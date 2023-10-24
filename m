@@ -2,78 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 020FB7D4386
-	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 02:00:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA9857D43CE
+	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 02:16:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230341AbjJXAAw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 20:00:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36354 "EHLO
+        id S231207AbjJXAQv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 20:16:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229510AbjJXAAu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 20:00:50 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76D15DC;
-        Mon, 23 Oct 2023 17:00:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698105648; x=1729641648;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rqLtEYc52ldeaBeaKpK8SUaczck2gWzp5TJSpCAbldg=;
-  b=kz5G4wSf3QPFnNc5ueoELYFzluRGfv50VNOHk91Ek3+tlWggl713Znmn
-   GBTjIu0tma4BtF1r8/qcspy3QiMRbQ02i0Z8XQboUHtXSjowAhkPtm6Zm
-   qkYc8vUOerVD4yoaqd21BcPppS6pNcgadkB01ug/s3jVweBJDf9uL3HcE
-   IEAXcwYSJI1fHr36Cd/OXCnVTMglWfyb0ro26IUoShgd6ahA8qioRpiLc
-   L0FHJ7dWnIt3ZCg4PLxce1yxIz6SfFjh3M2Li7EZ6Xmfho256e4S33fcL
-   RT2/uz4RUeXkfkTSAvLVzlcEgMjAnfAKBgg5kg0r3v9j5qg276Zr4BdY6
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="389799298"
-X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
-   d="scan'208";a="389799298"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 17:00:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="824115767"
-X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
-   d="scan'208";a="824115767"
-Received: from qwilliam-mobl.amr.corp.intel.com (HELO desk) ([10.212.150.186])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 17:00:46 -0700
-Date:   Mon, 23 Oct 2023 17:00:38 -0700
-From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Josh Poimboeuf <jpoimboe@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
-        ak@linux.intel.com, tim.c.chen@linux.intel.com,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        antonio.gomez.iglesias@linux.intel.com
-Subject: Re: [PATCH 2/6] x86/entry_64: Add VERW just before userspace
- transition
-Message-ID: <20231024000038.7zmaydklgf5ahbxq@desk>
-References: <20231020-delay-verw-v1-0-cff54096326d@linux.intel.com>
- <20231020-delay-verw-v1-2-cff54096326d@linux.intel.com>
- <20231023183521.zdlrfxvsdxftpxly@treble>
- <20231023210410.6oj7ekelf5puoud6@desk>
- <20231023214752.2d75h2m64yw6qzcw@treble>
- <20231023223059.4p7l474o5w3sdjuc@desk>
- <18da71ef-8586-400f-ae71-6d471f2fedcb@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <18da71ef-8586-400f-ae71-6d471f2fedcb@intel.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        with ESMTP id S229679AbjJXAQt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 20:16:49 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B45C2110
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 17:16:47 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1c9b774f193so32920375ad.0
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 17:16:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698106607; x=1698711407; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=T6ALsOVdAlXxureR7/QG1Tl27zbxYFHpyn+YFicZdFw=;
+        b=i9HwRcdQ9Snto35wwaub/NWGrf4zhl8z+CwyN/hcPoeChICO78mEZyINA1Gg5i198B
+         qxxJF1mcm9UmfSGhTrI9E4UZqF1PUnooB7bxayu11gUCI9ChoqrrSRTNoJ+/xc/EGVvo
+         zv6jxeZP1oHGSgL7uSqcxf1aSdc19JqNpRvfuED76VZr6Z7cPIHC9vrj3/PF2GiKDCEO
+         lkPaNohK2gr0eivBcxP48FqktbbnXh1pu7F7labgzNDjuKo5M7REutWAlynSYpL8hpHC
+         0UP3oYdEDNWYhvVSpKjVv6PLfGgHtgKl0LIHRzKaarUPofqhTY5/ze38tQ3Vk25Hiw8Y
+         He8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698106607; x=1698711407;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=T6ALsOVdAlXxureR7/QG1Tl27zbxYFHpyn+YFicZdFw=;
+        b=tNxDcW5/d4/kDbfAh3ClKFc+MIFb+tfRuihp4EgAVRsCoOw3DJhBuWGci/5yhvFUfr
+         m+T71lxyikh34RYOBoSMqs1rrhKhTMExAhHaW0UUPAVT93hl6XctypxJn6oCU6wWGCc/
+         DiJwWX+yh8nECSAPN8DWI5uKJ0r0L4RS5KAk2LW8nq1eG+VjA+revRB2uQhBdfQWcc57
+         JJqcAUMCnNuldBubN3TuGPDCWd1/NTfwPFRRNXh9/iHXoK93JwBzG6l/1N8DZSGFOUH7
+         JUPixJtBT6Bu7FoiTOXImNYv5pCoVndYbO+aThWxSHxqkhkv7pjwgs5iGkaBBzygHQyf
+         H4fA==
+X-Gm-Message-State: AOJu0YwNzHzndsKFhi20Vh/a20ZFKX2nq7g7e6pzK84oT456hbvB7Csi
+        Fc/vkazVvlbsbb82avSKusQpYBCWBAh5SvFvng2A+fRXSSwiXp/1g+XjDWGkpfe7Hflms6kSQ0J
+        RbyVc+g+ma617D/k+B46W4qg0DTAEF+kkGdN5bJHHdAkqA4WuL1Z84FLHFgWS9Xo=
+X-Google-Smtp-Source: AGHT+IFDCMmMrkqcHkV/IvrXQJsoF6mLgyYuQOcv/2eqAiN+SXhRfmuUXJSzhGqA+xfyOTY6AsU9aSipfADbnw==
+X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
+ (user=jmattson job=sendgmr) by 2002:a17:902:7fc6:b0:1c9:e830:15fa with SMTP
+ id t6-20020a1709027fc600b001c9e83015famr187346plb.0.1698106606998; Mon, 23
+ Oct 2023 17:16:46 -0700 (PDT)
+Date:   Mon, 23 Oct 2023 17:16:35 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.758.gaed0368e0e-goog
+Message-ID: <20231024001636.890236-1-jmattson@google.com>
+Subject: [PATCH 1/2] KVM: x86: Advertise CPUID.(EAX=7,ECX=2):EDX[5:0] to userspace
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "'Paolo Bonzini '" <pbonzini@redhat.com>,
+        "'Sean Christopherson '" <seanjc@google.com>
+Cc:     Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,50 +67,117 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 23, 2023 at 03:45:41PM -0700, Dave Hansen wrote:
-> On 10/23/23 15:30, Pawan Gupta wrote:
-> >>>>>  	/*
-> >>>>>  	 * iretq reads the "iret" frame and exits the NMI stack in a
-> >>>>>  	 * single instruction.  We are returning to kernel mode, so this
-> >>>> This isn't needed here.  This is the NMI return-to-kernel path.
-> >>> Yes, the VERW here can be omitted. But probably need to check if an NMI
-> >>> occuring between VERW and ring transition will still execute VERW after
-> >>> the NMI.
-> >> That window does exist, though I'm not sure it's worth worrying about.
-> > I am in favor of omitting the VERW here, unless someone objects with a
-> > rationale. IMO, precisely timing the NMIs in such a narrow window is
-> > impractical.
-> 
-> I'd bet that given the right PMU event you could make this pretty
-> reliable.  But normal users can't do that by default.  That leaves the
-> NMI watchdog which (I bet) you can still time, but which is pretty low
-> frequency.
-> 
-> Are there any other NMI sources that a normal user can cause problems with?
+The low five bits {INTEL_PSFD, IPRED_CTRL, RRSBA_CTRL, DDPD_U, BHI_CTRL}
+advertise the availability of specific bits in IA32_SPEC_CTRL. Since KVM
+dynamically determines the legal IA32_SPEC_CTRL bits for the underlying
+hardware, the hard work has already been done. Just let userspace know
+that a guest can use these IA32_SPEC_CTRL bits.
 
-Generating recoverable parity check errors using rowhammer? But, thats
-probably going too far for very little gain.
+The sixth bit (MCDT_NO) states that the processor does not exhibit MXCSR
+Configuration Dependent Timing (MCDT) behavior. This is an inherent
+property of the physical processor that is inherited by the virtual
+CPU. Pass that information on to userspace.
 
-> Let's at least leave a marker in here that folks can grep for:
-> 
-> 	/* Skip CLEAR_CPU_BUFFERS since it will rarely help */
+Signed-off-by: Jim Mattson <jmattson@google.com>
+---
+ arch/x86/kvm/cpuid.c         | 21 ++++++++++++++++++---
+ arch/x86/kvm/reverse_cpuid.h | 12 ++++++++++++
+ 2 files changed, 30 insertions(+), 3 deletions(-)
 
-Sure.
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index c134c181ba80..e5fc888b2715 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -677,6 +677,11 @@ void kvm_set_cpu_caps(void)
+ 		F(AMX_COMPLEX)
+ 	);
+ 
++	kvm_cpu_cap_init_kvm_defined(CPUID_7_2_EDX,
++		F(INTEL_PSFD) | F(IPRED_CTRL) | F(RRSBA_CTRL) | F(DDPD_U) |
++		F(BHI_CTRL) | F(MCDT_NO)
++	);
++
+ 	kvm_cpu_cap_mask(CPUID_D_1_EAX,
+ 		F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | F(XSAVES) | f_xfd
+ 	);
+@@ -957,13 +962,13 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 		break;
+ 	/* function 7 has additional index. */
+ 	case 7:
+-		entry->eax = min(entry->eax, 1u);
++		max_idx = entry->eax = min(entry->eax, 2u);
+ 		cpuid_entry_override(entry, CPUID_7_0_EBX);
+ 		cpuid_entry_override(entry, CPUID_7_ECX);
+ 		cpuid_entry_override(entry, CPUID_7_EDX);
+ 
+-		/* KVM only supports 0x7.0 and 0x7.1, capped above via min(). */
+-		if (entry->eax == 1) {
++		/* KVM only supports up to 0x7.2, capped above via min(). */
++		if (max_idx >= 1) {
+ 			entry = do_host_cpuid(array, function, 1);
+ 			if (!entry)
+ 				goto out;
+@@ -973,6 +978,16 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 			entry->ebx = 0;
+ 			entry->ecx = 0;
+ 		}
++		if (max_idx >= 2) {
++			entry = do_host_cpuid(array, function, 2);
++			if (!entry)
++				goto out;
++
++			cpuid_entry_override(entry, CPUID_7_2_EDX);
++			entry->ecx = 0;
++			entry->ebx = 0;
++			entry->eax = 0;
++		}
+ 		break;
+ 	case 0xa: { /* Architectural Performance Monitoring */
+ 		union cpuid10_eax eax;
+diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
+index b81650678375..17007016d8b5 100644
+--- a/arch/x86/kvm/reverse_cpuid.h
++++ b/arch/x86/kvm/reverse_cpuid.h
+@@ -16,6 +16,7 @@ enum kvm_only_cpuid_leafs {
+ 	CPUID_7_1_EDX,
+ 	CPUID_8000_0007_EDX,
+ 	CPUID_8000_0022_EAX,
++	CPUID_7_2_EDX,
+ 	NR_KVM_CPU_CAPS,
+ 
+ 	NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
+@@ -46,6 +47,14 @@ enum kvm_only_cpuid_leafs {
+ #define X86_FEATURE_AMX_COMPLEX         KVM_X86_FEATURE(CPUID_7_1_EDX, 8)
+ #define X86_FEATURE_PREFETCHITI         KVM_X86_FEATURE(CPUID_7_1_EDX, 14)
+ 
++/* Intel-defined sub-features, CPUID level 0x00000007:2 (EDX) */
++#define X86_FEATURE_INTEL_PSFD		KVM_X86_FEATURE(CPUID_7_2_EDX, 0)
++#define X86_FEATURE_IPRED_CTRL		KVM_X86_FEATURE(CPUID_7_2_EDX, 1)
++#define KVM_X86_FEATURE_RRSBA_CTRL	KVM_X86_FEATURE(CPUID_7_2_EDX, 2)
++#define X86_FEATURE_DDPD_U		KVM_X86_FEATURE(CPUID_7_2_EDX, 3)
++#define X86_FEATURE_BHI_CTRL		KVM_X86_FEATURE(CPUID_7_2_EDX, 4)
++#define X86_FEATURE_MCDT_NO		KVM_X86_FEATURE(CPUID_7_2_EDX, 5)
++
+ /* CPUID level 0x80000007 (EDX). */
+ #define KVM_X86_FEATURE_CONSTANT_TSC	KVM_X86_FEATURE(CPUID_8000_0007_EDX, 8)
+ 
+@@ -80,6 +89,7 @@ static const struct cpuid_reg reverse_cpuid[] = {
+ 	[CPUID_8000_0007_EDX] = {0x80000007, 0, CPUID_EDX},
+ 	[CPUID_8000_0021_EAX] = {0x80000021, 0, CPUID_EAX},
+ 	[CPUID_8000_0022_EAX] = {0x80000022, 0, CPUID_EAX},
++	[CPUID_7_2_EDX]       = {         7, 2, CPUID_EDX},
+ };
+ 
+ /*
+@@ -116,6 +126,8 @@ static __always_inline u32 __feature_translate(int x86_feature)
+ 		return KVM_X86_FEATURE_CONSTANT_TSC;
+ 	else if (x86_feature == X86_FEATURE_PERFMON_V2)
+ 		return KVM_X86_FEATURE_PERFMON_V2;
++	else if (x86_feature == X86_FEATURE_RRSBA_CTRL)
++		return KVM_X86_FEATURE_RRSBA_CTRL;
+ 
+ 	return x86_feature;
+ }
+-- 
+2.42.0.758.gaed0368e0e-goog
 
-> and some nice logic in the changelog that they can dig out if need be.
-> 
-> But, basically it sounds like the logic is:
-> 
-> 1. It's rare to get an NMI after VERW but before returning to userspace
-> 2. There is no known way to make that NMI less rare or target it
-> 3. It would take a large number of these precisely-timed NMIs to mount
->    an actual attack.  There's presumably not enough bandwidth.
-
-Thanks for this.
-
-> Anything else?
-
-4. The NMI in question occurs after a VERW, i.e. when user state is
-   restored and most interesting data is already scrubbed. Whats left is
-   only the data that NMI touches, and that may or may not be
-   interesting.
