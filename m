@@ -2,77 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B9087D5CE3
-	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 23:07:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C62137D5E32
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 00:31:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344095AbjJXVH5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Oct 2023 17:07:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37006 "EHLO
+        id S1344652AbjJXWbP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Oct 2023 18:31:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232399AbjJXVH4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Oct 2023 17:07:56 -0400
-Received: from out-190.mta0.migadu.com (out-190.mta0.migadu.com [91.218.175.190])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5973810CE
-        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 14:07:54 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1698181672;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=fSyLTmEne5H15gCAbFAp7YdAG90zxia/5FU2XX1Ko80=;
-        b=SgF8VpK96lCgNxnxzktqS5kjoR4CnoHvdxy6ggkwkdubuJa8oX2IY9Bx9xGzPbjlqKwdQi
-        77iks9pC4t3xHic6WhHU6ZpJuNOS4vEODgaHJIvAPxr9frvkih/bh9j9Hz3/Gn6Cy6/Gel
-        rBN+jeWaoilfjELzlfFZayzJxa0r1yY=
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     kvmarm@lists.linux.dev
-Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH] KVM: arm64: Stop printing about MMIO accesses where ISV==0
-Date:   Tue, 24 Oct 2023 21:07:39 +0000
-Message-ID: <20231024210739.1729723-1-oliver.upton@linux.dev>
+        with ESMTP id S1344650AbjJXWbE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Oct 2023 18:31:04 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 458954215;
+        Tue, 24 Oct 2023 15:29:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=2y2E9U9ipcgqhNemTPgdJ7dGCY1z+qxFK9VqKODRjRo=; b=AIVvGuDOZDBlSOZMDm37tlTcVB
+        iWdWJIn5mVyXVRVywL4LmGqSiYgqTah0ThEPD5lPkPpfEIS4oEif75HlfBbjsIyTK01VjqEZ7lFLX
+        sx67Gi1Bn09SV/zwnsTVPinsuc29Q5++wXmfgwFrVOg87ED8y15gqxcoh7ZH3i64t9yuZBPIgxp9G
+        /D0Fu8diM9tnsMNJbheKLh/9Uor+QRdDWEOqh0MTJ8m/PycUugwRN0oFtT5lOhKEJvGdJwgy1e9Q2
+        SBLBGJiHPkLgD3VC5BQOX5U1Tgq4WQ53VlwPFbmrXfbNhLDrITFI8sw61xJQm/XI7q1Sa/9/NEJF6
+        78f95d8w==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qvPt7-0054rI-LD; Tue, 24 Oct 2023 22:28:37 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 3FBED300451; Wed, 25 Oct 2023 00:28:37 +0200 (CEST)
+Date:   Wed, 25 Oct 2023 00:28:37 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     "H. Peter Anvin" <hpa@zytor.com>
+Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
+        ak@linux.intel.com, tim.c.chen@linux.intel.com,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        antonio.gomez.iglesias@linux.intel.com,
+        Alyssa Milburn <alyssa.milburn@intel.com>, song@kernel.org
+Subject: Re: [PATCH  v2 1/6] x86/bugs: Add asm helpers for executing VERW
+Message-ID: <20231024222837.GH33965@noisy.programming.kicks-ass.net>
+References: <20231024-delay-verw-v2-0-f1881340c807@linux.intel.com>
+ <20231024-delay-verw-v2-1-f1881340c807@linux.intel.com>
+ <20231024103601.GH31411@noisy.programming.kicks-ass.net>
+ <20231024163515.aivo2xfmwmbmlm7z@desk>
+ <20231024163621.GD40044@noisy.programming.kicks-ass.net>
+ <20231024164520.osvqo2dja2xhb7kn@desk>
+ <20231024170248.GE40044@noisy.programming.kicks-ass.net>
+ <DD2F34A0-4F2F-4C8C-A634-7DBEF31C40F0@zytor.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DD2F34A0-4F2F-4C8C-A634-7DBEF31C40F0@zytor.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It is a pretty well known fact that KVM does not support MMIO emulation
-without valid instruction syndrome information (ESR_EL2.ISV == 0). The
-dmesg is useless as it provides zero context and just winds up polluting
-logs. Let's just delete it.
+On Tue, Oct 24, 2023 at 11:27:36AM -0700, H. Peter Anvin wrote:
 
-Any userspace that cares should just use KVM_CAP_ARM_NISV_TO_USER, which
-inherently ties to a vCPU context.
+> the only overhead to modules other than load time (including the
+> runtime linking) is that modules can't realistically be mapped using
+> large page entries.
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/mmio.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-index 3dd38a151d2a..a53721be32ec 100644
---- a/arch/arm64/kvm/mmio.c
-+++ b/arch/arm64/kvm/mmio.c
-@@ -143,7 +143,6 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 			return 0;
- 		}
- 
--		kvm_pr_unimpl("Data abort outside memslots with no valid syndrome info\n");
- 		return -ENOSYS;
- 	}
- 
-
-base-commit: 6465e260f48790807eef06b583b38ca9789b6072
--- 
-2.42.0.758.gaed0368e0e-goog
-
+Song is working on that. Currently the module allocator is split between
+all (5 IIRC) different page permissions required, next step is using
+large page pools for those.
