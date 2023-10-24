@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7216B7D4926
-	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 09:58:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90D247D49B7
+	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 10:15:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232832AbjJXH6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Oct 2023 03:58:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54128 "EHLO
+        id S233537AbjJXIPy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Oct 2023 04:15:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232004AbjJXH6a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Oct 2023 03:58:30 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B073BF9
-        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 00:58:28 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-6b1ef786b7fso3984142b3a.3
-        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 00:58:28 -0700 (PDT)
+        with ESMTP id S233787AbjJXHzY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Oct 2023 03:55:24 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D07BF122
+        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 00:55:22 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id 41be03b00d2f7-5ad5178d1bfso3052346a12.2
+        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 00:55:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1698134307; x=1698739107; darn=vger.kernel.org;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1698134122; x=1698738922; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
         bh=o1OkbJmnnWIN+URdErn5nNacnovVGr3BkRnPR6Q0V5U=;
-        b=OMRE2IqRBbw25zNawQnNgPYMGyOHVpjZUd09goHOHuk4PhhLG8BSXjUhAyAyY+8sb5
-         fEG2R9CvSrmAATDwRofIhVsSOKYAbzRiTWTK0T5fzOGWAxM0IU+9uock1GluL5cBxXHu
-         b/DC3PK10utkHsQHQtHdSpROzVMceraktf9fze0f2olNUd+TXLI3NE4ruAoPDbTFg32F
-         6wm0jNNN2QHfDIjVFOBKYEuWc27e/ti7oKBxymyz4z8xwNLqL9aKIJK40o2Vib7COe1v
-         88u5oXmvSFhkBLA8fHp9IbTXgX/Ce8GEvazjthhAmQ9iYliNUwwCfwJaHI6RRQuBhcAZ
-         GcMQ==
+        b=O8K+DdLkZHdR7Fc5qp2H2pz+uipK/2SrQYSG8p3n2FOto+31ZGAzIEbPhU20yGvz13
+         oqfPzV/Qc7OIWK5lTNYtnV5wmqd+al9Di7OGdwBdyDGF17dgnc0cE9nyPlH+cZBeS8Pb
+         +i145TLJR/a9PDisZ7vXiMNGb7LHTIbPtfJG/XREwGP4/4LBEyx2GgdmS1TsJk46STHT
+         iyBhXf0TjyDK+GecALRE9G6Vwah2Qr/hWqVrwXC/3f2mG9nQ1y54F28EkPAVwyorPQB1
+         5daQUaB2ITax4EPhwZjkkXTMrmyvBGTkR6zdDvijNbyrYUzUPLRuOaSS7otdFule4K71
+         hWlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698134307; x=1698739107;
+        d=1e100.net; s=20230601; t=1698134122; x=1698738922;
         h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
         bh=o1OkbJmnnWIN+URdErn5nNacnovVGr3BkRnPR6Q0V5U=;
-        b=WAc8bi4sjA4oVDVBpW0viVARWj8yhq1Sqw/vMDvfQ/i9JiHduKXlDE5uqjUc2Q07at
-         nET/0OvO7sZ2S+dDsmVLTO9Odd443ieqLgtX3wPcbKNjR6OkJgHcSuyUbmjieZTKHcr3
-         VDn6MIlkLou2AfvtqbYEEjhHTWjOvXtd3tdMU/w5Un7bnr0YdZH8waE+lACeNgiBVlpd
-         uONSA/hnwpegDkQekd0ssA49qLsAPh+zT7Yp1l6eVXda+cyaMWjNDfKnDBvAacEEXTAh
-         biHD5AOs1xEI1BVf6uC3mb1mBhk/+tqPEgKM576v6EgNV6nwGuLCe4ZVXPS8EPNeeFGb
-         i72A==
-X-Gm-Message-State: AOJu0Yx/8UVd4uwbKmHFOhHZIw7tu0ynAD/JI1XsG1FoqIlzEMTSXNNi
-        i0DEnnv0CVgQR9l5qSO9n7BGFs1jVIxi1RMvtGEg7A==
-X-Google-Smtp-Source: AGHT+IHujAxpgpw9wbNA1CwPmU/3W4N3q9iKAKZQRIibVXnvzF07J1tET+EdvVoKB8bEcR5UPxiBOjyMzWn8TUledPg=
-X-Received: by 2002:a05:6a20:6a1d:b0:14d:f41c:435a with SMTP id
- p29-20020a056a206a1d00b0014df41c435amr2038421pzk.39.1698134307067; Tue, 24
- Oct 2023 00:58:27 -0700 (PDT)
+        b=Zns0QKr3D4SR33a8hVok3MmvyV1IUKOeUt0AZd0SvvO6HxuVhVM+k+Domk8QquX4Tj
+         iO+zFge40ctruBpbnPszD7YjKdW8eI0XvWHyjtQwMBZy1ffFUplDFIc8MirMyeEQqokg
+         Pf/Z26tQyRndHAY2MOt2xfrbyJbYuhferTv0mcJ4CiyVHq0++XvLOsSh5Iei/dIP0TVt
+         Hbwb/4/sqFqA0hMtmYhMNDUOrEfo7tL+QRjUPdA98g3XzH73q/IV9xyop+26wtCaH2aJ
+         og1t3z6YqcdYby5LmH/qO6BhJfpzLeTEPIP0X+Gaay6VeJORbTuGkW1sl8A1cPk8z90P
+         cY7w==
+X-Gm-Message-State: AOJu0Yy0f8rkniNRT/Oc9B/v3/ip5W/M2iZjx+ePJ/ApLkwVXw23BRWN
+        LYVBLWgOZ2advgeQPnPUCBTT76QHyb+ckUQWHI5iGEjGtfOX+KF5LAA=
+X-Google-Smtp-Source: AGHT+IESe7yLkYn4jHtaeEJUILf4yttqOK3b1t5e2moa34SyCMsGt2bc8wSXfYGQfzjaQgUOGClTATr8/JZzduHM9YQ=
+X-Received: by 2002:a05:6a20:729e:b0:15e:bb88:b76e with SMTP id
+ o30-20020a056a20729e00b0015ebb88b76emr2006406pzk.14.1698134122184; Tue, 24
+ Oct 2023 00:55:22 -0700 (PDT)
 MIME-Version: 1.0
 From:   Anup Patel <anup@brainfault.org>
-Date:   Tue, 24 Oct 2023 13:28:16 +0530
-Message-ID: <CAAhSdy2dg61z7=vsrOqwxHoV1GBvaAzcdUY4o6pLmTNM0WV5ig@mail.gmail.com>
-Subject: [GIT PULL] KVM/riscv changes for 6.7
+Date:   Tue, 24 Oct 2023 13:25:10 +0530
+Message-ID: <CAAhSdy2p0h8i=GPBx+=ZJVr_PSwOHhTqanJQmOc0O0bw1ffrmw@mail.gmail.com>
+Subject: KVM/riscv changes for 6.7
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
         Palmer Dabbelt <palmer@rivosinc.com>,
@@ -61,7 +61,7 @@ Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
         linux-riscv <linux-riscv@lists.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
