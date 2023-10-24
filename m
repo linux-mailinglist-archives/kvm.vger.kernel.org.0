@@ -2,84 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 338487D4E0A
+	by mail.lfdr.de (Postfix) with ESMTP id 0B5C07D4E09
 	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 12:37:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234140AbjJXKhE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Oct 2023 06:37:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47050 "EHLO
+        id S234210AbjJXKhG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Oct 2023 06:37:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231851AbjJXKhD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Oct 2023 06:37:03 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03283E5;
-        Tue, 24 Oct 2023 03:36:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=KYIweJyPgr9jAYgFFkbgWAnl0FwkE/8DRBNzonPBpYs=; b=EvGpMu9X6nvshe85ULHBCy5v/f
-        C9JgwzXXscrhZXKuDcpU31k+pwk8Xm15cBQsSR9Q6fjRNN2uOWnCjDya2gRvha5K5qoSZUq6iafSb
-        wkyDZ8aM2xJCPR/UqcplUsQuezVo+KNxc0LYsjSiLU2reYFfzjkTDUbutGKaqrg85T7w85/nrVInl
-        UKuPLvzxP6YocbkDMLeWXfpylzjGF1/rNATP/3fk3gFOA2FwvtkXo7ZXnXOgbwETduTvsFqRk8RaL
-        ObomnPC3uKC/KSGTznkeClCRgJ/qVDVyJe3bLutna/bZDDns3H3f3pVakwlHIGzK9df1n6wAnYNQa
-        Tlj/SGng==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qvElX-00FR15-11;
-        Tue, 24 Oct 2023 10:36:03 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-        id D6FCA300392; Tue, 24 Oct 2023 12:36:01 +0200 (CEST)
-Date:   Tue, 24 Oct 2023 12:36:01 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
-        ak@linux.intel.com, tim.c.chen@linux.intel.com,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        antonio.gomez.iglesias@linux.intel.com,
-        Alyssa Milburn <alyssa.milburn@intel.com>
-Subject: Re: [PATCH  v2 1/6] x86/bugs: Add asm helpers for executing VERW
-Message-ID: <20231024103601.GH31411@noisy.programming.kicks-ass.net>
-References: <20231024-delay-verw-v2-0-f1881340c807@linux.intel.com>
- <20231024-delay-verw-v2-1-f1881340c807@linux.intel.com>
+        with ESMTP id S234017AbjJXKhE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Oct 2023 06:37:04 -0400
+Received: from out-208.mta1.migadu.com (out-208.mta1.migadu.com [IPv6:2001:41d0:203:375::d0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F2D3E9
+        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 03:37:02 -0700 (PDT)
+Date:   Tue, 24 Oct 2023 10:36:55 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1698143820;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=RaUc/Jh4+pZIFR1fAHzmEjaXtHZw7YWxzJm5LgrjjuY=;
+        b=WU3amu7+Q5EXmgP9gUt1h0OgzkOD7zhq9OHo9UNenhwInKHnBObC/0S5S+UVCgnt9ovhYQ
+        jy9NQY1SpdyoSGenZuSPFLA30au1dorNNAfSfueDjGgghHaWHvXeZLTt73DcLS1qya06pe
+        /ILtcar6fYZy/j4RNgVsRgm/VwQ4KQI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Shaoqin Huang <shahuang@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v8 13/13] KVM: selftests: aarch64: vPMU test for
+ immutability
+Message-ID: <ZTeeR7xHmMELgVGZ@linux.dev>
+References: <20231020214053.2144305-1-rananta@google.com>
+ <20231020214053.2144305-14-rananta@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231024-delay-verw-v2-1-f1881340c807@linux.intel.com>
+In-Reply-To: <20231020214053.2144305-14-rananta@google.com>
+X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 24, 2023 at 01:08:21AM -0700, Pawan Gupta wrote:
+On Fri, Oct 20, 2023 at 09:40:53PM +0000, Raghavendra Rao Ananta wrote:
+> KVM marks some of the vPMU registers as immutable to
+> userspace once the vCPU has started running. Add a test
+> scenario to check this behavior.
+> 
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 
-> +.macro CLEAR_CPU_BUFFERS
-> +	ALTERNATIVE "jmp .Lskip_verw_\@;", "jmp .Ldo_verw_\@", X86_FEATURE_CLEAR_CPU_BUF
-> +		/* nopl __KERNEL_DS(%rax) */
-> +		.byte 0x0f, 0x1f, 0x80, 0x00, 0x00;
-> +.Lverw_arg_\@:	.word __KERNEL_DS;
-> +.Ldo_verw_\@:	verw _ASM_RIP(.Lverw_arg_\@);
-> +.Lskip_verw_\@:
-> +.endm
+Now that PMCR_EL0.N is the only thing that's getting the immutability
+treatment this patch fails. I'll probably drop it.
 
-Why can't this be:
-
-	ALTERNATIVE "". "verw _ASM_RIP(mds_verw_sel)", X86_FEATURE_CLEAR_CPU_BUF
-
-And have that mds_verw_sel thing be out-of-line ? That gives much better
-code for the case where we don't need this.
+-- 
+Thanks,
+Oliver
