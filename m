@@ -2,87 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 00B667D5081
-	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 14:59:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FBAB7D50F5
+	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 15:06:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234480AbjJXM7O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Oct 2023 08:59:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52530 "EHLO
+        id S234700AbjJXNGa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Oct 2023 09:06:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234346AbjJXM7N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Oct 2023 08:59:13 -0400
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4C4690
-        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 05:59:11 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-40842752c6eso35549335e9.1
-        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 05:59:11 -0700 (PDT)
+        with ESMTP id S234400AbjJXNGK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Oct 2023 09:06:10 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5422B4EDC
+        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 06:04:21 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so12503a12.0
+        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 06:04:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698152350; x=1698757150; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/Fv2AY0PfohaOR9XcU+8ZQ81rKPOWLOMFyddNbcLYLA=;
-        b=NyLBibkdNYzDa6k9cqeHV7vyhTpy3gEU6vEKe7GF6lzPwBpvR5mYHOLBRHocnBlmGz
-         1r5lLouhfoqXziNavEeqHwesLyowSmCJrQjvcTRRFz95QNMxwJNTk8GAeUGUrlhI7xyi
-         YVmTST+Gv9vBUWmvpUQsHihF+JzB8dp+eMfLEfX16HEgOkbVb9dP6WyMwzCZd58TpZww
-         sbS4vV0RJremx7kyPNvlw81uqpL19H6E2IS4mtmrWVWkEfFoLQ80dpOOXxCeykqgryZX
-         GFth4nn22g4O3dAFqJPcjgki6JYRY8N9yNBEvHdfMGaG+OI030WciPs0xaRZX4oJDN1W
-         B0Aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698152350; x=1698757150;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1698152659; x=1698757459; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/Fv2AY0PfohaOR9XcU+8ZQ81rKPOWLOMFyddNbcLYLA=;
-        b=LAglNHMxFB1/n/A5JVqnev5kXKoTxPOGV94g1LqL1u4zmiaqqZTGKBB+67mFhjYzBS
-         tV2awFX1aMxkZeeQKEjGwg3rtE1QSTUp1iHGuecPGxgmeTnqb9SlecXgCsKlU/B6/jj+
-         nVGVUgmN1DwswDBZE0QwxA9i2J9n4Z4skeaQ7SJsKfnmfC5N01rwa7r/v18CqXCp6Ju6
-         OMQ8vtKJgAHNJdfR+Ea9BTGBNwAdSTG4JyiMT7BrePpVAwrqocdQ9+Kmz+BEoJZHAljQ
-         nlvPwfNxCnkh7+78AmQ4+NtTouczHuHGbp0pUxoMj7+lpS8ZYXaeC+xVYCZKcdtM+liY
-         F1Cw==
-X-Gm-Message-State: AOJu0YzpaM7qumSd25QXwQ+KmwXYbkFkZdnmTzqzc8RphOW7xuG5gisA
-        /7SCP8mq/KC2qj6eaGrY0YE=
-X-Google-Smtp-Source: AGHT+IHO2khmsIcOqOzMGxdA5Ej9PMASd96m2EkszFQX+E0xL93HsityPlswigSIsmJsJG7LwrKmlw==
-X-Received: by 2002:a05:600c:5252:b0:408:389d:c22e with SMTP id fc18-20020a05600c525200b00408389dc22emr9189363wmb.25.1698152350138;
-        Tue, 24 Oct 2023 05:59:10 -0700 (PDT)
-Received: from [192.168.6.66] (54-240-197-230.amazon.com. [54.240.197.230])
-        by smtp.gmail.com with ESMTPSA id az20-20020a05600c601400b004054dcbf92asm11888555wmb.20.2023.10.24.05.59.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Oct 2023 05:59:08 -0700 (PDT)
-From:   Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <55bb6967-9499-45ef-b4c8-00fbfaccef0d@xen.org>
-Date:   Tue, 24 Oct 2023 13:59:07 +0100
+        bh=OoQb6YlfPBjYIy3Wpkmla/gijk8pUtPjEu2M/l2EG1U=;
+        b=umo0shyXRoOFhkvA5hTFCzgDIWSdxyXl3iBy9BEtCi3THojvIG9saT1n3NW9W8Lhws
+         C3y6SlVPsCXjNJqRN141eOJ4HSyQ1J6pjpsemSkucM4IWK5axUPiEHDnpx+1/bxK1B9W
+         e/u15OlTzkqqW+ZMQdVd6FMWGniW/hSH4q/39UIvDR2gH0CoCM7lq2UfQ5LVs/msYugX
+         NNQyR2vMtfmmJyOOO4f+t5f3UZ7zDJJJdbS+bGO56H2v5fRCr+of4lZkCDHmlQkM1iNx
+         /A16e4BlUJZP4+09slt0uzyt4593kInw0/sxfe+QV6ik9qoWdcIZk9TeKqALAtK3IJwa
+         k6rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698152659; x=1698757459;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OoQb6YlfPBjYIy3Wpkmla/gijk8pUtPjEu2M/l2EG1U=;
+        b=EVdxVaGapKSiVKruso3dITX7BGzWelrqEm+vQ2+7Q2CP7kkbYI64tJAnB6vaan0Gqf
+         RO/mWHP3XDxBFxMqBKC/U2wDzPoK6C7uBeQi9GleXF5VfAnImWKlBQeZfMSY3+IZdz/4
+         UHarAWBYVlgS95mKCDu2owwuEE6S6FaSM32eczBxAbfFwrV8/FyI3tVCZn/l30+tdY7V
+         pv3BLMi8SYvOJmFA1WqM/3fwXOX8pnc3cEMlXMD0Qq/WRtpUBGlzEhn1Y2NYae2eNG3V
+         VgdhuqMLSLLr+Prn2727vG2mY17XLyZBJtukMKRWLiySUzwHQbWqpa3IEg+R1bbrgpED
+         A1dg==
+X-Gm-Message-State: AOJu0Yxo7SgcV7nrChkXs3exhcWyH4BQTq8V8mn3OtR9hAkVZI1QqfC+
+        4kxGm/yf8AUome6Ld7ItbJ5u907nUM+PkSh0thu2kQ==
+X-Google-Smtp-Source: AGHT+IHHUEvBTRSqV64tSry+JE3ETQZUZKSAZ5x1xZ0zTNVhwA1XBFSWYOQzscm+T9fYeQZTqKRt9vNdTuLdje5x01o=
+X-Received: by 2002:aa7:c417:0:b0:540:9f5c:9a0d with SMTP id
+ j23-20020aa7c417000000b005409f5c9a0dmr69803edq.1.1698152659489; Tue, 24 Oct
+ 2023 06:04:19 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH 06/12] hw/xen: add get_frontend_path() method to
- XenDeviceClass
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>, qemu-devel@nongnu.org
-Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcelo Tosatti <mtosatti@redhat.com>, qemu-block@nongnu.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org
-References: <20231016151909.22133-1-dwmw2@infradead.org>
- <20231016151909.22133-7-dwmw2@infradead.org>
- <5ef43a7c-e535-496d-8a14-bccbadab3bc0@xen.org>
- <d43b900a6c7987c6832ceeede9b4c5ab65d5bacd.camel@infradead.org>
-Organization: Xen Project
-In-Reply-To: <d43b900a6c7987c6832ceeede9b4c5ab65d5bacd.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+References: <20231024075748.1675382-1-dapeng1.mi@linux.intel.com> <20231024075748.1675382-3-dapeng1.mi@linux.intel.com>
+In-Reply-To: <20231024075748.1675382-3-dapeng1.mi@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 24 Oct 2023 06:03:58 -0700
+Message-ID: <CALMp9eRqGr+5+C1OLhxv1i8Q=YVRmFxkZQJoh7HzWkPg2z=WoA@mail.gmail.com>
+Subject: Re: [kvm-unit-tests Patch 2/5] x86: pmu: Change the minimum value of
+ llc_misses event to 0
+To:     Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhang Xiong <xiong.y.zhang@intel.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Dapeng Mi <dapeng1.mi@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -90,38 +76,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/10/2023 13:56, David Woodhouse wrote:
-> On Tue, 2023-10-24 at 13:42 +0100, Paul Durrant wrote:
->>
->>> --- a/hw/xen/xen-bus.c
->>> +++ b/hw/xen/xen-bus.c
->>> @@ -711,8 +711,16 @@ static void xen_device_frontend_create(XenDevice *xendev, Error **errp)
->>>     {
->>>         ERRP_GUARD();
->>>         XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
->>> +    XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
->>>     
->>> -    xendev->frontend_path = xen_device_get_frontend_path(xendev);
->>> +    if (xendev_class->get_frontend_path) {
->>> +        xendev->frontend_path = xendev_class->get_frontend_path(xendev, errp);
->>> +        if (!xendev->frontend_path) {
->>> +            return;
->>
->> I think you need to update errp here to note that you are failing to
->> create the frontend.
-> 
-> If xendev_class->get_frontend_path returned NULL it will have filled in errp.
-> 
+On Tue, Oct 24, 2023 at 12:51=E2=80=AFAM Dapeng Mi <dapeng1.mi@linux.intel.=
+com> wrote:
+>
+> Along with the CPU HW's upgrade and optimization, the count of LLC
+> misses event for running loop() helper could be 0 just like seen on
+> Sapphire Rapids.
+>
+> So modify the lower limit of possible count range for LLC misses
+> events to 0 to avoid LLC misses event test failure on Sapphire Rapids.
 
-Ok, but a prepend to say that a lack of path there means we skip 
-frontend creation seems reasonable?
+I'm not convinced that these tests are really indicative of whether or
+not the PMU is working properly. If 0 is allowed for llc misses, for
+instance, doesn't this sub-test pass even when the PMU is disabled?
 
-> As a general rule (I'll be doing a bombing run on xen-bus once I get my
-> patch queue down into single digits) we should never check 'if (*errp)'
-> to check if a function had an error. It should *also* return a success
-> or failure indication, and we should cope with errp being NULL.
-> 
+Surely, we can do better.
 
-I'm pretty sure someone told me the exact opposite a few years back.
-
-   Paul
+> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> ---
+>  x86/pmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/x86/pmu.c b/x86/pmu.c
+> index 0def28695c70..7443fdab5c8a 100644
+> --- a/x86/pmu.c
+> +++ b/x86/pmu.c
+> @@ -35,7 +35,7 @@ struct pmu_event {
+>         {"instructions", 0x00c0, 10*N, 10.2*N},
+>         {"ref cycles", 0x013c, 1*N, 30*N},
+>         {"llc references", 0x4f2e, 1, 2*N},
+> -       {"llc misses", 0x412e, 1, 1*N},
+> +       {"llc misses", 0x412e, 0, 1*N},
+>         {"branches", 0x00c4, 1*N, 1.1*N},
+>         {"branch misses", 0x00c5, 0, 0.1*N},
+>  }, amd_gp_events[] =3D {
+> --
+> 2.34.1
+>
