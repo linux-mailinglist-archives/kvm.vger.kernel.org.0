@@ -2,194 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 435C87D5A09
-	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 20:01:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76E297D5A11
+	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 20:04:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343767AbjJXSA7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Oct 2023 14:00:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53790 "EHLO
+        id S1343956AbjJXSEA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Oct 2023 14:04:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234315AbjJXSA4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Oct 2023 14:00:56 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2058.outbound.protection.outlook.com [40.107.94.58])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 132BD10D1;
-        Tue, 24 Oct 2023 11:00:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ne7CtE8CpNbTwXoetYNNoN0dQSGaVZKGUwsQ/pK4iSWlKF4gHtMDT+yFygt8cis4WBSZNZbB26ynV+IbmfRk+z1VnYHNsmS45cYZ0e/uLbDbZBRKkvODYyvjj7tGTx+Z6BoXnzZ+SCTqHKntGJdBlEO7R/crlNhpTJOu8YzLKXnkynfg1tx9nYJUjp9PimW6R5AMDFoJF7mfx14d8wRIrxF/e5HQipS8HwNbjzzDvLZW+oFd8vqiKFdtbsrL/BrL3i0WPZqyQ4RFTnsh99tP0glZSF6CMXIKMOx6NMIvlnKaDmqlqA6vYeTzgWdYUAmtKiC/1OavSoqDYNVqm4BKFw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=h81IwE47UPsu103y+Rz/TUfndpGhgKskObSAw4VXh2Q=;
- b=bIGeFBK0YDxyfyvTjZhQIgDqQtP36D239YF7V/cAj4gYfmnI/FemnE1ysvRjwwuMmKky4Qdst7PjSnM0oAe0wieGjx7CtCoQAPlD88DMFf69JKjBrUHoticpBOyvJW182/9lBhYEL8s+TVdqfoPEGjrf3rBJFHHeDBtOVQ41+StHOATJp52TUWdcjoSX07Saoczs4mN4FKB752WjBc1ZcBxTm6XX4gOpEyBApQIeV2dh8tFJAkTZ/XLSIIPI880annGRMDOMVX4PBwTvkBp3q/tC410TcHzbcoH39b3b3MsZPajadZuIDnEyXTQvZv2l+E4S57yg9xcadaR0illLLg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h81IwE47UPsu103y+Rz/TUfndpGhgKskObSAw4VXh2Q=;
- b=WF0uGx9T1Ad8MSMjjgHRA0s7JnG+ZnzebbRDu2IG5b1hp01nvSFROwzetKeaWHFxHbvlS5y4c9CTqdsdxicLrDPOqd6yRsAGOcI9cjdof3XzXgscZWmdHDbvxz+MLt7sUIynCBKjudybQkdP2Q2efWHTvsbSkWbxrd/gnHGma48bJ6bLTFehDG4RZgDes5gya1Fc8IlG09ukjy0YWLMOtLaFiwzHR0o+3T3XsVm7c8xKwsv45AqK3La0Bkxcj20e5dCj5gKt7+PZi9Wt0wuHadCKCDp2epk8VLfCwieuIIwXT9UG7B1g5Mu9eyKP+c+Jlww2jzSh85vWAkdDSbicoA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM4PR12MB6183.namprd12.prod.outlook.com (2603:10b6:8:a7::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Tue, 24 Oct
- 2023 18:00:50 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6886.034; Tue, 24 Oct 2023
- 18:00:50 +0000
-Date:   Tue, 24 Oct 2023 15:00:49 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Nicolin Chen <nicolinc@nvidia.com>
-Cc:     Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org,
-        alex.williamson@redhat.com, kevin.tian@intel.com,
-        robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
-        eric.auger@redhat.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        zhenzhong.duan@intel.com, joao.m.martins@oracle.com
-Subject: Re: [PATCH v6 07/10] iommufd: Add a nested HW pagetable object
-Message-ID: <20231024180049.GV3952@nvidia.com>
-References: <20231024150609.46884-1-yi.l.liu@intel.com>
- <20231024150609.46884-8-yi.l.liu@intel.com>
- <20231024171810.GO3952@nvidia.com>
- <ZTf+zWJE2qlgkf1M@Asurada-Nvidia>
- <20231024173139.GR3952@nvidia.com>
- <ZTgEApUgriFj1dKa@Asurada-Nvidia>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZTgEApUgriFj1dKa@Asurada-Nvidia>
-X-ClientProxiedBy: DS7PR03CA0026.namprd03.prod.outlook.com
- (2603:10b6:5:3b8::31) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S234854AbjJXSD6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Oct 2023 14:03:58 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B8D410E4
+        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 11:03:55 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2bbbe81185dso11679561fa.0
+        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 11:03:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1698170633; x=1698775433; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eEONOSfW6QqBefI1upMEyQojVOQZ6IVElQgRfFuaf7Y=;
+        b=Kp2x6i1b5ec2acOHd7yKUzc8wA3wbH9KadqSvUei3IOTJiXCY2oE16hGCiUjJZT/1V
+         ffQy7TDNWLBcXex8TsLBxuZNx9Z9hHt2F+cbwJDNiOQQ4vnZAbMo4UQYwfFHY/gYoHUB
+         z2sSDaEm1eDcMVGNdg7ee2/oQqZnCyP10MODkyr0A/U2rKLtK54/zFgvgVX1CgCnTD7L
+         XE6APjrvBBNmzMuwrZqS//o3tO2NRL+7W30UFaVKuebBipcVu01QMmhgfETGJFQdpySJ
+         OkLPlIC7RN/JuwFH+aK8mXcl753g2ffLoYzt3zivOsT+1kErtK4ZlK39bK0WPSK1l2tU
+         I5EA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698170633; x=1698775433;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eEONOSfW6QqBefI1upMEyQojVOQZ6IVElQgRfFuaf7Y=;
+        b=Vnd3HnQaQ9l1V4QAL13O2j45mKcScL9lmjQBH+YNgFcICrJLSlccXhZvX1p/I6umGW
+         HfLCEes0x9k7g3qk/xKFbz/UU5sYCKZIY5HP2slXV/P0qEUkuinoCGMX+AxICM7XNCCG
+         eaaCxZysldEz3bz/erpu79C/DRN/rMC73FyTpoBT7eMFVGDSO3AIfnLSe+AYb/VLJw3Q
+         bszMNO6gSxdWlQjaZ5NZZNw2q5LwGgzbOJtGD2AWdAH4lZe0EKPLpo8wA47aCg+NPNP6
+         zAr6Ysa+BLjDimjTCyI//VZ9LlQiGB4C+UnmJIN2cmAzEGXZE4iVzehNyZ4VMFQDbdM+
+         TqHQ==
+X-Gm-Message-State: AOJu0YxjdDfv+reVIu1p7c5bV2/MnUK9MYZhCcepHGIsRGAvcUWwQm6p
+        tmXH7CASvn/XPTO3t3O0v5Vyaw==
+X-Google-Smtp-Source: AGHT+IHG9OjT799vBD3twtVwoDjSUtel3HWPnH4sumZmGMlI+6kjh9AOjNTruwRaRqCbCawkAtVdGA==
+X-Received: by 2002:a2e:a179:0:b0:2bc:d505:2bf3 with SMTP id u25-20020a2ea179000000b002bcd5052bf3mr8734627ljl.1.1698170633475;
+        Tue, 24 Oct 2023 11:03:53 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:999:a3a0:9f43:3ca4:162c:d540? ([2a01:e0a:999:a3a0:9f43:3ca4:162c:d540])
+        by smtp.gmail.com with ESMTPSA id n1-20020a5d4001000000b0032dc1fc84f2sm10498034wrp.46.2023.10.24.11.03.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Oct 2023 11:03:52 -0700 (PDT)
+Message-ID: <da308888-0e47-4ca4-b318-8f089421dc0b@rivosinc.com>
+Date:   Tue, 24 Oct 2023 20:03:52 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB6183:EE_
-X-MS-Office365-Filtering-Correlation-Id: ff170bbe-b645-4790-f434-08dbd4bb287d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: C/W3ofa6Y7x+Nj5DdsrTYV+7lyuHP7Os8O8GhGCrMqCvAtgAuP3lazaQml5NC/4H18BNU0oAZ5TYiqkTjtFpgFebdZ8jwaobT/kwz3VKWnr+x+zIB4UAoIsxhapoNzQTQTAGmA6WjjWhxxVQwGSxcsvqMaLlX0koEK9I1gfEzbSoQwVNSEYa7BIUKtc6H0OcQ/nyJmZznnbjcf5l2DMOv6W2ehaDAhru0b8B2N9HVWMukBDasqlUnULzGzp/fOK4gCQmX0SpSbG+ITedRU9o/lwvb0/f1jT+QLfCrPltDWQbejSL3DqsA0uJmVDbKkNW1geQ/G01ukQtrmkrpdBLfxPCP81/gvxhD8U81ZkdNT+R+K0jOTCHQMPHOpy7eo3nMmgDpg8iLJCLTXbOwYTWeWCxOR1f4P0LkkW8qUtIcnFxmRxPmy2uRNpGuQEwvLXHUKSHErsAvkMqEkQ1ki9glgNfu73TsOKYD1of36cOB+0wp2vJrbGZnJRP8MT/zxAyztCCNKONqaZj1KCbkeB4b7tP9Y0mj1w8lB1YwBJtANqlEM7PPIULna+5a+svmPSg
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(366004)(136003)(39860400002)(396003)(230922051799003)(1800799009)(186009)(451199024)(64100799003)(83380400001)(8676002)(1076003)(6862004)(4326008)(6506007)(5660300002)(26005)(2616005)(41300700001)(8936002)(6512007)(66899024)(316002)(66556008)(37006003)(66476007)(6636002)(66946007)(38100700002)(2906002)(478600001)(36756003)(33656002)(86362001)(6486002)(7416002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?UaK520VtGfTQ8gU39+F0qInySY2TdLajjjCyI1t29WVv7Ux91+CEGKL/O1jf?=
- =?us-ascii?Q?3EtYk+8tnaoH5LEci4Nq4GK6tSAIwPOsHPiHiJQ4IKIDPPM1QtIXYXK0bO6J?=
- =?us-ascii?Q?LffkopjKF3k7dolKgVpE6OYoTIv2jDZAljf7UbMjoH/wVDTClqFf7OXSVeTZ?=
- =?us-ascii?Q?Jw4MlrwcMtBRNvBqa/FWa8JDEMWSIYshoShGZtRteyPbqZLr6qKCmPEcEvpY?=
- =?us-ascii?Q?NE1kJOqD681AKaVau608u17q2UPif3B/LEpd5gpUdyZ6l2SRdvUeyD4Un//D?=
- =?us-ascii?Q?BmvlanuQQfVUFSTbS5RvYwLqqfhDr1hHR+a001uSiWzJWa/yjHiRj0amkKjQ?=
- =?us-ascii?Q?QAL0fRU6v2MMtv3ijAiVGoK0VD0b0eKq7nprYOxn7oayIhgrgqLluEPsWJ0w?=
- =?us-ascii?Q?KnDyR2MVt+GCe9ESmvltRhZUb4tjED460fMvSusRhgb88HPI59XvL4VKElUM?=
- =?us-ascii?Q?Yy6GnLS5hDrCZWl2406bKbXCMVlSZd8f+koley2lS0VeDoGtlVcyLfid3rqn?=
- =?us-ascii?Q?2Kzw9PgEcpMk7S6uTJmRBjGX9UGblQdREv6Dr+i0ot0wbvo5gQ5XNJ7y/68I?=
- =?us-ascii?Q?uWSS/UzzV+Kc6SKBhT5IcrnX718UWgI856UHm7Sl+lY9daxSwI1SCCqX5kq2?=
- =?us-ascii?Q?qvCmUI3lBvoWd6WT2kZ6VfAzIcsCdD/mkI6BEQd0gIHGNgdvRN2kmXEL5nfw?=
- =?us-ascii?Q?3SN9E/pqW9Pcb7WxMmY80wktwlp6+tUt04i3EnZFzL0mM8ew89iNCz45EEps?=
- =?us-ascii?Q?1ocrbFN2/jjDJXcFMGB5FqehgId8U21WJA7qOCc+gihiYtl7GaKp9jSLNeUL?=
- =?us-ascii?Q?tLNFoHYGzGXIh/Cnkmi9VU3iMhhCguDT1zc11sI8C5KY0UUoxinHzOz+ptKG?=
- =?us-ascii?Q?iApnoU3K1TgcV287szkX1N87eGh3BVsFe24F2/LYxXlJawTM1DtLHF4hl9UX?=
- =?us-ascii?Q?sefuPwkTAyqP07W+HCn5Mlr7zBHH0UosjUSO0nCkvpN4VJ7SaUUIUVCkAluS?=
- =?us-ascii?Q?Dm+PgmV/BNQXQ9fj97YIsUKE423aeMBdnmzsgXD71tMQkfrfpimT/HgKjp+r?=
- =?us-ascii?Q?uB04weyvhKan0K2Tef0HHBPRqsHxL//IxNMxqzm2IN+OKnaoO/7yA68vU18G?=
- =?us-ascii?Q?Txaamc2xJy6p4T/DhRQFpzBh/gMqT0gnb+AvKvs1GlYj2GgQydLwYjL5qR/V?=
- =?us-ascii?Q?n0v0xm/Dzi/gG1EOKt2RLYCTV6kp5DBow/Yyb7XU3mM09zIngIXMGEwh8Y9z?=
- =?us-ascii?Q?xh8dbaa64HKbPjYrBuSjIMG0kTUa/phM+nDe4eWk2yH1EOvhAJzqudFgjCow?=
- =?us-ascii?Q?NhRL3jYUWMUq07n+rzhTd0dhHBo85EmKptIJ393Mv9jB6Ojh28E3thWYqErp?=
- =?us-ascii?Q?J1PL2HJ8qCOVuAmw7kyObZ9+5J2MrvVgwiAjTGEUBm0RLGTxSlxNB2O8gXgf?=
- =?us-ascii?Q?4q+czuEJDN0A2hfoYUfCBKMuxPvzfU4yDCuMh8HP3zQL6rENp/+6FRKPx8Zp?=
- =?us-ascii?Q?KccxxJPAOgDnHdu3oUYlBhDSBB9eK8+D5BQ1jM2YhRJTE6eaqCY+hFUp4WEy?=
- =?us-ascii?Q?skuSajiofQU038EHUM5OOZLq9BpfCQ2bSM17b66R?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ff170bbe-b645-4790-f434-08dbd4bb287d
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2023 18:00:50.7613
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9nmeeK1Q9bAaTeNyZvuXUiwXSPEXND3JBtb2aJb6NGUr6oztXGAUegJSAjco/tEK
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6183
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/5] riscv: Use SYM_*() assembly macros instead of
+ deprecated ones
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+References: <20231024132655.730417-1-cleger@rivosinc.com>
+ <20231024132655.730417-3-cleger@rivosinc.com>
+ <20231024-e122c317599cd4c6db53c015@orel>
+Content-Language: en-US
+From:   =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+In-Reply-To: <20231024-e122c317599cd4c6db53c015@orel>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 24, 2023 at 10:50:58AM -0700, Nicolin Chen wrote:
 
-> > The point is for the user_data to always be available, the driver
-> > needs to check it if it is passed.
-> > 
-> > This should all be plumbed to allow drivers to also customize their
-> > paging domains too.
+
+On 24/10/2023 17:23, Andrew Jones wrote:
+> On Tue, Oct 24, 2023 at 03:26:52PM +0200, Clément Léger wrote:
+> ...
+>> diff --git a/arch/riscv/lib/uaccess.S b/arch/riscv/lib/uaccess.S
+>> index 09b47ebacf2e..3ab438f30d13 100644
+>> --- a/arch/riscv/lib/uaccess.S
+>> +++ b/arch/riscv/lib/uaccess.S
+>> @@ -10,8 +10,7 @@
+>>  	_asm_extable	100b, \lbl
+>>  	.endm
+>>  
+>> -ENTRY(__asm_copy_to_user)
+>> -ENTRY(__asm_copy_from_user)
+>> +SYM_FUNC_START(__asm_copy_to_user)
+>>  
+>>  	/* Enable access to user memory */
+>>  	li t6, SR_SUM
+>> @@ -181,13 +180,13 @@ ENTRY(__asm_copy_from_user)
+>>  	csrc CSR_STATUS, t6
+>>  	sub a0, t5, a0
+>>  	ret
+>> -ENDPROC(__asm_copy_to_user)
+>> -ENDPROC(__asm_copy_from_user)
+>> +SYM_FUNC_END(__asm_copy_to_user)
+>>  EXPORT_SYMBOL(__asm_copy_to_user)
+>> +SYM_FUNC_ALIAS(__asm_copy_from_user, __asm_copy_to_user)
+>>  EXPORT_SYMBOL(__asm_copy_from_user)
 > 
-> We don't have a use case of customizing the paging domains.
-> And our selftest isn't covering this path. Nor the case is
-> supported by the uAPI:
+> I didn't see any comment about the sharing of debug info among both the
+> from and to functions. Assuming it isn't confusing in some way, then
 
-But this is the design, it is why everything is setup like this - we
-didn't create a new op to allocate nesting domains, we made a flexible
-user allocator.
+Hi Andrew,
 
-> 458- * A kernel-managed HWPT will be created with the mappings from the given
-> 459- * IOAS via the @pt_id. The @data_type for this allocation must be set to
-> 460: * IOMMU_HWPT_DATA_NONE. The HWPT can be allocated as a parent HWPT for a
-> 461- * nesting configuration by passing IOMMU_HWPT_ALLOC_NEST_PARENT via @flags.
-> 462- *
-
-Yes, that is the reality today. If someone comes to use the more
-complete interface they need to fix that comment..
-
-> Also, if we do passing in the data, we'd need to...
- 
-> 280-static struct iommu_domain *
-> 281-mock_domain_alloc_user(struct device *dev, u32 flags,
-> 282-		       struct iommu_domain *parent,
-> 283:		       const struct iommu_user_data *user_data)
-> 284-{
-> 285-	struct mock_iommu_domain *mock_parent;
-> 286-	struct iommu_hwpt_selftest user_cfg;
-> 287-	int rc;
-> 288-
-> 289:	if (!user_data) {	/* must be mock_domain */
->
-> ...change this to if (!parent)...
-
-Yes, this logic is not ideal. The parent is the request for nesting,
-not user_data. user_data is the generic creation parameters, which are
-not supported outside nesting
- 
-Like this:
-
---- a/drivers/iommu/iommufd/selftest.c
-+++ b/drivers/iommu/iommufd/selftest.c
-@@ -286,14 +286,12 @@ mock_domain_alloc_user(struct device *dev, u32 flags,
-        int rc;
- 
-        /* must be mock_domain */
--       if (!user_data) {
-+       if (!parent) {
-                struct mock_dev *mdev = container_of(dev, struct mock_dev, dev);
-                bool has_dirty_flag = flags & IOMMU_HWPT_ALLOC_DIRTY_TRACKING;
-                bool no_dirty_ops = mdev->flags & MOCK_FLAGS_DEVICE_NO_DIRTY;
- 
--               if (parent)
--                       return ERR_PTR(-EINVAL);
--               if (has_dirty_flag && no_dirty_ops)
-+               if (user_data || (has_dirty_flag && no_dirty_ops))
-                        return ERR_PTR(-EOPNOTSUPP);
-                return __mock_domain_alloc_paging(IOMMU_DOMAIN_UNMANAGED,
-                                                  has_dirty_flag);
+I did some testing with gdb and it seems to correctly assume that
+__asm_copy_to_user maps to __asm_copy_from_user for debugging. The basic
+tests that I did (breakpoints, disasm, etc) seems to show no sign of
+problems for debugging. Were you thinking about other things specifically ?
 
 Thanks,
-Jason
+
+Clément
+
+> 
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> 
+> Thanks,
+> drew
