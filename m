@@ -2,66 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E1AD7D436F
-	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 01:46:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 020FB7D4386
+	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 02:00:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231697AbjJWXqd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 19:46:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40026 "EHLO
+        id S230341AbjJXAAw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 20:00:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231682AbjJWXqc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 19:46:32 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8304BDD
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 16:46:28 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1c9be0884ffso26015065ad.2
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 16:46:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698104788; x=1698709588; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2DRTta2TjFX3FWgIj07+aRef6sC8s7S30TJagNFrajY=;
-        b=Q9+/xTv1H0O6IkMgD5WoMmx9kl6zYCOqnuHu5eiX3c28xv89a9VCxBPY1vEuF4tZvb
-         MW5ZCeOSEFNo3DO5mxDSfEGB4OB5f7tunNwOqJb/UsJQJ6sfR/bdUFAqZWxAGLoBiFc2
-         nXxQ7vsKJRMipcac6AWDyFW72Hlud7JWo4PmWUXJqtm6KG/1vvoqlEWbo54lsBJA3R7W
-         PmgD/2ksLrtK3QC920s7YVlc9TzF0bF4hRp04Z1w7wpEHuui7MiiWUWP6AP3J3SVhLAL
-         dIb2PAp39d0cYG6Sz/yfu+cSrvaAbTxrC9dNZCBJelfBd9DkzytkfOqM1xoRcHEaeZZh
-         HLog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698104788; x=1698709588;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2DRTta2TjFX3FWgIj07+aRef6sC8s7S30TJagNFrajY=;
-        b=OHZNXeUfxYCZyrWnHXbgRldN4MtVtucQD+ZYYPP3F1hIaC001S9vM3iYA8rO3+kS9F
-         751VZWSi+AsNbiQy8B8XEXFQby0/FFOEzEggB5pa4/ZRMiGyUW5ywwotnkTIDLRp1YNT
-         Yh6K1Qz3rvPCHJteCaUljcN7nkBbdsR/fjGur2tlImaXOjFELkB5MLF/XugsDpt+RJyM
-         8zQHaREgEh3XLb7x/Lg1p422h2klJ2Cp5PLLDClJpa9NcVe1lShsrF3t/HVLWFq8XRZJ
-         42YhhKWaN/rU4r/EYospdN2Jh+iTeMPOEHTmSa4MHgTr+DrlbFn1m0S0jlGLStLMVlSz
-         Dz1g==
-X-Gm-Message-State: AOJu0YwRmPLSszqgAWUjqt4ge5uLOxDB/TCVcNCPGpvzgLVWvEhv0rHF
-        Q7p3v37iP+3YKtXE8UwS46fGahkJan0=
-X-Google-Smtp-Source: AGHT+IH0FqeYHDo7LQTtCwPn4EPd8cZOz3rQPZu7Oxo0Y0ebrlgG7M9bpedWQhyT/9zOEX8RSOtOhgN3CHY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:64c2:b0:1ca:874c:e031 with SMTP id
- y2-20020a17090264c200b001ca874ce031mr170131pli.6.1698104787957; Mon, 23 Oct
- 2023 16:46:27 -0700 (PDT)
-Date:   Mon, 23 Oct 2023 16:43:30 -0700
-In-Reply-To: <20230913124227.12574-1-binbin.wu@linux.intel.com>
-Mime-Version: 1.0
-References: <20230913124227.12574-1-binbin.wu@linux.intel.com>
-X-Mailer: git-send-email 2.42.0.758.gaed0368e0e-goog
-Message-ID: <169810442917.2499338.3440694989716170017.b4-ty@google.com>
-Subject: Re: [PATCH v11 00/16] LAM and LASS KVM Enabling
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     pbonzini@redhat.com, chao.gao@intel.com, kai.huang@intel.com,
-        David.Laight@ACULAB.COM, robert.hu@linux.intel.com,
-        guang.zeng@intel.com
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        with ESMTP id S229510AbjJXAAu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 20:00:50 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76D15DC;
+        Mon, 23 Oct 2023 17:00:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698105648; x=1729641648;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=rqLtEYc52ldeaBeaKpK8SUaczck2gWzp5TJSpCAbldg=;
+  b=kz5G4wSf3QPFnNc5ueoELYFzluRGfv50VNOHk91Ek3+tlWggl713Znmn
+   GBTjIu0tma4BtF1r8/qcspy3QiMRbQ02i0Z8XQboUHtXSjowAhkPtm6Zm
+   qkYc8vUOerVD4yoaqd21BcPppS6pNcgadkB01ug/s3jVweBJDf9uL3HcE
+   IEAXcwYSJI1fHr36Cd/OXCnVTMglWfyb0ro26IUoShgd6ahA8qioRpiLc
+   L0FHJ7dWnIt3ZCg4PLxce1yxIz6SfFjh3M2Li7EZ6Xmfho256e4S33fcL
+   RT2/uz4RUeXkfkTSAvLVzlcEgMjAnfAKBgg5kg0r3v9j5qg276Zr4BdY6
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="389799298"
+X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
+   d="scan'208";a="389799298"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 17:00:47 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="824115767"
+X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
+   d="scan'208";a="824115767"
+Received: from qwilliam-mobl.amr.corp.intel.com (HELO desk) ([10.212.150.186])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 17:00:46 -0700
+Date:   Mon, 23 Oct 2023 17:00:38 -0700
+From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Josh Poimboeuf <jpoimboe@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
+        ak@linux.intel.com, tim.c.chen@linux.intel.com,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        antonio.gomez.iglesias@linux.intel.com
+Subject: Re: [PATCH 2/6] x86/entry_64: Add VERW just before userspace
+ transition
+Message-ID: <20231024000038.7zmaydklgf5ahbxq@desk>
+References: <20231020-delay-verw-v1-0-cff54096326d@linux.intel.com>
+ <20231020-delay-verw-v1-2-cff54096326d@linux.intel.com>
+ <20231023183521.zdlrfxvsdxftpxly@treble>
+ <20231023210410.6oj7ekelf5puoud6@desk>
+ <20231023214752.2d75h2m64yw6qzcw@treble>
+ <20231023223059.4p7l474o5w3sdjuc@desk>
+ <18da71ef-8586-400f-ae71-6d471f2fedcb@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <18da71ef-8586-400f-ae71-6d471f2fedcb@intel.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,61 +81,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 13 Sep 2023 20:42:11 +0800, Binbin Wu wrote:
-> This patch series includes KVM enabling patches for Linear-address masking
-> (LAM) v11 and Linear Address Space Separation (LASS) v3 since the two features
-> have overlapping prep work and concepts. Sent as a single series to reduce the
-> probability of conflicts.
+On Mon, Oct 23, 2023 at 03:45:41PM -0700, Dave Hansen wrote:
+> On 10/23/23 15:30, Pawan Gupta wrote:
+> >>>>>  	/*
+> >>>>>  	 * iretq reads the "iret" frame and exits the NMI stack in a
+> >>>>>  	 * single instruction.  We are returning to kernel mode, so this
+> >>>> This isn't needed here.  This is the NMI return-to-kernel path.
+> >>> Yes, the VERW here can be omitted. But probably need to check if an NMI
+> >>> occuring between VERW and ring transition will still execute VERW after
+> >>> the NMI.
+> >> That window does exist, though I'm not sure it's worth worrying about.
+> > I am in favor of omitting the VERW here, unless someone objects with a
+> > rationale. IMO, precisely timing the NMIs in such a narrow window is
+> > impractical.
 > 
-> The patch series is organized as follows:
-> - Patch 1-4: Common prep work for both LAM and LASS.
-> - Patch 5-13: LAM part.
-> - Patch 14-16: LASS part.
+> I'd bet that given the right PMU event you could make this pretty
+> reliable.  But normal users can't do that by default.  That leaves the
+> NMI watchdog which (I bet) you can still time, but which is pretty low
+> frequency.
 > 
-> [...]
+> Are there any other NMI sources that a normal user can cause problems with?
 
-Applied to kvm-x86 lam (for 6.8)!  I skipped the LASS patches, including patch 2
-(the branch targets patch).  I kept the IMPLICIT emulator flag even thought it's
-not strictly needed as it's a nice way to document non-existent code.
+Generating recoverable parity check errors using rowhammer? But, thats
+probably going too far for very little gain.
 
-I massaged a few changelogs and fixed the KVM_X86_OP_OPTIONAL() issue, but
-otherwise I don't think I made any code changes (it's been a long day :-) ).
-Please take a look to make sure it all looks good.
+> Let's at least leave a marker in here that folks can grep for:
+> 
+> 	/* Skip CLEAR_CPU_BUFFERS since it will rarely help */
 
-Thanks!
+Sure.
 
-[01/16] KVM: x86: Consolidate flags for __linearize()
-        https://github.com/kvm-x86/linux/commit/81c940395b14
-[02/16] KVM: x86: Use a new flag for branch targets
-        (no commit info)
-[03/16] KVM: x86: Add an emulation flag for implicit system access
-        https://github.com/kvm-x86/linux/commit/90532843aebf
-[04/16] KVM: x86: Add X86EMUL_F_INVLPG and pass it in em_invlpg()
-        https://github.com/kvm-x86/linux/commit/34b4ed7c1eaf
-[05/16] KVM: x86/mmu: Drop non-PA bits when getting GFN for guest's PGD
-        https://github.com/kvm-x86/linux/commit/8b83853c5c98
-[06/16] KVM: x86: Add & use kvm_vcpu_is_legal_cr3() to check CR3's legality
-        https://github.com/kvm-x86/linux/commit/82ba7169837e
-[07/16] KVM: x86: Remove kvm_vcpu_is_illegal_gpa()
-        https://github.com/kvm-x86/linux/commit/95df55ee42fe
-[08/16] KVM: x86: Introduce get_untagged_addr() in kvm_x86_ops and call it in emulator
-        https://github.com/kvm-x86/linux/commit/7a747b6c84a1
-[09/16] KVM: x86: Untag address for vmexit handlers when LAM applicable
-        https://github.com/kvm-x86/linux/commit/ef99001b30a8
-[10/16] KVM: x86: Virtualize LAM for supervisor pointer
-        https://github.com/kvm-x86/linux/commit/4daea9a5183f
-[11/16] KVM: x86: Virtualize LAM for user pointer
-        https://github.com/kvm-x86/linux/commit/0cadc474eff0
-[12/16] KVM: x86: Advertise and enable LAM (user and supervisor)
-        https://github.com/kvm-x86/linux/commit/6ef90ee226f1
-[13/16] KVM: x86: Use KVM-governed feature framework to track "LAM enabled"
-        https://github.com/kvm-x86/linux/commit/b291db540763
-[14/16] KVM: emulator: Add emulation of LASS violation checks on linear address
-        (no commit info)
-[15/16] KVM: VMX: Virtualize LASS
-        (no commit info)
-[16/16] KVM: x86: Advertise LASS CPUID to user space
-        (no commit info)
+> and some nice logic in the changelog that they can dig out if need be.
+> 
+> But, basically it sounds like the logic is:
+> 
+> 1. It's rare to get an NMI after VERW but before returning to userspace
+> 2. There is no known way to make that NMI less rare or target it
+> 3. It would take a large number of these precisely-timed NMIs to mount
+>    an actual attack.  There's presumably not enough bandwidth.
 
---
-https://github.com/kvm-x86/linux/tree/next
+Thanks for this.
+
+> Anything else?
+
+4. The NMI in question occurs after a VERW, i.e. when user state is
+   restored and most interesting data is already scrubbed. Whats left is
+   only the data that NMI touches, and that may or may not be
+   interesting.
