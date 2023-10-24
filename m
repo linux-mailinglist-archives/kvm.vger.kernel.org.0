@@ -2,136 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 349CB7D581E
-	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 18:25:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E098B7D5862
+	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 18:31:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343853AbjJXQZ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Oct 2023 12:25:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53980 "EHLO
+        id S1343905AbjJXQbj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Oct 2023 12:31:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343557AbjJXQZZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Oct 2023 12:25:25 -0400
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BCEE111
-        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 09:25:23 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-4083f61322fso36956565e9.1
-        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 09:25:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698164721; x=1698769521; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UQsq2LWk3bVW9FNqtR4uLNXJWBJH5YdmWftR29dvZwY=;
-        b=chEveNsa2As/c/ASQKCQ9h66ecgNpjnp9UpqqerbBT1yeuXYvui4DOGunOr7VlCcix
-         HIWrOAU1oQnbL+WbD/LIjCVlxV1emwcaRL2VkkegGu8kYbfww1W+VXM5Mr0tEnD7mZnM
-         ncJj43p8OvjOcrqLGuuZk7pduD98CeDH7Oi0K1aoDY6hmkH+XPWcKGrDm4wrF7F4+f3y
-         SdWutzFb7r/5kfe1NXDtFX6HFoscf4mXruuSqiH/boCZ1zgsU7ng9dvCj5hDa9XP/bGD
-         e6tMS4fTCWAkVhwAki6Subev94bPaOZaiArwUY2Vg5hWH7BmUZNn1eqZ/9Qco5sRr9vS
-         TSZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698164721; x=1698769521;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UQsq2LWk3bVW9FNqtR4uLNXJWBJH5YdmWftR29dvZwY=;
-        b=NN8hjRzzKT0ALFq7t/GVYWspKh2y4qMKm1YB+5KQ06q74a9sJLfhryInGX9JEY+ZTY
-         3zRePM86fryEjGNUyT9cpkETwgsfughZE9MIKvtPHiTgJmFzeTGRQ0Rj5SwLQ1/LYFpp
-         uLeVqh/Bsw5gfl9a4SnTTFKjt6npE5mHyx3xerAiMshuoDMnREbY4LgaCmGHymPnQhei
-         bdvHkVAP3+gNWI5ChMCYq2me0P7NIFGk4i/2HQGxQZNDO5GamX5GWO0C7b1r95LdbLEx
-         Hp/eMd1YdhWnl7DPVc8E1/xseL8dvTszcYzSfR/SBNQbhphu+NbFbNGEOzl9WCkYw+yZ
-         2+dA==
-X-Gm-Message-State: AOJu0YzcZzoJ362ht+Z7pMHIki0BPI3MmA962VugR73lRzSOexrkbMjG
-        rUh2hZJQufXxYTsV51gkl30=
-X-Google-Smtp-Source: AGHT+IEyWeztiwQ8cM58Q3Udtb/rgzHp2VAypkAcc4XZaR7o8nmAoBYxpyNYOMgRGMHbHOA9ZtR7WQ==
-X-Received: by 2002:a1c:790a:0:b0:406:5308:cfeb with SMTP id l10-20020a1c790a000000b004065308cfebmr9764626wme.11.1698164721279;
-        Tue, 24 Oct 2023 09:25:21 -0700 (PDT)
-Received: from [192.168.6.66] (54-240-197-238.amazon.com. [54.240.197.238])
-        by smtp.gmail.com with ESMTPSA id p12-20020a05600c418c00b0040773c69fc0sm16842887wmh.11.2023.10.24.09.25.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Oct 2023 09:25:20 -0700 (PDT)
-From:   Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <19fc2701-4cd8-4a14-9d45-bfaea37ed2d6@xen.org>
-Date:   Tue, 24 Oct 2023 17:25:19 +0100
+        with ESMTP id S1343821AbjJXQbh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Oct 2023 12:31:37 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2083.outbound.protection.outlook.com [40.107.92.83])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E34B1B3;
+        Tue, 24 Oct 2023 09:31:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EaDscwwXjEWNUQnzoTFcAId2RLGBv0ReEL6NDJX7FT3K9m6ifpPl7hYbLLkyQ7EJ35wc9qU2/2Xz2le1n4P9EsPiaHFe1AqbMXrPADkMxiu2pVdJqBuuTdagqBG65FuUTD6EYgVWfxBUydtOJgrZAG3vinpclKiXIG9Hfok5VGqqHdiFvx+ZzLkAHigI46+ygt+W18gjaH87bJsdHyh44FgNSVvJFS36QBqdV6bE33efD/I1UZdP5IJcTI4UbhB1QyynKvywU64sY8SYZ4+ob1mMKl/eLjk78Y1MXAFjDwYxoPX9SnXW6hS4LYa/QXNqO1TvENnVi1mvoF3p+HbwrQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yjZEdiirtYBSxvJvgn//0j05xm1W/fOYUZtkEVaP2MM=;
+ b=CZYzWFXtKARglJeRHicIemu2Xkyt8gAdWWVA6biRD1Tzcqk4zEAH3MurdtUW2mAZ057VEHsxf794Mtdclw0OMKuisTYq7Gsu+8f9QMSWuUvVS2zP96s7pFuLxixc9aTGzrVDjoL1m0b/nNdFDi6aJdQ74g5oLi9Q6CnjWQEqXYuhxgfFcfMHGH1Z3AWBr4BGr8kBqFJ/cbzIB15DZS7IICBC7l5wvTSuDDjPsvzsFXnm5TH2daf5uium+NJWeoA9dyiamOIuGdWSqujrak27FEi8vBOagY+hmWgc5cpsinwpi5SvuEGjsXneKYpwWe9QqPkcMNpvGcaFGvfb+a+gVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yjZEdiirtYBSxvJvgn//0j05xm1W/fOYUZtkEVaP2MM=;
+ b=XUZdt1oHwFl4vki43j4fqeZ9+keNd8iyHhrtmF/99sdJrjB8eTpr6N2YiCWs3QjY+aduaWm/x9eKAnb0azO2J1aZXVyNZu0o3FYtf9V1LGJqjdBFl5Ssw9sj+dT7BKsQI8aBab9sOJ5kmUmPsp8c+yfQH0QsIp8Jzqhr4+WVLSxNT3ylsZ/4Wkj+gof/jAfVEyadxXcVh3hySy0FulJKBosR2lJ6SRo/r8YGbKDykLYJoKGZXMK3KM/JeFsfUjUy4wFRdztLWsFzGbeR83MC+QnrZCsX0ioX8qHE63cBmfMUlwJIx4PfiTPKv3rCAVzkzENoyJFTTpPg3PRF5FXbAA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by MW4PR12MB6873.namprd12.prod.outlook.com (2603:10b6:303:20c::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.26; Tue, 24 Oct
+ 2023 16:31:32 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6886.034; Tue, 24 Oct 2023
+ 16:31:32 +0000
+Date:   Tue, 24 Oct 2023 13:31:30 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
+        robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
+        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
+        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        zhenzhong.duan@intel.com, joao.m.martins@oracle.com
+Subject: Re: [PATCH v6 05/10] iommufd: Derive iommufd_hwpt_paging from
+ iommufd_hw_pagetable
+Message-ID: <20231024163130.GM3952@nvidia.com>
+References: <20231024150609.46884-1-yi.l.liu@intel.com>
+ <20231024150609.46884-6-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231024150609.46884-6-yi.l.liu@intel.com>
+X-ClientProxiedBy: DM6PR18CA0003.namprd18.prod.outlook.com
+ (2603:10b6:5:15b::16) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH 12/12] hw/xen: add support for Xen primary console in
- emulated mode
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>, qemu-devel@nongnu.org
-Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcelo Tosatti <mtosatti@redhat.com>, qemu-block@nongnu.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org
-References: <20231016151909.22133-1-dwmw2@infradead.org>
- <20231016151909.22133-13-dwmw2@infradead.org>
- <c18439ca-c9ae-4567-bbcf-dffe6f7b72e3@xen.org>
- <3acd078bba2d824f836b20a270c780dc2d031c43.camel@infradead.org>
- <3f22903b-30f0-40f2-8624-b681d9c7e05d@xen.org>
- <42b005d7c03d5b0d47a16c4e025d8c3ec7289e0f.camel@infradead.org>
-Organization: Xen Project
-In-Reply-To: <42b005d7c03d5b0d47a16c4e025d8c3ec7289e0f.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MW4PR12MB6873:EE_
+X-MS-Office365-Filtering-Correlation-Id: cfb70415-7be8-4a9f-f30d-08dbd4aeae95
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: t7rShTxNLCROwSQFczErMLQQjb+LvYO2Z+rhyn8kw+zzqxdSFlkmt5IIxu2MmBpGbO/+Z9ZQpAbWmBM8VZsShWqx1smVC3n6l1iRZSbLT5wnvL4FC3vMDQ/Jz4SikPbS1nBJkFMdOZ7qUwVpJO0P7lf9/Um4kRekKOyLlfsP1qcrlgkYK9BG1qL3ARntE0Y06XD3OXZNcgxCQ/zqcbBX6qKJaK5m81pdk6fT+aquIx/zEXRPcpRburJrKxYScCWNKko8cJgq6XBn5I9GzO0vIsdVcGgZ5Jlev4PbJzVzoYSdzCcc5BITQBYpN9ppJrSQYo1FQJ4ciI/q+xjf755WEl1jcpme5Syre5iPCyVXqJuxxuqLRpXqkV6rC3vKf6C14qBW1fUe7lZeGedhzd0JgwL4OvI9uZTcvQNbhw6qDZ0NMfXCD6IRhweitU2LvyuU98L1AHrG6zn9RrE81ycUl+R1mFPCpGPQylLpGsRfrxxYSP+dJqgz5vblqcbqWNFjqlzRaNaJwWPzLoaDc5o1WQy3ZK7ohYqpfKx+9MidgaQ7KYzTBvMvYqJUhlwyjXvl
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(396003)(136003)(346002)(39860400002)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(38100700002)(2616005)(1076003)(26005)(33656002)(66946007)(8676002)(83380400001)(6916009)(316002)(6486002)(4326008)(66556008)(66476007)(8936002)(36756003)(478600001)(41300700001)(6506007)(6512007)(5660300002)(7416002)(86362001)(2906002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?1Its1zLgU3rNDp4pXIbq/Z0Uhtcg/Xgj8QV5ntj4NdSI3TlDpMryCEQ8bXmH?=
+ =?us-ascii?Q?lkrWoVPPT82G3/j8yFvhZZcHeIRGeUmWSTmaiAo9JHSDRAjBerJfPKoJxzlk?=
+ =?us-ascii?Q?4Z0xoqAUALYolRJKXQjA6YTCEfD3NzU5f2eAYviQeXH8VPUNKtpZwxEDbHbM?=
+ =?us-ascii?Q?0OBZ9evpzyWcOuPiIzB1lZZp0EVZjA/zo0vp2g09zaOC/2AVejDzuqND3q3Q?=
+ =?us-ascii?Q?tmwXyVS+5A3SekpfmRY7KJWphkMp87gvCQ0/vIueUwI6wIDYQzAKx9Zl2Pck?=
+ =?us-ascii?Q?aln39ibtwJpVjD6LZCRh/wwK182K7z9zACP/tYZ3I8bAiUTe8AG0nkM3PQB8?=
+ =?us-ascii?Q?Mw11jC54YJTKsBxP0gYGajO/Py2sFc50PabCg6UaqO/c2CHQrwFToMsrSkfk?=
+ =?us-ascii?Q?1G0MYUniED3e6WcgGyScSpCXvFrCznzi+9SBLj3fRx8Rs/nFIrRzb40btqi/?=
+ =?us-ascii?Q?td+oSkH7U+tBztaICYvtd1wiraR5bgRWNYfVzXL0BMJtS2tz6zJFQrrRr8vT?=
+ =?us-ascii?Q?2svcYk6SckptvKPGN2hyEv3Az0QWBK02j+461K30uuqbSA+AwcLQRVZoe4U2?=
+ =?us-ascii?Q?aaRHdn8iAqFY2wuMlErlNJelevXoujaZQJQKUB16NMIzsx3QY0ogM6psZYLt?=
+ =?us-ascii?Q?U0dC0wiXbODT7m92skkcpdfRtwr0YQ6rCwzVpUkT7fIlRf4m4C+ZlTt5Ccfr?=
+ =?us-ascii?Q?7EWli3TEZHIGdPgpJRBswrE8zWDtPtBytxnuq5p8YJ8Zhk0QWt921mTDWsTn?=
+ =?us-ascii?Q?nD8RChsWF02Zo9hjNmHxs7qGMEfmpmxV1U0284XAz2Uec6nRg4vtZtnRKhMZ?=
+ =?us-ascii?Q?PHV5v7dGlPdYbxPHAeEjTHSJgwbf7Y66/5W+rVsWEaxY5kVc7eTg2VBM4UTj?=
+ =?us-ascii?Q?/ovsMaDpE56fZYc8fJdF3vZZoeF4o8e7c5EyBygkSKlZvc0dPEamgYKLjPlM?=
+ =?us-ascii?Q?qZ3QxoKjeD0UsZcR4LV/Kpqx1gr5R7dEflB3Hi8kSJxLHxCpCFvzQ1E7dgkY?=
+ =?us-ascii?Q?XvItX4sWQKxw2AmuxpbW1vAq2JzRowmvpGW/0dnZPTB6JDnKH2sBHmPlOciQ?=
+ =?us-ascii?Q?XCKhuKrwIbCxC3o+/mLAdg+VL2+cK3WZsP2BMfXRfy2sEYY1LKPNdlW8PFIN?=
+ =?us-ascii?Q?kARktNWS26mcJZTevvIhdYrs71bhgdtDIOw4MdF8sLNmeYHgyP7Sm/z4saYJ?=
+ =?us-ascii?Q?Qf+Yq+xQY9ymJ2eHLGYPBmpdTkV4XAZrxI6b9uCu7Qkeaj8sohsBGlkbnhng?=
+ =?us-ascii?Q?VFiBR+ss+H4cLSNUHfj/oJjCX81dtlb+yXMugbw6GCBXFuyv/7oipzEV4mp+?=
+ =?us-ascii?Q?3zkfanzcxme9xUCLP/aH8SJBsm8/p19odkZDuVs3vaXlglyWAs1ILLWfWVK9?=
+ =?us-ascii?Q?U86bPcJqVgDcdlcBusiw+LgGiOIMpJ1HJobsDf8hSM5TAMPQWI9ZqlIqBBbW?=
+ =?us-ascii?Q?mP69Hd3Z7zyZneO5NgKVHIYZAVkqY4qcGU7EfngWo+auDIixfPz9WoaYwrcP?=
+ =?us-ascii?Q?UgmjM1RUb4vmnX0J0aFhJRTt+Et2YCVM8Ju/GK+KvYt2Fj5aNNwoF+7C06KW?=
+ =?us-ascii?Q?rilFZdqkcE/rXMwSIESVyllsG3sEdH6fnG6ArLSk?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cfb70415-7be8-4a9f-f30d-08dbd4aeae95
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2023 16:31:32.3070
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LUOBIsuj5wD7/KkOirHPpi7jSgfogAJJa0l+beFXhUIH3YJp6cJu7VIidDFsJf1D
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6873
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/10/2023 16:49, David Woodhouse wrote:
-> On Tue, 2023-10-24 at 16:39 +0100, Paul Durrant wrote:
->> On 24/10/2023 16:37, David Woodhouse wrote:
->>> On Tue, 2023-10-24 at 15:20 +0100, Paul Durrant wrote:
->>>> On 16/10/2023 16:19, David Woodhouse wrote:
->>>>> From: David Woodhouse <dwmw@amazon.co.uk>
->>>>>
->>>>> The primary console is special because the toolstack maps a page at a
->>>>> fixed GFN and also allocates the guest-side event channel. Add support
->>>>> for that in emulated mode, so that we can have a primary console.
->>>>>
->>>>> Add a *very* rudimentary stub of foriegnmem ops for emulated mode, which
->>>>> supports literally nothing except a single-page mapping of the console
->>>>> page. This might as well have been a hack in the xen_console driver, but
->>>>> this way at least the special-casing is kept within the Xen emulation
->>>>> code, and it gives us a hook for a more complete implementation if/when
->>>>> we ever do need one.
->>>>>
->>>> Why can't you map the console page via the grant table like the xenstore
->>>> page?
->>>
->>> I suppose we could, but I didn't really want the generic xen-console
->>> device code having any more of a special case for 'Xen emulation' than
->>> it does already by having to call xen_primary_console_create().
->>>
->>
->> But doesn't is save you the whole foreignmem thing? You can use the
->> grant table for primary and secondary consoles.
-> 
-> Yes. And I could leave the existing foreignmem thing just for the case
-> of primary console under true Xen. It's probably not that awful a
-> special case, in the end.
-> 
-> Then again, I was surprised I didn't *already* have a foreignmem ops
-> for the emulated case, and we're probably going to want to continue
-> fleshing it out later, so I don't really mind adding it.
-> 
+On Tue, Oct 24, 2023 at 08:06:04AM -0700, Yi Liu wrote:
 
-True. We'll need it for some of the other more fun protocols like vkbd 
-or fb. Still, I think it'd be nicer to align the xenstore and primary 
-console code to look similar and punt the work until then :-)
+>  static int iommufd_group_do_replace_paging(struct iommufd_group *igroup,
+> -					   struct iommufd_hw_pagetable *hwpt)
+> +					   struct iommufd_hwpt_paging *hwpt_paging)
+>  {
+>  	struct iommufd_hw_pagetable *old_hwpt = igroup->hwpt;
+>  	struct iommufd_device *cur;
+> @@ -441,22 +447,23 @@ static int iommufd_group_do_replace_paging(struct iommufd_group *igroup,
+>  
+>  	lockdep_assert_held(&igroup->lock);
+>  
+> -	if (hwpt_is_paging(old_hwpt) && hwpt->ioas != old_hwpt->ioas) {
+> +	if (hwpt_is_paging(old_hwpt) &&
+> +	    hwpt_paging->ioas != to_hwpt_paging(old_hwpt)->ioas) {
+>  		list_for_each_entry(cur, &igroup->device_list, group_item) {
+>  			rc = iopt_table_enforce_dev_resv_regions(
+> -				&hwpt->ioas->iopt, cur->dev, NULL);
+> +				&hwpt_paging->ioas->iopt, cur->dev, NULL);
+>  			if (rc)
+>  				goto err_unresv;
+>  		}
+>  	}
+>  
+> -	rc = iommufd_group_setup_msi(igroup, hwpt);
+> +	rc = iommufd_group_setup_msi(igroup, hwpt_paging);
+>  	if (rc)
+>  		goto err_unresv;
+>  	return 0;
+>  
+>  err_unresv:
+> -	iommufd_group_remove_reserved_iova(igroup, hwpt);
+> +	iommufd_group_remove_reserved_iova(igroup, hwpt_paging);
+>  	return rc;
+>  }
+>  
+> @@ -482,7 +489,8 @@ iommufd_device_do_replace(struct iommufd_device *idev,
+>  	}
+>  
+>  	if (hwpt_is_paging(hwpt)) {
+> -		rc = iommufd_group_do_replace_paging(igroup, hwpt);
+> +		rc = iommufd_group_do_replace_paging(igroup,
+> +						     to_hwpt_paging(hwpt));
+>  		if (rc)
+>  			goto err_unlock;
+>  	}
+> @@ -493,8 +501,10 @@ iommufd_device_do_replace(struct iommufd_device *idev,
+>  
+>  	old_hwpt = igroup->hwpt;
+>  	if (hwpt_is_paging(old_hwpt) &&
+> -	    (!hwpt_is_paging(hwpt) || hwpt->ioas != old_hwpt->ioas))
+> -		iommufd_group_remove_reserved_iova(igroup, old_hwpt);
+> +	    (!hwpt_is_paging(hwpt) ||
+> +	     to_hwpt_paging(hwpt)->ioas != to_hwpt_paging(old_hwpt)->ioas))
+> +		iommufd_group_remove_reserved_iova(igroup,
+> +						   to_hwpt_paging(old_hwpt));
+>  
+>  	igroup->hwpt = hwpt;
+>  
+> @@ -513,7 +523,8 @@ iommufd_device_do_replace(struct iommufd_device *idev,
+>  	return old_hwpt;
+>  err_unresv:
+>  	if (hwpt_is_paging(hwpt))
+> -		iommufd_group_remove_reserved_iova(igroup, hwpt);
+> +		iommufd_group_remove_reserved_iova(igroup,
+> +						   to_hwpt_paging(old_hwpt));
 
-   Paul
+This gets a compiler warning:
+
+../drivers/iommu/iommufd/device.c:527:25: warning: variable 'old_hwpt' is uninitialized when used here [-Wuninitialized]
+                                                   to_hwpt_paging(old_hwpt));
+                                                                  ^~~~~~~~
+../drivers/iommu/iommufd/device.c:475:39: note: initialize the variable 'old_hwpt' to silence this warning
+        struct iommufd_hw_pagetable *old_hwpt;
+                                             ^
+                                              = NULL
+
+I fixed it with:
+
+--- a/drivers/iommu/iommufd/device.c
++++ b/drivers/iommu/iommufd/device.c
+@@ -488,6 +488,7 @@ iommufd_device_do_replace(struct iommufd_device *idev,
+                return NULL;
+        }
+ 
++       old_hwpt = igroup->hwpt;
+        if (hwpt_is_paging(hwpt)) {
+                rc = iommufd_group_do_replace_paging(igroup,
+                                                     to_hwpt_paging(hwpt));
+@@ -499,7 +500,6 @@ iommufd_device_do_replace(struct iommufd_device *idev,
+        if (rc)
+                goto err_unresv;
+ 
+-       old_hwpt = igroup->hwpt;
+        if (hwpt_is_paging(old_hwpt) &&
+            (!hwpt_is_paging(hwpt) ||
+             to_hwpt_paging(hwpt)->ioas != to_hwpt_paging(old_hwpt)->ioas))
+
+Jason
