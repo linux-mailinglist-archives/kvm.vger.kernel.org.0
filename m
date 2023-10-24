@@ -2,74 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 107F47D4F93
-	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 14:15:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 841437D4F99
+	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 14:16:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231773AbjJXMPx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Oct 2023 08:15:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35212 "EHLO
+        id S231648AbjJXMQa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Oct 2023 08:16:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231648AbjJXLlA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Oct 2023 07:41:00 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28635128;
-        Tue, 24 Oct 2023 04:40:58 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id d9443c01a7336-1ca816f868fso27939765ad.1;
-        Tue, 24 Oct 2023 04:40:58 -0700 (PDT)
+        with ESMTP id S232073AbjJXMQ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Oct 2023 08:16:28 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3A5810DD
+        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 05:16:21 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-408002b5b9fso36299975e9.3
+        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 05:16:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698147657; x=1698752457; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5viv4icoi216uHnGHO1LdrBrwyZJtbpFGI9zPwr27r8=;
-        b=cEcs9CF2mSDyFfdHoVimws4ymF4InGv3XolYfQgmd61tLIiHV4eA+gntxY/1r/bM3j
-         SNJCsHvkh4VUehT4kGpIMkDXv7U/fTnZ25UCHCS8V15d+LeTV9CpdBQVUcCpTlLguf79
-         21Exrq1AhIwHfDdo1Z77CVhzZs/I0BnP915fpeOV3UnmzhipadxD9gBvqjVv2tRN0OZT
-         x7z0MF2PveeaMWOjwD/5iletT1dlRm90CGGCwQwHJVXx5n2q6cVRtFYuz4lUARkPJavd
-         bsQdgHGq8kBXQiS6zFs8w76kUOTgdXNrDucYEHV9yP6cb2Bv6x5z1AOak1aSvKg2DrXv
-         BylA==
+        d=gmail.com; s=20230601; t=1698149780; x=1698754580; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XqhLs0VKE4eYGQf3IxDeRGyPalLn8V/39qWJijHHo24=;
+        b=S3RH8u/NNAbDyCwBiMkwXPeLuQoH1FFiAUHf0+dAdVQF4LB8QDxDu1Wrzh8o1KBODR
+         ABy8GTynb+OMsMULv4fUhpmgb4HmhfYfUP7fFD+c3GcCmkdmSPi/IKRSRPyoN1ERSJoH
+         da1fnIXKlrdcji37BC3TIaau1DSo/ySpId11FBf7nM1JVO82ZF75iURaGdw0MUdvaIuA
+         DUUnZe2DRCK1YRb2at85qfpwNnxnQg3a0nffDCAy24TQ4UjcmhukIU8sB/AuZ+uHuM94
+         4WlVyyy7vqe3rQsXVYBGrrSdYwigPD/NDRIaCClBXuD1BoydfsCuQKyufZA9LgUM4jwO
+         it8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698147657; x=1698752457;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=5viv4icoi216uHnGHO1LdrBrwyZJtbpFGI9zPwr27r8=;
-        b=KzFrlsDHwpiFwBsE0FG0kGrxqLoqB79JChelTTkQPsmYOPs/BPT6Wsu4HzQFUc3lHz
-         u73TMxkwqhfe1Ewc1l5+pRkqKT3u3yVApA88hm3JL0vdVjG5xLMzDtVEnMOGoDJd/Zhd
-         e9mVCzpbI2feFr0xOsPjNW6EPkLTxFS4dPvSkqXwSvtaxP0Nxjr1KysdHJqrNS5QrKHJ
-         ME7CSd353nua0W2vd0IV0ynHaORz3QYogZvL6LEWg53p5wqz/JFAgACqkccSgs9UOofE
-         Js4tP0KnXJpYuAaHkvWTEZDx7kBKfM/TUrlFiUy0Ae2qvMAGp4tS1gNFCEvaATajf7N8
-         Oldw==
-X-Gm-Message-State: AOJu0Yx2dFvlJEPLndrFeCHD+pcKnYroTKgsrKnvvPDshAIeQWcnW04c
-        uBZTHuOMHvKgDQLEahSEDF0=
-X-Google-Smtp-Source: AGHT+IHyfLJ8xGwyttzAqlikW6bhql9g45kc1vXlEUwmN3Lg1dicfzOvSTjmUM3LoOtfYwW0VUBtDA==
-X-Received: by 2002:a17:902:f94d:b0:1b5:561a:5ca9 with SMTP id kx13-20020a170902f94d00b001b5561a5ca9mr8645873plb.50.1698147657433;
-        Tue, 24 Oct 2023 04:40:57 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id l11-20020a170903244b00b001c73f3a9b7fsm7212593pls.185.2023.10.24.04.40.55
+        d=1e100.net; s=20230601; t=1698149780; x=1698754580;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XqhLs0VKE4eYGQf3IxDeRGyPalLn8V/39qWJijHHo24=;
+        b=Qs7J4PG+tc2c6ytVgVZkbS0ZkMeHHGabs6DuqK5XmewXqKboWc9k7H+WOWQvhN5X3p
+         VS/WbYhjVCYIFo41LPsNxnkOm8rNbgiUCN2p3OAqbqhoqJxYbGqkWm9qhG2CgBszLXQu
+         z5UHWxaARTj6IrhAcL4hx8MzfZLolXj5pe4oeMnKW4b+1h6YyL3LNustUMeufl0PDYw2
+         +UvKtpFL1H0DywNt/FCNzCYoREnrhK/zQ3lJ8Wk+btgOFn62JSn6YuG020Yqe6No+Zyp
+         8cYT0jTjLbMCQNpB4k+euzLevO+97Gi1VEPbktH5UKYd08M+wm26pEYpX7dmzuU3C0Zw
+         IIzw==
+X-Gm-Message-State: AOJu0YxvbYgk68pR3vnm0+9urWbiInXrEhjLn+uKxrfmg8vVFZMm1W9d
+        lVcnMqlJl/C3io+NGR0KFsQ=
+X-Google-Smtp-Source: AGHT+IE4Z5n2fmffxWcQ/sQr9yuXr/uNARW3iYvgNsmcZBaWl9xNE3uVkib5/sqcnF5f4lyc4e1dbQ==
+X-Received: by 2002:adf:e650:0:b0:32d:92fd:9f73 with SMTP id b16-20020adfe650000000b0032d92fd9f73mr7885913wrn.10.1698149779261;
+        Tue, 24 Oct 2023 05:16:19 -0700 (PDT)
+Received: from [192.168.6.66] (54-240-197-238.amazon.com. [54.240.197.238])
+        by smtp.gmail.com with ESMTPSA id w5-20020adfee45000000b00317a04131c5sm9822690wro.57.2023.10.24.05.16.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Oct 2023 04:40:57 -0700 (PDT)
-Message-ID: <957b598d-c2bc-4568-2f36-a4ae762b49a8@gmail.com>
-Date:   Tue, 24 Oct 2023 19:40:50 +0800
+        Tue, 24 Oct 2023 05:16:18 -0700 (PDT)
+From:   Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <456aae8e-ea07-4861-a91b-7c7e28d2a22b@xen.org>
+Date:   Tue, 24 Oct 2023 13:16:17 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.2.2
-Subject: Re: [PATCH v5 11/13] KVM: selftests: Test consistency of CPUID with
- num of fixed counters
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Like Xu <likexu@tencent.com>,
-        Jinrong Liang <cloudliang@tencent.com>
-References: <20231024002633.2540714-1-seanjc@google.com>
- <20231024002633.2540714-12-seanjc@google.com>
-From:   JinrongLiang <ljr.kernel@gmail.com>
-In-Reply-To: <20231024002633.2540714-12-seanjc@google.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH 01/12] i386/xen: fix per-vCPU upcall vector for Xen
+ emulation
+Content-Language: en-US
+To:     David Woodhouse <dwmw2@infradead.org>, qemu-devel@nongnu.org
+Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-block@nongnu.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org
+References: <20231016151909.22133-1-dwmw2@infradead.org>
+ <20231016151909.22133-2-dwmw2@infradead.org>
+Organization: Xen Project
+In-Reply-To: <20231016151909.22133-2-dwmw2@infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,126 +88,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-在 2023/10/24 08:26, Sean Christopherson 写道:
-> From: Jinrong Liang <cloudliang@tencent.com>
+On 16/10/2023 16:18, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
 > 
-> Extend the PMU counters test to verify KVM emulation of fixed counters in
-> addition to general purpose counters.  Fixed counters add an extra wrinkle
-> in the form of an extra supported bitmask.  Thus quoth the SDM:
+> The per-vCPU upcall vector support had two problems. Firstly it was
+> using the wrong hypercall argument and would always return -EFAULT.
+> And secondly it was using the wrong ioctl() to pass the vector to
+> the kernel and thus the *kernel* would always return -EINVAL.
 > 
->    fixed-function performance counter 'i' is supported if ECX[i] || (EDX[4:0] > i)
+> Linux doesn't (yet) use this mode so it went without decent testing
+> for a while.
 > 
-> Test that KVM handles a counter being available through either method.
-> 
-> Co-developed-by: Like Xu <likexu@tencent.com>
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Fixes: 105b47fdf2d0 ("i386/xen: implement HVMOP_set_evtchn_upcall_vector")
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 > ---
->   .../selftests/kvm/x86_64/pmu_counters_test.c  | 58 ++++++++++++++++++-
->   1 file changed, 55 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> index 274b7f4d4b53..f1d9cdd69a17 100644
-> --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> @@ -227,13 +227,19 @@ __GUEST_ASSERT(expect_gp ? vector == GP_VECTOR : !vector,			\
->   	       expect_gp ? "#GP" : "no fault", msr, vector)			\
->   
->   static void guest_rd_wr_counters(uint32_t base_msr, uint8_t nr_possible_counters,
-> -				 uint8_t nr_counters)
-> +				 uint8_t nr_counters, uint32_t or_mask)
->   {
->   	uint8_t i;
->   
->   	for (i = 0; i < nr_possible_counters; i++) {
->   		const uint32_t msr = base_msr + i;
-> -		const bool expect_success = i < nr_counters;
-> +
-> +		/*
-> +		 * Fixed counters are supported if the counter is less than the
-> +		 * number of enumerated contiguous counters *or* the counter is
-> +		 * explicitly enumerated in the supported counters mask.
-> +		 */
-> +		const bool expect_success = i < nr_counters || (or_mask & BIT(i));
->   
->   		/*
->   		 * KVM drops writes to MSR_P6_PERFCTR[0|1] if the counters are
-> @@ -273,7 +279,7 @@ static void guest_test_gp_counters(void)
->   	else
->   		base_msr = MSR_IA32_PERFCTR0;
->   
-> -	guest_rd_wr_counters(base_msr, MAX_NR_GP_COUNTERS, nr_gp_counters);
-> +	guest_rd_wr_counters(base_msr, MAX_NR_GP_COUNTERS, nr_gp_counters, 0);
->   }
->   
->   static void test_gp_counters(uint8_t nr_gp_counters, uint64_t perf_cap)
-> @@ -292,10 +298,51 @@ static void test_gp_counters(uint8_t nr_gp_counters, uint64_t perf_cap)
->   	kvm_vm_free(vm);
->   }
->   
-> +static void guest_test_fixed_counters(void)
-> +{
-> +	uint64_t supported_bitmask = 0;
-> +	uint8_t nr_fixed_counters = 0;
-> +
-> +	/* KVM provides fixed counters iff the vPMU version is 2+. */
+>   target/i386/kvm/xen-emu.c | 5 ++---
+>   1 file changed, 2 insertions(+), 3 deletions(-)
 
-s/iff/if/
-
-> +	if (this_cpu_property(X86_PROPERTY_PMU_VERSION) >= 2)
-> +		nr_fixed_counters = this_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS);
-> +
-> +	/*
-> +	 * The supported bitmask for fixed counters was introduced in PMU
-> +	 * version 5.
-> +	 */
-> +	if (this_cpu_property(X86_PROPERTY_PMU_VERSION) >= 5)
-> +		supported_bitmask = this_cpu_property(X86_PROPERTY_PMU_FIXED_COUNTERS_BITMASK);
-> +
-> +	guest_rd_wr_counters(MSR_CORE_PERF_FIXED_CTR0, MAX_NR_FIXED_COUNTERS,
-> +			     nr_fixed_counters, supported_bitmask);
-> +}
-> +
-> +static void test_fixed_counters(uint8_t nr_fixed_counters,
-> +				uint32_t supported_bitmask, uint64_t perf_cap)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_vm *vm;
-> +
-> +	vm = pmu_vm_create_with_one_vcpu(&vcpu, guest_test_fixed_counters);
-> +
-> +	vcpu_set_cpuid_property(vcpu, X86_PROPERTY_PMU_FIXED_COUNTERS_BITMASK,
-> +				supported_bitmask);
-> +	vcpu_set_cpuid_property(vcpu, X86_PROPERTY_PMU_NR_FIXED_COUNTERS,
-> +				nr_fixed_counters);
-> +	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, perf_cap);
-> +
-> +	run_vcpu(vcpu);
-> +
-> +	kvm_vm_free(vm);
-> +}
-> +
->   static void test_intel_counters(void)
->   {
-> +	uint8_t nr_fixed_counters = kvm_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS);
->   	uint8_t nr_gp_counters = kvm_cpu_property(X86_PROPERTY_PMU_NR_GP_COUNTERS);
->   	unsigned int i;
-> +	uint32_t k;
->   	uint8_t j;
->   
->   	const uint64_t perf_caps[] = {
-> @@ -306,6 +353,11 @@ static void test_intel_counters(void)
->   	for (i = 0; i < ARRAY_SIZE(perf_caps); i++) {
->   		for (j = 0; j <= nr_gp_counters; j++)
->   			test_gp_counters(j, perf_caps[i]);
-> +
-> +		for (j = 0; j <= nr_fixed_counters; j++) {
-> +			for (k = 0; k <= (BIT(nr_fixed_counters) - 1); k++)
-> +				test_fixed_counters(j, k, perf_caps[i]);
-> +		}
->   	}
->   }
->   
+Reviewed-by: Paul Durrant <paul@xen.org>
 
