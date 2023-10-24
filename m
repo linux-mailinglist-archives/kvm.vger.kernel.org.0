@@ -2,78 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E71D7D47AB
-	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 08:46:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 604177D486B
+	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 09:23:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232667AbjJXGqq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Oct 2023 02:46:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34082 "EHLO
+        id S232990AbjJXHXj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Oct 2023 03:23:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232589AbjJXGqo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Oct 2023 02:46:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD86E11A
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 23:45:55 -0700 (PDT)
+        with ESMTP id S232503AbjJXHXg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Oct 2023 03:23:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54ED511A
+        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 00:22:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698129954;
+        s=mimecast20190719; t=1698132167;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=BE5jVX5fnuNHBiu/EslZBnrBPYvlGW0tmMa0k/b9PBk=;
-        b=MD8aQWMMST0h1pFv7q0uJSuCwjAP5dMvAT9M5yldlllPLNrO5C/deBjrEMDHlmlZ9WpY91
-        //ChK8LeyWDQwlKZ37T1TcIrBGsPcfzxK6lIrkc1spDlTD34boKV6cNnOwpdKz+HAIK81E
-        pKliMkL/cBArm/YmgD2CFLjtvjKkXjE=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=rv0SpeFLc8EPDyVFSHvu8ODjo19NeLRxyGY2cziN3BQ=;
+        b=VOP7ZdKYocMvqXbyEYvH1Nf9SwC/Vd2Yc/ssNQg3zzlvlWq2AMrXtLlT5W9NrRX7tBBoeD
+        CG5xiqao0XPgey+cunthgbfJrpb8DKV5FiK30myG1I0rWVnYnFRA8YZE48pXEMyBKJpJyM
+        uN8QOPByg5pdOIijLhzzJz+/o2OFCSQ=
+Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
+ [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-67-IFkXYDCiO76tir8mEmKCtg-1; Tue, 24 Oct 2023 02:45:53 -0400
-X-MC-Unique: IFkXYDCiO76tir8mEmKCtg-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-51da39aa6dcso2640050a12.2
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 23:45:53 -0700 (PDT)
+ us-mta-126-g0GiNa-nPlOl9JAlbytRCw-1; Tue, 24 Oct 2023 03:22:45 -0400
+X-MC-Unique: g0GiNa-nPlOl9JAlbytRCw-1
+Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-457bc611991so1953086137.0
+        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 00:22:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698129951; x=1698734751;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BE5jVX5fnuNHBiu/EslZBnrBPYvlGW0tmMa0k/b9PBk=;
-        b=MGdwT6Nys4yodGqEztKx/I+q7NCGG/VczTmDdqNOxCusUWH03kBqGLAoHG04kIRuFY
-         8u5folk0KCwZ2cwpM1EA2C+hvQTpCV0g23VEfOLHiJll1+qIe5YPEQ82TIzeXVjoo8om
-         f9cI3w0rheuwru9Q7uFMAiz7GQmgRx45pBN38fpfoINobe0/VazE6Z3N7ibzxO3/WBuZ
-         844IUpAaE51HKQ1t2y8bzHznevCKRqS73kDYlSV2wkjE/fQGG+xLr182WlMspPvK4EvD
-         utoPZ5DaNi0LQXEzKjzUAVJI7wVGXsn71omD7sf1svby2yv9Yj1uZZn3GM6rS/59p7Z+
-         jWBw==
-X-Gm-Message-State: AOJu0YxpLf1N1o0+cOUf+eoz/dQtUQrlemonP/T50r46L2DoAU+/YO/p
-        pZ4h973GLBKsMv9Nv8/TwN1AAHpM9KzsnHsOLrhnX8eOhvCT/GcJAiEqEidWrEMj8BDhZoB2Xd7
-        azs4oLjyR2hHKb2roG8Xy8lhZ9x/N1oaPJuoDEbaIBA==
-X-Received: by 2002:a05:6402:42c5:b0:540:2ece:79 with SMTP id i5-20020a05640242c500b005402ece0079mr5899801edc.10.1698129951267;
-        Mon, 23 Oct 2023 23:45:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGgNZWI9uhoTtkVPn63A9ZoXab5BfIhKlWbTreT3y3kifMYOd2sQUkJet981s6n86VslmjOv+KibM7qY9+2T5A=
-X-Received: by 2002:a05:6402:42c5:b0:540:2ece:79 with SMTP id
- i5-20020a05640242c500b005402ece0079mr5899783edc.10.1698129950979; Mon, 23 Oct
- 2023 23:45:50 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698132165; x=1698736965;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rv0SpeFLc8EPDyVFSHvu8ODjo19NeLRxyGY2cziN3BQ=;
+        b=G/ogPScB0mkvEcDVPUoFwNSt5fWS+pnj+BUXA2NUDgY4Nx6rcj2uCVdnBYamKxXQSI
+         wWNzt2VHQ8/tBGOPR02zr+PdZaAr2XiCgNyRA7rIsifc7AqrHsKeBHJfSajrrVfu6CBw
+         MY9Ihz62MfssCeJ4RKJdETFyn6tQCxB7HLr5K3lwA8VW22HEszb32MytZf5bZbs45kgQ
+         VkUNK03xOIklLVNARwLnNAb8Y5cLntdOohyY0jaejDltjnuicCMleyPPySXOVL4g6AHq
+         oMKVVPwIRSp0VPDok6xsG8qQTa91uMjkvII1x6QLCpTMkdjfyNogzANs6COrDQwJYwlG
+         Doww==
+X-Gm-Message-State: AOJu0Yysz9rDBHxxFQx1SKnp1PRL44bWeG66376AgRZ2Sh3dBE0Zol2n
+        HzNAJldQ+6F90QWLMEpCKa/VNAwxep/ZU9+znXtAwW25maXVo6KT/JJiqYLXembpxrnTVbXeweS
+        fVYWRHv4LniC/
+X-Received: by 2002:a05:6102:2092:b0:450:8e58:2de4 with SMTP id h18-20020a056102209200b004508e582de4mr9896263vsr.7.1698132165221;
+        Tue, 24 Oct 2023 00:22:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGSc1UnFRYGpNLAyeRqiE0mbWYzJbU92m3CE1awsD070guqv6X6NuBMOiyw9bpdIyW4han0dA==
+X-Received: by 2002:a05:6102:2092:b0:450:8e58:2de4 with SMTP id h18-20020a056102209200b004508e582de4mr9896248vsr.7.1698132164898;
+        Tue, 24 Oct 2023 00:22:44 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-12-185-56.business.telecomitalia.it. [87.12.185.56])
+        by smtp.gmail.com with ESMTPSA id g24-20020a37e218000000b007671b599cf5sm3263591qki.40.2023.10.24.00.22.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Oct 2023 00:22:44 -0700 (PDT)
+Date:   Tue, 24 Oct 2023 09:22:30 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Alexandru Matei <alexandru.matei@uipath.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Mihai Petrisor <mihai.petrisor@uipath.com>,
+        Viorel Canja <viorel.canja@uipath.com>
+Subject: Re: [PATCH v3] vsock/virtio: initialize the_virtio_vsock before
+ using VQs
+Message-ID: <iqjmblf2n42w7afw42udxvju3znupmwrixfsbwcn247u7bayoc@zrbken7ls6m7>
+References: <20231023192207.1804-1-alexandru.matei@uipath.com>
 MIME-Version: 1.0
-References: <20231018171456.1624030-2-dtatulea@nvidia.com> <94caea55-b399-40c2-98ef-d435c228808f@oracle.com>
-In-Reply-To: <94caea55-b399-40c2-98ef-d435c228808f@oracle.com>
-From:   Lei Yang <leiyang@redhat.com>
-Date:   Tue, 24 Oct 2023 14:45:14 +0800
-Message-ID: <CAPpAL=zf=g0dyo4u7iOfmaTV+_voT+yLcx-Dav1ROFnya4aK_Q@mail.gmail.com>
-Subject: Re: [PATCH vhost v4 00/16] vdpa: Add support for vq descriptor mappings
-To:     Si-Wei Liu <si-wei.liu@oracle.com>
-Cc:     Dragos Tatulea <dtatulea@nvidia.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Eugenio Perez Martin <eperezma@redhat.com>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Parav Pandit <parav@nvidia.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20231023192207.1804-1-alexandru.matei@uipath.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,103 +84,96 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-QE tested this series v4 with regression testing on real nic, there
-are no new issues.
+On Mon, Oct 23, 2023 at 10:22:07PM +0300, Alexandru Matei wrote:
+>Once VQs are filled with empty buffers and we kick the host, it can send
+>connection requests. If the_virtio_vsock is not initialized before,
+>replies are silently dropped and do not reach the host.
+>
+>virtio_transport_send_pkt() can queue packets once the_virtio_vsock is
+>set, but they won't be processed until vsock->tx_run is set to true. We
+>queue vsock->send_pkt_work when initialization finishes to send those
+>packets queued earlier.
+>
+>Fixes: 0deab087b16a ("vsock/virtio: use RCU to avoid use-after-free on the_virtio_vsock")
+>Signed-off-by: Alexandru Matei <alexandru.matei@uipath.com>
+>---
+>v3:
+>- renamed vqs_fill to vqs_start and moved tx_run initialization to it
+>- queued send_pkt_work at the end of initialization to send packets queued earlier
+>v2:
+>- split virtio_vsock_vqs_init in vqs_init and vqs_fill and moved
+>  the_virtio_vsock initialization after vqs_init
+>
+> net/vmw_vsock/virtio_transport.c | 13 +++++++++++--
+> 1 file changed, 11 insertions(+), 2 deletions(-)
+>
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index e95df847176b..c0333f9a8002 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -555,6 +555,11 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
+>
+> 	virtio_device_ready(vdev);
+>
+>+	return 0;
+>+}
+>+
+>+static void virtio_vsock_vqs_start(struct virtio_vsock *vsock)
+>+{
+> 	mutex_lock(&vsock->tx_lock);
+> 	vsock->tx_run = true;
+> 	mutex_unlock(&vsock->tx_lock);
+>@@ -568,8 +573,6 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
+> 	virtio_vsock_event_fill(vsock);
+> 	vsock->event_run = true;
+> 	mutex_unlock(&vsock->event_lock);
+>-
+>-	return 0;
+> }
+>
+> static void virtio_vsock_vqs_del(struct virtio_vsock *vsock)
+>@@ -664,6 +667,9 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+> 		goto out;
+>
+> 	rcu_assign_pointer(the_virtio_vsock, vsock);
+>+	virtio_vsock_vqs_start(vsock);
+>+
+>+	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
 
-Tested-by: Lei Yang <leiyang@redhat.com>
+I would move this call in virtio_vsock_vqs_start() adding also a comment 
+on top, bringing back what you wrote in the commit. Something like this:
 
+         /* virtio_transport_send_pkt() can queue packets once
+          * the_virtio_vsock is set, but they won't be processed until
+          * vsock->tx_run is set to true. We queue vsock->send_pkt_work
+          * when initialization finishes to send those packets queued
+          * earlier.
+          */
 
-On Fri, Oct 20, 2023 at 7:50=E2=80=AFAM Si-Wei Liu <si-wei.liu@oracle.com> =
-wrote:
+Just as a consideration, we don't need to queue the other workers (rx, 
+event) because as long as we don't fill the queues with empty buffers, 
+the host can't send us any notification. (We could add it in the comment 
+if you want).
+
+The rest LGTM!
+
+Thanks,
+Stefano
+
 >
-> For patches 05-16:
+> 	mutex_unlock(&the_virtio_vsock_mutex);
 >
-> Reviewed-by: Si-Wei Liu <si-wei.liu@oracle.com>
-> Tested-by: Si-Wei Liu <si-wei.liu@oracle.com>
+>@@ -736,6 +742,9 @@ static int virtio_vsock_restore(struct virtio_device *vdev)
+> 		goto out;
 >
-> Thanks for the fixes!
+> 	rcu_assign_pointer(the_virtio_vsock, vsock);
+>+	virtio_vsock_vqs_start(vsock);
+>+
+>+	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
 >
-> On 10/18/2023 10:14 AM, Dragos Tatulea wrote:
-> > This patch series adds support for vq descriptor table mappings which
-> > are used to improve vdpa live migration downtime. The improvement comes
-> > from using smaller mappings which take less time to create and destroy
-> > in hw.
-> >
-> > The first part adds the vdpa core changes from Si-Wei [0].
-> >
-> > The second part adds support in mlx5_vdpa:
-> > - Refactor the mr code to be able to cleanly add descriptor mappings.
-> > - Add hardware descriptor mr support.
-> > - Properly update iotlb for cvq during ASID switch.
-> >
-> > Changes in v4:
-> >
-> > - Improved the handling of empty iotlbs. See mlx5_vdpa_change_map
-> >    section in patch "12/16 vdpa/mlx5: Improve mr upate flow".
-> > - Fixed a invalid usage of desc_group_mkey hw vq field when the
-> >    capability is not there. See patch
-> >    "15/16 vdpa/mlx5: Enable hw support for vq descriptor map".
-> >
-> > Changes in v3:
-> >
-> > - dup_iotlb now checks for src =3D=3D dst case and returns an error.
-> > - Renamed iotlb parameter in dup_iotlb to dst.
-> > - Removed a redundant check of the asid value.
-> > - Fixed a commit message.
-> > - mx5_ifc.h patch has been applied to mlx5-vhost tree. When applying
-> >    this series please pull from that tree first.
-> >
-> > Changes in v2:
-> >
-> > - The "vdpa/mlx5: Enable hw support for vq descriptor mapping" change
-> >    was split off into two patches to avoid merge conflicts into the tre=
-e
-> >    of Linus.
-> >
-> >    The first patch contains only changes for mlx5_ifc.h. This must be
-> >    applied into the mlx5-vdpa tree [1] first. Once this patch is applie=
-d
-> >    on mlx5-vdpa, the change has to be pulled fom mlx5-vdpa into the vho=
-st
-> >    tree and only then the remaining patches can be applied.
-> >
-> > [0] https://lore.kernel.org/virtualization/1694248959-13369-1-git-send-=
-email-si-wei.liu@oracle.com
-> > [1] https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git/=
-log/?h=3Dmlx5-vhost
-> >
-> > Dragos Tatulea (13):
-> >    vdpa/mlx5: Expose descriptor group mkey hw capability
-> >    vdpa/mlx5: Create helper function for dma mappings
-> >    vdpa/mlx5: Decouple cvq iotlb handling from hw mapping code
-> >    vdpa/mlx5: Take cvq iotlb lock during refresh
-> >    vdpa/mlx5: Collapse "dvq" mr add/delete functions
-> >    vdpa/mlx5: Rename mr destroy functions
-> >    vdpa/mlx5: Allow creation/deletion of any given mr struct
-> >    vdpa/mlx5: Move mr mutex out of mr struct
-> >    vdpa/mlx5: Improve mr update flow
-> >    vdpa/mlx5: Introduce mr for vq descriptor
-> >    vdpa/mlx5: Enable hw support for vq descriptor mapping
-> >    vdpa/mlx5: Make iotlb helper functions more generic
-> >    vdpa/mlx5: Update cvq iotlb mapping on ASID change
-> >
-> > Si-Wei Liu (3):
-> >    vdpa: introduce dedicated descriptor group for virtqueue
-> >    vhost-vdpa: introduce descriptor group backend feature
-> >    vhost-vdpa: uAPI to get dedicated descriptor group id
-> >
-> >   drivers/vdpa/mlx5/core/mlx5_vdpa.h |  31 +++--
-> >   drivers/vdpa/mlx5/core/mr.c        | 194 ++++++++++++++++------------=
--
-> >   drivers/vdpa/mlx5/core/resources.c |   6 +-
-> >   drivers/vdpa/mlx5/net/mlx5_vnet.c  | 105 +++++++++++-----
-> >   drivers/vhost/vdpa.c               |  27 ++++
-> >   include/linux/mlx5/mlx5_ifc.h      |   8 +-
-> >   include/linux/mlx5/mlx5_ifc_vdpa.h |   7 +-
-> >   include/linux/vdpa.h               |  11 ++
-> >   include/uapi/linux/vhost.h         |   8 ++
-> >   include/uapi/linux/vhost_types.h   |   5 +
-> >   10 files changed, 272 insertions(+), 130 deletions(-)
-> >
+> out:
+> 	mutex_unlock(&the_virtio_vsock_mutex);
+>-- 
+>2.25.1
 >
 
