@@ -2,173 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 43D927D59A8
-	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 19:24:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02EFE7D59B1
+	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 19:25:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343591AbjJXRXu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Oct 2023 13:23:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52922 "EHLO
+        id S229743AbjJXRZm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Oct 2023 13:25:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229743AbjJXRXt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Oct 2023 13:23:49 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2056.outbound.protection.outlook.com [40.107.244.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7508128;
-        Tue, 24 Oct 2023 10:23:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JeoMB2650Y+p27zTpioPhwkBJrSVfRhBwHzp/kT0yWdfyUokmuLlA9IIjLazyhI/SB/d1Jg7ol5Hz4tltH5Tstxo+yMzFkXgQi3QmkZh0+4FResdJuUHM2sVsgOrPWytsrUbaeABoQ9C3TcIHR0GTvxUPAjVkKwNmJgTS1PZ470DAeQwt4WkV0yvBL3MovpoDIDsDn1BKFA7HVORzadbU0wKm5d9jxChswFOjDLfFliZJ9BU38gLgiuxyAQpAbY5jNG97LG7VaR0TZpJr+EQ/L/+1iTnc+E0tm3wPPPjYTng3roqHpB5V1sNAwa77iwvPWvybuSX3tGOTPhreZEWEw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cQegSCm8eLJixrnEgPA+k31n3gtvgSNjagbXujerQrY=;
- b=H78ZyQhq1hu1drb9vGufwQiZVV1tRRlvBeHcMAlsiNgkOCG7n7hEwsnysixvOuLr/YQjF7/NCjqkyrs50bvP6lKDXWMxynr3L9fzHMp69793F7VTeldrEciqGSSh+Ezeu1VFJeIN9UdVvbmSCt4wq2efagDhP+ZHg+TQpMmr4U+jbz8iBhtlJEAf4sSuN8ha9xjnlkeZbrNaQy/mvvDvucn8yf2BInW3F7RlS3VUGXXN3AizBRa/CQNKs/2bH7/GnOPj3dPutTq04ZdETSe1AkjmgStwQlIOxqGZyde/gbF3a4gYYBR4rcsmaMkpX4DUKl6exMspmXDuGb3QHCFa6Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cQegSCm8eLJixrnEgPA+k31n3gtvgSNjagbXujerQrY=;
- b=O/d5Oo2LHuMsCmM8pmx4hS9GDWV7UcAUsDBgU2RaLVI8FgElfn4qEY3/JXdMUi373N8PLMCIfIheTxGsg3F5NHk1quOT6dQdQrjlv6niHux4irPvAzpmdYyvMtxKWxGfXaN/Z37yH11pn/qh9rGY2RlhHPK6/UDhY7gUMEV8sWr8tZeBlSK3Qi+P3ozQC+1iroG8SIr0jJ+LCKruwdjWAfWu/tfqIQyUpNTJdoDk2BC3y7ByB8ZMnLjestE3WvnSu4P1U43ST5H67ONs2TwXIXpoWOd3lxSQMllQ+oGHomsED834nZ6bxLeifG+neN52kl76D+fsgIOtZOJNW0zK5Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by MW3PR12MB4444.namprd12.prod.outlook.com (2603:10b6:303:5c::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.31; Tue, 24 Oct
- 2023 17:23:45 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6886.034; Tue, 24 Oct 2023
- 17:23:45 +0000
-Date:   Tue, 24 Oct 2023 14:23:43 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
-        robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
-        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
-        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
-        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        zhenzhong.duan@intel.com, joao.m.martins@oracle.com
-Subject: Re: [PATCH v6 02/10] iommu: Pass in parent domain with user_data to
- domain_alloc_user op
-Message-ID: <20231024172343.GP3952@nvidia.com>
-References: <20231024150609.46884-1-yi.l.liu@intel.com>
- <20231024150609.46884-3-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231024150609.46884-3-yi.l.liu@intel.com>
-X-ClientProxiedBy: SN7PR18CA0025.namprd18.prod.outlook.com
- (2603:10b6:806:f3::29) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MW3PR12MB4444:EE_
-X-MS-Office365-Filtering-Correlation-Id: 77066647-f96d-48c5-d276-08dbd4b5f9cf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YrkGjcPZ8oPNvFLnuk0S9Sn0MJQXdaqcIL6SejvO4JvP5bzj3Kig5xVQr4XV5MQyyvONU+guqGFmNboFaCFjicZ6qC9Y154bo3Ab8eNT/nWlnxAm3659bWOlg8WcZlcEegBDB5ylpC8b3m7u5Esc6O/FM2C4am/AMmgl06CVrRfEYqgvaD3aVlgN0EAo88HX3kH7s91f+7sPMfrXgTDzOXvUSnbq/9vPlBZrIhFPf28dQ8Z7jxNjcuhaNnV/FoVZuT1jXHCIcPqoNM1I0YcI8+W+dFVCMwNlZU62QqE7ei3D8JiEp9Jiez4M57xhRD8IFoA1cF67GaX5i/CSYM4XAfj+CxDq8T/FU4s9BNAka6wbw9ziyGwxWklFhhMKOJiiI3xxp0+uJqtr+JF4/nZgIbXGwRm6SQbIj0Jy53yrQkDp+F7yXh33WDON1M2AxIzcEv+2Vu4bN/AAvo81Z3dIBVVigwoCJqytB5C1kog5XNY46tfa1AffY/OzX5YnCDyXgs4OUzAplLWRCh05+0tlJ4wzY7dmYoqb/0dUv2suLtDUnA4pUv428sz5VRgGgftp
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(366004)(136003)(396003)(346002)(230922051799003)(64100799003)(186009)(451199024)(1800799009)(26005)(38100700002)(2906002)(5660300002)(86362001)(41300700001)(7416002)(36756003)(8936002)(8676002)(33656002)(4326008)(6916009)(6506007)(478600001)(1076003)(66946007)(316002)(66476007)(66556008)(2616005)(83380400001)(6512007)(6486002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?SCAzC31R/3p/rtI8mKlTIlyzZ0M8MP6OWoxZK2i5VwYx/JW9Qv+e1k9XM1PO?=
- =?us-ascii?Q?YadtoHCVhGKrikHIMQR7ARF73w2c2CK1LYFLOzS9ltvL6i8PH0Rc6BAzvrhY?=
- =?us-ascii?Q?LrwPUEG+alGDMSKZFBvw0EVc8/jMrF9NsOOyXTe2G+41EU4fs9aCHc0hwIzX?=
- =?us-ascii?Q?mHjrXsLgCCrZdQtYFJBa6A2DvVyfPsLpWcDyJbvogroQbnv+y5GDGxr/fmpn?=
- =?us-ascii?Q?gbnIC61Ba21orq8PP2KU4v5+2HeR56uiGZwVaEhXp6InkgF+CfXSoewaoL+j?=
- =?us-ascii?Q?IXOtGcQMVNNNckEpIHwiTP5miRUnNoYMrVS4oZTjArSQGjcyMuM47Q90Dxef?=
- =?us-ascii?Q?Xm5dFLyVUQXDqyaE/n1pXxUnok+ELU0x/s3H8OlcZY59uIanbhklPm20nez3?=
- =?us-ascii?Q?vcAa5xUdkJs9V9RPJg2YX2w8Uay7qP3O89Zb+/mt8dwrYsDrvlbNjpNHvuWq?=
- =?us-ascii?Q?w1KJsfu108qG1iGCcOo/88GL+gpehL/bbYcTp53S8JR2WfISxrHs7eL+ek+R?=
- =?us-ascii?Q?fhcK0ZvlW/c5aB2LX0sW0fJsbdVp5hAokVF5eBT/MHYOM6GUPXE0WbUmbyOe?=
- =?us-ascii?Q?6TaxaNrN7fR9CLWmGP9NAwkW0DEZnhLoN/L7emXhk7ZC+DQXGJlPP4t5JQLR?=
- =?us-ascii?Q?lgQC8ZwTIAjIaQweY//a4QzH/DBFAlpd+Hd6ylalXzboH2/9xlPXi7bd0Hra?=
- =?us-ascii?Q?ncVYEiC1NQTl7MsknEg1kyTVGPJfIVUT4xDKGomwRembaTUF25PjYLSzO9J2?=
- =?us-ascii?Q?9p9cmFVCGOHeWerJmi35SJnJBifYldutXF2e+Wa0xp71hw6zxq2l09IzDbv7?=
- =?us-ascii?Q?Tr309PnlKtnu+eBmvIxnWt8NA78JkAJ5vmvk1GiaXFa8LpL9uT2RisYtFm2a?=
- =?us-ascii?Q?JQM3m3akMw/gTrk5UgIdZvInibpRXBPTih8bH8KYIzJIVs6J9/hHBZIb+B7V?=
- =?us-ascii?Q?2OXGVaUEUN+L31ic9mUMvYbYjdABBv0MkYtg4YnH7hK+U2oG2slNPBpskTEJ?=
- =?us-ascii?Q?nLxKymOEhYBf+VOQjxTWiBitLTc/dhzuebTaX6ycGAb5F3iBbEY9P8l4YPON?=
- =?us-ascii?Q?8nxJMwnsqh0s6G9tt1CcxWM0PdaVzMlRJWy4ZmXxGyTIcgPKbIz9m70d7HpP?=
- =?us-ascii?Q?8XrmHKVxubUeYkiqIQkiOBAXhs/MOf5laKpDEIBItoorrZIfJ5u5Vz2i7ihs?=
- =?us-ascii?Q?A2jLwiH1XSHBvavAja8Nrf+9yraM+VIRoWaXc+SbErTdgJLJD4M1bPyLc2zW?=
- =?us-ascii?Q?XmtCpyPN47oBmrpSakngg2eKNFKKYmmU+6t2vVtfx6rr2fHkunGXtA+LHWtx?=
- =?us-ascii?Q?ZNUWh7ZPmpzJJ+ZbrmriTFfOOWntMX2o77W8/fsZGwiHrjfXRIY/CHNuv0vG?=
- =?us-ascii?Q?RWBGXsrOSXQCMt9OBrH4YHPIhFj8QWYpMO1JpIVa90yd/uyjB1dPT/BXbaEB?=
- =?us-ascii?Q?2i+8jVW6xPZzaBtwu/7WDRQ25GoVwY8mYjBisTNzVCA+V8MW++GHW0bIoOEQ?=
- =?us-ascii?Q?oMfDR1eu3rqO4TW1WUh6rGx9oFBgMfu4x7h9lVE/6wqpLwU6+tyiLO+JIkAK?=
- =?us-ascii?Q?wooz5Ort2H53VQ/qv2KxUdKy+g+LtJYz7HPdP7sG?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 77066647-f96d-48c5-d276-08dbd4b5f9cf
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2023 17:23:45.0549
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: G3ypnoF9pgkaD/tr9k5px15cgRET6WpHXS4A8q7gjRr5AiitEYNBNEo4DZzwFwzc
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4444
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S234857AbjJXRZk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Oct 2023 13:25:40 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77DFCD7D
+        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 10:25:37 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20A85C433C8;
+        Tue, 24 Oct 2023 17:25:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698168337;
+        bh=SnWhqOBzSfdQFKc2+NrPePJmpUyCSWtBX0wZvzDayBE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=lkoKW8J+yBAbVUuHRsznJ7NJUM0vyd3HTPdO9NHQRh2oS1BQLKS266jIaCrBIuWPa
+         8cemPvRda423dU7M/m3jkZ/SuM9BY/SxBv00jxHMO94kuQ5EW48ZyIM3pQgvgqjpj6
+         Mff08eWSBDXdOsEprA4vs1GcEE50Wt7z+X5P1kFSOyyC7RnuWK9KAQy4isGA6Cg/ZY
+         FJKlLGR4OrtDCKSPsd9+aVTMgLJCxRIc0mOx33qvgeo/Zb857HspXgzZbSADS3Ug/W
+         fZFzCQ+EbqIT/maTBWpgnayzsUqczNYIEBuztSC10nVjCZyYC5jPDgl0XmNpD/jKzs
+         Sg90Q7QBHdsLA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qvL9q-007Iu3-9e;
+        Tue, 24 Oct 2023 18:25:34 +0100
+Date:   Tue, 24 Oct 2023 18:25:33 +0100
+Message-ID: <86jzrc3pbm.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Miguel Luis <miguel.luis@oracle.com>
+Cc:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 5/5] KVM: arm64: Handle AArch32 SPSR_{irq,abt,und,fiq} as RAZ/WI
+In-Reply-To: <7DD05DC0-164E-440F-BEB1-E5040C512008@oracle.com>
+References: <20231023095444.1587322-1-maz@kernel.org>
+        <20231023095444.1587322-6-maz@kernel.org>
+        <7DD05DC0-164E-440F-BEB1-E5040C512008@oracle.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, eric.auger@redhat.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 24, 2023 at 08:06:01AM -0700, Yi Liu wrote:
-> domain_alloc_user op already accepts user flags for domain allocation, add
-> a parent domain pointer and a driver specific user data support as well.
-> 
-> Add a struct iommu_user_data as a bundle of data_ptr/data_len/type from an
-> iommufd core uAPI structure. Make the user data opaque to the core, since
-> a userspace driver must match the kernel driver. In the future, if drivers
-> share some common parameter, there would be a generic parameter as well.
-> 
-> Define an enum iommu_hwpt_data_type (with IOMMU_HWPT_DATA_NONE type) for
-> iommu drivers to add their own driver specific user data per hw_pagetable.
-> 
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> Co-developed-by: Nicolin Chen <nicolinc@nvidia.com>
-> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> ---
->  drivers/iommu/intel/iommu.c          |  7 ++++++-
->  drivers/iommu/iommufd/hw_pagetable.c |  3 ++-
->  drivers/iommu/iommufd/selftest.c     |  7 ++++++-
->  include/linux/iommu.h                | 27 ++++++++++++++++++++++++---
->  include/uapi/linux/iommufd.h         |  8 ++++++++
->  5 files changed, 46 insertions(+), 6 deletions(-)
+On Mon, 23 Oct 2023 19:55:10 +0100,
+Miguel Luis <miguel.luis@oracle.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> > On 23 Oct 2023, at 09:54, Marc Zyngier <maz@kernel.org> wrote:
+> >=20
+> > When trapping accesses from a NV guest that tries to access
+> > SPSR_{irq,abt,und,fiq}, make sure we handle them as RAZ/WI,
+> > as if AArch32 wasn't implemented.
+> >=20
+> > This involves a bit of repainting to make the visibility
+> > handler more generic.
+> >=20
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> > arch/arm64/include/asm/sysreg.h |  4 ++++
+> > arch/arm64/kvm/sys_regs.c       | 16 +++++++++++++---
+> > 2 files changed, 17 insertions(+), 3 deletions(-)
+> >=20
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/s=
+ysreg.h
+> > index 4a20a7dc5bc4..5e65f51c10d2 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -505,6 +505,10 @@
+> > #define SYS_SPSR_EL2 sys_reg(3, 4, 4, 0, 0)
+> > #define SYS_ELR_EL2 sys_reg(3, 4, 4, 0, 1)
+> > #define SYS_SP_EL1 sys_reg(3, 4, 4, 1, 0)
+> > +#define SYS_SPSR_irq sys_reg(3, 4, 4, 3, 0)
+> > +#define SYS_SPSR_abt sys_reg(3, 4, 4, 3, 1)
+> > +#define SYS_SPSR_und sys_reg(3, 4, 4, 3, 2)
+> > +#define SYS_SPSR_fiq sys_reg(3, 4, 4, 3, 3)
+> > #define SYS_IFSR32_EL2 sys_reg(3, 4, 5, 0, 1)
+> > #define SYS_AFSR0_EL2 sys_reg(3, 4, 5, 1, 0)
+> > #define SYS_AFSR1_EL2 sys_reg(3, 4, 5, 1, 1)
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 0071ccccaf00..be1ebd2c5ba0 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -1791,8 +1791,8 @@ static unsigned int el2_visibility(const struct k=
+vm_vcpu *vcpu,
+> >  * HCR_EL2.E2H=3D=3D1, and only in the sysreg table for convenience of
+> >  * handling traps. Given that, they are always hidden from userspace.
+> >  */
+> > -static unsigned int elx2_visibility(const struct kvm_vcpu *vcpu,
+> > -    const struct sys_reg_desc *rd)
+> > +static unsigned int hidden_user_visibility(const struct kvm_vcpu *vcpu,
+> > +   const struct sys_reg_desc *rd)
+> > {
+> > return REG_HIDDEN_USER;
+> > }
+> > @@ -1803,7 +1803,7 @@ static unsigned int elx2_visibility(const struct =
+kvm_vcpu *vcpu,
+> > .reset =3D rst, \
+> > .reg =3D name##_EL1, \
+> > .val =3D v, \
+> > - .visibility =3D elx2_visibility, \
+> > + .visibility =3D hidden_user_visibility, \
+> > }
+> >=20
+> > /*
+> > @@ -2387,6 +2387,16 @@ static const struct sys_reg_desc sys_reg_descs[]=
+ =3D {
+> > EL2_REG(ELR_EL2, access_rw, reset_val, 0),
+> > { SYS_DESC(SYS_SP_EL1), access_sp_el1},
+> >=20
+> > + /* AArch32 SPSR_* are RES0 if trapped from a NV guest */
+> > + { SYS_DESC(SYS_SPSR_irq), .access =3D trap_raz_wi,
+> > +  .visibility =3D hidden_user_visibility },
+> > + { SYS_DESC(SYS_SPSR_abt), .access =3D trap_raz_wi,
+> > +  .visibility =3D hidden_user_visibility },
+> > + { SYS_DESC(SYS_SPSR_und), .access =3D trap_raz_wi,
+> > +  .visibility =3D hidden_user_visibility },
+> > + { SYS_DESC(SYS_SPSR_fiq), .access =3D trap_raz_wi,
+> > +  .visibility =3D hidden_user_visibility },
+> > +
+>=20
+> I=E2=80=99m trying to understand this patch and its surroundings.
+>=20
+> Those SPSR_* registers UNDEF at EL0. I do not understand
+> why use REG_HIDDEN_USER instead of REG_HIDDEN.
 
-This patch should be immediately before "iommufd: Add a nested HW
-pagetable object"
+USER here means host userspace, not guest EL0. That's because the
+various SPSR_* registers are already visible from userspace as
+KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_*]), and the above entries are
+solely for the purpose of handling a trap (and thus must not be
+exposed in the list of available sysregs).
 
-Since it is basically preperation for that patch
+This is similar to what we are doing for the ELx2 registers, which are
+already exposed as EL0/EL1 registers.
 
-> diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
-> index c44eecf5d318..fccc6315a520 100644
-> --- a/include/uapi/linux/iommufd.h
-> +++ b/include/uapi/linux/iommufd.h
-> @@ -361,6 +361,14 @@ enum iommufd_hwpt_alloc_flags {
->  	IOMMU_HWPT_ALLOC_DIRTY_TRACKING = 1 << 1,
->  };
->  
-> +/**
-> + * enum iommu_hwpt_data_type - IOMMU HWPT Data Type
-> + * @IOMMU_HWPT_DATA_NONE: no data
-> + */
-> +enum iommu_hwpt_data_type {
-> +	IOMMU_HWPT_DATA_NONE,
-> +};
-> +
+> Also, could you please explain what is happening at PSTATE.EL =3D=3D EL1
+> and if EL2Enabled() && HCR_EL2.NV =3D=3D =E2=80=981=E2=80=99  ?
 
-And this hunk should go in "iommufd: Add a nested HW pagetable object"
+We directly take the trap and not forward it. This isn't exactly the
+letter of the architecture, but at the same time, treating these
+registers as RAZ/WI is the only valid implementation. I don't
+immediately see a problem with taking this shortcut.
 
-With the rest of the uapi
+	M.
 
-Jason
+--=20
+Without deviation from the norm, progress is not possible.
