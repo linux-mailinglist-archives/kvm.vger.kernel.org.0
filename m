@@ -2,34 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D54B7D5059
-	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 14:54:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F5B37D5072
+	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 14:56:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234449AbjJXMyH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Oct 2023 08:54:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36814 "EHLO
+        id S234374AbjJXM4p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Oct 2023 08:56:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234481AbjJXMyC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Oct 2023 08:54:02 -0400
+        with ESMTP id S234204AbjJXM4n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Oct 2023 08:56:43 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A427990
-        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 05:53:59 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 179A49B
+        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 05:56:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=tZORqiZM5Mg8CsBOodaxjXWIJsfRLfCeFzvnqFeufUE=; b=isgEbbZxTGK3/gacOH80tg/kp3
-        1PRnFvrB5+RfQQioiahTo2Qi7mKCyMKa6jNvVcrEYMed3RvXYz32DWNmKyuxMpbQAUCdniVpOlwzV
-        pqNzCgyK/yUR1Do0ppxvjKT8vrdMYfgSS6tRgd8qpl7zPPV1OGwqon3lXM7nai7Ca6/pN1ueYDjaV
-        Z2ZULgKIH672xfIgyyqzIpUwvundzPX6ti6Y08nzmxj3yKa5RrNBc6YmtYBkYsfXbDLmf41kdNlm4
-        P3BiKMJ6mD/+Hro5LsJknt9HCNBmrjNzx3HkoqIC70DIKiv3GVtRYZkxFLCA6fzc/dwmDbEjbpPnr
-        qlMerV/Q==;
+        bh=KIHpOafW3ieHRu7BMjAbXlB7WJxL6xUsJu+2+28+I9c=; b=nVsdDyUFe55lw7AH55Mvd7ePjU
+        GkjtmmYMnUyZ8z4Tbm2JpHwF6vFig+xSYKCsVk8K5APGRgW5mWP05qYZJbUpDhNtIS8zK4UN3VYfZ
+        VntK7WJNtL30Tbgdroy8cfLKB9mXvCaflSBfO8S6cjMZDrY7ge2wz3S40yLz7mgk9DOBy8cLcFpNP
+        5CSdtkwY3/P8pBhDYNE+oGAG8+zRsN2oPPBM0MYffn0B7CPqiXaf2+CC5Gtd4Lzk6io4+25zEMcLO
+        yPew6/GinpRahdetQH/r1OH5lPldxUpY0rg/04aT7bFleFEleeCx7NBkcI5mUnt42OYc5IeemCv+c
+        I+G0qHoQ==;
 Received: from [2001:8b0:10b:5:758e:a1c4:bc7:e7a7] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qvGuc-002Zca-5U; Tue, 24 Oct 2023 12:53:34 +0000
-Message-ID: <c1b29e327d989b4c58916ab61a1896a0c5f5463a.camel@infradead.org>
-Subject: Re: [PATCH 05/12] hw/xen: populate store frontend nodes with
- XenStore PFN/port
+        id 1qvGxD-002Zhe-4L; Tue, 24 Oct 2023 12:56:15 +0000
+Message-ID: <d43b900a6c7987c6832ceeede9b4c5ab65d5bacd.camel@infradead.org>
+Subject: Re: [PATCH 06/12] hw/xen: add get_frontend_path() method to
+ XenDeviceClass
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     paul@xen.org, qemu-devel@nongnu.org
 Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
@@ -43,13 +43,13 @@ Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
         Eduardo Habkost <eduardo@habkost.net>,
         Marcelo Tosatti <mtosatti@redhat.com>, qemu-block@nongnu.org,
         xen-devel@lists.xenproject.org, kvm@vger.kernel.org
-Date:   Tue, 24 Oct 2023 13:53:33 +0100
-In-Reply-To: <84ac7780-e17a-4957-b49b-46a8307eb9da@xen.org>
+Date:   Tue, 24 Oct 2023 13:56:14 +0100
+In-Reply-To: <5ef43a7c-e535-496d-8a14-bccbadab3bc0@xen.org>
 References: <20231016151909.22133-1-dwmw2@infradead.org>
-         <20231016151909.22133-6-dwmw2@infradead.org>
-         <84ac7780-e17a-4957-b49b-46a8307eb9da@xen.org>
+         <20231016151909.22133-7-dwmw2@infradead.org>
+         <5ef43a7c-e535-496d-8a14-bccbadab3bc0@xen.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-LuZ5CpWyylw6gO3a352G"
+        boundary="=-Q1DBezpZ2dJcIULBrgeD"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -63,45 +63,47 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-LuZ5CpWyylw6gO3a352G
+--=-Q1DBezpZ2dJcIULBrgeD
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2023-10-24 at 13:35 +0100, Paul Durrant wrote:
-> On 16/10/2023 16:19, David Woodhouse wrote:
-> > From: David Woodhouse <dwmw@amazon.co.uk>
-> >=20
-> > This is kind of redundant since without being able to get these
-> > through
-> > ome other method (HVMOP_get_param) the guest wouldn't be able to
-> > access
+On Tue, 2023-10-24 at 13:42 +0100, Paul Durrant wrote:
 >=20
-> ^ typo
+> > --- a/hw/xen/xen-bus.c
+> > +++ b/hw/xen/xen-bus.c
+> > @@ -711,8 +711,16 @@ static void xen_device_frontend_create(XenDevice *=
+xendev, Error **errp)
+> > =C2=A0=C2=A0 {
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ERRP_GUARD();
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 XenBus *xenbus =3D XEN_BUS(qdev_ge=
+t_parent_bus(DEVICE(xendev)));
+> > +=C2=A0=C2=A0=C2=A0 XenDeviceClass *xendev_class =3D XEN_DEVICE_GET_CLA=
+SS(xendev);
+> > =C2=A0=C2=A0=20
+> > -=C2=A0=C2=A0=C2=A0 xendev->frontend_path =3D xen_device_get_frontend_p=
+ath(xendev);
+> > +=C2=A0=C2=A0=C2=A0 if (xendev_class->get_frontend_path) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 xendev->frontend_path =3D x=
+endev_class->get_frontend_path(xendev, errp);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!xendev->frontend_path)=
+ {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=
+urn;
 >=20
-> > XenStore in order to find them. But Xen populates them, and it does
-> > allow guests to *rebind* to the event channel port after a reset.
-> >=20
->=20
-> ... although this can also be done by querying the remote end of the=20
-> port before reset.
->=20
-I think you had to do that anyway; I don't think I was supposed to be
-putting s->be_port in there anyway; it was supposed to be the
-*frontend* port, and I've changed that in my tree.
+> I think you need to update errp here to note that you are failing to=20
+> create the frontend.
 
-I'll drop this whole sentence (and fix the typo).
+If xendev_class->get_frontend_path returned NULL it will have filled in err=
+p.
 
-> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> > ---
-> > =C2=A0 hw/i386/kvm/xen_xenstore.c | 10 ++++++++++
-> > =C2=A0 1 file changed, 10 insertions(+)
-> >=20
->=20
-> Reviewed-by: Paul Durrant <paul@xen.org>
->=20
+As a general rule (I'll be doing a bombing run on xen-bus once I get my
+patch queue down into single digits) we should never check 'if (*errp)'
+to check if a function had an error. It should *also* return a success
+or failure indication, and we should cope with errp being NULL.
 
 
---=-LuZ5CpWyylw6gO3a352G
+
+--=-Q1DBezpZ2dJcIULBrgeD
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -193,24 +195,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMDI0MTI1MzMzWjAvBgkqhkiG9w0BCQQxIgQg/3yWeyoz
-Mn/Ks4ySvXyTYHWFkBlza/kSUSMAv+vNYxYwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMDI0MTI1NjE0WjAvBgkqhkiG9w0BCQQxIgQgAORed/r7
+yjaxaiKiEh0t0czu2+/5Zim+VBZ04/Jf4WAwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCVkku0U7ldxo6CNicYvlncK+WixwRm+tpD
-ZsRTo9jKCOyp/Iq30GTzqFLtsiOiqLptqQkDT6QfuiHTr9yPome/sVMHJebSeZ9j9k2wyicir/fL
-wNVSstTyA6CwVusOJJ6tJxaKB6lyTyfdf/cIWZyGzrE2ackGCP3BS04leSzQY3IYYVWAnY4M95m+
-GrXkou+JfV/Im5i/SXDWNErhhrIwVKz6mq+k7laIwH2bk/+5eLzMUJBi1+R9CSvNbpbgFW0/FWUQ
-GGSUixsXvgXt5KEpSX9/R2biVmqPMvAJK95nAOlLFYFhBBLl5sXYh7Wi2+lKO0T+XKWkH1e9w+1I
-t9tdAK43CiIWzBiwofsFzhS1Vx7Iy5XX1V8PHosuv/E8VFGGZOmYJxms2y5UA5pMtTL0JHSV3BWv
-leeNKZlnJ9C3trL2CFX1qgDwHb9QpEMEWeHVb6ETvn6IjAqgVl4i3HbWfn9eDpmHQ09M8PjDHaPX
-rHdmvQr0MUw4Kf2VWPHkL0TFvYO4ZAS5WgKFeZ8KcofftA/GMaF0QSVeyUvqEpQq8glnEh85VH71
-Gqho8DBSoXQQNI+XPteUiCXByyoJnHD583baX54h96WiwWgFJbb2/0jh3aWTpafV5ZiG51vLv6xY
-uW8xmO4V+XRsx+UFyawppw7ftXLrjSizl7febpaGvQAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgB+y0wFouAllrieYiBNX0M1VvbX9fwz8Bws
+7Ki3oasK+xmQUAxH4cIOF2jCfyTc0kbFRwpcbSJE7dMEzWtPfjw8tCG91NMoMeyLnVYHHLhDjddN
+3yipFEmzBvhencdgWnEomo4Rms3qbCP6LRt81zap8jNTBfqetTjHTDxJ00VkS1D021xn4AfWHNI6
+SQhBcSFRDmpw459qGnyOY7aRsMunShf7MzjN5DE69VWiH0yCDAW8vUoNXvj4Sesh8WmW2FhlT6bU
+ij2QD4CsnpY7zxheLmumN2qfcd9YnQ6l3j7x9nsQE/HPH7wrKnKNMIsSdmb8ah2kIkyGc8iGRrI3
+FGt07FJGqlN1ZXSryXOhl6Lv8nsSUnViP3HPJaSs/kOFANsVGQ+3d1SYSCNLhdDhTYLeyXbcT/KM
+mBY1mMpMB/tXpQYTmunEuSH6Vq/xJzt19sd/b/OznKD7inKcqeZXUpKAC6DY604/fNCUsf4FLCZi
+a4zipcZZ9VGSfL+TZClSWH4HGIYPM/Hp8sn0BY+iwLTgN1Prw9O76od5wrGzI5AtPElWsWRKHE+l
+mm+gprL2NH5AawtpW+YG7rcBvE7iqwVEX8O1HQE9bCAjOh/po1rzobLjJYnynSyYCM9p7KRnwBM1
+Ompq+pf6V6YH5Z9nGGcoV4yLfsv3eO4Yqy3+Lrj0VwAAAAAAAA==
 
 
---=-LuZ5CpWyylw6gO3a352G--
+--=-Q1DBezpZ2dJcIULBrgeD--
