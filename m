@@ -2,110 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 343097D5B11
-	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 21:05:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E82427D5B47
+	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 21:15:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344126AbjJXTFX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Oct 2023 15:05:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34998 "EHLO
+        id S1344230AbjJXTPF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Oct 2023 15:15:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234846AbjJXTFW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Oct 2023 15:05:22 -0400
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D788A10C9
-        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 12:05:20 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-53eeb28e8e5so2532a12.1
-        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 12:05:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698174319; x=1698779119; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gOkuHsAfrJFLE7fNlHS5Cbl0lv5GMVYVvk6+mbHAbI0=;
-        b=HaPNVzu8gbXV2P7omR8+m8RQwtv5ckAcUdxrCuDU2Nd26ceftp6mCYlyG4HxIbrEHr
-         Qvm4MKD2BIf1Tt4b8lqZXY26QJlrqqFwH3I69hTieh3Z0FT2wQXIOtPZLTqcAzG9TRLa
-         ZFzfa6l0datRvhvJAkRqysgKQ0OkKPCckfe+j3U/uowxxF/lHwUOg3yfUYv95ICVcz64
-         pl6hi26QeHmZK4IgNLB/qltvsiCet5IfNxOCcrehQ3gNDepCGGgH32u3tWvP7HXDbs2o
-         uQcjNxFm6PFJ90p+brO3nFzNiavh+ZJLJf/TYpyUHqpDp46ko2ZBTawLb8292O8MteGN
-         D+5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698174319; x=1698779119;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gOkuHsAfrJFLE7fNlHS5Cbl0lv5GMVYVvk6+mbHAbI0=;
-        b=ZHwJf/3myfqZpL2Q9AqnkDXw6ZiHIO82T2QljXkFtdT2tBSxuqm7QRrrumP6aeN2cR
-         6LDLxXedru/eggg1ghv8tHZn7SA/6oCiJ35cxISKP2VMFXi+ssayMsa25n00ZPg0cRnl
-         XYMfXC0+8i9aoug+5FdA3j36i20NbB3Mjy2Yx44f3+dCnUcFPb8+E9j0zb18n0/fX5oB
-         UCiBh31TPe7DJ2ZrdVyKfQJDePMDcMvF2Ub+5bONzAwTXjeWCjsW5R7WkPDZXmQOlPhW
-         dpvDlKCGDhqf5QL0PB0i18qCGyWrO1YCTYBTQURlXTTHKnVSgKf7u3LUsZ042APClX2d
-         KDIw==
-X-Gm-Message-State: AOJu0Ywjv3TrdAz+QWX6FJg+zEWM21V1ia6JHcxTf/01gC3g6yt8P7gW
-        Bz2Eq2rFmArDvGMWX46OJB3KXTKVubxUA456ZTrp8eMfbOR7rm7lvVQ=
-X-Google-Smtp-Source: AGHT+IEKCztwuOSHPsxHskXbwb/oYow4gdN8mVsjBdpn0DhVfa2NBxjgBQKluWcfdl36axseIhrFgRywb7dX+zDvSL8=
-X-Received: by 2002:a05:6402:288e:b0:540:9e44:483f with SMTP id
- eg14-20020a056402288e00b005409e44483fmr120416edb.4.1698174318634; Tue, 24 Oct
- 2023 12:05:18 -0700 (PDT)
+        with ESMTP id S232658AbjJXTPE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Oct 2023 15:15:04 -0400
+Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 068C8109;
+        Tue, 24 Oct 2023 12:15:02 -0700 (PDT)
+Received: from [127.0.0.1] ([98.35.210.218])
+        (authenticated bits=0)
+        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 39OJERvQ3400109
+        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+        Tue, 24 Oct 2023 12:14:28 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 39OJERvQ3400109
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+        s=2023101201; t=1698174870;
+        bh=JdRN/5MJBM/LR3Jboog2UEEm4N1T8ZmfUjckQ5zsnPU=;
+        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+        b=XzvB6sbofNBXw3tkVUrVcKv2C+OIILQqGCQRAgCMRPD8LBmnMW1CYgKpXXHei0kP5
+         9zW8X/C3SVXfkwus6UfhI0n9e9mlq0F30lcFudjaxCvDgv07QolVOXOxU1It4NnA3p
+         9gP9Yupsmo+9X/6zzrJ5eqiSypmzNjcC54w259e1ZDY2bwmk77Q1eWU0zfnjysOW8g
+         HAT4pC24RRtwLeDLKbwcYMvkxHx46G2wcIaWU6cMswjvNlplK+kRCW3OeQpHaG1rWH
+         l0Y08WDtOI6RbGWAj1g2SznPDHpNzT2VJ+YJcAS65QnDxCWHbOXTF3inbCwp6t3MKg
+         YDqnenxLabZeA==
+Date:   Tue, 24 Oct 2023 12:14:25 -0700
+From:   "H. Peter Anvin" <hpa@zytor.com>
+To:     "Luck, Tony" <tony.luck@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+CC:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        "Lutomirski, Andy" <luto@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        "antonio.gomez.iglesias@linux.intel.com" 
+        <antonio.gomez.iglesias@linux.intel.com>,
+        "Milburn, Alyssa" <alyssa.milburn@intel.com>
+Subject: RE: [PATCH  v2 1/6] x86/bugs: Add asm helpers for executing VERW
+User-Agent: K-9 Mail for Android
+In-Reply-To: <SJ1PR11MB6083E3E2D35B30F4E40E8FE7FCDFA@SJ1PR11MB6083.namprd11.prod.outlook.com>
+References: <20231024-delay-verw-v2-0-f1881340c807@linux.intel.com> <20231024-delay-verw-v2-1-f1881340c807@linux.intel.com> <20231024103601.GH31411@noisy.programming.kicks-ass.net> <20231024163515.aivo2xfmwmbmlm7z@desk> <20231024163621.GD40044@noisy.programming.kicks-ass.net> <20231024164520.osvqo2dja2xhb7kn@desk> <20231024170248.GE40044@noisy.programming.kicks-ass.net> <DD2F34A0-4F2F-4C8C-A634-7DBEF31C40F0@zytor.com> <SJ1PR11MB6083E3E2D35B30F4E40E8FE7FCDFA@SJ1PR11MB6083.namprd11.prod.outlook.com>
+Message-ID: <5B8EB5F2-16A7-47BC-97FE-262ED0169DE3@zytor.com>
 MIME-Version: 1.0
-References: <20231024075748.1675382-1-dapeng1.mi@linux.intel.com> <20231024075748.1675382-5-dapeng1.mi@linux.intel.com>
-In-Reply-To: <20231024075748.1675382-5-dapeng1.mi@linux.intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 24 Oct 2023 12:05:06 -0700
-Message-ID: <CALMp9eSQyyihzEz+xpB0QCZ4=WqQ9TGiSwMYiFob0D_Z7OY7mg@mail.gmail.com>
-Subject: Re: [kvm-unit-tests Patch 4/5] x86: pmu: Support validation for Intel
- PMU fixed counter 3
-To:     Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 24, 2023 at 12:51=E2=80=AFAM Dapeng Mi <dapeng1.mi@linux.intel.=
-com> wrote:
+On October 24, 2023 11:49:07 AM PDT, "Luck, Tony" <tony=2Eluck@intel=2Ecom>=
+ wrote:
+>> the only overhead to modules other than load time (including the runtim=
+e linking) is that modules can't realistically be mapped using large page e=
+ntries=2E
 >
-> Intel CPUs, like Sapphire Rapids, introduces a new fixed counter
-> (fixed counter 3) to counter/sample topdown.slots event, but current
-> code still doesn't cover this new fixed counter.
+>If there were some significant win for using large pages, couldn't the
+>kernel pre-allocate some 2MB pages in the [-2GiB,0) range?  Boot paramete=
+r
+>for how many (perhaps two for separate code/data pages)=2E First few load=
+ed
+>modules get to use that space until it is all gone=2E
 >
-> So add code to validate this new fixed counter.
+>It would all be quite messy if those modules were later unloaded/reloaded
+>=2E=2E=2E so there would have to be some compelling benchmarks to justify
+>the complexity=2E
+>
+>That's probably why Peter said "can't realistically"=2E
+>
+>-Tony
+>
 
-Can you explain how this "validates" anything?
-
-> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> ---
->  x86/pmu.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/x86/pmu.c b/x86/pmu.c
-> index 1bebf493d4a4..41165e168d8e 100644
-> --- a/x86/pmu.c
-> +++ b/x86/pmu.c
-> @@ -46,7 +46,8 @@ struct pmu_event {
->  }, fixed_events[] =3D {
->         {"fixed 1", MSR_CORE_PERF_FIXED_CTR0, 10*N, 10.2*N},
->         {"fixed 2", MSR_CORE_PERF_FIXED_CTR0 + 1, 1*N, 30*N},
-> -       {"fixed 3", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N}
-> +       {"fixed 3", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N},
-> +       {"fixed 4", MSR_CORE_PERF_FIXED_CTR0 + 3, 1*N, 100*N}
->  };
->
->  char *buf;
-> --
-> 2.34.1
->
+Sure it could, but it would mean the kernel is sitting on an average of 6 =
+MB of unusable memory=2E It would also mean that unloaded modules would cre=
+ate holes in that memory which would have to be managed=2E
