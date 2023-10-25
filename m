@@ -2,34 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 04EC17D6FF7
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 16:54:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E09437D6FE8
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 16:54:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344575AbjJYOwF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 10:52:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58456 "EHLO
+        id S1344474AbjJYOvd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 10:51:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344456AbjJYOvl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 10:51:41 -0400
+        with ESMTP id S1344380AbjJYOva (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 10:51:30 -0400
 Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F3BA12A
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:51:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14E6213A
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:51:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=gpval2gkdnYSDfubhYXUo8Wmpo6ErNXXryv5FV8GJTI=; b=rSWy9LoA4wJ29Sdd8/z2hODjqk
-        sU4jyfn/ca7c900gi56KR/yIHtgCkDipOf7DVpsfAhVoJhNpxot9LipzStyKPCVyqwKMKTxysIaEv
-        0YuAXNyE5AgxkxRSeJYKqBpfppT7/6ao2CisXyqhqzmDL2K6l4kQ5tHHleiN4DqL55cnqp7z5l9xR
-        4Z5wjBvcBtTYCR6i7K1gjbo4ajmj2LEStD5lXp3kLeHBxTzriCK9AQHne857Of2+1MRrkusbVQc15
-        lq7LnDg8Bb95Xbt+0qbQHD7Wbc+gBgQCeF9EzMWlLPQhPDYWQbDEOxDlcNayuAnjgD06/VptlWhXZ
-        2U2EZvtA==;
+        bh=Q/tyhQvSuMwg2Gh5kOIH6qsA0eNCoglo/BC/VrIl6Es=; b=KDYI3aY4tMOqlZWdfNfO3LfWji
+        oD5wYOBY7+ELSt03QoqbH58su+Ih3wGW5y4L029rvsFpFws8RSdxkpx1kvzrlS+TR8NZrSvLHKS2E
+        SjvLuuRm8b/GnqIqaDOe5rDZTyJ/8Guse6k/gguUsxYD44GH6Tn/1C0kqkUq3glxbg20jjPwKv8u9
+        Utgyvf4duButgytsgIFvJi/gbUd0SSA1jqoxw3sxA0TP7WEocX4xU//yXPAlhMq2BmAgFO6SYdQxX
+        O1MwfOqd73UkIrEQm5B9gRr0qBVYQsayxRgtHc1M0nfSNSW/4X7QtGGxiam1VQgi1BhfsTGnBKIs/
+        5Klyv7rQ==;
 Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
         by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qvfDZ-00GPLv-00;
-        Wed, 25 Oct 2023 14:51:03 +0000
+        id 1qvfDZ-00GPLw-00;
+        Wed, 25 Oct 2023 14:50:51 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qvfDX-002dE7-2w;
+        id 1qvfDX-002dEB-38;
         Wed, 25 Oct 2023 15:50:43 +0100
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     qemu-devel@nongnu.org
@@ -48,9 +48,9 @@ Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
         xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
         Bernhard Beschow <shentey@gmail.com>,
         Joel Upham <jupham125@gmail.com>
-Subject: [PATCH v3 03/28] hw/xen: select kernel mode for per-vCPU event channel upcall vector
-Date:   Wed, 25 Oct 2023 15:50:17 +0100
-Message-Id: <20231025145042.627381-4-dwmw2@infradead.org>
+Subject: [PATCH v3 04/28] hw/xen: don't clear map_track[] in xen_gnttab_reset()
+Date:   Wed, 25 Oct 2023 15:50:18 +0100
+Message-Id: <20231025145042.627381-5-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231025145042.627381-1-dwmw2@infradead.org>
 References: <20231025145042.627381-1-dwmw2@infradead.org>
@@ -69,88 +69,36 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-A guest which has configured the per-vCPU upcall vector may set the
-HVM_PARAM_CALLBACK_IRQ param to fairly much anything other than zero.
+The refcounts actually correspond to 'active_ref' structures stored in a
+GHashTable per "user" on the backend side (mostly, per XenDevice).
 
-For example, Linux v6.0+ after commit b1c3497e604 ("x86/xen: Add support
-for HVMOP_set_evtchn_upcall_vector") will just do this after setting the
-vector:
+If we zero map_track[] on reset, then when the backend drivers get torn
+down and release their mapping we hit the assert(s->map_track[ref] != 0)
+in gnt_unref().
 
-       /* Trick toolstack to think we are enlightened. */
-       if (!cpu)
-               rc = xen_set_callback_via(1);
+So leave them in place. Each backend driver will disconnect and reconnect
+as the guest comes back up again and reconnects, and it all works out OK
+in the end as the old refs get dropped.
 
-That's explicitly setting the delivery to GSI#1, but it's supposed to be
-overridden by the per-vCPU vector setting. This mostly works in Qemu
-*except* for the logic to enable the in-kernel handling of event channels,
-which falsely determines that the kernel cannot accelerate GSI delivery
-in this case.
-
-Add a kvm_xen_has_vcpu_callback_vector() to report whether vCPU#0 has
-the vector set, and use that in xen_evtchn_set_callback_param() to
-enable the kernel acceleration features even when the param *appears*
-to be set to target a GSI.
-
-Preserve the Xen behaviour that when HVM_PARAM_CALLBACK_IRQ is set to
-*zero* the event channel delivery is disabled completely. (Which is
-what that bizarre guest behaviour is working round in the first place.)
-
-Fixes: 91cce756179 ("hw/xen: Add xen_evtchn device for event channel emulation")
+Fixes: de26b2619789 ("hw/xen: Implement soft reset for emulated gnttab")
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 Reviewed-by: Paul Durrant <paul@xen.org>
 ---
- hw/i386/kvm/xen_evtchn.c  | 6 ++++++
- include/sysemu/kvm_xen.h  | 1 +
- target/i386/kvm/xen-emu.c | 7 +++++++
- 3 files changed, 14 insertions(+)
+ hw/i386/kvm/xen_gnttab.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/hw/i386/kvm/xen_evtchn.c b/hw/i386/kvm/xen_evtchn.c
-index a731738411..3d6f4b4a0a 100644
---- a/hw/i386/kvm/xen_evtchn.c
-+++ b/hw/i386/kvm/xen_evtchn.c
-@@ -490,6 +490,12 @@ int xen_evtchn_set_callback_param(uint64_t param)
-         break;
-     }
+diff --git a/hw/i386/kvm/xen_gnttab.c b/hw/i386/kvm/xen_gnttab.c
+index 21c30e3659..839ec920a1 100644
+--- a/hw/i386/kvm/xen_gnttab.c
++++ b/hw/i386/kvm/xen_gnttab.c
+@@ -541,7 +541,5 @@ int xen_gnttab_reset(void)
+     s->entries.v1[GNTTAB_RESERVED_XENSTORE].flags = GTF_permit_access;
+     s->entries.v1[GNTTAB_RESERVED_XENSTORE].frame = XEN_SPECIAL_PFN(XENSTORE);
  
-+    /* If the guest has set a per-vCPU callback vector, prefer that. */
-+    if (gsi && kvm_xen_has_vcpu_callback_vector()) {
-+        in_kernel = kvm_xen_has_cap(EVTCHN_SEND);
-+        gsi = 0;
-+    }
-+
-     if (!ret) {
-         /* If vector delivery was turned *off* then tell the kernel */
-         if ((s->callback_param >> CALLBACK_VIA_TYPE_SHIFT) ==
-diff --git a/include/sysemu/kvm_xen.h b/include/sysemu/kvm_xen.h
-index 595abfbe40..961c702c4e 100644
---- a/include/sysemu/kvm_xen.h
-+++ b/include/sysemu/kvm_xen.h
-@@ -22,6 +22,7 @@
- int kvm_xen_soft_reset(void);
- uint32_t kvm_xen_get_caps(void);
- void *kvm_xen_get_vcpu_info_hva(uint32_t vcpu_id);
-+bool kvm_xen_has_vcpu_callback_vector(void);
- void kvm_xen_inject_vcpu_callback_vector(uint32_t vcpu_id, int type);
- void kvm_xen_set_callback_asserted(void);
- int kvm_xen_set_vcpu_virq(uint32_t vcpu_id, uint16_t virq, uint16_t port);
-diff --git a/target/i386/kvm/xen-emu.c b/target/i386/kvm/xen-emu.c
-index 7c504d9fa4..75b2c557b9 100644
---- a/target/i386/kvm/xen-emu.c
-+++ b/target/i386/kvm/xen-emu.c
-@@ -424,6 +424,13 @@ void kvm_xen_set_callback_asserted(void)
-     }
+-    memset(s->map_track, 0, s->max_frames * ENTRIES_PER_FRAME_V1);
+-
+     return 0;
  }
- 
-+bool kvm_xen_has_vcpu_callback_vector(void)
-+{
-+    CPUState *cs = qemu_get_cpu(0);
-+
-+    return cs && !!X86_CPU(cs)->env.xen_vcpu_callback_vector;
-+}
-+
- void kvm_xen_inject_vcpu_callback_vector(uint32_t vcpu_id, int type)
- {
-     CPUState *cs = qemu_get_cpu(vcpu_id);
 -- 
 2.40.1
 
