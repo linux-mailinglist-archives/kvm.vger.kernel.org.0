@@ -2,55 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DDBCD7D5FC2
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 04:10:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 013FD7D6073
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 05:17:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231521AbjJYCKn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Oct 2023 22:10:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34028 "EHLO
+        id S232503AbjJYDRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Oct 2023 23:17:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbjJYCKm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Oct 2023 22:10:42 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28EAA10C6;
-        Tue, 24 Oct 2023 19:10:40 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4CE8C433CB;
-        Wed, 25 Oct 2023 02:10:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698199839;
-        bh=MEW/6MGCX1XZaqEbTH7Tu3kHTVovAqY5DrZ29wr8Xew=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=uH4cNl8Kw4fsOajNr7Apq3a9x7Mz4PRem/rdu9LNOqEbIOgzfW2BbLbVuGy/biovl
-         QRhz06szqJD04u3hqsYEnp7iItdAGSvtwhGCCFROSiDp9vZBz62wo3804WG83PwSNj
-         hpH1IM/EOjB0SGjKkN8EXLm93CXok2rEzDQ7FHf6SLHoDbFocR0gdmeMIgkAydLzBu
-         dXdneNdkizIdig7DPIz2AWdn8tRnmMafpJqSmobTzYbq+v37jcwL9PskYhXox/rg8L
-         9hA7MvauTgLNdBfQfyoDW9cbADe0ZtFaqed519bCR4dA71RFCIwg8OGRDOhGM2i6c6
-         etw1dYIIEbelQ==
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-53e70b0a218so7764079a12.2;
-        Tue, 24 Oct 2023 19:10:39 -0700 (PDT)
-X-Gm-Message-State: AOJu0YyhFr2K17bcaMxdFMvzO69hLPmQvZqd1SdWELH1ljZGCDsYLsUb
-        jNLujRlrBqthSpzD7rS12BC9dwT4Cm7lY4jadMs=
-X-Google-Smtp-Source: AGHT+IHx3K+HatlpnfYDCA4LL8aasoDk7hNaKKs2ktPpRhp8Xe2rQ89gQQG/ypsb3z8kBq6bcJ2FzuNuerxr24R97os=
-X-Received: by 2002:a17:906:fe4c:b0:9ba:a38:f2b2 with SMTP id
- wz12-20020a170906fe4c00b009ba0a38f2b2mr11705086ejb.41.1698199838119; Tue, 24
- Oct 2023 19:10:38 -0700 (PDT)
+        with ESMTP id S232489AbjJYDRc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Oct 2023 23:17:32 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9078182;
+        Tue, 24 Oct 2023 20:17:28 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id d2e1a72fcca58-6b9af7d41d2so4477307b3a.0;
+        Tue, 24 Oct 2023 20:17:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698203848; x=1698808648; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lSBC2EEzIFGKkcvVEZdun9j4nAtpxrzV4OlXixgyLsk=;
+        b=Q010FynxLVxIlNPE/0gmFnT7sNDDWPb5IElqDHbSInlUK1hfNqMTy5dMdJaum9yVF1
+         05ZEDnuKyb+f/i8bLpc/3D1GdE2fSCGGTs72XSvIKnGYO1UI5TF1u/zEzvwnov1h6pxt
+         f8Og91Wj2F/GbajAjHRXOcIJet+RwpLPt80ydyAC781nfq58fhtAcZ0LhBG/Lf6N3HdJ
+         pqL/eVhQac3Kyb+uQanTEF1zIA/LJrmK8dzskrYEJlACiDxutO8QCTe0SS89stpWpiR3
+         +IL8+LARYNBGqovVt66tuo1EOjyNgdJJLl6YFGlp0bwd4jDJvcpGDTdNroVc7hg6eu3D
+         3oIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698203848; x=1698808648;
+        h=content-transfer-encoding:in-reply-to:from:references:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=lSBC2EEzIFGKkcvVEZdun9j4nAtpxrzV4OlXixgyLsk=;
+        b=gROrsmy7K7kuZS8BDJTjKcO/ltcOm4uiol6Ja6tjj/QmAjQOqz/YDysYza38bDZmky
+         C4Lol65qaIyuBSI4RWMqySA6dRnLmVTAaMILL6nMu4ih94pYq2Q4tkWGLSPtY4ygtWJD
+         YLGmKhbulLbloGPcuqWfQxKCHAfe72w9V1kO3CH0kXPX3PMbcBemMiX0a2usA58CP72J
+         655lCs/K5P2fMqBx2DJRAvfV6nl999vugb4Ec7l8C6mluCtG+08vWPx+R76N3srYxMvR
+         lCwNUzdT6zSkzdeC2IXMY87H6sWCRgFaJGRyBjMLBAbhtVdF075Vs92gu5829XDIipsd
+         hAQw==
+X-Gm-Message-State: AOJu0Yx8hnGt7NSmRdpyXBRqAltCoaIPBcF4fL3Uf81INrMRM/FiN/xR
+        KuHAWnCr9IgrRHwMFt4ceAA=
+X-Google-Smtp-Source: AGHT+IG+PXQD+0Twc4cI6VT/NKbF/ORrJ8UovTK4yPuAQgl8aQYuGXR8hZ8Egak4wTQo4i6VCvlQJw==
+X-Received: by 2002:a62:f24c:0:b0:690:d620:7801 with SMTP id y12-20020a62f24c000000b00690d6207801mr9777229pfl.11.1698203847897;
+        Tue, 24 Oct 2023 20:17:27 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id z4-20020aa79904000000b006b6f3bc8123sm8284926pff.50.2023.10.24.20.17.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Oct 2023 20:17:27 -0700 (PDT)
+Message-ID: <f10b1eb8-db53-42e4-85ba-f38560724ae1@gmail.com>
+Date:   Wed, 25 Oct 2023 11:17:20 +0800
 MIME-Version: 1.0
-References: <20231005091825.3207300-1-chenhuacai@loongson.cn>
-In-Reply-To: <20231005091825.3207300-1-chenhuacai@loongson.cn>
-From:   Huacai Chen <chenhuacai@kernel.org>
-Date:   Wed, 25 Oct 2023 10:10:26 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H7VN_r-SzEMK6LHqXzVbNemZYuYYLb2mri=EGZ7qb3C3A@mail.gmail.com>
-Message-ID: <CAAhV-H7VN_r-SzEMK6LHqXzVbNemZYuYYLb2mri=EGZ7qb3C3A@mail.gmail.com>
-Subject: Re: [GIT PULL] LoongArch KVM changes for v6.7
-To:     Huacai Chen <chenhuacai@loongson.cn>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
-        Xuerui Wang <kernel@xen0n.name>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.2.2
+Subject: Re: [PATCH v5 08/13] KVM: selftests: Test Intel PMU architectural
+ events on gp counters
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>,
+        Jinrong Liang <cloudliang@tencent.com>
+References: <20231024002633.2540714-1-seanjc@google.com>
+ <20231024002633.2540714-9-seanjc@google.com> <ZTgf1Cutah5VQp_q@google.com>
+From:   JinrongLiang <ljr.kernel@gmail.com>
+In-Reply-To: <ZTgf1Cutah5VQp_q@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -59,127 +76,139 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Paolo,
+在 2023/10/25 03:49, Sean Christopherson 写道:
+> On Mon, Oct 23, 2023, Sean Christopherson wrote:
+>> +static void guest_measure_pmu_v1(struct kvm_x86_pmu_feature event,
+>> +				 uint32_t counter_msr, uint32_t nr_gp_counters)
+>> +{
+>> +	uint8_t idx = event.f.bit;
+>> +	unsigned int i;
+>> +
+>> +	for (i = 0; i < nr_gp_counters; i++) {
+>> +		wrmsr(counter_msr + i, 0);
+>> +		wrmsr(MSR_P6_EVNTSEL0 + i, ARCH_PERFMON_EVENTSEL_OS |
+>> +		      ARCH_PERFMON_EVENTSEL_ENABLE | intel_pmu_arch_events[idx]);
+>> +		__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
+>> +
+>> +		if (pmu_is_intel_event_stable(idx))
+>> +			GUEST_ASSERT_EQ(this_pmu_has(event), !!_rdpmc(i));
+>> +
+>> +		wrmsr(MSR_P6_EVNTSEL0 + i, ARCH_PERFMON_EVENTSEL_OS |
+>> +		      !ARCH_PERFMON_EVENTSEL_ENABLE |
+>> +		      intel_pmu_arch_events[idx]);
+>> +		wrmsr(counter_msr + i, 0);
+>> +		__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
+>> +
+>> +		if (pmu_is_intel_event_stable(idx))
+>> +			GUEST_ASSERT(!_rdpmc(i));
+>> +	}
+>> +
+>> +	GUEST_DONE();
+>> +}
+>> +
+>> +static void guest_measure_loop(uint8_t idx)
+>> +{
+>> +	const struct {
+>> +		struct kvm_x86_pmu_feature gp_event;
+>> +	} intel_event_to_feature[] = {
+>> +		[INTEL_ARCH_CPU_CYCLES]		   = { X86_PMU_FEATURE_CPU_CYCLES },
+>> +		[INTEL_ARCH_INSTRUCTIONS_RETIRED]  = { X86_PMU_FEATURE_INSNS_RETIRED },
+>> +		[INTEL_ARCH_REFERENCE_CYCLES]	   = { X86_PMU_FEATURE_REFERENCE_CYCLES },
+>> +		[INTEL_ARCH_LLC_REFERENCES]	   = { X86_PMU_FEATURE_LLC_REFERENCES },
+>> +		[INTEL_ARCH_LLC_MISSES]		   = { X86_PMU_FEATURE_LLC_MISSES },
+>> +		[INTEL_ARCH_BRANCHES_RETIRED]	   = { X86_PMU_FEATURE_BRANCH_INSNS_RETIRED },
+>> +		[INTEL_ARCH_BRANCHES_MISPREDICTED] = { X86_PMU_FEATURE_BRANCHES_MISPREDICTED },
+>> +	};
+>> +
+>> +	uint32_t nr_gp_counters = this_cpu_property(X86_PROPERTY_PMU_NR_GP_COUNTERS);
+>> +	uint32_t pmu_version = this_cpu_property(X86_PROPERTY_PMU_VERSION);
+>> +	struct kvm_x86_pmu_feature gp_event;
+>> +	uint32_t counter_msr;
+>> +	unsigned int i;
+>> +
+>> +	if (rdmsr(MSR_IA32_PERF_CAPABILITIES) & PMU_CAP_FW_WRITES)
+>> +		counter_msr = MSR_IA32_PMC0;
+>> +	else
+>> +		counter_msr = MSR_IA32_PERFCTR0;
+>> +
+>> +	gp_event = intel_event_to_feature[idx].gp_event;
+>> +	TEST_ASSERT_EQ(idx, gp_event.f.bit);
+>> +
+>> +	if (pmu_version < 2) {
+>> +		guest_measure_pmu_v1(gp_event, counter_msr, nr_gp_counters);
+> 
+> Looking at this again, testing guest PMU version 1 is practically impossible
+> because this testcase doesn't force the guest PMU version.  I.e. unless I'm
+> missing something, this requires old hardware or running in a VM with its PMU
+> forced to '1'.
+> 
+> And if all subtests use similar inputs, the common configuration can be shoved
+> into pmu_vm_create_with_one_vcpu().
+> 
+> It's easy enough to fold test_intel_arch_events() into test_intel_counters(),
+> which will also provide coverage for running with full-width writes enabled.  The
+> only downside is that the total runtime will be longer.
+> 
+>> +static void test_arch_events_cpuid(uint8_t i, uint8_t j, uint8_t idx)
+>> +{
+>> +	uint8_t arch_events_unavailable_mask = BIT_ULL(j);
+>> +	uint8_t arch_events_bitmap_size = BIT_ULL(i);
+>> +	struct kvm_vcpu *vcpu;
+>> +	struct kvm_vm *vm;
+>> +
+>> +	vm = pmu_vm_create_with_one_vcpu(&vcpu, guest_measure_loop);
+>> +
+>> +	vcpu_set_cpuid_property(vcpu, X86_PROPERTY_PMU_EBX_BIT_VECTOR_LENGTH,
+>> +				arch_events_bitmap_size);
+>> +	vcpu_set_cpuid_property(vcpu, X86_PROPERTY_PMU_EVENTS_MASK,
+>> +				arch_events_unavailable_mask);
+>> +
+>> +	vcpu_args_set(vcpu, 1, idx);
+>> +
+>> +	run_vcpu(vcpu);
+>> +
+>> +	kvm_vm_free(vm);
+>> +}
+>> +
+>> +static void test_intel_arch_events(void)
+>> +{
+>> +	uint8_t idx, i, j;
+>> +
+>> +	for (idx = 0; idx < NR_INTEL_ARCH_EVENTS; idx++) {
+> 
+> There's no need to iterate over each event in the host, we can simply add a wrapper
+> for guest_measure_loop() in the guest.  That'll be slightly faster since it won't
+> require creating and destroying a VM for every event.
+> 
+>> +		/*
+>> +		 * A brute force iteration of all combinations of values is
+>> +		 * likely to exhaust the limit of the single-threaded thread
+>> +		 * fd nums, so it's test by iterating through all valid
+>> +		 * single-bit values.
+>> +		 */
+>> +		for (i = 0; i < NR_INTEL_ARCH_EVENTS; i++) {
+> 
+> This is flawed/odd.  'i' becomes arch_events_bitmap_size, i.e. it's a length,
+> but the length is computed byt BIT(i).  That's nonsensical and will eventually
+> result in undefined behavior.  Oof, that'll actually happen sooner than later
+> because arch_events_bitmap_size is only a single byte, i.e. when the number of
+> events hits 9, this will try to shove 256 into an 8-bit variable.
+> 
+> The more correct approach would be to pass in 0..NR_INTEL_ARCH_EVENTS inclusive
+> as the size.  But I think we should actually test 0..length+1, where "length" is
+> the max of the native length and NR_INTEL_ARCH_EVENTS, i.e. we should verify KVM
+> KVM handles a size larger than the native length.
+> 
+>> +			for (j = 0; j < NR_INTEL_ARCH_EVENTS; j++)
+>> +				test_arch_events_cpuid(i, j, idx);
+> 
+> And here, I think it makes sense to brute force all possible values for at least
+> one configuration.  There aren't actually _that_ many values, e.g. currently it's
+> 64 (I think).  E.g. test the native PMU version with the "full" length, and then
+> test single bits with varying lengths.
+> 
+> I'll send a v6 later this week.
 
-Excuse me, but this is just a gentle reminder. The 6.7 merge window is
-coming soon, have you missed this PR mail? Or should I rebase to
-6.6-rc7 to send a new PR (a randconfig build error is fixed in
-6.6-rc7)?
+Got it, thanks.
 
-Huacai
-
-On Thu, Oct 5, 2023 at 5:18=E2=80=AFPM Huacai Chen <chenhuacai@loongson.cn>=
- wrote:
->
-> The following changes since commit 8a749fd1a8720d4619c91c8b6e7528c0a355c0=
-aa:
->
->   Linux 6.6-rc4 (2023-10-01 14:15:13 -0700)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson=
-.git tags/loongarch-kvm-6.7
->
-> for you to fetch changes up to 2c10cda4b777be4be9d9e69e4f70c818dbb15e21:
->
->   LoongArch: KVM: Add maintainers for LoongArch KVM (2023-10-02 10:01:29 =
-+0800)
->
-> ----------------------------------------------------------------
-> LoongArch KVM changes for v6.7
->
-> Add LoongArch's KVM support. Loongson 3A5000/3A6000 supports hardware
-> assisted virtualization. With cpu virtualization, there are separate
-> hw-supported user mode and kernel mode in guest mode. With memory
-> virtualization, there are two-level hw mmu table for guest mode and host
-> mode. Also there is separate hw cpu timer with consant frequency in
-> guest mode, so that vm can migrate between hosts with different freq.
-> Currently, we are able to boot LoongArch Linux guests.
->
-> Few key aspects of KVM LoongArch added by this series are:
-> 1. Enable kvm hardware features when kvm module is loaded.
-> 2. Implement VM and vcpu related ioctl interface such as vcpu create,
->    vcpu run etc. GET_ONE_REG/SET_ONE_REG ioctl commands are use to
->    get general registers one by one.
-> 3. Hardware access about MMU, timer and csr are emulated in kernel.
-> 4. Hardwares such as mmio and iocsr device are emulated in user space
->    such as IPI, irqchips, pci devices etc.
->
-> ----------------------------------------------------------------
-> Tianrui Zhao (25):
->       LoongArch: KVM: Add kvm related header files
->       LoongArch: KVM: Implement kvm module related interface
->       LoongArch: KVM: Implement kvm hardware enable, disable interface
->       LoongArch: KVM: Implement VM related functions
->       LoongArch: KVM: Add vcpu related header files
->       LoongArch: KVM: Implement basic vcpu interfaces
->       LoongArch: KVM: Implement basic vcpu ioctl interfaces
->       LoongArch: KVM: Implement fpu operations for vcpu
->       LoongArch: KVM: Implement vcpu interrupt operations
->       LoongArch: KVM: Implement vcpu load and vcpu put operations
->       LoongArch: KVM: Implement misc vcpu related interfaces
->       LoongArch: KVM: Implement vcpu timer operations
->       LoongArch: KVM: Implement virtual machine tlb operations
->       LoongArch: KVM: Implement kvm mmu operations
->       LoongArch: KVM: Implement handle csr exception
->       LoongArch: KVM: Implement handle iocsr exception
->       LoongArch: KVM: Implement handle idle exception
->       LoongArch: KVM: Implement handle gspr exception
->       LoongArch: KVM: Implement handle mmio exception
->       LoongArch: KVM: Implement handle fpu exception
->       LoongArch: KVM: Implement kvm exception vectors
->       LoongArch: KVM: Implement vcpu world switch
->       LoongArch: KVM: Enable kvm config and add the makefile
->       LoongArch: KVM: Supplement kvm document about LoongArch-specific pa=
-rt
->       LoongArch: KVM: Add maintainers for LoongArch KVM
->
->  Documentation/virt/kvm/api.rst             |  70 ++-
->  MAINTAINERS                                |  12 +
->  arch/loongarch/Kbuild                      |   2 +
->  arch/loongarch/Kconfig                     |   6 +
->  arch/loongarch/configs/loongson3_defconfig |   2 +
->  arch/loongarch/include/asm/inst.h          |  16 +
->  arch/loongarch/include/asm/kvm_csr.h       | 211 +++++++
->  arch/loongarch/include/asm/kvm_host.h      | 237 ++++++++
->  arch/loongarch/include/asm/kvm_mmu.h       | 139 +++++
->  arch/loongarch/include/asm/kvm_types.h     |  11 +
->  arch/loongarch/include/asm/kvm_vcpu.h      |  93 +++
->  arch/loongarch/include/asm/loongarch.h     |  19 +-
->  arch/loongarch/include/uapi/asm/kvm.h      | 108 ++++
->  arch/loongarch/kernel/asm-offsets.c        |  32 +
->  arch/loongarch/kvm/Kconfig                 |  40 ++
->  arch/loongarch/kvm/Makefile                |  22 +
->  arch/loongarch/kvm/exit.c                  | 696 +++++++++++++++++++++
->  arch/loongarch/kvm/interrupt.c             | 183 ++++++
->  arch/loongarch/kvm/main.c                  | 420 +++++++++++++
->  arch/loongarch/kvm/mmu.c                   | 914 +++++++++++++++++++++++=
-+++++
->  arch/loongarch/kvm/switch.S                | 250 ++++++++
->  arch/loongarch/kvm/timer.c                 | 197 ++++++
->  arch/loongarch/kvm/tlb.c                   |  32 +
->  arch/loongarch/kvm/trace.h                 | 162 +++++
->  arch/loongarch/kvm/vcpu.c                  | 939 +++++++++++++++++++++++=
-++++++
->  arch/loongarch/kvm/vm.c                    |  94 +++
->  include/uapi/linux/kvm.h                   |   9 +
->  27 files changed, 4902 insertions(+), 14 deletions(-)
->  create mode 100644 arch/loongarch/include/asm/kvm_csr.h
->  create mode 100644 arch/loongarch/include/asm/kvm_host.h
->  create mode 100644 arch/loongarch/include/asm/kvm_mmu.h
->  create mode 100644 arch/loongarch/include/asm/kvm_types.h
->  create mode 100644 arch/loongarch/include/asm/kvm_vcpu.h
->  create mode 100644 arch/loongarch/include/uapi/asm/kvm.h
->  create mode 100644 arch/loongarch/kvm/Kconfig
->  create mode 100644 arch/loongarch/kvm/Makefile
->  create mode 100644 arch/loongarch/kvm/exit.c
->  create mode 100644 arch/loongarch/kvm/interrupt.c
->  create mode 100644 arch/loongarch/kvm/main.c
->  create mode 100644 arch/loongarch/kvm/mmu.c
->  create mode 100644 arch/loongarch/kvm/switch.S
->  create mode 100644 arch/loongarch/kvm/timer.c
->  create mode 100644 arch/loongarch/kvm/tlb.c
->  create mode 100644 arch/loongarch/kvm/trace.h
->  create mode 100644 arch/loongarch/kvm/vcpu.c
->  create mode 100644 arch/loongarch/kvm/vm.c
+Please feel free to let me know if there's anything you'd like me to do.
