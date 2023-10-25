@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 91B867D70E8
+	by mail.lfdr.de (Postfix) with ESMTP id E5EDE7D70E9
 	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 17:29:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235084AbjJYPZk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 11:25:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50386 "EHLO
+        id S1344853AbjJYP1R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 11:27:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234954AbjJYPZh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 11:25:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6D81185
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 08:24:21 -0700 (PDT)
+        with ESMTP id S1344795AbjJYP0p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 11:26:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D55011A7
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 08:24:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698247461;
+        s=mimecast20190719; t=1698247478;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aqVJ3m6WMqYD4Mz4M4HGMFb+ujgiADMaHsCLEbrm/TU=;
-        b=HDFHOyGeavZ3BnJOY4u8skd06DrjIZKeUhVJ0dKOUFOXdMm1aapZehdJT0qHraWOPn45Hy
-        7vInt7ob+VHIM7oNswXYtrMK1v3NzwhXztAMMydxxE64jlG8dJyHIviF9LW3lu//HFFk0M
-        hvhtnZSpp9x3Kmzgb8yS19AQnhtl+Pk=
+        bh=A7rYVmvlTXbHka9B4LL2aRwu8lMZVlpT19ooAQbhZrk=;
+        b=TUBpKTir3/OeG0GWZeu7SDTymIG2fpWg4m0eaX3bNMV/rY9DwFV9Xp6qc1K2UyrVuRWT+i
+        jpd6mBNMxUduMYORJckNuNt99XaRC4FimsdotNjPjUK0UB95YyPJOcTd1bzJ7fUWn6uKRc
+        nMnWtpF35ppu8QWPhhnplwNEojuRb5g=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-458-nHjdpyvmNDuLue8Mc-4EaA-1; Wed,
- 25 Oct 2023 11:24:16 -0400
-X-MC-Unique: nHjdpyvmNDuLue8Mc-4EaA-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-369-6XDaTmb4NumUkKzmNae3ag-1; Wed,
+ 25 Oct 2023 11:24:17 -0400
+X-MC-Unique: 6XDaTmb4NumUkKzmNae3ag-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4DB1E3827962;
-        Wed, 25 Oct 2023 15:24:16 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6FD451C06350;
+        Wed, 25 Oct 2023 15:24:17 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.45.226.101])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F2152166B26;
-        Wed, 25 Oct 2023 15:24:15 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 82E2D2166B26;
+        Wed, 25 Oct 2023 15:24:16 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
 Cc:     linux-kernel@vger.kernel.org
-Subject: [PATCH 07/14] KVM: x86: hyper-v: Introduce kvm_hv_nested_transtion_tlb_flush() helper
-Date:   Wed, 25 Oct 2023 17:23:59 +0200
-Message-ID: <20231025152406.1879274-8-vkuznets@redhat.com>
+Subject: [PATCH 08/14] KVM: selftests: Make all Hyper-V tests explicitly dependent on Hyper-V emulation support in KVM
+Date:   Wed, 25 Oct 2023 17:24:00 +0200
+Message-ID: <20231025152406.1879274-9-vkuznets@redhat.com>
 In-Reply-To: <20231025152406.1879274-1-vkuznets@redhat.com>
 References: <20231025152406.1879274-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -53,92 +53,127 @@ Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As a preparation to making Hyper-V emulation optional, introduce a helper
-to handle pending KVM_REQ_HV_TLB_FLUSH requests.
-
-No functional change intended.
+In preparation for conditional Hyper-V emulation enablement in KVM, make
+Hyper-V specific tests check skip gracefully instead of failing when the
+support is not there.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/kvm/hyperv.h     | 12 ++++++++++++
- arch/x86/kvm/svm/nested.c | 10 ++--------
- arch/x86/kvm/vmx/nested.c | 10 ++--------
- 3 files changed, 16 insertions(+), 16 deletions(-)
+ tools/testing/selftests/kvm/x86_64/hyperv_clock.c            | 2 ++
+ tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c            | 5 +++--
+ .../selftests/kvm/x86_64/hyperv_extended_hypercalls.c        | 2 ++
+ tools/testing/selftests/kvm/x86_64/hyperv_features.c         | 2 ++
+ tools/testing/selftests/kvm/x86_64/hyperv_ipi.c              | 2 ++
+ tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c         | 1 +
+ tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c        | 2 ++
+ 7 files changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
-index ddb1d0b019e6..75dcbe598fbc 100644
---- a/arch/x86/kvm/hyperv.h
-+++ b/arch/x86/kvm/hyperv.h
-@@ -246,6 +246,18 @@ static inline int kvm_hv_verify_vp_assist(struct kvm_vcpu *vcpu)
- 	return kvm_hv_get_assist_page(vcpu);
- }
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
+index f25749eaa6a8..f5e1e98f04f9 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
+@@ -211,6 +211,8 @@ int main(void)
+ 	vm_vaddr_t tsc_page_gva;
+ 	int stage;
  
-+static inline void kvm_hv_nested_transtion_tlb_flush(struct kvm_vcpu *vcpu, bool tdp_enabled)
-+{
-+	/*
-+	 * KVM_REQ_HV_TLB_FLUSH flushes entries from either L1's VP_ID or
-+	 * L2's VP_ID upon request from the guest. Make sure we check for
-+	 * pending entries in the right FIFO upon L1/L2 transition as these
-+	 * requests are put by other vCPUs asynchronously.
-+	 */
-+	if (to_hv_vcpu(vcpu) && tdp_enabled)
-+		kvm_make_request(KVM_REQ_HV_TLB_FLUSH, vcpu);
-+}
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_TIME));
 +
- int kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu);
+ 	vm = vm_create_with_one_vcpu(&vcpu, guest_main);
  
- #endif
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 3fea8c47679e..74c04102ef01 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -487,14 +487,8 @@ static void nested_save_pending_event_to_vmcb12(struct vcpu_svm *svm,
+ 	vcpu_set_hv_cpuid(vcpu);
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c b/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
+index 7bde0c4dfdbd..4c7257ecd2a6 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
+@@ -240,11 +240,12 @@ int main(int argc, char *argv[])
+ 	struct ucall uc;
+ 	int stage;
  
- static void nested_svm_transition_tlb_flush(struct kvm_vcpu *vcpu)
+-	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+-
+ 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_NESTED_STATE));
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS));
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_DIRECT_TLBFLUSH));
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+ 
+ 	hcall_page = vm_vaddr_alloc_pages(vm, 1);
+ 	memset(addr_gva2hva(vm, hcall_page), 0x0,  getpagesize());
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
+index e036db1f32b9..949e08e98f31 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
+@@ -43,6 +43,8 @@ int main(void)
+ 	uint64_t *outval;
+ 	struct ucall uc;
+ 
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_CPUID));
++
+ 	/* Verify if extended hypercalls are supported */
+ 	if (!kvm_cpuid_has(kvm_get_supported_hv_cpuid(),
+ 			   HV_ENABLE_EXTENDED_HYPERCALLS)) {
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+index 9f28aa276c4e..387c605a3077 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+@@ -690,6 +690,8 @@ static void guest_test_hcalls_access(void)
+ 
+ int main(void)
  {
--	/*
--	 * KVM_REQ_HV_TLB_FLUSH flushes entries from either L1's VP_ID or
--	 * L2's VP_ID upon request from the guest. Make sure we check for
--	 * pending entries in the right FIFO upon L1/L2 transition as these
--	 * requests are put by other vCPUs asynchronously.
--	 */
--	if (to_hv_vcpu(vcpu) && npt_enabled)
--		kvm_make_request(KVM_REQ_HV_TLB_FLUSH, vcpu);
-+	/* Handle pending Hyper-V TLB flush requests */
-+	kvm_hv_nested_transtion_tlb_flush(vcpu, npt_enabled);
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_ENFORCE_CPUID));
++
+ 	pr_info("Testing access to Hyper-V specific MSRs\n");
+ 	guest_test_msrs_access();
  
- 	/*
- 	 * TODO: optimize unconditional TLB flush/MMU sync.  A partial list of
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index c5ec0ef51ff7..382c0746d069 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1139,14 +1139,8 @@ static void nested_vmx_transition_tlb_flush(struct kvm_vcpu *vcpu,
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c b/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c
+index 6feb5ddb031d..65e5f4c05068 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c
+@@ -248,6 +248,8 @@ int main(int argc, char *argv[])
+ 	int stage = 1, r;
+ 	struct ucall uc;
  
--	/*
--	 * KVM_REQ_HV_TLB_FLUSH flushes entries from either L1's VP_ID or
--	 * L2's VP_ID upon request from the guest. Make sure we check for
--	 * pending entries in the right FIFO upon L1/L2 transition as these
--	 * requests are put by other vCPUs asynchronously.
--	 */
--	if (to_hv_vcpu(vcpu) && enable_ept)
--		kvm_make_request(KVM_REQ_HV_TLB_FLUSH, vcpu);
-+	/* Handle pending Hyper-V TLB flush requests */
-+	kvm_hv_nested_transtion_tlb_flush(vcpu, enable_ept);
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_SEND_IPI));
++
+ 	vm = vm_create_with_one_vcpu(&vcpu[0], sender_guest_code);
  
- 	/*
- 	 * If vmcs12 doesn't use VPID, L1 expects linear and combined mappings
+ 	/* Hypercall input/output */
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
+index 6c1278562090..c9b18707edc0 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
+@@ -158,6 +158,7 @@ int main(int argc, char *argv[])
+ 	int stage;
+ 
+ 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM));
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_DIRECT_TLBFLUSH));
+ 
+ 	/* Create VM */
+ 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c b/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
+index 4758b6ef5618..c4443f71f8dd 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
+@@ -590,6 +590,8 @@ int main(int argc, char *argv[])
+ 	struct ucall uc;
+ 	int stage = 1, r, i;
+ 
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_TLBFLUSH));
++
+ 	vm = vm_create_with_one_vcpu(&vcpu[0], sender_guest_code);
+ 
+ 	/* Test data page */
 -- 
 2.41.0
 
