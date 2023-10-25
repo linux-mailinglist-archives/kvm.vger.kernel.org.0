@@ -2,46 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 533F37D7798
-	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 00:07:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B25A47D779D
+	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 00:08:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230268AbjJYWHm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 18:07:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50810 "EHLO
+        id S230139AbjJYWIv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 18:08:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229672AbjJYWHl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 18:07:41 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43031181;
-        Wed, 25 Oct 2023 15:07:39 -0700 (PDT)
+        with ESMTP id S229632AbjJYWIu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 18:08:50 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CA50137;
+        Wed, 25 Oct 2023 15:08:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698271659; x=1729807659;
+  t=1698271728; x=1729807728;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=rVH8e2xYJkm/6qBrfAwjjJPiaUgou/S0L0j6IGkYVcs=;
-  b=R3zm3Pv4id/aMZxuhD9+KIF3eckEHWLnjv4PeMy+VzLD5im1nXRQ/BFm
-   LRTm/Jxg6t6b0l++sbaB3p52YPtxqWRreagKPVi3EQd2+ocoJUnakKYVu
-   JHGh5JIRTRRUKNILeQsBsVHke4hftmaJbzw37dlnonCI+V9/OUgTeIX/P
-   ztNPDFdi2rkqtfDeyxnKUy8JpI/ae8H9L4eS2Y3qv8zn8q2x8eRNUURxF
-   iJhGJXNC/1kFCRIjOnE9GpGs/7eSIswVttthpv7xoYPRsrQEWXvOLO5mz
-   q0E1xnWPRVrSELks8VuF/pBGF+Lza4vKB65Xni2bHtpjyPwdsywvCggVb
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="391280180"
+   mime-version:in-reply-to;
+  bh=DWvlz5HH3IT7+JIB5yYoTEyrNXh/OYjDwgjcnyHWpak=;
+  b=mYK7380dPTkRJGodNDTDoIrRKIJJyzjYHYgjT5GI9kLeuD6BAvjjU0fA
+   6O4qJDhvMTAxkMbcX8ZbTNw56+f20Z3WUavl/parv0BNsp0xbyOP82KXJ
+   hNx53WsqJUfpnEFIM7+NCaw88xLPPqzkDcFIM8/lsfXgaoV8Ms807d197
+   JxiQi9YePxT1LB92uWN+BpGV2C8RlREoDQ0nmer8h54IUbQ3BzssRQfw+
+   g7N2kXSTv5ifel88ZUVLqpw6UNUJ06Ef56Zdoe2RZZ+3GlPcQAhlUoA0p
+   /ZgdiDuDXUdQse7i0hF3g7T59ZXaMyL0/tqyODzlGjRl5lBR6r6WkAMqi
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="191204"
 X-IronPort-AV: E=Sophos;i="6.03,252,1694761200"; 
-   d="scan'208";a="391280180"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 15:07:38 -0700
+   d="scan'208";a="191204"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 15:08:48 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="932518794"
+X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="875670600"
 X-IronPort-AV: E=Sophos;i="6.03,252,1694761200"; 
-   d="scan'208";a="932518794"
-Received: from kkomeyli-mobl.amr.corp.intel.com (HELO desk) ([10.251.29.139])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 15:07:38 -0700
-Date:   Wed, 25 Oct 2023 15:07:35 -0700
-From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To:     Andrew Cooper <andrew.cooper3@citrix.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
+   d="scan'208";a="875670600"
+Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
+  by fmsmga002.fm.intel.com with ESMTP; 25 Oct 2023 15:08:42 -0700
+Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qvm3M-0009EQ-1W;
+        Wed, 25 Oct 2023 22:08:40 +0000
+Date:   Thu, 26 Oct 2023 06:08:01 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>,
@@ -51,83 +55,85 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Jonathan Corbet <corbet@lwn.net>,
         Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
-        ak@linux.intel.com, tim.c.chen@linux.intel.com,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org,
+        ak@linux.intel.com, tim.c.chen@linux.intel.com
+Cc:     oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
         Alyssa Milburn <alyssa.milburn@linux.intel.com>,
         Daniel Sneddon <daniel.sneddon@linux.intel.com>,
         antonio.gomez.iglesias@linux.intel.com,
-        Alyssa Milburn <alyssa.milburn@intel.com>
-Subject: Re: [PATCH v3 1/6] x86/bugs: Add asm helpers for executing VERW
-Message-ID: <20231025220735.gpopnng76klkbuu3@desk>
-References: <20231025-delay-verw-v3-0-52663677ee35@linux.intel.com>
- <20231025-delay-verw-v3-1-52663677ee35@linux.intel.com>
- <8b6d857f-cbf6-4969-8285-f90254bdafc0@citrix.com>
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Subject: Re: [PATCH  v2 4/6] x86/bugs: Use ALTERNATIVE() instead of
+ mds_user_clear static key
+Message-ID: <202310260517.TrEGc1ZW-lkp@intel.com>
+References: <20231024-delay-verw-v2-4-f1881340c807@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8b6d857f-cbf6-4969-8285-f90254bdafc0@citrix.com>
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20231024-delay-verw-v2-4-f1881340c807@linux.intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 25, 2023 at 10:10:41PM +0100, Andrew Cooper wrote:
-> > +.align L1_CACHE_BYTES, 0xcc
-> > +SYM_CODE_START_NOALIGN(mds_verw_sel)
-> > +	UNWIND_HINT_UNDEFINED
-> > +	ANNOTATE_NOENDBR
-> > +	.word __KERNEL_DS
-> 
-> You need another .align here.  Otherwise subsequent code will still
-> start in this cacheline and defeat the purpose of trying to keep it
-> separate.
+Hi Pawan,
 
-Right.
+kernel test robot noticed the following build warnings:
 
-> > +SYM_CODE_END(mds_verw_sel);
-> 
-> Thinking about it, should this really be CODE and not a data entry?
+[auto build test WARNING on 05d3ef8bba77c1b5f98d941d8b2d4aeab8118ef1]
 
-Would that require adding a data equivalent of .entry.text and update
-KPTI to keep it mapped? Or is there an easier option?
+url:    https://github.com/intel-lab-lkp/linux/commits/Pawan-Gupta/x86-bugs-Add-asm-helpers-for-executing-VERW/20231024-161029
+base:   05d3ef8bba77c1b5f98d941d8b2d4aeab8118ef1
+patch link:    https://lore.kernel.org/r/20231024-delay-verw-v2-4-f1881340c807%40linux.intel.com
+patch subject: [PATCH  v2 4/6] x86/bugs: Use ALTERNATIVE() instead of mds_user_clear static key
+reproduce: (https://download.01.org/0day-ci/archive/20231026/202310260517.TrEGc1ZW-lkp@intel.com/reproduce)
 
-> P.S. Please CC on the full series.  Far less effort than fishing the
-> rest off lore.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310260517.TrEGc1ZW-lkp@intel.com/
 
-I didn't realize get_maintainer.pl isn't doing that already. Proposing
-below update to MAINTAINERS:
+All warnings (new ones prefixed by >>):
 
----
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Date: Wed, 25 Oct 2023 14:50:41 -0700
-Subject: [PATCH] MAINTAINERS: Update entry for X86 HARDWARE VULNERABILITIES
+>> Documentation/arch/x86/mds.rst:153: WARNING: Unexpected section title.
 
-Add Andrew Cooper to maintainers of hardware vulnerabilities
-mitigations.
+vim +153 Documentation/arch/x86/mds.rst
 
-Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+   141	
+   142	   When transitioning from kernel to user space the CPU buffers are flushed
+   143	   on affected CPUs when the mitigation is not disabled on the kernel
+   144	   command line. The mitigation is enabled through the feature flag
+   145	   X86_FEATURE_CLEAR_CPU_BUF.
+   146	
+   147	   The mitigation is invoked just before transitioning to userspace after
+   148	   user registers are restored. This is done to minimize the window in
+   149	   which kernel data could be accessed after VERW e.g. via an NMI after
+   150	   VERW.
+   151	
+   152	   Corner case not handled
+ > 153	   ^^^^^^^^^^^^^^^^^^^^^^^
+   154	   Interrupts returning to kernel don't clear CPUs buffers since the
+   155	   exit-to-user path is expected to do that anyways. But, there could be
+   156	   a case when an NMI is generated in kernel after the exit-to-user path
+   157	   has cleared the buffers. This case is not handled and NMI returning to
+   158	   kernel don't clear CPU buffers because:
+   159	
+   160	   1. It is rare to get an NMI after VERW, but before returning to userspace.
+   161	   2. For an unprivileged user, there is no known way to make that NMI
+   162	      less rare or target it.
+   163	   3. It would take a large number of these precisely-timed NMIs to mount
+   164	      an actual attack.  There's presumably not enough bandwidth.
+   165	   4. The NMI in question occurs after a VERW, i.e. when user state is
+   166	      restored and most interesting data is already scrubbed. Whats left
+   167	      is only the data that NMI touches, and that may or may not be of
+   168	      any interest.
+   169	
+   170	
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 2894f0777537..bf8c8707b8f8 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -23382,6 +23382,7 @@ M:	Thomas Gleixner <tglx@linutronix.de>
- M:	Borislav Petkov <bp@alien8.de>
- M:	Peter Zijlstra <peterz@infradead.org>
- M:	Josh Poimboeuf <jpoimboe@kernel.org>
-+M:	Andrew Cooper <andrew.cooper3@citrix.com>
- R:	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
- S:	Maintained
- F:	Documentation/admin-guide/hw-vuln/
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
