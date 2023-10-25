@@ -2,118 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B3FA77D69F5
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 13:23:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC1D07D69FE
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 13:24:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234446AbjJYLXF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 07:23:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52402 "EHLO
+        id S233782AbjJYLYq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 07:24:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232076AbjJYLXE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 07:23:04 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 606B3AC;
-        Wed, 25 Oct 2023 04:23:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698232982; x=1729768982;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=CZg24sm7bW9fHsCSHaWFydwaTAPtdesmJoU4Yu4b6n8=;
-  b=VMgcg73FlyVtlNW6f8icUfjFfKdq5m1xFo+xQ8LcPet/ZAt56iYojmKs
-   DMjDvfphZ5qmmtEN/Q9aVJRaz8ezqrZ0vNsPmn23DBVjeKPot9sFZcfd3
-   yymxhfpJt0yukcK0tzm1URG+fV33DvII2+H2AzlaszXpivSnlLHEudhoE
-   5oslbwgGREbz5L2wgCvua62vU+6AINAHsv/t4Fux/0xqaTbAcUeUVMra4
-   icF58eG7yeo+Xi+9ofgKUPlGEdzkTWV89SO7HnAfcsFDs77yb0jJ65L2a
-   criBnhktrYfyUeNutfHaL5xLP9r9ZoBhK6XzgOlLV/r0HPXgYS2Ln53Fd
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="386170339"
-X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
-   d="scan'208";a="386170339"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 04:23:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="1005984943"
-X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
-   d="scan'208";a="1005984943"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.25.165]) ([10.93.25.165])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 04:22:58 -0700
-Message-ID: <6132ba52-fdf1-4680-9e4e-5ea2fcb63b3c@linux.intel.com>
-Date:   Wed, 25 Oct 2023 19:22:55 +0800
+        with ESMTP id S230217AbjJYLYp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 07:24:45 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69B6AE8;
+        Wed, 25 Oct 2023 04:24:43 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-27d4b280e4eso604856a91.1;
+        Wed, 25 Oct 2023 04:24:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698233083; x=1698837883; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=z8Z+tYRzui7BaJuiaZnyDHDcWrbR6sR0khHhdgWMTK0=;
+        b=Uogu5R6NiorHh7DCI/9zY4nv8zOLuluoQ0guDV3Ozy46RTj6zOp/EP+vYbK6JDBsg3
+         BeI2yJE1IgHX3OHQvwrV9rKPU6dt3Ez/zwifapxw1882oiUr6DLRwpgpmJ28XG5OyVDA
+         HZWBagVbnqjc38osyGP/6kVQgG4fKEZXUBTlpYm1vfJxu/uzZQFLFfcu4BkJix1NERqo
+         r3MkV691EayVYjeEOh9gdNPkFzBY4iKTxgBPUKNFKAMsCVr6BeLe8bow/4q1eh3tLbil
+         RoBPOrwznvEE3OEMv+NCc/Ku/GTRUkJTw++B8rg5NIf6UpeLAz2hL/3x8skCPOQfg6E2
+         sDBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698233083; x=1698837883;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z8Z+tYRzui7BaJuiaZnyDHDcWrbR6sR0khHhdgWMTK0=;
+        b=p2aUdiaKSqgc/jKil3caX0mSoRw8hHP258N8p6+Qef/IaRzjZ19d/kxRIPO68hcMCF
+         Gp4Fu9HVEc0kNifBUMY8urUZSQyzlzzJYK3BPLBcGIO/VAImiWyMdJBuUaZJ1vfjC8j7
+         JbnzhGgR806vizM/PNeGEj85z3KMJRkukiCyU91DblX1/AV2/Y2sre4ph4fQOycKzXX/
+         z7TuZ7N91yZo2lEH2/he8tpi6fpt7qmDLU6RR9So4x+MthLgTr1h3pk11CsObq4p+AN1
+         rPnU93W0mnDC/L/6CVOf+SHxUYOrtbRAF1QaiFDtU6O90S36i4ZjkO5aH2KHjWo4ccRs
+         5THQ==
+X-Gm-Message-State: AOJu0Yw+uKxbo1uA32f2CK6zpMBFrP+rOy/ESRDw5ySpUyY+lafKmJCI
+        Lzlk/urzrokaLuCEp3Jqviw=
+X-Google-Smtp-Source: AGHT+IGo7WioyE6T60WElBAE+qqcB9BUrGyOmNrgzD0IHWwguA2y5too62V1ajdxZCs0XWEO+XnjjQ==
+X-Received: by 2002:a17:90b:8c:b0:27d:1aa:32b8 with SMTP id bb12-20020a17090b008c00b0027d01aa32b8mr24636071pjb.9.1698233082761;
+        Wed, 25 Oct 2023 04:24:42 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id k5-20020a17090a7f0500b00267b38f5e13sm8545467pjl.2.2023.10.25.04.24.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Oct 2023 04:24:42 -0700 (PDT)
+Message-ID: <53d7caba-8b00-42ab-849a-d8c8d94aea37@gmail.com>
+Date:   Wed, 25 Oct 2023 19:24:36 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests Patch 2/5] x86: pmu: Change the minimum value of
- llc_misses event to 0
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>
-References: <20231024075748.1675382-1-dapeng1.mi@linux.intel.com>
- <20231024075748.1675382-3-dapeng1.mi@linux.intel.com>
- <CALMp9eRqGr+5+C1OLhxv1i8Q=YVRmFxkZQJoh7HzWkPg2z=WoA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/xsave: Remove 'return void' expression for 'void
+ function'
 Content-Language: en-US
-From:   "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <CALMp9eRqGr+5+C1OLhxv1i8Q=YVRmFxkZQJoh7HzWkPg2z=WoA@mail.gmail.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+References: <20231007064019.17472-1-likexu@tencent.com>
+ <e4d6c6a5030f49f44febf99ba4c7040938c3c483.camel@redhat.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <e4d6c6a5030f49f44febf99ba4c7040938c3c483.camel@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Emm, did we miss this little fix ?
 
-On 10/24/2023 9:03 PM, Jim Mattson wrote:
-> On Tue, Oct 24, 2023 at 12:51 AM Dapeng Mi <dapeng1.mi@linux.intel.com> wrote:
->> Along with the CPU HW's upgrade and optimization, the count of LLC
->> misses event for running loop() helper could be 0 just like seen on
->> Sapphire Rapids.
+On 11/10/2023 12:12 am, Maxim Levitsky wrote:
+> У сб, 2023-10-07 у 14:40 +0800, Like Xu пише:
+>> From: Like Xu <likexu@tencent.com>
 >>
->> So modify the lower limit of possible count range for LLC misses
->> events to 0 to avoid LLC misses event test failure on Sapphire Rapids.
-> I'm not convinced that these tests are really indicative of whether or
-> not the PMU is working properly. If 0 is allowed for llc misses, for
-> instance, doesn't this sub-test pass even when the PMU is disabled?
->
-> Surely, we can do better.
-
-
-Considering the testing workload is just a simple adding loop, it's 
-reasonable and possible that it gets a 0 result for LLC misses and 
-branch misses events. Yeah, I agree the 0 count makes the results not so 
-credible. If we want to avoid these 0 count values, we may have to 
-complicate the workload, such as adding flush cache instructions, or 
-something like that (I'm not sure if there are instructions which can 
-force branch misses). How's your idea about this?
-
-
->
->> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+>> The requested info will be stored in 'guest_xsave->region' referenced by
+>> the incoming pointer "struct kvm_xsave *guest_xsave", thus there is no need
+>> to explicitly use return void expression for a void function "static void
+>> kvm_vcpu_ioctl_x86_get_xsave(...)". The issue is caught with [-Wpedantic].
+>>
+>> Fixes: 2d287ec65e79 ("x86/fpu: Allow caller to constrain xfeatures when copying to uabi buffer")
+>> Signed-off-by: Like Xu <likexu@tencent.com>
 >> ---
->>   x86/pmu.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>   arch/x86/kvm/x86.c | 4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
 >>
->> diff --git a/x86/pmu.c b/x86/pmu.c
->> index 0def28695c70..7443fdab5c8a 100644
->> --- a/x86/pmu.c
->> +++ b/x86/pmu.c
->> @@ -35,7 +35,7 @@ struct pmu_event {
->>          {"instructions", 0x00c0, 10*N, 10.2*N},
->>          {"ref cycles", 0x013c, 1*N, 30*N},
->>          {"llc references", 0x4f2e, 1, 2*N},
->> -       {"llc misses", 0x412e, 1, 1*N},
->> +       {"llc misses", 0x412e, 0, 1*N},
->>          {"branches", 0x00c4, 1*N, 1.1*N},
->>          {"branch misses", 0x00c5, 0, 0.1*N},
->>   }, amd_gp_events[] = {
->> --
->> 2.34.1
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index fdb2b0e61c43..2571466a317f 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -5503,8 +5503,8 @@ static void kvm_vcpu_ioctl_x86_get_xsave2(struct kvm_vcpu *vcpu,
+>>   static void kvm_vcpu_ioctl_x86_get_xsave(struct kvm_vcpu *vcpu,
+>>   					 struct kvm_xsave *guest_xsave)
+>>   {
+>> -	return kvm_vcpu_ioctl_x86_get_xsave2(vcpu, (void *)guest_xsave->region,
+>> -					     sizeof(guest_xsave->region));
+>> +	kvm_vcpu_ioctl_x86_get_xsave2(vcpu, (void *)guest_xsave->region,
+>> +				      sizeof(guest_xsave->region));
+>>   }
+>>   
+>>   static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
 >>
+>> base-commit: 86701e115030e020a052216baa942e8547e0b487
+> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
