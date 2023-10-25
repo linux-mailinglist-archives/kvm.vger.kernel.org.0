@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DE517D6FF0
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 16:54:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CFF37D7007
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 16:54:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344415AbjJYOvW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 10:51:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53888 "EHLO
+        id S1344116AbjJYOvS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 10:51:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344183AbjJYOvP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 10:51:15 -0400
+        with ESMTP id S235009AbjJYOvL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 10:51:11 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FE54E5
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:51:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 379A6E5
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:51:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=xzkyRUM7nQfBrePX87BOU/AjGHoWHaL/QraAYhiDuVA=; b=BL58INjOUPmq2JMYOeuvydyhAU
-        tPTn/p80t5Eh08H3gRlleRlgP+tgQWGq7N5wXJH7X/mlOScXTpOEWnbOuRpXEPuP6qVNRYaSGOugd
-        6tcXeJgK3mLtMIaVmwTi4STOuz6ondMNTsb2Dj73DZe37n6idaDQJsRGljufaBfSmbEuV49teBrTx
-        m/FgIqkMEwtqCXoCcT8ymUrb/NGT1pJYZuYZbwQtSluK2yb0iTICekflP2IJA3Gpi9MMvtZg5uGSH
-        wfGZq2vvHZM4qZ/snaUefgRQOvq1JM0TDWen5C41IvSrdS9pyW1ej5/6MqLtxrfa64loaDy8AXSPz
-        05GH0pzA==;
+        bh=j1Dn7q6Qaq7MnCa855VhKvMLvN78EtjWJTTcd6S4txs=; b=rRulWpO/m0gfiN0feKRMJZSGn5
+        hRb9Vhn0bdyIvk8sj9Nt8PrmsB+acuGZEgM7FOw8AsoyxXxHygnhWbexOYTZSNvolWwwRcUpY7hjN
+        XU24Q1mO6Z+auWuq84CoUAajkyrw/NRboHyl27cTjafRF6CgAJ9ul4iipKrpoBn0P3JGvvga1AXmv
+        QxxoqHWiJGigYp5z+gD7lgnCjxs+fGVFEcVdbQbvAv6KVjR1H8moKw2mVAHvZ2E9c75IQppZnUuAi
+        VRF1jA9gaRSwI4R/1xFcs4XD/lxEjotJUrUjcOw2BevIt2NNd/X3xQnnKAs5Y7sw7WIP62A7xqAxL
+        pPIINzNw==;
 Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qvfDb-009Nmv-GY; Wed, 25 Oct 2023 14:50:47 +0000
+        id 1qvfDb-009NnL-Gt; Wed, 25 Oct 2023 14:50:47 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qvfDZ-002dFp-2d;
+        id 1qvfDZ-002dFt-2r;
         Wed, 25 Oct 2023 15:50:45 +0100
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     qemu-devel@nongnu.org
@@ -47,9 +47,9 @@ Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
         xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
         Bernhard Beschow <shentey@gmail.com>,
         Joel Upham <jupham125@gmail.com>
-Subject: [PATCH v3 27/28] hw/xen: use qemu_create_nic_bus_devices() to instantiate Xen NICs
-Date:   Wed, 25 Oct 2023 15:50:41 +0100
-Message-Id: <20231025145042.627381-28-dwmw2@infradead.org>
+Subject: [PATCH v3 28/28] docs: update Xen-on-KVM documentation
+Date:   Wed, 25 Oct 2023 15:50:42 +0100
+Message-Id: <20231025145042.627381-29-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231025145042.627381-1-dwmw2@infradead.org>
 References: <20231025145042.627381-1-dwmw2@infradead.org>
@@ -68,117 +68,171 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-When instantiating XenBus itself, for each NIC which is configured with
-either the model unspecified, or set to to "xen" or "xen-net-device",
-create a corresponding xen-net-device for it.
+Add notes about console and network support, and how to launch PV guests.
+Clean up the disk configuration examples now that that's simpler, and
+remove the comment about IDE unplug on q35/AHCI now that it's fixed.
 
-Now we can launch emulated Xen guests with '-nic user', and this fixes
-the setup for Xen PV guests, which was previously broken in various
-ways and never actually managed to peer with the netdev.
+Also update stale avocado test filename in MAINTAINERS.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- hw/xen/xen-bus.c                    |  4 ++++
- hw/xen/xen_devconfig.c              | 25 -------------------------
- hw/xenpv/xen_machine_pv.c           |  9 ---------
- include/hw/xen/xen-legacy-backend.h |  1 -
- 4 files changed, 4 insertions(+), 35 deletions(-)
+ MAINTAINERS              |   2 +-
+ docs/system/i386/xen.rst | 100 ++++++++++++++++++++++++++++-----------
+ 2 files changed, 73 insertions(+), 29 deletions(-)
 
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index cc6f1b362f..fb82cc33e4 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -19,6 +19,7 @@
- #include "qapi/error.h"
- #include "qapi/qmp/qdict.h"
- #include "sysemu/sysemu.h"
-+#include "net/net.h"
- #include "trace.h"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index d36aa44661..0fcc454ccd 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -490,7 +490,7 @@ S: Supported
+ F: include/sysemu/kvm_xen.h
+ F: target/i386/kvm/xen*
+ F: hw/i386/kvm/xen*
+-F: tests/avocado/xen_guest.py
++F: tests/avocado/kvm_xen_guest.py
  
- static char *xen_device_get_backend_path(XenDevice *xendev)
-@@ -1140,4 +1141,7 @@ void xen_bus_init(void)
+ Guest CPU Cores (other accelerators)
+ ------------------------------------
+diff --git a/docs/system/i386/xen.rst b/docs/system/i386/xen.rst
+index f06765e88c..6214c4571e 100644
+--- a/docs/system/i386/xen.rst
++++ b/docs/system/i386/xen.rst
+@@ -15,46 +15,24 @@ Setup
+ -----
  
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
-     qbus_set_bus_hotplug_handler(bus);
+ Xen mode is enabled by setting the ``xen-version`` property of the KVM
+-accelerator, for example for Xen 4.10:
++accelerator, for example for Xen 4.17:
+ 
+ .. parsed-literal::
+ 
+-  |qemu_system| --accel kvm,xen-version=0x4000a,kernel-irqchip=split
++  |qemu_system| --accel kvm,xen-version=0x40011,kernel-irqchip=split
+ 
+ Additionally, virtual APIC support can be advertised to the guest through the
+ ``xen-vapic`` CPU flag:
+ 
+ .. parsed-literal::
+ 
+-  |qemu_system| --accel kvm,xen-version=0x4000a,kernel-irqchip=split --cpu host,+xen_vapic
++  |qemu_system| --accel kvm,xen-version=0x40011,kernel-irqchip=split --cpu host,+xen-vapic
+ 
+ When Xen support is enabled, QEMU changes hypervisor identification (CPUID
+ 0x40000000..0x4000000A) to Xen. The KVM identification and features are not
+ advertised to a Xen guest. If Hyper-V is also enabled, the Xen identification
+ moves to leaves 0x40000100..0x4000010A.
+ 
+-The Xen platform device is enabled automatically for a Xen guest. This allows
+-a guest to unplug all emulated devices, in order to use Xen PV block and network
+-drivers instead. Under Xen, the boot disk is typically available both via IDE
+-emulation, and as a PV block device. Guest bootloaders typically use IDE to load
+-the guest kernel, which then unplugs the IDE and continues with the Xen PV block
+-device.
+-
+-This configuration can be achieved as follows
+-
+-.. parsed-literal::
+-
+-  |qemu_system| -M pc --accel kvm,xen-version=0x4000a,kernel-irqchip=split \\
+-       -drive file=${GUEST_IMAGE},if=none,id=disk,file.locking=off -device xen-disk,drive=disk,vdev=xvda \\
+-       -drive file=${GUEST_IMAGE},index=2,media=disk,file.locking=off,if=ide
+-
+-It is necessary to use the pc machine type, as the q35 machine uses AHCI instead
+-of legacy IDE, and AHCI disks are not unplugged through the Xen PV unplug
+-mechanism.
+-
+-VirtIO devices can also be used; Linux guests may need to be dissuaded from
+-umplugging them by adding 'xen_emul_unplug=never' on their command line.
+-
+ Properties
+ ----------
+ 
+@@ -63,7 +41,10 @@ The following properties exist on the KVM accelerator object:
+ ``xen-version``
+   This property contains the Xen version in ``XENVER_version`` form, with the
+   major version in the top 16 bits and the minor version in the low 16 bits.
+-  Setting this property enables the Xen guest support.
++  Setting this property enables the Xen guest support. If Xen version 4.5 or
++  greater is specified, the HVM leaf in Xen CPUID is populated. Xen version
++  4.6 enables the vCPU ID in CPUID, and version 4.17 advertises vCPU upcall
++  vector support to the guest.
+ 
+ ``xen-evtchn-max-pirq``
+   Xen PIRQs represent an emulated physical interrupt, either GSI or MSI, which
+@@ -83,8 +64,71 @@ The following properties exist on the KVM accelerator object:
+   through simultaneous grants. For guests with large numbers of PV devices and
+   high throughput, it may be desirable to increase this value.
+ 
+-OS requirements
+----------------
++Xen paravirtual devices
++-----------------------
 +
-+    qemu_create_nic_bus_devices(bus, TYPE_XEN_DEVICE, "xen-net-device",
-+                                "xen", "xen-net-device");
- }
-diff --git a/hw/xen/xen_devconfig.c b/hw/xen/xen_devconfig.c
-index 3f77c675c6..2150869f60 100644
---- a/hw/xen/xen_devconfig.c
-+++ b/hw/xen/xen_devconfig.c
-@@ -46,31 +46,6 @@ static int xen_config_dev_all(char *fe, char *be)
++The Xen PCI platform device is enabled automatically for a Xen guest. This
++allows a guest to unplug all emulated devices, in order to use paravirtual
++block and network drivers instead.
++
++Those paravirtual Xen block, network (and console) devices can be created
++through the command line, and/or hot-plugged.
++
++To provide a Xen console device, define a character device and then a device
++of type ``xen-console`` to connect to it. For the Xen console equivalent of
++the handy ``-serial mon:stdio`` option, for example:
++
++.. parsed-literal::
++   -chardev -chardev stdio,mux=on,id=char0,signal=off -mon char0 \\
++   -device xen-console,chardev=char0
++
++The Xen network device is ``xen-net-device``, which becomes the default NIC
++model for emulated Xen guests, meaning that just the default ``-nic user``
++should automatically work and present a Xen network device to the guest.
++
++Disks can be configured with '``-drive file=${GUEST_IMAGE},if=xen``' and will
++appear to the guest as ``xvda`` onwards.
++
++Under Xen, the boot disk is typically available both via IDE emulation, and
++as a PV block device. Guest bootloaders typically use IDE to load the guest
++kernel, which then unplugs the IDE and continues with the Xen PV block device.
++
++This configuration can be achieved as follows:
++
++.. parsed-literal::
++
++  |qemu_system| --accel kvm,xen-version=0x40011,kernel-irqchip=split \\
++       -drive file=${GUEST_IMAGE},if=xen \\
++       -drive file=${GUEST_IMAGE},file.locking=off,if=ide
++
++VirtIO devices can also be used; Linux guests may need to be dissuaded from
++umplugging them by adding '``xen_emul_unplug=never``' on their command line.
++
++Booting Xen PV guests
++---------------------
++
++Booting PV guest kernels is possible by using the Xen PV shim (a version of Xen
++itself, designed to run inside a Xen HVM guest and provide memory management
++services for one guest alone).
++
++The Xen binary is provided as the ``-kernel`` and the guest kernel itself (or
++PV Grub image) as the ``-initrd`` image, which actually just means the first
++multiboot "module". For example:
++
++.. parsed-literal::
++
++  |qemu_system| --accel kvm,xen-version=0x40011,kernel-irqchip=split \\
++       -chardev stdio,id=char0 -device xen-console,chardev=char0 \\
++       -display none  -m 1G  -kernel xen -initrd bzImage \\
++       -append "pv-shim console=xen,pv -- console=hvc0 root=/dev/xvda1" \\
++       -drive file=${GUEST_IMAGE},if=xen
++
++The Xen image must be built with the ``CONFIG_XEN_GUEST`` and ``CONFIG_PV_SHIM``
++options, and as of Xen 4.17, Xen's PV shim mode does not support using a serial
++port; it must have a Xen console or it will panic.
++
++Host OS requirements
++--------------------
  
- /* ------------------------------------------------------------- */
- 
--int xen_config_dev_nic(NICInfo *nic)
--{
--    char fe[256], be[256];
--    char mac[20];
--    int vlan_id = -1;
--
--    net_hub_id_for_client(nic->netdev, &vlan_id);
--    snprintf(mac, sizeof(mac), "%02x:%02x:%02x:%02x:%02x:%02x",
--             nic->macaddr.a[0], nic->macaddr.a[1], nic->macaddr.a[2],
--             nic->macaddr.a[3], nic->macaddr.a[4], nic->macaddr.a[5]);
--    xen_pv_printf(NULL, 1, "config nic %d: mac=\"%s\"\n", vlan_id, mac);
--    xen_config_dev_dirs("vif", "qnic", vlan_id, fe, be, sizeof(fe));
--
--    /* frontend */
--    xenstore_write_int(fe, "handle",     vlan_id);
--    xenstore_write_str(fe, "mac",        mac);
--
--    /* backend */
--    xenstore_write_int(be, "handle",     vlan_id);
--    xenstore_write_str(be, "mac",        mac);
--
--    /* common stuff */
--    return xen_config_dev_all(fe, be);
--}
--
- int xen_config_dev_vfb(int vdev, const char *type)
- {
-     char fe[256], be[256];
-diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
-index 9f9f137f99..1130d1a147 100644
---- a/hw/xenpv/xen_machine_pv.c
-+++ b/hw/xenpv/xen_machine_pv.c
-@@ -32,8 +32,6 @@
- 
- static void xen_init_pv(MachineState *machine)
- {
--    int i;
--
-     setup_xen_backend_ops();
- 
-     /* Initialize backend core & drivers */
-@@ -62,13 +60,6 @@ static void xen_init_pv(MachineState *machine)
-         vga_interface_created = true;
-     }
- 
--    /* configure nics */
--    for (i = 0; i < nb_nics; i++) {
--        if (!nd_table[i].model || 0 != strcmp(nd_table[i].model, "xen"))
--            continue;
--        xen_config_dev_nic(nd_table + i);
--    }
--
-     xen_bus_init();
- 
-     /* config cleanup hook */
-diff --git a/include/hw/xen/xen-legacy-backend.h b/include/hw/xen/xen-legacy-backend.h
-index fc42146bc2..2cca174778 100644
---- a/include/hw/xen/xen-legacy-backend.h
-+++ b/include/hw/xen/xen-legacy-backend.h
-@@ -81,7 +81,6 @@ extern struct XenDevOps xen_usb_ops;          /* xen-usb.c         */
- 
- /* configuration (aka xenbus setup) */
- void xen_config_cleanup(void);
--int xen_config_dev_nic(NICInfo *nic);
- int xen_config_dev_vfb(int vdev, const char *type);
- int xen_config_dev_vkbd(int vdev);
- int xen_config_dev_console(int vdev);
+ The minimal Xen support in the KVM accelerator requires the host to be running
+ Linux v5.12 or newer. Later versions add optimisations: Linux v5.17 added
 -- 
 2.40.1
 
