@@ -2,68 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 56F497D5F27
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 02:45:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B843F7D5F6A
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 03:14:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229966AbjJYApS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Oct 2023 20:45:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50240 "EHLO
+        id S229801AbjJYBOH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Oct 2023 21:14:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229517AbjJYApR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Oct 2023 20:45:17 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF4089F
-        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 17:45:14 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a7cfdacf8fso3305387b3.0
-        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 17:45:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698194714; x=1698799514; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IBzlLzg+dr2okumSatJwslJtQuC7+lJZNLV+PHh2KzY=;
-        b=t1We2CDHza1o5zctxL9wdC5+JB5jKHYPDgcypmC1VOTLnc4dQIbzwb8hBmXvWfhsj5
-         tU9J4eDyzpC82b1mqH2gxOInaTK/RdIOYtxlBQySBybdWl64CcgP3rfd86s/S/uYoGYn
-         7I+Wu5fo5BN2/hPxVen+APY6ClpHl1nPqot65stB9yxhBZ7NH3YPlnMJ1vycIy2fw3MB
-         BswoscJ0Q7N0guUrVgJaYPwPZl3Fq3RDm/iFCeiZZQbU7snaPNNiR6EggUBPj9wXGaYy
-         qY1x1V4ieuLwSRS8xeQ8mtWNggISckYhPNqnG8ZsqTV5qysgd7yZX+p3LlGM2AeZSxMc
-         ACsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698194714; x=1698799514;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IBzlLzg+dr2okumSatJwslJtQuC7+lJZNLV+PHh2KzY=;
-        b=AbkSSofvHGsDJpD5+tlDda+06gqeaBQoy2l1IA7QECKiLE5fFKsYiWnWKUrNfPer7D
-         jLtYGukJDUD+E5bhkL4JLt2XmybaUMWj58EpZDGLcJ3YGH+q9bENX1PQaotF1aFIapSp
-         4YB+K6TwJfjQHk7OkySfi/7llJHC4MbdHeF9q0P7pRHdbq6nckuJsaP/Yvo5IfCXf0QE
-         x9HdMAyPO37nUT/33pTz70YdUfH+7LcjMgUILwpM3z1s40xSyxGJLr42G0DEpfYcBGQ8
-         1P90e9+p9lBNRyX2m0vc06acNQ+8rHpaB1+Cq5m9ZRK7DgKsn1GdDW9APWAtvNXTghY3
-         Suaw==
-X-Gm-Message-State: AOJu0YzneRKeW/n0I+vFQYwPoAjol0nWMdOo4s33lyKf2lxDE+ScOEgH
-        5VOcF801ICSP/zyFolWY6YRFfadPrss=
-X-Google-Smtp-Source: AGHT+IE0rzyMuQu+dmagkjFOIsButEe51YN9VAo/ljePrLbkdgYQ9shpuU8bvwIGK9Z3RDK6pgLuziD248E=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:d1c7:0:b0:d9a:ca20:1911 with SMTP id
- i190-20020a25d1c7000000b00d9aca201911mr408735ybg.4.1698194714225; Tue, 24 Oct
- 2023 17:45:14 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 24 Oct 2023 17:45:12 -0700
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.758.gaed0368e0e-goog
-Message-ID: <20231025004512.2709042-1-seanjc@google.com>
-Subject: [ANNOUNCE] PUCK Agenda - 2023.10.25 - No topic, but still a go
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229441AbjJYBOF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Oct 2023 21:14:05 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35D66128;
+        Tue, 24 Oct 2023 18:14:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698196444; x=1729732444;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=qpJjJRkBLu59n6lsEp+sa1jxDcxxSkX1crOOHG4/dVI=;
+  b=FNgkcvpWN4SLzxklZ6PQX/8g+06WDUDekbFXX0EeoiB5Z4ErLHU5k4xt
+   OjgiRsQ9L+inqUNt+nJ3vIz9sYzcDCtgtN4xTXQaKiPkWsNOC6fz6/Knq
+   1vxNciscIgFR07pgnAr0ZsOBiDj7UzHH0Tc16m9G+nS0veBYkhagJZlZk
+   q5uBAsDHo2jExOddx+oVQtNFCv10+MzAQHRK2V60ltBdnmwTQfrHDB83P
+   4Udf8BeT5l0m5I29pw6v+E58v5T9+vMqs9u4zT0BObqoSeFfZ2txvEJPh
+   v2OpwSCQbCmtxdkmBhKu8i0R5n/Tc+Cvu7KCrs7mKC9xAqYDIiQS9UV8P
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="391079010"
+X-IronPort-AV: E=Sophos;i="6.03,249,1694761200"; 
+   d="scan'208";a="391079010"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2023 18:14:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="708528752"
+X-IronPort-AV: E=Sophos;i="6.03,249,1694761200"; 
+   d="scan'208";a="708528752"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
+  by orsmga003.jf.intel.com with ESMTP; 24 Oct 2023 18:13:57 -0700
+Message-ID: <62f396d4-f890-477f-b9ea-7b330fec35c2@linux.intel.com>
+Date:   Wed, 25 Oct 2023 09:10:08 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc:     baolu.lu@linux.intel.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        zhenzhong.duan@intel.com, joao.m.martins@oracle.com
+Subject: Re: [PATCH] iommu/vt-d: Enhance capability check for nested parent
+ domain allocation
+Content-Language: en-US
+To:     Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org,
+        alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com,
+        robin.murphy@arm.com
+References: <20231024150011.44642-1-yi.l.liu@intel.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20231024150011.44642-1-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-No official topic again, but I just _love_ waking up before dawn, so I'll be
-online ;-)
+On 10/24/23 11:00 PM, Yi Liu wrote:
+> This adds the scalable mode check before allocating the nested parent domain
+> as checking nested capability is not enough. User may turn off scalable mode
+> which also means no nested support even if the hardware supports it.
+> 
+> Fixes: c97d1b20d383 ("iommu/vt-d: Add domain_alloc_user op")
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+> v1: Based on Joao's dirty page tracking v6 https://github.com/jpemartins/linux/commits/iommufd-v6
+> ---
+>   drivers/iommu/intel/iommu.c | 2 +-
+>   drivers/iommu/intel/iommu.h | 2 ++
+>   2 files changed, 3 insertions(+), 1 deletion(-)
+
+Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
+
+Hi Jason,
+
+Given that this fixes a commit in the iommufd tree, can you please pick
+this fix as well?
+
+Best regards,
+baolu
