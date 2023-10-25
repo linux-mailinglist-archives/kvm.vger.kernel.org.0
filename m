@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AB217D7011
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 16:54:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E94C7D6FD6
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 16:54:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234704AbjJYOvJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 10:51:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53792 "EHLO
+        id S1344364AbjJYOvR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 10:51:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234886AbjJYOvI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 10:51:08 -0400
+        with ESMTP id S234994AbjJYOvL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 10:51:11 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0846B0
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:51:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC941137
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:51:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=cMQamAmGxVX8j1TYaTFUxDpxUmOm6N6treNgi5dENCI=; b=WtDuCSvr5Q0uexpCx5QwfNxVZy
-        ROoD7PbXDpLBTHv10a4sb52qOcYxP7sVaVH/NJGwCgJ77PtptHAmxIq1lmRxaLvn1/sAI4mNcVa5y
-        12MBgl4J0jy+1GLBWvXaSTgc4K1BCjA/Yzihw3gyve96vcuHO9XMDH9OrxcLxgRE8veib5GQ8ptb2
-        hY7TYHtsyq18aAgKXiMYIlQ+358roX1Kia+c+gpKgmAlDKQ8yBhxawYBqJm5uBrelE/kfRoCjO185
-        nYGVKukjvboJ/wX9kHgvqrqfE/NVMb6HDHzCd7q1HBeO/OLNaZ1qtk3OhrwOmFOTaGnRChQkaQuje
-        9y7XfXuw==;
+        bh=I7wwUWDSmNrD50IckcuS/vpghKxFsMuU+uj7Ug/+mno=; b=RvDifJ46k3zOQxzO3K8gyXMav9
+        h9wbWdHVLd9gbqWP/b4m/KQeTI2stcYxTPljdDzPt6hb7NbRhR2P0Z4xKNwxtgzxk3N2Igdu5kwqT
+        AXV3Jx/OXlBhdliH0firkNh2O5qAZTR6XHzFMcLDeFRdKJoSGTYLHlhONm24s0uwaH0rDz1Fk/PGw
+        3QtrkBftuCQR9gV2WZxNA4tVN+MG4Zja8lhsVua2l7qFzWDiSaHeANeDiYbCF+WoLyBNRQbkEgsY2
+        OfZjG7o/oJkUjbPK3xppz5WL8MhBsZtqCyEEELWg6Dn7mGtZrcsYl+Wq2DQKqUo4lVF+bNWFOf8G7
+        JSaqrwxg==;
 Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qvfDY-009Nmf-Ta; Wed, 25 Oct 2023 14:50:44 +0000
+        id 1qvfDY-009Nma-Hc; Wed, 25 Oct 2023 14:50:44 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qvfDY-002dEJ-0I;
+        id 1qvfDY-002dEN-0Y;
         Wed, 25 Oct 2023 15:50:44 +0100
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     qemu-devel@nongnu.org
@@ -47,9 +47,9 @@ Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
         xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
         Bernhard Beschow <shentey@gmail.com>,
         Joel Upham <jupham125@gmail.com>
-Subject: [PATCH v3 06/28] hw/xen: take iothread mutex in xen_evtchn_reset_op()
-Date:   Wed, 25 Oct 2023 15:50:20 +0100
-Message-Id: <20231025145042.627381-7-dwmw2@infradead.org>
+Subject: [PATCH v3 07/28] hw/xen: use correct default protocol for xen-block on x86
+Date:   Wed, 25 Oct 2023 15:50:21 +0100
+Message-Id: <20231025145042.627381-8-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231025145042.627381-1-dwmw2@infradead.org>
 References: <20231025145042.627381-1-dwmw2@infradead.org>
@@ -68,28 +68,32 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-The xen_evtchn_soft_reset() function requires the iothread mutex, but is
-also called for the EVTCHNOP_reset hypercall. Ensure the mutex is taken
-in that case.
+Even on x86_64 the default protocol is the x86-32 one if the guest doesn't
+specifically ask for x86-64.
 
-Fixes: a15b10978fe6 ("hw/xen: Implement EVTCHNOP_reset")
+Fixes: b6af8926fb85 ("xen: add implementations of xen-block connect and disconnect functions...")
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- hw/i386/kvm/xen_evtchn.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/block/xen-block.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/hw/i386/kvm/xen_evtchn.c b/hw/i386/kvm/xen_evtchn.c
-index 3d6f4b4a0a..b2b4be9983 100644
---- a/hw/i386/kvm/xen_evtchn.c
-+++ b/hw/i386/kvm/xen_evtchn.c
-@@ -1135,6 +1135,7 @@ int xen_evtchn_reset_op(struct evtchn_reset *reset)
-         return -ESRCH;
-     }
+diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
+index a07cd7eb5d..64470fc579 100644
+--- a/hw/block/xen-block.c
++++ b/hw/block/xen-block.c
+@@ -117,7 +117,11 @@ static void xen_block_connect(XenDevice *xendev, Error **errp)
  
-+    QEMU_IOTHREAD_LOCK_GUARD();
-     return xen_evtchn_soft_reset();
- }
- 
+     if (xen_device_frontend_scanf(xendev, "protocol", "%ms",
+                                   &str) != 1) {
+-        protocol = BLKIF_PROTOCOL_NATIVE;
++        /* x86 defaults to the 32-bit protocol even for 64-bit guests. */
++        if (object_dynamic_cast(OBJECT(qdev_get_machine()), "x86-machine"))
++            protocol = BLKIF_PROTOCOL_X86_32;
++        else
++            protocol = BLKIF_PROTOCOL_NATIVE;
+     } else {
+         if (strcmp(str, XEN_IO_PROTO_ABI_X86_32) == 0) {
+             protocol = BLKIF_PROTOCOL_X86_32;
 -- 
 2.40.1
 
