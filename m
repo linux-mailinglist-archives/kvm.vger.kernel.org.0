@@ -2,127 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BF837D61D3
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 08:50:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C89507D61ED
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 08:56:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232270AbjJYGuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 02:50:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60688 "EHLO
+        id S232291AbjJYG4v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 02:56:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232229AbjJYGuo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 02:50:44 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25B9B181
-        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 23:50:42 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9b9faf05f51so761041866b.2
-        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 23:50:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1698216640; x=1698821440; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=MwdrCLs7J8pw9TLHstYCMVRsUZqiCP56vCN/PW3QTMo=;
-        b=LOsrUHKtNHXqvv2Rv06Qg37pWRMDznTuKeoBdSFU2mi58FCKO7JQOFoxSink7rDQ6E
-         eaFzpMioxz/gjd40YMjXg26hPEpkkdgTYxzEL1r264J3ZxJN/Hf9lBwOkPTFfat6fRdh
-         RC5UXSRVqe4OqjvfmQuK4bJdL5f0ark9mF+74i9sNVRqUbWsRAbYK0cSZM3rNpAcCQGS
-         cqIzk8XlOmHNjBWTIWelNK/eQP9Uc8hH08ZZrh2Z1wLUcofKFRdlJJvdVPUvRIZQRaNh
-         xJN1eDqN//dwdN6JaJVCRdBEkgIzXPH/3Nb5cktJMCPSzInHbuPV0XzCdtFA9TLjRVbC
-         474Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698216640; x=1698821440;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MwdrCLs7J8pw9TLHstYCMVRsUZqiCP56vCN/PW3QTMo=;
-        b=PJFczWYprIGl+gbSb6GVoCfxEuxLjeMTEQ08mJ9nwvRfcA7VR4fMs8TtC7TaUNb4mt
-         axjxleaS7x1eXQWO0haQ4RB9rVr2hNfSa78fIHkhRziW+yqhwIZPx06EObihvrRYm6Er
-         /mdT0exit6W+uJXYtyxokbRWHrKPMZdWodTZpJAgjDlBUd7QjPs8jh3x3AuXPkpO7IJ3
-         l+ZClKSHXrtS2naHKm5bUUO5fAHKB97KenLbZZFThHUhyR2PiFYSxg7kvOSGuSIYzsRh
-         Lqm8N49u6RHuneqXUgXJ8hYR5pSeCLpok4JHkix3dI6gBwsXSZxJpA/lW81+NebNxoOE
-         xQ3g==
-X-Gm-Message-State: AOJu0YwOlMKTA2LtHdBLFhKMQUw6OmQPsquGwggIvnfRA1u7LB56pQuK
-        BJM1KVWV53sJeA9e/b9kp+2ZSA==
-X-Google-Smtp-Source: AGHT+IEHX75CQrrE1AAOHnqkbOnbbTtmku7y2INZej13eNL87gyTFaPI5KTEJpDz3xLYzWLGvD/1wg==
-X-Received: by 2002:a17:906:dace:b0:9c3:730e:6947 with SMTP id xi14-20020a170906dace00b009c3730e6947mr11584331ejb.41.1698216640370;
-        Tue, 24 Oct 2023 23:50:40 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id s18-20020a1709060d7200b009cd52d08563sm678032ejh.223.2023.10.24.23.50.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Oct 2023 23:50:40 -0700 (PDT)
-Date:   Wed, 25 Oct 2023 08:50:33 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 2/5] riscv: Use SYM_*() assembly macros instead of
- deprecated ones
-Message-ID: <20231025-d21b7077ff99828bef7cfaa8@orel>
-References: <20231024132655.730417-1-cleger@rivosinc.com>
- <20231024132655.730417-3-cleger@rivosinc.com>
- <20231024-e122c317599cd4c6db53c015@orel>
- <da308888-0e47-4ca4-b318-8f089421dc0b@rivosinc.com>
+        with ESMTP id S229498AbjJYG4t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 02:56:49 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59598A6;
+        Tue, 24 Oct 2023 23:56:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=XACVKlQsgeevIRCx4krJ3Cs67Y3XIWvenl6gIVkrFAA=; b=Dl0ig3Z3i4kQ3aDi44pJMQ9FKl
+        PCrkZd6wuLQSa17a34c/FzdT9XHqUgCSzaRtk1bGKuEh133gYfFWBeDy6miBnVRoYyrFxWa1Lb3MI
+        rFl+zBLgTpfKfxxxs9I2N+GR0ZQ/aw7viJvLa5iE3nCLwJjGHr3GGs7gxIOJZgFxAft++PHPIMv+k
+        OlUtvvyu97Ok3V8htIMXtHLoCc65AR/jcJqhRlov7BDaMLZZuRxKsfxpjIqCdCXE9eyiq5IBst6Lj
+        pyhehYOt7PZxYk2sA6RLJ51O/ooeChtfDvo1XSERaiSbaqwJehBYCxczRr/O1ru2tzJYUbyI3ip87
+        omGYtmwQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qvXoJ-007H0F-3E; Wed, 25 Oct 2023 06:56:11 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 601FA30047C; Wed, 25 Oct 2023 08:56:10 +0200 (CEST)
+Date:   Wed, 25 Oct 2023 08:56:10 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
+        ak@linux.intel.com, tim.c.chen@linux.intel.com,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        antonio.gomez.iglesias@linux.intel.com,
+        Alyssa Milburn <alyssa.milburn@intel.com>
+Subject: Re: [PATCH  v2 1/6] x86/bugs: Add asm helpers for executing VERW
+Message-ID: <20231025065610.GA31201@noisy.programming.kicks-ass.net>
+References: <20231024-delay-verw-v2-0-f1881340c807@linux.intel.com>
+ <20231024-delay-verw-v2-1-f1881340c807@linux.intel.com>
+ <20231024103601.GH31411@noisy.programming.kicks-ass.net>
+ <20231025040029.uglv4dwmlnfhcjde@desk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <da308888-0e47-4ca4-b318-8f089421dc0b@rivosinc.com>
+In-Reply-To: <20231025040029.uglv4dwmlnfhcjde@desk>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 24, 2023 at 08:03:52PM +0200, Clément Léger wrote:
-> 
-> 
-> On 24/10/2023 17:23, Andrew Jones wrote:
-> > On Tue, Oct 24, 2023 at 03:26:52PM +0200, Clément Léger wrote:
-> > ...
-> >> diff --git a/arch/riscv/lib/uaccess.S b/arch/riscv/lib/uaccess.S
-> >> index 09b47ebacf2e..3ab438f30d13 100644
-> >> --- a/arch/riscv/lib/uaccess.S
-> >> +++ b/arch/riscv/lib/uaccess.S
-> >> @@ -10,8 +10,7 @@
-> >>  	_asm_extable	100b, \lbl
-> >>  	.endm
-> >>  
-> >> -ENTRY(__asm_copy_to_user)
-> >> -ENTRY(__asm_copy_from_user)
-> >> +SYM_FUNC_START(__asm_copy_to_user)
-> >>  
-> >>  	/* Enable access to user memory */
-> >>  	li t6, SR_SUM
-> >> @@ -181,13 +180,13 @@ ENTRY(__asm_copy_from_user)
-> >>  	csrc CSR_STATUS, t6
-> >>  	sub a0, t5, a0
-> >>  	ret
-> >> -ENDPROC(__asm_copy_to_user)
-> >> -ENDPROC(__asm_copy_from_user)
-> >> +SYM_FUNC_END(__asm_copy_to_user)
-> >>  EXPORT_SYMBOL(__asm_copy_to_user)
-> >> +SYM_FUNC_ALIAS(__asm_copy_from_user, __asm_copy_to_user)
-> >>  EXPORT_SYMBOL(__asm_copy_from_user)
-> > 
-> > I didn't see any comment about the sharing of debug info among both the
-> > from and to functions. Assuming it isn't confusing in some way, then
-> 
-> Hi Andrew,
-> 
-> I did some testing with gdb and it seems to correctly assume that
-> __asm_copy_to_user maps to __asm_copy_from_user for debugging. The basic
-> tests that I did (breakpoints, disasm, etc) seems to show no sign of
-> problems for debugging. Were you thinking about other things specifically ?
+On Tue, Oct 24, 2023 at 09:00:29PM -0700, Pawan Gupta wrote:
 
-Mostly just backtrace symbols, but I suppose we can live with it, since
-it wouldn't be the only weird thing in a backtrace.
+> config1: mitigations=on, 32-bit mode, post-boot
+> 
+> entry_SYSENTER_32:
+>    ...
+>    0xc1a3748e <+222>:   pop    %eax
+>    0xc1a3748f <+223>:   verw   0xc1a38240
+>    0xc1a37496 <+230>:   sti
+>    0xc1a37497 <+231>:   sysexit
+> 
+> ---------------------------------------------
+> 
+> config2: mitigations=off, 32-bit mode, post-boot
+> 
+> entry_SYSENTER_32:
+>    ...
+>    0xc1a3748e <+222>:   pop    %eax
+>    0xc1a3748f <+223>:   lea    0x0(%esi,%eiz,1),%esi   <---- Doesn't look right
+>    0xc1a37496 <+230>:   sti
+>    0xc1a37497 <+231>:   sysexit
+> 
+> ---------------------------------------------
+> 
+> config3: 32-bit mode, pre-boot objdump
+> 
+> entry_SYSENTER_32:
+>    ...
+>    c8e:       58                      pop    %eax
+>    c8f:       90                      nop
+>    c90:       90                      nop
+>    c91:       90                      nop
+>    c92:       90                      nop
+>    c93:       90                      nop
+>    c94:       90                      nop
+>    c95:       90                      nop
+>    c96:       fb                      sti
+>    c97:       0f 35                   sysexit
+> 
 
-Thanks,
-drew
+If you look at arch/x86/include/asm/nops.h, you'll find (for 32bit):
+
+ * 7: leal 0x0(%esi,%eiz,1),%esi
+
+Which reads as:
+
+	load-effective-address of %esi[0] into %esi
+
+which is, of course, just %esi.
+
+You can also get this from GAS using:
+
+	.nops 7
+
+which results in:
+
+   0:   8d b4 26 00 00 00 00    lea    0x0(%esi,%eiz,1),%esi
+
+It is basically abusing bizarro x86 instruction encoding rules to create
+a 7 byte nop without using NOPL. If you really want to know, volume 2
+of the SDM has a ton of stuff on instruction encoding, also the interweb
+:-)
