@@ -2,115 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B426A7D7113
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 17:39:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83CE47D71BF
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 18:30:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235035AbjJYPjn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 11:39:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38638 "EHLO
+        id S229746AbjJYQ3h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 12:29:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232621AbjJYPjm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 11:39:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F11EB10CE
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 08:29:26 -0700 (PDT)
+        with ESMTP id S232992AbjJYQ3e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 12:29:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7A3E91
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 09:28:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698247766;
+        s=mimecast20190719; t=1698251327;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=MiLrHcm1jHxIj86P0YZpTBI2aY7ofRBfJwnJst86kZs=;
-        b=g9Dh2beT/XsdYTcp8GS1/HlndgfjKTzW34yiQBVV/nQq586qbr9J8pHtQqAyCadDbT6I5S
-        4gaOfm4SJKiD3jSh7aK+RUdtmDPAHSHOEN2mrNWY+Alx3y97JLfSkkr1jTOHH3+frcxYJH
-        VPiCYKYXtULI1NoKNCbEwIJadHRyEyw=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-557-br9Zkg-dMF2GxD5U1p93qQ-1; Wed,
- 25 Oct 2023 11:29:22 -0400
-X-MC-Unique: br9Zkg-dMF2GxD5U1p93qQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3F53D3C1E9DD;
-        Wed, 25 Oct 2023 15:29:22 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.45.226.101])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6E1FD2166B26;
-        Wed, 25 Oct 2023 15:29:21 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH kvm-unit-tests 4/4] x86: hyper-v: Unify hyperv_clock with other Hyper-V tests
-Date:   Wed, 25 Oct 2023 17:29:15 +0200
-Message-ID: <20231025152915.1879661-5-vkuznets@redhat.com>
-In-Reply-To: <20231025152915.1879661-1-vkuznets@redhat.com>
-References: <20231025152915.1879661-1-vkuznets@redhat.com>
+        bh=7f29laoIijhonXA1qplGzkrij7Cw17Yg8oi2F3zZn44=;
+        b=PvFP7ts2JTTowheEmTPTiaU79rsGRDuAOV5RaURu9wdFK+g9eTlL8Bttj7rIptRfI0w2Wq
+        LX2wji3xxfHWm6yBAzej4xEUy25sKQ32A1ELl5EbgpgxZrAR3iz23+4fvsi5Dq2vxktnLm
+        qgOZtJgDPMjhInTA+hAvsXmX2RNwWsg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-572-Z6nGsnnUPAWTw27dmZk01g-1; Wed, 25 Oct 2023 12:28:45 -0400
+X-MC-Unique: Z6nGsnnUPAWTw27dmZk01g-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-32d9a31dc55so2377353f8f.3
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 09:28:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698251324; x=1698856124;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7f29laoIijhonXA1qplGzkrij7Cw17Yg8oi2F3zZn44=;
+        b=uvvwJ69XGLPW9+If8Z0Zg7czYBpUVS8K2WqmU7A1hKZ/EGm2HmKq2sKBmDPcpenULW
+         2jspfmEGZUs3SUDuqEHlo39x8c8QRUdKCo/I7aatztTS1M92wW1cRfpAmtiia6X2Xr3U
+         7IBCbfK1yIKQIIvvlPpnCzbQJsjeE/shMzJCurCAa5ABJP9Gfq2/jUX3wNNR0MGg9JDg
+         yyqv2chxCwTOfPS/9tWxmW0a1JKGnN//Vj+SO8hHOSqpASvP2T8zZstDHMnQDcoK1eXy
+         3HcMSPK94E6c7ZOuOmzYyy9SO/EEtN5Ys/EhTNG2yYwNqtnCgW7PScDy8iicWasTlxRV
+         SHYg==
+X-Gm-Message-State: AOJu0YxFuEi+53gWcIfV4ZFnqGCeOuPHkmE00PMmdKok2s+/HxFcZU7W
+        vuaupno9mu6FBgvBpMS5raFcbGhtdIqeczBqdKTsgvgQe+5I5U8wrh8XT/Y912cGMDn5TVZErWo
+        fBKrHFIiaNbS/
+X-Received: by 2002:a05:6000:1109:b0:32d:a41b:bd47 with SMTP id z9-20020a056000110900b0032da41bbd47mr11542318wrw.59.1698251324161;
+        Wed, 25 Oct 2023 09:28:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHwFCy0YoDnDfGZABBJQyL64nt6U4pb11zgcVmczDFn3yanVZ8VhqJb6BqWxJQhAbRpcW+bJw==
+X-Received: by 2002:a05:6000:1109:b0:32d:a41b:bd47 with SMTP id z9-20020a056000110900b0032da41bbd47mr11542301wrw.59.1698251323829;
+        Wed, 25 Oct 2023 09:28:43 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:1f6:3c98:7fa5:a31:81ed:a5e2])
+        by smtp.gmail.com with ESMTPSA id c14-20020adfe74e000000b0032d72f48555sm12387495wrn.36.2023.10.25.09.28.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Oct 2023 09:28:43 -0700 (PDT)
+Date:   Wed, 25 Oct 2023 12:28:37 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, jasowang@redhat.com,
+        jgg@nvidia.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, parav@nvidia.com,
+        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
+        joao.m.martins@oracle.com, si-wei.liu@oracle.com,
+        leonro@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH V1 vfio 9/9] vfio/virtio: Introduce a vfio driver over
+ virtio devices
+Message-ID: <20231025122625-mutt-send-email-mst@kernel.org>
+References: <20231017134217.82497-1-yishaih@nvidia.com>
+ <20231017134217.82497-10-yishaih@nvidia.com>
+ <20231024135713.360c2980.alex.williamson@redhat.com>
+ <d6c720a0-1575-45b7-b96d-03a916310699@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d6c720a0-1575-45b7-b96d-03a916310699@nvidia.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Always do 'return report_summary()' at the end, use report_abort() when an
-abnormality is detected.
+On Wed, Oct 25, 2023 at 05:35:51PM +0300, Yishai Hadas wrote:
+> > Do we want to make this only probe the correct subsystem vendor ID or do
+> > we want to emulate the subsystem vendor ID as well?  I don't see this is
+> > correct without one of those options.
+> 
+> Looking in the 1.x spec we can see the below.
+> 
+> Legacy Interfaces: A Note on PCI Device Discovery
+> 
+> "Transitional devices MUST have the PCI Subsystem
+> Device ID matching the Virtio Device ID, as indicated in section 5 ...
+> This is to match legacy drivers."
+> 
+> However, there is no need to enforce Subsystem Vendor ID.
+> 
+> This is what we followed here.
+> 
+> Makes sense ?
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- x86/hyperv_clock.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+Won't work for legacy windows drivers.
 
-diff --git a/x86/hyperv_clock.c b/x86/hyperv_clock.c
-index f1e7204a8ea9..7eb4f734ee5b 100644
---- a/x86/hyperv_clock.c
-+++ b/x86/hyperv_clock.c
-@@ -144,7 +144,6 @@ static void perf_test(int ncpus)
- 
- int main(int ac, char **av)
- {
--	int nerr = 0;
- 	int ncpus;
- 	struct hv_reference_tsc_page shadow;
- 	uint64_t tsc1, t1, tsc2, t2;
-@@ -152,7 +151,7 @@ int main(int ac, char **av)
- 
- 	if (!hv_time_ref_counter_supported()) {
- 		report_skip("time reference counter is unsupported");
--		return report_summary();
-+		goto done;
- 	}
- 
- 	setup_vm();
-@@ -167,10 +166,8 @@ int main(int ac, char **av)
- 	       "MSR value after enabling");
- 
- 	hvclock_get_time_values(&shadow, hv_clock);
--	if (shadow.tsc_sequence == 0 || shadow.tsc_sequence == 0xFFFFFFFF) {
--		printf("Reference TSC page not available\n");
--		exit(1);
--	}
-+	if (shadow.tsc_sequence == 0 || shadow.tsc_sequence == 0xFFFFFFFF)
-+		report_abort("Reference TSC page not available\n");
- 
- 	printf("scale: %" PRIx64" offset: %" PRId64"\n", shadow.tsc_scale, shadow.tsc_offset);
- 	ref1 = rdmsr(HV_X64_MSR_TIME_REF_COUNT);
-@@ -196,5 +193,6 @@ int main(int ac, char **av)
- 	report(rdmsr(HV_X64_MSR_REFERENCE_TSC) == 0,
- 	       "MSR value after disabling");
- 
--	return nerr > 0 ? 1 : 0;
-+done:
-+	return report_summary();
- }
 -- 
-2.41.0
+MST
 
