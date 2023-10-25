@@ -2,1005 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5684D7D7409
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 21:14:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E4D97D75F9
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 22:52:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbjJYTOV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 15:14:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42374 "EHLO
+        id S230054AbjJYUw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 16:52:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbjJYTOU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 15:14:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42C2BBB
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 12:13:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698261214;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Bja1f5Fe9hm+4OBKN7l9+xIkAkb3/Zlc2Gqwc1oO3BY=;
-        b=GHeen/6yuZxMQT1xoaYcMNNKJcAIXAQSWSKSSy/nnj+tNedZazC1BhYhrgeMRRh7erl3Zg
-        u0xVJv+N8Rapa92C/UxMVbN3gqc71WXbsOP1vR7NbhGcSlhi8NGYH89zcVRO8HydRgeQBJ
-        pf2fubkgrkNye6lZB9KhspJ6xip5rjg=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-647-82zTScF0Pl24fcV0ISoOZw-1; Wed, 25 Oct 2023 15:13:32 -0400
-X-MC-Unique: 82zTScF0Pl24fcV0ISoOZw-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7a64eb9c96aso89502739f.1
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 12:13:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698261212; x=1698866012;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Bja1f5Fe9hm+4OBKN7l9+xIkAkb3/Zlc2Gqwc1oO3BY=;
-        b=YyowRtMAG6Y6QJQF7xCNvX7G2FpHhCWkKxSwGdTOx51BFOM3IT25igerujCyhaQaVk
-         DStwfQWyuvWAcEiVtzBjVOYCAfMsGszRzeFomJ39RBJe3AXm1nj6F+BYS92noFru7B4X
-         q7AMkxVtUhU/lBVCjbx+vwScmYY4xnSAMDSAHB9pEmClkvtUiEIdelvwRr94PmO6v/rF
-         uq3zF71NggH+x8qf7b5xIeIUBrmnHqXk0wmpBbcj3bqMopegyh/dZsuJ6LSW3bz+zGXb
-         eGZEmpeMfWuSMtog8H3UyT6P7tgjRa28EXNDtm0TYI9xThmW12ctesfwSKdvjX8JSmVi
-         9QlQ==
-X-Gm-Message-State: AOJu0YxeYfoWduxNWeiEz76Ha4Y4B56SD56AP9urLBSIbL7dPDMphQNO
-        Ug5ps4YTAezWvXZz1+gEfDDCmjqF01ks+l3/9vmuLwqvi96yluiYFHH5c5jpz6kYhA+74h/qBk2
-        ydo4VfwqxS8Uo
-X-Received: by 2002:a05:6e02:1d1a:b0:34f:dfb5:8e8 with SMTP id i26-20020a056e021d1a00b0034fdfb508e8mr869951ila.14.1698261211744;
-        Wed, 25 Oct 2023 12:13:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH1wq/ARkUmELy9vK7Safgm19KzsG9lNJ/Gvz/ox82c3SSaghy4ADvEKJM7EWTAePPj1SA6Mg==
-X-Received: by 2002:a05:6e02:1d1a:b0:34f:dfb5:8e8 with SMTP id i26-20020a056e021d1a00b0034fdfb508e8mr869903ila.14.1698261211179;
-        Wed, 25 Oct 2023 12:13:31 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id j10-20020a926e0a000000b0035801ed36edsm239909ilc.47.2023.10.25.12.13.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Oct 2023 12:13:30 -0700 (PDT)
-Date:   Wed, 25 Oct 2023 13:13:28 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     <mst@redhat.com>, <jasowang@redhat.com>, <jgg@nvidia.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <parav@nvidia.com>, <feliu@nvidia.com>, <jiri@nvidia.com>,
-        <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
-        <si-wei.liu@oracle.com>, <leonro@nvidia.com>, <maorg@nvidia.com>
-Subject: Re: [PATCH V1 vfio 9/9] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Message-ID: <20231025131328.407a60a3.alex.williamson@redhat.com>
-In-Reply-To: <d6c720a0-1575-45b7-b96d-03a916310699@nvidia.com>
-References: <20231017134217.82497-1-yishaih@nvidia.com>
-        <20231017134217.82497-10-yishaih@nvidia.com>
-        <20231024135713.360c2980.alex.williamson@redhat.com>
-        <d6c720a0-1575-45b7-b96d-03a916310699@nvidia.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S230233AbjJYUwv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 16:52:51 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA653136;
+        Wed, 25 Oct 2023 13:52:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698267169; x=1729803169;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=nFU0gWVfaBmzYZu/sQ4XkeGrRDvj/BfRgOvVsVQkje4=;
+  b=Y5ZOcJEvkN6QrjZ9b3ItbSYy5d9G9MwqOVOaptKEePeD4uAHKzrrMQ+4
+   6oz/0MXKteweeLUlEM0YMGOzf7ImQwSJwVSvayzm2q9EXUhFZyQbtZphX
+   UlxNLDLacqwqYfuagf7LODrXjMeaDSGlk2vbpw6rMJFfCziLLvziQWCuw
+   vX9zytI3Nq4pUzMQcu7UElIY7JstWRf+EKup2j0l4tCOcodsjM9TqibOl
+   OhChClHt+HWNe2xVwyEut59Gp+491d+DMz6gbK0EdwZk6lMMkqefDYV25
+   dAQUbozr6Uij74KgLCjVyPJabaR/MvsUWJOLwSFcG0sZ9E1LOgWR2Pr6r
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="390255461"
+X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
+   d="scan'208";a="390255461"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 13:52:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
+   d="scan'208";a="259486"
+Received: from kkomeyli-mobl.amr.corp.intel.com (HELO desk) ([10.251.29.139])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 13:52:36 -0700
+Date:   Wed, 25 Oct 2023 13:52:44 -0700
+From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
+        ak@linux.intel.com, tim.c.chen@linux.intel.com
+Cc:     linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        antonio.gomez.iglesias@linux.intel.com,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Alyssa Milburn <alyssa.milburn@intel.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Nikolay Borisov <nik.borisov@suse.com>
+Subject: [PATCH v3 0/6] Delay VERW
+Message-ID: <20231025-delay-verw-v3-0-52663677ee35@linux.intel.com>
+X-B4-Tracking: v=1; b=H4sIAH19OWUC/2XMSw6CMBSF4a2Qji3pSyiO3IdxgO2t3ASLabFCC
+ Hu3wQnG4fmT8y0kQkCI5FQsJEDCiIPPQx4KYrrW34GizZsIJiRnnFMLfTvTBOFNLVO1anR1E0a
+ SfHgGcDht2IWQay4dxnEI86YnvvUvJNgeSpwyapw7KtZUUlT23KN/TSX6EfrSDI8NS2IPqB9AZ
+ MBxrblUzGhW/wPrun4A7q9Tae0AAAA=
+X-Mailer: b4 0.12.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spam-Status: No, score=-1.3 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
+        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 25 Oct 2023 17:35:51 +0300
-Yishai Hadas <yishaih@nvidia.com> wrote:
+v3:
+- Use .entry.text section for VERW memory operand. (Andrew/PeterZ)
+- Fix the duplicate header inclusion. (Chao)
 
-> On 24/10/2023 22:57, Alex Williamson wrote:
-> > On Tue, 17 Oct 2023 16:42:17 +0300
-> > Yishai Hadas <yishaih@nvidia.com> wrote:
-> >  
-> >> Introduce a vfio driver over virtio devices to support the legacy
-> >> interface functionality for VFs.
-> >>
-> >> Background, from the virtio spec [1].
-> >> --------------------------------------------------------------------
-> >> In some systems, there is a need to support a virtio legacy driver with
-> >> a device that does not directly support the legacy interface. In such
-> >> scenarios, a group owner device can provide the legacy interface
-> >> functionality for the group member devices. The driver of the owner
-> >> device can then access the legacy interface of a member device on behalf
-> >> of the legacy member device driver.
-> >>
-> >> For example, with the SR-IOV group type, group members (VFs) can not
-> >> present the legacy interface in an I/O BAR in BAR0 as expected by the
-> >> legacy pci driver. If the legacy driver is running inside a virtual
-> >> machine, the hypervisor executing the virtual machine can present a
-> >> virtual device with an I/O BAR in BAR0. The hypervisor intercepts the
-> >> legacy driver accesses to this I/O BAR and forwards them to the group
-> >> owner device (PF) using group administration commands.
-> >> --------------------------------------------------------------------
-> >>
-> >> Specifically, this driver adds support for a virtio-net VF to be exposed
-> >> as a transitional device to a guest driver and allows the legacy IO BAR
-> >> functionality on top.
-> >>
-> >> This allows a VM which uses a legacy virtio-net driver in the guest to
-> >> work transparently over a VF which its driver in the host is that new
-> >> driver.
-> >>
-> >> The driver can be extended easily to support some other types of virtio
-> >> devices (e.g virtio-blk), by adding in a few places the specific type
-> >> properties as was done for virtio-net.
-> >>
-> >> For now, only the virtio-net use case was tested and as such we introduce
-> >> the support only for such a device.
-> >>
-> >> Practically,
-> >> Upon probing a VF for a virtio-net device, in case its PF supports
-> >> legacy access over the virtio admin commands and the VF doesn't have BAR
-> >> 0, we set some specific 'vfio_device_ops' to be able to simulate in SW a
-> >> transitional device with I/O BAR in BAR 0.
-> >>
-> >> The existence of the simulated I/O bar is reported later on by
-> >> overwriting the VFIO_DEVICE_GET_REGION_INFO command and the device
-> >> exposes itself as a transitional device by overwriting some properties
-> >> upon reading its config space.
-> >>
-> >> Once we report the existence of I/O BAR as BAR 0 a legacy driver in the
-> >> guest may use it via read/write calls according to the virtio
-> >> specification.
-> >>
-> >> Any read/write towards the control parts of the BAR will be captured by
-> >> the new driver and will be translated into admin commands towards the
-> >> device.
-> >>
-> >> Any data path read/write access (i.e. virtio driver notifications) will
-> >> be forwarded to the physical BAR which its properties were supplied by
-> >> the admin command VIRTIO_ADMIN_CMD_LEGACY_NOTIFY_INFO upon the
-> >> probing/init flow.
-> >>
-> >> With that code in place a legacy driver in the guest has the look and
-> >> feel as if having a transitional device with legacy support for both its
-> >> control and data path flows.
-> >>
-> >> [1]
-> >> https://github.com/oasis-tcs/virtio-spec/commit/03c2d32e5093ca9f2a17797242fbef88efe94b8c
-> >>
-> >> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> >> ---
-> >>   MAINTAINERS                      |   7 +
-> >>   drivers/vfio/pci/Kconfig         |   2 +
-> >>   drivers/vfio/pci/Makefile        |   2 +
-> >>   drivers/vfio/pci/virtio/Kconfig  |  15 +
-> >>   drivers/vfio/pci/virtio/Makefile |   4 +
-> >>   drivers/vfio/pci/virtio/main.c   | 577 +++++++++++++++++++++++++++++++
-> >>   6 files changed, 607 insertions(+)
-> >>   create mode 100644 drivers/vfio/pci/virtio/Kconfig
-> >>   create mode 100644 drivers/vfio/pci/virtio/Makefile
-> >>   create mode 100644 drivers/vfio/pci/virtio/main.c
-> >>
-> >> diff --git a/MAINTAINERS b/MAINTAINERS
-> >> index 7a7bd8bd80e9..680a70063775 100644
-> >> --- a/MAINTAINERS
-> >> +++ b/MAINTAINERS
-> >> @@ -22620,6 +22620,13 @@ L:	kvm@vger.kernel.org
-> >>   S:	Maintained
-> >>   F:	drivers/vfio/pci/mlx5/
-> >>   
-> >> +VFIO VIRTIO PCI DRIVER
-> >> +M:	Yishai Hadas <yishaih@nvidia.com>
-> >> +L:	kvm@vger.kernel.org
-> >> +L:	virtualization@lists.linux-foundation.org
-> >> +S:	Maintained
-> >> +F:	drivers/vfio/pci/virtio
-> >> +
-> >>   VFIO PCI DEVICE SPECIFIC DRIVERS
-> >>   R:	Jason Gunthorpe <jgg@nvidia.com>
-> >>   R:	Yishai Hadas <yishaih@nvidia.com>
-> >> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-> >> index 8125e5f37832..18c397df566d 100644
-> >> --- a/drivers/vfio/pci/Kconfig
-> >> +++ b/drivers/vfio/pci/Kconfig
-> >> @@ -65,4 +65,6 @@ source "drivers/vfio/pci/hisilicon/Kconfig"
-> >>   
-> >>   source "drivers/vfio/pci/pds/Kconfig"
-> >>   
-> >> +source "drivers/vfio/pci/virtio/Kconfig"
-> >> +
-> >>   endmenu
-> >> diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-> >> index 45167be462d8..046139a4eca5 100644
-> >> --- a/drivers/vfio/pci/Makefile
-> >> +++ b/drivers/vfio/pci/Makefile
-> >> @@ -13,3 +13,5 @@ obj-$(CONFIG_MLX5_VFIO_PCI)           += mlx5/
-> >>   obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisilicon/
-> >>   
-> >>   obj-$(CONFIG_PDS_VFIO_PCI) += pds/
-> >> +
-> >> +obj-$(CONFIG_VIRTIO_VFIO_PCI) += virtio/
-> >> diff --git a/drivers/vfio/pci/virtio/Kconfig b/drivers/vfio/pci/virtio/Kconfig
-> >> new file mode 100644
-> >> index 000000000000..89eddce8b1bd
-> >> --- /dev/null
-> >> +++ b/drivers/vfio/pci/virtio/Kconfig
-> >> @@ -0,0 +1,15 @@
-> >> +# SPDX-License-Identifier: GPL-2.0-only
-> >> +config VIRTIO_VFIO_PCI
-> >> +        tristate "VFIO support for VIRTIO PCI devices"
-> >> +        depends on VIRTIO_PCI
-> >> +        select VFIO_PCI_CORE
-> >> +        help
-> >> +          This provides support for exposing VIRTIO VF devices using the VFIO
-> >> +          framework that can work with a legacy virtio driver in the guest.
-> >> +          Based on PCIe spec, VFs do not support I/O Space; thus, VF BARs shall
-> >> +          not indicate I/O Space.
-> >> +          As of that this driver emulated I/O BAR in software to let a VF be
-> >> +          seen as a transitional device in the guest and let it work with
-> >> +          a legacy driver.  
-> > This description is a little bit subtle to the hard requirements on the
-> > device.  Reading this, one might think that this should work for any
-> > SR-IOV VF virtio device, when in reality it only support virtio-net
-> > currently and places a number of additional requirements on the device
-> > (ex. legacy access and MSI-X support).  
-> 
-> Sure, will change to refer only to virtio-net devices which are capable 
-> for 'legacy access'.
-> 
-> No need to refer to MSI-X, please see below.
-> 
-> >  
-> >> +
-> >> +          If you don't know what to do here, say N.
-> >> diff --git a/drivers/vfio/pci/virtio/Makefile b/drivers/vfio/pci/virtio/Makefile
-> >> new file mode 100644
-> >> index 000000000000..2039b39fb723
-> >> --- /dev/null
-> >> +++ b/drivers/vfio/pci/virtio/Makefile
-> >> @@ -0,0 +1,4 @@
-> >> +# SPDX-License-Identifier: GPL-2.0-only
-> >> +obj-$(CONFIG_VIRTIO_VFIO_PCI) += virtio-vfio-pci.o
-> >> +virtio-vfio-pci-y := main.o
-> >> +
-> >> diff --git a/drivers/vfio/pci/virtio/main.c b/drivers/vfio/pci/virtio/main.c
-> >> new file mode 100644
-> >> index 000000000000..3fef4b21f7e6
-> >> --- /dev/null
-> >> +++ b/drivers/vfio/pci/virtio/main.c
-> >> @@ -0,0 +1,577 @@
-> >> +// SPDX-License-Identifier: GPL-2.0-only
-> >> +/*
-> >> + * Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved
-> >> + */
-> >> +
-> >> +#include <linux/device.h>
-> >> +#include <linux/module.h>
-> >> +#include <linux/mutex.h>
-> >> +#include <linux/pci.h>
-> >> +#include <linux/pm_runtime.h>
-> >> +#include <linux/types.h>
-> >> +#include <linux/uaccess.h>
-> >> +#include <linux/vfio.h>
-> >> +#include <linux/vfio_pci_core.h>
-> >> +#include <linux/virtio_pci.h>
-> >> +#include <linux/virtio_net.h>
-> >> +#include <linux/virtio_pci_admin.h>
-> >> +
-> >> +struct virtiovf_pci_core_device {
-> >> +	struct vfio_pci_core_device core_device;
-> >> +	u8 bar0_virtual_buf_size;
-> >> +	u8 *bar0_virtual_buf;
-> >> +	/* synchronize access to the virtual buf */
-> >> +	struct mutex bar_mutex;
-> >> +	void __iomem *notify_addr;
-> >> +	u32 notify_offset;
-> >> +	u8 notify_bar;  
-> > Push the above u8 to the end of the structure for better packing.  
-> OK
-> >> +	u16 pci_cmd;
-> >> +	u16 msix_ctrl;
-> >> +};
-> >> +
-> >> +static int
-> >> +virtiovf_issue_legacy_rw_cmd(struct virtiovf_pci_core_device *virtvdev,
-> >> +			     loff_t pos, char __user *buf,
-> >> +			     size_t count, bool read)
-> >> +{
-> >> +	bool msix_enabled = virtvdev->msix_ctrl & PCI_MSIX_FLAGS_ENABLE;
-> >> +	struct pci_dev *pdev = virtvdev->core_device.pdev;
-> >> +	u8 *bar0_buf = virtvdev->bar0_virtual_buf;
-> >> +	u16 opcode;
-> >> +	int ret;
-> >> +
-> >> +	mutex_lock(&virtvdev->bar_mutex);
-> >> +	if (read) {
-> >> +		opcode = (pos < VIRTIO_PCI_CONFIG_OFF(msix_enabled)) ?
-> >> +			VIRTIO_ADMIN_CMD_LEGACY_COMMON_CFG_READ :
-> >> +			VIRTIO_ADMIN_CMD_LEGACY_DEV_CFG_READ;
-> >> +		ret = virtio_pci_admin_legacy_io_read(pdev, opcode, pos, count,
-> >> +						      bar0_buf + pos);
-> >> +		if (ret)
-> >> +			goto out;
-> >> +		if (copy_to_user(buf, bar0_buf + pos, count))
-> >> +			ret = -EFAULT;
-> >> +		goto out;
-> >> +	}  
-> > TBH, I think the symmetry of read vs write would be more apparent if
-> > this were an else branch.  
-> OK, will do.
-> >> +
-> >> +	if (copy_from_user(bar0_buf + pos, buf, count)) {
-> >> +		ret = -EFAULT;
-> >> +		goto out;
-> >> +	}
-> >> +
-> >> +	opcode = (pos < VIRTIO_PCI_CONFIG_OFF(msix_enabled)) ?
-> >> +			VIRTIO_ADMIN_CMD_LEGACY_COMMON_CFG_WRITE :
-> >> +			VIRTIO_ADMIN_CMD_LEGACY_DEV_CFG_WRITE;
-> >> +	ret = virtio_pci_admin_legacy_io_write(pdev, opcode, pos, count,
-> >> +					       bar0_buf + pos);
-> >> +out:
-> >> +	mutex_unlock(&virtvdev->bar_mutex);
-> >> +	return ret;
-> >> +}
-> >> +
-> >> +static int
-> >> +translate_io_bar_to_mem_bar(struct virtiovf_pci_core_device *virtvdev,
-> >> +			    loff_t pos, char __user *buf,
-> >> +			    size_t count, bool read)
-> >> +{
-> >> +	struct vfio_pci_core_device *core_device = &virtvdev->core_device;
-> >> +	u16 queue_notify;
-> >> +	int ret;
-> >> +
-> >> +	if (pos + count > virtvdev->bar0_virtual_buf_size)
-> >> +		return -EINVAL;
-> >> +
-> >> +	switch (pos) {
-> >> +	case VIRTIO_PCI_QUEUE_NOTIFY:
-> >> +		if (count != sizeof(queue_notify))
-> >> +			return -EINVAL;
-> >> +		if (read) {
-> >> +			ret = vfio_pci_ioread16(core_device, true, &queue_notify,
-> >> +						virtvdev->notify_addr);
-> >> +			if (ret)
-> >> +				return ret;
-> >> +			if (copy_to_user(buf, &queue_notify,
-> >> +					 sizeof(queue_notify)))
-> >> +				return -EFAULT;
-> >> +			break;
-> >> +		}  
-> > Same.  
-> OK
-> >> +
-> >> +		if (copy_from_user(&queue_notify, buf, count))
-> >> +			return -EFAULT;
-> >> +
-> >> +		ret = vfio_pci_iowrite16(core_device, true, queue_notify,
-> >> +					 virtvdev->notify_addr);
-> >> +		break;
-> >> +	default:
-> >> +		ret = virtiovf_issue_legacy_rw_cmd(virtvdev, pos, buf, count,
-> >> +						   read);
-> >> +	}
-> >> +
-> >> +	return ret ? ret : count;
-> >> +}
-> >> +
-> >> +static bool range_intersect_range(loff_t range1_start, size_t count1,
-> >> +				  loff_t range2_start, size_t count2,
-> >> +				  loff_t *start_offset,
-> >> +				  size_t *intersect_count,
-> >> +				  size_t *register_offset)
-> >> +{
-> >> +	if (range1_start <= range2_start &&
-> >> +	    range1_start + count1 > range2_start) {
-> >> +		*start_offset = range2_start - range1_start;
-> >> +		*intersect_count = min_t(size_t, count2,
-> >> +					 range1_start + count1 - range2_start);
-> >> +		if (register_offset)
-> >> +			*register_offset = 0;
-> >> +		return true;
-> >> +	}
-> >> +
-> >> +	if (range1_start > range2_start &&
-> >> +	    range1_start < range2_start + count2) {
-> >> +		*start_offset = range1_start;
-> >> +		*intersect_count = min_t(size_t, count1,
-> >> +					 range2_start + count2 - range1_start);
-> >> +		if (register_offset)
-> >> +			*register_offset = range1_start - range2_start;
-> >> +		return true;
-> >> +	}  
-> > Seems like we're missing a case, and some documentation.
-> >
-> > The first test requires range1 to fully enclose range2 and provides the
-> > offset of range2 within range1 and the length of the intersection.
-> >
-> > The second test requires range1 to start from a non-zero offset within
-> > range2 and returns the absolute offset of range1 and the length of the
-> > intersection.
-> >
-> > The register offset is then non-zero offset of range1 into range2.  So
-> > does the caller use the zero value in the previous test to know range2
-> > exists within range1?
-> >
-> > We miss the cases where range1_start is <= range2_start and range1
-> > terminates within range2.  
-> 
-> The first test should cover this case as well of the case of fully 
-> enclosing.
-> 
-> It checks whether range1_start + count1 > range2_start which can 
-> terminates also within range2.
-> 
-> Isn't it ?
+v2: https://lore.kernel.org/r/20231024-delay-verw-v2-0-f1881340c807@linux.intel.com
+- Removed the extra EXEC_VERW macro layers. (Sean)
+- Move NOPL before VERW. (Sean)
+- s/USER_CLEAR_CPU_BUFFERS/CLEAR_CPU_BUFFERS/. (Josh/Dave)
+- Removed the comments before CLEAR_CPU_BUFFERS. (Josh)
+- Remove CLEAR_CPU_BUFFERS from NMI returning to kernel and document the
+  reason. (Josh/Dave)
+- Reformat comment in md_clear_update_mitigation(). (Josh)
+- Squash "x86/bugs: Cleanup mds_user_clear" patch. (Nikolay)
+- s/GUEST_CLEAR_CPU_BUFFERS/CLEAR_CPU_BUFFERS/. (Josh)
+- Added a patch from Sean to use CFLAGS.CF for VMLAUNCH/VMRESUME
+  selection. This facilitates a single CLEAR_CPU_BUFFERS location for both
+  VMLAUNCH and VMRESUME. (Sean)
 
-Hmm, maybe I read it wrong.  Let me try again...
+v1: https://lore.kernel.org/r/20231020-delay-verw-v1-0-cff54096326d@linux.intel.com
 
-The first test covers the cases where range1 starts at or below range2
-and range1 extends into or through range2.  start_offset describes the
-offset into range1 that range2 begins.  The intersect_count is the
-extent of the intersection and it's not clear what register_offset
-describes since it's zero.
+Hi,
 
-The second test covers the cases where range1 starts within range2.
-start_offset is the start of range1, which doesn't seem consistent with
-the previous branch usage.  The intersect_count does look consistent
-with the previous branch.  register_offset is then the offset of range1
-into range2
+Legacy instruction VERW was overloaded by some processors to clear
+micro-architectural CPU buffers as a mitigation of CPU bugs. This series
+moves VERW execution to a later point in exit-to-user path. This is
+needed because in some cases it may be possible for kernel data to be
+accessed after VERW in arch_exit_to_user_mode(). Such accesses may put
+data into MDS affected CPU buffers, for example:
 
-So I had some things wrong, but I'm still having trouble with a
-consistent definition of start_offset and register_offset.
+  1. Kernel data accessed by an NMI between VERW and return-to-user can
+     remain in CPU buffers (since NMI returning to kernel does not
+     execute VERW to clear CPU buffers).
+  2. Alyssa reported that after VERW is executed,
+     CONFIG_GCC_PLUGIN_STACKLEAK=y scrubs the stack used by a system
+     call. Memory accesses during stack scrubbing can move kernel stack
+     contents into CPU buffers.
+  3. When caller saved registers are restored after a return from
+     function executing VERW, the kernel stack accesses can remain in
+     CPU buffers(since they occur after VERW).
 
+Although these cases are less practical to exploit, moving VERW closer
+to ring transition reduces the attack surface.
 
-> I may add some documentation for that function as part of V2 as you asked.
-> 
-> >   I suppose we'll see below how this is used,
-> > but it seems asymmetric and incomplete.
-> >  
-> >> +
-> >> +	return false;
-> >> +}
-> >> +
-> >> +static ssize_t virtiovf_pci_read_config(struct vfio_device *core_vdev,
-> >> +					char __user *buf, size_t count,
-> >> +					loff_t *ppos)
-> >> +{
-> >> +	struct virtiovf_pci_core_device *virtvdev = container_of(
-> >> +		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
-> >> +	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
-> >> +	size_t register_offset;
-> >> +	loff_t copy_offset;
-> >> +	size_t copy_count;
-> >> +	__le32 val32;
-> >> +	__le16 val16;
-> >> +	u8 val8;
-> >> +	int ret;
-> >> +
-> >> +	ret = vfio_pci_core_read(core_vdev, buf, count, ppos);
-> >> +	if (ret < 0)
-> >> +		return ret;
-> >> +
-> >> +	if (range_intersect_range(pos, count, PCI_DEVICE_ID, sizeof(val16),
-> >> +				  &copy_offset, &copy_count, NULL)) {  
-> > If a user does 'setpci -s x:00.0 2.b' (range1 <= range2, but terminates
-> > within range2) they'll not enter this branch and see 41 rather than 00.
+Overview of the series:
 
-Yes, this does take the first branch per my second look, so copy_offset
-is zero, copy_count is 1.  I think the copy_to_user() works correctly
+Patch 1: Prepares VERW macros for use in asm.
+Patch 2: Adds macros to 64-bit entry/exit points.
+Patch 3: Adds macros to 32-bit entry/exit points.
+Patch 4: Enables the new macros.
+Patch 5: Uses CFLAGS.CF for VMLAUNCH/VMRESUME selection.
+Patch 6: Adds macro to VMenter.
 
-> > If a user does 'setpci -s x:00.0 3.b' (range1 > range2, range 1
-> > contained within range 2), the above function returns a copy_offset of
-> > range1_start (ie. 3).  But that offset is applied to the buffer, which
-> > is out of bounds.  The function needs to have returned an offset of 1
-> > and it should have applied to the val16 address.
-> >
-> > I don't think this works like it's intended.  
-> 
-> Is that because of the missing case ?
-> Please see my note above.
+Below is some performance data collected with v1 on a Skylake client
+compared with previous implementation:
 
-No, I think my original evaluation of this second case still holds,
-copy_offset is wrong.  I suspect what you're trying to do with
-start_offset and register_offset is specify the output buffer offset,
-ie. relative to range1 or buf, or the input offset, ie. range2 or our
-local val variable.  But start_offset is incorrectly calculated in the
-second branch above (should always be zero) and the caller didn't ask
-for the register offset here, which is seems it always should.
+Baseline: v6.6-rc5
 
-> >> +		val16 = cpu_to_le16(0x1000);  
-> > Please #define this somewhere rather than hiding a magic value here.  
-> Sure, will just replace to VIRTIO_TRANS_ID_NET.
-> >> +		if (copy_to_user(buf + copy_offset, &val16, copy_count))
-> >> +			return -EFAULT;
-> >> +	}
-> >> +
-> >> +	if ((virtvdev->pci_cmd & PCI_COMMAND_IO) &&
-> >> +	    range_intersect_range(pos, count, PCI_COMMAND, sizeof(val16),
-> >> +				  &copy_offset, &copy_count, &register_offset)) {
-> >> +		if (copy_from_user((void *)&val16 + register_offset, buf + copy_offset,
-> >> +				   copy_count))
-> >> +			return -EFAULT;
-> >> +		val16 |= cpu_to_le16(PCI_COMMAND_IO);
-> >> +		if (copy_to_user(buf + copy_offset, (void *)&val16 + register_offset,
-> >> +				 copy_count))
-> >> +			return -EFAULT;
-> >> +	}
-> >> +
-> >> +	if (range_intersect_range(pos, count, PCI_REVISION_ID, sizeof(val8),
-> >> +				  &copy_offset, &copy_count, NULL)) {
-> >> +		/* Transional needs to have revision 0 */
-> >> +		val8 = 0;
-> >> +		if (copy_to_user(buf + copy_offset, &val8, copy_count))
-> >> +			return -EFAULT;
-> >> +	}
-> >> +
-> >> +	if (range_intersect_range(pos, count, PCI_BASE_ADDRESS_0, sizeof(val32),
-> >> +				  &copy_offset, &copy_count, NULL)) {
-> >> +		val32 = cpu_to_le32(PCI_BASE_ADDRESS_SPACE_IO);  
-> > I'd still like to see the remainder of the BAR follow the semantics
-> > vfio-pci does.  I think this requires a __le32 bar0 field on the
-> > virtvdev struct to store writes and the read here would mask the lower
-> > bits up to the BAR size and OR in the IO indicator bit.  
-> 
-> OK, will do.
-> 
-> >
-> >  
-> >> +		if (copy_to_user(buf + copy_offset, &val32, copy_count))
-> >> +			return -EFAULT;
-> >> +	}
-> >> +
-> >> +	if (range_intersect_range(pos, count, PCI_SUBSYSTEM_ID, sizeof(val16),
-> >> +				  &copy_offset, &copy_count, NULL)) {
-> >> +		/*
-> >> +		 * Transitional devices use the PCI subsystem device id as
-> >> +		 * virtio device id, same as legacy driver always did.  
-> > Where did we require the subsystem vendor ID to be 0x1af4?  This
-> > subsystem device ID really only makes since given that subsystem
-> > vendor ID, right?  Otherwise I don't see that non-transitional devices,
-> > such as the VF, have a hard requirement per the spec for the subsystem
-> > vendor ID.
-> >
-> > Do we want to make this only probe the correct subsystem vendor ID or do
-> > we want to emulate the subsystem vendor ID as well?  I don't see this is
-> > correct without one of those options.  
-> 
-> Looking in the 1.x spec we can see the below.
-> 
-> Legacy Interfaces: A Note on PCI Device Discovery
-> 
-> "Transitional devices MUST have the PCI Subsystem
-> Device ID matching the Virtio Device ID, as indicated in section 5 ...
-> This is to match legacy drivers."
-> 
-> However, there is no need to enforce Subsystem Vendor ID.
-> 
-> This is what we followed here.
-> 
-> Makes sense ?
+| Test               | Configuration          | Relative |
+| ------------------ | ---------------------- | -------- |
+| build-linux-kernel | defconfig              | 1.00     |
+| hackbench          | 32 - Process           | 1.02     |
+| nginx              | Short Connection - 500 | 1.01     |
 
-So do I understand correctly that virtio dictates the subsystem device
-ID for all subsystem vendor IDs that implement a legacy virtio
-interface?  Ok, but this device didn't actually implement a legacy
-virtio interface.  The device itself is not tranistional, we're imposing
-an emulated transitional interface onto it.  So did the subsystem vendor
-agree to have their subsystem device ID managed by the virtio committee
-or might we create conflicts?  I imagine we know we don't have a
-conflict if we also virtualize the subsystem vendor ID.
+Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+---
+Pawan Gupta (5):
+      x86/bugs: Add asm helpers for executing VERW
+      x86/entry_64: Add VERW just before userspace transition
+      x86/entry_32: Add VERW just before userspace transition
+      x86/bugs: Use ALTERNATIVE() instead of mds_user_clear static key
+      KVM: VMX: Move VERW closer to VMentry for MDS mitigation
 
+Sean Christopherson (1):
+      KVM: VMX: Use BT+JNC, i.e. EFLAGS.CF to select VMRESUME vs. VMLAUNCH
 
-BTW, it would be a lot easier for all of the config space emulation here
-if we could make use of the existing field virtualization in
-vfio-pci-core.  In fact you'll see in vfio_config_init() that
-PCI_DEVICE_ID is already virtualized for VFs, so it would be enough to
-simply do the following to report the desired device ID:
+ Documentation/arch/x86/mds.rst       | 39 ++++++++++++++++++++++++++----------
+ arch/x86/entry/entry.S               | 16 +++++++++++++++
+ arch/x86/entry/entry_32.S            |  3 +++
+ arch/x86/entry/entry_64.S            | 11 ++++++++++
+ arch/x86/entry/entry_64_compat.S     |  1 +
+ arch/x86/include/asm/cpufeatures.h   |  2 +-
+ arch/x86/include/asm/entry-common.h  |  1 -
+ arch/x86/include/asm/nospec-branch.h | 27 ++++++++++++++-----------
+ arch/x86/kernel/cpu/bugs.c           | 15 ++++++--------
+ arch/x86/kernel/nmi.c                |  2 --
+ arch/x86/kvm/vmx/run_flags.h         |  7 +++++--
+ arch/x86/kvm/vmx/vmenter.S           |  9 ++++++---
+ arch/x86/kvm/vmx/vmx.c               | 10 ++++++---
+ 13 files changed, 99 insertions(+), 44 deletions(-)
+---
+base-commit: 05d3ef8bba77c1b5f98d941d8b2d4aeab8118ef1
+change-id: 20231011-delay-verw-d0474986b2c3
 
-	*(__le16 *)&vconfig[PCI_DEVICE_ID] = cpu_to_le16(0x1000);
+Best regards,
+-- 
+Thanks,
+Pawan
 
-It appears everything in this function could be handled similarly by
-vfio-pci-core if the right fields in the perm_bits.virt and .write
-bits could be manipulated and vconfig modified appropriately.  I'd look
-for a way that a variant driver could provide an alternate set of
-permissions structures for various capabilities.  Thanks,
-
-Alex
-
-
-> >> +		 */
-> >> +		val16 = cpu_to_le16(VIRTIO_ID_NET);
-> >> +		if (copy_to_user(buf + copy_offset, &val16, copy_count))
-> >> +			return -EFAULT;
-> >> +	}
-> >> +
-> >> +	return count;
-> >> +}
-> >> +
-> >> +static ssize_t
-> >> +virtiovf_pci_core_read(struct vfio_device *core_vdev, char __user *buf,
-> >> +		       size_t count, loff_t *ppos)
-> >> +{
-> >> +	struct virtiovf_pci_core_device *virtvdev = container_of(
-> >> +		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
-> >> +	struct pci_dev *pdev = virtvdev->core_device.pdev;
-> >> +	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
-> >> +	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
-> >> +	int ret;
-> >> +
-> >> +	if (!count)
-> >> +		return 0;
-> >> +
-> >> +	if (index == VFIO_PCI_CONFIG_REGION_INDEX)
-> >> +		return virtiovf_pci_read_config(core_vdev, buf, count, ppos);
-> >> +
-> >> +	if (index != VFIO_PCI_BAR0_REGION_INDEX)
-> >> +		return vfio_pci_core_read(core_vdev, buf, count, ppos);
-> >> +
-> >> +	ret = pm_runtime_resume_and_get(&pdev->dev);
-> >> +	if (ret) {
-> >> +		pci_info_ratelimited(pdev, "runtime resume failed %d\n",
-> >> +				     ret);
-> >> +		return -EIO;
-> >> +	}
-> >> +
-> >> +	ret = translate_io_bar_to_mem_bar(virtvdev, pos, buf, count, true);
-> >> +	pm_runtime_put(&pdev->dev);
-> >> +	return ret;
-> >> +}
-> >> +
-> >> +static ssize_t
-> >> +virtiovf_pci_core_write(struct vfio_device *core_vdev, const char __user *buf,
-> >> +			size_t count, loff_t *ppos)
-> >> +{
-> >> +	struct virtiovf_pci_core_device *virtvdev = container_of(
-> >> +		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
-> >> +	struct pci_dev *pdev = virtvdev->core_device.pdev;
-> >> +	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
-> >> +	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
-> >> +	int ret;
-> >> +
-> >> +	if (!count)
-> >> +		return 0;
-> >> +
-> >> +	if (index == VFIO_PCI_CONFIG_REGION_INDEX) {
-> >> +		size_t register_offset;
-> >> +		loff_t copy_offset;
-> >> +		size_t copy_count;
-> >> +
-> >> +		if (range_intersect_range(pos, count, PCI_COMMAND, sizeof(virtvdev->pci_cmd),
-> >> +					  &copy_offset, &copy_count,
-> >> +					  &register_offset)) {
-> >> +			if (copy_from_user((void *)&virtvdev->pci_cmd + register_offset,
-> >> +					   buf + copy_offset,
-> >> +					   copy_count))
-> >> +				return -EFAULT;
-> >> +		}
-> >> +
-> >> +		if (range_intersect_range(pos, count, pdev->msix_cap + PCI_MSIX_FLAGS,
-> >> +					  sizeof(virtvdev->msix_ctrl),
-> >> +					  &copy_offset, &copy_count,
-> >> +					  &register_offset)) {
-> >> +			if (copy_from_user((void *)&virtvdev->msix_ctrl + register_offset,
-> >> +					   buf + copy_offset,
-> >> +					   copy_count))
-> >> +				return -EFAULT;
-> >> +		}  
-> > MSI-X is setup via ioctl, so you're relying on a userspace that writes
-> > through the control register bit even though it doesn't do anything.
-> > Why not use vfio_pci_core_device.irq_type to track if MSI-X mode is
-> > enabled?  
-> OK, may switch to your suggestion post of testing it.
-> >  
-> >> +	}
-> >> +
-> >> +	if (index != VFIO_PCI_BAR0_REGION_INDEX)
-> >> +		return vfio_pci_core_write(core_vdev, buf, count, ppos);
-> >> +
-> >> +	ret = pm_runtime_resume_and_get(&pdev->dev);
-> >> +	if (ret) {
-> >> +		pci_info_ratelimited(pdev, "runtime resume failed %d\n", ret);
-> >> +		return -EIO;
-> >> +	}
-> >> +
-> >> +	ret = translate_io_bar_to_mem_bar(virtvdev, pos, (char __user *)buf, count, false);
-> >> +	pm_runtime_put(&pdev->dev);
-> >> +	return ret;
-> >> +}
-> >> +
-> >> +static int
-> >> +virtiovf_pci_ioctl_get_region_info(struct vfio_device *core_vdev,
-> >> +				   unsigned int cmd, unsigned long arg)
-> >> +{
-> >> +	struct virtiovf_pci_core_device *virtvdev = container_of(
-> >> +		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
-> >> +	unsigned long minsz = offsetofend(struct vfio_region_info, offset);
-> >> +	void __user *uarg = (void __user *)arg;
-> >> +	struct vfio_region_info info = {};
-> >> +
-> >> +	if (copy_from_user(&info, uarg, minsz))
-> >> +		return -EFAULT;
-> >> +
-> >> +	if (info.argsz < minsz)
-> >> +		return -EINVAL;
-> >> +
-> >> +	switch (info.index) {
-> >> +	case VFIO_PCI_BAR0_REGION_INDEX:
-> >> +		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
-> >> +		info.size = virtvdev->bar0_virtual_buf_size;
-> >> +		info.flags = VFIO_REGION_INFO_FLAG_READ |
-> >> +			     VFIO_REGION_INFO_FLAG_WRITE;
-> >> +		return copy_to_user(uarg, &info, minsz) ? -EFAULT : 0;
-> >> +	default:
-> >> +		return vfio_pci_core_ioctl(core_vdev, cmd, arg);
-> >> +	}
-> >> +}
-> >> +
-> >> +static long
-> >> +virtiovf_vfio_pci_core_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
-> >> +			     unsigned long arg)
-> >> +{
-> >> +	switch (cmd) {
-> >> +	case VFIO_DEVICE_GET_REGION_INFO:
-> >> +		return virtiovf_pci_ioctl_get_region_info(core_vdev, cmd, arg);
-> >> +	default:
-> >> +		return vfio_pci_core_ioctl(core_vdev, cmd, arg);
-> >> +	}
-> >> +}
-> >> +
-> >> +static int
-> >> +virtiovf_set_notify_addr(struct virtiovf_pci_core_device *virtvdev)
-> >> +{
-> >> +	struct vfio_pci_core_device *core_device = &virtvdev->core_device;
-> >> +	int ret;
-> >> +
-> >> +	/*
-> >> +	 * Setup the BAR where the 'notify' exists to be used by vfio as well
-> >> +	 * This will let us mmap it only once and use it when needed.
-> >> +	 */
-> >> +	ret = vfio_pci_core_setup_barmap(core_device,
-> >> +					 virtvdev->notify_bar);
-> >> +	if (ret)
-> >> +		return ret;
-> >> +
-> >> +	virtvdev->notify_addr = core_device->barmap[virtvdev->notify_bar] +
-> >> +			virtvdev->notify_offset;
-> >> +	return 0;
-> >> +}
-> >> +
-> >> +static int virtiovf_pci_open_device(struct vfio_device *core_vdev)
-> >> +{
-> >> +	struct virtiovf_pci_core_device *virtvdev = container_of(
-> >> +		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
-> >> +	struct vfio_pci_core_device *vdev = &virtvdev->core_device;
-> >> +	int ret;
-> >> +
-> >> +	ret = vfio_pci_core_enable(vdev);
-> >> +	if (ret)
-> >> +		return ret;
-> >> +
-> >> +	if (virtvdev->bar0_virtual_buf) {
-> >> +		/*
-> >> +		 * Upon close_device() the vfio_pci_core_disable() is called
-> >> +		 * and will close all the previous mmaps, so it seems that the
-> >> +		 * valid life cycle for the 'notify' addr is per open/close.
-> >> +		 */
-> >> +		ret = virtiovf_set_notify_addr(virtvdev);
-> >> +		if (ret) {
-> >> +			vfio_pci_core_disable(vdev);
-> >> +			return ret;
-> >> +		}
-> >> +	}
-> >> +
-> >> +	vfio_pci_core_finish_enable(vdev);
-> >> +	return 0;
-> >> +}
-> >> +
-> >> +static int virtiovf_get_device_config_size(unsigned short device)
-> >> +{
-> >> +	/* Network card */
-> >> +	return offsetofend(struct virtio_net_config, status);
-> >> +}
-> >> +
-> >> +static int virtiovf_read_notify_info(struct virtiovf_pci_core_device *virtvdev)
-> >> +{
-> >> +	u64 offset;
-> >> +	int ret;
-> >> +	u8 bar;
-> >> +
-> >> +	ret = virtio_pci_admin_legacy_io_notify_info(virtvdev->core_device.pdev,
-> >> +				VIRTIO_ADMIN_CMD_NOTIFY_INFO_FLAGS_OWNER_MEM,
-> >> +				&bar, &offset);
-> >> +	if (ret)
-> >> +		return ret;
-> >> +
-> >> +	virtvdev->notify_bar = bar;
-> >> +	virtvdev->notify_offset = offset;
-> >> +	return 0;
-> >> +}
-> >> +
-> >> +static int virtiovf_pci_init_device(struct vfio_device *core_vdev)
-> >> +{
-> >> +	struct virtiovf_pci_core_device *virtvdev = container_of(
-> >> +		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
-> >> +	struct pci_dev *pdev;
-> >> +	int ret;
-> >> +
-> >> +	ret = vfio_pci_core_init_dev(core_vdev);
-> >> +	if (ret)
-> >> +		return ret;
-> >> +
-> >> +	pdev = virtvdev->core_device.pdev;
-> >> +	ret = virtiovf_read_notify_info(virtvdev);
-> >> +	if (ret)
-> >> +		return ret;
-> >> +
-> >> +	/* Being ready with a buffer that supports MSIX */
-> >> +	virtvdev->bar0_virtual_buf_size = VIRTIO_PCI_CONFIG_OFF(true) +
-> >> +				virtiovf_get_device_config_size(pdev->device);
-> >> +	virtvdev->bar0_virtual_buf = kzalloc(virtvdev->bar0_virtual_buf_size,
-> >> +					     GFP_KERNEL);
-> >> +	if (!virtvdev->bar0_virtual_buf)
-> >> +		return -ENOMEM;
-> >> +	mutex_init(&virtvdev->bar_mutex);
-> >> +	return 0;
-> >> +}
-> >> +
-> >> +static void virtiovf_pci_core_release_dev(struct vfio_device *core_vdev)
-> >> +{
-> >> +	struct virtiovf_pci_core_device *virtvdev = container_of(
-> >> +		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
-> >> +
-> >> +	kfree(virtvdev->bar0_virtual_buf);
-> >> +	vfio_pci_core_release_dev(core_vdev);
-> >> +}
-> >> +
-> >> +static const struct vfio_device_ops virtiovf_acc_vfio_pci_tran_ops = {
-> >> +	.name = "virtio-transitional-vfio-pci",
-> >> +	.init = virtiovf_pci_init_device,
-> >> +	.release = virtiovf_pci_core_release_dev,
-> >> +	.open_device = virtiovf_pci_open_device,
-> >> +	.close_device = vfio_pci_core_close_device,
-> >> +	.ioctl = virtiovf_vfio_pci_core_ioctl,
-> >> +	.read = virtiovf_pci_core_read,
-> >> +	.write = virtiovf_pci_core_write,
-> >> +	.mmap = vfio_pci_core_mmap,
-> >> +	.request = vfio_pci_core_request,
-> >> +	.match = vfio_pci_core_match,
-> >> +	.bind_iommufd = vfio_iommufd_physical_bind,
-> >> +	.unbind_iommufd = vfio_iommufd_physical_unbind,
-> >> +	.attach_ioas = vfio_iommufd_physical_attach_ioas,
-> >> +};
-> >> +
-> >> +static const struct vfio_device_ops virtiovf_acc_vfio_pci_ops = {
-> >> +	.name = "virtio-acc-vfio-pci",
-> >> +	.init = vfio_pci_core_init_dev,
-> >> +	.release = vfio_pci_core_release_dev,
-> >> +	.open_device = virtiovf_pci_open_device,
-> >> +	.close_device = vfio_pci_core_close_device,
-> >> +	.ioctl = vfio_pci_core_ioctl,
-> >> +	.device_feature = vfio_pci_core_ioctl_feature,
-> >> +	.read = vfio_pci_core_read,
-> >> +	.write = vfio_pci_core_write,
-> >> +	.mmap = vfio_pci_core_mmap,
-> >> +	.request = vfio_pci_core_request,
-> >> +	.match = vfio_pci_core_match,
-> >> +	.bind_iommufd = vfio_iommufd_physical_bind,
-> >> +	.unbind_iommufd = vfio_iommufd_physical_unbind,
-> >> +	.attach_ioas = vfio_iommufd_physical_attach_ioas,
-> >> +};
-> >> +
-> >> +static bool virtiovf_bar0_exists(struct pci_dev *pdev)
-> >> +{
-> >> +	struct resource *res = pdev->resource;
-> >> +
-> >> +	return res->flags ? true : false;
-> >> +}
-> >> +
-> >> +#define VIRTIOVF_USE_ADMIN_CMD_BITMAP \
-> >> +	(BIT_ULL(VIRTIO_ADMIN_CMD_LIST_QUERY) | \
-> >> +	 BIT_ULL(VIRTIO_ADMIN_CMD_LIST_USE) | \
-> >> +	 BIT_ULL(VIRTIO_ADMIN_CMD_LEGACY_COMMON_CFG_WRITE) | \
-> >> +	 BIT_ULL(VIRTIO_ADMIN_CMD_LEGACY_COMMON_CFG_READ) | \
-> >> +	 BIT_ULL(VIRTIO_ADMIN_CMD_LEGACY_DEV_CFG_WRITE) | \
-> >> +	 BIT_ULL(VIRTIO_ADMIN_CMD_LEGACY_DEV_CFG_READ) | \
-> >> +	 BIT_ULL(VIRTIO_ADMIN_CMD_LEGACY_NOTIFY_INFO))
-> >> +
-> >> +static bool virtiovf_support_legacy_access(struct pci_dev *pdev)
-> >> +{
-> >> +	int buf_size = DIV_ROUND_UP(VIRTIO_ADMIN_MAX_CMD_OPCODE, 64) * 8;
-> >> +	u8 *buf;
-> >> +	int ret;
-> >> +
-> >> +	buf = kzalloc(buf_size, GFP_KERNEL);
-> >> +	if (!buf)
-> >> +		return false;
-> >> +
-> >> +	ret = virtio_pci_admin_list_query(pdev, buf, buf_size);
-> >> +	if (ret)
-> >> +		goto end;
-> >> +
-> >> +	if ((le64_to_cpup((__le64 *)buf) & VIRTIOVF_USE_ADMIN_CMD_BITMAP) !=
-> >> +		VIRTIOVF_USE_ADMIN_CMD_BITMAP) {
-> >> +		ret = -EOPNOTSUPP;
-> >> +		goto end;
-> >> +	}
-> >> +
-> >> +	/* Confirm the used commands */
-> >> +	memset(buf, 0, buf_size);
-> >> +	*(__le64 *)buf = cpu_to_le64(VIRTIOVF_USE_ADMIN_CMD_BITMAP);
-> >> +	ret = virtio_pci_admin_list_use(pdev, buf, buf_size);
-> >> +end:
-> >> +	kfree(buf);
-> >> +	return ret ? false : true;
-> >> +}
-> >> +
-> >> +static int virtiovf_pci_probe(struct pci_dev *pdev,
-> >> +			      const struct pci_device_id *id)
-> >> +{
-> >> +	const struct vfio_device_ops *ops = &virtiovf_acc_vfio_pci_ops;
-> >> +	struct virtiovf_pci_core_device *virtvdev;
-> >> +	int ret;
-> >> +
-> >> +	if (pdev->is_virtfn && virtiovf_support_legacy_access(pdev) &&
-> >> +	    !virtiovf_bar0_exists(pdev) && pdev->msix_cap)  
-> >
-> > All but the last test here are fairly evident requirements of the
-> > driver.  Why do we require a device that supports MSI-X?  
-> 
-> As now we check at run time to decide whether MSI-X is enabled/disabled 
-> to pick-up the correct op code, no need for that any more.
-> 
-> Will drop this MSI-X check from V2.
-> 
-> Thanks,
-> Yishai
-> 
-> >
-> > Thanks,
-> > Alex
-> >
-> >  
-> >> +		ops = &virtiovf_acc_vfio_pci_tran_ops;
-> >> +
-> >> +	virtvdev = vfio_alloc_device(virtiovf_pci_core_device, core_device.vdev,
-> >> +				     &pdev->dev, ops);
-> >> +	if (IS_ERR(virtvdev))
-> >> +		return PTR_ERR(virtvdev);
-> >> +
-> >> +	dev_set_drvdata(&pdev->dev, &virtvdev->core_device);
-> >> +	ret = vfio_pci_core_register_device(&virtvdev->core_device);
-> >> +	if (ret)
-> >> +		goto out;
-> >> +	return 0;
-> >> +out:
-> >> +	vfio_put_device(&virtvdev->core_device.vdev);
-> >> +	return ret;
-> >> +}
-> >> +
-> >> +static void virtiovf_pci_remove(struct pci_dev *pdev)
-> >> +{
-> >> +	struct virtiovf_pci_core_device *virtvdev = dev_get_drvdata(&pdev->dev);
-> >> +
-> >> +	vfio_pci_core_unregister_device(&virtvdev->core_device);
-> >> +	vfio_put_device(&virtvdev->core_device.vdev);
-> >> +}
-> >> +
-> >> +static const struct pci_device_id virtiovf_pci_table[] = {
-> >> +	/* Only virtio-net is supported/tested so far */
-> >> +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_REDHAT_QUMRANET, 0x1041) },
-> >> +	{}
-> >> +};
-> >> +
-> >> +MODULE_DEVICE_TABLE(pci, virtiovf_pci_table);
-> >> +
-> >> +static struct pci_driver virtiovf_pci_driver = {
-> >> +	.name = KBUILD_MODNAME,
-> >> +	.id_table = virtiovf_pci_table,
-> >> +	.probe = virtiovf_pci_probe,
-> >> +	.remove = virtiovf_pci_remove,
-> >> +	.err_handler = &vfio_pci_core_err_handlers,
-> >> +	.driver_managed_dma = true,
-> >> +};
-> >> +
-> >> +module_pci_driver(virtiovf_pci_driver);
-> >> +
-> >> +MODULE_LICENSE("GPL");
-> >> +MODULE_AUTHOR("Yishai Hadas <yishaih@nvidia.com>");
-> >> +MODULE_DESCRIPTION(
-> >> +	"VIRTIO VFIO PCI - User Level meta-driver for VIRTIO device family");  
-> 
-> 
 
