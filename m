@@ -2,155 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 156A87D6F86
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 16:43:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 55DBA7D6F0B
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 16:42:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344873AbjJYOMp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 10:12:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55508 "EHLO
+        id S235072AbjJYOVJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 10:21:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234446AbjJYOMn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 10:12:43 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 063CC186;
-        Wed, 25 Oct 2023 07:12:39 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39PE7bUn019574;
-        Wed, 25 Oct 2023 14:12:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=BUar4PKqsDG6lqfx7BQfkCcxg7vHtdJ/oKykSgevYVQ=;
- b=nDOJD714BKQOPVksmJngnpDToJzwvOCxD/tUfYcXuy0kpWyo2Aj1IFU+CsEC2JO4b671
- q3ybquuJU1/KtJiK9VNaPY2YZNdlueikqUaGbZKvx3RfFyUv6etWMbB+EqNswbO2dD5z
- e0elJXk0f49NUbm076tnOFJKWbi4r+EDU7NoMdak/djdzNitk5dZDwtwmHCsU5l1IBZk
- 6FOI22V7pxLlGBkVRooLu/L/xA/yicub9FdnbiVSBHLzg8RWrCSlqwbVdGUd0JiWzeXz
- pNgTIrbh5dEnWjLdCLoZxqhr1P7TTWi04YZoTv6qhhdPKV6KjD1CIF8dMbptPyJrQs7e iA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ty4gkg9c1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 25 Oct 2023 14:12:31 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39PE9nIY030539;
-        Wed, 25 Oct 2023 14:12:07 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ty4gkg8hu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 25 Oct 2023 14:12:07 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39PBsTFZ024368;
-        Wed, 25 Oct 2023 14:11:50 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tvu6k6r2n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 25 Oct 2023 14:11:50 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39PEBlCL38732256
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 25 Oct 2023 14:11:47 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 040E82006C;
-        Wed, 25 Oct 2023 14:11:47 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 62B932005A;
-        Wed, 25 Oct 2023 14:11:46 +0000 (GMT)
-Received: from [9.171.74.154] (unknown [9.171.74.154])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 25 Oct 2023 14:11:46 +0000 (GMT)
-Message-ID: <b2f2c118-c0e5-4238-8ec2-872a8920923b@linux.ibm.com>
-Date:   Wed, 25 Oct 2023 16:11:46 +0200
+        with ESMTP id S234673AbjJYOVH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 10:21:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D195E13A
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:20:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1698243623;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=S1yh9aFBXnB/uUDqIchESZqamQpwZAPHQV0zqqMljjg=;
+        b=KPW6x6rVg7rgOsqO8KUx/BD1X22FUcAV5tt2tTyWxHS7nXLrBOXmMFy/lNu4jxc2dhIVaB
+        xFFUmi93uYgWoazqOB7ku5Qgfr3WnPTLxjCv2owQ18RKI5WMQY8wEqBhR5ugKurqwlno1U
+        RFXPd7bG6f+sgl3IQU6xn07xEprsWas=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-417-zFBRW_o4MVS7AFs5J7n3mQ-1; Wed, 25 Oct 2023 10:20:22 -0400
+X-MC-Unique: zFBRW_o4MVS7AFs5J7n3mQ-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7a16fe687aaso603345839f.3
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:20:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698243622; x=1698848422;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S1yh9aFBXnB/uUDqIchESZqamQpwZAPHQV0zqqMljjg=;
+        b=Ek9rfXjvjzt/DvZHncliITruWPr2buIcN+gF6h8jPGpcIZV6q2kn2YHb9hSO/bn5pi
+         zTJybJMp9XJlnanqYqJgk2IG31N2TapRGEdgl1QlhnEjHggGAxWeSkW9cXalMXIlUQMK
+         CHtQtWNzaeEUERd673UsQwI4IhFzY1YdgHQuFIcUDKNEk3XGW5n/AMymzqE/nz+3zgC2
+         +QEu4Alhq5S/tKfALSMJsJzkaxiBTwRtZGnCHdPP70eh1vQ7X4OvVr6GpLlPYtE3Z7Pt
+         x585uIbQiMPe+4qh3zx6zZI7AMxzyi4GDKzBt9yqNH08ItbGzMOT4dercn2CqWjmbgtZ
+         UNjQ==
+X-Gm-Message-State: AOJu0YykfGhDj3YwEDSipbs0WRwFyHQUcFCba3CBZ6yTT+B0JdSHpISO
+        yfjh3C6KERUcUVu7zuQfpU1QAkMSZvOMMvdefOv+P7Za7HZ5Z8QS/OsgL7ypiKMN2TLUvQ8PILJ
+        TTj7Y7lSj266R
+X-Received: by 2002:a05:6e02:12c6:b0:357:a04c:31d2 with SMTP id i6-20020a056e0212c600b00357a04c31d2mr20557626ilm.16.1698243621710;
+        Wed, 25 Oct 2023 07:20:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHKwcXNmgBx56Nwj0CHsxsSuQrL5I2Rqp2efJfKlsiSWqJhSMRfzxIfmT0Id8DMwf8cHqeybw==
+X-Received: by 2002:a05:6e02:12c6:b0:357:a04c:31d2 with SMTP id i6-20020a056e0212c600b00357a04c31d2mr20557588ilm.16.1698243621425;
+        Wed, 25 Oct 2023 07:20:21 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id a18-20020a92d352000000b0035742971dd3sm3769998ilh.16.2023.10.25.07.20.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Oct 2023 07:20:20 -0700 (PDT)
+Date:   Wed, 25 Oct 2023 08:20:19 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Ankit Agrawal <ankita@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
+        Vikram Sethi <vsethi@nvidia.com>,
+        Andy Currid <acurrid@nvidia.com>,
+        Alistair Popple <apopple@nvidia.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Dan Williams <danw@nvidia.com>,
+        "Anuj Aggarwal (SW-GPU)" <anuaggarwal@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v12 1/1] vfio/nvgpu: Add vfio pci variant module for
+ grace hopper
+Message-ID: <20231025082019.14575863.alex.williamson@redhat.com>
+In-Reply-To: <BY5PR12MB376386DD53954BC3233AF595B0DEA@BY5PR12MB3763.namprd12.prod.outlook.com>
+References: <20231015163047.20391-1-ankita@nvidia.com>
+        <20231017165437.69a84f0c.alex.williamson@redhat.com>
+        <BY5PR12MB3763356FC8CD2A7B307BD9AAB0D8A@BY5PR12MB3763.namprd12.prod.outlook.com>
+        <20231023084312.15b8e37e.alex.williamson@redhat.com>
+        <BY5PR12MB37636C06DED20856CF604A86B0DFA@BY5PR12MB3763.namprd12.prod.outlook.com>
+        <20231024082854.0b767d74.alex.williamson@redhat.com>
+        <BN9PR11MB5276A59033E514C051E9E4618CDEA@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <BY5PR12MB376386DD53954BC3233AF595B0DEA@BY5PR12MB3763.namprd12.prod.outlook.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 06/10] s390x: topology: Refine stsi header
- test
-Content-Language: en-US
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        =?UTF-8?Q?Nico_B=C3=B6hr?= <nrb@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Andrew Jones <andrew.jones@linux.dev>,
-        Ricardo Koller <ricarkol@google.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        Shaoqin Huang <shahuang@redhat.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Nikos Nikoleris <nikos.nikoleris@arm.com>,
-        linux-s390@vger.kernel.org
-References: <20231020144900.2213398-1-nsg@linux.ibm.com>
- <20231020144900.2213398-7-nsg@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20231020144900.2213398-7-nsg@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: wowaRCGIDpL4uD-OxlheS0EkiIgRXjmz
-X-Proofpoint-ORIG-GUID: GFjEfsSBwt7DB9HighQtWG3pXAFi0mtG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-25_02,2023-10-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 phishscore=0 clxscore=1015 impostorscore=0 mlxscore=0
- malwarescore=0 spamscore=0 adultscore=0 priorityscore=1501 mlxlogscore=835
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310170001 definitions=main-2310250121
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/20/23 16:48, Nina Schoetterl-Glausch wrote:
-> Add checks for length field.
-> Also minor refactor.
-> 
-> Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
-> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+On Wed, 25 Oct 2023 12:43:24 +0000
+Ankit Agrawal <ankita@nvidia.com> wrote:
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> While the physical BAR is present on the device, it is not being used on =
+the host
+> system. The access to the device memory region on the host occur through =
+the
+> C2C interconnect link (not the PCIe) and is present for access as a separ=
+ate memory
+> region in the physical address space on the host. The variant driver quer=
+ies this range
+> from the host ACPI DSD tables.
+
+BTW, it's still never been answered why the latest QEMU series dropped
+the _DSD support.
+
+> Now, this device memory region on the host is exposed as a device BAR in =
+the VM.
+> So the device BAR in the VM is actually mapped to the device memory regio=
+n in the
+> physical address space (and not to the physical BAR) on the host. The con=
+fig space
+> accesses to the device however, are still going to the physical BAR on th=
+e host.
+>=20
+> > Does this BAR2 size match the size we're reporting for the region?=C2=
+=A0 Now
+> > I'm confused why we need to intercept the BAR2 region info if there's
+> > physically a real BAR behind it.=C2=A0 Thanks, =20
+>=20
+> Yes, it does match the size being reported through region info. But the r=
+egion
+> info ioctl is still intercepted to provide additional cap to establish th=
+e sparse
+> mapping. Why we do sparse mapping? The actual device memory size is not
+> power-of-2 aligned (a requirement for a BAR). So we roundup to the next
+> power-of-2 value and report the size as such. Then we utilize sparse mapp=
+ing
+> to show only the actual size of the device memory as mappable.
+
+Yes, it's clear to me why we need the sparse mapping and why we
+intercept the accesses, but the fact that there's an underlying
+physical BAR of the same size in config space has been completely
+absent in any previous discussions.
+
+In light of that, I don't think we should be independently calculating
+the BAR2 region size using roundup_pow_of_two(nvdev->memlength).
+Instead we should be using pci_resource_len() of the physical BAR2 to
+make it evident that this relationship exists.
+
+The comments throughout should also be updated to reflect this as
+currently they're written as if there is no physical BAR2 and we're
+making a completely independent decision relative to BAR2 sizing.  A
+comment should also be added to nvgrace_gpu_vfio_pci_read/write()
+explaining that the physical BAR2 provides the correct behavior
+relative to config space accesses.
+
+The probe function should also fail if pci_resource_len() for BAR2 is
+not sufficient for the coherent memory region.  Thanks,
+
+Alex
 
