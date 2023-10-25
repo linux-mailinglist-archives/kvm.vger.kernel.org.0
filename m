@@ -2,198 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D2817D61CC
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 08:46:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BF837D61D3
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 08:50:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232291AbjJYGqd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 02:46:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55158 "EHLO
+        id S232270AbjJYGuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 02:50:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232082AbjJYGq1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 02:46:27 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE3D491;
-        Tue, 24 Oct 2023 23:46:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698216385; x=1729752385;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=t44h8COzR4ouwa7WaS1CgXoeke0/67sV64CRsZQG6sE=;
-  b=PX/13T6VE3xTKEED91wskSDVAvphse7Qo3yqpmnp8ravRC+QVdk/5XYc
-   F4fPVi3v3cFfHO4PZslCnoKFwPyrgIOJeFVj4YQ6Dh4F+yWe6GmLZWdZO
-   +yudFCUsAX9gvgXiC7F+DVmpo7nFnnrJnlGV8LpO8WDP3AUYrQmqzB7LY
-   U8ESYF9s3k9xe70eF5foiI2DSKlFaoO1PfCo5p9qR177TSojwwmgklc9B
-   9SKtBv4Ah+bl6LNp2JfdpIV4JpcbZBVA95vucduR1743RMmZlUgFR8+gV
-   YV9ADL4frzVN6WmK+tF64cMCtN4copxDo+VhAyixI7++dcKr55kxp1kej
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="377617589"
-X-IronPort-AV: E=Sophos;i="6.03,249,1694761200"; 
-   d="scan'208";a="377617589"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2023 23:46:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="735290590"
-X-IronPort-AV: E=Sophos;i="6.03,249,1694761200"; 
-   d="scan'208";a="735290590"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Oct 2023 23:46:24 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 24 Oct 2023 23:46:24 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Tue, 24 Oct 2023 23:46:24 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.168)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Tue, 24 Oct 2023 23:46:23 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GD0xeQ289k/VAV2yzT4nu7WdhlSo7P9w32ogjTYM10rY4dc7dadb2cSBPLZyAdDIwNXqrO18UIuSp1YtrL5oM2HSVQt2eKGhxm3rGOrbJTamUSJRYDxKG1hNiAjJLXad92hqsamsSqLaA2l4FNWK+Xa8ej8z/7fDmIdbapClTNz27DyZArGqG3DaHtikyzc58EAu0BUlv81JC2fhuoDdQt5egazQcF0dXQQA9ZyAeen8+jaU9pn2edNYkLS52HNTPPRRQMwXUX+JPVAv3aML91tTw3UC1oDNlaJokwkHWANlkoFAL5+djntgztWowVILa1s6sslJLFXJ8VdH3meeAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=g4vaq3j3PfDhX/aLrsckHLngqesk9uXIh/INiEU0BQc=;
- b=fNGga7UwH+VgqLSz1RBgc5LVbaijnCRX7YGZ49AcbqBNDlV3hnkae8dG7R27Al5noDMxfXxKIZmznrOEF3OMpSwcRpW6ghjAqPqwMEFW8ktQqXbkW0Ih/j7lhOWa/O84JUoZGbrkNgd+eZvDxUi0fKw9lFk9Oa41423LNqy5XWbLVMWVREThosUgfXcXMdqRUHsr7tFStvgtZb86hpYN1Cn8ww/l0B/DmDXebcQj8JAWQJ1dxI7u8GMQnqNNb6T54g41UrITueRh4SlXXdDJsN0G03DaK2lsW8zuM3zK6SB/mPIXpNq3I8kr6dGyWg2yZT0gFpNYX695LY0MznoNCQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by DM4PR11MB8092.namprd11.prod.outlook.com (2603:10b6:8:184::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.31; Wed, 25 Oct
- 2023 06:46:20 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a%3]) with mapi id 15.20.6907.032; Wed, 25 Oct 2023
- 06:46:20 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
-CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "Martins, Joao" <joao.m.martins@oracle.com>
-Subject: RE: [PATCH v6 04/10] iommufd/device: Wrap
- IOMMUFD_OBJ_HWPT_PAGING-only configurations
-Thread-Topic: [PATCH v6 04/10] iommufd/device: Wrap
- IOMMUFD_OBJ_HWPT_PAGING-only configurations
-Thread-Index: AQHaBou2thRR0b1SL06rXFPsnYb7TrBaEGMQ
-Date:   Wed, 25 Oct 2023 06:46:20 +0000
-Message-ID: <BN9PR11MB5276E2B6AFB5617395E9A5768CDEA@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20231024150609.46884-1-yi.l.liu@intel.com>
- <20231024150609.46884-5-yi.l.liu@intel.com>
-In-Reply-To: <20231024150609.46884-5-yi.l.liu@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|DM4PR11MB8092:EE_
-x-ms-office365-filtering-correlation-id: 28dc91d9-1bad-4e45-663f-08dbd526189b
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: gEBk02t2lQdJxhZKI0sjrTwgJynnyk8vC79q4YOP7chmlfVk/bD4FNHTrxU5z6+TKj10ObMi3QGophQ6i8IyQnaFq6/oFO4THzoYiom/WK1G5/oUkbdH0su3s3DTPca+pcbFaFJ/HxEf33wDIJW5aZla47VFJnT7PZm2brj0E8CVF92v5sg5pVOPbl9HvTe/ozyClP8/BlL1PXa74yx49G+R2S+ROCkclASPl0CNQyHlg4ItOow1MuygEE3WPndZ1RFP7qrrbTmaCLstPVX3UOYHpUpLPPvY4pGdQLwE8f7F6cmlbJefMEOmSVkQ1GnITzYVB9+b3sDIU2UgNiC1AXjK3iRVv9k1lRmVi4MQxO0C3upXjREuAa7+owyZFi4NMv+GyxABTkzfTCRebQfMp/2I4F4rZx0wW1tUaEGosXZVoe1hbCHbQm/8aCsxVUVncaCZHpHqut9nGUK6FyQunYk+zSsL0yE0gE/9EJA4RCfEMKG4SS7RtxKyeBUTTOCTlqXJBn8syw3eq5AsjlnIzKYDfdJSbMkYisqBELoqR/HmDfZPE/WHNumMqAehTFbmf8w5zZkv2GbTo2uCrsW1MVQNhDTPVA5iLr+emP8/rgzsiBmK5kKOgsZfD8qGUijD
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(346002)(136003)(376002)(39860400002)(230922051799003)(451199024)(1800799009)(64100799003)(186009)(4744005)(66946007)(122000001)(2906002)(55016003)(38100700002)(82960400001)(110136005)(66446008)(316002)(76116006)(66556008)(64756008)(6506007)(7696005)(478600001)(54906003)(71200400001)(9686003)(83380400001)(52536014)(5660300002)(86362001)(7416002)(4326008)(33656002)(8676002)(41300700001)(8936002)(66476007)(38070700009)(26005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?sG1uOAm/2ruogq9WCawjsqPE9k5Og3ficPCC8Lp3pRObOodlBJhLgxoIlCQ6?=
- =?us-ascii?Q?V+o67LIzAwjB+vUN8MPZznNEEO/lMYn4UzByYdpY0Qtn74/5iGP40i+H0reD?=
- =?us-ascii?Q?S8glKdTERxyjmWf+rjwwdcsoHq+Gm8Iicq8dxz2eEnMWZm2S2mMPvlSZanaU?=
- =?us-ascii?Q?ICy71G9CgaJUwYxWA1YzEz+gzQFy6bEDgl3Cj+oVp2WG+GmXm4BWu41GnKQ0?=
- =?us-ascii?Q?BfMkE0cCYg9W0aTvtrmg7q71NM/b3mmttvDkKN/P/Ir0jvU/clVQHQYYzkLl?=
- =?us-ascii?Q?UPx2SSwCSnDrzv+aVufO1NwZq2amxs4SqcW0S5itaNNJTuvlHOcjio347eLb?=
- =?us-ascii?Q?ldFiRGLbIHb36qiPoWCUgORN370Uw9tDTmHAVMaskMxsTqj9rPDiD7xSFqK/?=
- =?us-ascii?Q?sWMd+iN6h4Kw8HX4xn5/9dLH4ekeoER30L7ym6CynwAAR20Q9MdtWzTcpGS1?=
- =?us-ascii?Q?h6wiiziI+8FLwZae2QMshU9x9M/MwvrTcuAbLMHDA9Km7efuraZIo68gfT+s?=
- =?us-ascii?Q?dIP5XwhQkN4JX09TitriXtE7OeqKrhCufQmo9HZ8rT/MR4wMvKuoUQFslNrO?=
- =?us-ascii?Q?9ZvgtlGBDnwpNJo7d5DEpf32ybxiqPqa633JokaZwpGVk45o3Ddr+YPvhEYX?=
- =?us-ascii?Q?i4HGQwJrZmc/Z/PLHmuHV7RPFiZ1p+SoTNp5VdpMEzb11C8MX50q9rkNCB7u?=
- =?us-ascii?Q?hg/bnjVJ+qFBMAvsYEMyIoxlue+lOFzUmAlzLrxx85MlVr7udIGDDKfM0mBe?=
- =?us-ascii?Q?BbXVCHTUunfPWh1zc35A5CI/Ema4Us6bqUbzT9phfSesu4y9LwKSllrx4zGH?=
- =?us-ascii?Q?c38BkeRDaYu55ngSxUMSfJtzgy5hU+fCqyOR9Xne1z656zKft1DZpCMVf/8L?=
- =?us-ascii?Q?zYau3dY9C19NT7WHyHSKiFxk5BTMcc9uEzJZPi+jf7tdeFcqVnw07DhIWGBQ?=
- =?us-ascii?Q?sEckhxI72mHlqzHSZRD3BATubncEv+gJohY28AmrQkgv88zE+VJgUnoVm9WC?=
- =?us-ascii?Q?WUcqixIpN+RNDSst2o8NQ44498AGLGGBV/tZ1Q2Dslk9HTWcQ5MWLd5A3/xj?=
- =?us-ascii?Q?aHJWem0p40c+a9iq8HVO/YvLPksqj/1jlhrvMd9dg1qLhP8oUHpJsnY4/g1V?=
- =?us-ascii?Q?E29i8tYTy4Yb5Zy6iMaD4FBc8d5c1SWVf1NTyaxY+SmgTsJdWONrSISfNcDt?=
- =?us-ascii?Q?dWT2Rur7SaxQ+ms318/fby9mL0galOYHkXDybQLsZwwkd4KVwnMCXq+sN4mx?=
- =?us-ascii?Q?3P7fifvPgIb4P/ioPCC/0F/WcTrIEOCqyofaXF4Wbw3yQhwZdHkONx2kqMEF?=
- =?us-ascii?Q?t5OWahuv85zI4OhdfTEhWY3YkLf36GNj46uaJt5pcirxkKJUXfe1HPmd05V3?=
- =?us-ascii?Q?bFwmGLtzEl+xEdgAs4G00jjRrvI6kQBNYquY/VaIhYKNlpenmoVysBZKREqq?=
- =?us-ascii?Q?kY4AprIhN2l3x0bMbdl3e5+CTkuRTUHbYTHQ7QQEAPyK9MxfcSq/kMtOFXFp?=
- =?us-ascii?Q?d4hoYsN0NqMOgq22d1CsuW9d9JGVQuHFhS4TuCvtmUywsNMbIcGrTXTVyp+a?=
- =?us-ascii?Q?L5Wan/Ys5lcBUT69B57drbjyLQGUd+fIG2bdLFC6?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S232229AbjJYGuo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 02:50:44 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25B9B181
+        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 23:50:42 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9b9faf05f51so761041866b.2
+        for <kvm@vger.kernel.org>; Tue, 24 Oct 2023 23:50:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1698216640; x=1698821440; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=MwdrCLs7J8pw9TLHstYCMVRsUZqiCP56vCN/PW3QTMo=;
+        b=LOsrUHKtNHXqvv2Rv06Qg37pWRMDznTuKeoBdSFU2mi58FCKO7JQOFoxSink7rDQ6E
+         eaFzpMioxz/gjd40YMjXg26hPEpkkdgTYxzEL1r264J3ZxJN/Hf9lBwOkPTFfat6fRdh
+         RC5UXSRVqe4OqjvfmQuK4bJdL5f0ark9mF+74i9sNVRqUbWsRAbYK0cSZM3rNpAcCQGS
+         cqIzk8XlOmHNjBWTIWelNK/eQP9Uc8hH08ZZrh2Z1wLUcofKFRdlJJvdVPUvRIZQRaNh
+         xJN1eDqN//dwdN6JaJVCRdBEkgIzXPH/3Nb5cktJMCPSzInHbuPV0XzCdtFA9TLjRVbC
+         474Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698216640; x=1698821440;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MwdrCLs7J8pw9TLHstYCMVRsUZqiCP56vCN/PW3QTMo=;
+        b=PJFczWYprIGl+gbSb6GVoCfxEuxLjeMTEQ08mJ9nwvRfcA7VR4fMs8TtC7TaUNb4mt
+         axjxleaS7x1eXQWO0haQ4RB9rVr2hNfSa78fIHkhRziW+yqhwIZPx06EObihvrRYm6Er
+         /mdT0exit6W+uJXYtyxokbRWHrKPMZdWodTZpJAgjDlBUd7QjPs8jh3x3AuXPkpO7IJ3
+         l+ZClKSHXrtS2naHKm5bUUO5fAHKB97KenLbZZFThHUhyR2PiFYSxg7kvOSGuSIYzsRh
+         Lqm8N49u6RHuneqXUgXJ8hYR5pSeCLpok4JHkix3dI6gBwsXSZxJpA/lW81+NebNxoOE
+         xQ3g==
+X-Gm-Message-State: AOJu0YwOlMKTA2LtHdBLFhKMQUw6OmQPsquGwggIvnfRA1u7LB56pQuK
+        BJM1KVWV53sJeA9e/b9kp+2ZSA==
+X-Google-Smtp-Source: AGHT+IEHX75CQrrE1AAOHnqkbOnbbTtmku7y2INZej13eNL87gyTFaPI5KTEJpDz3xLYzWLGvD/1wg==
+X-Received: by 2002:a17:906:dace:b0:9c3:730e:6947 with SMTP id xi14-20020a170906dace00b009c3730e6947mr11584331ejb.41.1698216640370;
+        Tue, 24 Oct 2023 23:50:40 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id s18-20020a1709060d7200b009cd52d08563sm678032ejh.223.2023.10.24.23.50.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Oct 2023 23:50:40 -0700 (PDT)
+Date:   Wed, 25 Oct 2023 08:50:33 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 2/5] riscv: Use SYM_*() assembly macros instead of
+ deprecated ones
+Message-ID: <20231025-d21b7077ff99828bef7cfaa8@orel>
+References: <20231024132655.730417-1-cleger@rivosinc.com>
+ <20231024132655.730417-3-cleger@rivosinc.com>
+ <20231024-e122c317599cd4c6db53c015@orel>
+ <da308888-0e47-4ca4-b318-8f089421dc0b@rivosinc.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 28dc91d9-1bad-4e45-663f-08dbd526189b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Oct 2023 06:46:20.0891
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: m2SOYRG+BhYseO3Gy9iBHNiPi8x1HDDmkXrfwbA/sP1+/dKpPNaCdZAGxwU5difKyxC2QsDmVTE/4NJCN5rtGg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB8092
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <da308888-0e47-4ca4-b318-8f089421dc0b@rivosinc.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Liu, Yi L <yi.l.liu@intel.com>
-> Sent: Tuesday, October 24, 2023 11:06 PM
-> +
-> +static int iommufd_group_do_replace_paging(struct iommufd_group
-> *igroup,
-> +					   struct iommufd_hw_pagetable
-> *hwpt)
-> +{
-> +	struct iommufd_hw_pagetable *old_hwpt =3D igroup->hwpt;
-> +	struct iommufd_device *cur;
-> +	int rc;
-> +
-> +	lockdep_assert_held(&igroup->lock);
-> +
-> +	if (hwpt_is_paging(old_hwpt) && hwpt->ioas !=3D old_hwpt->ioas) {
-> +		list_for_each_entry(cur, &igroup->device_list, group_item) {
-> +			rc =3D iopt_table_enforce_dev_resv_regions(
-> +				&hwpt->ioas->iopt, cur->dev, NULL);
-> +			if (rc)
-> +				goto err_unresv;
-> +		}
+On Tue, Oct 24, 2023 at 08:03:52PM +0200, Clément Léger wrote:
+> 
+> 
+> On 24/10/2023 17:23, Andrew Jones wrote:
+> > On Tue, Oct 24, 2023 at 03:26:52PM +0200, Clément Léger wrote:
+> > ...
+> >> diff --git a/arch/riscv/lib/uaccess.S b/arch/riscv/lib/uaccess.S
+> >> index 09b47ebacf2e..3ab438f30d13 100644
+> >> --- a/arch/riscv/lib/uaccess.S
+> >> +++ b/arch/riscv/lib/uaccess.S
+> >> @@ -10,8 +10,7 @@
+> >>  	_asm_extable	100b, \lbl
+> >>  	.endm
+> >>  
+> >> -ENTRY(__asm_copy_to_user)
+> >> -ENTRY(__asm_copy_from_user)
+> >> +SYM_FUNC_START(__asm_copy_to_user)
+> >>  
+> >>  	/* Enable access to user memory */
+> >>  	li t6, SR_SUM
+> >> @@ -181,13 +180,13 @@ ENTRY(__asm_copy_from_user)
+> >>  	csrc CSR_STATUS, t6
+> >>  	sub a0, t5, a0
+> >>  	ret
+> >> -ENDPROC(__asm_copy_to_user)
+> >> -ENDPROC(__asm_copy_from_user)
+> >> +SYM_FUNC_END(__asm_copy_to_user)
+> >>  EXPORT_SYMBOL(__asm_copy_to_user)
+> >> +SYM_FUNC_ALIAS(__asm_copy_from_user, __asm_copy_to_user)
+> >>  EXPORT_SYMBOL(__asm_copy_from_user)
+> > 
+> > I didn't see any comment about the sharing of debug info among both the
+> > from and to functions. Assuming it isn't confusing in some way, then
+> 
+> Hi Andrew,
+> 
+> I did some testing with gdb and it seems to correctly assume that
+> __asm_copy_to_user maps to __asm_copy_from_user for debugging. The basic
+> tests that I did (breakpoints, disasm, etc) seems to show no sign of
+> problems for debugging. Were you thinking about other things specifically ?
 
-should be:
+Mostly just backtrace symbols, but I suppose we can live with it, since
+it wouldn't be the only weird thing in a backtrace.
 
-	if (!hwpt_is_paging(old_hwpt) || hwpt->ioas !=3D old_hwpt->ioas) {
-		...
+Thanks,
+drew
