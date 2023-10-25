@@ -2,33 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 247457D7006
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 16:54:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5D707D6FF1
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 16:54:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344432AbjJYOvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 10:51:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53916 "EHLO
+        id S1344261AbjJYOwE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 10:52:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344288AbjJYOvQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 10:51:16 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABCEB13A
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:51:13 -0700 (PDT)
+        with ESMTP id S235031AbjJYOvj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 10:51:39 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C19DB10D9
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:51:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=y4cEjsiuJ1bFNsoLeKKWM6n6686E9X1lvqONj/DtYQs=; b=lrSrOgOplofh9XNYvO/Y6Cc20E
-        b2BRTomTqLlH4ivgwD4sBmyXjLP3I1Fai6wk4h8Si1HSDLa25iMcQJekBASDQUPnHVIhgwPDGuIPe
-        /fiD7p1xKwU7WPhmYzbbiUGkYAMCw9eYzzmKLc7jSYCCrbc9Il3cn+XOaaQle1LLOunGnghcs49bw
-        3xgOTsVL24eBNSqWchz1Vf7eCnWmMNu5ej9mU2LmU4o06Qtg1DKPiu8P5eSAmOZnGMDFsJIQQAZUI
-        06foiSUf0y/lJX5p1rYRRqKVhWC+mTGRpDqqHpAJiAZgoYQGU7Q2itxuffQXtTSt1ckoY4gF2ShZl
-        N4J97H8w==;
+        bh=SKjWRXIgiNg5ff3bqQvSLiVcvlPitO7cHPHfc8XhUXU=; b=i2fwrV8zZ2vjfC4alhYHqho5Kg
+        69ItbcjuoufZl6Gv9FMYnIEB1jR+EI2qtRRyqdOFgFYEK1LzG6KxP647hv5/G6my2/D3e1Nf518Bs
+        bpsvnspf+G1TgFmvc69VdUs+xMWSbH3w/d4GIgFwg5c42Bt8j3HQ0PB1C/Uw/bTNjij8N3BLhn+ME
+        sAQG8vSqxTsmOj0rSVeluMyopsAtLcdgMvZEUnRoZLqQP3/BB165JjV78qWqWj2nFaH3b3IQwlvyc
+        qdKCIT24XkYpjsTqPbsyzvjsef9hJe/F4fTkTDMQPAPKlnUOqPmS4ZrhiS0hKFMIO3E4buVrrQeEB
+        WiLXn9OQ==;
 Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qvfDZ-009Nmp-OP; Wed, 25 Oct 2023 14:50:45 +0000
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qvfDa-00GPM6-1D;
+        Wed, 25 Oct 2023 14:50:52 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qvfDZ-002dFP-0x;
+        id 1qvfDZ-002dFU-1H;
         Wed, 25 Oct 2023 15:50:45 +0100
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     qemu-devel@nongnu.org
@@ -47,16 +48,16 @@ Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
         xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
         Bernhard Beschow <shentey@gmail.com>,
         Joel Upham <jupham125@gmail.com>
-Subject: [PATCH v3 21/28] xen-platform: unplug AHCI disks
-Date:   Wed, 25 Oct 2023 15:50:35 +0100
-Message-Id: <20231025145042.627381-22-dwmw2@infradead.org>
+Subject: [PATCH v3 22/28] net: add qemu_{configure,create}_nic_device(), qemu_find_nic_info()
+Date:   Wed, 25 Oct 2023 15:50:36 +0100
+Message-Id: <20231025145042.627381-23-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231025145042.627381-1-dwmw2@infradead.org>
 References: <20231025145042.627381-1-dwmw2@infradead.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
@@ -68,117 +69,106 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-To support Xen guests using the Q35 chipset, the unplug protocol needs
-to also remove AHCI disks.
+Most code which directly accesses nd_table[] and nb_nics uses them for
+one of two things. Either "I have created a NIC device and I'd like a
+configuration for it", or "I will create a NIC device *if* there is a
+configuration for it".  With some variants on the theme around whether
+they actually *check* if the model specified in the configuration is
+the right one.
 
-Make pci_xen_ide_unplug() more generic, iterating over the children
-of the PCI device and destroying the "ide-hd" devices. That works the
-same for both AHCI and IDE, as does the detection of the primary disk
-as unit 0 on the bus named "ide.0".
+Provide functions which perform both of those, allowing platforms to
+be a little more consistent and as a step towards making nd_table[]
+and nb_nics private to the net code.
 
-Then pci_xen_ide_unplug() can be used for both AHCI and IDE devices.
+Also export the qemu_find_nic_info() helper, as some platforms have
+special cases they need to handle.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- hw/i386/xen/xen_platform.c | 68 +++++++++++++++++++++++++-------------
- 1 file changed, 45 insertions(+), 23 deletions(-)
+ include/net/net.h |  7 ++++++-
+ net/net.c         | 51 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 57 insertions(+), 1 deletion(-)
 
-diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
-index e2dd1b536a..ef7d3fc05f 100644
---- a/hw/i386/xen/xen_platform.c
-+++ b/hw/i386/xen/xen_platform.c
-@@ -169,39 +169,60 @@ static void pci_unplug_nics(PCIBus *bus)
-  *
-  * [1] https://xenbits.xen.org/gitweb/?p=xen.git;a=blob;f=docs/misc/hvm-emulated-unplug.pandoc
-  */
--static void pci_xen_ide_unplug(PCIDevice *d, bool aux)
-+struct ide_unplug_state {
-+    bool aux;
-+    int nr_unplugged;
-+};
-+
-+static int ide_dev_unplug(DeviceState *dev, void *_st)
- {
--    DeviceState *dev = DEVICE(d);
--    PCIIDEState *pci_ide;
--    int i;
-+    struct ide_unplug_state *st = _st;
-     IDEDevice *idedev;
-     IDEBus *idebus;
-     BlockBackend *blk;
-+    int unit;
-+
-+    idedev = IDE_DEVICE(object_dynamic_cast(OBJECT(dev), "ide-hd"));
-+    if (!idedev) {
-+        return 0;
-+    }
- 
--    pci_ide = PCI_IDE(dev);
-+    idebus = IDE_BUS(qdev_get_parent_bus(dev));
- 
--    for (i = aux ? 1 : 0; i < 4; i++) {
--        idebus = &pci_ide->bus[i / 2];
--        blk = idebus->ifs[i % 2].blk;
-+    unit = (idedev == idebus->slave);
-+    assert(unit || idedev == idebus->master);
- 
--        if (blk && idebus->ifs[i % 2].drive_kind != IDE_CD) {
--            if (!(i % 2)) {
--                idedev = idebus->master;
--            } else {
--                idedev = idebus->slave;
--            }
-+    if (st->aux && !unit && !strcmp(BUS(idebus)->name, "ide.0")) {
-+        return 0;
-+    }
- 
--            blk_drain(blk);
--            blk_flush(blk);
-+    blk = idebus->ifs[unit].blk;
-+    if (blk) {
-+        blk_drain(blk);
-+        blk_flush(blk);
- 
--            blk_detach_dev(blk, DEVICE(idedev));
--            idebus->ifs[i % 2].blk = NULL;
--            idedev->conf.blk = NULL;
--            monitor_remove_blk(blk);
--            blk_unref(blk);
--        }
-+        blk_detach_dev(blk, DEVICE(idedev));
-+        idebus->ifs[unit].blk = NULL;
-+        idedev->conf.blk = NULL;
-+        monitor_remove_blk(blk);
-+        blk_unref(blk);
-+    }
-+
-+    object_unparent(OBJECT(dev));
-+    st->nr_unplugged++;
-+
-+    return 0;
-+}
-+
-+static void pci_xen_ide_unplug(PCIDevice *d, bool aux)
-+{
-+    struct ide_unplug_state st = { aux, 0 };
-+    DeviceState *dev = DEVICE(d);
-+
-+    qdev_walk_children(dev, NULL, NULL, ide_dev_unplug, NULL, &st);
-+    if (st.nr_unplugged) {
-+        pci_device_reset(d);
-     }
--    pci_device_reset(d);
+diff --git a/include/net/net.h b/include/net/net.h
+index 2fb1c9181c..56be694c75 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -205,7 +205,12 @@ int qemu_show_nic_models(const char *arg, const char *const *models);
+ void qemu_check_nic_model(NICInfo *nd, const char *model);
+ int qemu_find_nic_model(NICInfo *nd, const char * const *models,
+                         const char *default_model);
+-
++NICInfo *qemu_find_nic_info(const char *typename, bool match_default,
++                            const char *alias);
++bool qemu_configure_nic_device(DeviceState *dev, bool match_default,
++                               const char *alias);
++DeviceState *qemu_create_nic_device(const char *typename, bool match_default,
++                                    const char *alias);
+ void print_net_client(Monitor *mon, NetClientState *nc);
+ void net_socket_rs_init(SocketReadState *rs,
+                         SocketReadStateFinalize *finalize,
+diff --git a/net/net.c b/net/net.c
+index bbe33da176..f8b4973a1e 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1072,6 +1072,57 @@ static int net_init_nic(const Netdev *netdev, const char *name,
+     return idx;
  }
  
- static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
-@@ -216,6 +237,7 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
++NICInfo *qemu_find_nic_info(const char *typename, bool match_default,
++                            const char *alias)
++{
++    NICInfo *nd;
++    int i;
++
++    for (i = 0; i < nb_nics; i++) {
++        nd = &nd_table[i];
++
++        if (!nd->used || nd->instantiated) {
++            continue;
++        }
++
++        if ((match_default && !nd->model) || !g_strcmp0(nd->model, typename)
++            || (alias && !g_strcmp0(nd->model, alias))) {
++            return nd;
++        }
++    }
++    return NULL;
++}
++
++
++/* "I have created a device. Please configure it if you can" */
++bool qemu_configure_nic_device(DeviceState *dev, bool match_default,
++                               const char *alias)
++{
++    NICInfo *nd = qemu_find_nic_info(object_get_typename(OBJECT(dev)),
++                                     match_default, alias);
++
++    if (nd) {
++        qdev_set_nic_properties(dev, nd);
++        return true;
++    }
++    return false;
++}
++
++/* "Please create a device, if you have a configuration for it" */
++DeviceState *qemu_create_nic_device(const char *typename, bool match_default,
++                                    const char *alias)
++{
++    NICInfo *nd = qemu_find_nic_info(typename, match_default, alias);
++    DeviceState *dev;
++
++    if (!nd) {
++        return NULL;
++    }
++
++    dev = qdev_new(typename);
++    qdev_set_nic_properties(dev, nd);
++    return dev;
++}
  
-     switch (pci_get_word(d->config + PCI_CLASS_DEVICE)) {
-     case PCI_CLASS_STORAGE_IDE:
-+    case PCI_CLASS_STORAGE_SATA:
-         pci_xen_ide_unplug(d, aux);
-         break;
- 
+ static int (* const net_client_init_fun[NET_CLIENT_DRIVER__MAX])(
+     const Netdev *netdev,
 -- 
 2.40.1
 
