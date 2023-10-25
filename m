@@ -2,41 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E4D97D75F9
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 22:52:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B51E97D7614
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 22:54:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230054AbjJYUw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 16:52:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55288 "EHLO
+        id S233153AbjJYUxF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 16:53:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230233AbjJYUwv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 16:52:51 -0400
+        with ESMTP id S232329AbjJYUxA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 16:53:00 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA653136;
-        Wed, 25 Oct 2023 13:52:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD02E184;
+        Wed, 25 Oct 2023 13:52:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698267169; x=1729803169;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=nFU0gWVfaBmzYZu/sQ4XkeGrRDvj/BfRgOvVsVQkje4=;
-  b=Y5ZOcJEvkN6QrjZ9b3ItbSYy5d9G9MwqOVOaptKEePeD4uAHKzrrMQ+4
-   6oz/0MXKteweeLUlEM0YMGOzf7ImQwSJwVSvayzm2q9EXUhFZyQbtZphX
-   UlxNLDLacqwqYfuagf7LODrXjMeaDSGlk2vbpw6rMJFfCziLLvziQWCuw
-   vX9zytI3Nq4pUzMQcu7UElIY7JstWRf+EKup2j0l4tCOcodsjM9TqibOl
-   OhChClHt+HWNe2xVwyEut59Gp+491d+DMz6gbK0EdwZk6lMMkqefDYV25
-   dAQUbozr6Uij74KgLCjVyPJabaR/MvsUWJOLwSFcG0sZ9E1LOgWR2Pr6r
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="390255461"
+  t=1698267175; x=1729803175;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=bKrk4oUB1RyJhM26Xb3XGAzoBI+ZL+b1OrWpIw4mqdA=;
+  b=RB6+4Btni8ROXTTL1LKark9z43ex0ID6SLYJovFW2r6FhpqAsAUBXK0d
+   b5J5DMVM4K0j9//ZtFBZvjzJEaf4tUBDo2vmgyjt+cjatFbpdhunDP1kk
+   mJTPBBR1Awa8Oz5QUF8xYsrVeZbh33BZ0Csekrwim99wgzw9mJcKmYasu
+   zh7Se2GPUKGHLsauDAi6dlR0ni1vb6Mir89850XYahJiSJuhF4k98RPMw
+   bDjQkY/57lkhIw7C82oxNBebmtfJdtSDl41v0tIvMoGKcMNmzT6xJwMjU
+   MqqTlSvuiBR44eQ3d2X0dHQUP8/OPGg0BgTtn/1Wfv0wUvqdIyrnAFVSR
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="390255480"
 X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
-   d="scan'208";a="390255461"
+   d="scan'208";a="390255480"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 13:52:48 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 13:52:55 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
-   d="scan'208";a="259486"
+   d="scan'208";a="259602"
 Received: from kkomeyli-mobl.amr.corp.intel.com (HELO desk) ([10.251.29.139])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 13:52:36 -0700
-Date:   Wed, 25 Oct 2023 13:52:44 -0700
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 13:52:43 -0700
+Date:   Wed, 25 Oct 2023 13:52:51 -0700
 From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -56,61 +57,33 @@ Cc:     linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
         antonio.gomez.iglesias@linux.intel.com,
         Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Alyssa Milburn <alyssa.milburn@intel.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Nikolay Borisov <nik.borisov@suse.com>
-Subject: [PATCH v3 0/6] Delay VERW
-Message-ID: <20231025-delay-verw-v3-0-52663677ee35@linux.intel.com>
-X-B4-Tracking: v=1; b=H4sIAH19OWUC/2XMSw6CMBSF4a2Qji3pSyiO3IdxgO2t3ASLabFCC
- Hu3wQnG4fmT8y0kQkCI5FQsJEDCiIPPQx4KYrrW34GizZsIJiRnnFMLfTvTBOFNLVO1anR1E0a
- SfHgGcDht2IWQay4dxnEI86YnvvUvJNgeSpwyapw7KtZUUlT23KN/TSX6EfrSDI8NS2IPqB9AZ
- MBxrblUzGhW/wPrun4A7q9Tae0AAAA=
+        Andrew Cooper <andrew.cooper3@citrix.com>
+Subject: [PATCH  v3 1/6] x86/bugs: Add asm helpers for executing VERW
+Message-ID: <20231025-delay-verw-v3-1-52663677ee35@linux.intel.com>
 X-Mailer: b4 0.12.3
+References: <20231025-delay-verw-v3-0-52663677ee35@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Spam-Status: No, score=-1.3 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
-        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+In-Reply-To: <20231025-delay-verw-v3-0-52663677ee35@linux.intel.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-v3:
-- Use .entry.text section for VERW memory operand. (Andrew/PeterZ)
-- Fix the duplicate header inclusion. (Chao)
-
-v2: https://lore.kernel.org/r/20231024-delay-verw-v2-0-f1881340c807@linux.intel.com
-- Removed the extra EXEC_VERW macro layers. (Sean)
-- Move NOPL before VERW. (Sean)
-- s/USER_CLEAR_CPU_BUFFERS/CLEAR_CPU_BUFFERS/. (Josh/Dave)
-- Removed the comments before CLEAR_CPU_BUFFERS. (Josh)
-- Remove CLEAR_CPU_BUFFERS from NMI returning to kernel and document the
-  reason. (Josh/Dave)
-- Reformat comment in md_clear_update_mitigation(). (Josh)
-- Squash "x86/bugs: Cleanup mds_user_clear" patch. (Nikolay)
-- s/GUEST_CLEAR_CPU_BUFFERS/CLEAR_CPU_BUFFERS/. (Josh)
-- Added a patch from Sean to use CFLAGS.CF for VMLAUNCH/VMRESUME
-  selection. This facilitates a single CLEAR_CPU_BUFFERS location for both
-  VMLAUNCH and VMRESUME. (Sean)
-
-v1: https://lore.kernel.org/r/20231020-delay-verw-v1-0-cff54096326d@linux.intel.com
-
-Hi,
-
-Legacy instruction VERW was overloaded by some processors to clear
-micro-architectural CPU buffers as a mitigation of CPU bugs. This series
-moves VERW execution to a later point in exit-to-user path. This is
-needed because in some cases it may be possible for kernel data to be
-accessed after VERW in arch_exit_to_user_mode(). Such accesses may put
-data into MDS affected CPU buffers, for example:
+MDS mitigation requires clearing the CPU buffers before returning to
+user. This needs to be done late in the exit-to-user path. Current
+location of VERW leaves a possibility of kernel data ending up in CPU
+buffers for memory accesses done after VERW such as:
 
   1. Kernel data accessed by an NMI between VERW and return-to-user can
-     remain in CPU buffers (since NMI returning to kernel does not
-     execute VERW to clear CPU buffers).
+     remain in CPU buffers ( since NMI returning to kernel does not
+     execute VERW to clear CPU buffers.
   2. Alyssa reported that after VERW is executed,
      CONFIG_GCC_PLUGIN_STACKLEAK=y scrubs the stack used by a system
      call. Memory accesses during stack scrubbing can move kernel stack
@@ -119,62 +92,97 @@ data into MDS affected CPU buffers, for example:
      function executing VERW, the kernel stack accesses can remain in
      CPU buffers(since they occur after VERW).
 
-Although these cases are less practical to exploit, moving VERW closer
-to ring transition reduces the attack surface.
+To fix this VERW needs to be moved very late in exit-to-user path.
 
-Overview of the series:
+In preparation for moving VERW to entry/exit asm code, create macros
+that can be used in asm. Also make them depend on a new feature flag
+X86_FEATURE_CLEAR_CPU_BUF.
 
-Patch 1: Prepares VERW macros for use in asm.
-Patch 2: Adds macros to 64-bit entry/exit points.
-Patch 3: Adds macros to 32-bit entry/exit points.
-Patch 4: Enables the new macros.
-Patch 5: Uses CFLAGS.CF for VMLAUNCH/VMRESUME selection.
-Patch 6: Adds macro to VMenter.
-
-Below is some performance data collected with v1 on a Skylake client
-compared with previous implementation:
-
-Baseline: v6.6-rc5
-
-| Test               | Configuration          | Relative |
-| ------------------ | ---------------------- | -------- |
-| build-linux-kernel | defconfig              | 1.00     |
-| hackbench          | 32 - Process           | 1.02     |
-| nginx              | Short Connection - 500 | 1.01     |
-
+Reported-by: Alyssa Milburn <alyssa.milburn@intel.com>
+Suggested-by: Andrew Cooper <andrew.cooper3@citrix.com>
+Suggested-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 ---
-Pawan Gupta (5):
-      x86/bugs: Add asm helpers for executing VERW
-      x86/entry_64: Add VERW just before userspace transition
-      x86/entry_32: Add VERW just before userspace transition
-      x86/bugs: Use ALTERNATIVE() instead of mds_user_clear static key
-      KVM: VMX: Move VERW closer to VMentry for MDS mitigation
-
-Sean Christopherson (1):
-      KVM: VMX: Use BT+JNC, i.e. EFLAGS.CF to select VMRESUME vs. VMLAUNCH
-
- Documentation/arch/x86/mds.rst       | 39 ++++++++++++++++++++++++++----------
- arch/x86/entry/entry.S               | 16 +++++++++++++++
- arch/x86/entry/entry_32.S            |  3 +++
- arch/x86/entry/entry_64.S            | 11 ++++++++++
- arch/x86/entry/entry_64_compat.S     |  1 +
+ arch/x86/entry/entry.S               | 16 ++++++++++++++++
  arch/x86/include/asm/cpufeatures.h   |  2 +-
- arch/x86/include/asm/entry-common.h  |  1 -
- arch/x86/include/asm/nospec-branch.h | 27 ++++++++++++++-----------
- arch/x86/kernel/cpu/bugs.c           | 15 ++++++--------
- arch/x86/kernel/nmi.c                |  2 --
- arch/x86/kvm/vmx/run_flags.h         |  7 +++++--
- arch/x86/kvm/vmx/vmenter.S           |  9 ++++++---
- arch/x86/kvm/vmx/vmx.c               | 10 ++++++---
- 13 files changed, 99 insertions(+), 44 deletions(-)
----
-base-commit: 05d3ef8bba77c1b5f98d941d8b2d4aeab8118ef1
-change-id: 20231011-delay-verw-d0474986b2c3
+ arch/x86/include/asm/nospec-branch.h | 15 +++++++++++++++
+ 3 files changed, 32 insertions(+), 1 deletion(-)
 
-Best regards,
+diff --git a/arch/x86/entry/entry.S b/arch/x86/entry/entry.S
+index bfb7bcb362bc..f8ba0c0b6e60 100644
+--- a/arch/x86/entry/entry.S
++++ b/arch/x86/entry/entry.S
+@@ -6,6 +6,9 @@
+ #include <linux/linkage.h>
+ #include <asm/export.h>
+ #include <asm/msr-index.h>
++#include <asm/unwind_hints.h>
++#include <asm/segment.h>
++#include <asm/cache.h>
+ 
+ .pushsection .noinstr.text, "ax"
+ 
+@@ -20,3 +23,16 @@ SYM_FUNC_END(entry_ibpb)
+ EXPORT_SYMBOL_GPL(entry_ibpb);
+ 
+ .popsection
++
++.pushsection .entry.text, "ax"
++
++.align L1_CACHE_BYTES, 0xcc
++SYM_CODE_START_NOALIGN(mds_verw_sel)
++	UNWIND_HINT_UNDEFINED
++	ANNOTATE_NOENDBR
++	.word __KERNEL_DS
++SYM_CODE_END(mds_verw_sel);
++/* For KVM */
++EXPORT_SYMBOL_GPL(mds_verw_sel);
++
++.popsection
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index 58cb9495e40f..f21fc0f12737 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -308,10 +308,10 @@
+ #define X86_FEATURE_SMBA		(11*32+21) /* "" Slow Memory Bandwidth Allocation */
+ #define X86_FEATURE_BMEC		(11*32+22) /* "" Bandwidth Monitoring Event Configuration */
+ #define X86_FEATURE_USER_SHSTK		(11*32+23) /* Shadow stack support for user mode applications */
+-
+ #define X86_FEATURE_SRSO		(11*32+24) /* "" AMD BTB untrain RETs */
+ #define X86_FEATURE_SRSO_ALIAS		(11*32+25) /* "" AMD BTB untrain RETs through aliasing */
+ #define X86_FEATURE_IBPB_ON_VMEXIT	(11*32+26) /* "" Issue an IBPB only on VMEXIT */
++#define X86_FEATURE_CLEAR_CPU_BUF	(11*32+27) /* "" Clear CPU buffers */
+ 
+ /* Intel-defined CPU features, CPUID level 0x00000007:1 (EAX), word 12 */
+ #define X86_FEATURE_AVX_VNNI		(12*32+ 4) /* AVX VNNI instructions */
+diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+index c55cc243592e..005e69f93115 100644
+--- a/arch/x86/include/asm/nospec-branch.h
++++ b/arch/x86/include/asm/nospec-branch.h
+@@ -329,6 +329,21 @@
+ #endif
+ .endm
+ 
++/*
++ * Macros to execute VERW instruction that mitigate transient data sampling
++ * attacks such as MDS. On affected systems a microcode update overloaded VERW
++ * instruction to also clear the CPU buffers. VERW clobbers CFLAGS.ZF.
++ *
++ * Note: Only the memory operand variant of VERW clears the CPU buffers.
++ */
++.macro EXEC_VERW
++	verw _ASM_RIP(mds_verw_sel)
++.endm
++
++.macro CLEAR_CPU_BUFFERS
++	ALTERNATIVE "", __stringify(EXEC_VERW), X86_FEATURE_CLEAR_CPU_BUF
++.endm
++
+ #else /* __ASSEMBLY__ */
+ 
+ #define ANNOTATE_RETPOLINE_SAFE					\
+
 -- 
-Thanks,
-Pawan
+2.34.1
 
 
