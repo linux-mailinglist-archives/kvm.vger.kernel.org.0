@@ -2,34 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B7FC47D6FF9
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 16:54:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 247457D7006
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 16:54:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344466AbjJYOvp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 10:51:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58468 "EHLO
+        id S1344432AbjJYOvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 10:51:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344485AbjJYOvb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 10:51:31 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 890A810DD
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:51:24 -0700 (PDT)
+        with ESMTP id S1344288AbjJYOvQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 10:51:16 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABCEB13A
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:51:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
+        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=iaeDXSTaoWdCm87GDHXDzDikArDTOfszjp92r6YPQM0=; b=Fpo2lDHmkFJFrEzTxCnYSHMQc+
-        H+POf4RpTDXrqfi7zmTI2kpkXiZEJ/4ikVugJbl/UXMyulJnl8bxTi7gdq+Xlhe/NOsdTz353nXNS
-        skhnTvQvc19bBykXDJLHjeBVQ97kJvOEjCn3zBqYb/BH5rDtwk6NqQC0EyXGhRuEVDofWOrIuQUbH
-        eDXBfUYpNVxLjOjbdUpmFPsWWBCjffiEX876q5ArcW6FdlTHX93HUMDbaBkhxtxYaZxt/fpHXCNkE
-        Ko/NceL/1GypeXooX+xxhcNkWMbOUUaDd3BrGGwo4s3+7LbNRB/e9K7vIixU+dnx+7J2jpuR7mvKp
-        dd1Vd6Hw==;
+        bh=y4cEjsiuJ1bFNsoLeKKWM6n6686E9X1lvqONj/DtYQs=; b=lrSrOgOplofh9XNYvO/Y6Cc20E
+        b2BRTomTqLlH4ivgwD4sBmyXjLP3I1Fai6wk4h8Si1HSDLa25iMcQJekBASDQUPnHVIhgwPDGuIPe
+        /fiD7p1xKwU7WPhmYzbbiUGkYAMCw9eYzzmKLc7jSYCCrbc9Il3cn+XOaaQle1LLOunGnghcs49bw
+        3xgOTsVL24eBNSqWchz1Vf7eCnWmMNu5ej9mU2LmU4o06Qtg1DKPiu8P5eSAmOZnGMDFsJIQQAZUI
+        06foiSUf0y/lJX5p1rYRRqKVhWC+mTGRpDqqHpAJiAZgoYQGU7Q2itxuffQXtTSt1ckoY4gF2ShZl
+        N4J97H8w==;
 Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qvfDa-00GPM5-1F;
-        Wed, 25 Oct 2023 14:50:51 +0000
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qvfDZ-009Nmp-OP; Wed, 25 Oct 2023 14:50:45 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qvfDZ-002dFL-0k;
+        id 1qvfDZ-002dFP-0x;
         Wed, 25 Oct 2023 15:50:45 +0100
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     qemu-devel@nongnu.org
@@ -48,16 +47,16 @@ Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
         xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
         Bernhard Beschow <shentey@gmail.com>,
         Joel Upham <jupham125@gmail.com>
-Subject: [PATCH v3 20/28] net: do not delete nics in net_cleanup()
-Date:   Wed, 25 Oct 2023 15:50:34 +0100
-Message-Id: <20231025145042.627381-21-dwmw2@infradead.org>
+Subject: [PATCH v3 21/28] xen-platform: unplug AHCI disks
+Date:   Wed, 25 Oct 2023 15:50:35 +0100
+Message-Id: <20231025145042.627381-22-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231025145042.627381-1-dwmw2@infradead.org>
 References: <20231025145042.627381-1-dwmw2@infradead.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
@@ -69,73 +68,117 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-In net_cleanup() we only need to delete the netdevs, as those may have
-state which outlives Qemu when it exits, and thus may actually need to
-be cleaned up on exit.
+To support Xen guests using the Q35 chipset, the unplug protocol needs
+to also remove AHCI disks.
 
-The nics, on the other hand, are owned by the device which created them.
-Most devices don't bother to clean up on exit because they don't have
-any state which will outlive Qemu... but XenBus devices do need to clean
-up their nodes in XenStore, and do have an exit handler to delete them.
+Make pci_xen_ide_unplug() more generic, iterating over the children
+of the PCI device and destroying the "ide-hd" devices. That works the
+same for both AHCI and IDE, as does the detection of the primary disk
+as unit 0 on the bus named "ide.0".
 
-When the XenBus exit handler destroys the xen-net-device, it attempts
-to delete its nic after net_cleanup() had already done so. And crashes.
-
-Fix this by only deleting netdevs as we walk the list. As the comment
-notes, we can't use QTAILQ_FOREACH_SAFE() as each deletion may remove
-*multiple* entries, including the "safely" saved 'next' pointer. But
-we can store the *previous* entry, since nics are safe.
+Then pci_xen_ide_unplug() can be used for both AHCI and IDE devices.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- net/net.c | 28 ++++++++++++++++++++++------
- 1 file changed, 22 insertions(+), 6 deletions(-)
+ hw/i386/xen/xen_platform.c | 68 +++++++++++++++++++++++++-------------
+ 1 file changed, 45 insertions(+), 23 deletions(-)
 
-diff --git a/net/net.c b/net/net.c
-index c0c0cbe99e..bbe33da176 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1499,18 +1499,34 @@ static void net_vm_change_state_handler(void *opaque, bool running,
- 
- void net_cleanup(void)
+diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
+index e2dd1b536a..ef7d3fc05f 100644
+--- a/hw/i386/xen/xen_platform.c
++++ b/hw/i386/xen/xen_platform.c
+@@ -169,39 +169,60 @@ static void pci_unplug_nics(PCIBus *bus)
+  *
+  * [1] https://xenbits.xen.org/gitweb/?p=xen.git;a=blob;f=docs/misc/hvm-emulated-unplug.pandoc
+  */
+-static void pci_xen_ide_unplug(PCIDevice *d, bool aux)
++struct ide_unplug_state {
++    bool aux;
++    int nr_unplugged;
++};
++
++static int ide_dev_unplug(DeviceState *dev, void *_st)
  {
--    NetClientState *nc;
-+    NetClientState *nc, **p = &QTAILQ_FIRST(&net_clients);
+-    DeviceState *dev = DEVICE(d);
+-    PCIIDEState *pci_ide;
+-    int i;
++    struct ide_unplug_state *st = _st;
+     IDEDevice *idedev;
+     IDEBus *idebus;
+     BlockBackend *blk;
++    int unit;
++
++    idedev = IDE_DEVICE(object_dynamic_cast(OBJECT(dev), "ide-hd"));
++    if (!idedev) {
++        return 0;
++    }
  
-     /*cleanup colo compare module for COLO*/
-     colo_compare_cleanup();
+-    pci_ide = PCI_IDE(dev);
++    idebus = IDE_BUS(qdev_get_parent_bus(dev));
  
--    /* We may del multiple entries during qemu_del_net_client(),
--     * so QTAILQ_FOREACH_SAFE() is also not safe here.
-+    /*
-+     * Walk the net_clients list and remove the netdevs but *not* any
-+     * NET_CLIENT_DRIVER_NIC entries. The latter are owned by the device
-+     * model which created them, and in some cases (e.g. xen-net-device)
-+     * the device itself may do cleanup at exit and will be upset if we
-+     * just delete its NIC from underneath it.
-+     *
-+     * Since qemu_del_net_client() may delete multiple entries, using
-+     * QTAILQ_FOREACH_SAFE() is not safe here. The only safe pointer
-+     * to keep as a bookmark is a NET_CLIENT_DRIVER_NIC entry, so keep
-+     * 'p' pointing to either the head of the list, or the 'next' field
-+     * of the latest NET_CLIENT_DRIVER_NIC, and operate on *p as we walk
-+     * the list.
-+     *
-+     * The 'nc' variable isn't part of the list traversal; it's purely
-+     * for convenience as too much '(*p)->' has a tendency to make the
-+     * readers' eyes bleed.
-      */
--    while (!QTAILQ_EMPTY(&net_clients)) {
--        nc = QTAILQ_FIRST(&net_clients);
-+    while (*p) {
-+        nc = *p;
-         if (nc->info->type == NET_CLIENT_DRIVER_NIC) {
--            qemu_del_nic(qemu_get_nic(nc));
-+            /* Skip NET_CLIENT_DRIVER_NIC entries */
-+            p = &QTAILQ_NEXT(nc, next);
-         } else {
-             qemu_del_net_client(nc);
-         }
+-    for (i = aux ? 1 : 0; i < 4; i++) {
+-        idebus = &pci_ide->bus[i / 2];
+-        blk = idebus->ifs[i % 2].blk;
++    unit = (idedev == idebus->slave);
++    assert(unit || idedev == idebus->master);
+ 
+-        if (blk && idebus->ifs[i % 2].drive_kind != IDE_CD) {
+-            if (!(i % 2)) {
+-                idedev = idebus->master;
+-            } else {
+-                idedev = idebus->slave;
+-            }
++    if (st->aux && !unit && !strcmp(BUS(idebus)->name, "ide.0")) {
++        return 0;
++    }
+ 
+-            blk_drain(blk);
+-            blk_flush(blk);
++    blk = idebus->ifs[unit].blk;
++    if (blk) {
++        blk_drain(blk);
++        blk_flush(blk);
+ 
+-            blk_detach_dev(blk, DEVICE(idedev));
+-            idebus->ifs[i % 2].blk = NULL;
+-            idedev->conf.blk = NULL;
+-            monitor_remove_blk(blk);
+-            blk_unref(blk);
+-        }
++        blk_detach_dev(blk, DEVICE(idedev));
++        idebus->ifs[unit].blk = NULL;
++        idedev->conf.blk = NULL;
++        monitor_remove_blk(blk);
++        blk_unref(blk);
++    }
++
++    object_unparent(OBJECT(dev));
++    st->nr_unplugged++;
++
++    return 0;
++}
++
++static void pci_xen_ide_unplug(PCIDevice *d, bool aux)
++{
++    struct ide_unplug_state st = { aux, 0 };
++    DeviceState *dev = DEVICE(d);
++
++    qdev_walk_children(dev, NULL, NULL, ide_dev_unplug, NULL, &st);
++    if (st.nr_unplugged) {
++        pci_device_reset(d);
+     }
+-    pci_device_reset(d);
+ }
+ 
+ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
+@@ -216,6 +237,7 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
+ 
+     switch (pci_get_word(d->config + PCI_CLASS_DEVICE)) {
+     case PCI_CLASS_STORAGE_IDE:
++    case PCI_CLASS_STORAGE_SATA:
+         pci_xen_ide_unplug(d, aux);
+         break;
+ 
 -- 
 2.40.1
 
