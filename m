@@ -2,438 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F0CE7D66FB
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 11:36:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19D207D67C3
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 12:02:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232897AbjJYJgk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 05:36:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50638 "EHLO
+        id S234484AbjJYKCC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 06:02:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229606AbjJYJgj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 05:36:39 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2088.outbound.protection.outlook.com [40.107.94.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2E61A6
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 02:36:35 -0700 (PDT)
+        with ESMTP id S233303AbjJYKB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 06:01:58 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C6AEDE;
+        Wed, 25 Oct 2023 03:01:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698228114; x=1729764114;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=bH0Jo5x+aJy7hh2pN8FWYw1LSq495S6OTQTfQvLaU5o=;
+  b=AbTaKMmo/LRAdQIO5/iMx9EU4meL6wFdSHUJvglNxOkA7e+JWjDq3ku2
+   v6GnDISzXi5v6UmijUjg62WenmU9MsQ2G5yeEnS+Pa7X20cpxIDK8AZ2I
+   KFOtK4fNGTfHbK9EB5vgVW5z7pmXBE8I1Ito1uQ1cSG5nMwF+jNax3Pbr
+   TJIbq6yn20/46f9pM4OrxK2g6XynsoGcTpnnfFDVUpX60Q3AUaQtQLd7y
+   DQk7g0xH6Q8rAdZLJymKE7p/iRuohC+fl/9xX1KFjflrXjPv5nE+5aVLg
+   qxhJFe/UvQzLkbmtVznBrqoAt0laRCG3V9uGCisRV4AGAJs7u4/lrJhs5
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="390129515"
+X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
+   d="scan'208";a="390129515"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 03:01:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="1090159319"
+X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
+   d="scan'208";a="1090159319"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Oct 2023 03:01:51 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Wed, 25 Oct 2023 03:01:50 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Wed, 25 Oct 2023 03:01:49 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Wed, 25 Oct 2023 03:01:49 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Wed, 25 Oct 2023 03:01:49 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NLmYwD7vaDlaHrNjVhr8ra71378HL6maVQ8mu1TvAwLw54ApOYlfv4xfQ2XXPvemAfCPxyGStca/nz6UTVme00jRxCi9FElE+4fjJwpkO/Dzo0G8WnimkkTTP89jfrxgZDHAXUvP6MpfWXBHWn4zv2iLt6C736TgKyCzHy9PQ2oGwDfHyKvVN0yoarMLvk21hkF7oI+Nxf8dclPac0AN1FAXWzeA/D/6vvsVScj7BJ3retwN+tGMFmD+ROtcjUArQ0miR7Q9j3/QcOQCQ4S5tJ75UJ37+xlwDnZmTMi+WoYMRz52OP14yW7HveJ/YYPmwupTaghtfE4eRy7XOTPIQg==
+ b=jkBuSvFHCWu9q/7kSUth8Xojf9SqSTv5xCZfXkfcHKeUaL/A3t9R5HnEpierP7Q3PN0Dh3hdC/0oKG+dlwoQA1tiq3LMNLLslonP6Y88Y1N8vha42MV5yM4VtFP5FUYD1ba7eF3jwcsOam0OUH+3XNfVy9nnZ8nh1/lFPwAqTJcntiLPRk2dCrjwX71zxCDQuPVWvy3cCgDEOUjBigsLXGqJeX/Y1GeC8ieFwefpVSq+5GNy2LtHUpSEAgY4b0tDmh/ZWzgEeC9JuXlOR9oAVCZQbcu/Eqj+4loOAjfFgSXalEwPCGuypp5lbwdiuACgLTKY5LESJK/TiA6WTnyA3w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KVrvLZH4VOwfxz+0WpAnsClCD9Z1kv7EEMcwCalXR1Q=;
- b=bKsjU1E5yFBu3jXvkDXcpP28bL6CuwRTJwau98a7XUjnAYm/wxF90325dFaioSPqclMZcNBsJ8XsFZscZ4iX5vWgc3DljsA0RUauMujJduQ9Rxpft91SlYv2wakqagN03RfGJjDgYLZ594BDg8fSPqplwl4FHFZkNG7PTXyGQUOa0q3koEL7Cgjmmg7eI2b/pqvpH50G00frhVxae+k2Wb2xHPJ52i2gB+VaOS934YwOp56bvijgU13hfqp9dk9SRn4qsPuY0PJDxA+/2oCdfftgUWxGIQuhNeoA3mzbKFODrk625dAD6ES/y3NC07fu8zyxYD4AQHICC48rXSay9g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KVrvLZH4VOwfxz+0WpAnsClCD9Z1kv7EEMcwCalXR1Q=;
- b=bcckztAtnRrFJ56fSb11i25UJYiULr2qTw8QawTBOJW+hvmMxPo6fX+TGNCh63ZJej9IfqVCq450BHNJH4MWFuqHA5UKqk2YfJAM4kEuMPNOAJNxAe2QSb7nWzizlYhUtcAjQBYV4K9+S+jZQjCxsdU5KTPGS3Qs9sJXKWoYWloG2wDTFTMWYhIhak+iLdEpt2mQbIwKF2+UNJrQ9HdU8Ud2gj+urkxr9E3gzXeJ1KJDKJvlShGPzqbREEwOvej61k5XEBxYvN4o5D8acfE2t92oSDinLkrZGuCYntPzdy7z0pbwt3go38MS2YwyjxrLq4Y4eWj1p7BE7jzKubt14w==
-Received: from CH2PR14CA0023.namprd14.prod.outlook.com (2603:10b6:610:60::33)
- by BY5PR12MB4920.namprd12.prod.outlook.com (2603:10b6:a03:1d3::19) with
+ bh=7U+TYZpY1XMPyV3JnAfWI12+pWXV1UAGnblJxJ1K0aA=;
+ b=W8oOLm5dFk93KW6qlwRwBDlUSM09MWy9bUO34M4saz7/GBfiil2qOIEqA1YOz52HJCRZsl51lRfl5gXwUK9XG/V3k6tT4nbf7udNNuXhSTMsfaPyrTGr8FPmFoEbkFvjoB2O3Z63bhEvDk/gz2mmUVAjdmimbpNR60/LrInfr0gBR2GfQvAjkCXWBvKo8thUrUy7sjUSbEhFKBMLLFGPPAp3I2DIdNJU5YDQaxYlWwuThrJAGejRGSyuRrBwHsR7HGeqjAcjhwe6vkDHq/gcvJlwPh+ypwJfHzT/0LMBfFVpq5aNinTNUrFcHI3n0RdzoPgy1T73X5g0bVNCNRTwPA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by SJ0PR11MB5182.namprd11.prod.outlook.com (2603:10b6:a03:2ae::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Wed, 25 Oct
- 2023 09:36:33 +0000
-Received: from DS2PEPF00003441.namprd04.prod.outlook.com
- (2603:10b6:610:60:cafe::bc) by CH2PR14CA0023.outlook.office365.com
- (2603:10b6:610:60::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.34 via Frontend
- Transport; Wed, 25 Oct 2023 09:36:32 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- DS2PEPF00003441.mail.protection.outlook.com (10.167.17.68) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6933.15 via Frontend Transport; Wed, 25 Oct 2023 09:36:32 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 25 Oct
- 2023 02:36:20 -0700
-Received: from [172.27.14.159] (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 25 Oct
- 2023 02:36:16 -0700
-Message-ID: <155561a3-cb30-48a9-8723-33b667e23aa5@nvidia.com>
-Date:   Wed, 25 Oct 2023 12:36:14 +0300
-MIME-Version: 1.0
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.19; Wed, 25 Oct
+ 2023 10:01:45 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::f8f4:bed2:b2f8:cb6b]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::f8f4:bed2:b2f8:cb6b%3]) with mapi id 15.20.6907.025; Wed, 25 Oct 2023
+ 10:01:44 +0000
+Message-ID: <e7ec64a8-7980-444e-9e04-89aa87bebb93@intel.com>
+Date:   Wed, 25 Oct 2023 18:04:10 +0800
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V1 vfio 6/9] virtio-pci: Introduce APIs to execute legacy
- IO admin commands
+Subject: Re: [PATCH v6 04/10] iommufd/device: Wrap
+ IOMMUFD_OBJ_HWPT_PAGING-only configurations
 Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     <alex.williamson@redhat.com>, <jasowang@redhat.com>,
-        <jgg@nvidia.com>, <kvm@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>, <parav@nvidia.com>,
-        <feliu@nvidia.com>, <jiri@nvidia.com>, <kevin.tian@intel.com>,
-        <joao.m.martins@oracle.com>, <si-wei.liu@oracle.com>,
-        <leonro@nvidia.com>, <maorg@nvidia.com>
-References: <20231017134217.82497-1-yishaih@nvidia.com>
- <20231017134217.82497-7-yishaih@nvidia.com>
- <20231024165210-mutt-send-email-mst@kernel.org>
-From:   Yishai Hadas <yishaih@nvidia.com>
-In-Reply-To: <20231024165210-mutt-send-email-mst@kernel.org>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
+CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "Martins, Joao" <joao.m.martins@oracle.com>
+References: <20231024150609.46884-1-yi.l.liu@intel.com>
+ <20231024150609.46884-5-yi.l.liu@intel.com>
+ <BN9PR11MB5276E2B6AFB5617395E9A5768CDEA@BN9PR11MB5276.namprd11.prod.outlook.com>
+From:   Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <BN9PR11MB5276E2B6AFB5617395E9A5768CDEA@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.126.231.35]
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: KL1PR0401CA0020.apcprd04.prod.outlook.com
+ (2603:1096:820:e::7) To DS0PR11MB7529.namprd11.prod.outlook.com
+ (2603:10b6:8:141::20)
+MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF00003441:EE_|BY5PR12MB4920:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9c5d27e1-0594-43c3-b1b4-08dbd53ddfd7
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|SJ0PR11MB5182:EE_
+X-MS-Office365-Filtering-Correlation-Id: b4f2d47c-6eb1-4136-bcc9-08dbd54164ba
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7lmgHVYsC/ix+eUT8bVLJQYkMSoLkzW/wDQVKmk6wdDaEMnVPgIFszPhedLvN+4nbYY0e5Ld4/yl0tuMpmZvAWsusSZ55nv4aTOcb3OZGIdeJ7WHDlmOBb58mmEhDQ2ATqZF9ekQ7tx07LJ34p9+bLWsDDBTiJtmTOEtX+qpYXGUp905olSA5B5vUUquwVX69sbFmjxrfOOeWDPrHWeQUTy1TMbuspCaEM8mLQnDnpkYESuH6Y1MK5ok/NqDE2+aDMxA+WT1SDZZtb2D8OiiUuw0ZG5Dk5LurEhvrLSC+354cTD23em0kc6H04I4aY8cxMXAyepm2vqXhPhuqURNIF4wyQkLhBFg+QFK/jegOnG01AsbHxT9mi/PPDTP0lDi0PFLhRi6AJRR1aZIfbYpxftGTf2U90SVsNL0NTvUCYxKl6y7MsKs9NuNt8TCjA9uxYXF+oD8RGx69iYZ8AO7sik6T3FK5cT/R0zbt9RVH8X4iWG2zHdBVZUrJu27SfFFxc+M5V9g8XlkxLckZsSOixdW3p7nj7f+gfLkgSscei0io5Ap/L3fAFc70maj8p4nOu4FtecHNxXYZ00EuD2YpdNgsynY4dxIs6ytZImdWWU0W4DHScPJ47KLMXbGborFwFICIneGW5CtFTm+sNM8h+a6s+6WaQ54UjIEaD8SNDC00Bhg5A2BxKwcG7Wa/1vD4nwtFDmrpJfvhNuaZCsHuWxyQk69UJ3bZsfuILq+z/I4ZsmBanMRv+OqCjKA1qFWYwybdRJCh629jR4jQhnFEg==
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(346002)(39860400002)(396003)(136003)(230922051799003)(186009)(451199024)(1800799009)(82310400011)(64100799003)(36840700001)(46966006)(40470700004)(31686004)(83380400001)(40480700001)(40460700003)(30864003)(36860700001)(8676002)(36756003)(4326008)(2906002)(8936002)(53546011)(107886003)(82740400003)(26005)(47076005)(2616005)(16526019)(7636003)(356005)(426003)(336012)(5660300002)(54906003)(6916009)(31696002)(316002)(70586007)(86362001)(41300700001)(16576012)(70206006)(478600001)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2023 09:36:32.5889
+X-Microsoft-Antispam-Message-Info: kYDIF75vxVqKI1tkUkBRkMkMKSN3tz1r7Z/UwfUu2+bnEysosObCtqEy1jswjn0DkeSI+TKjtJUIglwBI2EeM43z0HEtd9/Cf8Rfw1F8M80lmko2zJomANikTTnhaUnkAZzLH6PQqRgGWAkzt4Yix2EOQgXeIHaEWvY+gR6C7v2S3tUpUJ0zDsur3dRXGLINsC1eYPUZWOCM6SARH+F2A/e8Tml6zvcXwLrD0D7trO9h0czJiPkM/9vJjWQehWEngfMQ4tOkDQVDlPOoShScNHWoVsUSIBpR67Gp06iiSdutEMa7aCx17y7eC+zecsRwP5jbVkvsN2C9A5jFQaYbY+rIVxtIKvoVFNCFiXtczvaClwtSLF5f1D99wOEDEOUhXg04O5rreEFazcnvs6WN8L0NPJ6lWRgg4Ev9jL6/CZspXYu7sDrWoe7u/Vpnkv+SwCEJl5XuFcjbBaEdZdG6/xpXwOEUXrmx3GwpluymfFsOfUY1f+HluLz/20JDEWdnSm+T+c6+t6Hg79kU881SZ4Tjw0Nk0LPnYYTs6lcfpvuej/vbiaQp0ilxj+AWTGx9GDRn65QWKBSwbGYtjQlnKcCDspZlvy3GqlT9VkZQaW2ZYzLKwUbKFTR/8XMaT4pxiglSWCYatNhBCRtpXJn2Qw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(366004)(39860400002)(376002)(396003)(230922051799003)(1800799009)(451199024)(186009)(64100799003)(31696002)(4744005)(6486002)(8676002)(8936002)(31686004)(6666004)(66476007)(7416002)(54906003)(66946007)(66556008)(110136005)(86362001)(478600001)(5660300002)(41300700001)(316002)(4326008)(2906002)(6512007)(6506007)(53546011)(36756003)(38100700002)(2616005)(26005)(82960400001)(83380400001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?S0J1UEdzWEtBRXJHSVp4WE9lY25NWDZVOUtIWVVCa1NDT2JQOTBRZXZwbktn?=
+ =?utf-8?B?dHVzMWh2ZXR5czZha1VHdHV2U09VSGRXendDcE56NXlKL0F1bDFrZE1oOG9y?=
+ =?utf-8?B?b1M4TXJIbVI3anZ3d1BLRXFRNDduTVlkQXhWTUZQdFpGRlg5VVdvMmxVbDFT?=
+ =?utf-8?B?cDh6SlZKeTNtUi82UGhFTEJEa1FZczVkTnhFSCtvbHFuaHNJNnlnODB6WEpW?=
+ =?utf-8?B?RE4zQ2I1Q3pCbXRxampsKytveGJ2UFpMV3VqVTdYbkdjWHJ4SnVFSUVLYXBu?=
+ =?utf-8?B?UjlBRmJGbFlueDJEV2FBMDhINjBxSGFVNVhnLzhnUXhpVnlkMmZ1SEhjdXow?=
+ =?utf-8?B?VjdRemthWTBUUFJvakdLS2o1UGZvVlBkaURyVU0xTnNUM3FLN2E2WEpHSUpp?=
+ =?utf-8?B?cUpTNDZwOHlPMWRQek1BY0hUMHVzL3JObEd2cjFNQ2MzSGgyVjEybll6eTR5?=
+ =?utf-8?B?dXA1TVhlaTM4Y21pdVVlbVpDYjBrT0tPdjBKMTV0RHIxaEd4Znp1SWpmWlp6?=
+ =?utf-8?B?YnJaMmtZMmFoY0l3S1FYOEd4dGlDU2ZEOGdrZTdxN1BDYlYxbkFRdDBqNEhp?=
+ =?utf-8?B?YWtMcWcyODdpdkE3cGZraHNBbW1yMWZZK1UrWkhLa054bUVJREwxeTNOVWJU?=
+ =?utf-8?B?aEZFcldLOHhCT0F6bWlVeTNsa2FUcEtwOHF5NUt3TzdxZ2NHWVlTcGZBemRn?=
+ =?utf-8?B?cklvRG1zUkZ6Y25XL1U1eDNCOGdCVmlCb04xM010aytWOHN3aDVBbHFNNUw3?=
+ =?utf-8?B?QlFhMHJ2YUI0VDRIakhBdHYvMURKVlhBT3NxM0ppZ1ZIL1hncGRVTWxuUmty?=
+ =?utf-8?B?cWkvaHVzMDZmQnllYzBETjRWYWNsZFlqTXB0ZlJINmp4aGY3eWcvWmF4Nmtp?=
+ =?utf-8?B?MWpQbzdRb3dQZmhSeU1WWmxFMytvbmRhWll4dzB5cm1WbW1pOXdsOEZqUmlS?=
+ =?utf-8?B?Vkh6ZjQ3TkNQZ2ptcHZ3WER5MWNjSG5jMTByMTY0VFZvTGVpVzNyMUJvcUhj?=
+ =?utf-8?B?a2Zsc3BIMmVuSFdlZFg2eGxuWEppbGNyYlVMTUZJQzJ2Wm9qTzl6MDFGOTND?=
+ =?utf-8?B?Mkk3aTFFcjM5RC9UcmFzdyt3NXE2amlRREp1VGx3ZjZwQ09PZ2pwUzQ3amoy?=
+ =?utf-8?B?VUxDdFJiUVF0SUM3YWN3UEFoTnJlME4rZms3amRYbjg5eE1RYnFqRzROTVA4?=
+ =?utf-8?B?MGpxeWx4Rnk5eURxanRyN2xzT1N0Ym5DdE5MMkhjcm9KYncwSG1nNU5UK3BR?=
+ =?utf-8?B?bFNmZnY1NUFtN2tDeHhyTHlQWHdiVVRYeENHb0VFT3E3TlBCREdIQi9YZUl6?=
+ =?utf-8?B?bU8zOGcxN0QvSFg2Y3dKSjZ1NXI2RG96K1RjRWFsdHo3QlhDcWVYVUVNMFZt?=
+ =?utf-8?B?dGhRRWNKK2VNckFoZGp2Y21nTGVmQlFvOExPY0lOc09ZeFJSQnBubkl4ZDJV?=
+ =?utf-8?B?T0hjOFE3akJ5d01mK1E0eDBqVGhCampkZXRzQzlvcmJGVDF1MjE0bi9FSkR0?=
+ =?utf-8?B?ZTlBTzEwZ1hTOGtUakRCNStSSGJhcC9RUEhGRDNRcTVlanRBVUZSTkVFNGwr?=
+ =?utf-8?B?bjlYNmQveHJiV1g2ckZueHZ2ZS9pV3IzS0IrUEo4UkQ0M2lWTm1JVUNUdWsr?=
+ =?utf-8?B?RHBOckxRenhQYjBMV3l6ZVZsMHVKbkp3dUNlbDFRbFRVdFF4SzcwZlliNE0v?=
+ =?utf-8?B?NXBKTkFXWjFmNFpNODJMR2d6SjU2U1dncEZsc2RvamxvV3BXNEY0MW1uR2dV?=
+ =?utf-8?B?K3FJb3ZYMzVjVlBZKzBIWURSQmlYMnVHYkpZMlkyYmFDTFdBa2RlU1hRYksv?=
+ =?utf-8?B?RE1DTmpqcnpHcmF0bVF5OWlGdUNkMTBUUTduQXc3SmxFMlFycS8zODJZQ1JC?=
+ =?utf-8?B?QldKWHpuYUZ6WWhMNnJIZGI1R25Td2dXc2FOSHQxNUFUUGxXb3h2TXBOUGJC?=
+ =?utf-8?B?MnJCWlk2UzlQVlNMRmNHalhzWkZPMWhldVlNMHA5VmE1YVcvK2hUbHJYRFNy?=
+ =?utf-8?B?eWpxdE5UUzY0cDdPQnlIYUN6Yll1dGRhRHBCQmx0dkozTVFXQWg5ZlBXQkxI?=
+ =?utf-8?B?U2NsQTkvNGlBNTJ3dEQ2c2ozdTQwOVdRNmdZSWlxNDh6N2duZm1tWFEybEs3?=
+ =?utf-8?Q?ikl6YOc4csQRg9p/asm0RS0YI?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4f2d47c-6eb1-4136-bcc9-08dbd54164ba
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2023 10:01:44.6116
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9c5d27e1-0594-43c3-b1b4-08dbd53ddfd7
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS2PEPF00003441.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4920
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +MWD1ckOhPrf4UcoTtDlPFVDctvZF+j/wVjIIgKoDJg1x9dlGzLpC00pBAxg3BjbbWOp0i9uVlq+LKxBHlJ/1A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5182
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Re sending as previous reply was by mistake not in a text format.
-
-On 25/10/2023 0:01, Michael S. Tsirkin wrote:
-> On Tue, Oct 17, 2023 at 04:42:14PM +0300, Yishai Hadas wrote:
->> Introduce APIs to execute legacy IO admin commands.
->>
->> It includes: list_query/use, io_legacy_read/write,
->> io_legacy_notify_info.
->>
->> Those APIs will be used by the next patches from this series.
->>
->> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
->> ---
->>   drivers/virtio/virtio_pci_common.c |  11 ++
->>   drivers/virtio/virtio_pci_common.h |   2 +
->>   drivers/virtio/virtio_pci_modern.c | 206 +++++++++++++++++++++++++++++
->>   include/linux/virtio_pci_admin.h   |  18 +++
->>   4 files changed, 237 insertions(+)
->>   create mode 100644 include/linux/virtio_pci_admin.h
->>
->> diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
->> index 6b4766d5abe6..212d68401d2c 100644
->> --- a/drivers/virtio/virtio_pci_common.c
->> +++ b/drivers/virtio/virtio_pci_common.c
->> @@ -645,6 +645,17 @@ static struct pci_driver virtio_pci_driver = {
->>   	.sriov_configure = virtio_pci_sriov_configure,
->>   };
->>   
->> +struct virtio_device *virtio_pci_vf_get_pf_dev(struct pci_dev *pdev)
+On 2023/10/25 14:46, Tian, Kevin wrote:
+>> From: Liu, Yi L <yi.l.liu@intel.com>
+>> Sent: Tuesday, October 24, 2023 11:06 PM
+>> +
+>> +static int iommufd_group_do_replace_paging(struct iommufd_group
+>> *igroup,
+>> +					   struct iommufd_hw_pagetable
+>> *hwpt)
 >> +{
->> +	struct virtio_pci_device *pf_vp_dev;
+>> +	struct iommufd_hw_pagetable *old_hwpt = igroup->hwpt;
+>> +	struct iommufd_device *cur;
+>> +	int rc;
 >> +
->> +	pf_vp_dev = pci_iov_get_pf_drvdata(pdev, &virtio_pci_driver);
->> +	if (IS_ERR(pf_vp_dev))
->> +		return NULL;
+>> +	lockdep_assert_held(&igroup->lock);
 >> +
->> +	return &pf_vp_dev->vdev;
->> +}
->> +
->>   module_pci_driver(virtio_pci_driver);
->>   
->>   MODULE_AUTHOR("Anthony Liguori <aliguori@us.ibm.com>");
->> diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
->> index a21b9ba01a60..2785e61ed668 100644
->> --- a/drivers/virtio/virtio_pci_common.h
->> +++ b/drivers/virtio/virtio_pci_common.h
->> @@ -155,4 +155,6 @@ static inline void virtio_pci_legacy_remove(struct virtio_pci_device *vp_dev)
->>   int virtio_pci_modern_probe(struct virtio_pci_device *);
->>   void virtio_pci_modern_remove(struct virtio_pci_device *);
->>   
->> +struct virtio_device *virtio_pci_vf_get_pf_dev(struct pci_dev *pdev);
->> +
->>   #endif
->> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
->> index cc159a8e6c70..00b65e20b2f5 100644
->> --- a/drivers/virtio/virtio_pci_modern.c
->> +++ b/drivers/virtio/virtio_pci_modern.c
->> @@ -719,6 +719,212 @@ static void vp_modern_destroy_avq(struct virtio_device *vdev)
->>   	vp_dev->del_vq(&vp_dev->admin_vq.info);
->>   }
->>   
->> +/*
->> + * virtio_pci_admin_list_query - Provides to driver list of commands
->> + * supported for the PCI VF.
->> + * @dev: VF pci_dev
->> + * @buf: buffer to hold the returned list
->> + * @buf_size: size of the given buffer
->> + *
->> + * Returns 0 on success, or negative on failure.
->> + */
->> +int virtio_pci_admin_list_query(struct pci_dev *pdev, u8 *buf, int buf_size)
->> +{
->> +	struct virtio_device *virtio_dev = virtio_pci_vf_get_pf_dev(pdev);
->> +	struct virtio_admin_cmd cmd = {};
->> +	struct scatterlist result_sg;
->> +
->> +	if (!virtio_dev)
->> +		return -ENODEV;
->> +
->> +	sg_init_one(&result_sg, buf, buf_size);
->> +	cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_LIST_QUERY);
->> +	cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SRIOV);
->> +	cmd.result_sg = &result_sg;
->> +
->> +	return vp_modern_admin_cmd_exec(virtio_dev, &cmd);
->> +}
->> +EXPORT_SYMBOL_GPL(virtio_pci_admin_list_query);
->> +
->> +/*
->> + * virtio_pci_admin_list_use - Provides to device list of commands
->> + * used for the PCI VF.
->> + * @dev: VF pci_dev
->> + * @buf: buffer which holds the list
->> + * @buf_size: size of the given buffer
->> + *
->> + * Returns 0 on success, or negative on failure.
->> + */
->> +int virtio_pci_admin_list_use(struct pci_dev *pdev, u8 *buf, int buf_size)
->> +{
->> +	struct virtio_device *virtio_dev = virtio_pci_vf_get_pf_dev(pdev);
->> +	struct virtio_admin_cmd cmd = {};
->> +	struct scatterlist data_sg;
->> +
->> +	if (!virtio_dev)
->> +		return -ENODEV;
->> +
->> +	sg_init_one(&data_sg, buf, buf_size);
->> +	cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_LIST_USE);
->> +	cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SRIOV);
->> +	cmd.data_sg = &data_sg;
->> +
->> +	return vp_modern_admin_cmd_exec(virtio_dev, &cmd);
->> +}
->> +EXPORT_SYMBOL_GPL(virtio_pci_admin_list_use);
-> list commands are actually for a group, not for the VF.
-The VF was given to let the function gets the PF from it.
-For now, the only existing 'group_type' in the spec is SRIOV, this is 
-why we hard-coded it internally to match the VF PCI.
-
-Alternatively,
-We can change the API to get the PF and 'group_type' from the caller to 
-better match future usage.
-However, this will require to export the virtio_pci_vf_get_pf_dev() API 
-outside virtio-pci.
-
-Do you prefer to change to the latter option ?
->> +
->> +/*
->> + * virtio_pci_admin_legacy_io_write - Write legacy registers of a member device
->> + * @dev: VF pci_dev
->> + * @opcode: op code of the io write command
-> opcode is actually either VIRTIO_ADMIN_CMD_LEGACY_COMMON_CFG_WRITE
-> or VIRTIO_ADMIN_CMD_LEGACY_DEV_CFG_WRITE correct?
->
-> So please just add 2 APIs for this so users don't need to care.
-> Could be wrappers around these two things.
->
->
-OK.
-We'll export the below 2 APIs [1] which internally will call 
-virtio_pci_admin_legacy_io_write() with the proper op code hard-coded.
-[1]virtio_pci_admin_legacy_device_io_write()
-      virtio_pci_admin_legacy_common_io_write()
-
-Yishai
-
->
->> + * @offset: starting byte offset within the registers to write to
->> + * @size: size of the data to write
->> + * @buf: buffer which holds the data
->> + *
->> + * Returns 0 on success, or negative on failure.
->> + */
->> +int virtio_pci_admin_legacy_io_write(struct pci_dev *pdev, u16 opcode,
->> +				     u8 offset, u8 size, u8 *buf)
->> +{
->> +	struct virtio_device *virtio_dev = virtio_pci_vf_get_pf_dev(pdev);
->> +	struct virtio_admin_cmd_legacy_wr_data *data;
->> +	struct virtio_admin_cmd cmd = {};
->> +	struct scatterlist data_sg;
->> +	int vf_id;
->> +	int ret;
->> +
->> +	if (!virtio_dev)
->> +		return -ENODEV;
->> +
->> +	vf_id = pci_iov_vf_id(pdev);
->> +	if (vf_id < 0)
->> +		return vf_id;
->> +
->> +	data = kzalloc(sizeof(*data) + size, GFP_KERNEL);
->> +	if (!data)
->> +		return -ENOMEM;
->> +
->> +	data->offset = offset;
->> +	memcpy(data->registers, buf, size);
->> +	sg_init_one(&data_sg, data, sizeof(*data) + size);
->> +	cmd.opcode = cpu_to_le16(opcode);
->> +	cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SRIOV);
->> +	cmd.group_member_id = cpu_to_le64(vf_id + 1);
->> +	cmd.data_sg = &data_sg;
->> +	ret = vp_modern_admin_cmd_exec(virtio_dev, &cmd);
->> +
->> +	kfree(data);
->> +	return ret;
->> +}
->> +EXPORT_SYMBOL_GPL(virtio_pci_admin_legacy_io_write);
->> +
->> +/*
->> + * virtio_pci_admin_legacy_io_read - Read legacy registers of a member device
->> + * @dev: VF pci_dev
->> + * @opcode: op code of the io read command
->> + * @offset: starting byte offset within the registers to read from
->> + * @size: size of the data to be read
->> + * @buf: buffer to hold the returned data
->> + *
->> + * Returns 0 on success, or negative on failure.
->> + */
->> +int virtio_pci_admin_legacy_io_read(struct pci_dev *pdev, u16 opcode,
->> +				    u8 offset, u8 size, u8 *buf)
->> +{
->> +	struct virtio_device *virtio_dev = virtio_pci_vf_get_pf_dev(pdev);
->> +	struct virtio_admin_cmd_legacy_rd_data *data;
->> +	struct scatterlist data_sg, result_sg;
->> +	struct virtio_admin_cmd cmd = {};
->> +	int vf_id;
->> +	int ret;
->> +
->> +	if (!virtio_dev)
->> +		return -ENODEV;
->> +
->> +	vf_id = pci_iov_vf_id(pdev);
->> +	if (vf_id < 0)
->> +		return vf_id;
->> +
->> +	data = kzalloc(sizeof(*data), GFP_KERNEL);
->> +	if (!data)
->> +		return -ENOMEM;
->> +
->> +	data->offset = offset;
->> +	sg_init_one(&data_sg, data, sizeof(*data));
->> +	sg_init_one(&result_sg, buf, size);
->> +	cmd.opcode = cpu_to_le16(opcode);
->> +	cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SRIOV);
->> +	cmd.group_member_id = cpu_to_le64(vf_id + 1);
->> +	cmd.data_sg = &data_sg;
->> +	cmd.result_sg = &result_sg;
->> +	ret = vp_modern_admin_cmd_exec(virtio_dev, &cmd);
->> +
->> +	kfree(data);
->> +	return ret;
->> +}
->> +EXPORT_SYMBOL_GPL(virtio_pci_admin_legacy_io_read);
->> +
->> +/*
->> + * virtio_pci_admin_legacy_io_notify_info - Read the queue notification
->> + * information for legacy interface
->> + * @dev: VF pci_dev
->> + * @req_bar_flags: requested bar flags
->> + * @bar: on output the BAR number of the member device
->> + * @bar_offset: on output the offset within bar
->> + *
->> + * Returns 0 on success, or negative on failure.
->> + */
->> +int virtio_pci_admin_legacy_io_notify_info(struct pci_dev *pdev,
->> +					   u8 req_bar_flags, u8 *bar,
->> +					   u64 *bar_offset)
->> +{
->> +	struct virtio_device *virtio_dev = virtio_pci_vf_get_pf_dev(pdev);
->> +	struct virtio_admin_cmd_notify_info_result *result;
->> +	struct virtio_admin_cmd cmd = {};
->> +	struct scatterlist result_sg;
->> +	int vf_id;
->> +	int ret;
->> +
->> +	if (!virtio_dev)
->> +		return -ENODEV;
->> +
->> +	vf_id = pci_iov_vf_id(pdev);
->> +	if (vf_id < 0)
->> +		return vf_id;
->> +
->> +	result = kzalloc(sizeof(*result), GFP_KERNEL);
->> +	if (!result)
->> +		return -ENOMEM;
->> +
->> +	sg_init_one(&result_sg, result, sizeof(*result));
->> +	cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_LEGACY_NOTIFY_INFO);
->> +	cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SRIOV);
->> +	cmd.group_member_id = cpu_to_le64(vf_id + 1);
->> +	cmd.result_sg = &result_sg;
->> +	ret = vp_modern_admin_cmd_exec(virtio_dev, &cmd);
->> +	if (!ret) {
->> +		struct virtio_admin_cmd_notify_info_data *entry;
->> +		int i;
->> +
->> +		ret = -ENOENT;
->> +		for (i = 0; i < VIRTIO_ADMIN_CMD_MAX_NOTIFY_INFO; i++) {
->> +			entry = &result->entries[i];
->> +			if (entry->flags == VIRTIO_ADMIN_CMD_NOTIFY_INFO_FLAGS_END)
->> +				break;
->> +			if (entry->flags != req_bar_flags)
->> +				continue;
->> +			*bar = entry->bar;
->> +			*bar_offset = le64_to_cpu(entry->offset);
->> +			ret = 0;
->> +			break;
+>> +	if (hwpt_is_paging(old_hwpt) && hwpt->ioas != old_hwpt->ioas) {
+>> +		list_for_each_entry(cur, &igroup->device_list, group_item) {
+>> +			rc = iopt_table_enforce_dev_resv_regions(
+>> +				&hwpt->ioas->iopt, cur->dev, NULL);
+>> +			if (rc)
+>> +				goto err_unresv;
 >> +		}
->> +	}
->> +
->> +	kfree(result);
->> +	return ret;
->> +}
->> +EXPORT_SYMBOL_GPL(virtio_pci_admin_legacy_io_notify_info);
->> +
->>   static const struct virtio_config_ops virtio_pci_config_nodev_ops = {
->>   	.get		= NULL,
->>   	.set		= NULL,
->> diff --git a/include/linux/virtio_pci_admin.h b/include/linux/virtio_pci_admin.h
->> new file mode 100644
->> index 000000000000..cb916a4bc1b1
->> --- /dev/null
->> +++ b/include/linux/virtio_pci_admin.h
->> @@ -0,0 +1,18 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +#ifndef _LINUX_VIRTIO_PCI_ADMIN_H
->> +#define _LINUX_VIRTIO_PCI_ADMIN_H
->> +
->> +#include <linux/types.h>
->> +#include <linux/pci.h>
->> +
->> +int virtio_pci_admin_list_use(struct pci_dev *pdev, u8 *buf, int buf_size);
->> +int virtio_pci_admin_list_query(struct pci_dev *pdev, u8 *buf, int buf_size);
->> +int virtio_pci_admin_legacy_io_write(struct pci_dev *pdev, u16 opcode,
->> +				     u8 offset, u8 size, u8 *buf);
->> +int virtio_pci_admin_legacy_io_read(struct pci_dev *pdev, u16 opcode,
->> +				    u8 offset, u8 size, u8 *buf);
->> +int virtio_pci_admin_legacy_io_notify_info(struct pci_dev *pdev,
->> +					   u8 req_bar_flags, u8 *bar,
->> +					   u64 *bar_offset);
->> +
->> +#endif /* _LINUX_VIRTIO_PCI_ADMIN_H */
->> -- 
->> 2.27.0
+> 
+> should be:
+> 
+> 	if (!hwpt_is_paging(old_hwpt) || hwpt->ioas != old_hwpt->ioas) {
+> 		...
 
+oh, yes. The original logic is to add resv region when the ioas are
+different between new and old hwpts. But now, if the old hwpt is not
+paging, then it's already needed to add resv regions in the ioas.
 
+Regards,
+Yi Liu
