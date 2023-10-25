@@ -2,35 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 640ED7D7341
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 20:27:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26AAD7D73CE
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 21:02:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229788AbjJYS1h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 14:27:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49164 "EHLO
+        id S1343561AbjJYTC5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 15:02:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229583AbjJYS1f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 14:27:35 -0400
+        with ESMTP id S234719AbjJYTC4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 15:02:56 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4B0E1B2
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 11:27:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77F0B183
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 12:02:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=YF7Pgf5JG9oeOapVly95WZFHIXbPN/LHIYmrmUOXIZU=; b=MCS+gV84KY9iGO8IdwAL1G/3zk
-        h+kJo/yaUcp3yxGD+tiOH0VeTdtgKD5hzGOUtjZ6ZLVxiA5wLtFLPyNJiAOsClV7o1QiCYeQyN5Rg
-        NFyO7zXY29iYKu9yAtjOjLxv/rBaPHkqnIhsPKD9mPIt7svbwmtxdNcbqdb+iilrOe6WCdPUMEuBO
-        1IPNjmICTcz/OkfMZsmZuCLSWSHPnSvvv8OwXMhun5JcqR+8KzMWLMwVjHs8ZrGP2u24KmQvMjHX5
-        c+zYmY5T4cx2PonUhVY4LXGXhy1yBPUx2+w5XAzWinFi5CrzHPUGKfgnkZMpkiZj5Jeo9cmS94G0f
-        3anrEcrg==;
+        bh=RNbldFeH9RXvhlMpBkxoU3qDnF569sj7HrRIMA2FfyY=; b=GOLQM5YAVN8ONSWs9Bl6R+Z4Ah
+        yK2FLDGqcaIZ6VnC7cGLY2E2nuNoBWTMLBYZvI3yOPlp/rc+1Zy8aI4k7z/s+KCbHEKWQ8O/EtvPf
+        iCSB/q8wsmSh7Apb+xVZTET359Eib0ftTLVGDZ9RSeyexHId2vBbICP0edzIsKysw6GZ1EEnYgIqd
+        PwnYZiTJdXoU2rhxIIfLWxzZdYFQCZH+2amLL63+0a2NveAd/KbE39TGA7cGoQlbn71ESHSU7ljeY
+        COiALHuWH6uOWxhU1mb0wHFa4opjQzbB09HWKb02vFvmZ7WPRzm4dn6dHy9rgTlRjUcB+94vMnWh3
+        9mCXC32A==;
 Received: from [2001:8b0:10b:5:5bd0:63a6:23b2:1881] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qvian-00AIbv-JM; Wed, 25 Oct 2023 18:26:57 +0000
-Message-ID: <4a10a50e5469480a82cb993dedbff10c3d777082.camel@infradead.org>
+        id 1qvj9E-00AT4n-7V; Wed, 25 Oct 2023 19:02:32 +0000
+Message-ID: <0f7a176064f2b351576ab5d31a3a8e921cca4212.camel@infradead.org>
 Subject: Re: [PATCH v3 28/28] docs: update Xen-on-KVM documentation
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Eric Blake <eblake@redhat.com>
+To:     Andrew Cooper <andrew.cooper3@citrix.com>,
+        Eric Blake <eblake@redhat.com>
 Cc:     qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
         Hanna Reitz <hreitz@redhat.com>,
         Stefano Stabellini <sstabellini@kernel.org>,
@@ -47,13 +48,15 @@ Cc:     qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
         xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
         Bernhard Beschow <shentey@gmail.com>,
         Joel Upham <jupham125@gmail.com>
-Date:   Wed, 25 Oct 2023 19:26:56 +0100
-In-Reply-To: <6vbpkrebc7fpypbv2t7jbs7m3suxwbqqykeomzfxpenjj2sogd@rphcppcl4inl>
+Date:   Wed, 25 Oct 2023 20:02:31 +0100
+In-Reply-To: <21e8a265-bf5a-464c-86bc-f0fd7b5eb108@citrix.com>
 References: <20231025145042.627381-1-dwmw2@infradead.org>
          <20231025145042.627381-29-dwmw2@infradead.org>
          <6vbpkrebc7fpypbv2t7jbs7m3suxwbqqykeomzfxpenjj2sogd@rphcppcl4inl>
+         <4a10a50e5469480a82cb993dedbff10c3d777082.camel@infradead.org>
+         <21e8a265-bf5a-464c-86bc-f0fd7b5eb108@citrix.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-shXqgyMEQFTVt6coVWWq"
+        boundary="=-Fy7YuKjiqJwaUXFo/l80"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -67,88 +70,70 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-shXqgyMEQFTVt6coVWWq
+--=-Fy7YuKjiqJwaUXFo/l80
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2023-10-25 at 13:20 -0500, Eric Blake wrote:
-> On Wed, Oct 25, 2023 at 03:50:42PM +0100, David Woodhouse wrote:
-> > From: David Woodhouse <dwmw@amazon.co.uk>
-> >=20
-> > Add notes about console and network support, and how to launch PV guest=
-s.
-> > Clean up the disk configuration examples now that that's simpler, and
-> > remove the comment about IDE unplug on q35/AHCI now that it's fixed.
-> >=20
-> > Also update stale avocado test filename in MAINTAINERS.
-> >=20
-> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> > ---
-> > +Xen paravirtual devices
-> > +-----------------------
-> > +
-> > +The Xen PCI platform device is enabled automatically for a Xen guest. =
-This
-> > +allows a guest to unplug all emulated devices, in order to use paravir=
-tual
-> > +block and network drivers instead.
-> > +
-> > +Those paravirtual Xen block, network (and console) devices can be crea=
-ted
-> > +through the command line, and/or hot-plugged.
-> > +
-> > +To provide a Xen console device, define a character device and then a =
-device
-> > +of type ``xen-console`` to connect to it. For the Xen console equivale=
-nt of
-> > +the handy ``-serial mon:stdio`` option, for example:
-> > +
-> > +.. parsed-literal::
-> > +=C2=A0=C2=A0 -chardev -chardev stdio,mux=3Don,id=3Dchar0,signal=3Doff =
--mon char0 \\
-> > +=C2=A0=C2=A0 -device xen-console,chardev=3Dchar0
->=20
-> Is -chardev supposed to appear twice here?
+On Wed, 2023-10-25 at 19:56 +0100, Andrew Cooper wrote:
+> On 25/10/2023 7:26 pm, David Woodhouse wrote:
+> =C2=A0
+> > On Wed, 2023-10-25 at 13:20 -0500, Eric Blake wrote:
+> > =C2=A0
+> > > On Wed, Oct 25, 2023 at 03:50:42PM +0100, David Woodhouse wrote:
+> > =C2=A0
+> > > =C2=A0
+> > > > +
+> > > > +Booting Xen PV guests
+> > > > +---------------------
+> > > > +
+> > > > +Booting PV guest kernels is possible by using the Xen PV shim (a v=
+ersion of Xen
+> > > > +itself, designed to run inside a Xen HVM guest and provide memory =
+management
+> > > > +services for one guest alone).
+> > > > +
+> > > > +The Xen binary is provided as the ``-kernel`` and the guest kernel=
+ itself (or
+> > > > +PV Grub image) as the ``-initrd`` image, which actually just means=
+ the first
+> > > > +multiboot "module". For example:
+> > > > +
+> > > > +.. parsed-literal::
+> > > > +
+> > > > +=C2=A0 |qemu_system| --accel kvm,xen-version=3D0x40011,kernel-irqc=
+hip=3Dsplit \\
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -chardev stdio,id=3Dchar0 -de=
+vice xen-console,chardev=3Dchar0 \\
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -display none=C2=A0 -m 1G=C2=
+=A0 -kernel xen -initrd bzImage \\
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -append "pv-shim console=3Dxe=
+n,pv -- console=3Dhvc0 root=3D/dev/xvda1" \\
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -drive file=3D${GUEST_IMAGE},=
+if=3Dxen
+> > > Is the space between -- and console=3D intentionsl?
+> > Yes, that one is correct. The -- is how you separate Xen's command line
+> > (on the left) from the guest kernel command line (on the right).
+> =C2=A0
+> =C2=A0To expand on this a bit.
+> =C2=A0
+> =C2=A0Multiboot1 supports multiple modules but only a single command
+> line.=C2=A0 As one of the modules passed to Xen is the dom0 kernel, we
+> need some way to pass it's command line, hence the " -- ".
+> =C2=A0
+> =C2=A0Multiboot2 and PVH support a command line per module, which is the
+> preferred way to pass the commandlines, given a choice.
+> =C2=A0
 
-It is not. Will fix; thanks.
+Thanks.
 
-> ...
-> > +
-> > +Booting Xen PV guests
-> > +---------------------
-> > +
-> > +Booting PV guest kernels is possible by using the Xen PV shim (a versi=
-on of Xen
-> > +itself, designed to run inside a Xen HVM guest and provide memory mana=
-gement
-> > +services for one guest alone).
-> > +
-> > +The Xen binary is provided as the ``-kernel`` and the guest kernel its=
-elf (or
-> > +PV Grub image) as the ``-initrd`` image, which actually just means the=
- first
-> > +multiboot "module". For example:
-> > +
-> > +.. parsed-literal::
-> > +
-> > +=C2=A0 |qemu_system| --accel kvm,xen-version=3D0x40011,kernel-irqchip=
-=3Dsplit \\
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -chardev stdio,id=3Dchar0 -device=
- xen-console,chardev=3Dchar0 \\
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -display none=C2=A0 -m 1G=C2=A0 -=
-kernel xen -initrd bzImage \\
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -append "pv-shim console=3Dxen,pv=
- -- console=3Dhvc0 root=3D/dev/xvda1" \\
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -drive file=3D${GUEST_IMAGE},if=
-=3Dxen
->=20
-> Is the space between -- and console=3D intentionsl?
+Indeed, I had *originally* thought I was going to need to implement
+Multiboot2 in qemu in order to boot Shim + PV guest, but it turns out
+we can make it work with just Multiboot1 support.
 
-Yes, that one is correct. The -- is how you separate Xen's command line
-(on the left) from the guest kernel command line (on the right).
+As long as the guest kernel doesn't want an *actual* initrd, that is ;)
 
 
---=-shXqgyMEQFTVt6coVWWq
+--=-Fy7YuKjiqJwaUXFo/l80
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -240,24 +225,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMDI1MTgyNjU2WjAvBgkqhkiG9w0BCQQxIgQg0XTTncc1
-cNLXA9he7Sss7Y4KkFZ7pPry9FLpyxfjrscwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMDI1MTkwMjMxWjAvBgkqhkiG9w0BCQQxIgQgUuqj1cYj
+QfF6xg6PxqoniLN3SeWIqUBhQkdyhXy4d0Iwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBT7Bq6bGLkTsHAJp09kVJIpoJKZFYWWpta
-hfAcjvvKlLLAQqOWdlunrA7OjSuKU4bLLmxP+PsAp1xfwCdPWAeFpaj+JoHnYfTkQ0AZn2C3f0H9
-aPktNUtf6GUbuv7scwgFK/P2PAqLq8FBxYRQSHwuJl5q6H8EFwOJqp3u27o9Cs0yez7LwKvrYUFv
-TWo+JaNg0Rl82X+f0KF+dTc1TjsJTPg4LSjCfwufOSRK8VpgVfOgg+Lr1tsnrtiw4dIFEAiHzj+C
-5DbXT8tT+E52uIsz/If5dp8/+RZgHK84KXyByS9T3g+KZGdXC+/Loctd0hXK8ypKYDOaN1/nl0DB
-uikXINuwhWDMLGSQkFy+oFzyyWfgSfIsxxRlVH0HgZ3ViQoROEPp65Wp4gem1AiIMnzzfChpCC1O
-UEqJCSDLxT2guUiVknRiJByCF9Y8kuEKLmc1AhoGeTaF9fmNuMjgubtDLFu6Ld9Y+x4MDdoYldq0
-6l7WBtaUX2rkMYuG4qGHY8UjNjCTYa1VOOA23zMXlucC96ReWkWYwTO/dIjUF6SWGwiETvSFHFdK
-3fPgyGsjH7lmOk02Aw6USlh6CHwuzwNsdUz84GpHP9JUvcJtecCeuAkIxKwJv126kglLy0IOw5oZ
-clVKNBYuP2K7ZVLXa1uqi63p8mgOCtR5MN6jIgsP8gAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAsFmCHRPHQOvGFW7h8uvsCqx5qgo4ArbjB
+A1VFNFch0q45HUE7kB/HBjV7822gb78w55EZ849mRQJ7cUFgT1On5nwB8kG8wOvTzGjij3IlkaUE
+B7bj4YsbbQh5BQWKVhGyHZZskx7Gg+ZH+x9VncUB6v3a/IvVUB4I+RXmiIs4jHwbIsarRuXC2WjA
+JkgPQdSySsINV6+mQb1GmGbzBx9nRFXQHKs1Qveju2QiI30VhnstwyoOUGDR9IoYtKtaV7pwrHbE
+37O+oGUXaMtLGOuDMByJXBYYyEI5CarR5pAE6PhP3y7oXvh6Gs/ltBYA9zCEBZeT+xThok3VbDci
+MODgoD+HAa8Dr4Ojj2NxRf56HBeaPNJUz2OKYM8CJGO8C90Db6dPzBLKhu2Jq2fD97iRZKjMwsOB
+voyzNjnSoByd0ng24KDNBHzFZ4497MrJd3yYNfxRwt9gXJio+3mCVJGcZN1dqjxKHTOa1pcRkjSo
+VZp35qlFkd6J/JUhaMJ5cSLB/vrVsm3MBl5pp0eWET67fw+MtyXdc44TYBoaiU9JTq04KNBVKRjE
+hbQ/Y4EsYRG8M/6pd2yhrE2tNlI82rGTTmyBnHMfse/Q9zBZ0Pw13FsbgXPEzragEkfgyJ3rw2IQ
+0oriupkx09aNafY+jo5zGJDdJWgu46QDA7cT5mDBMgAAAAAAAA==
 
 
---=-shXqgyMEQFTVt6coVWWq--
+--=-Fy7YuKjiqJwaUXFo/l80--
