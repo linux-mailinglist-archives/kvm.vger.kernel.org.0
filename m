@@ -2,164 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 55DBA7D6F0B
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 16:42:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F5197D6F5C
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 16:43:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235072AbjJYOVJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 10:21:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44926 "EHLO
+        id S1344557AbjJYOWY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 10:22:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234673AbjJYOVH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 10:21:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D195E13A
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:20:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698243623;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=S1yh9aFBXnB/uUDqIchESZqamQpwZAPHQV0zqqMljjg=;
-        b=KPW6x6rVg7rgOsqO8KUx/BD1X22FUcAV5tt2tTyWxHS7nXLrBOXmMFy/lNu4jxc2dhIVaB
-        xFFUmi93uYgWoazqOB7ku5Qgfr3WnPTLxjCv2owQ18RKI5WMQY8wEqBhR5ugKurqwlno1U
-        RFXPd7bG6f+sgl3IQU6xn07xEprsWas=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-417-zFBRW_o4MVS7AFs5J7n3mQ-1; Wed, 25 Oct 2023 10:20:22 -0400
-X-MC-Unique: zFBRW_o4MVS7AFs5J7n3mQ-1
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7a16fe687aaso603345839f.3
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:20:22 -0700 (PDT)
+        with ESMTP id S1344550AbjJYOWW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 10:22:22 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAB94B9
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:22:20 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1c9f973d319so45637945ad.0
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:22:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698243740; x=1698848540; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UBKcY3PTFSrO9ZLn4V0uAyxFec2EF562aCVgDc00c5Q=;
+        b=n2SD6gVqGtK7M5570KDR+FkUDZRFLvYjAmz5Buf7L5oQkTc5XyXSvzt/fyWRJD5mmM
+         DH23+7m/z4XpCrYvQl7mgGV2mRhKG1+euGFkqlJxeVOFvcvEB5ZGl0ShxhEOaYW1jZun
+         09CL7yy4kjtnb4cnvTxC5VPT5STQSmbj5X6ijwfLr3BdOg9TCioskEpfCVDs6YVh80Xc
+         GhUPJd+KqBNBN9sIFEYWNrdZ1+sFNsV5ODU92wcuKyQHO6JcV5mDD7MftYTGLzWmnUfG
+         1f74RCGOPHtYaf4ZipuHzb5F4/HnMEfMAFqSWLIfDUuHmu7SGP3QmNL63+dlVBisy5iY
+         ieiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698243622; x=1698848422;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=S1yh9aFBXnB/uUDqIchESZqamQpwZAPHQV0zqqMljjg=;
-        b=Ek9rfXjvjzt/DvZHncliITruWPr2buIcN+gF6h8jPGpcIZV6q2kn2YHb9hSO/bn5pi
-         zTJybJMp9XJlnanqYqJgk2IG31N2TapRGEdgl1QlhnEjHggGAxWeSkW9cXalMXIlUQMK
-         CHtQtWNzaeEUERd673UsQwI4IhFzY1YdgHQuFIcUDKNEk3XGW5n/AMymzqE/nz+3zgC2
-         +QEu4Alhq5S/tKfALSMJsJzkaxiBTwRtZGnCHdPP70eh1vQ7X4OvVr6GpLlPYtE3Z7Pt
-         x585uIbQiMPe+4qh3zx6zZI7AMxzyi4GDKzBt9yqNH08ItbGzMOT4dercn2CqWjmbgtZ
-         UNjQ==
-X-Gm-Message-State: AOJu0YykfGhDj3YwEDSipbs0WRwFyHQUcFCba3CBZ6yTT+B0JdSHpISO
-        yfjh3C6KERUcUVu7zuQfpU1QAkMSZvOMMvdefOv+P7Za7HZ5Z8QS/OsgL7ypiKMN2TLUvQ8PILJ
-        TTj7Y7lSj266R
-X-Received: by 2002:a05:6e02:12c6:b0:357:a04c:31d2 with SMTP id i6-20020a056e0212c600b00357a04c31d2mr20557626ilm.16.1698243621710;
-        Wed, 25 Oct 2023 07:20:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHKwcXNmgBx56Nwj0CHsxsSuQrL5I2Rqp2efJfKlsiSWqJhSMRfzxIfmT0Id8DMwf8cHqeybw==
-X-Received: by 2002:a05:6e02:12c6:b0:357:a04c:31d2 with SMTP id i6-20020a056e0212c600b00357a04c31d2mr20557588ilm.16.1698243621425;
-        Wed, 25 Oct 2023 07:20:21 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id a18-20020a92d352000000b0035742971dd3sm3769998ilh.16.2023.10.25.07.20.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Oct 2023 07:20:20 -0700 (PDT)
-Date:   Wed, 25 Oct 2023 08:20:19 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Ankit Agrawal <ankita@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
-        Vikram Sethi <vsethi@nvidia.com>,
-        Andy Currid <acurrid@nvidia.com>,
-        Alistair Popple <apopple@nvidia.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Dan Williams <danw@nvidia.com>,
-        "Anuj Aggarwal (SW-GPU)" <anuaggarwal@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v12 1/1] vfio/nvgpu: Add vfio pci variant module for
- grace hopper
-Message-ID: <20231025082019.14575863.alex.williamson@redhat.com>
-In-Reply-To: <BY5PR12MB376386DD53954BC3233AF595B0DEA@BY5PR12MB3763.namprd12.prod.outlook.com>
-References: <20231015163047.20391-1-ankita@nvidia.com>
-        <20231017165437.69a84f0c.alex.williamson@redhat.com>
-        <BY5PR12MB3763356FC8CD2A7B307BD9AAB0D8A@BY5PR12MB3763.namprd12.prod.outlook.com>
-        <20231023084312.15b8e37e.alex.williamson@redhat.com>
-        <BY5PR12MB37636C06DED20856CF604A86B0DFA@BY5PR12MB3763.namprd12.prod.outlook.com>
-        <20231024082854.0b767d74.alex.williamson@redhat.com>
-        <BN9PR11MB5276A59033E514C051E9E4618CDEA@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <BY5PR12MB376386DD53954BC3233AF595B0DEA@BY5PR12MB3763.namprd12.prod.outlook.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20230601; t=1698243740; x=1698848540;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UBKcY3PTFSrO9ZLn4V0uAyxFec2EF562aCVgDc00c5Q=;
+        b=om0a4rxIyJCyiYhtwwD8j9eYsS1lxq6zC0LuBqJ3TiwvaYubh+VgHp7e7cslQo0cTg
+         hrZrGDGeVjsk7rLC+Kq7Gdynbq8xZYHdVykyhZ4wU6LJUPQpbmz1+UYM3TCMbfl4snCi
+         IBthOHqB2su/bDBVNb2nJVrYjdf8N9vhdH+Y9vo8wQ08Va2SiZNnvCnqjVTxERr08wQX
+         4FCOWx0torz+Z8ic9im7mMfUWi9CbQRz8cDjhPByGopDeaa/vo4pr1fRoFnPmCTRvZ9o
+         k27rHt9H34OYQwEJWDbHPVnQsJbMrI6+L+QzTEMaO3dZoWL/WXF5RE5xSDzLlU0XXoGf
+         gZBA==
+X-Gm-Message-State: AOJu0Yw5vBvuqbxgTnhMPR6XUwzioAAEz+yLwITR2i8b8QP3eb3fzZXS
+        G6GtjI9+fbDrBOrPJSvNPTC1geDfs5c=
+X-Google-Smtp-Source: AGHT+IHZKoRSEHlXrSTk7gXfGGMtoiiYgI7x2ddN7SPaYK+7MnNM5VmYunvYPrmqzbCB+sPrMcS19w1ctes=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:200a:b0:1ca:a251:786e with SMTP id
+ s10-20020a170903200a00b001caa251786emr245057pla.6.1698243740202; Wed, 25 Oct
+ 2023 07:22:20 -0700 (PDT)
+Date:   Wed, 25 Oct 2023 14:22:18 +0000
+In-Reply-To: <87a5s73w53.fsf@redhat.com>
+Mime-Version: 1.0
+References: <20231025055914.1201792-1-xiaoyao.li@intel.com>
+ <20231025055914.1201792-2-xiaoyao.li@intel.com> <87a5s73w53.fsf@redhat.com>
+Message-ID: <ZTkkmgs_oCnDCGvd@google.com>
+Subject: Re: [PATCH v2 1/2] x86/kvm/async_pf: Use separate percpu variable to
+ track the enabling of asyncpf
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Wanpeng Li <wanpengli@tencent.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 25 Oct 2023 12:43:24 +0000
-Ankit Agrawal <ankita@nvidia.com> wrote:
+On Wed, Oct 25, 2023, Vitaly Kuznetsov wrote:
+> Xiaoyao Li <xiaoyao.li@intel.com> writes:
+> > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> > index b8ab9ee5896c..388a3fdd3cad 100644
+> > --- a/arch/x86/kernel/kvm.c
+> > +++ b/arch/x86/kernel/kvm.c
+> > @@ -65,6 +65,7 @@ static int __init parse_no_stealacc(char *arg)
+> >  
+> >  early_param("no-steal-acc", parse_no_stealacc);
+> >  
+> > +static DEFINE_PER_CPU_READ_MOSTLY(bool, async_pf_enabled);
+> 
+> Would it make a difference is we replace this with a cpumask? I realize
+> that we need to access it on all CPUs from hotpaths but this mask will
+> rarely change so maybe there's no real perfomance hit?
 
-> While the physical BAR is present on the device, it is not being used on =
-the host
-> system. The access to the device memory region on the host occur through =
-the
-> C2C interconnect link (not the PCIe) and is present for access as a separ=
-ate memory
-> region in the physical address space on the host. The variant driver quer=
-ies this range
-> from the host ACPI DSD tables.
+FWIW, I personally prefer per-CPU booleans from a readability perspective.  I
+doubt there is a meaningful performance difference for a bitmap vs. individual
+booleans, the check is already gated by a static key, i.e. kernels that are NOT
+running as KVM guests don't care.
 
-BTW, it's still never been answered why the latest QEMU series dropped
-the _DSD support.
+Actually, if there's performance gains to be had, optimizing kvm_read_and_reset_apf_flags()
+to read the "enabled" flag if and only if it's necessary is a more likely candidate.
+Assuming the host isn't being malicious/stupid, then apf_reason.flags will be '0'
+if PV async #PFs are disabled.  The only question is whether or not apf_reason.flags
+is predictable enough for the CPU.
 
-> Now, this device memory region on the host is exposed as a device BAR in =
-the VM.
-> So the device BAR in the VM is actually mapped to the device memory regio=
-n in the
-> physical address space (and not to the physical BAR) on the host. The con=
-fig space
-> accesses to the device however, are still going to the physical BAR on th=
-e host.
->=20
-> > Does this BAR2 size match the size we're reporting for the region?=C2=
-=A0 Now
-> > I'm confused why we need to intercept the BAR2 region info if there's
-> > physically a real BAR behind it.=C2=A0 Thanks, =20
->=20
-> Yes, it does match the size being reported through region info. But the r=
-egion
-> info ioctl is still intercepted to provide additional cap to establish th=
-e sparse
-> mapping. Why we do sparse mapping? The actual device memory size is not
-> power-of-2 aligned (a requirement for a BAR). So we roundup to the next
-> power-of-2 value and report the size as such. Then we utilize sparse mapp=
-ing
-> to show only the actual size of the device memory as mappable.
+Aha!  In practice, the CPU already needs to resolve a branch based on apf_reason.flags,
+it's just "hidden" up in __kvm_handle_async_pf().
 
-Yes, it's clear to me why we need the sparse mapping and why we
-intercept the accesses, but the fact that there's an underlying
-physical BAR of the same size in config space has been completely
-absent in any previous discussions.
+If we really want to micro-optimize, provide an __always_inline inner helper so
+that __kvm_handle_async_pf() doesn't need to make a CALL just to read the flags.
+Then in the common case where a #PF isn't due to the host swapping out a page,
+the paravirt happy path doesn't need a taken branch and never reads the enabled
+variable.  E.g. the below generates:
 
-In light of that, I don't think we should be independently calculating
-the BAR2 region size using roundup_pow_of_two(nvdev->memlength).
-Instead we should be using pci_resource_len() of the physical BAR2 to
-make it evident that this relationship exists.
+   0xffffffff81939ed0 <+0>:	41 54              	push   %r12
+   0xffffffff81939ed2 <+2>:	31 c0              	xor    %eax,%eax
+   0xffffffff81939ed4 <+4>:	55                 	push   %rbp
+   0xffffffff81939ed5 <+5>:	53                 	push   %rbx
+   0xffffffff81939ed6 <+6>:	48 83 ec 08        	sub    $0x8,%rsp
+   0xffffffff81939eda <+10>:	65 8b 2d df 81 6f 7e	mov    %gs:0x7e6f81df(%rip),%ebp        # 0x320c0 <apf_reason>
+   0xffffffff81939ee1 <+17>:	85 ed              	test   %ebp,%ebp
+   0xffffffff81939ee3 <+19>:	75 09              	jne    0xffffffff81939eee <__kvm_handle_async_pf+30>
+   0xffffffff81939ee5 <+21>:	48 83 c4 08        	add    $0x8,%rsp
+   0xffffffff81939ee9 <+25>:	5b                 	pop    %rbx
+   0xffffffff81939eea <+26>:	5d                 	pop    %rbp
+   0xffffffff81939eeb <+27>:	41 5c              	pop    %r12
+   0xffffffff81939eed <+29>:	c3                 	ret
 
-The comments throughout should also be updated to reflect this as
-currently they're written as if there is no physical BAR2 and we're
-making a completely independent decision relative to BAR2 sizing.  A
-comment should also be added to nvgrace_gpu_vfio_pci_read/write()
-explaining that the physical BAR2 provides the correct behavior
-relative to config space accesses.
 
-The probe function should also fail if pci_resource_len() for BAR2 is
-not sufficient for the coherent memory region.  Thanks,
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index b8ab9ee5896c..b24133dc0731 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -240,22 +240,29 @@ void kvm_async_pf_task_wake(u32 token)
+ }
+ EXPORT_SYMBOL_GPL(kvm_async_pf_task_wake);
+ 
+-noinstr u32 kvm_read_and_reset_apf_flags(void)
++static __always_inline u32 __kvm_read_and_reset_apf_flags(void)
+ {
+-       u32 flags = 0;
++       u32 flags = __this_cpu_read(apf_reason.flags);
+ 
+-       if (__this_cpu_read(apf_reason.enabled)) {
+-               flags = __this_cpu_read(apf_reason.flags);
+-               __this_cpu_write(apf_reason.flags, 0);
++       if (unlikely(flags)) {
++               if (likely(__this_cpu_read(apf_reason.enabled)))
++                       __this_cpu_write(apf_reason.flags, 0);
++               else
++                       flags = 0;
+        }
+ 
+        return flags;
+ }
++
++u32 kvm_read_and_reset_apf_flags(void)
++{
++       return __kvm_read_and_reset_apf_flags();
++}
+ EXPORT_SYMBOL_GPL(kvm_read_and_reset_apf_flags);
+ 
+ noinstr bool __kvm_handle_async_pf(struct pt_regs *regs, u32 token)
+ {
+-       u32 flags = kvm_read_and_reset_apf_flags();
++       u32 flags = __kvm_read_and_reset_apf_flags();
+        irqentry_state_t state;
+ 
+        if (!flags)
 
-Alex
+> >  static DEFINE_PER_CPU_DECRYPTED(struct kvm_vcpu_pv_apf_data, apf_reason) __aligned(64);
+> >  DEFINE_PER_CPU_DECRYPTED(struct kvm_steal_time, steal_time) __aligned(64) __visible;
+> >  static int has_steal_clock = 0;
+> > @@ -244,7 +245,7 @@ noinstr u32 kvm_read_and_reset_apf_flags(void)
+> >  {
+> >  	u32 flags = 0;
+> >  
+> > -	if (__this_cpu_read(apf_reason.enabled)) {
+> > +	if (__this_cpu_read(async_pf_enabled)) {
+> >  		flags = __this_cpu_read(apf_reason.flags);
+> >  		__this_cpu_write(apf_reason.flags, 0);
+> >  	}
+> > @@ -295,7 +296,7 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_kvm_asyncpf_interrupt)
+> >  
+> >  	inc_irq_stat(irq_hv_callback_count);
+> >  
+> > -	if (__this_cpu_read(apf_reason.enabled)) {
+> > +	if (__this_cpu_read(async_pf_enabled)) {
+> >  		token = __this_cpu_read(apf_reason.token);
+> >  		kvm_async_pf_task_wake(token);
+> >  		__this_cpu_write(apf_reason.token, 0);
+> > @@ -362,7 +363,7 @@ static void kvm_guest_cpu_init(void)
+> >  		wrmsrl(MSR_KVM_ASYNC_PF_INT, HYPERVISOR_CALLBACK_VECTOR);
+> >  
+> >  		wrmsrl(MSR_KVM_ASYNC_PF_EN, pa);
+> > -		__this_cpu_write(apf_reason.enabled, 1);
+> > +		__this_cpu_write(async_pf_enabled, 1);
+> 
+> As 'async_pf_enabled' is bool, it would probably be more natural to
+> write
+> 
+> 	__this_cpu_write(async_pf_enabled, true);
 
++1000
