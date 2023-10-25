@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E09437D6FE8
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 16:54:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48E967D6FF5
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 16:54:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344474AbjJYOvd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 10:51:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54446 "EHLO
+        id S1344159AbjJYOv7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 10:51:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344380AbjJYOva (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 10:51:30 -0400
+        with ESMTP id S1344712AbjJYOvh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 10:51:37 -0400
 Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14E6213A
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:51:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC27ED50
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 07:51:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=Q/tyhQvSuMwg2Gh5kOIH6qsA0eNCoglo/BC/VrIl6Es=; b=KDYI3aY4tMOqlZWdfNfO3LfWji
-        oD5wYOBY7+ELSt03QoqbH58su+Ih3wGW5y4L029rvsFpFws8RSdxkpx1kvzrlS+TR8NZrSvLHKS2E
-        SjvLuuRm8b/GnqIqaDOe5rDZTyJ/8Guse6k/gguUsxYD44GH6Tn/1C0kqkUq3glxbg20jjPwKv8u9
-        Utgyvf4duButgytsgIFvJi/gbUd0SSA1jqoxw3sxA0TP7WEocX4xU//yXPAlhMq2BmAgFO6SYdQxX
-        O1MwfOqd73UkIrEQm5B9gRr0qBVYQsayxRgtHc1M0nfSNSW/4X7QtGGxiam1VQgi1BhfsTGnBKIs/
-        5Klyv7rQ==;
+        Content-Type:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:
+        To:From:Reply-To:Content-ID:Content-Description;
+        bh=RxBAjsQ+mysvOozFK2bkVeJvxuxKEpOcW9P4vMvsaUw=; b=kWEwCVesu3RU1Gi+zD5e+MXOzL
+        TI6NwMrSRoAQx1N/L//K4TlUXhKgj7PQrl+DuBhCNNSDgpxlC7tv6T7Eclwqo3JB/3jdzRkNzQ9qF
+        quoMMtl9n21EtXIqLbI9iMJAqKE5Ob4RUIz7XAD1NO24I6Wwr+QeGorNW5GKyAU6AJbWDsEToPZSu
+        XMKIpWSZ84bjXrvQIeIKE++0nq8nOdav05MHqaccNURQ/24YIQufkFSp5KZYBu8Or7scgLcu/6cHU
+        UsvgICpmvIfuJWV3/+UaFP9GBwV1+sI8ZM3NKS1yiX/c3qj/QciOq9QyDey+tRL/JUEb9G4h67r4c
+        sMq+tCFA==;
 Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
         by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qvfDZ-00GPLw-00;
-        Wed, 25 Oct 2023 14:50:51 +0000
+        id 1qvfDZ-00GPLx-01;
+        Wed, 25 Oct 2023 14:50:52 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qvfDX-002dEB-38;
-        Wed, 25 Oct 2023 15:50:43 +0100
+        id 1qvfDY-002dEF-06;
+        Wed, 25 Oct 2023 15:50:44 +0100
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     qemu-devel@nongnu.org
 Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
@@ -48,13 +48,14 @@ Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
         xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
         Bernhard Beschow <shentey@gmail.com>,
         Joel Upham <jupham125@gmail.com>
-Subject: [PATCH v3 04/28] hw/xen: don't clear map_track[] in xen_gnttab_reset()
-Date:   Wed, 25 Oct 2023 15:50:18 +0100
-Message-Id: <20231025145042.627381-5-dwmw2@infradead.org>
+Subject: [PATCH v3 05/28] hw/xen: fix XenStore watch delivery to guest
+Date:   Wed, 25 Oct 2023 15:50:19 +0100
+Message-Id: <20231025145042.627381-6-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231025145042.627381-1-dwmw2@infradead.org>
 References: <20231025145042.627381-1-dwmw2@infradead.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
@@ -69,36 +70,51 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-The refcounts actually correspond to 'active_ref' structures stored in a
-GHashTable per "user" on the backend side (mostly, per XenDevice).
+When fire_watch_cb() found the response buffer empty, it would call
+deliver_watch() to generate the XS_WATCH_EVENT message in the response
+buffer and send an event channel notification to the guest… without
+actually *copying* the response buffer into the ring. So there was
+nothing for the guest to see. The pending response didn't actually get
+processed into the ring until the guest next triggered some activity
+from its side.
 
-If we zero map_track[] on reset, then when the backend drivers get torn
-down and release their mapping we hit the assert(s->map_track[ref] != 0)
-in gnt_unref().
+Add the missing call to put_rsp().
 
-So leave them in place. Each backend driver will disconnect and reconnect
-as the guest comes back up again and reconnects, and it all works out OK
-in the end as the old refs get dropped.
+It might have been slightly nicer to call xen_xenstore_event() here,
+which would *almost* have worked. Except for the fact that it calls
+xen_be_evtchn_pending() to check that it really does have an event
+pending (and clear the eventfd for next time). And under Xen it's
+defined that setting that fd to O_NONBLOCK isn't guaranteed to work,
+so the emu implementation follows suit.
 
-Fixes: de26b2619789 ("hw/xen: Implement soft reset for emulated gnttab")
+This fixes Xen device hot-unplug.
+
+Fixes: 0254c4d19df ("hw/xen: Add xenstore wire implementation and implementation stubs")
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-Reviewed-by: Paul Durrant <paul@xen.org>
 ---
- hw/i386/kvm/xen_gnttab.c | 2 --
- 1 file changed, 2 deletions(-)
+ hw/i386/kvm/xen_xenstore.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/hw/i386/kvm/xen_gnttab.c b/hw/i386/kvm/xen_gnttab.c
-index 21c30e3659..839ec920a1 100644
---- a/hw/i386/kvm/xen_gnttab.c
-+++ b/hw/i386/kvm/xen_gnttab.c
-@@ -541,7 +541,5 @@ int xen_gnttab_reset(void)
-     s->entries.v1[GNTTAB_RESERVED_XENSTORE].flags = GTF_permit_access;
-     s->entries.v1[GNTTAB_RESERVED_XENSTORE].frame = XEN_SPECIAL_PFN(XENSTORE);
- 
--    memset(s->map_track, 0, s->max_frames * ENTRIES_PER_FRAME_V1);
--
-     return 0;
+diff --git a/hw/i386/kvm/xen_xenstore.c b/hw/i386/kvm/xen_xenstore.c
+index 660d0b72f9..8e716a7009 100644
+--- a/hw/i386/kvm/xen_xenstore.c
++++ b/hw/i386/kvm/xen_xenstore.c
+@@ -1357,10 +1357,12 @@ static void fire_watch_cb(void *opaque, const char *path, const char *token)
+     } else {
+         deliver_watch(s, path, token);
+         /*
+-         * If the message was queued because there was already ring activity,
+-         * no need to wake the guest. But if not, we need to send the evtchn.
++         * Attempt to queue the message into the actual ring, and send
++         * the event channel notification if any bytes are copied.
+          */
+-        xen_be_evtchn_notify(s->eh, s->be_port);
++        if (s->rsp_pending && put_rsp(s) > 0) {
++            xen_be_evtchn_notify(s->eh, s->be_port);
++        }
+     }
  }
+ 
 -- 
 2.40.1
 
