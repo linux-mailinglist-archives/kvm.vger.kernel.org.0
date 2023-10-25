@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6606D7D70FE
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 17:34:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B426A7D7113
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 17:39:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235100AbjJYPcc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 11:32:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55770 "EHLO
+        id S235035AbjJYPjn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 11:39:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235048AbjJYPca (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 11:32:30 -0400
+        with ESMTP id S232621AbjJYPjm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 11:39:42 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1860A196
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 08:31:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F11EB10CE
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 08:29:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698247897;
+        s=mimecast20190719; t=1698247766;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MtoXj1GYNMFSHttaFfxD/jjrlz6bvckSpFZTkJXcl/4=;
-        b=deWhkqSWEWiljA48IAWLX09BgvM8mGX432dQf66d0x0QDU1QLaFtaf7mdGCWYfPTM5MyUO
-        lHxVYG5D0CoTl7lSSfUcdRZ95hQsPG8WjxSTAHx7tkqJqbitQXH8TyxDFfd+PoAWNjJFAD
-        ZFAW+sGF321XDejY6iR349KfUlsDqd8=
+        bh=MiLrHcm1jHxIj86P0YZpTBI2aY7ofRBfJwnJst86kZs=;
+        b=g9Dh2beT/XsdYTcp8GS1/HlndgfjKTzW34yiQBVV/nQq586qbr9J8pHtQqAyCadDbT6I5S
+        4gaOfm4SJKiD3jSh7aK+RUdtmDPAHSHOEN2mrNWY+Alx3y97JLfSkkr1jTOHH3+frcxYJH
+        VPiCYKYXtULI1NoKNCbEwIJadHRyEyw=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-37-q9cDIzN4Ni-QF5cC8qpvKQ-1; Wed,
- 25 Oct 2023 11:30:17 -0400
-X-MC-Unique: q9cDIzN4Ni-QF5cC8qpvKQ-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-557-br9Zkg-dMF2GxD5U1p93qQ-1; Wed,
+ 25 Oct 2023 11:29:22 -0400
+X-MC-Unique: br9Zkg-dMF2GxD5U1p93qQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3981C1C0783D;
-        Wed, 25 Oct 2023 15:29:21 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3F53D3C1E9DD;
+        Wed, 25 Oct 2023 15:29:22 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.45.226.101])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 666E32166B27;
-        Wed, 25 Oct 2023 15:29:20 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6E1FD2166B26;
+        Wed, 25 Oct 2023 15:29:21 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH kvm-unit-tests 3/4] x86: hyper-v:  Use 'goto' instead of putting the whole test in an 'if' branch in hyperv_synic
-Date:   Wed, 25 Oct 2023 17:29:14 +0200
-Message-ID: <20231025152915.1879661-4-vkuznets@redhat.com>
+Subject: [PATCH kvm-unit-tests 4/4] x86: hyper-v: Unify hyperv_clock with other Hyper-V tests
+Date:   Wed, 25 Oct 2023 17:29:15 +0200
+Message-ID: <20231025152915.1879661-5-vkuznets@redhat.com>
 In-Reply-To: <20231025152915.1879661-1-vkuznets@redhat.com>
 References: <20231025152915.1879661-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -61,104 +61,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Unify 'hyperv_synic' test with other Hyper-V tests by using the:
-
- if (required-features-missing) {
-    report_skip();
-    goto done;
- }
- ...
-
- done:
-     return report_summary();
-
-pattern.
+Always do 'return report_summary()' at the end, use report_abort() when an
+abnormality is detected.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- x86/hyperv_synic.c | 61 +++++++++++++++++++++++-----------------------
- 1 file changed, 31 insertions(+), 30 deletions(-)
+ x86/hyperv_clock.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/x86/hyperv_synic.c b/x86/hyperv_synic.c
-index 9d61d8362ebd..ae57f1c5faac 100644
---- a/x86/hyperv_synic.c
-+++ b/x86/hyperv_synic.c
-@@ -141,45 +141,46 @@ static void synic_test_cleanup(void *ctx)
+diff --git a/x86/hyperv_clock.c b/x86/hyperv_clock.c
+index f1e7204a8ea9..7eb4f734ee5b 100644
+--- a/x86/hyperv_clock.c
++++ b/x86/hyperv_clock.c
+@@ -144,7 +144,6 @@ static void perf_test(int ncpus)
  
  int main(int ac, char **av)
  {
-+    int ncpus, i;
-+    bool ok;
+-	int nerr = 0;
+ 	int ncpus;
+ 	struct hv_reference_tsc_page shadow;
+ 	uint64_t tsc1, t1, tsc2, t2;
+@@ -152,7 +151,7 @@ int main(int ac, char **av)
  
--    if (synic_supported()) {
--        int ncpus, i;
--        bool ok;
--
--        setup_vm();
--        enable_apic();
-+    if (!synic_supported()) {
-+	report_skip("Hyper-V SynIC is not supported");
-+	goto done;
-+    }
+ 	if (!hv_time_ref_counter_supported()) {
+ 		report_skip("time reference counter is unsupported");
+-		return report_summary();
++		goto done;
+ 	}
  
--        ncpus = cpu_count();
--        if (ncpus > MAX_CPUS)
--            report_abort("number cpus exceeds %d", MAX_CPUS);
--        printf("ncpus = %d\n", ncpus);
-+    setup_vm();
-+    enable_apic();
+ 	setup_vm();
+@@ -167,10 +166,8 @@ int main(int ac, char **av)
+ 	       "MSR value after enabling");
  
--        synic_prepare_sint_vecs();
-+    ncpus = cpu_count();
-+    if (ncpus > MAX_CPUS)
-+	report_abort("number cpus exceeds %d", MAX_CPUS);
-+    printf("ncpus = %d\n", ncpus);
+ 	hvclock_get_time_values(&shadow, hv_clock);
+-	if (shadow.tsc_sequence == 0 || shadow.tsc_sequence == 0xFFFFFFFF) {
+-		printf("Reference TSC page not available\n");
+-		exit(1);
+-	}
++	if (shadow.tsc_sequence == 0 || shadow.tsc_sequence == 0xFFFFFFFF)
++		report_abort("Reference TSC page not available\n");
  
--        printf("prepare\n");
--        on_cpus(synic_test_prepare, (void *)read_cr3());
-+    synic_prepare_sint_vecs();
+ 	printf("scale: %" PRIx64" offset: %" PRId64"\n", shadow.tsc_scale, shadow.tsc_offset);
+ 	ref1 = rdmsr(HV_X64_MSR_TIME_REF_COUNT);
+@@ -196,5 +193,6 @@ int main(int ac, char **av)
+ 	report(rdmsr(HV_X64_MSR_REFERENCE_TSC) == 0,
+ 	       "MSR value after disabling");
  
--        for (i = 0; i < ncpus; i++) {
--            printf("test %d -> %d\n", i, ncpus - 1 - i);
--            on_cpu_async(i, synic_test, (void *)(ulong)(ncpus - 1 - i));
--        }
--        while (cpus_active() > 1)
--            pause();
-+    printf("prepare\n");
-+    on_cpus(synic_test_prepare, (void *)read_cr3());
- 
--        printf("cleanup\n");
--        on_cpus(synic_test_cleanup, NULL);
-+    for (i = 0; i < ncpus; i++) {
-+	printf("test %d -> %d\n", i, ncpus - 1 - i);
-+	on_cpu_async(i, synic_test, (void *)(ulong)(ncpus - 1 - i));
-+    }
-+    while (cpus_active() > 1)
-+	pause();
- 
--        ok = true;
--        for (i = 0; i < ncpus; ++i) {
--            printf("isr_enter_count[%d] = %d\n",
--                   i, atomic_read(&isr_enter_count[i]));
--            ok &= atomic_read(&isr_enter_count[i]) == 16;
--        }
-+    printf("cleanup\n");
-+    on_cpus(synic_test_cleanup, NULL);
- 
--        report(ok, "Hyper-V SynIC test");
--    } else {
--        printf("Hyper-V SynIC is not supported");
-+    ok = true;
-+    for (i = 0; i < ncpus; ++i) {
-+	printf("isr_enter_count[%d] = %d\n",
-+	       i, atomic_read(&isr_enter_count[i]));
-+	ok &= atomic_read(&isr_enter_count[i]) == 16;
-     }
- 
-+    report(ok, "Hyper-V SynIC test");
-+
+-	return nerr > 0 ? 1 : 0;
 +done:
-     return report_summary();
++	return report_summary();
  }
 -- 
 2.41.0
