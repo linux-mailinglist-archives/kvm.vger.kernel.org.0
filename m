@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 80F607D6BED
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 14:36:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3CFBA7D6C16
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 14:38:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344059AbjJYMgJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 08:36:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34474 "EHLO
+        id S1344046AbjJYMim (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 08:38:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344015AbjJYMgH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 08:36:07 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5834E129
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 05:36:02 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-53eeb28e8e5so9926a12.1
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 05:36:02 -0700 (PDT)
+        with ESMTP id S232807AbjJYMil (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 08:38:41 -0400
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FEDF8F
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 05:38:39 -0700 (PDT)
+Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-53f98cbcd76so9719a12.1
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 05:38:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698237361; x=1698842161; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1698237518; x=1698842318; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LGOk0CnKeZPsdii6KIyKL0bEMGOZJembVuo8Q1dzylc=;
-        b=YBoQjRLw9+oHFDgYKkjzpB+K08IZRJAZ62luCZ2odV/Y8L9LLaQs/qMAi2CQFfzmMF
-         9zZfzIBkhFKDI/Mev26IL+S0yohinfDqzvYPsqrY/jvpi4fhfoT1XMLb7IFmB6DZYVOm
-         IolLVixIXL9YlT4JUpz/eQpl7MhysL/hVGf039lE9CyMaWU82KgIyncI81xR1n9PRAyd
-         RFbR3XqggLk8haLusZpMZ36QgXHAZV+VSso0J2H7h/fGNfCaNcWfDIlxoVZ+3u8N4kKP
-         BMO8h4Uo/l4d8IV6iF4GPj9YthZhQG+cWy7wLRverZ0mYB2lSe1qvjq8iGReWS1KNDuc
-         SOvQ==
+        bh=W3l3fK8JlnRDjMYiAMXlKadC5mulz1cY1IxH7egtavM=;
+        b=bFFgKStkFAry370sQGddW0mcTkJIE6k4/z2ZOaQjKIalzxTfWLEQBF8NzLLL7tLYjd
+         DxLWT0UsCFkeBoAK4UwuuvXSaIfdp/UaWfWqo0ZHiturCM8hr6hEbY3Jolis4YKqk9gM
+         NHWLrT8xqV2JUY2ZFCfbifNbbYIk70e+4USi5NtubxezhIUhVaTPOaEG/2myBNhOGUVk
+         w2q+hh02okgpaGzxKVl8k1KXXJ5+GskvoT4z8CLcEuo0kA1oteMmfJDPvyBTOScdmnPz
+         AkLQzheupyhecLjaYf+J+GOinlCXoid/Cf7lGVERDODSr6nrwjHQZGPX7qfHTZ7pLyb6
+         iUHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698237361; x=1698842161;
+        d=1e100.net; s=20230601; t=1698237518; x=1698842318;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LGOk0CnKeZPsdii6KIyKL0bEMGOZJembVuo8Q1dzylc=;
-        b=p4qq4e4dQSVYMg6Xx7yi1NBFHDY/hW2lQejm48AnTC8qW9i+elDjfeUsF/E3VBYL4P
-         7lfubzGFrR0lvsY4xPaHe9MVxYci5tZ66CTj2jRWU8xt6EGr1QslHhq8tG/jA7ijp8BG
-         0+g0xmeqzm6b/hsc2gn6chCzEMLV+RRJdT5LPKA2GrQz6eNjvwymVgKSduMPb5//7/yb
-         bB5YwFQ36pr+RaHYTi8p108TiF850OreIVoL/UKgiO3Ae38YdQlHOIeIdJ6ENEJXgcqd
-         G32Uw4aDkG4LgpbTsz1rKXUINslk2ZJ3Scktw6o7Ou8piK+reMwTAGCocqOrkNHCMubc
-         ffhA==
-X-Gm-Message-State: AOJu0YzR1BekkGPXhiXMm37PjIudSPxjKioXj8NSJpHVNNWwItKncDmB
-        kwYty0xT45KrKsWwuwRMW43LrOv/XXv8bG5nqXIbbw==
-X-Google-Smtp-Source: AGHT+IFEpfxrI8CLUEQxg5JfpcGaKukYdSHtSjSmABmdlig6tD0vaaHz20rghsrGGrvjeWn8s+35DKPxd+teg+FQvl4=
-X-Received: by 2002:aa7:da95:0:b0:540:e46d:1ee8 with SMTP id
- q21-20020aa7da95000000b00540e46d1ee8mr80496eds.4.1698237360568; Wed, 25 Oct
- 2023 05:36:00 -0700 (PDT)
+        bh=W3l3fK8JlnRDjMYiAMXlKadC5mulz1cY1IxH7egtavM=;
+        b=QPPCgO+P2XuDs1YW/l/+nxSwWYwTtCI6GO3u7x51j/W5de+HnWivAcnyFcVoNT0QRc
+         OGRmig2jmZue3+OmTP8xEvYowiSrG20aMHZdfECKr6z1SkkKxq5zTyA5b1/c5bdA3dFt
+         XeBaAiPGDO+fA804OEG8HoJsAD8VAbiceT1zjeR3vgiZFZcqIW+P7nBQbZLhMc5zGV3/
+         4yjhLx09cBZ1ua9VWWhOePxTKBPMNt8UTEgIFk1Scxv17nIwteHGqEQqD3nN7ee+sexS
+         KvziUPrwkMZmMKLCJK9ltmif8hKRdYzJykPA455Btci35JdgLinz0EqhCBLitmJNftXa
+         987Q==
+X-Gm-Message-State: AOJu0Ywi2XfmYu+1ZjU3u5Z2gHW/1eaUhxA2YtIcmpPwIMcgX75Gz5kr
+        yh+AAoWD09FzElynqewQ1C5fFLdj5UTfuo01EmMc8A==
+X-Google-Smtp-Source: AGHT+IFV2kYyS0nXl907qHoBld9IgBOGa6z3I92wemf4cX+a+J09AbWj2FmewWIkgDqgwLMA1Zl/MsRimaHvir5XoA4=
+X-Received: by 2002:a50:9556:0:b0:53f:c607:c87a with SMTP id
+ v22-20020a509556000000b0053fc607c87amr73797eda.7.1698237517682; Wed, 25 Oct
+ 2023 05:38:37 -0700 (PDT)
 MIME-Version: 1.0
 References: <20231024075748.1675382-1-dapeng1.mi@linux.intel.com>
- <20231024075748.1675382-3-dapeng1.mi@linux.intel.com> <CALMp9eRqGr+5+C1OLhxv1i8Q=YVRmFxkZQJoh7HzWkPg2z=WoA@mail.gmail.com>
- <6132ba52-fdf1-4680-9e4e-5ea2fcb63b3c@linux.intel.com>
-In-Reply-To: <6132ba52-fdf1-4680-9e4e-5ea2fcb63b3c@linux.intel.com>
+ <20231024075748.1675382-5-dapeng1.mi@linux.intel.com> <CALMp9eSQyyihzEz+xpB0QCZ4=WqQ9TGiSwMYiFob0D_Z7OY7mg@mail.gmail.com>
+ <305f1ee4-a8c3-48eb-9368-531329e5266e@linux.intel.com>
+In-Reply-To: <305f1ee4-a8c3-48eb-9368-531329e5266e@linux.intel.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 25 Oct 2023 05:35:44 -0700
-Message-ID: <CALMp9eSX6OL9=9sgnKpNgRtuTV93A=G=u-5qT1_rpKFjL-dBNw@mail.gmail.com>
-Subject: Re: [kvm-unit-tests Patch 2/5] x86: pmu: Change the minimum value of
- llc_misses event to 0
+Date:   Wed, 25 Oct 2023 05:38:25 -0700
+Message-ID: <CALMp9eT94bGZFr3sfPAssh4jJLnLe4jGosRieGVb4pK1E31b5Q@mail.gmail.com>
+Subject: Re: [kvm-unit-tests Patch 4/5] x86: pmu: Support validation for Intel
+ PMU fixed counter 3
 To:     "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
@@ -70,7 +70,7 @@ Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,58 +78,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 25, 2023 at 4:23=E2=80=AFAM Mi, Dapeng <dapeng1.mi@linux.intel.=
+On Wed, Oct 25, 2023 at 4:26=E2=80=AFAM Mi, Dapeng <dapeng1.mi@linux.intel.=
 com> wrote:
 >
 >
-> On 10/24/2023 9:03 PM, Jim Mattson wrote:
+> On 10/25/2023 3:05 AM, Jim Mattson wrote:
 > > On Tue, Oct 24, 2023 at 12:51=E2=80=AFAM Dapeng Mi <dapeng1.mi@linux.in=
 tel.com> wrote:
-> >> Along with the CPU HW's upgrade and optimization, the count of LLC
-> >> misses event for running loop() helper could be 0 just like seen on
-> >> Sapphire Rapids.
+> >> Intel CPUs, like Sapphire Rapids, introduces a new fixed counter
+> >> (fixed counter 3) to counter/sample topdown.slots event, but current
+> >> code still doesn't cover this new fixed counter.
 > >>
-> >> So modify the lower limit of possible count range for LLC misses
-> >> events to 0 to avoid LLC misses event test failure on Sapphire Rapids.
-> > I'm not convinced that these tests are really indicative of whether or
-> > not the PMU is working properly. If 0 is allowed for llc misses, for
-> > instance, doesn't this sub-test pass even when the PMU is disabled?
-> >
-> > Surely, we can do better.
+> >> So add code to validate this new fixed counter.
+> > Can you explain how this "validates" anything?
 >
 >
-> Considering the testing workload is just a simple adding loop, it's
-> reasonable and possible that it gets a 0 result for LLC misses and
-> branch misses events. Yeah, I agree the 0 count makes the results not so
-> credible. If we want to avoid these 0 count values, we may have to
-> complicate the workload, such as adding flush cache instructions, or
-> something like that (I'm not sure if there are instructions which can
-> force branch misses). How's your idea about this?
+> I may not describe the sentence clearly. This would validate the fixed
+> counter 3 can count the slots event and get a valid count in a
+> reasonable range. Thanks.
 
-CLFLUSH is probably a good way to ensure cache misses. IBPB may be a
-good way to ensure branch mispredictions, or IBRS on parts without
-eIBRS.
+I thought the current vPMU implementation did not actually support
+top-down slots. If it doesn't work, how can it be validated?
 
 >
 > >
 > >> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 > >> ---
-> >>   x86/pmu.c | 2 +-
-> >>   1 file changed, 1 insertion(+), 1 deletion(-)
+> >>   x86/pmu.c | 3 ++-
+> >>   1 file changed, 2 insertions(+), 1 deletion(-)
 > >>
 > >> diff --git a/x86/pmu.c b/x86/pmu.c
-> >> index 0def28695c70..7443fdab5c8a 100644
+> >> index 1bebf493d4a4..41165e168d8e 100644
 > >> --- a/x86/pmu.c
 > >> +++ b/x86/pmu.c
-> >> @@ -35,7 +35,7 @@ struct pmu_event {
-> >>          {"instructions", 0x00c0, 10*N, 10.2*N},
-> >>          {"ref cycles", 0x013c, 1*N, 30*N},
-> >>          {"llc references", 0x4f2e, 1, 2*N},
-> >> -       {"llc misses", 0x412e, 1, 1*N},
-> >> +       {"llc misses", 0x412e, 0, 1*N},
-> >>          {"branches", 0x00c4, 1*N, 1.1*N},
-> >>          {"branch misses", 0x00c5, 0, 0.1*N},
-> >>   }, amd_gp_events[] =3D {
+> >> @@ -46,7 +46,8 @@ struct pmu_event {
+> >>   }, fixed_events[] =3D {
+> >>          {"fixed 1", MSR_CORE_PERF_FIXED_CTR0, 10*N, 10.2*N},
+> >>          {"fixed 2", MSR_CORE_PERF_FIXED_CTR0 + 1, 1*N, 30*N},
+> >> -       {"fixed 3", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N}
+> >> +       {"fixed 3", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N},
+> >> +       {"fixed 4", MSR_CORE_PERF_FIXED_CTR0 + 3, 1*N, 100*N}
+> >>   };
+> >>
+> >>   char *buf;
 > >> --
 > >> 2.34.1
 > >>
