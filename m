@@ -2,69 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84A4C7D6CED
-	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 15:17:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F32567D6D2F
+	for <lists+kvm@lfdr.de>; Wed, 25 Oct 2023 15:32:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343840AbjJYNRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 09:17:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57514 "EHLO
+        id S1344555AbjJYNbn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 09:31:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234415AbjJYNRX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 09:17:23 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50277116
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 06:17:20 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-9ba1eb73c27so888872366b.3
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 06:17:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1698239839; x=1698844639; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jy1KAByMy5a9RQfpu8qBOEbRmatxzjbYkxJIicvAit0=;
-        b=ZqqXPLfmxDqFoJecDJjGT3gxzC5nHTMXo+4g8mEXF/Ov6jjJv2Izf4YRppL3Rk94zf
-         Dp+gsK5XUiLyAEzhjiVosqKTcOVYD8UIGo1wJRzfGMu6Zu0uCUowFnc+4mzH8s9bPGoq
-         n3kUsqhPt2Nxku3MWC8lVhGiL8C0FGNwmK1MG/+D9Nxs5LCeZKiHdgQGtpb+vsfPWGbB
-         MH+0XYJVriABJVos+MhqyM3xJyZP+waAKW1wnQ8OR2TjVZv+UhMQK1MEUEZdOEcLRkZD
-         XW43dvpTxFI3yDT090E1h7V5U0XkUca837ptFQYaI7PBc1d1QillK8ivoZY02y6Wg1xl
-         fSuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698239839; x=1698844639;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jy1KAByMy5a9RQfpu8qBOEbRmatxzjbYkxJIicvAit0=;
-        b=qODf87uGz6hUqGeMr8O0hs3H4xFCYcgMfboZHpbjGd53tIyckz/h9+HOTQRLVKOElQ
-         vYOVmwHIyPPKSAMQEV4pKubckF1Qj+TVP/xL+pg07TbkZKR86yNPWpk2ztKeeGscOBze
-         zYNNsJJ47dTGrwDeelxe8NhymSjaT10aZBzYc9s+D+JO481tsXosYEA2+aANII3f0Fee
-         3BlhLjUpFHSmmpmU6ZTlGHyVq8/TjYj9Upb8srhO8SC/JerPfBVmoq8d41+dU9TPXJdG
-         yIfmIWpuEjnCArnbxxsJNrjneJ4jQlmQhAuROy4EH+2O04TWnheHbHUEutJPtmKecHoI
-         jPNA==
-X-Gm-Message-State: AOJu0YzxzBvFC4P4Q8Cqv+gpLUuPV49RGRrBydr+4lhO2tZ9RvOBaFH6
-        lz90tLEjPObSz+z+b8RJ+HIRRg==
-X-Google-Smtp-Source: AGHT+IH+cCNf+3pG6YkI2bMEmIX5BBkX6XMkqTdirqLRe9UvLaWhL/+WZ5XUIX9zv1lbciz+9wg3ag==
-X-Received: by 2002:a17:907:2da3:b0:9bf:60f9:9b7f with SMTP id gt35-20020a1709072da300b009bf60f99b7fmr12579815ejc.4.1698239838688;
-        Wed, 25 Oct 2023 06:17:18 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id qk2-20020a170906d9c200b009b97aa5a3aesm9985279ejb.34.2023.10.25.06.17.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Oct 2023 06:17:18 -0700 (PDT)
-Date:   Wed, 25 Oct 2023 15:17:17 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com,
-        maz@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org
-Subject: Re: [kvmtool PATCH v2 4/6] riscv: Add IRQFD support for in-kernel
- AIA irqchip
-Message-ID: <20231025-dbbd1ae8936d3f31aa136179@orel>
-References: <20230918125730.1371985-1-apatel@ventanamicro.com>
- <20230918125730.1371985-5-apatel@ventanamicro.com>
+        with ESMTP id S1344587AbjJYNbS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 09:31:18 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D345D4A;
+        Wed, 25 Oct 2023 06:31:10 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id B32BE1FF60;
+        Wed, 25 Oct 2023 13:31:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1698240668; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=CIp1MmRfnILX4Yf+/tPo8PCx9mdiGDw9VwirV8V2HRU=;
+        b=hmRYh6hz54vwvKSQD1N3xdqMCe/WcNW/cqW2TDT24RYBFZhKa1cYnQ5LEQLyNeVEstCwq1
+        ne0MIsJJIQnF2G2z3yWZdXxv63KUBGx9+yHZ8UaRJ11lfpy5aplNiYYwZgLSGaXm8n9IEw
+        O63sUvqVyPZvbM1Qu6ye8lZYLHdj6Ss=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 35ABB13524;
+        Wed, 25 Oct 2023 13:31:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id OUSQC5wYOWWtfQAAMHmgww
+        (envelope-from <jgross@suse.com>); Wed, 25 Oct 2023 13:31:08 +0000
+Message-ID: <fde7ffdd-4d12-4821-ac51-e67e65637111@suse.com>
+Date:   Wed, 25 Oct 2023 15:31:07 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230918125730.1371985-5-apatel@ventanamicro.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/5] x86/paravirt: move some functions and defines to
+ alternative
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ajay Kaher <akaher@vmware.com>,
+        Alexey Makhalov <amakhalov@vmware.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        xen-devel@lists.xenproject.org,
+        Peter Zijlstra <peterz@infradead.org>
+References: <20231019091520.14540-1-jgross@suse.com>
+ <20231019091520.14540-2-jgross@suse.com>
+ <20231025103402.GBZTjvGse9c0utZGO0@fat_crate.local>
+Content-Language: en-US
+From:   Juergen Gross <jgross@suse.com>
+Autocrypt: addr=jgross@suse.com; keydata=
+ xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
+ ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
+ dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
+ NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
+ XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
+ AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
+ CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
+ mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
+ G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
+ kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
+ Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
+ RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
+ vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
+ sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
+ aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
+ w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
+ auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
+ 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
+ fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
+ HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
+ QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
+ ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
+In-Reply-To: <20231025103402.GBZTjvGse9c0utZGO0@fat_crate.local>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------tj5QE79ujQ63w60kqxlnfAda"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
@@ -74,144 +100,128 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 18, 2023 at 06:27:28PM +0530, Anup Patel wrote:
-> To use irqfd with in-kernel AIA irqchip, we add custom
-> irq__add_irqfd and irq__del_irqfd functions. This allows
-> us to defer actual KVM_IRQFD ioctl() until AIA irqchip
-> is initialized by KVMTOOL.
-> 
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> ---
->  riscv/include/kvm/kvm-arch.h | 11 ++++++
->  riscv/irq.c                  | 73 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 84 insertions(+)
-> 
-> diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
-> index cd37fc6..1a8af6a 100644
-> --- a/riscv/include/kvm/kvm-arch.h
-> +++ b/riscv/include/kvm/kvm-arch.h
-> @@ -98,11 +98,22 @@ extern void (*riscv_irqchip_generate_fdt_node)(void *fdt, struct kvm *kvm);
->  extern u32 riscv_irqchip_phandle;
->  extern u32 riscv_irqchip_msi_phandle;
->  extern bool riscv_irqchip_line_sensing;
-> +extern bool riscv_irqchip_irqfd_ready;
->  
->  void plic__create(struct kvm *kvm);
->  
->  void pci__generate_fdt_nodes(void *fdt);
->  
-> +int riscv__add_irqfd(struct kvm *kvm, unsigned int gsi, int trigger_fd,
-> +		     int resample_fd);
-> +
-> +void riscv__del_irqfd(struct kvm *kvm, unsigned int gsi, int trigger_fd);
-> +
-> +#define irq__add_irqfd riscv__add_irqfd
-> +#define irq__del_irqfd riscv__del_irqfd
-> +
-> +int riscv__setup_irqfd_lines(struct kvm *kvm);
-> +
->  void riscv__generate_irq_prop(void *fdt, u8 irq, enum irq_type irq_type);
->  
->  void riscv__irqchip_create(struct kvm *kvm);
-> diff --git a/riscv/irq.c b/riscv/irq.c
-> index b608a2f..e6c0939 100644
-> --- a/riscv/irq.c
-> +++ b/riscv/irq.c
-> @@ -12,6 +12,7 @@ void (*riscv_irqchip_generate_fdt_node)(void *fdt, struct kvm *kvm) = NULL;
->  u32 riscv_irqchip_phandle = PHANDLE_RESERVED;
->  u32 riscv_irqchip_msi_phandle = PHANDLE_RESERVED;
->  bool riscv_irqchip_line_sensing = false;
-> +bool riscv_irqchip_irqfd_ready = false;
->  
->  void kvm__irq_line(struct kvm *kvm, int irq, int level)
->  {
-> @@ -46,6 +47,78 @@ void kvm__irq_trigger(struct kvm *kvm, int irq)
->  	}
->  }
->  
-> +struct riscv_irqfd_line {
-> +	unsigned int		gsi;
-> +	int			trigger_fd;
-> +	int			resample_fd;
-> +	struct list_head	list;
-> +};
-> +
-> +static LIST_HEAD(irqfd_lines);
-> +
-> +int riscv__add_irqfd(struct kvm *kvm, unsigned int gsi, int trigger_fd,
-> +		     int resample_fd)
-> +{
-> +	struct riscv_irqfd_line *line;
-> +
-> +	if (riscv_irqchip_irqfd_ready)
-> +		return irq__common_add_irqfd(kvm, gsi, trigger_fd,
-> +					     resample_fd);
-> +
-> +	/* Postpone the routing setup until we have a distributor */
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------tj5QE79ujQ63w60kqxlnfAda
+Content-Type: multipart/mixed; boundary="------------Y4C59w7B0uYx0ocNDu0QItRX";
+ protected-headers="v1"
+From: Juergen Gross <jgross@suse.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
+ virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ Ajay Kaher <akaher@vmware.com>, Alexey Makhalov <amakhalov@vmware.com>,
+ VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ xen-devel@lists.xenproject.org, Peter Zijlstra <peterz@infradead.org>
+Message-ID: <fde7ffdd-4d12-4821-ac51-e67e65637111@suse.com>
+Subject: Re: [PATCH v3 1/5] x86/paravirt: move some functions and defines to
+ alternative
+References: <20231019091520.14540-1-jgross@suse.com>
+ <20231019091520.14540-2-jgross@suse.com>
+ <20231025103402.GBZTjvGse9c0utZGO0@fat_crate.local>
+In-Reply-To: <20231025103402.GBZTjvGse9c0utZGO0@fat_crate.local>
 
-This comment comes from the Arm code. We probably want to replace
-distributor with "until the AIA is initialized" or something.
+--------------Y4C59w7B0uYx0ocNDu0QItRX
+Content-Type: multipart/mixed; boundary="------------RDhJM5AvKvHZQHCvrLZdkvG9"
 
-> +	line = malloc(sizeof(*line));
-> +	if (!line)
-> +		return -ENOMEM;
-> +
-> +	*line = (struct riscv_irqfd_line) {
-> +		.gsi		= gsi,
-> +		.trigger_fd	= trigger_fd,
-> +		.resample_fd	= resample_fd,
-> +	};
-> +	list_add(&line->list, &irqfd_lines);
-> +
-> +	return 0;
-> +}
-> +
-> +void riscv__del_irqfd(struct kvm *kvm, unsigned int gsi, int trigger_fd)
-> +{
-> +	struct riscv_irqfd_line *line;
-> +
-> +	if (riscv_irqchip_irqfd_ready) {
-> +		irq__common_del_irqfd(kvm, gsi, trigger_fd);
-> +		return;
-> +	}
-> +
-> +	list_for_each_entry(line, &irqfd_lines, list) {
-> +		if (line->gsi != gsi)
-> +			continue;
-> +
-> +		list_del(&line->list);
-> +		free(line);
-> +		break;
-> +	}
-> +}
-> +
-> +int riscv__setup_irqfd_lines(struct kvm *kvm)
-> +{
-> +	int ret;
-> +	struct riscv_irqfd_line *line, *tmp;
-> +
-> +	list_for_each_entry_safe(line, tmp, &irqfd_lines, list) {
-> +		ret = irq__common_add_irqfd(kvm, line->gsi, line->trigger_fd,
-> +					    line->resample_fd);
-> +		if (ret < 0) {
-> +			pr_err("Failed to register IRQFD");
-> +			return ret;
-> +		}
-> +
-> +		list_del(&line->list);
-> +		free(line);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  void riscv__generate_irq_prop(void *fdt, u8 irq, enum irq_type irq_type)
->  {
->  	u32 prop[2], size;
-> -- 
-> 2.34.1
->
+--------------RDhJM5AvKvHZQHCvrLZdkvG9
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-Other than the comment,
+T24gMjUuMTAuMjMgMTI6MzQsIEJvcmlzbGF2IFBldGtvdiB3cm90ZToNCj4gT24gVGh1LCBP
+Y3QgMTksIDIwMjMgYXQgMTE6MTU6MTZBTSArMDIwMCwgSnVlcmdlbiBHcm9zcyB3cm90ZToN
+Cj4+ICsvKiBMb3ctbGV2ZWwgYmFja2VuZCBmdW5jdGlvbnMgdXNhYmxlIGZyb20gYWx0ZXJu
+YXRpdmUgY29kZSByZXBsYWNlbWVudHMuICovDQo+PiArREVGSU5FX0FTTV9GVU5DKHg4Nl9u
+b3AsICIiLCAuZW50cnkudGV4dCk7DQo+PiArRVhQT1JUX1NZTUJPTF9HUEwoeDg2X25vcCk7
+DQo+IA0KPiBUaGlzIGlzIGFsbCB4ODYgY29kZSBzbyB5b3UgZG9uJ3QgcmVhbGx5IG5lZWQg
+dGhlICJ4ODZfIiBwcmVmaXggLSAibm9wIg0KPiBpcyBwZXJmZWN0bHkgZmluZS4NCg0KVGhl
+cmUgaXMNCg0KI2RlZmluZSBub3AoKSBhc20gdm9sYXRpbGUgKCJub3AiKQ0KDQppbiBhcmNo
+L3g4Ni9pbmNsdWRlL2FzbS9zcGVjaWFsX2luc25zLmggYWxyZWFkeS4NCg0KPiANCj4+ICtu
+b2luc3RyIHZvaWQgeDg2X0JVRyh2b2lkKQ0KPj4gK3sNCj4+ICsJQlVHKCk7DQo+PiArfQ0K
+Pj4gK0VYUE9SVF9TWU1CT0xfR1BMKHg4Nl9CVUcpOw0KPiANCj4gVGhhdCBleHBvcnQgaXMg
+bmVlZGVkIGZvcj8NCj4gDQo+IFBhcmF2aXJ0IHN0dWZmIGluIG1vZHVsZXM/DQo+IA0KPiBJ
+dCBidWlsZHMgaGVyZSB3aXRob3V0IGl0IC0gSSBndWVzcyBJIG5lZWQgdG8gZG8gYW4gYWxs
+bW9kY29uZmlnLg0KPiANCg0KSXQgbWlnaHQgbm90IGJlIG5lZWRlZCBub3csIGJ1dCBhcmUg
+eW91IHN1cmUgd2Ugd29uJ3QgbmVlZCBpdCBpbiBmdXR1cmU/DQoNCg0KSnVlcmdlbg0K
+--------------RDhJM5AvKvHZQHCvrLZdkvG9
+Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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
+jR/i1DG86lem3iBDXzXsZDn8R38=3D
+=3D2wuH
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------RDhJM5AvKvHZQHCvrLZdkvG9--
+
+--------------Y4C59w7B0uYx0ocNDu0QItRX--
+
+--------------tj5QE79ujQ63w60kqxlnfAda
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmU5GJsFAwAAAAAACgkQsN6d1ii/Ey8W
+5wgAgbckOQxRrqBgEkCJd/8/3z8u+REpyF2iEi4XI9Z3IQwLVYqSM6H169LwEmZVNvy57vbLS/y2
+DZaq8zG9hVM5577Om5RoQnTjIhgwwLb+wpNCKInr9qmMsOr3xjolptDE2bWZEzHZt1XzSvUZ1Y/p
+XzAdKi9yp6dT4Exi1gquxw8egMn0CUNUpJ7tB9NlK5UaIH4I8DCidZIWLbqUrrfS/3dvYK4qhb70
+PE3JCtvnF6w59/FDaxNi6NZlAEWmssSQEA9JoNknfaVKhtVJLIauRxuadqgHX83GwWif1hsnwPe4
+4vcGjrCPAhw0+qhc5HzUckvC4IKFe8ycGOQWwFSd2g==
+=w//9
+-----END PGP SIGNATURE-----
+
+--------------tj5QE79ujQ63w60kqxlnfAda--
