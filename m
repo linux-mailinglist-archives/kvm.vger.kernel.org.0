@@ -2,143 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EF887D8B8F
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 00:17:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4169C7D8BDF
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 00:55:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344958AbjJZWR4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Oct 2023 18:17:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42896 "EHLO
+        id S1344764AbjJZWzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Oct 2023 18:55:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233035AbjJZWRy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Oct 2023 18:17:54 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECC5F1A7;
-        Thu, 26 Oct 2023 15:17:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698358671; x=1729894671;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=DWsSN90e2MhXePBce8ZQpvACcJEf8coyEd40mDa4ehk=;
-  b=nbFQWPXXK9mva0HiJto/vNJzr4G1Xe/TQDGKGKXofxgO9vJW5lhbJmuj
-   QvITygVEXlO3lFvMuXn4vmRG5fJlMQYwJ6l5iZwTwrH9pjmI0YfPx4W5+
-   MuHVIYhguAWYYvPf+Ewryd+fboAxpF5e+iVK3qLAJov9FYmc0VxONprBK
-   J0sn4H2Ous5Bsm+Zqqq1b/BLPLmDgvQiSoAerHbAvHRMWywGhIoRRNSne
-   f61zInpua+bz0d62WdBJS7y4Cxo6rk2gDRJPTz9QJJhdVhDnpUoc2qjSy
-   OkM1HQF6FaVi+XTMVBMWW9pOZZJ6P6h47mnEM2eQFBcwpc7+irqqp0eua
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10875"; a="9201468"
-X-IronPort-AV: E=Sophos;i="6.03,254,1694761200"; 
-   d="scan'208";a="9201468"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2023 15:17:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10875"; a="903068858"
-X-IronPort-AV: E=Sophos;i="6.03,254,1694761200"; 
-   d="scan'208";a="903068858"
-Received: from pjmartin-mobl2.amr.corp.intel.com (HELO [10.209.32.248]) ([10.209.32.248])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2023 15:15:22 -0700
-Message-ID: <45417907-94c4-4243-9e68-d68d0b34ed5c@intel.com>
-Date:   Thu, 26 Oct 2023 15:17:48 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/6] x86/entry_64: Add VERW just before userspace
- transition
-Content-Language: en-US
-To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc:     Nikolay Borisov <nik.borisov@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
-        ak@linux.intel.com, tim.c.chen@linux.intel.com,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        antonio.gomez.iglesias@linux.intel.com
-References: <20231025-delay-verw-v3-0-52663677ee35@linux.intel.com>
- <20231025-delay-verw-v3-2-52663677ee35@linux.intel.com>
- <2cda7e85-aa75-4257-864d-0092b3339e0e@suse.com>
- <20231026192950.ylzc66f3f5naqvjv@desk>
- <ae3d993f-6ce4-42de-b9c4-ef0c7db663c0@intel.com>
- <20231026211508.tmd7hfniesiu53ps@desk> <20231026221311.5dqmnmvq4pnpqswn@desk>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
- oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
- 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
- ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
- VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
- iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
- c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
- pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
- ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
- QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABzUVEYXZpZCBDaHJp
- c3RvcGhlciBIYW5zZW4gKEludGVsIFdvcmsgQWRkcmVzcykgPGRhdmUuaGFuc2VuQGludGVs
- LmNvbT7CwXgEEwECACIFAlQ+9J0CGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEGg1
- lTBwyZKwLZUP/0dnbhDc229u2u6WtK1s1cSd9WsflGXGagkR6liJ4um3XCfYWDHvIdkHYC1t
- MNcVHFBwmQkawxsYvgO8kXT3SaFZe4ISfB4K4CL2qp4JO+nJdlFUbZI7cz/Td9z8nHjMcWYF
- IQuTsWOLs/LBMTs+ANumibtw6UkiGVD3dfHJAOPNApjVr+M0P/lVmTeP8w0uVcd2syiaU5jB
- aht9CYATn+ytFGWZnBEEQFnqcibIaOrmoBLu2b3fKJEd8Jp7NHDSIdrvrMjYynmc6sZKUqH2
- I1qOevaa8jUg7wlLJAWGfIqnu85kkqrVOkbNbk4TPub7VOqA6qG5GCNEIv6ZY7HLYd/vAkVY
- E8Plzq/NwLAuOWxvGrOl7OPuwVeR4hBDfcrNb990MFPpjGgACzAZyjdmYoMu8j3/MAEW4P0z
- F5+EYJAOZ+z212y1pchNNauehORXgjrNKsZwxwKpPY9qb84E3O9KYpwfATsqOoQ6tTgr+1BR
- CCwP712H+E9U5HJ0iibN/CDZFVPL1bRerHziuwuQuvE0qWg0+0SChFe9oq0KAwEkVs6ZDMB2
- P16MieEEQ6StQRlvy2YBv80L1TMl3T90Bo1UUn6ARXEpcbFE0/aORH/jEXcRteb+vuik5UGY
- 5TsyLYdPur3TXm7XDBdmmyQVJjnJKYK9AQxj95KlXLVO38lczsFNBFRjzmoBEACyAxbvUEhd
- GDGNg0JhDdezyTdN8C9BFsdxyTLnSH31NRiyp1QtuxvcqGZjb2trDVuCbIzRrgMZLVgo3upr
- MIOx1CXEgmn23Zhh0EpdVHM8IKx9Z7V0r+rrpRWFE8/wQZngKYVi49PGoZj50ZEifEJ5qn/H
- Nsp2+Y+bTUjDdgWMATg9DiFMyv8fvoqgNsNyrrZTnSgoLzdxr89FGHZCoSoAK8gfgFHuO54B
- lI8QOfPDG9WDPJ66HCodjTlBEr/Cwq6GruxS5i2Y33YVqxvFvDa1tUtl+iJ2SWKS9kCai2DR
- 3BwVONJEYSDQaven/EHMlY1q8Vln3lGPsS11vSUK3QcNJjmrgYxH5KsVsf6PNRj9mp8Z1kIG
- qjRx08+nnyStWC0gZH6NrYyS9rpqH3j+hA2WcI7De51L4Rv9pFwzp161mvtc6eC/GxaiUGuH
- BNAVP0PY0fqvIC68p3rLIAW3f97uv4ce2RSQ7LbsPsimOeCo/5vgS6YQsj83E+AipPr09Caj
- 0hloj+hFoqiticNpmsxdWKoOsV0PftcQvBCCYuhKbZV9s5hjt9qn8CE86A5g5KqDf83Fxqm/
- vXKgHNFHE5zgXGZnrmaf6resQzbvJHO0Fb0CcIohzrpPaL3YepcLDoCCgElGMGQjdCcSQ+Ci
- FCRl0Bvyj1YZUql+ZkptgGjikQARAQABwsFfBBgBAgAJBQJUY85qAhsMAAoJEGg1lTBwyZKw
- l4IQAIKHs/9po4spZDFyfDjunimEhVHqlUt7ggR1Hsl/tkvTSze8pI1P6dGp2XW6AnH1iayn
- yRcoyT0ZJ+Zmm4xAH1zqKjWplzqdb/dO28qk0bPso8+1oPO8oDhLm1+tY+cOvufXkBTm+whm
- +AyNTjaCRt6aSMnA/QHVGSJ8grrTJCoACVNhnXg/R0g90g8iV8Q+IBZyDkG0tBThaDdw1B2l
- asInUTeb9EiVfL/Zjdg5VWiF9LL7iS+9hTeVdR09vThQ/DhVbCNxVk+DtyBHsjOKifrVsYep
- WpRGBIAu3bK8eXtyvrw1igWTNs2wazJ71+0z2jMzbclKAyRHKU9JdN6Hkkgr2nPb561yjcB8
- sIq1pFXKyO+nKy6SZYxOvHxCcjk2fkw6UmPU6/j/nQlj2lfOAgNVKuDLothIxzi8pndB8Jju
- KktE5HJqUUMXePkAYIxEQ0mMc8Po7tuXdejgPMwgP7x65xtfEqI0RuzbUioFltsp1jUaRwQZ
- MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
- hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
- vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20231026221311.5dqmnmvq4pnpqswn@desk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        with ESMTP id S229668AbjJZWy7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Oct 2023 18:54:59 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 580811AB
+        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 15:54:57 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-da04fb79246so1074328276.2
+        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 15:54:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698360896; x=1698965696; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/PM5QRoJM5E7sHxdU8Gpjb3WFwx2mvG39y2sogXNJnc=;
+        b=Iscmo+e/Vgq5HNgCpEb7sBAezNDvU36C/6HFzQZRV7N9oNthzc6ErojSxiDaAYN8ao
+         3S8ZkGKFnqjfDVL+C+xst7/uTUIUz3ZmqDjRRyQ0QVtZlKsvvYNDPGt/b7cJc8D7FTZI
+         2ZJWZn/lWVcKDZ1j6oCy+pUkRqCDNa7jwdS+DXSVSbw8IH7MYUXEQ9EybFCvCDH0urQl
+         rZFP2KRqEl+89Aaxagz16WWM0g9OaXsHtSXK58VKoubqPoja6g7A33E9ujwc3hfYiYX6
+         kEDa8wyU5UC+QVnqjC3khfDw+QSxMkCnWc6Z5Mdsmp5k08jCGjHxtagZIF5KInnS/1HC
+         23FQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698360896; x=1698965696;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/PM5QRoJM5E7sHxdU8Gpjb3WFwx2mvG39y2sogXNJnc=;
+        b=td/DBe1+TxPZOkYZIqlT5PICszl/sA8K9aAJ2spTB/bX9geO9zog/U3fC4MzlAfqjH
+         4OIlcVNlPRmmb6jj3NwPfV8YUt5iv4AtdPeXIIodKP0r/E0kkXYEFUNsGMeRMccS62Hv
+         Cjzb5LlkioUe1RNzY/hWYISERgFj7EHx0x35t+OcM2dR74MOLIcbKZSK3CjQ/Qc3t2ej
+         qEjfTTVEnyGODiatL8pPiK4Pj8X22yn4HPfsI+i8SebBXQWMJLa+uzQ5cfuqLv/CnREr
+         CWcIb4jK4XynW9sqJTv5DYLTAuvHMQZj49BHVPA3u68Hu/r1qdqLafL/tYbMjjPmh0Tg
+         HOCQ==
+X-Gm-Message-State: AOJu0Yw0mr7emQgmniToc7Ld7NSKstgvq1KajGOuvo01T2TtEvkbliec
+        Sby4dNR0O+09780mcGhjM4ZHKmNSuEs=
+X-Google-Smtp-Source: AGHT+IErkEF/8uXxnLXeqR1mA+NdLf9/5+DzWEFWLO0C17ItryM4hgcXADqSB6htfL1r3+UGfZ+aiSEUAmw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1746:b0:d9a:59cb:8bed with SMTP id
+ bz6-20020a056902174600b00d9a59cb8bedmr15832ybb.5.1698360896597; Thu, 26 Oct
+ 2023 15:54:56 -0700 (PDT)
+Date:   Thu, 26 Oct 2023 15:54:55 -0700
+In-Reply-To: <ZTrj1CRKLOVbcytz@google.com>
+Mime-Version: 1.0
+References: <20231024002633.2540714-1-seanjc@google.com> <20231024002633.2540714-9-seanjc@google.com>
+ <ZTrOYztylSn7jNIE@google.com> <ZTrR638_KyKOwLIz@google.com> <ZTrj1CRKLOVbcytz@google.com>
+Message-ID: <ZTruPxjaU7NfrSOC@google.com>
+Subject: Re: [PATCH v5 08/13] KVM: selftests: Test Intel PMU architectural
+ events on gp counters
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Jinrong Liang <cloudliang@tencent.com>,
+        Like Xu <likexu@tencent.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/26/23 15:13, Pawan Gupta wrote:
->>>> Interrupts returning to kernel don't clear the CPU buffers. I believe
->>>> interrupts will be enabled here, and getting an interrupt here could
->>>> leak the data that interrupt touched.
->>> Specifically NMIs, right?
->> Yes, and VERW can omitted for the same reason as NMI returning to
->> kernel.
-> Thinking more on this, we should not omit verw here, as this spot is way
-> easier to target NMIs. A user executing SYSENTER in a loop has much
-> higher chances of causing an NMI to return to kernel, and skip verw.
+On Thu, Oct 26, 2023, Mingwei Zhang wrote:
+> On Thu, Oct 26, 2023, Sean Christopherson wrote:
+> > Heh, already did this too.  Though I'm not entirely sure it's more readable.  It's
+> > definitely more precise and featured :-)
+> > 
+> Oh dear, this is challenging to my rusty inline assembly skills :)
+> 
+> > #define GUEST_MEASURE_EVENT(_msr, _value, clflush, FEP)				\
+> > do {										\
+> > 	__asm__ __volatile__("wrmsr\n\t"					\
+> > 			     clflush "\n\t"					\
+> > 			     "mfence\n\t"					\
+> > 			     "1: mov $" __stringify(NUM_BRANCHES) ", %%ecx\n\t"	\
+> > 			     FEP "loop .\n\t"					\
+> > 			     FEP "mov %%edi, %%ecx\n\t"				\
+> > 			     FEP "xor %%eax, %%eax\n\t"				\
+> > 			     FEP "xor %%edx, %%edx\n\t"				\
+> > 			     "wrmsr\n\t"					\
+> > 			     : "+c"((int){_msr})				\
+> isn't it NUM_BRANCHES?
 
-Right.
+Nope.  It's hard to see because this doesn't provide the usage, but @_msr is an
+MSR index that is consumed by the first "wrmsr", i.e. this blob relies on the
+compiler to preload ECX, EAX, and EDX for WRMSR.  NUM_BRANCHES is manually loaded
+into ECX after WRMSR (WRMSR and LOOP both hardcode consuming ECX).
 
-This is also a path where we care *ZERO* about performance.  It's
-basically all upside to _add_ VERW and all downside (increased attack
-surface) to skip it.
+Ha!  I can actually drop the "+c" clobbering trick since ECX is restored to its
+input value before the asm blob finishes.  EDI is also loaded with _@msr so that
+it can be quickly reloaded into ECX for the WRMSR to disable the event.
+
+The purpose of doing both WRMSRs in assembly is to ensure the compiler doesn't
+insert _any_ code into the measured sequence, e.g. so that a random Jcc doesn't
+throw off instructions retired.
+
+> > 			     : "a"((uint32_t)_value), "d"(_value >> 32),	\
+> > 			       "D"(_msr)					\
+> > 	);									\
+> > } while (0)
+> >
+> 
+> do we need this label '1:' in the above code? It does not seems to be
+> used anywhere within the code.
+
+It's used by the caller as the target for CLFLUSH{,OPT}.
+
+	if (this_cpu_has(X86_FEATURE_CLFLUSHOPT))				\
+		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflushopt 1f", FEP);	\
+	else if (this_cpu_has(X86_FEATURE_CLFLUSH))				\
+		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflushopt 1f", FEP);	\
+	else									\
+		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "nop", FEP);		\
+> 
+> why is clflush needed here?
+
+As suggested by Jim, it allows verifying LLC references and misses by forcing
+the CPU to evict the cache line that holds the MOV at 1: (and likely holds most
+of the asm blob).
