@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D1B407D7ABC
-	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 04:14:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11DE87D7AE5
+	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 04:30:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233233AbjJZCON (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 22:14:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37592 "EHLO
+        id S230348AbjJZCaO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 22:30:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230409AbjJZCOJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 22:14:09 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9F0893;
-        Wed, 25 Oct 2023 19:14:07 -0700 (PDT)
+        with ESMTP id S229638AbjJZCaN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 22:30:13 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94D22D8;
+        Wed, 25 Oct 2023 19:30:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698286447; x=1729822447;
+  t=1698287411; x=1729823411;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=rJeotgt3nrNaf9y/6niWwn7vOnD7IEENGknl61i47RU=;
-  b=YK3ECjt6eEemgEO1fNUAMCUBhH66ObwmucnEPrsCzobn6xMBO6xzvQjX
-   buKpiya5kKgOqqLwd3Pgf9xkp3oHX0MPzoMWwTTJafeIsWU0pk1sYgO2T
-   bXx4/6y3VcUTJwlxRybXprlHXHCqMuCb4dhQCuWEEXK9CTMmgkmPAaRcJ
-   8Uo6CuHyWa6oJTNyhTF1fbmQstLFXS3JigeckzpiwrsQhqwXaaKKGsNy9
-   P+0ZpfQvFSAfDWa3PgQTkZpbU1muxVf5gJQUawUos7UrWx3VHv6mkQ2DO
-   xkvTM52e+mvLEt9r5EzikoiB4Lh7G87Ztg+fyticUOuM8dfFXE6lXuAPF
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="390300529"
+  bh=BN2P9oZIBpQVE+daOxwlLp98eLacdszXW6NwBh63YoA=;
+  b=kim1VtKQ+4Eo0RVWRa2cEVchd+7xEb5ARVDsTfxd+D1djtXG7g82U0Yx
+   8+/9OiclnOd6+wsaMjRkR3ZhRF3hMlNWTLmNk5gqE6oFjPV+PCrYxDc+T
+   L5PUedHCP4FNvLiOIEN789WZk/IQU1IUR9jAF9rTocR4+88XsocggBwXB
+   aKRUaeRrvRzyLD01jtdsXnMu++ymgvVIE3h7/Twb8VK/de24D9BaF/q39
+   zJ/etReeOPImswq2dNlS1HbrAqen60dqm+BVPfW+wSjJLYeZFjvwp1U8c
+   XzCgzw+jKcsjCiDt/2kL5swRWd+VSWuA1MX3K1373agoLDxPzWOk2Vlhd
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="387269388"
 X-IronPort-AV: E=Sophos;i="6.03,252,1694761200"; 
-   d="scan'208";a="390300529"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 19:14:07 -0700
+   d="scan'208";a="387269388"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 19:29:55 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="788325962"
+X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="882666548"
 X-IronPort-AV: E=Sophos;i="6.03,252,1694761200"; 
-   d="scan'208";a="788325962"
+   d="scan'208";a="882666548"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.20.184]) ([10.93.20.184])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 19:14:04 -0700
-Message-ID: <99684975-6317-4233-b87b-14ca731b335a@linux.intel.com>
-Date:   Thu, 26 Oct 2023 10:14:02 +0800
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 19:29:52 -0700
+Message-ID: <7e6105e3-0baa-45e3-bedf-9e129c1bf93d@linux.intel.com>
+Date:   Thu, 26 Oct 2023 10:29:49 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests Patch 2/5] x86: pmu: Change the minimum value of
- llc_misses event to 0
+Subject: Re: [kvm-unit-tests Patch 4/5] x86: pmu: Support validation for Intel
+ PMU fixed counter 3
 Content-Language: en-US
 To:     Jim Mattson <jmattson@google.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -55,18 +55,17 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Like Xu <like.xu.linux@gmail.com>,
         Dapeng Mi <dapeng1.mi@intel.com>
 References: <20231024075748.1675382-1-dapeng1.mi@linux.intel.com>
- <20231024075748.1675382-3-dapeng1.mi@linux.intel.com>
- <CALMp9eRqGr+5+C1OLhxv1i8Q=YVRmFxkZQJoh7HzWkPg2z=WoA@mail.gmail.com>
- <6132ba52-fdf1-4680-9e4e-5ea2fcb63b3c@linux.intel.com>
- <CALMp9eSX6OL9=9sgnKpNgRtuTV93A=G=u-5qT1_rpKFjL-dBNw@mail.gmail.com>
+ <20231024075748.1675382-5-dapeng1.mi@linux.intel.com>
+ <CALMp9eSQyyihzEz+xpB0QCZ4=WqQ9TGiSwMYiFob0D_Z7OY7mg@mail.gmail.com>
+ <305f1ee4-a8c3-48eb-9368-531329e5266e@linux.intel.com>
+ <CALMp9eT94bGZFr3sfPAssh4jJLnLe4jGosRieGVb4pK1E31b5Q@mail.gmail.com>
 From:   "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <CALMp9eSX6OL9=9sgnKpNgRtuTV93A=G=u-5qT1_rpKFjL-dBNw@mail.gmail.com>
+In-Reply-To: <CALMp9eT94bGZFr3sfPAssh4jJLnLe4jGosRieGVb4pK1E31b5Q@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -74,61 +73,57 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 10/25/2023 8:35 PM, Jim Mattson wrote:
-> On Wed, Oct 25, 2023 at 4:23 AM Mi, Dapeng <dapeng1.mi@linux.intel.com> wrote:
+On 10/25/2023 8:38 PM, Jim Mattson wrote:
+> On Wed, Oct 25, 2023 at 4:26 AM Mi, Dapeng <dapeng1.mi@linux.intel.com> wrote:
 >>
->> On 10/24/2023 9:03 PM, Jim Mattson wrote:
+>> On 10/25/2023 3:05 AM, Jim Mattson wrote:
 >>> On Tue, Oct 24, 2023 at 12:51 AM Dapeng Mi <dapeng1.mi@linux.intel.com> wrote:
->>>> Along with the CPU HW's upgrade and optimization, the count of LLC
->>>> misses event for running loop() helper could be 0 just like seen on
->>>> Sapphire Rapids.
+>>>> Intel CPUs, like Sapphire Rapids, introduces a new fixed counter
+>>>> (fixed counter 3) to counter/sample topdown.slots event, but current
+>>>> code still doesn't cover this new fixed counter.
 >>>>
->>>> So modify the lower limit of possible count range for LLC misses
->>>> events to 0 to avoid LLC misses event test failure on Sapphire Rapids.
->>> I'm not convinced that these tests are really indicative of whether or
->>> not the PMU is working properly. If 0 is allowed for llc misses, for
->>> instance, doesn't this sub-test pass even when the PMU is disabled?
->>>
->>> Surely, we can do better.
+>>>> So add code to validate this new fixed counter.
+>>> Can you explain how this "validates" anything?
 >>
->> Considering the testing workload is just a simple adding loop, it's
->> reasonable and possible that it gets a 0 result for LLC misses and
->> branch misses events. Yeah, I agree the 0 count makes the results not so
->> credible. If we want to avoid these 0 count values, we may have to
->> complicate the workload, such as adding flush cache instructions, or
->> something like that (I'm not sure if there are instructions which can
->> force branch misses). How's your idea about this?
-> CLFLUSH is probably a good way to ensure cache misses. IBPB may be a
-> good way to ensure branch mispredictions, or IBRS on parts without
-> eIBRS.
+>> I may not describe the sentence clearly. This would validate the fixed
+>> counter 3 can count the slots event and get a valid count in a
+>> reasonable range. Thanks.
+> I thought the current vPMU implementation did not actually support
+> top-down slots. If it doesn't work, how can it be validated?
 
+Ops, you reminds me, I just made a mistake, the kernel which I used 
+includes the vtopdown supporting patches, so the topdown slots is 
+supported. Since there are big arguments on the original vtopdown RFC 
+patches,  the topdown metrics feature is probably not to be supported in 
+current vPMU emulation framework, but the slots events support patches 
+(the former two patches 
+https://lore.kernel.org/all/20230927033124.1226509-1-dapeng1.mi@linux.intel.com/T/#m53883e39177eb9a0d8e23e4c382ddc6190c7f0f4 
+and 
+https://lore.kernel.org/all/20230927033124.1226509-1-dapeng1.mi@linux.intel.com/T/#m1d9c433eb6ce83b32e50f6d976fbfeee2b731fb9) 
+are still valuable and just a small piece of work and doesn't touch any 
+perf code. I'd like split these two patches into an independent patchset 
+and resend to LKML.
 
-Thanks Jim for the information. I'm not familiar with IBPB/IBRS 
-instructions, but just a glance, it looks there two instructions are 
-some kind of advanced instructions,  Not all Intel CPUs support these 
-instructions and not sure if AMD has similar instructions. It would be 
-better if there are more generic instruction to trigger branch miss. 
-Anyway I would look at the details and come back again.
-
-
+>
 >>>> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 >>>> ---
->>>>    x86/pmu.c | 2 +-
->>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>    x86/pmu.c | 3 ++-
+>>>>    1 file changed, 2 insertions(+), 1 deletion(-)
 >>>>
 >>>> diff --git a/x86/pmu.c b/x86/pmu.c
->>>> index 0def28695c70..7443fdab5c8a 100644
+>>>> index 1bebf493d4a4..41165e168d8e 100644
 >>>> --- a/x86/pmu.c
 >>>> +++ b/x86/pmu.c
->>>> @@ -35,7 +35,7 @@ struct pmu_event {
->>>>           {"instructions", 0x00c0, 10*N, 10.2*N},
->>>>           {"ref cycles", 0x013c, 1*N, 30*N},
->>>>           {"llc references", 0x4f2e, 1, 2*N},
->>>> -       {"llc misses", 0x412e, 1, 1*N},
->>>> +       {"llc misses", 0x412e, 0, 1*N},
->>>>           {"branches", 0x00c4, 1*N, 1.1*N},
->>>>           {"branch misses", 0x00c5, 0, 0.1*N},
->>>>    }, amd_gp_events[] = {
+>>>> @@ -46,7 +46,8 @@ struct pmu_event {
+>>>>    }, fixed_events[] = {
+>>>>           {"fixed 1", MSR_CORE_PERF_FIXED_CTR0, 10*N, 10.2*N},
+>>>>           {"fixed 2", MSR_CORE_PERF_FIXED_CTR0 + 1, 1*N, 30*N},
+>>>> -       {"fixed 3", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N}
+>>>> +       {"fixed 3", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N},
+>>>> +       {"fixed 4", MSR_CORE_PERF_FIXED_CTR0 + 3, 1*N, 100*N}
+>>>>    };
+>>>>
+>>>>    char *buf;
 >>>> --
 >>>> 2.34.1
 >>>>
