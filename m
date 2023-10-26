@@ -2,142 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 332BA7D890D
-	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 21:40:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 020C67D892F
+	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 21:50:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231910AbjJZTk4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Oct 2023 15:40:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56830 "EHLO
+        id S229815AbjJZTuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Oct 2023 15:50:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231397AbjJZTky (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Oct 2023 15:40:54 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B06A21B4;
-        Thu, 26 Oct 2023 12:40:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698349252; x=1729885252;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=0Nzv5LTJJEKsHmknlPaS9KY3l2lpzNkwRdh66CUbomM=;
-  b=ZnMyTh1DICXnoRMfGaqWjVd+M7sNeLrxzRtd4LdJHyXJtUJ3D0tZFbgQ
-   aJDDSRb1orcct0khHBWkeu+89HpIo8gbDs+2VDRPfGuwrFN4VuTwalF5F
-   umJ8OzIciK0zJHWTjp+jqQi+y0HV6dCYzjAulxdMedDzEJeDJcY2z+6CS
-   GQ9perKavjOnOIa1+U7qkB8+3GES8bzIRIqNkj3Db+z36E90gm5WwxlqR
-   be5p3D8ayAL0b/pj5EefmFw09oaEg93BHfdXSiHN0VpAIoQ8AmrFFGI4C
-   LCITCAPHDS3uLeiQHj/WhHjRCXJwJwLfWuKGG/+P9PUlcN2TcMkwKknYt
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10875"; a="377995506"
-X-IronPort-AV: E=Sophos;i="6.03,254,1694761200"; 
-   d="scan'208";a="377995506"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2023 12:40:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,254,1694761200"; 
-   d="scan'208";a="7399054"
-Received: from pjmartin-mobl2.amr.corp.intel.com (HELO [10.209.32.248]) ([10.209.32.248])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2023 12:40:39 -0700
-Message-ID: <ae3d993f-6ce4-42de-b9c4-ef0c7db663c0@intel.com>
-Date:   Thu, 26 Oct 2023 12:40:49 -0700
+        with ESMTP id S229668AbjJZTuL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Oct 2023 15:50:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 496CF129
+        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 12:49:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1698349762;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7Ge+RJ7YbGV1FiftUYJphvZYNXalHGufmR6iNwfI/PI=;
+        b=MtjrEFFBNM5MVDkF/zzqfU1Zqm3iOguAoHyBDmyOSAgAjsEsBLiRi16n03ukoLlbQv3ctv
+        NETe9UVWtg1yTxwGJhDa8JuQlfM1hpPCf0H14JQ8hj9mYktHcF2zhRok6tezrE6ihHFm0O
+        gDUeW6zDQSwttv7QsKww1PbOCzwkJoI=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-515-Q2r4svehOM23NOJYiUD9HQ-1; Thu, 26 Oct 2023 15:49:20 -0400
+X-MC-Unique: Q2r4svehOM23NOJYiUD9HQ-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9ae57d8b502so84182966b.2
+        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 12:49:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698349759; x=1698954559;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7Ge+RJ7YbGV1FiftUYJphvZYNXalHGufmR6iNwfI/PI=;
+        b=LpgdHJbLKZVioKpbjTV5vHqWvP55Z9ETesaa+pqZKwrq3oGhBuM506yXPcKX11EooZ
+         F0sT8MoUqAy8svtdHlvjDgXdhI3e882nMzn1w+A2VLO0Y9+rAE+ukhUUvJ0wPYxQdaBl
+         aZJPCv4QD8XrsL9TEoBs+k9vhPuZzSpVjFAIaDmR6sqXV2mT/eT+33bKBZfJvyOIX1fn
+         WZoJfuBZOGp2DkubjMqq8fkI3aaaytj1Orl7Kz8pstOjdAieeBcJhDnq/al88p5RcGLJ
+         HiTao8CNY7LMQhhZhp6I6fFcCnVY0mldK+bf2YJ1fYglQTPmuOXWlCreolTwbJCAefiM
+         YftA==
+X-Gm-Message-State: AOJu0Yzdi8vVerRBQqHVsyrTr/mYe1R1HJ3vrJ8OwjV3YyCTR7n86nnC
+        dy/ZOcV3mT+BbC8Z+C9c7vD1yTHgpTa0AGDp/8kTkNqcbu8ZvIuQGUBP0W9xv+GS6kBpwTd4F08
+        SssVLO7Z/tIeb
+X-Received: by 2002:a17:907:9620:b0:9ae:5370:81d5 with SMTP id gb32-20020a170907962000b009ae537081d5mr597034ejc.41.1698349759158;
+        Thu, 26 Oct 2023 12:49:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEUXOHkBYIfn+2pBCYONpHqii41GknD203DYooZrGXdYwVBkC1hVdFsqenoFskybh62G6EpgA==
+X-Received: by 2002:a17:907:9620:b0:9ae:5370:81d5 with SMTP id gb32-20020a170907962000b009ae537081d5mr597017ejc.41.1698349758844;
+        Thu, 26 Oct 2023 12:49:18 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:17b:37eb:8e1f:4b3b:22c7:7722])
+        by smtp.gmail.com with ESMTPSA id r24-20020a1709067fd800b0099cd008c1a4sm75668ejs.136.2023.10.26.12.49.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Oct 2023 12:49:18 -0700 (PDT)
+Date:   Thu, 26 Oct 2023 15:49:12 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, jasowang@redhat.com,
+        jgg@nvidia.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, parav@nvidia.com,
+        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
+        joao.m.martins@oracle.com, si-wei.liu@oracle.com,
+        leonro@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH V1 vfio 9/9] vfio/virtio: Introduce a vfio driver over
+ virtio devices
+Message-ID: <20231026140839-mutt-send-email-mst@kernel.org>
+References: <20231017134217.82497-1-yishaih@nvidia.com>
+ <20231017134217.82497-10-yishaih@nvidia.com>
+ <20231024135713.360c2980.alex.williamson@redhat.com>
+ <d6c720a0-1575-45b7-b96d-03a916310699@nvidia.com>
+ <20231025131328.407a60a3.alex.williamson@redhat.com>
+ <a55540a1-b61c-417b-97a5-567cfc660ce6@nvidia.com>
+ <20231026115539.72c01af9.alex.williamson@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/6] x86/entry_64: Add VERW just before userspace
- transition
-Content-Language: en-US
-To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Nikolay Borisov <nik.borisov@suse.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
-        ak@linux.intel.com, tim.c.chen@linux.intel.com,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        antonio.gomez.iglesias@linux.intel.com
-References: <20231025-delay-verw-v3-0-52663677ee35@linux.intel.com>
- <20231025-delay-verw-v3-2-52663677ee35@linux.intel.com>
- <2cda7e85-aa75-4257-864d-0092b3339e0e@suse.com>
- <20231026192950.ylzc66f3f5naqvjv@desk>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
- oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
- 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
- ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
- VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
- iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
- c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
- pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
- ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
- QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABzUVEYXZpZCBDaHJp
- c3RvcGhlciBIYW5zZW4gKEludGVsIFdvcmsgQWRkcmVzcykgPGRhdmUuaGFuc2VuQGludGVs
- LmNvbT7CwXgEEwECACIFAlQ+9J0CGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEGg1
- lTBwyZKwLZUP/0dnbhDc229u2u6WtK1s1cSd9WsflGXGagkR6liJ4um3XCfYWDHvIdkHYC1t
- MNcVHFBwmQkawxsYvgO8kXT3SaFZe4ISfB4K4CL2qp4JO+nJdlFUbZI7cz/Td9z8nHjMcWYF
- IQuTsWOLs/LBMTs+ANumibtw6UkiGVD3dfHJAOPNApjVr+M0P/lVmTeP8w0uVcd2syiaU5jB
- aht9CYATn+ytFGWZnBEEQFnqcibIaOrmoBLu2b3fKJEd8Jp7NHDSIdrvrMjYynmc6sZKUqH2
- I1qOevaa8jUg7wlLJAWGfIqnu85kkqrVOkbNbk4TPub7VOqA6qG5GCNEIv6ZY7HLYd/vAkVY
- E8Plzq/NwLAuOWxvGrOl7OPuwVeR4hBDfcrNb990MFPpjGgACzAZyjdmYoMu8j3/MAEW4P0z
- F5+EYJAOZ+z212y1pchNNauehORXgjrNKsZwxwKpPY9qb84E3O9KYpwfATsqOoQ6tTgr+1BR
- CCwP712H+E9U5HJ0iibN/CDZFVPL1bRerHziuwuQuvE0qWg0+0SChFe9oq0KAwEkVs6ZDMB2
- P16MieEEQ6StQRlvy2YBv80L1TMl3T90Bo1UUn6ARXEpcbFE0/aORH/jEXcRteb+vuik5UGY
- 5TsyLYdPur3TXm7XDBdmmyQVJjnJKYK9AQxj95KlXLVO38lczsFNBFRjzmoBEACyAxbvUEhd
- GDGNg0JhDdezyTdN8C9BFsdxyTLnSH31NRiyp1QtuxvcqGZjb2trDVuCbIzRrgMZLVgo3upr
- MIOx1CXEgmn23Zhh0EpdVHM8IKx9Z7V0r+rrpRWFE8/wQZngKYVi49PGoZj50ZEifEJ5qn/H
- Nsp2+Y+bTUjDdgWMATg9DiFMyv8fvoqgNsNyrrZTnSgoLzdxr89FGHZCoSoAK8gfgFHuO54B
- lI8QOfPDG9WDPJ66HCodjTlBEr/Cwq6GruxS5i2Y33YVqxvFvDa1tUtl+iJ2SWKS9kCai2DR
- 3BwVONJEYSDQaven/EHMlY1q8Vln3lGPsS11vSUK3QcNJjmrgYxH5KsVsf6PNRj9mp8Z1kIG
- qjRx08+nnyStWC0gZH6NrYyS9rpqH3j+hA2WcI7De51L4Rv9pFwzp161mvtc6eC/GxaiUGuH
- BNAVP0PY0fqvIC68p3rLIAW3f97uv4ce2RSQ7LbsPsimOeCo/5vgS6YQsj83E+AipPr09Caj
- 0hloj+hFoqiticNpmsxdWKoOsV0PftcQvBCCYuhKbZV9s5hjt9qn8CE86A5g5KqDf83Fxqm/
- vXKgHNFHE5zgXGZnrmaf6resQzbvJHO0Fb0CcIohzrpPaL3YepcLDoCCgElGMGQjdCcSQ+Ci
- FCRl0Bvyj1YZUql+ZkptgGjikQARAQABwsFfBBgBAgAJBQJUY85qAhsMAAoJEGg1lTBwyZKw
- l4IQAIKHs/9po4spZDFyfDjunimEhVHqlUt7ggR1Hsl/tkvTSze8pI1P6dGp2XW6AnH1iayn
- yRcoyT0ZJ+Zmm4xAH1zqKjWplzqdb/dO28qk0bPso8+1oPO8oDhLm1+tY+cOvufXkBTm+whm
- +AyNTjaCRt6aSMnA/QHVGSJ8grrTJCoACVNhnXg/R0g90g8iV8Q+IBZyDkG0tBThaDdw1B2l
- asInUTeb9EiVfL/Zjdg5VWiF9LL7iS+9hTeVdR09vThQ/DhVbCNxVk+DtyBHsjOKifrVsYep
- WpRGBIAu3bK8eXtyvrw1igWTNs2wazJ71+0z2jMzbclKAyRHKU9JdN6Hkkgr2nPb561yjcB8
- sIq1pFXKyO+nKy6SZYxOvHxCcjk2fkw6UmPU6/j/nQlj2lfOAgNVKuDLothIxzi8pndB8Jju
- KktE5HJqUUMXePkAYIxEQ0mMc8Po7tuXdejgPMwgP7x65xtfEqI0RuzbUioFltsp1jUaRwQZ
- MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
- hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
- vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20231026192950.ylzc66f3f5naqvjv@desk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231026115539.72c01af9.alex.williamson@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/26/23 12:29, Pawan Gupta wrote:
-> On Thu, Oct 26, 2023 at 07:25:27PM +0300, Nikolay Borisov wrote:
->> On 25.10.23 г. 23:52 ч., Pawan Gupta wrote:
->>> @@ -1520,6 +1530,7 @@ SYM_CODE_START(ignore_sysret)
->>>   	UNWIND_HINT_END_OF_STACK
->>>   	ENDBR
->>>   	mov	$-ENOSYS, %eax
->>> +	CLEAR_CPU_BUFFERS
->> nit: Just out of curiosity is it really needed in this case or it's doesn
->> for the sake of uniformity so that all ring3 transitions are indeed
->> covered??
-> Interrupts returning to kernel don't clear the CPU buffers. I believe
-> interrupts will be enabled here, and getting an interrupt here could
-> leak the data that interrupt touched.
+On Thu, Oct 26, 2023 at 11:55:39AM -0600, Alex Williamson wrote:
+> On Thu, 26 Oct 2023 15:08:12 +0300
+> Yishai Hadas <yishaih@nvidia.com> wrote:
+> 
+> > On 25/10/2023 22:13, Alex Williamson wrote:
+> > > On Wed, 25 Oct 2023 17:35:51 +0300
+> > > Yishai Hadas <yishaih@nvidia.com> wrote:
+> > >  
+> > >> On 24/10/2023 22:57, Alex Williamson wrote:  
+> > >>> On Tue, 17 Oct 2023 16:42:17 +0300
+> > >>> Yishai Hadas <yishaih@nvidia.com> wrote:
+>    
+> > >>>> +		if (copy_to_user(buf + copy_offset, &val32, copy_count))
+> > >>>> +			return -EFAULT;
+> > >>>> +	}
+> > >>>> +
+> > >>>> +	if (range_intersect_range(pos, count, PCI_SUBSYSTEM_ID, sizeof(val16),
+> > >>>> +				  &copy_offset, &copy_count, NULL)) {
+> > >>>> +		/*
+> > >>>> +		 * Transitional devices use the PCI subsystem device id as
+> > >>>> +		 * virtio device id, same as legacy driver always did.  
+> > >>> Where did we require the subsystem vendor ID to be 0x1af4?  This
+> > >>> subsystem device ID really only makes since given that subsystem
+> > >>> vendor ID, right?  Otherwise I don't see that non-transitional devices,
+> > >>> such as the VF, have a hard requirement per the spec for the subsystem
+> > >>> vendor ID.
+> > >>>
+> > >>> Do we want to make this only probe the correct subsystem vendor ID or do
+> > >>> we want to emulate the subsystem vendor ID as well?  I don't see this is
+> > >>> correct without one of those options.  
+> > >> Looking in the 1.x spec we can see the below.
+> > >>
+> > >> Legacy Interfaces: A Note on PCI Device Discovery
+> > >>
+> > >> "Transitional devices MUST have the PCI Subsystem
+> > >> Device ID matching the Virtio Device ID, as indicated in section 5 ...
+> > >> This is to match legacy drivers."
+> > >>
+> > >> However, there is no need to enforce Subsystem Vendor ID.
+> > >>
+> > >> This is what we followed here.
+> > >>
+> > >> Makes sense ?  
+> > > So do I understand correctly that virtio dictates the subsystem device
+> > > ID for all subsystem vendor IDs that implement a legacy virtio
+> > > interface?  Ok, but this device didn't actually implement a legacy
+> > > virtio interface.  The device itself is not tranistional, we're imposing
+> > > an emulated transitional interface onto it.  So did the subsystem vendor
+> > > agree to have their subsystem device ID managed by the virtio committee
+> > > or might we create conflicts?  I imagine we know we don't have a
+> > > conflict if we also virtualize the subsystem vendor ID.
+> > >  
+> > The non transitional net device in the virtio spec defined as the below 
+> > tuple.
+> > T_A: VID=0x1AF4, DID=0x1040, Subsys_VID=FOO, Subsys_DID=0x40.
+> > 
+> > And transitional net device in the virtio spec for a vendor FOO is 
+> > defined as:
+> > T_B: VID=0x1AF4,DID=0x1000,Subsys_VID=FOO, subsys_DID=0x1
+> > 
+> > This driver is converting T_A to T_B, which both are defined by the 
+> > virtio spec.
+> > Hence, it does not conflict for the subsystem vendor, it is fine.
+> 
+> Surprising to me that the virtio spec dictates subsystem device ID in
+> all cases.
 
-Specifically NMIs, right?
+Modern virtio spec doesn't. Legacy spec did.
 
-X86_EFLAGS_IF should be clear here.
+-- 
+MST
+
