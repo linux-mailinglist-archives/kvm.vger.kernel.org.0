@@ -2,153 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F06677D7B46
-	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 05:32:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE0627D7B52
+	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 05:41:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231652AbjJZDcj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 23:32:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59274 "EHLO
+        id S229705AbjJZDlp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 23:41:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229596AbjJZDci (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 23:32:38 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8D3EA3;
-        Wed, 25 Oct 2023 20:32:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698291156; x=1729827156;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=j0Fz8CzB06Dw8BJlqfX5Ul19OnFcKlSskxt2P3MS9M8=;
-  b=WtxMPDhV5kM7LIgdkxP/zHJX1NuY8lnNkN2ZOsAEWYNS5HWbdt6wJBAL
-   DO/bjR24ZPMDeoMqJBa/fClgPZul66L8S3hjoL5nwrDNKeWGnvKP3mPki
-   FhtLPCzH2oLsX0QXnfBoncH9hYCp2lmemBvIBEwa9mAtrqXiIjE6RWZ7G
-   vO/zogzHFgAW9iVPhf4oBimxd74l6jCNJ0/EU1TBZDnDy95i0JK6wuP1C
-   ZuzldNyoB9S9OACT0AnlMi/DLHXUFjeC+SaD0Eu5k7X75oFbFrUYsHUYR
-   LR/2Mx6hC5hPpvEbnss3NWbcpK+GW9ZGUGsSibvUv7hcotnZbDIFmCvZK
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="366800559"
-X-IronPort-AV: E=Sophos;i="6.03,252,1694761200"; 
-   d="scan'208";a="366800559"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 20:32:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="759059876"
-X-IronPort-AV: E=Sophos;i="6.03,252,1694761200"; 
-   d="scan'208";a="759059876"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.20.184]) ([10.93.20.184])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 20:32:33 -0700
-Message-ID: <719318df-dc19-4f4c-88ff-5c69377f713c@linux.intel.com>
-Date:   Thu, 26 Oct 2023 11:32:30 +0800
+        with ESMTP id S229554AbjJZDlm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 23:41:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14ECC189
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 20:40:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1698291654;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=lhkxc6ETah/XZ32WLeYNVGRCbB3KV39jeRBoHfU3kg4=;
+        b=Fx2lfsVk7aqA85MY7FRScXkuPrGzpqr6HcP5Y7KhHnWKh6XBNciAQRVKcIIo1xyTs3AJKh
+        TvISBXV3feZNPKV2m9UKTKjo4BZF3KvIVEF7YT26zGeVbh4x/XIfL0QtAvFnEdEyDuOFy9
+        lspwaUiIWK+dliHpP4LE/BpUvYG1ojE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-492-J43d35xXNTOFhmOY9ni3Vw-1; Wed, 25 Oct 2023 23:40:48 -0400
+X-MC-Unique: J43d35xXNTOFhmOY9ni3Vw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A36B9802891;
+        Thu, 26 Oct 2023 03:40:47 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 91EB0502A;
+        Thu, 26 Oct 2023 03:40:47 +0000 (UTC)
+From:   Shaoqin Huang <shahuang@redhat.com>
+To:     andrew.jones@linux.dev, kvmarm@lists.linux.dev
+Cc:     Shaoqin Huang <shahuang@redhat.com>,
+        Nikos Nikoleris <nikos.nikoleris@arm.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Ricardo Koller <ricarkol@google.com>,
+        Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v1] configure: arm64: Add support for dirty-ring in migration
+Date:   Wed, 25 Oct 2023 23:40:42 -0400
+Message-Id: <20231026034042.812006-1-shahuang@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests Patch 0/5] Fix PMU test failures on Sapphire
- Rapids
-Content-Language: en-US
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>
-References: <20231024075748.1675382-1-dapeng1.mi@linux.intel.com>
- <ZTmo9IVM2Tq6ZSrn@google.com>
-From:   "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <ZTmo9IVM2Tq6ZSrn@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/26/2023 7:47 AM, Mingwei Zhang wrote:
-> On Tue, Oct 24, 2023, Dapeng Mi wrote:
->> When running pmu test on Intel Sapphire Rapids, we found several
->> failures are encountered, such as "llc misses" failure, "all counters"
->> failure and "fixed counter 3" failure.
-> hmm, I have tested your series on a SPR machine. It looks like, all "llc
-> misses" already pass on my side. "all counters" always fail with/without
-> your patches. "fixed counter 3" never exists... I have "fixed
-> cntr-{0,1,2}" and "fixed-{0,1,2}"
+Add a new configure option "--dirty-ring-size" to support dirty-ring
+migration on arm64. By default, the dirty-ring is disabled, we can
+enable it by:
 
-1. "LLC misses" failure
+  # ./configure --dirty-ring-size=65536
 
-Yeah, the "LLC misses" failure is not always seen. I can see the "LLC  
-misses" 2 ~3 times out of 10 runs of PMU standalone test and you could 
-see the failure with higher possibility if you run the full 
-kvm-unit-tests. I think whether you can see the "LLC misses" failure it 
-really depends on current cache status on your system, how much cache 
-memory are consumed by other programs. If there are lots of free cache 
-lines on system when running the pmu test, you may have higher 
-possibility to see the LLC misses failures just like what I see below.
+This will generate one more entry in config.mak, it will look like:
 
-PASS: Intel: llc references-7
-*FAIL*: Intel: llc misses-0
-PASS: Intel: llc misses-1
-PASS: Intel: llc misses-2
+  # cat config.mak
+    :
+  ACCEL=kvm,dirty-ring-size=65536
 
-2. "all counters" failure
+With this configure option, user can easy enable dirty-ring and specify
+dirty-ring-size to test the dirty-ring in migration.
 
-Actually the "all counters" failure are not always seen, but it doesn't 
-mean current code is correct. In current code, the length of "cnt[10]" 
-array in check_counters_many() is defined as 10, but there are at least 
-11 counters supported (8 GP counters + 3 fixed counters) on SPR even 
-though fixed counter 3 is not supported in current upstream code. 
-Obviously there would be out of range memory access in 
-check_counters_many().
+Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+---
+ configure | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
->
-> You may want to double check the requirements of your series. Not just
-> under your setting without explainning those setting in detail.
->
-> Maybe what I am missing is your topdown series? So, before your topdown
-> series checked in. I don't see value in this series.
+diff --git a/configure b/configure
+index 6ee9b27..54ce38a 100755
+--- a/configure
++++ b/configure
+@@ -32,6 +32,7 @@ enable_dump=no
+ page_size=
+ earlycon=
+ efi=
++dirty_ring_size=
+ 
+ # Enable -Werror by default for git repositories only (i.e. developer builds)
+ if [ -e "$srcdir"/.git ]; then
+@@ -89,6 +90,9 @@ usage() {
+ 	    --[enable|disable]-efi Boot and run from UEFI (disabled by default, x86_64 and arm64 only)
+ 	    --[enable|disable]-werror
+ 	                           Select whether to compile with the -Werror compiler flag
++	    --dirty-ring-size=SIZE
++                             Specify the dirty-ring size and enable dirty-ring for
++                             migration(disable dirty-ring by default, arm64 only)
+ EOF
+     exit 1
+ }
+@@ -174,6 +178,9 @@ while [[ "$1" = -* ]]; do
+ 	--disable-werror)
+ 	    werror=
+ 	    ;;
++	--dirty-ring-size)
++	    dirty_ring_size="$arg"
++	    ;;
+ 	--help)
+ 	    usage
+ 	    ;;
+@@ -213,6 +220,27 @@ if [ "$efi" ] && [ "$arch" != "x86_64" ] && [ "$arch" != "arm64" ]; then
+     usage
+ fi
+ 
++if [ "$dirty_ring_size" ]; then
++    if [ "$arch" != "arm64" ]; then
++        echo "--dirty-ring-size is not supported for $arch"
++        usage
++    fi
++    _size=$dirty_ring_size
++    if [ ! "${_size//[0-9]}" ]; then
++        if (( _size < 1024 )); then
++            echo "--dirty-ring-size suggest minimum value is 1024"
++            usage
++        fi
++        if (( _size & (_size - 1) )); then
++            echo "--dirty-ring-size must be a power of two"
++            usage
++        fi
++    else
++        echo "--dirty-ring-size must be positive number and a power of two"
++        usage
++    fi
++fi
++
+ if [ -z "$page_size" ]; then
+     if [ "$efi" = 'y' ] && [ "$arch" = "arm64" ]; then
+         page_size="4096"
+@@ -419,6 +447,9 @@ EOF
+ if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+     echo "TARGET=$target" >> config.mak
+ fi
++if [ "$arch" = "arm64" ] && [ "$dirty_ring_size" ]; then
++    echo "ACCEL=kvm,dirty-ring-size=$dirty_ring_size" >> config.mak
++fi
+ 
+ cat <<EOF > lib/config.h
+ #ifndef _CONFIG_H_
+-- 
+2.40.1
 
-3. "fixed counter 3" failure
-
-Yeah, I just realized I used the kernel which includes the vtopdown 
-supporting patches after Jim's reminding. As the reply for Jim's 
-comments says, the patches for support slots event are still valuable 
-for current emulation framework and I would split them from the original 
-vtopdown patchset and resend them as an independent patchset. Anyway, 
-even though there is not slots event support in Kernel, it only impacts 
-the patch 4/5, other patches are still valuable.
-
-
->
-> Thanks.
-> -Mingwei
->> Intel Sapphire Rapids introduces new fixed counter 3, total PMU counters
->> including GP and fixed counters increase to 12 and also optimizes cache
->> subsystem. All these changes make the original assumptions in pmu test
->> unavailable any more on Sapphire Rapids. Patches 2-4 fixes these
->> failures, patch 0 remove the duplicate code and patch 5 adds assert to
->> ensure predefine fixed events are matched with HW fixed counters.
->>
->> Dapeng Mi (4):
->>    x86: pmu: Change the minimum value of llc_misses event to 0
->>    x86: pmu: Enlarge cnt array length to 64 in check_counters_many()
->>    x86: pmu: Support validation for Intel PMU fixed counter 3
->>    x86: pmu: Add asserts to warn inconsistent fixed events and counters
->>
->> Xiong Zhang (1):
->>    x86: pmu: Remove duplicate code in pmu_init()
->>
->>   lib/x86/pmu.c |  5 -----
->>   x86/pmu.c     | 17 ++++++++++++-----
->>   2 files changed, 12 insertions(+), 10 deletions(-)
->>
->>
->> base-commit: bfe5d7d0e14c8199d134df84d6ae8487a9772c48
->> -- 
->> 2.34.1
->>
