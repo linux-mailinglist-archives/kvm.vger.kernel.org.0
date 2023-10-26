@@ -2,235 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BFBC27D7C88
-	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 07:52:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EC2B7D7C99
+	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 07:55:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233233AbjJZFwz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Oct 2023 01:52:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49942 "EHLO
+        id S1344043AbjJZFzt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Oct 2023 01:55:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229638AbjJZFwy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Oct 2023 01:52:54 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB560115
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 22:52:49 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2c59a4dd14cso6922491fa.2
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 22:52:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698299568; x=1698904368; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Blus2E8MXTIU3zWcw+upkP+KG6Xw5pB0t5mXlT/gwLU=;
-        b=Qei/ZZ7t0ftOqQDswhNFoAp/o7k2J5DZKnpUjkzKef2SFvuuH94DaTv93QCdBdezP+
-         E4yW6h6yEwq2rnCwX2vdlfaC7epPJ9DBH1YKHzzQRZs7ttm95LfRijSWTvPBi3PI+bXy
-         p7o66gFBpYNSVT7Sk7kPHnggSg4xXsTHoyU/j4pqnoKNQk//nVS2YyFgOzMmjC8QgtDH
-         bHihNiGTeZ0D8d+aL83IoyvyOcBaOcBwxsooCdUdcUAu2N1SUifjkrz8t0v13ZGnEdCi
-         OpyIAnfnFQOdrFHGpEhpPfcJEe2itZ+s/Q05fM0py1ePtzs+ldF0ka1Th2BQbTAK6OAA
-         auJg==
+        with ESMTP id S230385AbjJZFzr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Oct 2023 01:55:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64852137
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 22:55:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1698299703;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Cjg6DeVHVHA93PGNMB0fOahjVGtCb1cn+p/l3CnIPTk=;
+        b=BPdD29I4/53IG6WPmyYPnClukfFB/E5MvSq55neTTuXk3uKJXT7tWb5FACjSM/75aG3R6O
+        r9iZufqaTn21tC85xOUBYa8BMykCh03IFIicz7tCLzp/BLh8qDZZ6ic3kZBbHTOhhBCh4q
+        iHSHletEAPuPhMOTAdnpinze5iZsy2g=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-371-8vdqlEEEPa6L-ocpP4bMoQ-1; Thu, 26 Oct 2023 01:55:00 -0400
+X-MC-Unique: 8vdqlEEEPa6L-ocpP4bMoQ-1
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-694d7f694a4so164244b3a.0
+        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 22:55:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698299568; x=1698904368;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=1e100.net; s=20230601; t=1698299699; x=1698904499;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Blus2E8MXTIU3zWcw+upkP+KG6Xw5pB0t5mXlT/gwLU=;
-        b=uN7jVZM6sutwZAQsMhEmos4LRiUICx99QdanlLw6h+Y94+oURxtvgIIRc7TvMYvA+4
-         xNR0ahmtaSPPqM5rYiQPfgG2AjScwYhhGORNDyOiLYGsb7QbLWNx1T4xftGZCDNe+1pN
-         MIyyBgnmIJCE5x5SjgYU2CAEWzNSPTixHxY2v+uAqHkghmAcPto9y+gbyHTZGXg3n97Y
-         lVBtbWnd+/NpDpGEF0uD9EDfdyGA9z5EUPz2NcX7FcLAphNm3mDOTH5oGPPs1akfZw8T
-         Xj3T/+2djO+n8e0KDiLODkdUbGoP7UU2G76bw1UAZ7mPVmNqOFpBwG013ObN3R0lS9Ou
-         bd1Q==
-X-Gm-Message-State: AOJu0YxN4lzm7ZuMJtOU85C2FlIHQotTk6XcFUSrH9krYbHnviOP7vcg
-        UqlIMK+LqHPMIPaBI6o5D02ieg==
-X-Google-Smtp-Source: AGHT+IGF8aTwjtsUMEqjRxbYFSfypaf74fyCg1NLwA+TH4Xd7SyLRTwSAW3uGtRI2Hotypp1x3c/Ww==
-X-Received: by 2002:a2e:9812:0:b0:2bd:102c:4161 with SMTP id a18-20020a2e9812000000b002bd102c4161mr13652384ljj.43.1698299567693;
-        Wed, 25 Oct 2023 22:52:47 -0700 (PDT)
-Received: from [192.168.69.115] (aif79-h01-176-172-114-150.dsl.sta.abo.bbox.fr. [176.172.114.150])
-        by smtp.gmail.com with ESMTPSA id m17-20020a056000009100b0032d829e10c0sm13514117wrx.28.2023.10.25.22.52.46
+        bh=Cjg6DeVHVHA93PGNMB0fOahjVGtCb1cn+p/l3CnIPTk=;
+        b=eqKPgSWYG+A//rXkDRE9Qe6LXYy0IcD0lLa+Gvx7EZvoIxH2RA7Plk9cMlO7hkwuEh
+         YPVuVqPqt5KBNyXQp4qt9EO2vtobpi5dY8Vb6gBzmw8cFp887D/ZFcVRkeTceGEoAQsE
+         JKutSsWTpj/hJIvpvMYzu/F0RgREPRdP5exEwFvh4Gwx9Xj4+1DXjsxC6o41Z83nzBpi
+         0/O6C142mAlXpvWWCCtkK+PWiKYXF2W68agpW9R1eu6B2YLu8gCvFbiV4mhJ9DR3bxPS
+         gsQ6r9p7B4Yu0BotyawWc187a3Z6T9HtgxhLkvIPH1S8GpMHD1UbDmSkoXnK8jdH60qY
+         mPsA==
+X-Gm-Message-State: AOJu0YyJb2oar+p82Z/S5dYSquVQ7EZBwp3A3rG+LiXlxGHuv2sCObYd
+        2tnDO7v18JnA6QLf2OCw3M0E7lQpn7vIYMU+2gjSu09UHhybgW54tkhNPaCtE3TzDU0zlACC2bX
+        mHlcrG3OpAh89
+X-Received: by 2002:a05:6a20:c188:b0:15a:2c0b:6c81 with SMTP id bg8-20020a056a20c18800b0015a2c0b6c81mr20697456pzb.3.1698299699294;
+        Wed, 25 Oct 2023 22:54:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFZIE9oSBGnpBc+/dOEbUzvR6MHa5tqGFrzsXG6ZL6CNPU7Mv41W8vbMDxYflPpTKr3D98sTg==
+X-Received: by 2002:a05:6a20:c188:b0:15a:2c0b:6c81 with SMTP id bg8-20020a056a20c18800b0015a2c0b6c81mr20697446pzb.3.1698299698974;
+        Wed, 25 Oct 2023 22:54:58 -0700 (PDT)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id iy10-20020a170903130a00b001c613091aeesm10171465plb.293.2023.10.25.22.54.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Oct 2023 22:52:47 -0700 (PDT)
-Message-ID: <78ddc3c3-6cfa-b48c-5d73-903adec6ac4a@linaro.org>
-Date:   Thu, 26 Oct 2023 07:52:45 +0200
+        Wed, 25 Oct 2023 22:54:58 -0700 (PDT)
+Message-ID: <9052ed87-e5cf-4d89-b480-54da4d8216c7@redhat.com>
+Date:   Thu, 26 Oct 2023 13:54:55 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH] target/i386/kvm: call kvm_put_vcpu_events() before
- kvm_put_nested_state()
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [kvm-unit-tests PATCH v1] configure: arm64: Add support for
+ dirty-ring in migration
 Content-Language: en-US
-To:     Eiichi Tsukata <eiichi.tsukata@nutanix.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20231026054201.87845-1-eiichi.tsukata@nutanix.com>
- <D761458A-9296-492B-85B9-F196C7D11CDA@nutanix.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <D761458A-9296-492B-85B9-F196C7D11CDA@nutanix.com>
+To:     Thomas Huth <thuth@redhat.com>, andrew.jones@linux.dev,
+        kvmarm@lists.linux.dev
+Cc:     Nikos Nikoleris <nikos.nikoleris@arm.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org
+References: <20231026034042.812006-1-shahuang@redhat.com>
+ <e318cd46-b871-448a-b95a-01647d8afc43@redhat.com>
+From:   Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <e318cd46-b871-448a-b95a-01647d8afc43@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Cc'ing Vitaly.
 
-On 26/10/23 07:49, Eiichi Tsukata wrote:
-> Hi all,
-> 
-> Here is additional details on the issue.
-> 
-> We've found this issue when testing Windows Virtual Secure Mode (VSM) VMs.
-> We sometimes saw live migration failures of VSM-enabled VMs. It turned
-> out that the issue happens during live migration when VMs change boot related
-> EFI variables (ex: BootOrder, Boot0001).
-> After some debugging, I've found the race I mentioned in the commit message.
-> 
-> Symptom
-> =======
-> 
-> When it happnes with the latest Qemu which has commit https://github.com/qemu/qemu/commit/7191f24c7fcfbc1216d09
-> Qemu shows the following error message on destination.
-> 
->    qemu-system-x86_64: Failed to put registers after init: Invalid argument
-> 
-> If it happens with older Qemu which doesn't have the commit, then we see  CPU dump something like this:
-> 
->    KVM internal error. Suberror: 3
->    extra data[0]: 0x0000000080000b0e
->    extra data[1]: 0x0000000000000031
->    extra data[2]: 0x0000000000000683
->    extra data[3]: 0x000000007f809000
->    extra data[4]: 0x0000000000000026
->    RAX=0000000000000000 RBX=0000000000000000 RCX=0000000000000000 RDX=0000000000000f61
->    RSI=0000000000000000 RDI=0000000000000000 RBP=0000000000000000 RSP=0000000000000000
->    R8 =0000000000000000 R9 =0000000000000000 R10=0000000000000000 R11=0000000000000000
->    R12=0000000000000000 R13=0000000000000000 R14=0000000000000000 R15=0000000000000000
->    RIP=000000000000fff0 RFL=00010002 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=0
->    ES =0020 0000000000000000 ffffffff 00c09300 DPL=0 DS   [-WA]
->    CS =0038 0000000000000000 ffffffff 00a09b00 DPL=0 CS64 [-RA]
->    SS =0020 0000000000000000 ffffffff 00c09300 DPL=0 DS   [-WA]
->    DS =0020 0000000000000000 ffffffff 00c09300 DPL=0 DS   [-WA]
->    FS =0020 0000000000000000 ffffffff 00c09300 DPL=0 DS   [-WA]
->    GS =0020 0000000000000000 ffffffff 00c09300 DPL=0 DS   [-WA]
->    LDT=0000 0000000000000000 ffffffff 00c00000
->    TR =0040 000000007f7df050 00068fff 00808b00 DPL=0 TSS64-busy
->    GDT=     000000007f7df000 0000004f
->    IDT=     000000007f836000 000001ff
->    CR0=80010033 CR2=000000000000fff0 CR3=000000007f809000 CR4=00000668
->    DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000 DR3=0000000000000000    DR6=00000000ffff0ff0 DR7=0000000000000400
->    EFER=0000000000000d00
->    Code=?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? <??> ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ??
-> 
-> In the above dump, CR3 is pointing to SMRAM region though SMM=0.
-> 
-> Repro
-> =====
-> 
-> Repro step is pretty simple.
-> 
-> * Run SMM enabled Linux guest with secure boot enabled OVMF.
-> * Run the following script in the guest.
-> 
->    /usr/libexec/qemu-kvm &
->    while true
->    do
->      efibootmgr -n 1
->    done
-> 
-> * Do live migration
-> 
-> On my environment, live migration fails in 20%.
-> 
-> VMX specific
-> ============
-> 
-> This issue is VMX sepcific and SVM is not affected as the validation
-> in svm_set_nested_state() is a bit different from VMX one.
-> 
-> VMX:
-> 
->    static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->                                    struct kvm_nested_state __user *user_kvm_nested_state,
->                                    struct kvm_nested_state *kvm_state)
->    {
->    ..           /*             * SMM temporarily disables VMX, so we cannot be in guest mode,
->           * nor can VMLAUNCH/VMRESUME be pending.  Outside SMM, SMM flags
->           * must be zero.
->           */           if (is_smm(vcpu) ?
->                  (kvm_state->flags &
->                   (KVM_STATE_NESTED_GUEST_MODE | KVM_STATE_NESTED_RUN_PENDING))
->                  : kvm_state->hdr.vmx.smm.flags)
->                  return -EINVAL;
->    ..
-> 
-> SVM:
-> 
->    static int svm_set_nested_state(struct kvm_vcpu *vcpu,
->                                    struct kvm_nested_state __user *user_kvm_nested_state,
->                                    struct kvm_nested_state *kvm_state)
->    {
->    ..           /* SMM temporarily disables SVM, so we cannot be in guest mode.  */           if (is_smm(vcpu) && (kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE))
->                  return -EINVAL;
->    ..
-> 
-> Thanks,
-> 
-> Eiichi
-> 
->> On Oct 26, 2023, at 14:42, Eiichi Tsukata <eiichi.tsukata@nutanix.com> wrote:
+
+On 10/26/23 13:12, Thomas Huth wrote:
+> On 26/10/2023 05.40, Shaoqin Huang wrote:
+>> Add a new configure option "--dirty-ring-size" to support dirty-ring
+>> migration on arm64. By default, the dirty-ring is disabled, we can
+>> enable it by:
 >>
->> kvm_put_vcpu_events() needs to be called before kvm_put_nested_state()
->> because vCPU's hflag is referred in KVM vmx_get_nested_state()
->> validation. Otherwise kvm_put_nested_state() can fail with -EINVAL when
->> a vCPU is in VMX operation and enters SMM mode. This leads to live
->> migration failure.
+>>    # ./configure --dirty-ring-size=65536
 >>
->> Signed-off-by: Eiichi Tsukata <eiichi.tsukata@nutanix.com>
->> ---
->> target/i386/kvm/kvm.c | 13 +++++++++----
->> 1 file changed, 9 insertions(+), 4 deletions(-)
+>> This will generate one more entry in config.mak, it will look like:
 >>
->> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
->> index e7c054cc16..cd635c9142 100644
->> --- a/target/i386/kvm/kvm.c
->> +++ b/target/i386/kvm/kvm.c
->> @@ -4741,6 +4741,15 @@ int kvm_arch_put_registers(CPUState *cpu, int level)
->>          return ret;
->>      }
+>>    # cat config.mak
+>>      :
+>>    ACCEL=kvm,dirty-ring-size=65536
 >>
->> +    /*
->> +     * must be before kvm_put_nested_state so that HF_SMM_MASK is set during
->> +     * SMM.
->> +     */
->> +    ret = kvm_put_vcpu_events(x86_cpu, level);
->> +    if (ret < 0) {
->> +        return ret;
->> +    }
->> +
->>      if (level >= KVM_PUT_RESET_STATE) {
->>          ret = kvm_put_nested_state(x86_cpu);
->>          if (ret < 0) {
->> @@ -4787,10 +4796,6 @@ int kvm_arch_put_registers(CPUState *cpu, int level)
->>      if (ret < 0) {
->>          return ret;
->>      }
->> -    ret = kvm_put_vcpu_events(x86_cpu, level);
->> -    if (ret < 0) {
->> -        return ret;
->> -    }
->>      if (level >= KVM_PUT_RESET_STATE) {
->>          ret = kvm_put_mp_state(x86_cpu);
->>          if (ret < 0) {
->> -- 
->> 2.41.0
->>
+>> With this configure option, user can easy enable dirty-ring and specify
+>> dirty-ring-size to test the dirty-ring in migration.
 > 
+> Do we really need a separate configure switch for this? If it is just 
+> about setting a value in the ACCEL variable, you can also run the tests 
+> like this:
 > 
+> ACCEL=kvm,dirty-ring-size=65536 ./run_tests.sh
+> 
+>   Thomas
+> 
+
+Hi Thomas,
+
+You're right. We can do it by simply set the ACCEL when execute 
+./run_tests.sh. I think maybe add a configure can make auto test to set 
+the dirty-ring easier? but I'm not 100% sure it will benefit to them.
+
+Thanks,
+Shaoqin
+
+-- 
+Shaoqin
 
