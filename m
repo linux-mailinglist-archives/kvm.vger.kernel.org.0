@@ -2,47 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AC317D8788
-	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 19:26:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6743A7D87A5
+	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 19:40:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344767AbjJZR0e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Oct 2023 13:26:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41606 "EHLO
+        id S231777AbjJZRki (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Oct 2023 13:40:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231474AbjJZR0c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Oct 2023 13:26:32 -0400
+        with ESMTP id S229649AbjJZRkg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Oct 2023 13:40:36 -0400
 Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 466A51AA;
-        Thu, 26 Oct 2023 10:26:30 -0700 (PDT)
-Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAAD010E;
+        Thu, 26 Oct 2023 10:40:33 -0700 (PDT)
+Received: from [192.168.7.187] ([76.103.185.250])
         (authenticated bits=0)
-        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 39QHPUFh208880
-        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-        Thu, 26 Oct 2023 10:25:36 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 39QHPUFh208880
+        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 39QHe3dG212792
+        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+        Thu, 26 Oct 2023 10:40:03 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 39QHe3dG212792
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-        s=2023101201; t=1698341136;
-        bh=+soeWjokAr6koOw8jyJylom0FYuC2ojwR4+8JV/w0LI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Z9ptqjsxSG9IJBXK8ZGLXnoYLH5EsFkaEtTEDnZBkPUMQE+iklr378FIZTTW0FxtY
-         d+WHwmY9RaBfpDXvIg3nwaNl8BluvrtqV+CjSXsI3TzHHVh/Kzxm6a/CR7BMv4LDYL
-         KEcAaZ6Zd27ujUscR9VKX3mLVfgtjUZIaA5UHRszKuxN2ICZaOebt43h1y/1KHxgyh
-         xuqOvDbNlu+9ql99/+P0VI6AhibHK917u0uHZLDGVs9Xf8DU1a7+Wqp27fxzSwF4/O
-         2EpYgRwpJbHsFdETRID+HHrabBVzplsQG7b7N7jpoSvnrIscthA76lBjbNqgZLzoYF
-         JpCvvh3CSPDlw==
-From:   "Xin Li (Intel)" <xin@zytor.com>
+        s=2023101201; t=1698342004;
+        bh=FNrhIteOWF3uJmsFb5bV5Sso1fDVYo8hPurD9rN2UVM=;
+        h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+        b=ErmBckXkZ6inBpQvtx4DBIj4iFWob5bH+lyHcr67GRC4DsIkHhmKaQzO7AYSTNWiY
+         xsex/odsaEXYW3TzeKZiYySvtbtOH3rO6dCjpDMFKFszkEP7y0kmJrt5efnqTBt9PM
+         cFwaVh6i64KfXEd/OB9aT1QDgzNb2eb8Xz5U053toa0CzlHLYW+L0QeTZFaAD/d62K
+         Yz21/UkPFF+LJrhMy2P4zhvorS9x5FhpWmzYliWt4SdxqR1J+owWcR7RFEhynaJDsu
+         qOVpERJATfVxGKLXEEQAWeaAaRkH2eNLNvxDYPuqSH/hdJanPgr4YVgOHU2+WoUoem
+         v1I21fteEhUDg==
+Message-ID: <06927b58-f5d7-4000-a2ce-ba55c666a0e9@zytor.com>
+Date:   Thu, 26 Oct 2023 10:40:01 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] KVM: VMX: Cleanup VMX basic information defines
+ and usages
+Content-Language: en-US
+From:   Xin Li <xin@zytor.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
         x86@kernel.org, hpa@zytor.com, weijiang.yang@intel.com
-Subject: [PATCH v2 2/2] KVM: VMX: Cleanup VMX misc information defines and usages
-Date:   Thu, 26 Oct 2023 10:25:30 -0700
-Message-Id: <20231026172530.208867-2-xin@zytor.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231026172530.208867-1-xin@zytor.com>
 References: <20231026172530.208867-1-xin@zytor.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <20231026172530.208867-1-xin@zytor.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
         SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
@@ -53,170 +90,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Xin Li <xin3.li@intel.com>
+On 10/26/2023 10:25 AM, Xin Li (Intel) wrote:
+> From: Xin Li <xin3.li@intel.com>
+> 
+> Define VMX basic information fields with BIT_ULL()/GENMASK_ULL(), and
+> replace hardcoded VMX basic numbers with these macros.
+> 
+> Per Sean's ask, read MSR_IA32_VMX_BASIC into an u64 to get rid of the
+> hi/lo crud.
+> 
+> Tested-by: Shan Kang <shan.kang@intel.com>
+> Signed-off-by: Xin Li <xin3.li@intel.com>
+> ---
+> 
+> Changes since v1:
+> * Don't add field shift macros unless it's really needed, extra layer
+>    of indirect makes it harder to read (Sean Christopherson).
+> * Add a static_assert() to ensure that VMX_BASIC_FEATURES_MASK doesn't
+>    overlap with VMX_BASIC_RESERVED_BITS (Sean Christopherson).
+> * read MSR_IA32_VMX_BASIC into an u64 rather than 2 u32 (Sean
+>    Christopherson).
+> * Add 2 new functions for extracting fields from VMX basic (Sean
+>    Christopherson).
+> * Drop the tools header update (Sean Christopherson).
+> * Move VMX basic field macros to arch/x86/include/asm/vmx.h.
+> ---
+>   arch/x86/include/asm/msr-index.h |  9 ---------
+>   arch/x86/include/asm/vmx.h       | 16 ++++++++++++++++
+>   arch/x86/kvm/vmx/nested.c        | 25 ++++++++++++++++++-------
+>   arch/x86/kvm/vmx/vmx.c           | 22 ++++++++++------------
+>   4 files changed, 44 insertions(+), 28 deletions(-)
 
-Define VMX misc information fields with BIT_ULL()/GENMASK_ULL(), and move
-VMX misc field macros to vmx.h if used in multiple files or where they are
-used only once.
+Sigh, forgot to add "--base=HEAD~2".
 
-Signed-off-by: Xin Li <xin3.li@intel.com>
----
- arch/x86/include/asm/msr-index.h |  4 ----
- arch/x86/include/asm/vmx.h       | 10 ++++------
- arch/x86/kvm/vmx/capabilities.h  |  4 ++--
- arch/x86/kvm/vmx/nested.c        | 34 ++++++++++++++++++++++++--------
- arch/x86/kvm/vmx/nested.h        |  2 +-
- arch/x86/kvm/vmx/vmx.c           |  2 +-
- 6 files changed, 34 insertions(+), 22 deletions(-)
+This is based on commit c076acf10c78c0d7e1aa50670e9cc4c91e8d59b4 of the 
+'next' branch in the kvm-x86 tree.
 
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index d83195f53e33..181366f1512c 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -1100,10 +1100,6 @@
- #define MSR_IA32_SMBA_BW_BASE		0xc0000280
- #define MSR_IA32_EVT_CFG_BASE		0xc0000400
- 
--/* MSR_IA32_VMX_MISC bits */
--#define MSR_IA32_VMX_MISC_INTEL_PT                 (1ULL << 14)
--#define MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS (1ULL << 29)
--#define MSR_IA32_VMX_MISC_PREEMPTION_TIMER_SCALE   0x1F
- /* AMD-V MSRs */
- 
- #define MSR_VM_CR                       0xc0010114
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index f919397900f1..6afda61429e6 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -126,12 +126,10 @@
- #define VMX_BASIC_INOUT				BIT_ULL(54)
- 
- /* VMX_MISC bits and bitmasks */
--#define VMX_MISC_PREEMPTION_TIMER_RATE_MASK	0x0000001f
--#define VMX_MISC_SAVE_EFER_LMA			0x00000020
--#define VMX_MISC_ACTIVITY_HLT			0x00000040
--#define VMX_MISC_ACTIVITY_WAIT_SIPI		0x00000100
--#define VMX_MISC_ZERO_LEN_INS			0x40000000
--#define VMX_MISC_MSR_LIST_MULTIPLIER		512
-+#define VMX_MISC_PREEMPTION_TIMER_RATE_MASK	GENMASK_ULL(4, 0)
-+#define VMX_MISC_INTEL_PT			BIT_ULL(14)
-+#define VMX_MISC_VMWRITE_SHADOW_RO_FIELDS	BIT_ULL(29)
-+#define VMX_MISC_ZERO_LEN_INS			BIT_ULL(30)
- 
- /* VMFUNC functions */
- #define VMFUNC_CONTROL_BIT(x)	BIT((VMX_FEATURE_##x & 0x1f) - 28)
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index 41a4533f9989..c88e33a13ae1 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -225,7 +225,7 @@ static inline bool cpu_has_vmx_vmfunc(void)
- static inline bool cpu_has_vmx_shadow_vmcs(void)
- {
- 	/* check if the cpu supports writing r/o exit information fields */
--	if (!(vmcs_config.misc & MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS))
-+	if (!(vmcs_config.misc & VMX_MISC_VMWRITE_SHADOW_RO_FIELDS))
- 		return false;
- 
- 	return vmcs_config.cpu_based_2nd_exec_ctrl &
-@@ -367,7 +367,7 @@ static inline bool cpu_has_vmx_invvpid_global(void)
- 
- static inline bool cpu_has_vmx_intel_pt(void)
- {
--	return (vmcs_config.misc & MSR_IA32_VMX_MISC_INTEL_PT) &&
-+	return (vmcs_config.misc & VMX_MISC_INTEL_PT) &&
- 		(vmcs_config.cpu_based_2nd_exec_ctrl & SECONDARY_EXEC_PT_USE_GPA) &&
- 		(vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_RTIT_CTL);
- }
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 274d480d9071..40dd77c76565 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -886,6 +886,8 @@ static int nested_vmx_store_msr_check(struct kvm_vcpu *vcpu,
- 	return 0;
- }
- 
-+#define VMX_MISC_MSR_LIST_MULTIPLIER	512
-+
- static u32 nested_vmx_max_atomic_switch_msrs(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-@@ -1295,18 +1297,34 @@ vmx_restore_control_msr(struct vcpu_vmx *vmx, u32 msr_index, u64 data)
- 	return 0;
- }
- 
-+#define VMX_MISC_SAVE_EFER_LMA		BIT_ULL(5)
-+#define VMX_MISC_ACTIVITY_STATE_BITMAP	GENMASK_ULL(8, 6)
-+#define VMX_MISC_ACTIVITY_HLT		BIT_ULL(6)
-+#define VMX_MISC_ACTIVITY_WAIT_SIPI	BIT_ULL(8)
-+#define VMX_MISC_RDMSR_IN_SMM		BIT_ULL(15)
-+#define VMX_MISC_VMXOFF_BLOCK_SMI	BIT_ULL(28)
-+
-+#define VMX_MISC_FEATURES_MASK			\
-+	(VMX_MISC_SAVE_EFER_LMA |		\
-+	 VMX_MISC_ACTIVITY_STATE_BITMAP |	\
-+	 VMX_MISC_INTEL_PT |			\
-+	 VMX_MISC_RDMSR_IN_SMM |		\
-+	 VMX_MISC_VMXOFF_BLOCK_SMI |		\
-+	 VMX_MISC_VMWRITE_SHADOW_RO_FIELDS |	\
-+	 VMX_MISC_ZERO_LEN_INS)
-+
-+#define VMX_MISC_RESERVED_BITS			\
-+	(BIT_ULL(31) | GENMASK_ULL(13, 9))
-+
- static int vmx_restore_vmx_misc(struct vcpu_vmx *vmx, u64 data)
- {
--	const u64 feature_and_reserved_bits =
--		/* feature */
--		BIT_ULL(5) | GENMASK_ULL(8, 6) | BIT_ULL(14) | BIT_ULL(15) |
--		BIT_ULL(28) | BIT_ULL(29) | BIT_ULL(30) |
--		/* reserved */
--		GENMASK_ULL(13, 9) | BIT_ULL(31);
- 	u64 vmx_misc = vmx_control_msr(vmcs_config.nested.misc_low,
- 				       vmcs_config.nested.misc_high);
- 
--	if (!is_bitwise_subset(vmx_misc, data, feature_and_reserved_bits))
-+	static_assert(!(VMX_MISC_FEATURES_MASK & VMX_MISC_RESERVED_BITS));
-+
-+	if (!is_bitwise_subset(vmx_misc, data,
-+			       VMX_MISC_FEATURES_MASK | VMX_MISC_RESERVED_BITS))
- 		return -EINVAL;
- 
- 	if ((vmx->nested.msrs.pinbased_ctls_high &
-@@ -6961,7 +6979,7 @@ static void nested_vmx_setup_misc_data(struct vmcs_config *vmcs_conf,
- {
- 	msrs->misc_low = (u32)vmcs_conf->misc & VMX_MISC_SAVE_EFER_LMA;
- 	msrs->misc_low |=
--		MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS |
-+		VMX_MISC_VMWRITE_SHADOW_RO_FIELDS |
- 		VMX_MISC_EMULATED_PREEMPTION_TIMER_RATE |
- 		VMX_MISC_ACTIVITY_HLT |
- 		VMX_MISC_ACTIVITY_WAIT_SIPI;
-diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-index b4b9d51438c6..24ff4df509b6 100644
---- a/arch/x86/kvm/vmx/nested.h
-+++ b/arch/x86/kvm/vmx/nested.h
-@@ -108,7 +108,7 @@ static inline unsigned nested_cpu_vmx_misc_cr3_count(struct kvm_vcpu *vcpu)
- static inline bool nested_cpu_has_vmwrite_any_field(struct kvm_vcpu *vcpu)
- {
- 	return to_vmx(vcpu)->nested.msrs.misc_low &
--		MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS;
-+		VMX_MISC_VMWRITE_SHADOW_RO_FIELDS;
- }
- 
- static inline bool nested_cpu_has_zero_length_injection(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b68d54f6e9f8..6bb96515185b 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8602,7 +8602,7 @@ static __init int hardware_setup(void)
- 		u64 use_timer_freq = 5000ULL * 1000 * 1000;
- 
- 		cpu_preemption_timer_multi =
--			vmcs_config.misc & VMX_MISC_PREEMPTION_TIMER_RATE_MASK;
-+			vmx_misc_preemption_timer_rate(vmcs_config.misc);
- 
- 		if (tsc_khz)
- 			use_timer_freq = (u64)tsc_khz * 1000;
--- 
-2.40.1
+Thanks!
+     Xin
 
