@@ -2,142 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 35D3A7D7B29
-	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 05:09:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F06677D7B46
+	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 05:32:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230518AbjJZDJS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Oct 2023 23:09:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36624 "EHLO
+        id S231652AbjJZDcj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Oct 2023 23:32:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230100AbjJZDJR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Oct 2023 23:09:17 -0400
+        with ESMTP id S229596AbjJZDci (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Oct 2023 23:32:38 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F28018B
-        for <kvm@vger.kernel.org>; Wed, 25 Oct 2023 20:09:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8D3EA3;
+        Wed, 25 Oct 2023 20:32:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698289755; x=1729825755;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=yWQDhRurLOH/L8IKsfUYl5qFYKHRqCxDZQmP6sNWFTk=;
-  b=Kcm1ivrnVzXUT9JBq18kO3/XA3e9YbIcOCucJzpL50Iy+a0/nvGicgAU
-   5krsj38j374f3gVTteozX9RVd9YdulIo/jaGNyPhI8R+Ff7y9W37VqChQ
-   nLKl5odj4LaLx5C0APvCFM3+89sFHcKYPI2OZw2NCVdzBEhonr2EYPGi1
-   LhYLh/1GBXVestX66Kto5ap1uBuWADtNZz2pYsuKduZiSm98+m1aTBff0
-   EhHQOxrrMDOJyqui+0h1Aj313fF/h6/ordXNtZkwDzJdZi4ecdnBZe5IK
-   z61VP3/G+IjHzfStxv5ZFDADqxCD91y4LblLRxw9o7xJ/s+YmcJHSpbA8
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="366797527"
+  t=1698291156; x=1729827156;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=j0Fz8CzB06Dw8BJlqfX5Ul19OnFcKlSskxt2P3MS9M8=;
+  b=WtxMPDhV5kM7LIgdkxP/zHJX1NuY8lnNkN2ZOsAEWYNS5HWbdt6wJBAL
+   DO/bjR24ZPMDeoMqJBa/fClgPZul66L8S3hjoL5nwrDNKeWGnvKP3mPki
+   FhtLPCzH2oLsX0QXnfBoncH9hYCp2lmemBvIBEwa9mAtrqXiIjE6RWZ7G
+   vO/zogzHFgAW9iVPhf4oBimxd74l6jCNJ0/EU1TBZDnDy95i0JK6wuP1C
+   ZuzldNyoB9S9OACT0AnlMi/DLHXUFjeC+SaD0Eu5k7X75oFbFrUYsHUYR
+   LR/2Mx6hC5hPpvEbnss3NWbcpK+GW9ZGUGsSibvUv7hcotnZbDIFmCvZK
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="366800559"
 X-IronPort-AV: E=Sophos;i="6.03,252,1694761200"; 
-   d="scan'208";a="366797527"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 20:09:14 -0700
+   d="scan'208";a="366800559"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 20:32:36 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="794043153"
+X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="759059876"
 X-IronPort-AV: E=Sophos;i="6.03,252,1694761200"; 
-   d="scan'208";a="794043153"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by orsmga001.jf.intel.com with ESMTP; 25 Oct 2023 20:09:12 -0700
-Date:   Thu, 26 Oct 2023 11:20:52 +0800
-From:   Zhao Liu <zhao1.liu@intel.com>
-To:     EwanHai <ewanhai-oc@zhaoxin.com>
-Cc:     pbonzini@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org
-Subject: Re: [PATCH] target/i386/kvm: Refine VMX controls setting for
- backward compatibility
-Message-ID: <ZTnbFJrHeKhoUA6F@intel.com>
-References: <20230925071453.14908-1-ewanhai-oc@zhaoxin.com>
+   d="scan'208";a="759059876"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.20.184]) ([10.93.20.184])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 20:32:33 -0700
+Message-ID: <719318df-dc19-4f4c-88ff-5c69377f713c@linux.intel.com>
+Date:   Thu, 26 Oct 2023 11:32:30 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests Patch 0/5] Fix PMU test failures on Sapphire
+ Rapids
+Content-Language: en-US
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhang Xiong <xiong.y.zhang@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Dapeng Mi <dapeng1.mi@intel.com>
+References: <20231024075748.1675382-1-dapeng1.mi@linux.intel.com>
+ <ZTmo9IVM2Tq6ZSrn@google.com>
+From:   "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <ZTmo9IVM2Tq6ZSrn@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230925071453.14908-1-ewanhai-oc@zhaoxin.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 25, 2023 at 03:14:53AM -0400, EwanHai wrote:
-> Date: Mon, 25 Sep 2023 03:14:53 -0400
-> From: EwanHai <ewanhai-oc@zhaoxin.com>
-> Subject: [PATCH] target/i386/kvm: Refine VMX controls setting for backward
->  compatibility
-> X-Mailer: git-send-email 2.34.1
-> 
-> Commit 4a910e1 ("target/i386: do not set unsupported VMX secondary
-> execution controls") implemented a workaround for hosts that have
-> specific CPUID features but do not support the corresponding VMX
-> controls, e.g., hosts support RDSEED but do not support RDSEED-Exiting.
-> 
-> In detail, commit 4a910e1 introduced a flag `has_msr_vmx_procbased_clts2`.
-> If KVM has `MSR_IA32_VMX_PROCBASED_CTLS2` in its msr list, QEMU would
-> use KVM's settings, avoiding any modifications to this MSR.
-> 
-> However, this commit (4a910e1) didn’t account for cases in older Linux
+On 10/26/2023 7:47 AM, Mingwei Zhang wrote:
+> On Tue, Oct 24, 2023, Dapeng Mi wrote:
+>> When running pmu test on Intel Sapphire Rapids, we found several
+>> failures are encountered, such as "llc misses" failure, "all counters"
+>> failure and "fixed counter 3" failure.
+> hmm, I have tested your series on a SPR machine. It looks like, all "llc
+> misses" already pass on my side. "all counters" always fail with/without
+> your patches. "fixed counter 3" never exists... I have "fixed
+> cntr-{0,1,2}" and "fixed-{0,1,2}"
 
-s/didn’t/didn't/
+1. "LLC misses" failure
 
-> kernels(e.g., linux-4.19.90) where `MSR_IA32_VMX_PROCBASED_CTLS2` is
+Yeah, the "LLC misses" failure is not always seen. I can see the "LLC  
+misses" 2 ~3 times out of 10 runs of PMU standalone test and you could 
+see the failure with higher possibility if you run the full 
+kvm-unit-tests. I think whether you can see the "LLC misses" failure it 
+really depends on current cache status on your system, how much cache 
+memory are consumed by other programs. If there are lots of free cache 
+lines on system when running the pmu test, you may have higher 
+possibility to see the LLC misses failures just like what I see below.
 
-For this old kernel, it's better to add the brief lifecycle note (e.g.,
-lts, EOL) to illustrate the value of considering such compatibility
-fixes.
+PASS: Intel: llc references-7
+*FAIL*: Intel: llc misses-0
+PASS: Intel: llc misses-1
+PASS: Intel: llc misses-2
 
-> in `kvm_feature_msrs`—obtained by ioctl(KVM_GET_MSR_FEATURE_INDEX_LIST),
+2. "all counters" failure
 
-s/—obtained/-obtained/
+Actually the "all counters" failure are not always seen, but it doesn't 
+mean current code is correct. In current code, the length of "cnt[10]" 
+array in check_counters_many() is defined as 10, but there are at least 
+11 counters supported (8 GP counters + 3 fixed counters) on SPR even 
+though fixed counter 3 is not supported in current upstream code. 
+Obviously there would be out of range memory access in 
+check_counters_many().
 
-> but not in `kvm_msr_list`—obtained by ioctl(KVM_GET_MSR_INDEX_LIST).
+>
+> You may want to double check the requirements of your series. Not just
+> under your setting without explainning those setting in detail.
+>
+> Maybe what I am missing is your topdown series? So, before your topdown
+> series checked in. I don't see value in this series.
 
-s/—obtained/-obtained/
+3. "fixed counter 3" failure
 
-> As a result,it did not set the `has_msr_vmx_procbased_clts2` flag based
-> on `kvm_msr_list` alone, even though KVM maintains the value of this MSR.
-> 
-> This patch supplements the above logic, ensuring that
-> `has_msr_vmx_procbased_clts2` is correctly set by checking both MSR
-> lists, thus maintaining compatibility with older kernels.
-> 
-> Signed-off-by: EwanHai <ewanhai-oc@zhaoxin.com>
-> ---
->  target/i386/kvm/kvm.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index af101fcdf6..6299284de4 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -2343,6 +2343,7 @@ void kvm_arch_do_init_vcpu(X86CPU *cpu)
->  static int kvm_get_supported_feature_msrs(KVMState *s)
->  {
->      int ret = 0;
-> +    int i;
->  
->      if (kvm_feature_msrs != NULL) {
->          return 0;
-> @@ -2377,6 +2378,11 @@ static int kvm_get_supported_feature_msrs(KVMState *s)
->          return ret;
->      }
+Yeah, I just realized I used the kernel which includes the vtopdown 
+supporting patches after Jim's reminding. As the reply for Jim's 
+comments says, the patches for support slots event are still valuable 
+for current emulation framework and I would split them from the original 
+vtopdown patchset and resend them as an independent patchset. Anyway, 
+even though there is not slots event support in Kernel, it only impacts 
+the patch 4/5, other patches are still valuable.
 
-It's worth adding a comment here to indicate that this is a
-compatibility fix.
 
--Zhao
-
->  
-> +    for (i = 0; i < kvm_feature_msrs->nmsrs; i++) {
-> +        if (kvm_feature_msrs->indices[i] == MSR_IA32_VMX_PROCBASED_CTLS2) {
-> +            has_msr_vmx_procbased_ctls2 = true;
-> +        }
-> +    }
->      return 0;
->  }
->  
-> -- 
-> 2.34.1
-> 
+>
+> Thanks.
+> -Mingwei
+>> Intel Sapphire Rapids introduces new fixed counter 3, total PMU counters
+>> including GP and fixed counters increase to 12 and also optimizes cache
+>> subsystem. All these changes make the original assumptions in pmu test
+>> unavailable any more on Sapphire Rapids. Patches 2-4 fixes these
+>> failures, patch 0 remove the duplicate code and patch 5 adds assert to
+>> ensure predefine fixed events are matched with HW fixed counters.
+>>
+>> Dapeng Mi (4):
+>>    x86: pmu: Change the minimum value of llc_misses event to 0
+>>    x86: pmu: Enlarge cnt array length to 64 in check_counters_many()
+>>    x86: pmu: Support validation for Intel PMU fixed counter 3
+>>    x86: pmu: Add asserts to warn inconsistent fixed events and counters
+>>
+>> Xiong Zhang (1):
+>>    x86: pmu: Remove duplicate code in pmu_init()
+>>
+>>   lib/x86/pmu.c |  5 -----
+>>   x86/pmu.c     | 17 ++++++++++++-----
+>>   2 files changed, 12 insertions(+), 10 deletions(-)
+>>
+>>
+>> base-commit: bfe5d7d0e14c8199d134df84d6ae8487a9772c48
+>> -- 
+>> 2.34.1
+>>
