@@ -2,112 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B1CA7D84C7
-	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 16:32:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C6EB7D8574
+	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 17:02:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345304AbjJZOcH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Oct 2023 10:32:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49978 "EHLO
+        id S1345312AbjJZPC5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Oct 2023 11:02:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345317AbjJZOcC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Oct 2023 10:32:02 -0400
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C88E10FD
-        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 07:31:56 -0700 (PDT)
-Date:   Thu, 26 Oct 2023 16:31:51 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1698330715;
+        with ESMTP id S231511AbjJZPC4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Oct 2023 11:02:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1D80B9
+        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 08:02:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1698332531;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Gh7Nm0UGIYs2Q8uUHR8BFDAb62odHkmv2yrJIpflUV0=;
-        b=QUiTWacQROpYXmCoa3ssdOwVvOFGIgmwBFTkVwsoTeX6kznf/yUr1mRd2qbUTYjg/9aeSJ
-        ingMHh/Gw63lVU7blXThPDX2kGobUWAbGRx61JqSa4eXj6CVC00dAEy7OMDUMXtgZNRJda
-        wFVS95jeY0qKFKUmayhl3Qug1YMGm2M=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Andrew Jones <andrew.jones@linux.dev>
-To:     Matthias Rosenfelder <matthias.rosenfelder@nio.io>
-Cc:     Andrew Jones <ajones@ventanamicro.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-Subject: Re: [kvm-unit-tests PATCH] arm: pmu: Fix overflow test condition
-Message-ID: <20231026-82e0400727da79cc04a637a4@orel>
-References: <FRYP281MB31463EC1486883DDA477393DF2C0A@FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM>
- <20231024-9418f5e7b9e014986bdd4b58@orel>
- <FRYP281MB3146C5D86DCCBBB6CA37D3ACF2DDA@FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Le7r1qZdjn6tilkqUR5AFBSjzkY/HKzRQy2FXtGZ7Zs=;
+        b=OKnheQcDLpt0MZ7/qDIKU1izK8od9JZGAvm5caZNjdP/tg0TvJ8UqeF4/lYDhig7NO/Ws1
+        wurIVqFoobgLvfTiS8Di84HaI9prvGlm34yctrb8dam4G6X3IZLUhOW7P6JiMdX+bwDTYs
+        UeGQvKLN/KGsBeTR9puAIeTWTRjkzNM=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-249-Q-XTeacfNGC313kEBmvPxQ-1; Thu, 26 Oct 2023 11:02:05 -0400
+X-MC-Unique: Q-XTeacfNGC313kEBmvPxQ-1
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1c9fc94b182so9509365ad.1
+        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 08:02:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698332522; x=1698937322;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Le7r1qZdjn6tilkqUR5AFBSjzkY/HKzRQy2FXtGZ7Zs=;
+        b=Rk/CtzkrDOGFcPyqFtcPQpQj6nwbudG16YZQ5DzEZMWdG0DxfQ+4nrCckQJvU6JTEp
+         M3wc8jFsZ7B99iE+MSMDxnw3iZLGmKnOCV6icHYH8WOurDLNKp/2LMQ3pX25NtfWwNVw
+         0KHntiMF2GDwLrPWH9bqjsXBQJXsIFV+IWO37sSBoToVwqwMnEEcY9Nt39KLiEi43B0I
+         a5osJBm6ch+w4ctNUaj8SVldA32pLKuaAws4JQLUQQG54BpLXOmME5sA6DoRyuNEV3qh
+         zcVLcRhqiHVZ5fGcqj0EgvF3jWLfBnI6/HBd9leWLYzOAf5DxcZ1fETxV2i16M6AkM0q
+         732Q==
+X-Gm-Message-State: AOJu0YyDJC83mC07KVJrm1rUGujGpLV//kCtmhKWZCI0yStdCXycZj2f
+        ZKgu64QOe4wuzEJ8hqCX0bRrgrECpoeCdikh+TqATfk+1bxiCG5HmfIo4bOvmu0aBUi+ZyN/Pau
+        yi6WjvaF1ic+H
+X-Received: by 2002:a17:902:d48b:b0:1cc:c0f:c163 with SMTP id c11-20020a170902d48b00b001cc0c0fc163mr2030466plg.17.1698332522014;
+        Thu, 26 Oct 2023 08:02:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEkMkNFGl6pf3X2t9+qgnZ2jJ6k9tsZamwMF9GCo+CggK6U8NBQgmvo80UyqhXw/fy4mQy7ew==
+X-Received: by 2002:a17:902:d48b:b0:1cc:c0f:c163 with SMTP id c11-20020a170902d48b00b001cc0c0fc163mr2030417plg.17.1698332521352;
+        Thu, 26 Oct 2023 08:02:01 -0700 (PDT)
+Received: from kernel-devel.local ([240d:1a:c0d:9f00:245e:16ff:fe87:c960])
+        by smtp.gmail.com with ESMTPSA id g11-20020a170902740b00b001c60e7bf5besm11032572pll.281.2023.10.26.08.01.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Oct 2023 08:02:00 -0700 (PDT)
+From:   Shigeru Yoshida <syoshida@redhat.com>
+To:     stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Shigeru Yoshida <syoshida@redhat.com>
+Subject: [PATCH net] virtio/vsock: Fix uninit-value in virtio_transport_recv_pkt()
+Date:   Fri, 27 Oct 2023 00:01:54 +0900
+Message-ID: <20231026150154.3536433-1-syoshida@redhat.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <FRYP281MB3146C5D86DCCBBB6CA37D3ACF2DDA@FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 26, 2023 at 02:24:07PM +0000, Matthias Rosenfelder wrote:
-> Hi drew,
-> 
-> thanks for coming back to me. I tried using "git-send-email" but was struggling with the SMTP configuration of my company (Microsoft Outlook online account...). So far I've not found a way to authenticate with SMTP, so I was unfortunately unable to send the patch (with improved rationale, as requested).
-> 
-> Since giving back to the open source community is more of a personal wish and is not required by management (but also not forbidden), it has low priority and I already spent some time on this. I will send patches in the future from my personal email account.
-> 
-> I am totally fine with someone else submitting the patch.
-> If it's not too inconvenient, could you please add a "reported-by" to the patch? (No problem if not)
-> Thank you.
+KMSAN reported the following uninit-value access issue:
 
-You have the authorship
+=====================================================
+BUG: KMSAN: uninit-value in virtio_transport_recv_pkt+0x1dfb/0x26a0 net/vmw_vsock/virtio_transport_common.c:1421
+ virtio_transport_recv_pkt+0x1dfb/0x26a0 net/vmw_vsock/virtio_transport_common.c:1421
+ vsock_loopback_work+0x3bb/0x5a0 net/vmw_vsock/vsock_loopback.c:120
+ process_one_work kernel/workqueue.c:2630 [inline]
+ process_scheduled_works+0xff6/0x1e60 kernel/workqueue.c:2703
+ worker_thread+0xeca/0x14d0 kernel/workqueue.c:2784
+ kthread+0x3cc/0x520 kernel/kthread.c:388
+ ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
 
-https://gitlab.com/jones-drew/kvm-unit-tests/-/commit/52d963e95aa2fa3ce4faa9557cb99c002b177ec7
+Uninit was stored to memory at:
+ virtio_transport_space_update net/vmw_vsock/virtio_transport_common.c:1274 [inline]
+ virtio_transport_recv_pkt+0x1ee8/0x26a0 net/vmw_vsock/virtio_transport_common.c:1415
+ vsock_loopback_work+0x3bb/0x5a0 net/vmw_vsock/vsock_loopback.c:120
+ process_one_work kernel/workqueue.c:2630 [inline]
+ process_scheduled_works+0xff6/0x1e60 kernel/workqueue.c:2703
+ worker_thread+0xeca/0x14d0 kernel/workqueue.c:2784
+ kthread+0x3cc/0x520 kernel/kthread.c:388
+ ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
 
-Thanks,
-drew
+Uninit was created at:
+ slab_post_alloc_hook+0x105/0xad0 mm/slab.h:767
+ slab_alloc_node mm/slub.c:3478 [inline]
+ kmem_cache_alloc_node+0x5a2/0xaf0 mm/slub.c:3523
+ kmalloc_reserve+0x13c/0x4a0 net/core/skbuff.c:559
+ __alloc_skb+0x2fd/0x770 net/core/skbuff.c:650
+ alloc_skb include/linux/skbuff.h:1286 [inline]
+ virtio_vsock_alloc_skb include/linux/virtio_vsock.h:66 [inline]
+ virtio_transport_alloc_skb+0x90/0x11e0 net/vmw_vsock/virtio_transport_common.c:58
+ virtio_transport_reset_no_sock net/vmw_vsock/virtio_transport_common.c:957 [inline]
+ virtio_transport_recv_pkt+0x1279/0x26a0 net/vmw_vsock/virtio_transport_common.c:1387
+ vsock_loopback_work+0x3bb/0x5a0 net/vmw_vsock/vsock_loopback.c:120
+ process_one_work kernel/workqueue.c:2630 [inline]
+ process_scheduled_works+0xff6/0x1e60 kernel/workqueue.c:2703
+ worker_thread+0xeca/0x14d0 kernel/workqueue.c:2784
+ kthread+0x3cc/0x520 kernel/kthread.c:388
+ ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
 
-> 
-> Best Regards,
-> 
-> Matthias
-> 
-> ________________________________________
-> From: Andrew Jones <ajones@ventanamicro.com>
-> Sent: Tuesday, October 24, 2023 13:31
-> To: Matthias Rosenfelder
-> Cc: kvm@vger.kernel.org; Andrew Jones; Alexandru Elisei; Eric Auger; kvmarm@lists.linux.dev
-> Subject: Re: [kvm-unit-tests PATCH] arm: pmu: Fix overflow test condition
-> 
-> CAUTION! External Email. Do not click links or open attachments unless you recognize the sender and know the content is safe.
-> 
-> On Fri, Sep 29, 2023 at 09:19:37PM +0000, Matthias Rosenfelder wrote:
-> > Hello,
-> >
-> > I think one of the test conditions for the KVM PMU unit test "basic_event_count" is not strong enough. It only checks whether an overflow occurred for counter #0, but it should also check that none happened for the other counter(s):
-> >
-> > report(read_sysreg(pmovsclr_el0) & 0x1,
-> >       "check overflow happened on #0 only");
-> >
-> > This should be "==" instead of "&".
-> >
-> > Note that this test uses one more counter (#1), which must not overflow. This should also be checked, even though this would be visible through the "report_info()" a few lines above. But the latter does not mark the test failing - it is purely informational, so any test automation will not notice.
-> >
-> >
-> > I apologize in advance if my email program at work messes up any formatting. Please let me know and I will try to reconfigure and resend if necessary. Thank you.
-> 
-> Hey Matthias,
-> 
-> We let you know the formatting was wrong, but we haven't yet received a
-> resend. But, since Eric already reviewed it, I've gone ahead and applied
-> it to arm/queue with this fixes tag
-> 
-> Fixes: 4ce2a8045624 ("arm: pmu: Basic event counter Tests")
-> 
-> drew
-> [Banner]<http://www.nio.io>
-> This email and any files transmitted with it are confidential and intended solely for the use of the individual or entity to whom they are addressed. You may NOT use, disclose, copy or disseminate this information. If you have received this email in error, please notify the sender and destroy all copies of the original message and all attachments. Please note that any views or opinions presented in this email are solely those of the author and do not necessarily represent those of the company. Finally, the recipient should check this email and any attachments for the presence of viruses. The company accepts no liability for any damage caused by any virus transmitted by this email.
+CPU: 1 PID: 10664 Comm: kworker/1:5 Not tainted 6.6.0-rc3-00146-g9f3ebbef746f #3
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc38 04/01/2014
+Workqueue: vsock-loopback vsock_loopback_work
+=====================================================
+
+The following simple reproducer can cause the issue described above:
+
+int main(void)
+{
+  int sock;
+  struct sockaddr_vm addr = {
+    .svm_family = AF_VSOCK,
+    .svm_cid = VMADDR_CID_ANY,
+    .svm_port = 1234,
+  };
+
+  sock = socket(AF_VSOCK, SOCK_STREAM, 0);
+  connect(sock, (struct sockaddr *)&addr, sizeof(addr));
+  return 0;
+}
+
+This issue occurs because the `buf_alloc` and `fwd_cnt` fields of the
+`struct virtio_vsock_hdr` are not initialized when a new skb is allocated
+in `virtio_transport_alloc_skb()`. This patch resolves the issue by
+initializing these fields during allocation.
+
+Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
+Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+---
+ net/vmw_vsock/virtio_transport_common.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 352d042b130b..102673bef189 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -68,6 +68,8 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
+ 	hdr->dst_port	= cpu_to_le32(dst_port);
+ 	hdr->flags	= cpu_to_le32(info->flags);
+ 	hdr->len	= cpu_to_le32(len);
++	hdr->buf_alloc	= cpu_to_le32(0);
++	hdr->fwd_cnt	= cpu_to_le32(0);
+ 
+ 	if (info->msg && len > 0) {
+ 		payload = skb_put(skb, len);
+-- 
+2.41.0
+
