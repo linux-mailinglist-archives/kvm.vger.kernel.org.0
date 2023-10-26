@@ -2,177 +2,492 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A33D7D82D4
-	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 14:40:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9EC67D8359
+	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 15:13:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344627AbjJZMkM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Oct 2023 08:40:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40230 "EHLO
+        id S1345018AbjJZNNp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Oct 2023 09:13:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230507AbjJZMkK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Oct 2023 08:40:10 -0400
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2081.outbound.protection.outlook.com [40.107.101.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BFA7C0
-        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 05:40:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nhXbPEHw3eYoh+7qUXikVLLoEjaEYHxxevhV5+h0NxvCTXWIyxX9IL69xa9f5SCvi/VTx075s/GBS0Z3Fh5MMlkaD70JwdFJtulx6CrWWpdeqnjh1XJdNN5/yjW1Yj8Wwk7E6fqNQW5IyCzVAlapBrGzcwGh/jR0n8shygmBCcga/X+7si5OHxHISSPhW/hiqOiRKD5gCKsBg4fje3mx4s9CwN3xjxX+qpWHfP6opGN9/dOrFsym2dL2sFv0IjPHFHWgiIaFH3huzOpbj579SYQeoDDULlH2Ly9zDj4HSEQ2iU8+V5x+5diUZxMS4lsdIncyu42sW6zurZT1pLi29A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2hKkn7MXzaT2TlLY2wyLW/9cT6jdMM93iAp8cnjfykI=;
- b=bNIbHkW/9vtoiDWxMBL7My5A6A7koB6Z0w9nhI1/QOdDgxaVZdV8Vj4QoDPou4NjnNiLsbJJZYWYi36R78hXQZfcQenYXihkcKzTfFE4d3auiRGwUYHor6KEi4HG/n3tYFicYWBaZAyRo0ysN6qxnWQkhYll+0q4kYLYvZyvXrDvwoRLPNglZ+2uLnwEoG5Jk0iI41P96/MJwZsHAl/1XWUvFtIcm25Wg1fJvOl1e37hYF9/6lh6obKnPIR0n/SO50Cw93TvQakdxm/1p3dANxq+wxGG2K6xVsFz29cgzod2ndzwfrRoPB/hF7iYPmR0nxvXCpmdCPBpbyD8vCLkQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2hKkn7MXzaT2TlLY2wyLW/9cT6jdMM93iAp8cnjfykI=;
- b=DNzzegq7vZHAisyvRzFrwALjltD5wMnIyrqBex8Mz8On9SNFj5nhlOeslkG4+tD49q/LwlbgcZNrFak5/Fg2Ra5kEXRrQFHnxtt+52dRmo7bSSw2aUiKoid8wdpbZXtpQb9dhp0u3/TsGTkTbbiC6zEBXh6DzM1fxseYtkk1TVkXVShAnFInlFVhzhKAYCML7b6dGOpm0j7NQkBAaYPswTZ45VUiIt9qQgEYJEd/WUWwuue3pey3ZEFnmfIxWcAC1n9zFql7sT7weBvJDD96bJvRgrDXEZOYV7IJaXEsn3hU1nZL0Ht3s0c12xBSXd1PDh5YXlYISrnZ9ScQ3GXWIw==
-Received: from PH0PR12MB5481.namprd12.prod.outlook.com (2603:10b6:510:d4::15)
- by SA3PR12MB9178.namprd12.prod.outlook.com (2603:10b6:806:396::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.19; Thu, 26 Oct
- 2023 12:40:05 +0000
-Received: from PH0PR12MB5481.namprd12.prod.outlook.com
- ([fe80::cdcb:e909:74a4:be7c]) by PH0PR12MB5481.namprd12.prod.outlook.com
- ([fe80::cdcb:e909:74a4:be7c%4]) with mapi id 15.20.6933.022; Thu, 26 Oct 2023
- 12:40:05 +0000
-From:   Parav Pandit <parav@nvidia.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Feng Liu <feliu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-        "si-wei.liu@oracle.com" <si-wei.liu@oracle.com>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Maor Gottlieb <maorg@nvidia.com>
-Subject: RE: [PATCH V1 vfio 9/9] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Thread-Topic: [PATCH V1 vfio 9/9] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Thread-Index: AQHaAP/t3dG05nYg50S7FQsh4+CEA7BZZo+AgAE4i4CAAE2RAIABG4MAgAABLoCAAAcq0A==
-Date:   Thu, 26 Oct 2023 12:40:04 +0000
-Message-ID: <PH0PR12MB5481E1AF869C1296B987A34BDCDDA@PH0PR12MB5481.namprd12.prod.outlook.com>
-References: <20231017134217.82497-1-yishaih@nvidia.com>
- <20231017134217.82497-10-yishaih@nvidia.com>
- <20231024135713.360c2980.alex.williamson@redhat.com>
- <d6c720a0-1575-45b7-b96d-03a916310699@nvidia.com>
- <20231025131328.407a60a3.alex.williamson@redhat.com>
- <a55540a1-b61c-417b-97a5-567cfc660ce6@nvidia.com>
- <20231026081033-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231026081033-mutt-send-email-mst@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR12MB5481:EE_|SA3PR12MB9178:EE_
-x-ms-office365-filtering-correlation-id: 910bc8cb-9880-4acd-c031-08dbd620ae09
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 74GWgWHD1iH3Moh476IU9h8Uz5yLb/yxj4zqBUYi2PzuOE3kLJ66LtB+EGagKiaa1r8PDUF0f1NYW/VI7SX1yYf2r+A1bYi3y5SdPogBRsSMHnccQdgUkZUDqMQlicxB/zdghnJvxNTlJlOxqBz3CaFTICbSTnX2K6slHvDFhNww0GFdYeYWwCL5miUa57eMQYltA16xgOFZBVRRWhariTyivA0P7kqe8ibFSFyz4PdRu3VDHIzXOPuCnPPLKxX7ptms/1tf9vGExz6YvgpuAz1QS+s5JsDUIRNV/CoFtD30HW03Jq2Qidu5zc7nwY4sHJF7dGVeQ5y/FZJnGydp5c+o0gHc7hyIrnTJ69Cx2FrlvKOX5sx8m/s9zQCAT5QW2R+K1fTEZDVtyBSzSbOQ1JhJwil89ZYMLk9Lff8anNVymToIkh6iN+JvtYy30p5/hpf4IRk5WvdfrPiZrzHkHpx+GJ89Lhl+wXfkKkoAUOYKUZDxhjVEmcfePdd4qqUZ0EACjoimHibzm1g2la8WlARrpKbYsALWYqYuqKaElKbaG1xx4B9DBjDWjNnIHqg+6Ck8sxoH+0m3bfMUns1iJWyvjj03mgB7ENNTlM0sZXLin+6Z7gtT/pSc0HFuCbWL
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB5481.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(136003)(366004)(376002)(346002)(230922051799003)(1800799009)(64100799003)(451199024)(186009)(122000001)(71200400001)(4326008)(2906002)(8936002)(8676002)(52536014)(107886003)(55016003)(41300700001)(5660300002)(9686003)(6506007)(316002)(6636002)(110136005)(26005)(76116006)(478600001)(7696005)(38070700009)(86362001)(33656002)(38100700002)(66476007)(66946007)(54906003)(66556008)(64756008)(66446008);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?2X7ldA2TsajzQWRMA/bOxZMkyCGILfMFBnixS20Ai8WEywqfjgWyPqlbnhQK?=
- =?us-ascii?Q?tRgHu39ibAQnhXOx4GHvYaa13sL8mHetQIgnuG2mxSDnHfvcedyfk+l2VVqs?=
- =?us-ascii?Q?CPyOLNyNhoWH1d0pry4nCaR4z+doRhVGKeqWl/EbqbgTsBJZ3kje5Uar5Tiq?=
- =?us-ascii?Q?ldiRW9uL79iiXwdPdPMzhPAIZt9q4PhwPKDezbeVfWzMRn6OFwfQCqXKkpS9?=
- =?us-ascii?Q?2iXMwLxt258d3GSU/WDtkp6kVI6KLhavSqnlI7PLFa5vbTzPavuus0rOMfLR?=
- =?us-ascii?Q?hU1VMGEfKzzxnHCNO7H5U3+59reVV4KJbwKYytP3lsHfPjyLPnS+ewXqs+p1?=
- =?us-ascii?Q?rPeRV0Jr+uPq20IABVjpzDM4g7HGEteAgYsmBWSO/QLe7v2NUNX5p6uhgf2a?=
- =?us-ascii?Q?A782QXV5fPy+A5Ky5vGg4rkd93FD8cEbxbGevLcMV24dQvfyBDnLa7yMCQB9?=
- =?us-ascii?Q?RvUV97kWCg09e7c6a2PX5f6HIS9nCX5rWsLsAwb7R6g52f/PyweqNoCeIsQY?=
- =?us-ascii?Q?G6gRBqXlxLUB40xCTcNB8bwAzfDA1P3lWzzzstSh1JLMwM7x3+V8cseFk2jl?=
- =?us-ascii?Q?ExdXUY0hLXCpT6v7OSzMTAKkn9bifRRcVG7uMufd8+pe9VzJMF1oIJWTQxmm?=
- =?us-ascii?Q?Y2IdJGwCXljrTxCDdMbfcehV3TxepQDqZR9z7gHgm8BNpW1y+BLPwIC/61vj?=
- =?us-ascii?Q?yZYbAqbbuINk0ZljLwZfqIgOqrDbU3PVX/SiaXW7ITx2tvcYL8D9QAbFjZUi?=
- =?us-ascii?Q?GiC0iv0jnc2SaKd96+pOsUtXIxltGKME7L8ZPvX3xzNefzO5Y69xUmGeLpjH?=
- =?us-ascii?Q?ShC3svAve2iMyaYzkUT5KPuORyM966w6qWsKaunuQcqovtuJGY/HJSR2LiWY?=
- =?us-ascii?Q?SY1W18KJdN8yXjWUyVJIRQooYBfDmDYx+P/SUv+VnfKTihKx2X9TSGrAZ/nh?=
- =?us-ascii?Q?Hj6cK5goNEbEscFTIs+sxWnqr56Jn/zN4KTNRb3idSUKctTU9yoBRwZqcQSW?=
- =?us-ascii?Q?LdKYvWKhAUlESXhXFdBRr5In63vbsJ7iXawRzWVr9oqMPPicpaz67CYAbg0c?=
- =?us-ascii?Q?mx66yjLQ3fyuwmIBkA4JD8gmKKslc1kmZ0MrBLYS7rRM9js+LOuZl8Na+OqR?=
- =?us-ascii?Q?r6vGY/LjAUT5c+nOqdaO9h2NO4ItknHfb5a3WYNvjLKcQFjpD7DiHjpysCK0?=
- =?us-ascii?Q?+DxrRpfrmdb2BjiZJN+2dDsu77d5DN5k4Cg+QeQZxgwP0hMAikaPfiyzC4mb?=
- =?us-ascii?Q?QAh/Ce+Ud0iKBsgqhVVwO9KhxVzI7lVLQghILlfz5cdMoMD6D0fNow/uh0Tq?=
- =?us-ascii?Q?sAv3uioviuHp9tpa3w1nxOeuwYdl1R49i1wTN/nN7S7OlV5YGpqT9O8Fl0CQ?=
- =?us-ascii?Q?FG+ivyMLKvop0Z0xgqOqwU3Hduv2cQhzkNDCyxcPpCfF9oWSMkleolZgDOax?=
- =?us-ascii?Q?YaV5gOMjoDXBFILJ/gG+RPNQ71ItkiHEoe5YMY8lh7jOUJXQbJlbHrtUBLF9?=
- =?us-ascii?Q?IDEa8If4hiHgj+090Fjfq0+QdkJI4RmoHMk0PN6dg+IvcdnUbluPOcikaB6C?=
- =?us-ascii?Q?Z7L4WtnM2IFHbbA+rMo=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB5481.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 910bc8cb-9880-4acd-c031-08dbd620ae09
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Oct 2023 12:40:04.9765
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: p7mOafkwnxOxfeLYiB5JZsrp3nNCth0Va1O0ZQOg6TUsq6257C1KBmHYTwRSteq5MeO+iYyuwswQp09sDwQICA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9178
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S231135AbjJZNNn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Oct 2023 09:13:43 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED1F1AE
+        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 06:13:40 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0440CC433C7;
+        Thu, 26 Oct 2023 13:13:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698326020;
+        bh=5gbISpsYfiUXU0Z2Df+YYl055iyGsKdhEBg4kUZKzxY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=FGoQmYEN9zTTgXpsOsQTzl54bVtgF0bvukWv+Y74bVkz7M695WpyaYO/1FZac08tD
+         1DiFVDJX61Sv1x1QYKMKglgpEl87hUcSkmVtASZ+7IO0MIOdOq8gIh2qxnmr6G0l6x
+         UkA8qplxDqgBhxJ1BDaZ319Urp7CVnhVzkeSkPxe2yBNmM/ef0hZFXohuRyKxJLdkE
+         dzmdZiuIpeai6CmvSgw9KSKi4e+sOtDSskKyfQbfubxPAEnJXyh60RDi2IuPxJOPv3
+         j0aaqIFoXcDzF4xiFXDG0hVkvSIejVTEeecoVHM1Nq7UMFFkC4OTER+xgVedL80xEV
+         7qz5603/r5xgQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qw0B7-007twP-FM;
+        Thu, 26 Oct 2023 14:13:37 +0100
+Date:   Thu, 26 Oct 2023 14:13:37 +0100
+Message-ID: <868r7p4jcu.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     kvm@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ricardo Koller <ricarkol@google.com>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2] KVM: arm64: selftests: Add arch_timer_edge_cases selftest
+In-Reply-To: <20230928210201.1310536-1-coltonlewis@google.com>
+References: <20230928210201.1310536-1-coltonlewis@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, ricarkol@google.com, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Michael S. Tsirkin <mst@redhat.com>
-> Sent: Thursday, October 26, 2023 5:42 PM
->=20
-> On Thu, Oct 26, 2023 at 03:08:12PM +0300, Yishai Hadas wrote:
-> > > > Makes sense ?
-> > > So do I understand correctly that virtio dictates the subsystem
-> > > device ID for all subsystem vendor IDs that implement a legacy
-> > > virtio interface?  Ok, but this device didn't actually implement a
-> > > legacy virtio interface.  The device itself is not tranistional,
-> > > we're imposing an emulated transitional interface onto it.  So did
-> > > the subsystem vendor agree to have their subsystem device ID managed
-> > > by the virtio committee or might we create conflicts?  I imagine we
-> > > know we don't have a conflict if we also virtualize the subsystem ven=
-dor ID.
-> > >
-> > The non transitional net device in the virtio spec defined as the
-> > below tuple.
-> > T_A: VID=3D0x1AF4, DID=3D0x1040, Subsys_VID=3DFOO, Subsys_DID=3D0x40.
-> >
-> > And transitional net device in the virtio spec for a vendor FOO is
-> > defined
-> > as:
-> > T_B: VID=3D0x1AF4,DID=3D0x1000,Subsys_VID=3DFOO, subsys_DID=3D0x1
-> >
-> > This driver is converting T_A to T_B, which both are defined by the
-> > virtio spec.
-> > Hence, it does not conflict for the subsystem vendor, it is fine.
->=20
-> You are talking about legacy guests, what 1.X spec says about them is muc=
-h less
-> important than what guests actually do.
-> Check the INF of the open source windows drivers and linux code, at least=
-.
+On Thu, 28 Sep 2023 22:02:01 +0100,
+Colton Lewis <coltonlewis@google.com> wrote:
+> 
+> Add a new arch_timer_edge_cases selftests that validates:
+> 
+> * timers above the max TVAL value
+> * timers in the past
+> * moving counters ahead and behind pending timers
+> * reprograming timers
+> * timers fired multiple times
+> * masking/unmasking using the timer control mask
+> 
+> These are intentionally unusual scenarios to stress compliance with
+> the arm architecture.
+> 
+> Co-developed-by: Ricardo Koller <ricarkol@google.com>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+> 
+> v2:
+> * Rebase to v6.6-rc3
+> * Use new GUEST_ASSERT macros
+> * Remove spinlock in favor of atomic operations
+> 
+> v1: https://lore.kernel.org/kvm/20230516213731.387132-1-coltonlewis@google.com/
+> 
+>  tools/testing/selftests/kvm/Makefile          |    1 +
+>  .../kvm/aarch64/arch_timer_edge_cases.c       | 1105 +++++++++++++++++
+>  .../kvm/include/aarch64/arch_timer.h          |   18 +-
+>  3 files changed, 1123 insertions(+), 1 deletion(-)
+>  create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index a3bb36fb3cfc..e940b7c6b818 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -141,6 +141,7 @@ TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
+> 
+>  TEST_GEN_PROGS_aarch64 += aarch64/aarch32_id_regs
+>  TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
+> +TEST_GEN_PROGS_aarch64 += aarch64/arch_timer_edge_cases
+>  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+>  TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
+>  TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
+> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c b/tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
+> new file mode 100644
+> index 000000000000..a3761a361de9
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
+> @@ -0,0 +1,1105 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * arch_timer_edge_cases.c - Tests the aarch64 timer IRQ functionality.
+> + *
+> + * The test validates some edge cases related to the arch-timer:
+> + * - timers above the max TVAL value.
+> + * - timers in the past
+> + * - moving counters ahead and behind pending timers.
+> + * - reprograming timers.
+> + * - timers fired multiple times.
+> + * - masking/unmasking using the timer control mask.
+> + *
+> + * Copyright (c) 2021, Google LLC.
+> + */
+> +
+> +#define _GNU_SOURCE
+> +
+> +#include <stdlib.h>
+> +#include <pthread.h>
+> +#include <linux/kvm.h>
+> +#include <linux/atomic.h>
+> +#include <linux/bitmap.h>
+> +#include <linux/sizes.h>
+> +#include <sched.h>
+> +#include <sys/sysinfo.h>
+> +
+> +#include "kvm_util.h"
+> +#include "processor.h"
+> +#include "delay.h"
+> +#include "arch_timer.h"
+> +#include "gic.h"
+> +#include "vgic.h"
+> +
+> +#define msecs_to_usecs(msec)		((msec) * 1000LL)
+> +
+> +#define CVAL_MAX			~0ULL
+> +/* tval is a signed 32-bit int. */
+> +#define TVAL_MAX			INT_MAX
+> +#define TVAL_MIN			INT_MIN
+> +
+> +#define GICD_BASE_GPA			0x8000000ULL
+> +#define GICR_BASE_GPA			0x80A0000ULL
 
-Linux legacy guest has,
+We already have 3 tests that do their own GIC setup. Maybe it is time
+someone either make vgic_v3_setup() deal with fixed addresses, or move
+this into a helper.
 
-static struct pci_device_id virtio_pci_id_table[] =3D {
-        { 0x1af4, PCI_ANY_ID, PCI_ANY_ID, PCI_ANY_ID, 0, 0, 0 },
-        { 0 },
-};
-Followed by an open coded driver check for 0x1000 to 0x103f range.
-Do you mean windows driver expects specific subsystem vendor id of 0x1af4?
+> +
+> +/* After how much time we say there is no IRQ. */
+> +#define TIMEOUT_NO_IRQ_US		msecs_to_usecs(50)
+> +
+> +#define TEST_MARGIN_US			1000ULL
+> +
+> +/* A nice counter value to use as the starting one for most tests. */
+> +#define DEF_CNT				(CVAL_MAX / 2)
+> +
+> +/* Number of runs. */
+> +#define NR_TEST_ITERS_DEF		5
+> +
+> +/* Default wait test time in ms. */
+> +#define WAIT_TEST_MS			10
+> +
+> +/* Default "long" wait test time in ms. */
+> +#define LONG_WAIT_TEST_MS		100
+> +
+> +/* Shared with IRQ handler. */
+> +struct test_vcpu_shared_data {
+> +	atomic_t handled;
+> +	atomic_t spurious;
+> +} shared_data;
+> +
+> +struct test_args {
+> +	/* Virtual or physical timer and counter tests. */
+> +	enum arch_timer timer;
+> +	/* Delay used for most timer tests. */
+> +	uint64_t wait_ms;
+> +	/* Delay used in the test_long_timer_delays test. */
+> +	uint64_t long_wait_ms;
+> +	/* Number of iterations. */
+> +	int iterations;
+> +	/* Whether to test the physical timer. */
+> +	bool test_physical;
+> +	/* Whether to test the virtual timer. */
+> +	bool test_virtual;
+> +};
+> +
+> +struct test_args test_args = {
+> +	.wait_ms = WAIT_TEST_MS,
+> +	.long_wait_ms = LONG_WAIT_TEST_MS,
+> +	.iterations = NR_TEST_ITERS_DEF,
+> +	.test_physical = true,
+> +	.test_virtual = true,
+> +};
+> +
+> +static int vtimer_irq, ptimer_irq;
+> +
+> +enum sync_cmd {
+> +	SET_REG_KVM_REG_ARM_TIMER_CNT = 100001,
+> +	USERSPACE_USLEEP,
+> +	USERSPACE_SCHED_YIELD,
+> +	USERSPACE_MIGRATE_SELF,
+> +};
+> +
+> +typedef void (*sleep_method_t)(enum arch_timer timer, uint64_t usec);
+> +
+> +static void sleep_poll(enum arch_timer timer, uint64_t usec);
+> +static void sleep_sched_poll(enum arch_timer timer, uint64_t usec);
+> +static void sleep_in_userspace(enum arch_timer timer, uint64_t usec);
+> +static void sleep_migrate(enum arch_timer timer, uint64_t usec);
+> +
+> +sleep_method_t sleep_method[] = {
+> +	sleep_poll,
+> +	sleep_sched_poll,
+> +	sleep_migrate,
+> +	sleep_in_userspace,
+> +};
+> +
+> +typedef void (*wfi_method_t)(void);
+> +
+> +static void wait_for_non_spurious_irq(void);
+> +static void wait_poll_for_irq(void);
+> +static void wait_sched_poll_for_irq(void);
+> +static void wait_migrate_poll_for_irq(void);
+> +
+> +wfi_method_t wfi_method[] = {
+> +	wait_for_non_spurious_irq,
+> +	wait_poll_for_irq,
+> +	wait_sched_poll_for_irq,
+> +	wait_migrate_poll_for_irq,
+> +};
+> +
+> +#define for_each_wfi_method(i)							\
+> +	for ((i) = 0; (i) < ARRAY_SIZE(wfi_method); (i)++)
+> +
+> +#define for_each_sleep_method(i)						\
+> +	for ((i) = 0; (i) < ARRAY_SIZE(sleep_method); (i)++)
+> +
+> +enum timer_view {
+> +	TIMER_CVAL = 1,
+> +	TIMER_TVAL,
+> +};
+> +
+> +#define ASSERT_IRQS_HANDLED(_nr, _args...) do {				\
+> +		int _h = atomic_read(&shared_data.handled);		\
+> +		__GUEST_ASSERT(_h == (_nr), "Handled %d IRQS but expected %d", _h, _nr, ##_args); \
+> +	} while (0)
+> +
+> +#define GUEST_SYNC_CLOCK(__cmd, __val)						\
+> +	GUEST_SYNC_ARGS(__cmd, __val, 0, 0, 0)
+> +
+> +#define USERSPACE_CMD(__cmd)							\
+> +	GUEST_SYNC_ARGS(__cmd, 0, 0, 0, 0)
+> +
+> +#define USERSPACE_SCHEDULE()							\
+> +	USERSPACE_CMD(USERSPACE_SCHED_YIELD)
+> +
+> +#define USERSPACE_MIGRATE_VCPU()						\
+> +	USERSPACE_CMD(USERSPACE_MIGRATE_SELF)
+> +
+> +#define SLEEP_IN_USERSPACE(__usecs)						\
+> +	GUEST_SYNC_ARGS(USERSPACE_USLEEP, (__usecs), 0, 0, 0)
+> +
+> +#define IAR_SPURIOUS		1023
+> +
+> +static void set_counter(enum arch_timer timer, uint64_t counter)
+> +{
+> +	GUEST_SYNC_ARGS(SET_REG_KVM_REG_ARM_TIMER_CNT, counter, timer, 0, 0);
+> +}
+> +
+> +static uint32_t next_pcpu(void)
+> +{
+> +	uint32_t max = get_nprocs();
+> +	uint32_t cur = sched_getcpu();
+> +	uint32_t next = cur;
+> +	cpu_set_t cpuset;
+> +
+> +	TEST_ASSERT(max > 1, "Need at least two physical cpus");
+> +
+> +	sched_getaffinity(getpid(), sizeof(cpuset), &cpuset);
+> +
+> +	do {
+> +		next = (next + 1) % CPU_SETSIZE;
+> +	} while (!CPU_ISSET(next, &cpuset));
+> +
+> +	return next;
+> +}
+> +
+> +static void guest_irq_handler(struct ex_regs *regs)
+> +{
+> +	unsigned int intid = gic_get_and_ack_irq();
+> +	enum arch_timer timer;
+> +	uint64_t cnt, cval;
+> +	uint32_t ctl;
+> +	bool timer_condition, istatus;
+> +
+> +	if (intid == IAR_SPURIOUS) {
+> +		atomic_inc(&shared_data.spurious);
+> +		goto out;
+> +	}
+> +
+> +	if (intid == ptimer_irq)
+> +		timer = PHYSICAL;
+> +	else if (intid == vtimer_irq)
+> +		timer = VIRTUAL;
+> +	else
+> +		goto out;
+> +
+> +	ctl = timer_get_ctl(timer);
+> +	cval = timer_get_cval(timer);
+> +	cnt = timer_get_cntct(timer);
+> +	timer_condition = cnt >= cval;
+> +	istatus = (ctl & CTL_ISTATUS) && (ctl & CTL_ENABLE);
+> +	GUEST_ASSERT_EQ(timer_condition, istatus);
+> +
+> +	/* Disable and mask the timer. */
+> +	timer_set_ctl(timer, CTL_IMASK);
+
+What is the point of masking if the timer is disabled?
+
+> +
+> +	atomic_inc(&shared_data.handled);
+
+You don't have any ordering between atomic operations and system
+register access. Could it be a problem?
+
+> +
+> +out:
+> +	gic_set_eoi(intid);
+> +}
+> +
+> +static void set_cval_irq(enum arch_timer timer, uint64_t cval_cycles,
+> +			 uint32_t ctl)
+> +{
+> +	atomic_set(&shared_data.handled, 0);
+> +	atomic_set(&shared_data.spurious, 0);
+> +	timer_set_cval(timer, cval_cycles);
+> +	timer_set_ctl(timer, ctl);
+
+Same question.
+
+> +}
+> +
+> +static void set_tval_irq(enum arch_timer timer, uint64_t tval_cycles,
+> +			 uint32_t ctl)
+> +{
+> +	atomic_set(&shared_data.handled, 0);
+> +	atomic_set(&shared_data.spurious, 0);
+> +	timer_set_tval(timer, tval_cycles);
+> +	timer_set_ctl(timer, ctl);
+> +}
+> +
+> +static void set_xval_irq(enum arch_timer timer, uint64_t xval, uint32_t ctl,
+> +			 enum timer_view tv)
+> +{
+> +	switch (tv) {
+> +	case TIMER_CVAL:
+> +		set_cval_irq(timer, xval, ctl);
+> +		break;
+> +	case TIMER_TVAL:
+> +		set_tval_irq(timer, xval, ctl);
+> +		break;
+> +	default:
+> +		GUEST_FAIL("Could not get timer %d", timer);
+> +	}
+> +}
+> +
+> +/*
+> + * Should be called with IRQs masked.
+> + *
+> + * Note that this can theoretically hang forever, so we rely on having
+> + * a timeout mechanism in the "runner", like:
+> + * tools/testing/selftests/kselftest/runner.sh.
+> + */
+> +static void wait_for_non_spurious_irq(void)
+> +{
+> +	int h;
+> +
+> +	for (h = atomic_read(&shared_data.handled); h == atomic_read(&shared_data.handled);) {
+> +		asm volatile ("wfi\n"
+> +			      "msr daifclr, #2\n"
+> +			      /* handle IRQ */
+> +			      "msr daifset, #2\n":::"memory");
+
+There is no guarantee that a pending interrupt would fire at the point
+where the comment is. R_RBZYL clearly state that you need a context
+synchronisation event between these two instructions if you want
+interrupts to be handled.
+
+> +	}
+> +}
+> +
+> +/*
+> + * Wait for an non-spurious IRQ by polling in the guest (userspace=0) or in
+> + * userspace (e.g., userspace=1 and userspace_cmd=USERSPACE_SCHED_YIELD).
+> + *
+> + * Should be called with IRQs masked. Not really needed like the wfi above, but
+> + * it should match the others.
+> + *
+> + * Note that this can theoretically hang forever, so we rely on having
+> + * a timeout mechanism in the "runner", like:
+> + * tools/testing/selftests/kselftest/runner.sh.
+> + */
+> +static void poll_for_non_spurious_irq(bool userspace, enum sync_cmd userspace_cmd)
+> +{
+> +	int h;
+> +
+> +	h = atomic_read(&shared_data.handled);
+> +
+> +	local_irq_enable();
+
+So half of this code is using local_irq_*(), and the rest is directly
+poking at DAIF. Amusingly enough, the two aren't even playing with the
+same set of bits.
+
+> +	while (h == atomic_read(&shared_data.handled)) {
+> +		if (userspace)
+> +			USERSPACE_CMD(userspace_cmd);
+> +		else
+> +			cpu_relax();
+> +	}
+> +	local_irq_disable();
+> +}
+> +
+> +static void wait_poll_for_irq(void)
+> +{
+> +	poll_for_non_spurious_irq(false, -1);
+
+Am I the only one who cries when seeing this -1 cast on an unsuspected
+enum, together with a flag saying "hey, I'm giving you crap
+arguments"? What was wrong having an actual enum value for it?
+
+> +}
+> +
+> +static void wait_sched_poll_for_irq(void)
+> +{
+> +	poll_for_non_spurious_irq(true, USERSPACE_SCHED_YIELD);
+> +}
+> +
+> +static void wait_migrate_poll_for_irq(void)
+> +{
+> +	poll_for_non_spurious_irq(true, USERSPACE_MIGRATE_SELF);
+> +}
+> +
+> +/*
+> + * Sleep for usec microseconds by polling in the guest (userspace=0) or in
+> + * userspace (e.g., userspace=1 and userspace_cmd=USERSPACE_SCHEDULE).
+> + */
+> +static void guest_poll(enum arch_timer test_timer, uint64_t usec,
+> +		       bool userspace, enum sync_cmd userspace_cmd)
+> +{
+> +	uint64_t cycles = usec_to_cycles(usec);
+> +	/* Whichever timer we are testing with, sleep with the other. */
+> +	enum arch_timer sleep_timer = 1 - test_timer;
+> +	uint64_t start = timer_get_cntct(sleep_timer);
+> +
+> +	while ((timer_get_cntct(sleep_timer) - start) < cycles) {
+> +		if (userspace)
+> +			USERSPACE_CMD(userspace_cmd);
+> +		else
+> +			cpu_relax();
+> +	}
+> +}
+> +
+> +static void sleep_poll(enum arch_timer timer, uint64_t usec)
+> +{
+> +	guest_poll(timer, usec, false, -1);
+
+More of the same stuff...
+
+Frankly, I even have a hard time understanding what this code is
+trying to achieve, let alone the lack of correctness from an
+architecture perspective.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
