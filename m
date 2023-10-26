@@ -2,217 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC51F7D86DB
-	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 18:39:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B3BA7D8782
+	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 19:24:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345135AbjJZQjz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Oct 2023 12:39:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55638 "EHLO
+        id S231777AbjJZRYf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Oct 2023 13:24:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231180AbjJZQjx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Oct 2023 12:39:53 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 213AD1AD
-        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 09:39:48 -0700 (PDT)
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39QDim3N028746;
-        Thu, 26 Oct 2023 16:39:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=IDW6ih7zn8oYWpIpcrW5tQGovSyuqtkkp1tz4Ft8RBk=;
- b=zyhah0pG1+hWnxJv9LLOZlCRHvz9gU12RV6ACRHcXEjlSXXflhN9BNnjbfG70D5bf6g3
- qKl0gPTaduTGa3Zaznc9ZXAUhK7OJcdBI3FghXwY/uHCcCbAsE2A5d6Rg67MvZ4YFb4r
- c9XuEdphe+I0dGm+2oQPCqL/pZifFkcZczI93VC+rsLT/Xft6qH/Oyi97dh8RXyDMXIp
- zkUDTJ7y/nk3ogXox3BEP+lqfkDcaOC/mAIKcDlmlMEq/47c+BpFWr5tDpzbW4VEtYDE
- Xc2gh35M4HwfiaCfaoDaQaFMQ5ImLWzp5QYmJeTG2tW/uaeAM+FkmfJobUznokaPnVNo BQ== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tv581ugg3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 26 Oct 2023 16:39:28 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39QGYBZx001631;
-        Thu, 26 Oct 2023 16:39:27 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2168.outbound.protection.outlook.com [104.47.59.168])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3tv53exps2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 26 Oct 2023 16:39:27 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SOVFqyPUvIRVDaFYmDKhcVIHWycGdnCiS5E+R51ztt+BbDHLEy0KVJDdJSFAc2aijg/fimHHK0rUN8XdZq+TCl8xwTntERhV/EqvirrUgEDQvDkyl4uQemfOmMc0n6i6UjZoXll2YznXufl4k0eG+UdtOSAEcz56NO0vefJXlfivX5xf/cMvYuftGm4lrJMAps/wL8eL2lMBZm8OWBARGbLI/JeTH5zj5iLu0RkP7dz5E7d+8AEXYIAeB/VRfUC8aPEjGsIiAia/3ws5/GweHbaGj82pfzU9SQth5118tvy7QUAm9w1t/A1Mr0MMn93qzZ7H828NRzhu5Mq986mcuQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IDW6ih7zn8oYWpIpcrW5tQGovSyuqtkkp1tz4Ft8RBk=;
- b=nN9hdvxxr4DLK7uRC0Z+6Oo7FZynpUjsJRxUaJJe59e/nX0zG9l485gE55WzQYGCRZjp0u7PB0m1mXi0eOVsvM5djsHxwB8HpQPE1HViaXR5XHj1zIZ2Y8ah0VedqLs7jS5R7MArlfJNNq+cmMJUmoLhdVCAUSG/EjvHqt6Q5YAGi2vtf9D/wPrH/ApWGgSiNdByBHjeaRQYISljbSFPMj0qqXXMOXD6lVm9SEGlurqsBdEAba9Bm4/ihBFmeGkt7IOHKrzm8r2GiFU/APOQ/fRufZxSG7CZXxgLpvdMVd6OT4cMZDMJV0FKotiStQ7L10md+f+0oO8c07CtBuaoLw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        with ESMTP id S230008AbjJZRYe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Oct 2023 13:24:34 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5BB990
+        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 10:24:31 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9c4ae201e0so1132618276.1
+        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 10:24:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IDW6ih7zn8oYWpIpcrW5tQGovSyuqtkkp1tz4Ft8RBk=;
- b=iaVnrXXF/Y0ujYVyAS3opLMrJf/WS+XiG1imHI3FC/FfNB1qiBwAl79ZuPJukPXZnHCtq5ZEt9UWBjgqvIGh65g8blEWeYQnNwD5qyZPl86dpBBb9bkH2r9jDU7k4iRNOOcnotaI5R8Bh9DbFqCvB4GmjxoBPwZOue1tpxJsZ3c=
-Received: from BYAPR10MB2663.namprd10.prod.outlook.com (2603:10b6:a02:a9::20)
- by BL3PR10MB6235.namprd10.prod.outlook.com (2603:10b6:208:38e::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.19; Thu, 26 Oct
- 2023 16:39:23 +0000
-Received: from BYAPR10MB2663.namprd10.prod.outlook.com
- ([fe80::afac:25ec:c0ba:643]) by BYAPR10MB2663.namprd10.prod.outlook.com
- ([fe80::afac:25ec:c0ba:643%4]) with mapi id 15.20.6933.019; Thu, 26 Oct 2023
- 16:39:23 +0000
-Message-ID: <b6b24f07-e63b-cb07-ab74-f9a178bde91f@oracle.com>
-Date:   Thu, 26 Oct 2023 09:39:24 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH] target/i386/monitor: synchronize cpu before printing
- lapic state
-To:     David Woodhouse <dwmw2@infradead.org>,
-        qemu-devel <qemu-devel@nongnu.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        Thomas Huth <thuth@redhat.com>
-References: <870c998c450ba7e2bc2a72c12066f1af75e507d0.camel@infradead.org>
-Content-Language: en-US
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-In-Reply-To: <870c998c450ba7e2bc2a72c12066f1af75e507d0.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY3PR05CA0022.namprd05.prod.outlook.com
- (2603:10b6:a03:254::27) To BYAPR10MB2663.namprd10.prod.outlook.com
- (2603:10b6:a02:a9::20)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR10MB2663:EE_|BL3PR10MB6235:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5c5ca617-fb21-410b-3160-08dbd6421c35
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: GSIPu7VO3S8ovBgZ5udN87ENiB4HohLSdKUkH/cY76hhqy14OvxhNPuoQq4xUcv2Ts2ghwWuOSrl/rNc/ViW7V4PiLAbjlHG0ftYngHS/zY6gD2LuDb0KaiIIOam2MMVEKE/aZoqCBegBVPwj1BkvDWAArF9pBCr+uoJxh1Yix7vNe0pJpfz5OB15RXv/pPyN/rO2CqGjQbOTjWk0SxM3f5sEgFF/l9nkW/AjgTVRpeuOHi5jDdrDODkiV+6xiVNUdXWZnnRHE+bKMmdWu1m5ScKJ1Y36laGunp53OM8Un6pLTTOoVncOpvIffNT9ZNRddIBDv2OX9MX5xmMsuzEcDZybZf/9GspMg3EIyxMjZY4NoBUb+i9VwS1qzd41T6UBkHvmLntk6taGKn4MIQ+C/8TOmhm95HaeiZmwbXQAkjrP0crhqW7Y4v1a2kJH4wztJPl8trsvsFbJoHwFaHu00zz32U7JTdr/V8Aq4D7r6YKoCbwdOxVirkXAYnU09dtPNxOQESm6ZPgMfxLw8aTzxulDbvLbNRZiNgIVyTYhJhsGPI6bR850NXIhUTXw5hddDwYXBwT3JtUX8xE3bSh+/YBF9psckgES+8DyQAekyMmXmlK9DRWGDNznmLkYqYHgoQsjWwOHYIoC/Yz3YnFXu90ureOe/fqi03h+/63UkJFN3dlrX5ZiamEaAl1J8ri
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2663.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(136003)(346002)(366004)(396003)(230922051799003)(1800799009)(451199024)(64100799003)(186009)(66476007)(2906002)(5660300002)(31686004)(41300700001)(44832011)(4326008)(8676002)(8936002)(2616005)(38100700002)(66946007)(66556008)(36756003)(54906003)(316002)(53546011)(26005)(86362001)(31696002)(6506007)(6512007)(110136005)(6486002)(966005)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WGtmK3o3a2lHaHFBWThUREZjZFZ3dFR3SUw3YlZTZSszdWZoQ0VMWFFKdFlG?=
- =?utf-8?B?eVozNjRYcVR3OTVOMGJxUWV6ckQxTjNkYkNFODRRdGZEdHU3dzIxSHZ5bXpJ?=
- =?utf-8?B?bHhTL2pIRDE4ZkJuOFgwWXpiN1VudlQwZWhETldTMlBJWVh1aEFwc2piNnVO?=
- =?utf-8?B?d1Z2eUwwOWRPQ3h4SDJkWGhCWmJ4QkpkamRCbjlxOXo1bjdpbkpCdEF5Z3M5?=
- =?utf-8?B?UFdIUkw1RlB4RE1IR3loWDRmL3h0cGdPaG14WWpBbGg3Ui9qZWdnaXRCb1FQ?=
- =?utf-8?B?RVNiemtjL0V3c0hLU3hWSUpoQjBKd3RyMHMxS1JwcVRPTVozVUVEN0YyWHFl?=
- =?utf-8?B?Z0VpblNqZldxY2hjOHc4Y0c5aVpTejNjNHZkTlZENGlmRmRYbmUzbmFZMjdU?=
- =?utf-8?B?eE5DYmlUSVJuNXBMRUIyaXRUajVnRXNyNUxLY1JDYTd3KzE5MWNvWm9WdHo0?=
- =?utf-8?B?am1JM2x3Z253SVl5TjFsbVk1Y2pLencxSE5NS2dyK3dXQ0NZZ0lsNXhqMTJB?=
- =?utf-8?B?RWRxVVBqd09Ma2tYTDErck9WS1UyVDg5V1AvQjBuT1ZJZXFiWk1VQmhzOE5G?=
- =?utf-8?B?WnovL1M3aC9qRmlTbGJZOFBsSjlJVEhnTVFTR1dqWURneWVXajhNKy8vSnE1?=
- =?utf-8?B?TmU5MExHbWhOK0FXMER2di9BQ1ZpTU0yVEIwai9IRFFGd0pFL3o3cXkyMWl0?=
- =?utf-8?B?dy9PblFnK0dZTUw3R0tDRUZPVmdBdjI0emEwS25MZTZOdVlydmYxU0NHY2ZM?=
- =?utf-8?B?OGNVYWRZYnFIWDZsVjBjQkNVYjdMTTliZE9nQmtUdzM4K1Bna3hyOGI0Mi84?=
- =?utf-8?B?ZTRVSkE2QTdBQmx2NWhZSkJZRWkwNWxHQ3FOc3I0eWRpaUlSbHgxSFgxUnZa?=
- =?utf-8?B?d1YreXdMNndDY3dacElWKzIrYzFSNTBTRWZuRmVhSWZUNmhBRG9WYWoycU1X?=
- =?utf-8?B?NlJFWkxxdXp6bkdFSUtJOHluQXlWSXFPVHRRNkx2bXlBNmYyM1lWV0kvRDdT?=
- =?utf-8?B?bHJlWi9UZmFzZlVHSUtOa3VsaGlMeXZhWmxnWVJ5Y0loc0NwQUNhUDlBZUli?=
- =?utf-8?B?UExZT3JUV0M4REZvOGVIZytielc2NWxURVBCd2pHa0xYUlRXbDgzbXpCY0pK?=
- =?utf-8?B?dW5yR1BER2ZjOTdMWUcwekxja2dNenY1RUVKTzNCa24xMG1vREJ6bzdWdHVM?=
- =?utf-8?B?YnVvZHROeXlXTmxVUFo1MmcwK0RIMWRpZTlGZERQa1lQTTJqQUNOT0xjQzlP?=
- =?utf-8?B?NWZNRDNNemdpaG8yZ012NlV1SGE5RkhuN0lIQVYyMUM3QkFyV3owVURTYTRO?=
- =?utf-8?B?Z3Y1dExWYTYzRXhZM2RFcHJXempuTWFrcXQwMG1jV2Q2aXdOMGRWd0lZRFB1?=
- =?utf-8?B?NHc1bldNbm95WWc5M0FkdjI5Q051YVFYdFpsQzNqaGxHNHYyU0NCWFhKNUhO?=
- =?utf-8?B?TTZsQzF6cTM3TzYwNTNQV3V4QzQ2Zi93ajlha1l2UTRUbTFQSm5DUThnbHdC?=
- =?utf-8?B?b3JXOUtxLzFXTFcyUkJWNzh1VVBoVmMrMUs4SVY0SDRkL0hzREYwOWVTaEdO?=
- =?utf-8?B?ZVluTGJhcWFsNWk4d2RnY0dVN3puMXROZXN6cjRTYUZoZlM5VVdXV0cxM3VP?=
- =?utf-8?B?RVNYTFk2QzZSRzhmYW9RZGFjRVQwUWFENkNldFBDOFpxNkdla3VmQzVnMDBv?=
- =?utf-8?B?Um5uQUxtRWViU0U4cFZaWWcvN3gwRjB5VElIUWhFYXNBWExsa3BETW1CNzdO?=
- =?utf-8?B?L3dnQ0hMMVNmQmM2enVnZEtWdFdkTi83MTJRZlpSYWtJU0N2ZEFCSjdNSHF3?=
- =?utf-8?B?dE50WTMwRXlkU0FPYzRHZ0ZrRnNEV1dVYnVLWUx5bWtwN3l5NWozOGVyUzIv?=
- =?utf-8?B?U1c4TVZOTzRWYnp5dVRYQ1dEWktIZG13bVdNcURTTzNMeVZZMG1XaHZFM3pN?=
- =?utf-8?B?NmJOVTN5eFhacFdWbFZiZUQvNEZ0ZGlpY3d2aGx3eHUxS2M4Ri9oVG9udnZ4?=
- =?utf-8?B?TGlTU1dqVFZsQzdiNWtIb0UxczdYT21JQi9maERJbUFrK0c1MTZEMXRVMFNG?=
- =?utf-8?B?T1UzeDRVWkRFOGVIeFZsT25YMlJoMWdzQlhrS2hoQmFTWWpwQVdXaFpHdkJv?=
- =?utf-8?B?LzVVTGZYSTAwUjZGc1dYQm9qaGMxZkk0UE10bTZRZXZmOU5sZi85WVhpczV4?=
- =?utf-8?B?Qnc9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: DCUT2mx/bYTDbfDIM6Wl29RrnfQ7pbNsvTuOlodgSmAUL6b1dh5hS9ZKCkHLiO2nonnGH+PgfIUxnCSxRHj5x+DYIJL+HEw1UuWl2bvBsSKlRscO2z7090BtEf0jf9TdgsOS5Z1KEps2zHIxUhTFOn0/fGm11DAtrX0DTxvTg/86SxOpmgMzEfG2hoVhdeUpEYyh+LWcv4WmH8Cja4z9J1gD2OHVh7g1y6ripeGOOb+zEiX83PQS0qLsBN8d5sZTyYLfJEdfavrAoGdDJmYNpVjuwfht0IYCayiMqx37BnnEPJxJE5cQbRaxS9xhS1FqkxuMmnblP1E5TBFzIvw47Wp0BxcSu2dlt343yzSqw+XLAWvlbolhOVsQ/aK8ky23rLRp+APTeFKVwXDfHC8NCzESTzOSuxCeyn/j0izKybWfRnexR/bgpSvhjzrvtlzV5xuchS9Czl1nYDZnfdINz/RB2P1T70eHRIkhtoY7lJfR1CD56wwE068sZcWtzcOsA216AJYB9z1Ty1FIfFcAkxNMNwjPLctUbxlHNdyG9E1/us3hJb4ZWTUE+9TQmf4HSIbhZl/0pS6Rodh64ZtVzHa897xnRFSvGDPKdNGkADvOkqMZwJn19x1962hAWpHvKLOhcxkW1y3OG0rb+1PgJ6UY0ya+LcmigcV1gjQ8vn+Yu9znCyQxsE8YQ/84UxEjZUoyVhaoZ5nd8krXU8PNtVzl6+YwhANN4DrZtWnIctsdhJRttqmpnSPeUWA1jvoynoPzaVq7EU3i6LudURdu/ACOuG2GGSUUTtI81Q0X6f9FVG+81CRrDUXy/64qlOG1D4cKWITzX+ySrpzgFPMOwJ0j5iUjGHQiN4M9F2xPVY0aQl/QxxjFitPyyKVpwxE8zAv9m/vI7xRbb0skAxYq/Q==
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5c5ca617-fb21-410b-3160-08dbd6421c35
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2663.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2023 16:39:23.3905
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YBIgEoH5m2lizIPbbF+TK+JcVDV6PbGkgfIQEDrPcv14jI/c9WHvb3Bhsyv2MsKMihSOOM5zn4qzFjkYKVSQrA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR10MB6235
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-26_15,2023-10-26_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxlogscore=999
- adultscore=0 bulkscore=0 suspectscore=0 mlxscore=0 phishscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310170001 definitions=main-2310260145
-X-Proofpoint-GUID: 1tTIbaWWYSDmC0Do_2DX3llnnLUCbiC0
-X-Proofpoint-ORIG-GUID: 1tTIbaWWYSDmC0Do_2DX3llnnLUCbiC0
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        d=google.com; s=20230601; t=1698341071; x=1698945871; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GatHVTLVnQhttOezHvDF6an1rysQIrElqbDH0zmxJVc=;
+        b=lbKqI8a7l5EDJHd+wAcDZRN0ZaPIOxr87+qCjnM+TDu0+M4HXmfzzXI+rn0KhHtdEk
+         o/G/dtd6/uQXnyPSXcMAwpdFpNxMy/zO6u4Rv9tyRKVsXCtX8bzQTApf0WG9e0bWmzKF
+         VlqspD13ohmhpnZB+Ry4PST+WLx+jEaDR33ctqMuyonZVLhZF6H2d2Sg2GEBqjmSJnGW
+         TKpeG55Wh72VzacOiMPflUthpreRQ77WWsa56xxPMprRSwmOZv3tT5s1YurdBjWPanAi
+         jH+nIdhJN/Kke7IUzgSCyzbqcycDQRFFTLpEr482M9eNAOqnHpPNdVZ1y1AC9n1BTa0Q
+         mryQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698341071; x=1698945871;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GatHVTLVnQhttOezHvDF6an1rysQIrElqbDH0zmxJVc=;
+        b=UlfmXyTj+pG0J5HUAO2daBfXqy/Y6Pt9u6q5OXAXK+2QhW182xMaPi6yst8XOEL7DF
+         18TQ9p7CJh+8T+kgEQXqqlgHGg1Yme4hs+7LyiEXpFIMWbXW1Fh1el+kzHXas69dnar9
+         U1sIhifV58P3otCMwcpk1WVweMd5tgo+b7+TbCRYNRbAvv9j2Z64ciWAg9M3BHiOBMxy
+         xDWEtZnC7lP+PZX3PxeLRoF9j2ChsrTL8DfvcfyX9b3P9bnE1Jo2CrUSgr88wf3DnOwL
+         hML1mvHe6KrWBNgkHqI+Ail7Z1T3TlbYO+U/Zp/uM1zHI7jCpNFUG1sSD7PsgyDxRp3m
+         2MvA==
+X-Gm-Message-State: AOJu0YwgunAvj6+TvDrXVJAOpMhlQlZgmLJ5YQPnpqW3sWIP9k3PnQQY
+        o9XqILvnlbDYEMlfqKhhIuyUOjLnwRw=
+X-Google-Smtp-Source: AGHT+IFoIo29n0krAH+TlH9QJyT5lQadiwDHLNCOnAK4kn2PMD28s+3e1hDT1EzxHebYBKuVWvvft+H5oPI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:d43:0:b0:da0:56a4:efe3 with SMTP id
+ 64-20020a250d43000000b00da056a4efe3mr7926ybn.5.1698341071104; Thu, 26 Oct
+ 2023 10:24:31 -0700 (PDT)
+Date:   Thu, 26 Oct 2023 10:24:29 -0700
+In-Reply-To: <de1b148c-45c6-6517-0926-53d1aad8978e@intel.com>
+Mime-Version: 1.0
+References: <20230914063325.85503-1-weijiang.yang@intel.com>
+ <20230914063325.85503-7-weijiang.yang@intel.com> <e0db6ffd-5d92-2a1a-bdfb-a190fe1ccd25@intel.com>
+ <1347cf03-4598-f923-74e4-a3d193d9d2e9@intel.com> <ZTf5wPKXuHBQk0AN@google.com>
+ <de1b148c-45c6-6517-0926-53d1aad8978e@intel.com>
+Message-ID: <ZTqgzZl-reO1m01I@google.com>
+Subject: Re: [PATCH v6 06/25] x86/fpu/xstate: Opt-in kernel dynamic bits when
+ calculate guest xstate size
+From:   Sean Christopherson <seanjc@google.com>
+To:     Weijiang Yang <weijiang.yang@intel.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>, pbonzini@redhat.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        peterz@infradead.org, chao.gao@intel.com,
+        rick.p.edgecombe@intel.com, john.allen@amd.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi David,
-
-On 10/26/23 08:39, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+On Wed, Oct 25, 2023, Weijiang Yang wrote:
+> On 10/25/2023 1:07 AM, Sean Christopherson wrote:
+> > On Fri, Sep 15, 2023, Weijiang Yang wrote:
+> > IIUC, the "dynamic" features contains CET_KERNEL, whereas xfeatures_mask_supervisor()
+> > conatins PASID, CET_USER, and CET_KERNEL.  PASID isn't virtualized by KVM, but
+> > doesn't that mean CET_USER will get dropped/lost if userspace requests AMX/XTILE
+> > enabling?
 > 
-> Where the local APIC is emulated by KVM, we need kvm_get_apic() to pull
-> the current state into userspace before it's printed. Otherwise we get
-> stale values.
+> Yes, __state_size is correct for guest enabled xfeatures, including CET_USER,
+> and it gets removed from __state_perm.
 > 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
->  target/i386/monitor.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-> index 6512846327..0754d699ba 100644
-> --- a/target/i386/monitor.c
-> +++ b/target/i386/monitor.c
-> @@ -29,6 +29,7 @@
->  #include "monitor/hmp.h"
->  #include "qapi/qmp/qdict.h"
->  #include "sysemu/kvm.h"
-> +#include "sysemu/hw_accel.h"
->  #include "qapi/error.h"
->  #include "qapi/qapi-commands-misc-target.h"
->  #include "qapi/qapi-commands-misc.h"
-> @@ -655,6 +656,7 @@ void hmp_info_local_apic(Monitor *mon, const QDict *qdict)
->      if (qdict_haskey(qdict, "apic-id")) {
->          int id = qdict_get_try_int(qdict, "apic-id", 0);
->          cs = cpu_by_arch_id(id);
-> +        cpu_synchronize_state(cs);
+> IIUC, from current qemu/kernel interaction for guest permission settings,
+> __xstate_request_perm() is called only _ONCE_ to set AMX/XTILE for every vCPU
+> thread, so the removal of guest supervisor xfeatures won't hurt guest! ;-/
 
-AFAIR, there is a case that cs may be NULL here when I was sending the similar
-bugfix long time ago.
+Huh?  I don't follow.  What does calling __xstate_request_perm() only once have
+to do with anything?
 
-https://lore.kernel.org/qemu-devel/20210701214051.1588-1-dongli.zhang@oracle.com/
+/me stares more
 
-... and resend:
+OMG, hell no.  First off, this code is a nightmare to follow.  The existing comment
+is useless.  No shit the code is adding in supervisor states for the host.  What's
+not AT ALL clear is *why*.
 
-https://lore.kernel.org/qemu-devel/20210908143803.29191-1-dongli.zhang@oracle.com/
+The commit says it's necessary because the "permission bitmap is only relevant
+for user states":
 
-... and resent by Daniel as part of another patchset (after review):
+  commit 781c64bfcb735960717d1cb45428047ff6a5030c
+  Author: Thomas Gleixner <tglx@linutronix.de>
+  Date:   Thu Mar 24 14:47:14 2022 +0100
 
-https://lore.kernel.org/qemu-devel/20211028155457.967291-19-berrange@redhat.com/
+    x86/fpu/xstate: Handle supervisor states in XSTATE permissions
+    
+    The size calculation in __xstate_request_perm() fails to take supervisor
+    states into account because the permission bitmap is only relevant for user
+    states.
 
+But @permitted comes from:
 
-This utility is helpful for the diagnostic of loss of interrupt issue.
+  permitted = xstate_get_group_perm(guest);
 
-Dongli Zhang
+which is either fpu->guest_perm.__state_perm or fpu->perm.__state_perm.  And
+__state_perm is initialized to:
 
->      } else {
->          cs = mon_get_cpu(mon);
->      }
+	fpu->perm.__state_perm		= fpu_kernel_cfg.default_features;
+
+where fpu_kernel_cfg.default_features contains everything except the dynamic
+xfeatures, i.e. everything except XFEATURE_MASK_XTILE_DATA:
+
+	fpu_kernel_cfg.default_features = fpu_kernel_cfg.max_features;
+	fpu_kernel_cfg.default_features &= ~XFEATURE_MASK_USER_DYNAMIC;
+
+So why on earth does this code to force back xfeatures_mask_supervisor()?  Because
+the code just below drops the supervisor bits to compute the user xstate size and
+then clobbers __state_perm.
+
+	/* Calculate the resulting user state size */
+	mask &= XFEATURE_MASK_USER_SUPPORTED;
+	usize = xstate_calculate_size(mask, false);
+
+	...
+
+	WRITE_ONCE(perm->__state_perm, mask);
+
+That is beyond asinine.  IIUC, the intent is to apply the permission bitmap only
+for user states, because the only dynamic states are user states.  Bbut the above
+creates an inconsistent mess.  If userspace doesn't request XTILE_DATA,
+__state_perm will contain supervisor states, but once userspace does request
+XTILE_DATA, __state_perm will be lost.
+
+And because that's not confusing enough, clobbering __state_perm would also drop
+FPU_GUEST_PERM_LOCKED, except that __xstate_request_perm() can' be reached with
+said LOCKED flag set.
+
+fpu_xstate_prctl() already strips out supervisor features:
+
+	case ARCH_GET_XCOMP_PERM:
+		/*
+		 * Lockless snapshot as it can also change right after the
+		 * dropping the lock.
+		 */
+		permitted = xstate_get_host_group_perm();
+		permitted &= XFEATURE_MASK_USER_SUPPORTED;
+		return put_user(permitted, uptr);
+
+	case ARCH_GET_XCOMP_GUEST_PERM:
+		permitted = xstate_get_guest_group_perm();
+		permitted &= XFEATURE_MASK_USER_SUPPORTED;
+		return put_user(permitted, uptr);
+
+and while KVM doesn't apply the __state_perm to supervisor states, if it did
+there would be zero harm in doing so.
+
+	case 0xd: {
+		u64 permitted_xcr0 = kvm_get_filtered_xcr0();
+		u64 permitted_xss = kvm_caps.supported_xss;
+
+Second, the relying on QEMU to only trigger __xstate_request_perm() is not acceptable.
+It "works" for the current code, but only because there's only a single dynamic
+feature, i.e. this will short circuit and prevent computing a bad ksize.
+
+	/* Check whether fully enabled */
+	if ((permitted & requested) == requested)
+		return 0;
+
+I don't know how I can possibly make it any clearer: KVM absolutely must not assume
+userspace behavior.
+
+So rather than continue with the current madness, which will break if/when the
+next dynamic feature comes along, just preserve non-user xfeatures/flags in
+__guest_perm.
+ 
+If there are no objections, I'll test the below and write a proper changelog.
+ 
+--
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 26 Oct 2023 10:17:33 -0700
+Subject: [PATCH] x86/fpu/xstate: Always preserve non-user xfeatures/flags in
+ __state_perm
+
+Fixes: 781c64bfcb73 ("x86/fpu/xstate: Handle supervisor states in XSTATE permissions")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kernel/fpu/xstate.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+index ef6906107c54..73f6bc00d178 100644
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -1601,16 +1601,20 @@ static int __xstate_request_perm(u64 permitted, u64 requested, bool guest)
+ 	if ((permitted & requested) == requested)
+ 		return 0;
+ 
+-	/* Calculate the resulting kernel state size */
++	/*
++	 * Calculate the resulting kernel state size.  Note, @permitted also
++	 * contains supervisor xfeatures even though supervisor are always
++	 * permitted for kernel and guest FPUs, and never permitted for user
++	 * FPUs.
++	 */
+ 	mask = permitted | requested;
+-	/* Take supervisor states into account on the host */
+-	if (!guest)
+-		mask |= xfeatures_mask_supervisor();
+ 	ksize = xstate_calculate_size(mask, compacted);
+ 
+-	/* Calculate the resulting user state size */
+-	mask &= XFEATURE_MASK_USER_SUPPORTED;
+-	usize = xstate_calculate_size(mask, false);
++	/*
++	 * Calculate the resulting user state size.  Take care not to clobber
++	 * the supervisor xfeatures in the new mask!
++	 */
++	usize = xstate_calculate_size(mask & XFEATURE_MASK_USER_SUPPORTED, false);
+ 
+ 	if (!guest) {
+ 		ret = validate_sigaltstack(usize);
+
+base-commit: c076acf10c78c0d7e1aa50670e9cc4c91e8d59b4
+-- 
