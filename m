@@ -2,234 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B3BA7D8782
-	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 19:24:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2B917D8789
+	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 19:26:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231777AbjJZRYf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Oct 2023 13:24:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54700 "EHLO
+        id S1344887AbjJZR0f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Oct 2023 13:26:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230008AbjJZRYe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Oct 2023 13:24:34 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5BB990
-        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 10:24:31 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9c4ae201e0so1132618276.1
-        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 10:24:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698341071; x=1698945871; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GatHVTLVnQhttOezHvDF6an1rysQIrElqbDH0zmxJVc=;
-        b=lbKqI8a7l5EDJHd+wAcDZRN0ZaPIOxr87+qCjnM+TDu0+M4HXmfzzXI+rn0KhHtdEk
-         o/G/dtd6/uQXnyPSXcMAwpdFpNxMy/zO6u4Rv9tyRKVsXCtX8bzQTApf0WG9e0bWmzKF
-         VlqspD13ohmhpnZB+Ry4PST+WLx+jEaDR33ctqMuyonZVLhZF6H2d2Sg2GEBqjmSJnGW
-         TKpeG55Wh72VzacOiMPflUthpreRQ77WWsa56xxPMprRSwmOZv3tT5s1YurdBjWPanAi
-         jH+nIdhJN/Kke7IUzgSCyzbqcycDQRFFTLpEr482M9eNAOqnHpPNdVZ1y1AC9n1BTa0Q
-         mryQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698341071; x=1698945871;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GatHVTLVnQhttOezHvDF6an1rysQIrElqbDH0zmxJVc=;
-        b=UlfmXyTj+pG0J5HUAO2daBfXqy/Y6Pt9u6q5OXAXK+2QhW182xMaPi6yst8XOEL7DF
-         18TQ9p7CJh+8T+kgEQXqqlgHGg1Yme4hs+7LyiEXpFIMWbXW1Fh1el+kzHXas69dnar9
-         U1sIhifV58P3otCMwcpk1WVweMd5tgo+b7+TbCRYNRbAvv9j2Z64ciWAg9M3BHiOBMxy
-         xDWEtZnC7lP+PZX3PxeLRoF9j2ChsrTL8DfvcfyX9b3P9bnE1Jo2CrUSgr88wf3DnOwL
-         hML1mvHe6KrWBNgkHqI+Ail7Z1T3TlbYO+U/Zp/uM1zHI7jCpNFUG1sSD7PsgyDxRp3m
-         2MvA==
-X-Gm-Message-State: AOJu0YwgunAvj6+TvDrXVJAOpMhlQlZgmLJ5YQPnpqW3sWIP9k3PnQQY
-        o9XqILvnlbDYEMlfqKhhIuyUOjLnwRw=
-X-Google-Smtp-Source: AGHT+IFoIo29n0krAH+TlH9QJyT5lQadiwDHLNCOnAK4kn2PMD28s+3e1hDT1EzxHebYBKuVWvvft+H5oPI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:d43:0:b0:da0:56a4:efe3 with SMTP id
- 64-20020a250d43000000b00da056a4efe3mr7926ybn.5.1698341071104; Thu, 26 Oct
- 2023 10:24:31 -0700 (PDT)
-Date:   Thu, 26 Oct 2023 10:24:29 -0700
-In-Reply-To: <de1b148c-45c6-6517-0926-53d1aad8978e@intel.com>
-Mime-Version: 1.0
-References: <20230914063325.85503-1-weijiang.yang@intel.com>
- <20230914063325.85503-7-weijiang.yang@intel.com> <e0db6ffd-5d92-2a1a-bdfb-a190fe1ccd25@intel.com>
- <1347cf03-4598-f923-74e4-a3d193d9d2e9@intel.com> <ZTf5wPKXuHBQk0AN@google.com>
- <de1b148c-45c6-6517-0926-53d1aad8978e@intel.com>
-Message-ID: <ZTqgzZl-reO1m01I@google.com>
-Subject: Re: [PATCH v6 06/25] x86/fpu/xstate: Opt-in kernel dynamic bits when
- calculate guest xstate size
-From:   Sean Christopherson <seanjc@google.com>
-To:     Weijiang Yang <weijiang.yang@intel.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>, pbonzini@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        peterz@infradead.org, chao.gao@intel.com,
-        rick.p.edgecombe@intel.com, john.allen@amd.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230505AbjJZR0c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Oct 2023 13:26:32 -0400
+Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 095301A6;
+        Thu, 26 Oct 2023 10:26:29 -0700 (PDT)
+Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
+        (authenticated bits=0)
+        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 39QHPUFg208880
+        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
+        Thu, 26 Oct 2023 10:25:35 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 39QHPUFg208880
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+        s=2023101201; t=1698341135;
+        bh=glvWDkY8U3bRDuFQ/suv80YTPZCTB7LdRK2W5T++R+c=;
+        h=From:To:Cc:Subject:Date:From;
+        b=pvEk7eMhZFa01d6arAyrwlPXioRoX56GXnB5sC5sjAUktCywE8fipiK14vGVY0Ynh
+         rV78sISxbzt7yQGmb674DIEGybPg5u8Ve7F+0EW3yV6RAhkkT1jFvlhZtqITghl+DH
+         Y3c5JkzEa+5tNPONAmT72Ohw1Hf7GLqUBwmGnOkXiaZ5BbJH6VK+ZzFebpLpwRv2G6
+         e4R7MD6PHtyC5KSTdygy7z/lQiAf+WYrGup9IxnD32W6akzig0meEA3UqbujnFIdJC
+         RaMz9OLI/ubZBgEn+HPVyjvwWc1TlMUxBsaOLAPjVn7RLjrQ/2aIuIEvdLQxKA4/Us
+         xrYeDZ3Hth9mA==
+From:   "Xin Li (Intel)" <xin@zytor.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, weijiang.yang@intel.com
+Subject: [PATCH v2 1/2] KVM: VMX: Cleanup VMX basic information defines and usages
+Date:   Thu, 26 Oct 2023 10:25:29 -0700
+Message-Id: <20231026172530.208867-1-xin@zytor.com>
+X-Mailer: git-send-email 2.40.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 25, 2023, Weijiang Yang wrote:
-> On 10/25/2023 1:07 AM, Sean Christopherson wrote:
-> > On Fri, Sep 15, 2023, Weijiang Yang wrote:
-> > IIUC, the "dynamic" features contains CET_KERNEL, whereas xfeatures_mask_supervisor()
-> > conatins PASID, CET_USER, and CET_KERNEL.  PASID isn't virtualized by KVM, but
-> > doesn't that mean CET_USER will get dropped/lost if userspace requests AMX/XTILE
-> > enabling?
-> 
-> Yes, __state_size is correct for guest enabled xfeatures, including CET_USER,
-> and it gets removed from __state_perm.
-> 
-> IIUC, from current qemu/kernel interaction for guest permission settings,
-> __xstate_request_perm() is called only _ONCE_ to set AMX/XTILE for every vCPU
-> thread, so the removal of guest supervisor xfeatures won't hurt guest! ;-/
+From: Xin Li <xin3.li@intel.com>
 
-Huh?  I don't follow.  What does calling __xstate_request_perm() only once have
-to do with anything?
+Define VMX basic information fields with BIT_ULL()/GENMASK_ULL(), and
+replace hardcoded VMX basic numbers with these macros.
 
-/me stares more
+Per Sean's ask, read MSR_IA32_VMX_BASIC into an u64 to get rid of the
+hi/lo crud.
 
-OMG, hell no.  First off, this code is a nightmare to follow.  The existing comment
-is useless.  No shit the code is adding in supervisor states for the host.  What's
-not AT ALL clear is *why*.
-
-The commit says it's necessary because the "permission bitmap is only relevant
-for user states":
-
-  commit 781c64bfcb735960717d1cb45428047ff6a5030c
-  Author: Thomas Gleixner <tglx@linutronix.de>
-  Date:   Thu Mar 24 14:47:14 2022 +0100
-
-    x86/fpu/xstate: Handle supervisor states in XSTATE permissions
-    
-    The size calculation in __xstate_request_perm() fails to take supervisor
-    states into account because the permission bitmap is only relevant for user
-    states.
-
-But @permitted comes from:
-
-  permitted = xstate_get_group_perm(guest);
-
-which is either fpu->guest_perm.__state_perm or fpu->perm.__state_perm.  And
-__state_perm is initialized to:
-
-	fpu->perm.__state_perm		= fpu_kernel_cfg.default_features;
-
-where fpu_kernel_cfg.default_features contains everything except the dynamic
-xfeatures, i.e. everything except XFEATURE_MASK_XTILE_DATA:
-
-	fpu_kernel_cfg.default_features = fpu_kernel_cfg.max_features;
-	fpu_kernel_cfg.default_features &= ~XFEATURE_MASK_USER_DYNAMIC;
-
-So why on earth does this code to force back xfeatures_mask_supervisor()?  Because
-the code just below drops the supervisor bits to compute the user xstate size and
-then clobbers __state_perm.
-
-	/* Calculate the resulting user state size */
-	mask &= XFEATURE_MASK_USER_SUPPORTED;
-	usize = xstate_calculate_size(mask, false);
-
-	...
-
-	WRITE_ONCE(perm->__state_perm, mask);
-
-That is beyond asinine.  IIUC, the intent is to apply the permission bitmap only
-for user states, because the only dynamic states are user states.  Bbut the above
-creates an inconsistent mess.  If userspace doesn't request XTILE_DATA,
-__state_perm will contain supervisor states, but once userspace does request
-XTILE_DATA, __state_perm will be lost.
-
-And because that's not confusing enough, clobbering __state_perm would also drop
-FPU_GUEST_PERM_LOCKED, except that __xstate_request_perm() can' be reached with
-said LOCKED flag set.
-
-fpu_xstate_prctl() already strips out supervisor features:
-
-	case ARCH_GET_XCOMP_PERM:
-		/*
-		 * Lockless snapshot as it can also change right after the
-		 * dropping the lock.
-		 */
-		permitted = xstate_get_host_group_perm();
-		permitted &= XFEATURE_MASK_USER_SUPPORTED;
-		return put_user(permitted, uptr);
-
-	case ARCH_GET_XCOMP_GUEST_PERM:
-		permitted = xstate_get_guest_group_perm();
-		permitted &= XFEATURE_MASK_USER_SUPPORTED;
-		return put_user(permitted, uptr);
-
-and while KVM doesn't apply the __state_perm to supervisor states, if it did
-there would be zero harm in doing so.
-
-	case 0xd: {
-		u64 permitted_xcr0 = kvm_get_filtered_xcr0();
-		u64 permitted_xss = kvm_caps.supported_xss;
-
-Second, the relying on QEMU to only trigger __xstate_request_perm() is not acceptable.
-It "works" for the current code, but only because there's only a single dynamic
-feature, i.e. this will short circuit and prevent computing a bad ksize.
-
-	/* Check whether fully enabled */
-	if ((permitted & requested) == requested)
-		return 0;
-
-I don't know how I can possibly make it any clearer: KVM absolutely must not assume
-userspace behavior.
-
-So rather than continue with the current madness, which will break if/when the
-next dynamic feature comes along, just preserve non-user xfeatures/flags in
-__guest_perm.
- 
-If there are no objections, I'll test the below and write a proper changelog.
- 
---
-From: Sean Christopherson <seanjc@google.com>
-Date: Thu, 26 Oct 2023 10:17:33 -0700
-Subject: [PATCH] x86/fpu/xstate: Always preserve non-user xfeatures/flags in
- __state_perm
-
-Fixes: 781c64bfcb73 ("x86/fpu/xstate: Handle supervisor states in XSTATE permissions")
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Tested-by: Shan Kang <shan.kang@intel.com>
+Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/kernel/fpu/xstate.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-index ef6906107c54..73f6bc00d178 100644
---- a/arch/x86/kernel/fpu/xstate.c
-+++ b/arch/x86/kernel/fpu/xstate.c
-@@ -1601,16 +1601,20 @@ static int __xstate_request_perm(u64 permitted, u64 requested, bool guest)
- 	if ((permitted & requested) == requested)
- 		return 0;
- 
--	/* Calculate the resulting kernel state size */
-+	/*
-+	 * Calculate the resulting kernel state size.  Note, @permitted also
-+	 * contains supervisor xfeatures even though supervisor are always
-+	 * permitted for kernel and guest FPUs, and never permitted for user
-+	 * FPUs.
-+	 */
- 	mask = permitted | requested;
--	/* Take supervisor states into account on the host */
--	if (!guest)
--		mask |= xfeatures_mask_supervisor();
- 	ksize = xstate_calculate_size(mask, compacted);
- 
--	/* Calculate the resulting user state size */
--	mask &= XFEATURE_MASK_USER_SUPPORTED;
--	usize = xstate_calculate_size(mask, false);
-+	/*
-+	 * Calculate the resulting user state size.  Take care not to clobber
-+	 * the supervisor xfeatures in the new mask!
-+	 */
-+	usize = xstate_calculate_size(mask & XFEATURE_MASK_USER_SUPPORTED, false);
- 
- 	if (!guest) {
- 		ret = validate_sigaltstack(usize);
+Changes since v1:
+* Don't add field shift macros unless it's really needed, extra layer
+  of indirect makes it harder to read (Sean Christopherson).
+* Add a static_assert() to ensure that VMX_BASIC_FEATURES_MASK doesn't
+  overlap with VMX_BASIC_RESERVED_BITS (Sean Christopherson).
+* read MSR_IA32_VMX_BASIC into an u64 rather than 2 u32 (Sean
+  Christopherson).
+* Add 2 new functions for extracting fields from VMX basic (Sean
+  Christopherson).
+* Drop the tools header update (Sean Christopherson).
+* Move VMX basic field macros to arch/x86/include/asm/vmx.h.
+---
+ arch/x86/include/asm/msr-index.h |  9 ---------
+ arch/x86/include/asm/vmx.h       | 16 ++++++++++++++++
+ arch/x86/kvm/vmx/nested.c        | 25 ++++++++++++++++++-------
+ arch/x86/kvm/vmx/vmx.c           | 22 ++++++++++------------
+ 4 files changed, 44 insertions(+), 28 deletions(-)
 
-base-commit: c076acf10c78c0d7e1aa50670e9cc4c91e8d59b4
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index 8bcbebb56b8f..d83195f53e33 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -1084,15 +1084,6 @@
+ #define MSR_IA32_VMX_VMFUNC             0x00000491
+ #define MSR_IA32_VMX_PROCBASED_CTLS3	0x00000492
+ 
+-/* VMX_BASIC bits and bitmasks */
+-#define VMX_BASIC_VMCS_SIZE_SHIFT	32
+-#define VMX_BASIC_TRUE_CTLS		(1ULL << 55)
+-#define VMX_BASIC_64		0x0001000000000000LLU
+-#define VMX_BASIC_MEM_TYPE_SHIFT	50
+-#define VMX_BASIC_MEM_TYPE_MASK	0x003c000000000000LLU
+-#define VMX_BASIC_MEM_TYPE_WB	6LLU
+-#define VMX_BASIC_INOUT		0x0040000000000000LLU
+-
+ /* Resctrl MSRs: */
+ /* - Intel: */
+ #define MSR_IA32_L3_QOS_CFG		0xc81
+diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+index 0e73616b82f3..f919397900f1 100644
+--- a/arch/x86/include/asm/vmx.h
++++ b/arch/x86/include/asm/vmx.h
+@@ -120,6 +120,12 @@
+ 
+ #define VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR	0x000011ff
+ 
++/* VMX_BASIC bits and bitmasks */
++#define VMX_BASIC_32BIT_PHYS_ADDR_ONLY		BIT_ULL(48)
++#define VMX_BASIC_MEM_TYPE_WB			6LLU
++#define VMX_BASIC_INOUT				BIT_ULL(54)
++
++/* VMX_MISC bits and bitmasks */
+ #define VMX_MISC_PREEMPTION_TIMER_RATE_MASK	0x0000001f
+ #define VMX_MISC_SAVE_EFER_LMA			0x00000020
+ #define VMX_MISC_ACTIVITY_HLT			0x00000040
+@@ -143,6 +149,16 @@ static inline u32 vmx_basic_vmcs_size(u64 vmx_basic)
+ 	return (vmx_basic & GENMASK_ULL(44, 32)) >> 32;
+ }
+ 
++static inline u32 vmx_basic_vmcs_basic_cap(u64 vmx_basic)
++{
++	return (vmx_basic & GENMASK_ULL(63, 45)) >> 32;
++}
++
++static inline u32 vmx_basic_vmcs_mem_type(u64 vmx_basic)
++{
++	return (vmx_basic & GENMASK_ULL(53, 50)) >> 50;
++}
++
+ static inline int vmx_misc_preemption_timer_rate(u64 vmx_misc)
+ {
+ 	return vmx_misc & VMX_MISC_PREEMPTION_TIMER_RATE_MASK;
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 4ba46e1b29d2..274d480d9071 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -1201,23 +1201,34 @@ static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
+ 	return (superset | subset) == superset;
+ }
+ 
++#define VMX_BASIC_VMCS_SIZE_SHIFT		32
++#define VMX_BASIC_DUAL_MONITOR_TREATMENT	BIT_ULL(49)
++#define VMX_BASIC_MEM_TYPE_SHIFT		50
++#define VMX_BASIC_TRUE_CTLS			BIT_ULL(55)
++
++#define VMX_BASIC_FEATURES_MASK			\
++	(VMX_BASIC_DUAL_MONITOR_TREATMENT |	\
++	 VMX_BASIC_INOUT |			\
++	 VMX_BASIC_TRUE_CTLS)
++
++#define VMX_BASIC_RESERVED_BITS			\
++	(GENMASK_ULL(63, 56) | GENMASK_ULL(47, 45) | BIT_ULL(31))
++
+ static int vmx_restore_vmx_basic(struct vcpu_vmx *vmx, u64 data)
+ {
+-	const u64 feature_and_reserved =
+-		/* feature (except bit 48; see below) */
+-		BIT_ULL(49) | BIT_ULL(54) | BIT_ULL(55) |
+-		/* reserved */
+-		BIT_ULL(31) | GENMASK_ULL(47, 45) | GENMASK_ULL(63, 56);
+ 	u64 vmx_basic = vmcs_config.nested.basic;
+ 
+-	if (!is_bitwise_subset(vmx_basic, data, feature_and_reserved))
++	static_assert(!(VMX_BASIC_FEATURES_MASK & VMX_BASIC_RESERVED_BITS));
++
++	if (!is_bitwise_subset(vmx_basic, data,
++			       VMX_BASIC_FEATURES_MASK | VMX_BASIC_RESERVED_BITS))
+ 		return -EINVAL;
+ 
+ 	/*
+ 	 * KVM does not emulate a version of VMX that constrains physical
+ 	 * addresses of VMX structures (e.g. VMCS) to 32-bits.
+ 	 */
+-	if (data & BIT_ULL(48))
++	if (data & VMX_BASIC_32BIT_PHYS_ADDR_ONLY)
+ 		return -EINVAL;
+ 
+ 	if (vmx_basic_vmcs_revision_id(vmx_basic) !=
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 4c3a70f26b42..b68d54f6e9f8 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2568,14 +2568,13 @@ static u64 adjust_vmx_controls64(u64 ctl_opt, u32 msr)
+ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 			     struct vmx_capability *vmx_cap)
+ {
+-	u32 vmx_msr_low, vmx_msr_high;
+ 	u32 _pin_based_exec_control = 0;
+ 	u32 _cpu_based_exec_control = 0;
+ 	u32 _cpu_based_2nd_exec_control = 0;
+ 	u64 _cpu_based_3rd_exec_control = 0;
+ 	u32 _vmexit_control = 0;
+ 	u32 _vmentry_control = 0;
+-	u64 misc_msr;
++	u64 vmx_basic;
+ 	int i;
+ 
+ 	/*
+@@ -2693,28 +2692,26 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 		_vmexit_control &= ~x_ctrl;
+ 	}
+ 
+-	rdmsr(MSR_IA32_VMX_BASIC, vmx_msr_low, vmx_msr_high);
++	rdmsrl(MSR_IA32_VMX_BASIC, vmx_basic);
+ 
+ 	/* IA-32 SDM Vol 3B: VMCS size is never greater than 4kB. */
+-	if ((vmx_msr_high & 0x1fff) > PAGE_SIZE)
++	if ((vmx_basic_vmcs_size(vmx_basic) > PAGE_SIZE))
+ 		return -EIO;
+ 
+ #ifdef CONFIG_X86_64
+ 	/* IA-32 SDM Vol 3B: 64-bit CPUs always have VMX_BASIC_MSR[48]==0. */
+-	if (vmx_msr_high & (1u<<16))
++	if (vmx_basic & VMX_BASIC_32BIT_PHYS_ADDR_ONLY)
+ 		return -EIO;
+ #endif
+ 
+ 	/* Require Write-Back (WB) memory type for VMCS accesses. */
+-	if (((vmx_msr_high >> 18) & 15) != 6)
++	if (vmx_basic_vmcs_mem_type(vmx_basic) != VMX_BASIC_MEM_TYPE_WB)
+ 		return -EIO;
+ 
+-	rdmsrl(MSR_IA32_VMX_MISC, misc_msr);
+-
+-	vmcs_conf->size = vmx_msr_high & 0x1fff;
+-	vmcs_conf->basic_cap = vmx_msr_high & ~0x1fff;
++	vmcs_conf->size = vmx_basic_vmcs_size(vmx_basic);
++	vmcs_conf->basic_cap = vmx_basic_vmcs_basic_cap(vmx_basic);
+ 
+-	vmcs_conf->revision_id = vmx_msr_low;
++	vmcs_conf->revision_id = vmx_basic_vmcs_revision_id(vmx_basic);
+ 
+ 	vmcs_conf->pin_based_exec_ctrl = _pin_based_exec_control;
+ 	vmcs_conf->cpu_based_exec_ctrl = _cpu_based_exec_control;
+@@ -2722,7 +2719,8 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 	vmcs_conf->cpu_based_3rd_exec_ctrl = _cpu_based_3rd_exec_control;
+ 	vmcs_conf->vmexit_ctrl         = _vmexit_control;
+ 	vmcs_conf->vmentry_ctrl        = _vmentry_control;
+-	vmcs_conf->misc	= misc_msr;
++
++	rdmsrl(MSR_IA32_VMX_MISC, vmcs_conf->misc);
+ 
+ #if IS_ENABLED(CONFIG_HYPERV)
+ 	if (enlightened_vmcs)
 -- 
+2.40.1
+
