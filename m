@@ -2,150 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DDCD7D7E66
-	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 10:23:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFE9B7D7E78
+	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 10:27:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229710AbjJZIXT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Oct 2023 04:23:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42058 "EHLO
+        id S1344527AbjJZI1w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Oct 2023 04:27:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229567AbjJZIXS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Oct 2023 04:23:18 -0400
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33C58DE
-        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 01:23:16 -0700 (PDT)
-Date:   Thu, 26 Oct 2023 08:23:10 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1698308594;
+        with ESMTP id S229639AbjJZI1u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Oct 2023 04:27:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7948DE
+        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 01:27:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1698308822;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vyThnddEdLJVkMZ8kXSPh+J95ZiePcRvMml5TUTrySM=;
-        b=LaDyRbMbiDMFa1NhG1AW4OAaAIcTlJGUb3XM0ST4cnarYenEuicN0WHq0tS13XbP/9VInt
-        BWnK9QNsi6LHy8gtJbAG25Yxy84gibCI7YsShwNXaQ/B9Flk2xHHI/0QPqrpar7D1lm8ff
-        4oFXnSoVBuPkvJTmobbx2Mj7m/W7ztE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Stop printing about MMIO accesses where
- ISV==0
-Message-ID: <ZToh7pNhz1zzQw6C@linux.dev>
-References: <20231024210739.1729723-1-oliver.upton@linux.dev>
- <86il6v3z6d.wl-maz@kernel.org>
- <ZTjQ43gpJUvfh6rG@linux.dev>
- <86fs1z3xia.wl-maz@kernel.org>
+        bh=LiXFBc8YsDvBzhxHytTZjcWCexeiPcrWUoCrLdYurNk=;
+        b=eXTXH5J8BN6QRDRhuIJ5OoKlIFTDQDYVQouAGW8ermI3XZ95IGYBU7KG44MNGVJb5GxgcX
+        OYisKMMxTv4vu/xhDZzdFtOlildXZHemMavUFrbbgeHyetO4Xw78NWd1NRHIXkFQvw6dqB
+        GVHM8fKB0ukHDOka/B/D86fa/Zc1Uj0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-440-AfOJAuHtP6SZAVeVp_QaGw-1; Thu, 26 Oct 2023 04:26:57 -0400
+X-MC-Unique: AfOJAuHtP6SZAVeVp_QaGw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E338F811E7D;
+        Thu, 26 Oct 2023 08:26:56 +0000 (UTC)
+Received: from redhat.com (dhcp-192-218.str.redhat.com [10.33.192.218])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E8EC40C6F79;
+        Thu, 26 Oct 2023 08:26:54 +0000 (UTC)
+Date:   Thu, 26 Oct 2023 10:26:53 +0200
+From:   Kevin Wolf <kwolf@redhat.com>
+To:     Andrew Cooper <andrew.cooper3@citrix.com>
+Cc:     David Woodhouse <dwmw2@infradead.org>,
+        Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org,
+        Hanna Reitz <hreitz@redhat.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Paul Durrant <paul@xen.org>,
+        =?iso-8859-1?Q?Marc-Andr=E9?= Lureau 
+        <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Jason Wang <jasowang@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-block@nongnu.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+        Bernhard Beschow <shentey@gmail.com>,
+        Joel Upham <jupham125@gmail.com>
+Subject: Re: [PATCH v3 28/28] docs: update Xen-on-KVM documentation
+Message-ID: <ZToizYcPjO0Zt52N@redhat.com>
+References: <20231025145042.627381-1-dwmw2@infradead.org>
+ <20231025145042.627381-29-dwmw2@infradead.org>
+ <6vbpkrebc7fpypbv2t7jbs7m3suxwbqqykeomzfxpenjj2sogd@rphcppcl4inl>
+ <4a10a50e5469480a82cb993dedbff10c3d777082.camel@infradead.org>
+ <21e8a265-bf5a-464c-86bc-f0fd7b5eb108@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <86fs1z3xia.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <21e8a265-bf5a-464c-86bc-f0fd7b5eb108@citrix.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 25, 2023 at 09:41:01AM +0100, Marc Zyngier wrote:
-> On Wed, 25 Oct 2023 09:25:07 +0100,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > On Wed, Oct 25, 2023 at 09:04:58AM +0100, Marc Zyngier wrote:
-> > 
-> > [...]
-> > 
-> > > While I totally agree that this *debug* statement should go, we should
-> > > also replace it with something else.
-> > > 
-> > > Because when you're trying to debug a guest (or even KVM itself),
-> > > seeing this message is a sure indication that the guest is performing
-> > > an access outside of memory. The fact that KVM tries to handle it as
-> > > MMIO is just an implementation artefact.
-> > > 
-> > > So I'd very much welcome a replacement tracepoint giving a bit more
-> > > information, such as guest PC, IPA being accessed, load or store. With
-> > > that, everybody wins.
-> > 
-> > Aren't we already covered by the kvm_guest_fault tracepoint? Userspace
-> > can filter events on ESR to get the faults it cares about. I'm not
-> > against adding another tracepoint, but in my experience kvm_guest_fault
-> > has been rather useful for debugging any type of guest fault.
+Am 25.10.2023 um 20:56 hat Andrew Cooper geschrieben:
+> On 25/10/2023 7:26 pm, David Woodhouse wrote:
+> > On Wed, 2023-10-25 at 13:20 -0500, Eric Blake wrote:
+> >> On Wed, Oct 25, 2023 at 03:50:42PM +0100, David Woodhouse wrote:
+> >>> +
+> >>> +Booting Xen PV guests
+> >>> +---------------------
+> >>> +
+> >>> +Booting PV guest kernels is possible by using the Xen PV shim (a version of Xen
+> >>> +itself, designed to run inside a Xen HVM guest and provide memory management
+> >>> +services for one guest alone).
+> >>> +
+> >>> +The Xen binary is provided as the ``-kernel`` and the guest kernel itself (or
+> >>> +PV Grub image) as the ``-initrd`` image, which actually just means the first
+> >>> +multiboot "module". For example:
+> >>> +
+> >>> +.. parsed-literal::
+> >>> +
+> >>> +  |qemu_system| --accel kvm,xen-version=0x40011,kernel-irqchip=split \\
+> >>> +       -chardev stdio,id=char0 -device xen-console,chardev=char0 \\
+> >>> +       -display none  -m 1G  -kernel xen -initrd bzImage \\
+> >>> +       -append "pv-shim console=xen,pv -- console=hvc0 root=/dev/xvda1" \\
+> >>> +       -drive file=${GUEST_IMAGE},if=xen
+> >> Is the space between -- and console= intentionsl?
+> > Yes, that one is correct. The -- is how you separate Xen's command line
+> > (on the left) from the guest kernel command line (on the right).
 > 
-> That tracepoint is one of the most triggered, and sifting through this
-> is a painful experience. If we go down that road, adding a bit of
-> extra documentation (pointed to from the KVM_RUN entry) and an example
-> filter script would be most useful.
+> To expand on this a bit.
+> 
+> Multiboot1 supports multiple modules but only a single command line.  As
+> one of the modules passed to Xen is the dom0 kernel, we need some way to
+> pass it's command line, hence the " -- ".
 
-Eh, I'd rather write kernel code than documentation, and I think you
-knew that too ;-)
+That's not right, even Multiboot 1 contains a 'string' field in the
+module structure that is defined to typically hold a command line. The
+exact meaning is OS dependent, so Xen could use it however it wants.
 
-How do you feel about this:
+In QEMU (and I believe this is the same behaviour as in GRUB),
+everything before the space in an -initrd argument is treated as a
+filename to load, everything after it is just passed as the command
+line.
 
-diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-index 3dd38a151d2a..200c8019a82a 100644
---- a/arch/arm64/kvm/mmio.c
-+++ b/arch/arm64/kvm/mmio.c
-@@ -135,6 +135,9 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 	 * volunteered to do so, and bail out otherwise.
- 	 */
- 	if (!kvm_vcpu_dabt_isvalid(vcpu)) {
-+		trace_kvm_mmio_nisv(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
-+				    kvm_vcpu_get_hfar(vcpu), fault_ipa);
-+
- 		if (test_bit(KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER,
- 			     &vcpu->kvm->arch.flags)) {
- 			run->exit_reason = KVM_EXIT_ARM_NISV;
-@@ -143,7 +146,6 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 			return 0;
- 		}
- 
--		kvm_pr_unimpl("Data abort outside memslots with no valid syndrome info\n");
- 		return -ENOSYS;
- 	}
- 
-diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-index 8ad53104934d..c18c1a95831e 100644
---- a/arch/arm64/kvm/trace_arm.h
-+++ b/arch/arm64/kvm/trace_arm.h
-@@ -136,6 +136,31 @@ TRACE_EVENT(kvm_mmio_emulate,
- 		  __entry->vcpu_pc, __entry->instr, __entry->cpsr)
- );
- 
-+TRACE_EVENT(kvm_mmio_nisv,
-+	TP_PROTO(unsigned long vcpu_pc, unsigned long esr,
-+		 unsigned long far, unsigned long ipa),
-+	TP_ARGS(vcpu_pc, esr, far, ipa),
-+
-+	TP_STRUCT__entry(
-+		__field(	unsigned long,	vcpu_pc		)
-+		__field(	unsigned long,	esr		)
-+		__field(	unsigned long,	far		)
-+		__field(	unsigned long,	ipa		)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->vcpu_pc		= vcpu_pc;
-+		__entry->esr			= esr;
-+		__entry->far			= far;
-+		__entry->ipa			= ipa;
-+	),
-+
-+	TP_printk("ipa %#016lx, esr %#016lx, far %#016lx, pc %#016lx",
-+		  __entry->ipa, __entry->esr,
-+		  __entry->far, __entry->vcpu_pc)
-+);
-+
-+
- TRACE_EVENT(kvm_set_way_flush,
- 	    TP_PROTO(unsigned long vcpu_pc, bool cache),
- 	    TP_ARGS(vcpu_pc, cache),
+So it would have been entirely possible to use -initrd 'bzImage
+console=hvc0 root=/dev/xvda1' if Xen worked like that.
 
--- 
-Thanks,
-Oliver
+> Multiboot2 and PVH support a command line per module, which is the
+> preferred way to pass the commandlines, given a choice.
+
+Multiboot 2 seems to integrate the string in a variable length module
+structure instead of just having a pointer in a fixed length one, but
+the model behind it is essentially the same as before.
+
+Kevin
+
