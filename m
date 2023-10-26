@@ -2,136 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EFE9B7D7E78
-	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 10:27:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AF7D7D7EBE
+	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 10:45:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344527AbjJZI1w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Oct 2023 04:27:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51104 "EHLO
+        id S1344564AbjJZIpY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Oct 2023 04:45:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229639AbjJZI1u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Oct 2023 04:27:50 -0400
+        with ESMTP id S229518AbjJZIpW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Oct 2023 04:45:22 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7948DE
-        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 01:27:02 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89883189
+        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 01:44:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698308822;
+        s=mimecast20190719; t=1698309875;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=LiXFBc8YsDvBzhxHytTZjcWCexeiPcrWUoCrLdYurNk=;
-        b=eXTXH5J8BN6QRDRhuIJ5OoKlIFTDQDYVQouAGW8ermI3XZ95IGYBU7KG44MNGVJb5GxgcX
-        OYisKMMxTv4vu/xhDZzdFtOlildXZHemMavUFrbbgeHyetO4Xw78NWd1NRHIXkFQvw6dqB
-        GVHM8fKB0ukHDOka/B/D86fa/Zc1Uj0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=vctb3d6Et+H3LGoRGV4K/3OvkDY/qaE7xpt3KtVR3mY=;
+        b=WlP0HTzVdgUbLJIFuZd6OdvBmIg7eU5TRP1NYfCKrE/KcazpSzKq/vKOOaqdRvx8RKHskN
+        R3/mdKmTNTEgsZRD0anpn/sOMrWErSFSBh5nsxbXWsRufK39PwFbqwB0uMG59ZdP5J+w0/
+        hw+Opf8JDgifzzOIxobEyaS9Q4gpOSo=
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-440-AfOJAuHtP6SZAVeVp_QaGw-1; Thu, 26 Oct 2023 04:26:57 -0400
-X-MC-Unique: AfOJAuHtP6SZAVeVp_QaGw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E338F811E7D;
-        Thu, 26 Oct 2023 08:26:56 +0000 (UTC)
-Received: from redhat.com (dhcp-192-218.str.redhat.com [10.33.192.218])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E8EC40C6F79;
-        Thu, 26 Oct 2023 08:26:54 +0000 (UTC)
-Date:   Thu, 26 Oct 2023 10:26:53 +0200
-From:   Kevin Wolf <kwolf@redhat.com>
-To:     Andrew Cooper <andrew.cooper3@citrix.com>
-Cc:     David Woodhouse <dwmw2@infradead.org>,
-        Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org,
-        Hanna Reitz <hreitz@redhat.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Paul Durrant <paul@xen.org>,
-        =?iso-8859-1?Q?Marc-Andr=E9?= Lureau 
-        <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Jason Wang <jasowang@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, qemu-block@nongnu.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-        Bernhard Beschow <shentey@gmail.com>,
-        Joel Upham <jupham125@gmail.com>
-Subject: Re: [PATCH v3 28/28] docs: update Xen-on-KVM documentation
-Message-ID: <ZToizYcPjO0Zt52N@redhat.com>
-References: <20231025145042.627381-1-dwmw2@infradead.org>
- <20231025145042.627381-29-dwmw2@infradead.org>
- <6vbpkrebc7fpypbv2t7jbs7m3suxwbqqykeomzfxpenjj2sogd@rphcppcl4inl>
- <4a10a50e5469480a82cb993dedbff10c3d777082.camel@infradead.org>
- <21e8a265-bf5a-464c-86bc-f0fd7b5eb108@citrix.com>
+ us-mta-486-PduELqH1Nzm_9u8S55Pt7w-1; Thu, 26 Oct 2023 04:44:32 -0400
+X-MC-Unique: PduELqH1Nzm_9u8S55Pt7w-1
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-694d7f694a4so194377b3a.0
+        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 01:44:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698309871; x=1698914671;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vctb3d6Et+H3LGoRGV4K/3OvkDY/qaE7xpt3KtVR3mY=;
+        b=CHRlLGvIRC+F+etbJR1iAVBHCcWaBK8hWOdjIAun8nuBQZhRkkwd6wRi3jgMP/Ianf
+         Smd1E4GCtfDtgsG3VxCg/SRt8wGXOyPah9B5VIp8xRRX1HFz6Df7ezfmkMt8dmJryVD7
+         XrqLT/ufOCMSrkQonGdneibNjjqcoFTotcwlzwAYEzr4ROkjvB/dbOWwss1L7jRLjVH1
+         ZHZiNH8PUIuMMSrl22i7fseRs9DH/oPOQ+aKb/FSR3eauNx3w8YdFiwg9V125vp5XtX7
+         ypL1VCkcJneMLN54TBsv+cAHBLqldfvU5B/rIAwvQvdEvjJ19DS0VVWFMYW/MFslGL5B
+         iOkg==
+X-Gm-Message-State: AOJu0YzMvWStQJCjUDP/DWWdZzQWDe3MDrQVYlTr1xsD9eCpe7VOdQ/n
+        ZU5C+MEYF4rqPzBEHGvZeFLVREnao7byrmnvC1/+mDS6MxU4Jo+SgWPa8XVrAFniOZuF1KRqafj
+        tIuHcq8RFBMvL
+X-Received: by 2002:a05:6a21:7881:b0:16e:26fd:7c02 with SMTP id bf1-20020a056a21788100b0016e26fd7c02mr23417507pzc.2.1698309871023;
+        Thu, 26 Oct 2023 01:44:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHpTPOkjjDsH1o7wrlbka9DxRCmMZ3jogtH7v+HOsgH5EbbyCxLczHjQvzZDP4zjrNJi8pr0w==
+X-Received: by 2002:a05:6a21:7881:b0:16e:26fd:7c02 with SMTP id bf1-20020a056a21788100b0016e26fd7c02mr23417492pzc.2.1698309870703;
+        Thu, 26 Oct 2023 01:44:30 -0700 (PDT)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id h185-20020a6253c2000000b00692cb1224casm11181702pfb.183.2023.10.26.01.44.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Oct 2023 01:44:30 -0700 (PDT)
+Message-ID: <907d8b7a-2cb0-f5b4-ac54-51aa1f6dd540@redhat.com>
+Date:   Thu, 26 Oct 2023 16:44:26 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [kvm-unit-tests PATCH v1] configure: arm64: Add support for
+ dirty-ring in migration
+Content-Language: en-US
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     Thomas Huth <thuth@redhat.com>, kvmarm@lists.linux.dev,
+        Nikos Nikoleris <nikos.nikoleris@arm.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org
+References: <20231026034042.812006-1-shahuang@redhat.com>
+ <e318cd46-b871-448a-b95a-01647d8afc43@redhat.com>
+ <9052ed87-e5cf-4d89-b480-54da4d8216c7@redhat.com>
+ <20231026-38a5f6360752b10fdb086adc@orel>
+From:   Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20231026-38a5f6360752b10fdb086adc@orel>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <21e8a265-bf5a-464c-86bc-f0fd7b5eb108@citrix.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 25.10.2023 um 20:56 hat Andrew Cooper geschrieben:
-> On 25/10/2023 7:26 pm, David Woodhouse wrote:
-> > On Wed, 2023-10-25 at 13:20 -0500, Eric Blake wrote:
-> >> On Wed, Oct 25, 2023 at 03:50:42PM +0100, David Woodhouse wrote:
-> >>> +
-> >>> +Booting Xen PV guests
-> >>> +---------------------
-> >>> +
-> >>> +Booting PV guest kernels is possible by using the Xen PV shim (a version of Xen
-> >>> +itself, designed to run inside a Xen HVM guest and provide memory management
-> >>> +services for one guest alone).
-> >>> +
-> >>> +The Xen binary is provided as the ``-kernel`` and the guest kernel itself (or
-> >>> +PV Grub image) as the ``-initrd`` image, which actually just means the first
-> >>> +multiboot "module". For example:
-> >>> +
-> >>> +.. parsed-literal::
-> >>> +
-> >>> +  |qemu_system| --accel kvm,xen-version=0x40011,kernel-irqchip=split \\
-> >>> +       -chardev stdio,id=char0 -device xen-console,chardev=char0 \\
-> >>> +       -display none  -m 1G  -kernel xen -initrd bzImage \\
-> >>> +       -append "pv-shim console=xen,pv -- console=hvc0 root=/dev/xvda1" \\
-> >>> +       -drive file=${GUEST_IMAGE},if=xen
-> >> Is the space between -- and console= intentionsl?
-> > Yes, that one is correct. The -- is how you separate Xen's command line
-> > (on the left) from the guest kernel command line (on the right).
+Hi drew,
+
+On 10/26/23 15:40, Andrew Jones wrote:
+> On Thu, Oct 26, 2023 at 01:54:55PM +0800, Shaoqin Huang wrote:
+>>
+>>
+>> On 10/26/23 13:12, Thomas Huth wrote:
+>>> On 26/10/2023 05.40, Shaoqin Huang wrote:
+>>>> Add a new configure option "--dirty-ring-size" to support dirty-ring
+>>>> migration on arm64. By default, the dirty-ring is disabled, we can
+>>>> enable it by:
+>>>>
+>>>>  Â Â  # ./configure --dirty-ring-size=65536
+>>>>
+>>>> This will generate one more entry in config.mak, it will look like:
+>>>>
+>>>>  Â Â  # cat config.mak
+>>>>  Â Â Â Â  :
+>>>>  Â Â  ACCEL=kvm,dirty-ring-size=65536
+>>>>
+>>>> With this configure option, user can easy enable dirty-ring and specify
+>>>> dirty-ring-size to test the dirty-ring in migration.
+>>>
+>>> Do we really need a separate configure switch for this? If it is just
+>>> about setting a value in the ACCEL variable, you can also run the tests
+>>> like this:
+>>>
+>>> ACCEL=kvm,dirty-ring-size=65536 ./run_tests.sh
+>>>
+>>>   Â Thomas
+>>>
+>>
+>> Hi Thomas,
+>>
+>> You're right. We can do it by simply set the ACCEL when execute
+>> ./run_tests.sh. I think maybe add a configure can make auto test to set the
+>> dirty-ring easier? but I'm not 100% sure it will benefit to them.
+>>
 > 
-> To expand on this a bit.
+> For unit tests that require specific configurations, those configurations
+> should be added to the unittests.cfg file. As we don't currently support
+> adding accel properties, we should add a new parameter and extend the
+> parsing.
+
+So you mean we add the accel properties into the unittests.cfg like:
+
+accel = kvm,dirty-ring-size=65536
+
+Then let the `for_each_unittest` to parse the parameter?
+In this way, should we copy the migration config to dirty-ring 
+migration? Just like:
+
+[its-migration]
+file = gic.flat
+smp = $MAX_SMP
+extra_params = -machine gic-version=3 -append 'its-migration'
+groups = its migration
+arch = arm64
+
+[its-migration-dirty-ring]
+file = gic.flat
+smp = $MAX_SMP
+extra_params = -machine gic-version=3 -append 'its-migration'
+groups = its migration
+arch = arm64
+accel = kvm,dirty-ring-size=65536
+
+So it will test both dirty bitmap and dirty ring.
+
+Thanks,
+Shaoqin
+
 > 
-> Multiboot1 supports multiple modules but only a single command line.  As
-> one of the modules passed to Xen is the dom0 kernel, we need some way to
-> pass it's command line, hence the " -- ".
-
-That's not right, even Multiboot 1 contains a 'string' field in the
-module structure that is defined to typically hold a command line. The
-exact meaning is OS dependent, so Xen could use it however it wants.
-
-In QEMU (and I believe this is the same behaviour as in GRUB),
-everything before the space in an -initrd argument is treated as a
-filename to load, everything after it is just passed as the command
-line.
-
-So it would have been entirely possible to use -initrd 'bzImage
-console=hvc0 root=/dev/xvda1' if Xen worked like that.
-
-> Multiboot2 and PVH support a command line per module, which is the
-> preferred way to pass the commandlines, given a choice.
-
-Multiboot 2 seems to integrate the string in a variable length module
-structure instead of just having a pointer in a fixed length one, but
-the model behind it is essentially the same as before.
-
-Kevin
+> Thanks,
+> drew
+> 
 
