@@ -2,130 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC3987D87EB
-	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 19:59:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35E897D8821
+	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 20:18:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233231AbjJZR7Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Oct 2023 13:59:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51040 "EHLO
+        id S231844AbjJZSSr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Oct 2023 14:18:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230479AbjJZR7P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Oct 2023 13:59:15 -0400
-Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F55F192
-        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 10:59:13 -0700 (PDT)
-Received: from [192.168.7.187] ([76.103.185.250])
-        (authenticated bits=0)
-        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 39QHx77R220440
-        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-        Thu, 26 Oct 2023 10:59:08 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 39QHx77R220440
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-        s=2023101201; t=1698343148;
-        bh=HP+1mqB0YWwcMW/7Ln17eOABmufO82xjLAmr7mutzpM=;
-        h=Date:To:Cc:From:Subject:From;
-        b=iR3WjvOSLI1WTUusui7N+EIW/gnpwAry4rC3zR9GcD15+0bOyf4gei9k7VTTotmJu
-         VNUZAK0F9QN8FhliPiZdzkvw7ajq0orbruydApRGADJrRfqUzVvq+8JUyhgcZKYtED
-         TFheLNeuxUYiaCZrC1R9HbkO9DuWeiG2cQp2/aXZo4gRGUWYfcoW9N6JXFJCena53J
-         vXKdO0ao4XLQhH7m/cjKNZnNPwbvz6bNYG1Helabnk0w7gNA6f6k9bbOta7ntmXTEG
-         h+1YqTTzT42moH1tuDjiDyZuDAfi7Vef8P16awKx1KY6knsZbFPtzhd2Iak+HROU2t
-         9TqxaHJCtvwiw==
-Message-ID: <a65e6d23-791b-4866-8cb8-543d8f1942a6@zytor.com>
-Date:   Thu, 26 Oct 2023 10:59:06 -0700
+        with ESMTP id S231625AbjJZSSq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Oct 2023 14:18:46 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2294192;
+        Thu, 26 Oct 2023 11:18:43 -0700 (PDT)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39QIEZ30017809;
+        Thu, 26 Oct 2023 18:18:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=qVfPEdY12sude9qpb6x/6PCFbJmpKdpptoj/LQcqZfM=;
+ b=cFdLibiL/4C0OS+i048SwImrl+sFyn1g0PeqNmLQ4X1yGu04Rn8ZlIioz2G5jL5HVM84
+ lyPiw5kIrBFUjdXVMQW8M0rGlsATXna2NV380dH3k3RF4/EjPvfrYB4hEQ9WAbP1oxQX
+ M78CiWMz1R/RhUpnybYIH2UQBEUELrOpozi9plmGHePod1iCFsihf3XNt5UoqMHtuOww
+ 1Ah8nKUyFIL7JiDNfcsOYTeLy8ziuiWILUgKcdj4YIXNRQq4RbmRjuaxp4C0qMnH7giu
+ RDVuTo3ZGElQa9B7n1AHV6KVXk4YuGN42Jf6PuLhUW4uIn/MAoQWRR/VWTpS/J4OCIlG sw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tyw7fr4mw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Oct 2023 18:18:42 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39QIFSE5023224;
+        Thu, 26 Oct 2023 18:18:42 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tyw7fr4mh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Oct 2023 18:18:42 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39QHUSVr026878;
+        Thu, 26 Oct 2023 18:18:41 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tvsyp7y0e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Oct 2023 18:18:41 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+        by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39QIIehY64487752
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 26 Oct 2023 18:18:41 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C9DD358056;
+        Thu, 26 Oct 2023 18:18:40 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 17B2858052;
+        Thu, 26 Oct 2023 18:18:40 +0000 (GMT)
+Received: from [9.61.161.121] (unknown [9.61.161.121])
+        by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 26 Oct 2023 18:18:39 +0000 (GMT)
+Message-ID: <425ba458-3eba-4742-930d-1248be2c2cd3@linux.ibm.com>
+Date:   Thu, 26 Oct 2023 14:18:39 -0400
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/3] s390/vfio-ap: improve reaction to response code 07
+ from PQAP(AQIC) command
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org
-From:   Xin Li <xin@zytor.com>
-Subject: Run user level code in guest in a new KVM selftest
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     jjherne@linux.ibm.com, pasic@linux.ibm.com,
+        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, david@redhat.com
+References: <20231018133829.147226-1-akrowiak@linux.ibm.com>
+ <20231018133829.147226-4-akrowiak@linux.ibm.com>
+ <0bed3d29-7fb1-d56d-5f12-e2010ae7d97f@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <0bed3d29-7fb1-d56d-5f12-e2010ae7d97f@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: sB2KYg-oJIwPyNuaaK5HFwsVLqWdNtpy
+X-Proofpoint-GUID: Qd7b1hmbPOGqG2axWloFvVZO9-_qCLyz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-26_16,2023-10-26_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 spamscore=0 malwarescore=0 clxscore=1015
+ impostorscore=0 suspectscore=0 phishscore=0 mlxlogscore=945
+ lowpriorityscore=0 mlxscore=0 adultscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2310170001
+ definitions=main-2310260158
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
-
-I'm adding a nested exception selftest for FRED, which needs to run
-user level code in guest.  I have to add the following hack for that:
-
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c 
-b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index d8288374078e..72928c07ccbe 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -159,6 +159,7 @@ static uint64_t *virt_create_upper_pte(struct kvm_vm 
-*vm,
-
-         if (!(*pte & PTE_PRESENT_MASK)) {
-                 *pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK;
-+               *pte |= PTE_USER_MASK;
-                 if (current_level == target_level)
-                         *pte |= PTE_LARGE_MASK | (paddr & 
-PHYSICAL_PAGE_MASK);
-                 else
-@@ -222,6 +223,7 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t 
-vaddr, uint64_t paddr, int level)
-         TEST_ASSERT(!(*pte & PTE_PRESENT_MASK),
-                     "PTE already present for 4k page at vaddr: 
-0x%lx\n", vaddr);
-         *pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK | (paddr & 
-PHYSICAL_PAGE_MASK);
-+       *pte |= PTE_USER_MASK;
-  }
-
-  void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
 
 
-Is there an exiting selftest running user level code in guest?
+On 10/26/23 10:15, Matthew Rosato wrote:
+> On 10/18/23 9:38 AM, Tony Krowiak wrote:
+>> Let's improve the vfio_ap driver's reaction to reception of response code
+>> 07 from the PQAP(AQIC) command when enabling interrupts on behalf of a
+>> guest:
+>>
+>> * Unregister the guest's ISC before the pages containing the notification
+>>    indicator bytes are unpinned.
+>>
+>> * Capture the return code from the kvm_s390_gisc_unregister function and
+>>    log a DBF warning if it fails.
+>>
+>> Suggested-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> 
+> Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> 
+> I went back-and-forth on whether this should be a stable/fixes candidate but I think no...  I happened to notice it while reviewing other code, I'm not aware that it's ever created a visible issue, and it's on a pretty immediate error path.  If anyone thinks it should be a stable candidate I have no objection but in that case would suggest to break the patch up to separate the new WARN from the fix.
 
-It seems there is none as the USER bit in PTEs is never set, what have I
-missed?
+Nothing has ever been reported and is probably very unlikely to be 
+reported; so, I agree it should not be a stable/fixes candidate.
 
-If such a facility doesn't exist, we probably need to find a
-clean solution to add the USER bit in user level page table mappings
-(which seems not yet clearly defined yet).
-
-Thanks!
-     Xin
+> 
+> 
+> 
