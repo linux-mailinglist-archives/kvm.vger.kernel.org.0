@@ -2,126 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 35E897D8821
-	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 20:18:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61AD17D8841
+	for <lists+kvm@lfdr.de>; Thu, 26 Oct 2023 20:28:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231844AbjJZSSr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Oct 2023 14:18:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40128 "EHLO
+        id S230517AbjJZS2u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Oct 2023 14:28:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231625AbjJZSSq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Oct 2023 14:18:46 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2294192;
-        Thu, 26 Oct 2023 11:18:43 -0700 (PDT)
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39QIEZ30017809;
-        Thu, 26 Oct 2023 18:18:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=qVfPEdY12sude9qpb6x/6PCFbJmpKdpptoj/LQcqZfM=;
- b=cFdLibiL/4C0OS+i048SwImrl+sFyn1g0PeqNmLQ4X1yGu04Rn8ZlIioz2G5jL5HVM84
- lyPiw5kIrBFUjdXVMQW8M0rGlsATXna2NV380dH3k3RF4/EjPvfrYB4hEQ9WAbP1oxQX
- M78CiWMz1R/RhUpnybYIH2UQBEUELrOpozi9plmGHePod1iCFsihf3XNt5UoqMHtuOww
- 1Ah8nKUyFIL7JiDNfcsOYTeLy8ziuiWILUgKcdj4YIXNRQq4RbmRjuaxp4C0qMnH7giu
- RDVuTo3ZGElQa9B7n1AHV6KVXk4YuGN42Jf6PuLhUW4uIn/MAoQWRR/VWTpS/J4OCIlG sw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tyw7fr4mw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Oct 2023 18:18:42 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39QIFSE5023224;
-        Thu, 26 Oct 2023 18:18:42 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tyw7fr4mh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Oct 2023 18:18:42 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39QHUSVr026878;
-        Thu, 26 Oct 2023 18:18:41 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tvsyp7y0e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Oct 2023 18:18:41 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-        by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39QIIehY64487752
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 26 Oct 2023 18:18:41 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C9DD358056;
-        Thu, 26 Oct 2023 18:18:40 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 17B2858052;
-        Thu, 26 Oct 2023 18:18:40 +0000 (GMT)
-Received: from [9.61.161.121] (unknown [9.61.161.121])
-        by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 26 Oct 2023 18:18:39 +0000 (GMT)
-Message-ID: <425ba458-3eba-4742-930d-1248be2c2cd3@linux.ibm.com>
-Date:   Thu, 26 Oct 2023 14:18:39 -0400
+        with ESMTP id S229815AbjJZS2s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Oct 2023 14:28:48 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2054.outbound.protection.outlook.com [40.107.94.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B877192;
+        Thu, 26 Oct 2023 11:28:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iKQFbS77apq99tTOiHalZC0vpXNmNPDZbm4LncNiAc+WkmuViIyeD6YSPt6fPRGYJTBd0U8BeLOaQi+XgYp4mxGnF8AqSPThJfjTeN2N1F1imDIZtEMLbR2/OuIcbmD41/Mt4cJLYMIDWNt6SiyvvUatnkvVA+SiQIpAp94rEKQIExAlHREopNil1UF1EAgRcR7oEqLAd6v6WnukhRsvH1R6u5HwM834BoJ4AhmMuf50Z34+OuRZ42EVS5Nw3mMksg9nOLJBihXnokVJSSU9I8cKrXzlwB8vZerBjsjV6CfL+A5+0sou2ybt6eDzn2EzwakTjbJ6UBiUwVlDF3Kt9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yvt4AxRp0YOZYUUyEC6uDhVDSCEbs2JZ0PZsIqymznk=;
+ b=Hmh+BmJkvWxVMManaGLJL4Ixl2ZP2nHNYhPRMmwhYNRrKqCJC4YOrqLIA/aUeHF6sj5ejbQg0LMTP+ST5qPxSSSwQg7f/SjHYeIdao3RAGIjv/f7PVkvb+JzdO9DnLKyOXhtQjz1R3jDINFLMJXUgiVCC9qO8j1sfeHbURcxCRhiKwLRlgJco834JpRp2No85ezSDdvnEynPvuM7UY0J5b6xGKo5QDVPgMS8dPtS+wILOZRB6K/kgA0fd80Kpri7h6KHRlol3eWIxNu0hYWxmMW9VeKI9uQ39uRaSZy3NIFAqNSAHu2lcCB0qTyTe9J+8UvWFVeOu1cv3Z2+04/3KA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yvt4AxRp0YOZYUUyEC6uDhVDSCEbs2JZ0PZsIqymznk=;
+ b=QzUdLHjxmqhkYpehdqYy989EspwwYYuAY5RxAABtBA//TId8MqzSgaKXNvKzh59nG3XRjk9GSbWooaZZ7EoO64F1APMSjndb0fxgas4ydjUrT0n6b/Cpv8DHAF+Y8PoY+iMtG88PginMTH3Sb3bAuR938r/IwoPZNlDj0EXEOoGIJoncXMCSFYlHRDlpiOQmS6hFKDyIUra7XzfG0W02XLXsincMyLpHncjFxViWoZxnNTzfUmgFQ8TuKnJCupw0BWlejgIXne7hkrRW6Cn4IUQbMvy9+9thbZ7DoRabSXrXwj0YtxeHt76PXTO0sw4KrfGEUZ6Nc8UvMCEUYj54tg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by PH0PR12MB7094.namprd12.prod.outlook.com (2603:10b6:510:21d::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Thu, 26 Oct
+ 2023 18:28:42 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::11a1:b0c7:7c88:9480]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::11a1:b0c7:7c88:9480%4]) with mapi id 15.20.6933.022; Thu, 26 Oct 2023
+ 18:28:42 +0000
+Date:   Thu, 26 Oct 2023 15:28:41 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
+        robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
+        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
+        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        zhenzhong.duan@intel.com, joao.m.martins@oracle.com,
+        xin.zeng@intel.com
+Subject: Re: [PATCH v7 00/10] iommufd: Add nesting infrastructure (part 1/2)
+Message-ID: <20231026182841.GR3952@nvidia.com>
+References: <20231026043938.63898-1-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231026043938.63898-1-yi.l.liu@intel.com>
+X-ClientProxiedBy: SN6PR05CA0030.namprd05.prod.outlook.com
+ (2603:10b6:805:de::43) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/3] s390/vfio-ap: improve reaction to response code 07
- from PQAP(AQIC) command
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jjherne@linux.ibm.com, pasic@linux.ibm.com,
-        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com
-References: <20231018133829.147226-1-akrowiak@linux.ibm.com>
- <20231018133829.147226-4-akrowiak@linux.ibm.com>
- <0bed3d29-7fb1-d56d-5f12-e2010ae7d97f@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <0bed3d29-7fb1-d56d-5f12-e2010ae7d97f@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: sB2KYg-oJIwPyNuaaK5HFwsVLqWdNtpy
-X-Proofpoint-GUID: Qd7b1hmbPOGqG2axWloFvVZO9-_qCLyz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-26_16,2023-10-26_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 spamscore=0 malwarescore=0 clxscore=1015
- impostorscore=0 suspectscore=0 phishscore=0 mlxlogscore=945
- lowpriorityscore=0 mlxscore=0 adultscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2310170001
- definitions=main-2310260158
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH0PR12MB7094:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7b06d299-7d82-4c79-8f73-08dbd65161e3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: mUSpQfgmo6y0zVQ4lv2Ik1ljxZIanRP3X02nh4NVKqzfyYC8RPEIBL2Z1FgURs67hwmR2i/jK0PNn146rC4WXNTf8mqEMbCQoJA8vOGO4bBJ4vyWmrYuRsnBLm2PvT39YTm3SX1Ku+SIE5e+wAWqh3tGx2jaZrOX3z90852sTOp4AvOt42IRiwPhjVZedvlu6owE6DujRVmtz8xSuLCacFy1MJXvBDsutTrUd0G/9ra+RjEMmVnPtiVYrbw96jWs07NqFIe+GiIqU6ke0gXHINReoNFbdKitamI3llusveNTVNAA0Z2B9HJccm2LKBDy+EYliJo610tnzXbYdosw+0gLx88jYJk+JA3O4XWKCNo0xHPiU2bj83MMsjwI3ax82szn1Ku/WVMlGdIYoxPCCz5LxMTXOqDR8gvp1FIZ9tJn0oB2qUa89sCXVWWpPhFIEUnBiJYo1uuhFKg7U8dk3ij0VDY8OW3/Xe8lucbUBvJcFnfOeOyQQteZSt2G3OyJnm3XzYtwIbfDIu1tm2reu+oK48wyV7jitUHS48AkTZdkp2+KembOeXXW6s7koRqM
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(376002)(366004)(396003)(136003)(230922051799003)(186009)(451199024)(1800799009)(64100799003)(6512007)(2616005)(1076003)(26005)(36756003)(33656002)(38100700002)(86362001)(83380400001)(6916009)(8936002)(316002)(66556008)(66476007)(66946007)(4744005)(2906002)(41300700001)(5660300002)(7416002)(8676002)(4326008)(6506007)(478600001)(6486002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?DkryHO4WtrHosTPoeWstLMrhKp6j8l5B9BNOB1/M6xxbw7zeAn3OT1wmTBY3?=
+ =?us-ascii?Q?VLUKRRIEmelxq7SRCz5Xtf5PR4n3kKG3lsssh27r8h0jHRhP1/EXFlWDiO6r?=
+ =?us-ascii?Q?fuhMI35SVibjhdOeUu+TiUQjWDiIlmmNE8SdRRZGNqb+JiKuBcSa6aa8pEnl?=
+ =?us-ascii?Q?IligODp3sh0g3txRkCDoBY2CNKfSrESeI1UX56DI/saifZbHk9FMiU4zQcYV?=
+ =?us-ascii?Q?6ZUmy3NkWWLVSsO9gfNdVGJ6gNyO83DiB7Ag8t+4uoc6BND27EUfnu9k9x86?=
+ =?us-ascii?Q?GN7vGXMLzCrUPqnxnpU3yCpGxUGErDal8C/GXfzAbsSVA9DFagtMSnXA5VkV?=
+ =?us-ascii?Q?Vv5hgj3EqKQQJRnmACl+fTgCnGoM2JRpyZzjAZZj/yCanv/fSxLC+ToIhP7w?=
+ =?us-ascii?Q?RpAbkteCBXf3dm/jjM8eg+QoFqG2FzSnNnQbY0jrSyd/Ju/Dkqq/EkE0rPVd?=
+ =?us-ascii?Q?bZCzTVX43na90RmWZfa3uhzDweIyYNPaXAoufM4V5CY0akOufdMQaq+Kr0uc?=
+ =?us-ascii?Q?8zFmLy06Op3m0sV8ROaeMVHgX2qh4v8Sv8HZlDi8pz9+EoD2tOf9irsiVg0r?=
+ =?us-ascii?Q?HbK56QcXfFnqZUtejGlHQHMEDjjfNOkyVMAfhc5O8aH+YJRmxeolkjlS07rk?=
+ =?us-ascii?Q?PU+oFQejLxVuSvVBMKIRinVKiZd0URvKTdJl77nLJkXoP+D6wNyIk6kJdoVC?=
+ =?us-ascii?Q?GLnxnC3dW1Zo+aqI/zatzUnEyKhzgBNhMkYkC42fwhxICpmnP+tQuoLInuan?=
+ =?us-ascii?Q?lfWt8Mb9ovBpSY7bGGfSZkn9ajVAfkDq4Hha/lnYHh3lhu0G4+N/P3DcNl/i?=
+ =?us-ascii?Q?gjtkU5TpC8x0iiVlXmH/v+3hNNCoHKksSBd+u9Gw9EEaBY22e42MqZ+dcemc?=
+ =?us-ascii?Q?554bUlgaU9xo7JsPUdpxbq6akt5Y+TlDOZiW406rPFUJS5vDTDWZG36h1fKF?=
+ =?us-ascii?Q?WNwjyM1qqU8LpYbjfg5Pw7NktiAZvzHGarJrsTNt2e2yo3i09UJmSJ2zym5e?=
+ =?us-ascii?Q?QWx9zlQbsuAlNPCiOzqXN6Mx0EWD5ePxAEUkMQ69rXGYCdPiYmVi08TC5UHP?=
+ =?us-ascii?Q?6CkvHUNcAYnO7i1HPdzqN5YZTYIG20+tkMKL2okxmW5EpgtyrjALE/oht9aV?=
+ =?us-ascii?Q?ztP9XOOudUO3CsW12dIrPzVI9TD+s1gcxL72VUXhg76vT4TSnznzu5ZtsrNi?=
+ =?us-ascii?Q?ursTjNK9b/W9RScX1WacaFdl7gdbWjTpcYQV+5iGfuiqs36PzhXbRPOt2kWp?=
+ =?us-ascii?Q?JeeTSv1y+Mg7PE8Jc3cVKMBvM6CkzNJsAKjUgstFV8IKMC2Ezic4POiHhi6M?=
+ =?us-ascii?Q?T15Kw2kyOfcf7ivIMcFmTA309LqKEQx7sfjN4jkmko3GiXi+T0As6xg0DRmE?=
+ =?us-ascii?Q?gsz1vo+8ICvvgBXCPRt8Qjg8XKykYeFVuEE5lSU58wFjJrKZkxyEb2/C0XVW?=
+ =?us-ascii?Q?h4tti3YTzSmOZQvRIFiI4hBqC6zN8F7i4KJapbcRvdkDUpvQGiTACXYEQEKC?=
+ =?us-ascii?Q?GmSd4aR9aWZSIk/4PbUQtltWVvHJa1x4tOulsq/F9fYTDqXv1LMJN6OdBZ9Q?=
+ =?us-ascii?Q?MmH8qPPvj3Dv4Z6aYZs=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b06d299-7d82-4c79-8f73-08dbd65161e3
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2023 18:28:42.7779
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JdWRBqxIjq8FgwLvGsEKdHufvfBtNaH4Kv/6btJENvMrEw2EQZKybmoBOMafaqbr
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7094
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Oct 25, 2023 at 09:39:28PM -0700, Yi Liu wrote:
 
+> Jason Gunthorpe (2):
+>   iommufd: Rename IOMMUFD_OBJ_HW_PAGETABLE to IOMMUFD_OBJ_HWPT_PAGING
+>   iommufd/device: Wrap IOMMUFD_OBJ_HWPT_PAGING-only configurations
+> 
+> Lu Baolu (1):
+>   iommu: Add IOMMU_DOMAIN_NESTED
+> 
+> Nicolin Chen (6):
+>   iommufd: Derive iommufd_hwpt_paging from iommufd_hw_pagetable
+>   iommufd: Share iommufd_hwpt_alloc with IOMMUFD_OBJ_HWPT_NESTED
+>   iommufd: Add a nested HW pagetable object
+>   iommu: Add iommu_copy_struct_from_user helper
+>   iommufd/selftest: Add nested domain allocation for mock domain
+>   iommufd/selftest: Add coverage for IOMMU_HWPT_ALLOC with nested HWPTs
+> 
+> Yi Liu (1):
+>   iommu: Pass in parent domain with user_data to domain_alloc_user op
 
-On 10/26/23 10:15, Matthew Rosato wrote:
-> On 10/18/23 9:38 AM, Tony Krowiak wrote:
->> Let's improve the vfio_ap driver's reaction to reception of response code
->> 07 from the PQAP(AQIC) command when enabling interrupts on behalf of a
->> guest:
->>
->> * Unregister the guest's ISC before the pages containing the notification
->>    indicator bytes are unpinned.
->>
->> * Capture the return code from the kvm_s390_gisc_unregister function and
->>    log a DBF warning if it fails.
->>
->> Suggested-by: Matthew Rosato <mjrosato@linux.ibm.com>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> 
-> Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> 
-> I went back-and-forth on whether this should be a stable/fixes candidate but I think no...  I happened to notice it while reviewing other code, I'm not aware that it's ever created a visible issue, and it's on a pretty immediate error path.  If anyone thinks it should be a stable candidate I have no objection but in that case would suggest to break the patch up to separate the new WARN from the fix.
+Updated, thanks
 
-Nothing has ever been reported and is probably very unlikely to be 
-reported; so, I agree it should not be a stable/fixes candidate.
-
-> 
-> 
-> 
+Jason
