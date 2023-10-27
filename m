@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 765387D8FA1
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 09:22:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F17E17D8FAA
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 09:23:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345406AbjJ0HWQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 03:22:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45328 "EHLO
+        id S1345333AbjJ0HXK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 03:23:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345389AbjJ0HWO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 03:22:14 -0400
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C4811B1
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 00:22:12 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-40839807e82so10032135e9.0
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 00:22:12 -0700 (PDT)
+        with ESMTP id S229590AbjJ0HXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 03:23:09 -0400
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15CCE194
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 00:23:07 -0700 (PDT)
+Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-32f70391608so178122f8f.2
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 00:23:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698391331; x=1698996131; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1698391385; x=1698996185; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=PqXLD4gsUSCQcm/bEiQQT7bGyjP9upwq2OK6iOIPglM=;
-        b=JPtXT557nuEe/eKzs/F3x3HQSvrPp30FOmjV7JpKS4PonJsNXzirn48naHQxQ3Vb7f
-         R/uLfsoWfuzLkTRAe8cyX+WY+NgoJWYvz6EXpCTrn1GL1YUrJmxH5XtLWglOR+7CuOpJ
-         9KD61Jcpkav6WGP3d9P5Nw2clN9IltH0b6DLX/qotApX9nHt0vGUmMfcvXMSM0AvfavR
-         t0fr954sCBBgVsYzOGy7NUR+l39JDwQnEoAjFgC8iJUmZhRMfVtPDuYsl7TWcCh/SA0e
-         dKpSYMNzPm2mUf7ce8icL41se4jP9GbC7jtaOKDQARPKmO/OsR6h1KwrgZhBpqXP6nbG
-         ScMA==
+        bh=dSCOMydOnsCaHq17QXAhhoXbOK1DobHQBIwwTw48NnM=;
+        b=NQC1g7ouSlhRQBxbKk3Qlzl6ehpJmf6rsb3V2pQM6OVaJ/8gAzsUFnhJmLleXLMMWv
+         Mnq5dFU2kQCCSktgkzJL90RXhJqSPFT8uWsRO68bSXXEtFCjGQAPwsc2l0m5D2wKHHyf
+         3I6FcgXfotthBLs02T5lBaRnmHKKFeRHftU4de8o6Gd0OSjcYqIjg2ngMZ4VryfvFGLN
+         FRdHvfwFLPJNcq7kiG4yVdOE005S/Sv9LyiLoMsKWbVHZL3mipRoJzkmmio4iDe/vZMd
+         wJE1G5HlW7xHNGr2DhPfOUJLhV1/I0SpRwlVNVog5yFlfsPqA6lJRmWy2HHt2l+M2ZPk
+         HDnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698391331; x=1698996131;
+        d=1e100.net; s=20230601; t=1698391385; x=1698996185;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=PqXLD4gsUSCQcm/bEiQQT7bGyjP9upwq2OK6iOIPglM=;
-        b=W7moudP49RYuZFXdDVoMcyV1zHH9Fop40ZlXaKItyx74tXLvpCuYdnwgq3qJUpj/9D
-         4T/EQgzKBsKYEGgpLhH3at19INTkDVqrsBvSBX2zGaVhVejcOzi2nOQ1mGLLMaYaVexg
-         qtDgIHPfXeniLbtNQ1M3saD6oSvcV+CZ9jtsdnz284fah3wha23Mz/1P9oxyUVwuqjMb
-         4iRSG6demwHb7MwmApUSm/JYQp4SyzuML8WXteTNHMHIXx3dWS5p/sLw8fGEXl8FXUVj
-         +d1p7e5prTnkO1BSgUQtFKGFHLFlpyLCloA0ZMCfwmIPeo8/Vg9h6phvkFHsj0IkW1d5
-         S2Dg==
-X-Gm-Message-State: AOJu0YzFO+iRu/hq+Bc9ZRpx0UYEAr+JIK64UX1JvQOIG9eW1KJ115U8
-        McLutBuQROEyIbfZCPlkqPQ=
-X-Google-Smtp-Source: AGHT+IGU6tTMgK6RwsBlq8F1RDINHIo2QB0XP1KOkIfo88Tr96dL8LD0Q31Rr4FqnFe7pGXkQLUMWQ==
-X-Received: by 2002:a05:600c:2d8c:b0:408:33ba:569a with SMTP id i12-20020a05600c2d8c00b0040833ba569amr6011223wmg.8.1698391330510;
-        Fri, 27 Oct 2023 00:22:10 -0700 (PDT)
+        bh=dSCOMydOnsCaHq17QXAhhoXbOK1DobHQBIwwTw48NnM=;
+        b=n8U5G2Ovj+BBfVAcg7FUJ8WVUwMUfx3h3bEsOr3SCHUXgupCbuZuL2Y4wRnRSAB1KU
+         leAzB1yR8dNEhs7fjL68whfQbKdv5tOp4hOD8g/KbuHjnOIsT7hXcK0KiMLoPZYAYjp7
+         ZqnO5sFukLlfgm6b7yDZvcX05Ov0/besdZhdjMKKSnEEG+zXQDBgWHRWzu7f6QT8DkSb
+         +KgrLecL3pLBVG4Gd6IBXPyaHBN/JNMtCHuEzFgMjz9fssKTX8MTBOMHGNrvGeA4rYf6
+         8BgVyMpoOSgVXiDg7BFinb5dwqxmZSa1+nWvF10O5FdSQIkuay9yeTNgRFVKp99ZIgT6
+         ydbQ==
+X-Gm-Message-State: AOJu0Yxq3FoEF7iJqHwR47y0VeT1CDbErdg2jy2ECuD6SHhDsGjAs136
+        Xg/m2+7U93sEHuRQP/kz4sU=
+X-Google-Smtp-Source: AGHT+IGcJqs+3Lj5Br/+siV+aN+YMItskE6Hk6MaX+RfvRLeEZhRqSD3XuVFCG4gSuppLBynhA6zLA==
+X-Received: by 2002:adf:e992:0:b0:321:6a61:e45a with SMTP id h18-20020adfe992000000b003216a61e45amr1332680wrm.15.1698391385492;
+        Fri, 27 Oct 2023 00:23:05 -0700 (PDT)
 Received: from [192.168.10.177] (54-240-197-235.amazon.com. [54.240.197.235])
-        by smtp.gmail.com with ESMTPSA id d16-20020adfef90000000b0032326908972sm1126352wro.17.2023.10.27.00.22.09
+        by smtp.gmail.com with ESMTPSA id d16-20020adfef90000000b0032326908972sm1126352wro.17.2023.10.27.00.23.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Oct 2023 00:22:10 -0700 (PDT)
-Message-ID: <ae99776d-bf6a-4b24-b617-fde8c76d087d@gmail.com>
-Date:   Fri, 27 Oct 2023 08:22:08 +0100
+        Fri, 27 Oct 2023 00:23:05 -0700 (PDT)
+Message-ID: <65c0d093-e83c-4307-9edb-2b4f04cde607@gmail.com>
+Date:   Fri, 27 Oct 2023 08:23:04 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: paul@xen.org
-Subject: Re: [PATCH v3 07/28] hw/xen: use correct default protocol for
- xen-block on x86
+Subject: Re: [PATCH v3 08/28] i386/xen: Ignore VCPU_SSHOTTMR_future flag in
+ set_singleshot_timer()
 Content-Language: en-US
 To:     David Woodhouse <dwmw2@infradead.org>, qemu-devel@nongnu.org
 Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
@@ -75,14 +75,14 @@ Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
         Bernhard Beschow <shentey@gmail.com>,
         Joel Upham <jupham125@gmail.com>
 References: <20231025145042.627381-1-dwmw2@infradead.org>
- <20231025145042.627381-8-dwmw2@infradead.org>
+ <20231025145042.627381-9-dwmw2@infradead.org>
 From:   "Durrant, Paul" <xadimgnik@gmail.com>
-In-Reply-To: <20231025145042.627381-8-dwmw2@infradead.org>
+In-Reply-To: <20231025145042.627381-9-dwmw2@infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -93,14 +93,16 @@ X-Mailing-List: kvm@vger.kernel.org
 On 25/10/2023 15:50, David Woodhouse wrote:
 > From: David Woodhouse <dwmw@amazon.co.uk>
 > 
-> Even on x86_64 the default protocol is the x86-32 one if the guest doesn't
-> specifically ask for x86-64.
+> Upstream Xen now ignores this flag¹, since the only guest kernel ever to
+> use it was buggy.
 > 
-> Fixes: b6af8926fb85 ("xen: add implementations of xen-block connect and disconnect functions...")
+> ¹ https://xenbits.xen.org/gitweb/?p=xen.git;a=commitdiff;h=19c6cbd909
+> 
 > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> Reviewed-by: Paul Durrant <paul@xen.org>
 > ---
->   hw/block/xen-block.c | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
+>   target/i386/kvm/xen-emu.c | 20 ++++++++++----------
+>   1 file changed, 10 insertions(+), 10 deletions(-)
 > 
 
 Reviewed-by: Paul Durrant <paul@xen.org>
