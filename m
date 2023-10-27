@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 011367D941E
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 11:48:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2BEB7D943C
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 11:52:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345542AbjJ0JsX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 05:48:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48236 "EHLO
+        id S1345559AbjJ0Jw0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 05:52:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230502AbjJ0JsW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 05:48:22 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C8EC9D
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 02:48:16 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-32dff08bbdbso1281816f8f.2
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 02:48:16 -0700 (PDT)
+        with ESMTP id S1345406AbjJ0JwX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 05:52:23 -0400
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A74F187
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 02:52:21 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-4084e49a5e5so15242425e9.3
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 02:52:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698400095; x=1699004895; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1698400339; x=1699005139; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=30VwI2HQrqCL5YyhF8qmfbeeHlzGfWBEtfc4fCXo8Fs=;
-        b=hkt3sMRe7rR1d10W+KW1xktcblerzO9qoo0S2RVwjGHQhzvuR6lCcW+XJuYvbqDCOK
-         TpXhh5+nh4ABCqrdAY3r/m++ji/OKmJi/vN4b2umg4ixok8YVwXanbcbcJ+b/KL+Ipjo
-         dMLwONxKGQlmv2SaTsdfdWF610ukiuafyJasQttpkHdgabNT3i3n0Zp/QqhyoSKy8FdL
-         ZNuOjOW5PgSKPDlDeWd3fMakE/YvdWE2Au0qwLaS/yspysc4lt4sEW2uMEMP1IU5KmlC
-         ug9T9MkPjz3aCAVNtyDoPkgH+YElivJMvnoNKSrFGCcT9fDbQWw7jkMGKLs+81hwObgu
-         HXPg==
+        bh=2yiE3kmnMlzeuIC0wQ9aeOyHGBx7Hm50hNBXLvo1oLI=;
+        b=HqNY0R2os7stj8aDfw8AVuMuiwy7+vosgpJvC3vOZWUKIEHJZ2xX/zEqjXWoS1pIP4
+         ddVS+GGgMJ4RiPbukkd7KSePdU5jASbu7PnWVDAiROPQJqnwnUsqyb1u1pwOksLpSk42
+         vgb+YPWoF0TSDBRJzAyNApvr5s0TVqszGfoPIkEeQDi6gZVitOfa0F5pGzpN829cyEcJ
+         FZyIMB042F6wy/O0Jj5Wg8TIgjHPA24jv08tbHcChQ6U1UPBOl/BvLUqFOXMTYxhFlq/
+         18+UBCtcd5Ef7Hzl1oEfvcWgUSkMYz8U3k84PSyWQ0T1vLoo0y8HSJe9jEvVFr2TY38p
+         xOBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698400095; x=1699004895;
+        d=1e100.net; s=20230601; t=1698400339; x=1699005139;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=30VwI2HQrqCL5YyhF8qmfbeeHlzGfWBEtfc4fCXo8Fs=;
-        b=SJVXudIOdF4m8zghDtAFvqxu4H41C7OjQKphRopdujXzdhO2NzAmK0UOtOGGMA7pr9
-         shw62GYGNQBYq5vx0kscdMFs0DOSdlMtsuCZDoPmmujtj2FUCO7NwP8EU1SxBTNKb5LN
-         TOiSklFItjMe/uWCY7P09Pn1GD2hpfhVlax6l034N2vZks+1yJbhWH+5N082HvwOZ7rv
-         QA68wDxaPZvSX4/+M0kgyDsVT9Gm5fAMZjKIsb0mHrH9zxJ0t++ScQY2d7OS+kYeS2Tp
-         0Lad/DShbRta2dpnWpuIK9yJcSqOHpJcJmernWkq+P+c7ZhfDrHfX1AiPuhG6os3XccO
-         BLyQ==
-X-Gm-Message-State: AOJu0Yy9Iv9cbRnWf7Jiq6GrXCrtxNvm2tHTQYjD8AnKCU4NDhfPo/br
-        NGRLmvWxRb3rZCurwGMMoIM=
-X-Google-Smtp-Source: AGHT+IE4PpSyRDRjuLCwnnRqMs4Ez7+O/3yvQMMGSADruwPllbL3a4A8idM4xcMnD9poi1dGJZ1Jjg==
-X-Received: by 2002:a05:6000:1361:b0:32d:9b80:e2c6 with SMTP id q1-20020a056000136100b0032d9b80e2c6mr1636403wrz.26.1698400094647;
-        Fri, 27 Oct 2023 02:48:14 -0700 (PDT)
+        bh=2yiE3kmnMlzeuIC0wQ9aeOyHGBx7Hm50hNBXLvo1oLI=;
+        b=njy+LSz3irgFoFWjpBJ79BGFPMeC1CtwgUpPLESIO9PZCuQpb02b9xD5YUuOZlILe1
+         ZWaEtHDN0kIx7jMGkhUk3n6dspV5xKvMn9i0TTaZK/oIlbHW8I1R7v24FBuLrYv9nKxe
+         tIwF1fwl+EFO/wJBw8z6eqK2CaJa4vIFjTNi1w8tz7ozWPTMAyEjjRAPrIqElHxPZN1V
+         +bJL+B2C4lGzte6Vr5GBAkPuUjAJss4I3/OcvnY7EgpSrW3gUKaAfjk/l6/7ly+3pZBO
+         QzYaKiN/c4x4kRrao583IFC815MFQe7HN+IkE2uhtKhckZWa/0AZbWujFeVzNN9IsAbY
+         EFTw==
+X-Gm-Message-State: AOJu0YykqtalOXzB1aNMW0H4v+XKdJmGfJFtHLfCoPwDmWYH5ZML2dGk
+        lbvkJfzaCft99uKjKAZlGoU=
+X-Google-Smtp-Source: AGHT+IEuLWOC6r1FV8oQb3wkYtxJ/Wfx1Om4s2yzSuMliOYSNXtiWemTUbczcZfVgloepcRrPb3iTw==
+X-Received: by 2002:a05:600c:4ecd:b0:403:31a:77b9 with SMTP id g13-20020a05600c4ecd00b00403031a77b9mr1829515wmq.37.1698400339330;
+        Fri, 27 Oct 2023 02:52:19 -0700 (PDT)
 Received: from [192.168.10.177] (54-240-197-235.amazon.com. [54.240.197.235])
-        by smtp.gmail.com with ESMTPSA id e9-20020a5d5949000000b00326f5d0ce0asm1389222wri.21.2023.10.27.02.48.13
+        by smtp.gmail.com with ESMTPSA id bd6-20020a05600c1f0600b003fee53feab5sm1212290wmb.10.2023.10.27.02.52.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Oct 2023 02:48:14 -0700 (PDT)
-Message-ID: <322697f1-c4fe-40ab-88ce-f99f9d1fe4d6@gmail.com>
-Date:   Fri, 27 Oct 2023 10:48:13 +0100
+        Fri, 27 Oct 2023 02:52:18 -0700 (PDT)
+Message-ID: <88aad170-24f2-4ec6-b43c-ac87dde81255@gmail.com>
+Date:   Fri, 27 Oct 2023 10:52:17 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: paul@xen.org
-Subject: Re: [PATCH v3 26/28] hw/i386/pc: use qemu_get_nic_info() and
- pci_init_nic_devices()
+Subject: Re: [PATCH v3 27/28] hw/xen: use qemu_create_nic_bus_devices() to
+ instantiate Xen NICs
 Content-Language: en-US
 To:     David Woodhouse <dwmw2@infradead.org>, qemu-devel@nongnu.org
 Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
@@ -75,9 +75,9 @@ Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
         Bernhard Beschow <shentey@gmail.com>,
         Joel Upham <jupham125@gmail.com>
 References: <20231025145042.627381-1-dwmw2@infradead.org>
- <20231025145042.627381-27-dwmw2@infradead.org>
+ <20231025145042.627381-28-dwmw2@infradead.org>
 From:   "Durrant, Paul" <xadimgnik@gmail.com>
-In-Reply-To: <20231025145042.627381-27-dwmw2@infradead.org>
+In-Reply-To: <20231025145042.627381-28-dwmw2@infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -93,19 +93,25 @@ X-Mailing-List: kvm@vger.kernel.org
 On 25/10/2023 15:50, David Woodhouse wrote:
 > From: David Woodhouse <dwmw@amazon.co.uk>
 > 
-> Eliminate direct access to nd_table[] and nb_nics by processing the the
-> ISA NICs first and then calling pci_init_nic_devices() for the test.
+> When instantiating XenBus itself, for each NIC which is configured with
+> either the model unspecified, or set to to "xen" or "xen-net-device",
+> create a corresponding xen-net-device for it.
 > 
-> It's important to do this *before* the subsequent patch which registers
-> the Xen PV network devices, because the code being remove here didn't
-> check whether nd->instantiated was already set before using each entry.
+> Now we can launch emulated Xen guests with '-nic user', and this fixes
+> the setup for Xen PV guests, which was previously broken in various
+> ways and never actually managed to peer with the netdev.
 > 
 > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 > ---
->   hw/i386/pc.c                | 21 +++++++++++----------
->   include/hw/net/ne2000-isa.h |  2 --
->   2 files changed, 11 insertions(+), 12 deletions(-)
+>   hw/xen/xen-bus.c                    |  4 ++++
+>   hw/xen/xen_devconfig.c              | 25 -------------------------
+>   hw/xenpv/xen_machine_pv.c           |  9 ---------
+>   include/hw/xen/xen-legacy-backend.h |  1 -
+>   4 files changed, 4 insertions(+), 35 deletions(-)
 > 
 
+Yay! I've been wanting this for years but ETIME.
+
 Reviewed-by: Paul Durrant <paul@xen.org>
+
 
