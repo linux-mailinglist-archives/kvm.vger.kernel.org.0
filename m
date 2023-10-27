@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 719F57D9B9B
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 16:39:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4395A7D9B9D
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 16:39:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345974AbjJ0OjF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 10:39:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57760 "EHLO
+        id S1346106AbjJ0OjJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 10:39:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345876AbjJ0OjB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 10:39:01 -0400
+        with ESMTP id S1345977AbjJ0OjC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 10:39:02 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 537E2DE;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3D89E3;
         Fri, 27 Oct 2023 07:38:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698417539; x=1729953539;
+  t=1698417540; x=1729953540;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=PE5fU1agwGvIYR6WvOaWH9GVoG/TbRgWJmFahYBu+3E=;
-  b=W91o8T+OFJe/GWkmC5yEGIfpYejsOutjiDN0hOcrJ8nxXEKCSzJDDKiw
-   v05OKruP/gBwbcBL4eDc4rfgudKP6Nyj/7mHi8ZDZpvWO+tbGuuSbVlyl
-   eort2OLe81g79DRQxFh8ak0xtHazucaBBmOQls+2D1kR5pZZYBfn5BipL
-   GtJVM07eytSsKUnaV5efvkYdam0RLyBDr8Umxq27000uY2f5hymqrAlhk
-   61EPGQLz7a/iI0YtkRMa7SqpjVOUUMSnOtww7C74TliLqQt5S4je+jkke
-   acyT9ouHYoO6w0BN/laURUYHE4dAz2Cwug0ukLXtftRIMuCuV70kkw6ml
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10876"; a="386670113"
+  bh=KI9R1ykioS10T+zkw0Cw1ATpow7yvlFUWGh3i+Y0oPk=;
+  b=Cuxy/yewMll0iq1rxeyEa6vjsqrhzGCpXCTYzXRhZhOD1CrjXYM+QQDo
+   xWzOk8Q6zbTI4v7MBgRvrCOp16n4TiGOZ9TGkn4Qn/aKhzzrTGZ1iZ0vH
+   hqY9zn2GVYvUEHAVDA837Q1mlr6wZb6ElKbF1q7+3uakaij2vNqYhgeJF
+   WN2ZRtXcmwnuRLw0xJswtxGFKXMgCYWl4PauGNp/0IcAY22WuQUJgQuPM
+   5KXcKHVSlD8eKcbxm6xLADsgj9Pu6dWP6pcE41nigDwHYCfeW4sIlUfmU
+   sILB/8SxCoaPzmEqgtIY1peQdQQXvxpPWJgWY1FJ3/5Wyh11hSOXt+qZR
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10876"; a="386670135"
 X-IronPort-AV: E=Sophos;i="6.03,256,1694761200"; 
-   d="scan'208";a="386670113"
+   d="scan'208";a="386670135"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 07:38:42 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 07:38:48 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.03,256,1694761200"; 
-   d="scan'208";a="812619"
+   d="scan'208";a="812623"
 Received: from dmnassar-mobl.amr.corp.intel.com (HELO desk) ([10.212.203.39])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 07:38:06 -0700
-Date:   Fri, 27 Oct 2023 07:38:40 -0700
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 07:38:12 -0700
+Date:   Fri, 27 Oct 2023 07:38:47 -0700
 From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -59,9 +59,10 @@ Cc:     linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
         antonio.gomez.iglesias@linux.intel.com,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Alyssa Milburn <alyssa.milburn@intel.com>
-Subject: [PATCH  v4 1/6] x86/bugs: Add asm helpers for executing VERW
-Message-ID: <20231027-delay-verw-v4-1-9a3622d4bcf7@linux.intel.com>
+        Dave Hansen <dave.hansen@intel.com>
+Subject: [PATCH  v4 2/6] x86/entry_64: Add VERW just before userspace
+ transition
+Message-ID: <20231027-delay-verw-v4-2-9a3622d4bcf7@linux.intel.com>
 X-Mailer: b4 0.12.3
 References: <20231027-delay-verw-v4-0-9a3622d4bcf7@linux.intel.com>
 MIME-Version: 1.0
@@ -77,112 +78,105 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-MDS mitigation requires clearing the CPU buffers before returning to
-user. This needs to be done late in the exit-to-user path. Current
-location of VERW leaves a possibility of kernel data ending up in CPU
-buffers for memory accesses done after VERW such as:
+Mitigation for MDS is to use VERW instruction to clear any secrets in
+CPU Buffers. Any memory accesses after VERW execution can still remain
+in CPU buffers. It is safer to execute VERW late in return to user path
+to minimize the window in which kernel data can end up in CPU buffers.
+There are not many kernel secrets to be had after SWITCH_TO_USER_CR3.
 
-  1. Kernel data accessed by an NMI between VERW and return-to-user can
-     remain in CPU buffers ( since NMI returning to kernel does not
-     execute VERW to clear CPU buffers.
-  2. Alyssa reported that after VERW is executed,
-     CONFIG_GCC_PLUGIN_STACKLEAK=y scrubs the stack used by a system
-     call. Memory accesses during stack scrubbing can move kernel stack
-     contents into CPU buffers.
-  3. When caller saved registers are restored after a return from
-     function executing VERW, the kernel stack accesses can remain in
-     CPU buffers(since they occur after VERW).
+Add support for deploying VERW mitigation after user register state is
+restored. This helps minimize the chances of kernel data ending up into
+CPU buffers after executing VERW.
 
-To fix this VERW needs to be moved very late in exit-to-user path.
+Note that the mitigation at the new location is not yet enabled.
 
-In preparation for moving VERW to entry/exit asm code, create macros
-that can be used in asm. Also make them depend on a new feature flag
-X86_FEATURE_CLEAR_CPU_BUF.
+  Corner case not handled
+  =======================
+  Interrupts returning to kernel don't clear CPUs buffers since the
+  exit-to-user path is expected to do that anyways. But, there could be
+  a case when an NMI is generated in kernel after the exit-to-user path
+  has cleared the buffers. This case is not handled and NMI returning to
+  kernel don't clear CPU buffers because:
 
-Reported-by: Alyssa Milburn <alyssa.milburn@intel.com>
-Suggested-by: Andrew Cooper <andrew.cooper3@citrix.com>
-Suggested-by: Peter Zijlstra <peterz@infradead.org>
+  1. It is rare to get an NMI after VERW, but before returning to userspace.
+  2. For an unprivileged user, there is no known way to make that NMI
+     less rare or target it.
+  3. It would take a large number of these precisely-timed NMIs to mount
+     an actual attack.  There's presumably not enough bandwidth.
+  4. The NMI in question occurs after a VERW, i.e. when user state is
+     restored and most interesting data is already scrubbed. Whats left
+     is only the data that NMI touches, and that may or may not be of
+     any interest.
+
+Suggested-by: Dave Hansen <dave.hansen@intel.com>
 Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 ---
- arch/x86/entry/entry.S               | 17 +++++++++++++++++
- arch/x86/include/asm/cpufeatures.h   |  2 +-
- arch/x86/include/asm/nospec-branch.h | 15 +++++++++++++++
- 3 files changed, 33 insertions(+), 1 deletion(-)
+ arch/x86/entry/entry_64.S        | 11 +++++++++++
+ arch/x86/entry/entry_64_compat.S |  1 +
+ 2 files changed, 12 insertions(+)
 
-diff --git a/arch/x86/entry/entry.S b/arch/x86/entry/entry.S
-index bfb7bcb362bc..8dc84bb9dc0b 100644
---- a/arch/x86/entry/entry.S
-+++ b/arch/x86/entry/entry.S
-@@ -6,6 +6,9 @@
- #include <linux/linkage.h>
- #include <asm/export.h>
- #include <asm/msr-index.h>
-+#include <asm/unwind_hints.h>
-+#include <asm/segment.h>
-+#include <asm/cache.h>
+diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
+index 43606de22511..9f97a8bd11e8 100644
+--- a/arch/x86/entry/entry_64.S
++++ b/arch/x86/entry/entry_64.S
+@@ -223,6 +223,7 @@ syscall_return_via_sysret:
+ SYM_INNER_LABEL(entry_SYSRETQ_unsafe_stack, SYM_L_GLOBAL)
+ 	ANNOTATE_NOENDBR
+ 	swapgs
++	CLEAR_CPU_BUFFERS
+ 	sysretq
+ SYM_INNER_LABEL(entry_SYSRETQ_end, SYM_L_GLOBAL)
+ 	ANNOTATE_NOENDBR
+@@ -663,6 +664,7 @@ SYM_INNER_LABEL(swapgs_restore_regs_and_return_to_usermode, SYM_L_GLOBAL)
+ 	/* Restore RDI. */
+ 	popq	%rdi
+ 	swapgs
++	CLEAR_CPU_BUFFERS
+ 	jmp	.Lnative_iret
  
- .pushsection .noinstr.text, "ax"
  
-@@ -20,3 +23,17 @@ SYM_FUNC_END(entry_ibpb)
- EXPORT_SYMBOL_GPL(entry_ibpb);
+@@ -774,6 +776,8 @@ native_irq_return_ldt:
+ 	 */
+ 	popq	%rax				/* Restore user RAX */
  
- .popsection
++	CLEAR_CPU_BUFFERS
 +
-+.pushsection .entry.text, "ax"
-+
-+.align L1_CACHE_BYTES, 0xcc
-+SYM_CODE_START_NOALIGN(mds_verw_sel)
-+	UNWIND_HINT_UNDEFINED
-+	ANNOTATE_NOENDBR
-+	.word __KERNEL_DS
-+.align L1_CACHE_BYTES, 0xcc
-+SYM_CODE_END(mds_verw_sel);
-+/* For KVM */
-+EXPORT_SYMBOL_GPL(mds_verw_sel);
-+
-+.popsection
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 58cb9495e40f..f21fc0f12737 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -308,10 +308,10 @@
- #define X86_FEATURE_SMBA		(11*32+21) /* "" Slow Memory Bandwidth Allocation */
- #define X86_FEATURE_BMEC		(11*32+22) /* "" Bandwidth Monitoring Event Configuration */
- #define X86_FEATURE_USER_SHSTK		(11*32+23) /* Shadow stack support for user mode applications */
--
- #define X86_FEATURE_SRSO		(11*32+24) /* "" AMD BTB untrain RETs */
- #define X86_FEATURE_SRSO_ALIAS		(11*32+25) /* "" AMD BTB untrain RETs through aliasing */
- #define X86_FEATURE_IBPB_ON_VMEXIT	(11*32+26) /* "" Issue an IBPB only on VMEXIT */
-+#define X86_FEATURE_CLEAR_CPU_BUF	(11*32+27) /* "" Clear CPU buffers */
+ 	/*
+ 	 * RSP now points to an ordinary IRET frame, except that the page
+ 	 * is read-only and RSP[31:16] are preloaded with the userspace
+@@ -1502,6 +1506,12 @@ nmi_restore:
+ 	std
+ 	movq	$0, 5*8(%rsp)		/* clear "NMI executing" */
  
- /* Intel-defined CPU features, CPUID level 0x00000007:1 (EAX), word 12 */
- #define X86_FEATURE_AVX_VNNI		(12*32+ 4) /* AVX VNNI instructions */
-diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
-index c55cc243592e..005e69f93115 100644
---- a/arch/x86/include/asm/nospec-branch.h
-+++ b/arch/x86/include/asm/nospec-branch.h
-@@ -329,6 +329,21 @@
++	/*
++	 * Skip CLEAR_CPU_BUFFERS here, since it only helps in rare cases like
++	 * NMI in kernel after user state is restored. For an unprivileged user
++	 * these conditions are hard to meet.
++	 */
++
+ 	/*
+ 	 * iretq reads the "iret" frame and exits the NMI stack in a
+ 	 * single instruction.  We are returning to kernel mode, so this
+@@ -1520,6 +1530,7 @@ SYM_CODE_START(ignore_sysret)
+ 	UNWIND_HINT_END_OF_STACK
+ 	ENDBR
+ 	mov	$-ENOSYS, %eax
++	CLEAR_CPU_BUFFERS
+ 	sysretl
+ SYM_CODE_END(ignore_sysret)
  #endif
- .endm
- 
-+/*
-+ * Macros to execute VERW instruction that mitigate transient data sampling
-+ * attacks such as MDS. On affected systems a microcode update overloaded VERW
-+ * instruction to also clear the CPU buffers. VERW clobbers CFLAGS.ZF.
-+ *
-+ * Note: Only the memory operand variant of VERW clears the CPU buffers.
-+ */
-+.macro EXEC_VERW
-+	verw _ASM_RIP(mds_verw_sel)
-+.endm
-+
-+.macro CLEAR_CPU_BUFFERS
-+	ALTERNATIVE "", __stringify(EXEC_VERW), X86_FEATURE_CLEAR_CPU_BUF
-+.endm
-+
- #else /* __ASSEMBLY__ */
- 
- #define ANNOTATE_RETPOLINE_SAFE					\
+diff --git a/arch/x86/entry/entry_64_compat.S b/arch/x86/entry/entry_64_compat.S
+index 70150298f8bd..245697eb8485 100644
+--- a/arch/x86/entry/entry_64_compat.S
++++ b/arch/x86/entry/entry_64_compat.S
+@@ -271,6 +271,7 @@ SYM_INNER_LABEL(entry_SYSRETL_compat_unsafe_stack, SYM_L_GLOBAL)
+ 	xorl	%r9d, %r9d
+ 	xorl	%r10d, %r10d
+ 	swapgs
++	CLEAR_CPU_BUFFERS
+ 	sysretl
+ SYM_INNER_LABEL(entry_SYSRETL_compat_end, SYM_L_GLOBAL)
+ 	ANNOTATE_NOENDBR
 
 -- 
 2.34.1
