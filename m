@@ -2,303 +2,429 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CD697D9F35
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 20:00:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 256FC7D9FCC
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 20:22:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346109AbjJ0SAI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 14:00:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38086 "EHLO
+        id S1346223AbjJ0SWc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 14:22:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231461AbjJ0SAH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 14:00:07 -0400
-Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8689F3;
-        Fri, 27 Oct 2023 11:00:04 -0700 (PDT)
-Received: from [192.168.7.187] ([76.103.185.250])
-        (authenticated bits=0)
-        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 39RHx76Q727634
-        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-        Fri, 27 Oct 2023 10:59:08 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 39RHx76Q727634
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-        s=2023101201; t=1698429549;
-        bh=GukAnHkZFI3/rBa416j/S5VKfqqJcD7kg8PrMwTvmfg=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=Lr7+bZ4KBh+It+K8G/kFD8XX/ZwlJkuAbtJ7MtGnkv6RtjaBrPQ8O9tQEdxY4Eh6M
-         yCy2FOzd4lvfc/bbO5ym+NQFQvcJFlraIQfCLXKDKcABq5gdX2mkbVUlo5MzQGoHpz
-         bt+6nnvXNx0UZPyU6m/ub6c39dvjTwLPlfAGDWD8iXNVC5JYvx8ZZLxT0wksyFs43/
-         8vxrdeRkeEeoL8HMkHruXUWDfgZCpm6bYpkc4bPiRr0TaS+JHEY2vW5TxkF6WsJtkx
-         g3UmJX9toIb7Xdh/6/1UAUMPRmZ+aGXt7b3jR9jRw4NJOkoszwQAl1wJHb9r7+QeYB
-         x9iwfkeYWSLsQ==
-Message-ID: <1e01fb97-2e3c-4fd7-8ed4-1770d6c2b0d4@zytor.com>
-Date:   Fri, 27 Oct 2023 10:59:05 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] KVM: VMX: Cleanup VMX basic information defines
- and usages
-Content-Language: en-US
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc:     "Yang, Weijiang" <weijiang.yang@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-References: <20231026172530.208867-1-xin@zytor.com>
- <4aff0cdcd6ae3b5998ac963df1eee31166caef1c.camel@intel.com>
-From:   Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <4aff0cdcd6ae3b5998ac963df1eee31166caef1c.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232199AbjJ0SWb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 14:22:31 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71780191
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 11:22:26 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d9a5a3f2d4fso1710268276.3
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 11:22:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698430945; x=1699035745; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:reply-to:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fUZ5ENGgmRmdtlmB4O/zxFZAY6wVMss4e0CPBbiQKYo=;
+        b=GS3mY6IAmnrMJ09G5tzoPvh7RWwLoFnnm/xelS6/LFfSbplv5yLqS9arT8xQI71Jc7
+         zKhpJ7q7Q8u9zwK5ZZzT3Cuex0HbOlptaiEHOIYZFDf74mbUFWKiMK3UN3Ja0Dfrcycp
+         GhpnhbFwiQ4JojpRB3N0gQN9LIdYqtgWFXRXNyTBLXur8E9wdAVmw52rIm2rA8ZdNjtr
+         PGgUzPjTfFXfaHpKFkbsEnxwJswbxnDozdUOs0+le34qEmuhRGGI46ipExl0n5igrg4f
+         hse5L7Wtt5LTwRiQEAyAUDonq+Z3r+B1Vgzxi+dD7g00eq9woqP1xOVdaxBAXlB/8e61
+         Ex5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698430945; x=1699035745;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:reply-to:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fUZ5ENGgmRmdtlmB4O/zxFZAY6wVMss4e0CPBbiQKYo=;
+        b=cD192egywrxRt1AVrpnAD0N+T91rObuIhNTJ/84jeqHs0kf0PrWi4h2+mJdO5vJ5L5
+         1nXlU/sVRHLwUaHeDBJU1YU0cHttEtJZWPmKX7L0IflXlglBnpbCdenWSFScElHE0E58
+         BpF6+70OX2H1pX+4xR8SNWnDGeM+Mf+7fcQSjCYHBhrOCvmiR0RKnjY7tLq/KLTJfnM/
+         Rh0lbuD01HgbSH5/NA6d+S5V3LJE5p1RZVYB6JxATqMmTwfDLB5M4mZSPksCXwb36+MQ
+         M25kM8U2PmaPEN2ba53WQch5L8Av7plYalGoxB5inQY3mZ6P12RnEr0SEgPDp6ThSnS1
+         f7lQ==
+X-Gm-Message-State: AOJu0YyCCY0M6D5iBPyW18SXIsVGRKs5NqdRQMXNrlwX/n0itYEFnq2c
+        rp9XVv4pWRIHuS9lyTX6dFM1OoE0xAc=
+X-Google-Smtp-Source: AGHT+IGTik1l5+MoAT0aZ1l3D7LvoGlEGGN/NmlkhnDMNOMyyxG0/NfMrOpUoSzppBt5u8UnrWOecHFs6SQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:d601:0:b0:d9a:6b49:433d with SMTP id
+ n1-20020a25d601000000b00d9a6b49433dmr66158ybg.6.1698430945618; Fri, 27 Oct
+ 2023 11:22:25 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 27 Oct 2023 11:21:42 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.820.g83a721a137-goog
+Message-ID: <20231027182217.3615211-1-seanjc@google.com>
+Subject: [PATCH v13 00/35] KVM: guest_memfd() and per-page attributes
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Xu Yilun <yilun.xu@intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Anish Moorthy <amoorthy@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        "=?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?=" <mic@digikod.net>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/27/2023 2:29 AM, Huang, Kai wrote:
-> 
->>   
->> +/* VMX_BASIC bits and bitmasks */
->> +#define VMX_BASIC_32BIT_PHYS_ADDR_ONLY		BIT_ULL(48)
->> +#define VMX_BASIC_MEM_TYPE_WB			6LLU
-> 
-> Strictly speaking, VMX_BASIC_MEM_TYPE_MB isn't any bit definition or bitmasks of
-> VMX_BASIC MSR.  So perhaps better to put it somewhere under separately.
+Non-KVM people, please take a gander at two small-ish patches buried in the
+middle of this series:
 
-Actually you reminded me that the memory type WB is architectural on
-x86, but I can't find it defined in a common x86 header.
+  fs: Export anon_inode_getfile_secure() for use by KVM
+  mm: Add AS_UNMOVABLE to mark mapping as completely unmovable
 
-We also have:
-#define VMX_EPTP_MT_WB                               0x6ull
-which is simply redundant if we have a common definition MEMTYPE_WB.
+Our plan/hope is to take this through the KVM tree for 6.8, reviews (and ac=
+ks!)
+would be much appreciated.  Note, adding AS_UNMOVABLE isn't strictly requir=
+ed as
+it's "just" an optimization, but we'd prefer to have it in place straightaw=
+ay.
+
+Reviews on all the KVM changes, especially the guest_memfd.c implementation=
+, are
+also most definitely welcome.
+
+The "what and why" at the very bottom is hopefully old news for most reader=
+s.  My
+plan is to copy the blurb into a tag when this is merged (today's word of t=
+he day
+is: optimism), e.g. so that the big picture and why we're doing this is cap=
+tured
+in the git history.
+
+Note, the v13 changelog below captures only changes that were not posted an=
+d
+applied to the v12+ development branch.  Those changes can be found in comm=
+its
+46c10adeda81..74a4d3b6a284 at
+=20
+    https://github.com/kvm-x86/linux.git tags/kvm-x86-guest_memfd-v12
+
+This series can be found at
+
+    https://github.com/kvm-x86/linux.git guest_memfd
+
+kvm-x86/guest_memfd is also now being fed into kvm-x86/next, i.e. will be g=
+etting
+coverage in linux-next as of the next build.
+
+Similar to the v12 "development cycle", any changes needed will be applied =
+on
+top of v13, and squashed prior to sending v14 (if needed) or merging (optim=
+ism!).
+
+KVM folks, ***LOOK HERE***.  v13 has several breaking userspace changes rel=
+ative
+to v12.  Some were "necessary" (removal of a pointless ioctl), others were
+opportunistic and opinionated (renaming kvm_userspace_memory_region2 fields=
+ to
+use guest_memfd instead of gmem).  I didn't post changes as I found the "is=
+sues"
+very late (when writing documentation) and didn't want to delay v13.
+
+Here's a diff of the linux/include/uapi/linux/kvm.h changes that will break
+userspace developed for v12.
+
+@@ -102,8 +102,8 @@ struct kvm_userspace_memory_region2 {
+        __u64 guest_phys_addr;
+        __u64 memory_size;
+        __u64 userspace_addr;
+-       __u64 gmem_offset;
+-       __u32 gmem_fd;
++       __u64 guest_memfd_offset;
++       __u32 guest_memfd;
+        __u32 pad1;
+        __u64 pad2[14];
+ };
+
+@@ -1231,9 +1215,10 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+ #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
+ #define KVM_CAP_USER_MEMORY2 230
+-#define KVM_CAP_MEMORY_ATTRIBUTES 231
+-#define KVM_CAP_GUEST_MEMFD 232
+-#define KVM_CAP_VM_TYPES 233
++#define KVM_CAP_MEMORY_FAULT_INFO 231
++#define KVM_CAP_MEMORY_ATTRIBUTES 232
++#define KVM_CAP_GUEST_MEMFD 233
++#define KVM_CAP_VM_TYPES 234
+=20
+ #ifdef KVM_CAP_IRQ_ROUTING
+=20
+@@ -2301,8 +2286,7 @@ struct kvm_s390_zpci_op {
+ #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
+=20
+ /* Available with KVM_CAP_MEMORY_ATTRIBUTES */
+-#define KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES    _IOR(KVMIO,  0xd2, __u64)
+-#define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd3, struct k=
+vm_memory_attributes)
++#define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd2, struct k=
+vm_memory_attributes)
+=20
+v13:
+ - Drop KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES, have KVM_CAP_MEMORY_ATTRIBUTES
+   return the supported attributes.
+ - Add KVM_CAP_MEMORY_FAULT_INFO to report support for KVM_EXIT_MEMORY_FAUL=
+T,
+   and shift capability numbers accordingly.
+ - Do s/gmem/guest_memfd (roughly) in userspace-facing APIs, i.e. use guest=
+_memfd
+   as the formal name.  Going off of various internal conversations, "gmem"=
+ isn't
+   at all intuitive, whereas "guest_memfd" gives readers/listeners a rough =
+idea
+   of what's going on.  If you don't like the rename, then next time volunt=
+eer
+   to write the documentation.  :-)
+ - Rename a leftover "out_restricted" label to "out_unbind".
+ - Write and clean up changelogs.
+ - Write and clean up documentation.
+ - Move "memory_fault" to the standard exit reasons union (requires userspa=
+ce to
+   rebuild, but shouldn't require code changes).
+ - Fix intermediate build issues (hidden behind unselectable Kconfigs)
+ - KVM_CAP_GUEST_MEMFD and KVM_CREATE_GUEST_MEMFD under the same #ifdefs.
+ - Fix a bug in kvm_mmu_invalidate_range_add() where adding multiple ranges=
+ in a
+   single invalidation would captured only the last range. [Xu Yilun]
+
+v12: https://lore.kernel.org/all/20230914015531.1419405-1-seanjc@google.com
+v11: https://lore.kernel.org/all/20230718234512.1690985-1-seanjc@google.com
+v10: https://lore.kernel.org/all/20221202061347.1070246-1-chao.p.peng@linux=
+.intel.coms
+
+Fodder for a merge tag:
+---
+Introduce several new KVM uAPIs to ultimately create a guest-first memory
+subsystem within KVM, a.k.a. guest_memfd.  Guest-first memory allows KVM to
+provide features, enhancements, and optimizations that are kludgly or outri=
+ght
+impossible to implement in a generic memory subsystem.
+
+The core KVM ioctl() for guest_memfd is KVM_CREATE_GUEST_MEMFD, which simil=
+ar
+to the generic memfd_create(), creates an anonymous file and returns a file
+descriptor that refers to it.  Again like "regular" memfd files, guest_memf=
+d
+files live in RAM, have volatile storage, and are automatically released wh=
+en
+the last reference is dropped.  The key differences between memfd files (an=
+d
+every other memory subystem) is that guest_memfd files are bound to their o=
+wning
+virtual machine, cannot be mapped, read, or written by userspace, and canno=
+t be
+resized (guest_memfd files do however support PUNCH_HOLE).
+
+A second KVM ioctl(), KVM_SET_MEMORY_ATTRIBUTES, allows userspace to specif=
+y
+attributes for a given page of guest memory, e.g. in the long term, it will
+likely be extended to allow userspace to specify per-gfn RWX protections.
+
+The immediate and driving use case for guest_memfd are Confidential (CoCo) =
+VMs,
+specifically AMD's SEV-SNP, Intel's TDX, and KVM's own pKVM.  For KVM CoCo =
+use
+cases, being able to map memory into KVM guests without requireming said me=
+mory
+to be mapped into the host is a hard requirement.  While SEV+ and TDX preve=
+nt
+untrusted software from reading guest private data by encrypting guest memo=
+ry,
+pKVM provides confidentiality and integrity *without* relying on memory
+encryption.  And with SEV-SNP and TDX, accessing guest private memory can b=
+e
+fatal to the host, i.e. KVM must be prevent host userspace from accessing g=
+uest
+memory irrespective of hardware behavior.
+
+Long term, guest_memfd provides KVM line-of-sight to use cases beyond CoCo =
+VMs,
+e.g. KVM currently doesn't support mapping memory as writable in the guest
+without it also being writable in host userspace, as KVM's ABI uses userspa=
+ce
+VMA protections to define the allow guest protection (with an exception gra=
+nted
+to mapping guest memory executable).
+
+Similarly, KVM currently requires the guest mapping size to be a strict sub=
+set
+of the host userspace mapping size, e.g. KVM doesn=E2=80=99t support creati=
+ng a 1GiB
+guest mapping unless userspace also has a 1GiB guest mapping.  Decoupling t=
+he
+mappings sizes would allow userspace to precisely map only what is needed
+without impacting guest performance, e.g. to again harden against unintenti=
+onal
+accesses to guest memory.
+
+A guest-first memory subsystem also provides clearer line of sight to thing=
+s
+like a dedicated memory pool (for slice-of-hardware VMs) and elimination of
+"struct page" (for offload setups where userspace _never_ needs to mmap() g=
+uest
+memory).
+
+guest_memfd is the result of 3+ years of development and exploration; takin=
+g on
+memory management responsibilities in KVM was not the first, second, or eve=
+n
+third choice for supporting CoCo VMs.  But after many failed attempts to av=
+oid
+KVM-specific backing memory, and looking at where things ended up, it is qu=
+ite
+clear that of all approaches tried, guest_memfd is the simplest, most robus=
+t,
+and most extensible, and the right thing to do for KVM and the kernel at-la=
+rge.
+---
+
+Ackerley Tng (1):
+  KVM: selftests: Test KVM exit behavior for private memory/access
+
+Chao Peng (8):
+  KVM: Use gfn instead of hva for mmu_notifier_retry
+  KVM: Add KVM_EXIT_MEMORY_FAULT exit to report faults to userspace
+  KVM: Introduce per-page memory attributes
+  KVM: x86: Disallow hugepages when memory attributes are mixed
+  KVM: x86/mmu: Handle page fault for private memory
+  KVM: selftests: Add KVM_SET_USER_MEMORY_REGION2 helper
+  KVM: selftests: Expand set_memory_region_test to validate
+    guest_memfd()
+  KVM: selftests: Add basic selftest for guest_memfd()
+
+Sean Christopherson (23):
+  KVM: Tweak kvm_hva_range and hva_handler_t to allow reusing for gfn
+    ranges
+  KVM: Assert that mmu_invalidate_in_progress *never* goes negative
+  KVM: WARN if there are dangling MMU invalidations at VM destruction
+  KVM: PPC: Drop dead code related to KVM_ARCH_WANT_MMU_NOTIFIER
+  KVM: PPC: Return '1' unconditionally for KVM_CAP_SYNC_MMU
+  KVM: Convert KVM_ARCH_WANT_MMU_NOTIFIER to
+    CONFIG_KVM_GENERIC_MMU_NOTIFIER
+  KVM: Introduce KVM_SET_USER_MEMORY_REGION2
+  KVM: Add a dedicated mmu_notifier flag for reclaiming freed memory
+  KVM: Drop .on_unlock() mmu_notifier hook
+  KVM: Prepare for handling only shared mappings in mmu_notifier events
+  mm: Add AS_UNMOVABLE to mark mapping as completely unmovable
+  fs: Export anon_inode_getfile_secure() for use by KVM
+  KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific backing
+    memory
+  KVM: Add transparent hugepage support for dedicated guest memory
+  KVM: x86: "Reset" vcpu->run->exit_reason early in KVM_RUN
+  KVM: Drop superfluous __KVM_VCPU_MULTIPLE_ADDRESS_SPACE macro
+  KVM: Allow arch code to track number of memslot address spaces per VM
+  KVM: x86: Add support for "protected VMs" that can utilize private
+    memory
+  KVM: selftests: Drop unused kvm_userspace_memory_region_find() helper
+  KVM: selftests: Convert lib's mem regions to
+    KVM_SET_USER_MEMORY_REGION2
+  KVM: selftests: Add support for creating private memslots
+  KVM: selftests: Introduce VM "shape" to allow tests to specify the VM
+    type
+  KVM: selftests: Add GUEST_SYNC[1-6] macros for synchronizing more data
+
+Vishal Annapurve (3):
+  KVM: selftests: Add helpers to convert guest memory b/w private and
+    shared
+  KVM: selftests: Add helpers to do KVM_HC_MAP_GPA_RANGE hypercalls
+    (x86)
+  KVM: selftests: Add x86-only selftest for private memory conversions
+
+ Documentation/virt/kvm/api.rst                | 208 ++++++
+ arch/arm64/include/asm/kvm_host.h             |   2 -
+ arch/arm64/kvm/Kconfig                        |   2 +-
+ arch/mips/include/asm/kvm_host.h              |   2 -
+ arch/mips/kvm/Kconfig                         |   2 +-
+ arch/powerpc/include/asm/kvm_host.h           |   2 -
+ arch/powerpc/kvm/Kconfig                      |   8 +-
+ arch/powerpc/kvm/book3s_hv.c                  |   2 +-
+ arch/powerpc/kvm/powerpc.c                    |   7 +-
+ arch/riscv/include/asm/kvm_host.h             |   2 -
+ arch/riscv/kvm/Kconfig                        |   2 +-
+ arch/x86/include/asm/kvm_host.h               |  17 +-
+ arch/x86/include/uapi/asm/kvm.h               |   3 +
+ arch/x86/kvm/Kconfig                          |  14 +-
+ arch/x86/kvm/debugfs.c                        |   2 +-
+ arch/x86/kvm/mmu/mmu.c                        | 271 +++++++-
+ arch/x86/kvm/mmu/mmu_internal.h               |   2 +
+ arch/x86/kvm/vmx/vmx.c                        |  11 +-
+ arch/x86/kvm/x86.c                            |  26 +-
+ fs/anon_inodes.c                              |   1 +
+ include/linux/kvm_host.h                      | 143 ++++-
+ include/linux/kvm_types.h                     |   1 +
+ include/linux/pagemap.h                       |  19 +-
+ include/uapi/linux/kvm.h                      |  51 ++
+ mm/compaction.c                               |  43 +-
+ mm/migrate.c                                  |   2 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ tools/testing/selftests/kvm/dirty_log_test.c  |   2 +-
+ .../testing/selftests/kvm/guest_memfd_test.c  | 221 +++++++
+ .../selftests/kvm/include/kvm_util_base.h     | 148 ++++-
+ .../testing/selftests/kvm/include/test_util.h |   5 +
+ .../selftests/kvm/include/ucall_common.h      |  11 +
+ .../selftests/kvm/include/x86_64/processor.h  |  15 +
+ .../selftests/kvm/kvm_page_table_test.c       |   2 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 233 ++++---
+ tools/testing/selftests/kvm/lib/memstress.c   |   3 +-
+ .../selftests/kvm/set_memory_region_test.c    | 100 +++
+ .../kvm/x86_64/private_mem_conversions_test.c | 487 ++++++++++++++
+ .../kvm/x86_64/private_mem_kvm_exits_test.c   | 120 ++++
+ .../kvm/x86_64/ucna_injection_test.c          |   2 +-
+ virt/kvm/Kconfig                              |  17 +
+ virt/kvm/Makefile.kvm                         |   1 +
+ virt/kvm/dirty_ring.c                         |   2 +-
+ virt/kvm/guest_memfd.c                        | 607 ++++++++++++++++++
+ virt/kvm/kvm_main.c                           | 505 ++++++++++++---
+ virt/kvm/kvm_mm.h                             |  26 +
+ 46 files changed, 3083 insertions(+), 272 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/guest_memfd_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/private_mem_conversi=
+ons_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/private_mem_kvm_exit=
+s_test.c
+ create mode 100644 virt/kvm/guest_memfd.c
 
 
->   
->> +#define VMX_BASIC_INOUT				BIT_ULL(54)
->> +
->> +/* VMX_MISC bits and bitmasks */
-> 
-> Your next patch is to "Cleanup VMX misc information defines and usages", so I
-> guess it's better to move any VMX_MISC related change to that patch.
-
-ah, you're right.
-
-> 
->>   #define VMX_MISC_PREEMPTION_TIMER_RATE_MASK	0x0000001f
->>   #define VMX_MISC_SAVE_EFER_LMA			0x00000020
->>   #define VMX_MISC_ACTIVITY_HLT			0x00000040
->> @@ -143,6 +149,16 @@ static inline u32 vmx_basic_vmcs_size(u64 vmx_basic)
->>   	return (vmx_basic & GENMASK_ULL(44, 32)) >> 32;
->>   }
->>   
->> +static inline u32 vmx_basic_vmcs_basic_cap(u64 vmx_basic)
->> +{
->> +	return (vmx_basic & GENMASK_ULL(63, 45)) >> 32;
->> +}
->> +
->> +static inline u32 vmx_basic_vmcs_mem_type(u64 vmx_basic)
->> +{
->> +	return (vmx_basic & GENMASK_ULL(53, 50)) >> 50;
->> +}
->> +
->>   static inline int vmx_misc_preemption_timer_rate(u64 vmx_misc)
->>   {
->>   	return vmx_misc & VMX_MISC_PREEMPTION_TIMER_RATE_MASK;
->> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> index 4ba46e1b29d2..274d480d9071 100644
->> --- a/arch/x86/kvm/vmx/nested.c
->> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -1201,23 +1201,34 @@ static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
->>   	return (superset | subset) == superset;
->>   }
->>   
->> +#define VMX_BASIC_VMCS_SIZE_SHIFT		32
->> +#define VMX_BASIC_DUAL_MONITOR_TREATMENT	BIT_ULL(49)
->> +#define VMX_BASIC_MEM_TYPE_SHIFT		50
->> +#define VMX_BASIC_TRUE_CTLS			BIT_ULL(55)
-> 
-> If I am reading correctly, the two "*_SHIFT" above are not used?  The above
-> vmx_basic_vmcs_mem_type() and vmx_basic_vmcs_basic_cap() use hard-coded values
-> directly.
-
-The 2 shift macros are needed in arch/x86/kvm/vmx/nested.c.
-
-> 
-> And How about moving all these bit/mask definitions to <asm/vmx.h> above?
-> 
-> It's better they stay together for better readability.
-
-Sean kind of prefers to keep the macros close to code that uses it,
-unless they are used somewhere else.
-
-> 
->> +
->> +#define VMX_BASIC_FEATURES_MASK			\
->> +	(VMX_BASIC_DUAL_MONITOR_TREATMENT |	\
->> +	 VMX_BASIC_INOUT |			\
->> +	 VMX_BASIC_TRUE_CTLS)
->> +
->> +#define VMX_BASIC_RESERVED_BITS			\
->> +	(GENMASK_ULL(63, 56) | GENMASK_ULL(47, 45) | BIT_ULL(31))
->> +
-> 
-> Also move these to <asm/vmx.h>?
-> 
->>   static int vmx_restore_vmx_basic(struct vcpu_vmx *vmx, u64 data)
->>   {
->> -	const u64 feature_and_reserved =
->> -		/* feature (except bit 48; see below) */
->> -		BIT_ULL(49) | BIT_ULL(54) | BIT_ULL(55) |
->> -		/* reserved */
->> -		BIT_ULL(31) | GENMASK_ULL(47, 45) | GENMASK_ULL(63, 56);
->>   	u64 vmx_basic = vmcs_config.nested.basic;
->>   
->> -	if (!is_bitwise_subset(vmx_basic, data, feature_and_reserved))
->> +	static_assert(!(VMX_BASIC_FEATURES_MASK & VMX_BASIC_RESERVED_BITS));
->> +
->> +	if (!is_bitwise_subset(vmx_basic, data,
->> +			       VMX_BASIC_FEATURES_MASK | VMX_BASIC_RESERVED_BITS))
->>   		return -EINVAL;
->>   
->>   	/*
->>   	 * KVM does not emulate a version of VMX that constrains physical
->>   	 * addresses of VMX structures (e.g. VMCS) to 32-bits.
->>   	 */
->> -	if (data & BIT_ULL(48))
->> +	if (data & VMX_BASIC_32BIT_PHYS_ADDR_ONLY)
->>   		return -EINVAL;
->>   
->>   	if (vmx_basic_vmcs_revision_id(vmx_basic) !=
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index 4c3a70f26b42..b68d54f6e9f8 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -2568,14 +2568,13 @@ static u64 adjust_vmx_controls64(u64 ctl_opt, u32 msr)
->>   static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->>   			     struct vmx_capability *vmx_cap)
->>   {
->> -	u32 vmx_msr_low, vmx_msr_high;
->>   	u32 _pin_based_exec_control = 0;
->>   	u32 _cpu_based_exec_control = 0;
->>   	u32 _cpu_based_2nd_exec_control = 0;
->>   	u64 _cpu_based_3rd_exec_control = 0;
->>   	u32 _vmexit_control = 0;
->>   	u32 _vmentry_control = 0;
->> -	u64 misc_msr;
->> +	u64 vmx_basic;
->>   	int i;
->>   
->>   	/*
->> @@ -2693,28 +2692,26 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->>   		_vmexit_control &= ~x_ctrl;
->>   	}
->>   
->> -	rdmsr(MSR_IA32_VMX_BASIC, vmx_msr_low, vmx_msr_high);
->> +	rdmsrl(MSR_IA32_VMX_BASIC, vmx_basic);
->>   
->>   	/* IA-32 SDM Vol 3B: VMCS size is never greater than 4kB. */
->> -	if ((vmx_msr_high & 0x1fff) > PAGE_SIZE)
->> +	if ((vmx_basic_vmcs_size(vmx_basic) > PAGE_SIZE))
->>   		return -EIO;
->>   
->>   #ifdef CONFIG_X86_64
->>   	/* IA-32 SDM Vol 3B: 64-bit CPUs always have VMX_BASIC_MSR[48]==0. */
->> -	if (vmx_msr_high & (1u<<16))
->> +	if (vmx_basic & VMX_BASIC_32BIT_PHYS_ADDR_ONLY)
->>   		return -EIO;
->>   #endif
->>   
->>   	/* Require Write-Back (WB) memory type for VMCS accesses. */
->> -	if (((vmx_msr_high >> 18) & 15) != 6)
->> +	if (vmx_basic_vmcs_mem_type(vmx_basic) != VMX_BASIC_MEM_TYPE_WB)
->>   		return -EIO;
->>   
->> -	rdmsrl(MSR_IA32_VMX_MISC, misc_msr);
->> -
->> -	vmcs_conf->size = vmx_msr_high & 0x1fff;
->> -	vmcs_conf->basic_cap = vmx_msr_high & ~0x1fff;
->> +	vmcs_conf->size = vmx_basic_vmcs_size(vmx_basic);
->> +	vmcs_conf->basic_cap = vmx_basic_vmcs_basic_cap(vmx_basic);
->>   
->> -	vmcs_conf->revision_id = vmx_msr_low;
->> +	vmcs_conf->revision_id = vmx_basic_vmcs_revision_id(vmx_basic);
-> 
-> I actually tried to do similar thing before, and Sean gave me below advice:
-> 
-> 	Rather than do all of these weird dances, what about saving the
-> full/raw
-> 	MSR in the config, and then using the helpers to extract info as
-> needed?
-> 
-> https://lkml.kernel.org/kvm/20230330092149.101047-1-kai.huang@intel.com/T/#m4879a3c7e66ede7bfa568a25aea4f6e3778e6e34
-> 
-> I agreed, but I has been too lazy to do this, sorry :-)
-> 
-> So maybe we should still go with this approach?
-
-Yes, this looks more consistent.
-
-> 
->>   
->>   	vmcs_conf->pin_based_exec_ctrl = _pin_based_exec_control;
->>   	vmcs_conf->cpu_based_exec_ctrl = _cpu_based_exec_control;
->> @@ -2722,7 +2719,8 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->>   	vmcs_conf->cpu_based_3rd_exec_ctrl = _cpu_based_3rd_exec_control;
->>   	vmcs_conf->vmexit_ctrl         = _vmexit_control;
->>   	vmcs_conf->vmentry_ctrl        = _vmentry_control;
->> -	vmcs_conf->misc	= misc_msr;
->> +
->> +	rdmsrl(MSR_IA32_VMX_MISC, vmcs_conf->misc);
-> 
-> Better to move VMX_MISC code to next patch I suppose.
-
-I view it a bit different, but maybe your suggestion is better.
-
-> 
-
-Thanks!
-     Xin
+base-commit: 2b3f2325e71f09098723727d665e2e8003d455dc
+--=20
+2.42.0.820.g83a721a137-goog
 
