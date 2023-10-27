@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 646397D8FE1
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 09:32:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B3637D9025
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 09:44:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345363AbjJ0HcD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 03:32:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59718 "EHLO
+        id S1345527AbjJ0Hoy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 03:44:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229590AbjJ0HcB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 03:32:01 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C4ECB0
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 00:31:59 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-4083f61322fso13676135e9.1
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 00:31:59 -0700 (PDT)
+        with ESMTP id S1345523AbjJ0Hou (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 03:44:50 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BBCE1BB
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 00:44:48 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-4083740f92dso14074435e9.3
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 00:44:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698391917; x=1698996717; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1698392687; x=1698997487; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3WQCodtLeMa/vLM2901WzSloIhFtxV+9ehL3oSRrzfA=;
-        b=TV9HGxhhpgnM233p7rVUx9qFl4LXgGmBDN0CFQNJvZRvMie6bctKlVkkg2IDeTRbVw
-         sscR4PcpdbqSZFRMSoeiYXzXzoePzgPx4no0MwR8pMnZ1cFnVlj9xMS06aDU0hqLhnPc
-         QVJDnZe2yykHBxAz1EfrokW9XqHrFls9v5O+4xJPsftM6JQ44CP0WL5gJ4KQVmDaIwwi
-         dCmfrME8g6D2AnB1HrStXosW6uOa4FEcidzZ3RCFYqaJNdwc4m0c0L/WW+CBWvx10m20
-         8upiOLLqGXWaOAyw9VC2Wh2V7DpYYEHSv/kHi5qT58nkntI+WtJ/22d5zElnMf2cUcET
-         QGtQ==
+        bh=weNLTHsNEHd1AKAqcG0eLkMfm7+O04Gb2EjgMXPk2o8=;
+        b=PiGV3IHKJr5CtGpD0m6YupndCW9ShruZSuDIeUqCKaRkWIoNtzkpcxPdGJwJ8ELLoi
+         p6Vc2ufphzmzAyE+Oy1D8FZLbCdV9zS0VQCzQTnh2AYBqObPMXNfm4+ppVrNRrJ1MAXe
+         kmO4yNWjsky4dH/RQ+cH2v9YJlL3atOkrSyI6LMstOF6Ay9HGZevyR32Iz53VUb5Gc0R
+         i7B6ZVu1mVsqWCfFxk3sbiMwgvQtQmk8++bEVKbNDTF/vQRLC2juNzUr1ZdAGIEgBUrS
+         vs0yS7+n+/FdZu+07Fwvxxqa5mSYYNh/LgSj6fHNNYVG/nPLxfHruia4NFE7qTityd4Q
+         4qdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698391917; x=1698996717;
+        d=1e100.net; s=20230601; t=1698392687; x=1698997487;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=3WQCodtLeMa/vLM2901WzSloIhFtxV+9ehL3oSRrzfA=;
-        b=k/lFTktGxUocpO8v2JUBz1iZf9n/Cut6dZ75NQo4hkqkFSQaWBUr8FcDkGcQw11Uha
-         A/WeReRhkvm6RXmTiqfKfeJQ0eIpBYV2KLY+yWk8cOKTijw4xWHj4VWHifUldMkRLVeV
-         EfY29396A02Qw89I90BLc+FQV84ss6CmZC0/royju/lgRceCdLD4AltcKn5QeaBb9/4g
-         IhGrmMIJJ4Yf38HECTb8EHprI2QW7LAnbzmyvjTiz/0dIV5PgUCSlJJFZR87k6piCvuX
-         RD8x/HrEOy9F4TfrPAzvUTPhVb6hTiLHPGmJDWiSLlInDj+nbINeQ4yxUaaByMcz19gv
-         cVeA==
-X-Gm-Message-State: AOJu0YylpVw/CeOYxxUv2W28W58iw4QgXmCW4JPEsC3aUQ2cOMRS+Bda
-        SRBtTHqwSUCsSTLB87z2Cr8=
-X-Google-Smtp-Source: AGHT+IEMg/Tnlu8eq0BMbhOEZDo19OPcdSvp2reFdXjF66hF1stq7Cv3VhULPpUY2sBAaCOfyGVFVg==
-X-Received: by 2002:a05:600c:2206:b0:409:295:9c6e with SMTP id z6-20020a05600c220600b0040902959c6emr1557480wml.30.1698391917503;
-        Fri, 27 Oct 2023 00:31:57 -0700 (PDT)
-Received: from [192.168.10.177] (54-240-197-227.amazon.com. [54.240.197.227])
-        by smtp.gmail.com with ESMTPSA id iv8-20020a05600c548800b003fefaf299b6sm929618wmb.38.2023.10.27.00.31.56
+        bh=weNLTHsNEHd1AKAqcG0eLkMfm7+O04Gb2EjgMXPk2o8=;
+        b=gUAvFx1j5zSQ4HEnLIR4QXP7bkBLcTvCl6EZ5u5vH+kDIp5fh/+yCXbwW6i9/sn34l
+         jaMUbwnbwrqjj4gNMgd70KtG221M5APxghOpIyy/H9KPOhVqjoTb6I3LcoHgBaMGJqJ6
+         K1qZ0Hitxo3Z4HzRYEcTUJVknqaYJRvgTmVwYdL0nkL6MNMllxFleUFahT5Oncu4qeOP
+         8jK9ABsiQBNntxbfQa4fHJ4OP3LXWnbTzftkSqncPVKUFZmF/EFA7wc5PW4XLmAWcSfM
+         6Ci0zaWXrSP3LCPK7Vdwpr1xeB1aT7nXvAwabI46r0MW1KLyFJGf+DufAzOrQwnYdMM2
+         j+7g==
+X-Gm-Message-State: AOJu0Ywr6xBA5l+s62Rc1V6mELG4z6hZJIfmi26iR9RoOztGD/iF9kr9
+        5YnBT4rH60VEQVuKMtAp+kgg5hHWD8nHNg==
+X-Google-Smtp-Source: AGHT+IGfHlZcElg4jlYC+dM2f33yrgLaTa3lKMccWGDiPJqAf0Qf0ppM0UHBxCctTNhgycC9pq53SA==
+X-Received: by 2002:a05:600c:45d3:b0:405:3dd0:6ee9 with SMTP id s19-20020a05600c45d300b004053dd06ee9mr1653222wmo.34.1698392686518;
+        Fri, 27 Oct 2023 00:44:46 -0700 (PDT)
+Received: from [192.168.10.177] (54-240-197-235.amazon.com. [54.240.197.235])
+        by smtp.gmail.com with ESMTPSA id g12-20020a05600c310c00b004068e09a70bsm940661wmo.31.2023.10.27.00.44.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Oct 2023 00:31:57 -0700 (PDT)
-Message-ID: <72d847b6-1031-48fd-8155-1cd441f37f8e@gmail.com>
-Date:   Fri, 27 Oct 2023 08:31:56 +0100
+        Fri, 27 Oct 2023 00:44:45 -0700 (PDT)
+Message-ID: <d58639b8-09de-4820-88ae-53de0db55f7f@gmail.com>
+Date:   Fri, 27 Oct 2023 08:44:44 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: paul@xen.org
-Subject: Re: [PATCH v3 14/28] hw/xen: add get_frontend_path() method to
- XenDeviceClass
+Subject: Re: [PATCH v3 17/28] hw/xen: add support for Xen primary console in
+ emulated mode
 Content-Language: en-US
 To:     David Woodhouse <dwmw2@infradead.org>, qemu-devel@nongnu.org
 Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
@@ -75,15 +75,15 @@ Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
         Bernhard Beschow <shentey@gmail.com>,
         Joel Upham <jupham125@gmail.com>
 References: <20231025145042.627381-1-dwmw2@infradead.org>
- <20231025145042.627381-15-dwmw2@infradead.org>
+ <20231025145042.627381-18-dwmw2@infradead.org>
 From:   "Durrant, Paul" <xadimgnik@gmail.com>
-In-Reply-To: <20231025145042.627381-15-dwmw2@infradead.org>
+In-Reply-To: <20231025145042.627381-18-dwmw2@infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -93,22 +93,45 @@ X-Mailing-List: kvm@vger.kernel.org
 On 25/10/2023 15:50, David Woodhouse wrote:
 > From: David Woodhouse <dwmw@amazon.co.uk>
 > 
-> The primary Xen console is special. The guest's side is set up for it by
-> the toolstack automatically and not by the standard PV init sequence.
+> The primary console is special because the toolstack maps a page into
+> the guest for its ring, and also allocates the guest-side event channel.
+> The guest's grant table is even primed to export that page using a known
+> grant ref#. Add support for all that in emulated mode, so that we can
+> have a primary console.
 > 
-> Accordingly, its *frontend* doesn't appear in …/device/console/0 either;
-> instead it appears under …/console in the guest's XenStore node.
+> For reasons unclear, the backends running under real Xen don't just use
+> a mapping of the well-known GNTTAB_RESERVED_CONSOLE grant ref (which
+> would also be in the ring-ref node in XenStore). Instead, the toolstack
+> sets the ring-ref node of the primary console to the GFN of the guest
+> page. The backend is expected to handle that special case and map it
+> with foreignmem operations instead.
 > 
-> To allow the Xen console driver to override the frontend path for the
-> primary console, add a method to the XenDeviceClass which can be used
-> instead of the standard xen_device_get_frontend_path()
+> We don't have an implementation of foreignmem ops for emulated Xen mode,
+> so just make it map GNTTAB_RESERVED_CONSOLE instead. This would probably
+> work for real Xen too, but we can't work out how to make real Xen create
+> a primary console of type "ioemu" to make QEMU drive it, so we can't
+> test that; might as well leave it as it is for now under Xen.
+> 
+> Now at last we can boot the Xen PV shim and run PV kernels in QEMU.
 > 
 > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 > ---
->   hw/xen/xen-bus.c         | 11 ++++++++++-
->   include/hw/xen/xen-bus.h |  2 ++
->   2 files changed, 12 insertions(+), 1 deletion(-)
+>   hw/char/xen_console.c             |  78 ++++++++----
+>   hw/i386/kvm/meson.build           |   1 +
+>   hw/i386/kvm/trace-events          |   2 +
+>   hw/i386/kvm/xen-stubs.c           |   8 ++
+>   hw/i386/kvm/xen_gnttab.c          |   7 +-
+>   hw/i386/kvm/xen_primary_console.c | 193 ++++++++++++++++++++++++++++++
+>   hw/i386/kvm/xen_primary_console.h |  23 ++++
+>   hw/i386/kvm/xen_xenstore.c        |  10 ++
+>   hw/xen/xen-bus.c                  |   5 +
+>   include/hw/xen/xen-bus.h          |   1 +
+>   target/i386/kvm/xen-emu.c         |  23 +++-
+>   11 files changed, 328 insertions(+), 23 deletions(-)
+>   create mode 100644 hw/i386/kvm/xen_primary_console.c
+>   create mode 100644 hw/i386/kvm/xen_primary_console.h
 > 
 
 Reviewed-by: Paul Durrant <paul@xen.org>
+
 
