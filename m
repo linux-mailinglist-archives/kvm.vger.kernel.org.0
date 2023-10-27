@@ -2,216 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 44DC67D9286
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 10:46:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 777067D929B
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 10:49:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231356AbjJ0IqP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 04:46:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60090 "EHLO
+        id S1345518AbjJ0ItT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 04:49:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234963AbjJ0IqO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 04:46:14 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B341FC4
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 01:46:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=CCdva9oSf6tY28xy4tw/eAe0/f89vRQdMgzrW7dc0zY=; b=au624mjryRC71K4dqNzr6vEYpR
-        i1VIwJKppRlM9F6K/FwEsGV2eGhonrk7KcXxOEXceXYYeVOasMOo89HuHMbsG81hXpUquEzvVCZYM
-        B7xckI19v8r+eJddZWoPRM61S01rq2RwVA3kdZjNoZTLWVkvhWTrhsasaC2MC3meB+3j4SJos4nOv
-        gTLaMd6486/DkrO5ktJJxuZKrFxgsTSG3eApBGyS5lCwpUZzUG8qstCAQ6LycGWxUOrwX+bflEF9E
-        q2mb006FGrAKrTudsj5LgBnsoan5a/6IwYEbm6+k7a3i6MQYzXX0qKVHT4SvOsgskQqNjGjG0D+IO
-        Of2zQx5w==;
-Received: from [2001:8b0:10b:5:a059:f7a9:933a:2236] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qwITM-002Slx-6X; Fri, 27 Oct 2023 08:45:42 +0000
-Message-ID: <f72e2e7feed3ecf17af8ab8442c359eea329ef17.camel@infradead.org>
-Subject: Re: [PATCH v3 13/28] hw/xen: automatically assign device index to
- block devices
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     paul@xen.org, qemu-devel@nongnu.org
-Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau 
-        <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Jason Wang <jasowang@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, qemu-block@nongnu.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-        Bernhard Beschow <shentey@gmail.com>,
-        Joel Upham <jupham125@gmail.com>
-Date:   Fri, 27 Oct 2023 09:45:39 +0100
-In-Reply-To: <74e54da5-9c35-485d-a13c-efac3f81dec2@gmail.com>
-References: <20231025145042.627381-1-dwmw2@infradead.org>
-         <20231025145042.627381-14-dwmw2@infradead.org>
-         <74e54da5-9c35-485d-a13c-efac3f81dec2@gmail.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-OZZWwwyLPIuvpVYNOyoh"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+        with ESMTP id S1345706AbjJ0Is4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 04:48:56 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BD7710E4
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 01:48:52 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-53f647c84d4so10791a12.0
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 01:48:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698396531; x=1699001331; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eopWR7hzxdYBX0Qk2wgiI2DI9yTPwgIf0SgwKfaDrAM=;
+        b=Ir0gjaC9LkbX2aKMdNsmbS+ZmhKqXO0fF/TcYpIVbMLwWbEuHznZzvSw/jb6yppn9r
+         3QWLUJRBYQdygmY4XtEviFlNOlRinqYCIckDNDNNPzETYBuyzQejTkPv/4N4M5D0EOIX
+         D5iv+XWysfWSRpJDzuyGoLhlnNci6bkveuw1pPgz+HOXgGRysoY0+ClajfHoDIE9Jsm7
+         XXdmlynOpds8dp522TD5k56YnWgyKzT4sU5gzq5E3MZhMwLT6SREN7Uv5wSkW/dsaEGO
+         WMN/02UWQIkZgX39qx7amPMJNmNeWQU951x2Cw1dnz+4UH6BrXYItOJqm8gEzEZdd12u
+         tXjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698396531; x=1699001331;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eopWR7hzxdYBX0Qk2wgiI2DI9yTPwgIf0SgwKfaDrAM=;
+        b=NYPXUTAd553BqTzo/HJDMEKMgR4Eg8NnO9OnW8jXWF9iJn3yxuNgAfpjG0Odv297yC
+         a+KIR2YWBjVjWyz7BtzUklhDB0VjbttWMASYrwtSM1ArbbHO0v020EsDX8SQbIOJYSV0
+         C3wCwXYVuxEcjpmsZ1MdaMnSV7DtWuEOgXaSv8f48/2NIYupfbAWM5e7/KQI8XXedKxx
+         lqyAYUPYA9nWPMpjmwnMI2erAv/QyWEJ2zswRk+hBCVK2+bGB+JSD/i8QuP5qktUyUgX
+         aIPZhd8/TZu30MGc7q9+RsifpUPe1CAtcHVKGhli1pzeJKvEavfT89HsSH6a1g+2dXI1
+         crHA==
+X-Gm-Message-State: AOJu0YyG86P+Ifp/M/sD60R2mKzdymS0cx/vCp1UJomjRR3BSl1ExUYZ
+        NAbTmf1PbRx0XYNQ0k6qmf/6vJMylcR/77kFx86P2A==
+X-Google-Smtp-Source: AGHT+IGLx1NE8+JdKjMMatUrOtTEatvfuzVyH5V7hCl3qV2cZj9w1pQgQMnWDlTxCd/HCS83jpdw9+UZPBp1eJAkA3A=
+X-Received: by 2002:a50:cc88:0:b0:540:e63d:3cfb with SMTP id
+ q8-20020a50cc88000000b00540e63d3cfbmr54276edi.3.1698396530554; Fri, 27 Oct
+ 2023 01:48:50 -0700 (PDT)
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <00000000000008b2940608ae3ce9@google.com> <ooihytsfbk3brbwi2oj27ju3ff43ns36qhksfixrxdau2nieor@ervvukakvk4n>
+In-Reply-To: <ooihytsfbk3brbwi2oj27ju3ff43ns36qhksfixrxdau2nieor@ervvukakvk4n>
+From:   Eric Dumazet <edumazet@google.com>
+Date:   Fri, 27 Oct 2023 10:48:39 +0200
+Message-ID: <CANn89i+kKiSL6KJ6cEW_J5BmV3vSswbNPMNVm8ysKjDynF9d5w@mail.gmail.com>
+Subject: Re: [syzbot] [net?] KMSAN: uninit-value in virtio_transport_recv_pkt
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     syzbot <syzbot+0c8ce1da0ac31abbadcd@syzkaller.appspotmail.com>,
+        davem@davemloft.net, kuba@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        pabeni@redhat.com, stefanha@redhat.com,
+        syzkaller-bugs@googlegroups.com,
+        virtualization@lists.linux-foundation.org, syoshida@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Oct 27, 2023 at 10:25=E2=80=AFAM Stefano Garzarella <sgarzare@redha=
+t.com> wrote:
+>
+> On Fri, Oct 27, 2023 at 01:11:24AM -0700, syzbot wrote:
+> >Hello,
+> >
+> >syzbot found the following issue on:
+> >
+> >HEAD commit:    d90b0276af8f Merge tag 'hardening-v6.6-rc3' of git://git=
+.k..
+> >git tree:       upstream
+> >console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D102c8b226800=
+00
+> >kernel config:  https://syzkaller.appspot.com/x/.config?x=3D6f1a4029b692=
+73f3
+> >dashboard link: https://syzkaller.appspot.com/bug?extid=3D0c8ce1da0ac31a=
+bbadcd
+> >compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for De=
+bian) 2.40
+> >syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D101e58ec68=
+0000
+> >C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D17f7adb66800=
+00
+> >
+> >Downloadable assets:
+> >disk image: https://storage.googleapis.com/syzbot-assets/83ae10beee39/di=
+sk-d90b0276.raw.xz
+> >vmlinux: https://storage.googleapis.com/syzbot-assets/c231992300f6/vmlin=
+ux-d90b0276.xz
+> >kernel image: https://storage.googleapis.com/syzbot-assets/6377c9c2ea97/=
+bzImage-d90b0276.xz
+> >
+> >IMPORTANT: if you fix the issue, please add the following tag to the com=
+mit:
+> >Reported-by: syzbot+0c8ce1da0ac31abbadcd@syzkaller.appspotmail.com
+> >
+> >=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+> >BUG: KMSAN: uninit-value in virtio_transport_recv_pkt+0x1c42/0x2580 net/=
+vmw_vsock/virtio_transport_common.c:1421
+> > virtio_transport_recv_pkt+0x1c42/0x2580 net/vmw_vsock/virtio_transport_=
+common.c:1421
+> > vsock_loopback_work+0x3e2/0x5d0 net/vmw_vsock/vsock_loopback.c:120
+> > process_one_work kernel/workqueue.c:2630 [inline]
+> > process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2703
+> > worker_thread+0xf45/0x1490 kernel/workqueue.c:2784
+> > kthread+0x3e8/0x540 kernel/kthread.c:388
+> > ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+> > ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+> >
+> >Uninit was stored to memory at:
+> > virtio_transport_space_update net/vmw_vsock/virtio_transport_common.c:1=
+274 [inline]
+> > virtio_transport_recv_pkt+0x1ea4/0x2580 net/vmw_vsock/virtio_transport_=
+common.c:1415
+> > vsock_loopback_work+0x3e2/0x5d0 net/vmw_vsock/vsock_loopback.c:120
+> > process_one_work kernel/workqueue.c:2630 [inline]
+> > process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2703
+> > worker_thread+0xf45/0x1490 kernel/workqueue.c:2784
+> > kthread+0x3e8/0x540 kernel/kthread.c:388
+> > ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+> > ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+> >
+> >Uninit was created at:
+> > slab_post_alloc_hook+0x12f/0xb70 mm/slab.h:767
+> > slab_alloc_node mm/slub.c:3478 [inline]
+> > kmem_cache_alloc_node+0x577/0xa80 mm/slub.c:3523
+> > kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:559
+> > __alloc_skb+0x318/0x740 net/core/skbuff.c:650
+> > alloc_skb include/linux/skbuff.h:1286 [inline]
+> > virtio_vsock_alloc_skb include/linux/virtio_vsock.h:66 [inline]
+> > virtio_transport_alloc_skb+0x8b/0x1170 net/vmw_vsock/virtio_transport_c=
+ommon.c:58
+> > virtio_transport_reset_no_sock net/vmw_vsock/virtio_transport_common.c:=
+957 [inline]
+> > virtio_transport_recv_pkt+0x1531/0x2580 net/vmw_vsock/virtio_transport_=
+common.c:1387
+> > vsock_loopback_work+0x3e2/0x5d0 net/vmw_vsock/vsock_loopback.c:120
+> > process_one_work kernel/workqueue.c:2630 [inline]
+> > process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2703
+> > worker_thread+0xf45/0x1490 kernel/workqueue.c:2784
+> > kthread+0x3e8/0x540 kernel/kthread.c:388
+> > ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+> > ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+> >
+> >CPU: 0 PID: 8 Comm: kworker/0:0 Not tainted 6.6.0-rc2-syzkaller-00337-gd=
+90b0276af8f #0
+> >Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS =
+Google 08/04/2023
+> >Workqueue: vsock-loopback vsock_loopback_work
+> >=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+> >
+>
+> Shigeru Yoshida already posted a patch here:
+>
+> https://lore.kernel.org/netdev/20231026150154.3536433-1-syoshida@redhat.c=
+om/
 
---=-OZZWwwyLPIuvpVYNOyoh
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, 2023-10-27 at 08:30 +0100, Durrant, Paul wrote:
->=20
-> > +=C2=A0=C2=A0=C2=A0 if (blockdev->props.vdev.type =3D=3D XEN_BLOCK_VDEV=
-_TYPE_INVALID) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 XenBus *xenbus =3D XEN_BUS(=
-qdev_get_parent_bus(DEVICE(xendev)));
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 char fe_path[XENSTORE_ABS_P=
-ATH_MAX + 1];
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 char *value;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int disk =3D 0;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned long idx;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Find an unoccupied devic=
-e name */
->=20
-> Not sure this is going to work is it? What happens if 'hda' or 'sda', or=
-=20
-> 'd0' exists? I think you need to use the core of the code in=20
-> xen_block_set_vdev() to generate names and search all possible encodings=
-=20
-> for each disk.
-
-Do we care? You're allowed to have *all* of "hda", "sda" and "xvda" at
-the same time. If a user explicitly provides "sda" and then provides
-another disk without giving it a name, we're allowed to use "xvda".
-
-Hell, you can also have *separate* backing stores provided as "hda1",
-"sda1" and "xvda1". I *might* have tolerated a heckle that this
-function should check for at least the latter of those, but when I was
-first coding it up I was more inclined to argue "Don't Do That Then".
-
---=-OZZWwwyLPIuvpVYNOyoh
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMDI3MDg0NTM5WjAvBgkqhkiG9w0BCQQxIgQgoPUCA6cK
-0bLX0WnKEHxzhzwk00vnxkwtNzIZ8NCtB7owgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCSsD9IZF23NzdxVfyFIu69RUDAXLZNLOwN
-qwTfna21IBjOO7Tsg0mIyzeJrJmGkM88vP0vf32D/FZqrftLGiEWG2JFRrqFnpkC+lxf373uewy1
-FJO3wLj1dIavzpI01OqIyhz/NZ6CwwXG/6C79f7ngQN/J5YsQgbK1DRrCYyho4EwDWx+/AHAiDWd
-vai67TPkW9UsgViXS32f8SFB8hKzMpyeCptPEX5j0eXphUmQr2sRMyS6vR9nMC6gyITr1y8SuPEf
-gHu/G4LVTnmJWPKXyVsD1ZFYE0QbtTLMnkQnOQyxIKxhJPyqJOnxOLzSvLZ488sJ1IW/hhkCoAoA
-eEM4TUzBMuULeZYHwREEdGneQhO0I2L/1i4EYtNUB3/2I4DxTRK1VeuRnhBGdzB0mvktVBDV/6+Z
-Xr3XFzscElEbpdry1cUE/J8s4Fzi+Z9/o1llTNOMYvHZ4cdOrr8X3cMbixvYY2vnLzCicY8Ug6Bj
-EZXN4sfiUaigW/i1OrTB9X5DwuC1DH9XtJlklKJgYczAY8Y8Thid6+7JgiuFPcSf2XiW29KCClN1
-vvvgCGAXr9HnfybhV2tr6+UmGEsSpQuJVwif7WiOTvtAd6ohI3UOVx6yqVzfO6DdL54CunStH2FK
-01fTE73syB0qzva+HytUuSS0RerpEx/teLRkQb1xjgAAAAAAAA==
-
-
---=-OZZWwwyLPIuvpVYNOyoh--
+Sure thing, this is why I released this syzbot report from my queue.
