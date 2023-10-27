@@ -2,60 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 13F657D9404
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 11:42:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F9E17D941A
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 11:47:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345505AbjJ0Jmg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 05:42:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53508 "EHLO
+        id S235121AbjJ0Jqz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 05:46:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231388AbjJ0Jme (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 05:42:34 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D589F9C
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 02:42:31 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-507adc3381cso2712842e87.3
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 02:42:31 -0700 (PDT)
+        with ESMTP id S1345671AbjJ0Jqx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 05:46:53 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F0C19D
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 02:46:51 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-32d9effe314so1284040f8f.3
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 02:46:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698399750; x=1699004550; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1698400009; x=1699004809; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kiz2KMdg7YL05gR8LgSt7smgQdVxoWMShyrXxPJfs9s=;
-        b=RTRiqE4F/5JgK2k28dKZay2qP/QvhkH41W2Re6TrAE3C8utGO/rf/Zn8Jo1WsC0Mrs
-         iSH5RlWN06y8qxrSyGhNG1nalY+PhB4grQDL3/MDd8WLajeDtZyMd//PIoJOWwIL6v++
-         ale8r8pnve5d6AIWj85rk6HMSS0qzNke3vKFssaq/r8rOOZmxSiCMLCqUlBo/aeRftWS
-         ufEUmyaawSAeaVaXhe7or0A4+jq8z7pa3LdBWt8Zso8Ghh3Y3ZyZTbrbrp3fvJhtyfrd
-         hfU7s/mH5E205dobkJPP1dsKNdZSoe8jQsd7eMGrmAwyw7FrMjb3dQHiVxj21UvoQWC1
-         xUQQ==
+        bh=jzLwa1GntXahp5+i4Iu7OMe0oRp7S0Pb5ddkQlqpbTs=;
+        b=V1sgpg7pDhvz8H+KGDrcSzxSO2igQbcjlEX3jIAjvp01p9LN1OJOvaJ/nyR6GqUuyg
+         NZmLPKRxhV4kGQYbU+kTmdITerjO5BDl/RZbxNrSkCFlLFfu5XpWuw3yLfz7IPz8Ahfw
+         b4srtWknAzHRJfG6u0rE42hCDefKdAjDujKQfdI+S8isLBM4WCnHzFYiNGim9lonVPJa
+         wD6RHFEb34nkLbzmpflQffvPnCtppne1Ival0dzrWDbB63hsOwdeXCf+VN0FJOHYRNuG
+         9/pdMma/gNJ29GNPeApEvIJrDwexTufxANc6DzfkkDkgud+9rZEOxAvbbTgTeFsQKXMT
+         uwog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698399750; x=1699004550;
+        d=1e100.net; s=20230601; t=1698400009; x=1699004809;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Kiz2KMdg7YL05gR8LgSt7smgQdVxoWMShyrXxPJfs9s=;
-        b=w0CZuNBNnwU9wtAULLWuXhYvAHeWfQJs0+1IbRWE4bRQj0fFtyfWJDWayZj/LrDZyw
-         8MsJ90Wm/yXpEdVvZdaKLf7meMUZDHm8uok3mNQG2Kjs2McEEn2YRuBUUUZDYvAiOMOd
-         J8DgCP37i4VKsCgM2mCgSB8Pf9xqKQZKSPPKFQatEcbmClF9/YGvC+MKGK/KdVlz+0Pv
-         axe52BD5SYaqn61Tun8vtOssaukdLdHi7Z3Foqg+m5Z3EZkDi+GwAb4e4OWKjAblZ61i
-         N6KKvrh1tQd7+c6Gu7RgB+xCJE6HxcCZ8VpZCsTOgCoc6tLYHxMjdV3DJuQQLVyd7enz
-         jW8A==
-X-Gm-Message-State: AOJu0YyXHgTu+uNcizm5UjaR2rFsdu4172XGkDOZ8gYZRGkB9kT0pPQz
-        hptoY3Ut/LHg7FYSuNs3UfU=
-X-Google-Smtp-Source: AGHT+IGhjfQTzfpSI0jSZ3Vaoz7HQMUUZYv6yz0Ojq0M+dEBGy0psEQV6EoLJB1bLce08/1kjOIo9w==
-X-Received: by 2002:a05:6512:406:b0:508:1eb0:3d4a with SMTP id u6-20020a056512040600b005081eb03d4amr1422321lfk.22.1698399749812;
-        Fri, 27 Oct 2023 02:42:29 -0700 (PDT)
+        bh=jzLwa1GntXahp5+i4Iu7OMe0oRp7S0Pb5ddkQlqpbTs=;
+        b=Y9AZKuP3DYk85yLcojT1XvzzP+/jogY8EW09b7gWt/qfOCRKSM0W5ARKH/LlqwOh9Y
+         Y57MP+wqd6UZGgBb7KPxmKO5Ldj/Yb2Aokn3/nJYIXXBK6C9dumJruHGEl/4l3sPXSBm
+         qe1AOl/nQOlbET0QEeO56g+njEQN133rhbW16tIfTnNqXabHugaLvCfNc/dVjh4rUX0G
+         NEQfiMfCNLNa96IUkJD6lElIW5jxp2ugrvlJlFEMsEtlfkqX5M95jZjqm34RT9qUvHHz
+         wLuvI1lbQnX4Xc6SC+JmihQ6Gk0qstjUk1XElt20U360kLYkt0GjLg5sleTcm4fTN/Pp
+         /ACQ==
+X-Gm-Message-State: AOJu0Yx8vabdyhoL5HUpMFah0NLZVy2gOnms066amO6zg5/h10Xtb1of
+        p4QH1tplKpWovgt8HA73Tp0=
+X-Google-Smtp-Source: AGHT+IF+xd8cuMtFJ/cywAMdwJALH04PvtMGn/mtI5e9KZNkVRA1ttigVPEIA2v+rqX3cz0pRpds5w==
+X-Received: by 2002:a5d:68c1:0:b0:32d:a022:8559 with SMTP id p1-20020a5d68c1000000b0032da0228559mr1762750wrw.47.1698400009412;
+        Fri, 27 Oct 2023 02:46:49 -0700 (PDT)
 Received: from [192.168.10.177] (54-240-197-235.amazon.com. [54.240.197.235])
-        by smtp.gmail.com with ESMTPSA id du15-20020a05600c634f00b003fc16ee2864sm1170909wmb.48.2023.10.27.02.42.28
+        by smtp.gmail.com with ESMTPSA id e9-20020a5d5949000000b00326f5d0ce0asm1389222wri.21.2023.10.27.02.46.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Oct 2023 02:42:29 -0700 (PDT)
-Message-ID: <1ac8c57c-d154-4176-802c-505e4d785a5e@gmail.com>
-Date:   Fri, 27 Oct 2023 10:42:27 +0100
+        Fri, 27 Oct 2023 02:46:49 -0700 (PDT)
+Message-ID: <b6cb24e3-d736-4951-b2dd-2a90562fd768@gmail.com>
+Date:   Fri, 27 Oct 2023 10:46:47 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: paul@xen.org
-Subject: Re: [PATCH v3 24/28] net: add qemu_create_nic_bus_devices()
+Subject: Re: [PATCH v3 25/28] hw/pci: add pci_init_nic_devices(),
+ pci_init_nic_in_slot()
 Content-Language: en-US
 To:     David Woodhouse <dwmw2@infradead.org>, qemu-devel@nongnu.org
 Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
@@ -74,11 +75,11 @@ Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
         Bernhard Beschow <shentey@gmail.com>,
         Joel Upham <jupham125@gmail.com>
 References: <20231025145042.627381-1-dwmw2@infradead.org>
- <20231025145042.627381-25-dwmw2@infradead.org>
+ <20231025145042.627381-26-dwmw2@infradead.org>
 From:   "Durrant, Paul" <xadimgnik@gmail.com>
-In-Reply-To: <20231025145042.627381-25-dwmw2@infradead.org>
+In-Reply-To: <20231025145042.627381-26-dwmw2@infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -92,16 +93,18 @@ X-Mailing-List: kvm@vger.kernel.org
 On 25/10/2023 15:50, David Woodhouse wrote:
 > From: David Woodhouse <dwmw@amazon.co.uk>
 > 
-> This will instantiate any NICs which live on a given bus type. Each bus
-> is allowed *one* substitution (for PCI it's virtio → virtio-net-pci, for
-> Xen it's xen → xen-net-device; no point in overengineering it unless we
-> actually want more).
+> The loop over nd_table[] to add PCI NICs is repeated in quite a few
+> places. Add a helper function to do it.
+> 
+> Some platforms also try to instantiate a specific model in a specific
+> slot, to match the real hardware. Add pci_init_nic_in_slot() for that
+> purpose.
 > 
 > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 > ---
->   include/net/net.h |  3 +++
->   net/net.c         | 53 +++++++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 56 insertions(+)
+>   hw/pci/pci.c         | 45 ++++++++++++++++++++++++++++++++++++++++++++
+>   include/hw/pci/pci.h |  4 +++-
+>   2 files changed, 48 insertions(+), 1 deletion(-)
 > 
 
 Reviewed-by: Paul Durrant <paul@xen.org>
