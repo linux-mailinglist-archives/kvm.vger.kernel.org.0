@@ -2,114 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A9D47D9546
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 12:32:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 443497D95BF
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 12:56:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231424AbjJ0Kck (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 06:32:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59096 "EHLO
+        id S1345598AbjJ0K4z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 06:56:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231386AbjJ0Kcj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 06:32:39 -0400
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A26AC18A
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 03:32:36 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-40838915cecso15259515e9.2
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 03:32:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698402755; x=1699007555; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=EnKvJtLdMM1klAtGShdO3PmXCUUiIZMF8/1aPxmDPfI=;
-        b=ePMPi0WrW7J3tfjLtyhQZIBhP6TWfzZn0BSsGdc3QqshQT2ju4UHSzZYGeuHaaw9H8
-         e69We4ws9yGj5IOeWj3uBXOrlv+GsVcv45Yuhjx3D5wKiBRvsezJmJE3kcUDawT8umBN
-         jeAlxxMBIFhau+lL+Fxt6iHtOfROK5Uykvl8Aap40ToJAY3zJofsA3qAlhuafto1uzJ+
-         FRnpuH2zZWOlwWLQIVXcb5Y3qIjXPHe9T+mZRyzztRjLm6FWSbYi+RrwtAhZalAf22CG
-         pJbwjJPhjqkAVeEB71rl91mLx4ZorAgvABD+vCfiPFx4dcdWjJlMRJPvk34dpwPVloYi
-         qNKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698402755; x=1699007555;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EnKvJtLdMM1klAtGShdO3PmXCUUiIZMF8/1aPxmDPfI=;
-        b=AofWEDvkQwIFFgDGpaTFL2LVHPwdfGiUHlax0Gq81w23mBFtP5/CMC8uNyTx8d1JPI
-         YzVWiybLMNVL2Hzwl8PEY3fAzYT2PPJl10pM9rrDg4ZMQ+MroK9w4upCj6u733eqgUx+
-         PGwLyiQ1yk9vPLhbqMatITEWOBa1AXSoNU3Jx05OYV8pXgJ62wuL85s3iabZJTW0xITf
-         Jxj4F5qxc70PIAYXDcC0SmfTwxQav3WMzoc9riLZYNgSiVD7fZAPg9SEOTaBvm/18Z+u
-         tfquX0ICeyos1CS2/wVCu4VaPsUjXIMScgPG+uIcJKwob+++8FIeUZB4VRpGh9OvH7uF
-         omKA==
-X-Gm-Message-State: AOJu0YySFCzF6yqKVcMmVFtoe6cJuyxWP2hzOXbPyWgj5nbEFGZqWoKY
-        o/9zpPnR4nI6zEzc//q9Cb0=
-X-Google-Smtp-Source: AGHT+IGWDabcILZvppndibIT+VlcAXisSRXRTOoY9Ub291eXsQSLS1cJV/CaQEshHMvzRuA7gSjyGg==
-X-Received: by 2002:a05:600c:1f94:b0:406:7232:1431 with SMTP id je20-20020a05600c1f9400b0040672321431mr2033254wmb.33.1698402754916;
-        Fri, 27 Oct 2023 03:32:34 -0700 (PDT)
-Received: from [192.168.10.177] (54-240-197-227.amazon.com. [54.240.197.227])
-        by smtp.gmail.com with ESMTPSA id o14-20020a05600c4fce00b0040775501256sm1300940wmq.16.2023.10.27.03.32.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Oct 2023 03:32:34 -0700 (PDT)
-Message-ID: <c538ea45-dac7-49f3-ad50-8c3a59755dee@gmail.com>
-Date:   Fri, 27 Oct 2023 11:32:33 +0100
+        with ESMTP id S1345705AbjJ0K4x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 06:56:53 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7C8918F;
+        Fri, 27 Oct 2023 03:56:50 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39RAjJTH023549;
+        Fri, 27 Oct 2023 10:56:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=3xTOujzU2+wfvwjQLEOWJbIoUBF5JE+bAZsliuvGrZc=;
+ b=er96YzU/6CqXwgpvpeq9EEZLkhQAm21cVl8uzuddC/ZIHFssj45d2/ZdR6UmMv+rB9In
+ NjjNwYhpARUlxiMT7mW6LGFRf8vcE3rTnvA9Afl6Vi66wc9kvWX97V4l4We3wr0bkULy
+ Ws41wGzk1EDIi7cZ/0kTbnqmbl3PPkMxL46p0ClpPMKqphOvj+o3PV2RQjKD6IXMAZos
+ Irgtje/f1X8REbgt/+kFBNfbtkNjK824ryVPIlgOEbaYbU8bXxhsfh8g8gYdPuVKdlgB
+ aPbjWBL9rajGrHDeW7PPPnnw+7Iri0flYTWAD7HotRUqZ9U+/G/8c6/930sXOtaYlap6 Dg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u0bqv8bw1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Oct 2023 10:56:49 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39RAl17H028892;
+        Fri, 27 Oct 2023 10:56:46 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u0bqv8bvr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Oct 2023 10:56:46 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39RASYoD021676;
+        Fri, 27 Oct 2023 10:56:45 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tywqscgay-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Oct 2023 10:56:45 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39RAugOc11141710
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 Oct 2023 10:56:42 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 441142004B;
+        Fri, 27 Oct 2023 10:56:42 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0B78420043;
+        Fri, 27 Oct 2023 10:56:42 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.152.224.212])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 27 Oct 2023 10:56:41 +0000 (GMT)
+Date:   Fri, 27 Oct 2023 12:56:38 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com,
+        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, david@redhat.com,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH v2 2/3] s390/vfio-ap: set status response code to 06 on
+ gisc registration failure
+Message-ID: <20231027125638.67a65ab9.pasic@linux.ibm.com>
+In-Reply-To: <20231018133829.147226-3-akrowiak@linux.ibm.com>
+References: <20231018133829.147226-1-akrowiak@linux.ibm.com>
+        <20231018133829.147226-3-akrowiak@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v3 13/28] hw/xen: automatically assign device index to
- block devices
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>, paul@xen.org,
-        qemu-devel@nongnu.org
-Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Jason Wang <jasowang@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, qemu-block@nongnu.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-        Bernhard Beschow <shentey@gmail.com>,
-        Joel Upham <jupham125@gmail.com>
-References: <20231025145042.627381-1-dwmw2@infradead.org>
- <20231025145042.627381-14-dwmw2@infradead.org>
- <74e54da5-9c35-485d-a13c-efac3f81dec2@gmail.com>
- <f72e2e7feed3ecf17af8ab8442c359eea329ef17.camel@infradead.org>
- <9fb67e52-f262-4cf4-91c2-a42411ba21c4@gmail.com>
- <b6458e730fd861243f534e33a48a857122e77ed5.camel@infradead.org>
-From:   "Durrant, Paul" <xadimgnik@gmail.com>
-In-Reply-To: <b6458e730fd861243f534e33a48a857122e77ed5.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ccMaKxqSscfAkitskD15OcwWmpme2vXw
+X-Proofpoint-ORIG-GUID: TnkQt8qym4ubyKi7kND7DFziGp3zYyWx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-27_08,2023-10-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 adultscore=0 mlxlogscore=999 clxscore=1011 impostorscore=0
+ phishscore=0 mlxscore=0 bulkscore=0 lowpriorityscore=0 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2310270093
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/10/2023 11:25, David Woodhouse wrote:
-> On Fri, 2023-10-27 at 10:01 +0100, Durrant, Paul wrote:
->>
->> This code is allocating a name automatically so I think the onus is on
->> it not create a needless clash which is likely to have unpredictable
->> results depending on what the guest is. Just avoid any aliasing in the
->> first place and things will be fine.
-> 
-> 
-> Yeah, fair enough. In which case I'll probably switch to using
-> xs_directory() and then processing those results to find a free slot,
-> instead of going out to XenStore for every existence check.
-> 
-> This isn't exactly fast path and I'm prepared to tolerate a little bit
-> of O(n²), but only within reason :)
+On Wed, 18 Oct 2023 09:38:24 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-Yes, doing an xs_directory() and then using the code 
-xen_block_get_vdev() to populate a list of existent disks will be neater.
+> From: Anthony Krowiak <akrowiak@linux.ibm.com>
+> 
+> The interception handler for the PQAP(AQIC) command calls the
+> kvm_s390_gisc_register function to register the guest ISC with the channel
+> subsystem. If that call fails, the status response code 08 - indicating
+> Invalid ZONE/GISA designation - is returned to the guest. This response
+> code does not make sense because the non-zero return code from the
+> kvm_s390_gisc_register function can be due one of two things: Either the
+> ISC passed as a parameter by the guest to the PQAP(AQIC) command is greater
+> than the maximum ISC value allowed, or the guest is not using a GISA.
+
+The "ISC passed as a parameter by the guest to the PQAP(AQIC) command is
+greater than the maximum ISC value allowed" is not possible. The isc is
+3 bits wide and all 8 values that can be represented on 3 bits are valid.
+
+This is only possible if the hypervisor was to mess up, or if the machine
+was broken.
+
+> 
+> Since this scenario is very unlikely to happen and there is no status
+> response code to indicate an invalid ISC value, let's set the
+> response code to 06 indicating 'Invalid address of AP-queue notification
+> byte'. While this is not entirely accurate, it is better than indicating
+> that the ZONE/GISA designation is invalid which is something the guest
+> can do nothing about since those values are set by the hypervisor.
+> 
+> Signed-off-by: Anthony Krowiak <akrowiak@linux.ibm.com>
+> Suggested-by: Halil Pasic <pasic@linux.ibm.com>
+
+
+> ---
+>  drivers/s390/crypto/vfio_ap_ops.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 9cb28978c186..25d7ce2094f8 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -393,8 +393,8 @@ static int ensure_nib_shared(unsigned long addr, struct gmap *gmap)
+>   * Register the guest ISC to GIB interface and retrieve the
+>   * host ISC to issue the host side PQAP/AQIC
+>   *
+> - * Response.status may be set to AP_RESPONSE_INVALID_ADDRESS in case the
+> - * vfio_pin_pages failed.
+> + * status.response_code may be set to AP_RESPONSE_INVALID_ADDRESS in case the
+> + * vfio_pin_pages or kvm_s390_gisc_register failed.
+>   *
+>   * Otherwise return the ap_queue_status returned by the ap_aqic(),
+>   * all retry handling will be done by the guest.
+> @@ -458,7 +458,7 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
+>  				 __func__, nisc, isc, q->apqn);
+>  
+>  		vfio_unpin_pages(&q->matrix_mdev->vdev, nib, 1);
+> -		status.response_code = AP_RESPONSE_INVALID_GISA;
+> +		status.response_code = AP_RESPONSE_INVALID_ADDRESS;
+>  		return status;
+>  	}
+>  
 
