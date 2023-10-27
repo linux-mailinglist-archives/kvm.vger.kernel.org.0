@@ -2,46 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0738D7D9BA3
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 16:39:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00E0F7D9C1A
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 16:49:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346089AbjJ0Oj3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 10:39:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60582 "EHLO
+        id S1345996AbjJ0OtX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 10:49:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346132AbjJ0OjS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 10:39:18 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3195610DB;
-        Fri, 27 Oct 2023 07:39:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698417555; x=1729953555;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=mjKmJXB8oVMEQJ55YBl9y3vDRhOMcEONKyySoTTCMIQ=;
-  b=RBWjJBXCODCf+1lv6IFxLpNKiOi0W249ivbKQlHK2/AL30xAd3AzvK3N
-   LmE+gJNT20pwF1y2G0kPQ8yRr7npy3fqqKEK8JspS7AchJI0e3DsFklDg
-   nudiPdPXRc/PSktFDkRKtCC1kqVgW+Rna6xtk12fp4s4RbVnB0Gx/47s9
-   2aXPq0G180BDJPAZTRTWuERI+CbM9NvNhbRzznIl40LPPDew52YbMh1ut
-   LRX+E0w8DQpHhwO3leAl2lOZoAJeY+LKotw9zGJwNi1t5gD3KNvIBjBki
-   reXRi/gQLDwyR9PVNUyP6W9LUmyPht3gNXBeNSnUBSZXJQ+ZFYa9ZGdL7
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10876"; a="606760"
-X-IronPort-AV: E=Sophos;i="6.03,256,1694761200"; 
-   d="scan'208";a="606760"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 07:39:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10876"; a="736094456"
-X-IronPort-AV: E=Sophos;i="6.03,256,1694761200"; 
-   d="scan'208";a="736094456"
-Received: from dmnassar-mobl.amr.corp.intel.com (HELO desk) ([10.212.203.39])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 07:39:12 -0700
-Date:   Fri, 27 Oct 2023 07:39:12 -0700
-From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        with ESMTP id S1345848AbjJ0OtW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 10:49:22 -0400
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97CDAC4;
+        Fri, 27 Oct 2023 07:49:20 -0700 (PDT)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 1343E40E01A4;
+        Fri, 27 Oct 2023 14:49:18 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+        header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+        by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id lB8tJ8G47sGK; Fri, 27 Oct 2023 14:49:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+        t=1698418155; bh=efdni8LIyAk3uyY0PXBFr5y1EyWZiHVxkj/zu94sZSA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hI/CIriGFipTm4+w04aK79z4ALAuJsHZtXxsgvOllb2FkSNGremvF+mmjzJpVHQ4z
+         g+etOVjG05xesehCFpiKIrVmTr/138EMUkY9T0TKaAaEeAFl0FvbXFWTlvQJeJquiq
+         VTYQs7pTj4x1nEOj7+dc5cpXlnhFnBZe/0zbgU+1FqimkY+kkKIiYXkdcDWin2sA07
+         uf1cKnVwE5JwzZ/c9mAjXfjZVHzoz4hLSCid+5Bwx3MskFVIiXAaMIyiVTH/NOPxxj
+         At8A9Qs83dCJYOzBMGhDNnIXTBf2EuCjyEAI+ojP0dlkErrtgAp7jKljk3ZsGETBai
+         4Z/wDni69LP6NfG9IPIVne8tipYseBLGh7+deRmJ7jfJmMD++tChc7SUov6NgGLcVz
+         7L1bNoptc9DV4KWz6KptH3IKBjDuxiN6bWJXdRtohmvQgLBGPbIDBps2HJsba52HPs
+         7Qlmvaf0ivf4cMVd+EekmrCDzXqh35bux45jWG+C5ygeW0XCMNuKiAN46zzMmw2I21
+         5j46AtX9XqHp+tTlnV/ZkQXsERdwxGG3BEe+Bgfu4TJN1hzHDus2jkpZ5mUWG5Q5gC
+         GjjNECLta/uRhl33JosFgJKP02STN4oFmXcoX6+XwcQZ5ziIyCvlLaXOJ8i6VOrJC1
+         nYjkTlrucCwH39lqpsCNMaE8=
+Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+        (No client certificate requested)
+        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5E53D40E018F;
+        Fri, 27 Oct 2023 14:48:49 +0000 (UTC)
+Date:   Fri, 27 Oct 2023 16:48:48 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>,
         Peter Zijlstra <peterz@infradead.org>,
@@ -52,111 +58,47 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
         Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
         ak@linux.intel.com, tim.c.chen@linux.intel.com,
         Andrew Cooper <andrew.cooper3@citrix.com>,
-        Nikolay Borisov <nik.borisov@suse.com>
-Cc:     linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        Nikolay Borisov <nik.borisov@suse.com>,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
         kvm@vger.kernel.org,
         Alyssa Milburn <alyssa.milburn@linux.intel.com>,
         Daniel Sneddon <daniel.sneddon@linux.intel.com>,
         antonio.gomez.iglesias@linux.intel.com,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Subject: [PATCH  v4 6/6] KVM: VMX: Move VERW closer to VMentry for MDS
- mitigation
-Message-ID: <20231027-delay-verw-v4-6-9a3622d4bcf7@linux.intel.com>
-X-Mailer: b4 0.12.3
+        Alyssa Milburn <alyssa.milburn@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>
+Subject: Re: [PATCH v4 0/6] Delay VERW
+Message-ID: <20231027144848.GGZTvN0AtGIQ9kBtkA@fat_crate.local>
 References: <20231027-delay-verw-v4-0-9a3622d4bcf7@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20231027-delay-verw-v4-0-9a3622d4bcf7@linux.intel.com>
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-During VMentry VERW is executed to mitigate MDS. After VERW, any memory
-access like register push onto stack may put host data in MDS affected
-CPU buffers. A guest can then use MDS to sample host data.
+On Fri, Oct 27, 2023 at 07:38:34AM -0700, Pawan Gupta wrote:
+> v4:
 
-Although likelihood of secrets surviving in registers at current VERW
-callsite is less, but it can't be ruled out. Harden the MDS mitigation
-by moving the VERW mitigation late in VMentry path.
+Why are you spamming people with your patchset? You've sent it 4 times
+in a week:
 
-Note that VERW for MMIO Stale Data mitigation is unchanged because of
-the complexity of per-guest conditional VERW which is not easy to handle
-that late in asm with no GPRs available. If the CPU is also affected by
-MDS, VERW is unconditionally executed late in asm regardless of guest
-having MMIO access.
+Oct 20               Pawan Gupta ( :  75|) [PATCH 0/6] Delay VERW
+Oct 24               Pawan Gupta ( :7.3K|) [PATCH v2 0/6] Delay VERW
+Oct 25               Pawan Gupta ( :7.5K|) [PATCH v3 0/6] Delay VERW
+Oct 27               Pawan Gupta ( :8.8K|) [PATCH v4 0/6] Delay VERW
 
-Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
----
- arch/x86/kvm/vmx/vmenter.S |  3 +++
- arch/x86/kvm/vmx/vmx.c     | 19 ++++++++++++++-----
- 2 files changed, 17 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-index b3b13ec04bac..139960deb736 100644
---- a/arch/x86/kvm/vmx/vmenter.S
-+++ b/arch/x86/kvm/vmx/vmenter.S
-@@ -161,6 +161,9 @@ SYM_FUNC_START(__vmx_vcpu_run)
- 	/* Load guest RAX.  This kills the @regs pointer! */
- 	mov VCPU_RAX(%_ASM_AX), %_ASM_AX
- 
-+	/* Clobbers EFLAGS.ZF */
-+	CLEAR_CPU_BUFFERS
-+
- 	/* Check EFLAGS.CF from the VMX_RUN_VMRESUME bit test above. */
- 	jnc .Lvmlaunch
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 24e8694b83fc..a05c6b80b06c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7226,16 +7226,24 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 
- 	guest_state_enter_irqoff();
- 
--	/* L1D Flush includes CPU buffer clear to mitigate MDS */
-+	/*
-+	 * L1D Flush includes CPU buffer clear to mitigate MDS, but VERW
-+	 * mitigation for MDS is done late in VMentry and is still
-+	 * executed in spite of L1D Flush. This is because an extra VERW
-+	 * should not matter much after the big hammer L1D Flush.
-+	 */
- 	if (static_branch_unlikely(&vmx_l1d_should_flush))
- 		vmx_l1d_flush(vcpu);
--	else if (cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF))
--		mds_clear_cpu_buffers();
- 	else if (static_branch_unlikely(&mmio_stale_data_clear) &&
- 		 kvm_arch_has_assigned_device(vcpu->kvm))
- 		mds_clear_cpu_buffers();
- 
--	vmx_disable_fb_clear(vmx);
-+	/*
-+	 * Optimize the latency of VERW in guests for MMIO mitigation. Skip
-+	 * the optimization when MDS mitigation(later in asm) is enabled.
-+	 */
-+	if (!cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF))
-+		vmx_disable_fb_clear(vmx);
- 
- 	if (vcpu->arch.cr2 != native_read_cr2())
- 		native_write_cr2(vcpu->arch.cr2);
-@@ -7248,7 +7256,8 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 
- 	vmx->idt_vectoring_info = 0;
- 
--	vmx_enable_fb_clear(vmx);
-+	if (!cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF))
-+		vmx_enable_fb_clear(vmx);
- 
- 	if (unlikely(vmx->fail)) {
- 		vmx->exit_reason.full = 0xdead;
+Is this something urgent or can you take your time like everyone else?
 
 -- 
-2.34.1
+Regards/Gruss,
+    Boris.
 
-
+https://people.kernel.org/tglx/notes-about-netiquette
