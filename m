@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 306057D9ED6
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 19:26:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26DF87D9ED7
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 19:26:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232233AbjJ0R0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 13:26:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43554 "EHLO
+        id S232483AbjJ0R0t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 13:26:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230101AbjJ0R0p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 13:26:45 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0824ECC
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 10:26:43 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d81e9981ff4so1630517276.3
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 10:26:42 -0700 (PDT)
+        with ESMTP id S231424AbjJ0R0q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 13:26:46 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2C65E1
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 10:26:44 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a7c97d5d5aso23504097b3.3
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 10:26:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698427602; x=1699032402; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=oBWOHfBvaxwXi0Jkp0rLqN6I3Y0cRSLQixXEhIf+mK4=;
-        b=FZa+BiAmHls0dUtUqIvmJ0ZYRYXc7qab4t9nO51PMITs3B19HaqhRydZl0wPVfU6ZV
-         gL85my24A3oZms52080EYM1Md4E+61hkW0HTu/Ke4Vm16KsjPPvgQbA5ZN/BPTRNAOp8
-         Rbk2jZViPfXMTpfS1AvzcqevXRt32zJ8Oiks+MMtKvk1uCnTp1Wf7iJW71v3V0Qfl2NV
-         z6jbF21rH0/TjXA6UXzEH2Jz/lgx8YoAM9yn2rRAdgp0CfsQWDZ/guhl4oXaGDO99UGN
-         njr9+9bq67KxyyMZJ4YhaR07X/H7EukRCkvRQhbkYIOpuHb+sfTG8Sb2W/TX7P3/vIOo
-         UUbA==
+        d=google.com; s=20230601; t=1698427604; x=1699032404; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=h7zgIHGY1fMUAUPEVpzUQCosT/suKTQ/PWlcIQnXnng=;
+        b=n+LoqulZmLHZ90Y9TO0GNu49Pcqo8DPEHDnY+UBUxXuaEqn0C3iasZjZWYW+6oL1vv
+         kwT4AtRkkmVB4Z9DiX/ytnCLdPcz0tRgcbkfQID9t+lUSd/KlZubFq2k+JzuA/OUVb5k
+         WcX1hl/pS7JNjQEjjFakRBznxif4ZnaAZwMDB+Z6t7J3PbJo6zN9ttKMRHLFUeN6MSgA
+         b7CKJYXsWOrqjAwp9Gr+ZDV8Ys1i/j1zJNpR6AP5D5NGqhM/+xFN8Xec4s/JPwf/KYUE
+         zMYcc9zBG9DsGyEZ5O008FU1AkCsHeS6WqD3KHZDefaztcEz5P+lfFuHrDKjYlpcHvik
+         5uSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698427602; x=1699032402;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oBWOHfBvaxwXi0Jkp0rLqN6I3Y0cRSLQixXEhIf+mK4=;
-        b=F9x9hl3mSN96k8g4yV6BKWgazl9c1zkzAUXn0XhDpA156kszPN/Jji39/SMffuQazN
-         N6OmMb30DqWF1ldnJyd1oL1f3Dlrl3yuRO0amS39aiSrQBdlAvL34QAxSEIIXfWIjOlY
-         NQtj13LXG9sR9/jdHtENgDUFIxNfBfwWm1tQPR0w4IATxW6kcuBrS1ekAU7KQTbrX1AI
-         1TgYnuByPVX2WIXx253aErErNkm9uHWO6WgeKM2DiI1KGYchO+BlbXxTWb9/TC9Renox
-         OHmcNe8Mmqxv0pgNipN/73JKNStcuDuZsAmUckD3CB0Zj6/FjH3Jyf+0yg/I03YOoks8
-         BukQ==
-X-Gm-Message-State: AOJu0Yz8x4CzYIx3d+2bQX6zuAS4m8DP2cx2Hm2ShwxBfn3DnqleJyAx
-        p74CcrL9SRC2C6r/8Yygodbth6Ow1KGyfw==
-X-Google-Smtp-Source: AGHT+IH8Hb71YTLTQSL8RziND2+AkK8OVWvdBQCZdXMO4HqSSDQIZ/yRXXJLfPMq5CT181mZ9+yBLgfUK7DhlA==
+        d=1e100.net; s=20230601; t=1698427604; x=1699032404;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h7zgIHGY1fMUAUPEVpzUQCosT/suKTQ/PWlcIQnXnng=;
+        b=tkkWugMu6UyQGwAwGrmo2A8n8zYVknrL65SOGNhQ4UYYZc9/0SRNyw3rV4Lh4G8489
+         +eIpSNT0IDHH1GaPd/b+eaitdvYHBaQ6Iv1htqqc3PMo2zN+m4X//qQgu50RW07Pe0sQ
+         A/3h2pFhyq2q4Q0gxNyxlwE6JCRAYQnEY8ujaAthG9h1Fe/1+3BUbZ3g4o5Xwc3/CcEf
+         HoNEBWjpSFlCFpkWJWUmgujGvMGQxzWCZAKHMu3JPE3ObtVOJAZZUtEhu6Dtg29hHCzR
+         NfOY3u/jUvqx84TXtbW7yAq4ys0G6/ZiLaXoaYzHrRK6KDqTwPIzK/WR0Dna37kKJ4U2
+         5Iog==
+X-Gm-Message-State: AOJu0YxwQgyPyWDQZsO2XNieXk9fiMMMeMSth2qUwHVnUqmrja8JZlVp
+        Fo5YmHaO4isOtQwLKqdfHJU9YjOibiCdMQ==
+X-Google-Smtp-Source: AGHT+IF+n56F/crcXR3VXYV/sH+3egVuaMavWLMNmhpVGT46qzZ23sCD1A5phOdoTLqreV5yBvrgEKoNtjIl8g==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a25:c50c:0:b0:da0:c49a:5feb with SMTP id
- v12-20020a25c50c000000b00da0c49a5febmr57688ybe.4.1698427602158; Fri, 27 Oct
- 2023 10:26:42 -0700 (PDT)
-Date:   Fri, 27 Oct 2023 10:26:37 -0700
+ (user=dmatlack job=sendgmr) by 2002:a0d:ca8d:0:b0:5a7:ba3f:3407 with SMTP id
+ m135-20020a0dca8d000000b005a7ba3f3407mr62840ywd.9.1698427603890; Fri, 27 Oct
+ 2023 10:26:43 -0700 (PDT)
+Date:   Fri, 27 Oct 2023 10:26:38 -0700
+In-Reply-To: <20231027172640.2335197-1-dmatlack@google.com>
 Mime-Version: 1.0
+References: <20231027172640.2335197-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.42.0.820.g83a721a137-goog
-Message-ID: <20231027172640.2335197-1-dmatlack@google.com>
-Subject: [PATCH 0/3] KVM: Performance and correctness fixes for CLEAR_DIRTY_LOG
+Message-ID: <20231027172640.2335197-2-dmatlack@google.com>
+Subject: [PATCH 1/3] KVM: x86/mmu: Fix off-by-1 when splitting huge pages
+ during CLEAR
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -67,51 +70,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series reduces the impact of CLEAR_DIRTY_LOG on guest performance
-(Patch 3) and fixes 2 minor bugs found along the way (Patches 1 and 2).
+Fix an off-by-1 error when passing in the range of pages to
+kvm_mmu_try_split_huge_pages() during CLEAR_DIRTY_LOG. Specifically, end
+is the last page that needs to be split (inclusive) so pass in `end + 1`
+since kvm_mmu_try_split_huge_pages() expects the `end` to be
+non-inclusive.
 
-We've observed that guest performance can drop while userspace is
-issuing CLEAR_DIRTY_LOG ioctls and tracked down the problem to
-contention on the mmu_lock in vCPU threads. CLEAR_DIRTY_LOG holds the
-write-lock, so this isn't that surprising. We previously explored
-converting CLEAR_DIRTY_LOG to hold the read-lock [1], but that has some
-negative consequences:
+At worst this will cause a huge page to be write-protected instead of
+eagerly split, which is purely a performance issue, not a correctness
+issue. But even that is unlikely as it would require userspace pass in a
+bitmap where the last page is the only 4K page on a huge page that needs
+to be split.
 
- - Pretty significant code churn is required on x86 and ARM to support
-   doing CLEAR under the read-lock. Things get especially hairy on x86
-   when considering how to support the Shadow MMU.
+Reported-by: Vipin Sharma <vipinsh@google.com>
+Fixes: f2928aae8b9a ("UPSTREAM: KVM: x86/mmu: Split huge pages mapped by the TDP MMU during KVM_CLEAR_DIRTY_LOG")
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- - Holding the read-lock means KVM will have to use atomic
-   compare-and-exchange operations during eager splitting and clearing
-   dirty bits, which can be quite slow on certain ARM platforms.
-
-This series proposed an alternative (well, complimentary, really)
-approach of simply dropping mmu_lock more frequently. I tested this
-series out with one of our internal Live Migration tests where the guest
-is running MySQL in a 160 vCPU VM (Intel Broadwell host) and it
-eliminates the performance drops we were seeing when userspace issues
-CLEAR ioctls. Furthermore I don't see any noticeable improvement when I
-test with this series plus a prototype patch convert CLEAR to the read
-lock on x86. i.e. It seems we can eliminate most of the lock contention
-by just dropping the lock more frequently.
-
-Cc: Vipin Sharma <vipinsh@google.com>
-
-[1] https://lore.kernel.org/kvm/20230602160914.4011728-1-vipinsh@google.com/
-
-David Matlack (3):
-  KVM: x86/mmu: Fix off-by-1 when splitting huge pages during CLEAR
-  KVM: x86/mmu: Check for leaf SPTE when clearing dirty bit in the TDP
-    MMU
-  KVM: Aggressively drop and reacquire mmu_lock during CLEAR_DIRTY_LOG
-
- arch/x86/kvm/mmu/mmu.c     | 2 +-
- arch/x86/kvm/mmu/tdp_mmu.c | 7 ++++---
- virt/kvm/kvm_main.c        | 4 ++--
- 3 files changed, 7 insertions(+), 6 deletions(-)
-
-
-base-commit: 2b3f2325e71f09098723727d665e2e8003d455dc
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index f7901cb4d2fa..6aa966631cab 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1382,7 +1382,7 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ 		gfn_t end = slot->base_gfn + gfn_offset + __fls(mask);
+ 
+ 		if (READ_ONCE(eager_page_split))
+-			kvm_mmu_try_split_huge_pages(kvm, slot, start, end, PG_LEVEL_4K);
++			kvm_mmu_try_split_huge_pages(kvm, slot, start, end + 1, PG_LEVEL_4K);
+ 
+ 		kvm_mmu_slot_gfn_write_protect(kvm, slot, start, PG_LEVEL_2M);
+ 
 -- 
 2.42.0.820.g83a721a137-goog
 
