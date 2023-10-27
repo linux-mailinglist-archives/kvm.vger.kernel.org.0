@@ -2,309 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F370E7D9A8C
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 15:58:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9624C7D9AA6
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 16:00:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345991AbjJ0N57 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 09:57:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44168 "EHLO
+        id S1345998AbjJ0OA7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 10:00:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345996AbjJ0N55 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 09:57:57 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 420C79D
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 06:57:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:Date:Cc:To:
-        From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=AGGwq1Jy9hB6IE8RzHGEBfv+y0arbI6gF8BWcjOqEtc=; b=jUwztbUu1dh2bIaeoHv4SZNuXx
-        XRRuzcgN5frihDCAsFDFWUJxo09Ld/wnZMqBfWC6sJqUF/SZ/3eva4tn865yMEbRvsoQVnd5Lm5z4
-        CDFom2SmcLOBUJQ31hREjeN1ztJM/BRYAldTbgwShjT6Phg0jQ0Kihp6H+OQ05e1QaJBVb3jWni0z
-        VJ3DW+ellAgXFzN1n24lsP7EW2g2KN7MnhCg/7FX5P/xTb6KKBPqaDyhEgjo4e1ULj8Adge99sQZI
-        mOpkskN/g6peixGraTCQsKyLzuLFx+n6U6RwvA2rPt36k3quCiH/Zt3MY7DlusB8nWx2mozI03wzu
-        miAn/T7w==;
-Received: from [2001:8b0:10b:5:8f9a:f53a:1a74:1a12] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qwNLR-003kY9-5n; Fri, 27 Oct 2023 13:57:49 +0000
-Message-ID: <79c1d7fca9aba762b9e97d3abd9b93e5f9045230.camel@infradead.org>
-Subject: [RFC PATCH] KVM: x86/xen: don't use broken get_kvmclock_ns() for
- Xen timers
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     kvm@vger.kernel.org
-Cc:     Paul Durrant <paul@xen.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Dongli Zhang <dongli.zhang@oracle.com>
-Date:   Fri, 27 Oct 2023 14:57:48 +0100
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-J8jK/VAjwrVg0z8+wiSj"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+        with ESMTP id S1345943AbjJ0OA4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 10:00:56 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACAE1CA;
+        Fri, 27 Oct 2023 07:00:54 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39RDlOb5012337;
+        Fri, 27 Oct 2023 14:00:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=GPXQHsDNhanH9RRnX367eQ4daaX4XwIiRdbXhz1ek0A=;
+ b=GI6IueJg4zj05kXd/9Au7Zv9OUgPvCWr5KQlTMrHEfWx1OKCfqjh7SF4uI4QIoxs90lp
+ 5GOVQd/x0Sgf88tOiFnxPd/FhICPWWOh7kfZwHIJugGrlm02+VWTaYHV9HPzIQhdLXSj
+ QpppEH/pixz71p3jGE8hWZ7sWCx8M5xcuJOpHQU4lb5pOQLlQlZ+UFqRfeTu3q0W/drv
+ Atm1XfWtL3JRtccU25H/Zx/XOCu/qrzmCplwJ4YmJmtNI+h9a1tW04VFbW2e2oTSjSMT
+ I6I2vY+JeQmxmA4XnqLnimxAAX7dJNDOKZLh39o2ifpHHiWrmucWkI4VrmfTONv29JTV kA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u0ed6gkyg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Oct 2023 14:00:43 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39RDnatk019833;
+        Fri, 27 Oct 2023 14:00:42 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u0ed6gkwr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Oct 2023 14:00:42 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39RDV45F027492;
+        Fri, 27 Oct 2023 14:00:40 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tywqrnfww-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Oct 2023 14:00:40 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39RE0blC39190978
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 Oct 2023 14:00:37 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 578962004E;
+        Fri, 27 Oct 2023 14:00:37 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AF82E2004B;
+        Fri, 27 Oct 2023 14:00:36 +0000 (GMT)
+Received: from [9.179.1.199] (unknown [9.179.1.199])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 27 Oct 2023 14:00:36 +0000 (GMT)
+Message-ID: <e27698dd-76e7-4c5c-a1c9-a146e239da7f@linux.ibm.com>
+Date:   Fri, 27 Oct 2023 16:00:36 +0200
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH 08/10] s390x: topology: Rewrite topology
+ list test
+Content-Language: en-US
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        =?UTF-8?Q?Nico_B=C3=B6hr?= <nrb@linux.ibm.com>
+Cc:     Andrew Jones <andrew.jones@linux.dev>,
+        Ricardo Koller <ricarkol@google.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Nikos Nikoleris <nikos.nikoleris@arm.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Shaoqin Huang <shahuang@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>
+References: <20231020144900.2213398-1-nsg@linux.ibm.com>
+ <20231020144900.2213398-9-nsg@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20231020144900.2213398-9-nsg@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: MYqf3uoDNxBlhV-pCdDSumFVbME6PG7n
+X-Proofpoint-ORIG-GUID: 1wkGWzeQCx43B85hBAEIbfMq9QK_q1dF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-27_12,2023-10-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ lowpriorityscore=0 bulkscore=0 impostorscore=0 spamscore=0 adultscore=0
+ phishscore=0 priorityscore=1501 suspectscore=0 clxscore=1011
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2310270121
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 10/20/23 16:48, Nina Schoetterl-Glausch wrote:
+> Rewrite recursion with separate functions for checking containers,
+> containers containing CPUs and CPUs.
+> This improves comprehension and allows for more tests.
+> We now also test for ordering of CPU TLEs and number of child entries.
+> 
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 
---=-J8jK/VAjwrVg0z8+wiSj
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+So, I've spent some time with the STSI specification and most of what 
+I've read makes sense, the other parts likely need more research on my 
+end. Anyway:
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+Acked-by: Janosch Frank <frankja@linux.ibm.com>
 
-The get_kvmclock_ns() function is broken. It isn't *just* the general
-brokenness of the KVM clock which sometimes gets yanked back into line
-with the host's CLOCK_MONOTONIC_RAW, potentially causing time to go
-backwards for the guest. It's worse than that; even when the clocks
-don't get resynced, get_kvmclock_ns() calculates time differently to
-the way the guest does, causing a systemic error.
+> ---
+>   lib/s390x/stsi.h |  36 +++++----
+>   s390x/topology.c | 201 ++++++++++++++++++++++++++++-------------------
+>   2 files changed, 142 insertions(+), 95 deletions(-)
+> 
+> diff --git a/lib/s390x/stsi.h b/lib/s390x/stsi.h
+> index 1e9d0958..f2290ca7 100644
+> --- a/lib/s390x/stsi.h
+> +++ b/lib/s390x/stsi.h
+[...]
+>   #define CPU_TOPOLOGY_MAX_LEVEL 6
+> diff --git a/s390x/topology.c b/s390x/topology.c
+> index df158aef..037d22cd 100644
+> --- a/s390x/topology.c
+> +++ b/s390x/topology.c
+> @@ -2,7 +2,7 @@
+>   /*
+>    * CPU Topology
+>    *
+> - * Copyright IBM Corp. 2022
+> + * Copyright IBM Corp. 2022, 2023
+>    *
+>    * Authors:
+>    *  Pierre Morel <pmorel@linux.ibm.com>
 
-The guest sees a TSC value scaled from the host TSC by a mul/shift
-conversion (hopefully done in hardware). It then converts that guest
-TSC value into nanoseconds using the mul/shift conversion given to it
-by the KVM pvclock information.
-
-But get_kvmclock_ns() performs only a single conversion directly from
-host TSC to nanoseconds, giving a different result. A test program at
-http://david.woodhou.se/tsdrift.c demonstrates the cumulative error
-over a day.
-
-=46rom the guest, http://david.woodhou.se/timerlat.c demonstrates ever
-increasing inaccuracies in the length of the actual delay observed when
-asking for e.g. 100=C2=B5s of sleep.
-
-root@ip-10-0-193-21:~# ./timerlat -c -n 5
-00000000 latency 103243/100000 (3.2430%)
-00000001 latency 103243/100000 (3.2430%)
-00000002 latency 103242/100000 (3.2420%)
-00000003 latency 103245/100000 (3.2450%)
-00000004 latency 103245/100000 (3.2450%)
-
-As a short-term fix, just calculate the kvmclock precisely the same
-way the guest does when setting timers.
-
-XX: does this even need to be conditional on constant TSC? Even if
-use_master_clock isn't true, the guest will *still* have used the
-*current* values in vcpu->arch.hv_clock with the *current* value of
-the guest TSC, won't it?
-
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
-As well as fixing kvmclock properly, I also want to rework some of the
-timer code to remove all concept of "now" from it. The guest tells us a
-time in (its) kvmclock nanoseconds at which it wants the timer to go
-off. We subtract its kvmclock "now" from that, call ktime_get() at a
-slightly different "now", then set an hrtimer for that now + the delta.
-
-It'd be much nicer to just calculate the host CLOCK_MONOTONIC_RAW time
-at which the guest's kvmclock will be the value that it asked for,
-without any of that sloppiness or ever using the word "now".
-
-
- arch/x86/kvm/xen.c | 31 ++++++++++++++++++++++++++++---
- 1 file changed, 28 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 0ea6016ad132..0c69781c1d07 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -24,6 +24,7 @@
- #include <xen/interface/sched.h>
-=20
- #include <asm/xen/cpuid.h>
-+#include <asm/pvclock.h>
-=20
- #include "cpuid.h"
- #include "trace.h"
-@@ -144,6 +145,30 @@ static enum hrtimer_restart xen_timer_callback(struct =
-hrtimer *timer)
- 	return HRTIMER_NORESTART;
- }
-=20
-+/*
-+ * get_kvmclock_ns() is broken when the guest TSC is scaled.
-+ *
-+ * The guest sees a *scaled* TSC (passed through one mul/shift conversion)
-+ * and then performs another mul/shift conversion according to the pvclock
-+ * information that KVM provided, to get its kvmclock in nanoseconds. That
-+ * is the clock it uses for setting its timers.
-+ *
-+ * get_kvmclock_ns(), on the other hand, just uses a *single* mul/shift
-+ * conversion to go straight from host TSC to nanoseconds. There is a
-+ * systemic error due to doing it differently to the guest, eventually
-+ * resulting in guest timers going off at the *wrong* times, according
-+ * to the guest's idea of what its kvmclock (i.e. Xen clock) is.
-+ *
-+ * Fixing kvmclock is hard. In the very short term, until we can do that,
-+ * just don't use it for the case where its brokenness matters most, the
-+ * Xen timers.
-+ */
-+static uint64_t vcpu_get_kvmclock_ns(struct kvm_vcpu *vcpu)
-+{
-+	uint64_t guest_tsc =3D kvm_read_l1_tsc(vcpu, rdtsc());
-+	return __pvclock_read_cycles(&vcpu->arch.hv_clock, guest_tsc);
-+}
-+
- static void kvm_xen_start_timer(struct kvm_vcpu *vcpu, u64 guest_abs, s64 =
-delta_ns)
- {
- 	atomic_set(&vcpu->arch.xen.timer_pending, 0);
-@@ -924,7 +949,7 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct=
- kvm_xen_vcpu_attr *data)
- 		if (data->u.timer.port && data->u.timer.expires_ns)
- 			kvm_xen_start_timer(vcpu, data->u.timer.expires_ns,
- 					    data->u.timer.expires_ns -
--					    get_kvmclock_ns(vcpu->kvm));
-+					    vcpu_get_kvmclock_ns(vcpu));
-=20
- 		r =3D 0;
- 		break;
-@@ -1374,7 +1399,7 @@ static bool kvm_xen_hcall_vcpu_op(struct kvm_vcpu *vc=
-pu, bool longmode, int cmd,
- 			return true;
- 		}
-=20
--		delta =3D oneshot.timeout_abs_ns - get_kvmclock_ns(vcpu->kvm);
-+		delta =3D oneshot.timeout_abs_ns - vcpu_get_kvmclock_ns(vcpu);
- 		if ((oneshot.flags & VCPU_SSHOTTMR_future) && delta < 0) {
- 			*r =3D -ETIME;
- 			return true;
-@@ -1404,7 +1429,7 @@ static bool kvm_xen_hcall_set_timer_op(struct kvm_vcp=
-u *vcpu, uint64_t timeout,
- 		return false;
-=20
- 	if (timeout) {
--		uint64_t guest_now =3D get_kvmclock_ns(vcpu->kvm);
-+		uint64_t guest_now =3D vcpu_get_kvmclock_ns(vcpu);
- 		int64_t delta =3D timeout - guest_now;
-=20
- 		/* Xen has a 'Linux workaround' in do_set_timer_op() which
---=20
-2.41.0
-
-
-
---=-J8jK/VAjwrVg0z8+wiSj
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMDI3MTM1NzQ4WjAvBgkqhkiG9w0BCQQxIgQg6bCZ+mJU
-r5P3MopqQl355mq78zmiS3wwOS0fUwZBqu4wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBzDB556UovfgmD6MRxG5uZR0U2+uLzxI7J
-AC8qgeLPyiPOuuZM0zytM3apNsBfcgGHfnLSMC2OFtKIxwgRoOasNBdUAdU+TINtCjA/hxj8ixb8
-5pfHH6JwSt9yIXzu+rFUlml2VyqgdPSCHHyLeHlbDNkagi3qdw2LeQPdo9UWxUb4qYnOduy6UX1G
-FLP6sseHP91z9M5SGjp2eoW8OyVANWSMa6BRbkIAbBVMs5V50bO4CL57MgqTd8aSaT+Thsr/6wk2
-L2KIlkEBtlzLS0RckNQlR/DBKOzBCsl+2rUFgjixmohZdsUgSRwmLAu+fTvs/4yJmkm0SVslE27T
-Z1Oxdmbe6uAkRS4Jq5bIzwkIOD8NnTl25MALaU4wYW0v1uWUPCeXGlsL58pmt86MKu+g8yJLgznT
-5T7mV9mELsBTmquJqTQfm0G/SqpodQoXFOtQon2kSc2TPW0zibIfpWic4b4Mt8RFGzD66EFHRqr7
-ejeCzJdsQAQoOHdg9O6XLplY18T7AxUaIGvcGijXXmsJyPBqYcq86GHu8xflfg5xc2uW2fQdGorV
-7nKOi/xBJqcASJzAzD3nfydp9mS4C73iBthpbrB7R28wk08QJVzjPySqPGbbSBw8oHHbA+4GhpXw
-/N2b223nWt+g5tTR5Q0XVlB9ytJP5nrXrPOsTfINkQAAAAAAAA==
-
-
---=-J8jK/VAjwrVg0z8+wiSj--
+If you touch this anyway, it might make sense to add your name to the 
+authors :)
