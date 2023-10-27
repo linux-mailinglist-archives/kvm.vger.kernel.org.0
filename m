@@ -2,168 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A1EF17D94FD
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 12:16:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 403477D9505
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 12:17:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345738AbjJ0KQ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 06:16:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34324 "EHLO
+        id S1345616AbjJ0KRl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 06:17:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345724AbjJ0KQY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 06:16:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B59E7DC
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 03:15:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698401734;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/3RUe/42QKtvFOMbEd083sCtycO90wm6iZz1XgOvH0k=;
-        b=X3sMzJrcUw5pmWZsRMWLzbz0A//T2IyC7SfNjR82zmXXUs2dE/uH7IJeImCkHf4Rl6FN4M
-        7JH3XT7jqgZOZSwQPm6LdvqqR2BcV/dC9zPC19KtpO0AdOMvUxDqZAyF2DWni/I/obTm0L
-        tehZxv+0smII3WXIFYmz5QFZsdj+NQE=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-231-m75M3zjQMT-RsRtBCfn_gQ-1; Fri, 27 Oct 2023 06:15:32 -0400
-X-MC-Unique: m75M3zjQMT-RsRtBCfn_gQ-1
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-41cba27f8b2so23260181cf.3
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 03:15:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698401732; x=1699006532;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/3RUe/42QKtvFOMbEd083sCtycO90wm6iZz1XgOvH0k=;
-        b=NO8x0nTQhIKgoeteftmHF2i9vVlCjMM/eXwlCmG8tu3bZ+X0h4F0uyU/byR3uMTizJ
-         mm7zhV1EOgygoanDIUzYKA583hmcCT1AGSUL7YSrtha/atx/2twqI7e1NX/njC1oRfNx
-         iC6Gsm8kgYJpi7y3w1/0oNDcEdrVO9tioR3bZZRO9zdNMSQq6Z2QI1IT1c4WT+LTodjf
-         phyE6P/vA6SxfbCqYp1rlqvyVFVcw7zEzgH43gUtS916DbsQQ9MW2qSJekOAnBrUIg8A
-         krAXQ9beMGheyjyTR/LaJ58n72h3Y79Rp5vqpLNNY81JaoAGxe+2aMImqaxER0X7/ITu
-         UcGA==
-X-Gm-Message-State: AOJu0Yx8RBoiFgPjbmhU18lA65HagYH9gqqVNQdb0hLDLNkfibg8p5yK
-        vM/OvI9JAkv2WwW3RQ2mWSfyUIb92NrWRfvwEMWBIfknQxP2BKr2tZYrb361XZ50Ikk7YJduRuI
-        eEvGrKlfLo8Mw
-X-Received: by 2002:ac8:5d07:0:b0:418:1235:5c86 with SMTP id f7-20020ac85d07000000b0041812355c86mr2910748qtx.43.1698401731785;
-        Fri, 27 Oct 2023 03:15:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFTEePNVAmHZb/864E4GdsNkiYTWojqEFJErvbBvnJDxMpu5e0tdtlubNMMIbyRvGLZJkKphA==
-X-Received: by 2002:ac8:5d07:0:b0:418:1235:5c86 with SMTP id f7-20020ac85d07000000b0041812355c86mr2910723qtx.43.1698401731427;
-        Fri, 27 Oct 2023 03:15:31 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-12-185-56.business.telecomitalia.it. [87.12.185.56])
-        by smtp.gmail.com with ESMTPSA id g21-20020ac85815000000b00418122186ccsm460002qtg.12.2023.10.27.03.15.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Oct 2023 03:15:31 -0700 (PDT)
-Date:   Fri, 27 Oct 2023 12:15:25 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Eric Dumazet <edumazet@google.com>
-Cc:     syzbot <syzbot+0c8ce1da0ac31abbadcd@syzkaller.appspotmail.com>,
-        davem@davemloft.net, kuba@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, stefanha@redhat.com,
-        syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org, syoshida@redhat.com
-Subject: Re: [syzbot] [net?] KMSAN: uninit-value in virtio_transport_recv_pkt
-Message-ID: <6pljp7toxsxk4ljnggvn44djqzbi2g3bfou5snhugdrbabu7wv@fpueaouu26ly>
-References: <00000000000008b2940608ae3ce9@google.com>
- <ooihytsfbk3brbwi2oj27ju3ff43ns36qhksfixrxdau2nieor@ervvukakvk4n>
- <CANn89i+kKiSL6KJ6cEW_J5BmV3vSswbNPMNVm8ysKjDynF9d5w@mail.gmail.com>
+        with ESMTP id S231487AbjJ0KRk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 06:17:40 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D187818A;
+        Fri, 27 Oct 2023 03:17:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698401858; x=1729937858;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ovH31mpxEu8DVpROwawryGv3U0nz8LD/NUhAxN46fTI=;
+  b=nYLUaBL/5Ko63rNcACQmm92qAGS8FqJngptzfnjJ4MrR0CuflOtuhcbe
+   HuCpg08E3Ixxz43PS6NUeRJuWsTwIZxOdeejpEOCPg0OfHiC9/FH4boji
+   o9YFHCmathUNvXYNdm+gA6ASwCwJZvuxyiC1MTmKMTvv02CPO8tmgXDRm
+   T1GhVIvgoqKc0wSKSSY3KwP+WGgZRV4Cm62wIieGqjD2LBmu9DOdIAzeD
+   8uy4McYUx3a+F3Qud9xqBEC79P2lYFJ3BZnK0/2yoxL6GYmPkaE+i8uOS
+   sex1kvFQXk5rhBKjdT7u4MNjo2eXmSKGyyEMuSgamp9j7CEIrU6UAjOFV
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10875"; a="367958824"
+X-IronPort-AV: E=Sophos;i="6.03,255,1694761200"; 
+   d="scan'208";a="367958824"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 03:17:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,255,1694761200"; 
+   d="scan'208";a="7609778"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.26.29]) ([10.93.26.29])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 03:17:22 -0700
+Message-ID: <a2483e6e-c5fe-4604-9aaa-db2a1df8fa77@linux.intel.com>
+Date:   Fri, 27 Oct 2023 18:17:32 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests Patch 2/5] x86: pmu: Change the minimum value of
+ llc_misses event to 0
+Content-Language: en-US
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhang Xiong <xiong.y.zhang@intel.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Dapeng Mi <dapeng1.mi@intel.com>
+References: <20231024075748.1675382-1-dapeng1.mi@linux.intel.com>
+ <20231024075748.1675382-3-dapeng1.mi@linux.intel.com>
+ <CALMp9eRqGr+5+C1OLhxv1i8Q=YVRmFxkZQJoh7HzWkPg2z=WoA@mail.gmail.com>
+ <6132ba52-fdf1-4680-9e4e-5ea2fcb63b3c@linux.intel.com>
+ <CALMp9eSX6OL9=9sgnKpNgRtuTV93A=G=u-5qT1_rpKFjL-dBNw@mail.gmail.com>
+ <99684975-6317-4233-b87b-14ca731b335a@linux.intel.com>
+ <CALMp9eRdiyHQjiSRufKvBLHhXQ9LgTpNO8djETZ9tSYZR_FBFg@mail.gmail.com>
+From:   "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <CALMp9eRdiyHQjiSRufKvBLHhXQ9LgTpNO8djETZ9tSYZR_FBFg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89i+kKiSL6KJ6cEW_J5BmV3vSswbNPMNVm8ysKjDynF9d5w@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 27, 2023 at 10:48:39AM +0200, Eric Dumazet wrote:
->On Fri, Oct 27, 2023 at 10:25 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+
+On 10/26/2023 8:19 PM, Jim Mattson wrote:
+> On Wed, Oct 25, 2023 at 7:14 PM Mi, Dapeng <dapeng1.mi@linux.intel.com> wrote:
 >>
->> On Fri, Oct 27, 2023 at 01:11:24AM -0700, syzbot wrote:
->> >Hello,
->> >
->> >syzbot found the following issue on:
->> >
->> >HEAD commit:    d90b0276af8f Merge tag 'hardening-v6.6-rc3' of git://git.k..
->> >git tree:       upstream
->> >console+strace: https://syzkaller.appspot.com/x/log.txt?x=102c8b22680000
->> >kernel config:  https://syzkaller.appspot.com/x/.config?x=6f1a4029b69273f3
->> >dashboard link: https://syzkaller.appspot.com/bug?extid=0c8ce1da0ac31abbadcd
->> >compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
->> >syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=101e58ec680000
->> >C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17f7adb6680000
->> >
->> >Downloadable assets:
->> >disk image: https://storage.googleapis.com/syzbot-assets/83ae10beee39/disk-d90b0276.raw.xz
->> >vmlinux: https://storage.googleapis.com/syzbot-assets/c231992300f6/vmlinux-d90b0276.xz
->> >kernel image: https://storage.googleapis.com/syzbot-assets/6377c9c2ea97/bzImage-d90b0276.xz
->> >
->> >IMPORTANT: if you fix the issue, please add the following tag to the commit:
->> >Reported-by: syzbot+0c8ce1da0ac31abbadcd@syzkaller.appspotmail.com
->> >
->> >=====================================================
->> >BUG: KMSAN: uninit-value in virtio_transport_recv_pkt+0x1c42/0x2580 net/vmw_vsock/virtio_transport_common.c:1421
->> > virtio_transport_recv_pkt+0x1c42/0x2580 net/vmw_vsock/virtio_transport_common.c:1421
->> > vsock_loopback_work+0x3e2/0x5d0 net/vmw_vsock/vsock_loopback.c:120
->> > process_one_work kernel/workqueue.c:2630 [inline]
->> > process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2703
->> > worker_thread+0xf45/0x1490 kernel/workqueue.c:2784
->> > kthread+0x3e8/0x540 kernel/kthread.c:388
->> > ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
->> > ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
->> >
->> >Uninit was stored to memory at:
->> > virtio_transport_space_update net/vmw_vsock/virtio_transport_common.c:1274 [inline]
->> > virtio_transport_recv_pkt+0x1ea4/0x2580 net/vmw_vsock/virtio_transport_common.c:1415
->> > vsock_loopback_work+0x3e2/0x5d0 net/vmw_vsock/vsock_loopback.c:120
->> > process_one_work kernel/workqueue.c:2630 [inline]
->> > process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2703
->> > worker_thread+0xf45/0x1490 kernel/workqueue.c:2784
->> > kthread+0x3e8/0x540 kernel/kthread.c:388
->> > ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
->> > ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
->> >
->> >Uninit was created at:
->> > slab_post_alloc_hook+0x12f/0xb70 mm/slab.h:767
->> > slab_alloc_node mm/slub.c:3478 [inline]
->> > kmem_cache_alloc_node+0x577/0xa80 mm/slub.c:3523
->> > kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:559
->> > __alloc_skb+0x318/0x740 net/core/skbuff.c:650
->> > alloc_skb include/linux/skbuff.h:1286 [inline]
->> > virtio_vsock_alloc_skb include/linux/virtio_vsock.h:66 [inline]
->> > virtio_transport_alloc_skb+0x8b/0x1170 net/vmw_vsock/virtio_transport_common.c:58
->> > virtio_transport_reset_no_sock net/vmw_vsock/virtio_transport_common.c:957 [inline]
->> > virtio_transport_recv_pkt+0x1531/0x2580 net/vmw_vsock/virtio_transport_common.c:1387
->> > vsock_loopback_work+0x3e2/0x5d0 net/vmw_vsock/vsock_loopback.c:120
->> > process_one_work kernel/workqueue.c:2630 [inline]
->> > process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2703
->> > worker_thread+0xf45/0x1490 kernel/workqueue.c:2784
->> > kthread+0x3e8/0x540 kernel/kthread.c:388
->> > ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
->> > ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
->> >
->> >CPU: 0 PID: 8 Comm: kworker/0:0 Not tainted 6.6.0-rc2-syzkaller-00337-gd90b0276af8f #0
->> >Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/04/2023
->> >Workqueue: vsock-loopback vsock_loopback_work
->> >=====================================================
->> >
+>> On 10/25/2023 8:35 PM, Jim Mattson wrote:
+>>> On Wed, Oct 25, 2023 at 4:23 AM Mi, Dapeng <dapeng1.mi@linux.intel.com> wrote:
+>>>> On 10/24/2023 9:03 PM, Jim Mattson wrote:
+>>>>> On Tue, Oct 24, 2023 at 12:51 AM Dapeng Mi <dapeng1.mi@linux.intel.com> wrote:
+>>>>>> Along with the CPU HW's upgrade and optimization, the count of LLC
+>>>>>> misses event for running loop() helper could be 0 just like seen on
+>>>>>> Sapphire Rapids.
+>>>>>>
+>>>>>> So modify the lower limit of possible count range for LLC misses
+>>>>>> events to 0 to avoid LLC misses event test failure on Sapphire Rapids.
+>>>>> I'm not convinced that these tests are really indicative of whether or
+>>>>> not the PMU is working properly. If 0 is allowed for llc misses, for
+>>>>> instance, doesn't this sub-test pass even when the PMU is disabled?
+>>>>>
+>>>>> Surely, we can do better.
+>>>> Considering the testing workload is just a simple adding loop, it's
+>>>> reasonable and possible that it gets a 0 result for LLC misses and
+>>>> branch misses events. Yeah, I agree the 0 count makes the results not so
+>>>> credible. If we want to avoid these 0 count values, we may have to
+>>>> complicate the workload, such as adding flush cache instructions, or
+>>>> something like that (I'm not sure if there are instructions which can
+>>>> force branch misses). How's your idea about this?
+>>> CLFLUSH is probably a good way to ensure cache misses. IBPB may be a
+>>> good way to ensure branch mispredictions, or IBRS on parts without
+>>> eIBRS.
 >>
->> Shigeru Yoshida already posted a patch here:
->>
->> https://lore.kernel.org/netdev/20231026150154.3536433-1-syoshida@redhat.com/
+>> Thanks Jim for the information. I'm not familiar with IBPB/IBRS
+>> instructions, but just a glance, it looks there two instructions are
+>> some kind of advanced instructions,  Not all Intel CPUs support these
+>> instructions and not sure if AMD has similar instructions. It would be
+>> better if there are more generic instruction to trigger branch miss.
+>> Anyway I would look at the details and come back again.
+> IBPB and IBRS are not instructions. IBPB (indirect branch predictor
+> barrier) is triggered by setting bit 0 of the IA32_PRED_CMD MSR. IBRS
+> (indirect branch restricted speculation) is triggered by setting bit 0
+> of the IA32_SPEC_CTRL MSR. It is true that the desired behavior of
+> IBRS (causing branch mispredictions) is only exhibited by certain
+> older parts. However, IBPB is now universally available, as it is
+> necessary to mitigate many speculative execution attacks. For Intel
+> documentation, see
+> https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/cpuid-enumeration-and-architectural-msrs.html.
 >
->Sure thing, this is why I released this syzbot report from my queue.
+> If you don't want to use these, you could train a branch to go one way
+> prior to measurement, and then arrange for the branch under test go
+> the other way.
+
+
+Thanks Jim. From my point of view, IBPB is still some kind of extended 
+feature which may be not supported on some older platforms. Considering 
+kvm-unit-tests could still be run on these old platforms, IBPB seems not 
+the best choice. I'm thinking an alternative way is to use the 'rdrand' 
+instruction to get a random value, and then call jmp instruction base on 
+the random value results. That would definitely cause branch misses. 
+This looks more generic.
+
+
 >
-
-Thanks for that ;-)
-
-Stefano
-
+>>>>>> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+>>>>>> ---
+>>>>>>     x86/pmu.c | 2 +-
+>>>>>>     1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/x86/pmu.c b/x86/pmu.c
+>>>>>> index 0def28695c70..7443fdab5c8a 100644
+>>>>>> --- a/x86/pmu.c
+>>>>>> +++ b/x86/pmu.c
+>>>>>> @@ -35,7 +35,7 @@ struct pmu_event {
+>>>>>>            {"instructions", 0x00c0, 10*N, 10.2*N},
+>>>>>>            {"ref cycles", 0x013c, 1*N, 30*N},
+>>>>>>            {"llc references", 0x4f2e, 1, 2*N},
+>>>>>> -       {"llc misses", 0x412e, 1, 1*N},
+>>>>>> +       {"llc misses", 0x412e, 0, 1*N},
+>>>>>>            {"branches", 0x00c4, 1*N, 1.1*N},
+>>>>>>            {"branch misses", 0x00c5, 0, 0.1*N},
+>>>>>>     }, amd_gp_events[] = {
+>>>>>> --
+>>>>>> 2.34.1
+>>>>>>
