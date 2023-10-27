@@ -2,138 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 485E57D9CE7
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 17:27:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D08D7D9D01
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 17:32:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346252AbjJ0P1k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 11:27:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39220 "EHLO
+        id S1346287AbjJ0Pcm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 11:32:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231690AbjJ0P1j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 11:27:39 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E97BAC;
-        Fri, 27 Oct 2023 08:27:37 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39RFRWKS020602;
-        Fri, 27 Oct 2023 15:27:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=aTofS//6lM+7vOdImDA4rxnNot16RvEWBnEbVQegqtE=;
- b=OkEvk8ZSe/eVkZtxonJ1CUi7Ypip6vRGcq8uGV3mEogA6GHdSPXztBhsaAAer6qhc6Ei
- s2B+ilOdagwVy53if+BNKabPiaONwd91DZhJfak6ZQJHZn2wunkYnbdKIuP3ERX4Rt2+
- sXkdh7tUr0b2OyX1ypiFtR3Zebzg3uynvyS75JZKR0PGI2uPONzAm5p4Z7NicTRWFv4x
- w6j01bluGDf8XhHBMqw58Z3fTd9ACiaxum1YHF+w7+htI5PeqXTKRXrvH7dRyVmxlvEO
- J8MvyXrSIAmEmUfTtvTyeBOGrN+bnUNGQ/tnOEGggTq5dszTXjqMvgMu0Uv5dyK02kLZ SQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u0fqb0bdg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Oct 2023 15:27:36 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39RFHddn017470;
-        Fri, 27 Oct 2023 15:27:35 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u0fqb0ahu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Oct 2023 15:27:33 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39RDP75T025010;
-        Fri, 27 Oct 2023 15:26:00 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tywqrww41-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Oct 2023 15:26:00 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-        by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39RFPwrv12518028
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Oct 2023 15:25:59 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A7F065805E;
-        Fri, 27 Oct 2023 15:25:58 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0019D58051;
-        Fri, 27 Oct 2023 15:25:57 +0000 (GMT)
-Received: from [9.61.163.200] (unknown [9.61.163.200])
-        by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 27 Oct 2023 15:25:57 +0000 (GMT)
-Message-ID: <7fe05c94-06ae-4e40-8894-95ad0b21a4a9@linux.ibm.com>
-Date:   Fri, 27 Oct 2023 11:25:57 -0400
+        with ESMTP id S231793AbjJ0Pcm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 11:32:42 -0400
+Received: from mail.alien8.de (mail.alien8.de [IPv6:2a01:4f9:3051:3f93::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E575BAC;
+        Fri, 27 Oct 2023 08:32:39 -0700 (PDT)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7920340E0171;
+        Fri, 27 Oct 2023 15:32:37 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+        header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+        by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id jDJHrcOMWMIw; Fri, 27 Oct 2023 15:32:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+        t=1698420755; bh=3t32flAh5iWCBkUsdkD01v2UC4zK48deLLcRD6aOnbw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=YKt6CdsI3PO1lX5N1mjnjjZSCJzMnDHyOgAny2v0TiCXURnvA3grQFg4ToXVP9lFm
+         rtLWYY0ZYIHMel93V4hJ/VgClXAtkmiWmVeEqy2TOLXylPe3Ew+Sv9C159d/HNLyCI
+         aUOUkJpIOOg37e+BFWqoeCYNgpOIFoYjf2pNpsX7AuquWdwGqpDVMvWXgOQrEC9485
+         wYa4nIiLei13lqfmjkb7zt5jmSbV7Gs8FAsbfHkpTEsE9j6SmLiZlwZuQVWlUZ2pkT
+         YYOn+oAmBQEacOnhYIYOaqhlCloOaZVGDoSJLflWQvAC0T0d8sD9rO95YQe5RyX+jz
+         aLB/owHRzjFNrqsmL5W4Zd7DcCNCEB84Xl1MtFFbM+MQqPOXyYaSspQ/i6/003cQ0G
+         lM8rFo93buBRR3osQ/9y3eQljKsth+RkEmtSCRqoUH1oJmYH75+R9lhaWWa7jCDNF3
+         AA72GoFOefMhDcgbphON0OFJlG7WfiegKw1iDKwTLcQGH7t0QrJ7csZ/rprLu7f54D
+         i5BElC++CHuaemJoKoDLbdeSfjhLP2n0mU7wGCf/ysZiUt4CucQ4G5is5OwrGEESae
+         av3BsHlxz+lZouQl378TovzqyGol621tBo1FppjQAlr/b3pmW1etHjspbV9MOkVJ29
+         H52Jj8z5domk9d3H6EcQ5mqI=
+Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+        (No client certificate requested)
+        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1F5A940E018F;
+        Fri, 27 Oct 2023 15:32:10 +0000 (UTC)
+Date:   Fri, 27 Oct 2023 17:32:03 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
+        ak@linux.intel.com, tim.c.chen@linux.intel.com,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        Nikolay Borisov <nik.borisov@suse.com>,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        antonio.gomez.iglesias@linux.intel.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alyssa Milburn <alyssa.milburn@intel.com>
+Subject: Re: [PATCH  v4 1/6] x86/bugs: Add asm helpers for executing VERW
+Message-ID: <20231027153203.GJZTvX84mr+63lVWIH@fat_crate.local>
+References: <20231027-delay-verw-v4-0-9a3622d4bcf7@linux.intel.com>
+ <20231027-delay-verw-v4-1-9a3622d4bcf7@linux.intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/3] s390/vfio-ap: set status response code to 06 on
- gisc registration failure
-Content-Language: en-US
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com,
-        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com, mjrosato@linux.ibm.com
-References: <20231026183250.254432-1-akrowiak@linux.ibm.com>
- <20231026183250.254432-3-akrowiak@linux.ibm.com>
- <20231027131904.165c7ad6.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <20231027131904.165c7ad6.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: xsa4torbGIfr5LiTVNH6-vM4L4Y433dc
-X-Proofpoint-GUID: nITYVzzeQ1SHCxO7Guegs83rVdJAUTLD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-27_13,2023-10-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
- malwarescore=0 adultscore=0 clxscore=1015 lowpriorityscore=0
- impostorscore=0 priorityscore=1501 spamscore=0 suspectscore=0
- mlxlogscore=921 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2310240000 definitions=main-2310270133
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231027-delay-verw-v4-1-9a3622d4bcf7@linux.intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 10/27/23 07:19, Halil Pasic wrote:
-> On Thu, 26 Oct 2023 14:32:44 -0400
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On Fri, Oct 27, 2023 at 07:38:40AM -0700, Pawan Gupta wrote:
+> MDS mitigation requires clearing the CPU buffers before returning to
+> user. This needs to be done late in the exit-to-user path. Current
+> location of VERW leaves a possibility of kernel data ending up in CPU
+> buffers for memory accesses done after VERW such as:
 > 
->> Since this scenario is very unlikely to happen and there is no status
->> response code to indicate an invalid ISC value, let's set the
-> 
-> Again invalid ISC won't happen except for hypervisor messes up.
+>   1. Kernel data accessed by an NMI between VERW and return-to-user can
+>      remain in CPU buffers ( since NMI returning to kernel does not
 
-Again, that is one of the checks performed by the kvm_s390_gisc_register
-function; however, I get your point and will remove reference in the 
-comment.
+Some leftover '('
 
+>      execute VERW to clear CPU buffers.
+>   2. Alyssa reported that after VERW is executed,
+>      CONFIG_GCC_PLUGIN_STACKLEAK=y scrubs the stack used by a system
+>      call. Memory accesses during stack scrubbing can move kernel stack
+>      contents into CPU buffers.
+>   3. When caller saved registers are restored after a return from
+>      function executing VERW, the kernel stack accesses can remain in
+>      CPU buffers(since they occur after VERW).
 > 
->> response code to 06 indicating 'Invalid address of AP-queue notification
->> byte'. While this is not entirely accurate, it is better than indicating
->> that the ZONE/GISA designation is invalid which is something the guest
->> can do nothing about since those values are set by the hypervisor.
+> To fix this VERW needs to be moved very late in exit-to-user path.
 > 
-> And more importantly AP_RESPONSE_INVALID_GISA is not valid for G2 in
-> the given scenario, since G2 is not trying to set up interrupts on behalf
-> of the G3 with a G3 GISA, but G2 is trying to set up interrupts for
-> itself. And then AP_RESPONSE_INVALID_GISA is architecturally simply not
-> a valid RC!
+> In preparation for moving VERW to entry/exit asm code, create macros
+> that can be used in asm. Also make them depend on a new feature flag
+> X86_FEATURE_CLEAR_CPU_BUF.
 
-Got it.
+The macros don't depend on the feature flag - VERW patching is done
+based on it.
 
-> 
->>
->> Signed-off-by: Anthony Krowiak <akrowiak@linux.ibm.com>
->> Suggested-by: Halil Pasic <pasic@linux.ibm.com>
-> 
-> Except for the explanation in the commit message, the patch is good. It
-> is up to you if you want to fix the commit message or not.
-> 
+> @@ -20,3 +23,17 @@ SYM_FUNC_END(entry_ibpb)
+>  EXPORT_SYMBOL_GPL(entry_ibpb);
+>  
+>  .popsection
+> +
+> +.pushsection .entry.text, "ax"
+> +
+> +.align L1_CACHE_BYTES, 0xcc
+> +SYM_CODE_START_NOALIGN(mds_verw_sel)
 
-I'll fix the commit message.
+That weird thing needs a comment explaining what it is for.
 
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+> +	UNWIND_HINT_UNDEFINED
+> +	ANNOTATE_NOENDBR
+> +	.word __KERNEL_DS
+> +.align L1_CACHE_BYTES, 0xcc
+> +SYM_CODE_END(mds_verw_sel);
+> +/* For KVM */
+> +EXPORT_SYMBOL_GPL(mds_verw_sel);
+> +
+> +.popsection
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> index 58cb9495e40f..f21fc0f12737 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -308,10 +308,10 @@
+>  #define X86_FEATURE_SMBA		(11*32+21) /* "" Slow Memory Bandwidth Allocation */
+>  #define X86_FEATURE_BMEC		(11*32+22) /* "" Bandwidth Monitoring Event Configuration */
+>  #define X86_FEATURE_USER_SHSTK		(11*32+23) /* Shadow stack support for user mode applications */
+> -
+>  #define X86_FEATURE_SRSO		(11*32+24) /* "" AMD BTB untrain RETs */
+>  #define X86_FEATURE_SRSO_ALIAS		(11*32+25) /* "" AMD BTB untrain RETs through aliasing */
+>  #define X86_FEATURE_IBPB_ON_VMEXIT	(11*32+26) /* "" Issue an IBPB only on VMEXIT */
+> +#define X86_FEATURE_CLEAR_CPU_BUF	(11*32+27) /* "" Clear CPU buffers */
+
+									   ... using VERW
+
+>  
+>  /* Intel-defined CPU features, CPUID level 0x00000007:1 (EAX), word 12 */
+>  #define X86_FEATURE_AVX_VNNI		(12*32+ 4) /* AVX VNNI instructions */
+> diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+> index c55cc243592e..005e69f93115 100644
+> --- a/arch/x86/include/asm/nospec-branch.h
+> +++ b/arch/x86/include/asm/nospec-branch.h
+> @@ -329,6 +329,21 @@
+>  #endif
+>  .endm
+>  
+> +/*
+> + * Macros to execute VERW instruction that mitigate transient data sampling
+> + * attacks such as MDS. On affected systems a microcode update overloaded VERW
+> + * instruction to also clear the CPU buffers. VERW clobbers CFLAGS.ZF.
+> + *
+> + * Note: Only the memory operand variant of VERW clears the CPU buffers.
+> + */
+> +.macro EXEC_VERW
+> +	verw _ASM_RIP(mds_verw_sel)
+> +.endm
+> +
+> +.macro CLEAR_CPU_BUFFERS
+> +	ALTERNATIVE "", __stringify(EXEC_VERW), X86_FEATURE_CLEAR_CPU_BUF
+> +.endm
+
+Why can't this simply be:
+
+.macro CLEAR_CPU_BUFFERS
+        ALTERNATIVE "", "verw mds_verw_sel(%rip)", X86_FEATURE_CLEAR_CPU_BUF
+.endm
+
+without that silly EXEC_VERW macro?
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
