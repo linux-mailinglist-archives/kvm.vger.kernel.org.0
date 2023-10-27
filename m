@@ -2,71 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 403477D9505
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 12:17:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AC6E7D9531
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 12:25:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345616AbjJ0KRl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 06:17:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55932 "EHLO
+        id S1345592AbjJ0KZo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 06:25:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231487AbjJ0KRk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 06:17:40 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D187818A;
-        Fri, 27 Oct 2023 03:17:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698401858; x=1729937858;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ovH31mpxEu8DVpROwawryGv3U0nz8LD/NUhAxN46fTI=;
-  b=nYLUaBL/5Ko63rNcACQmm92qAGS8FqJngptzfnjJ4MrR0CuflOtuhcbe
-   HuCpg08E3Ixxz43PS6NUeRJuWsTwIZxOdeejpEOCPg0OfHiC9/FH4boji
-   o9YFHCmathUNvXYNdm+gA6ASwCwJZvuxyiC1MTmKMTvv02CPO8tmgXDRm
-   T1GhVIvgoqKc0wSKSSY3KwP+WGgZRV4Cm62wIieGqjD2LBmu9DOdIAzeD
-   8uy4McYUx3a+F3Qud9xqBEC79P2lYFJ3BZnK0/2yoxL6GYmPkaE+i8uOS
-   sex1kvFQXk5rhBKjdT7u4MNjo2eXmSKGyyEMuSgamp9j7CEIrU6UAjOFV
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10875"; a="367958824"
-X-IronPort-AV: E=Sophos;i="6.03,255,1694761200"; 
-   d="scan'208";a="367958824"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 03:17:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,255,1694761200"; 
-   d="scan'208";a="7609778"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.26.29]) ([10.93.26.29])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 03:17:22 -0700
-Message-ID: <a2483e6e-c5fe-4604-9aaa-db2a1df8fa77@linux.intel.com>
-Date:   Fri, 27 Oct 2023 18:17:32 +0800
+        with ESMTP id S231345AbjJ0KZm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 06:25:42 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 931D610E
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 03:25:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=bjDgEQIvSDvOlYUvUIOtNjrwwS43zDdeaGfViAKqfDo=; b=TRQ6LKCVEU2oENLTpxJYhEJhOe
+        VbWY5sCPWyEU30lVNFynsWRV0LqfGfInXHT02qx5M9FNq6qZKkOyqf/NFbXkPAyt7cx7eQTIIwovg
+        /yjCKXHFGYvl6/EMI7KbE4XheFc0OmMFl5mRscPyyAK5M9J1gngdfry4V8Q9Yt8vq/u5uuzJdbW5L
+        S3t++PkirgODgbbFeJVfLB4zUw8EwO7PLBclEydtxmBwY+RvrhkQrFL34fQ3nxRQD6oUfHYlMH6/f
+        6ut9GXE51VSkY7gn74fySZgE1HY1KhNpIkqUm/JeMp5O6lVEhpncbiQQ9pttCdwz2OERoRPzA/nXT
+        LjGITn3Q==;
+Received: from [2001:8b0:10b:5:a059:f7a9:933a:2236] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qwK1d-002s8D-IJ; Fri, 27 Oct 2023 10:25:09 +0000
+Message-ID: <b6458e730fd861243f534e33a48a857122e77ed5.camel@infradead.org>
+Subject: Re: [PATCH v3 13/28] hw/xen: automatically assign device index to
+ block devices
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     paul@xen.org, qemu-devel@nongnu.org
+Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau 
+        <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Jason Wang <jasowang@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-block@nongnu.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+        Bernhard Beschow <shentey@gmail.com>,
+        Joel Upham <jupham125@gmail.com>
+Date:   Fri, 27 Oct 2023 11:25:08 +0100
+In-Reply-To: <9fb67e52-f262-4cf4-91c2-a42411ba21c4@gmail.com>
+References: <20231025145042.627381-1-dwmw2@infradead.org>
+         <20231025145042.627381-14-dwmw2@infradead.org>
+         <74e54da5-9c35-485d-a13c-efac3f81dec2@gmail.com>
+         <f72e2e7feed3ecf17af8ab8442c359eea329ef17.camel@infradead.org>
+         <9fb67e52-f262-4cf4-91c2-a42411ba21c4@gmail.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-VAZZmWjpnP+rAAS6AMba"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests Patch 2/5] x86: pmu: Change the minimum value of
- llc_misses event to 0
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>
-References: <20231024075748.1675382-1-dapeng1.mi@linux.intel.com>
- <20231024075748.1675382-3-dapeng1.mi@linux.intel.com>
- <CALMp9eRqGr+5+C1OLhxv1i8Q=YVRmFxkZQJoh7HzWkPg2z=WoA@mail.gmail.com>
- <6132ba52-fdf1-4680-9e4e-5ea2fcb63b3c@linux.intel.com>
- <CALMp9eSX6OL9=9sgnKpNgRtuTV93A=G=u-5qT1_rpKFjL-dBNw@mail.gmail.com>
- <99684975-6317-4233-b87b-14ca731b335a@linux.intel.com>
- <CALMp9eRdiyHQjiSRufKvBLHhXQ9LgTpNO8djETZ9tSYZR_FBFg@mail.gmail.com>
-From:   "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <CALMp9eRdiyHQjiSRufKvBLHhXQ9LgTpNO8djETZ9tSYZR_FBFg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -74,84 +69,137 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 10/26/2023 8:19 PM, Jim Mattson wrote:
-> On Wed, Oct 25, 2023 at 7:14 PM Mi, Dapeng <dapeng1.mi@linux.intel.com> wrote:
->>
->> On 10/25/2023 8:35 PM, Jim Mattson wrote:
->>> On Wed, Oct 25, 2023 at 4:23 AM Mi, Dapeng <dapeng1.mi@linux.intel.com> wrote:
->>>> On 10/24/2023 9:03 PM, Jim Mattson wrote:
->>>>> On Tue, Oct 24, 2023 at 12:51 AM Dapeng Mi <dapeng1.mi@linux.intel.com> wrote:
->>>>>> Along with the CPU HW's upgrade and optimization, the count of LLC
->>>>>> misses event for running loop() helper could be 0 just like seen on
->>>>>> Sapphire Rapids.
->>>>>>
->>>>>> So modify the lower limit of possible count range for LLC misses
->>>>>> events to 0 to avoid LLC misses event test failure on Sapphire Rapids.
->>>>> I'm not convinced that these tests are really indicative of whether or
->>>>> not the PMU is working properly. If 0 is allowed for llc misses, for
->>>>> instance, doesn't this sub-test pass even when the PMU is disabled?
->>>>>
->>>>> Surely, we can do better.
->>>> Considering the testing workload is just a simple adding loop, it's
->>>> reasonable and possible that it gets a 0 result for LLC misses and
->>>> branch misses events. Yeah, I agree the 0 count makes the results not so
->>>> credible. If we want to avoid these 0 count values, we may have to
->>>> complicate the workload, such as adding flush cache instructions, or
->>>> something like that (I'm not sure if there are instructions which can
->>>> force branch misses). How's your idea about this?
->>> CLFLUSH is probably a good way to ensure cache misses. IBPB may be a
->>> good way to ensure branch mispredictions, or IBRS on parts without
->>> eIBRS.
->>
->> Thanks Jim for the information. I'm not familiar with IBPB/IBRS
->> instructions, but just a glance, it looks there two instructions are
->> some kind of advanced instructions,  Not all Intel CPUs support these
->> instructions and not sure if AMD has similar instructions. It would be
->> better if there are more generic instruction to trigger branch miss.
->> Anyway I would look at the details and come back again.
-> IBPB and IBRS are not instructions. IBPB (indirect branch predictor
-> barrier) is triggered by setting bit 0 of the IA32_PRED_CMD MSR. IBRS
-> (indirect branch restricted speculation) is triggered by setting bit 0
-> of the IA32_SPEC_CTRL MSR. It is true that the desired behavior of
-> IBRS (causing branch mispredictions) is only exhibited by certain
-> older parts. However, IBPB is now universally available, as it is
-> necessary to mitigate many speculative execution attacks. For Intel
-> documentation, see
-> https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/cpuid-enumeration-and-architectural-msrs.html.
->
-> If you don't want to use these, you could train a branch to go one way
-> prior to measurement, and then arrange for the branch under test go
-> the other way.
+--=-VAZZmWjpnP+rAAS6AMba
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, 2023-10-27 at 10:01 +0100, Durrant, Paul wrote:
+>=20
+> This code is allocating a name automatically so I think the onus is on=
+=20
+> it not create a needless clash which is likely to have unpredictable=20
+> results depending on what the guest is. Just avoid any aliasing in the=
+=20
+> first place and things will be fine.
 
 
-Thanks Jim. From my point of view, IBPB is still some kind of extended 
-feature which may be not supported on some older platforms. Considering 
-kvm-unit-tests could still be run on these old platforms, IBPB seems not 
-the best choice. I'm thinking an alternative way is to use the 'rdrand' 
-instruction to get a random value, and then call jmp instruction base on 
-the random value results. That would definitely cause branch misses. 
-This looks more generic.
+Yeah, fair enough. In which case I'll probably switch to using
+xs_directory() and then processing those results to find a free slot,
+instead of going out to XenStore for every existence check.
+
+This isn't exactly fast path and I'm prepared to tolerate a little bit
+of O(n=C2=B2), but only within reason :)
+
+--=-VAZZmWjpnP+rAAS6AMba
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMDI3MTAyNTA4WjAvBgkqhkiG9w0BCQQxIgQgq5nRYNiS
+MbunRK5008ItBGQvZJti/nFL1hPSb+5jPl4wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCP2pKgi5ubkFqN7jBu7O6mogs190OG8MQz
+h6IMtYOCUiyhcRlBdsVhZZDRDOsqbujpqfKsfue9gWZu/AtoAD7V7jkIbbU3gL0s3sCrHoksOjiN
+8aLNC2ppLd36Vq96PDVWLxmt5d7JfXhyjDHeUryYIYpk0Uk2TbqpNpxeb3XSE9n+p0q5OmVITZpd
+ClSgB/dxBaldLuFgIZS1SXGI4XofL1d0V7JC3pZ3WNF0a+p51FUhhOUgMdTF8coqx0/YfyYPkBpb
+ryr8LIycdA5BxxTY1PEJJSU3YAJX9U2z1NPB73oP0n9avl93GKx+lA8PEXE1g2JqdWCY+Bbicr8J
+9jwC2RTPP5G+KuzqjusPz0NGr9xmYV+LsTRNKIj6iPwmTx4vuM3TYP5+ioDyklhxOAANCiwoy/ET
+YBoYWD8VKEqBYHwAGsPJQ/cnVV577Kmj1NrZ3+E0I2qIrHzrj3FPMzY6F/bWv1oar6kQ7pUVXnMI
+w/DyYXJCIDcl1GIQjKT4yI8O4DHo6wWgIh/+NitIygpU9oadDISVZrJXv8Wyv5U9WRzTU0tyVizx
+PRkEB2FlM22xc146G3KjyfT3twpDRMLOWtoTVTlwS/2z+rgFU09CEjV/NzL1vVTW7TouuZqwgow+
+DfcN5ZkMTyNU18SPy1/MyDmjx6LoIGeNM9RiF+jD+wAAAAAAAA==
 
 
->
->>>>>> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
->>>>>> ---
->>>>>>     x86/pmu.c | 2 +-
->>>>>>     1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/x86/pmu.c b/x86/pmu.c
->>>>>> index 0def28695c70..7443fdab5c8a 100644
->>>>>> --- a/x86/pmu.c
->>>>>> +++ b/x86/pmu.c
->>>>>> @@ -35,7 +35,7 @@ struct pmu_event {
->>>>>>            {"instructions", 0x00c0, 10*N, 10.2*N},
->>>>>>            {"ref cycles", 0x013c, 1*N, 30*N},
->>>>>>            {"llc references", 0x4f2e, 1, 2*N},
->>>>>> -       {"llc misses", 0x412e, 1, 1*N},
->>>>>> +       {"llc misses", 0x412e, 0, 1*N},
->>>>>>            {"branches", 0x00c4, 1*N, 1.1*N},
->>>>>>            {"branch misses", 0x00c5, 0, 0.1*N},
->>>>>>     }, amd_gp_events[] = {
->>>>>> --
->>>>>> 2.34.1
->>>>>>
+--=-VAZZmWjpnP+rAAS6AMba--
