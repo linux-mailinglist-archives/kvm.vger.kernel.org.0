@@ -1,149 +1,143 @@
-Return-Path: <kvm+bounces-1-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 631AA7DA2A6
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 23:50:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BD987DA395
+	for <lists+kvm@lfdr.de>; Sat, 28 Oct 2023 00:37:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B29A2826AB
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 21:50:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CDDE1C21210
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 22:37:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EBA93FE56;
-	Fri, 27 Oct 2023 21:50:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E007405FA;
+	Fri, 27 Oct 2023 22:37:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EUetufBG"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="siuBEOaT"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB95C3FE47
-	for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 21:50:45 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 646911BF;
-	Fri, 27 Oct 2023 14:50:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698443444; x=1729979444;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=q0l5J06L+fGQuohPoGhoWajD8slOcVWBDrKfXyDllH4=;
-  b=EUetufBGsxFpC8wsPIW8mYFGo6AgMWKZ1Vhoyr/ExOK2h2A0FA6FWHvi
-   WlTdNJK9CG4ZNnXBwfK+FBmn/5O2klwuSk3GkrYCN9aMSyPnKqCoTf/Zp
-   qeGRW9q67e8osSWfHCeKDhS8+sqqmydk0AHDZ8oY7YwLPEWxswhu/QRzy
-   SNQ95t31Iv83vtCZIaSlct1HZSVjWLPLzE2N6+xqqo4orALP/xZne+1kC
-   nRNdPsKRM9s0slGjzYH9uSXMnOxovYkahx1S6iNReXVorQPc6jB8j7P6X
-   BNqtdAJkkyfIYQt2UOBlgOWXddexEklVKnTgHohvPoqjvJK10/av+u9lz
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10876"; a="387667408"
-X-IronPort-AV: E=Sophos;i="6.03,257,1694761200"; 
-   d="scan'208";a="387667408"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 14:50:43 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10876"; a="903394108"
-X-IronPort-AV: E=Sophos;i="6.03,257,1694761200"; 
-   d="scan'208";a="903394108"
-Received: from hannahwo-mobl1.amr.corp.intel.com (HELO [10.209.35.60]) ([10.209.35.60])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 14:48:12 -0700
-Message-ID: <9fe968f0-cf38-4abf-b01c-5591c97ec886@intel.com>
-Date: Fri, 27 Oct 2023 14:50:41 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE8F405EA
+	for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 22:37:09 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2072.outbound.protection.outlook.com [40.107.94.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFFB81A5;
+	Fri, 27 Oct 2023 15:37:07 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CxmEBNTop/0I2G/teClcSO54+Sy/77Q2px5PkI6vSfOVhmofmGx+KPu31jau/ZIUdbCfeiLpfe7jX3Y/0Laiz51qGi7gxr7wCY6Bkh1KSCVUeoPPbuezw2rkh3I/8Mh8TYPn4t2fPQtCA5GfMmMP9Qn9fnudDI9MkrVIcV8DPxZDgNZenws/y67teurkGPM9c8TDPiQxF356iymUVukvYh9alTyD/WfR7rWDfgabGsVzJ1WSIHHzeMig8GbZSlJ3gINd25CynXT3OnVWEwRnworlC1JoxBgCyw6KO4MZswmnJdis/XlPzx8NyildPBuFp4h1KjvCZC1BChjxbqPXzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0BqHflw6gvRp3mIlubCrQJK0lU+Nu+vtISWSgsOEHCA=;
+ b=IfFPRRTXYNKRieiyuiifMzLd2Jn6GqxtCWdvr+1gGkfWni1f1T5I3AMbq4ESXs0L1tmnYeE3e89yNbO58vFrj87v7dFtem0ALqF1MzPAljXYnCbEI1baTwvIy6ofQFM6I6+INXj/BMm8BBqpRxtFtgX6aUgetJylnrUjwznbYQ5TjwcnRK5u7ddxcHfRTvUEE08a+5vRzaqCc5/RocK375+MAKBJTJILKujh9QTWpv+0mm73lQGgyCkaGSZGKXmhrtL5MCtFJFh8ks2q+Qi8Vy4bTNoggwSoc46O6hAy970lyTE1J/czGgxLF56s2lMa2jaLUhU9A9mD8vTCKEkrQg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=ziepe.ca smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0BqHflw6gvRp3mIlubCrQJK0lU+Nu+vtISWSgsOEHCA=;
+ b=siuBEOaTi1Jwy11xJryAJL3ZTDZhb7pDPMDC7PSfawYcukaOIXNV9NDfH9ToSMYXLO8u/neR60AmJ2mrPTRh5r3BfbpHU8xOIE/K/0gXcKfJY8TUEh/XCo1vLQwv6CR0HUYEuA2j2NojmHF1S9e4LPHwBtZqchUTQ3wplv4W28Y=
+Received: from MN2PR16CA0030.namprd16.prod.outlook.com (2603:10b6:208:134::43)
+ by SA0PR12MB4447.namprd12.prod.outlook.com (2603:10b6:806:9b::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.24; Fri, 27 Oct
+ 2023 22:37:03 +0000
+Received: from BL6PEPF0001AB50.namprd04.prod.outlook.com
+ (2603:10b6:208:134:cafe::ec) by MN2PR16CA0030.outlook.office365.com
+ (2603:10b6:208:134::43) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.27 via Frontend
+ Transport; Fri, 27 Oct 2023 22:37:03 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL6PEPF0001AB50.mail.protection.outlook.com (10.167.242.74) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6933.15 via Frontend Transport; Fri, 27 Oct 2023 22:37:03 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Fri, 27 Oct
+ 2023 17:37:02 -0500
+From: Brett Creeley <brett.creeley@amd.com>
+To: <jgg@ziepe.ca>, <yishaih@nvidia.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+	<alex.williamson@redhat.com>, <dan.carpenter@linaro.org>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<brett.creeley@amd.com>, <shannon.nelson@amd.com>
+Subject: [PATCH v3 vfio 0/3] pds/vfio: Fixes for locking bugs
+Date: Fri, 27 Oct 2023 15:36:48 -0700
+Message-ID: <20231027223651.36047-1-brett.creeley@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 05/50] x86/speculation: Do not enable Automatic IBRS
- if SEV SNP is enabled
-Content-Language: en-US
-To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
- thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
- pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
- jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
- slp@redhat.com, pgonda@google.com, peterz@infradead.org,
- srinivas.pandruvada@linux.intel.com, rientjes@google.com,
- dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz,
- kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
- marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
- alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
- nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
- zhi.a.wang@intel.com, Kim Phillips <kim.phillips@amd.com>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-6-michael.roth@amd.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20231016132819.1002933-6-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB50:EE_|SA0PR12MB4447:EE_
+X-MS-Office365-Filtering-Correlation-Id: e9d1ce0a-7159-41ff-067e-08dbd73d3dfb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	0tYqK7rjzsTzFcQ8ul70FZR86qVmQGPkwlAoJCwsHZFA1xYgDR2e8fyghq/2JQA31vLe2ESDWnOmKRp6W5eIfhFIG/2HoJBK8FXRJhE1oxniLXLPLfOjQBWWAGr0kOZk/ojlFCeVLZ02xS07UYxSTC0TUNTvnS49rFaditaYRYM7+iTQYPMoQujY4AAMdjX0JqEjThWoiFGhUZW9UDZKsMWvaobLhZpZnF/mUvNicvOSFYHN7q6RbOD5SBjCpSM07+3QLep9JhSXVWkUQ3wEmpyOEt0CAIzKnMWj3BvFgeUF2yIabcmHVLg/Vs8PnxFIRgnJ8lfvTvbsWM/9L5HH+fNdof0GIcNUGED1JHmwskMlzyJIxW3F+8QentDmAsvSsfDg6kMn9wf3MkuPFyXC+pdQJMXKZ+ZbITBOhBFftBPS08DeknOjaMeg1OJszwmhv6TwGjAInzh0UsHWk4zS6HrNpz72A8NxmZyRq793pFKY8cTuryeZp4NxZroLd/cRbNRuGjfC/1ZfFtIfnMmaZgZR1jcrQCiqXOl5JQZEbnCKfdLl737a+jcKY37KbbJv/+fJPARmTaS0RA1cVjxSaiP3KYMUX9ztc9mskH+qkf+xnFQlsZE3bYHMXCMaTW22FDxSZpFzud6yPWHKCaWfMUyMfEknTQS2O7QDGWUuQDm0qYr+YbeBgyI/s0D+yMyn2zBPw4vMHKgupPOhYO0mYybG7WEzEzMdrPg3Eeg+GMin0fbPD+jnxZZWORryEKErxqrKgQPRNVr7lEN7EQeiGanquYE5eMChsdWFYdHVcXf2dlwl0G/bt2HBD4C6YHpfhymsrq1eB51zjwGeljBCTg==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(376002)(346002)(396003)(230922051799003)(230173577357003)(230273577357003)(1800799009)(186009)(82310400011)(64100799003)(451199024)(46966006)(40470700004)(36840700001)(47076005)(40480700001)(36860700001)(70206006)(70586007)(110136005)(966005)(478600001)(316002)(54906003)(8676002)(4326008)(8936002)(5660300002)(6666004)(2616005)(86362001)(44832011)(2906002)(82740400003)(41300700001)(40460700003)(336012)(26005)(426003)(16526019)(1076003)(356005)(81166007)(83380400001)(36756003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2023 22:37:03.5426
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9d1ce0a-7159-41ff-067e-08dbd73d3dfb
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB50.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4447
 
-On 10/16/23 06:27, Michael Roth wrote:
-> Without SEV-SNP, Automatic IBRS protects only the kernel. But when
-> SEV-SNP is enabled, the Automatic IBRS protection umbrella widens to all
-> host-side code, including userspace. This protection comes at a cost:
-> reduced userspace indirect branch performance.
-> 
-> To avoid this performance loss, don't use Automatic IBRS on SEV-SNP
-> hosts. Fall back to retpolines instead.
+This series contains fixes for locking bugs in the recently introduced
+pds-vfio-pci driver. There was an initial bug reported by Dan Carpenter
+at:
 
-Thanks for the updated changelog:
+https://lore.kernel.org/kvm/1f9bc27b-3de9-4891-9687-ba2820c1b390@moroto.mountain/
 
-Acked-by: Dave Hansen <dave.hansen@intel.com>
+However, more locking bugs were found when looking into the previously
+mentioned issue. So, all fixes are included in this series.
 
-BTW, have you given your hardware folks a hard time about this?  It
-seems _kinda_ silly to be using retpolines when the hardware has a
-perfectly good IBRS implementation for the kernel.
+v3:
+- Change reset lock from spinlock to mutex
 
-Just please make sure there's a good underlying reason for this behavior
-and as opposed to being some kind of inadvertent side effect.
+v2:
+https://lore.kernel.org/kvm/20231011230115.35719-1-brett.creeley@amd.com/
+- Trim the OOPs in the patch commit messages
+- Rework patch 3/3 to only unlock the spinlock once
+- Destroy the state_mutex in the driver specific vfio_device_ops.release
+  callback
 
-I assume Auto-IBRS and SEV-SNP are going to be with us for a long time,
-so it would be nice to have a long term solution here.
+v1:
+https://lore.kernel.org/kvm/20230914191540.54946-1-brett.creeley@amd.com/
+
+Brett Creeley (3):
+  pds/vfio: Fix spinlock bad magic BUG
+  pds/vfio: Fix mutex lock->magic != lock warning
+  pds/vfio: Fix possible sleep while in atomic context
+
+ drivers/vfio/pci/pds/pci_drv.c  |  4 ++--
+ drivers/vfio/pci/pds/vfio_dev.c | 30 +++++++++++++++++++++---------
+ drivers/vfio/pci/pds/vfio_dev.h |  2 +-
+ 3 files changed, 24 insertions(+), 12 deletions(-)
+
+-- 
+2.17.1
+
 
