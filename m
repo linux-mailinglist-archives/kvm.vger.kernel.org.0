@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D80977DA025
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 20:24:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 757FC7DA02A
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 20:24:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346380AbjJ0SYX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 14:24:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36386 "EHLO
+        id S235181AbjJ0SY2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 14:24:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346561AbjJ0SXs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 14:23:48 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5978A19AC
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 11:23:04 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a7b53a48e5so20850557b3.1
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 11:23:04 -0700 (PDT)
+        with ESMTP id S235163AbjJ0SXw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 14:23:52 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5F501BC8
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 11:23:06 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cc281f1214so4820825ad.2
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 11:23:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698430981; x=1699035781; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1698430983; x=1699035783; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=QVHGnajj4HOCkrhgrdEXP5z3IZ3KkliWY6Z9SNVyio0=;
-        b=afzTdDPGnR5/HEu+93/RDsiIpfQHiVzu25BF9nT/3rXX06eZXTFvLAKsA99ZOq+cgk
-         wbiy+Lwq62Sz7q4lDicIke/0kQRydNxe17fDkPYEuijhK6AGt4y9AkRdkHgZjTb6Hu80
-         wc2Sbv6i54ULJbZE9QJG1orQZtFFM7sCcXzoJxw1rDKxX/DhiD9/Z5xeqcMWQxnhWUuB
-         S1I9DXwKmlfURezY7jU3Y/bs1AEb8x7QTm4/NOIkYebqeUiFpAL4jcwAyoUs8j3Nuksw
-         LBiLrPVEdwUwQSQdjjw2MTvfvhJ3haqOv4qNQxufbbZDx4gLoGohl/j5ty9egK3c48dH
-         o+9A==
+        bh=X28f2VSZ9uWGkcVQfgyyaL29edWIecAA+BgvPUM1/nQ=;
+        b=TAsoyKwQrRhBkC2T0BV9UzlM42kysMX9+ACqmd/QXr1ijh4RLJ1VlJ4hQPZ4OoCnoP
+         nbCZYhY6pekvlLoUCyZzAwSa+yMc1r43rJfCUAkFISwOFZGHtBAGnEcZa02h/8wBwJdx
+         jSrpIw1Kf0BksuhGm6AkW1SBhu460Fukx/mJT79P4oAo+yp88qo3Bx+q6fn13Zixczmv
+         bT3sGPjIm5mhwuwIz88+7+mCTJmQ/nnl5aiv/qhMojHS9SHHhTZ2DnajDqD5h8uBX8V8
+         l6DnOXn656nXWd1FKXoRCbrVr+m2oqTQ9B+oMX0yOUdPnYAe4dCLtk6BYZW/7PjKBCdh
+         yrJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698430981; x=1699035781;
+        d=1e100.net; s=20230601; t=1698430983; x=1699035783;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=QVHGnajj4HOCkrhgrdEXP5z3IZ3KkliWY6Z9SNVyio0=;
-        b=obrmFpsoT5Ay+KDE/TyvIQ/2RCC+TuPtnTIBF8YNLBPu03R7wgHYxvJFEaif2ysQLM
-         aA92VS75sopNxmEzrJkufIwZ2DPpNvwN/MpaORYLX0JPsStzzPHb8S0SS3/EicCsWAbm
-         E4xM/F42sbpzb9aS2IqZT4vZIy3B5sK6jPGniR91/HTSEBXIcK+uAjzL/JsRoruCo4vq
-         S1mIfc8wETjO7rPfLnDPHCkESDsVSHZx82ph7IluIt2Cwfm0x0t4LIJ+h0ZtrNF0DK0v
-         5QbXZTLETamjJ/GO5sGrZ5nxuP36a6Ij1r/uKke0KZJR+keE3eQpt3jhxytY6cvllAIB
-         +BFw==
-X-Gm-Message-State: AOJu0YwWCjV1XdqBPqr4viIX8zLQEZEL9+yT3oB1tEoPsTLj5RODUEtd
-        3O9GW1FRu0KKyiKTuTbE474y8Q9V0pI=
-X-Google-Smtp-Source: AGHT+IGhdcD7DYxvJo53MxSFMcue6wHqMJ/dJKXwjBlyW/fIhxTWfdSD8wIFRBeoqz4UflCFK1Su3DgQ67Q=
+        bh=X28f2VSZ9uWGkcVQfgyyaL29edWIecAA+BgvPUM1/nQ=;
+        b=o3x5qLFMHfaG1VqnldQlABBW2F+Qd0ZTpak0YW123R/L+IgdEk0NeeqRkCd6/EBEC/
+         koswb1GCEKLB5C599/9NEfit4nRNLlrEf5aqylwSLPc6I2UTKBfldhZUdP1gFN+8CT1t
+         TnKBszICs1YdWxi+2Q1BbAzjAujqCRMEoFTrqzJ7eO+Nha3jUsAKzAY3zD3qGyGw1IoK
+         gyhOb2+nlJp18rkZ3+ID4OwDI1UN9+I1DwqahfgeCapkbnY5yfjvpaof+c4WrG8QOyLz
+         +ilM2Hme9LBYWJYGwu1xvIEiRpDgaQSm4EPUjT6s7BlVS4LlA7PZSEkvCCdpIvHf/J0/
+         VVlg==
+X-Gm-Message-State: AOJu0YwJPKU7OcZRj7PXUXT15FnaS+kBAHITQYFRZfHrY9iuVc+5K1J6
+        t9TK8MyxP58ALGn/7ZwpOjrHmvPyq8A=
+X-Google-Smtp-Source: AGHT+IERP39eT1EKIW0o0w4FIDOku618XMvV1N7KQCMi55hnYoVKlxflcru5UfA66foRhtHASvLd2ndsc5U=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1083:b0:da0:567d:f819 with SMTP id
- v3-20020a056902108300b00da0567df819mr78702ybu.10.1698430981246; Fri, 27 Oct
- 2023 11:23:01 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:d4cc:b0:1cc:1900:28d7 with SMTP id
+ o12-20020a170902d4cc00b001cc190028d7mr82404plg.12.1698430983359; Fri, 27 Oct
+ 2023 11:23:03 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 27 Oct 2023 11:22:00 -0700
+Date:   Fri, 27 Oct 2023 11:22:01 -0700
 In-Reply-To: <20231027182217.3615211-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20231027182217.3615211-1-seanjc@google.com>
 X-Mailer: git-send-email 2.42.0.820.g83a721a137-goog
-Message-ID: <20231027182217.3615211-19-seanjc@google.com>
-Subject: [PATCH v13 18/35] KVM: x86: "Reset" vcpu->run->exit_reason early in KVM_RUN
+Message-ID: <20231027182217.3615211-20-seanjc@google.com>
+Subject: [PATCH v13 19/35] KVM: x86: Disallow hugepages when memory attributes
+ are mixed
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
@@ -98,58 +99,244 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Initialize run->exit_reason to KVM_EXIT_UNKNOWN early in KVM_RUN to reduce
-the probability of exiting to userspace with a stale run->exit_reason that
-*appears* to be valid.
+From: Chao Peng <chao.p.peng@linux.intel.com>
 
-To support fd-based guest memory (guest memory without a corresponding
-userspace virtual address), KVM will exit to userspace for various memory
-related errors, which userspace *may* be able to resolve, instead of using
-e.g. BUS_MCEERR_AR.  And in the more distant future, KVM will also likely
-utilize the same functionality to let userspace "intercept" and handle
-memory faults when the userspace mapping is missing, i.e. when fast gup()
-fails.
+Disallow creating hugepages with mixed memory attributes, e.g. shared
+versus private, as mapping a hugepage in this case would allow the guest
+to access memory with the wrong attributes, e.g. overlaying private memory
+with a shared hugepage.
 
-Because many of KVM's internal APIs related to guest memory use '0' to
-indicate "success, continue on" and not "exit to userspace", reporting
-memory faults/errors to userspace will set run->exit_reason and
-corresponding fields in the run structure fields in conjunction with a
-a non-zero, negative return code, e.g. -EFAULT or -EHWPOISON.  And because
-KVM already returns  -EFAULT in many paths, there's a relatively high
-probability that KVM could return -EFAULT without setting run->exit_reason,
-in which case reporting KVM_EXIT_UNKNOWN is much better than reporting
-whatever exit reason happened to be in the run structure.
+Tracking whether or not attributes are mixed via the existing
+disallow_lpage field, but use the most significant bit in 'disallow_lpage'
+to indicate a hugepage has mixed attributes instead using the normal
+refcounting.  Whether or not attributes are mixed is binary; either they
+are or they aren't.  Attempting to squeeze that info into the refcount is
+unnecessarily complex as it would require knowing the previous state of
+the mixed count when updating attributes.  Using a flag means KVM just
+needs to ensure the current status is reflected in the memslots.
 
-Note, KVM must wait until after run->immediate_exit is serviced to
-sanitize run->exit_reason as KVM's ABI is that run->exit_reason is
-preserved across KVM_RUN when run->immediate_exit is true.
-
-Link: https://lore.kernel.org/all/20230908222905.1321305-1-amoorthy@google.com
-Link: https://lore.kernel.org/all/ZFFbwOXZ5uI%2Fgdaf@google.com
+Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+Co-developed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/x86/include/asm/kvm_host.h |   3 +
+ arch/x86/kvm/mmu/mmu.c          | 154 +++++++++++++++++++++++++++++++-
+ arch/x86/kvm/x86.c              |   4 +
+ 3 files changed, 159 insertions(+), 2 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 31e84668014e..8d60e4745e8b 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1836,6 +1836,9 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu);
+ void kvm_mmu_init_vm(struct kvm *kvm);
+ void kvm_mmu_uninit_vm(struct kvm *kvm);
+ 
++void kvm_mmu_init_memslot_memory_attributes(struct kvm *kvm,
++					    struct kvm_memory_slot *slot);
++
+ void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu);
+ void kvm_mmu_reset_context(struct kvm_vcpu *vcpu);
+ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index d33657d61d80..4167d557c577 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -795,16 +795,26 @@ static struct kvm_lpage_info *lpage_info_slot(gfn_t gfn,
+ 	return &slot->arch.lpage_info[level - 2][idx];
+ }
+ 
++/*
++ * The most significant bit in disallow_lpage tracks whether or not memory
++ * attributes are mixed, i.e. not identical for all gfns at the current level.
++ * The lower order bits are used to refcount other cases where a hugepage is
++ * disallowed, e.g. if KVM has shadow a page table at the gfn.
++ */
++#define KVM_LPAGE_MIXED_FLAG	BIT(31)
++
+ static void update_gfn_disallow_lpage_count(const struct kvm_memory_slot *slot,
+ 					    gfn_t gfn, int count)
+ {
+ 	struct kvm_lpage_info *linfo;
+-	int i;
++	int old, i;
+ 
+ 	for (i = PG_LEVEL_2M; i <= KVM_MAX_HUGEPAGE_LEVEL; ++i) {
+ 		linfo = lpage_info_slot(gfn, slot, i);
++
++		old = linfo->disallow_lpage;
+ 		linfo->disallow_lpage += count;
+-		WARN_ON_ONCE(linfo->disallow_lpage < 0);
++		WARN_ON_ONCE((old ^ linfo->disallow_lpage) & KVM_LPAGE_MIXED_FLAG);
+ 	}
+ }
+ 
+@@ -7161,3 +7171,143 @@ void kvm_mmu_pre_destroy_vm(struct kvm *kvm)
+ 	if (kvm->arch.nx_huge_page_recovery_thread)
+ 		kthread_stop(kvm->arch.nx_huge_page_recovery_thread);
+ }
++
++#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
++static bool hugepage_test_mixed(struct kvm_memory_slot *slot, gfn_t gfn,
++				int level)
++{
++	return lpage_info_slot(gfn, slot, level)->disallow_lpage & KVM_LPAGE_MIXED_FLAG;
++}
++
++static void hugepage_clear_mixed(struct kvm_memory_slot *slot, gfn_t gfn,
++				 int level)
++{
++	lpage_info_slot(gfn, slot, level)->disallow_lpage &= ~KVM_LPAGE_MIXED_FLAG;
++}
++
++static void hugepage_set_mixed(struct kvm_memory_slot *slot, gfn_t gfn,
++			       int level)
++{
++	lpage_info_slot(gfn, slot, level)->disallow_lpage |= KVM_LPAGE_MIXED_FLAG;
++}
++
++static bool hugepage_has_attrs(struct kvm *kvm, struct kvm_memory_slot *slot,
++			       gfn_t gfn, int level, unsigned long attrs)
++{
++	const unsigned long start = gfn;
++	const unsigned long end = start + KVM_PAGES_PER_HPAGE(level);
++
++	if (level == PG_LEVEL_2M)
++		return kvm_range_has_memory_attributes(kvm, start, end, attrs);
++
++	for (gfn = start; gfn < end; gfn += KVM_PAGES_PER_HPAGE(level - 1)) {
++		if (hugepage_test_mixed(slot, gfn, level - 1) ||
++		    attrs != kvm_get_memory_attributes(kvm, gfn))
++			return false;
++	}
++	return true;
++}
++
++bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
++					 struct kvm_gfn_range *range)
++{
++	unsigned long attrs = range->arg.attributes;
++	struct kvm_memory_slot *slot = range->slot;
++	int level;
++
++	lockdep_assert_held_write(&kvm->mmu_lock);
++	lockdep_assert_held(&kvm->slots_lock);
++
++	/*
++	 * Calculate which ranges can be mapped with hugepages even if the slot
++	 * can't map memory PRIVATE.  KVM mustn't create a SHARED hugepage over
++	 * a range that has PRIVATE GFNs, and conversely converting a range to
++	 * SHARED may now allow hugepages.
++	 */
++	if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
++		return false;
++
++	/*
++	 * The sequence matters here: upper levels consume the result of lower
++	 * level's scanning.
++	 */
++	for (level = PG_LEVEL_2M; level <= KVM_MAX_HUGEPAGE_LEVEL; level++) {
++		gfn_t nr_pages = KVM_PAGES_PER_HPAGE(level);
++		gfn_t gfn = gfn_round_for_level(range->start, level);
++
++		/* Process the head page if it straddles the range. */
++		if (gfn != range->start || gfn + nr_pages > range->end) {
++			/*
++			 * Skip mixed tracking if the aligned gfn isn't covered
++			 * by the memslot, KVM can't use a hugepage due to the
++			 * misaligned address regardless of memory attributes.
++			 */
++			if (gfn >= slot->base_gfn) {
++				if (hugepage_has_attrs(kvm, slot, gfn, level, attrs))
++					hugepage_clear_mixed(slot, gfn, level);
++				else
++					hugepage_set_mixed(slot, gfn, level);
++			}
++			gfn += nr_pages;
++		}
++
++		/*
++		 * Pages entirely covered by the range are guaranteed to have
++		 * only the attributes which were just set.
++		 */
++		for ( ; gfn + nr_pages <= range->end; gfn += nr_pages)
++			hugepage_clear_mixed(slot, gfn, level);
++
++		/*
++		 * Process the last tail page if it straddles the range and is
++		 * contained by the memslot.  Like the head page, KVM can't
++		 * create a hugepage if the slot size is misaligned.
++		 */
++		if (gfn < range->end &&
++		    (gfn + nr_pages) <= (slot->base_gfn + slot->npages)) {
++			if (hugepage_has_attrs(kvm, slot, gfn, level, attrs))
++				hugepage_clear_mixed(slot, gfn, level);
++			else
++				hugepage_set_mixed(slot, gfn, level);
++		}
++	}
++	return false;
++}
++
++void kvm_mmu_init_memslot_memory_attributes(struct kvm *kvm,
++					    struct kvm_memory_slot *slot)
++{
++	int level;
++
++	if (!kvm_arch_has_private_mem(kvm))
++		return;
++
++	for (level = PG_LEVEL_2M; level <= KVM_MAX_HUGEPAGE_LEVEL; level++) {
++		/*
++		 * Don't bother tracking mixed attributes for pages that can't
++		 * be huge due to alignment, i.e. process only pages that are
++		 * entirely contained by the memslot.
++		 */
++		gfn_t end = gfn_round_for_level(slot->base_gfn + slot->npages, level);
++		gfn_t start = gfn_round_for_level(slot->base_gfn, level);
++		gfn_t nr_pages = KVM_PAGES_PER_HPAGE(level);
++		gfn_t gfn;
++
++		if (start < slot->base_gfn)
++			start += nr_pages;
++
++		/*
++		 * Unlike setting attributes, every potential hugepage needs to
++		 * be manually checked as the attributes may already be mixed.
++		 */
++		for (gfn = start; gfn < end; gfn += nr_pages) {
++			unsigned long attrs = kvm_get_memory_attributes(kvm, gfn);
++
++			if (hugepage_has_attrs(kvm, slot, gfn, level, attrs))
++				hugepage_clear_mixed(slot, gfn, level);
++			else
++				hugepage_set_mixed(slot, gfn, level);
++		}
++	}
++}
++#endif
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ee3cd8c3c0ef..f41dbb1465a0 100644
+index f41dbb1465a0..824b58b44382 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -10963,6 +10963,7 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
- {
- 	int r;
+@@ -12607,6 +12607,10 @@ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
+ 		}
+ 	}
  
-+	vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
- 	vcpu->arch.l1tf_flush_l1d = true;
++#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
++	kvm_mmu_init_memslot_memory_attributes(kvm, slot);
++#endif
++
+ 	if (kvm_page_track_create_memslot(kvm, slot, npages))
+ 		goto out_free;
  
- 	for (;;) {
 -- 
 2.42.0.820.g83a721a137-goog
 
