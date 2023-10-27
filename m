@@ -2,139 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 82C297D9AB2
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 16:04:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 391457D9AE7
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 16:12:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346043AbjJ0OEC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 10:04:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57604 "EHLO
+        id S1346076AbjJ0OMw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 10:12:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345997AbjJ0OEB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 10:04:01 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 238E7DE;
-        Fri, 27 Oct 2023 07:03:59 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39RDpgrv007185;
-        Fri, 27 Oct 2023 14:03:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=mfkMwzC5iCTTQA92R3nTRXIdLPb6nW7IXhNeTLvK0Pg=;
- b=P4bmUqZekkSwZQxSw0wzHEPL1YDjFapJJxCCFjggmrBgqGxuWN8Mj9BGwgTqSQt79/+H
- nnR8w4sA3JgfzMXjtl/q9VyHJKPoVbrHcC15ecl0YX+v3fKybG+pydXSZjfEf9I6WzE4
- /Zc1jungHpd5nZqxr7nttjKPKkYsCk9b8UzGrRAcYNaiTzq5aJaWIYPNgg1RdmUXS4UE
- Cv+E0ZAKRDNxDh1Il7p/sqMV5KWjDsz7kUVKyqYXIByBTKx33KdCZ/hXRJtBD+sutHB9
- tb6SYHkCbKXGhLl9he/xgKbDUQn0g8dLRIMQi+J8gTqd69YA0vVJSdf09GTsFECfJAbf zQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u0ef80egu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Oct 2023 14:03:57 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39RDt1h2017970;
-        Fri, 27 Oct 2023 14:03:56 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u0ef80eff-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Oct 2023 14:03:56 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39RDI41C021676;
-        Fri, 27 Oct 2023 14:03:55 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tywqsdgys-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Oct 2023 14:03:54 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39RE3pXA36831608
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Oct 2023 14:03:51 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 94DE620043;
-        Fri, 27 Oct 2023 14:03:51 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5483920040;
-        Fri, 27 Oct 2023 14:03:51 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.152.224.212])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 27 Oct 2023 14:03:51 +0000 (GMT)
-Date:   Fri, 27 Oct 2023 16:03:47 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com,
-        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH v2 2/3] s390/vfio-ap: set status response code to 06 on
- gisc registration failure
-Message-ID: <20231027160347.05c6cd60.pasic@linux.ibm.com>
-In-Reply-To: <8eb41445-1eff-4da7-830f-156f420afd5d@linux.ibm.com>
-References: <20231018133829.147226-1-akrowiak@linux.ibm.com>
-        <20231018133829.147226-3-akrowiak@linux.ibm.com>
-        <20231027125638.67a65ab9.pasic@linux.ibm.com>
-        <8eb41445-1eff-4da7-830f-156f420afd5d@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        with ESMTP id S231302AbjJ0OMu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 10:12:50 -0400
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56DC0FA
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 07:12:47 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-540105dea92so3203462a12.2
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 07:12:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=citrix.com; s=google; t=1698415966; x=1699020766; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
+         :content-language:subject:from:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=VO9vu7bmoU2J/IF2eJaU7O8plpGP9TRcwNE4oVJ9DFc=;
+        b=qE4Uoj1ZTvUv8XdszrAUjCECP7MfseoU3Je07Hj/42HKVLVpo3jHoZKnwcrpkdNYKK
+         BpKgwamPIQuOAipkXu6erU2r4iygAxtyg8S4FVLBg4EqEZAhUXkP7SArfsOx/Cbc2rDh
+         0pHIAQGHAhlDZYXMNeBaGLyzpz5ZYYbYdLsAg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698415966; x=1699020766;
+        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
+         :content-language:subject:from:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VO9vu7bmoU2J/IF2eJaU7O8plpGP9TRcwNE4oVJ9DFc=;
+        b=TWtQ6nvm0IuLJ5NJw6QGU2KHClSWxC4aCAJI6vmAvuHHIFY4Uz7ILoXB3cOwjVaAu7
+         LYdu805djASpaR75TJxTmbDPD9FG2MYLU2jcX9F/nQWp/87tNi7uvlVg00cQh4tC+vpN
+         qoiyiUVPaG2Pc23k5RgKr4darMeWG8GRjkPAdJC53cEOboDUba/ZImtwL0ljs2+Gb/m7
+         wZeYCT8yhW2VSA0W7Fj5iphdJZeeCXEdhmCAgYK9RsWbeMcMqlNHtkEHsY61RIoZuK9N
+         ZLx/77K8I3Y2E55TziHxD6we+Q3691d3L5ezQpVf9wiYfuXk3Dhn76OEQ9Eb7xx9LmX6
+         KaSw==
+X-Gm-Message-State: AOJu0YzOwPBb9Aiy1xFiFstQiOG33cs79+8t5z+kniiIiscq3lo1qPoj
+        5LjmCg36VSg7oXJCTTHLVG+L5Q==
+X-Google-Smtp-Source: AGHT+IFSHG58+AB4IT0GIx1QrSUz2BPwoei9v/Hnb704CnVCEbd6aiQIPLTxAFzHjjPdG/zCJPfOQA==
+X-Received: by 2002:a05:6402:134f:b0:522:4dd0:de72 with SMTP id y15-20020a056402134f00b005224dd0de72mr2385437edw.27.1698415965900;
+        Fri, 27 Oct 2023 07:12:45 -0700 (PDT)
+Received: from [10.80.67.28] (default-46-102-197-194.interdsl.co.uk. [46.102.197.194])
+        by smtp.gmail.com with ESMTPSA id g16-20020a056402321000b0053dda7926fcsm1270193eda.60.2023.10.27.07.12.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Oct 2023 07:12:45 -0700 (PDT)
+Message-ID: <cecd13f6-6d46-4a88-a30b-ce244d8fcd80@citrix.com>
+Date:   Fri, 27 Oct 2023 15:12:45 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: YoxX6pE3zZJ0xM09oIpJ1MEUTAqNnUtI
-X-Proofpoint-ORIG-GUID: ZRVq9v4AI2a852Rue87Vy-wZjdVuswqZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-27_12,2023-10-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- mlxscore=0 priorityscore=1501 malwarescore=0 clxscore=1015 suspectscore=0
- lowpriorityscore=0 spamscore=0 adultscore=0 mlxlogscore=999 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2310240000
- definitions=main-2310270122
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+From:   Andrew Cooper <andrew.cooper3@citrix.com>
+Subject: Re: [PATCH v3 1/6] x86/bugs: Add asm helpers for executing VERW
+Content-Language: en-GB
+To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
+        ak@linux.intel.com, tim.c.chen@linux.intel.com,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        antonio.gomez.iglesias@linux.intel.com,
+        Alyssa Milburn <alyssa.milburn@intel.com>
+References: <20231025-delay-verw-v3-0-52663677ee35@linux.intel.com>
+ <20231025-delay-verw-v3-1-52663677ee35@linux.intel.com>
+ <8b6d857f-cbf6-4969-8285-f90254bdafc0@citrix.com>
+ <20231025220735.gpopnng76klkbuu3@desk>
+ <0ee3e3cd-01b2-4662-ba08-d137663f1699@citrix.com>
+ <20231027134829.7ehdjwf5pfcqr6xp@desk>
+Autocrypt: addr=andrew.cooper3@citrix.com; keydata=
+ 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
+ 6+ahAA==
+In-Reply-To: <20231027134829.7ehdjwf5pfcqr6xp@desk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 27 Oct 2023 09:36:26 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-
-> >> The interception handler for the PQAP(AQIC) command calls the
-> >> kvm_s390_gisc_register function to register the guest ISC with the channel
-> >> subsystem. If that call fails, the status response code 08 - indicating
-> >> Invalid ZONE/GISA designation - is returned to the guest. This response
-> >> code does not make sense because the non-zero return code from the
-> >> kvm_s390_gisc_register function can be due one of two things: Either the
-> >> ISC passed as a parameter by the guest to the PQAP(AQIC) command is greater
-> >> than the maximum ISC value allowed, or the guest is not using a GISA.  
-> > 
-> > The "ISC passed as a parameter by the guest to the PQAP(AQIC) command is
-> > greater than the maximum ISC value allowed" is not possible. The isc is
-> > 3 bits wide and all 8 values that can be represented on 3 bits are valid.
-> > 
-> > This is only possible if the hypervisor was to mess up, or if the machine
-> > was broken.  
+On 27/10/2023 2:48 pm, Pawan Gupta wrote:
+> On the bright-side, I am seeing even better perf with VERW operand
+> out-of-line:
 > 
-> kvm_s390_gisc_register(struct kvm *kvm, u32 gisc)
-> {
-> 	struct kvm_s390_gisa_interrupt *gi = &kvm->arch.gisa_int;
+> Baseline: v6.6-rc5
 > 
-> 	if (!gi->origin)
-> 		return -ENODEV;
-> 	if (gisc > MAX_ISC)
-> 		return -ERANGE;
-> ...
+> | Test               | Configuration          | v1   | v3   |
+> | ------------------ | ---------------------- | ---- | ---- |
+> | build-linux-kernel | defconfig              | 1.00 | 1.00 |
+> | hackbench          | 32 - Process           | 1.02 | 1.06 |
+> | nginx              | Short Connection - 500 | 1.01 | 1.04 |
 > 
-> Just quoting what is in the code.
+> Disclaimer: These are collected by a stupid dev who knows nothing about
+> perf, please take this with a grain of salt.
 
-Right! But it is not the guest that calls this function directly. This
-function is called by the vfio_ap code.
+:)
 
-The guest passes ISC in bits 61, 62 and 63 of GR1.
+Almost as if it's a good idea to follow the advice of the Optimisation
+Guide on mixing code and data, which is "don't".
 
-So the guest can't give you an invalid value.
-
-Regards,
-Halil
+~Andrew
