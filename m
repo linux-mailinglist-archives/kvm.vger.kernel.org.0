@@ -2,107 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A3F017D8CA3
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 02:54:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DCF77D8CA5
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 02:55:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232306AbjJ0Ay6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Oct 2023 20:54:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38016 "EHLO
+        id S1345060AbjJ0AzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Oct 2023 20:55:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229831AbjJ0Ay4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Oct 2023 20:54:56 -0400
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [IPv6:2001:41d0:1004:224b::b9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A957D1B5
-        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 17:54:54 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1698368093;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hG2LAfyctCoLtIjZzeKRYZw/nVIS+d0blJ9NshgUWD4=;
-        b=vVzP0BLkHnaCFvF6jizyBwsKW1cp7K/9C9wBvrPcrCtmDL0mXqxcIsrWIBWAGsCvHx5qtR
-        +ywor4Zee9qLAjxE6ZW0D7ofd2vX7gR7we5QYOwsC13o2nnjf5qfx+kSAvke04qQldIIqZ
-        CQTyiOZOEx0M+AQkkrzUOG0mngaS0dM=
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     kvmarm@lists.linux.dev
-Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Subject: [PATCH 2/2] KVM: selftests: Avoid using forced target for generating arm64 headers
-Date:   Fri, 27 Oct 2023 00:54:39 +0000
-Message-ID: <20231027005439.3142015-3-oliver.upton@linux.dev>
-In-Reply-To: <20231027005439.3142015-1-oliver.upton@linux.dev>
-References: <20231027005439.3142015-1-oliver.upton@linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S1345018AbjJ0Ay7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Oct 2023 20:54:59 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 543311B5
+        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 17:54:57 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9ab79816a9so1243606276.3
+        for <kvm@vger.kernel.org>; Thu, 26 Oct 2023 17:54:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698368096; x=1698972896; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bkuZQVHnF0aSkP/dIjheAABr7DI7ra4xf7ceUlIhIOA=;
+        b=N5vy/BojceYcyZsXOErv9zlqMz1YHVjjgIddiN4EzVvc+LKvh7WUmN6EwF9jycZquG
+         +Mb1ojPiJFciP1PWnyLDQc60VyVp/soJDRKccS60oDKonDjLxB1zQPDqEvPyuWsxjpoQ
+         utzhW01A6U9is1aAtx7IY4OAsJyAan2JMlz5fw/9TMUpY8T68GIf8f3ckH1zqsB5NVfQ
+         6jcbk+Tf6i1jO4DmdPwR1NXu431HnoR3DeUcI0bzulPOv5RbkCvRXjMKxU5JSL1yuS7/
+         ghitgYvgvmA5SIdscnxFNL2YmWU8V23TDUqPrvIdzjy8GevIxVV5IFJ0SP2cUdytMiAq
+         pldQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698368096; x=1698972896;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bkuZQVHnF0aSkP/dIjheAABr7DI7ra4xf7ceUlIhIOA=;
+        b=AZnmuAbzAb+RS3Qm7CCRpdfXf77aewArR0xBmdjUIbVqiLM/FseFramHZNwKeU8DVc
+         MrR4xvxhEEAPmau8HoMU5h9jinO6Z+Zu24MxEyMCiotSERcQu7mI3TSxduUU+g5/I0UV
+         Rm8bpoyRKZKHjW68zVjh9YvE4e7klY7RxQNI6/GNord91CmMvLmtxpaKEMOb/FwUBNmV
+         IodjbXAVuP98qqUYE0jcteGNym3Wk8Ict1AeVclzbN+ajh0/1tcJ/CRVKmkBibJaiLNA
+         SsUldsaIsn39OtbX6bW6yJJ/jEiT8MizEbp/VsisYSAe5uq0p6EucF90kOi+sjUVTqcR
+         YFEg==
+X-Gm-Message-State: AOJu0YxiERnutmUu8rVU/ZvI0kEgnIB+zxDH9lSFpIfdEIqKnl69UxIT
+        oXemH3qvDYTkmWPJ2C3yxa14MvhHZAs=
+X-Google-Smtp-Source: AGHT+IFzmJoqDgYO9QXDRmkYoxqCR+kjdKTksziWrDJdDTfTH+RScme8Nu0cffkwjhcLtTaBByM2IWGLXsM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:494:0:b0:d13:856b:c10a with SMTP id
+ 142-20020a250494000000b00d13856bc10amr22985ybe.3.1698368096547; Thu, 26 Oct
+ 2023 17:54:56 -0700 (PDT)
+Date:   Thu, 26 Oct 2023 17:54:54 -0700
+In-Reply-To: <a65e6d23-791b-4866-8cb8-543d8f1942a6@zytor.com>
+Mime-Version: 1.0
+References: <a65e6d23-791b-4866-8cb8-543d8f1942a6@zytor.com>
+Message-ID: <ZTsKXmXXr4lIi5If@google.com>
+Subject: Re: Run user level code in guest in a new KVM selftest
+From:   Sean Christopherson <seanjc@google.com>
+To:     Xin Li <xin@zytor.com>
+Cc:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The 'prepare' target that generates the arm64 sysreg headers had no
-prerequisites, so it wound up forcing a rebuild of all KVM selftests
-each invocation. Add a rule for the generated headers and just have
-dependents use that for a prerequisite.
+On Thu, Oct 26, 2023, Xin Li wrote:
+> Hi Sean,
+> 
+> I'm adding a nested exception selftest for FRED, which needs to run
+> user level code in guest.  I have to add the following hack for that:
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index d8288374078e..72928c07ccbe 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -159,6 +159,7 @@ static uint64_t *virt_create_upper_pte(struct kvm_vm
+> *vm,
+> 
+>         if (!(*pte & PTE_PRESENT_MASK)) {
+>                 *pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK;
+> +               *pte |= PTE_USER_MASK;
+>                 if (current_level == target_level)
+>                         *pte |= PTE_LARGE_MASK | (paddr &
+> PHYSICAL_PAGE_MASK);
+>                 else
+> @@ -222,6 +223,7 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr,
+> uint64_t paddr, int level)
+>         TEST_ASSERT(!(*pte & PTE_PRESENT_MASK),
+>                     "PTE already present for 4k page at vaddr: 0x%lx\n",
+> vaddr);
+>         *pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK | (paddr &
+> PHYSICAL_PAGE_MASK);
+> +       *pte |= PTE_USER_MASK;
+>  }
+> 
+>  void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+> 
+> 
+> Is there an exiting selftest running user level code in guest?
 
-Reported-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Fixes: 9697d84cc3b6 ("KVM: selftests: Generate sysreg-defs.h and add to include path")
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- tools/testing/selftests/kvm/Makefile | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+Nope, not that I know of.
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 4f4f6ad025f4..4de096bbf124 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -22,10 +22,8 @@ arm64_tools_dir := $(top_srcdir)/tools/arch/arm64/tools/
- GEN_HDRS := $(top_srcdir)/tools/arch/arm64/include/generated/
- CFLAGS += -I$(GEN_HDRS)
- 
--prepare:
-+$(GEN_HDRS): $(wildcard $(arm64_tools_dir)/*)
- 	$(MAKE) -C $(arm64_tools_dir)
--else
--prepare:
- endif
- 
- LIBKVM += lib/assert.c
-@@ -276,10 +274,10 @@ EXTRA_CLEAN += $(GEN_HDRS) \
- 	       cscope.*
- 
- x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
--$(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c prepare
-+$(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c $(GEN_HDRS)
- 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
- 
--$(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S prepare
-+$(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S $(GEN_HDRS)
- 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
- 
- # Compile the string overrides as freestanding to prevent the compiler from
-@@ -289,9 +287,10 @@ $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
- 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -ffreestanding $< -o $@
- 
- x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
-+$(SPLIT_TESTS_OBJS): $(GEN_HDRS)
- $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
- $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
--$(TEST_GEN_OBJ): prepare
-+$(TEST_GEN_OBJ): $(GEN_HDRS)
- 
- cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include lib ..
- cscope:
--- 
-2.42.0.820.g83a721a137-goog
+> It seems there is none as the USER bit in PTEs is never set, what have I
+> missed?
 
+Nothing.
+
+> If such a facility doesn't exist, we probably need to find a
+> clean solution to add the USER bit in user level page table mappings
+> (which seems not yet clearly defined yet).
+
+Yes, being able to run usercode would be very nice indeed.  It should be a lot
+simpler than KUT since we can stuff guest state directly.  The big hiccup is SMEP
+and SMAP, e.g. we can't just set PTE_USER_MASK blindly :-(
+
+My best off-the-top-of-my-head idea is to play games with "enum vm_guest_mode" so
+that we know from time zero that the guest will be run in user mode, e.g. so that
+loading the initial guest_code can map it for user.
