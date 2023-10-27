@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D450B7D9E68
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 19:01:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 486797D9E6D
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 19:01:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345983AbjJ0RBb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 13:01:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41258 "EHLO
+        id S1345941AbjJ0RBl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 13:01:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345941AbjJ0RBa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 13:01:30 -0400
+        with ESMTP id S1346009AbjJ0RBb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 13:01:31 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 291EF1A1;
-        Fri, 27 Oct 2023 10:01:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24B47E1;
+        Fri, 27 Oct 2023 10:01:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698426086; x=1729962086;
+  t=1698426089; x=1729962089;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=15lJMwbf/gDQp6s/rBs3T3D7+FEeslB9BPq+GkkAYEI=;
-  b=SmrIIn2A/YLuwEC7+iKRNoPt1gockL23VWzsa0JEu32LmCJoo6x8VW6z
-   2iIo61t8btJqvoGqYHzdmGMxHzm1byNFiPhGYgo6PnpGnbyYu/vE8Ka0S
-   Z53/PvX2o0b2/hluNnJa8UbWTjG7K03MtQO13ZOyNZ9MMA9rvGtT88OG7
-   YIODQwoSQx7Uwsas9sTnzIdMEwoa/g4/5tBWUh/ihowOAPBxmDHWTKeKf
-   0Nkbc3QrZf362//nHGPx3vaR/+tPzCpST0RdSfttSVnhPlhZS1gk1QgS+
-   dT1WqPEb/D59+k1o7K82MDSU3Ee9EH/AopEoLjwfmxg4jp0j1a3B3sKfW
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10876"; a="611847"
+  bh=QurWvqwaCbuGq5TOlO2MFOTsKf0tkl0qBDeYQV0jKBg=;
+  b=GrL0Y/Fbqyx4P/pCPqmlqdJAgQmhdw2txK/xNK93nDieWjAY3GiYq3Vw
+   UYZSsOjBBceFEg6nrFxQHlgXwp9ugwtZL1Mja15WWeHUD5+DbFUkr9PUJ
+   H2V0SjYL1OEDbAplUc1Ow4vw9fc/g8GPzn8OcgX538UQo5kWvU5a7BJBM
+   cH3Rieiy3hmnFmidAjB123rlMrNQcOzeW2rpMMQxoHDwFSXT8hlaqB8DT
+   TbaU/IS6u+8+SGliQm0mGT+iHyN2ZEDBk4UeMMfAa4nYuwqvWOCHkUxL4
+   HQrM8u9s+1Ddrwu1ZQIsbAeVpiILh2n09RUhTI2MgCBfofcMls3I4ItMZ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10876"; a="611853"
 X-IronPort-AV: E=Sophos;i="6.03,256,1694761200"; 
-   d="scan'208";a="611847"
+   d="scan'208";a="611853"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
   by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 10:01:15 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10876"; a="1090988149"
+X-IronPort-AV: E=McAfee;i="6600,9927,10876"; a="1090988154"
 X-IronPort-AV: E=Sophos;i="6.03,256,1694761200"; 
-   d="scan'208";a="1090988149"
+   d="scan'208";a="1090988154"
 Received: from rchatre-ws.ostc.intel.com ([10.54.69.144])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 10:01:13 -0700
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 10:01:14 -0700
 From:   Reinette Chatre <reinette.chatre@intel.com>
 To:     jgg@nvidia.com, yishaih@nvidia.com,
         shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
@@ -46,9 +46,9 @@ Cc:     kvm@vger.kernel.org, dave.jiang@intel.com, jing2.liu@intel.com,
         ashok.raj@intel.com, fenghua.yu@intel.com,
         tom.zanussi@linux.intel.com, reinette.chatre@intel.com,
         linux-kernel@vger.kernel.org, patches@lists.linux.dev
-Subject: [RFC PATCH V3 03/26] vfio/pci: Use unsigned int instead of unsigned
-Date:   Fri, 27 Oct 2023 10:00:35 -0700
-Message-Id: <640dad3021715f4585f0c0ccb57224826cc82b68.1698422237.git.reinette.chatre@intel.com>
+Subject: [RFC PATCH V3 04/26] vfio/pci: Make core interrupt callbacks accessible to all virtual devices
+Date:   Fri, 27 Oct 2023 10:00:36 -0700
+Message-Id: <52141bbf2a7e7c4d0a9ce74e2f652b8f4e3211fd.1698422237.git.reinette.chatre@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1698422237.git.reinette.chatre@intel.com>
 References: <cover.1698422237.git.reinette.chatre@intel.com>
@@ -64,129 +64,227 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-checkpatch.pl warns about usage of bare unsigned.
+The functions handling actions on interrupts for a virtual PCI device
+triggered by VFIO_DEVICE_SET_IRQS ioctl() expect to act on a passthrough
+PCI device represented by a struct vfio_pci_core_device.
 
-Change unsigned to unsigned int as a preparatory change
-to avoid checkpatch.pl producing several warnings as
-the work adding support for backends to VFIO interrupt
-management progress.
+A virtual device can support MSI-X while not being a passthrough PCI
+device and thus not be represented by a struct vfio_pci_core_device.
+
+To support MSI-X in virtual devices it needs to be possible for
+their drivers to interact with the MSI-X interrupt management and
+thus the interrupt management should not require struct
+vfio_pci_core_device.
+
+Introduce struct vfio_pci_intr_ctx that will contain a virtual device's
+interrupt context to be managed by an interrupt management backend.
+The first supported backend is the existing PCI device interrupt
+management. Modify the core VFIO PCI interrupt management functions
+to expect this structure. As a backend managing interrupts of
+passthrough PCI devices the existing VFIO PCI functions continue to
+operate on an actual PCI device represented by
+struct vfio_pci_core_device that is provided via a private pointer.
+
+More members will be added to struct vfio_pci_intr_ctx as members
+unique to interrupt context are transitioned from struct
+vfio_pci_core_device.
 
 Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
 ---
 Changes since RFC V2:
-- Include vfio_msi_set_block() in changes.
+- Improve changelog and comments.
 
-Note to maintainers:
-After this change checkpatch.pl still has a few complaints
-about existing code using int32_t instead of s32. This was
-not changed and these warnings remain.
+ drivers/vfio/pci/vfio_pci_core.c  |  7 ++++---
+ drivers/vfio/pci/vfio_pci_intrs.c | 29 ++++++++++++++++++++---------
+ drivers/vfio/pci/vfio_pci_priv.h  |  2 +-
+ include/linux/vfio_pci_core.h     |  9 +++++++++
+ 4 files changed, 34 insertions(+), 13 deletions(-)
 
- drivers/vfio/pci/vfio_pci_intrs.c | 42 ++++++++++++++++++-------------
- 1 file changed, 24 insertions(+), 18 deletions(-)
-
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index 1929103ee59a..bb8181444c41 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -594,7 +594,7 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
+ 	/* Stop the device from further DMA */
+ 	pci_clear_master(pdev);
+ 
+-	vfio_pci_set_irqs_ioctl(vdev, VFIO_IRQ_SET_DATA_NONE |
++	vfio_pci_set_irqs_ioctl(&vdev->intr_ctx, VFIO_IRQ_SET_DATA_NONE |
+ 				VFIO_IRQ_SET_ACTION_TRIGGER,
+ 				vdev->irq_type, 0, 0, NULL);
+ 
+@@ -1216,8 +1216,8 @@ static int vfio_pci_ioctl_set_irqs(struct vfio_pci_core_device *vdev,
+ 
+ 	mutex_lock(&vdev->igate);
+ 
+-	ret = vfio_pci_set_irqs_ioctl(vdev, hdr.flags, hdr.index, hdr.start,
+-				      hdr.count, data);
++	ret = vfio_pci_set_irqs_ioctl(&vdev->intr_ctx, hdr.flags, hdr.index,
++				      hdr.start, hdr.count, data);
+ 
+ 	mutex_unlock(&vdev->igate);
+ 	kfree(data);
+@@ -2166,6 +2166,7 @@ int vfio_pci_core_init_dev(struct vfio_device *core_vdev)
+ 	INIT_LIST_HEAD(&vdev->sriov_pfs_item);
+ 	init_rwsem(&vdev->memory_lock);
+ 	xa_init(&vdev->ctx);
++	vdev->intr_ctx.priv = vdev;
+ 
+ 	return 0;
+ }
 diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index b5b1c09bef25..9f4f3ab48f87 100644
+index 9f4f3ab48f87..af1053873eaa 100644
 --- a/drivers/vfio/pci/vfio_pci_intrs.c
 +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -503,8 +503,9 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
- 	return ret;
- }
- 
--static int vfio_msi_set_block(struct vfio_pci_core_device *vdev, unsigned start,
--			      unsigned count, int32_t *fds, bool msix)
-+static int vfio_msi_set_block(struct vfio_pci_core_device *vdev,
-+			      unsigned int start, unsigned int count,
-+			      int32_t *fds, bool msix)
- {
- 	unsigned int i, j;
- 	int ret = 0;
-@@ -553,8 +554,9 @@ static void vfio_msi_disable(struct vfio_pci_core_device *vdev, bool msix)
+@@ -553,11 +553,13 @@ static void vfio_msi_disable(struct vfio_pci_core_device *vdev, bool msix)
+ /*
   * IOCTL support
   */
- static int vfio_pci_set_intx_unmask(struct vfio_pci_core_device *vdev,
--				    unsigned index, unsigned start,
--				    unsigned count, uint32_t flags, void *data)
-+				    unsigned int index, unsigned int start,
-+				    unsigned int count, uint32_t flags,
-+				    void *data)
+-static int vfio_pci_set_intx_unmask(struct vfio_pci_core_device *vdev,
++static int vfio_pci_set_intx_unmask(struct vfio_pci_intr_ctx *intr_ctx,
+ 				    unsigned int index, unsigned int start,
+ 				    unsigned int count, uint32_t flags,
+ 				    void *data)
  {
++	struct vfio_pci_core_device *vdev = intr_ctx->priv;
++
  	if (!is_intx(vdev) || start != 0 || count != 1)
  		return -EINVAL;
-@@ -584,8 +586,8 @@ static int vfio_pci_set_intx_unmask(struct vfio_pci_core_device *vdev,
+ 
+@@ -585,10 +587,12 @@ static int vfio_pci_set_intx_unmask(struct vfio_pci_core_device *vdev,
+ 	return 0;
  }
  
- static int vfio_pci_set_intx_mask(struct vfio_pci_core_device *vdev,
--				  unsigned index, unsigned start,
--				  unsigned count, uint32_t flags, void *data)
-+				  unsigned int index, unsigned int start,
-+				  unsigned int count, uint32_t flags, void *data)
+-static int vfio_pci_set_intx_mask(struct vfio_pci_core_device *vdev,
++static int vfio_pci_set_intx_mask(struct vfio_pci_intr_ctx *intr_ctx,
+ 				  unsigned int index, unsigned int start,
+ 				  unsigned int count, uint32_t flags, void *data)
  {
++	struct vfio_pci_core_device *vdev = intr_ctx->priv;
++
  	if (!is_intx(vdev) || start != 0 || count != 1)
  		return -EINVAL;
-@@ -604,8 +606,9 @@ static int vfio_pci_set_intx_mask(struct vfio_pci_core_device *vdev,
+ 
+@@ -605,11 +609,13 @@ static int vfio_pci_set_intx_mask(struct vfio_pci_core_device *vdev,
+ 	return 0;
  }
  
- static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
--				     unsigned index, unsigned start,
--				     unsigned count, uint32_t flags, void *data)
-+				     unsigned int index, unsigned int start,
-+				     unsigned int count, uint32_t flags,
-+				     void *data)
+-static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
++static int vfio_pci_set_intx_trigger(struct vfio_pci_intr_ctx *intr_ctx,
+ 				     unsigned int index, unsigned int start,
+ 				     unsigned int count, uint32_t flags,
+ 				     void *data)
  {
++	struct vfio_pci_core_device *vdev = intr_ctx->priv;
++
  	if (is_intx(vdev) && !count && (flags & VFIO_IRQ_SET_DATA_NONE)) {
  		vfio_intx_disable(vdev);
-@@ -647,8 +650,9 @@ static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
+ 		return 0;
+@@ -649,11 +655,12 @@ static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
+ 	return 0;
  }
  
- static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
--				    unsigned index, unsigned start,
--				    unsigned count, uint32_t flags, void *data)
-+				    unsigned int index, unsigned int start,
-+				    unsigned int count, uint32_t flags,
-+				    void *data)
+-static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
++static int vfio_pci_set_msi_trigger(struct vfio_pci_intr_ctx *intr_ctx,
+ 				    unsigned int index, unsigned int start,
+ 				    unsigned int count, uint32_t flags,
+ 				    void *data)
  {
++	struct vfio_pci_core_device *vdev = intr_ctx->priv;
  	struct vfio_pci_irq_ctx *ctx;
  	unsigned int i;
-@@ -755,8 +759,9 @@ static int vfio_pci_set_ctx_trigger_single(struct eventfd_ctx **ctx,
+ 	bool msix = (index == VFIO_PCI_MSIX_IRQ_INDEX) ? true : false;
+@@ -758,11 +765,13 @@ static int vfio_pci_set_ctx_trigger_single(struct eventfd_ctx **ctx,
+ 	return -EINVAL;
  }
  
- static int vfio_pci_set_err_trigger(struct vfio_pci_core_device *vdev,
--				    unsigned index, unsigned start,
--				    unsigned count, uint32_t flags, void *data)
-+				    unsigned int index, unsigned int start,
-+				    unsigned int count, uint32_t flags,
-+				    void *data)
+-static int vfio_pci_set_err_trigger(struct vfio_pci_core_device *vdev,
++static int vfio_pci_set_err_trigger(struct vfio_pci_intr_ctx *intr_ctx,
+ 				    unsigned int index, unsigned int start,
+ 				    unsigned int count, uint32_t flags,
+ 				    void *data)
  {
++	struct vfio_pci_core_device *vdev = intr_ctx->priv;
++
  	if (!pci_is_pcie(vdev->pdev))
  		return -ENOTTY;
-@@ -769,8 +774,9 @@ static int vfio_pci_set_err_trigger(struct vfio_pci_core_device *vdev,
+ 
+@@ -773,11 +782,13 @@ static int vfio_pci_set_err_trigger(struct vfio_pci_core_device *vdev,
+ 					       count, flags, data);
  }
  
- static int vfio_pci_set_req_trigger(struct vfio_pci_core_device *vdev,
--				    unsigned index, unsigned start,
--				    unsigned count, uint32_t flags, void *data)
-+				    unsigned int index, unsigned int start,
-+				    unsigned int count, uint32_t flags,
-+				    void *data)
+-static int vfio_pci_set_req_trigger(struct vfio_pci_core_device *vdev,
++static int vfio_pci_set_req_trigger(struct vfio_pci_intr_ctx *intr_ctx,
+ 				    unsigned int index, unsigned int start,
+ 				    unsigned int count, uint32_t flags,
+ 				    void *data)
  {
++	struct vfio_pci_core_device *vdev = intr_ctx->priv;
++
  	if (index != VFIO_PCI_REQ_IRQ_INDEX || start != 0 || count > 1)
  		return -EINVAL;
-@@ -780,11 +786,11 @@ static int vfio_pci_set_req_trigger(struct vfio_pci_core_device *vdev,
+ 
+@@ -785,11 +796,11 @@ static int vfio_pci_set_req_trigger(struct vfio_pci_core_device *vdev,
+ 					       count, flags, data);
  }
  
- int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
--			    unsigned index, unsigned start, unsigned count,
--			    void *data)
-+			    unsigned int index, unsigned int start,
-+			    unsigned int count, void *data)
+-int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
++int vfio_pci_set_irqs_ioctl(struct vfio_pci_intr_ctx *intr_ctx, uint32_t flags,
+ 			    unsigned int index, unsigned int start,
+ 			    unsigned int count, void *data)
  {
--	int (*func)(struct vfio_pci_core_device *vdev, unsigned index,
--		    unsigned start, unsigned count, uint32_t flags,
-+	int (*func)(struct vfio_pci_core_device *vdev, unsigned int index,
-+		    unsigned int start, unsigned int count, uint32_t flags,
+-	int (*func)(struct vfio_pci_core_device *vdev, unsigned int index,
++	int (*func)(struct vfio_pci_intr_ctx *intr_ctx, unsigned int index,
+ 		    unsigned int start, unsigned int count, uint32_t flags,
  		    void *data) = NULL;
  
- 	switch (index) {
+@@ -838,5 +849,5 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
+ 	if (!func)
+ 		return -ENOTTY;
+ 
+-	return func(vdev, index, start, count, flags, data);
++	return func(intr_ctx, index, start, count, flags, data);
+ }
+diff --git a/drivers/vfio/pci/vfio_pci_priv.h b/drivers/vfio/pci/vfio_pci_priv.h
+index 5e4fa69aee16..6dddcfe7ab19 100644
+--- a/drivers/vfio/pci/vfio_pci_priv.h
++++ b/drivers/vfio/pci/vfio_pci_priv.h
+@@ -26,7 +26,7 @@ struct vfio_pci_ioeventfd {
+ bool vfio_pci_intx_mask(struct vfio_pci_core_device *vdev);
+ void vfio_pci_intx_unmask(struct vfio_pci_core_device *vdev);
+ 
+-int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
++int vfio_pci_set_irqs_ioctl(struct vfio_pci_intr_ctx *intr_ctx, uint32_t flags,
+ 			    unsigned index, unsigned start, unsigned count,
+ 			    void *data);
+ 
+diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+index 562e8754869d..38355a4817fd 100644
+--- a/include/linux/vfio_pci_core.h
++++ b/include/linux/vfio_pci_core.h
+@@ -49,6 +49,14 @@ struct vfio_pci_region {
+ 	u32				flags;
+ };
+ 
++/*
++ * Interrupt context of virtual PCI device
++ * @priv:		Private data of interrupt management backend
++ */
++struct vfio_pci_intr_ctx {
++	void				*priv;
++};
++
+ struct vfio_pci_core_device {
+ 	struct vfio_device	vdev;
+ 	struct pci_dev		*pdev;
+@@ -96,6 +104,7 @@ struct vfio_pci_core_device {
+ 	struct mutex		vma_lock;
+ 	struct list_head	vma_list;
+ 	struct rw_semaphore	memory_lock;
++	struct vfio_pci_intr_ctx	intr_ctx;
+ };
+ 
+ /* Will be exported for vfio pci drivers usage */
 -- 
 2.34.1
 
