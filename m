@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BDBF57D8F95
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 09:20:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 765387D8FA1
+	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 09:22:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345404AbjJ0HUa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Oct 2023 03:20:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35720 "EHLO
+        id S1345406AbjJ0HWQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Oct 2023 03:22:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345449AbjJ0HUZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Oct 2023 03:20:25 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44B7F1B4
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 00:20:23 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-32ded3eb835so1290555f8f.0
-        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 00:20:23 -0700 (PDT)
+        with ESMTP id S1345389AbjJ0HWO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Oct 2023 03:22:14 -0400
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C4811B1
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 00:22:12 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-40839807e82so10032135e9.0
+        for <kvm@vger.kernel.org>; Fri, 27 Oct 2023 00:22:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698391221; x=1698996021; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1698391331; x=1698996131; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=GiaZXgzc6McjQsGUPYikXLbeJ+i8MopBoPjQmhJQfo4=;
-        b=Z5xcV4kIjn0BHHzwj4vbiC8lSk+Yb+DCWLPek85pELtbHSdCrtyT0lUYnBvw0VSAha
-         xjelaCdbvFlnrKN1sR2eLvgBG5oco5MVmd+yinweZ2ABO/jc+JpmzGjIBFD1WJeSIAhi
-         6LT3O0sfUEVNYqnJbp0lYNc4mEy8AlpB1xt4VIEmNeJICZc+CGmVz/Nr7Dq9LpLfH8PU
-         KSUpA6yCphRxDZPEwZCX+ioxUxHz20ELb/kf9tHvO6mwnjVgt1U5OvFS8dElVRYt6dWS
-         AX7Gl/O6rvvoSouz90fLPwGrEw02LdIpMPOmCf5xvodeqrg8F3Bss6578dD/89k/eAY2
-         PO8Q==
+        bh=PqXLD4gsUSCQcm/bEiQQT7bGyjP9upwq2OK6iOIPglM=;
+        b=JPtXT557nuEe/eKzs/F3x3HQSvrPp30FOmjV7JpKS4PonJsNXzirn48naHQxQ3Vb7f
+         R/uLfsoWfuzLkTRAe8cyX+WY+NgoJWYvz6EXpCTrn1GL1YUrJmxH5XtLWglOR+7CuOpJ
+         9KD61Jcpkav6WGP3d9P5Nw2clN9IltH0b6DLX/qotApX9nHt0vGUmMfcvXMSM0AvfavR
+         t0fr954sCBBgVsYzOGy7NUR+l39JDwQnEoAjFgC8iJUmZhRMfVtPDuYsl7TWcCh/SA0e
+         dKpSYMNzPm2mUf7ce8icL41se4jP9GbC7jtaOKDQARPKmO/OsR6h1KwrgZhBpqXP6nbG
+         ScMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698391221; x=1698996021;
+        d=1e100.net; s=20230601; t=1698391331; x=1698996131;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=GiaZXgzc6McjQsGUPYikXLbeJ+i8MopBoPjQmhJQfo4=;
-        b=cdKxoQDgCumj8ooOjntNkzKh37oAuxGHZ8vbSJlVBleRLgdljoUmyuwveQ5jTM8Tez
-         lcvn6zOCyxf+hxRvwWGKyW5WgK8TVWWzVzSZ2NMJB01RJXJmhY1+BFlAfqpnc//vnnL5
-         LWXfoD9oor4GQ88oJW6C8xb4plDYhtI89G+4AkjN1NbhYFmD00ru6uJ9tAU0MOw2+YsD
-         GG2nqWV+R7w/6CObHHu9IDklhuNDvAY9MRkhq7Lzy0EvY0R9h7CGgS2B4B9YLcn0W4Co
-         vRCUa2TtuzXEnINfrqdAM7Jxng8NCYnSQXPjXFr5bLgXfX3hy8MEZQByaJ1Zulz0LnL4
-         jPRA==
-X-Gm-Message-State: AOJu0YxMfrK3raL6aKAqe3NgcULwlNft45tgGIoPpaDM0/0bUB2FNYgT
-        vrwpNpnDlpbq1NiXkKTaFJc=
-X-Google-Smtp-Source: AGHT+IF4ESb9Dtm5knfUhlBl2xjFSwSZ+UZKmlwz+qng/KTBk8Cd66OauspRUmQDrVkZd9/qUpk6wg==
-X-Received: by 2002:a5d:4c42:0:b0:31f:a62d:264 with SMTP id n2-20020a5d4c42000000b0031fa62d0264mr1433744wrt.37.1698391221555;
-        Fri, 27 Oct 2023 00:20:21 -0700 (PDT)
-Received: from [192.168.10.177] (54-240-197-227.amazon.com. [54.240.197.227])
-        by smtp.gmail.com with ESMTPSA id t13-20020a5d534d000000b0032d9548240fsm1114969wrv.82.2023.10.27.00.20.20
+        bh=PqXLD4gsUSCQcm/bEiQQT7bGyjP9upwq2OK6iOIPglM=;
+        b=W7moudP49RYuZFXdDVoMcyV1zHH9Fop40ZlXaKItyx74tXLvpCuYdnwgq3qJUpj/9D
+         4T/EQgzKBsKYEGgpLhH3at19INTkDVqrsBvSBX2zGaVhVejcOzi2nOQ1mGLLMaYaVexg
+         qtDgIHPfXeniLbtNQ1M3saD6oSvcV+CZ9jtsdnz284fah3wha23Mz/1P9oxyUVwuqjMb
+         4iRSG6demwHb7MwmApUSm/JYQp4SyzuML8WXteTNHMHIXx3dWS5p/sLw8fGEXl8FXUVj
+         +d1p7e5prTnkO1BSgUQtFKGFHLFlpyLCloA0ZMCfwmIPeo8/Vg9h6phvkFHsj0IkW1d5
+         S2Dg==
+X-Gm-Message-State: AOJu0YzFO+iRu/hq+Bc9ZRpx0UYEAr+JIK64UX1JvQOIG9eW1KJ115U8
+        McLutBuQROEyIbfZCPlkqPQ=
+X-Google-Smtp-Source: AGHT+IGU6tTMgK6RwsBlq8F1RDINHIo2QB0XP1KOkIfo88Tr96dL8LD0Q31Rr4FqnFe7pGXkQLUMWQ==
+X-Received: by 2002:a05:600c:2d8c:b0:408:33ba:569a with SMTP id i12-20020a05600c2d8c00b0040833ba569amr6011223wmg.8.1698391330510;
+        Fri, 27 Oct 2023 00:22:10 -0700 (PDT)
+Received: from [192.168.10.177] (54-240-197-235.amazon.com. [54.240.197.235])
+        by smtp.gmail.com with ESMTPSA id d16-20020adfef90000000b0032326908972sm1126352wro.17.2023.10.27.00.22.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Oct 2023 00:20:21 -0700 (PDT)
-Message-ID: <94b54185-7ae6-48f9-976c-f4213a3643d0@gmail.com>
-Date:   Fri, 27 Oct 2023 08:20:19 +0100
+        Fri, 27 Oct 2023 00:22:10 -0700 (PDT)
+Message-ID: <ae99776d-bf6a-4b24-b617-fde8c76d087d@gmail.com>
+Date:   Fri, 27 Oct 2023 08:22:08 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: paul@xen.org
-Subject: Re: [PATCH v3 06/28] hw/xen: take iothread mutex in
- xen_evtchn_reset_op()
+Subject: Re: [PATCH v3 07/28] hw/xen: use correct default protocol for
+ xen-block on x86
 Content-Language: en-US
 To:     David Woodhouse <dwmw2@infradead.org>, qemu-devel@nongnu.org
 Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
@@ -75,9 +75,9 @@ Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
         Bernhard Beschow <shentey@gmail.com>,
         Joel Upham <jupham125@gmail.com>
 References: <20231025145042.627381-1-dwmw2@infradead.org>
- <20231025145042.627381-7-dwmw2@infradead.org>
+ <20231025145042.627381-8-dwmw2@infradead.org>
 From:   "Durrant, Paul" <xadimgnik@gmail.com>
-In-Reply-To: <20231025145042.627381-7-dwmw2@infradead.org>
+In-Reply-To: <20231025145042.627381-8-dwmw2@infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -93,15 +93,14 @@ X-Mailing-List: kvm@vger.kernel.org
 On 25/10/2023 15:50, David Woodhouse wrote:
 > From: David Woodhouse <dwmw@amazon.co.uk>
 > 
-> The xen_evtchn_soft_reset() function requires the iothread mutex, but is
-> also called for the EVTCHNOP_reset hypercall. Ensure the mutex is taken
-> in that case.
+> Even on x86_64 the default protocol is the x86-32 one if the guest doesn't
+> specifically ask for x86-64.
 > 
-> Fixes: a15b10978fe6 ("hw/xen: Implement EVTCHNOP_reset")
+> Fixes: b6af8926fb85 ("xen: add implementations of xen-block connect and disconnect functions...")
 > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 > ---
->   hw/i386/kvm/xen_evtchn.c | 1 +
->   1 file changed, 1 insertion(+)
+>   hw/block/xen-block.c | 6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
 > 
 
 Reviewed-by: Paul Durrant <paul@xen.org>
