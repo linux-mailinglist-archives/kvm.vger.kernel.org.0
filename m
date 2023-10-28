@@ -1,65 +1,130 @@
-Return-Path: <kvm+bounces-8-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 187D47DA403
-	for <lists+kvm@lfdr.de>; Sat, 28 Oct 2023 01:23:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14AE47DA599
+	for <lists+kvm@lfdr.de>; Sat, 28 Oct 2023 09:58:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A97EB2173A
-	for <lists+kvm@lfdr.de>; Fri, 27 Oct 2023 23:23:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC0FA28275C
+	for <lists+kvm@lfdr.de>; Sat, 28 Oct 2023 07:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF4E41223;
-	Fri, 27 Oct 2023 23:23:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="m3BBIsHR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0969179E0;
+	Sat, 28 Oct 2023 07:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0106334CD1;
-	Fri, 27 Oct 2023 23:22:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BE46C433C7;
-	Fri, 27 Oct 2023 23:22:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1698448979;
-	bh=euoi0gsHk/0YPq55clyHDu+jm37VY6jlna/C0hrDMTs=;
-	h=Date:From:To:Subject:References:In-Reply-To:From;
-	b=m3BBIsHR/VPcsd5spaOT2brsOBwRM/T6t45o/xQOFCoHp6uRoEuZlXzP5yxodmhG6
-	 fop/7YVrQ3CrisYfNO0SoI2fSbUHc0/Stxnh2jB06DIm37toRNIuzIVjRp4fL8O7tE
-	 aSymxaFR/1XVwVYlkLlig+sIOx7x7CFilpVjsTh4=
-Date: Fri, 27 Oct 2023 19:22:57 -0400
-From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-To: dccp@vger.kernel.org, dmaengine@vger.kernel.org, 
-	ecryptfs@vger.kernel.org, fio@vger.kernel.org, fstests@vger.kernel.org, 
-	initramfs@vger.kernel.org, io-uring@vger.kernel.org, kernel-janitors@vger.kernel.org, 
-	keyrings@vger.kernel.org, kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: This list is being migrated to the new vger infra (no action
- required)
-Message-ID: <20231027-vagabond-quail-of-efficiency-dd3dd5@meerkat>
-References: <20231027-strange-debonair-basilisk-cecdab@meerkat>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAD4611B
+	for <kvm@vger.kernel.org>; Sat, 28 Oct 2023 07:57:53 +0000 (UTC)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 205CDF2;
+	Sat, 28 Oct 2023 00:57:51 -0700 (PDT)
+Received: from kwepemm000005.china.huawei.com (unknown [172.30.72.53])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4SHWxS2vJ7zMlDw;
+	Sat, 28 Oct 2023 15:53:32 +0800 (CST)
+Received: from huawei.com (10.50.163.32) by kwepemm000005.china.huawei.com
+ (7.193.23.27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Sat, 28 Oct
+ 2023 15:57:48 +0800
+From: Longfang Liu <liulongfang@huawei.com>
+To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <jonathan.cameron@huawei.com>
+CC: <bcreeley@amd.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linuxarm@openeuler.org>, <liulongfang@huawei.com>
+Subject: [PATCH v18 0/2] add debugfs to migration driver
+Date: Sat, 28 Oct 2023 15:54:45 +0800
+Message-ID: <20231028075447.41939-1-liulongfang@huawei.com>
+X-Mailer: git-send-email 2.24.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231027-strange-debonair-basilisk-cecdab@meerkat>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.50.163.32]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm000005.china.huawei.com (7.193.23.27)
+X-CFilter-Loop: Reflected
 
-On Fri, Oct 27, 2023 at 06:56:49PM -0400, Konstantin Ryabitsev wrote:
-> This list is being migrated to the new vger infrastructure. This should be a
-> fully transparent process and you don't need to change anything about how you
-> participate with the list or how you receive mail.
-> 
-> There will be a brief delay with archives on lore.kernel.org. I will follow up
-> once the archive migration has been completed.
+Add a debugfs function to the migration driver in VFIO to provide
+a step-by-step debugfs information for the migration driver.
 
-This work is now complete. If anything isn't working correctly, please report
-it to helpdesk@kernel.org.
+Changes v17 -> v18
+	Replace seq_printf() with seq_puts().
 
-Best wishes,
--K
+Changes v16 -> v17
+	Add separate VFIO_DEBUGFS Kconfig entries.
+
+Changes v15 -> v16
+	Update the calling order of functions to maintain symmetry
+
+Changes v14 -> v15
+	Update the output status value of live migration.
+
+Changes v13 -> v14
+	Split the patchset and keep the vfio debugfs frame.
+
+Changes v12 -> v13
+	Solve the problem of open and close competition to debugfs.
+
+Changes v11 -> v12
+	Update loading conditions of vfio debugfs.
+
+Changes v10 -> v11
+	Delete the device restore function in debugfs.
+
+Changes v9 -> v10
+	Update the debugfs file of the live migration driver.
+
+Changes v8 -> v9
+	Update the debugfs directory structure of vfio.
+
+Changes v7 -> v8
+	Add support for platform devices.
+
+Changes v6 -> v7
+	Fix some code style issues.
+
+Changes v5 -> v6
+	Control the creation of debugfs through the CONFIG_DEBUG_FS.
+
+Changes v4 -> v5
+	Remove the newly added vfio_migration_ops and use seq_printf
+	to optimize the implementation of debugfs.
+
+Changes v3 -> v4
+	Change the migration_debug_operate interface to debug_root file.
+
+Changes v2 -> v3
+	Extend the debugfs function from hisilicon device to vfio.
+
+Changes v1 -> v2
+	Change the registration method of root_debugfs to register
+	with module initialization. 
+
+Longfang Liu (2):
+  vfio/migration: Add debugfs to live migration driver
+  Documentation: add debugfs description for vfio
+
+ Documentation/ABI/testing/debugfs-vfio | 25 +++++++
+ MAINTAINERS                            |  1 +
+ drivers/vfio/Kconfig                   | 10 +++
+ drivers/vfio/Makefile                  |  1 +
+ drivers/vfio/debugfs.c                 | 90 ++++++++++++++++++++++++++
+ drivers/vfio/vfio.h                    | 14 ++++
+ drivers/vfio/vfio_main.c               |  4 ++
+ include/linux/vfio.h                   |  7 ++
+ include/uapi/linux/vfio.h              |  1 +
+ 9 files changed, 153 insertions(+)
+ create mode 100644 Documentation/ABI/testing/debugfs-vfio
+ create mode 100644 drivers/vfio/debugfs.c
+
+-- 
+2.24.0
+
 
