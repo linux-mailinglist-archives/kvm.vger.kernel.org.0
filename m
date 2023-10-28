@@ -1,113 +1,115 @@
-Return-Path: <kvm+bounces-11-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-12-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BC7E7DA5A0
-	for <lists+kvm@lfdr.de>; Sat, 28 Oct 2023 09:59:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C50A7DA6D8
+	for <lists+kvm@lfdr.de>; Sat, 28 Oct 2023 14:07:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA80AB215DF
-	for <lists+kvm@lfdr.de>; Sat, 28 Oct 2023 07:59:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99398B2151B
+	for <lists+kvm@lfdr.de>; Sat, 28 Oct 2023 12:07:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F4C88F63;
-	Sat, 28 Oct 2023 07:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 372A214F85;
+	Sat, 28 Oct 2023 12:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IgM5WohF"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C96F8F48
-	for <kvm@vger.kernel.org>; Sat, 28 Oct 2023 07:58:54 +0000 (UTC)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD384F2;
-	Sat, 28 Oct 2023 00:58:52 -0700 (PDT)
-Received: from kwepemm000005.china.huawei.com (unknown [172.30.72.54])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4SHX0B567Jz1L9L1;
-	Sat, 28 Oct 2023 15:55:54 +0800 (CST)
-Received: from huawei.com (10.50.163.32) by kwepemm000005.china.huawei.com
- (7.193.23.27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Sat, 28 Oct
- 2023 15:58:50 +0800
-From: Longfang Liu <liulongfang@huawei.com>
-To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <jonathan.cameron@huawei.com>
-CC: <bcreeley@amd.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linuxarm@openeuler.org>, <liulongfang@huawei.com>
-Subject: [PATCH v18 2/2] Documentation: add debugfs description for vfio
-Date: Sat, 28 Oct 2023 15:54:47 +0800
-Message-ID: <20231028075447.41939-3-liulongfang@huawei.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20231028075447.41939-1-liulongfang@huawei.com>
-References: <20231028075447.41939-1-liulongfang@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B3323CF
+	for <kvm@vger.kernel.org>; Sat, 28 Oct 2023 12:07:18 +0000 (UTC)
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76DADA7
+	for <kvm@vger.kernel.org>; Sat, 28 Oct 2023 05:07:17 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6ba54c3ed97so2923167b3a.2
+        for <kvm@vger.kernel.org>; Sat, 28 Oct 2023 05:07:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698494837; x=1699099637; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SKJvKcyb2RWdDk274b6iPkQC86bAjXYUlIA5aUdbkBo=;
+        b=IgM5WohFxh4umDHrDBLnfrp2mNyTVRmx2/sEt/7zOpEMVada5lFIgxt/cSftZguMuu
+         wvvJoPtVztHH6c/qoIIdx/9nlVWZHFuikXUo/MvHbzcMr3ETNVrFP2Fe0GizkgCEcBwz
+         X9LHtiDS0Mx4Rc4aRko9XH1Vhlkfwo75qtSXJ/yqL5CneM9zK3HGMKJZsuJewaJAC1oC
+         KBCq7nR07brSIIZcdwXrVLoBS5ijkyajqN2HfQQMm/gZCa1HKEmlJR33cNAuzEQJ5AQu
+         uLFLYxjzsTRhY+mJOMZxe62EVAoQwdGhnvqMUawp3/RbPX/XvX8B6NAJmTsgt+D4h/X7
+         t0ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698494837; x=1699099637;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SKJvKcyb2RWdDk274b6iPkQC86bAjXYUlIA5aUdbkBo=;
+        b=oFF4Y+QzAjOxyM1JZLyvQLeNUhKrmRdpspN1E4t6ETvN4RBayc29vgW5UPeWEhQORq
+         2eyzxPCn0DuL3qGGqdTVQVLKSzI5TtsEBp7R3Ta2OhSEWKCna/ayWIah7Fjrnnhske9d
+         maVOb9UeDgp9FQxwG5ajOAXyvd7OY9hIYWvMVkAtnuXD1zqtkXUih4RAZx838DfR63y7
+         D8QkD8hQMfD4zV/h75RluNTZJ+ZYmRi+ibbuYUR4fCauZYiT2IOG6QF5KHMEx9y0WodW
+         iv0bSHFydl/6mvIy4Ig9fcVlW7EdoKb43I1nNeWBDebMUlveDLp5bkxgLO6h6xPpWoj3
+         Z7kg==
+X-Gm-Message-State: AOJu0Yx+sO8ltal9u0GJpEo3GeAr/+dyU0gbiwIErgQOP8Qy9fsyT2zB
+	uElQuGbyXXCwl5p3YiKS4ObIQA7J+FYynLFN7OE=
+X-Google-Smtp-Source: AGHT+IEdj5XrMmmITiaCJ/1atu+NuwxiM/2j4rW1PnubHu13oZ74aiFbiLTK1fmTX+M9Q6PFdb17tO0twOE44XNBHk4=
+X-Received: by 2002:a05:6a20:748b:b0:17a:de5d:1d7e with SMTP id
+ p11-20020a056a20748b00b0017ade5d1d7emr6720018pzd.55.1698494836794; Sat, 28
+ Oct 2023 05:07:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.50.163.32]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm000005.china.huawei.com (7.193.23.27)
-X-CFilter-Loop: Reflected
+References: <20231021134015.1119597-1-daan.j.demeyer@gmail.com> <ZTlSPbh2GnhOKExO@redhat.com>
+In-Reply-To: <ZTlSPbh2GnhOKExO@redhat.com>
+From: Daan De Meyer <daan.j.demeyer@gmail.com>
+Date: Sat, 28 Oct 2023 14:07:05 +0200
+Message-ID: <CAO8sHcnh1mqaEchGSwYaFr7+LTau9yQRt_4zVJGrFsroWik3ew@mail.gmail.com>
+Subject: Re: [PATCH] Add class property to configure KVM device node to use
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-1.Add an debugfs document description file to help users understand
-how to use the accelerator live migration driver's debugfs.
-2.Update the file paths that need to be maintained in MAINTAINERS
+Anything else needed before this patch can be merged?
 
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
----
- Documentation/ABI/testing/debugfs-vfio | 25 +++++++++++++++++++++++++
- MAINTAINERS                            |  1 +
- 2 files changed, 26 insertions(+)
- create mode 100644 Documentation/ABI/testing/debugfs-vfio
+Cheers,
 
-diff --git a/Documentation/ABI/testing/debugfs-vfio b/Documentation/ABI/testing/debugfs-vfio
-new file mode 100644
-index 000000000000..445e9f58f924
---- /dev/null
-+++ b/Documentation/ABI/testing/debugfs-vfio
-@@ -0,0 +1,25 @@
-+What:		/sys/kernel/debug/vfio
-+Date:		Oct 2023
-+KernelVersion:  6.7
-+Contact:	Longfang Liu <liulongfang@huawei.com>
-+Description:	This debugfs file directory is used for debugging
-+		of vfio devices, it's a common directory for all vfio devices.
-+		Vfio core will create a device subdirectory under this
-+		directory.
-+
-+What:		/sys/kernel/debug/vfio/<device>/migration
-+Date:		Oct 2023
-+KernelVersion:  6.7
-+Contact:	Longfang Liu <liulongfang@huawei.com>
-+Description:	This debugfs file directory is used for debugging
-+		of vfio devices that support live migration.
-+		The debugfs of each vfio device that supports live migration
-+		could be created under this directory.
-+
-+What:		/sys/kernel/debug/vfio/<device>/migration/state
-+Date:		Oct 2023
-+KernelVersion:  6.7
-+Contact:	Longfang Liu <liulongfang@huawei.com>
-+Description:	Read the live migration status of the vfio device.
-+		The contents of the state file reflects the migration state
-+		relative to those defined in the vfio_device_mig_state enum
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b19995690904..a6be3b4219c7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -22591,6 +22591,7 @@ L:	kvm@vger.kernel.org
- S:	Maintained
- T:	git https://github.com/awilliam/linux-vfio.git
- F:	Documentation/ABI/testing/sysfs-devices-vfio-dev
-+F:	Documentation/ABI/testing/debugfs-vfio
- F:	Documentation/driver-api/vfio.rst
- F:	drivers/vfio/
- F:	include/linux/vfio.h
--- 
-2.24.0
+Daan
 
+On Wed, 25 Oct 2023 at 19:37, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
+>
+> On Sat, Oct 21, 2023 at 03:40:15PM +0200, Daan De Meyer wrote:
+> > This allows passing the KVM device node to use as a file
+> > descriptor via /dev/fdset/XX. Passing the device node to
+> > use as a file descriptor allows running qemu unprivileged
+> > even when the user running qemu is not in the kvm group
+> > on distributions where access to /dev/kvm is gated behind
+> > membership of the kvm group (as long as the process invoking
+> > qemu is able to open /dev/kvm and passes the file descriptor
+> > to qemu).
+> >
+> > Signed-off-by: Daan De Meyer <daan.j.demeyer@gmail.com>
+> > ---
+> >  accel/kvm/kvm-all.c      | 25 ++++++++++++++++++++++++-
+> >  include/sysemu/kvm_int.h |  1 +
+> >  qemu-options.hx          |  8 +++++++-
+> >  3 files changed, 32 insertions(+), 2 deletions(-)
+>
+> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>
+>
+> With regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
+>
 
