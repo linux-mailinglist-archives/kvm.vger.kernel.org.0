@@ -1,322 +1,170 @@
-Return-Path: <kvm+bounces-91-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-92-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72DD97DBD96
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 17:16:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 567F07DBD99
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 17:17:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52F7A1C20AED
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 16:16:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E426B20EDE
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 16:17:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B1D18C3B;
-	Mon, 30 Oct 2023 16:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1514A18E14;
+	Mon, 30 Oct 2023 16:17:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XRV4WUTc"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="0fnLza0D"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F9F918C21
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 16:16:35 +0000 (UTC)
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 372D9D9
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 09:16:33 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-408c6ec1fd1so111285e9.1
-        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 09:16:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698682591; x=1699287391; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0cqIfDguuwM8szZAtDVbLhY+g3EClj8oauil5zhjmZw=;
-        b=XRV4WUTcqTtEUmcbiBe/7DvcqHoqnz4ZyqD3z43Ub0Q8ryhu13P1Vh+4j/pXvu8yMa
-         8RCRw6E4AkLj3OeqgFlchVHbQzH7G5BLCV3beERjFFvPkBNQlt9WhHUkD6IcVgDUEEpV
-         FSRhKrDdIfjt6umGHwspS7MUHFKSAnISdKw3mkEq5hBoMptaH0sm5NVzYp0FmZQrRO+L
-         26/NR9qvAcICpD650Df8Po3Lym9kaeYLLwPQSZZ+MCn5DD4PiAYYozkoZrnb4KebZkzw
-         CZQWpZY8a/PryBlgbRXbvWVgki/4OvpIlOl9x/zGIvLNRafHnLPD0bS4jT8ny7G+vn5Z
-         S9iA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698682591; x=1699287391;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0cqIfDguuwM8szZAtDVbLhY+g3EClj8oauil5zhjmZw=;
-        b=tiXe3RGsYF9wLWB9LdiWqtjjElU5043v2I1XP9buA2vhiH6zTSD/1/+HID/qhdaloO
-         xmWGekJVLosT6TF9x6zVzyOfrYwSXI8rC3gyd2aI8AUBL2DDNpmia2kx63qM1PSrj8J4
-         XptsfzHt7dL7TAePdomc5nNihYNjSC3yC1UjTa3AOBZetRuvm803Adk7kZZD8P0NEUZb
-         KQumZI3iCCRLwKOLpzRgYfxCEpN5c3xduKY07tPaxs9/iGNkciYo5Sjteq23wCmwMBoO
-         0VdBgsui72fvkRA6OOMziDR3NXbzduzFG6grVdPLU6tNqQeCrosm+phkKrOV9qki+ZyI
-         KguA==
-X-Gm-Message-State: AOJu0YyFOxpKAnzTmGTUUt7b7FFmFzvxqHCnxHSrFOBNl+0nB9oBTcVX
-	ESZgtvYClyp/TTc6bY42S4C2kUOXBd91G3mhMhkr2Q==
-X-Google-Smtp-Source: AGHT+IFW57OXDy5bWwRXULtPdqrc1qOo26G4aRNTieSFhqmD44MpYmOpKsAVyPbbqsfJbhCu70cZaMPIZvQe5J8Yf+8=
-X-Received: by 2002:a05:600c:1c81:b0:3f4:fb7:48d4 with SMTP id
- k1-20020a05600c1c8100b003f40fb748d4mr132874wms.3.1698682591394; Mon, 30 Oct
- 2023 09:16:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251C018E00
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 16:17:25 +0000 (UTC)
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2055.outbound.protection.outlook.com [40.107.6.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8C9CC2;
+	Mon, 30 Oct 2023 09:17:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XNEWITsrSlVqE6daEdxkqPWNJBB0YGNdLA4GH5cF8sGZzH4fYvKJIRU6Vr25dDmoxqAzinzVus8rWMgrRuyH3CwUynG/o2dsS7Kfx/CEbrONZA6LMKXrN97MvZF0/9zPBE08l51vA28EmgmvL42j1KQt+87OwlUBeGj8SlQlgx2QTY+Fb6r/qhFTaO/PKy5W1WdKlnuSLniF+mHwZ1S9abNmzLhvu3mpCD8G0E15fxfyyPdbw1EEY3g0ISOrDCsGhHDVpgUHMuwBNOQCQOAew85P6OyhVD1tedaUUyBF/IxM4XIXVXp/J5QPBnthiqUR1PocpzonCYavT7Ktx7IbpA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8dj4/aTXKHZZG1AZpy8lmyppcI1CqjqHF+gLH2yyYM8=;
+ b=ZklY79HLkE9csmHcJ8pq/ELAQeuiv9lanX43EXk2Uh7FkVwvt3WPqXKRkEVRo3ueAneh6RRlji6514XGUh6BUhxtCrI+DPQFsTxB/qzRWTwLBuFKSsyIAq2cmoVFBpamn+Voq9DopDgdQjKsh2oLZe3nEXKxIMtFmo74so4mEKdoD7eb1c94qQAOobOAolYnvkXvmAVZd+5gA+f5CsQR3fEpCU5fOmc5LGwnfvpV3RsSNEoJhL0q/S9LTZz08ZGkVfKTCT4fOu7kkfwQ4giUYH32y20ll71eu97UzHXLwOXMR/99SIjJMs+v5+rPx/V5jzGgGz20dm0mpZLyyYWBhA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8dj4/aTXKHZZG1AZpy8lmyppcI1CqjqHF+gLH2yyYM8=;
+ b=0fnLza0DNpRoVaUWBcH91OFb5f82v+xKaUqE0R+EexLtd/rJO4N/+Ha/aeUVbZPpEQR76na3gmzuMXVH4ymrTBMdeaU3XsVYrRFpmV9PB+3D5r6xXfCm0nXJmoo2+/Q3/sjHdejqQygASYOwnCsHvlJ1Jy0znzymaHFWSd5DOzQDlwdYv5vCr5Puu/77ktryoQ14dCOYGh8UHDqv5P0jDYPKU6ZEHIOCz5H8y+jDcZ26a4TUJmy4qLMaEzMx6zcp1b39OAy/zzodclDIpCNcMvyUJfDB+fAXE13VoPFR87z0k0HYE8v4nVzYI09Sp2wR9SlY9LzcixtetGKpSJZkgw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=suse.com;
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com (2603:10a6:102:cc::8)
+ by AS5PR04MB9754.eurprd04.prod.outlook.com (2603:10a6:20b:654::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.23; Mon, 30 Oct
+ 2023 16:17:21 +0000
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::6bbb:37c3:40c4:9780]) by PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::6bbb:37c3:40c4:9780%4]) with mapi id 15.20.6933.019; Mon, 30 Oct 2023
+ 16:17:21 +0000
+Message-ID: <d0a37147-ff96-44b3-bee4-7004f0af5199@suse.com>
+Date: Mon, 30 Oct 2023 18:17:16 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: x86: User mutex guards to eliminate
+ __kvm_x86_vendor_init()
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>
+Cc: pbonzini@redhat.com, x86@kernel.org, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231030141728.1406118-1-nik.borisov@suse.com>
+ <ZT_UtjWSKCwgBxb_@google.com>
+From: Nikolay Borisov <nik.borisov@suse.com>
+In-Reply-To: <ZT_UtjWSKCwgBxb_@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: VI1PR0102CA0078.eurprd01.prod.exchangelabs.com
+ (2603:10a6:803:15::19) To PA4PR04MB7790.eurprd04.prod.outlook.com
+ (2603:10a6:102:cc::8)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231030063652.68675-1-nikunj@amd.com> <20231030063652.68675-6-nikunj@amd.com>
-In-Reply-To: <20231030063652.68675-6-nikunj@amd.com>
-From: Dionna Amalie Glaze <dionnaglaze@google.com>
-Date: Mon, 30 Oct 2023 09:16:20 -0700
-Message-ID: <CAAH4kHY_sM0DTL+EVz3GNDq1q_5S4FH1Ku9EMV0HOzFAY1s4QQ@mail.gmail.com>
-Subject: Re: [PATCH v5 05/14] virt: sev-guest: Add vmpck_id to snp_guest_dev struct
-To: Nikunj A Dadhania <nikunj@amd.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org, 
-	kvm@vger.kernel.org, bp@alien8.de, mingo@redhat.com, tglx@linutronix.de, 
-	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com, 
-	pbonzini@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Sun, Oct 29, 2023 at 11:38=E2=80=AFPM Nikunj A Dadhania <nikunj@amd.com>=
- wrote:
->
-> Drop vmpck and os_area_msg_seqno pointers so that secret page layout
-> does not need to be exposed to the sev-guest driver after the rework.
-> Instead, add helper APIs to access vmpck and os_area_msg_seqno when
-> needed.
->
-> Also, change function is_vmpck_empty() to snp_is_vmpck_empty() in
-> preparation for moving to sev.c.
->
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-> ---
->  drivers/virt/coco/sev-guest/sev-guest.c | 85 ++++++++++++-------------
->  1 file changed, 42 insertions(+), 43 deletions(-)
->
-> diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/=
-sev-guest/sev-guest.c
-> index 5801dd52ffdf..4dd094c73e2f 100644
-> --- a/drivers/virt/coco/sev-guest/sev-guest.c
-> +++ b/drivers/virt/coco/sev-guest/sev-guest.c
-> @@ -50,8 +50,7 @@ struct snp_guest_dev {
->
->         struct snp_secrets_page_layout *layout;
->         struct snp_req_data input;
-> -       u32 *os_area_msg_seqno;
-> -       u8 *vmpck;
-> +       unsigned int vmpck_id;
->  };
->
->  static u32 vmpck_id;
-> @@ -61,14 +60,22 @@ MODULE_PARM_DESC(vmpck_id, "The VMPCK ID to use when =
-communicating with the PSP.
->  /* Mutex to serialize the shared buffer access and command handling. */
->  static DEFINE_MUTEX(snp_cmd_mutex);
->
-> -static bool is_vmpck_empty(struct snp_guest_dev *snp_dev)
-> +static inline u8 *snp_get_vmpck(struct snp_guest_dev *snp_dev)
->  {
-> -       char zero_key[VMPCK_KEY_LEN] =3D {0};
-> +       return snp_dev->layout->vmpck0 + snp_dev->vmpck_id * VMPCK_KEY_LE=
-N;
-> +}
->
-> -       if (snp_dev->vmpck)
-> -               return !memcmp(snp_dev->vmpck, zero_key, VMPCK_KEY_LEN);
-> +static inline u32 *snp_get_os_area_msg_seqno(struct snp_guest_dev *snp_d=
-ev)
-> +{
-> +       return &snp_dev->layout->os_area.msg_seqno_0 + snp_dev->vmpck_id;
-> +}
->
-> -       return true;
-> +static bool snp_is_vmpck_empty(struct snp_guest_dev *snp_dev)
-> +{
-> +       char zero_key[VMPCK_KEY_LEN] =3D {0};
-> +       u8 *key =3D snp_get_vmpck(snp_dev);
-> +
-> +       return !memcmp(key, zero_key, VMPCK_KEY_LEN);
->  }
->
->  /*
-> @@ -90,20 +97,22 @@ static bool is_vmpck_empty(struct snp_guest_dev *snp_=
-dev)
->   */
->  static void snp_disable_vmpck(struct snp_guest_dev *snp_dev)
->  {
-> +       u8 *key =3D snp_get_vmpck(snp_dev);
-> +
->         dev_alert(snp_dev->dev, "Disabling vmpck_id %d to prevent IV reus=
-e.\n",
-> -                 vmpck_id);
-> -       memzero_explicit(snp_dev->vmpck, VMPCK_KEY_LEN);
-> -       snp_dev->vmpck =3D NULL;
-> +                 snp_dev->vmpck_id);
-> +       memzero_explicit(key, VMPCK_KEY_LEN);
->  }
-
-We disable the VMPCK because we believe the guest to be under attack,
-but this only clears a single key. Shouldn't we clear all VMPCK keys
-in the secrets page for good measure? If at VMPCK > 0, most likely the
-0..VMPCK-1 keys have been zeroed by whatever was prior in the boot
-stack, but still better to be safe.
-
->
->  static inline u64 __snp_get_msg_seqno(struct snp_guest_dev *snp_dev)
->  {
-> +       u32 *os_area_msg_seqno =3D snp_get_os_area_msg_seqno(snp_dev);
->         u64 count;
->
->         lockdep_assert_held(&snp_dev->cmd_mutex);
->
->         /* Read the current message sequence counter from secrets pages *=
-/
-> -       count =3D *snp_dev->os_area_msg_seqno;
-> +       count =3D *os_area_msg_seqno;
->
->         return count + 1;
->  }
-> @@ -131,11 +140,13 @@ static u64 snp_get_msg_seqno(struct snp_guest_dev *=
-snp_dev)
->
->  static void snp_inc_msg_seqno(struct snp_guest_dev *snp_dev)
->  {
-> +       u32 *os_area_msg_seqno =3D snp_get_os_area_msg_seqno(snp_dev);
-> +
->         /*
->          * The counter is also incremented by the PSP, so increment it by=
- 2
->          * and save in secrets page.
->          */
-> -       *snp_dev->os_area_msg_seqno +=3D 2;
-> +       *os_area_msg_seqno +=3D 2;
->  }
->
->  static inline struct snp_guest_dev *to_snp_dev(struct file *file)
-> @@ -145,15 +156,22 @@ static inline struct snp_guest_dev *to_snp_dev(stru=
-ct file *file)
->         return container_of(dev, struct snp_guest_dev, misc);
->  }
->
-> -static struct aesgcm_ctx *snp_init_crypto(u8 *key, size_t keylen)
-> +static struct aesgcm_ctx *snp_init_crypto(struct snp_guest_dev *snp_dev)
->  {
->         struct aesgcm_ctx *ctx;
-> +       u8 *key;
-> +
-> +       if (snp_is_vmpck_empty(snp_dev)) {
-> +               pr_err("SNP: vmpck id %d is null\n", snp_dev->vmpck_id);
-> +               return NULL;
-> +       }
->
->         ctx =3D kzalloc(sizeof(*ctx), GFP_KERNEL_ACCOUNT);
->         if (!ctx)
->                 return NULL;
->
-> -       if (aesgcm_expandkey(ctx, key, keylen, AUTHTAG_LEN)) {
-> +       key =3D snp_get_vmpck(snp_dev);
-> +       if (aesgcm_expandkey(ctx, key, VMPCK_KEY_LEN, AUTHTAG_LEN)) {
->                 pr_err("SNP: crypto init failed\n");
->                 kfree(ctx);
->                 return NULL;
-> @@ -586,7 +604,7 @@ static long snp_guest_ioctl(struct file *file, unsign=
-ed int ioctl, unsigned long
->         mutex_lock(&snp_dev->cmd_mutex);
->
->         /* Check if the VMPCK is not empty */
-> -       if (is_vmpck_empty(snp_dev)) {
-> +       if (snp_is_vmpck_empty(snp_dev)) {
->                 dev_err_ratelimited(snp_dev->dev, "VMPCK is disabled\n");
->                 mutex_unlock(&snp_dev->cmd_mutex);
->                 return -ENOTTY;
-> @@ -656,32 +674,14 @@ static const struct file_operations snp_guest_fops =
-=3D {
->         .unlocked_ioctl =3D snp_guest_ioctl,
->  };
->
-> -static u8 *get_vmpck(int id, struct snp_secrets_page_layout *layout, u32=
- **seqno)
-> +bool snp_assign_vmpck(struct snp_guest_dev *dev, int vmpck_id)
->  {
-> -       u8 *key =3D NULL;
-> +       if (WARN_ON(vmpck_id > 3))
-> +               return false;
-
-The vmpck_id is an int for some reason, so < 0 is also a problem. Can
-we not use unsigned int?
-
->
-> -       switch (id) {
-> -       case 0:
-> -               *seqno =3D &layout->os_area.msg_seqno_0;
-> -               key =3D layout->vmpck0;
-> -               break;
-> -       case 1:
-> -               *seqno =3D &layout->os_area.msg_seqno_1;
-> -               key =3D layout->vmpck1;
-> -               break;
-> -       case 2:
-> -               *seqno =3D &layout->os_area.msg_seqno_2;
-> -               key =3D layout->vmpck2;
-> -               break;
-> -       case 3:
-> -               *seqno =3D &layout->os_area.msg_seqno_3;
-> -               key =3D layout->vmpck3;
-> -               break;
-> -       default:
-> -               break;
-> -       }
-> +       dev->vmpck_id =3D vmpck_id;
->
-> -       return key;
-> +       return true;
->  }
->
->  static int __init sev_guest_probe(struct platform_device *pdev)
-> @@ -713,14 +713,14 @@ static int __init sev_guest_probe(struct platform_d=
-evice *pdev)
->                 goto e_unmap;
->
->         ret =3D -EINVAL;
-> -       snp_dev->vmpck =3D get_vmpck(vmpck_id, layout, &snp_dev->os_area_=
-msg_seqno);
-> -       if (!snp_dev->vmpck) {
-> +       snp_dev->layout =3D layout;
-> +       if (!snp_assign_vmpck(snp_dev, vmpck_id)) {
->                 dev_err(dev, "invalid vmpck id %d\n", vmpck_id);
->                 goto e_unmap;
->         }
->
->         /* Verify that VMPCK is not zero. */
-> -       if (is_vmpck_empty(snp_dev)) {
-> +       if (snp_is_vmpck_empty(snp_dev)) {
->                 dev_err(dev, "vmpck id %d is null\n", vmpck_id);
->                 goto e_unmap;
->         }
-> @@ -728,7 +728,6 @@ static int __init sev_guest_probe(struct platform_dev=
-ice *pdev)
->         mutex_init(&snp_dev->cmd_mutex);
->         platform_set_drvdata(pdev, snp_dev);
->         snp_dev->dev =3D dev;
-> -       snp_dev->layout =3D layout;
->
->         /* Allocate the shared page used for the request and response mes=
-sage. */
->         snp_dev->request =3D alloc_shared_pages(dev, sizeof(struct snp_gu=
-est_msg));
-> @@ -744,7 +743,7 @@ static int __init sev_guest_probe(struct platform_dev=
-ice *pdev)
->                 goto e_free_response;
->
->         ret =3D -EIO;
-> -       snp_dev->ctx =3D snp_init_crypto(snp_dev->vmpck, VMPCK_KEY_LEN);
-> +       snp_dev->ctx =3D snp_init_crypto(snp_dev);
->         if (!snp_dev->ctx)
->                 goto e_free_cert_data;
->
-> --
-> 2.34.1
->
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PA4PR04MB7790:EE_|AS5PR04MB9754:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5daf183a-6d80-44d4-ec89-08dbd963b1ab
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	GhhHULMA5Byb0v1dzgwBvZDiZMSRElMnCnEZlAaMcKvmz9zy7lNjPXYRcD6AORD91T/PTzBh/E5qY5yx+bH3DcS0Q2sfeYdqwgwlv2UDZHpnJEuQ7THtr2t/zcDyVEauQDQKgaAXSgsQNEK6a/v5v3Nb+IqLUYklaHyfnI/todoYp5ZcoapcxmS40i3G1wOiv3lfz04Zu4ZRXQ34PVwNAWXPENg5Zw58x38ES95YgK0dCUVYBXJn+Rdbe5cWuYiGpkmIDME1G9yS95NPgxNtysUjcHZPvxn20JK7cv4sNO8Kx9wcInwWACPWv+tp/t21e584U5vVZqoN8ayBTBZlbTkz0KKJhFabEp1b0I7x8PNGl+3TFMO9uY+mTDAyio2EBWDXMqYJgzzVzzMJHgx8joCywuQYWcwJDDJYGro/0TqyEQ7B3lVT4ycocjz6bMtPb+zsmbtg5UkrC2sZpWGj3NCdWjgqPIZ02MgD615hSsscUF+LWzNJmWWXJxr0TUAjXTQq7tis4KnX2mBPxlkE6XZGAVre8gOpbASEkGt6463IAfKgnFclwUdb3+/oSvwzrBoXZ53DiLi3WgT1VE2SbrjJCVleMOjxFu+FNuW4lss3fdYDJB7H5ZOa4C8436giDNAA0nhAry6vVY4i2pI76g==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7790.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(376002)(366004)(396003)(39860400002)(230922051799003)(1800799009)(186009)(64100799003)(451199024)(6506007)(2616005)(8676002)(86362001)(36756003)(6916009)(31696002)(5660300002)(6486002)(6512007)(41300700001)(6666004)(66476007)(4326008)(66556008)(83380400001)(478600001)(8936002)(66946007)(2906002)(316002)(38100700002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?OXJYSGFMUkRiMDF6QlNtOXZRNzYwSFZoejFrNExVYWlwUjZUMHk0VktFMXF6?=
+ =?utf-8?B?SW1QZlFMRmkrcnlKNUpDeDhXLzFKODJheEZCTnNRT3p2ZGFWNFdSeGhSUkE0?=
+ =?utf-8?B?Sy9QZDUvVmFjanVFZ2x3US8xRVZWbWpFN0dPM25vengvZEc5eDZrZ0JKNS9R?=
+ =?utf-8?B?WHFLNDNxMGUwdjRBMkpkaU1EaWlNZkxSWmlwM0Z1cExIY2RYQ3pQNDEwZlVa?=
+ =?utf-8?B?VW50OHR4NU11ZWJ4MTFuTklSdjZ1b2J1OUxPVDl4VkV6WFhBSUNCQ2NOTTk4?=
+ =?utf-8?B?TDVvTlBZcnpOcEpPdmxGZUZOUGRNbmlIQ2JRT090OWJzYUI1SWN4R3lqNmRX?=
+ =?utf-8?B?aCtBN0g2ZDd5VmU3UzFqL1dFVVNBOFN1UmFLUUdzelBnUEllQjFVZDZQU1A2?=
+ =?utf-8?B?b0hGS0tiRjJpY1lOd2swRGNhSWFXWFBzR0kzYlFRMG5pTEM2czFWV1hWeFRu?=
+ =?utf-8?B?a21tTXN4aW45emFoK1MxTUoxL1ltM09NOFJZTDNUQlozMmxMcTBncVF3Y1Zx?=
+ =?utf-8?B?TlkyQlNVZUN0MVIxdkpvUVBCcWQ5cmNrSTNKakQvQzE2TUtqWUl2NktPWlRR?=
+ =?utf-8?B?aVFFcFJhWWVvYWhyQ01JUmZpMTRoem9OQkh5Sk92R0xmUzN1cmR5UTZYcVVi?=
+ =?utf-8?B?RXJzRUFVaGs5NGlBZDJtZWU3cXpEbFlGbTYyYW42WnZhNk5CNGFOWkNoQ2pt?=
+ =?utf-8?B?ZiszRVBLSFRkUzd3b0ZLYUV4aHQ2QXl6SnhTVlord01mK1FNdmIvRkpzeFBr?=
+ =?utf-8?B?anV1RFJlTDZJUnR0MjZVVkhxaXFNaStxU1ZaUWtoWUZBNm1pR2cxUmZ1eE0y?=
+ =?utf-8?B?QlpjVEVRbGw1VDZoL1AvWU9qeGZwWllBbGs3eEFpa05BdXlWOS96YzgxZ1Qy?=
+ =?utf-8?B?N0kwMTdKS0JkTVEvQ0RyOXdGUlhSdG0wcG9IYy9CVlJVM0M5akxkOHY4cldj?=
+ =?utf-8?B?Q0Z5Zkt0Y001SVBGYlg3YUVyb0FLbE9sVUwvUG1USGZUSS9uUHYyZzJabmZE?=
+ =?utf-8?B?ak16VXZiN1ZUb2N3aDlBSEtFYUFmd29tV0VMWmJYeFlEa2k0TmVDT3NFZWJi?=
+ =?utf-8?B?N1NDTHU3VzdEampSeExqQjZCaTlobHhyYytFcmFzekF0ckVyZTlCWWZkUDMz?=
+ =?utf-8?B?WTQxRlRuWkN3b2ZCeHRadHNqcGc0NXJQT1pWQzREaEVGSDVVZ3FaOHZ2Qkkv?=
+ =?utf-8?B?aU9CNkhhWm5PTC9iQWcvWHQwRFdYTnQ1MklZODh0Q3ZNckZ1bndkekRCVTFD?=
+ =?utf-8?B?M1hRdkVTZzBmSW81N2tXTjlUUlc2YVFiMWIrd0pYci9aQ2pDZG54K04vWHEw?=
+ =?utf-8?B?andqK3lrNmJKSk11eFBCMG1QTTd2THJKOElQdjRYTGJraDU5b3BEZlhUWWg1?=
+ =?utf-8?B?UUd0bUpvbHJPRitQUXZ6UVZJRzNoa3F3T3UvTGVFc2d2OXZSWm50bHhDaWxS?=
+ =?utf-8?B?RXRuRVczQnF4cUJqRlZ0S2s4aTdSeis0RWdtVmpURmppTWdSaDlNZGRyY3pm?=
+ =?utf-8?B?OUxGcC9TVHM5bUFJVWhBWGlycUlBblNLZHVlMHJ3bE01K3BOSWVPQzhUSEta?=
+ =?utf-8?B?U3pKN1FaSEVXWXMrdzVtT1Bacm9pSlIya1Jzb004bG1CaHV1RjBnR2xxWjh4?=
+ =?utf-8?B?SVNERzNhQmt5QzRnQ3JxQkRnRGdONkIrR0tjR1lMZUFZUnlaMFU5WWhIa0p4?=
+ =?utf-8?B?YW5mV3hRTTYranZ6cUF4cVkwUXhYYWxoaUJEd2J1RkhIc3RHUnZUcVROUW5n?=
+ =?utf-8?B?N3F0c3BxcTVyMmV5RjZXcGlLTFZLUkNKOXNwcWJGN214dDJrM0VPclBSZzBN?=
+ =?utf-8?B?VWZQeVdMVGpVL25qaitjV2xLTFYrWlZqQktodTFsUFE2c2JuQ0pqaDl4SWx6?=
+ =?utf-8?B?UnpSWkR6cUdGNGo0cW9BcHByUnVSVDI0N3Q4TXl1ZTFIT3czZFJkTklVaUhN?=
+ =?utf-8?B?dWZpdWQ1Mk5DZTFjd3kyTUFJRE9VS1ZQNFlNKzY3cE1FREhXRDNoNUxSaEZJ?=
+ =?utf-8?B?N3ZCeE40a3V6UFhPRWYwdVN2a3kwMTU5NGFnTGM3WXJsTWxiS2FTL0tTTUIx?=
+ =?utf-8?B?MElWMUdxVjN1enRHSEUyNlY2dFZ5UEVHRVlFRWZvSTZnd2lpQXpyUDg4dVZG?=
+ =?utf-8?B?eDFLWkErUWZYcUl1UTVFMEtPQnFLbjVMVXVKMUdLTUllVFVQak1IWFgwQXhm?=
+ =?utf-8?Q?cB7lundLN/vTZs+c7Q2D7SkPoIdOjx+KZz/JVNSQ9gFe?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5daf183a-6d80-44d4-ec89-08dbd963b1ab
+X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7790.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2023 16:17:21.1775
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8SQLgfPyGaaIDPqMMf+3B0ZJYrtw3z+1CCis+T/fu3S7rjq8ohoF9HjK2mXeCTZfbiRGOIIFbmst3g5sm//SCw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR04MB9754
 
 
---=20
--Dionna Glaze, PhD (she/her)
+
+On 30.10.23 г. 18:07 ч., Sean Christopherson wrote:
+> On Mon, Oct 30, 2023, Nikolay Borisov wrote:
+>> Current separation between (__){0,1}kvm_x86_vendor_init() is superfluos as
+> 
+> superfluous
+> 
+> But this intro is actively misleading.  The double-underscore variant most definitely
+> isn't superfluous, e.g. it eliminates the need for gotos reduces the probability
+> of incorrect error codes, bugs in the error handling, etc.  It _becomes_ superflous
+> after switching to guard(mutex).
+> 
+> IMO, this is one of the instances where the "problem, then solution" appoach is
+> counter-productive.  If there are no objections, I'll massage the change log to
+> the below when applying (for 6.8, in a few weeks).
+> 
+>    Use the recently introduced guard(mutex) infrastructure acquire and
+>    automatically release vendor_module_lock when the guard goes out of scope.
+>    Drop the inner __kvm_x86_vendor_init(), its sole purpose was to simplify
+>    releasing vendor_module_lock in error paths.
+> 
+>    No functional change intended.
+
+Thanks, I'm fine with this changelog.
+
+> 
+>> the the underscore version doesn't have any other callers.
+>>
+>> Instead, use the newly added cleanup infrastructure to ensure that
+>> kvm_x86_vendor_init() holds the vendor_module_lock throughout its
+>> exectuion and that in case of error in the middle it's released. No
+>> functional changes.
+> 
 
