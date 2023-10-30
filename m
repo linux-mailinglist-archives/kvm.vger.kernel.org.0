@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-113-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-114-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CACD57DBEFD
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 18:32:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67EAD7DBF07
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 18:34:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1530B281C08
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 17:32:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB4FCB20A01
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 17:34:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71B1C199B1;
-	Mon, 30 Oct 2023 17:32:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1F22199BA;
+	Mon, 30 Oct 2023 17:34:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IyYlixsi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aX7D2XIn"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D9F199A5
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 17:31:59 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9640299
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:31:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2748199A3
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 17:34:21 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B6F79C
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:34:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698687117;
+	s=mimecast20190719; t=1698687259;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=3g1TVhpzsOzzHHVoXez8JAaDO7pX06gUTyU2b4+L2DI=;
-	b=IyYlixsiNWlGKrXB5enn4+dorl8uqg2Mts1Q9YjRWfwNiWp6Sk4VVg7Ma30ySQiMb8I0oN
-	T4h9w8/24va4fKDcRUUrG+U6OPg9LAHU8N6z5NHVwvGVcLUgma6HoG0dzruKFBr5mudWm+
-	TRXs3yRjBxxXzgzfYOju046hqrWAbMs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=5fMqrw+qFhssxj8qhYVvLd8lvq+1o5oZc/SrI7TORTQ=;
+	b=aX7D2XInE3im0lFLJxafHhkRtxARBOstcwsapG6x2d3JTjdZ3VqRgF0QpSfg56C02KacZm
+	pb94k/ApH88eR4CYWHB9oRFIR3J+MFC9TQn4exSyFBvSUT5ZHAh3WI0BQYEa+5TwsVLdAa
+	uL16pDRgM8OREsxchxcUaW0idqhlPcs=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-264-ZXbCWGs2Mse5XmyA4W3Zqg-1; Mon, 30 Oct 2023 13:31:56 -0400
-X-MC-Unique: ZXbCWGs2Mse5XmyA4W3Zqg-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4084001846eso35339785e9.1
-        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:31:56 -0700 (PDT)
+ us-mta-621-NzgzFiN4NcC-O2w1qg3_LA-1; Mon, 30 Oct 2023 13:34:18 -0400
+X-MC-Unique: NzgzFiN4NcC-O2w1qg3_LA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-32de95ec119so2466417f8f.2
+        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:34:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698687115; x=1699291915;
+        d=1e100.net; s=20230601; t=1698687256; x=1699292056;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3g1TVhpzsOzzHHVoXez8JAaDO7pX06gUTyU2b4+L2DI=;
-        b=WL3gNC6dAAf056L6ukz084Z0nLxnii2Xvh5FUHuQVW38ApD7iJGY3/EkVavKyEpdro
-         Mi0jbsu3APtMBBYf41OyEDuOMs1lQixv5UQvNzGJkuV+Y+7WgtLutG2CNCP37t//ky5A
-         kQTNHrzkrnWj2WeNW7vm8tsVnC1z2q0bS0HZEbEh4wsRk9CZjp99ltuNWs1hNGn/iim4
-         DnRUtbiiz9wL98bmthjOeSNNOllytVPWYisHjdcjEI50XNewLhmm0QWtZim4H5JhfKUn
-         fsm+l+APt7iqjTLO0FN6TCfKsPk3rBPZeFth09Mbm4vlDC6OZy9flRNIuhJq6ID3xs2s
-         T3jw==
-X-Gm-Message-State: AOJu0YzdJhMzVQjZF2vTj/8Voeyo6Uv8eGcYA1Dd6gGADW8Mum0vCUsp
-	GSmehNkYmgrLE9u1/2zCIaB2iEcPKtFTVSiYYgC5IS3fhAoZ5bWsKlFXZuvDb72POoPFo6FHeji
-	p1Ti9YFNBZh4V
-X-Received: by 2002:a05:600c:3b13:b0:405:3455:567e with SMTP id m19-20020a05600c3b1300b004053455567emr8489624wms.5.1698687115245;
-        Mon, 30 Oct 2023 10:31:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFOw2pwrz3emhHHPGzRcEZaKdyXE5ETYrjkl0hP08/axAOlUIY6MyqVTu78CJe3u248QTKzww==
-X-Received: by 2002:a05:600c:3b13:b0:405:3455:567e with SMTP id m19-20020a05600c3b1300b004053455567emr8489569wms.5.1698687114826;
-        Mon, 30 Oct 2023 10:31:54 -0700 (PDT)
+        bh=5fMqrw+qFhssxj8qhYVvLd8lvq+1o5oZc/SrI7TORTQ=;
+        b=MKNMYnvjFGKI7yDGbkdYK906nBAWgITOpg9JwQMCT4X/7k2ZoNbHFp36WWE+huLx45
+         NWYibv99KAscnMstZ0JhXfBTYofYjZyyBnMt35KeQgm6vtTnSQbGqTKZPJcsAi4QOu+a
+         PemYvBq+bsN99i+LJYJKQRjRvoChqZfhHRKaqmXbkXROBRELrxSqCnKCG2t9LQZeHnpt
+         UCDrpM6gOjqx8PjLuakjRhG3tR8d+hxMRPfUIVavRlf2+s6xfdiPRHdfn7xJRsIYkVxF
+         oG/WqPLf5gFuUI0ruqcM6YnNLTaHEkAfcAMNZbkd8PqFxci7KxI6hIyljecNg8JWJXgo
+         T2ZA==
+X-Gm-Message-State: AOJu0YxP2waICh3forudN3MthwTGS7SaqamcpVwGVupoDoio1on7ymYC
+	tHCOJCaOJKwMjUoUFz6RhVW98xSGYqxeD6U9HrbJ4rJa3zKPdloL+28lGNqmhuMP53JjYl4ghpd
+	Gm8yp2oOQO+5No9Ne7YnZ
+X-Received: by 2002:a5d:674c:0:b0:32d:bc7d:c431 with SMTP id l12-20020a5d674c000000b0032dbc7dc431mr8595480wrw.1.1698687256656;
+        Mon, 30 Oct 2023 10:34:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGoSwHjCgF60i9p5iHFG+4s/5oKx7xoJBSRpuzoczO/1s/n65Z43CGXqwQnwC+DGZUjQ2L04A==
+X-Received: by 2002:a5d:674c:0:b0:32d:bc7d:c431 with SMTP id l12-20020a5d674c000000b0032dbc7dc431mr8595455wrw.1.1698687256340;
+        Mon, 30 Oct 2023 10:34:16 -0700 (PDT)
 Received: from [192.168.1.174] ([151.81.68.207])
-        by smtp.googlemail.com with ESMTPSA id c5-20020a05600c0a4500b004094d4292aesm449246wmq.18.2023.10.30.10.31.51
+        by smtp.googlemail.com with ESMTPSA id o26-20020a5d58da000000b0032d2489a399sm8695806wrf.49.2023.10.30.10.34.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Oct 2023 10:31:54 -0700 (PDT)
-Message-ID: <0731604e-8692-4c51-9427-78b4c629f9e9@redhat.com>
-Date: Mon, 30 Oct 2023 18:31:50 +0100
+        Mon, 30 Oct 2023 10:34:15 -0700 (PDT)
+Message-ID: <9bc69994-c98f-48e4-b956-08a8d98a6e6d@redhat.com>
+Date: Mon, 30 Oct 2023 18:34:12 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -73,8 +73,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 18/35] KVM: x86: "Reset" vcpu->run->exit_reason early
- in KVM_RUN
+Subject: Re: [PATCH v13 22/35] KVM: Allow arch code to track number of memslot
+ address spaces per VM
 Content-Language: en-US
 To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
  Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
@@ -105,7 +105,7 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  Isaku Yamahata <isaku.yamahata@gmail.com>,
  "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-19-seanjc@google.com>
+ <20231027182217.3615211-23-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -142,56 +142,20 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20231027182217.3615211-19-seanjc@google.com>
+In-Reply-To: <20231027182217.3615211-23-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 10/27/23 20:22, Sean Christopherson wrote:
-> Initialize run->exit_reason to KVM_EXIT_UNKNOWN early in KVM_RUN to reduce
-> the probability of exiting to userspace with a stale run->exit_reason that
-> *appears* to be valid.
+> Let x86 track the number of address spaces on a per-VM basis so that KVM
+> can disallow SMM memslots for confidential VMs.  Confidentials VMs are
+> fundamentally incompatible with emulating SMM, which as the name suggests
+> requires being able to read and write guest memory and register state.
 > 
-> To support fd-based guest memory (guest memory without a corresponding
-> userspace virtual address), KVM will exit to userspace for various memory
-> related errors, which userspace *may* be able to resolve, instead of using
-> e.g. BUS_MCEERR_AR.  And in the more distant future, KVM will also likely
-> utilize the same functionality to let userspace "intercept" and handle
-> memory faults when the userspace mapping is missing, i.e. when fast gup()
-> fails.
-> 
-> Because many of KVM's internal APIs related to guest memory use '0' to
-> indicate "success, continue on" and not "exit to userspace", reporting
-> memory faults/errors to userspace will set run->exit_reason and
-> corresponding fields in the run structure fields in conjunction with a
-> a non-zero, negative return code, e.g. -EFAULT or -EHWPOISON.  And because
-> KVM already returns  -EFAULT in many paths, there's a relatively high
-> probability that KVM could return -EFAULT without setting run->exit_reason,
-> in which case reporting KVM_EXIT_UNKNOWN is much better than reporting
-> whatever exit reason happened to be in the run structure.
-> 
-> Note, KVM must wait until after run->immediate_exit is serviced to
-> sanitize run->exit_reason as KVM's ABI is that run->exit_reason is
-> preserved across KVM_RUN when run->immediate_exit is true.
-> 
-> Link: https://lore.kernel.org/all/20230908222905.1321305-1-amoorthy@google.com
-> Link: https://lore.kernel.org/all/ZFFbwOXZ5uI%2Fgdaf@google.com
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/x86.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ee3cd8c3c0ef..f41dbb1465a0 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10963,6 +10963,7 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
->   {
->   	int r;
->   
-> +	vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
->   	vcpu->arch.l1tf_flush_l1d = true;
->   
->   	for (;;) {
+> Disallowing SMM will simplify support for guest private memory, as KVM
+> will not need to worry about tracking memory attributes for multiple
+> address spaces (SMM is the only "non-default" address space across all
+> architectures).
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
