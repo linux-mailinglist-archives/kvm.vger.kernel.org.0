@@ -1,161 +1,135 @@
-Return-Path: <kvm+bounces-89-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-90-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAA517DBD84
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 17:11:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 316717DBD8F
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 17:13:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D11BA1C20B25
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 16:10:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2215CB20F6F
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 16:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED29F18C3A;
-	Mon, 30 Oct 2023 16:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19EAC18E11;
+	Mon, 30 Oct 2023 16:13:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xIpHiLlY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kNeNHzK1"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB5318C17
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 16:10:52 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E4E0C2
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 09:10:50 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-da033914f7cso3990935276.0
-        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 09:10:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6567A18C18
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 16:12:57 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 730C0C5
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 09:12:55 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a7af53bde4so45605837b3.0
+        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 09:12:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698682249; x=1699287049; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3/eJ4eIlm/QBKFGigGc88HjjNKR0Bxic1+CMFaJ9ygg=;
-        b=xIpHiLlYMInUSLi5VCe6TqJpt61TrAn/5ZPqHyszcZVdiUz0c28xoPUwvcEMHNUUBu
-         bjF6Yr/DB7VAqku0bXwkoDWpKKaLxSJLtdpMLXIhVr1yBgLYL10+qdippLa24OArU/Ob
-         OwQ2TTIYKwbkYktDUAQAIdsnD/M4DgEeFtpYBvnMbhG3d/BCNvQoQVsQPU27dnX1jXDB
-         UeMR4FLftEFiRahqkhojZ8222kP2JSVepRntLbr6vFa4dpcBCRJpOWtfBeutPekiBf49
-         oUMkfOtdlQQrA4ZJF3Lld7zJYzp8Ky17grYE0WRGw7K9oXCY6meP3JgYnvf8zfFcsScO
-         Pq2w==
+        d=google.com; s=20230601; t=1698682374; x=1699287174; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Tgkw7eW9dhnk+knrp7jJaqDTfZMev9xwF7TYvvMUsbc=;
+        b=kNeNHzK1Sz8aeXqqKEvpbAb68aFVu1cPCqsiiJ2Dk5nqBE8kZYoB6bLegGvN5z67N3
+         4vH+PUUME3MJxSCsJybvOeO8FPA2ANuh5XluvW0rg1Xj960dj7adVpAwWe9EK5qartPJ
+         r64aSEzAT5AF/Rc1L5bixs6YJO9sxE1iqmJN5HGMCWRZGgQSEdF9b5hH10UiwIPd7S4Z
+         ++c3NchvC+MXcwms1XNUJnfyFcVwnlxeaILjvLSb0G8GG+OWlPab7jKXg/kQVYfL4hkK
+         0aVY1yD9qFv0DEHpuHcN17a34m0lJLVZ/jLuJUtpZpMsXmI5vAhZZwdNJvmC9aIaGOmV
+         z2Og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698682249; x=1699287049;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3/eJ4eIlm/QBKFGigGc88HjjNKR0Bxic1+CMFaJ9ygg=;
-        b=t0Msl27t4lNmCQz5K4s0Adp33B1s4qc3/fNq2Q0qnps1Q0Lt4myc4dB9rZORpqUGHh
-         Lwyx0/mBjnrPGkcfkHs7o6fAEOw/675p4UKw7cGLsFrZB39Ggi53ypLuvjRDYUQRAC8N
-         N5wcHJ2H8Vx7G1HhsqSnOGX/mqIHaWh65LLGhZ191JDEcY9b1CnCOZZd+SaFM3uRZv0U
-         B56jGmjDmaGEtu8+ZsPTUJiHnvSfMFIrrR/IGp6fWwbdRj0UljkwhlfBKBYuPbEV02xb
-         jcZ+my9s07NAe6RNZhE8Ewy0bEege7DIsurj3xSxDQtZX10fTrG7ISl2OK/1SJU+yyIc
-         1zNA==
-X-Gm-Message-State: AOJu0YyNQVf8BcJdmmBquUhW1qO/O+9QI9q4TBi8bOooEUltIvj36Vzu
-	NFdyl5sZ3sbZZ0iaWaJy4M0ZQORveFc=
-X-Google-Smtp-Source: AGHT+IG/nj4LaX3JPzHZqsehR5FWhArOOi7E0ApKeqEkunCLK98IonUlxUU55c5VBDsNlZFSGb1icvfnahw=
+        d=1e100.net; s=20230601; t=1698682374; x=1699287174;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Tgkw7eW9dhnk+knrp7jJaqDTfZMev9xwF7TYvvMUsbc=;
+        b=anYEpGpKoC7JtF1VnkesWNcB3Z4ps8O/9gTtrUQOZH4NJbN1wGrQ47cqMkxjnRet0X
+         DG5PNRF0785S3kKsDpzPCXYemUQmLv14S6paPUokWOFuhvqJsvE9Kib0l56Jr4dhvUlv
+         YHhqfB3JcRP6hyKk3NyAb/luFF5+o8ZK6qOQ7im9DSmXnwVpOAHJ4Mo/1jNAkIR40pvm
+         HJC2t4nQHr9Oo+oh45XpeqQ4tTvwdhjTeXl9FBIDuiJrWqhVAJ2WMW0XnTRruKYYZjxs
+         ZItp457eyXt8wbNS/p9qkpChhQN/pZFd+PubqJXQS2xmJjFC0KRv623cEXCpBsO28s2W
+         Ex7A==
+X-Gm-Message-State: AOJu0YxQvwSx5gkE430qwGL9UIjGjxOONUh01qxKJ2vQdn0i2FjN/1xk
+	SXO2TOfUGEw8VCd2cFehweY+Hqg6HIE=
+X-Google-Smtp-Source: AGHT+IHXERmhF1p7ZLDX+e5zNpxMNE30YgXaemlxnBQEovmUJpclQzlFIZqH7J8ykW6OvSDZcwj8yNLtP1w=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1083:b0:d9a:c3b8:4274 with SMTP id
- v3-20020a056902108300b00d9ac3b84274mr243782ybu.7.1698682249642; Mon, 30 Oct
- 2023 09:10:49 -0700 (PDT)
-Date: Mon, 30 Oct 2023 16:10:48 +0000
-In-Reply-To: <ZT9lQ9c7Bik6FIpw@chao-email>
+ (user=seanjc job=sendgmr) by 2002:a81:920b:0:b0:59b:f3a2:cd79 with SMTP id
+ j11-20020a81920b000000b0059bf3a2cd79mr205625ywg.8.1698682374564; Mon, 30 Oct
+ 2023 09:12:54 -0700 (PDT)
+Date: Mon, 30 Oct 2023 09:12:53 -0700
+In-Reply-To: <20231029093928.138570-1-jose.pekkarinen@foxhound.fi>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-14-seanjc@google.com>
- <ZT9lQ9c7Bik6FIpw@chao-email>
-Message-ID: <ZT_ViJOW1p4TN_fI@google.com>
-Subject: Re: [PATCH v13 13/35] KVM: Introduce per-page memory attributes
+References: <20231029093928.138570-1-jose.pekkarinen@foxhound.fi>
+Message-ID: <ZT_WBanoip8zhxis@google.com>
+Subject: Re: [PATCH] KVM: x86: replace do_div with div64_ul
 From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>, 
-	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
-	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+To: "=?utf-8?B?Sm9zw6k=?= Pekkarinen" <jose.pekkarinen@foxhound.fi>
+Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, skhan@linuxfoundation.org, x86@kernel.org, 
+	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kernel-mentees@lists.linuxfoundation.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 30, 2023, Chao Gao wrote:
-> On Fri, Oct 27, 2023 at 11:21:55AM -0700, Sean Christopherson wrote:
-> >From: Chao Peng <chao.p.peng@linux.intel.com>
-> >
-> >In confidential computing usages, whether a page is private or shared is
-> >necessary information for KVM to perform operations like page fault
-> >handling, page zapping etc. There are other potential use cases for
-> >per-page memory attributes, e.g. to make memory read-only (or no-exec,
-> >or exec-only, etc.) without having to modify memslots.
-> >
-> >Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
-> >userspace to operate on the per-page memory attributes.
-> >  - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
-> >    a guest memory range.
-> 
-> >  - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
-> >    memory attributes.
-> 
-> This ioctl() is already removed. So, the changelog is out-of-date and needs
-> an update.
+On Sun, Oct 29, 2023, Jos=C3=A9 Pekkarinen wrote:
+> Reported by coccinelle, there is a do_div call that does
+> 64-by-32 divisions even in 64bit platforms, this patch will
+> move it to div64_ul macro that will decide the correct
+> division function for the platform underneath. The output
+> the warning follows:
+>=20
+> arch/x86/kvm/lapic.c:1948:1-7: WARNING: do_div() does a 64-by-32 division=
+, please consider using div64_ul instead.
+>=20
+> Signed-off-by: Jos=C3=A9 Pekkarinen <jose.pekkarinen@foxhound.fi>
+> ---
+>  arch/x86/kvm/lapic.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 3e977dbbf993..0b90c6ad5091 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -1945,7 +1945,7 @@ static void start_sw_tscdeadline(struct kvm_lapic *=
+apic)
+>  	guest_tsc =3D kvm_read_l1_tsc(vcpu, rdtsc());
+> =20
+>  	ns =3D (tscdeadline - guest_tsc) * 1000000ULL;
+> -	do_div(ns, this_tsc_khz);
+> +	div64_ul(ns, this_tsc_khz);
 
-Doh, I lost track of this and the fixup for KVM_CAP_MEMORY_ATTRIBUTES below.
+Well this is silly, virtual_tsc_khz is a u32.
 
-> >+:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> >+:Architectures: x86
-> >+:Type: vm ioctl
-> >+:Parameters: struct kvm_memory_attributes(in)
-> 
-> 					   ^ add one space here?
+	unsigned long this_tsc_khz =3D vcpu->arch.virtual_tsc_khz;
 
-Ah, yeah, that does appear to be the standard.
-> 
-> 
-> >+static bool kvm_pre_set_memory_attributes(struct kvm *kvm,
-> >+					  struct kvm_gfn_range *range)
-> >+{
-> >+	/*
-> >+	 * Unconditionally add the range to the invalidation set, regardless of
-> >+	 * whether or not the arch callback actually needs to zap SPTEs.  E.g.
-> >+	 * if KVM supports RWX attributes in the future and the attributes are
-> >+	 * going from R=>RW, zapping isn't strictly necessary.  Unconditionally
-> >+	 * adding the range allows KVM to require that MMU invalidations add at
-> >+	 * least one range between begin() and end(), e.g. allows KVM to detect
-> >+	 * bugs where the add() is missed.  Rexlaing the rule *might* be safe,
-> 
-> 					    ^^^^^^^^ Relaxing
-> 
-> >@@ -4640,6 +4850,17 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
-> > 	case KVM_CAP_BINARY_STATS_FD:
-> > 	case KVM_CAP_SYSTEM_EVENT_DATA:
-> > 		return 1;
-> >+#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> >+	case KVM_CAP_MEMORY_ATTRIBUTES:
-> >+		u64 attrs = kvm_supported_mem_attributes(kvm);
-> >+
-> >+		r = -EFAULT;
-> >+		if (copy_to_user(argp, &attrs, sizeof(attrs)))
-> >+			goto out;
-> >+		r = 0;
-> >+		break;
-> 
-> This cannot work, e.g., no @argp in this function and is fixed by a later commit:
-> 
-> 	fcbef1e5e5d2 ("KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific backing memory")
+struct kvm_vcpu_arch {=20
 
-I'll post a fixup patch for all of these, thanks much!
+	...
+
+	u32 virtual_tsc_khz;
+
+}
+
+I assume this will make coccinelle happy?
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 245b20973cae..31e9c84b8791 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1932,7 +1932,7 @@ static void start_sw_tscdeadline(struct kvm_lapic *ap=
+ic)
+        u64 ns =3D 0;
+        ktime_t expire;
+        struct kvm_vcpu *vcpu =3D apic->vcpu;
+-       unsigned long this_tsc_khz =3D vcpu->arch.virtual_tsc_khz;
++       u32 this_tsc_khz =3D vcpu->arch.virtual_tsc_khz;
+        unsigned long flags;
+        ktime_t now;
+=20
+
 
