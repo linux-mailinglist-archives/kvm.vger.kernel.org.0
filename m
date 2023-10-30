@@ -1,161 +1,384 @@
-Return-Path: <kvm+bounces-53-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-54-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D30A57DB39B
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 07:39:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D77287DB39D
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 07:40:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83C2B281415
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 06:39:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3DCA1B20DC6
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 06:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1913D27A;
-	Mon, 30 Oct 2023 06:39:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE26D26E;
+	Mon, 30 Oct 2023 06:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mw5NEosP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fB5eJIL3"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77A2BD263
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 06:39:32 +0000 (UTC)
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2046.outbound.protection.outlook.com [40.107.244.46])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E548F3;
-	Sun, 29 Oct 2023 23:39:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nkS8hUmfgoQSLmx8FI/zq+MIJrZc+iOqtKZUu0oHy77DjunAxj2+se+lHOh+8mgxZSV4KorOIHzXP7rjIYciWHX2NxD0duA+Xg9fEo6S+CTHykHwOnDHq/ZvmoiF3CxGQD6gcRCr55+KwTaVH/AcPDKMpUIWFLcSUFMZ1jh4pKGKy31zp4vdFZmNR6qd5pfJJi/fTmEeeoKjlUyummf1qEhemdo6o/uWlIcBx88DNtSOxF5a673O/p+WTS0cghy1BGu7ypkj1/RDJeAMG/4ifePGe+HW24tT1H5+k1TUCUPjynJ7WM/HurIOIKRa3e5Vqp2me0ToCEQhsB/r+vDh7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7S0QfNyZyCPa4u3nkOKUErbZa/aijuE0Cav6TY9y0Jo=;
- b=dEKbUtzBVyAPUqsIoWpl7nZ5a7D0sfprtxuFCU83wSpDMePeIIMS4Nzjko0x3BBPHEcvUfgEREyCVw8e6qfSbE4S0C3i9uPmwwPIxGXempy9u2BU2U8gttISX3VNgyKLAgEmwE/7aYxOVSzp5MJHuFNpe24bFmOtR/oJoNSj76Pcug25z45topn7yqBQ8nENR4+pVoD0OjTGKBqYUPvPZ5Oi8isctazW1myEkSB3AfxTXh07uxC3h+niPjwozBr/vMknFqTD06UTE5M5Ll1S5Wv8Vwaq9NqNLoURArvx3yl85nKDJOlKcZc4pEl4xi1YxGuD07bMmVYnerUhnYloVg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7S0QfNyZyCPa4u3nkOKUErbZa/aijuE0Cav6TY9y0Jo=;
- b=mw5NEosPzc8OhhPO1ytdra4r0BlYWjdiytGAMn3sDaEdd8bV5AqvBg2A2klNdMZDPHvj16fpV5KCJB7lQ5A/5/NYCaDVyKiJEmfR96WPAYVrQyxTks+ZabFcBN5/tpn75D9e4tpECfPY8WXzyM9SzA44t4GQDfg9i/bXkseBVVg=
-Received: from CY8PR19CA0046.namprd19.prod.outlook.com (2603:10b6:930:6::10)
- by DS0PR12MB8041.namprd12.prod.outlook.com (2603:10b6:8:147::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.25; Mon, 30 Oct
- 2023 06:39:09 +0000
-Received: from CY4PEPF0000EDD2.namprd03.prod.outlook.com
- (2603:10b6:930:6:cafe::71) by CY8PR19CA0046.outlook.office365.com
- (2603:10b6:930:6::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.28 via Frontend
- Transport; Mon, 30 Oct 2023 06:39:08 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000EDD2.mail.protection.outlook.com (10.167.241.206) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6933.15 via Frontend Transport; Mon, 30 Oct 2023 06:39:08 +0000
-Received: from gomati.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Mon, 30 Oct
- 2023 01:38:48 -0500
-From: Nikunj A Dadhania <nikunj@amd.com>
-To: <linux-kernel@vger.kernel.org>, <thomas.lendacky@amd.com>,
-	<x86@kernel.org>, <kvm@vger.kernel.org>
-CC: <bp@alien8.de>, <mingo@redhat.com>, <tglx@linutronix.de>,
-	<dave.hansen@linux.intel.com>, <dionnaglaze@google.com>, <pgonda@google.com>,
-	<seanjc@google.com>, <pbonzini@redhat.com>, <nikunj@amd.com>
-Subject: [PATCH v5 14/14] x86/sev: Enable Secure TSC for SNP guests
-Date: Mon, 30 Oct 2023 12:06:52 +0530
-Message-ID: <20231030063652.68675-15-nikunj@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231030063652.68675-1-nikunj@amd.com>
-References: <20231030063652.68675-1-nikunj@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A893AD263
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 06:40:20 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDFF119BA
+	for <kvm@vger.kernel.org>; Sun, 29 Oct 2023 23:39:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698647989;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5nyjgS0fYQSx/D6IewuJYJKpefagBoQYUrzFE3HJwSY=;
+	b=fB5eJIL3QOH7J2z/nlzm6z96Mz7TIe1d0+gfnjhjmWfN2yYRaedXmMCsSUsop/dumjnT2h
+	Jh6iHC97uIMhSkz2lmb+qZOd4AVrdv02iRClEHlAjSZHv5hdpYrZ6krrrV/TiWTzKdGcEC
+	lGxWX+cRBdB6p0vNV2Zn07lXhXoVQjg=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-299-g96-M_q9MFi6P5sjkTI-Rw-1; Mon, 30 Oct 2023 02:39:43 -0400
+X-MC-Unique: g96-M_q9MFi6P5sjkTI-Rw-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7789577b582so549759685a.0
+        for <kvm@vger.kernel.org>; Sun, 29 Oct 2023 23:39:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698647983; x=1699252783;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5nyjgS0fYQSx/D6IewuJYJKpefagBoQYUrzFE3HJwSY=;
+        b=FuwA9qzLroqt2E9dRa4FRkYGcpY+5bk/18GALrXGXxe5TYOQQuCiQg6xHp347V+MwG
+         RfXnMdtOvmnrSo3M3RwfHhjwJMV63PsRQtmESzU9awSspq+RxKi3LdyKAzSmJaN4GhUq
+         sHSv2sa+xrO2fA1JYy0jvksEw3hl+bw4qw+g+iS1qgVSESwemOzG6jdBhNuFrpmLtgJL
+         w/JG0UU2OrvUYCZ9pc4lBXVubv1x6jKBq+DoUptEqcgAXeA0Qpp0JB2qg1yQajU/Pclj
+         uCMTQCxRpqL/tLcq26BgS9ihUOQ3mf9jPnEw27D0C9l3zgnVOoGxEx0lWmtd6zXJ5ahn
+         o9+Q==
+X-Gm-Message-State: AOJu0Yy7SxiHv5uSJPsV5v1Cr28TTHUrecKGiicKqfvp6MLg0IsZGQk+
+	JCaCbinPAJvXiSXdVBn3G/r+b3ut35SddmXPnBymNso1AEcSIftAnpay/xV7L3rMSKeERBd5wbe
+	4L2/cTCl1UJsg
+X-Received: by 2002:a05:620a:284a:b0:774:3581:588f with SMTP id h10-20020a05620a284a00b007743581588fmr10211177qkp.53.1698647982934;
+        Sun, 29 Oct 2023 23:39:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEbHw2zXdgTmOe2Ipypz0FWeothc3gJE844cZo0OJypubB7AFZMaV4V7mlETkwq0DTLZNfoTw==
+X-Received: by 2002:a05:620a:284a:b0:774:3581:588f with SMTP id h10-20020a05620a284a00b007743581588fmr10211165qkp.53.1698647982600;
+        Sun, 29 Oct 2023 23:39:42 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:280:24f0:3f78:514a:4f03:fdc0? ([2a01:e0a:280:24f0:3f78:514a:4f03:fdc0])
+        by smtp.gmail.com with ESMTPSA id e22-20020a05620a209600b007756d233fbdsm3088023qka.37.2023.10.29.23.39.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 29 Oct 2023 23:39:42 -0700 (PDT)
+Message-ID: <365845dd-ffc4-4a0d-b5cd-622e18ae9eef@redhat.com>
+Date: Mon, 30 Oct 2023 07:39:39 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 1/2] vfio/migration: Add debugfs to live migration
+ driver
+Content-Language: en-US
+To: Longfang Liu <liulongfang@huawei.com>, alex.williamson@redhat.com,
+ jgg@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+ jonathan.cameron@huawei.com
+Cc: bcreeley@amd.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linuxarm@openeuler.org
+References: <20231028075447.41939-1-liulongfang@huawei.com>
+ <20231028075447.41939-2-liulongfang@huawei.com>
+From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clegoate@redhat.com>
+In-Reply-To: <20231028075447.41939-2-liulongfang@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EDD2:EE_|DS0PR12MB8041:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3968ae8b-6668-42eb-64ca-08dbd912eba9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	26/CSPagFGtGSue1wm/NaJtR5R/sHa9keuLy5KZI/zPpe/FQcsogOXKoBMOnvH56my8zIiWIACCu/lcZzr/qtkUwZigwJfH9QFHHnMHlPDSP+GfSG3+4yUlg5TvWpYjPEmyeLmmln2nwFH1ZMjjPBfb2s3bRJtLfPvILC84GjZRZy9y+zjPBMfVR3dwGrQK5zBm2PGgJCWaOzzfwXHoV4XUgQu8PDzPcEWAGIuMGLkj6uRiaBBL44VjQyFIwV8lY62617kyZYHumvKFQFwxIQk+PHlejhANLE3ONqA/jXObexbr7GfbgqNlqjtTBv11E5boKafJZAzdb2PWC9xpI2FntRjoKxFGX85MrHWENkd2URghAZGvuZIBbnuTljEWhB6qeJ/ei2XVIjul71J/rYmI7+8J3QxreijhWffmnGbhxYalXGvIzZ7POtO9XYkXJsKPpREQ2sK3slWPyQwVBMZx1hZbNoorZdvxbPNjBKSr/REGhlhVA8djY11V1QEXQMqLvDYpgBzdYd3pJOd4MNUtJ308RRSl5R1sv8yTn6Dene1AbheIfyC5DLFZgIHyowLXXXEhGl6CMju66tseDubasBbEgJqnwPZHteC6Hc6jWTlxIwImFJVgNMcs2c1ElNOYy74kqofDqYIi7ndCIDv26BknraNKpFcHBGwYCv2a+Aw/jgY9U+0gD+SccWIxmIimfohLsaOtPzrC9Gtx2CMUp/wDjpWFdBcQFQnHINEP90t9O24vLIgrusr0Ipg8ZBOusthphwP9wj2mubUaBfA==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(346002)(39860400002)(376002)(136003)(230922051799003)(451199024)(64100799003)(186009)(82310400011)(1800799009)(40470700004)(46966006)(36840700001)(2906002)(40460700003)(36860700001)(54906003)(70586007)(70206006)(47076005)(81166007)(356005)(82740400003)(316002)(478600001)(26005)(7696005)(6666004)(110136005)(83380400001)(2616005)(16526019)(426003)(1076003)(336012)(41300700001)(7416002)(5660300002)(8936002)(8676002)(4326008)(40480700001)(36756003)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2023 06:39:08.8349
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3968ae8b-6668-42eb-64ca-08dbd912eba9
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EDD2.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8041
 
-Now that all the required plumbing is done for enabling SNP
-Secure TSC feature, add Secure TSC to snp features present list.
+On 10/28/23 09:54, Longfang Liu wrote:
+> There are multiple devices, software and operational steps involved
+> in the process of live migration. An error occurred on any node may
+> cause the live migration operation to fail.
+> This complex process makes it very difficult to locate and analyze
+> the cause when the function fails.
+> 
+> In order to quickly locate the cause of the problem when the
+> live migration fails, I added a set of debugfs to the vfio
+> live migration driver.
+> 
+>      +-------------------------------------------+
+>      |                                           |
+>      |                                           |
+>      |                  QEMU                     |
+>      |                                           |
+>      |                                           |
+>      +---+----------------------------+----------+
+>          |      ^                     |      ^
+>          |      |                     |      |
+>          |      |                     |      |
+>          v      |                     v      |
+>       +---------+--+               +---------+--+
+>       |src vfio_dev|               |dst vfio_dev|
+>       +--+---------+               +--+---------+
+>          |      ^                     |      ^
+>          |      |                     |      |
+>          v      |                     |      |
+>     +-----------+----+           +-----------+----+
+>     |src dev debugfs |           |dst dev debugfs |
+>     +----------------+           +----------------+
+> 
+> The entire debugfs directory will be based on the definition of
+> the CONFIG_DEBUG_FS macro. If this macro is not enabled, the
+> interfaces in vfio.h will be empty definitions, and the creation
+> and initialization of the debugfs directory will not be executed.
+> 
+>     vfio
+>      |
+>      +---<dev_name1>
+>      |    +---migration
+>      |        +--state
+>      |
+>      +---<dev_name2>
+>           +---migration
+>               +--state
+> 
+> debugfs will create a public root directory "vfio" file.
+> then create a dev_name() file for each live migration device.
+> First, create a unified state acquisition file of "migration"
+> in this device directory.
+> Then, create a public live migration state lookup file "state".
+> 
+> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
 
-The CC_ATTR_GUEST_SECURE_TSC can be used by the guest to query whether
-the SNP guest has Secure TSC feature active.
 
-Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
----
- arch/x86/boot/compressed/sev.c |  3 ++-
- arch/x86/mm/mem_encrypt.c      | 10 ++++++++--
- 2 files changed, 10 insertions(+), 3 deletions(-)
+Reviewed-by: Cédric Le Goater <clg@redhat.com>
 
-diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
-index 80d76aea1f7b..b1a4bab8ecf1 100644
---- a/arch/x86/boot/compressed/sev.c
-+++ b/arch/x86/boot/compressed/sev.c
-@@ -375,7 +375,8 @@ static void enforce_vmpl0(void)
-  * by the guest kernel. As and when a new feature is implemented in the
-  * guest kernel, a corresponding bit should be added to the mask.
-  */
--#define SNP_FEATURES_PRESENT	MSR_AMD64_SNP_DEBUG_SWAP
-+#define SNP_FEATURES_PRESENT	(MSR_AMD64_SNP_DEBUG_SWAP |	\
-+				 MSR_AMD64_SNP_SECURE_TSC)
- 
- u64 snp_get_unsupported_features(u64 status)
- {
-diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
-index 01abecc9a774..26608b9f2ca7 100644
---- a/arch/x86/mm/mem_encrypt.c
-+++ b/arch/x86/mm/mem_encrypt.c
-@@ -69,8 +69,14 @@ static void print_mem_encrypt_feature_info(void)
- 		pr_cont(" SEV-ES");
- 
- 	/* Secure Nested Paging */
--	if (cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
--		pr_cont(" SEV-SNP");
-+	if (cc_platform_has(CC_ATTR_GUEST_SEV_SNP)) {
-+		pr_cont(" SEV-SNP\n");
-+		pr_cont("SNP Features active: ");
-+
-+		/* SNP Secure TSC */
-+		if (cc_platform_has(CC_ATTR_GUEST_SECURE_TSC))
-+			pr_cont(" SECURE-TSC");
-+	}
- 
- 	pr_cont("\n");
- }
--- 
-2.34.1
+Thanks,
+
+C.
+
+
+> ---
+>   drivers/vfio/Kconfig      | 10 +++++
+>   drivers/vfio/Makefile     |  1 +
+>   drivers/vfio/debugfs.c    | 90 +++++++++++++++++++++++++++++++++++++++
+>   drivers/vfio/vfio.h       | 14 ++++++
+>   drivers/vfio/vfio_main.c  |  4 ++
+>   include/linux/vfio.h      |  7 +++
+>   include/uapi/linux/vfio.h |  1 +
+>   7 files changed, 127 insertions(+)
+>   create mode 100644 drivers/vfio/debugfs.c
+> 
+> diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+> index 6bda6dbb4878..ceae52fd7586 100644
+> --- a/drivers/vfio/Kconfig
+> +++ b/drivers/vfio/Kconfig
+> @@ -80,6 +80,16 @@ config VFIO_VIRQFD
+>   	select EVENTFD
+>   	default n
+>   
+> +config VFIO_DEBUGFS
+> +	bool "Export VFIO internals in DebugFS"
+> +	depends on DEBUG_FS
+> +	help
+> +	  Allows exposure of VFIO device internals. This option enables
+> +	  the use of debugfs by VFIO drivers as required. The device can
+> +	  cause the VFIO code create a top-level debug/vfio directory
+> +	  during initialization, and then populate a subdirectory with
+> +	  entries as required.
+> +
+>   source "drivers/vfio/pci/Kconfig"
+>   source "drivers/vfio/platform/Kconfig"
+>   source "drivers/vfio/mdev/Kconfig"
+> diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+> index c82ea032d352..d43a699d55b1 100644
+> --- a/drivers/vfio/Makefile
+> +++ b/drivers/vfio/Makefile
+> @@ -8,6 +8,7 @@ vfio-$(CONFIG_VFIO_GROUP) += group.o
+>   vfio-$(CONFIG_IOMMUFD) += iommufd.o
+>   vfio-$(CONFIG_VFIO_CONTAINER) += container.o
+>   vfio-$(CONFIG_VFIO_VIRQFD) += virqfd.o
+> +vfio-$(CONFIG_VFIO_DEBUGFS) += debugfs.o
+>   
+>   obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
+>   obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
+> diff --git a/drivers/vfio/debugfs.c b/drivers/vfio/debugfs.c
+> new file mode 100644
+> index 000000000000..9f02ae15e084
+> --- /dev/null
+> +++ b/drivers/vfio/debugfs.c
+> @@ -0,0 +1,90 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (c) 2023, HiSilicon Ltd.
+> + */
+> +
+> +#include <linux/device.h>
+> +#include <linux/debugfs.h>
+> +#include <linux/seq_file.h>
+> +#include <linux/vfio.h>
+> +#include "vfio.h"
+> +
+> +static struct dentry *vfio_debugfs_root;
+> +
+> +static int vfio_device_state_read(struct seq_file *seq, void *data)
+> +{
+> +	struct device *vf_dev = seq->private;
+> +	struct vfio_device *vdev = container_of(vf_dev, struct vfio_device, device);
+> +	enum vfio_device_mig_state state;
+> +	int ret;
+> +
+> +	BUILD_BUG_ON(VFIO_DEVICE_STATE_NR !=
+> +		VFIO_DEVICE_STATE_PRE_COPY_P2P + 1);
+> +
+> +	ret = vdev->mig_ops->migration_get_state(vdev, &state);
+> +	if (ret)
+> +		return -EINVAL;
+> +
+> +	switch (state) {
+> +	case VFIO_DEVICE_STATE_ERROR:
+> +		seq_puts(seq, "ERROR\n");
+> +		break;
+> +	case VFIO_DEVICE_STATE_STOP:
+> +		seq_puts(seq, "STOP\n");
+> +		break;
+> +	case VFIO_DEVICE_STATE_RUNNING:
+> +		seq_puts(seq, "RUNNING\n");
+> +		break;
+> +	case VFIO_DEVICE_STATE_STOP_COPY:
+> +		seq_puts(seq, "STOP_COPY\n");
+> +		break;
+> +	case VFIO_DEVICE_STATE_RESUMING:
+> +		seq_puts(seq, "RESUMING\n");
+> +		break;
+> +	case VFIO_DEVICE_STATE_RUNNING_P2P:
+> +		seq_puts(seq, "RUNNING_P2P\n");
+> +		break;
+> +	case VFIO_DEVICE_STATE_PRE_COPY:
+> +		seq_puts(seq, "PRE_COPY\n");
+> +		break;
+> +	case VFIO_DEVICE_STATE_PRE_COPY_P2P:
+> +		seq_puts(seq, "PRE_COPY_P2P\n");
+> +		break;
+> +	default:
+> +		seq_puts(seq, "Invalid\n");
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +void vfio_device_debugfs_init(struct vfio_device *vdev)
+> +{
+> +	struct device *dev = &vdev->device;
+> +
+> +	vdev->debug_root = debugfs_create_dir(dev_name(vdev->dev), vfio_debugfs_root);
+> +
+> +	if (vdev->mig_ops) {
+> +		struct dentry *vfio_dev_migration = NULL;
+> +
+> +		vfio_dev_migration = debugfs_create_dir("migration", vdev->debug_root);
+> +		debugfs_create_devm_seqfile(dev, "state", vfio_dev_migration,
+> +					  vfio_device_state_read);
+> +	}
+> +}
+> +
+> +void vfio_device_debugfs_exit(struct vfio_device *vdev)
+> +{
+> +	debugfs_remove_recursive(vdev->debug_root);
+> +}
+> +
+> +void vfio_debugfs_create_root(void)
+> +{
+> +	vfio_debugfs_root = debugfs_create_dir("vfio", NULL);
+> +}
+> +
+> +void vfio_debugfs_remove_root(void)
+> +{
+> +	debugfs_remove_recursive(vfio_debugfs_root);
+> +	vfio_debugfs_root = NULL;
+> +}
+> +
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index 307e3f29b527..bde84ad344e5 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -448,4 +448,18 @@ static inline void vfio_device_put_kvm(struct vfio_device *device)
+>   }
+>   #endif
+>   
+> +#ifdef CONFIG_VFIO_DEBUGFS
+> +void vfio_debugfs_create_root(void);
+> +void vfio_debugfs_remove_root(void);
+> +
+> +void vfio_device_debugfs_init(struct vfio_device *vdev);
+> +void vfio_device_debugfs_exit(struct vfio_device *vdev);
+> +#else
+> +static inline void vfio_debugfs_create_root(void) { }
+> +static inline void vfio_debugfs_remove_root(void) { }
+> +
+> +static inline void vfio_device_debugfs_init(struct vfio_device *vdev) { }
+> +static inline void vfio_device_debugfs_exit(struct vfio_device *vdev) { }
+> +#endif /* CONFIG_VFIO_DEBUGFS */
+> +
+>   #endif
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index e31e1952d7b8..94f02b6891ac 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -311,6 +311,7 @@ static int __vfio_register_dev(struct vfio_device *device,
+>   	refcount_set(&device->refcount, 1);
+>   
+>   	vfio_device_group_register(device);
+> +	vfio_device_debugfs_init(device);
+>   
+>   	return 0;
+>   err_out:
+> @@ -378,6 +379,7 @@ void vfio_unregister_group_dev(struct vfio_device *device)
+>   		}
+>   	}
+>   
+> +	vfio_device_debugfs_exit(device);
+>   	/* Balances vfio_device_set_group in register path */
+>   	vfio_device_remove_group(device);
+>   }
+> @@ -1676,6 +1678,7 @@ static int __init vfio_init(void)
+>   	if (ret)
+>   		goto err_alloc_dev_chrdev;
+>   
+> +	vfio_debugfs_create_root();
+>   	pr_info(DRIVER_DESC " version: " DRIVER_VERSION "\n");
+>   	return 0;
+>   
+> @@ -1691,6 +1694,7 @@ static int __init vfio_init(void)
+>   
+>   static void __exit vfio_cleanup(void)
+>   {
+> +	vfio_debugfs_remove_root();
+>   	ida_destroy(&vfio.device_ida);
+>   	vfio_cdev_cleanup();
+>   	class_destroy(vfio.device_class);
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 454e9295970c..769d7af86225 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -69,6 +69,13 @@ struct vfio_device {
+>   	u8 iommufd_attached:1;
+>   #endif
+>   	u8 cdev_opened:1;
+> +#ifdef CONFIG_DEBUG_FS
+> +	/*
+> +	 * debug_root is a static property of the vfio_device
+> +	 * which must be set prior to registering the vfio_device.
+> +	 */
+> +	struct dentry *debug_root;
+> +#endif
+>   };
+>   
+>   /**
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 7f5fb010226d..2b68e6cdf190 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -1219,6 +1219,7 @@ enum vfio_device_mig_state {
+>   	VFIO_DEVICE_STATE_RUNNING_P2P = 5,
+>   	VFIO_DEVICE_STATE_PRE_COPY = 6,
+>   	VFIO_DEVICE_STATE_PRE_COPY_P2P = 7,
+> +	VFIO_DEVICE_STATE_NR,
+>   };
+>   
+>   /**
 
 
