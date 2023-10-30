@@ -1,158 +1,130 @@
-Return-Path: <kvm+bounces-55-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FDF57DB3A9
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 07:51:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4A577DB453
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 08:30:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B621B20DAB
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 06:51:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1269AB20DAB
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 07:30:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27BD13D71;
-	Mon, 30 Oct 2023 06:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD0BE6ABF;
+	Mon, 30 Oct 2023 07:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bv87x68n"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NZMk1E8P"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498E51C11
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 06:51:15 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7030CC1
-	for <kvm@vger.kernel.org>; Sun, 29 Oct 2023 23:51:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698648669;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k/plvhVyykkxJgC+LDzB7nrVde68eR6Wbay50l+w4Jo=;
-	b=bv87x68nSZSyuT168scufqbFCBUtb7QmCDG1X5jfaYRs6t9iGQMYtVIoo8bS6VvxkNeuG7
-	r7gc82GZn9tyOGvsr0BMxWWfI9u2sSOaD1Z6QzE3zTsh+/8a2ucyoWESU+pFdY7TGreaJ2
-	et0lgpeUPKYEPtXB9FVYZzR8uaOuLD8=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-14-qrqUS6gHPGOQK27w47UOOg-1; Mon, 30 Oct 2023 02:51:08 -0400
-X-MC-Unique: qrqUS6gHPGOQK27w47UOOg-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-67012b06439so29609146d6.1
-        for <kvm@vger.kernel.org>; Sun, 29 Oct 2023 23:51:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698648667; x=1699253467;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k/plvhVyykkxJgC+LDzB7nrVde68eR6Wbay50l+w4Jo=;
-        b=cwlVY6dJN7l/EPeh4KaNQWur1DyQvFFNt1P12STD7uYsIS7BAbyPEua/D3LVfcGL8G
-         TUoRx56zdsjLeexIeARaWdhMxeYFv9/BrqoGL4r/JkWU+11lhMS+4chxIK+8htweTgGX
-         cYXk91gV11tQaKIteHMUmDP/CTIZ9TlvnVNUyp+CBQX1Ska0QDVsGO/fkoPSSgcBHvxH
-         fi7XH31HDQgBXsyd/nYhGJZJHOVKbpDZ50iOmie5avKl86jEDi2lrIy/bwuD2qGGvmCj
-         bOIaf9gOmXQKCwjcVju+Z4Ti83rOBOT/chZMjpYxn/Xp1Eq41kyRvBH1tHQaVFZP8a2L
-         PHag==
-X-Gm-Message-State: AOJu0Yy8VHfuNQCfhHtHkv5x6CrRTCjTB9PK+SpMgUHevLRPL4hHsJ3m
-	gGcWO8fS8JDt2IgnF1y6sFSdSGoUFfiE0i6ZMBixGGUBOehQBvx2cv7Z5pOVazpY0LNGLScQmsV
-	rNjNAvs6dpfEd
-X-Received: by 2002:ad4:5c65:0:b0:656:3b4c:b98b with SMTP id i5-20020ad45c65000000b006563b4cb98bmr13663441qvh.11.1698648667661;
-        Sun, 29 Oct 2023 23:51:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHcWTyJ/ls0PM/ts30s4JrMKonOhY6WcnFIQsH/9qqUm8IcFB7cyTLHbt51Omk+YQiO7SvxwQ==
-X-Received: by 2002:ad4:5c65:0:b0:656:3b4c:b98b with SMTP id i5-20020ad45c65000000b006563b4cb98bmr13663439qvh.11.1698648667424;
-        Sun, 29 Oct 2023 23:51:07 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:280:24f0:3f78:514a:4f03:fdc0? ([2a01:e0a:280:24f0:3f78:514a:4f03:fdc0])
-        by smtp.gmail.com with ESMTPSA id x15-20020a0ceb8f000000b00670c15033aesm2179985qvo.144.2023.10.29.23.51.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 29 Oct 2023 23:51:07 -0700 (PDT)
-Message-ID: <356dd79e-9079-4bbc-9b64-9468b6f7b6a7@redhat.com>
-Date: Mon, 30 Oct 2023 07:51:04 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7313D6AA7
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 07:30:41 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84879BD;
+	Mon, 30 Oct 2023 00:30:37 -0700 (PDT)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39U7BZep019514;
+	Mon, 30 Oct 2023 07:30:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references :
+ subject : to : cc : from : message-id : date; s=pp1;
+ bh=egzwXkF4JfFlnhYDclVe21mtap08zHwMPFF8smpGZZs=;
+ b=NZMk1E8Puvi2o13skueQtTC1KNnGv3Y6TOIpRJwVTvhQz72j7wGyJaxB8wd/vBTWDAPD
+ iR4Ba4xeh7HCg4NKJAfbOBNMMCrAv46LREWRr/ALhlplJPBqwdXnH3cWjwlSWhwFjzf8
+ FpQs7DPafdoxdWG9Y0Pt/jIjqmMXUI4CCv7sxmV0gFO4pIxOyU+mX9JypS83F0u4Cn/J
+ cQYDh/vE+XOEYHRaTSlqdEH/fW29b3s023TaBsk54pS1BX76vuqqDNbUxxFnSG2sG1bp
+ JlgYKg4kT861hVmlMM8yleiaNRW4JpQ/ThtKsQystsgbg2g5QucR41XQ8NXIHq9bUYVE 6Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u1xr9k8km-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Oct 2023 07:30:22 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39U7C6W3022213;
+	Mon, 30 Oct 2023 07:30:21 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u1xr9k8jn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Oct 2023 07:30:21 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39U52JmE019881;
+	Mon, 30 Oct 2023 07:30:19 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u1d0y7pf1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Oct 2023 07:30:19 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39U7UGqg16712316
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 30 Oct 2023 07:30:16 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8231720067;
+	Mon, 30 Oct 2023 07:30:16 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 47DD92005A;
+	Mon, 30 Oct 2023 07:30:16 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.71.140])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 30 Oct 2023 07:30:16 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 2/2] Documentation: add debugfs description for vfio
-Content-Language: en-US
-To: Longfang Liu <liulongfang@huawei.com>, alex.williamson@redhat.com,
- jgg@nvidia.com, shameerali.kolothum.thodi@huawei.com,
- jonathan.cameron@huawei.com
-Cc: bcreeley@amd.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linuxarm@openeuler.org
-References: <20231028075447.41939-1-liulongfang@huawei.com>
- <20231028075447.41939-3-liulongfang@huawei.com>
-From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clegoate@redhat.com>
-In-Reply-To: <20231028075447.41939-3-liulongfang@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <0f132157ec6437326c6bd63f8be18976b19f058a.camel@linux.ibm.com>
+References: <20231020144900.2213398-1-nsg@linux.ibm.com> <169823651572.67523.10556581938548735484@t14-nrb> <0f132157ec6437326c6bd63f8be18976b19f058a.camel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 00/10] s390x: topology: Fixes and extension
+To: Andrew Jones <andrew.jones@linux.dev>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Nikos Nikoleris <nikos.nikoleris@arm.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Shaoqin Huang <shahuang@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+        kvm@vger.kernel.org, Ricardo Koller <ricarkol@google.com>
+From: Nico Boehr <nrb@linux.ibm.com>
+Message-ID: <169865101572.16357.716294326143671029@t14-nrb>
+User-Agent: alot/0.8.1
+Date: Mon, 30 Oct 2023 08:30:15 +0100
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: mpbyY604XHzUiTIcNjy6qtYoLbQcsGuZ
+X-Proofpoint-GUID: auZGWl2ocuwVKlYI2_mhteG7FFydOH7P
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-30_05,2023-10-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 malwarescore=0
+ adultscore=0 mlxlogscore=999 lowpriorityscore=0 clxscore=1011
+ priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2310240000 definitions=main-2310300055
 
-On 10/28/23 09:54, Longfang Liu wrote:
-> 1.Add an debugfs document description file to help users understand
-> how to use the accelerator live migration driver's debugfs.
-> 2.Update the file paths that need to be maintained in MAINTAINERS
+Quoting Nina Schoetterl-Glausch (2023-10-27 18:36:12)
+> On Wed, 2023-10-25 at 14:21 +0200, Nico Boehr wrote:
+> > Quoting Nina Schoetterl-Glausch (2023-10-20 16:48:50)
+> > > v1 -> v2:
+> > >  * patch 1, introducing enums (Janosch)
+> > >  * add comment explaining 8 alignment of stsi block length
+> > >  * unsigned cpu_in_masks, iteration (Nico)
+> > >  * fix copy paste error when checking ordering (thanks Nina)
+> > >  * don't escape newline when \\ at end of line in multiline string
+> > >  * change commit messages (thanks Janosch, thanks Nico)
+> > >  * pick up tags (thanks Janosch, thanks Nico)
+> > >=20
+> > > Fix a number of issues as well as rewrite and extend the topology list
+> > > checking.
+> > > Add a test case with a complex topology configuration.
+> > > In order to keep the unittests.cfg file readable, implement multiline
+> > > strings for extra_params.
+> >=20
+> > Thanks, I've pushed this to our CI for coverage.
+>=20
+> And it found some problems.
+> Want me to resend the series or just fixup patches?
 
-Should we have 2 patches instead ?
-
-Anyhow,
-
-Reviewed-by: Cédric Le Goater <clg@redhat.com>
-
-Thanks,
-
-C.
-
-
-> 
-> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-> ---
->   Documentation/ABI/testing/debugfs-vfio | 25 +++++++++++++++++++++++++
->   MAINTAINERS                            |  1 +
->   2 files changed, 26 insertions(+)
->   create mode 100644 Documentation/ABI/testing/debugfs-vfio
-> 
-> diff --git a/Documentation/ABI/testing/debugfs-vfio b/Documentation/ABI/testing/debugfs-vfio
-> new file mode 100644
-> index 000000000000..445e9f58f924
-> --- /dev/null
-> +++ b/Documentation/ABI/testing/debugfs-vfio
-> @@ -0,0 +1,25 @@
-> +What:		/sys/kernel/debug/vfio
-> +Date:		Oct 2023
-> +KernelVersion:  6.7
-> +Contact:	Longfang Liu <liulongfang@huawei.com>
-> +Description:	This debugfs file directory is used for debugging
-> +		of vfio devices, it's a common directory for all vfio devices.
-> +		Vfio core will create a device subdirectory under this
-> +		directory.
-> +
-> +What:		/sys/kernel/debug/vfio/<device>/migration
-> +Date:		Oct 2023
-> +KernelVersion:  6.7
-> +Contact:	Longfang Liu <liulongfang@huawei.com>
-> +Description:	This debugfs file directory is used for debugging
-> +		of vfio devices that support live migration.
-> +		The debugfs of each vfio device that supports live migration
-> +		could be created under this directory.
-> +
-> +What:		/sys/kernel/debug/vfio/<device>/migration/state
-> +Date:		Oct 2023
-> +KernelVersion:  6.7
-> +Contact:	Longfang Liu <liulongfang@huawei.com>
-> +Description:	Read the live migration status of the vfio device.
-> +		The contents of the state file reflects the migration state
-> +		relative to those defined in the vfio_device_mig_state enum
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index b19995690904..a6be3b4219c7 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -22591,6 +22591,7 @@ L:	kvm@vger.kernel.org
->   S:	Maintained
->   T:	git https://github.com/awilliam/linux-vfio.git
->   F:	Documentation/ABI/testing/sysfs-devices-vfio-dev
-> +F:	Documentation/ABI/testing/debugfs-vfio
->   F:	Documentation/driver-api/vfio.rst
->   F:	drivers/vfio/
->   F:	include/linux/vfio.h
-
+I think it would be best if you resend the whole series.
 
