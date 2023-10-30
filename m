@@ -1,112 +1,177 @@
-Return-Path: <kvm+bounces-97-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-98-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC6627DBE02
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 17:35:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFCD97DBE16
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 17:38:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 199A11C20B1E
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 16:35:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C9701C20A4D
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 16:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B54A18E32;
-	Mon, 30 Oct 2023 16:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A73401798C;
+	Mon, 30 Oct 2023 16:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SjddyvcF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aBm6eZRy"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F7B19440
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 16:34:58 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27A879E
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 09:34:57 -0700 (PDT)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39UGEk7P023908;
-	Mon, 30 Oct 2023 16:34:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=dG6sE90S6mN47vpfv8wj9aM5tradmU3QBcpgMkU1nUw=;
- b=SjddyvcFDOjK26IB40OLp1VQBgP9X4skGzIy2JgHdkQCv/wbkPGOPspEtFfufUivkhJe
- ZaVvUTrse/hWug3dGM9TCiG11O5VPFNTUrlwOnFrDs9my6wU22kkf8A8DQ5HYd6RAjJS
- EYxil2Y929O2wY0POy1QxTFIXRznJhr7aiZ1C6lewqrZxjNCS1WEo8Gcs4wg3swc9KRz
- H8X/3ZozEgN8mrwJrHuuUCvw8fLmBiUhPeX67IQyqA+RJ/5/l2tZlHyNMLz8706+vPtd
- Zdp7s7srCjiEaFoOiN4377t2z4uVuwhXmsHbcViPIcbaqSUfEOBj0Uq0oMK13xCZbKQS mg== 
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u2fu8rj8e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Oct 2023 16:34:28 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39UEdD5i007664;
-	Mon, 30 Oct 2023 16:34:24 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u1dmnabt6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Oct 2023 16:34:24 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39UGYMZF24904322
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 30 Oct 2023 16:34:22 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1ED3B2004D;
-	Mon, 30 Oct 2023 16:34:22 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 948DB20040;
-	Mon, 30 Oct 2023 16:34:21 +0000 (GMT)
-Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.179.11.228])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 30 Oct 2023 16:34:21 +0000 (GMT)
-Message-ID: <1b714907d9a6923575530b3bb2ab0c93f2333250.camel@linux.ibm.com>
-Subject: Re: [PATCH 2/2] KVM: selftests: Avoid using forced target for
- generating arm64 headers
-From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        James Morse
- <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui
- Yu <yuzenghui@huawei.com>
-Date: Mon, 30 Oct 2023 17:34:21 +0100
-In-Reply-To: <20231027005439.3142015-3-oliver.upton@linux.dev>
-References: <20231027005439.3142015-1-oliver.upton@linux.dev>
-	 <20231027005439.3142015-3-oliver.upton@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97AE518E33
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 16:38:19 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F6DE9E
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 09:38:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698683896;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=hJI+hdEWXbKa+M8W7tfHy5n3N8xPX6O0WbfIPeXfRTc=;
+	b=aBm6eZRyoqeJn0Oo8ofOusNplu2VxXbZ10coZ1RNpiM4zg3RGQ1D0JFJFdGGTTDHVlTPLE
+	RnmcVv53uyAL6OrvUlGbQvJYQK5tML31NjDgQhZ4ao0fqaduKt9OfM+tWBLhLyjHAOgsgR
+	O2akOUaUP73GGgJgvjY3IvxtHoMD3O0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-237-sgZljrczMLqsb0O1QnucQg-1; Mon, 30 Oct 2023 12:38:14 -0400
+X-MC-Unique: sgZljrczMLqsb0O1QnucQg-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-408f9cee5e8so36002035e9.0
+        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 09:38:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698683893; x=1699288693;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hJI+hdEWXbKa+M8W7tfHy5n3N8xPX6O0WbfIPeXfRTc=;
+        b=mL56DpURx/6WqpOy5Pgo4m2uM7n6tEB7wF8KhARpg0YjEmRXGCZ2SmMHXjiSxi2Fv6
+         F6FbolhxhHSAdB2vGNyQeSrRjpPQbuBC/3EO1keh0PniN8532QcQEKNx9C1Vri7etxjs
+         SAUlx2gO5i/2oD8opzxnzwe3977RRQh060M/92zvMZPAxPv1cb5rlJXFPdWu0Y/8nnC/
+         ma2fqko/5bgwrTJurSyMar0ro4P6LIquX+LA37l//gO5z9QclJirdiUyMDIu/fiEu6NI
+         8mFZ8uCsU+m3rUP+51AXVLt42fEnYLK3aCf7+180bnqkjsakaKHLCGe00Ntf4m3Q0Jjd
+         kd6w==
+X-Gm-Message-State: AOJu0YynRWmPHWIBWLQ3SwlKt9IrOAIPSIKLSNlbVkKwxDBJh2Gixa+x
+	KArSXvTsKCIkXwovrEVPHLOWLJhT6M0mkSWX0bYRHFNyTVW9+KUoRVwMkgdwK8grkEzOUlJ3HOp
+	D8X5CFBUjyb79
+X-Received: by 2002:a05:600c:4f53:b0:3fa:934c:8356 with SMTP id m19-20020a05600c4f5300b003fa934c8356mr8459623wmq.10.1698683892958;
+        Mon, 30 Oct 2023 09:38:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGZEMK/0a4y6GRranfUYFosow/+q05YMqexgnrNudyg+ulCeoJJOVHXdjy3BiTQsTruKVMBhA==
+X-Received: by 2002:a05:600c:4f53:b0:3fa:934c:8356 with SMTP id m19-20020a05600c4f5300b003fa934c8356mr8459576wmq.10.1698683892541;
+        Mon, 30 Oct 2023 09:38:12 -0700 (PDT)
+Received: from [192.168.1.174] ([151.81.68.207])
+        by smtp.googlemail.com with ESMTPSA id m1-20020a05600c4f4100b004063d8b43e7sm13252825wmq.48.2023.10.30.09.37.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Oct 2023 09:38:11 -0700 (PDT)
+Message-ID: <09966596-397a-47c6-8f43-610a1013d34a@redhat.com>
+Date: Mon, 30 Oct 2023 17:37:42 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: zdXkW699K-NQWtMgShi6ERL0MYXrmDXp
-X-Proofpoint-ORIG-GUID: zdXkW699K-NQWtMgShi6ERL0MYXrmDXp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-30_10,2023-10-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- clxscore=1015 priorityscore=1501 malwarescore=0 bulkscore=0
- impostorscore=0 phishscore=0 adultscore=0 spamscore=0 mlxlogscore=679
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2310300129
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v13 07/35] KVM: Convert KVM_ARCH_WANT_MMU_NOTIFIER to
+ CONFIG_KVM_GENERIC_MMU_NOTIFIER
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ Xiaoyao Li <xiaoyao.li@intel.com>, Xu Yilun <yilun.xu@intel.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>,
+ David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
+ =?UTF-8?Q?n?= <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>,
+ Vishal Annapurve <vannapurve@google.com>,
+ Ackerley Tng <ackerleytng@google.com>,
+ Maciej Szmigiero <mail@maciej.szmigiero.name>,
+ David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
+ Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+ Liam Merwick <liam.merwick@oracle.com>,
+ Isaku Yamahata <isaku.yamahata@gmail.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20231027182217.3615211-1-seanjc@google.com>
+ <20231027182217.3615211-8-seanjc@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20231027182217.3615211-8-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, 2023-10-27 at 00:54 +0000, Oliver Upton wrote:
-> The 'prepare' target that generates the arm64 sysreg headers had no
-> prerequisites, so it wound up forcing a rebuild of all KVM selftests
-> each invocation. Add a rule for the generated headers and just have
-> dependents use that for a prerequisite.
->=20
-> Reported-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> Fixes: 9697d84cc3b6 ("KVM: selftests: Generate sysreg-defs.h and add to i=
-nclude path")
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+On 10/27/23 20:21, Sean Christopherson wrote:
+> Convert KVM_ARCH_WANT_MMU_NOTIFIER into a Kconfig and select it where
+> appropriate to effectively maintain existing behavior.  Using a proper
+> Kconfig will simplify building more functionality on top of KVM's
+> mmu_notifier infrastructure.
+> 
+> Add a forward declaration of kvm_gfn_range to kvm_types.h so that
+> including arch/powerpc/include/asm/kvm_ppc.h's with CONFIG_KVM=n doesn't
+> generate warnings due to kvm_gfn_range being undeclared.  PPC defines
+> hooks for PR vs. HV without guarding them via #ifdeffery, e.g.
+> 
+>   bool (*unmap_gfn_range)(struct kvm *kvm, struct kvm_gfn_range *range);
+>   bool (*age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
+>   bool (*test_age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
+>   bool (*set_spte_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
+> 
+> Alternatively, PPC could forward declare kvm_gfn_range, but there's no
+> good reason not to define it in common KVM.
 
-Tested-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+The new #define should also imply KVM_CAP_SYNC_MMU, or even: 
+KVM_CAP_SYNC_MMU should just be enabled by all architectures at this 
+point.  You don't need to care about it, I have a larger series for caps 
+that are enabled by all architectures and I'll post it for 6.8.
 
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Paolo
 
 
