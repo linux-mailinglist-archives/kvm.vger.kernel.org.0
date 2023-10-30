@@ -1,272 +1,174 @@
-Return-Path: <kvm+bounces-140-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-141-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0998C7DC323
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 00:30:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B71A7DC326
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 00:32:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B31822816A3
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 23:30:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EF6C1C20B9D
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 23:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CBA018E3C;
-	Mon, 30 Oct 2023 23:30:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B7B19BB6;
+	Mon, 30 Oct 2023 23:31:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Auo4VYvT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VbFvMXkl"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890EB18AE9
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 23:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089A4199AF
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 23:31:53 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B29C6E1
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 16:30:44 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 340EEC2
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 16:31:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698708643;
+	s=mimecast20190719; t=1698708711;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uRvzCP5v+vCa5V8gkjAmVzBD6PvXRbnm4WTXIRTATIs=;
-	b=Auo4VYvTohHDMjI28n7jlkX8TUEwnq8POIx1qVOtQkpB+pe60BxmOPVVeMJXxEFlxmiT1l
-	mFIR0l+DECDqXDTJBKDLg0mHfQ/knRdAcUujatWjeRwbB7r7kfvA0cNK+lu3HfYtDzdut4
-	6kotAq+cD1ffH2lYOuIyjCDwGxcTnAo=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=hr5b+/tamFpp9Nju6BJVO0BdbMTX3Xt5jeifbWo4b6E=;
+	b=VbFvMXklkYQ2v+6PNgwR/nb+fVzzAo75IdOpLKQ5s6p3zvlnHDdKGQTKbcKZAI9dgNGfLe
+	TcJwqbMDnGm5gJ3Nqvb0ra1LgiuJljaPU+buonWz1NNLZDwhClo6O3bd1lTorkHmK6yBSt
+	I54vtdUBo4xuIsTVOleA6vEni3c4/LM=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-657-FY-JiELWMPWqRAkFaKIzig-1; Mon, 30 Oct 2023 19:30:27 -0400
-X-MC-Unique: FY-JiELWMPWqRAkFaKIzig-1
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5b2c12c8248so3409105a12.3
-        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 16:30:27 -0700 (PDT)
+ us-mta-687-AyIE2EQGPteZ8703rGW2qA-1; Mon, 30 Oct 2023 19:31:44 -0400
+X-MC-Unique: AyIE2EQGPteZ8703rGW2qA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40837aa4a58so33523105e9.0
+        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 16:31:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698708626; x=1699313426;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uRvzCP5v+vCa5V8gkjAmVzBD6PvXRbnm4WTXIRTATIs=;
-        b=S9oweIGRg2aU6fUGMJCUgwahtQlFvFy0kWozyhbqNXnJZ/cNkShOCd2Qq76wQZ+sAW
-         cUAu+A8vey5NSEnvJNm86HrRNPaX4EBMjkm/+wUuLghJXfzEmK0sc0nLrCDY6Vfw7Cq7
-         iGFt6u9Ym2D3vc1aXgfIOaoRa8DGRNgwNTikVisfYwuwUdIZYzkPd7Y9Qtoos2srPpmF
-         B4ZkRawfxYHwTEfSaG1/pj0kDYD3PJe018RgWOi8zNARhyzM3XQIQPMEpgN9gd3t9sfv
-         bvh0jtfvCOYeTngxiGL9NzImGgCJ+MwGo0cdc5stA2A2lSy+P2HTYNC8EazVUI58ctMr
-         83NQ==
-X-Gm-Message-State: AOJu0YxBWmaGBhZpaqz1BgGZZEzGc0qHLIFuS4P9luGbd1eoGMj6+s5o
-	kigXj8+CbGm470NLByfhxWotiKCOQWIDvL7VheexlFiTd5uTlvfdnBHAxJwCzF9XkXTBVyghmeG
-	Mh1GzGhzMJDQH
-X-Received: by 2002:a05:6a20:7aa7:b0:180:de1d:b93e with SMTP id u39-20020a056a207aa700b00180de1db93emr1004737pzh.28.1698708626183;
-        Mon, 30 Oct 2023 16:30:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFsyQY2FR+nrJRYkcGbF92lyOCd/oNKEiPa6M1r7mJZv2Cfk0Q+P8eru6uiHM6p/3PJ7tw9Sw==
-X-Received: by 2002:a05:6a20:7aa7:b0:180:de1d:b93e with SMTP id u39-20020a056a207aa700b00180de1db93emr1004723pzh.28.1698708625843;
-        Mon, 30 Oct 2023 16:30:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698708703; x=1699313503;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hr5b+/tamFpp9Nju6BJVO0BdbMTX3Xt5jeifbWo4b6E=;
+        b=uxAI0MlrFUu+/jYPI8MR/WvzS7mV3VOEwdJcJIuNnabU8PPzxpJ6yH71TZWuTlWjQP
+         X2x3zRvn2a4vzAq1fBXzCT+wpaae/QNgLd6ZncC3WRxm99dgijvhL3Ki1cs/+bdWV7qB
+         KurA2wKVnWzWIIzsI03oB3iMRBPF/LsTwpP+BLUIqqXn9F8he8m8ctZEgoAChenINhR/
+         Io9XZaFCwYBvwEpIMd7/62ULkKnOYImDQXZbUljT9VXlTlXwjRpcxqGVyCoMR9WlPt4l
+         KC69Ox7N4BMnMmny4hPsbUaYdraW2XoFyADNA64mazicaznz3cNaDiv66LowZso5wSDl
+         MgHA==
+X-Gm-Message-State: AOJu0YzKM9z68QJJ+EskB1vHZLyf2mSee/zVZ18CAhaFgndixeZhJfxG
+	1rSk3ATuVMTizC53Z5CFKer6Dsm7Ft59JNiVB0XG/uCMT1yWvewpEW/OLzPUrbBg06F/KqKBoWd
+	ckc5WnPSc77I7
+X-Received: by 2002:a05:600c:5408:b0:405:358c:ba74 with SMTP id he8-20020a05600c540800b00405358cba74mr1087252wmb.0.1698708703266;
+        Mon, 30 Oct 2023 16:31:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGEB5LIBlkQ+jVd4pnrhNDIucdhp/bRgd7Y4NOKOvq4dvjKk9iXv7t9mM2QJArjIcoshhuYjQ==
+X-Received: by 2002:a05:600c:5408:b0:405:358c:ba74 with SMTP id he8-20020a05600c540800b00405358cba74mr1087239wmb.0.1698708702926;
+        Mon, 30 Oct 2023 16:31:42 -0700 (PDT)
 Received: from redhat.com ([2.52.26.150])
-        by smtp.gmail.com with ESMTPSA id e23-20020aa78c57000000b00690fe1c928csm60842pfd.147.2023.10.30.16.30.20
+        by smtp.gmail.com with ESMTPSA id n2-20020a05600c294200b0040775fd5bf9sm156640wmd.0.2023.10.30.16.31.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Oct 2023 16:30:25 -0700 (PDT)
-Date: Mon, 30 Oct 2023 19:30:17 -0400
+        Mon, 30 Oct 2023 16:31:42 -0700 (PDT)
+Date: Mon, 30 Oct 2023 19:31:38 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Yishai Hadas <yishaih@nvidia.com>
-Cc: alex.williamson@redhat.com, jasowang@redhat.com, jgg@nvidia.com,
-	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	parav@nvidia.com, feliu@nvidia.com, jiri@nvidia.com,
-	kevin.tian@intel.com, joao.m.martins@oracle.com,
-	si-wei.liu@oracle.com, leonro@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH V2 vfio 5/9] virtio-pci: Initialize the supported admin
- commands
-Message-ID: <20231030192904-mutt-send-email-mst@kernel.org>
+To: Parav Pandit <parav@nvidia.com>
+Cc: Yishai Hadas <yishaih@nvidia.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
+	Feng Liu <feliu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	"kevin.tian@intel.com" <kevin.tian@intel.com>,
+	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+	"si-wei.liu@oracle.com" <si-wei.liu@oracle.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Maor Gottlieb <maorg@nvidia.com>
+Subject: Re: [PATCH V2 vfio 2/9] virtio-pci: Introduce admin virtqueue
+Message-ID: <20231030193110-mutt-send-email-mst@kernel.org>
 References: <20231029155952.67686-1-yishaih@nvidia.com>
- <20231029155952.67686-6-yishaih@nvidia.com>
- <20231029160750-mutt-send-email-mst@kernel.org>
- <bb8df2c8-74b5-4666-beda-550248a88890@nvidia.com>
- <20231030115541-mutt-send-email-mst@kernel.org>
- <4e95d66c-c382-4612-8d4b-7ff2b0acd3fb@nvidia.com>
+ <20231029155952.67686-3-yishaih@nvidia.com>
+ <20231029161909-mutt-send-email-mst@kernel.org>
+ <PH0PR12MB54810E45C628DE3A5829D438DCA1A@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <20231030115759-mutt-send-email-mst@kernel.org>
+ <PH0PR12MB548197CD7A10D5A89B7213CDDCA1A@PH0PR12MB5481.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4e95d66c-c382-4612-8d4b-7ff2b0acd3fb@nvidia.com>
+In-Reply-To: <PH0PR12MB548197CD7A10D5A89B7213CDDCA1A@PH0PR12MB5481.namprd12.prod.outlook.com>
 
-On Mon, Oct 30, 2023 at 06:06:45PM +0200, Yishai Hadas wrote:
-> On 30/10/2023 17:57, Michael S. Tsirkin wrote:
-> > On Mon, Oct 30, 2023 at 05:27:50PM +0200, Yishai Hadas wrote:
-> > > On 29/10/2023 22:17, Michael S. Tsirkin wrote:
-> > > > On Sun, Oct 29, 2023 at 05:59:48PM +0200, Yishai Hadas wrote:
-> > > > > Initialize the supported admin commands upon activating the admin queue.
-> > > > > 
-> > > > > The supported commands are saved as part of the admin queue context, it
-> > > > > will be used by the next patches from this series.
-> > > > > 
-> > > > > Note:
-> > > > > As we don't want to let upper layers to execute admin commands before
-> > > > > that this initialization step was completed, we set ref count to 1 only
-> > > > > post of that flow and use a non ref counted version command for this
-> > > > > internal flow.
-> > > > > 
+On Mon, Oct 30, 2023 at 06:10:06PM +0000, Parav Pandit wrote:
+> 
+> 
+> > From: Michael S. Tsirkin <mst@redhat.com>
+> > Sent: Monday, October 30, 2023 9:29 PM
+> > On Mon, Oct 30, 2023 at 03:51:40PM +0000, Parav Pandit wrote:
+> > >
+> > >
+> > > > From: Michael S. Tsirkin <mst@redhat.com>
+> > > > Sent: Monday, October 30, 2023 1:53 AM
+> > > >
+> > > > On Sun, Oct 29, 2023 at 05:59:45PM +0200, Yishai Hadas wrote:
+> > > > > From: Feng Liu <feliu@nvidia.com>
+> > > > >
+> > > > > Introduce support for the admin virtqueue. By negotiating
+> > > > > VIRTIO_F_ADMIN_VQ feature, driver detects capability and creates
+> > > > > one administration virtqueue. Administration virtqueue
+> > > > > implementation in virtio pci generic layer, enables multiple types
+> > > > > of upper layer drivers such as vfio, net, blk to utilize it.
+> > > > >
+> > > > > Signed-off-by: Feng Liu <feliu@nvidia.com>
+> > > > > Reviewed-by: Parav Pandit <parav@nvidia.com>
+> > > > > Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 > > > > > Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
 > > > > > ---
-> > > > >    drivers/virtio/virtio_pci_common.h |  1 +
-> > > > >    drivers/virtio/virtio_pci_modern.c | 77 +++++++++++++++++++++++++++++-
-> > > > >    2 files changed, 77 insertions(+), 1 deletion(-)
-> > > > > 
-> > > > > diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
-> > > > > index a21b9ba01a60..9e07e556a51a 100644
-> > > > > --- a/drivers/virtio/virtio_pci_common.h
-> > > > > +++ b/drivers/virtio/virtio_pci_common.h
-> > > > > @@ -46,6 +46,7 @@ struct virtio_pci_admin_vq {
-> > > > >    	struct virtio_pci_vq_info info;
-> > > > >    	struct completion flush_done;
-> > > > >    	refcount_t refcount;
-> > > > > +	u64 supported_cmds;
-> > > > >    	/* Name of the admin queue: avq.$index. */
-> > > > >    	char name[10];
-> > > > >    	u16 vq_index;
-> > > > > diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
-> > > > > index ccd7a4d9f57f..25e27aa79cab 100644
-> > > > > --- a/drivers/virtio/virtio_pci_modern.c
-> > > > > +++ b/drivers/virtio/virtio_pci_modern.c
-> > > > > @@ -19,6 +19,9 @@
-> > > > >    #define VIRTIO_RING_NO_LEGACY
-> > > > >    #include "virtio_pci_common.h"
-> > > > > +static int vp_modern_admin_cmd_exec(struct virtio_device *vdev,
-> > > > > +				    struct virtio_admin_cmd *cmd);
+> > > > >  drivers/virtio/virtio.c                | 37 ++++++++++++++--
+> > > > >  drivers/virtio/virtio_pci_common.c     |  3 ++
+> > > > >  drivers/virtio/virtio_pci_common.h     | 15 ++++++-
+> > > > >  drivers/virtio/virtio_pci_modern.c     | 61 +++++++++++++++++++++++++-
+> > > > >  drivers/virtio/virtio_pci_modern_dev.c | 18 ++++++++
+> > > > >  include/linux/virtio_config.h          |  4 ++
+> > > > >  include/linux/virtio_pci_modern.h      |  5 +++
+> > > > >  7 files changed, 137 insertions(+), 6 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+> > > > > index
+> > > > > 3893dc29eb26..f4080692b351 100644
+> > > > > --- a/drivers/virtio/virtio.c
+> > > > > +++ b/drivers/virtio/virtio.c
+> > > > > @@ -302,9 +302,15 @@ static int virtio_dev_probe(struct device *_d)
+> > > > >  	if (err)
+> > > > >  		goto err;
+> > > > >
+> > > > > +	if (dev->config->create_avq) {
+> > > > > +		err = dev->config->create_avq(dev);
+> > > > > +		if (err)
+> > > > > +			goto err;
+> > > > > +	}
 > > > > > +
-> > > > I don't much like forward declarations. Just order functions sensibly
-> > > > and they will not be needed.
-> > > OK, will be part of V3.
-> > > 
-> > > > >    static u64 vp_get_features(struct virtio_device *vdev)
-> > > > >    {
-> > > > >    	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
-> > > > > @@ -59,6 +62,42 @@ vp_modern_avq_set_abort(struct virtio_pci_admin_vq *admin_vq, bool abort)
-> > > > >    	WRITE_ONCE(admin_vq->abort, abort);
-> > > > >    }
-> > > > > +static void virtio_pci_admin_init_cmd_list(struct virtio_device *virtio_dev)
-> > > > > +{
-> > > > > +	struct virtio_pci_device *vp_dev = to_vp_device(virtio_dev);
-> > > > > +	struct virtio_admin_cmd cmd = {};
-> > > > > +	struct scatterlist result_sg;
-> > > > > +	struct scatterlist data_sg;
-> > > > > +	__le64 *data;
-> > > > > +	int ret;
-> > > > > +
-> > > > > +	data = kzalloc(sizeof(*data), GFP_KERNEL);
-> > > > > +	if (!data)
-> > > > > +		return;
-> > > > > +
-> > > > > +	sg_init_one(&result_sg, data, sizeof(*data));
-> > > > > +	cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_LIST_QUERY);
-> > > > > +	cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SRIOV);
-> > > > > +	cmd.result_sg = &result_sg;
-> > > > > +
-> > > > > +	ret = vp_modern_admin_cmd_exec(virtio_dev, &cmd);
-> > > > > +	if (ret)
-> > > > > +		goto end;
-> > > > > +
-> > > > > +	sg_init_one(&data_sg, data, sizeof(*data));
-> > > > > +	cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_LIST_USE);
-> > > > > +	cmd.data_sg = &data_sg;
-> > > > > +	cmd.result_sg = NULL;
-> > > > > +
-> > > > > +	ret = vp_modern_admin_cmd_exec(virtio_dev, &cmd);
-> > > > > +	if (ret)
-> > > > > +		goto end;
-> > > > > +
-> > > > > +	vp_dev->admin_vq.supported_cmds = le64_to_cpu(*data);
-> > > > > +end:
-> > > > > +	kfree(data);
-> > > > > +}
-> > > > > +
-> > > > >    static void vp_modern_avq_activate(struct virtio_device *vdev)
-> > > > >    {
-> > > > >    	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
-> > > > > @@ -67,6 +106,7 @@ static void vp_modern_avq_activate(struct virtio_device *vdev)
-> > > > >    	if (!virtio_has_feature(vdev, VIRTIO_F_ADMIN_VQ))
-> > > > >    		return;
-> > > > > +	virtio_pci_admin_init_cmd_list(vdev);
-> > > > >    	init_completion(&admin_vq->flush_done);
-> > > > >    	refcount_set(&admin_vq->refcount, 1);
-> > > > >    	vp_modern_avq_set_abort(admin_vq, false);
-> > > > > @@ -562,6 +602,35 @@ static bool vp_get_shm_region(struct virtio_device *vdev,
-> > > > >    	return true;
-> > > > >    }
-> > > > > +static int __virtqueue_exec_admin_cmd(struct virtio_pci_admin_vq *admin_vq,
-> > > > > +				    struct scatterlist **sgs,
-> > > > > +				    unsigned int out_num,
-> > > > > +				    unsigned int in_num,
-> > > > > +				    void *data,
-> > > > > +				    gfp_t gfp)
-> > > > > +{
-> > > > > +	struct virtqueue *vq;
-> > > > > +	int ret, len;
-> > > > > +
-> > > > > +	vq = admin_vq->info.vq;
-> > > > > +
-> > > > > +	ret = virtqueue_add_sgs(vq, sgs, out_num, in_num, data, gfp);
-> > > > > +	if (ret < 0)
-> > > > > +		return ret;
-> > > > > +
-> > > > > +	if (unlikely(!virtqueue_kick(vq)))
-> > > > > +		return -EIO;
-> > > > > +
-> > > > > +	while (!virtqueue_get_buf(vq, &len) &&
-> > > > > +	       !virtqueue_is_broken(vq))
-> > > > > +		cpu_relax();
-> > > > > +
-> > > > > +	if (virtqueue_is_broken(vq))
-> > > > > +		return -EIO;
-> > > > > +
-> > > > > +	return 0;
-> > > > > +}
-> > > > > +
-> > > > This is tolerable I guess but it might pin the CPU for a long time.
-> > > > The difficulty is handling suprize removal well which we currently
-> > > > don't do with interrupts. I would say it's ok as is but add
-> > > > a TODO comments along the lines of /* TODO: use interrupts once these virtqueue_is_broken */
-> > > I assume that you asked for adding the below comment before the while loop:
-> > > /* TODO use interrupts to reduce cpu cycles in the future */
-> > > 
-> > > Right ?
-> > > 
-> > > Yishai
-> > Well I wrote what I meant. in the future is redundant - everyone knows
-> > we can't change the past.
-> 
-> I agree, no need for 'in the future'.
-> 
-> However, in your suggestion you mentioned  "once these virtqueue_is_broken".
-> 
-> What does that mean in current polling mode ?
-> 
-> Yishai
-
-Maye better: /* TODO: use vq callback once it supports virtqueue_is_broken */
-
+> > > > >  	err = drv->probe(dev);
+> > > > >  	if (err)
+> > > > > -		goto err;
+> > > > > +		goto err_probe;
+> > > > >
+> > > > >  	/* If probe didn't do it, mark device DRIVER_OK ourselves. */
+> > > > >  	if (!(dev->config->get_status(dev) & VIRTIO_CONFIG_S_DRIVER_OK))
+> > > >
+> > > > Hmm I am not all that happy that we are just creating avq unconditionally.
+> > > > Can't we do it on demand to avoid wasting resources if no one uses it?
+> > > >
+> > > Virtio queues must be enabled before driver_ok as we discussed in
+> > F_DYNAMIC bit exercise.
+> > > So creating AQ when first legacy command is invoked, would be too late.
 > > 
-> > > > >    static int virtqueue_exec_admin_cmd(struct virtio_pci_admin_vq *admin_vq,
-> > > > >    				    struct scatterlist **sgs,
-> > > > >    				    unsigned int out_num,
-> > > > > @@ -653,7 +722,13 @@ static int vp_modern_admin_cmd_exec(struct virtio_device *vdev,
-> > > > >    		in_num++;
-> > > > >    	}
-> > > > > -	ret = virtqueue_exec_admin_cmd(&vp_dev->admin_vq, sgs,
-> > > > > +	if (cmd->opcode == VIRTIO_ADMIN_CMD_LIST_QUERY ||
-> > > > > +	    cmd->opcode == VIRTIO_ADMIN_CMD_LIST_USE)
-> > > > > +		ret = __virtqueue_exec_admin_cmd(&vp_dev->admin_vq, sgs,
-> > > > > +				       out_num, in_num,
-> > > > > +				       sgs, GFP_KERNEL);
-> > > > > +	else
-> > > > > +		ret = virtqueue_exec_admin_cmd(&vp_dev->admin_vq, sgs,
-> > > > >    				       out_num, in_num,
-> > > > >    				       sgs, GFP_KERNEL);
-> > > > >    	if (ret) {
-> > > > > -- 
-> > > > > 2.27.0
-> 
+> > Well we didn't release the spec with AQ so I am pretty sure there are no devices
+> > using the feature. Do we want to already make an exception for AQ and allow
+> > creating AQs after DRIVER_OK even without F_DYNAMIC?
+> > 
+> No. it would abuse the init time config registers for the dynamic things like this.
+> For flow filters and others there is need for dynamic q creation with multiple physical address anyway.
+
+That seems like a completely unrelated issue.
+
+> So creating virtqueues dynamically using a generic scheme is desired with new feature bit.
 
 
