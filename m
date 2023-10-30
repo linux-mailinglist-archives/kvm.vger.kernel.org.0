@@ -1,116 +1,185 @@
-Return-Path: <kvm+bounces-116-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-117-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6876D7DBF17
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 18:36:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EDB6E7DBF25
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 18:39:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00089B20E56
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 17:36:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CA56B20BA3
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 17:39:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B70C4199B5;
-	Mon, 30 Oct 2023 17:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB6D9199BC;
+	Mon, 30 Oct 2023 17:39:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IJ+HG5gm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ag6UE2BA"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC2B1945E
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 17:36:39 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF4EC93
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:36:38 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-da03ef6fc30so4400847276.0
-        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:36:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698687398; x=1699292198; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8vz5wnkmcum9q1qyUnxUAw0SL2P8FyU7ENITNbJXLW0=;
-        b=IJ+HG5gmjGGXOT93f4QQPYaODHQbGWsLrxBlu9v1CiL/tQZc49J7kkSCcpVbTJYjAl
-         frOe/7O1B1ApWk6iP402yUruSSXgE/82RqaAv/5FV35aAPliA6eeGS+HJ2vkI2WEGCtn
-         dijCEVQt3sBDAZxiBpGVdGEpxJaTm6FOeboGz1oRPOKH5mHhWzQyYUg2HHkIQGVhS79v
-         lxhf7U8dEJl7pa4xVL77Zre8jZoPCsoRieZkSEdMDZzxCSda/AG/966WYAuNpvlxpA9e
-         aPHM4Vc1rY0dI03YZ+PMBICToB+YJXrPao3gOGSW6wjtN4Xf2dM7gU3jKE+mMzRoFTmR
-         5Q7g==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4DC199AC
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 17:39:33 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF6F7A9
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:39:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698687571;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=+DXS2SMXoVtHIusoTNobzAVDxifuslX+O0gTNMn/npQ=;
+	b=Ag6UE2BAHIefNXhmix/VL8ONjRqROWaE6/41ZGC7ylIcnOP4F+x3INEoovmzt0X1oygXDG
+	0DrsMFWnJvB07D9Jyy5GZYP0tturANBfzxFw1/mqIEs++XR7293VZQsEAKSyG+s//rkeCW
+	t/AacLlEFUshELCV7IGu1gjdFstSu44=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-615-_kbdakM7OlWCa6DPDWPsbQ-1; Mon, 30 Oct 2023 13:39:29 -0400
+X-MC-Unique: _kbdakM7OlWCa6DPDWPsbQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-408508aa81cso35349225e9.3
+        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:39:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698687398; x=1699292198;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8vz5wnkmcum9q1qyUnxUAw0SL2P8FyU7ENITNbJXLW0=;
-        b=AC/XdZXhuXfrWiFrJYNOjt7YWnRBCQEsi/RAJ0juBakHQMJUU+YxySgBCXJBu2cfe9
-         x75RbkDOi50LpyL4Yn8qHBFhWBLJbLuBzt1NZfmc2lHsm+OetkdlXuPja+BJMVVUqHzr
-         L0jdONW/1M0XNu5+yl2C9QR+MLdqauucbLFI8rBDqfwAYdOkGWexUYeNyocA3GAOlNkJ
-         CqObschpQ0mwZzd6r9mHSOnRnw2auNnhJ13CrUlt/Q2NgjKzpPG3EOvfqdsmK57KPK4t
-         exHZfN1fLA6xW15giuFzFXOViIgZMe1dVZRhZOj8ycFi9R/GUBowYMwuuDyxMCpI9Haj
-         CKrw==
-X-Gm-Message-State: AOJu0YzTc/ky82n4kv1lt5WI04QCnwEKuixSZwNGmLfqGkRw5fS9NSP2
-	elNJCeD13z39xoIShB9/f9qfcO2MKbM=
-X-Google-Smtp-Source: AGHT+IEEffbEmQjd4o2X7fGwPqKpFD/uxoIxAWj4vvpPaQwpwy726tAOw84DngpKljDqNb2fsvt5pi0rExE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:a93:b0:d9a:e6ae:ddb7 with SMTP id
- cd19-20020a0569020a9300b00d9ae6aeddb7mr186866ybb.7.1698687398064; Mon, 30 Oct
- 2023 10:36:38 -0700 (PDT)
-Date: Mon, 30 Oct 2023 10:36:36 -0700
-In-Reply-To: <146168ae-900d-4eee-9a47-a1ba2ea57aa6@redhat.com>
+        d=1e100.net; s=20230601; t=1698687568; x=1699292368;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+DXS2SMXoVtHIusoTNobzAVDxifuslX+O0gTNMn/npQ=;
+        b=N1Zh9kCLO3D9pMgopNfLEvKodApldscqYu8Yi8K/Z7XntdiYxitb9evvv3OcUGi+e/
+         9b9T0xHAUR5s9Btz0ZTe/babqRzLhRaPWCH6TCztbQoLywswiNVa5BSV6N/Wh//Ev4ey
+         x9XMODeRz/NAzxi5TGs5pE86v1mETzROQzifmssTJ/uGpHTMVnKCiCLWqe61M2czrZWb
+         R3HPwyv4NpCDC81vv32VMs1t/FM0d3hUkB4V1t9muGjRxk+zHhnAuZCqTbCWU76tfY78
+         MRc2mwikaM0+PxfSn2GEqYZqKqf69rokn9AuUVRUQPS7ooIW+oKPG42RI8UwBUwxqR9C
+         XyZQ==
+X-Gm-Message-State: AOJu0YxPZ1ZfoeOVUnPN8my8s8/EY5v9xKxHkmtUh+eGVfOOmPDTozd5
+	f3jmBAtb6eA0SEShkBl2qB2q10iosM3XbWPX1RWsZX6BPT1QL8XDvTtry/oJLOfDoYO+yUkqrpS
+	VN8QWH9GfdM61
+X-Received: by 2002:a05:600c:4748:b0:409:325:e499 with SMTP id w8-20020a05600c474800b004090325e499mr8333092wmo.32.1698687568562;
+        Mon, 30 Oct 2023 10:39:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHjkVjq8oZnh05Prw8i0aF39OlPnVPmFNjtO6TXzNl6UxyV80hGH62Lh8Nc0yfk4QqAnWBdUg==
+X-Received: by 2002:a05:600c:4748:b0:409:325:e499 with SMTP id w8-20020a05600c474800b004090325e499mr8333053wmo.32.1698687568216;
+        Mon, 30 Oct 2023 10:39:28 -0700 (PDT)
+Received: from [192.168.1.174] ([151.81.68.207])
+        by smtp.googlemail.com with ESMTPSA id c18-20020a05600c0a5200b0040770ec2c19sm13195773wmq.10.2023.10.30.10.39.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Oct 2023 10:39:27 -0700 (PDT)
+Message-ID: <80471c15-a37e-4129-8101-d30b8f73cb9f@redhat.com>
+Date: Mon, 30 Oct 2023 18:39:25 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231030141728.1406118-1-nik.borisov@suse.com>
- <ZT_UtjWSKCwgBxb_@google.com> <146168ae-900d-4eee-9a47-a1ba2ea57aa6@redhat.com>
-Message-ID: <ZT_ppBmxdd6917cl@google.com>
-Subject: Re: [PATCH] KVM: x86: User mutex guards to eliminate __kvm_x86_vendor_init()
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Nikolay Borisov <nik.borisov@suse.com>, x86@kernel.org, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v13 00/35] KVM: guest_memfd() and per-page attributes
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ Xiaoyao Li <xiaoyao.li@intel.com>, Xu Yilun <yilun.xu@intel.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>,
+ David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
+ =?UTF-8?Q?n?= <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>,
+ Vishal Annapurve <vannapurve@google.com>,
+ Ackerley Tng <ackerleytng@google.com>,
+ Maciej Szmigiero <mail@maciej.szmigiero.name>,
+ David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
+ Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+ Liam Merwick <liam.merwick@oracle.com>,
+ Isaku Yamahata <isaku.yamahata@gmail.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20231027182217.3615211-1-seanjc@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20231027182217.3615211-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 30, 2023, Paolo Bonzini wrote:
-> On 10/30/23 17:07, Sean Christopherson wrote:
-> > On Mon, Oct 30, 2023, Nikolay Borisov wrote:
-> > > Current separation between (__){0,1}kvm_x86_vendor_init() is superfluos as
-> > 
-> > superfluous
-> > 
-> > But this intro is actively misleading.  The double-underscore variant most definitely
-> > isn't superfluous, e.g. it eliminates the need for gotos reduces the probability
-> > of incorrect error codes, bugs in the error handling, etc.  It _becomes_ superflous
-> > after switching to guard(mutex).
-> > 
-> > IMO, this is one of the instances where the then solution problem appoach is
-> > counter-productive.  If there are no objections, I'll massage the change log to
-> > the below when applying (for 6.8, in a few weeks).
+On 10/27/23 20:21, Sean Christopherson wrote:
+> Non-KVM people, please take a gander at two small-ish patches buried in the
+> middle of this series:
 > 
-> I think this is a "Speak Now or Forever Rest in Peace" situation.  I'm going
-> to wait a couple days more for reviews to come in, post a v14 myself, and
-> apply the series to kvm/next as soon as Linus merges the 6.7 changes.  The
-> series will be based on the 6.7 tags/for-linus, and when 6.7-rc1 comes up,
-> I'll do this to straighten the history:
+>    fs: Export anon_inode_getfile_secure() for use by KVM
+>    mm: Add AS_UNMOVABLE to mark mapping as completely unmovable
+> 
+> Our plan/hope is to take this through the KVM tree for 6.8, reviews (and acks!)
+> would be much appreciated.  Note, adding AS_UNMOVABLE isn't strictly required as
+> it's "just" an optimization, but we'd prefer to have it in place straightaway.
 
-Heh, I'm pretty sure you meant to respond to the guest_memfd series.
+Reporting what I wrote in the other thread, for wider distribution:
 
-> 	git checkout kvm/next
-> 	git tag -s -f kvm-gmem HEAD
-> 	git reset --hard v6.7-rc1
-> 	git merge tags/kvm-gmem
-> 	# fix conflict with Christian Brauner's VFS series
-> 	git commit
-> 	git push kvm
-> 
-> 6.8 is not going to be out for four months, and I'm pretty sure that
-> anything discovered within "a few weeks" can be applied on top, and the
-> heaviness of a 35-patch series will outweigh any imperfections by a long
-> margin).
-> 
-> (Full disclosure: this is _also_ because I want to apply this series to the
-> RHEL kernel, and Red Hat has a high level of disdain for non-upstream
-> patches.  But it's mostly because I want all dependencies to be able to move
-> on and be developed on top of stock kvm/next).
+I'm going to wait a couple days more for reviews to come in, post a v14
+myself, and apply the series to kvm/next as soon as Linus merges the 6.7
+changes.  The series will be based on the 6.7 tags/for-linus, and when
+6.7-rc1 comes up, I'll do this to straighten the history:
+
+	git checkout kvm/next
+	git tag -s -f kvm-gmem HEAD
+	git reset --hard v6.7-rc1
+	git merge tags/kvm-gmem
+	# fix conflict with Christian Brauner's VFS series
+	git commit
+	git push kvm
+
+6.8 is not going to be out for four months, and I'm pretty sure that
+anything that would be discovered within "a few weeks" can also be
+applied on top, and the heaviness of a 35-patch series will outweigh any
+imperfections by a long margin.
+
+(Full disclosure: this is _also_ because I want to apply this series to
+the RHEL kernel, and Red Hat has a high level of disdain for
+non-upstream patches.  But it's mostly because I want all dependencies
+to be able to move on and be developed on top of stock kvm/next).
+
+Paolo
+
 
