@@ -1,130 +1,236 @@
-Return-Path: <kvm+bounces-56-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4A577DB453
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 08:30:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D5547DB4E1
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 09:12:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1269AB20DAB
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 07:30:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17F3DB20E1C
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 08:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD0BE6ABF;
-	Mon, 30 Oct 2023 07:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F926D286;
+	Mon, 30 Oct 2023 08:12:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NZMk1E8P"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d4gTJher"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7313D6AA7
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 07:30:41 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84879BD;
-	Mon, 30 Oct 2023 00:30:37 -0700 (PDT)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39U7BZep019514;
-	Mon, 30 Oct 2023 07:30:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references :
- subject : to : cc : from : message-id : date; s=pp1;
- bh=egzwXkF4JfFlnhYDclVe21mtap08zHwMPFF8smpGZZs=;
- b=NZMk1E8Puvi2o13skueQtTC1KNnGv3Y6TOIpRJwVTvhQz72j7wGyJaxB8wd/vBTWDAPD
- iR4Ba4xeh7HCg4NKJAfbOBNMMCrAv46LREWRr/ALhlplJPBqwdXnH3cWjwlSWhwFjzf8
- FpQs7DPafdoxdWG9Y0Pt/jIjqmMXUI4CCv7sxmV0gFO4pIxOyU+mX9JypS83F0u4Cn/J
- cQYDh/vE+XOEYHRaTSlqdEH/fW29b3s023TaBsk54pS1BX76vuqqDNbUxxFnSG2sG1bp
- JlgYKg4kT861hVmlMM8yleiaNRW4JpQ/ThtKsQystsgbg2g5QucR41XQ8NXIHq9bUYVE 6Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u1xr9k8km-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Oct 2023 07:30:22 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39U7C6W3022213;
-	Mon, 30 Oct 2023 07:30:21 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u1xr9k8jn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Oct 2023 07:30:21 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39U52JmE019881;
-	Mon, 30 Oct 2023 07:30:19 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u1d0y7pf1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Oct 2023 07:30:19 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39U7UGqg16712316
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 30 Oct 2023 07:30:16 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8231720067;
-	Mon, 30 Oct 2023 07:30:16 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 47DD92005A;
-	Mon, 30 Oct 2023 07:30:16 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.71.140])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 30 Oct 2023 07:30:16 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974B5D267;
+	Mon, 30 Oct 2023 08:12:18 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 504ACA2;
+	Mon, 30 Oct 2023 01:12:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698653537; x=1730189537;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=N7fgkNsYqzyQEPdyjc5ZvJhPw1EHpN8HXepKO0W0mGg=;
+  b=d4gTJher4XgPHEUYvoXBGn+3UFCW7TVR4aXbDJIhLY9aTxofF9aiwi6l
+   uCHnO0Wunq4qK5kAYZpOff8IpLyaiw7T+FqcfKTVQqETFJQQ9nwUJ7jSx
+   P92zZMHc9bPUoEb9S7tEIw7gfRlJgTXeQImKy8fz57dztjP1fL5VM+fmR
+   4GZKl+JxiyuOtVpheNvR2+pJX2JPpdEUchVnMK9a8PneDZIUlUe4lzp+3
+   OtQBmCtEdU4A54uJINhUqtK+WFGkokRUD0p6Tg8RIFVzpQAQ9eSNHbexV
+   kosp3nY5iRcmQWDpM4q3PqvmGGB9MbBdDI1Rz86HVUl1ArpGK75aVL4aN
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10878"; a="390888816"
+X-IronPort-AV: E=Sophos;i="6.03,263,1694761200"; 
+   d="scan'208";a="390888816"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2023 01:12:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10878"; a="830612580"
+X-IronPort-AV: E=Sophos;i="6.03,263,1694761200"; 
+   d="scan'208";a="830612580"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Oct 2023 01:12:16 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 30 Oct 2023 01:12:15 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Mon, 30 Oct 2023 01:12:15 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Mon, 30 Oct 2023 01:12:15 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MKR9snjzNe/Ze86/qVyvbmy4AQSAF5la52gpnZexKPjrurBMmU1F8x0WKpvEL6sfPcz6f0Y3f+e/n6XoIHe38SK6OmsfUWa69hPx5bh1Mb8j/RSRmp1mou/RfwNhzqwNsFfRRRcpdTEsp87pjIyBdBKXlPR4yKak7R2DvVoQA6E85XPg4pqZXQ7E063yjLYfHSIC1gD4XkmJoU56tYad7BVjGbfFbS4iCXGbppebi2r1T62/NPg3t/E9l5hoUIpBlsSs16UrWQ5Af5JIqkDXlIo73+dNuB8imoentRNfdQfndKL0wVW2CVVdUfScDVURgSDXKCGJOz19sO+5Q82mNw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=X9vkp1CJIfW1AIEPRn0itXrQbWQ42HgzTp/f393cgFg=;
+ b=fBK+a9k2esbaO4oiP0mi+tmuzoOLrCMwU2/Sl3kUqXJQH30CQHnfE5GKZvMnZeI9uMcn7K+JC344rHzF+XgXlJne+snOdtgXCYunbIYJQjqmG2eiqvdWtOfnUQvhzo0PljACSw/JIzlVV0oVxhtbHJX03tD3e2U1fkeozyVcfxW16nEJrQsK6DvVKVxsjbaPRD8yfB+1sqNjyFPUPDVK6kafCvVZ7PIP0yjRvlRu+dGBIzrzUYG6ws5rxoZcacPozZh58hZUHcdWUaO3Kb1YfeSbfRY4m3BVsOv66I5jZlmCaho5Dt1EDeqG3B0/k3uAo/+zgNCSOeKFjE7eDPu7FA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by DS7PR11MB7782.namprd11.prod.outlook.com (2603:10b6:8:e0::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6933.27; Mon, 30 Oct 2023 08:12:07 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::6227:c967:5d1d:2b72]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::6227:c967:5d1d:2b72%5]) with mapi id 15.20.6933.027; Mon, 30 Oct 2023
+ 08:12:07 +0000
+Date: Mon, 30 Oct 2023 16:11:47 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	"Oliver Upton" <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
+	"Michael Ellerman" <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
+	"Paul Walmsley" <paul.walmsley@sifive.com>, Palmer Dabbelt
+	<palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro
+	<viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, "Matthew
+ Wilcox (Oracle)" <willy@infradead.org>, Andrew Morton
+	<akpm@linux-foundation.org>, <kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<linux-mips@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
+	<kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
+	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
+	<linux-kernel@vger.kernel.org>, Xiaoyao Li <xiaoyao.li@intel.com>, Xu Yilun
+	<yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba
+	<tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy
+	<amoorthy@google.com>, David Matlack <dmatlack@google.com>, Yu Zhang
+	<yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>,
+	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>, Vlastimil Babka
+	<vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, Ackerley Tng
+	<ackerleytng@google.com>, "Maciej Szmigiero" <mail@maciej.szmigiero.name>,
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, Liam
+ Merwick <liam.merwick@oracle.com>, "Isaku Yamahata"
+	<isaku.yamahata@gmail.com>, "Kirill A . Shutemov"
+	<kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCH v13 13/35] KVM: Introduce per-page memory attributes
+Message-ID: <ZT9lQ9c7Bik6FIpw@chao-email>
+References: <20231027182217.3615211-1-seanjc@google.com>
+ <20231027182217.3615211-14-seanjc@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231027182217.3615211-14-seanjc@google.com>
+X-ClientProxiedBy: SI2PR02CA0012.apcprd02.prod.outlook.com
+ (2603:1096:4:194::7) To CH3PR11MB8660.namprd11.prod.outlook.com
+ (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <0f132157ec6437326c6bd63f8be18976b19f058a.camel@linux.ibm.com>
-References: <20231020144900.2213398-1-nsg@linux.ibm.com> <169823651572.67523.10556581938548735484@t14-nrb> <0f132157ec6437326c6bd63f8be18976b19f058a.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 00/10] s390x: topology: Fixes and extension
-To: Andrew Jones <andrew.jones@linux.dev>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Nikos Nikoleris <nikos.nikoleris@arm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Shaoqin Huang <shahuang@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>,
-        kvm@vger.kernel.org, Ricardo Koller <ricarkol@google.com>
-From: Nico Boehr <nrb@linux.ibm.com>
-Message-ID: <169865101572.16357.716294326143671029@t14-nrb>
-User-Agent: alot/0.8.1
-Date: Mon, 30 Oct 2023 08:30:15 +0100
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: mpbyY604XHzUiTIcNjy6qtYoLbQcsGuZ
-X-Proofpoint-GUID: auZGWl2ocuwVKlYI2_mhteG7FFydOH7P
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-30_05,2023-10-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 malwarescore=0
- adultscore=0 mlxlogscore=999 lowpriorityscore=0 clxscore=1011
- priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2310240000 definitions=main-2310300055
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|DS7PR11MB7782:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0492113d-a4d0-4a22-4f72-08dbd91fe8a0
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: IW6w/QjkvzkXweV4lRD4ALJJE/n7n54hL8mSCjWHjSaCLzqdxibA9dABe06l0+6sHr1I1Ou+9Zycg3qgjsSdQ9BBaAMNHJHnUBJ28aZ1iKDbYVpzKt5qMKTfR1ecRZkiHrZXhJIfcmEwtSb254AzJQwMIAKNuC7MqqTRlL0H3MBhSwc2vIiuc+qTGRPXeEU8DeIKnUEPgoBiUoYJY1HwiUGgfsXEKJho2Op8NI9X8W9/SE7BwYAOy+u8HVNfPWwTaF0gyFmEb0hBVSuQnYWfeh40Atgp3BP1BFWFr/NZEwWqVQqFk/CQuyeKyYrO1LpWICaFdFN7MdzPZw2TqPOgnrA9x3rM3NpC1Ozd0WtB/s76S+ARQKoceEUVGrPWIKWvtsfaBY+SSZUV5FDoxaehHNtm9gSIGdCAjCEhpNAMUaq2etUl4FlfCaPMiNV5HZvdzX5f/zKC593U6na4MsH6aW8Xl4u4cWae0EVsjgTpDcfPDl8ulSILcgfIw4J1diz++gnVPHIamR0iVaCBEorx7a2eyUiirgi3Bx4FScEwRdGbaWNQy101LhUKPvPVDWEB
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(366004)(376002)(346002)(39860400002)(136003)(230922051799003)(186009)(451199024)(1800799009)(64100799003)(5660300002)(41300700001)(7416002)(2906002)(7406005)(54906003)(66946007)(66556008)(66476007)(6486002)(8936002)(8676002)(4326008)(44832011)(478600001)(316002)(6916009)(33716001)(38100700002)(83380400001)(86362001)(9686003)(6512007)(6506007)(6666004)(26005)(82960400001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PI9DcH28XxTUT57eRoZ+dDxXY7h0KtSmfut7rIfbLrakHC93YTpMht0me4NP?=
+ =?us-ascii?Q?+dZbsEOijvLTO78IU9qzCUDHO7FbPDkcDFwkgKDu51oGTb8Lc475xJptX/R9?=
+ =?us-ascii?Q?JJhdmCgmXbt1QhLlYhWdMvTgjj8/MOcU375ZVoNkr9/6OqU+bRZE32yRA7he?=
+ =?us-ascii?Q?2aeCqmjIU7hbGP8WruM4QYEUFOp0tZV+O15aPG016Qonq1vojJj1fXvUlUcL?=
+ =?us-ascii?Q?1jGStrE9NjHp1HAZTqQx2k4GmmTN0dPVV+kKTqTxluCHm12JwEjd5BfXX0co?=
+ =?us-ascii?Q?Wj5Dlfmjf7cK9gtHvxVCSDljax2HjCpGX4JFNRKDcwDzlmlcvrCwFITytVI7?=
+ =?us-ascii?Q?CCxhwWocBeFJ722Fe/B4m5LhK101EyUMEEJeisubZFh+l6k5xiHRWhCPxYx7?=
+ =?us-ascii?Q?3/f6HWbEXcxkeaTPjfUh1rOffHYw7IMGffvv4zpX5H2nxdlJWzfPnmR3zED2?=
+ =?us-ascii?Q?XHv/m1ReO1jporBEAu/Cp/K5dOReZYF79Hdz3ER+nZn4+UirelcNCSFWeQN+?=
+ =?us-ascii?Q?hjUilkET97E4YH+tzieMyNsK0FlWVcfslRVBa9DU6cS9GDWflyOUD3gcZ0V5?=
+ =?us-ascii?Q?53yKJc3uVXSuWtqWr6Xdg5DsAT94IyKPyxpLRobQw0AoUVWy0zR40p+EDcq9?=
+ =?us-ascii?Q?WygtI8kIRjOPlQ1tOl9OhvrM5t5y3JcgSaEFG0/mzSIT/CCoH0Z86Wnfqm3L?=
+ =?us-ascii?Q?NqZgesKOjikw53iuIoUA1bgragghW9kbpbtnMySOtHYFM0OgIlKjGWbR5XoF?=
+ =?us-ascii?Q?lZ4Ftv5dfEirm7UB/ktY1pGxqCm7ic6EZCt23e0vBlY8sw1aHZ9k2DVhpBXx?=
+ =?us-ascii?Q?YcbhspeiiWAmGkZW0BFkkbr0xEG/4rtHVER4AsbLsHrEUyL5V286i/jEf+//?=
+ =?us-ascii?Q?ijjaryACFRKtzrP+DyX9Wga6Qz6VAh3RbiG9GOOFT5U7V9Fbq1+wh/vFLILP?=
+ =?us-ascii?Q?Ca4BssKHE5ETh31DPqQyCLP/M3n1DTkQbzYqh2aLbiFYlT9fL1mo0RiQEknB?=
+ =?us-ascii?Q?sPMChZLKnWvVD5dp8L5Z/WbS4X/u3RtFyMYIf9zrbLPbr+hZyRRjC2koH7mK?=
+ =?us-ascii?Q?uvXwSkV1vehdAJe3zjs1mS4E37PZMACc020CNztBVC7McUGnfY3siS82mNWn?=
+ =?us-ascii?Q?1XYd/1mmLRoHSQEWTOm8ycDhGHBYOJcJzdTND6a9n3OIzAs7FTxgD/OF2l5I?=
+ =?us-ascii?Q?DJsERjVPK0YY6NYMM3nJoSKR0bF9M4570q4vFT7Kc5MyojTyxO8SrNSsVM2I?=
+ =?us-ascii?Q?w0o5rvtx5pskhuEFN6r0Av5sPX/deBxiJhsXiisbsJP/8amROtDpVgFa8cvy?=
+ =?us-ascii?Q?jq7hG93xGAzWQZTa4a+jnaM5RVp3VImubvxTVo3P+FIVRJ+Q76A/tsk0aWOe?=
+ =?us-ascii?Q?i00TTz/4zhtNgghMpM9f46oDgvIjkGb1O25c4Zozb4v3L6b0wJO4ly6QhCB2?=
+ =?us-ascii?Q?hh8VE1fpvEefRFSFPwMj8wQT7J8yNfL2M9ib/pd7lfyvNq6F49xwm5HrmzKk?=
+ =?us-ascii?Q?VoM6NbIbgPo6pxLPNf3622X0ug3UCp4E/hpJwnOx/sVh4JLD7ea5jFf3AWn+?=
+ =?us-ascii?Q?AimAEb/L+MlyyYbAVjGZrYWAkTpuWRcuzY+IFxqR?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0492113d-a4d0-4a22-4f72-08dbd91fe8a0
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2023 08:12:07.4694
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CtLySxnyC6zgG2d7/Ju6fExQnsupAJ990YIT9LSkWZqTb+JKA9vsJHykP1HwwNUBTiYpU7iawhXJvFj6wwBmNw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB7782
+X-OriginatorOrg: intel.com
 
-Quoting Nina Schoetterl-Glausch (2023-10-27 18:36:12)
-> On Wed, 2023-10-25 at 14:21 +0200, Nico Boehr wrote:
-> > Quoting Nina Schoetterl-Glausch (2023-10-20 16:48:50)
-> > > v1 -> v2:
-> > >  * patch 1, introducing enums (Janosch)
-> > >  * add comment explaining 8 alignment of stsi block length
-> > >  * unsigned cpu_in_masks, iteration (Nico)
-> > >  * fix copy paste error when checking ordering (thanks Nina)
-> > >  * don't escape newline when \\ at end of line in multiline string
-> > >  * change commit messages (thanks Janosch, thanks Nico)
-> > >  * pick up tags (thanks Janosch, thanks Nico)
-> > >=20
-> > > Fix a number of issues as well as rewrite and extend the topology list
-> > > checking.
-> > > Add a test case with a complex topology configuration.
-> > > In order to keep the unittests.cfg file readable, implement multiline
-> > > strings for extra_params.
-> >=20
-> > Thanks, I've pushed this to our CI for coverage.
->=20
-> And it found some problems.
-> Want me to resend the series or just fixup patches?
+On Fri, Oct 27, 2023 at 11:21:55AM -0700, Sean Christopherson wrote:
+>From: Chao Peng <chao.p.peng@linux.intel.com>
+>
+>In confidential computing usages, whether a page is private or shared is
+>necessary information for KVM to perform operations like page fault
+>handling, page zapping etc. There are other potential use cases for
+>per-page memory attributes, e.g. to make memory read-only (or no-exec,
+>or exec-only, etc.) without having to modify memslots.
+>
+>Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
+>userspace to operate on the per-page memory attributes.
+>  - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
+>    a guest memory range.
 
-I think it would be best if you resend the whole series.
+>  - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
+>    memory attributes.
+
+This ioctl() is already removed. So, the changelog is out-of-date and needs
+an update.
+
+>
+>+
+>+:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+>+:Architectures: x86
+>+:Type: vm ioctl
+>+:Parameters: struct kvm_memory_attributes(in)
+
+					   ^ add one space here?
+
+
+>+static bool kvm_pre_set_memory_attributes(struct kvm *kvm,
+>+					  struct kvm_gfn_range *range)
+>+{
+>+	/*
+>+	 * Unconditionally add the range to the invalidation set, regardless of
+>+	 * whether or not the arch callback actually needs to zap SPTEs.  E.g.
+>+	 * if KVM supports RWX attributes in the future and the attributes are
+>+	 * going from R=>RW, zapping isn't strictly necessary.  Unconditionally
+>+	 * adding the range allows KVM to require that MMU invalidations add at
+>+	 * least one range between begin() and end(), e.g. allows KVM to detect
+>+	 * bugs where the add() is missed.  Rexlaing the rule *might* be safe,
+
+					    ^^^^^^^^ Relaxing
+
+>@@ -4640,6 +4850,17 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+> 	case KVM_CAP_BINARY_STATS_FD:
+> 	case KVM_CAP_SYSTEM_EVENT_DATA:
+> 		return 1;
+>+#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+>+	case KVM_CAP_MEMORY_ATTRIBUTES:
+>+		u64 attrs = kvm_supported_mem_attributes(kvm);
+>+
+>+		r = -EFAULT;
+>+		if (copy_to_user(argp, &attrs, sizeof(attrs)))
+>+			goto out;
+>+		r = 0;
+>+		break;
+
+This cannot work, e.g., no @argp in this function and is fixed by a later commit:
+
+	fcbef1e5e5d2 ("KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific backing memory")
 
