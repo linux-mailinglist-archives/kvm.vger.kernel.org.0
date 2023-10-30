@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-108-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-109-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 882BB7DBEB8
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 18:22:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 883A67DBEC1
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 18:22:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5EB81C20895
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 17:22:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E3B528170B
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 17:22:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385ED199A3;
-	Mon, 30 Oct 2023 17:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87087199A0;
+	Mon, 30 Oct 2023 17:22:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PQ3I0Mq5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BWeJ6CuU"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF3719476
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 17:21:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3840D199A5
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 17:22:46 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C97293
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:21:53 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 583EBEE
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:22:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698686512;
+	s=mimecast20190719; t=1698686562;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=boXyb+7L5Zlgo2abx5zbreDpGqLqBIK3j4ToQmqyh+g=;
-	b=PQ3I0Mq5F8y+PRSLhKgBxSP/5THZi0Wu/pb49A3lEB2ccHuFkyk8OcVAY8+8UDAzFvj46W
-	29wOhcs/yF/5+iTjxzDJqnpHPVLm9ue3XaCfZOeAE8bApmYM2/+Q18NzzjKcxSazGRbank
-	C3PRzBMwYlsrSFeuLn/8xABgfyqpyuk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=6ITwAt3fuOh2cDBi6BB8DUSA16OthbZCN3xR2w5GAmk=;
+	b=BWeJ6CuUNYISo0gEiTDGH22NWV8MfdS8eTlej+4Op0A8+lzju+LF7Xmo3c5c7KjZK7XYV+
+	vsOR0SVUBmDaQ0VDqz118gpuEixd2zvs7/i211yA4I/XIupm6a/iCJwoF3CBJJb4SfjcPz
+	yCBeKLpOx+85r4NwKZoc7EGAxwTF94Y=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-678-w9eNyyMuPoWRx0_ikVjpSg-1; Mon, 30 Oct 2023 13:21:48 -0400
-X-MC-Unique: w9eNyyMuPoWRx0_ikVjpSg-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-408f9cee5e8so36283165e9.0
-        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:21:48 -0700 (PDT)
+ us-mta-186-gCnBMzAzPd-YS3NRwapFBA-1; Mon, 30 Oct 2023 13:22:41 -0400
+X-MC-Unique: gCnBMzAzPd-YS3NRwapFBA-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4084d0b171eso36712835e9.0
+        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:22:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698686507; x=1699291307;
+        d=1e100.net; s=20230601; t=1698686555; x=1699291355;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=boXyb+7L5Zlgo2abx5zbreDpGqLqBIK3j4ToQmqyh+g=;
-        b=hsGL5mwo6wwSQea8J/+hp5u3/uyLj4dYbVGhOJOQLPaaz5SqIjqSeAIk9q7QjnJhxv
-         JqhuhlAAA7ncIwrPhT8RssPcyi3UWTUa+b5pNikCF1PkyQh4CqIcrxgY67+wBkNUhWtL
-         5EERdShEVihDkmbBpKUHfg0gpH4ecWxfH3HooiA+QZH5G9MR2vE+xyx1BXB2z46cikvi
-         BxPSN17lS4IC2D/vTLQu/GU2+7YKp80uYhrVysTUezU8b7D1FuFT1wN5pbmAi7dy0SLr
-         Cna+CNXlp0JLzf+PevGFyV+1aQoCYOPQOAjNcg6QfdSEjuN3GfN51wUbpQ3vwuf5I0mT
-         znuw==
-X-Gm-Message-State: AOJu0YwZ91SSp/4gyTVays40OvCFWwGF2wUj8yJWMemr3ySCej4jF6Sp
-	6Joe1Tn8D7Klrgr3+Vq8SLkAhFbxA1Fa7mr26g5SB8Z5hkEm/sdkjKD3Wf4/loPezRnuFAxhx+4
-	WEAcEN5UB6gfE
-X-Received: by 2002:a05:600c:548c:b0:401:be70:53b6 with SMTP id iv12-20020a05600c548c00b00401be7053b6mr9028868wmb.15.1698686507257;
-        Mon, 30 Oct 2023 10:21:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE5I9OwLPDhwwdBq05u6PEcpXrmwFdGU+aFTRWkhJj3tDNeJuJ2HVg1bUTUoaNx9gtt3fCykA==
-X-Received: by 2002:a05:600c:548c:b0:401:be70:53b6 with SMTP id iv12-20020a05600c548c00b00401be7053b6mr9028817wmb.15.1698686506934;
-        Mon, 30 Oct 2023 10:21:46 -0700 (PDT)
+        bh=6ITwAt3fuOh2cDBi6BB8DUSA16OthbZCN3xR2w5GAmk=;
+        b=bpRF/5oCgXaYsimWiCfHanJ3hPB+X9Lne+wKDySq0XHR3iCjFPytfRsKSPdB8whM6f
+         8NMorF64vWZya/hYX90yw58Y9JyGYOCK5g4YQ9SlBm9S73/ynrlq0aHTsusDYMv4Fd+z
+         NoQhWhujsB6B7NxVvHCIIszMAtO5mVaSkqiz0HbMsFEIAicqSDNtLSM72GCZsXf0S+Iq
+         Az4cQsfNaoRr+GxIBbKJ6I7CJn2dtdKpwGnFfjY1OmZ+tlsiJkKQg9fi3nM5s3SwHQXW
+         FYkrBr+Vphhel3JPdjiP6cxkvbaq13M7dP1/5KVkJREfUCA9r/Ww0+htw3F0NElZXL49
+         6R3g==
+X-Gm-Message-State: AOJu0Yxtbh5yLAlXRugGBq/HkHwUgv9WyX22H5Fhp6pgyEn4fowHNHJW
+	WKXRLPbLYrCsBe2xmOWKyOcEolnkcPZEfeDFf5XogMBQ5+k241HFKVU4EiJpBKoNMoz556MeEhc
+	hNDhaO7rvJrGp
+X-Received: by 2002:a05:600c:45cd:b0:407:4701:f9e with SMTP id s13-20020a05600c45cd00b0040747010f9emr296196wmo.17.1698686555025;
+        Mon, 30 Oct 2023 10:22:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEsBlg/6wPDQVRi/nfUx2iIcHKNVjd7bvALhjURWCUu+koDyl9/DjnrY9Jn65zYlgTA6JZouA==
+X-Received: by 2002:a05:600c:45cd:b0:407:4701:f9e with SMTP id s13-20020a05600c45cd00b0040747010f9emr296155wmo.17.1698686554568;
+        Mon, 30 Oct 2023 10:22:34 -0700 (PDT)
 Received: from [192.168.1.174] ([151.81.68.207])
-        by smtp.googlemail.com with ESMTPSA id c5-20020a05600c0a4500b004094d4292aesm430163wmq.18.2023.10.30.10.21.35
+        by smtp.googlemail.com with ESMTPSA id c5-20020a05600c0a4500b004094d4292aesm430163wmq.18.2023.10.30.10.22.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Oct 2023 10:21:46 -0700 (PDT)
-Message-ID: <077cec97-7920-4d20-8bd3-fe07ab8bcc29@redhat.com>
-Date: Mon, 30 Oct 2023 18:21:33 +0100
+        Mon, 30 Oct 2023 10:22:33 -0700 (PDT)
+Message-ID: <904fd341-7bfd-4b63-a2ed-16c9249e698e@redhat.com>
+Date: Mon, 30 Oct 2023 18:22:26 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -73,8 +73,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 12/35] KVM: Prepare for handling only shared mappings
- in mmu_notifier events
+Subject: Re: [PATCH v13 09/35] KVM: Add KVM_EXIT_MEMORY_FAULT exit to report
+ faults to userspace
 Content-Language: en-US
 To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
  Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
@@ -105,7 +105,7 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  Isaku Yamahata <isaku.yamahata@gmail.com>,
  "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-13-seanjc@google.com>
+ <20231027182217.3615211-10-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -142,33 +142,196 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20231027182217.3615211-13-seanjc@google.com>
+In-Reply-To: <20231027182217.3615211-10-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 10/27/23 20:21, Sean Christopherson wrote:
-> @@ -635,6 +635,13 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
->  			 * the second or later invocation of the handler).
->  			 */
->  			gfn_range.arg = range->arg;
+> From: Chao Peng <chao.p.peng@linux.intel.com>
+> 
+> Add a new KVM exit type to allow userspace to handle memory faults that
+> KVM cannot resolve, but that userspace *may* be able to handle (without
+> terminating the guest).
+> 
+> KVM will initially use KVM_EXIT_MEMORY_FAULT to report implicit
+> conversions between private and shared memory.  With guest private memory,
+> there will be two kind of memory conversions:
+> 
+>    - explicit conversion: happens when the guest explicitly calls into KVM
+>      to map a range (as private or shared)
+> 
+>    - implicit conversion: happens when the guest attempts to access a gfn
+>      that is configured in the "wrong" state (private vs. shared)
+> 
+> On x86 (first architecture to support guest private memory), explicit
+> conversions will be reported via KVM_EXIT_HYPERCALL+KVM_HC_MAP_GPA_RANGE,
+> but reporting KVM_EXIT_HYPERCALL for implicit conversions is undesriable
+> as there is (obviously) no hypercall, and there is no guarantee that the
+> guest actually intends to convert between private and shared, i.e. what
+> KVM thinks is an implicit conversion "request" could actually be the
+> result of a guest code bug.
+> 
+> KVM_EXIT_MEMORY_FAULT will be used to report memory faults that appear to
+> be implicit conversions.
+> 
+> Note!  To allow for future possibilities where KVM reports
+> KVM_EXIT_MEMORY_FAULT and fills run->memory_fault on _any_ unresolved
+> fault, KVM returns "-EFAULT" (-1 with errno == EFAULT from userspace's
+> perspective), not '0'!  Due to historical baggage within KVM, exiting to
+> userspace with '0' from deep callstacks, e.g. in emulation paths, is
+> infeasible as doing so would require a near-complete overhaul of KVM,
+> whereas KVM already propagates -errno return codes to userspace even when
+> the -errno originated in a low level helper.
+> 
+> Report the gpa+size instead of a single gfn even though the initial usage
+> is expected to always report single pages.  It's entirely possible, likely
+> even, that KVM will someday support sub-page granularity faults, e.g.
+> Intel's sub-page protection feature allows for additional protections at
+> 128-byte granularity.
+> 
+> Link: https://lore.kernel.org/all/20230908222905.1321305-5-amoorthy@google.com
+> Link: https://lore.kernel.org/all/ZQ3AmLO2SYv3DszH@google.com
+> Cc: Anish Moorthy <amoorthy@google.com>
+> Cc: David Matlack <dmatlack@google.com>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+
+> ---
+>   Documentation/virt/kvm/api.rst | 41 ++++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/x86.c             |  1 +
+>   include/linux/kvm_host.h       | 11 +++++++++
+>   include/uapi/linux/kvm.h       |  8 +++++++
+>   4 files changed, 61 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index ace984acc125..860216536810 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6723,6 +6723,26 @@ array field represents return values. The userspace should update the return
+>   values of SBI call before resuming the VCPU. For more details on RISC-V SBI
+>   spec refer, https://github.com/riscv/riscv-sbi-doc.
+>   
+> +::
 > +
-> +			/*
-> +			 * HVA-based notifications aren't relevant to private
-> +			 * mappings as they don't have a userspace mapping.
-
-It's confusing who "they" is.  Maybe
-
-	 * HVA-based notifications provide a userspace address,
-	 * and as such are only relevant for shared mappings.
-
-Paolo
-
-> +			 */
-> +			gfn_range.only_private = false;
-> +			gfn_range.only_shared = true;
->  			gfn_range.may_block = range->may_block;
->  
->  			/*
-
+> +		/* KVM_EXIT_MEMORY_FAULT */
+> +		struct {
+> +			__u64 flags;
+> +			__u64 gpa;
+> +			__u64 size;
+> +		} memory;
+> +
+> +KVM_EXIT_MEMORY_FAULT indicates the vCPU has encountered a memory fault that
+> +could not be resolved by KVM.  The 'gpa' and 'size' (in bytes) describe the
+> +guest physical address range [gpa, gpa + size) of the fault.  The 'flags' field
+> +describes properties of the faulting access that are likely pertinent.
+> +Currently, no flags are defined.
+> +
+> +Note!  KVM_EXIT_MEMORY_FAULT is unique among all KVM exit reasons in that it
+> +accompanies a return code of '-1', not '0'!  errno will always be set to EFAULT
+> +or EHWPOISON when KVM exits with KVM_EXIT_MEMORY_FAULT, userspace should assume
+> +kvm_run.exit_reason is stale/undefined for all other error numbers.
+> +
+>   ::
+>   
+>       /* KVM_EXIT_NOTIFY */
+> @@ -7757,6 +7777,27 @@ This capability is aimed to mitigate the threat that malicious VMs can
+>   cause CPU stuck (due to event windows don't open up) and make the CPU
+>   unavailable to host or other VMs.
+>   
+> +7.34 KVM_CAP_MEMORY_FAULT_INFO
+> +------------------------------
+> +
+> +:Architectures: x86
+> +:Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
+> +
+> +The presence of this capability indicates that KVM_RUN will fill
+> +kvm_run.memory_fault if KVM cannot resolve a guest page fault VM-Exit, e.g. if
+> +there is a valid memslot but no backing VMA for the corresponding host virtual
+> +address.
+> +
+> +The information in kvm_run.memory_fault is valid if and only if KVM_RUN returns
+> +an error with errno=EFAULT or errno=EHWPOISON *and* kvm_run.exit_reason is set
+> +to KVM_EXIT_MEMORY_FAULT.
+> +
+> +Note: Userspaces which attempt to resolve memory faults so that they can retry
+> +KVM_RUN are encouraged to guard against repeatedly receiving the same
+> +error/annotated fault.
+> +
+> +See KVM_EXIT_MEMORY_FAULT for more information.
+> +
+>   8. Other capabilities.
+>   ======================
+>   
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 6409914428ca..ee3cd8c3c0ef 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4518,6 +4518,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_ENABLE_CAP:
+>   	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
+>   	case KVM_CAP_IRQFD_RESAMPLE:
+> +	case KVM_CAP_MEMORY_FAULT_INFO:
+>   		r = 1;
+>   		break;
+>   	case KVM_CAP_EXIT_HYPERCALL:
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 4e741ff27af3..96aa930536b1 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2327,4 +2327,15 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+>   /* Max number of entries allowed for each kvm dirty ring */
+>   #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
+>   
+> +static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+> +						 gpa_t gpa, gpa_t size)
+> +{
+> +	vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
+> +	vcpu->run->memory_fault.gpa = gpa;
+> +	vcpu->run->memory_fault.size = size;
+> +
+> +	/* Flags are not (yet) defined or communicated to userspace. */
+> +	vcpu->run->memory_fault.flags = 0;
+> +}
+> +
+>   #endif
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index bd1abe067f28..7ae9987b48dd 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -274,6 +274,7 @@ struct kvm_xen_exit {
+>   #define KVM_EXIT_RISCV_SBI        35
+>   #define KVM_EXIT_RISCV_CSR        36
+>   #define KVM_EXIT_NOTIFY           37
+> +#define KVM_EXIT_MEMORY_FAULT     38
+>   
+>   /* For KVM_EXIT_INTERNAL_ERROR */
+>   /* Emulate instruction failed. */
+> @@ -520,6 +521,12 @@ struct kvm_run {
+>   #define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
+>   			__u32 flags;
+>   		} notify;
+> +		/* KVM_EXIT_MEMORY_FAULT */
+> +		struct {
+> +			__u64 flags;
+> +			__u64 gpa;
+> +			__u64 size;
+> +		} memory_fault;
+>   		/* Fix the size of the union. */
+>   		char padding[256];
+>   	};
+> @@ -1203,6 +1210,7 @@ struct kvm_ppc_resize_hpt {
+>   #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+>   #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
+>   #define KVM_CAP_USER_MEMORY2 230
+> +#define KVM_CAP_MEMORY_FAULT_INFO 231
+>   
+>   #ifdef KVM_CAP_IRQ_ROUTING
+>   
 
 
