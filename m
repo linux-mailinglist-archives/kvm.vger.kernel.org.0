@@ -1,182 +1,116 @@
-Return-Path: <kvm+bounces-115-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-116-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C93BD7DBF12
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 18:36:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6876D7DBF17
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 18:36:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E5F0282576
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 17:36:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00089B20E56
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 17:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 615EB199BC;
-	Mon, 30 Oct 2023 17:36:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B70C4199B5;
+	Mon, 30 Oct 2023 17:36:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IcA+ZLnp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IJ+HG5gm"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FED199A6
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 17:36:16 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B19AF93
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:36:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698687374;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=3jYLwfXXzRbH81zwo7MCV6nGPuDVHVRPsAgIWckITik=;
-	b=IcA+ZLnpKQJpkCRGDeb33JEkCn0qNxsf+T38lWM+J1FdtxfUv3d9OgweJu6+CVjKyNkrdb
-	xFUFoD42L/cV+VNMIP9EugPeJNCCu6ePeotPp/6SdlzGexxjJrJaQcjpo4kSnAW0weezRq
-	9i8t5ffjdsjeJr6mTv6hFVPs4mNBzpg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-533-YUwtH5ycMaqdBl4f-n8LRg-1; Mon, 30 Oct 2023 13:36:13 -0400
-X-MC-Unique: YUwtH5ycMaqdBl4f-n8LRg-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4083c9b426fso33259215e9.2
-        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:36:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC2B1945E
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 17:36:39 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF4EC93
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:36:38 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-da03ef6fc30so4400847276.0
+        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:36:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698687398; x=1699292198; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8vz5wnkmcum9q1qyUnxUAw0SL2P8FyU7ENITNbJXLW0=;
+        b=IJ+HG5gmjGGXOT93f4QQPYaODHQbGWsLrxBlu9v1CiL/tQZc49J7kkSCcpVbTJYjAl
+         frOe/7O1B1ApWk6iP402yUruSSXgE/82RqaAv/5FV35aAPliA6eeGS+HJ2vkI2WEGCtn
+         dijCEVQt3sBDAZxiBpGVdGEpxJaTm6FOeboGz1oRPOKH5mHhWzQyYUg2HHkIQGVhS79v
+         lxhf7U8dEJl7pa4xVL77Zre8jZoPCsoRieZkSEdMDZzxCSda/AG/966WYAuNpvlxpA9e
+         aPHM4Vc1rY0dI03YZ+PMBICToB+YJXrPao3gOGSW6wjtN4Xf2dM7gU3jKE+mMzRoFTmR
+         5Q7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698687372; x=1699292172;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3jYLwfXXzRbH81zwo7MCV6nGPuDVHVRPsAgIWckITik=;
-        b=Jf9/ygxvtbAOQWbmnGSmPSKpbe7ORHGnC0x59hJY5LM8hgJgiTgR7vjN+t1e7T13OQ
-         cw0QTBeL/+T9ykjQcB/eXvk1ut9uTtTvjX74SsA/3+xE3BXreP8tt7u5zOG+CRPMdm3l
-         b1CWDRWDyRQgREy+gEFgOiA4IBMdwNs6kqXai3r6XnbVI1P9bgtxaXVd10r9SiHMHtoW
-         qtqAMgae0BecYmWFjfXlNcwELjfxdYP0I1vAU2f+zhs9DIdnhG0YORk7kiU9VnJtvzyI
-         LKLw0HU1O4p4oGwJCjJ/rfKp9xG6by3YaYwv2ym7S8RTXdnCJEEHweFEydcqdGwnQ0kJ
-         u21Q==
-X-Gm-Message-State: AOJu0YxIt0pgo642Ir/5kl6Thk/YYFbO9jcI+HSiwTTqj2eho6L7Nlhf
-	aVtR6sQKBf62GVtc3ahYTvlZtgLMjwTrfZD5N8lFS6hbmabCGWcSsCF74aeRYRSqO4OTfNoZOHy
-	OsuJJbNKwK70A
-X-Received: by 2002:adf:ec4f:0:b0:32d:8357:42dd with SMTP id w15-20020adfec4f000000b0032d835742ddmr6883277wrn.68.1698687371995;
-        Mon, 30 Oct 2023 10:36:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEboAELdFqaoOZREgnEhsC/lbRki6/0Jdh0l66f6RUru0wLk22AqSmUMVbSPZpU1ZFwEkh2hA==
-X-Received: by 2002:adf:ec4f:0:b0:32d:8357:42dd with SMTP id w15-20020adfec4f000000b0032d835742ddmr6883233wrn.68.1698687371568;
-        Mon, 30 Oct 2023 10:36:11 -0700 (PDT)
-Received: from [192.168.1.174] ([151.81.68.207])
-        by smtp.googlemail.com with ESMTPSA id p14-20020a5d68ce000000b003253523d767sm8703507wrw.109.2023.10.30.10.36.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Oct 2023 10:36:10 -0700 (PDT)
-Message-ID: <a56e499f-c91c-45da-b404-444c22b2df24@redhat.com>
-Date: Mon, 30 Oct 2023 18:36:07 +0100
+        d=1e100.net; s=20230601; t=1698687398; x=1699292198;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8vz5wnkmcum9q1qyUnxUAw0SL2P8FyU7ENITNbJXLW0=;
+        b=AC/XdZXhuXfrWiFrJYNOjt7YWnRBCQEsi/RAJ0juBakHQMJUU+YxySgBCXJBu2cfe9
+         x75RbkDOi50LpyL4Yn8qHBFhWBLJbLuBzt1NZfmc2lHsm+OetkdlXuPja+BJMVVUqHzr
+         L0jdONW/1M0XNu5+yl2C9QR+MLdqauucbLFI8rBDqfwAYdOkGWexUYeNyocA3GAOlNkJ
+         CqObschpQ0mwZzd6r9mHSOnRnw2auNnhJ13CrUlt/Q2NgjKzpPG3EOvfqdsmK57KPK4t
+         exHZfN1fLA6xW15giuFzFXOViIgZMe1dVZRhZOj8ycFi9R/GUBowYMwuuDyxMCpI9Haj
+         CKrw==
+X-Gm-Message-State: AOJu0YzTc/ky82n4kv1lt5WI04QCnwEKuixSZwNGmLfqGkRw5fS9NSP2
+	elNJCeD13z39xoIShB9/f9qfcO2MKbM=
+X-Google-Smtp-Source: AGHT+IEEffbEmQjd4o2X7fGwPqKpFD/uxoIxAWj4vvpPaQwpwy726tAOw84DngpKljDqNb2fsvt5pi0rExE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:a93:b0:d9a:e6ae:ddb7 with SMTP id
+ cd19-20020a0569020a9300b00d9ae6aeddb7mr186866ybb.7.1698687398064; Mon, 30 Oct
+ 2023 10:36:38 -0700 (PDT)
+Date: Mon, 30 Oct 2023 10:36:36 -0700
+In-Reply-To: <146168ae-900d-4eee-9a47-a1ba2ea57aa6@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 23/35] KVM: x86: Add support for "protected VMs" that
- can utilize private memory
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
- Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Andrew Morton <akpm@linux-foundation.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- Xiaoyao Li <xiaoyao.li@intel.com>, Xu Yilun <yilun.xu@intel.com>,
- Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
- Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>,
- David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
- =?UTF-8?Q?n?= <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>,
- Vishal Annapurve <vannapurve@google.com>,
- Ackerley Tng <ackerleytng@google.com>,
- Maciej Szmigiero <mail@maciej.szmigiero.name>,
- David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
- Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
- Liam Merwick <liam.merwick@oracle.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-24-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20231027182217.3615211-24-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20231030141728.1406118-1-nik.borisov@suse.com>
+ <ZT_UtjWSKCwgBxb_@google.com> <146168ae-900d-4eee-9a47-a1ba2ea57aa6@redhat.com>
+Message-ID: <ZT_ppBmxdd6917cl@google.com>
+Subject: Re: [PATCH] KVM: x86: User mutex guards to eliminate __kvm_x86_vendor_init()
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Nikolay Borisov <nik.borisov@suse.com>, x86@kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On 10/27/23 20:22, Sean Christopherson wrote:
-> Add a new x86 VM type, KVM_X86_SW_PROTECTED_VM, to serve as a development
-> and testing vehicle for Confidential (CoCo) VMs, and potentially to even
-> become a "real" product in the distant future, e.g. a la pKVM.
+On Mon, Oct 30, 2023, Paolo Bonzini wrote:
+> On 10/30/23 17:07, Sean Christopherson wrote:
+> > On Mon, Oct 30, 2023, Nikolay Borisov wrote:
+> > > Current separation between (__){0,1}kvm_x86_vendor_init() is superfluos as
+> > 
+> > superfluous
+> > 
+> > But this intro is actively misleading.  The double-underscore variant most definitely
+> > isn't superfluous, e.g. it eliminates the need for gotos reduces the probability
+> > of incorrect error codes, bugs in the error handling, etc.  It _becomes_ superflous
+> > after switching to guard(mutex).
+> > 
+> > IMO, this is one of the instances where the then solution problem appoach is
+> > counter-productive.  If there are no objections, I'll massage the change log to
+> > the below when applying (for 6.8, in a few weeks).
 > 
-> The private memory support in KVM x86 is aimed at AMD's SEV-SNP and
-> Intel's TDX, but those technologies are extremely complex (understatement),
-> difficult to debug, don't support running as nested guests, and require
-> hardware that's isn't universally accessible.  I.e. relying SEV-SNP or TDX
-> for maintaining guest private memory isn't a realistic option.
+> I think this is a "Speak Now or Forever Rest in Peace" situation.  I'm going
+> to wait a couple days more for reviews to come in, post a v14 myself, and
+> apply the series to kvm/next as soon as Linus merges the 6.7 changes.  The
+> series will be based on the 6.7 tags/for-linus, and when 6.7-rc1 comes up,
+> I'll do this to straighten the history:
+
+Heh, I'm pretty sure you meant to respond to the guest_memfd series.
+
+> 	git checkout kvm/next
+> 	git tag -s -f kvm-gmem HEAD
+> 	git reset --hard v6.7-rc1
+> 	git merge tags/kvm-gmem
+> 	# fix conflict with Christian Brauner's VFS series
+> 	git commit
+> 	git push kvm
 > 
-> At the very least, KVM_X86_SW_PROTECTED_VM will enable a variety of
-> selftests for guest_memfd and private memory support without requiring
-> unique hardware.
+> 6.8 is not going to be out for four months, and I'm pretty sure that
+> anything discovered within "a few weeks" can be applied on top, and the
+> heaviness of a 35-patch series will outweigh any imperfections by a long
+> margin).
 > 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-
-with one nit:
-
-> +---------------------
-> +
-> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> +:Architectures: x86
-> +:Type: system ioctl
-> +
-> +This capability returns a bitmap of support VM types.  The 1-setting of bit @n
-
-s/support/supported/
-
-Paolo
-
+> (Full disclosure: this is _also_ because I want to apply this series to the
+> RHEL kernel, and Red Hat has a high level of disdain for non-upstream
+> patches.  But it's mostly because I want all dependencies to be able to move
+> on and be developed on top of stock kvm/next).
 
