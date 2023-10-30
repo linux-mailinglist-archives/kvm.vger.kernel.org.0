@@ -1,168 +1,369 @@
-Return-Path: <kvm+bounces-104-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-105-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFFD47DBE8C
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 18:12:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B33CD7DBE8E
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 18:12:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B2D4281610
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 17:12:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D49B41C20B3E
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 17:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F04419469;
-	Mon, 30 Oct 2023 17:12:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B966119463;
+	Mon, 30 Oct 2023 17:12:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cpLDJt2+"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Mxj2TjQe"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4638618C18
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 17:12:05 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD6A9FA
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:11:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698685915;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=lo4ysHz5pmHfFsXnk84EoayTJ3hTlIhc3rVOfp1rxtc=;
-	b=cpLDJt2+6yxkZbmC7dAvXetuv6zb+Okf2WZrlidRuXr59dd4Ieo0D95vLh1pG3XpMitwSH
-	FIYEosZk7PEEkIiKFempJUazAQzvBf4NHCnThG1GmfPYeV/D6LBQVQBFS6toBJtoXUnkfc
-	xAd4JF24ptyQSHh5Q3SK3zFHgkxwjko=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-183-KZENAIb4NPSo0p68w09GNw-1; Mon, 30 Oct 2023 13:11:54 -0400
-X-MC-Unique: KZENAIb4NPSo0p68w09GNw-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4084e263ec4so34468885e9.2
-        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 10:11:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698685913; x=1699290713;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lo4ysHz5pmHfFsXnk84EoayTJ3hTlIhc3rVOfp1rxtc=;
-        b=VINo+t4zDNoQNnD8cC3REwP51gG5vmPCVlAOqrfkug2Xrel7sn1Ztu2UcTaDfI8o4+
-         aIq9FLRiFPbALe07rO4OUuKlDGbYmEXrBsWO2ili+GpLQAsGqEulDSxUuESXWfibPuJb
-         zQAV8qQIXgiexCMykIEJCYqKKPxFs7f9Z9qEkqJ135QHtTtR9QvTrpQH6y5rzSozsHEA
-         YcZfJF7WCb4Qqzra5YaVgkWLt3Vq8waMCwxUdBGHaOGhHycqrDkkc6B83gUquCbAWzVC
-         2s8dUml+x2wNN3wTR096Dx8z+kEdzucIgQ4DVNivHfnbkpQx0ZoUvbBYikd+bItO5X0D
-         5+2g==
-X-Gm-Message-State: AOJu0YxKf/DQXEj8MnNZWhGT1e0EInSm6+UB7lzxR7xpJsC3u8ZNuppv
-	jZLkajHzcd/TcrPDJ81oflgh5I/FeCaRiVN30uwKaecXSi0sgR+xyMr3rVaNtOzywqD9CVBUeyT
-	Bna+l0uUqLDBR
-X-Received: by 2002:a05:600c:1c9a:b0:401:d803:6243 with SMTP id k26-20020a05600c1c9a00b00401d8036243mr8797105wms.32.1698685912896;
-        Mon, 30 Oct 2023 10:11:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEE3mzsAlLnekLWdY8A4rueILcmfn/0LGvZfOgJVm2OXLCsoyw1l1K7DLfNbIxoxk9UoBDhkg==
-X-Received: by 2002:a05:600c:1c9a:b0:401:d803:6243 with SMTP id k26-20020a05600c1c9a00b00401d8036243mr8797063wms.32.1698685912474;
-        Mon, 30 Oct 2023 10:11:52 -0700 (PDT)
-Received: from [192.168.1.174] ([151.81.68.207])
-        by smtp.googlemail.com with ESMTPSA id w16-20020adfcd10000000b0032da75af3easm8617198wrm.80.2023.10.30.10.11.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Oct 2023 10:11:51 -0700 (PDT)
-Message-ID: <773328b3-0ef0-4e93-afb9-6fba3302b8a7@redhat.com>
-Date: Mon, 30 Oct 2023 18:11:39 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A11B19455
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 17:12:22 +0000 (UTC)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2066.outbound.protection.outlook.com [40.107.93.66])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09723FA;
+	Mon, 30 Oct 2023 10:12:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FUjA0zal02frxHh6T/Eh/lFL/6IBRJOdwrQ5+QY49Kcs463v6eaEWXQ2gfy5Ic8WOkVECnUR9JuFYXl4kjTwjBx9yMxLqP73HExunROHPzHOHsEEdCkL41HNsDQH1dUU2COs5MIssmMHihieksiUTttDPMMnhWZlcOBetB4wcLdsxi9M8QF59QRQpT7u6nbIjhRw8MM60jH3i/Q/BVz75k1KFsMdyjBJoFDG7bN2KqPSEwQuArurfMsRQUlKscanFm6CH9m7b3b+JTO7Q436OeEE+p0ejriCcgBllLQo/SHMqDtK93rUUP7f/uaXPGqgTDLR640eZzN5XMlWbk0h7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=83qERt5UCOVvYt8y06MVZGLApSi+3BiArB+kEqr8BDM=;
+ b=NSPorNeubc+CAsdRSbv4tdSNbR6nUiab7ydA4T/SiHQkZAub+rV4jQIjr3uMXJUjZbFr8/CVdiGP3H8F3L2JH+Gwmsu0efHVnMPIPq+Ra0kCB0iqYVxL4eiquMhxUfrBixiWxeHArhC1JSTvvXgMW4a+4xgtRpcZpuNJNSdKVIIY+Dj3v/uT7w25/uddozrI+7XIOh0GxQuzgb4FYmSrbdk2B7/IKvjbcnR4gHSy/f+L9uEBqYHDyzynu2tDax92yC2kaNp2SoV9bfGbsS+wicaAkKnzB30/fuB46U7FajLxmd16U0v/cwOdTiE0Q+wsWdjcDptLkmE/ml0n/VbSHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=83qERt5UCOVvYt8y06MVZGLApSi+3BiArB+kEqr8BDM=;
+ b=Mxj2TjQej/SMvgMXYDnu+bBrKnLSZunXhk71bn91EQQlun+Va3PBYufRV7sczMSI8dzwSAU9SVFYSpaBOSF19i9T6cOG9eSpi6JVJ/uJAk64De/iR0Pm6IDPPpnKFPhIBJaYlFbQD1ZkUlqeOKW1UmiwtnBUBY9jEAcTF9DVs4E=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
+ by DS0PR12MB6654.namprd12.prod.outlook.com (2603:10b6:8:d1::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.28; Mon, 30 Oct
+ 2023 17:12:14 +0000
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::e16e:d7f1:94ad:3021]) by BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::e16e:d7f1:94ad:3021%7]) with mapi id 15.20.6933.027; Mon, 30 Oct 2023
+ 17:12:14 +0000
+Message-ID: <57b904e1-9a17-9203-e275-4b5a31ca8a71@amd.com>
+Date: Mon, 30 Oct 2023 12:12:10 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v5 05/14] virt: sev-guest: Add vmpck_id to snp_guest_dev
+ struct
+Content-Language: en-US
+To: Dionna Amalie Glaze <dionnaglaze@google.com>,
+ Nikunj A Dadhania <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+ bp@alien8.de, mingo@redhat.com, tglx@linutronix.de,
+ dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+ pbonzini@redhat.com
+References: <20231030063652.68675-1-nikunj@amd.com>
+ <20231030063652.68675-6-nikunj@amd.com>
+ <CAAH4kHY_sM0DTL+EVz3GNDq1q_5S4FH1Ku9EMV0HOzFAY1s4QQ@mail.gmail.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <CAAH4kHY_sM0DTL+EVz3GNDq1q_5S4FH1Ku9EMV0HOzFAY1s4QQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DS7PR03CA0118.namprd03.prod.outlook.com
+ (2603:10b6:5:3b7::33) To BL1PR12MB5732.namprd12.prod.outlook.com
+ (2603:10b6:208:387::17)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 10/35] KVM: Add a dedicated mmu_notifier flag for
- reclaiming freed memory
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
- Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Andrew Morton <akpm@linux-foundation.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- Xiaoyao Li <xiaoyao.li@intel.com>, Xu Yilun <yilun.xu@intel.com>,
- Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
- Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>,
- David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
- =?UTF-8?Q?n?= <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>,
- Vishal Annapurve <vannapurve@google.com>,
- Ackerley Tng <ackerleytng@google.com>,
- Maciej Szmigiero <mail@maciej.szmigiero.name>,
- David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
- Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
- Liam Merwick <liam.merwick@oracle.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-11-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20231027182217.3615211-11-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|DS0PR12MB6654:EE_
+X-MS-Office365-Filtering-Correlation-Id: c7ec3ee9-7943-4fe0-1c9e-08dbd96b5c72
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	nYDmvO+zSk0quCgAkn7XNu2vbKYy04/kW182QDsNYyY/AjvWaZ7kwzQ+C5qfD0kuOEC3CqXOY/YkG2PmFhWCs3phoUgSjv14JCy1NMdyIpbcI4mwle+NGaoy106bYS4T+ML9G7b1ZpTLpFpIzP9vWi8whgJnobqyAD8hDjKa+mak8rGUd97JbpyWl0GM4TaQf0NMNpP5HcDk43N/0BSwrqjGIwNvgAoC7qAvYnTb/KzMXct08GqW8Ge4Y+z6LJpjnIjKhwYmWybkJcjoiWRufYTRaRLlYTQ2Qtba1NbtqR5gkt7pMRmHm+x+kYRvW988k6J9s2ZUPVCYT2f4OT7WJIDvNWZfbjj556YpCFMDAVFvdWwVqCWD3wXCDfpATtRWGqOpgfiI1ZrzXkEi3LbvYQihiTamocKP40YbuWYiPg3uucVtCk7B5fa05jWQmEukn5fREDfDLqJskjnr/ALMHaOvifjRUwUUqWh/6jlBWtbYvL4dwRG4a7zpomRzv1Azjeo3Tq1KR0Vc/PGeLspO6yLiHpI8fNxfY4sdqhBWB6lVibBNMiSbcYr+xs6r0Qxd5c/iiWMyO49vO5Uo1ayDgT1V0CW47rYG/pvrI2/jKCRmyGimHhrg0pQ1gNAy+ssQQ5NcVV9qF8kWPgTAJPpyCA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(366004)(346002)(39860400002)(376002)(230922051799003)(64100799003)(451199024)(1800799009)(186009)(6512007)(2616005)(26005)(53546011)(478600001)(6506007)(6666004)(83380400001)(5660300002)(7416002)(2906002)(41300700001)(110136005)(8936002)(4326008)(8676002)(66476007)(66946007)(6636002)(66556008)(316002)(6486002)(38100700002)(31696002)(86362001)(36756003)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?S3dYdDl1c3U1YmdZZWZHeUpjcjZka1d4Ny9zV2JDckZZQ255bks2ZDViYjEr?=
+ =?utf-8?B?aEsySTJZQndYMmFoc3VGMUw3YzNQeUgxVk9xeGp6c3pORXQ1eXNWVXdRMVhD?=
+ =?utf-8?B?ZVovTUc2Wno0TitsSmpucEtRSzBtS0hET0xLTHVZRUN1WjFQVlRMTXNmelhD?=
+ =?utf-8?B?bEk3RXF1bXJBeWdsc3NoSC9OVUgwd1FPLzVsNFFpTXBOZG1lclNES0F3SlRi?=
+ =?utf-8?B?cXFVZTdjd3IxZVJWTC9wMGh4UHVBb3hZNHUrUkdpNjlqa1ROUDdHQlkxQXZi?=
+ =?utf-8?B?aUNWeEJzQTBGQnFpYTVCTXhPRmJWZm9YbEFLKzdxVWNYbld0V05PVlFDcGg1?=
+ =?utf-8?B?VmxWZjhqM1dkZzdLd2NvbHliNVZYdWY5dU94QnZZZkNKeTV6ejdnREl3VFBZ?=
+ =?utf-8?B?Y2w3bUJIYzU2K3VvUjBPampmTUVwUFI1Zi9iSmZWOGJQa3pncDRlSlBFdlpO?=
+ =?utf-8?B?ZWh3MmljRldJLzdMajA3UlA0Z0o1bnZCYThkWjlwY0l5WVpmMSt1amhiMWtB?=
+ =?utf-8?B?ays0T1hOUUhKTjNnbHdQcFNMbUV0alRyYmc1cGMvbzAzVG5TQ1JmbklRL2l5?=
+ =?utf-8?B?RGJhdDkraVBzNHZ3b3d5S1JNejk1bldpRkhaZW41eVJFdFkvWERjTFJza3lU?=
+ =?utf-8?B?RTI2eTh2TFJ2NU5KcXBidVBPTTkwUXFpeDVDYlVlRlVvWmh5dzB5cFV5dUls?=
+ =?utf-8?B?QlBxYVo5MXBJbHFtcGw4bjgyWVlTbGI4eGorODhLaitYWVhuS3RVTEg2ZSs2?=
+ =?utf-8?B?di9VT3lzN2hqdzd1cEJKZWpkRFFlMytTcDAwaUZTeFhHTVRZR3c5YW5tVUFp?=
+ =?utf-8?B?ejBVMVpMUG9mR2NZQ2xJNE1BYllhQzFKNng0V3BUWmNxbjc0SDlETW90NDEw?=
+ =?utf-8?B?cVRUMmMyRXZTSmlEYUkxd0dWa2szeTlvQXZ0dzZJY2MwbnFrcGlQelpIWCtw?=
+ =?utf-8?B?NnQ3Y0QrYndNOTFKOG5YbG00NmR1SWxsR044cnJMZVovK0lWOUpsSHhwRUJC?=
+ =?utf-8?B?Yk9BVnpMR1ZhWUFZMnhzQ3VuNTJUOFd3NGU1amZSRUc4YUZOcTUrais1Zmh0?=
+ =?utf-8?B?SGp3TDdnRitRQTUxaGpsc2RmbmZsZzZCL1lzcWUrUXQrMTR6SGkxZG9YRjh4?=
+ =?utf-8?B?RnFhR1lSWGlUOW9mMmNZeHpnTk1LeDF6bHBFbTFjT0s2UXEyMm5FQmlSUElF?=
+ =?utf-8?B?OVdXaDFVWWhRUzVzUG15TzdTWVc0K1l6YkcyMENpbGlOZ0Uwa2JRMFhKNjZj?=
+ =?utf-8?B?MkdDZnczejI0U0hLRW4xUnhPdkJ6NFlvR0VhTm1kUnV2Z0Qwd09OOHRneFJl?=
+ =?utf-8?B?eHNCVFJGYlhJSUFja3hrcm1ZU2RZVXZzOVBHN0c0QkM3NDZ6WXBrNEMweDlt?=
+ =?utf-8?B?d3hwQ3BvMmpORHN1aTVxbVo4VWQyVmFNYUZaT2xPcWxyekNMT2tBcFhZaWZS?=
+ =?utf-8?B?NjlwZmpOS0haaWhSbFAvZzhRZnp4QklMUDNhUk1XQ3o2dlRxL0tmdCtIYzVL?=
+ =?utf-8?B?UjJKM3NhNUsvSXlKV2JtYVFrVUhWNXo1MVJNWSs3OGtVeTM3WXVkYzlIZXZU?=
+ =?utf-8?B?NXdBMTBwbGdKeXdKcnhtNGhmdTlnQTc2TUhxY1NhTTVrZXNqdndSaHEzMDBK?=
+ =?utf-8?B?V3ErVEN0YTYxWkVUcy9ENkZGMTRmdnlDTElLOEJ3MXhMbHZ1bGk0a1ljekl2?=
+ =?utf-8?B?Y1RudzV5UHNDdzMvN0JBRjVZMXFVdEJ4T1JUcDZLVE1iVHV0aVoySzFaeVE5?=
+ =?utf-8?B?VU05Zk1GMGx4dkZqV2lEWmJWOHVSNUdvbUIrK0RCUkxoMjh6MDhpVkxVZ1JC?=
+ =?utf-8?B?a1paejBCbkM4Nmxxck1SV2dFZ3ovaitPWXRNaDYwUlhNU0xXVWFEQ2pETERZ?=
+ =?utf-8?B?R0N1ZXQ1Nm1QaUE3ZEpiaE9lUElGaGlOcUhhRllzd21YTENUemkxRTVjaEUz?=
+ =?utf-8?B?L1o4eklBSnhyZnpzSFRwNjJ0OWloTFZ3ZFIyNmg5K0FmYytjR1BFZE5vRHI3?=
+ =?utf-8?B?b3BreG5BMTBGb3dRZ2pqVTg3dnZVNG80NXNOYXYxMVpVMGpuSDI5bzR2Nnl2?=
+ =?utf-8?B?L3A2N3pZa05NMWNwVzF3aVAvdHpYdlBrTEtjWDVEbE9Oak55ZzF2WUVZaWhy?=
+ =?utf-8?Q?/14VDYJEBKhtxduAxbVKg3NDb?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c7ec3ee9-7943-4fe0-1c9e-08dbd96b5c72
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2023 17:12:13.9799
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oOBX6mgV1Xpm+Z2F7i0qSg/lW8ktrTbwSVH/qtkZyEVKyzKmtsPZzFJy2L6bSHRbRI9SxCnGty86iq1p5eOXHQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6654
 
-On 10/27/23 20:21, Sean Christopherson wrote:
-> Handle AMD SEV's kvm_arch_guest_memory_reclaimed() hook by having
-> __kvm_handle_hva_range() return whether or not an overlapping memslot
-> was found, i.e. mmu_lock was acquired.  Using the .on_unlock() hook
-> works, but kvm_arch_guest_memory_reclaimed() needs to run after dropping
-> mmu_lock, which makes .on_lock() and .on_unlock() asymmetrical.
+On 10/30/23 11:16, Dionna Amalie Glaze wrote:
+> On Sun, Oct 29, 2023 at 11:38 PM Nikunj A Dadhania <nikunj@amd.com> wrote:
+>>
+>> Drop vmpck and os_area_msg_seqno pointers so that secret page layout
+>> does not need to be exposed to the sev-guest driver after the rework.
+>> Instead, add helper APIs to access vmpck and os_area_msg_seqno when
+>> needed.
+>>
+>> Also, change function is_vmpck_empty() to snp_is_vmpck_empty() in
+>> preparation for moving to sev.c.
+>>
+>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+>> ---
+>>   drivers/virt/coco/sev-guest/sev-guest.c | 85 ++++++++++++-------------
+>>   1 file changed, 42 insertions(+), 43 deletions(-)
+>>
+>> diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
+>> index 5801dd52ffdf..4dd094c73e2f 100644
+>> --- a/drivers/virt/coco/sev-guest/sev-guest.c
+>> +++ b/drivers/virt/coco/sev-guest/sev-guest.c
+>> @@ -50,8 +50,7 @@ struct snp_guest_dev {
+>>
+>>          struct snp_secrets_page_layout *layout;
+>>          struct snp_req_data input;
+>> -       u32 *os_area_msg_seqno;
+>> -       u8 *vmpck;
+>> +       unsigned int vmpck_id;
+>>   };
+>>
+>>   static u32 vmpck_id;
+>> @@ -61,14 +60,22 @@ MODULE_PARM_DESC(vmpck_id, "The VMPCK ID to use when communicating with the PSP.
+>>   /* Mutex to serialize the shared buffer access and command handling. */
+>>   static DEFINE_MUTEX(snp_cmd_mutex);
+>>
+>> -static bool is_vmpck_empty(struct snp_guest_dev *snp_dev)
+>> +static inline u8 *snp_get_vmpck(struct snp_guest_dev *snp_dev)
+>>   {
+>> -       char zero_key[VMPCK_KEY_LEN] = {0};
+>> +       return snp_dev->layout->vmpck0 + snp_dev->vmpck_id * VMPCK_KEY_LEN;
+>> +}
+>>
+>> -       if (snp_dev->vmpck)
+>> -               return !memcmp(snp_dev->vmpck, zero_key, VMPCK_KEY_LEN);
+>> +static inline u32 *snp_get_os_area_msg_seqno(struct snp_guest_dev *snp_dev)
+>> +{
+>> +       return &snp_dev->layout->os_area.msg_seqno_0 + snp_dev->vmpck_id;
+>> +}
+>>
+>> -       return true;
+>> +static bool snp_is_vmpck_empty(struct snp_guest_dev *snp_dev)
+>> +{
+>> +       char zero_key[VMPCK_KEY_LEN] = {0};
+>> +       u8 *key = snp_get_vmpck(snp_dev);
+>> +
+>> +       return !memcmp(key, zero_key, VMPCK_KEY_LEN);
+>>   }
+>>
+>>   /*
+>> @@ -90,20 +97,22 @@ static bool is_vmpck_empty(struct snp_guest_dev *snp_dev)
+>>    */
+>>   static void snp_disable_vmpck(struct snp_guest_dev *snp_dev)
+>>   {
+>> +       u8 *key = snp_get_vmpck(snp_dev);
+>> +
+>>          dev_alert(snp_dev->dev, "Disabling vmpck_id %d to prevent IV reuse.\n",
+>> -                 vmpck_id);
+>> -       memzero_explicit(snp_dev->vmpck, VMPCK_KEY_LEN);
+>> -       snp_dev->vmpck = NULL;
+>> +                 snp_dev->vmpck_id);
+>> +       memzero_explicit(key, VMPCK_KEY_LEN);
+>>   }
 > 
-> Use a small struct to return the tuple of the notifier-specific return,
-> plus whether or not overlap was found.  Because the iteration helpers are
-> __always_inlined, practically speaking, the struct will never actually be
-> returned from a function call (not to mention the size of the struct will
-> be two bytes in practice).
+> We disable the VMPCK because we believe the guest to be under attack,
+> but this only clears a single key. Shouldn't we clear all VMPCK keys
+> in the secrets page for good measure? If at VMPCK > 0, most likely the
+> 0..VMPCK-1 keys have been zeroed by whatever was prior in the boot
+> stack, but still better to be safe.
 
-Could have been split in two patches, but it's fine anyway.
+Doing that would be a separate patch series and isn't appropriate here.
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Thanks,
+Tom
 
-Paolo
-
+> 
+>>
+>>   static inline u64 __snp_get_msg_seqno(struct snp_guest_dev *snp_dev)
+>>   {
+>> +       u32 *os_area_msg_seqno = snp_get_os_area_msg_seqno(snp_dev);
+>>          u64 count;
+>>
+>>          lockdep_assert_held(&snp_dev->cmd_mutex);
+>>
+>>          /* Read the current message sequence counter from secrets pages */
+>> -       count = *snp_dev->os_area_msg_seqno;
+>> +       count = *os_area_msg_seqno;
+>>
+>>          return count + 1;
+>>   }
+>> @@ -131,11 +140,13 @@ static u64 snp_get_msg_seqno(struct snp_guest_dev *snp_dev)
+>>
+>>   static void snp_inc_msg_seqno(struct snp_guest_dev *snp_dev)
+>>   {
+>> +       u32 *os_area_msg_seqno = snp_get_os_area_msg_seqno(snp_dev);
+>> +
+>>          /*
+>>           * The counter is also incremented by the PSP, so increment it by 2
+>>           * and save in secrets page.
+>>           */
+>> -       *snp_dev->os_area_msg_seqno += 2;
+>> +       *os_area_msg_seqno += 2;
+>>   }
+>>
+>>   static inline struct snp_guest_dev *to_snp_dev(struct file *file)
+>> @@ -145,15 +156,22 @@ static inline struct snp_guest_dev *to_snp_dev(struct file *file)
+>>          return container_of(dev, struct snp_guest_dev, misc);
+>>   }
+>>
+>> -static struct aesgcm_ctx *snp_init_crypto(u8 *key, size_t keylen)
+>> +static struct aesgcm_ctx *snp_init_crypto(struct snp_guest_dev *snp_dev)
+>>   {
+>>          struct aesgcm_ctx *ctx;
+>> +       u8 *key;
+>> +
+>> +       if (snp_is_vmpck_empty(snp_dev)) {
+>> +               pr_err("SNP: vmpck id %d is null\n", snp_dev->vmpck_id);
+>> +               return NULL;
+>> +       }
+>>
+>>          ctx = kzalloc(sizeof(*ctx), GFP_KERNEL_ACCOUNT);
+>>          if (!ctx)
+>>                  return NULL;
+>>
+>> -       if (aesgcm_expandkey(ctx, key, keylen, AUTHTAG_LEN)) {
+>> +       key = snp_get_vmpck(snp_dev);
+>> +       if (aesgcm_expandkey(ctx, key, VMPCK_KEY_LEN, AUTHTAG_LEN)) {
+>>                  pr_err("SNP: crypto init failed\n");
+>>                  kfree(ctx);
+>>                  return NULL;
+>> @@ -586,7 +604,7 @@ static long snp_guest_ioctl(struct file *file, unsigned int ioctl, unsigned long
+>>          mutex_lock(&snp_dev->cmd_mutex);
+>>
+>>          /* Check if the VMPCK is not empty */
+>> -       if (is_vmpck_empty(snp_dev)) {
+>> +       if (snp_is_vmpck_empty(snp_dev)) {
+>>                  dev_err_ratelimited(snp_dev->dev, "VMPCK is disabled\n");
+>>                  mutex_unlock(&snp_dev->cmd_mutex);
+>>                  return -ENOTTY;
+>> @@ -656,32 +674,14 @@ static const struct file_operations snp_guest_fops = {
+>>          .unlocked_ioctl = snp_guest_ioctl,
+>>   };
+>>
+>> -static u8 *get_vmpck(int id, struct snp_secrets_page_layout *layout, u32 **seqno)
+>> +bool snp_assign_vmpck(struct snp_guest_dev *dev, int vmpck_id)
+>>   {
+>> -       u8 *key = NULL;
+>> +       if (WARN_ON(vmpck_id > 3))
+>> +               return false;
+> 
+> The vmpck_id is an int for some reason, so < 0 is also a problem. Can
+> we not use unsigned int?
+> 
+>>
+>> -       switch (id) {
+>> -       case 0:
+>> -               *seqno = &layout->os_area.msg_seqno_0;
+>> -               key = layout->vmpck0;
+>> -               break;
+>> -       case 1:
+>> -               *seqno = &layout->os_area.msg_seqno_1;
+>> -               key = layout->vmpck1;
+>> -               break;
+>> -       case 2:
+>> -               *seqno = &layout->os_area.msg_seqno_2;
+>> -               key = layout->vmpck2;
+>> -               break;
+>> -       case 3:
+>> -               *seqno = &layout->os_area.msg_seqno_3;
+>> -               key = layout->vmpck3;
+>> -               break;
+>> -       default:
+>> -               break;
+>> -       }
+>> +       dev->vmpck_id = vmpck_id;
+>>
+>> -       return key;
+>> +       return true;
+>>   }
+>>
+>>   static int __init sev_guest_probe(struct platform_device *pdev)
+>> @@ -713,14 +713,14 @@ static int __init sev_guest_probe(struct platform_device *pdev)
+>>                  goto e_unmap;
+>>
+>>          ret = -EINVAL;
+>> -       snp_dev->vmpck = get_vmpck(vmpck_id, layout, &snp_dev->os_area_msg_seqno);
+>> -       if (!snp_dev->vmpck) {
+>> +       snp_dev->layout = layout;
+>> +       if (!snp_assign_vmpck(snp_dev, vmpck_id)) {
+>>                  dev_err(dev, "invalid vmpck id %d\n", vmpck_id);
+>>                  goto e_unmap;
+>>          }
+>>
+>>          /* Verify that VMPCK is not zero. */
+>> -       if (is_vmpck_empty(snp_dev)) {
+>> +       if (snp_is_vmpck_empty(snp_dev)) {
+>>                  dev_err(dev, "vmpck id %d is null\n", vmpck_id);
+>>                  goto e_unmap;
+>>          }
+>> @@ -728,7 +728,6 @@ static int __init sev_guest_probe(struct platform_device *pdev)
+>>          mutex_init(&snp_dev->cmd_mutex);
+>>          platform_set_drvdata(pdev, snp_dev);
+>>          snp_dev->dev = dev;
+>> -       snp_dev->layout = layout;
+>>
+>>          /* Allocate the shared page used for the request and response message. */
+>>          snp_dev->request = alloc_shared_pages(dev, sizeof(struct snp_guest_msg));
+>> @@ -744,7 +743,7 @@ static int __init sev_guest_probe(struct platform_device *pdev)
+>>                  goto e_free_response;
+>>
+>>          ret = -EIO;
+>> -       snp_dev->ctx = snp_init_crypto(snp_dev->vmpck, VMPCK_KEY_LEN);
+>> +       snp_dev->ctx = snp_init_crypto(snp_dev);
+>>          if (!snp_dev->ctx)
+>>                  goto e_free_cert_data;
+>>
+>> --
+>> 2.34.1
+>>
+> 
+> 
 
