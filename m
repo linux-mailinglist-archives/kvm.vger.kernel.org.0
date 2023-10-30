@@ -1,72 +1,71 @@
-Return-Path: <kvm+bounces-136-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-137-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04B457DC24D
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 23:07:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61EC27DC256
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 23:12:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65D04B20F80
-	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 22:07:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02523B20EBD
+	for <lists+kvm@lfdr.de>; Mon, 30 Oct 2023 22:12:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 729921D6BE;
-	Mon, 30 Oct 2023 22:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1718E1DA2D;
+	Mon, 30 Oct 2023 22:12:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kVEKXpML"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WmJRwsVA"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85991CFBB
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 22:07:33 +0000 (UTC)
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6A929E
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 15:07:32 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cc1ddb34ccso24871815ad.1
-        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 15:07:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B76C1D539
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 22:12:17 +0000 (UTC)
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B41DEFE
+	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 15:12:12 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-6be1065cc81so5043802b3a.3
+        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 15:12:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698703652; x=1699308452; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1698703932; x=1699308732; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EkAABuzKmGyzNibmrxwxoleV2c1qCswFjV4kStA9p5Y=;
-        b=kVEKXpML+Xnymqdjk1TIs+7FkXy/G1sadkB/VgrZzHoFMEIC5U9Cbi2svdIskMQlp2
-         JdcWE3bzzlvB4zldFNiaEwV5b9LGDRGUlatM/AUm9SLVFjS5tUKDbdziWIvm5rkE0KpF
-         jslcwgkRtvHIYTWNHlzL9sKt4LD133P8Jc3i6FwWqTlVmpz7CmYgk0ADh2y9mYSe5dFO
-         4Htk6JSLnncnyPq4aSokKHxDfdSEL7t7Csi/1NtgeY+cp0u5FajTnSSu23DrgTZ78XVp
-         0XaMgLVhEj/MPuYhiA7OzjVCPgs/RRBLh7/s/g74aT3sijqc6TDWioD/cmsPaRSw1ucn
-         nVhA==
+        bh=g8DEvtikhnQyn+T5K55cZjm1cs6/IKtx/WCyiBBil5U=;
+        b=WmJRwsVAjOdugnxCaIdp3UcES2KqSgFbohBM76jKC7YPTZJdwtQ2PJU+QhiSZRiH2N
+         5grrkTcJsGZVpzmuJiqBvCAH1jTwlEWNQ6KcmVPhvVQu+YoCWBCWzm6bIO9PqhzlbpZp
+         bS6cnQ2aFt/5tjb0yB7qKOY3M/1aFkZWpPMzd1YNkwGkI5BJrTgc2Xx9Eat3tgF88QvR
+         0KnkZG31xaUlQfT7A+8SN8KfNPxTV7vbtZmhGawVrF4NEf/86WzkrpHQrHqu808T/NsV
+         Hmzh/NgXh85ruWCCmnVbRbrEROpg/OPDFFG1M6s5VPyp+ehahaeFeXgpKRtJp/Y/So0q
+         db0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698703652; x=1699308452;
+        d=1e100.net; s=20230601; t=1698703932; x=1699308732;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EkAABuzKmGyzNibmrxwxoleV2c1qCswFjV4kStA9p5Y=;
-        b=S9UQVXRXgY0batjo6bljm1LA2tlqZgoTUWJgAAp+MfdJM7Yt2pDpEIQOKYhvVklmgb
-         Hbh9J15QEq6V7uBhT8CY2EeqpkqNnjF66/nuvjIvrCKSXQPi3bGpQwSIOzfawzhSK/MA
-         nlChBZEVP53R/eJlxg89OPgaFwswoE7m+DAL7h73WtrnlEr/VA5rRP6vmyayV8EorgX7
-         4bu8LdppMy9RaXTLQs9hKuEvXS+UQbG0psglB4GmpGNzdRjomTFaYjAqhVQAh3hY9STR
-         lAxm3PVr7MGGbjOBB13XUPZR4tLnNLuKasg/D5UZiyTiKryJnyo0H3gMGkLfnRGVCktt
-         4iMg==
-X-Gm-Message-State: AOJu0YwEttkhMu2vky75YJi4SWGJffOU6CdaLDbooO33vIEHElJd9xdD
-	XJv1Z2UZdSJtJXoEJ3iHaO/6ZkVBVIs=
-X-Google-Smtp-Source: AGHT+IHfmttfYISWufdVkZGI1GGv3oPE0CaVU/9uw2yWegmaBLqLOedbYI1/usu4SKmN8TEK3NCdArCTZyE=
+        bh=g8DEvtikhnQyn+T5K55cZjm1cs6/IKtx/WCyiBBil5U=;
+        b=FHFqvUAgJO1hxiQSE9wAOkWOnAZVwSiw7UX8QhBMH/rP7rslr3EPESlSMy8yQsVyWy
+         zDT7e7GSnuv+9I9QtAonEGwdbxb66WqDyLftDc5GofOq0pt9qsVv3ecmMb0k6SO/3QNv
+         LSRqZUfUUPhW0TQEG33M6XIgFKplVInjyNv5ymtX4TQk4o3RTb31oLm9GEJGO48LjS8i
+         vtLNI5f3a57LCLSskIaYCnHUFay5nTSX6HGIaFXWlXFiEcjXhs3umq+pQiFLwKz7pcYk
+         tjx6JkFu0K5oYK5tPbT6V2uN7ZNntQK3DVDWr8anTSIpMKJgs/PjghXqrXw4mwc6u3BR
+         eK3g==
+X-Gm-Message-State: AOJu0YwByTNntAfZhUt6eN0UE0UToK2pX6t1pKt8gg3FW/0yp2MH6zju
+	YE1TpuUKcJkpkPmLeCognopqYIGKYoQ=
+X-Google-Smtp-Source: AGHT+IGGcxVYGAYGv3uCrE8wHX1TR4p8IURd9gUNgfJNwa+fo9vdIR8HGGPD/6eLST5HVrX+Zf4WM1nECms=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:ed45:b0:1cc:533e:f52b with SMTP id
- y5-20020a170902ed4500b001cc533ef52bmr49726plb.4.1698703652255; Mon, 30 Oct
- 2023 15:07:32 -0700 (PDT)
-Date: Mon, 30 Oct 2023 15:07:30 -0700
-In-Reply-To: <077cec97-7920-4d20-8bd3-fe07ab8bcc29@redhat.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1755:b0:68e:24fe:d9a with SMTP id
+ j21-20020a056a00175500b0068e24fe0d9amr205380pfc.2.1698703932137; Mon, 30 Oct
+ 2023 15:12:12 -0700 (PDT)
+Date: Mon, 30 Oct 2023 15:12:10 -0700
+In-Reply-To: <ZUARTvhpChFSGF9s@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-13-seanjc@google.com>
- <077cec97-7920-4d20-8bd3-fe07ab8bcc29@redhat.com>
-Message-ID: <ZUApIvo_gIdsfEEV@google.com>
-Subject: Re: [PATCH v13 12/35] KVM: Prepare for handling only shared mappings
- in mmu_notifier events
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-9-seanjc@google.com>
+ <211d093f-4023-4a39-a23f-6d8543512675@redhat.com> <ZUARTvhpChFSGF9s@google.com>
+Message-ID: <ZUAqOn_zjvM4hukK@google.com>
+Subject: Re: [PATCH v13 08/35] KVM: Introduce KVM_SET_USER_MEMORY_REGION2
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -92,21 +91,35 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Oct 30, 2023, Paolo Bonzini wrote:
-> On 10/27/23 20:21, Sean Christopherson wrote:
-> > @@ -635,6 +635,13 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
-> >  			 * the second or later invocation of the handler).
-> >  			 */
-> >  			gfn_range.arg = range->arg;
-> > +
-> > +			/*
-> > +			 * HVA-based notifications aren't relevant to private
-> > +			 * mappings as they don't have a userspace mapping.
+On Mon, Oct 30, 2023, Sean Christopherson wrote:
+> On Mon, Oct 30, 2023, Paolo Bonzini wrote:
+> > On 10/27/23 20:21, Sean Christopherson wrote:
+> > > 
+> > > +		if (ioctl == KVM_SET_USER_MEMORY_REGION)
+> > > +			size = sizeof(struct kvm_userspace_memory_region);
+> > 
+> > This also needs a memset(&mem, 0, sizeof(mem)), otherwise the out-of-bounds
+> > access of the commit message becomes a kernel stack read.
 > 
-> It's confusing who "they" is.  Maybe
+> Ouch.  There's some irony.  Might be worth doing memset(&mem, -1, sizeof(mem))
+> though as '0' is a valid file descriptor and a valid file offset.
 > 
-> 	 * HVA-based notifications provide a userspace address,
-> 	 * and as such are only relevant for shared mappings.
+> > Probably worth adding a check on valid flags here.
+> 
+> Definitely needed.  There's a very real bug here.  But rather than duplicate flags
+> checking or plumb @ioctl all the way to __kvm_set_memory_region(), now that we
+> have the fancy guard(mutex) and there are no internal calls to kvm_set_memory_region(),
+> what if we:
+> 
+>   1. Acquire/release slots_lock in __kvm_set_memory_region()
 
-Works for me.
+Gah, this won't work with x86's usage, which acquire slots_lock quite far away
+from __kvm_set_memory_region() in several places.  The rest of the idea still
+works, kvm_vm_ioctl_set_memory_region() will just need to take slots_lock manually.
+
+>   2. Call kvm_set_memory_region() from x86 code for the internal memslots
+>   3. Disallow *any* flags for internal memslots
+>   4. Open code check_memory_region_flags in kvm_vm_ioctl_set_memory_region()
+>   5. Pass @ioctl to kvm_vm_ioctl_set_memory_region() and allow KVM_MEM_PRIVATE
+>      only for KVM_SET_USER_MEMORY_REGION2
 
