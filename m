@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-202-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-203-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE8167DCEEA
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 15:21:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 032117DCEEB
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 15:21:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DED1A1C20C6D
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 14:21:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3161C281187
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 14:21:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92E7613FE1;
-	Tue, 31 Oct 2023 14:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 060A61DFC2;
+	Tue, 31 Oct 2023 14:21:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BuEDuozH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S1mYexjh"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231FB1D532
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 14:20:58 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD92CC9
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:20:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780BC13FE1
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 14:21:29 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4506EED
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:21:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698762055;
+	s=mimecast20190719; t=1698762087;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QXthgqjY+SpDv3y6xxTLIrI9RIFKk1NjsAtr8h5OfqY=;
-	b=BuEDuozHbSZwNU+XkdMcIedVTB+Bn7iGagUqX8t8NJv7OgwRAs8ZdpTJDoAT7wJTpp1ufR
-	FCtgD30up9tTjcV+iCmzv8YIAieXQrvEdBx3XPH3wiVlV+H8Wfjj7SQdVxvAQ/oayJk5m5
-	1qpC4SGTnjDxhrXcPRHI2h1mRkv9VGA=
-Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
- [209.85.222.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=tEGwtLaTyDLUbYAbJd8Pcxwvb/gHACp97/7gVsbA1Xc=;
+	b=S1mYexjh7FAp25UHj7rKBwNOetcZfkzXyxJvtkMVH6I9t0k6/AxVLWLGaSCX3+C5L4olRZ
+	qTIK7Q0Ii07CTKtk5lPMC/i8yakp0P+Xl3y+IlVGR+THUrZYp39mfGdmhbvoE1C8oQDOZE
+	v2Kv/t7R4fB7QbXJTixqmwmyXlIzlKQ=
+Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
+ [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-226-tA7pqKMoPjyvFe-FiRP9tQ-1; Tue, 31 Oct 2023 10:20:54 -0400
-X-MC-Unique: tA7pqKMoPjyvFe-FiRP9tQ-1
-Received: by mail-ua1-f72.google.com with SMTP id a1e0cc1a2514c-7b9b269f05cso2065529241.3
-        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:20:54 -0700 (PDT)
+ us-mta-43-VXX6irVQPueChhptrVkwcw-1; Tue, 31 Oct 2023 10:21:25 -0400
+X-MC-Unique: VXX6irVQPueChhptrVkwcw-1
+Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-457bc85ac53so1847899137.3
+        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:21:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698762053; x=1699366853;
+        d=1e100.net; s=20230601; t=1698762085; x=1699366885;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QXthgqjY+SpDv3y6xxTLIrI9RIFKk1NjsAtr8h5OfqY=;
-        b=QSCs0QV508iTPHoBAh1Bj6Npd3cMH5GqIK15ifNX7u8HvhKHI+QEijVfxMjuJ9HsNc
-         Qm6BUOW4KehMxbzam8xUNcw/Bgr7CkfruQApERsbWD8tkwA7nOhlitg80D+iXZ4OnlfZ
-         7FKzNJ8cEEpveR0y89/ESsasxIZTkANM09LCPIaxdi424qD6hK4ARKomq4eFgVZU8sqK
-         FnMhVGI2EIfKj0l5iBSDs4+xqq2AhBwiI0nAPYdVKcH1JgFqgFvnhoBsYVGpCQHaCWXX
-         XQZM+Jhd8dbLF6tMIuThplwA1lbZzolO+Nhta4XcuDXVfb+BeH5HPKn+XS5tf0JuE1ja
-         xHtQ==
-X-Gm-Message-State: AOJu0YxpEqqAykGXncKP5Z6fEckoWGJE1wtiRn/UDEsdZ+Us5UoK2dK7
-	zFx3U5nTZGnTW4234p+ErosnVw7vcWNTtxbhn9p3fWWZBwR0AjvEXUGcNZtbGCuDybpwd0S9H10
-	K07UB0ADPA4DJEoRadOJBEt1zAGenGns9pWQy
-X-Received: by 2002:a67:c89d:0:b0:457:bc5f:b497 with SMTP id v29-20020a67c89d000000b00457bc5fb497mr11554246vsk.27.1698762053570;
-        Tue, 31 Oct 2023 07:20:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGZTNWIrtxgjAmfW2uP5CgYHQb74iSe9pyTPKxSUoeAiL/+ELfGW3MKgEGC5lWgJVeaIXdJwYHIgvWDZhYMIJs=
-X-Received: by 2002:a67:c89d:0:b0:457:bc5f:b497 with SMTP id
- v29-20020a67c89d000000b00457bc5fb497mr11554223vsk.27.1698762053277; Tue, 31
- Oct 2023 07:20:53 -0700 (PDT)
+        bh=tEGwtLaTyDLUbYAbJd8Pcxwvb/gHACp97/7gVsbA1Xc=;
+        b=aDYS/pfbYIqRY7wo1Z+1olavJo09g88EKuy8TmoqKOT6J+VzJrHlZKBxdk6jEvxhzb
+         zj4TcjTEJrOp7WGa22xnWiNyU0KZtqVzEe83B0TinTUUC2gMw2MrCi8RutYoje+UTJ02
+         x5Nrsz/umdx4Oj0cjB8B3sJNIXmESdmp20zfxDqrKRGHmu3s/Zo6BzsZ7Xq6F3wlw2Yh
+         NcLLbgjZx4GwtSJ0oKrbG+6anWhuM7s2PdL8vyRFkjqK3lYoKtHTAjlshon5wipKu46e
+         3/GrppxI5mO3GEPSUEcEJBa762KHpSy/L0ePz8ZVxnWZ6SoM1UyZfrfQ+vci9U5BkaC0
+         NJYw==
+X-Gm-Message-State: AOJu0YwdjymavpxOMRfQcOcGoTAG8JOEPcwK2OV4UC3zScrOzIpNK0OM
+	83258x/yOZXt+GE8qtjsg6/ipT1+8AONEetcs6OmABdmnmVYDJraEVuwuSlJbsRylLTbU5N1cdA
+	k9I3O7+nJT74ndDoc7vmi7XCUEWss
+X-Received: by 2002:a67:b044:0:b0:45a:98d9:38ea with SMTP id q4-20020a67b044000000b0045a98d938eamr7690802vsh.16.1698762085036;
+        Tue, 31 Oct 2023 07:21:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG2V2HRRlSao5fkLO60dc1man5T8XhRoSC+35EbDqRfws4Hgm+ZERXgteR1s842YAalJM05R9C6Jle+6nalghs=
+X-Received: by 2002:a67:b044:0:b0:45a:98d9:38ea with SMTP id
+ q4-20020a67b044000000b0045a98d938eamr7690782vsh.16.1698762084734; Tue, 31 Oct
+ 2023 07:21:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231027204933.3651381-1-seanjc@google.com> <20231027204933.3651381-5-seanjc@google.com>
-In-Reply-To: <20231027204933.3651381-5-seanjc@google.com>
+References: <20231027204933.3651381-1-seanjc@google.com> <20231027204933.3651381-4-seanjc@google.com>
+In-Reply-To: <20231027204933.3651381-4-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 31 Oct 2023 15:20:41 +0100
-Message-ID: <CABgObfb55_B0SC41j9iiqBuccoSiZK+x488Pqpyq=R32eObtwQ@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM: x86: MMU changes for 6.7
+Date: Tue, 31 Oct 2023 15:21:12 +0100
+Message-ID: <CABgObfaimAUNCaTqM85=qq0Re1ZwQyJO9vNQFZRJHs_D+Y9uKQ@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM: x86: Misc changes for 6.7
 To: Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -81,77 +81,136 @@ Content-Transfer-Encoding: quoted-printable
 On Fri, Oct 27, 2023 at 10:49=E2=80=AFPM Sean Christopherson <seanjc@google=
 .com> wrote:
 >
-> This is mostly the first half of a series by Yan to optimize KVM's handli=
-ng of
-> guest MTRR changes for VMs with non-coherent DMA.  Yan had to put more co=
-mplex
-> changes that actually realize the optimizations on hold, but the patches =
-here
-> are all nice cleanups on their own.
+> A truly miscellaneous collection of patches this time around.  David M's =
+PML
+> fix obviously belongs in the MMU pull request, but I applied it to the wr=
+ong
+> branch and didn't want to rebase for such a silly thing.
 >
 > The following changes since commit 5804c19b80bf625c6a9925317f845e497434d6=
 d3:
 >
 >   Merge tag 'kvm-riscv-fixes-6.6-1' of https://github.com/kvm-riscv/linux=
  into HEAD (2023-09-23 05:35:55 -0400)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/kvm-x86/linux.git tags/kvm-x86-misc-6.7
+>
+> for you to fetch changes up to 2770d4722036d6bd24bcb78e9cd7f6e572077d03:
+>
+>   KVM: x86: Ignore MSR_AMD64_TW_CFG access (2023-10-19 10:55:14 -0700)
 
 Pulled, thanks.
 
 Paolo
 
-
-> are available in the Git repository at:
->
->   https://github.com/kvm-x86/linux.git tags/kvm-x86-mmu-6.7
->
-> for you to fetch changes up to 1de9992f9de0a92b6e11133aba0e2be833c11084:
->
->   KVM: x86/mmu: Remove unnecessary =E2=80=98NULL=E2=80=99 values from spt=
-ep (2023-10-18 14:34:28 -0700)
 >
 > ----------------------------------------------------------------
-> KVM x86 MMU changes for 6.7:
+> KVM x86 misc changes for 6.7:
 >
->  - Clean up code that deals with honoring guest MTRRs when the VM has
->    non-coherent DMA and host MTRRs are ignored, i.e. EPT is enabled.
+>  - Add CONFIG_KVM_MAX_NR_VCPUS to allow supporting up to 4096 vCPUs witho=
+ut
+>    forcing more common use cases to eat the extra memory overhead.
 >
->  - Zap EPT entries when non-coherent DMA assignment stops/start to preven=
-t
->    using stale entries with the wrong memtype.
+>  - Add IBPB and SBPB virtualization support.
 >
->  - Don't ignore guest PAT for CR0.CD=3D1 && KVM_X86_QUIRK_CD_NW_CLEARED=
-=3Dy, as
->    there's zero reason to ignore guest PAT if the effective MTRR memtype =
-is WB.
->    This will also allow for future optimizations of handling guest MTRR u=
-pdates
->    for VMs with non-coherent DMA and the quirk enabled.
+>  - Fix a bug where restoring a vCPU snapshot that was taken within 1 seco=
+nd of
+>    creating the original vCPU would cause KVM to try to synchronize the v=
+CPU's
+>    TSC and thus clobber the correct TSC being set by userspace.
 >
->  - Harden the fast page fault path to guard against encountering an inval=
-id
->    root when walking SPTEs.
+>  - Compute guest wall clock using a single TSC read to avoid generating a=
+n
+>    inaccurate time, e.g. if the vCPU is preempted between multiple TSC re=
+ads.
+>
+>  - "Virtualize" HWCR.TscFreqSel to make Linux guests happy, which complai=
+n
+>     about a "Firmware Bug" if the bit isn't set for select F/M/S combos.
+>
+>  - Don't apply side effects to Hyper-V's synthetic timer on writes from
+>    userspace to fix an issue where the auto-enable behavior can trigger
+>    spurious interrupts, i.e. do auto-enabling only for guest writes.
+>
+>  - Remove an unnecessary kick of all vCPUs when synchronizing the dirty l=
+og
+>    without PML enabled.
+>
+>  - Advertise "support" for non-serializing FS/GS base MSR writes as appro=
+priate.
+>
+>  - Use octal notation for file permissions through KVM x86.
+>
+>  - Fix a handful of typo fixes and warts.
 >
 > ----------------------------------------------------------------
-> Li zeming (1):
->       KVM: x86/mmu: Remove unnecessary =E2=80=98NULL=E2=80=99 values from=
- sptep
+> David Matlack (1):
+>       KVM: x86/mmu: Stop kicking vCPUs to sync the dirty log when PML is =
+disabled
 >
-> Yan Zhao (5):
->       KVM: x86/mmu: Add helpers to return if KVM honors guest MTRRs
->       KVM: x86/mmu: Zap SPTEs when CR0.CD is toggled iff guest MTRRs are =
-honored
->       KVM: x86/mmu: Zap SPTEs on MTRR update iff guest MTRRs are honored
->       KVM: x86/mmu: Zap KVM TDP when noncoherent DMA assignment starts/st=
-ops
->       KVM: VMX: drop IPAT in memtype when CD=3D1 for KVM_X86_QUIRK_CD_NW_=
-CLEARED
+> David Woodhouse (1):
+>       KVM: x86: Refine calculation of guest wall clock to use a single TS=
+C read
 >
->  arch/x86/kvm/mmu.h     |  7 +++++++
->  arch/x86/kvm/mmu/mmu.c | 37 ++++++++++++++++++++++++++-----------
->  arch/x86/kvm/mtrr.c    |  2 +-
->  arch/x86/kvm/vmx/vmx.c |  9 +++------
->  arch/x86/kvm/x86.c     | 21 ++++++++++++++++++---
->  5 files changed, 55 insertions(+), 21 deletions(-)
+> Dongli Zhang (1):
+>       KVM: x86: remove always-false condition in kvmclock_sync_fn
+>
+> Jim Mattson (4):
+>       KVM: x86: Allow HWCR.McStatusWrEn to be cleared once set
+>       KVM: x86: Virtualize HWCR.TscFreqSel[bit 24]
+>       KVM: selftests: Test behavior of HWCR, a.k.a. MSR_K7_HWCR
+>       x86: KVM: Add feature flag for CPUID.80000021H:EAX[bit 1]
+>
+> Josh Poimboeuf (2):
+>       KVM: x86: Add IBPB_BRTYPE support
+>       KVM: x86: Add SBPB support
+>
+> Kyle Meyer (1):
+>       KVM: x86: Add CONFIG_KVM_MAX_NR_VCPUS to allow up to 4096 vCPUs
+>
+> Liang Chen (1):
+>       KVM: x86: remove the unused assigned_dev_head from kvm_arch
+>
+> Like Xu (1):
+>       KVM: x86: Don't sync user-written TSC against startup values
+>
+> Maciej S. Szmigiero (1):
+>       KVM: x86: Ignore MSR_AMD64_TW_CFG access
+>
+> Michal Luczaj (2):
+>       KVM: x86: Remove redundant vcpu->arch.cr0 assignments
+>       KVM: x86: Force TLB flush on userspace changes to special registers
+>
+> Mingwei Zhang (1):
+>       KVM: x86: Update the variable naming in kvm_x86_ops.sched_in()
+>
+> Nicolas Saenz Julienne (1):
+>       KVM: x86: hyper-v: Don't auto-enable stimer on write from user-spac=
+e
+>
+> Peng Hao (1):
+>       KVM: x86: Use octal for file permission
+>
+>  arch/x86/include/asm/cpufeatures.h                 |   1 +
+>  arch/x86/include/asm/kvm_host.h                    |  12 +-
+>  arch/x86/include/asm/msr-index.h                   |   1 +
+>  arch/x86/kvm/Kconfig                               |  11 ++
+>  arch/x86/kvm/cpuid.c                               |   8 +-
+>  arch/x86/kvm/cpuid.h                               |   3 +-
+>  arch/x86/kvm/hyperv.c                              |  10 +-
+>  arch/x86/kvm/smm.c                                 |   1 -
+>  arch/x86/kvm/svm/svm.c                             |   2 +-
+>  arch/x86/kvm/vmx/vmx.c                             |  20 +--
+>  arch/x86/kvm/x86.c                                 | 195 +++++++++++++++=
++-----
+>  arch/x86/kvm/x86.h                                 |   1 +
+>  arch/x86/kvm/xen.c                                 |   4 +-
+>  tools/testing/selftests/kvm/Makefile               |   1 +
+>  tools/testing/selftests/kvm/x86_64/hwcr_msr_test.c |  47 +++++
+>  15 files changed, 251 insertions(+), 66 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/hwcr_msr_test.c
 >
 
 
