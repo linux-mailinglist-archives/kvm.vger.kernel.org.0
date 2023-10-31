@@ -1,135 +1,127 @@
-Return-Path: <kvm+bounces-200-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-201-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E96E17DCEDA
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 15:15:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31AB97DCEDF
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 15:16:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CF102818CA
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 14:15:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE3A6B21104
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 14:16:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 756001DFC0;
-	Tue, 31 Oct 2023 14:15:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662C61DFD4;
+	Tue, 31 Oct 2023 14:16:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UYuvTV2p"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3LTiG76G"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92201DDF5
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 14:15:20 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CE64107
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:15:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698761714;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zUGnQiCF/6Ik0AtOZ0SWI2X75euizpW/yno5GZDuOec=;
-	b=UYuvTV2piSdrDWMuyo79TpmnGB0fc3cVoE6yP+sx5e6Xcz5xPT6vMuOf5q5/ggILV3mmNQ
-	PRVVg088zJBF6kDovAruTHxMb3V/akES1DUEjQ34Lq57AqoSjBh/QVVSQFREQF89koX1ia
-	cHsXiuZziWCr78T3XkBpSi2xcsBweUQ=
-Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
- [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-96-emB6R0dPNbC-ydQb6Ld8Vg-1; Tue, 31 Oct 2023 10:15:12 -0400
-X-MC-Unique: emB6R0dPNbC-ydQb6Ld8Vg-1
-Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-457bdbb84dbso2343285137.0
-        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:15:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 076F31DFC6
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 14:16:18 +0000 (UTC)
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD884F5
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:16:17 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cc591d8177so15197475ad.3
+        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:16:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698761777; x=1699366577; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+SCWDVcx1K76tZHWI6JguONJ6NnGeKLP7+QbYfrb3Rs=;
+        b=3LTiG76GVOEc8lRq/TWhVMCBV8LuspBYlB/0ZIqRRak+sx2n46riS4bQtfSIk4aJnK
+         ntUUHuodNmr6cOqafV7BjMw8U5tKd+L0HzhZeZsO1dOTZIcaN83bqsc5u0PJrHIXnUdH
+         APf4M1tVvArfQk9bmox4Dgl8MvFDpXVQpuSqG1VX6yeO5/kYbwCjbCcT78UghJs4YwnI
+         GPr3vgcKx3TG8dDPsz4v7hYyYBhF9AX1XGKsRyoQ1D8y2xbDFp/W/DVu5jXfFLA15Joz
+         bGeQrIXuFRBDriN1OItvIqOh0QyQ3CMm62EVBPD98LhSaU/AWmprxKRG1r3hTvx/H04n
+         o+Zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698761712; x=1699366512;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zUGnQiCF/6Ik0AtOZ0SWI2X75euizpW/yno5GZDuOec=;
-        b=vinOqd5IjGpwrzPtxC9GrB6fTYJpRqTH/DdKyDjb7KYJb+AjEsUDBII+OsHkxivhgl
-         24zmlxijQgCfZ2uU62DNVmVNwidbgEcsSCTffjNHbIEHTcH/kmqbSZIlD8NB4gVM3O3J
-         gKQIb3hIs+loCPKQg5cjjjTZ3SpIzD0DUUk5yeclMhz9GPU3q/itLLTWibs03C4Og9U3
-         X2/rqygt8GX5JnVg8lhRmP9lBnt1Q9HlfO2nglEgPVwndG6ESTMzs8knHwIBOUy23Mtm
-         L3Ov8rDCg3UOYYBXAcbVtU9F8ihUM313jv51ZCqJJ4xhsoOwqtU4urkl4GrTSzm+yPIf
-         Nt+Q==
-X-Gm-Message-State: AOJu0Yy/Klr3OtMwlmoxQNAMU5IO50yG7uOaAnbUcVRLqidG6B7iv1Px
-	4Q5tHiXV7d62bviIyRyuxotl8br0C82f3sraXHhiTQvo5tkCmHTlJfajRX+3HqFUsSJT22hNPcU
-	dhaLbk7tcU2wAjpa58lAitQy3/m09W4Lwnkht
-X-Received: by 2002:a67:c89e:0:b0:458:19fc:e1e5 with SMTP id v30-20020a67c89e000000b0045819fce1e5mr12735502vsk.6.1698761711826;
-        Tue, 31 Oct 2023 07:15:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEzfspbtQPT/PwHpMJ6AmRbIK+Xv0rm0SMcOh4AZ98GXC/seDM6hbA1/X8AnPzKjQfoUtt/DHdK26LXWPMwctU=
-X-Received: by 2002:a67:c89e:0:b0:458:19fc:e1e5 with SMTP id
- v30-20020a67c89e000000b0045819fce1e5mr12735480vsk.6.1698761711580; Tue, 31
- Oct 2023 07:15:11 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698761777; x=1699366577;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+SCWDVcx1K76tZHWI6JguONJ6NnGeKLP7+QbYfrb3Rs=;
+        b=lgAdvuRFbCUjuZEX9Ub7Eve+fSHzkbEWgXcvLxDXcApgsdoPEjIfkfwoHGtLq3d7kS
+         9eWOjWwxjMs8n2/ES2qE17nJ1qfFvnbKFC64KBGbZypfB2nfmpQwTrJuLwWwcla/4tQB
+         ONxjE+wwGbdmMRFVCtnGHeWyO5z1u5hwQoYCJDHsNylD4NxDjMRomh8J9fptkrC/TouU
+         rw0zhQI+isTS1D3DthcErk0LntxRX/StqdNqdXpqhmdLdYbxlCgd9oq2Ah2H5/QDobCN
+         4lzeBU2zAWk6ZPczens4zry94uFdoY8hPL90verFkFuKW6bwik1VKp9Xz9Vfp+Elu3e3
+         7T3Q==
+X-Gm-Message-State: AOJu0YzihbhLDN5IPeVk2meLMmgBWgmhUSHK56XT6/PvTP00AkydDsU7
+	92SdRGB7urwxBuNBFNVMbUSY9feX+5M=
+X-Google-Smtp-Source: AGHT+IG8tFKfIuO6cbI6ukftnUzYB8muWE8fOHZgWpajrHJaT+RkL+zDaTOo8ZNIlEatfvapWXD9jFRr58g=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:2616:b0:1cc:2549:c281 with SMTP id
+ jd22-20020a170903261600b001cc2549c281mr206233plb.13.1698761777291; Tue, 31
+ Oct 2023 07:16:17 -0700 (PDT)
+Date: Tue, 31 Oct 2023 07:16:15 -0700
+In-Reply-To: <7c0844d8-6f97-4904-a140-abeabeb552c1@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231027204933.3651381-1-seanjc@google.com> <20231027204933.3651381-2-seanjc@google.com>
-In-Reply-To: <20231027204933.3651381-2-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 31 Oct 2023 15:15:00 +0100
-Message-ID: <CABgObfZEXKOnLaU9pcH8n3VSGgFRYWy00VP4n5szjdK-pBMhqw@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM: x86: APIC changes for 6.7
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-18-seanjc@google.com>
+ <7c0844d8-6f97-4904-a140-abeabeb552c1@intel.com>
+Message-ID: <ZUEML6oJXDCFJ9fg@google.com>
+Subject: Re: [PATCH v13 17/35] KVM: Add transparent hugepage support for
+ dedicated guest memory
+From: Sean Christopherson <seanjc@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xu Yilun <yilun.xu@intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
+	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Oct 27, 2023 at 10:49=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> Two small APIC changes for 6.7, both specific to Intel's APICv.
->
-> The following changes since commit 5804c19b80bf625c6a9925317f845e497434d6=
-d3:
->
->   Merge tag 'kvm-riscv-fixes-6.6-1' of https://github.com/kvm-riscv/linux=
- into HEAD (2023-09-23 05:35:55 -0400)
->
-> are available in the Git repository at:
->
->   https://github.com/kvm-x86/linux.git tags/kvm-x86-apic-6.7
->
-> for you to fetch changes up to 629d3698f6958ee6f8131ea324af794f973b12ac:
->
->   KVM: x86: Clear bit12 of ICR after APIC-write VM-exit (2023-09-28 10:42=
-:16 -0700)
+On Tue, Oct 31, 2023, Xiaoyao Li wrote:
+> On 10/28/2023 2:21 AM, Sean Christopherson wrote:
+> > Extended guest_memfd to allow backing guest memory with transparent
+> > hugepages. Require userspace to opt-in via a flag even though there's no
+> > known/anticipated use case for forcing small pages as THP is optional,
+> > i.e. to avoid ending up in a situation where userspace is unaware that
+> > KVM can't provide hugepages.
+> 
+> Personally, it seems not so "transparent" if requiring userspace to opt-in.
+> 
+> People need to 1) check if the kernel built with TRANSPARENT_HUGEPAGE
+> support, or check is the sysfs of transparent hugepage exists; 2)get the
+> maximum support hugepage size 3) ensure the size satisfies the alignment;
+> before opt-in it.
+> 
+> Even simpler, userspace can blindly try to create guest memfd with
+> transparent hugapage flag. If getting error, fallback to create without the
+> transparent hugepage flag.
+> 
+> However, it doesn't look transparent to me.
 
-Pulled, thanks.
+The "transparent" part is referring to the underlying kernel mechanism, it's not
+saying anything about the API.  The "transparent" part of THP is that the kernel
+doesn't guarantee hugepages, i.e. whether or not hugepages are actually used is
+(mostly) transparent to userspace.
 
-Paolo
+Paolo also isn't the biggest fan[*], but there are also downsides to always
+allowing hugepages, e.g. silent failure due to lack of THP or unaligned size,
+and there's precedent in the form of MADV_HUGEPAGE.
 
-> ----------------------------------------------------------------
-> KVM x86 APIC changes for 6.7:
->
->  - Purge VMX's posted interrupt descriptor *before* loading APIC state wh=
-en
->    handling KVM_SET_LAPIC.  Purging the PID after loading APIC state resu=
-lts in
->    lost APIC timer IRQs as the APIC timer can be armed as part of loading=
- APIC
->    state, i.e. can immediately pend an IRQ if the expiry is in the past.
->
->  - Clear the ICR.BUSY bit when handling trap-like x2APIC writes to suppre=
-ss a
->    WARN due to KVM expecting the BUSY bit to be cleared when sending IPIs=
-.
->
-> ----------------------------------------------------------------
-> Haitao Shan (1):
->       KVM: x86: Fix lapic timer interrupt lost after loading a snapshot.
->
-> Tao Su (1):
->       KVM: x86: Clear bit12 of ICR after APIC-write VM-exit
->
->  arch/x86/include/asm/kvm-x86-ops.h |  1 +
->  arch/x86/include/asm/kvm_host.h    |  1 +
->  arch/x86/kvm/lapic.c               | 30 +++++++++++++++++-------------
->  arch/x86/kvm/vmx/vmx.c             |  4 ++--
->  4 files changed, 21 insertions(+), 15 deletions(-)
->
-
+[*] https://lore.kernel.org/all/84a908ae-04c7-51c7-c9a8-119e1933a189@redhat.com
 
