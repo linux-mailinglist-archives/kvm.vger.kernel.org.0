@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-172-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-173-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5D287DC956
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 10:22:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE02F7DC957
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 10:22:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E66471C20C28
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 09:22:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A60422817A2
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 09:22:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3341218AEA;
-	Tue, 31 Oct 2023 09:22:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 995DE1944C;
+	Tue, 31 Oct 2023 09:22:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iWx4M9u/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ng6mG7EJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8813D182A4
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 09:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00BAB18C29
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 09:22:00 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA494F5;
-	Tue, 31 Oct 2023 02:21:55 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D77E110;
+	Tue, 31 Oct 2023 02:21:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698744115; x=1730280115;
+  t=1698744119; x=1730280119;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=UFdm8PB2RMdMC4FZjkejhXgoSvo9XB2tTzL2mbbsxug=;
-  b=iWx4M9u/9A9OWr3wBgyb7kE2Du0NZCDOL0eH9IQaQpiwvTtQuXt6m36Q
-   CSWkZWhJtmKfyZBybPIV/3riyz0IXZQqxL7fE1VnAgjX9lNEjpsra0w7u
-   pKzGtHjCTjfKySWSs6wimh5WkeJ61bydumltAL4YKhs91cUwlpLrvVsBI
-   05APr/LxjkdaJ5DexTyrCFVKkbiZNDLHCWW9QhuhfsDxD3QQVOy9ko8N8
-   AJGlKmPFWxAHCu3fIMsKHBTvtFiG89ygXTZXDanuycdJo+VIhXrQOgjju
-   7N58szOrVQf+rz3GRBj7VV+CgbRCDFvtRUSE7yXvfjAp68WZOelLyj9u1
+  bh=hGJvfX2hIKMvWkOHT5amNhhbAWNGgZop9FcOLKuXuaA=;
+  b=Ng6mG7EJ4znXJ+IDS1nfquItUA+grbWRFMielJRLsPj/K6+x8rm9Ztw2
+   rVvi50cEyUfdVcEtkLmuBBfzg/eoXZvZl+9DZlrKKU/JpwPar892mWq3U
+   B4Rmh4AN2B1FA1xhSAqqqM3kmcacUmNCSymaIDoFx7ZG28S9gV/csx60d
+   4sx9Ro62HOJY7kRXBGLtrMg4uI2hO9cFMmGTC51DXf7CqIl9qPDyo9/po
+   I1EXWRMCoK/huf1HnABjbvw+Ke7kakRBqee9IKth9vaBjXYp5UIJTWgo3
+   ZOsVdRl4V5ZE042yd67F5C3FW1BE9FuzKb1NhBB1wgG7pvgRyO+BleGF8
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10879"; a="385435973"
+X-IronPort-AV: E=McAfee;i="6600,9927,10879"; a="385435983"
 X-IronPort-AV: E=Sophos;i="6.03,265,1694761200"; 
-   d="scan'208";a="385435973"
+   d="scan'208";a="385435983"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2023 02:21:55 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2023 02:21:58 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10879"; a="877445527"
+X-IronPort-AV: E=McAfee;i="6600,9927,10879"; a="877445531"
 X-IronPort-AV: E=Sophos;i="6.03,265,1694761200"; 
-   d="scan'208";a="877445527"
+   d="scan'208";a="877445531"
 Received: from dmi-pnp-i7.sh.intel.com ([10.239.159.155])
-  by fmsmga002.fm.intel.com with ESMTP; 31 Oct 2023 02:21:53 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 31 Oct 2023 02:21:55 -0700
 From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 To: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>
@@ -59,9 +59,9 @@ Cc: kvm@vger.kernel.org,
 	Like Xu <like.xu.linux@gmail.com>,
 	Dapeng Mi <dapeng1.mi@intel.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [kvm-unit-tests Patch v2 3/5] x86: pmu: Enlarge cnt array length to 64 in check_counters_many()
-Date: Tue, 31 Oct 2023 17:29:19 +0800
-Message-Id: <20231031092921.2885109-4-dapeng1.mi@linux.intel.com>
+Subject: [kvm-unit-tests Patch v2 4/5] x86: pmu: Support validation for Intel PMU fixed counter 3
+Date: Tue, 31 Oct 2023 17:29:20 +0800
+Message-Id: <20231031092921.2885109-5-dapeng1.mi@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231031092921.2885109-1-dapeng1.mi@linux.intel.com>
 References: <20231031092921.2885109-1-dapeng1.mi@linux.intel.com>
@@ -73,32 +73,30 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Considering there are already 8 GP counters and 4 fixed counters on
-latest Intel CPUs, like Sapphire Rapids. The original cnt array length
-10 is definitely not enough to cover all supported PMU counters on these
-new CPUs and it would cause PMU counter validation failures.
+Intel CPUs, like Sapphire Rapids, introduces a new fixed counter
+(fixed counter 3) to counter/sample topdown.slots event, but current
+code still doesn't cover this new fixed counter.
 
-It's probably more and more GP and fixed counters are introduced in the
-future and then directly extends the cnt array length to 64.
+So this patch adds code to validate this new fixed counter can count
+slots event correctly.
 
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 ---
- x86/pmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ x86/pmu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/x86/pmu.c b/x86/pmu.c
-index 1df5794b7ef8..6bd8f6d53f55 100644
+index 6bd8f6d53f55..404dc7b62ac2 100644
 --- a/x86/pmu.c
 +++ b/x86/pmu.c
-@@ -259,7 +259,7 @@ static void check_fixed_counters(void)
+@@ -47,6 +47,7 @@ struct pmu_event {
+ 	{"fixed 1", MSR_CORE_PERF_FIXED_CTR0, 10*N, 10.2*N},
+ 	{"fixed 2", MSR_CORE_PERF_FIXED_CTR0 + 1, 1*N, 500*N},
+ 	{"fixed 3", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 300*N},
++	{"fixed 4", MSR_CORE_PERF_FIXED_CTR0 + 3, 1*N, 5000*N},
+ };
  
- static void check_counters_many(void)
- {
--	pmu_counter_t cnt[10];
-+	pmu_counter_t cnt[64];
- 	int i, n;
- 
- 	for (i = 0, n = 0; n < pmu.nr_gp_counters; i++) {
+ char *buf;
 -- 
 2.34.1
 
