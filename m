@@ -1,359 +1,201 @@
-Return-Path: <kvm+bounces-207-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-208-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA9217DCFE3
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 16:06:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A41F7DD037
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 16:15:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65C40281340
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 15:06:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82935B20BDA
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 15:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 572FF1DFF1;
-	Tue, 31 Oct 2023 15:06:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8BD81E506;
+	Tue, 31 Oct 2023 15:15:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j8vckZMq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M9BWjWpx"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9226F1DFDA
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 15:06:26 +0000 (UTC)
-Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE595FC
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 08:06:23 -0700 (PDT)
-Received: by mail-qv1-xf33.google.com with SMTP id 6a1803df08f44-66d134a019cso39563326d6.3
-        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 08:06:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D65DA1DDF6
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 15:15:08 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6A8E133
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 08:14:44 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7b9e83b70so46536217b3.0
+        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 08:14:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698764783; x=1699369583; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XFiJeiYR5SSNo2dE3+Iew6FPjauUb0S9LLfJ6JqjMGA=;
-        b=j8vckZMqbY9KcvIxQrSo/HJlbqDw7k6UvP2Kd2EAGuwecFKnb0LZ24iXjhl9/9MH1Y
-         /oD8lDN4AWShZT8fRTurC3X8jdX/+un17y/PzuOCyR8ctgnEOk0TaWtIwB80449HGsl6
-         O9VJp9jCm0Yv8uOSUzbKsEnSDcRzCueJYfkiwBUVPEsK8X7D++xSacNzmIppWZRaOe53
-         CvXlKF4DA4MqOrgM8j0vapBcMAzwkZjE5RJmMBoOA8bMU+uDVmuIR5uJYy11RV0GW2vF
-         IefiSWIgC+R3u10Gemm5sChFQBiIgCJ/pOqHuHOXY49BmVH77uKH8Od8H58JRTXtIggx
-         qR5w==
+        d=google.com; s=20230601; t=1698765282; x=1699370082; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vr1AErEXYYfmkBWS1LpTvT+F3LQxWwS/eQ/Zsz08Hd4=;
+        b=M9BWjWpxClyc/8GzdXwMHPm2trrMVt/mDn03SACAKl3QuBZ/JJh0v3AQEQIsQ0bVMf
+         1PcMeN59OWwHXFAIO+SQJuSEARd+M+ETklHntkgmIvjtvXBy/z3Wa5/nbbvH0VY5Z2+Y
+         rugTX5x5wAz49K81wSU7bOQibbyZGaSiHl5d5KsUeoqMVrVuJ3p6fwdqywsoucrtsOph
+         FsDujNX6Inguxiw5Uu1Ze9/TDHCW1eCSTXv8fvp13eDyMUgKIUrklc4ipYDBvY3ZMKO7
+         0FuxBNCHHI4OaJ6Ew3FchSd1FkGxwpd4DouViz7Tp9s3QMaZ7Gpol76Qmh+7EJT1hJBP
+         q+sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698764783; x=1699369583;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XFiJeiYR5SSNo2dE3+Iew6FPjauUb0S9LLfJ6JqjMGA=;
-        b=t3B+/45E7mhqGQ47gwkvKDmbw3292dk7zuXj9i2SYvzAE8gSmThBHkkEANNchFo1Ci
-         Fas3u3Qdi6aT8lgU+GEkFBQhLpsXceYBGmW0C84BJ9lXzallj9WcUSBXHf3Xf4pQYW1M
-         HwfvJugg+4jZ2pHDapxA3hl5H5M/7ZBdLlF+aqF9KuHGTx0KP05iQaEpo6BukHIy9HCN
-         T2MvGvrrnAPEJQArd0p6hLeay+UB+Mtzu1ABHl3F5xKoK25oY7CrjL6dgyV+2eXcLwBG
-         gCkaRWxrCt2IJH6lQ2zHVBBL445cFqsMl936Z+4WeysJJAi6PjZvKjpXWSiTb3iuG3zk
-         49CA==
-X-Gm-Message-State: AOJu0YyNGAINxXXQ4jT5PO/u6GgjCgJmBq0RBJgVcVJzmTdhU2EY+UvV
-	EQf/wk+B5YgSmtMJM9WORyKHSq5C9ti4H4zHxKYPWjyXzQOMBDra2P+r3A==
-X-Google-Smtp-Source: AGHT+IE151kEFir7qf7e2DG0sarSRU7TzUC/5hmwAex0rxC4ctantPqpX1svsxQNccGEPatzUcut0zJ7zmReLsYMGwo=
-X-Received: by 2002:ad4:5ce3:0:b0:66d:5b50:44d with SMTP id
- iv3-20020ad45ce3000000b0066d5b50044dmr20218799qvb.57.1698764782743; Tue, 31
- Oct 2023 08:06:22 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698765282; x=1699370082;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vr1AErEXYYfmkBWS1LpTvT+F3LQxWwS/eQ/Zsz08Hd4=;
+        b=ouvNbYZ5zHakWWBNu6eHF5bshK2u9LJGcCYTqukHCc+c02yPhFHFEBlSynWcLPa3Mj
+         OoRKoocT1ZAkh8cDdyuHj+NIhY63pzfuvxDA2Dw5VzIWy+VYZIXjmZzcS16KvOphW8Pi
+         ixG1duOCy9xlgnBPqJhLnaLYn92c2CPvmcJsW9CksAlq4loXaV/rVwA3/XBXvzP/jacV
+         7sBVvSRBUaoqW50yeHPC9iBfNacEEcgV48f5+7TvBAM/fp+WJZmwa3a4zvBVdTHxwdEy
+         L+faCOfmYazd1tL6Ox0Xlehe8AB6EaGhghRTwGa7UerZIhoczeRoAF8yoXb8Y7UqPTaa
+         j0kA==
+X-Gm-Message-State: AOJu0YwsGj6ZhXd9HlQsU7Wy38pik9dreMgG1Wq2yJC5zMObvyzv0zRG
+	0IFbOX9ooEFvXMqJhHuPlW854RezG8o=
+X-Google-Smtp-Source: AGHT+IECkJTmhIJGkTF4pKGmyqapQ5bOlzGrkJelJGfeRGK75Ip1x8yi4FRzdb0jO8EFwvIyDKkUu5yUfSE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a0d:cccd:0:b0:5a7:ad04:5118 with SMTP id
+ o196-20020a0dcccd000000b005a7ad045118mr77305ywd.3.1698765282634; Tue, 31 Oct
+ 2023 08:14:42 -0700 (PDT)
+Date: Tue, 31 Oct 2023 08:14:41 -0700
+In-Reply-To: <ZUDQXbDDsGI3KiQ8@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-17-seanjc@google.com>
-In-Reply-To: <20231027182217.3615211-17-seanjc@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 31 Oct 2023 15:05:45 +0000
-Message-ID: <CA+EHjTzj4drYKONVOLP19DYpJ4O8kSXcFzw2AKier1QdcFKx_Q@mail.gmail.com>
-Subject: Re: [PATCH v13 16/35] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <2C868574-37F4-437D-8355-46A6D1615E51@cs.utexas.edu>
+ <ZTxEIGmq69mUraOD@google.com> <ZT+eipbV5+mSjr+G@yzhao56-desk.sh.intel.com>
+ <ZUAC0jvFE0auohL4@google.com> <ZUDQXbDDsGI3KiQ8@yzhao56-desk.sh.intel.com>
+Message-ID: <ZUEZ4QRjUcu7y3gN@google.com>
+Subject: Re: A question about how the KVM emulates the effect of guest MTRRs
+ on AMD platforms
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Yibo Huang <ybhuang@cs.utexas.edu>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Hi,
-
-On Fri, Oct 27, 2023 at 7:23=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
+On Tue, Oct 31, 2023, Yan Zhao wrote:
+> On Mon, Oct 30, 2023 at 12:24:02PM -0700, Sean Christopherson wrote:
+> > On Mon, Oct 30, 2023, Yan Zhao wrote:
+> > Digging deeper through the history, this *mostly* appears to be the result of coming
+> > to the complete wrong conclusion for handling memtypes during EPT and VT-d enabling.
 
 ...
 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
-rst
-> index e2252c748fd6..e82c69d5e755 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6079,6 +6079,15 @@ applied.
->  :Parameters: struct kvm_userspace_memory_region2 (in)
->  :Returns: 0 on success, -1 on error
->
-> +KVM_SET_USER_MEMORY_REGION2 is an extension to KVM_SET_USER_MEMORY_REGIO=
-N that
-> +allows mapping guest_memfd memory into a guest.  All fields shared with
-> +KVM_SET_USER_MEMORY_REGION identically.  Userspace can set KVM_MEM_PRIVA=
-TE in
-> +flags to have KVM bind the memory region to a given guest_memfd range of
-> +[guest_memfd_offset, guest_memfd_offset + memory_size].  The target gues=
-t_memfd
-> +must point at a file created via KVM_CREATE_GUEST_MEMFD on the current V=
-M, and
-> +the target range must not be bound to any other memory region.  All stan=
-dard
-> +bounds checks apply (use common sense).
-> +
+> > Note the CommitDates!  The AuthorDates strongly suggests Sheng Yang added the whole
+> > IGMT things as a bug fix for issues that were detected during EPT + VT-d + passthrough
+> > enabling, but Avi applied it earlier because it was a generic fix.
+> >
+> My feeling is that
+> Current memtype handling for non-coherent DMA is a compromise between
+> (a) security ("qemu mappings will use writeback and guest mapping will use guest
+> specified memory types")
+> (b) the effective memtype cannot be cacheable if guest thinks it's non-cacheable.
 
-Bikeshedding here: Not sure if KVM_MEM_PRIVATE is the best name for
-this. It gets confusing with KVM_MEMORY_ATTRIBUTE_PRIVATE, i.e., that
-a region marked as KVM_MEM_PRIVATE is only potentially private. It did
-confuse the rest of the team when I walked them through a previous
-version of this code once. Would something like KVM_MEM_GUESTMEM make
-more sense?
+And correctness.  E.g. accessing memory with conficting memtypes could cause guest
+data corruption, which isn't strictly the same as (a).
 
->  ::
->
->    struct kvm_userspace_memory_region2 {
-> @@ -6087,9 +6096,24 @@ applied.
->         __u64 guest_phys_addr;
->         __u64 memory_size; /* bytes */
->         __u64 userspace_addr; /* start of the userspace allocated memory =
-*/
-> +  __u64 guest_memfd_offset;
-> +       __u32 guest_memfd;
-> +       __u32 pad1;
-> +       __u64 pad2[14];
->    };
->
-> -See KVM_SET_USER_MEMORY_REGION.
-> +A KVM_MEM_PRIVATE region _must_ have a valid guest_memfd (private memory=
-) and
-> +userspace_addr (shared memory).  However, "valid" for userspace_addr sim=
-ply
-> +means that the address itself must be a legal userspace address.  The ba=
-cking
-> +mapping for userspace_addr is not required to be valid/populated at the =
-time of
-> +KVM_SET_USER_MEMORY_REGION2, e.g. shared memory can be lazily mapped/all=
-ocated
-> +on-demand.
+> So, for MMIOs in non-coherent DMAs, mapping them as UC in EPT is understandable,
+> because other value like WB or WC is not preferred --
+> guest usually sets MMIOs' PAT to UC or WC, so "PAT=UC && EPT=WB" or
+> "PAT=UC && EPT=WC" are not preferred according to SDM due to page aliasing.
+> And VFIO maps the MMIOs to UC in host.
+> (With pass-through GPU in my env, the MMIOs' guest MTRR is UC,
+>  I can observe host hang if I program its EPT type to
+>  - WB+IPAT or
+>  - WC
+>  )
 
-Regarding requiring that a private region have both a valid
-guest_memfd and a userspace_addr, should this be
-implementation-specific? In pKVM at least, all regions for protected
-VMs are private, and KVM doesn't care about the host userspace address
-for those regions even when part of the memory is shared.
+Yes, but all of that simply confirms that it's KVM's responsibility to map host
+MMIO as UC.  The hangs you observe likely have nothing to do with memory aliasing,
+and everything to do with accessing real MMIO with incompatible memtypes.
 
-> +When mapping a gfn into the guest, KVM selects shared vs. private, i.e c=
-onsumes
-> +userspace_addr vs. guest_memfd, based on the gfn's KVM_MEMORY_ATTRIBUTE_=
-PRIVATE
-> +state.  At VM creation time, all memory is shared, i.e. the PRIVATE attr=
-ibute
-> +is '0' for all gfns.  Userspace can control whether memory is shared/pri=
-vate by
-> +toggling KVM_MEMORY_ATTRIBUTE_PRIVATE via KVM_SET_MEMORY_ATTRIBUTES as n=
-eeded.
+> For guest RAM, looks honoring guest MTRRs just mitigates the page aliasing
+> problem.
+> E.g. if guest PAT=UC because its MTRR=UC, setting EPT type=UC can avoid
+> "guest PAT=UC && EPT=WB", which is not recommended in SDM.
+> But it still breaks (a) if guest PAT is UC.
+> Also, honoring guest MTRRs in EPT is friendly to old systems that do not enable
+> PAT. I guess :)
 
-In pKVM, guest memory is private by default, and most of it will
-remain so for the lifetime of the VM. Userspace could explicitly mark
-all the guest's memory as private at initialization, but it would save
-a slight amount of work. That said, I understand that it might be
-better to be consistent across implementations.
+LOL, no way.  The PAT can't be disabled, and the default PAT combinations are
+backwards compatible with legacy PCD+PWT.  The only way for this to provide value
+is if someone is virtualizing a pre-Pentium Pro CPU, doing device passthrough,
+and *only* doing so on hardware with EPT.
 
-...
+> But I agree, in common cases, honoring guest MTRRs or not looks no big difference.
+> (And I'm not lucky enough to reproduce page-aliasing-caused MCE yet in my
+> environment).
 
-> --- /dev/null
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -0,0 +1,548 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#include <linux/backing-dev.h>
-> +#include <linux/falloc.h>
-> +#include <linux/kvm_host.h>
-> +#include <linux/pagemap.h>
-> +#include <linux/anon_inodes.h>
+FWIW, I don't think that page aliasing with WC/UC actually causes machine checks.
+What does result in #MC (assuming things haven't changed in the last few years)
+is accessing MMIO using WB and other cacheable memtypes, e.g. map the host APIC
+with WB and you should see #MCs.  I suspect this is what people encountered years
+ago when KVM attempted to honored guest MTRRs at all times.  E.g. the "full" MTRR
+virtualization patch that got reverted deliberately allowed the guest to control
+the memtype for host MMIO.
 
-nit: should this include be first (to maintain alphabetical ordering
-of the includes)?
+The SDM makes aliasing sound super scary, but then has footnotes where it explicitly
+requires the CPU to play nice with aliasing, e.g. if MTRRs are *not* UC but the
+effective memtype is UC, then the CPU is *required* to snoop caches:
 
-> +
-> +#include "kvm_mm.h"
-> +
-> +struct kvm_gmem {
-> +       struct kvm *kvm;
-> +       struct xarray bindings;
-> +       struct list_head entry;
-> +};
-> +
-> +static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t ind=
-ex)
-> +{
-> +       struct folio *folio;
-> +
-> +       /* TODO: Support huge pages. */
-> +       folio =3D filemap_grab_folio(inode->i_mapping, index);
-> +       if (IS_ERR_OR_NULL(folio))
-> +               return NULL;
-> +
-> +       /*
-> +        * Use the up-to-date flag to track whether or not the memory has=
- been
-> +        * zeroed before being handed off to the guest.  There is no back=
-ing
-> +        * storage for the memory, so the folio will remain up-to-date un=
-til
-> +        * it's removed.
-> +        *
-> +        * TODO: Skip clearing pages when trusted firmware will do it whe=
-n
-> +        * assigning memory to the guest.
-> +        */
-> +       if (!folio_test_uptodate(folio)) {
-> +               unsigned long nr_pages =3D folio_nr_pages(folio);
-> +               unsigned long i;
-> +
-> +               for (i =3D 0; i < nr_pages; i++)
-> +                       clear_highpage(folio_page(folio, i));
-> +
-> +               folio_mark_uptodate(folio);
-> +       }
-> +
-> +       /*
-> +        * Ignore accessed, referenced, and dirty flags.  The memory is
-> +        * unevictable and there is no storage to write back to.
-> +        */
-> +       return folio;
-> +}
-> +
-> +static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t sta=
-rt,
-> +                                     pgoff_t end)
-> +{
-> +       bool flush =3D false, found_memslot =3D false;
-> +       struct kvm_memory_slot *slot;
-> +       struct kvm *kvm =3D gmem->kvm;
-> +       unsigned long index;
-> +
-> +       xa_for_each_range(&gmem->bindings, index, slot, start, end - 1) {
-> +               pgoff_t pgoff =3D slot->gmem.pgoff;
-> +
-> +               struct kvm_gfn_range gfn_range =3D {
-> +                       .start =3D slot->base_gfn + max(pgoff, start) - p=
-goff,
-> +                       .end =3D slot->base_gfn + min(pgoff + slot->npage=
-s, end) - pgoff,
-> +                       .slot =3D slot,
-> +                       .may_block =3D true,
-> +               };
-> +
-> +               if (!found_memslot) {
-> +                       found_memslot =3D true;
-> +
-> +                       KVM_MMU_LOCK(kvm);
-> +                       kvm_mmu_invalidate_begin(kvm);
-> +               }
-> +
-> +               flush |=3D kvm_mmu_unmap_gfn_range(kvm, &gfn_range);
-> +       }
-> +
-> +       if (flush)
-> +               kvm_flush_remote_tlbs(kvm);
-> +
-> +       if (found_memslot)
-> +               KVM_MMU_UNLOCK(kvm);
-> +}
-> +
-> +static void kvm_gmem_invalidate_end(struct kvm_gmem *gmem, pgoff_t start=
-,
-> +                                   pgoff_t end)
-> +{
-> +       struct kvm *kvm =3D gmem->kvm;
-> +
-> +       if (xa_find(&gmem->bindings, &start, end - 1, XA_PRESENT)) {
-> +               KVM_MMU_LOCK(kvm);
-> +               kvm_mmu_invalidate_end(kvm);
-> +               KVM_MMU_UNLOCK(kvm);
-> +       }
-> +}
-> +
-> +static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff=
-_t len)
-> +{
-> +       struct list_head *gmem_list =3D &inode->i_mapping->private_list;
-> +       pgoff_t start =3D offset >> PAGE_SHIFT;
-> +       pgoff_t end =3D (offset + len) >> PAGE_SHIFT;
-> +       struct kvm_gmem *gmem;
-> +
-> +       /*
-> +        * Bindings must stable across invalidation to ensure the start+e=
-nd
+  2. The UC attribute came from the page-table or page-directory entry and
+     processors are required to check their caches because the data may be cached
+     due to page aliasing, which is not recommended.
 
-nit: Bindings must _be/stay?_ stable
+Lack of snooping can effectively cause data corruption and ordering issues, but
+at least for WC/UC vs. WB I don't think there are actual #MC problems with aliasing.
 
-...
+> For CR0_CD=1,
+> - w/o KVM_X86_QUIRK_CD_NW_CLEARED, it meets (b), but breaks (a).
+> - w/  KVM_X86_QUIRK_CD_NW_CLEARED, with IPAT=1, it meets (a), but breaks (b);
+>                                    with IPAT=0, it may breaks (a), but meets (b)
 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 78a0b09ef2a5..5d1a2f1b4e94 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -798,7 +798,7 @@ void kvm_mmu_invalidate_range_add(struct kvm *kvm, gf=
-n_t start, gfn_t end)
->         }
->  }
->
-> -static bool kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_rang=
-e *range)
-> +bool kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *rang=
-e)
->  {
->         kvm_mmu_invalidate_range_add(kvm, range->start, range->end);
->         return kvm_unmap_gfn_range(kvm, range);
-> @@ -1034,6 +1034,9 @@ static void kvm_destroy_dirty_bitmap(struct kvm_mem=
-ory_slot *memslot)
->  /* This does not remove the slot from struct kvm_memslots data structure=
-s */
->  static void kvm_free_memslot(struct kvm *kvm, struct kvm_memory_slot *sl=
-ot)
->  {
-> +       if (slot->flags & KVM_MEM_PRIVATE)
-> +               kvm_gmem_unbind(slot);
-> +
+CR0.CD=1 is a mess above and beyond memtypes.  Huh.  It's even worse than I thought,
+because according to the SDM, Atom CPUs don't support no-fill mode:
 
-Should this be called after kvm_arch_free_memslot()? Arch-specific ode
-might need some of the data before the unbinding, something I thought
-might be necessary at one point for the pKVM port when deleting a
-memslot, but realized later that kvm_invalidate_memslot() ->
-kvm_arch_guest_memory_reclaimed() was the more logical place for it.
-Also, since that seems to be the pattern for arch-specific handlers in
-KVM.
+  3. Not supported In Intel Atom processors. If CD = 1 in an Intel Atom processor,
+     caching is disabled.
 
->         kvm_destroy_dirty_bitmap(slot);
->
->         kvm_arch_free_memslot(kvm, slot);
+Before I read that blurb about Atom CPUs, what I was going to say is that, AFAIK,
+it's *impossible* to accurately virtualize CR0.CD=1 on VMX because there's no way
+to emulate no-fill mode.
 
-...
+> > Discussion from the EPT+MTRR enabling thread[*] more or less confirms that Sheng
+> > Yang was trying to resolve issues with passthrough MMIO.
+> > 
+> >  * Sheng Yang 
+> >   : Do you mean host(qemu) would access this memory and if we set it to guest 
+> >   : MTRR, host access would be broken? We would cover this in our shadow MTRR 
+> >   : patch, for we encountered this in video ram when doing some experiment with 
+> >   : VGA assignment. 
+> > 
+> > And in the same thread, there's also what appears to be confirmation of Intel
+> > running into issues with Windows XP related to a guest device driver mapping
+> > DMA with WC in the PAT.  Hilariously, Avi effectively said "KVM can't modify the
+> > SPTE memtype to match the guest for EPT/NPT", which while true, completely overlooks
+> > the fact that EPT and NPT both honor guest PAT by default.  /facepalm
+> 
+> My interpretation is that the since guest PATs are in guest page tables,
+> while with EPT/NPT, guest page tables are not shadowed, it's not easy to
+> check guest PATs  to disallow host QEMU access to non-WB guest RAM.
 
-Cheers,
-/fuad
+Ah, yeah, your interpretation makes sense.
+
+The best idea I can think of to support things like this is to have KVM grab the
+effective PAT memtype from the host userspace page tables, shove that into the
+EPT/NPT memtype, and then ignore guest PAT.  I don't if that would actually work
+though.
+
+> The credence is with Avi's following word:
+> "Looks like a conflict between the requirements of a hypervisor 
+> supporting device assignment, and the memory type constraints of mapping 
+> everything with the same memory type.  As far as I can see, the only 
+> solution is not to map guest memory in the hypervisor, and do all 
+> accesses via dma.  This is easy for virtual disk, somewhat harder for 
+> virtual networking (need a dma engine or a multiqueue device).
+> 
+> Since qemu will only access memory on demand, we don't actually have to 
+> unmap guest memory, only to ensure that qemu doesn't touch it.  Things 
+> like live migration and page sharing won't work, but they aren't 
+> expected to with device assignment anyway."
 
