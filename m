@@ -1,133 +1,150 @@
-Return-Path: <kvm+bounces-198-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-199-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 815EB7DCECF
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 15:11:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B1017DCED4
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 15:15:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA992B20F80
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 14:11:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A78B9B20F29
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 14:15:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08A031DDFF;
-	Tue, 31 Oct 2023 14:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5101DDFF;
+	Tue, 31 Oct 2023 14:14:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eD6TW17F"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JX1qAFBE"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358101DFC2
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 14:10:54 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EB3811F
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:10:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624B81A5AF
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 14:14:51 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31E0FC9
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:14:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698761451;
+	s=mimecast20190719; t=1698761688;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+29grXFJZojFwHG1sZMUj8N4tYbCAXJFoBUSIxQKeyY=;
-	b=eD6TW17FcLteN7LBHLH1xMpKnoD53DS/htYT0H9fVG8P4rMsDrM3KmW73UhD8KT5ZEDPSG
-	TngtDt4u11xuTtXdrFcJWm5+RJSLi1R2y6v/pJYCtSTJEk3deIS2k20ue4HdN6I5+iu2r1
-	RVOUpE+UdZCgh+MEmmr29m+FRVoo+kA=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=t0Rzur0DPYsSsAxdt1Pi/bDYKklT+E5fkG1AqmAajEo=;
+	b=JX1qAFBET2PgT4uufK+IAavhWO2wfI4cFdoKi0TgJBViZOljZP3O0rV6hhV+CQlFdp0RBQ
+	EALqApHuJXJz+n4RXuMZUK3/s5WtLMsO5he9Zax7VmdtXDl3WrIU1u3U/QkOoXZcZe0Hw/
+	cSI5IEJ6j/72EIP2Xd0Jq5ZFurGL+Qs=
+Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
+ [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-669-cWS2x355OtiobkhUwNDK2g-1; Tue, 31 Oct 2023 10:10:49 -0400
-X-MC-Unique: cWS2x355OtiobkhUwNDK2g-1
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-6ce26047c6eso7823162a34.2
-        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:10:49 -0700 (PDT)
+ us-mta-630-mzsHHn8UMLqbcqWfbu00nw-1; Tue, 31 Oct 2023 10:14:46 -0400
+X-MC-Unique: mzsHHn8UMLqbcqWfbu00nw-1
+Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-457d9c334f2so1852335137.2
+        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:14:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698761449; x=1699366249;
+        d=1e100.net; s=20230601; t=1698761686; x=1699366486;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+29grXFJZojFwHG1sZMUj8N4tYbCAXJFoBUSIxQKeyY=;
-        b=HLVQH0dElJNWGGGuGO1J/4vpiSNHRQe6CnrQQSpUqmZes9XoJb44ug/zYSGy1B106S
-         vMObFQj7hHrUZWFwGYL1k5LRuhEqg9a2/dBCpYuOVgIEj8b3qjcwzLu+COTwy7CNrtvR
-         ZQBJrKCIfkBR1nXH76hbkLGtmsZ4t7LlQznRh9TgUvgCtgNBVWQU9FF6+vIqLa7P1wT8
-         AHcPpxKzwcv+44o3h6aN1IpSGhAyQINi5YNEYJcnKWueyP/qABvS64QPHBEOQX8mEQpJ
-         fxtQClDofm3NqApwUpV+aVzkE0Cf504nLNY6273AncqT6eWU+C9HWVeJMoKx4QoiI0wp
-         4pfA==
-X-Gm-Message-State: AOJu0YwLxR6JCGdvHxo1t+o7JDzHi78ha6DLb/mVo9ZhhtU/kAEw9vXb
-	uOYKIR1XZP/oYaOkTOC9IkJ083kU9vnp2eOOPGSqPR2zH0b3B4MWHSgRhDolMu5H/CKGR5Z+Hnf
-	zr1+sTnkxmYrp28eOctfF5MMNzSZT
-X-Received: by 2002:a05:6871:23c7:b0:1e9:edd1:2176 with SMTP id xy7-20020a05687123c700b001e9edd12176mr12825503oab.33.1698761449246;
-        Tue, 31 Oct 2023 07:10:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFkDNkghapOOyIO7MlIs094HOLFT5jnQNcb86xPe9HYK72gpMCPOxpT4qdgb2CzpsWn5KZbftCAGayTULfQu1w=
-X-Received: by 2002:a05:6871:23c7:b0:1e9:edd1:2176 with SMTP id
- xy7-20020a05687123c700b001e9edd12176mr12825480oab.33.1698761448978; Tue, 31
- Oct 2023 07:10:48 -0700 (PDT)
+        bh=t0Rzur0DPYsSsAxdt1Pi/bDYKklT+E5fkG1AqmAajEo=;
+        b=Yge7g566X8eNBUDM/AOxY6ph5pHzGAh6Iil3VK8QtVd9pVMRqV3V1n9psYY6o5gE0t
+         c68BVhmKk/ZcLIM8yz3DcUpPEtvrthIWh7SjGmoAp66M2Z8okBJSGhLJ85OHYHpJmjwK
+         5Yk8csy9A5484AaaA8Jw7vTb3o0iIoXEIxhzrDCSzWnKIXE4fJ6tImHCd2JvY1Ncmu9D
+         bgXqkNx+yej1EZ8zcJQWcpIUa4TgsozkSwfh+0KTpSLfOWc96IZ81mteyTuIl8IJ4UCP
+         EQomTCgAdQiUn7jFF1Z+4lmMCbZOaES4s75TcoO+G2aNQUGP3kngrJpKvPvXrSFuW8O8
+         N2IA==
+X-Gm-Message-State: AOJu0YzRRG5FGmlApjcPaeeU8V08ijfsjShziZNi4/6TgF/2pOoVaV62
+	4ho6O8HMMwAw5txPRuS6wTH+EIk/8boV5deN7HJAnYBgZ+PDGOzPverWeLB6kEVeL/I9IPd7SYI
+	8uIQOwiiiVyIW+R9ht7J9azIuC/IF
+X-Received: by 2002:a05:6102:3d8c:b0:457:a915:5e85 with SMTP id h12-20020a0561023d8c00b00457a9155e85mr12840825vsv.28.1698761686242;
+        Tue, 31 Oct 2023 07:14:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG2aILnhqixBNcNVNeBm0z/LBexH2dJ9/e2srt+6eIErcEXLvOaCG43iBBOkp/KJnhIZQ53Q3DZhvKlvsGLv0M=
+X-Received: by 2002:a05:6102:3d8c:b0:457:a915:5e85 with SMTP id
+ h12-20020a0561023d8c00b00457a9155e85mr12840811vsv.28.1698761685982; Tue, 31
+ Oct 2023 07:14:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231030092101.66014-1-frankja@linux.ibm.com>
-In-Reply-To: <20231030092101.66014-1-frankja@linux.ibm.com>
+References: <20231027204933.3651381-1-seanjc@google.com> <20231027204933.3651381-3-seanjc@google.com>
+In-Reply-To: <20231027204933.3651381-3-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 31 Oct 2023 15:10:37 +0100
-Message-ID: <CABgObfZtmcbdtWRFmhEuZuKBMf-AgNG_25g9GHZ0o3ZPnthtZA@mail.gmail.com>
-Subject: Re: [GIT PULL 0/2] KVM: s390: Changes for 6.7
-To: Janosch Frank <frankja@linux.ibm.com>
-Cc: kvm@vger.kernel.org, david@redhat.com, borntraeger@linux.ibm.com, 
-	cohuck@redhat.com, linux-s390@vger.kernel.org, nrb@linux.ibm.com, 
-	imbrenda@linux.ibm.com
+Date: Tue, 31 Oct 2023 15:14:34 +0100
+Message-ID: <CABgObfY8Mr29fQwWfLE4fhDUnUnYw8_wQ1UGcBq9i86PncSE=g@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM: x86: Documentation updates for 6.7
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 30, 2023 at 10:22=E2=80=AFAM Janosch Frank <frankja@linux.ibm.c=
-om> wrote:
+On Fri, Oct 27, 2023 at 10:49=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
 >
-> Paolo, please pull these two patches for 6.7.
+> Doc updates for 6.7.  The bulk is a cleanup of the kvm_mmu_page docs, whi=
+ch are
+> sadly already stale because I neglected to update the docs when removing =
+the
+> TDP MMU's async root zapping :-(
 >
-> They introduce counters and a tracepoint into our nested VM page table
-> management code. Debuging nested page table management is notoriously
-> hard but the added low-overhead debug data will allow us to get a feel
-> for the problem before deploying deeper and higher overhead debugging
-> means.
+> The following changes since commit 5804c19b80bf625c6a9925317f845e497434d6=
+d3:
 >
-> I've held back the patches for a bit since we had suspicious CI fails
-> but they turned out to be unrelated and have been fixed at the end of
-> last week.
+>   Merge tag 'kvm-riscv-fixes-6.6-1' of https://github.com/kvm-riscv/linux=
+ into HEAD (2023-09-23 05:35:55 -0400)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/kvm-x86/linux.git tags/kvm-x86-docs-6.7
 
 Pulled, thanks.
 
 Paolo
 
+> for you to fetch changes up to b35babd3abea081de0611ce0d5b85281c18c52c7:
 >
+>   KVM: x86/pmu: Add documentation for fixed ctr on PMU filter (2023-09-27=
+ 14:23:51 -0700)
 >
-> The following changes since commit ce9ecca0238b140b88f43859b211c9fdfd8e5b=
-70:
+> ----------------------------------------------------------------
+> KVM x86 Documentation updates for 6.7:
 >
->   Linux 6.6-rc2 (2023-09-17 14:40:24 -0700)
+>  - Fix various typos, notably a confusing reference to the non-existent
+>    "struct kvm_vcpu_event" (the actual structure is kvm_vcpu_events, plur=
+al).
 >
-> are available in the Git repository at:
+>  - Update x86's kvm_mmu_page documentation to bring it closer to the code
+>    (this raced with the removal of async zapping and so the documentation=
+ is
+>    already stale; my bad).
 >
->   https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/=
-kvm-s390-next-6.7-1
+>  - Document the behavior of x86 PMU filters on fixed counters.
 >
-> for you to fetch changes up to 70fea30195168fd84e7076720c984f0ac1af5b09:
+> ----------------------------------------------------------------
+> Jinrong Liang (1):
+>       KVM: x86/pmu: Add documentation for fixed ctr on PMU filter
 >
->   KVM: s390: add tracepoint in gmap notifier (2023-10-16 14:54:29 +0200)
+> Michal Luczaj (1):
+>       KVM: Correct kvm_vcpu_event(s) typo in KVM API documentation
 >
-> Nico Boehr (2):
->   KVM: s390: add stat counter for shadow gmap events
->   KVM: s390: add tracepoint in gmap notifier
+> Mingwei Zhang (6):
+>       KVM: Documentation: Add the missing description for guest_mode in k=
+vm_mmu_page_role
+>       KVM: Documentation: Update the field name gfns and its description =
+in kvm_mmu_page
+>       KVM: Documentation: Add the missing description for ptep in kvm_mmu=
+_page
+>       KVM: Documentation: Add the missing description for tdp_mmu_root_co=
+unt into kvm_mmu_page
+>       KVM: Documentation: Add the missing description for mmu_valid_gen i=
+nto kvm_mmu_page
+>       KVM: Documentation: Add the missing description for tdp_mmu_page in=
+to kvm_mmu_page
 >
->  arch/s390/include/asm/kvm_host.h |  7 +++++++
->  arch/s390/kvm/gaccess.c          |  7 +++++++
->  arch/s390/kvm/kvm-s390.c         | 11 ++++++++++-
->  arch/s390/kvm/trace-s390.h       | 23 +++++++++++++++++++++++
->  arch/s390/kvm/vsie.c             |  5 ++++-
->  5 files changed, 51 insertions(+), 2 deletions(-)
->
-> --
-> 2.41.0
+>  Documentation/virt/kvm/api.rst     | 36 +++++++++++++++++++++++--------
+>  Documentation/virt/kvm/x86/mmu.rst | 43 ++++++++++++++++++++++++++++++--=
+------
+>  2 files changed, 61 insertions(+), 18 deletions(-)
 >
 
 
