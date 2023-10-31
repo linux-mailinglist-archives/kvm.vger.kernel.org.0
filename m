@@ -1,165 +1,114 @@
-Return-Path: <kvm+bounces-241-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-242-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DC917DD5FD
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 19:24:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E2827DD648
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 19:48:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DB491C20CCD
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 18:24:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E677E281245
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 18:48:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 415792230F;
-	Tue, 31 Oct 2023 18:24:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB165210EC;
+	Tue, 31 Oct 2023 18:48:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pXXCc/Ey"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YJnTQ/WR"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF0F7219FE
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 18:24:15 +0000 (UTC)
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF273DF
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 11:24:13 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1cc1ee2d8dfso41800535ad.3
-        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 11:24:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298B120326
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 18:48:09 +0000 (UTC)
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A9AAF4
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 11:48:08 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-54357417e81so2444a12.0
+        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 11:48:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698776653; x=1699381453; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fA4BSuC8POmGjMQJ0k8vnna5BPAxY9Ekm8SCU7EDDBY=;
-        b=pXXCc/EymZAI1UfbBeV5XR71rJrHgRQDUI+akFhgXsPfgrMeKf3TltpNq883kc+Ihu
-         1qmVyqyIJuErRmSkaVwfEL8WigX4tzxKfuYTviGsSTGl6jekGQ71OKEZ7bpv5cYxYL8l
-         LLsSt+Tpm3NOmyuXbcLqSLtimYgKpEfLzmdJARApIikDo0k5vQcc0DwflTL8jMw/uDs8
-         aXRDjVO3HuVdjkVUEJ75WF1WkeoDES5/XCb8dAxlwOO4J3Qu8nLSFlhdv/IacwLrtgX1
-         jePZ+d1Bh7cLoCKTRLq/EIe+IX92jP3G1HMuSH0Yb+88y6p2TuvEwJIpd8mVDEhfXIwR
-         Rmhg==
+        d=google.com; s=20230601; t=1698778087; x=1699382887; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T4SYutzdU2lYd0Ydt06asj331E5VhblLHsx51CrMqmA=;
+        b=YJnTQ/WRC2U3bPZjGOWHbLsEkzSghyqbu7bDhyEcSK+kT+HuASVc8f38LejspYCeT3
+         jsUo/y26VsoY7Bs9XRINtlGOuneO9zFdR5l9NN4rW0QTdhBmDDkGbjPKoZQP58Quf+R6
+         s54wIqKDqqOQw6LKnN0hGsUtUO6onElpwCmrmg9vNBRGSkAyjtHiiu2gvP7TeD+7V5Ry
+         rcminDem9Z/4gQ7vWhj07yZNQjnhcGNQ0QiXg7CoPuCVMC0o6t7hDBhGfHPlQ1D+2QHy
+         uOXQPD4J+4ToaAaOxsyE5uNCBt07C/Y0By4NejQ82AvcYtiOWXXnt4Zt6QZyt1tc2r1P
+         cHBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698776653; x=1699381453;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fA4BSuC8POmGjMQJ0k8vnna5BPAxY9Ekm8SCU7EDDBY=;
-        b=HT8kyVlkSGFI4QyWcehDpqxB+c9Wgvoo6Fhcvk5nNinRPrQJK42suKC3406m8+3nAh
-         q3NWQd/xfJWDeXX9ev/Ia1ZCynMWq8pYtVBgPZjJJjfmmlzlUsK9wEvAjTLzm85i9/dL
-         4ZL16QqTxa6B7a76y85ir4D5ZAMQL5S6tJQhTfiz7oIuEPS8b0CA5v+eBFipc7nSimcH
-         +YuEnycfmIl7gF3wJThTxBh8AgYh7gmrDt9oJRV5IfxOVC+zKNv8BKANwZ75tlQ6LgTS
-         FB8V46ADgka6HdzSa1ydPQWgLPa+AgA1JDqMWGCXn3KfUpfHCSvpzspFXW57BtpuELDQ
-         Ygzw==
-X-Gm-Message-State: AOJu0YzULpx9ZeTesC1+2axiHb4eNnwcpGtccQOyma+MRGHFGC1WDDox
-	V8UTmbYPHuSMrZhxA0K+biMurA==
-X-Google-Smtp-Source: AGHT+IFxkiDdZGGfHsdazjXYZcfW0cI1Huw/6T3VggKB9s0vUh/sA7Jolgtag5oCOtU2pTLnT1L5FA==
-X-Received: by 2002:a17:902:ecca:b0:1cc:54b5:b4fa with SMTP id a10-20020a170902ecca00b001cc54b5b4famr5681643plh.18.1698776652868;
-        Tue, 31 Oct 2023 11:24:12 -0700 (PDT)
-Received: from google.com (175.199.125.34.bc.googleusercontent.com. [34.125.199.175])
-        by smtp.gmail.com with ESMTPSA id 13-20020a170902c20d00b001c5dea67c26sm1620267pll.233.2023.10.31.11.24.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Oct 2023 11:24:11 -0700 (PDT)
-Date: Tue, 31 Oct 2023 11:24:07 -0700
-From: David Matlack <dmatlack@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
-	Anish Moorthy <amoorthy@google.com>,
-	Yu Zhang <yu.c.zhang@linux.intel.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Maciej Szmigiero <mail@maciej.szmigiero.name>,
-	David Hildenbrand <david@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
-	Liam Merwick <liam.merwick@oracle.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH v13 16/35] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-Message-ID: <ZUFGRyQEuWj4RJS0@google.com>
-References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-17-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1698778087; x=1699382887;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=T4SYutzdU2lYd0Ydt06asj331E5VhblLHsx51CrMqmA=;
+        b=K5RWzA3SIRTi5e/kpmtupAcwBamAmQT9OsxHjJsJJN9dlKp8YY6Sh/nYg84HC4oPeK
+         TMkj3piEP4akjH2h9iuH1L1XF1Dvs37flrwere62Y+hd+j04wkwF/AOgG1AKCvS6WOj2
+         L/Tnq3AT8CXtv1AUB4L2upkjGBdRd90eMP9W1EYj6O4gRsX9DV3dUwFhdJrD7A3ukNbt
+         93q/iEIgfnyR180T8QDdPGf7BponexuyhPbEH1u8uXYUm491PrG1MASg9sdbYlaAhS91
+         Z2o9PcNSqtEO6UzMzcG3jVqIKWqj4xpVN1dLAdk66AA6xzaJrtG4B8tkA1IRArxm9wPE
+         aCAQ==
+X-Gm-Message-State: AOJu0YxjfBEle76L44aLgufodkxGxzB3jzaL65GxK5Mit3jhwShL89cO
+	YKvuUF0azfVrnWNxUhkeOrecExe9w2ns7oXPy7vAjw==
+X-Google-Smtp-Source: AGHT+IH8aQCcupadQGpdlmBqtD0mL9ohRx/4Q5A0bBK0kcOUvlee6GUiG1dAoGzqxix5jpbUy532ZaZqXpUondFIT1w=
+X-Received: by 2002:a50:c04f:0:b0:542:d737:dc7e with SMTP id
+ u15-20020a50c04f000000b00542d737dc7emr201265edd.0.1698778086580; Tue, 31 Oct
+ 2023 11:48:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231027182217.3615211-17-seanjc@google.com>
+References: <20231031092921.2885109-1-dapeng1.mi@linux.intel.com> <20231031092921.2885109-5-dapeng1.mi@linux.intel.com>
+In-Reply-To: <20231031092921.2885109-5-dapeng1.mi@linux.intel.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Tue, 31 Oct 2023 11:47:54 -0700
+Message-ID: <CALMp9eQ4Xj5D-kgqVMKUNmdF37rLcMRXyDYdQU339sRCKZ7d9A@mail.gmail.com>
+Subject: Re: [kvm-unit-tests Patch v2 4/5] x86: pmu: Support validation for
+ Intel PMU fixed counter 3
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Zhenyu Wang <zhenyuw@linux.intel.com>, 
+	Zhang Xiong <xiong.y.zhang@intel.com>, Mingwei Zhang <mizhang@google.com>, 
+	Like Xu <like.xu.linux@gmail.com>, Dapeng Mi <dapeng1.mi@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2023-10-27 11:21 AM, Sean Christopherson wrote:
-> Introduce an ioctl(), KVM_CREATE_GUEST_MEMFD, to allow creating file-based
-> memory that is tied to a specific KVM virtual machine and whose primary
-> purpose is to serve guest memory.
-> 
-> A guest-first memory subsystem allows for optimizations and enhancements
-> that are kludgy or outright infeasible to implement/support in a generic
-> memory subsystem.  With guest_memfd, guest protections and mapping sizes
-> are fully decoupled from host userspace mappings.   E.g. KVM currently
-> doesn't support mapping memory as writable in the guest without it also
-> being writable in host userspace, as KVM's ABI uses VMA protections to
-> define the allow guest protection.  Userspace can fudge this by
-> establishing two mappings, a writable mapping for the guest and readable
-> one for itself, but that’s suboptimal on multiple fronts.
-> 
-> Similarly, KVM currently requires the guest mapping size to be a strict
-> subset of the host userspace mapping size, e.g. KVM doesn’t support
-> creating a 1GiB guest mapping unless userspace also has a 1GiB guest
-> mapping.  Decoupling the mappings sizes would allow userspace to precisely
-> map only what is needed without impacting guest performance, e.g. to
-> harden against unintentional accesses to guest memory.
-> 
-> Decoupling guest and userspace mappings may also allow for a cleaner
-> alternative to high-granularity mappings for HugeTLB, which has reached a
-> bit of an impasse and is unlikely to ever be merged.
-> 
-> A guest-first memory subsystem also provides clearer line of sight to
-> things like a dedicated memory pool (for slice-of-hardware VMs) and
-> elimination of "struct page" (for offload setups where userspace _never_
-> needs to mmap() guest memory).
+On Tue, Oct 31, 2023 at 2:22=E2=80=AFAM Dapeng Mi <dapeng1.mi@linux.intel.c=
+om> wrote:
+>
+> Intel CPUs, like Sapphire Rapids, introduces a new fixed counter
+> (fixed counter 3) to counter/sample topdown.slots event, but current
+> code still doesn't cover this new fixed counter.
+>
+> So this patch adds code to validate this new fixed counter can count
+> slots event correctly.
 
-All of these use-cases involve using guest_memfd for shared pages, but
-this entire series sets up KVM to only use guest_memfd for private
-pages.
+I'm not convinced that this actually validates anything.
 
-For example, the per-page attributes are a property of a KVM VM, not the
-underlying guest_memfd. So that implies we will need separate
-guest_memfds for private and shared pages. But a given memslot can have
-a mix of private and shared pages. So that implies a memslot will need
-to support 2 guest_memfds? But the UAPI only allows 1 and uses the HVA
-for shared mappings.
+Suppose, for example, that KVM used fixed counter 1 when the guest
+asked for fixed counter 3. Wouldn't this test still pass?
 
-My initial reaction after reading through this series is that the
-per-page private/shared should be a property of the guest_memfd, not the
-VM. Maybe it would even be cleaner in the long-run to make all memory
-attributes a property of the guest_memfd. That way we can scope the
-support to only guest_memfds and not have to worry about making per-page
-attributes work with "legacy" HVA-based memslots.
-
-Maybe can you sketch out how you see this proposal being extensible to
-using guest_memfd for shared mappings?
+> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> ---
+>  x86/pmu.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/x86/pmu.c b/x86/pmu.c
+> index 6bd8f6d53f55..404dc7b62ac2 100644
+> --- a/x86/pmu.c
+> +++ b/x86/pmu.c
+> @@ -47,6 +47,7 @@ struct pmu_event {
+>         {"fixed 1", MSR_CORE_PERF_FIXED_CTR0, 10*N, 10.2*N},
+>         {"fixed 2", MSR_CORE_PERF_FIXED_CTR0 + 1, 1*N, 500*N},
+>         {"fixed 3", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 300*N},
+> +       {"fixed 4", MSR_CORE_PERF_FIXED_CTR0 + 3, 1*N, 5000*N},
+>  };
+>
+>  char *buf;
+> --
+> 2.34.1
+>
 
