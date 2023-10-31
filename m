@@ -1,71 +1,83 @@
-Return-Path: <kvm+bounces-163-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-167-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5927A7DC8C5
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 09:58:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 439E47DC8D8
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 10:00:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08F0828138E
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 08:58:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 929B9B20D23
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 09:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E1DF12E64;
-	Tue, 31 Oct 2023 08:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B78125CF;
+	Tue, 31 Oct 2023 09:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lIRRkAAc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aEdh52PL"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A59EEA3
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 08:58:07 +0000 (UTC)
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A99ACC2
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 01:58:05 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-507a98517f3so7547895e87.0
-        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 01:58:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698742684; x=1699347484; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=d4STdM0jYEXN+54aJ9JQEaU7mf4zySlUWnw/NPnMyOY=;
-        b=lIRRkAAcg+uQNDo+L7xqz+20yba9RZQ55trzNV8YpjJBCjy4NneV5kx1NBy9U5A2iT
-         Kzck1Fb6Lnf0XFB1KXYzVDILn72xlZseWGeC1XbDBkKPnM8zdoSyeQ8iBvhB+synZ52L
-         H9916lelA8YBHU307XEaHX8XNRFZgiUHjcEBgexfPYTccOI4bpDeJXnCevwaCUcZQ/7A
-         xpQfarpj776xq2dz0ssMWUb742NIC+oWh0dEk1wNpz+1HpSmVvjTo11U7Pm2CBeovqdm
-         /id6UbqFdCFIsX7BvnoCrF7ayhTJCPxsNI2m3ZCDy8XwYw0FUi1/TZQV0uNgs+7KNgzx
-         SXvw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5EC3EEA3
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 09:00:14 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4E9BF9
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 02:00:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698742812;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JJaPhbcmh8rSiQ4KL2QqVbu7Ce8KpG8/Bm1tkvMPCfo=;
+	b=aEdh52PLgbu13210qsLG1jIRZPzKh1gE8r8cTbxWVJeUPn2V7kqxmoHZWA3+kwI/TVIgQd
+	KbtiUEZkkdfWOOXXq7O4lpDEDjHZe4jMS4cCZkJGYbEheiSXWLDFZAwU8WYwsgqZPL6DGU
+	Q9VICgj2SQeEvoHzxFS33d3wYzFzhNc=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-145-8yHOmrYONn6Xj59P5LZmRw-1; Tue, 31 Oct 2023 05:00:11 -0400
+X-MC-Unique: 8yHOmrYONn6Xj59P5LZmRw-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-507b8ac8007so6322568e87.0
+        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 02:00:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698742684; x=1699347484;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=d4STdM0jYEXN+54aJ9JQEaU7mf4zySlUWnw/NPnMyOY=;
-        b=iWzRsN08Fj5zg8bH3+1IvKWv0b/uC3Lg3ssfUAL8FIPt346Wy9nXRcrart0Nbe6mg6
-         gKJA0q4wLaoxFhnV9oM9dNI83VCRyEEEMkNDP5UejgR89EmJZemS0Gbtrvw08LndjgDP
-         iA9awtTYr1n4VExExw41M7QQnKOrZgoAK4SrVUb4gkz4FsBxQeTMeO47SH3IFC6T94jL
-         dbU5AtmMYdJhqBtzgEsAeQ+jfFpI30wqKlMx3iiAMGVexknWKhGT7oOHbZWEi6uebq/M
-         5YRPAsWOy7332MrcqmEsO9yyDQNgd5bakHih1A3igFV+zjy2dk5vL5QfGRmmzg0S4PdE
-         /lAQ==
-X-Gm-Message-State: AOJu0Yz4+LG3FiwQZzH1XCcXLmdnS724jvXv/CVg0M1Za53ISP8fJSqg
-	tNclNkJSW3MQnEr24wkCZHkP1A==
-X-Google-Smtp-Source: AGHT+IGpyL5LNThnF9EVE+It32ZKweaZuoUkY2L75q/AthejDBJRPtrL7WQrHmLGI6tPuRs941KE2w==
-X-Received: by 2002:ac2:5f51:0:b0:507:9f4c:b72 with SMTP id 17-20020ac25f51000000b005079f4c0b72mr8428895lfz.15.1698742683962;
-        Tue, 31 Oct 2023 01:58:03 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id y17-20020adff6d1000000b0032f7d7ec4adsm973923wrp.92.2023.10.31.01.58.03
+        d=1e100.net; s=20230601; t=1698742809; x=1699347609;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JJaPhbcmh8rSiQ4KL2QqVbu7Ce8KpG8/Bm1tkvMPCfo=;
+        b=Yy7n8ZJiTlMa2lzPdXamJMLWQh+085d5UsLSpPh/O+TzQ7gRkH4x4gsMFXin6Ik9Pn
+         VpOPjSLc5FW23XlPst2ulZxTjtH8mP0LGqzv9BRLSm2KNLYJGqAJXay02ncjYBIE9RyN
+         BkLQlecgjOZjhYSTRAXJdv79MJ+/C2Z7wWQWdsv7j+LtyLLMKqExX1qCZYIX5nibTEZ6
+         jc8cIvxT3RGlXTr7inne5Yhd8IA7RAQydJM1cLteF1QpIlb05m42SQSAIkKaGDKYaEpP
+         EJNEewLtu7b/6/J/Xy1oDwRkT7Bi1CZLk+XwW+oxuSu25VS/iiTDpmWlTbOu1NkDTaxi
+         gp4A==
+X-Gm-Message-State: AOJu0YxxMXxkYg9ZuyTfKRFW6LzPuWUiEATH6p52b6PlFECJN5WJo70d
+	qomRfrthKaJw6JKJJZ1FLOp1yyKW+FTzO5qlsP4U61C0LpBQ0gkXqrJtNpMYvOE2tKa1Ojd751D
+	o5LzE+0vfazdb
+X-Received: by 2002:ac2:42c3:0:b0:509:2b82:4ce8 with SMTP id n3-20020ac242c3000000b005092b824ce8mr1849299lfl.42.1698742809669;
+        Tue, 31 Oct 2023 02:00:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE3S35L/UQTy/U7yQi8+SVu+0V8xB9AoTI/4Vdd4oeEJ0oJwQJPeCjGFyCZnVrk7tqVWNUWCQ==
+X-Received: by 2002:ac2:42c3:0:b0:509:2b82:4ce8 with SMTP id n3-20020ac242c3000000b005092b824ce8mr1849274lfl.42.1698742809259;
+        Tue, 31 Oct 2023 02:00:09 -0700 (PDT)
+Received: from redhat.com ([2.52.26.150])
+        by smtp.gmail.com with ESMTPSA id e13-20020a056000194d00b003142e438e8csm998743wry.26.2023.10.31.02.00.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Oct 2023 01:58:03 -0700 (PDT)
-Date: Tue, 31 Oct 2023 11:58:00 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-	kvm@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] KVM: Add missing fput() on error path
-Message-ID: <64117a7f-ece5-42b1-a88a-3a1412f76dca@moroto.mountain>
+        Tue, 31 Oct 2023 02:00:08 -0700 (PDT)
+Date: Tue, 31 Oct 2023 05:00:04 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Yishai Hadas <yishaih@nvidia.com>
+Cc: alex.williamson@redhat.com, jasowang@redhat.com, jgg@nvidia.com,
+	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	parav@nvidia.com, feliu@nvidia.com, jiri@nvidia.com,
+	kevin.tian@intel.com, joao.m.martins@oracle.com,
+	si-wei.liu@oracle.com, leonro@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH V2 vfio 6/9] virtio-pci: Introduce APIs to execute legacy
+ IO admin commands
+Message-ID: <20231031045933-mutt-send-email-mst@kernel.org>
+References: <20231029155952.67686-1-yishaih@nvidia.com>
+ <20231029155952.67686-7-yishaih@nvidia.com>
+ <20231031040403-mutt-send-email-mst@kernel.org>
+ <3a7c776d-1e5a-4c8d-b91e-9da5fe91db32@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -74,30 +86,19 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+In-Reply-To: <3a7c776d-1e5a-4c8d-b91e-9da5fe91db32@nvidia.com>
 
-Call fput() on this error path.
+On Tue, Oct 31, 2023 at 10:30:41AM +0200, Yishai Hadas wrote:
+> > And further, is caller expected not to invoke several of these
+> > in parallel on the same device? If yes this needs to be
+> > documented. I don't see where does vfio enforce this if yes.
+> Please have a look at virtiovf_issue_legacy_rw_cmd() from patch #9.
+> 
+> It has a lock on its VF device to serialize access to the bar, it includes
+> calling this API.
+> 
+> Yishai
 
-Fixes: fcbef1e5e5d2 ("KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific backing memory")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- virt/kvm/guest_memfd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 7f62abe3df9e..039f1bb70a0c 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -473,7 +473,7 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
- 	inode = file_inode(file);
- 
- 	if (offset < 0 || !PAGE_ALIGNED(offset))
--		return -EINVAL;
-+		goto err;
- 
- 	if (offset + size > i_size_read(inode))
- 		goto err;
--- 
-2.42.0
+OK so if caller must serialize accesses then please document this assumption.
 
 
