@@ -1,153 +1,139 @@
-Return-Path: <kvm+bounces-193-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-194-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E50C7DCE99
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 15:05:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E215F7DCE9A
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 15:05:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF327B21096
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 14:05:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DC801C20CA9
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 14:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 747311DDF6;
-	Tue, 31 Oct 2023 14:04:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A1541DDDE;
+	Tue, 31 Oct 2023 14:05:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FrCK2BdF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KTRbEKlR"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20345255
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 14:04:55 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66069F4
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:04:53 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-da033914f7cso5397201276.0
-        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:04:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698761092; x=1699365892; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZsemryN+7v+wOBolNu7Hy0wHrULeaB9eFsfVkGp1/e8=;
-        b=FrCK2BdFm4j45mpD+yVokt411jGTt+mhy/sd2Vi1orDmdUK8qPAg6Jm9kdANvFkCjX
-         D442v8pY1sA/+tReHxcAfbkggmdQRySJHmw3dTDtt9FzVamFAh2sclv3iu1KjT281u72
-         7OuE3iL6KlaPE3tSJOcImXWWHQaTRoacU/ptNs1BHPkG77XA6Bw0RcLbLqKCAeiMEx7Q
-         8mt4dKfkx4h/coDYAysMLp5puGQCmD7YT6/nDvz6i+9Nya+wAS0B2PwzR10/ytE10XVW
-         damMDw/uLdR0ixdVowm64jHzCLEN7U/q9ybNbp3O+mIRh/VfbCYgW3gtAP5+mBumgGnY
-         MPlw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF92C1DDDC
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 14:05:19 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D5EDDE
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:05:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698761117;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=b3+IDD/zfis6WmMbv8JkX7GvGsvp9oF9UGR72Q5DJxI=;
+	b=KTRbEKlR93ESGdIUDLmON428qOaCkAwmr03f+HJwbMTFe3ZDGJu4Xbz6AvR4cYKelJQgTI
+	bY+WDqndJW9RQYM26dEK3WpurAdHoCPrPHKVHg8aK50EQqCkmL9Q4F6nnHxsjbNfG7J7AG
+	jpn6kvLdNumUHfjOW2QankrJN5hIjdc=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-596-1l1-oz77Mni4CsRz4MEVIQ-1; Tue, 31 Oct 2023 10:05:05 -0400
+X-MC-Unique: 1l1-oz77Mni4CsRz4MEVIQ-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-53e2acda9d6so4302429a12.2
+        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:05:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698761092; x=1699365892;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZsemryN+7v+wOBolNu7Hy0wHrULeaB9eFsfVkGp1/e8=;
-        b=uy4zFw6OguF6IqPB8+zOTp/+8UyeBL6cdKZ/nDolhXg7Bi/Wk2awU3Ux/WcOnFXgtO
-         HMgXmtD4JgLGSP8D96CSk5zfLpBVvVhlKqCsxCb8dvZJfvC2L7ANj8n2bigVlNnZNNNn
-         ysVKJyQuh5RJz0asjZdJ9PcjSJY/w31Zce1+GT9ahBnNqTga2Pb/5Y998cBbU43F+29x
-         AzkDnQFNYobmqIURowBAqFe+auGsX55kEhiqBRt6k9hJGLkBHcQD4HwsLAsBedEBlrWm
-         3cRKB5B2dHNfM3Go/B17f18SyR6zp5vUXSaM8Dq7T1oH6AbZVddz3tcc0T2FFeUQ27Gc
-         uSrw==
-X-Gm-Message-State: AOJu0Yxad+5XgMJDk2COM3FW+J0d4OYPc2AL+NwYJA8tUr1ye/qtM7w4
-	6/DZCNxMGxPKaOhQbhA0GzdJwS+B8GI=
-X-Google-Smtp-Source: AGHT+IGMRYf422gsAhq04hJnKRMCzmHg+RO6tAl4JuMhPFGeve1lxsPBrReypZbUvK9g95iFN5O303NMZlw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1083:b0:d9a:c3b8:4274 with SMTP id
- v3-20020a056902108300b00d9ac3b84274mr301710ybu.7.1698761092559; Tue, 31 Oct
- 2023 07:04:52 -0700 (PDT)
-Date: Tue, 31 Oct 2023 07:04:51 -0700
-In-Reply-To: <2edd908a-9699-4d8e-9063-c655f1fc9712@intel.com>
+        d=1e100.net; s=20230601; t=1698761103; x=1699365903;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b3+IDD/zfis6WmMbv8JkX7GvGsvp9oF9UGR72Q5DJxI=;
+        b=jJ1W+Z2H5VSzdEt4Q7EprDkYc8/QhdJXqdcRQ57Ktj4wU0Ib/Goggo6iVUDys7w4Yg
+         xHL+XZKvvhewbTLFFbY+xAAKsW7AuMx1WvK1Y341OpvqTWHK88MtOLgjI6/Hi2KN5fuu
+         e744EZ77VH4mARL1PCnPADR6iz1Rs8/eWQxI+bblThalkt5EaUn1A24Mj1BJAarGZAwf
+         9AErOjc6i6XOP8FZsrhFUdwG/KFiGm/C5Q6RN95crCj55ehD1MgB76SRXgc69k3aVyhB
+         7g7h8p1OUo2XrGh9YMrATyKijDm1e2V0kVjlAC3bnHra5QTrKmSxE3BIl00Kv7FbuG2O
+         6ERQ==
+X-Gm-Message-State: AOJu0Yw7eys3Na8Z1mZMB3HkB7DYyZTmQdbyiP/CDB56UU29AYnKYoFo
+	k5SvPhn/sWUtOtd+lddi2DbRT2j9lCYrl2uY8KUN9DgFPaWOM8Meu7mvLamjQcT53bZThTQWTdq
+	+Ea4zL3NfybHH
+X-Received: by 2002:a50:9f21:0:b0:543:5b61:6908 with SMTP id b30-20020a509f21000000b005435b616908mr2688972edf.18.1698761103186;
+        Tue, 31 Oct 2023 07:05:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG/3bnW3ujZbhhfg09W20sfZCeii3XoDwWmA9FyvDCB0gAGy5rkuqM3n7qS5VM/IUq0Q0gU9Q==
+X-Received: by 2002:a50:9f21:0:b0:543:5b61:6908 with SMTP id b30-20020a509f21000000b005435b616908mr2688949edf.18.1698761102840;
+        Tue, 31 Oct 2023 07:05:02 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id f18-20020a50a6d2000000b0053e5f67d637sm1199012edc.9.2023.10.31.07.05.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 Oct 2023 07:05:02 -0700 (PDT)
+Message-ID: <27596365-7796-4009-9bd1-b4640b03bb5b@redhat.com>
+Date: Tue, 31 Oct 2023 15:04:59 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-9-seanjc@google.com>
- <2edd908a-9699-4d8e-9063-c655f1fc9712@intel.com>
-Message-ID: <ZUEJg_rBf35NyCG3@google.com>
-Subject: Re: [PATCH v13 08/35] KVM: Introduce KVM_SET_USER_MEMORY_REGION2
-From: Sean Christopherson <seanjc@google.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xu Yilun <yilun.xu@intel.com>, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
-	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: Add missing fput() on error path
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>,
+ Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Michael Roth <michael.roth@amd.com>, Ackerley Tng
+ <ackerleytng@google.com>,
+ "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, kvm@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
+References: <64117a7f-ece5-42b1-a88a-3a1412f76dca@moroto.mountain>
+ <ZUEJUQYiszUISROL@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <ZUEJUQYiszUISROL@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 31, 2023, Xiaoyao Li wrote:
-> On 10/28/2023 2:21 AM, Sean Christopherson wrote:
-> > Introduce a "version 2" of KVM_SET_USER_MEMORY_REGION so that additional
-> > information can be supplied without setting userspace up to fail.  The
-> > padding in the new kvm_userspace_memory_region2 structure will be used to
-> > pass a file descriptor in addition to the userspace_addr, i.e. allow
-> > userspace to point at a file descriptor and map memory into a guest that
-> > is NOT mapped into host userspace.
-> > 
-> > Alternatively, KVM could simply add "struct kvm_userspace_memory_region2"
-> > without a new ioctl(), but as Paolo pointed out, adding a new ioctl()
-> > makes detection of bad flags a bit more robust, e.g. if the new fd field
-> > is guarded only by a flag and not a new ioctl(), then a userspace bug
-> > (setting a "bad" flag) would generate out-of-bounds access instead of an
-> > -EINVAL error.
-> > 
-> > Cc: Jarkko Sakkinen <jarkko@kernel.org>
-> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   Documentation/virt/kvm/api.rst | 21 +++++++++++++++++++
-> >   arch/x86/kvm/x86.c             |  2 +-
-> >   include/linux/kvm_host.h       |  4 ++--
-> >   include/uapi/linux/kvm.h       | 13 ++++++++++++
-> >   virt/kvm/kvm_main.c            | 38 +++++++++++++++++++++++++++-------
-> >   5 files changed, 67 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index 21a7578142a1..ace984acc125 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -6070,6 +6070,27 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the SET_ONE_REG
-> >   interface. No error will be returned, but the resulting offset will not be
-> >   applied.
-> > +4.139 KVM_SET_USER_MEMORY_REGION2
-> > +---------------------------------
-> > +
-> > +:Capability: KVM_CAP_USER_MEMORY2
-> > +:Architectures: all
-> > +:Type: vm ioctl
-> > +:Parameters: struct kvm_userspace_memory_region2 (in)
-> > +:Returns: 0 on success, -1 on error
-> > +
-> > +::
-> > +
-> > +  struct kvm_userspace_memory_region2 {
-> > +	__u32 slot;
-> > +	__u32 flags;
-> > +	__u64 guest_phys_addr;
-> > +	__u64 memory_size; /* bytes */
-> > +	__u64 userspace_addr; /* start of the userspace allocated memory */
+On 10/31/23 15:04, Sean Christopherson wrote:
+>>   
+>>   	if (offset < 0 || !PAGE_ALIGNED(offset))
+>> -		return -EINVAL;
+>> +		goto err;
+> Gah, I messed up when squashing a fix for v13.
 > 
-> missing
-> 
-> 	__u64 pad[16];
+> Paolo, assuming you're grabbing all the fixups for v14, please apply this one too.
 
-I can't even copy+paste correctly :-(
+Yes, it was already on my list. :)
+
+Paolo
+
 
