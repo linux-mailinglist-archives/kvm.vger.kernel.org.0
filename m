@@ -1,139 +1,205 @@
-Return-Path: <kvm+bounces-194-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-195-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E215F7DCE9A
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 15:05:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EB247DCEC9
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 15:09:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DC801C20CA9
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 14:05:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 861A6B20ED4
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 14:09:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A1541DDDE;
-	Tue, 31 Oct 2023 14:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509951DDF6;
+	Tue, 31 Oct 2023 14:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KTRbEKlR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y/23c6aF"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF92C1DDDC
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 14:05:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB141DDE0
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 14:09:42 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D5EDDE
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:05:18 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4CFDD73
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:09:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698761117;
+	s=mimecast20190719; t=1698761373;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=b3+IDD/zfis6WmMbv8JkX7GvGsvp9oF9UGR72Q5DJxI=;
-	b=KTRbEKlR93ESGdIUDLmON428qOaCkAwmr03f+HJwbMTFe3ZDGJu4Xbz6AvR4cYKelJQgTI
-	bY+WDqndJW9RQYM26dEK3WpurAdHoCPrPHKVHg8aK50EQqCkmL9Q4F6nnHxsjbNfG7J7AG
-	jpn6kvLdNumUHfjOW2QankrJN5hIjdc=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references;
+	bh=PSrlOFadgRmkp59Ps7hIlpBA3Ozc75gF0uiWtS5xZoA=;
+	b=Y/23c6aFjjs3bhvH84JvOZiYdApSznDOBFfWjNjzF1txxrmdM/zm6h+j0ObO6LpUBr/AY5
+	4V8MNn1mcaSju1Mi892LXAvUBiylEXCpoY7h7BcI4T3uopULE+8R6ciaZCy0XRpSbTbXEI
+	n1Oqu+z0eqRa9L1+p17+hJkB/WbAwbw=
+Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com
+ [209.85.160.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-596-1l1-oz77Mni4CsRz4MEVIQ-1; Tue, 31 Oct 2023 10:05:05 -0400
-X-MC-Unique: 1l1-oz77Mni4CsRz4MEVIQ-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-53e2acda9d6so4302429a12.2
-        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:05:04 -0700 (PDT)
+ us-mta-434--xgYP_o_NBWjbLNRGbRRTA-1; Tue, 31 Oct 2023 10:09:31 -0400
+X-MC-Unique: -xgYP_o_NBWjbLNRGbRRTA-1
+Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-1dd886536f2so7477454fac.3
+        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 07:09:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698761103; x=1699365903;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b3+IDD/zfis6WmMbv8JkX7GvGsvp9oF9UGR72Q5DJxI=;
-        b=jJ1W+Z2H5VSzdEt4Q7EprDkYc8/QhdJXqdcRQ57Ktj4wU0Ib/Goggo6iVUDys7w4Yg
-         xHL+XZKvvhewbTLFFbY+xAAKsW7AuMx1WvK1Y341OpvqTWHK88MtOLgjI6/Hi2KN5fuu
-         e744EZ77VH4mARL1PCnPADR6iz1Rs8/eWQxI+bblThalkt5EaUn1A24Mj1BJAarGZAwf
-         9AErOjc6i6XOP8FZsrhFUdwG/KFiGm/C5Q6RN95crCj55ehD1MgB76SRXgc69k3aVyhB
-         7g7h8p1OUo2XrGh9YMrATyKijDm1e2V0kVjlAC3bnHra5QTrKmSxE3BIl00Kv7FbuG2O
-         6ERQ==
-X-Gm-Message-State: AOJu0Yw7eys3Na8Z1mZMB3HkB7DYyZTmQdbyiP/CDB56UU29AYnKYoFo
-	k5SvPhn/sWUtOtd+lddi2DbRT2j9lCYrl2uY8KUN9DgFPaWOM8Meu7mvLamjQcT53bZThTQWTdq
-	+Ea4zL3NfybHH
-X-Received: by 2002:a50:9f21:0:b0:543:5b61:6908 with SMTP id b30-20020a509f21000000b005435b616908mr2688972edf.18.1698761103186;
-        Tue, 31 Oct 2023 07:05:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG/3bnW3ujZbhhfg09W20sfZCeii3XoDwWmA9FyvDCB0gAGy5rkuqM3n7qS5VM/IUq0Q0gU9Q==
-X-Received: by 2002:a50:9f21:0:b0:543:5b61:6908 with SMTP id b30-20020a509f21000000b005435b616908mr2688949edf.18.1698761102840;
-        Tue, 31 Oct 2023 07:05:02 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id f18-20020a50a6d2000000b0053e5f67d637sm1199012edc.9.2023.10.31.07.05.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Oct 2023 07:05:02 -0700 (PDT)
-Message-ID: <27596365-7796-4009-9bd1-b4640b03bb5b@redhat.com>
-Date: Tue, 31 Oct 2023 15:04:59 +0100
+        d=1e100.net; s=20230601; t=1698761370; x=1699366170;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PSrlOFadgRmkp59Ps7hIlpBA3Ozc75gF0uiWtS5xZoA=;
+        b=M53r166veed3kl0pRuqRzWYnxqAtF9rskzLBiv3jjpE0cUZuiMb5RcYbwEKLlWNu5k
+         nKdbEqC97lWMmyHdfIGIMba0CXPnC1z/PIiDX4vEmv+Z0meuLIZ5Lp/v2lwiYCwzykAS
+         QyAewXWXGV1ghrhWuyyteIxT4uaC5cCh41HAU9VsEk8ih2bPthlU9lInI6rGdZjGRWPd
+         k1WjJRmUUf4KFTgwA0SRp5WTAuOmAruZwfI1XR6+EZzy+VYQv5ixmbaklYWoOfJ3uoWL
+         bLxiCQVDEoQGpH7tnsPegwxQiBnduuKnucZQeqqh25SYvpz7q8SkhxYXVry7GwbOFt5z
+         H3iQ==
+X-Gm-Message-State: AOJu0Yws/cSK3mztxKIWBByuw/UBgEb932x7WU0PJyZCIVutLW+hRh16
+	Uk5LBjI7++sLRYyC0Mvn9Fg+zml9zoI4TC47LFZ640SB9ncZOta4wLifjbDmZbQpfB20t9nOZQV
+	lohdpbCxaYTRN7a2WKSQIr/GEkTfeXUgnqQ40
+X-Received: by 2002:a05:6870:180d:b0:1e9:c18b:b2da with SMTP id t13-20020a056870180d00b001e9c18bb2damr14768259oaf.18.1698761369988;
+        Tue, 31 Oct 2023 07:09:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFH5Kh6RCGV+88rrPsi6GN5YEaQ4HK/udqjWpjbov/sleXyyQzFEyt1SUvx/PitO+ubDGHgzNiGoOwUb15AZaU=
+X-Received: by 2002:a05:6870:180d:b0:1e9:c18b:b2da with SMTP id
+ t13-20020a056870180d00b001e9c18bb2damr14768241oaf.18.1698761369717; Tue, 31
+ Oct 2023 07:09:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: Add missing fput() on error path
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>,
- Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Michael Roth <michael.roth@amd.com>, Ackerley Tng
- <ackerleytng@google.com>,
- "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, kvm@vger.kernel.org,
- kernel-janitors@vger.kernel.org
-References: <64117a7f-ece5-42b1-a88a-3a1412f76dca@moroto.mountain>
- <ZUEJUQYiszUISROL@google.com>
+References: <20231005091825.3207300-1-chenhuacai@loongson.cn>
+In-Reply-To: <20231005091825.3207300-1-chenhuacai@loongson.cn>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <ZUEJUQYiszUISROL@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Date: Tue, 31 Oct 2023 15:09:17 +0100
+Message-ID: <CABgObfZt+bEV2Ho5guX3=2eqJnBxt01D5tp6J-_VZuK1=JiWew@mail.gmail.com>
+Subject: Re: [GIT PULL] LoongArch KVM changes for v6.7
+To: Huacai Chen <chenhuacai@loongson.cn>
+Cc: Huacai Chen <chenhuacai@kernel.org>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Xuerui Wang <kernel@xen0n.name>, 
+	Jiaxun Yang <jiaxun.yang@flygoat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/31/23 15:04, Sean Christopherson wrote:
->>   
->>   	if (offset < 0 || !PAGE_ALIGNED(offset))
->> -		return -EINVAL;
->> +		goto err;
-> Gah, I messed up when squashing a fix for v13.
-> 
-> Paolo, assuming you're grabbing all the fixups for v14, please apply this one too.
+On Thu, Oct 5, 2023 at 11:28=E2=80=AFAM Huacai Chen <chenhuacai@loongson.cn=
+> wrote:
+>
+> The following changes since commit 8a749fd1a8720d4619c91c8b6e7528c0a355c0=
+aa:
+>
+>   Linux 6.6-rc4 (2023-10-01 14:15:13 -0700)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson=
+.git tags/loongarch-kvm-6.7
+>
+> for you to fetch changes up to 2c10cda4b777be4be9d9e69e4f70c818dbb15e21:
+>
+>   LoongArch: KVM: Add maintainers for LoongArch KVM (2023-10-02 10:01:29 =
++0800)
 
-Yes, it was already on my list. :)
+Pulled, thanks.
 
 Paolo
+
+>
+> ----------------------------------------------------------------
+> LoongArch KVM changes for v6.7
+>
+> Add LoongArch's KVM support. Loongson 3A5000/3A6000 supports hardware
+> assisted virtualization. With cpu virtualization, there are separate
+> hw-supported user mode and kernel mode in guest mode. With memory
+> virtualization, there are two-level hw mmu table for guest mode and host
+> mode. Also there is separate hw cpu timer with consant frequency in
+> guest mode, so that vm can migrate between hosts with different freq.
+> Currently, we are able to boot LoongArch Linux guests.
+>
+> Few key aspects of KVM LoongArch added by this series are:
+> 1. Enable kvm hardware features when kvm module is loaded.
+> 2. Implement VM and vcpu related ioctl interface such as vcpu create,
+>    vcpu run etc. GET_ONE_REG/SET_ONE_REG ioctl commands are use to
+>    get general registers one by one.
+> 3. Hardware access about MMU, timer and csr are emulated in kernel.
+> 4. Hardwares such as mmio and iocsr device are emulated in user space
+>    such as IPI, irqchips, pci devices etc.
+>
+> ----------------------------------------------------------------
+> Tianrui Zhao (25):
+>       LoongArch: KVM: Add kvm related header files
+>       LoongArch: KVM: Implement kvm module related interface
+>       LoongArch: KVM: Implement kvm hardware enable, disable interface
+>       LoongArch: KVM: Implement VM related functions
+>       LoongArch: KVM: Add vcpu related header files
+>       LoongArch: KVM: Implement basic vcpu interfaces
+>       LoongArch: KVM: Implement basic vcpu ioctl interfaces
+>       LoongArch: KVM: Implement fpu operations for vcpu
+>       LoongArch: KVM: Implement vcpu interrupt operations
+>       LoongArch: KVM: Implement vcpu load and vcpu put operations
+>       LoongArch: KVM: Implement misc vcpu related interfaces
+>       LoongArch: KVM: Implement vcpu timer operations
+>       LoongArch: KVM: Implement virtual machine tlb operations
+>       LoongArch: KVM: Implement kvm mmu operations
+>       LoongArch: KVM: Implement handle csr exception
+>       LoongArch: KVM: Implement handle iocsr exception
+>       LoongArch: KVM: Implement handle idle exception
+>       LoongArch: KVM: Implement handle gspr exception
+>       LoongArch: KVM: Implement handle mmio exception
+>       LoongArch: KVM: Implement handle fpu exception
+>       LoongArch: KVM: Implement kvm exception vectors
+>       LoongArch: KVM: Implement vcpu world switch
+>       LoongArch: KVM: Enable kvm config and add the makefile
+>       LoongArch: KVM: Supplement kvm document about LoongArch-specific pa=
+rt
+>       LoongArch: KVM: Add maintainers for LoongArch KVM
+>
+>  Documentation/virt/kvm/api.rst             |  70 ++-
+>  MAINTAINERS                                |  12 +
+>  arch/loongarch/Kbuild                      |   2 +
+>  arch/loongarch/Kconfig                     |   6 +
+>  arch/loongarch/configs/loongson3_defconfig |   2 +
+>  arch/loongarch/include/asm/inst.h          |  16 +
+>  arch/loongarch/include/asm/kvm_csr.h       | 211 +++++++
+>  arch/loongarch/include/asm/kvm_host.h      | 237 ++++++++
+>  arch/loongarch/include/asm/kvm_mmu.h       | 139 +++++
+>  arch/loongarch/include/asm/kvm_types.h     |  11 +
+>  arch/loongarch/include/asm/kvm_vcpu.h      |  93 +++
+>  arch/loongarch/include/asm/loongarch.h     |  19 +-
+>  arch/loongarch/include/uapi/asm/kvm.h      | 108 ++++
+>  arch/loongarch/kernel/asm-offsets.c        |  32 +
+>  arch/loongarch/kvm/Kconfig                 |  40 ++
+>  arch/loongarch/kvm/Makefile                |  22 +
+>  arch/loongarch/kvm/exit.c                  | 696 +++++++++++++++++++++
+>  arch/loongarch/kvm/interrupt.c             | 183 ++++++
+>  arch/loongarch/kvm/main.c                  | 420 +++++++++++++
+>  arch/loongarch/kvm/mmu.c                   | 914 +++++++++++++++++++++++=
++++++
+>  arch/loongarch/kvm/switch.S                | 250 ++++++++
+>  arch/loongarch/kvm/timer.c                 | 197 ++++++
+>  arch/loongarch/kvm/tlb.c                   |  32 +
+>  arch/loongarch/kvm/trace.h                 | 162 +++++
+>  arch/loongarch/kvm/vcpu.c                  | 939 +++++++++++++++++++++++=
+++++++
+>  arch/loongarch/kvm/vm.c                    |  94 +++
+>  include/uapi/linux/kvm.h                   |   9 +
+>  27 files changed, 4902 insertions(+), 14 deletions(-)
+>  create mode 100644 arch/loongarch/include/asm/kvm_csr.h
+>  create mode 100644 arch/loongarch/include/asm/kvm_host.h
+>  create mode 100644 arch/loongarch/include/asm/kvm_mmu.h
+>  create mode 100644 arch/loongarch/include/asm/kvm_types.h
+>  create mode 100644 arch/loongarch/include/asm/kvm_vcpu.h
+>  create mode 100644 arch/loongarch/include/uapi/asm/kvm.h
+>  create mode 100644 arch/loongarch/kvm/Kconfig
+>  create mode 100644 arch/loongarch/kvm/Makefile
+>  create mode 100644 arch/loongarch/kvm/exit.c
+>  create mode 100644 arch/loongarch/kvm/interrupt.c
+>  create mode 100644 arch/loongarch/kvm/main.c
+>  create mode 100644 arch/loongarch/kvm/mmu.c
+>  create mode 100644 arch/loongarch/kvm/switch.S
+>  create mode 100644 arch/loongarch/kvm/timer.c
+>  create mode 100644 arch/loongarch/kvm/tlb.c
+>  create mode 100644 arch/loongarch/kvm/trace.h
+>  create mode 100644 arch/loongarch/kvm/vcpu.c
+>  create mode 100644 arch/loongarch/kvm/vm.c
+>
 
 
