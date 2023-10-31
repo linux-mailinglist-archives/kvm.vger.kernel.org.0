@@ -1,98 +1,132 @@
-Return-Path: <kvm+bounces-175-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-179-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F42317DC9B4
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 10:35:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44BDF7DCA4D
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 10:59:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8189D2817B5
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 09:35:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1F0B1F220CE
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 09:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12C1315AE8;
-	Tue, 31 Oct 2023 09:35:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0966818C10;
+	Tue, 31 Oct 2023 09:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XiGoT1lp"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324D413AE5
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 09:35:12 +0000 (UTC)
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEC41BB
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 02:35:09 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-102-NPlOFUtyOJyGU0BiTK64og-1; Tue, 31 Oct 2023 09:35:07 +0000
-X-MC-Unique: NPlOFUtyOJyGU0BiTK64og-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 31 Oct
- 2023 09:35:23 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Tue, 31 Oct 2023 09:35:23 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: =?utf-8?B?J0pvc8OpIFBla2thcmluZW4n?= <jose.pekkarinen@foxhound.fi>,
-	"seanjc@google.com" <seanjc@google.com>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "tglx@linutronix.de" <tglx@linutronix.de>,
-	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"skhan@linuxfoundation.org" <skhan@linuxfoundation.org>
-CC: "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-	"linux-kernel-mentees@lists.linuxfoundation.org"
-	<linux-kernel-mentees@lists.linuxfoundation.org>
-Subject: RE: [PATCH] KVM: x86: replace do_div with div64_ul
-Thread-Topic: [PATCH] KVM: x86: replace do_div with div64_ul
-Thread-Index: AQHaCkzW1Xnt8sZ59Em+v+kyKOU1sLBjphAA
-Date: Tue, 31 Oct 2023 09:35:23 +0000
-Message-ID: <23f90fd3273a4d7f961b277758ac7af8@AcuMS.aculab.com>
-References: <20231029093928.138570-1-jose.pekkarinen@foxhound.fi>
-In-Reply-To: <20231029093928.138570-1-jose.pekkarinen@foxhound.fi>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB6D13AD4
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 09:59:36 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 321CE97
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 02:59:35 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39V9BIui028144
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 09:59:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=UFEf31kd8bpnRCU/TRhpjNYx01qWnhWVgJhB/qeKdLY=;
+ b=XiGoT1lpsjPLrUN2/VLpbjQ59XejP1b6O+W9XNDgBpWttX8dd0CDEcsZiocxDI6VBtnj
+ ZhrezTtUnJ4+c/Xedm8n+vUscw7giIhBRPg7rPItLe8Wezj7MfQLZfowm8xsuUoPRaVf
+ dv5mPzBz90pF4KzjGc9GcEvvkCV5wN+eWG5/+5TElroj/ThUWFk8uCgvTA9K3JYGUpPN
+ xQzXTxzgggyUTNcy2mjIf5NNjtzicE90M2T4zbhQJsr5wtc4BcXvxyzhQU86a0Md0f0H
+ QeVS/SOU3xg0vk/x7g1C5QzvZG9CAZsclz8MxHVz0oyUgfTxbwRigmTwOXMypJc8uG5d Kw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u2x3au264-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 09:59:34 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39V9fDk0013105
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 09:59:34 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u2x3au0vs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 31 Oct 2023 09:59:22 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39V83GsJ007734;
+	Tue, 31 Oct 2023 09:55:57 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u1dmnffay-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 31 Oct 2023 09:55:57 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39V9tr2O39453060
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 31 Oct 2023 09:55:53 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C6A192004D;
+	Tue, 31 Oct 2023 09:55:53 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A106620043;
+	Tue, 31 Oct 2023 09:55:53 +0000 (GMT)
+Received: from a46lp67.. (unknown [9.152.108.100])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 31 Oct 2023 09:55:53 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: kvm@vger.kernel.org
+Cc: nrb@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
+        david@redhat.com
+Subject: [kvm-unit-tests PATCH v2 0/3] s390x: Improve console handling
+Date: Tue, 31 Oct 2023 09:55:16 +0000
+Message-Id: <20231031095519.73311-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: uNHy4uPsyMd8qpIqhE9KLyu96kSTEwR8
+X-Proofpoint-GUID: aqB58hJ30QqM8LhL7h9yjafo11y5ESMp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-30_13,2023-10-31_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=383 bulkscore=0 spamscore=0 suspectscore=0 adultscore=0
+ mlxscore=0 priorityscore=1501 malwarescore=0 clxscore=1015
+ lowpriorityscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2310240000 definitions=main-2310310078
 
-RnJvbTogSm9zw6kgUGVra2FyaW5lbg0KPiBTZW50OiAyOSBPY3RvYmVyIDIwMjMgMDk6MzkNCj4g
-DQo+IFJlcG9ydGVkIGJ5IGNvY2NpbmVsbGUsIHRoZXJlIGlzIGEgZG9fZGl2IGNhbGwgdGhhdCBk
-b2VzDQo+IDY0LWJ5LTMyIGRpdmlzaW9ucyBldmVuIGluIDY0Yml0IHBsYXRmb3JtcywgdGhpcyBw
-YXRjaCB3aWxsDQo+IG1vdmUgaXQgdG8gZGl2NjRfdWwgbWFjcm8gdGhhdCB3aWxsIGRlY2lkZSB0
-aGUgY29ycmVjdA0KPiBkaXZpc2lvbiBmdW5jdGlvbiBmb3IgdGhlIHBsYXRmb3JtIHVuZGVybmVh
-dGguIFRoZSBvdXRwdXQNCj4gdGhlIHdhcm5pbmcgZm9sbG93czoNCj4gDQo+IGFyY2gveDg2L2t2
-bS9sYXBpYy5jOjE5NDg6MS03OiBXQVJOSU5HOiBkb19kaXYoKSBkb2VzIGEgNjQtYnktMzIgZGl2
-aXNpb24sIHBsZWFzZSBjb25zaWRlciB1c2luZw0KPiBkaXY2NF91bCBpbnN0ZWFkLg0KDQpUaGF0
-IGlzIGFib3V0IHRoZSB3b3JzdCBtZXNzYWdlIGZyb20gdGhlIGNvY2NpbmVsbGUgc2NyaXB0cy4N
-Ckl0IHJlYWxseSBvdWdodCB0byBhc2sgeW91IHRvIGNoZWNrIHRoZSBkb21haW4gb24gdGhlIHZh
-bHVlcy4NCg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSm9zw6kgUGVra2FyaW5lbiA8am9zZS5wZWtr
-YXJpbmVuQGZveGhvdW5kLmZpPg0KPiAtLS0NCj4gIGFyY2gveDg2L2t2bS9sYXBpYy5jIHwgMiAr
-LQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pDQo+IA0K
-PiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL2xhcGljLmMgYi9hcmNoL3g4Ni9rdm0vbGFwaWMu
-Yw0KPiBpbmRleCAzZTk3N2RiYmY5OTMuLjBiOTBjNmFkNTA5MSAxMDA2NDQNCj4gLS0tIGEvYXJj
-aC94ODYva3ZtL2xhcGljLmMNCj4gKysrIGIvYXJjaC94ODYva3ZtL2xhcGljLmMNCj4gQEAgLTE5
-NDUsNyArMTk0NSw3IEBAIHN0YXRpYyB2b2lkIHN0YXJ0X3N3X3RzY2RlYWRsaW5lKHN0cnVjdCBr
-dm1fbGFwaWMgKmFwaWMpDQo+ICAJZ3Vlc3RfdHNjID0ga3ZtX3JlYWRfbDFfdHNjKHZjcHUsIHJk
-dHNjKCkpOw0KPiANCj4gIAlucyA9ICh0c2NkZWFkbGluZSAtIGd1ZXN0X3RzYykgKiAxMDAwMDAw
-VUxMOw0KPiAtCWRvX2RpdihucywgdGhpc190c2Nfa2h6KTsNCj4gKwlkaXY2NF91bChucywgdGhp
-c190c2Nfa2h6KTsNCg0KRGlkIHlvdSB0ZXN0IHRoaXM/DQpIaW50IC0geW91IGRpZG4ndC4NCg0K
-CURhdmlkDQoNCj4gDQo+ICAJaWYgKGxpa2VseSh0c2NkZWFkbGluZSA+IGd1ZXN0X3RzYykgJiYN
-Cj4gIAkgICAgbGlrZWx5KG5zID4gYXBpYy0+bGFwaWNfdGltZXIudGltZXJfYWR2YW5jZV9ucykp
-IHsNCj4gLS0NCj4gMi4zOS4yDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJh
-bWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0
-cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
+Console IO is and has been in a state of "works for me". I don't think
+that will change soon since there's no need for a proper console
+driver when all we want is the ability to print or read a line at a
+time.
+
+However since input is only supported on the ASCII console I was
+forced to use it on the HMC. The HMC generally does not add a \r on a
+\n so each line doesn't start at column 0. It's time to finally fix
+that.
+
+Also, since there are environments that only provide the line-mode
+console it's time to add line-mode input to properly support them.
+
+v2:
+	* Reworked detect_host routine to support being called in early setup
+	* Added length checks in sclp_print_ascii for compat handling
+	* Added Linux reference to lib/s390x/sclp-console.c header
+v1:
+	* Fenced ASCII compat handling so it's only use in LPAR
+	* Squashed compat handling into one patch
+	* Added an early detect_host since SCLP might be used in setup
+	* Fixed up a few formatting issues in input patch
+	* Fixed up copyright stuff
+
+Janosch Frank (3):
+  lib: s390x: hw: rework do_detect_host so we don't need allocation
+  lib: s390x: sclp: Add compat handling for HMC ASCII consoles
+  lib: s390x: sclp: Add line mode input handling
+
+ lib/s390x/hardware.c     |  11 +--
+ lib/s390x/sclp-console.c | 206 +++++++++++++++++++++++++++++++++++----
+ lib/s390x/sclp.h         |  26 ++++-
+ 3 files changed, 215 insertions(+), 28 deletions(-)
+
+-- 
+2.34.1
 
 
