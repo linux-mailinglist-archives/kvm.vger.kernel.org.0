@@ -1,161 +1,324 @@
-Return-Path: <kvm+bounces-146-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-147-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 344637DC382
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 01:21:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C26347DC464
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 03:26:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B96B2B20C4E
-	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 00:21:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B50B61C20B59
+	for <lists+kvm@lfdr.de>; Tue, 31 Oct 2023 02:26:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A463807;
-	Tue, 31 Oct 2023 00:20:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 957FD5257;
+	Tue, 31 Oct 2023 02:26:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DutbvxFd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lzqfXbea"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F15C67F2
-	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 00:20:55 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9181F4
-	for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 17:20:53 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-da0cb98f66cso4125262276.2
-        for <kvm@vger.kernel.org>; Mon, 30 Oct 2023 17:20:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698711653; x=1699316453; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QBv8J2j2tFrn/qyS6YAMefYGNMpKBA+EnJ/tz9XeZcQ=;
-        b=DutbvxFdNj+zxFsXIApxuqgL/svtHFE4X/w9rnzDlctDS5aEKYBHsMFuGsD2ppEan5
-         YFMqvnCKG53Rlybn98y5q77a5MpuTtAucEPhIo7eNk2V2+s7EPAj4EjoZBsxjiDA1Wgp
-         wZyw9LMd2L4yUILKkMIJFH/1f1+Ais7lSpK/pUNwe4B9tfDfsTc1jUYuMaYPzxVg7ODU
-         Iwvs+PMW6VidbEzn0tHKXJ+viUEAs8xkSYidMx8TdObaEwuzsWe2YmDYf0JxpwIfdben
-         DccNkbIfGdDwrnq3qLloMhx6T6yKHqGXtqh+AZmjyqVu2zal4Z5Kh2E43uC+4/vEsslQ
-         BfSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698711653; x=1699316453;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QBv8J2j2tFrn/qyS6YAMefYGNMpKBA+EnJ/tz9XeZcQ=;
-        b=OXGCXo8496HujCLenLKuj6OeC02ipY4Hz8ppDOUEFERtpc7Bq8PgP2lBrQ061Plc2M
-         zKHXr/M7nedvcHpKP9VulAA6XG0WlN/ZuQOBfCNSuAJmw9viS9SlNBtzwKlh+1zt1ySw
-         3DONSsKCbwq8LAnvvZ6JNWj3idPJ6s7SHNVtA4pFVc3NblwZMQOtxb37vJkdXEa+QNSB
-         xpe+a3XjwVHfrIkIPfXj1XD1GdhviDS+L2jtqecxOa43xNLgxZkrDoIHOk47FaQFRW6c
-         Wntln+lPvH1NLKewHbG9VSdXXa0pl6PSK1dP+y6BpqSJWfThOr9JlkU+7eX0bJ4XkBHV
-         J6/A==
-X-Gm-Message-State: AOJu0YwGvabRKPtT6iGsMMW/4QK799LEANuWhdLt6ioU6DrNrEDdAwvN
-	9TdWX8gnGRHPXev82Id/Odtf4mbpUSo=
-X-Google-Smtp-Source: AGHT+IHDrosN2uCkEGjbekhzE56kmIuP6ZdJ4qX5BxhY2UQvH9WBnwhhS/T43sOArnZ3ZTMzAD09hmalB/w=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:168c:b0:da0:3e46:8ba5 with SMTP id
- bx12-20020a056902168c00b00da03e468ba5mr205460ybb.8.1698711652929; Mon, 30 Oct
- 2023 17:20:52 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 30 Oct 2023 17:20:49 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F23C46B6;
+	Tue, 31 Oct 2023 02:26:42 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65CD5E4;
+	Mon, 30 Oct 2023 19:26:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698719200; x=1730255200;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=1RxaiPSscGnriT5S1YWbGyKo7Yhdv1SBTp2kCHaOJTg=;
+  b=lzqfXbea3Fak2kxKVwVBX2tCid17AqzoBpSJYL6nTbNtA9XBy8tsIntJ
+   WebQmcaai0ZflO+qk66sHPHXUMyUeLkgaUZv56yEXTVhvUMiFm0EN+fe+
+   HEl1Djoxao8IEVeW7rqCye+fyywJcK1yfKUYpYhqeriqC3TbGYyYhbieT
+   womnNXkO0x+HUjh7V981e1kTukPsBqhOf/cP5kiTwu2dLyLrgHVzrkqxx
+   gSoTVJWnrcvpfzbMOW8BiHfylFcVO+f9OzrOAHVuKCzV+zqlfPBXlVG3O
+   viMYQm7xUMO6tFUjZOgET1NltLDG1IGxGNJsXUga0+WaK+lzJ1ohc0SVb
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10879"; a="373249634"
+X-IronPort-AV: E=Sophos;i="6.03,264,1694761200"; 
+   d="scan'208";a="373249634"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2023 19:26:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,264,1694761200"; 
+   d="scan'208";a="8161358"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.9.145]) ([10.93.9.145])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2023 19:26:27 -0700
+Message-ID: <2edd908a-9699-4d8e-9063-c655f1fc9712@intel.com>
+Date: Tue, 31 Oct 2023 10:26:22 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.820.g83a721a137-goog
-Message-ID: <20231031002049.3915752-1-seanjc@google.com>
-Subject: [PATCH guest_memfd] KVM: selftests: Add a memory region subtest to
- validate invalid flags
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v13 08/35] KVM: Introduce KVM_SET_USER_MEMORY_REGION2
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>,
+ Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+ Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>,
+ Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
+ =?UTF-8?Q?n?= <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>,
+ Vishal Annapurve <vannapurve@google.com>,
+ Ackerley Tng <ackerleytng@google.com>,
+ Maciej Szmigiero <mail@maciej.szmigiero.name>,
+ David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
+ Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+ Liam Merwick <liam.merwick@oracle.com>,
+ Isaku Yamahata <isaku.yamahata@gmail.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20231027182217.3615211-1-seanjc@google.com>
+ <20231027182217.3615211-9-seanjc@google.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20231027182217.3615211-9-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add a subtest to set_memory_region_test to verify that KVM rejects invalid
-flags and combinations with -EINVAL.
+On 10/28/2023 2:21 AM, Sean Christopherson wrote:
+> Introduce a "version 2" of KVM_SET_USER_MEMORY_REGION so that additional
+> information can be supplied without setting userspace up to fail.  The
+> padding in the new kvm_userspace_memory_region2 structure will be used to
+> pass a file descriptor in addition to the userspace_addr, i.e. allow
+> userspace to point at a file descriptor and map memory into a guest that
+> is NOT mapped into host userspace.
+> 
+> Alternatively, KVM could simply add "struct kvm_userspace_memory_region2"
+> without a new ioctl(), but as Paolo pointed out, adding a new ioctl()
+> makes detection of bad flags a bit more robust, e.g. if the new fd field
+> is guarded only by a flag and not a new ioctl(), then a userspace bug
+> (setting a "bad" flag) would generate out-of-bounds access instead of an
+> -EINVAL error.
+> 
+> Cc: Jarkko Sakkinen <jarkko@kernel.org>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   Documentation/virt/kvm/api.rst | 21 +++++++++++++++++++
+>   arch/x86/kvm/x86.c             |  2 +-
+>   include/linux/kvm_host.h       |  4 ++--
+>   include/uapi/linux/kvm.h       | 13 ++++++++++++
+>   virt/kvm/kvm_main.c            | 38 +++++++++++++++++++++++++++-------
+>   5 files changed, 67 insertions(+), 11 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 21a7578142a1..ace984acc125 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6070,6 +6070,27 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the SET_ONE_REG
+>   interface. No error will be returned, but the resulting offset will not be
+>   applied.
+>   
+> +4.139 KVM_SET_USER_MEMORY_REGION2
+> +---------------------------------
+> +
+> +:Capability: KVM_CAP_USER_MEMORY2
+> +:Architectures: all
+> +:Type: vm ioctl
+> +:Parameters: struct kvm_userspace_memory_region2 (in)
+> +:Returns: 0 on success, -1 on error
+> +
+> +::
+> +
+> +  struct kvm_userspace_memory_region2 {
+> +	__u32 slot;
+> +	__u32 flags;
+> +	__u64 guest_phys_addr;
+> +	__u64 memory_size; /* bytes */
+> +	__u64 userspace_addr; /* start of the userspace allocated memory */
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
+missing
 
-Selftest that *tries* to detect cases where KVM allows v2 flags for
-KVM_SET_USER_MEMORY_REGION.  It's kinda worthless because KVM will likely fail
-with EINVAL anyways, but maybe it'll provide meaningful coverage in concert
-with a sanitizer?
+	__u64 pad[16];
 
- .../selftests/kvm/set_memory_region_test.c    | 49 +++++++++++++++++++
- 1 file changed, 49 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-index ca83e3307a98..268baf853bd6 100644
---- a/tools/testing/selftests/kvm/set_memory_region_test.c
-+++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-@@ -326,6 +326,53 @@ static void test_zero_memory_regions(void)
- }
- #endif /* __x86_64__ */
- 
-+static void test_invalid_memory_region_flags(void)
-+{
-+	uint32_t supported_flags = KVM_MEM_LOG_DIRTY_PAGES;
-+	const uint32_t v2_only_flags = KVM_MEM_PRIVATE;
-+	struct kvm_vm *vm;
-+	int r, i;
-+
-+#ifdef __x86_64__
-+	supported_flags |= KVM_MEM_READONLY;
-+
-+	if (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM))
-+		vm = vm_create_barebones_protected_vm();
-+	else
-+#endif
-+		vm = vm_create_barebones();
-+
-+	if (kvm_check_cap(KVM_CAP_MEMORY_ATTRIBUTES) & KVM_MEMORY_ATTRIBUTE_PRIVATE)
-+		supported_flags |= KVM_MEM_PRIVATE;
-+
-+	for (i = 0; i < 32; i++) {
-+		if ((supported_flags & BIT(i)) && !(v2_only_flags & BIT(i)))
-+			continue;
-+
-+		r = __vm_set_user_memory_region(vm, MEM_REGION_SLOT, BIT(i),
-+						MEM_REGION_GPA, MEM_REGION_SIZE, NULL);
-+
-+		TEST_ASSERT(r && errno == EINVAL,
-+			    "KVM_SET_USER_MEMORY_REGION should have failed on v2 only flag 0x%lx", BIT(i));
-+
-+		if (supported_flags & BIT(i))
-+			continue;
-+
-+		r = __vm_set_user_memory_region2(vm, MEM_REGION_SLOT, BIT(i),
-+						 MEM_REGION_GPA, MEM_REGION_SIZE, NULL, 0, 0);
-+		TEST_ASSERT(r && errno == EINVAL,
-+			    "KVM_SET_USER_MEMORY_REGION2 should have failed on unsupported flag 0x%lx", BIT(i));
-+	}
-+
-+	if (supported_flags & KVM_MEM_PRIVATE) {
-+		r = __vm_set_user_memory_region2(vm, MEM_REGION_SLOT,
-+						 KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_PRIVATE,
-+						 MEM_REGION_GPA, MEM_REGION_SIZE, NULL, 0, 0);
-+		TEST_ASSERT(r && errno == EINVAL,
-+			    "KVM_SET_USER_MEMORY_REGION2 should have failed, dirty logging private memory is unsupported");
-+	}
-+}
-+
- /*
-  * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
-  * tentative to add further slots should fail.
-@@ -491,6 +538,8 @@ int main(int argc, char *argv[])
- 	test_zero_memory_regions();
- #endif
- 
-+	test_invalid_memory_region_flags();
-+
- 	test_add_max_memory_regions();
- 
- 	if (kvm_has_cap(KVM_CAP_GUEST_MEMFD) &&
-
-base-commit: 881375a408c0f4ea451ff14545b59216d2923881
--- 
-2.42.0.820.g83a721a137-goog
+> +  };
+> +
+> +See KVM_SET_USER_MEMORY_REGION.
+> +
+>   5. The kvm_run structure
+>   ========================
+>   
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 41cce5031126..6409914428ca 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12455,7 +12455,7 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
+>   	}
+>   
+>   	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+> -		struct kvm_userspace_memory_region m;
+> +		struct kvm_userspace_memory_region2 m;
+>   
+>   		m.slot = id | (i << 16);
+>   		m.flags = 0;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 5faba69403ac..4e741ff27af3 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1146,9 +1146,9 @@ enum kvm_mr_change {
+>   };
+>   
+>   int kvm_set_memory_region(struct kvm *kvm,
+> -			  const struct kvm_userspace_memory_region *mem);
+> +			  const struct kvm_userspace_memory_region2 *mem);
+>   int __kvm_set_memory_region(struct kvm *kvm,
+> -			    const struct kvm_userspace_memory_region *mem);
+> +			    const struct kvm_userspace_memory_region2 *mem);
+>   void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot);
+>   void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen);
+>   int kvm_arch_prepare_memory_region(struct kvm *kvm,
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 13065dd96132..bd1abe067f28 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -95,6 +95,16 @@ struct kvm_userspace_memory_region {
+>   	__u64 userspace_addr; /* start of the userspace allocated memory */
+>   };
+>   
+> +/* for KVM_SET_USER_MEMORY_REGION2 */
+> +struct kvm_userspace_memory_region2 {
+> +	__u32 slot;
+> +	__u32 flags;
+> +	__u64 guest_phys_addr;
+> +	__u64 memory_size;
+> +	__u64 userspace_addr;
+> +	__u64 pad[16];
+> +};
+> +
+>   /*
+>    * The bit 0 ~ bit 15 of kvm_userspace_memory_region::flags are visible for
+>    * userspace, other bits are reserved for kvm internal use which are defined
+> @@ -1192,6 +1202,7 @@ struct kvm_ppc_resize_hpt {
+>   #define KVM_CAP_COUNTER_OFFSET 227
+>   #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+>   #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
+> +#define KVM_CAP_USER_MEMORY2 230
+>   
+>   #ifdef KVM_CAP_IRQ_ROUTING
+>   
+> @@ -1473,6 +1484,8 @@ struct kvm_vfio_spapr_tce {
+>   					struct kvm_userspace_memory_region)
+>   #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
+>   #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
+> +#define KVM_SET_USER_MEMORY_REGION2 _IOW(KVMIO, 0x49, \
+> +					 struct kvm_userspace_memory_region2)
+>   
+>   /* enable ucontrol for s390 */
+>   struct kvm_s390_ucas_mapping {
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 6e708017064d..3f5b7c2c5327 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1578,7 +1578,7 @@ static void kvm_replace_memslot(struct kvm *kvm,
+>   	}
+>   }
+>   
+> -static int check_memory_region_flags(const struct kvm_userspace_memory_region *mem)
+> +static int check_memory_region_flags(const struct kvm_userspace_memory_region2 *mem)
+>   {
+>   	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
+>   
+> @@ -1980,7 +1980,7 @@ static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
+>    * Must be called holding kvm->slots_lock for write.
+>    */
+>   int __kvm_set_memory_region(struct kvm *kvm,
+> -			    const struct kvm_userspace_memory_region *mem)
+> +			    const struct kvm_userspace_memory_region2 *mem)
+>   {
+>   	struct kvm_memory_slot *old, *new;
+>   	struct kvm_memslots *slots;
+> @@ -2084,7 +2084,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>   EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
+>   
+>   int kvm_set_memory_region(struct kvm *kvm,
+> -			  const struct kvm_userspace_memory_region *mem)
+> +			  const struct kvm_userspace_memory_region2 *mem)
+>   {
+>   	int r;
+>   
+> @@ -2096,7 +2096,7 @@ int kvm_set_memory_region(struct kvm *kvm,
+>   EXPORT_SYMBOL_GPL(kvm_set_memory_region);
+>   
+>   static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
+> -					  struct kvm_userspace_memory_region *mem)
+> +					  struct kvm_userspace_memory_region2 *mem)
+>   {
+>   	if ((u16)mem->slot >= KVM_USER_MEM_SLOTS)
+>   		return -EINVAL;
+> @@ -4566,6 +4566,7 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+>   {
+>   	switch (arg) {
+>   	case KVM_CAP_USER_MEMORY:
+> +	case KVM_CAP_USER_MEMORY2:
+>   	case KVM_CAP_DESTROY_MEMORY_REGION_WORKS:
+>   	case KVM_CAP_JOIN_MEMORY_REGIONS_WORKS:
+>   	case KVM_CAP_INTERNAL_ERROR_DATA:
+> @@ -4821,6 +4822,14 @@ static int kvm_vm_ioctl_get_stats_fd(struct kvm *kvm)
+>   	return fd;
+>   }
+>   
+> +#define SANITY_CHECK_MEM_REGION_FIELD(field)					\
+> +do {										\
+> +	BUILD_BUG_ON(offsetof(struct kvm_userspace_memory_region, field) !=		\
+> +		     offsetof(struct kvm_userspace_memory_region2, field));	\
+> +	BUILD_BUG_ON(sizeof_field(struct kvm_userspace_memory_region, field) !=		\
+> +		     sizeof_field(struct kvm_userspace_memory_region2, field));	\
+> +} while (0)
+> +
+>   static long kvm_vm_ioctl(struct file *filp,
+>   			   unsigned int ioctl, unsigned long arg)
+>   {
+> @@ -4843,15 +4852,28 @@ static long kvm_vm_ioctl(struct file *filp,
+>   		r = kvm_vm_ioctl_enable_cap_generic(kvm, &cap);
+>   		break;
+>   	}
+> +	case KVM_SET_USER_MEMORY_REGION2:
+>   	case KVM_SET_USER_MEMORY_REGION: {
+> -		struct kvm_userspace_memory_region kvm_userspace_mem;
+> +		struct kvm_userspace_memory_region2 mem;
+> +		unsigned long size;
+> +
+> +		if (ioctl == KVM_SET_USER_MEMORY_REGION)
+> +			size = sizeof(struct kvm_userspace_memory_region);
+> +		else
+> +			size = sizeof(struct kvm_userspace_memory_region2);
+> +
+> +		/* Ensure the common parts of the two structs are identical. */
+> +		SANITY_CHECK_MEM_REGION_FIELD(slot);
+> +		SANITY_CHECK_MEM_REGION_FIELD(flags);
+> +		SANITY_CHECK_MEM_REGION_FIELD(guest_phys_addr);
+> +		SANITY_CHECK_MEM_REGION_FIELD(memory_size);
+> +		SANITY_CHECK_MEM_REGION_FIELD(userspace_addr);
+>   
+>   		r = -EFAULT;
+> -		if (copy_from_user(&kvm_userspace_mem, argp,
+> -						sizeof(kvm_userspace_mem)))
+> +		if (copy_from_user(&mem, argp, size))
+>   			goto out;
+>   
+> -		r = kvm_vm_ioctl_set_memory_region(kvm, &kvm_userspace_mem);
+> +		r = kvm_vm_ioctl_set_memory_region(kvm, &mem);
+>   		break;
+>   	}
+>   	case KVM_GET_DIRTY_LOG: {
 
 
