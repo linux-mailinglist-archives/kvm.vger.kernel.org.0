@@ -1,175 +1,194 @@
-Return-Path: <kvm+bounces-323-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-324-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D366F7DE4A7
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 17:36:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D49347DE4D0
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 17:46:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CBD7EB2120D
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 16:36:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00AC91C20DEB
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 16:46:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7C11154A0;
-	Wed,  1 Nov 2023 16:36:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09CF815E84;
+	Wed,  1 Nov 2023 16:46:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yuFCX/+h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GbmChK2+"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D1912B83
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 16:36:04 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A8F6110
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 09:36:03 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-da1aa98ec19so6159633276.2
-        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 09:36:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7CF15493
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 16:46:09 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B47210C
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 09:46:06 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5b064442464so64577787b3.3
+        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 09:46:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698856562; x=1699461362; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=azJu2Dh8gujl5qnxyYwo1n6krfiG0RwudOI1y5vnuB4=;
-        b=yuFCX/+hNdCQoExuPOLtehV1sJV5YXuIC4dK84hnQsWhPdH2Z3iLN7bxdeMtxGj+WB
-         cyzEaD66/7stT4SYcguXXwRhJjsUPKJnPLc7tlAGTT6QQ7U8Hc2NurenL8NF3eoKj+4P
-         RfWTVWvFfkqVD2gRfDU09y5lBFNvzjzueEpuaO2xsVY5I4+kSjoC83fBVUIBnh3QJaL8
-         RsG8orHK+MB9w4bObQ/9WLURAj4uIVelYqCRJKbCGCOjf013V/nSWEedtPb+5hmOsFjL
-         r6GSwII+CK6XrhP83YYhH3pshpbwSDDI4qB9CrX5BKhf+VGh0py3HXKrLZViwVuSh4mC
-         zYng==
+        d=google.com; s=20230601; t=1698857165; x=1699461965; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TK6zRbNRnaaGZQru6tpn4DJQzZiGHhIaVNTtMzEhwHs=;
+        b=GbmChK2++j9Z0JUs0KsrZHv0aPtsBHfQ0LvOKWrnYyC+OIcBG/jf0zqKdDGrmK1dkR
+         lEoqiLdsmhTrvJzGEtUBgACUoyQko7v1lYUAwq61Z0S8BQZI5VFhr9Bp6t9nmB2sCFK6
+         4VHft0h0xIwFXgELuGQTNBblAB8Nysjmzz4+gZPi01nbB8+lN+MTgZIAny0qcxYfz2ru
+         rIy5oTNyaWUUxA97ABomiUqQO1LiYLGGXbtB15VA9Qn/gLJjd2voWNeyhOp/H5Kajepr
+         Ngw8wDy4Nerq8zm8YywlCqJjyjm1WmSjnAPPtJKFkkkICxYDI3Cf0KM5bf3N4vhrjfnc
+         r/UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698856562; x=1699461362;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=azJu2Dh8gujl5qnxyYwo1n6krfiG0RwudOI1y5vnuB4=;
-        b=lSVP1vdXIJLDKV/UX7030w9JeIWDlIiUz+1jCr4UWo4gDE+Xo2aY4wt7KnplMnumY/
-         pfEsiWhBImbK/4RPt6V7CH/dgqrq9A9Xf3du6bu+FM8GJv13+7c1oJRqd2NTU2Q2twNc
-         SX07PYKp6VwySf9uTWxaG4mj5UJ/QO0S2HZd4csS8iA0aqAoXxsGgLPVgi6kijWzJZOP
-         mMhoFwpKiKgSDkkUGmBot77MB1sNv6BK8UtW9xzuEDV696yUnVfBHLtSEegHBeDhYykg
-         WjyxorS0MZf1oF2SEEUy6VlfPFf7c+CCexzksB7J9PsWbdZqLJu8aMvzoO8uc/P+Fl5c
-         q9ig==
-X-Gm-Message-State: AOJu0YxJehqPflKeDZGzMqwjuUkGB5I+k4AFjDCbG3YP44doi3lnWeb0
-	NYKhH5vig892OQPB0sZc4MlNwy8Qla4=
-X-Google-Smtp-Source: AGHT+IFqCABorYKmfCmJZy/oBSeOXTtnBU+krovHVjWnvhFIdm8AwbTMBJoMdfZ9FR5pLbycY5bTrtHt4Z4=
+        d=1e100.net; s=20230601; t=1698857165; x=1699461965;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TK6zRbNRnaaGZQru6tpn4DJQzZiGHhIaVNTtMzEhwHs=;
+        b=MrgYfQLjmjxly1LiywaDvW7t3SVdab9NaZblOWLaIt47t2LRjyAVqDmBMmhWlkRnqA
+         46eVGLDQcwgGQj7bhPiu1ySVkxbW+yKZIgLMBFLIyBIo3mPeI4zZnTbKNRoWmJ3yzULF
+         XM2fv6oaTEdWbikwBzoEtdlzfHTdaDL7v+NYbyFxN4xasGvaRhaXodD9jrhIoofmUyjP
+         UmGuCaw7UXFx2emRqQ9AWolh9nmhHdPj5beYym8mQBErmEtCAUGhXK0OKBntc0whXd3+
+         3+4nFpD8BtHwYoq99AYdsUtmxdlsSd+dZ0i+xQjJvd4pAoaEqFjNYlkV7TdZa8/yANPI
+         HvXA==
+X-Gm-Message-State: AOJu0Ywo+zIHWaRBS9m4DFK/hQW6uheOnY089nsVnUnq9ab+ou4ca4xK
+	Z49PbNFex08KAkqIis/QOTbnfaIhVLU=
+X-Google-Smtp-Source: AGHT+IHtwh3c3DNIaPCk1TA9eY4hLxblw7bOvi/N9yqoqPx/PUA0Lv0gE6u8JTy7Iy5AmtVcGWneKurXYr8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:770f:0:b0:da0:73c2:db78 with SMTP id
- s15-20020a25770f000000b00da073c2db78mr326876ybc.9.1698856562473; Wed, 01 Nov
- 2023 09:36:02 -0700 (PDT)
-Date: Wed, 1 Nov 2023 09:36:00 -0700
-In-Reply-To: <CABgObfaw4Byuzj5J3k48jdwT0HCKXLJNiuaA9H8Dtg+GOq==Sw@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a25:abcd:0:b0:da0:42f3:6ce4 with SMTP id
+ v71-20020a25abcd000000b00da042f36ce4mr277219ybi.7.1698857165733; Wed, 01 Nov
+ 2023 09:46:05 -0700 (PDT)
+Date: Wed, 1 Nov 2023 09:46:04 -0700
+In-Reply-To: <20231101112934.631344-1-paul@xen.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-18-seanjc@google.com>
- <7c0844d8-6f97-4904-a140-abeabeb552c1@intel.com> <ZUEML6oJXDCFJ9fg@google.com>
- <92ba7ddd-2bc8-4a8d-bd67-d6614b21914f@intel.com> <ZUJVfCkIYYFp5VwG@google.com>
- <CABgObfaw4Byuzj5J3k48jdwT0HCKXLJNiuaA9H8Dtg+GOq==Sw@mail.gmail.com>
-Message-ID: <ZUJ-cJfofk2d_I0B@google.com>
-Subject: Re: [PATCH v13 17/35] KVM: Add transparent hugepage support for
- dedicated guest memory
+References: <20231101112934.631344-1-paul@xen.org>
+Message-ID: <ZUKAzGzEts262FqC@google.com>
+Subject: Re: [PATCH v3] KVM x86/xen: add an override for PVCLOCK_TSC_STABLE_BIT
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xu Yilun <yilun.xu@intel.com>, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
-	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Paul Durrant <paul@xen.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Nov 01, 2023, Paolo Bonzini wrote:
-> On Wed, Nov 1, 2023 at 2:41=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> >
-> > On Wed, Nov 01, 2023, Xiaoyao Li wrote:
-> > > On 10/31/2023 10:16 PM, Sean Christopherson wrote:
-> > > > On Tue, Oct 31, 2023, Xiaoyao Li wrote:
-> > > > > On 10/28/2023 2:21 AM, Sean Christopherson wrote:
-> > > But it's different than MADV_HUGEPAGE, in a way. Per my understanding=
-, the
-> > > failure of MADV_HUGEPAGE is not fatal, user space can ignore it and
-> > > continue.
-> > >
-> > > However, the failure of KVM_GUEST_MEMFD_ALLOW_HUGEPAGE is fatal, whic=
-h leads
-> > > to failure of guest memfd creation.
-> >
-> > Failing KVM_CREATE_GUEST_MEMFD isn't truly fatal, it just requires diff=
-erent
-> > action from userspace, i.e. instead of ignoring the error, userspace co=
-uld redo
-> > KVM_CREATE_GUEST_MEMFD with KVM_GUEST_MEMFD_ALLOW_HUGEPAGE=3D0.
-> >
-> > We could make the behavior more like MADV_HUGEPAGE, e.g. theoretically =
-we could
-> > extend fadvise() with FADV_HUGEPAGE, or add a guest_memfd knob/ioctl() =
-to let
-> > userspace provide advice/hints after creating a guest_memfd.  But I sus=
-pect that
-> > guest_memfd would be the only user of FADV_HUGEPAGE, and IMO a post-cre=
-ation hint
-> > is actually less desirable.
-> >
-> > KVM_GUEST_MEMFD_ALLOW_HUGEPAGE will fail only if userspace didn't provi=
-de a
-> > compatible size or the kernel doesn't support THP.  An incompatible siz=
-e is likely
-> > a userspace bug, and for most setups that want to utilize guest_memfd, =
-lack of THP
-> > support is likely a configuration bug.  I.e. many/most uses *want* fail=
-ures due to
-> > KVM_GUEST_MEMFD_ALLOW_HUGEPAGE to be fatal.
-> >
-> > > For current implementation, I think maybe KVM_GUEST_MEMFD_DESIRE_HUGE=
-PAGE
-> > > fits better than KVM_GUEST_MEMFD_ALLOW_HUGEPAGE? or maybe *PREFER*?
-> >
-> > Why?  Verbs like "prefer" and "desire" aren't a good fit IMO because th=
-ey suggest
-> > the flag is a hint, and hints are usually best effort only, i.e. are ig=
-nored if
-> > there is a fundamental incompatibility.
-> >
-> > "Allow" isn't perfect, e.g. I would much prefer a straight KVM_GUEST_ME=
-MFD_USE_HUGEPAGES
-> > or KVM_GUEST_MEMFD_HUGEPAGES flag, but I wanted the name to convey that=
- KVM doesn't
-> > (yet) guarantee hugepages.  I.e. KVM_GUEST_MEMFD_ALLOW_HUGEPAGE is stro=
-nger than
-> > a hint, but weaker than a requirement.  And if/when KVM supports a dedi=
-cated memory
-> > pool of some kind, then we can add KVM_GUEST_MEMFD_REQUIRE_HUGEPAGE.
->=20
-> I think that the current patch is fine, but I will adjust it to always
-> allow the flag, and to make the size check even if !CONFIG_TRANSPARENT_HU=
-GEPAGE.
-> If hugepages are not guaranteed, and (theoretically) you could have no
-> hugepage at all in the result, it's okay to get this result even if THP i=
-s not
-> available in the kernel.
+On Wed, Nov 01, 2023, Paul Durrant wrote:
+> @@ -3231,12 +3245,15 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+>  	vcpu->hv_clock.flags = pvclock_flags;
+>  
+>  	if (vcpu->pv_time.active)
+> -		kvm_setup_guest_pvclock(v, &vcpu->pv_time, 0);
+> +		kvm_setup_guest_pvclock(v, &vcpu->pv_time, 0, false);
+> +
+>  	if (vcpu->xen.vcpu_info_cache.active)
+>  		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_info_cache,
+> -					offsetof(struct compat_vcpu_info, time));
+> +					offsetof(struct compat_vcpu_info, time),
+> +					xen_pvclock_tsc_unstable);
+>  	if (vcpu->xen.vcpu_time_info_cache.active)
+> -		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_info_cache, 0);
+> +		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_info_cache, 0,
+> +					xen_pvclock_tsc_unstable);
+>  	kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
+>  	return 0;
 
-Can you post a fixup patch?  It's not clear to me exactly what behavior you=
- intend
-to end up with.
+Please rebase, this conflicts with commit ee11ab6bb04e ("KVM: X86: Reduce size of
+kvm_vcpu_arch structure when CONFIG_KVM_XEN=n").  I can solve the conflict, but
+I really shouldn't have to.
+
+Also, your version of git should support --base, which makes life much easier for
+others when non-trivial conflicts are encountered.  From maintainer-kvm-x86.rst:
+
+ : Git Base
+ : ~~~~~~~~
+ : If you are using git version 2.9.0 or later (Googlers, this is all of you!),
+ : use ``git format-patch`` with the ``--base`` flag to automatically include the
+ : base tree information in the generated patches.
+ : 
+ : Note, ``--base=auto`` works as expected if and only if a branch's upstream is
+ : set to the base topic branch, e.g. it will do the wrong thing if your upstream
+ : is set to your personal repository for backup purposes.  An alternative "auto"
+ : solution is to derive the names of your development branches based on their
+ : KVM x86 topic, and feed that into ``--base``.  E.g. ``x86/pmu/my_branch_name``,
+ : and then write a small wrapper to extract ``pmu`` from the current branch name
+ : to yield ``--base=x/pmu``, where ``x`` is whatever name your repository uses to
+ : track the KVM x86 remote.
+
+> @@ -4531,7 +4548,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  		    KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL |
+>  		    KVM_XEN_HVM_CONFIG_SHARED_INFO |
+>  		    KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL |
+> -		    KVM_XEN_HVM_CONFIG_EVTCHN_SEND;
+> +		    KVM_XEN_HVM_CONFIG_EVTCHN_SEND |
+> +		    KVM_XEN_HVM_CONFIG_PVCLOCK_TSC_UNSTABLE;
+>  		if (sched_info_on())
+>  			r |= KVM_XEN_HVM_CONFIG_RUNSTATE |
+>  			     KVM_XEN_HVM_CONFIG_RUNSTATE_UPDATE_FLAG;
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index 40edf4d1974c..7699d94f190b 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -1111,9 +1111,12 @@ int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
+>  
+>  int kvm_xen_hvm_config(struct kvm *kvm, struct kvm_xen_hvm_config *xhc)
+>  {
+> +	bool update_pvclock = false;
+> +
+>  	/* Only some feature flags need to be *enabled* by userspace */
+>  	u32 permitted_flags = KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL |
+> -		KVM_XEN_HVM_CONFIG_EVTCHN_SEND;
+> +		KVM_XEN_HVM_CONFIG_EVTCHN_SEND |
+> +		KVM_XEN_HVM_CONFIG_PVCLOCK_TSC_UNSTABLE;
+>  
+>  	if (xhc->flags & ~permitted_flags)
+>  		return -EINVAL;
+> @@ -1134,9 +1137,19 @@ int kvm_xen_hvm_config(struct kvm *kvm, struct kvm_xen_hvm_config *xhc)
+>  	else if (!xhc->msr && kvm->arch.xen_hvm_config.msr)
+>  		static_branch_slow_dec_deferred(&kvm_xen_enabled);
+>  
+> +	if ((kvm->arch.xen_hvm_config.flags &
+> +	     KVM_XEN_HVM_CONFIG_PVCLOCK_TSC_UNSTABLE) !=
+> +	    (xhc->flags &
+> +	     KVM_XEN_HVM_CONFIG_PVCLOCK_TSC_UNSTABLE))
+> +		update_pvclock = true;
+
+Rather than a boolean and the above, which is a bit hard to parse, what about
+taking a snapshot of the old flags and then doing an XOR?
+
+	/* Only some feature flags need to be *enabled* by userspace */
+	u32 permitted_flags = KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL |
+		KVM_XEN_HVM_CONFIG_EVTCHN_SEND |
+		KVM_XEN_HVM_CONFIG_PVCLOCK_TSC_UNSTABLE;
+	u32 old_flags;
+
+	if (xhc->flags & ~permitted_flags)
+		return -EINVAL;
+
+	/*
+	 * With hypercall interception the kernel generates its own
+	 * hypercall page so it must not be provided.
+	 */
+	if ((xhc->flags & KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL) &&
+	    (xhc->blob_addr_32 || xhc->blob_addr_64 ||
+	     xhc->blob_size_32 || xhc->blob_size_64))
+		return -EINVAL;
+
+	mutex_lock(&kvm->arch.xen.xen_lock);
+
+	if (xhc->msr && !kvm->arch.xen_hvm_config.msr)
+		static_branch_inc(&kvm_xen_enabled.key);
+	else if (!xhc->msr && kvm->arch.xen_hvm_config.msr)
+		static_branch_slow_dec_deferred(&kvm_xen_enabled);
+
+	old_flags = kvm->arch.xen_hvm_config.flags;
+	memcpy(&kvm->arch.xen_hvm_config, xhc, sizeof(*xhc));
+
+	mutex_unlock(&kvm->arch.xen.xen_lock);
+
+	if ((old_flags ^ xhc->flags) & KVM_XEN_HVM_CONFIG_PVCLOCK_TSC_UNSTABLE)
+		kvm_make_all_cpus_request(kvm, KVM_REQ_CLOCK_UPDATE);
+
+	return 0;
 
