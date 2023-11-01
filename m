@@ -1,173 +1,181 @@
-Return-Path: <kvm+bounces-327-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-328-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 161BD7DE56D
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 18:37:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D82D37DE5BE
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 19:05:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77758B21016
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 17:37:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 146901C20C0D
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 18:05:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33534182A0;
-	Wed,  1 Nov 2023 17:36:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB9818E0E;
+	Wed,  1 Nov 2023 18:05:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1G73i3bp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cV0KYCn8"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC44F134C5
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 17:36:51 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ADAAE4
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 10:36:50 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-da0c7d27fb0so6524146276.1
-        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 10:36:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3EF21862A
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 18:05:50 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E207F10F
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 11:05:45 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5afe220cadeso1145937b3.3
+        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 11:05:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698860209; x=1699465009; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1698861945; x=1699466745; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Aa5pPv4/g+I3C3eNDgudVhrFstr6S8Xmtwrf0OlljDI=;
-        b=1G73i3bpqP3lEIiYf1Xa+PqF+ry3FPPmHtzhkTz2ESLqKv/PJo83UzY0L3tGLSLtgw
-         FEf6apQxu3ajl2eaf2jpMXM8oiMYlwvL+Gaj7CmFke3L5WVAzOh6QUSsRjnNhhvyggQP
-         /0obTqP8SXrHs5tm5Lcs1IoffSqT4ZAyvwPXIthiiQ2/DYs3pRsDS0oN02OgNcKyJmxV
-         +il1EDZ1G9lZ1tby+sgxcieBPfodwSlNZ7rJ6OOgSa83N+qrWIIICrK86C1Ay71kdg1m
-         h7J1Ii0mSVbVxFFpS5Ul/5maHoLcclIuFP3aDRfEoQUS+LZ7DrcFMxeDrV3szI4QTAZm
-         WoHw==
+        bh=rL6PypGT2hlmINXu9QUwfJHSqDzRPjLPXVa5ioHlgmM=;
+        b=cV0KYCn8U3gEavG+eISSGQWUwGWiGyKlJz0hIyUcqRq3sOyBpI1UF5gxACX7Lg9om9
+         Wln6PNazQdGp0Qcz52443Ku6hXwMpIBpPU2WgwOqMt75SmIkiAMAk4JIFBkDPe58XTfu
+         PzbS1uacqXACACPptXq697KyQTYD3J0eDPkOy5VbzTBJsAOJOg3Ol7sfhcASrTuD73Qv
+         00XhjtsSKaXZQBCWOgyMtCCptnxr1erS2LhZBaN4w0ofwZxs7EIxpBUen5YhxPrfpotO
+         1CcoOPcDUPBliOvsQTV50V/hBxv7j/pAPSCVIYOdmDbfmfmLQMNLuhElBxPM6IwQtp8R
+         2zeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698860209; x=1699465009;
+        d=1e100.net; s=20230601; t=1698861945; x=1699466745;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Aa5pPv4/g+I3C3eNDgudVhrFstr6S8Xmtwrf0OlljDI=;
-        b=c88k0jm+BNFuUpRCl0RDobf2ruvmgemmp7OjdPsXAcgp4ospW0kTl1Yiv0trzaGHal
-         R9eO8ZHCzqVM+3euUC3doB7hHDBYTjD1PmTQLw0rGoc1amClg/oOLOPGXA71o/Tp9ayW
-         4QU+37d9kqq/p3TGYcP98tD/t/avDTW/LAkojyJlSz5qVDpQ0E7iVdRw2wExrf5yaBPM
-         L8al4mLTp5sCxo4meIVll3lz863EPQ8GsIV/UmL8sAsJJncazFAMvIvz0OHYLxuUXPnj
-         EuO85wLsYW78fWh5u/juX30ztoFZjo08l3IYtpZWlh4IbjMb4qXR2jrFrTfMxVsAZZ/f
-         EPCA==
-X-Gm-Message-State: AOJu0YzpPjZqX0wNATdYwu/PHHcQVb/HGceblH1tiZQdo+U1oFsEF4+P
-	uLmgU9+7HXvG3u5uPZKQaIaxL6drNuw=
-X-Google-Smtp-Source: AGHT+IG/a6Sj0mASs5/8PEJQnR69sSphX+9SHKWYEjRPOLGEF4l6c52AgzjYtmdhHr7JL68mzkGP7JI8NEg=
+        bh=rL6PypGT2hlmINXu9QUwfJHSqDzRPjLPXVa5ioHlgmM=;
+        b=C/5aSBRTcwLI/MlMEyxCsFMge36l4ozkPEI2W4mlkDUxA9SaswRkgPfwfTLEx1siCg
+         Ck6O/rAKy7xPmHIiPCSVYUVxINf+dHoAh1spvQNjtJxja8TTiVzB2fpqqE09ocNwT2lQ
+         YfQVUk6JztMcIgLcnDdB3GcupvnkWLft3nJ+WCfb+Xu83owImFrrYZIgpz1CEsrbFHZh
+         Xzqw1UYKM9STnCnEkv6rMcff6qG6OywJ+c20r0RCdN2bECmMjPPm35Phs6UNIKp2NVv8
+         D2O7zNOIkV4InljOqm0sAIhedXuDVz2svIiUiClhp7F+aEsRaZyEx6MC14XotvoB7eTy
+         IK7Q==
+X-Gm-Message-State: AOJu0Yz3qnHFUdebGr48AvTWryoakb/onFUisMifCM8qjvPlao66PUFZ
+	tkoN8+eTQOABFp+pvxlf/Ur8iW1R4rM=
+X-Google-Smtp-Source: AGHT+IF0EJWzD90tR3Yra+xB6XEurYAJXQJ9oQtDBrvYG4t2cwb5yIePSuJ/SeetUVaU4iSB2o0dFSo4ZJQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:168c:b0:da0:3e46:8ba5 with SMTP id
- bx12-20020a056902168c00b00da03e468ba5mr304342ybb.8.1698860209654; Wed, 01 Nov
- 2023 10:36:49 -0700 (PDT)
-Date: Wed, 1 Nov 2023 10:36:48 -0700
-In-Reply-To: <482bfea6f54ea1bb7d1ad75e03541d0ba0e5be6f.camel@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a81:a14c:0:b0:59b:e97e:f7e2 with SMTP id
+ y73-20020a81a14c000000b0059be97ef7e2mr351426ywg.4.1698861945136; Wed, 01 Nov
+ 2023 11:05:45 -0700 (PDT)
+Date: Wed, 1 Nov 2023 11:05:43 -0700
+In-Reply-To: <2b1973ee44498039c97d4d11de3a93b0f3b1d2d8.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-10-seanjc@google.com>
- <482bfea6f54ea1bb7d1ad75e03541d0ba0e5be6f.camel@intel.com>
-Message-ID: <ZUKMsOdg3N9wmEzy@google.com>
-Subject: Re: [PATCH v13 09/35] KVM: Add KVM_EXIT_MEMORY_FAULT exit to report
- faults to userspace
+References: <20230914063325.85503-1-weijiang.yang@intel.com>
+ <20230914063325.85503-15-weijiang.yang@intel.com> <2b1973ee44498039c97d4d11de3a93b0f3b1d2d8.camel@redhat.com>
+Message-ID: <ZUKTd_a00fs1nyyk@google.com>
+Subject: Re: [PATCH v6 14/25] KVM: x86: Load guest FPU state when access
+ XSAVE-managed MSRs
 From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, 
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "brauner@kernel.org" <brauner@kernel.org>, 
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>, 
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>, 
-	"maz@kernel.org" <maz@kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"mpe@ellerman.id.au" <mpe@ellerman.id.au>, "willy@infradead.org" <willy@infradead.org>, 
-	"anup@brainfault.org" <anup@brainfault.org>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>, "mic@digikod.net" <mic@digikod.net>, 
-	"liam.merwick@oracle.com" <liam.merwick@oracle.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, "david@redhat.com" <david@redhat.com>, 
-	"tabba@google.com" <tabba@google.com>, "amoorthy@google.com" <amoorthy@google.com>, 
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, 
-	"michael.roth@amd.com" <michael.roth@amd.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, 
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>, 
-	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>, Vishal Annapurve <vannapurve@google.com>, 
-	"vbabka@suse.cz" <vbabka@suse.cz>, "mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, 
-	"yu.c.zhang@linux.intel.com" <yu.c.zhang@linux.intel.com>, "qperret@google.com" <qperret@google.com>, 
-	"dmatlack@google.com" <dmatlack@google.com>, Yilun Xu <yilun.xu@intel.com>, 
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, 
-	"ackerleytng@google.com" <ackerleytng@google.com>, "jarkko@kernel.org" <jarkko@kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, Wei W Wang <wei.w.wang@intel.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, dave.hansen@intel.com, peterz@infradead.org, 
+	chao.gao@intel.com, rick.p.edgecombe@intel.com, john.allen@amd.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Nov 01, 2023, Kai Huang wrote:
-> 
-> > +7.34 KVM_CAP_MEMORY_FAULT_INFO
-> > +------------------------------
-> > +
-> > +:Architectures: x86
-> > +:Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
-> > +
-> > +The presence of this capability indicates that KVM_RUN will fill
-> > +kvm_run.memory_fault if KVM cannot resolve a guest page fault VM-Exit, e.g. if
-> > +there is a valid memslot but no backing VMA for the corresponding host virtual
-> > +address.
-> > +
-> > +The information in kvm_run.memory_fault is valid if and only if KVM_RUN returns
-> > +an error with errno=EFAULT or errno=EHWPOISON *and* kvm_run.exit_reason is set
-> > +to KVM_EXIT_MEMORY_FAULT.
-> 
-> IIUC returning -EFAULT or whatever -errno is sort of KVM internal
-> implementation.
-
-The errno that is returned to userspace is ABI.  In KVM, it's a _very_ poorly
-defined ABI for the vast majority of ioctls(), but it's still technically ABI.
-KVM gets away with being cavalier with errno because the vast majority of errors
-are considered fatal by userespace, i.e. in most cases, userspace simply doesn't
-care about the exact errno.
-
-A good example is KVM_RUN with -EINTR; if KVM were to return something other than
--EINTR on a pending signal or vcpu->run->immediate_exit, userspace would fall over.
-
-> Is it better to relax the validity of kvm_run.memory_fault when
-> KVM_RUN returns any -errno?
-
-Not unless there's a need to do so, and if there is then we can update the
-documentation accordingly.  If KVM's ABI is that kvm_run.memory_fault is valid
-for any errno, then KVM would need to purge kvm_run.exit_reason super early in
-KVM_RUN, e.g. to prevent an -EINTR return due to immediate_exit from being
-misinterpreted as KVM_EXIT_MEMORY_FAULT.  And purging exit_reason super early is
-subtly tricky because KVM's (again, poorly documented) ABI is that *some* exit
-reasons are preserved across KVM_RUN with vcpu->run->immediate_exit (or with a
-pending signal).
-
-https://lore.kernel.org/all/ZFFbwOXZ5uI%2Fgdaf@google.com
-
-> [...]
-> 
-> 
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -2327,4 +2327,15 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
-> >  /* Max number of entries allowed for each kvm dirty ring */
-> >  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
+On Tue, Oct 31, 2023, Maxim Levitsky wrote:
+> On Thu, 2023-09-14 at 02:33 -0400, Yang Weijiang wrote:
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 66edbed25db8..a091764bf1d2 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -133,6 +133,9 @@ static int __set_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2);
+> >  static void __get_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2);
 > >  
-> > +static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
-> > +						 gpa_t gpa, gpa_t size)
+> >  static DEFINE_MUTEX(vendor_module_lock);
+> > +static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu);
+> > +static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu);
+> > +
+> >  struct kvm_x86_ops kvm_x86_ops __read_mostly;
+> >  
+> >  #define KVM_X86_OP(func)					     \
+> > @@ -4372,6 +4375,22 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> >  }
+> >  EXPORT_SYMBOL_GPL(kvm_get_msr_common);
+> >  
+> > +static const u32 xstate_msrs[] = {
+> > +	MSR_IA32_U_CET, MSR_IA32_PL0_SSP, MSR_IA32_PL1_SSP,
+> > +	MSR_IA32_PL2_SSP, MSR_IA32_PL3_SSP,
+> > +};
+> > +
+> > +static bool is_xstate_msr(u32 index)
 > > +{
-> > +	vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
-> > +	vcpu->run->memory_fault.gpa = gpa;
-> > +	vcpu->run->memory_fault.size = size;
+> > +	int i;
 > > +
-> > +	/* Flags are not (yet) defined or communicated to userspace. */
-> > +	vcpu->run->memory_fault.flags = 0;
+> > +	for (i = 0; i < ARRAY_SIZE(xstate_msrs); i++) {
+> > +		if (index == xstate_msrs[i])
+> > +			return true;
+> > +	}
+> > +	return false;
 > > +}
-> > +
 > 
-> KVM_CAP_MEMORY_FAULT_INFO is x86 only, is it better to put this function to
-> <asm/kvm_host.h>?
+> The name 'xstate_msr' IMHO is not clear.
+> 
+> How about naming it 'guest_fpu_state_msrs', together with adding a comment like that:
 
-I'd prefer to keep it in generic code, as it's highly likely to end up there
-sooner than later.  There's a known use case for ARM (exit to userspace on missing
-userspace mapping[*]), and I'm guessing pKVM (also ARM) will also utilize this API.
+Maybe xstate_managed_msrs?  I'd prefer not to include "guest" because the behavior
+is more a property of the architecture and/or the host kernel.  I understand where
+you're coming from, but it's the MSR *values* are part of guest state, whereas the
+check is a query on how KVM manages the MSR value, if that makes sense.
 
-[*] https://lore.kernel.org/all/20230908222905.1321305-8-amoorthy@google.com
+And I really don't like "FPU".  I get why the the kernel uses the "FPU" terminology,
+but for this check in particular I want to tie the behavior back to the architecture,
+i.e. provide the hint that the reason why these MSRs are special is because Intel
+defined them to be context switched via XSTATE.
+
+Actually, this is unnecesary bikeshedding to some extent, using an array is silly.
+It's easier and likely far more performant (not that that matters in this case)
+to use a switch statement.
+
+Is this better?
+
+/*
+ * Returns true if the MSR in question is managed via XSTATE, i.e. is context
+ * switched with the rest of guest FPU state.
+ */
+static bool is_xstate_managed_msr(u32 index)
+{
+	switch (index) {
+	case MSR_IA32_U_CET:
+	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+		return true;
+	default:
+		return false;
+	}
+}
+
+/*
+ * Read or write a bunch of msrs. All parameters are kernel addresses.
+ *
+ * @return number of msrs set successfully.
+ */
+static int __msr_io(struct kvm_vcpu *vcpu, struct kvm_msrs *msrs,
+		    struct kvm_msr_entry *entries,
+		    int (*do_msr)(struct kvm_vcpu *vcpu,
+				  unsigned index, u64 *data))
+{
+	bool fpu_loaded = false;
+	int i;
+
+	for (i = 0; i < msrs->nmsrs; ++i) {
+		/*
+	 	 * If userspace is accessing one or more XSTATE-managed MSRs,
+		 * temporarily load the guest's FPU state so that the guest's
+		 * MSR value(s) is resident in hardware, i.e. so that KVM can
+		 * get/set the MSR via RDMSR/WRMSR.
+	 	 */
+		if (vcpu && !fpu_loaded && kvm_caps.supported_xss &&
+		    is_xstate_managed_msr(entries[i].index)) {
+			kvm_load_guest_fpu(vcpu);
+			fpu_loaded = true;
+		}
+		if (do_msr(vcpu, entries[i].index, &entries[i].data))
+			break;
+	}
+	if (fpu_loaded)
+		kvm_put_guest_fpu(vcpu);
+
+	return i;
+}
 
