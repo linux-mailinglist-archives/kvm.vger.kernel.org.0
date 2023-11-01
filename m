@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-321-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-322-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DF477DE3FD
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 16:47:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D1697DE49A
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 17:32:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEBAE1C20D7C
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 15:47:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E54B4B21176
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 16:32:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB24414A8A;
-	Wed,  1 Nov 2023 15:47:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3568E15E84;
+	Wed,  1 Nov 2023 16:32:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R8f5o18b"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H0peW2Vg"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC1010796
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 15:47:13 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C205A1A3
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 08:46:54 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d9cb10a5d44so3517917276.0
-        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 08:46:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE3415E80
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 16:31:59 +0000 (UTC)
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9101D10C
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 09:31:58 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cc252cbde2so37996355ad.0
+        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 09:31:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698853614; x=1699458414; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1698856318; x=1699461118; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+gmfEwDq9YKbn0e9zNhr6JroCC1Q/o4VCtKw/NJY+XI=;
-        b=R8f5o18bZMfb+Mujd5yu7bloi3yblWuXh53i6ZvNzS7+BhzU0VrifCKiPIJnSIMxLl
-         /IFFOhaWEQGz751e8hhiUtDhQsRnwpTrW3oV5BBZsivBoUlwhSD5ccQ8OAf13p6YVfBx
-         a1FHXRo7EtfUYAlCa8E6nqDpPP5NIP17YppMxFhCpyaUPzDGkL2F6Ri+qNRvatCSLKo2
-         euwd11vg2nTUeqkKX0iHbn/wbDs4r1tE3RjkZjtQQes04hToH327VxdEz7PLkBX/jqJH
-         LdxhvcCUfIL31/tywkl+TQAcghyUULIKk9FjRCLIE5S16//mEBaMgpgVgezBdlL2kbkb
-         Tvcg==
+        bh=YV/Jadwf9F+4h9faQyKBO/VGXY2YU0z1WDp/3xRNHSA=;
+        b=H0peW2VgEHgEAmUBl8WSgwDu6k3CQIV6n15GUScEvSn79JwEn8g4dsqv2PfNQmSRHg
+         mOr2XyOBSXinROqvvc2GgKs1M6Psbmyf3XBBY7PvM9YV5NQChNUy3xr0RR1I0AdhZFNj
+         /SEtTbNu0cOhpnalVQUgXoJd6qFRGEirEilPOzervJ/2/0VSipCg1CQpoQKk5UNouxy0
+         71lE735dwCIub4yXv1iTRdUMUZ3mAyODMCZLa3WDd4K01dmctSTNMadjXZeKZf7Okjqb
+         G8704HOhBl/ifqqMLgPT98Ih3vTLySx1YzU1a92CT0vd+c0zoH8M5gkyV02gwZzB2ptg
+         x/MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698853614; x=1699458414;
+        d=1e100.net; s=20230601; t=1698856318; x=1699461118;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+gmfEwDq9YKbn0e9zNhr6JroCC1Q/o4VCtKw/NJY+XI=;
-        b=ej1Fv3dDPi5FPc0a4HGlefvvZiKege9lpsEz1AQgmE4vMxDq//HBeVUJe/JyEPmV4R
-         gr24Mz9sJbCOwwUhyESu26r9jcxg5bE9scIR50WKBcgtXp0L7eICURaww6X+AMEiHycd
-         CXOKqV3ErcHEfXzmq35HbnKQovtsKP0WfiazQ4eBVqfyTM+50cNCBPdyPVoM/NTUD69c
-         WVtamv+V7QJ2JcucDkNyPtxD/XJ83tWHij3Wb/G+flmemR0oFeB224ZmMv8bvARxcjlg
-         aMNRkV/CbIhyGyEyDCPbqWZm7a/9jzFrJ2KhrMEy4f+rR16gIqMdfHE5DRZHvqFxucBe
-         oVjQ==
-X-Gm-Message-State: AOJu0Yz5Jjx4MAUE/qZWid64y7SGHQ4HswuJE8/3UZq+fcqFBfDmGgZE
-	vpCjhSpgTu5CFLPO9jP3vDU8XsKCuew=
-X-Google-Smtp-Source: AGHT+IEBt0uSJewyoJrLLtdvjctQO/o9X0wlbeyTNS63E5GY+2uUI42JULOEN/0uLDWjZChmRx92eHbGuic=
+        bh=YV/Jadwf9F+4h9faQyKBO/VGXY2YU0z1WDp/3xRNHSA=;
+        b=lhhLlLJ74iao4VD8qtyDnIdi6nyaNmMl6agPnPMaExAfnV2SvS6dlNv29tGdn9/fMi
+         3UOs0Z+H+LtCyvgf8JhoQe0RQQNnaaFr3ffNyo8VTQTKHzMDfhfBZ/jeBi96Eno4yh+j
+         J+o4Sh/bpStklB3V9d9dBxUdyGrIAxn7nkicdllUrgEPKgC2RQnE5/8gPPYZVJ7SKFp9
+         5tJR8l+tS6ozwXZfSbl6g2cUI8qwt4BHQd8WQF8fO3wqPZl6JfjQqpxTsIyYdkYZ/uec
+         7zb10beZ4JiwIQl4SBoGsNVVodo6QxG3+mJXDUSY92z59aKLNa21DQ3eRqMwGx8LH9Yb
+         3o9A==
+X-Gm-Message-State: AOJu0Yxa1kqHxWdJvOHogCrpm/60gEZ+7RDBs2TsbhyR6dzvdpHkHB+t
+	mUC/WP2RotT7ch3WrXr45klurWdND+k=
+X-Google-Smtp-Source: AGHT+IFjPqC/TQoUJx9xijTOJvOyhtwW2g8NWHhEyZb55Fnj2J2udLjDB8ouZshuVH4VRanHeJsp8MbYxRU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:aac6:0:b0:d9a:5349:4bdd with SMTP id
- t64-20020a25aac6000000b00d9a53494bddmr316853ybi.8.1698853613847; Wed, 01 Nov
- 2023 08:46:53 -0700 (PDT)
-Date: Wed, 1 Nov 2023 08:46:52 -0700
-In-Reply-To: <ea3609bf7c7759b682007042b98191d91d10a751.camel@redhat.com>
+ (user=seanjc job=sendgmr) by 2002:a17:903:25d2:b0:1cc:2ffe:5a27 with SMTP id
+ jc18-20020a17090325d200b001cc2ffe5a27mr230020plb.9.1698856318050; Wed, 01 Nov
+ 2023 09:31:58 -0700 (PDT)
+Date: Wed, 1 Nov 2023 09:31:56 -0700
+In-Reply-To: <d67fe0ca19f7aef855aa376ada0fc96a66ca0d4f.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -63,10 +63,9 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230914063325.85503-1-weijiang.yang@intel.com>
- <20230914063325.85503-19-weijiang.yang@intel.com> <ea3609bf7c7759b682007042b98191d91d10a751.camel@redhat.com>
-Message-ID: <ZUJy7A5Hp6lnZVyq@google.com>
-Subject: Re: [PATCH v6 18/25] KVM: x86: Use KVM-governed feature framework to
- track "SHSTK/IBT enabled"
+ <20230914063325.85503-20-weijiang.yang@intel.com> <d67fe0ca19f7aef855aa376ada0fc96a66ca0d4f.camel@redhat.com>
+Message-ID: <ZUJ9fDuQUNe9BLUA@google.com>
+Subject: Re: [PATCH v6 19/25] KVM: VMX: Emulate read and write to CET MSRs
 From: Sean Christopherson <seanjc@google.com>
 To: Maxim Levitsky <mlevitsk@redhat.com>
 Cc: Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
@@ -76,158 +75,132 @@ Content-Type: text/plain; charset="us-ascii"
 
 On Tue, Oct 31, 2023, Maxim Levitsky wrote:
 > On Thu, 2023-09-14 at 02:33 -0400, Yang Weijiang wrote:
-> > Use the governed feature framework to track whether X86_FEATURE_SHSTK
-> > and X86_FEATURE_IBT features can be used by userspace and guest, i.e.,
-> > the features can be used iff both KVM and guest CPUID can support them.
+> > Add emulation interface for CET MSR access. The emulation code is split
+> > into common part and vendor specific part. The former does common check
+> > for MSRs and reads/writes directly from/to XSAVE-managed MSRs via the
+> > helpers while the latter accesses the MSRs linked to VMCS fields.
 > > 
 > > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 > > ---
-> >  arch/x86/kvm/governed_features.h | 2 ++
-> >  arch/x86/kvm/vmx/vmx.c           | 2 ++
-> >  2 files changed, 4 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/governed_features.h b/arch/x86/kvm/governed_features.h
-> > index 423a73395c10..db7e21c5ecc2 100644
-> > --- a/arch/x86/kvm/governed_features.h
-> > +++ b/arch/x86/kvm/governed_features.h
-> > @@ -16,6 +16,8 @@ KVM_GOVERNED_X86_FEATURE(PAUSEFILTER)
-> >  KVM_GOVERNED_X86_FEATURE(PFTHRESHOLD)
-> >  KVM_GOVERNED_X86_FEATURE(VGIF)
-> >  KVM_GOVERNED_X86_FEATURE(VNMI)
-> > +KVM_GOVERNED_X86_FEATURE(SHSTK)
-> > +KVM_GOVERNED_X86_FEATURE(IBT)
-> >  
-> >  #undef KVM_GOVERNED_X86_FEATURE
-> >  #undef KVM_GOVERNED_FEATURE
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 9409753f45b0..fd5893b3a2c8 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -7765,6 +7765,8 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> >  		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_XSAVES);
-> >  
-> >  	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_VMX);
-> > +	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_SHSTK);
-> > +	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_IBT);
-> >  
-> >  	vmx_setup_uret_msrs(vmx);
-> >  
-> 
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> 
-> 
-> PS: IMHO The whole 'governed feature framework' is very confusing and
-> somewhat poorly documented.
->
-> Currently the only partial explanation of it, is at 'governed_features',
-> which doesn't explain how to use it.
 
-To be honest, terrible name aside, I thought kvm_governed_feature_check_and_set()
-would be fairly self-explanatory, at least relative to all the other CPUID handling
-in KVM.
+...
 
-> For the reference this is how KVM expects governed features to be used in the
-> common case (there are some exceptions to this but they are rare)
-> 
-> 1. If a feature is not enabled in host CPUID or KVM doesn't support it, 
->    KVM is expected to not enable it in KVM cpu caps.
-> 
-> 2. Userspace uploads guest CPUID.
-> 
-> 3. After the guest CPUID upload, the vendor code calls
->    kvm_governed_feature_check_and_set() which sets governed features = True iff
->    feature is supported in both kvm cpu caps and in guest CPUID.
->
-> 4. kvm/vendor code uses 'guest_can_use()' to query the value of the governed
->    feature instead of reading guest CPUID.
-> 
-> It might make sense to document the above somewhere at least.
->
-> Now about another thing I am thinking:
-> 
-> I do know that the mess of boolean flags that svm had is worse than these
-> governed features and functionality wise these are equivalent.
-> 
-> However thinking again about the whole thing: 
-> 
-> IMHO the 'governed features' is another quite confusing term that a KVM
-> developer will need to learn and keep in memory.
+> > +	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+> > +	case MSR_KVM_SSP:
+> > +		if (host_msr_reset && kvm_cpu_cap_has(X86_FEATURE_SHSTK))
+> > +			break;
+> > +		if (!guest_can_use(vcpu, X86_FEATURE_SHSTK))
+> > +			return 1;
+> > +		if (index == MSR_KVM_SSP && !host_initiated)
+> > +			return 1;
+> > +		if (is_noncanonical_address(data, vcpu))
+> > +			return 1;
+> > +		if (index != MSR_IA32_INT_SSP_TAB && !IS_ALIGNED(data, 4))
+> > +			return 1;
+> > +		break;
+> Once again I'll prefer to have an ioctl for setting/getting SSP, this will
+> make the above code simpler (e.g there will be no need to check that write
+> comes from the host/etc).
 
-I 100% agree, but I explicitly called out the terrible name in the v1 and v2
-cover letters[1][2], and the patches were on the list for 6 months before I
-applied them.  I'm definitely still open to a better name, but I'm also not
-exactly chomping at the bit to get behind the bikehsed.
+I don't think an ioctl() would be simpler overall, especially when factoring in
+userspace.  With a synthetic MSR, we get the following quite cheaply:
 
-v1:
- : Note, I don't like the name "governed", but it was the least awful thing I
- : could come up with.  Suggestions most definitely welcome.
+ 1. Enumerating support to userspace.
+ 2. Save/restore of the value, e.g. for live migration.
+ 3. Vendor hooks for propagating values to/from the VMCS/VMCB.
 
-v2:
- : Note, I still don't like the name "governed", but no one has suggested
- : anything else, let alone anything better :-)
+For an ioctl(), #1 would require a capability, #2 (and #1 to some extent) would
+require new userspace flows, and #3 would require new kvm_x86_ops hooks.
 
+The synthetic MSR adds a small amount of messiness, as does bundling 
+MSR_IA32_INT_SSP_TAB with the other shadow stack MSRs.  The bulk of the mess comes
+from the need to allow userspace to write '0' when KVM enumerated supported to
+userspace.
 
-[1] https://lore.kernel.org/all/20230217231022.816138-1-seanjc@google.com
-[2] https://lore.kernel.org/all/20230729011608.1065019-1-seanjc@google.com
+If we isolate MSR_IA32_INT_SSP_TAB, that'll help with the synthetic MSR and with
+MSR_IA32_INT_SSP_TAB.  For the unfortunate "host reset" behavior, the best idea I
+came up with is to add a helper.  It's still a bit ugly, but the ugliness is
+contained in a helper and IMO makes it much easier to follow the case statements.
 
-> Because of that, can't we just use guest CPUID as a single source of truth
-> and drop all the governed features code?
+get:
 
-No, not without a rather massive ABI break.  To make guest CPUID the single source
-of true, KVM would need to modify guest CPUID to squash features that userspace
-has set, but that are not supported by hardware.  And that is most definitely a
-can of worms I don't want to reopen, e.g. see the mess that got created when KVM
-tried to "help" userspace by mucking with VMX capability MSRs in response to
-CPUID changes.
+	case MSR_IA32_INT_SSP_TAB:
+		if (!guest_can_use(vcpu, X86_FEATURE_SHSTK) ||
+		    !guest_cpuid_has(vcpu, X86_FEATURE_LM))
+			return 1;
+		break;
+	case MSR_KVM_SSP:
+		if (!host_initiated)
+			return 1;
+		fallthrough;
+	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+		if (!guest_can_use(vcpu, X86_FEATURE_SHSTK))
+			return 1;
+		break;
 
-There aren't many real use cases for advertising "unsupported" features via guest
-CPUID, but there are some, and I have definitely abused KVM_SET_CPUID2 for testing
-purposes.
+static bool is_set_cet_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u64 data,
+				   bool host_initiated)
+{
+	bool any_cet = index == MSR_IA32_S_CET || index == MSR_IA32_U_CET;
 
-And as above, that doesn't work for X86_FEATURE_XSAVES or X86_FEATURE_GBPAGES.
+	if (guest_can_use(vcpu, X86_FEATURE_SHSTK))
+		return true;
 
-We'd also have to overhaul guest CPUID lookups to be significantly faster (which
-is doable), as one of the motiviations for the framework was to avoid the overhead
-of looking through guest CPUID without needing one-off boolean fields.
+	if (any_cet && guest_can_use(vcpu, X86_FEATURE_IBT))
+		return true;
 
-> In most cases, when the governed feature value will differ from the guest
-> CPUID is when a feature is enabled in the guest CPUID, but not enabled in the
-> KVM caps.
-> 
-> I do see two exceptions to this: XSAVES on AMD and X86_FEATURE_GBPAGES, in
-> which the opposite happens, governed feature is enabled, even when the
-> feature is hidden from the guest CPUID, but it might be better from
-> readability wise point, to deal with these cases manually and we unlikely to
-> have many new such cases in the future.
-> 
-> So for the common case of CPUID mismatch, when the governed feature is
-> disabled but guest CPUID is enabled, does it make sense to allow this? 
+	/* 
+	 * If KVM supports the MSR, i.e. has enumerated the MSR existence to
+	 * userspace, then userspace is allowed to write '0' irrespective of
+	 * whether or not the MSR is exposed to the guest.
+	 */
+	if (!host_initiated || data)
+		return false;
 
-Yes and no.  For "governed features", probably not.  But for CPUID as a whole, there
-are legimiate cases where userspace needs to enumerate things that aren't officially
-"supported" by KVM.  E.g. topology, core crystal frequency (CPUID 0x15), defeatures
-that KVM hasn't yet learned about, features that don't have virtualization controls
-and KVM hasn't yet learned about, etc.  And for things like Xen and Hyper-V paravirt
-features, it's very doable to implement features that are enumerate by CPUID fully
-in userspace, e.g. using MSR filters.
+	if (kvm_cpu_cap_has(X86_FEATURE_SHSTK))
+		return true;
 
-But again, it's a moot point because KVM has (mostly) allowed userspace to fully
-control guest CPUID for a very long time.
+	return any_cet && kvm_cpu_cap_has(X86_FEATURE_IBT);
+}
 
-> Such a feature which is advertised as supported but not really working is a
-> recipe of hard to find guest bugs IMHO.
-> 
-> IMHO it would be much better to just check this condition and do
-> kvm_vm_bugged() or something in case when a feature is enabled in the guest
-> CPUID but KVM can't support it, and then just use guest CPUID in
-> 'guest_can_use()'.
+set:
+	case MSR_IA32_U_CET:
+	case MSR_IA32_S_CET:
+		if (!is_set_cet_msr_allowed(vcpu, index, data, host_initiated))
+			return 1;
+		if (data & CET_US_RESERVED_BITS)
+			return 1;
+		if (!guest_can_use(vcpu, X86_FEATURE_SHSTK) &&
+		    (data & CET_US_SHSTK_MASK_BITS))
+			return 1;
+		if (!guest_can_use(vcpu, X86_FEATURE_IBT) &&
+		    (data & CET_US_IBT_MASK_BITS))
+			return 1;
+		if (!IS_ALIGNED(CET_US_LEGACY_BITMAP_BASE(data), 4))
+			return 1;
 
-Maybe, if we were creating KVM from scratch, e.g. didn't have to worry about
-existing uesrspace behavior and could implement a more forward-looking API than
-KVM_GET_SUPPORTED_CPUID.  But even then the enforcement would need to be limited
-to "pure" hardware-defined feature bits, and I suspect that there would still be
-exceptions.  And there would likely be complexitly in dealing with CPUID leafs
-that are completely unknown to KVM, e.g. unless KVM completely disallowed non-zero
-values for unknown CPUID leafs, adding restrictions when a feature is defined by
-Intel or AMD would be at constant risk of breaking userspace.
+		/* IBT can be suppressed iff the TRACKER isn't WAIT_ENDBR. */
+		if ((data & CET_SUPPRESS) && (data & CET_WAIT_ENDBR))
+			return 1;
+		break;
+	case MSR_IA32_INT_SSP_TAB:
+		if (!guest_cpuid_has(vcpu, X86_FEATURE_LM))
+			return 1;
+
+		if (is_noncanonical_address(data, vcpu))
+			return 1;
+		break;
+	case MSR_KVM_SSP:
+		if (!host_initiated)
+			return 1;
+		fallthrough;
+	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+		if (!is_set_cet_msr_allowed(vcpu, index, data, host_initiated))
+			return 1;
+		if (is_noncanonical_address(data, vcpu))
+			return 1;
+		if (!IS_ALIGNED(data, 4))
+			return 1;
+		break;
+	}
 
