@@ -1,109 +1,166 @@
-Return-Path: <kvm+bounces-334-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-335-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 861887DE7B1
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 22:53:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EE447DE7BB
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 22:56:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A59061C209E8
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 21:53:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FD3F1C20DF4
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 21:56:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21A791BDCE;
-	Wed,  1 Nov 2023 21:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A23FD1BDDD;
+	Wed,  1 Nov 2023 21:55:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="due/HLHw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yordn67/"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8531B296
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 21:53:47 +0000 (UTC)
-Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71C24119
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 14:53:46 -0700 (PDT)
-Received: by mail-oo1-xc31.google.com with SMTP id 006d021491bc7-581ed744114so146730eaf.0
-        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 14:53:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AFDB1B296
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 21:55:50 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A3A2119
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 14:55:49 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d99ec34829aso301301276.1
+        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 14:55:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698875625; x=1699480425; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pNGtVCoxYNTqqb91lIin52vLqJx98695iGNTRt2vMkQ=;
-        b=due/HLHwDNo3rIbJwyeSI5u8S2s7Z1BKuZ+tyJ3dnIANS2+0O/eCX0HJfStqOFxVvL
-         Hx7U2zSO+PiQN8d41w4o22OjHR6PMVXx2Yo39Ly9rwj92/B9nKG9XGWH8ZDHwIoRmWIy
-         XSC372amhehCUWpmNI8hIYI/iNXjvZjidZKqKOygQv60RUii0ChUW0qz58p2TL8DwJDX
-         dnzFu3+gmQQyzmXKqY8EO/kni1G/cd1zefVEu3TleMouPE0fyhH4itCnKpEMl/NTsyyY
-         JgAUxFpSGLm5eyc9gzD9uRm/U5lfWywlvUnnLLpNudQM3ikGuWlRZRjl+R8LojMG6SAS
-         pMIQ==
+        d=google.com; s=20230601; t=1698875748; x=1699480548; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PcqXHpLnYUoCfOstmB/gusaSnz1wSaaIZvticgi9YrM=;
+        b=yordn67/B9coJ27wikY+cNB1RREF7cB4b3Ue4KVs4bUxR7NMszr2uB6DsTcvRFezm4
+         Mv9vIV4D1zL7Ebq8eYUvDJaTsA+b6DbfwYGOyfYZ+gn6JBg2zh32vssNDt0PgQWyi3Hc
+         V30xoKLPHpSqs3H12W5kHbw59Cp3oq89IhbOXGRukrdOHcIips6mw6fvttACqcV26Iao
+         o3OJKk/xvzHC16DLzD0pyWC3byA8iAor+alj9Jl/Ez2piZBXn5OAsYe77vVBVgD3KaOP
+         Uo0at9aIB4srFmOFz36vXvyhDqsKT+KVB/6JAS3Kq2OtaQ1RroksSDGcgJr8iz7Y9trj
+         xkLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698875625; x=1699480425;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pNGtVCoxYNTqqb91lIin52vLqJx98695iGNTRt2vMkQ=;
-        b=LGWpglhoPpeaQFZFiWkkTe3dmhO+hVkXT1Ieiup4/xsLoD+Wdxl8yDh8CkcbP/Lc9m
-         PkK7DQFUn0x34aDX9cBHfErUSJJVrJ13ghhbH0GylGswIz0TJ+6fuO0lQ9ntm9Q73pm+
-         VEBKJHAZQwlXZTuizWPIv9TjMqRpB1qP/L+OAg7EXNMafPG43BqbLJfa4lW1St/lMyac
-         1BbbAZALgi3KXV63+rmzPe8BRS1C2kBMBak/vDKSK+OhHHzRoG0Q/HAi6AE+U0y0tcJJ
-         V4mSVj61tvwZSmrsdd2U0pbb5De79AAmOrd3amOt06WxOwtnzx+cyD9sUm6G7elPKUYD
-         PuNg==
-X-Gm-Message-State: AOJu0YztoAcNjqiHzm6yUDAohvBw8aXYEjVSF3ncKJArA9UJeGd7qrVW
-	xFjB1TdwCI9hhUVi8hst0E/hWZqQtQ54+XZcYf3KTg==
-X-Google-Smtp-Source: AGHT+IHbn1+cpbAI+nliVXgth/Acy7IzPuB2yfJ1vWUR+O6XaiKCG2ZEex24dfHa/3lbHwAMIWL2L6Fx5V4/upuTheA=
-X-Received: by 2002:a4a:de89:0:b0:57b:86f5:701c with SMTP id
- v9-20020a4ade89000000b0057b86f5701cmr13459410oou.4.1698875625558; Wed, 01 Nov
- 2023 14:53:45 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698875748; x=1699480548;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PcqXHpLnYUoCfOstmB/gusaSnz1wSaaIZvticgi9YrM=;
+        b=CVh19piAX5AihP2Wha2zsoYaQmfdX/K8wQ6nS83AwmbVTaZwEBwKFor6YIebNMPlUq
+         nW2o6frTAjphDAi7J2RIcN+sHv7vdGMMYhGqnbMqC5/ExqIaI7wcNpxrrSXMSfb+UDCG
+         7eKhbp3oN/ArD6OV8aJ7k3G105lccyrpCvsAntxOzJSxnqaexfZHNpt/xyoB5lJ8Zih7
+         biEQ9GO5g2Tlks9ulDDFcbr5wZIJbiwYzhw1XZ28Bc1JDkDGDdOX0erMHMiOI2TqFnpI
+         ejataFk3EJflJFLTtdST7phbmMbAuukThFYNzbnvng1lTBYwixSlowqdseQ34iq0vENi
+         m84w==
+X-Gm-Message-State: AOJu0YyqYFAhPTNIBpwfXmvgYMNtYlsVuvZNh+IJ6Z6s++jYXar3WVzj
+	pGf1y1mzZHrlnTxozkEAY52tcdhq+6k=
+X-Google-Smtp-Source: AGHT+IE2sMY2tsOG0bVHgm+pvNoyezNqlGkOo8OmSBoeRdI+YDBZP5bgBr5ffHZ4bVc102IwBIrDYpGpUa8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1083:b0:d9a:c3b8:4274 with SMTP id
+ v3-20020a056902108300b00d9ac3b84274mr405001ybu.7.1698875748263; Wed, 01 Nov
+ 2023 14:55:48 -0700 (PDT)
+Date: Wed, 1 Nov 2023 14:55:46 -0700
+In-Reply-To: <CA+EHjTwTT9cFzYTtwT43nLJS01Sgt0NqzUgKAnfo2fiV3tEvXg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-11-amoorthy@google.com>
- <ZR4U_czGstnDrVxo@google.com>
-In-Reply-To: <ZR4U_czGstnDrVxo@google.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Wed, 1 Nov 2023 14:53:09 -0700
-Message-ID: <CAF7b7mrka8ASjp2UWWunCORjYbjUaOzSyzy_p-0KZXdrfOBOHQ@mail.gmail.com>
-Subject: Re: [PATCH v5 10/17] KVM: Implement KVM_CAP_USERFAULT_ON_MISSING by
- atomizing __gfn_to_pfn_memslot() calls
-To: Sean Christopherson <seanjc@google.com>, David Matlack <dmatlack@google.com>
-Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
-	jthoughton@google.com, axelrasmussen@google.com, peterx@redhat.com, 
-	nadav.amit@gmail.com, isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-17-seanjc@google.com>
+ <CA+EHjTzj4drYKONVOLP19DYpJ4O8kSXcFzw2AKier1QdcFKx_Q@mail.gmail.com>
+ <ZUF8A5KpwpA6IKUH@google.com> <CA+EHjTwTT9cFzYTtwT43nLJS01Sgt0NqzUgKAnfo2fiV3tEvXg@mail.gmail.com>
+Message-ID: <ZULJYg5cf1UrNq3e@google.com>
+Subject: Re: [PATCH v13 16/35] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From: Sean Christopherson <seanjc@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
+	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Oct 4, 2023 at 6:44=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> Eh, the shortlog basically says "do work" with a lot of fancy words.  It =
-really
-> just boils down to:
->
->   KVM: Let callers of __gfn_to_pfn_memslot() opt-out of USERFAULT_ON_MISS=
-ING
+On Wed, Nov 01, 2023, Fuad Tabba wrote:
+> > > > @@ -1034,6 +1034,9 @@ static void kvm_destroy_dirty_bitmap(struct kvm_memory_slot *memslot)
+> > > >  /* This does not remove the slot from struct kvm_memslots data structures */
+> > > >  static void kvm_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
+> > > >  {
+> > > > +       if (slot->flags & KVM_MEM_PRIVATE)
+> > > > +               kvm_gmem_unbind(slot);
+> > > > +
+> > >
+> > > Should this be called after kvm_arch_free_memslot()? Arch-specific ode
+> > > might need some of the data before the unbinding, something I thought
+> > > might be necessary at one point for the pKVM port when deleting a
+> > > memslot, but realized later that kvm_invalidate_memslot() ->
+> > > kvm_arch_guest_memory_reclaimed() was the more logical place for it.
+> > > Also, since that seems to be the pattern for arch-specific handlers in
+> > > KVM.
+> >
+> > Maybe?  But only if we can about symmetry between the allocation and free paths
+> > I really don't think kvm_arch_free_memslot() should be doing anything beyond a
+> > "pure" free.  E.g. kvm_arch_free_memslot() is also called after moving a memslot,
+> > which hopefully we never actually have to allow for guest_memfd, but any code in
+> > kvm_arch_free_memslot() would bring about "what if" questions regarding memslot
+> > movement.  I.e. the API is intended to be a "free arch metadata associated with
+> > the memslot".
+> >
+> > Out of curiosity, what does pKVM need to do at kvm_arch_guest_memory_reclaimed()?
+> 
+> It's about the host reclaiming ownership of guest memory when tearing
+> down a protected guest. In pKVM, we currently teardown the guest and
+> reclaim its memory when kvm_arch_destroy_vm() is called. The problem
+> with guestmem is that kvm_gmem_unbind() could get called before that
+> happens, after which the host might try to access the unbound guest
+> memory. Since the host hasn't reclaimed ownership of the guest memory
+> from hyp, hilarity ensues (it crashes).
+> 
+> Initially, I hooked reclaim guest memory to kvm_free_memslot(), but
+> then I needed to move the unbind later in the function. I realized
+> later that kvm_arch_guest_memory_reclaimed() gets called earlier (at
+> the right time), and is more aptly named.
 
-Proposed commit message for v6:
+Aha!  I suspected that might be the case.
 
-> KVM: Implement KVM_CAP EXIT_ON_MISSING by checking memslot flag in __gfn_=
-to_pfn_memslot()
->
-> When the slot flag is enabled, forbid __gfn_to_pfn_memslot() from
-> faulting in pages for which mappings are absent. However, some callers of
-> __gfn_to_pfn_memslot() (such as kvm_vcpu_map()) must be able to opt out
-> of this behavior: allow doing so via the new can_exit_on_missing
-> parameter.
+TDX and SNP also need to solve the same problem of "reclaiming" memory before it
+can be safely accessed by the host.  The plan is to add an arch hook (or two?)
+into guest_memfd that is invoked when memory is freed from guest_memfd.
 
-Although separately, I don't think the parameter should be named
-can_exit_on_missing (or, as you suggested, can_do_userfault)-
-__gfn_to_pfn_memslot() shouldn't know or care how its callers are
-setting up KVM exits, after all.
+Hooking kvm_arch_guest_memory_reclaimed() isn't completely correct as deleting a
+memslot doesn't *guarantee* that guest memory is actually reclaimed (which reminds
+me, we need to figure out a better name for that thing before introducing
+kvm_arch_gmem_invalidate()).
 
-I think it makes sense to rename the new parameter and, for the same
-reasoning, the memslot flag to "forbid_fault_on_missing" and
-KVM_MEM_FORBID_FAULT_ON_MISSING respectively. Objections?
+The effective false positives aren't fatal for the current usage because the hook
+is used only for x86 SEV guests to flush caches.  An unnecessary flush can cause
+performance issues, but it doesn't affect correctness. For TDX and SNP, and IIUC
+pKVM, false positives are fatal because KVM could assign memory back to the host
+that is still owned by guest_memfd.
+
+E.g. a misbehaving userspace could prematurely delete a memslot.  And the more
+fun example is intrahost migration, where the plan is to allow pointing multiple
+guest_memfd files at a single guest_memfd inode:
+https://lore.kernel.org/all/cover.1691446946.git.ackerleytng@google.com
+
+There was a lot of discussion for this, but it's scattered all over the place.
+The TL;DR is is that the inode will represent physical memory, and a file will
+represent a given "struct kvm" instance's view of that memory.  And so the memory
+isn't reclaimed until the inode is truncated/punched.
+
+I _think_ this reflects the most recent plan from the guest_memfd side:
+https://lore.kernel.org/all/1233d749211c08d51f9ca5d427938d47f008af1f.1689893403.git.isaku.yamahata@intel.com
 
