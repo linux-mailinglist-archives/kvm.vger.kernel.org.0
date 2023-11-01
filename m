@@ -1,156 +1,89 @@
-Return-Path: <kvm+bounces-310-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-309-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 667A47DE122
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 13:52:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1AE77DE120
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 13:52:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91D491C20D7E
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 12:52:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82AE8280F9F
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 12:52:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5597312E46;
-	Wed,  1 Nov 2023 12:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A572B12B8F;
+	Wed,  1 Nov 2023 12:52:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v29IL5Vy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sLch8VwW"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A95011187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAD610974
 	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 12:52:00 +0000 (UTC)
-Received: from mail-vk1-xa29.google.com (mail-vk1-xa29.google.com [IPv6:2607:f8b0:4864:20::a29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3537D101
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 05:51:56 -0700 (PDT)
-Received: by mail-vk1-xa29.google.com with SMTP id 71dfb90a1353d-4a13374a1e8so2754538e0c.1
-        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 05:51:56 -0700 (PDT)
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B08EFC
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 05:51:59 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-54357417e81so12967a12.0
+        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 05:51:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698843115; x=1699447915; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1698843117; x=1699447917; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=d3o84LhG/JDs4XT09LqOqAL557WR+kTbV5Toac0tgZE=;
-        b=v29IL5VyU3B+aIfMrMdmbix8p5RVup/xW4vUd6RBnr33Bu8rfYh4G9v+WM1qpVJypq
-         gUqbJSpQOqW37W/djoRJRIkKHZzIrcfejcAVmEP62zMyHDrCtUV8o5xm9kmK0A5uXqpN
-         apJ1xeSyhmnijeGDVHeBGftbSrruIvUPi1PhaD+ZY5fJYApRylMJb9TK7eDjeoSvgGgS
-         fGgQaVG7lCLuPpTDIcraWrc5yHng2VtxHRAKVcjqPT7wuVWgNcUO2wyZf05wsrfCjkOW
-         LFomWquwgrI4aiqOJaMRYMEiqNFRO4P8TGYhaKNN5Qy9bJ5LxbPFHzUI5OiqEo5kfxQy
-         2+Bw==
+        bh=Y5Xp3E2sNGurYgFgV4DFltI61gPnCGK2ee6FfBRryFI=;
+        b=sLch8VwWZ1zSWfBadZ8y7Hj0W93EptAw+uscEv3zuRfnDoneD/GWEIwccnaJtKnxpf
+         vFsn8hIS1x2CMwzQzmSDZZnmop/xOmlII+340ZCPhU/1KoclJPJ+CSMrAXE7p6DhurSt
+         md6ZiVmounouybPxqU7CeYRNyM0gRKUmtx8+He/5rHhv6f27izWempfoQ0l//9da2DfF
+         gHn1Wo/Xzo8J4mCy5MTm6SjY5owjbQZkJ3tVfBKY6iY010ECa+zX1NpOfb3opKfrOyE3
+         U47zzgT4vNH4SseHHP85nne4/JEdnvFd2zloEHFvYnlhszAr7KFSqK7P1no+9JnoNNz7
+         5Scg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698843115; x=1699447915;
+        d=1e100.net; s=20230601; t=1698843117; x=1699447917;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=d3o84LhG/JDs4XT09LqOqAL557WR+kTbV5Toac0tgZE=;
-        b=puNx7kzwGRVe+NlU9CdwdE0PPTakuUlXDw5mJbXP+3HcxYnKs6xgqVO7gxDhsOhlIY
-         8i78cCg3tmSuRqcWKIW1MwIHmGdpOJbFNlDZH4RyHJfrdh2I1oZ+CAn0eoDMa42gmnyD
-         SuckvHShFqWMiUJ69XutzrPdRpEO2HY/vg7ZF/1py/zqs3cyZp9MVrOvnGxPlOnS0s/o
-         nXcKYeDSua9JRt8WxCGfTJuO8KWPqXc0XXgS1R+3n/42BhJ6h9PeuIZk0qiInE6mNJ5g
-         w0BlQoTkfPUkQ4dVuJcLqvKkjsArkX2H+uzNdUxGXjak2CraWfvVSvNVyTkrG5VOd82q
-         dw+w==
-X-Gm-Message-State: AOJu0YwlK5NmGcjymLeYTpJaneuJanPiwtVGxpkmPTJ6CgrQXR48rC7t
-	aUtx42pMiuBIVJ1peE7Lj7fzPxEZCvGclYedrepzvw==
-X-Google-Smtp-Source: AGHT+IF0GS509bXC109Q/KsllvKKbuNv6izlI+nfo857C1iROxiLKrI4wNuuGIZxmkDtH9Saf2Z2BbskHZJDaldFC6s=
-X-Received: by 2002:a1f:9b13:0:b0:4a1:7278:3bf5 with SMTP id
- d19-20020a1f9b13000000b004a172783bf5mr13903007vke.4.1698843115068; Wed, 01
- Nov 2023 05:51:55 -0700 (PDT)
+        bh=Y5Xp3E2sNGurYgFgV4DFltI61gPnCGK2ee6FfBRryFI=;
+        b=cN/Ht16iUkqaCzvm3Ojv+wNRQMauXR5LG2C8UH7dZj4izG0sVGFIskqpCm5OrC94oT
+         xplyxuK3HIUeNxx/dgIgdbxnLI6hSyGGFtVhPSsaSfrFOqq0Ba+635/gtn7QVZTruDq0
+         qeVAgaNpDrupfDJKAXzv7/QBDrzvsSv/ZhVSHGtrPIYwEnFl5ZdiC47dYkVTaEhhwyxb
+         gJZ9smTTKApLLlW2YFJcB2gt1Pk24AlUApAZY6xkD4INrBtf3dbQ6HBY/4eHlXzpBoHM
+         yVVgiNKsLMpUiqNPbzdUVvsGDB2PVQlLFm7u0uc3IBPeArVbBuMtIVfD3wXTn9C98iH+
+         siig==
+X-Gm-Message-State: AOJu0YwYKFAnzJR9pBnVLQ1fthg81YCr6lfkc4Bgb2zkefNg9yBSBz8H
+	Pvi9s6Clj6R+PSqderjx07xLTWmS+d11f9tIuPvvuw==
+X-Google-Smtp-Source: AGHT+IFkCTEbSFkG7scGgC6TPzXxes69hSs6N5IfbBplDhafMoz8fYHl4lzT4ijrjOXjRvVuuGWhG1FmH8yvUfSka2I=
+X-Received: by 2002:a05:6402:17da:b0:543:72e1:7f7 with SMTP id
+ s26-20020a05640217da00b0054372e107f7mr210251edy.1.1698843117362; Wed, 01 Nov
+ 2023 05:51:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-6-seanjc@google.com>
-In-Reply-To: <20231027182217.3615211-6-seanjc@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 1 Nov 2023 12:51:19 +0000
-Message-ID: <CA+EHjTxq9zBY02bqsThV5+afLY1mGXyfs+X1yiKL0kM8SSz_Ug@mail.gmail.com>
-Subject: Re: [PATCH v13 05/35] KVM: PPC: Drop dead code related to KVM_ARCH_WANT_MMU_NOTIFIER
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20231031092921.2885109-1-dapeng1.mi@linux.intel.com> <20231031092921.2885109-2-dapeng1.mi@linux.intel.com>
+In-Reply-To: <20231031092921.2885109-2-dapeng1.mi@linux.intel.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Wed, 1 Nov 2023 05:51:41 -0700
+Message-ID: <CALMp9eTB-uPOnUchFsX=-JDz3Pu-OjdSksOEVQvz3htNazDhvQ@mail.gmail.com>
+Subject: Re: [kvm-unit-tests Patch v2 1/5] x86: pmu: Remove duplicate code in pmu_init()
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Zhenyu Wang <zhenyuw@linux.intel.com>, 
+	Zhang Xiong <xiong.y.zhang@intel.com>, Mingwei Zhang <mizhang@google.com>, 
+	Like Xu <like.xu.linux@gmail.com>, Dapeng Mi <dapeng1.mi@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 27, 2023 at 7:22=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
+On Tue, Oct 31, 2023 at 2:21=E2=80=AFAM Dapeng Mi <dapeng1.mi@linux.intel.c=
+om> wrote:
 >
-> Assert that both KVM_ARCH_WANT_MMU_NOTIFIER and CONFIG_MMU_NOTIFIER are
-> defined when KVM is enabled, and return '1' unconditionally for the
-> CONFIG_KVM_BOOK3S_HV_POSSIBLE=3Dn path.  All flavors of PPC support for K=
-VM
-> select MMU_NOTIFIER, and KVM_ARCH_WANT_MMU_NOTIFIER is unconditionally
-> defined by arch/powerpc/include/asm/kvm_host.h.
+> From: Xiong Zhang <xiong.y.zhang@intel.com>
 >
-> Effectively dropping use of KVM_ARCH_WANT_MMU_NOTIFIER will simplify a
-> future cleanup to turn KVM_ARCH_WANT_MMU_NOTIFIER into a Kconfig, i.e.
-> will allow combining all of the
+> There are totally same code in pmu_init() helper, remove the duplicate
+> code.
 >
->   #if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
->
-> checks into a single
->
->   #ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
->
-> without having to worry about PPC's "bare" usage of
-> KVM_ARCH_WANT_MMU_NOTIFIER.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
-
-Reviewed-by: Fuad Tabba <tabba@google.com>
-
-Cheers,
-/fuad
-
->  arch/powerpc/kvm/powerpc.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index 7197c8256668..b0a512ede764 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -632,12 +632,13 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, l=
-ong ext)
->                 break;
->  #endif
->         case KVM_CAP_SYNC_MMU:
-> +#if !defined(CONFIG_MMU_NOTIFIER) || !defined(KVM_ARCH_WANT_MMU_NOTIFIER=
-)
-> +               BUILD_BUG();
-> +#endif
->  #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
->                 r =3D hv_enabled;
-> -#elif defined(KVM_ARCH_WANT_MMU_NOTIFIER)
-> -               r =3D 1;
->  #else
-> -               r =3D 0;
-> +               r =3D 1;
->  #endif
->                 break;
->  #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-> --
-> 2.42.0.820.g83a721a137-goog
->
+> Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
+> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
 
