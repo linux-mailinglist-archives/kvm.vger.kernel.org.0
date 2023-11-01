@@ -1,119 +1,118 @@
-Return-Path: <kvm+bounces-270-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-271-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61C0A7DDB10
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 03:38:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EE307DDB1F
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 03:48:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56ACBB21125
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 02:38:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9232C1C20D45
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 02:48:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5153BED5;
-	Wed,  1 Nov 2023 02:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B385E10EF;
+	Wed,  1 Nov 2023 02:48:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="RuqRHB3z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I7dELkTH"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D695367
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 02:37:58 +0000 (UTC)
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D189C2;
-	Tue, 31 Oct 2023 19:37:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1698806269;
-	bh=w5Q+yOjS1lbBrWUF1wYoPOETYbMslm549x5jw+MUTHg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RuqRHB3zd8iG/m4CwbzADMSPwk6K/Glp1LKXaIYLynePaUlH2Jk4pkcSDwgFBs4LL
-	 +Aldn2Q4qE6KObBWK7dmkaIS6AnBRxSD9xpga4PPGcfbB64Ipwdlo36EWbS5FJI2tw
-	 NJiG0C3l342Wg6JiJAC8gZqzpaT6fYt4GpUCJa9BPZLNpX7Z0LojT1v11JvfNMX0Ax
-	 QgkYp/drI7lJMmKstXTO6hdsuTfOkL9poxqFOly8MjaGDVN6xQdd6+AVpG9e9yjtgb
-	 ANrbqGhyB83wSaWsekJPZlsNXL5It/LTR09D0NSSu4lQwgEGPg+E+KGjuFuF4ZRJTx
-	 WHujZYOL/BFmw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4SKrlF4DvRz4wcg;
-	Wed,  1 Nov 2023 13:37:45 +1100 (AEDT)
-Date: Wed, 1 Nov 2023 13:37:43 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul@pwsan.com>
-Cc: Anup Patel <anup@brainfault.org>, Andrew Jones
- <ajones@ventanamicro.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Mayuresh Chitale <mchitale@ventanamicro.com>,
- Palmer Dabbelt <palmer@rivosinc.com>, Paolo Bonzini <pbonzini@redhat.com>,
- KVM <kvm@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the kvm-riscv tree with the risc-v
- tree
-Message-ID: <20231101133743.70454594@canb.auug.org.au>
-In-Reply-To: <20231030125302.250fc7e8@canb.auug.org.au>
-References: <20231030125302.250fc7e8@canb.auug.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B462DA32
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 02:48:09 +0000 (UTC)
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6B5BF3
+	for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 19:48:07 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so7194a12.0
+        for <kvm@vger.kernel.org>; Tue, 31 Oct 2023 19:48:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698806886; x=1699411686; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GBisgJ9QGTELvVjJu1jW4LEFa5KH3eLa6pgyaizlfpI=;
+        b=I7dELkTHRZI6Ft2T6W/D0rvxDBBGekrzgAHyQr2b0yQmEw9fYhi1HeYBrok/rA61pV
+         VP7+4CIdQFgUDuq0XE/Uw8wftwB8EWY6VTpcKfFV52zHP3w6t0J05lZ9Hw16Zo8II4Zs
+         i/8nmO4EzIErXPSICrecy5r+fO15tKrS2eWUk5cZ77FvetPRHHzFL6U7vwc5GWJqvavS
+         DP416C2DDAruw9c+jTZmvlDPpPfSVZb568uEyOKcmsiK0+eK8IQ07CBurRvBhFqckaBp
+         RPt9IdoQyTL1ild93s2Gf3q026CAXUnFO2g++jARNw3rdFiXqBoFOjqBL3Ez734FW2oZ
+         FsxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698806886; x=1699411686;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GBisgJ9QGTELvVjJu1jW4LEFa5KH3eLa6pgyaizlfpI=;
+        b=b3ryAY2LbqzJHNp3QObCB41B+fhA1midk+CQO0V6Ar5/VhtO45x7QtOkeEKmLKvB3U
+         WEDyWGoWYtayzajIe6L1LKE6X1nerF9+92pawPlSq+TmQHytlcAlPEnkrnDW/HKn2ijO
+         wPb3kbxa15C9VmC7Fo1Xe7vu7sJiBOm5iejCIyZ2uvz+iNjPI7tEYNKDllJDOZCgCxCN
+         eTAlBJmkjmCIIiVFqzgzSYcqyJTXFM6msNDDGXRRmxqTN3kGyJW8t+Sv3eIXeYEKu0Ha
+         82mDe2vDdrEWdhE75Ddm4Q85SigHDFVwRZVz7hRhSPPGon6tPxpqlxYCGU5JY+Qkq77o
+         pBww==
+X-Gm-Message-State: AOJu0YzPaG++XaBV9EPAZKu8FcJqOQjPr4n+KMpvtKntvMbS+SAqZnbw
+	zyIuUhipsTuH13yFwSeJXIJzsbVaccqzlEwiARktVw==
+X-Google-Smtp-Source: AGHT+IFBES0LJlTgryIhVSib3Wvc/VZriFT7FNc4avva3KWlfHL4RO1f5PaYTbdAncKIyKrpFeVFxO1RxrdLPc/rNKQ=
+X-Received: by 2002:aa7:c718:0:b0:543:7345:6283 with SMTP id
+ i24-20020aa7c718000000b0054373456283mr181280edq.3.1698806885966; Tue, 31 Oct
+ 2023 19:48:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/4y4=U+6yjH0ay7I=XYwtotI";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-
---Sig_/4y4=U+6yjH0ay7I=XYwtotI
-Content-Type: text/plain; charset=US-ASCII
+References: <20231031092921.2885109-1-dapeng1.mi@linux.intel.com>
+ <20231031092921.2885109-5-dapeng1.mi@linux.intel.com> <CALMp9eQ4Xj5D-kgqVMKUNmdF37rLcMRXyDYdQU339sRCKZ7d9A@mail.gmail.com>
+ <28796dd3-ac4e-4a38-b9e1-f79533b2a798@linux.intel.com>
+In-Reply-To: <28796dd3-ac4e-4a38-b9e1-f79533b2a798@linux.intel.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Tue, 31 Oct 2023 19:47:50 -0700
+Message-ID: <CALMp9eRH5pttOA5BApdVeSbbkOU-kWcOWAoGMfK-9f=cy2Jf0g@mail.gmail.com>
+Subject: Re: [kvm-unit-tests Patch v2 4/5] x86: pmu: Support validation for
+ Intel PMU fixed counter 3
+To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Zhenyu Wang <zhenyuw@linux.intel.com>, 
+	Zhang Xiong <xiong.y.zhang@intel.com>, Mingwei Zhang <mizhang@google.com>, 
+	Like Xu <like.xu.linux@gmail.com>, Dapeng Mi <dapeng1.mi@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
-
-On Mon, 30 Oct 2023 12:53:02 +1100 Stephen Rothwell <sfr@canb.auug.org.au> =
-wrote:
+On Tue, Oct 31, 2023 at 7:33=E2=80=AFPM Mi, Dapeng <dapeng1.mi@linux.intel.=
+com> wrote:
 >
-> Today's linux-next merge of the kvm-riscv tree got a conflict in:
->=20
->   arch/riscv/include/asm/csr.h
->=20
-> between commit:
->=20
->   43c16d51a19b ("RISC-V: Enable cbo.zero in usermode")
->=20
-> from the risc-v tree and commits:
->=20
->   db3c01c7a308 ("RISCV: KVM: Add senvcfg context save/restore")
->   81f0f314fec9 ("RISCV: KVM: Add sstateen0 context save/restore")
->=20
-> from the kvm-riscv tree.
->=20
-> I fixed it up (I just used the latter version of this file) and can
-> carry the fix as necessary. This is now fixed as far as linux-next is
-> concerned, but any non trivial conflicts should be mentioned to your
-> upstream maintainer when your tree is submitted for merging.  You may
-> also want to consider cooperating with the maintainer of the conflicting
-> tree to minimise any particularly complex conflicts.
+>
+> On 11/1/2023 2:47 AM, Jim Mattson wrote:
+> > On Tue, Oct 31, 2023 at 2:22=E2=80=AFAM Dapeng Mi <dapeng1.mi@linux.int=
+el.com> wrote:
+> >> Intel CPUs, like Sapphire Rapids, introduces a new fixed counter
+> >> (fixed counter 3) to counter/sample topdown.slots event, but current
+> >> code still doesn't cover this new fixed counter.
+> >>
+> >> So this patch adds code to validate this new fixed counter can count
+> >> slots event correctly.
+> > I'm not convinced that this actually validates anything.
+> >
+> > Suppose, for example, that KVM used fixed counter 1 when the guest
+> > asked for fixed counter 3. Wouldn't this test still pass?
+>
+>
+> Per my understanding, as long as the KVM returns a valid count in the
+> reasonable count range, we can think KVM works correctly. We don't need
+> to entangle on how KVM really uses the HW, it could be impossible and
+> unnecessary.
 
-This is now a conflict between the kvm tree and the risc-v tree.
+Now, I see how the Pentium FDIV bug escaped notice. Hey, the numbers
+are in a reasonable range. What's everyone upset about?
 
---=20
-Cheers,
-Stephen Rothwell
+> Yeah, currently the predefined valid count range may be some kind of
+> loose since I want to cover as much as hardwares and avoid to cause
+> regression. Especially after introducing the random jump and clflush
+> instructions, the cycles and slots become much more hard to predict.
+> Maybe we can have a comparable restricted count range in the initial
+> change, and we can loosen the restriction then if we encounter a failure
+> on some specific hardware. do you think it's better? Thanks.
 
---Sig_/4y4=U+6yjH0ay7I=XYwtotI
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmVBufcACgkQAVBC80lX
-0GwhQgf/VhKxVFTnb9O4m7ZXuCCW66Xp3NHf1tADuOxPYlg5mUMKlwBHXlXVleNn
-QiBg+Rujt/1FBmiXPJjiYwDGXaQcu9zkKoi3fe7vbX2zzLGfdDLm3SKdje8q10uS
-lnsIKiUc4bz498tkzDPwJ345s1zsji4YHiEPWw+nG3PuPkmHSF5bnj5AjErLj5qy
-Per14S5UBvUE6BGHOae81DNeaLJ8ve6Yep97icATgpxZ/V+Wh5/qYXTrfWHvWqX1
-oyi/jebBRMzLMt8LNO2DCzOy+zHIT3S+Xr7vNen/qWB9VwZPCxtH2971xZOS+svI
-OLukwv9Cv+hF74UTcpv2SUIEfLWi7Q==
-=fGHd
------END PGP SIGNATURE-----
-
---Sig_/4y4=U+6yjH0ay7I=XYwtotI--
+I think the test is essentially useless, and should probably just be
+deleted, so that it doesn't give a false sense of confidence.
 
