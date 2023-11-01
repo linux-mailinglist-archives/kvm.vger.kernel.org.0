@@ -1,141 +1,142 @@
-Return-Path: <kvm+bounces-284-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-285-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB4ED7DDD22
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 08:25:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36BD77DDD2B
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 08:27:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B4F91C20DB9
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 07:25:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF21E281181
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 07:27:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A12F612F;
-	Wed,  1 Nov 2023 07:25:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EOVCUeoz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E985692;
+	Wed,  1 Nov 2023 07:27:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6845680;
-	Wed,  1 Nov 2023 07:25:43 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42D88C2;
-	Wed,  1 Nov 2023 00:25:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698823539; x=1730359539;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=qWRVoltW9FVs6NYX3CWyFfOjxesJ7ml8CJp5xBKO3/4=;
-  b=EOVCUeozcT1NzVrIgdJtfxx6i7mCK1uws2kYos0e8yuYTfLr0dwqwGKp
-   QmmOYY1fS3NH5F53S2ybE14BH7mliFv39x9GKPVX/usRuck+DRk9o4jv9
-   Ynx6d2WAo/NwEDiXKHCkdMIhKZaWDgQvgxnlbH3kLKd1L/Xv7qdFLqw9d
-   dCvggauYe/b9lAJqQ6XLXAnppfmQXv6irZ+4Sn9ipwMNDymUyKr51/nXK
-   GBjnXY5dncs81GadtrECWaJvVwxMMkGZ9bFFnodamezNFVyEAZHSjZ1gc
-   N7Aq+p4E9q1Tofjmx/V6UuhBce+/wOcYDJiGF9Rtay9IRC/Q5G7u/L+Bg
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10880"; a="392307402"
-X-IronPort-AV: E=Sophos;i="6.03,267,1694761200"; 
-   d="scan'208";a="392307402"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2023 00:25:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,267,1694761200"; 
-   d="scan'208";a="8964294"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.9.145]) ([10.93.9.145])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2023 00:25:26 -0700
-Message-ID: <92ba7ddd-2bc8-4a8d-bd67-d6614b21914f@intel.com>
-Date: Wed, 1 Nov 2023 15:25:23 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FE97567F
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 07:27:22 +0000 (UTC)
+Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [IPv6:2a01:4f8:150:2161:1:b009:f23e:0])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDB38E4;
+	Wed,  1 Nov 2023 00:27:19 -0700 (PDT)
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
+	by bmailout3.hostsharing.net (Postfix) with ESMTPS id B8605100D9404;
+	Wed,  1 Nov 2023 08:27:17 +0100 (CET)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 6577B1BAC8D; Wed,  1 Nov 2023 08:27:17 +0100 (CET)
+Date: Wed, 1 Nov 2023 08:27:17 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: linux-coco@lists.linux.dev, kvm@vger.kernel.org,
+	linux-pci@vger.kernel.org, Dan Williams <dan.j.williams@intel.com>,
+	Jonathan Cameron <jic23@kernel.org>
+Subject: Re: TDISP enablement
+Message-ID: <20231101072717.GB25863@wunner.de>
+References: <e05eafd8-04b3-4953-8bca-dc321c1a60b9@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 17/35] KVM: Add transparent hugepage support for
- dedicated guest memory
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
- Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, Xu Yilun <yilun.xu@intel.com>,
- Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
- Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>,
- David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
- =?UTF-8?Q?n?= <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>,
- Vishal Annapurve <vannapurve@google.com>,
- Ackerley Tng <ackerleytng@google.com>,
- Maciej Szmigiero <mail@maciej.szmigiero.name>,
- David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
- Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
- Liam Merwick <liam.merwick@oracle.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-18-seanjc@google.com>
- <7c0844d8-6f97-4904-a140-abeabeb552c1@intel.com>
- <ZUEML6oJXDCFJ9fg@google.com>
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <ZUEML6oJXDCFJ9fg@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e05eafd8-04b3-4953-8bca-dc321c1a60b9@amd.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On 10/31/2023 10:16 PM, Sean Christopherson wrote:
-> On Tue, Oct 31, 2023, Xiaoyao Li wrote:
->> On 10/28/2023 2:21 AM, Sean Christopherson wrote:
->>> Extended guest_memfd to allow backing guest memory with transparent
->>> hugepages. Require userspace to opt-in via a flag even though there's no
->>> known/anticipated use case for forcing small pages as THP is optional,
->>> i.e. to avoid ending up in a situation where userspace is unaware that
->>> KVM can't provide hugepages.
->>
->> Personally, it seems not so "transparent" if requiring userspace to opt-in.
->>
->> People need to 1) check if the kernel built with TRANSPARENT_HUGEPAGE
->> support, or check is the sysfs of transparent hugepage exists; 2)get the
->> maximum support hugepage size 3) ensure the size satisfies the alignment;
->> before opt-in it.
->>
->> Even simpler, userspace can blindly try to create guest memfd with
->> transparent hugapage flag. If getting error, fallback to create without the
->> transparent hugepage flag.
->>
->> However, it doesn't look transparent to me.
-> 
-> The "transparent" part is referring to the underlying kernel mechanism, it's not
-> saying anything about the API.  The "transparent" part of THP is that the kernel
-> doesn't guarantee hugepages, i.e. whether or not hugepages are actually used is
-> (mostly) transparent to userspace.
-> 
-> Paolo also isn't the biggest fan[*], but there are also downsides to always
-> allowing hugepages, e.g. silent failure due to lack of THP or unaligned size,
-> and there's precedent in the form of MADV_HUGEPAGE.
-> 
-> [*] https://lore.kernel.org/all/84a908ae-04c7-51c7-c9a8-119e1933a189@redhat.com
+On Wed, Nov 01, 2023 at 09:56:11AM +1100, Alexey Kardashevskiy wrote:
+> - device_connect - starts CMA/SPDM session, returns measurements/certs,
+> runs IDE_KM to program the keys;
 
-But it's different than MADV_HUGEPAGE, in a way. Per my understanding, 
-the failure of MADV_HUGEPAGE is not fatal, user space can ignore it and 
-continue.
+Does the PSP have a set of trusted root certificates?
+If so, where does it get them from?
 
-However, the failure of KVM_GUEST_MEMFD_ALLOW_HUGEPAGE is fatal, which 
-leads to failure of guest memfd creation.
+If not, does the PSP just blindly trust the validity of the cert chain?
+Who validates the cert chain, and when?
+Which slot do you use?
+Do you return only the cert chain of that single slot or of all slots?
+Does the PSP read out all measurements available?  This may take a while
+if the measurements are large and there are a lot of them.
 
-For current implementation, I think maybe 
-KVM_GUEST_MEMFD_DESIRE_HUGEPAGE fits better than 
-KVM_GUEST_MEMFD_ALLOW_HUGEPAGE? or maybe *PREFER*?
+
+> - tdi_info - read measurements/certs/interface report;
+
+Does this return cached cert chains and measurements from the device
+or does it retrieve them anew?  (Measurements might have changed if
+MEAS_FRESH_CAP is supported.)
+
+
+> If the user wants only CMA/SPDM, the Lukas'es patched will do that without
+> the PSP. This may co-exist with the AMD PSP (if the endpoint allows multiple
+> sessions).
+
+It can co-exist if the pci_cma_claim_ownership() library call
+provided by patch 12/12 is invoked upon device_connect.
+
+It would seem advantageous if you could delay device_connect
+until a device is actually passed through.  Then the OS can
+initially authenticate and measure devices and the PSP takes
+over when needed.
+
+
+> If the user wants only IDE, the AMD PSP's device_connect needs to be called
+> and the host OS does not get to know the IDE keys. Other vendors allow
+> programming IDE keys to the RC on the baremetal, and this also may co-exist
+> with a TSM running outside of Linux - the host still manages trafic classes
+> and streams.
+
+I'm wondering if your implementation is spec compliant:
+
+PCIe r6.1 sec 6.33.3 says that "It is permitted for a Root Complex
+to [...] use implementation specific key management."  But "For
+Endpoint Functions, [...] Function 0 must implement [...]
+the IDE key management (IDE_KM) protocol as a Responder."
+
+So the keys need to be programmed into the endpoint using IDE_KM
+but for the Root Port it's permitted to use implementation-specific
+means.
+
+The keys for the endpoint and Root Port are the same because this
+is symmetric encryption.
+
+If the keys are internal to the PSP, the kernel can't program the
+keys into the endpoint using IDE_KM.  So your implementation precludes
+IDE setup by the host OS kernel.
+
+device_connect is meant to be used for TDISP, i.e. with devices which
+have the TEE-IO Supported bit set in the Device Capabilities Register.
+
+What are you going to do with IDE-capable devices which have that bit
+cleared?  Are they unsupported by your implementation?
+
+It seems to me an architecture cannot claim IDE compliance if it's
+limited to TEE-IO capable devices, which might only be a subset of
+the available products.
+
+
+> The next steps:
+> - expose blobs via configfs (like Dan did configfs-tsm);
+> - s/tdisp.ko/coco.ko/;
+> - ask the audience - what is missing to make it reusable for other vendors
+> and uses?
+
+I intend to expose measurements in sysfs in a measurements/ directory
+below each CMA-capable device's directory.  There are products coming
+to the market which support only CMA and are not interested in IDE or
+TISP.  When bringing up TDISP, measurements received as part of an
+interface report must be exposed in the same way so that user space
+tooling which evaluates the measurememt works both with TEE-IO capable
+and incapable products.  This could be achieved by fetching measurements
+from the interface report instead of via SPDM when TDISP is in use.
+
+Thanks,
+
+Lukas
 
