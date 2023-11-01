@@ -1,112 +1,173 @@
-Return-Path: <kvm+bounces-326-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-327-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4D397DE542
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 18:21:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 161BD7DE56D
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 18:37:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E5201C204AB
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 17:21:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77758B21016
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 17:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 601E815E98;
-	Wed,  1 Nov 2023 17:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33534182A0;
+	Wed,  1 Nov 2023 17:36:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nuXm2Koc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1G73i3bp"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9EB14F70
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 17:21:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC44F134C5
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 17:36:51 +0000 (UTC)
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98573136
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 10:20:56 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d81e9981ff4so6117704276.3
-        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 10:20:56 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ADAAE4
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 10:36:50 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-da0c7d27fb0so6524146276.1
+        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 10:36:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698859256; x=1699464056; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1698860209; x=1699465009; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TDeMHyg6nuM6uHT2NhRlyelK+fI/RFOQGU6FtIWq+2I=;
-        b=nuXm2KocmpbxdbmXC+RtU7wGzmV0XtSzPB/k+4qzCth2TwazsSLX7PN0/rZ1zlQZJD
-         VKcmWJfjCrCvn7AfEI+stBdTXKzpnOdUiE6YUNPl2ApjjBkUqj9z4lAffMcU+Xlszani
-         lvauQkrJI4j4WtxHeYS1QguZYRIDohvpgZuzMWEUGZRaTMepGNdsg5piEJF3syRCRDvJ
-         aoDVKgQtahhFcz7fNT55NBQH0JxS6YJF0vXBDLxOQRsplMLRsiWzBF8Emlz7aOIfRfpn
-         HUDkKaEu8xhFAeUXZjG+QQLtuIppMrGplUvRq8OJf9DLLZAZ00IntUyx7XzikS8vx4sF
-         gpIw==
+        bh=Aa5pPv4/g+I3C3eNDgudVhrFstr6S8Xmtwrf0OlljDI=;
+        b=1G73i3bpqP3lEIiYf1Xa+PqF+ry3FPPmHtzhkTz2ESLqKv/PJo83UzY0L3tGLSLtgw
+         FEf6apQxu3ajl2eaf2jpMXM8oiMYlwvL+Gaj7CmFke3L5WVAzOh6QUSsRjnNhhvyggQP
+         /0obTqP8SXrHs5tm5Lcs1IoffSqT4ZAyvwPXIthiiQ2/DYs3pRsDS0oN02OgNcKyJmxV
+         +il1EDZ1G9lZ1tby+sgxcieBPfodwSlNZ7rJ6OOgSa83N+qrWIIICrK86C1Ay71kdg1m
+         h7J1Ii0mSVbVxFFpS5Ul/5maHoLcclIuFP3aDRfEoQUS+LZ7DrcFMxeDrV3szI4QTAZm
+         WoHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698859256; x=1699464056;
+        d=1e100.net; s=20230601; t=1698860209; x=1699465009;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TDeMHyg6nuM6uHT2NhRlyelK+fI/RFOQGU6FtIWq+2I=;
-        b=hxXQgrTGuZ0WsIhhR6jQn8QzFbHXuElLMZiac+8lwjvxroYBTjYtX4mb5hP/0kfBcU
-         pbRBXjDToE7+Uz+K86Eb+9mzxgexafUWq7bhM4OMDq1RFLQsWyvkrlw2v626lh/CWhXB
-         Z1pDHgEaHkca5ebjUuqa4XSq3UUMtcYc+B5jfhJh3IR/UYGRdP7LIR65uDmMH/hTEy9X
-         2E1rwjpc/b9jhTiqaT6p91yZ8badkuI82hU/Pl+Dliyiz2U5CzH1rjgCaGFrtSViH6w6
-         PifZIakP9/i1J5DyTuXtmaxzUpPdtjyp4aa22imEOERg++aQwsh7gllQA9sGyExZdCHz
-         ZaAw==
-X-Gm-Message-State: AOJu0YwWY3D0OeHQxgrpa46HHPuOeAdjhcbFgY7f0B59TBbn875A19GP
-	OrX3QqR3tS0rYII33nNaHJZOeJ6v+D8=
-X-Google-Smtp-Source: AGHT+IFwGVOPpso45s8V613XF539Qxh3lGXMwKqbbJhIsTxBDYEsG0+0t68Cu9sJzvzKgPmuAbddDRn/tvw=
+        bh=Aa5pPv4/g+I3C3eNDgudVhrFstr6S8Xmtwrf0OlljDI=;
+        b=c88k0jm+BNFuUpRCl0RDobf2ruvmgemmp7OjdPsXAcgp4ospW0kTl1Yiv0trzaGHal
+         R9eO8ZHCzqVM+3euUC3doB7hHDBYTjD1PmTQLw0rGoc1amClg/oOLOPGXA71o/Tp9ayW
+         4QU+37d9kqq/p3TGYcP98tD/t/avDTW/LAkojyJlSz5qVDpQ0E7iVdRw2wExrf5yaBPM
+         L8al4mLTp5sCxo4meIVll3lz863EPQ8GsIV/UmL8sAsJJncazFAMvIvz0OHYLxuUXPnj
+         EuO85wLsYW78fWh5u/juX30ztoFZjo08l3IYtpZWlh4IbjMb4qXR2jrFrTfMxVsAZZ/f
+         EPCA==
+X-Gm-Message-State: AOJu0YzpPjZqX0wNATdYwu/PHHcQVb/HGceblH1tiZQdo+U1oFsEF4+P
+	uLmgU9+7HXvG3u5uPZKQaIaxL6drNuw=
+X-Google-Smtp-Source: AGHT+IG/a6Sj0mASs5/8PEJQnR69sSphX+9SHKWYEjRPOLGEF4l6c52AgzjYtmdhHr7JL68mzkGP7JI8NEg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:7702:0:b0:d9a:6007:223a with SMTP id
- s2-20020a257702000000b00d9a6007223amr319245ybc.8.1698859255708; Wed, 01 Nov
- 2023 10:20:55 -0700 (PDT)
-Date: Wed, 1 Nov 2023 10:20:54 -0700
-In-Reply-To: <5c5eb1cc92d05fb7717fe3480aeb7b20e7842d05.camel@redhat.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:168c:b0:da0:3e46:8ba5 with SMTP id
+ bx12-20020a056902168c00b00da03e468ba5mr304342ybb.8.1698860209654; Wed, 01 Nov
+ 2023 10:36:49 -0700 (PDT)
+Date: Wed, 1 Nov 2023 10:36:48 -0700
+In-Reply-To: <482bfea6f54ea1bb7d1ad75e03541d0ba0e5be6f.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20230914063325.85503-1-weijiang.yang@intel.com>
- <20230914063325.85503-13-weijiang.yang@intel.com> <5c5eb1cc92d05fb7717fe3480aeb7b20e7842d05.camel@redhat.com>
-Message-ID: <ZUKI9oqwaZ46dHeX@google.com>
-Subject: Re: [PATCH v6 12/25] KVM: x86: Refresh CPUID on write to guest MSR_IA32_XSS
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-10-seanjc@google.com>
+ <482bfea6f54ea1bb7d1ad75e03541d0ba0e5be6f.camel@intel.com>
+Message-ID: <ZUKMsOdg3N9wmEzy@google.com>
+Subject: Re: [PATCH v13 09/35] KVM: Add KVM_EXIT_MEMORY_FAULT exit to report
+ faults to userspace
 From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, dave.hansen@intel.com, peterz@infradead.org, 
-	chao.gao@intel.com, rick.p.edgecombe@intel.com, john.allen@amd.com, 
-	Zhang Yi Z <yi.z.zhang@linux.intel.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, 
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "brauner@kernel.org" <brauner@kernel.org>, 
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>, 
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>, 
+	"maz@kernel.org" <maz@kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"mpe@ellerman.id.au" <mpe@ellerman.id.au>, "willy@infradead.org" <willy@infradead.org>, 
+	"anup@brainfault.org" <anup@brainfault.org>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>, "mic@digikod.net" <mic@digikod.net>, 
+	"liam.merwick@oracle.com" <liam.merwick@oracle.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, "david@redhat.com" <david@redhat.com>, 
+	"tabba@google.com" <tabba@google.com>, "amoorthy@google.com" <amoorthy@google.com>, 
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, 
+	"michael.roth@amd.com" <michael.roth@amd.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, 
+	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>, 
+	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>, Vishal Annapurve <vannapurve@google.com>, 
+	"vbabka@suse.cz" <vbabka@suse.cz>, "mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, 
+	"yu.c.zhang@linux.intel.com" <yu.c.zhang@linux.intel.com>, "qperret@google.com" <qperret@google.com>, 
+	"dmatlack@google.com" <dmatlack@google.com>, Yilun Xu <yilun.xu@intel.com>, 
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, 
+	"ackerleytng@google.com" <ackerleytng@google.com>, "jarkko@kernel.org" <jarkko@kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, Wei W Wang <wei.w.wang@intel.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Oct 31, 2023, Maxim Levitsky wrote:
-> On Thu, 2023-09-14 at 02:33 -0400, Yang Weijiang wrote:
-> > @@ -312,6 +313,17 @@ static u64 vcpu_get_supported_xcr0(struct kvm_vcpu *vcpu)
-> >  	return (best->eax | ((u64)best->edx << 32)) & kvm_caps.supported_xcr0;
-> >  }
+On Wed, Nov 01, 2023, Kai Huang wrote:
+> 
+> > +7.34 KVM_CAP_MEMORY_FAULT_INFO
+> > +------------------------------
+> > +
+> > +:Architectures: x86
+> > +:Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
+> > +
+> > +The presence of this capability indicates that KVM_RUN will fill
+> > +kvm_run.memory_fault if KVM cannot resolve a guest page fault VM-Exit, e.g. if
+> > +there is a valid memslot but no backing VMA for the corresponding host virtual
+> > +address.
+> > +
+> > +The information in kvm_run.memory_fault is valid if and only if KVM_RUN returns
+> > +an error with errno=EFAULT or errno=EHWPOISON *and* kvm_run.exit_reason is set
+> > +to KVM_EXIT_MEMORY_FAULT.
+> 
+> IIUC returning -EFAULT or whatever -errno is sort of KVM internal
+> implementation.
+
+The errno that is returned to userspace is ABI.  In KVM, it's a _very_ poorly
+defined ABI for the vast majority of ioctls(), but it's still technically ABI.
+KVM gets away with being cavalier with errno because the vast majority of errors
+are considered fatal by userespace, i.e. in most cases, userspace simply doesn't
+care about the exact errno.
+
+A good example is KVM_RUN with -EINTR; if KVM were to return something other than
+-EINTR on a pending signal or vcpu->run->immediate_exit, userspace would fall over.
+
+> Is it better to relax the validity of kvm_run.memory_fault when
+> KVM_RUN returns any -errno?
+
+Not unless there's a need to do so, and if there is then we can update the
+documentation accordingly.  If KVM's ABI is that kvm_run.memory_fault is valid
+for any errno, then KVM would need to purge kvm_run.exit_reason super early in
+KVM_RUN, e.g. to prevent an -EINTR return due to immediate_exit from being
+misinterpreted as KVM_EXIT_MEMORY_FAULT.  And purging exit_reason super early is
+subtly tricky because KVM's (again, poorly documented) ABI is that *some* exit
+reasons are preserved across KVM_RUN with vcpu->run->immediate_exit (or with a
+pending signal).
+
+https://lore.kernel.org/all/ZFFbwOXZ5uI%2Fgdaf@google.com
+
+> [...]
+> 
+> 
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -2327,4 +2327,15 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+> >  /* Max number of entries allowed for each kvm dirty ring */
+> >  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
 > >  
-> > +static u64 vcpu_get_supported_xss(struct kvm_vcpu *vcpu)
+> > +static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+> > +						 gpa_t gpa, gpa_t size)
 > > +{
-> > +	struct kvm_cpuid_entry2 *best;
+> > +	vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
+> > +	vcpu->run->memory_fault.gpa = gpa;
+> > +	vcpu->run->memory_fault.size = size;
 > > +
-> > +	best = kvm_find_cpuid_entry_index(vcpu, 0xd, 1);
-> > +	if (!best)
-> > +		return 0;
-> > +
-> > +	return (best->ecx | ((u64)best->edx << 32)) & kvm_caps.supported_xss;
+> > +	/* Flags are not (yet) defined or communicated to userspace. */
+> > +	vcpu->run->memory_fault.flags = 0;
 > > +}
+> > +
 > 
-> Same question as one for patch that added vcpu_get_supported_xcr0()
-> Why to have per vCPU supported XSS if we assume that all CPUs have the same
-> CPUID?
-> 
-> I mean I am not against supporting hybrid CPU models, but KVM currently doesn't
-> support this and this creates illusion that it does.
+> KVM_CAP_MEMORY_FAULT_INFO is x86 only, is it better to put this function to
+> <asm/kvm_host.h>?
 
-KVM does "support" hybrid vCPU models in the sense that KVM has allow hybrid models
-since forever.  There are definite things that won't work, e.g. not all relevant
-CPUID bits are captured in kvm_mmu_page_role, and so KVM will incorrectly share
-page tables across vCPUs that are technically incompatible.
+I'd prefer to keep it in generic code, as it's highly likely to end up there
+sooner than later.  There's a known use case for ARM (exit to userspace on missing
+userspace mapping[*]), and I'm guessing pKVM (also ARM) will also utilize this API.
 
-But for many features, heterogenous vCPU models do Just Work as far as KVM is
-concerned.  There likely isn't a real world kernel that supports heterogenous
-feature sets for things like XSS and XCR0, but that's a guest software limitation,
-not a limitation of KVM's CPU virtualization.
-
-As with many things, KVM's ABI is to let userspace shoot themselves in the foot.
+[*] https://lore.kernel.org/all/20230908222905.1321305-8-amoorthy@google.com
 
