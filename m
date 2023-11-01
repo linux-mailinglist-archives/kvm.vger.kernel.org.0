@@ -1,101 +1,132 @@
-Return-Path: <kvm+bounces-337-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-338-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F04D77DE7F5
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 23:15:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBC147DE816
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 23:26:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE43DB20E41
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 22:15:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7BA72B211AB
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 22:26:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88901BDEF;
-	Wed,  1 Nov 2023 22:15:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5240A1C2A7;
+	Wed,  1 Nov 2023 22:26:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dWGA/jlP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hxe+bHtp"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 904BD11CBB
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 22:15:03 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54AFE120
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 15:15:01 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7cf717bacso5366967b3.1
-        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 15:15:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22AFE1BDF0
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 22:25:56 +0000 (UTC)
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B747512C
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 15:25:54 -0700 (PDT)
+Received: by mail-ot1-x336.google.com with SMTP id 46e09a7af769-6ce327458a6so163368a34.1
+        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 15:25:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698876900; x=1699481700; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AZUx8eyAtnd4MLrDQkE9b5iSo4ODlmVMuEOqA88XPCE=;
-        b=dWGA/jlP9KYXfHOq1B00FLV+q8SPT/y6NA8JG7F33GlEvEXnG+6ziFJIWB3okmKtch
-         zC+mfXw0NArJ/jU9+1qmvN0fljuLMMm7huD0CSpsk1B1VLNvh+ZvbJMU3fUvGxPic02L
-         Xjl8CwPV719HHh6Nkp4cmg9imx6c2fUimE26px+68GCZXnCP2h5xY7UBZBzoXSEgnaDx
-         qrcMrVAeNL+HqtTTMQGmb6oxNUz3euu1HVapnzboheNBb1+zcOl+U6HtZBxAySICEMgt
-         Ny1RU0leyW9I1FnY2cq1EVGok7HZWN+6boEraD3kUezeHtjyCrxh7m4UTBW03/aukFgy
-         FT9g==
+        d=google.com; s=20230601; t=1698877554; x=1699482354; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=294ol75obltyYqEqfl+9y62VRvfSAWQRBPN9Wezacbg=;
+        b=hxe+bHtpIEDGl1mY4LssfmnrHb0m/30lUUeg5ENyHokBE0JmCLm55+M7E6MiAYzwXz
+         8mg9ng2lOGQOJKw/hxHMINFKWEhmcPySS8Idboflo3ZWF4TvZZiqvqJBjxR+ITDhX1gr
+         t2fdN4/bn5rh5dPI2KvFM4EUVkgvLxl01T0aApoXcS38suE9/kln4yp9PQS3ZudO2KPA
+         Ryh+xZNf/+pLcucVzEYXPT6HR0ni2yvoT9NDNqEroj23/N90xO9+B/14yG4ez0SXBLG0
+         /AN4jp8ts6X59Tjqugh1DClAhulohREASFLL4qzqd+xHgWeKZlCNTGtyU/lOVcw126uK
+         h3ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698876900; x=1699481700;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AZUx8eyAtnd4MLrDQkE9b5iSo4ODlmVMuEOqA88XPCE=;
-        b=oc7Z3WdvyMSIhoCpBLZ7J+EmLdj7oNZxuG4oAYIFNwi5o2C9p1KXvL21qpjj3TCxtZ
-         jV2b09ia6BvkcPaxYMlC3YXTYATGXUWK+dUoL4S8b4RY9JfVDUy2ttAydzi/Uv4MUxl2
-         6hMwt7pWFb3rEEP1kkwFhl8GdAoaEfPLoy4c+Lt3As6BjvBCIGQPZbUEe+NyPMYcI+/o
-         CbH53BRdOgFDyWTzbMX4xfpk3WZ+Nqj9M0hkRI+MNJms4szxrwcLZ+4/Ycg/6HUQp+tR
-         iY+lSdm8VwVtjBp1YZyq31RyB1FOiutZrYK5NfmmMrYeH0+bMckzLqKN9zzKn4G9CcGP
-         VhhQ==
-X-Gm-Message-State: AOJu0YyrtMmjVyiQRFF9KH3P6dKxLgbO0I/+G8y4AmbVzNfwJAsIQfDv
-	J0555Sy0LjBllV1S4dxyZ+jAPnrOj1M=
-X-Google-Smtp-Source: AGHT+IEXfjGw9mEX6v8vrZsfhwz+lK/Ks4rEmpGGTr1iX9SweIr9i1OP2rAJI23eUzGqrvJaXd4EC2JTg1g=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:8689:0:b0:d9a:3bee:255c with SMTP id
- z9-20020a258689000000b00d9a3bee255cmr316101ybk.7.1698876900547; Wed, 01 Nov
- 2023 15:15:00 -0700 (PDT)
-Date: Wed, 1 Nov 2023 15:14:58 -0700
-In-Reply-To: <c07416ff2919f0aa30d3a810ccdfbed8c387ce0a.camel@redhat.com>
+        d=1e100.net; s=20230601; t=1698877554; x=1699482354;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=294ol75obltyYqEqfl+9y62VRvfSAWQRBPN9Wezacbg=;
+        b=c4HM3/01EGk0YoV/13u5FipTgiH0tQmKOtFJZ/2+PK26nBUKTtt39OU6ZFyxyo0U4C
+         3Gbv6SVY3KNXOCSb2/DS3fTR1kAKrZ7kKhkBFhp1fLj00RtruhgDW5FNPVWkgkZ8Jbzr
+         b2eoBcGflok1GM7PFPncXEMpc5Ki2aFrCc/rKKyVS8zW9Oq5c/kmBLCxaOWWsR/shk+k
+         Oi9JCaNNVJEJpmyVi9Ucd+KxSh36x0esnR0Zf+1ykWq3c9tDjho0Oa1vv3/4N6mXBAx/
+         tVV7lpfGMbSNHRVItZgZl6yafFxjYF6WEhlisz0Ou5Q/spU9Z230o7/TNMjVickMQsHp
+         1GRQ==
+X-Gm-Message-State: AOJu0YwxToQxbNGhNyzZdBMzddMql4TJqnv6uCjbWXwS6wJzumEofMc4
+	p0UldQTBHd3Wx2xrJfCyf5tPlikIGAtDWQGBBJHzTg==
+X-Google-Smtp-Source: AGHT+IEz52TIIahqocPRQHTgpnNRkVELhbb8QsFoXnxMsUeqH1qkZEFXxONxXhy1tVdwDNDCy4jVR8qXcK82xhTcmaY=
+X-Received: by 2002:a05:6830:3149:b0:6bd:62c1:65c with SMTP id
+ c9-20020a056830314900b006bd62c1065cmr2188470ots.18.1698877553954; Wed, 01 Nov
+ 2023 15:25:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230914063325.85503-1-weijiang.yang@intel.com>
- <20230914063325.85503-24-weijiang.yang@intel.com> <c07416ff2919f0aa30d3a810ccdfbed8c387ce0a.camel@redhat.com>
-Message-ID: <ZULN4vMwP1t_mKg7@google.com>
-Subject: Re: [PATCH v6 23/25] KVM: x86: Enable CET virtualization for VMX and
- advertise to userspace
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, dave.hansen@intel.com, peterz@infradead.org, 
-	chao.gao@intel.com, rick.p.edgecombe@intel.com, john.allen@amd.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-11-amoorthy@google.com>
+ <ZR4U_czGstnDrVxo@google.com> <CAF7b7mrka8ASjp2UWWunCORjYbjUaOzSyzy_p-0KZXdrfOBOHQ@mail.gmail.com>
+ <ZULLNdp6XKD6Twuc@google.com>
+In-Reply-To: <ZULLNdp6XKD6Twuc@google.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Wed, 1 Nov 2023 15:25:17 -0700
+Message-ID: <CAF7b7mqEU0rT9dqq5SXvE+XU0TdCbXWk0OW2ayrW5nBg3M_BFg@mail.gmail.com>
+Subject: Re: [PATCH v5 10/17] KVM: Implement KVM_CAP_USERFAULT_ON_MISSING by
+ atomizing __gfn_to_pfn_memslot() calls
+To: Sean Christopherson <seanjc@google.com>
+Cc: David Matlack <dmatlack@google.com>, oliver.upton@linux.dev, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	robert.hoo.linux@gmail.com, jthoughton@google.com, axelrasmussen@google.com, 
+	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
+	kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 31, 2023, Maxim Levitsky wrote:
-> On Thu, 2023-09-14 at 02:33 -0400, Yang Weijiang wrote:
-> > @@ -685,6 +686,13 @@ void kvm_set_cpu_caps(void)
-> >  		kvm_cpu_cap_set(X86_FEATURE_INTEL_STIBP);
-> >  	if (boot_cpu_has(X86_FEATURE_AMD_SSBD))
-> >  		kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL_SSBD);
-> > +	/*
-> > +	 * The feature bit in boot_cpu_data.x86_capability could have been
-> > +	 * cleared due to ibt=off cmdline option, then add it back if CPU
-> > +	 * supports IBT.
-> > +	 */
-> > +	if (cpuid_edx(7) & F(IBT))
-> > +		kvm_cpu_cap_set(X86_FEATURE_IBT);
-> 
-> The usual policy is that when the host doesn't support a feature, then the guest
-> should not support it either. On the other hand, for this particular feature,
-> it is probably safe to use it. Just a point for a discussion.
+On Wed, Nov 1, 2023 at 3:03=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Wed, Nov 01, 2023, Anish Moorthy wrote:
+> > On Wed, Oct 4, 2023 at 6:44=E2=80=AFPM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> > >
+> > > Eh, the shortlog basically says "do work" with a lot of fancy words. =
+ It really
+> > > just boils down to:
+> > >
+> > >   KVM: Let callers of __gfn_to_pfn_memslot() opt-out of USERFAULT_ON_=
+MISSING
+> >
+> > Proposed commit message for v6:
+> >
+> > > KVM: Implement KVM_CAP EXIT_ON_MISSING by checking memslot flag in __=
+gfn_to_pfn_memslot()
+> > >
+> > > When the slot flag is enabled, forbid __gfn_to_pfn_memslot() from
+> > > faulting in pages for which mappings are absent. However, some caller=
+s of
+> > > __gfn_to_pfn_memslot() (such as kvm_vcpu_map()) must be able to opt o=
+ut
+> > > of this behavior: allow doing so via the new can_exit_on_missing
+> > > parameter.
+> >
+> > Although separately, I don't think the parameter should be named
+> > can_exit_on_missing (or, as you suggested, can_do_userfault)-
+> > __gfn_to_pfn_memslot() shouldn't know or care how its callers are
+> > setting up KVM exits, after all.
+>
+> Why not?  __gfn_to_pfn_memslot() gets passed all kinds of constraints, I =
+don't
+> see how "I can't handle exits to userspace" is any different.
 
-Agreed, this needs extra justification.  It's "safe" in theory, but if the admin
-disabled IBT because of a ucode bug, then all bets are off.
+Well the thing is that __gfn_to_pfn_memslot() is orthogonal to KVM
+exits. Its callers are just using it to try resolving a pfn, and what
+they do with the results is up to them.
 
-I'm guessing this was added because of the virtualization hole?  I.e. if KVM
-allows CR4.CET=1 for shadow stacks, then KVM can't (easily?) prevent the guest
-from also using IBT.
+Put more concretely, __gfn_to_pfn_memslot() has many callers of which
+only two (the stage-2 fault handlers) actually use it to set up a KVM
+exit- how does a parameter named "can_exit_on_missing" make sense to
+its callers in general? If it were __gfn_to_pfn_memslot() itself that
+was populating the run struct in response to absent mappings then I
+would agree that the name was appropriate- but that's not what's going
+on here.
+
+(side note, I'll assume that aside from the current naming discussion
+the commit message I proposed is fine)
 
