@@ -1,136 +1,183 @@
-Return-Path: <kvm+bounces-343-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-344-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B82D7DE864
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 23:56:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 699C27DE8CC
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 00:17:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CFAB2819E1
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 22:56:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C21312818AC
+	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 23:17:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ACEB1B282;
-	Wed,  1 Nov 2023 22:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA3018E31;
+	Wed,  1 Nov 2023 23:17:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="De5kuXXi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="chyzq9C4"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A685F18E08
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 22:56:07 +0000 (UTC)
-Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 457BA119
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 15:56:06 -0700 (PDT)
-Received: by mail-ot1-x32f.google.com with SMTP id 46e09a7af769-6d2fedd836fso172115a34.1
-        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 15:56:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698879365; x=1699484165; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jrvYQU4WA1un1SeaZQLwsW4KzArk33583vMtLvNHy+s=;
-        b=De5kuXXidpIwL0y/k019BbWWjV5dVhZRW8E4cQRIDMby1y2/YXWAsjnMLQPA0GIbuB
-         je+fzpJ5ZrY/SWmPo+YDnJgIx/sf5+vAejmZo0R0uaDQrqEWpy5pjAHg1i7pR9n5/M+s
-         +EchiBmN6t2Kez28yH8fqi76JFNzH8ZqjrTH0go1BA/XEMvtTjXZhl7HGffhBe82ztmq
-         d5dLpx0Ykgss5/cJLksHcc8oG/r8/lsEArDXDL7MpCDnvvBInDv9otj1PLAc2Qz2TFcH
-         8KKx9rXOyTOjNGeMVqNpQVcwfa5IOyLiSafbhrSTfszIT+WinEV9t2Rt9GYi5SzQ52k1
-         vLMA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABDC21C2BB
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 23:17:33 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1579A134
+	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 16:17:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698880647;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0vwHZc+/Gns5rEzdivTNKNr5j0n3GZLH4TX/0o56Y/4=;
+	b=chyzq9C4fVwZzI3soe1A5mGtIdOLQK9TeWLdrfFE2MWQm87zJdSKxYsXrj9pZuoC2K0u/2
+	+Jcv9wvuE7yWgatY0YOqsAswsY6VWszGHZPAi6yjsyGxCwQ2EEllY3bb8OaRnr3HPcxVej
+	wzYgkpgzPN7v1eUl1rFJV+jZBcXcj+E=
+Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
+ [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-622-4WoBFotWOtiC8JcCEW39jg-1; Wed, 01 Nov 2023 19:17:25 -0400
+X-MC-Unique: 4WoBFotWOtiC8JcCEW39jg-1
+Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-457bc611991so160206137.0
+        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 16:17:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698879365; x=1699484165;
+        d=1e100.net; s=20230601; t=1698880645; x=1699485445;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jrvYQU4WA1un1SeaZQLwsW4KzArk33583vMtLvNHy+s=;
-        b=cGz78P2oGwvVbcDsWJYqixw2yzpdA5lL83CDGpYh/pEtIgT743XCVCEEv/yJuSRk2H
-         qY+rT4jYKemgJ5SR+SL8gEl6dqWEddw/8zEkOCugoOYoDf3v6H/kHPboAznTWjGB+t2c
-         /TJM2T6UIWZXkp0WA34u4zlbrH1f/sJhLM8Ysa/ANcdeDokknFQDSzb+xGYQMySo+cGt
-         f9D+ZZM0B8+xfeLQ9TOOjf3do/KXf+f9Eo+MBvL22MJOZR8RUSPMRa7Yt/1JLbYGDNtp
-         ScKPyisC7TJ900drKR5OZpqaFhzqm5Jybwyq/T4X3S8tldj85zeWuzcyO9KP1AaV16lM
-         3NdA==
-X-Gm-Message-State: AOJu0YxBiWorqoq5275gIE1iNEy4gdSSDWkl1xY6xExO8NEMr+uIImkx
-	qKozEZ3ehOkBcGyW3RCEWK749HQeTPmQBS20/TDTtg==
-X-Google-Smtp-Source: AGHT+IH+2aIZiuOrtKGaaevt7OnKP2TRzw53ixw7u/I6WI7t+0IGfCTUwcgoNgYWrurLwuw9EkLvMEhLMOj9Z8J00go=
-X-Received: by 2002:a05:6870:6b0c:b0:1e9:cde8:6db0 with SMTP id
- mt12-20020a0568706b0c00b001e9cde86db0mr24144773oab.50.1698879365487; Wed, 01
- Nov 2023 15:56:05 -0700 (PDT)
+        bh=0vwHZc+/Gns5rEzdivTNKNr5j0n3GZLH4TX/0o56Y/4=;
+        b=CxprgL9xclsWJChmelFZaVAcqM/wDIIJcfl6DVtx8CiSXSr99E4lMlocDXjVTpHOXU
+         sbdhKt+r6XT5HXsF2aZ79+nzuhG4Dzci9uJpUmpg31VS5VEEwA45S7h4fj/Uk6LfAuD1
+         FULq7Y1u6nzKi0i7QVsm/jCW1sonDsR1W5CJdETcQeWIL1AaxTR7Xx/Y9tbexsJrwJnS
+         fWYI/qTCZbhnZPJpPz01FanM7Q8OmXJBgKOOXyBJauLyISV42A5tq8kDnHD4r6vreD2o
+         4MVmlrRikC3FtgfQ4H63IWxesC3/nCPVREf6rDbHMl+U+LUb9+3h9r56yZTaCaTURrWe
+         3qZg==
+X-Gm-Message-State: AOJu0Yzdk40UNNfTMASXt3knrEVTx1c9DR4Iwq69q76PJX3kgq8RbKty
+	IMUwwu3s8C7BtEbMnVDL1yVTtw8lcqWY9AGvcQmhg8gsODvRKKRQcFWtJIY3pOVTAMk0h4JMrzV
+	MnrQKJHuhqByroz9FbyU3iR/YjQBQ
+X-Received: by 2002:a67:b70e:0:b0:450:8e58:2de4 with SMTP id h14-20020a67b70e000000b004508e582de4mr14946731vsf.7.1698880645380;
+        Wed, 01 Nov 2023 16:17:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IERW8ZMUKS1oQBttUXGlXfpcF1aXMGz29SltsJOczMO7DdV5tM2YzmJ2Q5mLWwPrzL7OcDPCpWawHIyBUWWBis=
+X-Received: by 2002:a67:b70e:0:b0:450:8e58:2de4 with SMTP id
+ h14-20020a67b70e000000b004508e582de4mr14946722vsf.7.1698880645133; Wed, 01
+ Nov 2023 16:17:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-12-amoorthy@google.com>
- <ZR4WzE1JOvq_0dhE@google.com>
-In-Reply-To: <ZR4WzE1JOvq_0dhE@google.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Wed, 1 Nov 2023 15:55:29 -0700
-Message-ID: <CAF7b7mo0Pbju__J+58-0zHxNFn7R2=8WKTHmKYtcb_4eEa5bTw@mail.gmail.com>
-Subject: Re: [PATCH v5 11/17] KVM: x86: Enable KVM_CAP_USERFAULT_ON_MISSING
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-18-seanjc@google.com>
+ <7c0844d8-6f97-4904-a140-abeabeb552c1@intel.com> <ZUEML6oJXDCFJ9fg@google.com>
+ <92ba7ddd-2bc8-4a8d-bd67-d6614b21914f@intel.com> <ZUJVfCkIYYFp5VwG@google.com>
+ <CABgObfaw4Byuzj5J3k48jdwT0HCKXLJNiuaA9H8Dtg+GOq==Sw@mail.gmail.com>
+ <ZUJ-cJfofk2d_I0B@google.com> <4ca2253d-276f-43c5-8e9f-0ded5d5b2779@redhat.com>
+ <ZULSkilO-tdgDGyT@google.com>
+In-Reply-To: <ZULSkilO-tdgDGyT@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 2 Nov 2023 00:17:13 +0100
+Message-ID: <CABgObfbq_Hg0B=jvsSDqYH3CSpX+RsxfwB-Tc-eYF4uq2Qw9cg@mail.gmail.com>
+Subject: Re: [PATCH v13 17/35] KVM: Add transparent hugepage support for
+ dedicated guest memory
 To: Sean Christopherson <seanjc@google.com>
-Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
-	jthoughton@google.com, ricarkol@google.com, axelrasmussen@google.com, 
-	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
-	kconsul@linux.vnet.ibm.com
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xu Yilun <yilun.xu@intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 4, 2023 at 6:52=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
+On Wed, Nov 1, 2023 at 11:35=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
-> On Fri, Sep 08, 2023, Anish Moorthy wrote:
-> > The relevant __gfn_to_pfn_memslot() calls in __kvm_faultin_pfn()
-> > already use MEMSLOT_ACCESS_NONATOMIC_MAY_UPGRADE.
+> On Wed, Nov 01, 2023, Paolo Bonzini wrote:
+> > On 11/1/23 17:36, Sean Christopherson wrote:
+> > > > > "Allow" isn't perfect, e.g. I would much prefer a straight KVM_GU=
+EST_MEMFD_USE_HUGEPAGES
+> > > > > or KVM_GUEST_MEMFD_HUGEPAGES flag, but I wanted the name to conve=
+y that KVM doesn't
+> > > > > (yet) guarantee hugepages.  I.e. KVM_GUEST_MEMFD_ALLOW_HUGEPAGE i=
+s stronger than
+> > > > > a hint, but weaker than a requirement.  And if/when KVM supports =
+a dedicated memory
+> > > > > pool of some kind, then we can add KVM_GUEST_MEMFD_REQUIRE_HUGEPA=
+GE.
+> > > > I think that the current patch is fine, but I will adjust it to alw=
+ays
+> > > > allow the flag, and to make the size check even if !CONFIG_TRANSPAR=
+ENT_HUGEPAGE.
+> > > > If hugepages are not guaranteed, and (theoretically) you could have=
+ no
+> > > > hugepage at all in the result, it's okay to get this result even if=
+ THP is not
+> > > > available in the kernel.
+> > > Can you post a fixup patch?  It's not clear to me exactly what behavi=
+or you intend
+> > > to end up with.
+> >
+> > Sure, just this:
+> >
+> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> > index 7d1a33c2ad42..34fd070e03d9 100644
+> > --- a/virt/kvm/guest_memfd.c
+> > +++ b/virt/kvm/guest_memfd.c
+> > @@ -430,10 +430,7 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_cr=
+eate_guest_memfd *args)
+> >  {
+> >       loff_t size =3D args->size;
+> >       u64 flags =3D args->flags;
+> > -     u64 valid_flags =3D 0;
+> > -
+> > -     if (IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE))
+> > -             valid_flags |=3D KVM_GUEST_MEMFD_ALLOW_HUGEPAGE;
+> > +     u64 valid_flags =3D KVM_GUEST_MEMFD_ALLOW_HUGEPAGE;
+> >       if (flags & ~valid_flags)
+> >               return -EINVAL;
+> > @@ -441,11 +438,9 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_cr=
+eate_guest_memfd *args)
+> >       if (size < 0 || !PAGE_ALIGNED(size))
+> >               return -EINVAL;
+> > -#ifdef CONFIG_TRANSPARENT_HUGEPAGE
+> >       if ((flags & KVM_GUEST_MEMFD_ALLOW_HUGEPAGE) &&
+> >           !IS_ALIGNED(size, HPAGE_PMD_SIZE))
+> >               return -EINVAL;
+> > -#endif
 >
-> --verbose
+> That won't work, HPAGE_PMD_SIZE is valid only for CONFIG_TRANSPARENT_HUGE=
+PAGE=3Dy.
+>
+> #else /* CONFIG_TRANSPARENT_HUGEPAGE */
+> #define HPAGE_PMD_SHIFT ({ BUILD_BUG(); 0; })
+> #define HPAGE_PMD_MASK ({ BUILD_BUG(); 0; })
+> #define HPAGE_PMD_SIZE ({ BUILD_BUG(); 0; })
 
-Alright, how about the following?
+Would have caught it when actually testing it, I guess. :) It has to
+be PMD_SIZE, possibly with
 
-    KVM: x86: Enable KVM_CAP_EXIT_ON_MISSING
+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
+BUILD_BUG_ON(HPAGE_PMD_SIZE !=3D PMD_SIZE);
+#endif
 
-    __gfn_to_pfn_memslot(), used by the stage-2 fault handler, already
-    checks the memslot flag to avoid faulting in missing pages as required.
-    Therefore, enabling the capability is just a matter of selecting the kc=
-onfig
-    to allow the flag to actually be set.
+for extra safety.
 
-> Hmm, I vote to squash this patch with
->
->   KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
->
-> or rather, squash that code into this patch.  Ditto for the ARM patches.
->
-> Since we're making KVM_EXIT_MEMORY_FAULT informational-only for flows tha=
-t KVM
-> isn't committing to supporting, I think it makes sense to enable the arch=
- specific
-> paths that *need* to return KVM_EXIT_MEMORY_FAULT at the same time as the=
- feature
-> that adds the requirement.
->
-> E.g. without HAVE_KVM_USERFAULT_ON_MISSING support, per the contract we a=
-re creating,
-> it would be totally fine for KVM to not use KVM_EXIT_MEMORY_FAULT for the=
- page
-> fault paths.  And that obviously has to be the case since KVM_CAP_MEMORY_=
-FAULT_INFO
-> is introduced before the arch code is enabled.
->
-> But as of this path, KVM *must* return KVM_EXIT_MEMORY_FAULT, so we shoul=
-d make
-> it impossible to do a straight revert of that dependency.
+Paolo
 
-Should we really be concerned about people reverting the
-KVM_CAP_MEMORY_FAULT_INFO commit(s) in this way? I see what you're
-saying- but it also seems to me that KVM could add other things akin
-to KVM_CAP_EXIT_ON_MISSING in the future, and then we end up in the
-exact same situation. Sure the squash might make sense for the
-specific commits in the series, but there's a general issue that isn't
-really being solved.
-
-Maybe I'm just letting the better be the enemy of the best, but I do
-like the current separation/single-focus of the commits. That said,
-the squash is nbd and I can go ahead if you're not convinced.
 
