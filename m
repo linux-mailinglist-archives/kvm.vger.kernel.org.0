@@ -1,292 +1,226 @@
-Return-Path: <kvm+bounces-448-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-449-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02D4A7DF9FF
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 19:35:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 779D57DFA03
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 19:35:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0A2F281190
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 18:35:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18941B21488
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 18:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E87B21357;
-	Thu,  2 Nov 2023 18:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75BCA200AB;
+	Thu,  2 Nov 2023 18:35:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YOw9bHF5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K+2IY0Fr"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E079E21359
-	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 18:35:16 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDC25128
-	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 11:35:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698950114;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N4aRCzDVchJmhXnWZveRqLidGEencbVI2Bo/er04qs0=;
-	b=YOw9bHF5XyAwv2vWexaPkPXFjayFpHZuzWIkWbP3idfUNRkl87sHxJ1q3u9zaFICGPYV9T
-	bAN7M4UUofxoVMBphrw/KnrtddmgUfKIMZelC1l5R0f1kX+0L/X1Bdj26tDr0SvXF/zoys
-	uER0lAaTovwkl21W5fKQvb6yHc2/xZ4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-179-HSAklbxIPceCgEQ0iKrC_g-1; Thu, 02 Nov 2023 14:35:12 -0400
-X-MC-Unique: HSAklbxIPceCgEQ0iKrC_g-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-32f521150aaso645620f8f.1
-        for <kvm@vger.kernel.org>; Thu, 02 Nov 2023 11:35:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698950111; x=1699554911;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=N4aRCzDVchJmhXnWZveRqLidGEencbVI2Bo/er04qs0=;
-        b=uIrthN3qdbge6VtSDkV8cPHF5pXatI02QrxNjeRXy1JVWAiFMrJXIye55ghm9cvxxt
-         mAwIgNEHHyP0AwSrtQ6wgvkebjZtCETwjHukJcTNRWaI98gTcvQXLiGfHlMlXu9t5YKM
-         /Rt6D/Xr2MJwS3NDPg5uiTh61YAJa7NWIaiCbM/u3YSbruBLNxy9K6wstMc6Sm2EWa/Y
-         5kCTSsnW3Du+JGgbIbQrhTsFoKyQWzHgJF8CYjU4U0pdSfYx5aHr3edHIFe+I2SOotbq
-         /bqFGI7qscnT/nAHkOBaqOYSoEnhyDvHpUA9lqkiqt8idx5YkGUB5U9G9YfyA7MpXqai
-         /wmw==
-X-Gm-Message-State: AOJu0Yy24U0C7bcPRCXy/c2jcuZWzCg3rPHxH21PrIrRxp+oXl0sLXjU
-	yyKmH9F4C1QdieVhh1WmKwaWpVRj9hAExiJ/da2UV21+J9+MRmku2ebwY3+ahKqRPYbWbkiAWns
-	Kd/7kiN7RUYOU
-X-Received: by 2002:a5d:58d8:0:b0:32d:d2ab:f8e3 with SMTP id o24-20020a5d58d8000000b0032dd2abf8e3mr13140001wrf.68.1698950111444;
-        Thu, 02 Nov 2023 11:35:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHzlbcNABTrNQMGaiVGyemkwLQ6UflpTYTNRiwRtee1J+zE6N6uq8VBudkTvaQQC2tvlgpkSQ==
-X-Received: by 2002:a5d:58d8:0:b0:32d:d2ab:f8e3 with SMTP id o24-20020a5d58d8000000b0032dd2abf8e3mr13139991wrf.68.1698950111068;
-        Thu, 02 Nov 2023 11:35:11 -0700 (PDT)
-Received: from starship ([89.237.99.95])
-        by smtp.gmail.com with ESMTPSA id d13-20020adfe2cd000000b0032ddf2804ccsm4081wrj.83.2023.11.02.11.35.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Nov 2023 11:35:08 -0700 (PDT)
-Message-ID: <73c4d3d4c4e7b631d5604178a127bf20cc122034.camel@redhat.com>
-Subject: Re: [PATCH v6 18/25] KVM: x86: Use KVM-governed feature framework
- to track "SHSTK/IBT enabled"
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, dave.hansen@intel.com, 
-	peterz@infradead.org, chao.gao@intel.com, rick.p.edgecombe@intel.com, 
-	john.allen@amd.com
-Date: Thu, 02 Nov 2023 20:35:06 +0200
-In-Reply-To: <ZUJy7A5Hp6lnZVyq@google.com>
-References: <20230914063325.85503-1-weijiang.yang@intel.com>
-	 <20230914063325.85503-19-weijiang.yang@intel.com>
-	 <ea3609bf7c7759b682007042b98191d91d10a751.camel@redhat.com>
-	 <ZUJy7A5Hp6lnZVyq@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA3414274;
+	Thu,  2 Nov 2023 18:35:35 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 450EFDB;
+	Thu,  2 Nov 2023 11:35:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698950131; x=1730486131;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=4oJXWL25r8xbMStnOC6PXzlKG7Q1Fs8jN08h1AzJKmk=;
+  b=K+2IY0FrhkkZA7YSvIV54qrxGGhCU/+bLab16XX6Sahst2YxOG2Dew1p
+   u0wo6ao8mLm/Y28uzI6Bfkhb6eyPJWG/EKSwKGYGuvmneD8Z5sez78dSf
+   xoU6Xd5M4q8Aru9GvbrwNwCvCTI//ZGNs7rX/juSm2X8rtoZuJktsbpin
+   1jmqD0d2sjXWtFPQ8wLiw+9spfy/KwQllmBln6C8a/Mbi3UeKb3WeYNzf
+   eo3jEEOP5f2CSsoUaBaXpauMZSMWVTwbv55dJMW2nZaNybEhhBZfVOGB3
+   J4AzBRUkVHDKVFH1q2DNghWSuOKdvxg2BDP3uAmY89VGU/+MKsTx3KM5B
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10882"; a="368990407"
+X-IronPort-AV: E=Sophos;i="6.03,272,1694761200"; 
+   d="scan'208";a="368990407"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 11:35:30 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10882"; a="1092816011"
+X-IronPort-AV: E=Sophos;i="6.03,272,1694761200"; 
+   d="scan'208";a="1092816011"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 02 Nov 2023 11:35:29 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Thu, 2 Nov 2023 11:35:25 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Thu, 2 Nov 2023 11:35:24 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Thu, 2 Nov 2023 11:35:24 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Thu, 2 Nov 2023 11:35:23 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=m4e8qDAxJmTBl78NqRbCoIXqMGxbah7WG7icyWf9KAb8AuKeiZgiItED81qLL8xqXQWC1NrVEnMWK3PMxaBoF4MYPsQC+LoICbksOEoeipxb8xoniXLrSLLyccx8whWqvFC/NDMqw4hka+Gz1s19/BaO0DgMNT6rI4jc8LoQ8+/AJXd3XHwuLkYVbsfxFxU2E04Yizotn+7MTP/3hs4hBVZZJN4+zR6zvvlh2tjiCWzDGSvxOqyymcJGz3n2qF6LiSV8AfRN+2CROq1fk4cbAP5UV11+EfJ4JlIIz354x4uOjJXWJx2RJLWOyfpADqSCDE5VsVTCdiqy+FJp2IwTsQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4oJXWL25r8xbMStnOC6PXzlKG7Q1Fs8jN08h1AzJKmk=;
+ b=BOrLXBUhR6oh02CrBAOGFE4IS93T7CLhdoGnAG7s8WAEwNb928Bh23UdQ9kj/NTOf/XLe0m7DNrpGFwfa9jGp8D2yErjM9rDICAHS+Aa0DeSE5W1urhnvN5gH/tJLzWnprWlg63s7lrjTiMhV0/pgwc4dOiCdx+TrLYjRGDMkwOj5ETOi/s9etCcTOd3VJYqKzb3NeKYtqbbP6Ks2gi0luZ7lBJhpwUYX73SdTrQp8zwZeWXjrI20Orf9o5ei6I8YUQed6LgvKX5ZzSVzCibPF9PsnOSnEdRB3SeUh2c03xSHU/4Psjt6sqvn/E+YYJLNXMg30nNqfa4nlimq6WHMA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by PH7PR11MB8569.namprd11.prod.outlook.com (2603:10b6:510:304::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.19; Thu, 2 Nov
+ 2023 18:35:21 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::5d1:aa22:7c98:f3c6]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::5d1:aa22:7c98:f3c6%6]) with mapi id 15.20.6954.019; Thu, 2 Nov 2023
+ 18:35:21 +0000
+From: "Huang, Kai" <kai.huang@intel.com>
+To: "pbonzini@redhat.com" <pbonzini@redhat.com>, "Christopherson,, Sean"
+	<seanjc@google.com>
+CC: "Li, Xiaoyao" <xiaoyao.li@intel.com>, "kvm-riscv@lists.infradead.org"
+	<kvm-riscv@lists.infradead.org>, "mic@digikod.net" <mic@digikod.net>,
+	"liam.merwick@oracle.com" <liam.merwick@oracle.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+	"david@redhat.com" <david@redhat.com>, "linux-mips@vger.kernel.org"
+	<linux-mips@vger.kernel.org>, "amoorthy@google.com" <amoorthy@google.com>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"tabba@google.com" <tabba@google.com>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, "michael.roth@amd.com" <michael.roth@amd.com>,
+	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>, "chenhuacai@kernel.org"
+	<chenhuacai@kernel.org>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+	"mpe@ellerman.id.au" <mpe@ellerman.id.au>, "Annapurve, Vishal"
+	<vannapurve@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
+	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+	"maz@kernel.org" <maz@kernel.org>, "willy@infradead.org"
+	<willy@infradead.org>, "dmatlack@google.com" <dmatlack@google.com>,
+	"anup@brainfault.org" <anup@brainfault.org>, "yu.c.zhang@linux.intel.com"
+	<yu.c.zhang@linux.intel.com>, "Xu, Yilun" <yilun.xu@intel.com>,
+	"qperret@google.com" <qperret@google.com>, "brauner@kernel.org"
+	<brauner@kernel.org>, "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"ackerleytng@google.com" <ackerleytng@google.com>, "jarkko@kernel.org"
+	<jarkko@kernel.org>, "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-mm@kvack.org"
+	<linux-mm@kvack.org>, "Wang, Wei W" <wei.w.wang@intel.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>
+Subject: Re: [PATCH v13 09/35] KVM: Add KVM_EXIT_MEMORY_FAULT exit to report
+ faults to userspace
+Thread-Topic: [PATCH v13 09/35] KVM: Add KVM_EXIT_MEMORY_FAULT exit to report
+ faults to userspace
+Thread-Index: AQHaCQKnsgoTcbnsvUKkAITO6oVjaLBlURAAgABw5QCAAKIkgIAAabmAgAAYoICAAE6SAIAAL52A
+Date: Thu, 2 Nov 2023 18:35:20 +0000
+Message-ID: <55672e5b0ff9855e609654b6565f610dbffa56fd.camel@intel.com>
+References: <20231027182217.3615211-1-seanjc@google.com>
+	 <20231027182217.3615211-10-seanjc@google.com>
+	 <482bfea6f54ea1bb7d1ad75e03541d0ba0e5be6f.camel@intel.com>
+	 <ZUKMsOdg3N9wmEzy@google.com>
+	 <64e3764e36ba7a00d94cc7db1dea1ef06b620aaf.camel@intel.com>
+	 <32cb71700aedcbd1f65276cf44a601760ffc364b.camel@intel.com>
+	 <496b78bb-ad12-4eed-a62c-8c2fd725ec61@redhat.com>
+	 <ZUPD9NWF4eOXqeiA@google.com>
+In-Reply-To: <ZUPD9NWF4eOXqeiA@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|PH7PR11MB8569:EE_
+x-ms-office365-filtering-correlation-id: 6c262d30-ad01-4b01-2c8d-08dbdbd2783f
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: j3uZNaCZvdCzNMGqtDN0+rdpxIFRVPBLxF/CjG7lG3Xa+Ui5Qjvnb7mGmqYkfkUfyivZW+FLFZkviN8A3igp1+DycPu8dvuuuOb2Orinl+cRyimwNUxKZAjczWuuzX5vIMSc+ekupO+eruVbg1rJ6jwUlPReD/G7aJ4gs4CjthiMjg1T3cTu6qoZ35dyIi8Xvr9SbeHqkySHmZPDJ+5sgDcMuz9ulqVRSiAhgtT8I6jU3WOsiWM9tyzzoK92mm24z2jW4Qor5OzxPv7Q/hXAA/kfycLLH2b2de0frtXQm0bubrOKilvNHUsopOEWp+XvL3ZRH70pX1S3YN9N1dFGU5zg7/BPMOXnA9FMmX/0NIpco58O9poYbfMJgLIjSbhrNvCSaYnqrdRxvl9H/EfghP4OUcxMvPVLUjAWy11jZ1UJKB/fiWpWh1UoG0YwrPAV2QKVKn0vnWPyWyHSjCZrE8ur4PPL2iYI2O5qgrx+X/7nrDqny3kHixg3nFjPsDZlDRiKOM4uNFGBDyCitTzf0U0KOCJaU4HJaj17W5IBd2d8l5L+qHSj4xe5p1j83Kee0BMlsmPKS//4hLDsiPc3JrQ9ZDqv7QcMgQu+nl3tIeDBg5/y6n8Aqafd4MPbYQ1d
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(136003)(39860400002)(376002)(346002)(230922051799003)(1800799009)(451199024)(186009)(64100799003)(53546011)(8936002)(6486002)(4744005)(41300700001)(7406005)(7416002)(82960400001)(5660300002)(2906002)(86362001)(122000001)(64756008)(6512007)(2616005)(71200400001)(110136005)(4326008)(38100700002)(8676002)(91956017)(26005)(66446008)(66476007)(66556008)(66946007)(6506007)(316002)(54906003)(478600001)(76116006)(36756003)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Q1k4ekpoMlF3UnM1bGtXNGtqdG0vQkxsR1lNSEdXdjVHVFY4cE10ZFlXc2Vp?=
+ =?utf-8?B?ZlhmSkRkRmUxVlpUdjhqaXYxRmM4K3VRcXRkMGhpNHF5TnZ6UjFzQVFCL3Vo?=
+ =?utf-8?B?MDk0Zi9mOW1rK2VJVy94ZHRJR3ZreWE5L1VNNVVsT3NRRlhSTGNDRE9WcHVU?=
+ =?utf-8?B?UVIva3h1cHRiRWlaT09TclBrS2ZYRmVIK1NGWHZZa2NkTnpWWDFLTldoa1hx?=
+ =?utf-8?B?djdLWUNlWHA5bTkzMW9oV2hOZGpuUmE3UlY0R2ltbnVvdnNIa1ZOTW13Znpk?=
+ =?utf-8?B?M0hkS0tsNFY4d2dpQ3lWRkJjblNZRVRIQ0k4SXJOVlFzdCt0S2IrbVpCWlFO?=
+ =?utf-8?B?TTQrYmhHRmt1ZjZXdE9ISnZUaHhlYVNsUlJwQUprSDI2VGx5WXlXVnJDOFRO?=
+ =?utf-8?B?RXI4SjBlZXN6cUxYTkJYeDVxcnZHNHpRdnczZ21NYVg3UE0xL0dlTjUzVDJo?=
+ =?utf-8?B?eTJIY0g5K1FkOXNOUHpXQlhsUllxYUxLaC8rc2l0TWg3ZkV0U1N6QUtOVVho?=
+ =?utf-8?B?Q2Z5cE5zTi9TdlEyb3RBQ3FhazhBME1GRjV2bG5tMnlHa3ZmYTZzbGUzc0tO?=
+ =?utf-8?B?UHRkeGxSd2tVNll1QW5jMVFzQ1o1N3l5Rlp3ZnhFVVFhZ3JMbEpBRHZZTkhI?=
+ =?utf-8?B?emkweEp3UmhaYVZTZHpsVHF3L2xEUUN4Y092bXFOZTEwdHpOczhBd2V3TnhQ?=
+ =?utf-8?B?Mk96TGZwRWxVSEVoU3ZuaVd1S0VZOXRHNnNTcHM2Mi9pYTJsV09hb0RGSDlv?=
+ =?utf-8?B?SGhKV1lOdmRpUEwzYytoYzFubGwvR1lnUHUvRmxwNVBuL2dYbkFELy9aY3Js?=
+ =?utf-8?B?WGNjLzN6dUlUcmprRlFnN0VWM1Fxb0lkZTFuWWhyR0M5Ymx4RE1xcGludU1E?=
+ =?utf-8?B?bU9Pd1NNR3R0K1RIc3V1akdVbGRJcitaOVk5bFhRb21yKzBXYjAyd2srclZk?=
+ =?utf-8?B?OVg2RGc3cVJHc1pJUk5halRQMlhadjFDQlNNUXY5VnhZbndsc2Nid0JBQlZX?=
+ =?utf-8?B?WFBDTnV3ZnlSSHE0SnF1VVV5L25NZ3g1L1pXNEk3VDRBNjQ0VnJKM1gvY0tF?=
+ =?utf-8?B?TFRCa2NrN1BCMzIrdVpNOStzWGpLTWNHdE1YNG1hZTU4UmpKQTdSMGIyTlBi?=
+ =?utf-8?B?KzBDRGRhV1hjSzE0U0FIcFNZOXRrc3Y5UjFsN2x3emw5T1pobmlhaHpGeXUz?=
+ =?utf-8?B?NEYwNHFZSi81UkpVaUlrSWRUc3VzQlRvZkZpWUd5eHhncThsK0lLK1Mwbm9M?=
+ =?utf-8?B?VHFYK3ZPdVFxNkVINjBXTFJFSlJuVk0vSnhzeXFPM2dxOS8wY1g3dThiaENW?=
+ =?utf-8?B?VldsaU5JckVxdG1ndENOSGhhNmdDQXZIejFta2FGa3hCeWs4N1BsTjU0cXp3?=
+ =?utf-8?B?WTR6VDNtNjEwWXdMdS94aEdsSnEwemtTYy95MU80M01Rbk5qYTNzVE5nMzRT?=
+ =?utf-8?B?M1hIb3RNRzdMSWRKTXd0ZVNwSkxQREVaREo3byt3VndmTlZ4VnVyNkRKWGow?=
+ =?utf-8?B?RUlFb1haVVdVaWphL2hPVnliRDNtaVlXU1F3cjd4YjVxMWxzZFUwZkhiNW02?=
+ =?utf-8?B?UEtkY1RHSVBYOUVVZG5hU0lIZWowTmpXeHFxTFY3a0IvamxDTWI2UFMzR0VX?=
+ =?utf-8?B?a3hZV25hOVRQQXdBT1YxcGordjBOVkJNbFczdDlOVjE5dnZwY3Y5S1dTVjZJ?=
+ =?utf-8?B?OTBjQjRNMjh4cmtHUmI4VnRzL0x1bncxdUFPQXNjeFYrNk9ZUTFOUkpFTVJK?=
+ =?utf-8?B?WUFqaFo2eUNRcFN1TFBKSnJHWWc0QTI2ZHFjdVRIYnJQMGsxU0wyTWVVR2Jh?=
+ =?utf-8?B?M3ltckwxL2VWUWZLaW5EZVNtN1hBczVyVGFFTmY1TGE1cjFyUHlqUlUzeC9W?=
+ =?utf-8?B?b0trOGdnMXpSZm9pOVdHT3JhSlh6OFhORERxV3pGZVNSeTVmbTlMb0VxZUtW?=
+ =?utf-8?B?ZkIvTkxvandDWmpUbnIwY0o3aVgrUlhWMXQwWWkvL0pRMG5EVmJoSUdPZ2c2?=
+ =?utf-8?B?S2FTQjRhRkpPdUZVdzBFS0RSQmlCakJXZ0k0SGhFeEdjZGJLdlBIZmllbXZQ?=
+ =?utf-8?B?UXRQam84RUpEY3R6a2pVbFc3cUw3bUpSa0VTcm8xdVZpWXl0bnFaV3oxQnZH?=
+ =?utf-8?B?VUo2MUJpWDkveUtRUFFqenNNTWY5d2lGd2xoWi9obUNUK0ZkYThBaDdQVzVu?=
+ =?utf-8?B?Y1E9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <74FDCC177320F944ACB608818902ED2B@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c262d30-ad01-4b01-2c8d-08dbdbd2783f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Nov 2023 18:35:20.9909
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zUiB7sjiAJFWGCDvsC2fya89WUgLrQktgTA54FTIl+YS0tOPPjSCxLxojusYR00iLQv/Q+nyMtHF2qCDVBV86Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8569
+X-OriginatorOrg: intel.com
 
-On Wed, 2023-11-01 at 08:46 -0700, Sean Christopherson wrote:
-> On Tue, Oct 31, 2023, Maxim Levitsky wrote:
-> > On Thu, 2023-09-14 at 02:33 -0400, Yang Weijiang wrote:
-> > > Use the governed feature framework to track whether X86_FEATURE_SHSTK
-> > > and X86_FEATURE_IBT features can be used by userspace and guest, i.e.,
-> > > the features can be used iff both KVM and guest CPUID can support them.
-> > > 
-> > > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> > > ---
-> > >  arch/x86/kvm/governed_features.h | 2 ++
-> > >  arch/x86/kvm/vmx/vmx.c           | 2 ++
-> > >  2 files changed, 4 insertions(+)
-> > > 
-> > > diff --git a/arch/x86/kvm/governed_features.h b/arch/x86/kvm/governed_features.h
-> > > index 423a73395c10..db7e21c5ecc2 100644
-> > > --- a/arch/x86/kvm/governed_features.h
-> > > +++ b/arch/x86/kvm/governed_features.h
-> > > @@ -16,6 +16,8 @@ KVM_GOVERNED_X86_FEATURE(PAUSEFILTER)
-> > >  KVM_GOVERNED_X86_FEATURE(PFTHRESHOLD)
-> > >  KVM_GOVERNED_X86_FEATURE(VGIF)
-> > >  KVM_GOVERNED_X86_FEATURE(VNMI)
-> > > +KVM_GOVERNED_X86_FEATURE(SHSTK)
-> > > +KVM_GOVERNED_X86_FEATURE(IBT)
-> > >  
-> > >  #undef KVM_GOVERNED_X86_FEATURE
-> > >  #undef KVM_GOVERNED_FEATURE
-> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > index 9409753f45b0..fd5893b3a2c8 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > @@ -7765,6 +7765,8 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> > >  		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_XSAVES);
-> > >  
-> > >  	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_VMX);
-> > > +	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_SHSTK);
-> > > +	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_IBT);
-> > >  
-> > >  	vmx_setup_uret_msrs(vmx);
-> > >  
-> > 
-> > Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > 
-> > 
-> > PS: IMHO The whole 'governed feature framework' is very confusing and
-> > somewhat poorly documented.
-> > 
-> > Currently the only partial explanation of it, is at 'governed_features',
-> > which doesn't explain how to use it.
-> 
-> To be honest, terrible name aside, I thought kvm_governed_feature_check_and_set()
-> would be fairly self-explanatory, at least relative to all the other CPUID handling
-> in KVM.
-
-What is not self-explanatory is what are the governed_feature and how to query them.
-
-> 
-> > For the reference this is how KVM expects governed features to be used in the
-> > common case (there are some exceptions to this but they are rare)
-> > 
-> > 1. If a feature is not enabled in host CPUID or KVM doesn't support it, 
-> >    KVM is expected to not enable it in KVM cpu caps.
-> > 
-> > 2. Userspace uploads guest CPUID.
-> > 
-> > 3. After the guest CPUID upload, the vendor code calls
-> >    kvm_governed_feature_check_and_set() which sets governed features = True iff
-> >    feature is supported in both kvm cpu caps and in guest CPUID.
-> > 
-> > 4. kvm/vendor code uses 'guest_can_use()' to query the value of the governed
-> >    feature instead of reading guest CPUID.
-> > 
-> > It might make sense to document the above somewhere at least.
-> > 
-> > Now about another thing I am thinking:
-> > 
-> > I do know that the mess of boolean flags that svm had is worse than these
-> > governed features and functionality wise these are equivalent.
-> > 
-> > However thinking again about the whole thing: 
-> > 
-> > IMHO the 'governed features' is another quite confusing term that a KVM
-> > developer will need to learn and keep in memory.
-> 
-> I 100% agree, but I explicitly called out the terrible name in the v1 and v2
-> cover letters[1][2], and the patches were on the list for 6 months before I
-> applied them.  I'm definitely still open to a better name, but I'm also not
-> exactly chomping at the bit to get behind the bikehsed.
-
-Honestly I don't know if I can come up with a better name either.
-Name is IMHO not the underlying problem, its the feature itself that is confusing.
-
-> 
-> v1:
->  : Note, I don't like the name "governed", but it was the least awful thing I
->  : could come up with.  Suggestions most definitely welcome.
-> 
-> v2:
->  : Note, I still don't like the name "governed", but no one has suggested
->  : anything else, let alone anything better :-)
-> 
-> 
-> [1] https://lore.kernel.org/all/20230217231022.816138-1-seanjc@google.com
-> [2] https://lore.kernel.org/all/20230729011608.1065019-1-seanjc@google.com
-> 
-> > Because of that, can't we just use guest CPUID as a single source of truth
-> > and drop all the governed features code?
-> 
-> No, not without a rather massive ABI break.  To make guest CPUID the single source
-> of true, KVM would need to modify guest CPUID to squash features that userspace
-> has set, but that are not supported by hardware.  And that is most definitely a
-> can of worms I don't want to reopen, e.g. see the mess that got created when KVM
-> tried to "help" userspace by mucking with VMX capability MSRs in response to
-> CPUID changes.
-
-
-> 
-> There aren't many real use cases for advertising "unsupported" features via guest
-> CPUID, but there are some, and I have definitely abused KVM_SET_CPUID2 for testing
-> purposes.
-> 
-> And as above, that doesn't work for X86_FEATURE_XSAVES or X86_FEATURE_GBPAGES.
-> 
-> We'd also have to overhaul guest CPUID lookups to be significantly faster (which
-> is doable), as one of the motiviations for the framework was to avoid the overhead
-> of looking through guest CPUID without needing one-off boolean fields.
-> 
-> > In most cases, when the governed feature value will differ from the guest
-> > CPUID is when a feature is enabled in the guest CPUID, but not enabled in the
-> > KVM caps.
-> > 
-> > I do see two exceptions to this: XSAVES on AMD and X86_FEATURE_GBPAGES, in
-> > which the opposite happens, governed feature is enabled, even when the
-> > feature is hidden from the guest CPUID, but it might be better from
-> > readability wise point, to deal with these cases manually and we unlikely to
-> > have many new such cases in the future.
-> > 
-> > So for the common case of CPUID mismatch, when the governed feature is
-> > disabled but guest CPUID is enabled, does it make sense to allow this? 
-> 
-> Yes and no.  For "governed features", probably not.  But for CPUID as a whole, there
-> are legimiate cases where userspace needs to enumerate things that aren't officially
-> "supported" by KVM.  E.g. topology, core crystal frequency (CPUID 0x15), defeatures
-> that KVM hasn't yet learned about, features that don't have virtualization controls
-> and KVM hasn't yet learned about, etc.  And for things like Xen and Hyper-V paravirt
-> features, it's very doable to implement features that are enumerate by CPUID fully
-> in userspace, e.g. using MSR filters.
-> 
-> But again, it's a moot point because KVM has (mostly) allowed userspace to fully
-> control guest CPUID for a very long time.
-> 
-> > Such a feature which is advertised as supported but not really working is a
-> > recipe of hard to find guest bugs IMHO.
-> > 
-> > IMHO it would be much better to just check this condition and do
-> > kvm_vm_bugged() or something in case when a feature is enabled in the guest
-> > CPUID but KVM can't support it, and then just use guest CPUID in
-> > 'guest_can_use()'.
-
-OK, I won't argue that much over this, however I still think that there are
-better ways to deal with it.
-
-If we put optimizations aside (all of this can surely be optimized such as to
-have very little overhead)
-
-How about we have 2 cpuids: Guest visible CPUID which KVM will never use directly
-other than during initialization and effective cpuid which is roughly
-what governed features are, but will include all features and will be initialized
-roughly like governed features are initialized:
-
-effective_cpuid = guest_cpuid & kvm_supported_cpuid 
-
-Except for some forced overrides like for XSAVES and such.
-
-Then we won't need to maintain a list of governed features, and guest_can_use()
-for all features will just return the effective cpuid leafs.
-
-In other words, I want KVM to turn all known CPUID features to governed features,
-and then remove all the mentions of governed features except 'guest_can_use'
-which is a good API.
-
-Such proposal will use a bit more memory but will make it easier for future
-KVM developers to understand the code and have less chance of introducing bugs.
-
-Best regards,
-	Maxim Levitsky
-
-
-
-> 
-> Maybe, if we were creating KVM from scratch, e.g. didn't have to worry about
-> existing uesrspace behavior and could implement a more forward-looking API than
-> KVM_GET_SUPPORTED_CPUID.  But even then the enforcement would need to be limited
-> to "pure" hardware-defined feature bits, and I suspect that there would still be
-> exceptions.  And there would likely be complexitly in dealing with CPUID leafs
-> that are completely unknown to KVM, e.g. unless KVM completely disallowed non-zero
-> values for unknown CPUID leafs, adding restrictions when a feature is defined by
-> Intel or AMD would be at constant risk of breaking userspace.
-> 
-
-
+T24gVGh1LCAyMDIzLTExLTAyIGF0IDA4OjQ0IC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOgo+IE9uIFRodSwgTm92IDAyLCAyMDIzLCBQYW9sbyBCb256aW5pIHdyb3RlOgo+ID4gT24g
+MTEvMi8yMyAxMDozNSwgSHVhbmcsIEthaSB3cm90ZToKPiA+ID4gSUlVQyBLVk0gY2FuIGFscmVh
+ZHkgaGFuZGxlIHRoZSBjYXNlIG9mIHBvaXNvbmVkCj4gPiA+IHBhZ2UgYnkgc2VuZGluZyBzaWdu
+YWwgdG8gdXNlciBhcHA6Cj4gPiA+IAo+ID4gPiDCoAlzdGF0aWMgaW50IGt2bV9oYW5kbGVfZXJy
+b3JfcGZuKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSzCoAkJCXN0cnVjdAo+ID4gPiBrdm1fcGFnZV9m
+YXVsdCAqZmF1bHQpwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoAl7Cj4gPiA+
+IMKgCQkuLi4KPiA+ID4gCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqAJCWlmIChmYXVsdC0+cGZuID09
+IEtWTV9QRk5fRVJSX0hXUE9JU09OKSB7Cj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoAkJa3ZtX3NlbmRfaHdwb2lzb25fc2lnbmFsKGZhdWx0LT5zbG90LCBmYXVsdC0+Z2ZuKTsK
+PiAKPiBObywgdGhpcyBkb2Vzbid0IHdvcmssIGJlY2F1c2UgdGhhdCBzaWduYWxzIHRoZSBob3N0
+IHZpcnR1YWwgYWRkcmVzcwoKQWgsIHJpZ2h0IDotKQo=
 
