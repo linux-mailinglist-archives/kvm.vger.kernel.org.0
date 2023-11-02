@@ -1,172 +1,143 @@
-Return-Path: <kvm+bounces-380-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-381-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36B1F7DF0F7
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 12:14:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 042187DF1EB
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 13:02:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1C02B212E7
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 11:14:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34C781C20F6C
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 12:02:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F182F14A8F;
-	Thu,  2 Nov 2023 11:14:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1240E15E90;
+	Thu,  2 Nov 2023 12:02:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VMjjnme9"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="bJlBdzJ0"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1037514271
-	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 11:14:22 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 869AF111
-	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 04:14:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698923660;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=nE+jpziewfIiESFBa36vSQ59b0yur6c77ORQ4q4A4TQ=;
-	b=VMjjnme95siBMGJmpyz6WxwVYbrc9lgpnUMkAtw9NP6iASHrjDoMMm5SzTitgQz4Bcf3DY
-	wCbp6o9iCcdq94+f8rsVxEDUTZB5AaN0z9zb/nB4IU6hpVET+9EM8MydeXiQICKm97d5pK
-	IIee8Twyb6jAWJG3fTGcHQrOOcIu9sg=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-489-Pk5-IbJyO86tqhwjWOE46A-1; Thu, 02 Nov 2023 07:14:19 -0400
-X-MC-Unique: Pk5-IbJyO86tqhwjWOE46A-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5400c8c6392so611767a12.1
-        for <kvm@vger.kernel.org>; Thu, 02 Nov 2023 04:14:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8D3B14AA3
+	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 12:02:03 +0000 (UTC)
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D26110DB
+	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 05:01:58 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1cc1e1e74beso7239175ad.1
+        for <kvm@vger.kernel.org>; Thu, 02 Nov 2023 05:01:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1698926518; x=1699531318; darn=vger.kernel.org;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=KoS5Yzc43oJ/fOlEyyLAOhYHKPtTN8IraB0rRBs3MmU=;
+        b=bJlBdzJ0AHhWdQCIf3SrLDFKVkvXvKWlDTdT8FDfZxgdcFinpT6OXPPgolZt1g9YVU
+         J6jEJSkdOMB9kDm3ikWP+8NJUFaVjFPscf5aHmWoj9x4hzKyTGMPvXDOqAKKtVMVySNs
+         nWWmjg8qBBW6xaf1DJyjJ5RxPJc4RPEmsQ1SpnQNshYyfjCoLu5ldn8pe2eu63EuWypR
+         uuXvsCJv/2c2H434TOfVT+LhaGErdJ8Wd9Sf9+zrnRVIRefeBJkxCgeyAxuzbjo9lcaZ
+         EmQ3V7UgEj4ssX4veBaph+/7ekgNmJEfbXKP03TMUZjcYKhAFDNYLw5osLZZYLEOLLRI
+         tWdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698923658; x=1699528458;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1698926518; x=1699531318;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nE+jpziewfIiESFBa36vSQ59b0yur6c77ORQ4q4A4TQ=;
-        b=BzhVRNkQx6BEd/ZRwNInb+3M52zMf1e7ZsP8U3stHEs3GVik6Ckqd5ilL62IGGmK2M
-         sT8XmE14Je/IS7of/QGZzYVq7+IETxdUzBUqIsL5JhuBDb10VrGOxGci9wTDjnAh5l1E
-         QZBZMyRJckh3j1RqefIa3kEWy8juZHJ4ttYKrNBIkKh6p4/qSgxbLaikfIAAnstrU1Cd
-         YOcMLuofq8Iws63+AsXwhxT1460UOWygHcUqs6i9uDIlX6nCmqtbXlIfuUHGFk25JTvK
-         +MiDedfZ6AhNfOBOo/JQoKs1/nORGwcDCPp/rbQ2OFtX4GWqs5uVm/6iG6ZhPxmC3UbT
-         9+eQ==
-X-Gm-Message-State: AOJu0Yx8NXErl5Y1160dDO1KPuu4WpchcxsWpWJw2reM47RWbQAdDPCn
-	Z5LNlzKFRjVu49KTQ2XhY6ZZ2DkZvCmZFjn1yItSPuBrwXvLnPi/rMm70HF2szIDLWew3vNGqEa
-	DmvUAftzaVJ+U
-X-Received: by 2002:a05:6402:d6b:b0:541:29c8:959b with SMTP id ec43-20020a0564020d6b00b0054129c8959bmr12074257edb.39.1698923658426;
-        Thu, 02 Nov 2023 04:14:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEXhppfRa15KEqVY2rnJoTwoiSC4PZM5XqKpBQUyQg58A1nLwAa47Vx7RLL9LFOmphAlpAU2Q==
-X-Received: by 2002:a05:6402:d6b:b0:541:29c8:959b with SMTP id ec43-20020a0564020d6b00b0054129c8959bmr12074247edb.39.1698923658101;
-        Thu, 02 Nov 2023 04:14:18 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id r25-20020a50c019000000b00537666d307csm2257960edb.32.2023.11.02.04.14.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Nov 2023 04:14:17 -0700 (PDT)
-Message-ID: <cbd46f04-c53b-4d22-9730-76f2ace141d9@redhat.com>
-Date: Thu, 2 Nov 2023 12:14:13 +0100
+        bh=KoS5Yzc43oJ/fOlEyyLAOhYHKPtTN8IraB0rRBs3MmU=;
+        b=gUz6/whWn6pGSOOtwfPOqIiDvO50wBbrRYs3F6kR+pTNqCflJp9IpvVspvC6SmkB8A
+         d+yNSwMiJmJGYFEB2JMJVbeLTS/ZAXoDZV3lSH2d+hCPhl0VHV/cPg/PGZVKKQqTCC8t
+         ESEln3Rrsgtqu02BYiEyrqCr0u0tgRgI1FBOwXGbhdIfOM/XpITRj8MCeKOelNDxjnMa
+         RQ2TXO3+5FEClezm4aiXZuoDXY5n/k7UwBvORiLin5gHoP0DyqDRSGBZjNGXdK6K8pGS
+         NXV8cJY7Qg3BC25yzYhNPhuUwhpvjoAVpc9jGSC30dp4zACYtqOlQAUwNim3EjQ/jAUV
+         17ig==
+X-Gm-Message-State: AOJu0YwUk30/DbmWRCkBFUvQ9AYGdGbMROHTNIkP8mx4Y9M9wt/7FoV9
+	3fIm3A2soLNdGVMY14y3Oq80pA==
+X-Google-Smtp-Source: AGHT+IE6nEv56zM0QCxqMU8kUXvOQDH9qhvdkxo16VJLcIXw6R7KqMseiu/2jgHWmzTZVVw8yrOyzQ==
+X-Received: by 2002:a17:902:e80f:b0:1cc:7af4:d12c with SMTP id u15-20020a170902e80f00b001cc7af4d12cmr4685399plg.62.1698926517886;
+        Thu, 02 Nov 2023 05:01:57 -0700 (PDT)
+Received: from hsinchu26.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
+        by smtp.gmail.com with ESMTPSA id l12-20020a170902f68c00b001cc0f6028b8sm2969008plg.106.2023.11.02.05.01.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Nov 2023 05:01:56 -0700 (PDT)
+From: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+To: linux-riscv@lists.infradead.org,
+	kvm-riscv@lists.infradead.org
+Cc: greentime.hu@sifive.com,
+	vincent.chen@sifive.com,
+	tjytimi@163.com,
+	alex@ghiti.fr,
+	conor.dooley@microchip.com,
+	ajones@ventanamicro.com,
+	Yong-Xuan Wang <yongxuan.wang@sifive.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 3/4] RISC-V: KVM: Add Svadu Extension Support for Guest/VM
+Date: Thu,  2 Nov 2023 12:01:24 +0000
+Message-Id: <20231102120129.11261-4-yongxuan.wang@sifive.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20231102120129.11261-1-yongxuan.wang@sifive.com>
+References: <20231102120129.11261-1-yongxuan.wang@sifive.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 12/35] KVM: Prepare for handling only shared mappings
- in mmu_notifier events
-Content-Language: en-US
-To: Binbin Wu <binbin.wu@linux.intel.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
- Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>,
- Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
- Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>,
- Yu Zhang <yu.c.zhang@linux.intel.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
- =?UTF-8?Q?n?= <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>,
- Vishal Annapurve <vannapurve@google.com>,
- Ackerley Tng <ackerleytng@google.com>,
- Maciej Szmigiero <mail@maciej.szmigiero.name>,
- David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
- Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
- Liam Merwick <liam.merwick@oracle.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-13-seanjc@google.com>
- <9963b77c-3a38-4f89-b21e-48d0fdda8f53@linux.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <9963b77c-3a38-4f89-b21e-48d0fdda8f53@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 11/2/23 06:59, Binbin Wu wrote:
-> 
->> Add flags to "struct kvm_gfn_range" to let notifier events target
->> only shared and only private mappings, and write up the existing
->> mmu_notifier events to be shared-only (private memory is never
->> associated with a userspace virtual address, i.e. can't be reached
->> via mmu_notifiers).
->> 
->> Add two flags so that KVM can handle the three possibilities
->> (shared, private, and shared+private) without needing something
->> like a tri-state enum.
->
-> I see the two flags are set/cleared in __kvm_handle_hva_range() in
-> this patch and kvm_handle_gfn_range() from the later patch 13/35, but
-> I didn't see they are used/read in this patch series if I didn't miss
-> anything.  How are they supposed to be used in KVM?
+We extend the KVM ISA extension ONE_REG interface to allow VMM
+tools  to detect and enable Svadu extension for Guest/VM.
 
-They are going to be used by SNP/TDX patches.
+Also set the ADUE bit in henvcfg CSR if Svadu extension is
+available for Guest/VM.
 
-Paolo
+Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+---
+ arch/riscv/include/uapi/asm/kvm.h | 1 +
+ arch/riscv/kvm/vcpu.c             | 3 +++
+ arch/riscv/kvm/vcpu_onereg.c      | 1 +
+ 3 files changed, 5 insertions(+)
+
+diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
+index 992c5e407104..3c7a6c762d0f 100644
+--- a/arch/riscv/include/uapi/asm/kvm.h
++++ b/arch/riscv/include/uapi/asm/kvm.h
+@@ -131,6 +131,7 @@ enum KVM_RISCV_ISA_EXT_ID {
+ 	KVM_RISCV_ISA_EXT_ZICSR,
+ 	KVM_RISCV_ISA_EXT_ZIFENCEI,
+ 	KVM_RISCV_ISA_EXT_ZIHPM,
++	KVM_RISCV_ISA_EXT_SVADU,
+ 	KVM_RISCV_ISA_EXT_MAX,
+ };
+ 
+diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+index 82229db1ce73..c95a3447eb50 100644
+--- a/arch/riscv/kvm/vcpu.c
++++ b/arch/riscv/kvm/vcpu.c
+@@ -487,6 +487,9 @@ static void kvm_riscv_vcpu_update_config(const unsigned long *isa)
+ 	if (riscv_isa_extension_available(isa, ZICBOZ))
+ 		henvcfg |= ENVCFG_CBZE;
+ 
++	if (riscv_isa_extension_available(isa, SVADU))
++		henvcfg |= ENVCFG_ADUE;
++
+ 	csr_write(CSR_HENVCFG, henvcfg);
+ #ifdef CONFIG_32BIT
+ 	csr_write(CSR_HENVCFGH, henvcfg >> 32);
+diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
+index b7e0e03c69b1..2b7c7592e273 100644
+--- a/arch/riscv/kvm/vcpu_onereg.c
++++ b/arch/riscv/kvm/vcpu_onereg.c
+@@ -36,6 +36,7 @@ static const unsigned long kvm_isa_ext_arr[] = {
+ 	/* Multi letter extensions (alphabetically sorted) */
+ 	KVM_ISA_EXT_ARR(SSAIA),
+ 	KVM_ISA_EXT_ARR(SSTC),
++	KVM_ISA_EXT_ARR(SVADU),
+ 	KVM_ISA_EXT_ARR(SVINVAL),
+ 	KVM_ISA_EXT_ARR(SVNAPOT),
+ 	KVM_ISA_EXT_ARR(SVPBMT),
+-- 
+2.17.1
 
 
