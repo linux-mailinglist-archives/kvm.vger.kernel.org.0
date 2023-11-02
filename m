@@ -1,73 +1,73 @@
-Return-Path: <kvm+bounces-390-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-391-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBAED7DF476
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 15:02:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4874E7DF4C2
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 15:17:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18FD71C20ECE
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 14:02:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC993B21253
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 14:17:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 396551B295;
-	Thu,  2 Nov 2023 14:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5D91BDEF;
+	Thu,  2 Nov 2023 14:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yxy4gQpw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OsLIgabC"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A3A19BC2
-	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 14:02:17 +0000 (UTC)
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FA4B12E
-	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 07:02:16 -0700 (PDT)
-Received: by mail-qv1-xf2c.google.com with SMTP id 6a1803df08f44-66d190a8f87so5643136d6.0
-        for <kvm@vger.kernel.org>; Thu, 02 Nov 2023 07:02:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4E71B283
+	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 14:17:27 +0000 (UTC)
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A197182
+	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 07:17:26 -0700 (PDT)
+Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-41cc537ed54so4936481cf.2
+        for <kvm@vger.kernel.org>; Thu, 02 Nov 2023 07:17:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698933735; x=1699538535; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1698934645; x=1699539445; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=U02Q7Uz9N3AbuVAnly2/lx/zX8zq9jlSHWgyTKq7w1o=;
-        b=Yxy4gQpwYzPaq9tP896yqaCi9p11oYl2Yzvg3AOcYCBzXFNcPARUyBNABoHe9j9N3V
-         wcBmk8rMRqhtKI0gtYIRh61Q/cqDIcZE8J4dHHUV6LHQRoOmJuNLhNQ6cmmaeKBSxVRV
-         64KMyHAErZ+NOkvBIgGj9Mc1O1KS55eSImpiDRj1arP6EztcNJW3ziCErr+nM8bBP9/z
-         c1srkNrEVFXof5T1vl+NJ8cXDxQh0UvP6/wANNL5klwVVRz1nyj0QLrFARtokMET/G/J
-         lrcHEQMbta2sM5ZZpxZWXLDAHHjVIDEqCYqYABwvEC3pOo95InIC6QSaE8lq0Pi45HPM
-         5eKA==
+        bh=c7O2KSplInLsDb19B+zn/jm8iaKKD/NZ+yWSezVEL04=;
+        b=OsLIgabCoGKVlVZSp8tm2b2oZ9ZHoUwL2ONfJDXKG7vLOh9Gy0Q7creS9+9vSDkWXo
+         J4xO3IfflUSoz3agNqV8SLG0gC3te/x7TZ6sYp2bdeugnbXNHrdXCRBRSWhOzHl2XBY7
+         wGZgK9FUiGVmDp3dikT6mr4V2SLGfpYH3fJHliQdXLxkK67GEghvvvL9gs168X/DP0Gi
+         3e/4Cvdsx7r3PCHKdyc3vDTgChBRl+AE0wFDw/BxswdRpDyk/eUcDLWQUAL3WRayU5k7
+         Z8q5wNFPiOne9g28KQTrHgWxLH4nylI+k2KnZFOk1VzNYCJERVO5Qw6Bos7EnD7outx6
+         Gcmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698933735; x=1699538535;
+        d=1e100.net; s=20230601; t=1698934645; x=1699539445;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=U02Q7Uz9N3AbuVAnly2/lx/zX8zq9jlSHWgyTKq7w1o=;
-        b=BKWCJ5bLrCK3YDfOm5sSsi4HoyJdJ/oqvFETkAcwT+clmxx5NMVaXbdPlOfy+OzOds
-         uFxyAxtmSLxg/I4p5GU+qqwU6wc4AOcfagFBZuzD40j5wK/cosPZ+qAqJUhJSqrPAlEr
-         dKD6gjiLro4GwpR66usb40ncj2aBwzpaiu6KBFKOZHce4T6XJ68GWgv6pZoJBhlsJ+KD
-         Wo4H+hZxXhgyNBy7a2ddY4zsdqAHiHTVptogL/YaHXJegLNjyU8QuwBzfaPfjCDE3R63
-         MzRw7Bf318508Mgqfq0Ms7SmQeJpka4/O4lmswDJl/PUipV24+coonzWK7JL08uWTd7x
-         rr1w==
-X-Gm-Message-State: AOJu0YznNvC68uXQxy4m8JzzDwMA0Tr5GFawbycW+GBxLs/YudUripjy
-	u6DxdSAYsPxhl9yOaier19dNf/9CIA8B0U8J41W19w==
-X-Google-Smtp-Source: AGHT+IFvNZeWhAvz2uQajFEXI2VcBpwz2QgnpWebvg+MWTN/rWHt/IyUj1LF075258r9rR5adzICFKMJ4AWj6dfus40=
-X-Received: by 2002:ad4:5c47:0:b0:66d:62b7:53f4 with SMTP id
- a7-20020ad45c47000000b0066d62b753f4mr28124932qva.45.1698933735448; Thu, 02
- Nov 2023 07:02:15 -0700 (PDT)
+        bh=c7O2KSplInLsDb19B+zn/jm8iaKKD/NZ+yWSezVEL04=;
+        b=AKXQhfimTeLoKPkGRlRynMH+/mopMFdropazywkTHnTg8R0IHCl7OfpM1be9Tv3csV
+         p+56k9l5r3HQhL/AaImFiIaMgh//5VP7ak4s34Mp3BrclkctFH2MXn3oZTP5FR5cQ2gj
+         WSzrCeRQRThYHQu9N6ciPoHLopJFMgg8Ne94zEiAxY05WmmbTSQRfXN2osFvzo3jk41s
+         bWBCPLHLJbXtawJCumT8rrKah978SY4uAfigvmOhBnvtZExma2Ks+/gQD9nBJi7w+UrQ
+         9WMJG5qH1qFBMLslKjx+3QtLdyDaOAnSJqWQq8tzddtMZhSI+PPrEM5c7nsKGELr+Qqq
+         hyKQ==
+X-Gm-Message-State: AOJu0YzspYWJ/V7RpRSNwhtCzYt5szDupRLfd3nuLuS9FoE2tPvauFPl
+	Ke1vTMPuf4mzyLC1p56vqB1GrcsBcRMF5xxZ14KPjQ==
+X-Google-Smtp-Source: AGHT+IGAosxm/0woyiCy5wtpQ5hw9PNiMnNT8Y+nXK7zRiDLlPKvw69895suNy2q5wz5DwPz9Dn0X+ha5Vtg4tVBUZc=
+X-Received: by 2002:a05:6214:d88:b0:66d:3a0f:97a with SMTP id
+ e8-20020a0562140d8800b0066d3a0f097amr20020837qve.6.1698934645120; Thu, 02 Nov
+ 2023 07:17:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-13-seanjc@google.com>
-In-Reply-To: <20231027182217.3615211-13-seanjc@google.com>
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-19-seanjc@google.com>
+In-Reply-To: <20231027182217.3615211-19-seanjc@google.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Thu, 2 Nov 2023 14:01:39 +0000
-Message-ID: <CA+EHjTyAU9XZ3OgqXjmAKh-BKsLrH_8QtnJihQxF4fhk8WPSYg@mail.gmail.com>
-Subject: Re: [PATCH v13 12/35] KVM: Prepare for handling only shared mappings
- in mmu_notifier events
+Date: Thu, 2 Nov 2023 14:16:49 +0000
+Message-ID: <CA+EHjTwXdntKGMjb8Zj1M3iVVN5NX6iLwbzJjE72j_eVczTQYw@mail.gmail.com>
+Subject: Re: [PATCH v13 18/35] KVM: x86: "Reset" vcpu->run->exit_reason early
+ in KVM_RUN
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
@@ -94,74 +94,67 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
-
-On Fri, Oct 27, 2023 at 7:22=E2=80=AFPM Sean Christopherson <seanjc@google.=
+On Fri, Oct 27, 2023 at 7:23=E2=80=AFPM Sean Christopherson <seanjc@google.=
 com> wrote:
 >
-> Add flags to "struct kvm_gfn_range" to let notifier events target only
-> shared and only private mappings, and write up the existing mmu_notifier
-> events to be shared-only (private memory is never associated with a
-> userspace virtual address, i.e. can't be reached via mmu_notifiers).
+> Initialize run->exit_reason to KVM_EXIT_UNKNOWN early in KVM_RUN to reduc=
+e
+> the probability of exiting to userspace with a stale run->exit_reason tha=
+t
+> *appears* to be valid.
 >
-> Add two flags so that KVM can handle the three possibilities (shared,
-> private, and shared+private) without needing something like a tri-state
-> enum.
+> To support fd-based guest memory (guest memory without a corresponding
+> userspace virtual address), KVM will exit to userspace for various memory
+> related errors, which userspace *may* be able to resolve, instead of usin=
+g
+> e.g. BUS_MCEERR_AR.  And in the more distant future, KVM will also likely
+> utilize the same functionality to let userspace "intercept" and handle
+> memory faults when the userspace mapping is missing, i.e. when fast gup()
+> fails.
 >
-> Link: https://lore.kernel.org/all/ZJX0hk+KpQP0KUyB@google.com
+> Because many of KVM's internal APIs related to guest memory use '0' to
+> indicate "success, continue on" and not "exit to userspace", reporting
+> memory faults/errors to userspace will set run->exit_reason and
+> corresponding fields in the run structure fields in conjunction with a
+> a non-zero, negative return code, e.g. -EFAULT or -EHWPOISON.  And becaus=
+e
+> KVM already returns  -EFAULT in many paths, there's a relatively high
+> probability that KVM could return -EFAULT without setting run->exit_reaso=
+n,
+> in which case reporting KVM_EXIT_UNKNOWN is much better than reporting
+> whatever exit reason happened to be in the run structure.
+>
+> Note, KVM must wait until after run->immediate_exit is serviced to
+> sanitize run->exit_reason as KVM's ABI is that run->exit_reason is
+> preserved across KVM_RUN when run->immediate_exit is true.
+>
+> Link: https://lore.kernel.org/all/20230908222905.1321305-1-amoorthy@googl=
+e.com
+> Link: https://lore.kernel.org/all/ZFFbwOXZ5uI%2Fgdaf@google.com
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  include/linux/kvm_host.h | 2 ++
->  virt/kvm/kvm_main.c      | 7 +++++++
->  2 files changed, 9 insertions(+)
->
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 96aa930536b1..89c1a991a3b8 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -263,6 +263,8 @@ struct kvm_gfn_range {
->         gfn_t start;
->         gfn_t end;
->         union kvm_mmu_notifier_arg arg;
-> +       bool only_private;
-> +       bool only_shared;
 
-If these flags aren't used in this patch series, should this patch be
-moved to the other series?
-
-Also, if shared+private is a possibility, doesn't the prefix "only_"
-confuse things a bit? I.e., what is shared+private, is it when both
-are 0 or when both are 1? I assume it's the former (both are 0), but
-it might be clearer.
+Reviewed-by: Fuad Tabba <tabba@google.com>
+Tested-by: Fuad Tabba <tabba@google.com>
 
 Cheers,
 /fuad
 
->         bool may_block;
->  };
->  bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index cb9376833c18..302ccb87b4c1 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -635,6 +635,13 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva=
-_range(struct kvm *kvm,
->                          * the second or later invocation of the handler)=
-.
->                          */
->                         gfn_range.arg =3D range->arg;
-> +
-> +                       /*
-> +                        * HVA-based notifications aren't relevant to pri=
-vate
-> +                        * mappings as they don't have a userspace mappin=
-g.
-> +                        */
-> +                       gfn_range.only_private =3D false;
-> +                       gfn_range.only_shared =3D true;
->                         gfn_range.may_block =3D range->may_block;
+>  arch/x86/kvm/x86.c | 1 +
+>  1 file changed, 1 insertion(+)
 >
->                         /*
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index ee3cd8c3c0ef..f41dbb1465a0 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10963,6 +10963,7 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
+>  {
+>         int r;
+>
+> +       vcpu->run->exit_reason =3D KVM_EXIT_UNKNOWN;
+>         vcpu->arch.l1tf_flush_l1d =3D true;
+>
+>         for (;;) {
 > --
 > 2.42.0.820.g83a721a137-goog
 >
