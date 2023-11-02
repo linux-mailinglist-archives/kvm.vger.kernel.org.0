@@ -1,277 +1,112 @@
-Return-Path: <kvm+bounces-374-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-375-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D3687DF012
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 11:33:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AB257DF017
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 11:33:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E1541C20F18
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 10:33:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B5581C20F22
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 10:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488C614A8F;
-	Thu,  2 Nov 2023 10:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7113814A87;
+	Thu,  2 Nov 2023 10:33:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L46DUtDI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RKbSOMJx"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE9A14274
-	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 10:32:49 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DA2F19B
-	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 03:32:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698921162;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=EePgrsn5C6IrnNIxegoYsuWMp1Sc1phl1cmFpN1d7s8=;
-	b=L46DUtDIQz53ccRCdQJFJW+IAJeOTCUlk/sx4p80wcznfruR810GKiOwtP4ylzCiGlKFDX
-	podk5YYZT9sfsW7qPcP6fVrvomodgFreTYDjcy6BU0i0uaDplExrcjosRKYpmitAczB1Dh
-	2/MHXbm+gWrsNdckstPhqNzG0zDlYQ4=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-655-CdxkYd9rOS231LiN5eCoUg-1; Thu, 02 Nov 2023 06:32:41 -0400
-X-MC-Unique: CdxkYd9rOS231LiN5eCoUg-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-99bca0b9234so53192566b.2
-        for <kvm@vger.kernel.org>; Thu, 02 Nov 2023 03:32:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698921160; x=1699525960;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EePgrsn5C6IrnNIxegoYsuWMp1Sc1phl1cmFpN1d7s8=;
-        b=Of71SspovOt4kR/7VRnbL081n8XmBFNmTIr5OrpNOA74KOXoAQOYJbIiWenufPwwg4
-         V+vECCBolYz6yLaVkVdteap//oAhmv/EP61oQj8lgd8ctTYUvX3iOwrKeRxYzs4NoYWV
-         fDlRp1eylGcIxRdoSqs0Mli3+8uRxJ8JZQoB14kQX+J9pilE0xYxrhK0SmRUJuXVdA07
-         3WBtWG8VFZhJJkV6+T4iani/8qDtSNb1Hrm7jIDjfsut1OEPlU/2HgovpetU6/2fFhws
-         TEgs1xTsVPDFS7WUoHPgMcsZu4kMbYdFHE+yyWVhEkAXJa7yABfKObX1NsgNuLSvQMzR
-         vE+Q==
-X-Gm-Message-State: AOJu0Yyn8SupEduhBXdwGznX1jrG6sxExzmdMG4qmBv4rf7PE0ImneFP
-	5SkRrUDCr9fY7SsYdC29TiVQUY23ysbWs/NER/aWM9yMY+YHUuGvSEtl4DdOkO5rNGOXHo/5Xuv
-	4haGvUdwpsOES
-X-Received: by 2002:a17:907:70a:b0:9bd:9bfe:e410 with SMTP id xb10-20020a170907070a00b009bd9bfee410mr4134668ejb.72.1698921160423;
-        Thu, 02 Nov 2023 03:32:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHdKWTZCjPNQtOILp1najbjDKUZt1gJ0TmclwPTaP4Nu9rDAFXiy/5MsPxAUlznxhN/2PedEg==
-X-Received: by 2002:a17:907:70a:b0:9bd:9bfe:e410 with SMTP id xb10-20020a170907070a00b009bd9bfee410mr4134618ejb.72.1698921159974;
-        Thu, 02 Nov 2023 03:32:39 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id y13-20020a170906470d00b0099bd1a78ef5sm957651ejq.74.2023.11.02.03.32.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Nov 2023 03:32:39 -0700 (PDT)
-Message-ID: <a03d0e36-7b38-4841-9c62-66c9029e388d@redhat.com>
-Date: Thu, 2 Nov 2023 11:32:34 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0EC14AA3
+	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 10:33:16 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B343A131;
+	Thu,  2 Nov 2023 03:33:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698921193; x=1730457193;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=SLairH+CCw3ORzUP44W20Kvl7uWrU7IvwIG+cWwSFUk=;
+  b=RKbSOMJxC2TrvtdhS/Yfl1oNg2f15wttoBePOvqXmMxWofZENsZCiGGV
+   rJ/tMxl+IKcTdLD8KJZKy6V91mbQHABEVNWaNXvMc9htilgJHFFggGyg4
+   p75SYfQnOqIQ1tnSoFxOUwvUH16t3ycZ0+AvMeGOuLkNluNe9s9siBdRy
+   HeASXWmugcXAFTucPQf8dpho3iEro1MLpoUww5rWDzpmsspHqXbA9ErM+
+   o4iVSoeUZThurbPOpSqaRgFCX515gma895xSb55cujnv2pwS0N7LU9FuY
+   ubcVWzg6hMCtDnySp9kf2eQV7yjI5J5s5tVHqqKye7f9fwu3sYWC4+eHV
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10881"; a="379076149"
+X-IronPort-AV: E=Sophos;i="6.03,271,1694761200"; 
+   d="scan'208";a="379076149"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 03:33:13 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10881"; a="934745072"
+X-IronPort-AV: E=Sophos;i="6.03,271,1694761200"; 
+   d="scan'208";a="934745072"
+Received: from arajan-mobl.amr.corp.intel.com (HELO box.shutemov.name) ([10.251.215.101])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 03:33:09 -0700
+Received: by box.shutemov.name (Postfix, from userid 1000)
+	id 2F0B4109AF7; Thu,  2 Nov 2023 13:33:06 +0300 (+03)
+Date: Thu, 2 Nov 2023 13:33:06 +0300
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc: Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
+	thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+	bp@alien8.de, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, dionnaglaze@google.com,
+	pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
+Subject: Re: [PATCH v5 13/14] x86/tsc: Mark Secure TSC as reliable clocksource
+Message-ID: <20231102103306.v7ydmrobd5ibs4yn@box.shutemov.name>
+References: <20231030063652.68675-1-nikunj@amd.com>
+ <20231030063652.68675-14-nikunj@amd.com>
+ <57d63309-51cd-4138-889d-43fbdf5ec790@intel.com>
+ <ae267e31-5722-4784-9146-28bb13ca7cf5@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 13/35] KVM: Introduce per-page memory attributes
-Content-Language: en-US
-To: "Huang, Kai" <kai.huang@intel.com>,
- "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
- "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
- "Christopherson,, Sean" <seanjc@google.com>,
- "brauner@kernel.org" <brauner@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
- "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
- "palmer@dabbelt.com" <palmer@dabbelt.com>, "maz@kernel.org"
- <maz@kernel.org>, "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
- "willy@infradead.org" <willy@infradead.org>,
- "anup@brainfault.org" <anup@brainfault.org>,
- "akpm@linux-foundation.org" <akpm@linux-foundation.org>
-Cc: "Li, Xiaoyao" <xiaoyao.li@intel.com>,
- "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
- "mic@digikod.net" <mic@digikod.net>,
- "liam.merwick@oracle.com" <liam.merwick@oracle.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
- "david@redhat.com" <david@redhat.com>, "tabba@google.com"
- <tabba@google.com>, "amoorthy@google.com" <amoorthy@google.com>,
- "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
- "michael.roth@amd.com" <michael.roth@amd.com>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
- "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
- "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
- "Annapurve, Vishal" <vannapurve@google.com>, "vbabka@suse.cz"
- <vbabka@suse.cz>, "mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>,
- "yu.c.zhang@linux.intel.com" <yu.c.zhang@linux.intel.com>,
- "qperret@google.com" <qperret@google.com>,
- "dmatlack@google.com" <dmatlack@google.com>, "Xu, Yilun"
- <yilun.xu@intel.com>, "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
- "ackerleytng@google.com" <ackerleytng@google.com>,
- "jarkko@kernel.org" <jarkko@kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>, "Wang, Wei W"
- <wei.w.wang@intel.com>
-References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-14-seanjc@google.com>
- <b486ed5036fab6d6d4e13a6c68abddcb9541d51b.camel@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <b486ed5036fab6d6d4e13a6c68abddcb9541d51b.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ae267e31-5722-4784-9146-28bb13ca7cf5@amd.com>
 
-On 11/2/23 04:01, Huang, Kai wrote:
-> On Fri, 2023-10-27 at 11:21 -0700, Sean Christopherson wrote:
->> From: Chao Peng <chao.p.peng@linux.intel.com>
->>
->> In confidential computing usages, whether a page is private or shared is
->> necessary information for KVM to perform operations like page fault
->> handling, page zapping etc. There are other potential use cases for
->> per-page memory attributes, e.g. to make memory read-only (or no-exec,
->> or exec-only, etc.) without having to modify memslots.
->>
->> Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
->> userspace to operate on the per-page memory attributes.
->>    - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
->>      a guest memory range.
->>    - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
->>      memory attributes.
->>
->> Use an xarray to store the per-page attributes internally, with a naive,
->> not fully optimized implementation, i.e. prioritize correctness over
->> performance for the initial implementation.
->>
->> Use bit 3 for the PRIVATE attribute so that KVM can use bits 0-2 for RWX
->> attributes/protections in the future, e.g. to give userspace fine-grained
->> control over read, write, and execute protections for guest memory.
->>
->> Provide arch hooks for handling attribute changes before and after common
->> code sets the new attributes, e.g. x86 will use the "pre" hook to zap all
->> relevant mappings, and the "post" hook to track whether or not hugepages
->> can be used to map the range.
->>
->> To simplify the implementation wrap the entire sequence with
->> kvm_mmu_invalidate_{begin,end}() even though the operation isn't strictly
->> guaranteed to be an invalidation.  For the initial use case, x86 *will*
->> always invalidate memory, and preventing arch code from creating new
->> mappings while the attributes are in flux makes it much easier to reason
->> about the correctness of consuming attributes.
->>
->> It's possible that future usages may not require an invalidation, e.g.
->> if KVM ends up supporting RWX protections and userspace grants _more_
->> protections, but again opt for simplicity and punt optimizations to
->> if/when they are needed.
->>
->> Suggested-by: Sean Christopherson <seanjc@google.com>
->> Link: https://lore.kernel.org/all/Y2WB48kD0J4VGynX@google.com
->> Cc: Fuad Tabba <tabba@google.com>
->> Cc: Xu Yilun <yilun.xu@intel.com>
->> Cc: Mickaël Salaün <mic@digikod.net>
->> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
->> Co-developed-by: Sean Christopherson <seanjc@google.com>
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
->>
+On Thu, Nov 02, 2023 at 11:23:34AM +0530, Nikunj A. Dadhania wrote:
+> On 10/30/2023 10:48 PM, Dave Hansen wrote:
+> > On 10/29/23 23:36, Nikunj A Dadhania wrote:
+> > ...
+> >> diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
+> >> index 15f97c0abc9d..b0a8546d3703 100644
+> >> --- a/arch/x86/kernel/tsc.c
+> >> +++ b/arch/x86/kernel/tsc.c
+> >> @@ -1241,7 +1241,7 @@ static void __init check_system_tsc_reliable(void)
+> >>  			tsc_clocksource_reliable = 1;
+> >>  	}
+> >>  #endif
+> >> -	if (boot_cpu_has(X86_FEATURE_TSC_RELIABLE))
+> >> +	if (boot_cpu_has(X86_FEATURE_TSC_RELIABLE) || cc_platform_has(CC_ATTR_GUEST_SECURE_TSC))
+> >>  		tsc_clocksource_reliable = 1;
+> > 
+> > Why can't you just set X86_FEATURE_TSC_RELIABLE?
 > 
-> [...]
+> Last time when I tried, I had removed my kvmclock changes and I had set
+> the X86_FEATURE_TSC_RELIABLE similar to Kirill's patch[1], this did not
+> select the SecureTSC.
 > 
->> +Note, there is no "get" API.  Userspace is responsible for explicitly tracking
->> +the state of a gfn/page as needed.
->> +
->>
-> 
-> [...]
-> 
->>   
->> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
->> +static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn)
->> +{
->> +	return xa_to_value(xa_load(&kvm->mem_attr_array, gfn));
->> +}
-> 
-> Only call xa_to_value() when xa_load() returns !NULL?
+> Let me try setting X86_FEATURE_TSC_RELIABLE and retaining my patch for
+> skipping kvmclock.
 
-This xarray does not store a pointer, therefore xa_load() actually 
-returns an integer that is tagged with 1 in the low bit:
+kvmclock lowers its rating if TSC is good enough:
 
-static inline unsigned long xa_to_value(const void *entry)
-{
-         return (unsigned long)entry >> 1;
-}
+	if (boot_cpu_has(X86_FEATURE_CONSTANT_TSC) &&
+	    boot_cpu_has(X86_FEATURE_NONSTOP_TSC) &&
+	    !check_tsc_unstable())
+		kvm_clock.rating = 299;
 
-Returning zero for an empty entry is okay, so the result of xa_load() 
-can be used directly.
+Does your TSC meet the requirements?
 
-
->> +
->> +bool kvm_range_has_memory_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
->> +				     unsigned long attrs);
-> 
-> Seems it's not immediately clear why this function is needed in this patch,
-> especially when you said there is no "get" API above.  Add some material to
-> changelog?
-
-It's used by later patches; even without a "get" API, it's a pretty 
-fundamental functionality.
-
->> +bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
->> +					struct kvm_gfn_range *range);
->> +bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
->> +					 struct kvm_gfn_range *range);
-> 
-> Looks if this Kconfig is on, the above two arch hooks won't have implementation.
-> 
-> Is it better to have two __weak empty versions here in this patch?
-> 
-> Anyway, from the changelog it seems it's not mandatory for some ARCH to provide
-> the above two if one wants to turn this on, i.e., the two hooks can be empty and
-> the ARCH can just use the __weak version.
-
-I think this can be added by the first arch that needs memory attributes 
-and also doesn't need one of these hooks.  Or perhaps the x86 
-kvm_arch_pre_set_memory_attributes() could be made generic and thus that 
-would be the __weak version.  It's too early to tell, so it's better to 
-leave the implementation to the architectures for now.
-
-Paolo
-
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
 
