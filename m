@@ -1,232 +1,249 @@
-Return-Path: <kvm+bounces-393-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-394-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 862DD7DF509
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 15:30:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE8A87DF513
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 15:32:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E40A1F2278D
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 14:30:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE0771C20E69
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 14:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD86E1BDEB;
-	Thu,  2 Nov 2023 14:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD4F1BDFA;
+	Thu,  2 Nov 2023 14:32:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="5pxqjCQd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VhvQWx6U"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A44381BDD1
-	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 14:29:53 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2044.outbound.protection.outlook.com [40.107.223.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC2A210F5;
-	Thu,  2 Nov 2023 07:29:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KN3tDAVrG8IfncLOSO5oRHfdTX17YMoxJfag1h1LXVTaTXRb5h20kzF2T9AVDI5pJ8bv5uPlIZtT6gQb+IDJiinLSTYArbWOZNZzgnzPQOCaA+HV0sPfROTv/Bmp/sviLyDRHq3eihkq6FV/dW5nlB4neNxs+xypaBE45V7Yc5vJWL59QmmJ4X+NRYZ7r1I36MJldXrcomMrHWlq+yjv5DiUmITZnG4RK8ELPiTj9RyzBCfzYBpTPjK1AzYCsM958GKDUwjKdg+Dul+/d38eBy7j45DTel646skxrCvyT9EX5S5KX6906Aj53vfSOTuJYA+eIjYEXp6Wz2s01HcE6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CXc9McQIhEfXK0Hww43B0fzTvs5x3MsGCGcmbuXFtXU=;
- b=lSd34cRpdY1CCMidaJVCKc4pyrQ7dtEP6fKi11C5FPJm9lS1nQq4EAC211Qr8gJwgfcqBQ/pPkD2ERdsK1PElbykeljjCAZtM/KnvLvJZfy9CAcvApjO3pLtZn1KPWVm3rFvCb3TDj1J+6wbxU78GhJMDfJlUBSSQlSUd2/Q/kyttNz6uQzsDpqXToly+uW61j5VdaMfGb0fuFIAMpt5btROBEpjeWIvJtgKJeYfB/zwg4BkwHkI+IxkaUY2wj1jt7HRLOgqCOB7wB0fvhVvI3DedkT/EtdvcO2j/pG9kfSamG5LWGyLebKnjnedmx7t8ULIuLzNOGik+M7RvVKu0A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CXc9McQIhEfXK0Hww43B0fzTvs5x3MsGCGcmbuXFtXU=;
- b=5pxqjCQdDqSla0LMQSEe/IirW5sGo97H0UqAQHfLoKlJTUAuHA6EFeDy3cPmhVJvqI/VtH6Be3qvNjvBUbDYuMVaCLPfchGbB40czJONo7Bph4AeMAwnSZIItUamsOpbT0qmmzXvhw96lt3Q4+QaxmMObvu2lT3ffmoazIiUMiw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
- by SN7PR12MB6840.namprd12.prod.outlook.com (2603:10b6:806:264::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.19; Thu, 2 Nov
- 2023 14:29:25 +0000
-Received: from BL1PR12MB5732.namprd12.prod.outlook.com
- ([fe80::e16e:d7f1:94ad:3021]) by BL1PR12MB5732.namprd12.prod.outlook.com
- ([fe80::e16e:d7f1:94ad:3021%7]) with mapi id 15.20.6933.030; Thu, 2 Nov 2023
- 14:29:25 +0000
-Message-ID: <0c4ea410-4213-4ab6-9151-da312a50aacf@amd.com>
-Date: Thu, 2 Nov 2023 09:29:22 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 09/14] x86/sev: Add Secure TSC support for SNP guests
-Content-Language: en-US
-To: nikunj@amd.com, linux-kernel@vger.kernel.org, x86@kernel.org,
- kvm@vger.kernel.org, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: bp@alien8.de, mingo@redhat.com, tglx@linutronix.de,
- dave.hansen@linux.intel.com, dionnaglaze@google.com, pgonda@google.com,
- seanjc@google.com, pbonzini@redhat.com
-References: <20231030063652.68675-1-nikunj@amd.com>
- <20231030063652.68675-10-nikunj@amd.com>
- <b5e71977-abf6-aa27-3a7b-37230b014724@amd.com>
- <60e5b46c-7e4b-44bb-a76f-a4b30b154d4a@amd.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Autocrypt: addr=thomas.lendacky@amd.com; keydata=
- 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
- 1NhFSLKvfA==
-In-Reply-To: <60e5b46c-7e4b-44bb-a76f-a4b30b154d4a@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DS7PR05CA0048.namprd05.prod.outlook.com
- (2603:10b6:8:2f::19) To BL1PR12MB5732.namprd12.prod.outlook.com
- (2603:10b6:208:387::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A124C14274
+	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 14:32:05 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3535138
+	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 07:31:29 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5b053454aeeso15068737b3.0
+        for <kvm@vger.kernel.org>; Thu, 02 Nov 2023 07:31:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698935488; x=1699540288; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lAaMrTmFkqkQBDJIun0NhM/ukv/V2L1IOTp3rGU5ITI=;
+        b=VhvQWx6U4gyeq6W5gYAqbv4/8sbf9RsCGjG64n5vwJceLlCDGZyW0dERUv413A7hpI
+         0idrYnYHT5mQWmB7hl7kyZzr1q4N3V6Vo6bG0BEoGuE/OkdDjpfIBA2HAZb7/OjhslHk
+         luZWn7+bl1SW0K1EWRoexIwq/78H7m0NGg0YGGVmfoCk6ROtCQrGt5q9+UadtudqpzMS
+         I1k0B9a+Q+AltItJt1C+RdZg2srmTrpKfE3wxz8ikyfjxS+CU/ddWW602D3anbYlVdFy
+         P/UmHswKEO+DoMmExG456Ztnok3V1Ro4dp0cJ2GNTwVsS884F9S1mRrrZkvzBbHgW3fT
+         efqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698935488; x=1699540288;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lAaMrTmFkqkQBDJIun0NhM/ukv/V2L1IOTp3rGU5ITI=;
+        b=U81XGtPM3/ILKgLS9FGArOGD3YM+y7jKKo5OcYN4VANCo64NrukCas8rIe58CzhNFg
+         nxZ+30Q7rg2iwDOdGcZ7DJKfa3rVf3vcgj60ijP8zjwe9Hiu1DG0q9mjgv+BkhiEiWfv
+         DnuGdW8xXSJGofiXD5S0p3Mr0u978ZYiZmIkXEzIF4BsHY+CdkjvIsoZqwtbhvBYfgrd
+         5bbpieXrePMOi4yIWBfHOYn05tzemFJ2vaDeAtln1BaKk7qw0FsztQj1HD9nnDDtuizi
+         DguM5P5KKF0SKtFBCpsfmLItAM3i17e0vi+sJ8rgYd+dldng7z/x6ECzFZIzKq1g2PIu
+         I0Xw==
+X-Gm-Message-State: AOJu0YyjlWDFzfrvevlEXX08M4jRANf1/Fv/K1pknfwEMuN+YJaX75ia
+	eFSARNPuhx4oTSq5x827YK+0LbRjT+c=
+X-Google-Smtp-Source: AGHT+IFt5OlbwPoWBLHdP1x9iWe1p/R5K4XFVEL+0pJMEt6E5XClHt/AagSNfWvU17EPnbEIB37aU8lKvgo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:4f4e:0:b0:586:50cf:e13f with SMTP id
+ d75-20020a814f4e000000b0058650cfe13fmr390775ywb.1.1698935488657; Thu, 02 Nov
+ 2023 07:31:28 -0700 (PDT)
+Date: Thu, 2 Nov 2023 07:31:27 -0700
+In-Reply-To: <CAF7b7mo0Pbju__J+58-0zHxNFn7R2=8WKTHmKYtcb_4eEa5bTw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|SN7PR12MB6840:EE_
-X-MS-Office365-Filtering-Correlation-Id: e2332115-ec17-43bf-0b5d-08dbdbb01d36
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	VEpDKD0tCWLPmnrqLeIJSSD+XUCIILZppl/MP7xjrNcNMmeOtNKARLpzOCGQTm2zTN6MTxzkchq0Edg/yThJgOw+A2ln7OVMbvGS6sqDC9tlm0N/UaP5lgNH9FwLHTIPGGMax7MHuwCJEdD6pWLfQcMdKcciihjg7VH+6z+bDnYb7Lej+rd4n08iGXFi67hWaPXcgZqvUSPufwpXzYf1smvEoKx7JI48cduE2xtqaMTpD0YoatBz6CH+OsVJk5dwsfmspLBmD38rpYt7m3q0kE5p1Rc+pUWqpGbVbLh9Wu8CyIiGpoZWH6tY21+1ETHUY+yWGMPN+L9kIB0vCwRFBPG1zD0b9E5teFqKSizDE/YvDGL90k5TJsdYpCbYpxarenEOBycpGe0x+LOPO3auLAzAXzyDVt2uF/6QAi1U7spr6gLPl5oVMXmDEJQr50y9xKagWDYVA9Kefo1nkUUgcvaQm9y0IClQ07g1rfKV/e6vlEstVSHfn+WMPquMpsclO5hQocBlMT6qydDrX4BWgljVmJtjR6+p8PBIsaZGFbhsisPTI/0gEXX82Bmup+X5QOi95CaDe3aIRMnuCmyP3VIT55Ii+4AA39XFYV6CP3ejIJk297abewWRS33PwBmmcAZomMCwaO/WiSkYPoR+2w==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(39860400002)(346002)(136003)(376002)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(26005)(6512007)(53546011)(6666004)(2616005)(6506007)(478600001)(6486002)(66946007)(5660300002)(41300700001)(8936002)(66476007)(6916009)(8676002)(66556008)(316002)(36756003)(38100700002)(31696002)(4326008)(83380400001)(86362001)(2906002)(7416002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UjFOcTgwUHczT1JPYm1NK1dsU3I0RTlVaEpnaGFSNFNleThxTDBqbkZPQy96?=
- =?utf-8?B?SDFVNnV0dGlkUjZUTUlqRGRwZlhmSnNvOE9RSVBPcUVLSU9hL3lzNXBtckZC?=
- =?utf-8?B?QzBPOHRLdVZKOXF0aGxvcEVQdzJHR29iTDJvbittWWRGdmhqeDdzUG42L2c0?=
- =?utf-8?B?WlRhbjU4dGlOZXY1c3hmS3NLNGE0T0ZvYlArR0syRnF1aFM5NnpDdi84Smd0?=
- =?utf-8?B?QStaRS9EeU1jS2R4N3Jnbm1aM3pWSlBRUVlBMWZDbXUrTUVTY0RWRmR1K09Y?=
- =?utf-8?B?VnJjc1J4OENUL0szN2xvTHgyUzJkRzZZaVpmQWVPT3l1czNrS0xkMlVnQjJ4?=
- =?utf-8?B?Uk85QVJmNmdRKzdSb3dqbklVbmFQYUFNNDRPa1RaWHNFN0FrLzlGMUdBU1Yv?=
- =?utf-8?B?S2I2K0VnSXlvVHZLVEtYdXRFRmhSWHlPSWlvMGptVzRiWWZyVC80eWxHZTdu?=
- =?utf-8?B?dXlXZnUxMzBxSE5aZlhIakc3N1R6dWhCaTRiUGlpNi95cnpReFV5eVRwV3Ew?=
- =?utf-8?B?MWE4dDJkdlI2WmxkZ3NwakJuV01EL0R6VTF3MnlORTU5NXJLbEJHdHJFalFP?=
- =?utf-8?B?T3RmVXFSWEZJeXBqNC9JM2FWY2VDM3FFd3R6c3F2czZET1B3VEFXSFFUUDgr?=
- =?utf-8?B?dkVxd0FNRFREYmtFK1JZcGV5aGZ3bGkvbjFQeWx2VXp4a0EzaWhmWTQ5VTg2?=
- =?utf-8?B?L2hQVEF6eVpzZUl3T25MMWdKWXd0bytLSjJ3MUdXdVc2Q3VBRWVLMGlaaEtU?=
- =?utf-8?B?WEFYeStrS2xmUHVVTlFHK05zRlNqLzFZQWZMT0hhaUNORmRvcEtpVGZwQTlK?=
- =?utf-8?B?YUJKUHJSYXRQbUVUR2krSUZRb0JBNlEvaGxDNHQxUmtRd1EyRVJkOTlEakpB?=
- =?utf-8?B?WEVYK2xuTzRkQ2ppdWN6cDBBVUV3WW9OS0dNUFdQTXIzM2RjcUdCM3Q3NE9u?=
- =?utf-8?B?OWZRdXdJWnJXak5zUkh6ekU3L2NYeXZVTkp5M3lMUEZBclJPNXJXd1ZaSnpl?=
- =?utf-8?B?eEVDb1hXeXZzRkg5MW9peXJJSE1FWEhXL1N5emg1UXlpYmc5aDBKZE1SRTNU?=
- =?utf-8?B?STVsaHpvU1Z3VjFXUVJqUnlSV1QyU05hSHA5bTk1VkFiWmhWUjc4UnM0bWxT?=
- =?utf-8?B?NVorZ0dmYlFrTUxBaVMwbHdsSlQ1dmh4aFhtaDQvc2NOOWZLSjh2R291NG15?=
- =?utf-8?B?N1VUbmwwSVhONmdjZTBFZjVNVHM3aGlHcTJHTHM2Vk8zYVF1bTZ0aDlQVE55?=
- =?utf-8?B?R2VreHdWZTRVTTRjOFc5N0RTUGNLTldGbmVQOGVXeXgwUlJsd2ZWaWdRMEkv?=
- =?utf-8?B?T1pTUUpoY0FjZ1dkaXFFUWVzUWRDcmhFUzlxRkFNdzVpWWpIU1lsRWUyTWVy?=
- =?utf-8?B?bEg2Sm8zK0NzMmlNclFSMGVVOUp4dklXRnNRS2xGWGRjaFNFWGNnSWcraGd0?=
- =?utf-8?B?VUJRRzVYcThncERjRk5FQTZNdGpYUEZmYmNUL2hpWHBiWTZDMjJrZkhOUGdx?=
- =?utf-8?B?bktXNEJ0OWJrTGtFaWdISk1ZUUlzZTRSODdTNkR1cmQ3R3pmY2tLV2ZWNy8w?=
- =?utf-8?B?WlhNVENhK2wrTURocHlBV0RIdjVocHovZGFWc0VNUXdiM0ExVHlwWUxRNHZ3?=
- =?utf-8?B?YzAxK29LdkYzaFhzcmYyTnpMaFVOUnRDYXVGcFgzclgwR0RGQUNEcjhZNUpH?=
- =?utf-8?B?eHEvb3hWVjZpeTM3TmVtWGh5NE1yTi9CNG5IYnYzUXp0NE9pWHFza3J0ay95?=
- =?utf-8?B?dWNlL250cDQvbWZRQnJmdTAyeGpjWVpUeXdyYTVmbnpKaUowNkM5SCtOejZH?=
- =?utf-8?B?a0c4M3hCeCtNenQyMmRhQTgzQzJrZHF3WGpGb3lJTTVKczdTNTU5MVpQeW9r?=
- =?utf-8?B?dFdYZ0pBY3Z0WVYxWVV3bDZCdnp1YjFqT250anBCdFJJcUw2VTF0S296NHdD?=
- =?utf-8?B?OTJpbWpxRTFYTTE4MDk4Vitwekl4bmxqSEhnK3ZwdkhJZU5DUGY3VzBhUXNx?=
- =?utf-8?B?aFdDTnAwZFY5TjZKNlZGY2N3VTRCVm4rbTBoWEI3ZVRFMFpBczFnNHI5MlI0?=
- =?utf-8?B?VU5KYWlldG9GcnRURUx3VFVzR0VqVlhSVW1WNk5QeDBEZTFCajkyY2JVUVUx?=
- =?utf-8?Q?AnF6GOA5Rb2Pk6IZLfIXJPrBr?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e2332115-ec17-43bf-0b5d-08dbdbb01d36
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Nov 2023 14:29:25.5294
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: n0KCoida6k2QBUyqr/I9nDMcT2KKrvplLvt0Pa9g8bI9YO2KAB+t6/LXosuCQWeetK/HlR+kOZwXwIGB9WU7OA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6840
+Mime-Version: 1.0
+References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-12-amoorthy@google.com>
+ <ZR4WzE1JOvq_0dhE@google.com> <CAF7b7mo0Pbju__J+58-0zHxNFn7R2=8WKTHmKYtcb_4eEa5bTw@mail.gmail.com>
+Message-ID: <ZUOyvwfLKlDKZKf8@google.com>
+Subject: Re: [PATCH v5 11/17] KVM: x86: Enable KVM_CAP_USERFAULT_ON_MISSING
+From: Sean Christopherson <seanjc@google.com>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
+	jthoughton@google.com, ricarkol@google.com, axelrasmussen@google.com, 
+	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
+	kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/2/23 00:36, Nikunj A. Dadhania wrote:
-> On 10/31/2023 1:56 AM, Tom Lendacky wrote:
->> On 10/30/23 01:36, Nikunj A Dadhania wrote:
->>> Add support for Secure TSC in SNP enabled guests. Secure TSC allows
->>> guest to securely use RDTSC/RDTSCP instructions as the parameters
->>> being used cannot be changed by hypervisor once the guest is launched.
->>>
->>> During the boot-up of the secondary cpus, SecureTSC enabled guests
->>> need to query TSC info from AMD Security Processor. This communication
->>> channel is encrypted between the AMD Security Processor and the guest,
->>> the hypervisor is just the conduit to deliver the guest messages to
->>> the AMD Security Processor. Each message is protected with an
->>> AEAD (AES-256 GCM). Use minimal AES GCM library to encrypt/decrypt SNP
->>> Guest messages to communicate with the PSP.
->>
->> Add to this commit message that you're using the enc_init hook to perform some Secure TSC initialization and why you have to do that.
-> 
-> Sure, will add.
->   
->>>
->>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
->>> ---
->>>    arch/x86/coco/core.c             |  3 ++
->>>    arch/x86/include/asm/sev-guest.h | 18 +++++++
->>>    arch/x86/include/asm/sev.h       |  2 +
->>>    arch/x86/include/asm/svm.h       |  6 ++-
->>>    arch/x86/kernel/sev.c            | 82 ++++++++++++++++++++++++++++++++
->>>    arch/x86/mm/mem_encrypt_amd.c    |  6 +++
->>>    include/linux/cc_platform.h      |  8 ++++
->>>    7 files changed, 123 insertions(+), 2 deletions(-)
->>>
+On Wed, Nov 01, 2023, Anish Moorthy wrote:
+> On Wed, Oct 4, 2023 at 6:52=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> >
+> > On Fri, Sep 08, 2023, Anish Moorthy wrote:
+> > > The relevant __gfn_to_pfn_memslot() calls in __kvm_faultin_pfn()
+> > > already use MEMSLOT_ACCESS_NONATOMIC_MAY_UPGRADE.
+> >
+> > --verbose
+>=20
+> Alright, how about the following?
+>=20
+>     KVM: x86: Enable KVM_CAP_EXIT_ON_MISSING
+>=20
+>     __gfn_to_pfn_memslot(), used by the stage-2 fault handler, already
+>     checks the memslot flag to avoid faulting in missing pages as require=
+d.
+>     Therefore, enabling the capability is just a matter of selecting the =
+kconfig
+>     to allow the flag to actually be set.
+>=20
+> > Hmm, I vote to squash this patch with
+> >
+> >   KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
+> >
+> > or rather, squash that code into this patch.  Ditto for the ARM patches=
+.
+> >
+> > Since we're making KVM_EXIT_MEMORY_FAULT informational-only for flows t=
+hat KVM
+> > isn't committing to supporting, I think it makes sense to enable the ar=
+ch specific
+> > paths that *need* to return KVM_EXIT_MEMORY_FAULT at the same time as t=
+he feature
+> > that adds the requirement.
+> >
+> > E.g. without HAVE_KVM_USERFAULT_ON_MISSING support, per the contract we=
+ are creating,
+> > it would be totally fine for KVM to not use KVM_EXIT_MEMORY_FAULT for t=
+he page
+> > fault paths.  And that obviously has to be the case since KVM_CAP_MEMOR=
+Y_FAULT_INFO
+> > is introduced before the arch code is enabled.
+> >
+> > But as of this path, KVM *must* return KVM_EXIT_MEMORY_FAULT, so we sho=
+uld make
+> > it impossible to do a straight revert of that dependency.
+>=20
+> Should we really be concerned about people reverting the
+> KVM_CAP_MEMORY_FAULT_INFO commit(s) in this way?
 
->>> +void __init snp_secure_tsc_prepare(void)
->>> +{
->>> +    if (!cc_platform_has(CC_ATTR_GUEST_SECURE_TSC))
->>> +        return;
->>> +
->>> +    if (snp_get_tsc_info())
->>> +        sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SNP_UNSUPPORTED);
->>
->> How about using SEV_TERM_SET_LINUX and a new GHCB_TERM_SECURE_TSC_INFO.
-> 
-> Yes, we can do that, I remember you had said this will required GHCB spec change and then thought of sticking with the current return code.
+Yes.  A revert is highly unlikely, but possible.  Keep in mind that with up=
+stream
+KVM, there are a *lot* of end users that don't know the inner workings of K=
+VM
+(or the kernel).  When things break, the standard approach for such users i=
+s to
+bisect to find where things first broke, and then to try reverting the susp=
+ected
+commit to see if that fixes the problem.
 
-No spec change needed. The base SNP support is already using it, so not an 
-issue to add a new error code.
+In the (again, highly unlikely) case that filling run->memory_fault breaks =
+something,
+an unsuspecting user will bisect to that commit and revert.  Then they're s=
+uddenly
+in a situation where they've unknowing broken KVM, and likely in a way that=
+ won't
+immediately fail.
 
-Thanks,
-Tom
+*Nothing* in either changelog gives any clue that there is a hard dependenc=
+y.
+Even the slightly more verbose version above provides almost no indication =
+of the
+real dependency, as it primarily talks about __gfn_to_pfn_memslot() and
+KVM_CAP_EXIT_ON_MISSING.
+=20
+And now that we've punted on trying annotate "everything", there's no sane =
+way
+for the "Annotate -EFAULTs from kvm_handle_error_pfn()" changelog to commun=
+icate
+that it will have a hard dependency in the future.  If the changelog says "=
+this
+will be used by blah blah blah", then it raises the question of "well why i=
+sn't
+this added there?".
 
+And the patches are tiny.  Having a final "enable and advertise XYZ" patch =
+is
+relatively common for new features, but that's often because the enabling o=
+f the
+new feature is spread across multiple patches.  E.g. see the LAM support si=
+tting
+in "https://github.com/kvm-x86/linux.git lam".  And in those cases, the har=
+d
+dependency is always very obvious, e.g. if someone complained that revertin=
+g
+"Virtualize LAM for user pointer" but not "Advertise and enable LAM (user a=
+nd
+supervisor)" caused problems, we'd be like, "well, yeah".
+
+> I see what you're> saying- but it also seems to me that KVM could add oth=
+er
+> things akin to KVM_CAP_EXIT_ON_MISSING in the future, and then we end up =
+in
+> the exact same situation.
+
+No, it's not the exact same situation.
+
+First and foremost, we *can't* solve that problem, because some future feat=
+ure
+doesn't exist yet.
+
+Second, merging features into two different kernel releases creates a very =
+different
+situation.  Let's say this goes into kernel 6.9, and then some future featu=
+re
+lands in kernel 6.11 and has a hard dependency on the annotations.  The odd=
+s of
+needing to revert a patch from 6.9 while upgrading to 6.11 are significnatl=
+y lower
+than the odds of needing to revert a patch from 6.9-rc1 between when rc1 is=
+ released
+and a user upgrades to 6.9.  And users aren't stupid; they might not know t=
+he inner
+workings of KVM, but bisecting to a patch from 6.9 when upgrading to 6.11 w=
+ould
+give them pause.
+
+Third, with the patches squashed, to revert the annotations, a person would=
+ also
+be reverting _this_ patch (because they'd be one and the same).  At that po=
+int,
+they're no longer reverting a seemingly innocous "give userspace more info"=
+ commit,
+they're reverting something that clearly advertises a feature userspace, wh=
+ich
+again provides a clue that a straight revert might not be super safe.
+
+> Sure the squash might make sense for the specific commits in the series, =
+but
+> there's a general issue that isn't really being solved.
+
+Patches within a series and future series are two very different things.
+
+> Maybe I'm just letting the better be the enemy of the best,
+
+The "best" isn't even possible, unless we never ship anything, ever.
+
+> but I do like the current separation/single-focus of the commits.
+
+Because you already know what the entire series does.  Someone looking at t=
+his
+patch without already understanding the big picture is going to have no ide=
+a that
+these two patches are tightly coupled.
+
+And again, now that we've punted on annotating everything, I see zero reaso=
+n to
+split the patches.  Maybe you could argue it provides a new bisection point=
+, but
+again the patches are _tiny_, and that same bisection point is effectively =
+achieved
+by running with an "older" userspace, i.e. a userspace that doesn't utilize=
+ the
+KVM_MEM_EXIT_ON_MISSING, which is literally every userspace in existence ri=
+ght now.
+
+> That said, the squash is nbd and I can go ahead if you're not convinced.
 
