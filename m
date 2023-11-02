@@ -1,141 +1,110 @@
-Return-Path: <kvm+bounces-454-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-455-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A75B17DFBED
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 22:14:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AE667DFC33
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 23:13:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58F7AB213BA
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 21:14:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFD98281E0F
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 22:13:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC1F219F0;
-	Thu,  2 Nov 2023 21:14:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82C0622313;
+	Thu,  2 Nov 2023 22:13:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LUZlpSea"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TM6/oIgc"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BD0521352
-	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 21:14:01 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A01218B
-	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 14:13:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698959639;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wfkOCZI8s/vE06TUoYXsRUD43KZX2PM2aWjgbIbsBpM=;
-	b=LUZlpSeaW+7tdD0wTPDoO7uCnMQxj7EvNzyitB5gUcZqJFGJo2xr5MS85IkAEDgNYUagGU
-	CsnXIbzE8CF8TaNR5n4NoTFMDdmbDHf3RL7v1n1WowahLY25mdUrbIj5CVn8uPIrBbxrMy
-	yefC3TBveRLofq3RcKZD/Ni7u+3e4dg=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-447-w2PN6A3oP0uK53cr2D_0EQ-1; Thu, 02 Nov 2023 17:13:56 -0400
-X-MC-Unique: w2PN6A3oP0uK53cr2D_0EQ-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7aad53fd070so192082239f.1
-        for <kvm@vger.kernel.org>; Thu, 02 Nov 2023 14:13:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698959635; x=1699564435;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wfkOCZI8s/vE06TUoYXsRUD43KZX2PM2aWjgbIbsBpM=;
-        b=Ht52dT3cixoM/OF1018zAXiALeGvbGmBZ8e0XNJxkJXFbgqIpjuZmSshW/Mv+nNECk
-         DVBU5aVIKfD1Aw2N4oelrMUaIJYwc4DMpYAbe7rid+FgDWpWkWULAW5aUfCIQiBUTaga
-         ArokriW+IyUpxDF1hiLxshzILmqTe6l/3pSc0Hi4wsjelc1obj9clLbljVMQZB1TTcK+
-         SP5jj3kMMKX2E0t37PXp3Q4BVVKa70lpOYccineDhTglB3MyuGc9Ov4MzFBlUzdq9cBS
-         0BN1F70KsicO2CQZFXgAPCBoeWiAXhsO6eYw/ERXW+GdZ6vXZGawFHWYgfZZ9aojc95y
-         rBfA==
-X-Gm-Message-State: AOJu0YzGmghbzP48UM6RCYtx4ZNDPYGfGa6SqPasE81B7Jjr09+10YIg
-	ZYh1ddqscfn6EFfUDku1ZerTFAFOm/uG152XCPHT6BKxZYHSUsnj8p+wdFO7kufE1mP7Er2Lpjg
-	NePzDwRAvcH0V
-X-Received: by 2002:a05:6e02:1aa3:b0:357:a51e:7dc4 with SMTP id l3-20020a056e021aa300b00357a51e7dc4mr1194188ilv.8.1698959635169;
-        Thu, 02 Nov 2023 14:13:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHRtIDvk2h6ou5ybOQtJNHDdfQL1y1Tux+ld68/4dPL58MpKjJYWrha15wfkZsxlztkkSrmeg==
-X-Received: by 2002:a05:6e02:1aa3:b0:357:a51e:7dc4 with SMTP id l3-20020a056e021aa300b00357a51e7dc4mr1194170ilv.8.1698959634873;
-        Thu, 02 Nov 2023 14:13:54 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id r20-20020a056e02109400b0035742971dd3sm96799ilj.16.2023.11.02.14.13.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Nov 2023 14:13:54 -0700 (PDT)
-Date: Thu, 2 Nov 2023 15:13:52 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: "Chatre, Reinette" <reinette.chatre@intel.com>, "jgg@nvidia.com"
- <jgg@nvidia.com>, "yishaih@nvidia.com" <yishaih@nvidia.com>,
- "shameerali.kolothum.thodi@huawei.com"
- <shameerali.kolothum.thodi@huawei.com>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, "Jiang, Dave" <dave.jiang@intel.com>, "Liu, Jing2"
- <jing2.liu@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "Yu, Fenghua"
- <fenghua.yu@intel.com>, "tom.zanussi@linux.intel.com"
- <tom.zanussi@linux.intel.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "patches@lists.linux.dev"
- <patches@lists.linux.dev>
-Subject: Re: [RFC PATCH V3 00/26] vfio/pci: Back guest interrupts from
- Interrupt Message Store (IMS)
-Message-ID: <20231102151352.1731de78.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB52769292F138F69D8717BE8D8CA6A@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <cover.1698422237.git.reinette.chatre@intel.com>
-	<BL1PR11MB52710EAB683507AD7FAD6A5B8CA0A@BL1PR11MB5271.namprd11.prod.outlook.com>
-	<20231101120714.7763ed35.alex.williamson@redhat.com>
-	<BN9PR11MB52769292F138F69D8717BE8D8CA6A@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8393D1F94C
+	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 22:12:57 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D080E193
+	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 15:12:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698963170; x=1730499170;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=1Gm0uGCQLXrLGtorJZ/tXDdVUHAqLa3KE9DQA+5PIkM=;
+  b=TM6/oIgcXpZnA1wkEl561QdZLZNVGJLUZLlk6vONVBFzOEErq7noF0LO
+   iWufVUFe5um5Wk+13WQXdppnZ2g7GXPPtmwUEWYBSku8zpXk9l1qRJsTv
+   WK8e2DZ8jQ5N0RKIbUa+5v9hCsUykxTg2+EezMfoXDXERvuBHzSd5nPyC
+   1ofJIw6R2y++ToRdEuu4h2GGZNvBTJDRSWa3a+at9dmswr7eDa+hg/Ork
+   EFy2DpWZIfnsAE/wzzBndthklYFvnzYOlPGuShf4ssy10GXUGvMG9CyGr
+   p5dQPLSq0vmbIbODNDFdlh/yesixE3vFHzHjSvXdmuQU3NlZ9PG5uBVj7
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10882"; a="369036949"
+X-IronPort-AV: E=Sophos;i="6.03,272,1694761200"; 
+   d="scan'208";a="369036949"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 15:12:44 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10882"; a="711317523"
+X-IronPort-AV: E=Sophos;i="6.03,272,1694761200"; 
+   d="scan'208";a="711317523"
+Received: from lkp-server01.sh.intel.com (HELO 17d9e85e5079) ([10.239.97.150])
+  by orsmga003.jf.intel.com with ESMTP; 02 Nov 2023 15:12:40 -0700
+Received: from kbuild by 17d9e85e5079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qyfva-0001uv-0l;
+	Thu, 02 Nov 2023 22:12:38 +0000
+Date: Fri, 3 Nov 2023 06:11:40 +0800
+From: kernel test robot <lkp@intel.com>
+To: David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Paul Durrant <paul@xen.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Dongli Zhang <dongli.zhang@oracle.com>
+Subject: Re: [PATCH] KVM: x86/xen: improve accuracy of Xen timers
+Message-ID: <202311030654.j0vxHNkS-lkp@intel.com>
+References: <b5a974bdc330be91c2356f5bb2cc68ef1cc7ed40.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b5a974bdc330be91c2356f5bb2cc68ef1cc7ed40.camel@infradead.org>
 
-On Thu, 2 Nov 2023 03:14:09 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+Hi David,
 
-> > From: Tian, Kevin
-> > Sent: Thursday, November 2, 2023 10:52 AM
-> >   
-> > >
-> > > Without an in-tree user of this code, we're just chopping up code for
-> > > no real purpose.  There's no reason that a variant driver requiring IMS
-> > > couldn't initially implement their own SET_IRQS ioctl.  Doing that  
-> > 
-> > this is an interesting idea. We haven't seen a real usage which wants
-> > such MSI emulation on IMS for variant drivers. but if the code is
-> > simple enough to demonstrate the 1st user of IMS it might not be
-> > a bad choice. There are additional trap-emulation required in the
-> > device MMIO bar (mostly copying MSI permission entry which contains
-> > PASID info to the corresponding IMS entry). At a glance that area
-> > is 4k-aligned so should be doable.
-> >   
-> 
-> misread the spec. the MSI-X permission table which provides
-> auxiliary data to MSI-X table is not 4k-aligned. It sits in the 1st
-> 4k page together with many other registers. emulation of them
-> could be simple with a native read/write handler but not sure
-> whether any of them may sit in a hot path to affect perf due to
-> trap...
+kernel test robot noticed the following build errors:
 
-I'm not sure if you're referring to a specific device spec or the PCI
-spec, but the PCI spec has long included an implementation note
-suggesting alignment of the MSI-X vector table and pba and separation
-from CSRs, and I see this is now even more strongly worded in the 6.0
-spec.
+[auto build test ERROR on kvm/queue]
+[also build test ERROR on mst-vhost/linux-next linus/master v6.6]
+[cannot apply to kvm/linux-next next-20231102]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Note though that for QEMU, these are emulated in the VMM and not
-written through to the device.  The result of writes to the vector
-table in the VMM are translated to vector use/unuse operations, which
-we see at the kernel level through SET_IRQS ioctl calls.  Are you
-expecting to get PASID information written by the guest through the
-emulated vector table?  That would entail something more than a simple
-IMS backend to MSI-X frontend.  Thanks,
+url:    https://github.com/intel-lab-lkp/linux/commits/David-Woodhouse/KVM-x86-xen-improve-accuracy-of-Xen-timers/20231028-020037
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/b5a974bdc330be91c2356f5bb2cc68ef1cc7ed40.camel%40infradead.org
+patch subject: [PATCH] KVM: x86/xen: improve accuracy of Xen timers
+config: i386-allyesconfig (https://download.01.org/0day-ci/archive/20231103/202311030654.j0vxHNkS-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231103/202311030654.j0vxHNkS-lkp@intel.com/reproduce)
 
-Alex
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311030654.j0vxHNkS-lkp@intel.com/
 
+All errors (new ones prefixed by >>):
+
+   ld: arch/x86/kvm/xen.o: in function `kvm_xen_start_timer':
+>> xen.c:(.text+0x132): undefined reference to `kvm_get_monotonic_and_clockread'
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
