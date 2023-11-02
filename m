@@ -1,183 +1,71 @@
-Return-Path: <kvm+bounces-344-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-345-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 699C27DE8CC
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 00:17:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0054D7DE925
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 01:01:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C21312818AC
-	for <lists+kvm@lfdr.de>; Wed,  1 Nov 2023 23:17:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A8261C20E85
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 00:01:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA3018E31;
-	Wed,  1 Nov 2023 23:17:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 190081C35;
+	Thu,  2 Nov 2023 00:01:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="chyzq9C4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VDEFXhnT"
 X-Original-To: kvm@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABDC21C2BB
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 23:17:33 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1579A134
-	for <kvm@vger.kernel.org>; Wed,  1 Nov 2023 16:17:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698880647;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0vwHZc+/Gns5rEzdivTNKNr5j0n3GZLH4TX/0o56Y/4=;
-	b=chyzq9C4fVwZzI3soe1A5mGtIdOLQK9TeWLdrfFE2MWQm87zJdSKxYsXrj9pZuoC2K0u/2
-	+Jcv9wvuE7yWgatY0YOqsAswsY6VWszGHZPAi6yjsyGxCwQ2EEllY3bb8OaRnr3HPcxVej
-	wzYgkpgzPN7v1eUl1rFJV+jZBcXcj+E=
-Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
- [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-622-4WoBFotWOtiC8JcCEW39jg-1; Wed, 01 Nov 2023 19:17:25 -0400
-X-MC-Unique: 4WoBFotWOtiC8JcCEW39jg-1
-Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-457bc611991so160206137.0
-        for <kvm@vger.kernel.org>; Wed, 01 Nov 2023 16:17:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698880645; x=1699485445;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0vwHZc+/Gns5rEzdivTNKNr5j0n3GZLH4TX/0o56Y/4=;
-        b=CxprgL9xclsWJChmelFZaVAcqM/wDIIJcfl6DVtx8CiSXSr99E4lMlocDXjVTpHOXU
-         sbdhKt+r6XT5HXsF2aZ79+nzuhG4Dzci9uJpUmpg31VS5VEEwA45S7h4fj/Uk6LfAuD1
-         FULq7Y1u6nzKi0i7QVsm/jCW1sonDsR1W5CJdETcQeWIL1AaxTR7Xx/Y9tbexsJrwJnS
-         fWYI/qTCZbhnZPJpPz01FanM7Q8OmXJBgKOOXyBJauLyISV42A5tq8kDnHD4r6vreD2o
-         4MVmlrRikC3FtgfQ4H63IWxesC3/nCPVREf6rDbHMl+U+LUb9+3h9r56yZTaCaTURrWe
-         3qZg==
-X-Gm-Message-State: AOJu0Yzdk40UNNfTMASXt3knrEVTx1c9DR4Iwq69q76PJX3kgq8RbKty
-	IMUwwu3s8C7BtEbMnVDL1yVTtw8lcqWY9AGvcQmhg8gsODvRKKRQcFWtJIY3pOVTAMk0h4JMrzV
-	MnrQKJHuhqByroz9FbyU3iR/YjQBQ
-X-Received: by 2002:a67:b70e:0:b0:450:8e58:2de4 with SMTP id h14-20020a67b70e000000b004508e582de4mr14946731vsf.7.1698880645380;
-        Wed, 01 Nov 2023 16:17:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IERW8ZMUKS1oQBttUXGlXfpcF1aXMGz29SltsJOczMO7DdV5tM2YzmJ2Q5mLWwPrzL7OcDPCpWawHIyBUWWBis=
-X-Received: by 2002:a67:b70e:0:b0:450:8e58:2de4 with SMTP id
- h14-20020a67b70e000000b004508e582de4mr14946722vsf.7.1698880645133; Wed, 01
- Nov 2023 16:17:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD46910F6
+	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 00:01:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4BFE6C433C8;
+	Thu,  2 Nov 2023 00:01:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698883280;
+	bh=ntQko+8dkscPDZRJ3pZ8fhtqtiQ5uxRbqAcj1V/+OPw=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=VDEFXhnTqKO2+JVjxw0Ip6tt4JRxCjc7Qza8nUB0VcFahonXpZYioIdqLF5szkWfI
+	 +ro4V39oK9Dnt1xI/9iCGBbm2x314qRlv96Hj7ylyMhkjR7LneIMqmP0zwov+Lmt2+
+	 EBkHXk9Tm4Ja/3aom4JVAXrqdzS/vVuekZmPtx8IFd+3lzh3xY1sIkGoc3awaNzM/h
+	 BNs+bAHS/XMTy028IdlvhiqSM/vjEtsemzk45TL4xvfx4Cc8A78uob6VCpJhDqAYiK
+	 1S8W9ikceQo/0T2gdCuFz7WPTDI+9etSj8eVpu1GBzZI1MOW9g+O15Kg/U/DmYekJC
+	 EWHy/LuwCSbIg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3BF1DC4316B;
+	Thu,  2 Nov 2023 00:01:20 +0000 (UTC)
+Subject: Re: [GIT PULL] VFIO updates for v6.7-rc1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20231031115400.570e00d1.alex.williamson@redhat.com>
+References: <20231031115400.570e00d1.alex.williamson@redhat.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20231031115400.570e00d1.alex.williamson@redhat.com>
+X-PR-Tracked-Remote: https://github.com/awilliam/linux-vfio.git tags/vfio-v6.7-rc1
+X-PR-Tracked-Commit-Id: 2b88119e35b00d8cb418d86abbace3b90a993bd7
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: deefd5024f0772cf56052ace9a8c347dc70bcaf3
+Message-Id: <169888328023.31464.13235227422474558237.pr-tracker-bot@kernel.org>
+Date: Thu, 02 Nov 2023 00:01:20 +0000
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kernel@vger.kernel.org, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-18-seanjc@google.com>
- <7c0844d8-6f97-4904-a140-abeabeb552c1@intel.com> <ZUEML6oJXDCFJ9fg@google.com>
- <92ba7ddd-2bc8-4a8d-bd67-d6614b21914f@intel.com> <ZUJVfCkIYYFp5VwG@google.com>
- <CABgObfaw4Byuzj5J3k48jdwT0HCKXLJNiuaA9H8Dtg+GOq==Sw@mail.gmail.com>
- <ZUJ-cJfofk2d_I0B@google.com> <4ca2253d-276f-43c5-8e9f-0ded5d5b2779@redhat.com>
- <ZULSkilO-tdgDGyT@google.com>
-In-Reply-To: <ZULSkilO-tdgDGyT@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 2 Nov 2023 00:17:13 +0100
-Message-ID: <CABgObfbq_Hg0B=jvsSDqYH3CSpX+RsxfwB-Tc-eYF4uq2Qw9cg@mail.gmail.com>
-Subject: Re: [PATCH v13 17/35] KVM: Add transparent hugepage support for
- dedicated guest memory
-To: Sean Christopherson <seanjc@google.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xu Yilun <yilun.xu@intel.com>, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 1, 2023 at 11:35=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Wed, Nov 01, 2023, Paolo Bonzini wrote:
-> > On 11/1/23 17:36, Sean Christopherson wrote:
-> > > > > "Allow" isn't perfect, e.g. I would much prefer a straight KVM_GU=
-EST_MEMFD_USE_HUGEPAGES
-> > > > > or KVM_GUEST_MEMFD_HUGEPAGES flag, but I wanted the name to conve=
-y that KVM doesn't
-> > > > > (yet) guarantee hugepages.  I.e. KVM_GUEST_MEMFD_ALLOW_HUGEPAGE i=
-s stronger than
-> > > > > a hint, but weaker than a requirement.  And if/when KVM supports =
-a dedicated memory
-> > > > > pool of some kind, then we can add KVM_GUEST_MEMFD_REQUIRE_HUGEPA=
-GE.
-> > > > I think that the current patch is fine, but I will adjust it to alw=
-ays
-> > > > allow the flag, and to make the size check even if !CONFIG_TRANSPAR=
-ENT_HUGEPAGE.
-> > > > If hugepages are not guaranteed, and (theoretically) you could have=
- no
-> > > > hugepage at all in the result, it's okay to get this result even if=
- THP is not
-> > > > available in the kernel.
-> > > Can you post a fixup patch?  It's not clear to me exactly what behavi=
-or you intend
-> > > to end up with.
-> >
-> > Sure, just this:
-> >
-> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> > index 7d1a33c2ad42..34fd070e03d9 100644
-> > --- a/virt/kvm/guest_memfd.c
-> > +++ b/virt/kvm/guest_memfd.c
-> > @@ -430,10 +430,7 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_cr=
-eate_guest_memfd *args)
-> >  {
-> >       loff_t size =3D args->size;
-> >       u64 flags =3D args->flags;
-> > -     u64 valid_flags =3D 0;
-> > -
-> > -     if (IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE))
-> > -             valid_flags |=3D KVM_GUEST_MEMFD_ALLOW_HUGEPAGE;
-> > +     u64 valid_flags =3D KVM_GUEST_MEMFD_ALLOW_HUGEPAGE;
-> >       if (flags & ~valid_flags)
-> >               return -EINVAL;
-> > @@ -441,11 +438,9 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_cr=
-eate_guest_memfd *args)
-> >       if (size < 0 || !PAGE_ALIGNED(size))
-> >               return -EINVAL;
-> > -#ifdef CONFIG_TRANSPARENT_HUGEPAGE
-> >       if ((flags & KVM_GUEST_MEMFD_ALLOW_HUGEPAGE) &&
-> >           !IS_ALIGNED(size, HPAGE_PMD_SIZE))
-> >               return -EINVAL;
-> > -#endif
->
-> That won't work, HPAGE_PMD_SIZE is valid only for CONFIG_TRANSPARENT_HUGE=
-PAGE=3Dy.
->
-> #else /* CONFIG_TRANSPARENT_HUGEPAGE */
-> #define HPAGE_PMD_SHIFT ({ BUILD_BUG(); 0; })
-> #define HPAGE_PMD_MASK ({ BUILD_BUG(); 0; })
-> #define HPAGE_PMD_SIZE ({ BUILD_BUG(); 0; })
+The pull request you sent on Tue, 31 Oct 2023 11:54:00 -0600:
 
-Would have caught it when actually testing it, I guess. :) It has to
-be PMD_SIZE, possibly with
+> https://github.com/awilliam/linux-vfio.git tags/vfio-v6.7-rc1
 
-#ifdef CONFIG_TRANSPARENT_HUGEPAGE
-BUILD_BUG_ON(HPAGE_PMD_SIZE !=3D PMD_SIZE);
-#endif
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/deefd5024f0772cf56052ace9a8c347dc70bcaf3
 
-for extra safety.
+Thank you!
 
-Paolo
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
