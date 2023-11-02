@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-421-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-420-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F02F7DF7BF
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 17:34:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C38E87DF7BD
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 17:34:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 001A9B2141A
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 16:34:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 30581B21310
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 16:34:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5845F21370;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E8D21369;
 	Thu,  2 Nov 2023 16:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EsmSVOSo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AmaOE2qt"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B6721341
-	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 16:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949B821340
+	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 16:34:03 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4323112D;
-	Thu,  2 Nov 2023 09:33:56 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23AC013D;
+	Thu,  2 Nov 2023 09:33:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698942836; x=1730478836;
+  t=1698942839; x=1730478839;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=GNhPW88MPkib21AmFUv5fnJN41E4w62qwPpqIsA6MqA=;
-  b=EsmSVOSoDB5EgNt+BATFkiFm5WztaGU14qzrvpJD6VrBgRQYRUNZybiU
-   8wjthNK9E0ecvAZPf/fEt53Gql6itAkhy4xLSRSPdlSDEdiOebQZ2Wmp1
-   Le88PJ/IgwAF8oUFLn2rH3vbbLQQI6OmjGfWePL3VoIUmHbLBuser4x0b
-   rjYYBkKtCAzSTca+k2fj24AWukKCVKTmNUK2IP9pKVVfu41/1Ls6QAUio
-   KTb+E1HwSR4fSoIznwUNb8gm2GoaBui+pnLotATtkzZueWum+AsjCzIPz
-   ri9V5qrSr3G+/5ajYpeJwssqcjGgdhhvmpUvqLxsyp1WwxxmgK+I6xNHV
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10882"; a="388571041"
+  bh=8b2lW3eo74qPEH0+9VzElndbmy1zGlp6Ujy7Gd2vHyU=;
+  b=AmaOE2qtMikWedmjeBqGgVzNTdBFuLxpQy3Z+vKKxz3rPsIqsd1ttYZD
+   PONBMZx6TwYQKPs5CSptGksGlzVgCMXrGu/7Dm7Zb4KsjQ0yhliHDvWsm
+   Mc0zjo/PkDyNLe1LXFy+Igetso837e6ZIWBNonnwX80fyVch16q13pWzf
+   eVur08M1fYy2OH82ZrLDeVSOAMdFHxpwsHtjYdT2IS3ZbBK68Fk5P9/L1
+   +Xs2m1aQVRt3Yr3dpaiSF5zNsE0nsADM71EcKq/bLp8tezuAlHC4UTqwe
+   T598HG2GRO6FJKidRpuXkiwmCsTvUZjG0aRsDax4YdfPPFvdGhe2yhkgH
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10882"; a="388571110"
 X-IronPort-AV: E=Sophos;i="6.03,272,1694761200"; 
-   d="scan'208";a="388571041"
+   d="scan'208";a="388571110"
 Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 09:33:33 -0700
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 09:33:51 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.03,272,1694761200"; 
-   d="scan'208";a="9448518"
+   d="scan'208";a="9448535"
 Received: from arthur-vostro-3668.sh.intel.com ([10.239.159.65])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 09:33:27 -0700
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 09:33:34 -0700
 From: Zeng Guang <guang.zeng@intel.com>
 To: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
@@ -66,9 +66,9 @@ Cc: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
 	linux-riscv@lists.infradead.org,
 	Zeng Guang <guang.zeng@intel.com>
-Subject: [RFC PATCH v1 6/8] KVM: selftests: x86: Allow user to access user-mode address and I/O address space
-Date: Thu,  2 Nov 2023 23:51:09 +0800
-Message-Id: <20231102155111.28821-7-guang.zeng@intel.com>
+Subject: [RFC PATCH v1 7/8] KVM: selftests: x86: Support vcpu run in user mode
+Date: Thu,  2 Nov 2023 23:51:10 +0800
+Message-Id: <20231102155111.28821-8-guang.zeng@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20231102155111.28821-1-guang.zeng@intel.com>
 References: <20231102155111.28821-1-guang.zeng@intel.com>
@@ -78,83 +78,56 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 
-Configure the U/S bit in paging-structure entries according to operation
-mode and delimit user has user-mode access only to user-mode address
-space.
-
-Similarly set I/O privilege level as ring 3 in EFLAGS register to allow
-user to access the I/O address space.
+Introduce vcpu_setup_user_mode() to support vcpu run in user mode.
 
 Signed-off-by: Zeng Guang <guang.zeng@intel.com>
 ---
- .../selftests/kvm/include/x86_64/processor.h   |  3 ++-
- .../selftests/kvm/lib/x86_64/processor.c       | 18 +++++++++++++++---
- 2 files changed, 17 insertions(+), 4 deletions(-)
+ .../selftests/kvm/include/x86_64/processor.h  |  1 +
+ .../selftests/kvm/lib/x86_64/processor.c      | 19 +++++++++++++++++++
+ 2 files changed, 20 insertions(+)
 
 diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 4b167e3e0370..9c8224c80664 100644
+index 9c8224c80664..2534bdf8aa71 100644
 --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
 +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -24,7 +24,8 @@ extern bool host_cpu_is_amd;
+@@ -800,6 +800,7 @@ static inline void cpu_relax(void)
+ struct kvm_x86_state *vcpu_save_state(struct kvm_vcpu *vcpu);
+ void vcpu_load_state(struct kvm_vcpu *vcpu, struct kvm_x86_state *state);
+ void kvm_x86_state_cleanup(struct kvm_x86_state *state);
++void vcpu_setup_user_mode(struct kvm_vcpu *vcpu, void *guest_code);
  
- #define NMI_VECTOR		0x02
- 
--#define X86_EFLAGS_FIXED	 (1u << 1)
-+#define X86_EFLAGS_FIXED	(1u << 1)
-+#define X86_EFLAGS_IOPL		(3u << 12)
- 
- #define X86_CR4_VME		(1ul << 0)
- #define X86_CR4_PVI		(1ul << 1)
+ const struct kvm_msr_list *kvm_get_msr_index_list(void);
+ const struct kvm_msr_list *kvm_get_feature_msr_index_list(void);
 diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 487e1f829031..7647c3755ca2 100644
+index 7647c3755ca2..c84292b35f2d 100644
 --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
 +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -117,6 +117,14 @@ static void sregs_dump(FILE *stream, struct kvm_sregs *sregs, uint8_t indent)
- 	}
+@@ -1071,6 +1071,25 @@ void vcpu_load_state(struct kvm_vcpu *vcpu, struct kvm_x86_state *state)
+ 		vcpu_nested_state_set(vcpu, &state->nested);
  }
  
-+static bool gva_is_kernel_addr(uint64_t gva)
++void vcpu_setup_user_mode(struct kvm_vcpu *vcpu, void *guest_code)
 +{
-+	if (gva & BIT_ULL(63))
-+		return true;
++	struct kvm_sregs sregs;
++	struct kvm_regs regs;
++	struct kvm_vm *vm = vcpu->vm;
 +
-+	return false;
++	vcpu_sregs_get(vcpu, &sregs);
++	kvm_seg_set_code_64bit(vm, USER_CODE_SELECTOR, &sregs.cs);
++	kvm_seg_set_data_64bit(vm, USER_DATA_SELECTOR, &sregs.ds);
++	kvm_seg_set_data_64bit(vm, USER_DATA_SELECTOR, &sregs.es);
++	kvm_seg_set_data_64bit(vm, USER_DATA_SELECTOR, &sregs.ss);
++	vcpu_sregs_set(vcpu, &sregs);
++
++	vcpu_regs_get(vcpu, &regs);
++	regs.rsp = vcpu->stack_vaddr - (DEFAULT_STACK_PGS >> 1) * getpagesize();
++	regs.rip = (unsigned long) guest_code;
++	vcpu_regs_set(vcpu, &regs);
 +}
 +
- bool kvm_is_tdp_enabled(void)
+ void kvm_x86_state_cleanup(struct kvm_x86_state *state)
  {
- 	if (host_cpu_is_intel)
-@@ -161,7 +169,8 @@ static uint64_t *virt_create_upper_pte(struct kvm_vm *vm,
- 	uint64_t *pte = virt_get_pte(vm, parent_pte, vaddr, current_level);
- 
- 	if (!(*pte & PTE_PRESENT_MASK)) {
--		*pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK;
-+		*pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK |
-+		       (gva_is_kernel_addr(vaddr) ? 0 : PTE_USER_MASK);
- 		if (current_level == target_level)
- 			*pte |= PTE_LARGE_MASK | (paddr & PHYSICAL_PAGE_MASK);
- 		else
-@@ -224,7 +233,8 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
- 	pte = virt_get_pte(vm, pde, vaddr, PG_LEVEL_4K);
- 	TEST_ASSERT(!(*pte & PTE_PRESENT_MASK),
- 		    "PTE already present for 4k page at vaddr: 0x%lx\n", vaddr);
--	*pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK | (paddr & PHYSICAL_PAGE_MASK);
-+	*pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK | (paddr & PHYSICAL_PAGE_MASK) |
-+	       (gva_is_kernel_addr(vaddr) ? 0 : PTE_USER_MASK);
- }
- 
- void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
-@@ -630,7 +640,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 
- 	/* Setup guest general purpose registers */
- 	vcpu_regs_get(vcpu, &regs);
--	regs.rflags = regs.rflags | 0x2;
-+
-+	/* Allow user privilege to access the I/O address space */
-+	regs.rflags = regs.rflags | X86_EFLAGS_FIXED | X86_EFLAGS_IOPL;
- 	regs.rsp = (unsigned long)KERNEL_ADDR(stack_vaddr);
- 	regs.rip = (unsigned long)KERNEL_ADDR(guest_code);
- 	vcpu_regs_set(vcpu, &regs);
+ 	free(state->xsave);
 -- 
 2.21.3
 
