@@ -1,178 +1,151 @@
-Return-Path: <kvm+bounces-399-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-400-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 077A67DF56C
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 15:58:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 486F77DF692
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 16:36:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6173281BDD
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 14:57:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6596F1C20EF8
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 15:36:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B2C519BDE;
-	Thu,  2 Nov 2023 14:57:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9E121CF9C;
+	Thu,  2 Nov 2023 15:36:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WABnDmPn"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Vpi/wzOF"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1D61B282
-	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 14:57:49 +0000 (UTC)
-Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3CC0182
-	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 07:57:47 -0700 (PDT)
-Received: by mail-qv1-xf35.google.com with SMTP id 6a1803df08f44-66d264e67d8so6008256d6.1
-        for <kvm@vger.kernel.org>; Thu, 02 Nov 2023 07:57:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698937067; x=1699541867; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oO6y6W0Hx2JX7rhY2F9inSHXy5EHTr89TCOrnU0rbjw=;
-        b=WABnDmPn5on4qHZIWANY+CuhNh4heHUUGc6Z1RpTJLvLhxOk+sFyH+7L2AMchSpL+J
-         PqTaI1s7f8Li/A5NPoBSePZDyRbPHpIjbQibERvyfmOYab7P1mS/fEx/Ot1dD7SS07Sq
-         n9IDH2JN36ixe5W+G1wkbrhTu0CciPOYRUXpGTs/Np6efSo4vcQl9aTaK6cHnRj/iEhT
-         qAwV4QY/CeuwrE7DRseMVwtFTV8DJd0oawbA/2gsPZ7fZzws34hrWcbJ0hQ4jxOHVpMk
-         t16vU8dc5ir/4snBt+0cgtgoUpngRtkZeb9eKQw/qFTh/kpSmArsYS3sMQiq1pXXbwx9
-         MGNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698937067; x=1699541867;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oO6y6W0Hx2JX7rhY2F9inSHXy5EHTr89TCOrnU0rbjw=;
-        b=e9sMiIksMB7oW/MurSzLD6YJGzK36g3jYvbnW4/tbZV72/kJO9HGHBOz4F9JMr4ygO
-         MXS2utxsX/29SQb/N25fF+rWY54AEj8/MSsr2yCybATpEVpF8Q09hXmhbVmEuALrYhh9
-         ojdYtkCXjOJ+5hzvrPBItwvRgSQ9uTjC/ZfhBFAyVnrIHrFyDdOxA0ad0QEMksEikIJ5
-         Wn6vtFJm/xz+6jpiHGdbSWnyDqoFFiscodqZPeznt+CVWmsDaBoK2K2fX6J745nHClWj
-         MCIWsBXBQrr5v4tNCKdCAdiUydCOrttlQmvD2/Y04huGFYqzGeVwBnCpSb/6F/LrNpZS
-         q2Dg==
-X-Gm-Message-State: AOJu0Yyxk1ihbCsCMYN/a13H+Pi8Ru2lvjnh7mU9tfk/ODoBPZP+MlnQ
-	OJjOZGgheojLYXemm04BtwUJCoHXkgm0E/TvgnK92Qc56IqGElQv4x6JveF6
-X-Google-Smtp-Source: AGHT+IHH5fWOUl6XWE3cRbRkmtci3EQG11sJ5sTElOUO4i3o8jogptvsMwjY2tQIjVOiF2P5A518xtVBqTDVb2uPT1o=
-X-Received: by 2002:a05:6214:252d:b0:66d:1b2f:3f64 with SMTP id
- gg13-20020a056214252d00b0066d1b2f3f64mr24532994qvb.31.1698937066885; Thu, 02
- Nov 2023 07:57:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7031CF90
+	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 15:35:57 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5FD4137
+	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 08:35:55 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A2FS2FV026921
+	for <kvm@vger.kernel.org>; Thu, 2 Nov 2023 15:35:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=wF5NfqQ4bffah4Wkydft3VIxLoSxH5iyzbcDsHM8748=;
+ b=Vpi/wzOFnsjKp7DhidVcdUyhqPndA5dORYtPj0wYgu2DyV57jIuXi3lwXo60qTRpD2m4
+ X8EWUFUbeptoA0i7LeJNAaYjXbTsr8HeSvnFxeco3FMBto/XMctXFRTrGkvnxF2QBWGd
+ jqaY8j6OMKXIy20X1fpwD8iI503jr+dADketBN4MVKVpeQnL1cc3IDXLqT8F5P2Tt11z
+ Dr+J1Xa6qY9zY/gabHn3a8B81H2yg1qZrOXxfKNoxw7/TpHSQIx+ZePlXZU6PDLpLNNl
+ A5jywWBRGYzTxqgruj2gDP24ZQ/HtoSYJ9w20bDZmyUDi6pC2HmeDoK7DHfOZXCyQmK0 nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u4ee9gcq1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <kvm@vger.kernel.org>; Thu, 02 Nov 2023 15:35:54 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A2FSba4028761
+	for <kvm@vger.kernel.org>; Thu, 2 Nov 2023 15:35:54 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u4ee9gcpv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 Nov 2023 15:35:54 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A2DuEJf011310;
+	Thu, 2 Nov 2023 15:35:53 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u1eukf6b1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 Nov 2023 15:35:53 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A2FZomd6685372
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 2 Nov 2023 15:35:50 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1250A20043;
+	Thu,  2 Nov 2023 15:35:50 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DEC9020040;
+	Thu,  2 Nov 2023 15:35:49 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  2 Nov 2023 15:35:49 +0000 (GMT)
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: kvm@vger.kernel.org
+Cc: nrb@linux.ibm.com, nsg@linux.ibm.com, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com
+Subject: [PATCH v2 1/1] KVM: s390: vsie: fix wrong VIR 37 when MSO is used
+Date: Thu,  2 Nov 2023 16:35:49 +0100
+Message-ID: <20231102153549.53984-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-13-seanjc@google.com>
- <CA+EHjTyAU9XZ3OgqXjmAKh-BKsLrH_8QtnJihQxF4fhk8WPSYg@mail.gmail.com> <ZUO1Giju0GkUdF0o@google.com>
-In-Reply-To: <ZUO1Giju0GkUdF0o@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 2 Nov 2023 14:57:10 +0000
-Message-ID: <CA+EHjTwpVSyUC8oiii3EYU8pqEJ0D0NXA1EZt76wjfPBpk2rFA@mail.gmail.com>
-Subject: Re: [PATCH v13 12/35] KVM: Prepare for handling only shared mappings
- in mmu_notifier events
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: d805AncK8TAn_IRkf1ifL2rGuO6NZygG
+X-Proofpoint-ORIG-GUID: jQb_EDantOZXAGM2hdJvLya3TbE00Bsi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-02_04,2023-11-02_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ lowpriorityscore=0 spamscore=0 phishscore=0 adultscore=0
+ priorityscore=1501 mlxlogscore=825 impostorscore=0 mlxscore=0
+ malwarescore=0 clxscore=1015 suspectscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2310240000
+ definitions=main-2311020125
 
-On Thu, Nov 2, 2023 at 2:41=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Thu, Nov 02, 2023, Fuad Tabba wrote:
-> > Hi,
-> >
-> > On Fri, Oct 27, 2023 at 7:22=E2=80=AFPM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
-> > >
-> > > Add flags to "struct kvm_gfn_range" to let notifier events target onl=
-y
-> > > shared and only private mappings, and write up the existing mmu_notif=
-ier
-> > > events to be shared-only (private memory is never associated with a
-> > > userspace virtual address, i.e. can't be reached via mmu_notifiers).
-> > >
-> > > Add two flags so that KVM can handle the three possibilities (shared,
-> > > private, and shared+private) without needing something like a tri-sta=
-te
-> > > enum.
-> > >
-> > > Link: https://lore.kernel.org/all/ZJX0hk+KpQP0KUyB@google.com
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > ---
-> > >  include/linux/kvm_host.h | 2 ++
-> > >  virt/kvm/kvm_main.c      | 7 +++++++
-> > >  2 files changed, 9 insertions(+)
-> > >
-> > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > > index 96aa930536b1..89c1a991a3b8 100644
-> > > --- a/include/linux/kvm_host.h
-> > > +++ b/include/linux/kvm_host.h
-> > > @@ -263,6 +263,8 @@ struct kvm_gfn_range {
-> > >         gfn_t start;
-> > >         gfn_t end;
-> > >         union kvm_mmu_notifier_arg arg;
-> > > +       bool only_private;
-> > > +       bool only_shared;
-> >
-> > If these flags aren't used in this patch series, should this patch be
-> > moved to the other series?
->
-> If *both* TDX and SNP need this patch, then I think it's probably worth a=
-pplying
-> it now to make their lives easier.  But if only one needs the support, th=
-en I
-> completely agree this should be punted to whichever series needs it (this=
- also
-> came up in v11, but we didn't force the issue).
->
-> Mike, Isaku?
->
-> > Also, if shared+private is a possibility, doesn't the prefix "only_"
-> > confuse things a bit? I.e., what is shared+private, is it when both
-> > are 0 or when both are 1? I assume it's the former (both are 0), but
-> > it might be clearer.
->
-> Heh, I was hoping that "only_private && only_shared" would be obviously n=
-onsensical.
->
-> The only alternative I can think would be to add an enum, e.g.
->
->         enum {
->                 PROCESS_PRIVATE_AND_SHARED,
->                 PROCESS_ONLY_PRIVATE,
->                 PROCESS_ONLY_SHARED,
->         };
->
-> because every other way of expressing the flags either results in more co=
-nfusion
-> or an unsafe default.  I.e. I want zapping only private or only shared to=
- require
-> the caller to explicitly set a non-zero value, which is how I ended up wi=
-th
-> "only_{private,shared}" as opposed to "process_{private,shared}".
+When the host invalidates a guest page, it will also check if the page
+was used to map the prefix of any guest CPUs, in which case they are
+stopped and marked as needing a prefix refresh. Upon starting the
+affected CPUs again, their prefix pages are explicitly faulted in and
+revalidated if they had been invalidated. A bit in the PGSTEs indicates
+whether or not a page might contain a prefix. The bit is allowed to
+overindicate. Pages above 2G are skipped, because they cannot be
+prefixes, since KVM runs all guests with MSO = 0.
 
-I don't have a strong opinion about this. Having an enum looks good to me.
+The same applies for nested guests (VSIE). When the host invalidates a
+guest page that maps the prefix of the nested guest, it has to stop the
+affected nested guest CPUs and mark them as needing a prefix refresh.
+The same PGSTE bit used for the guest prefix is also used for the
+nested guest. Pages above 2G are skipped like for normal guests, which
+is the source of the bug.
 
-Cheers,
-/fuad
+The nested guest runs is the guest primary address space. The guest
+could be running the nested guest using MSO != 0. If the MSO + prefix
+for the nested guest is above 2G, the check for nested prefix will skip
+it. This will cause the invalidation notifier to not stop the CPUs of
+the nested guest and not mark them as needing refresh. When the nested
+guest is run again, its prefix will not be refreshed, since it has not
+been marked for refresh. This will cause a fatal validity intercept
+with VIR code 37.
+
+Fix this by removing the check for 2G for nested guests. Now all
+invalidations of pages with the notify bit set will always scan the
+existing VSIE shadow state descriptors.
+
+This allows to catch invalidations of nested guest prefix mappings even
+when the prefix is above 2G in the guest virtual address space.
+
+Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+---
+ arch/s390/kvm/vsie.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+index 61499293c2ac..e55f489e1fb7 100644
+--- a/arch/s390/kvm/vsie.c
++++ b/arch/s390/kvm/vsie.c
+@@ -587,10 +587,6 @@ void kvm_s390_vsie_gmap_notifier(struct gmap *gmap, unsigned long start,
+ 
+ 	if (!gmap_is_shadow(gmap))
+ 		return;
+-	if (start >= 1UL << 31)
+-		/* We are only interested in prefix pages */
+-		return;
+-
+ 	/*
+ 	 * Only new shadow blocks are added to the list during runtime,
+ 	 * therefore we can safely reference them all the time.
+-- 
+2.41.0
+
 
