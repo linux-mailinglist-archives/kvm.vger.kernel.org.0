@@ -1,154 +1,210 @@
-Return-Path: <kvm+bounces-413-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-423-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EBB07DF7A3
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 17:29:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 817707DF85F
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 18:09:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4ADB21C20F2F
-	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 16:29:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2758E281C63
+	for <lists+kvm@lfdr.de>; Thu,  2 Nov 2023 17:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DE541DFE4;
-	Thu,  2 Nov 2023 16:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A2B41DFCC;
+	Thu,  2 Nov 2023 17:09:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iP3n4d/O"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nur0BZKJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE651DDE3
-	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 16:28:56 +0000 (UTC)
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95982E3
-	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 09:28:54 -0700 (PDT)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-4083f613272so10102465e9.1
-        for <kvm@vger.kernel.org>; Thu, 02 Nov 2023 09:28:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D62A1C2A3
+	for <kvm@vger.kernel.org>; Thu,  2 Nov 2023 17:09:45 +0000 (UTC)
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3939F123;
+	Thu,  2 Nov 2023 10:09:44 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-32d849cc152so717176f8f.1;
+        Thu, 02 Nov 2023 10:09:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698942533; x=1699547333; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=20owt2l3/cxGLzLA2xbevoL+xSQuNASMB596X3+ow7c=;
-        b=iP3n4d/OPngbE98wbRDR3NysfZjhFfYHlQVQlVBVc9y+2/IJSvqtZz866SXw/mX+/e
-         W0pJF0hWV7u78rKyEJP7X+RqylVKogh2sx+8h9p7boqcoyUCTkc5limXF7CmLJDfcO64
-         ZVrNM92P6dDLOSAV+cQzWAkB0Oi1ZUWaebe4LyULhZgDomckhwu5VVQTDzeOX4bgRpgA
-         /0tUSYkqtqp21tSUpv2QVc+s8tqJQkzTBfAXMfgsTGtf7UpIn7H/jiKHA6oIQEXZVTaZ
-         Cs+HgkrMeohH6Yri08aBNMoVe4FgY5Dfy/Og6XJljrTyIxyihRg7OtaXxruVXMlYQ06a
-         MXjA==
+        d=gmail.com; s=20230601; t=1698944982; x=1699549782; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EbGxNbLJRmahSx99LzM7d9094Ni7ib3XOyEeixN5wWY=;
+        b=Nur0BZKJc/9og572BHAgrcyS+fCmYdYvRpF8UiS+BwK/eLhpFfeeCG+Fzd3f4EMUJq
+         qhloGEZmK2qxCIRXbWzi1diLiliubLULHQFU7ZgjJpipqh0WEDTiLH3Z2TNDo6Buvnbz
+         YK10R09/8+zZB9N3x9rRvKkAZb9GQiO49OZ5MsTw43KSc4yVGGtT/UCrper8ubJCZGCM
+         JkxdRMjJn7jeCXjaW6hpE/LMsWFLITFEXm9rM1YZkHzWNf28TAlS0M8jKM2b1yamzBOU
+         XJ4WIT3QppBFy8vRn2augqsYpPkFcOX2brLZJnHAQCrEtyDxLGJdTMoyzY0Ono5oatja
+         dAUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698942533; x=1699547333;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=20owt2l3/cxGLzLA2xbevoL+xSQuNASMB596X3+ow7c=;
-        b=LPjSerFMKyvAGjI0Pq/i3L5kH08n6HLM3blOLPsVHuaIXzUp+h68RJsxtKJ2sANp8h
-         V56UISmt43lqvlKqYY1NzVN+yFGPOxEMMhN1MsCTfedGGDablVz75xhQLyn1K5+wGWIx
-         txOy1ErjGyi0IxnzJDtV0sZH5P6ENJBI04QZf8++X+pdYFffnMRF/VDT3GjsXLg1CMrD
-         inCRK5Wm3Jl8EQ+LfsvblphZ6dJhtqE8/hs69xxVpZ7xNPfenLbjL7nHtFLDJO9bRofg
-         mF9UT609nGfapvJXksAVVddHcs0Gx7PCRrxeYs06zM+VgQdZTUBtmaeBTUAVgvaL6IVi
-         gbGw==
-X-Gm-Message-State: AOJu0Yyzf2aXC/2n3xAjI5Yzx/UBuw36AJ5YjcrxAj4RtosgIKw5YzfM
-	LO6E5TL/BGkP7KDY0PHbidkK3dAKvhEDUuP2p+lwUQ==
-X-Google-Smtp-Source: AGHT+IGzC+UPQWsYSxEKly7WToGYHThIxdsAXI0NVkPIoloyom3O4LGBjzNagfuu2dI4j91jKOVPOWF7c1N4gZ20sPc=
-X-Received: by 2002:a5d:4b51:0:b0:32d:8e54:29f6 with SMTP id
- w17-20020a5d4b51000000b0032d8e5429f6mr14415276wrs.47.1698942532901; Thu, 02
- Nov 2023 09:28:52 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698944982; x=1699549782;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EbGxNbLJRmahSx99LzM7d9094Ni7ib3XOyEeixN5wWY=;
+        b=o9hIcQDg9TudFQFq/es13vZFViXBRa+r2oJXfxdYL6JUBCDigobugriqNTUQ+0qSJD
+         DYj09+n1A5LZEtELM1cFt3I7G3VY6T1U8EDgNyHUruY4C+l12hXjQQgAHygMGc/FpY/s
+         cttmTDF/1NlvCcHDW0iQc9glazKzYwpUeukNcu7GyIxiDbx/c0eMft+OHDcB6+4aDdaa
+         eusmnpnQd9rn4RIdTdhVSB/AkgJ/WKcL9zbFpxNel9J0rct2KXDnkCS8x5EdNVMahd9+
+         oYWISGZNKzdVsMcd5ogEoOPTB4Cd2g2Sdeb/PfPY99FeC9et0vYFWQzsvSLNjy4BzYY7
+         zK/A==
+X-Gm-Message-State: AOJu0YxqU9aPPR5FWZ0gcc5efAmxQjFD/TjGfubdJiZIst8iWMUVRiKq
+	jqPHsTFEOrFORRKHi+p3w4c=
+X-Google-Smtp-Source: AGHT+IHdxgBwu6GEmKfbAa5TiXS6dvNkS7jGNo6S0td2v1WOhtU70ix2Gq0dKcH7l5+HpNiUSDIs0w==
+X-Received: by 2002:adf:e68b:0:b0:32d:87e1:c349 with SMTP id r11-20020adfe68b000000b0032d87e1c349mr13334118wrm.57.1698944982345;
+        Thu, 02 Nov 2023 10:09:42 -0700 (PDT)
+Received: from [192.168.14.38] (54-240-197-235.amazon.com. [54.240.197.235])
+        by smtp.gmail.com with ESMTPSA id e6-20020adfe386000000b0032f983f7306sm2942733wrm.78.2023.11.02.10.09.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Nov 2023 10:09:41 -0700 (PDT)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <d912e3ee-f2e5-4c40-99cd-214b16fe8fac@xen.org>
+Date: Thu, 2 Nov 2023 17:09:40 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-17-seanjc@google.com>
- <ZUFGRyQEuWj4RJS0@google.com> <ZUFzZf-YmCRYP6qo@google.com>
- <CALzav=d9eXZfK=op7A=UftbpuPpUbxqV6CmkqqxxBNuNsUU4nw@mail.gmail.com>
- <6642c379-1023-4716-904f-4bbf076744c2@redhat.com> <ZUPIXt1XzZrriswG@google.com>
-In-Reply-To: <ZUPIXt1XzZrriswG@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Thu, 2 Nov 2023 09:28:23 -0700
-Message-ID: <CALzav=eaVc5rzmHwnQr7aotyTKi9Agdte7NAL0NvBeE+f6zYoA@mail.gmail.com>
-Subject: Re: [PATCH v13 16/35] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH v7 01/11] KVM: pfncache: add a map helper function
+Content-Language: en-US
 To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Anish Moorthy <amoorthy@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Paul Durrant <pdurrant@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>,
+ David Woodhouse <dwmw2@infradead.org>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20231002095740.1472907-1-paul@xen.org>
+ <20231002095740.1472907-2-paul@xen.org> <ZUGL0syLTH09BbsI@google.com>
+Organization: Xen Project
+In-Reply-To: <ZUGL0syLTH09BbsI@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 2, 2023 at 9:03=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Thu, Nov 02, 2023, Paolo Bonzini wrote:
-> > On 10/31/23 23:39, David Matlack wrote:
-> > > > > Maybe can you sketch out how you see this proposal being extensib=
-le to
-> > > > > using guest_memfd for shared mappings?
-> > > > For in-place conversions, e.g. pKVM, no additional guest_memfd is n=
-eeded.  What's
-> > > > missing there is the ability to (safely) mmap() guest_memfd, e.g. K=
-VM needs to
-> > > > ensure there are no outstanding references when converting back to =
-private.
-> > > >
-> > > > For TDX/SNP, assuming we don't find a performant and robust way to =
-do in-place
-> > > > conversions, a second fd+offset pair would be needed.
-> > > Is there a way to support non-in-place conversions within a single gu=
-est_memfd?
-> >
-> > For TDX/SNP, you could have a hook from KVM_SET_MEMORY_ATTRIBUTES to gu=
-est
-> > memory.  The hook would invalidate now-private parts if they have a VMA=
-,
-> > causing a SIGSEGV/EFAULT if the host touches them.
-> >
-> > It would forbid mappings from multiple gfns to a single offset of the
-> > guest_memfd, because then the shared vs. private attribute would be tie=
-d to
-> > the offset.  This should not be a problem; for example, in the case of =
-SNP,
-> > the RMP already requires a single mapping from host physical address to
-> > guest physical address.
->
-> I don't see how this can work.  It's not a M:1 scenario (where M is multi=
-ple gfns),
-> it's a 1:N scenario (wheren N is multiple offsets).  The *gfn* doesn't ch=
-ange on
-> a conversion, what needs to change to do non-in-place conversion is the p=
-fn, which
-> is effectively the guest_memfd+offset pair.
->
-> So yes, we *could* support non-in-place conversions within a single guest=
-_memfd,
-> but it would require a second offset,
+On 31/10/2023 23:20, Sean Christopherson wrote:
+> On Mon, Oct 02, 2023, Paul Durrant wrote:
+>> From: Paul Durrant <pdurrant@amazon.com>
+> 
+> Please make the changelog standalone, i.e. don't rely on the shortlog to provide
+> context.  Yeah, it can be silly and repetive sometimes, particularly when viewing
+> git commits where the shortlog+changelog are bundled fairly close together, but
+> when viewing patches in a mail client, e.g. when I'm doing initial review, the
+> shortlog is in the subject which may be far away or even completely hidden (as is
+> the case as I'm typing this).
+> 
+> I could have sworn I included this in Documentation/process/maintainer-kvm-x86.rst,
+> but I'm not finding it.
+> 
 
-Why can't KVM free the existing page at guest_memfd+offset and
-allocate a new one when doing non-in-place conversions?
+OK, I'll add some more text.
 
-> at which point it makes sense to add a
-> second file descriptor as well.  Userspace could still use a single guest=
-_memfd
-> instance, i.e. pass in the same file descriptor but different offsets.
+>> We have an unmap helper but mapping is open-coded. Arguably this is fine
+> 
+> Pronouns.
+> 
+
+Sorry... didn't realize that was an issue.
+
+>> because mapping is done in only one place, hva_to_pfn_retry(), but adding
+>> the helper does make that function more readable.
+>>
+>> No functional change intended.
+>>
+>> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+>> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+>> ---
+>> Cc: Sean Christopherson <seanjc@google.com>
+>> Cc: David Woodhouse <dwmw2@infradead.org>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>   virt/kvm/pfncache.c | 43 +++++++++++++++++++++++++------------------
+>>   1 file changed, 25 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+>> index 2d6aba677830..0f36acdf577f 100644
+>> --- a/virt/kvm/pfncache.c
+>> +++ b/virt/kvm/pfncache.c
+>> @@ -96,17 +96,28 @@ bool kvm_gpc_check(struct gfn_to_pfn_cache *gpc, unsigned long len)
+>>   }
+>>   EXPORT_SYMBOL_GPL(kvm_gpc_check);
+>>   
+>> -static void gpc_unmap_khva(kvm_pfn_t pfn, void *khva)
+>> +static void *gpc_map(kvm_pfn_t pfn)
+>> +{
+>> +	if (pfn_valid(pfn))
+>> +		return kmap(pfn_to_page(pfn));
+>> +#ifdef CONFIG_HAS_IOMEM
+>> +	else
+> 
+> There's no need for the "else", the happy path is terminal.
+> 
+>> +		return memremap(pfn_to_hpa(pfn), PAGE_SIZE, MEMREMAP_WB);
+>> +#endif
+> 
+> This needs a return for CONFIG_HAS_IOMEM=n.  I haven't tried to compile, but I'm
+> guessing s390 won't be happy.
+> 
+
+Oops, yes, of course.
+
+> This?
+> 
+> static void *gpc_map(kvm_pfn_t pfn)
+> {
+> 	if (pfn_valid(pfn))
+> 		return kmap(pfn_to_page(pfn));
+> 
+> #ifdef CONFIG_HAS_IOMEM
+> 	return memremap(pfn_to_hpa(pfn), PAGE_SIZE, MEMREMAP_WB);
+> #else
+> 	return NULL;
+> #endif
+> }
+> 
+
+Looks good. Thanks,
+
+   Paul
+
+>> +}
+>> +
+>> +static void gpc_unmap(kvm_pfn_t pfn, void *khva)
+>>   {
+>>   	/* Unmap the old pfn/page if it was mapped before. */
+>> -	if (!is_error_noslot_pfn(pfn) && khva) {
+>> -		if (pfn_valid(pfn))
+>> -			kunmap(pfn_to_page(pfn));
+>> +	if (is_error_noslot_pfn(pfn) || !khva)
+>> +		return;
+>> +
+>> +	if (pfn_valid(pfn))
+>> +		kunmap(pfn_to_page(pfn));
+>>   #ifdef CONFIG_HAS_IOMEM
+>> -		else
+>> -			memunmap(khva);
+>> +	else
+>> +		memunmap(khva);
+>>   #endif
+> 
+> I don't mind the refactoring, but it needs to be at least mentioned in the
+> changelog.  And if we're going to bother, it probably makes sense to add a WARN
+> in the CONFIG_HAS_IOMEM=n path, e.g.
+> 
+> 	/* Unmap the old pfn/page if it was mapped before. */
+> 	if (is_error_noslot_pfn(pfn) || !khva)
+> 		return;
+> 
+> 	if (pfn_valid(pfn))
+> 		kunmap(pfn_to_page(pfn));
+> 	else
+> #ifdef CONFIG_HAS_IOMEM
+> 		memunmap(khva);
+> #else
+> 		WARN_ON_ONCE(1);
+> #endif
+> 
+
 
