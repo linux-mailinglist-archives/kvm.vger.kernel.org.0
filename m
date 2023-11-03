@@ -1,126 +1,113 @@
-Return-Path: <kvm+bounces-473-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-478-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A56457E0001
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 10:30:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECAE87E000D
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 10:37:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 604EA281E8A
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 09:30:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 611251F22266
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 09:37:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB7F31549B;
-	Fri,  3 Nov 2023 09:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9359A11C82;
+	Fri,  3 Nov 2023 09:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dmcjJwr1"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GUjYh48b"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D22512B7E
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 09:30:03 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F0E6D4B;
-	Fri,  3 Nov 2023 02:30:01 -0700 (PDT)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A39OYDX012824;
-	Fri, 3 Nov 2023 09:30:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=rkjta/9FYCQorqFCdZfOewXusplPfNL4DC0joOQSLoI=;
- b=dmcjJwr1yZnc+znPmyszdjmVk5frlfgoXJjqgB64Pl3SWE38/mKVVUcePF1Qtu7KZgPh
- sa1Hkrv/FJw+f4uskvgS1sQ0id3DEM9zYu0HYrajUQhw4clMDpHRgwNs1+hM57BluI2E
- WCk4Nbc+4G6lHXtQ3N+q6N9ZZfCzROV95GoiGbJrijyKXGtgZJ5IgxB0wUILnioVnMCS
- f9QUKXKfvY4BAqINxi+UW/VPv8aDgPy/XMobLxJMWJjzeIf8T9WG0XP78P/oe0xRZhUU
- wUiP8BktxxAEMGP+k+fluFt9+ANHqKk0myF19Pt4isSJY1vEQ1o4psKLYFWHRtwFEqyf JA== 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E50DCA51
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 09:37:39 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 462C5D4B
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 02:37:36 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A38lLaf008792
+	for <kvm@vger.kernel.org>; Fri, 3 Nov 2023 09:37:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references :
+ subject : from : to : cc : message-id : date; s=pp1;
+ bh=ctrXTcIu6sFVOYSlvzinfXfG7E1afNYiqLbgNDUAhNw=;
+ b=GUjYh48bc6xS/vGguL5uobXGzTahDqa3eFJHfDF8lj+SsVjkmmK0t4jHWOrTI//ygGkS
+ X4jaI0lIOctiB84M/MWvxbGjJC5bZyHp9YNLg6r7WqjUJMz7Dt9M+Hw6xp+KSHy95F05
+ LGHIra291D37NQdhfXPrZoNu1Lpq12LxOIqOY/DMzHjH36z0bU0we1uzFmtVyTQhUKl9
+ WcAqDd8j8x3936MrCFT3j1qaWt5QObSqMvRUggEvB6geaprHsq4i2D2PETpdaZVCWXOP
+ 8HJZf6h8Ux0B9sYPOOqXFCLYdnj1ZKds+YxPfWkKnpxUtl9ih/RkTlKvbkKol4n+d7tK Eg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u4x6wg44e-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u4wnmhggv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <kvm@vger.kernel.org>; Fri, 03 Nov 2023 09:37:35 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A38mL28013002
+	for <kvm@vger.kernel.org>; Fri, 3 Nov 2023 09:37:35 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u4wnmhgg9-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 09:30:00 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A39OXls012702;
-	Fri, 3 Nov 2023 09:29:59 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u4x6wg448-1
+	Fri, 03 Nov 2023 09:37:35 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A39PA6G011544;
+	Fri, 3 Nov 2023 09:37:33 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u1e4mcu6n-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 09:29:59 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A38QZtL019895;
-	Fri, 3 Nov 2023 09:29:59 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u1d10557k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 09:29:59 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A39TucX17498754
+	Fri, 03 Nov 2023 09:37:33 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A39bUBJ24379964
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 3 Nov 2023 09:29:56 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1A59D20040;
-	Fri,  3 Nov 2023 09:29:56 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E33A72004D;
-	Fri,  3 Nov 2023 09:29:55 +0000 (GMT)
-Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  3 Nov 2023 09:29:55 +0000 (GMT)
-From: Nico Boehr <nrb@linux.ibm.com>
-To: frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v7 8/8] lib: s390x: interrupt: remove TEID_ASCE defines
-Date: Fri,  3 Nov 2023 10:29:37 +0100
-Message-ID: <20231103092954.238491-9-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231103092954.238491-1-nrb@linux.ibm.com>
-References: <20231103092954.238491-1-nrb@linux.ibm.com>
+	Fri, 3 Nov 2023 09:37:30 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A030420049;
+	Fri,  3 Nov 2023 09:37:30 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 382D820040;
+	Fri,  3 Nov 2023 09:37:30 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.63.94])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  3 Nov 2023 09:37:30 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20231031095519.73311-1-frankja@linux.ibm.com>
+References: <20231031095519.73311-1-frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v2 0/3] s390x: Improve console handling
+From: Nico Boehr <nrb@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc: imbrenda@linux.ibm.com, thuth@redhat.com, david@redhat.com
+Message-ID: <169900424909.24043.13145914467338666237@t14-nrb>
+User-Agent: alot/0.8.1
+Date: Fri, 03 Nov 2023 10:37:29 +0100
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: rW22c2iNZ10QmoxkeXCqL31P-ZtVVSid
-X-Proofpoint-GUID: 6lXHZ6gXaY-N4Y3YCb05BKup4XWFPb5P
+X-Proofpoint-ORIG-GUID: UwU7NDWRN20VdS36KnamjWoYlQmQW4rJ
+X-Proofpoint-GUID: R279VYjwHkju9qnVPtsQ1ebFF97whS-o
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-11-03_09,2023-11-02_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
- lowpriorityscore=0 impostorscore=0 mlxlogscore=765 priorityscore=1501
- adultscore=0 suspectscore=0 bulkscore=0 malwarescore=0 clxscore=1015
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311030078
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=656
+ priorityscore=1501 spamscore=0 suspectscore=0 lowpriorityscore=0
+ phishscore=0 mlxscore=0 malwarescore=0 impostorscore=0 clxscore=1015
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311030079
 
-These defines were - I can only guess - meant for the asce_id field.
-Since print_decode_teid() used AS_PRIM and friends instead, I see little
-benefit in keeping these around.
+Quoting Janosch Frank (2023-10-31 10:55:16)
+> Console IO is and has been in a state of "works for me". I don't think
+> that will change soon since there's no need for a proper console
+> driver when all we want is the ability to print or read a line at a
+> time.
+>=20
+> However since input is only supported on the ASCII console I was
+> forced to use it on the HMC. The HMC generally does not add a \r on a
+> \n so each line doesn't start at column 0. It's time to finally fix
+> that.
+>=20
+> Also, since there are environments that only provide the line-mode
+> console it's time to add line-mode input to properly support them.
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- lib/s390x/asm/interrupt.h | 5 -----
- 1 file changed, 5 deletions(-)
-
-diff --git a/lib/s390x/asm/interrupt.h b/lib/s390x/asm/interrupt.h
-index 7f73d473b346..48bd78fa1515 100644
---- a/lib/s390x/asm/interrupt.h
-+++ b/lib/s390x/asm/interrupt.h
-@@ -13,11 +13,6 @@
- #define EXT_IRQ_EXTERNAL_CALL	0x1202
- #define EXT_IRQ_SERVICE_SIG	0x2401
- 
--#define TEID_ASCE_PRIMARY	0
--#define TEID_ASCE_AR		1
--#define TEID_ASCE_SECONDARY	2
--#define TEID_ASCE_HOME		3
--
- union teid {
- 	unsigned long val;
- 	union {
--- 
-2.41.0
-
+Pushed to our internal CI for coverage, thanks.
 
