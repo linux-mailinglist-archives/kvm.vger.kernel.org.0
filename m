@@ -1,212 +1,169 @@
-Return-Path: <kvm+bounces-496-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-487-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9DF87E0479
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 15:14:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A97097E03D6
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 14:39:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51040B214B6
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 14:14:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D88C91C21072
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 13:39:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1EA1BDCC;
-	Fri,  3 Nov 2023 14:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEAA718627;
+	Fri,  3 Nov 2023 13:39:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cyNfcVjI"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FVIloVvW"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD9D11A70A
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 14:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19851182D8
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 13:39:43 +0000 (UTC)
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C753F1B9;
-	Fri,  3 Nov 2023 07:14:27 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3Dkvlt002012;
-	Fri, 3 Nov 2023 14:14:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E38D91B2;
+	Fri,  3 Nov 2023 06:39:42 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3DBCYR018784;
+	Fri, 3 Nov 2023 13:39:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=2dHkwY0ZexrWZfQ46gqbOMiqCKtCgsoqLD7Omyhjzfo=;
- b=cyNfcVjImx+4VTVWpi1qnjq2Da7Z/auk/dL8tQtT81w074ys+3BYlSZitKEi3gJR1fKi
- hZVlc2NLAKTr3mIckFQIcEWr+LFqhA4N6T00z4XRMC/Z73jRVNeOSJJ5C6OlNBxtGANO
- 4EmlAw1OuXrmgb9+FtY+kjQ4GVCGR4eZ8l2QrBeWVrQrNb4VaqKyWz8iOJmjumDUhuYx
- +OhyCvOnGmb9F2/bJJ8qe+rT3PB9SPS9zBlW2X72lB3PYSXiX8cDeqndOjswV3k10/k2
- E+Gn+HVQiZ1TUqHaTjG70GeAOehl1oe9738Y+10f9JeKH/g7Is/zNKc4qAR/yMHZbtIo Qg== 
+ bh=VRuU66SXOze1LgvMMFxrC5V7m2uGlZkrKtopyEfnZ8Q=;
+ b=FVIloVvWtd2XqAECxwUEqKUx3UPOmjSNKgYFz17SEuShvJWFBZZjS3cb1CrxSVs1RPC8
+ Kf3e4fFEFAsNX0SB8aLdx3ZAgVbbVyevAzUFS/Iaw+dwH5MWx13IoBfrPLcFBeAZvcOB
+ VyUAwmkBJszlDmRDXl0LZsHcqel4lK+ddefc94WdBOkfvj6fI7z2jJ3BacNh18LFmAZw
+ UikyfXgeTu9Tn8Xgc0JxRroJ8GvqRphCGo7BzWFZY9zXjJlKxwQXONG3pK4SFnAInG2P
+ 2Qqx71zkJtuOL+yIm6VxeyzNDBHAeI/LEQyb9dJr80FGmut+0IoMhJ6dBGtjo00abYDq rA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u522295wc-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u50mkunwh-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 14:14:26 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A3E5ata004124;
-	Fri, 3 Nov 2023 14:14:25 GMT
+	Fri, 03 Nov 2023 13:39:42 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A3DBEcq019033;
+	Fri, 3 Nov 2023 13:39:41 GMT
 Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u522295sn-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u50mkunw2-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 14:14:24 +0000
+	Fri, 03 Nov 2023 13:39:41 +0000
 Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3Dm2VY011291;
-	Fri, 3 Nov 2023 14:14:16 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u1eukp23y-1
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3D8lps011310;
+	Fri, 3 Nov 2023 13:39:40 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u1euknupx-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 14:14:16 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A3EEDCd16253674
+	Fri, 03 Nov 2023 13:39:40 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A3DdcRP15401582
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 3 Nov 2023 14:14:13 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C4AEB20043;
-	Fri,  3 Nov 2023 14:14:13 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A31B020040;
-	Fri,  3 Nov 2023 14:14:13 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  3 Nov 2023 14:14:13 +0000 (GMT)
-Date: Fri, 3 Nov 2023 14:35:55 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Nico Boehr <nrb@linux.ibm.com>
-Cc: frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v7 1/8] lib: s390x: introduce bitfield
- for PSW mask
-Message-ID: <20231103143555.1b6d35ff@p-imbrenda>
-In-Reply-To: <20231103092954.238491-2-nrb@linux.ibm.com>
-References: <20231103092954.238491-1-nrb@linux.ibm.com>
-	<20231103092954.238491-2-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	Fri, 3 Nov 2023 13:39:38 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E67CA2004D;
+	Fri,  3 Nov 2023 13:39:37 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9128E20040;
+	Fri,  3 Nov 2023 13:39:37 +0000 (GMT)
+Received: from [9.171.0.100] (unknown [9.171.0.100])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  3 Nov 2023 13:39:37 +0000 (GMT)
+Message-ID: <909e4ccc-9f13-4867-b274-601ad78cb1a9@linux.ibm.com>
+Date: Fri, 3 Nov 2023 14:39:37 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v7 3/8] s390x: sie: switch to home space
+ mode before entering SIE
+Content-Language: en-US
+To: Nico Boehr <nrb@linux.ibm.com>, imbrenda@linux.ibm.com, thuth@redhat.com
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20231103092954.238491-1-nrb@linux.ibm.com>
+ <20231103092954.238491-4-nrb@linux.ibm.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20231103092954.238491-4-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3IKmUVE54MK5x9qlX9UAMOYKUrYgciJK
-X-Proofpoint-ORIG-GUID: gv8ITapMpfGOdE-_6m1vL8OMXqu8MOAg
+X-Proofpoint-GUID: VBaWhLApimXOIO4D9NrVarlwIHo_XDxV
+X-Proofpoint-ORIG-GUID: DCVG8moCNkiZ8KHka2MKNaYj5qllIdiF
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-03_13,2023-11-02_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- impostorscore=0 malwarescore=0 mlxscore=0 priorityscore=1501
- lowpriorityscore=0 phishscore=0 bulkscore=0 adultscore=0 clxscore=1015
- mlxlogscore=855 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311030120
+ definitions=2023-11-03_12,2023-11-02_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ mlxlogscore=999 clxscore=1015 lowpriorityscore=0 malwarescore=0
+ bulkscore=0 adultscore=0 impostorscore=0 phishscore=0 priorityscore=1501
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311030114
 
-On Fri,  3 Nov 2023 10:29:30 +0100
-Nico Boehr <nrb@linux.ibm.com> wrote:
-
-> Changing the PSW mask is currently little clumsy, since there is only the
-> PSW_MASK_* defines. This makes it hard to change e.g. only the address
-> space in the current PSW without a lot of bit fiddling.
+On 11/3/23 10:29, Nico Boehr wrote:
+> This is to prepare for running guests without MSO/MSL, which is
+> currently not possible.
 > 
-> Introduce a bitfield for the PSW mask. This makes this kind of
-> modifications much simpler and easier to read.
+> We already have code in sie64a to setup a guest primary ASCE before
+> entering SIE, so we can in theory switch to the page tables which
+> translate gpa to hpa.
+> 
+> But the host is running in primary space mode already, so changing the
+> primary ASCE before entering SIE will also affect the host's code and
+> data.
+> 
+> To make this switch useful, the host should run in a different address
+> space mode. Hence, set up and change to home address space mode before
+> installing the guest ASCE.
+> 
+> The home space ASCE is just copied over from the primary space ASCE, so
+> no functional change is intended, also for tests that want to use
+> MSO/MSL. If a test intends to use a different primary space ASCE, it can
+> now just set the guest.asce in the save_area.
 > 
 > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 > Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-> ---
->  lib/s390x/asm/arch_def.h | 25 ++++++++++++++++++++++++-
->  s390x/selftest.c         | 34 ++++++++++++++++++++++++++++++++++
->  2 files changed, 58 insertions(+), 1 deletion(-)
-> 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index bb26e008cc68..f629b6d0a17f 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -37,9 +37,32 @@ struct stack_frame_int {
->  };
->  
->  struct psw {
-> -	uint64_t	mask;
-> +	union {
-> +		uint64_t	mask;
-> +		struct {
-> +			uint64_t reserved00:1;
-> +			uint64_t per:1;
-> +			uint64_t reserved02:3;
-> +			uint64_t dat:1;
-> +			uint64_t io:1;
-> +			uint64_t ext:1;
-> +			uint64_t key:4;
-> +			uint64_t reserved12:1;
-> +			uint64_t mchk:1;
-> +			uint64_t wait:1;
-> +			uint64_t pstate:1;
-> +			uint64_t as:2;
-> +			uint64_t cc:2;
-> +			uint64_t prg_mask:4;
-> +			uint64_t reserved24:7;
-> +			uint64_t ea:1;
-> +			uint64_t ba:1;
-> +			uint64_t reserved33:31;
-> +		};
-> +	};
->  	uint64_t	addr;
->  };
-> +_Static_assert(sizeof(struct psw) == 16, "PSW size");
->  
->  #define PSW(m, a) ((struct psw){ .mask = (m), .addr = (uint64_t)(a) })
->  
-> diff --git a/s390x/selftest.c b/s390x/selftest.c
-> index 13fd36bc06f8..92ed4e5d35eb 100644
-> --- a/s390x/selftest.c
-> +++ b/s390x/selftest.c
-> @@ -74,6 +74,39 @@ static void test_malloc(void)
->  	report_prefix_pop();
->  }
->  
-> +static void test_psw_mask(void)
-> +{
-> +	uint64_t expected_key = 0xf;
-> +	struct psw test_psw = PSW(0, 0);
-> +
-> +	report_prefix_push("PSW mask");
-> +	test_psw.mask = PSW_MASK_DAT;
-> +	report(test_psw.dat, "DAT matches expected=0x%016lx actual=0x%016lx", PSW_MASK_DAT, test_psw.mask);
-> +
-> +	test_psw.mask = PSW_MASK_IO;
-> +	report(test_psw.io, "IO matches expected=0x%016lx actual=0x%016lx", PSW_MASK_IO, test_psw.mask);
-> +
-> +	test_psw.mask = PSW_MASK_EXT;
-> +	report(test_psw.ext, "EXT matches expected=0x%016lx actual=0x%016lx", PSW_MASK_EXT, test_psw.mask);
-> +
-> +	test_psw.mask = expected_key << (63 - 11);
-> +	report(test_psw.key == expected_key, "PSW Key matches expected=0x%lx actual=0x%x", expected_key, test_psw.key);
-> +
-> +	test_psw.mask = 1UL << (63 - 13);
-> +	report(test_psw.mchk, "MCHK matches");
-> +
-> +	test_psw.mask = PSW_MASK_WAIT;
-> +	report(test_psw.wait, "Wait matches expected=0x%016lx actual=0x%016lx", PSW_MASK_WAIT, test_psw.mask);
-> +
-> +	test_psw.mask = PSW_MASK_PSTATE;
-> +	report(test_psw.pstate, "Pstate matches expected=0x%016lx actual=0x%016lx", PSW_MASK_PSTATE, test_psw.mask);
-> +
-> +	test_psw.mask = PSW_MASK_64;
-> +	report(test_psw.ea && test_psw.ba, "BA/EA matches expected=0x%016lx actual=0x%016lx", PSW_MASK_64, test_psw.mask);
-> +
-> +	report_prefix_pop();
-> +}
-> +
->  int main(int argc, char**argv)
->  {
->  	report_prefix_push("selftest");
-> @@ -89,6 +122,7 @@ int main(int argc, char**argv)
->  	test_fp();
->  	test_pgm_int();
->  	test_malloc();
-> +	test_psw_mask();
->  
->  	return report_summary();
->  }
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
 
