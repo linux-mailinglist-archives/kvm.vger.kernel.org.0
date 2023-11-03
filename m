@@ -1,225 +1,131 @@
-Return-Path: <kvm+bounces-509-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-510-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7F497E06AC
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 17:44:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 811AA7E0762
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 18:30:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E989C1C210AC
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 16:44:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B21F91C210AA
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 17:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3B1A1CA8A;
-	Fri,  3 Nov 2023 16:44:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C6E20B21;
+	Fri,  3 Nov 2023 17:30:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kq46efc0"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7E218625
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 16:44:12 +0000 (UTC)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DABDE111;
-	Fri,  3 Nov 2023 09:44:08 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.206])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4SMRM85W5Lz67gDh;
-	Sat,  4 Nov 2023 00:40:52 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Fri, 3 Nov
- 2023 16:44:06 +0000
-Date: Fri, 3 Nov 2023 16:44:04 +0000
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Alexey Kardashevskiy <aik@amd.com>
-CC: Lukas Wunner <lukas@wunner.de>, <linux-coco@lists.linux.dev>,
-	<kvm@vger.kernel.org>, <linux-pci@vger.kernel.org>, Dan Williams
-	<dan.j.williams@intel.com>, Jonathan Cameron <jic23@kernel.org>,
-	<suzuki.poulose@arm.com>
-Subject: Re: TDISP enablement
-Message-ID: <20231103164404.00006e0b@Huawei.com>
-In-Reply-To: <4cfe829f-8373-4ff4-a963-3ee74fa39efe@amd.com>
-References: <e05eafd8-04b3-4953-8bca-dc321c1a60b9@amd.com>
-	<20231101072717.GB25863@wunner.de>
-	<20231101110551.00003896@Huawei.com>
-	<4cfe829f-8373-4ff4-a963-3ee74fa39efe@amd.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 087661CF88
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 17:30:17 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDDE8136;
+	Fri,  3 Nov 2023 10:30:16 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3H9QiC002850;
+	Fri, 3 Nov 2023 17:30:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=F/MbwI7I3lpLeDSp5tJGhwWlILsNf2tIxZUSdv1jJW4=;
+ b=kq46efc0g04pDo+g0qI8SQr+byAcAF/1W989ivWJuNW+08Z3RUQvxynp3e9N57q72d4s
+ krV73avZ3rVLEWV4/sK5rCemKeOmzSI1oAgesn2frV8CWLOWuf3WDIM/p/CamDB6yTdS
+ Es+ZcI0aFxTwnR6WShTyjGAjyuuP5tRKWjsuJddEpxXON6YyyFOMZSd0rghp6aonxdM+
+ jHPUZidZpHMDaru8ShIIW6RRJZBwmzBKV+3lpG9m0nRLBjoJoLV2CDaP7s4NBPfrEmTq
+ ERf98zCEy4b4g639mqNpjucpdNK9K9/T0v+33MCyOm2ISPkHFWv3fDGgc2yQP4JA8IV0 hQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u550x0jm6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 03 Nov 2023 17:30:15 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A3HMDbb011979;
+	Fri, 3 Nov 2023 17:30:15 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u550x0jkd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 03 Nov 2023 17:30:15 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3GOdS7000614;
+	Fri, 3 Nov 2023 17:30:14 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u1cmtqt16-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 03 Nov 2023 17:30:14 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A3HU9Ni13828734
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 3 Nov 2023 17:30:09 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A565620049;
+	Fri,  3 Nov 2023 17:30:09 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5D2DC2004B;
+	Fri,  3 Nov 2023 17:30:09 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  3 Nov 2023 17:30:09 +0000 (GMT)
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To: Vasily Gorbik <gor@linux.ibm.com>,
+        David Hildenbrand <dahi@linux.vnet.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Michael Mueller <mimu@linux.vnet.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Cornelia Huck <cornelia.huck@de.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org
+Subject: [PATCH 0/4] KVM: s390: Fix minor bugs in STFLE shadowing
+Date: Fri,  3 Nov 2023 18:30:04 +0100
+Message-Id: <20231103173008.630217-1-nsg@linux.ibm.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Q_zCaKUp-8IIUHy5yN_UU-IkoDTomx56
+X-Proofpoint-GUID: Q87tJPGnOcREUlAH-YTmxrOv4QvkE00p
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-03_16,2023-11-02_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=617 bulkscore=0
+ clxscore=1011 phishscore=0 spamscore=0 priorityscore=1501 malwarescore=0
+ adultscore=0 suspectscore=0 impostorscore=0 mlxscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2310240000
+ definitions=main-2311030146
 
- 
-> >>> - tdi_info - read measurements/certs/interface report;  
-> >>
-> >> Does this return cached cert chains and measurements from the device
-> >> or does it retrieve them anew?  (Measurements might have changed if
-> >> MEAS_FRESH_CAP is supported.)
-> >>
-> >>  
-> >>> If the user wants only CMA/SPDM, the Lukas'es patched will do that without
-> >>> the PSP. This may co-exist with the AMD PSP (if the endpoint allows multiple
-> >>> sessions).  
-> >>
-> >> It can co-exist if the pci_cma_claim_ownership() library call
-> >> provided by patch 12/12 is invoked upon device_connect.
-> >>
-> >> It would seem advantageous if you could delay device_connect
-> >> until a device is actually passed through.  Then the OS can
-> >> initially authenticate and measure devices and the PSP takes
-> >> over when needed.  
-> > 
-> > Would that delay mean IDE isn't up - I think that wants to be
-> > available whether or not pass through is going on.
-> > 
-> > Given potential restrictions on IDE resources, I'd expect to see an explicit
-> > opt in from userspace on the host to start that process for a given
-> > device.  (udev rule or similar might kick it off for simple setups).
-> > 
-> > Would that work for the flows described?  
-> 
-> This would work but my (likely wrong) intention was also to run 
-> necessary setup in both host and guest at the same time before drivers 
-> probe devices. And while delaying it in the host is fine (well, for us 
-> in AMD, as we are aiming for CoCo/TDISP), in the guest this means less 
-> flexibility in enlightening the PCI subsystem and the guest driver: 
-> ideally (or at least initially) the driver is supposed to probe already 
-> enabled and verified device, as otherwise it has to do SWIOTLB until the 
-> userspace does the verification and kicks the driver to go proper direct 
-> DMA (or reload the driver?).
+Fix two bugs in the STFLE vsie implementation.
+The first concerns the identification if the guest is intending
+to use interpretive execution for STFLE for its guest.
+The second fixes too much of the guests memory being accessed when
+shadowing.
 
-In the case of a guest getting a VF, there probably won't be any way for
-the kernel to run any native attestation anyway, so policy would have to
-rely on the CoCo paths. Kernel stuff Lukas has would just not try to attest
-or claim anything about it. If a VF has a CMA capable DOE instance
-then that's not there for IDE stuff at all, but for the guest to get
-direct measurements etc without PSP or anything else getting involved
-in which case the guest using that directly is a reasonable thing to do.
+Nina Schoetterl-Glausch (4):
+  KVM: s390: vsie: Fix STFLE interpretive execution identification
+  KVM: s390: vsie: Fix length of facility list shadowed
+  KVM: s390: cpu model: Use previously unused constant
+  KVM: s390: Minor refactor of base/ext facility lists
 
-> 
-> > Next bit probably has holes...  Key is that a lot of the checks
-> > may fail, and it's up to host userspace policy to decide whether
-> > to proceed (other policy in the secure VM side of things obviously)
-> > 
-> > So my rough thinking is - for the two options (IDE / TDISP)
-> > 
-> > Comparing with Alexey's flow I think only real difference is that
-> > I call out explicit host userspace policy controls. I'd also like  
-> 
-> My imagination fails me :) What is the host supposed to do if the device 
-> verification fails/succeeds later, and how much later, and the device is 
-> a boot disk? Or is this userspace going to be limited to initramdisk? 
-> What is that thing which we are protecting against? Or it is for CUDA 
-> and such (which yeah, it can wait)?
+ arch/s390/include/asm/facility.h |  6 +++++
+ arch/s390/include/asm/kvm_host.h |  2 +-
+ arch/s390/kernel/Makefile        |  2 +-
+ arch/s390/kernel/facility.c      | 18 +++++++++++++
+ arch/s390/kvm/kvm-s390.c         | 44 ++++++++++++++------------------
+ arch/s390/kvm/vsie.c             | 15 +++++++++--
+ 6 files changed, 58 insertions(+), 29 deletions(-)
+ create mode 100644 arch/s390/kernel/facility.c
 
-There are a bunch of non obvious cases indeed.  Hence make it all policy.
-Though if you have a flow where verification is needed for boot disk and
-it fails (and policy says that's not acceptable) then bad luck you
-probably need to squirt a cert into your ramdisk or UEFI or similar.
 
-> 
-> > to use similar interfaces to convey state to host userspace as
-> > per Lukas' existing approaches.  Sure there will also be in
-> > kernel interfaces for driver to get data if it knows what to do
-> > with it.  I'd also like to enable the non tdisp flow to handle
-> > IDE setup 'natively' if that's possible on particular hardware.
-> > 
-> > 1. Host has a go at CMA/SPDM. Policy might say that a failure here is
-> >     a failure in general so reject device - or it might decide it's up to
-> >     the PSP etc.   (userspace can see if it succeeded)
-> >     I'd argue host software can launch this at any time.  It will
-> >     be a denial of service attack but so are many other things the host
-> >     can do.  
-> 
-> Trying to visualize it in my head - policy is a kernel cmdline or module 
-> parameter?
+base-commit: 05d3ef8bba77c1b5f98d941d8b2d4aeab8118ef1
+-- 
+2.39.2
 
-Neither - it's bind not happening until userspace decides to kick it off.
-The module could provide it's own policy on top of this - so userspace
-could defer to that if it makes sense (so bind but rely on probe failing
-if policy not met).
-
-> 
-> > 2. TDISP policy decision from host (userspace policy control)
-> >     Need to know end goal.  
-> 
-> /sys/bus/pci/devices/0000:11:22.3/tdisp ?
-
-Maybe - I'm sure we'll bikeshed anything like that :)
-
-> 
-> > 3. IDE opt in from userspace.  Policy decision.
-> >    - If not TDISP
-> >      - device_connect(IDE ONLY) - bunch of proxying in host OS.
-> >      - Cert chain and measurements presented to host, host can then check if
-> >        it is happy and expose for next policy decision.
-> >      - Hooks exposed for host to request more measurements, key refresh etc.
-> >        Idea being that the flow is host driven with PSP providing required
-> >        services.  If host can just do setup directly that's fine too.  
-> 
-> I'd expect the user to want IDE on from the very beginning, why wait to 
-> turn it on later? The question is rather if the user wants to panic() or 
-> warn() or block the device if IDE setup failed.
-
-There are some concerns about being able to support enough selective IDE streams.
-Might turn out to be a false concern (I've not yet got visibility of enough
-implementations to be able to tell).
-Also (as I understand it as a software guy) IDE has a significant performance
-and power cost (and for CXL at least there are various trade offs and options
-you can enable depending on security model and device features).
-
-There is "talk" of people turning IDE off if they can cope without it and only
-enabling for CoCo (and possibly selectively doing that as well)
-
-> 
-> >    - If TDISP (technically you can run tdisp from host, but lets assume
-> >      for now no one wants to do that? (yet)).
-> >      - device_connect(TDISP) - bunch of proxying in host OS.
-> >      - Cert chain and measurements presented to host, host can then check if
-> >        it is happy and expose for next policy decision.  
-> 
-> On AMD SEV TIO the TDISP setup happens in "tdi_bind" when the device is 
-> about to be passed through which is when QEMU (==userspace) starts.
-Ah. Ok.
-
-> 
-> > 
-> > 4. Flow after this depends on early or late binding (lockdown)
-> >     but could load driver at this point.  Userspace policy.
-> >     tdi-bind etc.  
-> 
-> Not sure I follow this. A host or guest driver?
-
-Hmm - I confess I'm confusing myself now.
-
-At this stage we just have enough info to load a driver for the PF because
-to get to state we want locked prior to VF assignment the PF driver may
-have some configuration to do.
-
-If all that goes well and the TDI can be moved to locked state, and assigned
-to a TVM which then has to decide to issue tdi_validate before binding
-the guest driver (which I assume is the TDISP START_INTERFACE_REQUEST
-bit of the state machine). Or is the guest driver ever needed before this
-transition? (I see you called it out as not, but is it always a one time
-thing on driver load or can that decision change without unbind/bind
-of driver?)
-
-I know this gets more complex for the PF pass through cases where the
-driver needs to load and do some setup before you can lock down the device
-but do people have that requirement for VFs? If they do it feels like
-device was designed wrong to me...
-
-Too many specs (some of which provide too many ways you 'could' do it)
-so I may well have a bunch of this wrong :(
-
-Jonathan
 
