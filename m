@@ -1,230 +1,232 @@
-Return-Path: <kvm+bounces-533-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-534-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33BAF7E0B0A
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 23:27:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9C727E0B3A
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 23:44:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80478B21521
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 22:26:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 792EA281FF8
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 22:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6B2249EA;
-	Fri,  3 Nov 2023 22:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33676249FA;
+	Fri,  3 Nov 2023 22:44:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IQwxyHfC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eRdP5MYT"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB53B2376B
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 22:26:48 +0000 (UTC)
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71E8AD61
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 15:26:46 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cc23f2226bso20039025ad.2
-        for <kvm@vger.kernel.org>; Fri, 03 Nov 2023 15:26:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E57122338
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 22:44:08 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45B3FD6E
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 15:44:06 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a9012ab0adso36502107b3.1
+        for <kvm@vger.kernel.org>; Fri, 03 Nov 2023 15:44:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699050406; x=1699655206; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5qz3lxpTjwV7uKrVt1pa7AdPIpFhmvNL57r88OWBGAs=;
-        b=IQwxyHfCAuD/AEJWllqin+xq06mvClt7YSuq/rtrDGScuqZ/cRhZf/YNCrTxSxp/Cd
-         VRNhPgV/zK4OCWwX4WXXorxDGZ7g/wt+ggwKbEdUn+4VRXSnc7i+3BtRk20pmUzFKGQC
-         rvx4jcb3bJkmq/zfWner9cNaB0au79HMXmDDmDkpiQBTfs1eGElp6TqTdYpxET0nw/2c
-         pN+LrmSGPjK1BPXKhvrm4wMdxK7l/rqhk2GxTOVA3Dkv4gsbAcFoi0jOvuuaUXx2CcXf
-         6QkZklFSyA1OIRXbBU1EVCqqBY4D7kT1LMlKt3XOhe+HHQGTYxJYFnPmFEXaJhDOH6TL
-         a+Gg==
+        d=google.com; s=20230601; t=1699051445; x=1699656245; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VHUs19MXg68FJ/UikGSWl1xtUmfy1ZNYmGDVs0epASU=;
+        b=eRdP5MYTex7drFSvnL8KqbMuun5bFCt9F19Ie+gn87Sws08TPDik6fMEhpWDYHc+Tq
+         zj1nW1YWspv3f5JvTv1gOvybTkExyY/sczl0YsQXlTbrNl6tnb6AKVRANhaKdQGG+iVg
+         VOPV+IGfWF7Is5mFbH9KuY2/7GQMN+uLeHlxXxK4etRrzBtwGPq13ju0tatp0KEqpcqq
+         luPgfWcMtusTndj7JjPY/IgwxqxvIUdRzBZNemKtxs+1rQ9ZC9YBZ9XLdGPmlj0tlQ4Q
+         Rb0QZnAeePkNn/31ORt4eC/8YJXMcosXX5awUpGrPE9kJaL/SFDBvAPuSssBGFwUE1ez
+         y47g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699050406; x=1699655206;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5qz3lxpTjwV7uKrVt1pa7AdPIpFhmvNL57r88OWBGAs=;
-        b=psM5533vrswm3OiGtl/K1NGe/ak99lY2wlKx7da+maynCNCHNoTUYmnfJERWA2bc3k
-         rJ0Gooc2CsiXyz7klFTsTxrN6MCNIcN5mujzudQXnMYEIOMfI3yf2NNkLIqQehIJ0DbY
-         TogDPDllruM9nqV8jzJzBNw96qsQYuTqRMocRbe/TVwrsuopNZKoTRewD3JOa5GoQUdd
-         d6bDOzac0qU8Xrea8xZCZ1YGZV7E/ZgZEsayMiRPqtVDFeHjTI+Ggk5Pq7ymIcKRpLJl
-         NgFHndb4rSdXNRUm4fMEKzQb6N4Dbv4xeGgr471dBclkhAo9jt/3mJebxU+q9TLVPsbT
-         ZuKw==
-X-Gm-Message-State: AOJu0YxgQjjHYNXZSJ9MDjh2NMyJHcDsvXAA34XLBH3Gk4II3qVyTWO6
-	U8Ue+sIbSifhujkGTcI7JOVaWBE8src=
-X-Google-Smtp-Source: AGHT+IFeq7cdSJcWPrN+bNFUJYmnJmsZZZr44kVjASAIEmkPN7hPLrgXLlkfdFkrHpJgynav7YkKwmOhOvs=
+        d=1e100.net; s=20230601; t=1699051445; x=1699656245;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VHUs19MXg68FJ/UikGSWl1xtUmfy1ZNYmGDVs0epASU=;
+        b=cm8Ddg7MeALLQm+YZ25yESPzsud8oX/We0q72VUpywR04r+eLeVq1GyOGHgq/DRo9y
+         txpIFcohI/+0G8jru5Saa0WC2UzTlSl84U7OeTY7UBWiJKZPW+v36Uc06Jn6pNPWcd6g
+         IMM1AVLHZFx5FreQS+wlY8NZs7qZoT6vYPzPUDr+XoDFDAGadJKC6wfXZcNVKjwNnUKz
+         n9uuJVYCK7vB4fOJrXZ2QZZHz5ICA3Wa2zJYEZFrj+51p6kd2xO816h02ExHCiTKbMd6
+         +iL5h5w7V+2peL7HuRoyVSJQB6IYnyT63TA1DepxZXkTanxQPTJ98r7KsqvHsVrndJOd
+         472A==
+X-Gm-Message-State: AOJu0YwxoxwkhnqDS0svUIIVG5ZF25p4gdGOM2zzIv3jFPI0uq2MwA27
+	voAy3IukxIg78UsijKrUFrgCNR8lxUc=
+X-Google-Smtp-Source: AGHT+IHPtAwEWr+ctDqsScG5V+Q52QTEUJtI+qEU6hGf5rCAVAqdsox8vEdKuTAwtWiJ7ZeFf05HMmjUPRE=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:7293:b0:1ca:8e79:53b7 with SMTP id
- d19-20020a170902729300b001ca8e7953b7mr386188pll.9.1699050405789; Fri, 03 Nov
- 2023 15:26:45 -0700 (PDT)
-Date: Fri, 3 Nov 2023 15:26:44 -0700
-In-Reply-To: <d1166177-c0ab-a8a5-94a6-e4e7ebdeb1c0@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a81:a056:0:b0:59b:ca80:919a with SMTP id
+ x83-20020a81a056000000b0059bca80919amr78967ywg.0.1699051445462; Fri, 03 Nov
+ 2023 15:44:05 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri,  3 Nov 2023 15:44:02 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20230914063325.85503-1-weijiang.yang@intel.com>
- <20230914063325.85503-20-weijiang.yang@intel.com> <d67fe0ca19f7aef855aa376ada0fc96a66ca0d4f.camel@redhat.com>
- <ZUJ9fDuQUNe9BLUA@google.com> <d1166177-c0ab-a8a5-94a6-e4e7ebdeb1c0@intel.com>
-Message-ID: <ZUVzpM465isag2bj@google.com>
-Subject: Re: [PATCH v6 19/25] KVM: VMX: Emulate read and write to CET MSRs
+X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
+Message-ID: <20231103224402.347278-1-seanjc@google.com>
+Subject: [PATCH] x86/fpu/xstate: Always preserve non-user xfeatures/flags in __state_perm
 From: Sean Christopherson <seanjc@google.com>
-To: Weijiang Yang <weijiang.yang@intel.com>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	dave.hansen@intel.com, peterz@infradead.org, chao.gao@intel.com, 
-	rick.p.edgecombe@intel.com, john.allen@amd.com, 
-	Maxim Levitsky <mlevitsk@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
+Cc: linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Weijiang Yang <weijiang.yang@intel.com>, Dave Hansen <dave.hansen@intel.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Chao Gao <chao.gao@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	John Allen <john.allen@amd.com>, kvm@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Nov 03, 2023, Weijiang Yang wrote:
-> On 11/2/2023 12:31 AM, Sean Christopherson wrote:
-> > On Tue, Oct 31, 2023, Maxim Levitsky wrote:
-> > > On Thu, 2023-09-14 at 02:33 -0400, Yang Weijiang wrote:
-> > > > Add emulation interface for CET MSR access. The emulation code is split
-> > > > into common part and vendor specific part. The former does common check
-> > > > for MSRs and reads/writes directly from/to XSAVE-managed MSRs via the
-> > > > helpers while the latter accesses the MSRs linked to VMCS fields.
-> > > > 
-> > > > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> > > > ---
-> > ...
-> > 
-> > > > +	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-> > > > +	case MSR_KVM_SSP:
-> > > > +		if (host_msr_reset && kvm_cpu_cap_has(X86_FEATURE_SHSTK))
-> > > > +			break;
-> > > > +		if (!guest_can_use(vcpu, X86_FEATURE_SHSTK))
-> > > > +			return 1;
-> > > > +		if (index == MSR_KVM_SSP && !host_initiated)
-> > > > +			return 1;
-> > > > +		if (is_noncanonical_address(data, vcpu))
-> > > > +			return 1;
-> > > > +		if (index != MSR_IA32_INT_SSP_TAB && !IS_ALIGNED(data, 4))
-> > > > +			return 1;
-> > > > +		break;
-> > > Once again I'll prefer to have an ioctl for setting/getting SSP, this will
-> > > make the above code simpler (e.g there will be no need to check that write
-> > > comes from the host/etc).
-> > I don't think an ioctl() would be simpler overall, especially when factoring in
-> > userspace.  With a synthetic MSR, we get the following quite cheaply:
-> > 
-> >   1. Enumerating support to userspace.
-> >   2. Save/restore of the value, e.g. for live migration.
-> >   3. Vendor hooks for propagating values to/from the VMCS/VMCB.
-> > 
-> > For an ioctl(), #1 would require a capability, #2 (and #1 to some extent) would
-> > require new userspace flows, and #3 would require new kvm_x86_ops hooks.
-> > 
-> > The synthetic MSR adds a small amount of messiness, as does bundling
-> > MSR_IA32_INT_SSP_TAB with the other shadow stack MSRs.  The bulk of the mess comes
-> > from the need to allow userspace to write '0' when KVM enumerated supported to
-> > userspace.
-> > 
-> > If we isolate MSR_IA32_INT_SSP_TAB, that'll help with the synthetic MSR and with
-> > MSR_IA32_INT_SSP_TAB.  For the unfortunate "host reset" behavior, the best idea I
-> > came up with is to add a helper.  It's still a bit ugly, but the ugliness is
-> > contained in a helper and IMO makes it much easier to follow the case statements.
-> 
-> Frankly speaking, existing code is not hard to understand to me :-), the
-> handling for MSR_KVM_SSP and MSR_IA32_INT_SSP_TAB is straightforward if
-> audiences read the related spec.
+When granting userspace or a KVM guest access to an xfeature, preserve the
+entity's existing supervisor and software-defined permissions as tracked
+by __state_perm, i.e. use __state_perm to track *all* permissions even
+though all supported supervisor xfeatures are granted to all FPUs and
+FPU_GUEST_PERM_LOCKED disallows changing permissions.
 
-I don't necessarily disagree, but I 100% agree with Maxim that host_msr_reset is
-a confusing name.  As Maxim pointed out, '0' isn't necessarily the RESET value.
-And host_msr_reset implies that userspace is emulating a RESET, which may not
-actually be true, e.g. a naive userspace could be restoring '0' as part of live
-migration.
+Effectively clobbering supervisor permissions results in inconsistent
+behavior, as xstate_get_group_perm() will report supervisor features for
+process that do NOT request access to dynamic user xfeatures, whereas any
+and all supervisor features will be absent from the set of permissions for
+any process that is granted access to one or more dynamic xfeatures (which
+right now means AMX).
 
-> But I'll take your advice and enclose below changes. Thanks!
+The inconsistency isn't problematic because fpu_xstate_prctl() already
+strips out everything except user xfeatures:
 
-Definitely feel free to propose an alternative.  My goal with the suggested change
-is eliminate host_msr_reset without creating creating unwieldy case statements.
-Isolating MSR_IA32_INT_SSP_TAB was (obviously) the best solution I came up with.
+        case ARCH_GET_XCOMP_PERM:
+                /*
+                 * Lockless snapshot as it can also change right after the
+                 * dropping the lock.
+                 */
+                permitted = xstate_get_host_group_perm();
+                permitted &= XFEATURE_MASK_USER_SUPPORTED;
+                return put_user(permitted, uptr);
 
-> > get:
-> > 
-> > 	case MSR_IA32_INT_SSP_TAB:
-> > 		if (!guest_can_use(vcpu, X86_FEATURE_SHSTK) ||
-> > 		    !guest_cpuid_has(vcpu, X86_FEATURE_LM))
-> > 			return 1;
-> > 		break;
-> > 	case MSR_KVM_SSP:
-> > 		if (!host_initiated)
-> > 			return 1;
-> > 		fallthrough;
-> > 	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-> > 		if (!guest_can_use(vcpu, X86_FEATURE_SHSTK))
-> > 			return 1;
-> > 		break;
-> > 
-> > static bool is_set_cet_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u64 data,
-> > 				   bool host_initiated)
-> > {
-> > 	bool any_cet = index == MSR_IA32_S_CET || index == MSR_IA32_U_CET;
-> > 
-> > 	if (guest_can_use(vcpu, X86_FEATURE_SHSTK))
-> > 		return true;
-> > 
-> > 	if (any_cet && guest_can_use(vcpu, X86_FEATURE_IBT))
-> > 		return true;
-> > 
-> > 	/*
-> > 	 * If KVM supports the MSR, i.e. has enumerated the MSR existence to
-> > 	 * userspace, then userspace is allowed to write '0' irrespective of
-> > 	 * whether or not the MSR is exposed to the guest.
-> > 	 */
-> > 	if (!host_initiated || data)
-> > 		return false;
-> > 	if (kvm_cpu_cap_has(X86_FEATURE_SHSTK))
-> > 		return true;
-> > 
-> > 	return any_cet && kvm_cpu_cap_has(X86_FEATURE_IBT);
-> > }
-> > 
-> > set:
-> > 	case MSR_IA32_U_CET:
-> > 	case MSR_IA32_S_CET:
-> > 		if (!is_set_cet_msr_allowed(vcpu, index, data, host_initiated))
-> > 			return 1;
-> > 		if (data & CET_US_RESERVED_BITS)
-> > 			return 1;
-> > 		if (!guest_can_use(vcpu, X86_FEATURE_SHSTK) &&
-> > 		    (data & CET_US_SHSTK_MASK_BITS))
-> > 			return 1;
-> > 		if (!guest_can_use(vcpu, X86_FEATURE_IBT) &&
-> > 		    (data & CET_US_IBT_MASK_BITS))
-> > 			return 1;
-> > 		if (!IS_ALIGNED(CET_US_LEGACY_BITMAP_BASE(data), 4))
-> > 			return 1;
-> > 
-> > 		/* IBT can be suppressed iff the TRACKER isn't WAIT_ENDBR. */
-> > 		if ((data & CET_SUPPRESS) && (data & CET_WAIT_ENDBR))
-> > 			return 1;
-> > 		break;
-> > 	case MSR_IA32_INT_SSP_TAB:
-> > 		if (!guest_cpuid_has(vcpu, X86_FEATURE_LM))
-> > 			return 1;
+        case ARCH_GET_XCOMP_GUEST_PERM:
+                permitted = xstate_get_guest_group_perm();
+                permitted &= XFEATURE_MASK_USER_SUPPORTED;
+                return put_user(permitted, uptr);
 
-Doh, I think this should be:
+and similarly KVM doesn't apply the __state_perm to supervisor states
+(kvm_get_filtered_xcr0() incorporates xstate_get_guest_group_perm()):
 
-		if (!is_set_cet_msr_allowed(vcpu, index, data, host_initiated) ||
-		    !guest_cpuid_has(vcpu, X86_FEATURE_LM))
-			return 1;
-> > 
-> > 		if (is_noncanonical_address(data, vcpu))
-> > 			return 1;
-> > 		break;
-> > 	case MSR_KVM_SSP:
-> > 		if (!host_initiated)
-> > 			return 1;
-> > 		fallthrough;
-> > 	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-> > 		if (!is_set_cet_msr_allowed(vcpu, index, data, host_initiated))
-> > 			return 1;
-> > 		if (is_noncanonical_address(data, vcpu))
-> > 			return 1;
-> > 		if (!IS_ALIGNED(data, 4))
-> > 			return 1;
-> > 		break;
-> > 	}
-> 
+        case 0xd: {
+                u64 permitted_xcr0 = kvm_get_filtered_xcr0();
+                u64 permitted_xss = kvm_caps.supported_xss;
+
+But if KVM in particular were to ever change, dropping supervisor
+permissions would result in subtle bugs in KVM's reporting of supported
+CPUID settings.  And the above behavior also means that having supervisor
+xfeatures in __state_perm is correctly handled by all users.
+
+Dropping supervisor permissions also creates another landmine for KVM.  If
+more dynamic user xfeatures are ever added, requesting access to multiple
+xfeatures in separate ARCH_REQ_XCOMP_GUEST_PERM calls will result in the
+second invocation of __xstate_request_perm() computing the wrong ksize, as
+as the mask passed to xstate_calculate_size() would not contain *any*
+supervisor features.
+
+Commit 781c64bfcb73 ("x86/fpu/xstate: Handle supervisor states in XSTATE
+permissions") fudged around the size issue for userspace FPUs, but for
+reasons unknown skipped guest FPUs.  Lack of a fix for KVM "works" only
+because KVM doesn't yet support virtualizing features that have supervisor
+xfeatures, i.e. as of today, KVM guest FPUs will never need the relevant
+xfeatures.
+
+Simply extending the hack-a-fix for guests would temporarily solve the
+ksize issue, but wouldn't address the inconsistency issue and would leave
+another lurking pitfall for KVM.  KVM support for virtualizing CET will
+likely add CET_KERNEL as a guest-only xfeature, i.e. CET_KERNEL will not
+be set in xfeatures_mask_supervisor() and would again be dropped when
+granting access to dynamic xfeatures.
+
+Note, the existing clobbering behavior is rather subtle.  The @permitted
+parameter to __xstate_request_perm() comes from:
+
+	permitted = xstate_get_group_perm(guest);
+
+which is either fpu->guest_perm.__state_perm or fpu->perm.__state_perm,
+where __state_perm is initialized to:
+
+        fpu->perm.__state_perm          = fpu_kernel_cfg.default_features;
+
+and copied to the guest side of things:
+
+	/* Same defaults for guests */
+	fpu->guest_perm = fpu->perm;
+
+fpu_kernel_cfg.default_features contains everything except the dynamic
+xfeatures, i.e. everything except XFEATURE_MASK_XTILE_DATA:
+
+        fpu_kernel_cfg.default_features = fpu_kernel_cfg.max_features;
+        fpu_kernel_cfg.default_features &= ~XFEATURE_MASK_USER_DYNAMIC;
+
+When __xstate_request_perm() restricts the local "mask" variable to
+compute the user state size:
+
+	mask &= XFEATURE_MASK_USER_SUPPORTED;
+	usize = xstate_calculate_size(mask, false);
+
+it subtly overwrites the target __state_perm with "mask" containing only
+user xfeatures:
+
+	perm = guest ? &fpu->guest_perm : &fpu->perm;
+	/* Pairs with the READ_ONCE() in xstate_get_group_perm() */
+	WRITE_ONCE(perm->__state_perm, mask);
+
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Weijiang Yang <weijiang.yang@intel.com>
+Cc: Dave Hansen <dave.hansen@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Chao Gao <chao.gao@intel.com>
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: John Allen <john.allen@amd.com>
+Cc: kvm@vger.kernel.org
+Link: https://lore.kernel.org/all/ZTqgzZl-reO1m01I@google.com
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+
+Note, I haven't tested the PASID side of things, so someone with more know-how
+definitely needs to take this for a spin.
+
+ arch/x86/kernel/fpu/xstate.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+index ef6906107c54..73f6bc00d178 100644
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -1601,16 +1601,20 @@ static int __xstate_request_perm(u64 permitted, u64 requested, bool guest)
+ 	if ((permitted & requested) == requested)
+ 		return 0;
+ 
+-	/* Calculate the resulting kernel state size */
++	/*
++	 * Calculate the resulting kernel state size.  Note, @permitted also
++	 * contains supervisor xfeatures even though supervisor are always
++	 * permitted for kernel and guest FPUs, and never permitted for user
++	 * FPUs.
++	 */
+ 	mask = permitted | requested;
+-	/* Take supervisor states into account on the host */
+-	if (!guest)
+-		mask |= xfeatures_mask_supervisor();
+ 	ksize = xstate_calculate_size(mask, compacted);
+ 
+-	/* Calculate the resulting user state size */
+-	mask &= XFEATURE_MASK_USER_SUPPORTED;
+-	usize = xstate_calculate_size(mask, false);
++	/*
++	 * Calculate the resulting user state size.  Take care not to clobber
++	 * the supervisor xfeatures in the new mask!
++	 */
++	usize = xstate_calculate_size(mask & XFEATURE_MASK_USER_SUPPORTED, false);
+ 
+ 	if (!guest) {
+ 		ret = validate_sigaltstack(usize);
+
+base-commit: 45b890f7689eb0aba454fc5831d2d79763781677
+-- 
+2.42.0.869.gea05f2083d-goog
+
 
