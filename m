@@ -1,113 +1,118 @@
-Return-Path: <kvm+bounces-478-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-479-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECAE87E000D
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 10:37:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EC307E0012
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 10:43:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 611251F22266
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 09:37:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46C781C20FB9
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 09:43:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9359A11C82;
-	Fri,  3 Nov 2023 09:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD4612B76;
+	Fri,  3 Nov 2023 09:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GUjYh48b"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PLifHEsm"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E50DCA51
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 09:37:39 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 462C5D4B
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 02:37:36 -0700 (PDT)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A38lLaf008792
-	for <kvm@vger.kernel.org>; Fri, 3 Nov 2023 09:37:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references :
- subject : from : to : cc : message-id : date; s=pp1;
- bh=ctrXTcIu6sFVOYSlvzinfXfG7E1afNYiqLbgNDUAhNw=;
- b=GUjYh48bc6xS/vGguL5uobXGzTahDqa3eFJHfDF8lj+SsVjkmmK0t4jHWOrTI//ygGkS
- X4jaI0lIOctiB84M/MWvxbGjJC5bZyHp9YNLg6r7WqjUJMz7Dt9M+Hw6xp+KSHy95F05
- LGHIra291D37NQdhfXPrZoNu1Lpq12LxOIqOY/DMzHjH36z0bU0we1uzFmtVyTQhUKl9
- WcAqDd8j8x3936MrCFT3j1qaWt5QObSqMvRUggEvB6geaprHsq4i2D2PETpdaZVCWXOP
- 8HJZf6h8Ux0B9sYPOOqXFCLYdnj1ZKds+YxPfWkKnpxUtl9ih/RkTlKvbkKol4n+d7tK Eg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u4wnmhggv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <kvm@vger.kernel.org>; Fri, 03 Nov 2023 09:37:35 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A38mL28013002
-	for <kvm@vger.kernel.org>; Fri, 3 Nov 2023 09:37:35 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u4wnmhgg9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 09:37:35 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A39PA6G011544;
-	Fri, 3 Nov 2023 09:37:33 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u1e4mcu6n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 09:37:33 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A39bUBJ24379964
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 3 Nov 2023 09:37:30 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A030420049;
-	Fri,  3 Nov 2023 09:37:30 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 382D820040;
-	Fri,  3 Nov 2023 09:37:30 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.63.94])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  3 Nov 2023 09:37:30 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C16111702
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 09:42:57 +0000 (UTC)
+Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AD2BD42
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 02:42:55 -0700 (PDT)
+Received: by mail-qv1-xf30.google.com with SMTP id 6a1803df08f44-66cfd874520so10484746d6.2
+        for <kvm@vger.kernel.org>; Fri, 03 Nov 2023 02:42:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699004575; x=1699609375; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=KR3uUy+lpOtuK74sFvr5LpDDKafluOWW+OG46f9Hrzo=;
+        b=PLifHEsmRHpPtO/bkvhueEZllLgnEf4sVw6fk80yY0NqAEoWrTttWEylmGiTW/kb46
+         2ok3ePRS9R9U2ILpGsYJe7bLWUG7M9JJI7ZDxHWExAN+5qKG4gqzN6IbjrJklS1GdQi9
+         5IrvE85NDccRnOTaSzRWCO+3krPNSZU9Ca4BFDbHxd/NixgAlfBIAarCl3eyi4ff2ZnV
+         KIpWMS1ct6ZmKkbjGa705xZrzg1wKXMVJ47GfI1SzW9/E1U/y7y+X2mAiwez7KkSo47A
+         7ZulluUL0N9pHvg2X++2Dig8zDdbVBMxzepsYZH04yBYIBcsRuz/pMZw8hSSltN5h97G
+         PJoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699004575; x=1699609375;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KR3uUy+lpOtuK74sFvr5LpDDKafluOWW+OG46f9Hrzo=;
+        b=q8ir/yELR+MeFQhbpkt9o52q5JTRyiw0XwoREV+Xe+Xt5SpP5FHmzwqSLytKJBMnR8
+         kCqQznn6M95VJP9qsNZzqUZCQv1m7cdCZmXFb9AWmbz5okSM7EM3XnyQo7CNzUl3QTzK
+         HoPnPAqj/xLBN16cX8/DiJGbnxcvlQ8lFxqIq3aTJBuWtyRcTK3WOigNH9px6gcm3yek
+         rd0aaNFn8pw8pCn4PPqhiFOS2sqNC9beY+HExpMefuAr4cPBL9ahrm2x/60o55B6aYyI
+         ycz22bjI0yrEaCWQa0FHSc0FRK21Y3laqvQkuMgie6AWH2DoF0D0gDpyTs1HLVM7NnQU
+         EeuQ==
+X-Gm-Message-State: AOJu0Yz6iOEJEvY2M3SfbPmxxtejwwae5aDa4J/aooSHwqYv4gx6cn9+
+	Quz7RXxDa6X2jWE3g38xXl5Ld2dj6r/V20T9JrtvDw==
+X-Google-Smtp-Source: AGHT+IHMtnnuJ+fshc7oeOwDt21mO974uTwKm6avpjixqQMFQPk6nu4AOneq997yl+dXgdaxeuVP+cu76MznLmTOvmQ=
+X-Received: by 2002:a05:6214:401c:b0:66d:34a8:3ed0 with SMTP id
+ kd28-20020a056214401c00b0066d34a83ed0mr22048546qvb.26.1699004574544; Fri, 03
+ Nov 2023 02:42:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20231031095519.73311-1-frankja@linux.ibm.com>
-References: <20231031095519.73311-1-frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v2 0/3] s390x: Improve console handling
-From: Nico Boehr <nrb@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc: imbrenda@linux.ibm.com, thuth@redhat.com, david@redhat.com
-Message-ID: <169900424909.24043.13145914467338666237@t14-nrb>
-User-Agent: alot/0.8.1
-Date: Fri, 03 Nov 2023 10:37:29 +0100
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: UwU7NDWRN20VdS36KnamjWoYlQmQW4rJ
-X-Proofpoint-GUID: R279VYjwHkju9qnVPtsQ1ebFF97whS-o
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-03_09,2023-11-02_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=656
- priorityscore=1501 spamscore=0 suspectscore=0 lowpriorityscore=0
- phishscore=0 mlxscore=0 malwarescore=0 impostorscore=0 clxscore=1015
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311030079
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-17-seanjc@google.com>
+In-Reply-To: <20231027182217.3615211-17-seanjc@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 3 Nov 2023 09:42:17 +0000
+Message-ID: <CA+EHjTxEvJpfA7urRj6EbbuwTGWAw6ZYu6NmX9sLT5Cdp5p3eA@mail.gmail.com>
+Subject: Re: [PATCH v13 16/35] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Quoting Janosch Frank (2023-10-31 10:55:16)
-> Console IO is and has been in a state of "works for me". I don't think
-> that will change soon since there's no need for a proper console
-> driver when all we want is the ability to print or read a line at a
-> time.
->=20
-> However since input is only supported on the ASCII console I was
-> forced to use it on the HMC. The HMC generally does not add a \r on a
-> \n so each line doesn't start at column 0. It's time to finally fix
-> that.
->=20
-> Also, since there are environments that only provide the line-mode
-> console it's time to add line-mode input to properly support them.
+Hi,
 
-Pushed to our internal CI for coverage, thanks.
+...
+
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index e2252c748fd6..e82c69d5e755 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+
+...
+
+> +4.141 KVM_CREATE_GUEST_MEMFD
+> +----------------------------
+> +
+> +:Capability: KVM_CAP_GUEST_MEMFD
+> +:Architectures: none
+> +:Type: vm ioctl
+> +:Parameters: struct struct kvm_create_guest_memfd(in)
+
+One struct too many.
+
+Cheers,
+/fuad
 
