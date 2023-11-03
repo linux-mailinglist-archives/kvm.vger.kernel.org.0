@@ -1,167 +1,179 @@
-Return-Path: <kvm+bounces-480-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-481-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79F647E0024
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 11:02:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13FFD7E0025
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 11:04:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 647E71C21061
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 10:02:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE146281E7A
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 10:04:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EB9A134BC;
-	Fri,  3 Nov 2023 10:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4265214281;
+	Fri,  3 Nov 2023 10:03:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EmLHSsMF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eViAA9dF"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E1D125CC
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 10:01:56 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9034B191
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 03:01:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699005712;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=XqnoXVfWawq8QrClZNYW97zTnEotSmYZbTk5P8wdCbA=;
-	b=EmLHSsMF/dlj/9tOIqXb1mp1BK7tVaauI/qS4FTUFRy9PqxRzrHYKlAUbRnRt5guWFEmhy
-	susCsLvXW9mtwPae/wUjfKAzgqdmLqbcihx8eyNNLg945oEUCg27BC10yzjr4iGBnkSqCW
-	+BDEt2HuCmlCDiiVBU5gjEXh1LqZ/zo=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-331-UmZduIG_PUyEWgbnm3CRQA-1; Fri,
- 03 Nov 2023 06:01:47 -0400
-X-MC-Unique: UmZduIG_PUyEWgbnm3CRQA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DFC7B3C0F668;
-	Fri,  3 Nov 2023 10:01:46 +0000 (UTC)
-Received: from laptop.redhat.com (unknown [10.39.192.57])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 187E01121308;
-	Fri,  3 Nov 2023 10:01:44 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com,
-	eric.auger@redhat.com,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	andrew.jones@linux.dev,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	alexandru.elisei@arm.com
-Cc: jarichte@redhat.com
-Subject: [kvm-unit-tests PATCH] arm: pmu-overflow-interrupt: Increase count values
-Date: Fri,  3 Nov 2023 11:01:39 +0100
-Message-ID: <20231103100139.55807-1-eric.auger@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A953B13AC8
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 10:03:48 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 914CABD;
+	Fri,  3 Nov 2023 03:03:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699005823; x=1730541823;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=8E8dn8Xek5yYAahg5pJzt4zURQpPI7tPe+CLjEMKDQg=;
+  b=eViAA9dFnhg48ELf/IhLNL3eCwsugIDludUCbKZeOOksUiufDf6XQelB
+   W6UZaO5kjCqtmq2wSe23p/Ss7DeacHKS8lqvBSZ2MGfqW1LcpzdijF9rz
+   u37b0D3peI1CuMWa4wA25qUsoImXYhhM0rosFU8oqPDA81DqNfzsRgpGM
+   55YsRdxLpSlK+hrVIW/Q1XekYd3OZAJUgiSIOe5KO3M3ISUfNskrQ2t+6
+   zZlvoHoU9RH16QuJAUXZFmMmVJDOFLKA/O3zBLjeL7E+q1sjIXdBb1r/t
+   LM1PnzkEcZBDNTnJKcEw39O1wlN8T2A0I0KWpnKKunlO+vhrhAspSbLGw
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10882"; a="455408298"
+X-IronPort-AV: E=Sophos;i="6.03,273,1694761200"; 
+   d="scan'208";a="455408298"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2023 03:03:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10882"; a="878600848"
+X-IronPort-AV: E=Sophos;i="6.03,273,1694761200"; 
+   d="scan'208";a="878600848"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.12.33]) ([10.93.12.33])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2023 03:03:16 -0700
+Message-ID: <8272bad5-323e-46ae-9244-7b76832393fb@linux.intel.com>
+Date: Fri, 3 Nov 2023 18:03:13 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Patch 1/2] KVM: x86/pmu: Add Intel CPUID-hinted TopDown slots
+ event
+Content-Language: en-US
+To: Jim Mattson <jmattson@google.com>
+Cc: "Liang, Kan" <kan.liang@linux.intel.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Zhenyu Wang <zhenyuw@linux.intel.com>, Zhang Xiong
+ <xiong.y.zhang@intel.com>, Mingwei Zhang <mizhang@google.com>,
+ Like Xu <like.xu.linux@gmail.com>, Dapeng Mi <dapeng1.mi@intel.com>,
+ Like Xu <likexu@tencent.com>
+References: <20231031090613.2872700-1-dapeng1.mi@linux.intel.com>
+ <20231031090613.2872700-2-dapeng1.mi@linux.intel.com>
+ <CALMp9eR_BFdNNTXhSpbuH66jXcRLVB8VvD8V+kY245NbusN2+g@mail.gmail.com>
+ <c3f0e4ac-1790-40c1-a09e-209a09e3d230@linux.intel.com>
+ <CALMp9eTDAiJ=Kuh7KkwdAY8x1BL2ZjdgFiPFRHXSSVCpcXp9rw@mail.gmail.com>
+ <baa64cf4-11de-4581-89b6-3a86448e3a6e@linux.intel.com>
+ <a14147e7-0b35-4fba-b785-ef568474c69b@linux.intel.com>
+ <85706bd7-7df0-4d4b-932c-d807ddb14f9e@linux.intel.com>
+ <CALMp9eS3NdTUnRrYPB+mMoGKj5NnsYXNUfUJX8Gv=wWCN4dkoQ@mail.gmail.com>
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <CALMp9eS3NdTUnRrYPB+mMoGKj5NnsYXNUfUJX8Gv=wWCN4dkoQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On some hardware, some pmu-overflow-interrupt failures can be observed.
-Although the even counter overflows, the interrupt is not seen as
-expected. This happens in the subtest after "promote to 64-b" comment.
-After analysis, the PMU overflow interrupt actually hits, ie.
-kvm_pmu_perf_overflow() gets called and KVM_REQ_IRQ_PENDING is set,
-as expected. However the PMCR.E is reset by the handle_exit path, at
-kvm_pmu_handle_pmcr() before the next guest entry and
-kvm_pmu_flush_hwstate/kvm_pmu_update_state subsequent call.
-There, since the enable bit has been reset, kvm_pmu_update_state() does
-not inject the interrupt into the guest.
 
-This does not seem to be a KVM bug but rather an unfortunate
-scenario where the test disables the PMCR.E too closely to the
-advent of the overflow interrupt.
+On 11/3/2023 1:45 AM, Jim Mattson wrote:
+> On Wed, Nov 1, 2023 at 7:07 PM Mi, Dapeng <dapeng1.mi@linux.intel.com> wrote:
+>>
+>> On 11/1/2023 9:33 PM, Liang, Kan wrote:
+>>> On 2023-10-31 11:31 p.m., Mi, Dapeng wrote:
+>>>> On 11/1/2023 11:04 AM, Jim Mattson wrote:
+>>>>> On Tue, Oct 31, 2023 at 6:59 PM Mi, Dapeng
+>>>>> <dapeng1.mi@linux.intel.com> wrote:
+>>>>>> On 11/1/2023 2:22 AM, Jim Mattson wrote:
+>>>>>>> On Tue, Oct 31, 2023 at 1:58 AM Dapeng Mi
+>>>>>>> <dapeng1.mi@linux.intel.com> wrote:
+>>>>>>>> This patch adds support for the architectural topdown slots event
+>>>>>>>> which
+>>>>>>>> is hinted by CPUID.0AH.EBX.
+>>>>>>> Can't a guest already program an event selector to count event select
+>>>>>>> 0xa4, unit mask 1, unless the event is prohibited by
+>>>>>>> KVM_SET_PMU_EVENT_FILTER?
+>>>>>> Actually defining this new slots arch event is to do the sanity check
+>>>>>> for supported arch-events which is enumerated by CPUID.0AH.EBX.
+>>>>>> Currently vPMU would check if the arch event from guest is supported by
+>>>>>> KVM. If not, it would be rejected just like intel_hw_event_available()
+>>>>>> shows.
+>>>>>>
+>>>>>> If we don't add the slots event in the intel_arch_events[] array, guest
+>>>>>> may program the slots event and pass the sanity check of KVM on a
+>>>>>> platform which actually doesn't support slots event and program the
+>>>>>> event on a real GP counter and got an invalid count. This is not
+>>>>>> correct.
+>>>>> On physical hardware, it is possible to program a GP counter with the
+>>>>> event selector and unit mask of the slots event whether or not the
+>>>>> platform supports it. Isn't KVM wrong to disallow something that a
+>>>>> physical CPU allows?
+>>>> Yeah, I agree. But I'm not sure if this is a flaw on PMU driver. If an
+>>>> event is not supported by the hardware,  we can't predict the PMU's
+>>>> behavior and a meaningless count may be returned and this could mislead
+>>>> the user.
+>>> The user can program any events on the GP counter. The perf doesn't
+>>> limit it. For the unsupported event, 0 should be returned. Please keep
+>>> in mind, the event list keeps updating. If the kernel checks for each
+>>> event, it could be a disaster. I don't think it's a flaw.
+>>
+>> Thanks Kan, it would be ok as long as 0 is always returned for
+>> unsupported events. IMO, it's a nice to have feature that KVM does this
+>> sanity check for supported arch events, it won't break anything.
+> The hardware PMU most assuredly does not return 0 for unsupported events.
+>
+> For example, if I use host perf to sample event selector 0xa4 unit
+> mask 1 on a Broadwell host (406f1), I get...
+>
+> # perf stat -e r01a4 sleep 10
+>
+>   Performance counter stats for 'sleep 10':
+>
+>             386,964      r01a4
+>
+>        10.000907211 seconds time elapsed
+>
+> Broadwell does not advertise support for architectural event 7 in
+> CPUID.0AH:EBX, so KVM will refuse to measure this event inside a
+> guest. That seems broken to me.
 
-Since it looks like a benign and inlikely case, let's resize the number
-of iterations to prevent the PMCR enable bit from being resetted
-at the same time as the actual overflow event.
 
-COUNT_INT is introduced, arbitrarily set to 1000 iterations and is
-used in this test.
+Yeah, I also saw similar results on Coffee Lake which doesn't support 
+slots events and the return count seems to be a random and meaningless 
+value. If so, this meaningless value may mislead the guest perf user. 
+ From this point view it looks the sanity check in KVM is useful, but it 
+indeed leads to different behavior between guest and host.
 
-Reported-by: Jan Richter <jarichte@redhat.com>
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- arm/pmu.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+I'm neutral on either keeping or removing this check. How's other 
+reviewers' opinion on this?
 
-diff --git a/arm/pmu.c b/arm/pmu.c
-index a91a7b1f..acd88571 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -66,6 +66,7 @@
- #define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
- #define COUNT 250
- #define MARGIN 100
-+#define COUNT_INT 1000
- /*
-  * PRE_OVERFLOW2 is set so that 1st @COUNT iterations do not
-  * produce 32b overflow and 2nd @COUNT iterations do. To accommodate
-@@ -978,13 +979,13 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
- 
- 	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
- 
--	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-+	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
- 	report(expect_interrupts(0), "no overflow interrupt after preset");
- 
- 	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
- 	isb();
- 
--	for (i = 0; i < 100; i++)
-+	for (i = 0; i < COUNT_INT; i++)
- 		write_sysreg(0x2, pmswinc_el0);
- 
- 	isb();
-@@ -1002,15 +1003,15 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
- 	write_sysreg(ALL_SET_32, pmintenset_el1);
- 	isb();
- 
--	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-+	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
- 
- 	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
- 	isb();
- 
--	for (i = 0; i < 100; i++)
-+	for (i = 0; i < COUNT_INT; i++)
- 		write_sysreg(0x3, pmswinc_el0);
- 
--	mem_access_loop(addr, 200, pmu.pmcr_ro);
-+	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro);
- 	report_info("overflow=0x%lx", read_sysreg(pmovsclr_el0));
- 	report(expect_interrupts(0x3),
- 		"overflow interrupts expected on #0 and #1");
-@@ -1029,7 +1030,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
- 	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
- 	write_regn_el0(pmevcntr, 0, pre_overflow);
- 	isb();
--	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-+	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
- 	report(expect_interrupts(0x1), "expect overflow interrupt");
- 
- 	/* overflow on odd counter */
-@@ -1037,7 +1038,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
- 	write_regn_el0(pmevcntr, 0, pre_overflow);
- 	write_regn_el0(pmevcntr, 1, all_set);
- 	isb();
--	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-+	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
- 	if (overflow_at_64bits) {
- 		report(expect_interrupts(0x1),
- 		       "expect overflow interrupt on even counter");
--- 
-2.41.0
 
+>
+>>> Thanks,
+>>> Kan
+>>>> Add Kan to confirm this.
+>>>>
+>>>> Hi Kan,
+>>>>
+>>>> Have you any comments on this? Thanks.
+>>>>
+>>>>
+>>>>>>> AFAICT, this change just enables event filtering based on
+>>>>>>> CPUID.0AH:EBX[bit 7] (though it's not clear to me why two independent
+>>>>>>> mechanisms are necessary for event filtering).
+>>>>>> IMO, these are two different things. this change is just to enable the
+>>>>>> supported arch events check for slot events, the event filtering is
+>>>>>> another thing.
+>>>>> How is clearing CPUID.0AH:EBX[bit 7] any different from putting {event
+>>>>> select 0xa4, unit mask 1} in a deny list with the PMU event filter?
+>>>> I think there is no difference in the conclusion but with two different
+>>>> methods.
+>>>>
+>>>>
 
