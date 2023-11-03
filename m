@@ -1,243 +1,214 @@
-Return-Path: <kvm+bounces-504-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-505-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 899197E04BD
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 15:33:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 030697E04FE
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 15:51:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29E0BB21485
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 14:33:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 253D61C2084A
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 14:51:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128C81B278;
-	Fri,  3 Nov 2023 14:33:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D1641A5A0;
+	Fri,  3 Nov 2023 14:51:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CeP2gnI/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CaROKxZN"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235711A5A1
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 14:33:05 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DECD8D50
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 07:33:03 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-da0631f977bso2515213276.2
-        for <kvm@vger.kernel.org>; Fri, 03 Nov 2023 07:33:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 702201A585
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 14:51:21 +0000 (UTC)
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30B36D48
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 07:51:17 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-54357417e81so14258a12.0
+        for <kvm@vger.kernel.org>; Fri, 03 Nov 2023 07:51:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699021983; x=1699626783; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rpJSZ5mbXewL2nGOafYwkZFzofRxVugIM54vK7gCLUs=;
-        b=CeP2gnI/hRgpGVxhF25z0WF/GM/jv+jBjYDx2ocN6KA0v5NFf3jN0YXWpauNY4pyBH
-         +w7w6m5a+Ws9CGiM2gIaOWjsbq0NB4QZRXJySm3AibIonTGZb0NsKCaU7KYQAZZaMVoH
-         /LtmJCsRrmg1cudxXkT7x2Qz7SkhiKNyPxpwphCsQxNs6szPhMYEvpQWbmz28zvFLPx3
-         rzEqu2KokGt0C/g0C1Zf7hmZ16YgFtvGGmQQeawj4np00h2Zwa0zAE4zAJwfuRfwiXGY
-         JQKsA4Hc4H/RLyB6c9WLE3QTxr2SCyBL/MWgTtIH4QQYX2lC0dg01KwrNVIL1XuJr8M+
-         UYAg==
+        d=google.com; s=20230601; t=1699023075; x=1699627875; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zD/MaSMg/kgZSChzxbcT6Dosmg6sUB4leV3Wuu940+w=;
+        b=CaROKxZNsEHaGYgGtOOs8Cb7ObewnZGsScJ7QKRhyssuMSUVg7Q1akmnIz894E+ejc
+         gVnsU02rLrtmTMSVv7xBcFM/Cq2TyqFRQaFdKuxZc580q1qbs+iHOqM/xpp1J1OQUFEA
+         z5umLy5WWekNNmQDT5Ztgu5e98xAv0Wied9/n635HNfueu1972gXKftw0RO7Ns8WA23x
+         dYNoZ8DqHb3lohpCiThNiJW2xPZ4cMouU4Fsz12qMURxHivkJV8Ymd+FOd12epqU21lg
+         rUzt664ebb/yY/T4bLKNkLpJmXEuUt5u4ub15SxF2HKDzkzmWqEXyScDrtYYajLOILPc
+         oKsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699021983; x=1699626783;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rpJSZ5mbXewL2nGOafYwkZFzofRxVugIM54vK7gCLUs=;
-        b=Rh56m9QOFvTbRuJzg0zk3mO7gvnxK3RmAWh0JdmOkqS5qv6XCyIX/tp+fpNYWXU1jN
-         cz95mD7RiDY7LA7NPfzBDQk1Mf37dtlkk5OxIDDnu+WlaXfSghAbGSFddHXVN6lefN3n
-         lby6j4eGELDEOD94ftINLnKqw+9z9m7rKN+irubeNmrMxx1VS5VLgBTSp4ZAEuzA+Sh8
-         qT4LxE3EFEA+UkbhWdbVXIwfGCPItxqX/oXQ1QaCigHvwS6xFkfRKfYgFverH/ASOxZw
-         azXkhfiC4IceNNZjUwuZ9u042SEowyR8TGo7QOAaRxY1XufIKgix0/8pkOK6cMecAzQM
-         441w==
-X-Gm-Message-State: AOJu0YwRpbyUpUEhon1BwRZfObV6DzUlEBfFIHLi8fdj4pGrphBW95cn
-	4S9QQWnu9lm7v9TcAo//dODm76vXjPo=
-X-Google-Smtp-Source: AGHT+IEZTmjXBmRW1uEZrAtI3/gkqMzQWqxt/qWCdH2d8f4UJ0Ia5LRCJdg8JZKIDOc/x8NM3c6iHqtNRaU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:7653:0:b0:d9a:38e4:78b5 with SMTP id
- r80-20020a257653000000b00d9a38e478b5mr436112ybc.5.1699021983042; Fri, 03 Nov
- 2023 07:33:03 -0700 (PDT)
-Date: Fri, 3 Nov 2023 07:33:01 -0700
-In-Reply-To: <f4e2d8c79ca3f238aafd61a82a3f5ad5c2d6bcab.camel@redhat.com>
+        d=1e100.net; s=20230601; t=1699023075; x=1699627875;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zD/MaSMg/kgZSChzxbcT6Dosmg6sUB4leV3Wuu940+w=;
+        b=hsUidXuUYV60CAPf5wv9hI/Q37HBOz3Ec2DiFf5M8wJK09MxCd4UOADUFJTwx/pAcZ
+         VZ1+ibyjFm/n/3cyTgdbWQsRUttWssNejNBfy9CSnqNX4eq+M8ItSHPQnBLjReF2/ORs
+         UGJz+ney+v4MOCvZBUUnkyBiagU2r+U1nhmtLJifqgDMz/iDBzw3hSqB2soQsenQv+mt
+         mgUEB87Mb6++FIW/93OirO2HihK90E8dq1/p25C15ejmz9PFlzNrouwpsW9/UonT/jb0
+         jE35NCicuxqIC+MMu4rUJldsehBh/gXDNrTqwRphd60Xr0t4hiJIwVfqxHALA6XI22yX
+         zDtA==
+X-Gm-Message-State: AOJu0YyKrKVPa5Jp2NojrzHRgnakkYdnO1ZeRahhZtvarxF2VOkpRBcb
+	6qAyiliQ6SRd1TrcBUsHTth8WjlBPvnaKijwxvIzAA==
+X-Google-Smtp-Source: AGHT+IF2oN85Q8Nnco3g801bQXQ3CJKdrAkEvpDUCc/YmVsb406mQEIECzvYj7tlQdKG/TBi07IYavwOplWrfs5D04w=
+X-Received: by 2002:a50:d50f:0:b0:542:d737:dc7e with SMTP id
+ u15-20020a50d50f000000b00542d737dc7emr231923edi.0.1699023075385; Fri, 03 Nov
+ 2023 07:51:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230914063325.85503-1-weijiang.yang@intel.com>
- <20230914063325.85503-7-weijiang.yang@intel.com> <e0db6ffd-5d92-2a1a-bdfb-a190fe1ccd25@intel.com>
- <1347cf03-4598-f923-74e4-a3d193d9d2e9@intel.com> <ZTf5wPKXuHBQk0AN@google.com>
- <de1b148c-45c6-6517-0926-53d1aad8978e@intel.com> <ZTqgzZl-reO1m01I@google.com>
- <d6eb8a9dc5b0e4b83e1944d7e0bb8ee2cb9cc111.camel@redhat.com>
- <ZUJdohf6wLE5LrCN@google.com> <f4e2d8c79ca3f238aafd61a82a3f5ad5c2d6bcab.camel@redhat.com>
-Message-ID: <ZUUEnXcqgY7O0jp7@google.com>
-Subject: Re: [PATCH v6 06/25] x86/fpu/xstate: Opt-in kernel dynamic bits when
- calculate guest xstate size
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Weijiang Yang <weijiang.yang@intel.com>, Dave Hansen <dave.hansen@intel.com>, pbonzini@redhat.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, peterz@infradead.org, 
-	chao.gao@intel.com, rick.p.edgecombe@intel.com, john.allen@amd.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20231031090613.2872700-1-dapeng1.mi@linux.intel.com>
+ <20231031090613.2872700-2-dapeng1.mi@linux.intel.com> <CALMp9eR_BFdNNTXhSpbuH66jXcRLVB8VvD8V+kY245NbusN2+g@mail.gmail.com>
+ <c3f0e4ac-1790-40c1-a09e-209a09e3d230@linux.intel.com> <CALMp9eTDAiJ=Kuh7KkwdAY8x1BL2ZjdgFiPFRHXSSVCpcXp9rw@mail.gmail.com>
+ <baa64cf4-11de-4581-89b6-3a86448e3a6e@linux.intel.com> <a14147e7-0b35-4fba-b785-ef568474c69b@linux.intel.com>
+ <85706bd7-7df0-4d4b-932c-d807ddb14f9e@linux.intel.com> <CALMp9eS3NdTUnRrYPB+mMoGKj5NnsYXNUfUJX8Gv=wWCN4dkoQ@mail.gmail.com>
+ <8272bad5-323e-46ae-9244-7b76832393fb@linux.intel.com>
+In-Reply-To: <8272bad5-323e-46ae-9244-7b76832393fb@linux.intel.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Fri, 3 Nov 2023 07:50:59 -0700
+Message-ID: <CALMp9eQOBAyCY9pC54rG4K2WvLnj1kw4oeNrNOPVDr1ChpbOXQ@mail.gmail.com>
+Subject: Re: [Patch 1/2] KVM: x86/pmu: Add Intel CPUID-hinted TopDown slots event
+To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+Cc: "Liang, Kan" <kan.liang@linux.intel.com>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Zhenyu Wang <zhenyuw@linux.intel.com>, Zhang Xiong <xiong.y.zhang@intel.com>, 
+	Mingwei Zhang <mizhang@google.com>, Like Xu <like.xu.linux@gmail.com>, 
+	Dapeng Mi <dapeng1.mi@intel.com>, Like Xu <likexu@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 02, 2023, Maxim Levitsky wrote:
-> On Wed, 2023-11-01 at 07:16 -0700, Sean Christopherson wrote:
-> > On Tue, Oct 31, 2023, Maxim Levitsky wrote:
-> > > On Thu, 2023-10-26 at 10:24 -0700, Sean Christopherson wrote:
-> > > > --
-> > > > From: Sean Christopherson <seanjc@google.com>
-> > > > Date: Thu, 26 Oct 2023 10:17:33 -0700
-> > > > Subject: [PATCH] x86/fpu/xstate: Always preserve non-user xfeatures/flags in
-> > > >  __state_perm
-> > > > 
-> > > > Fixes: 781c64bfcb73 ("x86/fpu/xstate: Handle supervisor states in XSTATE permissions")
-> > > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > > ---
-> > > >  arch/x86/kernel/fpu/xstate.c | 18 +++++++++++-------
-> > > >  1 file changed, 11 insertions(+), 7 deletions(-)
-> > > > 
-> > > > diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-> > > > index ef6906107c54..73f6bc00d178 100644
-> > > > --- a/arch/x86/kernel/fpu/xstate.c
-> > > > +++ b/arch/x86/kernel/fpu/xstate.c
-> > > > @@ -1601,16 +1601,20 @@ static int __xstate_request_perm(u64 permitted, u64 requested, bool guest)
-> > > >  	if ((permitted & requested) == requested)
-> > > >  		return 0;
-> > > >  
-> > > > -	/* Calculate the resulting kernel state size */
-> > > > +	/*
-> > > > +	 * Calculate the resulting kernel state size.  Note, @permitted also
-> > > > +	 * contains supervisor xfeatures even though supervisor are always
-> > > > +	 * permitted for kernel and guest FPUs, and never permitted for user
-> > > > +	 * FPUs.
-> > > > +	 */
-> > > >  	mask = permitted | requested;
-> > > > -	/* Take supervisor states into account on the host */
-> > > > -	if (!guest)
-> > > > -		mask |= xfeatures_mask_supervisor();
-> > > >  	ksize = xstate_calculate_size(mask, compacted);
-> > > 
-> > > This might not work with kernel dynamic features, because
-> > > xfeatures_mask_supervisor() will return all supported supervisor features.
-> > 
-> > I don't understand what you mean by "This".
-> 
-> > 
-> > Somewhat of a side topic, I feel very strongly that we should use "guest only"
-> > terminology instead of "dynamic".  There is nothing dynamic about whether or not
-> > XFEATURE_CET_KERNEL is allowed; there's not even a real "decision" beyond checking
-> > wheter or not CET is supported.
-> 
-> > > Therefore at least until we have an actual kernel dynamic feature (a feature
-> > > used by the host kernel and not KVM, and which has to be dynamic like AMX),
-> > > I suggest that KVM stops using the permission API completely for the guest
-> > > FPU state, and just gives all the features it wants to enable right to
-> > 
-> > By "it", I assume you mean userspace?
-> > 
-> > > __fpu_alloc_init_guest_fpstate() (Guest FPU permission API IMHO should be
-> > > deprecated and ignored)
-> > 
-> > KVM allocates guest FPU state during KVM_CREATE_VCPU, so not using prctl() would
-> > either require KVM to defer allocating guest FPU state until KVM_SET_CPUID{,2},
-> > or would require a VM-scoped KVM ioctl() to let userspace opt-in to
-> > 
-> > Allocating guest FPU state during KVM_SET_CPUID{,2} would get messy, 
-> 
-> > as KVM allows
-> > multiple calls to KVM_SET_CPUID{,2} so long as the vCPU hasn't done KVM_RUN.  E.g.
-> > KVM would need to support actually resizing guest FPU state, which would be extra
-> > complexity without any meaningful benefit.
-> 
-> 
-> OK, I understand you now. What you claim is that it is legal to do this:
-> 
-> - KVM_SET_XSAVE
-> - KVM_SET_CPUID (with AMX enabled)
-> 
-> KVM_SET_CPUID will have to resize the xstate which is already valid.
+On Fri, Nov 3, 2023 at 3:03=E2=80=AFAM Mi, Dapeng <dapeng1.mi@linux.intel.c=
+om> wrote:
+>
+>
+> On 11/3/2023 1:45 AM, Jim Mattson wrote:
+> > On Wed, Nov 1, 2023 at 7:07=E2=80=AFPM Mi, Dapeng <dapeng1.mi@linux.int=
+el.com> wrote:
+> >>
+> >> On 11/1/2023 9:33 PM, Liang, Kan wrote:
+> >>> On 2023-10-31 11:31 p.m., Mi, Dapeng wrote:
+> >>>> On 11/1/2023 11:04 AM, Jim Mattson wrote:
+> >>>>> On Tue, Oct 31, 2023 at 6:59=E2=80=AFPM Mi, Dapeng
+> >>>>> <dapeng1.mi@linux.intel.com> wrote:
+> >>>>>> On 11/1/2023 2:22 AM, Jim Mattson wrote:
+> >>>>>>> On Tue, Oct 31, 2023 at 1:58=E2=80=AFAM Dapeng Mi
+> >>>>>>> <dapeng1.mi@linux.intel.com> wrote:
+> >>>>>>>> This patch adds support for the architectural topdown slots even=
+t
+> >>>>>>>> which
+> >>>>>>>> is hinted by CPUID.0AH.EBX.
+> >>>>>>> Can't a guest already program an event selector to count event se=
+lect
+> >>>>>>> 0xa4, unit mask 1, unless the event is prohibited by
+> >>>>>>> KVM_SET_PMU_EVENT_FILTER?
+> >>>>>> Actually defining this new slots arch event is to do the sanity ch=
+eck
+> >>>>>> for supported arch-events which is enumerated by CPUID.0AH.EBX.
+> >>>>>> Currently vPMU would check if the arch event from guest is support=
+ed by
+> >>>>>> KVM. If not, it would be rejected just like intel_hw_event_availab=
+le()
+> >>>>>> shows.
+> >>>>>>
+> >>>>>> If we don't add the slots event in the intel_arch_events[] array, =
+guest
+> >>>>>> may program the slots event and pass the sanity check of KVM on a
+> >>>>>> platform which actually doesn't support slots event and program th=
+e
+> >>>>>> event on a real GP counter and got an invalid count. This is not
+> >>>>>> correct.
+> >>>>> On physical hardware, it is possible to program a GP counter with t=
+he
+> >>>>> event selector and unit mask of the slots event whether or not the
+> >>>>> platform supports it. Isn't KVM wrong to disallow something that a
+> >>>>> physical CPU allows?
+> >>>> Yeah, I agree. But I'm not sure if this is a flaw on PMU driver. If =
+an
+> >>>> event is not supported by the hardware,  we can't predict the PMU's
+> >>>> behavior and a meaningless count may be returned and this could misl=
+ead
+> >>>> the user.
+> >>> The user can program any events on the GP counter. The perf doesn't
+> >>> limit it. For the unsupported event, 0 should be returned. Please kee=
+p
+> >>> in mind, the event list keeps updating. If the kernel checks for each
+> >>> event, it could be a disaster. I don't think it's a flaw.
+> >>
+> >> Thanks Kan, it would be ok as long as 0 is always returned for
+> >> unsupported events. IMO, it's a nice to have feature that KVM does thi=
+s
+> >> sanity check for supported arch events, it won't break anything.
+> > The hardware PMU most assuredly does not return 0 for unsupported event=
+s.
+> >
+> > For example, if I use host perf to sample event selector 0xa4 unit
+> > mask 1 on a Broadwell host (406f1), I get...
+> >
+> > # perf stat -e r01a4 sleep 10
+> >
+> >   Performance counter stats for 'sleep 10':
+> >
+> >             386,964      r01a4
+> >
+> >        10.000907211 seconds time elapsed
+> >
+> > Broadwell does not advertise support for architectural event 7 in
+> > CPUID.0AH:EBX, so KVM will refuse to measure this event inside a
+> > guest. That seems broken to me.
+>
+>
+> Yeah, I also saw similar results on Coffee Lake which doesn't support
+> slots events and the return count seems to be a random and meaningless
+> value. If so, this meaningless value may mislead the guest perf user.
+>  From this point view it looks the sanity check in KVM is useful, but it
+> indeed leads to different behavior between guest and host.
 
-I was actually talking about
+Calling this a "sanity check" is somewhat specious, since the guards
+are based on the guest CPUID rather than the host CPUID. There is
+nothing to prevent the hypervisor from setting guest
+CPUID.0AH:EAX[31:24] to 32 and guest CPUID.0AH:EBX to 0, making 32
+architectural events available to the guest. If it were really a
+sanity check, it would prevent the guest from using architectural
+events that are not supported by the host.
 
-  KVM_SET_CPUID2 (with dynamic user feature #1)
-  KVM_SET_CPUID2 (with dynamic user feature #2)
+Moreover, I'm pretty sure that a "sanity check" would only apply to
+top-down slots. Have there been any physical CPUs to date that support
+architectural events, but do not support all of the first seven
+architectural events?
 
-The second call through __xstate_request_perm() will be done with only user
-xfeatures in @permitted and so the kernel will compute the wrong ksize.
-
-> Your patch to fix the __xstate_request_perm() does seem to be correct in a
-> sense that it will preserve the kernel fpu components in the fpu permissions.
-> 
-> However note that kernel fpu permissions come from
-> 'fpu_kernel_cfg.default_features' which don't include the dynamic kernel
-> xfeatures (added a few patches before this one).
-
-CET_KERNEL isn't dynamic!  It's guest-only.  There are no runtime decisions as to
-whether or not CET_KERNEL is allowed.  All guest FPU get CET_KERNEL, no kernel FPUs
-get CET_KERNEL.
-
-That matters because I am also proposing that we add a dedicated, defined-at-boot
-fpu_guest_cfg instead of bolting on a "dynamic", which is what I meant by this:
-
- : Or even better if it doesn't cause weirdness elsewhere, a dedicated
- : fpu_guest_cfg.  For me at least, a fpu_guest_cfg would make it easier to
- : understand what all is going on.
-
-That way, initialization of permissions is simply
-
-	fpu->guest_perm = fpu_guest_cfg.default_features;
-
-and there's no need to differentiate between guest and kernel FPUs when reallocating
-for dynamic user xfeatures because guest_perm.__state_perm already holds the correct
-data.
-
-> Therefore an attempt to resize the xstate to include a kernel dynamic feature by
-> __xfd_enable_feature will fail.
-> 
-> If kvm on the other hand includes all the kernel dynamic features in the
-> initial allocation of FPU state (not optimal but possible),
-
-This is what I am suggesting.
-
- : There are definitely scenarios where CET will not be exposed to KVM guests, but
- : I don't see any reason to make the guest FPU space dynamically sized for CET.
- : It's what, 40 bytes?
-
-> then later call to __xstate_request_perm for a userspace dynamic feature
-> (which can still happen) will mess the the xstate, because again the
-> permission code assumes that only default kernel features were granted the
-> permissions.
-> 
-> 
-> This has to be solved this way or another.
-> 
-> > 
-> > The only benefit I can think of for a VM-scoped ioctl() is that it would allow a
-> > single process to host multiple VMs with different dynamic xfeature requirements.
-> > But such a setup is mostly theoretical.  Maybe it'll affect the SEV migration
-> > helper at some point?  But even that isn't guaranteed.
-> > 
-> > So while I agree that ARCH_GET_XCOMP_GUEST_PERM isn't ideal, practically speaking
-> > it's sufficient for all current use cases.  Unless a concrete use case comes along,
-> > deprecating ARCH_GET_XCOMP_GUEST_PERM in favor of a KVM ioctl() would be churn for
-> > both the kernel and userspace without any meaningful benefit, or really even any
-> > true change in behavior.
-> 
-> 
-> ARCH_GET_XCOMP_GUEST_PERM/ARCH_SET_XCOMP_GUEST_PERM is not a good API from
-> usability POV, because it is redundant.
-> 
-> KVM already has API called KVM_SET_CPUID2, by which the qemu/userspace
-> instructs the KVM, how much space to allocate, to support a VM with *this*
-> CPUID.
-> 
-> For example if qemu asks for nested SVM/VMX, then kvm will allocate on demand
-> state for it (also at least 8K/vCPU btw).  The same should apply for AMX -
-> Qemu sets AMX xsave bit in CPUID - that permits KVM to allocate the extra
-> state when needed.
-> 
-> I don't see why we need an extra and non KVM API for that.
-
-I don't necessarily disagree, but what's done is done.  We missed our chance to
-propose a different mechanism, and at this point undoing all of that without good
-cause is unlikely to benefit anyone.  If a use comes along that needs something
-"better" than the prctl() API, then I agree it'd be worth revisiting.
+> I'm neutral on either keeping or removing this check. How's other
+> reviewers' opinion on this?
+>
+>
+> >
+> >>> Thanks,
+> >>> Kan
+> >>>> Add Kan to confirm this.
+> >>>>
+> >>>> Hi Kan,
+> >>>>
+> >>>> Have you any comments on this? Thanks.
+> >>>>
+> >>>>
+> >>>>>>> AFAICT, this change just enables event filtering based on
+> >>>>>>> CPUID.0AH:EBX[bit 7] (though it's not clear to me why two indepen=
+dent
+> >>>>>>> mechanisms are necessary for event filtering).
+> >>>>>> IMO, these are two different things. this change is just to enable=
+ the
+> >>>>>> supported arch events check for slot events, the event filtering i=
+s
+> >>>>>> another thing.
+> >>>>> How is clearing CPUID.0AH:EBX[bit 7] any different from putting {ev=
+ent
+> >>>>> select 0xa4, unit mask 1} in a deny list with the PMU event filter?
+> >>>> I think there is no difference in the conclusion but with two differ=
+ent
+> >>>> methods.
+> >>>>
+> >>>>
 
