@@ -1,142 +1,117 @@
-Return-Path: <kvm+bounces-460-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-462-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9494D7DFE81
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 05:10:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8A537DFF39
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 07:41:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBCFF1C21054
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 04:10:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 489EDB214DA
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 06:41:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956AF17F7;
-	Fri,  3 Nov 2023 04:10:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8637461;
+	Fri,  3 Nov 2023 06:41:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oA3yIDjl"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SpA1pJbD"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1FEB15C1;
-	Fri,  3 Nov 2023 04:10:44 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C4DE1A8;
-	Thu,  2 Nov 2023 21:10:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698984638; x=1730520638;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=juHXPhfl2UOyfQDlVnje9FjGKXxO1moD004mEr2wKcQ=;
-  b=oA3yIDjlqC57hp6Mk5iqy9d8CSACWtzIyRlXtuJ57/THHaVvlzF4eY/Z
-   JXGQxzvRJDenWw42fg9cfPC6gu7+LuvEq6Y0S541X8Aq/owMXSASnF7Vc
-   h+pW9407ajlI2aEliW3rWG701gbfzBJ7AyZgXfTf8S59bqOLfgvblgX37
-   KKK+x8nFxDHgVeBA4qQPV+zX8L89qb6Sz0du/XYs7sjqht/6FuLT4p1hu
-   fmDR8xN4S9uqreYiRpo1RUo8tVxuSBWpBUMpkamQcAHR+wjPhc9mNnOZq
-   J+nfdLY/9LIpyx1VdYb4T8P7tf9WLqIenJTSHPwIYGQvHo8E/vYxl/JID
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10882"; a="387762853"
-X-IronPort-AV: E=Sophos;i="6.03,273,1694761200"; 
-   d="scan'208";a="387762853"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 21:10:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10882"; a="1008694807"
-X-IronPort-AV: E=Sophos;i="6.03,273,1694761200"; 
-   d="scan'208";a="1008694807"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmsmga006.fm.intel.com with ESMTP; 02 Nov 2023 21:10:28 -0700
-Date: Fri, 3 Nov 2023 12:09:01 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
-	Anish Moorthy <amoorthy@google.com>,
-	David Matlack <dmatlack@google.com>,
-	Yu Zhang <yu.c.zhang@linux.intel.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Maciej Szmigiero <mail@maciej.szmigiero.name>,
-	David Hildenbrand <david@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
-	Liam Merwick <liam.merwick@oracle.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH v13 09/35] KVM: Add KVM_EXIT_MEMORY_FAULT exit to report
- faults to userspace
-Message-ID: <ZURyXWhZDSCBnMV1@yilunxu-OptiPlex-7050>
-References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-10-seanjc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39112D61B
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 06:41:40 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D49891BD;
+	Thu,  2 Nov 2023 23:41:38 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A36dxrw010123;
+	Fri, 3 Nov 2023 06:41:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=1sO2ax16Yb/93+OdAaMC8HxcpBQcgys6B/ME9a0CQ7c=;
+ b=SpA1pJbDv3CKrfEL/YYCM1yhscclQS76PSWMq0O0wsxwO2I+a6SYXiegAP+amXXobv/9
+ Hi06LZeUNXEMd8kYS2i3TEipkKnMRF5bSdmYBzhUtkwfYyxLX507KKsr80MIEhSI/rOs
+ dGg9T5DOfCHhiyiWybiiWxqXOma0w+QTfSPV81/JiJXkX0kJ39C7xr6aIGc7GwxUc0S+
+ FVMA2mc9zRUs5jK1NSgHTpRjgo9xMaNYQLUotPd8ud53VvsNZE0SyFQFmJIyQBN4fqBV
+ ZMVHzvXKYDNup78wGwE+Huteng1cXDxxcQz7xLstosv8Whh+96Zdqm9vW74sMAlGUYjy UQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u4usu81eq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 03 Nov 2023 06:41:37 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A36fbQI015884;
+	Fri, 3 Nov 2023 06:41:37 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u4usu81ed-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 03 Nov 2023 06:41:37 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A34mAH7019876;
+	Fri, 3 Nov 2023 06:41:36 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u1d104bsv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 03 Nov 2023 06:41:36 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A36fXTH12452478
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 3 Nov 2023 06:41:33 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 655972004F;
+	Fri,  3 Nov 2023 06:41:33 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2666D2004B;
+	Fri,  3 Nov 2023 06:41:33 +0000 (GMT)
+Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  3 Nov 2023 06:41:33 +0000 (GMT)
+From: Nico Boehr <nrb@linux.ibm.com>
+To: frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v1 0/2] s390x: Align SIE tests to 2GB
+Date: Fri,  3 Nov 2023 07:35:45 +0100
+Message-ID: <20231103064132.11358-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231027182217.3615211-10-seanjc@google.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: gd8iw99YXe8aC0SVZvSdD4wl7KX-7Xa_
+X-Proofpoint-GUID: NcM-d4eR2ldaFfWk7fPHPavI8LddE64f
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-03_06,2023-11-02_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
+ clxscore=1015 suspectscore=0 phishscore=0 impostorscore=0 malwarescore=0
+ spamscore=0 mlxlogscore=999 lowpriorityscore=0 priorityscore=1501
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311030053
 
-On Fri, Oct 27, 2023 at 11:21:51AM -0700, Sean Christopherson wrote:
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6723,6 +6723,26 @@ array field represents return values. The userspace should update the return
->  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
->  spec refer, https://github.com/riscv/riscv-sbi-doc.
->  
-> +::
-> +
-> +		/* KVM_EXIT_MEMORY_FAULT */
-> +		struct {
-> +			__u64 flags;
-> +			__u64 gpa;
-> +			__u64 size;
-> +		} memory;
-                  ^
+Some environments on s390x require guests to be aligned to 2GB. This is a
+problem when kvm-unit-tests act as a hypervisor, since guests run with MSO/MSL
+there and guest memory doesn't satisfy this requirement.
 
-Should update to "memory_fault" to align with other places.
+This series ensures kvm-unit-tests fulfills the 2G alignment requirement.
 
-[...]
+Note that this currently breaks the mvpg-sie test case under KVM due to prefix
+issues, a fix is due for upstream submission.
 
-> @@ -520,6 +521,12 @@ struct kvm_run {
->  #define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
->  			__u32 flags;
->  		} notify;
-> +		/* KVM_EXIT_MEMORY_FAULT */
-> +		struct {
-> +			__u64 flags;
-> +			__u64 gpa;
-> +			__u64 size;
-> +		} memory_fault;
->  		/* Fix the size of the union. */
->  		char padding[256];
->  	};
+Nico Boehr (2):
+  s390x: spec_ex-sie: refactor to use snippet API
+  s390x: sie: ensure guests are aligned to 2GB
 
-Thanks,
-Yilun
+ lib/s390x/sie.c     | 42 ++++++++++++++++++++++++++++++++++++++++++
+ lib/s390x/sie.h     |  2 ++
+ lib/s390x/snippet.h |  9 +++------
+ s390x/sie.c         |  4 ++--
+ s390x/spec_ex-sie.c | 13 ++++++-------
+ 5 files changed, 55 insertions(+), 15 deletions(-)
 
-> 
+-- 
+2.41.0
+
 
