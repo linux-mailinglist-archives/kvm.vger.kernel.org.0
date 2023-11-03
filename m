@@ -1,73 +1,73 @@
-Return-Path: <kvm+bounces-490-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-491-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 658FF7E0406
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 14:53:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5621D7E0415
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 14:56:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 880331C20FEB
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 13:53:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1237B21461
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 13:56:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F0D18640;
-	Fri,  3 Nov 2023 13:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8294A18643;
+	Fri,  3 Nov 2023 13:56:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="InwBEG5L"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AGauV5Lt"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FCAC18623
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 13:53:24 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 317851BC;
-	Fri,  3 Nov 2023 06:53:23 -0700 (PDT)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3DeZRM010431;
-	Fri, 3 Nov 2023 13:53:22 GMT
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9070B18623
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 13:56:34 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43FF0B7;
+	Fri,  3 Nov 2023 06:56:33 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3ClQ8t002546;
+	Fri, 3 Nov 2023 13:56:33 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=MMH8ozRwp4kh/XUcdVpIxPzJwLfnq/jGVaKV2ar6qsU=;
- b=InwBEG5LdWsQdu5eRqaRnhF1KB9qJiXFfpMTLhwZr+luen43R3wpI5KUYMDueuZ7boO+
- 1Q6j1SZXGqHVtHIKtmfJkUL439TB3vROdHhZgiyP5eujNoDRUOV3yT43+sgPfxy/ctWq
- 3WbwjnBpOQetKbxbYOiiT6fRsZcuINQNogSRoigKpOP6MapAdNXyBScz0aHy8frL3Vzp
- qcJXIUMnyAyTq5Ez2c79bNHQtZZBoOHH3t7DzdTIOZNh1jz7Dcbi6NS9BVGiVF/5GRaf
- FvRMGFy0iivXBRoPiFzCS83FrxcNwdgzkIRL6luyV8DpzQl/Z3l/8gN/4nqTPycAgxBB qA== 
+ bh=B7q15ReZ4I9jvhU4A6rPizlDdaoYtGmeCk5A8qEYxu8=;
+ b=AGauV5Lts8NMH8uMzRM05lvw1FELWa/CvRSbYXVXJe4uXEYz7HQbm/nJsz6RyvbGRZOC
+ QZzpFNdmtRpHSp2iA5qVjRk5ROJHYqATy9yPUIX4DZIwugd6k7HyFJKoNIdODckn99QN
+ JO4lfZG/ix+VYgccucOxdlQhzClMIoZ9OW4/ShA7qaEwBdgday7S/OX7cdD8/Xkd5LXU
+ +DySEzZfQYVjQ/gw8UsaYnsfVPNQp8CS0S4OareQji4BrK0jC9jXwmQUzBpiHRb5RSvH
+ JfOkczNUYr5AkC2OWPZdQz/qIHl6tRri4Vi7gw11O/RVajZrP7V5qp+EUegyTDrMcdib iA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u51y1gg4k-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u5160tvqb-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 13:53:22 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A3DeoxV011289;
-	Fri, 3 Nov 2023 13:53:21 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u51y1gg46-1
+	Fri, 03 Nov 2023 13:56:32 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A3Dl33v009909;
+	Fri, 3 Nov 2023 13:56:32 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u5160tvpn-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 13:53:21 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3DRARX031403;
-	Fri, 3 Nov 2023 13:53:21 GMT
+	Fri, 03 Nov 2023 13:56:32 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3D9inO011286;
+	Fri, 3 Nov 2023 13:56:30 GMT
 Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u1fb2nsfh-1
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u1euknxkw-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 13:53:21 +0000
+	Fri, 03 Nov 2023 13:56:30 +0000
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A3DrIt445482598
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A3DuRR140894768
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 3 Nov 2023 13:53:18 GMT
+	Fri, 3 Nov 2023 13:56:27 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0B8C52004B;
-	Fri,  3 Nov 2023 13:53:18 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id A492520049;
+	Fri,  3 Nov 2023 13:56:27 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ACFBD20049;
-	Fri,  3 Nov 2023 13:53:17 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 4A9B02004B;
+	Fri,  3 Nov 2023 13:56:27 +0000 (GMT)
 Received: from [9.171.0.100] (unknown [9.171.0.100])
 	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  3 Nov 2023 13:53:17 +0000 (GMT)
-Message-ID: <908915d7-d782-4358-9937-bcdba8db0450@linux.ibm.com>
-Date: Fri, 3 Nov 2023 14:53:17 +0100
+	Fri,  3 Nov 2023 13:56:27 +0000 (GMT)
+Message-ID: <a5df2213-0afc-4cbd-a86d-0b9c717675dd@linux.ibm.com>
+Date: Fri, 3 Nov 2023 14:56:26 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,13 +75,13 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v7 5/8] s390x: lib: sie: don't reenter SIE
- on pgm int
+Subject: Re: [kvm-unit-tests PATCH v7 6/8] s390x: add test source dir to
+ include paths
 Content-Language: en-US
 To: Nico Boehr <nrb@linux.ibm.com>, imbrenda@linux.ibm.com, thuth@redhat.com
 Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
 References: <20231103092954.238491-1-nrb@linux.ibm.com>
- <20231103092954.238491-6-nrb@linux.ibm.com>
+ <20231103092954.238491-7-nrb@linux.ibm.com>
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; keydata=
  xsFNBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -125,42 +125,54 @@ Autocrypt: addr=frankja@linux.ibm.com; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20231103092954.238491-6-nrb@linux.ibm.com>
+In-Reply-To: <20231103092954.238491-7-nrb@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: UCsurSuMnvkj4RWPbgOmhQvncqMF6r09
-X-Proofpoint-ORIG-GUID: k24Q-uYUYubyi6vBvnYS8OYQMheaX7jr
+X-Proofpoint-ORIG-GUID: qwEvbZgZ1zAAKhVuF9EXsXaV2usp1IW-
+X-Proofpoint-GUID: r9FBiYpvfRStEzZ49Ji4lrrthyeUjPDu
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-11-03_12,2023-11-02_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- lowpriorityscore=0 mlxlogscore=239 priorityscore=1501 spamscore=0
- impostorscore=0 suspectscore=0 phishscore=0 bulkscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311030116
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ spamscore=0 clxscore=1015 impostorscore=0 mlxscore=0 bulkscore=0
+ mlxlogscore=999 lowpriorityscore=0 malwarescore=0 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311030117
 
 On 11/3/23 10:29, Nico Boehr wrote:
-> At the moment, when a PGM int occurs while in SIE, we will just reenter
-> SIE after the interrupt handler was called.
+> Sometimes, it is useful to share some defines between a snippet and a
+> test. By adding the source directory to include paths, header files can
+> be placed in the snippet directory and included from the test (or vice
+> versa).
 > 
-> This is because sie() has a loop which checks icptcode and re-enters SIE
-> if it is zero.
-> 
-> However, this behaviour is quite undesirable for SIE tests, since it
-> doesn't give the host the chance to assert on the PGM int. Instead, we
-> will just re-enter SIE, on nullifing conditions even causing the
-> exception again.
-> 
-> In sie(), check whether a pgm int code is set in lowcore. If it has,
-> exit the loop so the test can react to the interrupt. Add a new function
-> read_pgm_int_code() to obtain the interrupt code.
-> 
-> Note that this introduces a slight oddity with sie and pgm int in
-> certain cases: If a PGM int occurs between a expect_pgm_int() and sie(),
-> we will now never enter SIE until the pgm_int_code is cleared by e.g.
-> clear_pgm_int().
+> This is a prerequisite for "s390x: add a test for SIE without MSO/MSL".
 
-Is there any use in NOT having an assert(!read_pgm_int_code()) before 
-entering the loop?
+"This is a prerequisite for future tests."
+
+I'd never directly reference a future commit.
+
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   s390x/Makefile | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 6e967194ae0d..947a4344738f 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -67,7 +67,7 @@ test_cases: $(tests)
+>   test_cases_binary: $(tests_binary)
+>   test_cases_pv: $(tests_pv_binary)
+>   
+> -INCLUDE_PATHS = $(SRCDIR)/lib $(SRCDIR)/lib/s390x
+> +INCLUDE_PATHS = $(SRCDIR)/lib $(SRCDIR)/lib/s390x $(SRCDIR)/s390x
+>   # Include generated header files (e.g. in case of out-of-source builds)
+>   INCLUDE_PATHS += lib
+>   CPPFLAGS = $(addprefix -I,$(INCLUDE_PATHS))
+
 
