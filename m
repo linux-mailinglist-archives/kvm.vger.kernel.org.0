@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-522-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-523-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A921E7E0839
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 19:34:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 683CD7E0842
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 19:36:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 974E5281F49
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 18:34:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5BB1B212E4
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 18:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75704224FD;
-	Fri,  3 Nov 2023 18:34:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 209E1224EE;
+	Fri,  3 Nov 2023 18:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L+YarWT0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D959QSyO"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1C56224EE
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 18:34:31 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C8DAD67
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 11:34:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB65224D1
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 18:36:24 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57B4CD47
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 11:36:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699036465;
+	s=mimecast20190719; t=1699036582;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=DV/S7omvhbYwHDnUY6vpZhv1/f8zjD3mp2JOTCN8Wks=;
-	b=L+YarWT0en3Wq2bmLPxSh2mLNI1zjqiimsc5jupgDMWOzwtMMYQguPcY/EZk4zE3+CjuoA
-	zML8NtpaiYBcu9+yac1GaOA4kjPeL96Ij0FzvcWQg08Hp3J3DoFvwfUC+P6CDe6bsxL1hP
-	20VtM3P+bXMr8hfu8BSbGxS7bYq5dps=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=hSth+EszIudR/gy5W5ptyhOsalHykaDyVCa9TwHuWQg=;
+	b=D959QSyOOfYFopr+hqYO9PvXwMqI6p6goNsJhaVvQ9A9mQd3TigA6cmaj5gWJFsn71YAcC
+	Nf9oP9bsOo6CaU/8qrAMJD5wlzDJ90cBNsr1Qe00BqW6uMjP/4kr+xmmZQlIDMrmHGcgsR
+	ZnBQH42abzdEi1RVaFrz+U2SxDND854=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-675-YQyhD_-vOfuJTe_2QCeAdQ-1; Fri, 03 Nov 2023 14:34:24 -0400
-X-MC-Unique: YQyhD_-vOfuJTe_2QCeAdQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40837aa4a58so15855945e9.0
-        for <kvm@vger.kernel.org>; Fri, 03 Nov 2023 11:34:23 -0700 (PDT)
+ us-mta-36-wuptPJRxNkeoFRZa9UXYBg-1; Fri, 03 Nov 2023 14:36:21 -0400
+X-MC-Unique: wuptPJRxNkeoFRZa9UXYBg-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-32f8371247fso1139373f8f.2
+        for <kvm@vger.kernel.org>; Fri, 03 Nov 2023 11:36:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699036463; x=1699641263;
+        d=1e100.net; s=20230601; t=1699036580; x=1699641380;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DV/S7omvhbYwHDnUY6vpZhv1/f8zjD3mp2JOTCN8Wks=;
-        b=digC0NGhIRS5fA47RTqUsSUlfO69sP08ukmeX/ar7LsVva1LE2+LyPqQ5YpfIlo1G8
-         KvEUGWPkq2BidfwanhdJjDfJ+gUsyAW9wjv0WvAXQ0AUujgZENqUJq4l+TsUUYzLS/VC
-         Hd8G2F9k6H5JPw9IanUQVIw8zJ+yJGAREKHINHC51RsaCcotJg97OelIlrTq5RpQlO6Q
-         E9iXs2sSrdGitd0paoxafWXwRRR6PX7fGcnufszxu2z4MwDbIi6xAHTj+WYlxxWuSYog
-         aWPpo6FqFHZnViv0o4R93k6Y3Dr0xWJJq2qheluhqPTQh1BML4DxSDh43aknV1ymgF/w
-         I8bg==
-X-Gm-Message-State: AOJu0YzF0YwQaa+OOjRjsglv4HXtIFhecsvENAiQd300DHUZRNpgv7PT
-	bEX3LL1LnGXUMtCKzH9Dp4KDe8hLKLTZafaW9sdTA1P9p3gzmpdFbT7ANpAAo0n2p0rRgHTrIlo
-	F7hzOQxWdFd9X
-X-Received: by 2002:a05:600c:45c7:b0:408:33ba:569a with SMTP id s7-20020a05600c45c700b0040833ba569amr3931088wmo.8.1699036462909;
-        Fri, 03 Nov 2023 11:34:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFyc4iwNN/kw5lj/CPevnsornB6J2TBuuGtLonHd599AUj7KWLDowZbKt4+1pFfFurjpot9XA==
-X-Received: by 2002:a05:600c:45c7:b0:408:33ba:569a with SMTP id s7-20020a05600c45c700b0040833ba569amr3931068wmo.8.1699036462450;
-        Fri, 03 Nov 2023 11:34:22 -0700 (PDT)
+        bh=hSth+EszIudR/gy5W5ptyhOsalHykaDyVCa9TwHuWQg=;
+        b=smRKjXFo5BEC3siNHNZtgxXh/U02Y1rqqLj129c10D1MIz9zWJ51WxzBJ6B6/WTmf4
+         Jvi1ZGm28n82vcqKMop7ui/VC5PzlDOai6BgwTb9ZR/pcGxWgGUFyQ2TcXkfpGt/PfH8
+         f9u17hv5MvbeumnngGrfJRXDExeJlK0CDP18pB2Q/8O1v55Pm+485KCdVynYnokg4/Gp
+         0VFO9TXdhYptmfqk0LQlEjAdllsFcScXGgS/+dtrHBOFcfjjPeikAqxWtcw8BMXcWiC9
+         Qf71F+cuuMzK5QALOYd5P+0GcVpPxDglj1sDoMAOdBCNuAG++R5HHT9kysKhgsmxRftv
+         12RQ==
+X-Gm-Message-State: AOJu0YwVNB+2M0dt+VJjz0YxsAD1SWsAn3DHtz8xmLG579z3EyYw5dEr
+	LWqVxZj+kkaxxYXT5/khAV1VKwCauLbGHfBeOXdyb8t1cTaJ1uMwlMcmwIbjst2ve3tLszNhFB+
+	W+z7mTojS8Q41
+X-Received: by 2002:a5d:4c45:0:b0:32d:9a20:c9e0 with SMTP id n5-20020a5d4c45000000b0032d9a20c9e0mr17255175wrt.61.1699036580256;
+        Fri, 03 Nov 2023 11:36:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEVlXPpTzGahw+e056z2LWKjOknCHazYzIzJSaGYfmGbP/8167CjCfjVfY4q+Fm5b+omyS6wQ==
+X-Received: by 2002:a5d:4c45:0:b0:32d:9a20:c9e0 with SMTP id n5-20020a5d4c45000000b0032d9a20c9e0mr17255152wrt.61.1699036579835;
+        Fri, 03 Nov 2023 11:36:19 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c70a:a600:bc48:cd31:d01f:f468? (p200300cbc70aa600bc48cd31d01ff468.dip0.t-ipconnect.de. [2003:cb:c70a:a600:bc48:cd31:d01f:f468])
-        by smtp.gmail.com with ESMTPSA id er14-20020a05600c84ce00b0040472ad9a3dsm3182989wmb.14.2023.11.03.11.34.21
+        by smtp.gmail.com with ESMTPSA id s8-20020a5d6a88000000b0032fbd0c7d04sm1413468wru.55.2023.11.03.11.36.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Nov 2023 11:34:22 -0700 (PDT)
-Message-ID: <c05841de-d1d9-406b-a143-f1e3662d99b9@redhat.com>
-Date: Fri, 3 Nov 2023 19:34:21 +0100
+        Fri, 03 Nov 2023 11:36:19 -0700 (PDT)
+Message-ID: <4c3cec3c-da81-426c-815b-afee1de68947@redhat.com>
+Date: Fri, 3 Nov 2023 19:36:18 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -74,20 +74,21 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/4] KVM: s390: vsie: Fix length of facility list shadowed
+Subject: Re: [PATCH 3/4] KVM: s390: cpu model: Use previously unused constant
 Content-Language: en-US
 To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
  Alexander Gordeev <agordeev@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Cornelia Huck <cornelia.huck@de.ibm.com>,
+ Michael Mueller <mimu@linux.vnet.ibm.com>,
  Christian Borntraeger <borntraeger@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <dahi@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, linux-s390@vger.kernel.org,
- Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Michael Mueller <mimu@linux.vnet.ibm.com>
+ Vasily Gorbik <gor@linux.ibm.com>, Claudio Imbrenda
+ <imbrenda@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+ David Hildenbrand <dahi@linux.vnet.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>,
+ kvm@vger.kernel.org, linux-s390@vger.kernel.org
 References: <20231103173008.630217-1-nsg@linux.ibm.com>
- <20231103173008.630217-3-nsg@linux.ibm.com>
+ <20231103173008.630217-4-nsg@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -134,85 +135,18 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20231103173008.630217-3-nsg@linux.ibm.com>
+In-Reply-To: <20231103173008.630217-4-nsg@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 03.11.23 18:30, Nina Schoetterl-Glausch wrote:
-> The length of the facility list accessed when interpretively executing
-> STFLE is the same as the hosts facility list (in case of format-0)
-> When shadowing, copy only those bytes.
-> The memory following the facility list need not be accessible, in which
-> case we'd wrongly inject a validity intercept.
-> 
-> Fixes: 66b630d5b7f2 ("KVM: s390: vsie: support STFLE interpretation")
-> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> ---
->   arch/s390/include/asm/facility.h |  6 ++++++
->   arch/s390/kernel/Makefile        |  2 +-
->   arch/s390/kernel/facility.c      | 18 ++++++++++++++++++
->   arch/s390/kvm/vsie.c             | 12 +++++++++++-
->   4 files changed, 36 insertions(+), 2 deletions(-)
->   create mode 100644 arch/s390/kernel/facility.c
-> 
-> diff --git a/arch/s390/include/asm/facility.h b/arch/s390/include/asm/facility.h
-> index 94b6919026df..796007125dff 100644
-> --- a/arch/s390/include/asm/facility.h
-> +++ b/arch/s390/include/asm/facility.h
-> @@ -111,4 +111,10 @@ static inline void stfle(u64 *stfle_fac_list, int size)
->   	preempt_enable();
->   }
->   
-> +/**
-> + * stfle_size - Actual size of the facility list as specified by stfle
-> + * (number of double words)
-> + */
-> +unsigned int stfle_size(void);
-> +
->   #endif /* __ASM_FACILITY_H */
-> diff --git a/arch/s390/kernel/Makefile b/arch/s390/kernel/Makefile
-> index 0df2b88cc0da..0daa81439478 100644
-> --- a/arch/s390/kernel/Makefile
-> +++ b/arch/s390/kernel/Makefile
-> @@ -41,7 +41,7 @@ obj-y	+= sysinfo.o lgr.o os_info.o
->   obj-y	+= runtime_instr.o cache.o fpu.o dumpstack.o guarded_storage.o sthyi.o
->   obj-y	+= entry.o reipl.o kdebugfs.o alternative.o
->   obj-y	+= nospec-branch.o ipl_vmparm.o machine_kexec_reloc.o unwind_bc.o
-> -obj-y	+= smp.o text_amode31.o stacktrace.o abs_lowcore.o
-> +obj-y	+= smp.o text_amode31.o stacktrace.o abs_lowcore.o facility.o
->   
->   extra-y				+= vmlinux.lds
->   
-> diff --git a/arch/s390/kernel/facility.c b/arch/s390/kernel/facility.c
-> new file mode 100644
-> index 000000000000..c33a95a562da
-> --- /dev/null
-> +++ b/arch/s390/kernel/facility.c
-> @@ -0,0 +1,18 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright IBM Corp. 2023
-> + */
-> +
-> +#include <asm/facility.h>
-> +
-> +unsigned int stfle_size(void)
-> +{
-> +	static unsigned int size = 0;
-> +	u64 dummy;
-> +
-> +	if (!size) {
-> +		size = __stfle_asm(&dummy, 1) + 1;
-> +	}
-> +	return size;
-> +}
-> +EXPORT_SYMBOL(stfle_size);
+> No point in defining a size for the mask if we're not going to use it.
 
-Possible races? Should have to use an atomic?
+I neither understand the patch description nor what the bug is that is 
+being fixed (and how that description relates to the patch 
+subject+description).
 
-No access to documentation, but sounds plausible.
-
-Acked-by: David Hildenbrand <david@redhat.com>
+Please improve the patch description.
 
 -- 
 Cheers,
