@@ -1,258 +1,182 @@
-Return-Path: <kvm+bounces-519-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-520-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B18D7E07D9
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 18:56:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E80B37E07E6
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 19:03:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2770A1C210AB
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 17:56:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42C36281CC3
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 18:03:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A57D22EF9;
-	Fri,  3 Nov 2023 17:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D061321342;
+	Fri,  3 Nov 2023 18:03:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FjeJPHgS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MuHx6ToR"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D6F225A4;
-	Fri,  3 Nov 2023 17:56:02 +0000 (UTC)
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC09B1BD;
-	Fri,  3 Nov 2023 10:56:00 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-9d224dca585so354913066b.1;
-        Fri, 03 Nov 2023 10:56:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED8718626
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 18:03:11 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F17C41B9
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 11:03:09 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-da04fb79246so2704118276.2
+        for <kvm@vger.kernel.org>; Fri, 03 Nov 2023 11:03:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699034159; x=1699638959; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ANnfbv1oGkDpEz/e45pUqxbq4vbbI9kV1Jy9Nq/Lv90=;
-        b=FjeJPHgSk67T50NWxh5D7atfWqnCvkgvtcY+QMr54VoYRV4tu44oDD4kVvzXWV/PCH
-         HcabX/RFYUe1Uiye4O/Ki1hsOoyCIEGUziDt2Y3NW+oAaY1N2i7WeU4so88gZGpmvXgF
-         Uu9/y/XmPLxG5uMLVxC9X4SzxBCQNeOL/Bo6b8JSJ7o3ON8fHnhWuFgWiuP1rYR5kLVm
-         sze6i0vI79Lf4+xNHFUE9Sten0Et/pQoue3bHo6PUhULDY1RKpCbvRpJDwIXhzV4u8rQ
-         IXjkiD2uK8q7rR+fjmImY4OjfwYMCz3ny/E15mnV/kiaXREvUAlkONxj9lqk/AbNIDuq
-         oq9w==
+        d=google.com; s=20230601; t=1699034589; x=1699639389; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yOW9lJ/pb/LNUWLip6vU1IMGdPjrtEEEy/T6WmZb0ws=;
+        b=MuHx6ToRr9TAkxyM5dcLrxh5PWM/ET52FZ38tbYhn8Bf9Nor2QjlAjlCenK7hvnJo9
+         JFYrW2zPioF0uDs+vLURWTrcyOhS9mSt+qhH6s27LL/VtM7SWXAUFl1BjWPQ2I40I9U/
+         5eoM4Kz0mflCnnLB7WCC6zOzrHYFZUrPg/HTgKsuM6ScMZFMQTCSzKN1Zl/hueufHqkd
+         W+VqQyW7gGE7qMniyblzpMdgYYZ1hX7efGo338vx+NfnqdcGyUAitd357s3oW5n5Ffxf
+         2KcFaJVgiJ8ZmiMStoAiqS993dZpX4K8twQ9IinN2XPer7QkZOZWgy3H+mrdq7fUFgYN
+         hD8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699034159; x=1699638959;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ANnfbv1oGkDpEz/e45pUqxbq4vbbI9kV1Jy9Nq/Lv90=;
-        b=L6bw9ebbSWSX42T3KHT9LgoxrStV0bbJk/e7rCo5YxriySh2NNPSwP6IDQDJJ/H7Ja
-         M/IrJ9OjhOFqvc8LMGAEv1ojD7PcutQXU7MvBOtG8XNhgcU2ZXDcXPrwodghRldszvtB
-         fHXso4kn0/TIM58Z1Xot8sFtSI+snZqxnyikWKAtHhUJBCrWTNXfDSsM3umeygFUaXQF
-         8ZZpzdXzQwZhcWC8/lWOYNPrulgTThxek90MsDlxQZyuncmIlVwrM0eHBeocBQDKjeqj
-         XCombZlvgsP/mmUIZdRZ2fLJRwaNaM7QclplKcg2qhf2riqCgieDgww5Eyx+r9h0PhqB
-         ZV+Q==
-X-Gm-Message-State: AOJu0YwO6CCTYBHfpg3Q3nHmzKN/FqBliwM59qq4FFdeeGZNxek1c75K
-	pzja79DiMmyxp/H7L/1n6LY=
-X-Google-Smtp-Source: AGHT+IG+Ba5CGONVICNPRhtchYsMjNYT5WbIR+O63L72F5/7sEGvOVu44gBRrmbNu6Mhg9TmbQSthA==
-X-Received: by 2002:a17:907:72c2:b0:9ad:c763:bc7a with SMTP id du2-20020a17090772c200b009adc763bc7amr8200301ejc.23.1699034159044;
-        Fri, 03 Nov 2023 10:55:59 -0700 (PDT)
-Received: from fedora.. (host-62-211-113-16.retail.telecomitalia.it. [62.211.113.16])
-        by smtp.gmail.com with ESMTPSA id wj6-20020a170907050600b009ddf1a84379sm80306ejb.51.2023.11.03.10.55.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Nov 2023 10:55:58 -0700 (PDT)
-From: f.storniolo95@gmail.com
-To: luigi.leonardi@outlook.com,
-	kvm@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	mst@redhat.com,
-	imbrenda@linux.vnet.ibm.com,
-	kuba@kernel.org,
-	asias@redhat.com,
-	stefanha@redhat.com,
-	pabeni@redhat.com,
-	sgarzare@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	Filippo Storniolo <f.storniolo95@gmail.com>
-Subject: [PATCH net 4/4] test/vsock: add dobule bind connect test
-Date: Fri,  3 Nov 2023 18:55:51 +0100
-Message-ID: <20231103175551.41025-5-f.storniolo95@gmail.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231103175551.41025-1-f.storniolo95@gmail.com>
-References: <20231103175551.41025-1-f.storniolo95@gmail.com>
+        d=1e100.net; s=20230601; t=1699034589; x=1699639389;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yOW9lJ/pb/LNUWLip6vU1IMGdPjrtEEEy/T6WmZb0ws=;
+        b=SiYDRRbU15JFC4hQE41RVVGLxoFjp6pFacf3+sRZtg+bOMeafsF3U3eHWwb+JfKZHQ
+         i5nMRhSUoGRSh0/wMSU+OuCbgS3vILKDlerXbYFWmhYRdDRSTsqWkyHaX+sEKve8/isC
+         VNHAZEyuvGWEG/LnqGBgumjz97lgUSK8rtZigFYt258vSfUGBCZvx/uGf7y1CYHhZUbr
+         ChKSt69xIkWahZD9JWVt69i995mskE766SBrqn2zQ6lAwYoKXww4nHzGZoC/WV3lS8e+
+         OXi+e/VmJ67fzXmNri+85qfClRAUb1ZpAoKXX0RhNfzLMtG5UelJTkFfhPuxmyVBRlNT
+         IPug==
+X-Gm-Message-State: AOJu0Yy9lIpbbkimPCI+bzYGc24Py3t7gouVa5Fu60yb6+n97e9t+Jmd
+	nSsKfhjp7eFxv3nRv3nBQGX4WyDij+E=
+X-Google-Smtp-Source: AGHT+IGSBg/O3LivVPjS+v6jcL60T1QSIGTzrjd2zPs8MafiMCI1rYqG76LlWrYEwyavu5jHKMZUEChBZaY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:4dc2:0:b0:d9c:bdff:e45a with SMTP id
+ a185-20020a254dc2000000b00d9cbdffe45amr380948ybb.12.1699034589126; Fri, 03
+ Nov 2023 11:03:09 -0700 (PDT)
+Date: Fri, 3 Nov 2023 11:03:07 -0700
+In-Reply-To: <CALMp9eQkWtfppw2XemFpf2WT7PPpvPTuBjjmGbR6RP_i9mCENQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20231031090613.2872700-2-dapeng1.mi@linux.intel.com>
+ <CALMp9eR_BFdNNTXhSpbuH66jXcRLVB8VvD8V+kY245NbusN2+g@mail.gmail.com>
+ <c3f0e4ac-1790-40c1-a09e-209a09e3d230@linux.intel.com> <CALMp9eTDAiJ=Kuh7KkwdAY8x1BL2ZjdgFiPFRHXSSVCpcXp9rw@mail.gmail.com>
+ <baa64cf4-11de-4581-89b6-3a86448e3a6e@linux.intel.com> <a14147e7-0b35-4fba-b785-ef568474c69b@linux.intel.com>
+ <85706bd7-7df0-4d4b-932c-d807ddb14f9e@linux.intel.com> <CALMp9eS3NdTUnRrYPB+mMoGKj5NnsYXNUfUJX8Gv=wWCN4dkoQ@mail.gmail.com>
+ <2004baa6-b494-462c-a11f-8104ea152c6a@linux.intel.com> <CALMp9eQkWtfppw2XemFpf2WT7PPpvPTuBjjmGbR6RP_i9mCENQ@mail.gmail.com>
+Message-ID: <ZUU12-TUR_1cj47u@google.com>
+Subject: Re: [Patch 1/2] KVM: x86/pmu: Add Intel CPUID-hinted TopDown slots event
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Kan Liang <kan.liang@linux.intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Zhenyu Wang <zhenyuw@linux.intel.com>, Zhang Xiong <xiong.y.zhang@intel.com>, 
+	Mingwei Zhang <mizhang@google.com>, Like Xu <like.xu.linux@gmail.com>, 
+	Dapeng Mi <dapeng1.mi@intel.com>, Like Xu <likexu@tencent.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Filippo Storniolo <f.storniolo95@gmail.com>
+On Fri, Nov 03, 2023, Jim Mattson wrote:
+> On Fri, Nov 3, 2023 at 8:13=E2=80=AFAM Liang, Kan <kan.liang@linux.intel.=
+com> wrote:
+> >
+> >
+> >
+> > On 2023-11-02 1:45 p.m., Jim Mattson wrote:
+> > > On Wed, Nov 1, 2023 at 7:07=E2=80=AFPM Mi, Dapeng <dapeng1.mi@linux.i=
+ntel.com> wrote:
+> > >>
+> > >>
+> > >> On 11/1/2023 9:33 PM, Liang, Kan wrote:
+> > >>>
+> > >>> On 2023-10-31 11:31 p.m., Mi, Dapeng wrote:
+> > >>>> On 11/1/2023 11:04 AM, Jim Mattson wrote:
+> > >>>>> On Tue, Oct 31, 2023 at 6:59=E2=80=AFPM Mi, Dapeng
+> > >>>>> <dapeng1.mi@linux.intel.com> wrote:
+> > >>>>>> On 11/1/2023 2:22 AM, Jim Mattson wrote:
+> > >>>>>>> On Tue, Oct 31, 2023 at 1:58=E2=80=AFAM Dapeng Mi
+> > >>>>>>> <dapeng1.mi@linux.intel.com> wrote:
+> > >>>>>>>> This patch adds support for the architectural topdown slots ev=
+ent
+> > >>>>>>>> which
+> > >>>>>>>> is hinted by CPUID.0AH.EBX.
+> > >>>>>>> Can't a guest already program an event selector to count event =
+select
+> > >>>>>>> 0xa4, unit mask 1, unless the event is prohibited by
+> > >>>>>>> KVM_SET_PMU_EVENT_FILTER?
+> > >>>>>> Actually defining this new slots arch event is to do the sanity =
+check
+> > >>>>>> for supported arch-events which is enumerated by CPUID.0AH.EBX.
+> > >>>>>> Currently vPMU would check if the arch event from guest is suppo=
+rted by
+> > >>>>>> KVM. If not, it would be rejected just like intel_hw_event_avail=
+able()
+> > >>>>>> shows.
+> > >>>>>>
+> > >>>>>> If we don't add the slots event in the intel_arch_events[] array=
+, guest
+> > >>>>>> may program the slots event and pass the sanity check of KVM on =
+a
+> > >>>>>> platform which actually doesn't support slots event and program =
+the
+> > >>>>>> event on a real GP counter and got an invalid count. This is not
+> > >>>>>> correct.
+> > >>>>> On physical hardware, it is possible to program a GP counter with=
+ the
+> > >>>>> event selector and unit mask of the slots event whether or not th=
+e
+> > >>>>> platform supports it. Isn't KVM wrong to disallow something that =
+a
+> > >>>>> physical CPU allows?
+> > >>>>
+> > >>>> Yeah, I agree. But I'm not sure if this is a flaw on PMU driver. I=
+f an
+> > >>>> event is not supported by the hardware,  we can't predict the PMU'=
+s
+> > >>>> behavior and a meaningless count may be returned and this could mi=
+slead
+> > >>>> the user.
+> > >>> The user can program any events on the GP counter. The perf doesn't
+> > >>> limit it. For the unsupported event, 0 should be returned. Please k=
+eep
+> > >>> in mind, the event list keeps updating. If the kernel checks for ea=
+ch
+> > >>> event, it could be a disaster. I don't think it's a flaw.
+> > >>
+> > >>
+> > >> Thanks Kan, it would be ok as long as 0 is always returned for
+> > >> unsupported events. IMO, it's a nice to have feature that KVM does t=
+his
+> > >> sanity check for supported arch events, it won't break anything.
+> > >
+> > > The hardware PMU most assuredly does not return 0 for unsupported eve=
+nts.
+> > >
+> > > For example, if I use host perf to sample event selector 0xa4 unit
+> > > mask 1 on a Broadwell host (406f1), I get...
+> >
+> > I think we have different understanding about the meaning of the
+> > "unsupported". There is no enumeration of the Architectural Topdown
+> > Slots, which only means the Topdown Slots/01a4 is not an architectural
+> > event on the platform. It doesn't mean that the event encoding is
+> > unsupported. It could be used by another event, especially on the
+> > previous platform.
+>=20
+> If the same event encoding could be used by a microarchitectural event
+> on a prior platform, then it is *definitely* wrong for KVM to refuse
+> to monitor the event just because it isn't enumerated as a supported
+> architectural event.
 
-This add bind connect test which creates a listening server socket
-and tries to connect a client with a bound local port to it twice.
++1000!  Thanks Kan, this is exactly the info we need!
 
-Co-developed-by: Luigi Leonardi <luigi.leonardi@outlook.com>
-Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
-Signed-off-by: Filippo Storniolo <f.storniolo95@gmail.com>
----
- tools/testing/vsock/util.c       | 47 ++++++++++++++++++++++++++++++
- tools/testing/vsock/util.h       |  3 ++
- tools/testing/vsock/vsock_test.c | 50 ++++++++++++++++++++++++++++++++
- 3 files changed, 100 insertions(+)
+I'll add a patch to build on "Always treat Fixed counters as available when
+supported"[*] and rip out intel_hw_event_available().
 
-diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
-index 2fc96f29bdf2..ae2b33c21c45 100644
---- a/tools/testing/vsock/util.c
-+++ b/tools/testing/vsock/util.c
-@@ -85,6 +85,48 @@ void vsock_wait_remote_close(int fd)
- 	close(epollfd);
- }
- 
-+/* Bind to <bind_port>, connect to <cid, port> and return the file descriptor. */
-+int vsock_bind_connect(unsigned int cid, unsigned int port, unsigned int bind_port, int type)
-+{
-+	struct sockaddr_vm sa_client = {
-+		.svm_family = AF_VSOCK,
-+		.svm_cid = VMADDR_CID_ANY,
-+		.svm_port = bind_port,
-+	};
-+	struct sockaddr_vm sa_server = {
-+		.svm_family = AF_VSOCK,
-+		.svm_cid = cid,
-+		.svm_port = port,
-+	};
-+
-+	int client_fd, ret;
-+
-+	client_fd = socket(AF_VSOCK, type, 0);
-+	if (client_fd < 0) {
-+		perror("socket");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (bind(client_fd, (struct sockaddr *)&sa_client, sizeof(sa_client))) {
-+		perror("bind");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	timeout_begin(TIMEOUT);
-+	do {
-+		ret = connect(client_fd, (struct sockaddr *)&sa_server, sizeof(sa_server));
-+		timeout_check("connect");
-+	} while (ret < 0 && errno == EINTR);
-+	timeout_end();
-+
-+	if (ret < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	return client_fd;
-+}
-+
- /* Connect to <cid, port> and return the file descriptor. */
- static int vsock_connect(unsigned int cid, unsigned int port, int type)
- {
-@@ -223,6 +265,11 @@ int vsock_stream_accept(unsigned int cid, unsigned int port,
- 	return vsock_accept(cid, port, clientaddrp, SOCK_STREAM);
- }
- 
-+int vsock_stream_listen(unsigned int cid, unsigned int port)
-+{
-+	return vsock_listen(cid, port, SOCK_STREAM);
-+}
-+
- int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
- 			   struct sockaddr_vm *clientaddrp)
- {
-diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
-index a77175d25864..03c88d0cb861 100644
---- a/tools/testing/vsock/util.h
-+++ b/tools/testing/vsock/util.h
-@@ -36,9 +36,12 @@ struct test_case {
- void init_signals(void);
- unsigned int parse_cid(const char *str);
- int vsock_stream_connect(unsigned int cid, unsigned int port);
-+int vsock_bind_connect(unsigned int cid, unsigned int port,
-+		       unsigned int bind_port, int type);
- int vsock_seqpacket_connect(unsigned int cid, unsigned int port);
- int vsock_stream_accept(unsigned int cid, unsigned int port,
- 			struct sockaddr_vm *clientaddrp);
-+int vsock_stream_listen(unsigned int cid, unsigned int port);
- int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
- 			   struct sockaddr_vm *clientaddrp);
- void vsock_wait_remote_close(int fd);
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index c1f7bc9abd22..5b0e93f9996c 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -1180,6 +1180,51 @@ static void test_stream_shutrd_server(const struct test_opts *opts)
- 	close(fd);
- }
- 
-+static void test_double_bind_connect_server(const struct test_opts *opts)
-+{
-+	int listen_fd, client_fd, i;
-+	struct sockaddr_vm sa_client;
-+	socklen_t socklen_client = sizeof(sa_client);
-+
-+	listen_fd = vsock_stream_listen(VMADDR_CID_ANY, 1234);
-+
-+	for (i = 0; i < 2; i++) {
-+		control_writeln("LISTENING");
-+
-+		timeout_begin(TIMEOUT);
-+		do {
-+			client_fd = accept(listen_fd, (struct sockaddr *)&sa_client,
-+					   &socklen_client);
-+			timeout_check("accept");
-+		} while (client_fd < 0 && errno == EINTR);
-+		timeout_end();
-+
-+		if (client_fd < 0) {
-+			perror("accept");
-+			exit(EXIT_FAILURE);
-+		}
-+
-+		/* Waiting for remote peer to close connection */
-+		vsock_wait_remote_close(client_fd);
-+	}
-+
-+	close(listen_fd);
-+}
-+
-+static void test_double_bind_connect_client(const struct test_opts *opts)
-+{
-+	int i, client_fd;
-+
-+	for (i = 0; i < 2; i++) {
-+		/* Wait until server is ready to accept a new connection */
-+		control_expectln("LISTENING");
-+
-+		client_fd = vsock_bind_connect(opts->peer_cid, 1234, 4321, SOCK_STREAM);
-+
-+		close(client_fd);
-+	}
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -1285,6 +1330,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_stream_msgzcopy_empty_errq_client,
- 		.run_server = test_stream_msgzcopy_empty_errq_server,
- 	},
-+	{
-+		.name = "SOCK_STREAM double bind connect",
-+		.run_client = test_double_bind_connect_client,
-+		.run_server = test_double_bind_connect_server,
-+	},
- 	{},
- };
- 
--- 
-2.41.0
-
+[*] https://lore.kernel.org/all/20231024002633.2540714-4-seanjc@google.com
 
