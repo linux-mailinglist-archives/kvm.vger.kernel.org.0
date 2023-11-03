@@ -1,91 +1,83 @@
-Return-Path: <kvm+bounces-513-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-515-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA64A7E0770
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 18:31:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D851B7E07CE
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 18:56:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68962281EFB
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 17:31:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AE5FB2149C
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 17:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E54F2135C;
-	Fri,  3 Nov 2023 17:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4294D2136F;
+	Fri,  3 Nov 2023 17:55:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SrVzf+ok"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KcmXVTpK"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664F421341
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 17:31:34 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C899013E;
-	Fri,  3 Nov 2023 10:31:32 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3H9OC2002669;
-	Fri, 3 Nov 2023 17:31:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=UsNIhSuDbtYP3OaMXs+2agd2J5yFl9Vo8sEz+w3vziQ=;
- b=SrVzf+ok+1PamAioLd/0etN4xnUuW1ewG7aPQF5paIDUwv2EMc+eMfBvwMeXuC8Q5y/c
- KGVoz2edANb4Gf4+6VA3lzR208P35ssHZsuSZZFsi7mNgiZiPu+GbVSUJXtJflXDPEuQ
- Y4Zu2OcShLugkD80eXG0fi2Q3uzK21eXgyzQnt1oYyIF8dTHcRRMgkmsvsPceZCPorJb
- 5w0keDFdDVYmHWjUBJ8nsWkCvtJjfCffWxfSPQ7fqv0uOJqyhPnWdw+QZSdN6oKTX/QT
- gNGll7kfzD034KpknHXSrVjgPjHtaHc73gsi53OdLmjcA4uvSYFgnVHqj397tq8DbmEX +w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u550x0mby-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 17:31:31 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A3H9lHV004743;
-	Fri, 3 Nov 2023 17:31:31 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u550x0mbn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 17:31:31 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3HLu1K007685;
-	Fri, 3 Nov 2023 17:31:30 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u1dmp7gs1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 17:31:30 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A3HUBe138338974
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 3 Nov 2023 17:30:11 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 172C920040;
-	Fri,  3 Nov 2023 17:30:11 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D00962005A;
-	Fri,  3 Nov 2023 17:30:10 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  3 Nov 2023 17:30:10 +0000 (GMT)
-From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To: Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-Cc: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Cornelia Huck <cornelia.huck@de.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Michael Mueller <mimu@linux.vnet.ibm.com>,
-        David Hildenbrand <dahi@linux.vnet.ibm.com>
-Subject: [PATCH 4/4] KVM: s390: Minor refactor of base/ext facility lists
-Date: Fri,  3 Nov 2023 18:30:08 +0100
-Message-Id: <20231103173008.630217-5-nsg@linux.ibm.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231103173008.630217-1-nsg@linux.ibm.com>
-References: <20231103173008.630217-1-nsg@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991A22D625;
+	Fri,  3 Nov 2023 17:55:56 +0000 (UTC)
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5DE7D44;
+	Fri,  3 Nov 2023 10:55:54 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-54366784377so3785083a12.3;
+        Fri, 03 Nov 2023 10:55:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699034153; x=1699638953; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SelOsO4e7GQx4YbT87ZuQxwsrQ0BMcUUcVqEb+J9ljQ=;
+        b=KcmXVTpKamYccmaCVCqm2XmsgsbX9wCA88bH2cS+o+2rC8hxHo7kbMdZKWbpccEtuE
+         M24Rqman/uZ2iucQMDiJ3LeMk+ju+08itQOSoXk2AUEXZYv+0VhjjO+ZxumfCjV2zm7W
+         txYa1LHqjB1P+kfGStPLDohxSCJzBFmfA8HHuHUsQT/6ZzTxbvsIJPTdfKEUduBgqaSz
+         UJCLGIdNRHvVy8gSUKlK056ZHCaju2scPRctU/WvGpkI9aj/5sRUuT+o3DwFVIbUeEIj
+         Nzft2SA8+6KboxJzveO6uLPdIDjk+mgIV0Ge3Bzc3nDPJxRuyeaJRatTWmcme25V9P3h
+         pRYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699034153; x=1699638953;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SelOsO4e7GQx4YbT87ZuQxwsrQ0BMcUUcVqEb+J9ljQ=;
+        b=pe09NGcLED9mqI0vvk9srZJPpHR1bf42CaQ2M2qgskM2HzvyHv5KF5tJ3wRhuf/gCd
+         ABJZ6gxKGt+OY5dnLhMBk4/qWIBMDfEigO+KNZxGbV6yYxDWIajMFJ13ConzTOSr4eiS
+         lriedq7K82C8OEQ5ZWgyjENQ2AQP3yUPo+sf/0wjpQXEc3vdwNHFQ3dOXWEO7Y2AO2JU
+         oXaklDyBLlX8QYo0aczfPVdfMMwHoEDz6dEUWXb72U1IW6ux7Yi8jw/WhWvgNF+muyye
+         ecLIsfzhQxm8w4pSmjvEtLZaRx/HXFznlQxei40ESq6jjbNdXRiDKKWC23xgyNzvnSVL
+         cBfw==
+X-Gm-Message-State: AOJu0YwdOzTcI2U/K6j57Zsda6VjGOPH/S9jhvIhrvFGj4vGfYaKgxV8
+	9TYPOjWAGFJXPJRVlWAgBlHewKbMQHhpfw==
+X-Google-Smtp-Source: AGHT+IHtBfN5qqilHam3HPfW97af6GjBiqTqanKMhhWgWDVGR9JFL8UGu7zLUnI5jEJnj7wKSgSvCA==
+X-Received: by 2002:a17:906:c14f:b0:9bd:f155:eb54 with SMTP id dp15-20020a170906c14f00b009bdf155eb54mr7760058ejc.6.1699034153179;
+        Fri, 03 Nov 2023 10:55:53 -0700 (PDT)
+Received: from fedora.. (host-62-211-113-16.retail.telecomitalia.it. [62.211.113.16])
+        by smtp.gmail.com with ESMTPSA id wj6-20020a170907050600b009ddf1a84379sm80306ejb.51.2023.11.03.10.55.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Nov 2023 10:55:52 -0700 (PDT)
+From: f.storniolo95@gmail.com
+To: luigi.leonardi@outlook.com,
+	kvm@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	mst@redhat.com,
+	imbrenda@linux.vnet.ibm.com,
+	kuba@kernel.org,
+	asias@redhat.com,
+	stefanha@redhat.com,
+	pabeni@redhat.com,
+	sgarzare@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	Filippo Storniolo <f.storniolo95@gmail.com>
+Subject: [PATCH net 0/4] vsock: fix server prevents clients from reconnecting
+Date: Fri,  3 Nov 2023 18:55:47 +0100
+Message-ID: <20231103175551.41025-1-f.storniolo95@gmail.com>
+X-Mailer: git-send-email 2.41.0
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -93,118 +85,36 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: YfRqRlpFGu1Yz6e7jED8TE4eMlxY3ZgT
-X-Proofpoint-GUID: T7TI_AAbL0-9oREfMC48cUjLy_6NNNn8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-03_16,2023-11-02_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 bulkscore=0
- clxscore=1015 phishscore=0 spamscore=0 priorityscore=1501 malwarescore=0
- adultscore=0 suspectscore=0 impostorscore=0 mlxscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2310240000
- definitions=main-2311030146
 
-Directly use the size of the arrays instead of going through the
-indirection of kvm_s390_fac_size().
-Don't use magic number for the number of entries in the non hypervisor
-managed facility bit mask list.
-Make the constraint of that number on kvm_s390_fac_base obvious.
-Get rid of implicit double anding of stfle_fac_list.
+From: Filippo Storniolo <f.storniolo95@gmail.com>
 
-Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
----
+This patch series introduce fix and tests for the following vsock bug:
+If the same remote peer, using the same port, tries to connect
+to a server on a listening port more than once, the server will
+reject the connection, causing a "connection reset by peer"
+error on the remote peer. This is due to the presence of a
+dangling socket from a previous connection in both the connected
+and bound socket lists.
+The inconsistency of the above lists only occurs when the remote
+peer disconnects and the server remains active.
+This bug does not occur when the server socket is closed.
 
+More details on the first patch changelog.
+The remaining patches are refactoring and test.
 
-I found it confusing before and think it's nicer this way but
-it might be needless churn.
+Filippo Storniolo (4):
+  vsock/virtio: remove socket from connected/bound list on shutdown
+  test/vsock fix: add missing check on socket creation
+  test/vsock: refactor vsock_accept
+  test/vsock: add dobule bind connect test
 
+ net/vmw_vsock/virtio_transport_common.c | 16 +++--
+ tools/testing/vsock/util.c              | 87 +++++++++++++++++++++----
+ tools/testing/vsock/util.h              |  3 +
+ tools/testing/vsock/vsock_test.c        | 50 ++++++++++++++
+ 4 files changed, 139 insertions(+), 17 deletions(-)
 
- arch/s390/kvm/kvm-s390.c | 44 +++++++++++++++++-----------------------
- 1 file changed, 19 insertions(+), 25 deletions(-)
-
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index b3f17e014cab..e00ab2f38c89 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -217,33 +217,25 @@ static int async_destroy = 1;
- module_param(async_destroy, int, 0444);
- MODULE_PARM_DESC(async_destroy, "Asynchronous destroy for protected guests");
- 
--/*
-- * For now we handle at most 16 double words as this is what the s390 base
-- * kernel handles and stores in the prefix page. If we ever need to go beyond
-- * this, this requires changes to code, but the external uapi can stay.
-- */
--#define SIZE_INTERNAL 16
--
-+#define HMFAI_DWORDS 16
- /*
-  * Base feature mask that defines default mask for facilities. Consists of the
-  * defines in FACILITIES_KVM and the non-hypervisor managed bits.
-  */
--static unsigned long kvm_s390_fac_base[SIZE_INTERNAL] = { FACILITIES_KVM };
-+static unsigned long kvm_s390_fac_base[HMFAI_DWORDS] = { FACILITIES_KVM };
-+static_assert(ARRAY_SIZE(((long[]){ FACILITIES_KVM })) <= HMFAI_DWORDS);
-+static_assert(ARRAY_SIZE(kvm_s390_fac_base) <= S390_ARCH_FAC_MASK_SIZE_U64);
-+static_assert(ARRAY_SIZE(kvm_s390_fac_base) <= S390_ARCH_FAC_LIST_SIZE_U64);
-+static_assert(ARRAY_SIZE(kvm_s390_fac_base) <= ARRAY_SIZE(stfle_fac_list));
-+
- /*
-  * Extended feature mask. Consists of the defines in FACILITIES_KVM_CPUMODEL
-  * and defines the facilities that can be enabled via a cpu model.
-  */
--static unsigned long kvm_s390_fac_ext[SIZE_INTERNAL] = { FACILITIES_KVM_CPUMODEL };
--
--static unsigned long kvm_s390_fac_size(void)
--{
--	BUILD_BUG_ON(SIZE_INTERNAL > S390_ARCH_FAC_MASK_SIZE_U64);
--	BUILD_BUG_ON(SIZE_INTERNAL > S390_ARCH_FAC_LIST_SIZE_U64);
--	BUILD_BUG_ON(SIZE_INTERNAL * sizeof(unsigned long) >
--		sizeof(stfle_fac_list));
--
--	return SIZE_INTERNAL;
--}
-+static const unsigned long kvm_s390_fac_ext[] = { FACILITIES_KVM_CPUMODEL };
-+static_assert(ARRAY_SIZE(kvm_s390_fac_ext) <= S390_ARCH_FAC_MASK_SIZE_U64);
-+static_assert(ARRAY_SIZE(kvm_s390_fac_ext) <= S390_ARCH_FAC_LIST_SIZE_U64);
-+static_assert(ARRAY_SIZE(kvm_s390_fac_ext) <= ARRAY_SIZE(stfle_fac_list));
- 
- /* available cpu features supported by kvm */
- static DECLARE_BITMAP(kvm_s390_available_cpu_feat, KVM_S390_VM_CPU_FEAT_NR_BITS);
-@@ -3341,13 +3333,16 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	kvm->arch.sie_page2->kvm = kvm;
- 	kvm->arch.model.fac_list = kvm->arch.sie_page2->fac_list;
- 
--	for (i = 0; i < kvm_s390_fac_size(); i++) {
-+	for (i = 0; i < ARRAY_SIZE(kvm_s390_fac_base); i++) {
- 		kvm->arch.model.fac_mask[i] = stfle_fac_list[i] &
--					      (kvm_s390_fac_base[i] |
--					       kvm_s390_fac_ext[i]);
-+					      kvm_s390_fac_base[i];
- 		kvm->arch.model.fac_list[i] = stfle_fac_list[i] &
- 					      kvm_s390_fac_base[i];
- 	}
-+	for (i = 0; i < ARRAY_SIZE(kvm_s390_fac_ext); i++) {
-+		kvm->arch.model.fac_mask[i] |= stfle_fac_list[i] &
-+					       kvm_s390_fac_ext[i];
-+	}
- 	kvm->arch.model.subfuncs = kvm_s390_available_subfunc;
- 
- 	/* we are always in czam mode - even on pre z14 machines */
-@@ -5859,9 +5854,8 @@ static int __init kvm_s390_init(void)
- 		return -EINVAL;
- 	}
- 
--	for (i = 0; i < 16; i++)
--		kvm_s390_fac_base[i] |=
--			stfle_fac_list[i] & nonhyp_mask(i);
-+	for (i = 0; i < HMFAI_DWORDS; i++)
-+		kvm_s390_fac_base[i] |= nonhyp_mask(i);
- 
- 	r = __kvm_s390_init();
- 	if (r)
 -- 
-2.39.2
+2.41.0
 
 
