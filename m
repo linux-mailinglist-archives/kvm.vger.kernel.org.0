@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-523-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-524-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 683CD7E0842
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 19:36:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A30A7E085B
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 19:41:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5BB1B212E4
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 18:36:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B8931C20962
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 18:41:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 209E1224EE;
-	Fri,  3 Nov 2023 18:36:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05D5B2572;
+	Fri,  3 Nov 2023 18:41:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D959QSyO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MEwZpCeQ"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB65224D1
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 18:36:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65082D60B
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 18:41:46 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57B4CD47
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 11:36:23 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C22AB134
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 11:41:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699036582;
+	s=mimecast20190719; t=1699036905;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=hSth+EszIudR/gy5W5ptyhOsalHykaDyVCa9TwHuWQg=;
-	b=D959QSyOOfYFopr+hqYO9PvXwMqI6p6goNsJhaVvQ9A9mQd3TigA6cmaj5gWJFsn71YAcC
-	Nf9oP9bsOo6CaU/8qrAMJD5wlzDJ90cBNsr1Qe00BqW6uMjP/4kr+xmmZQlIDMrmHGcgsR
-	ZnBQH42abzdEi1RVaFrz+U2SxDND854=
+	bh=rQdlhLsgwoDUWtGk1QN2qdmt5PoNVil6qIYYzzkXmf8=;
+	b=MEwZpCeQNSA/T7SRDDOeDo1wvFLz1Hk9mS/3ZTODvGdot4JSW7qt8M+VUjJ769V7U0+Xez
+	4qvvPFOPpEP7wuJ66l8xcXn+wQIq648+Y0MRR47nyZu4VE3+Qcr7AG6DkA0+nEbzhSG76D
+	xZDaIVphJ8o89qFUcOb9PtFfVDqmkhY=
 Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
  [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-36-wuptPJRxNkeoFRZa9UXYBg-1; Fri, 03 Nov 2023 14:36:21 -0400
-X-MC-Unique: wuptPJRxNkeoFRZa9UXYBg-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-32f8371247fso1139373f8f.2
-        for <kvm@vger.kernel.org>; Fri, 03 Nov 2023 11:36:21 -0700 (PDT)
+ us-mta-614-GDiOqjzCNXKjM_6jwuWmqA-1; Fri, 03 Nov 2023 14:41:43 -0400
+X-MC-Unique: GDiOqjzCNXKjM_6jwuWmqA-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-32db6a28e24so1080130f8f.0
+        for <kvm@vger.kernel.org>; Fri, 03 Nov 2023 11:41:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699036580; x=1699641380;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hSth+EszIudR/gy5W5ptyhOsalHykaDyVCa9TwHuWQg=;
-        b=smRKjXFo5BEC3siNHNZtgxXh/U02Y1rqqLj129c10D1MIz9zWJ51WxzBJ6B6/WTmf4
-         Jvi1ZGm28n82vcqKMop7ui/VC5PzlDOai6BgwTb9ZR/pcGxWgGUFyQ2TcXkfpGt/PfH8
-         f9u17hv5MvbeumnngGrfJRXDExeJlK0CDP18pB2Q/8O1v55Pm+485KCdVynYnokg4/Gp
-         0VFO9TXdhYptmfqk0LQlEjAdllsFcScXGgS/+dtrHBOFcfjjPeikAqxWtcw8BMXcWiC9
-         Qf71F+cuuMzK5QALOYd5P+0GcVpPxDglj1sDoMAOdBCNuAG++R5HHT9kysKhgsmxRftv
-         12RQ==
-X-Gm-Message-State: AOJu0YwVNB+2M0dt+VJjz0YxsAD1SWsAn3DHtz8xmLG579z3EyYw5dEr
-	LWqVxZj+kkaxxYXT5/khAV1VKwCauLbGHfBeOXdyb8t1cTaJ1uMwlMcmwIbjst2ve3tLszNhFB+
-	W+z7mTojS8Q41
-X-Received: by 2002:a5d:4c45:0:b0:32d:9a20:c9e0 with SMTP id n5-20020a5d4c45000000b0032d9a20c9e0mr17255175wrt.61.1699036580256;
-        Fri, 03 Nov 2023 11:36:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEVlXPpTzGahw+e056z2LWKjOknCHazYzIzJSaGYfmGbP/8167CjCfjVfY4q+Fm5b+omyS6wQ==
-X-Received: by 2002:a5d:4c45:0:b0:32d:9a20:c9e0 with SMTP id n5-20020a5d4c45000000b0032d9a20c9e0mr17255152wrt.61.1699036579835;
-        Fri, 03 Nov 2023 11:36:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1699036902; x=1699641702;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :references:cc:to:from:content-language:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rQdlhLsgwoDUWtGk1QN2qdmt5PoNVil6qIYYzzkXmf8=;
+        b=k2/2GS0GgkGjbz2wrSzIvAkuoVAHfyQlxW+ZisH5/JO/N1gZ2grprcRyVFP5uMLY6C
+         MPgWwqLu7NF+AZpnLwx4YJ3DMcK6eLtDmCty8ENXfx/3oDLaz2I7RBv54toF+qS8r+z/
+         IR+GFL/wM5CrcPA5ZcXjO3b0tb2oqgbs4LnutbPh6BVZ55jL0C2QisYZspGlHHn9GB6S
+         JvBW2CXY7l/iA8thMc0I0BXGYbwpullCdB6RnMkYqq5mnaBktsgVoE9iHmVyqyhIaUtA
+         34T5wGW+jSG6+ikzswLNp06ou5SgkbeTD68EKHJ25Ox5FA+UoetCY/0kSYS+fKo8xNzs
+         T/uQ==
+X-Gm-Message-State: AOJu0YwAJov4DjzIGCDokBHYp6Bk5EvMD+5+ERwPm8s8nQ396e+wThvv
+	wS3Le21NJHnQryM+VHioTWsJvh71nttN195pDZ5wRlymar1WfGFuym1umR2j0GiEnu995Rw1WVp
+	e/l0NGiYttCCK
+X-Received: by 2002:a05:6000:1ce:b0:31f:f753:5897 with SMTP id t14-20020a05600001ce00b0031ff7535897mr20414709wrx.59.1699036902499;
+        Fri, 03 Nov 2023 11:41:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFDXKVSFHCqELK9UNyOjjCQaFsE3qSEeRJXe06NKwAr08GvR30qcJa0LO7VP9KZXwoCJUWWgg==
+X-Received: by 2002:a05:6000:1ce:b0:31f:f753:5897 with SMTP id t14-20020a05600001ce00b0031ff7535897mr20414690wrx.59.1699036902075;
+        Fri, 03 Nov 2023 11:41:42 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c70a:a600:bc48:cd31:d01f:f468? (p200300cbc70aa600bc48cd31d01ff468.dip0.t-ipconnect.de. [2003:cb:c70a:a600:bc48:cd31:d01f:f468])
-        by smtp.gmail.com with ESMTPSA id s8-20020a5d6a88000000b0032fbd0c7d04sm1413468wru.55.2023.11.03.11.36.18
+        by smtp.gmail.com with ESMTPSA id g2-20020a056000118200b0032dcb08bf94sm2454372wrx.60.2023.11.03.11.41.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Nov 2023 11:36:19 -0700 (PDT)
-Message-ID: <4c3cec3c-da81-426c-815b-afee1de68947@redhat.com>
-Date: Fri, 3 Nov 2023 19:36:18 +0100
+        Fri, 03 Nov 2023 11:41:41 -0700 (PDT)
+Message-ID: <47d18f06-13b2-4ec5-b601-eb9a2738f06b@redhat.com>
+Date: Fri, 3 Nov 2023 19:41:40 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,6 +76,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 3/4] KVM: s390: cpu model: Use previously unused constant
 Content-Language: en-US
+From: David Hildenbrand <david@redhat.com>
 To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
  Alexander Gordeev <agordeev@linux.ibm.com>,
  Cornelia Huck <cornelia.huck@de.ibm.com>,
@@ -89,7 +90,7 @@ Cc: linux-kernel@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>,
  kvm@vger.kernel.org, linux-s390@vger.kernel.org
 References: <20231103173008.630217-1-nsg@linux.ibm.com>
  <20231103173008.630217-4-nsg@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
+ <4c3cec3c-da81-426c-815b-afee1de68947@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -135,18 +136,33 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20231103173008.630217-4-nsg@linux.ibm.com>
+In-Reply-To: <4c3cec3c-da81-426c-815b-afee1de68947@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 03.11.23 18:30, Nina Schoetterl-Glausch wrote:
-> No point in defining a size for the mask if we're not going to use it.
+On 03.11.23 19:36, David Hildenbrand wrote:
+> On 03.11.23 18:30, Nina Schoetterl-Glausch wrote:
+>> No point in defining a size for the mask if we're not going to use it.
+> 
+> I neither understand the patch description nor what the bug is that is
+> being fixed (and how that description relates to the patch
+> subject+description).
+> 
+> Please improve the patch description.
+> 
 
-I neither understand the patch description nor what the bug is that is 
-being fixed (and how that description relates to the patch 
-subject+description).
+Should this be
 
-Please improve the patch description.
+"
+KVM: s390: cpu model: use proper define for facility mask size
+
+We're using S390_ARCH_FAC_LIST_SIZE_U64 instead of 
+S390_ARCH_FAC_MASK_SIZE_U64 to define the array size of the facility 
+mask. Let's properly use S390_ARCH_FAC_MASK_SIZE_U64. Note that both
+values are the same and, therefore, this is a pure cleanup.
+"
+
+I'm not convinced there is a bug and that this deserves a "Fixes:".
 
 -- 
 Cheers,
