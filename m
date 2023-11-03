@@ -1,191 +1,225 @@
-Return-Path: <kvm+bounces-508-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-509-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E2DB7E05C4
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 16:51:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7F497E06AC
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 17:44:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E628A281EEA
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 15:51:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E989C1C210AC
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 16:44:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B4221C68B;
-	Fri,  3 Nov 2023 15:51:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UwnpNprt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3B1A1CA8A;
+	Fri,  3 Nov 2023 16:44:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68BD51C680
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 15:51:29 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA720D42
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 08:51:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699026687;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cQfUHragInpQXkGJlCrmUlsPxp9RJTqS4atEg6g9qME=;
-	b=UwnpNprtcBwEGMOCc96Hdlprad4ubmuIPPe95X8FVTClmJ37MgyN0Gn08ezh+2rlPveijb
-	3aCRx9tEeynT5tUK6+gpkRx3mtbn1++J83V4MekIegubieWPt1NL4oIP2CNdO5ROjfRywC
-	sioWZgtKuxK3TB93Jc8V/hyLFd76M3A=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-640-Vo4-ALRoNDW_mwEHVslOiw-1; Fri, 03 Nov 2023 11:51:24 -0400
-X-MC-Unique: Vo4-ALRoNDW_mwEHVslOiw-1
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7acf8510819so165308439f.1
-        for <kvm@vger.kernel.org>; Fri, 03 Nov 2023 08:51:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699026683; x=1699631483;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cQfUHragInpQXkGJlCrmUlsPxp9RJTqS4atEg6g9qME=;
-        b=CIyJ4/aMmKCsZjTXJtd8iQRSM1wnzVDM99pSOzE4pJ7PA2YB7Qvkucsm6u1edjBkS/
-         luM7cxqgNJCwT8ft31teEHtuglQCgxM6NkhfvobjjiA0xcTSBEkY9hP2E6tqrvv9y6yd
-         5kHZhSToCuq6UVdEpm7n0K/XE0nss/TtK6CG7JnY0HOeW6n7lCs08iR4zd3pC0huQ8m7
-         7p4faTCCrQe1Qdq8s+AabRFKAZwV9QA546Eoe8ViRwLLQE+o2VQxkYQHEg4jrRYLKy/x
-         4PoOk91niW7yMFTGLcxvllzvCEVe8Qma4o/LGakW/wRhvDwAx9X/gNu5oa/M1VffmqU7
-         gWpQ==
-X-Gm-Message-State: AOJu0Ywc+EvbpaI1yku90zgiQmwEii0GdJdOsp6DM3kGn/JYU5zPQ7Cf
-	ETJNvmpYYfPQfJ52JJh3fyFusREIJtyIC1eJSlNfBRa4s6EbqfbC+eMnIsqHqEV2uLJXgNCn4bh
-	+DNf+t7zl0XoB
-X-Received: by 2002:a05:6e02:1846:b0:357:8d71:347f with SMTP id b6-20020a056e02184600b003578d71347fmr34486484ilv.8.1699026683233;
-        Fri, 03 Nov 2023 08:51:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFGj8CHxufE7VHtH3JkFgjEN1b6NgZYdSnvw1WC8K1DBeYPqTQM5Psn/dldpSTv/MzEpAzisw==
-X-Received: by 2002:a05:6e02:1846:b0:357:8d71:347f with SMTP id b6-20020a056e02184600b003578d71347fmr34486459ilv.8.1699026683002;
-        Fri, 03 Nov 2023 08:51:23 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id b16-20020a92ce10000000b003596a440efasm281748ilo.19.2023.11.03.08.51.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Nov 2023 08:51:22 -0700 (PDT)
-Date: Fri, 3 Nov 2023 09:51:19 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: "Chatre, Reinette" <reinette.chatre@intel.com>, "jgg@nvidia.com"
- <jgg@nvidia.com>, "yishaih@nvidia.com" <yishaih@nvidia.com>,
- "shameerali.kolothum.thodi@huawei.com"
- <shameerali.kolothum.thodi@huawei.com>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, "Jiang, Dave" <dave.jiang@intel.com>, "Liu, Jing2"
- <jing2.liu@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "Yu, Fenghua"
- <fenghua.yu@intel.com>, "tom.zanussi@linux.intel.com"
- <tom.zanussi@linux.intel.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "patches@lists.linux.dev"
- <patches@lists.linux.dev>
-Subject: Re: [RFC PATCH V3 00/26] vfio/pci: Back guest interrupts from
- Interrupt Message Store (IMS)
-Message-ID: <20231103095119.63aa796f.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB5276BCEA3275EC7203E06FDA8CA5A@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <cover.1698422237.git.reinette.chatre@intel.com>
-	<BL1PR11MB52710EAB683507AD7FAD6A5B8CA0A@BL1PR11MB5271.namprd11.prod.outlook.com>
-	<20231101120714.7763ed35.alex.williamson@redhat.com>
-	<BN9PR11MB52769292F138F69D8717BE8D8CA6A@BN9PR11MB5276.namprd11.prod.outlook.com>
-	<20231102151352.1731de78.alex.williamson@redhat.com>
-	<BN9PR11MB5276BCEA3275EC7203E06FDA8CA5A@BN9PR11MB5276.namprd11.prod.outlook.com>
-Organization: Red Hat
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7E218625
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 16:44:12 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DABDE111;
+	Fri,  3 Nov 2023 09:44:08 -0700 (PDT)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.206])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4SMRM85W5Lz67gDh;
+	Sat,  4 Nov 2023 00:40:52 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Fri, 3 Nov
+ 2023 16:44:06 +0000
+Date: Fri, 3 Nov 2023 16:44:04 +0000
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Alexey Kardashevskiy <aik@amd.com>
+CC: Lukas Wunner <lukas@wunner.de>, <linux-coco@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <linux-pci@vger.kernel.org>, Dan Williams
+	<dan.j.williams@intel.com>, Jonathan Cameron <jic23@kernel.org>,
+	<suzuki.poulose@arm.com>
+Subject: Re: TDISP enablement
+Message-ID: <20231103164404.00006e0b@Huawei.com>
+In-Reply-To: <4cfe829f-8373-4ff4-a963-3ee74fa39efe@amd.com>
+References: <e05eafd8-04b3-4953-8bca-dc321c1a60b9@amd.com>
+	<20231101072717.GB25863@wunner.de>
+	<20231101110551.00003896@Huawei.com>
+	<4cfe829f-8373-4ff4-a963-3ee74fa39efe@amd.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.76]
+X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
+X-CFilter-Loop: Reflected
 
-On Fri, 3 Nov 2023 07:23:13 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
-
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Friday, November 3, 2023 5:14 AM
+ 
+> >>> - tdi_info - read measurements/certs/interface report;  
+> >>
+> >> Does this return cached cert chains and measurements from the device
+> >> or does it retrieve them anew?  (Measurements might have changed if
+> >> MEAS_FRESH_CAP is supported.)
+> >>
+> >>  
+> >>> If the user wants only CMA/SPDM, the Lukas'es patched will do that without
+> >>> the PSP. This may co-exist with the AMD PSP (if the endpoint allows multiple
+> >>> sessions).  
+> >>
+> >> It can co-exist if the pci_cma_claim_ownership() library call
+> >> provided by patch 12/12 is invoked upon device_connect.
+> >>
+> >> It would seem advantageous if you could delay device_connect
+> >> until a device is actually passed through.  Then the OS can
+> >> initially authenticate and measure devices and the PSP takes
+> >> over when needed.  
 > > 
-> > On Thu, 2 Nov 2023 03:14:09 +0000
-> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> >   
-> > > > From: Tian, Kevin
-> > > > Sent: Thursday, November 2, 2023 10:52 AM
-> > > >  
-> > > > >
-> > > > > Without an in-tree user of this code, we're just chopping up code for
-> > > > > no real purpose.  There's no reason that a variant driver requiring IMS
-> > > > > couldn't initially implement their own SET_IRQS ioctl.  Doing that  
-> > > >
-> > > > this is an interesting idea. We haven't seen a real usage which wants
-> > > > such MSI emulation on IMS for variant drivers. but if the code is
-> > > > simple enough to demonstrate the 1st user of IMS it might not be
-> > > > a bad choice. There are additional trap-emulation required in the
-> > > > device MMIO bar (mostly copying MSI permission entry which contains
-> > > > PASID info to the corresponding IMS entry). At a glance that area
-> > > > is 4k-aligned so should be doable.
-> > > >  
-> > >
-> > > misread the spec. the MSI-X permission table which provides
-> > > auxiliary data to MSI-X table is not 4k-aligned. It sits in the 1st
-> > > 4k page together with many other registers. emulation of them
-> > > could be simple with a native read/write handler but not sure
-> > > whether any of them may sit in a hot path to affect perf due to
-> > > trap...  
+> > Would that delay mean IDE isn't up - I think that wants to be
+> > available whether or not pass through is going on.
 > > 
-> > I'm not sure if you're referring to a specific device spec or the PCI
-> > spec, but the PCI spec has long included an implementation note
-> > suggesting alignment of the MSI-X vector table and pba and separation
-> > from CSRs, and I see this is now even more strongly worded in the 6.0
-> > spec.
+> > Given potential restrictions on IDE resources, I'd expect to see an explicit
+> > opt in from userspace on the host to start that process for a given
+> > device.  (udev rule or similar might kick it off for simple setups).
 > > 
-> > Note though that for QEMU, these are emulated in the VMM and not
-> > written through to the device.  The result of writes to the vector
-> > table in the VMM are translated to vector use/unuse operations, which
-> > we see at the kernel level through SET_IRQS ioctl calls.  Are you
-> > expecting to get PASID information written by the guest through the
-> > emulated vector table?  That would entail something more than a simple
-> > IMS backend to MSI-X frontend.  Thanks,
-> >   
+> > Would that work for the flows described?  
 > 
-> I was referring to IDXD device spec. Basically it allows a process to
-> submit a descriptor which contains a completion interrupt handle.
-> The handle is the index of a MSI-X entry or IMS entry allocated by
-> the idxd driver. To mark the association between application and
-> related handles the driver records the PASID of the application
-> in an auxiliary structure for MSI-X (called MSI-X permission table)
-> or directly in the IMS entry. This additional info includes whether
-> an MSI-X/IMS entry has PASID enabled and if yes what is the PASID
-> value to be checked against the descriptor.
+> This would work but my (likely wrong) intention was also to run 
+> necessary setup in both host and guest at the same time before drivers 
+> probe devices. And while delaying it in the host is fine (well, for us 
+> in AMD, as we are aiming for CoCo/TDISP), in the guest this means less 
+> flexibility in enlightening the PCI subsystem and the guest driver: 
+> ideally (or at least initially) the driver is supposed to probe already 
+> enabled and verified device, as otherwise it has to do SWIOTLB until the 
+> userspace does the verification and kicks the driver to go proper direct 
+> DMA (or reload the driver?).
+
+In the case of a guest getting a VF, there probably won't be any way for
+the kernel to run any native attestation anyway, so policy would have to
+rely on the CoCo paths. Kernel stuff Lukas has would just not try to attest
+or claim anything about it. If a VF has a CMA capable DOE instance
+then that's not there for IDE stuff at all, but for the guest to get
+direct measurements etc without PSP or anything else getting involved
+in which case the guest using that directly is a reasonable thing to do.
+
 > 
-> As you said virtualizing MSI-X table itself is via SET_IRQS and it's
-> 4k aligned. Then we also need to capture guest updates to the MSI-X
-> permission table and copy the PASID information into the
-> corresponding IMS entry when using the IMS backend. It's MSI-X
-> permission table not 4k aligned then trapping it will affect adjacent
-> registers.
+> > Next bit probably has holes...  Key is that a lot of the checks
+> > may fail, and it's up to host userspace policy to decide whether
+> > to proceed (other policy in the secure VM side of things obviously)
+> > 
+> > So my rough thinking is - for the two options (IDE / TDISP)
+> > 
+> > Comparing with Alexey's flow I think only real difference is that
+> > I call out explicit host userspace policy controls. I'd also like  
 > 
-> My quick check in idxd spec doesn't reveal an real impact in perf
-> critical path. Most registers are configuration/control registers
-> accessed at driver init time and a few interrupt registers related
-> to errors or administrative purpose.
+> My imagination fails me :) What is the host supposed to do if the device 
+> verification fails/succeeds later, and how much later, and the device is 
+> a boot disk? Or is this userspace going to be limited to initramdisk? 
+> What is that thing which we are protecting against? Or it is for CUDA 
+> and such (which yeah, it can wait)?
 
-Right, it looks like you'll need to trap writes to the MSI-X
-Permissions Table via a sparse mmap capability to avoid assumptions
-whether it lives on the same page as the MSI-X vector table or PBA.
-Ideally the hardware folks have considered this to avoid any conflict
-with latency sensitive registers.
+There are a bunch of non obvious cases indeed.  Hence make it all policy.
+Though if you have a flow where verification is needed for boot disk and
+it fails (and policy says that's not acceptable) then bad luck you
+probably need to squirt a cert into your ramdisk or UEFI or similar.
 
-The variant driver would use this for collecting the meta data relative
-to the IMS interrupt, but this is all tangential to whether we
-preemptively slice up vfio-pci-core's SET_IRQS ioctl or the iDXD driver
-implements its own.
+> 
+> > to use similar interfaces to convey state to host userspace as
+> > per Lukas' existing approaches.  Sure there will also be in
+> > kernel interfaces for driver to get data if it knows what to do
+> > with it.  I'd also like to enable the non tdisp flow to handle
+> > IDE setup 'natively' if that's possible on particular hardware.
+> > 
+> > 1. Host has a go at CMA/SPDM. Policy might say that a failure here is
+> >     a failure in general so reject device - or it might decide it's up to
+> >     the PSP etc.   (userspace can see if it succeeded)
+> >     I'd argue host software can launch this at any time.  It will
+> >     be a denial of service attack but so are many other things the host
+> >     can do.  
+> 
+> Trying to visualize it in my head - policy is a kernel cmdline or module 
+> parameter?
 
-And just to be clear, I don't expect the iDXD variant driver to go to
-extraordinary lengths to duplicate the core ioctl, we can certainly
-refactor and export things where it makes sense, but I think it likely
-makes more sense for the variant driver to implement the shell of the
-ioctl rather than trying to multiplex the entire core ioctl with an ops
-structure that's so intimately tied to the core implementation and
-focused only on the MSI-X code paths.  Thanks,
+Neither - it's bind not happening until userspace decides to kick it off.
+The module could provide it's own policy on top of this - so userspace
+could defer to that if it makes sense (so bind but rely on probe failing
+if policy not met).
 
-Alex
+> 
+> > 2. TDISP policy decision from host (userspace policy control)
+> >     Need to know end goal.  
+> 
+> /sys/bus/pci/devices/0000:11:22.3/tdisp ?
 
+Maybe - I'm sure we'll bikeshed anything like that :)
+
+> 
+> > 3. IDE opt in from userspace.  Policy decision.
+> >    - If not TDISP
+> >      - device_connect(IDE ONLY) - bunch of proxying in host OS.
+> >      - Cert chain and measurements presented to host, host can then check if
+> >        it is happy and expose for next policy decision.
+> >      - Hooks exposed for host to request more measurements, key refresh etc.
+> >        Idea being that the flow is host driven with PSP providing required
+> >        services.  If host can just do setup directly that's fine too.  
+> 
+> I'd expect the user to want IDE on from the very beginning, why wait to 
+> turn it on later? The question is rather if the user wants to panic() or 
+> warn() or block the device if IDE setup failed.
+
+There are some concerns about being able to support enough selective IDE streams.
+Might turn out to be a false concern (I've not yet got visibility of enough
+implementations to be able to tell).
+Also (as I understand it as a software guy) IDE has a significant performance
+and power cost (and for CXL at least there are various trade offs and options
+you can enable depending on security model and device features).
+
+There is "talk" of people turning IDE off if they can cope without it and only
+enabling for CoCo (and possibly selectively doing that as well)
+
+> 
+> >    - If TDISP (technically you can run tdisp from host, but lets assume
+> >      for now no one wants to do that? (yet)).
+> >      - device_connect(TDISP) - bunch of proxying in host OS.
+> >      - Cert chain and measurements presented to host, host can then check if
+> >        it is happy and expose for next policy decision.  
+> 
+> On AMD SEV TIO the TDISP setup happens in "tdi_bind" when the device is 
+> about to be passed through which is when QEMU (==userspace) starts.
+Ah. Ok.
+
+> 
+> > 
+> > 4. Flow after this depends on early or late binding (lockdown)
+> >     but could load driver at this point.  Userspace policy.
+> >     tdi-bind etc.  
+> 
+> Not sure I follow this. A host or guest driver?
+
+Hmm - I confess I'm confusing myself now.
+
+At this stage we just have enough info to load a driver for the PF because
+to get to state we want locked prior to VF assignment the PF driver may
+have some configuration to do.
+
+If all that goes well and the TDI can be moved to locked state, and assigned
+to a TVM which then has to decide to issue tdi_validate before binding
+the guest driver (which I assume is the TDISP START_INTERFACE_REQUEST
+bit of the state machine). Or is the guest driver ever needed before this
+transition? (I see you called it out as not, but is it always a one time
+thing on driver load or can that decision change without unbind/bind
+of driver?)
+
+I know this gets more complex for the PF pass through cases where the
+driver needs to load and do some setup before you can lock down the device
+but do people have that requirement for VFs? If they do it feels like
+device was designed wrong to me...
+
+Too many specs (some of which provide too many ways you 'could' do it)
+so I may well have a bunch of this wrong :(
+
+Jonathan
 
