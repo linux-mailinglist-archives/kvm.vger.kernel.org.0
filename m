@@ -1,73 +1,73 @@
-Return-Path: <kvm+bounces-500-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-501-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 919787E0484
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 15:16:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE8B07E048C
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 15:18:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46D30281ED4
-	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 14:16:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46B1F281E5E
+	for <lists+kvm@lfdr.de>; Fri,  3 Nov 2023 14:18:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17CE71A5A1;
-	Fri,  3 Nov 2023 14:16:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1B651A58D;
+	Fri,  3 Nov 2023 14:18:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fgmwJPh6"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DMTmczjF"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E5C31A585
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 14:16:43 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A23B1BD;
-	Fri,  3 Nov 2023 07:16:42 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3Dl1ma002201;
-	Fri, 3 Nov 2023 14:16:42 GMT
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256C31A27F
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 14:18:39 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D5FAD42;
+	Fri,  3 Nov 2023 07:18:38 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3EElXH007456;
+	Fri, 3 Nov 2023 14:18:37 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=DLp0k0qGD0yN2F+79YahdkIP40hzMLhzP2YpF7nGne8=;
- b=fgmwJPh6CRfGK7XbG2Bo9e1PmeR7emlpX6JxNumX1KwTdzfYZNI4Ks2pa7i9a4hTGyq4
- 6QIDsMTuFAKSRPp7VFhGZOmNwdqu32OeL7YRiozO99l5UCmFKQmXoWURcUY0LUIykqFF
- j2ob9N0Ph0wH018mwjzVIRV9LZjXTjoWC3+HPA1eH0pWs/eRzdJjzU4pjIhSoqTkf9VD
- 8a9c3HcjscYr5uj8JcED44gqlgfi2lcpk+Ic1RokNpZurQput5fk3LXZ0rdCFSfc2god
- bIAJ8VXSwLC3xb+xZhqIjz8tnsrGCX5WaNPZ2/L01W/PjfsZambbreID7YmjFov80xF2 uQ== 
+ bh=ULbHwFJxIghbRWNKGUKelCHcI5PBDKWI9cuGA3hOMCU=;
+ b=DMTmczjFaiUc/MNHFWEjNkISEHlmhBLEWpXq+vRb1wv8LbZ+M1pVv/IxzpR4wZuD2bTs
+ v4YDL8CTohFb9XxVOhrEUG0dMUyR5qJiSnbK5G9Qt8f4ugmMXwOI+Tzago4e4NnIBuF5
+ 29TuhHcWPKcakyy7gqGX23DKY65D8kXY9BWaIsVGpebWl5pcqG/ERonhodHjfs4HO7j8
+ 9xPhikvLFPLmAbkPKv8KeJU+6s1PxFtIziXT1k43RGm9df/PBg6Ftav4+YT4IjCD5+Yt
+ 70/ZdY0gn0TGx5PD7KZPLXGYTWhnHw5WeDYhjMrh0hMFbTYdmbMU/IQSqsRD7E9wCfcW LA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u522298nc-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u526a0p2b-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 14:16:41 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A3E6j1m009939;
-	Fri, 3 Nov 2023 14:16:41 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u522298mn-1
+	Fri, 03 Nov 2023 14:18:36 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A3EEldj007394;
+	Fri, 3 Nov 2023 14:18:36 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u526a0p26-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 14:16:41 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3DGrOG031452;
-	Fri, 3 Nov 2023 14:16:40 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u1fb2nx5f-1
+	Fri, 03 Nov 2023 14:18:36 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3CNaIZ011548;
+	Fri, 3 Nov 2023 14:18:35 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u1e4meaqq-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 14:16:40 +0000
+	Fri, 03 Nov 2023 14:18:35 +0000
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A3EGbgj13566554
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A3EIWcn43319660
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 3 Nov 2023 14:16:37 GMT
+	Fri, 3 Nov 2023 14:18:32 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 58E8F20049;
-	Fri,  3 Nov 2023 14:16:37 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id A362A2004D;
+	Fri,  3 Nov 2023 14:18:32 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0F44C2004D;
-	Fri,  3 Nov 2023 14:16:37 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 5AB6B20049;
+	Fri,  3 Nov 2023 14:18:32 +0000 (GMT)
 Received: from [9.171.0.100] (unknown [9.171.0.100])
 	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  3 Nov 2023 14:16:36 +0000 (GMT)
-Message-ID: <f774a230-26b4-4742-8557-f504aa9344be@linux.ibm.com>
-Date: Fri, 3 Nov 2023 15:16:36 +0100
+	Fri,  3 Nov 2023 14:18:32 +0000 (GMT)
+Message-ID: <e9c9e6bb-d494-40a4-8f46-f2237f0c0ac3@linux.ibm.com>
+Date: Fri, 3 Nov 2023 15:18:32 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,13 +75,13 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v7 7/8] s390x: add a test for SIE without
- MSO/MSL
+Subject: Re: [kvm-unit-tests PATCH v7 8/8] lib: s390x: interrupt: remove
+ TEID_ASCE defines
 Content-Language: en-US
 To: Nico Boehr <nrb@linux.ibm.com>, imbrenda@linux.ibm.com, thuth@redhat.com
 Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
 References: <20231103092954.238491-1-nrb@linux.ibm.com>
- <20231103092954.238491-8-nrb@linux.ibm.com>
+ <20231103092954.238491-9-nrb@linux.ibm.com>
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; keydata=
  xsFNBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -125,90 +125,30 @@ Autocrypt: addr=frankja@linux.ibm.com; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20231103092954.238491-8-nrb@linux.ibm.com>
+In-Reply-To: <20231103092954.238491-9-nrb@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: QQR_-5TeZFrEudfBSo96XA4nM_VcL9lc
-X-Proofpoint-ORIG-GUID: TOgTewRPMyCU_ocI88-puoszJxfjngzI
+X-Proofpoint-ORIG-GUID: K_p2y8GG9GpW6k56O3JvEeyAU_r-ewZf
+X-Proofpoint-GUID: oMqaAMQRD0nUj0mYJ2oO843gP1PqdvUx
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-11-03_13,2023-11-02_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- impostorscore=0 malwarescore=0 mlxscore=0 priorityscore=1501
- lowpriorityscore=0 phishscore=0 bulkscore=0 adultscore=0 clxscore=1015
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=906 lowpriorityscore=0
+ clxscore=1015 priorityscore=1501 phishscore=0 suspectscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2310240000 definitions=main-2311030120
 
 On 11/3/23 10:29, Nico Boehr wrote:
-> Since we now have the ability to run guests without MSO/MSL, add a test
-> to make sure this doesn't break.
+> These defines were - I can only guess - meant for the asce_id field.
+> Since print_decode_teid() used AS_PRIM and friends instead, I see little
+> benefit in keeping these around.
 > 
 > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 > Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-Two small nits below
-
-> +
-> +static void test_sie_dat(void)
-> +{
-> +	uint64_t test_page_gpa, test_page_hpa;
-> +	uint8_t *test_page_hva, expected_val;
-> +	bool contents_match;
-> +	uint8_t r1;
-> +
-> +	/* guest will tell us the guest physical address of the test buffer */
-> +	sie(&vm);
-> +
-> +	r1 = (vm.sblk->ipa & 0xf0) >> 4;
-> +	test_page_gpa = vm.save_area.guest.grs[r1];
-> +	test_page_hpa = virt_to_pte_phys(guest_root, (void*)test_page_gpa);
-> +	test_page_hva = __va(test_page_hpa);
-> +	assert(vm.sblk->icptcode == ICPT_INST &&
-> +	       (vm.sblk->ipa & 0xff00) == 0x8300 && vm.sblk->ipb == 0x9c0000);
-
-Move the assert right under the sie() call.
-
-> +	report_info("test buffer gpa=0x%lx hva=%p", test_page_gpa, test_page_hva);
-> +
-> +	/* guest will now write to the test buffer and we verify the contents */
-> +	sie(&vm);
-> +	assert(vm.sblk->icptcode == ICPT_INST &&
-> +	       vm.sblk->ipa == 0x8300 && vm.sblk->ipb == 0x440000);
-> +
-
-[...]
-
-> +static void setup_guest(void)
-> +{
-> +	extern const char SNIPPET_NAME_START(c, sie_dat)[];
-> +	extern const char SNIPPET_NAME_END(c, sie_dat)[];
-> +	uint64_t guest_max_addr;
-> +
-> +	setup_vm();
-> +	snippet_setup_guest(&vm, false);
-> +
-> +	/* allocate a region-1 table */
-> +	guest_root = pgd_alloc_one();
-> +
-> +	/* map guest memory 1:1 */
-
-0:guest_max_addr
-
-> +	guest_max_addr = GUEST_TOTAL_PAGE_COUNT * PAGE_SIZE;
-> +	for (uint64_t i = 0; i < guest_max_addr; i += PAGE_SIZE)
-> +		install_page(guest_root, __pa(vm.guest_mem + i), (void *)i);
-> +
-> +	/* set up storage limit supression - leave mso and msl intact they are ignored anyways */
-> +	vm.sblk->cpuflags |= CPUSTAT_SM;
-> +
-> +	/* set up the guest asce */
-> +	vm.save_area.guest.asce = __pa(guest_root) | ASCE_DT_REGION1 | REGION_TABLE_LENGTH;
-> +
-> +	snippet_init(&vm, SNIPPET_NAME_START(c, sie_dat),
-> +		     SNIPPET_LEN(c, sie_dat), SNIPPET_UNPACK_OFF);
-> +}
-> +
-
+For once I'm not responsible so:
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
 
