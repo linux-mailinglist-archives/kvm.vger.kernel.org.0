@@ -1,185 +1,177 @@
-Return-Path: <kvm+bounces-567-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-568-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E9377E0C86
-	for <lists+kvm@lfdr.de>; Sat,  4 Nov 2023 01:04:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D82317E0C9B
+	for <lists+kvm@lfdr.de>; Sat,  4 Nov 2023 01:08:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0044B21B48
-	for <lists+kvm@lfdr.de>; Sat,  4 Nov 2023 00:04:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FB8C282025
+	for <lists+kvm@lfdr.de>; Sat,  4 Nov 2023 00:07:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43717F9E2;
-	Sat,  4 Nov 2023 00:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25EC8623;
+	Sat,  4 Nov 2023 00:07:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PrhYXGRQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3Bw+1wvB"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7908CC8C8
-	for <kvm@vger.kernel.org>; Sat,  4 Nov 2023 00:03:27 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 070CE1735
-	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 17:03:19 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9ab7badadeso3410986276.1
-        for <kvm@vger.kernel.org>; Fri, 03 Nov 2023 17:03:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB4F163
+	for <kvm@vger.kernel.org>; Sat,  4 Nov 2023 00:07:50 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDEC3E0
+	for <kvm@vger.kernel.org>; Fri,  3 Nov 2023 17:07:48 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a7cc433782so34715187b3.3
+        for <kvm@vger.kernel.org>; Fri, 03 Nov 2023 17:07:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699056199; x=1699660999; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1699056468; x=1699661268; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=yilGYXp68Gbkah/X+aiEqo69eD6DcRs1k7jq3pnaJG0=;
-        b=PrhYXGRQXDy2Ufld/nmOej2eX0/rRRKB0FLcxie6dNxN4DNLBqb756aOgohALGvpgn
-         NDo95V+7d7ZtI9iT5SWw32bMVk22ylN1S3QKup6zovh8lXgBAvuP8NZtAfKi0gXJNjrt
-         u//eorY5smk8dIHKZU3wzVTVcnqh1k1ZJlbequh/iFH40LW1rC4nGUeaKyrSKbyHKQXH
-         Jh6JfDF/oIHs9kaTMz3TC+7MN+cyKlebh6AYsmUsLvtRgkS9+7qmotRNJR8ysk7zCDZd
-         Ja8TjC6YEeyoI3avxBoPNLk7PAcGmaLJ8DOzxqt9Oue9KcbJ0Mmf2aiQ6uYe/EPk4XU9
-         DRIw==
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7pCmBk/d8/7BmVgL/y39uEDYRNT0sESO20FlC/h78mQ=;
+        b=3Bw+1wvBB502igmVg9vShkrkTyS/4dAuVY/RhuSDUxqcUBP9N6qsgjtn83Curc87fu
+         sK+iaqEqvyWyBnzKNs1iBZrHJJxl1BL4tMTlsl7uB6yfBKlg/BACoFhivpO+sJXVV5Qz
+         koUazJOEN1AxcuZFQgARXSlfplq95NH7Qhutwov47gvLJLlVlCWb7NOe2giT1kNUQmFw
+         GbUlU82fSpshwQAUWfCatTKMS2a6+oHG6qrLgxgshFXbMx96r7mMIwjLErSV+SCYLaBa
+         od9OcYXmOskmqn6oPVSQBhv3l9w79BBckDLu1yJKyBFfCRfpSM6vdek9tQjr25GgtuDJ
+         Qe1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699056199; x=1699660999;
+        d=1e100.net; s=20230601; t=1699056468; x=1699661268;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yilGYXp68Gbkah/X+aiEqo69eD6DcRs1k7jq3pnaJG0=;
-        b=ER2v8a1dRXn43w8YPNfC0nKza04kHXxL5VWbG+k29F8zVD/qW9yzGoifZgSsJmngMR
-         Q4z7iUqHUx5m7xC9GnQ/5go5Y+lmzjUqorUyKty0D2KqBJe4ZH7rtEUo+0SmqFQMhpI7
-         rM50BiguPXDnSywBHWJI7YerrTNBAHgsRWW7XtTywHkh1FVXswGGweVXNBheDst2BSbX
-         MIKyKx1LL5b6utzym4+e/nyCRG73umnlplhCX7wO7MwH8YzUsy7/7BGxzo+ye0g63PmB
-         kScOYc4jtGjkM0ygk0quOq01GBbXs4qoEZXcKVD7CExOb6B6Atv+hGgsx5ij1T9gv49Z
-         nITA==
-X-Gm-Message-State: AOJu0YxiiSFhG1WfERwBmXVqOPllYBq778xpYwFe+sNHbbgR9E2qdCki
-	MVQEhQeIm9V9ctydaVxDDdFoacq+1xY=
-X-Google-Smtp-Source: AGHT+IEicFfkBpZ2m9QbCFIL/o0Vua2YTrgtnpUv+V0BpPEsG8P69HWK7wUOZjk1sFEN97lq90Ji7Khz4nM=
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7pCmBk/d8/7BmVgL/y39uEDYRNT0sESO20FlC/h78mQ=;
+        b=DTOjZK/i9DlnbOMrGwvLOaUaqGXN4Of7Kp2mw0K1iduQzZsn2q6Zj+GnfzJu3YuSZe
+         Nd1YiVFmD5uUcVmpACQxZi6WAPucN38NvKFT4q5IAZWU70dkLUsXJqGg0QE2MNE+Gt1U
+         lq/DhbWMDg7tXkYQx7yqziYGB71fKsTE7uknPJL2wkklGQaeNm3cIyoSBZwrSAFGJg9Y
+         VKWXUvkonnuRvtnF5lvW7KCGZFRNfhh1tSDUK979hRPt6DAioFxNaQ8FK3yFTLauNG8h
+         y4og2t+Ko0gXa6azPq+R3DVKJ8qxvlGFEfqUeYkFxAaPNawhGxTxGVM0aoE37OdkNpbP
+         QiJA==
+X-Gm-Message-State: AOJu0YypggIPAxRz5Yk7NVNKPXL8XibxRBF3vGNtKFuenHMQ1nDxbaX3
+	htwGZgGJIfnV9qt/IIvIBAyqCOwssto=
+X-Google-Smtp-Source: AGHT+IHrFg0i8c+upGstRkCOtYCLhKbcNDwrwPljNf59tCzhF8790qymO/HYfk6E37nQq71VNARXcw7+prY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:565:b0:da0:c979:fd70 with SMTP id
- a5-20020a056902056500b00da0c979fd70mr474880ybt.9.1699056199021; Fri, 03 Nov
- 2023 17:03:19 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  3 Nov 2023 17:02:38 -0700
-In-Reply-To: <20231104000239.367005-1-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a0d:d6d6:0:b0:5a7:f68c:8d1 with SMTP id
+ y205-20020a0dd6d6000000b005a7f68c08d1mr91440ywd.10.1699056468054; Fri, 03 Nov
+ 2023 17:07:48 -0700 (PDT)
+Date: Fri, 3 Nov 2023 17:07:46 -0700
+In-Reply-To: <73c4d3d4c4e7b631d5604178a127bf20cc122034.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231104000239.367005-1-seanjc@google.com>
-X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
-Message-ID: <20231104000239.367005-21-seanjc@google.com>
-Subject: [PATCH v6 20/20] KVM: selftests: Test PMC virtualization with forced emulation
+References: <20230914063325.85503-1-weijiang.yang@intel.com>
+ <20230914063325.85503-19-weijiang.yang@intel.com> <ea3609bf7c7759b682007042b98191d91d10a751.camel@redhat.com>
+ <ZUJy7A5Hp6lnZVyq@google.com> <73c4d3d4c4e7b631d5604178a127bf20cc122034.camel@redhat.com>
+Message-ID: <ZUWLUs3J-G_5VCx_@google.com>
+Subject: Re: [PATCH v6 18/25] KVM: x86: Use KVM-governed feature framework to
+ track "SHSTK/IBT enabled"
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Kan Liang <kan.liang@linux.intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
-	Jinrong Liang <cloudliang@tencent.com>, Like Xu <likexu@tencent.com>, 
-	Jim Mattson <jmattson@google.com>, Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, dave.hansen@intel.com, peterz@infradead.org, 
+	chao.gao@intel.com, rick.p.edgecombe@intel.com, john.allen@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-Extend the PMC counters test to use forced emulation to verify that KVM
-emulates counter events for instructions retired and branches retired.
-Force emulation for only a subset of the measured code to test that KVM
-does the right thing when mixing perf events with emulated events.
+On Thu, Nov 02, 2023, Maxim Levitsky wrote:
+> On Wed, 2023-11-01 at 08:46 -0700, Sean Christopherson wrote:
+> > On Tue, Oct 31, 2023, Maxim Levitsky wrote:
+> > > On Thu, 2023-09-14 at 02:33 -0400, Yang Weijiang wrote:
+> > > > Use the governed feature framework to track whether X86_FEATURE_SHSTK
+> > > > and X86_FEATURE_IBT features can be used by userspace and guest, i.e.,
+> > > > the features can be used iff both KVM and guest CPUID can support them.
+> > > PS: IMHO The whole 'governed feature framework' is very confusing and
+> > > somewhat poorly documented.
+> > > 
+> > > Currently the only partial explanation of it, is at 'governed_features',
+> > > which doesn't explain how to use it.
+> > 
+> > To be honest, terrible name aside, I thought kvm_governed_feature_check_and_set()
+> > would be fairly self-explanatory, at least relative to all the other CPUID handling
+> > in KVM.
+> 
+> What is not self-explanatory is what are the governed_feature and how to query them.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../selftests/kvm/x86_64/pmu_counters_test.c  | 44 +++++++++++++------
- 1 file changed, 30 insertions(+), 14 deletions(-)
+...
 
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-index e6cf76d3499b..c66cf92cc9cc 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-@@ -21,6 +21,7 @@
- 
- static uint8_t kvm_pmu_version;
- static bool kvm_has_perf_caps;
-+static bool is_forced_emulation_enabled;
- 
- static struct kvm_vm *pmu_vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
- 						  void *guest_code,
-@@ -34,6 +35,7 @@ static struct kvm_vm *pmu_vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
- 	vcpu_init_descriptor_tables(*vcpu);
- 
- 	sync_global_to_guest(vm, kvm_pmu_version);
-+	sync_global_to_guest(vm, is_forced_emulation_enabled);
- 
- 	/*
- 	 * Set PERF_CAPABILITIES before PMU version as KVM disallows enabling
-@@ -138,37 +140,50 @@ static void guest_assert_event_count(uint8_t idx,
-  * If CLFUSH{,OPT} is supported, flush the cacheline containing (at least) the
-  * start of the loop to force LLC references and misses, i.e. to allow testing
-  * that those events actually count.
-+ *
-+ * If forced emulation is enabled (and specified), force emulation on a subset
-+ * of the measured code to verify that KVM correctly emulates instructions and
-+ * branches retired events in conjunction with hardware also counting said
-+ * events.
-  */
--#define GUEST_MEASURE_EVENT(_msr, _value, clflush)				\
-+#define GUEST_MEASURE_EVENT(_msr, _value, clflush, FEP)				\
- do {										\
- 	__asm__ __volatile__("wrmsr\n\t"					\
- 			     clflush "\n\t"					\
- 			     "mfence\n\t"					\
- 			     "1: mov $" __stringify(NUM_BRANCHES) ", %%ecx\n\t"	\
--			     "loop .\n\t"					\
--			     "mov %%edi, %%ecx\n\t"				\
--			     "xor %%eax, %%eax\n\t"				\
--			     "xor %%edx, %%edx\n\t"				\
-+			     FEP "loop .\n\t"					\
-+			     FEP "mov %%edi, %%ecx\n\t"				\
-+			     FEP "xor %%eax, %%eax\n\t"				\
-+			     FEP "xor %%edx, %%edx\n\t"				\
- 			     "wrmsr\n\t"					\
- 			     :: "a"((uint32_t)_value), "d"(_value >> 32),	\
- 				"c"(_msr), "D"(_msr)				\
- 	);									\
- } while (0)
- 
-+#define GUEST_TEST_EVENT(_idx, _event, _pmc, _pmc_msr, _ctrl_msr, _value, FEP)	\
-+do {										\
-+	wrmsr(pmc_msr, 0);							\
-+										\
-+	if (this_cpu_has(X86_FEATURE_CLFLUSHOPT))				\
-+		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflushopt 1f", FEP);	\
-+	else if (this_cpu_has(X86_FEATURE_CLFLUSH))				\
-+		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflush 1f", FEP);	\
-+	else									\
-+		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "nop", FEP);		\
-+										\
-+	guest_assert_event_count(_idx, _event, _pmc, _pmc_msr);			\
-+} while (0)
-+
- static void __guest_test_arch_event(uint8_t idx, struct kvm_x86_pmu_feature event,
- 				    uint32_t pmc, uint32_t pmc_msr,
- 				    uint32_t ctrl_msr, uint64_t ctrl_msr_value)
- {
--	wrmsr(pmc_msr, 0);
-+	GUEST_TEST_EVENT(idx, event, pmc, pmc_msr, ctrl_msr, ctrl_msr_value, "");
- 
--	if (this_cpu_has(X86_FEATURE_CLFLUSHOPT))
--		GUEST_MEASURE_EVENT(ctrl_msr, ctrl_msr_value, "clflushopt 1f");
--	else if (this_cpu_has(X86_FEATURE_CLFLUSH))
--		GUEST_MEASURE_EVENT(ctrl_msr, ctrl_msr_value, "clflush 1f");
--	else
--		GUEST_MEASURE_EVENT(ctrl_msr, ctrl_msr_value, "nop");
--
--	guest_assert_event_count(idx, event, pmc, pmc_msr);
-+	if (is_forced_emulation_enabled)
-+		GUEST_TEST_EVENT(idx, event, pmc, pmc_msr, ctrl_msr, ctrl_msr_value, KVM_FEP);
- }
- 
- #define X86_PMU_FEATURE_NULL						\
-@@ -544,6 +559,7 @@ int main(int argc, char *argv[])
- 
- 	kvm_pmu_version = kvm_cpu_property(X86_PROPERTY_PMU_VERSION);
- 	kvm_has_perf_caps = kvm_cpu_has(X86_FEATURE_PDCM);
-+	is_forced_emulation_enabled = kvm_is_forced_emulation_enabled();
- 
- 	test_intel_counters();
- 
--- 
-2.42.0.869.gea05f2083d-goog
+> > > However thinking again about the whole thing: 
+> > > 
+> > > IMHO the 'governed features' is another quite confusing term that a KVM
+> > > developer will need to learn and keep in memory.
+> > 
+> > I 100% agree, but I explicitly called out the terrible name in the v1 and v2
+> > cover letters[1][2], and the patches were on the list for 6 months before I
+> > applied them.  I'm definitely still open to a better name, but I'm also not
+> > exactly chomping at the bit to get behind the bikehsed.
+> 
+> Honestly I don't know if I can come up with a better name either.  Name is
+> IMHO not the underlying problem, its the feature itself that is confusing.
 
+...
+
+> > Yes and no.  For "governed features", probably not.  But for CPUID as a whole, there
+> > are legimiate cases where userspace needs to enumerate things that aren't officially
+> > "supported" by KVM.  E.g. topology, core crystal frequency (CPUID 0x15), defeatures
+> > that KVM hasn't yet learned about, features that don't have virtualization controls
+> > and KVM hasn't yet learned about, etc.  And for things like Xen and Hyper-V paravirt
+> > features, it's very doable to implement features that are enumerate by CPUID fully
+> > in userspace, e.g. using MSR filters.
+> > 
+> > But again, it's a moot point because KVM has (mostly) allowed userspace to fully
+> > control guest CPUID for a very long time.
+> > 
+> > > Such a feature which is advertised as supported but not really working is a
+> > > recipe of hard to find guest bugs IMHO.
+> > > 
+> > > IMHO it would be much better to just check this condition and do
+> > > kvm_vm_bugged() or something in case when a feature is enabled in the guest
+> > > CPUID but KVM can't support it, and then just use guest CPUID in
+> > > 'guest_can_use()'.
+> 
+> OK, I won't argue that much over this, however I still think that there are
+> better ways to deal with it.
+> 
+> If we put optimizations aside (all of this can surely be optimized such as to
+> have very little overhead)
+> 
+> How about we have 2 cpuids: Guest visible CPUID which KVM will never use directly
+> other than during initialization and effective cpuid which is roughly
+> what governed features are, but will include all features and will be initialized
+> roughly like governed features are initialized:
+> 
+> effective_cpuid = guest_cpuid & kvm_supported_cpuid 
+> 
+> Except for some forced overrides like for XSAVES and such.
+> 
+> Then we won't need to maintain a list of governed features, and guest_can_use()
+> for all features will just return the effective cpuid leafs.
+> 
+> In other words, I want KVM to turn all known CPUID features to governed features,
+> and then remove all the mentions of governed features except 'guest_can_use'
+> which is a good API.
+> 
+> Such proposal will use a bit more memory but will make it easier for future
+> KVM developers to understand the code and have less chance of introducing bugs.
+
+Hmm, two _full_ CPUID arrays would be a mess and completely unnecessary.  E.g.
+we'd have to sort out Hyper-V and KVM PV, which both have their own caches.  And
+a duplicate entry for things like F/M/S would be ridiculous.
+
+But maintaining a per-vCPU version of the CPU caps is definitely doable.  I.e. a
+vCPU equivalent to kvm_cpu_caps and the per-CPU capabilities.  There are currently
+25 leafs that are tracked by kvm_cpu_caps, so relative to "governed" features,
+the cost will be 96 bytes per vCPU.  I agree that 96 bytes is worth eating, we've
+certainly taken on more for a lot, lot less.
+
+It's a lot of churn, and there are some subtle nasties, e.g. MWAIT and other
+CPUID bits that changed based on MSRs or CR4, but most of the churn is superficial
+and the result is waaaaay less ugly than governed features and for the majority of
+features will Just Work.
+
+I'll get a series posted next week (need to write changelogs and do a _lot_ more
+testing).  If you want to take a peek at where I'm headed before then:
+
+  https://github.com/sean-jc/linux x86/guest_cpufeatures
 
