@@ -1,225 +1,188 @@
-Return-Path: <kvm+bounces-585-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-586-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D47287E0FA2
-	for <lists+kvm@lfdr.de>; Sat,  4 Nov 2023 14:47:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7894C7E1003
+	for <lists+kvm@lfdr.de>; Sat,  4 Nov 2023 16:05:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A9B7B211C1
-	for <lists+kvm@lfdr.de>; Sat,  4 Nov 2023 13:47:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9DACB20E9E
+	for <lists+kvm@lfdr.de>; Sat,  4 Nov 2023 15:05:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC0431A595;
-	Sat,  4 Nov 2023 13:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9B21A5B3;
+	Sat,  4 Nov 2023 15:05:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QQynLCMV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LzRdBNgd"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E412919BCD
-	for <kvm@vger.kernel.org>; Sat,  4 Nov 2023 13:47:04 +0000 (UTC)
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46695123
-	for <kvm@vger.kernel.org>; Sat,  4 Nov 2023 06:47:01 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so6903a12.0
-        for <kvm@vger.kernel.org>; Sat, 04 Nov 2023 06:47:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699105620; x=1699710420; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4IHCSGPafA533OwSQMvLmdn1gOAi+VivQ/tQHnAD4YM=;
-        b=QQynLCMVkSQV/bd6YxXpo6c31vN+LwGCif2gA1Oj4S9Bkiurc04h1JHpmHz2o/0hku
-         OikfYe397/kFs2z01juum2+29U5dcqZ8J0LeErkm22fIMrCDkE16YBEgNN57l6XHggzx
-         wQxvRwtCwNOnBatR+D19BGriFzN6szIOdIIqGNlALt/M0cHwEe88mhZUvAzEpl2u6ywH
-         KuS5Jj3It5s6lgHtTdgyQzifEJZsT901oRAeXgI+F7h2R3NEmO8s98nnm+kCZAGAE9AI
-         rtzg3WtuMFrQaFK1GhSnnu+rwWLGY05t5S6ouYBFrWA4+zAKfuyO8xThKbu0lYcxZz0+
-         WeMw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845AA7497
+	for <kvm@vger.kernel.org>; Sat,  4 Nov 2023 15:05:44 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 547CE1BC
+	for <kvm@vger.kernel.org>; Sat,  4 Nov 2023 08:05:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699110341;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=i9z4ksAJKoBaMot+I42cegftv20OKEb1WSe8JorPWis=;
+	b=LzRdBNgdwHzFiu4aFvzRj+HyKpTMQLvsPl8BrnxdzHAdLaI7D8LoGQ26oU3wDpQ2FLVRs/
+	3QNAOj+8xB9ZrHCejqOrL+OXgZng7oeykNSXOVKMVQS9q9E9HZ7uOFrQSQ15m4VSB2NShV
+	BHOxCqYZbuLJxGnWTfcZvCNbFmzxs0k=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-197-Ty5XoRliPRSPOI-tERZbrA-1; Sat, 04 Nov 2023 11:05:40 -0400
+X-MC-Unique: Ty5XoRliPRSPOI-tERZbrA-1
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-573fdb618eeso2337705a12.0
+        for <kvm@vger.kernel.org>; Sat, 04 Nov 2023 08:05:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699105620; x=1699710420;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4IHCSGPafA533OwSQMvLmdn1gOAi+VivQ/tQHnAD4YM=;
-        b=WN05TNQ7FofWc1A+s2e7ywiG9PyHem7rug14H7WcHfBrebvqaZ+bMOtk6TRBMaXS3V
-         jDsMEOSbnRcu0cgeOH6tnabkYEOfI3tN+Lct8pOQzzChDAwSU8MKXIn3/1F1H4yB23C6
-         26JeOtF3YgNDqU7ufPZaOmNosHsn1sQKMCLFu3DjR96yicQ7yq7JH96vwq0be800OnGM
-         Ck85q+P+ryawZAfDFtK7CLVJLssoJHvxRoHfSN5lU4BKNSaB8ZEskxAgzsHGgD7cRAYf
-         iwg9baAdJvT6obn0PbzB7u4BJ8G4Bfd8GyR+NbPmhGdYaNMWLYZbQmU3w/NVOm29mPwJ
-         dVTA==
-X-Gm-Message-State: AOJu0YyDKqQUCSyvoUAgJNRFdAj/QtRD8yFyXZF3F0gZLE7vX5V6SQNy
-	Je4PwktcdXxyeRIGv/OY95MfAwd4TVRc2O9wxKrmQg==
-X-Google-Smtp-Source: AGHT+IFaVde2Gf94YPNr+N0q3kInBq+p4YM2sodMiHoaQSi/+7/LRhAwIntGJW/An950O0h3ikxJNbofivIKcnnZca8=
-X-Received: by 2002:a50:8757:0:b0:544:24a8:ebd with SMTP id
- 23-20020a508757000000b0054424a80ebdmr80217edv.4.1699105619567; Sat, 04 Nov
- 2023 06:46:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1699110339; x=1699715139;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=i9z4ksAJKoBaMot+I42cegftv20OKEb1WSe8JorPWis=;
+        b=n6ZSNUC1wlXxlxFgIuBxNCrynPHF9YS+I5vlFBnBbrfOyXorJ74Y7YR/V38q5jMITS
+         y8Wnldjme83ekVOeBqZOzKSwRmoZcg47RuHgYe0Lhvry4EfL0f5v/rkrwIBQoY71IRVP
+         O3yRrKWgjQJ5xG8vsAttjM0rnfEfTjoWOJLpTusogM6saqQ9/ev1z3q/rBPho0wBy6ky
+         l8dyAKNIB9R9/PCawdPLCh/mkt2Wi5woOIKi5PzeEr07iGtvQ7+R7d+i+P3ICUXc0i9a
+         WoEYeKpzPXOhwZSKmOIAwlMPhdxe8e1uOXKpSmoaJVHhKNTbbidnBYOtnP81ROSZr8Km
+         iIog==
+X-Gm-Message-State: AOJu0YyALBGOiOfl8zGwB8ZlHchqSBNrFbgoEvHUS9DE010P1WFkXR1O
+	huCiIxjkLssBHj6qQlInnopBOhaXGp4AJoKf+ueWhqQEdPQf7uUmFZQlmGffXR/tD1T9x8pDflW
+	/qPXKHXbkCCYr
+X-Received: by 2002:a17:902:e811:b0:1cc:569b:1df4 with SMTP id u17-20020a170902e81100b001cc569b1df4mr20338648plg.1.1699110338879;
+        Sat, 04 Nov 2023 08:05:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHVdmZGqn+TlZ02ZFL16cTMGSicZ9LUGUPBMgKZ/dntpJav50rMK+vkrfXHS8Z6F1PWTban/w==
+X-Received: by 2002:a17:902:e811:b0:1cc:569b:1df4 with SMTP id u17-20020a170902e81100b001cc569b1df4mr20338619plg.1.1699110338500;
+        Sat, 04 Nov 2023 08:05:38 -0700 (PDT)
+Received: from kernel-devel.local ([240d:1a:c0d:9f00:245e:16ff:fe87:c960])
+        by smtp.gmail.com with ESMTPSA id jf7-20020a170903268700b001ca21c8abf7sm3101797plb.188.2023.11.04.08.05.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 04 Nov 2023 08:05:38 -0700 (PDT)
+From: Shigeru Yoshida <syoshida@redhat.com>
+To: stefanha@redhat.com,
+	sgarzare@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shigeru Yoshida <syoshida@redhat.com>,
+	syzbot+0c8ce1da0ac31abbadcd@syzkaller.appspotmail.com
+Subject: [PATCH net v2] virtio/vsock: Fix uninit-value in virtio_transport_recv_pkt()
+Date: Sun,  5 Nov 2023 00:05:31 +0900
+Message-ID: <20231104150531.257952-1-syoshida@redhat.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231104000239.367005-1-seanjc@google.com> <20231104000239.367005-12-seanjc@google.com>
-In-Reply-To: <20231104000239.367005-12-seanjc@google.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Sat, 4 Nov 2023 06:46:42 -0700
-Message-ID: <CALMp9eRzvj_Ach=QySHgpkKO6z=42OJmC4DPU=tCTxcioFvZEw@mail.gmail.com>
-Subject: Re: [PATCH v6 11/20] KVM: selftests: Test Intel PMU architectural
- events on fixed counters
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Kan Liang <kan.liang@linux.intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
-	Jinrong Liang <cloudliang@tencent.com>, Like Xu <likexu@tencent.com>, 
-	Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 3, 2023 at 5:03=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> From: Jinrong Liang <cloudliang@tencent.com>
->
-> Extend the PMU counters test to validate architectural events using fixed
-> counters.  The core logic is largely the same, the biggest difference
-> being that if a fixed counter exists, its associated event is available
-> (the SDM doesn't explicitly state this to be true, but it's KVM's ABI and
-> letting software program a fixed counter that doesn't actually count woul=
-d
-> be quite bizarre).
->
-> Note, fixed counters rely on PERF_GLOBAL_CTRL.
->
-> Co-developed-by: Like Xu <likexu@tencent.com>
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+KMSAN reported the following uninit-value access issue:
 
-Reviewed-by: Jim Mattson <jmattson@google.com>
+=====================================================
+BUG: KMSAN: uninit-value in virtio_transport_recv_pkt+0x1dfb/0x26a0 net/vmw_vsock/virtio_transport_common.c:1421
+ virtio_transport_recv_pkt+0x1dfb/0x26a0 net/vmw_vsock/virtio_transport_common.c:1421
+ vsock_loopback_work+0x3bb/0x5a0 net/vmw_vsock/vsock_loopback.c:120
+ process_one_work kernel/workqueue.c:2630 [inline]
+ process_scheduled_works+0xff6/0x1e60 kernel/workqueue.c:2703
+ worker_thread+0xeca/0x14d0 kernel/workqueue.c:2784
+ kthread+0x3cc/0x520 kernel/kthread.c:388
+ ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
 
-> ---
->  .../selftests/kvm/x86_64/pmu_counters_test.c  | 53 ++++++++++++++++---
->  1 file changed, 45 insertions(+), 8 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/too=
-ls/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> index dd9a7864410c..4d3a5c94b8ba 100644
-> --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> @@ -150,25 +150,46 @@ static void __guest_test_arch_event(uint8_t idx, st=
-ruct kvm_x86_pmu_feature even
->         guest_assert_event_count(idx, event, pmc, pmc_msr);
->  }
->
-> +#define X86_PMU_FEATURE_NULL                                           \
-> +({                                                                     \
-> +       struct kvm_x86_pmu_feature feature =3D {};                       =
- \
-> +                                                                       \
-> +       feature;                                                        \
-> +})
-> +
-> +static bool pmu_is_null_feature(struct kvm_x86_pmu_feature event)
-> +{
-> +       return !(*(u64 *)&event);
-> +}
-> +
->  static void guest_test_arch_event(uint8_t idx)
->  {
->         const struct {
->                 struct kvm_x86_pmu_feature gp_event;
-> +               struct kvm_x86_pmu_feature fixed_event;
->         } intel_event_to_feature[] =3D {
-> -               [INTEL_ARCH_CPU_CYCLES]            =3D { X86_PMU_FEATURE_=
-CPU_CYCLES },
-> -               [INTEL_ARCH_INSTRUCTIONS_RETIRED]  =3D { X86_PMU_FEATURE_=
-INSNS_RETIRED },
-> -               [INTEL_ARCH_REFERENCE_CYCLES]      =3D { X86_PMU_FEATURE_=
-REFERENCE_CYCLES },
-> -               [INTEL_ARCH_LLC_REFERENCES]        =3D { X86_PMU_FEATURE_=
-LLC_REFERENCES },
-> -               [INTEL_ARCH_LLC_MISSES]            =3D { X86_PMU_FEATURE_=
-LLC_MISSES },
-> -               [INTEL_ARCH_BRANCHES_RETIRED]      =3D { X86_PMU_FEATURE_=
-BRANCH_INSNS_RETIRED },
-> -               [INTEL_ARCH_BRANCHES_MISPREDICTED] =3D { X86_PMU_FEATURE_=
-BRANCHES_MISPREDICTED },
-> +               [INTEL_ARCH_CPU_CYCLES]            =3D { X86_PMU_FEATURE_=
-CPU_CYCLES, X86_PMU_FEATURE_CPU_CYCLES_FIXED },
-> +               [INTEL_ARCH_INSTRUCTIONS_RETIRED]  =3D { X86_PMU_FEATURE_=
-INSNS_RETIRED, X86_PMU_FEATURE_INSNS_RETIRED_FIXED },
-> +               /*
-> +                * Note, the fixed counter for reference cycles is NOT th=
-e same
-> +                * as the general purpose architectural event (because th=
-e GP
-> +                * event is garbage).  The fixed counter explicitly count=
-s at
-> +                * the same frequency as the TSC, whereas the GP event co=
-unts
-> +                * at a fixed, but uarch specific, frequency.  Bundle the=
-m here
-> +                * for simplicity.
-> +                */
+Uninit was stored to memory at:
+ virtio_transport_space_update net/vmw_vsock/virtio_transport_common.c:1274 [inline]
+ virtio_transport_recv_pkt+0x1ee8/0x26a0 net/vmw_vsock/virtio_transport_common.c:1415
+ vsock_loopback_work+0x3bb/0x5a0 net/vmw_vsock/vsock_loopback.c:120
+ process_one_work kernel/workqueue.c:2630 [inline]
+ process_scheduled_works+0xff6/0x1e60 kernel/workqueue.c:2703
+ worker_thread+0xeca/0x14d0 kernel/workqueue.c:2784
+ kthread+0x3cc/0x520 kernel/kthread.c:388
+ ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
 
-Implementation-specific is not necessarily garbage, though it would be
-nice if there was a way to query the frequency rather than calibrating
-against another clock.
-Note that tools/perf/pmu-events/arch/x86/*/pipeline.json does
-typically indicate the {0x3c, 1} frequency for the CPU in question.
+Uninit was created at:
+ slab_post_alloc_hook+0x105/0xad0 mm/slab.h:767
+ slab_alloc_node mm/slub.c:3478 [inline]
+ kmem_cache_alloc_node+0x5a2/0xaf0 mm/slub.c:3523
+ kmalloc_reserve+0x13c/0x4a0 net/core/skbuff.c:559
+ __alloc_skb+0x2fd/0x770 net/core/skbuff.c:650
+ alloc_skb include/linux/skbuff.h:1286 [inline]
+ virtio_vsock_alloc_skb include/linux/virtio_vsock.h:66 [inline]
+ virtio_transport_alloc_skb+0x90/0x11e0 net/vmw_vsock/virtio_transport_common.c:58
+ virtio_transport_reset_no_sock net/vmw_vsock/virtio_transport_common.c:957 [inline]
+ virtio_transport_recv_pkt+0x1279/0x26a0 net/vmw_vsock/virtio_transport_common.c:1387
+ vsock_loopback_work+0x3bb/0x5a0 net/vmw_vsock/vsock_loopback.c:120
+ process_one_work kernel/workqueue.c:2630 [inline]
+ process_scheduled_works+0xff6/0x1e60 kernel/workqueue.c:2703
+ worker_thread+0xeca/0x14d0 kernel/workqueue.c:2784
+ kthread+0x3cc/0x520 kernel/kthread.c:388
+ ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
 
-> +               [INTEL_ARCH_REFERENCE_CYCLES]      =3D { X86_PMU_FEATURE_=
-REFERENCE_CYCLES, X86_PMU_FEATURE_REFERENCE_CYCLES_FIXED },
-> +               [INTEL_ARCH_LLC_REFERENCES]        =3D { X86_PMU_FEATURE_=
-LLC_REFERENCES, X86_PMU_FEATURE_NULL },
-> +               [INTEL_ARCH_LLC_MISSES]            =3D { X86_PMU_FEATURE_=
-LLC_MISSES, X86_PMU_FEATURE_NULL },
-> +               [INTEL_ARCH_BRANCHES_RETIRED]      =3D { X86_PMU_FEATURE_=
-BRANCH_INSNS_RETIRED, X86_PMU_FEATURE_NULL },
-> +               [INTEL_ARCH_BRANCHES_MISPREDICTED] =3D { X86_PMU_FEATURE_=
-BRANCHES_MISPREDICTED, X86_PMU_FEATURE_NULL },
->         };
->
->         uint32_t nr_gp_counters =3D this_cpu_property(X86_PROPERTY_PMU_NR=
-_GP_COUNTERS);
->         uint32_t pmu_version =3D guest_get_pmu_version();
->         /* PERF_GLOBAL_CTRL exists only for Architectural PMU Version 2+.=
- */
->         bool guest_has_perf_global_ctrl =3D pmu_version >=3D 2;
-> -       struct kvm_x86_pmu_feature gp_event;
-> +       struct kvm_x86_pmu_feature gp_event, fixed_event;
->         uint32_t base_pmc_msr;
->         unsigned int i;
->
-> @@ -198,6 +219,22 @@ static void guest_test_arch_event(uint8_t idx)
->                 __guest_test_arch_event(idx, gp_event, i, base_pmc_msr + =
-i,
->                                         MSR_P6_EVNTSEL0 + i, eventsel);
->         }
-> +
-> +       if (!guest_has_perf_global_ctrl)
-> +               return;
-> +
-> +       fixed_event =3D intel_event_to_feature[idx].fixed_event;
-> +       if (pmu_is_null_feature(fixed_event) || !this_pmu_has(fixed_event=
-))
-> +               return;
-> +
-> +       i =3D fixed_event.f.bit;
-> +
-> +       wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, BIT_ULL(4 * i));
-> +
-> +       __guest_test_arch_event(idx, fixed_event, PMC_FIXED_RDPMC_BASE | =
-i,
-> +                               MSR_CORE_PERF_FIXED_CTR0 + i,
-> +                               MSR_CORE_PERF_GLOBAL_CTRL,
-> +                               BIT_ULL(PMC_IDX_FIXED + i));
->  }
->
->  static void guest_test_arch_events(void)
-> --
-> 2.42.0.869.gea05f2083d-goog
->
+CPU: 1 PID: 10664 Comm: kworker/1:5 Not tainted 6.6.0-rc3-00146-g9f3ebbef746f #3
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc38 04/01/2014
+Workqueue: vsock-loopback vsock_loopback_work
+=====================================================
+
+The following simple reproducer can cause the issue described above:
+
+int main(void)
+{
+  int sock;
+  struct sockaddr_vm addr = {
+    .svm_family = AF_VSOCK,
+    .svm_cid = VMADDR_CID_ANY,
+    .svm_port = 1234,
+  };
+
+  sock = socket(AF_VSOCK, SOCK_STREAM, 0);
+  connect(sock, (struct sockaddr *)&addr, sizeof(addr));
+  return 0;
+}
+
+This issue occurs because the `buf_alloc` and `fwd_cnt` fields of the
+`struct virtio_vsock_hdr` are not initialized when a new skb is allocated
+in `virtio_transport_init_hdr()`. This patch resolves the issue by
+initializing these fields during allocation.
+
+Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
+Reported-and-tested-by: syzbot+0c8ce1da0ac31abbadcd@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=0c8ce1da0ac31abbadcd
+Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+---
+v1->v2:
+- Rebase on the latest net tree
+https://lore.kernel.org/all/20231026150154.3536433-1-syoshida@redhat.com/
+---
+ net/vmw_vsock/virtio_transport_common.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index e22c81435ef7..dc65dd4d26df 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -130,6 +130,8 @@ static void virtio_transport_init_hdr(struct sk_buff *skb,
+ 	hdr->dst_port	= cpu_to_le32(dst_port);
+ 	hdr->flags	= cpu_to_le32(info->flags);
+ 	hdr->len	= cpu_to_le32(payload_len);
++	hdr->buf_alloc	= cpu_to_le32(0);
++	hdr->fwd_cnt	= cpu_to_le32(0);
+ }
+ 
+ static void virtio_transport_copy_nonlinear_skb(const struct sk_buff *skb,
+-- 
+2.41.0
+
 
