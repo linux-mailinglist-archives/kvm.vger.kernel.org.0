@@ -1,69 +1,95 @@
-Return-Path: <kvm+bounces-573-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-574-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44DC27E0EA3
-	for <lists+kvm@lfdr.de>; Sat,  4 Nov 2023 10:36:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 464EF7E0EC8
+	for <lists+kvm@lfdr.de>; Sat,  4 Nov 2023 11:28:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1282B213FB
-	for <lists+kvm@lfdr.de>; Sat,  4 Nov 2023 09:36:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61F1E1C21097
+	for <lists+kvm@lfdr.de>; Sat,  4 Nov 2023 10:28:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9F9111BC;
-	Sat,  4 Nov 2023 09:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31D82154B0;
+	Sat,  4 Nov 2023 10:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z8CINsO5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="foGeNAp0"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A487FDDC8
-	for <kvm@vger.kernel.org>; Sat,  4 Nov 2023 09:36:04 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D9181B2;
-	Sat,  4 Nov 2023 02:36:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6696B1172F;
+	Sat,  4 Nov 2023 10:28:37 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A5F0D45;
+	Sat,  4 Nov 2023 03:28:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699090562; x=1730626562;
+  t=1699093715; x=1730629715;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=p/vZ9aQJJ8vbDAzRwB2cAWFoPhpzbeHXMAy/cAJcjkw=;
-  b=Z8CINsO5wBK3LerG9EYfeqtcotNVW3fKVSZAvLheejWh2VkdTaULz5PA
-   XmJZZlmFLnKDMcjye1cT3h8gsIc4UMVv2jyHajeRBgCp/uF2UcuIpUOts
-   Mhqli190GT4HjPFVfLAiXS+5P9CLSAJaHJ0tgezOIE+STl32t2GpK2K1l
-   p7J6GNL//e3uKH5o6KvbcGDlUza5H7dZlaI2iH/mKLtsn4slSm2MK2K/F
-   EU/TwVKNKBh4+TmdBC4DnkN4GWXQdPNhhXTzXsXYqf4qlE6SpMJmZehru
-   5z5w2CyZsMk2ncxjB/elX7IjZd3fXo7Vb/NLOqU8GF0yoJ47e6rSxEeoC
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10883"; a="475307850"
+  bh=5TP8v/J0LaSvm65b/oAssWoyHA+UqQe21NaYSLdqziw=;
+  b=foGeNAp0gbxaUJ9/YsLvEz8DKYJl5tcAeoh7PLnYxdlRQfGTvVJIvoH/
+   XpA9z1GmvXZMlBjf/lHuFLq+pXl8qn74JPPdGHpVUqWHKKeb9qfTS93r8
+   j+5DOEvayTRcVHosAJ5/lR3j0LHbk6iWcG1YaT61LiG4I9j2CfpvCgYs6
+   dehAI6a72P+2O7QIw2CDhPNFfbYGdIKmHEic+F+esqdEfj+G78ehZENx1
+   oqy2dla4absGwqhR4tC3Vd1g6avCoqkKkRFmwhrxYjEzrIUxLwbqbJF2o
+   uCjC4afLNyV9SP9ReMgny2iIexaGPFqUURPrtEVE+EjOeLmTKeq+1Hm8F
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10883"; a="453377379"
 X-IronPort-AV: E=Sophos;i="6.03,276,1694761200"; 
-   d="scan'208";a="475307850"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2023 02:36:02 -0700
+   d="scan'208";a="453377379"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2023 03:28:34 -0700
 X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10883"; a="796860179"
 X-IronPort-AV: E=Sophos;i="6.03,276,1694761200"; 
-   d="scan'208";a="3159059"
-Received: from lkp-server01.sh.intel.com (HELO 17d9e85e5079) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 04 Nov 2023 02:35:58 -0700
-Received: from kbuild by 17d9e85e5079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qzD4N-0003jr-1d;
-	Sat, 04 Nov 2023 09:35:55 +0000
-Date: Sat, 4 Nov 2023 17:35:13 +0800
-From: kernel test robot <lkp@intel.com>
-To: ankita@nvidia.com, jgg@nvidia.com, alex.williamson@redhat.com,
-	yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
-	kevin.tian@intel.com
-Cc: oe-kbuild-all@lists.linux.dev, aniketa@nvidia.com, cjia@nvidia.com,
-	kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
-	acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
-	danw@nvidia.com, anuaggarwal@nvidia.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v12 1/1] vfio/nvgpu: Add vfio pci variant module for
- grace hopper
-Message-ID: <202311041743.tL7StQAH-lkp@intel.com>
-References: <20231015163047.20391-1-ankita@nvidia.com>
+   d="scan'208";a="796860179"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orsmga001.jf.intel.com with ESMTP; 04 Nov 2023 03:28:23 -0700
+Date: Sat, 4 Nov 2023 18:26:55 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
+	Xu Yilun <yilun.xu@intel.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+	Anish Moorthy <amoorthy@google.com>,
+	David Matlack <dmatlack@google.com>,
+	Yu Zhang <yu.c.zhang@linux.intel.com>,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Maciej Szmigiero <mail@maciej.szmigiero.name>,
+	David Hildenbrand <david@redhat.com>,
+	Quentin Perret <qperret@google.com>,
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+	Liam Merwick <liam.merwick@oracle.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCH v13 16/35] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+Message-ID: <ZUYcb6no9ADYytrx@yilunxu-OptiPlex-7050>
+References: <20231027182217.3615211-1-seanjc@google.com>
+ <20231027182217.3615211-17-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,165 +98,173 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231015163047.20391-1-ankita@nvidia.com>
+In-Reply-To: <20231027182217.3615211-17-seanjc@google.com>
 
-Hi,
+> +KVM_SET_USER_MEMORY_REGION2 is an extension to KVM_SET_USER_MEMORY_REGION that
+> +allows mapping guest_memfd memory into a guest.  All fields shared with
+> +KVM_SET_USER_MEMORY_REGION identically.  Userspace can set KVM_MEM_PRIVATE in
+> +flags to have KVM bind the memory region to a given guest_memfd range of
+> +[guest_memfd_offset, guest_memfd_offset + memory_size].  The target guest_memfd
+                                                        ^
+The range end should be exclusive, is it?
 
-kernel test robot noticed the following build warnings:
+> +must point at a file created via KVM_CREATE_GUEST_MEMFD on the current VM, and
+> +the target range must not be bound to any other memory region.  All standard
+> +bounds checks apply (use common sense).
+> +
+>  ::
+>  
+>    struct kvm_userspace_memory_region2 {
+> @@ -6087,9 +6096,24 @@ applied.
+>  	__u64 guest_phys_addr;
+>  	__u64 memory_size; /* bytes */
+>  	__u64 userspace_addr; /* start of the userspace allocated memory */
+> +  __u64 guest_memfd_offset;
+> +	__u32 guest_memfd;
+> +	__u32 pad1;
+> +	__u64 pad2[14];
+>    };
+>  
 
-[auto build test WARNING on awilliam-vfio/for-linus]
-[also build test WARNING on linus/master v6.6 next-20231103]
-[cannot apply to awilliam-vfio/next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+[...]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/ankita-nvidia-com/vfio-nvgpu-Add-vfio-pci-variant-module-for-grace-hopper/20231017-131546
-base:   https://github.com/awilliam/linux-vfio.git for-linus
-patch link:    https://lore.kernel.org/r/20231015163047.20391-1-ankita%40nvidia.com
-patch subject: [PATCH v12 1/1] vfio/nvgpu: Add vfio pci variant module for grace hopper
-config: powerpc-allmodconfig (https://download.01.org/0day-ci/archive/20231104/202311041743.tL7StQAH-lkp@intel.com/config)
-compiler: powerpc64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231104/202311041743.tL7StQAH-lkp@intel.com/reproduce)
+> +static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+> +{
+> +	const char *anon_name = "[kvm-gmem]";
+> +	struct kvm_gmem *gmem;
+> +	struct inode *inode;
+> +	struct file *file;
+> +	int fd, err;
+> +
+> +	fd = get_unused_fd_flags(0);
+> +	if (fd < 0)
+> +		return fd;
+> +
+> +	gmem = kzalloc(sizeof(*gmem), GFP_KERNEL);
+> +	if (!gmem) {
+> +		err = -ENOMEM;
+> +		goto err_fd;
+> +	}
+> +
+> +	/*
+> +	 * Use the so called "secure" variant, which creates a unique inode
+> +	 * instead of reusing a single inode.  Each guest_memfd instance needs
+> +	 * its own inode to track the size, flags, etc.
+> +	 */
+> +	file = anon_inode_getfile_secure(anon_name, &kvm_gmem_fops, gmem,
+> +					 O_RDWR, NULL);
+> +	if (IS_ERR(file)) {
+> +		err = PTR_ERR(file);
+> +		goto err_gmem;
+> +	}
+> +
+> +	file->f_flags |= O_LARGEFILE;
+> +
+> +	inode = file->f_inode;
+> +	WARN_ON(file->f_mapping != inode->i_mapping);
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202311041743.tL7StQAH-lkp@intel.com/
+Just curious, why should we check the mapping fields which is garanteed in
+other subsystem?
 
-All warnings (new ones prefixed by >>):
+> +
+> +	inode->i_private = (void *)(unsigned long)flags;
+> +	inode->i_op = &kvm_gmem_iops;
+> +	inode->i_mapping->a_ops = &kvm_gmem_aops;
+> +	inode->i_mode |= S_IFREG;
+> +	inode->i_size = size;
+> +	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
+> +	mapping_set_unmovable(inode->i_mapping);
+> +	/* Unmovable mappings are supposed to be marked unevictable as well. */
+> +	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
+> +
+> +	kvm_get_kvm(kvm);
+> +	gmem->kvm = kvm;
+> +	xa_init(&gmem->bindings);
+> +	list_add(&gmem->entry, &inode->i_mapping->private_list);
+> +
+> +	fd_install(fd, file);
+> +	return fd;
+> +
+> +err_gmem:
+> +	kfree(gmem);
+> +err_fd:
+> +	put_unused_fd(fd);
+> +	return err;
+> +}
 
->> drivers/vfio/pci/nvgrace-gpu/main.c:226:9: warning: no previous prototype for 'nvgrace_gpu_read_mem' [-Wmissing-prototypes]
-     226 | ssize_t nvgrace_gpu_read_mem(void __user *buf, size_t count, loff_t *ppos,
-         |         ^~~~~~~~~~~~~~~~~~~~
->> drivers/vfio/pci/nvgrace-gpu/main.c:298:9: warning: no previous prototype for 'nvgrace_gpu_write_mem' [-Wmissing-prototypes]
-     298 | ssize_t nvgrace_gpu_write_mem(size_t count, loff_t *ppos, const void __user *buf,
-         |         ^~~~~~~~~~~~~~~~~~~~~
+[...]
 
+> +int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
+> +		  unsigned int fd, loff_t offset)
+> +{
+> +	loff_t size = slot->npages << PAGE_SHIFT;
+> +	unsigned long start, end;
+> +	struct kvm_gmem *gmem;
+> +	struct inode *inode;
+> +	struct file *file;
+> +
+> +	BUILD_BUG_ON(sizeof(gfn_t) != sizeof(slot->gmem.pgoff));
+> +
+> +	file = fget(fd);
+> +	if (!file)
+> +		return -EBADF;
+> +
+> +	if (file->f_op != &kvm_gmem_fops)
+> +		goto err;
+> +
+> +	gmem = file->private_data;
+> +	if (gmem->kvm != kvm)
+> +		goto err;
+> +
+> +	inode = file_inode(file);
+> +
+> +	if (offset < 0 || !PAGE_ALIGNED(offset))
+> +		return -EINVAL;
 
-vim +/nvgrace_gpu_read_mem +226 drivers/vfio/pci/nvgrace-gpu/main.c
+Should also "goto err" here.
 
-   214	
-   215	/*
-   216	 * Read count bytes from the device memory at an offset. The actual device
-   217	 * memory size (available) may not be a power-of-2. So the driver fakes
-   218	 * the size to a power-of-2 (reported) when exposing to a user space driver.
-   219	 *
-   220	 * Read request beyond the actual device size is filled with ~0, while
-   221	 * those beyond the actual reported size is skipped.
-   222	 *
-   223	 * A read from a negative or an offset greater than reported size, a negative
-   224	 * count are considered error conditions and returned with an -EINVAL.
-   225	 */
- > 226	ssize_t nvgrace_gpu_read_mem(void __user *buf, size_t count, loff_t *ppos,
-   227				      struct nvgrace_gpu_vfio_pci_core_device *nvdev)
-   228	{
-   229		u64 offset = *ppos & VFIO_PCI_OFFSET_MASK;
-   230		size_t mem_count, i, bar_size = roundup_pow_of_two(nvdev->memlength);
-   231		u8 val = 0xFF;
-   232	
-   233		if (offset >= bar_size)
-   234			return -EINVAL;
-   235	
-   236		/* Clip short the read request beyond reported BAR size */
-   237		count = min(count, bar_size - (size_t)offset);
-   238	
-   239		/*
-   240		 * Determine how many bytes to be actually read from the device memory.
-   241		 * Read request beyond the actual device memory size is filled with ~0,
-   242		 * while those beyond the actual reported size is skipped.
-   243		 */
-   244		if (offset >= nvdev->memlength)
-   245			mem_count = 0;
-   246		else
-   247			mem_count = min(count, nvdev->memlength - (size_t)offset);
-   248	
-   249		/*
-   250		 * Handle read on the BAR2 region. Map to the target device memory
-   251		 * physical address and copy to the request read buffer.
-   252		 */
-   253		if (copy_to_user(buf, (u8 *)nvdev->memmap + offset, mem_count))
-   254			return -EFAULT;
-   255	
-   256		/*
-   257		 * Only the device memory present on the hardware is mapped, which may
-   258		 * not be power-of-2 aligned. A read to an offset beyond the device memory
-   259		 * size is filled with ~0.
-   260		 */
-   261		for (i = mem_count; i < count; i++)
-   262			put_user(val, (unsigned char __user *)(buf + i));
-   263	
-   264		*ppos += count;
-   265		return count;
-   266	}
-   267	
-   268	static ssize_t nvgrace_gpu_vfio_pci_read(struct vfio_device *core_vdev,
-   269						  char __user *buf, size_t count, loff_t *ppos)
-   270	{
-   271		unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
-   272		struct nvgrace_gpu_vfio_pci_core_device *nvdev = container_of(
-   273			core_vdev, struct nvgrace_gpu_vfio_pci_core_device, core_device.vdev);
-   274		int ret;
-   275	
-   276		if (index == VFIO_PCI_BAR2_REGION_INDEX) {
-   277			ret = nvgrace_gpu_memmap(nvdev);
-   278			if (ret)
-   279				return ret;
-   280	
-   281			return nvgrace_gpu_read_mem(buf, count, ppos, nvdev);
-   282		}
-   283	
-   284		return vfio_pci_core_read(core_vdev, buf, count, ppos);
-   285	}
-   286	
-   287	/*
-   288	 * Write count bytes to the device memory at a given offset. The actual device
-   289	 * memory size (available) may not be a power-of-2. So the driver fakes the
-   290	 * size to a power-of-2 (reported) when exposing to a user space driver.
-   291	 *
-   292	 * Write request beyond the actual device size are dropped, while those
-   293	 * beyond the actual reported size are skipped entirely.
-   294	 *
-   295	 * A write to a negative or an offset greater than the reported size, a
-   296	 * negative count are considered error conditions and returned with an -EINVAL.
-   297	 */
- > 298	ssize_t nvgrace_gpu_write_mem(size_t count, loff_t *ppos, const void __user *buf,
-   299				       struct nvgrace_gpu_vfio_pci_core_device *nvdev)
-   300	{
-   301		u64 offset = *ppos & VFIO_PCI_OFFSET_MASK;
-   302		size_t mem_count, bar_size = roundup_pow_of_two(nvdev->memlength);
-   303	
-   304		if (offset >= bar_size)
-   305			return -EINVAL;
-   306	
-   307		/* Clip short the write request beyond reported BAR size */
-   308		count = min(count, bar_size - (size_t)offset);
-   309	
-   310		/*
-   311		 * Determine how many bytes to be actually written to the device memory.
-   312		 * Do not write to the offset beyond available size.
-   313		 */
-   314		if (offset >= nvdev->memlength)
-   315			goto exitfn;
-   316	
-   317		mem_count = min(count, nvdev->memlength - (size_t)offset);
-   318	
-   319		/*
-   320		 * Only the device memory present on the hardware is mapped, which may
-   321		 * not be power-of-2 aligned. A write to the BAR2 region implies an
-   322		 * access outside the available device memory on the hardware. Drop
-   323		 * those write requests.
-   324		 */
-   325		if (copy_from_user((u8 *)nvdev->memmap + offset, buf, mem_count))
-   326			return -EFAULT;
-   327	
-   328	exitfn:
-   329		*ppos += count;
-   330		return count;
-   331	}
-   332	
+> +
+> +	if (offset + size > i_size_read(inode))
+> +		goto err;
+> +
+> +	filemap_invalidate_lock(inode->i_mapping);
+> +
+> +	start = offset >> PAGE_SHIFT;
+> +	end = start + slot->npages;
+> +
+> +	if (!xa_empty(&gmem->bindings) &&
+> +	    xa_find(&gmem->bindings, &start, end - 1, XA_PRESENT)) {
+> +		filemap_invalidate_unlock(inode->i_mapping);
+> +		goto err;
+> +	}
+> +
+> +	/*
+> +	 * No synchronize_rcu() needed, any in-flight readers are guaranteed to
+> +	 * be see either a NULL file or this new file, no need for them to go
+> +	 * away.
+> +	 */
+> +	rcu_assign_pointer(slot->gmem.file, file);
+> +	slot->gmem.pgoff = start;
+> +
+> +	xa_store_range(&gmem->bindings, start, end - 1, slot, GFP_KERNEL);
+> +	filemap_invalidate_unlock(inode->i_mapping);
+> +
+> +	/*
+> +	 * Drop the reference to the file, even on success.  The file pins KVM,
+> +	 * not the other way 'round.  Active bindings are invalidated if the
+                             ^
+around?
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+Yilun
+
+> +	 * file is closed before memslots are destroyed.
+> +	 */
+> +	fput(file);
+> +	return 0;
+> +
+> +err:
+> +	fput(file);
+> +	return -EINVAL;
+> +}
 
