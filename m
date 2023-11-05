@@ -1,187 +1,193 @@
-Return-Path: <kvm+bounces-587-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-588-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28EE97E1097
-	for <lists+kvm@lfdr.de>; Sat,  4 Nov 2023 19:28:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7436C7E12F3
+	for <lists+kvm@lfdr.de>; Sun,  5 Nov 2023 11:16:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A7A01C20A7A
-	for <lists+kvm@lfdr.de>; Sat,  4 Nov 2023 18:28:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 164CD2814C7
+	for <lists+kvm@lfdr.de>; Sun,  5 Nov 2023 10:16:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C06A823753;
-	Sat,  4 Nov 2023 18:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="ScwqdFiH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1362AD49;
+	Sun,  5 Nov 2023 10:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB0122301
-	for <kvm@vger.kernel.org>; Sat,  4 Nov 2023 18:28:35 +0000 (UTC)
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 666B9D45
-	for <kvm@vger.kernel.org>; Sat,  4 Nov 2023 11:28:32 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6bd0e1b1890so2624153b3a.3
-        for <kvm@vger.kernel.org>; Sat, 04 Nov 2023 11:28:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1699122512; x=1699727312; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1Raflo2MBCaVxBeRy7GF6tekllGnegpXQwpqv2rpEa4=;
-        b=ScwqdFiHbXZNgbXoMVlLHyOWjkB3JCmJGcSM1LgTY1yV3eOfjh0d7ddz0j74dkmzGp
-         xQHsfNaSo7NW+aSpEV0GV7/H4XAHxPjN/ZxqhlI3ACUhkiWgI1+PkzyueL1yMM1gkq2J
-         S2UZBkIwbFO7sNJYOz9XivhzOkvLm47TrjhcWt5NVuX0/XAkO8R57XmCTXKxZLNSC0zW
-         FCfGnHlJClnbdX79VS2+azRCS0eqY9oMSz34+IDKZ4H+sZaG8J8ZWbPIIsxpCgbdgu5T
-         9Q5rPh21kJ+6FwfB6JUPBS5YC9TJsLDGc9z+e5SXy3szoiANAZwhEBXuulcyQzCRvNkL
-         aeow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699122512; x=1699727312;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Raflo2MBCaVxBeRy7GF6tekllGnegpXQwpqv2rpEa4=;
-        b=TgIC6b/c6DFrcAe8DwYfB5JVKBrcEf06Pul+g8FUH1U+5WQbKfIVMYgRcGCreGMEVv
-         ySo6JVIqgtXPW7jKSmjOHclrusAq0ZLmjY5MwJWxRWC5dCPdDdXeH/Fog88L9Jl4S8pS
-         owkjdw19s+4RDob4oROJsLABEDV2Do0UZjjTQaeoEjh7I2grwAAukxPMzZFZjGu6vjre
-         RKEZ7za4/ZCxbs3JJD3hi+DGfa7P8Ppcr2Df0i/7CVwvOh0zlds1ZdHHdKtWk74jaTAQ
-         vedF4IXN2H3mtuviOm8wBVfZYAFLVrvis8sGrH0wtOMHJcpsgo1SdrKvjS7G6LuuVXIr
-         gnXg==
-X-Gm-Message-State: AOJu0YzitQ1PEOVCWpcphGNrib5WaTfWb0RreOiXCqwRuDxQFVnr0D2d
-	/3TbAXuRc4OJl6AP7ok/fELZ1+E8/Hw8iqSsrUZlpyvN
-X-Google-Smtp-Source: AGHT+IGaDGG/WtGKuZ1zNNq+ppYZY512/uaLCsfdkoU+LYbpvTT3T/3A11TecaxZQDaizKJ+OJEyaA==
-X-Received: by 2002:a05:6a00:3a0e:b0:6c3:402a:d54d with SMTP id fj14-20020a056a003a0e00b006c3402ad54dmr6843336pfb.11.1699122511816;
-        Sat, 04 Nov 2023 11:28:31 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c085:21e1::1052? ([2620:10d:c090:400::4:56eb])
-        by smtp.gmail.com with ESMTPSA id h1-20020a056a00230100b006889511ab14sm3187642pfh.37.2023.11.04.11.28.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 04 Nov 2023 11:28:31 -0700 (PDT)
-Message-ID: <67c45ff3-4f98-4ca5-bd68-2d90cc52a775@davidwei.uk>
-Date: Sat, 4 Nov 2023 11:28:28 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77553C2A
+	for <kvm@vger.kernel.org>; Sun,  5 Nov 2023 10:16:11 +0000 (UTC)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9F40BF2
+	for <kvm@vger.kernel.org>; Sun,  5 Nov 2023 02:16:08 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 47381C15;
+	Sun,  5 Nov 2023 02:16:51 -0800 (PST)
+Received: from monolith (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 911093F64C;
+	Sun,  5 Nov 2023 02:16:06 -0800 (PST)
+Date: Sun, 5 Nov 2023 10:16:50 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: pbonzini@redhat.com, thuth@redhat.com, andrew.jones@linux.dev,
+	kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+	nikos.nikoleris@arm.com
+Subject: Re: [kvm-unit-tests RFC PATCH 00/19] arm/arm64: Rework cache
+ maintenance at boot
+Message-ID: <ZUdrku2u6OGc43wv@monolith>
+References: <20220809091558.14379-1-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] virtio/vsock: Fix uninit-value in
- virtio_transport_recv_pkt()
-To: Shigeru Yoshida <syoshida@redhat.com>, stefanha@redhat.com,
- sgarzare@redhat.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+0c8ce1da0ac31abbadcd@syzkaller.appspotmail.com
-References: <20231104150531.257952-1-syoshida@redhat.com>
-Content-Language: en-GB
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20231104150531.257952-1-syoshida@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220809091558.14379-1-alexandru.elisei@arm.com>
 
-On 2023-11-04 08:05, Shigeru Yoshida wrote:
-> KMSAN reported the following uninit-value access issue:
-> 
-> =====================================================
-> BUG: KMSAN: uninit-value in virtio_transport_recv_pkt+0x1dfb/0x26a0 net/vmw_vsock/virtio_transport_common.c:1421
->  virtio_transport_recv_pkt+0x1dfb/0x26a0 net/vmw_vsock/virtio_transport_common.c:1421
->  vsock_loopback_work+0x3bb/0x5a0 net/vmw_vsock/vsock_loopback.c:120
->  process_one_work kernel/workqueue.c:2630 [inline]
->  process_scheduled_works+0xff6/0x1e60 kernel/workqueue.c:2703
->  worker_thread+0xeca/0x14d0 kernel/workqueue.c:2784
->  kthread+0x3cc/0x520 kernel/kthread.c:388
->  ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
-> 
-> Uninit was stored to memory at:
->  virtio_transport_space_update net/vmw_vsock/virtio_transport_common.c:1274 [inline]
->  virtio_transport_recv_pkt+0x1ee8/0x26a0 net/vmw_vsock/virtio_transport_common.c:1415
->  vsock_loopback_work+0x3bb/0x5a0 net/vmw_vsock/vsock_loopback.c:120
->  process_one_work kernel/workqueue.c:2630 [inline]
->  process_scheduled_works+0xff6/0x1e60 kernel/workqueue.c:2703
->  worker_thread+0xeca/0x14d0 kernel/workqueue.c:2784
->  kthread+0x3cc/0x520 kernel/kthread.c:388
->  ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
-> 
-> Uninit was created at:
->  slab_post_alloc_hook+0x105/0xad0 mm/slab.h:767
->  slab_alloc_node mm/slub.c:3478 [inline]
->  kmem_cache_alloc_node+0x5a2/0xaf0 mm/slub.c:3523
->  kmalloc_reserve+0x13c/0x4a0 net/core/skbuff.c:559
->  __alloc_skb+0x2fd/0x770 net/core/skbuff.c:650
->  alloc_skb include/linux/skbuff.h:1286 [inline]
->  virtio_vsock_alloc_skb include/linux/virtio_vsock.h:66 [inline]
->  virtio_transport_alloc_skb+0x90/0x11e0 net/vmw_vsock/virtio_transport_common.c:58
->  virtio_transport_reset_no_sock net/vmw_vsock/virtio_transport_common.c:957 [inline]
->  virtio_transport_recv_pkt+0x1279/0x26a0 net/vmw_vsock/virtio_transport_common.c:1387
->  vsock_loopback_work+0x3bb/0x5a0 net/vmw_vsock/vsock_loopback.c:120
->  process_one_work kernel/workqueue.c:2630 [inline]
->  process_scheduled_works+0xff6/0x1e60 kernel/workqueue.c:2703
->  worker_thread+0xeca/0x14d0 kernel/workqueue.c:2784
->  kthread+0x3cc/0x520 kernel/kthread.c:388
->  ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
-> 
-> CPU: 1 PID: 10664 Comm: kworker/1:5 Not tainted 6.6.0-rc3-00146-g9f3ebbef746f #3
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc38 04/01/2014
-> Workqueue: vsock-loopback vsock_loopback_work
-> =====================================================
-> 
-> The following simple reproducer can cause the issue described above:
-> 
-> int main(void)
-> {
->   int sock;
->   struct sockaddr_vm addr = {
->     .svm_family = AF_VSOCK,
->     .svm_cid = VMADDR_CID_ANY,
->     .svm_port = 1234,
->   };
-> 
->   sock = socket(AF_VSOCK, SOCK_STREAM, 0);
->   connect(sock, (struct sockaddr *)&addr, sizeof(addr));
->   return 0;
-> }
-> 
-> This issue occurs because the `buf_alloc` and `fwd_cnt` fields of the
-> `struct virtio_vsock_hdr` are not initialized when a new skb is allocated
-> in `virtio_transport_init_hdr()`. This patch resolves the issue by
-> initializing these fields during allocation.
-> 
-> Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
-> Reported-and-tested-by: syzbot+0c8ce1da0ac31abbadcd@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=0c8ce1da0ac31abbadcd
-> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
-> ---
-> v1->v2:
-> - Rebase on the latest net tree
-> https://lore.kernel.org/all/20231026150154.3536433-1-syoshida@redhat.com/
-> ---
->  net/vmw_vsock/virtio_transport_common.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index e22c81435ef7..dc65dd4d26df 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -130,6 +130,8 @@ static void virtio_transport_init_hdr(struct sk_buff *skb,
->  	hdr->dst_port	= cpu_to_le32(dst_port);
->  	hdr->flags	= cpu_to_le32(info->flags);
->  	hdr->len	= cpu_to_le32(payload_len);
-> +	hdr->buf_alloc	= cpu_to_le32(0);
-> +	hdr->fwd_cnt	= cpu_to_le32(0);
+Hi,
 
-This change looks good to me.
+I had a v2 almost finished a few months ago (maybe a year), but I parked
+the patches when we decided that the best thing to do was to have UEFI
+support in first, then rework the cache maintenance - that way, the changes
+can be tested on baremetal, which is much more unforgiving than KVM.
 
-I did notice that payload_len in virtio_transport_init_hdr is size_t but
-len in struct virtio_vsock_hdr is __le32. But I don't think this is an
-issue other than wasting some stack space, though.
+Unfortunately I've been busy with other things and I don't know when I'll
+be able to come back to this. So I've pushed the work-in-progress here [1],
+with what I hope is a helpful changelog since v1.
 
->  }
->  
->  static void virtio_transport_copy_nonlinear_skb(const struct sk_buff *skb,
+If my memory serves me right, even though it is marked as wip, it was
+running just fine under KVM and I was waiting for UEFI to test it on
+baremetal before posting.
+
+I don't know when I'll have the time to get back to the series, so if
+anyone is still interested, feel free to pick it up. If someone does pick
+up the series, they can drop/rework patches as they see fit, and I'll try
+to do my best to review whatever is posted on the list (but no promises).
+
+[1] https://gitlab.arm.com/linux-arm/kvm-unit-tests-ae/-/tree/arm-arm64-rework-cache-maintenance-at-boot-v2-wip2
+
+Thanks,
+Alex
+
+On Tue, Aug 09, 2022 at 10:15:39AM +0100, Alexandru Elisei wrote:
+> I got the idea for this series as I was looking at the UEFI support series
+> [1]. More specifically, I realized that the cache maintenance performed by
+> asm_mmu_disable is insuficient. Patch #19 ("arm/arm64: Rework the cache
+> maintenance in asm_mmu_disable") describes what is wrong with
+> asm_mmu_disable. A detailed explanation of what cache maintenance is needed
+> and why is needed can be found in patch #18 ("arm/arm64: Perform dcache
+> maintenance at boot").
+> 
+> Then I realized that I couldn't fix only asm_mmu_disable, and leave the
+> rest of kvm-unit-tests without the needed cache maintenance, so here it is,
+> my attempt at adding the cache maintenace operations (from now on, CMOs)
+> required by the architecture.
+> 
+> My approach is to try to enable the MMU and build the translation tables as
+> soon as possible, to avoid as much of cache maintenance as possible. I
+> didn't want to do it in the early assembly code, like Linux, because I like
+> the fact that kvm-unit-tests keeps the assembly code to a minimum, and I
+> wanted to preserve that. So I made the physical allocator simpler (patches
+> #2-#6) so it can be used to create the translation tables immediately after
+> the memory regions are populated.
+> 
+> After moving some code around, especially how the secondaries are brought
+> online, the dcache maintenance is implemented in patch #18 ("arm/arm64:
+> Perform dcache maintenance at boot").
+> 
+> The series is an RFC, and I open to suggestions about how to do things
+> better; I'm happy to rework the entire series if a better approach is
+> proposed.
+> 
+> Why is this needed? Nobody complained about test failing because of missing
+> CMOs before, so why add them now? I see two reasons for the series:
+> 
+> 1. For architectural correctness. The emphasis has been so far on the test
+> themselves to be architectural compliant, but I believe that the boot code
+> should get the same treatment. kvm-unit-tests has started to be used in
+> different ways than before, and I don't think that we should limit
+> ourselves to running under one hypervisor, or running under a hypervisor at
+> all. Which brings me to point number 2.
+> 
+> 2. If nothing else, this can serve as a showcase for the UEFI support
+> series for the required cache maintenance. Although I hope that UEFI
+> support will end up sharing at least some of the boot code with the
+> non-UEFI boot path.
+> 
+> This is an RFC and has some rough edges, probably also bugs, but I believe
+> the concept to be sound. If/when the series stabilizes, I'll probably split
+> it into separate series (for example, the __ASSEMBLY__ define patch could
+> probably be separate from the others). Tested by running all the arm and
+> arm64 tests on a rockpro64 with qemu.
+> 
+> [1] https://lore.kernel.org/all/20220630100324.3153655-1-nikos.nikoleris@arm.com/
+> 
+> Alexandru Elisei (19):
+>   Makefile: Define __ASSEMBLY__ for assembly files
+>   lib/alloc_phys: Initialize align_min
+>   lib/alloc_phys: Use phys_alloc_aligned_safe and rename it to
+>     memalign_early
+>   powerpc: Use the page allocator
+>   lib/alloc_phys: Remove locking
+>   lib/alloc_phys: Remove allocation accounting
+>   arm/arm64: Mark the phys_end parameter as unused in setup_mmu()
+>   arm/arm64: Use pgd_alloc() to allocate mmu_idmap
+>   arm/arm64: Zero secondary CPUs' stack
+>   arm/arm64: Enable the MMU early
+>   arm/arm64: Map the UART when creating the translation tables
+>   arm/arm64: assembler.h: Replace size with end address for
+>     dcache_by_line_op
+>   arm: page.h: Add missing libcflat.h include
+>   arm/arm64: Add C functions for doing cache maintenance
+>   lib/alloc_phys: Add callback to perform cache maintenance
+>   arm/arm64: Allocate secondaries' stack using the page allocator
+>   arm/arm64: Configure secondaries' stack before enabling the MMU
+>   arm/arm64: Perform dcache maintenance at boot
+>   arm/arm64: Rework the cache maintenance in asm_mmu_disable
+> 
+>  Makefile                   |   5 +-
+>  arm/Makefile.arm           |   4 +-
+>  arm/Makefile.arm64         |   4 +-
+>  arm/Makefile.common        |   4 +-
+>  arm/cstart.S               |  59 ++++++++++++------
+>  arm/cstart64.S             |  56 +++++++++++++----
+>  lib/alloc_phys.c           | 122 ++++++++++++-------------------------
+>  lib/alloc_phys.h           |  13 +++-
+>  lib/arm/asm/assembler.h    |  15 ++---
+>  lib/arm/asm/cacheflush.h   |   1 +
+>  lib/arm/asm/mmu-api.h      |   1 +
+>  lib/arm/asm/mmu.h          |   6 --
+>  lib/arm/asm/page.h         |   2 +
+>  lib/arm/asm/pgtable.h      |  52 ++++++++++++++--
+>  lib/arm/asm/thread_info.h  |   3 +-
+>  lib/arm/cache.S            |  89 +++++++++++++++++++++++++++
+>  lib/arm/io.c               |   5 ++
+>  lib/arm/io.h               |   3 +
+>  lib/arm/mmu.c              |  60 +++++++++++-------
+>  lib/arm/processor.c        |   6 +-
+>  lib/arm/setup.c            |  66 ++++++++++++++++----
+>  lib/arm/smp.c              |   9 ++-
+>  lib/arm64/asm/assembler.h  |  11 ++--
+>  lib/arm64/asm/cacheflush.h |  32 ++++++++++
+>  lib/arm64/asm/mmu.h        |   5 --
+>  lib/arm64/asm/pgtable.h    |  67 ++++++++++++++++++--
+>  lib/arm64/cache.S          |  85 ++++++++++++++++++++++++++
+>  lib/arm64/processor.c      |   5 +-
+>  lib/devicetree.c           |   2 +-
+>  lib/powerpc/setup.c        |   8 +++
+>  powerpc/Makefile.common    |   1 +
+>  powerpc/cstart64.S         |   1 -
+>  powerpc/spapr_hcall.c      |   5 +-
+>  33 files changed, 608 insertions(+), 199 deletions(-)
+>  create mode 100644 lib/arm/asm/cacheflush.h
+>  create mode 100644 lib/arm/cache.S
+>  create mode 100644 lib/arm64/asm/cacheflush.h
+>  create mode 100644 lib/arm64/cache.S
+> 
+> -- 
+> 2.37.1
+> 
 
