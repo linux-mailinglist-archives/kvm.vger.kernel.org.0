@@ -1,123 +1,120 @@
-Return-Path: <kvm+bounces-777-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-778-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FA127E28A2
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:26:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B32B7E28B9
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:31:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D151EB20C39
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 15:26:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 558DA28131B
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 15:31:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B6C928E0D;
-	Mon,  6 Nov 2023 15:26:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1A5728E0F;
+	Mon,  6 Nov 2023 15:31:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hy5SrHpU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VS2mrP9J"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB99628DCA
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 15:26:32 +0000 (UTC)
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97538107
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 07:26:31 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id 41be03b00d2f7-5b980391d7cso2578987a12.0
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 07:26:31 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECF128E08
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 15:31:21 +0000 (UTC)
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00F94112
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 07:31:20 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1cc5ef7e815so30579595ad.3
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 07:31:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699284391; x=1699889191; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x4LpEv+pwTjdcAwF4xpHM37cbtA1PVwPNrLsJCgrL6w=;
-        b=Hy5SrHpU6ePJYqtbTSD1DD575oeBmoUHJBdto4yxZMquOSLgbQi32K5rSCWluvGWgm
-         HWMCwQPDsurvzgqC6Jt8PecIkbnKYEAznR8A9wFu13xFRfKk9FBAwUxb3Vrg/O4zu/ij
-         PZe/8IKFrUHBEtDnpoMZXxUdSoky5trp7i5fPPd892TsxS9R5GzYHv77Aq8UpGuksc/l
-         ZedyLtAvWdH8JvJhT9zXsNViOwof8h2wlGeAU2YtbO6xWrYz/M6IaX4YY/me9ICvxrVu
-         nBKKV0nqgn94DBuKagVU/2WCAuCeHFXOdDY+w9j7cbssso8MSdKgO1THQ4FuvjN2VUOJ
-         rynA==
+        d=google.com; s=20230601; t=1699284680; x=1699889480; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W4pgWCBKNlAdji/TNyedAYk8usKNcfQXaSq+BvgKk6s=;
+        b=VS2mrP9JMObCyBc3U1bEWv/lJ3A/ztpYHfW2X8kYcyH8DlefIF2Q68JIoPHsE1HWZj
+         XzIetZ3Uj9A9aIk7gTGVUofPTSKOYlXfhZj2V7f1yb2bSWgRhrkSv+j/fK7AyzBH+6nP
+         htCiW4OTQTAoxnoq7XGc3bNae+4kwFWvOXgAfteefJCKcAqkGMK+yH8i0tN5kHCpH+p4
+         iilEXbElOIQOoAUbiEhzSLs4nKdK0ICIORxhIh+R2lUVmD5tAi7vQMcsRvKQt3QgHI2h
+         H+/8i8PQ8gp9nGbXs8hZCTU8ZWVs0+7S4y6vKRNKP1vTxRQPKYSRqXXWiw/o7RvS+exH
+         9PTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699284391; x=1699889191;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x4LpEv+pwTjdcAwF4xpHM37cbtA1PVwPNrLsJCgrL6w=;
-        b=HyXq3LIGADrq1hNBbUQgO/jVHVH0NbMDwTXy0fpREc077cf+xhxOxcBoSTtM4tJ5FI
-         Ufb1R65xCPUvsIYIQK24WYLMeUfvvfPCwbgQCCoWwvCTNor/HlCZRRU81O6roHDDrrhE
-         7HwqNtT0m/DO0lPuv2nyijguEpRjmab5J6M8c411mE1aB6PuF36HspuSQbzMbN9bMV0F
-         R6ij4Ao5yBHVtDOx05y0/41rnJc15rlTTRNxB8ezeQbrxvkJEViBWdZWmNxtg4nBrxE+
-         8qvfSCGpFvrPlp4UXuBhCp1UGliaPXDhd5drVCPUpcP8DInC+Eq3Hx1PYrXIIoZ6QhSn
-         4h6g==
-X-Gm-Message-State: AOJu0YwP9x9ZHAo804k1pyhLJqFvbX+AbrQ9oS9QsChHlma6inn5ykJw
-	GmdWeUQTkjG4rt8FAP+zISx9G35HPjbEUsifiFQ=
-X-Google-Smtp-Source: AGHT+IHneaGbT3C6gj2FjJc2jLmhWR8Zp1CCaLiP6VFe6pRtSFgtNJLd4OfSAHBhhT0X9wtKmfoQIrPkKcM7VPhtP9U=
-X-Received: by 2002:a17:90a:f198:b0:27d:60b1:4f2c with SMTP id
- bv24-20020a17090af19800b0027d60b14f2cmr22602053pjb.4.1699284390916; Mon, 06
- Nov 2023 07:26:30 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699284680; x=1699889480;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=W4pgWCBKNlAdji/TNyedAYk8usKNcfQXaSq+BvgKk6s=;
+        b=kSmcRcY5BAoXKids33KSU5Wj4R4A7yiWdjec1gkvxi7Iy4UlYepf9X/gfQIy+iP0n8
+         eOi7lgl2uZdeT0FFUqhoEi7cvCYbS1kdmA6DI6TG9RjWhxcnhejzKw7HdO0FnfdNY5jN
+         l46VdIoYMzR3g9UcREzdGkg7cshlwXXlcKZ3pe960s+IZhRl8MXz6O+VByLJoGTEfWYx
+         tIhd1puUdPcEW/SAH9szs9Hmh9Xu1gU5q/lc1MClsgTRK76lWumlmWklA/9q14he0JiE
+         jzWU6ZmVDI9FbV3JNFsBSpVlN2wLZUy2O9gQCfKln+6Efp/kUhdoB1kLALvbb3AN0eNf
+         3Clw==
+X-Gm-Message-State: AOJu0YyR4aR2F2d1DBXGYmArMxlbzq+y6phfBBFp4hOwUlJ8qDLbAMCR
+	uS5WxRYXiRAErG+WOC9w7sei8U/SZVc=
+X-Google-Smtp-Source: AGHT+IE+rwwSZOnNIm1oVLkjORXDZFsy09Wm5zk955j3nfIYxz7wPLisHgR0CkAQkaQqXTvi+0e32bs4FSs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:ac8e:b0:1cc:30cf:eae6 with SMTP id
+ h14-20020a170902ac8e00b001cc30cfeae6mr498273plr.10.1699284680259; Mon, 06 Nov
+ 2023 07:31:20 -0800 (PST)
+Date: Mon, 6 Nov 2023 07:31:18 -0800
+In-Reply-To: <CALMp9eS+kNYYK_1Ufy5vc5PK25q-ny20woxbHz1onStkcfWNVw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231021134015.1119597-1-daan.j.demeyer@gmail.com>
- <ZTlSPbh2GnhOKExO@redhat.com> <CAO8sHcnh1mqaEchGSwYaFr7+LTau9yQRt_4zVJGrFsroWik3ew@mail.gmail.com>
-In-Reply-To: <CAO8sHcnh1mqaEchGSwYaFr7+LTau9yQRt_4zVJGrFsroWik3ew@mail.gmail.com>
-From: Daan De Meyer <daan.j.demeyer@gmail.com>
-Date: Mon, 6 Nov 2023 16:26:19 +0100
-Message-ID: <CAO8sHcmFqcHs=F7GTUj=Avn_K91q5sw97nLKEco=2kpCsMyCxg@mail.gmail.com>
-Subject: Re: [PATCH] Add class property to configure KVM device node to use
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20231104000239.367005-1-seanjc@google.com> <20231104000239.367005-3-seanjc@google.com>
+ <CALMp9eS+kNYYK_1Ufy5vc5PK25q-ny20woxbHz1onStkcfWNVw@mail.gmail.com>
+Message-ID: <ZUkGxqX8mJPPtxHD@google.com>
+Subject: Re: [PATCH v6 02/20] KVM: x86/pmu: Don't enumerate support for fixed
+ counters KVM can't virtualize
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kan Liang <kan.liang@linux.intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
+	Jinrong Liang <cloudliang@tencent.com>, Like Xu <likexu@tencent.com>, 
+	Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-Ping
+On Sat, Nov 04, 2023, Jim Mattson wrote:
+> On Fri, Nov 3, 2023 at 5:02=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> >
+> > Hide fixed counters for which perf is incapable of creating the associa=
+ted
+> > architectural event.  Except for the so called pseudo-architectural eve=
+nt
+> > for counting TSC reference cycle, KVM virtualizes fixed counters by
+> > creating a perf event for the associated general purpose architectural
+> > event.  If the associated event isn't supported in hardware, KVM can't
+> > actually virtualize the fixed counter because perf will likely not prog=
+ram
+> > up the correct event.
+>=20
+> Won't it? My understanding was that perf preferred to use a fixed
+> counter when there was a choice of fixed or general purpose counter.
+> Unless the fixed counter is already assigned to a perf_event, KVM's
+> request should be satisfied by assigning the fixed counter.
+>=20
+> > Note, this issue is almost certainly limited to running KVM on a funky
+> > virtual CPU model, no known real hardware has an asymmetric PMU where a
+> > fixed counter is supported but the associated architectural event is no=
+t.
+>=20
+> This seems like a fix looking for a problem. Has the "problem"
+> actually been encountered?
 
-Daan
-
-On Sat, 28 Oct 2023 at 14:07, Daan De Meyer <daan.j.demeyer@gmail.com> wrot=
-e:
->
-> Anything else needed before this patch can be merged?
->
-> Cheers,
->
-> Daan
->
-> On Wed, 25 Oct 2023 at 19:37, Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m> wrote:
-> >
-> > On Sat, Oct 21, 2023 at 03:40:15PM +0200, Daan De Meyer wrote:
-> > > This allows passing the KVM device node to use as a file
-> > > descriptor via /dev/fdset/XX. Passing the device node to
-> > > use as a file descriptor allows running qemu unprivileged
-> > > even when the user running qemu is not in the kvm group
-> > > on distributions where access to /dev/kvm is gated behind
-> > > membership of the kvm group (as long as the process invoking
-> > > qemu is able to open /dev/kvm and passes the file descriptor
-> > > to qemu).
-> > >
-> > > Signed-off-by: Daan De Meyer <daan.j.demeyer@gmail.com>
-> > > ---
-> > >  accel/kvm/kvm-all.c      | 25 ++++++++++++++++++++++++-
-> > >  include/sysemu/kvm_int.h |  1 +
-> > >  qemu-options.hx          |  8 +++++++-
-> > >  3 files changed, 32 insertions(+), 2 deletions(-)
-> >
-> > Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> >
-> >
-> > With regards,
-> > Daniel
-> > --
-> > |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> > |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> > |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
-> >
+Heh, yes, I "encountered" the problem in a curated VM I created.  But I com=
+pletely
+agree that this is unnecessary, especially since odds are very, very good t=
+hat
+requesting the architectural general purpose encoding will still work.  E.g=
+. in
+my goofy setup, the underlying hardware does support the architectural even=
+t and
+so even if perf doesn't use the fixed counter for whatever reason, the GP c=
+ounter
+will still count the right event.
 
