@@ -1,98 +1,121 @@
-Return-Path: <kvm+bounces-775-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-776-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEC9D7E274C
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 15:43:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C807C7E2877
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:16:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 944DC2811BC
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 14:43:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E237B21015
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 15:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B175B28DB0;
-	Mon,  6 Nov 2023 14:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463AE28E08;
+	Mon,  6 Nov 2023 15:16:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZiU9OBxE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qMMyAp8P"
 X-Original-To: kvm@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27F6BAD21
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 14:43:30 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBE31EA
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 06:43:28 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-da0c4ab85e2so2648924276.2
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 06:43:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699281808; x=1699886608; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VxhFFdGA0ojufmjeJNUhYbX6mfIrV7txvfMvwhSfBvI=;
-        b=ZiU9OBxEeF3BDTeqyGOH4aUPDjpQiz1Jiqxn+UfoMjzf5xw0aDbwoUjR/UIAfwI3hW
-         +9gv7hQ8VYVEl0kwTLWpVX0Idjmz8uEHRAZ9YXXXiI2I7koAKLz/ITMczlYoe3h2tuvm
-         fhWP3Xm5R80YSa3Sv72nLnyaak0Jdc/V7vjnh/KVR4ZWhbDhbYTubqpVDew01Nz4rBT5
-         7smsx88D/bJz+tzwhchhedPJ98s4F/SMvb2EyH3E5SD7kUzj+msO2yKT/JFTd0gSoxrP
-         u71I6Ta2IUFCR3Ao7R6kunLz/hzaAozbTY99r5QdpbuPJoi8YM6Qjv+c0/UjjDsMPMCP
-         vpHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699281808; x=1699886608;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VxhFFdGA0ojufmjeJNUhYbX6mfIrV7txvfMvwhSfBvI=;
-        b=BVlxHdIkBctajaxZxz7Bi9NmU8ZkxvtqL1gs/QnnthioE3fmde+AKD9rMAfrBjYpRD
-         cgtU51Y8uUbG0Wbps694DGKhTs6VxoSe7fafrpqN0/tBNS+ISGbS3tcAEMAEfMKB9qYr
-         TpC8GTq0wCOCZIl2tFGB5q1UAOS+qBSpK+k/z2M2sUnFMYW/pVNWw+bZ0p8lHbIcxck/
-         tdybqXqyMm1pdDJq9MElO8yK0dWIw3I3frUiy6brdC5btLRY/4X7nC8MweKh5zvnyyRq
-         OgHKCiym1sUa4ixgA1Qj5bILTERehTD88OU9CuWJkUSezx8a6I8l2lqnnPGjRNi9Jsxh
-         9mVg==
-X-Gm-Message-State: AOJu0YxajtErj19ak7Va2fJCq8YGSxvwjsLolsdXROcvhXfisRAPq5nN
-	JDikNV+B80tYavHzbWgXgVdE+diDopQ=
-X-Google-Smtp-Source: AGHT+IEeaK2OvSI6L2Xq4KzsQ2jm/Pbk5vY3mHTW2bRkFtSlTE2uRjmmAIgguun4lL3NuXFip0HnmlUhXYY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ce94:0:b0:da0:3bea:cdc7 with SMTP id
- x142-20020a25ce94000000b00da03beacdc7mr523910ybe.2.1699281807938; Mon, 06 Nov
- 2023 06:43:27 -0800 (PST)
-Date: Mon, 6 Nov 2023 06:43:26 -0800
-In-Reply-To: <CALMp9eSgvq1zOZ4KFnsPHQWk62AGYj560SvVops-bmtpyLGPRQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76091F95A;
+	Mon,  6 Nov 2023 15:16:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC322C433C8;
+	Mon,  6 Nov 2023 15:16:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699283789;
+	bh=zDZFduCEDJmeuVjp8rHp1YK3z18DtyX3wrd2wnaF+Bs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qMMyAp8P8d1YZR+ToLbBSMxg7E0h+nAM09J8k36AJrgWT3pLgMKJv3rUJwYZoBC+5
+	 /7HcfewbvKZBV+XxkAhBXKfAMpJI5v88gc4Hx8N8Z+ws3elm72tPTVmOM+mru/Ax7o
+	 hgKcBnrkjrOwDRP6ZT7ROB1Yw66jbjLQJ8E14gCmpX61VhuiBziDh0K7mRiqlcqPKr
+	 f2Apj/1uFkrm0Y9QqXxL4Y0uZAXlZ2WeCIdMR3xorlstgRMc5NC4/sI8S+JkZDghFD
+	 iwus793QJkToU2FLLBik2jgcjMG6YyKIg5FBdgreEw23GWddN78m4uMrF2NWf2K1cn
+	 BhSHwanj5lm1w==
+Date: Mon, 6 Nov 2023 16:16:16 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Sean Christopherson <seanjc@google.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
+	Xu Yilun <yilun.xu@intel.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+	Anish Moorthy <amoorthy@google.com>,
+	David Matlack <dmatlack@google.com>,
+	Yu Zhang <yu.c.zhang@linux.intel.com>,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Maciej Szmigiero <mail@maciej.szmigiero.name>,
+	David Hildenbrand <david@redhat.com>,
+	Quentin Perret <qperret@google.com>,
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+	Liam Merwick <liam.merwick@oracle.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCH 14/34] fs: Rename anon_inode_getfile_secure() and
+ anon_inode_getfd_secure()
+Message-ID: <20231106-kondor-anfahren-23157efabaef@brauner>
+References: <20231105163040.14904-1-pbonzini@redhat.com>
+ <20231105163040.14904-15-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231104000239.367005-1-seanjc@google.com> <20231104000239.367005-2-seanjc@google.com>
- <CALMp9eSgvq1zOZ4KFnsPHQWk62AGYj560SvVops-bmtpyLGPRQ@mail.gmail.com>
-Message-ID: <ZUj7jj-8pzvMDXDA@google.com>
-Subject: Re: [PATCH v6 01/20] KVM: x86/pmu: Don't allow exposing unsupported
- architectural events
-From: Sean Christopherson <seanjc@google.com>
-To: Jim Mattson <jmattson@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Kan Liang <kan.liang@linux.intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
-	Jinrong Liang <cloudliang@tencent.com>, Like Xu <likexu@tencent.com>, 
-	Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231105163040.14904-15-pbonzini@redhat.com>
 
-On Sat, Nov 04, 2023, Jim Mattson wrote:
-> On Fri, Nov 3, 2023 at 5:02=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> >
-> > Hide architectural events that unsupported according to guest CPUID *or=
-*
-> > hardware, i.e. don't let userspace advertise and potentially program
-> > unsupported architectural events.
->=20
-> The bitmask, pmu->available_event_types, is only used in
-> intel_hw_event_available(). As discussed
-> (https://lore.kernel.org/kvm/ZUU12-TUR_1cj47u@google.com/),
-> intel_hw_event_available() should go away.
+On Sun, Nov 05, 2023 at 05:30:17PM +0100, Paolo Bonzini wrote:
+> The call to the inode_init_security_anon() LSM hook is not the sole
+> reason to use anon_inode_getfile_secure() or anon_inode_getfd_secure().
+> For example, the functions also allow one to create a file with non-zero
+> size, without needing a full-blown filesystem.  In this case, you don't
+> need a "secure" version, just unique inodes; the current name of the
+> functions is confusing and does not explain well the difference with
+> the more "standard" anon_inode_getfile() and anon_inode_getfd().
+> 
+> Of course, there is another side of the coin; neither io_uring nor
+> userfaultfd strictly speaking need distinct inodes, and it is not
+> that clear anymore that anon_inode_create_get{file,fd}() allow the LSM
+> to intercept and block the inode's creation.  If one was so inclined,
+> anon_inode_getfile_secure() and anon_inode_getfd_secure() could be kept,
+> using the shared inode or a new one depending on CONFIG_SECURITY.
+> However, this is probably overkill, and potentially a cause of bugs in
+> different configurations.  Therefore, just add a comment to io_uring
+> and userfaultfd explaining the choice of the function.
+> 
+> While at it, remove the export for what is now anon_inode_create_getfd().
+> There is no in-tree module that uses it, and the old name is gone anyway.
 
-Ah drat, I completely forgot about this patch when I added the patch to rem=
-ove
-intel_hw_event_available().
+That's great, thanks.
+
+> If anybody actually needs the symbol, they can ask or they can just use
+> anon_inode_create_getfile(), which will be exported very soon for use
+> in KVM.
+> 
+> Suggested-by: Christian Brauner <brauner@kernel.org>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+
+Looks good to me,
+Reviewed-by: Christian Brauner <brauner@kernel.org>
 
