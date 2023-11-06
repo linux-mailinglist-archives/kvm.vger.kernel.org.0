@@ -1,142 +1,125 @@
-Return-Path: <kvm+bounces-791-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-792-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B685A7E29A4
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 17:25:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16D507E29E7
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 17:36:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FB152811A9
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:25:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C37752814E9
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:36:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFAF229416;
-	Mon,  6 Nov 2023 16:25:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A01FD250EB;
+	Mon,  6 Nov 2023 16:36:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ySAqN7oF"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rsvVA7mq"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F0028E3A
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 16:25:26 +0000 (UTC)
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EE971BC
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 08:25:19 -0800 (PST)
-Received: by mail-oi1-x229.google.com with SMTP id 5614622812f47-3b2f2b9a176so3006689b6e.0
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 08:25:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699287918; x=1699892718; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5xnGb8Sp7Bw2ldCk3b7+mm/bKINtcTCgeZ/KDZ+GW64=;
-        b=ySAqN7oF51WslqTAsZBYQDAR51F5kZ5ot7qgCrPfpSmjVPtcEgBcbD39bwxufl1EcP
-         yPyEG4zpQUveZNdV2zq28oAaZ4TO60traeY1rXtM6K3yhuoBF/0cTRT5MAhSnOUQEfzK
-         ro8+X30m/hTmUYF7liMk6rN9BOpurtlqYQN9v467MdzTk71trnHZZWjAh9Y+Mmd16zyb
-         keVJSJ60oOYsxhas68tyVoruknKeo64lObVhYadQtyrBr7d6H85Mm4+epAkEwnPDKRSH
-         gTU5iiWrVtBODpMqIoHJlDd1kwfyLpfo2hdBzPX8mNpgCgeTMkymuGzO4NpZyvzcs0o7
-         35DA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699287918; x=1699892718;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5xnGb8Sp7Bw2ldCk3b7+mm/bKINtcTCgeZ/KDZ+GW64=;
-        b=mYMirhyXOd/HUTGYXV9KILYH8mCrjBgJGVhZA6RXRQVAPkR6bpzP9i5dYCPdOMDPCP
-         852t5HI5HTHK/YqhiseS6/upOdwF2Gwe+jR/svb2MwipQhZjYPCFV39c+1E1R4vVNADK
-         ePOtyCgREsQuSofInlxLoTk17X9/s4jfxspUrRn1JG3olX4sa/ftGeSNoEnlsvemyBcB
-         j+ltDHbK8aUaxpAq0Zdu3iolffGTHpC9mnrg/vD4fFbrKGWmW/95HNNmeN6yc28kL1Bx
-         nIqedi+06Vix3zeqaMu/ukcOG5CY1SZovekqPEWh8XD6tR208OPbsYEtZwjq/d1GN1rp
-         vR4g==
-X-Gm-Message-State: AOJu0Yy7JoN3GQCyJEL/BqeePNtM1DaJ60dMYBu3nhx/qa3FW9+b+QuN
-	alzn0uNZO61+VzLWuEdM4pgbMoBpLH6qHwxfaCwVnw==
-X-Google-Smtp-Source: AGHT+IEz2M905daE9adgBPAvjj9bLaNYp4EiTefEe+KnfTT86zKFKrzhkzHGJH5RS/f9fNDUudL2BwXAULrnwcO9LCk=
-X-Received: by 2002:a05:6808:28c:b0:3af:a107:cf68 with SMTP id
- z12-20020a056808028c00b003afa107cf68mr28980109oic.40.1699287918292; Mon, 06
- Nov 2023 08:25:18 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C609D29420
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 16:36:21 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6088D45;
+	Mon,  6 Nov 2023 08:36:16 -0800 (PST)
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6FQ5fr028237;
+	Mon, 6 Nov 2023 16:36:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : cc :
+ subject : from : to : message-id : date; s=pp1;
+ bh=Sbzuf+OnQHH5tUggamHsayPTTzuNU772E4ajzp1pews=;
+ b=rsvVA7mqB4PnHnLYgH3ksbzHthBjhkbIfZL6QKS8GeTlRN9yC6cs5VZU32NzoqwaaUD1
+ rtJMxMe8ga/2/k6o8Npsy3oHbaAN1JA2WvTczykStHuvuUBzOg3vpnxGNC4i0PDEKwIF
+ vOGP3v5cC4jNmujtl9CvIsQgjYS4qYXTSt3hjYTOzqyXHxztGXe60g6JoR0tAzqHpgAo
+ iQOANnbwGw24XHpySfm0pnGqx8wMIkkGgpr1lG5GY8hm649iSx5fLUJD5DI+wgZ6Y8OO
+ CZ5p6GR5prPfOBM2ZIYpnW5e822l616FsbSIQnDxw9XDoBOnZsGXmctYzXDf9ULsxsRj TQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u722pkrc7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 16:36:16 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A6GCC8n020415;
+	Mon, 6 Nov 2023 16:36:15 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u722pkrbh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 16:36:15 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6EBuCf025608;
+	Mon, 6 Nov 2023 16:36:14 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u619nammp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 16:36:14 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A6GaBkN4915758
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 6 Nov 2023 16:36:11 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1937120043;
+	Mon,  6 Nov 2023 16:36:11 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EBAFA20040;
+	Mon,  6 Nov 2023 16:36:10 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.68.179])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  6 Nov 2023 16:36:10 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-26-pbonzini@redhat.com>
- <CA+EHjTxy6TWM3oBG0Q6v5090XTrs+M8_m5=6Z2E1P-HyTkrGWg@mail.gmail.com> <ZUkQjW-yMnLfD7XW@google.com>
-In-Reply-To: <ZUkQjW-yMnLfD7XW@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 6 Nov 2023 16:24:42 +0000
-Message-ID: <CA+EHjTw8Om6DGatxGhLJHpUb4RY_ma1pidd=mYxTQseE7vDB4A@mail.gmail.com>
-Subject: Re: [PATCH 25/34] KVM: selftests: Add helpers to convert guest memory
- b/w private and shared
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <908915d7-d782-4358-9937-bcdba8db0450@linux.ibm.com>
+References: <20231103092954.238491-1-nrb@linux.ibm.com> <20231103092954.238491-6-nrb@linux.ibm.com> <908915d7-d782-4358-9937-bcdba8db0450@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v7 5/8] s390x: lib: sie: don't reenter SIE on pgm int
+From: Nico Boehr <nrb@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>, imbrenda@linux.ibm.com,
+        thuth@redhat.com
+Message-ID: <169928857055.23816.6698035070741775404@t14-nrb>
+User-Agent: alot/0.8.1
+Date: Mon, 06 Nov 2023 17:36:10 +0100
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: RU93mczkM8tltSUMEz5Wnz2LUFs2koks
+X-Proofpoint-GUID: Uw5yRVyJ89Ap5qKu5pLgs3ecm28W3izW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-06_12,2023-11-02_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=1 malwarescore=0 adultscore=0
+ lowpriorityscore=0 spamscore=1 phishscore=0 priorityscore=1501 bulkscore=0
+ mlxscore=1 impostorscore=0 clxscore=1015 suspectscore=0 mlxlogscore=216
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2310240000
+ definitions=main-2311060134
 
-On Mon, Nov 6, 2023 at 4:13=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Mon, Nov 06, 2023, Fuad Tabba wrote:
-> > On Sun, Nov 5, 2023 at 4:34=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.c=
-om> wrote:
-> > > +void vm_guest_mem_fallocate(struct kvm_vm *vm, uint64_t base, uint64=
-_t size,
-> > > +                           bool punch_hole)
-> > > +{
-> > > +       const int mode =3D FALLOC_FL_KEEP_SIZE | (punch_hole ? FALLOC=
-_FL_PUNCH_HOLE : 0);
-> > > +       struct userspace_mem_region *region;
-> > > +       uint64_t end =3D base + size;
-> > > +       uint64_t gpa, len;
-> > > +       off_t fd_offset;
-> > > +       int ret;
-> > > +
-> > > +       for (gpa =3D base; gpa < end; gpa +=3D len) {
-> > > +               uint64_t offset;
-> > > +
-> > > +               region =3D userspace_mem_region_find(vm, gpa, gpa);
-> > > +               TEST_ASSERT(region && region->region.flags & KVM_MEM_=
-GUEST_MEMFD,
-> > > +                           "Private memory region not found for GPA =
-0x%lx", gpa);
-> > > +
-> > > +               offset =3D (gpa - region->region.guest_phys_addr);
-> >
-> > nit: why the parentheses?
->
-> I simply forgot to remove them when I changed the function to support spa=
-nning
-> multiple memslots, i.e. when the code went from this
->
->         fd_offset =3D region->region.gmem_offset +
->                     (gpa - region->region.guest_phys_addr);
->
-> to what you see above.
+Quoting Janosch Frank (2023-11-03 14:53:17)
+> On 11/3/23 10:29, Nico Boehr wrote:
+> > At the moment, when a PGM int occurs while in SIE, we will just reenter
+> > SIE after the interrupt handler was called.
+> >=20
+> > This is because sie() has a loop which checks icptcode and re-enters SIE
+> > if it is zero.
+> >=20
+> > However, this behaviour is quite undesirable for SIE tests, since it
+> > doesn't give the host the chance to assert on the PGM int. Instead, we
+> > will just re-enter SIE, on nullifing conditions even causing the
+> > exception again.
+> >=20
+> > In sie(), check whether a pgm int code is set in lowcore. If it has,
+> > exit the loop so the test can react to the interrupt. Add a new function
+> > read_pgm_int_code() to obtain the interrupt code.
+> >=20
+> > Note that this introduces a slight oddity with sie and pgm int in
+> > certain cases: If a PGM int occurs between a expect_pgm_int() and sie(),
+> > we will now never enter SIE until the pgm_int_code is cleared by e.g.
+> > clear_pgm_int().
+>=20
+> Is there any use in NOT having an assert(!read_pgm_int_code()) before=20
+> entering the loop?
 
-I wasn't actually expecting an answer, but I literally _did_ ask for it :)
-
-Thanks,
-/fuad
+I added it, nothing breaks, so probably none. Thanks.
 
