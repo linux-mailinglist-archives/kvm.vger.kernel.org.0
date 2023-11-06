@@ -1,477 +1,186 @@
-Return-Path: <kvm+bounces-738-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-739-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2A1A7E2089
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:55:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95A2C7E2128
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 13:18:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B780B20DC5
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:55:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50073281451
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:18:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189C91A739;
-	Mon,  6 Nov 2023 11:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80D031EB54;
+	Mon,  6 Nov 2023 12:18:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jA7a9Q5u"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="i5AHHhBn"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF641A5A4
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:55:22 +0000 (UTC)
-Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04543125
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 03:55:19 -0800 (PST)
-Received: by mail-qv1-xf30.google.com with SMTP id 6a1803df08f44-6705379b835so28849876d6.1
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 03:55:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699271718; x=1699876518; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c8NELU8K0U+724gQqgT5wy1Wri3ftccwsyaGDd96txU=;
-        b=jA7a9Q5u3tTa1uK+1x+C7dQVcnvnVJCLDCx9vVeyIoTZ6qw54qwmdGSo/CNWcdGrT2
-         q2szNqZW2ag86DEgyroZQDG7h123QypnstzbmS42QahAynLFUEqo9GQJaNoHaidGG8am
-         c1/3X85PwjNO2HEEuCskg0eeo5XOA9okoYedeZWY1U+tA4q7Bd53Sz2SwpjVWqJlne4S
-         VItwsHz8bMlhwejLoG+d41aA5kYtMNwr6owvMfONdpxrptuq3+eO4bSO87krtyKkZAW0
-         btZEd+teTJXkYtJuPVCX1o83AQ8FIKAGoXh5UZ/VVsaMR4LgIArF4S/wFP0+QObZt4iJ
-         hHHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699271718; x=1699876518;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=c8NELU8K0U+724gQqgT5wy1Wri3ftccwsyaGDd96txU=;
-        b=EVKVL5G+n6iA7z/5LR+tJcHWYyzuXcHnWwaztxO3slgVWkWOoj89bSTfm6k/K1fF3R
-         IW2E0tSiskgOwcMwl+pIfOHuSnVoG0iPYh2tAnAaqwzz1bGpadABWL49rUpzC7jcnOs6
-         R0poYo+mnWVBZ0Q0sbMhPMfGon95dutSctScVnW1gMDEtN9O1pRGM1kT+SwCRXxWH+hP
-         oFzBM/HPTOJpwKavuG714Q5aV0VCX2g6JVhtKEaWIcNhKBatqVhaKOuZHzCX5O2wfSd8
-         LV9oYH4cNZ8QUwyyQw/nHknHSMziD4qRNJXp2tp1rDRleB1XoC6R2eCuOZFq1ug7tDhC
-         j8LA==
-X-Gm-Message-State: AOJu0YxJw/j9SWm3qT+CiI1NB9ViCt1rW9xHWnUJfU5zJQ19s723sb7g
-	pZYk1VQeHP7ZoS352dn2GAqngrHmE3LdZfAOxPkGRw==
-X-Google-Smtp-Source: AGHT+IHpVKDogqYQTihitTUe1P1EC0BoRtrFXM2LqQxju0Y16TTjwSfxvbJ6Op1XhFBMPQO2JF14bitC65EzLdgz9hY=
-X-Received: by 2002:ad4:574b:0:b0:66d:775:d1af with SMTP id
- q11-20020ad4574b000000b0066d0775d1afmr35284081qvx.59.1699271717922; Mon, 06
- Nov 2023 03:55:17 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4ED71EB36
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 12:18:16 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3112710DD;
+	Mon,  6 Nov 2023 04:18:14 -0800 (PST)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6Bkw2U008679;
+	Mon, 6 Nov 2023 12:18:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=n1HCNS2C1DIwKMuK9T+3ZhC1Zs59rbEWAeWHmBM+lqw=;
+ b=i5AHHhBnIONfmYlm0w/zpnikchMh3ADiH7/S4H+lS3sZrDzcNiJSkFoJuw/Oz8eb9WxL
+ 53MrMnOPDOVChRktJtMhh6O0EGh/6tEQTMWNt6LhjdzygTeWF/SX+LDNvg3Hs/sf4Fz7
+ Q6WT+4Fl+VzABax5a3VhL55Oi4EmdJMWeYcjYYatPzRVT8Ngkzj7MEhjcew5alX2ZUOt
+ VLhFHczCFOZ4ZmUNSywxM662PVtD8FwYgNhLBhLW1MNvGdVsfluIjfeHl00iNjtNLQrD
+ vX23YBmWaohAPPfAzmbpYvn2YDz3i2ovWuwygV9omZurByskW9QQu4edo8iDXj+SGj1U 9Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u6yjtrwn3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 12:18:13 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A6BlZ8a011477;
+	Mon, 6 Nov 2023 12:18:12 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u6yjtrwmt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 12:18:12 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6AbsxW007958;
+	Mon, 6 Nov 2023 12:18:12 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u60ny996j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 12:18:11 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A6CI5P614090842
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 6 Nov 2023 12:18:05 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BBD492004B;
+	Mon,  6 Nov 2023 12:18:05 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 620C620040;
+	Mon,  6 Nov 2023 12:18:05 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  6 Nov 2023 12:18:05 +0000 (GMT)
+Date: Mon, 6 Nov 2023 13:18:03 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank
+ <frankja@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Alexander
+ Gordeev <agordeev@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        David
+ Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Cornelia Huck
+ <cornelia.huck@de.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Michael
+ Mueller <mimu@linux.vnet.ibm.com>,
+        David Hildenbrand
+ <dahi@linux.vnet.ibm.com>
+Subject: Re: [PATCH 4/4] KVM: s390: Minor refactor of base/ext facility
+ lists
+Message-ID: <20231106131803.15985f2e@p-imbrenda>
+In-Reply-To: <44148ab315f28a6d77627675cbde26977418c5df.camel@linux.ibm.com>
+References: <20231103173008.630217-1-nsg@linux.ibm.com>
+	<20231103173008.630217-5-nsg@linux.ibm.com>
+	<20231103193254.7deef2e5@p-imbrenda>
+	<44148ab315f28a6d77627675cbde26977418c5df.camel@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-28-pbonzini@redhat.com>
-In-Reply-To: <20231105163040.14904-28-pbonzini@redhat.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 6 Nov 2023 11:54:42 +0000
-Message-ID: <CA+EHjTxz-e_JKYTtEjjYJTXmpvizRXe8EUbhY2E7bwFjkkHVFw@mail.gmail.com>
-Subject: Re: [PATCH 27/34] KVM: selftests: Introduce VM "shape" to allow tests
- to specify the VM type
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Sean Christopherson <seanjc@google.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: zCB3qCG0MBJbK2Og1pgD2i0QNMNE7wAS
+X-Proofpoint-ORIG-GUID: VNPB-bMD6Dt-6lDqQztXxZ7bqmVTtsQx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-06_10,2023-11-02_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 priorityscore=1501 mlxscore=0 malwarescore=0
+ adultscore=0 spamscore=0 bulkscore=0 mlxlogscore=773 clxscore=1015
+ suspectscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2310240000 definitions=main-2311060100
 
-On Sun, Nov 5, 2023 at 4:34=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->
-> From: Sean Christopherson <seanjc@google.com>
->
-> Add a "vm_shape" structure to encapsulate the selftests-defined "mode",
-> along with the KVM-defined "type" for use when creating a new VM.  "mode"
-> tracks physical and virtual address properties, as well as the preferred
-> backing memory type, while "type" corresponds to the VM type.
->
-> Taking the VM type will allow adding tests for KVM_CREATE_GUEST_MEMFD,
-> a.k.a. guest private memory, without needing an entirely separate set of
-> helpers.  Guest private memory is effectively usable only by confidential
-> VM types, and it's expected that x86 will double down and require unique
-> VM types for TDX and SNP guests.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Message-Id: <20231027182217.3615211-30-seanjc@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
+On Mon, 06 Nov 2023 12:38:55 +0100
+Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
 
-nit: as in a prior selftest commit messages, references in the commit
-message to guest _private_ memory. Should these be changed to just
-guest memory?
+[...]
 
-Reviewed-by: Fuad Tabba <tabba@google.com>
-Tested-by: Fuad Tabba <tabba@google.com>
+> > this was sized to [SIZE_INTERNAL], now it doesn't have a fixed size. is
+> > this intentional?  
+> 
+> Yes, it's as big as it needs to be, that way it cannot be too small, so one
+> less thing to consider.
 
-Cheers,
-/fuad
+fair enough
+ 
+> [...]
+> > >  /* available cpu features supported by kvm */
+> > >  static DECLARE_BITMAP(kvm_s390_available_cpu_feat, KVM_S390_VM_CPU_FEAT_NR_BITS);
+> > > @@ -3341,13 +3333,16 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+> > >  	kvm->arch.sie_page2->kvm = kvm;
+> > >  	kvm->arch.model.fac_list = kvm->arch.sie_page2->fac_list;
+> > >  
+> > > -	for (i = 0; i < kvm_s390_fac_size(); i++) {
+> > > +	for (i = 0; i < ARRAY_SIZE(kvm_s390_fac_base); i++) {
+> > >  		kvm->arch.model.fac_mask[i] = stfle_fac_list[i] &
+> > > -					      (kvm_s390_fac_base[i] |
+> > > -					       kvm_s390_fac_ext[i]);
+> > > +					      kvm_s390_fac_base[i];
+> > >  		kvm->arch.model.fac_list[i] = stfle_fac_list[i] &
+> > >  					      kvm_s390_fac_base[i];
+> > >  	}
+> > > +	for (i = 0; i < ARRAY_SIZE(kvm_s390_fac_ext); i++) {
+> > > +		kvm->arch.model.fac_mask[i] |= stfle_fac_list[i] &
+> > > +					       kvm_s390_fac_ext[i];
+> > > +	}  
+> > 
+> > I like it better when it's all in one place, instead of having two loops  
+> 
+> Hmm, it's the result of the arrays being different lengths now.
 
->  tools/testing/selftests/kvm/dirty_log_test.c  |  2 +-
->  .../selftests/kvm/include/kvm_util_base.h     | 54 +++++++++++++++----
->  .../selftests/kvm/kvm_page_table_test.c       |  2 +-
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 43 +++++++--------
->  tools/testing/selftests/kvm/lib/memstress.c   |  3 +-
->  .../kvm/x86_64/ucna_injection_test.c          |  2 +-
->  6 files changed, 72 insertions(+), 34 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing=
-/selftests/kvm/dirty_log_test.c
-> index 936f3a8d1b83..6cbecf499767 100644
-> --- a/tools/testing/selftests/kvm/dirty_log_test.c
-> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
-> @@ -699,7 +699,7 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mo=
-de, struct kvm_vcpu **vcpu,
->
->         pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
->
-> -       vm =3D __vm_create(mode, 1, extra_mem_pages);
-> +       vm =3D __vm_create(VM_SHAPE(mode), 1, extra_mem_pages);
->
->         log_mode_create_vm_done(vm);
->         *vcpu =3D vm_vcpu_add(vm, 0, guest_code);
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/=
-testing/selftests/kvm/include/kvm_util_base.h
-> index 1441fca6c273..157508c071f3 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -188,6 +188,23 @@ enum vm_guest_mode {
->         NUM_VM_MODES,
->  };
->
-> +struct vm_shape {
-> +       enum vm_guest_mode mode;
-> +       unsigned int type;
-> +};
-> +
-> +#define VM_TYPE_DEFAULT                        0
-> +
-> +#define VM_SHAPE(__mode)                       \
-> +({                                             \
-> +       struct vm_shape shape =3D {               \
-> +               .mode =3D (__mode),               \
-> +               .type =3D VM_TYPE_DEFAULT         \
-> +       };                                      \
-> +                                               \
-> +       shape;                                  \
-> +})
-> +
->  #if defined(__aarch64__)
->
->  extern enum vm_guest_mode vm_mode_default;
-> @@ -220,6 +237,8 @@ extern enum vm_guest_mode vm_mode_default;
->
->  #endif
->
-> +#define VM_SHAPE_DEFAULT       VM_SHAPE(VM_MODE_DEFAULT)
-> +
->  #define MIN_PAGE_SIZE          (1U << MIN_PAGE_SHIFT)
->  #define PTES_PER_MIN_PAGE      ptes_per_page(MIN_PAGE_SIZE)
->
-> @@ -784,21 +803,21 @@ vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
->   * __vm_create() does NOT create vCPUs, @nr_runnable_vcpus is used purel=
-y to
->   * calculate the amount of memory needed for per-vCPU data, e.g. stacks.
->   */
-> -struct kvm_vm *____vm_create(enum vm_guest_mode mode);
-> -struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable=
-_vcpus,
-> +struct kvm_vm *____vm_create(struct vm_shape shape);
-> +struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_v=
-cpus,
->                            uint64_t nr_extra_pages);
->
->  static inline struct kvm_vm *vm_create_barebones(void)
->  {
-> -       return ____vm_create(VM_MODE_DEFAULT);
-> +       return ____vm_create(VM_SHAPE_DEFAULT);
->  }
->
->  static inline struct kvm_vm *vm_create(uint32_t nr_runnable_vcpus)
->  {
-> -       return __vm_create(VM_MODE_DEFAULT, nr_runnable_vcpus, 0);
-> +       return __vm_create(VM_SHAPE_DEFAULT, nr_runnable_vcpus, 0);
->  }
->
-> -struct kvm_vm *__vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t =
-nr_vcpus,
-> +struct kvm_vm *__vm_create_with_vcpus(struct vm_shape shape, uint32_t nr=
-_vcpus,
->                                       uint64_t extra_mem_pages,
->                                       void *guest_code, struct kvm_vcpu *=
-vcpus[]);
->
-> @@ -806,17 +825,27 @@ static inline struct kvm_vm *vm_create_with_vcpus(u=
-int32_t nr_vcpus,
->                                                   void *guest_code,
->                                                   struct kvm_vcpu *vcpus[=
-])
->  {
-> -       return __vm_create_with_vcpus(VM_MODE_DEFAULT, nr_vcpus, 0,
-> +       return __vm_create_with_vcpus(VM_SHAPE_DEFAULT, nr_vcpus, 0,
->                                       guest_code, vcpus);
->  }
->
-> +
-> +struct kvm_vm *__vm_create_shape_with_one_vcpu(struct vm_shape shape,
-> +                                              struct kvm_vcpu **vcpu,
-> +                                              uint64_t extra_mem_pages,
-> +                                              void *guest_code);
-> +
->  /*
->   * Create a VM with a single vCPU with reasonable defaults and @extra_me=
-m_pages
->   * additional pages of guest memory.  Returns the VM and vCPU (via out p=
-aram).
->   */
-> -struct kvm_vm *__vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
-> -                                        uint64_t extra_mem_pages,
-> -                                        void *guest_code);
-> +static inline struct kvm_vm *__vm_create_with_one_vcpu(struct kvm_vcpu *=
-*vcpu,
-> +                                                      uint64_t extra_mem=
-_pages,
-> +                                                      void *guest_code)
-> +{
-> +       return __vm_create_shape_with_one_vcpu(VM_SHAPE_DEFAULT, vcpu,
-> +                                              extra_mem_pages, guest_cod=
-e);
-> +}
->
->  static inline struct kvm_vm *vm_create_with_one_vcpu(struct kvm_vcpu **v=
-cpu,
->                                                      void *guest_code)
-> @@ -824,6 +853,13 @@ static inline struct kvm_vm *vm_create_with_one_vcpu=
-(struct kvm_vcpu **vcpu,
->         return __vm_create_with_one_vcpu(vcpu, 0, guest_code);
->  }
->
-> +static inline struct kvm_vm *vm_create_shape_with_one_vcpu(struct vm_sha=
-pe shape,
-> +                                                          struct kvm_vcp=
-u **vcpu,
-> +                                                          void *guest_co=
-de)
-> +{
-> +       return __vm_create_shape_with_one_vcpu(shape, vcpu, 0, guest_code=
-);
-> +}
-> +
->  struct kvm_vcpu *vm_recreate_with_one_vcpu(struct kvm_vm *vm);
->
->  void kvm_pin_this_task_to_pcpu(uint32_t pcpu);
-> diff --git a/tools/testing/selftests/kvm/kvm_page_table_test.c b/tools/te=
-sting/selftests/kvm/kvm_page_table_test.c
-> index 69f26d80c821..e37dc9c21888 100644
-> --- a/tools/testing/selftests/kvm/kvm_page_table_test.c
-> +++ b/tools/testing/selftests/kvm/kvm_page_table_test.c
-> @@ -254,7 +254,7 @@ static struct kvm_vm *pre_init_before_test(enum vm_gu=
-est_mode mode, void *arg)
->
->         /* Create a VM with enough guest pages */
->         guest_num_pages =3D test_mem_size / guest_page_size;
-> -       vm =3D __vm_create_with_vcpus(mode, nr_vcpus, guest_num_pages,
-> +       vm =3D __vm_create_with_vcpus(VM_SHAPE(mode), nr_vcpus, guest_num=
-_pages,
->                                     guest_code, test_args.vcpus);
->
->         /* Align down GPA of the testing memslot */
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/s=
-elftests/kvm/lib/kvm_util.c
-> index 95a553400ea9..1c74310f1d44 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -209,7 +209,7 @@ __weak void vm_vaddr_populate_bitmap(struct kvm_vm *v=
-m)
->                 (1ULL << (vm->va_bits - 1)) >> vm->page_shift);
->  }
->
-> -struct kvm_vm *____vm_create(enum vm_guest_mode mode)
-> +struct kvm_vm *____vm_create(struct vm_shape shape)
->  {
->         struct kvm_vm *vm;
->
-> @@ -221,13 +221,13 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mod=
-e)
->         vm->regions.hva_tree =3D RB_ROOT;
->         hash_init(vm->regions.slot_hash);
->
-> -       vm->mode =3D mode;
-> -       vm->type =3D 0;
-> +       vm->mode =3D shape.mode;
-> +       vm->type =3D shape.type;
->
-> -       vm->pa_bits =3D vm_guest_mode_params[mode].pa_bits;
-> -       vm->va_bits =3D vm_guest_mode_params[mode].va_bits;
-> -       vm->page_size =3D vm_guest_mode_params[mode].page_size;
-> -       vm->page_shift =3D vm_guest_mode_params[mode].page_shift;
-> +       vm->pa_bits =3D vm_guest_mode_params[vm->mode].pa_bits;
-> +       vm->va_bits =3D vm_guest_mode_params[vm->mode].va_bits;
-> +       vm->page_size =3D vm_guest_mode_params[vm->mode].page_size;
-> +       vm->page_shift =3D vm_guest_mode_params[vm->mode].page_shift;
->
->         /* Setup mode specific traits. */
->         switch (vm->mode) {
-> @@ -265,7 +265,7 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode)
->                 /*
->                  * Ignore KVM support for 5-level paging (vm->va_bits =3D=
-=3D 57),
->                  * it doesn't take effect unless a CR4.LA57 is set, which=
- it
-> -                * isn't for this VM_MODE.
-> +                * isn't for this mode (48-bit virtual address space).
->                  */
->                 TEST_ASSERT(vm->va_bits =3D=3D 48 || vm->va_bits =3D=3D 5=
-7,
->                             "Linear address width (%d bits) not supported=
-",
-> @@ -285,10 +285,11 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mod=
-e)
->                 vm->pgtable_levels =3D 5;
->                 break;
->         default:
-> -               TEST_FAIL("Unknown guest mode, mode: 0x%x", mode);
-> +               TEST_FAIL("Unknown guest mode: 0x%x", vm->mode);
->         }
->
->  #ifdef __aarch64__
-> +       TEST_ASSERT(!vm->type, "ARM doesn't support test-provided types")=
-;
->         if (vm->pa_bits !=3D 40)
->                 vm->type =3D KVM_VM_TYPE_ARM_IPA_SIZE(vm->pa_bits);
->  #endif
-> @@ -347,19 +348,19 @@ static uint64_t vm_nr_pages_required(enum vm_guest_=
-mode mode,
->         return vm_adjust_num_guest_pages(mode, nr_pages);
->  }
->
-> -struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable=
-_vcpus,
-> +struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_v=
-cpus,
->                            uint64_t nr_extra_pages)
->  {
-> -       uint64_t nr_pages =3D vm_nr_pages_required(mode, nr_runnable_vcpu=
-s,
-> +       uint64_t nr_pages =3D vm_nr_pages_required(shape.mode, nr_runnabl=
-e_vcpus,
->                                                  nr_extra_pages);
->         struct userspace_mem_region *slot0;
->         struct kvm_vm *vm;
->         int i;
->
-> -       pr_debug("%s: mode=3D'%s' pages=3D'%ld'\n", __func__,
-> -                vm_guest_mode_string(mode), nr_pages);
-> +       pr_debug("%s: mode=3D'%s' type=3D'%d', pages=3D'%ld'\n", __func__=
-,
-> +                vm_guest_mode_string(shape.mode), shape.type, nr_pages);
->
-> -       vm =3D ____vm_create(mode);
-> +       vm =3D ____vm_create(shape);
->
->         vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, nr_pa=
-ges, 0);
->         for (i =3D 0; i < NR_MEM_REGIONS; i++)
-> @@ -400,7 +401,7 @@ struct kvm_vm *__vm_create(enum vm_guest_mode mode, u=
-int32_t nr_runnable_vcpus,
->   * extra_mem_pages is only used to calculate the maximum page table size=
-,
->   * no real memory allocation for non-slot0 memory in this function.
->   */
-> -struct kvm_vm *__vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t =
-nr_vcpus,
-> +struct kvm_vm *__vm_create_with_vcpus(struct vm_shape shape, uint32_t nr=
-_vcpus,
->                                       uint64_t extra_mem_pages,
->                                       void *guest_code, struct kvm_vcpu *=
-vcpus[])
->  {
-> @@ -409,7 +410,7 @@ struct kvm_vm *__vm_create_with_vcpus(enum vm_guest_m=
-ode mode, uint32_t nr_vcpus
->
->         TEST_ASSERT(!nr_vcpus || vcpus, "Must provide vCPU array");
->
-> -       vm =3D __vm_create(mode, nr_vcpus, extra_mem_pages);
-> +       vm =3D __vm_create(shape, nr_vcpus, extra_mem_pages);
->
->         for (i =3D 0; i < nr_vcpus; ++i)
->                 vcpus[i] =3D vm_vcpu_add(vm, i, guest_code);
-> @@ -417,15 +418,15 @@ struct kvm_vm *__vm_create_with_vcpus(enum vm_guest=
-_mode mode, uint32_t nr_vcpus
->         return vm;
->  }
->
-> -struct kvm_vm *__vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
-> -                                        uint64_t extra_mem_pages,
-> -                                        void *guest_code)
-> +struct kvm_vm *__vm_create_shape_with_one_vcpu(struct vm_shape shape,
-> +                                              struct kvm_vcpu **vcpu,
-> +                                              uint64_t extra_mem_pages,
-> +                                              void *guest_code)
->  {
->         struct kvm_vcpu *vcpus[1];
->         struct kvm_vm *vm;
->
-> -       vm =3D __vm_create_with_vcpus(VM_MODE_DEFAULT, 1, extra_mem_pages=
-,
-> -                                   guest_code, vcpus);
-> +       vm =3D __vm_create_with_vcpus(shape, 1, extra_mem_pages, guest_co=
-de, vcpus);
->
->         *vcpu =3D vcpus[0];
->         return vm;
-> diff --git a/tools/testing/selftests/kvm/lib/memstress.c b/tools/testing/=
-selftests/kvm/lib/memstress.c
-> index df457452d146..d05487e5a371 100644
-> --- a/tools/testing/selftests/kvm/lib/memstress.c
-> +++ b/tools/testing/selftests/kvm/lib/memstress.c
-> @@ -168,7 +168,8 @@ struct kvm_vm *memstress_create_vm(enum vm_guest_mode=
- mode, int nr_vcpus,
->          * The memory is also added to memslot 0, but that's a benign sid=
-e
->          * effect as KVM allows aliasing HVAs in meslots.
->          */
-> -       vm =3D __vm_create_with_vcpus(mode, nr_vcpus, slot0_pages + guest=
-_num_pages,
-> +       vm =3D __vm_create_with_vcpus(VM_SHAPE(mode), nr_vcpus,
-> +                                   slot0_pages + guest_num_pages,
->                                     memstress_guest_code, vcpus);
->
->         args->vm =3D vm;
-> diff --git a/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c b/t=
-ools/testing/selftests/kvm/x86_64/ucna_injection_test.c
-> index 85f34ca7e49e..0ed32ec903d0 100644
-> --- a/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
-> @@ -271,7 +271,7 @@ int main(int argc, char *argv[])
->
->         kvm_check_cap(KVM_CAP_MCE);
->
-> -       vm =3D __vm_create(VM_MODE_DEFAULT, 3, 0);
-> +       vm =3D __vm_create(VM_SHAPE_DEFAULT, 3, 0);
->
->         kvm_ioctl(vm->kvm_fd, KVM_X86_GET_MCE_CAP_SUPPORTED,
->                   &supported_mcg_caps);
-> --
-> 2.39.1
->
->
+ah, I had missed that, the names are very similar.
+
+> 
+> [...]
+> 
+> > > -	for (i = 0; i < 16; i++)
+> > > -		kvm_s390_fac_base[i] |=
+> > > -			stfle_fac_list[i] & nonhyp_mask(i);
+> > > +	for (i = 0; i < HMFAI_DWORDS; i++)
+> > > +		kvm_s390_fac_base[i] |= nonhyp_mask(i);  
+> > 
+> > where did the stfle_fac_list[i] go?  
+> 
+> I deleted it. That's what I meant by "Get rid of implicit double
+> anding of stfle_fac_list".
+> Besides it being redundant I didn't like it conceptually.
+> kvm_s390_fac_base specifies the facilities we support, regardless
+> if they're installed in the configuration. The hypervisor managed
+> ones are unconditionally declared via FACILITIES_KVM and we can add
+> the non hypervisor managed ones unconditionally, too.
+
+makes sense
+
+> 
+> > >  	r = __kvm_s390_init();
+> > >  	if (r)  
+> >   
+> 
+
 
