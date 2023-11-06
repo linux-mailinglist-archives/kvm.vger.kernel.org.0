@@ -1,71 +1,74 @@
-Return-Path: <kvm+bounces-820-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-821-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B9B27E2F6A
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 23:06:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 709C57E2FB6
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 23:19:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8DD3280D11
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 22:06:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9876A1C2099D
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 22:19:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9934E2EB05;
-	Mon,  6 Nov 2023 22:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE812EB1E;
+	Mon,  6 Nov 2023 22:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j8K/cwsF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dlS8DLbi"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF5882D048
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 22:06:00 +0000 (UTC)
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9ED910A
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 14:05:59 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6c398717726so2178468b3a.2
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 14:05:59 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED4A2EB09
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 22:19:01 +0000 (UTC)
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8B6C1BC
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 14:19:00 -0800 (PST)
+Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-3b56b618217so3018411b6e.0
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 14:19:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699308359; x=1699913159; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/O5mNQYvmSeM4g33PS0eM+ofipQ6AbL8BoPwtDwzqak=;
-        b=j8K/cwsFvRv2oFXjZVVgP0O+ehmV/GHJ7QQRRZhfLszAwkTZvW85iIEZD3XrtLG5vk
-         YcvHYd7dDHvXNYQCJuPC8q+BaP+LN+4VP8YU03ynRakzLVIB6AKAUE+635TegNjdzVii
-         m3M85TjI/PneaDbz0AE2ss2sKpO/zY6fh6mu34AS8BE4c2Uui+6Dj+MCZIc/iVkCjDJM
-         Q/cQ2lBzKujbSfWztZeISUYyPgr40RJc72bVIUlH+wsWwi5+XcIK9zi2qxYtt905CGtV
-         qPd/1f5TMVVneLlCqexeOlIPKqqn495H6gBvo6cr4Rx0F1BLfRK5LToI/ee0K7wQn/aG
-         KrRA==
+        d=gmail.com; s=20230601; t=1699309140; x=1699913940; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UwzHdCviQ65RDktZk0sYRv7bUKUvh9rHa406X9SjzMI=;
+        b=dlS8DLbih+bidJz+t4x46mxqw/2g8sX5/6YNiWX4GiuvZiUL7naWeuQG1X3dgDcgP6
+         CkgNugeLk0okZ+ORTSHgAM9D0ul7z31OJel7SuGQha6S/PZwn7CM2HuQWJngesMSm+0x
+         lBjYkfmAnDgoJ8q86MnjKWYcwTtVhrBmYLAfCjUciIQEau9o0G0cN1ZHzi9NF1rNXp4O
+         asrMGLPjdQfafaFGKTgBr8G5WkG2h4tP/n1ZsttMOOkvzr6Z0hHSLDOewxL76MUytwHJ
+         EbmEGwAx65PRjTlQ0uo8fpO7eBE24W4XA7g4uHxivNjpHmmFm4NmJ9Kd2ifa6OdIbPkm
+         DdBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699308359; x=1699913159;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/O5mNQYvmSeM4g33PS0eM+ofipQ6AbL8BoPwtDwzqak=;
-        b=V4lzaUIbafnRmNFdd44evkaDMyrzM2SE4UDuXOeYC909Htbiis3NON2grYe5iylQ79
-         3tfgcrz8EbzGY3PV9nK49s51wiK7+PLaOKxdHFO/e5+U0zctWnKJzX5e4pqejCOYhMx1
-         PX59F85vV2vhrz1gVC9TCJ5vDuP/RqKNV7tN4lJqc9W1rWRNXE2rCO0C8+rAZjVikVuX
-         p7BmiACixEoVxpOLGfWmbqtSYz+fYEvxN16LrFTYEmAfVUDG4piQBlpyu90bUvQePBh1
-         i2/X5005hNOVczsOcUlnSylG5tE9UxbghK4OBYBwPqxccWty2DTZmhjdmXonPa9cZV8W
-         twRQ==
-X-Gm-Message-State: AOJu0YwIMighzPa8llI7nqbBWFL+AZ/M2AW34u3iW17RjN1NnJIPFDgu
-	tskStvPFoLjyosX60I5/Ab4=
-X-Google-Smtp-Source: AGHT+IG51xwsXhXTi9GpjcP4vczglPWY2Z+iqaRZ+zr5SoLpDZO3UkBOCdQUd1pjQ+D8WmQxa+j6mA==
-X-Received: by 2002:a05:6a00:17a9:b0:6be:265:1bf6 with SMTP id s41-20020a056a0017a900b006be02651bf6mr29519997pfg.32.1699308359061;
-        Mon, 06 Nov 2023 14:05:59 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699309140; x=1699913940;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UwzHdCviQ65RDktZk0sYRv7bUKUvh9rHa406X9SjzMI=;
+        b=hBFy5Owp25JJb0qR3gcoiVOCRaxb3exAvujaeK4+547vhnaEbuNEKoSgu5c6BUFiWV
+         JvPzmnblyyP70Dhoe+fT0sTYkhUVkBTJ1dbBa7TQeSS8Et0BFpuRbr30pIQyEd6dYEJD
+         iolJrr9tjIMbVFkIL3c326jcqfGrU+Q60Ah1AnBaD1rKmreeXSPZub8bDT4+0uqw4Ytk
+         yd1JOmLAz7QvyVo4uKNQKEoEP/W1ElKABJjcLRr26aNEPgFK8GTJ5iCvghDxbdq9znv8
+         P5e+DiqzhT9h0yxwE2lBN3bu2sSiFqtC+xod4Bn0b6UTSpFUOWe8tFprJQow9+REs/u3
+         Mdvg==
+X-Gm-Message-State: AOJu0Yxs+DRXYlV7dSb0op082qSJl+SevINa6Oi+66KI9EeZCCJPqb5H
+	+YswfdXe9HE/acE+tkX+VbM=
+X-Google-Smtp-Source: AGHT+IEUU4SICVu9QQn1tzyb0qeaJMuCcShTiUWZgdopjkoKzzJ23buM6OIkoXCuSWTLXUcircgERA==
+X-Received: by 2002:a05:6808:2394:b0:3a6:fb16:c782 with SMTP id bp20-20020a056808239400b003a6fb16c782mr39232442oib.30.1699309139914;
+        Mon, 06 Nov 2023 14:18:59 -0800 (PST)
 Received: from paxos.mtv.corp.google.com ([2620:15c:9d:2:b062:65c9:e9d5:831b])
-        by smtp.gmail.com with ESMTPSA id t17-20020a056a00139100b006933866f49dsm6252195pfg.19.2023.11.06.14.05.58
+        by smtp.gmail.com with ESMTPSA id h15-20020a056a00218f00b006c3467ae25asm6000167pfi.206.2023.11.06.14.18.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Nov 2023 14:05:58 -0800 (PST)
+        Mon, 06 Nov 2023 14:18:59 -0800 (PST)
 From: Lepton Wu <ytht.net@gmail.com>
 To: brijesh.singh@amd.com
 Cc: tglx@linutronix.de,
 	kvm@vger.kernel.org,
 	Lepton Wu <ytht.net@gmail.com>
-Subject: [PATCH] x86/mm: Guard adding .bbs..decrypted section with CONFIG_AMD_MEM_ENCRYPT
-Date: Mon,  6 Nov 2023 14:05:28 -0800
-Message-ID: <20231106220528.3193206-1-ytht.net@gmail.com>
+Subject: [PATCH v2] x86/mm: Guard adding .bbs..decrypted section with CONFIG_AMD_MEM_ENCRYPT
+Date: Mon,  6 Nov 2023 14:16:52 -0800
+Message-ID: <20231106221831.3200581-1-ytht.net@gmail.com>
 X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
+In-Reply-To: <20231106220528.3193206-1-ytht.net@gmail.com>
+References: <20231106220528.3193206-1-ytht.net@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,8 +78,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 commit b3f0907c71e0 ("x86/mm: Add .bss..decrypted section to hold shared variables")
-usage on some kernels without CONFIG_AMD_MEM_ENCRYPT. Fix it by guarding it
-with CONFIG_AMD_MEM_ENCRYP.
+adds almost 2M memory usage on some kernels without CONFIG_AMD_MEM_ENCRYPT.
+Fix it by guarding it with CONFIG_AMD_MEM_ENCRYPT.
 
 Signed-off-by: Lepton Wu <ytht.net@gmail.com>
 ---
