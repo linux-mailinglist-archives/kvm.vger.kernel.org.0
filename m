@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-716-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-717-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BC857E1F8F
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:09:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE9F07E1F91
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:09:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3822280D49
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:09:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D20581C20BE6
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D864F199CE;
-	Mon,  6 Nov 2023 11:09:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577F71A5BB;
+	Mon,  6 Nov 2023 11:09:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qyd27gcY"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k3sA5ePH"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D3218E05
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:09:05 +0000 (UTC)
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4DD4FA
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 03:09:01 -0800 (PST)
-Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-32d849cc152so3001768f8f.1
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 03:09:01 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B461A596
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:09:11 +0000 (UTC)
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 885EB191
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 03:09:08 -0800 (PST)
+Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-507adc3381cso5489697e87.3
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 03:09:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699268940; x=1699873740; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1699268947; x=1699873747; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=l0/vWnFHt+cyNHMvzu2dssx7xYyn6IEpyeIo7MQjzWQ=;
-        b=Qyd27gcYpUAX33VuD3V60EEg/WXc1kq2QYg5IXwR+c3PfBhsU7glBHDKlepNdhJSf5
-         sVAR02LIRRvMd8eX247VxwFXjpaYUfiU+QBqZ8YVQs1OrNxV45n/JJvCcBVe+KCwSWjW
-         i1rqy0EIYq+4n0FuB03lJVY4qc+sEJH3ftifVZKEwM+FepjRBenX22qQ4PwDHnw6D2b6
-         u1FNKcVZnuX/bYk2kLBcUylV8mRNLvDaDECsfx56rMfPtxPt9NqHUVj8yckPspjh/OxP
-         k2IqMsMsBhnDqhn/ksScJX3fXxctlNy+NUAfbY4U2wnM655XKzYiaBrT2F7MXCIyA+OV
-         K0Qw==
+        bh=csVQGgR+Tak3/eKK57JrtNqjD/O4/1GmajzGwSgP8l0=;
+        b=k3sA5ePHaUaL+0NraaBP33n7zYhynEv4csu+5APLc7yzzXu1A84C0ccY5u6Fnn1+sD
+         SWIpDM15l8NeV3QCS7dD7UJ5Cx3PtkQZIFfBjLNmqKnQc5IHqU70tnNiQkN7wLvVd3sp
+         /FWlAs/6cnpsKWA1DySqq+0LvE1jrz0X4od+ov2KVrV2m+xsDIz0rjwOezGkVuE3cd+K
+         UVnw7OPDsk2tGIjFfvZZ3MYtsakQ+SI9nE9ho92YfXM0Kbm9bGJyECR0Zf8ekEDSNPVD
+         hC8oyPoUNruRoZkjCCqnutp6zCo/izO46HuWGtntldtOnpobsTIwd9oi+k3hTcYJTXI/
+         WJOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699268940; x=1699873740;
+        d=1e100.net; s=20230601; t=1699268947; x=1699873747;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=l0/vWnFHt+cyNHMvzu2dssx7xYyn6IEpyeIo7MQjzWQ=;
-        b=PecpfpG6X4R4NH4tsSzFIyzN/h+EstzDNxPsgo0E+hqhydqoMBIAm9pN9eLllM8m8A
-         fD0exSMxlFHPtbmDz7pLUk0CYoZeA7Vpi7hHp0MDP926LdpvQQaeTU5gXiOEtM14Rcop
-         VVV1v3RRkqr73s+mwt5wX20b/SP2rB/4tw3aArWczpT05f2xTHLYJD5cnSjpUsSzTRQL
-         ecek0W/q1cJYN+zZqR//2ymuFouylQdb0CSiDhhikIj2kw+PLGRjuXt81XOzIKPbtnD6
-         Z1HQpyLsDM93GZdXQPESPYqYacQFLeL75uHP6JjPPjKH7rlL3mPfNM+c3DXwSwuXX4V9
-         UZUA==
-X-Gm-Message-State: AOJu0YymW5pGaELUN+9cSJKj3B/boRnN1iTlDsttu3czzWkqXp8FzZOd
-	Mmz1k+OHXJjOCAkSshxxaz8q1g==
-X-Google-Smtp-Source: AGHT+IFsbitm3bJThRshzHVNkwv0m7bE7yeAZoRxHUIurMBc1Abgxn0QnxImhW8tuDAE+j3RuaAyCQ==
-X-Received: by 2002:a05:6000:1361:b0:32d:9b80:e2c6 with SMTP id q1-20020a056000136100b0032d9b80e2c6mr22417154wrz.26.1699268940275;
-        Mon, 06 Nov 2023 03:09:00 -0800 (PST)
+        bh=csVQGgR+Tak3/eKK57JrtNqjD/O4/1GmajzGwSgP8l0=;
+        b=I+Qv/oLbh+EkAlwhIf8gKgaZiIyhaccJhPWnyhGneCm6FpM5mj8uOzejw9UYTeh9Ig
+         fdFwsrwmNBTT5KbmT2nmRgLrT1a2ltdW9de65i+iz4XmMJ9u3ItHZQmJI8pUhYPHs8if
+         v2Vg1xgI4vTU3kBecGYCXBAVaSFDdjPbWz9yYCKNaqG6wThpbBRnAkTElCkSqb+eDAuH
+         K/NGApBGNr0g1/s56U7NuoH43E9UShSL7Qe5iCKN8yI7cByGTuxCq6qf/NQZEcVa6+Ks
+         PZVvM7Ijb8ltFDVSqEjBFjoGDcQL83Wn7/cil1FOV/DJQ9Py1h6pRm8cuHBaCOJ/zrH7
+         snkw==
+X-Gm-Message-State: AOJu0Yx12yQcnZHJtFTYwm4m/ndK3kX6UdoXVhqyiWoAZ4rpgNNWRZeT
+	8yXSe3/8Z6Fis9i3XTyf1T05bQ==
+X-Google-Smtp-Source: AGHT+IF/NpB8HMHP7H/FI9jfuMU1i8ZqGUSvagHUJCDZQ+ivvnwriIb7n7tIOJDMRsdh2YcofDQnWA==
+X-Received: by 2002:a05:6512:370b:b0:507:a6a5:a87b with SMTP id z11-20020a056512370b00b00507a6a5a87bmr20578908lfr.51.1699268946691;
+        Mon, 06 Nov 2023 03:09:06 -0800 (PST)
 Received: from m1x-phil.lan (176-131-220-199.abo.bbox.fr. [176.131.220.199])
-        by smtp.gmail.com with ESMTPSA id z18-20020adfec92000000b0032da8fb0d05sm9132494wrn.110.2023.11.06.03.08.58
+        by smtp.gmail.com with ESMTPSA id j19-20020a05600c191300b004090ca6d785sm11949457wmq.2.2023.11.06.03.09.04
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 06 Nov 2023 03:08:59 -0800 (PST)
+        Mon, 06 Nov 2023 03:09:06 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: kvm@vger.kernel.org,
@@ -68,11 +68,13 @@ Cc: kvm@vger.kernel.org,
 	qemu-arm@nongnu.org,
 	Fiona Ebner <f.ebner@proxmox.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	simon.rowe@nutanix.com,
-	John Snow <jsnow@redhat.com>
-Subject: [PULL 47/60] hw/ide: reset: cancel async DMA operation before resetting state
-Date: Mon,  6 Nov 2023 12:03:19 +0100
-Message-ID: <20231106110336.358-48-philmd@linaro.org>
+	John Snow <jsnow@redhat.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Laurent Vivier <lvivier@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PULL 48/60] tests/qtest: ahci-test: add test exposing reset issue with pending callback
+Date: Mon,  6 Nov 2023 12:03:20 +0100
+Message-ID: <20231106110336.358-49-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231106110336.358-1-philmd@linaro.org>
 References: <20231106110336.358-1-philmd@linaro.org>
@@ -87,104 +89,126 @@ Content-Transfer-Encoding: 8bit
 
 From: Fiona Ebner <f.ebner@proxmox.com>
 
-If there is a pending DMA operation during ide_bus_reset(), the fact
-that the IDEState is already reset before the operation is canceled
-can be problematic. In particular, ide_dma_cb() might be called and
-then use the reset IDEState which contains the signature after the
-reset. When used to construct the IO operation this leads to
-ide_get_sector() returning 0 and nsector being 1. This is particularly
-bad, because a write command will thus destroy the first sector which
-often contains a partition table or similar.
+Before commit "hw/ide: reset: cancel async DMA operation before
+resetting state", this test would fail, because a reset with a
+pending write operation would lead to an unsolicited write to the
+first sector of the disk.
 
-Traces showing the unsolicited write happening with IDEState
-0x5595af6949d0 being used after reset:
-
-> ahci_port_write ahci(0x5595af6923f0)[0]: port write [reg:PxSCTL] @ 0x2c: 0x00000300
-> ahci_reset_port ahci(0x5595af6923f0)[0]: reset port
-> ide_reset IDEstate 0x5595af6949d0
-> ide_reset IDEstate 0x5595af694da8
-> ide_bus_reset_aio aio_cancel
-> dma_aio_cancel dbs=0x7f64600089a0
-> dma_blk_cb dbs=0x7f64600089a0 ret=0
-> dma_complete dbs=0x7f64600089a0 ret=0 cb=0x5595acd40b30
-> ahci_populate_sglist ahci(0x5595af6923f0)[0]
-> ahci_dma_prepare_buf ahci(0x5595af6923f0)[0]: prepare buf limit=512 prepared=512
-> ide_dma_cb IDEState 0x5595af6949d0; sector_num=0 n=1 cmd=DMA WRITE
-> dma_blk_io dbs=0x7f6420802010 bs=0x5595ae2c6c30 offset=0 to_dev=1
-> dma_blk_cb dbs=0x7f6420802010 ret=0
-
-> (gdb) p *qiov
-> $11 = {iov = 0x7f647c76d840, niov = 1, {{nalloc = 1, local_iov = {iov_base = 0x0,
->       iov_len = 512}}, {__pad = "\001\000\000\000\000\000\000\000\000\000\000",
->       size = 512}}}
-> (gdb) bt
-> #0  blk_aio_pwritev (blk=0x5595ae2c6c30, offset=0, qiov=0x7f6420802070, flags=0,
->     cb=0x5595ace6f0b0 <dma_blk_cb>, opaque=0x7f6420802010)
->     at ../block/block-backend.c:1682
-> #1  0x00005595ace6f185 in dma_blk_cb (opaque=0x7f6420802010, ret=<optimized out>)
->     at ../softmmu/dma-helpers.c:179
-> #2  0x00005595ace6f778 in dma_blk_io (ctx=0x5595ae0609f0,
->     sg=sg@entry=0x5595af694d00, offset=offset@entry=0, align=align@entry=512,
->     io_func=io_func@entry=0x5595ace6ee30 <dma_blk_write_io_func>,
->     io_func_opaque=io_func_opaque@entry=0x5595ae2c6c30,
->     cb=0x5595acd40b30 <ide_dma_cb>, opaque=0x5595af6949d0,
->     dir=DMA_DIRECTION_TO_DEVICE) at ../softmmu/dma-helpers.c:244
-> #3  0x00005595ace6f90a in dma_blk_write (blk=0x5595ae2c6c30,
->     sg=sg@entry=0x5595af694d00, offset=offset@entry=0, align=align@entry=512,
->     cb=cb@entry=0x5595acd40b30 <ide_dma_cb>, opaque=opaque@entry=0x5595af6949d0)
->     at ../softmmu/dma-helpers.c:280
-> #4  0x00005595acd40e18 in ide_dma_cb (opaque=0x5595af6949d0, ret=<optimized out>)
->     at ../hw/ide/core.c:953
-> #5  0x00005595ace6f319 in dma_complete (ret=0, dbs=0x7f64600089a0)
->     at ../softmmu/dma-helpers.c:107
-> #6  dma_blk_cb (opaque=0x7f64600089a0, ret=0) at ../softmmu/dma-helpers.c:127
-> #7  0x00005595ad12227d in blk_aio_complete (acb=0x7f6460005b10)
->     at ../block/block-backend.c:1527
-> #8  blk_aio_complete (acb=0x7f6460005b10) at ../block/block-backend.c:1524
-> #9  blk_aio_write_entry (opaque=0x7f6460005b10) at ../block/block-backend.c:1594
-> #10 0x00005595ad258cfb in coroutine_trampoline (i0=<optimized out>,
->     i1=<optimized out>) at ../util/coroutine-ucontext.c:177
+The test writes a pattern to the beginning of the disk and verifies
+that it is still intact after a reset with a pending operation. It
+also checks that the pending operation actually completes correctly.
 
 Signed-off-by: Fiona Ebner <f.ebner@proxmox.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Tested-by: simon.rowe@nutanix.com
-Message-ID: <20230906130922.142845-1-f.ebner@proxmox.com>
+Message-ID: <20230906130922.142845-2-f.ebner@proxmox.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- hw/ide/core.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ tests/qtest/ahci-test.c | 86 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 85 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index b5e0dcd29b..63ba665f3d 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -2515,19 +2515,19 @@ static void ide_dummy_transfer_stop(IDEState *s)
+diff --git a/tests/qtest/ahci-test.c b/tests/qtest/ahci-test.c
+index eea8b5f77b..5a1923f721 100644
+--- a/tests/qtest/ahci-test.c
++++ b/tests/qtest/ahci-test.c
+@@ -1424,6 +1424,89 @@ static void test_reset(void)
+     ahci_shutdown(ahci);
+ }
  
- void ide_bus_reset(IDEBus *bus)
- {
--    bus->unit = 0;
--    bus->cmd = 0;
--    ide_reset(&bus->ifs[0]);
--    ide_reset(&bus->ifs[1]);
--    ide_clear_hob(bus);
--
--    /* pending async DMA */
-+    /* pending async DMA - needs the IDEState before it is reset */
-     if (bus->dma->aiocb) {
-         trace_ide_bus_reset_aio();
-         blk_aio_cancel(bus->dma->aiocb);
-         bus->dma->aiocb = NULL;
-     }
- 
-+    bus->unit = 0;
-+    bus->cmd = 0;
-+    ide_reset(&bus->ifs[0]);
-+    ide_reset(&bus->ifs[1]);
-+    ide_clear_hob(bus);
++static void test_reset_pending_callback(void)
++{
++    AHCIQState *ahci;
++    AHCICommand *cmd;
++    uint8_t port;
++    uint64_t ptr1;
++    uint64_t ptr2;
 +
-     /* reset dma provider too */
-     if (bus->dma->ops->reset) {
-         bus->dma->ops->reset(bus->dma);
++    int bufsize = 4 * 1024;
++    int speed = bufsize + (bufsize / 2);
++    int offset1 = 0;
++    int offset2 = bufsize / AHCI_SECTOR_SIZE;
++
++    g_autofree unsigned char *tx1 = g_malloc(bufsize);
++    g_autofree unsigned char *tx2 = g_malloc(bufsize);
++    g_autofree unsigned char *rx1 = g_malloc0(bufsize);
++    g_autofree unsigned char *rx2 = g_malloc0(bufsize);
++
++    /* Uses throttling to make test independent of specific environment. */
++    ahci = ahci_boot_and_enable("-drive if=none,id=drive0,file=%s,"
++                                "cache=writeback,format=%s,"
++                                "throttling.bps-write=%d "
++                                "-M q35 "
++                                "-device ide-hd,drive=drive0 ",
++                                tmp_path, imgfmt, speed);
++
++    port = ahci_port_select(ahci);
++    ahci_port_clear(ahci, port);
++
++    ptr1 = ahci_alloc(ahci, bufsize);
++    ptr2 = ahci_alloc(ahci, bufsize);
++
++    g_assert(ptr1 && ptr2);
++
++    /* Need two different patterns. */
++    do {
++        generate_pattern(tx1, bufsize, AHCI_SECTOR_SIZE);
++        generate_pattern(tx2, bufsize, AHCI_SECTOR_SIZE);
++    } while (memcmp(tx1, tx2, bufsize) == 0);
++
++    qtest_bufwrite(ahci->parent->qts, ptr1, tx1, bufsize);
++    qtest_bufwrite(ahci->parent->qts, ptr2, tx2, bufsize);
++
++    /* Write to beginning of disk to check it wasn't overwritten later. */
++    ahci_guest_io(ahci, port, CMD_WRITE_DMA_EXT, ptr1, bufsize, offset1);
++
++    /* Issue asynchronously to get a pending callback during reset. */
++    cmd = ahci_command_create(CMD_WRITE_DMA_EXT);
++    ahci_command_adjust(cmd, offset2, ptr2, bufsize, 0);
++    ahci_command_commit(ahci, cmd, port);
++    ahci_command_issue_async(ahci, cmd);
++
++    ahci_set(ahci, AHCI_GHC, AHCI_GHC_HR);
++
++    ahci_command_free(cmd);
++
++    /* Wait for throttled write to finish. */
++    sleep(1);
++
++    /* Start again. */
++    ahci_clean_mem(ahci);
++    ahci_pci_enable(ahci);
++    ahci_hba_enable(ahci);
++    port = ahci_port_select(ahci);
++    ahci_port_clear(ahci, port);
++
++    /* Read and verify. */
++    ahci_guest_io(ahci, port, CMD_READ_DMA_EXT, ptr1, bufsize, offset1);
++    qtest_bufread(ahci->parent->qts, ptr1, rx1, bufsize);
++    g_assert_cmphex(memcmp(tx1, rx1, bufsize), ==, 0);
++
++    ahci_guest_io(ahci, port, CMD_READ_DMA_EXT, ptr2, bufsize, offset2);
++    qtest_bufread(ahci->parent->qts, ptr2, rx2, bufsize);
++    g_assert_cmphex(memcmp(tx2, rx2, bufsize), ==, 0);
++
++    ahci_free(ahci, ptr1);
++    ahci_free(ahci, ptr2);
++
++    ahci_clean_mem(ahci);
++
++    ahci_shutdown(ahci);
++}
++
+ static void test_ncq_simple(void)
+ {
+     AHCIQState *ahci;
+@@ -1945,7 +2028,8 @@ int main(int argc, char **argv)
+     qtest_add_func("/ahci/migrate/dma/halted", test_migrate_halted_dma);
+ 
+     qtest_add_func("/ahci/max", test_max);
+-    qtest_add_func("/ahci/reset", test_reset);
++    qtest_add_func("/ahci/reset/simple", test_reset);
++    qtest_add_func("/ahci/reset/pending_callback", test_reset_pending_callback);
+ 
+     qtest_add_func("/ahci/io/ncq/simple", test_ncq_simple);
+     qtest_add_func("/ahci/migrate/ncq/simple", test_migrate_ncq);
 -- 
 2.41.0
 
