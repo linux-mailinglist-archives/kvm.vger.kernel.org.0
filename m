@@ -1,145 +1,374 @@
-Return-Path: <kvm+bounces-663-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-664-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D7497E1F14
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:00:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65D0C7E1F1B
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:01:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDC0D2811A7
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:00:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 848AF1C209E4
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BEA31805F;
-	Mon,  6 Nov 2023 11:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FBBF182BF;
+	Mon,  6 Nov 2023 11:01:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Zh4DMfpA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xk/37/Ky"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A341818035
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:00:30 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8287CB7;
-	Mon,  6 Nov 2023 03:00:29 -0800 (PST)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6AFPVk009474;
-	Mon, 6 Nov 2023 11:00:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=D1iKgU8MaxGuAanmiVdwjL8M+qWemCsbQIouJx2h9no=;
- b=Zh4DMfpAf8sU/IEX6RreKH5+teAiKdvNVAGDQjZPSYFwImhqXGDfncUy0v/ce7vIk1hr
- VvvhZ9QYLon0jq/vlgLL9vc1OjbACiSv8pv5fAF7Kq/oF2JLemwv+vJXH5Z9P9v8vhfG
- dL03OXBP1cW4rILzfyci5C5FkXet8T7wXtSOMngwTRkfhNpS5dbhkmF6mXeXtQDauVrI
- pkU3FWXkl1nlGLD4hpEFxChn4zffd6TxjvO29RR5UhFWvAZF1qSWyNr82fyDS4EbSjoJ
- B/RLWnCMfHjDCLfVnSvNfI9hVwMzzoPDpjSwMb+jmyN/hFhN3T9EQPkDWBUu/UVPXuG8 JQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u6wcnu0m4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 Nov 2023 11:00:28 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A6AGs2e015022;
-	Mon, 6 Nov 2023 11:00:27 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u6wcnu0jg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 Nov 2023 11:00:27 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A69doPm028237;
-	Mon, 6 Nov 2023 11:00:26 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u62gjrbj2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 Nov 2023 11:00:26 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A6B0K4x17367604
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 6 Nov 2023 11:00:20 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 25DA92004B;
-	Mon,  6 Nov 2023 11:00:20 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7024320040;
-	Mon,  6 Nov 2023 11:00:19 +0000 (GMT)
-Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.179.20.192])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  6 Nov 2023 11:00:19 +0000 (GMT)
-Message-ID: <5cfee0930c4665481480d00bcb334b8c8c161426.camel@linux.ibm.com>
-Subject: Re: [PATCH 3/4] KVM: s390: cpu model: Use previously unused constant
-From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Cornelia Huck <cornelia.huck@de.ibm.com>,
-        Michael
- Mueller <mimu@linux.vnet.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Claudio
- Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        David Hildenbrand <dahi@linux.vnet.ibm.com>,
-        Janosch Frank
- <frankja@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Date: Mon, 06 Nov 2023 12:00:19 +0100
-In-Reply-To: <47d18f06-13b2-4ec5-b601-eb9a2738f06b@redhat.com>
-References: <20231103173008.630217-1-nsg@linux.ibm.com>
-	 <20231103173008.630217-4-nsg@linux.ibm.com>
-	 <4c3cec3c-da81-426c-815b-afee1de68947@redhat.com>
-	 <47d18f06-13b2-4ec5-b601-eb9a2738f06b@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB6D18044
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:01:12 +0000 (UTC)
+Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B331FD57
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 03:01:10 -0800 (PST)
+Received: by mail-qv1-xf32.google.com with SMTP id 6a1803df08f44-66d24ccc6f2so44900966d6.0
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 03:01:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699268470; x=1699873270; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y/jW8kMjXgRuIy1M2h5sLyMjeudj06HAL2YGYnbzqYU=;
+        b=xk/37/Kyvb3Fg0p+JBiy93aO6/TSLlw3zEi7SR7fM3qJjSqlRhd95iSYJJ2lDYDVO3
+         AqaK1fIN/jWnxkk7MlLY/ewKay9FOvFj6xi1oyv1QQgM/uSq2RQUpATHv5htNPPA9NrS
+         7z9ndrQQo6WCyeIqm8ZrCMgQbX3DmlMKQJiHgcIIjkUcJHcZFs9ih1wPyFZYQ9loAawi
+         JNHFoJbJ85GeIxZ5PRNm76VB9MVf8de+Z+ZN7R8TnbfEEZIilJSJudmj754RaFkmnZ6e
+         n1KnM4uBdrSq7oqu5ArlM5AWYFuH5/XlDp0sLUrQR7AULfOylj81/JGqd2djHuFMAkcE
+         yM1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699268470; x=1699873270;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y/jW8kMjXgRuIy1M2h5sLyMjeudj06HAL2YGYnbzqYU=;
+        b=I1Bki414ZvDn6Cr6G32BlBcZeU8iAlG1irhED2RTa09XwRl1U4kLPC+4nyP8cNiJSw
+         BccWhopuIg59+RkY6ahyOLgkU2rspzIanMkDmmsYNwcPpcrKI4syM4gnWwlxmh5/+XHf
+         27DzuNc6pJRGk9wtzCgQDa7HeaE5m7a/0/B8mvOuMFq22bMV6D1XM8Sr+OFPtjYjhzKf
+         2AyexqP8NUrU2aYEHME6irbIAcMcrt46Nh6R033QPWkz4IkhKpmR7mhF3cRVxEQ7SR46
+         q9KA4SGOMUAVJL66LaBfzx9OmsL9roMNGUC+rAvDtmV091Mbli/XlASo70bakzv8I8CD
+         nI4Q==
+X-Gm-Message-State: AOJu0YzquVEhfBsizCblWfL7yB4F/pKSg4Dq4/eZoAJ2QfODUDvmCupG
+	rRsftxQvnqQXiF94fPWQ8lVZEn8gXonzzcibBMTO1w==
+X-Google-Smtp-Source: AGHT+IFa+nDsKAaimQq1Ix7n3hwLXHpTpfQZZDdbj5Z1OOw4/lGGeIsJrAK++Ef2UwD8IUCAFdqUvFrr7OPKx30gqD8=
+X-Received: by 2002:ad4:5ccc:0:b0:66d:593f:9a4c with SMTP id
+ iu12-20020ad45ccc000000b0066d593f9a4cmr16991977qvb.2.1699268469649; Mon, 06
+ Nov 2023 03:01:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 0Ddf0zaDIOqePaT9AAAdgOVroaXugE7k
-X-Proofpoint-ORIG-GUID: TujqQAYWG4kRhei_sFweFZhNDJRux6Q6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-06_09,2023-11-02_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- adultscore=0 lowpriorityscore=0 mlxscore=0 mlxlogscore=375 spamscore=0
- clxscore=1015 malwarescore=0 priorityscore=1501 impostorscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311060091
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-24-seanjc@google.com>
+In-Reply-To: <20231027182217.3615211-24-seanjc@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 6 Nov 2023 11:00:33 +0000
+Message-ID: <CA+EHjTwN8BP+7hDveRyx0d+D3CmQN05kHEpLdi2q27jYBuFzAw@mail.gmail.com>
+Subject: Re: [PATCH v13 23/35] KVM: x86: Add support for "protected VMs" that
+ can utilize private memory
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2023-11-03 at 19:41 +0100, David Hildenbrand wrote:
-> On 03.11.23 19:36, David Hildenbrand wrote:
-> > On 03.11.23 18:30, Nina Schoetterl-Glausch wrote:
-> > > No point in defining a size for the mask if we're not going to use it=
-.
-> >=20
-> > I neither understand the patch description nor what the bug is that is
-> > being fixed (and how that description relates to the patch
-> > subject+description).
-> >=20
-> > Please improve the patch description.
-> >=20
->=20
-> Should this be
->=20
-> "
-> KVM: s390: cpu model: use proper define for facility mask size
->=20
-> We're using S390_ARCH_FAC_LIST_SIZE_U64 instead of=20
-> S390_ARCH_FAC_MASK_SIZE_U64 to define the array size of the facility=20
-> mask. Let's properly use S390_ARCH_FAC_MASK_SIZE_U64. Note that both
-> values are the same and, therefore, this is a pure cleanup.
-> "
->=20
-> I'm not convinced there is a bug and that this deserves a "Fixes:".
+Hi,
 
-Oh yeah, sorry, purely a cleanup. S390_ARCH_FAC_MASK_SIZE_U64 wasn't
-used anywhere. I also considered just getting rid of it and using one
-constant for both list and mask.
+
+On Fri, Oct 27, 2023 at 7:23=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> Add a new x86 VM type, KVM_X86_SW_PROTECTED_VM, to serve as a development
+> and testing vehicle for Confidential (CoCo) VMs, and potentially to even
+> become a "real" product in the distant future, e.g. a la pKVM.
+>
+> The private memory support in KVM x86 is aimed at AMD's SEV-SNP and
+> Intel's TDX, but those technologies are extremely complex (understatement=
+),
+> difficult to debug, don't support running as nested guests, and require
+> hardware that's isn't universally accessible.  I.e. relying SEV-SNP or TD=
+X
+
+nit: "that isn't"
+
+Reviewed-by: Fuad Tabba <tabba@google.com>
+Tested-by: Fuad Tabba <tabba@google.com>
+
+Cheers,
+/fuad
+
+> for maintaining guest private memory isn't a realistic option.
+>
+> At the very least, KVM_X86_SW_PROTECTED_VM will enable a variety of
+> selftests for guest_memfd and private memory support without requiring
+> unique hardware.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst  | 32 ++++++++++++++++++++++++++++++++
+>  arch/x86/include/asm/kvm_host.h | 15 +++++++++------
+>  arch/x86/include/uapi/asm/kvm.h |  3 +++
+>  arch/x86/kvm/Kconfig            | 12 ++++++++++++
+>  arch/x86/kvm/mmu/mmu_internal.h |  1 +
+>  arch/x86/kvm/x86.c              | 16 +++++++++++++++-
+>  include/uapi/linux/kvm.h        |  1 +
+>  virt/kvm/Kconfig                |  5 +++++
+>  8 files changed, 78 insertions(+), 7 deletions(-)
+>
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
+rst
+> index 38dc1fda4f45..00029436ac5b 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -147,10 +147,29 @@ described as 'basic' will be available.
+>  The new VM has no virtual cpus and no memory.
+>  You probably want to use 0 as machine type.
+>
+> +X86:
+> +^^^^
+> +
+> +Supported X86 VM types can be queried via KVM_CAP_VM_TYPES.
+> +
+> +S390:
+> +^^^^^
+> +
+>  In order to create user controlled virtual machines on S390, check
+>  KVM_CAP_S390_UCONTROL and use the flag KVM_VM_S390_UCONTROL as
+>  privileged user (CAP_SYS_ADMIN).
+>
+> +MIPS:
+> +^^^^^
+> +
+> +To use hardware assisted virtualization on MIPS (VZ ASE) rather than
+> +the default trap & emulate implementation (which changes the virtual
+> +memory layout to fit in user mode), check KVM_CAP_MIPS_VZ and use the
+> +flag KVM_VM_MIPS_VZ.
+> +
+> +ARM64:
+> +^^^^^^
+> +
+>  On arm64, the physical address size for a VM (IPA Size limit) is limited
+>  to 40bits by default. The limit can be configured if the host supports t=
+he
+>  extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
+> @@ -8650,6 +8669,19 @@ block sizes is exposed in KVM_CAP_ARM_SUPPORTED_BL=
+OCK_SIZES as a
+>  64-bit bitmap (each bit describing a block size). The default value is
+>  0, to disable the eager page splitting.
+>
+> +8.41 KVM_CAP_VM_TYPES
+> +---------------------
+> +
+> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> +:Architectures: x86
+> +:Type: system ioctl
+> +
+> +This capability returns a bitmap of support VM types.  The 1-setting of =
+bit @n
+> +means the VM type with value @n is supported.  Possible values of @n are=
+::
+> +
+> +  #define KVM_X86_DEFAULT_VM   0
+> +  #define KVM_X86_SW_PROTECTED_VM      1
+> +
+>  9. Known KVM API problems
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
+ost.h
+> index f9e8d5642069..dff10051e9b6 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1244,6 +1244,7 @@ enum kvm_apicv_inhibit {
+>  };
+>
+>  struct kvm_arch {
+> +       unsigned long vm_type;
+>         unsigned long n_used_mmu_pages;
+>         unsigned long n_requested_mmu_pages;
+>         unsigned long n_max_mmu_pages;
+> @@ -2077,6 +2078,12 @@ void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t =
+new_pgd);
+>  void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
+>                        int tdp_max_root_level, int tdp_huge_page_level);
+>
+> +#ifdef CONFIG_KVM_PRIVATE_MEM
+> +#define kvm_arch_has_private_mem(kvm) ((kvm)->arch.vm_type !=3D KVM_X86_=
+DEFAULT_VM)
+> +#else
+> +#define kvm_arch_has_private_mem(kvm) false
+> +#endif
+> +
+>  static inline u16 kvm_read_ldt(void)
+>  {
+>         u16 ldt;
+> @@ -2125,14 +2132,10 @@ enum {
+>  #define HF_SMM_INSIDE_NMI_MASK (1 << 2)
+>
+>  # define KVM_MAX_NR_ADDRESS_SPACES     2
+> +/* SMM is currently unsupported for guests with private memory. */
+> +# define kvm_arch_nr_memslot_as_ids(kvm) (kvm_arch_has_private_mem(kvm) =
+? 1 : 2)
+>  # define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_M=
+ASK ? 1 : 0)
+>  # define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role=
+).smm)
+> -
+> -static inline int kvm_arch_nr_memslot_as_ids(struct kvm *kvm)
+> -{
+> -       return KVM_MAX_NR_ADDRESS_SPACES;
+> -}
+> -
+>  #else
+>  # define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, 0)
+>  #endif
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/=
+kvm.h
+> index 1a6a1f987949..a448d0964fc0 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -562,4 +562,7 @@ struct kvm_pmu_event_filter {
+>  /* x86-specific KVM_EXIT_HYPERCALL flags. */
+>  #define KVM_EXIT_HYPERCALL_LONG_MODE   BIT(0)
+>
+> +#define KVM_X86_DEFAULT_VM     0
+> +#define KVM_X86_SW_PROTECTED_VM        1
+> +
+>  #endif /* _ASM_X86_KVM_H */
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index 091b74599c22..8452ed0228cb 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -77,6 +77,18 @@ config KVM_WERROR
+>
+>           If in doubt, say "N".
+>
+> +config KVM_SW_PROTECTED_VM
+> +       bool "Enable support for KVM software-protected VMs"
+> +       depends on EXPERT
+> +       depends on X86_64
+> +       select KVM_GENERIC_PRIVATE_MEM
+> +       help
+> +         Enable support for KVM software-protected VMs.  Currently "prot=
+ected"
+> +         means the VM can be backed with memory provided by
+> +         KVM_CREATE_GUEST_MEMFD.
+> +
+> +         If unsure, say "N".
+> +
+>  config KVM_INTEL
+>         tristate "KVM for Intel (and compatible) processors support"
+>         depends on KVM && IA32_FEAT_CTL
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_inter=
+nal.h
+> index 86c7cb692786..b66a7d47e0e4 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -297,6 +297,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vc=
+pu *vcpu, gpa_t cr2_or_gpa,
+>                 .max_level =3D KVM_MAX_HUGEPAGE_LEVEL,
+>                 .req_level =3D PG_LEVEL_4K,
+>                 .goal_level =3D PG_LEVEL_4K,
+> +               .is_private =3D kvm_mem_is_private(vcpu->kvm, cr2_or_gpa =
+>> PAGE_SHIFT),
+>         };
+>         int r;
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c4d17727b199..e3eb608b6692 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4441,6 +4441,13 @@ static int kvm_ioctl_get_supported_hv_cpuid(struct=
+ kvm_vcpu *vcpu,
+>         return 0;
+>  }
+>
+> +static bool kvm_is_vm_type_supported(unsigned long type)
+> +{
+> +       return type =3D=3D KVM_X86_DEFAULT_VM ||
+> +              (type =3D=3D KVM_X86_SW_PROTECTED_VM &&
+> +               IS_ENABLED(CONFIG_KVM_SW_PROTECTED_VM) && tdp_enabled);
+> +}
+> +
+>  int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  {
+>         int r =3D 0;
+> @@ -4632,6 +4639,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, =
+long ext)
+>         case KVM_CAP_X86_NOTIFY_VMEXIT:
+>                 r =3D kvm_caps.has_notify_vmexit;
+>                 break;
+> +       case KVM_CAP_VM_TYPES:
+> +               r =3D BIT(KVM_X86_DEFAULT_VM);
+> +               if (kvm_is_vm_type_supported(KVM_X86_SW_PROTECTED_VM))
+> +                       r |=3D BIT(KVM_X86_SW_PROTECTED_VM);
+> +               break;
+>         default:
+>                 break;
+>         }
+> @@ -12314,9 +12326,11 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned l=
+ong type)
+>         int ret;
+>         unsigned long flags;
+>
+> -       if (type)
+> +       if (!kvm_is_vm_type_supported(type))
+>                 return -EINVAL;
+>
+> +       kvm->arch.vm_type =3D type;
+> +
+>         ret =3D kvm_page_track_init(kvm);
+>         if (ret)
+>                 goto out;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 29e9eb51dec9..5b5820d19e71 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1218,6 +1218,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_MEMORY_FAULT_INFO 231
+>  #define KVM_CAP_MEMORY_ATTRIBUTES 232
+>  #define KVM_CAP_GUEST_MEMFD 233
+> +#define KVM_CAP_VM_TYPES 234
+>
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index 08afef022db9..2c964586aa14 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -104,3 +104,8 @@ config KVM_GENERIC_MEMORY_ATTRIBUTES
+>  config KVM_PRIVATE_MEM
+>         select XARRAY_MULTI
+>         bool
+> +
+> +config KVM_GENERIC_PRIVATE_MEM
+> +       select KVM_GENERIC_MEMORY_ATTRIBUTES
+> +       select KVM_PRIVATE_MEM
+> +       bool
+> --
+> 2.42.0.820.g83a721a137-goog
+>
 
