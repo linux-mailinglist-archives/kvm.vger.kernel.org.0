@@ -1,381 +1,350 @@
-Return-Path: <kvm+bounces-665-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-668-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC6587E1F25
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:02:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF3707E1F30
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:03:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90D962812A1
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:02:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6809AB20B10
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC6D182DB;
-	Mon,  6 Nov 2023 11:02:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE461A58A;
+	Mon,  6 Nov 2023 11:03:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vYNcYifD"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cuabuBTi"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D5E18045
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:02:35 +0000 (UTC)
-Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB1441BF
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 03:02:32 -0800 (PST)
-Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-5a84204e7aeso50246707b3.0
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 03:02:32 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058E7199A1
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:03:43 +0000 (UTC)
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F05FBB
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 03:03:41 -0800 (PST)
+Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-507e85ebf50so5315980e87.1
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 03:03:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699268552; x=1699873352; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V2GJ8/Y90IpmxpdY5rYjfIxqDFVHPJDdAKZ/UZv6WBc=;
-        b=vYNcYifDPP598PI8ch9gsg0/D6zQlCvtxo4xnaAmv4fBAEd2qbBuirTXWg5IE8hpfH
-         LtHI/BJZARdS5opWd+N0g0u+i2LlMo5/aBnmCjyP2IV/WxnBkXmr0PcFeIEMPxbu5YbF
-         WhzEaCkLFxtZmqTJmDxipCXdb4338WocA2daOHgVW2lSr6IC/8HDdprHZgT6OAhepVxi
-         jcUco6+YnH8jYxVP6QO7nFuTB7NpiAD/t60K7W81hKm0Aq2zViYGuefiHn/aEYXXGZWk
-         DJ+gsmhJHo1Fz6VjGvxRJ1HHcIFRrdotH5oSuvwI2ONM9vf3TJXxVzul3L0SPLqVjJ85
-         Msiw==
+        d=linaro.org; s=google; t=1699268619; x=1699873419; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=s2ZTAIZ3EcP2rWfDpzhdpbAQPKF0BMVTmUIclEXcHBw=;
+        b=cuabuBTidQJ1RADeG8blCRV3Zqd3OSs16QbShXgA2rn9CKJEzqz7QO3ka/As0NyVsj
+         J6leJ2R+CUymhZheJT2g3aNOr1ogLz18O3rkTq31UF2os0yl1mBYRpdtTqlZLFxjhB/Q
+         hJC8rjfn+cGLr1H+oVttYGtG1ZfBc0qOs1cnZ/ghySU8sIae29zySs6ZGML36elzXAMd
+         szP7eI7p4nIofl5BS4zYXF93ImVnN2UE19y1DFThPClXGjwJiYtN/b7EUr+qsFktBuZj
+         bB5fvVZQIgyY2k2j3X8yIeEP3Tc29DNHIBgKbrihsL9ogBhEAPlPzu8v2b5Ca1IbkM7Y
+         Mw3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699268552; x=1699873352;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=V2GJ8/Y90IpmxpdY5rYjfIxqDFVHPJDdAKZ/UZv6WBc=;
-        b=TUpiSg0P7qmdwcMn+6yE5ACV1DkhEkHWv9sBusSS3LCNfQQA6TiqSvx48cx5H2fGS+
-         MrFIeBZcX8AZAPyp2O5/V8S352R4MIl9prqK0FsGVv+E0BJcusLkWCstzwiOPoZ5fMu6
-         MIlb0MF5I9jvK04FmbS45xzW1FazUa5mWZEg9xGiVl04LvkVhYwEHopxy/PABP37uFQv
-         fsPCjFoxdJvTxaA9F7uW2hyEDcT22YX5Dh9VilA0O/JxcjvuHIM7As0dK61PYv74nklq
-         ezuJ8UZqqaDuhcSyWqil6glGQ7gXycWSka/oGS38W/UJCmhLZGHkak8/jCwL81wRejn1
-         AiKg==
-X-Gm-Message-State: AOJu0YwQCJHwygiyyoOP5Mhz3UDhIUUywgDQqHKgXab3lvZv97HYiuWZ
-	8xbXXZjUwiqlCrhwm1WfGuFvjcybs25+tsN6VPXSlg==
-X-Google-Smtp-Source: AGHT+IENsSw7a/V4UHxjgeCZCxumLhfZFTIQeh3gjUw+ULtbqWsBt8O3seLfs1J5njILHP4HGiHHO4KXlr48V0F1FV0=
-X-Received: by 2002:a0d:ead2:0:b0:5a2:20ec:40be with SMTP id
- t201-20020a0dead2000000b005a220ec40bemr12462308ywe.29.1699268551723; Mon, 06
- Nov 2023 03:02:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699268619; x=1699873419;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=s2ZTAIZ3EcP2rWfDpzhdpbAQPKF0BMVTmUIclEXcHBw=;
+        b=EwJXgQNxFItbZ9VxaefwefZcTNKCYIQMph/MNz4PFwAScDGzvH/J7OYmBkkfW0bmtO
+         s8YuAD6A7pMIOzbeLDhiD9cn3AfnjOfbCAZ0mk1aX34iibzChwdUJ9Gi54bEqHxX0IRP
+         IsgGxYMQdxHJOOnoDmKrJDH+Nwt9RIwWHd7iEZAV40G77AQVKUqv7nWB/7OItlyAX+S+
+         yln6x09o7+Xr8T1CybVWw0rSipXtYhUodr8F1xfAHatisnRV0agJAqNW3jwB2LcgL8ju
+         CyfnPtXpv20wADDAl4uSBKplKaHzbpUCKLc1Lp/HGpUaMIvn0TuuBbdfe22JrRovF+Ee
+         n+KQ==
+X-Gm-Message-State: AOJu0YyMfSHp6TS1TKwPYtlO28B7qn+L/AMhdE6tDO+f9+PznsUnRqoF
+	HYPtMwCo+Fs9A6Qozl1LUc4/T2CSv0rBJ7t9PvQ=
+X-Google-Smtp-Source: AGHT+IGNzLYMSLsslMQga51M3r9N5uuOrws0qA3e9rqVKRKRadV9n0aLe1jaAtSMePpczmUtzjFbew==
+X-Received: by 2002:a05:6512:2810:b0:504:30eb:f2ac with SMTP id cf16-20020a056512281000b0050430ebf2acmr25611384lfb.68.1699268619393;
+        Mon, 06 Nov 2023 03:03:39 -0800 (PST)
+Received: from m1x-phil.lan (176-131-220-199.abo.bbox.fr. [176.131.220.199])
+        by smtp.gmail.com with ESMTPSA id j17-20020a056000125100b0032db4e660d9sm9168557wrx.56.2023.11.06.03.03.37
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 06 Nov 2023 03:03:39 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org,
+	qemu-s390x@nongnu.org,
+	qemu-block@nongnu.org,
+	qemu-riscv@nongnu.org,
+	qemu-ppc@nongnu.org,
+	qemu-arm@nongnu.org,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Subject: [PULL 00/60] Misc HW/UI patches for 2023-11-06
+Date: Mon,  6 Nov 2023 12:02:32 +0100
+Message-ID: <20231106110336.358-1-philmd@linaro.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-22-pbonzini@redhat.com>
-In-Reply-To: <20231105163040.14904-22-pbonzini@redhat.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 6 Nov 2023 11:01:56 +0000
-Message-ID: <CA+EHjTw33hNZPeRZnoxM8snKE=s3T6ebSgOOAKqCyrb3rDPa9g@mail.gmail.com>
-Subject: Re: [PATCH 21/34] KVM: x86: Add support for "protected VMs" that can
- utilize private memory
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Sean Christopherson <seanjc@google.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Hi,
+The following changes since commit d762bf97931b58839316b68a570eecc6143c9e3e:
 
-On Sun, Nov 5, 2023 at 4:33=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->
-> From: Sean Christopherson <seanjc@google.com>
->
-> Add a new x86 VM type, KVM_X86_SW_PROTECTED_VM, to serve as a development
-> and testing vehicle for Confidential (CoCo) VMs, and potentially to even
-> become a "real" product in the distant future, e.g. a la pKVM.
->
-> The private memory support in KVM x86 is aimed at AMD's SEV-SNP and
-> Intel's TDX, but those technologies are extremely complex (understatement=
-),
-> difficult to debug, don't support running as nested guests, and require
-> hardware that's isn't universally accessible.  I.e. relying SEV-SNP or TD=
-X
+  Merge tag 'pull-target-arm-20231102' of https://git.linaro.org/people/pmaydell/qemu-arm into staging (2023-11-03 10:04:12 +0800)
 
-(replied to v13 earlier, sorry)
+are available in the Git repository at:
 
-nit: "that isn't"
+  https://github.com/philmd/qemu.git tags/misc-cpus-20231106
 
-Reviewed-by: Fuad Tabba <tabba@google.com>
-Tested-by: Fuad Tabba <tabba@google.com>
+for you to fetch changes up to a81b438ac3933419910cbdf2e2e8d87681de611e:
 
-Cheers,
-/fuad
+  ui/sdl2: use correct key names in win title on mac (2023-11-06 11:07:32 +0100)
 
-> for maintaining guest private memory isn't a realistic option.
->
-> At the very least, KVM_X86_SW_PROTECTED_VM will enable a variety of
-> selftests for guest_memfd and private memory support without requiring
-> unique hardware.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> Message-Id: <20231027182217.3615211-24-seanjc@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  Documentation/virt/kvm/api.rst  | 32 ++++++++++++++++++++++++++++++++
->  arch/x86/include/asm/kvm_host.h | 15 +++++++++------
->  arch/x86/include/uapi/asm/kvm.h |  3 +++
->  arch/x86/kvm/Kconfig            | 12 ++++++++++++
->  arch/x86/kvm/mmu/mmu_internal.h |  1 +
->  arch/x86/kvm/x86.c              | 16 +++++++++++++++-
->  include/uapi/linux/kvm.h        |  1 +
->  virt/kvm/Kconfig                |  5 +++++
->  8 files changed, 78 insertions(+), 7 deletions(-)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
-rst
-> index 4a9a291380ad..38882263278d 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -147,10 +147,29 @@ described as 'basic' will be available.
->  The new VM has no virtual cpus and no memory.
->  You probably want to use 0 as machine type.
->
-> +X86:
-> +^^^^
-> +
-> +Supported X86 VM types can be queried via KVM_CAP_VM_TYPES.
-> +
-> +S390:
-> +^^^^^
-> +
->  In order to create user controlled virtual machines on S390, check
->  KVM_CAP_S390_UCONTROL and use the flag KVM_VM_S390_UCONTROL as
->  privileged user (CAP_SYS_ADMIN).
->
-> +MIPS:
-> +^^^^^
-> +
-> +To use hardware assisted virtualization on MIPS (VZ ASE) rather than
-> +the default trap & emulate implementation (which changes the virtual
-> +memory layout to fit in user mode), check KVM_CAP_MIPS_VZ and use the
-> +flag KVM_VM_MIPS_VZ.
-> +
-> +ARM64:
-> +^^^^^^
-> +
->  On arm64, the physical address size for a VM (IPA Size limit) is limited
->  to 40bits by default. The limit can be configured if the host supports t=
-he
->  extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
-> @@ -8766,6 +8785,19 @@ block sizes is exposed in KVM_CAP_ARM_SUPPORTED_BL=
-OCK_SIZES as a
->  64-bit bitmap (each bit describing a block size). The default value is
->  0, to disable the eager page splitting.
->
-> +8.41 KVM_CAP_VM_TYPES
-> +---------------------
-> +
-> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> +:Architectures: x86
-> +:Type: system ioctl
-> +
-> +This capability returns a bitmap of support VM types.  The 1-setting of =
-bit @n
-> +means the VM type with value @n is supported.  Possible values of @n are=
-::
-> +
-> +  #define KVM_X86_DEFAULT_VM   0
-> +  #define KVM_X86_SW_PROTECTED_VM      1
-> +
->  9. Known KVM API problems
->  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
-ost.h
-> index 75ab0da06e64..a565a2e70f30 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1255,6 +1255,7 @@ enum kvm_apicv_inhibit {
->  };
->
->  struct kvm_arch {
-> +       unsigned long vm_type;
->         unsigned long n_used_mmu_pages;
->         unsigned long n_requested_mmu_pages;
->         unsigned long n_max_mmu_pages;
-> @@ -2089,6 +2090,12 @@ void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t =
-new_pgd);
->  void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
->                        int tdp_max_root_level, int tdp_huge_page_level);
->
-> +#ifdef CONFIG_KVM_PRIVATE_MEM
-> +#define kvm_arch_has_private_mem(kvm) ((kvm)->arch.vm_type !=3D KVM_X86_=
-DEFAULT_VM)
-> +#else
-> +#define kvm_arch_has_private_mem(kvm) false
-> +#endif
-> +
->  static inline u16 kvm_read_ldt(void)
->  {
->         u16 ldt;
-> @@ -2137,14 +2144,10 @@ enum {
->  #define HF_SMM_INSIDE_NMI_MASK (1 << 2)
->
->  # define KVM_MAX_NR_ADDRESS_SPACES     2
-> +/* SMM is currently unsupported for guests with private memory. */
-> +# define kvm_arch_nr_memslot_as_ids(kvm) (kvm_arch_has_private_mem(kvm) =
-? 1 : 2)
->  # define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_M=
-ASK ? 1 : 0)
->  # define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role=
-).smm)
-> -
-> -static inline int kvm_arch_nr_memslot_as_ids(struct kvm *kvm)
-> -{
-> -       return KVM_MAX_NR_ADDRESS_SPACES;
-> -}
-> -
->  #else
->  # define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, 0)
->  #endif
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/=
-kvm.h
-> index 1a6a1f987949..a448d0964fc0 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -562,4 +562,7 @@ struct kvm_pmu_event_filter {
->  /* x86-specific KVM_EXIT_HYPERCALL flags. */
->  #define KVM_EXIT_HYPERCALL_LONG_MODE   BIT(0)
->
-> +#define KVM_X86_DEFAULT_VM     0
-> +#define KVM_X86_SW_PROTECTED_VM        1
-> +
->  #endif /* _ASM_X86_KVM_H */
-> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index e61383674c75..c1716e83d176 100644
-> --- a/arch/x86/kvm/Kconfig
-> +++ b/arch/x86/kvm/Kconfig
-> @@ -77,6 +77,18 @@ config KVM_WERROR
->
->           If in doubt, say "N".
->
-> +config KVM_SW_PROTECTED_VM
-> +       bool "Enable support for KVM software-protected VMs"
-> +       depends on EXPERT
-> +       depends on X86_64
-> +       select KVM_GENERIC_PRIVATE_MEM
-> +       help
-> +         Enable support for KVM software-protected VMs.  Currently "prot=
-ected"
-> +         means the VM can be backed with memory provided by
-> +         KVM_CREATE_GUEST_MEMFD.
-> +
-> +         If unsure, say "N".
-> +
->  config KVM_INTEL
->         tristate "KVM for Intel (and compatible) processors support"
->         depends on KVM && IA32_FEAT_CTL
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_inter=
-nal.h
-> index 86c7cb692786..b66a7d47e0e4 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -297,6 +297,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vc=
-pu *vcpu, gpa_t cr2_or_gpa,
->                 .max_level =3D KVM_MAX_HUGEPAGE_LEVEL,
->                 .req_level =3D PG_LEVEL_4K,
->                 .goal_level =3D PG_LEVEL_4K,
-> +               .is_private =3D kvm_mem_is_private(vcpu->kvm, cr2_or_gpa =
->> PAGE_SHIFT),
->         };
->         int r;
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index f521c97f5c64..6d0772b47041 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4548,6 +4548,13 @@ static int kvm_ioctl_get_supported_hv_cpuid(struct=
- kvm_vcpu *vcpu,
->         return 0;
->  }
->
-> +static bool kvm_is_vm_type_supported(unsigned long type)
-> +{
-> +       return type =3D=3D KVM_X86_DEFAULT_VM ||
-> +              (type =3D=3D KVM_X86_SW_PROTECTED_VM &&
-> +               IS_ENABLED(CONFIG_KVM_SW_PROTECTED_VM) && tdp_enabled);
-> +}
-> +
->  int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  {
->         int r =3D 0;
-> @@ -4739,6 +4746,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, =
-long ext)
->         case KVM_CAP_X86_NOTIFY_VMEXIT:
->                 r =3D kvm_caps.has_notify_vmexit;
->                 break;
-> +       case KVM_CAP_VM_TYPES:
-> +               r =3D BIT(KVM_X86_DEFAULT_VM);
-> +               if (kvm_is_vm_type_supported(KVM_X86_SW_PROTECTED_VM))
-> +                       r |=3D BIT(KVM_X86_SW_PROTECTED_VM);
-> +               break;
->         default:
->                 break;
->         }
-> @@ -12436,9 +12448,11 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned l=
-ong type)
->         int ret;
->         unsigned long flags;
->
-> -       if (type)
-> +       if (!kvm_is_vm_type_supported(type))
->                 return -EINVAL;
->
-> +       kvm->arch.vm_type =3D type;
-> +
->         ret =3D kvm_page_track_init(kvm);
->         if (ret)
->                 goto out;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 8eb10f560c69..e9cb2df67a1d 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1227,6 +1227,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_MEMORY_FAULT_INFO 232
->  #define KVM_CAP_MEMORY_ATTRIBUTES 233
->  #define KVM_CAP_GUEST_MEMFD 234
-> +#define KVM_CAP_VM_TYPES 235
->
->  #ifdef KVM_CAP_IRQ_ROUTING
->
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index 08afef022db9..2c964586aa14 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -104,3 +104,8 @@ config KVM_GENERIC_MEMORY_ATTRIBUTES
->  config KVM_PRIVATE_MEM
->         select XARRAY_MULTI
->         bool
-> +
-> +config KVM_GENERIC_PRIVATE_MEM
-> +       select KVM_GENERIC_MEMORY_ATTRIBUTES
-> +       select KVM_PRIVATE_MEM
-> +       bool
-> --
-> 2.39.1
->
->
+Few checkpatch warnings in target/i386/hvf/x86_emu.c are deliberately ignored.
+----------------------------------------------------------------
+Misc hardware patch queue
+
+HW emulation:
+- PMBus fixes and tests (Titus)
+- IDE fixes and tests (Fiona)
+- New ADM1266 sensor (Titus)
+- Better error propagation in PCI-ISA i82378 (Philippe)
+
+Topology:
+- Fix CPUState::nr_cores calculation (Zhuocheng Ding and Zhao Liu)
+
+Monitor:
+- Synchronize CPU state in 'info lapic' (Dongli Zhang)
+
+QOM:
+- Have 'cpu-qom.h' target-agnostic (Philippe)
+- Call object_class_is_abstract once in cpu_class_by_name (Philippe)
+
+UI:
+- Use correct key names in titles on MacOS / SDL2 (Adrian)
+
+MIPS:
+- Fix MSA BZ/BNZ and TX79 LQ/SQ opcodes (Philippe)
+
+Nios2:
+- Create IRQs *after* vCPU is realized (Philippe)
+
+PPC:
+- Restrict KVM objects to system emulation (Philippe)
+
+X86:
+- HVF & KVM cleanups (Philippe)
+
+Various targets:
+- Use env_archcpu() to optimize (Philippe)
+
+Misc:
+- Few global variable shadowing removed (Philippe)
+- Introduce cpu_exec_reset_hold and factor tcg_cpu_reset_hold out (Philippe)
+- Remove few more 'softmmu' mentions (Philippe)
+- Fix and cleanup in vl.c (Akihiko & Marc-André)
+- MAINTAINERS updates (Thomas, Daniel)
+
+----------------------------------------------------------------
+
+Adrian Wowk (1):
+  ui/sdl2: use correct key names in win title on mac
+
+Akihiko Odaki (1):
+  vl: Free machine list
+
+Daniel P. Berrangé (1):
+  MAINTAINERS: update libvirt devel mailing list address
+
+Dongli Zhang (1):
+  target/i386/monitor: synchronize cpu state for lapic info
+
+Fiona Ebner (2):
+  hw/ide: reset: cancel async DMA operation before resetting state
+  tests/qtest: ahci-test: add test exposing reset issue with pending
+    callback
+
+Marc-André Lureau (1):
+  vl: constify default_list
+
+Philippe Mathieu-Daudé (39):
+  tests/vm/ubuntu.aarch64: Correct comment about TCG specific delay
+  tests/unit/test-seccomp: Remove mentions of softmmu in test names
+  accel/tcg: Declare tcg_flush_jmp_cache() in 'exec/tb-flush.h'
+  accel: Introduce cpu_exec_reset_hold()
+  accel/tcg: Factor tcg_cpu_reset_hold() out
+  target: Unify QOM style
+  target: Mention 'cpu-qom.h' is target agnostic
+  target/arm: Move internal declarations from 'cpu-qom.h' to 'cpu.h'
+  target/ppc: Remove CPU_RESOLVING_TYPE from 'cpu-qom.h'
+  target/riscv: Remove CPU_RESOLVING_TYPE from 'cpu-qom.h'
+  target: Declare FOO_CPU_TYPE_NAME/SUFFIX in 'cpu-qom.h'
+  target/hexagon: Declare QOM definitions in 'cpu-qom.h'
+  target/loongarch: Declare QOM definitions in 'cpu-qom.h'
+  target/nios2: Declare QOM definitions in 'cpu-qom.h'
+  target/openrisc: Declare QOM definitions in 'cpu-qom.h'
+  target/riscv: Move TYPE_RISCV_CPU_BASE definition to 'cpu.h'
+  target/ppc: Use env_archcpu() in helper_book3s_msgsndp()
+  target/riscv: Use env_archcpu() in [check_]nanbox()
+  target/s390x: Use env_archcpu() in handle_diag_308()
+  target/xtensa: Use env_archcpu() in update_c[compare|count]()
+  target/i386/hvf: Use x86_cpu in simulate_[rdmsr|wrmsr]()
+  target/i386/hvf: Use env_archcpu() in simulate_[rdmsr/wrmsr]()
+  target/i386/hvf: Use CPUState typedef
+  target/i386/hvf: Rename 'CPUState *cpu' variable as 'cs'
+  target/i386/hvf: Rename 'X86CPU *x86_cpu' variable as 'cpu'
+  target/i386/kvm: Correct comment in kvm_cpu_realize()
+  target/mips: Fix MSA BZ/BNZ opcodes displacement
+  target/mips: Fix TX79 LQ/SQ opcodes
+  sysemu/kvm: Restrict kvmppc_get_radix_page_info() to ppc targets
+  hw/ppc/e500: Restrict ppce500_init_mpic_kvm() to KVM
+  target/ppc: Restrict KVM objects to system emulation
+  target/ppc: Prohibit target specific KVM prototypes on user emulation
+  target/nios2: Create IRQs *after* accelerator vCPU is realized
+  target/alpha: Tidy up alpha_cpu_class_by_name()
+  hw/cpu: Call object_class_is_abstract() once in cpu_class_by_name()
+  exec/cpu: Have cpu_exec_realize() return a boolean
+  hw/cpu: Clean up global variable shadowing
+  hw/loader: Clean up global variable shadowing in rom_add_file()
+  hw/isa/i82378: Propagate error if PC_SPEAKER device creation failed
+
+Thomas Huth (2):
+  MAINTAINERS: Add include/hw/timer/tmu012.h to the SH4 R2D section
+  MAINTAINERS: Add the CAN documentation file to the CAN section
+
+Zhao Liu (3):
+  hw/i386: Fix comment style in topology.h
+  tests/unit: Rename test-x86-cpuid.c to test-x86-topo.c
+  hw/cpu: Update the comments of nr_cores and nr_dies
+
+Zhuocheng Ding (1):
+  system/cpus: Fix CPUState.nr_cores' calculation
+
+titusr@google.com (8):
+  hw/i2c: pmbus add support for block receive
+  hw/i2c: pmbus: add vout mode bitfields
+  hw/i2c: pmbus: add fan support
+  hw/i2c: pmbus: add VCAP register
+  hw/sensor: add ADM1266 device model
+  tests/qtest: add tests for ADM1266
+  hw/i2c: pmbus: immediately clear faults on request
+  hw/i2c: pmbus: reset page register for out of range reads
+
+ MAINTAINERS                                   |   8 +-
+ include/exec/cpu-common.h                     |   3 -
+ include/exec/tb-flush.h                       |   2 +
+ include/hw/core/cpu.h                         |  20 +-
+ include/hw/i2c/pmbus_device.h                 |  17 ++
+ include/hw/i386/topology.h                    |  33 +--
+ include/hw/loader.h                           |   2 +-
+ include/sysemu/accel-ops.h                    |   1 +
+ include/sysemu/kvm.h                          |   1 -
+ target/alpha/cpu-qom.h                        |   7 +-
+ target/alpha/cpu.h                            |   4 -
+ target/arm/cpu-qom.h                          |  34 +--
+ target/arm/cpu.h                              |  24 +-
+ target/arm/internals.h                        |   6 +
+ target/avr/cpu-qom.h                          |   8 +-
+ target/avr/cpu.h                              |   4 -
+ target/cris/cpu-qom.h                         |   7 +-
+ target/cris/cpu.h                             |   4 -
+ target/hexagon/cpu-qom.h                      |  28 ++
+ target/hexagon/cpu.h                          |  20 +-
+ target/hppa/cpu-qom.h                         |   4 +-
+ target/hppa/cpu.h                             |   2 -
+ target/i386/cpu-qom.h                         |   5 +-
+ target/i386/cpu.h                             |   5 +-
+ target/i386/hvf/x86_emu.h                     |   4 +-
+ target/loongarch/cpu-qom.h                    |  24 ++
+ target/loongarch/cpu.h                        |  14 +-
+ target/m68k/cpu-qom.h                         |   7 +-
+ target/m68k/cpu.h                             |   4 -
+ target/microblaze/cpu-qom.h                   |   4 +-
+ target/microblaze/cpu.h                       |   2 -
+ target/mips/cpu-qom.h                         |   5 +-
+ target/mips/cpu.h                             |   4 -
+ target/nios2/cpu-qom.h                        |  19 ++
+ target/nios2/cpu.h                            |  11 +-
+ target/openrisc/cpu-qom.h                     |  22 ++
+ target/openrisc/cpu.h                         |  14 +-
+ target/ppc/cpu-qom.h                          |   3 +-
+ target/ppc/cpu.h                              |   4 +-
+ target/ppc/kvm_ppc.h                          |   4 +
+ target/riscv/cpu-qom.h                        |  12 +-
+ target/riscv/cpu.h                            |  10 +-
+ target/riscv/internals.h                      |   8 +-
+ target/rx/cpu-qom.h                           |   7 +-
+ target/rx/cpu.h                               |   4 -
+ target/s390x/cpu-qom.h                        |   8 +-
+ target/s390x/cpu.h                            |   4 -
+ target/sh4/cpu-qom.h                          |   7 +-
+ target/sh4/cpu.h                              |   4 -
+ target/sparc/cpu-qom.h                        |   7 +-
+ target/sparc/cpu.h                            |   4 -
+ target/tricore/cpu-qom.h                      |   7 +-
+ target/tricore/cpu.h                          |   4 -
+ target/xtensa/cpu-qom.h                       |   7 +-
+ target/xtensa/cpu.h                           |   4 -
+ target/mips/tcg/msa.decode                    |   4 +-
+ target/mips/tcg/tx79.decode                   |   2 +-
+ accel/stubs/tcg-stub.c                        |   4 -
+ accel/tcg/cputlb.c                            |   1 +
+ accel/tcg/tcg-accel-ops.c                     |   9 +
+ accel/tcg/translate-all.c                     |   8 -
+ accel/tcg/user-exec-stub.c                    |   4 +
+ cpu-common.c                                  |   6 +-
+ cpu-target.c                                  |   6 +-
+ hw/core/cpu-common.c                          |  19 +-
+ hw/core/loader.c                              |   4 +-
+ hw/i2c/pmbus_device.c                         | 237 +++++++++++++++-
+ hw/ide/core.c                                 |  14 +-
+ hw/isa/i82378.c                               |   4 +-
+ hw/ppc/e500.c                                 |   4 +
+ hw/sensor/adm1266.c                           | 254 ++++++++++++++++++
+ linux-user/main.c                             |   2 +-
+ plugins/core.c                                |   1 -
+ system/cpus.c                                 |   9 +-
+ system/vl.c                                   |   5 +-
+ target/alpha/cpu.c                            |  10 +-
+ target/arm/cpu.c                              |   3 +-
+ target/avr/cpu.c                              |   3 +-
+ target/cris/cpu.c                             |   3 +-
+ target/hexagon/cpu.c                          |   3 +-
+ target/i386/cpu.c                             |   9 +-
+ target/i386/hvf/hvf.c                         |   4 +-
+ target/i386/hvf/x86_emu.c                     | 111 ++++----
+ target/i386/kvm/kvm-cpu.c                     |   1 +
+ target/i386/monitor.c                         |   5 +
+ target/loongarch/cpu.c                        |   3 +-
+ target/m68k/cpu.c                             |   3 +-
+ target/nios2/cpu.c                            |  16 +-
+ target/openrisc/cpu.c                         |   3 +-
+ target/ppc/excp_helper.c                      |   2 +-
+ target/ppc/kvm-stub.c                         |  19 --
+ target/ppc/kvm.c                              |   4 +-
+ target/riscv/cpu.c                            |   3 +-
+ target/rx/cpu.c                               |   6 +-
+ target/s390x/cpu_models.c                     |   2 +-
+ target/s390x/diag.c                           |   2 +-
+ target/sh4/cpu.c                              |   3 -
+ target/tricore/cpu.c                          |   3 +-
+ target/xtensa/cpu.c                           |   3 +-
+ target/xtensa/op_helper.c                     |   4 +-
+ tests/qtest/adm1266-test.c                    | 122 +++++++++
+ tests/qtest/ahci-test.c                       |  86 +++++-
+ tests/qtest/max34451-test.c                   |  24 ++
+ tests/unit/test-seccomp.c                     |  24 +-
+ .../{test-x86-cpuid.c => test-x86-topo.c}     |   2 +-
+ ui/sdl2.c                                     |   8 +
+ hw/arm/Kconfig                                |   1 +
+ hw/sensor/Kconfig                             |   5 +
+ hw/sensor/meson.build                         |   1 +
+ target/ppc/meson.build                        |   2 +-
+ tests/qtest/meson.build                       |   1 +
+ tests/unit/meson.build                        |   4 +-
+ tests/vm/ubuntu.aarch64                       |   2 +-
+ 113 files changed, 1162 insertions(+), 436 deletions(-)
+ create mode 100644 target/hexagon/cpu-qom.h
+ create mode 100644 target/loongarch/cpu-qom.h
+ create mode 100644 target/nios2/cpu-qom.h
+ create mode 100644 target/openrisc/cpu-qom.h
+ create mode 100644 hw/sensor/adm1266.c
+ delete mode 100644 target/ppc/kvm-stub.c
+ create mode 100644 tests/qtest/adm1266-test.c
+ rename tests/unit/{test-x86-cpuid.c => test-x86-topo.c} (99%)
+
+-- 
+2.41.0
+
 
