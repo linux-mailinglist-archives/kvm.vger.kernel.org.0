@@ -1,189 +1,123 @@
-Return-Path: <kvm+bounces-782-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-783-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 034357E292D
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:56:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E50B7E2937
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:59:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32B231C20C22
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 15:56:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E9D61C20C11
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 15:59:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E3ED28E34;
-	Mon,  6 Nov 2023 15:56:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6BB828E2E;
+	Mon,  6 Nov 2023 15:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jfgAGp2H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M3G0b72N"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A8918644
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 15:56:08 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AACC13E
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 07:56:06 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d99ec34829aso5356461276.1
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 07:56:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1016128E06
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 15:59:01 +0000 (UTC)
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACD6E191
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 07:59:00 -0800 (PST)
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-40842752c6eso35687805e9.1
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 07:59:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699286165; x=1699890965; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2j2Mtk4lW9HEtWavGEnwteIJF5J/7dhiq9rSq3IBx+E=;
-        b=jfgAGp2HE5/xK9g4UWhCfe0wF8pepGfMwluQ7Me8zjfyk6kURtfjawQkzEKUL79x23
-         GA7yRpH7oYJ7PauF34lFwNQOzPOo074h3+rK5Nbw9zxFiNBJVL7dPbJmt303qnicGXhF
-         nEfy/sj/763fXTU7n9f9aw4t+i+ogT4UuEHWx8nRxxHclr16shV25An5cvb61i6Now6A
-         HZvr0t1B/eWzYe7LBjBhD2PvN13RVPGJ0vCSFvcA0giqJQMP2Ia9JWL28QQRK4AcKjCE
-         yKF3NGLMBB0N+rtxWhEtTE6umISScKcM05FoJLvnyi5f4Ogi9MTGBHt+4K6q2C36ozTG
-         krEQ==
+        d=gmail.com; s=20230601; t=1699286339; x=1699891139; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YdRU2ICAmJ5fzVK5A8/S2GOgHKTlNLHwKSHWlkevpuU=;
+        b=M3G0b72NS64h0Xdd9wGkpyy9wNhRJ5/kJxzvIrI6rgPd0zBszrwsydG8LHygFXhyAI
+         uMdKLeOvKX27kyHq3w4aVyyw5SNdyLFNS7h24x6jQT2SiWdAxHr5rCQRG3Da1J4kO3sx
+         r1t518Mn6pD3QaXjWZAcGinsHmnd1ioNvIXKGodFArtE1MB+VHhAsxX/5wfQ0YWs3EV0
+         4wJ48IgfOThIYtx3kxsgsuZZQI3hNWVzMEuXOnch6uNXgOyd7xsWSHuIajtLwXf9F51g
+         EuURy6WzHSomah/raseur77ZqY49VVpOZZASYrbN4CGl+vRWst6s3QLH7mfYhEjurJ1X
+         hddQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699286165; x=1699890965;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=2j2Mtk4lW9HEtWavGEnwteIJF5J/7dhiq9rSq3IBx+E=;
-        b=UhcySQpTfx8qaGoMKwOSMMTBSfSM3pa217RqfRhp8NKVVRQ/a4xbRTPyspmJRTQ5Oz
-         qTkX63JiWWKafZMTzUMfdZvxzMf3rU+pq4+nTw+qwP01uWGxBxxTKVpivoCMApK9rPPB
-         f2CZNvFGNKS3LnLbNzE7WtxhGRxJX/cNbB/oYYkN+NgH83mUs+TRSSndpE6MrX32iWq4
-         27YFnXU/nQRo696y3X6lhHv7SanR2Pqevmgb/+vb0Gf/4ayheTA1ccuTKSocP4an8V+u
-         VJuGimUAu9vWFqZOGJqQ8Tg1NgtdPCeCn8D0ceorvcpL9Uu7xdZrK7pLwC81+GUCB+1N
-         e4Iw==
-X-Gm-Message-State: AOJu0Yy+WbDeMG6EF3kdnXJm1Oi5NGNdL5D9BMpKpkqJ9FuOy2GjBAOh
-	/MQvpWDKXFjEKfJo1WPVvULxGhZjj/0=
-X-Google-Smtp-Source: AGHT+IERk2b/M7d3G4J3vDGzrJ+T8jAsirv4bBIzvQT8OzuTMUe5AwPvC/SZu8YyGY6aMLoBT08jDOLmS/Y=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1083:b0:d9a:c3b8:4274 with SMTP id
- v3-20020a056902108300b00d9ac3b84274mr683795ybu.7.1699286165114; Mon, 06 Nov
- 2023 07:56:05 -0800 (PST)
-Date: Mon, 6 Nov 2023 07:56:03 -0800
-In-Reply-To: <ZUjqJjz0Epf7ii8F@yilunxu-OptiPlex-7050>
+        d=1e100.net; s=20230601; t=1699286339; x=1699891139;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YdRU2ICAmJ5fzVK5A8/S2GOgHKTlNLHwKSHWlkevpuU=;
+        b=Z+AsBO7rBaGvsX0oZLp4PPXsb16PmAEseBlE6kb+LM9ni7DJ9VW+yDM8wodn8baJUT
+         6DPYV8gXKZSGAKj9LK6AM+FK+Pu8mvWi/nOJoqrJVcmQdK54iWGU6L3uiIaEOZhugUKf
+         KOqwGCPcYg39Pnd0QQk0gssjOaIcYDyKhP67+D0u2l289MzClZikZd166qzYc8x5XFae
+         fBsxAZrmnxSHQVWHoivcM7CI3G09TLx/qMEip4hB/s2/2VmZ7Zk7wKDTKup0z8Khftf6
+         tWm/uSjfiFhUgkQwvh0WrmmxLg3oMnL18RQjKFWpB9sRtLND+VjUN7XniqvN3aaMVnQa
+         ogIw==
+X-Gm-Message-State: AOJu0Yweqw9nwBICVeTHgElbx+DVHWd7rbJ6x1bMj+iqCY+G/MElDdT+
+	1k1FhZYcb1YkarAOOfpLxAs=
+X-Google-Smtp-Source: AGHT+IG+oPN1NQBnC7slICVrFKIK+QQJ+pHrO26W48S90buGxRQhChU5XJhSimZD7bEJ7PpCsy+dGA==
+X-Received: by 2002:a5d:6051:0:b0:32d:a4c4:f700 with SMTP id j17-20020a5d6051000000b0032da4c4f700mr20821057wrt.38.1699286338898;
+        Mon, 06 Nov 2023 07:58:58 -0800 (PST)
+Received: from [10.95.110.31] (54-240-197-231.amazon.com. [54.240.197.231])
+        by smtp.gmail.com with ESMTPSA id bs14-20020a056000070e00b0032d8eecf901sm10060456wrb.3.2023.11.06.07.58.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Nov 2023 07:58:58 -0800 (PST)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <e2cb5f62-9a32-4ea2-bb34-b551dcb0755c@xen.org>
+Date: Mon, 6 Nov 2023 15:58:54 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-21-seanjc@google.com>
- <ZUeSaAKRemlSRQpO@yilunxu-OptiPlex-7050> <CABgObfb1Wf2ptitGhJPM6VcmkCG9haMoQj2BsttjeoV=9F0O9Q@mail.gmail.com>
- <ZUjqJjz0Epf7ii8F@yilunxu-OptiPlex-7050>
-Message-ID: <ZUkMk6b6vZe2ANkK@google.com>
-Subject: Re: [PATCH v13 20/35] KVM: x86/mmu: Handle page fault for private memory
-From: Sean Christopherson <seanjc@google.com>
-To: Xu Yilun <yilun.xu@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>, 
-	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
-	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH v4 06/17] hw/xen: automatically assign device index to
+ block devices
+Content-Language: en-US
+To: David Woodhouse <dwmw2@infradead.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Eduardo Habkost <eduardo@habkost.net>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-block@nongnu.org, xen-devel@lists.xenproject.org, kvm@vger.kernel.org
+References: <20231106143507.1060610-1-dwmw2@infradead.org>
+ <20231106143507.1060610-7-dwmw2@infradead.org>
+Organization: Xen Project
+In-Reply-To: <20231106143507.1060610-7-dwmw2@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 06, 2023, Xu Yilun wrote:
-> On Sun, Nov 05, 2023 at 05:19:36PM +0100, Paolo Bonzini wrote:
-> > On Sun, Nov 5, 2023 at 2:04=E2=80=AFPM Xu Yilun <yilun.xu@linux.intel.c=
-om> wrote:
-> > >
-> > > > +static void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcp=
-u,
-> > > > +                                           struct kvm_page_fault *=
-fault)
-> > > > +{
-> > > > +     kvm_prepare_memory_fault_exit(vcpu, fault->gfn << PAGE_SHIFT,
-> > > > +                                   PAGE_SIZE, fault->write, fault-=
->exec,
-> > > > +                                   fault->is_private);
-> > > > +}
-> > > > +
-> > > > +static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> > > > +                                struct kvm_page_fault *fault)
-> > > > +{
-> > > > +     int max_order, r;
-> > > > +
-> > > > +     if (!kvm_slot_can_be_private(fault->slot)) {
-> > > > +             kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> > > > +             return -EFAULT;
-> > > > +     }
-> > > > +
-> > > > +     r =3D kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &f=
-ault->pfn,
-> > > > +                          &max_order);
-> > > > +     if (r) {
-> > > > +             kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> > > > +             return r;
-> > >
-> > > Why report KVM_EXIT_MEMORY_FAULT here? even with a ret !=3D -EFAULT?
-> >=20
-> > The cases are EFAULT, EHWPOISON (which can report
-> > KVM_EXIT_MEMORY_FAULT) and ENOMEM. I think it's fine
-> > that even -ENOMEM can return KVM_EXIT_MEMORY_FAULT,
-> > and it doesn't violate the documentation.  The docs tell you "what
-> > can you do if error if EFAULT or EHWPOISON?"; they don't
-> > exclude that other errnos result in KVM_EXIT_MEMORY_FAULT,
-> > it's just that you're not supposed to look at it
->=20
-> Thanks, it's OK for ENOMEM + KVM_EXIT_MEMORY_FAULT.
->=20
-> Another concern is, now 3 places to report EFAULT + KVM_EXIT_MEMORY_FAULT=
-:
->=20
->   if (!kvm_slot_can_be_private(fault->slot)) {
-> 	kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> 	return -EFAULT;
->   }
->=20
->   file =3D kvm_gmem_get_file(slot);
->   if (!file)
-> 	return -EFAULT;
->=20
->   if (fault->is_private !=3D kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
-> 	kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> 	return -EFAULT;
->   }
->=20
-> They are different cases, and seems userspace should handle them
-> differently, but not enough information to distinguish them.
+On 06/11/2023 14:34, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> There's no need to force the user to assign a vdev. We can automatically
+> assign one, starting at xvda and searching until we find the first disk
+> name that's unused.
+> 
+> This means we can now allow '-drive if=xen,file=xxx' to work without an
+> explicit separate -driver argument, just like if=virtio.
+> 
+> Rip out the legacy handling from the xenpv machine, which was scribbling
+> over any disks configured by the toolstack, and didn't work with anything
+> but raw images.
+> 
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> Acked-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   blockdev.c                          |  15 +++-
+>   hw/block/xen-block.c                | 118 ++++++++++++++++++++++++++--
+>   hw/xen/xen_devconfig.c              |  28 -------
+>   hw/xenpv/xen_machine_pv.c           |   9 ---
+>   include/hw/xen/xen-legacy-backend.h |   1 -
+>   5 files changed, 125 insertions(+), 46 deletions(-)
+> 
 
-For the first, the memory_fault exit will inform userspace that the guest w=
-ants
-to map memory as private, and userspace will see that the memslot isn't con=
-figured
-to support private mappings.  Userspace may not even need to query memslots=
-, e.g.
-if the gfn in question has been enumerated to the guest as something that c=
-an only
-be mapped shared.
+Reviewed-by: Paul Durrant <paul@xen.org>
 
-For the second (no valid guest_memfd file), userspace put the last referenc=
-e to
-the guest_memfd file without informing the guest or creating a memslot.  Th=
-at's
-firmly a userspace bug.
-
-For the third and last, userspace will see that the guest is requesting a p=
-rivate
-mapping but the gfn is configured for shared mappings.
-
-In all cases, userspace has the necessary information to resolve the issue,=
- where
-"resolving the issue" may mean terminating the guest.  If userspace isn't t=
-racking
-memslots or the private attribute, then userspace has far bigger problems.
 
