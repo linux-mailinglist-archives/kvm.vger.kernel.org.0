@@ -1,44 +1,43 @@
-Return-Path: <kvm+bounces-653-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-647-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67ED47E1EA0
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:41:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9087F7E1E94
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:40:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5A49B20C45
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 10:41:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31E69B20E9D
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 10:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07B111A72A;
-	Mon,  6 Nov 2023 10:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7572518046;
+	Mon,  6 Nov 2023 10:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HsrZzoi7"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lUwHxNJ1"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641EC1A701
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 10:40:34 +0000 (UTC)
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFA07DB
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 02:40:32 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8130918026
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 10:40:22 +0000 (UTC)
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA5F494
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 02:40:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:Message-ID:Date:Subject:Cc:To:From:Reply-To:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=8hFASJ6FJkP5+9JiryopkqrFh+wE1Upzc1d8akCwXKw=; b=HsrZzoi7oxWmojvdJbVOfncH0N
-	LbE/oaY1cF3jW518bYSyd7CXECURPhDuOuFEE8NyoL8eFV3GGox+Hzctzdk+/TrfqieRU1enW9yFr
-	9QS6NRkLSjfqmAQLbcdxS3Gb1+iD4xJilLEbyoaeMSg2pJ4JawL966SDpIEVrq04r+qmKAXrLxj4e
-	ZX45hY+bYHsbjDE//upJSGdIXJBW9tqgCeakGBy0fTLvjj0NoQi92EG8h6lsFZHgKf7HrBEqMiegB
-	Myb8iENcsbB7PG7qHQYJleGczojpxfri7o1i2f3titfD/eMwazbQ+Pf+kPbTTzWI8D2JtXw0NnvD8
-	By83/WAw==;
+	d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+	Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=wOMw/UywJs8oL1LQQcgtToi+dJjeH7aP4AFa7EtnSbM=; b=lUwHxNJ1U1La7N7HYHVdJ5UMsn
+	L8ZcNKscZiT57bK7PQz2qfH1Pug1s7gtF1UB9Qji6aLEC9gfsjAsIdOJwPdRy/F/k3F+ce++T32+8
+	eE8N+RrSBOuq4MsSShJMGOSb6Q3bcuJnlVvYQKyOrcA3rJs6NAUto8yac1SEV/F5Jt9e/NH8i0Nwq
+	Bah8ewkbmFCtdlxyGBAdeceVBaU4xgbna65iOtV4uDZE61AVW3WnewCx3ytOYQhaM/pjG9CDl+Nue
+	klanfVjqoByXh3jztUzwBeZGiNvXkPVtDz/JOFUWbgLTFQ49tyAiDj3KaV89rMjfyTMuFmzaIu19O
+	nK5wZ4Zg==;
 Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
-	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qzx1R-00ARzt-0U;
-	Mon, 06 Nov 2023 10:39:57 +0000
+	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1qzx1P-005R1g-J6; Mon, 06 Nov 2023 10:39:56 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.96.2 #2 (Red Hat Linux))
-	id 1qzx1P-000qFu-2O;
+	id 1qzx1P-000qFx-2a;
 	Mon, 06 Nov 2023 10:39:55 +0000
 From: David Woodhouse <dwmw2@infradead.org>
 To: qemu-devel@nongnu.org,
@@ -57,64 +56,47 @@ Cc: Stefano Stabellini <sstabellini@kernel.org>,
 	xen-devel@lists.xenproject.org,
 	qemu-block@nongnu.org,
 	kvm@vger.kernel.org
-Subject: [PULL 0/7] xenfv-stable queue
-Date: Mon,  6 Nov 2023 10:39:48 +0000
-Message-ID: <20231106103955.200867-1-dwmw2@infradead.org>
+Subject: [PULL 1/7] i386/xen: Don't advertise XENFEAT_supervisor_mode_kernel
+Date: Mon,  6 Nov 2023 10:39:49 +0000
+Message-ID: <20231106103955.200867-2-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20231106103955.200867-1-dwmw2@infradead.org>
+References: <20231106103955.200867-1-dwmw2@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-The following changes since commit d762bf97931b58839316b68a570eecc6143c9e3e:
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-  Merge tag 'pull-target-arm-20231102' of https://git.linaro.org/people/pmaydell/qemu-arm into staging (2023-11-03 10:04:12 +0800)
+This confuses lscpu into thinking it's running in PVH mode.
 
-are available in the Git repository at:
+Cc: qemu-stable@nongnu.org
+Fixes: bedcc139248 ("i386/xen: implement HYPERVISOR_xen_version")
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+Reviewed-by: Paul Durrant <paul@xen.org>
+---
+ target/i386/kvm/xen-emu.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-  git://git.infradead.org/users/dwmw2/qemu.git tags/pull-xenfv-stable-20231106
+diff --git a/target/i386/kvm/xen-emu.c b/target/i386/kvm/xen-emu.c
+index 76348f9d5d..0055441b2e 100644
+--- a/target/i386/kvm/xen-emu.c
++++ b/target/i386/kvm/xen-emu.c
+@@ -267,7 +267,6 @@ static bool kvm_xen_hcall_xen_version(struct kvm_xen_exit *exit, X86CPU *cpu,
+             fi.submap |= 1 << XENFEAT_writable_page_tables |
+                          1 << XENFEAT_writable_descriptor_tables |
+                          1 << XENFEAT_auto_translated_physmap |
+-                         1 << XENFEAT_supervisor_mode_kernel |
+                          1 << XENFEAT_hvm_callback_vector |
+                          1 << XENFEAT_hvm_safe_pvclock |
+                          1 << XENFEAT_hvm_pirqs;
+-- 
+2.41.0
 
-for you to fetch changes up to a1c1082908dde4867b1ac55f546bea0c17d52318:
-
-  hw/xen: use correct default protocol for xen-block on x86 (2023-11-06 10:03:45 +0000)
-
-----------------------------------------------------------------
-Bugfixes for emulated Xen support
-
-Selected bugfixes for mainline and stable, especially to the per-vCPU
-local APIC vector delivery mode for event channel notifications, which
-was broken in a number of ways.
-
-The xen-block driver has been defaulting to the wrong protocol for x86
-guest, and this fixes that — which is technically an incompatible change
-but I'm fairly sure nobody relies on the broken behaviour (and in
-production I *have* seen guests which rely on the correct behaviour,
-which now matches the blkback driver in the Linux kernel).
-
-A handful of other simple fixes for issues which came to light as new
-features (qv) were being developed.
-
-----------------------------------------------------------------
-David Woodhouse (7):
-      i386/xen: Don't advertise XENFEAT_supervisor_mode_kernel
-      i386/xen: fix per-vCPU upcall vector for Xen emulation
-      hw/xen: select kernel mode for per-vCPU event channel upcall vector
-      hw/xen: don't clear map_track[] in xen_gnttab_reset()
-      hw/xen: fix XenStore watch delivery to guest
-      hw/xen: take iothread mutex in xen_evtchn_reset_op()
-      hw/xen: use correct default protocol for xen-block on x86
-
- hw/block/xen-block.c       | 10 +++++++---
- hw/i386/kvm/xen_evtchn.c   |  7 +++++++
- hw/i386/kvm/xen_gnttab.c   |  2 --
- hw/i386/kvm/xen_xenstore.c |  8 +++++---
- include/sysemu/kvm_xen.h   |  1 +
- target/i386/kvm/xen-emu.c  | 16 +++++++++++-----
- 6 files changed, 31 insertions(+), 13 deletions(-)
 
