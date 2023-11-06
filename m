@@ -1,89 +1,150 @@
-Return-Path: <kvm+bounces-779-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-780-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A05337E28D4
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:35:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C1657E28EB
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:43:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F446B20F42
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 15:35:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2622C281574
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 15:43:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B416E28E20;
-	Mon,  6 Nov 2023 15:35:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38EB228E2B;
+	Mon,  6 Nov 2023 15:43:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EbUg5E0M"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vzsyRpmA"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41BC428E0F
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 15:35:33 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36C25B8
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 07:35:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699284931;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-	b=EbUg5E0MGmMQnfqOMLGavwQ3MABB56ByrWv8cwoN8Lzxnq5NLBMWlt1luSPWhztTmovuD0
-	ca8Zea4XTRHLPYggZOy3Citz1wQ+M+pGu5mT5YihSPemhg38ZdmV0MlUf1F4+QDnCw3OSf
-	mfjG0dKNJFaeBYv41LF3zabpmQUWcfQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-115-Vj2pGwTuPcuAJZx0W02IpA-1; Mon, 06 Nov 2023 10:35:29 -0500
-X-MC-Unique: Vj2pGwTuPcuAJZx0W02IpA-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-32fa25668acso2332061f8f.1
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 07:35:29 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5043028E07
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 15:43:25 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CE83118
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 07:43:23 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a8d9dcdd2bso93832507b3.2
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 07:43:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699285403; x=1699890203; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ABS8rPoBy1ITQ62kUEvxWovIfmSWeQOAvNCpebOJLoI=;
+        b=vzsyRpmAxCH/8GChvrGqDn1yvCAI0owjxSc6wm0w6nRGowEL6uQH0k86wM3BowHnWI
+         YO+R/Q2MeQV7zL2YvlMRp+22CKQJHYviHQJiz0i65xCl7cDkcN92Hc+gP14ppMymRD2H
+         aNKuUvrMcOB0Y4b701bftPjfVwD1nBdpNRCXnjvIWg7qEQYr6bnVR10Wr9ZRLz5WKfcL
+         qITuyIHcTB0+pH6vcpcz51cGsP3HxdLI6QiqVZ5anzF+GCPejnwTJ6NV8yQuDbkP8EAc
+         /QZSYZnij1meUOSvTcHCycSqLXFAA8JQQ7ufFnyiSnwYFLNV/kl6P7zkJFOHvY7xbPv8
+         Os3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699284928; x=1699889728;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=R1QRMukU6ptVwSWDAgXWZ450z/QA288Znb/wY+OcbG4TWwYssSp/T8Xu+LPFdtItPD
-         ZIOSUimd4VA/8WbPxjS+k2LP7UOS/nxjsjHqXo0Ng5BJCtb42BGLWc69/IyaJj/Q0vmK
-         p6XogsxHmdivgzO9EOakMa0+ER0MGkGsxRnIgXojuwUtAna+2OR2ZqerZVLESlAw8bAv
-         ybufG+GqL3JMYDJL2oqInH4P0OL7hU8CXgnXyP2xE3kTzOUSSSwNNivkVnsUC9xor9lI
-         M3dUPYGnjQrBxLfjgYsbD8bLuO8ud7CkedeR/pua+R1+DfwH0l0EX6J/YTwAefZ6/6VO
-         A/VA==
-X-Gm-Message-State: AOJu0YwYHjxr3j0+cBwPA920sTmov2s0Atd07Ee80yZdbq0MqzwaW/Qe
-	flytEppDZJwB36tLxJwFb3VYyTdfgQ7sI6YrNzaCsFmu0v/8JnKh67CxfcCEhUQ4RokyXS95IeU
-	zfdcVwJP5j3Db
-X-Received: by 2002:adf:e544:0:b0:32d:82b4:1957 with SMTP id z4-20020adfe544000000b0032d82b41957mr22964694wrm.40.1699284928156;
-        Mon, 06 Nov 2023 07:35:28 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGB+hvEtcEYbw7nHXb6mTXOGKcehrK2MMN0/X/aJawX2ZrpkQHnPCU04aA65se1mhd/If+2hQ==
-X-Received: by 2002:adf:e544:0:b0:32d:82b4:1957 with SMTP id z4-20020adfe544000000b0032d82b41957mr22964679wrm.40.1699284927791;
-        Mon, 06 Nov 2023 07:35:27 -0800 (PST)
-Received: from [192.168.10.118] ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id m1-20020a056000180100b0031980783d78sm9737093wrh.54.2023.11.06.07.35.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Nov 2023 07:35:27 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Daan De Meyer <daan.j.demeyer@gmail.com>
-Cc: qemu-devel@nongnu.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH] Add class property to configure KVM device node to use
-Date: Mon,  6 Nov 2023 16:35:25 +0100
-Message-ID: <20231106153525.417950-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231021134015.1119597-1-daan.j.demeyer@gmail.com>
-References: 
+        d=1e100.net; s=20230601; t=1699285403; x=1699890203;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ABS8rPoBy1ITQ62kUEvxWovIfmSWeQOAvNCpebOJLoI=;
+        b=eOmTKJIJZ+56bfNUW0mQR41B6aQmosZURorKkMOWrNnV4dpUiAVWfsRRcuRCJsW5c9
+         PKvXsfpdDvLc/Rni/tGbaKp6e5oXDZHi7HbbfnZQEfYfjBoXcsP0DvcYgygqJOQ9aN29
+         lUi+TlGfjCJTtPFDyaosbsUBvTDDEeEdhYsHswNVhtrJD3rpeOM6FCtbbpaB3VwbCDmU
+         6ISikPtyFfzcX0aSx9yU55V9vVHkp7cCtVCAjN2durjHW+VuMmZg1XxSVlb7tMh+Qwu8
+         8ZN2Yk02BZVUAxv3aYThCgJIuw1dQdyCjS8O/AyM8vVS1aRYUFTrXjs65vzUi7MJe4Ma
+         3Yrw==
+X-Gm-Message-State: AOJu0Yz3p3L7ylBILuASg2s71rq03yMfpSK1yDpIUDrojlIJCud0M8XO
+	mvoeH6TSoY1H/fPdCJltcQV4TlGiuBc=
+X-Google-Smtp-Source: AGHT+IFZU6oilNAmMp5GLulg+dwoZ1zspXQbywwTDejvG8kP1K7yDCwH0QkLRrw/RyNVPmFev9uMuH6PQSU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:ce94:0:b0:da0:3bea:cdc7 with SMTP id
+ x142-20020a25ce94000000b00da03beacdc7mr527390ybe.2.1699285402751; Mon, 06 Nov
+ 2023 07:43:22 -0800 (PST)
+Date: Mon, 6 Nov 2023 07:43:07 -0800
+In-Reply-To: <ZUYcb6no9ADYytrx@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-17-seanjc@google.com>
+ <ZUYcb6no9ADYytrx@yilunxu-OptiPlex-7050>
+Message-ID: <ZUkJiwp8VHY0ICab@google.com>
+Subject: Re: [PATCH v13 16/35] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From: Sean Christopherson <seanjc@google.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
+	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Queued, thanks.
+On Sat, Nov 04, 2023, Xu Yilun wrote:
+> > +KVM_SET_USER_MEMORY_REGION2 is an extension to KVM_SET_USER_MEMORY_REGION that
+> > +allows mapping guest_memfd memory into a guest.  All fields shared with
+> > +KVM_SET_USER_MEMORY_REGION identically.  Userspace can set KVM_MEM_PRIVATE in
+> > +flags to have KVM bind the memory region to a given guest_memfd range of
+> > +[guest_memfd_offset, guest_memfd_offset + memory_size].  The target guest_memfd
+>                                                         ^
+> The range end should be exclusive, is it?
 
-Paolo
+Yes, that should be a ')', not a ']'.
 
+> > +static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+> > +{
+> > +	const char *anon_name = "[kvm-gmem]";
+> > +	struct kvm_gmem *gmem;
+> > +	struct inode *inode;
+> > +	struct file *file;
+> > +	int fd, err;
+> > +
+> > +	fd = get_unused_fd_flags(0);
+> > +	if (fd < 0)
+> > +		return fd;
+> > +
+> > +	gmem = kzalloc(sizeof(*gmem), GFP_KERNEL);
+> > +	if (!gmem) {
+> > +		err = -ENOMEM;
+> > +		goto err_fd;
+> > +	}
+> > +
+> > +	/*
+> > +	 * Use the so called "secure" variant, which creates a unique inode
+> > +	 * instead of reusing a single inode.  Each guest_memfd instance needs
+> > +	 * its own inode to track the size, flags, etc.
+> > +	 */
+> > +	file = anon_inode_getfile_secure(anon_name, &kvm_gmem_fops, gmem,
+> > +					 O_RDWR, NULL);
+> > +	if (IS_ERR(file)) {
+> > +		err = PTR_ERR(file);
+> > +		goto err_gmem;
+> > +	}
+> > +
+> > +	file->f_flags |= O_LARGEFILE;
+> > +
+> > +	inode = file->f_inode;
+> > +	WARN_ON(file->f_mapping != inode->i_mapping);
+> 
+> Just curious, why should we check the mapping fields which is garanteed in
+> other subsystem?
+
+Mostly to document the behavior.  The vast majority of folks that read this code
+will be KVM developers, not file systems developers, and will likely have no clue
+about the relationship between f_mapping and i_mapping.  And in the extremely
+unlikely scenario that anon_inode_getfile_secure() no longer sets f_mapping, a
+WARN detects the issue whereas a comment does not.
 
