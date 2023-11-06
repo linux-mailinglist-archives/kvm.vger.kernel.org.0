@@ -1,60 +1,64 @@
-Return-Path: <kvm+bounces-760-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-762-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8779A7E26F7
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 15:35:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 861CD7E26FC
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 15:35:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3041B20EE0
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 14:35:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37C8C2814E3
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 14:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEC3528DC0;
-	Mon,  6 Nov 2023 14:35:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF6F28DC4;
+	Mon,  6 Nov 2023 14:35:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE566291D
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 14:35:30 +0000 (UTC)
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABB2FF4
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 06:35:28 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD5128DA1
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 14:35:40 +0000 (UTC)
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A155BB
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 06:35:34 -0800 (PST)
 X-IronPort-AV: E=Sophos;i="6.03,281,1694736000"; 
-   d="scan'208";a="164474836"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-617e30c2.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2023 14:35:27 +0000
+   d="scan'208";a="311812503"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-b538c141.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2023 14:35:32 +0000
 Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1a-m6i4x-617e30c2.us-east-1.amazon.com (Postfix) with ESMTPS id 9FCE669295;
-	Mon,  6 Nov 2023 14:35:20 +0000 (UTC)
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:48591]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.28.94:2525] with esmtp (Farcaster)
- id 927607e1-2df9-4bf5-81a9-e1390d599a5c; Mon, 6 Nov 2023 14:35:19 +0000 (UTC)
-X-Farcaster-Flow-ID: 927607e1-2df9-4bf5-81a9-e1390d599a5c
-Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+	by email-inbound-relay-iad-1e-m6i4x-b538c141.us-east-1.amazon.com (Postfix) with ESMTPS id 23189A0FAF;
+	Mon,  6 Nov 2023 14:35:23 +0000 (UTC)
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:26660]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.187:2525] with esmtp (Farcaster)
+ id a759a9d9-1c63-4a45-8564-de5087df7c67; Mon, 6 Nov 2023 14:35:23 +0000 (UTC)
+X-Farcaster-Flow-ID: a759a9d9-1c63-4a45-8564-de5087df7c67
+Received: from EX19EXOUWB001.ant.amazon.com (10.250.64.229) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Mon, 6 Nov 2023 14:35:19 +0000
+ 15.2.1118.39; Mon, 6 Nov 2023 14:35:23 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
+ EX19EXOUWB001.ant.amazon.com (10.250.64.229) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.27; Mon, 6 Nov 2023 14:35:22 +0000
 Received: from u3832b3a9db3152.ant.amazon.com (10.106.83.6) by
  mail-relay.amazon.com (10.250.64.254) with Microsoft SMTP Server id
- 15.2.1118.39 via Frontend Transport; Mon, 6 Nov 2023 14:35:16 +0000
+ 15.2.1118.39 via Frontend Transport; Mon, 6 Nov 2023 14:35:19 +0000
 From: David Woodhouse <dwmw2@infradead.org>
 To: <qemu-devel@nongnu.org>
-CC: Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>, Peter
- Maydell <peter.maydell@linaro.org>, Stefano Stabellini
-	<sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Paul
- Durrant <paul@xen.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?=
-	<marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard
- Henderson <richard.henderson@linaro.org>, Eduardo Habkost
-	<eduardo@habkost.net>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel
- Apfelbaum <marcel.apfelbaum@gmail.com>, Jason Wang <jasowang@redhat.com>,
+CC: Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>, "Peter
+ Maydell" <peter.maydell@linaro.org>, Stefano Stabellini
+	<sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "Paul
+ Durrant" <paul@xen.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?=
+	<marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Richard
+ Henderson" <richard.henderson@linaro.org>, Eduardo Habkost
+	<eduardo@habkost.net>, "Michael S. Tsirkin" <mst@redhat.com>, "Marcel
+ Apfelbaum" <marcel.apfelbaum@gmail.com>, Jason Wang <jasowang@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>, <qemu-block@nongnu.org>,
 	<xen-devel@lists.xenproject.org>, <kvm@vger.kernel.org>
-Subject: [PATCH v4 02/17] hw/xen: Clean up event channel 'type_val' handling to use union
-Date: Mon, 6 Nov 2023 14:34:52 +0000
-Message-ID: <20231106143507.1060610-3-dwmw2@infradead.org>
+Subject: [PATCH v4 03/17] include: update Xen public headers to Xen 4.17.2 release
+Date: Mon, 6 Nov 2023 14:34:53 +0000
+Message-ID: <20231106143507.1060610-4-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231106143507.1060610-1-dwmw2@infradead.org>
 References: <20231106143507.1060610-1-dwmw2@infradead.org>
@@ -70,409 +74,1202 @@ Precedence: Bulk
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-A previous implementation of this stuff used a 64-bit field for all of
-the port information (vcpu/type/type_val) and did atomic exchanges on
-them. When I implemented that in Qemu I regretted my life choices and
-just kept it simple with locking instead.
-
-So there's no need for the XenEvtchnPort to be so simplistic. We can
-use a union for the pirq/virq/interdomain information, which lets us
-keep a separate bit for the 'remote domain' in interdomain ports. A
-single bit is enough since the only possible targets are loopback or
-qemu itself.
-
-So now we can ditch PORT_INFO_TYPEVAL_REMOTE_QEMU and the horrid
-manual masking, although the in-memory representation is identical
-so there's no change in the saved state ABI.
+... in order to advertise the XEN_HVM_CPUID_UPCALL_VECTOR feature,
+which will come in a subsequent commit.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-Reviewed-by: Paul Durrant <paul@xen.org>
+Acked-by: Paul Durrant <paul@xen.org>
 ---
- hw/i386/kvm/xen_evtchn.c | 151 ++++++++++++++++++---------------------
- 1 file changed, 70 insertions(+), 81 deletions(-)
+ hw/i386/kvm/xen_xenstore.c                    |  2 +-
+ include/hw/xen/interface/arch-arm.h           | 37 +++++++-------
+ include/hw/xen/interface/arch-x86/cpuid.h     | 31 +++++-------
+ .../hw/xen/interface/arch-x86/xen-x86_32.h    | 19 +------
+ .../hw/xen/interface/arch-x86/xen-x86_64.h    | 19 +------
+ include/hw/xen/interface/arch-x86/xen.h       | 26 ++--------
+ include/hw/xen/interface/event_channel.h      | 19 +------
+ include/hw/xen/interface/features.h           | 19 +------
+ include/hw/xen/interface/grant_table.h        | 19 +------
+ include/hw/xen/interface/hvm/hvm_op.h         | 19 +------
+ include/hw/xen/interface/hvm/params.h         | 19 +------
+ include/hw/xen/interface/io/blkif.h           | 27 ++++------
+ include/hw/xen/interface/io/console.h         | 19 +------
+ include/hw/xen/interface/io/fbif.h            | 19 +------
+ include/hw/xen/interface/io/kbdif.h           | 19 +------
+ include/hw/xen/interface/io/netif.h           | 25 +++-------
+ include/hw/xen/interface/io/protocols.h       | 19 +------
+ include/hw/xen/interface/io/ring.h            | 49 ++++++++++---------
+ include/hw/xen/interface/io/usbif.h           | 19 +------
+ include/hw/xen/interface/io/xenbus.h          | 19 +------
+ include/hw/xen/interface/io/xs_wire.h         | 36 ++++++--------
+ include/hw/xen/interface/memory.h             | 30 +++++-------
+ include/hw/xen/interface/physdev.h            | 23 ++-------
+ include/hw/xen/interface/sched.h              | 19 +------
+ include/hw/xen/interface/trace.h              | 19 +------
+ include/hw/xen/interface/vcpu.h               | 19 +------
+ include/hw/xen/interface/version.h            | 19 +------
+ include/hw/xen/interface/xen-compat.h         | 19 +------
+ include/hw/xen/interface/xen.h                | 19 +------
+ 29 files changed, 124 insertions(+), 523 deletions(-)
 
-diff --git a/hw/i386/kvm/xen_evtchn.c b/hw/i386/kvm/xen_evtchn.c
-index b2b4be9983..02b8cbf8df 100644
---- a/hw/i386/kvm/xen_evtchn.c
-+++ b/hw/i386/kvm/xen_evtchn.c
-@@ -58,7 +58,15 @@ OBJECT_DECLARE_SIMPLE_TYPE(XenEvtchnState, XEN_EVTCHN)
- typedef struct XenEvtchnPort {
-     uint32_t vcpu;      /* Xen/ACPI vcpu_id */
-     uint16_t type;      /* EVTCHNSTAT_xxxx */
--    uint16_t type_val;  /* pirq# / virq# / remote port according to type */
-+    union {
-+        uint16_t val;  /* raw value for serialization etc. */
-+        uint16_t pirq;
-+        uint16_t virq;
-+        struct {
-+            uint16_t port:15;
-+            uint16_t to_qemu:1; /* Only two targets; qemu or loopback */
-+        } interdomain;
-+    } u;
- } XenEvtchnPort;
+diff --git a/hw/i386/kvm/xen_xenstore.c b/hw/i386/kvm/xen_xenstore.c
+index 8e716a7009..831da535fc 100644
+--- a/hw/i386/kvm/xen_xenstore.c
++++ b/hw/i386/kvm/xen_xenstore.c
+@@ -331,7 +331,7 @@ static void xs_error(XenXenstoreState *s, unsigned int id,
+     const char *errstr = NULL;
  
- /* 32-bit compatibility definitions, also used natively in 32-bit build */
-@@ -105,14 +113,6 @@ struct xenevtchn_handle {
-     int fd;
- };
+     for (unsigned int i = 0; i < ARRAY_SIZE(xsd_errors); i++) {
+-        struct xsd_errors *xsd_error = &xsd_errors[i];
++        const struct xsd_errors *xsd_error = &xsd_errors[i];
  
--/*
-- * For unbound/interdomain ports there are only two possible remote
-- * domains; self and QEMU. Use a single high bit in type_val for that,
-- * and the low bits for the remote port number (or 0 for unbound).
-- */
--#define PORT_INFO_TYPEVAL_REMOTE_QEMU           0x8000
--#define PORT_INFO_TYPEVAL_REMOTE_PORT_MASK      0x7FFF
--
+         if (xsd_error->errnum == errnum) {
+             errstr = xsd_error->errstring;
+diff --git a/include/hw/xen/interface/arch-arm.h b/include/hw/xen/interface/arch-arm.h
+index 94b31511dd..1528ced509 100644
+--- a/include/hw/xen/interface/arch-arm.h
++++ b/include/hw/xen/interface/arch-arm.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * arch-arm.h
+  *
+  * Guest OS interface to ARM Xen.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright 2011 (C) Citrix Systems
+  */
+ 
+@@ -361,6 +344,7 @@ typedef uint64_t xen_callback_t;
+ #define PSR_DBG_MASK    (1<<9)        /* arm64: Debug Exception mask */
+ #define PSR_IT_MASK     (0x0600fc00)  /* Thumb If-Then Mask */
+ #define PSR_JAZELLE     (1<<24)       /* Jazelle Mode */
++#define PSR_Z           (1<<30)       /* Zero condition flag */
+ 
+ /* 32 bit modes */
+ #define PSR_MODE_USR 0x10
+@@ -383,7 +367,15 @@ typedef uint64_t xen_callback_t;
+ #define PSR_MODE_EL1t 0x04
+ #define PSR_MODE_EL0t 0x00
+ 
+-#define PSR_GUEST32_INIT  (PSR_ABT_MASK|PSR_FIQ_MASK|PSR_IRQ_MASK|PSR_MODE_SVC)
++/*
++ * We set PSR_Z to be able to boot Linux kernel versions with an invalid
++ * encoding of the first 8 NOP instructions. See commit a92882a4d270 in
++ * Linux.
++ *
++ * Note that PSR_Z is also set by U-Boot and QEMU -kernel when loading
++ * zImage kernels on aarch32.
++ */
++#define PSR_GUEST32_INIT (PSR_Z|PSR_ABT_MASK|PSR_FIQ_MASK|PSR_IRQ_MASK|PSR_MODE_SVC)
+ #define PSR_GUEST64_INIT (PSR_ABT_MASK|PSR_FIQ_MASK|PSR_IRQ_MASK|PSR_MODE_EL1h)
+ 
+ #define SCTLR_GUEST_INIT    xen_mk_ullong(0x00c50078)
+@@ -398,6 +390,10 @@ typedef uint64_t xen_callback_t;
+ 
+ /* Physical Address Space */
+ 
++/* Virtio MMIO mappings */
++#define GUEST_VIRTIO_MMIO_BASE   xen_mk_ullong(0x02000000)
++#define GUEST_VIRTIO_MMIO_SIZE   xen_mk_ullong(0x00100000)
++
  /*
-  * These 'emuirq' values are used by Xen in the LM stream... and yes, I am
-  * insane enough to think about guest-transparent live migration from actual
-@@ -210,16 +210,16 @@ static int xen_evtchn_post_load(void *opaque, int version_id)
-         XenEvtchnPort *p = &s->port_table[i];
+  * vGIC mappings: Only one set of mapping is used by the guest.
+  * Therefore they can overlap.
+@@ -484,6 +480,9 @@ typedef uint64_t xen_callback_t;
  
-         if (p->type == EVTCHNSTAT_pirq) {
--            assert(p->type_val);
--            assert(p->type_val < s->nr_pirqs);
-+            assert(p->u.pirq);
-+            assert(p->u.pirq < s->nr_pirqs);
+ #define GUEST_VPL011_SPI        32
  
-             /*
-              * Set the gsi to IRQ_UNBOUND; it may be changed to an actual
-              * GSI# below, or to IRQ_MSI_EMU when the MSI table snooping
-              * catches up with it.
-              */
--            s->pirq[p->type_val].gsi = IRQ_UNBOUND;
--            s->pirq[p->type_val].port = i;
-+            s->pirq[p->u.pirq].gsi = IRQ_UNBOUND;
-+            s->pirq[p->u.pirq].port = i;
-         }
-     }
-     /* Rebuild s->pirq[].gsi mapping */
-@@ -243,7 +243,7 @@ static const VMStateDescription xen_evtchn_port_vmstate = {
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32(vcpu, XenEvtchnPort),
-         VMSTATE_UINT16(type, XenEvtchnPort),
--        VMSTATE_UINT16(type_val, XenEvtchnPort),
-+        VMSTATE_UINT16(u.val, XenEvtchnPort),
-         VMSTATE_END_OF_LIST()
-     }
++#define GUEST_VIRTIO_MMIO_SPI_FIRST   33
++#define GUEST_VIRTIO_MMIO_SPI_LAST    43
++
+ /* PSCI functions */
+ #define PSCI_cpu_suspend 0
+ #define PSCI_cpu_off     1
+diff --git a/include/hw/xen/interface/arch-x86/cpuid.h b/include/hw/xen/interface/arch-x86/cpuid.h
+index ce46305bee..7ecd16ae05 100644
+--- a/include/hw/xen/interface/arch-x86/cpuid.h
++++ b/include/hw/xen/interface/arch-x86/cpuid.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * arch-x86/cpuid.h
+  *
+  * CPUID interface to Xen.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2007 Citrix Systems, Inc.
+  *
+  * Authors:
+@@ -102,6 +85,18 @@
+ #define XEN_HVM_CPUID_IOMMU_MAPPINGS   (1u << 2)
+ #define XEN_HVM_CPUID_VCPU_ID_PRESENT  (1u << 3) /* vcpu id is present in EBX */
+ #define XEN_HVM_CPUID_DOMID_PRESENT    (1u << 4) /* domid is present in ECX */
++/*
++ * With interrupt format set to 0 (non-remappable) bits 55:49 from the
++ * IO-APIC RTE and bits 11:5 from the MSI address can be used to store
++ * high bits for the Destination ID. This expands the Destination ID
++ * field from 8 to 15 bits, allowing to target APIC IDs up 32768.
++ */
++#define XEN_HVM_CPUID_EXT_DEST_ID      (1u << 5)
++/*
++ * Per-vCPU event channel upcalls work correctly with physical IRQs
++ * bound to event channels.
++ */
++#define XEN_HVM_CPUID_UPCALL_VECTOR    (1u << 6)
+ 
+ /*
+  * Leaf 6 (0x40000x05)
+diff --git a/include/hw/xen/interface/arch-x86/xen-x86_32.h b/include/hw/xen/interface/arch-x86/xen-x86_32.h
+index 19d7388633..139438e835 100644
+--- a/include/hw/xen/interface/arch-x86/xen-x86_32.h
++++ b/include/hw/xen/interface/arch-x86/xen-x86_32.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * xen-x86_32.h
+  *
+  * Guest OS interface to x86 32-bit Xen.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2004-2007, K A Fraser
+  */
+ 
+diff --git a/include/hw/xen/interface/arch-x86/xen-x86_64.h b/include/hw/xen/interface/arch-x86/xen-x86_64.h
+index 40aed14366..5d9035ed22 100644
+--- a/include/hw/xen/interface/arch-x86/xen-x86_64.h
++++ b/include/hw/xen/interface/arch-x86/xen-x86_64.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * xen-x86_64.h
+  *
+  * Guest OS interface to x86 64-bit Xen.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2004-2006, K A Fraser
+  */
+ 
+diff --git a/include/hw/xen/interface/arch-x86/xen.h b/include/hw/xen/interface/arch-x86/xen.h
+index 7acd94c8eb..c0f4551247 100644
+--- a/include/hw/xen/interface/arch-x86/xen.h
++++ b/include/hw/xen/interface/arch-x86/xen.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * arch-x86/xen.h
+  *
+  * Guest OS interface to x86 Xen.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2004-2006, K A Fraser
+  */
+ 
+@@ -320,12 +303,9 @@ struct xen_arch_domainconfig {
+     uint32_t misc_flags;
  };
-@@ -605,14 +605,13 @@ static void unbind_backend_ports(XenEvtchnState *s)
  
-     for (i = 1; i < s->nr_ports; i++) {
-         p = &s->port_table[i];
--        if (p->type == EVTCHNSTAT_interdomain &&
--            (p->type_val & PORT_INFO_TYPEVAL_REMOTE_QEMU)) {
--            evtchn_port_t be_port = p->type_val & PORT_INFO_TYPEVAL_REMOTE_PORT_MASK;
-+        if (p->type == EVTCHNSTAT_interdomain && p->u.interdomain.to_qemu) {
-+            evtchn_port_t be_port = p->u.interdomain.port;
+-/* Location of online VCPU bitmap. */
+-#define XEN_ACPI_CPU_MAP             0xaf00
+-#define XEN_ACPI_CPU_MAP_LEN         ((HVM_MAX_VCPUS + 7) / 8)
++/* Max  XEN_X86_* constant. Used for ABI checking. */
++#define XEN_X86_MISC_FLAGS_MAX XEN_X86_MSR_RELAXED
  
-             if (s->be_handles[be_port]) {
-                 /* This part will be overwritten on the load anyway. */
-                 p->type = EVTCHNSTAT_unbound;
--                p->type_val = PORT_INFO_TYPEVAL_REMOTE_QEMU;
-+                p->u.interdomain.port = 0;
+-/* GPE0 bit set during CPU hotplug */
+-#define XEN_ACPI_GPE0_CPUHP_BIT      2
+ #endif
  
-                 /* Leave the backend port open and unbound too. */
-                 if (kvm_xen_has_cap(EVTCHN_SEND)) {
-@@ -650,30 +649,22 @@ int xen_evtchn_status_op(struct evtchn_status *status)
+ /*
+diff --git a/include/hw/xen/interface/event_channel.h b/include/hw/xen/interface/event_channel.h
+index 73c9f38ce1..0d91a1c4af 100644
+--- a/include/hw/xen/interface/event_channel.h
++++ b/include/hw/xen/interface/event_channel.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * event_channel.h
+  *
+  * Event channels between domains.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2003-2004, K A Fraser.
+  */
  
-     switch (p->type) {
-     case EVTCHNSTAT_unbound:
--        if (p->type_val & PORT_INFO_TYPEVAL_REMOTE_QEMU) {
--            status->u.unbound.dom = DOMID_QEMU;
--        } else {
--            status->u.unbound.dom = xen_domid;
--        }
-+        status->u.unbound.dom = p->u.interdomain.to_qemu ? DOMID_QEMU
-+                                                         : xen_domid;
-         break;
+diff --git a/include/hw/xen/interface/features.h b/include/hw/xen/interface/features.h
+index 9ee2f760ef..d2a9175aae 100644
+--- a/include/hw/xen/interface/features.h
++++ b/include/hw/xen/interface/features.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * features.h
+  *
+  * Feature flags, reported by XENVER_get_features.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2006, Keir Fraser <keir@xensource.com>
+  */
  
-     case EVTCHNSTAT_interdomain:
--        if (p->type_val & PORT_INFO_TYPEVAL_REMOTE_QEMU) {
--            status->u.interdomain.dom = DOMID_QEMU;
--        } else {
--            status->u.interdomain.dom = xen_domid;
--        }
--
--        status->u.interdomain.port = p->type_val &
--            PORT_INFO_TYPEVAL_REMOTE_PORT_MASK;
-+        status->u.interdomain.dom = p->u.interdomain.to_qemu ? DOMID_QEMU
-+                                                             : xen_domid;
-+        status->u.interdomain.port = p->u.interdomain.port;
-         break;
+diff --git a/include/hw/xen/interface/grant_table.h b/include/hw/xen/interface/grant_table.h
+index 7934d7b718..1dfa17a6d0 100644
+--- a/include/hw/xen/interface/grant_table.h
++++ b/include/hw/xen/interface/grant_table.h
+@@ -1,27 +1,10 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * grant_table.h
+  *
+  * Interface for granting foreign access to page frames, and receiving
+  * page-ownership transfers.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2004, K A Fraser
+  */
  
-     case EVTCHNSTAT_pirq:
--        status->u.pirq = p->type_val;
-+        status->u.pirq = p->u.pirq;
-         break;
+diff --git a/include/hw/xen/interface/hvm/hvm_op.h b/include/hw/xen/interface/hvm/hvm_op.h
+index 870ec52060..e22adf0319 100644
+--- a/include/hw/xen/interface/hvm/hvm_op.h
++++ b/include/hw/xen/interface/hvm/hvm_op.h
+@@ -1,22 +1,5 @@
++/* SPDX-License-Identifier: MIT */
+ /*
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2007, Keir Fraser
+  */
  
-     case EVTCHNSTAT_virq:
--        status->u.virq = p->type_val;
-+        status->u.virq = p->u.virq;
-         break;
-     }
+diff --git a/include/hw/xen/interface/hvm/params.h b/include/hw/xen/interface/hvm/params.h
+index c9d6e70d7b..a22b4ed45d 100644
+--- a/include/hw/xen/interface/hvm/params.h
++++ b/include/hw/xen/interface/hvm/params.h
+@@ -1,22 +1,5 @@
++/* SPDX-License-Identifier: MIT */
+ /*
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2007, Keir Fraser
+  */
  
-@@ -989,7 +980,7 @@ static int clear_port_pending(XenEvtchnState *s, evtchn_port_t port)
- static void free_port(XenEvtchnState *s, evtchn_port_t port)
- {
-     s->port_table[port].type = EVTCHNSTAT_closed;
--    s->port_table[port].type_val = 0;
-+    s->port_table[port].u.val = 0;
-     s->port_table[port].vcpu = 0;
+diff --git a/include/hw/xen/interface/io/blkif.h b/include/hw/xen/interface/io/blkif.h
+index 4cdba79aba..22f1eef0c0 100644
+--- a/include/hw/xen/interface/io/blkif.h
++++ b/include/hw/xen/interface/io/blkif.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * blkif.h
+  *
+  * Unified block-device I/O interface for Xen guest OSes.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2003-2004, Keir Fraser
+  * Copyright (c) 2012, Spectra Logic Corporation
+  */
+@@ -363,6 +346,14 @@
+  *      that the frontend requires that the logical block size is 512 as it
+  *      is hardcoded (which is the case in some frontend implementations).
+  *
++ * trusted
++ *      Values:         0/1 (boolean)
++ *      Default value:  1
++ *
++ *      A value of "0" indicates that the frontend should not trust the
++ *      backend, and should deploy whatever measures available to protect from
++ *      a malicious backend on the other end.
++ *
+  *------------------------- Virtual Device Properties -------------------------
+  *
+  * device-type
+diff --git a/include/hw/xen/interface/io/console.h b/include/hw/xen/interface/io/console.h
+index 4811f47220..4509b4b689 100644
+--- a/include/hw/xen/interface/io/console.h
++++ b/include/hw/xen/interface/io/console.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * console.h
+  *
+  * Console I/O interface for Xen guest OSes.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2005, Keir Fraser
+  */
  
-     if (s->nr_ports == port + 1) {
-@@ -1012,7 +1003,7 @@ static int allocate_port(XenEvtchnState *s, uint32_t vcpu, uint16_t type,
-         if (s->port_table[p].type == EVTCHNSTAT_closed) {
-             s->port_table[p].vcpu = vcpu;
-             s->port_table[p].type = type;
--            s->port_table[p].type_val = val;
-+            s->port_table[p].u.val = val;
+diff --git a/include/hw/xen/interface/io/fbif.h b/include/hw/xen/interface/io/fbif.h
+index cc25aab32e..93c73195d8 100644
+--- a/include/hw/xen/interface/io/fbif.h
++++ b/include/hw/xen/interface/io/fbif.h
+@@ -1,24 +1,7 @@
++/* SPDX-License-Identifier: MIT */
+ /*
+  * fbif.h -- Xen virtual frame buffer device
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (C) 2005 Anthony Liguori <aliguori@us.ibm.com>
+  * Copyright (C) 2006 Red Hat, Inc., Markus Armbruster <armbru@redhat.com>
+  */
+diff --git a/include/hw/xen/interface/io/kbdif.h b/include/hw/xen/interface/io/kbdif.h
+index a6b01c52c7..4bde6b3821 100644
+--- a/include/hw/xen/interface/io/kbdif.h
++++ b/include/hw/xen/interface/io/kbdif.h
+@@ -1,24 +1,7 @@
++/* SPDX-License-Identifier: MIT */
+ /*
+  * kbdif.h -- Xen virtual keyboard/mouse
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (C) 2005 Anthony Liguori <aliguori@us.ibm.com>
+  * Copyright (C) 2006 Red Hat, Inc., Markus Armbruster <armbru@redhat.com>
+  */
+diff --git a/include/hw/xen/interface/io/netif.h b/include/hw/xen/interface/io/netif.h
+index 00dd258712..c13b85061d 100644
+--- a/include/hw/xen/interface/io/netif.h
++++ b/include/hw/xen/interface/io/netif.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * netif.h
+  *
+  * Unified network-device I/O interface for Xen guest OSes.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2003-2004, Keir Fraser
+  */
  
-             *port = p;
+@@ -160,6 +143,12 @@
+  * be applied if it is set.
+  */
  
-@@ -1053,15 +1044,15 @@ static int close_port(XenEvtchnState *s, evtchn_port_t port,
-         return -ENOENT;
- 
-     case EVTCHNSTAT_pirq:
--        s->pirq[p->type_val].port = 0;
--        if (s->pirq[p->type_val].is_translated) {
-+        s->pirq[p->u.pirq].port = 0;
-+        if (s->pirq[p->u.pirq].is_translated) {
-             *flush_kvm_routes = true;
-         }
-         break;
- 
-     case EVTCHNSTAT_virq:
--        kvm_xen_set_vcpu_virq(virq_is_global(p->type_val) ? 0 : p->vcpu,
--                              p->type_val, 0);
-+        kvm_xen_set_vcpu_virq(virq_is_global(p->u.virq) ? 0 : p->vcpu,
-+                              p->u.virq, 0);
-         break;
- 
-     case EVTCHNSTAT_ipi:
-@@ -1071,8 +1062,8 @@ static int close_port(XenEvtchnState *s, evtchn_port_t port,
-         break;
- 
-     case EVTCHNSTAT_interdomain:
--        if (p->type_val & PORT_INFO_TYPEVAL_REMOTE_QEMU) {
--            uint16_t be_port = p->type_val & ~PORT_INFO_TYPEVAL_REMOTE_QEMU;
-+        if (p->u.interdomain.to_qemu) {
-+            uint16_t be_port = p->u.interdomain.port;
-             struct xenevtchn_handle *xc = s->be_handles[be_port];
-             if (xc) {
-                 if (kvm_xen_has_cap(EVTCHN_SEND)) {
-@@ -1082,14 +1073,15 @@ static int close_port(XenEvtchnState *s, evtchn_port_t port,
-             }
-         } else {
-             /* Loopback interdomain */
--            XenEvtchnPort *rp = &s->port_table[p->type_val];
--            if (!valid_port(p->type_val) || rp->type_val != port ||
-+            XenEvtchnPort *rp = &s->port_table[p->u.interdomain.port];
-+            if (!valid_port(p->u.interdomain.port) ||
-+                rp->u.interdomain.port != port ||
-                 rp->type != EVTCHNSTAT_interdomain) {
-                 error_report("Inconsistent state for interdomain unbind");
-             } else {
-                 /* Set the other end back to unbound */
-                 rp->type = EVTCHNSTAT_unbound;
--                rp->type_val = 0;
-+                rp->u.interdomain.port = 0;
-             }
-         }
-         break;
-@@ -1214,7 +1206,7 @@ int xen_evtchn_bind_vcpu_op(struct evtchn_bind_vcpu *vcpu)
-     if (p->type == EVTCHNSTAT_interdomain ||
-         p->type == EVTCHNSTAT_unbound ||
-         p->type == EVTCHNSTAT_pirq ||
--        (p->type == EVTCHNSTAT_virq && virq_is_global(p->type_val))) {
-+        (p->type == EVTCHNSTAT_virq && virq_is_global(p->u.virq))) {
-         /*
-          * unmask_port() with do_unmask==false will just raise the event
-          * on the new vCPU if the port was already pending.
-@@ -1359,19 +1351,15 @@ int xen_evtchn_bind_ipi_op(struct evtchn_bind_ipi *ipi)
- int xen_evtchn_bind_interdomain_op(struct evtchn_bind_interdomain *interdomain)
- {
-     XenEvtchnState *s = xen_evtchn_singleton;
--    uint16_t type_val;
-     int ret;
- 
-     if (!s) {
-         return -ENOTSUP;
-     }
- 
--    if (interdomain->remote_dom == DOMID_QEMU) {
--        type_val = PORT_INFO_TYPEVAL_REMOTE_QEMU;
--    } else if (interdomain->remote_dom == DOMID_SELF ||
--               interdomain->remote_dom == xen_domid) {
--        type_val = 0;
--    } else {
-+    if (interdomain->remote_dom != DOMID_QEMU &&
-+        interdomain->remote_dom != DOMID_SELF &&
-+        interdomain->remote_dom != xen_domid) {
-         return -ESRCH;
-     }
- 
-@@ -1382,8 +1370,8 @@ int xen_evtchn_bind_interdomain_op(struct evtchn_bind_interdomain *interdomain)
-     qemu_mutex_lock(&s->port_lock);
- 
-     /* The newly allocated port starts out as unbound */
--    ret = allocate_port(s, 0, EVTCHNSTAT_unbound, type_val,
--                        &interdomain->local_port);
-+    ret = allocate_port(s, 0, EVTCHNSTAT_unbound, 0, &interdomain->local_port);
++/*
++ * The setting of "trusted" node to "0" in the frontend path signals that the
++ * frontend should not trust the backend, and should deploy whatever measures
++ * available to protect from a malicious backend on the other end.
++ */
 +
-     if (ret) {
-         goto out;
-     }
-@@ -1408,7 +1396,8 @@ int xen_evtchn_bind_interdomain_op(struct evtchn_bind_interdomain *interdomain)
-             assign_kernel_eventfd(lp->type, xc->guest_port, xc->fd);
-         }
-         lp->type = EVTCHNSTAT_interdomain;
--        lp->type_val = PORT_INFO_TYPEVAL_REMOTE_QEMU | interdomain->remote_port;
-+        lp->u.interdomain.to_qemu = 1;
-+        lp->u.interdomain.port = interdomain->remote_port;
-         ret = 0;
-     } else {
-         /* Loopback */
-@@ -1416,19 +1405,18 @@ int xen_evtchn_bind_interdomain_op(struct evtchn_bind_interdomain *interdomain)
-         XenEvtchnPort *lp = &s->port_table[interdomain->local_port];
+ /*
+  * Control ring
+  * ============
+diff --git a/include/hw/xen/interface/io/protocols.h b/include/hw/xen/interface/io/protocols.h
+index 52b4de0f81..7815e1ff0f 100644
+--- a/include/hw/xen/interface/io/protocols.h
++++ b/include/hw/xen/interface/io/protocols.h
+@@ -1,24 +1,7 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * protocols.h
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2008, Keir Fraser
+  */
  
-         /*
--         * The 'remote' port for loopback must be an unbound port allocated for
--         * communication with the local domain (as indicated by rp->type_val
--         * being zero, not PORT_INFO_TYPEVAL_REMOTE_QEMU), and must *not* be
--         * the port that was just allocated for the local end.
-+         * The 'remote' port for loopback must be an unbound port allocated
-+         * for communication with the local domain, and must *not* be the
-+         * port that was just allocated for the local end.
-          */
-         if (interdomain->local_port != interdomain->remote_port &&
--            rp->type == EVTCHNSTAT_unbound && rp->type_val == 0) {
-+            rp->type == EVTCHNSTAT_unbound && !rp->u.interdomain.to_qemu) {
+diff --git a/include/hw/xen/interface/io/ring.h b/include/hw/xen/interface/io/ring.h
+index c486c457e0..025939278b 100644
+--- a/include/hw/xen/interface/io/ring.h
++++ b/include/hw/xen/interface/io/ring.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * ring.h
+  *
+  * Shared producer-consumer ring macros.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Tim Deegan and Andrew Warfield November 2004.
+  */
  
-             rp->type = EVTCHNSTAT_interdomain;
--            rp->type_val = interdomain->local_port;
-+            rp->u.interdomain.port = interdomain->local_port;
+@@ -95,9 +78,8 @@ typedef unsigned int RING_IDX;
+  * of the shared memory area (PAGE_SIZE, for instance). To initialise
+  * the front half:
+  *
+- *     mytag_front_ring_t front_ring;
+- *     SHARED_RING_INIT((mytag_sring_t *)shared_page);
+- *     FRONT_RING_INIT(&front_ring, (mytag_sring_t *)shared_page, PAGE_SIZE);
++ *     mytag_front_ring_t ring;
++ *     XEN_FRONT_RING_INIT(&ring, (mytag_sring_t *)shared_page, PAGE_SIZE);
+  *
+  * Initializing the back follows similarly (note that only the front
+  * initializes the shared ring):
+@@ -184,6 +166,11 @@ typedef struct __name##_back_ring __name##_back_ring_t
  
-             lp->type = EVTCHNSTAT_interdomain;
--            lp->type_val = interdomain->remote_port;
-+            lp->u.interdomain.port = interdomain->remote_port;
-         } else {
-             ret = -EINVAL;
-         }
-@@ -1447,7 +1435,6 @@ int xen_evtchn_bind_interdomain_op(struct evtchn_bind_interdomain *interdomain)
- int xen_evtchn_alloc_unbound_op(struct evtchn_alloc_unbound *alloc)
- {
-     XenEvtchnState *s = xen_evtchn_singleton;
--    uint16_t type_val;
-     int ret;
+ #define FRONT_RING_INIT(_r, _s, __size) FRONT_RING_ATTACH(_r, _s, 0, __size)
  
-     if (!s) {
-@@ -1458,18 +1445,20 @@ int xen_evtchn_alloc_unbound_op(struct evtchn_alloc_unbound *alloc)
-         return -ESRCH;
-     }
- 
--    if (alloc->remote_dom == DOMID_QEMU) {
--        type_val = PORT_INFO_TYPEVAL_REMOTE_QEMU;
--    } else if (alloc->remote_dom == DOMID_SELF ||
--               alloc->remote_dom == xen_domid) {
--        type_val = 0;
--    } else {
-+    if (alloc->remote_dom != DOMID_QEMU &&
-+        alloc->remote_dom != DOMID_SELF &&
-+        alloc->remote_dom != xen_domid) {
-         return -EPERM;
-     }
- 
-     qemu_mutex_lock(&s->port_lock);
- 
--    ret = allocate_port(s, 0, EVTCHNSTAT_unbound, type_val, &alloc->port);
-+    ret = allocate_port(s, 0, EVTCHNSTAT_unbound, 0, &alloc->port);
++#define XEN_FRONT_RING_INIT(r, s, size) do {                            \
++    SHARED_RING_INIT(s);                                                \
++    FRONT_RING_INIT(r, s, size);                                        \
++} while (0)
 +
-+    if (!ret && alloc->remote_dom == DOMID_QEMU) {
-+        XenEvtchnPort *p = &s->port_table[alloc->port];
-+        p->u.interdomain.to_qemu = 1;
-+    }
+ #define BACK_RING_ATTACH(_r, _s, _i, __size) do {                       \
+     (_r)->rsp_prod_pvt = (_i);                                          \
+     (_r)->req_cons = (_i);                                              \
+@@ -208,11 +195,11 @@ typedef struct __name##_back_ring __name##_back_ring_t
+     (RING_FREE_REQUESTS(_r) == 0)
  
-     qemu_mutex_unlock(&s->port_lock);
+ /* Test if there are outstanding messages to be processed on a ring. */
+-#define RING_HAS_UNCONSUMED_RESPONSES(_r)                               \
++#define XEN_RING_NR_UNCONSUMED_RESPONSES(_r)                            \
+     ((_r)->sring->rsp_prod - (_r)->rsp_cons)
  
-@@ -1496,12 +1485,12 @@ int xen_evtchn_send_op(struct evtchn_send *send)
+ #ifdef __GNUC__
+-#define RING_HAS_UNCONSUMED_REQUESTS(_r) ({                             \
++#define XEN_RING_NR_UNCONSUMED_REQUESTS(_r) ({                          \
+     unsigned int req = (_r)->sring->req_prod - (_r)->req_cons;          \
+     unsigned int rsp = RING_SIZE(_r) -                                  \
+         ((_r)->req_cons - (_r)->rsp_prod_pvt);                          \
+@@ -220,13 +207,27 @@ typedef struct __name##_back_ring __name##_back_ring_t
+ })
+ #else
+ /* Same as above, but without the nice GCC ({ ... }) syntax. */
+-#define RING_HAS_UNCONSUMED_REQUESTS(_r)                                \
++#define XEN_RING_NR_UNCONSUMED_REQUESTS(_r)                             \
+     ((((_r)->sring->req_prod - (_r)->req_cons) <                        \
+       (RING_SIZE(_r) - ((_r)->req_cons - (_r)->rsp_prod_pvt))) ?        \
+      ((_r)->sring->req_prod - (_r)->req_cons) :                         \
+      (RING_SIZE(_r) - ((_r)->req_cons - (_r)->rsp_prod_pvt)))
+ #endif
  
-     switch (p->type) {
-     case EVTCHNSTAT_interdomain:
--        if (p->type_val & PORT_INFO_TYPEVAL_REMOTE_QEMU) {
-+        if (p->u.interdomain.to_qemu) {
-             /*
-              * This is an event from the guest to qemu itself, which is
-              * serving as the driver domain.
-              */
--            uint16_t be_port = p->type_val & ~PORT_INFO_TYPEVAL_REMOTE_QEMU;
-+            uint16_t be_port = p->u.interdomain.port;
-             struct xenevtchn_handle *xc = s->be_handles[be_port];
-             if (xc) {
-                 eventfd_write(xc->fd, 1);
-@@ -1511,7 +1500,7 @@ int xen_evtchn_send_op(struct evtchn_send *send)
-             }
-         } else {
-             /* Loopback interdomain ports; just a complex IPI */
--            set_port_pending(s, p->type_val);
-+            set_port_pending(s, p->u.interdomain.port);
-         }
-         break;
++#ifdef XEN_RING_HAS_UNCONSUMED_IS_BOOL
++/*
++ * These variants should only be used in case no caller is abusing them for
++ * obtaining the number of unconsumed responses/requests.
++ */
++#define RING_HAS_UNCONSUMED_RESPONSES(_r) \
++    (!!XEN_RING_NR_UNCONSUMED_RESPONSES(_r))
++#define RING_HAS_UNCONSUMED_REQUESTS(_r)  \
++    (!!XEN_RING_NR_UNCONSUMED_REQUESTS(_r))
++#else
++#define RING_HAS_UNCONSUMED_RESPONSES(_r) XEN_RING_NR_UNCONSUMED_RESPONSES(_r)
++#define RING_HAS_UNCONSUMED_REQUESTS(_r)  XEN_RING_NR_UNCONSUMED_REQUESTS(_r)
++#endif
++
+ /* Direct access to individual ring elements, by index. */
+ #define RING_GET_REQUEST(_r, _idx)                                      \
+     (&((_r)->sring->ring[((_idx) & (RING_SIZE(_r) - 1))].req))
+diff --git a/include/hw/xen/interface/io/usbif.h b/include/hw/xen/interface/io/usbif.h
+index c0a552e195..875af0dc7c 100644
+--- a/include/hw/xen/interface/io/usbif.h
++++ b/include/hw/xen/interface/io/usbif.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: MIT */
+ /*
+  * usbif.h
+  *
+@@ -5,24 +6,6 @@
+  *
+  * Copyright (C) 2009, FUJITSU LABORATORIES LTD.
+  * Author: Noboru Iwamatsu <n_iwamatsu@jp.fujitsu.com>
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+  */
  
-@@ -1553,8 +1542,7 @@ int xen_evtchn_set_port(uint16_t port)
+ #ifndef __XEN_PUBLIC_IO_USBIF_H__
+diff --git a/include/hw/xen/interface/io/xenbus.h b/include/hw/xen/interface/io/xenbus.h
+index 927f9db552..9cd0cd7c67 100644
+--- a/include/hw/xen/interface/io/xenbus.h
++++ b/include/hw/xen/interface/io/xenbus.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /*****************************************************************************
+  * xenbus.h
+  *
+  * Xenbus protocol details.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (C) 2005 XenSource Ltd.
+  */
  
-     /* QEMU has no business sending to anything but these */
-     if (p->type == EVTCHNSTAT_virq ||
--        (p->type == EVTCHNSTAT_interdomain &&
--         (p->type_val & PORT_INFO_TYPEVAL_REMOTE_QEMU))) {
-+        (p->type == EVTCHNSTAT_interdomain && p->u.interdomain.to_qemu)) {
-         set_port_pending(s, port);
-         ret = 0;
-     }
-@@ -2064,7 +2052,7 @@ int xen_be_evtchn_bind_interdomain(struct xenevtchn_handle *xc, uint32_t domid,
-     switch (gp->type) {
-     case EVTCHNSTAT_interdomain:
-         /* Allow rebinding after migration, preserve port # if possible */
--        be_port = gp->type_val & ~PORT_INFO_TYPEVAL_REMOTE_QEMU;
-+        be_port = gp->u.interdomain.port;
-         assert(be_port != 0);
-         if (!s->be_handles[be_port]) {
-             s->be_handles[be_port] = xc;
-@@ -2085,7 +2073,8 @@ int xen_be_evtchn_bind_interdomain(struct xenevtchn_handle *xc, uint32_t domid,
-         }
+diff --git a/include/hw/xen/interface/io/xs_wire.h b/include/hw/xen/interface/io/xs_wire.h
+index 4dd6632669..04e6849feb 100644
+--- a/include/hw/xen/interface/io/xs_wire.h
++++ b/include/hw/xen/interface/io/xs_wire.h
+@@ -1,25 +1,8 @@
++/* SPDX-License-Identifier: MIT */
+ /*
+  * Details of the "wire" protocol between Xen Store Daemon and client
+  * library or guest kernel.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (C) 2005 Rusty Russell IBM Corporation
+  */
  
-         gp->type = EVTCHNSTAT_interdomain;
--        gp->type_val = be_port | PORT_INFO_TYPEVAL_REMOTE_QEMU;
-+        gp->u.interdomain.to_qemu = 1;
-+        gp->u.interdomain.port = be_port;
-         xc->guest_port = guest_port;
-         if (kvm_xen_has_cap(EVTCHN_SEND)) {
-             assign_kernel_eventfd(gp->type, guest_port, xc->fd);
-@@ -2130,7 +2119,7 @@ int xen_be_evtchn_unbind(struct xenevtchn_handle *xc, evtchn_port_t port)
-         /* This should never *not* be true */
-         if (gp->type == EVTCHNSTAT_interdomain) {
-             gp->type = EVTCHNSTAT_unbound;
--            gp->type_val = PORT_INFO_TYPEVAL_REMOTE_QEMU;
-+            gp->u.interdomain.port = 0;
-         }
+@@ -71,11 +54,12 @@ struct xsd_errors
+ #ifdef EINVAL
+ #define XSD_ERROR(x) { x, #x }
+ /* LINTED: static unused */
+-static struct xsd_errors xsd_errors[]
++static const struct xsd_errors xsd_errors[]
+ #if defined(__GNUC__)
+ __attribute__((unused))
+ #endif
+     = {
++    /* /!\ New errors should be added at the end of the array. */
+     XSD_ERROR(EINVAL),
+     XSD_ERROR(EACCES),
+     XSD_ERROR(EEXIST),
+@@ -90,7 +74,8 @@ __attribute__((unused))
+     XSD_ERROR(EBUSY),
+     XSD_ERROR(EAGAIN),
+     XSD_ERROR(EISCONN),
+-    XSD_ERROR(E2BIG)
++    XSD_ERROR(E2BIG),
++    XSD_ERROR(EPERM),
+ };
+ #endif
  
-         if (kvm_xen_has_cap(EVTCHN_SEND)) {
-@@ -2284,11 +2273,11 @@ EvtchnInfoList *qmp_xen_event_list(Error **errp)
+@@ -124,6 +109,7 @@ struct xenstore_domain_interface {
+     XENSTORE_RING_IDX rsp_cons, rsp_prod;
+     uint32_t server_features; /* Bitmap of features supported by the server */
+     uint32_t connection;
++    uint32_t error;
+ };
  
-         info->type = p->type;
-         if (p->type == EVTCHNSTAT_interdomain) {
--            info->remote_domain = g_strdup((p->type_val & PORT_INFO_TYPEVAL_REMOTE_QEMU) ?
-+            info->remote_domain = g_strdup(p->u.interdomain.to_qemu ?
-                                            "qemu" : "loopback");
--            info->target = p->type_val & PORT_INFO_TYPEVAL_REMOTE_PORT_MASK;
-+            info->target = p->u.interdomain.port;
-         } else {
--            info->target = p->type_val;
-+            info->target = p->u.val; /* pirq# or virq# */
-         }
-         info->vcpu = p->vcpu;
-         info->pending = test_bit(i, pending);
+ /* Violating this is very bad.  See docs/misc/xenstore.txt. */
+@@ -135,10 +121,18 @@ struct xenstore_domain_interface {
+ 
+ /* The ability to reconnect a ring */
+ #define XENSTORE_SERVER_FEATURE_RECONNECTION 1
++/* The presence of the "error" field in the ring page */
++#define XENSTORE_SERVER_FEATURE_ERROR        2
+ 
+ /* Valid values for the connection field */
+ #define XENSTORE_CONNECTED 0 /* the steady-state */
+-#define XENSTORE_RECONNECT 1 /* guest has initiated a reconnect */
++#define XENSTORE_RECONNECT 1 /* reconnect in progress */
++
++/* Valid values for the error field */
++#define XENSTORE_ERROR_NONE    0 /* No error */
++#define XENSTORE_ERROR_COMM    1 /* Communication problem */
++#define XENSTORE_ERROR_RINGIDX 2 /* Invalid ring index */
++#define XENSTORE_ERROR_PROTO   3 /* Protocol violation (payload too long) */
+ 
+ #endif /* _XS_WIRE_H */
+ 
+diff --git a/include/hw/xen/interface/memory.h b/include/hw/xen/interface/memory.h
+index 383a9468c3..29cf5c8239 100644
+--- a/include/hw/xen/interface/memory.h
++++ b/include/hw/xen/interface/memory.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * memory.h
+  *
+  * Memory reservation and information.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2005, Keir Fraser <keir@xensource.com>
+  */
+ 
+@@ -541,12 +524,14 @@ struct xen_mem_sharing_op {
+                 uint32_t gref;     /* IN: gref to debug         */
+             } u;
+         } debug;
+-        struct mem_sharing_op_fork {      /* OP_FORK */
++        struct mem_sharing_op_fork {      /* OP_FORK{,_RESET} */
+             domid_t parent_domain;        /* IN: parent's domain id */
+ /* Only makes sense for short-lived forks */
+ #define XENMEM_FORK_WITH_IOMMU_ALLOWED (1u << 0)
+ /* Only makes sense for short-lived forks */
+ #define XENMEM_FORK_BLOCK_INTERRUPTS   (1u << 1)
++#define XENMEM_FORK_RESET_STATE        (1u << 2)
++#define XENMEM_FORK_RESET_MEMORY       (1u << 3)
+             uint16_t flags;               /* IN: optional settings */
+             uint32_t pad;                 /* Must be set to 0 */
+         } fork;
+@@ -662,6 +647,13 @@ struct xen_mem_acquire_resource {
+      * two calls.
+      */
+     uint32_t nr_frames;
++    /*
++     * Padding field, must be zero on input.
++     * In a previous version this was an output field with the lowest bit
++     * named XENMEM_rsrc_acq_caller_owned. Future versions of this interface
++     * will not reuse this bit as an output with the field being zero on
++     * input.
++     */
+     uint32_t pad;
+     /*
+      * IN - the index of the initial frame to be mapped. This parameter
+diff --git a/include/hw/xen/interface/physdev.h b/include/hw/xen/interface/physdev.h
+index d271766ad0..f0c0d4727c 100644
+--- a/include/hw/xen/interface/physdev.h
++++ b/include/hw/xen/interface/physdev.h
+@@ -1,22 +1,5 @@
++/* SPDX-License-Identifier: MIT */
+ /*
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2006, Keir Fraser
+  */
+ 
+@@ -211,8 +194,8 @@ struct physdev_manage_pci_ext {
+     /* IN */
+     uint8_t bus;
+     uint8_t devfn;
+-    unsigned is_extfn;
+-    unsigned is_virtfn;
++    uint32_t is_extfn;
++    uint32_t is_virtfn;
+     struct {
+         uint8_t bus;
+         uint8_t devfn;
+diff --git a/include/hw/xen/interface/sched.h b/include/hw/xen/interface/sched.h
+index 811bd87c82..b4362c6a1d 100644
+--- a/include/hw/xen/interface/sched.h
++++ b/include/hw/xen/interface/sched.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * sched.h
+  *
+  * Scheduler state interactions
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2005, Keir Fraser <keir@xensource.com>
+  */
+ 
+diff --git a/include/hw/xen/interface/trace.h b/include/hw/xen/interface/trace.h
+index d5fa4aea8d..62a179971d 100644
+--- a/include/hw/xen/interface/trace.h
++++ b/include/hw/xen/interface/trace.h
+@@ -1,24 +1,7 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * include/public/trace.h
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Mark Williamson, (C) 2004 Intel Research Cambridge
+  * Copyright (C) 2005 Bin Ren
+  */
+diff --git a/include/hw/xen/interface/vcpu.h b/include/hw/xen/interface/vcpu.h
+index 3623af932f..81a3b3a743 100644
+--- a/include/hw/xen/interface/vcpu.h
++++ b/include/hw/xen/interface/vcpu.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * vcpu.h
+  *
+  * VCPU initialisation, query, and hotplug.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2005, Keir Fraser <keir@xensource.com>
+  */
+ 
+diff --git a/include/hw/xen/interface/version.h b/include/hw/xen/interface/version.h
+index 17a81e23cd..9c78b4f3b6 100644
+--- a/include/hw/xen/interface/version.h
++++ b/include/hw/xen/interface/version.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * version.h
+  *
+  * Xen version, type, and compile information.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2005, Nguyen Anh Quynh <aquynh@gmail.com>
+  * Copyright (c) 2005, Keir Fraser <keir@xensource.com>
+  */
+diff --git a/include/hw/xen/interface/xen-compat.h b/include/hw/xen/interface/xen-compat.h
+index e1c027a95c..97fe698498 100644
+--- a/include/hw/xen/interface/xen-compat.h
++++ b/include/hw/xen/interface/xen-compat.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * xen-compat.h
+  *
+  * Guest OS interface to Xen.  Compatibility layer.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2006, Christian Limpach
+  */
+ 
+diff --git a/include/hw/xen/interface/xen.h b/include/hw/xen/interface/xen.h
+index e373592c33..920567e006 100644
+--- a/include/hw/xen/interface/xen.h
++++ b/include/hw/xen/interface/xen.h
+@@ -1,26 +1,9 @@
++/* SPDX-License-Identifier: MIT */
+ /******************************************************************************
+  * xen.h
+  *
+  * Guest OS interface to Xen.
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to
+- * deal in the Software without restriction, including without limitation the
+- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+- * sell copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+- * DEALINGS IN THE SOFTWARE.
+- *
+  * Copyright (c) 2004, K A Fraser
+  */
+ 
 -- 
 2.34.1
 
