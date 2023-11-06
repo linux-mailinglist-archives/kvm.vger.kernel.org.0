@@ -1,137 +1,385 @@
-Return-Path: <kvm+bounces-730-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-729-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE19A7E1FAB
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:10:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AC7A7E1FA9
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:10:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86EF2281621
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:10:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F8E3280E3C
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B5101EB2F;
-	Mon,  6 Nov 2023 11:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B601C692;
+	Mon,  6 Nov 2023 11:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n8l9ZI/O"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SJtS3dqU"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810621A708
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:10:29 +0000 (UTC)
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95BFA10DD
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 03:10:26 -0800 (PST)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-509109104e2so5579183e87.3
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 03:10:26 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7295C1A705
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:10:28 +0000 (UTC)
+Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A29D10CF
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 03:10:24 -0800 (PST)
+Received: by mail-qv1-xf2d.google.com with SMTP id 6a1803df08f44-66cfd35f595so24069646d6.2
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 03:10:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699269025; x=1699873825; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1699269023; x=1699873823; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xBR3Oh8zClbS1YQ62m6eKxWZ4Ons8qsU0E4Liv4Rvg0=;
-        b=n8l9ZI/O3VCPjKKwhlguMHar3XNfCp7tyCNywAL0BlErgA6BQ44f+TrfMzJpGvrmay
-         GhSMjsLWYt2kRYr/gx9yPXI3XsANxJlpn0mynrB4nd3xTRMEb51jYZxLN4elHi8YPYAl
-         dMsMC7qS+HFUkbyxjpIKMcLbNX61pndH1OcawcZBzxOXwPHzveEsjknwlp6jllT/2a3Q
-         MbsMnN+X4P8y5XyUc67pcDhpMzzyIhk8FMr9eMvwuygcngZM53aKryBF5+1xRxQcphag
-         CQSL8lrrKspVptWaDoU3Qe6kV8LlOzYVtLUwyYTslxu9pHz+uzOY6TQq0X0eGx/4Ylt9
-         8BEg==
+        bh=qnJqfkSSRV3TBP0JexdvtsqLHYDxALR7H+cYP6TRCJE=;
+        b=SJtS3dqUGrKW28uxSwfWyiN0BGL2D7TgvMufK+WSZ9HkYWxoBPNKag1WoIpZ2KtIAq
+         W79SAPZQirGVO7OBeSqppVDUTxG+xM/lQZ9xm+HKBFVDbasWLoBLQ7V0jAaGHm7/dEEd
+         O+qOVeidLuM93YEJ7+c10RnZ/TI0X4DP8y39eEHqdCBJWbS3kAXskWEdxWEak4iAA4mv
+         P77vJHf6as5d6EDfWSFK2uAC/d5TmKftjgt7VMZABpJCg0BMBWfCQ+YL1FwynvdwH99x
+         JhY0PoPirXyevOmuNgGS8empZ2/IwKkwOBeCFm26KmsNflqmuKaMb46eo9D9RQwQP9NC
+         fecQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699269025; x=1699873825;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1699269023; x=1699873823;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xBR3Oh8zClbS1YQ62m6eKxWZ4Ons8qsU0E4Liv4Rvg0=;
-        b=jYGeXkpH5XMq2l5B/lUKKMo8VZipXo6Aw2dtM/4AWXQbLv8ZUGQf3SNceNFH/UvAZG
-         xZrQ77s80Uf8FdnIVHWeAu3fYiLA2HOJeHdqZ4RXdIGBUHC9wjBJlkrnUP/zCUPbW+mF
-         3qLlkRC5ADNiZW4u++z7zysvW1RN6c5jRohdIPr58TTmFV6sOrz9JcyrxNX70S+MpcJB
-         EvSMqvU1cgYw29YFCGSQxovl2hrUFSr7OgVOu0wY27rxd3aw5T726S/KIHQAuF5nShiv
-         yar2OLNz/hwsJ+0JnVeePBKMwYsEY4qFpUpX9ionUXIcVH6WmmUeWiWRJhyCbE2s045W
-         ZCrQ==
-X-Gm-Message-State: AOJu0Yx7ft7/V9rHilitNEfFzmtkPt+IkBVqGO2BBVHxFumx0b0tvCkt
-	PjjCXBeadn1/orzCI3V5p1NBtw==
-X-Google-Smtp-Source: AGHT+IFMIKgYKaG2x26tSZ+5foWBGqKNS7CQHWd9OLbklpXVybTTE5AVAduGsFeWircKlsRiiuVWlA==
-X-Received: by 2002:a05:6512:318f:b0:509:45ed:1083 with SMTP id i15-20020a056512318f00b0050945ed1083mr12662290lfe.40.1699269024745;
-        Mon, 06 Nov 2023 03:10:24 -0800 (PST)
-Received: from m1x-phil.lan (176-131-220-199.abo.bbox.fr. [176.131.220.199])
-        by smtp.gmail.com with ESMTPSA id bh7-20020a05600c3d0700b00401b242e2e6sm11965729wmb.47.2023.11.06.03.10.23
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 06 Nov 2023 03:10:24 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To: qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org,
-	qemu-s390x@nongnu.org,
-	qemu-block@nongnu.org,
-	qemu-riscv@nongnu.org,
-	qemu-ppc@nongnu.org,
-	qemu-arm@nongnu.org,
-	Adrian Wowk <dev@adrianwowk.com>,
-	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Gerd Hoffmann <kraxel@redhat.com>
-Subject: [PULL 60/60] ui/sdl2: use correct key names in win title on mac
-Date: Mon,  6 Nov 2023 12:03:32 +0100
-Message-ID: <20231106110336.358-61-philmd@linaro.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231106110336.358-1-philmd@linaro.org>
-References: <20231106110336.358-1-philmd@linaro.org>
+        bh=qnJqfkSSRV3TBP0JexdvtsqLHYDxALR7H+cYP6TRCJE=;
+        b=uMrmW9kPXNupi7a/ciqvGijc+bTWpyIjRcM+2jldbE6jJbBsIzcJXhliNps5DmeVXA
+         21p73VP/vP6E4UQbubTAk8exQZ5LuO+EpxqGLP3+NI6ZxjbGO8MX/vVjUvMmcMSurByb
+         cwj2TS2LxoDFIzS+7+WdHswkjC/63Mh4S9UCqXkJ6y5r4eZBmmOYNTwn6Cbd+F4NrkXL
+         +rlGlGadOGOHYwKsMLbdM30XXxfmuuOnz2dkr1WV7d8qTsUEnsiJW0owrc4QaZb233RV
+         Z6cBbgdGMwOReqkfQD2irSj58OW//3wluYtXNgSdXdmtCEwwqcONiIboJJEAtNsRRKwL
+         /Dwg==
+X-Gm-Message-State: AOJu0Yy29hMd5u2wT5CPeiVE+dmfjs9Ra8CrgPYARjbCYPM2cbS+Z0Jf
+	476WogKWyfvDSdiLxFtxyRcM6uTv5+J3fBDVA2HxgA==
+X-Google-Smtp-Source: AGHT+IHU/+pefiFnPy+6hnE6koYxy9w/9xmRXHTMFvjZ+YNn5s7SNPQyF9p0CVa6tIfW5b4YJfx0jin9klIyZI5tK50=
+X-Received: by 2002:a05:6214:d62:b0:66d:2eab:85ec with SMTP id
+ 2-20020a0562140d6200b0066d2eab85ecmr28750220qvs.61.1699269022903; Mon, 06 Nov
+ 2023 03:10:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-25-pbonzini@redhat.com>
+In-Reply-To: <20231105163040.14904-25-pbonzini@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 6 Nov 2023 11:09:46 +0000
+Message-ID: <CA+EHjTwOFAEMchVjob=3chD-TJ=Wau3iPnLdtFXBtiRUG4Dtug@mail.gmail.com>
+Subject: Re: [PATCH 24/34] KVM: selftests: Add support for creating private memslots
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Sean Christopherson <seanjc@google.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Adrian Wowk <dev@adrianwowk.com>
+Hi,
 
-Previously, when using the SDL2 UI on MacOS, the title bar uses incorrect
-key names (such as Ctrl and Alt instead of the standard MacOS key symbols
-like ⌃ and ⌥). This commit changes sdl_update_caption in ui/sdl2.c to
-use the correct symbols when compiling for MacOS (CONFIG_DARWIN is
-defined).
+Regarding the subject (and the commit message), should we still be
+calling them "private" slots, or guestmem_slots?
 
-Unfortunately, standard Mac keyboards do not include a "Right-Ctrl" key,
-so in the case that the SDL grab mode is set to HOT_KEY_MOD_RCTRL, the
-default text is still used.
+On Sun, Nov 5, 2023 at 4:34=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>
+> From: Sean Christopherson <seanjc@google.com>
+>
+> Add support for creating "private" memslots via KVM_CREATE_GUEST_MEMFD an=
+d
+> KVM_SET_USER_MEMORY_REGION2.  Make vm_userspace_mem_region_add() a wrappe=
+r
+> to its effective replacement, vm_mem_add(), so that private memslots are
+> fully opt-in, i.e. don't require update all tests that add memory regions=
+.
 
-Signed-off-by: Adrian Wowk <dev@adrianwowk.com>
-Acked-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Message-ID: <20231030024119.28342-1-dev@adrianwowk.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
----
- ui/sdl2.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+nit: update->updating
 
-diff --git a/ui/sdl2.c b/ui/sdl2.c
-index fbfdb64e90..4971963f00 100644
---- a/ui/sdl2.c
-+++ b/ui/sdl2.c
-@@ -172,11 +172,19 @@ static void sdl_update_caption(struct sdl2_console *scon)
-         status = " [Stopped]";
-     } else if (gui_grab) {
-         if (alt_grab) {
-+#ifdef CONFIG_DARWIN
-+            status = " - Press ⌃⌥⇧G to exit grab";
-+#else
-             status = " - Press Ctrl-Alt-Shift-G to exit grab";
-+#endif
-         } else if (ctrl_grab) {
-             status = " - Press Right-Ctrl-G to exit grab";
-         } else {
-+#ifdef CONFIG_DARWIN
-+            status = " - Press ⌃⌥G to exit grab";
-+#else
-             status = " - Press Ctrl-Alt-G to exit grab";
-+#endif
-         }
-     }
- 
--- 
-2.41.0
+>
+> Pivot on the KVM_MEM_PRIVATE flag instead of the validity of the "gmem"
 
+KVM_MEM_PRIVATE  -> KVM_MEM_GUEST_MEMFD
+
+> file descriptor so that simple tests can let vm_mem_add() do the heavy
+> lifting of creating the guest memfd, but also allow the caller to pass in
+> an explicit fd+offset so that fancier tests can do things like back
+> multiple memslots with a single file.  If the caller passes in a fd, dup(=
+)
+> the fd so that (a) __vm_mem_region_delete() can close the fd associated
+> with the memory region without needing yet another flag, and (b) so that
+> the caller can safely close its copy of the fd without having to first
+> destroy memslots.
+>
+> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Message-Id: <20231027182217.3615211-27-seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  .../selftests/kvm/include/kvm_util_base.h     | 23 ++++++
+>  .../testing/selftests/kvm/include/test_util.h |  5 ++
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 76 +++++++++++--------
+>  3 files changed, 73 insertions(+), 31 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/=
+testing/selftests/kvm/include/kvm_util_base.h
+> index 9f144841c2ee..9f861182c02a 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -431,6 +431,26 @@ static inline uint64_t vm_get_stat(struct kvm_vm *vm=
+, const char *stat_name)
+>
+>  void vm_create_irqchip(struct kvm_vm *vm);
+>
+> +static inline int __vm_create_guest_memfd(struct kvm_vm *vm, uint64_t si=
+ze,
+> +                                       uint64_t flags)
+> +{
+> +       struct kvm_create_guest_memfd guest_memfd =3D {
+> +               .size =3D size,
+> +               .flags =3D flags,
+> +       };
+> +
+> +       return __vm_ioctl(vm, KVM_CREATE_GUEST_MEMFD, &guest_memfd);
+> +}
+> +
+> +static inline int vm_create_guest_memfd(struct kvm_vm *vm, uint64_t size=
+,
+> +                                       uint64_t flags)
+> +{
+> +       int fd =3D __vm_create_guest_memfd(vm, size, flags);
+> +
+> +       TEST_ASSERT(fd >=3D 0, KVM_IOCTL_ERROR(KVM_CREATE_GUEST_MEMFD, fd=
+));
+> +       return fd;
+> +}
+> +
+>  void vm_set_user_memory_region(struct kvm_vm *vm, uint32_t slot, uint32_=
+t flags,
+>                                uint64_t gpa, uint64_t size, void *hva);
+>  int __vm_set_user_memory_region(struct kvm_vm *vm, uint32_t slot, uint32=
+_t flags,
+> @@ -439,6 +459,9 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+>         enum vm_mem_backing_src_type src_type,
+>         uint64_t guest_paddr, uint32_t slot, uint64_t npages,
+>         uint32_t flags);
+> +void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type=
+,
+> +               uint64_t guest_paddr, uint32_t slot, uint64_t npages,
+> +               uint32_t flags, int guest_memfd_fd, uint64_t guest_memfd_=
+offset);
+>
+>  void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t =
+flags);
+>  void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_g=
+pa);
+> diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/test=
+ing/selftests/kvm/include/test_util.h
+> index 7e614adc6cf4..7257f2243ab9 100644
+> --- a/tools/testing/selftests/kvm/include/test_util.h
+> +++ b/tools/testing/selftests/kvm/include/test_util.h
+> @@ -142,6 +142,11 @@ static inline bool backing_src_is_shared(enum vm_mem=
+_backing_src_type t)
+>         return vm_mem_backing_src_alias(t)->flag & MAP_SHARED;
+>  }
+>
+> +static inline bool backing_src_can_be_huge(enum vm_mem_backing_src_type =
+t)
+> +{
+> +       return t !=3D VM_MEM_SRC_ANONYMOUS && t !=3D VM_MEM_SRC_SHMEM;
+> +}
+> +
+>  /* Aligns x up to the next multiple of size. Size must be a power of 2. =
+*/
+>  static inline uint64_t align_up(uint64_t x, uint64_t size)
+>  {
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/s=
+elftests/kvm/lib/kvm_util.c
+> index 3676b37bea38..b63500fca627 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -669,6 +669,8 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
+>                 TEST_ASSERT(!ret, __KVM_SYSCALL_ERROR("munmap()", ret));
+>                 close(region->fd);
+>         }
+> +       if (region->region.guest_memfd >=3D 0)
+> +               close(region->region.guest_memfd);
+>
+>         free(region);
+>  }
+> @@ -870,36 +872,15 @@ void vm_set_user_memory_region(struct kvm_vm *vm, u=
+int32_t slot, uint32_t flags,
+>                     errno, strerror(errno));
+>  }
+>
+> -/*
+> - * VM Userspace Memory Region Add
+> - *
+> - * Input Args:
+> - *   vm - Virtual Machine
+> - *   src_type - Storage source for this region.
+> - *              NULL to use anonymous memory.
+
+"VM_MEM_SRC_ANONYMOUS to use anonymous memory"
+
+> - *   guest_paddr - Starting guest physical address
+> - *   slot - KVM region slot
+> - *   npages - Number of physical pages
+> - *   flags - KVM memory region flags (e.g. KVM_MEM_LOG_DIRTY_PAGES)
+> - *
+> - * Output Args: None
+> - *
+> - * Return: None
+> - *
+> - * Allocates a memory area of the number of pages specified by npages
+> - * and maps it to the VM specified by vm, at a starting physical address
+> - * given by guest_paddr.  The region is created with a KVM region slot
+> - * given by slot, which must be unique and < KVM_MEM_SLOTS_NUM.  The
+> - * region is created with the flags given by flags.
+> - */
+> -void vm_userspace_mem_region_add(struct kvm_vm *vm,
+> -       enum vm_mem_backing_src_type src_type,
+> -       uint64_t guest_paddr, uint32_t slot, uint64_t npages,
+> -       uint32_t flags)
+> +/* FIXME: This thing needs to be ripped apart and rewritten. */
+
+It sure does :)
+
+With these nits:
+
+Reviewed-by: Fuad Tabba <tabba@google.com>
+Tested-by: Fuad Tabba <tabba@google.com>
+
+Cheers,
+/fuad
+
+> +void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type=
+,
+> +               uint64_t guest_paddr, uint32_t slot, uint64_t npages,
+> +               uint32_t flags, int guest_memfd, uint64_t guest_memfd_off=
+set)
+>  {
+>         int ret;
+>         struct userspace_mem_region *region;
+>         size_t backing_src_pagesz =3D get_backing_src_pagesz(src_type);
+> +       size_t mem_size =3D npages * vm->page_size;
+>         size_t alignment;
+>
+>         TEST_ASSERT(vm_adjust_num_guest_pages(vm->mode, npages) =3D=3D np=
+ages,
+> @@ -952,7 +933,7 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+>         /* Allocate and initialize new mem region structure. */
+>         region =3D calloc(1, sizeof(*region));
+>         TEST_ASSERT(region !=3D NULL, "Insufficient Memory");
+> -       region->mmap_size =3D npages * vm->page_size;
+> +       region->mmap_size =3D mem_size;
+>
+>  #ifdef __s390x__
+>         /* On s390x, the host address must be aligned to 1M (due to PGSTE=
+s) */
+> @@ -999,14 +980,38 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+>         /* As needed perform madvise */
+>         if ((src_type =3D=3D VM_MEM_SRC_ANONYMOUS ||
+>              src_type =3D=3D VM_MEM_SRC_ANONYMOUS_THP) && thp_configured(=
+)) {
+> -               ret =3D madvise(region->host_mem, npages * vm->page_size,
+> +               ret =3D madvise(region->host_mem, mem_size,
+>                               src_type =3D=3D VM_MEM_SRC_ANONYMOUS ? MADV=
+_NOHUGEPAGE : MADV_HUGEPAGE);
+>                 TEST_ASSERT(ret =3D=3D 0, "madvise failed, addr: %p lengt=
+h: 0x%lx src_type: %s",
+> -                           region->host_mem, npages * vm->page_size,
+> +                           region->host_mem, mem_size,
+>                             vm_mem_backing_src_alias(src_type)->name);
+>         }
+>
+>         region->backing_src_type =3D src_type;
+> +
+> +       if (flags & KVM_MEM_GUEST_MEMFD) {
+> +               if (guest_memfd < 0) {
+> +                       uint32_t guest_memfd_flags =3D 0;
+> +                       TEST_ASSERT(!guest_memfd_offset,
+> +                                   "Offset must be zero when creating ne=
+w guest_memfd");
+> +                       guest_memfd =3D vm_create_guest_memfd(vm, mem_siz=
+e, guest_memfd_flags);
+> +               } else {
+> +                       /*
+> +                        * Install a unique fd for each memslot so that t=
+he fd
+> +                        * can be closed when the region is deleted witho=
+ut
+> +                        * needing to track if the fd is owned by the fra=
+mework
+> +                        * or by the caller.
+> +                        */
+> +                       guest_memfd =3D dup(guest_memfd);
+> +                       TEST_ASSERT(guest_memfd >=3D 0, __KVM_SYSCALL_ERR=
+OR("dup()", guest_memfd));
+> +               }
+> +
+> +               region->region.guest_memfd =3D guest_memfd;
+> +               region->region.guest_memfd_offset =3D guest_memfd_offset;
+> +       } else {
+> +               region->region.guest_memfd =3D -1;
+> +       }
+> +
+>         region->unused_phy_pages =3D sparsebit_alloc();
+>         sparsebit_set_num(region->unused_phy_pages,
+>                 guest_paddr >> vm->page_shift, npages);
+> @@ -1019,9 +1024,10 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm=
+,
+>         TEST_ASSERT(ret =3D=3D 0, "KVM_SET_USER_MEMORY_REGION2 IOCTL fail=
+ed,\n"
+>                 "  rc: %i errno: %i\n"
+>                 "  slot: %u flags: 0x%x\n"
+> -               "  guest_phys_addr: 0x%lx size: 0x%lx",
+> +               "  guest_phys_addr: 0x%lx size: 0x%lx guest_memfd: %d\n",
+>                 ret, errno, slot, flags,
+> -               guest_paddr, (uint64_t) region->region.memory_size);
+> +               guest_paddr, (uint64_t) region->region.memory_size,
+> +               region->region.guest_memfd);
+>
+>         /* Add to quick lookup data structures */
+>         vm_userspace_mem_region_gpa_insert(&vm->regions.gpa_tree, region)=
+;
+> @@ -1042,6 +1048,14 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm=
+,
+>         }
+>  }
+>
+> +void vm_userspace_mem_region_add(struct kvm_vm *vm,
+> +                                enum vm_mem_backing_src_type src_type,
+> +                                uint64_t guest_paddr, uint32_t slot,
+> +                                uint64_t npages, uint32_t flags)
+> +{
+> +       vm_mem_add(vm, src_type, guest_paddr, slot, npages, flags, -1, 0)=
+;
+> +}
+> +
+>  /*
+>   * Memslot to region
+>   *
+> --
+> 2.39.1
+>
+>
 
