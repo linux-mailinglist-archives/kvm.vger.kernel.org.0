@@ -1,335 +1,355 @@
-Return-Path: <kvm+bounces-817-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-818-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB7747E2E1C
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 21:23:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C9457E2E54
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 21:41:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C7F1B20ACD
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 20:23:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 110B2280D3E
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 20:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36FBD2E632;
-	Mon,  6 Nov 2023 20:23:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF122C867;
+	Mon,  6 Nov 2023 20:40:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fOqyPJDV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qdgyepgs"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31151A591
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 20:23:21 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 846E8D8
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 12:23:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699302198;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eeAP0cefi3Ir8MDuGvq5mNSBI8sgcmOPd6YY6yW4jB0=;
-	b=fOqyPJDVij7I2WR4utBl/77wAmgD9FPLU7ByTuhgXm+7XfdVi53SPzAf6epeqmIlea7/wy
-	1pcXEDFAMpyra9TJEuTLfYi2ylVDxmJh41hqvH2xwZ0rQhwhP5v837lNgelWW2yveJzquT
-	wAPyVU01w869Kv9I+BMnMI6QD17F1/g=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-520-gUUfgBdbMdKgCIFCyoP_fA-1; Mon, 06 Nov 2023 15:23:12 -0500
-X-MC-Unique: gUUfgBdbMdKgCIFCyoP_fA-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-77891ef5fc9so90212585a.1
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 12:23:12 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5623F29CF6
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 20:40:51 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A9E3D76
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 12:40:49 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-da04776a869so4792943276.0
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 12:40:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699303248; x=1699908048; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QM6qohx+9oIaDINhDMHJi+mlZHqH6wIQjqhKc0eFioU=;
+        b=qdgyepgsC1uQsu8K6jagR9wMhTO9+kSU4Npm9zYlQkXoCqsyhtNkBVqaHtum67VK8b
+         TJqm/wPAAjv5ql6Rq8i0lHitMqDO6CV31/qrm/cQwbkbHt2yuKPdgYxkeOUCCzYAVOLU
+         1wwzJKp+4z698MgL2GCcfWWfOu9kIPAdCg1+da8Dl6+dVFRU0NxmgPmM2Sb/NhV1FrE0
+         wxkzsDlOJnWQa9m13huoxnaLhvQzLYc7houL1QX+jseWrqHwlmvIHEjY8VyXDHD+4Wy6
+         aNuY3Dk12pJcMaGL2Y9ONRLkfJSF+vFEdi+M+fXZrjAH7sHcm3Jz0fsfLLsokzOMK2X+
+         G7ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699302192; x=1699906992;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eeAP0cefi3Ir8MDuGvq5mNSBI8sgcmOPd6YY6yW4jB0=;
-        b=clg2nbhcXm9M4gk06QsMlhd/LRRAoDSo0aArbbhuJJqwS608iOD9O9dP1wvN5Z+zko
-         I7Mk5j+kPWupvu7ztfF0JW74eAnimZ1QSXDCBzwraa4Zc+v+sU/5jg6fAljMTbhrts93
-         CS8vwTWuAJ/l9Rg64tVMWR4V6bC5q3781Po92rWrmmu7zL1RRspwasN8xqPsN4r2QwZg
-         /vbEssQt7HL+01D/BlUt4iHXCzyq4F+EmEI5zJytgXjFiWPvyWIvQfNepwmirBxI0xP5
-         4AZa8sVt2Yj4r8DtWVjIKsHkdVPD89kLZetLXRlOcC1HCclTLq0rgTeksIyaamKpmqs0
-         AnNw==
-X-Gm-Message-State: AOJu0YyWxwCxmefIAunfsRrhMRUex9dRJrku6oTAmDzlLp/lnuKkhDga
-	nij4ImunMF1k5RAIIpEaQ3fw10/7LpLA75R3LYWtsXZ81nV0E+oDQa9OmEgX3fZgQtwbcJf23g+
-	BKks4XY1AVOZf
-X-Received: by 2002:a05:620a:469f:b0:776:f188:eee6 with SMTP id bq31-20020a05620a469f00b00776f188eee6mr36666918qkb.2.1699302191973;
-        Mon, 06 Nov 2023 12:23:11 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH4uiplFatXqm73s3DT+1+5DNQ8jk38PdsXYUnAmioYWr19R7KUdmM/460Dvs9DTe4X5qmO+A==
-X-Received: by 2002:a05:620a:469f:b0:776:f188:eee6 with SMTP id bq31-20020a05620a469f00b00776f188eee6mr36666889qkb.2.1699302191517;
-        Mon, 06 Nov 2023 12:23:11 -0800 (PST)
-Received: from x1n (cpe5c7695f3aee0-cm5c7695f3aede.cpe.net.cable.rogers.com. [99.254.144.39])
-        by smtp.gmail.com with ESMTPSA id i10-20020a05620a144a00b0076cb3690ae7sm3612636qkl.68.2023.11.06.12.23.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Nov 2023 12:23:11 -0800 (PST)
-Date: Mon, 6 Nov 2023 15:23:08 -0500
-From: Peter Xu <peterx@redhat.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm list <kvm@vger.kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	James Houghton <jthoughton@google.com>,
-	Oliver Upton <oupton@google.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Mike Kravetz <mike.kravetz@oracle.com>,
-	Andrea Arcangeli <aarcange@redhat.com>
-Subject: Re: RFC: A KVM-specific alternative to UserfaultFD
-Message-ID: <ZUlLLGLi1IyMyhm4@x1n>
-References: <CALzav=d23P5uE=oYqMpjFohvn0CASMJxXB_XEOEi-jtqWcFTDA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1699303248; x=1699908048;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=QM6qohx+9oIaDINhDMHJi+mlZHqH6wIQjqhKc0eFioU=;
+        b=Ec54HFewkmxZk262NpUUELyZTUP0gP8rGK1PPAHrKXxEHdI5cdXFOZeGv+NjOmLne4
+         7t1y8lXL8lJ/Eq99+Tq3LzVu2OlJR453rjWV+2WeBn6qWb+IYIyTQWu2nbgdA1d3+mr9
+         eF9Dt6su0mm6jgZ3d/tzo3sixYtFu4pqGfE4NM3CLIIRuRZm7yErC7BaOa/KddMdSiKX
+         7+KfXvJ/kVqQGT/xUBtqujMn6IiSThvF2ApyzAGTo0rR1VrngrAeQn84axwxYG1cBGkF
+         66jZFqSOwlH8BkLN14K1FXD1F5+S9fNsIE5W+bpFWrFwCmXlSKrvlgvoDdK1QATj3qNk
+         641Q==
+X-Gm-Message-State: AOJu0YzTwIbYb2nL0YBtFQo1kb0c/dNaPlBJCN97pCc16uuL0lnuI+l7
+	PdusBR+i/6fdgQqwqcw2xrqELl/qTjo=
+X-Google-Smtp-Source: AGHT+IHGJZTr+99CoJv+V3lEztsrN7CAj3K+6E8B3GoxKxb99wPAZ63dCisQjnrepys1EZ9IpsYWpym6TAQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1788:b0:da0:c9a5:b529 with SMTP id
+ ca8-20020a056902178800b00da0c9a5b529mr556213ybb.12.1699303248740; Mon, 06 Nov
+ 2023 12:40:48 -0800 (PST)
+Date: Mon, 6 Nov 2023 12:40:47 -0800
+In-Reply-To: <e704b8ef-7488-96f4-27a8-35af722d4a3f@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CALzav=d23P5uE=oYqMpjFohvn0CASMJxXB_XEOEi-jtqWcFTDA@mail.gmail.com>
+Mime-Version: 1.0
+References: <20231104000239.367005-1-seanjc@google.com> <20231104000239.367005-10-seanjc@google.com>
+ <CALMp9eT22j2Ob9ihva41p2JRufR5P+xnzsm99LEd1quxnfCyWA@mail.gmail.com> <e704b8ef-7488-96f4-27a8-35af722d4a3f@gmail.com>
+Message-ID: <ZUlPT6ed5d0FCLYL@google.com>
+Subject: Re: [PATCH v6 09/20] KVM: selftests: Add pmu.h and lib/pmu.c for
+ common PMU assets
+From: Sean Christopherson <seanjc@google.com>
+To: JinrongLiang <ljr.kernel@gmail.com>
+Cc: Jim Mattson <jmattson@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Kan Liang <kan.liang@linux.intel.com>, 
+	Dapeng Mi <dapeng1.mi@linux.intel.com>, Like Xu <likexu@tencent.com>, 
+	Aaron Lewis <aaronlewis@google.com>, Jinrong Liang <cloudliang@tencent.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi, David,
+On Mon, Nov 06, 2023, JinrongLiang wrote:
+> =E5=9C=A8 2023/11/4 21:20, Jim Mattson =E5=86=99=E9=81=93:
+> > > diff --git a/tools/testing/selftests/kvm/include/pmu.h b/tools/testin=
+g/selftests/kvm/include/pmu.h
+> > > new file mode 100644
+> > > index 000000000000..987602c62b51
+> > > --- /dev/null
+> > > +++ b/tools/testing/selftests/kvm/include/pmu.h
+> > > @@ -0,0 +1,84 @@
+> > > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > > +/*
+> > > + * Copyright (C) 2023, Tencent, Inc.
+> > > + */
+> > > +#ifndef SELFTEST_KVM_PMU_H
+> > > +#define SELFTEST_KVM_PMU_H
+> > > +
+> > > +#include <stdint.h>
+> > > +
+> > > +#define X86_PMC_IDX_MAX                                64
+> > > +#define INTEL_PMC_MAX_GENERIC                          32
+> >=20
+> > I think this is actually 15. Note that IA32_PMC0 through IA32_PMC7
+> > have MSR indices from 0xc1 through 0xc8, and MSR 0xcf is
+> > IA32_CORE_CAPABILITIES. At the very least, we have to handle
+> > non-contiguous MSR indices if we ever go beyond IA32_PMC14.
 
-Before Paolo shares his opinion, I can provide some quick comments.
+There's no reason to define this, it's not used in selftests.
 
-On Mon, Nov 06, 2023 at 10:25:13AM -0800, David Matlack wrote:
-> Hi Paolo,
-> 
-> I'd like your feedback on whether you would merge a KVM-specific
-> alternative to UserfaultFD.
-> 
-> Within Google we have a feature called "KVM Demand Paging" that we
-> have been using for post-copy live migration since 2014 and memory
-> poisoning emulation more recently. The high-level design is:
+> > > +#define KVM_PMU_EVENT_FILTER_MAX_EVENTS                300
+> > > +
+> > > +#define GP_COUNTER_NR_OFS_BIT                          8
+> > > +#define EVENT_LENGTH_OFS_BIT                           24
+> > > +
+> > > +#define PMU_VERSION_MASK                               GENMASK_ULL(7=
+, 0)
+> > > +#define EVENT_LENGTH_MASK                              GENMASK_ULL(3=
+1, EVENT_LENGTH_OFS_BIT)
+> > > +#define GP_COUNTER_NR_MASK                             GENMASK_ULL(1=
+5, GP_COUNTER_NR_OFS_BIT)
+> > > +#define FIXED_COUNTER_NR_MASK                          GENMASK_ULL(4=
+, 0)
 
-I have no immediate comment on the proposal yet, but I can list how uffd
-handles below as comparisons, inline below.
+These are also unneeded, they're superseded by CPUID properties.
 
-> 
->   (a) A bitmap that tracks which GFNs are present, along with a UAPI
-> to enable/disable the present bitmap.
+> > > +#define ARCH_PERFMON_EVENTSEL_EVENT                    GENMASK_ULL(7=
+, 0)
+> > > +#define ARCH_PERFMON_EVENTSEL_UMASK                    GENMASK_ULL(1=
+5, 8)
+> > > +#define ARCH_PERFMON_EVENTSEL_USR                      BIT_ULL(16)
+> > > +#define ARCH_PERFMON_EVENTSEL_OS                       BIT_ULL(17)
+> > > +#define ARCH_PERFMON_EVENTSEL_EDGE                     BIT_ULL(18)
+> > > +#define ARCH_PERFMON_EVENTSEL_PIN_CONTROL              BIT_ULL(19)
+> > > +#define ARCH_PERFMON_EVENTSEL_INT                      BIT_ULL(20)
+> > > +#define ARCH_PERFMON_EVENTSEL_ANY                      BIT_ULL(21)
+> > > +#define ARCH_PERFMON_EVENTSEL_ENABLE                   BIT_ULL(22)
+> > > +#define ARCH_PERFMON_EVENTSEL_INV                      BIT_ULL(23)
+> > > +#define ARCH_PERFMON_EVENTSEL_CMASK                    GENMASK_ULL(3=
+1, 24)
+> > > +
+> > > +#define PMC_MAX_FIXED                                  16
 
-Uffd uses the pgtable (anon) or page cache (shmem/hugetlb) directly.
-Slight win, IMHO, because bitmap will be extra structure to maintain the
-same information, IIUC.
+Also unneeded.
 
->   (b) UAPIs for marking GFNs present and non-present.
+> > > +#define PMC_IDX_FIXED                                  32
 
-Similar, this is something bound to above bitmap design, and not needed for
-uffd.  Extra interface?
+This one is absolutely ridiculous.  It's the shift for the enable bit in gl=
+obal
+control, which is super obvious from the name. /s
 
->   (c) KVM_RUN support for returning to userspace on guest page faults
-> to non-present GFNs.
+> > > +
+> > > +/* RDPMC offset for Fixed PMCs */
+> > > +#define PMC_FIXED_RDPMC_BASE                           BIT_ULL(30)
+> > > +#define PMC_FIXED_RDPMC_METRICS                        BIT_ULL(29)
+> > > +
+> > > +#define FIXED_BITS_MASK                                0xFULL
+> > > +#define FIXED_BITS_STRIDE                              4
+> > > +#define FIXED_0_KERNEL                                 BIT_ULL(0)
+> > > +#define FIXED_0_USER                                   BIT_ULL(1)
+> > > +#define FIXED_0_ANYTHREAD                              BIT_ULL(2)
+> > > +#define FIXED_0_ENABLE_PMI                             BIT_ULL(3)
+> > > +
+> > > +#define fixed_bits_by_idx(_idx, _bits)                 \
+> > > +       ((_bits) << ((_idx) * FIXED_BITS_STRIDE))
 
-Uffd has the wait queues, so this will be extra kvm interface to maintain,
-but not easy to judge because it may bring benefits indeed, like better
-concurrency.  Personally I'm just not sure (1) how important concurrency is
-in this use case, and (2) whether we can improve uffd general code on
-scalability.
+*sigh*  And now I see where the "i * 4" stuff in the new test comes from.  =
+My
+plan is to redo the above as:
 
-For (1), if the time to resolve a remote page fault is bottlenecked on the
-network, concurrency may not matter a huge deal, IMHO.  But I didn't really
-do enough test over this area.
+/* RDPMC offset for Fixed PMCs */
+#define FIXED_PMC_RDPMC_METRICS			BIT_ULL(29)
+#define FIXED_PMC_RDPMC_BASE			BIT_ULL(30)
 
-For (2), something like:
+#define FIXED_PMC_GLOBAL_CTRL_ENABLE(_idx)	BIT_ULL((32 + (_idx)))
 
-https://lore.kernel.org/r/20230905214235.320571-1-peterx@redhat.com
+#define FIXED_PMC_KERNEL			BIT_ULL(0)
+#define FIXED_PMC_USER				BIT_ULL(1)
+#define FIXED_PMC_ANYTHREAD			BIT_ULL(2)
+#define FIXED_PMC_ENABLE_PMI			BIT_ULL(3)
+#define FIXED_PMC_NR_BITS			4
+#define FIXED_PMC_CTRL(_idx, _val)		((_val) << ((_idx) * FIXED_PMC_NR_BITS)=
+)
 
-I didn't continue that thread because QEMU doesn't use uffd as heavy, so no
-rush to push that further from QEMU's perspective.  However IMHO it'll
-always be valuable to profile userfault to see whether the issues can be
-resolved in more general ways.  One thing that can happen is that we
-explored uffd enough so we may find out the bottleneck that we cannot avoid
-due to uffd's design, but IIUC that work hasn't yet been done by anyone,
-IOW there's still chance to me to provide a generic solution.
+> > > +#define AMD64_NR_COUNTERS                              4
+> > > +#define AMD64_NR_COUNTERS_CORE                         6
 
->   (d) A notification mechanism and wait queue to coordinate KVM
-> accesses to non-present GFNs.
+These too can be dropped for now.
 
-Probably uffd's wait queue to be reimplemented more or less.
+> > > +#define PMU_CAP_FW_WRITES                              BIT_ULL(13)
+> > > +#define PMU_CAP_LBR_FMT                                0x3f
+> > > +
+> > > +enum intel_pmu_architectural_events {
+> > > +       /*
+> > > +        * The order of the architectural events matters as support f=
+or each
+> > > +        * event is enumerated via CPUID using the index of the event=
+.
+> > > +        */
+> > > +       INTEL_ARCH_CPU_CYCLES,
+> > > +       INTEL_ARCH_INSTRUCTIONS_RETIRED,
+> > > +       INTEL_ARCH_REFERENCE_CYCLES,
+> > > +       INTEL_ARCH_LLC_REFERENCES,
+> > > +       INTEL_ARCH_LLC_MISSES,
+> > > +       INTEL_ARCH_BRANCHES_RETIRED,
+> > > +       INTEL_ARCH_BRANCHES_MISPREDICTED,
+> > > +       NR_INTEL_ARCH_EVENTS,
+> > > +};
+> > > +
+> > > +enum amd_pmu_k7_events {
+> > > +       AMD_ZEN_CORE_CYCLES,
+> > > +       AMD_ZEN_INSTRUCTIONS,
+> > > +       AMD_ZEN_BRANCHES,
+> > > +       AMD_ZEN_BRANCH_MISSES,
+> > > +       NR_AMD_ARCH_EVENTS,
+> > > +};
+> > > +
+> > > +extern const uint64_t intel_pmu_arch_events[];
+> > > +extern const uint64_t amd_pmu_arch_events[];
+> >=20
+> > AMD doesn't define *any* architectural events. Perhaps
+> > amd_pmu_zen_events[], though who knows what Zen5 and  beyond will
+> > bring?
+> >=20
+> > > +extern const int intel_pmu_fixed_pmc_events[];
+> > > +
+> > > +#endif /* SELFTEST_KVM_PMU_H */
+> > > diff --git a/tools/testing/selftests/kvm/lib/pmu.c b/tools/testing/se=
+lftests/kvm/lib/pmu.c
+> > > new file mode 100644
+> > > index 000000000000..27a6c35f98a1
+> > > --- /dev/null
+> > > +++ b/tools/testing/selftests/kvm/lib/pmu.c
+> > > @@ -0,0 +1,28 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-only
+> > > +/*
+> > > + * Copyright (C) 2023, Tencent, Inc.
+> > > + */
+> > > +
+> > > +#include <stdint.h>
+> > > +
+> > > +#include "pmu.h"
+> > > +
+> > > +/* Definitions for Architectural Performance Events */
+> > > +#define ARCH_EVENT(select, umask) (((select) & 0xff) | ((umask) & 0x=
+ff) << 8)
+> >=20
+> > There's nothing architectural about this. Perhaps RAW_EVENT() for
+> > consistency with perf?
 
-Is this only used when there's no vcpu thread context?  I remember Anish's
-other proposal on vcpu exit can already achieve similar without the queue.
+Works for me.
 
->   (e) UAPI or KVM policy for collapsing SPTEs into huge pages as guest
-> memory becomes present.
+> > > +const uint64_t intel_pmu_arch_events[] =3D {
+> > > +       [INTEL_ARCH_CPU_CYCLES]                 =3D ARCH_EVENT(0x3c, =
+0x0),
+> > > +       [INTEL_ARCH_INSTRUCTIONS_RETIRED]       =3D ARCH_EVENT(0xc0, =
+0x0),
+> > > +       [INTEL_ARCH_REFERENCE_CYCLES]           =3D ARCH_EVENT(0x3c, =
+0x1),
+> > > +       [INTEL_ARCH_LLC_REFERENCES]             =3D ARCH_EVENT(0x2e, =
+0x4f),
+> > > +       [INTEL_ARCH_LLC_MISSES]                 =3D ARCH_EVENT(0x2e, =
+0x41),
+> > > +       [INTEL_ARCH_BRANCHES_RETIRED]           =3D ARCH_EVENT(0xc4, =
+0x0),
+> > > +       [INTEL_ARCH_BRANCHES_MISPREDICTED]      =3D ARCH_EVENT(0xc5, =
+0x0),
+> >=20
+> > [INTEL_ARCH_TOPDOWN_SLOTS] =3D ARCH_EVENT(0xa4, 1),
 
-This interface will also be needed if with userfaultfd, but if with uffd
-it'll be a common interface so can be used outside VM context.
+...
 
-> 
-> The actual implementation within Google has a lot of warts that I
-> won't get into... but I think we could have a pretty clean upstream
-> solution.
-> 
-> In fact, a lot of the infrastructure needed to support this design is
-> already in-flight upstream. e.g. (a) and (b) could be built on top of
-> the new memory attributes (although I have concerns about the
-> performance of using xarray vs. bitmaps), (c) can be built on top of
-> the memory-fault exiting. The most complex piece of new code would be
-> the notification mechanism for (d). Within Google we've been using a
-> netlink socket, but I think we should use a custom file descriptor
-> instead.
-> 
-> If we do it right, almost no architecture-specific support is needed.
-> Just a small bit in the page fault path (for (c) and to account for
-> the present bitmap when determining what (huge)page size to map).
-> 
-> The most painful part of carrying KVM Demand Paging out-of-tree has
-> been maintaining the hooks for (d). But this has been mostly
-> self-inflicted. We started out by manually annotating all of the code
-> where KVM reads/writes guest memory. But there are more core routines
-> that all guest-memory accesses go through (e.g. __gfn_to_hva_many())
-> where we could put a single hook, and then KVM just has to make sure
+> > > @@ -63,7 +50,6 @@
+> > >=20
+> > >   #define AMD_ZEN_BR_RETIRED EVENT(0xc2, 0)
+> >=20
+> > Now AMD_ZEN_BRANCHES, above?
+>=20
+> Yes, I forgot to replace INTEL_BR_RETIRED, AMD_ZEN_BR_RETIRED and
+> INST_RETIRED in pmu_event_filter_test.c and remove their macro definition=
+s.
 
-It's great to know (d) is actually not a real problem, however..
+Having to go through an array to get a hardcoded value is silly, e.g. it ma=
+kes
+it unnecessarily difficult to reference the encodings because they aren't s=
+imple
+literals.
 
-> to invalidate an gfn-to-hva/pfn caches and SPTEs when a page becomes
-> non-present (which is rare and typically only happens before a vCPU
-> starts running). And hooking KVM accesses to guest memory isn't
-> exactly new, KVM already manually tracks all writes to keep the dirty
-> log up to date.
+My vote is this:
 
-.. what about all the other kernel modules that can directly access the
-guest memory without KVM APIs, like, vhost?  Does all of them need to
-implement similar things?
+#define	INTEL_ARCH_CPU_CYCLES			RAW_EVENT(0x3c, 0x00)
+#define	INTEL_ARCH_INSTRUCTIONS_RETIRED		RAW_EVENT(0xc0, 0x00)
+#define	INTEL_ARCH_REFERENCE_CYCLES		RAW_EVENT(0x3c, 0x01)
+#define	INTEL_ARCH_LLC_REFERENCES		RAW_EVENT(0x2e, 0x4f)
+#define	INTEL_ARCH_LLC_MISSES			RAW_EVENT(0x2e, 0x41)
+#define	INTEL_ARCH_BRANCHES_RETIRED		RAW_EVENT(0xc4, 0x00)
+#define	INTEL_ARCH_BRANCHES_MISPREDICTED	RAW_EVENT(0xc5, 0x00)
+#define	INTEL_ARCH_TOPDOWN_SLOTS		RAW_EVENT(0xa4, 0x01)
 
-> 
-> So why merge a KVM-specific alternative to UserfaultFD?
-> 
-> Taking a step back, let's look at what UserfaultFD is actually
-> providing for KVM VMs:
-> 
->   1. Coordination of userspace accesses to guest memory.
->   2. Coordination of KVM+guest accesses to guest memory.
-> 
-> (1.) technically does not need kernel support. It's possible to solve
-> this problem in userspace, and likely can be more efficient to solve
-> it in userspace because you have more flexibility and can avoid
-> bouncing through the kernel page fault handler. And it's not
-> unreasonable to expect VMMs to support this. VMMs already need to
-> manually intercept userspace _writes_ to guest memory to implement
-> dirty tracking efficiently. It's a small step beyond that to intercept
-> both reads and writes for post-copy. And VMMs are increasingly
-> multi-process. UserfaultFD provides coordination within a process but
-> VMMs already need to deal with coordinating across processes already.
-> i.e. UserfaultFD is only solving part of the problem for (1.).
-> 
-> The KVM-specific approach is basically to provide kernel support for
-> (2) and let userspace solve (1) however it likes.
+#define	AMD_ZEN_CORE_CYCLES			RAW_EVENT(0x76, 0x00)
+#define	AMD_ZEN_INSTRUCTIONS_RETIRED		RAW_EVENT(0xc0, 0x00)
+#define	AMD_ZEN_BRANCHES_RETIRED		RAW_EVENT(0xc2, 0x00)
+#define	AMD_ZEN_BRANCHES_MISPREDICTED		RAW_EVENT(0xc3, 0x00)
 
-It's slightly unfortunate to QEMU and other userspace hypervisors in this
-case, because it means even if the new interface will be merged, each
-community will need to add support for it for the same postcopy feature,
-and I'm not 100% sure on the complexity at least for QEMU.
+/*
+ * Note!  The order and thus the index of the architectural events matters =
+as
+ * support for each event is enumerated via CPUID using the index of the ev=
+ent.
+ */
+enum intel_pmu_architectural_events {
+	INTEL_ARCH_CPU_CYCLES_INDEX,
+	INTEL_ARCH_INSTRUCTIONS_RETIRED_INDEX,
+	INTEL_ARCH_REFERENCE_CYCLES_INDEX,
+	INTEL_ARCH_LLC_REFERENCES_INDEX,
+	INTEL_ARCH_LLC_MISSES_INDEX,
+	INTEL_ARCH_BRANCHES_RETIRED_INDEX,
+	INTEL_ARCH_BRANCHES_MISPREDICTED_INDEX,
+	INTEL_ARCH_TOPDOWN_SLOTS_INDEX,
+	NR_INTEL_ARCH_EVENTS,
+};
 
-I think this is not a major concern if purely judging from KVM perspective,
-indeed, as long as the solution supercedes the current one, so I think it's
-still okay to do so.  Meanwhile there is also the other option to let
-whatever userspace (QEMU, etc.) keeps using userfaultfd, so KVM will have
-two solutions for VM postcopy, which is also not fully unacceptable,
-either.  In all cases, before deciding to go this way, IMHO it'll be a nice
-gesture to consider the side effects to other communities, like QEMU, that
-heavily consumes KVM.
+enum amd_pmu_zen_events {
+	AMD_ZEN_CORE_CYCLES_INDEX,
+	AMD_ZEN_INSTRUCTIONS_INDEX,
+	AMD_ZEN_BRANCHES_INDEX,
+	AMD_ZEN_BRANCH_MISSES_INDEX,
+	NR_AMD_ZEN_EVENTS,
+};
 
-> 
-> But if UserfaultFD solves (1) and (2), why introduce a KVM feature
-> that solves only (2)?
-> 
-> Well, UserfaultFD has some very real downsides:
-> 
->   * Lack of sufficient HugeTLB Support: The most recent and glaring
->     problem is upstream's NACK of HugeTLB High Granularity Mapping [1].
->     Without HGM, UserfaultFD can only handle HugeTLB faults at huge
->     page granularity. i.e. If a VM is backed with 1GiB HugeTLB, then
->     UserfaultFD can only handle 1GiB faults. Demand-fetching 1GiB of
->     memory from a remote host during the post-copy phase of live
->     migration is untenable. Even 2MiB fetches are painful with most
->     current NICs. In effect, there is no line-of-sight on an upstream
->     solution for post-copy live migration for VMs backed with HugeTLB.
+extern const uint64_t intel_pmu_arch_events[];
+extern const uint64_t amd_pmu_zen_events[];
 
-Indeed I didn't see any patch from James anymore for that support.  Does it
-mean that the project will be discontinued?
+...
 
-Personally I still think this is the right way to go, that it'll be good if
-hugetlb pages can be split in any context even outside hypervisors.
 
-I don't think the community is NACKing the solution to allow hugetlb to
-split, it's not merged sololy because the specialty of hugetlbfs, and HGM
-just happened at that stage of time.
+const uint64_t intel_pmu_arch_events[] =3D {
+	INTEL_ARCH_CPU_CYCLES,
+	INTEL_ARCH_INSTRUCTIONS_RETIRED,
+	INTEL_ARCH_REFERENCE_CYCLES,
+	INTEL_ARCH_LLC_REFERENCES,
+	INTEL_ARCH_LLC_MISSES,
+	INTEL_ARCH_BRANCHES_RETIRED,
+	INTEL_ARCH_BRANCHES_MISPREDICTED,
+	INTEL_ARCH_TOPDOWN_SLOTS,
+};
+kvm_static_assert(ARRAY_SIZE(intel_pmu_arch_events) =3D=3D NR_INTEL_ARCH_EV=
+ENTS);
 
-I had a feeling that it'll be resolved sooner or later, even without a
-hugetlb v2, maybe?  That "v2" suggestion seems to be the final conclusion
-per the last lsfmm 2023 conference; however I don't know whether the
-discussion continued anywhere else, and I think that not all the ways are
-explored, and maybe we can work it out with current hugetlb code base in
-some form so that the community will be happy to allow hugetlb add new
-features again.
-
-> 
->   * Memory Overhead: UserfaultFD requires an extra 8 bytes per page of
->     guest memory for the userspace page table entries.
-
-What is this one?
-
-> 
->   * CPU Overhead: UserfaultFD has to manipulate userspace page tables to
->     split mappings down to PAGE_SIZE, handle PAGE_SIZE'd faults, and,
->     later, collapse mappings back into huge pages. These manipulations take
->     locks like mmap_lock, page locks, and page table locks.
-
-Indeed this can be a problem, however this is also the best part of
-userfaultfd on the cleaness of the whole design, that it unifies everything
-into the core mm, and it's already there.  That's also why it can work with
-kvm/vhost/userapp/whatever as long as the page is accessed in whatever
-form.
-
-> 
->   * Complexity: UserfaultFD-based demand paging depends on functionality
->     across multiple subsystems in the kernel including Core MM, KVM, as
->     well as the each of the memory filesystems (tmpfs, HugeTLB, and
->     eventually guest_memfd). Debugging problems requires
->     knowledge across many domains that many engineers do not have. And
->     solving problems requires getting buy-in from multiple subsystem
->     maintainers that may not all be aligned (see: HGM).
-
-I'll put HGM related discussion in above bullet.  OTOH, I'd consider
-"debugging problem requires knowledge across many domains" not as valid as
-reasoning.  At least this is not a pure technical point, and I think we
-should still stick with technical comparisons on the solutions.
-
-> 
-> All of these are addressed with a KVM-specific solution. A
-> KVM-specific solution can have:
-> 
->   * Transparent support for any backing memory subsystem (tmpfs,
->     HugeTLB, and even guest_memfd).
-
-I'm curious how hard would it be to allow guest_memfd support userfaultfd.
-David, do you know?
-
-The rest are already supported by uffd so I assume not a major problem.
-
->   * Only 1 bit of overhead per page of guest memory.
->   * No need to modify host page tables.
->   * All code contained within KVM.
->   * Significantly fewer LOC than UserfaultFD.
-
-We're not planning to remove uffd from mm even if this is merged.. right?
-Could you elaborate?
-
-> 
-> Ok, that's the pitch. What are your thoughts?
-> 
-> [1] https://lore.kernel.org/linux-mm/20230218002819.1486479-1-jthoughton@google.com/
-
-How about hwpoison in no-KVM contexts?  I remember Mike Kravetz mentioned
-about that in the database usages, and IIRC Google also mentioned the
-interest in that area at least before.
-
-Copy Mike for that; copy Andrea for everything.
-
-Thanks,
-
--- 
-Peter Xu
-
+const uint64_t amd_pmu_zen_events[] =3D {
+	AMD_ZEN_CORE_CYCLES,
+	AMD_ZEN_INSTRUCTIONS_RETIRED,
+	AMD_ZEN_BRANCHES_RETIRED,
+	AMD_ZEN_BRANCHES_MISPREDICTED,
+};
+kvm_static_assert(ARRAY_SIZE(amd_pmu_zen_events) =3D=3D NR_AMD_ZEN_EVENTS);
 
