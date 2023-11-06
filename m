@@ -1,187 +1,174 @@
-Return-Path: <kvm+bounces-814-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-815-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22C677E2BD8
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 19:25:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 766CA7E2C8F
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 20:01:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 798762817A3
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 18:25:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C539281709
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 19:01:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F24762D029;
-	Mon,  6 Nov 2023 18:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3563F2943E;
+	Mon,  6 Nov 2023 19:01:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p7dDrTfV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2+OIpzdY"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC172C874
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 18:25:46 +0000 (UTC)
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 358B8D49
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 10:25:44 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-4083740f92dso35372745e9.3
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 10:25:44 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92227DDBB
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 19:01:10 +0000 (UTC)
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29742BB
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:01:09 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cc29f3afe0so31025875ad.2
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 11:01:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699295142; x=1699899942; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=PZbnOM7riEudGU41WAWVHJxxAgVIo5bmLQWh/3qy2QU=;
-        b=p7dDrTfVe/xI66uroMfqOBf0ufx3lAfLXVLaBFJwi3zkdZUh1OFIWZrvjcHX5lJUJo
-         nzyciEjx/6RTaoicpxe5Ba/M6VDLfY1V2fC+yPgI3CeDzr9YUT6ilTHt9IevHX+HGdyM
-         docZtmPZsGXviq2HgWmD+tOWVpMsw1qEtMATuLkXaXxMnt+iqzwDeTQI6hZ39rU9m4IF
-         bFxFAuNx6ZFp1z6W1WtzN8iQzAUmQVaJ2BaLzjhzQ34qf0xAtRSz0OecYJzGTuNwwNCQ
-         UiWbheaJJthmtdTQQaJqbn+Ghir/jJxhyZDskYtSzYZtK3eNXB1QDk8fjMtYj2ZLbsBO
-         OsNA==
+        d=google.com; s=20230601; t=1699297268; x=1699902068; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PGkM+GRz/6fYflQxsLrTt3gzPDlcKqRYPaToqANSy+c=;
+        b=2+OIpzdYdxqDj04JgzfNtedMgHDoURt26Pdyn3DhZnXLqalChyShHj1tM11pDsKmNf
+         3tirJqFkUo/eezyxQpKXC0pBCXGlDImuabh5fTuZYCOvdbQHu9ZPLZtRedJGAV6ldTrn
+         xr4xEfcqdpl0Gdw+Bfi20uLKW3PEUTc87XXL/bkV/puol379wwbPJs9AG4drYU2eFGEu
+         nEIowM4lnXqC636o6DX91HlQzDIrVKepU4FoASjgKr5zyky0AkWh++oNrOdgs9m+ozRX
+         4XQh4MgnpU3Hf5DXONlq5uB7Um46cLt2cByfh0hBBvi3D4QuHFOQUhZTGuqxpFfe8heG
+         mTiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699295142; x=1699899942;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PZbnOM7riEudGU41WAWVHJxxAgVIo5bmLQWh/3qy2QU=;
-        b=Y4HdCI18H8utgI5qfJwxpkn9o5orDuMi7BaqQmIfSEMXUNPRAnOzp93a2WJNmYmmuu
-         DbxiQRv81L8KlAI1HyWF36p8Yh4w6jLgpXOxlcK/LtdZTl+gSaGWNHsbG5O/EtziEoQC
-         AWDB2hFHSvDDBXl8TTWIPbuboZmnE+wCSJT4A1vwenjfWu3A1hp6Y6ujLYXhBiAEGP38
-         LvVvUIqJFaeSHXgWSwXOGeDN7/MrOByVtt3bEK+x4u4ywuA+T5wsdrZwJotiyIldZb1L
-         fN06jbUNm3+38aYSZKsHwMkNNMTp0GdTvXKzNm1j5ytWFlS96eFejen4omRXGx2Wb/20
-         Lytw==
-X-Gm-Message-State: AOJu0YyiGqBrrB5osZ72mrgpluUtTcxfB5iwGNL7mwVwoKHjIbIpCYGN
-	w8DteCDHR+3B9v4uDpwi9kF6zMyGUyeUDONeLFHZ4A==
-X-Google-Smtp-Source: AGHT+IGmZRqvulBIYkvstrT5vZf9v7xG3mXvGD1G/qvRDEa0Wn50IaaWfnICFy/qZaiQ4+qeMBy9qNzAXncWFRQAfKc=
-X-Received: by 2002:a05:6000:18a4:b0:32f:755c:c625 with SMTP id
- b4-20020a05600018a400b0032f755cc625mr24342465wri.11.1699295142426; Mon, 06
- Nov 2023 10:25:42 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699297268; x=1699902068;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PGkM+GRz/6fYflQxsLrTt3gzPDlcKqRYPaToqANSy+c=;
+        b=mFXPdIt0OlKkx8QElh3YB9zQA2XkI5zizJo3goKnLTdYq7WrnkFgPMc45VYCZVY0iq
+         LN8bGGZuOuk3eqHcxO8+8VQhkNwoNrwDHNug6umURgNO30DKkw0+7zFmtQcNAFxdiN7E
+         5zOVCoEFH8i2Wxz9pf4zVo+oecNJEaSzyTES968htJkxgE3h/0lQGVI01D2vhPkLXX0L
+         IobN+p+M1mmUHwkG1U8tlRsU67C2WstUKwP7BPEkJDEABbp0BHxv0TuFdpu7QC+9wKsk
+         QZTqsIVf4qyC73cptGB+rBW/cnPpsRhlRpbXeijXeRspqG4+YlRFKk6a4MB9X0V4TBqH
+         vjQg==
+X-Gm-Message-State: AOJu0Yyn2WGkpqhWLjqU+0vadmsgTUCJlrRklb1Ro1vknPSIoczUX9GS
+	+QkxMUONfvSwbYE6LBIaSwXZnqPkFsk=
+X-Google-Smtp-Source: AGHT+IHyQBAL4dOQ5LIbv0mtbn+G8Pt/3SZ5S9Z+6RamvNchDoBzMSHY+prxoGkql5VThnidOjI97mnVEXA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:ee14:b0:1ca:b952:f5fa with SMTP id
+ z20-20020a170902ee1400b001cab952f5famr504750plb.5.1699297268653; Mon, 06 Nov
+ 2023 11:01:08 -0800 (PST)
+Date: Mon, 6 Nov 2023 11:01:07 -0800
+In-Reply-To: <CALMp9eTQiom+0b5qPP_0u2tGqw9GcWbJVMNGeNZms8MTH8byuQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: David Matlack <dmatlack@google.com>
-Date: Mon, 6 Nov 2023 10:25:13 -0800
-Message-ID: <CALzav=d23P5uE=oYqMpjFohvn0CASMJxXB_XEOEi-jtqWcFTDA@mail.gmail.com>
-Subject: RFC: A KVM-specific alternative to UserfaultFD
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm list <kvm@vger.kernel.org>, Sean Christopherson <seanjc@google.com>, 
-	James Houghton <jthoughton@google.com>, Oliver Upton <oupton@google.com>, Peter Xu <peterx@redhat.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20231104000239.367005-1-seanjc@google.com> <20231104000239.367005-7-seanjc@google.com>
+ <CALMp9eTQiom+0b5qPP_0u2tGqw9GcWbJVMNGeNZms8MTH8byuQ@mail.gmail.com>
+Message-ID: <ZUk388PuvlcC8F2T@google.com>
+Subject: Re: [PATCH v6 06/20] KVM: selftests: Add vcpu_set_cpuid_property() to
+ set properties
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kan Liang <kan.liang@linux.intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
+	Jinrong Liang <cloudliang@tencent.com>, Like Xu <likexu@tencent.com>, 
+	Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Paolo,
+On Sat, Nov 04, 2023, Jim Mattson wrote:
+> On Fri, Nov 3, 2023 at 5:02=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> >
+> > From: Jinrong Liang <cloudliang@tencent.com>
+> >
+> > Add vcpu_set_cpuid_property() helper function for setting properties, a=
+nd
+> > use it instead of open coding an equivalent for MAX_PHY_ADDR.  Future v=
+PMU
+> > testcases will also need to stuff various CPUID properties.
+> >
+> > Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
+> > Co-developed-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  .../testing/selftests/kvm/include/x86_64/processor.h |  4 +++-
+> >  tools/testing/selftests/kvm/lib/x86_64/processor.c   | 12 +++++++++---
+> >  .../kvm/x86_64/smaller_maxphyaddr_emulation_test.c   |  2 +-
+> >  3 files changed, 13 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/t=
+ools/testing/selftests/kvm/include/x86_64/processor.h
+> > index 25bc61dac5fb..a01931f7d954 100644
+> > --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> > +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> > @@ -994,7 +994,9 @@ static inline void vcpu_set_cpuid(struct kvm_vcpu *=
+vcpu)
+> >         vcpu_ioctl(vcpu, KVM_GET_CPUID2, vcpu->cpuid);
+> >  }
+> >
+> > -void vcpu_set_cpuid_maxphyaddr(struct kvm_vcpu *vcpu, uint8_t maxphyad=
+dr);
+> > +void vcpu_set_cpuid_property(struct kvm_vcpu *vcpu,
+> > +                            struct kvm_x86_cpu_property property,
+> > +                            uint32_t value);
+> >
+> >  void vcpu_clear_cpuid_entry(struct kvm_vcpu *vcpu, uint32_t function);
+> >  void vcpu_set_or_clear_cpuid_feature(struct kvm_vcpu *vcpu,
+> > diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools=
+/testing/selftests/kvm/lib/x86_64/processor.c
+> > index d8288374078e..9e717bc6bd6d 100644
+> > --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> > +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> > @@ -752,11 +752,17 @@ void vcpu_init_cpuid(struct kvm_vcpu *vcpu, const=
+ struct kvm_cpuid2 *cpuid)
+> >         vcpu_set_cpuid(vcpu);
+> >  }
+> >
+> > -void vcpu_set_cpuid_maxphyaddr(struct kvm_vcpu *vcpu, uint8_t maxphyad=
+dr)
+> > +void vcpu_set_cpuid_property(struct kvm_vcpu *vcpu,
+> > +                            struct kvm_x86_cpu_property property,
+> > +                            uint32_t value)
+> >  {
+> > -       struct kvm_cpuid_entry2 *entry =3D vcpu_get_cpuid_entry(vcpu, 0=
+x80000008);
+> > +       struct kvm_cpuid_entry2 *entry;
+> > +
+> > +       entry =3D __vcpu_get_cpuid_entry(vcpu, property.function, prope=
+rty.index);
+> > +
+> > +       (&entry->eax)[property.reg] &=3D ~GENMASK(property.hi_bit, prop=
+erty.lo_bit);
+> > +       (&entry->eax)[property.reg] |=3D value << (property.lo_bit);
+>=20
+> What if 'value' is too large?
+>=20
+> Perhaps:
+>          value <<=3D property.lo_bit;
+>          TEST_ASSERT(!(value & ~GENMASK(property.hi_bit,
+> property.lo_bit)), "value is too large");
 
-I'd like your feedback on whether you would merge a KVM-specific
-alternative to UserfaultFD.
+Heh, if the mask is something like bits 31:24, this would miss the case whe=
+re
+shifting value would drop bits.=20
 
-Within Google we have a feature called "KVM Demand Paging" that we
-have been using for post-copy live migration since 2014 and memory
-poisoning emulation more recently. The high-level design is:
+Rather than explicitly detecting edge cases, I think the simplest approach =
+is to
+assert that kvm_cpuid_property() reads back @value, e.g.
 
-  (a) A bitmap that tracks which GFNs are present, along with a UAPI
-to enable/disable the present bitmap.
-  (b) UAPIs for marking GFNs present and non-present.
-  (c) KVM_RUN support for returning to userspace on guest page faults
-to non-present GFNs.
-  (d) A notification mechanism and wait queue to coordinate KVM
-accesses to non-present GFNs.
-  (e) UAPI or KVM policy for collapsing SPTEs into huge pages as guest
-memory becomes present.
+	struct kvm_cpuid_entry2 *entry;
 
-The actual implementation within Google has a lot of warts that I
-won't get into... but I think we could have a pretty clean upstream
-solution.
+	entry =3D __vcpu_get_cpuid_entry(vcpu, property.function, property.index);
 
-In fact, a lot of the infrastructure needed to support this design is
-already in-flight upstream. e.g. (a) and (b) could be built on top of
-the new memory attributes (although I have concerns about the
-performance of using xarray vs. bitmaps), (c) can be built on top of
-the memory-fault exiting. The most complex piece of new code would be
-the notification mechanism for (d). Within Google we've been using a
-netlink socket, but I think we should use a custom file descriptor
-instead.
+	(&entry->eax)[property.reg] &=3D ~GENMASK(property.hi_bit, property.lo_bit=
+);
+	(&entry->eax)[property.reg] |=3D value << property.lo_bit;
 
-If we do it right, almost no architecture-specific support is needed.
-Just a small bit in the page fault path (for (c) and to account for
-the present bitmap when determining what (huge)page size to map).
+	vcpu_set_cpuid(vcpu);
 
-The most painful part of carrying KVM Demand Paging out-of-tree has
-been maintaining the hooks for (d). But this has been mostly
-self-inflicted. We started out by manually annotating all of the code
-where KVM reads/writes guest memory. But there are more core routines
-that all guest-memory accesses go through (e.g. __gfn_to_hva_many())
-where we could put a single hook, and then KVM just has to make sure
-to invalidate an gfn-to-hva/pfn caches and SPTEs when a page becomes
-non-present (which is rare and typically only happens before a vCPU
-starts running). And hooking KVM accesses to guest memory isn't
-exactly new, KVM already manually tracks all writes to keep the dirty
-log up to date.
-
-So why merge a KVM-specific alternative to UserfaultFD?
-
-Taking a step back, let's look at what UserfaultFD is actually
-providing for KVM VMs:
-
-  1. Coordination of userspace accesses to guest memory.
-  2. Coordination of KVM+guest accesses to guest memory.
-
-(1.) technically does not need kernel support. It's possible to solve
-this problem in userspace, and likely can be more efficient to solve
-it in userspace because you have more flexibility and can avoid
-bouncing through the kernel page fault handler. And it's not
-unreasonable to expect VMMs to support this. VMMs already need to
-manually intercept userspace _writes_ to guest memory to implement
-dirty tracking efficiently. It's a small step beyond that to intercept
-both reads and writes for post-copy. And VMMs are increasingly
-multi-process. UserfaultFD provides coordination within a process but
-VMMs already need to deal with coordinating across processes already.
-i.e. UserfaultFD is only solving part of the problem for (1.).
-
-The KVM-specific approach is basically to provide kernel support for
-(2) and let userspace solve (1) however it likes.
-
-But if UserfaultFD solves (1) and (2), why introduce a KVM feature
-that solves only (2)?
-
-Well, UserfaultFD has some very real downsides:
-
-  * Lack of sufficient HugeTLB Support: The most recent and glaring
-    problem is upstream's NACK of HugeTLB High Granularity Mapping [1].
-    Without HGM, UserfaultFD can only handle HugeTLB faults at huge
-    page granularity. i.e. If a VM is backed with 1GiB HugeTLB, then
-    UserfaultFD can only handle 1GiB faults. Demand-fetching 1GiB of
-    memory from a remote host during the post-copy phase of live
-    migration is untenable. Even 2MiB fetches are painful with most
-    current NICs. In effect, there is no line-of-sight on an upstream
-    solution for post-copy live migration for VMs backed with HugeTLB.
-
-  * Memory Overhead: UserfaultFD requires an extra 8 bytes per page of
-    guest memory for the userspace page table entries.
-
-  * CPU Overhead: UserfaultFD has to manipulate userspace page tables to
-    split mappings down to PAGE_SIZE, handle PAGE_SIZE'd faults, and,
-    later, collapse mappings back into huge pages. These manipulations take
-    locks like mmap_lock, page locks, and page table locks.
-
-  * Complexity: UserfaultFD-based demand paging depends on functionality
-    across multiple subsystems in the kernel including Core MM, KVM, as
-    well as the each of the memory filesystems (tmpfs, HugeTLB, and
-    eventually guest_memfd). Debugging problems requires
-    knowledge across many domains that many engineers do not have. And
-    solving problems requires getting buy-in from multiple subsystem
-    maintainers that may not all be aligned (see: HGM).
-
-All of these are addressed with a KVM-specific solution. A
-KVM-specific solution can have:
-
-  * Transparent support for any backing memory subsystem (tmpfs,
-    HugeTLB, and even guest_memfd).
-  * Only 1 bit of overhead per page of guest memory.
-  * No need to modify host page tables.
-  * All code contained within KVM.
-  * Significantly fewer LOC than UserfaultFD.
-
-Ok, that's the pitch. What are your thoughts?
-
-[1] https://lore.kernel.org/linux-mm/20230218002819.1486479-1-jthoughton@google.com/
+	/* Sanity check that @value doesn't exceed the bounds in any way. */
+	TEST_ASSERT_EQ(kvm_cpuid_property(vcpu->cpuid, property), value);
 
