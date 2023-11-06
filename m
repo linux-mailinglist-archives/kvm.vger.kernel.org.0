@@ -1,171 +1,131 @@
-Return-Path: <kvm+bounces-754-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-755-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CBAC7E2559
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 14:31:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E94117E25DF
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 14:43:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E69A1C20B09
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 13:31:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32856B21020
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 13:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E16324A06;
-	Mon,  6 Nov 2023 13:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B78725107;
+	Mon,  6 Nov 2023 13:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Tkp5vxJU"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="JI1Cnh1z"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5598A22F1B;
-	Mon,  6 Nov 2023 13:30:55 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 838D210A;
-	Mon,  6 Nov 2023 05:30:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699277453; x=1730813453;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=GcPOwqKIRcSDpD/XkGdZ5KVAeJljJ23LDoDjt600Qfg=;
-  b=Tkp5vxJUJyXrBZ2wV/laQ+hredbTr6MbNtHiMB6j8I6jylMIhHh9BmJt
-   DjKHAN/ZeHXFLI1RWWe5kdPeXU7C4fwsv5dhDJ+a1q2WxKn4XhaakZVP/
-   X8GtrTjBbryVH1/1/Bjz6R7wkgXsiR8X05WcKkRYbWZhrcfyC7u+xnPXM
-   zx/TbCqECwCSaRbytAnB5sfKcbHqgnRoLynCR9cyc0YcxoxhrSgMxfwdA
-   TZIxf9+V0zQioMRzOtTF3CFWnFBTzfsccD90L1D8RDilDvxABse8Ug6Di
-   ZTXdPEITWBSk4tp4mkEokSc7s0sBmq0J5nfLAc2ksFK7fL002AUA3szAy
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="2263458"
-X-IronPort-AV: E=Sophos;i="6.03,281,1694761200"; 
-   d="scan'208";a="2263458"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2023 05:30:53 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="755855766"
-X-IronPort-AV: E=Sophos;i="6.03,281,1694761200"; 
-   d="scan'208";a="755855766"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orsmga007.jf.intel.com with ESMTP; 06 Nov 2023 05:30:42 -0800
-Date: Mon, 6 Nov 2023 21:29:10 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
-	Anish Moorthy <amoorthy@google.com>,
-	David Matlack <dmatlack@google.com>,
-	Yu Zhang <yu.c.zhang@linux.intel.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Maciej Szmigiero <mail@maciej.szmigiero.name>,
-	David Hildenbrand <david@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
-	Liam Merwick <liam.merwick@oracle.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH v13 20/35] KVM: x86/mmu: Handle page fault for private
- memory
-Message-ID: <ZUjqJjz0Epf7ii8F@yilunxu-OptiPlex-7050>
-References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-21-seanjc@google.com>
- <ZUeSaAKRemlSRQpO@yilunxu-OptiPlex-7050>
- <CABgObfb1Wf2ptitGhJPM6VcmkCG9haMoQj2BsttjeoV=9F0O9Q@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863021A71D
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 13:43:36 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D430CBF;
+	Mon,  6 Nov 2023 05:43:34 -0800 (PST)
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6Coo77004819;
+	Mon, 6 Nov 2023 13:43:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=YZp4oLK5iXzn4ExIqPYZzqPlL5iac2fpiMqDfzauBNw=;
+ b=JI1Cnh1z60/7ibR0HLg0C1sizeHkW7P6MMfA41O44AsEOLIOGhMOo7UjkZdbbqEgm+ch
+ gA+w0VG+W6EFKEpGbN5xM2yGwqyvOarhKbozg/MHMnhEJ9OLuxEACAMszzR9b0N7j3LH
+ IuzDOwd0JFhLJ5BvTVhUxX1Dtw+TzWJpbQFbALvXYn/JNb4uekYBFD2uvIYrFNpiPjJT
+ mOsX7hEKSfAfWxjmswi3upL0UlF9k/xHmA4ZGs6GlLwx2Ftbajs5bEnkh78v1vL+1a49
+ EeCANwkynoJX3etP9e+GrnlbtrRUehFI4+bylFnlhYzgWaexFjEOIAzK5yZ/TFJ1sYsU 2A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u705rj62t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 13:43:34 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A6DC43r026866;
+	Mon, 6 Nov 2023 13:43:33 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u705rj62b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 13:43:33 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6D4vQQ016958;
+	Mon, 6 Nov 2023 13:43:33 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u6301h1bp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 13:43:32 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A6DhRSP11076212
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 6 Nov 2023 13:43:27 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F245120040;
+	Mon,  6 Nov 2023 13:43:26 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5070B20043;
+	Mon,  6 Nov 2023 13:43:26 +0000 (GMT)
+Received: from osiris (unknown [9.171.27.3])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon,  6 Nov 2023 13:43:26 +0000 (GMT)
+Date: Mon, 6 Nov 2023 14:43:24 +0100
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <dahi@linux.vnet.ibm.com>,
+        Cornelia Huck <cornelia.huck@de.ibm.com>, linux-s390@vger.kernel.org,
+        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Michael Mueller <mimu@linux.vnet.ibm.com>
+Subject: Re: [PATCH 2/4] KVM: s390: vsie: Fix length of facility list shadowed
+Message-ID: <20231106134324.12197-B-hca@linux.ibm.com>
+References: <20231103173008.630217-1-nsg@linux.ibm.com>
+ <20231103173008.630217-3-nsg@linux.ibm.com>
+ <c05841de-d1d9-406b-a143-f1e3662d99b9@redhat.com>
+ <c78b345b9b59197cad89a661095f5f3d1e0d0718.camel@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABgObfb1Wf2ptitGhJPM6VcmkCG9haMoQj2BsttjeoV=9F0O9Q@mail.gmail.com>
+In-Reply-To: <c78b345b9b59197cad89a661095f5f3d1e0d0718.camel@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: VWtgHUFx8d9AAqCwkp6KIM0A5_ZH2oUJ
+X-Proofpoint-ORIG-GUID: N8lA1Ldrmw2cU4pgGuYc8wa-U2l_4O0z
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-06_12,2023-11-02_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
+ impostorscore=0 lowpriorityscore=0 priorityscore=1501 mlxscore=0
+ spamscore=0 mlxlogscore=404 clxscore=1011 phishscore=0 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311060110
 
-On Sun, Nov 05, 2023 at 05:19:36PM +0100, Paolo Bonzini wrote:
-> On Sun, Nov 5, 2023 at 2:04 PM Xu Yilun <yilun.xu@linux.intel.com> wrote:
-> >
-> > > +static void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
-> > > +                                           struct kvm_page_fault *fault)
+On Mon, Nov 06, 2023 at 02:06:22PM +0100, Nina Schoetterl-Glausch wrote:
+> > > +unsigned int stfle_size(void)
 > > > +{
-> > > +     kvm_prepare_memory_fault_exit(vcpu, fault->gfn << PAGE_SHIFT,
-> > > +                                   PAGE_SIZE, fault->write, fault->exec,
-> > > +                                   fault->is_private);
-> > > +}
+> > > +	static unsigned int size = 0;
+> > > +	u64 dummy;
 > > > +
-> > > +static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> > > +                                struct kvm_page_fault *fault)
-> > > +{
-> > > +     int max_order, r;
-> > > +
-> > > +     if (!kvm_slot_can_be_private(fault->slot)) {
-> > > +             kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> > > +             return -EFAULT;
-> > > +     }
-> > > +
-> > > +     r = kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault->pfn,
-> > > +                          &max_order);
-> > > +     if (r) {
-> > > +             kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> > > +             return r;
-> >
-> > Why report KVM_EXIT_MEMORY_FAULT here? even with a ret != -EFAULT?
+> > > +	if (!size) {
+> > > +		size = __stfle_asm(&dummy, 1) + 1;
+> > > +	}
+
+Please get rid of the braces here. checkpatch.pl with "--strict" should
+complain too, I guess.
+
+> > Possible races? Should have to use an atomic?
 > 
-> The cases are EFAULT, EHWPOISON (which can report
-> KVM_EXIT_MEMORY_FAULT) and ENOMEM. I think it's fine
-> that even -ENOMEM can return KVM_EXIT_MEMORY_FAULT,
-> and it doesn't violate the documentation.  The docs tell you "what
-> can you do if error if EFAULT or EHWPOISON?"; they don't
-> exclude that other errnos result in KVM_EXIT_MEMORY_FAULT,
-> it's just that you're not supposed to look at it
+> Good point. Calling __stfle_asm multiple times is fine
+> and AFAIK torn reads/writes aren't possible. I don't see a way
+> for the compiler to break things either.
+> But it might indeed be nicer to use an atomic, without
+> any downsides.
 
-Thanks, it's OK for ENOMEM + KVM_EXIT_MEMORY_FAULT.
-
-Another concern is, now 3 places to report EFAULT + KVM_EXIT_MEMORY_FAULT:
-
-  if (!kvm_slot_can_be_private(fault->slot)) {
-	kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-	return -EFAULT;
-  }
-
-  file = kvm_gmem_get_file(slot);
-  if (!file)
-	return -EFAULT;
-
-  if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
-	kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-	return -EFAULT;
-  }
-
-They are different cases, and seems userspace should handle them
-differently, but not enough information to distinguish them.
-
-Thanks,
-Yilun
-
-> 
-> Paolo
-> 
-> 
+Please use WRITE_ONCE() and READ_ONCE(); that's more than sufficient here.
 
