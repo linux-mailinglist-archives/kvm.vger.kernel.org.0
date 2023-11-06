@@ -1,222 +1,141 @@
-Return-Path: <kvm+bounces-670-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-710-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 023F47E1F36
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:04:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E5EDD7E1F83
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:08:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC439281423
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:04:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0DD9281655
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:08:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B381C68A;
-	Mon,  6 Nov 2023 11:03:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2C51A5B8;
+	Mon,  6 Nov 2023 11:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TonV0kcq"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ngnx2d/3"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED75E1A5A9
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:03:50 +0000 (UTC)
-Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BF17FA
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 03:03:49 -0800 (PST)
-Received: by mail-qv1-xf30.google.com with SMTP id 6a1803df08f44-66d09b6d007so30993296d6.1
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 03:03:49 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 168D81A592
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:08:23 +0000 (UTC)
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCA9BA3
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 03:08:21 -0800 (PST)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-4081ccf69dcso31193385e9.0
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 03:08:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699268628; x=1699873428; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=linaro.org; s=google; t=1699268900; x=1699873700; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MQ8TONDIpPhmTy6Gjm0dgeV6egeVVxfnh06xkrQleLY=;
-        b=TonV0kcqKq1XY1Ybr3NXfEZUxfWiPs619VEWGjQyvxDcke1wV+eXBbxsGimGZt5nrT
-         Bh+NlZWUA+4UZzYVihMFMDzLd1uW9iuuvsDON9B3VlGmg1AsnYauXfFrxr7rc0MeLAd0
-         WbDSvbaxbi8sxaVirHWVy19hlezi6XqgnuoUxH+ofN5STYZi7InmsMWNlUt6EChdCDJ9
-         MeyNLF5DVIpi4uLkxN52z83Zasid1RCGNmI680HjJ+YK3GbnUjCSdRECrmaaWw5L+fGL
-         2RRWgINqlNPQ7BC7k1RyScqYG4RVaa6U+iitbOKUoi5UubBS571J3wl8+TIYOOHP7WhA
-         tjOw==
+        bh=P0lV2v0Wmf5sVpflPIAh1iXlsF2JSjaFEuoVMwFWbSs=;
+        b=Ngnx2d/3m8cZGHYdRchAYpFRDUTReMyqRiGsXxHhQwfSgzJlmGa1JfC0UawsHQ6jKn
+         yVQV7jhK9gYKPxxtZoiAqcdWTZBAfjBAjDuTa46cYPWGn7gK3ci/HJU4ASPNIxJqYiOD
+         TOBdyV+4VilpwU1EE42vPX4xn2ayyzEam1D6+hDe93wl5Gq79X/5N/7mlp+YX207p95/
+         lBdT4EY/tyVAxucxuAsHq9gdEIfp8YcpTB41dCE+/r2h/EgCa8try9WoKekIPb2PiB6+
+         4xoQeTFw4oiBSAYfCTA5KghUC66g0dunr8WQEvfXRfeugx9Fak9mb17WS/LiawRhdzFL
+         vWsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699268628; x=1699873428;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1699268900; x=1699873700;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MQ8TONDIpPhmTy6Gjm0dgeV6egeVVxfnh06xkrQleLY=;
-        b=ktiGUUtDkm6SMcGjyXnfdFAPM2QLK3RjUdwKtf3t08AWbsJp3BONVVOIGFmgaRa0yA
-         2gaPCXW/yIJyKoQH0wO6jP0H4KYI3KEqGE2J0PGUDYz2sWWYwCvANl5qrl1PNUWzLJlV
-         PyKDoAeKqIRXbGCbXmPrjCH4zPgVtc7XfR3cEFBu1dlt/z8Qdij18tzot1eYHo9oY4mR
-         7EmcBEvmnEYqU9tlC6Xd7ezTGP3j1CbZOc8nGUYfmm9Ny66FWG6FwV9nTG+Am/cdP+qq
-         dwlQDwP9Jjmc49oxpemQvR8VlOPmArjmBqE4mDC6iO/iOmuVsM6Rr8vG/QSldZU2DLnJ
-         md9w==
-X-Gm-Message-State: AOJu0YxLjXVDHrZiRg552Mh748/S4J2cwXyCOcvRxxLsb7AzawQvIIJN
-	RXim9XOciLILEmWd9TiVRTEvuGcdJoPN/T7gvL+YXw==
-X-Google-Smtp-Source: AGHT+IHHh4fCnCxDMnJOn7/R0pkHJKwXr6C+d2r8s0u73YKLv4MHtUig5I9yHuaqDmXCQ/Y0QVlMeO42z9uduKCvqDI=
-X-Received: by 2002:a0c:f1ca:0:b0:66d:28a5:d153 with SMTP id
- u10-20020a0cf1ca000000b0066d28a5d153mr26974988qvl.47.1699268628158; Mon, 06
- Nov 2023 03:03:48 -0800 (PST)
+        bh=P0lV2v0Wmf5sVpflPIAh1iXlsF2JSjaFEuoVMwFWbSs=;
+        b=OnAfXJzKHnTWn4cn9Ut6Ze3suoioGaTjmlPedA3ZTSK8/lgMKoT14pasdDKl5aCWso
+         S7oLSY9JHga/fXxC1Gbt3rr3Nmj2ygkPxqKjZpSy/6GE/A4zQZH71aGn9lqa8/4QY3vK
+         C1Zpqtbt8RjZKHWO0mm5kXIN8ALcL+uKaMAlT5GXnFbw01KMKAnHTHG8mCtemOUJR7sa
+         Mnk3CGaGrCO4T4iC3RAahhuQzqyTZihGBK8iKgQAYr3Zs0+U6tU8tBmB7PH0qpWfSwM+
+         EXsCWq9FuhjXxj9mfaC981KbR9D5yFOHjlCD10fNxrFf3gpoEhdpJxktIIINvxeLSUV7
+         iAqg==
+X-Gm-Message-State: AOJu0YwQsaxsZ0sNsZcYf9l20JAyLs6NBAxkPql3DjqaRP4mYNgtY9wI
+	VWYKBK/qY+HpfKBTXrN/uC/eFQ==
+X-Google-Smtp-Source: AGHT+IE5qy7fo5hvbTA76kNpTwyuY8BAliZrJmEatPyDDOojWhCYCUN5LQHLcBtUF5POiIT/JDO9Og==
+X-Received: by 2002:a05:600c:3205:b0:403:aced:f7f4 with SMTP id r5-20020a05600c320500b00403acedf7f4mr11411925wmp.12.1699268900310;
+        Mon, 06 Nov 2023 03:08:20 -0800 (PST)
+Received: from m1x-phil.lan (176-131-220-199.abo.bbox.fr. [176.131.220.199])
+        by smtp.gmail.com with ESMTPSA id j19-20020a05600c1c1300b004060f0a0fd5sm11862251wms.13.2023.11.06.03.08.18
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 06 Nov 2023 03:08:20 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org,
+	qemu-s390x@nongnu.org,
+	qemu-block@nongnu.org,
+	qemu-riscv@nongnu.org,
+	qemu-ppc@nongnu.org,
+	qemu-arm@nongnu.org,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Ani Sinha <anisinha@redhat.com>
+Subject: [PULL 41/60] hw/loader: Clean up global variable shadowing in rom_add_file()
+Date: Mon,  6 Nov 2023 12:03:13 +0100
+Message-ID: <20231106110336.358-42-philmd@linaro.org>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20231106110336.358-1-philmd@linaro.org>
+References: <20231106110336.358-1-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-24-pbonzini@redhat.com>
-In-Reply-To: <20231105163040.14904-24-pbonzini@redhat.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 6 Nov 2023 11:03:12 +0000
-Message-ID: <CA+EHjTw1RGEKD6Zv_QEtzTLLA4STTQrS4WYCY-HUdScAKXfBGg@mail.gmail.com>
-Subject: Re: [PATCH 23/34] KVM: selftests: Convert lib's mem regions to KVM_SET_USER_MEMORY_REGION2
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Sean Christopherson <seanjc@google.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sun, Nov 5, 2023 at 4:33=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->
-> From: Sean Christopherson <seanjc@google.com>
->
-> Use KVM_SET_USER_MEMORY_REGION2 throughout KVM's selftests library so tha=
-t
-> support for guest private memory can be added without needing an entirely
-> separate set of helpers.
->
-> Note, this obviously makes selftests backwards-incompatible with older KV=
-M
-> versions from this point forward.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Message-Id: <20231027182217.3615211-26-seanjc@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
+Fix:
 
-Reviewed-by: Fuad Tabba <tabba@google.com>
-Tested-by: Fuad Tabba <tabba@google.com>
+  hw/core/loader.c:1073:27: error: declaration shadows a variable in the global scope [-Werror,-Wshadow]
+                       bool option_rom, MemoryRegion *mr,
+                            ^
+  include/sysemu/sysemu.h:57:22: note: previous declaration is here
+  extern QEMUOptionRom option_rom[MAX_OPTION_ROMS];
+                       ^
 
-Cheers,
-/fuad
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Reviewed-by: Ani Sinha <anisinha@redhat.com>
+Message-Id: <20231010115048.11856-3-philmd@linaro.org>
+---
+ include/hw/loader.h | 2 +-
+ hw/core/loader.c    | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
->  .../selftests/kvm/include/kvm_util_base.h     |  2 +-
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 19 ++++++++++---------
->  2 files changed, 11 insertions(+), 10 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/=
-testing/selftests/kvm/include/kvm_util_base.h
-> index 967eaaeacd75..9f144841c2ee 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -44,7 +44,7 @@ typedef uint64_t vm_paddr_t; /* Virtual Machine (Guest)=
- physical address */
->  typedef uint64_t vm_vaddr_t; /* Virtual Machine (Guest) virtual address =
-*/
->
->  struct userspace_mem_region {
-> -       struct kvm_userspace_memory_region region;
-> +       struct kvm_userspace_memory_region2 region;
->         struct sparsebit *unused_phy_pages;
->         int fd;
->         off_t offset;
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/s=
-elftests/kvm/lib/kvm_util.c
-> index f09295d56c23..3676b37bea38 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -453,8 +453,9 @@ void kvm_vm_restart(struct kvm_vm *vmp)
->                 vm_create_irqchip(vmp);
->
->         hash_for_each(vmp->regions.slot_hash, ctr, region, slot_node) {
-> -               int ret =3D ioctl(vmp->fd, KVM_SET_USER_MEMORY_REGION, &r=
-egion->region);
-> -               TEST_ASSERT(ret =3D=3D 0, "KVM_SET_USER_MEMORY_REGION IOC=
-TL failed,\n"
-> +               int ret =3D ioctl(vmp->fd, KVM_SET_USER_MEMORY_REGION2, &=
-region->region);
-> +
-> +               TEST_ASSERT(ret =3D=3D 0, "KVM_SET_USER_MEMORY_REGION2 IO=
-CTL failed,\n"
->                             "  rc: %i errno: %i\n"
->                             "  slot: %u flags: 0x%x\n"
->                             "  guest_phys_addr: 0x%llx size: 0x%llx",
-> @@ -657,7 +658,7 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
->         }
->
->         region->region.memory_size =3D 0;
-> -       vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION, &region->region);
-> +       vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->region);
->
->         sparsebit_free(&region->unused_phy_pages);
->         ret =3D munmap(region->mmap_start, region->mmap_size);
-> @@ -1014,8 +1015,8 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
->         region->region.guest_phys_addr =3D guest_paddr;
->         region->region.memory_size =3D npages * vm->page_size;
->         region->region.userspace_addr =3D (uintptr_t) region->host_mem;
-> -       ret =3D __vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION, &region->regio=
-n);
-> -       TEST_ASSERT(ret =3D=3D 0, "KVM_SET_USER_MEMORY_REGION IOCTL faile=
-d,\n"
-> +       ret =3D __vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->regi=
-on);
-> +       TEST_ASSERT(ret =3D=3D 0, "KVM_SET_USER_MEMORY_REGION2 IOCTL fail=
-ed,\n"
->                 "  rc: %i errno: %i\n"
->                 "  slot: %u flags: 0x%x\n"
->                 "  guest_phys_addr: 0x%lx size: 0x%lx",
-> @@ -1097,9 +1098,9 @@ void vm_mem_region_set_flags(struct kvm_vm *vm, uin=
-t32_t slot, uint32_t flags)
->
->         region->region.flags =3D flags;
->
-> -       ret =3D __vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION, &region->regio=
-n);
-> +       ret =3D __vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->regi=
-on);
->
-> -       TEST_ASSERT(ret =3D=3D 0, "KVM_SET_USER_MEMORY_REGION IOCTL faile=
-d,\n"
-> +       TEST_ASSERT(ret =3D=3D 0, "KVM_SET_USER_MEMORY_REGION2 IOCTL fail=
-ed,\n"
->                 "  rc: %i errno: %i slot: %u flags: 0x%x",
->                 ret, errno, slot, flags);
->  }
-> @@ -1127,9 +1128,9 @@ void vm_mem_region_move(struct kvm_vm *vm, uint32_t=
- slot, uint64_t new_gpa)
->
->         region->region.guest_phys_addr =3D new_gpa;
->
-> -       ret =3D __vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION, &region->regio=
-n);
-> +       ret =3D __vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->regi=
-on);
->
-> -       TEST_ASSERT(!ret, "KVM_SET_USER_MEMORY_REGION failed\n"
-> +       TEST_ASSERT(!ret, "KVM_SET_USER_MEMORY_REGION2 failed\n"
->                     "ret: %i errno: %i slot: %u new_gpa: 0x%lx",
->                     ret, errno, slot, new_gpa);
->  }
-> --
-> 2.39.1
->
->
+diff --git a/include/hw/loader.h b/include/hw/loader.h
+index c4c14170ea..8685e27334 100644
+--- a/include/hw/loader.h
++++ b/include/hw/loader.h
+@@ -272,7 +272,7 @@ void pstrcpy_targphys(const char *name,
+ 
+ ssize_t rom_add_file(const char *file, const char *fw_dir,
+                      hwaddr addr, int32_t bootindex,
+-                     bool option_rom, MemoryRegion *mr, AddressSpace *as);
++                     bool has_option_rom, MemoryRegion *mr, AddressSpace *as);
+ MemoryRegion *rom_add_blob(const char *name, const void *blob, size_t len,
+                            size_t max_len, hwaddr addr,
+                            const char *fw_file_name,
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index 4dd5a71fb7..7f0cbfb214 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -1070,7 +1070,7 @@ static void *rom_set_mr(Rom *rom, Object *owner, const char *name, bool ro)
+ 
+ ssize_t rom_add_file(const char *file, const char *fw_dir,
+                      hwaddr addr, int32_t bootindex,
+-                     bool option_rom, MemoryRegion *mr,
++                     bool has_option_rom, MemoryRegion *mr,
+                      AddressSpace *as)
+ {
+     MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
+@@ -1139,7 +1139,7 @@ ssize_t rom_add_file(const char *file, const char *fw_dir,
+                  basename);
+         snprintf(devpath, sizeof(devpath), "/rom@%s", fw_file_name);
+ 
+-        if ((!option_rom || mc->option_rom_has_mr) && mc->rom_file_has_mr) {
++        if ((!has_option_rom || mc->option_rom_has_mr) && mc->rom_file_has_mr) {
+             data = rom_set_mr(rom, OBJECT(fw_cfg), devpath, true);
+         } else {
+             data = rom->data;
+-- 
+2.41.0
+
 
