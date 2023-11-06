@@ -1,68 +1,73 @@
-Return-Path: <kvm+bounces-784-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-785-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BC487E2949
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 17:01:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE02B7E295B
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 17:04:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C91D1C20C67
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:01:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B5B8B21037
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:04:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 186B228E3A;
-	Mon,  6 Nov 2023 16:01:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF9D28E3D;
+	Mon,  6 Nov 2023 16:04:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dSMTv1OX"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BDy1w+uF"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FCC27465
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 16:01:30 +0000 (UTC)
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D7C5D42
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 08:01:28 -0800 (PST)
-Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-40842752c6eso35710555e9.1
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 08:01:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699286487; x=1699891287; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VuSTMH9ud0jYjriaosHkWWyigJusFLw9itadu/Ef8us=;
-        b=dSMTv1OXjgHD38Tt46FpwUmk7jjQoc4fsf/KRV5NCScfmA90sszjlkiZhfVXGS0Hh1
-         Y/Xmn0/n70DytPkAyw/O7f26PILjQQ4hxPH8dxuKL3EWYxw+xsna3kSBEsh7dxl9Kuwo
-         yc7acnZm5mO92mTukfz52J8P5ae+HPcLZXxaOmpfWcHWfyJCRcApY5UsgKB38YuzfOxQ
-         59i2JDBUxjeh0zHQeAEYhYm1h9vowa8WP7Jlbe11F+FtccCQGwIEaK/RGFSl0sXnBkXo
-         gnbSO+/UkVM2YSCIclW/bzwWFaWsm5HcdIbDUTUjyKI24YIyvPOS4mPf/VMch64IhVS+
-         9qJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699286487; x=1699891287;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VuSTMH9ud0jYjriaosHkWWyigJusFLw9itadu/Ef8us=;
-        b=ETTJ7kwGlz1mEgjSMY4Wwf8WxftA+PUW7yhdyb9cJM/rW6hAIdS11uizCC5An3CQLc
-         h89Zb7gZbgtb93VYe25AeQ7RAbI0h3+B2nfR7oHW4D16MZeJ+9C+0fJwMZQI/Ct9PbzL
-         D8R/AXvFj2kftfqE1NUJQin5xOe0kssDyKsZNqyV+rwGwpOMQmR2OE8eCpW9T4OnGCRZ
-         cEkp+eCd70O945kZ9OzuCFXdRLEayuq+qDDn4jrP2Gs0o+cCAnEKOV6+HTl6X0cA3x+V
-         /hjKHIOTnfnIovQtSLpH+FZPd+rIyZzh2tSNqRhYHY8TW8bUo1S8oLKGYzUv9f4iWYgG
-         mhJQ==
-X-Gm-Message-State: AOJu0Ywy7mgKPjdm09cNPPbrQd5sw6tYYTBFufEovJi5bqflbNBRRvMw
-	1OASl6VEyiEZmP/bcmuJx9Uq9VD5FphL0Q==
-X-Google-Smtp-Source: AGHT+IE+3PRRsyWElc9zPvKSrIuMWGE4WXTjXvI2QsMrBJiC6CPa5U2EB5CV13HsYIol7JDB6fOz+Q==
-X-Received: by 2002:a5d:6485:0:b0:32f:a7d5:4ef with SMTP id o5-20020a5d6485000000b0032fa7d504efmr11943384wri.44.1699286486710;
-        Mon, 06 Nov 2023 08:01:26 -0800 (PST)
-Received: from [10.95.110.31] (54-240-197-231.amazon.com. [54.240.197.231])
-        by smtp.gmail.com with ESMTPSA id h3-20020a5d5043000000b0032dba85ea1bsm9838958wrt.75.2023.11.06.08.01.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Nov 2023 08:01:24 -0800 (PST)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <71dc2018-9840-458e-8ca6-3cb8ab86666d@xen.org>
-Date: Mon, 6 Nov 2023 16:01:19 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A2AF250FE
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 16:04:05 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F7A613E;
+	Mon,  6 Nov 2023 08:04:03 -0800 (PST)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6FeF2u017483;
+	Mon, 6 Nov 2023 16:04:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=MGbbZNP/mdzm3S/5Ztp69aF9Y4qswVAtQclS9ietJKA=;
+ b=BDy1w+uFOknc7t5DYyGqJGcHUTt6dv3FKCK/HR3bGpWQrSCuZ8jKax3vcPrMruTzgHmy
+ acAzgCUG97l4NIjYh9M1Bh+oErIOOL+sA96962qwVqEfEaK9vHFqZ5AfwQxn33dQXl/w
+ 0WkKJLEa0XwSPG9Io+U0x6hN5B+c+9zil1adB8w5dnDTdnu6TBd1ca/2rQuEdP5VaqLT
+ M8rgKTqAEeY/5GapWj9HtEvI6fsfThbauiDb7ttsb/j5xKoFmL8eulBokAaqEHIa3sz/
+ wu5hvlpjRYWrgdkjTxzztOt8RJA776v0cqy6L53LinzHQWIzkPwTO//en9Etyag87oXe dA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u7302rvg6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 16:04:00 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A6FeiEY020142;
+	Mon, 6 Nov 2023 16:03:53 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u7302rvax-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 16:03:53 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6FZvQk012848;
+	Mon, 6 Nov 2023 16:03:41 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u609sjpge-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 16:03:41 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A6G3e2615008032
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 6 Nov 2023 16:03:41 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D48A158063;
+	Mon,  6 Nov 2023 16:03:40 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CB9EC58053;
+	Mon,  6 Nov 2023 16:03:39 +0000 (GMT)
+Received: from [9.61.121.140] (unknown [9.61.121.140])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  6 Nov 2023 16:03:39 +0000 (GMT)
+Message-ID: <cff6c61d-71a9-4dcc-a12a-5160b67d9ae4@linux.ibm.com>
+Date: Mon, 6 Nov 2023 11:03:39 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -70,57 +75,105 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v4 13/17] hw/i386/pc: support '-nic' for xen-net-device
+Subject: Re: [PATCH] s390/vfio-ap: fix sysfs status attribute for AP queue
+ devices
 Content-Language: en-US
-To: David Woodhouse <dwmw2@infradead.org>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Eduardo Habkost <eduardo@habkost.net>, "Michael S. Tsirkin"
- <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Jason Wang <jasowang@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- qemu-block@nongnu.org, xen-devel@lists.xenproject.org, kvm@vger.kernel.org
-References: <20231106143507.1060610-1-dwmw2@infradead.org>
- <20231106143507.1060610-14-dwmw2@infradead.org>
-Organization: Xen Project
-In-Reply-To: <20231106143507.1060610-14-dwmw2@infradead.org>
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+To: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc: jjherne@linux.ibm.com, pasic@linux.ibm.com, borntraeger@linux.ibm.com,
+        frankja@linux.ibm.com, imbrenda@linux.ibm.com, david@redhat.com,
+        stable@vger.kernel.org
+References: <20231020204838.409521-1-akrowiak@linux.ibm.com>
+Organization: IBM
+In-Reply-To: <20231020204838.409521-1-akrowiak@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: dsx9XxmwV9OrZfFiJB7AK9_H2MfZQJl8
+X-Proofpoint-GUID: v-z6IauqZ0fi2RxW9WwV0zFaK3ZLHkdN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-06_12,2023-11-02_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 impostorscore=0 suspectscore=0 mlxscore=0 bulkscore=0
+ lowpriorityscore=0 adultscore=0 clxscore=1015 mlxlogscore=999 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311060129
 
-On 06/11/2023 14:35, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+PING
+This patch is pretty straight forward, does anyone see a reason why this 
+shouldn't be integrated?
+
+On 10/20/23 16:48, Tony Krowiak wrote:
+> The 'status' attribute for AP queue devices bound to the vfio_ap device
+> driver displays incorrect status when the mediated device is attached to a
+> guest, but the queue device is not passed through. In the current
+> implementation, the status displayed is 'in_use' which is not correct; it
+> should be 'assigned'. This can happen if one of the queue devices
+> associated with a given adapter is not bound to the vfio_ap device driver.
+> For example:
 > 
-> The default NIC creation seems a bit hackish to me. I don't understand
-> why each platform has to call pci_nic_init_nofail() from a point in the
-> code where it actually has a pointer to the PCI bus, and then we have
-> the special cases for things like ne2k_isa.
+> Queues listed in /sys/bus/ap/drivers/vfio_ap:
+> 14.0005
+> 14.0006
+> 14.000d
+> 16.0006
+> 16.000d
 > 
-> If qmp_device_add() can *find* the appropriate bus and instantiate
-> the device on it, why can't we just do that from generic code for
-> creating the default NICs too?
+> Queues listed in /sys/devices/vfio_ap/matrix/$UUID/matrix
+> 14.0005
+> 14.0006
+> 14.000d
+> 16.0005
+> 16.0006
+> 16.000d
 > 
-> But that isn't a yak I want to shave today. Add a xenbus field to the
-> PCMachineState so that it can make its way from pc_basic_device_init()
-> to pc_nic_init() and be handled as a special case like ne2k_isa is.
+> Queues listed in /sys/devices/vfio_ap/matrix/$UUID/guest_matrix
+> 14.0005
+> 14.0006
+> 14.000d
 > 
-> Now we can launch emulated Xen guests with '-nic user'.
+> The reason no queues for adapter 0x16 are listed in the guest_matrix is
+> because queue 16.0005 is not bound to the vfio_ap device driver, so no
+> queue associated with the adapter is passed through to the guest;
+> therefore, each queue device for adapter 0x16 should display 'assigned'
+> instead of 'in_use', because those queues are not in use by a guest, but
+> only assigned to the mediated device.
 > 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> Let's check the AP configuration for the guest to determine whether a
+> queue device is passed through before displaying a status of 'in_use'.
+> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> Fixes: f139862b92cf ("s390/vfio-ap: add status attribute to AP queue device's sysfs dir")
+> Cc: stable@vger.kernel.org
 > ---
->   hw/i386/pc.c             | 11 ++++++++---
->   hw/i386/pc_piix.c        |  2 +-
->   hw/i386/pc_q35.c         |  2 +-
->   hw/xen/xen-bus.c         |  4 +++-
->   include/hw/i386/pc.h     |  4 +++-
->   include/hw/xen/xen-bus.h |  2 +-
->   6 files changed, 17 insertions(+), 8 deletions(-)
+>   drivers/s390/crypto/vfio_ap_ops.c | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
 > 
-
-Reviewed-by: Paul Durrant <paul@xen.org>
-
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 4db538a55192..871c14a6921f 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -1976,6 +1976,7 @@ static ssize_t status_show(struct device *dev,
+>   {
+>   	ssize_t nchars = 0;
+>   	struct vfio_ap_queue *q;
+> +	unsigned long apid, apqi;
+>   	struct ap_matrix_mdev *matrix_mdev;
+>   	struct ap_device *apdev = to_ap_dev(dev);
+>   
+> @@ -1984,7 +1985,11 @@ static ssize_t status_show(struct device *dev,
+>   	matrix_mdev = vfio_ap_mdev_for_queue(q);
+>   
+>   	if (matrix_mdev) {
+> -		if (matrix_mdev->kvm)
+> +		apid = AP_QID_CARD(q->apqn);
+> +		apqi = AP_QID_QUEUE(q->apqn);
+> +		if (matrix_mdev->kvm &&
+> +		    test_bit_inv(apid, matrix_mdev->shadow_apcb.apm) &&
+> +		    test_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm))
+>   			nchars = scnprintf(buf, PAGE_SIZE, "%s\n",
+>   					   AP_QUEUE_IN_USE);
+>   		else
 
