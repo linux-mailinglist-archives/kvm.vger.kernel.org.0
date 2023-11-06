@@ -1,431 +1,145 @@
-Return-Path: <kvm+bounces-662-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-663-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEF017E1EFD
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:55:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D7497E1F14
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:00:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 155CF1F21A6A
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 10:55:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDC0D2811A7
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 839CA18055;
-	Mon,  6 Nov 2023 10:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BEA31805F;
+	Mon,  6 Nov 2023 11:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kLCasMPU"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Zh4DMfpA"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D761799E
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 10:55:10 +0000 (UTC)
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46DC3BD
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 02:55:07 -0800 (PST)
-Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-777754138bdso280487385a.1
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 02:55:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699268106; x=1699872906; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PHBvDRtRAEwaxL1lSliJcpIEY0ugq80CfKQxFJAL4q0=;
-        b=kLCasMPU31DaYByFdMZh+Xq8q1ztGZ1h3iNtcXyygXRz8HqYCqSNXqSR5G6PGQ5fKZ
-         48/ER32rJstXoif6Y0klI2h+XyDQuN5mnQM5Hr2ImA8MtOnVmZDasC2LgLs3FplvMxk+
-         3tBeBYzUDxbkoR8qNH0PkiSMI9yPjdicUKwathXKj48l2AP5g9+4WMy0Vkqmh3j5W76t
-         NSd3+t4xUq5TycRJTtU7ZMM205ztaHbO/0GMNsXbOROvUyincs1+RZrpH68ZPnlRPzFX
-         rqnnnB7mGdvqSXgUhjn+WJqA3eoP3yUfHSbTOQ4lYUJMIQdJEc8RqwKJlyCcFYE7KdnY
-         QYIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699268106; x=1699872906;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PHBvDRtRAEwaxL1lSliJcpIEY0ugq80CfKQxFJAL4q0=;
-        b=F2jviKCmZDPDVdXjA2dipraEPRoBW5Z7A9jPfSXBgHBuol0tL7CjekDtImiMfKFWWP
-         +9nGDTlPThYrKE1voJsF0Y9Erj9lox48MQapvdUHjlVmgkSzWQwFNd3PZDDVY9iXl/FP
-         p6Y+iB/HplvUgP9Shus0SYlSF9MqoWY/s0A++q/i5c38Jq3t2zpOzbnCczrIyGN3aw7R
-         UOXxkOBOBmUj6RM3FBGJV1riPuRTeD6dXlpzqs6Iym6JH01OCfUeZLUNJdMqgsmEoArW
-         nNkzHAkqVjMbjoL+LXfr2Ru3I/e46x7DLFdjWMWp7vhinPqH3LJfvJUb5BAWgqZnM7dJ
-         U7wA==
-X-Gm-Message-State: AOJu0YyznaurUWdB6JVXxCgDQ2q6gCrIaVDilowpdQT0LuoOsPaXSksg
-	lVBVJ/Tlw+mURgOrfVkCFlm0IrCDVkDANi7bWZZVug==
-X-Google-Smtp-Source: AGHT+IHQA77T0g4ukNLcN7qAXFDRTk2DUmoX/u+9pcfa/KbWWZJ9Bol7j14XEdBbYSqTk4yOjgLv7gDTy2y1jUp9r+w=
-X-Received: by 2002:ad4:5ce3:0:b0:66d:5b50:44d with SMTP id
- iv3-20020ad45ce3000000b0066d5b50044dmr43103399qvb.57.1699268106185; Mon, 06
- Nov 2023 02:55:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A341818035
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:00:30 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8287CB7;
+	Mon,  6 Nov 2023 03:00:29 -0800 (PST)
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6AFPVk009474;
+	Mon, 6 Nov 2023 11:00:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=D1iKgU8MaxGuAanmiVdwjL8M+qWemCsbQIouJx2h9no=;
+ b=Zh4DMfpAf8sU/IEX6RreKH5+teAiKdvNVAGDQjZPSYFwImhqXGDfncUy0v/ce7vIk1hr
+ VvvhZ9QYLon0jq/vlgLL9vc1OjbACiSv8pv5fAF7Kq/oF2JLemwv+vJXH5Z9P9v8vhfG
+ dL03OXBP1cW4rILzfyci5C5FkXet8T7wXtSOMngwTRkfhNpS5dbhkmF6mXeXtQDauVrI
+ pkU3FWXkl1nlGLD4hpEFxChn4zffd6TxjvO29RR5UhFWvAZF1qSWyNr82fyDS4EbSjoJ
+ B/RLWnCMfHjDCLfVnSvNfI9hVwMzzoPDpjSwMb+jmyN/hFhN3T9EQPkDWBUu/UVPXuG8 JQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u6wcnu0m4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 11:00:28 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A6AGs2e015022;
+	Mon, 6 Nov 2023 11:00:27 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u6wcnu0jg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 11:00:27 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A69doPm028237;
+	Mon, 6 Nov 2023 11:00:26 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u62gjrbj2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 11:00:26 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A6B0K4x17367604
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 6 Nov 2023 11:00:20 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 25DA92004B;
+	Mon,  6 Nov 2023 11:00:20 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7024320040;
+	Mon,  6 Nov 2023 11:00:19 +0000 (GMT)
+Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.179.20.192])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  6 Nov 2023 11:00:19 +0000 (GMT)
+Message-ID: <5cfee0930c4665481480d00bcb334b8c8c161426.camel@linux.ibm.com>
+Subject: Re: [PATCH 3/4] KVM: s390: cpu model: Use previously unused constant
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Cornelia Huck <cornelia.huck@de.ibm.com>,
+        Michael
+ Mueller <mimu@linux.vnet.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Claudio
+ Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        David Hildenbrand <dahi@linux.vnet.ibm.com>,
+        Janosch Frank
+ <frankja@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Date: Mon, 06 Nov 2023 12:00:19 +0100
+In-Reply-To: <47d18f06-13b2-4ec5-b601-eb9a2738f06b@redhat.com>
+References: <20231103173008.630217-1-nsg@linux.ibm.com>
+	 <20231103173008.630217-4-nsg@linux.ibm.com>
+	 <4c3cec3c-da81-426c-815b-afee1de68947@redhat.com>
+	 <47d18f06-13b2-4ec5-b601-eb9a2738f06b@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-19-pbonzini@redhat.com>
-In-Reply-To: <20231105163040.14904-19-pbonzini@redhat.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 6 Nov 2023 10:54:30 +0000
-Message-ID: <CA+EHjTxPuAxdRZMpGCRjKbiuPOsQqoCs5LFQV8kRPvdh0emzwA@mail.gmail.com>
-Subject: Re: [PATCH 18/34] KVM: x86/mmu: Handle page fault for private memory
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Sean Christopherson <seanjc@google.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 0Ddf0zaDIOqePaT9AAAdgOVroaXugE7k
+X-Proofpoint-ORIG-GUID: TujqQAYWG4kRhei_sFweFZhNDJRux6Q6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-06_09,2023-11-02_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ adultscore=0 lowpriorityscore=0 mlxscore=0 mlxlogscore=375 spamscore=0
+ clxscore=1015 malwarescore=0 priorityscore=1501 impostorscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311060091
 
-Hi,
-
-On Sun, Nov 5, 2023 at 4:33=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->
-> From: Chao Peng <chao.p.peng@linux.intel.com>
->
-> Add support for resolving page faults on guest private memory for VMs
-> that differentiate between "shared" and "private" memory.  For such VMs,
-> KVM_MEM_PRIVATE memslots can include both fd-based private memory and
-
-KVM_MEM_PRIVATE  -> KVM_MEM_GUEST_MEMFD
-
-Cheers,
-/fuad
-
-> hva-based shared memory, and KVM needs to map in the "correct" variant,
-> i.e. KVM needs to map the gfn shared/private as appropriate based on the
-> current state of the gfn's KVM_MEMORY_ATTRIBUTE_PRIVATE flag.
->
-> For AMD's SEV-SNP and Intel's TDX, the guest effectively gets to request
-> shared vs. private via a bit in the guest page tables, i.e. what the gues=
-t
-> wants may conflict with the current memory attributes.  To support such
-> "implicit" conversion requests, exit to user with KVM_EXIT_MEMORY_FAULT
-> to forward the request to userspace.  Add a new flag for memory faults,
-> KVM_MEMORY_EXIT_FLAG_PRIVATE, to communicate whether the guest wants to
-> map memory as shared vs. private.
->
-> Like KVM_MEMORY_ATTRIBUTE_PRIVATE, use bit 3 for flagging private memory
-> so that KVM can use bits 0-2 for capturing RWX behavior if/when userspace
-> needs such information, e.g. a likely user of KVM_EXIT_MEMORY_FAULT is to
-> exit on missing mappings when handling guest page fault VM-Exits.  In
-> that case, userspace will want to know RWX information in order to
-> correctly/precisely resolve the fault.
->
-> Note, private memory *must* be backed by guest_memfd, i.e. shared mapping=
-s
-> always come from the host userspace page tables, and private mappings
-> always come from a guest_memfd instance.
->
-> Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-> Tested-by: Fuad Tabba <tabba@google.com>
-> Message-Id: <20231027182217.3615211-21-seanjc@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  Documentation/virt/kvm/api.rst  |   8 ++-
->  arch/x86/kvm/mmu/mmu.c          | 101 ++++++++++++++++++++++++++++++--
->  arch/x86/kvm/mmu/mmu_internal.h |   1 +
->  include/linux/kvm_host.h        |   8 ++-
->  include/uapi/linux/kvm.h        |   1 +
->  5 files changed, 110 insertions(+), 9 deletions(-)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
-rst
-> index 6d681f45969e..4a9a291380ad 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6953,6 +6953,7 @@ spec refer, https://github.com/riscv/riscv-sbi-doc.
->
->                 /* KVM_EXIT_MEMORY_FAULT */
->                 struct {
-> +  #define KVM_MEMORY_EXIT_FLAG_PRIVATE (1ULL << 3)
->                         __u64 flags;
->                         __u64 gpa;
->                         __u64 size;
-> @@ -6961,8 +6962,11 @@ spec refer, https://github.com/riscv/riscv-sbi-doc=
+On Fri, 2023-11-03 at 19:41 +0100, David Hildenbrand wrote:
+> On 03.11.23 19:36, David Hildenbrand wrote:
+> > On 03.11.23 18:30, Nina Schoetterl-Glausch wrote:
+> > > No point in defining a size for the mask if we're not going to use it=
 .
->  KVM_EXIT_MEMORY_FAULT indicates the vCPU has encountered a memory fault =
-that
->  could not be resolved by KVM.  The 'gpa' and 'size' (in bytes) describe =
-the
->  guest physical address range [gpa, gpa + size) of the fault.  The 'flags=
-' field
-> -describes properties of the faulting access that are likely pertinent.
-> -Currently, no flags are defined.
-> +describes properties of the faulting access that are likely pertinent:
-> +
-> + - KVM_MEMORY_EXIT_FLAG_PRIVATE - When set, indicates the memory fault o=
-ccurred
-> +   on a private memory access.  When clear, indicates the fault occurred=
- on a
-> +   shared access.
->
->  Note!  KVM_EXIT_MEMORY_FAULT is unique among all KVM exit reasons in tha=
-t it
->  accompanies a return code of '-1', not '0'!  errno will always be set to=
- EFAULT
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index f5c6b0643645..754a5aaebee5 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3147,9 +3147,9 @@ static int host_pfn_mapping_level(struct kvm *kvm, =
-gfn_t gfn,
->         return level;
->  }
->
-> -int kvm_mmu_max_mapping_level(struct kvm *kvm,
-> -                             const struct kvm_memory_slot *slot, gfn_t g=
-fn,
-> -                             int max_level)
-> +static int __kvm_mmu_max_mapping_level(struct kvm *kvm,
-> +                                      const struct kvm_memory_slot *slot=
-,
-> +                                      gfn_t gfn, int max_level, bool is_=
-private)
->  {
->         struct kvm_lpage_info *linfo;
->         int host_level;
-> @@ -3161,6 +3161,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
->                         break;
->         }
->
-> +       if (is_private)
-> +               return max_level;
-> +
->         if (max_level =3D=3D PG_LEVEL_4K)
->                 return PG_LEVEL_4K;
->
-> @@ -3168,6 +3171,16 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
->         return min(host_level, max_level);
->  }
->
-> +int kvm_mmu_max_mapping_level(struct kvm *kvm,
-> +                             const struct kvm_memory_slot *slot, gfn_t g=
-fn,
-> +                             int max_level)
-> +{
-> +       bool is_private =3D kvm_slot_can_be_private(slot) &&
-> +                         kvm_mem_is_private(kvm, gfn);
-> +
-> +       return __kvm_mmu_max_mapping_level(kvm, slot, gfn, max_level, is_=
-private);
-> +}
-> +
->  void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_faul=
-t *fault)
->  {
->         struct kvm_memory_slot *slot =3D fault->slot;
-> @@ -3188,8 +3201,9 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu,=
- struct kvm_page_fault *fault
->          * Enforce the iTLB multihit workaround after capturing the reque=
-sted
->          * level, which will be used to do precise, accurate accounting.
->          */
-> -       fault->req_level =3D kvm_mmu_max_mapping_level(vcpu->kvm, slot,
-> -                                                    fault->gfn, fault->m=
-ax_level);
-> +       fault->req_level =3D __kvm_mmu_max_mapping_level(vcpu->kvm, slot,
-> +                                                      fault->gfn, fault-=
->max_level,
-> +                                                      fault->is_private)=
-;
->         if (fault->req_level =3D=3D PG_LEVEL_4K || fault->huge_page_disal=
-lowed)
->                 return;
->
-> @@ -4269,6 +4283,55 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vc=
-pu, struct kvm_async_pf *work)
->         kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true, NULL);
->  }
->
-> +static inline u8 kvm_max_level_for_order(int order)
-> +{
-> +       BUILD_BUG_ON(KVM_MAX_HUGEPAGE_LEVEL > PG_LEVEL_1G);
-> +
-> +       KVM_MMU_WARN_ON(order !=3D KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G) &&
-> +                       order !=3D KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M) &&
-> +                       order !=3D KVM_HPAGE_GFN_SHIFT(PG_LEVEL_4K));
-> +
-> +       if (order >=3D KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G))
-> +               return PG_LEVEL_1G;
-> +
-> +       if (order >=3D KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M))
-> +               return PG_LEVEL_2M;
-> +
-> +       return PG_LEVEL_4K;
-> +}
-> +
-> +static void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
-> +                                             struct kvm_page_fault *faul=
-t)
-> +{
-> +       kvm_prepare_memory_fault_exit(vcpu, fault->gfn << PAGE_SHIFT,
-> +                                     PAGE_SIZE, fault->write, fault->exe=
-c,
-> +                                     fault->is_private);
-> +}
-> +
-> +static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> +                                  struct kvm_page_fault *fault)
-> +{
-> +       int max_order, r;
-> +
-> +       if (!kvm_slot_can_be_private(fault->slot)) {
-> +               kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> +               return -EFAULT;
-> +       }
-> +
-> +       r =3D kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault=
-->pfn,
-> +                            &max_order);
-> +       if (r) {
-> +               kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> +               return r;
-> +       }
-> +
-> +       fault->max_level =3D min(kvm_max_level_for_order(max_order),
-> +                              fault->max_level);
-> +       fault->map_writable =3D !(fault->slot->flags & KVM_MEM_READONLY);
-> +
-> +       return RET_PF_CONTINUE;
-> +}
-> +
->  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_faul=
-t *fault)
->  {
->         struct kvm_memory_slot *slot =3D fault->slot;
-> @@ -4301,6 +4364,14 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu=
-, struct kvm_page_fault *fault
->                         return RET_PF_EMULATE;
->         }
->
-> +       if (fault->is_private !=3D kvm_mem_is_private(vcpu->kvm, fault->g=
-fn)) {
-> +               kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> +               return -EFAULT;
-> +       }
-> +
-> +       if (fault->is_private)
-> +               return kvm_faultin_pfn_private(vcpu, fault);
-> +
->         async =3D false;
->         fault->pfn =3D __gfn_to_pfn_memslot(slot, fault->gfn, false, fals=
-e, &async,
->                                           fault->write, &fault->map_writa=
-ble,
-> @@ -7188,6 +7259,26 @@ void kvm_mmu_pre_destroy_vm(struct kvm *kvm)
->  }
->
->  #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
-> +                                       struct kvm_gfn_range *range)
-> +{
-> +       /*
-> +        * Zap SPTEs even if the slot can't be mapped PRIVATE.  KVM x86 o=
-nly
-> +        * supports KVM_MEMORY_ATTRIBUTE_PRIVATE, and so it *seems* like =
-KVM
-> +        * can simply ignore such slots.  But if userspace is making memo=
-ry
-> +        * PRIVATE, then KVM must prevent the guest from accessing the me=
-mory
-> +        * as shared.  And if userspace is making memory SHARED and this =
-point
-> +        * is reached, then at least one page within the range was previo=
-usly
-> +        * PRIVATE, i.e. the slot's possible hugepage ranges are changing=
-.
-> +        * Zapping SPTEs in this case ensures KVM will reassess whether o=
-r not
-> +        * a hugepage can be used for affected ranges.
-> +        */
-> +       if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
-> +               return false;
-> +
-> +       return kvm_unmap_gfn_range(kvm, range);
-> +}
-> +
->  static bool hugepage_test_mixed(struct kvm_memory_slot *slot, gfn_t gfn,
->                                 int level)
->  {
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_inter=
-nal.h
-> index decc1f153669..86c7cb692786 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -201,6 +201,7 @@ struct kvm_page_fault {
->
->         /* Derived from mmu and global state.  */
->         const bool is_tdp;
-> +       const bool is_private;
->         const bool nx_huge_page_workaround_enabled;
->
->         /*
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index a6de526c0426..67dfd4d79529 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -2357,14 +2357,18 @@ static inline void kvm_account_pgtable_pages(void=
- *virt, int nr)
->  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
->
->  static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
-> -                                                gpa_t gpa, gpa_t size)
-> +                                                gpa_t gpa, gpa_t size,
-> +                                                bool is_write, bool is_e=
-xec,
-> +                                                bool is_private)
->  {
->         vcpu->run->exit_reason =3D KVM_EXIT_MEMORY_FAULT;
->         vcpu->run->memory_fault.gpa =3D gpa;
->         vcpu->run->memory_fault.size =3D size;
->
-> -       /* Flags are not (yet) defined or communicated to userspace. */
-> +       /* RWX flags are not (yet) defined or communicated to userspace. =
-*/
->         vcpu->run->memory_fault.flags =3D 0;
-> +       if (is_private)
-> +               vcpu->run->memory_fault.flags |=3D KVM_MEMORY_EXIT_FLAG_P=
-RIVATE;
->  }
->
->  #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 2802d10aa88c..8eb10f560c69 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -535,6 +535,7 @@ struct kvm_run {
->                 } notify;
->                 /* KVM_EXIT_MEMORY_FAULT */
->                 struct {
-> +#define KVM_MEMORY_EXIT_FLAG_PRIVATE   (1ULL << 3)
->                         __u64 flags;
->                         __u64 gpa;
->                         __u64 size;
-> --
-> 2.39.1
->
->
+> >=20
+> > I neither understand the patch description nor what the bug is that is
+> > being fixed (and how that description relates to the patch
+> > subject+description).
+> >=20
+> > Please improve the patch description.
+> >=20
+>=20
+> Should this be
+>=20
+> "
+> KVM: s390: cpu model: use proper define for facility mask size
+>=20
+> We're using S390_ARCH_FAC_LIST_SIZE_U64 instead of=20
+> S390_ARCH_FAC_MASK_SIZE_U64 to define the array size of the facility=20
+> mask. Let's properly use S390_ARCH_FAC_MASK_SIZE_U64. Note that both
+> values are the same and, therefore, this is a pure cleanup.
+> "
+>=20
+> I'm not convinced there is a bug and that this deserves a "Fixes:".
+
+Oh yeah, sorry, purely a cleanup. S390_ARCH_FAC_MASK_SIZE_U64 wasn't
+used anywhere. I also considered just getting rid of it and using one
+constant for both list and mask.
 
