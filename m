@@ -1,150 +1,118 @@
-Return-Path: <kvm+bounces-780-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-781-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C1657E28EB
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:43:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4EE07E2921
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:51:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2622C281574
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 15:43:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E2142815B7
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 15:51:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38EB228E2B;
-	Mon,  6 Nov 2023 15:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3075728E25;
+	Mon,  6 Nov 2023 15:51:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vzsyRpmA"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Pgr4DJor"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5043028E07
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 15:43:25 +0000 (UTC)
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CE83118
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 07:43:23 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a8d9dcdd2bso93832507b3.2
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 07:43:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699285403; x=1699890203; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ABS8rPoBy1ITQ62kUEvxWovIfmSWeQOAvNCpebOJLoI=;
-        b=vzsyRpmAxCH/8GChvrGqDn1yvCAI0owjxSc6wm0w6nRGowEL6uQH0k86wM3BowHnWI
-         YO+R/Q2MeQV7zL2YvlMRp+22CKQJHYviHQJiz0i65xCl7cDkcN92Hc+gP14ppMymRD2H
-         aNKuUvrMcOB0Y4b701bftPjfVwD1nBdpNRCXnjvIWg7qEQYr6bnVR10Wr9ZRLz5WKfcL
-         qITuyIHcTB0+pH6vcpcz51cGsP3HxdLI6QiqVZ5anzF+GCPejnwTJ6NV8yQuDbkP8EAc
-         /QZSYZnij1meUOSvTcHCycSqLXFAA8JQQ7ufFnyiSnwYFLNV/kl6P7zkJFOHvY7xbPv8
-         Os3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699285403; x=1699890203;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ABS8rPoBy1ITQ62kUEvxWovIfmSWeQOAvNCpebOJLoI=;
-        b=eOmTKJIJZ+56bfNUW0mQR41B6aQmosZURorKkMOWrNnV4dpUiAVWfsRRcuRCJsW5c9
-         PKvXsfpdDvLc/Rni/tGbaKp6e5oXDZHi7HbbfnZQEfYfjBoXcsP0DvcYgygqJOQ9aN29
-         lUi+TlGfjCJTtPFDyaosbsUBvTDDEeEdhYsHswNVhtrJD3rpeOM6FCtbbpaB3VwbCDmU
-         6ISikPtyFfzcX0aSx9yU55V9vVHkp7cCtVCAjN2durjHW+VuMmZg1XxSVlb7tMh+Qwu8
-         8ZN2Yk02BZVUAxv3aYThCgJIuw1dQdyCjS8O/AyM8vVS1aRYUFTrXjs65vzUi7MJe4Ma
-         3Yrw==
-X-Gm-Message-State: AOJu0Yz3p3L7ylBILuASg2s71rq03yMfpSK1yDpIUDrojlIJCud0M8XO
-	mvoeH6TSoY1H/fPdCJltcQV4TlGiuBc=
-X-Google-Smtp-Source: AGHT+IFZU6oilNAmMp5GLulg+dwoZ1zspXQbywwTDejvG8kP1K7yDCwH0QkLRrw/RyNVPmFev9uMuH6PQSU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ce94:0:b0:da0:3bea:cdc7 with SMTP id
- x142-20020a25ce94000000b00da03beacdc7mr527390ybe.2.1699285402751; Mon, 06 Nov
- 2023 07:43:22 -0800 (PST)
-Date: Mon, 6 Nov 2023 07:43:07 -0800
-In-Reply-To: <ZUYcb6no9ADYytrx@yilunxu-OptiPlex-7050>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC5E1EB22
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 15:51:32 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9B9410CC;
+	Mon,  6 Nov 2023 07:51:30 -0800 (PST)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6Fex1h028635;
+	Mon, 6 Nov 2023 15:51:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : cc :
+ subject : from : to : message-id : date; s=pp1;
+ bh=gmk6cqmM4Eayik0Z0A8soydrg46f++E8kacPrAmqEX0=;
+ b=Pgr4DJorXgnBci6lw04v56GGX/r0rC8s3XTzOApRGbC0Nz6Q/NuCeb/I7FcqP7VKggqS
+ WqIibl9hEHMnBPlraurPP6VGzU+nmy4jJJkdTYuj5qGLKA+ftPwGcmhLkz6lN+FA9xog
+ j1ideJ7OiixDiPansfs2jKESFcXNkie57aiaQaP4GTHJBMeVRxoLtPW1xTogISqg88hQ
+ ehjM6ityY9lPVs/Qge7rUQDmY0k1VCXTKQx15Z5OVcYduLHSMTCyDfLvuX/EPnk57ZsS
+ tUVyJxVK2at0Ym7sreanC9S8Ae9TfwDOeJ7HCF66oR7ircquC2ggGlJDpEMZnCew0KWs zA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u71sgjyv2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 15:51:29 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A6FfNXo032354;
+	Mon, 6 Nov 2023 15:51:29 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u71sgjymq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 15:51:29 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6FOpv7017004;
+	Mon, 6 Nov 2023 15:51:09 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u6301ht3k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Nov 2023 15:51:08 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A6Fp6wK43123286
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 6 Nov 2023 15:51:06 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2571C2004B;
+	Mon,  6 Nov 2023 15:51:06 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 038BC20049;
+	Mon,  6 Nov 2023 15:51:06 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.68.179])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  6 Nov 2023 15:51:05 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-17-seanjc@google.com>
- <ZUYcb6no9ADYytrx@yilunxu-OptiPlex-7050>
-Message-ID: <ZUkJiwp8VHY0ICab@google.com>
-Subject: Re: [PATCH v13 16/35] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-From: Sean Christopherson <seanjc@google.com>
-To: Xu Yilun <yilun.xu@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>, 
-	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
-	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <f774a230-26b4-4742-8557-f504aa9344be@linux.ibm.com>
+References: <20231103092954.238491-1-nrb@linux.ibm.com> <20231103092954.238491-8-nrb@linux.ibm.com> <f774a230-26b4-4742-8557-f504aa9344be@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v7 7/8] s390x: add a test for SIE without MSO/MSL
+From: Nico Boehr <nrb@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>, imbrenda@linux.ibm.com,
+        thuth@redhat.com
+Message-ID: <169928586562.23816.12377210934787398767@t14-nrb>
+User-Agent: alot/0.8.1
+Date: Mon, 06 Nov 2023 16:51:05 +0100
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: deOxPGM1Dt9whNGrRgTU0B4m34izI_h5
+X-Proofpoint-GUID: EyFXksrZc-JSb29BWeZPZyvLS8ccOdNK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-06_12,2023-11-02_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ lowpriorityscore=0 clxscore=1015 malwarescore=0 spamscore=0
+ mlxlogscore=999 suspectscore=0 priorityscore=1501 adultscore=0 bulkscore=0
+ impostorscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311060128
 
-On Sat, Nov 04, 2023, Xu Yilun wrote:
-> > +KVM_SET_USER_MEMORY_REGION2 is an extension to KVM_SET_USER_MEMORY_REGION that
-> > +allows mapping guest_memfd memory into a guest.  All fields shared with
-> > +KVM_SET_USER_MEMORY_REGION identically.  Userspace can set KVM_MEM_PRIVATE in
-> > +flags to have KVM bind the memory region to a given guest_memfd range of
-> > +[guest_memfd_offset, guest_memfd_offset + memory_size].  The target guest_memfd
->                                                         ^
-> The range end should be exclusive, is it?
-
-Yes, that should be a ')', not a ']'.
-
-> > +static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+Quoting Janosch Frank (2023-11-03 15:16:36)
+[...]
+> > +static void setup_guest(void)
 > > +{
-> > +	const char *anon_name = "[kvm-gmem]";
-> > +	struct kvm_gmem *gmem;
-> > +	struct inode *inode;
-> > +	struct file *file;
-> > +	int fd, err;
+> > +     extern const char SNIPPET_NAME_START(c, sie_dat)[];
+> > +     extern const char SNIPPET_NAME_END(c, sie_dat)[];
+> > +     uint64_t guest_max_addr;
 > > +
-> > +	fd = get_unused_fd_flags(0);
-> > +	if (fd < 0)
-> > +		return fd;
+> > +     setup_vm();
+> > +     snippet_setup_guest(&vm, false);
 > > +
-> > +	gmem = kzalloc(sizeof(*gmem), GFP_KERNEL);
-> > +	if (!gmem) {
-> > +		err = -ENOMEM;
-> > +		goto err_fd;
-> > +	}
+> > +     /* allocate a region-1 table */
+> > +     guest_root =3D pgd_alloc_one();
 > > +
-> > +	/*
-> > +	 * Use the so called "secure" variant, which creates a unique inode
-> > +	 * instead of reusing a single inode.  Each guest_memfd instance needs
-> > +	 * its own inode to track the size, flags, etc.
-> > +	 */
-> > +	file = anon_inode_getfile_secure(anon_name, &kvm_gmem_fops, gmem,
-> > +					 O_RDWR, NULL);
-> > +	if (IS_ERR(file)) {
-> > +		err = PTR_ERR(file);
-> > +		goto err_gmem;
-> > +	}
-> > +
-> > +	file->f_flags |= O_LARGEFILE;
-> > +
-> > +	inode = file->f_inode;
-> > +	WARN_ON(file->f_mapping != inode->i_mapping);
-> 
-> Just curious, why should we check the mapping fields which is garanteed in
-> other subsystem?
+> > +     /* map guest memory 1:1 */
+>=20
+> 0:guest_max_addr
 
-Mostly to document the behavior.  The vast majority of folks that read this code
-will be KVM developers, not file systems developers, and will likely have no clue
-about the relationship between f_mapping and i_mapping.  And in the extremely
-unlikely scenario that anon_inode_getfile_secure() no longer sets f_mapping, a
-WARN detects the issue whereas a comment does not.
+Sorry, I don't get what you mean.
 
