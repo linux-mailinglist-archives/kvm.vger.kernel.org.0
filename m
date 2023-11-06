@@ -1,222 +1,477 @@
-Return-Path: <kvm+bounces-737-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-738-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D4D67E2079
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:54:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2A1A7E2089
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:55:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3D78B20C99
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:54:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B780B20DC5
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5A71A707;
-	Mon,  6 Nov 2023 11:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189C91A739;
+	Mon,  6 Nov 2023 11:55:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="BwOV+M05"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jA7a9Q5u"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1E31A5A4
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:53:58 +0000 (UTC)
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2068.outbound.protection.outlook.com [40.107.92.68])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD79E100;
-	Mon,  6 Nov 2023 03:53:56 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h2DB7n5x+eUONN7aLOjigijXIXnGyK0oz4hmK3xZLJneH4SPH0BJz53u2ksuinnv54IgtYxHdyKtxXr5rPWLh0msfKTtLyarj3W91M9pch1XBm75CeyEn2908CaqnRm1IOIsCCvB2nLWF/kcfL9cGgENtIoF3tRv5q5/RYh5Qzl9V27v9DRMmzFf8LVTKJF1cSVjX01GXhCBkDQNQ2zLVApmzmxnWv8+jUN4AT+75KkbHlEaT/EXGlSfHA7YQds0vUjeI399y7zBJDpE+owybnE4tydCNa55bkafzgpoQrUJavoJZyYB+pedCXX7Pp/snlOVzI7zV0MCLhuG1GWWjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CC803RG7GJFm+5UI+HZBOokAL8RnDCQfaPt9NLNt7Ls=;
- b=eUI+ie8Q9dSVRZPmyJisCTxfEbb+t6l1BEW8mbneGhpeaTcnkGPk1phE+6PvVbf8q+Xi+iw0iLdoPaDmMSBQbud1l3JZwzKdGJBaddrWk5CHsvI8c/t2NjMix1GQvAYUdnCA8SkzvWbHEaUmbavkLqtFQh6gyRX4k0SAhPzunyVhwVAocCR0TrrosBXTkG1MhLSGlz1GRLN08yFCsIbLEIbM6bEBGOjIYIMS6DTuB5tykM9H/jI0sJQMLSDXWKJiq46Iu0bBCgQN+mwpAFePWKCnRXBwLSneKwZihRTQDZIYpazabK91b1Si9gpyfwyw4aoi5IkpU/nfdMnmX1YtIw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CC803RG7GJFm+5UI+HZBOokAL8RnDCQfaPt9NLNt7Ls=;
- b=BwOV+M0535ziqOe2bMbSQThoqQj4GyFIRjGPKmLydV9o1j7CNZF4tzcnTW5LSYE61ZTw4yJjisquEsNovb7+iaU+uYRNYaaYcKPh2Qvu9LpOQ6dAf9fKtIsUEmZut/YemXiH/dZftrXtk4k9glnaUh7gTO2grn1ks/wHgRsQWdc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
- CH0PR12MB5283.namprd12.prod.outlook.com (2603:10b6:610:d6::12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6954.28; Mon, 6 Nov 2023 11:53:54 +0000
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::93cc:c27:4af6:b78c]) by DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::93cc:c27:4af6:b78c%2]) with mapi id 15.20.6954.028; Mon, 6 Nov 2023
- 11:53:54 +0000
-Message-ID: <b56a1eb7-4e31-4806-9f5e-31efe7212e04@amd.com>
-Date: Mon, 6 Nov 2023 17:23:44 +0530
-User-Agent: Mozilla Thunderbird
-Reply-To: nikunj@amd.com
-Subject: Re: [PATCH v5 13/14] x86/tsc: Mark Secure TSC as reliable clocksource
-Content-Language: en-US
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
- seanjc@google.com, pbonzini@redhat.com
-Cc: Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
- thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org, bp@alien8.de,
- mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
- dionnaglaze@google.com, pgonda@google.com
-References: <20231030063652.68675-1-nikunj@amd.com>
- <20231030063652.68675-14-nikunj@amd.com>
- <57d63309-51cd-4138-889d-43fbdf5ec790@intel.com>
- <ae267e31-5722-4784-9146-28bb13ca7cf5@amd.com>
- <20231102103306.v7ydmrobd5ibs4yn@box.shutemov.name>
- <5d8040b2-c761-4cea-a2ec-39319603e94a@amd.com>
- <cf92b26e-d940-4dc8-a339-56903952cee2@amd.com>
- <20231102123851.jsdolkfz7sd3jys7@box>
-From: "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <20231102123851.jsdolkfz7sd3jys7@box>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN2PR01CA0044.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:22::19) To DS7PR12MB6309.namprd12.prod.outlook.com
- (2603:10b6:8:96::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF641A5A4
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:55:22 +0000 (UTC)
+Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04543125
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 03:55:19 -0800 (PST)
+Received: by mail-qv1-xf30.google.com with SMTP id 6a1803df08f44-6705379b835so28849876d6.1
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 03:55:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699271718; x=1699876518; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c8NELU8K0U+724gQqgT5wy1Wri3ftccwsyaGDd96txU=;
+        b=jA7a9Q5u3tTa1uK+1x+C7dQVcnvnVJCLDCx9vVeyIoTZ6qw54qwmdGSo/CNWcdGrT2
+         q2szNqZW2ag86DEgyroZQDG7h123QypnstzbmS42QahAynLFUEqo9GQJaNoHaidGG8am
+         c1/3X85PwjNO2HEEuCskg0eeo5XOA9okoYedeZWY1U+tA4q7Bd53Sz2SwpjVWqJlne4S
+         VItwsHz8bMlhwejLoG+d41aA5kYtMNwr6owvMfONdpxrptuq3+eO4bSO87krtyKkZAW0
+         btZEd+teTJXkYtJuPVCX1o83AQ8FIKAGoXh5UZ/VVsaMR4LgIArF4S/wFP0+QObZt4iJ
+         hHHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699271718; x=1699876518;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=c8NELU8K0U+724gQqgT5wy1Wri3ftccwsyaGDd96txU=;
+        b=EVKVL5G+n6iA7z/5LR+tJcHWYyzuXcHnWwaztxO3slgVWkWOoj89bSTfm6k/K1fF3R
+         IW2E0tSiskgOwcMwl+pIfOHuSnVoG0iPYh2tAnAaqwzz1bGpadABWL49rUpzC7jcnOs6
+         R0poYo+mnWVBZ0Q0sbMhPMfGon95dutSctScVnW1gMDEtN9O1pRGM1kT+SwCRXxWH+hP
+         oFzBM/HPTOJpwKavuG714Q5aV0VCX2g6JVhtKEaWIcNhKBatqVhaKOuZHzCX5O2wfSd8
+         LV9oYH4cNZ8QUwyyQw/nHknHSMziD4qRNJXp2tp1rDRleB1XoC6R2eCuOZFq1ug7tDhC
+         j8LA==
+X-Gm-Message-State: AOJu0YxJw/j9SWm3qT+CiI1NB9ViCt1rW9xHWnUJfU5zJQ19s723sb7g
+	pZYk1VQeHP7ZoS352dn2GAqngrHmE3LdZfAOxPkGRw==
+X-Google-Smtp-Source: AGHT+IHpVKDogqYQTihitTUe1P1EC0BoRtrFXM2LqQxju0Y16TTjwSfxvbJ6Op1XhFBMPQO2JF14bitC65EzLdgz9hY=
+X-Received: by 2002:ad4:574b:0:b0:66d:775:d1af with SMTP id
+ q11-20020ad4574b000000b0066d0775d1afmr35284081qvx.59.1699271717922; Mon, 06
+ Nov 2023 03:55:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|CH0PR12MB5283:EE_
-X-MS-Office365-Filtering-Correlation-Id: d576e8f2-9b19-4d59-3da8-08dbdebf0ccf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	2/WWbyEE7V0gl/JXvqZdIsaLc6NtYDzq9BWTSQeh1X8P91ue4y1lo1MRuhgtUyKtbWI0AVkAYqqgsKviCEHA3Cjbs5zzh9CTPN9cWTaJ83f+MMwu9h9ntMEw2gzlCuhI5cYY01fZGsutsgsgx2TgDpgzdK5bOmXso70KgAJfuPnDQYF/EqLS7z0BdqY83pXhSyQSUx7vKuCGzRnRAffxjG7eQJMKlTSNvGYR+3F8jXr3IANqeBiDOYrIgpFHW0QSlOy/Y2FP0YHMPBdxezkgGVl6b3jKdD1qKBsMKBqb/PG8pueUyQWf5+sU2iWww8tDbBF1wDEDipiq8r13a4d2daG9cM99S1ZnxOr4m7N4JzuduKM5yBcSW2AFQXQgt8hJhLy0Yv05F64KUUuEfxhLRKV2PwDwu+SKPQ6xp+DXSsHQWbRfOttKO1npPqwat+gVWhQF3yerOeAWO6zvgsXXGeSnyVF2StuKWwd7ylqxk+HdCRJVa+NvM3ScNnTWXin7CbwG6q0Ffw19EXh+cKO3IDksu2AZyDorw9xQ6VOQvFdQNQ27Iq3EUQtcWGgcAirpBDdk9bjml2ORRg0BuWhTKKMYr8vo0m0eVKoY4hNTJv2HEZ2VZk9TMQOmrX7Q1CU5zmGTroFtTzFGDhIwZkCktg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(366004)(136003)(376002)(396003)(230922051799003)(186009)(1800799009)(64100799003)(451199024)(83380400001)(316002)(38100700002)(6666004)(6506007)(6486002)(478600001)(2616005)(66556008)(66476007)(6512007)(26005)(66946007)(7416002)(5660300002)(53546011)(2906002)(3450700001)(4326008)(36756003)(31696002)(8676002)(8936002)(41300700001)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MVlvdk9WaWlUcXg0SUpxNWhTUU5vKytTaVl3UE5sRlRyQmhxdlpyU1FoMnpm?=
- =?utf-8?B?TGZrK3FlZit5anVqQXB3b3dUVUtmNlRFZVBkbC95MS9sNFR1ZWhiM3RXSjc1?=
- =?utf-8?B?R0tWZFdJcy9wSXplejJoY1JPWlVCTmJNenVBeXFqWjEzeXphVVpBSjBqVFdW?=
- =?utf-8?B?ZnhHUHpvK3E4aFRXNklnN1d2WVowVkdJMkZVazNMSkNmYWdSajk5a1RkRGVu?=
- =?utf-8?B?ZkJTWkUyTWVWSXEvQllhQ3dkSXROTHlHdTZsNWtjK1NNZXB3SnRqU3p5ZVlR?=
- =?utf-8?B?emRSL1E2K05ZdWdhNzc0RlM3S1E0V0ZvakY5Tzc0Y2pUQU1EaGxwa2NnUytL?=
- =?utf-8?B?QXdpQU9UNmZFQ004Z0UycThXOW1sT0NXOWMyNkR2OFhBNTVUZWcvS2NzZ3BU?=
- =?utf-8?B?cUtrQ1hvdFF3ZnN2Vk95dGs5SlVsSi8zbDZ3ZU5TL1NYREhSNitqVHJhZ1Vu?=
- =?utf-8?B?VVRGWStzYnUvUlVDZkFlMXJoeng0aWE2VEhxSnFLY1I2MVRmNVAxcmh1Qjlx?=
- =?utf-8?B?Y0xpOEhIZW1naXl5aG82bDZYTmVtS3g2OU14b0lDckMwQnh3WExDWHJSYkNX?=
- =?utf-8?B?dlU2anFVeHA0YkNHYk45SER3WGo3dElsN3ZLcThmZTU4THJIQjBTY1lFUXYx?=
- =?utf-8?B?dHhPbU1jK0lOTVFlaG13anF4MzNFdU5SWElpcTNnSkw4dE9FSDNRdzVtNkFQ?=
- =?utf-8?B?MWUvYjU1RktyNjB2c0k1RGJ6Rkk2WXNHUUEwNnhiZEdyTmRSSlI3WkdrVExx?=
- =?utf-8?B?OU9OQkhDRGU4eHlIRUxETXBGNXdNNHUxSXlsbkp0M3NKT1RnS1FET3hzeXM3?=
- =?utf-8?B?OWs5MFlDbm1zbC9BYmNyWWtzWmtmeStqTVhIb3V0azAvMGRLenY0T3ZtMFRI?=
- =?utf-8?B?ZzE0ZUFFRndUWFdqUUtJV3VLM0E3b0V4SU9ZU1pRbFJ1NXlTYWtSRzdlVDRv?=
- =?utf-8?B?aFR4SHZqUHZjSENvUlFYRU5FZzdhUTF6T3R0dG5YRlJ4eXpRSnlJNCtzeVB5?=
- =?utf-8?B?K2ZwS3cxSXdRUzYzOXc5MXB3K2dPajBoZkRnS21PNzdzWVpna0RFYzZuc3lo?=
- =?utf-8?B?OVdhK2E1cWRpYU1JNUdDRWY5OTEvdXYxNnVFUktKR2lZcndJUWRCUElGTHZ0?=
- =?utf-8?B?VGFCWHdEVnNVM3FCbmMvdlVURzhWTGFMLy9TSVFCbFhvWmYzYSthdmhEQndR?=
- =?utf-8?B?cW9VQkh3VHVjeDMyQkNEUDdSMnhia0F0Wllkb25oYVJENEFCbHR1NHFKOGsw?=
- =?utf-8?B?WEtkTGYxcDUvMmlScVFuUnk2SVQzSXJxdkFkdXRzaTBlM3ZhbWVNQkxTL0hi?=
- =?utf-8?B?M29icWowd2lScXFDOG55NUhDVHdzdkpha2pDd05nT094MlR6RGV6ZnEvaHRH?=
- =?utf-8?B?cU14M3JXbVpBQjVCd1ZPZTF2cTI5L3FlMnlZUVo4OEhRdjU4THI1U2V6RUtC?=
- =?utf-8?B?Z016N3pYTVdhYW0xZVdYaG1lY1BiNjU2bWtTQkJGRGJ3Z3hXV3NGZjdEenlI?=
- =?utf-8?B?OEFhR1p4WVRUcUlXcGIxOVVoTTlMT2tnZ0VpdlU3L1lrQVE2M2h5K3NRdmVD?=
- =?utf-8?B?aFZWbVhrUWdhNG5MbERXeFZYVHZVazRLOHFVRmUzZTduTGhiMWp3RHdOZGQ2?=
- =?utf-8?B?aXd5ZVBEb3Z5K0hacXFCempkbWdXSVZnQkRFeGpaUXZ2MksxZ21RdW53YnVU?=
- =?utf-8?B?ZDFza0c1d0JlZ3J4OXZJajlpSTVDVmNDYTlKcWNNV1NkWFVkWklXSGxKZmQz?=
- =?utf-8?B?TG03OE5iZk56UUpGenZ4L0xaMDR0bklJZzBjQzJMYlY1MkYrbVUyaUhPc2tx?=
- =?utf-8?B?Y3hUdmUzUFZMOGZDYyszU2UxWUNHYmhmMlVERjZYaHl4QWZKbzdCMFpPTUJ0?=
- =?utf-8?B?dCs2RStGYWpKMVdPSVBoZzFVNTY4SGhtNDE4UzhFMWtTeEJhRTNQMjh1K1VV?=
- =?utf-8?B?b2QrV3Y5dXVOOGh6SFVaaHB4U0JVNkl6SXdKQVllb29rZE9NRmpCc01KWUVJ?=
- =?utf-8?B?NWdsTFAzd0twY0ZjTGE3T3BCRDZ1UFBDcWR3MHc0a2VnSVVzSDcxaXExWlZX?=
- =?utf-8?B?OFlhWEZMS2xYVEpvVmk4enZtb0VZU3pqNnBQQ1lUVTFqanhnUmlzQjR1Rytq?=
- =?utf-8?Q?x7tFvrSnoyLBYoJ9igaOmDk89?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d576e8f2-9b19-4d59-3da8-08dbdebf0ccf
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2023 11:53:54.1533
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: S3Wu/f6v+nlA6qL27o+ow8oxt6C/otuPAp0TY/QTdEyd7HmjECV0l4lYX03b1dcRyWg6W8WouAsVAZc2gaP9rw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5283
+References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-28-pbonzini@redhat.com>
+In-Reply-To: <20231105163040.14904-28-pbonzini@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 6 Nov 2023 11:54:42 +0000
+Message-ID: <CA+EHjTxz-e_JKYTtEjjYJTXmpvizRXe8EUbhY2E7bwFjkkHVFw@mail.gmail.com>
+Subject: Re: [PATCH 27/34] KVM: selftests: Introduce VM "shape" to allow tests
+ to specify the VM type
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Sean Christopherson <seanjc@google.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/2/2023 6:08 PM, Kirill A. Shutemov wrote:
-> On Thu, Nov 02, 2023 at 05:46:26PM +0530, Nikunj A. Dadhania wrote:
->> On 11/2/2023 5:37 PM, Nikunj A. Dadhania wrote:
->>> On 11/2/2023 4:03 PM, Kirill A. Shutemov wrote:
->>>> On Thu, Nov 02, 2023 at 11:23:34AM +0530, Nikunj A. Dadhania wrote:
->>>>> On 10/30/2023 10:48 PM, Dave Hansen wrote:
->>>>>> On 10/29/23 23:36, Nikunj A Dadhania wrote:
->>>>>> ...
->>>>>>> diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
->>>>>>> index 15f97c0abc9d..b0a8546d3703 100644
->>>>>>> --- a/arch/x86/kernel/tsc.c
->>>>>>> +++ b/arch/x86/kernel/tsc.c
->>>>>>> @@ -1241,7 +1241,7 @@ static void __init check_system_tsc_reliable(void)
->>>>>>>  			tsc_clocksource_reliable = 1;
->>>>>>>  	}
->>>>>>>  #endif
->>>>>>> -	if (boot_cpu_has(X86_FEATURE_TSC_RELIABLE))
->>>>>>> +	if (boot_cpu_has(X86_FEATURE_TSC_RELIABLE) || cc_platform_has(CC_ATTR_GUEST_SECURE_TSC))
->>>>>>>  		tsc_clocksource_reliable = 1;
->>>>>>
->>>>>> Why can't you just set X86_FEATURE_TSC_RELIABLE?
->>>>>
->>>>> Last time when I tried, I had removed my kvmclock changes and I had set
->>>>> the X86_FEATURE_TSC_RELIABLE similar to Kirill's patch[1], this did not
->>>>> select the SecureTSC.
->>>>>
->>>>> Let me try setting X86_FEATURE_TSC_RELIABLE and retaining my patch for
->>>>> skipping kvmclock.
->>>>
->>>> kvmclock lowers its rating if TSC is good enough:
->>>>
->>>> 	if (boot_cpu_has(X86_FEATURE_CONSTANT_TSC) &&
->>>> 	    boot_cpu_has(X86_FEATURE_NONSTOP_TSC) &&
->>>> 	    !check_tsc_unstable())
->>>> 		kvm_clock.rating = 299;
->>>>
->>>> Does your TSC meet the requirements?
->>>
->>> I have set TscInvariant (bit 8) in CPUID_8000_0007_edx and TSC is set as reliable.
->>>
->>> With this I see kvm_clock rating being lowered, but kvm-clock is still being picked as clock-source.
->>
->> Ah.. at later point TSC is picked up, is this expected ?
->>
->> [    2.564052] clocksource: Switched to clocksource kvm-clock
->> [    2.678136] clocksource: Switched to clocksource tsc
-> 
-> On bare metal I see switch from tsc-early to tsc. tsc-early rating is
-> equal to kvmclock rating after it gets lowered.
+On Sun, Nov 5, 2023 at 4:34=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>
+> From: Sean Christopherson <seanjc@google.com>
+>
+> Add a "vm_shape" structure to encapsulate the selftests-defined "mode",
+> along with the KVM-defined "type" for use when creating a new VM.  "mode"
+> tracks physical and virtual address properties, as well as the preferred
+> backing memory type, while "type" corresponds to the VM type.
+>
+> Taking the VM type will allow adding tests for KVM_CREATE_GUEST_MEMFD,
+> a.k.a. guest private memory, without needing an entirely separate set of
+> helpers.  Guest private memory is effectively usable only by confidential
+> VM types, and it's expected that x86 will double down and require unique
+> VM types for TDX and SNP guests.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Message-Id: <20231027182217.3615211-30-seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
 
-For SNP guest with secure tsc enabled, kvm-clock and tsc-early both are at 299.
-Initially, kvm-clock is selected as clocksource and when tsc with 300 rating is enqueued, 
-clocksource then switches to tsc.
+nit: as in a prior selftest commit messages, references in the commit
+message to guest _private_ memory. Should these be changed to just
+guest memory?
 
-[    0.004231] clocksource: clocksource_enqueue: name kvm-clock rating 299
-[...]
-[    2.046319] clocksource: clocksource_enqueue: name tsc-early rating 299
-[...]
-[    3.399179] clocksource: Switched to clocksource kvm-clock
-[...]
-[    3.513652] clocksource: clocksource_enqueue: name tsc rating 300
-[    3.517314] clocksource: Switched to clocksource tsc
- 
-> Maybe kvmclock rating has to be even lower after detecting sane TSC?
+Reviewed-by: Fuad Tabba <tabba@google.com>
+Tested-by: Fuad Tabba <tabba@google.com>
 
-If I set kvmclock rating to 298, I do see exact behavior as you have seen on the bare-metal.
+Cheers,
+/fuad
 
-[    0.004520] clocksource: clocksource_enqueue: name kvm-clock rating 298
-[...]
-[    1.827422] clocksource: clocksource_enqueue: name tsc-early rating 299
-[...]
-[    3.485059] clocksource: Switched to clocksource tsc-early
-[...]
-[    3.623625] clocksource: clocksource_enqueue: name tsc rating 300
-[    3.628954] clocksource: Switched to clocksource tsc
-
-Regards
-Nikunj
-
+>  tools/testing/selftests/kvm/dirty_log_test.c  |  2 +-
+>  .../selftests/kvm/include/kvm_util_base.h     | 54 +++++++++++++++----
+>  .../selftests/kvm/kvm_page_table_test.c       |  2 +-
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 43 +++++++--------
+>  tools/testing/selftests/kvm/lib/memstress.c   |  3 +-
+>  .../kvm/x86_64/ucna_injection_test.c          |  2 +-
+>  6 files changed, 72 insertions(+), 34 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing=
+/selftests/kvm/dirty_log_test.c
+> index 936f3a8d1b83..6cbecf499767 100644
+> --- a/tools/testing/selftests/kvm/dirty_log_test.c
+> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
+> @@ -699,7 +699,7 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mo=
+de, struct kvm_vcpu **vcpu,
+>
+>         pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
+>
+> -       vm =3D __vm_create(mode, 1, extra_mem_pages);
+> +       vm =3D __vm_create(VM_SHAPE(mode), 1, extra_mem_pages);
+>
+>         log_mode_create_vm_done(vm);
+>         *vcpu =3D vm_vcpu_add(vm, 0, guest_code);
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/=
+testing/selftests/kvm/include/kvm_util_base.h
+> index 1441fca6c273..157508c071f3 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -188,6 +188,23 @@ enum vm_guest_mode {
+>         NUM_VM_MODES,
+>  };
+>
+> +struct vm_shape {
+> +       enum vm_guest_mode mode;
+> +       unsigned int type;
+> +};
+> +
+> +#define VM_TYPE_DEFAULT                        0
+> +
+> +#define VM_SHAPE(__mode)                       \
+> +({                                             \
+> +       struct vm_shape shape =3D {               \
+> +               .mode =3D (__mode),               \
+> +               .type =3D VM_TYPE_DEFAULT         \
+> +       };                                      \
+> +                                               \
+> +       shape;                                  \
+> +})
+> +
+>  #if defined(__aarch64__)
+>
+>  extern enum vm_guest_mode vm_mode_default;
+> @@ -220,6 +237,8 @@ extern enum vm_guest_mode vm_mode_default;
+>
+>  #endif
+>
+> +#define VM_SHAPE_DEFAULT       VM_SHAPE(VM_MODE_DEFAULT)
+> +
+>  #define MIN_PAGE_SIZE          (1U << MIN_PAGE_SHIFT)
+>  #define PTES_PER_MIN_PAGE      ptes_per_page(MIN_PAGE_SIZE)
+>
+> @@ -784,21 +803,21 @@ vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
+>   * __vm_create() does NOT create vCPUs, @nr_runnable_vcpus is used purel=
+y to
+>   * calculate the amount of memory needed for per-vCPU data, e.g. stacks.
+>   */
+> -struct kvm_vm *____vm_create(enum vm_guest_mode mode);
+> -struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable=
+_vcpus,
+> +struct kvm_vm *____vm_create(struct vm_shape shape);
+> +struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_v=
+cpus,
+>                            uint64_t nr_extra_pages);
+>
+>  static inline struct kvm_vm *vm_create_barebones(void)
+>  {
+> -       return ____vm_create(VM_MODE_DEFAULT);
+> +       return ____vm_create(VM_SHAPE_DEFAULT);
+>  }
+>
+>  static inline struct kvm_vm *vm_create(uint32_t nr_runnable_vcpus)
+>  {
+> -       return __vm_create(VM_MODE_DEFAULT, nr_runnable_vcpus, 0);
+> +       return __vm_create(VM_SHAPE_DEFAULT, nr_runnable_vcpus, 0);
+>  }
+>
+> -struct kvm_vm *__vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t =
+nr_vcpus,
+> +struct kvm_vm *__vm_create_with_vcpus(struct vm_shape shape, uint32_t nr=
+_vcpus,
+>                                       uint64_t extra_mem_pages,
+>                                       void *guest_code, struct kvm_vcpu *=
+vcpus[]);
+>
+> @@ -806,17 +825,27 @@ static inline struct kvm_vm *vm_create_with_vcpus(u=
+int32_t nr_vcpus,
+>                                                   void *guest_code,
+>                                                   struct kvm_vcpu *vcpus[=
+])
+>  {
+> -       return __vm_create_with_vcpus(VM_MODE_DEFAULT, nr_vcpus, 0,
+> +       return __vm_create_with_vcpus(VM_SHAPE_DEFAULT, nr_vcpus, 0,
+>                                       guest_code, vcpus);
+>  }
+>
+> +
+> +struct kvm_vm *__vm_create_shape_with_one_vcpu(struct vm_shape shape,
+> +                                              struct kvm_vcpu **vcpu,
+> +                                              uint64_t extra_mem_pages,
+> +                                              void *guest_code);
+> +
+>  /*
+>   * Create a VM with a single vCPU with reasonable defaults and @extra_me=
+m_pages
+>   * additional pages of guest memory.  Returns the VM and vCPU (via out p=
+aram).
+>   */
+> -struct kvm_vm *__vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
+> -                                        uint64_t extra_mem_pages,
+> -                                        void *guest_code);
+> +static inline struct kvm_vm *__vm_create_with_one_vcpu(struct kvm_vcpu *=
+*vcpu,
+> +                                                      uint64_t extra_mem=
+_pages,
+> +                                                      void *guest_code)
+> +{
+> +       return __vm_create_shape_with_one_vcpu(VM_SHAPE_DEFAULT, vcpu,
+> +                                              extra_mem_pages, guest_cod=
+e);
+> +}
+>
+>  static inline struct kvm_vm *vm_create_with_one_vcpu(struct kvm_vcpu **v=
+cpu,
+>                                                      void *guest_code)
+> @@ -824,6 +853,13 @@ static inline struct kvm_vm *vm_create_with_one_vcpu=
+(struct kvm_vcpu **vcpu,
+>         return __vm_create_with_one_vcpu(vcpu, 0, guest_code);
+>  }
+>
+> +static inline struct kvm_vm *vm_create_shape_with_one_vcpu(struct vm_sha=
+pe shape,
+> +                                                          struct kvm_vcp=
+u **vcpu,
+> +                                                          void *guest_co=
+de)
+> +{
+> +       return __vm_create_shape_with_one_vcpu(shape, vcpu, 0, guest_code=
+);
+> +}
+> +
+>  struct kvm_vcpu *vm_recreate_with_one_vcpu(struct kvm_vm *vm);
+>
+>  void kvm_pin_this_task_to_pcpu(uint32_t pcpu);
+> diff --git a/tools/testing/selftests/kvm/kvm_page_table_test.c b/tools/te=
+sting/selftests/kvm/kvm_page_table_test.c
+> index 69f26d80c821..e37dc9c21888 100644
+> --- a/tools/testing/selftests/kvm/kvm_page_table_test.c
+> +++ b/tools/testing/selftests/kvm/kvm_page_table_test.c
+> @@ -254,7 +254,7 @@ static struct kvm_vm *pre_init_before_test(enum vm_gu=
+est_mode mode, void *arg)
+>
+>         /* Create a VM with enough guest pages */
+>         guest_num_pages =3D test_mem_size / guest_page_size;
+> -       vm =3D __vm_create_with_vcpus(mode, nr_vcpus, guest_num_pages,
+> +       vm =3D __vm_create_with_vcpus(VM_SHAPE(mode), nr_vcpus, guest_num=
+_pages,
+>                                     guest_code, test_args.vcpus);
+>
+>         /* Align down GPA of the testing memslot */
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/s=
+elftests/kvm/lib/kvm_util.c
+> index 95a553400ea9..1c74310f1d44 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -209,7 +209,7 @@ __weak void vm_vaddr_populate_bitmap(struct kvm_vm *v=
+m)
+>                 (1ULL << (vm->va_bits - 1)) >> vm->page_shift);
+>  }
+>
+> -struct kvm_vm *____vm_create(enum vm_guest_mode mode)
+> +struct kvm_vm *____vm_create(struct vm_shape shape)
+>  {
+>         struct kvm_vm *vm;
+>
+> @@ -221,13 +221,13 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mod=
+e)
+>         vm->regions.hva_tree =3D RB_ROOT;
+>         hash_init(vm->regions.slot_hash);
+>
+> -       vm->mode =3D mode;
+> -       vm->type =3D 0;
+> +       vm->mode =3D shape.mode;
+> +       vm->type =3D shape.type;
+>
+> -       vm->pa_bits =3D vm_guest_mode_params[mode].pa_bits;
+> -       vm->va_bits =3D vm_guest_mode_params[mode].va_bits;
+> -       vm->page_size =3D vm_guest_mode_params[mode].page_size;
+> -       vm->page_shift =3D vm_guest_mode_params[mode].page_shift;
+> +       vm->pa_bits =3D vm_guest_mode_params[vm->mode].pa_bits;
+> +       vm->va_bits =3D vm_guest_mode_params[vm->mode].va_bits;
+> +       vm->page_size =3D vm_guest_mode_params[vm->mode].page_size;
+> +       vm->page_shift =3D vm_guest_mode_params[vm->mode].page_shift;
+>
+>         /* Setup mode specific traits. */
+>         switch (vm->mode) {
+> @@ -265,7 +265,7 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode)
+>                 /*
+>                  * Ignore KVM support for 5-level paging (vm->va_bits =3D=
+=3D 57),
+>                  * it doesn't take effect unless a CR4.LA57 is set, which=
+ it
+> -                * isn't for this VM_MODE.
+> +                * isn't for this mode (48-bit virtual address space).
+>                  */
+>                 TEST_ASSERT(vm->va_bits =3D=3D 48 || vm->va_bits =3D=3D 5=
+7,
+>                             "Linear address width (%d bits) not supported=
+",
+> @@ -285,10 +285,11 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mod=
+e)
+>                 vm->pgtable_levels =3D 5;
+>                 break;
+>         default:
+> -               TEST_FAIL("Unknown guest mode, mode: 0x%x", mode);
+> +               TEST_FAIL("Unknown guest mode: 0x%x", vm->mode);
+>         }
+>
+>  #ifdef __aarch64__
+> +       TEST_ASSERT(!vm->type, "ARM doesn't support test-provided types")=
+;
+>         if (vm->pa_bits !=3D 40)
+>                 vm->type =3D KVM_VM_TYPE_ARM_IPA_SIZE(vm->pa_bits);
+>  #endif
+> @@ -347,19 +348,19 @@ static uint64_t vm_nr_pages_required(enum vm_guest_=
+mode mode,
+>         return vm_adjust_num_guest_pages(mode, nr_pages);
+>  }
+>
+> -struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable=
+_vcpus,
+> +struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_v=
+cpus,
+>                            uint64_t nr_extra_pages)
+>  {
+> -       uint64_t nr_pages =3D vm_nr_pages_required(mode, nr_runnable_vcpu=
+s,
+> +       uint64_t nr_pages =3D vm_nr_pages_required(shape.mode, nr_runnabl=
+e_vcpus,
+>                                                  nr_extra_pages);
+>         struct userspace_mem_region *slot0;
+>         struct kvm_vm *vm;
+>         int i;
+>
+> -       pr_debug("%s: mode=3D'%s' pages=3D'%ld'\n", __func__,
+> -                vm_guest_mode_string(mode), nr_pages);
+> +       pr_debug("%s: mode=3D'%s' type=3D'%d', pages=3D'%ld'\n", __func__=
+,
+> +                vm_guest_mode_string(shape.mode), shape.type, nr_pages);
+>
+> -       vm =3D ____vm_create(mode);
+> +       vm =3D ____vm_create(shape);
+>
+>         vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, nr_pa=
+ges, 0);
+>         for (i =3D 0; i < NR_MEM_REGIONS; i++)
+> @@ -400,7 +401,7 @@ struct kvm_vm *__vm_create(enum vm_guest_mode mode, u=
+int32_t nr_runnable_vcpus,
+>   * extra_mem_pages is only used to calculate the maximum page table size=
+,
+>   * no real memory allocation for non-slot0 memory in this function.
+>   */
+> -struct kvm_vm *__vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t =
+nr_vcpus,
+> +struct kvm_vm *__vm_create_with_vcpus(struct vm_shape shape, uint32_t nr=
+_vcpus,
+>                                       uint64_t extra_mem_pages,
+>                                       void *guest_code, struct kvm_vcpu *=
+vcpus[])
+>  {
+> @@ -409,7 +410,7 @@ struct kvm_vm *__vm_create_with_vcpus(enum vm_guest_m=
+ode mode, uint32_t nr_vcpus
+>
+>         TEST_ASSERT(!nr_vcpus || vcpus, "Must provide vCPU array");
+>
+> -       vm =3D __vm_create(mode, nr_vcpus, extra_mem_pages);
+> +       vm =3D __vm_create(shape, nr_vcpus, extra_mem_pages);
+>
+>         for (i =3D 0; i < nr_vcpus; ++i)
+>                 vcpus[i] =3D vm_vcpu_add(vm, i, guest_code);
+> @@ -417,15 +418,15 @@ struct kvm_vm *__vm_create_with_vcpus(enum vm_guest=
+_mode mode, uint32_t nr_vcpus
+>         return vm;
+>  }
+>
+> -struct kvm_vm *__vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
+> -                                        uint64_t extra_mem_pages,
+> -                                        void *guest_code)
+> +struct kvm_vm *__vm_create_shape_with_one_vcpu(struct vm_shape shape,
+> +                                              struct kvm_vcpu **vcpu,
+> +                                              uint64_t extra_mem_pages,
+> +                                              void *guest_code)
+>  {
+>         struct kvm_vcpu *vcpus[1];
+>         struct kvm_vm *vm;
+>
+> -       vm =3D __vm_create_with_vcpus(VM_MODE_DEFAULT, 1, extra_mem_pages=
+,
+> -                                   guest_code, vcpus);
+> +       vm =3D __vm_create_with_vcpus(shape, 1, extra_mem_pages, guest_co=
+de, vcpus);
+>
+>         *vcpu =3D vcpus[0];
+>         return vm;
+> diff --git a/tools/testing/selftests/kvm/lib/memstress.c b/tools/testing/=
+selftests/kvm/lib/memstress.c
+> index df457452d146..d05487e5a371 100644
+> --- a/tools/testing/selftests/kvm/lib/memstress.c
+> +++ b/tools/testing/selftests/kvm/lib/memstress.c
+> @@ -168,7 +168,8 @@ struct kvm_vm *memstress_create_vm(enum vm_guest_mode=
+ mode, int nr_vcpus,
+>          * The memory is also added to memslot 0, but that's a benign sid=
+e
+>          * effect as KVM allows aliasing HVAs in meslots.
+>          */
+> -       vm =3D __vm_create_with_vcpus(mode, nr_vcpus, slot0_pages + guest=
+_num_pages,
+> +       vm =3D __vm_create_with_vcpus(VM_SHAPE(mode), nr_vcpus,
+> +                                   slot0_pages + guest_num_pages,
+>                                     memstress_guest_code, vcpus);
+>
+>         args->vm =3D vm;
+> diff --git a/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c b/t=
+ools/testing/selftests/kvm/x86_64/ucna_injection_test.c
+> index 85f34ca7e49e..0ed32ec903d0 100644
+> --- a/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
+> @@ -271,7 +271,7 @@ int main(int argc, char *argv[])
+>
+>         kvm_check_cap(KVM_CAP_MCE);
+>
+> -       vm =3D __vm_create(VM_MODE_DEFAULT, 3, 0);
+> +       vm =3D __vm_create(VM_SHAPE_DEFAULT, 3, 0);
+>
+>         kvm_ioctl(vm->kvm_fd, KVM_X86_GET_MCE_CAP_SUPPORTED,
+>                   &supported_mcg_caps);
+> --
+> 2.39.1
+>
+>
 
