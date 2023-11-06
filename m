@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-790-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-791-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC6C47E2992
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 17:17:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B685A7E29A4
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 17:25:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 096201C20C5C
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:17:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FB152811A9
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:25:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C7829412;
-	Mon,  6 Nov 2023 16:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFAF229416;
+	Mon,  6 Nov 2023 16:25:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3o8M6NtH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ySAqN7oF"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8688C29402
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 16:17:48 +0000 (UTC)
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DD96D45
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 08:17:46 -0800 (PST)
-Received: by mail-qv1-xf31.google.com with SMTP id 6a1803df08f44-66d13ac2796so30033086d6.2
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 08:17:46 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F0028E3A
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 16:25:26 +0000 (UTC)
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EE971BC
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 08:25:19 -0800 (PST)
+Received: by mail-oi1-x229.google.com with SMTP id 5614622812f47-3b2f2b9a176so3006689b6e.0
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 08:25:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699287466; x=1699892266; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1699287918; x=1699892718; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lUV8zKIdpTV0f8ZMhx633GQ2l+XRSBNMcsvYJoEfTx4=;
-        b=3o8M6NtHBemcOm+WImExN2FSkf9rn450dHn/P65eZjlIW2aCrACWXBwOyfiWzwA0QA
-         df03rptJDJdDFyoyBXZQMrx8x+zr4/6Yho5Vq99CZOwdBOT1kOO4ZrxBi5VSfG7/g+i2
-         42W6TbW7eDdDtEnIrogMhtX8k2PHMwCNFCtBhwTOp5ZndPZSh88xacBL38yksWV4tbmd
-         YssaPajDRIXn9V+UEvZla/fNVG9vrw3IAHWjNnhcIL+B6UWMtixB3zKHyQ0J9uJjpjLT
-         ADMfKVdRzDOZC3f8Kf0ejMMB6+1chRy6YFVtxYxOc27YRb4a/ZBquILr8L4z6bW4Z1s9
-         dFlA==
+        bh=5xnGb8Sp7Bw2ldCk3b7+mm/bKINtcTCgeZ/KDZ+GW64=;
+        b=ySAqN7oF51WslqTAsZBYQDAR51F5kZ5ot7qgCrPfpSmjVPtcEgBcbD39bwxufl1EcP
+         yPyEG4zpQUveZNdV2zq28oAaZ4TO60traeY1rXtM6K3yhuoBF/0cTRT5MAhSnOUQEfzK
+         ro8+X30m/hTmUYF7liMk6rN9BOpurtlqYQN9v467MdzTk71trnHZZWjAh9Y+Mmd16zyb
+         keVJSJ60oOYsxhas68tyVoruknKeo64lObVhYadQtyrBr7d6H85Mm4+epAkEwnPDKRSH
+         gTU5iiWrVtBODpMqIoHJlDd1kwfyLpfo2hdBzPX8mNpgCgeTMkymuGzO4NpZyvzcs0o7
+         35DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699287466; x=1699892266;
+        d=1e100.net; s=20230601; t=1699287918; x=1699892718;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lUV8zKIdpTV0f8ZMhx633GQ2l+XRSBNMcsvYJoEfTx4=;
-        b=GJ+IblxtqEGgDA63fPyEWhnqov+f3mCliwvfugH5yTsxYy9SkNlEMMo69GVo799SgQ
-         D2JOZTTW+0cDlvCzGYSk/s+Xp4t58cyyZyq4xCbfiyaup6RtgfMCOkIePX7qnwCJJkgX
-         41R16RuPg2bEYPZZI0E2pQE4+JeY04fdZYXg6/OCFmdqeRLikzd5UGYQFoaN/d3ApBjt
-         Ra+RxH8X6R0oxslODNHPnhqkqEK9dkemWAByDxSO2jo/b5151h19K+06S1wQTT6l/2P1
-         gfsMJm3RJvo6TBgmJWGIO9q8+B5xYoDgIJ/pX/XivxBJKJ2nfTKg/JFzbxotP1gp77kO
-         j55A==
-X-Gm-Message-State: AOJu0YyqFHfUV6IsHjuK2LHM+td+ee2Kxi71HcU5voEg0tUDo/ej1nqe
-	2ERarBwjQIed6eivYZ4SMwVQkzyEa5IcqYKHp3CXTA==
-X-Google-Smtp-Source: AGHT+IFFqaeUa+zb1fqYMH2SBG8qERPcG1V2EKOvlLONFWJF+9JT7SC3ACnaIHdf6fX4zUtKFZJjWCRYHGHhXFDqHvM=
-X-Received: by 2002:ad4:5c83:0:b0:670:9f8d:f7be with SMTP id
- o3-20020ad45c83000000b006709f8df7bemr44676404qvh.13.1699287465633; Mon, 06
- Nov 2023 08:17:45 -0800 (PST)
+        bh=5xnGb8Sp7Bw2ldCk3b7+mm/bKINtcTCgeZ/KDZ+GW64=;
+        b=mYMirhyXOd/HUTGYXV9KILYH8mCrjBgJGVhZA6RXRQVAPkR6bpzP9i5dYCPdOMDPCP
+         852t5HI5HTHK/YqhiseS6/upOdwF2Gwe+jR/svb2MwipQhZjYPCFV39c+1E1R4vVNADK
+         ePOtyCgREsQuSofInlxLoTk17X9/s4jfxspUrRn1JG3olX4sa/ftGeSNoEnlsvemyBcB
+         j+ltDHbK8aUaxpAq0Zdu3iolffGTHpC9mnrg/vD4fFbrKGWmW/95HNNmeN6yc28kL1Bx
+         nIqedi+06Vix3zeqaMu/ukcOG5CY1SZovekqPEWh8XD6tR208OPbsYEtZwjq/d1GN1rp
+         vR4g==
+X-Gm-Message-State: AOJu0Yy7JoN3GQCyJEL/BqeePNtM1DaJ60dMYBu3nhx/qa3FW9+b+QuN
+	alzn0uNZO61+VzLWuEdM4pgbMoBpLH6qHwxfaCwVnw==
+X-Google-Smtp-Source: AGHT+IEz2M905daE9adgBPAvjj9bLaNYp4EiTefEe+KnfTT86zKFKrzhkzHGJH5RS/f9fNDUudL2BwXAULrnwcO9LCk=
+X-Received: by 2002:a05:6808:28c:b0:3af:a107:cf68 with SMTP id
+ z12-20020a056808028c00b003afa107cf68mr28980109oic.40.1699287918292; Mon, 06
+ Nov 2023 08:25:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-28-pbonzini@redhat.com>
- <CA+EHjTxz-e_JKYTtEjjYJTXmpvizRXe8EUbhY2E7bwFjkkHVFw@mail.gmail.com> <ZUkOgdTMbH40XFGE@google.com>
-In-Reply-To: <ZUkOgdTMbH40XFGE@google.com>
+References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-26-pbonzini@redhat.com>
+ <CA+EHjTxy6TWM3oBG0Q6v5090XTrs+M8_m5=6Z2E1P-HyTkrGWg@mail.gmail.com> <ZUkQjW-yMnLfD7XW@google.com>
+In-Reply-To: <ZUkQjW-yMnLfD7XW@google.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 6 Nov 2023 16:17:09 +0000
-Message-ID: <CA+EHjTzc4zwN1atU1mSnbi3Lvb0c83MATQSk1uSWxae2iKi0aw@mail.gmail.com>
-Subject: Re: [PATCH 27/34] KVM: selftests: Introduce VM "shape" to allow tests
- to specify the VM type
+Date: Mon, 6 Nov 2023 16:24:42 +0000
+Message-ID: <CA+EHjTw8Om6DGatxGhLJHpUb4RY_ma1pidd=mYxTQseE7vDB4A@mail.gmail.com>
+Subject: Re: [PATCH 25/34] KVM: selftests: Add helpers to convert guest memory
+ b/w private and shared
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
@@ -95,58 +95,48 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 6, 2023 at 4:04=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+On Mon, Nov 6, 2023 at 4:13=E2=80=AFPM Sean Christopherson <seanjc@google.c=
 om> wrote:
 >
 > On Mon, Nov 06, 2023, Fuad Tabba wrote:
 > > On Sun, Nov 5, 2023 at 4:34=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.c=
 om> wrote:
-> > >
-> > > From: Sean Christopherson <seanjc@google.com>
-> > >
-> > > Add a "vm_shape" structure to encapsulate the selftests-defined "mode=
-",
-> > > along with the KVM-defined "type" for use when creating a new VM.  "m=
-ode"
-> > > tracks physical and virtual address properties, as well as the prefer=
-red
-> > > backing memory type, while "type" corresponds to the VM type.
-> > >
-> > > Taking the VM type will allow adding tests for KVM_CREATE_GUEST_MEMFD=
-,
-> > > a.k.a. guest private memory, without needing an entirely separate set=
- of
-> > > helpers.  Guest private memory is effectively usable only by confiden=
-tial
-> > > VM types, and it's expected that x86 will double down and require uni=
-que
-> > > VM types for TDX and SNP guests.
-> > >
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > Message-Id: <20231027182217.3615211-30-seanjc@google.com>
-> > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > ---
+> > > +void vm_guest_mem_fallocate(struct kvm_vm *vm, uint64_t base, uint64=
+_t size,
+> > > +                           bool punch_hole)
+> > > +{
+> > > +       const int mode =3D FALLOC_FL_KEEP_SIZE | (punch_hole ? FALLOC=
+_FL_PUNCH_HOLE : 0);
+> > > +       struct userspace_mem_region *region;
+> > > +       uint64_t end =3D base + size;
+> > > +       uint64_t gpa, len;
+> > > +       off_t fd_offset;
+> > > +       int ret;
+> > > +
+> > > +       for (gpa =3D base; gpa < end; gpa +=3D len) {
+> > > +               uint64_t offset;
+> > > +
+> > > +               region =3D userspace_mem_region_find(vm, gpa, gpa);
+> > > +               TEST_ASSERT(region && region->region.flags & KVM_MEM_=
+GUEST_MEMFD,
+> > > +                           "Private memory region not found for GPA =
+0x%lx", gpa);
+> > > +
+> > > +               offset =3D (gpa - region->region.guest_phys_addr);
 > >
-> > nit: as in a prior selftest commit messages, references in the commit
-> > message to guest _private_ memory. Should these be changed to just
-> > guest memory?
+> > nit: why the parentheses?
 >
-> Hmm, no, "private" is mostly appropriate here.  At this point in time, on=
-ly x86
-> supports KVM_CREATE_GUEST_MEMFD, and x86 only supports it for private mem=
-ory.
-> And the purpose of letting x86 selftests specify KVM_X86_SW_PROTECTED_VM,=
- i.e.
-> the reason this patch exists, is purely to get private memory.
+> I simply forgot to remove them when I changed the function to support spa=
+nning
+> multiple memslots, i.e. when the code went from this
 >
-> Maybe tweak the second paragraph to this?
+>         fd_offset =3D region->region.gmem_offset +
+>                     (gpa - region->region.guest_phys_addr);
 >
-> Taking the VM type will allow adding tests for KVM_CREATE_GUEST_MEMFD
-> without needing an entirely separate set of helpers.  At this time,
-> guest_memfd is effectively usable only by confidential VM types in the
-> form of guest private memory, and it's expected that x86 will double down
-> and require unique VM types for TDX and SNP guests.
+> to what you see above.
 
-sgtm
+I wasn't actually expecting an answer, but I literally _did_ ask for it :)
+
+Thanks,
 /fuad
 
