@@ -1,226 +1,249 @@
-Return-Path: <kvm+bounces-642-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-643-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DDC47E1D43
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 10:29:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A21E7E1D52
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 10:37:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0E761C209C5
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 09:29:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5ECD52812E1
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 09:37:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEAB1171D5;
-	Mon,  6 Nov 2023 09:29:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD161642A;
+	Mon,  6 Nov 2023 09:37:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PjXfxRXK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aCZLoUJu"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA822171A9;
-	Mon,  6 Nov 2023 09:29:48 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A2DEF1;
-	Mon,  6 Nov 2023 01:29:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699262987; x=1730798987;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=SX/EdGYO+EHv3iK5y0EBmdkV+IVHLED11jvSHWhRLfQ=;
-  b=PjXfxRXK+NYX898pAnLu0rGMxUTVhEJX8NwU2M1I5NbcdCr61ufy2KMi
-   eUFOspyqig22dB7y0V9i+Rk9vEkTTYYmHfV8OTrSDLFAuY9GSzc6YiX+R
-   7dolR5CkzhaG3ITOQTORYraZM/i6IqdLmCGJIMF6jSynk7gY0i5KAwG+C
-   XiqeGkVTiMsJ4zCV0oqL9CIrchHPR4DijaclfrTgAYexVMXJ7EQcGPHpB
-   O65umBFr6udAcVKr4Vu8lmYh8ciArG6mts5OO8hpeGdc/6bPCnj/rwY5h
-   n0owerrvR8iyjuTkm/I6kOzqpAApg8hqzeeLBAcqtMk1zC8DqA0L9leED
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="386415853"
-X-IronPort-AV: E=Sophos;i="6.03,281,1694761200"; 
-   d="scan'208";a="386415853"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2023 01:29:46 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="1009468939"
-X-IronPort-AV: E=Sophos;i="6.03,281,1694761200"; 
-   d="scan'208";a="1009468939"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Nov 2023 01:29:45 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 6 Nov 2023 01:29:45 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Mon, 6 Nov 2023 01:29:45 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Mon, 6 Nov 2023 01:29:45 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XqXGEwvSCmwPoZelfmL+m25KtYZGwoMjd3VjhCrmIyIF7l/k+u2+8mN9f3lKVTTSG6efhTijc9u+vXVsUrfA3MpcxvcZ40MbjvuAh2SMaHoYDBDbOquHg3kVXHpdrJufT1Ie64TQvM+ndDO8KokLbBR51uWNL174eNkCn8qv9B5AXjKtcFXjcOsJTzaJd5nTr4JR+RXr5zpoZo5V8HHHi/o4RHnLVtRiqI4932ywoUyjYrDtw/vwjXGNhT9ZPz0cwloRuXVoeThs6cYuqmDJPJjw3CyUzJie8ytGAbMrqujJQOE/Sq7qZgiJu9n45kS/+IoRKqj/xateAMGWBWUGog==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SX/EdGYO+EHv3iK5y0EBmdkV+IVHLED11jvSHWhRLfQ=;
- b=Y03HSijGJHTtHMDxdfueHxw6BgejUNMJS7b9OC8uU6VhGCSGckorNSlnvsLmeyYmE9yHL/b4d3jsDq7iBZ5bR8WpWRPQHPR5LFE4tvvS7bMigmKQPWoiTgAzCB8gEgnJNP06SB/75HGFK4WQlXEohgaaqEskNmdfKuENON8d/usv1nsvK/fswYjTBVnZr4A6AVgjahpcHQCaO70/SmIJ64LCduPm4H3qzq6xyedGP425X/itV4N4LmbsiDvcdQe6z1wl0thIt/44uHX0dL77oWzv01y1WnbmYJnnehFP86XvvuA0PkmMN/Pg5CRAXwbXp38m6NrV0jx32Ma2wWRlSA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by BL1PR11MB5525.namprd11.prod.outlook.com (2603:10b6:208:31f::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.28; Mon, 6 Nov
- 2023 09:29:43 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::5d1:aa22:7c98:f3c6]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::5d1:aa22:7c98:f3c6%6]) with mapi id 15.20.6954.021; Mon, 6 Nov 2023
- 09:29:43 +0000
-From: "Huang, Kai" <kai.huang@intel.com>
-To: "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "Christopherson,,
- Sean" <seanjc@google.com>, "brauner@kernel.org" <brauner@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "chenhuacai@kernel.org"
-	<chenhuacai@kernel.org>, "palmer@dabbelt.com" <palmer@dabbelt.com>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "maz@kernel.org"
-	<maz@kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"mpe@ellerman.id.au" <mpe@ellerman.id.au>, "paul.walmsley@sifive.com"
-	<paul.walmsley@sifive.com>, "anup@brainfault.org" <anup@brainfault.org>,
-	"willy@infradead.org" <willy@infradead.org>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>
-CC: "Li, Xiaoyao" <xiaoyao.li@intel.com>, "kvm-riscv@lists.infradead.org"
-	<kvm-riscv@lists.infradead.org>, "mic@digikod.net" <mic@digikod.net>,
-	"liam.merwick@oracle.com" <liam.merwick@oracle.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-	"david@redhat.com" <david@redhat.com>, "tabba@google.com" <tabba@google.com>,
-	"amoorthy@google.com" <amoorthy@google.com>, "linuxppc-dev@lists.ozlabs.org"
-	<linuxppc-dev@lists.ozlabs.org>, "michael.roth@amd.com"
-	<michael.roth@amd.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>, "Annapurve,
- Vishal" <vannapurve@google.com>, "yilun.xu@linux.intel.com"
-	<yilun.xu@linux.intel.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
-	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>,
-	"yu.c.zhang@linux.intel.com" <yu.c.zhang@linux.intel.com>,
-	"qperret@google.com" <qperret@google.com>, "dmatlack@google.com"
-	<dmatlack@google.com>, "Xu, Yilun" <yilun.xu@intel.com>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"ackerleytng@google.com" <ackerleytng@google.com>, "jarkko@kernel.org"
-	<jarkko@kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-mm@kvack.org"
-	<linux-mm@kvack.org>, "Wang, Wei W" <wei.w.wang@intel.com>
-Subject: Re: [PATCH 03/34] KVM: Use gfn instead of hva for mmu_notifier_retry
-Thread-Topic: [PATCH 03/34] KVM: Use gfn instead of hva for mmu_notifier_retry
-Thread-Index: AQHaEAWKALgh7o/PQ0+hlh/f39aBp7BtB3sA
-Date: Mon, 6 Nov 2023 09:29:42 +0000
-Message-ID: <814958af6bf6b00752a715da74a0cb85efded1aa.camel@intel.com>
-References: <20231105163040.14904-1-pbonzini@redhat.com>
-	 <20231105163040.14904-4-pbonzini@redhat.com>
-In-Reply-To: <20231105163040.14904-4-pbonzini@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.48.4 (3.48.4-1.fc38) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|BL1PR11MB5525:EE_
-x-ms-office365-filtering-correlation-id: f305c237-1707-4472-2eba-08dbdeaae884
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: LQIoN1rckUJ9MEVuwFdsQqrRryLSdEluZbI0/UCbTyGMOBuo4a3L9Lhph2YJN/Hh9scsZAlj5C+V9WPnoCrJliqgFgbbpWVec+aHPZVH7+qRHaF3gDwanGZM/I6PvmqfyyFYIiccPRnIF2EsIK4tDG/nTAdrhcrc5LQa70ultkK6HQQa/S76QAPxbVZMkXITrQqT8tfEDHm1zw797Aga0NICDTY70EkFlhzS01nsg31PBVenPu8TJaSPtEQKcEk+APpT8teKHO+xyTd7NLYFePWONK9WWRBuTG7dnFQ5X8wiUTdSs7YdvAsyEV0ZuQ+4Oc3f0Yii4PJ+KqxrYvGYnr2VjPQY4wBuNAk5KI8W3gUzBvzMCbTwOraX2NJpk3x7G0O6UcqPJE0pG/R1WUeTbluMj9BrVS9BOtDZXBvZMIkmAESG6Gntm68TXI63+5l1sYuDoYTpb9p533tjeGVuKfMP3n43vglkTUCHVasSzyNr9lSQzkCgxCA6+6PTAf9pMut71tlLcmFyzY4UfxsJZ1L3WVjy3Rhlw/QwR3D3zFa1NBJP7PjR1cp2DQYiZ3OYdWnMRbCQCDDXyEIbvzu45ZmLwdHvoZd3iQXUdO9axDv708WVGMBzgTr0ni7WR0XT
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(366004)(136003)(39860400002)(346002)(230922051799003)(186009)(1800799009)(451199024)(64100799003)(2616005)(6512007)(6486002)(6506007)(478600001)(71200400001)(2906002)(38100700002)(36756003)(86362001)(122000001)(82960400001)(7416002)(5660300002)(7406005)(41300700001)(66476007)(64756008)(66446008)(54906003)(83380400001)(66556008)(66946007)(26005)(921008)(38070700009)(91956017)(110136005)(316002)(8936002)(76116006)(4326008)(8676002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?SWQrazlJQXdFU29QMWhtckgvMFQ4YTZnamZJSm1VNHQrazkzVk9rRU1JRTJO?=
- =?utf-8?B?WkEvcnpOWEgycWpIemlEOXBlVkVTWTVLV0Z3UFUzNDk5WnBDMnhyREZHVkht?=
- =?utf-8?B?c3Nhc1d5UnZqekkwa0c3WHdudFZ1RFZuTVZ5YmpKZXV3K2htVlBlOWVLMnJO?=
- =?utf-8?B?SXByUHFiS3Azb3M2N1YzbW1mU29qdXpRcHViYk5LeG1OajE5WFNjdXNuamZa?=
- =?utf-8?B?R1YvVlZCczd2VTNiNlRIaVM4eXhyeDMzSU5JY0l1anI2SDQyOVZCNHhucWxW?=
- =?utf-8?B?OUZydCtZSGM1dTNHYys5MGpzREYzbG51K28yU2hpbldoSGVuei93MHg4Qkps?=
- =?utf-8?B?SUh0akhlT1dEY29QeXZWSVU0RGpvVWFkVUU2dVhISXhaNkpUWEM3TXB2c21T?=
- =?utf-8?B?UmRpL2hRUTF0YmNNNlhueEdFTVpHb3FWaEpXS1NJZE93cmVvd3RnSUNYNnpi?=
- =?utf-8?B?T2N0R3l1alJqcGQ0VlpyM29Wakc3NGpaS0ZxemhXVnFtOFkzSEpUQVlWd0NQ?=
- =?utf-8?B?NTAvS1JpVW1lUkJZV1g4S1FOTjlldjBsSkhGNzNxREl4NHBiUHJXTTdYYmZy?=
- =?utf-8?B?TU1Ma2hZZ2E4OG1vYjRYK250ZTk1cU9SYnBpOFcybmpiblV2dHJHOG5KcFVu?=
- =?utf-8?B?QVlCWXAxdThLNGhLZE9kanoyVzBVbFdRSG9LOFloUmU1TmJwQm9Yb1ZXc3pX?=
- =?utf-8?B?dFgvNEhXNXZMY0pEck1FMjczMXJneVVDazJzTWRuV3hOck9hZ3JKT0VGb3JK?=
- =?utf-8?B?WjlHQk96WmZDVFdDU2FRTFJJanJNb2FJWFg2MGhxam12Q0Y0eFV2cG9ZUE5l?=
- =?utf-8?B?eWlJS1BVb0pkODZMQnpHOTZsSHVmSnlsTFZHQlhCNW9vNlQwemNOV2YrYlNj?=
- =?utf-8?B?eVM5MmtXaDYvTEN2aFBwTzV5UCsrbnRQektZQnozT1pUUnFrWW10ak9SbnFK?=
- =?utf-8?B?RGtUYlNLdW1FVlJaYnU2TEFnTHFBM2t5UGZEeUdiTG1LOEpmR0VBdGNJbU16?=
- =?utf-8?B?RWRIQnh0MEhIbG1EL1luMUlUYUsyZlVQL3ZTK05laDd1WWI2YldBb2RUUERi?=
- =?utf-8?B?K05GVFlQVXJiMmZzL1F0L3E0eHRqVEVrV2QvZVNHWGxVd1MzY2NGSGYyVUNB?=
- =?utf-8?B?ZGc1T3Rta1A2Yys0OGtCcnAxQW1IVjZVM2xFT0RvNkxyZGh5dWFMREoyL1Ir?=
- =?utf-8?B?d3c3ZStDdzc0SDNwenBycHpxUGJrTTBhQnAvRks5ek9jSWNjY0xPOHZuamVY?=
- =?utf-8?B?VFk1RVE0bGdYSWpPZXJNUEYxN0xHRjVUUTJxOGVtcjBQZHErUndxQW44djhU?=
- =?utf-8?B?bHlWUGFFRnVnK04wcG1FOVpHd2gwUVp0MVNzM0pBd1FjWE5JLzh1M1dwbVVV?=
- =?utf-8?B?Y3Z6bTk3VENYNnFyWWlmQzVPUGZPSFV6d0pRR3IvQ2dQa2F6SnJiNDRUd01w?=
- =?utf-8?B?cVdpWUNyd2pxUUNJdG56R2NMSnYxcktmMHNMTnpoYzg3SUNFaC9LL3FTbVJT?=
- =?utf-8?B?RTZYTlJFWjJFOWRaL1JhTit5VHZUOWNNaHR6ZE9XVEhZbTVnU0ZWSkpXbWlM?=
- =?utf-8?B?djh6U1J6TUVMSnRFdTFLRXZzZkxVM0dOeGtOTFVjZmFscG9TaFl3YTNWYkFV?=
- =?utf-8?B?S2RiRHdUZS9WSWdyRnkwUUpFNHBwVlpnNlVtNEx2MDlLM0dhdlpheGxCRDM3?=
- =?utf-8?B?YTYvQjZJZjZvdTBhZWpzQXhYeERQRVQ5Vzd6bDNGQTdjU3Rnai9LUW5tTWYx?=
- =?utf-8?B?WGRxQjFSaWYzVHh3ZFZ0NU5HZU1GbitoaUUrME4xYkFGVHpPOEY0S2lBd2Jq?=
- =?utf-8?B?Zm9waXMvc3N6THlkZzZnWWk5Z2FFcW9XVXhDZGI5UFVZZ2FBUW9leUpjYzhX?=
- =?utf-8?B?SVdTcU8vUGhDcEZRZXNLWEk2SHlZRzhWaWlXVFQyS0gvS3gwRnVqaGl3bXUr?=
- =?utf-8?B?R0RUNlVOMy9iM21RTTBiUk8xdm5Ib29vQVVJK1Q2Vnc4ZnFrQ1dYMG8wSG5O?=
- =?utf-8?B?YXdnaElacVFxWEVVVE1MUVU2d21kS0Yvd0ZqMUQxUGVPNXVhci9xUVk1VWI1?=
- =?utf-8?B?TlJibHpzRmpPWTd0TGgxM3diNEVEcFNuUVluN21wK3ByNnNGazJUb0pxMWhU?=
- =?utf-8?B?Ync5L2NpY0JpRDgzS0tsaEEwOFhrd0RySDVtSEFsd1p6ZG5KcTFwUnRLbi90?=
- =?utf-8?B?WHc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <613E3D0EF52E884EA53029B3BAB1F523@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FD015AFD
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 09:37:10 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B13EDB
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 01:37:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699263428;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/ek9xHU+c48j74pQ1dRBGoWQGjXiUEXkjvfYr7/xNeQ=;
+	b=aCZLoUJuCbk4skNeIxA7V9mzN+6s7PtOmc5Qe7mtSb53hhhDzZ+ppIOvks2jrIJ5m9KGpm
+	xvONaVsaR3oVGygQp6UqkzN4p21FO5zDAOBtL/H4dbQmiAS3Pj/HLdHVqiuzBWmtXhZ5Ct
+	rpfnZi9jvO6y/WSmKq3I2zfpN3Dc6Rc=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-696-aY4rUub2N3S14l6fPJWN8Q-1; Mon, 06 Nov 2023 04:37:07 -0500
+X-MC-Unique: aY4rUub2N3S14l6fPJWN8Q-1
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-26b6eb0f1f3so1294717a91.1
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 01:37:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699263426; x=1699868226;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/ek9xHU+c48j74pQ1dRBGoWQGjXiUEXkjvfYr7/xNeQ=;
+        b=cj1GyggBCI9wdbcFyMt0gVI2pJh9JWSkAZqXqGp661FY8ZGuWkZX7ljFrgLeGFFwdT
+         YDwtRr03R5i50MMO8sjKy4g54ZRvlzIW2sbApGpPaoG/qnPfqZY4AR0oMJsaDPZSRNpY
+         U+Pv1HspErnzyAEa8IWN62BNCzCFJ/CwtxujawIuBooVTXB7L2Vm32hbd6iujq04ZwQO
+         FliKWFHRpe21q2Xa+xz3plN9Gso2WIrd15rf8W+OUEpe4y/ahuq0jxHbHe9vESIdS9VX
+         CfXDlDnGcgKLZ3+XBxOuXDJEjDW1VsKUVX4ENzHDu+asZZcD9E4d3VL5qO7HH2D3fjPl
+         nWng==
+X-Gm-Message-State: AOJu0Yx83OlRngG2l2oyTv2OUI7HJYs9ZY6WAn6mRS8+y87q7R03Qebh
+	Bodu/1tUVoH1ruWHkjte0bt15wWnJqpgr6zg2X/t+JC47pLvqfLTI5UuRs2AJHo0qaZMZ2iVrHs
+	S7cIx55HBM+8T
+X-Received: by 2002:a17:903:2581:b0:1cc:3e45:ac1e with SMTP id jb1-20020a170903258100b001cc3e45ac1emr24250833plb.6.1699263425953;
+        Mon, 06 Nov 2023 01:37:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IESKZedxUqOrtYYE4u+YZYSWOXq7PI3xHg1EXB8jO3KijU7PQYzXr0ZHP13luGygv1Ji4CUPQ==
+X-Received: by 2002:a17:903:2581:b0:1cc:3e45:ac1e with SMTP id jb1-20020a170903258100b001cc3e45ac1emr24250819plb.6.1699263425595;
+        Mon, 06 Nov 2023 01:37:05 -0800 (PST)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id q14-20020a170902a3ce00b001bd62419744sm5624890plb.147.2023.11.06.01.37.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Nov 2023 01:37:05 -0800 (PST)
+Message-ID: <678f0bd1-1232-f785-45ac-45a8f4404347@redhat.com>
+Date: Mon, 6 Nov 2023 17:37:01 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f305c237-1707-4472-2eba-08dbdeaae884
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Nov 2023 09:29:42.9363
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Kgk5ISa1eCbX8YsILs9QKK0rlaEUxabejbh8eSH4v1E0JnuOHR4d6uEgkwtL3GNyoS3NgSzD17C8ykKqoxjc7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5525
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [kvm-unit-tests RFC PATCH 00/19] arm/arm64: Rework cache
+ maintenance at boot
+To: Alexandru Elisei <alexandru.elisei@arm.com>, pbonzini@redhat.com,
+ thuth@redhat.com, andrew.jones@linux.dev, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, nikos.nikoleris@arm.com
+References: <20220809091558.14379-1-alexandru.elisei@arm.com>
+ <ZUdrku2u6OGc43wv@monolith>
+Content-Language: en-US
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <ZUdrku2u6OGc43wv@monolith>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-T24gU3VuLCAyMDIzLTExLTA1IGF0IDE3OjMwICswMTAwLCBQYW9sbyBCb256aW5pIHdyb3RlOg0K
-PiBGcm9tOiBDaGFvIFBlbmcgPGNoYW8ucC5wZW5nQGxpbnV4LmludGVsLmNvbT4NCj4gDQo+IEN1
-cnJlbnRseSBpbiBtbXVfbm90aWZpZXIgaW52YWxpZGF0ZSBwYXRoLCBodmEgcmFuZ2UgaXMgcmVj
-b3JkZWQgYW5kIHRoZW4NCj4gY2hlY2tlZCBhZ2FpbnN0IGJ5IG1tdV9pbnZhbGlkYXRlX3JldHJ5
-X2h2YSgpIGluIHRoZSBwYWdlIGZhdWx0IGhhbmRsaW5nDQo+IHBhdGguIEhvd2V2ZXIsIGZvciB0
-aGUgc29vbi10by1iZS1pbnRyb2R1Y2VkIHByaXZhdGUgbWVtb3J5LCBhIHBhZ2UgZmF1bHQNCj4g
-bWF5IG5vdCBoYXZlIGEgaHZhIGFzc29jaWF0ZWQsIGNoZWNraW5nIGdmbihncGEpIG1ha2VzIG1v
-cmUgc2Vuc2UuDQo+IA0KPiBGb3IgZXhpc3RpbmcgaHZhIGJhc2VkIHNoYXJlZCBtZW1vcnksIGdm
-biBpcyBleHBlY3RlZCB0byBhbHNvIHdvcmsuIFRoZQ0KPiBvbmx5IGRvd25zaWRlIGlzIHdoZW4g
-YWxpYXNpbmcgbXVsdGlwbGUgZ2ZucyB0byBhIHNpbmdsZSBodmEsIHRoZQ0KPiBjdXJyZW50IGFs
-Z29yaXRobSBvZiBjaGVja2luZyBtdWx0aXBsZSByYW5nZXMgY291bGQgcmVzdWx0IGluIGEgbXVj
-aA0KPiBsYXJnZXIgcmFuZ2UgYmVpbmcgcmVqZWN0ZWQuIFN1Y2ggYWxpYXNpbmcgc2hvdWxkIGJl
-IHVuY29tbW9uLCBzbyB0aGUNCj4gaW1wYWN0IGlzIGV4cGVjdGVkIHNtYWxsLg0KPiANCj4gU3Vn
-Z2VzdGVkLWJ5OiBTZWFuIENocmlzdG9waGVyc29uIDxzZWFuamNAZ29vZ2xlLmNvbT4NCj4gQ2M6
-IFh1IFlpbHVuIDx5aWx1bi54dUBpbnRlbC5jb20+DQo+IFNpZ25lZC1vZmYtYnk6IENoYW8gUGVu
-ZyA8Y2hhby5wLnBlbmdAbGludXguaW50ZWwuY29tPg0KPiBSZXZpZXdlZC1ieTogRnVhZCBUYWJi
-YSA8dGFiYmFAZ29vZ2xlLmNvbT4NCj4gVGVzdGVkLWJ5OiBGdWFkIFRhYmJhIDx0YWJiYUBnb29n
-bGUuY29tPg0KPiBbc2VhbjogY29udmVydCB2bXhfc2V0X2FwaWNfYWNjZXNzX3BhZ2VfYWRkcigp
-IHRvIGdmbi1iYXNlZCBBUEldDQo+IFNpZ25lZC1vZmYtYnk6IFNlYW4gQ2hyaXN0b3BoZXJzb24g
-PHNlYW5qY0Bnb29nbGUuY29tPg0KPiBSZXZpZXdlZC1ieTogUGFvbG8gQm9uemluaSA8cGJvbnpp
-bmlAcmVkaGF0LmNvbT4NCj4gUmV2aWV3ZWQtYnk6IFh1IFlpbHVuIDx5aWx1bi54dUBsaW51eC5p
-bnRlbC5jb20+DQo+IE1lc3NhZ2UtSWQ6IDwyMDIzMTAyNzE4MjIxNy4zNjE1MjExLTQtc2Vhbmpj
-QGdvb2dsZS5jb20+DQo+IFNpZ25lZC1vZmYtYnk6IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJl
-ZGhhdC5jb20+DQo+IA0KDQpSZXZpZXdlZC1ieTogS2FpIEh1YW5nIDxrYWkuaHVhbmdAaW50ZWwu
-Y29tPg0K
+Hi Alexandru,
+
+On 11/5/23 18:16, Alexandru Elisei wrote:
+> Hi,
+> 
+> I had a v2 almost finished a few months ago (maybe a year), but I parked
+> the patches when we decided that the best thing to do was to have UEFI
+> support in first, then rework the cache maintenance - that way, the changes
+> can be tested on baremetal, which is much more unforgiving than KVM.
+> 
+> Unfortunately I've been busy with other things and I don't know when I'll
+> be able to come back to this. So I've pushed the work-in-progress here [1],
+> with what I hope is a helpful changelog since v1.
+> 
+> If my memory serves me right, even though it is marked as wip, it was
+> running just fine under KVM and I was waiting for UEFI to test it on
+> baremetal before posting.
+> 
+> I don't know when I'll have the time to get back to the series, so if
+> anyone is still interested, feel free to pick it up. If someone does pick
+> up the series, they can drop/rework patches as they see fit, and I'll try
+> to do my best to review whatever is posted on the list (but no promises).
+> 
+> [1] https://gitlab.arm.com/linux-arm/kvm-unit-tests-ae/-/tree/arm-arm64-rework-cache-maintenance-at-boot-v2-wip2
+
+I'm willing to take your work. But I can't open your link posted in [1]. 
+I don't have permission to access it. Could you please posted it on a 
+public place?
+
+Thanks,
+Shaoqin
+
+> 
+> Thanks,
+> Alex
+> 
+> On Tue, Aug 09, 2022 at 10:15:39AM +0100, Alexandru Elisei wrote:
+>> I got the idea for this series as I was looking at the UEFI support series
+>> [1]. More specifically, I realized that the cache maintenance performed by
+>> asm_mmu_disable is insuficient. Patch #19 ("arm/arm64: Rework the cache
+>> maintenance in asm_mmu_disable") describes what is wrong with
+>> asm_mmu_disable. A detailed explanation of what cache maintenance is needed
+>> and why is needed can be found in patch #18 ("arm/arm64: Perform dcache
+>> maintenance at boot").
+>>
+>> Then I realized that I couldn't fix only asm_mmu_disable, and leave the
+>> rest of kvm-unit-tests without the needed cache maintenance, so here it is,
+>> my attempt at adding the cache maintenace operations (from now on, CMOs)
+>> required by the architecture.
+>>
+>> My approach is to try to enable the MMU and build the translation tables as
+>> soon as possible, to avoid as much of cache maintenance as possible. I
+>> didn't want to do it in the early assembly code, like Linux, because I like
+>> the fact that kvm-unit-tests keeps the assembly code to a minimum, and I
+>> wanted to preserve that. So I made the physical allocator simpler (patches
+>> #2-#6) so it can be used to create the translation tables immediately after
+>> the memory regions are populated.
+>>
+>> After moving some code around, especially how the secondaries are brought
+>> online, the dcache maintenance is implemented in patch #18 ("arm/arm64:
+>> Perform dcache maintenance at boot").
+>>
+>> The series is an RFC, and I open to suggestions about how to do things
+>> better; I'm happy to rework the entire series if a better approach is
+>> proposed.
+>>
+>> Why is this needed? Nobody complained about test failing because of missing
+>> CMOs before, so why add them now? I see two reasons for the series:
+>>
+>> 1. For architectural correctness. The emphasis has been so far on the test
+>> themselves to be architectural compliant, but I believe that the boot code
+>> should get the same treatment. kvm-unit-tests has started to be used in
+>> different ways than before, and I don't think that we should limit
+>> ourselves to running under one hypervisor, or running under a hypervisor at
+>> all. Which brings me to point number 2.
+>>
+>> 2. If nothing else, this can serve as a showcase for the UEFI support
+>> series for the required cache maintenance. Although I hope that UEFI
+>> support will end up sharing at least some of the boot code with the
+>> non-UEFI boot path.
+>>
+>> This is an RFC and has some rough edges, probably also bugs, but I believe
+>> the concept to be sound. If/when the series stabilizes, I'll probably split
+>> it into separate series (for example, the __ASSEMBLY__ define patch could
+>> probably be separate from the others). Tested by running all the arm and
+>> arm64 tests on a rockpro64 with qemu.
+>>
+>> [1] https://lore.kernel.org/all/20220630100324.3153655-1-nikos.nikoleris@arm.com/
+>>
+>> Alexandru Elisei (19):
+>>    Makefile: Define __ASSEMBLY__ for assembly files
+>>    lib/alloc_phys: Initialize align_min
+>>    lib/alloc_phys: Use phys_alloc_aligned_safe and rename it to
+>>      memalign_early
+>>    powerpc: Use the page allocator
+>>    lib/alloc_phys: Remove locking
+>>    lib/alloc_phys: Remove allocation accounting
+>>    arm/arm64: Mark the phys_end parameter as unused in setup_mmu()
+>>    arm/arm64: Use pgd_alloc() to allocate mmu_idmap
+>>    arm/arm64: Zero secondary CPUs' stack
+>>    arm/arm64: Enable the MMU early
+>>    arm/arm64: Map the UART when creating the translation tables
+>>    arm/arm64: assembler.h: Replace size with end address for
+>>      dcache_by_line_op
+>>    arm: page.h: Add missing libcflat.h include
+>>    arm/arm64: Add C functions for doing cache maintenance
+>>    lib/alloc_phys: Add callback to perform cache maintenance
+>>    arm/arm64: Allocate secondaries' stack using the page allocator
+>>    arm/arm64: Configure secondaries' stack before enabling the MMU
+>>    arm/arm64: Perform dcache maintenance at boot
+>>    arm/arm64: Rework the cache maintenance in asm_mmu_disable
+>>
+>>   Makefile                   |   5 +-
+>>   arm/Makefile.arm           |   4 +-
+>>   arm/Makefile.arm64         |   4 +-
+>>   arm/Makefile.common        |   4 +-
+>>   arm/cstart.S               |  59 ++++++++++++------
+>>   arm/cstart64.S             |  56 +++++++++++++----
+>>   lib/alloc_phys.c           | 122 ++++++++++++-------------------------
+>>   lib/alloc_phys.h           |  13 +++-
+>>   lib/arm/asm/assembler.h    |  15 ++---
+>>   lib/arm/asm/cacheflush.h   |   1 +
+>>   lib/arm/asm/mmu-api.h      |   1 +
+>>   lib/arm/asm/mmu.h          |   6 --
+>>   lib/arm/asm/page.h         |   2 +
+>>   lib/arm/asm/pgtable.h      |  52 ++++++++++++++--
+>>   lib/arm/asm/thread_info.h  |   3 +-
+>>   lib/arm/cache.S            |  89 +++++++++++++++++++++++++++
+>>   lib/arm/io.c               |   5 ++
+>>   lib/arm/io.h               |   3 +
+>>   lib/arm/mmu.c              |  60 +++++++++++-------
+>>   lib/arm/processor.c        |   6 +-
+>>   lib/arm/setup.c            |  66 ++++++++++++++++----
+>>   lib/arm/smp.c              |   9 ++-
+>>   lib/arm64/asm/assembler.h  |  11 ++--
+>>   lib/arm64/asm/cacheflush.h |  32 ++++++++++
+>>   lib/arm64/asm/mmu.h        |   5 --
+>>   lib/arm64/asm/pgtable.h    |  67 ++++++++++++++++++--
+>>   lib/arm64/cache.S          |  85 ++++++++++++++++++++++++++
+>>   lib/arm64/processor.c      |   5 +-
+>>   lib/devicetree.c           |   2 +-
+>>   lib/powerpc/setup.c        |   8 +++
+>>   powerpc/Makefile.common    |   1 +
+>>   powerpc/cstart64.S         |   1 -
+>>   powerpc/spapr_hcall.c      |   5 +-
+>>   33 files changed, 608 insertions(+), 199 deletions(-)
+>>   create mode 100644 lib/arm/asm/cacheflush.h
+>>   create mode 100644 lib/arm/cache.S
+>>   create mode 100644 lib/arm64/asm/cacheflush.h
+>>   create mode 100644 lib/arm64/cache.S
+>>
+>> -- 
+>> 2.37.1
+>>
+> 
+
+-- 
+Shaoqin
+
 
