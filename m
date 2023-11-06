@@ -1,117 +1,135 @@
-Return-Path: <kvm+bounces-788-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-789-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F5727E296E
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 17:10:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 757A87E297C
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 17:13:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFE971C20BE8
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:10:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A58551C209CF
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:13:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED7F829406;
-	Mon,  6 Nov 2023 16:10:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D1829406;
+	Mon,  6 Nov 2023 16:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aD5tj1AA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Oe1xs7MQ"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C84628E06
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 16:10:17 +0000 (UTC)
-Received: from mail-oo1-xc2c.google.com (mail-oo1-xc2c.google.com [IPv6:2607:f8b0:4864:20::c2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41EFB1BF
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 08:10:13 -0800 (PST)
-Received: by mail-oo1-xc2c.google.com with SMTP id 006d021491bc7-586a5d76413so2608441eaf.3
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 08:10:13 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5E9529414
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 16:13:05 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA767191
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 08:13:03 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a828bdcfbaso63790757b3.2
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 08:13:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699287012; x=1699891812; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=o9tVeKqMjlN1sJbwbYzCcGCuISPVc7ZyUOuNd53U1po=;
-        b=aD5tj1AAoj1V+YOaz70nZcZAoUCvtUZdV8flydqdRoN9JbmO9lVaHKhbJCtovuZDcw
-         IcflfQdVG9jtPRMKN5XZ2KJyUy+Qp33e8pI2o9P9qtvxREJaAYsXdJoHBv6Ag/6RYG73
-         9d4H0llYx+KfrV1m1WOFhuK9BXDvB8qVczEZ4D2cZohFhqVM0n14gYDgR7Cxw69tsXZW
-         fAvNkkpF97fc4uBEKXUxSs7IY4pD+WlvYnT79Hy19FCGwSdSRoPDexfL08TGXyDjBBxx
-         YNJMSEdkUwNSBkXii46WtPdD7W8Na7jj10kxaBmnIWwImWdznzVxiH6s08vsX5LwnvzZ
-         NPOQ==
+        d=google.com; s=20230601; t=1699287183; x=1699891983; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mmoUoGnC/t23H3IPxV2qsT2AAyd7sUSE5gGiJgJlDX0=;
+        b=Oe1xs7MQxbs5oPRVpc1SJfxw+zaBXWx0tAzWWUfGeY0ZnxLo3TUCZUwSHoYrsLcen+
+         0T98De4h1V0jyIRipVTcdvrBJ3Gf6ahV4xyT5pGJZOMVm2tQZItGID1uzEtmhh/aG+xd
+         iN5yBgGbHR5grM6zMLTpWxCSPRcfeObuMhPxbVqdGo94SCvbVIL/p7EHqsDDYVZS7oux
+         38cAa3a5BNG2BF/RGEaagKWyzMT3MhudxuLj0b7sjmXHkLqn1bXVwZoG0xgvZmFfzo6o
+         qOXxpsu4IIKS84P9O1shcP+44+bOV0AFRJXACHqrQAZ8unbvgtfM8pN2zOg6LTUiLAxB
+         P8KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699287012; x=1699891812;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o9tVeKqMjlN1sJbwbYzCcGCuISPVc7ZyUOuNd53U1po=;
-        b=gyQqki/YK3FjZmPa5r6WpLUbcbRDZlSbxPXEaDmo8BLsgmqqoteNaXuW9p/8C3oiXI
-         PWu30pzIvnkMazBjJb6FYkB4MvkMXMmNLHsToCFdIt2NX+3UV10T6QXvcuj45BYK7dIR
-         KCb0XoIam+IhtchIZO9gBKvFhVPUxbmSrnPSy4Vbg0ZDhU1TUJQSannTAomWlzx6pf2S
-         oWlRGL6/5ZCz/+++MVmRKIa1L4FtwkBkp8OYLwZYtauFpeTuIpCfWIAvEf3tCC3JLcBp
-         Sn2BxgloT9G9krcAwN9uBOgsW6Cvmh/Ga+YpwfgPOOqTvGRjCZzZHk4pQEpZSKb0gfJD
-         knbA==
-X-Gm-Message-State: AOJu0Ywwu3htfUh2EJ5CVe7QWcbpyHAZCrujOKhvwflUW3LTv3IrHuXI
-	h6oz8/wfMr6WWEirIEt2/AU=
-X-Google-Smtp-Source: AGHT+IE/sRaTmVzjjCiO2dK5s1AvjHxOUyoPSJxnyNWlqiA3OF+6Q3xTw5HxTC+nzv/U1i2QoMa6WQ==
-X-Received: by 2002:a05:6870:788:b0:1e9:c7cc:df9a with SMTP id en8-20020a056870078800b001e9c7ccdf9amr148125oab.11.1699287012406;
-        Mon, 06 Nov 2023 08:10:12 -0800 (PST)
-Received: from [10.95.110.31] (54-240-197-231.amazon.com. [54.240.197.231])
-        by smtp.gmail.com with ESMTPSA id d31-20020ab014a2000000b007b0f0d45133sm1599687uae.25.2023.11.06.08.10.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Nov 2023 08:10:12 -0800 (PST)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <9f15534c-8b79-4127-9b91-0dc449547833@xen.org>
-Date: Mon, 6 Nov 2023 16:10:05 +0000
+        d=1e100.net; s=20230601; t=1699287183; x=1699891983;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=mmoUoGnC/t23H3IPxV2qsT2AAyd7sUSE5gGiJgJlDX0=;
+        b=aABTieqAYUlzfl4RpacMKMwhy/6wWDRJlWhGstNGO5ZxYirDXEsPvr8RgeYzUf0HLZ
+         ykhmvrBDNBTBkihkS3PfUXEQaEGzcJPMQTCU+7vyEu5J2MOPDYDF1Syein/HZvhWVjet
+         zwrU8Hl6rImasJNqFXTx1z/7Z+ktxSJJLI/88K1Yqv7kaSFbJJOBcqKzxnjrXM1+v9D/
+         /3EI1MHc6X8ws88jd/X5OD5z9nDaxidU/op7xuPtutnKrup8mEvDMgg8UXgaB8OMJ4s4
+         6MIr78XAYb/InQCPgD0SRr+yEkMEMcwDNoTvI+zt2ItJYEsUSxf5Rr4AEv5EKI+LYAXt
+         EHXg==
+X-Gm-Message-State: AOJu0YzzuWbQq/QDOdK+ULMu83PpAfmXiYawlck3iGzm82+Mob9p4i2f
+	UkHSnY3O+EMwDxi6cC4ihv5K3o3ji5g=
+X-Google-Smtp-Source: AGHT+IEuz2kxbbqGFRlRrYjmJAAmCd5YL62xYCCumvx9nTcHzja2SicRUTSCOZ5GtJw0RknzXE1Az5YHDFw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a0d:d5d2:0:b0:5a7:ad67:b4b6 with SMTP id
+ x201-20020a0dd5d2000000b005a7ad67b4b6mr228755ywd.2.1699287183068; Mon, 06 Nov
+ 2023 08:13:03 -0800 (PST)
+Date: Mon, 6 Nov 2023 08:13:01 -0800
+In-Reply-To: <CA+EHjTxy6TWM3oBG0Q6v5090XTrs+M8_m5=6Z2E1P-HyTkrGWg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v4 17/17] docs: update Xen-on-KVM documentation
-Content-Language: en-US
-To: David Woodhouse <dwmw2@infradead.org>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Eduardo Habkost <eduardo@habkost.net>, "Michael S. Tsirkin"
- <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Jason Wang <jasowang@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- qemu-block@nongnu.org, xen-devel@lists.xenproject.org, kvm@vger.kernel.org
-References: <20231106143507.1060610-1-dwmw2@infradead.org>
- <20231106143507.1060610-18-dwmw2@infradead.org>
-Organization: Xen Project
-In-Reply-To: <20231106143507.1060610-18-dwmw2@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-26-pbonzini@redhat.com>
+ <CA+EHjTxy6TWM3oBG0Q6v5090XTrs+M8_m5=6Z2E1P-HyTkrGWg@mail.gmail.com>
+Message-ID: <ZUkQjW-yMnLfD7XW@google.com>
+Subject: Re: [PATCH 25/34] KVM: selftests: Add helpers to convert guest memory
+ b/w private and shared
+From: Sean Christopherson <seanjc@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
+	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 06/11/2023 14:35, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> Add notes about console and network support, and how to launch PV guests.
-> Clean up the disk configuration examples now that that's simpler, and
-> remove the comment about IDE unplug on q35/AHCI now that it's fixed.
-> 
-> Update the -initrd option documentation to explain how to quote commas
-> in module command lines, and reference it when documenting PV guests.
-> 
-> Also update stale avocado test filename in MAINTAINERS.
-> 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
->   MAINTAINERS              |   2 +-
->   docs/system/i386/xen.rst | 107 +++++++++++++++++++++++++++++----------
->   qemu-options.hx          |  14 +++--
->   3 files changed, 91 insertions(+), 32 deletions(-)
-> 
+On Mon, Nov 06, 2023, Fuad Tabba wrote:
+> On Sun, Nov 5, 2023 at 4:34=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com=
+> wrote:
+> > +void vm_guest_mem_fallocate(struct kvm_vm *vm, uint64_t base, uint64_t=
+ size,
+> > +                           bool punch_hole)
+> > +{
+> > +       const int mode =3D FALLOC_FL_KEEP_SIZE | (punch_hole ? FALLOC_F=
+L_PUNCH_HOLE : 0);
+> > +       struct userspace_mem_region *region;
+> > +       uint64_t end =3D base + size;
+> > +       uint64_t gpa, len;
+> > +       off_t fd_offset;
+> > +       int ret;
+> > +
+> > +       for (gpa =3D base; gpa < end; gpa +=3D len) {
+> > +               uint64_t offset;
+> > +
+> > +               region =3D userspace_mem_region_find(vm, gpa, gpa);
+> > +               TEST_ASSERT(region && region->region.flags & KVM_MEM_GU=
+EST_MEMFD,
+> > +                           "Private memory region not found for GPA 0x=
+%lx", gpa);
+> > +
+> > +               offset =3D (gpa - region->region.guest_phys_addr);
+>=20
+> nit: why the parentheses?
 
-Reviewed-by: Paul Durrant <paul@xen.org>
+I simply forgot to remove them when I changed the function to support spann=
+ing
+multiple memslots, i.e. when the code went from this
 
+	fd_offset =3D region->region.gmem_offset +
+		    (gpa - region->region.guest_phys_addr);
+
+to what you see above.
 
