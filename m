@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-696-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-697-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 390F67E1F70
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:07:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6789B7E1F71
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 12:07:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCD30B21884
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:07:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08B23B21905
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:07:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0035F1A71D;
-	Mon,  6 Nov 2023 11:06:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 505EE1C6A3;
+	Mon,  6 Nov 2023 11:06:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="alp2M5ul"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bTpmU5ZL"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D66E1A703
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:06:49 +0000 (UTC)
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC1CDB0
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 03:06:47 -0800 (PST)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-40839652b97so32714115e9.3
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 03:06:47 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C25311A737
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 11:06:55 +0000 (UTC)
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 329D1D8
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 03:06:54 -0800 (PST)
+Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2c50305c5c4so62262801fa.1
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 03:06:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699268806; x=1699873606; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1699268812; x=1699873612; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fVCnzhVZzYM83NLjfDBn8N7f5t+G1396ppAvAy7GW2E=;
-        b=alp2M5uldfPav0AxpRo2zkpJuGYz4I+tNdodkzCUH0YRNdiZELVhRjxgU6RdCADz/l
-         gYoffLC2uDiEa5u6ECkDt++Y6bu1wSInU4K2iSBQjIAFvXwRoixM844ObcUpi/2fqbwP
-         S7YzwyoJmWQraGaRUCeaEjJUh5tJ64/jg0hCZgI9a0q8bY24uAxA+76vf203NYmvuXr5
-         elvZZcF6anDpsM1Ib1uCaNVR21jjl5XPHiG3YnmuBJ4stNeG04wFyK49BXrhs9D2Z6cd
-         yjG4JFQLiSungKCHktAbCcWwPsJMuh6tX7tc4Y8bpJ6GNHzJzUhrwL169x8izqzC5aOA
-         bUUA==
+        bh=+6pej+XFgeNy8hwy7UMk7tmyBIA+j/BAJUFV7Aiq4os=;
+        b=bTpmU5ZLc5ri5Q00b6T1J30V3JDJV2sLvqLDS120vyRgZ5/4lzOlm/tiFzU8Wxv7u6
+         +dVzAQ6kZ/wBEhSV8FWG/BUV0T9goeLvYkWqpon68Mrxy8k012UeZY/3pS4n2qbe7Fzd
+         Y7h4h0Chm4Vg64Aw/V7ETaBUKwZfW4aWMFVOW/YcSZEqdrbghgzDUHbXdwoLB862iTUT
+         KnndFYXJMma6JpVZGcZXM1p/x05CB/oxiciJCyEtXo0F3wa0jyEKeW2c9u7F3isVysBL
+         eVoh4pzzmcAJdgVcjNgrY8RgzCpB84py51Ox7XsBnOndBzX6toNy12FvUfxcWIF0JLgb
+         Zdqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699268806; x=1699873606;
+        d=1e100.net; s=20230601; t=1699268812; x=1699873612;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fVCnzhVZzYM83NLjfDBn8N7f5t+G1396ppAvAy7GW2E=;
-        b=InkX5FfguX182+ZfeLG0HZNzF6sQ5mI9Mc2+q/yO8mRk0YMmfrJQA9kgB8TeoJjg9S
-         zHWrVUx/kfx1hTRUBn3EBPNuQGndN1NFxXFsNuczBdS3ZIRJiRrDsqB2LQqkIxnscT8+
-         ueggju0idbdcrI1SOmsF5xCROJSWMVsNAKWJaejouVTCVvsXDeFRIXwbhQA0AGIayXyG
-         cXnK+eQPpMo5n8aFqrmHO6rv+GtuTyHrno4cP2wCefoI+d+bSW3CVlL0QdEcy1JPenRY
-         pRpy8gfEVGV2nz9E8kH0+NemzEK+GF4y8Vhse4KYUD9BRM0x9CVEBhgOd156SkzdpW8D
-         K3aQ==
-X-Gm-Message-State: AOJu0YxweEIEcnabqEsU01KrrxBMerhftrTzpZEqBPxSUt+S7MHbjOzj
-	4de+Rgg2LcJn80SRgOM3T23Uxw==
-X-Google-Smtp-Source: AGHT+IEuDTQrO8cfHoeslXtrcco5KNUpzx8izu/DwKSeIwxrOOJugEKrgSkn8Nrwlb1DSs8x9XejMQ==
-X-Received: by 2002:a05:600c:1d0e:b0:402:8896:bb7b with SMTP id l14-20020a05600c1d0e00b004028896bb7bmr22306462wms.6.1699268806095;
-        Mon, 06 Nov 2023 03:06:46 -0800 (PST)
+        bh=+6pej+XFgeNy8hwy7UMk7tmyBIA+j/BAJUFV7Aiq4os=;
+        b=HudCeijGqy2vvL8JK4yCiKXKU5NKa7Td4eGF/zKqWs5lP2KAZ6fzinYDFbpFILWhF9
+         6zUIPFvf5Gt/VW2oNkpdDYvgR4QE8cHXR6Y/cRfHDhxZ7AsO9mw1uwe92uTnA313E+5O
+         3p+LDcvL7lArC7lzaDUWOz0sQH9z+BesUm8HU/V78tNwvqbgRkNndbLujp7EACvb7E2t
+         m7uUwK9mBDSp0EWMe9PZ50LnNyXMTpi4uFh/smW59hMN1X3oQuwiFtmNalOd7I3MnEKW
+         v7HNoo5UxcTZ0+ArXlm+DIn3XdYYVSQCLCRfqA2KyornY1DgvxlsaIkNWRHWYSk4xfW2
+         /0yQ==
+X-Gm-Message-State: AOJu0YxWJCw7Ie6+n6OSfv2y//OlwfrSFmDi+mZU9NwxhgbBmhEltjOM
+	0MmGauFapLVH4WL9qka+aFPEKw==
+X-Google-Smtp-Source: AGHT+IH9cDYwLDc1MRsfDAEGSPwPoLCFIf+s8baeSOuvBOTKWXUgUmhGOWDpYJxS4pQKbqZtqaKfYw==
+X-Received: by 2002:a05:651c:200c:b0:2c5:2d7:412 with SMTP id s12-20020a05651c200c00b002c502d70412mr18916048ljo.19.1699268812592;
+        Mon, 06 Nov 2023 03:06:52 -0800 (PST)
 Received: from m1x-phil.lan (176-131-220-199.abo.bbox.fr. [176.131.220.199])
-        by smtp.gmail.com with ESMTPSA id n3-20020a05600c4f8300b004064288597bsm11904145wmq.30.2023.11.06.03.06.44
+        by smtp.gmail.com with ESMTPSA id r16-20020a05600c459000b003fefaf299b6sm11914693wmo.38.2023.11.06.03.06.50
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 06 Nov 2023 03:06:45 -0800 (PST)
+        Mon, 06 Nov 2023 03:06:52 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: kvm@vger.kernel.org,
@@ -67,12 +67,12 @@ Cc: kvm@vger.kernel.org,
 	qemu-ppc@nongnu.org,
 	qemu-arm@nongnu.org,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	Cameron Esfahani <dirty@apple.com>,
-	Roman Bolshakov <rbolshakov@ddn.com>
-Subject: [PULL 27/60] target/i386/hvf: Rename 'X86CPU *x86_cpu' variable as 'cpu'
-Date: Mon,  6 Nov 2023 12:02:59 +0100
-Message-ID: <20231106110336.358-28-philmd@linaro.org>
+	Richard Henderson <richard.henderson@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>
+Subject: [PULL 28/60] target/i386/kvm: Correct comment in kvm_cpu_realize()
+Date: Mon,  6 Nov 2023 12:03:00 +0100
+Message-ID: <20231106110336.358-29-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231106110336.358-1-philmd@linaro.org>
 References: <20231106110336.358-1-philmd@linaro.org>
@@ -85,84 +85,25 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Follow the naming used by other files in target/i386/.
-
-No functional changes.
-
-Suggested-by: Zhao Liu <zhao1.liu@intel.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
-Message-Id: <20231020111136.44401-4-philmd@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20230918160257.30127-4-philmd@linaro.org>
 ---
- target/i386/hvf/x86_emu.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ target/i386/kvm/kvm-cpu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/i386/hvf/x86_emu.c b/target/i386/hvf/x86_emu.c
-index 5b82e84778..3a3f0a50d0 100644
---- a/target/i386/hvf/x86_emu.c
-+++ b/target/i386/hvf/x86_emu.c
-@@ -665,7 +665,7 @@ static void exec_lods(CPUX86State *env, struct x86_decode *decode)
- 
- void simulate_rdmsr(CPUX86State *env)
- {
--    X86CPU *x86_cpu = env_archcpu(env);
-+    X86CPU *cpu = env_archcpu(env);
-     CPUState *cs = env_cpu(env);
-     uint32_t msr = ECX(env);
-     uint64_t val = 0;
-@@ -675,10 +675,10 @@ void simulate_rdmsr(CPUX86State *env)
-         val = rdtscp() + rvmcs(cs->accel->fd, VMCS_TSC_OFFSET);
-         break;
-     case MSR_IA32_APICBASE:
--        val = cpu_get_apic_base(x86_cpu->apic_state);
-+        val = cpu_get_apic_base(cpu->apic_state);
-         break;
-     case MSR_IA32_UCODE_REV:
--        val = x86_cpu->ucode_rev;
-+        val = cpu->ucode_rev;
-         break;
-     case MSR_EFER:
-         val = rvmcs(cs->accel->fd, VMCS_GUEST_IA32_EFER);
-@@ -766,7 +766,7 @@ static void exec_rdmsr(CPUX86State *env, struct x86_decode *decode)
- 
- void simulate_wrmsr(CPUX86State *env)
- {
--    X86CPU *x86_cpu = env_archcpu(env);
-+    X86CPU *cpu = env_archcpu(env);
-     CPUState *cs = env_cpu(env);
-     uint32_t msr = ECX(env);
-     uint64_t data = ((uint64_t)EDX(env) << 32) | EAX(env);
-@@ -775,7 +775,7 @@ void simulate_wrmsr(CPUX86State *env)
-     case MSR_IA32_TSC:
-         break;
-     case MSR_IA32_APICBASE:
--        cpu_set_apic_base(x86_cpu->apic_state, data);
-+        cpu_set_apic_base(cpu->apic_state, data);
-         break;
-     case MSR_FSBASE:
-         wvmcs(cs->accel->fd, VMCS_GUEST_FS_BASE, data);
-@@ -1419,8 +1419,8 @@ static void init_cmd_handler()
- 
- void load_regs(CPUState *cs)
- {
--    X86CPU *x86_cpu = X86_CPU(cs);
--    CPUX86State *env = &x86_cpu->env;
-+    X86CPU *cpu = X86_CPU(cs);
-+    CPUX86State *env = &cpu->env;
- 
-     int i = 0;
-     RRX(env, R_EAX) = rreg(cs->accel->fd, HV_X86_RAX);
-@@ -1442,8 +1442,8 @@ void load_regs(CPUState *cs)
- 
- void store_regs(CPUState *cs)
- {
--    X86CPU *x86_cpu = X86_CPU(cs);
--    CPUX86State *env = &x86_cpu->env;
-+    X86CPU *cpu = X86_CPU(cs);
-+    CPUX86State *env = &cpu->env;
- 
-     int i = 0;
-     wreg(cs->accel->fd, HV_X86_RAX, RAX(env));
+diff --git a/target/i386/kvm/kvm-cpu.c b/target/i386/kvm/kvm-cpu.c
+index 56c72f3c45..9c791b7b05 100644
+--- a/target/i386/kvm/kvm-cpu.c
++++ b/target/i386/kvm/kvm-cpu.c
+@@ -37,6 +37,7 @@ static bool kvm_cpu_realizefn(CPUState *cs, Error **errp)
+      *  -> cpu_exec_realizefn():
+      *            -> accel_cpu_common_realize()
+      *               kvm_cpu_realizefn() -> host_cpu_realizefn()
++     *  -> cpu_common_realizefn()
+      *  -> check/update ucode_rev, phys_bits, mwait
+      */
+     if (cpu->max_features) {
 -- 
 2.41.0
 
