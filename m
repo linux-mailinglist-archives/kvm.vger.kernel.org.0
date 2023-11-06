@@ -1,118 +1,189 @@
-Return-Path: <kvm+bounces-781-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-782-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4EE07E2921
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:51:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 034357E292D
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 16:56:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E2142815B7
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 15:51:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32B231C20C22
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 15:56:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3075728E25;
-	Mon,  6 Nov 2023 15:51:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E3ED28E34;
+	Mon,  6 Nov 2023 15:56:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Pgr4DJor"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jfgAGp2H"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC5E1EB22
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 15:51:32 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9B9410CC;
-	Mon,  6 Nov 2023 07:51:30 -0800 (PST)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6Fex1h028635;
-	Mon, 6 Nov 2023 15:51:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- subject : from : to : message-id : date; s=pp1;
- bh=gmk6cqmM4Eayik0Z0A8soydrg46f++E8kacPrAmqEX0=;
- b=Pgr4DJorXgnBci6lw04v56GGX/r0rC8s3XTzOApRGbC0Nz6Q/NuCeb/I7FcqP7VKggqS
- WqIibl9hEHMnBPlraurPP6VGzU+nmy4jJJkdTYuj5qGLKA+ftPwGcmhLkz6lN+FA9xog
- j1ideJ7OiixDiPansfs2jKESFcXNkie57aiaQaP4GTHJBMeVRxoLtPW1xTogISqg88hQ
- ehjM6ityY9lPVs/Qge7rUQDmY0k1VCXTKQx15Z5OVcYduLHSMTCyDfLvuX/EPnk57ZsS
- tUVyJxVK2at0Ym7sreanC9S8Ae9TfwDOeJ7HCF66oR7ircquC2ggGlJDpEMZnCew0KWs zA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u71sgjyv2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 Nov 2023 15:51:29 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A6FfNXo032354;
-	Mon, 6 Nov 2023 15:51:29 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u71sgjymq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 Nov 2023 15:51:29 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6FOpv7017004;
-	Mon, 6 Nov 2023 15:51:09 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u6301ht3k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 Nov 2023 15:51:08 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A6Fp6wK43123286
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 6 Nov 2023 15:51:06 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2571C2004B;
-	Mon,  6 Nov 2023 15:51:06 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 038BC20049;
-	Mon,  6 Nov 2023 15:51:06 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.68.179])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  6 Nov 2023 15:51:05 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A8918644
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 15:56:08 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AACC13E
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 07:56:06 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d99ec34829aso5356461276.1
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 07:56:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699286165; x=1699890965; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2j2Mtk4lW9HEtWavGEnwteIJF5J/7dhiq9rSq3IBx+E=;
+        b=jfgAGp2HE5/xK9g4UWhCfe0wF8pepGfMwluQ7Me8zjfyk6kURtfjawQkzEKUL79x23
+         GA7yRpH7oYJ7PauF34lFwNQOzPOo074h3+rK5Nbw9zxFiNBJVL7dPbJmt303qnicGXhF
+         nEfy/sj/763fXTU7n9f9aw4t+i+ogT4UuEHWx8nRxxHclr16shV25An5cvb61i6Now6A
+         HZvr0t1B/eWzYe7LBjBhD2PvN13RVPGJ0vCSFvcA0giqJQMP2Ia9JWL28QQRK4AcKjCE
+         yKF3NGLMBB0N+rtxWhEtTE6umISScKcM05FoJLvnyi5f4Ogi9MTGBHt+4K6q2C36ozTG
+         krEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699286165; x=1699890965;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2j2Mtk4lW9HEtWavGEnwteIJF5J/7dhiq9rSq3IBx+E=;
+        b=UhcySQpTfx8qaGoMKwOSMMTBSfSM3pa217RqfRhp8NKVVRQ/a4xbRTPyspmJRTQ5Oz
+         qTkX63JiWWKafZMTzUMfdZvxzMf3rU+pq4+nTw+qwP01uWGxBxxTKVpivoCMApK9rPPB
+         f2CZNvFGNKS3LnLbNzE7WtxhGRxJX/cNbB/oYYkN+NgH83mUs+TRSSndpE6MrX32iWq4
+         27YFnXU/nQRo696y3X6lhHv7SanR2Pqevmgb/+vb0Gf/4ayheTA1ccuTKSocP4an8V+u
+         VJuGimUAu9vWFqZOGJqQ8Tg1NgtdPCeCn8D0ceorvcpL9Uu7xdZrK7pLwC81+GUCB+1N
+         e4Iw==
+X-Gm-Message-State: AOJu0Yy+WbDeMG6EF3kdnXJm1Oi5NGNdL5D9BMpKpkqJ9FuOy2GjBAOh
+	/MQvpWDKXFjEKfJo1WPVvULxGhZjj/0=
+X-Google-Smtp-Source: AGHT+IERk2b/M7d3G4J3vDGzrJ+T8jAsirv4bBIzvQT8OzuTMUe5AwPvC/SZu8YyGY6aMLoBT08jDOLmS/Y=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1083:b0:d9a:c3b8:4274 with SMTP id
+ v3-20020a056902108300b00d9ac3b84274mr683795ybu.7.1699286165114; Mon, 06 Nov
+ 2023 07:56:05 -0800 (PST)
+Date: Mon, 6 Nov 2023 07:56:03 -0800
+In-Reply-To: <ZUjqJjz0Epf7ii8F@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-21-seanjc@google.com>
+ <ZUeSaAKRemlSRQpO@yilunxu-OptiPlex-7050> <CABgObfb1Wf2ptitGhJPM6VcmkCG9haMoQj2BsttjeoV=9F0O9Q@mail.gmail.com>
+ <ZUjqJjz0Epf7ii8F@yilunxu-OptiPlex-7050>
+Message-ID: <ZUkMk6b6vZe2ANkK@google.com>
+Subject: Re: [PATCH v13 20/35] KVM: x86/mmu: Handle page fault for private memory
+From: Sean Christopherson <seanjc@google.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
+	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <f774a230-26b4-4742-8557-f504aa9344be@linux.ibm.com>
-References: <20231103092954.238491-1-nrb@linux.ibm.com> <20231103092954.238491-8-nrb@linux.ibm.com> <f774a230-26b4-4742-8557-f504aa9344be@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v7 7/8] s390x: add a test for SIE without MSO/MSL
-From: Nico Boehr <nrb@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>, imbrenda@linux.ibm.com,
-        thuth@redhat.com
-Message-ID: <169928586562.23816.12377210934787398767@t14-nrb>
-User-Agent: alot/0.8.1
-Date: Mon, 06 Nov 2023 16:51:05 +0100
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: deOxPGM1Dt9whNGrRgTU0B4m34izI_h5
-X-Proofpoint-GUID: EyFXksrZc-JSb29BWeZPZyvLS8ccOdNK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-06_12,2023-11-02_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- lowpriorityscore=0 clxscore=1015 malwarescore=0 spamscore=0
- mlxlogscore=999 suspectscore=0 priorityscore=1501 adultscore=0 bulkscore=0
- impostorscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311060128
 
-Quoting Janosch Frank (2023-11-03 15:16:36)
-[...]
-> > +static void setup_guest(void)
-> > +{
-> > +     extern const char SNIPPET_NAME_START(c, sie_dat)[];
-> > +     extern const char SNIPPET_NAME_END(c, sie_dat)[];
-> > +     uint64_t guest_max_addr;
-> > +
-> > +     setup_vm();
-> > +     snippet_setup_guest(&vm, false);
-> > +
-> > +     /* allocate a region-1 table */
-> > +     guest_root =3D pgd_alloc_one();
-> > +
-> > +     /* map guest memory 1:1 */
+On Mon, Nov 06, 2023, Xu Yilun wrote:
+> On Sun, Nov 05, 2023 at 05:19:36PM +0100, Paolo Bonzini wrote:
+> > On Sun, Nov 5, 2023 at 2:04=E2=80=AFPM Xu Yilun <yilun.xu@linux.intel.c=
+om> wrote:
+> > >
+> > > > +static void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcp=
+u,
+> > > > +                                           struct kvm_page_fault *=
+fault)
+> > > > +{
+> > > > +     kvm_prepare_memory_fault_exit(vcpu, fault->gfn << PAGE_SHIFT,
+> > > > +                                   PAGE_SIZE, fault->write, fault-=
+>exec,
+> > > > +                                   fault->is_private);
+> > > > +}
+> > > > +
+> > > > +static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
+> > > > +                                struct kvm_page_fault *fault)
+> > > > +{
+> > > > +     int max_order, r;
+> > > > +
+> > > > +     if (!kvm_slot_can_be_private(fault->slot)) {
+> > > > +             kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+> > > > +             return -EFAULT;
+> > > > +     }
+> > > > +
+> > > > +     r =3D kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &f=
+ault->pfn,
+> > > > +                          &max_order);
+> > > > +     if (r) {
+> > > > +             kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+> > > > +             return r;
+> > >
+> > > Why report KVM_EXIT_MEMORY_FAULT here? even with a ret !=3D -EFAULT?
+> >=20
+> > The cases are EFAULT, EHWPOISON (which can report
+> > KVM_EXIT_MEMORY_FAULT) and ENOMEM. I think it's fine
+> > that even -ENOMEM can return KVM_EXIT_MEMORY_FAULT,
+> > and it doesn't violate the documentation.  The docs tell you "what
+> > can you do if error if EFAULT or EHWPOISON?"; they don't
+> > exclude that other errnos result in KVM_EXIT_MEMORY_FAULT,
+> > it's just that you're not supposed to look at it
 >=20
-> 0:guest_max_addr
+> Thanks, it's OK for ENOMEM + KVM_EXIT_MEMORY_FAULT.
+>=20
+> Another concern is, now 3 places to report EFAULT + KVM_EXIT_MEMORY_FAULT=
+:
+>=20
+>   if (!kvm_slot_can_be_private(fault->slot)) {
+> 	kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+> 	return -EFAULT;
+>   }
+>=20
+>   file =3D kvm_gmem_get_file(slot);
+>   if (!file)
+> 	return -EFAULT;
+>=20
+>   if (fault->is_private !=3D kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
+> 	kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+> 	return -EFAULT;
+>   }
+>=20
+> They are different cases, and seems userspace should handle them
+> differently, but not enough information to distinguish them.
 
-Sorry, I don't get what you mean.
+For the first, the memory_fault exit will inform userspace that the guest w=
+ants
+to map memory as private, and userspace will see that the memslot isn't con=
+figured
+to support private mappings.  Userspace may not even need to query memslots=
+, e.g.
+if the gfn in question has been enumerated to the guest as something that c=
+an only
+be mapped shared.
+
+For the second (no valid guest_memfd file), userspace put the last referenc=
+e to
+the guest_memfd file without informing the guest or creating a memslot.  Th=
+at's
+firmly a userspace bug.
+
+For the third and last, userspace will see that the guest is requesting a p=
+rivate
+mapping but the gfn is configured for shared mappings.
+
+In all cases, userspace has the necessary information to resolve the issue,=
+ where
+"resolving the issue" may mean terminating the guest.  If userspace isn't t=
+racking
+memslots or the private attribute, then userspace has far bigger problems.
 
