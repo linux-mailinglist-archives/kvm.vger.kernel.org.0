@@ -1,142 +1,182 @@
-Return-Path: <kvm+bounces-810-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-812-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 205697E2AC8
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 18:14:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA9CF7E2B6D
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 18:47:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D037C2816A8
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 17:14:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 716D5281803
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 17:47:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B89429CF3;
-	Mon,  6 Nov 2023 17:13:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E5AE2C862;
+	Mon,  6 Nov 2023 17:47:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RL+mXaaK"
+	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="xwHBJzAw"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54192941E
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 17:13:53 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C93BD47;
-	Mon,  6 Nov 2023 09:13:51 -0800 (PST)
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6HB49V014750;
-	Mon, 6 Nov 2023 17:13:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- subject : to : from : message-id : date; s=pp1;
- bh=bNOLNbdUN9/83zEbvD8nEUpQ2JzjebQTj8dL38bKozQ=;
- b=RL+mXaaKv6YW9Oljv2GxqrPMR78u3h85Mj7bqS3YsMpQLC/ehJUnmphnX5FnbhyE61kU
- wUJ6zqSxZN/ch4MmOZ4SaMTTPXBUn4XK/eK6jfiUeGrwFvWmHB/M+lJIcHV+RMUBuFt6
- vtm1yUYrq3PRyzuNi/DabiQ0t8TbT2k4N4rWU2TC6WgekkfsouRznxejKhxHfk1SKMNB
- XG4ay6mTakP+qjjHgSR5MS5/y3NcYrVhFxVhEPf9ctLEtgBzfl0GiMoN+t6ZixCHpZ6i
- jljIwF7EFd4Zrqumvi3WgBEJmeTMJXyAwTG7XlkuHhRBEUwtIO2aWy2wxMjthmLbD2F8 gw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u73gh9u9b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 Nov 2023 17:13:43 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A6GlrI2018799;
-	Mon, 6 Nov 2023 17:13:42 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u73gh9u8p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 Nov 2023 17:13:42 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6FXmvF016950;
-	Mon, 6 Nov 2023 17:13:41 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u6301jaaq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 Nov 2023 17:13:41 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A6HDcVs31195494
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 6 Nov 2023 17:13:38 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D220120040;
-	Mon,  6 Nov 2023 17:13:38 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 457A020043;
-	Mon,  6 Nov 2023 17:13:38 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.68.179])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  6 Nov 2023 17:13:38 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E8329D0F
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 17:47:32 +0000 (UTC)
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FF9DD4C
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 09:47:30 -0800 (PST)
+Received: by mail-ot1-x335.google.com with SMTP id 46e09a7af769-6ce322b62aeso2999317a34.3
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 09:47:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1699292849; x=1699897649; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AjiTCAPQ/Dvh52BiHkeWzErmU2ehyc+Vb2ES67exqnE=;
+        b=xwHBJzAw/uzAkKsYhpH7d2DW8I+ChudZ66luAjAoiv8RYK/2HYoEAPXUGoLadZbfyU
+         YZp+4KPx5d90muzJJ7pS547Gd1mUIm9mRNYQpfP/xaEpf9ETH87n08ljjSNwzSc16bWJ
+         KMuLLkPMwuyjuDeoatltmCjG+a0surbeI9J1FNsXE6JRFzPnLSJmIddIdnOP7rhdUVit
+         U1dQ43B/XiYUe1a6lajh8RVopO7fVKF3sOG4xEe4mWRmy7XiZIqv6/cR4S6IGqHwRTUc
+         BeVtiY8pqIRtEh655JjZoy3M7typfmtz2pNuQOHbxmhE+V+C5ikWx9gx4d5pCHFHX9Ic
+         Yp4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699292849; x=1699897649;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AjiTCAPQ/Dvh52BiHkeWzErmU2ehyc+Vb2ES67exqnE=;
+        b=T9ZujR9tTE0wACl54Rc/T7Sj+M3cFm50N2VgMxi7X6eOl4GgpUNnCPM/TARaCdDPxC
+         i9F8FmeE9FSdPYGkJZ5bjEh0COcec5xGVnx+WFcqt3gG5xxVAfMNrjjj95NaP5LsQ+zl
+         yfxiuGwIbJJAXSQFf76pkQ4WV8zN7UEfpz80s3V06jSvH2Qo6dioHkSe5Ki8fSmR8uYW
+         gSNRwGIrqbn0okMVx+JfNc2B5mN8dkPqFWssjAQtWPjs5kVmWEJoINDDqsfCRiWLvcDA
+         DSqLAjcn1l01twQZS70B8s+s5XCwnC8V3MKEIpi+Pj2XRzBcfFHzOn0mx4qBJyQ7VY7m
+         Cnrg==
+X-Gm-Message-State: AOJu0Yw98G5PSpVqQyhbSkpYTsnl/ZHxTTOUpP/qFsmxOAWb3/UnF9fc
+	gcv/x8m/8HNLA3tMzEG5+YcXBA==
+X-Google-Smtp-Source: AGHT+IFHaQWxtub12aD9f9065e5oc0uXm1/nB/k434xLnQkRciT453rkxM4oCkVOVhn2njVQQYU0sw==
+X-Received: by 2002:a05:6830:925:b0:6cd:8c8:1654 with SMTP id v37-20020a056830092500b006cd08c81654mr35325191ott.2.1699292849495;
+        Mon, 06 Nov 2023 09:47:29 -0800 (PST)
+Received: from localhost ([192.184.165.199])
+        by smtp.gmail.com with ESMTPSA id az5-20020a056830458500b006c4727812fdsm1340215otb.15.2023.11.06.09.47.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Nov 2023 09:47:28 -0800 (PST)
+Date: Mon, 06 Nov 2023 09:47:28 -0800 (PST)
+X-Google-Original-Date: Mon, 06 Nov 2023 09:40:24 PST (-0800)
+Subject:     Re: [PATCH v2 4/5] riscv: kvm: Use SYM_*() assembly macros instead of deprecated ones
+In-Reply-To: <20231024132655.730417-5-cleger@rivosinc.com>
+CC: Paul Walmsley <paul.walmsley@sifive.com>, aou@eecs.berkeley.edu,
+  anup@brainfault.org, atishp@atishpatra.org, ajones@ventanamicro.com, cleger@rivosinc.com,
+  linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+  kvm-riscv@lists.infradead.org
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: cleger@rivosinc.com
+Message-ID: <mhng-a152f6da-63a0-4863-a637-e6ee4f4fa4d7@palmer-ri-x1c9>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20231106175316.1f05d090@p-imbrenda>
-References: <20231106125352.859992-1-nrb@linux.ibm.com> <20231106125352.859992-3-nrb@linux.ibm.com> <20231106175316.1f05d090@p-imbrenda>
-Cc: frankja@linux.ibm.com, thuth@redhat.com, david@redhat.com,
-        pbonzini@redhat.com, andrew.jones@linux.dev, lvivier@redhat.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v1 02/10] powerpc: properly format non-kernel-doc comments
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-From: Nico Boehr <nrb@linux.ibm.com>
-Message-ID: <169929081714.70850.5803437896270751208@t14-nrb>
-User-Agent: alot/0.8.1
-Date: Mon, 06 Nov 2023 18:13:37 +0100
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: G5-Eh6ya0ILZl6gDgslXAmXmMIzCsMsh
-X-Proofpoint-GUID: w4JXJtJd6EUf8248tjDRQjzGy1TBvHlQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-06_12,2023-11-02_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- impostorscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0 adultscore=0
- clxscore=1015 lowpriorityscore=0 phishscore=0 mlxscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311060139
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Quoting Claudio Imbrenda (2023-11-06 17:53:16)
-> On Mon,  6 Nov 2023 13:50:58 +0100
-> Nico Boehr <nrb@linux.ibm.com> wrote:
->=20
-> > These comments do not follow the kernel-doc style, hence they should not
-> > start with /**.
-> >=20
-> > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> > ---
-> >  powerpc/emulator.c    | 2 +-
-> >  powerpc/spapr_hcall.c | 6 +++---
-> >  powerpc/spapr_vpa.c   | 4 ++--
-> >  3 files changed, 6 insertions(+), 6 deletions(-)
-> >=20
-> > diff --git a/powerpc/emulator.c b/powerpc/emulator.c
-> > index 65ae4b65e655..39dd59645368 100644
-> > --- a/powerpc/emulator.c
-> > +++ b/powerpc/emulator.c
-> > @@ -71,7 +71,7 @@ static void test_64bit(void)
-> >       report_prefix_pop();
-> >  }
-> > =20
-> > -/**
-> > +/*
-> >   * Test 'Load String Word Immediate' instruction
-> >   */
->=20
-> this should have the name of the function first:=20
->  * test_lswi() - Test 'Load String ...=20
->=20
-> (same for all the other functions here)
+On Tue, 24 Oct 2023 06:26:54 PDT (-0700), cleger@rivosinc.com wrote:
+> ENTRY()/END()/WEAK() macros are deprecated and we should make use of the
+> new SYM_*() macros [1] for better annotation of symbols. Replace the
+> deprecated ones with the new ones and fix wrong usage of END()/ENDPROC()
+> to correctly describe the symbols.
+>
+> [1] https://docs.kernel.org/core-api/asm-annotations.html
+>
+> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> ---
+>  arch/riscv/kvm/vcpu_switch.S | 28 ++++++++++++----------------
+>  1 file changed, 12 insertions(+), 16 deletions(-)
+>
+> diff --git a/arch/riscv/kvm/vcpu_switch.S b/arch/riscv/kvm/vcpu_switch.S
+> index d74df8eb4d71..8b18473780ac 100644
+> --- a/arch/riscv/kvm/vcpu_switch.S
+> +++ b/arch/riscv/kvm/vcpu_switch.S
+> @@ -15,7 +15,7 @@
+>  	.altmacro
+>  	.option norelax
+>
+> -ENTRY(__kvm_riscv_switch_to)
+> +SYM_FUNC_START(__kvm_riscv_switch_to)
+>  	/* Save Host GPRs (except A0 and T0-T6) */
+>  	REG_S	ra, (KVM_ARCH_HOST_RA)(a0)
+>  	REG_S	sp, (KVM_ARCH_HOST_SP)(a0)
+> @@ -208,9 +208,9 @@ __kvm_switch_return:
+>
+>  	/* Return to C code */
+>  	ret
+> -ENDPROC(__kvm_riscv_switch_to)
+> +SYM_FUNC_END(__kvm_riscv_switch_to)
+>
+> -ENTRY(__kvm_riscv_unpriv_trap)
+> +SYM_CODE_START(__kvm_riscv_unpriv_trap)
+>  	/*
+>  	 * We assume that faulting unpriv load/store instruction is
+>  	 * 4-byte long and blindly increment SEPC by 4.
+> @@ -231,12 +231,10 @@ ENTRY(__kvm_riscv_unpriv_trap)
+>  	csrr	a1, CSR_HTINST
+>  	REG_S	a1, (KVM_ARCH_TRAP_HTINST)(a0)
+>  	sret
+> -ENDPROC(__kvm_riscv_unpriv_trap)
+> +SYM_CODE_END(__kvm_riscv_unpriv_trap)
+>
+>  #ifdef	CONFIG_FPU
+> -	.align 3
+> -	.global __kvm_riscv_fp_f_save
+> -__kvm_riscv_fp_f_save:
+> +SYM_FUNC_START(__kvm_riscv_fp_f_save)
+>  	csrr t2, CSR_SSTATUS
+>  	li t1, SR_FS
+>  	csrs CSR_SSTATUS, t1
+> @@ -276,10 +274,9 @@ __kvm_riscv_fp_f_save:
+>  	sw t0, KVM_ARCH_FP_F_FCSR(a0)
+>  	csrw CSR_SSTATUS, t2
+>  	ret
+> +SYM_FUNC_END(__kvm_riscv_fp_f_save)
+>
+> -	.align 3
+> -	.global __kvm_riscv_fp_d_save
+> -__kvm_riscv_fp_d_save:
+> +SYM_FUNC_START(__kvm_riscv_fp_d_save)
+>  	csrr t2, CSR_SSTATUS
+>  	li t1, SR_FS
+>  	csrs CSR_SSTATUS, t1
+> @@ -319,10 +316,9 @@ __kvm_riscv_fp_d_save:
+>  	sw t0, KVM_ARCH_FP_D_FCSR(a0)
+>  	csrw CSR_SSTATUS, t2
+>  	ret
+> +SYM_FUNC_END(__kvm_riscv_fp_d_save)
+>
+> -	.align 3
+> -	.global __kvm_riscv_fp_f_restore
+> -__kvm_riscv_fp_f_restore:
+> +SYM_FUNC_START(__kvm_riscv_fp_f_restore)
+>  	csrr t2, CSR_SSTATUS
+>  	li t1, SR_FS
+>  	lw t0, KVM_ARCH_FP_F_FCSR(a0)
+> @@ -362,10 +358,9 @@ __kvm_riscv_fp_f_restore:
+>  	fscsr t0
+>  	csrw CSR_SSTATUS, t2
+>  	ret
+> +SYM_FUNC_END(__kvm_riscv_fp_f_restore)
+>
+> -	.align 3
+> -	.global __kvm_riscv_fp_d_restore
+> -__kvm_riscv_fp_d_restore:
+> +SYM_FUNC_START(__kvm_riscv_fp_d_restore)
+>  	csrr t2, CSR_SSTATUS
+>  	li t1, SR_FS
+>  	lw t0, KVM_ARCH_FP_D_FCSR(a0)
+> @@ -405,4 +400,5 @@ __kvm_riscv_fp_d_restore:
+>  	fscsr t0
+>  	csrw CSR_SSTATUS, t2
+>  	ret
+> +SYM_FUNC_END(__kvm_riscv_fp_d_restore)
+>  #endif
 
-Since none of these comments really follow kerneldoc style and are mostly
-static anyways, the idea was to convert them to non-kerneldoc style, by
-changing the comment from:
-/**
-
-to:
-/*
-
-But I am just as fine to make the comments proper kerneldoc style, if we
-see value in that.
+Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
 
