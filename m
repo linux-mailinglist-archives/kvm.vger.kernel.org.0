@@ -1,249 +1,318 @@
-Return-Path: <kvm+bounces-643-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-644-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A21E7E1D52
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 10:37:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 263607E1E31
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 11:24:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5ECD52812E1
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 09:37:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D46C5281426
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 10:24:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD161642A;
-	Mon,  6 Nov 2023 09:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28ADA18030;
+	Mon,  6 Nov 2023 10:24:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aCZLoUJu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JODhOQh6"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FD015AFD
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 09:37:10 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B13EDB
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 01:37:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699263428;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/ek9xHU+c48j74pQ1dRBGoWQGjXiUEXkjvfYr7/xNeQ=;
-	b=aCZLoUJuCbk4skNeIxA7V9mzN+6s7PtOmc5Qe7mtSb53hhhDzZ+ppIOvks2jrIJ5m9KGpm
-	xvONaVsaR3oVGygQp6UqkzN4p21FO5zDAOBtL/H4dbQmiAS3Pj/HLdHVqiuzBWmtXhZ5Ct
-	rpfnZi9jvO6y/WSmKq3I2zfpN3Dc6Rc=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-696-aY4rUub2N3S14l6fPJWN8Q-1; Mon, 06 Nov 2023 04:37:07 -0500
-X-MC-Unique: aY4rUub2N3S14l6fPJWN8Q-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-26b6eb0f1f3so1294717a91.1
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 01:37:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12FCC1799E
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 10:24:25 +0000 (UTC)
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D34F9DB
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 02:24:23 -0800 (PST)
+Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-41cc44736f2so30051941cf.3
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 02:24:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699266263; x=1699871063; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Jx7pzo9zslWgjVRljunAjs24sdVG2mkanbp0iYdFwaI=;
+        b=JODhOQh6IZK5b57bgt+tbqhYpZqu7mAtmnj1I32IhxvEx0ZCQkkP9PNPPw7my+Se5G
+         0hfnoehIHwyUPmlnrOSQaEoWPTKByzqfvvpf+fCCE0DAWR4otXPZlgUbxo0FwwSu2TL6
+         +c6hC+umSddz6JJA9YBwnCkfcvFXt7JsvJndnmbqWQ6Y5FV54XMB5SAHiJ+EpaPkk7ZX
+         pEGd/4torDbF86UQf7p8JtGsPxnFUuE4vSMo06/30v9R1XZ+L6vEKHC0DvVUBKQYzieZ
+         o/hd7mGCBXUTxitZ1Cmf1obG3elW4OIX83b7qYlFZG1t64gSG6XindjeWVThhtilCtrZ
+         YMug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699263426; x=1699868226;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/ek9xHU+c48j74pQ1dRBGoWQGjXiUEXkjvfYr7/xNeQ=;
-        b=cj1GyggBCI9wdbcFyMt0gVI2pJh9JWSkAZqXqGp661FY8ZGuWkZX7ljFrgLeGFFwdT
-         YDwtRr03R5i50MMO8sjKy4g54ZRvlzIW2sbApGpPaoG/qnPfqZY4AR0oMJsaDPZSRNpY
-         U+Pv1HspErnzyAEa8IWN62BNCzCFJ/CwtxujawIuBooVTXB7L2Vm32hbd6iujq04ZwQO
-         FliKWFHRpe21q2Xa+xz3plN9Gso2WIrd15rf8W+OUEpe4y/ahuq0jxHbHe9vESIdS9VX
-         CfXDlDnGcgKLZ3+XBxOuXDJEjDW1VsKUVX4ENzHDu+asZZcD9E4d3VL5qO7HH2D3fjPl
-         nWng==
-X-Gm-Message-State: AOJu0Yx83OlRngG2l2oyTv2OUI7HJYs9ZY6WAn6mRS8+y87q7R03Qebh
-	Bodu/1tUVoH1ruWHkjte0bt15wWnJqpgr6zg2X/t+JC47pLvqfLTI5UuRs2AJHo0qaZMZ2iVrHs
-	S7cIx55HBM+8T
-X-Received: by 2002:a17:903:2581:b0:1cc:3e45:ac1e with SMTP id jb1-20020a170903258100b001cc3e45ac1emr24250833plb.6.1699263425953;
-        Mon, 06 Nov 2023 01:37:05 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IESKZedxUqOrtYYE4u+YZYSWOXq7PI3xHg1EXB8jO3KijU7PQYzXr0ZHP13luGygv1Ji4CUPQ==
-X-Received: by 2002:a17:903:2581:b0:1cc:3e45:ac1e with SMTP id jb1-20020a170903258100b001cc3e45ac1emr24250819plb.6.1699263425595;
-        Mon, 06 Nov 2023 01:37:05 -0800 (PST)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id q14-20020a170902a3ce00b001bd62419744sm5624890plb.147.2023.11.06.01.37.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Nov 2023 01:37:05 -0800 (PST)
-Message-ID: <678f0bd1-1232-f785-45ac-45a8f4404347@redhat.com>
-Date: Mon, 6 Nov 2023 17:37:01 +0800
+        d=1e100.net; s=20230601; t=1699266263; x=1699871063;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Jx7pzo9zslWgjVRljunAjs24sdVG2mkanbp0iYdFwaI=;
+        b=hILhlohLFfCSs0bbkk+k4rAZIfC4AfZctR33bKMnTwUuNbQC7H0uZbNORblrvOvMF2
+         /oWuj7fApcVe9zi3QioM+3cZ/5xYjTa9Af0QgjQ6IgWIvlmV6FbxlTTHcByVLb2UY4bw
+         CfkWBmNNNC3v60/TdOmIlrXzTM6Ql1G0J4V7YHp3ADUBX0wZg0xmfsn91TVfkm6RCSEi
+         KNJLkAvoCyp9NeMdB4f6ke8qNIhOc+AYYZwY96V/h6Y670GhiFBXxafDEuLnWyHIQOUd
+         HFhsIW8M1bnRHZqjoattfq8upmUDrdRr74GPIabxBmoAEF0zSm3/7ztM8qAqZSuEeWCN
+         oAhg==
+X-Gm-Message-State: AOJu0YyV4XvpS9CHBh8RJXPk90vleT1Kzy0oIpLWiZJec9bS6WroGVnR
+	qF17NFa9vvJO2grAwI0KT4hD+3sMHKVq2fM5JAAcdA==
+X-Google-Smtp-Source: AGHT+IGxqUy2TkFSF/6DzAsvotrbwxLeZiINpO4wtvkCRKfv4JWO0abdv88fQIT6HNBLh2pi2NT5y8KzEPnGx9OmZnQ=
+X-Received: by 2002:ad4:5aa3:0:b0:66d:bc21:814c with SMTP id
+ u3-20020ad45aa3000000b0066dbc21814cmr37429526qvg.65.1699266262770; Mon, 06
+ Nov 2023 02:24:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [kvm-unit-tests RFC PATCH 00/19] arm/arm64: Rework cache
- maintenance at boot
-To: Alexandru Elisei <alexandru.elisei@arm.com>, pbonzini@redhat.com,
- thuth@redhat.com, andrew.jones@linux.dev, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, nikos.nikoleris@arm.com
-References: <20220809091558.14379-1-alexandru.elisei@arm.com>
- <ZUdrku2u6OGc43wv@monolith>
-Content-Language: en-US
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <ZUdrku2u6OGc43wv@monolith>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-10-pbonzini@redhat.com>
+In-Reply-To: <20231105163040.14904-10-pbonzini@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 6 Nov 2023 10:23:46 +0000
+Message-ID: <CA+EHjTz5F14ULr0ji0-Xq+gAHMZo7EV8tA4KRTkp0pPzZ1dcng@mail.gmail.com>
+Subject: Re: [PATCH 09/34] KVM: Add KVM_EXIT_MEMORY_FAULT exit to report
+ faults to userspace
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Sean Christopherson <seanjc@google.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Alexandru,
+On Sun, Nov 5, 2023 at 4:32=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>
+> From: Chao Peng <chao.p.peng@linux.intel.com>
+>
+> Add a new KVM exit type to allow userspace to handle memory faults that
+> KVM cannot resolve, but that userspace *may* be able to handle (without
+> terminating the guest).
+>
+> KVM will initially use KVM_EXIT_MEMORY_FAULT to report implicit
+> conversions between private and shared memory.  With guest private memory=
+,
+> there will be two kind of memory conversions:
+>
+>   - explicit conversion: happens when the guest explicitly calls into KVM
+>     to map a range (as private or shared)
+>
+>   - implicit conversion: happens when the guest attempts to access a gfn
+>     that is configured in the "wrong" state (private vs. shared)
+>
+> On x86 (first architecture to support guest private memory), explicit
+> conversions will be reported via KVM_EXIT_HYPERCALL+KVM_HC_MAP_GPA_RANGE,
+> but reporting KVM_EXIT_HYPERCALL for implicit conversions is undesriable
+> as there is (obviously) no hypercall, and there is no guarantee that the
+> guest actually intends to convert between private and shared, i.e. what
+> KVM thinks is an implicit conversion "request" could actually be the
+> result of a guest code bug.
+>
+> KVM_EXIT_MEMORY_FAULT will be used to report memory faults that appear to
+> be implicit conversions.
+>
+> Note!  To allow for future possibilities where KVM reports
+> KVM_EXIT_MEMORY_FAULT and fills run->memory_fault on _any_ unresolved
+> fault, KVM returns "-EFAULT" (-1 with errno =3D=3D EFAULT from userspace'=
+s
+> perspective), not '0'!  Due to historical baggage within KVM, exiting to
+> userspace with '0' from deep callstacks, e.g. in emulation paths, is
+> infeasible as doing so would require a near-complete overhaul of KVM,
+> whereas KVM already propagates -errno return codes to userspace even when
+> the -errno originated in a low level helper.
+>
+> Report the gpa+size instead of a single gfn even though the initial usage
+> is expected to always report single pages.  It's entirely possible, likel=
+y
+> even, that KVM will someday support sub-page granularity faults, e.g.
+> Intel's sub-page protection feature allows for additional protections at
+> 128-byte granularity.
+>
+> Link: https://lore.kernel.org/all/20230908222905.1321305-5-amoorthy@googl=
+e.com
+> Link: https://lore.kernel.org/all/ZQ3AmLO2SYv3DszH@google.com
+> Cc: Anish Moorthy <amoorthy@google.com>
+> Cc: David Matlack <dmatlack@google.com>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> Message-Id: <20231027182217.3615211-10-seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
 
-On 11/5/23 18:16, Alexandru Elisei wrote:
-> Hi,
-> 
-> I had a v2 almost finished a few months ago (maybe a year), but I parked
-> the patches when we decided that the best thing to do was to have UEFI
-> support in first, then rework the cache maintenance - that way, the changes
-> can be tested on baremetal, which is much more unforgiving than KVM.
-> 
-> Unfortunately I've been busy with other things and I don't know when I'll
-> be able to come back to this. So I've pushed the work-in-progress here [1],
-> with what I hope is a helpful changelog since v1.
-> 
-> If my memory serves me right, even though it is marked as wip, it was
-> running just fine under KVM and I was waiting for UEFI to test it on
-> baremetal before posting.
-> 
-> I don't know when I'll have the time to get back to the series, so if
-> anyone is still interested, feel free to pick it up. If someone does pick
-> up the series, they can drop/rework patches as they see fit, and I'll try
-> to do my best to review whatever is posted on the list (but no promises).
-> 
-> [1] https://gitlab.arm.com/linux-arm/kvm-unit-tests-ae/-/tree/arm-arm64-rework-cache-maintenance-at-boot-v2-wip2
+Reviewed-by: Fuad Tabba <tabba@google.com>
+Tested-by: Fuad Tabba <tabba@google.com>
 
-I'm willing to take your work. But I can't open your link posted in [1]. 
-I don't have permission to access it. Could you please posted it on a 
-public place?
+Cheers,
+/fuad
 
-Thanks,
-Shaoqin
-
-> 
-> Thanks,
-> Alex
-> 
-> On Tue, Aug 09, 2022 at 10:15:39AM +0100, Alexandru Elisei wrote:
->> I got the idea for this series as I was looking at the UEFI support series
->> [1]. More specifically, I realized that the cache maintenance performed by
->> asm_mmu_disable is insuficient. Patch #19 ("arm/arm64: Rework the cache
->> maintenance in asm_mmu_disable") describes what is wrong with
->> asm_mmu_disable. A detailed explanation of what cache maintenance is needed
->> and why is needed can be found in patch #18 ("arm/arm64: Perform dcache
->> maintenance at boot").
->>
->> Then I realized that I couldn't fix only asm_mmu_disable, and leave the
->> rest of kvm-unit-tests without the needed cache maintenance, so here it is,
->> my attempt at adding the cache maintenace operations (from now on, CMOs)
->> required by the architecture.
->>
->> My approach is to try to enable the MMU and build the translation tables as
->> soon as possible, to avoid as much of cache maintenance as possible. I
->> didn't want to do it in the early assembly code, like Linux, because I like
->> the fact that kvm-unit-tests keeps the assembly code to a minimum, and I
->> wanted to preserve that. So I made the physical allocator simpler (patches
->> #2-#6) so it can be used to create the translation tables immediately after
->> the memory regions are populated.
->>
->> After moving some code around, especially how the secondaries are brought
->> online, the dcache maintenance is implemented in patch #18 ("arm/arm64:
->> Perform dcache maintenance at boot").
->>
->> The series is an RFC, and I open to suggestions about how to do things
->> better; I'm happy to rework the entire series if a better approach is
->> proposed.
->>
->> Why is this needed? Nobody complained about test failing because of missing
->> CMOs before, so why add them now? I see two reasons for the series:
->>
->> 1. For architectural correctness. The emphasis has been so far on the test
->> themselves to be architectural compliant, but I believe that the boot code
->> should get the same treatment. kvm-unit-tests has started to be used in
->> different ways than before, and I don't think that we should limit
->> ourselves to running under one hypervisor, or running under a hypervisor at
->> all. Which brings me to point number 2.
->>
->> 2. If nothing else, this can serve as a showcase for the UEFI support
->> series for the required cache maintenance. Although I hope that UEFI
->> support will end up sharing at least some of the boot code with the
->> non-UEFI boot path.
->>
->> This is an RFC and has some rough edges, probably also bugs, but I believe
->> the concept to be sound. If/when the series stabilizes, I'll probably split
->> it into separate series (for example, the __ASSEMBLY__ define patch could
->> probably be separate from the others). Tested by running all the arm and
->> arm64 tests on a rockpro64 with qemu.
->>
->> [1] https://lore.kernel.org/all/20220630100324.3153655-1-nikos.nikoleris@arm.com/
->>
->> Alexandru Elisei (19):
->>    Makefile: Define __ASSEMBLY__ for assembly files
->>    lib/alloc_phys: Initialize align_min
->>    lib/alloc_phys: Use phys_alloc_aligned_safe and rename it to
->>      memalign_early
->>    powerpc: Use the page allocator
->>    lib/alloc_phys: Remove locking
->>    lib/alloc_phys: Remove allocation accounting
->>    arm/arm64: Mark the phys_end parameter as unused in setup_mmu()
->>    arm/arm64: Use pgd_alloc() to allocate mmu_idmap
->>    arm/arm64: Zero secondary CPUs' stack
->>    arm/arm64: Enable the MMU early
->>    arm/arm64: Map the UART when creating the translation tables
->>    arm/arm64: assembler.h: Replace size with end address for
->>      dcache_by_line_op
->>    arm: page.h: Add missing libcflat.h include
->>    arm/arm64: Add C functions for doing cache maintenance
->>    lib/alloc_phys: Add callback to perform cache maintenance
->>    arm/arm64: Allocate secondaries' stack using the page allocator
->>    arm/arm64: Configure secondaries' stack before enabling the MMU
->>    arm/arm64: Perform dcache maintenance at boot
->>    arm/arm64: Rework the cache maintenance in asm_mmu_disable
->>
->>   Makefile                   |   5 +-
->>   arm/Makefile.arm           |   4 +-
->>   arm/Makefile.arm64         |   4 +-
->>   arm/Makefile.common        |   4 +-
->>   arm/cstart.S               |  59 ++++++++++++------
->>   arm/cstart64.S             |  56 +++++++++++++----
->>   lib/alloc_phys.c           | 122 ++++++++++++-------------------------
->>   lib/alloc_phys.h           |  13 +++-
->>   lib/arm/asm/assembler.h    |  15 ++---
->>   lib/arm/asm/cacheflush.h   |   1 +
->>   lib/arm/asm/mmu-api.h      |   1 +
->>   lib/arm/asm/mmu.h          |   6 --
->>   lib/arm/asm/page.h         |   2 +
->>   lib/arm/asm/pgtable.h      |  52 ++++++++++++++--
->>   lib/arm/asm/thread_info.h  |   3 +-
->>   lib/arm/cache.S            |  89 +++++++++++++++++++++++++++
->>   lib/arm/io.c               |   5 ++
->>   lib/arm/io.h               |   3 +
->>   lib/arm/mmu.c              |  60 +++++++++++-------
->>   lib/arm/processor.c        |   6 +-
->>   lib/arm/setup.c            |  66 ++++++++++++++++----
->>   lib/arm/smp.c              |   9 ++-
->>   lib/arm64/asm/assembler.h  |  11 ++--
->>   lib/arm64/asm/cacheflush.h |  32 ++++++++++
->>   lib/arm64/asm/mmu.h        |   5 --
->>   lib/arm64/asm/pgtable.h    |  67 ++++++++++++++++++--
->>   lib/arm64/cache.S          |  85 ++++++++++++++++++++++++++
->>   lib/arm64/processor.c      |   5 +-
->>   lib/devicetree.c           |   2 +-
->>   lib/powerpc/setup.c        |   8 +++
->>   powerpc/Makefile.common    |   1 +
->>   powerpc/cstart64.S         |   1 -
->>   powerpc/spapr_hcall.c      |   5 +-
->>   33 files changed, 608 insertions(+), 199 deletions(-)
->>   create mode 100644 lib/arm/asm/cacheflush.h
->>   create mode 100644 lib/arm/cache.S
->>   create mode 100644 lib/arm64/asm/cacheflush.h
->>   create mode 100644 lib/arm64/cache.S
->>
->> -- 
->> 2.37.1
->>
-> 
-
--- 
-Shaoqin
-
+>  Documentation/virt/kvm/api.rst | 41 ++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/x86.c             |  1 +
+>  include/linux/kvm_host.h       | 11 +++++++++
+>  include/uapi/linux/kvm.h       |  8 +++++++
+>  4 files changed, 61 insertions(+)
+>
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
+rst
+> index bdea1423c5f8..481fb0e2ce90 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6846,6 +6846,26 @@ array field represents return values. The userspac=
+e should update the return
+>  values of SBI call before resuming the VCPU. For more details on RISC-V =
+SBI
+>  spec refer, https://github.com/riscv/riscv-sbi-doc.
+>
+> +::
+> +
+> +               /* KVM_EXIT_MEMORY_FAULT */
+> +               struct {
+> +                       __u64 flags;
+> +                       __u64 gpa;
+> +                       __u64 size;
+> +               } memory_fault;
+> +
+> +KVM_EXIT_MEMORY_FAULT indicates the vCPU has encountered a memory fault =
+that
+> +could not be resolved by KVM.  The 'gpa' and 'size' (in bytes) describe =
+the
+> +guest physical address range [gpa, gpa + size) of the fault.  The 'flags=
+' field
+> +describes properties of the faulting access that are likely pertinent.
+> +Currently, no flags are defined.
+> +
+> +Note!  KVM_EXIT_MEMORY_FAULT is unique among all KVM exit reasons in tha=
+t it
+> +accompanies a return code of '-1', not '0'!  errno will always be set to=
+ EFAULT
+> +or EHWPOISON when KVM exits with KVM_EXIT_MEMORY_FAULT, userspace should=
+ assume
+> +kvm_run.exit_reason is stale/undefined for all other error numbers.
+> +
+>  ::
+>
+>      /* KVM_EXIT_NOTIFY */
+> @@ -7880,6 +7900,27 @@ This capability is aimed to mitigate the threat th=
+at malicious VMs can
+>  cause CPU stuck (due to event windows don't open up) and make the CPU
+>  unavailable to host or other VMs.
+>
+> +7.34 KVM_CAP_MEMORY_FAULT_INFO
+> +------------------------------
+> +
+> +:Architectures: x86
+> +:Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
+> +
+> +The presence of this capability indicates that KVM_RUN will fill
+> +kvm_run.memory_fault if KVM cannot resolve a guest page fault VM-Exit, e=
+.g. if
+> +there is a valid memslot but no backing VMA for the corresponding host v=
+irtual
+> +address.
+> +
+> +The information in kvm_run.memory_fault is valid if and only if KVM_RUN =
+returns
+> +an error with errno=3DEFAULT or errno=3DEHWPOISON *and* kvm_run.exit_rea=
+son is set
+> +to KVM_EXIT_MEMORY_FAULT.
+> +
+> +Note: Userspaces which attempt to resolve memory faults so that they can=
+ retry
+> +KVM_RUN are encouraged to guard against repeatedly receiving the same
+> +error/annotated fault.
+> +
+> +See KVM_EXIT_MEMORY_FAULT for more information.
+> +
+>  8. Other capabilities.
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7b389f27dffc..8f9d8939b63b 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4625,6 +4625,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, l=
+ong ext)
+>         case KVM_CAP_ENABLE_CAP:
+>         case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
+>         case KVM_CAP_IRQFD_RESAMPLE:
+> +       case KVM_CAP_MEMORY_FAULT_INFO:
+>                 r =3D 1;
+>                 break;
+>         case KVM_CAP_EXIT_HYPERCALL:
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 4e741ff27af3..96aa930536b1 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2327,4 +2327,15 @@ static inline void kvm_account_pgtable_pages(void =
+*virt, int nr)
+>  /* Max number of entries allowed for each kvm dirty ring */
+>  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
+>
+> +static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+> +                                                gpa_t gpa, gpa_t size)
+> +{
+> +       vcpu->run->exit_reason =3D KVM_EXIT_MEMORY_FAULT;
+> +       vcpu->run->memory_fault.gpa =3D gpa;
+> +       vcpu->run->memory_fault.size =3D size;
+> +
+> +       /* Flags are not (yet) defined or communicated to userspace. */
+> +       vcpu->run->memory_fault.flags =3D 0;
+> +}
+> +
+>  #endif
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 308cc70bd6ab..59010a685007 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -275,6 +275,7 @@ struct kvm_xen_exit {
+>  #define KVM_EXIT_RISCV_CSR        36
+>  #define KVM_EXIT_NOTIFY           37
+>  #define KVM_EXIT_LOONGARCH_IOCSR  38
+> +#define KVM_EXIT_MEMORY_FAULT     39
+>
+>  /* For KVM_EXIT_INTERNAL_ERROR */
+>  /* Emulate instruction failed. */
+> @@ -528,6 +529,12 @@ struct kvm_run {
+>  #define KVM_NOTIFY_CONTEXT_INVALID     (1 << 0)
+>                         __u32 flags;
+>                 } notify;
+> +               /* KVM_EXIT_MEMORY_FAULT */
+> +               struct {
+> +                       __u64 flags;
+> +                       __u64 gpa;
+> +                       __u64 size;
+> +               } memory_fault;
+>                 /* Fix the size of the union. */
+>                 char padding[256];
+>         };
+> @@ -1212,6 +1219,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
+>  #define KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES 230
+>  #define KVM_CAP_USER_MEMORY2 231
+> +#define KVM_CAP_MEMORY_FAULT_INFO 232
+>
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>
+> --
+> 2.39.1
+>
+>
 
