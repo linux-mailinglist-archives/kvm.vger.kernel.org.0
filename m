@@ -1,229 +1,189 @@
-Return-Path: <kvm+bounces-756-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-758-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDD857E26C5
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 15:27:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDC377E26F1
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 15:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E21EB20FC6
-	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 14:27:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B92F1C20BFF
+	for <lists+kvm@lfdr.de>; Mon,  6 Nov 2023 14:35:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988F728DA2;
-	Mon,  6 Nov 2023 14:26:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gw9KfQ+X"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25BC628DC3;
+	Mon,  6 Nov 2023 14:35:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25986286BA
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 14:26:52 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C628DF4
-	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 06:26:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699280810;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=EQEY0yLpyjybbnIksSuJ4Z5QD7aeTkworRxg3pV8noA=;
-	b=gw9KfQ+X1O+MfbcCQxnNJC6CL99Wkg2OwASArQmi9tNKwqr3p5A6vRqSHszc3cpXkl5TWA
-	fIm5MYHJfrEwfbufMCAlOF2zQjVgfv71HcplV2w2VDpHUITblrwFStA4xcUIvFtxzkXGGq
-	u5t69z8o4Gb27sJyEgjvCULetiajfIQ=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-25-qWFXE3IaN72zua0h93WinA-1; Mon, 06 Nov 2023 09:26:49 -0500
-X-MC-Unique: qWFXE3IaN72zua0h93WinA-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2c515541a25so47945001fa.0
-        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 06:26:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699280808; x=1699885608;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EQEY0yLpyjybbnIksSuJ4Z5QD7aeTkworRxg3pV8noA=;
-        b=vb1fIBPObkGy6/x1+ra83KN11d9dis5ti0VbeuwWNmKXBd83dfrmDP0869Z5mOLki2
-         4QBadWHRtmtXaVgjmFs7DB7m0pTOm+s4y6uDEHC4naThh2E/FsTCNz7uTSt5/g5579DW
-         anAqQs02gwFvSHvNp7y3WtFbffj7APTUP6id2SBXidgeKKGSWAqz/TzsAFoLuWNUcYWl
-         mVoXpkaXNUsb4TZw6BKa689tVdR2i3ztvzR6fUNZ60a4D8f8NGMmZjWYLupQ9D05rl/f
-         e+TAEswaxfywDmVkAJFHowgF2MQedXOimY2cE5j9C9iW1H4/SlwtYu9SD/SXkM7IPod1
-         bQ3A==
-X-Gm-Message-State: AOJu0YwLjsCKfYuYBg4VxEXZ9+BPryLw47LbjI5SmLBch5IFZ/i/C72C
-	fg51+GoRnIoTKIgEV1w39antbNc0knR6NN30vXLE72S04lvdwGG8qizZI0tbBFH+DyyzjF2a8V0
-	TUmyZ7/TVvnBE
-X-Received: by 2002:a2e:b953:0:b0:2c5:2d02:ed14 with SMTP id 19-20020a2eb953000000b002c52d02ed14mr21572215ljs.23.1699280808165;
-        Mon, 06 Nov 2023 06:26:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGe0jlmDLWFqZf1fufd7JZlCly/w1zvo9x6RPHgHPz0rI92EPGNolcWdP4AapnywQ3Fs4WFBA==
-X-Received: by 2002:a2e:b953:0:b0:2c5:2d02:ed14 with SMTP id 19-20020a2eb953000000b002c52d02ed14mr21572194ljs.23.1699280807790;
-        Mon, 06 Nov 2023 06:26:47 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id l41-20020a05600c1d2900b004083a105f27sm12541348wms.26.2023.11.06.06.26.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Nov 2023 06:26:47 -0800 (PST)
-Message-ID: <affca7a8-116e-4b0f-9edf-6cdc05ba65ca@redhat.com>
-Date: Mon, 6 Nov 2023 15:26:44 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FBC528DAC
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 14:35:24 +0000 (UTC)
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D50AFC6
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 06:35:22 -0800 (PST)
+X-IronPort-AV: E=Sophos;i="6.03,281,1694736000"; 
+   d="scan'208";a="41362360"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-d23e07e8.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2023 14:35:21 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
+	by email-inbound-relay-iad-1d-m6i4x-d23e07e8.us-east-1.amazon.com (Postfix) with ESMTPS id 20E1283A70;
+	Mon,  6 Nov 2023 14:35:14 +0000 (UTC)
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:14317]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.187:2525] with esmtp (Farcaster)
+ id 1c473c1c-c50b-4c1c-b64e-8d2edea49916; Mon, 6 Nov 2023 14:35:13 +0000 (UTC)
+X-Farcaster-Flow-ID: 1c473c1c-c50b-4c1c-b64e-8d2edea49916
+Received: from EX19EXOUWB002.ant.amazon.com (10.250.64.247) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Mon, 6 Nov 2023 14:35:13 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
+ EX19EXOUWB002.ant.amazon.com (10.250.64.247) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.27; Mon, 6 Nov 2023 14:35:12 +0000
+Received: from u3832b3a9db3152.ant.amazon.com (10.106.83.6) by
+ mail-relay.amazon.com (10.250.64.254) with Microsoft SMTP Server id
+ 15.2.1118.39 via Frontend Transport; Mon, 6 Nov 2023 14:35:09 +0000
+From: David Woodhouse <dwmw2@infradead.org>
+To: <qemu-devel@nongnu.org>
+CC: Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>, "Peter
+ Maydell" <peter.maydell@linaro.org>, Stefano Stabellini
+	<sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "Paul
+ Durrant" <paul@xen.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?=
+	<marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Richard
+ Henderson" <richard.henderson@linaro.org>, Eduardo Habkost
+	<eduardo@habkost.net>, "Michael S. Tsirkin" <mst@redhat.com>, "Marcel
+ Apfelbaum" <marcel.apfelbaum@gmail.com>, Jason Wang <jasowang@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, <qemu-block@nongnu.org>,
+	<xen-devel@lists.xenproject.org>, <kvm@vger.kernel.org>
+Subject: [PATCH v4 00/17] Get Xen PV shim running in QEMU, add net and console
+Date: Mon, 6 Nov 2023 14:34:50 +0000
+Message-ID: <20231106143507.1060610-1-dwmw2@infradead.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 31/34] KVM: selftests: Expand set_memory_region_test to
- validate guest_memfd()
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Sean Christopherson <seanjc@google.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Andrew Morton <akpm@linux-foundation.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- Xiaoyao Li <xiaoyao.li@intel.com>, Xu Yilun <yilun.xu@intel.com>,
- Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
- Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>,
- David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
- =?UTF-8?Q?n?= <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>,
- Vishal Annapurve <vannapurve@google.com>,
- Ackerley Tng <ackerleytng@google.com>,
- Maciej Szmigiero <mail@maciej.szmigiero.name>,
- David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
- Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
- Liam Merwick <liam.merwick@oracle.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>,
- "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20231105163040.14904-1-pbonzini@redhat.com>
- <20231105163040.14904-32-pbonzini@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
- CxXPkIBTvYY+ZPkoTh5xF9oS1jqI8iRLzouzF8yXs3QjQIZ2SfuCxSVwlV65jotcjD2FTN04
- hVopm9llFijNZpVIOGUTqzM4U55sdsCcZUluWM6x4HSOdw5F5Utxfp1wOjD/v92Lrax0hjiX
- DResHSt48q+8FrZzY+AUbkUS+Jm34qjswdrgsC5uxeVcLkBgWLmov2kMaMROT0YmFY6A3m1S
- P/kXmHDXxhe23gKb3dgwxUTpENDBGcfEzrzilWueOeUWiOcWuFOed/C3SyijBx3Av/lbCsHU
- Vx6pMycNTdzU1BuAroB+Y3mNEuW56Yd44jlInzG2UOwt9XjjdKkJZ1g0P9dwptwLEgTEd3Fo
- UdhAQyRXGYO8oROiuh+RZ1lXp6AQ4ZjoyH8WLfTLf5g1EKCTc4C1sy1vQSdzIRu3rBIjAvnC
- tGZADei1IExLqB3uzXKzZ1BZ+Z8hnt2og9hb7H0y8diYfEk2w3R7wEr+Ehk5NQsT2MPI2QBd
- wEv1/Aj1DgUHZAHzG1QN9S8wNWQ6K9DqHZTBnI1hUlkp22zCSHK/6FwUCuYp1zcAEQEAAc0j
- UGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT7CwU0EEwECACMFAlRCcBICGwMH
- CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRB+FRAMzTZpsbceDp9IIN6BIA0Ol7MoB15E
- 11kRz/ewzryFY54tQlMnd4xxfH8MTQ/mm9I482YoSwPMdcWFAKnUX6Yo30tbLiNB8hzaHeRj
- jx12K+ptqYbg+cevgOtbLAlL9kNgLLcsGqC2829jBCUTVeMSZDrzS97ole/YEez2qFpPnTV0
- VrRWClWVfYh+JfzpXmgyhbkuwUxNFk421s4Ajp3d8nPPFUGgBG5HOxzkAm7xb1cjAuJ+oi/K
- CHfkuN+fLZl/u3E/fw7vvOESApLU5o0icVXeakfSz0LsygEnekDbxPnE5af/9FEkXJD5EoYG
- SEahaEtgNrR4qsyxyAGYgZlS70vkSSYJ+iT2rrwEiDlo31MzRo6Ba2FfHBSJ7lcYdPT7bbk9
- AO3hlNMhNdUhoQv7M5HsnqZ6unvSHOKmReNaS9egAGdRN0/GPDWr9wroyJ65ZNQsHl9nXBqE
- AukZNr5oJO5vxrYiAuuTSd6UI/xFkjtkzltG3mw5ao2bBpk/V/YuePrJsnPFHG7NhizrxttB
- nTuOSCMo45pfHQ+XYd5K1+Cv/NzZFNWscm5htJ0HznY+oOsZvHTyGz3v91pn51dkRYN0otqr
- bQ4tlFFuVjArBZcapSIe6NV8C4cEiSTOwE0EVEJx7gEIAMeHcVzuv2bp9HlWDp6+RkZe+vtl
- KwAHplb/WH59j2wyG8V6i33+6MlSSJMOFnYUCCL77bucx9uImI5nX24PIlqT+zasVEEVGSRF
- m8dgkcJDB7Tps0IkNrUi4yof3B3shR+vMY3i3Ip0e41zKx0CvlAhMOo6otaHmcxr35sWq1Jk
- tLkbn3wG+fPQCVudJJECvVQ//UAthSSEklA50QtD2sBkmQ14ZryEyTHQ+E42K3j2IUmOLriF
- dNr9NvE1QGmGyIcbw2NIVEBOK/GWxkS5+dmxM2iD4Jdaf2nSn3jlHjEXoPwpMs0KZsgdU0pP
- JQzMUMwmB1wM8JxovFlPYrhNT9MAEQEAAcLBMwQYAQIACQUCVEJx7gIbDAAKCRB+FRAMzTZp
- sadRDqCctLmYICZu4GSnie4lKXl+HqlLanpVMOoFNnWs9oRP47MbE2wv8OaYh5pNR9VVgyhD
- OG0AU7oidG36OeUlrFDTfnPYYSF/mPCxHttosyt8O5kabxnIPv2URuAxDByz+iVbL+RjKaGM
- GDph56ZTswlx75nZVtIukqzLAQ5fa8OALSGum0cFi4ptZUOhDNz1onz61klD6z3MODi0sBZN
- Aj6guB2L/+2ZwElZEeRBERRd/uommlYuToAXfNRdUwrwl9gRMiA0WSyTb190zneRRDfpSK5d
- usXnM/O+kr3Dm+Ui+UioPf6wgbn3T0o6I5BhVhs4h4hWmIW7iNhPjX1iybXfmb1gAFfjtHfL
- xRUr64svXpyfJMScIQtBAm0ihWPltXkyITA92ngCmPdHa6M1hMh4RDX+Jf1fiWubzp1voAg0
- JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
- dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
- b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20231105163040.14904-32-pbonzini@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Precedence: Bulk
 
-On 11/5/23 17:30, Paolo Bonzini wrote:
-> From: Chao Peng <chao.p.peng@linux.intel.com>
-> 
-> Expand set_memory_region_test to exercise various positive and negative
-> testcases for private memory.
-> 
->   - Non-guest_memfd() file descriptor for private memory
->   - guest_memfd() from different VM
->   - Overlapping bindings
->   - Unaligned bindings
+The Xen PV shim requires a PV console; add that. Also update the Xen PV 
+network support to the new XenDevice model so that it can be used with 
+emulated Xen guests. Fix up the Xen block support to allow it to be used
+with '-device file=IMAGE,if=xen'.
 
-This needs a small fixup:
+Update the documentation to reflect all of these, taking the opportunity
+to simplify what it says about q35, by making unplug work for AHCI.
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index e4d2cd9218b2..1b58f943562f 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -819,6 +819,7 @@ static inline struct kvm_vm *vm_create_barebones(void)
-  	return ____vm_create(VM_SHAPE_DEFAULT);
-  }
-  
-+#ifdef __x86_64__
-  static inline struct kvm_vm *vm_create_barebones_protected_vm(void)
-  {
-  	const struct vm_shape shape = {
-@@ -828,6 +829,7 @@ static inline struct kvm_vm *vm_create_barebones_protected_vm(void)
-  
-  	return ____vm_create(shape);
-  }
-+#endif
-  
-  static inline struct kvm_vm *vm_create(uint32_t nr_runnable_vcpus)
-  {
-diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-index 1891774eb6d4..302c7a46955b 100644
---- a/tools/testing/selftests/kvm/set_memory_region_test.c
-+++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-@@ -386,6 +386,7 @@ static void test_add_max_memory_regions(void)
-  }
-  
-  
-+#ifdef __x86_64__
-  static void test_invalid_guest_memfd(struct kvm_vm *vm, int memfd,
-  				     size_t offset, const char *msg)
-  {
-@@ -476,14 +477,13 @@ static void test_add_overlapping_private_memory_regions(void)
-  	close(memfd);
-  	kvm_vm_free(vm);
-  }
-+#endif
-  
-  int main(int argc, char *argv[])
-  {
-  #ifdef __x86_64__
-  	int i, loops;
--#endif
-  
--#ifdef __x86_64__
-  	/*
-  	 * FIXME: the zero-memslot test fails on aarch64 and s390x because
-  	 * KVM_RUN fails with ENOEXEC or EFAULT.
-@@ -493,6 +493,7 @@ int main(int argc, char *argv[])
-  
-  	test_add_max_memory_regions();
-  
-+#ifdef __x86_64__
-  	if (kvm_has_cap(KVM_CAP_GUEST_MEMFD) &&
-  	    (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM))) {
-  		test_add_private_memory_region();
-@@ -501,7 +502,6 @@ int main(int argc, char *argv[])
-  		pr_info("Skipping tests for KVM_MEM_GUEST_MEMFD memory regions\n");
-  	}
-  
--#ifdef __x86_64__
-  	if (argc > 1)
-  		loops = atoi_positive("Number of iterations", argv[1]);
-  	else
+Ignore the VCPU_SSHOTTMR_future timer flag, and advertise the 'fixed'
+per-vCPU upcall vector support, as newer upstream Xen do.
 
-in order to compile successfully on non-x86 platforms.
+Fix a bug where net_cleanup() would remove the NIC from underneath the 
+emulated network devices, which doesn't work well when network devices 
+have their own destructors (as the Xen PV one has to, in order to clean 
+up the XenStore nodes).
+
+v4:
+ • Drop the fixes from the start of the series, which have been sent as
+   a separate pull request (cc: qemu-stable):
+   https://lore.kernel.org/qemu-devel/20231106103955.200867-1-dwmw2@infradead.org/
+ • Go back to the original, more hackish, version of making `-nic` work
+   for Xen network. The better fix for that is not going to get through
+   review before the soft freeze.
+ • Fix the documentation so the docs can reference the '-initrd' command
+   line option with newer Sphinx.
+ • Improve the duplicate detection for Xen block devices to match all
+   partitions and even the same disk number on different majors.
+
+David Woodhouse (17):
+      i386/xen: Ignore VCPU_SSHOTTMR_future flag in set_singleshot_timer()
+      hw/xen: Clean up event channel 'type_val' handling to use union
+      include: update Xen public headers to Xen 4.17.2 release
+      i386/xen: advertise XEN_HVM_CPUID_UPCALL_VECTOR in CPUID
+      hw/xen: populate store frontend nodes with XenStore PFN/port
+      hw/xen: automatically assign device index to block devices
+      hw/xen: add get_frontend_path() method to XenDeviceClass
+      hw/xen: do not repeatedly try to create a failing backend device
+      hw/xen: update Xen console to XenDevice model
+      hw/xen: add support for Xen primary console in emulated mode
+      hw/xen: only remove peers of PCI NICs on unplug
+      hw/xen: update Xen PV NIC to XenDevice model
+      hw/i386/pc: support '-nic' for xen-net-device
+      net: do not delete nics in net_cleanup()
+      xen-platform: unplug AHCI disks
+      doc/sphinx/hxtool.py: add optional label argument to SRST directive
+      docs: update Xen-on-KVM documentation
+
+
+
+ MAINTAINERS                                    |   2 +-
+ blockdev.c                                     |  15 +-
+ docs/sphinx/hxtool.py                          |  18 +-
+ docs/system/i386/xen.rst                       | 107 +++--
+ docs/system/invocation.rst                     |   1 +
+ hw/block/xen-block.c                           | 118 ++++-
+ hw/char/trace-events                           |   8 +
+ hw/char/xen_console.c                          | 572 +++++++++++++++++++------
+ hw/i386/kvm/meson.build                        |   1 +
+ hw/i386/kvm/trace-events                       |   2 +
+ hw/i386/kvm/xen-stubs.c                        |   8 +
+ hw/i386/kvm/xen_evtchn.c                       | 151 +++----
+ hw/i386/kvm/xen_gnttab.c                       |   7 +-
+ hw/i386/kvm/xen_primary_console.c              | 193 +++++++++
+ hw/i386/kvm/xen_primary_console.h              |  23 +
+ hw/i386/kvm/xen_xenstore.c                     |  23 +-
+ hw/i386/pc.c                                   |  11 +-
+ hw/i386/pc_piix.c                              |   2 +-
+ hw/i386/pc_q35.c                               |   2 +-
+ hw/i386/xen/xen_platform.c                     |  77 ++--
+ hw/net/meson.build                             |   2 +-
+ hw/net/trace-events                            |  11 +
+ hw/net/xen_nic.c                               | 484 ++++++++++++++++-----
+ hw/xen/xen-backend.c                           |  27 +-
+ hw/xen/xen-bus.c                               |  23 +-
+ hw/xen/xen-legacy-backend.c                    |   1 -
+ hw/xen/xen_devconfig.c                         |  28 --
+ hw/xenpv/xen_machine_pv.c                      |  10 -
+ include/hw/i386/pc.h                           |   4 +-
+ include/hw/xen/interface/arch-arm.h            |  37 +-
+ include/hw/xen/interface/arch-x86/cpuid.h      |  31 +-
+ include/hw/xen/interface/arch-x86/xen-x86_32.h |  19 +-
+ include/hw/xen/interface/arch-x86/xen-x86_64.h |  19 +-
+ include/hw/xen/interface/arch-x86/xen.h        |  26 +-
+ include/hw/xen/interface/event_channel.h       |  19 +-
+ include/hw/xen/interface/features.h            |  19 +-
+ include/hw/xen/interface/grant_table.h         |  19 +-
+ include/hw/xen/interface/hvm/hvm_op.h          |  19 +-
+ include/hw/xen/interface/hvm/params.h          |  19 +-
+ include/hw/xen/interface/io/blkif.h            |  27 +-
+ include/hw/xen/interface/io/console.h          |  19 +-
+ include/hw/xen/interface/io/fbif.h             |  19 +-
+ include/hw/xen/interface/io/kbdif.h            |  19 +-
+ include/hw/xen/interface/io/netif.h            |  25 +-
+ include/hw/xen/interface/io/protocols.h        |  19 +-
+ include/hw/xen/interface/io/ring.h             |  49 +--
+ include/hw/xen/interface/io/usbif.h            |  19 +-
+ include/hw/xen/interface/io/xenbus.h           |  19 +-
+ include/hw/xen/interface/io/xs_wire.h          |  36 +-
+ include/hw/xen/interface/memory.h              |  30 +-
+ include/hw/xen/interface/physdev.h             |  23 +-
+ include/hw/xen/interface/sched.h               |  19 +-
+ include/hw/xen/interface/trace.h               |  19 +-
+ include/hw/xen/interface/vcpu.h                |  19 +-
+ include/hw/xen/interface/version.h             |  19 +-
+ include/hw/xen/interface/xen-compat.h          |  19 +-
+ include/hw/xen/interface/xen.h                 |  19 +-
+ include/hw/xen/xen-backend.h                   |   1 +
+ include/hw/xen/xen-bus.h                       |   5 +-
+ include/hw/xen/xen-legacy-backend.h            |   1 -
+ net/net.c                                      |  28 +-
+ qemu-options.hx                                |  14 +-
+ target/i386/kvm/kvm.c                          |   4 +
+ target/i386/kvm/xen-emu.c                      |  43 +-
+ 64 files changed, 1681 insertions(+), 991 deletions(-)
+
 
 
