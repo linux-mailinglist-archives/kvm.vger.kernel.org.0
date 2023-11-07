@@ -1,152 +1,156 @@
-Return-Path: <kvm+bounces-1053-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1054-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C6757E4879
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 19:42:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73FD27E488A
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 19:45:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B4BB1C20CFB
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 18:42:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE945B20F1B
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 18:45:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FF69358A9;
-	Tue,  7 Nov 2023 18:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C54C358AB;
+	Tue,  7 Nov 2023 18:45:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="E4sYMxpb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wk/XAYNv"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFB630FA9
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 18:42:29 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4555A116;
-	Tue,  7 Nov 2023 10:42:29 -0800 (PST)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A7IeiIE003031;
-	Tue, 7 Nov 2023 18:42:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=6e9g5TataTjtWaCWdXYn+6nf6rWz4+9eM6ZYPAfwEXI=;
- b=E4sYMxpbQ4SoQwB5gC8w4QA3ZM6Jpi5jGCUFzIGA8YTEC46n8avpmSe2lM8P+NlrIdUf
- V68ZLr7+rP2zMpfC1mqftwz6dNn9icdkqZjznAinzH+AuK9HI+3PCQUKL0u0JtVVGbbQ
- ykexxZuAp0n5HbYNHegzxYBzPnf7NjIFJnHoPY5MCZtd63Nc+3KjM6WGdy5kcV59DIP8
- O2j2BouRJ00YdbzWyJikutBWwI5uSpV68itZIQtdMamiLmbGEDapubLQl+EZtIIT5P99
- HlSZLkTkDP1Vsva2cBfqJ2VFDAXmc25FUFV512t/lU8Mh8HE/hYOcDvY3FeQJvllHI+m 6Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u7tqkr11c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Nov 2023 18:42:18 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A7IewTJ003333;
-	Tue, 7 Nov 2023 18:42:18 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u7tqkr10v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Nov 2023 18:42:18 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A7HNZeC007918;
-	Tue, 7 Nov 2023 18:42:17 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u60nyjxbq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Nov 2023 18:42:17 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A7IgE3D15270402
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 7 Nov 2023 18:42:14 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E7F5F2004D;
-	Tue,  7 Nov 2023 18:42:13 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9F3E520043;
-	Tue,  7 Nov 2023 18:42:13 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  7 Nov 2023 18:42:13 +0000 (GMT)
-Date: Tue, 7 Nov 2023 19:42:11 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Nico Boehr <nrb@linux.ibm.com>
-Cc: frankja@linux.ibm.com, thuth@redhat.com, david@redhat.com,
-        pbonzini@redhat.com, andrew.jones@linux.dev, lvivier@redhat.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v1 02/10] powerpc: properly format
- non-kernel-doc comments
-Message-ID: <20231107194211.337bbc4d@p-imbrenda>
-In-Reply-To: <169929081714.70850.5803437896270751208@t14-nrb>
-References: <20231106125352.859992-1-nrb@linux.ibm.com>
-	<20231106125352.859992-3-nrb@linux.ibm.com>
-	<20231106175316.1f05d090@p-imbrenda>
-	<169929081714.70850.5803437896270751208@t14-nrb>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FBF328C8
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 18:45:30 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E431313A
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 10:45:29 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-da1aa98ec19so7242782276.2
+        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 10:45:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699382729; x=1699987529; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qDCWSKP4vAXUfzgvit4LuMfPr8WJgpyfnDtKqeEtqPM=;
+        b=wk/XAYNv1sOWUOx9OfKo051v4I4PAw012Dm0+OstdHfohkuLZ+iFiZrX7vekrus7qR
+         OIWZSQBFjq9+zolNzdjiLFBurKhxYX6xtZxVQ3QJZbJXs0qx5evYgeAKYLGB9TVe7Y13
+         shTrZV2oEhHH4kA++BLct7P/ln9dxqnNWuzRnDGeshE4qymb9PtwL/MSeujSujUIAfx9
+         TkPPVfVGc1xBSt+MMie33xZgCp5ICqi2+CtYY7JTZsWcxkwqQP2aHawutoCJlxA1/OeC
+         /CuAOWHBkbVJruxdEgwLpGhzdUJggpE7/sdpGd6Lc0nXkZdD4oNBSnPzPyyVlpXwWlsp
+         iAdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699382729; x=1699987529;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qDCWSKP4vAXUfzgvit4LuMfPr8WJgpyfnDtKqeEtqPM=;
+        b=tnL1GwXkHwJ3+RHrNpVIwxou/lnT1etmjgheRURrDAjC1Wde+yIYzP4ZX2Ty+b4pQV
+         PP1dRZY1X5cRRMJzokmlUY6g41cWrWgDc53l11xlC3DsXaZVOGXt2Z8ga2Va0rLpN1QC
+         XtlTNq9VhM4oTgD6QBF7YCwKWJiIPJmht9dXCA+A88lAY/mTKSIG72cbBFDMKrPyBKWG
+         6X2net8f2JhGQjAodmL1j4FHwGr6PLKDhzH2NMKqJfD+uEF9NVZ/ETB78TY4+cj2HyEZ
+         X4pOHQlet6MZwRbdJIZESGq/bFv5yzl948+q6PtYE94QxoF4MJBhSVj1LA71KpDd6qsj
+         EGQw==
+X-Gm-Message-State: AOJu0YwP9wYzpam78umlGcbJKl2TBCrVIkbm32XXmkI0Q7V7IYGsWSmh
+	NaCE36II2FLHXD4rOJMCY9/AXBVtXVAtuXkvtg==
+X-Google-Smtp-Source: AGHT+IG5qQtQqzPjeR5Y8G8AU6M7XDVXPeztR72N2C8qU92svUe1OJ6H7dpDFe3evTNNP4IMa8JRdAt/s/dkx9nskg==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a25:c789:0:b0:d9a:c218:8177 with SMTP
+ id w131-20020a25c789000000b00d9ac2188177mr566295ybe.8.1699382729191; Tue, 07
+ Nov 2023 10:45:29 -0800 (PST)
+Date: Tue, 07 Nov 2023 18:45:28 +0000
+In-Reply-To: <ZUVxNs7q1yRyDq4a@linux.dev> (message from Oliver Upton on Fri, 3
+ Nov 2023 22:16:22 +0000)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: JGbdimfDR6sN7FuOYNAevApGSWYChkZ4
-X-Proofpoint-ORIG-GUID: CGQFV8Wgswp2kZXs32-C2vfUkDjrFd3u
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-07_10,2023-11-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
- mlxlogscore=999 lowpriorityscore=0 spamscore=0 mlxscore=0 suspectscore=0
- adultscore=0 impostorscore=0 clxscore=1015 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311070154
+Mime-Version: 1.0
+Message-ID: <gsntsf5hv1vb.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v3 2/3] KVM: arm64: selftests: Guarantee interrupts are handled
+From: Colton Lewis <coltonlewis@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, maz@kernel.org, james.morse@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, ricarkol@google.com, 
+	kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Mon, 06 Nov 2023 18:13:37 +0100
-Nico Boehr <nrb@linux.ibm.com> wrote:
+Oliver Upton <oliver.upton@linux.dev> writes:
 
-> Quoting Claudio Imbrenda (2023-11-06 17:53:16)
-> > On Mon,  6 Nov 2023 13:50:58 +0100
-> > Nico Boehr <nrb@linux.ibm.com> wrote:
-> >   
-> > > These comments do not follow the kernel-doc style, hence they should not
-> > > start with /**.
-> > > 
-> > > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> > > ---
-> > >  powerpc/emulator.c    | 2 +-
-> > >  powerpc/spapr_hcall.c | 6 +++---
-> > >  powerpc/spapr_vpa.c   | 4 ++--
-> > >  3 files changed, 6 insertions(+), 6 deletions(-)
-> > > 
-> > > diff --git a/powerpc/emulator.c b/powerpc/emulator.c
-> > > index 65ae4b65e655..39dd59645368 100644
-> > > --- a/powerpc/emulator.c
-> > > +++ b/powerpc/emulator.c
-> > > @@ -71,7 +71,7 @@ static void test_64bit(void)
-> > >       report_prefix_pop();
-> > >  }
-> > >  
-> > > -/**
-> > > +/*
-> > >   * Test 'Load String Word Immediate' instruction
-> > >   */  
-> > 
-> > this should have the name of the function first: 
-> >  * test_lswi() - Test 'Load String ... 
-> > 
-> > (same for all the other functions here)  
-> 
-> Since none of these comments really follow kerneldoc style and are mostly
-> static anyways, the idea was to convert them to non-kerneldoc style, by
-> changing the comment from:
-> /**
-> 
-> to:
-> /*
-> 
-> But I am just as fine to make the comments proper kerneldoc style, if we
-> see value in that.
+> Hi Colton,
 
-oufff yes sorry I had totally misread that
+> On Fri, Nov 03, 2023 at 07:29:14PM +0000, Colton Lewis wrote:
+>> Break up the asm instructions poking daifclr and daifset to handle
+>> interrupts. R_RBZYL specifies pending interrupts will be handle after
+>> context synchronization events such as an ISB.
+
+>> Introduce a function wrapper for the WFI instruction.
+
+>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+
+> What's missing from the changelog is that you've spotted an actual bug,
+> and this is really a bugfix.
+
+I will update the changelog mentioning this is a bugfix.
+
+>> ---
+>>   tools/testing/selftests/kvm/aarch64/vgic_irq.c    | 12 ++++++------
+>>   tools/testing/selftests/kvm/include/aarch64/gic.h |  3 +++
+>>   tools/testing/selftests/kvm/lib/aarch64/gic.c     |  5 +++++
+>>   3 files changed, 14 insertions(+), 6 deletions(-)
+
+>> diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c  
+>> b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+>> index d3bf584d2cc1..85f182704d79 100644
+>> --- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+>> +++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+>> @@ -269,13 +269,13 @@ static void guest_inject(struct test_args *args,
+>>   	KVM_INJECT_MULTI(cmd, first_intid, num);
+
+>>   	while (irq_handled < num) {
+>> -		asm volatile("wfi\n"
+>> -			     "msr daifclr, #2\n"
+>> -			     /* handle IRQ */
+>> -			     "msr daifset, #2\n"
+>> -			     : : : "memory");
+>> +		gic_wfi();
+>> +		local_irq_enable();
+>> +		isb();
+>> +		/* handle IRQ */
+
+> nit: this comment should appear above the isb()
+
+I put it there because the manual specifies pending interrupts are
+handled before the first instruction *after* the context sync, but I can
+see why to put it above.
+
+>> +		local_irq_disable();
+>>   	}
+>> -	asm volatile("msr daifclr, #2" : : : "memory");
+>> +	local_irq_enable();
+
+>>   	GUEST_ASSERT_EQ(irq_handled, num);
+>>   	for (i = first_intid; i < num + first_intid; i++)
+>> diff --git a/tools/testing/selftests/kvm/include/aarch64/gic.h  
+>> b/tools/testing/selftests/kvm/include/aarch64/gic.h
+>> index 9043eaef1076..f474714e4cb2 100644
+>> --- a/tools/testing/selftests/kvm/include/aarch64/gic.h
+>> +++ b/tools/testing/selftests/kvm/include/aarch64/gic.h
+>> @@ -47,4 +47,7 @@ void gic_irq_clear_pending(unsigned int intid);
+>>   bool gic_irq_get_pending(unsigned int intid);
+>>   void gic_irq_set_config(unsigned int intid, bool is_edge);
+
+>> +/* Execute a Wait For Interrupt instruction. */
+>> +void gic_wfi(void);
+>> +
+
+> WFIs have nothing to do with the GIC, they're an instruction supported
+> by the CPU. I'd just merge the definition and declaration into the
+> header while you're at it.
+
+> So, could you throw something like this in aarch64/processor.h?
+
+> static inline void wfi(void)
+> {
+> 	asm volatile("wfi");
+> }
+
+Will do.
 
