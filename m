@@ -1,239 +1,140 @@
-Return-Path: <kvm+bounces-889-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E04F77E4169
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 15:05:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71D057E41BD
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 15:22:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 074631C20C8B
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 14:05:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0243DB20E23
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 14:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40BE30F92;
-	Tue,  7 Nov 2023 14:05:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 137EE30FBA;
+	Tue,  7 Nov 2023 14:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dj28b8Hi"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94BA13212
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 14:05:11 +0000 (UTC)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4D21AB3
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 06:05:09 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 69D4513D5;
-	Tue,  7 Nov 2023 06:05:53 -0800 (PST)
-Received: from monolith (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 58CD63F703;
-	Tue,  7 Nov 2023 06:05:07 -0800 (PST)
-Date: Tue, 7 Nov 2023 14:05:49 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	andrew.jones@linux.dev, maz@kernel.org, oliver.upton@linux.dev,
-	jarichte@redhat.com
-Subject: Re: [kvm-unit-tests PATCH] arm: pmu-overflow-interrupt: Increase
- count values
-Message-ID: <ZUpEPbILA-idXISd@monolith>
-References: <20231103100139.55807-1-eric.auger@redhat.com>
- <ZUoIxznZwPyti254@monolith>
- <5d93f447-c2c5-4c41-b0ea-9108736a2372@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3A98F5B
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 14:22:21 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB150C1
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 06:22:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699366939;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kLVHjLQFNZM1R0nYZqPiujbYlWwyXgBaHuNRoop7EPA=;
+	b=Dj28b8HiLNh80D90HqLJmx7WIpe/w7VUB3zqkI8SJ+gRBJIlQ/oRc4o4kBIATtdFD7OcAt
+	YNl/WpkYRMFDyZnojvq6FwhIupv8LLpU2V8I/71TXagf8YAbwLJHd307w5DLqFkzrAIovK
+	Re7yMnJJG/7q2ujlybJCHC1zKsll/6w=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-340-375zLsf0MAWZSrXKdkPLfA-1; Tue, 07 Nov 2023 09:22:03 -0500
+X-MC-Unique: 375zLsf0MAWZSrXKdkPLfA-1
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-41e1899175eso14311621cf.1
+        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 06:22:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699366922; x=1699971722;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kLVHjLQFNZM1R0nYZqPiujbYlWwyXgBaHuNRoop7EPA=;
+        b=qYIyisXnwwaRX3UU7e4BofxQxkjrN4Nt9NeCYJ3N+lq7+vUM8t1yLDolSww+Ivsgyi
+         GnK3HAXuF/uzg+R7ggljSA/++peYMlqzl3NcPrwL6KgP3rSWpU1ViIKLSx43uWK02Ebe
+         hpf7XiJ/NoFczjRYVUt/9KwqeJyP25mCTy4f9N/hUHPNGN2v1n9hdKm/6A+zzUOwkLIF
+         Q63NdOO41EtSF1d2TmEGgu2SA9mEyCD3m2j8eeNDXa0IXIYZFqMHrAhQ92eRvjID97ot
+         PGrfAvYw175qleSyCdtwBG/jMMdDucB+RK94pvXWmaosQi+JdJJoEpVzFIuuD5bpHCDy
+         JL8A==
+X-Gm-Message-State: AOJu0YxUZIZrLD/uO9w7De7AhYdR9yycCaGUCXHSuwSJLaoZd/2AEV3E
+	XHfUK07vFqaiAB1ufx0kK1s9tbRXRAzTpwis/3s1GXzhwDbpD/zcL6OHSV+/pXtvbymF+e9w5XG
+	zRuC+/MDr+Qvj
+X-Received: by 2002:a05:622a:170f:b0:410:840c:dee4 with SMTP id h15-20020a05622a170f00b00410840cdee4mr36943982qtk.0.1699366922541;
+        Tue, 07 Nov 2023 06:22:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHJFXpDr9X9RFihk+VPwdyMnsatw1TqkV4bKtaRR5BQ3bRDMKcrWsKyjydjHhyk0m8Mrxk5GQ==
+X-Received: by 2002:a05:622a:170f:b0:410:840c:dee4 with SMTP id h15-20020a05622a170f00b00410840cdee4mr36943964qtk.0.1699366922182;
+        Tue, 07 Nov 2023 06:22:02 -0800 (PST)
+Received: from x1n (cpe5c7695f3aee0-cm5c7695f3aede.cpe.net.cable.rogers.com. [99.254.144.39])
+        by smtp.gmail.com with ESMTPSA id x5-20020ac87305000000b0041cbb7139a9sm4286337qto.65.2023.11.07.06.22.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Nov 2023 06:22:01 -0800 (PST)
+Date: Tue, 7 Nov 2023 09:21:59 -0500
+From: Peter Xu <peterx@redhat.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Axel Rasmussen <axelrasmussen@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, kvm list <kvm@vger.kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	James Houghton <jthoughton@google.com>,
+	Oliver Upton <oupton@google.com>,
+	Mike Kravetz <mike.kravetz@oracle.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Frank van der Linden <fvdl@google.com>
+Subject: Re: RFC: A KVM-specific alternative to UserfaultFD
+Message-ID: <ZUpIB1/5eZ/2X+0M@x1n>
+References: <CALzav=d23P5uE=oYqMpjFohvn0CASMJxXB_XEOEi-jtqWcFTDA@mail.gmail.com>
+ <ZUlLLGLi1IyMyhm4@x1n>
+ <CAJHvVciC3URbJJMwhU0ahhzq6bomr7juuWqPdpczV6Qgb8OUuQ@mail.gmail.com>
+ <ZUlw163pvpJ+Uue8@x1n>
+ <CALzav=d=sAJBK7fBeJwi3BVJ+4ai5MjU7-u0RD4BQMGNRYi_Tw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <5d93f447-c2c5-4c41-b0ea-9108736a2372@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALzav=d=sAJBK7fBeJwi3BVJ+4ai5MjU7-u0RD4BQMGNRYi_Tw@mail.gmail.com>
 
-On Tue, Nov 07, 2023 at 02:34:05PM +0100, Eric Auger wrote:
-> Hi Alexandru,
+On Mon, Nov 06, 2023 at 03:22:05PM -0800, David Matlack wrote:
+> On Mon, Nov 6, 2023 at 3:03 PM Peter Xu <peterx@redhat.com> wrote:
+> > On Mon, Nov 06, 2023 at 02:24:13PM -0800, Axel Rasmussen wrote:
+> > > On Mon, Nov 6, 2023 at 12:23 PM Peter Xu <peterx@redhat.com> wrote:
+> > > > On Mon, Nov 06, 2023 at 10:25:13AM -0800, David Matlack wrote:
+> > > > >
+> > > > >   * Memory Overhead: UserfaultFD requires an extra 8 bytes per page of
+> > > > >     guest memory for the userspace page table entries.
+> > > >
+> > > > What is this one?
+> > >
+> > > In the way we use userfaultfd, there are two shared userspace mappings
+> > > - one non-UFFD registered one which is used to resolve demand paging
+> > > faults, and another UFFD-registered one which is handed to KVM et al
+> > > for the guest to use. I think David is talking about the "second"
+> > > mapping as overhead here, since with the KVM-based approach he's
+> > > describing we don't need that mapping.
+> >
+> > I see, but then is it userspace relevant?  IMHO we should discuss the
+> > proposal based only on the design itself, rather than relying on any
+> > details on possible userspace implementations if two mappings are not
+> > required but optional.
 > 
-> On 11/7/23 10:52, Alexandru Elisei wrote:
-> > Hi Eric,
-> >
-> > On Fri, Nov 03, 2023 at 11:01:39AM +0100, Eric Auger wrote:
-> >> On some hardware, some pmu-overflow-interrupt failures can be observed.
-> >> Although the even counter overflows, the interrupt is not seen as
-> >> expected. This happens in the subtest after "promote to 64-b" comment.
-> >> After analysis, the PMU overflow interrupt actually hits, ie.
-> >> kvm_pmu_perf_overflow() gets called and KVM_REQ_IRQ_PENDING is set,
-> >> as expected. However the PMCR.E is reset by the handle_exit path, at
-> >> kvm_pmu_handle_pmcr() before the next guest entry and
-> >> kvm_pmu_flush_hwstate/kvm_pmu_update_state subsequent call.
-> >> There, since the enable bit has been reset, kvm_pmu_update_state() does
-> >> not inject the interrupt into the guest.
-> >>
-> >> This does not seem to be a KVM bug but rather an unfortunate
-> >> scenario where the test disables the PMCR.E too closely to the
-> >> advent of the overflow interrupt.
-> > If I understand correctly, the KVM PMU, after receiving the hardware PMUIRQ and
-> > before injecting the interrupt, checks that the PMU is enabled according to the
-> > pseudocode for the function CheckForPMUOverflow(). CheckForPMUOverflow() returns
-> > false because PMCR_EL1.E is 0, so the KVM PMU decides not to inject the
-> > interrupt.
-> >
-> > Is that correct?
-> 
-> Yes that's correct
-> >
-> > Changing the number of SW_INCR events might not be optimal - for example,
-> > COUNT_INT > 100 might hide an error that otherwise would have been triggered if
-> > the number of events were 100. Not very likely, but still a possibility.
-> I also changed the COUNT for SW_INCR events to unify the code. However
-> this is not strictly necessary to fix the issue I encounter. I can
-> revert that change if you prefer.
+> What I mean here is that for UserfaultFD to track accesses at
+> PAGE_SIZE granularity, that requires 1 PTE per page, i.e. 8 bytes per
+> page. Versus the KVM-based approach which only requires 1 bit per page
+> for the present bitmap. This is inherent in the design of UserfaultFD
+> because it uses PTEs to track what is present, not specific to how we
+> use UserfaultFD.
 
-I don't understand how that would solve the problem. As I see it, the problem is
-that PMCR_EL1.E is cleared too fast after the PMU asserts the interrupt on
-overflow, not the time it takes to get to the overflow condition (i.e, the
-number of iterations mem_access_loop() does).
+Shouldn't the userspace normally still maintain one virtual mapping anyway
+for the guest address range?  As IIUC kvm still relies a lot on HVA to work
+(at least before guest memfd)? E.g., KVM_SET_USER_MEMORY_REGION, or mmu
+notifiers.  If so, that 8 bytes should be there with/without userfaultfd,
+IIUC.
 
-> >
-> > Another approach would be to wait for a set amount of time for the CPU to take
-> > the interrupt. There's something similar in timer.c::{test_timer_tval(),
-> > timer_do_wfi()}.
-> you're right. However this would urge me to have a separate asm code
-> that loops with wfi after doing the mem_access loop. I am not sure this
-> is worth the candle here?
-
-I think plain C would work, I was thinking something like this:
-
-diff --git a/arm/pmu.c b/arm/pmu.c
-index a91a7b1fd4be..fb2eb5fa2e50 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -979,6 +979,23 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
-        /* interrupts are disabled (PMINTENSET_EL1 == 0) */
-
-        mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-+
-+       if (!expect_interrupts(0)) {
-+                for (i = 0; i < 10; i++) {
-+                       local_irq_disable();
-+                       if (expect_interrupts(0)) {
-+                               local_irq_enable();
-+                               break;
-+                       }
-+                       report_info("waiting for interrupt...");
-+                       wfi();
-+                       local_irq_enable();
-+                       if (expect_interrupts(0))
-+                               break;
-+                        mdelay(100);
-+                }
-+       }
-+
-        report(expect_interrupts(0), "no overflow interrupt after preset");
-
-        set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-
-Can be cleaned up by moving it to separate function, etc. Has the downside that
-it may performs extra memory accesses in expect_interrupts(). Your choice.
-
-By the way, pmu_stats is not declared volatile, which means that the
-compiler is free to optimize accesses to the struct by caching previously
-read values in registers. Have you tried declaring it as volatile, in case
-that fixes the issues you were seeing?
-
-If you do decide to go with the above suggestion, I strongly suggest
-pmu_stats is declared as volatile, otherwise the compiler will likely end
-up not reading from memory on every iteration.
+Also, I think that's not strictly needed for any kind of file memories, as
+in those case userfaultfd works with page cache.
 
 Thanks,
-Alex
-> 
-> Thanks!
-> 
-> Eric
-> >
-> > Thanks,
-> > Alex
-> >
-> >> Since it looks like a benign and inlikely case, let's resize the number
-> >> of iterations to prevent the PMCR enable bit from being resetted
-> >> at the same time as the actual overflow event.
-> >>
-> >> COUNT_INT is introduced, arbitrarily set to 1000 iterations and is
-> >> used in this test.
-> >>
-> >> Reported-by: Jan Richter <jarichte@redhat.com>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >> ---
-> >>  arm/pmu.c | 15 ++++++++-------
-> >>  1 file changed, 8 insertions(+), 7 deletions(-)
-> >>
-> >> diff --git a/arm/pmu.c b/arm/pmu.c
-> >> index a91a7b1f..acd88571 100644
-> >> --- a/arm/pmu.c
-> >> +++ b/arm/pmu.c
-> >> @@ -66,6 +66,7 @@
-> >>  #define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
-> >>  #define COUNT 250
-> >>  #define MARGIN 100
-> >> +#define COUNT_INT 1000
-> >>  /*
-> >>   * PRE_OVERFLOW2 is set so that 1st @COUNT iterations do not
-> >>   * produce 32b overflow and 2nd @COUNT iterations do. To accommodate
-> >> @@ -978,13 +979,13 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
-> >>  
-> >>  	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
-> >>  
-> >> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >>  	report(expect_interrupts(0), "no overflow interrupt after preset");
-> >>  
-> >>  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >>  	isb();
-> >>  
-> >> -	for (i = 0; i < 100; i++)
-> >> +	for (i = 0; i < COUNT_INT; i++)
-> >>  		write_sysreg(0x2, pmswinc_el0);
-> >>  
-> >>  	isb();
-> >> @@ -1002,15 +1003,15 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
-> >>  	write_sysreg(ALL_SET_32, pmintenset_el1);
-> >>  	isb();
-> >>  
-> >> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >>  
-> >>  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >>  	isb();
-> >>  
-> >> -	for (i = 0; i < 100; i++)
-> >> +	for (i = 0; i < COUNT_INT; i++)
-> >>  		write_sysreg(0x3, pmswinc_el0);
-> >>  
-> >> -	mem_access_loop(addr, 200, pmu.pmcr_ro);
-> >> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro);
-> >>  	report_info("overflow=0x%lx", read_sysreg(pmovsclr_el0));
-> >>  	report(expect_interrupts(0x3),
-> >>  		"overflow interrupts expected on #0 and #1");
-> >> @@ -1029,7 +1030,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
-> >>  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
-> >>  	write_regn_el0(pmevcntr, 0, pre_overflow);
-> >>  	isb();
-> >> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >>  	report(expect_interrupts(0x1), "expect overflow interrupt");
-> >>  
-> >>  	/* overflow on odd counter */
-> >> @@ -1037,7 +1038,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
-> >>  	write_regn_el0(pmevcntr, 0, pre_overflow);
-> >>  	write_regn_el0(pmevcntr, 1, all_set);
-> >>  	isb();
-> >> -	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >>  	if (overflow_at_64bits) {
-> >>  		report(expect_interrupts(0x1),
-> >>  		       "expect overflow interrupt on even counter");
-> >> -- 
-> >> 2.41.0
-> >>
-> 
+
+-- 
+Peter Xu
+
 
