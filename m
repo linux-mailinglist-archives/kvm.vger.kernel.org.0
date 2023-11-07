@@ -1,166 +1,217 @@
-Return-Path: <kvm+bounces-1066-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1067-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 786147E4988
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 21:05:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A03E7E49A5
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 21:20:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19FA5B20FD5
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 20:05:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2246281324
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 20:20:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC57236B15;
-	Tue,  7 Nov 2023 20:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9E6A36B1E;
+	Tue,  7 Nov 2023 20:20:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0EP8BSjR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Jx32YUgd"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1755436AED
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 20:04:52 +0000 (UTC)
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C336E7
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 12:04:52 -0800 (PST)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-4083ac51d8aso46294435e9.2
-        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 12:04:51 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D61F730F97
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 20:20:10 +0000 (UTC)
+Received: from mail-oa1-x49.google.com (mail-oa1-x49.google.com [IPv6:2001:4860:4864:20::49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 620B810C2
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 12:20:10 -0800 (PST)
+Received: by mail-oa1-x49.google.com with SMTP id 586e51a60fabf-1e9c2c00182so8269092fac.1
+        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 12:20:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699387490; x=1699992290; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RW9IhHaBIvQOgwf4W1AtJa+oIMrtwReenj+NnKK52Cw=;
-        b=0EP8BSjRVG0ikfjTRCqMSUmiXy8yE489kZ8+G0HwFhcSDo6QRxV5zqH9ZfIW6KZWwn
-         EXdv9WAE0NK0kBzsQtaN6G473UnUFgPhil+ln4GVMFbxvzQ4HRXpZqUQa8+i1xC62kU2
-         p2HQh/adX/iCJCNGPU9ab+XW1byeO/npKBrwrQCfm4IgIOe4Vs3hTHEImtbgBE5hGumk
-         XsaS0E/CW7YRUCHYRT2OoqudgdNPPi5dGcitXezR5iBOXB9L1XiiVw+hifnbIhqzPvLt
-         FATvZdNdx2wMsZJvokujBpLni7KuKrn0ZG/fqdexox/+KHaaKyj5SeUj2MnMpFFr9WSS
-         B5Lg==
+        d=google.com; s=20230601; t=1699388409; x=1699993209; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=OykAIpEWbk6LIaIkkxOJrcQt1UgoP8zugcDvBcK6nI8=;
+        b=Jx32YUgd6pd2PEmb7DKg0AeXcOA8NkJeVohuThV8YEdjMGo17uFHIcdH7AM7GPuOHR
+         /T4DrMeSvY++srxHcmSdhO5Qn+IU21i/XIY708A1rDkRmuWWcO1sVIYRAy8UgwQw+lKw
+         pg9gOsq6Sy9LgP1p4rIBBDOo7Ww3eQ6Jg3BA4UBk8D2RRlqg0Ye+sAzEDG8b26deoDQ/
+         LpyUMAcR2SxjgJNQnLy6aNwhTCGOKEsokOx1Q3RHgZlAQDFhZrlWfavoLpd2/Z8NrdYf
+         5COWOWz5MY06NQG2uLtMOAzg8pU1yuqf8UF4NPeTmSS3DGmOQJ/kPVk0JD/6LHZDA+gO
+         2TcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699387490; x=1699992290;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RW9IhHaBIvQOgwf4W1AtJa+oIMrtwReenj+NnKK52Cw=;
-        b=d23RiYAnO5fAr8V84eEUz0UECcH33+HqBwWiXk0DtzZjOlygn/yBbOZZ4dp+dyCD7K
-         tmxe8jxaIj0PCsXitc7KRjNLveFAONAP9wq/YagvJz++DeBNYGOe+M6SK5CDG2z8muUn
-         Jyc3oxs7Ig6KrOFiaPWPRozk5+OC4pP97SieZ4laUyL682ffRfgb73PrIQWK7OgL9Loq
-         OFSWR7z49UwUqM3ESgglfY8UjezCMiFDm74RU7BslilwUyD7EBEWVG/F390HrpvGQM2f
-         wv7Ru8yZc6XRfWlL5NkJralCYKXc5MUiZx+GbtcvltxRxy81CI9FpFVExMIEDmyQcNvJ
-         uu0A==
-X-Gm-Message-State: AOJu0Yx86CLFsHpyd2X5hybRjMJpp1Q/aaib5B1Cl8dSjKpcXbzBmtlK
-	DABSTNxz2FDnJk+ni2HYa113ANRGN5s3mICnBTW2Qg==
-X-Google-Smtp-Source: AGHT+IEIGVbTRObx1tr0gG+0IuLYj3+1JOu+AU0k0JmLnlgUHqVUDDUFk2EYebyRDI74KsY58WnYRJXVxEJu+xzwFZQ=
-X-Received: by 2002:a05:6000:1c9:b0:32d:8185:9526 with SMTP id
- t9-20020a05600001c900b0032d81859526mr24013690wrx.55.1699387490353; Tue, 07
- Nov 2023 12:04:50 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699388409; x=1699993209;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OykAIpEWbk6LIaIkkxOJrcQt1UgoP8zugcDvBcK6nI8=;
+        b=gb11fHtHP0ew6Jo4ULoPjrXwZE6fRSvIepGvl6zxq8OpEFj0Kr2dmam1QzmWHU0RXy
+         B4+/m+/Alfe2qVf6gsFTXdsdBzeVQkQWKyYQOr5kYEp7Km8+UbTEnR2cdzuV3dSrrxqq
+         YZcdO5k8mVphnaxH/CMgaqVmm/T9Trw60Ol6o2pFGMnpGVyoTf6AAzu6OYR6bQAh0Td7
+         Xh0V2+luWST56u7dudmOtr4HId2sly8kcMigGW0xRGvODek+pdHzBWt+/g+65FvoRHDx
+         pBCx2Vu/XiHOwSY0R0anb3cJTWTnC+qJVOyxupG7YBX/ZRBySPGHlOUjT6Wapt/mvaIm
+         v/kg==
+X-Gm-Message-State: AOJu0YxWGbA/1gaTONAjnwGolyB+IKOcbH6FA7q+kIk3P5FpDO003cV1
+	wwXlfEDyAaGEe3LkgiztdznB5idSGszHktGvfHfjJ65v9NdVKzhKHkhcAoa09bVKcXU++E1g69R
+	BBOYLoLX2qOPU3TOdEyVwbv1ookNcWpTTbGk/E/7Cn6h5ASA+wa9/8wIqsxWdlX0=
+X-Google-Smtp-Source: AGHT+IG4rCA6ipEaucqlLGG43TsOeihXcJEuUzc09doDWaHMWqlINy1ZKn10385vpzpwBT4LVnZtJhFzx4cgwA==
+X-Received: from aghulati-dev.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:18bb])
+ (user=aghulati job=sendgmr) by 2002:a05:6870:41ca:b0:1e9:9e47:9555 with SMTP
+ id z10-20020a05687041ca00b001e99e479555mr1820529oac.11.1699388409723; Tue, 07
+ Nov 2023 12:20:09 -0800 (PST)
+Date: Tue,  7 Nov 2023 20:19:48 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <CALzav=d23P5uE=oYqMpjFohvn0CASMJxXB_XEOEi-jtqWcFTDA@mail.gmail.com>
- <ZUlLLGLi1IyMyhm4@x1n> <fcef7c96-a1bb-4c1d-962b-1bdc2a3b4f19@redhat.com>
-In-Reply-To: <fcef7c96-a1bb-4c1d-962b-1bdc2a3b4f19@redhat.com>
-From: David Matlack <dmatlack@google.com>
-Date: Tue, 7 Nov 2023 12:04:21 -0800
-Message-ID: <CALzav=ejfDDRdjtx-ipFYrhNWPZnj3P0RSNHOQCP+OQf5YGX5w@mail.gmail.com>
-Subject: Re: RFC: A KVM-specific alternative to UserfaultFD
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, kvm list <kvm@vger.kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, James Houghton <jthoughton@google.com>, 
-	Oliver Upton <oupton@google.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Mike Kravetz <mike.kravetz@oracle.com>, Andrea Arcangeli <aarcange@redhat.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
+Message-ID: <20231107202002.667900-1-aghulati@google.com>
+Subject: [RFC PATCH 00/14] Support multiple KVM modules on the same host
+From: Anish Ghulati <aghulati@google.com>
+To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, hpa@zytor.com, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>, peterz@infradead.org, paulmck@kernel.org, 
+	Mark Rutland <mark.rutland@arm.com>
+Cc: Anish Ghulati <aghulati@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 7, 2023 at 8:25=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
-> On 11/6/23 21:23, Peter Xu wrote:
-> > On Mon, Nov 06, 2023 at 10:25:13AM -0800, David Matlack wrote:
-> >>
-> >> So why merge a KVM-specific alternative to UserfaultFD?
-> >>
-> >> Taking a step back, let's look at what UserfaultFD is actually
-> >> providing for KVM VMs:
-> >>
-> >>    1. Coordination of userspace accesses to guest memory.
-> >>    2. Coordination of KVM+guest accesses to guest memory.
-> >>
-> >> VMMs already need to
-> >> manually intercept userspace _writes_ to guest memory to implement
-> >> dirty tracking efficiently. It's a small step beyond that to intercept
-> >> both reads and writes for post-copy. And VMMs are increasingly
-> >> multi-process. UserfaultFD provides coordination within a process but
-> >> VMMs already need to deal with coordinating across processes already.
-> >> i.e. UserfaultFD is only solving part of the problem for (1.).
->
-> This is partly true but it is missing non-vCPU kernel accesses, and it's
-> what worries me the most if you propose this as a generic mechanism.
+This series is a rough, PoC-quality RFC to allow (un)loading and running
+multiple KVM modules simultaneously on a single host, e.g. to deploy
+fixes, mitigations, and/or new features without having to drain all VMs 
+from the host. Multi-KVM will also allow running the "same" KVM module
+with different params, e.g. to run trusted VMs with different mitigations.
 
-Non-vCPU accesses in KVM could still be handled with my proposal. But
-I agree that non-KVM kernel accesses are a gap.
+The goal of this RFC is to get feedback on the idea itself and the
+high-level approach.  In particular, we're looking for input on:
 
->  My
-> gut feeling even without reading everything was (and it was confirmed
-> after): I am open to merging some specific features that close holes in
-> the userfaultfd API, but in general I like the unification between
-> guest, userspace *and kernel* accesses that userfaultfd brings. The fact
-> that it includes VGIC on Arm is a cherry on top. :)
+ - Combining kvm_intel.ko and kvm_amd.ko into kvm.ko
+ - Exposing multiple /dev/kvmX devices via Kconfig
+ - The name and prefix of the new base module
 
-Can you explain how VGIC interacts with UFFD? I'd like to understand
-if/how that could work with a KVM-specific solution.
+Feedback on individual patches is also welcome, but please keep in mind
+that this is very much a work in-progress
 
->
-> For things other than guest_memfd, I want to ask Peter & co. if there
-> could be a variant of userfaultfd that is better integrated with memfd,
-> and solve the multi-process VMM issue.  For example, maybe a
-> userfaultfd-like mechanism for memfd could handle missing faults from
-> _any_ VMA for the memfd.
->
-> However, guest_memfd could be a good usecase for the mechanism that you
-> suggest.  Currently guest_memfd cannot be mapped in userspace pages.  As
-> such it cannot be used with userfaultfd.  Furthermore, because it is
-> only mapped by hypervisor page tables, or written via hypervisor APIs,
-> guest_memfd can easily track presence at 4KB granularity even if backed
-> by huge pages.  That could be a point in favor of a KVM-specific solution=
-.
->
-> Also, even if we envision mmap() support as one of the future extensions
-> of guest_memfd, that does not mean you can use it together with
-> userfaultfd.  For example, if we had restrictedmem-backed guest_memfd,
-> or non-struct-page-backed guest_memfd, mmap() would be creating a
-> VM_PFNMAP area.
->
-> Once you have the implementation done for guest_memfd, it is interesting
-> to see how easily it extends to other, userspace-mappable kinds of
-> memory.  But I still dislike the fact that you need some kind of extra
-> protocol in userspace, for multi-process VMMs.  This is the kind of
-> thing that the kernel is supposed to facilitate.  I'd like it to do
-> _more_ of that (see above memfd pseudo-suggestion), not less.
+This builds on Sean's series to hide KVM internals:
 
-I was also thinking guest_memfd could be an avenue to solve the
-multi-process issue. But a little different than the way you described
-(because I still want to find an upstream solution for HugeTLB-backed
-VMs, if possible).
+    https://lore.kernel.org/lkml/20230916003118.2540661-1-seanjc@google.com
 
-What I was thinking was that my proposal could be extended to
-guest_memfd VMAs. The way my proposal works is that all KVM and guest
-accesses would be guaranteed to go through the VM's present bitmaps,
-but accesses through VMAs are not. But with guest_memfd, once we add
-mmap() support, we have access to the struct kvm at the time that
-mmap() is called and when handling page faults on the guest_memfd VMA.
-So it'd be possible for guest_memfd to consult the present bitmap,
-notify userspace on non-present pages, and wait for pages to become
-present when handling faults. This means we could funnel all accesses
-through VMAs (multi-process and non-KVM kernel accesses) through a
-single notification mechanism. i.e. It solves the multi-process issue
-and unifies guest, kernel, and userspace accesses. BUT, only for
-guest_memfd.
+The whole thing can be found at:
 
-So in the short term we could provide a partial solution for
-HugeTLB-backed VMs (at least unblocking Google's use-case) and in the
-long-term there's line of sight of a unified solution.
+    https://github.com/asg-17/linux vac-rfc
+
+The basic gist of the approach is to:
+
+ - Move system-wide virtualization resource management to a new base
+   module to avoid collisions between different KVM modules, e.g. VPIDs
+   and ASIDs need to be unique per VM, and callbacks from IRQ handlers need
+   to be mediated so that things like PMIs get to the right KVM instance.
+
+ - Refactor KVM to make all upgradable assets visible only to KVM, i.e.
+   make KVM a black box, so that the layout/size of things like "struct
+   kvm_vcpu" isn't exposed to the kernel at-large.
+
+ - Fold kvm_intel.ko and kvm_amd.ko into kvm.ko to avoid complications
+   having to generate unique symbols for every symbol exported by kvm.ko.
+
+ - Add a Kconfig string to allow defining a device and module postfix at
+   build time, e.g. to create kvmX.ko and /dev/kvmX.
+
+The proposed name of the new base module is vac.ko, a.k.a.
+Virtualization Acceleration Code (Unupgradable Units Module). Childish
+humor aside, "vac" is a unique name in the kernel and hopefully in x86
+and hardware terminology, is a unique name in the kernel and hopefully
+in x86 and hardware terminology, e.g. `git grep vac_` yields no hits in
+the kernel. It also has the same number of characters as "kvm", e.g.
+the namespace can be modified without needing whitespace adjustment if
+we want to go that route.
+
+Requirements / Goals / Notes:
+ - Fully opt-in and backwards compatible (except for the disappearance
+   of kvm_{amd,intel}.ko).
+
+ - User space ultimately controls and is responsible for deployment,
+   usage, lifecycles, etc.  Standard module refcounting applies, but 
+   ensuruing that a VM is created with the "right" KVM module is a user
+   space problem.
+
+ - No user space *VMM* changes are required, e.g. /dev/kvm can be
+   presented to a VMM by symlinking /dev/kvmX.
+
+ - Mutually exclusive with subsytems that have a hard dependency on KVM,
+   i.e. KVMGT.
+
+ - x86 only (for the foreseeable future).
+
+Anish Ghulati (13):
+  KVM: x86: Move common module params from SVM/VMX to x86
+  KVM: x86: Fold x86 vendor modules into the main KVM modules
+  KVM: x86: Remove unused exports
+  KVM: x86: Create stubs for a new VAC module
+  KVM: x86: Refactor hardware enable/disable operations into a new file
+  KVM: x86: Move user return msr operations out of KVM
+  KVM: SVM: Move shared SVM data structures into VAC
+  KVM: VMX: Move shared VMX data structures into VAC
+  KVM: VMX: Move VMX enable and disable into VAC
+  KVM: SVM: Move SVM enable and disable into VAC
+  KVM: x86: Move VMX and SVM support checks into VAC
+  KVM: x86: VAC: Move all hardware enable/disable code into VAC
+  KVM: VAC: Bring up VAC as a new module
+
+Venkatesh Srinivas (1):
+  KVM: x86: Move shared KVM state into VAC
+
+ arch/x86/include/asm/kvm-x86-ops.h |   3 +-
+ arch/x86/include/asm/kvm_host.h    |  12 +-
+ arch/x86/kernel/nmi.c              |   2 +-
+ arch/x86/kvm/Kconfig               |  29 +-
+ arch/x86/kvm/Makefile              |  31 ++-
+ arch/x86/kvm/cpuid.c               |   8 +-
+ arch/x86/kvm/hyperv.c              |   2 -
+ arch/x86/kvm/irq.c                 |   3 -
+ arch/x86/kvm/irq_comm.c            |   2 -
+ arch/x86/kvm/kvm_onhyperv.c        |   3 -
+ arch/x86/kvm/lapic.c               |  15 -
+ arch/x86/kvm/mmu/mmu.c             |  12 -
+ arch/x86/kvm/mmu/spte.c            |   4 -
+ arch/x86/kvm/mtrr.c                |   1 -
+ arch/x86/kvm/pmu.c                 |   2 -
+ arch/x86/kvm/svm/nested.c          |   4 +-
+ arch/x86/kvm/svm/sev.c             |   2 +-
+ arch/x86/kvm/svm/svm.c             | 224 ++-------------
+ arch/x86/kvm/svm/svm.h             |  21 +-
+ arch/x86/kvm/svm/svm_data.h        |  23 ++
+ arch/x86/kvm/svm/svm_ops.h         |   1 +
+ arch/x86/kvm/svm/vac.c             | 172 ++++++++++++
+ arch/x86/kvm/svm/vac.h             |  20 ++
+ arch/x86/kvm/vac.c                 | 214 +++++++++++++++
+ arch/x86/kvm/vac.h                 |  69 +++++
+ arch/x86/kvm/vmx/nested.c          |   6 +-
+ arch/x86/kvm/vmx/vac.c             | 287 +++++++++++++++++++
+ arch/x86/kvm/vmx/vac.h             |  20 ++
+ arch/x86/kvm/vmx/vmx.c             | 332 +++-------------------
+ arch/x86/kvm/vmx/vmx.h             |   2 -
+ arch/x86/kvm/vmx/vmx_ops.h         |   1 +
+ arch/x86/kvm/x86.c                 | 423 ++---------------------------
+ arch/x86/kvm/x86.h                 |  15 +-
+ include/linux/kvm_host.h           |   2 +
+ virt/kvm/Makefile.kvm              |  14 +-
+ virt/kvm/kvm_main.c                | 210 +-------------
+ virt/kvm/vac.c                     | 192 +++++++++++++
+ virt/kvm/vac.h                     |  40 +++
+ 38 files changed, 1212 insertions(+), 1211 deletions(-)
+ create mode 100644 arch/x86/kvm/svm/svm_data.h
+ create mode 100644 arch/x86/kvm/svm/vac.c
+ create mode 100644 arch/x86/kvm/svm/vac.h
+ create mode 100644 arch/x86/kvm/vac.c
+ create mode 100644 arch/x86/kvm/vac.h
+ create mode 100644 arch/x86/kvm/vmx/vac.c
+ create mode 100644 arch/x86/kvm/vmx/vac.h
+ create mode 100644 virt/kvm/vac.c
+ create mode 100644 virt/kvm/vac.h
+
+
+base-commit: 0b78fc46e5450f08ef92431e569c797a63f31517
+-- 
+2.42.0.869.gea05f2083d-goog
+
 
