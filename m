@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-953-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-940-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75DFA7E4299
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 16:03:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 862697E428C
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 16:01:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A733F1C20DF8
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 15:03:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E69FFB21050
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 15:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09DC831A93;
-	Tue,  7 Nov 2023 15:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47D0134CEA;
+	Tue,  7 Nov 2023 14:59:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GZEoeGY9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OBzLIdEG"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6059131A64
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 15:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639F1347D3
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 14:59:30 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDFCF30E1;
-	Tue,  7 Nov 2023 06:59:00 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA96F30EF;
+	Tue,  7 Nov 2023 06:59:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699369141; x=1730905141;
+  t=1699369143; x=1730905143;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=nDz5ZFHsySJuVF9S9JoOemj38IFxKvmeZ5aZEy093Fo=;
-  b=GZEoeGY9xWQ8XVp68uOiQUOvJoDDEMvaJDFoGXK8EhEU63Kf/vJWnu3T
-   R6KYONbI9a5PE7cG4USfTScjVf3AV/1VywGAJFOdojrrHBSDpD0vz5B/B
-   iaNgByCDC0Jfn17bbNC2DN4qImY8mXAvVA7Kby5X9rqhEgWnhfIV90jr8
-   +m7/x/2SCUT/AIyYa6ylMivoPdMPhiHmnIWQ/BUICHdJOpLssyaMlftEt
-   OtdRb3/Sj1dyJ21qjGoucLrxVyKq9L4KpWdXg6059D+E7uK8728KmHdTM
-   K9CPvZrvtnNmhsCOKdm34l0D3cfkhoxugGZpf1owzR4xIT49kxuZrKRoR
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10887"; a="2462332"
+  bh=7q2PCtImM/JaM02G7jQMfIFieP59b4RsodnEKsHhXcM=;
+  b=OBzLIdEG+/b4XvyZOzLB6pc2tpHienAEOls1w/TGFHzwiM7RB0A4Arm+
+   3cudV2YIPXtzI4i1M8Mk7PEK7LqigIY2En9X9gSBhSkg2a50cxU/fqz4a
+   2zoFdc2WGZQSMUSfHaXfN/6ANa9VWDwfTMBmF22viPPAL34STwDpZeR8n
+   jcJBZCKIIazdX83EeQeT8Ru4rHFspoXWc4sLDhB+Uh6VZEym2eSTPwYLY
+   pcMXAKzoySN6rlwdeAZpAqdnGRnsuGssq6QdVUYjo0Nd9yRu0NTzlLc7y
+   7on825nbeSrAJOu7f9m1iGTGlMp+76LpiurB87o7hRfNuvXsX0pe5aWeI
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10887"; a="2462336"
 X-IronPort-AV: E=Sophos;i="6.03,284,1694761200"; 
-   d="scan'208";a="2462332"
+   d="scan'208";a="2462336"
 Received: from fmviesa001.fm.intel.com ([10.60.135.141])
   by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2023 06:58:13 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.03,284,1694761200"; 
-   d="scan'208";a="10851397"
+   d="scan'208";a="10851400"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2023 06:58:12 -0800
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2023 06:58:13 -0800
 From: isaku.yamahata@intel.com
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -60,11 +60,10 @@ Cc: isaku.yamahata@intel.com,
 	Zhi Wang <zhi.wang.linux@gmail.com>,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
-	tina.zhang@intel.com,
-	Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v17 050/116] KVM: VMX: Move setting of EPT MMU masks to common VT-x code
-Date: Tue,  7 Nov 2023 06:56:16 -0800
-Message-Id: <f94a2f7e67ddf373570178c109e549a4ef8b2b6f.1699368322.git.isaku.yamahata@intel.com>
+	tina.zhang@intel.com
+Subject: [PATCH v17 051/116] KVM: TDX: Add accessors VMX VMCS helpers
+Date: Tue,  7 Nov 2023 06:56:17 -0800
+Message-Id: <ce2084089ce5a76463132e8970f4f52819b1cfcb.1699368322.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1699368322.git.isaku.yamahata@intel.com>
 References: <cover.1699368322.git.isaku.yamahata@intel.com>
@@ -76,61 +75,122 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-EPT MMU masks are used commonly for VMX and TDX.  The value needs to be
-initialized in common code before both VMX/TDX-specific initialization
-code.
+TDX defines SEAMCALL APIs to access TDX control structures corresponding to
+the VMX VMCS.  Introduce helper accessors to hide its SEAMCALL ABI details.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/main.c | 9 +++++++++
- arch/x86/kvm/vmx/vmx.c  | 4 ----
- 2 files changed, 9 insertions(+), 4 deletions(-)
+ arch/x86/kvm/vmx/tdx.h | 95 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 95 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index e5a918d81200..0180b3e5b1f8 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -4,6 +4,7 @@
- #include "x86_ops.h"
- #include "vmx.h"
- #include "nested.h"
-+#include "mmu.h"
- #include "pmu.h"
- #include "tdx.h"
- #include "tdx_arch.h"
-@@ -50,6 +51,14 @@ static __init int vt_hardware_setup(void)
- 	if (ret)
- 		return ret;
+diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+index 961a7da2452a..d92a75c78e6e 100644
+--- a/arch/x86/kvm/vmx/tdx.h
++++ b/arch/x86/kvm/vmx/tdx.h
+@@ -57,6 +57,101 @@ static inline struct vcpu_tdx *to_tdx(struct kvm_vcpu *vcpu)
+ 	return container_of(vcpu, struct vcpu_tdx, vcpu);
+ }
  
-+	/*
-+	 * As kvm_mmu_set_ept_masks() updates enable_mmio_caching, call it
-+	 * before checking enable_mmio_caching.
-+	 */
-+	if (enable_ept)
-+		kvm_mmu_set_ept_masks(enable_ept_ad_bits,
-+				      cpu_has_vmx_ept_execute_only());
++static __always_inline void tdvps_vmcs_check(u32 field, u8 bits)
++{
++#define VMCS_ENC_ACCESS_TYPE_MASK	0x1UL
++#define VMCS_ENC_ACCESS_TYPE_FULL	0x0UL
++#define VMCS_ENC_ACCESS_TYPE_HIGH	0x1UL
++#define VMCS_ENC_ACCESS_TYPE(field)	((field) & VMCS_ENC_ACCESS_TYPE_MASK)
 +
- 	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
- 
- 	return 0;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index af31ad8e893b..2dd0fe161d27 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8409,10 +8409,6 @@ __init int vmx_hardware_setup(void)
- 
- 	set_bit(0, vmx_vpid_bitmap); /* 0 is reserved for host */
- 
--	if (enable_ept)
--		kvm_mmu_set_ept_masks(enable_ept_ad_bits,
--				      cpu_has_vmx_ept_execute_only());
--
- 	/*
- 	 * Setup shadow_me_value/shadow_me_mask to include MKTME KeyID
- 	 * bits to shadow_zero_check.
++	/* TDX is 64bit only.  HIGH field isn't supported. */
++	BUILD_BUG_ON_MSG(__builtin_constant_p(field) &&
++			 VMCS_ENC_ACCESS_TYPE(field) == VMCS_ENC_ACCESS_TYPE_HIGH,
++			 "Read/Write to TD VMCS *_HIGH fields not supported");
++
++	BUILD_BUG_ON(bits != 16 && bits != 32 && bits != 64);
++
++#define VMCS_ENC_WIDTH_MASK	GENMASK(14, 13)
++#define VMCS_ENC_WIDTH_16BIT	(0UL << 13)
++#define VMCS_ENC_WIDTH_64BIT	(1UL << 13)
++#define VMCS_ENC_WIDTH_32BIT	(2UL << 13)
++#define VMCS_ENC_WIDTH_NATURAL	(3UL << 13)
++#define VMCS_ENC_WIDTH(field)	((field) & VMCS_ENC_WIDTH_MASK)
++
++	/* TDX is 64bit only.  i.e. natural width = 64bit. */
++	BUILD_BUG_ON_MSG(bits != 64 && __builtin_constant_p(field) &&
++			 (VMCS_ENC_WIDTH(field) == VMCS_ENC_WIDTH_64BIT ||
++			  VMCS_ENC_WIDTH(field) == VMCS_ENC_WIDTH_NATURAL),
++			 "Invalid TD VMCS access for 64-bit field");
++	BUILD_BUG_ON_MSG(bits != 32 && __builtin_constant_p(field) &&
++			 VMCS_ENC_WIDTH(field) == VMCS_ENC_WIDTH_32BIT,
++			 "Invalid TD VMCS access for 32-bit field");
++	BUILD_BUG_ON_MSG(bits != 16 && __builtin_constant_p(field) &&
++			 VMCS_ENC_WIDTH(field) == VMCS_ENC_WIDTH_16BIT,
++			 "Invalid TD VMCS access for 16-bit field");
++}
++
++static __always_inline void tdvps_state_non_arch_check(u64 field, u8 bits) {}
++static __always_inline void tdvps_management_check(u64 field, u8 bits) {}
++
++#define TDX_BUILD_TDVPS_ACCESSORS(bits, uclass, lclass)				\
++static __always_inline u##bits td_##lclass##_read##bits(struct vcpu_tdx *tdx,	\
++							u32 field)		\
++{										\
++	struct tdx_module_args out;						\
++	u64 err;								\
++										\
++	tdvps_##lclass##_check(field, bits);					\
++	err = tdh_vp_rd(tdx->tdvpr_pa, TDVPS_##uclass(field), &out);		\
++	if (KVM_BUG_ON(err, tdx->vcpu.kvm)) {					\
++		pr_err("TDH_VP_RD["#uclass".0x%x] failed: 0x%llx\n",		\
++		       field, err);						\
++		return 0;							\
++	}									\
++	return (u##bits)out.r8;							\
++}										\
++static __always_inline void td_##lclass##_write##bits(struct vcpu_tdx *tdx,	\
++						      u32 field, u##bits val)	\
++{										\
++	struct tdx_module_args out;						\
++	u64 err;								\
++										\
++	tdvps_##lclass##_check(field, bits);					\
++	err = tdh_vp_wr(tdx->tdvpr_pa, TDVPS_##uclass(field), val,		\
++		      GENMASK_ULL(bits - 1, 0), &out);				\
++	if (KVM_BUG_ON(err, tdx->vcpu.kvm))					\
++		pr_err("TDH_VP_WR["#uclass".0x%x] = 0x%llx failed: 0x%llx\n",	\
++		       field, (u64)val, err);					\
++}										\
++static __always_inline void td_##lclass##_setbit##bits(struct vcpu_tdx *tdx,	\
++						       u32 field, u64 bit)	\
++{										\
++	struct tdx_module_args out;						\
++	u64 err;								\
++										\
++	tdvps_##lclass##_check(field, bits);					\
++	err = tdh_vp_wr(tdx->tdvpr_pa, TDVPS_##uclass(field), bit, bit, &out);	\
++	if (KVM_BUG_ON(err, tdx->vcpu.kvm))					\
++		pr_err("TDH_VP_WR["#uclass".0x%x] |= 0x%llx failed: 0x%llx\n",	\
++		       field, bit, err);					\
++}										\
++static __always_inline void td_##lclass##_clearbit##bits(struct vcpu_tdx *tdx,	\
++							 u32 field, u64 bit)	\
++{										\
++	struct tdx_module_args out;						\
++	u64 err;								\
++										\
++	tdvps_##lclass##_check(field, bits);					\
++	err = tdh_vp_wr(tdx->tdvpr_pa, TDVPS_##uclass(field), 0, bit, &out);	\
++	if (KVM_BUG_ON(err, tdx->vcpu.kvm))					\
++		pr_err("TDH_VP_WR["#uclass".0x%x] &= ~0x%llx failed: 0x%llx\n",	\
++		       field, bit,  err);					\
++}
++
++TDX_BUILD_TDVPS_ACCESSORS(16, VMCS, vmcs);
++TDX_BUILD_TDVPS_ACCESSORS(32, VMCS, vmcs);
++TDX_BUILD_TDVPS_ACCESSORS(64, VMCS, vmcs);
++
+ static __always_inline u64 td_tdcs_exec_read64(struct kvm_tdx *kvm_tdx, u32 field)
+ {
+ 	struct tdx_module_args out;
 -- 
 2.25.1
 
