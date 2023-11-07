@@ -1,185 +1,281 @@
-Return-Path: <kvm+bounces-1091-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1092-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B14727E4BC6
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 23:33:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D4767E4C71
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 00:07:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8AE9CB20F0C
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 22:33:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C647B2105F
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 23:06:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 674AA2A8D4;
-	Tue,  7 Nov 2023 22:33:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0C43066B;
+	Tue,  7 Nov 2023 23:06:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="xJWE8wZX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EmARByoS"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A1E2A8DE;
-	Tue,  7 Nov 2023 22:33:47 +0000 (UTC)
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2089.outbound.protection.outlook.com [40.107.101.89])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8FA611C;
-	Tue,  7 Nov 2023 14:33:46 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FbPL8t2m5o0QZV3hVk3iH05F4IY1gMuyQz0JHCwytQjkbgu8U/7C+QXN5mfilVNPKcpy/RJMrPLtWi6D2gZym/FDYV1kVCHBYa5cNxrEpk8I81qG/8IQaOrmzPjmC6Qo3SoNdGaCYrgOr/5OjBwlSKNZmOk5gD8NbLeeo2Dmq7863vFwPM7Dyjxr+RmhLCPqLNtnhxfV85/iXnAJpfcJVPjM9YeNYyyxeBK/ofW4VI7YT5asejFavGliJGdKUZ4mxUXbLyES6gFWiLLlio7it5S8+RQxhs7IYK+JFzVVxBR6kmE/1FY/h4KT4bx3PAmGkzv4eq0VvaJSYBC03x9Xjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UMGrDPQak/zX4s/hDB/w4mO2t2Wb65hda8lIHXbTjOY=;
- b=HkgTKhhssgS84ytH1sdsnz0Q6YV1QnOoITYCRx4hR7M0O5hibLQrWUrq8nC3EqTK3JRcF9GWlYc/eB9kI4MWbntCGdXGP36QChvRlRm2Kr82i3ZjsoOXEyFQGGXUQhgBnmxgyX+il7tu6RpiKnyd4LU0pl4vLQTVC8s5E00mDA/qhWPIg0YM2B1HZnNpSlafpJgVmzV4kgCscuBIu944VI+CNR1Drhp1qyph1jyzE4e7aUFIUL1tU/wBSOX0O6VRyGNNsO6wlkq/BPBP8dQK5QwRnVxFpbd6nydbPrcmH/m40X6P1gZAYJ/aLKvDS/aswpT7LrXlz6DY5WSJPSfOrg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UMGrDPQak/zX4s/hDB/w4mO2t2Wb65hda8lIHXbTjOY=;
- b=xJWE8wZX6Wck8f+3komwd+m+BnRq1SUe6HaJ5tlVUTBVY0+IJbw0890NzTIpuDyNfuBk46G6kQx2vxC/7ZcKVabJ4Q8xO8tKuT4sDhnmV1Z8tBf7nSeuYqMq4xtw/6i3eX5bh+jQL/Nixgjqql+v2yBYlnO5bP/F/WRiVdYEs9Q=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SJ0PR12MB8614.namprd12.prod.outlook.com (2603:10b6:a03:47d::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.28; Tue, 7 Nov
- 2023 22:33:44 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::3341:faaf:5974:f152]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::3341:faaf:5974:f152%6]) with mapi id 15.20.6954.028; Tue, 7 Nov 2023
- 22:33:44 +0000
-Message-ID: <4b68fd05-5d21-0472-42c3-6cf6f1f9f967@amd.com>
-Date: Tue, 7 Nov 2023 16:33:41 -0600
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.1
-Subject: Re: [PATCH v10 06/50] x86/sev: Add the host SEV-SNP initialization
- support
-Content-Language: en-US
-To: Borislav Petkov <bp@alien8.de>
-Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
- thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
- pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
- jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
- slp@redhat.com, pgonda@google.com, peterz@infradead.org,
- srinivas.pandruvada@linux.intel.com, rientjes@google.com,
- dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz, kirill@shutemov.name,
- ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
- sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
- jarkko@kernel.org, nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
- liam.merwick@oracle.com, zhi.a.wang@intel.com,
- Brijesh Singh <brijesh.singh@amd.com>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-7-michael.roth@amd.com>
- <20231107163142.GAZUpmbt/i3himIf+E@fat_crate.local>
- <4a2016d6-dc1f-ff68-9827-0b72b7c8eac2@amd.com>
- <20231107191931.GCZUqNwxP8JcSbjZ0/@fat_crate.local>
- <20231107202757.GEZUqdzYyzVBHTBhZX@fat_crate.local>
- <250f5513-91c0-d0b5-cb59-439e26ba16dc@amd.com>
- <20231107212740.GFZUqrzK7yzy41dRKp@fat_crate.local>
- <20231107220852.GGZUq1dHJ2q9LYV2oG@fat_crate.local>
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <20231107220852.GGZUq1dHJ2q9LYV2oG@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR13CA0095.namprd13.prod.outlook.com
- (2603:10b6:806:24::10) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E943065F
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 23:06:47 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B296A10C9
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 15:06:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699398405;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=evOOxUwRzOxqxcodoYQiu8D+8i7HycPPu2po6a+EzrU=;
+	b=EmARByoS4vCEFctjs7v/5+BNS9ui6+zfZ6Lshl0azXbDaAVpvSCeqwTfPQzrADcIwySRTS
+	/iz7m0za11ua1YMyrTNstqhEzxN+IoA9GbqoigUKLmrf6j8zG+8jUZKttVT3LiwDyyMjby
+	ucw9xxGtgs+xKrIDn9/222dYZXIK5N8=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-346-QprPeT9DPIaVYEaAJ0YrDw-1; Tue, 07 Nov 2023 18:06:44 -0500
+X-MC-Unique: QprPeT9DPIaVYEaAJ0YrDw-1
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7ac3dfff4c8so587507839f.3
+        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 15:06:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699398403; x=1700003203;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=evOOxUwRzOxqxcodoYQiu8D+8i7HycPPu2po6a+EzrU=;
+        b=sqj31YOnTMEgnnIODEewmrmfMydT3boQNtF5VsoF0qox4SeF0EJvCcc73fFr97JYPI
+         jFshA86MqFZRyoT0zwtIiM6J2hoyCrrmyGcwkYMvQvGakp/cgk2Re8uXRe6Q4BsDXCVa
+         xkh2uaGQd8z7vCsJQ7qrN48RClZE1Q1NWP2Q0M2HP0pDPYnrlMb83DpJoWD1lE28xdIv
+         i6uLp3CzPobPvHh+kglgMzNiPkO1A2iEBaLm/q4sNVs/Vkwu056PNT3DHwGQyrEV27+q
+         TEdOe/QoRMtI57OfP8Efg16j8lF9jKfCE86Of4ubOTuzEmOfVMnHFyDLcCh4u59Emd1E
+         PUbA==
+X-Gm-Message-State: AOJu0YzQqO5FHZVFmAtMNneW0+3A3W4EpjxP6ikTjIp439cSbnls9UUZ
+	HaEn2ldSm8C0yEnHicDdu3o2IXPw9n8C13Mc454Sq/pplgbPkDWMK4vKxx37dpPvR41wtjI77AZ
+	bMfUGD+Z5+3i6
+X-Received: by 2002:a6b:dd15:0:b0:7ac:7cbf:972 with SMTP id f21-20020a6bdd15000000b007ac7cbf0972mr261431ioc.12.1699398403535;
+        Tue, 07 Nov 2023 15:06:43 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGaQwvUt/Q1P1zaKJYSFtqLACqcrOblpWzBgvcWqmvYHf8+bh/9ikaMkiqgQ/LmNo+qmavYmA==
+X-Received: by 2002:a6b:dd15:0:b0:7ac:7cbf:972 with SMTP id f21-20020a6bdd15000000b007ac7cbf0972mr261409ioc.12.1699398403197;
+        Tue, 07 Nov 2023 15:06:43 -0800 (PST)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id g15-20020a056602242f00b0076c569c7a48sm3193990iob.39.2023.11.07.15.06.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Nov 2023 15:06:42 -0800 (PST)
+Date: Tue, 7 Nov 2023 16:06:41 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Reinette Chatre <reinette.chatre@intel.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, "jgg@nvidia.com" <jgg@nvidia.com>,
+ "yishaih@nvidia.com" <yishaih@nvidia.com>,
+ "shameerali.kolothum.thodi@huawei.com"
+ <shameerali.kolothum.thodi@huawei.com>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>, "Jiang, Dave" <dave.jiang@intel.com>, "Liu, Jing2"
+ <jing2.liu@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "Yu, Fenghua"
+ <fenghua.yu@intel.com>, "tom.zanussi@linux.intel.com"
+ <tom.zanussi@linux.intel.com>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "patches@lists.linux.dev"
+ <patches@lists.linux.dev>
+Subject: Re: [RFC PATCH V3 00/26] vfio/pci: Back guest interrupts from
+ Interrupt Message Store (IMS)
+Message-ID: <20231107160641.45aee2e0.alex.williamson@redhat.com>
+In-Reply-To: <7f8b89c7-7ae0-4f2d-9e46-e15a6db7f6d9@intel.com>
+References: <cover.1698422237.git.reinette.chatre@intel.com>
+	<BL1PR11MB52710EAB683507AD7FAD6A5B8CA0A@BL1PR11MB5271.namprd11.prod.outlook.com>
+	<20231101120714.7763ed35.alex.williamson@redhat.com>
+	<BN9PR11MB52769292F138F69D8717BE8D8CA6A@BN9PR11MB5276.namprd11.prod.outlook.com>
+	<20231102151352.1731de78.alex.williamson@redhat.com>
+	<BN9PR11MB5276BCEA3275EC7203E06FDA8CA5A@BN9PR11MB5276.namprd11.prod.outlook.com>
+	<20231103095119.63aa796f.alex.williamson@redhat.com>
+	<BN9PR11MB52765E82CB809DA7C04A3EF18CA9A@BN9PR11MB5276.namprd11.prod.outlook.com>
+	<7f8b89c7-7ae0-4f2d-9e46-e15a6db7f6d9@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|SJ0PR12MB8614:EE_
-X-MS-Office365-Filtering-Correlation-Id: 880c81f9-5883-4883-f275-08dbdfe19993
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	RXzeH2pNwmOSO4kiam4rc8KNAvLxCQu3lM1evY8qclXPF9nBnEK4EEZJecp7MhKkeWzjYFWwG4DO31oR2FjokdhZVt8k8lWMa2N5MJPnrLDn8TwxToYPnzInHt3jmKjA7rgl5Za0xChqLr5Q0Uk/RJZWriGBeQvOqoOsfmFxDIDOJvEA9zYLuj9kyQnSnK8UxITlSQ+X5hVr/fQ/e15/0E2sLxqZIuhbWfA52DtslIka9F6B9zTa8gOWJFigixGrk3OsuCLSNf6DMNwcEzIYz6rrASjP96acwy1pwZXNXieTdZdyG4T4PeMQ5EgsFkabHkzvDIY9+9VjT2upywQkXMMLOh4OUe/b28ApNjYZhq1+5VTTNGVvmRm7OV/lRSrsRXRAjswmlfmunVwtdWOIet+KrsXfqQKhdX29vzt7Br4+LJhoMd1/nVCy/ZaMLxmV/SUi3K/2AdU6P8mcFyjnsLE+72dS3Fq9vH+9bSnVkrvKX+oa2qck+gsSkmHODO6B/igizj4dLfWeErCNqLffxF3UkZXPiGUbLDEs8Z63cSXYxxpKD2qKs49mkfyeqKvrYmA0Uu330z/rnUYSRliN20aNC6yAJY7nVgvzKFgFYd3HYMEEEtM4Wk6Acl73LRiQDlRzHD2RU2mNubUK3yIevQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(396003)(376002)(136003)(346002)(230922051799003)(1800799009)(186009)(451199024)(64100799003)(54906003)(66476007)(66556008)(66946007)(6666004)(36756003)(6512007)(38100700002)(6506007)(26005)(2616005)(53546011)(316002)(31696002)(83380400001)(6916009)(86362001)(478600001)(8676002)(4326008)(2906002)(6486002)(8936002)(7406005)(41300700001)(7416002)(5660300002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?OUU0Sm14UDdQTnZxYmZDVWlaalBwYWU4T0VOR3MyWnlYVHpkTlFSeXc2a2pH?=
- =?utf-8?B?QXQweUpDNE16Mk4rRlZKUVRsa1ZubXdLekp2c3FIOWVJS2lvMzhEOUh4MFVH?=
- =?utf-8?B?bStkRGp1eUpvcEJRQ2xRTUtlRjFpcGhhbmpuZnZyOUVRV3orRlcyL1pYQmtL?=
- =?utf-8?B?RU1mbnRJaFRJR3hKbms3bE41ZFQ3Q2hWaWZ2OGhtd1FQVEFWeGVmMFBnQXd5?=
- =?utf-8?B?WnUzUTJUdWxSREVQOHJYY3NsVXkwb3NCUWhGUmpVNU1WV0tOaEJudHVkdGNH?=
- =?utf-8?B?dTVNMXNjZHVYWllRSXdZTG9GVldvbkZ2NDZYMmtzUHc1SHV0WmNPU3VXQ1VU?=
- =?utf-8?B?a3hkQk9NMFNhNW1Lb0pIL0tZWEFUK0dQdUF5aCtDNXdBNmdWcXYwZ1BXQkNH?=
- =?utf-8?B?NURGbEczc0s5cFlLSWs4dEJDZEJMMGtadlZ3Tm1lUW0yb0s2VFFpTnB3WkJM?=
- =?utf-8?B?TGtUbk12eWU5L3RtallhUUVBNlYzQS90cnU4RnVoWmxIczJtYUc3aWdsd0Z5?=
- =?utf-8?B?NDZ4bFVZLzIwYnc5TVVWUUNMaW5rTHBUTmFsTCsxeHN4VHFDZFl6bno4c1dt?=
- =?utf-8?B?L3cxdWdCNWx5VTVET0p2ZEhVbEx2cTdvbmpqM1ZoUGlSeTEvcGhub3hTblJu?=
- =?utf-8?B?cklDbkhpNzFEN2VZbzhsRWtBYVlGTlZ0K3NiTUk2RnYwZHFhNmpxNHE5amFX?=
- =?utf-8?B?Uk1ZNjVyK1hSS2tPSXEyM05BbWMwemZOSTBKUWRSY1VFOEo3ZHdyaTR4bWtD?=
- =?utf-8?B?ZXk0SVkwSmYzQSt6c1I2dGh0NExVQURycXdvZHNnL3Q2NjBZK0k0VUpZVGtp?=
- =?utf-8?B?STl6cS9lQjJQb0o1YkRCdGZrV3FpcjliTzlGQWdkcWpWMUtwQkVCQk9MSHg5?=
- =?utf-8?B?b3kzUitmK1R3ZjFIOWNrU3ZVQUJSbWxxUXhsOWxQajU4VnAvZ2k1ZWJ2RGpC?=
- =?utf-8?B?aGdNWWw0L0JnS3h2dXcrMEZuaHRqdTIwaGNHc1VqeTIvdUcvK092NHp1NEVO?=
- =?utf-8?B?K281VGE4R0pFN01rWnhWN2hoQTlrNmdxSTFCd3RocXRXVGJER01ocjEyWFBy?=
- =?utf-8?B?SEFNUm9DVHFWYjRuZlFsbko2R0V3SGY5eDRQQVFtSFhNK2FJMFhaa0lJa0lO?=
- =?utf-8?B?Zng0eGpSRWI2dGRIQnNXQm9hYk9DWjB1bFpHWTM0c05oS3lVMWx5ejFvWmRx?=
- =?utf-8?B?R0M0bzEyS1lvRGN1eHhQNmFTamNEd0lrVkFUUXdZcmdmeDR5QWRIZ1dBekhp?=
- =?utf-8?B?emlGSWdKL2pNMEQrOEY2S3ZzVUx5REtNZGM5TWhzYUZmamt4U2NYTDM0MFBr?=
- =?utf-8?B?ZVptTEJkVUFoSlVzRnlNRjg1c2luTEJ5V3JhSVgrc29TOUtTU0JBcjJUc25w?=
- =?utf-8?B?dDRPN2xHMG1RTmNrM0dpNmpTTXJXOW5Sdjd2RmpMeG4rWGw2V0RxSDc0SDVq?=
- =?utf-8?B?aGtnQ3pMVnFjRUFwZGZ3R000L0ROTU04RVFqWDV0S3g0VDhkSWx0OFNGdFJq?=
- =?utf-8?B?eXE1dmhBVzdNUGgzZHZTTFRVZk5kS1dGNWVLOTkxRkZDVGNobUNSWnFrQ3hs?=
- =?utf-8?B?TlVkVGs3cndhMStvaG5SREdwcTdGTE9FNk54cEVFOWlpOUovRFNYSUtkY0c1?=
- =?utf-8?B?UjZDTnd0RFhQbHlTTnVFVExMZnRPSCtyQnczM3h5YVg4UDkzMmNyZU1BRDc2?=
- =?utf-8?B?SEUvR2x1T1d6RWY3c2hvNnd1dmxMcko3Wno0SmdaZEd3RTMxc1pTYVNjR2x6?=
- =?utf-8?B?cVNOZlZPWGFJRGZxZXhQUVIvMnIxRTJmREVMdE5xRml2TEJHc0czeFpKcE4y?=
- =?utf-8?B?RmxaN1ArcXkvWTJ6Zlg5R0pJcUZFQ3NGVFB1SVkwK2VCZGh4TVZZK2FVUERr?=
- =?utf-8?B?aHZ2SlBsQmdaZm5KRmIvYysvWWhWUzdyTWRTUEtabTNNRHc5eCsraFZ2bWNX?=
- =?utf-8?B?TjJ2bFlHM0llenorWTVCSWlVRkpQOCtOL3MxMUNJOVQyMlZnRVBPVmxTbkti?=
- =?utf-8?B?QmF5VXorakNRcWFsVUVRakxGNnF4Z1d5TytoMFlWTCtrWXBGbmlCbEkwRnk1?=
- =?utf-8?B?NURlaXBJNlU4R3daVTNyaXBPc28yUXVHM1R1Z0wyUG1sU0NnMDh0d1MvTWJG?=
- =?utf-8?Q?WY4TZAaX7ZoUjvTknxuOxNtRV?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 880c81f9-5883-4883-f275-08dbdfe19993
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2023 22:33:44.1927
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZKUwm0R7YU9P0kpfCWza7QfxQw7H/OLMrJ5T+8ofozleLF2/jOtG3rJSWqEExnkpRZOXXktYmLgdq/kPQQiJ7A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8614
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 11/7/2023 4:08 PM, Borislav Petkov wrote:
->   static int __init snp_rmptable_init(void)
->   {
-> -	int family, model;
-> -
-> -	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +	if (!amd_iommu_snp_en)
->   		return 0;
+On Tue, 7 Nov 2023 11:48:28 -0800
+Reinette Chatre <reinette.chatre@intel.com> wrote:
+
+> Hi Alex and Kevin,
 > 
+> On 11/7/2023 12:29 AM, Tian, Kevin wrote:
+> >> From: Alex Williamson <alex.williamson@redhat.com>
+> >> Sent: Friday, November 3, 2023 11:51 PM
+> >>
+> >> On Fri, 3 Nov 2023 07:23:13 +0000
+> >> "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> >>  
+> >>>> From: Alex Williamson <alex.williamson@redhat.com>
+> >>>> Sent: Friday, November 3, 2023 5:14 AM
+> >>>>
+> >>>> On Thu, 2 Nov 2023 03:14:09 +0000
+> >>>> "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> >>>>  
+> >>>>>> From: Tian, Kevin
+> >>>>>> Sent: Thursday, November 2, 2023 10:52 AM
+> >>>>>>  
+> >>>>>>>
+> >>>>>>> Without an in-tree user of this code, we're just chopping up code for
+> >>>>>>> no real purpose.  There's no reason that a variant driver requiring  
+> >> IMS  
+> >>>>>>> couldn't initially implement their own SET_IRQS ioctl.  Doing that  
+> >>>>>>
+> >>>>>> this is an interesting idea. We haven't seen a real usage which wants
+> >>>>>> such MSI emulation on IMS for variant drivers. but if the code is
+> >>>>>> simple enough to demonstrate the 1st user of IMS it might not be
+> >>>>>> a bad choice. There are additional trap-emulation required in the
+> >>>>>> device MMIO bar (mostly copying MSI permission entry which  
+> >> contains  
+> >>>>>> PASID info to the corresponding IMS entry). At a glance that area
+> >>>>>> is 4k-aligned so should be doable.
+> >>>>>>  
+> >>>>>
+> >>>>> misread the spec. the MSI-X permission table which provides
+> >>>>> auxiliary data to MSI-X table is not 4k-aligned. It sits in the 1st
+> >>>>> 4k page together with many other registers. emulation of them
+> >>>>> could be simple with a native read/write handler but not sure
+> >>>>> whether any of them may sit in a hot path to affect perf due to
+> >>>>> trap...  
+> >>>>
+> >>>> I'm not sure if you're referring to a specific device spec or the PCI
+> >>>> spec, but the PCI spec has long included an implementation note
+> >>>> suggesting alignment of the MSI-X vector table and pba and separation
+> >>>> from CSRs, and I see this is now even more strongly worded in the 6.0
+> >>>> spec.
+> >>>>
+> >>>> Note though that for QEMU, these are emulated in the VMM and not
+> >>>> written through to the device.  The result of writes to the vector
+> >>>> table in the VMM are translated to vector use/unuse operations, which
+> >>>> we see at the kernel level through SET_IRQS ioctl calls.  Are you
+> >>>> expecting to get PASID information written by the guest through the
+> >>>> emulated vector table?  That would entail something more than a simple
+> >>>> IMS backend to MSI-X frontend.  Thanks,
+> >>>>  
+> >>>
+> >>> I was referring to IDXD device spec. Basically it allows a process to
+> >>> submit a descriptor which contains a completion interrupt handle.
+> >>> The handle is the index of a MSI-X entry or IMS entry allocated by
+> >>> the idxd driver. To mark the association between application and
+> >>> related handles the driver records the PASID of the application
+> >>> in an auxiliary structure for MSI-X (called MSI-X permission table)
+> >>> or directly in the IMS entry. This additional info includes whether
+> >>> an MSI-X/IMS entry has PASID enabled and if yes what is the PASID
+> >>> value to be checked against the descriptor.
+> >>>
+> >>> As you said virtualizing MSI-X table itself is via SET_IRQS and it's
+> >>> 4k aligned. Then we also need to capture guest updates to the MSI-X
+> >>> permission table and copy the PASID information into the
+> >>> corresponding IMS entry when using the IMS backend. It's MSI-X
+> >>> permission table not 4k aligned then trapping it will affect adjacent
+> >>> registers.
+> >>>
+> >>> My quick check in idxd spec doesn't reveal an real impact in perf
+> >>> critical path. Most registers are configuration/control registers
+> >>> accessed at driver init time and a few interrupt registers related
+> >>> to errors or administrative purpose.  
+> >>
+> >> Right, it looks like you'll need to trap writes to the MSI-X
+> >> Permissions Table via a sparse mmap capability to avoid assumptions
+> >> whether it lives on the same page as the MSI-X vector table or PBA.
+> >> Ideally the hardware folks have considered this to avoid any conflict
+> >> with latency sensitive registers.
+> >>
+> >> The variant driver would use this for collecting the meta data relative
+> >> to the IMS interrupt, but this is all tangential to whether we
+> >> preemptively slice up vfio-pci-core's SET_IRQS ioctl or the iDXD driver
+> >> implements its own.  
+> > 
+> > Agree
+> >   
+> >>
+> >> And just to be clear, I don't expect the iDXD variant driver to go to
+> >> extraordinary lengths to duplicate the core ioctl, we can certainly
+> >> refactor and export things where it makes sense, but I think it likely
+> >> makes more sense for the variant driver to implement the shell of the
+> >> ioctl rather than trying to multiplex the entire core ioctl with an ops
+> >> structure that's so intimately tied to the core implementation and
+> >> focused only on the MSI-X code paths.  Thanks,
+> >>  
+> > 
+> > btw I'll let Reinette to decide whether she wants to implement such
+> > a variant driver or waits until idxd siov driver is ready to demonstrate
+> > the usage. One concern with the variant driver approach is lacking
+> > of a real-world usage (e.g. what IMS brings when guest only wants
+> > MSI-X on an assigned PF). Though it may provide a shorter path
+> > to enable the IMS backend support, also comes with the long-term
+> > maintenance burden.  
+> 
+> Thank you very much for your guidance and advice.
+> 
+> I'd be happy to implement what is required for this work. Unfortunately
+> I am not confident that I understand what is meant with "variant driver".
+> 
+> I initially understood "variant driver" to mean the planned IDXD virtual
+> device driver (the "IDXD VDCM" driver) that will assign IDXD resources
+> to guests with varying granularity and back the guest MSI-X interrupts
+> of these virtual devices with IMS interrupts on the host. From Kevin
+> I understand "variant driver" is a new sample driver for an IDXD
+> assigned PF, backing guest MSI-X interrupts with IMS interrupts on
+> the host.
+> 
+> The IDXD VDCM driver is in progress. If a new variant driver needs to be
+> created then I still need to do some research in how to accomplish it.
+> Even so, it is not clear to me who the users of this new driver would be.
+> If the requirement is to demonstrate this VFIO IMS usage then we could
+> perhaps wait until the IDXD VDCM driver is ready and thus not have to deal
+> with additional maintenance burden.
 
-We will still need some method to tell the IOMMU driver if SNP 
-support/feature is disabled by this function, for example, when CPU 
-family and model is not supported by SNP and we jump to no_snp label.
+A vfio-pci variant driver is specifically a driver that leverages
+portions of vfio-pci-core for implementing vfio_device_ops and binds to
+a PCI device.  It might actually be the wrong term here, but I jumped
+to that since the series tries to generalize portions of one of the
+vfio-pci-core code paths. You might very well be intending to use this
+with something more like an mdev driver, which is fine.
 
-The reliable way for this to work is to ensure snp_rmptable_init() is 
-called before IOMMU initialization and then IOMMU initialization depends 
-on SNP feature flag setup by snp_rmptable_init() to enable SNP support 
-on IOMMU or not.
+That also sort of illustrates the point though that this series is
+taking a pretty broad approach to slicing up vfio-pci-core's SET_IRQS
+ioctl code path, enabling support for IMS backed interrupts, but in
+effect complicating the whole thing without any actual consumer to
+justify the complication.  Meanwhile I think the goal is to reduce
+complication to a driver that doesn't exist yet.  So it currently seems
+like a poor trade-off.
 
-If snp_rmptable_init() is called after IOMMU initialization and it 
-detects an issue with SNP support it will clear the SNP feature but the 
-IOMMU driver does not get notified about it, therefore, 
-snp_rmptable_init() should get called before IOMMU initialization or as 
-part of IOMMU initialization, for example, amd_iommu_enable() calling 
-snp_rmptable_init() before calling iommu_snp_enable().
+This driver that doesn't exist yet could implement its own SET_IRQS
+ioctl that backs MSI-X with IMS as a starting point.  Presumably we
+expect multiple drivers to require this behavior, so common code makes
+sense, but the rest of us in the community can't really evaluate how
+much it makes sense to slice the common code without seeing that
+implementation and how it might leverage, if not directly use, the
+existing core code.
 
-Thanks,
-Ashish
+The sample drivers come into play in that if we were to make the
+vfio-pci-core SET_IRQS path usable in this generic way, then any driver
+implementing SET_IRQS for a PCI device should be able to take advantage
+of it, including those that already exist in samples/vfio-mdev/.  I
+don't think anyone is requesting an iDXD sample driver, the real driver
+should be sufficient.
+
+> In the mean time there are items that I do understand better
+> and will work on right away:
+> - Do not have ops span the SET_IRQS ioctl()
+> - Use container_of() instead of opaque pointer
+> - Do not ignore INTx, consider the mdev sample driver when refactoring
+>   this code.
+> - Consider the Intel vgpu driver as user of new emulated interrupt
+>   interface.
+
+I think looking at kvmgt and the existing sample drivers to find
+commonality that actually provides simplification would be a good
+start, but I don't anticipate implementing IMS backed MSI-X in common
+code unless we're at least imminently able to make use of it.  Thanks,
+
+Alex
 
 
