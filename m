@@ -1,390 +1,226 @@
-Return-Path: <kvm+bounces-886-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-887-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D26D7E3FA4
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 14:08:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEFCF7E401B
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 14:34:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 043E7B20E9F
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 13:08:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B6631C20B1B
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 13:34:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377332FE3B;
-	Tue,  7 Nov 2023 13:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7D7130CF3;
+	Tue,  7 Nov 2023 13:34:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d+Aqvpji"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VWFbmB3n"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4655D2DF93
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 13:07:58 +0000 (UTC)
-Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E4AD47AF
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 05:07:55 -0800 (PST)
-Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-1f0f160e293so707432fac.0
-        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 05:07:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699362475; x=1699967275; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7VRoxoxM3bk/ddMYA7RkVxhIt7sN32CxDfhJasXbdTQ=;
-        b=d+AqvpjiFbFAWRV9cRJNKM3v3+qxl1cKA38dut0JjiA4ZbvMBxHGiFdgjCsutproHH
-         6HnqdEbNqk0h/X0h52BLPSv3pILQ6OucibhTiP7uDR3GnEkBHBWQnf9hG6p0JVzcviQC
-         aY9Ojx2Mztp6zUpbe5e9YEeKDWtdBIkSNLBThIGCKPJKRlP48841vRZ5iB4Uj0BdizKf
-         M9PGkCSbajupx+ldPomAqseDO/W0+69X4hr3QQdNE9Onj+F79btBCLki3H9VRTSSO7co
-         Zz9FQYfrvqEiG2x5YPNAv5Ud1E/XsNf4yucjlAKenbi1kIrzw8HR08VQVCqGalDrGrq+
-         ZbDQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184342FE3A
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 13:34:12 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2F3C93
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 05:34:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699364050;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1cJRt9Hh1gkpWx/pnSymwGngN5HgV0e76oVuw4mSbHI=;
+	b=VWFbmB3nNQOc0QY8uCRG90KgeKzK1Rk8BZEUdKG5izrjWi+j+RqVnY07bzFBhu2gnbSTAz
+	eGH6cPyMuAN9bNB3YAFB5L5YVlNctpMri7HnklpjgSn0NDA82/+KPFuUtyMKCAWw1/p9Rf
+	d3prqBErmA6a+M3I2N2XfMCI1Q6tOKs=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-665-B7lxO7uGPVm2jca4fQO7pg-1; Tue, 07 Nov 2023 08:34:09 -0500
+X-MC-Unique: B7lxO7uGPVm2jca4fQO7pg-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-66d12b547e2so73655986d6.0
+        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 05:34:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699362475; x=1699967275;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7VRoxoxM3bk/ddMYA7RkVxhIt7sN32CxDfhJasXbdTQ=;
-        b=eUQ/iPeK311NPSo9RSebvXfLwXslnjw0d2opxl0BCdR8pXmegazNo1fnN0tC86AO3F
-         khHcfiUwQP+CHPlw7nuqynjWTXzxHpufhigFKZgpeMMflz67H65a7+XJFA/SOcIf0zcZ
-         W5HbEqN6kPPw9pq2JlnjRs1hNiltudz8Zgorf7RUycg89RDdIK9SV6skEf0SPtsj4CU+
-         SGagmJEZ3By8RPz1fjb07dZUIUUmAzUwN1MzggOqPNY+GPnAHH5Xj4ksiGnG/P+8AnGM
-         flO3d4D8xEpRH4F6ywH+qUhA2z8s2jM5wg2iig+uMpznrq7HMBaFepyER8l+zHv9WZuv
-         qPnQ==
-X-Gm-Message-State: AOJu0YwmzcM8PqQC+oI/fgvQOX3BvVRqGL5P5IaztbwCBVeaRGjzo+Zy
-	hacV59VbIviQEayKKSwfLYkgt3QSQKY1VsMutyxiyw==
-X-Google-Smtp-Source: AGHT+IEc/OoLKiW5UzIza8k0AJcg/cvGrUiQc/SGatsr9amhK5Gck/VoGoIGcZKiRYhIoVxvQmPBVV/w9nNgSokWHaw=
-X-Received: by 2002:a05:6871:3227:b0:1ef:ace4:f360 with SMTP id
- mo39-20020a056871322700b001eface4f360mr2023903oac.17.1699362474620; Tue, 07
- Nov 2023 05:07:54 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699364049; x=1699968849;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1cJRt9Hh1gkpWx/pnSymwGngN5HgV0e76oVuw4mSbHI=;
+        b=gx7PX1i32/90qdr5jcKQnmirWL8QcCR9d6QHVU0EKJLB4sMn6kry5DC9iZlSgIx2+u
+         bj6mJDXg9ijuFzYFX8XfD8ILa79yKApvllBmX3cCpIiIJ83KpQAwr9pMYkCplofHMFT4
+         Wi5f5Ye1iadLOe2/lswWfYBKkGw1yFXDwneOr8ByI2N2fH3AU33gT36Q8R4w1sY90MMn
+         HStDO3I3iMEi1WY9Tf9djkPJIg5BWcP3fmr2Jut2XKMgSC3G79KsG9/fsVwVQFh3CqBm
+         9F9OPtT31ygnFv/JxLWALc60CoUy4+afCaPtdGzK6s6xzRNT7zfx3ZAwgf+pL36TyEUT
+         1xEw==
+X-Gm-Message-State: AOJu0YwaMNW9r9lKnVbW+ZnI2MqQ7FJHFP/XL37hTAM40uoAHAXiUWyJ
+	e78qAiZa1JEWm9hhr1OadEIroLkMZpeqmCJhYtPzMiREmth5M1o4/qzViXrAh3N4iA7WkBxcsor
+	aeyWy3azfSSVV
+X-Received: by 2002:ad4:5f4f:0:b0:66d:5020:ef67 with SMTP id p15-20020ad45f4f000000b0066d5020ef67mr35107102qvg.36.1699364048869;
+        Tue, 07 Nov 2023 05:34:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFOHDTf/8Ys7QRuX1rOCxSBHQ0XTcoY4xrEjdDPKhgk93uz0BhrvPTMIV1q/WLSzYssdcAOaA==
+X-Received: by 2002:ad4:5f4f:0:b0:66d:5020:ef67 with SMTP id p15-20020ad45f4f000000b0066d5020ef67mr35107079qvg.36.1699364048590;
+        Tue, 07 Nov 2023 05:34:08 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id g9-20020ad45109000000b0066cf2423c79sm4358222qvp.139.2023.11.07.05.34.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Nov 2023 05:34:08 -0800 (PST)
+Message-ID: <5d93f447-c2c5-4c41-b0ea-9108736a2372@redhat.com>
+Date: Tue, 7 Nov 2023 14:34:05 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-33-pbonzini@redhat.com>
-In-Reply-To: <20231105163040.14904-33-pbonzini@redhat.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 7 Nov 2023 13:07:18 +0000
-Message-ID: <CA+EHjTxMK2G3WSQsjPA5zn94+a91HsoaWXx8tz1TTGuq1tVZ5Q@mail.gmail.com>
-Subject: Re: [PATCH 32/34] KVM: selftests: Add basic selftest for guest_memfd()
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Sean Christopherson <seanjc@google.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH] arm: pmu-overflow-interrupt: Increase
+ count values
+Content-Language: en-US
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ andrew.jones@linux.dev, maz@kernel.org, oliver.upton@linux.dev,
+ jarichte@redhat.com
+References: <20231103100139.55807-1-eric.auger@redhat.com>
+ <ZUoIxznZwPyti254@monolith>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <ZUoIxznZwPyti254@monolith>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
+Hi Alexandru,
 
-On Sun, Nov 5, 2023 at 4:35=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
+On 11/7/23 10:52, Alexandru Elisei wrote:
+> Hi Eric,
 >
-> From: Chao Peng <chao.p.peng@linux.intel.com>
+> On Fri, Nov 03, 2023 at 11:01:39AM +0100, Eric Auger wrote:
+>> On some hardware, some pmu-overflow-interrupt failures can be observed.
+>> Although the even counter overflows, the interrupt is not seen as
+>> expected. This happens in the subtest after "promote to 64-b" comment.
+>> After analysis, the PMU overflow interrupt actually hits, ie.
+>> kvm_pmu_perf_overflow() gets called and KVM_REQ_IRQ_PENDING is set,
+>> as expected. However the PMCR.E is reset by the handle_exit path, at
+>> kvm_pmu_handle_pmcr() before the next guest entry and
+>> kvm_pmu_flush_hwstate/kvm_pmu_update_state subsequent call.
+>> There, since the enable bit has been reset, kvm_pmu_update_state() does
+>> not inject the interrupt into the guest.
+>>
+>> This does not seem to be a KVM bug but rather an unfortunate
+>> scenario where the test disables the PMCR.E too closely to the
+>> advent of the overflow interrupt.
+> If I understand correctly, the KVM PMU, after receiving the hardware PMUIRQ and
+> before injecting the interrupt, checks that the PMU is enabled according to the
+> pseudocode for the function CheckForPMUOverflow(). CheckForPMUOverflow() returns
+> false because PMCR_EL1.E is 0, so the KVM PMU decides not to inject the
+> interrupt.
 >
-> Add a selftest to verify the basic functionality of guest_memfd():
->
-> + file descriptor created with the guest_memfd() ioctl does not allow
->   read/write/mmap operations
-> + file size and block size as returned from fstat are as expected
-> + fallocate on the fd checks that offset/length on
->   fallocate(FALLOC_FL_PUNCH_HOLE) should be page aligned
-> + invalid inputs (misaligned size, invalid flags) are rejected
-> + file size and inode are unique (the innocuous-sounding
->   anon_inode_getfile() backs all files with a single inode...)
->
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> Co-developed-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Message-Id: <20231027182217.3615211-35-seanjc@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../testing/selftests/kvm/guest_memfd_test.c  | 206 ++++++++++++++++++
->  2 files changed, 207 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/guest_memfd_test.c
->
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftes=
-ts/kvm/Makefile
-> index ecdea5e7afa8..fd3b30a4ca7b 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -134,6 +134,7 @@ TEST_GEN_PROGS_x86_64 +=3D access_tracking_perf_test
->  TEST_GEN_PROGS_x86_64 +=3D demand_paging_test
->  TEST_GEN_PROGS_x86_64 +=3D dirty_log_test
->  TEST_GEN_PROGS_x86_64 +=3D dirty_log_perf_test
-> +TEST_GEN_PROGS_x86_64 +=3D guest_memfd_test
->  TEST_GEN_PROGS_x86_64 +=3D guest_print_test
->  TEST_GEN_PROGS_x86_64 +=3D hardware_disable_test
->  TEST_GEN_PROGS_x86_64 +=3D kvm_create_max_vcpus
-> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testi=
-ng/selftests/kvm/guest_memfd_test.c
-> new file mode 100644
-> index 000000000000..ea0ae7e25330
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-> @@ -0,0 +1,206 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright Intel Corporation, 2023
-> + *
-> + * Author: Chao Peng <chao.p.peng@linux.intel.com>
-> + */
-> +
-> +#define _GNU_SOURCE
-> +#include "test_util.h"
-> +#include "kvm_util_base.h"
-> +#include <linux/bitmap.h>
-> +#include <linux/falloc.h>
-> +#include <sys/mman.h>
-> +#include <sys/types.h>
-> +#include <sys/stat.h>
-> +
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <unistd.h>
-> +#include <errno.h>
-> +#include <stdio.h>
-> +#include <fcntl.h>
+> Is that correct?
 
-The include ordering should be fixed. Otherwise,
-
-Reviewed-by: Fuad Tabba <tabba@google.com>
-Tested-by: Fuad Tabba <tabba@google.com>
-
-Cheers,
-/fuad
-
-
-> +
-> +static void test_file_read_write(int fd)
-> +{
-> +       char buf[64];
-> +
-> +       TEST_ASSERT(read(fd, buf, sizeof(buf)) < 0,
-> +                   "read on a guest_mem fd should fail");
-> +       TEST_ASSERT(write(fd, buf, sizeof(buf)) < 0,
-> +                   "write on a guest_mem fd should fail");
-> +       TEST_ASSERT(pread(fd, buf, sizeof(buf), 0) < 0,
-> +                   "pread on a guest_mem fd should fail");
-> +       TEST_ASSERT(pwrite(fd, buf, sizeof(buf), 0) < 0,
-> +                   "pwrite on a guest_mem fd should fail");
-> +}
-> +
-> +static void test_mmap(int fd, size_t page_size)
-> +{
-> +       char *mem;
-> +
-> +       mem =3D mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED,=
- fd, 0);
-> +       TEST_ASSERT_EQ(mem, MAP_FAILED);
-> +}
-> +
-> +static void test_file_size(int fd, size_t page_size, size_t total_size)
-> +{
-> +       struct stat sb;
-> +       int ret;
-> +
-> +       ret =3D fstat(fd, &sb);
-> +       TEST_ASSERT(!ret, "fstat should succeed");
-> +       TEST_ASSERT_EQ(sb.st_size, total_size);
-> +       TEST_ASSERT_EQ(sb.st_blksize, page_size);
-> +}
-> +
-> +static void test_fallocate(int fd, size_t page_size, size_t total_size)
-> +{
-> +       int ret;
-> +
-> +       ret =3D fallocate(fd, FALLOC_FL_KEEP_SIZE, 0, total_size);
-> +       TEST_ASSERT(!ret, "fallocate with aligned offset and size should =
-succeed");
-> +
-> +       ret =3D fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
-> +                       page_size - 1, page_size);
-> +       TEST_ASSERT(ret, "fallocate with unaligned offset should fail");
-> +
-> +       ret =3D fallocate(fd, FALLOC_FL_KEEP_SIZE, total_size, page_size)=
-;
-> +       TEST_ASSERT(ret, "fallocate beginning at total_size should fail")=
-;
-> +
-> +       ret =3D fallocate(fd, FALLOC_FL_KEEP_SIZE, total_size + page_size=
-, page_size);
-> +       TEST_ASSERT(ret, "fallocate beginning after total_size should fai=
-l");
-> +
-> +       ret =3D fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
-> +                       total_size, page_size);
-> +       TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) at total_size should suc=
-ceed");
-> +
-> +       ret =3D fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
-> +                       total_size + page_size, page_size);
-> +       TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) after total_size should =
-succeed");
-> +
-> +       ret =3D fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
-> +                       page_size, page_size - 1);
-> +       TEST_ASSERT(ret, "fallocate with unaligned size should fail");
-> +
-> +       ret =3D fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
-> +                       page_size, page_size);
-> +       TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) with aligned offset and =
-size should succeed");
-> +
-> +       ret =3D fallocate(fd, FALLOC_FL_KEEP_SIZE, page_size, page_size);
-> +       TEST_ASSERT(!ret, "fallocate to restore punched hole should succe=
-ed");
-> +}
-> +
-> +static void test_invalid_punch_hole(int fd, size_t page_size, size_t tot=
-al_size)
-> +{
-> +       struct {
-> +               off_t offset;
-> +               off_t len;
-> +       } testcases[] =3D {
-> +               {0, 1},
-> +               {0, page_size - 1},
-> +               {0, page_size + 1},
-> +
-> +               {1, 1},
-> +               {1, page_size - 1},
-> +               {1, page_size},
-> +               {1, page_size + 1},
-> +
-> +               {page_size, 1},
-> +               {page_size, page_size - 1},
-> +               {page_size, page_size + 1},
-> +       };
-> +       int ret, i;
-> +
-> +       for (i =3D 0; i < ARRAY_SIZE(testcases); i++) {
-> +               ret =3D fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUN=
-CH_HOLE,
-> +                               testcases[i].offset, testcases[i].len);
-> +               TEST_ASSERT(ret =3D=3D -1 && errno =3D=3D EINVAL,
-> +                           "PUNCH_HOLE with !PAGE_SIZE offset (%lx) and/=
-or length (%lx) should fail",
-> +                           testcases[i].offset, testcases[i].len);
-> +       }
-> +}
-> +
-> +static void test_create_guest_memfd_invalid(struct kvm_vm *vm)
-> +{
-> +       size_t page_size =3D getpagesize();
-> +       uint64_t flag;
-> +       size_t size;
-> +       int fd;
-> +
-> +       for (size =3D 1; size < page_size; size++) {
-> +               fd =3D __vm_create_guest_memfd(vm, size, 0);
-> +               TEST_ASSERT(fd =3D=3D -1 && errno =3D=3D EINVAL,
-> +                           "guest_memfd() with non-page-aligned page siz=
-e '0x%lx' should fail with EINVAL",
-> +                           size);
-> +       }
-> +
-> +       for (flag =3D 1; flag; flag <<=3D 1) {
-> +               uint64_t bit;
-> +
-> +               fd =3D __vm_create_guest_memfd(vm, page_size, flag);
-> +               TEST_ASSERT(fd =3D=3D -1 && errno =3D=3D EINVAL,
-> +                           "guest_memfd() with flag '0x%lx' should fail =
-with EINVAL",
-> +                           flag);
-> +
-> +               for_each_set_bit(bit, &valid_flags, 64) {
-> +                       fd =3D __vm_create_guest_memfd(vm, page_size, fla=
-g | BIT_ULL(bit));
-> +                       TEST_ASSERT(fd =3D=3D -1 && errno =3D=3D EINVAL,
-> +                                   "guest_memfd() with flags '0x%llx' sh=
-ould fail with EINVAL",
-> +                                   flag | BIT_ULL(bit));
-> +               }
-> +       }
-> +}
-> +
-> +static void test_create_guest_memfd_multiple(struct kvm_vm *vm)
-> +{
-> +       int fd1, fd2, ret;
-> +       struct stat st1, st2;
-> +
-> +       fd1 =3D __vm_create_guest_memfd(vm, 4096, 0);
-> +       TEST_ASSERT(fd1 !=3D -1, "memfd creation should succeed");
-> +
-> +       ret =3D fstat(fd1, &st1);
-> +       TEST_ASSERT(ret !=3D -1, "memfd fstat should succeed");
-> +       TEST_ASSERT(st1.st_size =3D=3D 4096, "memfd st_size should match =
-requested size");
-> +
-> +       fd2 =3D __vm_create_guest_memfd(vm, 8192, 0);
-> +       TEST_ASSERT(fd2 !=3D -1, "memfd creation should succeed");
-> +
-> +       ret =3D fstat(fd2, &st2);
-> +       TEST_ASSERT(ret !=3D -1, "memfd fstat should succeed");
-> +       TEST_ASSERT(st2.st_size =3D=3D 8192, "second memfd st_size should=
- match requested size");
-> +
-> +       ret =3D fstat(fd1, &st1);
-> +       TEST_ASSERT(ret !=3D -1, "memfd fstat should succeed");
-> +       TEST_ASSERT(st1.st_size =3D=3D 4096, "first memfd st_size should =
-still match requested size");
-> +       TEST_ASSERT(st1.st_ino !=3D st2.st_ino, "different memfd should h=
-ave different inode numbers");
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +       size_t page_size;
-> +       size_t total_size;
-> +       int fd;
-> +       struct kvm_vm *vm;
-> +
-> +       TEST_REQUIRE(kvm_has_cap(KVM_CAP_GUEST_MEMFD));
-> +
-> +       page_size =3D getpagesize();
-> +       total_size =3D page_size * 4;
-> +
-> +       vm =3D vm_create_barebones();
-> +
-> +       test_create_guest_memfd_invalid(vm);
-> +       test_create_guest_memfd_multiple(vm);
-> +
-> +       fd =3D vm_create_guest_memfd(vm, total_size, 0);
-> +
-> +       test_file_read_write(fd);
-> +       test_mmap(fd, page_size);
-> +       test_file_size(fd, page_size, total_size);
-> +       test_fallocate(fd, page_size, total_size);
-> +       test_invalid_punch_hole(fd, page_size, total_size);
-> +
-> +       close(fd);
-> +}
-> --
-> 2.39.1
+Yes that's correct
 >
+> Changing the number of SW_INCR events might not be optimal - for example,
+> COUNT_INT > 100 might hide an error that otherwise would have been triggered if
+> the number of events were 100. Not very likely, but still a possibility.
+I also changed the COUNT for SW_INCR events to unify the code. However
+this is not strictly necessary to fix the issue I encounter. I can
+revert that change if you prefer.
 >
+> Another approach would be to wait for a set amount of time for the CPU to take
+> the interrupt. There's something similar in timer.c::{test_timer_tval(),
+> timer_do_wfi()}.
+you're right. However this would urge me to have a separate asm code
+that loops with wfi after doing the mem_access loop. I am not sure this
+is worth the candle here?
+
+Thanks!
+
+Eric
+>
+> Thanks,
+> Alex
+>
+>> Since it looks like a benign and inlikely case, let's resize the number
+>> of iterations to prevent the PMCR enable bit from being resetted
+>> at the same time as the actual overflow event.
+>>
+>> COUNT_INT is introduced, arbitrarily set to 1000 iterations and is
+>> used in this test.
+>>
+>> Reported-by: Jan Richter <jarichte@redhat.com>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  arm/pmu.c | 15 ++++++++-------
+>>  1 file changed, 8 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/arm/pmu.c b/arm/pmu.c
+>> index a91a7b1f..acd88571 100644
+>> --- a/arm/pmu.c
+>> +++ b/arm/pmu.c
+>> @@ -66,6 +66,7 @@
+>>  #define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
+>>  #define COUNT 250
+>>  #define MARGIN 100
+>> +#define COUNT_INT 1000
+>>  /*
+>>   * PRE_OVERFLOW2 is set so that 1st @COUNT iterations do not
+>>   * produce 32b overflow and 2nd @COUNT iterations do. To accommodate
+>> @@ -978,13 +979,13 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+>>  
+>>  	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
+>>  
+>> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+>> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+>>  	report(expect_interrupts(0), "no overflow interrupt after preset");
+>>  
+>>  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+>>  	isb();
+>>  
+>> -	for (i = 0; i < 100; i++)
+>> +	for (i = 0; i < COUNT_INT; i++)
+>>  		write_sysreg(0x2, pmswinc_el0);
+>>  
+>>  	isb();
+>> @@ -1002,15 +1003,15 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+>>  	write_sysreg(ALL_SET_32, pmintenset_el1);
+>>  	isb();
+>>  
+>> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+>> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+>>  
+>>  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+>>  	isb();
+>>  
+>> -	for (i = 0; i < 100; i++)
+>> +	for (i = 0; i < COUNT_INT; i++)
+>>  		write_sysreg(0x3, pmswinc_el0);
+>>  
+>> -	mem_access_loop(addr, 200, pmu.pmcr_ro);
+>> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro);
+>>  	report_info("overflow=0x%lx", read_sysreg(pmovsclr_el0));
+>>  	report(expect_interrupts(0x3),
+>>  		"overflow interrupts expected on #0 and #1");
+>> @@ -1029,7 +1030,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+>>  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
+>>  	write_regn_el0(pmevcntr, 0, pre_overflow);
+>>  	isb();
+>> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+>> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+>>  	report(expect_interrupts(0x1), "expect overflow interrupt");
+>>  
+>>  	/* overflow on odd counter */
+>> @@ -1037,7 +1038,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+>>  	write_regn_el0(pmevcntr, 0, pre_overflow);
+>>  	write_regn_el0(pmevcntr, 1, all_set);
+>>  	isb();
+>> -	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+>> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+>>  	if (overflow_at_64bits) {
+>>  		report(expect_interrupts(0x1),
+>>  		       "expect overflow interrupt on even counter");
+>> -- 
+>> 2.41.0
+>>
+
 
