@@ -1,43 +1,44 @@
-Return-Path: <kvm+bounces-846-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-854-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4736A7E37AB
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 10:22:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8A487E37BE
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 10:23:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78BF41C20AFC
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 09:22:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D43FB20B58
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 09:23:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7D8112E4B;
-	Tue,  7 Nov 2023 09:22:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F378329CF2;
+	Tue,  7 Nov 2023 09:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Cw1GeOn4"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Vy4F3cdm"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36FB8F6F
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 09:22:19 +0000 (UTC)
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 393E0106
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 01:22:18 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F5928E29
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 09:22:32 +0000 (UTC)
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C490A114
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 01:22:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+	d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
 	Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=kWdbDjeYz0afnZnwtIhprW3R32uFeN2KMkLsabrtTH8=; b=Cw1GeOn4kpo8cW2cKosb3qe9MO
-	dyfGbnQtiq55C/Sw5Cvina+fKES9cSV1XfsFJKhXJ8bfrclHP+3L26I7mgvzz36dYJllEEnQVMFsF
-	HoV0m5bq0JsQl3wDWE5ikNkzgPrAOk2jazWS6AWFEzKvMquaosPtu882fXTRAIxIGqEUyNlJ36lK8
-	73fT2RuvI8EN9w/U/J7MLWSnVhqkU01k8NGlVQJcCpkFdGpvaMLJAoJ3YqsH3oyip60Pp8NsU4Znu
-	kxLCpOt+uhIAe47HC6/wZ/m+fAP8JC3j4vMJILoOf02sh1d0Nu5BWz4neZVPHvWNLeYVLXgUeQCiN
-	hD6B72zA==;
+	bh=qaX76sba0ihoWf79BpMjucCx6OK5R/g8GeoiQOwguNA=; b=Vy4F3cdmVrZDN8OdQ8yswaBCcD
+	H0d5tv4GKZdX8q2YUADeKMPnY3Y8Q5m2INiIh49d5erdwPxXHU8DaWOCeg7BHS6XPPQmSwOGEUiij
+	qBT2PgRY+d8steJDkFD6bceOapYA+Ut92ElQ0CcqwgxTdjramjxxgg4fxJ1SxyL7gIxG00oixtquZ
+	gvMORJpAETT5lNq0thRGyroFWHBj7inI/7JrPLLwAzVsFyzxK+LkwVMzuQ+Aq19bHfoqlaOTAxTTK
+	ykDmbRecugCKq+9TPczxpacUUpZQnpeNfH5koRx0/XwM4XBdFZTjaPc/fhR4kC9KSqPCZZcy0uznk
+	8a7xJLZg==;
 Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
-	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1r0IHN-00BPkW-UH; Tue, 07 Nov 2023 09:21:50 +0000
+	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1r0IHP-00BtG4-0U;
+	Tue, 07 Nov 2023 09:21:55 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.96.2 #2 (Red Hat Linux))
-	id 1r0IHO-001hKg-0o;
+	id 1r0IHO-001hKk-0y;
 	Tue, 07 Nov 2023 09:21:50 +0000
 From: David Woodhouse <dwmw2@infradead.org>
 To: qemu-devel@nongnu.org,
@@ -58,9 +59,9 @@ Cc: Kevin Wolf <kwolf@redhat.com>,
 	qemu-block@nongnu.org,
 	xen-devel@lists.xenproject.org,
 	kvm@vger.kernel.org
-Subject: [PULL 13/15] hw/i386/pc: support '-nic' for xen-net-device
-Date: Tue,  7 Nov 2023 09:21:45 +0000
-Message-ID: <20231107092149.404842-14-dwmw2@infradead.org>
+Subject: [PULL 14/15] xen-platform: unplug AHCI disks
+Date: Tue,  7 Nov 2023 09:21:46 +0000
+Message-ID: <20231107092149.404842-15-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231107092149.404842-1-dwmw2@infradead.org>
 References: <20231107092149.404842-1-dwmw2@infradead.org>
@@ -72,152 +73,122 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-The default NIC creation seems a bit hackish to me. I don't understand
-why each platform has to call pci_nic_init_nofail() from a point in the
-code where it actually has a pointer to the PCI bus, and then we have
-the special cases for things like ne2k_isa.
+To support Xen guests using the Q35 chipset, the unplug protocol needs
+to also remove AHCI disks.
 
-If qmp_device_add() can *find* the appropriate bus and instantiate
-the device on it, why can't we just do that from generic code for
-creating the default NICs too?
+Make pci_xen_ide_unplug() more generic, iterating over the children
+of the PCI device and destroying the "ide-hd" devices. That works the
+same for both AHCI and IDE, as does the detection of the primary disk
+as unit 0 on the bus named "ide.0".
 
-But that isn't a yak I want to shave today. Add a xenbus field to the
-PCMachineState so that it can make its way from pc_basic_device_init()
-to pc_nic_init() and be handled as a special case like ne2k_isa is.
-
-Now we can launch emulated Xen guests with '-nic user'.
+Then pci_xen_ide_unplug() can be used for both AHCI and IDE devices.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 Reviewed-by: Paul Durrant <paul@xen.org>
 ---
- hw/i386/pc.c             | 11 ++++++++---
- hw/i386/pc_piix.c        |  2 +-
- hw/i386/pc_q35.c         |  2 +-
- hw/xen/xen-bus.c         |  4 +++-
- include/hw/i386/pc.h     |  4 +++-
- include/hw/xen/xen-bus.h |  2 +-
- 6 files changed, 17 insertions(+), 8 deletions(-)
+ hw/i386/xen/xen_platform.c | 68 +++++++++++++++++++++++++-------------
+ 1 file changed, 45 insertions(+), 23 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 1aef21aa2c..188bc9d0f8 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1261,7 +1261,7 @@ void pc_basic_device_init(struct PCMachineState *pcms,
-         if (pcms->bus) {
-             pci_create_simple(pcms->bus, -1, "xen-platform");
-         }
--        xen_bus_init();
-+        pcms->xenbus = xen_bus_init();
-         xen_be_init();
-     }
- #endif
-@@ -1289,7 +1289,8 @@ void pc_basic_device_init(struct PCMachineState *pcms,
-                     pcms->vmport != ON_OFF_AUTO_ON);
- }
- 
--void pc_nic_init(PCMachineClass *pcmc, ISABus *isa_bus, PCIBus *pci_bus)
-+void pc_nic_init(PCMachineClass *pcmc, ISABus *isa_bus, PCIBus *pci_bus,
-+                 BusState *xen_bus)
- {
-     MachineClass *mc = MACHINE_CLASS(pcmc);
-     int i;
-@@ -1299,7 +1300,11 @@ void pc_nic_init(PCMachineClass *pcmc, ISABus *isa_bus, PCIBus *pci_bus)
-         NICInfo *nd = &nd_table[i];
-         const char *model = nd->model ? nd->model : mc->default_nic;
- 
--        if (g_str_equal(model, "ne2k_isa")) {
-+        if (xen_bus && (!nd->model || g_str_equal(model, "xen-net-device"))) {
-+            DeviceState *dev = qdev_new("xen-net-device");
-+            qdev_set_nic_properties(dev, nd);
-+            qdev_realize_and_unref(dev, xen_bus, &error_fatal);
-+        } else if (g_str_equal(model, "ne2k_isa")) {
-             pc_init_ne2k_isa(isa_bus, nd);
-         } else {
-             pci_nic_init_nofail(nd, pci_bus, model, NULL);
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 26e161beb9..eace854335 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -342,7 +342,7 @@ static void pc_init1(MachineState *machine,
-     pc_basic_device_init(pcms, isa_bus, x86ms->gsi, rtc_state, true,
-                          0x4);
- 
--    pc_nic_init(pcmc, isa_bus, pci_bus);
-+    pc_nic_init(pcmc, isa_bus, pci_bus, pcms->xenbus);
- 
-     if (pcmc->pci_enabled) {
-         pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 597943ff1b..4f3e5412f6 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -340,7 +340,7 @@ static void pc_q35_init(MachineState *machine)
- 
-     /* the rest devices to which pci devfn is automatically assigned */
-     pc_vga_init(isa_bus, host_bus);
--    pc_nic_init(pcmc, isa_bus, host_bus);
-+    pc_nic_init(pcmc, isa_bus, host_bus, pcms->xenbus);
- 
-     if (machine->nvdimms_state->is_enabled) {
-         nvdimm_init_acpi_state(machine->nvdimms_state, system_io,
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index cc6f1b362f..4973e7d9c9 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -1133,11 +1133,13 @@ static void xen_register_types(void)
- 
- type_init(xen_register_types)
- 
--void xen_bus_init(void)
-+BusState *xen_bus_init(void)
- {
-     DeviceState *dev = qdev_new(TYPE_XEN_BRIDGE);
-     BusState *bus = qbus_new(TYPE_XEN_BUS, dev, NULL);
- 
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
-     qbus_set_bus_hotplug_handler(bus);
+diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
+index e2dd1b536a..ef7d3fc05f 100644
+--- a/hw/i386/xen/xen_platform.c
++++ b/hw/i386/xen/xen_platform.c
+@@ -169,39 +169,60 @@ static void pci_unplug_nics(PCIBus *bus)
+  *
+  * [1] https://xenbits.xen.org/gitweb/?p=xen.git;a=blob;f=docs/misc/hvm-emulated-unplug.pandoc
+  */
+-static void pci_xen_ide_unplug(PCIDevice *d, bool aux)
++struct ide_unplug_state {
++    bool aux;
++    int nr_unplugged;
++};
 +
-+    return bus;
++static int ide_dev_unplug(DeviceState *dev, void *_st)
+ {
+-    DeviceState *dev = DEVICE(d);
+-    PCIIDEState *pci_ide;
+-    int i;
++    struct ide_unplug_state *st = _st;
+     IDEDevice *idedev;
+     IDEBus *idebus;
+     BlockBackend *blk;
++    int unit;
++
++    idedev = IDE_DEVICE(object_dynamic_cast(OBJECT(dev), "ide-hd"));
++    if (!idedev) {
++        return 0;
++    }
+ 
+-    pci_ide = PCI_IDE(dev);
++    idebus = IDE_BUS(qdev_get_parent_bus(dev));
+ 
+-    for (i = aux ? 1 : 0; i < 4; i++) {
+-        idebus = &pci_ide->bus[i / 2];
+-        blk = idebus->ifs[i % 2].blk;
++    unit = (idedev == idebus->slave);
++    assert(unit || idedev == idebus->master);
+ 
+-        if (blk && idebus->ifs[i % 2].drive_kind != IDE_CD) {
+-            if (!(i % 2)) {
+-                idedev = idebus->master;
+-            } else {
+-                idedev = idebus->slave;
+-            }
++    if (st->aux && !unit && !strcmp(BUS(idebus)->name, "ide.0")) {
++        return 0;
++    }
+ 
+-            blk_drain(blk);
+-            blk_flush(blk);
++    blk = idebus->ifs[unit].blk;
++    if (blk) {
++        blk_drain(blk);
++        blk_flush(blk);
+ 
+-            blk_detach_dev(blk, DEVICE(idedev));
+-            idebus->ifs[i % 2].blk = NULL;
+-            idedev->conf.blk = NULL;
+-            monitor_remove_blk(blk);
+-            blk_unref(blk);
+-        }
++        blk_detach_dev(blk, DEVICE(idedev));
++        idebus->ifs[unit].blk = NULL;
++        idedev->conf.blk = NULL;
++        monitor_remove_blk(blk);
++        blk_unref(blk);
++    }
++
++    object_unparent(OBJECT(dev));
++    st->nr_unplugged++;
++
++    return 0;
++}
++
++static void pci_xen_ide_unplug(PCIDevice *d, bool aux)
++{
++    struct ide_unplug_state st = { aux, 0 };
++    DeviceState *dev = DEVICE(d);
++
++    qdev_walk_children(dev, NULL, NULL, ide_dev_unplug, NULL, &st);
++    if (st.nr_unplugged) {
++        pci_device_reset(d);
+     }
+-    pci_device_reset(d);
  }
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 29a9724524..a10ceeabbf 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -33,6 +33,7 @@ typedef struct PCMachineState {
  
-     /* Pointers to devices and objects: */
-     PCIBus *bus;
-+    BusState *xenbus;
-     I2CBus *smbus;
-     PFlashCFI01 *flash[2];
-     ISADevice *pcspk;
-@@ -184,7 +185,8 @@ void pc_basic_device_init(struct PCMachineState *pcms,
- void pc_cmos_init(PCMachineState *pcms,
-                   BusState *ide0, BusState *ide1,
-                   ISADevice *s);
--void pc_nic_init(PCMachineClass *pcmc, ISABus *isa_bus, PCIBus *pci_bus);
-+void pc_nic_init(PCMachineClass *pcmc, ISABus *isa_bus, PCIBus *pci_bus,
-+                 BusState *xen_bus);
+ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
+@@ -216,6 +237,7 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
  
- void pc_i8259_create(ISABus *isa_bus, qemu_irq *i8259_irqs);
+     switch (pci_get_word(d->config + PCI_CLASS_DEVICE)) {
+     case PCI_CLASS_STORAGE_IDE:
++    case PCI_CLASS_STORAGE_SATA:
+         pci_xen_ide_unplug(d, aux);
+         break;
  
-diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index 38d40afa37..334ddd1ff6 100644
---- a/include/hw/xen/xen-bus.h
-+++ b/include/hw/xen/xen-bus.h
-@@ -75,7 +75,7 @@ struct XenBusClass {
- OBJECT_DECLARE_TYPE(XenBus, XenBusClass,
-                     XEN_BUS)
- 
--void xen_bus_init(void);
-+BusState *xen_bus_init(void);
- 
- void xen_device_backend_set_state(XenDevice *xendev,
-                                   enum xenbus_state state);
 -- 
 2.41.0
 
