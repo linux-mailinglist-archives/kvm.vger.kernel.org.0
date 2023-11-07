@@ -1,367 +1,227 @@
-Return-Path: <kvm+bounces-830-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-831-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B1CB7E34FC
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 06:48:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9C747E3513
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 07:10:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F3FD280EB5
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 05:48:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E95571C20AF4
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 06:10:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 356A6B65C;
-	Tue,  7 Nov 2023 05:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18FF8B653;
+	Tue,  7 Nov 2023 06:10:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Jznw8oNq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DwFY0WqD"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE7839468;
-	Tue,  7 Nov 2023 05:47:53 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B67B92;
-	Mon,  6 Nov 2023 21:47:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699336072; x=1730872072;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=oqZ5JQNUaGOSPFfGCcRkwAJc+NX/2BP9g4PZc+AIHn4=;
-  b=Jznw8oNqapngi7iGnOQu2xN4sNeE8X/jdC9wrmA2lSe8u5Q/1IfD3g/y
-   8aF4U6kHAKS135rOsiYEmfXVcFJBBefvKYgLPYNOkMuNrJfwmlZWxtDvg
-   SR0Up5AhFdQtMS4/pDe3CooBwTrYgU8A8ldzq+4QvVm8LdV12mqDWK8l7
-   4AeP1Ta6LX4v0gGKNkjdUKaXHTslWSBdaCo/odSYBSEbPCRHXi7J8yTAJ
-   Wk+9SW1sacDiMvPg6NsA4PxZvdSHCOJ/T027rNJcLLpSbmvTCDXtgWg2w
-   zLRNlcPt6bal/frB4sTwzwZ/JePZLyEXIuNKmUjQiSPXH+U9njDRzHpM9
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="10978160"
-X-IronPort-AV: E=Sophos;i="6.03,282,1694761200"; 
-   d="scan'208";a="10978160"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2023 21:47:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="832964536"
-X-IronPort-AV: E=Sophos;i="6.03,282,1694761200"; 
-   d="scan'208";a="832964536"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmsmga004.fm.intel.com with ESMTP; 06 Nov 2023 21:47:40 -0800
-Date: Tue, 7 Nov 2023 13:47:40 +0800
-From: Yuan Yao <yuan.yao@linux.intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Sean Christopherson <seanjc@google.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
-	Anish Moorthy <amoorthy@google.com>,
-	David Matlack <dmatlack@google.com>,
-	Yu Zhang <yu.c.zhang@linux.intel.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Maciej Szmigiero <mail@maciej.szmigiero.name>,
-	David Hildenbrand <david@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
-	Liam Merwick <liam.merwick@oracle.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH 08/34] KVM: Introduce KVM_SET_USER_MEMORY_REGION2
-Message-ID: <20231107054739.pamcdd2z564c6xv3@yy-desk-7060>
-References: <20231105163040.14904-1-pbonzini@redhat.com>
- <20231105163040.14904-9-pbonzini@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284FC8C19
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 06:10:48 +0000 (UTC)
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 345DB110
+	for <kvm@vger.kernel.org>; Mon,  6 Nov 2023 22:10:43 -0800 (PST)
+Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-50931d0bb04so2288e87.0
+        for <kvm@vger.kernel.org>; Mon, 06 Nov 2023 22:10:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699337441; x=1699942241; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7w492P8EaMyzzBXQGsoWoq23LSvZpwaYh30vR46ByNc=;
+        b=DwFY0WqDuzVuffzxYZHFksTXVBuK1aS5KiCy8Q0dqtZpO8bevK45K0z21+f+wHCdJz
+         1eW9964gvfut+B6xfrx6kggJV5eKkRZMfU/hoYvkWhsic19ZSK5dwgs7aoYtH7btgwhq
+         mrHAErE4fuR1EE5HRZplc6+JePEpC1dxcE2mijhqr3loxFCVqtaViyVlpYCAus5MOYFJ
+         G1sitE59nihM5Qc/e8mdl8/kv+yrnOxeMlPUcg7DL0lSj/745tuolmP409IQ1h1ucK4G
+         xcdZWcS8sECTnsBYNtPTxEVzSHOANqZcluUSZsgaKz6a9YjXWBmAWFYJjFy9scrdQcNP
+         0AUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699337441; x=1699942241;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7w492P8EaMyzzBXQGsoWoq23LSvZpwaYh30vR46ByNc=;
+        b=TisaKWB9kAKXRDeRLLwJtxmyjBGjm/3aeJ3tM7HLDaebVDFfz7CZvVKKoCVNHH1NKY
+         qNjeW6aCCIBdQDMAg1sUXNtQNiaInT81e0rGoX7dRDCRY+MtiMHtrOTvNcexmQkxGRCH
+         sFEcw2af4Ql8VewbYAieKKHELqaO7yDiJuR4FYLhYNal/Uri28/guBLycjHKi6yD1OzB
+         YH9NIb3ElhH3jtsZQr1Y2LQqf2b515vI74qMQzT+hN1KTKjvX6oApIKfn81EvGov4xbm
+         Pk6mX04kNQU5tKFjVEy2AvkdFqyda6e303GVXcRtADb5+ZKn7Uo9AXu718ZLk2eBccEf
+         PX2A==
+X-Gm-Message-State: AOJu0Yz8h2aLaLXHKXAKKb1dtzeBt8xECSOsfmVfOFeIhxkw/HsBf/fx
+	R8tBsexZNMJn6mWXYEqgsfZleODP+LbFOYN2D7/sMA==
+X-Google-Smtp-Source: AGHT+IEQvtxnLlB7F29eRu/cA7awY+Kxexhgv1i34AQJasD2LNOF96/NDCw5kXIBvzx84FiV23+2NcPPv0JH3c6k38Q=
+X-Received: by 2002:a05:6512:108c:b0:501:a2b9:6046 with SMTP id
+ j12-20020a056512108c00b00501a2b96046mr38300lfg.7.1699337441012; Mon, 06 Nov
+ 2023 22:10:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231105163040.14904-9-pbonzini@redhat.com>
-User-Agent: NeoMutt/20171215
+References: <20231011195740.3349631-1-oliver.upton@linux.dev>
+ <20231011195740.3349631-3-oliver.upton@linux.dev> <CAM9d7cjxkAmEc=g0jWBPQ9d6GYmfdZSKjqi5v0UsoPvkQy-fSw@mail.gmail.com>
+ <ZS/n5dqo6dZE40HE@kernel.org>
+In-Reply-To: <ZS/n5dqo6dZE40HE@kernel.org>
+From: Ian Rogers <irogers@google.com>
+Date: Mon, 6 Nov 2023 22:10:29 -0800
+Message-ID: <CAP-5=fWcrQqZz5vTEd_YHBcZ8rGF4Shj=QpZ9mTLDnXbwwLZmw@mail.gmail.com>
+Subject: Re: [PATCH v3 2/5] perf build: Generate arm64's sysreg-defs.h and add
+ to include path
+To: Arnaldo Carvalho de Melo <acme@kernel.org>
+Cc: Namhyung Kim <namhyung@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-perf-users@vger.kernel.org, Mark Brown <broonie@kernel.org>, 
+	Jing Zhang <jingzhangos@google.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, James Morse <james.morse@arm.com>, 
+	Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Adrian Hunter <adrian.hunter@intel.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Mark Rutland <mark.rutland@arm.com>, 
+	Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Nov 05, 2023 at 05:30:11PM +0100, Paolo Bonzini wrote:
-> From: Sean Christopherson <seanjc@google.com>
+On Wed, Oct 18, 2023 at 7:12=E2=80=AFAM Arnaldo Carvalho de Melo
+<acme@kernel.org> wrote:
 >
-> Introduce a "version 2" of KVM_SET_USER_MEMORY_REGION so that additional
-> information can be supplied without setting userspace up to fail.  The
-> padding in the new kvm_userspace_memory_region2 structure will be used to
-> pass a file descriptor in addition to the userspace_addr, i.e. allow
-> userspace to point at a file descriptor and map memory into a guest that
-> is NOT mapped into host userspace.
+> Em Tue, Oct 17, 2023 at 03:23:40PM -0700, Namhyung Kim escreveu:
+> > Hello,
+> >
+> > On Wed, Oct 11, 2023 at 12:58=E2=80=AFPM Oliver Upton <oliver.upton@lin=
+ux.dev> wrote:
+> > >
+> > > Start generating sysreg-defs.h in anticipation of updating sysreg.h t=
+o a
+> > > version that needs the generated output.
+> > >
+> > > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> >
+> > It seems we also need this on non-ARM archs to process ARM SPE data.
+> >
+> > Acked-by: Namhyung Kim <namhyung@kernel.org>
 >
-> Alternatively, KVM could simply add "struct kvm_userspace_memory_region2"
-> without a new ioctl(), but as Paolo pointed out, adding a new ioctl()
-> makes detection of bad flags a bit more robust, e.g. if the new fd field
-> is guarded only by a flag and not a new ioctl(), then a userspace bug
-> (setting a "bad" flag) would generate out-of-bounds access instead of an
-> -EINVAL error.
+> When building with CORESIGHT=3D1, yes.
 >
-> Cc: Jarkko Sakkinen <jarkko@kernel.org>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-> Tested-by: Fuad Tabba <tabba@google.com>
-> Message-Id: <20231027182217.3615211-9-seanjc@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  Documentation/virt/kvm/api.rst | 22 +++++++++++++
->  arch/x86/kvm/x86.c             |  2 +-
->  include/linux/kvm_host.h       |  4 +--
->  include/uapi/linux/kvm.h       | 13 ++++++++
->  virt/kvm/kvm_main.c            | 57 +++++++++++++++++++++++++++++-----
->  5 files changed, 87 insertions(+), 11 deletions(-)
+> I have it in my tests and:
 >
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 7025b3751027..bdea1423c5f8 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -1340,6 +1340,7 @@ yet and must be cleared on entry.
->  	__u64 guest_phys_addr;
->  	__u64 memory_size; /* bytes */
->  	__u64 userspace_addr; /* start of the userspace allocated memory */
-> +	__u64 pad[16];
+> =E2=AC=A2[acme@toolbox perf-tools-next]$ ls -la /tmp/build/perf-tools-nex=
+t/util/arm-spe.o
+> -rw-r--r--. 1 acme acme 135432 Oct 17 16:49 /tmp/build/perf-tools-next/ut=
+il/arm-spe.o
+> =E2=AC=A2[acme@toolbox perf-tools-next]$ ldd /tmp/build/perf-tools-next/p=
+erf | grep csd
+>         libopencsd_c_api.so.1 =3D> /lib64/libopencsd_c_api.so.1 (0x00007f=
+36bfca5000)
+>         libopencsd.so.1 =3D> /lib64/libopencsd.so.1 (0x00007f36be2e0000)
+> =E2=AC=A2[acme@toolbox perf-tools-next]$ rpm -qf /lib64/libopencsd.so.1
+> opencsd-1.3.3-1.fc38.x86_64
+> =E2=AC=A2[acme@toolbox perf-tools-next]$ rpm -q --qf "%{summary}\n" openc=
+sd
+> An open source CoreSight(tm) Trace Decode library
+> =E2=AC=A2[acme@toolbox perf-tools-next]$
+>
+> Well, double checked and arm-spe.o is built by default, only way to
+> disable it is using NO_AUXTRACE=3D1 in the make command line, but then
+> IIRC one needs linking with opencsd to decode all those traces, right?
+>
+> Anyway:
+>
+> Acked-by: Arnaldo Carvalho de Melo <acme@redhat.com>
+>
+> - Arnaldo
+>
+> > Thanks,
+> > Namhyung
+> >
+> >
+> > > ---
+> > >  tools/perf/Makefile.perf | 15 +++++++++++++--
+> > >  tools/perf/util/Build    |  2 +-
+> > >  2 files changed, 14 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/tools/perf/Makefile.perf b/tools/perf/Makefile.perf
+> > > index 37af6df7b978..14dedd11a1f5 100644
+> > > --- a/tools/perf/Makefile.perf
+> > > +++ b/tools/perf/Makefile.perf
+> > > @@ -443,6 +443,15 @@ drm_ioctl_tbl :=3D $(srctree)/tools/perf/trace/b=
+eauty/drm_ioctl.sh
+> > >  # Create output directory if not already present
+> > >  _dummy :=3D $(shell [ -d '$(beauty_ioctl_outdir)' ] || mkdir -p '$(b=
+eauty_ioctl_outdir)')
+> > >
+> > > +arm64_gen_sysreg_dir :=3D $(srctree)/tools/arch/arm64/tools
+> > > +
+> > > +arm64-sysreg-defs: FORCE
+> > > +       $(Q)$(MAKE) -C $(arm64_gen_sysreg_dir)
 
-Looks incorrect to add padding part in kvm_userspace_memory_region,
-only need to apply on kvm_userspace_memory_region2 below.
+Should this not build an install_headers target? The generated code is
+going into the source tree as is, ignoring O=3D options to make.
 
->    };
+Thanks,
+Ian
+
+> > > +
+> > > +arm64-sysreg-defs-clean:
+> > > +       $(call QUIET_CLEAN,arm64-sysreg-defs)
+> > > +       $(Q)$(MAKE) -C $(arm64_gen_sysreg_dir) clean > /dev/null
+> > > +
+> > >  $(drm_ioctl_array): $(drm_hdr_dir)/drm.h $(drm_hdr_dir)/i915_drm.h $=
+(drm_ioctl_tbl)
+> > >         $(Q)$(SHELL) '$(drm_ioctl_tbl)' $(drm_hdr_dir) > $@
+> > >
+> > > @@ -716,7 +725,9 @@ endif
+> > >  __build-dir =3D $(subst $(OUTPUT),,$(dir $@))
+> > >  build-dir   =3D $(or $(__build-dir),.)
+> > >
+> > > -prepare: $(OUTPUT)PERF-VERSION-FILE $(OUTPUT)common-cmds.h archheade=
+rs $(drm_ioctl_array) \
+> > > +prepare: $(OUTPUT)PERF-VERSION-FILE $(OUTPUT)common-cmds.h archheade=
+rs \
+> > > +       arm64-sysreg-defs \
+> > > +       $(drm_ioctl_array) \
+> > >         $(fadvise_advice_array) \
+> > >         $(fsconfig_arrays) \
+> > >         $(fsmount_arrays) \
+> > > @@ -1125,7 +1136,7 @@ endif # BUILD_BPF_SKEL
+> > >  bpf-skel-clean:
+> > >         $(call QUIET_CLEAN, bpf-skel) $(RM) -r $(SKEL_TMP_OUT) $(SKEL=
+ETONS)
+> > >
+> > > -clean:: $(LIBAPI)-clean $(LIBBPF)-clean $(LIBSUBCMD)-clean $(LIBSYMB=
+OL)-clean $(LIBPERF)-clean fixdep-clean python-clean bpf-skel-clean tests-c=
+oresight-targets-clean
+> > > +clean:: $(LIBAPI)-clean $(LIBBPF)-clean $(LIBSUBCMD)-clean $(LIBSYMB=
+OL)-clean $(LIBPERF)-clean arm64-sysreg-defs-clean fixdep-clean python-clea=
+n bpf-skel-clean tests-coresight-targets-clean
+> > >         $(call QUIET_CLEAN, core-objs)  $(RM) $(LIBPERF_A) $(OUTPUT)p=
+erf-archive $(OUTPUT)perf-iostat $(LANG_BINDINGS)
+> > >         $(Q)find $(or $(OUTPUT),.) -name '*.o' -delete -o -name '\.*.=
+cmd' -delete -o -name '\.*.d' -delete
+> > >         $(Q)$(RM) $(OUTPUT).config-detected
+> > > diff --git a/tools/perf/util/Build b/tools/perf/util/Build
+> > > index 6d657c9927f7..2f76230958ad 100644
+> > > --- a/tools/perf/util/Build
+> > > +++ b/tools/perf/util/Build
+> > > @@ -345,7 +345,7 @@ CFLAGS_rbtree.o        +=3D -Wno-unused-parameter=
+ -DETC_PERFCONFIG=3D"BUILD_STR($(ET
+> > >  CFLAGS_libstring.o     +=3D -Wno-unused-parameter -DETC_PERFCONFIG=
+=3D"BUILD_STR($(ETC_PERFCONFIG_SQ))"
+> > >  CFLAGS_hweight.o       +=3D -Wno-unused-parameter -DETC_PERFCONFIG=
+=3D"BUILD_STR($(ETC_PERFCONFIG_SQ))"
+> > >  CFLAGS_header.o        +=3D -include $(OUTPUT)PERF-VERSION-FILE
+> > > -CFLAGS_arm-spe.o       +=3D -I$(srctree)/tools/arch/arm64/include/
+> > > +CFLAGS_arm-spe.o       +=3D -I$(srctree)/tools/arch/arm64/include/ -=
+I$(srctree)/tools/arch/arm64/include/generated/
+> > >
+> > >  $(OUTPUT)util/argv_split.o: ../lib/argv_split.c FORCE
+> > >         $(call rule_mkdir)
+> > > --
+> > > 2.42.0.609.gbb76f46606-goog
+> > >
 >
->    /* for kvm_userspace_memory_region::flags */
-> @@ -6192,6 +6193,27 @@ to know what fields can be changed for the system register described by
->  ``op0, op1, crn, crm, op2``. KVM rejects ID register values that describe a
->  superset of the features supported by the system.
->
-> +4.140 KVM_SET_USER_MEMORY_REGION2
-> +---------------------------------
-> +
-> +:Capability: KVM_CAP_USER_MEMORY2
-> +:Architectures: all
-> +:Type: vm ioctl
-> +:Parameters: struct kvm_userspace_memory_region2 (in)
-> +:Returns: 0 on success, -1 on error
-> +
-> +::
-> +
-> +  struct kvm_userspace_memory_region2 {
-> +	__u32 slot;
-> +	__u32 flags;
-> +	__u64 guest_phys_addr;
-> +	__u64 memory_size; /* bytes */
-> +	__u64 userspace_addr; /* start of the userspace allocated memory */
-> +  };
-> +
-> +See KVM_SET_USER_MEMORY_REGION.
-> +
->  5. The kvm_run structure
->  ========================
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 2c924075f6f1..7b389f27dffc 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12576,7 +12576,7 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
->  	}
->
->  	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-> -		struct kvm_userspace_memory_region m;
-> +		struct kvm_userspace_memory_region2 m;
->
->  		m.slot = id | (i << 16);
->  		m.flags = 0;
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 5faba69403ac..4e741ff27af3 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1146,9 +1146,9 @@ enum kvm_mr_change {
->  };
->
->  int kvm_set_memory_region(struct kvm *kvm,
-> -			  const struct kvm_userspace_memory_region *mem);
-> +			  const struct kvm_userspace_memory_region2 *mem);
->  int __kvm_set_memory_region(struct kvm *kvm,
-> -			    const struct kvm_userspace_memory_region *mem);
-> +			    const struct kvm_userspace_memory_region2 *mem);
->  void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot);
->  void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen);
->  int kvm_arch_prepare_memory_region(struct kvm *kvm,
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 211b86de35ac..308cc70bd6ab 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -95,6 +95,16 @@ struct kvm_userspace_memory_region {
->  	__u64 userspace_addr; /* start of the userspace allocated memory */
->  };
->
-> +/* for KVM_SET_USER_MEMORY_REGION2 */
-> +struct kvm_userspace_memory_region2 {
-> +	__u32 slot;
-> +	__u32 flags;
-> +	__u64 guest_phys_addr;
-> +	__u64 memory_size;
-> +	__u64 userspace_addr;
-> +	__u64 pad[16];
-> +};
-> +
->  /*
->   * The bit 0 ~ bit 15 of kvm_userspace_memory_region::flags are visible for
->   * userspace, other bits are reserved for kvm internal use which are defined
-> @@ -1201,6 +1211,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
->  #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
->  #define KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES 230
-> +#define KVM_CAP_USER_MEMORY2 231
->
->  #ifdef KVM_CAP_IRQ_ROUTING
->
-> @@ -1483,6 +1494,8 @@ struct kvm_vfio_spapr_tce {
->  					struct kvm_userspace_memory_region)
->  #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
->  #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
-> +#define KVM_SET_USER_MEMORY_REGION2 _IOW(KVMIO, 0x49, \
-> +					 struct kvm_userspace_memory_region2)
->
->  /* enable ucontrol for s390 */
->  struct kvm_s390_ucas_mapping {
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index dc81279ea385..756b94ecd511 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1580,7 +1580,15 @@ static void kvm_replace_memslot(struct kvm *kvm,
->  	}
->  }
->
-> -static int check_memory_region_flags(const struct kvm_userspace_memory_region *mem)
-> +/*
-> + * Flags that do not access any of the extra space of struct
-> + * kvm_userspace_memory_region2.  KVM_SET_USER_MEMORY_REGION_V1_FLAGS
-> + * only allows these.
-> + */
-> +#define KVM_SET_USER_MEMORY_REGION_V1_FLAGS \
-> +	(KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)
-> +
-> +static int check_memory_region_flags(const struct kvm_userspace_memory_region2 *mem)
->  {
->  	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
->
-> @@ -1982,7 +1990,7 @@ static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
->   * Must be called holding kvm->slots_lock for write.
->   */
->  int __kvm_set_memory_region(struct kvm *kvm,
-> -			    const struct kvm_userspace_memory_region *mem)
-> +			    const struct kvm_userspace_memory_region2 *mem)
->  {
->  	struct kvm_memory_slot *old, *new;
->  	struct kvm_memslots *slots;
-> @@ -2086,7 +2094,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
->  EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
->
->  int kvm_set_memory_region(struct kvm *kvm,
-> -			  const struct kvm_userspace_memory_region *mem)
-> +			  const struct kvm_userspace_memory_region2 *mem)
->  {
->  	int r;
->
-> @@ -2098,7 +2106,7 @@ int kvm_set_memory_region(struct kvm *kvm,
->  EXPORT_SYMBOL_GPL(kvm_set_memory_region);
->
->  static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
-> -					  struct kvm_userspace_memory_region *mem)
-> +					  struct kvm_userspace_memory_region2 *mem)
->  {
->  	if ((u16)mem->slot >= KVM_USER_MEM_SLOTS)
->  		return -EINVAL;
-> @@ -4568,6 +4576,7 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
->  {
->  	switch (arg) {
->  	case KVM_CAP_USER_MEMORY:
-> +	case KVM_CAP_USER_MEMORY2:
->  	case KVM_CAP_DESTROY_MEMORY_REGION_WORKS:
->  	case KVM_CAP_JOIN_MEMORY_REGIONS_WORKS:
->  	case KVM_CAP_INTERNAL_ERROR_DATA:
-> @@ -4823,6 +4832,14 @@ static int kvm_vm_ioctl_get_stats_fd(struct kvm *kvm)
->  	return fd;
->  }
->
-> +#define SANITY_CHECK_MEM_REGION_FIELD(field)					\
-> +do {										\
-> +	BUILD_BUG_ON(offsetof(struct kvm_userspace_memory_region, field) !=		\
-> +		     offsetof(struct kvm_userspace_memory_region2, field));	\
-> +	BUILD_BUG_ON(sizeof_field(struct kvm_userspace_memory_region, field) !=		\
-> +		     sizeof_field(struct kvm_userspace_memory_region2, field));	\
-> +} while (0)
-> +
->  static long kvm_vm_ioctl(struct file *filp,
->  			   unsigned int ioctl, unsigned long arg)
->  {
-> @@ -4845,15 +4862,39 @@ static long kvm_vm_ioctl(struct file *filp,
->  		r = kvm_vm_ioctl_enable_cap_generic(kvm, &cap);
->  		break;
->  	}
-> +	case KVM_SET_USER_MEMORY_REGION2:
->  	case KVM_SET_USER_MEMORY_REGION: {
-> -		struct kvm_userspace_memory_region kvm_userspace_mem;
-> +		struct kvm_userspace_memory_region2 mem;
-> +		unsigned long size;
-> +
-> +		if (ioctl == KVM_SET_USER_MEMORY_REGION) {
-> +			/*
-> +			 * Fields beyond struct kvm_userspace_memory_region shouldn't be
-> +			 * accessed, but avoid leaking kernel memory in case of a bug.
-> +			 */
-> +			memset(&mem, 0, sizeof(mem));
-> +			size = sizeof(struct kvm_userspace_memory_region);
-> +		} else {
-> +			size = sizeof(struct kvm_userspace_memory_region2);
-> +		}
-> +
-> +		/* Ensure the common parts of the two structs are identical. */
-> +		SANITY_CHECK_MEM_REGION_FIELD(slot);
-> +		SANITY_CHECK_MEM_REGION_FIELD(flags);
-> +		SANITY_CHECK_MEM_REGION_FIELD(guest_phys_addr);
-> +		SANITY_CHECK_MEM_REGION_FIELD(memory_size);
-> +		SANITY_CHECK_MEM_REGION_FIELD(userspace_addr);
->
->  		r = -EFAULT;
-> -		if (copy_from_user(&kvm_userspace_mem, argp,
-> -						sizeof(kvm_userspace_mem)))
-> +		if (copy_from_user(&mem, argp, size))
->  			goto out;
->
-> -		r = kvm_vm_ioctl_set_memory_region(kvm, &kvm_userspace_mem);
-> +		r = -EINVAL;
-> +		if (ioctl == KVM_SET_USER_MEMORY_REGION &&
-> +		    (mem.flags & ~KVM_SET_USER_MEMORY_REGION_V1_FLAGS))
-> +			goto out;
-> +
-> +		r = kvm_vm_ioctl_set_memory_region(kvm, &mem);
->  		break;
->  	}
->  	case KVM_GET_DIRTY_LOG: {
 > --
-> 2.39.1
 >
->
->
+> - Arnaldo
 
