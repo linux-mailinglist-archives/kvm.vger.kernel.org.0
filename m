@@ -1,133 +1,204 @@
-Return-Path: <kvm+bounces-883-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-885-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E5B37E3F49
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 13:54:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC81D7E3F4F
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 13:55:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F4B71C209F0
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 12:54:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 194611C20B9E
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 12:55:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A8492DF93;
-	Tue,  7 Nov 2023 12:54:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10451D69E;
+	Tue,  7 Nov 2023 12:54:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UdOzZzWL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Un6EMDAB"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557BD29CE9
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 12:54:10 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CEBAD7C;
-	Tue,  7 Nov 2023 04:54:08 -0800 (PST)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A7BeuWg020167;
-	Tue, 7 Nov 2023 12:54:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=cZ2UJAdL7WVvX4Zc+VxFFznJzLRVM+D12j8QJWWA3c0=;
- b=UdOzZzWLLXXIGYgf9OY0Y21YEYd/TMJHF6ZgP+/wQhaBzvALK1mRDNnqsYkHfpSzYsMA
- jZ5NvqAbFaPx3yP36yr7hCgE5ENMDX/zx209+/ojeXJfO0SQwKdn4ol/iiy1e8NldBl5
- Ili+9+bpuFeBcB0JVSMYjTw53X5AyGYenV6Dwi6yGS0vJkrckQ2YaeK26UWd9lbyYitv
- nFbpKc/gMp6kh3t71Y3jAW0ljbdK3+XH1muaL2f/8venYh68/Uq6aQb/frrUWMURrZPX
- myDxOSzMGZ/MGwt5IHv8HXa51+erHdLIXWi2GOEL2mzs1KGV+dN+fL1SgYKbWVJ2xyuZ fA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u7mck2euv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Nov 2023 12:54:07 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A7CBnbr020077;
-	Tue, 7 Nov 2023 12:54:07 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u7mck2eub-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Nov 2023 12:54:07 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A7CdFlt007974;
-	Tue, 7 Nov 2023 12:54:05 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u60nygrxx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Nov 2023 12:54:05 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A7Cs2i26619730
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 7 Nov 2023 12:54:02 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 76B062004B;
-	Tue,  7 Nov 2023 12:54:02 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5D60420043;
-	Tue,  7 Nov 2023 12:54:02 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  7 Nov 2023 12:54:02 +0000 (GMT)
-Date: Tue, 7 Nov 2023 13:54:01 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Nico Boehr <nrb@linux.ibm.com>
-Cc: frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 3/3] s390x: mvpg-sie: fix
- virtual-physical address confusion
-Message-ID: <20231107135401.5d980831@p-imbrenda>
-In-Reply-To: <20231106170849.1184162-4-nrb@linux.ibm.com>
-References: <20231106170849.1184162-1-nrb@linux.ibm.com>
-	<20231106170849.1184162-4-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 334CE2FE03
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 12:54:51 +0000 (UTC)
+Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4622C5FE6
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 04:54:48 -0800 (PST)
+Received: by mail-qv1-xf2f.google.com with SMTP id 6a1803df08f44-66d060aa2a4so38561906d6.2
+        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 04:54:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699361687; x=1699966487; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FuFbqjfsVCp34XchBGKV0CWjcihho4T2q4FA5kjS7eU=;
+        b=Un6EMDABv8osp1SzeUde9l3uSm1+LK4uI3/Wu+cFXyVNMIZ0rMR/5y2WqYz4ljDei6
+         +UstRklWEF315C2RRPERQYquxJILvOtavMpOMBrD9ZCSJ3kQUhQTpUQwGYNsKlKFV0Au
+         9pDAFk4IyHTnT/i1e73IyiDfD5vNhZdZuY4rhCmkL8fsbbKEtuE2zqRBlSj+26h995MX
+         cTYnsTzPvhxmwqkUDQXtHHDHN0RvpgVHyXtyt0AzZjgVgEAWnZfyez76Z8CSRihgpf2t
+         id7TSCEyy1BVRHpWMH0os1JdBe+OFN7EUOdHo5pQT5H3VHK4OH1mJP2VKGwrTYPh03be
+         asyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699361687; x=1699966487;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FuFbqjfsVCp34XchBGKV0CWjcihho4T2q4FA5kjS7eU=;
+        b=anqOGupdmb17PWKhfK/8icsYoF5bV2NP5tR7izvzho3C4H5RMmlwMSaHC8oYGenNLz
+         MVYCEC5gmja+6vFpixPwxojmNZZX4ze95/D+jMDdT3kwD16vR96h2hhbc00//3yD/mqs
+         Gjr26/7/I+m55DKs1L/gXQXsBkHoENcN7YL8vJ9y4evcqNl7FV5CJOt5/8N/dZh3mEPi
+         SBjeA3DxkF206BK/pz8qDahptIgm09V0Ixyx6476xOpjMooRYOzkW08k2nuNF0QcML0r
+         46/X+UN3Nh5BscpihmI2hau8JPwZnxaUckV0OpZa09KUsgekv1ce6EzUohyTE3R4gOyI
+         4Vnw==
+X-Gm-Message-State: AOJu0Yxy0kLuyt3E+jMp84iFRhvMJtRhPMu609goAIyqdTOrJSb1szrT
+	G/InbTkEEsx1hK7Q7Rk1bch259iiy2JRPHarsIQVmA==
+X-Google-Smtp-Source: AGHT+IHS9JUkEkC/BybEMf4UmdGXo/DmXLNK4bOT/jrKIAqRMkLyM4gXD6uMK1OzLS09666PL8dXekXtndn5vIwFZqQ=
+X-Received: by 2002:a05:6214:260c:b0:66f:bb36:9a51 with SMTP id
+ gu12-20020a056214260c00b0066fbb369a51mr33614248qvb.36.1699361687221; Tue, 07
+ Nov 2023 04:54:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: nm2AoFKNn70bSU0RuEUhjXx8tUYeDgMn
-X-Proofpoint-ORIG-GUID: HrPnyz2SKY4K5wGIDb38zPzQiRJVjyue
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-07_04,2023-11-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
- suspectscore=0 phishscore=0 priorityscore=1501 bulkscore=0 impostorscore=0
- mlxlogscore=999 mlxscore=0 spamscore=0 lowpriorityscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2310240000
- definitions=main-2311070106
+References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-31-pbonzini@redhat.com>
+In-Reply-To: <20231105163040.14904-31-pbonzini@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 7 Nov 2023 12:54:10 +0000
+Message-ID: <CA+EHjTyZoLLv1nRfCEY4nHrbHadphn37jw3OPS17x1dAm_YUxA@mail.gmail.com>
+Subject: Re: [PATCH 30/34] KVM: selftests: Add KVM_SET_USER_MEMORY_REGION2 helper
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Sean Christopherson <seanjc@google.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon,  6 Nov 2023 18:08:02 +0100
-Nico Boehr <nrb@linux.ibm.com> wrote:
-
-> The addresses reported for the partial execution of mvpg instruction are
-> physical addresses. Now that MSO is a virtual address, we can't simply
-> compare the PEI fields in the sie block with MSO, but need to do an
-> additional translation step.
-> 
-> Add the necessary virtual-physical translations and expose the
-> virt_to_pte_phys() function in mmu.h which is useful for this kind of
-> translation.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+On Sun, Nov 5, 2023 at 4:34=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>
+> From: Chao Peng <chao.p.peng@linux.intel.com>
+>
+> Add helpers to invoke KVM_SET_USER_MEMORY_REGION2 directly so that tests
+> can validate of features that are unique to "version 2" of "set user
+> memory region", e.g. do negative testing on gmem_fd and gmem_offset.
+>
+> Provide a raw version as well as an assert-success version to reduce
+> the amount of boilerplate code need for basic usage.
+>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Message-Id: <20231027182217.3615211-33-seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  lib/s390x/mmu.h  |  2 ++
->  s390x/mvpg-sie.c | 15 +++++++++++----
->  2 files changed, 13 insertions(+), 4 deletions(-)
-> 
-> diff --git a/lib/s390x/mmu.h b/lib/s390x/mmu.h
-> index dadc2e600f9a..e9e837236603 100644
-> --- a/lib/s390x/mmu.h
-> +++ b/lib/s390x/mmu.h
-> @@ -95,4 +95,6 @@ static inline void unprotect_page(void *vaddr, unsigned long prot)
->  
->  void *get_dat_entry(pgd_t *pgtable, void *vaddr, enum pgt_level level);
->  
-> +phys_addr_t virt_to_pte_phys(pgd_t *pgtable, void *vaddr);
 
-or just #include <vmalloc.h> ?
+Reviewed-by: Fuad Tabba <tabba@google.com>
+Tested-by: Fuad Tabba <tabba@google.com>
 
-[...]
+Cheers,
+/fuad
+
+>  .../selftests/kvm/include/kvm_util_base.h     |  7 +++++
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 29 +++++++++++++++++++
+>  2 files changed, 36 insertions(+)
+>
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/=
+testing/selftests/kvm/include/kvm_util_base.h
+> index 157508c071f3..8ec122f5fcc8 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -522,6 +522,13 @@ void vm_set_user_memory_region(struct kvm_vm *vm, ui=
+nt32_t slot, uint32_t flags,
+>                                uint64_t gpa, uint64_t size, void *hva);
+>  int __vm_set_user_memory_region(struct kvm_vm *vm, uint32_t slot, uint32=
+_t flags,
+>                                 uint64_t gpa, uint64_t size, void *hva);
+> +void vm_set_user_memory_region2(struct kvm_vm *vm, uint32_t slot, uint32=
+_t flags,
+> +                               uint64_t gpa, uint64_t size, void *hva,
+> +                               uint32_t guest_memfd, uint64_t guest_memf=
+d_offset);
+> +int __vm_set_user_memory_region2(struct kvm_vm *vm, uint32_t slot, uint3=
+2_t flags,
+> +                                uint64_t gpa, uint64_t size, void *hva,
+> +                                uint32_t guest_memfd, uint64_t guest_mem=
+fd_offset);
+> +
+>  void vm_userspace_mem_region_add(struct kvm_vm *vm,
+>         enum vm_mem_backing_src_type src_type,
+>         uint64_t guest_paddr, uint32_t slot, uint64_t npages,
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/s=
+elftests/kvm/lib/kvm_util.c
+> index 1c74310f1d44..d05d95cc3693 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -873,6 +873,35 @@ void vm_set_user_memory_region(struct kvm_vm *vm, ui=
+nt32_t slot, uint32_t flags,
+>                     errno, strerror(errno));
+>  }
+>
+> +int __vm_set_user_memory_region2(struct kvm_vm *vm, uint32_t slot, uint3=
+2_t flags,
+> +                                uint64_t gpa, uint64_t size, void *hva,
+> +                                uint32_t guest_memfd, uint64_t guest_mem=
+fd_offset)
+> +{
+> +       struct kvm_userspace_memory_region2 region =3D {
+> +               .slot =3D slot,
+> +               .flags =3D flags,
+> +               .guest_phys_addr =3D gpa,
+> +               .memory_size =3D size,
+> +               .userspace_addr =3D (uintptr_t)hva,
+> +               .guest_memfd =3D guest_memfd,
+> +               .guest_memfd_offset =3D guest_memfd_offset,
+> +       };
+> +
+> +       return ioctl(vm->fd, KVM_SET_USER_MEMORY_REGION2, &region);
+> +}
+> +
+> +void vm_set_user_memory_region2(struct kvm_vm *vm, uint32_t slot, uint32=
+_t flags,
+> +                               uint64_t gpa, uint64_t size, void *hva,
+> +                               uint32_t guest_memfd, uint64_t guest_memf=
+d_offset)
+> +{
+> +       int ret =3D __vm_set_user_memory_region2(vm, slot, flags, gpa, si=
+ze, hva,
+> +                                              guest_memfd, guest_memfd_o=
+ffset);
+> +
+> +       TEST_ASSERT(!ret, "KVM_SET_USER_MEMORY_REGION2 failed, errno =3D =
+%d (%s)",
+> +                   errno, strerror(errno));
+> +}
+> +
+> +
+>  /* FIXME: This thing needs to be ripped apart and rewritten. */
+>  void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type=
+,
+>                 uint64_t guest_paddr, uint32_t slot, uint64_t npages,
+> --
+> 2.39.1
+>
+>
 
