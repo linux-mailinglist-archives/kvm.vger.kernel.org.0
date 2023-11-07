@@ -1,136 +1,182 @@
-Return-Path: <kvm+bounces-1036-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1037-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EEED7E46CD
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 18:24:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5016D7E46EA
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 18:27:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2792B20EA5
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 17:24:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E1B61C20A2A
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 17:27:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A03C3347B9;
-	Tue,  7 Nov 2023 17:24:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFD61347CB;
+	Tue,  7 Nov 2023 17:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iCE9kWoX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SApOfQWY"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1CB335C0
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 17:24:40 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 576A7101
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 09:24:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699377879;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n6iRqFYmz5H1LDnW4p44izaVbI8kvsmsngAn7NQqBlQ=;
-	b=iCE9kWoXtvWiY6bpIZmaDTPl8zoifQtunAFS/u6hh9her818gZYJ7tDx++YishT7OiB79d
-	yFlX7qWc7w6TrDY5slBKWC4/JPgNeIiZ1LZ7p4pN5fxGqnc9fndGgdu2PwgMfilp+yE/oq
-	a935w+ZO7TGSDRN+ChHlUzwg8fWtnig=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-251-BchFnXtpOVeEhsvPsycUWg-1; Tue, 07 Nov 2023 12:24:33 -0500
-X-MC-Unique: BchFnXtpOVeEhsvPsycUWg-1
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-6cd01bd39a3so1037836a34.1
-        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 09:24:33 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3177E347AD
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 17:27:23 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E2F120
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 09:27:22 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5afa86b8d66so80313597b3.3
+        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 09:27:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699378042; x=1699982842; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Qa2wFXn+fN/9MOzm2p0htr7TnYIvjcbd3WdjaN07M/k=;
+        b=SApOfQWYC9LmzzbP04Sz03KN1j6GWowzoqVDrR+eoszpBD1+TxUbsDYAGtwPxXkqyk
+         NqCQ6sGrOYtCKxKtZAzeLOGpotn0YcpE8m92mC+H24JuUAsB2/MEdFzowPNLz90XlGqx
+         keSEhAKp/PG9GixQhyllTirYiuYEQyVNJhFjzz94Y8ap4TejoMErlXnHvq1UlS/sexBv
+         A026cfYfXu1SvfH/0fNJziIahS07Dwpup/3cdwzl5lzxU+EDImxf4H1zW8vWtteL0STB
+         5q6wH0wof9W6FhaXdj3/IgHerOtS5l1Wu23VmqMSWGifaRf51QvCmiuVGhOL+EOYE+i5
+         Y8Ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699377873; x=1699982673;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n6iRqFYmz5H1LDnW4p44izaVbI8kvsmsngAn7NQqBlQ=;
-        b=cBPk4ZdoXbvIsqOYT4QppqunoDHyYoRPwXzraguMf8JFaMUHkI654XY5OwXUfsLF/s
-         Dqepw3puJN59PZF+mVGFBnjzTvyqJHgrWLWWYz41eaGmJGiCtMHvlF3UEnXbne/g5daQ
-         X+r4WmP0ca5NCke7I5ekeOH8UmgMwitBdnpZkGxKRsxCL2uyejWC9ZNvm7olvcoPMLiP
-         PgUKjrM313vtjUqBjA4e1NQgx1J+k5Wgp5NQ4i9ihhN1GVAWFc7mLrs1jLRY+EQf8PUq
-         2Xau6QUrBqbzE51ef+ShAwdrHwfW6B5sQDNEk/zo4W0bHD7ZshDAfZQA3Cad5FGtTARl
-         WYRw==
-X-Gm-Message-State: AOJu0YxwGz0gv9bXjOQO298ijLeWgC0fEH2K9I3rgPmCk6Cx2Bh6E2ME
-	XLm+hYgo9c+hsI0ct7SRRq7b79trFdHOGIIPLwVuwoIGv6HARNiKtqESxrPQj9ZlkKDZfAFTuE5
-	8UjsQLORHI7W5
-X-Received: by 2002:a4a:c991:0:b0:586:7095:126d with SMTP id u17-20020a4ac991000000b005867095126dmr31247062ooq.0.1699377872873;
-        Tue, 07 Nov 2023 09:24:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE8w6NSbcnoCKrFSZ3eVgNyXybxogde+kXTelNxtMRNBvmZFASv4LSQb8UyoPhsLshGuiJtXA==
-X-Received: by 2002:a4a:c991:0:b0:586:7095:126d with SMTP id u17-20020a4ac991000000b005867095126dmr31247040ooq.0.1699377872564;
-        Tue, 07 Nov 2023 09:24:32 -0800 (PST)
-Received: from x1n (cpe5c7695f3aee0-cm5c7695f3aede.cpe.net.cable.rogers.com. [99.254.144.39])
-        by smtp.gmail.com with ESMTPSA id hj8-20020a05622a620800b00403cce833eesm92803qtb.27.2023.11.07.09.24.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Nov 2023 09:24:32 -0800 (PST)
-Date: Tue, 7 Nov 2023 12:24:29 -0500
-From: Peter Xu <peterx@redhat.com>
-To: James Houghton <jthoughton@google.com>
-Cc: David Matlack <dmatlack@google.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, kvm list <kvm@vger.kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Oliver Upton <oupton@google.com>,
-	Mike Kravetz <mike.kravetz@oracle.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Frank van der Linden <fvdl@google.com>
-Subject: Re: RFC: A KVM-specific alternative to UserfaultFD
-Message-ID: <ZUpyzWOuhFDTXiAW@x1n>
-References: <CALzav=d23P5uE=oYqMpjFohvn0CASMJxXB_XEOEi-jtqWcFTDA@mail.gmail.com>
- <ZUlLLGLi1IyMyhm4@x1n>
- <CAJHvVciC3URbJJMwhU0ahhzq6bomr7juuWqPdpczV6Qgb8OUuQ@mail.gmail.com>
- <ZUlw163pvpJ+Uue8@x1n>
- <CALzav=d=sAJBK7fBeJwi3BVJ+4ai5MjU7-u0RD4BQMGNRYi_Tw@mail.gmail.com>
- <ZUpIB1/5eZ/2X+0M@x1n>
- <CADrL8HUHO12Bxrx94_VoS8AsN5uEO1qYM2SCF7Tgw-=vsRUwBA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1699378042; x=1699982842;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Qa2wFXn+fN/9MOzm2p0htr7TnYIvjcbd3WdjaN07M/k=;
+        b=o7MsgxYD8QpaW+oF55ERVsIYUXFEwV7VwJyvKzkOuWLoIhyJe0uZ+Wq2ZBG0Np6oG8
+         46DDOO2ucowA3l8w4xCBvKjE+7HonMs2Qw4ZnAD/N715urdqGtEhXzAS8LDZCFhFKrgk
+         KC39keLB6v41Qvmt26/3OyWX77FoT0V3D8emkbwEFYayoylrHtooN4AM5MyYxTv3H+x9
+         qUTYgkBbu19htX4ihxFj549PSiwI8hgpy4rObi1Lgb2dyaPBEKlD+wHebktiuMR2Dl4S
+         wROgI3Mu9Si2VtucyKpMDRRGRlsnegvnY/12WVQt8tZYSQeD3C96Q6WoKycAr+BlDfYW
+         IbBA==
+X-Gm-Message-State: AOJu0YxdZgQQt/a/9pc5KW61fmlFq6ucgpCftuCC3jDVXtb3pEDZaqvE
+	iIgaQWKyeESs52v3RfeJnzVFLH+cAfU=
+X-Google-Smtp-Source: AGHT+IEfx2xJRyHlzos0vemGZEAAO4aiy00M2pBqcV8b4prgzhoMSWSgigaGYOWEUbs4hq72Zazg1t3nACs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a0d:d88e:0:b0:5a8:33ab:d545 with SMTP id
+ a136-20020a0dd88e000000b005a833abd545mr290916ywe.2.1699378041829; Tue, 07 Nov
+ 2023 09:27:21 -0800 (PST)
+Date: Tue, 7 Nov 2023 09:27:20 -0800
+In-Reply-To: <2c804098-af2b-4f1d-a39f-eb42f58635d7@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CADrL8HUHO12Bxrx94_VoS8AsN5uEO1qYM2SCF7Tgw-=vsRUwBA@mail.gmail.com>
+Mime-Version: 1.0
+References: <20231104000239.367005-1-seanjc@google.com> <20231104000239.367005-4-seanjc@google.com>
+ <CALMp9eTvR1mNw7PEms7840t13dD_VGhEWpaz9w6prSiyDR9GtA@mail.gmail.com> <2c804098-af2b-4f1d-a39f-eb42f58635d7@linux.intel.com>
+Message-ID: <ZUpzeGnWtExCxhcS@google.com>
+Subject: Re: [PATCH v6 03/20] KVM: x86/pmu: Don't enumerate arch events KVM
+ doesn't support
+From: Sean Christopherson <seanjc@google.com>
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Jim Mattson <jmattson@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Kan Liang <kan.liang@linux.intel.com>, 
+	Jinrong Liang <cloudliang@tencent.com>, Like Xu <likexu@tencent.com>, 
+	Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 07, 2023 at 08:11:09AM -0800, James Houghton wrote:
-> This extra ~8 bytes per page overhead is real, and it is the
-> theoretical maximum additional overhead that userfaultfd would require
-> over a KVM-based demand paging alternative when we are using
-> hugepages. Consider the case where we are using THPs and have just
-> finished post-copy, and we haven't done any collapsing yet:
-> 
-> For userfaultfd: because we have UFFDIO_COPY'd or UFFDIO_CONTINUE'd at
-> 4K (because we demand-fetched at 4K), the userspace page tables are
-> entirely shattered. KVM has no choice but to have an entirely
-> shattered second-stage page table as well.
-> 
-> For KVM demand paging: the userspace page tables can remain entirely
-> populated, so we get PMD mappings here. KVM, though, uses 4K SPTEs
-> because we have only just finished post-copy and haven't started
-> collapsing yet.
-> 
-> So both systems end up with a shattered second stage page table, but
-> userfaultfd has a shattered userspace page table as well (+8 bytes/4K
-> if using THP, +another 8 bytes/2M if using HugeTLB-1G, etc.) and that
-> is where the extra overhead comes from.
-> 
-> The second mapping of guest memory that we use today (through which we
-> install memory), given that we are using hugepages, will use PMDs and
-> PUDs, so the overhead is minimal.
-> 
-> Hope that clears things up!
+On Tue, Nov 07, 2023, Dapeng Mi wrote:
+>=20
+> On 11/4/2023 8:41 PM, Jim Mattson wrote:
+> > On Fri, Nov 3, 2023 at 5:02=E2=80=AFPM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> > > Don't advertise support to userspace for architectural events that KV=
+M
+> > > doesn't support, i.e. for "real" events that aren't listed in
+> > > intel_pmu_architectural_events.  On current hardware, this effectivel=
+y
+> > > means "don't advertise support for Top Down Slots".
+> > NR_REAL_INTEL_ARCH_EVENTS is only used in intel_hw_event_available().
+> > As discussed (https://lore.kernel.org/kvm/ZUU12-TUR_1cj47u@google.com/)=
+,
+> > intel_hw_event_available() should go away.
+> >=20
+> > Aside from mapping fixed counters to event selector and unit mask
+> > (fixed_pmc_events[]), KVM has no reason to know when a new
+> > architectural event is defined.
+>=20
+>=20
+> Since intel_hw_event_available() would be removed, it looks the enum
+> intel_pmu_architectural_events and intel_arch_events[] array become usele=
+ss.
+> We can directly simply modify current fixed_pmc_events[] array and use it=
+ to
+> store fixed counter events code and umask.
 
-Ah I see, thanks James.  Though, is this a real concern in production use,
-considering worst case 0.2% overhead (all THP backed) and only exist during
-postcopy, only on destination host?
+Yep, I came to the same conclusion.  This is what I ended up with yesterday=
+:
 
-In all cases, I agree that's still a valid point then, comparing to a
-constant 1/32k consumption with a bitmap.
+/*
+ * Map fixed counter events to architectural general purpose event encoding=
+s.
+ * Perf doesn't provide APIs to allow KVM to directly program a fixed count=
+er,
+ * and so KVM instead programs the architectural event to effectively reque=
+st
+ * the fixed counter.  Perf isn't guaranteed to use a fixed counter and may
+ * instead program the encoding into a general purpose counter, e.g. if a
+ * different perf_event is already utilizing the requested counter, but the=
+ end
+ * result is the same (ignoring the fact that using a general purpose count=
+er
+ * will likely exacerbate counter contention).
+ *
+ * Note, reference cycles is counted using a perf-defined "psuedo-encoding"=
+,
+ * there is no architectural general purpose encoding for reference TSC cyc=
+les.
+ */
+static u64 intel_get_fixed_pmc_eventsel(int index)
+{
+        const struct {
+                u8 eventsel;
+                u8 unit_mask;
+        } fixed_pmc_events[] =3D {
+                [0] =3D { 0xc0, 0x00 }, /* Instruction Retired / PERF_COUNT=
+_HW_INSTRUCTIONS. */
+                [1] =3D { 0x3c, 0x00 }, /* CPU Cycles/ PERF_COUNT_HW_CPU_CY=
+CLES. */
+                [2] =3D { 0x00, 0x03 }, /* Reference TSC Cycles / PERF_COUN=
+T_HW_REF_CPU_CYCLES*/
+        };
 
-Thanks,
+        BUILD_BUG_ON(ARRAY_SIZE(fixed_pmc_events) !=3D KVM_PMC_MAX_FIXED);
 
--- 
-Peter Xu
+        return (fixed_pmc_events[index].unit_mask << 8) |
+               fixed_pmc_events[index].eventsel;
+}
+
+...
+
+static void intel_pmu_init(struct kvm_vcpu *vcpu)
+{
+        int i;
+        struct kvm_pmu *pmu =3D vcpu_to_pmu(vcpu);
+        struct lbr_desc *lbr_desc =3D vcpu_to_lbr_desc(vcpu);
+
+        for (i =3D 0; i < KVM_INTEL_PMC_MAX_GENERIC; i++) {
+                pmu->gp_counters[i].type =3D KVM_PMC_GP;
+                pmu->gp_counters[i].vcpu =3D vcpu;
+                pmu->gp_counters[i].idx =3D i;
+                pmu->gp_counters[i].current_config =3D 0;
+        }
+
+        for (i =3D 0; i < KVM_PMC_MAX_FIXED; i++) {
+                pmu->fixed_counters[i].type =3D KVM_PMC_FIXED;
+                pmu->fixed_counters[i].vcpu =3D vcpu;
+                pmu->fixed_counters[i].idx =3D i + INTEL_PMC_IDX_FIXED;
+                pmu->fixed_counters[i].current_config =3D 0;
+                pmu->fixed_counters[i].eventsel =3D intel_get_fixed_pmc_eve=
+ntsel(i);
+        }
+
+        lbr_desc->records.nr =3D 0;
+        lbr_desc->event =3D NULL;
+        lbr_desc->msr_passthrough =3D false;
+}
+
 
 
