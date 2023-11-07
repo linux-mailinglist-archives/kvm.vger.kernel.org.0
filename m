@@ -1,44 +1,44 @@
-Return-Path: <kvm+bounces-856-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-861-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F32E87E37C1
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 10:23:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 397FF7E37C7
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 10:23:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8343281009
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 09:23:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BDFD9B20E6E
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 09:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7792D026;
-	Tue,  7 Nov 2023 09:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6121E2D7AF;
+	Tue,  7 Nov 2023 09:22:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aV84bzG7"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KsMnxRK1"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA2029420
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 09:22:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB9C2D7A4
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 09:22:52 +0000 (UTC)
 Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45745113
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 01:22:32 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70F70C6
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 01:22:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:
-	To:From:Reply-To:Content-ID:Content-Description;
-	bh=8NC7zpHNUo9fTggjfL7ZxSV8IkLkmeuOC0riizcU694=; b=aV84bzG7ukFmJTaTuA0mtfKe0U
-	+Ajm3miAr4CJKjCvycFlH65hRrcWMVTEtDB6vE8ggMdhPtHYWGnrVE3nZ8HX9zT3gR9MDlttFZCDa
-	qfq4FXPaWILOFgdHLMr68c01echV8zlcMU7mpjnyNluBIW3HrnFT2CP+WVFX6z1POLZ3pzkXFkp87
-	wZ+hbaIGdPrsK39ki+HNpF6PEgk7lbTExcDAhhaJ/u2HXP70FjDcdHJruS5CCUSSrrlP6I6G/+7cL
-	ZVpIk+g5iLiVrs97EEAvKpdJR1nEkcXu6Srn4Br9OYPXe4e9tg/CIu/ayYaFroJw4Y3SR3wSzIaMQ
-	TuWynf4w==;
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+	Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=/CMaJBnJmvQd/ocElpHBvWeWCvX/LNONV/G+w8L6jDA=; b=KsMnxRK1sIgZPj9JkKygbTnE/V
+	IACskiJ0AD9+u/vFFRPe4Y36Ty4MqrZBtO8C48/FJ7M+5BxQEvwFLznwKaSgnApTLVP+nvUrC3+h+
+	7aWMU2Bi7wI7nqDZU3It/gB6UPn6X66QRmpJXn0Iw4vlubYMkGrXcBQ8WI19yGRavhnThFEZWS9Bk
+	UQo4gSySTaDRLHxFxPEbT+MqXHJwL+kwtCv6IOa990N1BkHhB64VcfMsxINkxo7oSoYHc3GqzHLy9
+	nttpoKefPK+CPrgFIblugHeh2nOIc5y9Kffg/yH8wEI/DJilN7HamMoDc3JJfCTU8FHe33KaAfaok
+	p3GlO0+w==;
 Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
 	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1r0IHP-00BtG1-0d;
-	Tue, 07 Nov 2023 09:21:55 +0000
+	id 1r0IHP-00BtG2-0U;
+	Tue, 07 Nov 2023 09:21:52 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.96.2 #2 (Red Hat Linux))
-	id 1r0IHN-001hKI-2u;
+	id 1r0IHN-001hKM-35;
 	Tue, 07 Nov 2023 09:21:49 +0000
 From: David Woodhouse <dwmw2@infradead.org>
 To: qemu-devel@nongnu.org,
@@ -59,9 +59,9 @@ Cc: Kevin Wolf <kwolf@redhat.com>,
 	qemu-block@nongnu.org,
 	xen-devel@lists.xenproject.org,
 	kvm@vger.kernel.org
-Subject: [PULL 07/15] hw/xen: add get_frontend_path() method to XenDeviceClass
-Date: Tue,  7 Nov 2023 09:21:39 +0000
-Message-ID: <20231107092149.404842-8-dwmw2@infradead.org>
+Subject: [PULL 08/15] hw/xen: do not repeatedly try to create a failing backend device
+Date: Tue,  7 Nov 2023 09:21:40 +0000
+Message-ID: <20231107092149.404842-9-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231107092149.404842-1-dwmw2@infradead.org>
 References: <20231107092149.404842-1-dwmw2@infradead.org>
@@ -71,73 +71,118 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-The primary Xen console is special. The guest's side is set up for it by
-the toolstack automatically and not by the standard PV init sequence.
+If xen_backend_device_create() fails to instantiate a device, the XenBus
+code will just keep trying over and over again each time the bus is
+re-enumerated, as long as the backend appears online and in
+XenbusStateInitialising.
 
-Accordingly, its *frontend* doesn't appear in …/device/console/0 either;
-instead it appears under …/console in the guest's XenStore node.
+The only thing which prevents the XenBus code from recreating duplicates
+of devices which already exist, is the fact that xen_device_realize()
+sets the backend state to XenbusStateInitWait. If the attempt to create
+the device doesn't get *that* far, that's when it will keep getting
+retried.
 
-To allow the Xen console driver to override the frontend path for the
-primary console, add a method to the XenDeviceClass which can be used
-instead of the standard xen_device_get_frontend_path()
+My first thought was to handle errors by setting the backend state to
+XenbusStateClosed, but that doesn't work for XenConsole which wants to
+*ignore* any device of type != "ioemu" completely.
+
+So, make xen_backend_device_create() *keep* the XenBackendInstance for a
+failed device, and provide a new xen_backend_exists() function to allow
+xen_bus_type_enumerate() to check whether one already exists before
+creating a new one.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 Reviewed-by: Paul Durrant <paul@xen.org>
 ---
- hw/xen/xen-bus.c         | 11 ++++++++++-
- include/hw/xen/xen-bus.h |  2 ++
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ hw/xen/xen-backend.c         | 27 +++++++++++++++++++++------
+ hw/xen/xen-bus.c             |  3 ++-
+ include/hw/xen/xen-backend.h |  1 +
+ 3 files changed, 24 insertions(+), 7 deletions(-)
 
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index ece8ec40cd..12ff782005 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -711,8 +711,17 @@ static void xen_device_frontend_create(XenDevice *xendev, Error **errp)
- {
-     ERRP_GUARD();
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
+diff --git a/hw/xen/xen-backend.c b/hw/xen/xen-backend.c
+index 5b0fb76eae..b9bf70a9f5 100644
+--- a/hw/xen/xen-backend.c
++++ b/hw/xen/xen-backend.c
+@@ -101,6 +101,24 @@ static XenBackendInstance *xen_backend_list_find(XenDevice *xendev)
+     return NULL;
+ }
  
--    xendev->frontend_path = xen_device_get_frontend_path(xendev);
-+    if (xendev_class->get_frontend_path) {
-+        xendev->frontend_path = xendev_class->get_frontend_path(xendev, errp);
-+        if (!xendev->frontend_path) {
-+            error_prepend(errp, "failed to create frontend: ");
-+            return;
++bool xen_backend_exists(const char *type, const char *name)
++{
++    const XenBackendImpl *impl = xen_backend_table_lookup(type);
++    XenBackendInstance *backend;
++
++    if (!impl) {
++        return false;
++    }
++
++    QLIST_FOREACH(backend, &backend_list, entry) {
++        if (backend->impl == impl && !strcmp(backend->name, name)) {
++            return true;
 +        }
-+    } else {
-+        xendev->frontend_path = xen_device_get_frontend_path(xendev);
++    }
++
++    return false;
++}
++
+ static void xen_backend_list_remove(XenBackendInstance *backend)
+ {
+     QLIST_REMOVE(backend, entry);
+@@ -122,11 +140,6 @@ void xen_backend_device_create(XenBus *xenbus, const char *type,
+     backend->name = g_strdup(name);
+ 
+     impl->create(backend, opts, errp);
+-    if (*errp) {
+-        g_free(backend->name);
+-        g_free(backend);
+-        return;
+-    }
+ 
+     backend->impl = impl;
+     xen_backend_list_add(backend);
+@@ -165,7 +178,9 @@ bool xen_backend_try_device_destroy(XenDevice *xendev, Error **errp)
+     }
+ 
+     impl = backend->impl;
+-    impl->destroy(backend, errp);
++    if (backend->xendev) {
++        impl->destroy(backend, errp);
 +    }
  
-     /*
-      * The frontend area may have already been created by a legacy
-diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index f435898164..eb440880b5 100644
---- a/include/hw/xen/xen-bus.h
-+++ b/include/hw/xen/xen-bus.h
-@@ -33,6 +33,7 @@ struct XenDevice {
- };
- typedef struct XenDevice XenDevice;
+     xen_backend_list_remove(backend);
+     g_free(backend->name);
+diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+index 12ff782005..3ffd1a5333 100644
+--- a/hw/xen/xen-bus.c
++++ b/hw/xen/xen-bus.c
+@@ -209,7 +209,8 @@ static void xen_bus_type_enumerate(XenBus *xenbus, const char *type)
+                           NULL, "%u", &online) != 1)
+             online = 0;
  
-+typedef char *(*XenDeviceGetFrontendPath)(XenDevice *xendev, Error **errp);
- typedef char *(*XenDeviceGetName)(XenDevice *xendev, Error **errp);
- typedef void (*XenDeviceRealize)(XenDevice *xendev, Error **errp);
- typedef void (*XenDeviceFrontendChanged)(XenDevice *xendev,
-@@ -46,6 +47,7 @@ struct XenDeviceClass {
-     /*< public >*/
-     const char *backend;
-     const char *device;
-+    XenDeviceGetFrontendPath get_frontend_path;
-     XenDeviceGetName get_name;
-     XenDeviceRealize realize;
-     XenDeviceFrontendChanged frontend_changed;
+-        if (online && state == XenbusStateInitialising) {
++        if (online && state == XenbusStateInitialising &&
++            !xen_backend_exists(type, backend[i])) {
+             Error *local_err = NULL;
+ 
+             xen_bus_backend_create(xenbus, type, backend[i], backend_path,
+diff --git a/include/hw/xen/xen-backend.h b/include/hw/xen/xen-backend.h
+index aac2fd454d..0f01631ae7 100644
+--- a/include/hw/xen/xen-backend.h
++++ b/include/hw/xen/xen-backend.h
+@@ -33,6 +33,7 @@ XenDevice *xen_backend_get_device(XenBackendInstance *backend);
+ void xen_backend_register(const XenBackendInfo *info);
+ const char **xen_backend_get_types(unsigned int *nr);
+ 
++bool xen_backend_exists(const char *type, const char *name);
+ void xen_backend_device_create(XenBus *xenbus, const char *type,
+                                const char *name, QDict *opts, Error **errp);
+ bool xen_backend_try_device_destroy(XenDevice *xendev, Error **errp);
 -- 
 2.41.0
 
