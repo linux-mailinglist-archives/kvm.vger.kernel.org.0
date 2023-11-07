@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-1080-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1081-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D11AB7E49BC
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 21:21:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99E927E49BE
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 21:21:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBCEB1C20B6E
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 20:21:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A078B213FD
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 20:21:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BB5E38DE0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB44938DE4;
 	Tue,  7 Nov 2023 20:20:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NsEjyrMO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HKG4ED9r"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3CAC374E0
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 20:20:45 +0000 (UTC)
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 849691BC1
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 12:20:44 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5b0c27d504fso584647b3.1
-        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 12:20:44 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B6B38DD2
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 20:20:47 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF3E21BD5
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 12:20:46 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5afc00161daso71888637b3.1
+        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 12:20:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699388444; x=1699993244; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1699388445; x=1699993245; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yXDUOFgM+YJ6fuoNpSYf2QUTfSwK89RGtXlj6ZKeva0=;
-        b=NsEjyrMOBOiWjvQskSwxahyBoLK9q+VErmNWJkesgpAtVQ34oMrDzeikmUogyVBO92
-         liq0ldbxkW67PYUqxuh2H8jZPw7p8Nh5cc4/5ZsqRvS9/IgeNnwP2yiyDdgmSxDBDBpD
-         ZZaILfQ4wAmjfyoCIBgbA9/FYdjp3xJee0pSDag+x4WdGumadwTBPqLzVNSbVbhBkrxu
-         7YZIUMI10pwllIdVvEr4KhLIRfYD32lnIGcILQJUbPbVLB2HWykRuvybRdI8hsCayqFK
-         Xg73hpsu176dckd6thXsY+WnUVnklAWOHy2EYXprRB7OIIKSCI05ktFUz/1L4tZLCRWP
-         ou2Q==
+        bh=ZQAw0ON8pSiwfP7SCUimnogabyDDeRCkLmZQJGRc1WY=;
+        b=HKG4ED9ralL7HpTRXxFcYdGMCZ6vxeAcJgB2E+W58e1EwGHtdSIWVgPHOBUpT1eMzR
+         vBp53Lb0XNeblTE1V7J6+7odMA5sPjc8srF1jU/PlLrxQNRUumjLdtcTWxSZsffKe8gA
+         PXAh1T19/YNPOVZnySMN6aPbK2UvHIAYzto+Kc1/tqX0aG10e7O5pN01u2zIFN5RVZae
+         KQ9URE/heaj6B/uSQHW3pLQfpQxb4Vhod8wXyB6rCJ5Rsfx0LT/+W3J2Pau7ARO0iuq1
+         0ST0S9P0qN3X/hyhMJU7NBG+GUvh0CaDbJUhsoyDEdn2pLxqJUb59sJZ3sTugFanjz3y
+         c7ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699388444; x=1699993244;
+        d=1e100.net; s=20230601; t=1699388445; x=1699993245;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yXDUOFgM+YJ6fuoNpSYf2QUTfSwK89RGtXlj6ZKeva0=;
-        b=H921HdBa1e14QZBCqHBVQDCxBFAff+yPE4i8e+b/luO/wVwHLpS3aHasd1eczWN1UZ
-         qi4NcNBu9ryKR5JCrjWagyZV9lTXRtGZE6ge9ditne+ixshvqj/Yq3OtvR6kSI2YEWvW
-         htTM17LdppeGHxWSQ4arVYaxBLxDT6TTsMkLSS02pmOvKVEY66lH36B/77qcNPUaIf3e
-         Vh+3pvnAauMNa0tfgofn8GqxeqazROuP46YuUIVHBfrg133u+7GVtFBXKJGoMLKgxI+w
-         8vFAul/R7JYRPqxwI9Z0rqDh+j96N2FCRRvgS0urwAz2wrP8KWl4/i4igYox8+I5H7NW
-         CPRA==
-X-Gm-Message-State: AOJu0Yzz8L4tAuTbVgp6lQ+qCtR7WDRQVvQIPJLJ/MGLj3uiALcW1LcO
-	lLk6h0k6ScC+ZjnaV6SxoC5wG38TEXnOb5zS97tYRYLw36WfTJxB1UgJ2US4o20n4O9WaUjPPVj
-	5uapU+Ztpsq/43P2zFk+eUpa8M2uq4RTdukdAl55lSfe8OivDn3ecu8AVyVOMaMY=
-X-Google-Smtp-Source: AGHT+IGngbHKbHvkhMevIYXtZILRES11OdFIH5EJXTOVmK/Q4JcN12vJAVedP442pRgmwB2lAyEha9qaYf+TcQ==
+        bh=ZQAw0ON8pSiwfP7SCUimnogabyDDeRCkLmZQJGRc1WY=;
+        b=ubrYUghYMp0o1yxcs0G6C3922p8iGfqQl/4llgQIAYM2asdSNv8/YdZ2eOvkBHatNB
+         3BUvmAJ6Zwiuo/UkjG34nAmdttIwskALDvUTaxyUlqT2TOwMJU+u+23UMOYWgjQgpFqw
+         qKwWXY8rgHyRousALzn1/Ie2nAjRXC6thnLIe1gO3dcu562PnFCz/KZxr5W216E/N2CQ
+         zPLz2RP5uYWo3ud5HqolMFQTNw7dmmoblwTcsbGZkVpoIBCdpXc8XHqMF948TtImz0FQ
+         ZNouKvKSreRKYAIlhwwo6da5wUvM3B0DqppzXvfnytKD0QabKm8zezVJhv4bhm2V6X5r
+         4kJw==
+X-Gm-Message-State: AOJu0YwKgFPJkzBKnavgqbirMmFa7zgcukLWADkD/caZJ4ENp25v7Wfo
+	nhZIbh6OPIZIYXBSgb7jSq6H4NoyBgh95BTGsazWy30aDPbz/qF1cO+Hr2iTyX56pVhS2AXZJ/2
+	mY5WiLqOfrDhHpc30q8L4UVesx9cDb1h0EYZ097qCYMJGto7TlobH0iXQHfFF3aw=
+X-Google-Smtp-Source: AGHT+IGGp0RrdBk3N/KBsHjgBX08s9Oh/FJF/LwNEpoqYzP7pNtygHXRwITYMsVvon7NnSywaSRhHMZFH7k/Og==
 X-Received: from aghulati-dev.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:18bb])
- (user=aghulati job=sendgmr) by 2002:a0d:d7cb:0:b0:58c:e8da:4d1a with SMTP id
- z194-20020a0dd7cb000000b0058ce8da4d1amr81006ywd.2.1699388443344; Tue, 07 Nov
- 2023 12:20:43 -0800 (PST)
-Date: Tue,  7 Nov 2023 20:20:01 +0000
+ (user=aghulati job=sendgmr) by 2002:a0d:df4d:0:b0:5a7:b8d1:ef65 with SMTP id
+ i74-20020a0ddf4d000000b005a7b8d1ef65mr286460ywe.3.1699388445403; Tue, 07 Nov
+ 2023 12:20:45 -0800 (PST)
+Date: Tue,  7 Nov 2023 20:20:02 +0000
 In-Reply-To: <20231107202002.667900-1-aghulati@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -65,9 +65,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20231107202002.667900-1-aghulati@google.com>
 X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
-Message-ID: <20231107202002.667900-14-aghulati@google.com>
-Subject: [RFC PATCH 13/14] KVM: x86: VAC: Move all hardware enable/disable
- code into VAC
+Message-ID: <20231107202002.667900-15-aghulati@google.com>
+Subject: [RFC PATCH 14/14] KVM: VAC: Bring up VAC as a new module
 From: Anish Ghulati <aghulati@google.com>
 To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
@@ -78,399 +77,654 @@ To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Cc: Anish Ghulati <aghulati@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-De-indirect hardware enable and disable. Now that all of these functions
-are in the VAC, they don't need to be called via an indirect ops table and
-static call.
+Add Kconfig options to build VAC as a new module. Make KVM dependent on
+this new "base" module.
+
+Add another Kconfig option to accept a postfix ID for multi-KVM. This
+option allows setting a postfix to KVM module and character device names
+to distinguish multiple KVMs running on the same host. Set the default
+value to null.
+
+Opportunistically fix indentation on the Makefile.
+
+Resolve TODOs by moving vac_vmx/svm_init/exit() calls to the module_init
+and module_exit functions of VAC.
+
+Add exports for VAC data and functions that are required in KVM. Also
+make some functions private now that they are not needed outside VAC.
+
+TODO: Fix the module name, which is currently set to kvm-vac.
 
 Signed-off-by: Anish Ghulati <aghulati@google.com>
 ---
- arch/x86/include/asm/kvm-x86-ops.h |   2 -
- arch/x86/kvm/svm/svm.c             |   2 -
- arch/x86/kvm/svm/svm_ops.h         |   1 +
- arch/x86/kvm/vac.c                 |  46 +++++++++++-
- arch/x86/kvm/vac.h                 |   9 ++-
- arch/x86/kvm/vmx/vmx.c             |   2 -
- arch/x86/kvm/vmx/vmx_ops.h         |   1 +
- arch/x86/kvm/x86.c                 | 117 -----------------------------
- arch/x86/kvm/x86.h                 |   2 -
- include/linux/kvm_host.h           |   2 +
- virt/kvm/vac.h                     |   5 ++
- 11 files changed, 58 insertions(+), 131 deletions(-)
+ arch/x86/kvm/Kconfig      | 17 ++++++++++++++++
+ arch/x86/kvm/Makefile     | 29 +++++++++++++++------------
+ arch/x86/kvm/svm/svm.c    |  3 ---
+ arch/x86/kvm/svm/vac.c    |  8 +++++++-
+ arch/x86/kvm/vac.c        | 42 +++++++++++++++++++++++++++++++++++++--
+ arch/x86/kvm/vac.h        |  2 --
+ arch/x86/kvm/vmx/nested.c |  5 +++--
+ arch/x86/kvm/vmx/vac.c    | 25 ++++++++++++++++++++---
+ arch/x86/kvm/vmx/vac.h    |  2 --
+ arch/x86/kvm/vmx/vmx.c    | 14 +++++--------
+ arch/x86/kvm/x86.c        |  7 -------
+ virt/kvm/Makefile.kvm     | 15 +++++++-------
+ virt/kvm/kvm_main.c       |  7 ++++---
+ virt/kvm/vac.c            |  7 +++++++
+ 14 files changed, 128 insertions(+), 55 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 764be4a26a0c..340dcae9dd32 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -16,8 +16,6 @@ BUILD_BUG_ON(1)
-  */
- KVM_X86_OP(vendor_exit)
- KVM_X86_OP(check_processor_compatibility)
--KVM_X86_OP(hardware_enable)
--KVM_X86_OP(hardware_disable)
- KVM_X86_OP(hardware_unsetup)
- KVM_X86_OP(has_emulated_msr)
- KVM_X86_OP(vcpu_after_set_cpuid)
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index adfa57d59643..42a0a0107572 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -17,10 +17,19 @@ menuconfig VIRTUALIZATION
+ 
+ if VIRTUALIZATION
+ 
++config VAC
++	tristate "Virtualization Acceleration Component (VAC)"
++	select KVM_GENERIC_HARDWARE_ENABLING
++	help
++	  Support running multiple KVM modules on the same host. If VAC is not
++          selected to run as a separate module, it will run as part of KVM, and
++          the system will only support a single KVM.
++
+ config KVM
+ 	tristate "Kernel-based Virtual Machine (KVM) support"
+ 	depends on HIGH_RES_TIMERS
+ 	depends on X86_LOCAL_APIC
++	depends on VAC
+ 	select PREEMPT_NOTIFIERS
+ 	select MMU_NOTIFIER
+ 	select HAVE_KVM_IRQCHIP
+@@ -60,6 +69,14 @@ config KVM
+ 
+ 	  If unsure, say N.
+ 
++config KVM_ID
++	string "KVM: Postfix ID for multi-KVM"
++	depends on KVM
++	default ""
++	help
++	  This is the postfix string to append to the KVM module and
++          character device to differentiate multiple KVM builds.
++
+ config KVM_WERROR
+ 	bool "Compile KVM with -Werror"
+ 	# KASAN may cause the build to fail due to larger frames
+diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+index b3de4bd7988f..48d263ecaffa 100644
+--- a/arch/x86/kvm/Makefile
++++ b/arch/x86/kvm/Makefile
+@@ -8,33 +8,36 @@ endif
+ 
+ include $(srctree)/virt/kvm/Makefile.kvm
+ 
+-kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
++kvm-vac-y                   := $(KVM)/vac.o vac.o
++kvm-vac-$(CONFIG_KVM_INTEL) += vmx/vac.o
++kvm-vac-$(CONFIG_KVM_AMD)   += svm/vac.o
++
++kvm$(CONFIG_KVM_ID)-y	   += x86.o emulate.o i8259.o irq.o lapic.o \
+ 			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
+ 			   hyperv.o debugfs.o mmu/mmu.o mmu/page_track.o \
+ 			   mmu/spte.o
+ 
+-kvm-y                   += vac.o vmx/vac.o svm/vac.o
+-
+ ifdef CONFIG_HYPERV
+-kvm-y			+= kvm_onhyperv.o
++kvm$(CONFIG_KVM_ID)-y	    += kvm_onhyperv.o
+ endif
+ 
+-kvm-$(CONFIG_X86_64) += mmu/tdp_iter.o mmu/tdp_mmu.o
+-kvm-$(CONFIG_KVM_XEN)	+= xen.o
+-kvm-$(CONFIG_KVM_SMM)	+= smm.o
++kvm$(CONFIG_KVM_ID)-$(CONFIG_X86_64)    	+= mmu/tdp_iter.o mmu/tdp_mmu.o
++kvm$(CONFIG_KVM_ID)-$(CONFIG_KVM_XEN)		+= xen.o
++kvm$(CONFIG_KVM_ID)-$(CONFIG_KVM_SMM)		+= smm.o
+ 
+-kvm-$(CONFIG_KVM_INTEL)	+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+-			   vmx/hyperv.o vmx/nested.o vmx/posted_intr.o
+-kvm-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
++kvm$(CONFIG_KVM_ID)-$(CONFIG_KVM_INTEL)		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
++						vmx/hyperv.o vmx/nested.o vmx/posted_intr.o
++kvm$(CONFIG_KVM_ID)-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
+ 
+-kvm-$(CONFIG_KVM_AMD)	+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
+-			   svm/sev.o svm/hyperv.o
++kvm$(CONFIG_KVM_ID)-$(CONFIG_KVM_AMD)		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
++						svm/sev.o svm/hyperv.o
+ 
+ ifdef CONFIG_HYPERV
+ kvm-$(CONFIG_KVM_AMD)	+= svm/svm_onhyperv.o
+ endif
+ 
+-obj-$(CONFIG_KVM)	+= kvm.o
++obj-$(CONFIG_VAC)       += kvm-vac.o
++obj-$(CONFIG_KVM)	+= kvm$(CONFIG_KVM_ID).o
+ 
+ AFLAGS_svm/vmenter.o    := -iquote $(obj)
+ $(obj)/svm/vmenter.o: $(obj)/kvm-asm-offsets.h
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index df5673c98e7b..fb2c72430c7a 100644
+index fb2c72430c7a..6b9f81fc84db 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -4739,8 +4739,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.check_processor_compatibility = svm_check_processor_compat,
+@@ -5166,9 +5166,6 @@ int __init svm_init(void)
+ 	if (r)
+ 		return r;
  
- 	.hardware_unsetup = svm_hardware_unsetup,
--	.hardware_enable = svm_hardware_enable,
--	.hardware_disable = svm_hardware_disable,
- 	.has_emulated_msr = svm_has_emulated_msr,
+-	//TODO: Remove this init call once VAC is a module
+-	vac_svm_init();
+-
+ 	/*
+ 	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
+ 	 * exposed to userspace!
+diff --git a/arch/x86/kvm/svm/vac.c b/arch/x86/kvm/svm/vac.c
+index 7c4db99ca7d5..37ad2a3a9d2d 100644
+--- a/arch/x86/kvm/svm/vac.c
++++ b/arch/x86/kvm/svm/vac.c
+@@ -8,7 +8,10 @@
+ #include "vac.h"
  
- 	.vcpu_create = svm_vcpu_create,
-diff --git a/arch/x86/kvm/svm/svm_ops.h b/arch/x86/kvm/svm/svm_ops.h
-index 36c8af87a707..5e89c06b5147 100644
---- a/arch/x86/kvm/svm/svm_ops.h
-+++ b/arch/x86/kvm/svm/svm_ops.h
-@@ -4,6 +4,7 @@
+ DEFINE_PER_CPU(struct svm_cpu_data, svm_data);
++EXPORT_SYMBOL_GPL(svm_data);
++
+ unsigned int max_sev_asid;
++EXPORT_SYMBOL_GPL(max_sev_asid);
  
- #include <linux/compiler_types.h>
+ static bool __kvm_is_svm_supported(void)
+ {
+@@ -52,6 +55,7 @@ bool kvm_is_svm_supported(void)
  
-+#include "../vac.h"
- #include "x86.h"
+ 	return supported;
+ }
++EXPORT_SYMBOL_GPL(kvm_is_svm_supported);
  
- #define svm_asm(insn, clobber...)				\
+ static inline void kvm_cpu_svm_disable(void)
+ {
+@@ -87,6 +91,7 @@ void svm_hardware_disable(void)
+ 
+ 	amd_pmu_disable_virt();
+ }
++EXPORT_SYMBOL_GPL(svm_hardware_disable);
+ 
+ int svm_hardware_enable(void)
+ {
+@@ -152,6 +157,7 @@ int svm_hardware_enable(void)
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(svm_hardware_enable);
+ 
+ int __init vac_svm_init(void)
+ {
+@@ -160,7 +166,7 @@ int __init vac_svm_init(void)
+ 	return 0;
+ }
+ 
+-void vac_svm_exit(void)
++void __exit vac_svm_exit(void)
+ {
+ 	cpu_emergency_unregister_virt_callback(svm_emergency_disable);
+ }
 diff --git a/arch/x86/kvm/vac.c b/arch/x86/kvm/vac.c
-index ab77aee4e1fa..79f5c2ac159a 100644
+index 79f5c2ac159a..2d7ca59b4c90 100644
 --- a/arch/x86/kvm/vac.c
 +++ b/arch/x86/kvm/vac.c
-@@ -3,6 +3,8 @@
+@@ -2,13 +2,18 @@
+ 
  #include "vac.h"
  #include <asm/msr.h>
- 
-+extern bool kvm_rebooting;
++#include <linux/module.h>
 +
++MODULE_LICENSE("GPL");
+ 
+ extern bool kvm_rebooting;
+ 
  u32 __read_mostly kvm_uret_msrs_list[KVM_MAX_NR_USER_RETURN_MSRS];
  struct kvm_user_return_msrs __percpu *user_return_msrs;
++EXPORT_SYMBOL_GPL(user_return_msrs);
  
-@@ -35,7 +37,7 @@ void kvm_on_user_return(struct user_return_notifier *urn)
- 	}
- }
+ u32 __read_mostly kvm_nr_uret_msrs;
++EXPORT_SYMBOL_GPL(kvm_nr_uret_msrs);
  
--void kvm_user_return_msr_cpu_online(void)
-+static void kvm_user_return_msr_cpu_online(void)
+ void kvm_on_user_return(struct user_return_notifier *urn)
  {
- 	unsigned int cpu = smp_processor_id();
- 	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
-@@ -49,7 +51,7 @@ void kvm_user_return_msr_cpu_online(void)
- 	}
+@@ -85,6 +90,7 @@ int kvm_add_user_return_msr(u32 msr)
+ 	kvm_uret_msrs_list[kvm_nr_uret_msrs] = msr;
+ 	return kvm_nr_uret_msrs++;
  }
++EXPORT_SYMBOL_GPL(kvm_add_user_return_msr);
  
--void drop_user_return_notifiers(void)
-+static void drop_user_return_notifiers(void)
+ int kvm_find_user_return_msr(u32 msr)
  {
- 	unsigned int cpu = smp_processor_id();
- 	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
-@@ -117,6 +119,46 @@ int kvm_set_user_return_msr(unsigned int slot, u64 value, u64 mask)
+@@ -96,6 +102,7 @@ int kvm_find_user_return_msr(u32 msr)
+ 	}
+ 	return -1;
+ }
++EXPORT_SYMBOL_GPL(kvm_find_user_return_msr);
+ 
+ int kvm_set_user_return_msr(unsigned int slot, u64 value, u64 mask)
+ {
+@@ -118,6 +125,7 @@ int kvm_set_user_return_msr(unsigned int slot, u64 value, u64 mask)
+ 	}
  	return 0;
  }
++EXPORT_SYMBOL_GPL(kvm_set_user_return_msr);
  
-+int kvm_arch_hardware_enable(void)
-+{
-+	int ret = -EIO;
-+
-+	kvm_user_return_msr_cpu_online();
-+
-+	if (kvm_is_vmx_supported())
-+		ret = vmx_hardware_enable();
-+	else if (kvm_is_svm_supported())
-+		ret = svm_hardware_enable();
-+	if (ret != 0)
-+		return ret;
-+
-+	// TODO: Handle unstable TSC
-+
-+	return 0;
-+}
-+
-+void kvm_arch_hardware_disable(void)
-+{
-+	if (kvm_is_vmx_supported())
-+		vmx_hardware_disable();
-+	else if (kvm_is_svm_supported())
-+		svm_hardware_disable();
-+	drop_user_return_notifiers();
-+}
-+
-+/*
-+ * Handle a fault on a hardware virtualization (VMX or SVM) instruction.
-+ *
-+ * Hardware virtualization extension instructions may fault if a reboot turns
-+ * off virtualization while processes are running.  Usually after catching the
-+ * fault we just panic; during reboot instead the instruction is ignored.
-+ */
-+noinstr void kvm_spurious_fault(void)
-+{
-+	/* Fault while not rebooting.  We want the trace. */
-+	BUG_ON(!kvm_rebooting);
-+}
-+
- int kvm_alloc_user_return_msrs(void)
+ int kvm_arch_hardware_enable(void)
+ {
+@@ -158,8 +166,9 @@ noinstr void kvm_spurious_fault(void)
+ 	/* Fault while not rebooting.  We want the trace. */
+ 	BUG_ON(!kvm_rebooting);
+ }
++EXPORT_SYMBOL_GPL(kvm_spurious_fault);
+ 
+-int kvm_alloc_user_return_msrs(void)
++static int kvm_alloc_user_return_msrs(void)
  {
  	user_return_msrs = alloc_percpu(struct kvm_user_return_msrs);
+ 	if (!user_return_msrs) {
+@@ -170,7 +179,36 @@ int kvm_alloc_user_return_msrs(void)
+ 	return 0;
+ }
+ 
+-void kvm_free_user_return_msrs(void)
++static void kvm_free_user_return_msrs(void)
+ {
+ 	free_percpu(user_return_msrs);
+ }
++
++int __init vac_init(void)
++{
++	int r = 0;
++
++	r = kvm_alloc_user_return_msrs();
++	if (r)
++		goto out_user_return_msrs;
++
++	if (kvm_is_vmx_supported())
++		r = vac_vmx_init();
++	else if (kvm_is_svm_supported())
++		r = vac_svm_init();
++
++out_user_return_msrs:
++	return r;
++}
++module_init(vac_init);
++
++void __exit vac_exit(void)
++{
++	if (kvm_is_vmx_supported())
++		vac_vmx_exit();
++	else if (kvm_is_svm_supported())
++		vac_svm_exit();
++
++	kvm_free_user_return_msrs();
++}
++module_exit(vac_exit);
 diff --git a/arch/x86/kvm/vac.h b/arch/x86/kvm/vac.h
-index 5be30cce5a1c..daf1f137d196 100644
+index daf1f137d196..a40e5309ec5f 100644
 --- a/arch/x86/kvm/vac.h
 +++ b/arch/x86/kvm/vac.h
-@@ -5,13 +5,14 @@
+@@ -56,8 +56,6 @@ struct kvm_user_return_msrs {
  
- #include <linux/user-return-notifier.h>
+ extern u32 __read_mostly kvm_nr_uret_msrs;
  
--int __init vac_init(void);
--void vac_exit(void);
-+void kvm_spurious_fault(void);
- 
- #ifdef CONFIG_KVM_INTEL
- bool kvm_is_vmx_supported(void);
- int __init vac_vmx_init(void);
- void vac_vmx_exit(void);
-+int vmx_hardware_enable(void);
-+void vmx_hardware_disable(void);
- #else
- bool kvm_is_vmx_supported(void) { return false }
- int __init vac_vmx_init(void)
-@@ -25,6 +26,8 @@ void vac_vmx_exit(void) {}
- bool kvm_is_svm_supported(void);
- int __init vac_svm_init(void);
- void vac_svm_exit(void);
-+int svm_hardware_enable(void);
-+void svm_hardware_disable(void);
- #else
- bool kvm_is_svm_supported(void) { return false }
- int __init vac_svm_init(void)
-@@ -59,8 +62,6 @@ int kvm_add_user_return_msr(u32 msr);
+-int kvm_alloc_user_return_msrs(void);
+-void kvm_free_user_return_msrs(void);
+ int kvm_add_user_return_msr(u32 msr);
  int kvm_find_user_return_msr(u32 msr);
  int kvm_set_user_return_msr(unsigned int slot, u64 value, u64 mask);
- void kvm_on_user_return(struct user_return_notifier *urn);
--void kvm_user_return_msr_cpu_online(void);
--void drop_user_return_notifiers(void);
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 5c6ac7662453..c4999b4cf257 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -307,7 +307,8 @@ static void free_nested(struct kvm_vcpu *vcpu)
+ 	vmx->nested.vmxon = false;
+ 	vmx->nested.smm.vmxon = false;
+ 	vmx->nested.vmxon_ptr = INVALID_GPA;
+-	free_vpid(vmx->nested.vpid02);
++	if (enable_vpid)
++		free_vpid(vmx->nested.vpid02);
+ 	vmx->nested.posted_intr_nv = -1;
+ 	vmx->nested.current_vmptr = INVALID_GPA;
+ 	if (enable_shadow_vmcs) {
+@@ -5115,7 +5116,7 @@ static int enter_vmx_operation(struct kvm_vcpu *vcpu)
+ 		     HRTIMER_MODE_ABS_PINNED);
+ 	vmx->nested.preemption_timer.function = vmx_preemption_timer_fn;
  
- static inline bool kvm_is_supported_user_return_msr(u32 msr)
+-	vmx->nested.vpid02 = allocate_vpid();
++	vmx->nested.vpid02 = enable_vpid ? allocate_vpid() : 0;
+ 
+ 	vmx->nested.vmcs02_initialized = false;
+ 	vmx->nested.vmxon = true;
+diff --git a/arch/x86/kvm/vmx/vac.c b/arch/x86/kvm/vmx/vac.c
+index cdfdeb67a719..e147b9890c99 100644
+--- a/arch/x86/kvm/vmx/vac.c
++++ b/arch/x86/kvm/vmx/vac.c
+@@ -8,6 +8,10 @@
+ #include "vmx_ops.h"
+ #include "posted_intr.h"
+ 
++// TODO: Move these to VAC
++void vmclear_error(struct vmcs *vmcs, u64 phys_addr) {}
++void invept_error(unsigned long ext, u64 eptp, gpa_t gpa) {}
++
+ /*
+  * We maintain a per-CPU linked-list of VMCS loaded on that CPU. This is needed
+  * when a CPU is brought down, and we need to VMCLEAR all VMCSs loaded on it.
+@@ -17,16 +21,19 @@ static DEFINE_PER_CPU(struct list_head, loaded_vmcss_on_cpu);
+ static DEFINE_PER_CPU(struct vmcs *, vmxarea);
+ 
+ DEFINE_PER_CPU(struct vmcs *, current_vmcs);
++EXPORT_SYMBOL_GPL(current_vmcs);
+ 
+ void vac_set_vmxarea(struct vmcs *vmcs, int cpu)
  {
+ 	per_cpu(vmxarea, cpu) = vmcs;
+ }
++EXPORT_SYMBOL_GPL(vac_set_vmxarea);
+ 
+ struct vmcs *vac_get_vmxarea(int cpu)
+ {
+ 	return per_cpu(vmxarea, cpu);
+ }
++EXPORT_SYMBOL_GPL(vac_get_vmxarea);
+ 
+ static DECLARE_BITMAP(vmx_vpid_bitmap, VMX_NR_VPIDS);
+ static DEFINE_SPINLOCK(vmx_vpid_lock);
+@@ -59,6 +66,7 @@ bool kvm_is_vmx_supported(void)
+ 
+ 	return supported;
+ }
++EXPORT_SYMBOL_GPL(kvm_is_vmx_supported);
+ 
+ int allocate_vpid(void)
+ {
+@@ -75,6 +83,7 @@ int allocate_vpid(void)
+ 	spin_unlock(&vmx_vpid_lock);
+ 	return vpid;
+ }
++EXPORT_SYMBOL_GPL(allocate_vpid);
+ 
+ void free_vpid(int vpid)
+ {
+@@ -84,6 +93,7 @@ void free_vpid(int vpid)
+ 	__clear_bit(vpid, vmx_vpid_bitmap);
+ 	spin_unlock(&vmx_vpid_lock);
+ }
++EXPORT_SYMBOL_GPL(free_vpid);
+ 
+ void add_vmcs_to_loaded_vmcss_on_cpu(
+ 		struct list_head *loaded_vmcss_on_cpu_link,
+@@ -91,6 +101,7 @@ void add_vmcs_to_loaded_vmcss_on_cpu(
+ {
+ 	list_add(loaded_vmcss_on_cpu_link, &per_cpu(loaded_vmcss_on_cpu, cpu));
+ }
++EXPORT_SYMBOL_GPL(add_vmcs_to_loaded_vmcss_on_cpu);
+ 
+ static void __loaded_vmcs_clear(void *arg)
+ {
+@@ -130,6 +141,7 @@ void loaded_vmcs_clear(struct loaded_vmcs *loaded_vmcs)
+ 			 __loaded_vmcs_clear, loaded_vmcs, 1);
+ 
+ }
++EXPORT_SYMBOL_GPL(loaded_vmcs_clear);
+ 
+ static int kvm_cpu_vmxon(u64 vmxon_pointer)
+ {
+@@ -175,11 +187,16 @@ int vmx_hardware_enable(void)
+ 		return r;
+ 	}
+ 
+-	if (enable_ept)
++	// TODO: VAC: Since we can have a mix of KVMs with enable_ept=0 and =1,
++	// we need to perform a global INVEPT here.
++	// TODO: Check for the
++	// vmx_capability invept bit before executing this.
++	if (1)
+ 		ept_sync_global();
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(vmx_hardware_enable);
+ 
+ static void vmclear_local_loaded_vmcss(void)
+ {
+@@ -246,6 +263,7 @@ void vmx_hardware_disable(void)
+ 
+ 	intel_pt_handle_vmx(0);
+ }
++EXPORT_SYMBOL_GPL(vmx_hardware_disable);
+ 
+ int __init vac_vmx_init(void)
+ {
+@@ -254,7 +272,8 @@ int __init vac_vmx_init(void)
+ 	for_each_possible_cpu(cpu) {
+ 		INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
+ 
+-		pi_init_cpu(cpu);
++		// TODO: Move posted interrupts list to VAC
++		// pi_init_cpu(cpu);
+ 	}
+ 
+ 	cpu_emergency_register_virt_callback(vmx_emergency_disable);
+@@ -262,7 +281,7 @@ int __init vac_vmx_init(void)
+ 	return 0;
+ }
+ 
+-void vac_vmx_exit(void)
++void __exit vac_vmx_exit(void)
+ {
+ 	cpu_emergency_unregister_virt_callback(vmx_emergency_disable);
+ }
+diff --git a/arch/x86/kvm/vmx/vac.h b/arch/x86/kvm/vmx/vac.h
+index d5af0ca67e3f..991df7ad9d81 100644
+--- a/arch/x86/kvm/vmx/vac.h
++++ b/arch/x86/kvm/vmx/vac.h
+@@ -16,7 +16,5 @@ void add_vmcs_to_loaded_vmcss_on_cpu(
+ 		struct list_head *loaded_vmcss_on_cpu_link,
+ 		int cpu);
+ void loaded_vmcs_clear(struct loaded_vmcs *loaded_vmcs);
+-int vmx_hardware_enable(void);
+-void vmx_hardware_disable(void);
+ 
+ #endif // ARCH_X86_KVM_VMX_VAC_H
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 6301b49e0e80..69a6a8591996 100644
+index 69a6a8591996..8d749da61c71 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8013,8 +8013,6 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+@@ -7201,7 +7201,8 @@ static void vmx_vcpu_free(struct kvm_vcpu *vcpu)
  
- 	.hardware_unsetup = vmx_hardware_unsetup,
+ 	if (enable_pml)
+ 		vmx_destroy_pml_buffer(vmx);
+-	free_vpid(vmx->vpid);
++	if (enable_vpid)
++		free_vpid(vmx->vpid);
+ 	nested_vmx_free_vcpu(vcpu);
+ 	free_loaded_vmcs(vmx->loaded_vmcs);
+ }
+@@ -7219,7 +7220,7 @@ static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
  
--	.hardware_enable = vmx_hardware_enable,
--	.hardware_disable = vmx_hardware_disable,
- 	.has_emulated_msr = vmx_has_emulated_msr,
+ 	err = -ENOMEM;
  
- 	.vm_size = sizeof(struct kvm_vmx),
-diff --git a/arch/x86/kvm/vmx/vmx_ops.h b/arch/x86/kvm/vmx/vmx_ops.h
-index 33af7b4c6eb4..60325fd39120 100644
---- a/arch/x86/kvm/vmx/vmx_ops.h
-+++ b/arch/x86/kvm/vmx/vmx_ops.h
-@@ -8,6 +8,7 @@
+-	vmx->vpid = allocate_vpid();
++	vmx->vpid = enable_vpid ? allocate_vpid() : 0;
  
- #include "hyperv.h"
- #include "vmcs.h"
-+#include "../vac.h"
- #include "../x86.h"
+ 	/*
+ 	 * If PML is turned on, failure on enabling PML just results in failure
+@@ -7308,7 +7309,8 @@ static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
+ free_pml:
+ 	vmx_destroy_pml_buffer(vmx);
+ free_vpid:
+-	free_vpid(vmx->vpid);
++	if (enable_vpid)
++		free_vpid(vmx->vpid);
+ 	return err;
+ }
  
- void vmread_error(unsigned long field);
+@@ -7992,9 +7994,6 @@ static void __vmx_exit(void)
+ {
+ 	allow_smaller_maxphyaddr = false;
+ 
+-	//TODO: Remove this exit call once VAC is a module
+-	vac_vmx_exit();
+-
+ 	vmx_cleanup_l1d_flush();
+ }
+ 
+@@ -8436,9 +8435,6 @@ int __init vmx_init(void)
+ 	if (r)
+ 		goto err_l1d_flush;
+ 
+-	//TODO: Remove this init call once VAC is a module
+-	vac_vmx_init();
+-
+ 	vmx_check_vmcs12_offsets();
+ 
+ 	/*
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 7466a5945147..a74139061e4d 100644
+index a74139061e4d..57b5bee2d484 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -370,19 +370,6 @@ int kvm_set_apic_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	return 0;
- }
+@@ -9274,10 +9274,6 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+ 		return -ENOMEM;
+ 	}
  
--/*
-- * Handle a fault on a hardware virtualization (VMX or SVM) instruction.
-- *
-- * Hardware virtualization extension instructions may fault if a reboot turns
-- * off virtualization while processes are running.  Usually after catching the
-- * fault we just panic; during reboot instead the instruction is ignored.
-- */
--noinstr void kvm_spurious_fault(void)
--{
--	/* Fault while not rebooting.  We want the trace. */
--	BUG_ON(!kvm_rebooting);
--}
+-	r = kvm_alloc_user_return_msrs();
+-	if (r)
+-		goto out_free_x86_emulator_cache;
 -
- #define EXCPT_BENIGN		0
- #define EXCPT_CONTRIBUTORY	1
- #define EXCPT_PF		2
-@@ -9363,7 +9350,6 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
- 	return 0;
- 
- out_unwind_ops:
--	kvm_x86_ops.hardware_enable = NULL;
- 	static_call(kvm_x86_hardware_unsetup)();
+ 	r = kvm_mmu_vendor_module_init();
+ 	if (r)
+ 		goto out_free_percpu;
+@@ -9354,8 +9350,6 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
  out_mmu_exit:
  	kvm_mmu_vendor_module_exit();
-@@ -9414,7 +9400,6 @@ void kvm_x86_vendor_exit(void)
- 	WARN_ON(static_branch_unlikely(&kvm_xen_enabled.key));
+ out_free_percpu:
+-	kvm_free_user_return_msrs();
+-out_free_x86_emulator_cache:
+ 	kmem_cache_destroy(x86_emulator_cache);
+ 	return r;
+ }
+@@ -9393,7 +9387,6 @@ void kvm_x86_vendor_exit(void)
  #endif
- 	mutex_lock(&vendor_module_lock);
--	kvm_x86_ops.hardware_enable = NULL;
- 	mutex_unlock(&vendor_module_lock);
- }
+ 	static_call(kvm_x86_hardware_unsetup)();
+ 	kvm_mmu_vendor_module_exit();
+-	kvm_free_user_return_msrs();
+ 	kmem_cache_destroy(x86_emulator_cache);
+ #ifdef CONFIG_KVM_XEN
+ 	static_key_deferred_flush(&kvm_xen_enabled);
+diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
+index 7876021ea4d7..f1ad75797fe8 100644
+--- a/virt/kvm/Makefile.kvm
++++ b/virt/kvm/Makefile.kvm
+@@ -7,13 +7,12 @@ ccflags-y += -I$(srctree)/$(src) -D__KVM__
  
-@@ -11952,108 +11937,6 @@ void kvm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
- 	kvm_rip_write(vcpu, 0);
- }
+ KVM ?= ../../../virt/kvm
  
--int kvm_arch_hardware_enable(void)
--{
--	struct kvm *kvm;
--	struct kvm_vcpu *vcpu;
--	unsigned long i;
--	int ret;
--	u64 local_tsc;
--	u64 max_tsc = 0;
--	bool stable, backwards_tsc = false;
--
--	kvm_user_return_msr_cpu_online();
--
--	ret = kvm_x86_check_processor_compatibility();
--	if (ret)
--		return ret;
--
--	ret = static_call(kvm_x86_hardware_enable)();
--	if (ret != 0)
--		return ret;
--
--	local_tsc = rdtsc();
--	stable = !kvm_check_tsc_unstable();
--	list_for_each_entry(kvm, &vm_list, vm_list) {
--		kvm_for_each_vcpu(i, vcpu, kvm) {
--			if (!stable && vcpu->cpu == smp_processor_id())
--				kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
--			if (stable && vcpu->arch.last_host_tsc > local_tsc) {
--				backwards_tsc = true;
--				if (vcpu->arch.last_host_tsc > max_tsc)
--					max_tsc = vcpu->arch.last_host_tsc;
--			}
--		}
--	}
--
--	/*
--	 * Sometimes, even reliable TSCs go backwards.  This happens on
--	 * platforms that reset TSC during suspend or hibernate actions, but
--	 * maintain synchronization.  We must compensate.  Fortunately, we can
--	 * detect that condition here, which happens early in CPU bringup,
--	 * before any KVM threads can be running.  Unfortunately, we can't
--	 * bring the TSCs fully up to date with real time, as we aren't yet far
--	 * enough into CPU bringup that we know how much real time has actually
--	 * elapsed; our helper function, ktime_get_boottime_ns() will be using boot
--	 * variables that haven't been updated yet.
--	 *
--	 * So we simply find the maximum observed TSC above, then record the
--	 * adjustment to TSC in each VCPU.  When the VCPU later gets loaded,
--	 * the adjustment will be applied.  Note that we accumulate
--	 * adjustments, in case multiple suspend cycles happen before some VCPU
--	 * gets a chance to run again.  In the event that no KVM threads get a
--	 * chance to run, we will miss the entire elapsed period, as we'll have
--	 * reset last_host_tsc, so VCPUs will not have the TSC adjusted and may
--	 * loose cycle time.  This isn't too big a deal, since the loss will be
--	 * uniform across all VCPUs (not to mention the scenario is extremely
--	 * unlikely). It is possible that a second hibernate recovery happens
--	 * much faster than a first, causing the observed TSC here to be
--	 * smaller; this would require additional padding adjustment, which is
--	 * why we set last_host_tsc to the local tsc observed here.
--	 *
--	 * N.B. - this code below runs only on platforms with reliable TSC,
--	 * as that is the only way backwards_tsc is set above.  Also note
--	 * that this runs for ALL vcpus, which is not a bug; all VCPUs should
--	 * have the same delta_cyc adjustment applied if backwards_tsc
--	 * is detected.  Note further, this adjustment is only done once,
--	 * as we reset last_host_tsc on all VCPUs to stop this from being
--	 * called multiple times (one for each physical CPU bringup).
--	 *
--	 * Platforms with unreliable TSCs don't have to deal with this, they
--	 * will be compensated by the logic in vcpu_load, which sets the TSC to
--	 * catchup mode.  This will catchup all VCPUs to real time, but cannot
--	 * guarantee that they stay in perfect synchronization.
--	 */
--	if (backwards_tsc) {
--		u64 delta_cyc = max_tsc - local_tsc;
--		list_for_each_entry(kvm, &vm_list, vm_list) {
--			kvm->arch.backwards_tsc_observed = true;
--			kvm_for_each_vcpu(i, vcpu, kvm) {
--				vcpu->arch.tsc_offset_adjustment += delta_cyc;
--				vcpu->arch.last_host_tsc = local_tsc;
--				kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
--			}
--
--			/*
--			 * We have to disable TSC offset matching.. if you were
--			 * booting a VM while issuing an S4 host suspend....
--			 * you may have some problem.  Solving this issue is
--			 * left as an exercise to the reader.
--			 */
--			kvm->arch.last_tsc_nsec = 0;
--			kvm->arch.last_tsc_write = 0;
--		}
--
--	}
--	return 0;
--}
--
--void kvm_arch_hardware_disable(void)
--{
--	static_call(kvm_x86_hardware_disable)();
--	drop_user_return_notifiers();
--}
--
- bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
- {
- 	return vcpu->kvm->arch.bsp_vcpu_id == vcpu->vcpu_id;
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 1da8efcd3e9c..17ff3917b9a8 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -40,8 +40,6 @@ struct kvm_caps {
- 	u64 supported_perf_cap;
+-kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
++kvm$(CONFIG_KVM_ID)-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
+ ifdef CONFIG_VFIO
+-kvm-y += $(KVM)/vfio.o
++kvm$(CONFIG_KVM_ID)-y += $(KVM)/vfio.o
+ endif
+-kvm-y += $(KVM)/vac.o
+-kvm-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
+-kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
+-kvm-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
+-kvm-$(CONFIG_HAVE_KVM_DIRTY_RING) += $(KVM)/dirty_ring.o
+-kvm-$(CONFIG_HAVE_KVM_PFNCACHE) += $(KVM)/pfncache.o
++kvm$(CONFIG_KVM_ID)-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
++kvm$(CONFIG_KVM_ID)-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
++kvm$(CONFIG_KVM_ID)-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
++kvm$(CONFIG_KVM_ID)-$(CONFIG_HAVE_KVM_DIRTY_RING) += $(KVM)/dirty_ring.o
++kvm$(CONFIG_KVM_ID)-$(CONFIG_HAVE_KVM_PFNCACHE) += $(KVM)/pfncache.o
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 575f044fd842..c4af06b1e62c 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -5163,9 +5163,8 @@ static struct file_operations kvm_chardev_ops = {
  };
  
--void kvm_spurious_fault(void);
--
- #define KVM_NESTED_VMENTER_CONSISTENCY_CHECK(consistency_check)		\
- ({									\
- 	bool failed = (consistency_check);				\
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index f0afe549c0d6..d26671682764 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1467,9 +1467,11 @@ static inline void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu) {}
- #endif
+ static struct miscdevice kvm_dev = {
+-	KVM_MINOR,
+-	"kvm",
+-	&kvm_chardev_ops,
++	.minor = KVM_MINOR,
++	.fops = &kvm_chardev_ops,
+ };
+ 
+ static void kvm_iodevice_destructor(struct kvm_io_device *dev)
+@@ -5914,7 +5913,9 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
+ 	/*
+ 	 * Registration _must_ be the very last thing done, as this exposes
+ 	 * /dev/kvm to userspace, i.e. all infrastructure must be setup!
++	 * Append CONFIG_KVM_ID to the device name.
+ 	 */
++	kvm_dev.name = kasprintf(GFP_KERNEL, "kvm%s", CONFIG_KVM_ID);
+ 	r = misc_register(&kvm_dev);
+ 	if (r) {
+ 		pr_err("kvm: misc device register failed\n");
+diff --git a/virt/kvm/vac.c b/virt/kvm/vac.c
+index c628afeb3d4b..60f5bec2659a 100644
+--- a/virt/kvm/vac.c
++++ b/virt/kvm/vac.c
+@@ -10,6 +10,7 @@ DEFINE_PER_CPU(cpumask_var_t, cpu_kick_mask);
+ EXPORT_SYMBOL(cpu_kick_mask);
+ 
+ DEFINE_PER_CPU(struct kvm_vcpu *, kvm_running_vcpu);
++EXPORT_SYMBOL_GPL(kvm_running_vcpu);
  
  #ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
-+#ifndef CONFIG_X86
- int kvm_arch_hardware_enable(void);
- void kvm_arch_hardware_disable(void);
+ DEFINE_MUTEX(vac_lock);
+@@ -56,6 +57,7 @@ int kvm_online_cpu(unsigned int cpu)
+ 	mutex_unlock(&vac_lock);
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(kvm_online_cpu);
+ 
+ static void hardware_disable_nolock(void *junk)
+ {
+@@ -79,6 +81,7 @@ int kvm_offline_cpu(unsigned int cpu)
+ 	mutex_unlock(&vac_lock);
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(kvm_offline_cpu);
+ 
+ static void hardware_disable_all_nolock(void)
+ {
+@@ -97,6 +100,7 @@ void hardware_disable_all(void)
+ 	mutex_unlock(&vac_lock);
+ 	cpus_read_unlock();
+ }
++EXPORT_SYMBOL_GPL(hardware_disable_all);
+ 
+ int hardware_enable_all(void)
+ {
+@@ -129,6 +133,7 @@ int hardware_enable_all(void)
+ 
+ 	return r;
+ }
++EXPORT_SYMBOL_GPL(hardware_enable_all);
+ 
+ static int kvm_reboot(struct notifier_block *notifier, unsigned long val,
+ 		      void *v)
+@@ -176,10 +181,12 @@ struct notifier_block kvm_reboot_notifier = {
+ 	.notifier_call = kvm_reboot,
+ 	.priority = 0,
+ };
++EXPORT_SYMBOL_GPL(kvm_reboot_notifier);
+ 
+ struct syscore_ops kvm_syscore_ops = {
+ 	.suspend = kvm_suspend,
+ 	.resume = kvm_resume,
+ };
++EXPORT_SYMBOL_GPL(kvm_syscore_ops);
+ 
  #endif
-+#endif
- int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
- bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
- int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/vac.h b/virt/kvm/vac.h
-index f3e7b08168df..b5159fa3f18d 100644
---- a/virt/kvm/vac.h
-+++ b/virt/kvm/vac.h
-@@ -13,6 +13,11 @@ int kvm_offline_cpu(unsigned int cpu);
- void hardware_disable_all(void);
- int hardware_enable_all(void);
- 
-+#ifdef CONFIG_X86
-+int kvm_arch_hardware_enable(void);
-+void kvm_arch_hardware_disable(void);
-+#endif
-+
- extern struct notifier_block kvm_reboot_notifier;
- 
- extern struct syscore_ops kvm_syscore_ops;
 -- 
 2.42.0.869.gea05f2083d-goog
 
