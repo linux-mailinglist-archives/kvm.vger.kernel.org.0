@@ -1,366 +1,307 @@
-Return-Path: <kvm+bounces-1050-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1051-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4B7E7E4841
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 19:31:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AE777E484C
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 19:33:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2CCA1C20C84
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 18:31:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3C702812F7
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 18:33:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CF8736AEE;
-	Tue,  7 Nov 2023 18:31:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C44F358B9;
+	Tue,  7 Nov 2023 18:33:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BEORjZDB"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="23+7iRWU"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06374358B5
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 18:31:24 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C982125
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 10:31:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699381882;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5T916OhqBqbSvF+bfK753LwTEnPyTXxluNJryek0/Bg=;
-	b=BEORjZDBysahne2WhvFgkHAQPyaX+klno3bwEbnC0UYE+2HdFGcYxeRG40jXpHh1Jn/RYb
-	CxQEg21zcMr1JgmhISdYyVbU/Cz1nm8vjZ/eUBh+Zt4p3wGgQqr79m9t5+UO/6QZ/v9seu
-	y6j1y23YAtR8GhzRrIfvETsRhkhJgag=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-612-KCeLLp_TNoK1oIQhgj-Fqg-1; Tue, 07 Nov 2023 13:31:21 -0500
-X-MC-Unique: KCeLLp_TNoK1oIQhgj-Fqg-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5079c865541so1509336e87.3
-        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 10:31:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699381568; x=1699986368;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5T916OhqBqbSvF+bfK753LwTEnPyTXxluNJryek0/Bg=;
-        b=dB51GN9kOzDMvxi51GpJfbu4SjZP11fTWMRr3W8n0Jt0noQpCq6bmZMJgjdruez0Ri
-         zklWaEjKUmKfYyQ6EfMmuMqiuYftkhSK3udywT2YVwZwVL36ZHdddVPkha1BvjCkmQW3
-         Fc6DxC33yaZv6LkkCegTvOlIpjyfLFU5LS+AevlQh3OZlHcORnXm4brlYLNAyVlbeDaw
-         a/HY3oOD30os87+vuDn2N5PzLnnDC+5+xkT3c8FRePfIetYce7Q8WGnROOXb4QRyddrH
-         dKsTwFJXGVwz+RBKpurUuY6WHO5wYEIoUqD4WTfh+oRQQdMAjvm48jeafOGDy4baz1Ld
-         wF2w==
-X-Gm-Message-State: AOJu0YxANubV1EAUw5CoilmlsSmGj4gKHGePRcIeYSubTNDYyyAxVcPA
-	AxKByFegGzmqRONN7HFN/+4vEn+T38dn713/97Ac4A3LfzPAp69WOXb8GkHErTbwSRsXmQBZKZ1
-	vI+utdtu6EVZX
-X-Received: by 2002:a05:6512:138a:b0:509:4767:57f9 with SMTP id fc10-20020a056512138a00b00509476757f9mr14592369lfb.55.1699381568555;
-        Tue, 07 Nov 2023 10:26:08 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFY5U6ZHCbnB22Laaorp8UUPfX4fVga+9jP7ekGNOGpsJcbnII5g2ApSfDHdjEjIugevNu1qA==
-X-Received: by 2002:a05:6512:138a:b0:509:4767:57f9 with SMTP id fc10-20020a056512138a00b00509476757f9mr14592351lfb.55.1699381568183;
-        Tue, 07 Nov 2023 10:26:08 -0800 (PST)
-Received: from starship ([89.237.99.95])
-        by smtp.gmail.com with ESMTPSA id n11-20020a5d400b000000b0032179c4a46dsm2992138wrp.100.2023.11.07.10.26.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Nov 2023 10:26:07 -0800 (PST)
-Message-ID: <56ea03e7db1d2b53f54d6779e76c7e9a99e19356.camel@redhat.com>
-Subject: Re: [PATCH 11/14] KVM: nVMX: hyper-v: Introduce
- nested_vmx_evmptr12() and nested_vmx_is_evmptr12_valid() helpers
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, Paolo
- Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: linux-kernel@vger.kernel.org
-Date: Tue, 07 Nov 2023 20:26:06 +0200
-In-Reply-To: <20231025152406.1879274-12-vkuznets@redhat.com>
-References: <20231025152406.1879274-1-vkuznets@redhat.com>
-	 <20231025152406.1879274-12-vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04351358B6;
+	Tue,  7 Nov 2023 18:33:05 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2062.outbound.protection.outlook.com [40.107.220.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57158125;
+	Tue,  7 Nov 2023 10:33:05 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eafjjeK2VTLERLD9Kn9FMAoDF/ujitHYedTVnOXKt9BffqG44lmWoVoSr/+PaYHwFSmF/0KaV/EvOVrImkRAaKmgHZlXCYlYW4MXLfVh9LfJU01r9YsOmzTNrJXxrL98qT7Yx/UHjoQ5sVMUJWJHCPibDL/kM2D6QuNNP9hs/DRBbI3xJ2aDaacShtZ3a1jdR+6TnA4Gtb6SgkRuJa8xjd+kiP1W8lh5Q3/3hkEcXsfsPR8qc48VijCImlgoxMbks6xWOy8+pigLxqjkXmepfNgI5IyVqQkynIOu+p9s9UVQVhJUR0ayhQ7KbK4akSobdHCJdpWdd4Orm2ehw4fXBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TSp+QH1DdOCpVqoJOXbgxOk7Iu0JcI9gw1oBTKmraLA=;
+ b=fq5Ur2rEp5WLVaAUgCmSp2KEsYGq+qJPVj3Km9OBIvpdX2iXe+pNREs1P9pVk2T2jYBdl4p76p8qqnyWREacaddoH5Jm1GxO4jn9dNf7Iv03dsX2/pKzb6vmd/crWf1VAUIyBptWv8FYzrKjJ3yzAwCJZaoe8ieQK8JH1+AK3wI6fvGFm+JZalqDzqdfq7ne0cwc+7UjGx+b3n2tDABAZR0Qfe6w/gvpvecP2QSEpVUbx2tNe51T3ba2KbBs4LOzAc6jUkVKQpWO0qtf9uJ+gfO9c+zksbOc9K2fM3E5X+zvRPQWfYWIgS7hPkiVMco2MitBNW9TK7Eza5eM/M/xDg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TSp+QH1DdOCpVqoJOXbgxOk7Iu0JcI9gw1oBTKmraLA=;
+ b=23+7iRWUk1pvVW82IXzcePmCWzLAsnoBzLZEsKN99tNWG5mzCEUa0xQxriNPkYfQ0gT0crLgRpf+DW3Rl5pkde3w2lWrv3EV1DPw7HkjYJifJhrMmNGmErA61U72k6cmjAnz7rCVj9UxjOQaolF7hf4GrfQAw1lkCTHE1tHYeUA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
+ by MN2PR12MB4533.namprd12.prod.outlook.com (2603:10b6:208:266::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.18; Tue, 7 Nov
+ 2023 18:33:02 +0000
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::e16e:d7f1:94ad:3021]) by BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::e16e:d7f1:94ad:3021%7]) with mapi id 15.20.6954.028; Tue, 7 Nov 2023
+ 18:33:02 +0000
+Message-ID: <8ec38db1-5ccf-4684-bc0d-d48579ebf0d0@amd.com>
+Date: Tue, 7 Nov 2023 12:32:58 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 06/50] x86/sev: Add the host SEV-SNP initialization
+ support
+To: Borislav Petkov <bp@alien8.de>, Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, hpa@zytor.com,
+ ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+ vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+ dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+ peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+ rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
+ kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+ marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+ alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
+ nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
+ zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-7-michael.roth@amd.com>
+ <20231107163142.GAZUpmbt/i3himIf+E@fat_crate.local>
+Content-Language: en-US
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Autocrypt: addr=thomas.lendacky@amd.com; keydata=
+ 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
+ 1NhFSLKvfA==
+In-Reply-To: <20231107163142.GAZUpmbt/i3himIf+E@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9P221CA0012.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:806:25::17) To BL1PR12MB5732.namprd12.prod.outlook.com
+ (2603:10b6:208:387::17)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|MN2PR12MB4533:EE_
+X-MS-Office365-Filtering-Correlation-Id: b9e99109-78db-4ec6-e280-08dbdfbff985
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	CCnnQyQtbT3wV+6sgVuSC6lTs6seO51K5HL/K+4bPEj5WxpKZ17XoMe19Zx9NCjyZ1QscFYX8yjUfPahDKCQd8krlQHtgYOkiSLhSo5cJAAYHyk2Mth4eyiBTB1U6kycz1TeL3oFNt+4rjuxWcZaja6ZnlSafOTa0BJGMuPZCDzOLx6Pycuei455b4eYUOjmfVb/BPlMZl3ae9Fkdaal1bkA5OoeuY+/5B0VpE4QHN0PHsrHQwRkD9tsuaxjQIXdzEjAWewHNYzcYnYB9KAc5vpSgmdNyRdGmQJZV2uSRYIqE6hQsrPWt0tVOWoO1Qqb6medfgS98UxuIxrwR7Spm/obVyDTTGz9RG0MXI1Hy8FGKrV0faWzDJ0a3oO9bMI5jc5977yTchGtq6Qoej6wLIXSVY+vNl5PXOpZ9N5hV5zZH3JLjBDZwfUxVQDctZxn6me6hJEcJ8XWMHuivTjJq3AEii8XMLWoJGLX6WrpHjax+fnvPFocWuXblwc2aangDzcfXJb5gh1bCs4+z5yZVGZ6DUJl5VOKNuZCxeBmrYv6CYwmf7qDn34VIENKLySYJBeaqVKdNmfhMX0PJVU2TkkyFsC3p9msNl24/nNR7dbTs5w/L7mmF75RCOVJdp6aaUTexPaYLZlhHSaL0JOPug==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(346002)(136003)(366004)(376002)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(83380400001)(6666004)(31696002)(2906002)(36756003)(110136005)(38100700002)(6486002)(66556008)(316002)(66476007)(6636002)(66946007)(86362001)(8676002)(8936002)(4326008)(478600001)(7416002)(7406005)(2616005)(6506007)(6512007)(53546011)(5660300002)(41300700001)(26005)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bm9Cc1lncWR0UnhuWTc1d0M5WDZsMWRxdTNXTFpjOGY1Q01EQzN2azd2M0RP?=
+ =?utf-8?B?SmRYWjUvbEdUQ1NCYXhTeWhaeGx6YWtkdHlzbnJjUWYxSjFZdnRLbzhqQmFw?=
+ =?utf-8?B?YUw2TE5NVW5UelhzNDRXWlNab1pBczArOUZqZ1FkbGNsaFZKbllQU292eDdr?=
+ =?utf-8?B?enVmV3dFcXNFdktraTVPaVJvYVhXVE04OVhnK3JKclo4M0N5MFVhWVkyVnY5?=
+ =?utf-8?B?N0tBbXJyUmJ2RHVTdEgrZmNNcG4yKy9GS3Z5NmIzTFVxb3JTZXQ3UHFwZExB?=
+ =?utf-8?B?WnNYbitWcDl3bk1QTXo3MkkwUXNtTmlMbGRHZGNEQ1lUZFFSb2hFYVVCWmpt?=
+ =?utf-8?B?ZHpxc3J4N0pYaitacHVFbnpmbWZFMXZRbEZKQUFsQW9sdm85enhaVGpvek9V?=
+ =?utf-8?B?OTl2RSt5aTAwNDZwUzNyTS9IR0VLOG5IZnk5aTg5WU5TNElrbSs5SGFGOHNm?=
+ =?utf-8?B?TUdWcHVaNnVvVGtxL1VYNnI4QXJOSjhmamc5Qmd0cGErNzg0ZndveXFHZ29N?=
+ =?utf-8?B?OTJ2eGdQWWR4UTRQOUxDYzM5Vm5INVFIblhjQ3lwc1JOakN0eFJ5anJHTHRL?=
+ =?utf-8?B?aTQ0OW5ZcFFLaURlSDlMbG44ekxzVHo0WGZqWFhUbytsMnM0c2s3MFFYRzNL?=
+ =?utf-8?B?Z3ljMGFqdUFldEc5UklYMXkwaHRTb2V5aFpGODJrbFRkbVJMd0dHSXF4aGdP?=
+ =?utf-8?B?WkRubTJKNXZSUUgrVFhRVllKZzBMbHRjUVBmYUtML3UzeGhlNkhYQTNMc2Mx?=
+ =?utf-8?B?b3MwSlcxWVMvRldBRWhxMEpJWmU3TkZqbmVwTk9ndmh5NTNuLy9YVjdHdVRY?=
+ =?utf-8?B?eEY1aEJUc3VvWFRvQlI3dGxRREJHZFlsNCtyR0xLYlhBd0Q5dTZ3NHdEWG5N?=
+ =?utf-8?B?bEdJSFNEMjNkdStHeWNPOXZ1Nnl6VUJ4N0VRSkFidWNEcXFQS0lpT09BZklx?=
+ =?utf-8?B?VjJ4ZGdRdUtBU3NSSmwranViS3R2dlRiTVI4aE5xUkdHclhkOCtHVU1OelNR?=
+ =?utf-8?B?MnQrM0ZDUkRubk13b2Nuc1V6SnZhUExYRksyWnBJZ01HTm9rVVhwSFRFNFFE?=
+ =?utf-8?B?S1VMalR0WXFwRGp5RGNPYUdNdmYrQW1PN0lzQ0h2VTlObVFZenNDNHU5akNp?=
+ =?utf-8?B?cThNS3ByUDFySDlOSDBHYXExN1B0d24vSHdDeWM2dHJYb2VqOFBWWTNLK3pV?=
+ =?utf-8?B?cjRlR0I2UzVYVVk5YzIvaDdKL24wVjE1dEVTOU1qUFZzNUtQbXEwaHpEM1li?=
+ =?utf-8?B?TmpzbUlDUUxjZjF2czNmRm9JOUZTZnlnWHlwMmgrL1NUUzVEamV5cFEyMldh?=
+ =?utf-8?B?TURLbndieDY5SWtNS04yK2t6UEp2MXJzMS9NVm5adi9vekJvOUJGV0pNRjFj?=
+ =?utf-8?B?VnQvQmJMQlBsdDN3NFJmaWdKanRrclJvSUZIWk5uSmVZSVRiWUdJMHZCZ2M4?=
+ =?utf-8?B?Y0hCV1dUUWhsdFlka3FXWWdUd3lvSnQvbkZCV0MrTmNzaHlINVFLSHFlWDlv?=
+ =?utf-8?B?QmVaTFRZa0FUakovamphUDhoSjM5VHJPTDEwN3FrZVVKaVlDa1hmVDRmeStv?=
+ =?utf-8?B?Y0txRUdIa1RqdnpKQTJzSjBxUTAwUlhHTFZPZWNzeGdoRTU2dHA0R1I0eVVN?=
+ =?utf-8?B?ZGxKWEFDdGtvYlFHV0RwWkpwWGRNVVNxdVlLd0JiWjh3N0tEMHRhbVdnS1Iz?=
+ =?utf-8?B?T3dkdWtQdk5KdjJ4UWZ6Z1ZHeE9pZ3B1YkR0aTNDWWJQUkNoTlc5NHR0K0s3?=
+ =?utf-8?B?bUlyekpLc2FEM3dLSlArUk15VVdRUmxFMFpBZTUvY25XUVEybVNheFc5QXFX?=
+ =?utf-8?B?bEFTKzNuRkNXUFpySGcxdmVlVFFSYWdselNObXRQZTV2SXJ6RGxLMUdidHFr?=
+ =?utf-8?B?TTliTWJUbWJZMXVMYlhUWHY0TVZVUWdOdGpXTEZOcE85V1B5ZEJQbEtkS2ZG?=
+ =?utf-8?B?Q01RYzdLVEdyOU9KbzlOdDBVa29ZcG9xT2hmTmh1VzlSSktybThMQ21EdEh1?=
+ =?utf-8?B?Nmd2YUdjdWtBVmgvT3pzSmJlNWxmV1NtbkdKanAvUG1ZejlDaDk4ZTFsZmp3?=
+ =?utf-8?B?ZC9oUnVUYmhoajFFaElrckV1aWxxSmo5b1ZML3FXMi9WVzNkS2wxV08zcXZh?=
+ =?utf-8?Q?m+BdDCodxm0k+gkt8RjiURscP?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b9e99109-78db-4ec6-e280-08dbdfbff985
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2023 18:33:02.2923
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WO6kaRsLBpLh8P25WXOLCk6Q0FVppHEfLHRFGS/2s4ukqKOJoowUJ8rzC9N8Qjn3WnXbLWWgbNmIM9Djvmbxfg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4533
 
-On Wed, 2023-10-25 at 17:24 +0200, Vitaly Kuznetsov wrote:
-> 'vmx->nested.hv_evmcs_vmptr' accesses are all over the place so hiding
-> 'hv_evmcs_vmptr' under 'ifdef CONFIG_KVM_HYPERV' would take a lot of
-> ifdefs. Introduce 'nested_vmx_evmptr12()' accessor and
-> 'nested_vmx_is_evmptr12_valid()' checker instead. Note, several explicit
+On 11/7/23 10:31, Borislav Petkov wrote:
+> On Mon, Oct 16, 2023 at 08:27:35AM -0500, Michael Roth wrote:
+>> +static bool early_rmptable_check(void)
+>> +{
+>> +	u64 rmp_base, rmp_size;
+>> +
+>> +	/*
+>> +	 * For early BSP initialization, max_pfn won't be set up yet, wait until
+>> +	 * it is set before performing the RMP table calculations.
+>> +	 */
+>> +	if (!max_pfn)
+>> +		return true;
 > 
->   nested_vmx_evmptr12(vmx) != EVMPTR_INVALID
-> 
-> comparisons exist for a reson: 'nested_vmx_is_evmptr12_valid()' also checks
-> against 'EVMPTR_MAP_PENDING' and in these places this is undesireable. It
-> is possible to e.g. introduce 'nested_vmx_is_evmptr12_invalid()' and turn
-> these sites into
-> 
->   !nested_vmx_is_evmptr12_invalid(vmx)
-> 
-> eliminating the need for 'nested_vmx_evmptr12()' but this seems to create
-> even more confusion.
-Makes sense.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/kvm/vmx/hyperv.h | 10 +++++++++
->  arch/x86/kvm/vmx/nested.c | 44 +++++++++++++++++++--------------------
->  arch/x86/kvm/vmx/nested.h |  2 +-
->  3 files changed, 33 insertions(+), 23 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/hyperv.h b/arch/x86/kvm/vmx/hyperv.h
-> index 933ef6cad5e6..ba1a95ea72b7 100644
-> --- a/arch/x86/kvm/vmx/hyperv.h
-> +++ b/arch/x86/kvm/vmx/hyperv.h
-> @@ -4,6 +4,7 @@
->  
->  #include <linux/kvm_host.h>
->  #include "vmcs12.h"
-> +#include "vmx.h"
->  
->  #define EVMPTR_INVALID (-1ULL)
->  #define EVMPTR_MAP_PENDING (-2ULL)
-> @@ -20,7 +21,14 @@ enum nested_evmptrld_status {
->  	EVMPTRLD_ERROR,
->  };
->  
-> +struct vcpu_vmx;
-> +
->  #ifdef CONFIG_KVM_HYPERV
-> +static inline gpa_t nested_vmx_evmptr12(struct vcpu_vmx *vmx) { return vmx->nested.hv_evmcs_vmptr; }
-> +static inline bool nested_vmx_is_evmptr12_valid(struct vcpu_vmx *vmx)
-> +{
-> +	return evmptr_is_valid(vmx->nested.hv_evmcs_vmptr);
-> +}
->  u64 nested_get_evmptr(struct kvm_vcpu *vcpu);
->  uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu);
->  int nested_enable_evmcs(struct kvm_vcpu *vcpu,
-> @@ -30,6 +38,8 @@ int nested_evmcs_check_controls(struct vmcs12 *vmcs12);
->  bool nested_evmcs_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu);
->  void vmx_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu);
->  #else
-> +static inline gpa_t nested_vmx_evmptr12(struct vcpu_vmx *vmx) { return EVMPTR_INVALID; }
-> +static inline bool nested_vmx_is_evmptr12_valid(struct vcpu_vmx *vmx) { return false; }
->  static inline u64 nested_get_evmptr(struct kvm_vcpu *vcpu) { return EVMPTR_INVALID; }
->  static inline void nested_evmcs_filter_control_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 *pdata) {}
->  static inline bool nested_evmcs_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu) { return false; }
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index d0d735974b2c..b45586588bae 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -179,7 +179,7 @@ static int nested_vmx_failValid(struct kvm_vcpu *vcpu,
->  	 * VM_INSTRUCTION_ERROR is not shadowed. Enlightened VMCS 'shadows' all
->  	 * fields and thus must be synced.
->  	 */
-> -	if (to_vmx(vcpu)->nested.hv_evmcs_vmptr != EVMPTR_INVALID)
-> +	if (nested_vmx_evmptr12(to_vmx(vcpu)) != EVMPTR_INVALID)
->  		to_vmx(vcpu)->nested.need_vmcs12_to_shadow_sync = true;
->  
->  	return kvm_skip_emulated_instruction(vcpu);
-> @@ -194,7 +194,7 @@ static int nested_vmx_fail(struct kvm_vcpu *vcpu, u32 vm_instruction_error)
->  	 * can't be done if there isn't a current VMCS.
->  	 */
->  	if (vmx->nested.current_vmptr == INVALID_GPA &&
-> -	    !evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
-> +	    !nested_vmx_is_evmptr12_valid(vmx))
->  		return nested_vmx_failInvalid(vcpu);
->  
->  	return nested_vmx_failValid(vcpu, vm_instruction_error);
-> @@ -230,7 +230,7 @@ static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
->  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  
-> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
-> +	if (nested_vmx_is_evmptr12_valid(vmx)) {
->  		kvm_vcpu_unmap(vcpu, &vmx->nested.hv_evmcs_map, true);
->  		vmx->nested.hv_evmcs = NULL;
->  	}
-> @@ -2011,7 +2011,7 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
->  		return EVMPTRLD_DISABLED;
->  	}
->  
-> -	if (unlikely(evmcs_gpa != vmx->nested.hv_evmcs_vmptr)) {
-> +	if (unlikely(evmcs_gpa != nested_vmx_evmptr12(vmx))) {
->  		vmx->nested.current_vmptr = INVALID_GPA;
->  
->  		nested_release_evmcs(vcpu);
-> @@ -2089,7 +2089,7 @@ void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  
-> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
-> +	if (nested_vmx_is_evmptr12_valid(vmx))
->  		copy_vmcs12_to_enlightened(vmx);
->  	else
->  		copy_vmcs12_to_shadow(vmx);
-> @@ -2243,7 +2243,7 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct loaded_vmcs *vmcs0
->  	u32 exec_control;
->  	u64 guest_efer = nested_vmx_calc_efer(vmx, vmcs12);
->  
-> -	if (vmx->nested.dirty_vmcs12 || evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
-> +	if (vmx->nested.dirty_vmcs12 || nested_vmx_is_evmptr12_valid(vmx))
->  		prepare_vmcs02_early_rare(vmx, vmcs12);
->  
->  	/*
-> @@ -2538,11 +2538,11 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  	bool load_guest_pdptrs_vmcs12 = false;
->  
-> -	if (vmx->nested.dirty_vmcs12 || evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
-> +	if (vmx->nested.dirty_vmcs12 || nested_vmx_is_evmptr12_valid(vmx)) {
->  		prepare_vmcs02_rare(vmx, vmcs12);
->  		vmx->nested.dirty_vmcs12 = false;
->  
-> -		load_guest_pdptrs_vmcs12 = !evmptr_is_valid(vmx->nested.hv_evmcs_vmptr) ||
-> +		load_guest_pdptrs_vmcs12 = !nested_vmx_is_evmptr12_valid(vmx) ||
->  			!(vmx->nested.hv_evmcs->hv_clean_fields &
->  			  HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1);
->  	}
-> @@ -2665,7 +2665,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
->  	 * bits when it changes a field in eVMCS. Mark all fields as clean
->  	 * here.
->  	 */
-> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
-> +	if (nested_vmx_is_evmptr12_valid(vmx))
->  		vmx->nested.hv_evmcs->hv_clean_fields |=
->  			HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL;
->  
-> @@ -3173,7 +3173,7 @@ static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
->  	 * properly reflected.
->  	 */
->  	if (guest_cpuid_has_evmcs(vcpu) &&
-> -	    vmx->nested.hv_evmcs_vmptr == EVMPTR_MAP_PENDING) {
-> +	    nested_vmx_evmptr12(vmx) == EVMPTR_MAP_PENDING) {
->  		enum nested_evmptrld_status evmptrld_status =
->  			nested_vmx_handle_enlightened_vmptrld(vcpu, false);
->  
-> @@ -3543,7 +3543,7 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
->  
->  	load_vmcs12_host_state(vcpu, vmcs12);
->  	vmcs12->vm_exit_reason = exit_reason.full;
-> -	if (enable_shadow_vmcs || evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
-> +	if (enable_shadow_vmcs || nested_vmx_is_evmptr12_valid(vmx))
->  		vmx->nested.need_vmcs12_to_shadow_sync = true;
->  	return NVMX_VMENTRY_VMEXIT;
->  }
-> @@ -3576,7 +3576,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
->  	if (CC(evmptrld_status == EVMPTRLD_VMFAIL))
->  		return nested_vmx_failInvalid(vcpu);
->  
-> -	if (CC(!evmptr_is_valid(vmx->nested.hv_evmcs_vmptr) &&
-> +	if (CC(!nested_vmx_is_evmptr12_valid(vmx) &&
->  	       vmx->nested.current_vmptr == INVALID_GPA))
->  		return nested_vmx_failInvalid(vcpu);
->  
-> @@ -3591,7 +3591,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
->  	if (CC(vmcs12->hdr.shadow_vmcs))
->  		return nested_vmx_failInvalid(vcpu);
->  
-> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
-> +	if (nested_vmx_is_evmptr12_valid(vmx)) {
->  		copy_enlightened_to_vmcs12(vmx, vmx->nested.hv_evmcs->hv_clean_fields);
->  		/* Enlightened VMCS doesn't have launch state */
->  		vmcs12->launch_state = !launch;
-> @@ -4336,11 +4336,11 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  
-> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
-> +	if (nested_vmx_is_evmptr12_valid(vmx))
->  		sync_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
->  
->  	vmx->nested.need_sync_vmcs02_to_vmcs12_rare =
-> -		!evmptr_is_valid(vmx->nested.hv_evmcs_vmptr);
-> +		!nested_vmx_is_evmptr12_valid(vmx);
->  
->  	vmcs12->guest_cr0 = vmcs12_guest_cr0(vcpu, vmcs12);
->  	vmcs12->guest_cr4 = vmcs12_guest_cr4(vcpu, vmcs12);
-> @@ -4861,7 +4861,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
->  	}
->  
->  	if ((vm_exit_reason != -1) &&
-> -	    (enable_shadow_vmcs || evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)))
-> +	    (enable_shadow_vmcs || nested_vmx_is_evmptr12_valid(vmx)))
->  		vmx->nested.need_vmcs12_to_shadow_sync = true;
->  
->  	/* in case we halted in L2 */
-> @@ -5327,7 +5327,7 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
->  					   vmptr + offsetof(struct vmcs12,
->  							    launch_state),
->  					   &zero, sizeof(zero));
-> -	} else if (vmx->nested.hv_evmcs && vmptr == vmx->nested.hv_evmcs_vmptr) {
-> +	} else if (vmx->nested.hv_evmcs && vmptr == nested_vmx_evmptr12(vmx)) {
->  		nested_release_evmcs(vcpu);
->  	}
->  
-> @@ -5367,7 +5367,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
->  	/* Decode instruction info and find the field to read */
->  	field = kvm_register_read(vcpu, (((instr_info) >> 28) & 0xf));
->  
-> -	if (!evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
-> +	if (!nested_vmx_is_evmptr12_valid(vmx)) {
->  		/*
->  		 * In VMX non-root operation, when the VMCS-link pointer is INVALID_GPA,
->  		 * any VMREAD sets the ALU flags for VMfailInvalid.
-> @@ -5593,7 +5593,7 @@ static int handle_vmptrld(struct kvm_vcpu *vcpu)
->  		return nested_vmx_fail(vcpu, VMXERR_VMPTRLD_VMXON_POINTER);
->  
->  	/* Forbid normal VMPTRLD if Enlightened version was used */
-> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
-> +	if (nested_vmx_is_evmptr12_valid(vmx))
->  		return 1;
->  
->  	if (vmx->nested.current_vmptr != vmptr) {
-> @@ -5656,7 +5656,7 @@ static int handle_vmptrst(struct kvm_vcpu *vcpu)
->  	if (!nested_vmx_check_permission(vcpu))
->  		return 1;
->  
-> -	if (unlikely(evmptr_is_valid(to_vmx(vcpu)->nested.hv_evmcs_vmptr)))
-> +	if (unlikely(nested_vmx_is_evmptr12_valid(to_vmx(vcpu))))
->  		return 1;
->  
->  	if (get_vmx_mem_address(vcpu, exit_qual, instr_info,
-> @@ -6442,7 +6442,7 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
->  			kvm_state.size += sizeof(user_vmx_nested_state->vmcs12);
->  
->  			/* 'hv_evmcs_vmptr' can also be EVMPTR_MAP_PENDING here */
-> -			if (vmx->nested.hv_evmcs_vmptr != EVMPTR_INVALID)
-> +			if (nested_vmx_evmptr12(vmx) != EVMPTR_INVALID)
->  				kvm_state.flags |= KVM_STATE_NESTED_EVMCS;
->  
->  			if (is_guest_mode(vcpu) &&
-> @@ -6498,7 +6498,7 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
->  	} else  {
->  		copy_vmcs02_to_vmcs12_rare(vcpu, get_vmcs12(vcpu));
->  		if (!vmx->nested.need_vmcs12_to_shadow_sync) {
-> -			if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
-> +			if (nested_vmx_is_evmptr12_valid(vmx))
->  				/*
->  				 * L1 hypervisor is not obliged to keep eVMCS
->  				 * clean fields data always up-to-date while
-> diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-> index b0f2e26c1aea..0cedb80c5c94 100644
-> --- a/arch/x86/kvm/vmx/nested.h
-> +++ b/arch/x86/kvm/vmx/nested.h
-> @@ -58,7 +58,7 @@ static inline int vmx_has_valid_vmcs12(struct kvm_vcpu *vcpu)
->  
->  	/* 'hv_evmcs_vmptr' can also be EVMPTR_MAP_PENDING here */
->  	return vmx->nested.current_vmptr != -1ull ||
-> -		vmx->nested.hv_evmcs_vmptr != EVMPTR_INVALID;
-> +		nested_vmx_evmptr12(vmx) != EVMPTR_INVALID;
->  }
->  
->  static inline u16 nested_get_vpid02(struct kvm_vcpu *vcpu)
+> This already says that this is called at the wrong point during init.
 
+(Just addressing some of your comments, Mike to address others)
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+I commented earlier that we can remove this check and then it becomes 
+purely a check for whether the RMP table has been pre-allocated by the 
+BIOS. It is done early here in order to allow for AutoIBRS to be used as a 
+Spectre mitigation. If an RMP table has not been allocated by BIOS then 
+the SNP feature can be cleared, allowing AutoIBRS to be used, if available.
 
-Best regards,
-	Maxim Levitsky
+> 
+> Right now we have
+> 
+> early_identify_cpu -> early_init_amd -> early_detect_mem_encrypt
+> 
+> which runs only on the BSP but then early_init_amd() is called in
+> init_amd() too so that it takes care of the APs too.
+> 
+> Which ends up doing a lot of unnecessary work on each AP in
+> early_detect_mem_encrypt() like calculating the RMP size on each AP
+> unnecessarily where this needs to happen exactly once.
+> 
+> Is there any reason why this function cannot be moved to init_amd()
+> where it'll do the normal, per-AP init?
 
+It needs to be called early enough to allow for AutoIBRS to not be 
+disabled just because SNP is supported. By calling it where it is 
+currently called, the SNP feature can be cleared if, even though 
+supported, SNP can't be used, allowing AutoIBRS to be used as a more 
+performant Spectre mitigation.
+
+> 
+> And the stuff that needs to happen once, needs to be called once too.
+> 
+>> +
+>> +	return snp_get_rmptable_info(&rmp_base, &rmp_size);
+>> +}
+>> +
+>>   static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
+>>   {
+>>   	u64 msr;
+>> @@ -659,6 +674,9 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
+>>   		if (!(msr & MSR_K7_HWCR_SMMLOCK))
+>>   			goto clear_sev;
+>>   
+>> +		if (cpu_has(c, X86_FEATURE_SEV_SNP) && !early_rmptable_check())
+>> +			goto clear_snp;
+>> +
+>>   		return;
+>>   
+>>   clear_all:
+>> @@ -666,6 +684,7 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
+>>   clear_sev:
+>>   		setup_clear_cpu_cap(X86_FEATURE_SEV);
+>>   		setup_clear_cpu_cap(X86_FEATURE_SEV_ES);
+>> +clear_snp:
+>>   		setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
+>>   	}
+>>   }
+> 
+> ...
+> 
+>> +bool snp_get_rmptable_info(u64 *start, u64 *len)
+>> +{
+>> +	u64 max_rmp_pfn, calc_rmp_sz, rmp_sz, rmp_base, rmp_end;
+>> +
+>> +	rdmsrl(MSR_AMD64_RMP_BASE, rmp_base);
+>> +	rdmsrl(MSR_AMD64_RMP_END, rmp_end);
+>> +
+>> +	if (!(rmp_base & RMP_ADDR_MASK) || !(rmp_end & RMP_ADDR_MASK)) {
+>> +		pr_err("Memory for the RMP table has not been reserved by BIOS\n");
+>> +		return false;
+>> +	}
+> 
+> If you're masking off bits 0-12 above...
+
+Because the RMP_END MSR, most specifically, has a default value of 0x1fff, 
+where bits [12:0] are reserved. So to specifically check if the MSR has 
+been set to a non-zero end value, the bit are masked off. However, ...
+
+> 
+>> +
+>> +	if (rmp_base > rmp_end) {
+> 
+> ... why aren't you using the masked out vars further on?
+
+... the full values can be used once they have been determined to not be zero.
+
+> 
+> I know, the hw will say, yeah, those bits are 0 but still. IOW, do:
+> 
+> 	rmp_base &= RMP_ADDR_MASK;
+> 	rmp_end  &= RMP_ADDR_MASK;
+> 
+> after reading them.
+
+You can't for RMP_END since it will always have bits 12:0 set to one and 
+you shouldn't clear them once you know that the MSR has truly been set.
+
+Thanks,
+Tom
+
+> 
 
