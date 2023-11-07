@@ -1,295 +1,291 @@
-Return-Path: <kvm+bounces-892-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-893-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57CF57E41CC
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 15:28:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 286B47E41F4
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 15:39:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DD72281117
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 14:28:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DD13B20DA9
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 14:39:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D8B73158C;
-	Tue,  7 Nov 2023 14:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 323F030D1B;
+	Tue,  7 Nov 2023 14:39:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z0br5Ufz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a0HadBcO"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10E7430FB2
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 14:28:22 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51DD0C1
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 06:28:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699367299;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yQz7XDRqpRcOvl1El/TeTwltdvqTAcyN8GLW2xo3nRI=;
-	b=Z0br5UfzE+RDrgfodAJyJ8WfLjfZNYjizUINd6u1sPlEsI69khSEbqMXkxAuuF+IU3813Q
-	hFqCObvy3rNRa+h/1fudkVGPThhHqw3NnuVp1Cj2fZBCpy/H5iNNwbGr7WKOhOCdb6JoLb
-	v5Zyd2WdJuaRmPYrpmIY4c3xawijjng=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-379-D8brIUHcOt6T8PYSJfpphg-1; Tue, 07 Nov 2023 09:28:18 -0500
-X-MC-Unique: D8brIUHcOt6T8PYSJfpphg-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-66d1e755077so71057586d6.0
-        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 06:28:17 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A1B1426A
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 14:39:37 +0000 (UTC)
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39BDDD77
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 06:39:33 -0800 (PST)
+Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-66d0f945893so47139846d6.1
+        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 06:39:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699367972; x=1699972772; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9yWUxtco4+SHtMfDkrQFL/rv2xiDn8sNB7VvrAl+j00=;
+        b=a0HadBcO9L6wge+xFkmXvQsQ+4y25Mq48FkUSZYGLV0jAXXGHs7ApM1Og/RPxjiN1T
+         Fr9hBOnagPhsrM0/CZ5sXHTdbACqtxVK8orwWPYn6sInsauLXLloQcLok4HYxcNImFxC
+         vMtgDMBPIsxq5i4B4HpcUNVwIAvTzdvod11hzHcBMw9FI7EP+8UbUbxvRaVFSqQFzY1+
+         VyrI/qScOyIiRxnrFPbsQL3XTX4OzEwkX4ExcnH1XeGfEZeJYob8NydL+qPmcyMNdpe5
+         Kaq73dWMAdf/ojYp0k6tnUOGhowrxoi4YPbEVqIQklHGE0ViHDoK6rRFgVbXawy4Ev97
+         mNFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699367297; x=1699972097;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yQz7XDRqpRcOvl1El/TeTwltdvqTAcyN8GLW2xo3nRI=;
-        b=uGUg66dBeX91eltQ/kC06FGBSjVwcqTuhW+Qnd8EQF7n+ZtW0WcLTkbSb4XJT8dGmK
-         FLU4nWlbwU9qtkheLgL1L7w35WsJttezNxi7G90TVkpAiq9GTDZh1HqTh1rEzCSHqDBh
-         GvlUXCWxj/wS6dXc8/En5v1NYLXETi/JzzKK64NdTb5IcG0WU2ZbgTQQ8AqHlxz7IDDK
-         26/rc2WX/v+F02/4UODyshtPhUnYnlCxQfvZ9iGpUjwYSVT1gMIUS0Y5eyJ5c4nZETaf
-         +UAYKognFb7BrrqFCrTs3Dt6yHxJaTn5VI7uNPth0vKAlu5g3Jtg/pYswVv4DkxAkYGt
-         veOw==
-X-Gm-Message-State: AOJu0Ywqf/O7Fw+shmXh/euJkdhdn1GNiopTZ6WXCHaFaIcFknXaCBnX
-	Le7Yor5DK8x3Vsty3BF8QsaN1stHeOXdVzdXKAvvwTSlh9aJ1e49mEiOpMg610xrTzYUwggeG7x
-	3wDXy8EvS8N0h
-X-Received: by 2002:a05:6214:21e3:b0:66d:2eb6:f3f6 with SMTP id p3-20020a05621421e300b0066d2eb6f3f6mr33303066qvj.32.1699367297374;
-        Tue, 07 Nov 2023 06:28:17 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFrhbICCqAcrRSt7nl5/ozJ8pTsPUjIlvisA6dHwVEpq2Z/yEIywToGrfLz5HB582YC0J2ioA==
-X-Received: by 2002:a05:6214:21e3:b0:66d:2eb6:f3f6 with SMTP id p3-20020a05621421e300b0066d2eb6f3f6mr33303043qvj.32.1699367297017;
-        Tue, 07 Nov 2023 06:28:17 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id e16-20020a056214111000b00670a8921170sm4405134qvs.112.2023.11.07.06.28.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Nov 2023 06:28:16 -0800 (PST)
-Message-ID: <78773d4c-21b6-4366-a1ec-da42286d2458@redhat.com>
-Date: Tue, 7 Nov 2023 15:28:12 +0100
+        d=1e100.net; s=20230601; t=1699367972; x=1699972772;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9yWUxtco4+SHtMfDkrQFL/rv2xiDn8sNB7VvrAl+j00=;
+        b=kHGWM4VftpRDQoy/m/1QTBDgzmKReo5Pb/4+CTH/GJFrayNU+nGSkdwmQK8EvoPn59
+         m/GPPXhG3oTqzyyKPo6liFMWQ5mxxLAopeOHOQpoyLDt9MB628z6PLzpH1bqVElTfbDP
+         e3j6Ywo16GzjeAsM3+vjAbzN7uNQTuDMuzoWoHPyzRbOzVVWTj7UWek2fdPAEr0IErXb
+         qT+ftC3e5jly8TgmD0C1pD5Xgr7btV+M4XezlDtFS/lxaxXSIVfxrkIU3toitCBh+Wum
+         +lWJ29KNI2jretU9oAC7Jdno5aHXefIh4hzT1a8G7Xb48BwJdLrvIimhnaxpwmn2f4Tb
+         3HAg==
+X-Gm-Message-State: AOJu0Yw/NzBD6Dy4YnPxSQB8O6tStRHtXtdY+hiCv6a9j3TFJU6Xkaef
+	4fzCzakTF6geWFYqlbtT8eU+EVBvcJpcIDc+QHJiwQ==
+X-Google-Smtp-Source: AGHT+IENouhYwfq0zksB9smEGLB+VMdhNNrCcscvQWBkeUX0Zkluj03/Xo1edckn4e3jUv+DeKenqbsHwG9y+w7RhbQ=
+X-Received: by 2002:a05:6214:5297:b0:66f:abb4:49ff with SMTP id
+ kj23-20020a056214529700b0066fabb449ffmr3397127qvb.7.1699367972171; Tue, 07
+ Nov 2023 06:39:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH] arm: pmu-overflow-interrupt: Increase
- count values
-Content-Language: en-US
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- andrew.jones@linux.dev, maz@kernel.org, oliver.upton@linux.dev,
- jarichte@redhat.com
-References: <20231103100139.55807-1-eric.auger@redhat.com>
- <ZUoIxznZwPyti254@monolith> <5d93f447-c2c5-4c41-b0ea-9108736a2372@redhat.com>
- <ZUpEPbILA-idXISd@monolith>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <ZUpEPbILA-idXISd@monolith>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-34-pbonzini@redhat.com>
+In-Reply-To: <20231105163040.14904-34-pbonzini@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 7 Nov 2023 14:38:55 +0000
+Message-ID: <CA+EHjTw4C-3E+V0WsC68DtKRjqCt+d7M=q3STM48fKHiy4GvSw@mail.gmail.com>
+Subject: Re: [PATCH 33/34] KVM: selftests: Test KVM exit behavior for private memory/access
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Sean Christopherson <seanjc@google.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 11/7/23 15:05, Alexandru Elisei wrote:
-> On Tue, Nov 07, 2023 at 02:34:05PM +0100, Eric Auger wrote:
->> Hi Alexandru,
->>
->> On 11/7/23 10:52, Alexandru Elisei wrote:
->>> Hi Eric,
->>>
->>> On Fri, Nov 03, 2023 at 11:01:39AM +0100, Eric Auger wrote:
->>>> On some hardware, some pmu-overflow-interrupt failures can be observed.
->>>> Although the even counter overflows, the interrupt is not seen as
->>>> expected. This happens in the subtest after "promote to 64-b" comment.
->>>> After analysis, the PMU overflow interrupt actually hits, ie.
->>>> kvm_pmu_perf_overflow() gets called and KVM_REQ_IRQ_PENDING is set,
->>>> as expected. However the PMCR.E is reset by the handle_exit path, at
->>>> kvm_pmu_handle_pmcr() before the next guest entry and
->>>> kvm_pmu_flush_hwstate/kvm_pmu_update_state subsequent call.
->>>> There, since the enable bit has been reset, kvm_pmu_update_state() does
->>>> not inject the interrupt into the guest.
->>>>
->>>> This does not seem to be a KVM bug but rather an unfortunate
->>>> scenario where the test disables the PMCR.E too closely to the
->>>> advent of the overflow interrupt.
->>> If I understand correctly, the KVM PMU, after receiving the hardware PMUIRQ and
->>> before injecting the interrupt, checks that the PMU is enabled according to the
->>> pseudocode for the function CheckForPMUOverflow(). CheckForPMUOverflow() returns
->>> false because PMCR_EL1.E is 0, so the KVM PMU decides not to inject the
->>> interrupt.
->>>
->>> Is that correct?
->> Yes that's correct
->>> Changing the number of SW_INCR events might not be optimal - for example,
->>> COUNT_INT > 100 might hide an error that otherwise would have been triggered if
->>> the number of events were 100. Not very likely, but still a possibility.
->> I also changed the COUNT for SW_INCR events to unify the code. However
->> this is not strictly necessary to fix the issue I encounter. I can
->> revert that change if you prefer.
-> I don't understand how that would solve the problem. As I see it, the problem is
-> that PMCR_EL1.E is cleared too fast after the PMU asserts the interrupt on
-> overflow, not the time it takes to get to the overflow condition (i.e, the
-> number of iterations mem_access_loop() does).
-
-sorry I did not make my point clear. Indeed wrt SW_INCR overflow testing
-I do not intend to fix any issue by this change. I just intended to use
-the same number of iterations as for mem_access. So I will revert that
-change.
+On Sun, Nov 5, 2023 at 4:35=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
 >
->>> Another approach would be to wait for a set amount of time for the CPU to take
->>> the interrupt. There's something similar in timer.c::{test_timer_tval(),
->>> timer_do_wfi()}.
->> you're right. However this would urge me to have a separate asm code
->> that loops with wfi after doing the mem_access loop. I am not sure this
->> is worth the candle here?
-> I think plain C would work, I was thinking something like this:
+> From: Ackerley Tng <ackerleytng@google.com>
 >
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index a91a7b1fd4be..fb2eb5fa2e50 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -979,6 +979,23 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->         /* interrupts are disabled (PMINTENSET_EL1 == 0) */
+> "Testing private access when memslot gets deleted" tests the behavior
+> of KVM when a private memslot gets deleted while the VM is using the
+> private memslot. When KVM looks up the deleted (slot =3D NULL) memslot,
+> KVM should exit to userspace with KVM_EXIT_MEMORY_FAULT.
 >
->         mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-Currently PMCR_E is reset by mem_access_loop() (at msr pmcr_el0,
-xzr\n"). so if we want to introduce a delay between the overflow
-interrupt and the PMCR.E disable, we need to either add extra MEM_ACCESS
-or do wfi within mem_access_loop()
-Or we do something like what you suggest below and reset the PMCR_E
-afterwards with the downside to add extra code execution accounted by
-the PMU. I would prefer to avoid that since the purpose of having the
-asm code was to "master" what we measure.
+> In the second test, upon a private access to non-private memslot, KVM
+> should also exit to userspace with KVM_EXIT_MEMORY_FAULT.
+
+nit: The commit message is referring to private memslots, which might
+need rewording with the latest changes in v14.
+
+> Intentionally don't take a requirement on KVM_CAP_GUEST_MEMFD,
+> KVM_CAP_MEMORY_FAULT_INFO, KVM_MEMORY_ATTRIBUTE_PRIVATE, etc., as it's a
+> KVM bug to advertise KVM_X86_SW_PROTECTED_VM without its prerequisites.
+>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> [sean: call out the similarities with set_memory_region_test]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Message-Id: <20231027182217.3615211-36-seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../kvm/x86_64/private_mem_kvm_exits_test.c   | 120 ++++++++++++++++++
+>  2 files changed, 121 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/private_mem_kvm_ex=
+its_test.c
+>
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftes=
+ts/kvm/Makefile
+> index fd3b30a4ca7b..69ce8e06b3a3 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -92,6 +92,7 @@ TEST_GEN_PROGS_x86_64 +=3D x86_64/nested_exceptions_tes=
+t
+>  TEST_GEN_PROGS_x86_64 +=3D x86_64/platform_info_test
+>  TEST_GEN_PROGS_x86_64 +=3D x86_64/pmu_event_filter_test
+>  TEST_GEN_PROGS_x86_64 +=3D x86_64/private_mem_conversions_test
+> +TEST_GEN_PROGS_x86_64 +=3D x86_64/private_mem_kvm_exits_test
+>  TEST_GEN_PROGS_x86_64 +=3D x86_64/set_boot_cpu_id
+>  TEST_GEN_PROGS_x86_64 +=3D x86_64/set_sregs_test
+>  TEST_GEN_PROGS_x86_64 +=3D x86_64/smaller_maxphyaddr_emulation_test
+> diff --git a/tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_tes=
+t.c b/tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
+> new file mode 100644
+> index 000000000000..2f02f6128482
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
+> @@ -0,0 +1,120 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2022, Google LLC.
+
+nit: 2023
+
+Nits aside:
+Reviewed-by: Fuad Tabba <tabba@google.com>
+Tested-by: Fuad Tabba <tabba@google.com>
+
+Cheers,
+/fuad
+
+
+
+
+> + */
+> +#include <linux/kvm.h>
+> +#include <pthread.h>
+> +#include <stdint.h>
 > +
-> +       if (!expect_interrupts(0)) {
-> +                for (i = 0; i < 10; i++) {
-> +                       local_irq_disable();
-> +                       if (expect_interrupts(0)) {
-> +                               local_irq_enable();
-> +                               break;
-> +                       }
-> +                       report_info("waiting for interrupt...");
-> +                       wfi();
-> +                       local_irq_enable();
-> +                       if (expect_interrupts(0))
-> +                               break;
-> +                        mdelay(100);
-> +                }
+> +#include "kvm_util.h"
+> +#include "processor.h"
+> +#include "test_util.h"
+> +
+> +/* Arbitrarily selected to avoid overlaps with anything else */
+> +#define EXITS_TEST_GVA 0xc0000000
+> +#define EXITS_TEST_GPA EXITS_TEST_GVA
+> +#define EXITS_TEST_NPAGES 1
+> +#define EXITS_TEST_SIZE (EXITS_TEST_NPAGES * PAGE_SIZE)
+> +#define EXITS_TEST_SLOT 10
+> +
+> +static uint64_t guest_repeatedly_read(void)
+> +{
+> +       volatile uint64_t value;
+> +
+> +       while (true)
+> +               value =3D *((uint64_t *) EXITS_TEST_GVA);
+> +
+> +       return value;
+> +}
+> +
+> +static uint32_t run_vcpu_get_exit_reason(struct kvm_vcpu *vcpu)
+> +{
+> +       int r;
+> +
+> +       r =3D _vcpu_run(vcpu);
+> +       if (r) {
+> +               TEST_ASSERT(errno =3D=3D EFAULT, KVM_IOCTL_ERROR(KVM_RUN,=
+ r));
+> +               TEST_ASSERT_EQ(vcpu->run->exit_reason, KVM_EXIT_MEMORY_FA=
+ULT);
 > +       }
+> +       return vcpu->run->exit_reason;
+> +}
 > +
->         report(expect_interrupts(0), "no overflow interrupt after preset");
+> +const struct vm_shape protected_vm_shape =3D {
+> +       .mode =3D VM_MODE_DEFAULT,
+> +       .type =3D KVM_X86_SW_PROTECTED_VM,
+> +};
+> +
+> +static void test_private_access_memslot_deleted(void)
+> +{
+> +       struct kvm_vm *vm;
+> +       struct kvm_vcpu *vcpu;
+> +       pthread_t vm_thread;
+> +       void *thread_return;
+> +       uint32_t exit_reason;
+> +
+> +       vm =3D vm_create_shape_with_one_vcpu(protected_vm_shape, &vcpu,
+> +                                          guest_repeatedly_read);
+> +
+> +       vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+> +                                   EXITS_TEST_GPA, EXITS_TEST_SLOT,
+> +                                   EXITS_TEST_NPAGES,
+> +                                   KVM_MEM_GUEST_MEMFD);
+> +
+> +       virt_map(vm, EXITS_TEST_GVA, EXITS_TEST_GPA, EXITS_TEST_NPAGES);
+> +
+> +       /* Request to access page privately */
+> +       vm_mem_set_private(vm, EXITS_TEST_GPA, EXITS_TEST_SIZE);
+> +
+> +       pthread_create(&vm_thread, NULL,
+> +                      (void *(*)(void *))run_vcpu_get_exit_reason,
+> +                      (void *)vcpu);
+> +
+> +       vm_mem_region_delete(vm, EXITS_TEST_SLOT);
+> +
+> +       pthread_join(vm_thread, &thread_return);
+> +       exit_reason =3D (uint32_t)(uint64_t)thread_return;
+> +
+> +       TEST_ASSERT_EQ(exit_reason, KVM_EXIT_MEMORY_FAULT);
+> +       TEST_ASSERT_EQ(vcpu->run->memory_fault.flags, KVM_MEMORY_EXIT_FLA=
+G_PRIVATE);
+> +       TEST_ASSERT_EQ(vcpu->run->memory_fault.gpa, EXITS_TEST_GPA);
+> +       TEST_ASSERT_EQ(vcpu->run->memory_fault.size, EXITS_TEST_SIZE);
+> +
+> +       kvm_vm_free(vm);
+> +}
+> +
+> +static void test_private_access_memslot_not_private(void)
+> +{
+> +       struct kvm_vm *vm;
+> +       struct kvm_vcpu *vcpu;
+> +       uint32_t exit_reason;
+> +
+> +       vm =3D vm_create_shape_with_one_vcpu(protected_vm_shape, &vcpu,
+> +                                          guest_repeatedly_read);
+> +
+> +       /* Add a non-private memslot (flags =3D 0) */
+> +       vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+> +                                   EXITS_TEST_GPA, EXITS_TEST_SLOT,
+> +                                   EXITS_TEST_NPAGES, 0);
+> +
+> +       virt_map(vm, EXITS_TEST_GVA, EXITS_TEST_GPA, EXITS_TEST_NPAGES);
+> +
+> +       /* Request to access page privately */
+> +       vm_mem_set_private(vm, EXITS_TEST_GPA, EXITS_TEST_SIZE);
+> +
+> +       exit_reason =3D run_vcpu_get_exit_reason(vcpu);
+> +
+> +       TEST_ASSERT_EQ(exit_reason, KVM_EXIT_MEMORY_FAULT);
+> +       TEST_ASSERT_EQ(vcpu->run->memory_fault.flags, KVM_MEMORY_EXIT_FLA=
+G_PRIVATE);
+> +       TEST_ASSERT_EQ(vcpu->run->memory_fault.gpa, EXITS_TEST_GPA);
+> +       TEST_ASSERT_EQ(vcpu->run->memory_fault.size, EXITS_TEST_SIZE);
+> +
+> +       kvm_vm_free(vm);
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +       TEST_REQUIRE(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PRO=
+TECTED_VM));
+> +
+> +       test_private_access_memslot_deleted();
+> +       test_private_access_memslot_not_private();
+> +}
+> --
+> 2.39.1
 >
->         set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
 >
-> Can be cleaned up by moving it to separate function, etc. Has the downside that
-> it may performs extra memory accesses in expect_interrupts(). Your choice.
->
-> By the way, pmu_stats is not declared volatile, which means that the
-> compiler is free to optimize accesses to the struct by caching previously
-> read values in registers. Have you tried declaring it as volatile, in case
-> that fixes the issues you were seeing?
-In my case it won't fix the issue because the stats match what happens
-but your suggestion makes total sense in general.
-
-I will add that.
-
-Eric
->
-> If you do decide to go with the above suggestion, I strongly suggest
-> pmu_stats is declared as volatile, otherwise the compiler will likely end
-> up not reading from memory on every iteration.
->
-> Thanks,
-> Alex
->> Thanks!
->>
->> Eric
->>> Thanks,
->>> Alex
->>>
->>>> Since it looks like a benign and inlikely case, let's resize the number
->>>> of iterations to prevent the PMCR enable bit from being resetted
->>>> at the same time as the actual overflow event.
->>>>
->>>> COUNT_INT is introduced, arbitrarily set to 1000 iterations and is
->>>> used in this test.
->>>>
->>>> Reported-by: Jan Richter <jarichte@redhat.com>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>> ---
->>>>  arm/pmu.c | 15 ++++++++-------
->>>>  1 file changed, 8 insertions(+), 7 deletions(-)
->>>>
->>>> diff --git a/arm/pmu.c b/arm/pmu.c
->>>> index a91a7b1f..acd88571 100644
->>>> --- a/arm/pmu.c
->>>> +++ b/arm/pmu.c
->>>> @@ -66,6 +66,7 @@
->>>>  #define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
->>>>  #define COUNT 250
->>>>  #define MARGIN 100
->>>> +#define COUNT_INT 1000
->>>>  /*
->>>>   * PRE_OVERFLOW2 is set so that 1st @COUNT iterations do not
->>>>   * produce 32b overflow and 2nd @COUNT iterations do. To accommodate
->>>> @@ -978,13 +979,13 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->>>>  
->>>>  	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
->>>>  
->>>> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->>>> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->>>>  	report(expect_interrupts(0), "no overflow interrupt after preset");
->>>>  
->>>>  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->>>>  	isb();
->>>>  
->>>> -	for (i = 0; i < 100; i++)
->>>> +	for (i = 0; i < COUNT_INT; i++)
->>>>  		write_sysreg(0x2, pmswinc_el0);
->>>>  
->>>>  	isb();
->>>> @@ -1002,15 +1003,15 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->>>>  	write_sysreg(ALL_SET_32, pmintenset_el1);
->>>>  	isb();
->>>>  
->>>> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->>>> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->>>>  
->>>>  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->>>>  	isb();
->>>>  
->>>> -	for (i = 0; i < 100; i++)
->>>> +	for (i = 0; i < COUNT_INT; i++)
->>>>  		write_sysreg(0x3, pmswinc_el0);
->>>>  
->>>> -	mem_access_loop(addr, 200, pmu.pmcr_ro);
->>>> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro);
->>>>  	report_info("overflow=0x%lx", read_sysreg(pmovsclr_el0));
->>>>  	report(expect_interrupts(0x3),
->>>>  		"overflow interrupts expected on #0 and #1");
->>>> @@ -1029,7 +1030,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->>>>  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
->>>>  	write_regn_el0(pmevcntr, 0, pre_overflow);
->>>>  	isb();
->>>> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->>>> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->>>>  	report(expect_interrupts(0x1), "expect overflow interrupt");
->>>>  
->>>>  	/* overflow on odd counter */
->>>> @@ -1037,7 +1038,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->>>>  	write_regn_el0(pmevcntr, 0, pre_overflow);
->>>>  	write_regn_el0(pmevcntr, 1, all_set);
->>>>  	isb();
->>>> -	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->>>> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->>>>  	if (overflow_at_64bits) {
->>>>  		report(expect_interrupts(0x1),
->>>>  		       "expect overflow interrupt on even counter");
->>>> -- 
->>>> 2.41.0
->>>>
-
 
