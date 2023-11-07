@@ -1,203 +1,168 @@
-Return-Path: <kvm+bounces-1039-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1040-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7453A7E47CF
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 19:06:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CB707E47D0
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 19:06:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5228B20EC4
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 18:06:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0216DB20E77
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 18:06:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9CA73589E;
-	Tue,  7 Nov 2023 18:06:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B37EB3589E;
+	Tue,  7 Nov 2023 18:06:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hWwP9gE2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fitOuWiU"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0733717F0
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 18:05:58 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DACB125
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 10:05:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699380357;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lZWN7e/E9MLOuZ4Civj0SoRpxsYHcBxuGSdGcIP4Qsg=;
-	b=hWwP9gE2v22MdpzVq26FdbiCsBPFMg1PmFemkLfXr9V+abf2sx0iYXBUQ93N0bnmACPKab
-	TNQBOvh4fGtAid2I7q2P4nwpFgH4xLYO6omPi9bQeD8Yb1rIjPR4rM5vHi8aN3WNeGI1FV
-	n3sZdJUVR+wfqc5ydkuekpjA+bu7uLc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-52-_vdWnheVMJ2gMF_dki36Fw-1; Tue, 07 Nov 2023 13:05:55 -0500
-X-MC-Unique: _vdWnheVMJ2gMF_dki36Fw-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4084001846eso39273115e9.1
-        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 10:05:54 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94AB617F0
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 18:06:05 +0000 (UTC)
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03E9C120
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 10:06:05 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cc3130ba31so42629435ad.0
+        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 10:06:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699380364; x=1699985164; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aU34lsBWG3jyTwTzaaJkynQ9ddxhzB5NuqZaVtQepC4=;
+        b=fitOuWiUGMs0NOMCalAV3mJmSIokpD3dzOdcShSNZUSg1XSqdNhpTEiYTAutIhhliy
+         1gq+lJ53/eF6WyJ7/EVTeSf7hTWbxw+nTzGEQUfq8Hft933IZypTPGutgbuZH7OIB/Xr
+         Noc/vUBxWUnoIpSYYoJeFcpumCFutYtaclM4lbpy7AbOAcIWeMWqFVnvtvYixrevNCt7
+         04sU2KBaKluspPaDYykSj95SrERza/VZ1IpxUx6glGbfllO9kvSAU8PFgD1I0fknfnSk
+         SHfdJLDUBlNpR0nQSv4CDpr0vMPtTwSxMgRkqUNzJNSe3sGHsIqDTNtZwrGpmazItdFi
+         nl5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699380354; x=1699985154;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lZWN7e/E9MLOuZ4Civj0SoRpxsYHcBxuGSdGcIP4Qsg=;
-        b=KzK56SXMvvzm6Bh8+CB3nI9Mayd8+BRYoZFWhKWVstil9Yr1vatwLNzs6a6DJvlhr8
-         5jrDJj/faQIulziZqhbn4ihKTp0fID/C2QwXUcuxk37hQTJ/QP0MUCXUqqiyPaZXURZD
-         zW2RuPzcnlx5Gm5J0/9LMXGGiVKHFUzAgyQbcYWaTcfzFExqI/knagQTde5FeQ6lxU8d
-         q6tpvL28GihvA6jmdHDUAw50gkwZULBPcVrjBWt0s/nraOTSUHZMeb1kokHvGM3N7Ybr
-         scCefn4nGCuhLJJ+YMFik28wS0fcpReXPi8bvq68A+f4XWejJn8aZtnyYkUNmLT/XMbI
-         Kyzw==
-X-Gm-Message-State: AOJu0YwFgf95OacAFZm1fL9qnB90CXjMRbvQ2TCICV2NiGjCR0EdLq5h
-	vSL3z0hK5sUqvutgrJUG9o0eDTi3bgqrg8qRzpusSV+/jC/me2zmYPM4B8p0AZUverZ/s6kfaYn
-	5j6pSAzWzKmrS
-X-Received: by 2002:a05:600c:1c24:b0:409:6e0e:e948 with SMTP id j36-20020a05600c1c2400b004096e0ee948mr3090690wms.1.1699380353888;
-        Tue, 07 Nov 2023 10:05:53 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFVbUnIMkGEN1RZAQbj4aBP3/Gu/RlHkG0yjlsbbGdC2xv6pzcnYLvZlX7eGdsqZsIc/nN+6Q==
-X-Received: by 2002:a05:600c:1c24:b0:409:6e0e:e948 with SMTP id j36-20020a05600c1c2400b004096e0ee948mr3090674wms.1.1699380353435;
-        Tue, 07 Nov 2023 10:05:53 -0800 (PST)
-Received: from starship ([89.237.99.95])
-        by smtp.gmail.com with ESMTPSA id p29-20020a05600c1d9d00b0040772934b12sm16875455wms.7.2023.11.07.10.05.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Nov 2023 10:05:53 -0800 (PST)
-Message-ID: <d0df418154b18204ee6130a8e077f2d0c1c65c2f.camel@redhat.com>
-Subject: Re: [PATCH v6 18/25] KVM: x86: Use KVM-governed feature framework
- to track "SHSTK/IBT enabled"
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, dave.hansen@intel.com, 
-	peterz@infradead.org, chao.gao@intel.com, rick.p.edgecombe@intel.com, 
-	john.allen@amd.com
-Date: Tue, 07 Nov 2023 20:05:51 +0200
-In-Reply-To: <ZUWLUs3J-G_5VCx_@google.com>
-References: <20230914063325.85503-1-weijiang.yang@intel.com>
-	 <20230914063325.85503-19-weijiang.yang@intel.com>
-	 <ea3609bf7c7759b682007042b98191d91d10a751.camel@redhat.com>
-	 <ZUJy7A5Hp6lnZVyq@google.com>
-	 <73c4d3d4c4e7b631d5604178a127bf20cc122034.camel@redhat.com>
-	 <ZUWLUs3J-G_5VCx_@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        d=1e100.net; s=20230601; t=1699380364; x=1699985164;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aU34lsBWG3jyTwTzaaJkynQ9ddxhzB5NuqZaVtQepC4=;
+        b=kg8gz+tq4+k6JcvsLkMxXlNSYHM+xbdSefa+hb6nzuWLx5P6EiMXB1xxRkyK8nhROx
+         aAdUtT1qEsOydQRwkkxG2bkRe4kKFxqrl6OCxaEoe6+FqPuU3fpu8Oq6imPS+sWM2urb
+         LCt/X1ivggsAT9qJWqcC6RoZ9Npgg/sd9AbVgMCzVqk2LEZU2bIJKUC4lhwagVFc0VfS
+         ZvjWC4cMfHZ0BU2vnbTCszk3xgmtQ3o6ifY+u6Pmv+iLKRsBwl8+gwfY35Wle2z62nlD
+         lqyoxX/CoWZ5CEugslNhttgQVEYsWvtrT1jQcvYlSQPJZnWsJWtYX8uDB/sm63wphpaI
+         IHgg==
+X-Gm-Message-State: AOJu0YzauaxNO53KDE9/LYrYG2Uip1hM4GyHcw5tIagudNYJYn6h67MJ
+	XztYjrimm9xZc5NSonpGnyc4JqcGCnw=
+X-Google-Smtp-Source: AGHT+IFsYh7pqnMF6bnCC/oyEJRS68sDpOtjIDr0qSs0BPKh8B681uNHVt3b3tnovpKX6rtHcRNrk/tc5ZM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:ef83:b0:1cc:454f:73dc with SMTP id
+ iz3-20020a170902ef8300b001cc454f73dcmr457603plb.7.1699380364543; Tue, 07 Nov
+ 2023 10:06:04 -0800 (PST)
+Date: Tue, 7 Nov 2023 10:06:02 -0800
+In-Reply-To: <ZUoCxyNsc/dB4/eN@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <2C868574-37F4-437D-8355-46A6D1615E51@cs.utexas.edu>
+ <ZTxEIGmq69mUraOD@google.com> <ZT+eipbV5+mSjr+G@yzhao56-desk.sh.intel.com>
+ <ZUAC0jvFE0auohL4@google.com> <ZUDQXbDDsGI3KiQ8@yzhao56-desk.sh.intel.com>
+ <ZUEZ4QRjUcu7y3gN@google.com> <ZUIVfpAz0+7jVZvC@yzhao56-desk.sh.intel.com>
+ <ZUlp4AgjvoG7zk_Y@google.com> <ZUoCxyNsc/dB4/eN@yzhao56-desk.sh.intel.com>
+Message-ID: <ZUp8iqBDm_Ylqiau@google.com>
+Subject: Re: A question about how the KVM emulates the effect of guest MTRRs
+ on AMD platforms
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Yibo Huang <ybhuang@cs.utexas.edu>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, 2023-11-03 at 17:07 -0700, Sean Christopherson wrote:
-> On Thu, Nov 02, 2023, Maxim Levitsky wrote:
-> > On Wed, 2023-11-01 at 08:46 -0700, Sean Christopherson wrote:
-> > > On Tue, Oct 31, 2023, Maxim Levitsky wrote:
-> > > > On Thu, 2023-09-14 at 02:33 -0400, Yang Weijiang wrote:
-> > > > > Use the governed feature framework to track whether X86_FEATURE_SHSTK
-> > > > > and X86_FEATURE_IBT features can be used by userspace and guest, i.e.,
-> > > > > the features can be used iff both KVM and guest CPUID can support them.
-> > > > PS: IMHO The whole 'governed feature framework' is very confusing and
-> > > > somewhat poorly documented.
+On Tue, Nov 07, 2023, Yan Zhao wrote:
+> On Mon, Nov 06, 2023 at 02:34:08PM -0800, Sean Christopherson wrote:
+> > On Wed, Nov 01, 2023, Yan Zhao wrote:
+> > > On Tue, Oct 31, 2023 at 08:14:41AM -0700, Sean Christopherson wrote:
+> 
+> > > If no #MC, could EPT type of guest RAM also be set to WB (without IPAT) even
+> > > without non-coherent DMA?
+> > 
+> > No, there are snooping/ordering issues on Intel, and to a lesser extent AMD.  AMD's
+> > WC+ solves the most straightfoward cases, e.g. WC+ snoops caches, and VMRUN and
+> > #VMEXIT flush the WC buffers to ensure that guest writes are visible and #VMEXIT
+> > (and vice versa).  That may or may not be sufficient for multi-threaded use cases,
+> > but I've no idea if there is actually anything to worry about on that front.  I
+> > think there's also a flaw with guest using UC, which IIUC doesn't snoop caches,
+> > i.e. the guest could get stale data.
+> > 
+> > AFAIK, Intel CPUs don't provide anything like WC+, so KVM would have to provide
+> > something similar to safely let the guest control memtypes.  Arguably, KVM should
+> > have such mechansisms anyways, e.g. to make non-coherent DMA VMs more robust.
+> > 
+> > But even then, there's still the question of why, i.e. what would be the benefit
+> > of letting the guest control memtypes when it's not required for functional
+> > correctness, and would that benefit outweight the cost.
+> 
+> Ok, so for a coherent device , if it's assigned together with a non-coherent
+> device, and if there's a page with host PAT = WB and guest PAT=UC, we need to
+> ensure the host write is flushed before guest read/write and guest DMA though no
+> need to worry about #MC, right?
+
+It's not even about devices, it applies to all non-MMIO memory, i.e. unless the
+host forces UC for a given page, there's potential for WB vs. WC/UC issues.
+
+> > > > > For CR0_CD=1,
+> > > > > - w/o KVM_X86_QUIRK_CD_NW_CLEARED, it meets (b), but breaks (a).
+> > > > > - w/  KVM_X86_QUIRK_CD_NW_CLEARED, with IPAT=1, it meets (a), but breaks (b);
+> > > > >                                    with IPAT=0, it may breaks (a), but meets (b)
 > > > > 
-> > > > Currently the only partial explanation of it, is at 'governed_features',
-> > > > which doesn't explain how to use it.
-> > > 
-> > > To be honest, terrible name aside, I thought kvm_governed_feature_check_and_set()
-> > > would be fairly self-explanatory, at least relative to all the other CPUID handling
-> > > in KVM.
-> > 
-> > What is not self-explanatory is what are the governed_feature and how to query them.
-> 
-> ...
-> 
-> > > > However thinking again about the whole thing: 
+> > > > CR0.CD=1 is a mess above and beyond memtypes.  Huh.  It's even worse than I thought,
+> > > > because according to the SDM, Atom CPUs don't support no-fill mode:
 > > > > 
-> > > > IMHO the 'governed features' is another quite confusing term that a KVM
-> > > > developer will need to learn and keep in memory.
-> > > 
-> > > I 100% agree, but I explicitly called out the terrible name in the v1 and v2
-> > > cover letters[1][2], and the patches were on the list for 6 months before I
-> > > applied them.  I'm definitely still open to a better name, but I'm also not
-> > > exactly chomping at the bit to get behind the bikehsed.
-> > 
-> > Honestly I don't know if I can come up with a better name either.  Name is
-> > IMHO not the underlying problem, its the feature itself that is confusing.
-> 
-> ...
-> 
-> > > Yes and no.  For "governed features", probably not.  But for CPUID as a whole, there
-> > > are legimiate cases where userspace needs to enumerate things that aren't officially
-> > > "supported" by KVM.  E.g. topology, core crystal frequency (CPUID 0x15), defeatures
-> > > that KVM hasn't yet learned about, features that don't have virtualization controls
-> > > and KVM hasn't yet learned about, etc.  And for things like Xen and Hyper-V paravirt
-> > > features, it's very doable to implement features that are enumerate by CPUID fully
-> > > in userspace, e.g. using MSR filters.
-> > > 
-> > > But again, it's a moot point because KVM has (mostly) allowed userspace to fully
-> > > control guest CPUID for a very long time.
-> > > 
-> > > > Such a feature which is advertised as supported but not really working is a
-> > > > recipe of hard to find guest bugs IMHO.
+> > > >   3. Not supported In Intel Atom processors. If CD = 1 in an Intel Atom processor,
+> > > >      caching is disabled.
 > > > > 
-> > > > IMHO it would be much better to just check this condition and do
-> > > > kvm_vm_bugged() or something in case when a feature is enabled in the guest
-> > > > CPUID but KVM can't support it, and then just use guest CPUID in
-> > > > 'guest_can_use()'.
+> > > > Before I read that blurb about Atom CPUs, what I was going to say is that, AFAIK,
+> > > > it's *impossible* to accurately virtualize CR0.CD=1 on VMX because there's no way
+> > > > to emulate no-fill mode.
+> > > > 
+> > > > > > Discussion from the EPT+MTRR enabling thread[*] more or less confirms that Sheng
+> > > > > > Yang was trying to resolve issues with passthrough MMIO.
+> > > > > > 
+> > > > > >  * Sheng Yang 
+> > > > > >   : Do you mean host(qemu) would access this memory and if we set it to guest 
+> > > > > >   : MTRR, host access would be broken? We would cover this in our shadow MTRR 
+> > > > > >   : patch, for we encountered this in video ram when doing some experiment with 
+> > > > > >   : VGA assignment. 
+> > > > > > 
+> > > > > > And in the same thread, there's also what appears to be confirmation of Intel
+> > > > > > running into issues with Windows XP related to a guest device driver mapping
+> > > > > > DMA with WC in the PAT.  Hilariously, Avi effectively said "KVM can't modify the
+> > > > > > SPTE memtype to match the guest for EPT/NPT", which while true, completely overlooks
+> > > > > > the fact that EPT and NPT both honor guest PAT by default.  /facepalm
+> > > > > 
+> > > > > My interpretation is that the since guest PATs are in guest page tables,
+> > > > > while with EPT/NPT, guest page tables are not shadowed, it's not easy to
+> > > > > check guest PATs  to disallow host QEMU access to non-WB guest RAM.
+> > > > 
+> > > > Ah, yeah, your interpretation makes sense.
+> > > > 
+> > > > The best idea I can think of to support things like this is to have KVM grab the
+> > > > effective PAT memtype from the host userspace page tables, shove that into the
+> > > > EPT/NPT memtype, and then ignore guest PAT.  I don't if that would actually work
+> > > > though.
+> > > Hmm, it might not work. E.g. in GPU, some MMIOs are mapped as UC-, while some
+> > > others as WC, even they belong to the same BAR.
+> > > I don't think host can know which one to choose in advance.
+> > > I think it should be also true to RAM range, guest can do memremap to a memory
+> > > type that host doesn't know beforehand.
 > > 
-> > OK, I won't argue that much over this, however I still think that there are
-> > better ways to deal with it.
-> > 
-> > If we put optimizations aside (all of this can surely be optimized such as to
-> > have very little overhead)
-> > 
-> > How about we have 2 cpuids: Guest visible CPUID which KVM will never use directly
-> > other than during initialization and effective cpuid which is roughly
-> > what governed features are, but will include all features and will be initialized
-> > roughly like governed features are initialized:
-> > 
-> > effective_cpuid = guest_cpuid & kvm_supported_cpuid 
-> > 
-> > Except for some forced overrides like for XSAVES and such.
-> > 
-> > Then we won't need to maintain a list of governed features, and guest_can_use()
-> > for all features will just return the effective cpuid leafs.
-> > 
-> > In other words, I want KVM to turn all known CPUID features to governed features,
-> > and then remove all the mentions of governed features except 'guest_can_use'
-> > which is a good API.
-> > 
-> > Such proposal will use a bit more memory but will make it easier for future
-> > KVM developers to understand the code and have less chance of introducing bugs.
-> 
-> Hmm, two _full_ CPUID arrays would be a mess and completely unnecessary.  E.g.
-> we'd have to sort out Hyper-V and KVM PV, which both have their own caches.  And
-> a duplicate entry for things like F/M/S would be ridiculous.
-> 
-> But maintaining a per-vCPU version of the CPU caps is definitely doable.  I.e. a
-> vCPU equivalent to kvm_cpu_caps and the per-CPU capabilities.  There are currently
-> 25 leafs that are tracked by kvm_cpu_caps, so relative to "governed" features,
-> the cost will be 96 bytes per vCPU.  I agree that 96 bytes is worth eating, we've
-> certainly taken on more for a lot, lot less.
-> 
-> It's a lot of churn, and there are some subtle nasties, e.g. MWAIT and other
-> CPUID bits that changed based on MSRs or CR4, but most of the churn is superficial
-> and the result is waaaaay less ugly than governed features and for the majority of
-> features will Just Work.
-> 
-> I'll get a series posted next week (need to write changelogs and do a _lot_ more
-> testing).  If you want to take a peek at where I'm headed before then:
-> 
->   https://github.com/sean-jc/linux x86/guest_cpufeatures
+> > The goal wouldn't be to honor guest memtype, it would be to ensure correctness.
+> > E.g. guest can do memremap all it wants, and KVM will always ignore the guest's
+> > memtype.
+> AFAIK, some GPUs with TTM driver may call set_pages_array_uc() to convert pages
+> to PAT=UC-(e.g. for doorbell). Intel i915 also could vmap a page with PAT=WC
+> (e.g. for some command buffer, see i915_gem_object_map_page()).
+> It's not easy for host to know which guest pages are allocated by guest driver
+> for such UC/WC conversion, and it should have problem to map such pages as "WB +
+> ignore guest PAT" if the device is non-coherent.
 
-This looks very good, looking forward to see the patches on the mailing list.
-
-Best regards,
-	Maxim Levitsky
-
-> 
-
-
+Ah, right, I was thinking specifically of virtio-gpu, where there is more explicit
+coordination between guest and host regarding the buffers.  Drat.
 
