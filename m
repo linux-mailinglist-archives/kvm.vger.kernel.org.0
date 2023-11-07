@@ -1,44 +1,43 @@
-Return-Path: <kvm+bounces-862-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-863-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F8307E37D7
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 10:25:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC1CF7E37DC
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 10:26:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D593CB20CF5
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 09:25:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D202B20D07
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 09:26:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDBE42D795;
-	Tue,  7 Nov 2023 09:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8A52D795;
+	Tue,  7 Nov 2023 09:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XXLIEPqz"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AAr2xYyu"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEEC32D786
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 09:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D34352D786
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 09:26:32 +0000 (UTC)
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 980B910A
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 01:25:20 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD8B9106
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 01:26:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=lDnI+BR25hSHTCQh/yPBWI/j2NQPRqi0Ej7YY+Ig8nc=; b=XXLIEPqzWBhckNc+r6HnYqZL6i
-	IVXGktcmSkS87UVPvDTWdvY8bm4lkl9rVGmkHd9+2LjBriZUij9nzKzqyVoe69hEJUbEPTPJcHLYZ
-	BpNqrG69JpyEY/V1ijBMjqRRgE4gt6Jxd483s/Z7cv61EcuA72XjlxxxGH57nOD1FxHeI+p4XlcuT
-	Ot3SvAxAiS0oQbvvYh402snsfFS/O735gIPQTboxF2YZbLFNgn8UXKBq08PzoSf5bCxhLx/11m6Le
-	2lvCDYKP+QK1P5djDv/gOgxbhLnqDu+6BRffd4wNcicmRFVaXiPs7KCg8XAZmcrQ5zpA7QJdnd9al
-	0f88bY4A==;
+	bh=p1TSQVpF6nzxSHBwLx4pIvUfIfh/fenhfieJnDJPWA4=; b=AAr2xYyuXFBK+ykK2iWZuwyM5e
+	HbJuHIHRVDl6UBzpig0yliSoneIHfqc2nOfXCIu06fXUb0ML6PqUQ5+CzDrSAb2biGnKtnr10/Nv4
+	5eAKbZrNIyByDKuAIZm4ezutVREDJbZ3Z+4yzz4T4RpZK/JWOz6kRlVGsVIXIglBMw/I9NnOblOfI
+	LiGG/6cp9eBeSQXLgoZCb56cQQ15tuFhrEu5J7wSx4JWINY+2EyaIA3nCErjWuuh31lPyiU8Qqy+E
+	bdG6CV6rFn2zpO/kaGy5MkjGHQXiHi/vOi5n2YVjR80/mq08KAl3STcOgYU/y3M/FAeoWVAvBLn+s
+	6xibzNEQ==;
 Received: from [2001:8b0:10b:5:63c4:8578:30dc:d79e] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1r0IKZ-00BSLB-A9; Tue, 07 Nov 2023 09:25:08 +0000
-Message-ID: <d86f6b781420898f959bc39d488d589e640c8cf5.camel@infradead.org>
-Subject: Re: [PATCH v4 16/17] doc/sphinx/hxtool.py: add optional label
- argument to SRST directive
+	id 1r0ILg-00BSPT-P5; Tue, 07 Nov 2023 09:26:17 +0000
+Message-ID: <797ea680eacd0012906aae89fd5cf94395d7b8cb.camel@infradead.org>
+Subject: Re: [PATCH v4 14/17] net: do not delete nics in net_cleanup()
 From: David Woodhouse <dwmw2@infradead.org>
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>, Peter
@@ -51,12 +50,12 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>, Peter
  Apfelbaum <marcel.apfelbaum@gmail.com>, Jason Wang <jasowang@redhat.com>,
  Marcelo Tosatti <mtosatti@redhat.com>,  qemu-block@nongnu.org,
  xen-devel@lists.xenproject.org, kvm@vger.kernel.org
-Date: Tue, 07 Nov 2023 09:25:07 +0000
-In-Reply-To: <20231106143507.1060610-17-dwmw2@infradead.org>
+Date: Tue, 07 Nov 2023 09:26:16 +0000
+In-Reply-To: <20231106143507.1060610-15-dwmw2@infradead.org>
 References: <20231106143507.1060610-1-dwmw2@infradead.org>
-	 <20231106143507.1060610-17-dwmw2@infradead.org>
+	 <20231106143507.1060610-15-dwmw2@infradead.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-rQuFZzNqFQQuyIVq2aQW"
+	boundary="=-fGWDpuQzN13l32rL7klP"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -67,31 +66,38 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-rQuFZzNqFQQuyIVq2aQW
+--=-fGWDpuQzN13l32rL7klP
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Mon, 2023-11-06 at 14:35 +0000, David Woodhouse wrote:
 > From: David Woodhouse <dwmw@amazon.co.uk>
 >=20
-> We can't just embed labels directly into files like qemu-options.hx which
-> are included from multiple top-level RST files, because Sphinx sees the
-> labels as duplicate: https://github.com/sphinx-doc/sphinx/issues/9707
+> In net_cleanup() we only need to delete the netdevs, as those may have
+> state which outlives Qemu when it exits, and thus may actually need to
+> be cleaned up on exit.
 >=20
-> So add an 'emitrefs' option to the Sphinx hxtool-doc directive, which is
-> set only in invocation.rst and not from the HTML rendition of the man
-> page. Along with an argument to the SRST directive which causes a label
-> of the form '.. _LABEL-reference-label:' to be emitted when the emitrefs
-> option is set.
+> The nics, on the other hand, are owned by the device which created them.
+> Most devices don't bother to clean up on exit because they don't have
+> any state which will outlive Qemu... but XenBus devices do need to clean
+> up their nodes in XenStore, and do have an exit handler to delete them.
+>=20
+> When the XenBus exit handler destroys the xen-net-device, it attempts
+> to delete its nic after net_cleanup() had already done so. And crashes.
+>=20
+> Fix this by only deleting netdevs as we walk the list. As the comment
+> notes, we can't use QTAILQ_FOREACH_SAFE() as each deletion may remove
+> *multiple* entries, including the "safely" saved 'next' pointer. But
+> we can store the *previous* entry, since nics are safe.
 >=20
 > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
+> Reviewed-by: Paul Durrant <paul@xen.org>
 
-FWIW I've left this out of the pull request I just sent, and the Xen
-docs just tell the user to go *find* the -initrd documentation instead
-of being able to emit a direct link. We can fix that later.
+I've left this out of the pull request I've just sent, pending Jason's
+approval for it. As it's a bugfix, I don't think we strictly has to be
+in by *today*, right? We still have a little time?
 
---=-rQuFZzNqFQQuyIVq2aQW
+--=-fGWDpuQzN13l32rL7klP
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -183,25 +189,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTA3MDkyNTA3WjAvBgkqhkiG9w0BCQQxIgQgUHu9UhMc
-MzvsJ+Z+Y+Vzlp/LOfQhhPiLDZt2rfnD7xUwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTA3MDkyNjE2WjAvBgkqhkiG9w0BCQQxIgQgsRJsCtSX
+Xs2a8O97MSyazEdh6m8IJbOwiFj2zh+7F+cwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCEQg40j/N457tiWL0212ZIxP+Mw/2UW7qL
-0VKBEo5HJcZrXwPyhiUdrh7UHws8iVMPJskwoKJ/7+j2UZShXfGIVrsBy7EMT8iZn9squpKsFrOP
-nf69vIrXfoNsOa+JLcKYotC9AtBB9bgVnzf9CHDjGZMkRdmRFTAuCTRY7yR4m4qraysX0RB6zxtI
-Lj1oMSJiSXjrPffx6kU7oRGAm9oak/zcmevbAQp3TPHupEzsxuyehmHv6rl9mEHgFRkSQpuHFWO7
-bTkdLl2daboEFlf2pj2UhNQK/mISzX7QrdHYc7kounFa9bkpCC+Hcgc6L1IMfeoM8eDbYQX/lYXN
-vW7SfZh09gWmpVYo0OAVdWVlmNvOxLa2zdm7cQnjvh9aMloCjJ8rbjiANp7a097ugaMqV/53SS2V
-fesa9haJzTarE2OqGHPrsGUWNj3dFCnnHRnIqO/OuN0NgtNRpj3uTA4HGHaNhu6zq5xMOL/7WeOt
-h55X1h1T+4uRUb1UgFYnn+SFw1fJqYB8wC88T9pOyiiB5FfrNu1JR71rGgzuQJy14IYF0gCXCWf3
-i1G+6uxen5C3tOhp3alcyapf7cF0ck8SG5JPusHFZER5pbfo30gF5b+RfbpqD5gfdanndltKiUL5
-Uv1YSYJgLrN4Qn+pf+yqsBxKAa4AUQB3oVLEMUmMOwAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBGEfiupl6Yl3DU5spaQG/GfQXkjU6D9hxv
+CPrm6lgdK6gTHb6738ZzmCOLBRULrmfAQ1NbFybgIHVQyqCQ1dgoyeocmnua9Y3j70MUlD40m+Uu
+aN+bIkzEH0O6DwvmonlFFIPOYW5VGtGutyDU9cbL3Lzvv3LntNYOb5l6yFdCFoSqYLcYLZVXjNNI
+CwOHGziigc3pI7t4lriqBR3HhlD8GzxDiuRs/I8Jo5bF1CzkiWJUPrYIQUVr9BRfH2+PzViStnAR
+IF2hIyzuZ3BSEqgnQtg6GxOe1M6z7JyJ1kJResMg9IHOOpwlQDVIdX5+zYrokxn4wQYvTGSDC6ux
+VSDM4axJUIaAuR0oZV6T29mtq6b/dCxu8uUNJf5nK3yYzB/FQqhYqbJ0exG6YMk5HIOByy86wVgZ
+aKkOb0o1B0Pdeu2ZmGsE7BEz0ERP12efJvQ9i0TZ3uiaD70jr/fOj6zbsZmPy952thbNaL9+J2Z7
+aLLj8nQWq88iF9sSlNSuwN9udes+qY0BRARoxeGQ0MepS0dJsYhefQ7MhpxtqZf4Wk6zVJamGH8E
+7VxBvvfgx2Z06jcI4zaQ6EG0txE4XHeuq2WLvRI92omnUBEVy+XroXsNxpN5BJWK4DFyQOIvhJXS
+NM05qc5RQI4/+7XY7H72d3ETExtzSMJABlA1F63MTAAAAAAAAA==
 
 
---=-rQuFZzNqFQQuyIVq2aQW--
+--=-fGWDpuQzN13l32rL7klP--
 
