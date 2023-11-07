@@ -1,348 +1,284 @@
-Return-Path: <kvm+bounces-837-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-838-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2D087E368B
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 09:18:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C4D77E36A0
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 09:29:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 934C4B20DA9
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 08:18:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39BCE280FAD
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 08:29:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E27710A15;
-	Tue,  7 Nov 2023 08:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BD3C10A25;
+	Tue,  7 Nov 2023 08:29:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UZG4vlcl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dYn6dAM6"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51D410942
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 08:17:54 +0000 (UTC)
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D2A192;
-	Tue,  7 Nov 2023 00:17:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=u2HeZOCrWr7m2+yivFVVewtDLCGVF7UMVinO6IGMhKI=; b=UZG4vlclvTSre+uTyL5vYx+Mh8
-	blgnL5E+bqwThjQj9vhsJ3wNPRGyACfebAYTEv14sFQWYyRJhEOG66IRF8Q6m1AP/WbAfsjw6Dt1O
-	6xj9NAoRkyCwTTBffRy1/YRH+5x0uV+swqDny7ya/yk68riAzqVH+9uA6lpejvR3a2IzdjV6yNUgk
-	qC1pEFBYK98wLK8yLtP5Gh9JOmgtrLEy9x/Z0ukrCCi2RODONuIxRAdlvHpvfPOvpf53DSL+9dshL
-	aAt86STVLaW7g33n4ZVZUjP7Uz7QNJ3P5OI8QfPfRv+43uJGYCLe5y9tjyEEa93Szz2O/GG9tq+ss
-	OfWecFmQ==;
-Received: from [2001:8b0:10b:5:a6cf:3641:9b8:6403] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1r0HHQ-00B9Eh-7e; Tue, 07 Nov 2023 08:17:49 +0000
-Message-ID: <12e8ade22fe6c1e6bec74e60e8213302a7da635e.camel@infradead.org>
-Subject: Re: [PATCH v2] KVM: x86/xen: improve accuracy of Xen timers
-From: David Woodhouse <dwmw2@infradead.org>
-To: Dongli Zhang <dongli.zhang@oracle.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Cc: Paul Durrant <paul@xen.org>, Sean Christopherson <seanjc@google.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>,  Borislav Petkov <bp@alien8.de>, Dave
- Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
- <hpa@zytor.com>
-Date: Tue, 07 Nov 2023 08:17:48 +0000
-In-Reply-To: <2bd5d543-08a0-a0f6-0f59-b8724a2d8d75@oracle.com>
-References: <96da7273adfff2a346de9a4a27ce064f6fe0d0a1.camel@infradead.org>
-	 <74f32bfae7243a78d0e74b1ba3a2d1ea4a4a7518.camel@infradead.org>
-	 <2bd5d543-08a0-a0f6-0f59-b8724a2d8d75@oracle.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-jonb5B2Fg8DNd2j2Yc9x"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C36111094E
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 08:29:14 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04746DF;
+	Tue,  7 Nov 2023 00:29:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699345753; x=1730881753;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=sC5p3A6npWIfNItWRgHFJ90wL7G+7unD67P0lpbayiQ=;
+  b=dYn6dAM6QxlMmq2G7lzewxR0xAF5Cca1NCFgAb4+UNOytvsNB14IzwTP
+   2L1DBnsJDbzqlwTHKrtYsa1FQTszCI71kGWxHNrn6/4MAgx8EVKdlCMsn
+   c48dcwS9WzY6JirPCBD8eUQtQYMp5fRYVPJ0k9eKsALGxE0vHpuxjiEH3
+   i7mZkQfy7L3ZqCQLeWiSrOfcOoaFP8GfqtjMLZ7k3/xo8y6aX+V83E3ee
+   ZqUSv23HCN9xUNZUmiExVlb2ao41Ni/4VBPspaAjHu0KSgqcn0WCcQX82
+   pbBqNekcmFJzJDaNThqKwBPVslZVfQEIjl1ajbni1BVeUZVsNjLUbR4xS
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="374487551"
+X-IronPort-AV: E=Sophos;i="6.03,283,1694761200"; 
+   d="scan'208";a="374487551"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2023 00:29:12 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="797599621"
+X-IronPort-AV: E=Sophos;i="6.03,283,1694761200"; 
+   d="scan'208";a="797599621"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Nov 2023 00:29:12 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Tue, 7 Nov 2023 00:29:12 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Tue, 7 Nov 2023 00:29:11 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Tue, 7 Nov 2023 00:29:11 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Tue, 7 Nov 2023 00:29:11 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NU5oanAvSM1kw5G4iVNI87aRI92ccxpdc9hi83wDZ/RC7Ux5w4ufFZLXHMgL123mJrqRMJ2L9pax47H9iWF6KW6EN+g5m5cIqh5X8qh/SmZoa2TLngj3rDNNmBOrenvnnrOTLuNHfPNCVyEk2hNWnBFtnk/qECH4Gw8vl1eOveTk6OUM2wHB3FshiWPRnNsakYAwEhRUMu8zT6w2vsgED7wcfFX9aRXUbDXScIVE0p4Jz7BmMI3ooayTggsy7k71B3D9qBH/0WZeeWSSn7DGxYD8pZvyrn129s26nCf7RXOTZ4RlUgpT0MJfUeF5dWCX35Pu2s+ZIy1mzjtHkjVFPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=d522EpTkDJqbauP15CSYyb3hxK6bssVtCpM9//2BG+0=;
+ b=V0uchjIuSnciK9U5Wym0yPONu1S/f7JjuE/E/0DeFbxPXKB93coHvqxYMA4C0vtkwzjGBBJDyG7ExBagBGQJ8tMw7aYjVy7cFZs6Uw+zLZ15qi4uJa8cQtBXza166PdkdSTiTaGgr+wG5a1A4tCnQ8qWFR5bl8j3AS2zYuaqUhQ08satgCBqz+f/NVGBY+rqD4Lg4HduG+953PhoMJBM28XfmENGr2kdrJn3DSrMZyYid1IG+jjc1CJaHil0DE6kT3tZYQBmHOiASRDNMrGfxrFR2pUxcAongeuWM8/zFL8XytaGHWEOCoyrH3qni7eU1RXi5hcpNQ+0JliAHqF3LA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by CH0PR11MB5460.namprd11.prod.outlook.com (2603:10b6:610:d3::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.28; Tue, 7 Nov
+ 2023 08:29:09 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::e7a4:a757:2f2e:f96a]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::e7a4:a757:2f2e:f96a%3]) with mapi id 15.20.6954.029; Tue, 7 Nov 2023
+ 08:29:08 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+CC: "Chatre, Reinette" <reinette.chatre@intel.com>, "jgg@nvidia.com"
+	<jgg@nvidia.com>, "yishaih@nvidia.com" <yishaih@nvidia.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "Jiang, Dave" <dave.jiang@intel.com>, "Liu, Jing2"
+	<jing2.liu@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "Yu, Fenghua"
+	<fenghua.yu@intel.com>, "tom.zanussi@linux.intel.com"
+	<tom.zanussi@linux.intel.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "patches@lists.linux.dev"
+	<patches@lists.linux.dev>
+Subject: RE: [RFC PATCH V3 00/26] vfio/pci: Back guest interrupts from
+ Interrupt Message Store (IMS)
+Thread-Topic: [RFC PATCH V3 00/26] vfio/pci: Back guest interrupts from
+ Interrupt Message Store (IMS)
+Thread-Index: AQHaCPdEtaV8qeHO6EmMpiKLQ58cQ7BjhMFwgAJFzACAAIkGYIAADu6QgAEuhgCAAKTv8IAAk0eAgAXJGJA=
+Date: Tue, 7 Nov 2023 08:29:08 +0000
+Message-ID: <BN9PR11MB52765E82CB809DA7C04A3EF18CA9A@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <cover.1698422237.git.reinette.chatre@intel.com>
+	<BL1PR11MB52710EAB683507AD7FAD6A5B8CA0A@BL1PR11MB5271.namprd11.prod.outlook.com>
+	<20231101120714.7763ed35.alex.williamson@redhat.com>
+	<BN9PR11MB52769292F138F69D8717BE8D8CA6A@BN9PR11MB5276.namprd11.prod.outlook.com>
+	<20231102151352.1731de78.alex.williamson@redhat.com>
+	<BN9PR11MB5276BCEA3275EC7203E06FDA8CA5A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20231103095119.63aa796f.alex.williamson@redhat.com>
+In-Reply-To: <20231103095119.63aa796f.alex.williamson@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|CH0PR11MB5460:EE_
+x-ms-office365-filtering-correlation-id: 9ed1e9ca-fc91-441b-d3f9-08dbdf6b9cd9
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 37RKtNbzdQ0jE7xlzJiZW+cW/ePOZKUylja+4s9sKC8KBY6Dppyoy2IbSfRgwL+dviJm4aQz+O2Ms2dZvalNJdirfJLMQ4Cxcce5WKP5p6oSmzQT9gCTB5NnHay9DjYSnYvwEyZPm3lOLILf1ZVSP7SBjUcDh5MuXgZLnq51UaJ2xPqwhz3ydoqMKawhQSD3TznMmi4e09Bt6gad1pIIdDTwzr/AAFsm38R5zekjNkcqAeKCt8zOaE5wHAjeexXSDUqU0cqnx9l+CygvwT0mkoPbm7dpnn5R8wODSs4K+O4jFxq4IslJyBloKnq4VlXaDEsqP0wSDFK9erVVIpbpDQN6ymzxRfsEUsHdrOQUK1toUYHgk8KvnOr8vcRbTfEbGIfLLbyhYIcJIphER3BeDcL2QhrEKDwd5avDMMQll+y7C79c22NpkIIirY5gKTsmfaO4Gj+otIKIw+rmA8aKVk/XQC+nvtbrrLE7giFtdUAeb2N2UAtrNMHU2SwBYGMSL89ScUNPRD5YKflF/+IppTjF4cLwEUZhEm4giG5qQbnjNP2mtj3IwK7QNEm2ib01UqEnPHVMucjOeJijAX6becRenko6H9fBXZZt9t2RZC757c6v0IBnJEbY8QNIU2jx
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(136003)(346002)(39860400002)(366004)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(66899024)(38100700002)(86362001)(5660300002)(41300700001)(15650500001)(2906002)(38070700009)(33656002)(82960400001)(122000001)(478600001)(83380400001)(9686003)(66946007)(26005)(76116006)(66476007)(316002)(6916009)(64756008)(66446008)(54906003)(66556008)(7696005)(71200400001)(6506007)(55016003)(8936002)(4326008)(8676002)(52536014);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?QhRQtUmqvDZX2ONzMuf4Ix3pwY5FOAq2Ld7WWYYxC+LRrXdIZjiQoay1APZw?=
+ =?us-ascii?Q?FGb9EDX5hRStKAYd/sNA4PGMQVAJ2SfSYxGtIZNElD0Ylr8yYeRYHzNRywJi?=
+ =?us-ascii?Q?j42fFRq8l60OUZeZ3hYY0gQVPBrvYfN7N6gjp/ncL6pqDDVSrslU8uNU8GLT?=
+ =?us-ascii?Q?DHeZzWnXxBj8YDD9mHboRqG2xbmFaPPqYSy9hSH4NzemWlEOVCNAGP3HVM14?=
+ =?us-ascii?Q?i6WyTz9C/FqbtkmE2bhLHQpZ25B7HoSKMfF+qeRuznW2UhD6xmmKH7pcUYFn?=
+ =?us-ascii?Q?O31f9FqXxx+qdaOK+AQtognt8uD6nbvIUDm8vEZI/jFHFNPRTnveVc5knbTe?=
+ =?us-ascii?Q?JJ09Loet7ybNVbD9L7k1FWBzVbJ9baxTAGRzLGMqI8aWnaS4hCSJftjI2v6/?=
+ =?us-ascii?Q?ejonpkmIOYUNkZbhlifB+W7MfmFKgoIXplMIILY2nSvXf9totvx72HVVRbzi?=
+ =?us-ascii?Q?Rw1PzvFBsSwSMHed8D5PxKwCTpDyKa8d5r/AGnJSq1QPS02KWbmjyOZ6VlYl?=
+ =?us-ascii?Q?ocCxZj4iof9LMgESwoW1gzV9PrAlt87F9uh74JxYhuPZ+/EW+30y28pkT3lU?=
+ =?us-ascii?Q?pci6RtaFtSqN98/a3ZL5QphFWCU2eNbe0gzfpA5Od6XDNgSpASfxft1GAnt3?=
+ =?us-ascii?Q?K/KT9YVcbDB28qNqMCPuNR8FZ5aWAcCiBL8ChE1tIWhFwUsDBok34xdC2Dzy?=
+ =?us-ascii?Q?VCbA9ZRDwbVgZwQDjhuzAGnjt/aHNywk4a2nKFXWULkbIoYZaCCDDD8zW7b4?=
+ =?us-ascii?Q?2uPS+FTNdbuEUD7kyfjvEwz+DD+ykf8Ykh4bZXxcVoEKg+94Lx1EE8hdPDux?=
+ =?us-ascii?Q?u8Q8qlFUDyOx00bs3KjcunkMR28tFPS+fe+WGZn7zXKoyAXN8mbGNvcXWaSk?=
+ =?us-ascii?Q?TYPObo91Qzqef/ErCJztCeSR1ZXyVJKa6CvE5VCMN1Wl0wCvAbHTJfHvkTPQ?=
+ =?us-ascii?Q?OK4W3nJFG5O+o7YBgSjhTF50bLUk7VKisY4AeiQ1q4qQ8o7/3yPj9oyhGBdE?=
+ =?us-ascii?Q?a1R5Kdss+NqZyhdK39D98Av8NTKckonTywcl800s+3gspV+rKb/YAvZ0VfFr?=
+ =?us-ascii?Q?Y4ZSuio66U2uoD+fzvoHGKOdLJ0iLwtVq/IVE4YhgUhNptvi0RFPgmhSftbl?=
+ =?us-ascii?Q?x7gv3RkXFQlhR8IKkMZ1AAufN11986+a+dHnvi8pJGz1PZYPPBNl0BaVxNaF?=
+ =?us-ascii?Q?zzCumrTZ2Ox8ciJ4mEeRKzjpxZd1SzzG09qpimeA6G+7IWpsgLVrqzV26koE?=
+ =?us-ascii?Q?FsKKOHW1cRTrXfDLZDgJbWvHgaD2x+OokCNqZAFOd4J7XTkGs4aKWlnCD+IB?=
+ =?us-ascii?Q?1EiJbD6/U+qoaS8VWPECJbFMIFtD1+e/cWCvre20D3wyCiDIiB+nKCIxDT5o?=
+ =?us-ascii?Q?2sYLlmj+GPRvFhXjfFXiuA4NXryutLQkGAhMtc51g1XXvUeGRNqXFzqDP4DE?=
+ =?us-ascii?Q?nAwAswDqGbTc2yOAy2Gev5to5ZwYkYYFP48+xF1mhrGjfZ6fPO2OC93b0f72?=
+ =?us-ascii?Q?lfjaswceGHCXBCLWWzuN3GvliqxwzblMHAphTGE4qKxBpj5NOUoYk5JBR8TA?=
+ =?us-ascii?Q?h7Xec9K996RLRCJ/cgFqj36pkanlY0woyRXrDlfO?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9ed1e9ca-fc91-441b-d3f9-08dbdf6b9cd9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Nov 2023 08:29:08.8458
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: lcHqDE+pR8O/H1JmOPGcG0mwZS/wK9Rr/EYpcbSObhRJK01eDCB3PLSH6823XvaKrrSjpGtVn8Pl69LIX0WRGQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5460
+X-OriginatorOrg: intel.com
 
-
---=-jonb5B2Fg8DNd2j2Yc9x
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, 2023-11-06 at 17:44 -0800, Dongli Zhang wrote:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (vcpu->arch.hv_clock.vers=
-ion && vcpu->kvm->arch.use_master_clock &&
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 static_cp=
-u_has(X86_FEATURE_CONSTANT_TSC)) {
+> From: Alex Williamson <alex.williamson@redhat.com>
+> Sent: Friday, November 3, 2023 11:51 PM
 >=20
-> If there any reason to use both vcpu->kvm->arch.use_master_clock and
-> X86_FEATURE_CONSTANT_TSC?
+> On Fri, 3 Nov 2023 07:23:13 +0000
+> "Tian, Kevin" <kevin.tian@intel.com> wrote:
+>=20
+> > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > Sent: Friday, November 3, 2023 5:14 AM
+> > >
+> > > On Thu, 2 Nov 2023 03:14:09 +0000
+> > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> > >
+> > > > > From: Tian, Kevin
+> > > > > Sent: Thursday, November 2, 2023 10:52 AM
+> > > > >
+> > > > > >
+> > > > > > Without an in-tree user of this code, we're just chopping up co=
+de for
+> > > > > > no real purpose.  There's no reason that a variant driver requi=
+ring
+> IMS
+> > > > > > couldn't initially implement their own SET_IRQS ioctl.  Doing t=
+hat
+> > > > >
+> > > > > this is an interesting idea. We haven't seen a real usage which w=
+ants
+> > > > > such MSI emulation on IMS for variant drivers. but if the code is
+> > > > > simple enough to demonstrate the 1st user of IMS it might not be
+> > > > > a bad choice. There are additional trap-emulation required in the
+> > > > > device MMIO bar (mostly copying MSI permission entry which
+> contains
+> > > > > PASID info to the corresponding IMS entry). At a glance that area
+> > > > > is 4k-aligned so should be doable.
+> > > > >
+> > > >
+> > > > misread the spec. the MSI-X permission table which provides
+> > > > auxiliary data to MSI-X table is not 4k-aligned. It sits in the 1st
+> > > > 4k page together with many other registers. emulation of them
+> > > > could be simple with a native read/write handler but not sure
+> > > > whether any of them may sit in a hot path to affect perf due to
+> > > > trap...
+> > >
+> > > I'm not sure if you're referring to a specific device spec or the PCI
+> > > spec, but the PCI spec has long included an implementation note
+> > > suggesting alignment of the MSI-X vector table and pba and separation
+> > > from CSRs, and I see this is now even more strongly worded in the 6.0
+> > > spec.
+> > >
+> > > Note though that for QEMU, these are emulated in the VMM and not
+> > > written through to the device.  The result of writes to the vector
+> > > table in the VMM are translated to vector use/unuse operations, which
+> > > we see at the kernel level through SET_IRQS ioctl calls.  Are you
+> > > expecting to get PASID information written by the guest through the
+> > > emulated vector table?  That would entail something more than a simpl=
+e
+> > > IMS backend to MSI-X frontend.  Thanks,
+> > >
+> >
+> > I was referring to IDXD device spec. Basically it allows a process to
+> > submit a descriptor which contains a completion interrupt handle.
+> > The handle is the index of a MSI-X entry or IMS entry allocated by
+> > the idxd driver. To mark the association between application and
+> > related handles the driver records the PASID of the application
+> > in an auxiliary structure for MSI-X (called MSI-X permission table)
+> > or directly in the IMS entry. This additional info includes whether
+> > an MSI-X/IMS entry has PASID enabled and if yes what is the PASID
+> > value to be checked against the descriptor.
+> >
+> > As you said virtualizing MSI-X table itself is via SET_IRQS and it's
+> > 4k aligned. Then we also need to capture guest updates to the MSI-X
+> > permission table and copy the PASID information into the
+> > corresponding IMS entry when using the IMS backend. It's MSI-X
+> > permission table not 4k aligned then trapping it will affect adjacent
+> > registers.
+> >
+> > My quick check in idxd spec doesn't reveal an real impact in perf
+> > critical path. Most registers are configuration/control registers
+> > accessed at driver init time and a few interrupt registers related
+> > to errors or administrative purpose.
+>=20
+> Right, it looks like you'll need to trap writes to the MSI-X
+> Permissions Table via a sparse mmap capability to avoid assumptions
+> whether it lives on the same page as the MSI-X vector table or PBA.
+> Ideally the hardware folks have considered this to avoid any conflict
+> with latency sensitive registers.
+>=20
+> The variant driver would use this for collecting the meta data relative
+> to the IMS interrupt, but this is all tangential to whether we
+> preemptively slice up vfio-pci-core's SET_IRQS ioctl or the iDXD driver
+> implements its own.
 
-Er, paranoia? I'll recheck.
-
-> I think even __get_kvmclock() would not require both cases at the same ti=
-me?
->=20
-> =C2=A03071=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ka->use_ma=
-ster_clock &&
-> =C2=A03072=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 (static_cpu_has(X86_FEATURE_CONSTANT_TSC) || __this_cpu_read(cpu_=
-tsc_khz))) {
->=20
-
-But it does. That requires ka->use_master_clock (line 3071) AND that we
-know the current CPU's TSC frequency (line 3072).
-
-My code insists on the CONSTANT_TSC form of "knowing the current CPU's
-TSC frequency" because even with a get_cpu(), it's not clear the guest
-*was* running on this vCPU when it did its calculations. So I don't
-want to go anywhere near the !CONSTANT_TSC case; it can use the
-fallback.
-
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0/*
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * Without CONSTANT_TSC, get_kvmclock_ns() is the only=
- option.
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 *
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * Also if the guest PV clock hasn't been set up yet, =
-as is
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * likely to be the case during migration when the vCP=
-U has
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * not been run yet. It would be possible to calculate=
- the
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * scaling factors properly in that case but there's n=
-ot much
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * point in doing so. The get_kvmclock_ns() drift accu=
-mulates
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * over time, so it's OK to use it at startup. Besides=
-, on
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * migration there's going to be a little bit of skew =
-in the
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * precise moment at which timers fire anyway. Often t=
-hey'll
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * be in the "past" by the time the VM is running agai=
-n after
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * migration.
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0guest_now =3D get_kvmclock_ns(vcpu->kvm);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0kernel_now =3D ktime_get();
->=20
-> 1. Can I assume the issue is still there if we fall into the "else" case?=
- That
-> is, the increasing inaccuracy as the VM has been up for longer and longer=
- time?
->=20
-> If that is the case, which may be better?
->=20
-> (1) get_kvmclock_ns(), or
-> (2) always get_kvmclock_base_ns() + ka->kvmclock_offset, when pvclock is =
-not
-> enabled, regardless whether master clock is used. At least, the inaccurar=
-y is
-> not going to increase over guest time?
-
-No, those are both wrong, and drifting further away over time. They are
-each *differently* wrong, which is why periodically clamping (1) to (2)
-is also broken, as previously discussed. I know you've got a patch to
-do that clamping more *often* which would slightly reduce the pain
-because the kvmclock wouldn't jump backwards so *far* each time... but
-it's still wrong to do so at all (in either direction).
-
->=20
-> 2. I see 3 scenarios here:
->=20
-> (1) vcpu->arch.hv_clock.version and master clock is used.
->=20
-> In this case, the bugfix looks good.
->=20
-> (2) The master clock is used. However, pv clock is not enabled.
->=20
-> In this case, the bug is not resolved? ... even the master clock is used.
-
-Under Xen the PV clock is always enabled. It's in the vcpu_info
-structure which is required for any kind of event channel setup.
+Agree
 
 >=20
-> (3) The master clock is not used.
->=20
-> We fall into get_kvmclock_base_ns() + ka->kvmclock_offset. The behavior i=
-s not
-> changed. This looks good.
->=20
->=20
-> Just from my own point: as this patch involves relatively complex changes=
-, I
-> would suggest resolve the issue, but not use a temporary solution :)
+> And just to be clear, I don't expect the iDXD variant driver to go to
+> extraordinary lengths to duplicate the core ioctl, we can certainly
+> refactor and export things where it makes sense, but I think it likely
+> makes more sense for the variant driver to implement the shell of the
+> ioctl rather than trying to multiplex the entire core ioctl with an ops
+> structure that's so intimately tied to the core implementation and
+> focused only on the MSI-X code paths.  Thanks,
 >=20
 
-This is the conversation I had with Paul on Tuesday, when he wanted me
-to fix up this "(3) / behaviour is not changed" case. And yes, I argued
-that we *don't* want a temporary solution for this case. Because yes:
-
-> (I see you mentioned that you will be back with get_kvmclock_ns())
-
-We need to fix get_kvmclock_ns() anyway. The systemic drift *and* the
-fact that we periodically clamp it to a different clock and make it
-jump. I was working on the former and have something half-done but was
-preempted by the realisation that the QEMU soft freeze is today, and I
-needed to flush my QEMU patch queue.
-
-But even once we fix get_kvmclock_ns(), *this* patch stands. Because it
-*also* addresses the "now" problem, where we get the time by one clock
-... and then some time passes ... and we get the time by another clock,
-and subtract one from the other as if they were the *same* time.
-
-Using kvm_get_monotonic_and_clockread() gives us a single TSC read
-corresponding to the CLOCK_MONOTONIC time, from which we can calculate
-the kvmclock time. We just *happen* to calculate it correctly here,
-unlike anywhere else in KVM.
-
-> Based on your bug fix, I see the below cases:
->=20
-> If master clock is not used:
-> =C2=A0=C2=A0=C2=A0 get_kvmclock_base_ns() + ka->kvmclock_offset
->=20
-> If master clock is used:
-> =C2=A0=C2=A0=C2=A0 If pvclock is enabled:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 use the &vcpu->arch.hv_clock t=
-o get current guest time
-> =C2=A0=C2=A0=C2=A0 Else
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 create a temporary hv_clock, b=
-ased on masterclock.
-
-I don't want to do that last 'else' clause yet, because that feels like
-a temporary workaround. It should be enough to call get_kvmclock_ns(),
-once we fix it.
-
-
-
-
---=-jonb5B2Fg8DNd2j2Yc9x
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTA3MDgxNzQ4WjAvBgkqhkiG9w0BCQQxIgQgb5anloGU
-JBzi9l8+1dfhEa4yGM1uXKiX0RabQ3jOZJgwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAxE+tTqJ7og4GBL7iKL6KgfEU/FL2dDkwV
-CxywXrkKj4twGDBUq9d454AXXoLYmUzRXfC4VUu5kYidTRIk/uVh8Sa6x7QdNuy/BxkAzCymFR4d
-6vZKvNdgad6AFeowJR2Qi1/Am8puL48K2VjkmOBAUnnT33R9P+GJ+w+7gHnWnwX0CzvNF1RenuGS
-76RU4hXJQ33cw2TUcdm3zdwhr6UuZlajco8L1180dxUio9bIPMKUjGGko+HX3Ver8QARjgN9Mmn6
-61xWY71EUxNv67l8RTj935ZMonsyYhUBdegg5/2A6jnPQp8hsYCXzolVWLHtkzabta2yjqdz4wKB
-alQXrIFt6hGd9vKHaidqNPOXsCg3nCS7o+Q4OXoZABiybaItRfPsGOlNw2mybWIUXRBKVrEi73ww
-YzT7m+TJUiI5TdNp2Jx0hCu2ZFtko7US6xqWb3Lxvi3SjUx3xm/qLYuKindCffSGphy7NotBd3N4
-KO4num6aGaxwhlScJBqSaIKK/dgAHWI4b9QeFcMyL8EoCQd3UeZTRQzLPBCiD8ryObQy9CYtIB6K
-V3mvf7vysx+5pazS1WPjSNe7M4aMrYIxFNtrZaCZLg1FrPNcuTYupRySGsYQ7CDTizMDqv+ilgVp
-TBlMCei5EmFq8Qj+ZRU2NOZmd51U3msBvKaJu/H5aAAAAAAAAA==
-
-
---=-jonb5B2Fg8DNd2j2Yc9x--
+btw I'll let Reinette to decide whether she wants to implement such
+a variant driver or waits until idxd siov driver is ready to demonstrate
+the usage. One concern with the variant driver approach is lacking
+of a real-world usage (e.g. what IMS brings when guest only wants
+MSI-X on an assigned PF). Though it may provide a shorter path
+to enable the IMS backend support, also comes with the long-term
+maintenance burden.
 
