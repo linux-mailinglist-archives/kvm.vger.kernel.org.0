@@ -1,288 +1,207 @@
-Return-Path: <kvm+bounces-848-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-862-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 693487E37B2
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 10:22:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F8307E37D7
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 10:25:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E84DE1F21639
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 09:22:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D593CB20CF5
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 09:25:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A278913FEA;
-	Tue,  7 Nov 2023 09:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDBE42D795;
+	Tue,  7 Nov 2023 09:25:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cXL8LypY"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XXLIEPqz"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C646C10A0D
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 09:22:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEEC32D786
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 09:25:22 +0000 (UTC)
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E91EE101
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 01:22:19 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 980B910A
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 01:25:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-	Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=YJV5o104qjauuiRqcLLaaBRiRTHcW4la7jnMKfwf+K4=; b=cXL8LypY6rlFsaV56+e/DjbVqU
-	RoQUR6lbnGbrqsclyoZC+HYzegiv3pFjFQCZ7gU1ug+xOoRcxJP3Jr9OOK+SfkppcR9DD7sHeC+SN
-	wjm1KPuYqZNv/VLy9SXZY5IF9fqUMwNebr0vQlGypMe3zYjRc9oiPNycttxsNL4IZd8/ADWGaEeSE
-	dWJg+EL41yAVH6MXSwbteq9Ap45i+71y9TTtGb+V+pX2DyOlmPVLdgizOivb2ajAMP2irEh/yb0w6
-	GLxqgwCm40NU5OBiXq/u8G4vv7N+HssHaZXqAtZjQpL3Owh2OMm9N0oGg4KWw/eWtAWh4+4MZyE20
-	rPtyB4cQ==;
-Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=lDnI+BR25hSHTCQh/yPBWI/j2NQPRqi0Ej7YY+Ig8nc=; b=XXLIEPqzWBhckNc+r6HnYqZL6i
+	IVXGktcmSkS87UVPvDTWdvY8bm4lkl9rVGmkHd9+2LjBriZUij9nzKzqyVoe69hEJUbEPTPJcHLYZ
+	BpNqrG69JpyEY/V1ijBMjqRRgE4gt6Jxd483s/Z7cv61EcuA72XjlxxxGH57nOD1FxHeI+p4XlcuT
+	Ot3SvAxAiS0oQbvvYh402snsfFS/O735gIPQTboxF2YZbLFNgn8UXKBq08PzoSf5bCxhLx/11m6Le
+	2lvCDYKP+QK1P5djDv/gOgxbhLnqDu+6BRffd4wNcicmRFVaXiPs7KCg8XAZmcrQ5zpA7QJdnd9al
+	0f88bY4A==;
+Received: from [2001:8b0:10b:5:63c4:8578:30dc:d79e] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1r0IHO-00BPkY-3C; Tue, 07 Nov 2023 09:21:50 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.96.2 #2 (Red Hat Linux))
-	id 1r0IHO-001hKo-19;
-	Tue, 07 Nov 2023 09:21:50 +0000
+	id 1r0IKZ-00BSLB-A9; Tue, 07 Nov 2023 09:25:08 +0000
+Message-ID: <d86f6b781420898f959bc39d488d589e640c8cf5.camel@infradead.org>
+Subject: Re: [PATCH v4 16/17] doc/sphinx/hxtool.py: add optional label
+ argument to SRST directive
 From: David Woodhouse <dwmw2@infradead.org>
-To: qemu-devel@nongnu.org,
-	Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>,
-	Hanna Reitz <hreitz@redhat.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Anthony Perard <anthony.perard@citrix.com>,
-	Paul Durrant <paul@xen.org>,
-	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Jason Wang <jasowang@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	qemu-block@nongnu.org,
-	xen-devel@lists.xenproject.org,
-	kvm@vger.kernel.org
-Subject: [PULL 15/15] docs: update Xen-on-KVM documentation
-Date: Tue,  7 Nov 2023 09:21:47 +0000
-Message-ID: <20231107092149.404842-16-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231107092149.404842-1-dwmw2@infradead.org>
-References: <20231107092149.404842-1-dwmw2@infradead.org>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>, Peter
+ Maydell <peter.maydell@linaro.org>, Stefano Stabellini
+ <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Paul
+ Durrant <paul@xen.org>,  =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau
+ <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard
+ Henderson <richard.henderson@linaro.org>, Eduardo Habkost
+ <eduardo@habkost.net>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel
+ Apfelbaum <marcel.apfelbaum@gmail.com>, Jason Wang <jasowang@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>,  qemu-block@nongnu.org,
+ xen-devel@lists.xenproject.org, kvm@vger.kernel.org
+Date: Tue, 07 Nov 2023 09:25:07 +0000
+In-Reply-To: <20231106143507.1060610-17-dwmw2@infradead.org>
+References: <20231106143507.1060610-1-dwmw2@infradead.org>
+	 <20231106143507.1060610-17-dwmw2@infradead.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-rQuFZzNqFQQuyIVq2aQW"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-From: David Woodhouse <dwmw@amazon.co.uk>
 
-Add notes about console and network support, and how to launch PV guests.
-Clean up the disk configuration examples now that that's simpler, and
-remove the comment about IDE unplug on q35/AHCI now that it's fixed.
+--=-rQuFZzNqFQQuyIVq2aQW
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Update the -initrd option documentation to explain how to quote commas
-in module command lines, and reference it when documenting PV guests.
+On Mon, 2023-11-06 at 14:35 +0000, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+>=20
+> We can't just embed labels directly into files like qemu-options.hx which
+> are included from multiple top-level RST files, because Sphinx sees the
+> labels as duplicate: https://github.com/sphinx-doc/sphinx/issues/9707
+>=20
+> So add an 'emitrefs' option to the Sphinx hxtool-doc directive, which is
+> set only in invocation.rst and not from the HTML rendition of the man
+> page. Along with an argument to the SRST directive which causes a label
+> of the form '.. _LABEL-reference-label:' to be emitted when the emitrefs
+> option is set.
+>=20
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> ---
 
-Also update stale avocado test filename in MAINTAINERS.
+FWIW I've left this out of the pull request I just sent, and the Xen
+docs just tell the user to go *find* the -initrd documentation instead
+of being able to emit a direct link. We can fix that later.
 
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-Reviewed-by: Paul Durrant <paul@xen.org>
----
- MAINTAINERS              |   2 +-
- docs/system/i386/xen.rst | 107 +++++++++++++++++++++++++++++----------
- qemu-options.hx          |  12 ++++-
- 3 files changed, 90 insertions(+), 31 deletions(-)
+--=-rQuFZzNqFQQuyIVq2aQW
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 59b92ee640..fd6b362311 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -490,7 +490,7 @@ S: Supported
- F: include/sysemu/kvm_xen.h
- F: target/i386/kvm/xen*
- F: hw/i386/kvm/xen*
--F: tests/avocado/xen_guest.py
-+F: tests/avocado/kvm_xen_guest.py
- 
- Guest CPU Cores (other accelerators)
- ------------------------------------
-diff --git a/docs/system/i386/xen.rst b/docs/system/i386/xen.rst
-index f06765e88c..81898768ba 100644
---- a/docs/system/i386/xen.rst
-+++ b/docs/system/i386/xen.rst
-@@ -15,46 +15,24 @@ Setup
- -----
- 
- Xen mode is enabled by setting the ``xen-version`` property of the KVM
--accelerator, for example for Xen 4.10:
-+accelerator, for example for Xen 4.17:
- 
- .. parsed-literal::
- 
--  |qemu_system| --accel kvm,xen-version=0x4000a,kernel-irqchip=split
-+  |qemu_system| --accel kvm,xen-version=0x40011,kernel-irqchip=split
- 
- Additionally, virtual APIC support can be advertised to the guest through the
- ``xen-vapic`` CPU flag:
- 
- .. parsed-literal::
- 
--  |qemu_system| --accel kvm,xen-version=0x4000a,kernel-irqchip=split --cpu host,+xen_vapic
-+  |qemu_system| --accel kvm,xen-version=0x40011,kernel-irqchip=split --cpu host,+xen-vapic
- 
- When Xen support is enabled, QEMU changes hypervisor identification (CPUID
- 0x40000000..0x4000000A) to Xen. The KVM identification and features are not
- advertised to a Xen guest. If Hyper-V is also enabled, the Xen identification
- moves to leaves 0x40000100..0x4000010A.
- 
--The Xen platform device is enabled automatically for a Xen guest. This allows
--a guest to unplug all emulated devices, in order to use Xen PV block and network
--drivers instead. Under Xen, the boot disk is typically available both via IDE
--emulation, and as a PV block device. Guest bootloaders typically use IDE to load
--the guest kernel, which then unplugs the IDE and continues with the Xen PV block
--device.
--
--This configuration can be achieved as follows
--
--.. parsed-literal::
--
--  |qemu_system| -M pc --accel kvm,xen-version=0x4000a,kernel-irqchip=split \\
--       -drive file=${GUEST_IMAGE},if=none,id=disk,file.locking=off -device xen-disk,drive=disk,vdev=xvda \\
--       -drive file=${GUEST_IMAGE},index=2,media=disk,file.locking=off,if=ide
--
--It is necessary to use the pc machine type, as the q35 machine uses AHCI instead
--of legacy IDE, and AHCI disks are not unplugged through the Xen PV unplug
--mechanism.
--
--VirtIO devices can also be used; Linux guests may need to be dissuaded from
--umplugging them by adding 'xen_emul_unplug=never' on their command line.
--
- Properties
- ----------
- 
-@@ -63,7 +41,10 @@ The following properties exist on the KVM accelerator object:
- ``xen-version``
-   This property contains the Xen version in ``XENVER_version`` form, with the
-   major version in the top 16 bits and the minor version in the low 16 bits.
--  Setting this property enables the Xen guest support.
-+  Setting this property enables the Xen guest support. If Xen version 4.5 or
-+  greater is specified, the HVM leaf in Xen CPUID is populated. Xen version
-+  4.6 enables the vCPU ID in CPUID, and version 4.17 advertises vCPU upcall
-+  vector support to the guest.
- 
- ``xen-evtchn-max-pirq``
-   Xen PIRQs represent an emulated physical interrupt, either GSI or MSI, which
-@@ -83,8 +64,78 @@ The following properties exist on the KVM accelerator object:
-   through simultaneous grants. For guests with large numbers of PV devices and
-   high throughput, it may be desirable to increase this value.
- 
--OS requirements
-----------------
-+Xen paravirtual devices
-+-----------------------
-+
-+The Xen PCI platform device is enabled automatically for a Xen guest. This
-+allows a guest to unplug all emulated devices, in order to use paravirtual
-+block and network drivers instead.
-+
-+Those paravirtual Xen block, network (and console) devices can be created
-+through the command line, and/or hot-plugged.
-+
-+To provide a Xen console device, define a character device and then a device
-+of type ``xen-console`` to connect to it. For the Xen console equivalent of
-+the handy ``-serial mon:stdio`` option, for example:
-+
-+.. parsed-literal::
-+   -chardev stdio,mux=on,id=char0,signal=off -mon char0 \\
-+   -device xen-console,chardev=char0
-+
-+The Xen network device is ``xen-net-device``, which becomes the default NIC
-+model for emulated Xen guests, meaning that just the default NIC provided
-+by QEMU should automatically work and present a Xen network device to the
-+guest.
-+
-+Disks can be configured with '``-drive file=${GUEST_IMAGE},if=xen``' and will
-+appear to the guest as ``xvda`` onwards.
-+
-+Under Xen, the boot disk is typically available both via IDE emulation, and
-+as a PV block device. Guest bootloaders typically use IDE to load the guest
-+kernel, which then unplugs the IDE and continues with the Xen PV block device.
-+
-+This configuration can be achieved as follows:
-+
-+.. parsed-literal::
-+
-+  |qemu_system| --accel kvm,xen-version=0x40011,kernel-irqchip=split \\
-+       -drive file=${GUEST_IMAGE},if=xen \\
-+       -drive file=${GUEST_IMAGE},file.locking=off,if=ide
-+
-+VirtIO devices can also be used; Linux guests may need to be dissuaded from
-+umplugging them by adding '``xen_emul_unplug=never``' on their command line.
-+
-+Booting Xen PV guests
-+---------------------
-+
-+Booting PV guest kernels is possible by using the Xen PV shim (a version of Xen
-+itself, designed to run inside a Xen HVM guest and provide memory management
-+services for one guest alone).
-+
-+The Xen binary is provided as the ``-kernel`` and the guest kernel itself (or
-+PV Grub image) as the ``-initrd`` image, which actually just means the first
-+multiboot "module". For example:
-+
-+.. parsed-literal::
-+
-+  |qemu_system| --accel kvm,xen-version=0x40011,kernel-irqchip=split \\
-+       -chardev stdio,id=char0 -device xen-console,chardev=char0 \\
-+       -display none  -m 1G  -kernel xen -initrd bzImage \\
-+       -append "pv-shim console=xen,pv -- console=hvc0 root=/dev/xvda1" \\
-+       -drive file=${GUEST_IMAGE},if=xen
-+
-+The Xen image must be built with the ``CONFIG_XEN_GUEST`` and ``CONFIG_PV_SHIM``
-+options, and as of Xen 4.17, Xen's PV shim mode does not support using a serial
-+port; it must have a Xen console or it will panic.
-+
-+The example above provides the guest kernel command line after a separator
-+(" ``--`` ") on the Xen command line, and does not provide the guest kernel
-+with an actual initramfs, which would need to listed as a second multiboot
-+module. For more complicated alternatives, see the command line
-+documentation for the ``-initrd`` option.
-+
-+Host OS requirements
-+--------------------
- 
- The minimal Xen support in the KVM accelerator requires the host to be running
- Linux v5.12 or newer. Later versions add optimisations: Linux v5.17 added
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 7809036d8c..3eee3c33eb 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3986,14 +3986,22 @@ ERST
- DEF("initrd", HAS_ARG, QEMU_OPTION_initrd, \
-            "-initrd file    use 'file' as initial ram disk\n", QEMU_ARCH_ALL)
- SRST
-+
- ``-initrd file``
-     Use file as initial ram disk.
- 
- ``-initrd "file1 arg=foo,file2"``
-     This syntax is only available with multiboot.
- 
--    Use file1 and file2 as modules and pass arg=foo as parameter to the
--    first module.
-+    Use file1 and file2 as modules and pass ``arg=foo`` as parameter to the
-+    first module. Commas can be provided in module parameters by doubling
-+    them on the command line to escape them:
-+
-+``-initrd "bzImage earlyprintk=xen,,keep root=/dev/xvda1,initrd.img"``
-+    Multiboot only. Use bzImage as the first module with
-+    "``earlyprintk=xen,keep root=/dev/xvda1``" as its command line,
-+    and initrd.img as the second module.
-+
- ERST
- 
- DEF("dtb", HAS_ARG, QEMU_OPTION_dtb, \
--- 
-2.41.0
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTA3MDkyNTA3WjAvBgkqhkiG9w0BCQQxIgQgUHu9UhMc
+MzvsJ+Z+Y+Vzlp/LOfQhhPiLDZt2rfnD7xUwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCEQg40j/N457tiWL0212ZIxP+Mw/2UW7qL
+0VKBEo5HJcZrXwPyhiUdrh7UHws8iVMPJskwoKJ/7+j2UZShXfGIVrsBy7EMT8iZn9squpKsFrOP
+nf69vIrXfoNsOa+JLcKYotC9AtBB9bgVnzf9CHDjGZMkRdmRFTAuCTRY7yR4m4qraysX0RB6zxtI
+Lj1oMSJiSXjrPffx6kU7oRGAm9oak/zcmevbAQp3TPHupEzsxuyehmHv6rl9mEHgFRkSQpuHFWO7
+bTkdLl2daboEFlf2pj2UhNQK/mISzX7QrdHYc7kounFa9bkpCC+Hcgc6L1IMfeoM8eDbYQX/lYXN
+vW7SfZh09gWmpVYo0OAVdWVlmNvOxLa2zdm7cQnjvh9aMloCjJ8rbjiANp7a097ugaMqV/53SS2V
+fesa9haJzTarE2OqGHPrsGUWNj3dFCnnHRnIqO/OuN0NgtNRpj3uTA4HGHaNhu6zq5xMOL/7WeOt
+h55X1h1T+4uRUb1UgFYnn+SFw1fJqYB8wC88T9pOyiiB5FfrNu1JR71rGgzuQJy14IYF0gCXCWf3
+i1G+6uxen5C3tOhp3alcyapf7cF0ck8SG5JPusHFZER5pbfo30gF5b+RfbpqD5gfdanndltKiUL5
+Uv1YSYJgLrN4Qn+pf+yqsBxKAa4AUQB3oVLEMUmMOwAAAAAAAA==
 
+
+--=-rQuFZzNqFQQuyIVq2aQW--
 
