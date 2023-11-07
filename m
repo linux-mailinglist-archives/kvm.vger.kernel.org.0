@@ -1,87 +1,83 @@
-Return-Path: <kvm+bounces-1088-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1089-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C04C77E4B83
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 23:09:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90AA77E4BB2
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 23:29:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1CF81C20B6E
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 22:09:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA2011C20C92
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 22:29:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25BF32A8C4;
-	Tue,  7 Nov 2023 22:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 896A22A8CF;
+	Tue,  7 Nov 2023 22:29:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="kazyfy9M"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h4/MLFNe"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CCF2F87F;
-	Tue,  7 Nov 2023 22:09:44 +0000 (UTC)
-Received: from mail.alien8.de (mail.alien8.de [IPv6:2a01:4f9:3051:3f93::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B96583;
-	Tue,  7 Nov 2023 14:09:43 -0800 (PST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id B818940E0192;
-	Tue,  7 Nov 2023 22:09:40 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id MbibT-UAAQK9; Tue,  7 Nov 2023 22:09:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1699394978; bh=lOT/q2YMdfMaABo1869FPWc3E5BoFcxVu/riUnoyNfE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kazyfy9MvcfPtPI2fIHIuAgO8cNbKnOJerf7UFZ/vmwZ29AYomlihQKkFnCazWCGE
-	 YnYFf2u+olFhHZl0nOc+C04jfE4t4ELuytMz89ibcTlyzbxSesC2ikJPfhOrC9SMfH
-	 NE3mWDHSg5XeYHz2Zbj6kgduVhP0L++xlw3A21u0vAVVfwkAcdoTtBePO1fv9iFA8U
-	 hO86aq6Y6f/3aLrVVaPX7CcMEUaOcp5uhcV1ImIwXDskHjLaARwQh+2WluChaABDrX
-	 xc7Nf/k1xM2aPa8QYnQ2Lv68Asnz5tCVW+cBvrO+TuqbnR2TRHsjM6bG74aTSNO1ta
-	 DfjNwkQecY8Rei72kk5mtZweOCD/p2gZLMRSioP68LcYUxfDA+zWhNx3jtPU7zZWTm
-	 8cgb+STwIH65xamLBIGqLS679KW+fIGgv1+0j9tqMZFHMRFtL70r5NdbUMx7VfvvUf
-	 YWcnYEPnH/uhjvMHdDBC36OEsVmm0Unt5Zup1Q3okckHBj4W0h2ShoC5ZJmo53tpFU
-	 VTp/UWmukqbi4EkmCBYupQg4lwmzfl1AJDNE9De28cSLOmzUjhdZB39PFgGn/5qKqQ
-	 SeS3sEMDv5G5hFV8jy96ohxCIdkFggvbyOWpxz9cUPmGv5ddsWN0RecxElZR+UNYgp
-	 SAWqknNy5TXbnANuc6EsHRq4=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F14EB40E0191;
-	Tue,  7 Nov 2023 22:08:57 +0000 (UTC)
-Date: Tue, 7 Nov 2023 23:08:52 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-	linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-	tony.luck@intel.com, marcorr@google.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
-	liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v10 06/50] x86/sev: Add the host SEV-SNP initialization
- support
-Message-ID: <20231107220852.GGZUq1dHJ2q9LYV2oG@fat_crate.local>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-7-michael.roth@amd.com>
- <20231107163142.GAZUpmbt/i3himIf+E@fat_crate.local>
- <4a2016d6-dc1f-ff68-9827-0b72b7c8eac2@amd.com>
- <20231107191931.GCZUqNwxP8JcSbjZ0/@fat_crate.local>
- <20231107202757.GEZUqdzYyzVBHTBhZX@fat_crate.local>
- <250f5513-91c0-d0b5-cb59-439e26ba16dc@amd.com>
- <20231107212740.GFZUqrzK7yzy41dRKp@fat_crate.local>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618A02F870
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 22:29:07 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C94D11B
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 14:29:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699396145;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=14nYNv3+xpT4VSdBjbRS8HYKLwqiJKoVofBxrd00cPA=;
+	b=h4/MLFNeeDIlCWeOE8fqpCfqrczNWi2/gmiuO2EMbhmcaO+RbvVGzZ9ILlXCGzqi70WWBp
+	p2lSgXRuaZk0GUUTgVmfbHBpASc5OWhomD8dizKAb9EPnZ3odT7vR/J/ZrxvaCj70u3COJ
+	h3XVkwSClbUdlQXqU3Kfao3Nlj2JjQs=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-451-PdylK355MQe-x2p-dRJOmg-1; Tue, 07 Nov 2023 17:29:03 -0500
+X-MC-Unique: PdylK355MQe-x2p-dRJOmg-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-778a3e0b755so97869585a.1
+        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 14:29:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699396143; x=1700000943;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=14nYNv3+xpT4VSdBjbRS8HYKLwqiJKoVofBxrd00cPA=;
+        b=CuisHEgVB2lYHgBjtpmS+ZtbwSxO+USktWGz6GkYEFhc8fWMr1aUguU56M38xy+HxY
+         7DxgmRSszom2PngW1NajoJXmgjY8rkM02QN1aZkv4tnTQ2dnqwBhDlddse88YdZJe+AJ
+         nv2f3uwQ5EFKaNhFMqRNrvUaVpHQYGWQzmCtrt97cx5OyFC8B3HnOUZtDeYQ/S2Or5qr
+         a0qW88QFpl3skCRQfSnsDSLGR94z5OdYxnx6meJv60Lx87Dvu2vmoH2ic/B/maHvXYVk
+         mTCtDgnKbU6805YTaIvJKNavVGu8ZQFwYvQgnKtmcNfWBGY9cUtzavsugbe1Rdxx/vlS
+         sG6Q==
+X-Gm-Message-State: AOJu0YwIPf9fLyvMvsiWDm7zOchSskEwRkZ7IxvlJjC1YRMeXudukaMQ
+	RargkuD9G5MnhL0J6DmQu5KP4QRH6iUQF7uuXlaK2zS1o367hnmR5cni5CHCUJo/ChHn2pNWid7
+	mInuIpnk1NjbU
+X-Received: by 2002:a05:620a:1a98:b0:76d:95d3:800f with SMTP id bl24-20020a05620a1a9800b0076d95d3800fmr548461qkb.3.1699396143256;
+        Tue, 07 Nov 2023 14:29:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFGb2u25pNaIZvHnk6V0FK7STL+1PooXM5T2CLNLGM3wP6wOMwdu+mXbDrkzZ/DBEyIi9BNRw==
+X-Received: by 2002:a05:620a:1a98:b0:76d:95d3:800f with SMTP id bl24-20020a05620a1a9800b0076d95d3800fmr548450qkb.3.1699396142894;
+        Tue, 07 Nov 2023 14:29:02 -0800 (PST)
+Received: from x1n (cpe5c7695f3aee0-cm5c7695f3aede.cpe.net.cable.rogers.com. [99.254.144.39])
+        by smtp.gmail.com with ESMTPSA id bj28-20020a05620a191c00b007756f60bcacsm352809qkb.79.2023.11.07.14.29.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Nov 2023 14:29:02 -0800 (PST)
+Date: Tue, 7 Nov 2023 17:29:00 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: David Matlack <dmatlack@google.com>, kvm list <kvm@vger.kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	James Houghton <jthoughton@google.com>,
+	Oliver Upton <oupton@google.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Mike Kravetz <mike.kravetz@oracle.com>,
+	Andrea Arcangeli <aarcange@redhat.com>
+Subject: Re: RFC: A KVM-specific alternative to UserfaultFD
+Message-ID: <ZUq6LJ+YppFlf43f@x1n>
+References: <CALzav=d23P5uE=oYqMpjFohvn0CASMJxXB_XEOEi-jtqWcFTDA@mail.gmail.com>
+ <ZUlLLGLi1IyMyhm4@x1n>
+ <fcef7c96-a1bb-4c1d-962b-1bdc2a3b4f19@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,172 +86,223 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231107212740.GFZUqrzK7yzy41dRKp@fat_crate.local>
+In-Reply-To: <fcef7c96-a1bb-4c1d-962b-1bdc2a3b4f19@redhat.com>
 
-Ontop. Only build-tested.
+Paolo,
 
----
-diff --git a/arch/x86/include/asm/iommu.h b/arch/x86/include/asm/iommu.h
-index 2fd52b65deac..3be2451e7bc8 100644
---- a/arch/x86/include/asm/iommu.h
-+++ b/arch/x86/include/asm/iommu.h
-@@ -10,6 +10,7 @@ extern int force_iommu, no_iommu;
- extern int iommu_detected;
- extern int iommu_merge;
- extern int panic_on_overflow;
-+extern bool amd_iommu_snp_en;
- 
- #ifdef CONFIG_SWIOTLB
- extern bool x86_swiotlb_enable;
-diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index 8b9ed72489e4..9237c327ad6d 100644
---- a/arch/x86/virt/svm/sev.c
-+++ b/arch/x86/virt/svm/sev.c
-@@ -196,23 +196,15 @@ static __init int __snp_rmptable_init(void)
- 
- static int __init snp_rmptable_init(void)
- {
--	int family, model;
--
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!amd_iommu_snp_en)
- 		return 0;
- 
--	family = boot_cpu_data.x86;
--	model  = boot_cpu_data.x86_model;
--
- 	/*
- 	 * RMP table entry format is not architectural and it can vary by processor and
- 	 * is defined by the per-processor PPR. Restrict SNP support on the known CPU
- 	 * model and family for which the RMP table entry format is currently defined for.
- 	 */
--	if (family != 0x19 || model > 0xaf)
--		goto nosnp;
--
--	if (amd_iommu_snp_enable())
-+	if (boot_cpu_data.x86 != 0x19 || boot_cpu_data.x86_model > 0xaf)
- 		goto nosnp;
- 
- 	if (__snp_rmptable_init())
-@@ -228,12 +220,10 @@ static int __init snp_rmptable_init(void)
- }
- 
- /*
-- * This must be called after the PCI subsystem. This is because amd_iommu_snp_enable()
-- * is called to ensure the IOMMU supports the SEV-SNP feature, which can only be
-- * called after subsys_initcall().
-+ * This must be called after the IOMMU has been initialized.
-  *
-  * NOTE: IOMMU is enforced by SNP to ensure that hypervisor cannot program DMA
-  * directly into guest private memory. In case of SNP, the IOMMU ensures that
-  * the page(s) used for DMA are hypervisor owned.
-  */
--fs_initcall(snp_rmptable_init);
-+device_initcall(snp_rmptable_init);
-diff --git a/drivers/iommu/amd/amd_iommu.h b/drivers/iommu/amd/amd_iommu.h
-index e2857109e966..353d68b25fe2 100644
---- a/drivers/iommu/amd/amd_iommu.h
-+++ b/drivers/iommu/amd/amd_iommu.h
-@@ -148,6 +148,4 @@ struct dev_table_entry *get_dev_table(struct amd_iommu *iommu);
- 
- extern u64 amd_iommu_efr;
- extern u64 amd_iommu_efr2;
--
--extern bool amd_iommu_snp_en;
- #endif
-diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
-index 1c9924de607a..9e72cd8413bb 100644
---- a/drivers/iommu/amd/init.c
-+++ b/drivers/iommu/amd/init.c
-@@ -3255,6 +3255,35 @@ static bool __init detect_ivrs(void)
- 	return true;
- }
- 
-+#ifdef CONFIG_KVM_AMD_SEV
-+static void iommu_snp_enable(void)
-+{
-+	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+		return;
-+
-+	/*
-+	 * The SNP support requires that IOMMU must be enabled, and is
-+	 * not configured in the passthrough mode.
-+	 */
-+	if (no_iommu || iommu_default_passthrough()) {
-+		pr_err("SNP: IOMMU is disabled or configured in passthrough mode, SNP cannot be supported");
-+		return;
-+	}
-+
-+	amd_iommu_snp_en = check_feature_on_all_iommus(FEATURE_SNP);
-+	if (!amd_iommu_snp_en)
-+		return;
-+
-+	pr_info("SNP enabled\n");
-+
-+	/* Enforce IOMMU v1 pagetable when SNP is enabled. */
-+	if (amd_iommu_pgtable != AMD_IOMMU_V1) {
-+		pr_warn("Force to using AMD IOMMU v1 page table due to SNP\n");
-+		amd_iommu_pgtable = AMD_IOMMU_V1;
-+	}
-+}
-+#endif
-+
- /****************************************************************************
-  *
-  * AMD IOMMU Initialization State Machine
-@@ -3290,6 +3319,7 @@ static int __init state_next(void)
- 		break;
- 	case IOMMU_ENABLED:
- 		register_syscore_ops(&amd_iommu_syscore_ops);
-+		iommu_snp_enable();
- 		ret = amd_iommu_init_pci();
- 		init_state = ret ? IOMMU_INIT_ERROR : IOMMU_PCI_INIT;
- 		break;
-@@ -3802,40 +3832,4 @@ int amd_iommu_pc_set_reg(struct amd_iommu *iommu, u8 bank, u8 cntr, u8 fxn, u64
- 	return iommu_pc_get_set_reg(iommu, bank, cntr, fxn, value, true);
- }
- 
--#ifdef CONFIG_KVM_AMD_SEV
--int amd_iommu_snp_enable(void)
--{
--	/*
--	 * The SNP support requires that IOMMU must be enabled, and is
--	 * not configured in the passthrough mode.
--	 */
--	if (no_iommu || iommu_default_passthrough()) {
--		pr_err("SNP: IOMMU is disabled or configured in passthrough mode, SNP cannot be supported");
--		return -EINVAL;
--	}
--
--	/*
--	 * Prevent enabling SNP after IOMMU_ENABLED state because this process
--	 * affect how IOMMU driver sets up data structures and configures
--	 * IOMMU hardware.
--	 */
--	if (init_state > IOMMU_ENABLED) {
--		pr_err("SNP: Too late to enable SNP for IOMMU.\n");
--		return -EINVAL;
--	}
--
--	amd_iommu_snp_en = check_feature_on_all_iommus(FEATURE_SNP);
--	if (!amd_iommu_snp_en)
--		return -EINVAL;
--
--	pr_info("SNP enabled\n");
--
--	/* Enforce IOMMU v1 pagetable when SNP is enabled. */
--	if (amd_iommu_pgtable != AMD_IOMMU_V1) {
--		pr_warn("Force to using AMD IOMMU v1 page table due to SNP\n");
--		amd_iommu_pgtable = AMD_IOMMU_V1;
--	}
- 
--	return 0;
--}
--#endif
+On Tue, Nov 07, 2023 at 05:25:06PM +0100, Paolo Bonzini wrote:
+> On 11/6/23 21:23, Peter Xu wrote:
+> > On Mon, Nov 06, 2023 at 10:25:13AM -0800, David Matlack wrote:
+> > > Hi Paolo,
+> > > 
+> > > I'd like your feedback on whether you would merge a KVM-specific
+> > > alternative to UserfaultFD.
+> 
+> I'm reply to Peter's message because he already brought up some points that
+> I'd have made...
+> 
+> > >    (b) UAPIs for marking GFNs present and non-present.
+> > 
+> > Similar, this is something bound to above bitmap design, and not needed for
+> > uffd.  Extra interface?
+> 
+> We already use fallocate APIs to mark GFNs non-present in guest_memfd; and
+> we also use them to mark GFNs present but it would not work to do that for
+> atomic copy-and-allocate.  This UAPI could be pwrite() or a ioctl().
+
+Agree.
+
+> 
+> > >    (c) KVM_RUN support for returning to userspace on guest page faults
+> > > to non-present GFNs.
+> > 
+> > For (1), if the time to resolve a remote page fault is bottlenecked on the
+> > network, concurrency may not matter a huge deal, IMHO.
+> 
+> That's likely, and it means we could simply extend KVM_EXIT_MEMORY_FAULT.
+> However, we need to be careful not to have a maze of twisty APIs, all
+> different.
+> 
+> > >    (d) A notification mechanism and wait queue to coordinate KVM
+> > > accesses to non-present GFNs.
+> > 
+> > Probably uffd's wait queue to be reimplemented more or less.
+> > Is this only used when there's no vcpu thread context?  I remember Anish's
+> > other proposal on vcpu exit can already achieve similar without the queue.
+> 
+> I think this synchronization can be done mostly in userspace, at least on
+> x86 (just like we got rid of the global VM-level dirty ring). But it remains
+> a problem on Arm.
+
+My memory was that ARM was also not the only outlier?  We probably need to
+reach a consensus on whether we should consider ARM and no-vcpu context
+from the start of the design.
+
+> 
+> > >    (e) UAPI or KVM policy for collapsing SPTEs into huge pages as guest
+> > > memory becomes present.
+> > 
+> > This interface will also be needed if with userfaultfd, but if with uffd
+> > it'll be a common interface so can be used outside VM context.
+> 
+> And it can be a generic API anyway (could be fadvise).
+
+IMHO it should depend on whether multiple KVM instances will have the same
+requirement when they are attached to the same gmemfd, when we want to
+collapse small folios into a large for that gmemfd.
+
+If my understanding is correct, that "N kvm <-> 1 gmemfd" idea was mostly
+for kvm live upgrade on old<->new modules as the plan, then it seems all
+KVMs do have the same goal over the large folio, then fadvise() seems
+proper to me.
+
+> 
+> > > So why merge a KVM-specific alternative to UserfaultFD?
+> > > 
+> > > Taking a step back, let's look at what UserfaultFD is actually
+> > > providing for KVM VMs:
+> > > 
+> > >    1. Coordination of userspace accesses to guest memory.
+> > >    2. Coordination of KVM+guest accesses to guest memory.
+> > > 
+> > > VMMs already need to
+> > > manually intercept userspace _writes_ to guest memory to implement
+> > > dirty tracking efficiently. It's a small step beyond that to intercept
+> > > both reads and writes for post-copy. And VMMs are increasingly
+> > > multi-process. UserfaultFD provides coordination within a process but
+> > > VMMs already need to deal with coordinating across processes already.
+> > > i.e. UserfaultFD is only solving part of the problem for (1.).
+> 
+> This is partly true but it is missing non-vCPU kernel accesses, and it's
+> what worries me the most if you propose this as a generic mechanism.  My gut
+> feeling even without reading everything was (and it was confirmed after): I
+> am open to merging some specific features that close holes in the
+> userfaultfd API, but in general I like the unification between guest,
+> userspace *and kernel* accesses that userfaultfd brings. The fact that it
+> includes VGIC on Arm is a cherry on top. :)
+> 
+> For things other than guest_memfd, I want to ask Peter & co. if there could
+> be a variant of userfaultfd that is better integrated with memfd, and solve
+> the multi-process VMM issue.  For example, maybe a userfaultfd-like
+> mechanism for memfd could handle missing faults from _any_ VMA for the
+> memfd.
+
+On "why uffd is per-vma": I never confirmed with Andrea on the current
+design of uffd, but IMO it makes sense to make it per-process from security
+pov, otherwise it's more a risk to the whole system: consider an attacker
+open a fake logfile under shmem, waiting for another proc to open it and
+control page fault of it.  The current uffd design requires each process to
+be voluntary into userfaultfd involvements by either invoking syscall(uffd)
+or open(/dev/userfaultfd).  People are obviously worried about uffd safety
+already even with current conservative per-mm design, so as to introduce
+unprileged_userfaultfd, /dev/userfaultfd, selinux rules, etc..
+
+I think memfd can be a good candidate to start support file uffd if we want
+to go that far, because memfd is by default anonymous, so at least added
+much more complexity on hijacking.  Above example won't apply to memfd due
+to anonymousness, requiring the target taking memfd and mmap() into its
+address space, which is much harder.  IOW, the "voluntary" part moved from
+uffd desc to the memfd desc.
+
+What I don't know is whether it'd be worthwhile to go with such a design..
+Currently even with per-mm uffd the complexity is mostly manageable to me:
+each proc needs to allocate its own uffd, register, and deliver to the host
+process (e.g. in QEMU's case, openvswitch delivers that to QEMU).
+
+> 
+> However, guest_memfd could be a good usecase for the mechanism that you
+> suggest.  Currently guest_memfd cannot be mapped in userspace pages.  As
+> such it cannot be used with userfaultfd.  Furthermore, because it is only
+> mapped by hypervisor page tables, or written via hypervisor APIs,
+> guest_memfd can easily track presence at 4KB granularity even if backed by
+> huge pages.  That could be a point in favor of a KVM-specific solution.
+> 
+> Also, even if we envision mmap() support as one of the future extensions of
+> guest_memfd, that does not mean you can use it together with userfaultfd.
+> For example, if we had restrictedmem-backed guest_memfd, or
+> non-struct-page-backed guest_memfd, mmap() would be creating a VM_PFNMAP
+> area.
+
+I think it's doable to support userfaultfd (or at least something like
+userfaultfd) as long as we can trap at the fault time (e.g., the PFN should
+be faulted dynamically in some form, rather than pfn mapped in mmap()).
+AFAIK userfaultfd doesn't require page struct on its own.
+
+> 
+> Once you have the implementation done for guest_memfd, it is interesting to
+> see how easily it extends to other, userspace-mappable kinds of memory.  But
+> I still dislike the fact that you need some kind of extra protocol in
+> userspace, for multi-process VMMs.  This is the kind of thing that the
+> kernel is supposed to facilitate.  I'd like it to do _more_ of that (see
+> above memfd pseudo-suggestion), not less.
+
+Is that our future plan to extend gmemfd to normal memories?
+
+I see that gmemfd manages folio on its own.  I think it'll make perfect
+sense if it's for use in CoCo context, where the memory is so special to be
+generic anyway.
+
+However if to extend it to generic memories, I'm wondering how do we
+support existing memory features of such memory which already exist with
+KVM_SET_USER_MEMORY_REGION v1.  To name some:
+
+  - numa awareness
+  - swapping
+  - cgroup
+  - punch hole (in a huge page, aka, thp split)
+  - cma allocations for huge pages / page migrations
+  - ...
+
+I also haven't thought all through on how other modules should consume
+gmemfd yet, as I raised the other question previously on vhost.
+E.g. AFAICT, vhost at least will also need ioctl(VHOST_SET_MEM_TABLE2).
+
+Does it mean that most of these features will be reimplemented in kvm in
+some form?  Or is there easy way?
+
+> 
+> > > All of these are addressed with a KVM-specific solution. A
+> > > KVM-specific solution can have:
+> > > 
+> > >    * Transparent support for any backing memory subsystem (tmpfs,
+> > >      HugeTLB, and even guest_memfd).
+> > 
+> > I'm curious how hard would it be to allow guest_memfd support userfaultfd.
+> > David, do you know?
+> 
+> Did I answer above?  I suppose you'd have something along the lines of
+> vma_is_shmem() added to vma_can_userfault; or possibly add something to
+> vm_ops to bridge the differences.
+
+Relying on "whether folio existed in gmemfd mapping" sounds very sane and
+natural to identify data presence.  However not yet clear on the rest to me.
+
+Currently kvm_gmem_allocate() does look like the place where gmemfd folios
+will be allocated, so that can be an unified hook point where we'd want
+something besides a zeroed page, huge or small.  But I'm not sure that's
+the long term plan: it seems to me current fallocate(gmemfd) approach is
+more for populating the mem object when VM starts.
+
+A "can be relevant" question could be: what will happen if vhost would like
+to DMA to a guest page that hasn't yet been transferred to the CoCo VM,
+assuming we're during a postcopy process?  It seems to me there's some page
+request interface still missing for gmemfd, but I'm also not sure.
+
+> 
+> > The rest are already supported by uffd so I assume not a major problem.
+> 
+> Userfaultfd is kinda unusable for 1GB pages so I'm not sure I'd include it
+> in the "already works" side, but yeah.
+
+Ah I never meant that 1G is working when leaving that comment. :) It's a
+long known issue that userfaultfd / postcopy is not usable on 1G pages.
+
+I think it's indeed fair to assume it's just broken and won't be able to be
+fixed at least in the near future.
+
+Thanks,
 
 -- 
-Regards/Gruss,
-    Boris.
+Peter Xu
 
-https://people.kernel.org/tglx/notes-about-netiquette
 
