@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-1047-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1048-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DBF17E4830
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 19:23:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA1A97E4831
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 19:24:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EB831C20CCC
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 18:23:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4685281369
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 18:24:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EBDA358B2;
-	Tue,  7 Nov 2023 18:23:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A11D358B3;
+	Tue,  7 Nov 2023 18:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hiqb+12R"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fl5LXkaG"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC28E34CFD
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 18:23:40 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3126AB0
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 10:23:40 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D60234CFD
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 18:24:01 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C172B0
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 10:24:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699381419;
+	s=mimecast20190719; t=1699381439;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1vp3UJWW6xNI7hxA0xI2ABX05SkVUa/IjbZ1CJ7y6hs=;
-	b=hiqb+12Rw/G/ZToQNsV0IArPv0BMTvnAV6qOtcLWtXKS+Df7sSq7hc7Oys/MAQTAzqFYyS
-	yZ509iCl7/ibIRN+/xfSjVr4YfZxVs9bv3Hs7M4A0Lmuya3mF4BuzQA1U0ajrppJeJUxQW
-	Z86KKasg3zGvoUEVSC6eci/WS/mt4lk=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=/Fa7TX1dpbFH/Zga8tQtJE/RfR0M2MgCr3mjwgTk8t8=;
+	b=Fl5LXkaGck37DFxwivAL2IyHnWFRVAQ4qL6nyxdSKNw+Q3QvGQ/mslhhgi42t5XFGkYvHf
+	jzKNSkkyHd3e84XfnuqzFiDzcHrmusokHTHL3LVqGtQE5V3SkJW8Nol0qkNh9CuXyBow9U
+	zcI8ZrhRnkXczmp4Gaox4+kpuOFJKMk=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-622-6EIuadeFMZyGRTJRuXFwfw-1; Tue, 07 Nov 2023 13:23:36 -0500
-X-MC-Unique: 6EIuadeFMZyGRTJRuXFwfw-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-507b8ac8007so6516113e87.0
-        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 10:23:36 -0800 (PST)
+ us-mta-661-K9o0x6dRM7-AdSHpmzwUIQ-1; Tue, 07 Nov 2023 13:23:58 -0500
+X-MC-Unique: K9o0x6dRM7-AdSHpmzwUIQ-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4090fa518bbso39952005e9.2
+        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 10:23:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699381415; x=1699986215;
+        d=1e100.net; s=20230601; t=1699381437; x=1699986237;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=1vp3UJWW6xNI7hxA0xI2ABX05SkVUa/IjbZ1CJ7y6hs=;
-        b=VIwC06l69JmCH3U2Bka2H+wcStQ1W8Jih7gCo3HJQL/MdZcG54eQeMtNj5JVMeLGkP
-         HPU1Ix+UkXvV4fSR6gqs+a6uVzW84KFxiU82hOIBbaCTyev8Rwht43Jd6HWdondIeM0B
-         saaVDP0Ocdz1VAdajN1R8VYHRr/etYKazhvzVGlqkK5JGhrqBrcXqojeFG+3wIy6OsTE
-         y4xMJ0Z2Q7gsl46jDfB3hIEcIUZfSa/unbr80hoU12P68bcZfOTkNBnMbNvau1KhBO/C
-         7DYzJlppYWXcnesMw1dAKOhZzLz+bMScoEHA2QdebT38AItFlX4edvnrncn5iGcx3ZGH
-         5tEg==
-X-Gm-Message-State: AOJu0YyNdvvzXrfgtY21+Ni3xAnikbphoS1qiD6DlAZLwXCSsAsuT5xR
-	1IAGvfXKCofV2kWMcNKjK9z+cOwH8eT817rOhtBd2V25P9roW7zh43SCRfjQa6vZLasKvQ2bQVH
-	5Qb259aKt9asb
-X-Received: by 2002:ac2:446e:0:b0:4fe:2f8a:457e with SMTP id y14-20020ac2446e000000b004fe2f8a457emr24771977lfl.43.1699381414711;
-        Tue, 07 Nov 2023 10:23:34 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGHfGpg0Oqo9JaFHN93kZteH1RvotcM0JNyFXc1rpSwlPcfpg8yP3XK27S2xPSaFc172VIgSg==
-X-Received: by 2002:ac2:446e:0:b0:4fe:2f8a:457e with SMTP id y14-20020ac2446e000000b004fe2f8a457emr24771965lfl.43.1699381414310;
-        Tue, 07 Nov 2023 10:23:34 -0800 (PST)
+        bh=/Fa7TX1dpbFH/Zga8tQtJE/RfR0M2MgCr3mjwgTk8t8=;
+        b=XCMHrmxWt+It7diK/LEtzjSNKe4aS+iZlkCOS03an4i9OswZicnBsd8QzNisrcRGd1
+         pofgyUJWEm/a5DJfCRxgxDVuytOC9/1VkgFyJs0RBmO6xFQkUMjZkzO01TBrNPZnuIWq
+         1asHPBFKvkXl87/Wqvr0i+e/atmAd25AEqT6hk4LmQdiYQB4JbWeXAuzP8LSb5u1dFI3
+         ly5Yye5okxMG9piLrEvmYR8QRbZhWxR3iFU2uJ86BWv4y4bfC9v47gKEZGATAD7+MY34
+         hcqBzhYtjL7VQVbsuV5WLiNJ+ytVN9PBqxaTfniFwxPlkJXYFf57HWbSgBZzTHmrcwrJ
+         qRZA==
+X-Gm-Message-State: AOJu0YzClHHiSdaB1z3cYYnTZOgl+zSi1qwDWigO1/pCVwCOyj4UEgUo
+	E6RNMvBZTkL5Aj3UnMf1m8U4pu7ynEmJnkP/hKlWDbCo9Acnhd5z0Ucwl9zwrNcpUTdqMGk0Syi
+	I6M7rwCGrmD7k
+X-Received: by 2002:adf:ecc9:0:b0:31f:ffd1:6cf4 with SMTP id s9-20020adfecc9000000b0031fffd16cf4mr24244597wro.12.1699381437640;
+        Tue, 07 Nov 2023 10:23:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFOtFN7OscvQ1twrJ8oLPMfSY0r0hR/w6/F5GYecbQ+YusNKtCVkEmYXnc5fkUoq9po9cma5Q==
+X-Received: by 2002:adf:ecc9:0:b0:31f:ffd1:6cf4 with SMTP id s9-20020adfecc9000000b0031fffd16cf4mr24244585wro.12.1699381437298;
+        Tue, 07 Nov 2023 10:23:57 -0800 (PST)
 Received: from starship ([89.237.99.95])
-        by smtp.gmail.com with ESMTPSA id k8-20020adfe8c8000000b0032d9caeab0fsm3020598wrn.77.2023.11.07.10.23.33
+        by smtp.gmail.com with ESMTPSA id e12-20020adffd0c000000b0032d893d8dc8sm3045610wrr.2.2023.11.07.10.23.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Nov 2023 10:23:33 -0800 (PST)
-Message-ID: <5aea3131a1166e30e12f9a5ef490327607219193.camel@redhat.com>
-Subject: Re: [PATCH 08/14] KVM: selftests: Make all Hyper-V tests explicitly
- dependent on Hyper-V emulation support in KVM
+        Tue, 07 Nov 2023 10:23:57 -0800 (PST)
+Message-ID: <449d3b0506dbab0ec6c397de778addde02ef19f0.camel@redhat.com>
+Subject: Re: [PATCH 09/14] KVM: selftests: Fix vmxon_pa == vmcs12_pa ==
+ -1ull vmx_set_nested_state_test for !eVMCS case
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, Paolo
  Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 Cc: linux-kernel@vger.kernel.org
-Date: Tue, 07 Nov 2023 20:23:32 +0200
-In-Reply-To: <20231025152406.1879274-9-vkuznets@redhat.com>
+Date: Tue, 07 Nov 2023 20:23:55 +0200
+In-Reply-To: <20231025152406.1879274-10-vkuznets@redhat.com>
 References: <20231025152406.1879274-1-vkuznets@redhat.com>
-	 <20231025152406.1879274-9-vkuznets@redhat.com>
+	 <20231025152406.1879274-10-vkuznets@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -86,141 +86,77 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
 On Wed, 2023-10-25 at 17:24 +0200, Vitaly Kuznetsov wrote:
-> In preparation for conditional Hyper-V emulation enablement in KVM, make
-> Hyper-V specific tests check skip gracefully instead of failing when the
-> support is not there.
+> The "vmxon_pa == vmcs12_pa == -1ull" test happens to work by accident: as
+> Enlightened VMCS is always supported, set_default_vmx_state() adds
+> 'KVM_STATE_NESTED_EVMCS' to 'flags' and the following branch of
+> vmx_set_nested_state() is executed:
+> 
+>         if ((kvm_state->flags & KVM_STATE_NESTED_EVMCS) &&
+>             (!guest_can_use(vcpu, X86_FEATURE_VMX) ||
+>              !vmx->nested.enlightened_vmcs_enabled))
+>                         return -EINVAL;
+> 
+> as 'enlightened_vmcs_enabled' is false. In fact, "vmxon_pa == vmcs12_pa ==
+> -1ull" is a valid state when not tainted by wrong flags so the test should
+> aim for this branch:
+> 
+>         if (kvm_state->hdr.vmx.vmxon_pa == INVALID_GPA)
+>                 return 0;
+> 
+> Test all this properly:
+> - Without KVM_STATE_NESTED_EVMCS in the flags, the expected return value is
+> '0'.
+> - With KVM_STATE_NESTED_EVMCS flag (when supported) set, the expected
+> return value is '-EINVAL' prior to enabling eVMCS and '0' after.
 > 
 > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 > ---
->  tools/testing/selftests/kvm/x86_64/hyperv_clock.c            | 2 ++
->  tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c            | 5 +++--
->  .../selftests/kvm/x86_64/hyperv_extended_hypercalls.c        | 2 ++
->  tools/testing/selftests/kvm/x86_64/hyperv_features.c         | 2 ++
->  tools/testing/selftests/kvm/x86_64/hyperv_ipi.c              | 2 ++
->  tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c         | 1 +
->  tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c        | 2 ++
->  7 files changed, 14 insertions(+), 2 deletions(-)
+>  .../kvm/x86_64/vmx_set_nested_state_test.c       | 16 ++++++++++------
+>  1 file changed, 10 insertions(+), 6 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
-> index f25749eaa6a8..f5e1e98f04f9 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
-> @@ -211,6 +211,8 @@ int main(void)
->  	vm_vaddr_t tsc_page_gva;
->  	int stage;
+> diff --git a/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c b/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c
+> index 41ea7028a1f8..67a62a5a8895 100644
+> --- a/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c
+> @@ -125,21 +125,25 @@ void test_vmx_nested_state(struct kvm_vcpu *vcpu)
 >  
-> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_TIME));
-> +
-Makes sense.
->  	vm = vm_create_with_one_vcpu(&vcpu, guest_main);
+>  	/*
+>  	 * Setting vmxon_pa == -1ull and vmcs_pa == -1ull exits early without
+> -	 * setting the nested state but flags other than eVMCS must be clear.
+> -	 * The eVMCS flag can be set if the enlightened VMCS capability has
+> -	 * been enabled.
+> +	 * setting the nested state. When the eVMCS flag is not set, the
+> +	 * expected return value is '0'.
+>  	 */
+>  	set_default_vmx_state(state, state_sz);
+> +	state->flags = 0;
+>  	state->hdr.vmx.vmxon_pa = -1ull;
+>  	state->hdr.vmx.vmcs12_pa = -1ull;
+> -	test_nested_state_expect_einval(vcpu, state);
+> +	test_nested_state(vcpu, state);
 >  
->  	vcpu_set_hv_cpuid(vcpu);
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c b/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
-> index 7bde0c4dfdbd..4c7257ecd2a6 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
-> @@ -240,11 +240,12 @@ int main(int argc, char *argv[])
->  	struct ucall uc;
->  	int stage;
+> -	state->flags &= KVM_STATE_NESTED_EVMCS;
+> +	/*
+> +	 * When eVMCS is supported, the eVMCS flag can only be set if the
+> +	 * enlightened VMCS capability has been enabled.
+> +	 */
+>  	if (have_evmcs) {
+> +		state->flags = KVM_STATE_NESTED_EVMCS;
+>  		test_nested_state_expect_einval(vcpu, state);
+>  		vcpu_enable_evmcs(vcpu);
+> +		test_nested_state(vcpu, state);
+>  	}
+> -	test_nested_state(vcpu, state);
 >  
-> -	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-> -
->  	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
->  	TEST_REQUIRE(kvm_has_cap(KVM_CAP_NESTED_STATE));
->  	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS));
-> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_DIRECT_TLBFLUSH));
+>  	/* It is invalid to have vmxon_pa == -1ull and SMM flags non-zero. */
+>  	state->hdr.vmx.smm.flags = 1;
 
-The test indeed uses the direct TLB flush.
 
-It might be a good idea in the future to rename the test to hyperv_nested_vmx or something like
-that because it tests more than just the evmcs.
-It's not urgent though.
-
-> +
-> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
->  
->  	hcall_page = vm_vaddr_alloc_pages(vm, 1);
->  	memset(addr_gva2hva(vm, hcall_page), 0x0,  getpagesize());
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
-> index e036db1f32b9..949e08e98f31 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
-> @@ -43,6 +43,8 @@ int main(void)
->  	uint64_t *outval;
->  	struct ucall uc;
->  
-> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_CPUID));
-Yep, the test uses KVM_GET_SUPPORTED_HV_CPUID.
-> +
->  	/* Verify if extended hypercalls are supported */
->  	if (!kvm_cpuid_has(kvm_get_supported_hv_cpuid(),
->  			   HV_ENABLE_EXTENDED_HYPERCALLS)) {
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> index 9f28aa276c4e..387c605a3077 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> @@ -690,6 +690,8 @@ static void guest_test_hcalls_access(void)
->  
->  int main(void)
->  {
-> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_ENFORCE_CPUID));
-> +
-Correct.
->  	pr_info("Testing access to Hyper-V specific MSRs\n");
->  	guest_test_msrs_access();
->  
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c b/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c
-> index 6feb5ddb031d..65e5f4c05068 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c
-> @@ -248,6 +248,8 @@ int main(int argc, char *argv[])
->  	int stage = 1, r;
->  	struct ucall uc;
->  
-> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_SEND_IPI));
-Correct.
-> +
->  	vm = vm_create_with_one_vcpu(&vcpu[0], sender_guest_code);
->  
->  	/* Hypercall input/output */
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-> index 6c1278562090..c9b18707edc0 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-> @@ -158,6 +158,7 @@ int main(int argc, char *argv[])
->  	int stage;
->  
->  	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM));
-> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_DIRECT_TLBFLUSH));
-
-Maybe also rename the test in the future to hyperv_nested_svm or something like that,
-for the same reason.
-
->  
->  	/* Create VM */
->  	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c b/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
-> index 4758b6ef5618..c4443f71f8dd 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
-> @@ -590,6 +590,8 @@ int main(int argc, char *argv[])
->  	struct ucall uc;
->  	int stage = 1, r, i;
->  
-> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_TLBFLUSH));
-Also makes sense.
-
-> +
->  	vm = vm_create_with_one_vcpu(&vcpu[0], sender_guest_code);
->  
->  	/* Test data page */
-
+Makes sense, but I am not 100% sure that I haven't missed something.
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 Best regards,
 	Maxim Levitsky
-
-
 
 
