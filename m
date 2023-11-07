@@ -1,227 +1,201 @@
-Return-Path: <kvm+bounces-835-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-836-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE4827E35A0
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 08:16:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D33237E365B
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 09:08:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8312A280E76
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 07:16:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 576B8B20E2A
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 08:08:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E231CA56;
-	Tue,  7 Nov 2023 07:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58765101F2;
+	Tue,  7 Nov 2023 08:07:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H5terDM5"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hUd2Q7HE"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E037FC8D5
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 07:15:55 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4734711F;
-	Mon,  6 Nov 2023 23:15:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699341354; x=1730877354;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=TyCAbVwX14pmdNrNARKvdC5oei0EiaO7XnUOLpcDubc=;
-  b=H5terDM5HmCpnykOBUj/Nu6rtMKnRDrf0s8XC7c2yr+1oUSJAOGUsJZ2
-   ps7iMLrxsbzj1j5RnQbQtgFhnot8nz/AgGKI6rACF+gIHEeXW2XBJoe30
-   w9w0u49zrHUFFPn/E+ZXNo8O/G6bwtHyrIIL9AyIl6v0DhNMYNameKOP2
-   ri00XbHG+719jMfmfpw0kE7Rid29Hq2ZS2IaavXE+FoGR26xTNjXYQDuG
-   5q97ZF2kTOV4WfkNoN0xsZrmC+cLKD9VzPcSQsMlgGETRhqqjr7/kX6uM
-   jODL5dNbb0+OHFy7ycYPR53cARKLzC+xOuMQtRrNGVXq1zLN0xGW6xSoB
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="379839028"
-X-IronPort-AV: E=Sophos;i="6.03,282,1694761200"; 
-   d="scan'208";a="379839028"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2023 23:15:52 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="906327033"
-X-IronPort-AV: E=Sophos;i="6.03,282,1694761200"; 
-   d="scan'208";a="906327033"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.238.1.248]) ([10.238.1.248])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2023 23:15:49 -0800
-Message-ID: <2537aa0b-8893-4df6-9cfc-c33bad9e7515@linux.intel.com>
-Date: Tue, 7 Nov 2023 15:15:49 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E02DDB3
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 08:07:53 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F461114;
+	Tue,  7 Nov 2023 00:07:51 -0800 (PST)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A785Jln014630;
+	Tue, 7 Nov 2023 08:07:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=mime-version : date :
+ from : to : cc : subject : reply-to : in-reply-to : references :
+ message-id : content-type : content-transfer-encoding; s=pp1;
+ bh=7gzP5LHnhJ3AXPiMA6NlNzNXHze64ekcT/WiS/MQFXE=;
+ b=hUd2Q7HEY75KAFAuyrPOyr6BifhKE73ofZ9lCeqvdmgPXZZ+48bXprEeCWSS9ZwjPmZE
+ m28x4tCDW6IpUXvKRqPU3YZ23rv3567eQ1lYCFc4WitUwRibLNnhBtfSL8agxQZ8KNwx
+ m9QZ+4mhbrmw6TR7m5/PA2zLZCrHm5X2FxNtwPNXjQTqUDaXF7jlmBlW3Sw4yMOTvRxM
+ X/+bI++Z3xZbNabMN6mepJ9Fk69FUcC1w4gvst8CxOf3vzj8I+h9+FrgvTbikUlZOJDk
+ iR/P3f0eZU5oPj89xx+MkoUwfiLdk1lhryzxI2cmWgSfEQgRsrkAxZvbkRwfZLU2syTl oQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u7hds02dr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 Nov 2023 08:07:49 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A785bmB015479;
+	Tue, 7 Nov 2023 08:07:49 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u7hds02db-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 Nov 2023 08:07:49 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A77o4XI007930;
+	Tue, 7 Nov 2023 08:07:48 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u61skf2y5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 Nov 2023 08:07:48 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A787laY19071708
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 7 Nov 2023 08:07:47 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3206A58056;
+	Tue,  7 Nov 2023 08:07:47 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F2C0258052;
+	Tue,  7 Nov 2023 08:07:45 +0000 (GMT)
+Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  7 Nov 2023 08:07:45 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 05/20] KVM: x86/pmu: Allow programming events that
- match unsupported arch events
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Kan Liang <kan.liang@linux.intel.com>, Jinrong Liang
- <cloudliang@tencent.com>, Like Xu <likexu@tencent.com>,
- Jim Mattson <jmattson@google.com>, Aaron Lewis <aaronlewis@google.com>
-References: <20231104000239.367005-1-seanjc@google.com>
- <20231104000239.367005-6-seanjc@google.com>
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20231104000239.367005-6-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Date: Tue, 07 Nov 2023 09:07:45 +0100
+From: Harald Freudenberger <freude@linux.ibm.com>
+To: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, pasic@linux.ibm.com,
+        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, david@redhat.com, stable@vger.kernel.org
+Subject: Re: [PATCH] s390/vfio-ap: fix sysfs status attribute for AP queue
+ devices
+Reply-To: freude@linux.ibm.com
+Mail-Reply-To: freude@linux.ibm.com
+In-Reply-To: <cff6c61d-71a9-4dcc-a12a-5160b67d9ae4@linux.ibm.com>
+References: <20231020204838.409521-1-akrowiak@linux.ibm.com>
+ <cff6c61d-71a9-4dcc-a12a-5160b67d9ae4@linux.ibm.com>
+Message-ID: <12aef605a2add44afca75cc647674cdb@linux.ibm.com>
+X-Sender: freude@linux.ibm.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: tmWVeew_3h_S2pzJnbsGxvmefs5_KwGX
+X-Proofpoint-ORIG-GUID: BagmgpN2EuyEMsUB9Md3k2Uukfq4HaPt
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-06_15,2023-11-02_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ phishscore=0 adultscore=0 lowpriorityscore=0 suspectscore=0
+ mlxlogscore=999 mlxscore=0 priorityscore=1501 spamscore=0 clxscore=1011
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311070065
 
-On 11/4/2023 8:02 AM, Sean Christopherson wrote:
-> Remove KVM's bogus restriction that the guest can't program an event whose
-> encoding matches an unsupported architectural event.  The enumeration of
-> an architectural event only says that if a CPU supports an architectural
-> event, then the event can be programmed using the architectural encoding.
-> The enumeration does NOT say anything about the encoding when the CPU
-> doesn't report support the architectural event.
->
-> Preventing the guest from counting events whose encoding happens to match
-> an architectural event breaks existing functionality whenever Intel adds
-> an architectural encoding that was *ever* used for a CPU that doesn't
-> enumerate support for the architectural event, even if the encoding is for
-> the exact same event!
->
-> E.g. the architectural encoding for Top-Down Slots is 0x01a4.  Broadwell
-> CPUs, which do not support the Top-Down Slots architectural event, 0x10a4
-> is a valid, model-specific event.  Denying guest usage of 0x01a4 if/when
-> KVM adds support for Top-Down slots would break any Broadwell-based guest.
->
-> Reported-by: Kan Liang <kan.liang@linux.intel.com>
-> Closes: https://lore.kernel.org/all/2004baa6-b494-462c-a11f-8104ea152c6a@linux.intel.com
-> Cc: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> Fixes: a21864486f7e ("KVM: x86/pmu: Fix available_event_types check for REF_CPU_CYCLES event")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/include/asm/kvm-x86-pmu-ops.h |  1 -
->   arch/x86/kvm/pmu.c                     |  1 -
->   arch/x86/kvm/pmu.h                     |  1 -
->   arch/x86/kvm/svm/pmu.c                 |  6 ----
->   arch/x86/kvm/vmx/pmu_intel.c           | 38 --------------------------
->   5 files changed, 47 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm-x86-pmu-ops.h b/arch/x86/include/asm/kvm-x86-pmu-ops.h
-> index 6c98f4bb4228..884af8ef7657 100644
-> --- a/arch/x86/include/asm/kvm-x86-pmu-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-pmu-ops.h
-> @@ -12,7 +12,6 @@ BUILD_BUG_ON(1)
->    * a NULL definition, for example if "static_call_cond()" will be used
->    * at the call sites.
->    */
-> -KVM_X86_PMU_OP(hw_event_available)
->   KVM_X86_PMU_OP(pmc_idx_to_pmc)
->   KVM_X86_PMU_OP(rdpmc_ecx_to_pmc)
->   KVM_X86_PMU_OP(msr_idx_to_pmc)
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index 9ae07db6f0f6..99ed72966528 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -374,7 +374,6 @@ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
->   static bool pmc_event_is_allowed(struct kvm_pmc *pmc)
->   {
->   	return pmc_is_globally_enabled(pmc) && pmc_speculative_in_use(pmc) &&
-> -	       static_call(kvm_x86_pmu_hw_event_available)(pmc) &&
->   	       check_pmu_event_filter(pmc);
->   }
->   
-> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> index 5341e8f69a22..f3e7a356fd81 100644
-> --- a/arch/x86/kvm/pmu.h
-> +++ b/arch/x86/kvm/pmu.h
-> @@ -20,7 +20,6 @@
->   
->   struct kvm_pmu_ops {
->   	void (*init_pmu_capability)(void);
-> -	bool (*hw_event_available)(struct kvm_pmc *pmc);
->   	struct kvm_pmc *(*pmc_idx_to_pmc)(struct kvm_pmu *pmu, int pmc_idx);
->   	struct kvm_pmc *(*rdpmc_ecx_to_pmc)(struct kvm_vcpu *vcpu,
->   		unsigned int idx, u64 *mask);
-> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-> index 373ff6a6687b..5596fe816ea8 100644
-> --- a/arch/x86/kvm/svm/pmu.c
-> +++ b/arch/x86/kvm/svm/pmu.c
-> @@ -73,11 +73,6 @@ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
->   	return amd_pmc_idx_to_pmc(pmu, idx);
->   }
->   
-> -static bool amd_hw_event_available(struct kvm_pmc *pmc)
-> -{
-> -	return true;
-> -}
-> -
->   static bool amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
->   {
->   	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> @@ -249,7 +244,6 @@ static void amd_pmu_reset(struct kvm_vcpu *vcpu)
->   }
->   
->   struct kvm_pmu_ops amd_pmu_ops __initdata = {
-> -	.hw_event_available = amd_hw_event_available,
->   	.pmc_idx_to_pmc = amd_pmc_idx_to_pmc,
->   	.rdpmc_ecx_to_pmc = amd_rdpmc_ecx_to_pmc,
->   	.msr_idx_to_pmc = amd_msr_idx_to_pmc,
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index b239e7dbdc9b..9bf700da1e17 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -140,43 +140,6 @@ static struct kvm_pmc *intel_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
->   	}
->   }
->   
-> -static bool intel_hw_event_available(struct kvm_pmc *pmc)
-> -{
-> -	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
-> -	u8 event_select = pmc->eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
-> -	u8 unit_mask = (pmc->eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
-> -	int i;
-> -
-> -	/*
-> -	 * Fixed counters are always available if KVM reaches this point.  If a
-> -	 * fixed counter is unsupported in hardware or guest CPUID, KVM doesn't
-> -	 * allow the counter's corresponding MSR to be written.  KVM does use
-> -	 * architectural events to program fixed counters, as the interface to
-> -	 * perf doesn't allow requesting a specific fixed counter, e.g. perf
-> -	 * may (sadly) back a guest fixed PMC with a general purposed counter.
-> -	 * But if _hardware_ doesn't support the associated event, KVM simply
-> -	 * doesn't enumerate support for the fixed counter.
-> -	 */
-> -	if (pmc_is_fixed(pmc))
-> -		return true;
-> -
-> -	BUILD_BUG_ON(ARRAY_SIZE(intel_arch_events) != NR_INTEL_ARCH_EVENTS);
-> -
-> -	/*
-> -	 * Disallow events reported as unavailable in guest CPUID.  Note, this
-> -	 * doesn't apply to pseudo-architectural events (see above).
-> -	 */
-> -	for (i = 0; i < NR_REAL_INTEL_ARCH_EVENTS; i++) {
-> -		if (intel_arch_events[i].eventsel != event_select ||
-> -		    intel_arch_events[i].unit_mask != unit_mask)
-> -			continue;
-> -
-> -		return pmu->available_event_types & BIT(i);
-> -	}
-> -
-> -	return true;
-> -}
-> -
->   static bool intel_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
->   {
->   	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> @@ -842,7 +805,6 @@ void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu)
->   
->   struct kvm_pmu_ops intel_pmu_ops __initdata = {
->   	.init_pmu_capability = intel_init_pmu_capability,
-> -	.hw_event_available = intel_hw_event_available,
->   	.pmc_idx_to_pmc = intel_pmc_idx_to_pmc,
->   	.rdpmc_ecx_to_pmc = intel_rdpmc_ecx_to_pmc,
->   	.msr_idx_to_pmc = intel_msr_idx_to_pmc,
+On 2023-11-06 17:03, Tony Krowiak wrote:
+> PING
+> This patch is pretty straight forward, does anyone see a reason why
+> this shouldn't be integrated?
+> 
+> On 10/20/23 16:48, Tony Krowiak wrote:
+>> The 'status' attribute for AP queue devices bound to the vfio_ap 
+>> device
+>> driver displays incorrect status when the mediated device is attached 
+>> to a
+>> guest, but the queue device is not passed through. In the current
+>> implementation, the status displayed is 'in_use' which is not correct; 
+>> it
+>> should be 'assigned'. This can happen if one of the queue devices
+>> associated with a given adapter is not bound to the vfio_ap device 
+>> driver.
+>> For example:
+>> 
+>> Queues listed in /sys/bus/ap/drivers/vfio_ap:
+>> 14.0005
+>> 14.0006
+>> 14.000d
+>> 16.0006
+>> 16.000d
+>> 
+>> Queues listed in /sys/devices/vfio_ap/matrix/$UUID/matrix
+>> 14.0005
+>> 14.0006
+>> 14.000d
+>> 16.0005
+>> 16.0006
+>> 16.000d
+>> 
+>> Queues listed in /sys/devices/vfio_ap/matrix/$UUID/guest_matrix
+>> 14.0005
+>> 14.0006
+>> 14.000d
+>> 
+>> The reason no queues for adapter 0x16 are listed in the guest_matrix 
+>> is
+>> because queue 16.0005 is not bound to the vfio_ap device driver, so no
+>> queue associated with the adapter is passed through to the guest;
+>> therefore, each queue device for adapter 0x16 should display 
+>> 'assigned'
+>> instead of 'in_use', because those queues are not in use by a guest, 
+>> but
+>> only assigned to the mediated device.
+>> 
+>> Let's check the AP configuration for the guest to determine whether a
+>> queue device is passed through before displaying a status of 'in_use'.
+>> 
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>> Fixes: f139862b92cf ("s390/vfio-ap: add status attribute to AP queue 
+>> device's sysfs dir")
+>> Cc: stable@vger.kernel.org
+>> ---
+>>   drivers/s390/crypto/vfio_ap_ops.c | 7 ++++++-
+>>   1 file changed, 6 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/drivers/s390/crypto/vfio_ap_ops.c 
+>> b/drivers/s390/crypto/vfio_ap_ops.c
+>> index 4db538a55192..871c14a6921f 100644
+>> --- a/drivers/s390/crypto/vfio_ap_ops.c
+>> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+>> @@ -1976,6 +1976,7 @@ static ssize_t status_show(struct device *dev,
+>>   {
+>>   	ssize_t nchars = 0;
+>>   	struct vfio_ap_queue *q;
+>> +	unsigned long apid, apqi;
+>>   	struct ap_matrix_mdev *matrix_mdev;
+>>   	struct ap_device *apdev = to_ap_dev(dev);
+>>   @@ -1984,7 +1985,11 @@ static ssize_t status_show(struct device 
+>> *dev,
+>>   	matrix_mdev = vfio_ap_mdev_for_queue(q);
+>>     	if (matrix_mdev) {
+>> -		if (matrix_mdev->kvm)
+>> +		apid = AP_QID_CARD(q->apqn);
+>> +		apqi = AP_QID_QUEUE(q->apqn);
+>> +		if (matrix_mdev->kvm &&
+>> +		    test_bit_inv(apid, matrix_mdev->shadow_apcb.apm) &&
+>> +		    test_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm))
+>>   			nchars = scnprintf(buf, PAGE_SIZE, "%s\n",
+>>   					   AP_QUEUE_IN_USE);
+>>   		else
 
-
-Reviewed-by:  Dapeng Mi <dapeng1.mi@linux.intel.com>
-
+I can give you an
+Acked-by: Harald Freudenberger <freude@linux.ibm.com>
+for this. Your explanation sounds sane to me and fixes a wrong
+display. However, I am not familiar with the code so, I can't tell
+if that's correct.
+Just a remark: How can it happen that one queue is not bound to the vfio 
+dd?
+Didn't we actively remove the unbind possibility from the sysfs for 
+devices
+assigned to the vfio dd?
 
