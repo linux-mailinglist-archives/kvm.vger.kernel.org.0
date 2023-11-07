@@ -1,133 +1,136 @@
-Return-Path: <kvm+bounces-1033-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1036-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE4D57E4694
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 18:11:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EEED7E46CD
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 18:24:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFC161C20D06
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 17:11:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2792B20EA5
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 17:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E370347A0;
-	Tue,  7 Nov 2023 17:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A03C3347B9;
+	Tue,  7 Nov 2023 17:24:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eeo87wUh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iCE9kWoX"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A428315B2
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 17:11:50 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C29649B;
-	Tue,  7 Nov 2023 09:11:49 -0800 (PST)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A7GwXYg029699;
-	Tue, 7 Nov 2023 17:11:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=P2/0r41YhdGhqR0vt7CFe2kQwbY5e3cpRfy81sHeWe4=;
- b=eeo87wUhH3XYt+LRH2bgxqCBjEVCVMi0dZtVUbM6XPdUE6rvky+tziXIhEMpBMjRF8re
- 05+zsaKXsUSnJIksXlt3mBUh8CC+iwOObZbEN1LBfK0Zg6fADtLcHUMLVluNKG3RqA6N
- cQjaaezJVLMZOIeCDen3IPn4v11FuXbbN/OUCFfioTkAvNbcxl1w7ijDWHj8fvXkmmT0
- 8pjuIAFQ8stmNuCkSkFiCz2KO2lEbNJxC8OC7Olg4M3o0HmW764ZvtIcZliLGnVgEUCF
- G5mK/OQDvXN2lyW3yRulxs8ELgAtlNZAQAaFFxziQ+MQw6XlveR1P0YDffcXrxBGbI4s ig== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u7s2n91f6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Nov 2023 17:11:48 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A7HBmIn000413;
-	Tue, 7 Nov 2023 17:11:48 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u7s2n9128-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Nov 2023 17:11:47 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A7Gae3N028230;
-	Tue, 7 Nov 2023 17:11:16 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u62gk1uqf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Nov 2023 17:11:16 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A7HBDqC22807054
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 7 Nov 2023 17:11:13 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A3A2B2004D;
-	Tue,  7 Nov 2023 17:11:13 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4DCE020049;
-	Tue,  7 Nov 2023 17:11:13 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  7 Nov 2023 17:11:13 +0000 (GMT)
-Date: Tue, 7 Nov 2023 18:11:05 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Cc: Janosch Frank <frankja@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Christian
- Borntraeger <borntraeger@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sven Schnelle
- <svens@linux.ibm.com>
-Subject: Re: [PATCH v2 2/4] KVM: s390: vsie: Fix length of facility list
- shadowed
-Message-ID: <20231107181105.3143f8f7@p-imbrenda>
-In-Reply-To: <20231107123118.778364-3-nsg@linux.ibm.com>
-References: <20231107123118.778364-1-nsg@linux.ibm.com>
-	<20231107123118.778364-3-nsg@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1CB335C0
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 17:24:40 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 576A7101
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 09:24:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699377879;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n6iRqFYmz5H1LDnW4p44izaVbI8kvsmsngAn7NQqBlQ=;
+	b=iCE9kWoXtvWiY6bpIZmaDTPl8zoifQtunAFS/u6hh9her818gZYJ7tDx++YishT7OiB79d
+	yFlX7qWc7w6TrDY5slBKWC4/JPgNeIiZ1LZ7p4pN5fxGqnc9fndGgdu2PwgMfilp+yE/oq
+	a935w+ZO7TGSDRN+ChHlUzwg8fWtnig=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-251-BchFnXtpOVeEhsvPsycUWg-1; Tue, 07 Nov 2023 12:24:33 -0500
+X-MC-Unique: BchFnXtpOVeEhsvPsycUWg-1
+Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-6cd01bd39a3so1037836a34.1
+        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 09:24:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699377873; x=1699982673;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=n6iRqFYmz5H1LDnW4p44izaVbI8kvsmsngAn7NQqBlQ=;
+        b=cBPk4ZdoXbvIsqOYT4QppqunoDHyYoRPwXzraguMf8JFaMUHkI654XY5OwXUfsLF/s
+         Dqepw3puJN59PZF+mVGFBnjzTvyqJHgrWLWWYz41eaGmJGiCtMHvlF3UEnXbne/g5daQ
+         X+r4WmP0ca5NCke7I5ekeOH8UmgMwitBdnpZkGxKRsxCL2uyejWC9ZNvm7olvcoPMLiP
+         PgUKjrM313vtjUqBjA4e1NQgx1J+k5Wgp5NQ4i9ihhN1GVAWFc7mLrs1jLRY+EQf8PUq
+         2Xau6QUrBqbzE51ef+ShAwdrHwfW6B5sQDNEk/zo4W0bHD7ZshDAfZQA3Cad5FGtTARl
+         WYRw==
+X-Gm-Message-State: AOJu0YxwGz0gv9bXjOQO298ijLeWgC0fEH2K9I3rgPmCk6Cx2Bh6E2ME
+	XLm+hYgo9c+hsI0ct7SRRq7b79trFdHOGIIPLwVuwoIGv6HARNiKtqESxrPQj9ZlkKDZfAFTuE5
+	8UjsQLORHI7W5
+X-Received: by 2002:a4a:c991:0:b0:586:7095:126d with SMTP id u17-20020a4ac991000000b005867095126dmr31247062ooq.0.1699377872873;
+        Tue, 07 Nov 2023 09:24:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE8w6NSbcnoCKrFSZ3eVgNyXybxogde+kXTelNxtMRNBvmZFASv4LSQb8UyoPhsLshGuiJtXA==
+X-Received: by 2002:a4a:c991:0:b0:586:7095:126d with SMTP id u17-20020a4ac991000000b005867095126dmr31247040ooq.0.1699377872564;
+        Tue, 07 Nov 2023 09:24:32 -0800 (PST)
+Received: from x1n (cpe5c7695f3aee0-cm5c7695f3aede.cpe.net.cable.rogers.com. [99.254.144.39])
+        by smtp.gmail.com with ESMTPSA id hj8-20020a05622a620800b00403cce833eesm92803qtb.27.2023.11.07.09.24.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Nov 2023 09:24:32 -0800 (PST)
+Date: Tue, 7 Nov 2023 12:24:29 -0500
+From: Peter Xu <peterx@redhat.com>
+To: James Houghton <jthoughton@google.com>
+Cc: David Matlack <dmatlack@google.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, kvm list <kvm@vger.kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Oliver Upton <oupton@google.com>,
+	Mike Kravetz <mike.kravetz@oracle.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Frank van der Linden <fvdl@google.com>
+Subject: Re: RFC: A KVM-specific alternative to UserfaultFD
+Message-ID: <ZUpyzWOuhFDTXiAW@x1n>
+References: <CALzav=d23P5uE=oYqMpjFohvn0CASMJxXB_XEOEi-jtqWcFTDA@mail.gmail.com>
+ <ZUlLLGLi1IyMyhm4@x1n>
+ <CAJHvVciC3URbJJMwhU0ahhzq6bomr7juuWqPdpczV6Qgb8OUuQ@mail.gmail.com>
+ <ZUlw163pvpJ+Uue8@x1n>
+ <CALzav=d=sAJBK7fBeJwi3BVJ+4ai5MjU7-u0RD4BQMGNRYi_Tw@mail.gmail.com>
+ <ZUpIB1/5eZ/2X+0M@x1n>
+ <CADrL8HUHO12Bxrx94_VoS8AsN5uEO1qYM2SCF7Tgw-=vsRUwBA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: iXE-Ie6CzKNY1mPDELbBM-zBi2lMQ6IN
-X-Proofpoint-ORIG-GUID: Red-iamF0QfLzJwuSLGiBcAKemFbA9eN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-07_08,2023-11-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- mlxlogscore=648 impostorscore=0 lowpriorityscore=0 clxscore=1015
- malwarescore=0 mlxscore=0 priorityscore=1501 adultscore=0 phishscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311070142
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CADrL8HUHO12Bxrx94_VoS8AsN5uEO1qYM2SCF7Tgw-=vsRUwBA@mail.gmail.com>
 
-On Tue,  7 Nov 2023 13:31:16 +0100
-Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
+On Tue, Nov 07, 2023 at 08:11:09AM -0800, James Houghton wrote:
+> This extra ~8 bytes per page overhead is real, and it is the
+> theoretical maximum additional overhead that userfaultfd would require
+> over a KVM-based demand paging alternative when we are using
+> hugepages. Consider the case where we are using THPs and have just
+> finished post-copy, and we haven't done any collapsing yet:
+> 
+> For userfaultfd: because we have UFFDIO_COPY'd or UFFDIO_CONTINUE'd at
+> 4K (because we demand-fetched at 4K), the userspace page tables are
+> entirely shattered. KVM has no choice but to have an entirely
+> shattered second-stage page table as well.
+> 
+> For KVM demand paging: the userspace page tables can remain entirely
+> populated, so we get PMD mappings here. KVM, though, uses 4K SPTEs
+> because we have only just finished post-copy and haven't started
+> collapsing yet.
+> 
+> So both systems end up with a shattered second stage page table, but
+> userfaultfd has a shattered userspace page table as well (+8 bytes/4K
+> if using THP, +another 8 bytes/2M if using HugeTLB-1G, etc.) and that
+> is where the extra overhead comes from.
+> 
+> The second mapping of guest memory that we use today (through which we
+> install memory), given that we are using hugepages, will use PMDs and
+> PUDs, so the overhead is minimal.
+> 
+> Hope that clears things up!
 
-[...]
+Ah I see, thanks James.  Though, is this a real concern in production use,
+considering worst case 0.2% overhead (all THP backed) and only exist during
+postcopy, only on destination host?
 
-> -obj-y	+= smp.o text_amode31.o stacktrace.o abs_lowcore.o
-> +obj-y	+= smp.o text_amode31.o stacktrace.o abs_lowcore.o facility.o
->  
->  extra-y				+= vmlinux.lds
->  
-> diff --git a/arch/s390/kernel/facility.c b/arch/s390/kernel/facility.c
-> new file mode 100644
-> index 000000000000..5e80a4f65363
-> --- /dev/null
-> +++ b/arch/s390/kernel/facility.c
+In all cases, I agree that's still a valid point then, comparing to a
+constant 1/32k consumption with a bitmap.
 
-I wonder if this is the right place for this?
+Thanks,
 
-This function seems to be used only for vsie, maybe you can just move
-it to vsie.c? or do you think it will be used elsewhere too?
+-- 
+Peter Xu
 
-[...]
 
