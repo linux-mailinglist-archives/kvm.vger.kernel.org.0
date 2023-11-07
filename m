@@ -1,346 +1,139 @@
-Return-Path: <kvm+bounces-1031-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1035-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 004067E4613
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 17:32:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C2947E469C
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 18:14:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2105A1C20D44
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 16:32:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E84F028125E
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 17:14:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F25B328CA;
-	Tue,  7 Nov 2023 16:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC3B3347B7;
+	Tue,  7 Nov 2023 17:13:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Ir2P9eUe"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ON/eHTtv"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F00347B7;
-	Tue,  7 Nov 2023 16:32:36 +0000 (UTC)
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EAA82D61;
-	Tue,  7 Nov 2023 08:32:35 -0800 (PST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C61F840E01A4;
-	Tue,  7 Nov 2023 16:32:32 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id g1-qSrUy7Zvx; Tue,  7 Nov 2023 16:32:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1699374750; bh=/66xR9WwT2nRxnZsZiVrrkdqU3jUBlpqlG2vSrMefUg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ir2P9eUeMj8FlnblX4WEHf2sRZaTnOn4y3N4kA74rLKXhsZEFIYfRicDarY5Wy8y4
-	 lL0smUZvdgqddTRDmeHAp5aZk7Q8Udtan+Fr7JVZ7ekWTfgXPmUe4UZ0TPWXa0KBkI
-	 k19fbhPpUVz8NPj3ig6Q3bQH5XfZbnIf6pL64L2c64HA3zqCwUNgE741S4XpFBq5Cg
-	 /SmNdQM2iYkZyVqFa7gRc96FBjT4zs2ZSds9cMSmAtCcsrHhyMecsqIHmSxlzmzmAw
-	 oriD6xITv5/zgGg4F7JP0NllNQt9XUfY7qWWrYBepJMo3GjmnAoKOL+DXQhI3QaY8R
-	 gGq8ZmUtR/jEJOKSEc/0HJFVM2kIlT5AkcCC6bm6ruGnXExeghDeb53oSJdJQpwvA+
-	 faRvbpc2Lu0HC+CCR8PSvLqpZ0jWMIk1Zf2pTwMOmg9Jc3BGkl6Vh96cfGPL4qUCVm
-	 Cnl36cVAnK5R67SlIw+QRh23Hbd/Pt4GDD3nnLE7s1H6bnUPcZzWz8g9RZGlfJ7COU
-	 6lcrAiwbqL4adLdVYZElKNTynazvC0aLKGc9lvxBhpGT3hFKxE7DBB5Jh1RkZxo8CF
-	 VBsphHJCfIYnvLAlELR3g6uAoCcaUvcIbgcZuUlKoPC3Jov4o8xSh+K+mVGNfuUUIL
-	 A4yoxiNdT0B4LxfLNZkL6NJY=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3430040E0191;
-	Tue,  7 Nov 2023 16:31:50 +0000 (UTC)
-Date: Tue, 7 Nov 2023 17:31:42 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-	tony.luck@intel.com, marcorr@google.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v10 06/50] x86/sev: Add the host SEV-SNP initialization
- support
-Message-ID: <20231107163142.GAZUpmbt/i3himIf+E@fat_crate.local>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-7-michael.roth@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 394A4335C0
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 17:13:56 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9456E101;
+	Tue,  7 Nov 2023 09:13:55 -0800 (PST)
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A7GlwHj024268;
+	Tue, 7 Nov 2023 17:13:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=J2sXMPy7YCpN3NzlE07fo1gvQe/TBf6KbHnhTydY8RY=;
+ b=ON/eHTtvzsJpMG/OljG+XVN57PfOPfXjXWhn4C1lofjVkAF0M0wUyqgmAT3wwIA/TkRg
+ xJEOp7w3Pg71PtlUDFD7uL9bqj8xYVFxO1//jmMQ4RBpDs3gTDctCfZEaGhnN1DLwtYA
+ f3i1d9h16O2rEe3QbNS5yT/yUxx/u9ZH9vf7bZMVGkAeu3XlSHCRhjPhfRt8u0zTNnR+
+ vrihsVpOZNuGDwLcx+j5hdFsxIbDt6JBu+DPXRMsRgMrt+6gtasm2jwP1Lhq4o98H6NX
+ qLt53K4fv05EFB2Mv7C6FZUJKtcd/Q3VOTLsArianObscD5UOqcrIWlO/YHQUFlrX0Q1 9Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u7s2p94wn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 Nov 2023 17:13:55 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A7GmNQX026870;
+	Tue, 7 Nov 2023 17:13:54 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u7s2p93u6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 Nov 2023 17:13:51 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A7FNLjd007961;
+	Tue, 7 Nov 2023 17:11:15 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u60nyjbft-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 Nov 2023 17:11:14 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A7HBCrT51708286
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 7 Nov 2023 17:11:12 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F1B742004D;
+	Tue,  7 Nov 2023 17:11:11 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9D66E20049;
+	Tue,  7 Nov 2023 17:11:11 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  7 Nov 2023 17:11:11 +0000 (GMT)
+Date: Tue, 7 Nov 2023 17:41:01 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+        Heiko Carstens
+ <hca@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Christian
+ Borntraeger <borntraeger@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH v2 3/4] KVM: s390: cpu model: Use proper define for
+ facility mask size
+Message-ID: <20231107174101.5fa42d06@p-imbrenda>
+In-Reply-To: <20231107123118.778364-4-nsg@linux.ibm.com>
+References: <20231107123118.778364-1-nsg@linux.ibm.com>
+	<20231107123118.778364-4-nsg@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231016132819.1002933-7-michael.roth@amd.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: XuF0tZ1DtLSwrYeca6fRR6FX1g_WD8ny
+X-Proofpoint-GUID: NbFqpfndV0B-S7GTYK1g5jwKFfRWgJpr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-07_08,2023-11-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 impostorscore=0 mlxscore=0 malwarescore=0 adultscore=0
+ spamscore=0 clxscore=1015 priorityscore=1501 mlxlogscore=821 bulkscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311070142
 
-On Mon, Oct 16, 2023 at 08:27:35AM -0500, Michael Roth wrote:
-> +static bool early_rmptable_check(void)
-> +{
-> +	u64 rmp_base, rmp_size;
-> +
-> +	/*
-> +	 * For early BSP initialization, max_pfn won't be set up yet, wait until
-> +	 * it is set before performing the RMP table calculations.
-> +	 */
-> +	if (!max_pfn)
-> +		return true;
+On Tue,  7 Nov 2023 13:31:17 +0100
+Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
 
-This already says that this is called at the wrong point during init.
+> Use the previously unused S390_ARCH_FAC_MASK_SIZE_U64 instead of
+> S390_ARCH_FAC_LIST_SIZE_U64 for defining the fac_mask array.
+> Note that both values are the same, there is no functional change.
+> 
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 
-Right now we have
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-early_identify_cpu -> early_init_amd -> early_detect_mem_encrypt
-
-which runs only on the BSP but then early_init_amd() is called in
-init_amd() too so that it takes care of the APs too.
-
-Which ends up doing a lot of unnecessary work on each AP in
-early_detect_mem_encrypt() like calculating the RMP size on each AP
-unnecessarily where this needs to happen exactly once.
-
-Is there any reason why this function cannot be moved to init_amd()
-where it'll do the normal, per-AP init?
-
-And the stuff that needs to happen once, needs to be called once too.
-
-> +
-> +	return snp_get_rmptable_info(&rmp_base, &rmp_size);
-> +}
-> +
->  static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
->  {
->  	u64 msr;
-> @@ -659,6 +674,9 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
->  		if (!(msr & MSR_K7_HWCR_SMMLOCK))
->  			goto clear_sev;
+> ---
+>  arch/s390/include/asm/kvm_host.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 427f9528a7b6..46fcd2f9dff8 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -811,7 +811,7 @@ struct s390_io_adapter {
 >  
-> +		if (cpu_has(c, X86_FEATURE_SEV_SNP) && !early_rmptable_check())
-> +			goto clear_snp;
-> +
->  		return;
->  
->  clear_all:
-> @@ -666,6 +684,7 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
->  clear_sev:
->  		setup_clear_cpu_cap(X86_FEATURE_SEV);
->  		setup_clear_cpu_cap(X86_FEATURE_SEV_ES);
-> +clear_snp:
->  		setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
->  	}
->  }
+>  struct kvm_s390_cpu_model {
+>  	/* facility mask supported by kvm & hosting machine */
+> -	__u64 fac_mask[S390_ARCH_FAC_LIST_SIZE_U64];
+> +	__u64 fac_mask[S390_ARCH_FAC_MASK_SIZE_U64];
+>  	struct kvm_s390_vm_cpu_subfunc subfuncs;
+>  	/* facility list requested by guest (in dma page) */
+>  	__u64 *fac_list;
 
-...
-
-> +bool snp_get_rmptable_info(u64 *start, u64 *len)
-> +{
-> +	u64 max_rmp_pfn, calc_rmp_sz, rmp_sz, rmp_base, rmp_end;
-> +
-> +	rdmsrl(MSR_AMD64_RMP_BASE, rmp_base);
-> +	rdmsrl(MSR_AMD64_RMP_END, rmp_end);
-> +
-> +	if (!(rmp_base & RMP_ADDR_MASK) || !(rmp_end & RMP_ADDR_MASK)) {
-> +		pr_err("Memory for the RMP table has not been reserved by BIOS\n");
-> +		return false;
-> +	}
-
-If you're masking off bits 0-12 above...
-
-> +
-> +	if (rmp_base > rmp_end) {
-
-... why aren't you using the masked out vars further on?
-
-I know, the hw will say, yeah, those bits are 0 but still. IOW, do:
-
-	rmp_base &= RMP_ADDR_MASK;
-	rmp_end  &= RMP_ADDR_MASK;
-
-after reading them.
-
-> +		pr_err("RMP configuration not valid: base=%#llx, end=%#llx\n", rmp_base, rmp_end);
-> +		return false;
-> +	}
-> +
-> +	rmp_sz = rmp_end - rmp_base + 1;
-> +
-> +	/*
-> +	 * Calculate the amount the memory that must be reserved by the BIOS to
-> +	 * address the whole RAM, including the bookkeeping area. The RMP itself
-> +	 * must also be covered.
-> +	 */
-> +	max_rmp_pfn = max_pfn;
-> +	if (PHYS_PFN(rmp_end) > max_pfn)
-> +		max_rmp_pfn = PHYS_PFN(rmp_end);
-> +
-> +	calc_rmp_sz = (max_rmp_pfn << 4) + RMPTABLE_CPU_BOOKKEEPING_SZ;
-> +
-> +	if (calc_rmp_sz > rmp_sz) {
-> +		pr_err("Memory reserved for the RMP table does not cover full system RAM (expected 0x%llx got 0x%llx)\n",
-> +		       calc_rmp_sz, rmp_sz);
-> +		return false;
-> +	}
-> +
-> +	*start = rmp_base;
-> +	*len = rmp_sz;
-> +
-> +	return true;
-> +}
-> +
-> +static __init int __snp_rmptable_init(void)
-> +{
-> +	u64 rmp_base, rmp_size;
-> +	void *rmp_start;
-> +	u64 val;
-> +
-> +	if (!snp_get_rmptable_info(&rmp_base, &rmp_size))
-> +		return 1;
-> +
-> +	pr_info("RMP table physical address [0x%016llx - 0x%016llx]\n",
-
-That's "RMP table physical range"
-
-> +		rmp_base, rmp_base + rmp_size - 1);
-> +
-> +	rmp_start = memremap(rmp_base, rmp_size, MEMREMAP_WB);
-> +	if (!rmp_start) {
-> +		pr_err("Failed to map RMP table addr 0x%llx size 0x%llx\n", rmp_base, rmp_size);
-
-No need to dump rmp_base and rmp_size again here - you're dumping them
-above.
-
-> +		return 1;
-> +	}
-> +
-> +	/*
-> +	 * Check if SEV-SNP is already enabled, this can happen in case of
-> +	 * kexec boot.
-> +	 */
-> +	rdmsrl(MSR_AMD64_SYSCFG, val);
-> +	if (val & MSR_AMD64_SYSCFG_SNP_EN)
-> +		goto skip_enable;
-> +
-> +	/* Initialize the RMP table to zero */
-
-Again: useless comment.
-
-> +	memset(rmp_start, 0, rmp_size);
-> +
-> +	/* Flush the caches to ensure that data is written before SNP is enabled. */
-> +	wbinvd_on_all_cpus();
-> +
-> +	/* MFDM must be enabled on all the CPUs prior to enabling SNP. */
-
-First of all, use the APM bit name here pls: MtrrFixDramModEn.
-
-And then, for the life of me, I can't find any mention in the APM why
-this bit is needed. Neither in "15.36.2 Enabling SEV-SNP" nor in
-"15.34.3 Enabling SEV".
-
-Looking at the bit defintions of WrMem an RdMem - read and write
-requests get directed to system memory instead of MMIO so I guess you
-don't want to be able to write MMIO for certain physical ranges when SNP
-is enabled but it'll be good to have this properly explained instead of
-a "this must happen" information-less sentence.
-
-> +	on_each_cpu(mfd_enable, NULL, 1);
-> +
-> +	/* Enable SNP on all CPUs. */
-
-Useless comment.
-
-> +	on_each_cpu(snp_enable, NULL, 1);
-> +
-> +skip_enable:
-> +	rmp_start += RMPTABLE_CPU_BOOKKEEPING_SZ;
-> +	rmp_size -= RMPTABLE_CPU_BOOKKEEPING_SZ;
-> +
-> +	rmptable_start = (struct rmpentry *)rmp_start;
-> +	rmptable_max_pfn = rmp_size / sizeof(struct rmpentry) - 1;
-> +
-> +	return 0;
-> +}
-> +
-> +static int __init snp_rmptable_init(void)
-> +{
-> +	int family, model;
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +		return 0;
-> +
-> +	family = boot_cpu_data.x86;
-> +	model  = boot_cpu_data.x86_model;
-
-Looks useless - just use boot_cpu_data directly below.
-
-As mentioned here already https://lore.kernel.org/all/Y9ubi0i4Z750gdMm@zn.tnic/
-
-And I already mentioned that for v9:
-
-https://lore.kernel.org/r/20230621094236.GZZJLGDAicp1guNPvD@fat_crate.local
-
-Next time I'm NAKing this patch until you incorporate all review
-comments or you give a technical reason why you disagree with them.
-
-> +	/*
-> +	 * RMP table entry format is not architectural and it can vary by processor and
-> +	 * is defined by the per-processor PPR. Restrict SNP support on the known CPU
-> +	 * model and family for which the RMP table entry format is currently defined for.
-> +	 */
-> +	if (family != 0x19 || model > 0xaf)
-> +		goto nosnp;
-> +
-> +	if (amd_iommu_snp_enable())
-> +		goto nosnp;
-> +
-> +	if (__snp_rmptable_init())
-> +		goto nosnp;
-> +
-> +	cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "x86/rmptable_init:online", __snp_enable, NULL);
-> +
-> +	return 0;
-> +
-> +nosnp:
-> +	setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
-> +	return -ENOSYS;
-> +}
-> +
-> +/*
-> + * This must be called after the PCI subsystem. This is because amd_iommu_snp_enable()
-> + * is called to ensure the IOMMU supports the SEV-SNP feature, which can only be
-> + * called after subsys_initcall().
-> + *
-> + * NOTE: IOMMU is enforced by SNP to ensure that hypervisor cannot program DMA
-> + * directly into guest private memory. In case of SNP, the IOMMU ensures that
-> + * the page(s) used for DMA are hypervisor owned.
-> + */
-> +fs_initcall(snp_rmptable_init);
-
-This looks backwards. AFAICT, the IOMMU code should call arch code to
-enable SNP at the right time, not the other way around - arch code
-calling driver code.
-
-Especially if the SNP table enablement depends on some exact IOMMU
-init_state:
-
-        if (init_state > IOMMU_ENABLED) {
-		pr_err("SNP: Too late to enable SNP for IOMMU.\n");
-
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
 
