@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-910-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-911-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 406F27E425A
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 15:59:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 220B57E425C
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 15:59:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8F5728115A
-	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 14:59:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73D06B21144
+	for <lists+kvm@lfdr.de>; Tue,  7 Nov 2023 14:59:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F69B34CF6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88EE434CFD;
 	Tue,  7 Nov 2023 14:57:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bn93EHUx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gwb+KVoU"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B3F328AD
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF09F328BC
 	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 14:57:54 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81552101;
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D76E2125;
 	Tue,  7 Nov 2023 06:57:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1699369072; x=1730905072;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=wGSwPnLoEemYp2aB3J7ygchAGWEZcE12PKLB9SkRt30=;
-  b=bn93EHUxokkbRqtjZS5wjSVhHMNRTjhWhWAqVCdSobFoI2UxPmsq/+gH
-   sLp6BSF1V8roLy2GOsIslJ5I2lLTvX53qS+qfbSGXpcrBfWI3/3CdJ9yn
-   HdHqOp9zsDp79PJwY2tokJv7+PfPinlcfaKFcxYMAHJgixRJ683d5zhJG
-   Dn8b8WSiQ7dAtMUey+U9zIPWu3MRiLPpsRq2856v157By0QWcNVgwbufI
-   kUyTKs77SqRny2WvxvkBBP2xJDEG3tg40AMpL/TkcGoJbEedrXWjijavc
-   97ahLe5YblLHyAYknUxdEhvmnbb+9vth9Zl8LdBpHBOIHnSj1DC2C3npj
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10887"; a="374555776"
+  bh=/ZKURepEe01uUpkN4oCM/0ZX44AKWFtrtV9gPK2hmPs=;
+  b=gwb+KVoU7jLbIcGgGg+LV0uzBUFSSgUWrJ8/K69KHQLNGy3jSvhe0uIo
+   2pRIDPds5k8TqMGL1pBpu4Ia3Yf0UIZbUfb7A9BoPar5YYAZp+0+D24fI
+   NXr5mUy3avYomVm/zn/fPBHfIO8tPQPhd8JUPWNX7EHyuR1JpgO8LEEIQ
+   xtyU2Lo3fkiD/zFQQ3RCQxik/PfbefBsDMsCnC68V1UMa3HOJTqIikeF4
+   /j65nOYssYoT4JdBP1h1hl63De1FehlqmEHSwNIfg9nSKi2o+GG0NQPjQ
+   okQOo0RcX7+655q/u9zCg0FNO2/TMx0U9g/oqoeysOrx1wQqFG2R+94bz
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10887"; a="374555781"
 X-IronPort-AV: E=Sophos;i="6.03,284,1694761200"; 
-   d="scan'208";a="374555776"
+   d="scan'208";a="374555781"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2023 06:57:52 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.03,284,1694761200"; 
-   d="scan'208";a="10444048"
+   d="scan'208";a="10444052"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2023 06:57:51 -0800
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2023 06:57:52 -0800
 From: isaku.yamahata@intel.com
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -61,9 +61,9 @@ Cc: isaku.yamahata@intel.com,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
 	tina.zhang@intel.com
-Subject: [PATCH v17 016/116] x86/virt/tdx: Add a helper function to return system wide info about TDX module
-Date: Tue,  7 Nov 2023 06:55:42 -0800
-Message-Id: <9069af111a000d8e67d94ffbda8ea82756cc9d36.1699368322.git.isaku.yamahata@intel.com>
+Subject: [PATCH v17 017/116] KVM: TDX: Add place holder for TDX VM specific mem_enc_op ioctl
+Date: Tue,  7 Nov 2023 06:55:43 -0800
+Message-Id: <a9436d3112ba317605c5754e7a618672bf40328f.1699368322.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1699368322.git.isaku.yamahata@intel.com>
 References: <cover.1699368322.git.isaku.yamahata@intel.com>
@@ -77,239 +77,180 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TDX KVM needs system-wide information about the TDX module, struct
-tdsysinfo_struct.  Add a helper function tdx_get_sysinfo() to return it
-instead of KVM getting it with various error checks.  Make KVM call the
-function and stash the info.  Move out the struct definition about it to
-common place arch/x86/include/asm/tdx.h.
+KVM_MEMORY_ENCRYPT_OP was introduced for VM-scoped operations specific for
+guest state-protected VM.  It defined subcommands for technology-specific
+operations under KVM_MEMORY_ENCRYPT_OP.  Despite its name, the subcommands
+are not limited to memory encryption, but various technology-specific
+operations are defined.  It's natural to repurpose KVM_MEMORY_ENCRYPT_OP
+for TDX specific operations and define subcommands.
+
+TDX requires VM-scoped TDX-specific operations for device model, for
+example, qemu.  Getting system-wide parameters, TDX-specific VM
+initialization.
+
+Add a place holder function for TDX specific VM-scoped ioctl as mem_enc_op.
+TDX specific sub-commands will be added to retrieve/pass TDX specific
+parameters.  Make mem_enc_ioctl non-optional as it's always filled.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/asm/tdx.h  | 59 +++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/tdx.c      | 15 +++++++++-
- arch/x86/virt/vmx/tdx/tdx.c | 20 +++++++++++--
- arch/x86/virt/vmx/tdx/tdx.h | 51 --------------------------------
- 4 files changed, 91 insertions(+), 54 deletions(-)
+v15:
+- change struct kvm_tdx_cmd to drop unused member.
+---
+ arch/x86/include/asm/kvm-x86-ops.h |  2 +-
+ arch/x86/include/uapi/asm/kvm.h    | 26 ++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/main.c            | 10 ++++++++++
+ arch/x86/kvm/vmx/tdx.c             | 26 ++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/x86_ops.h         |  4 ++++
+ arch/x86/kvm/x86.c                 |  4 ----
+ 6 files changed, 67 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index 3b648f290af3..276bdae47738 100644
---- a/arch/x86/include/asm/tdx.h
-+++ b/arch/x86/include/asm/tdx.h
-@@ -109,6 +109,62 @@ static inline u64 sc_retry(sc_func_t func, u64 fn,
- #define seamcall_ret(_fn, _args)	sc_retry(__seamcall_ret, (_fn), (_args))
- #define seamcall_saved_ret(_fn, _args)	sc_retry(__seamcall_saved_ret, (_fn), (_args))
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 66aa6c606dd4..09abb53d92ea 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -121,7 +121,7 @@ KVM_X86_OP(enter_smm)
+ KVM_X86_OP(leave_smm)
+ KVM_X86_OP(enable_smi_window)
+ #endif
+-KVM_X86_OP_OPTIONAL(mem_enc_ioctl)
++KVM_X86_OP(mem_enc_ioctl)
+ KVM_X86_OP_OPTIONAL(mem_enc_register_region)
+ KVM_X86_OP_OPTIONAL(mem_enc_unregister_region)
+ KVM_X86_OP_OPTIONAL(vm_copy_enc_context_from)
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index aa7a56a47564..615fb60b3717 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -567,4 +567,30 @@ struct kvm_pmu_event_filter {
+ #define KVM_X86_TDX_VM		2
+ #define KVM_X86_SNP_VM		3
  
-+struct tdx_cpuid_config {
-+	__struct_group(tdx_cpuid_config_leaf, leaf_sub_leaf, __packed,
-+		u32 leaf;
-+		u32 sub_leaf;
-+	);
-+	__struct_group(tdx_cpuid_config_value, value, __packed,
-+		u32 eax;
-+		u32 ebx;
-+		u32 ecx;
-+		u32 edx;
-+	);
-+} __packed;
++/* Trust Domain eXtension sub-ioctl() commands. */
++enum kvm_tdx_cmd_id {
++	KVM_TDX_CAPABILITIES = 0,
 +
-+#define TDSYSINFO_STRUCT_SIZE		1024
-+#define TDSYSINFO_STRUCT_ALIGNMENT	1024
++	KVM_TDX_CMD_NR_MAX,
++};
 +
-+/*
-+ * The size of this structure itself is flexible.  The actual structure
-+ * passed to TDH.SYS.INFO must be padded to TDSYSINFO_STRUCT_SIZE bytes
-+ * and TDSYSINFO_STRUCT_ALIGNMENT bytes aligned.
-+ */
-+struct tdsysinfo_struct {
-+	/* TDX-SEAM Module Info */
-+	u32	attributes;
-+	u32	vendor_id;
-+	u32	build_date;
-+	u16	build_num;
-+	u16	minor_version;
-+	u16	major_version;
-+	u8	reserved0[14];
-+	/* Memory Info */
-+	u16	max_tdmrs;
-+	u16	max_reserved_per_tdmr;
-+	u16	pamt_entry_size;
-+	u8	reserved1[10];
-+	/* Control Struct Info */
-+	u16	tdcs_base_size;
-+	u8	reserved2[2];
-+	u16	tdvps_base_size;
-+	u8	tdvps_xfam_dependent_size;
-+	u8	reserved3[9];
-+	/* TD Capabilities */
-+	u64	attributes_fixed0;
-+	u64	attributes_fixed1;
-+	u64	xfam_fixed0;
-+	u64	xfam_fixed1;
-+	u8	reserved4[32];
-+	u32	num_cpuid_config;
++struct kvm_tdx_cmd {
++	/* enum kvm_tdx_cmd_id */
++	__u32 id;
++	/* flags for sub-commend. If sub-command doesn't use this, set zero. */
++	__u32 flags;
 +	/*
-+	 * The actual number of CPUID_CONFIG depends on above
-+	 * 'num_cpuid_config'.
++	 * data for each sub-command. An immediate or a pointer to the actual
++	 * data in process virtual address.  If sub-command doesn't use it,
++	 * set zero.
 +	 */
-+	DECLARE_FLEX_ARRAY(struct tdx_cpuid_config, cpuid_configs);
-+} __packed;
++	__u64 data;
++	/*
++	 * Auxiliary error code.  The sub-command may return TDX SEAMCALL
++	 * status code in addition to -Exxx.
++	 * Defined for consistency with struct kvm_sev_cmd.
++	 */
++	__u64 error;
++};
 +
-+const struct tdsysinfo_struct *tdx_get_sysinfo(void);
- bool platform_tdx_enabled(void);
- int tdx_cpu_enable(void);
- int tdx_enable(void);
-@@ -137,6 +193,9 @@ static inline u64 __seamcall_saved_ret(u64 fn, struct tdx_module_args *args)
- {
- 	return TDX_SEAMCALL_UD;
+ #endif /* _ASM_X86_KVM_H */
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 73a1c4b64819..a95bbd10c3d8 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -51,6 +51,14 @@ static int vt_vm_init(struct kvm *kvm)
+ 	return vmx_vm_init(kvm);
  }
+ 
++static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
++{
++	if (!is_td(kvm))
++		return -ENOTTY;
 +
-+struct tdsysinfo_struct;
-+static inline const struct tdsysinfo_struct *tdx_get_sysinfo(void) { return NULL; }
- static inline bool platform_tdx_enabled(void) { return false; }
- static inline int tdx_cpu_enable(void) { return -ENODEV; }
- static inline int tdx_enable(void)  { return -ENODEV; }
++	return tdx_vm_ioctl(kvm, argp);
++}
++
+ #define VMX_REQUIRED_APICV_INHIBITS				\
+ 	(BIT(APICV_INHIBIT_REASON_DISABLE)|			\
+ 	 BIT(APICV_INHIBIT_REASON_ABSENT) |			\
+@@ -201,6 +209,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.complete_emulated_msr = kvm_complete_insn_gp,
+ 
+ 	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
++
++	.mem_enc_ioctl = vt_mem_enc_ioctl,
+ };
+ 
+ struct kvm_x86_init_ops vt_init_ops __initdata = {
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 9d3f593eacb8..b0e3409da5a8 100644
+index b0e3409da5a8..ead229e34813 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -11,9 +11,18 @@
- #undef pr_fmt
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+@@ -16,6 +16,32 @@
+ 		offsetof(struct tdsysinfo_struct, cpuid_configs))	\
+ 		/ sizeof(struct tdx_cpuid_config))
  
-+#define TDX_MAX_NR_CPUID_CONFIGS					\
-+	((TDSYSINFO_STRUCT_SIZE -					\
-+		offsetof(struct tdsysinfo_struct, cpuid_configs))	\
-+		/ sizeof(struct tdx_cpuid_config))
++int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
++{
++	struct kvm_tdx_cmd tdx_cmd;
++	int r;
++
++	if (copy_from_user(&tdx_cmd, argp, sizeof(struct kvm_tdx_cmd)))
++		return -EFAULT;
++	if (tdx_cmd.error)
++		return -EINVAL;
++
++	mutex_lock(&kvm->lock);
++
++	switch (tdx_cmd.id) {
++	default:
++		r = -EINVAL;
++		goto out;
++	}
++
++	if (copy_to_user(argp, &tdx_cmd, sizeof(struct kvm_tdx_cmd)))
++		r = -EFAULT;
++
++out:
++	mutex_unlock(&kvm->lock);
++	return r;
++}
 +
  static int __init tdx_module_setup(void)
  {
--	int ret;
-+	const struct tdsysinfo_struct *tdsysinfo;
-+	int ret = 0;
+ 	const struct tdsysinfo_struct *tdsysinfo;
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index ed9147f7b958..6487884a8d8e 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -137,9 +137,13 @@ void vmx_setup_mce(struct kvm_vcpu *vcpu);
+ #ifdef CONFIG_INTEL_TDX_HOST
+ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
+ bool tdx_is_vm_type_supported(unsigned long type);
 +
-+	BUILD_BUG_ON(sizeof(*tdsysinfo) > TDSYSINFO_STRUCT_SIZE);
-+	BUILD_BUG_ON(TDX_MAX_NR_CPUID_CONFIGS != 37);
++int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+ #else
+ static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
+ static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
++
++static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
+ #endif
  
- 	ret = tdx_enable();
- 	if (ret) {
-@@ -21,6 +30,10 @@ static int __init tdx_module_setup(void)
- 		return ret;
+ #endif /* __KVM_X86_VMX_X86_OPS_H */
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 26bd5eb88b8a..ced75e9204b9 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7176,10 +7176,6 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+ 		goto out;
  	}
- 
-+	/* Sanitary check just in case. */
-+	tdsysinfo = tdx_get_sysinfo();
-+	WARN_ON(tdsysinfo->num_cpuid_config > TDX_MAX_NR_CPUID_CONFIGS);
-+
- 	return 0;
- }
- 
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index c01cbfc81fbb..9942804cf62f 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -265,6 +265,20 @@ static int get_tdx_sysinfo(struct tdsysinfo_struct *tdsysinfo,
- 	return 0;
- }
- 
-+static struct tdsysinfo_struct *tdsysinfo;
-+
-+const struct tdsysinfo_struct *tdx_get_sysinfo(void)
-+{
-+	const struct tdsysinfo_struct *r = NULL;
-+
-+	mutex_lock(&tdx_module_lock);
-+	if (tdx_module_status == TDX_MODULE_INITIALIZED)
-+		r = tdsysinfo;
-+	mutex_unlock(&tdx_module_lock);
-+	return r;
-+}
-+EXPORT_SYMBOL_GPL(tdx_get_sysinfo);
-+
- /*
-  * Add a memory region as a TDX memory block.  The caller must make sure
-  * all memory regions are added in address ascending order and don't
-@@ -1090,7 +1104,6 @@ static int init_tdmrs(struct tdmr_info_list *tdmr_list)
- 
- static int init_tdx_module(void)
- {
--	struct tdsysinfo_struct *tdsysinfo;
- 	struct cmr_info *cmr_array;
- 	int tdsysinfo_size;
- 	int cmr_array_size;
-@@ -1181,7 +1194,10 @@ static int init_tdx_module(void)
- 	 * For now both @sysinfo and @cmr_array are only used during
- 	 * module initialization, so always free them.
- 	 */
--	kfree(tdsysinfo);
-+	if (ret) {
-+		kfree(tdsysinfo);
-+		tdsysinfo = NULL;
-+	}
- 	kfree(cmr_array);
- 	return ret;
- 
-diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-index 5bcbfc2fc466..c37a54cff1fa 100644
---- a/arch/x86/virt/vmx/tdx/tdx.h
-+++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -36,57 +36,6 @@ struct cmr_info {
- #define MAX_CMRS	32
- #define CMR_INFO_ARRAY_ALIGNMENT	512
- 
--struct cpuid_config {
--	u32	leaf;
--	u32	sub_leaf;
--	u32	eax;
--	u32	ebx;
--	u32	ecx;
--	u32	edx;
--} __packed;
+ 	case KVM_MEMORY_ENCRYPT_OP: {
+-		r = -ENOTTY;
+-		if (!kvm_x86_ops.mem_enc_ioctl)
+-			goto out;
 -
--#define TDSYSINFO_STRUCT_SIZE		1024
--#define TDSYSINFO_STRUCT_ALIGNMENT	1024
--
--/*
-- * The size of this structure itself is flexible.  The actual structure
-- * passed to TDH.SYS.INFO must be padded to TDSYSINFO_STRUCT_SIZE bytes
-- * and TDSYSINFO_STRUCT_ALIGNMENT bytes aligned.
-- */
--struct tdsysinfo_struct {
--	/* TDX-SEAM Module Info */
--	u32	attributes;
--	u32	vendor_id;
--	u32	build_date;
--	u16	build_num;
--	u16	minor_version;
--	u16	major_version;
--	u8	reserved0[14];
--	/* Memory Info */
--	u16	max_tdmrs;
--	u16	max_reserved_per_tdmr;
--	u16	pamt_entry_size;
--	u8	reserved1[10];
--	/* Control Struct Info */
--	u16	tdcs_base_size;
--	u8	reserved2[2];
--	u16	tdvps_base_size;
--	u8	tdvps_xfam_dependent_size;
--	u8	reserved3[9];
--	/* TD Capabilities */
--	u64	attributes_fixed0;
--	u64	attributes_fixed1;
--	u64	xfam_fixed0;
--	u64	xfam_fixed1;
--	u8	reserved4[32];
--	u32	num_cpuid_config;
--	/*
--	 * The actual number of CPUID_CONFIG depends on above
--	 * 'num_cpuid_config'.
--	 */
--	DECLARE_FLEX_ARRAY(struct cpuid_config, cpuid_configs);
--} __packed;
--
- struct tdmr_reserved_area {
- 	u64 offset;
- 	u64 size;
+ 		r = static_call(kvm_x86_mem_enc_ioctl)(kvm, argp);
+ 		break;
+ 	}
 -- 
 2.25.1
 
