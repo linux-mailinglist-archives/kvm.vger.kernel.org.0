@@ -1,73 +1,71 @@
-Return-Path: <kvm+bounces-1274-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1275-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05D787E5F15
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 21:21:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23AFE7E5F34
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 21:31:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B46D42815B2
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 20:21:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DF931C20C38
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 20:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016D937178;
-	Wed,  8 Nov 2023 20:21:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CFE6374D1;
+	Wed,  8 Nov 2023 20:31:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KGL1jXLw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xium73UG"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181883716F
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 20:21:25 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06F152134;
-	Wed,  8 Nov 2023 12:21:24 -0800 (PST)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A8KFWNO007888;
-	Wed, 8 Nov 2023 20:21:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=JWLjtEDsbu9pQezW8V3iE5wEiBaU0MWE30c+dgKsRU4=;
- b=KGL1jXLwtWr3iWohog/wEZhBrM8GoluuvcdEdNE4mnpEXmD7nmV73twEgBJ1ZSot/mOx
- StCFyLKycBzfbNm3PDVafkEGDJDy3MuU1/zCXrxktDeY5d5r98EF8GW5jhvQccBUYnV/
- yPk8YWCRDW6RiISX1vXifv1rDVj9FVnUkg43ZWQwb90w7fHmFn06KBHYmcSNqSWa9R9k
- ZDQDtfCJFAn74GPR/kdo7JGgHTrn9mEerrWeKR+7wUP09+oT3Zb6YUTEdCRP+GXJMmOd
- E94YFScCrTYv3i+gf4LV1WOiDGrn7JK7FgqfHXyyxwITpCjise+nJdR3bNXubrxdMK20 4w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u8fyf2fru-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Nov 2023 20:21:23 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A8KFwS8010853;
-	Wed, 8 Nov 2023 20:21:23 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u8fyf2fra-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Nov 2023 20:21:23 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A8J2k0q014372;
-	Wed, 8 Nov 2023 20:21:22 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u7w21ybqc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Nov 2023 20:21:22 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A8KLLur25362986
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 8 Nov 2023 20:21:22 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E3D185805F;
-	Wed,  8 Nov 2023 20:21:21 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CE7AB58062;
-	Wed,  8 Nov 2023 20:21:20 +0000 (GMT)
-Received: from [9.61.74.193] (unknown [9.61.74.193])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  8 Nov 2023 20:21:20 +0000 (GMT)
-Message-ID: <17ef8d76-5dec-46a3-84e1-1b92fadd27b0@linux.ibm.com>
-Date: Wed, 8 Nov 2023 15:21:20 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B4A374C3
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 20:31:35 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90059258D
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 12:31:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699475493;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=MtB8ohQOEzMANjmqu0FCOmdxHso7iJv2r+v/FvfKTAE=;
+	b=Xium73UG9+BDG3ey0mQHjAix3L2B1DtqNrhzBb6uvyIzAwev79jdnUypASZm/XDB0KwA53
+	Tp2/guOfqyT/sVue/yrCkD6MxKDhRwhm8FT3FGXj1QkHJBxHBjp0veQdBnGU+UqHK7l2Ri
+	5dQrsdkLzLjpW3PlSXAt3tFXB6wAcJQ=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-170-4rv_MWC6PGmVVOf19BElsA-1; Wed, 08 Nov 2023 15:31:32 -0500
+X-MC-Unique: 4rv_MWC6PGmVVOf19BElsA-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9e293cd8269so11729766b.0
+        for <kvm@vger.kernel.org>; Wed, 08 Nov 2023 12:31:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699475491; x=1700080291;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MtB8ohQOEzMANjmqu0FCOmdxHso7iJv2r+v/FvfKTAE=;
+        b=M/qdrGbotn9MJqdEycMJOl5EkuZae9qcbuys2hXFmOMFk0zfSrk7dPX9loQ413aev9
+         VUDKCqnfPXYRAUhEOgGsO0Df4+shDox+qSmYt2v1KtrKyJrK1cFlJ5wwnVKlt0LfRC5D
+         IXD3JxOhdLpF+9j/VWJce1vPJyhAOL3Nq2rxi5HlE50DlGbeWaC5HcuoWrlogFWm9hWQ
+         RembsikCXraRUPcFrlMKwTRwzA+Gfy2m0V2dZVJl8reqv6EN/PD8sA/86dp1FeimyCA4
+         CCq9piKq2Kz5Y9BAUrVgxaUVnHhHF8V8UNK6qNP/vOHL9B7hnKtOOZXpqVCGj56d+egM
+         J5UQ==
+X-Gm-Message-State: AOJu0YwxMFSnvQsN8ke242sYtKRB+GNq1F6fHn/KN3Tg1F4ukMERRrNi
+	uXM4YdXuixsghsUQJKBJSnlpSofkx5mKOtHFxXPS/y6tIf7fqVjrP/TeVPCmBSpKY6UO5N3X1si
+	MA97imDEfW9JM
+X-Received: by 2002:a17:907:a4c1:b0:9e3:fbab:e091 with SMTP id vq1-20020a170907a4c100b009e3fbabe091mr1929659ejc.15.1699475491330;
+        Wed, 08 Nov 2023 12:31:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHaQFHEMVK2eGELzcR5AsUy+0ZQmgx/f+sWXEc4bB+3m1OFJDynAK5+sSf1PVTvF09KXeogow==
+X-Received: by 2002:a17:907:a4c1:b0:9e3:fbab:e091 with SMTP id vq1-20020a170907a4c100b009e3fbabe091mr1929645ejc.15.1699475491070;
+        Wed, 08 Nov 2023 12:31:31 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id a27-20020a1709063a5b00b009c6a4a5ac80sm1519304ejf.169.2023.11.08.12.31.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Nov 2023 12:31:30 -0800 (PST)
+Message-ID: <d47135d7-ee5b-4c57-ac49-e9d94e8fcae2@redhat.com>
+Date: Wed, 8 Nov 2023 21:31:29 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,114 +73,67 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] s390/vfio-ap: fix sysfs status attribute for AP queue
- devices
+Subject: Re: [kvm:guestmemfd 59/59]
+ arch/s390/kvm/../../../virt/kvm/kvm_main.c:5517:14: error: 'KVM_TRACE_ENABLE'
+ undeclared; did you mean 'KVM_PV_ENABLE'?
 Content-Language: en-US
-From: Tony Krowiak <akrowiak@linux.ibm.com>
-To: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc: jjherne@linux.ibm.com, pasic@linux.ibm.com, borntraeger@linux.ibm.com,
-        frankja@linux.ibm.com, imbrenda@linux.ibm.com, david@redhat.com,
-        Harald Freudenberger <freude@linux.ibm.com>
-References: <20231108201135.351419-1-akrowiak@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <20231108201135.351419-1-akrowiak@linux.ibm.com>
+To: Sean Christopherson <seanjc@google.com>, kernel test robot <lkp@intel.com>
+Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+ Robert Hu <robert.hu@intel.com>, Farrah Chen <farrah.chen@intel.com>,
+ Danmei Wei <danmei.wei@intel.com>
+References: <202311090100.Zt0adRi9-lkp@intel.com>
+ <ZUvtbInra7-Nypgq@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <ZUvtbInra7-Nypgq@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Knz054HCiTxFwKUszYpj6N7jesrU_sJZ
-X-Proofpoint-ORIG-GUID: aTanNe0nwYMzlVTApE8mmgOKt61P-bZ4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-08_09,2023-11-08_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- adultscore=0 malwarescore=0 clxscore=1015 phishscore=0 mlxscore=0
- impostorscore=0 mlxlogscore=999 suspectscore=0 spamscore=0 bulkscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311080167
 
-Christian,
-Can this be pushed with the Acks by Halil and Harald?
+On 11/8/23 21:19, Sean Christopherson wrote:
+> On Thu, Nov 09, 2023, kernel test robot wrote:
+>> tree:https://git.kernel.org/pub/scm/virt/kvm/kvm.git  guestmemfd
+>> head:   cd689ddd5c93ea177b28029d57c13e18b160875b
+>> commit: cd689ddd5c93ea177b28029d57c13e18b160875b [59/59] KVM: remove deprecated UAPIs
+> Paolo, I assume you force pushed to guestmemfd at some point at that this is no
+> longer an issue?  I can't find the above object, and given the shortlog I'm guessing
+> it was a WIP thing unrelated to guest_memfd.
 
-On 11/8/23 15:11, Tony Krowiak wrote:
-> The 'status' attribute for AP queue devices bound to the vfio_ap device
-> driver displays incorrect status when the mediated device is attached to a
-> guest, but the queue device is not passed through. In the current
-> implementation, the status displayed is 'in_use' which is not correct; it
-> should be 'assigned'. This can happen if one of the queue devices
-> associated with a given adapter is not bound to the vfio_ap device driver.
-> For example:
-> 
-> Queues listed in /sys/bus/ap/drivers/vfio_ap:
-> 14.0005
-> 14.0006
-> 14.000d
-> 16.0006
-> 16.000d
-> 
-> Queues listed in /sys/devices/vfio_ap/matrix/$UUID/matrix
-> 14.0005
-> 14.0006
-> 14.000d
-> 16.0005
-> 16.0006
-> 16.000d
-> 
-> Queues listed in /sys/devices/vfio_ap/matrix/$UUID/guest_matrix
-> 14.0005
-> 14.0006
-> 14.000d
-> 
-> The reason no queues for adapter 0x16 are listed in the guest_matrix is
-> because queue 16.0005 is not bound to the vfio_ap device driver, so no
-> queue associated with the adapter is passed through to the guest;
-> therefore, each queue device for adapter 0x16 should display 'assigned'
-> instead of 'in_use', because those queues are not in use by a guest, but
-> only assigned to the mediated device.
-> 
-> Let's check the AP configuration for the guest to determine whether a
-> queue device is passed through before displaying a status of 'in_use'.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Acked-by: Halil Pasic <pasic@linux.ibm.com>
-> Acked-by: Harald Freudenberger <freude@linux.ibm.com>
-> ---
->   drivers/s390/crypto/vfio_ap_ops.c | 16 +++++++++++++++-
->   1 file changed, 15 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 4db538a55192..6e0a79086656 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -1976,6 +1976,7 @@ static ssize_t status_show(struct device *dev,
->   {
->   	ssize_t nchars = 0;
->   	struct vfio_ap_queue *q;
-> +	unsigned long apid, apqi;
->   	struct ap_matrix_mdev *matrix_mdev;
->   	struct ap_device *apdev = to_ap_dev(dev);
->   
-> @@ -1983,8 +1984,21 @@ static ssize_t status_show(struct device *dev,
->   	q = dev_get_drvdata(&apdev->device);
->   	matrix_mdev = vfio_ap_mdev_for_queue(q);
->   
-> +	/* If the queue is assigned to the matrix mediated device, then
-> +	 * determine whether it is passed through to a guest; otherwise,
-> +	 * indicate that it is unassigned.
-> +	 */
->   	if (matrix_mdev) {
-> -		if (matrix_mdev->kvm)
-> +		apid = AP_QID_CARD(q->apqn);
-> +		apqi = AP_QID_QUEUE(q->apqn);
-> +		/*
-> +		 * If the queue is passed through to the guest, then indicate
-> +		 * that it is in use; otherwise, indicate that it is
-> +		 * merely assigned to a matrix mediated device.
-> +		 */
-> +		if (matrix_mdev->kvm &&
-> +		    test_bit_inv(apid, matrix_mdev->shadow_apcb.apm) &&
-> +		    test_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm))
->   			nchars = scnprintf(buf, PAGE_SIZE, "%s\n",
->   					   AP_QUEUE_IN_USE);
->   		else
+Yes, I had pushed a bit too much.
+
+Paolo
+
 
