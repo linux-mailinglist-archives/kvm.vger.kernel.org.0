@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-1253-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1248-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A10ED7E5DF6
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 20:02:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0715B7E5DDE
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 20:01:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41E5CB20FD0
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 19:01:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B44B82819C7
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 19:01:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 856F139841;
-	Wed,  8 Nov 2023 19:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 328A838DDC;
+	Wed,  8 Nov 2023 19:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eX3fdQK8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q/6YwCg6"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B32E36B0F;
-	Wed,  8 Nov 2023 19:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5617836B1C;
+	Wed,  8 Nov 2023 19:00:29 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C52DB2115;
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D335C2116;
 	Wed,  8 Nov 2023 11:00:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1699470020; x=1731006020;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=IRPQ5ioteqwh4CfCqIjfG/Rnvw8uAQhRAapN4CI6IQw=;
-  b=eX3fdQK8JsApP9z8bxI4pPxxR05RM8YyOiRfWXbjw2rJEqxlm7zRdp9W
-   pQbg8cgk1w2aSDFDt5Y4anHI8VTAaBNkINTyhDQb/1mE+LlI8/TzxAfab
-   GcHEJgtZTmsFsgDJ74D8FrD7720XbMkvK2pNziOaqqiYfvo7KQ+c6+ZAo
-   06tssZmc1nDnA3IQAvb7maZv28mcRfP0B7eIOzcT/aDpfeX3JaRsUWD0y
-   uQYc0Y3h7d7v+D7RTtTxkal8uOfy9RKjxXpDSuDPe0UHamVYQhigFf+/4
-   HixVkH5BZq+xFt5qkdY89sd433ufE0dX1ansoz59eZeHG/a+AhtPv+QvK
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="8486267"
+  bh=XBjxJzF23ZyrUcL//Abo2czdnJUCDVfOQL8DmGgF2m8=;
+  b=Q/6YwCg6+2ThjXVGKYUkH/NwkKs2WM3Mr4dWqgSqIQVxO/Oz5n5zVBYf
+   jYp6GXxMOlfUWzdu3BbLo3abjybb/ZWUEvSyEpfaV1an6XDICcBRcR+sM
+   bg+Egp6+zRJfD4f7VBtfaphGP1bANpcVhNdJDFDDHKOp63xSt5q1M3Okh
+   JkHyxLzBfYeLEeu2VA55gqwejYlW/HpGqCmD2LqyqfElBx0ufefHktWox
+   oDOxYrG/vj4qNVs/BZhJV3pY4KUKev3WAQz6gTud9mPOVUoGHfPLAYCuy
+   Q141VC27lHrHuQ/HM5zcBHbfgn7wEmJCZq+W04emD/EaK93CCGtfKpe00
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="8486281"
 X-IronPort-AV: E=Sophos;i="6.03,287,1694761200"; 
-   d="scan'208";a="8486267"
+   d="scan'208";a="8486281"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 11:00:19 -0800
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 11:00:20 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.03,287,1694761200"; 
-   d="scan'208";a="10892433"
+   d="scan'208";a="10892439"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by orviesa001.jf.intel.com with ESMTP; 08 Nov 2023 11:00:18 -0800
+  by orviesa001.jf.intel.com with ESMTP; 08 Nov 2023 11:00:19 -0800
 From: Xin Li <xin3.li@intel.com>
 To: kvm@vger.kernel.org,
 	linux-doc@vger.kernel.org,
@@ -68,9 +68,9 @@ Cc: seanjc@google.com,
 	vkuznets@redhat.com,
 	peterz@infradead.org,
 	ravi.v.shankar@intel.com
-Subject: [PATCH v1 06/23] KVM: VMX: Defer enabling FRED MSRs save/load until after set CPUID
-Date: Wed,  8 Nov 2023 10:29:46 -0800
-Message-ID: <20231108183003.5981-7-xin3.li@intel.com>
+Subject: [PATCH v1 07/23] KVM: VMX: Disable intercepting FRED MSRs
+Date: Wed,  8 Nov 2023 10:29:47 -0800
+Message-ID: <20231108183003.5981-8-xin3.li@intel.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231108183003.5981-1-xin3.li@intel.com>
 References: <20231108183003.5981-1-xin3.li@intel.com>
@@ -82,86 +82,46 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Clear FRED VM entry/exit controls when initializing a vCPU, and set
-these controls only if FRED is enumerated after set CPUID.
-
-FRED VM entry/exit controls need to be set to establish context
-sufficient to support FRED event delivery immediately after VM entry
-and exit.  However it is not required to save/load FRED MSRs for
-a non-FRED guest, which aren't supposed to access FRED MSRs.
-
-A non-FRED guest should get #GP upon accessing FRED MSRs, otherwise
-it corrupts host FRED MSRs.
+Add FRED MSRs to the valid passthrough MSR list and disable intercepting
+FRED MSRs only if FRED is enumerated after set CPUID.
 
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 34 +++++++++++++++++++++++++++++++++-
- 1 file changed, 33 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/vmx.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 9186f41974ab..5d4786812664 100644
+index 5d4786812664..327e052d90c1 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4423,6 +4423,9 @@ static u32 vmx_vmentry_ctrl(void)
- 	if (cpu_has_perf_global_ctrl_bug())
- 		vmentry_ctrl &= ~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
+@@ -700,6 +700,9 @@ static bool is_valid_passthrough_msr(u32 msr)
+ 	case MSR_LBR_CORE_TO ... MSR_LBR_CORE_TO + 8:
+ 		/* LBR MSRs. These are handled in vmx_update_intercept_for_lbr_msrs() */
+ 		return true;
++	case MSR_IA32_FRED_RSP0 ... MSR_IA32_FRED_CONFIG:
++		/* FRED MSRs should be passthrough to FRED guests only */
++		return true;
+ 	}
  
-+	/* Whether to load guest FRED MSRs is deferred until after set CPUID */
-+	vmentry_ctrl &= ~VM_ENTRY_LOAD_IA32_FRED;
+ 	r = possible_passthrough_msr_slot(msr) != -ENOENT;
+@@ -7813,6 +7816,16 @@ static void vmx_vcpu_config_fred_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	secondary_vm_exit_controls_setbit(vmx,
+ 					  SECONDARY_VM_EXIT_SAVE_IA32_FRED |
+ 					  SECONDARY_VM_EXIT_LOAD_IA32_FRED);
 +
- 	return vmentry_ctrl;
++	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP0, MSR_TYPE_RW);
++	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP1, MSR_TYPE_RW);
++	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP2, MSR_TYPE_RW);
++	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP3, MSR_TYPE_RW);
++	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_FRED_STKLVLS, MSR_TYPE_RW);
++	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_FRED_SSP1, MSR_TYPE_RW);
++	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_FRED_SSP2, MSR_TYPE_RW);
++	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_FRED_SSP3, MSR_TYPE_RW);
++	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_FRED_CONFIG, MSR_TYPE_RW);
  }
  
-@@ -4458,7 +4461,13 @@ static u32 vmx_vmexit_ctrl(void)
- 
- static u64 vmx_secondary_vmexit_ctrl(void)
- {
--	return vmcs_config.secondary_vmexit_ctrl;
-+	u64 secondary_vmexit_ctrl = vmcs_config.secondary_vmexit_ctrl;
-+
-+	/* Whether to save/load FRED MSRs is deferred until after set CPUID */
-+	secondary_vmexit_ctrl &= ~(SECONDARY_VM_EXIT_SAVE_IA32_FRED |
-+				   SECONDARY_VM_EXIT_LOAD_IA32_FRED);
-+
-+	return secondary_vmexit_ctrl;
- }
- 
- static void vmx_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
-@@ -7785,10 +7794,33 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
- 		vmx->pt_desc.ctl_bitmask &= ~(0xfULL << (32 + i * 4));
- }
- 
-+static void vmx_vcpu_config_fred_after_set_cpuid(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+
-+	if (!cpu_feature_enabled(X86_FEATURE_FRED) ||
-+	    !guest_cpuid_has(vcpu, X86_FEATURE_FRED))
-+		return;
-+
-+	/* Enable loading guest FRED MSRs from VMCS */
-+	vm_entry_controls_setbit(vmx, VM_ENTRY_LOAD_IA32_FRED);
-+
-+	/*
-+	 * Enable saving guest FRED MSRs into VMCS and loading host FRED MSRs
-+	 * from VMCS.
-+	 */
-+	vm_exit_controls_setbit(vmx, VM_EXIT_ACTIVATE_SECONDARY_CONTROLS);
-+	secondary_vm_exit_controls_setbit(vmx,
-+					  SECONDARY_VM_EXIT_SAVE_IA32_FRED |
-+					  SECONDARY_VM_EXIT_LOAD_IA32_FRED);
-+}
-+
  static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
-+	vmx_vcpu_config_fred_after_set_cpuid(vcpu);
-+
- 	/*
- 	 * XSAVES is effectively enabled if and only if XSAVE is also exposed
- 	 * to the guest.  XSAVES depends on CR4.OSXSAVE, and CR4.OSXSAVE can be
 -- 
 2.42.0
 
