@@ -1,118 +1,155 @@
-Return-Path: <kvm+bounces-1233-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1235-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4B517E5C65
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 18:28:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B46F27E5C78
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 18:34:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55FB6B20D42
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 17:28:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E42F281705
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 17:34:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E0132C75;
-	Wed,  8 Nov 2023 17:27:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4079032C79;
+	Wed,  8 Nov 2023 17:34:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="OUC5VGJV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z/cnRE/X"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE81732C67;
-	Wed,  8 Nov 2023 17:27:51 +0000 (UTC)
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15C7610D9;
-	Wed,  8 Nov 2023 09:27:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1699464471; x=1731000471;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=hBzmNII0I3GifFKe/JRW/XiwCLaYSx9NjN5qNg4RJqU=;
-  b=OUC5VGJVVKj0M8aIcUJUnKeSGSFRbmu1t3xOj2kZjIo7+A55lauE3qPb
-   w7K6hAFpg7Wq3XSQnrKuwtnNpL/blB1x4m91l4+fxwzHQCUN88czUYKF0
-   v4FSZe23qXBSQjh/oKdcZEX/85veYnMNDV3Wf9qVqMWQI5WtsAlqYyvjo
-   k=;
-X-IronPort-AV: E=Sophos;i="6.03,286,1694736000"; 
-   d="scan'208";a="42137507"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 17:27:47 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com (Postfix) with ESMTPS id 83739A0CD9;
-	Wed,  8 Nov 2023 17:27:43 +0000 (UTC)
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:49948]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.3.26:2525] with esmtp (Farcaster)
- id fda2a43b-2f90-4542-9a2c-16f8fb6acca0; Wed, 8 Nov 2023 17:27:42 +0000 (UTC)
-X-Farcaster-Flow-ID: fda2a43b-2f90-4542-9a2c-16f8fb6acca0
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Wed, 8 Nov 2023 17:27:40 +0000
-Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
- (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Wed, 8 Nov
- 2023 17:27:36 +0000
-Message-ID: <c867cd1f-9060-4db9-8a00-4b513f32c2b7@amazon.com>
-Date: Wed, 8 Nov 2023 18:27:34 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56759321B8
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 17:34:39 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A22D61FDF
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 09:34:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699464878; x=1731000878;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=e+oRgoW4dG6ERipjruO1Dz4aP2SFo7r8UekPSbqLwis=;
+  b=Z/cnRE/XWUKWBuzOkWCSPTHeF2+s33DdGtDbiVvvNVaWSE4q0JOJDEx+
+   xPwJgvBlBbWK3IFej+lNryBmF58pY1lEMOkF+PMu+TnSpYCo9iHMdom0Q
+   gL3caTtkT5SuB19lVrBKX3vA8npaXd4KHsqJueSCeVnAAn0g3hXpb6anM
+   ezPPlApYOLOYdwtJNTmbrrWGQzcUv6ODwnEfZzHFMTR+asgahtWJ4/PZQ
+   MMujHvm5MkYgaqV5z6MGFM/diiZql0N3Kw+sp4MUhQ5JlLuh/6+Ualh0R
+   yPiMhvk0U2ENfFfz6HL516VFFiqxAe7A14+ZJ+d9cgvaGG+O5EOyqGabu
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="380210639"
+X-IronPort-AV: E=Sophos;i="6.03,286,1694761200"; 
+   d="scan'208";a="380210639"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 09:34:35 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="792263228"
+X-IronPort-AV: E=Sophos;i="6.03,286,1694761200"; 
+   d="scan'208";a="792263228"
+Received: from lkp-server01.sh.intel.com (HELO 17d9e85e5079) ([10.239.97.150])
+  by orsmga008.jf.intel.com with ESMTP; 08 Nov 2023 09:34:33 -0800
+Received: from kbuild by 17d9e85e5079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r0mRj-00085o-0i;
+	Wed, 08 Nov 2023 17:34:31 +0000
+Date: Thu, 9 Nov 2023 01:34:08 +0800
+From: kernel test robot <lkp@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+	Robert Hu <robert.hu@intel.com>,
+	Farrah Chen <farrah.chen@intel.com>,
+	Danmei Wei <danmei.wei@intel.com>
+Subject: [kvm:guestmemfd 59/59]
+ arch/s390/kvm/../../../virt/kvm/kvm_main.c:5517:14: error:
+ 'KVM_TRACE_ENABLE' undeclared; did you mean 'KVM_PV_ENABLE'?
+Message-ID: <202311090100.Zt0adRi9-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 29/33] KVM: VMX: Save instruction length on EPT violation
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>, Nicolas Saenz Julienne
-	<nsaenz@amazon.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-hyperv@vger.kernel.org>, <pbonzini@redhat.com>, <vkuznets@redhat.com>,
-	<anelkz@amazon.com>, <dwmw@amazon.co.uk>, <jgowans@amazon.com>,
-	<corbert@lwn.net>, <kys@microsoft.com>, <haiyangz@microsoft.com>,
-	<decui@microsoft.com>, <x86@kernel.org>, <linux-doc@vger.kernel.org>
-References: <20231108111806.92604-1-nsaenz@amazon.com>
- <20231108111806.92604-30-nsaenz@amazon.com> <ZUvDZUbUR4s_9VNG@google.com>
-From: Alexander Graf <graf@amazon.com>
-In-Reply-To: <ZUvDZUbUR4s_9VNG@google.com>
-X-Originating-IP: [10.253.83.51]
-X-ClientProxiedBy: EX19D040UWA004.ant.amazon.com (10.13.139.93) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Ck9uIDA4LjExLjIzIDE4OjIwLCBTZWFuIENocmlzdG9waGVyc29uIHdyb3RlOgo+IE9uIFdlZCwg
-Tm92IDA4LCAyMDIzLCBOaWNvbGFzIFNhZW56IEp1bGllbm5lIHdyb3RlOgo+PiBTYXZlIHRoZSBs
-ZW5ndGggb2YgdGhlIGluc3RydWN0aW9uIHRoYXQgdHJpZ2dlcmVkIGFuIEVQVCB2aW9sYXRpb24g
-aW4KPj4gc3RydWN0IGt2bV92Y3B1X2FyY2guIFRoaXMgd2lsbCBiZSB1c2VkIHRvIHBvcHVsYXRl
-IEh5cGVyLVYgVlNNIG1lbW9yeQo+PiBpbnRlcmNlcHQgbWVzc2FnZXMuCj4gVGhpcyBpcyBzaWxs
-eSBhbmQgdW5uZWNlc3NhcmlseSBvYmZ1c2NhdGVzICp3aHkqIChhcyBteSByZXNwb25zZSByZWdh
-cmRpbmcgU1ZNCj4gc2hvd3MpLCBpLmUuIHRoYXQgdGhpcyBpcyAibmVlZGVkIiBiZWN1YXNlIHRo
-ZSB2YWx1ZSBpcyBjb25zdW1lZCBieSBhICpkaWZmZXJlbnQqCj4gdkNQVSwgbm90IGJlY2F1c2Ug
-b2YgcGVyZm9ybWFuY2UgY29uY2VybnMuCj4KPiBJdCdzIGFsc28gYnJva2VuLCBBRkFJQ1Qgbm90
-aGluZyBwcmV2ZW50cyB0aGUgaW50ZXJjZXB0ZWQgdkNQVSBmcm9tIGhpdHRpbmcgYQo+IGRpZmZl
-cmVudCBFUFQgdmlvbGF0aW9uIGJlZm9yZSB0aGUgdGFyZ2V0IHZDUFUgY29uc3VtZXMgZXhpdF9p
-bnN0cnVjdGlvbl9sZW4uCj4KPiBIb2x5IGNvdy4gIEFsbCBvZiBkZWxpdmVyX2dwYV9pbnRlcmNl
-cHQoKSBpcyB3aWxkbHkgdW5zYWZlLiAgQXNpZGUgZnJvbSByYWNlCj4gY29uZGl0aW9ucywgd2hp
-Y2ggaW4gYW5kIG9mIHRoZW1zZWx2ZXMgYXJlIGEgbm9uLXN0YXJ0ZXIsIG5vdGhpbmcgZ3VhcmFu
-dGVlcyB0aGF0Cj4gdGhlIGludGVyY2VwdGVkIHZDUFUgYWN0dWFsbHkgY2FjaGVkIGFsbCBvZiB0
-aGUgaW5mb3JtYXRpb24gdGhhdCBpcyBoZWxkIGluIGl0cyBWTUNTLgo+Cj4gVGhlIHNhbmUgd2F5
-IHRvIGRvIHRoaXMgaXMgdG8gc25hcHNob3QgKmFsbCogaW5mb3JtYXRpb24gb24gdGhlIGludGVy
-Y2VwdGVkIHZDUFUsCj4gYW5kIHRoZW4gaGFuZCB0aGF0IG9mZiBhcyBhIHBheWxvYWQgdG8gdGhl
-IHRhcmdldCB2Q1BVLiAgVGhhdCBpcywgYXNzdW1pbmcgdGhlCj4gY3Jvc3MtdkNQVSBzdHVmZiBp
-cyBhY3R1YWxseSBuZWNlc3NhcnkuICBBdCBhIGdsYW5jZSwgSSBkb24ndCBzZWUgYW55dGhpbmcg
-dGhhdAo+IGV4cGxhaW5zICp3aHkqLgoKCll1cCwgSSBiZWxpZXZlIHlvdSByZXBlYXRlZCB0aGUg
-Y29tbWVudCBJIGhhZCBvbiB0aGUgZnVuY3Rpb24gLSBhbmQgCk5pY29sYXMgYWxyZWFkeSBhZ3Jl
-ZWQgOikuIFRoaXMgc2hvdWxkIGdvIHRocm91Z2ggdXNlciBzcGFjZSB3aGljaCAKYXV0b21hdGlj
-YWxseSBtZWFucyB5b3UgbmVlZCB0byBidWJibGUgdXAgYWxsIG5lY2Vzc2FyeSB0cmFwIGRhdGEg
-dG8gCnVzZXIgc3BhY2Ugb24gdGhlIGZhdWx0aW5nIHZDUFUgYW5kIHRoZW4gaW5qZWN0IHRoZSBm
-dWxsIHNldCBvZiBkYXRhIAppbnRvIHRoZSByZWNlaXZpbmcgb25lLgoKTXkgcG9pbnQgd2l0aCB0
-aGUgY29tbWVudCBvbiB0aGlzIHBhdGNoIHdhcyAiRG9uJ3QgYnJlYWsgQU1EIChvciBhbmNpZW50
-IApWTVggd2l0aG91dCBpbnN0cnVjdGlvbiBsZW5ndGggZGVjb2RpbmcgW0RvZXMgdGhhdCBleGlz
-dD8gSSBrbm93IFNWTSBoYXMgCm9sZCBDUFVzIHRoYXQgZG9uJ3QgZG8gaXRdKSBwbGVhc2UiLgoK
-CkFsZXgKCgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICktyYXVzZW5z
-dHIuIDM4CjEwMTE3IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hsYWVn
-ZXIsIEpvbmF0aGFuIFdlaXNzCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0ZW5i
-dXJnIHVudGVyIEhSQiAxNDkxNzMgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkgMjM3IDg3
-OQoKCg==
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git guestmemfd
+head:   cd689ddd5c93ea177b28029d57c13e18b160875b
+commit: cd689ddd5c93ea177b28029d57c13e18b160875b [59/59] KVM: remove deprecated UAPIs
+config: s390-defconfig (https://download.01.org/0day-ci/archive/20231109/202311090100.Zt0adRi9-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231109/202311090100.Zt0adRi9-lkp@intel.com/reproduce)
 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311090100.Zt0adRi9-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   arch/s390/kvm/../../../virt/kvm/kvm_main.c: In function 'kvm_dev_ioctl':
+>> arch/s390/kvm/../../../virt/kvm/kvm_main.c:5517:14: error: 'KVM_TRACE_ENABLE' undeclared (first use in this function); did you mean 'KVM_PV_ENABLE'?
+    5517 |         case KVM_TRACE_ENABLE:
+         |              ^~~~~~~~~~~~~~~~
+         |              KVM_PV_ENABLE
+   arch/s390/kvm/../../../virt/kvm/kvm_main.c:5517:14: note: each undeclared identifier is reported only once for each function it appears in
+>> arch/s390/kvm/../../../virt/kvm/kvm_main.c:5518:14: error: 'KVM_TRACE_PAUSE' undeclared (first use in this function)
+    5518 |         case KVM_TRACE_PAUSE:
+         |              ^~~~~~~~~~~~~~~
+>> arch/s390/kvm/../../../virt/kvm/kvm_main.c:5519:14: error: 'KVM_TRACE_DISABLE' undeclared (first use in this function); did you mean 'KVM_PV_DISABLE'?
+    5519 |         case KVM_TRACE_DISABLE:
+         |              ^~~~~~~~~~~~~~~~~
+         |              KVM_PV_DISABLE
+
+
+vim +5517 arch/s390/kvm/../../../virt/kvm/kvm_main.c
+
+f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5488  
+f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5489  static long kvm_dev_ioctl(struct file *filp,
+f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5490  			  unsigned int ioctl, unsigned long arg)
+f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5491  {
+f15ba52bfabc3b virt/kvm/kvm_main.c    Thomas Huth     2023-02-08  5492  	int r = -EINVAL;
+f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5493  
+f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5494  	switch (ioctl) {
+f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5495  	case KVM_GET_API_VERSION:
+f0fe510864a452 drivers/kvm/kvm_main.c Avi Kivity      2007-03-07  5496  		if (arg)
+f0fe510864a452 drivers/kvm/kvm_main.c Avi Kivity      2007-03-07  5497  			goto out;
+f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5498  		r = KVM_API_VERSION;
+f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5499  		break;
+f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5500  	case KVM_CREATE_VM:
+e08b96371625aa virt/kvm/kvm_main.c    Carsten Otte    2012-01-04  5501  		r = kvm_dev_ioctl_create_vm(arg);
+f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5502  		break;
+018d00d2fef27f drivers/kvm/kvm_main.c Zhang Xiantao   2007-11-15  5503  	case KVM_CHECK_EXTENSION:
+784aa3d7fb6f72 virt/kvm/kvm_main.c    Alexander Graf  2014-07-14  5504  		r = kvm_vm_ioctl_check_extension_generic(NULL, arg);
+85f455f7ddbed4 drivers/kvm/kvm_main.c Eddie Dong      2007-07-06  5505  		break;
+07c45a366d89f8 drivers/kvm/kvm_main.c Avi Kivity      2007-03-07  5506  	case KVM_GET_VCPU_MMAP_SIZE:
+07c45a366d89f8 drivers/kvm/kvm_main.c Avi Kivity      2007-03-07  5507  		if (arg)
+07c45a366d89f8 drivers/kvm/kvm_main.c Avi Kivity      2007-03-07  5508  			goto out;
+adb1ff46754a87 virt/kvm/kvm_main.c    Avi Kivity      2008-01-24  5509  		r = PAGE_SIZE;     /* struct kvm_run */
+adb1ff46754a87 virt/kvm/kvm_main.c    Avi Kivity      2008-01-24  5510  #ifdef CONFIG_X86
+adb1ff46754a87 virt/kvm/kvm_main.c    Avi Kivity      2008-01-24  5511  		r += PAGE_SIZE;    /* pio data page */
+5f94c1741bdc7a virt/kvm/kvm_main.c    Laurent Vivier  2008-05-30  5512  #endif
+4b4357e02523ec virt/kvm/kvm_main.c    Paolo Bonzini   2017-03-31  5513  #ifdef CONFIG_KVM_MMIO
+5f94c1741bdc7a virt/kvm/kvm_main.c    Laurent Vivier  2008-05-30  5514  		r += PAGE_SIZE;    /* coalesced mmio ring page */
+adb1ff46754a87 virt/kvm/kvm_main.c    Avi Kivity      2008-01-24  5515  #endif
+07c45a366d89f8 drivers/kvm/kvm_main.c Avi Kivity      2007-03-07  5516  		break;
+d4c9ff2d1b78e3 virt/kvm/kvm_main.c    Feng(Eric  Liu  2008-04-10 @5517) 	case KVM_TRACE_ENABLE:
+d4c9ff2d1b78e3 virt/kvm/kvm_main.c    Feng(Eric  Liu  2008-04-10 @5518) 	case KVM_TRACE_PAUSE:
+d4c9ff2d1b78e3 virt/kvm/kvm_main.c    Feng(Eric  Liu  2008-04-10 @5519) 	case KVM_TRACE_DISABLE:
+2023a29cbe3413 virt/kvm/kvm_main.c    Marcelo Tosatti 2009-06-18  5520  		r = -EOPNOTSUPP;
+d4c9ff2d1b78e3 virt/kvm/kvm_main.c    Feng(Eric  Liu  2008-04-10  5521) 		break;
+6aa8b732ca01c3 drivers/kvm/kvm_main.c Avi Kivity      2006-12-10  5522  	default:
+043405e10001fe drivers/kvm/kvm_main.c Carsten Otte    2007-10-10  5523  		return kvm_arch_dev_ioctl(filp, ioctl, arg);
+6aa8b732ca01c3 drivers/kvm/kvm_main.c Avi Kivity      2006-12-10  5524  	}
+6aa8b732ca01c3 drivers/kvm/kvm_main.c Avi Kivity      2006-12-10  5525  out:
+6aa8b732ca01c3 drivers/kvm/kvm_main.c Avi Kivity      2006-12-10  5526  	return r;
+6aa8b732ca01c3 drivers/kvm/kvm_main.c Avi Kivity      2006-12-10  5527  }
+6aa8b732ca01c3 drivers/kvm/kvm_main.c Avi Kivity      2006-12-10  5528  
+
+:::::: The code at line 5517 was first introduced by commit
+:::::: d4c9ff2d1b78e385471b3f4d80c0596909926ef7 KVM: Add kvm trace userspace interface
+
+:::::: TO: Feng(Eric) Liu <eric.e.liu@intel.com>
+:::::: CC: Avi Kivity <avi@qumranet.com>
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
