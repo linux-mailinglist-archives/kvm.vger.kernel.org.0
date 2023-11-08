@@ -1,91 +1,94 @@
-Return-Path: <kvm+bounces-1215-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1216-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54D7D7E5AD3
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 17:11:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2AA57E5AEC
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 17:15:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F33B281646
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 16:11:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F8901C20BF9
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 16:15:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A54230D08;
-	Wed,  8 Nov 2023 16:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661A430FAF;
+	Wed,  8 Nov 2023 16:15:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z38J8OwT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jmM381Qo"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A611BDDA
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 16:11:05 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 429C91FE8
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 08:11:05 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-da0c7d27fb0so8050194276.1
-        for <kvm@vger.kernel.org>; Wed, 08 Nov 2023 08:11:05 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07CFF30D08
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 16:15:21 +0000 (UTC)
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DEFA1FE8
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 08:15:21 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cc23f2226bso49848625ad.2
+        for <kvm@vger.kernel.org>; Wed, 08 Nov 2023 08:15:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699459864; x=1700064664; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1699460121; x=1700064921; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SCyKbBYBcpAJ2v4LwtdWLPucCqpggSO4tuF11LbpeUo=;
-        b=Z38J8OwTOMzg0ZKkMEdHyv/RLPGlEISvgB2MZxpkcqKIVJ57SAWDNtLcnc6lpO2LFY
-         rhFGFVjHqk2YojbL83tOAT7vSypb3F9pCi0O8cgCArtCwQjz48vcdqd8P+LWtMY0z8Gq
-         tvII1XfL0uCq1JjvGeuXx3nRHD4TzZBmkvkB4v1YKeXH+l+Zs6a6hbzqhr9GVdbh9Loz
-         ZZAkIEag3smj3s/F5WuSHnX8CvZ+nRSVpRTJ2I12w/mp/fPpaOjHzBaB56ZjAmdzIPd+
-         3zW469u2DJ+wQk8CeRN0grCRH7l7w4e0t0JQWVzxHdF0rX70kqjbmUi90+nHKosnakKR
-         vF5Q==
+        bh=hkv2aSpFw25Sjc2pDxCz5exBlHcYk4gTYVmkV2GOyQs=;
+        b=jmM381QoHM6/g0FB4YGETIBR5O3J1Dych7X+lotMdYThzDNuBSm38Bvy2TsfZPUuBz
+         LzlpsoZeXenCsP0R9cO1z5mCRUWbfMliqX3Z3O7dCfsTunpZ30Cgf3LrGqt/mpzbZSbW
+         O46em/jCPUWIkZdsHEfghHGMlEzU+D2q9+JXzOIJcLoFDjOuitCNXbMB6+FW+S0LNsxc
+         F5WUZwqo/HTJJeTLt/A3/SNIOAkpsY83aURbgEu8jX3rhG1CNmCXmqlv5kG2IL5HBNiD
+         v9M9nQ6x4wQbc3Uuw3RJHsDPVCYkYFT/ksNlNSKDpcP6VV1dYHtf7ofUP8DUxJg0LVXp
+         aDpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699459864; x=1700064664;
+        d=1e100.net; s=20230601; t=1699460121; x=1700064921;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SCyKbBYBcpAJ2v4LwtdWLPucCqpggSO4tuF11LbpeUo=;
-        b=QrsDEg9KLrkklRHRpV1eY+x0Lv8lOdYGbLQ1A4N+MiNEyTyd50TL2MUy7wOV1X+A3P
-         jZvLRbcXVeAxa5WwMVjDPwLFPNXjt1CBkTJuf0A8Q1gdh0bMIe+4L0UYXiqKBLH4UFQj
-         dOXB6KD/RDQ5r6PkWAS6HOtdOZ6mCGURFvO7aePTtDFL7XUrl0+I7+Ze7WQy5m6eIcBv
-         8XV8wQD5tyZmTMlv1yzlqY2S9pi0pkau5LhYKW1CSkgrqMvHmNzAcvP1FhZcJcm03fKM
-         mHrno+e+wCYcOv5Mj1A4uqAWAY9lgdNWOmb4qN97hoPktUH81WjNoFAMUR7/K8PZRUWY
-         6M3w==
-X-Gm-Message-State: AOJu0YyfFuU0jX6zjER+iAcxfw23TdVsR7t/wKAGtmqFppg5huEeKzi6
-	wxRpI9GfqWz4JG6MyQCH+srHCBrCW5I=
-X-Google-Smtp-Source: AGHT+IElPBL0TUz47UKKevcrQ52vnzXf3uBAKsqEBbIPFRFkQe5teIswfhYivY589qMtJ1q1v1W1c+yk5QU=
+        bh=hkv2aSpFw25Sjc2pDxCz5exBlHcYk4gTYVmkV2GOyQs=;
+        b=WkauanEmwtwABuRoVBus0bZMaSpZgMhLbH7yF5C8TVRYK9RkCAKyPSQjiJZ3FT4YdV
+         dqPRIbIwKrGWaX2STUdIGqb7rQeslm7PmLi4TLBjoUMgPV8AeF/xGa5h02eEUxG09nS9
+         PodWLFHW1DqMqX8qCsxHmv2EObQx0pVSlEJPpEkEJog07zfTm51LikGHMfCPhVTkOaLe
+         3Zg0wcnQayY5wIQXnzZS4EoIKyH6yMaxqpwxNLTvY/nUM0EE7AerH1VaJ6sj6fzgiNVm
+         SQh2HFt/JCUozG2ZuhHWNbwV0ibhGVbKwiTjLMvsK5rJGn3h0NkE5mglLJF4qXdvf5KQ
+         E+BA==
+X-Gm-Message-State: AOJu0YxAxykhnysQhaBpzWklfN6WFMum3bERioQixu66RJYJcnPcScQJ
+	zZrz6ZI5YQzSsNSJcbtcH3zLTwkmlU0=
+X-Google-Smtp-Source: AGHT+IFTaQxuB68rES3N/Ouf34zgkF8c8VJFXOJJTqeB2NI7Tbr2np/f2yCXpxs97M+wYFrZ4r8BXQsnFFA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:24c:b0:da3:ba0f:c84f with SMTP id
- k12-20020a056902024c00b00da3ba0fc84fmr40900ybs.4.1699459864456; Wed, 08 Nov
- 2023 08:11:04 -0800 (PST)
-Date: Wed, 8 Nov 2023 08:11:02 -0800
-In-Reply-To: <20231108111806.92604-2-nsaenz@amazon.com>
+ (user=seanjc job=sendgmr) by 2002:a17:903:1386:b0:1cc:5674:9177 with SMTP id
+ jx6-20020a170903138600b001cc56749177mr37933plb.11.1699460120994; Wed, 08 Nov
+ 2023 08:15:20 -0800 (PST)
+Date: Wed, 8 Nov 2023 08:15:19 -0800
+In-Reply-To: <2573d04d-feff-4119-a79c-dbf9b85e62fd@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231108111806.92604-1-nsaenz@amazon.com> <20231108111806.92604-2-nsaenz@amazon.com>
-Message-ID: <ZUuzFshjO7NO5k3b@google.com>
-Subject: Re: [RFC 01/33] KVM: x86: Decouple lapic.h from hyperv.h
+References: <20231108111806.92604-1-nsaenz@amazon.com> <20231108111806.92604-30-nsaenz@amazon.com>
+ <2573d04d-feff-4119-a79c-dbf9b85e62fd@amazon.com>
+Message-ID: <ZUu0FzbW5tr2Werz@google.com>
+Subject: Re: [RFC 29/33] KVM: VMX: Save instruction length on EPT violation
 From: Sean Christopherson <seanjc@google.com>
-To: Nicolas Saenz Julienne <nsaenz@amazon.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+To: Alexander Graf <graf@amazon.com>
+Cc: Nicolas Saenz Julienne <nsaenz@amazon.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	linux-hyperv@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com, 
-	anelkz@amazon.com, graf@amazon.com, dwmw@amazon.co.uk, jgowans@amazon.com, 
-	corbert@lwn.net, kys@microsoft.com, haiyangz@microsoft.com, 
-	decui@microsoft.com, x86@kernel.org, linux-doc@vger.kernel.org
+	anelkz@amazon.com, dwmw@amazon.co.uk, jgowans@amazon.com, corbert@lwn.net, 
+	kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com, 
+	x86@kernel.org, linux-doc@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Nov 08, 2023, Nicolas Saenz Julienne wrote:
-> lapic.h has no dependencies with hyperv.h, so don't include it there.
+On Wed, Nov 08, 2023, Alexander Graf wrote:
 > 
-> Additionally, cpuid.c implicitly relied on hyperv.h's inclusion through
-> lapic.h, so include it explicitly there.
+> On 08.11.23 12:18, Nicolas Saenz Julienne wrote:
+> > Save the length of the instruction that triggered an EPT violation in
+> > struct kvm_vcpu_arch. This will be used to populate Hyper-V VSM memory
+> > intercept messages.
+> > 
+> > Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
 > 
-> Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
-> ---
+> 
+> In v1, please do this for SVM as well :)
 
-FWIW, feel free to post patches like this without the full context, I'm more than
-happy to take patches that resolve header inclusion issues even if the issue(s)
-only become visible with additional changes.
-
-I'll earmark this one for 6.8.
+Why?  KVM caches values on VMX because VMREAD is measurable slower than memory
+accesses, especially when running nested.  SVM has no such problems.  I wouldn't
+be surprised if adding a "cache" is actually less performant due to increased
+pressure and misses on the hardware cache.
 
