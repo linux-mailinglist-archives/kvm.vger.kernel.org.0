@@ -1,150 +1,155 @@
-Return-Path: <kvm+bounces-1190-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1191-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC07F7E55C7
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 12:49:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBCA27E55D2
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 12:54:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65263280D6D
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 11:49:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6045BB20FC6
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 11:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23534168CD;
-	Wed,  8 Nov 2023 11:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91CF8171B1;
+	Wed,  8 Nov 2023 11:54:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VoH14TI8"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LY9HGlJW"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C28B2CA8
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 11:49:28 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E9161711;
-	Wed,  8 Nov 2023 03:49:27 -0800 (PST)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A8BJgwL028743;
-	Wed, 8 Nov 2023 11:49:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=CEJaMbaHhCqIClsnYdCkXryOy8I92xAA0bWxJfAZYto=;
- b=VoH14TI8sA2zsXeaaLbpyChIPLEdIc2PawPtirZvA6V1jIDTatHj/mqqgC7ygao441VW
- m17mkKtHXsL4dp9ZI1593o4xBt25R8DRebgvW7mC19Z0JjDGK2KaC+Ckdl8yHP0PVTDB
- rNBLE4P7CC8lVPly3UmEBUxYyH7Iy73DGnBycOF4HNk1Y449pLR68MCun0Nd/4gwyR+M
- vYlHCiYqxXanqPtZejglIGjK4zP0CDyKJ1hlUMcBy3/qWEcACXO/gnN8yAnTpheCtT/6
- OgEi+avE3m2Iq2dMUhQ8ezAdSdVKJy2G7qZA1YOZClr/wnGNND7Zg8Qm1FKjRLJsD0v6 Dw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u89byh5kf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Nov 2023 11:49:26 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A8BduaA017436;
-	Wed, 8 Nov 2023 11:49:26 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u89byh5k8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Nov 2023 11:49:26 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A8BUAeC014506;
-	Wed, 8 Nov 2023 11:49:25 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u7w21vejx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Nov 2023 11:49:25 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A8BnMoS6619696
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 8 Nov 2023 11:49:22 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 440D320040;
-	Wed,  8 Nov 2023 11:49:22 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8C4572004E;
-	Wed,  8 Nov 2023 11:49:21 +0000 (GMT)
-Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.171.7.102])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  8 Nov 2023 11:49:21 +0000 (GMT)
-Message-ID: <2c15b9a6b97666805491a06deee4bac497ed88cd.camel@linux.ibm.com>
-Subject: Re: [PATCH v2 2/4] KVM: s390: vsie: Fix length of facility list
- shadowed
-From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Janosch Frank <frankja@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Christian
- Borntraeger <borntraeger@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sven Schnelle
- <svens@linux.ibm.com>
-Date: Wed, 08 Nov 2023 12:49:21 +0100
-In-Reply-To: <20231108122338.0ff2052e@p-imbrenda>
-References: <20231107123118.778364-1-nsg@linux.ibm.com>
-	 <20231107123118.778364-3-nsg@linux.ibm.com>
-	 <20231108122338.0ff2052e@p-imbrenda>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FB90D505;
+	Wed,  8 Nov 2023 11:54:11 +0000 (UTC)
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A278D1BDC;
+	Wed,  8 Nov 2023 03:54:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1699444452; x=1730980452;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=jWN/NUNSusUsn6RI+uWdNC4hq5SKifKzdJsG8Aqpq4g=;
+  b=LY9HGlJWVhar84lBUirhTmvqMduYSvpCBUjLLqAohojRfrsx7wgKKvUC
+   qwME3++jc4/190FTsjjejlLxuXBkXxMffMpilP+z2r43glAyPVBojLQkF
+   z7tSxAzKJg9LG1UJScNY45F6INgJBvb0L6QCoxEJLI5I/0bd9zRIf8AxA
+   I=;
+X-IronPort-AV: E=Sophos;i="6.03,286,1694736000"; 
+   d="scan'208";a="369121027"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-245b69b1.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 11:54:09 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
+	by email-inbound-relay-iad-1e-m6i4x-245b69b1.us-east-1.amazon.com (Postfix) with ESMTPS id 57C24340127;
+	Wed,  8 Nov 2023 11:54:05 +0000 (UTC)
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:5180]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.50.174:2525] with esmtp (Farcaster)
+ id 72f21bb4-da44-4f0f-a384-27fe822589e0; Wed, 8 Nov 2023 11:54:04 +0000 (UTC)
+X-Farcaster-Flow-ID: 72f21bb4-da44-4f0f-a384-27fe822589e0
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Wed, 8 Nov 2023 11:54:03 +0000
+Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
+ (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Wed, 8 Nov
+ 2023 11:53:59 +0000
+Message-ID: <5fcefdf3-d1ff-4244-8b58-1da0cd7e4a4f@amazon.com>
+Date: Wed, 8 Nov 2023 12:53:57 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: URwrf1P0upx-d4CQwioRC4_AbXOHfxZ1
-X-Proofpoint-GUID: kp19vDC3t1XntH_n0vFrNhPoOrnmESsO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-08_01,2023-11-08_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 mlxscore=0 mlxlogscore=615 spamscore=0 phishscore=0
- clxscore=1015 adultscore=0 suspectscore=0 bulkscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311080098
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 05/33] KVM: x86: hyper-v: Introduce VTL call/return
+ prologues in hypercall page
+Content-Language: en-US
+To: Nicolas Saenz Julienne <nsaenz@amazon.com>, <kvm@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
+	<pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+	<anelkz@amazon.com>, <dwmw@amazon.co.uk>, <jgowans@amazon.com>,
+	<corbert@lwn.net>, <kys@microsoft.com>, <haiyangz@microsoft.com>,
+	<decui@microsoft.com>, <x86@kernel.org>, <linux-doc@vger.kernel.org>
+References: <20231108111806.92604-1-nsaenz@amazon.com>
+ <20231108111806.92604-6-nsaenz@amazon.com>
+From: Alexander Graf <graf@amazon.com>
+In-Reply-To: <20231108111806.92604-6-nsaenz@amazon.com>
+X-Originating-IP: [10.253.83.51]
+X-ClientProxiedBy: EX19D040UWA003.ant.amazon.com (10.13.139.6) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 
-On Wed, 2023-11-08 at 12:23 +0100, Claudio Imbrenda wrote:
-> On Tue,  7 Nov 2023 13:31:16 +0100
-> Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
->=20
-> [...]
->=20
-> > diff --git a/arch/s390/kernel/facility.c b/arch/s390/kernel/facility.c
-> > new file mode 100644
-> > index 000000000000..5e80a4f65363
-> > --- /dev/null
-> > +++ b/arch/s390/kernel/facility.c
-> > @@ -0,0 +1,21 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * Copyright IBM Corp. 2023
-> > + */
-> > +
-> > +#include <asm/facility.h>
-> > +
-> > +unsigned int stfle_size(void)
-> > +{
-> > +	static unsigned int size;
-> > +	u64 dummy;
-> > +	unsigned int r;
->=20
-> reverse Christmas tree please :)
-
-Might be an opportunity to clear that up for me.
-AFAIK reverse christmas tree isn't universally enforced in the kernel.
-Do we do it in generic s390 code? I know we do for s390 kvm.
-Personally I don't quite get the rational, but I don't care much either :)
-Heiko?
-
-> with that fixed:
->=20
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
->=20
-> [...]
+Ck9uIDA4LjExLjIzIDEyOjE3LCBOaWNvbGFzIFNhZW56IEp1bGllbm5lIHdyb3RlOgo+IFZUTCBj
+YWxsL3JldHVybiBoeXBlcmNhbGxzIGhhdmUgdGhlaXIgb3duIGVudHJ5IHBvaW50cyBpbiB0aGUg
+aHlwZXJjYWxsCj4gcGFnZSBiZWNhdXNlIHRoZXkgZG9uJ3QgZm9sbG93IG5vcm1hbCBoeXBlci12
+IGh5cGVyY2FsbCBjb252ZW50aW9ucy4KPiBNb3ZlIHRoZSBWVEwgY2FsbC9yZXR1cm4gY29udHJv
+bCBpbnB1dCBpbnRvIEVDWC9SQVggYW5kIHNldCB0aGUKPiBoeXBlcmNhbGwgY29kZSBpbnRvIEVB
+WC9SQ1ggYmVmb3JlIGNhbGxpbmcgdGhlIGh5cGVyY2FsbCBpbnN0cnVjdGlvbiBpbgo+IG9yZGVy
+IHRvIGJlIGFibGUgdG8gdXNlIHRoZSBIeXBlci1WIGh5cGVyY2FsbCBlbnRyeSBmdW5jdGlvbi4K
+Pgo+IEd1ZXN0cyBjYW4gcmVhZCBhbiBlbXVsYXRlZCBjb2RlIHBhZ2Ugb2Zmc2V0cyByZWdpc3Rl
+ciB0byBrbm93IHRoZQo+IG9mZnNldHMgaW50byB0aGUgaHlwZXJjYWxsIHBhZ2UgZm9yIHRoZSBW
+VEwgY2FsbC9yZXR1cm4gZW50cmllcy4KPgo+IFNpZ25lZC1vZmYtYnk6IE5pY29sYXMgU2Flbnog
+SnVsaWVubmUgPG5zYWVuekBhbWF6b24uY29tPgo+Cj4gLS0tCj4KPiBNeSB0cmVlIGhhcyB0aGUg
+YWRkaXRpb25hbCBwYXRjaCwgd2UncmUgc3RpbGwgdHJ5aW5nIHRvIHVuZGVyc3RhbmQgdW5kZXIK
+PiB3aGF0IGNvbmRpdGlvbnMgV2luZG93cyBleHBlY3RzIHRoZSBvZmZzZXQgdG8gYmUgZml4ZWQu
+Cj4KPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL2h5cGVydi5jIGIvYXJjaC94ODYva3ZtL2h5
+cGVydi5jCj4gaW5kZXggNTRmN2YzNmE4OWJmLi45ZjJlYThjMzQ0NDcgMTAwNjQ0Cj4gLS0tIGEv
+YXJjaC94ODYva3ZtL2h5cGVydi5jCj4gKysrIGIvYXJjaC94ODYva3ZtL2h5cGVydi5jCj4gQEAg
+LTI5NCw2ICsyOTQsNyBAQCBzdGF0aWMgaW50IHBhdGNoX2h5cGVyY2FsbF9wYWdlKHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSwgdTY0IGRhdGEpCj4KPiAgICAgICAgICAvKiBWVEwgY2FsbC9yZXR1cm4g
+ZW50cmllcyAqLwo+ICAgICAgICAgIGlmICgha3ZtX3hlbl9oeXBlcmNhbGxfZW5hYmxlZChrdm0p
+ICYmIGt2bV9odl92c21fZW5hYmxlZChrdm0pKSB7Cj4gKyAgICAgICAgICAgICAgIGkgPSAyMjsK
+PiAgICNpZmRlZiBDT05GSUdfWDg2XzY0Cj4gICAgICAgICAgICAgICAgICBpZiAoaXNfNjRfYml0
+X21vZGUodmNwdSkpIHsKPiAgICAgICAgICAgICAgICAgICAgICAgICAgLyoKPiAtLS0KPiAgIGFy
+Y2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggICB8ICAyICsKPiAgIGFyY2gveDg2L2t2bS9o
+eXBlcnYuYyAgICAgICAgICAgICB8IDc4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0K
+PiAgIGluY2x1ZGUvYXNtLWdlbmVyaWMvaHlwZXJ2LXRsZnMuaCB8IDExICsrKysrCj4gICAzIGZp
+bGVzIGNoYW5nZWQsIDkwIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKPgo+IGRpZmYgLS1n
+aXQgYS9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIGIvYXJjaC94ODYvaW5jbHVkZS9h
+c20va3ZtX2hvc3QuaAo+IGluZGV4IGEyZjIyNGY5NTQwNC4uMDBjZDIxYjA5ZjhjIDEwMDY0NAo+
+IC0tLSBhL2FyY2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPiArKysgYi9hcmNoL3g4Ni9p
+bmNsdWRlL2FzbS9rdm1faG9zdC5oCj4gQEAgLTExMDUsNiArMTEwNSw4IEBAIHN0cnVjdCBrdm1f
+aHYgewo+ICAgCXU2NCBodl90c2NfZW11bGF0aW9uX3N0YXR1czsKPiAgIAl1NjQgaHZfaW52dHNj
+X2NvbnRyb2w7Cj4gICAKPiArCXVuaW9uIGh2X3JlZ2lzdGVyX3ZzbV9jb2RlX3BhZ2Vfb2Zmc2V0
+cyB2c21fY29kZV9wYWdlX29mZnNldHM7Cj4gKwo+ICAgCS8qIEhvdyBtYW55IHZDUFVzIGhhdmUg
+VlAgaW5kZXggIT0gdkNQVSBpbmRleCAqLwo+ICAgCWF0b21pY190IG51bV9taXNtYXRjaGVkX3Zw
+X2luZGV4ZXM7Cj4gICAKPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL2h5cGVydi5jIGIvYXJj
+aC94ODYva3ZtL2h5cGVydi5jCj4gaW5kZXggNzhkMDUzMDQyNjY3Li5kNGIxYjUzZWE2M2QgMTAw
+NjQ0Cj4gLS0tIGEvYXJjaC94ODYva3ZtL2h5cGVydi5jCj4gKysrIGIvYXJjaC94ODYva3ZtL2h5
+cGVydi5jCj4gQEAgLTI1OSw3ICsyNTksOCBAQCBzdGF0aWMgdm9pZCBzeW5pY19leGl0KHN0cnVj
+dCBrdm1fdmNwdV9odl9zeW5pYyAqc3luaWMsIHUzMiBtc3IpCj4gICBzdGF0aWMgaW50IHBhdGNo
+X2h5cGVyY2FsbF9wYWdlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTY0IGRhdGEpCj4gICB7Cj4g
+ICAJc3RydWN0IGt2bSAqa3ZtID0gdmNwdS0+a3ZtOwo+IC0JdTggaW5zdHJ1Y3Rpb25zWzldOwo+
+ICsJc3RydWN0IGt2bV9odiAqaHYgPSB0b19rdm1faHYoa3ZtKTsKPiArCXU4IGluc3RydWN0aW9u
+c1sweDMwXTsKPiAgIAlpbnQgaSA9IDA7Cj4gICAJdTY0IGFkZHI7Cj4gICAKPiBAQCAtMjg1LDYg
+KzI4Niw4MSBAQCBzdGF0aWMgaW50IHBhdGNoX2h5cGVyY2FsbF9wYWdlKHN0cnVjdCBrdm1fdmNw
+dSAqdmNwdSwgdTY0IGRhdGEpCj4gICAJLyogcmV0ICovCj4gICAJKCh1bnNpZ25lZCBjaGFyICop
+aW5zdHJ1Y3Rpb25zKVtpKytdID0gMHhjMzsKPiAgIAo+ICsJLyogVlRMIGNhbGwvcmV0dXJuIGVu
+dHJpZXMgKi8KPiArCWlmICgha3ZtX3hlbl9oeXBlcmNhbGxfZW5hYmxlZChrdm0pICYmIGt2bV9o
+dl92c21fZW5hYmxlZChrdm0pKSB7CgoKWW91IGRvbid0IGludHJvZHVjZSBrdm1faHZfdnNtX2Vu
+YWJsZWQoKSBiZWZvcmUuIFBsZWFzZSBkbyBhIHF1aWNrIHRlc3QgCmJ1aWxkIG9mIGFsbCBpbmRp
+dmlkdWFsIGNvbW1pdHMgb2YgeW91ciBwYXRjaCBzZXQgZm9yIHYxIDopLgoKCj4gKyNpZmRlZiBD
+T05GSUdfWDg2XzY0CgoKV2h5IGRvIHlvdSBuZWVkIHRoZSBpZmRlZiBoZXJlPyBpc19sb25nX21v
+ZGUoKSBhbHJlYWR5IGhhcyBhbiBpZmRlZiB0aGF0IAp3aWxsIGFsd2F5cyByZXR1cm4gZmFsc2Ug
+Zm9yIGlzXzY0X2JpdF9tb2RlKCkgb24gMzJiaXQgaG9zdHMuCgoKPiArCQlpZiAoaXNfNjRfYml0
+X21vZGUodmNwdSkpIHsKPiArCQkJLyoKPiArCQkJICogVlRMIGNhbGwgNjQtYml0IGVudHJ5IHBy
+b2xvZ3VlOgo+ICsJCQkgKiAJbW92ICVyY3gsICVyYXgKPiArCQkJICogCW1vdiAkMHgxMSwgJWVj
+eAo+ICsJCQkgKiAJam1wIDA6Cj4gKwkJCSAqLwo+ICsJCQlodi0+dnNtX2NvZGVfcGFnZV9vZmZz
+ZXRzLnZ0bF9jYWxsX29mZnNldCA9IGk7Cj4gKwkJCWluc3RydWN0aW9uc1tpKytdID0gMHg0ODsK
+PiArCQkJaW5zdHJ1Y3Rpb25zW2krK10gPSAweDg5Owo+ICsJCQlpbnN0cnVjdGlvbnNbaSsrXSA9
+IDB4Yzg7Cj4gKwkJCWluc3RydWN0aW9uc1tpKytdID0gMHhiOTsKPiArCQkJaW5zdHJ1Y3Rpb25z
+W2krK10gPSAweDExOwo+ICsJCQlpbnN0cnVjdGlvbnNbaSsrXSA9IDB4MDA7Cj4gKwkJCWluc3Ry
+dWN0aW9uc1tpKytdID0gMHgwMDsKPiArCQkJaW5zdHJ1Y3Rpb25zW2krK10gPSAweDAwOwo+ICsJ
+CQlpbnN0cnVjdGlvbnNbaSsrXSA9IDB4ZWI7Cj4gKwkJCWluc3RydWN0aW9uc1tpKytdID0gMHhl
+MDsKCgpJIHRoaW5rIGl0IHdvdWxkIGJlIGEgbG90IGVhc2llciB0byByZWFkIChiZWNhdXNlIGl0
+J3MgZGVuc2VyKSBpZiB5b3UgCm1vdmUgdGhlIG9wY29kZXMgaW50byBhIGNoYXJhY3RlciBhcnJh
+eToKCmNoYXIgdnRsX2VudHJ5W10gPSB7IDB4NDgsIDB4ODksIDB4YzgsIDB4YjksIDB4MTEsIDB4
+MDAsIDB4MDAsIDB4MDAuIAoweGViLCAweGUwIH07CgphbmQgdGhlbiBqdXN0IG1lbWNweSgpLgoK
+CkFsZXgKCgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vu
+c3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFl
+Z2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVu
+YnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4
+NzkKCgo=
 
 
