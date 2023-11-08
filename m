@@ -1,123 +1,172 @@
-Return-Path: <kvm+bounces-1234-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1236-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C7D27E5C77
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 18:34:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AF74C7E5C99
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 18:47:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0412B20F30
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 17:34:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3EA8BB20FC7
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 17:47:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BCEB32C68;
-	Wed,  8 Nov 2023 17:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE67D32C7E;
+	Wed,  8 Nov 2023 17:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XbR7vWv2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tlm/Z+v5"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2567630338
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 17:34:38 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 960751BE3
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 09:34:37 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3294632C68
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 17:46:50 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C9F41FF6
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 09:46:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699464876;
+	s=mimecast20190719; t=1699465609;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xZGn049Z75ixJvG6iAZ1DUS2viDNPnb4B/IxK+b5sq4=;
-	b=XbR7vWv2aaUqsG4qHy7gDG05uhU+OljCylv5W1W5/reP+f2BicGxvszbxy3o2Vye+rYYwK
-	hopW+EcPJWD9EYxsoPWbdcFBtnEhdjEl4+SQrqsw8UaVa6OvBszuUmkq8+kN/lkTBaBFPN
-	KfUzkInx26Uan8aJQGZdu9qOVrwvM0s=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=onqupeUG78+mEU+ZWvy+wvhifXweK14Yjrxwf2b2OCM=;
+	b=Tlm/Z+v5ohFqhm7T0aXQq4s507jXy0nCtVh8yPwkEzXHSA2osVp+RHhAPFHzg4bQGlIKZs
+	i9baRLDqq5Wf9TN1Jy8de6FmGaDXLTTgt1Htix1seC9qyn6jJNCnTZimkz6ND6TaWCE+Zw
+	jb+7qpoImqJZKHORZB/Nzo2mNGEz4pg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-362-dGQlAmceMXSNTCEFNI1jIw-1; Wed, 08 Nov 2023 12:34:33 -0500
-X-MC-Unique: dGQlAmceMXSNTCEFNI1jIw-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-77a02ceef95so107486585a.0
-        for <kvm@vger.kernel.org>; Wed, 08 Nov 2023 09:34:33 -0800 (PST)
+ us-mta-407-rEkFjyJaPwihAqThQCC9oQ-1; Wed, 08 Nov 2023 12:46:47 -0500
+X-MC-Unique: rEkFjyJaPwihAqThQCC9oQ-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-32fd8da34fbso1615860f8f.1
+        for <kvm@vger.kernel.org>; Wed, 08 Nov 2023 09:46:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699464873; x=1700069673;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1699465606; x=1700070406;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xZGn049Z75ixJvG6iAZ1DUS2viDNPnb4B/IxK+b5sq4=;
-        b=qlihANx3mFOgqD1bP7HnBQw/vuGiQ5MrJTLcnPeUtlHrBcsMEQKSmSTKxmQ/AsyJws
-         i7WUa4tmDzRJRR9oZQpAXYgWB/DHi5MnJB2jb9rxX74mXMrqNT8Jnf8kPfXZRSQVn4Ds
-         KXDBEuC+NiWnvRDBQ4JDupGZ2tgeVJFPKN7QS/SU7gIENXFHP3qYA1k5QdzG8vcv/wHO
-         I+2mpzIIJFdAalX7OQjNoSJ6/eREQGxZVtQvyeT0qcyZq5GKybLvGUEpuF/LnEaBl0Fr
-         zFMjsFLr6lcWfzHjdNTIhNHZJA7ZqWp1eo2gC8+E+4+69sXp81yiRhmWEr4015n3M9kp
-         +OjA==
-X-Gm-Message-State: AOJu0YzC4vCn0I7TcIbiORqmeNbcFoyK2HL0P1VlOdXSND5tkcWNr+2x
-	fe7eMKyRhxAV+wKYHz4gMFeNuwKjqMQ/3gzmPC+0SbRRE4KsPvk754wC5hBB5N6Y4hTaEmUpu8H
-	/FU72irnS2R3v
-X-Received: by 2002:a05:620a:1d0e:b0:76f:167a:cc4d with SMTP id dl14-20020a05620a1d0e00b0076f167acc4dmr2713670qkb.2.1699464873066;
-        Wed, 08 Nov 2023 09:34:33 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG+wgzYuOU7bGQ6kEPnsqPx24+XBg4Ic2pjZhtAvPpX5YetDe00Z9GXOVTugJ+xCTgfEyi4gw==
-X-Received: by 2002:a05:620a:1d0e:b0:76f:167a:cc4d with SMTP id dl14-20020a05620a1d0e00b0076f167acc4dmr2713648qkb.2.1699464872829;
-        Wed, 08 Nov 2023 09:34:32 -0800 (PST)
-Received: from x1n (cpe5c7695f3aee0-cm5c7695f3aede.cpe.net.cable.rogers.com. [99.254.144.39])
-        by smtp.gmail.com with ESMTPSA id bp7-20020a05620a458700b00767e2668536sm1273080qkb.17.2023.11.08.09.34.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Nov 2023 09:34:32 -0800 (PST)
-Date: Wed, 8 Nov 2023 12:34:30 -0500
-From: Peter Xu <peterx@redhat.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Paolo Bonzini <pbonzini@redhat.com>, kvm list <kvm@vger.kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	James Houghton <jthoughton@google.com>,
-	Oliver Upton <oupton@google.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Mike Kravetz <mike.kravetz@oracle.com>,
-	Andrea Arcangeli <aarcange@redhat.com>
-Subject: Re: RFC: A KVM-specific alternative to UserfaultFD
-Message-ID: <ZUvGpmk680nBKwOE@x1n>
-References: <CALzav=d23P5uE=oYqMpjFohvn0CASMJxXB_XEOEi-jtqWcFTDA@mail.gmail.com>
- <ZUlLLGLi1IyMyhm4@x1n>
- <fcef7c96-a1bb-4c1d-962b-1bdc2a3b4f19@redhat.com>
- <CALzav=ejfDDRdjtx-ipFYrhNWPZnj3P0RSNHOQCP+OQf5YGX5w@mail.gmail.com>
- <ZUqn0OwtNR19PDve@linux.dev>
- <CALzav=evOG04=mtnc9Tf=bevWq0PbW_2Q=2e=ErruXtE+3gDVQ@mail.gmail.com>
- <ZUrj8IK__59kHixL@linux.dev>
- <CALzav=dXDh4xAzDEbKOxLZkgjEyNs8VLoCOuJg4YYrD0=QzvGw@mail.gmail.com>
+        bh=onqupeUG78+mEU+ZWvy+wvhifXweK14Yjrxwf2b2OCM=;
+        b=Wbf7PpVzHw+y1u04i+xzjxej1th9o1JqtpZMiU9n6p9OC1tk95/vMk3m/HxcWDfvPX
+         dw3Bt0DQeaAQVwsQzktcx1/jaisbeHyCMQLe9MUm08+Kucy+sx6UCTSKMjfmttTdKTnj
+         Bpk6YIQXlbG7c+YuUWiknYDDyEAUfjwlXwuYeDGo/+Mg50UpOtX0kCi6hClF1aTyEro4
+         EqJwk1PIMi2i4yXPdc9zUwcdiJ/Jd4YNFdauE9gZEFLNRZS/pwCViynvkhH+z9iqpqpW
+         pBoW/2Uj/8R0eE75F7CqRXp9rEU8oxCSNcBfh1MNNBOgLvxtoatWq3ebFN63vEByawmE
+         dZ6A==
+X-Gm-Message-State: AOJu0YywIABVS4sIFNaVGM509CBwXF9gvP1rqa3+lptuThUyOem6ZXXj
+	BIaISZ0JojOC6nCEYeBq3TWW6SbqKRGvM8vFsi6stSSjb4cJ7N2tTPJqTX4CCdjib3up3zC6u4I
+	xC+VVtzCUfFO9
+X-Received: by 2002:a05:6000:1564:b0:32d:aabd:d70f with SMTP id 4-20020a056000156400b0032daabdd70fmr2681665wrz.46.1699465606175;
+        Wed, 08 Nov 2023 09:46:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGfpUcJygumLPv96UDlR5FUmq2JmUADA5v0M+Maw9BgL9Eso99C9wHi1mY3b/4SaLWoC45jsQ==
+X-Received: by 2002:a05:6000:1564:b0:32d:aabd:d70f with SMTP id 4-20020a056000156400b0032daabdd70fmr2681648wrz.46.1699465605725;
+        Wed, 08 Nov 2023 09:46:45 -0800 (PST)
+Received: from ?IPV6:2003:cb:c712:c800:c9f8:7b16:67ce:ff2a? (p200300cbc712c800c9f87b1667ceff2a.dip0.t-ipconnect.de. [2003:cb:c712:c800:c9f8:7b16:67ce:ff2a])
+        by smtp.gmail.com with ESMTPSA id a10-20020a5d53ca000000b00326dd5486dcsm5391438wrw.107.2023.11.08.09.46.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Nov 2023 09:46:45 -0800 (PST)
+Message-ID: <3fae63a4-6ddf-48c5-a8df-080dc088f683@redhat.com>
+Date: Wed, 8 Nov 2023 18:46:44 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CALzav=dXDh4xAzDEbKOxLZkgjEyNs8VLoCOuJg4YYrD0=QzvGw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/4] KVM: s390: cpu model: Use proper define for
+ facility mask size
+Content-Language: en-US
+To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Vasily Gorbik
+ <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org
+References: <20231108171229.3404476-1-nsg@linux.ibm.com>
+ <20231108171229.3404476-4-nsg@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
+ 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
+ rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
+ wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
+ 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
+ pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
+ KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
+ BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
+ 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
+ 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
+ M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
+ AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
+ boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
+ 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
+ XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
+ a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
+ Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
+ 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
+ kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
+ th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
+ jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20231108171229.3404476-4-nsg@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 08, 2023 at 08:56:22AM -0800, David Matlack wrote:
-> Thanks for the longer explanation. Yes kvm_read_guest() eventually
-> calls __copy_from_user() which will trigger a page fault and
-> UserfaultFD will notify userspace and wait for the page to become
-> present. In the KVM-specific proposal I outlined, calling
-> kvm_read_guest() will ultimately result in a check of the VM's present
-> bitmap and KVM will nnotify userspace and wait for the page to become
-> present if it's not, before calling __copy_from_user(). So I don't
-> expect a KVM-specific solution to have any increased maintenance
-> burden for VGIC (or any other widgets).
+On 08.11.23 18:12, Nina Schoetterl-Glausch wrote:
+> Use the previously unused S390_ARCH_FAC_MASK_SIZE_U64 instead of
+> S390_ARCH_FAC_LIST_SIZE_U64 for defining the fac_mask array.
+> Note that both values are the same, there is no functional change.
+> 
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/kvm_host.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 427f9528a7b6..46fcd2f9dff8 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -811,7 +811,7 @@ struct s390_io_adapter {
+>   
+>   struct kvm_s390_cpu_model {
+>   	/* facility mask supported by kvm & hosting machine */
+> -	__u64 fac_mask[S390_ARCH_FAC_LIST_SIZE_U64];
+> +	__u64 fac_mask[S390_ARCH_FAC_MASK_SIZE_U64];
+>   	struct kvm_s390_vm_cpu_subfunc subfuncs;
+>   	/* facility list requested by guest (in dma page) */
+>   	__u64 *fac_list;
 
-The question is how to support modules that do not use kvm apis at all,
-like vhost.  I raised the question in my initial reply, too.
-
-I think if vhost is going to support gmemfd, it'll need new apis so maybe
-there'll be a chance to take that into account, but I'm not 100% sure it'll
-be the same complexity, also not sure if that's the plan even for CoCo.
-
-Or is anything like vhost not considered to be supported for gmemfd at all?
-Is there any plan for the new postcopy proposal then for generic mem (!CoCo)?
-
-Thanks,
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
-Peter Xu
+Cheers,
+
+David / dhildenb
 
 
