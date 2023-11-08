@@ -1,128 +1,206 @@
-Return-Path: <kvm+bounces-1212-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1214-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 449387E5A7D
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 16:52:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E199D7E5ACE
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 17:08:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33753B20F38
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 15:52:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1ECD11C20C1D
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 16:08:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4413064E;
-	Wed,  8 Nov 2023 15:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112F730CF5;
+	Wed,  8 Nov 2023 16:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VFfWVN50"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cbu3WNJj"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FCEEECC
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 15:52:12 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75EE91BC3;
-	Wed,  8 Nov 2023 07:52:12 -0800 (PST)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A8FeaMC011786;
-	Wed, 8 Nov 2023 15:52:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=M2q8vwHaki+jn0C1mY1Z/X+t7bLixbQI5D79jPq2rpc=;
- b=VFfWVN505WRmgApN3tci+BCEbV5eX+pwNqmKiFuH0Sdoi+KwiNvVyvfdoYeEk0wOFWhP
- HZ1FykCgTuBXlkT/96eW3x9GtngCbVxBl7/F+s41VelWxfiKazQ6a0bv5Q6W6kTH0FRy
- gXNxmhPRFNwff7XcVzCuJD2wovC9USXjCgtjIVCu5tvVA5rpoxRdup8gs3p4eI0y3prh
- OQMOn7tKq6FHyw7sZVG7hjMegt3Hu9wxx68GpY1xJC6QpuFvPu2cePH/CsIe4iqNf61d
- P3FaSFYa4Q4Hx4wXpfZi1XlEZgz7P/zmBPByF4STyiCHgR0GBYlRejKlejORfk99WFPf qQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u8d65recx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Nov 2023 15:52:11 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A8FegTh012095;
-	Wed, 8 Nov 2023 15:52:10 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u8d65rech-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Nov 2023 15:52:10 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A8EMZFx028371;
-	Wed, 8 Nov 2023 15:52:10 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u7w22dsh8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Nov 2023 15:52:09 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A8Fq6Xu15401508
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 8 Nov 2023 15:52:07 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D95A420043;
-	Wed,  8 Nov 2023 15:52:06 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9D53C20040;
-	Wed,  8 Nov 2023 15:52:06 +0000 (GMT)
-Received: from osiris (unknown [9.152.212.60])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed,  8 Nov 2023 15:52:06 +0000 (GMT)
-Date: Wed, 8 Nov 2023 16:52:04 +0100
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sven Schnelle <svens@linux.ibm.com>
-Subject: Re: [PATCH v2 2/4] KVM: s390: vsie: Fix length of facility list
- shadowed
-Message-ID: <20231108155204.7251-C-hca@linux.ibm.com>
-References: <20231107123118.778364-1-nsg@linux.ibm.com>
- <20231107123118.778364-3-nsg@linux.ibm.com>
- <20231108122338.0ff2052e@p-imbrenda>
- <2c15b9a6b97666805491a06deee4bac497ed88cd.camel@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE793034F
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 16:08:21 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65B9B1FE7;
+	Wed,  8 Nov 2023 08:08:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699459701; x=1730995701;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=VCjzH6mVYN4iFo+LQzgIsGM1zhF1v29DXkIIMQyJhLY=;
+  b=cbu3WNJjZpwZoacRDxrtd5QTbpE8euMF/UYaMZzodCkKbREFV1IPDqKw
+   LlkIo04XY4hWwfRqRVPzHxPaOKxSjtG/6OPoSzK05SOts5XEnnpBdrAnM
+   o5TSlGneXdAbpmdRC/buatzNOZJJT134MKroVQkkxG4hOdK7oVBr7/BdJ
+   7zfERvvTjb28D7EbV1AAN6q78zOCsNCaE5ZtRzkF6ZrAFzbbVXQD1pLVZ
+   yyjKe1QqH/jT0q2WmQx6jK8Tb3SXDMfY2zROyQsR9qCLS4n8y8c8ow02M
+   WIE+SDhTmGzBUnjJCOLQZ6zy64p5W3AXI0CgAsyPVIoI4IL4pEgpdgRx3
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="393708437"
+X-IronPort-AV: E=Sophos;i="6.03,286,1694761200"; 
+   d="scan'208";a="393708437"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 08:06:34 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,286,1694761200"; 
+   d="scan'208";a="4423030"
+Received: from linux.intel.com ([10.54.29.200])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 08:06:34 -0800
+Received: from [10.213.166.225] (kliang2-mobl1.ccr.corp.intel.com [10.213.166.225])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by linux.intel.com (Postfix) with ESMTPS id C7C4F580DB4;
+	Wed,  8 Nov 2023 08:06:32 -0800 (PST)
+Message-ID: <4281eee7-6423-4ec8-bb18-c6aeee1faf2c@linux.intel.com>
+Date: Wed, 8 Nov 2023 11:06:31 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2c15b9a6b97666805491a06deee4bac497ed88cd.camel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ER2F6Keo-RvyQSYBOB9RtbMA6mh2fDxD
-X-Proofpoint-ORIG-GUID: bl7-Gh1NH-mOcO90T6dNiSyfDdwY_RLL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-08_04,2023-11-08_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
- phishscore=0 impostorscore=0 mlxscore=0 malwarescore=0 adultscore=0
- spamscore=0 priorityscore=1501 mlxlogscore=457 bulkscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311080130
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 03/19] KVM: x86/pmu: Remove KVM's enumeration of
+ Intel's architectural encodings
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Dapeng Mi <dapeng1.mi@linux.intel.com>, Jim Mattson <jmattson@google.com>,
+ Jinrong Liang <cloudliang@tencent.com>, Aaron Lewis <aaronlewis@google.com>,
+ Like Xu <likexu@tencent.com>
+References: <20231108003135.546002-1-seanjc@google.com>
+ <20231108003135.546002-4-seanjc@google.com>
+Content-Language: en-US
+From: "Liang, Kan" <kan.liang@linux.intel.com>
+In-Reply-To: <20231108003135.546002-4-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 08, 2023 at 12:49:21PM +0100, Nina Schoetterl-Glausch wrote:
-> On Wed, 2023-11-08 at 12:23 +0100, Claudio Imbrenda wrote:
-> > On Tue,  7 Nov 2023 13:31:16 +0100
-> > Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
-> > 
-> > [...]
-> > > +unsigned int stfle_size(void)
-> > > +{
-> > > +	static unsigned int size;
-> > > +	u64 dummy;
-> > > +	unsigned int r;
-> > 
-> > reverse Christmas tree please :)
+
+
+On 2023-11-07 7:31 p.m., Sean Christopherson wrote:
+> Drop KVM's enumeration of Intel's architectural event encodings, and
+> instead open code the three encodings (of which only two are real) that
+> KVM uses to emulate fixed counters.  Now that KVM doesn't incorrectly
+> enforce the availability of architectural encodings, there is no reason
+> for KVM to ever care about the encodings themselves, at least not in the
+> current format of an array indexed by the encoding's position in CPUID.
 > 
-> Might be an opportunity to clear that up for me.
-> AFAIK reverse christmas tree isn't universally enforced in the kernel.
-> Do we do it in generic s390 code? I know we do for s390 kvm.
-> Personally I don't quite get the rational, but I don't care much either :)
-> Heiko?
+> Opportunistically add a comment to explain why KVM cares about eventsel
+> values for fixed counters.
+> 
+> Suggested-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/vmx/pmu_intel.c | 72 ++++++++++++------------------------
+>  1 file changed, 23 insertions(+), 49 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 7737ee2fc62f..c4f2c6a268e7 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -22,52 +22,6 @@
+>  
+>  #define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFCTR0)
+>  
+> -enum intel_pmu_architectural_events {
+> -	/*
+> -	 * The order of the architectural events matters as support for each
+> -	 * event is enumerated via CPUID using the index of the event.
+> -	 */
+> -	INTEL_ARCH_CPU_CYCLES,
+> -	INTEL_ARCH_INSTRUCTIONS_RETIRED,
+> -	INTEL_ARCH_REFERENCE_CYCLES,
+> -	INTEL_ARCH_LLC_REFERENCES,
+> -	INTEL_ARCH_LLC_MISSES,
+> -	INTEL_ARCH_BRANCHES_RETIRED,
+> -	INTEL_ARCH_BRANCHES_MISPREDICTED,
+> -
+> -	NR_REAL_INTEL_ARCH_EVENTS,
+> -
+> -	/*
+> -	 * Pseudo-architectural event used to implement IA32_FIXED_CTR2, a.k.a.
+> -	 * TSC reference cycles.  The architectural reference cycles event may
+> -	 * or may not actually use the TSC as the reference, e.g. might use the
+> -	 * core crystal clock or the bus clock (yeah, "architectural").
+> -	 */
+> -	PSEUDO_ARCH_REFERENCE_CYCLES = NR_REAL_INTEL_ARCH_EVENTS,
+> -	NR_INTEL_ARCH_EVENTS,
+> -};
+> -
+> -static struct {
+> -	u8 eventsel;
+> -	u8 unit_mask;
+> -} const intel_arch_events[] = {
+> -	[INTEL_ARCH_CPU_CYCLES]			= { 0x3c, 0x00 },
+> -	[INTEL_ARCH_INSTRUCTIONS_RETIRED]	= { 0xc0, 0x00 },
+> -	[INTEL_ARCH_REFERENCE_CYCLES]		= { 0x3c, 0x01 },
+> -	[INTEL_ARCH_LLC_REFERENCES]		= { 0x2e, 0x4f },
+> -	[INTEL_ARCH_LLC_MISSES]			= { 0x2e, 0x41 },
+> -	[INTEL_ARCH_BRANCHES_RETIRED]		= { 0xc4, 0x00 },
+> -	[INTEL_ARCH_BRANCHES_MISPREDICTED]	= { 0xc5, 0x00 },
+> -	[PSEUDO_ARCH_REFERENCE_CYCLES]		= { 0x00, 0x03 },
+> -};
+> -
+> -/* mapping between fixed pmc index and intel_arch_events array */
+> -static int fixed_pmc_events[] = {
+> -	[0] = INTEL_ARCH_INSTRUCTIONS_RETIRED,
+> -	[1] = INTEL_ARCH_CPU_CYCLES,
+> -	[2] = PSEUDO_ARCH_REFERENCE_CYCLES,
+> -};
+> -
+>  static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
+>  {
+>  	struct kvm_pmc *pmc;
+> @@ -442,8 +396,29 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  	return 0;
+>  }
+>  
+> +/*
+> + * Map fixed counter events to architectural general purpose event encodings.
+> + * Perf doesn't provide APIs to allow KVM to directly program a fixed counter,
+> + * and so KVM instead programs the architectural event to effectively request
+> + * the fixed counter.  Perf isn't guaranteed to use a fixed counter and may
+> + * instead program the encoding into a general purpose counter, e.g. if a
+> + * different perf_event is already utilizing the requested counter, but the end
+> + * result is the same (ignoring the fact that using a general purpose counter
+> + * will likely exacerbate counter contention).
+> + *
+> + * Note, reference cycles is counted using a perf-defined "psuedo-encoding",
+> + * as there is no architectural general purpose encoding for reference cycles.
 
-We do that for _new_ code in s390 code, yes.
+It's not the case for the latest Intel platforms anymore. Please see
+ffbe4ab0beda ("perf/x86/intel: Extend the ref-cycles event to GP counters").
+
+Maybe perf should export .event_map to KVM somehow.
+
+Thanks,
+Kan
+> + */
+>  static void setup_fixed_pmc_eventsel(struct kvm_pmu *pmu)
+>  {
+> +	const struct {
+> +		u8 eventsel;
+> +		u8 unit_mask;
+> +	} fixed_pmc_events[] = {
+> +		[0] = { 0xc0, 0x00 }, /* Instruction Retired / PERF_COUNT_HW_INSTRUCTIONS. */
+> +		[1] = { 0x3c, 0x00 }, /* CPU Cycles/ PERF_COUNT_HW_CPU_CYCLES. */
+> +		[2] = { 0x00, 0x03 }, /* Reference Cycles / PERF_COUNT_HW_REF_CPU_CYCLES*/
+> +	};
+>  	int i;
+>  
+>  	BUILD_BUG_ON(ARRAY_SIZE(fixed_pmc_events) != KVM_PMC_MAX_FIXED);
+> @@ -451,10 +426,9 @@ static void setup_fixed_pmc_eventsel(struct kvm_pmu *pmu)
+>  	for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+>  		int index = array_index_nospec(i, KVM_PMC_MAX_FIXED);
+>  		struct kvm_pmc *pmc = &pmu->fixed_counters[index];
+> -		u32 event = fixed_pmc_events[index];
+>  
+> -		pmc->eventsel = (intel_arch_events[event].unit_mask << 8) |
+> -				 intel_arch_events[event].eventsel;
+> +		pmc->eventsel = (fixed_pmc_events[index].unit_mask << 8) |
+> +				 fixed_pmc_events[index].eventsel;
+>  	}
+>  }
+>  
 
