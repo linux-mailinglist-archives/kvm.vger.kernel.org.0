@@ -1,155 +1,123 @@
-Return-Path: <kvm+bounces-1235-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1234-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B46F27E5C78
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 18:34:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C7D27E5C77
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 18:34:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E42F281705
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 17:34:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0412B20F30
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 17:34:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4079032C79;
-	Wed,  8 Nov 2023 17:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BCEB32C68;
+	Wed,  8 Nov 2023 17:34:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z/cnRE/X"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XbR7vWv2"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56759321B8
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 17:34:39 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A22D61FDF
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 09:34:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699464878; x=1731000878;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=e+oRgoW4dG6ERipjruO1Dz4aP2SFo7r8UekPSbqLwis=;
-  b=Z/cnRE/XWUKWBuzOkWCSPTHeF2+s33DdGtDbiVvvNVaWSE4q0JOJDEx+
-   xPwJgvBlBbWK3IFej+lNryBmF58pY1lEMOkF+PMu+TnSpYCo9iHMdom0Q
-   gL3caTtkT5SuB19lVrBKX3vA8npaXd4KHsqJueSCeVnAAn0g3hXpb6anM
-   ezPPlApYOLOYdwtJNTmbrrWGQzcUv6ODwnEfZzHFMTR+asgahtWJ4/PZQ
-   MMujHvm5MkYgaqV5z6MGFM/diiZql0N3Kw+sp4MUhQ5JlLuh/6+Ualh0R
-   yPiMhvk0U2ENfFfz6HL516VFFiqxAe7A14+ZJ+d9cgvaGG+O5EOyqGabu
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="380210639"
-X-IronPort-AV: E=Sophos;i="6.03,286,1694761200"; 
-   d="scan'208";a="380210639"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 09:34:35 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="792263228"
-X-IronPort-AV: E=Sophos;i="6.03,286,1694761200"; 
-   d="scan'208";a="792263228"
-Received: from lkp-server01.sh.intel.com (HELO 17d9e85e5079) ([10.239.97.150])
-  by orsmga008.jf.intel.com with ESMTP; 08 Nov 2023 09:34:33 -0800
-Received: from kbuild by 17d9e85e5079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1r0mRj-00085o-0i;
-	Wed, 08 Nov 2023 17:34:31 +0000
-Date: Thu, 9 Nov 2023 01:34:08 +0800
-From: kernel test robot <lkp@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	Robert Hu <robert.hu@intel.com>,
-	Farrah Chen <farrah.chen@intel.com>,
-	Danmei Wei <danmei.wei@intel.com>
-Subject: [kvm:guestmemfd 59/59]
- arch/s390/kvm/../../../virt/kvm/kvm_main.c:5517:14: error:
- 'KVM_TRACE_ENABLE' undeclared; did you mean 'KVM_PV_ENABLE'?
-Message-ID: <202311090100.Zt0adRi9-lkp@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2567630338
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 17:34:38 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 960751BE3
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 09:34:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699464876;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xZGn049Z75ixJvG6iAZ1DUS2viDNPnb4B/IxK+b5sq4=;
+	b=XbR7vWv2aaUqsG4qHy7gDG05uhU+OljCylv5W1W5/reP+f2BicGxvszbxy3o2Vye+rYYwK
+	hopW+EcPJWD9EYxsoPWbdcFBtnEhdjEl4+SQrqsw8UaVa6OvBszuUmkq8+kN/lkTBaBFPN
+	KfUzkInx26Uan8aJQGZdu9qOVrwvM0s=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-362-dGQlAmceMXSNTCEFNI1jIw-1; Wed, 08 Nov 2023 12:34:33 -0500
+X-MC-Unique: dGQlAmceMXSNTCEFNI1jIw-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-77a02ceef95so107486585a.0
+        for <kvm@vger.kernel.org>; Wed, 08 Nov 2023 09:34:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699464873; x=1700069673;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xZGn049Z75ixJvG6iAZ1DUS2viDNPnb4B/IxK+b5sq4=;
+        b=qlihANx3mFOgqD1bP7HnBQw/vuGiQ5MrJTLcnPeUtlHrBcsMEQKSmSTKxmQ/AsyJws
+         i7WUa4tmDzRJRR9oZQpAXYgWB/DHi5MnJB2jb9rxX74mXMrqNT8Jnf8kPfXZRSQVn4Ds
+         KXDBEuC+NiWnvRDBQ4JDupGZ2tgeVJFPKN7QS/SU7gIENXFHP3qYA1k5QdzG8vcv/wHO
+         I+2mpzIIJFdAalX7OQjNoSJ6/eREQGxZVtQvyeT0qcyZq5GKybLvGUEpuF/LnEaBl0Fr
+         zFMjsFLr6lcWfzHjdNTIhNHZJA7ZqWp1eo2gC8+E+4+69sXp81yiRhmWEr4015n3M9kp
+         +OjA==
+X-Gm-Message-State: AOJu0YzC4vCn0I7TcIbiORqmeNbcFoyK2HL0P1VlOdXSND5tkcWNr+2x
+	fe7eMKyRhxAV+wKYHz4gMFeNuwKjqMQ/3gzmPC+0SbRRE4KsPvk754wC5hBB5N6Y4hTaEmUpu8H
+	/FU72irnS2R3v
+X-Received: by 2002:a05:620a:1d0e:b0:76f:167a:cc4d with SMTP id dl14-20020a05620a1d0e00b0076f167acc4dmr2713670qkb.2.1699464873066;
+        Wed, 08 Nov 2023 09:34:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG+wgzYuOU7bGQ6kEPnsqPx24+XBg4Ic2pjZhtAvPpX5YetDe00Z9GXOVTugJ+xCTgfEyi4gw==
+X-Received: by 2002:a05:620a:1d0e:b0:76f:167a:cc4d with SMTP id dl14-20020a05620a1d0e00b0076f167acc4dmr2713648qkb.2.1699464872829;
+        Wed, 08 Nov 2023 09:34:32 -0800 (PST)
+Received: from x1n (cpe5c7695f3aee0-cm5c7695f3aede.cpe.net.cable.rogers.com. [99.254.144.39])
+        by smtp.gmail.com with ESMTPSA id bp7-20020a05620a458700b00767e2668536sm1273080qkb.17.2023.11.08.09.34.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Nov 2023 09:34:32 -0800 (PST)
+Date: Wed, 8 Nov 2023 12:34:30 -0500
+From: Peter Xu <peterx@redhat.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Paolo Bonzini <pbonzini@redhat.com>, kvm list <kvm@vger.kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	James Houghton <jthoughton@google.com>,
+	Oliver Upton <oupton@google.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Mike Kravetz <mike.kravetz@oracle.com>,
+	Andrea Arcangeli <aarcange@redhat.com>
+Subject: Re: RFC: A KVM-specific alternative to UserfaultFD
+Message-ID: <ZUvGpmk680nBKwOE@x1n>
+References: <CALzav=d23P5uE=oYqMpjFohvn0CASMJxXB_XEOEi-jtqWcFTDA@mail.gmail.com>
+ <ZUlLLGLi1IyMyhm4@x1n>
+ <fcef7c96-a1bb-4c1d-962b-1bdc2a3b4f19@redhat.com>
+ <CALzav=ejfDDRdjtx-ipFYrhNWPZnj3P0RSNHOQCP+OQf5YGX5w@mail.gmail.com>
+ <ZUqn0OwtNR19PDve@linux.dev>
+ <CALzav=evOG04=mtnc9Tf=bevWq0PbW_2Q=2e=ErruXtE+3gDVQ@mail.gmail.com>
+ <ZUrj8IK__59kHixL@linux.dev>
+ <CALzav=dXDh4xAzDEbKOxLZkgjEyNs8VLoCOuJg4YYrD0=QzvGw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <CALzav=dXDh4xAzDEbKOxLZkgjEyNs8VLoCOuJg4YYrD0=QzvGw@mail.gmail.com>
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git guestmemfd
-head:   cd689ddd5c93ea177b28029d57c13e18b160875b
-commit: cd689ddd5c93ea177b28029d57c13e18b160875b [59/59] KVM: remove deprecated UAPIs
-config: s390-defconfig (https://download.01.org/0day-ci/archive/20231109/202311090100.Zt0adRi9-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231109/202311090100.Zt0adRi9-lkp@intel.com/reproduce)
+On Wed, Nov 08, 2023 at 08:56:22AM -0800, David Matlack wrote:
+> Thanks for the longer explanation. Yes kvm_read_guest() eventually
+> calls __copy_from_user() which will trigger a page fault and
+> UserfaultFD will notify userspace and wait for the page to become
+> present. In the KVM-specific proposal I outlined, calling
+> kvm_read_guest() will ultimately result in a check of the VM's present
+> bitmap and KVM will nnotify userspace and wait for the page to become
+> present if it's not, before calling __copy_from_user(). So I don't
+> expect a KVM-specific solution to have any increased maintenance
+> burden for VGIC (or any other widgets).
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202311090100.Zt0adRi9-lkp@intel.com/
+The question is how to support modules that do not use kvm apis at all,
+like vhost.  I raised the question in my initial reply, too.
 
-All errors (new ones prefixed by >>):
+I think if vhost is going to support gmemfd, it'll need new apis so maybe
+there'll be a chance to take that into account, but I'm not 100% sure it'll
+be the same complexity, also not sure if that's the plan even for CoCo.
 
-   arch/s390/kvm/../../../virt/kvm/kvm_main.c: In function 'kvm_dev_ioctl':
->> arch/s390/kvm/../../../virt/kvm/kvm_main.c:5517:14: error: 'KVM_TRACE_ENABLE' undeclared (first use in this function); did you mean 'KVM_PV_ENABLE'?
-    5517 |         case KVM_TRACE_ENABLE:
-         |              ^~~~~~~~~~~~~~~~
-         |              KVM_PV_ENABLE
-   arch/s390/kvm/../../../virt/kvm/kvm_main.c:5517:14: note: each undeclared identifier is reported only once for each function it appears in
->> arch/s390/kvm/../../../virt/kvm/kvm_main.c:5518:14: error: 'KVM_TRACE_PAUSE' undeclared (first use in this function)
-    5518 |         case KVM_TRACE_PAUSE:
-         |              ^~~~~~~~~~~~~~~
->> arch/s390/kvm/../../../virt/kvm/kvm_main.c:5519:14: error: 'KVM_TRACE_DISABLE' undeclared (first use in this function); did you mean 'KVM_PV_DISABLE'?
-    5519 |         case KVM_TRACE_DISABLE:
-         |              ^~~~~~~~~~~~~~~~~
-         |              KVM_PV_DISABLE
+Or is anything like vhost not considered to be supported for gmemfd at all?
+Is there any plan for the new postcopy proposal then for generic mem (!CoCo)?
 
-
-vim +5517 arch/s390/kvm/../../../virt/kvm/kvm_main.c
-
-f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5488  
-f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5489  static long kvm_dev_ioctl(struct file *filp,
-f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5490  			  unsigned int ioctl, unsigned long arg)
-f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5491  {
-f15ba52bfabc3b virt/kvm/kvm_main.c    Thomas Huth     2023-02-08  5492  	int r = -EINVAL;
-f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5493  
-f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5494  	switch (ioctl) {
-f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5495  	case KVM_GET_API_VERSION:
-f0fe510864a452 drivers/kvm/kvm_main.c Avi Kivity      2007-03-07  5496  		if (arg)
-f0fe510864a452 drivers/kvm/kvm_main.c Avi Kivity      2007-03-07  5497  			goto out;
-f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5498  		r = KVM_API_VERSION;
-f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5499  		break;
-f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5500  	case KVM_CREATE_VM:
-e08b96371625aa virt/kvm/kvm_main.c    Carsten Otte    2012-01-04  5501  		r = kvm_dev_ioctl_create_vm(arg);
-f17abe9a44425f drivers/kvm/kvm_main.c Avi Kivity      2007-02-21  5502  		break;
-018d00d2fef27f drivers/kvm/kvm_main.c Zhang Xiantao   2007-11-15  5503  	case KVM_CHECK_EXTENSION:
-784aa3d7fb6f72 virt/kvm/kvm_main.c    Alexander Graf  2014-07-14  5504  		r = kvm_vm_ioctl_check_extension_generic(NULL, arg);
-85f455f7ddbed4 drivers/kvm/kvm_main.c Eddie Dong      2007-07-06  5505  		break;
-07c45a366d89f8 drivers/kvm/kvm_main.c Avi Kivity      2007-03-07  5506  	case KVM_GET_VCPU_MMAP_SIZE:
-07c45a366d89f8 drivers/kvm/kvm_main.c Avi Kivity      2007-03-07  5507  		if (arg)
-07c45a366d89f8 drivers/kvm/kvm_main.c Avi Kivity      2007-03-07  5508  			goto out;
-adb1ff46754a87 virt/kvm/kvm_main.c    Avi Kivity      2008-01-24  5509  		r = PAGE_SIZE;     /* struct kvm_run */
-adb1ff46754a87 virt/kvm/kvm_main.c    Avi Kivity      2008-01-24  5510  #ifdef CONFIG_X86
-adb1ff46754a87 virt/kvm/kvm_main.c    Avi Kivity      2008-01-24  5511  		r += PAGE_SIZE;    /* pio data page */
-5f94c1741bdc7a virt/kvm/kvm_main.c    Laurent Vivier  2008-05-30  5512  #endif
-4b4357e02523ec virt/kvm/kvm_main.c    Paolo Bonzini   2017-03-31  5513  #ifdef CONFIG_KVM_MMIO
-5f94c1741bdc7a virt/kvm/kvm_main.c    Laurent Vivier  2008-05-30  5514  		r += PAGE_SIZE;    /* coalesced mmio ring page */
-adb1ff46754a87 virt/kvm/kvm_main.c    Avi Kivity      2008-01-24  5515  #endif
-07c45a366d89f8 drivers/kvm/kvm_main.c Avi Kivity      2007-03-07  5516  		break;
-d4c9ff2d1b78e3 virt/kvm/kvm_main.c    Feng(Eric  Liu  2008-04-10 @5517) 	case KVM_TRACE_ENABLE:
-d4c9ff2d1b78e3 virt/kvm/kvm_main.c    Feng(Eric  Liu  2008-04-10 @5518) 	case KVM_TRACE_PAUSE:
-d4c9ff2d1b78e3 virt/kvm/kvm_main.c    Feng(Eric  Liu  2008-04-10 @5519) 	case KVM_TRACE_DISABLE:
-2023a29cbe3413 virt/kvm/kvm_main.c    Marcelo Tosatti 2009-06-18  5520  		r = -EOPNOTSUPP;
-d4c9ff2d1b78e3 virt/kvm/kvm_main.c    Feng(Eric  Liu  2008-04-10  5521) 		break;
-6aa8b732ca01c3 drivers/kvm/kvm_main.c Avi Kivity      2006-12-10  5522  	default:
-043405e10001fe drivers/kvm/kvm_main.c Carsten Otte    2007-10-10  5523  		return kvm_arch_dev_ioctl(filp, ioctl, arg);
-6aa8b732ca01c3 drivers/kvm/kvm_main.c Avi Kivity      2006-12-10  5524  	}
-6aa8b732ca01c3 drivers/kvm/kvm_main.c Avi Kivity      2006-12-10  5525  out:
-6aa8b732ca01c3 drivers/kvm/kvm_main.c Avi Kivity      2006-12-10  5526  	return r;
-6aa8b732ca01c3 drivers/kvm/kvm_main.c Avi Kivity      2006-12-10  5527  }
-6aa8b732ca01c3 drivers/kvm/kvm_main.c Avi Kivity      2006-12-10  5528  
-
-:::::: The code at line 5517 was first introduced by commit
-:::::: d4c9ff2d1b78e385471b3f4d80c0596909926ef7 KVM: Add kvm trace userspace interface
-
-:::::: TO: Feng(Eric) Liu <eric.e.liu@intel.com>
-:::::: CC: Avi Kivity <avi@qumranet.com>
+Thanks,
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Peter Xu
+
 
