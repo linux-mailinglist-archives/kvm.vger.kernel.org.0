@@ -1,58 +1,58 @@
-Return-Path: <kvm+bounces-1278-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1279-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD7F47E5F4C
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 21:38:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55DD57E5F53
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 21:41:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDF241C20C0C
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 20:38:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07C782814A3
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 20:41:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E307930F94;
-	Wed,  8 Nov 2023 20:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59B8E36B0F;
+	Wed,  8 Nov 2023 20:41:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JnUZNMcl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AGx9yYWs"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABDA8610D
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 20:38:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533B132C65
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 20:41:28 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 353071FEE;
-	Wed,  8 Nov 2023 12:38:21 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D12891FEE;
+	Wed,  8 Nov 2023 12:41:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699475901; x=1731011901;
+  t=1699476087; x=1731012087;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=guyzV1x+BNcL76TrK8k+P+aM2LkkhhwuAL+/FvBB+CQ=;
-  b=JnUZNMclk3+8h1M5NGrg7UdkGAoDWMfumTpB5OpQLA/DCIBTOaaN2p/3
-   UwVTA4XrA3O4hrEYe346CRI3bmG8j+oQfdhiDmep69dVvy/j9rTAKgwor
-   8v0FIzGmnRMaosT1wGvEamMxG4uMrOdCIMO5+YErE/6PK6veNSGO2ylCf
-   8DHOIt2jm95UCFh8bjkOVmGL5EP6EzvGC5aCyq+uafgirdLkpNvll79Gu
-   +Xih3L0UE2NDO9zSX1UoFUKWEDTvO3j9i5/tP6uJXpU3/PVwc1/nDc90q
-   sVaZb+uOif52jkh2Nm2xXcePvT8O4Q5Qxe7gnWri8i863kImnUTznjtOn
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="380244722"
+  bh=5vTuv7i33xV6Xb2Jmaxi1kuydek/b7NH6zn+kDGHWj0=;
+  b=AGx9yYWsBaB+ygcs03zOhFW5tcIWY2eqPr870dOGJv25amo1oogTAWIO
+   ov9yih9uDBUmNXETEAwP7zGRVQPt4JI0GUdyKtb9/fOnzAFY8iX9lunu2
+   m6UBE8TX4HfEzYhkERvSsZC3ev3LzNvNp2f/Lc3P4w0igk/Mh8huKqBkr
+   b4VNoHZ01AGgakeeiX12ntxcQuYkZbpuik94ephUOnOItjUD9gsRZAmDZ
+   nTzlzRtzxIXQGlDFHbugUH1Baepi5eFbCqPDyTNb+LJFAwIAWkdd08N9t
+   e/+8VcyB3903BxvOgQnrgDlO9WCNaL+ZJIu2PiXSL/2bITlQkPV2GfAj4
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="380245074"
 X-IronPort-AV: E=Sophos;i="6.03,287,1694761200"; 
-   d="scan'208";a="380244722"
+   d="scan'208";a="380245074"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 12:38:20 -0800
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 12:41:27 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.03,287,1694761200"; 
-   d="scan'208";a="4310972"
+   d="scan'208";a="4311555"
 Received: from linux.intel.com ([10.54.29.200])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 12:38:22 -0800
+  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 12:41:27 -0800
 Received: from [10.213.166.225] (kliang2-mobl1.ccr.corp.intel.com [10.213.166.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by linux.intel.com (Postfix) with ESMTPS id AA148580D4E;
-	Wed,  8 Nov 2023 12:38:19 -0800 (PST)
-Message-ID: <7539656d-53d1-4724-b978-f86325d26573@linux.intel.com>
-Date: Wed, 8 Nov 2023 15:38:18 -0500
+	by linux.intel.com (Postfix) with ESMTPS id 4E8BA580D4E;
+	Wed,  8 Nov 2023 12:41:26 -0800 (PST)
+Message-ID: <54d1437e-dcbb-49c6-a83c-bc87da03f196@linux.intel.com>
+Date: Wed, 8 Nov 2023 15:41:25 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -60,115 +60,178 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 03/19] KVM: x86/pmu: Remove KVM's enumeration of
- Intel's architectural encodings
+Subject: Re: [PATCH v7 02/19] KVM: x86/pmu: Allow programming events that
+ match unsupported arch events
 Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Dapeng Mi <dapeng1.mi@linux.intel.com>,
- Jim Mattson <jmattson@google.com>, Jinrong Liang <cloudliang@tencent.com>,
- Aaron Lewis <aaronlewis@google.com>, Like Xu <likexu@tencent.com>
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Dapeng Mi <dapeng1.mi@linux.intel.com>, Jim Mattson <jmattson@google.com>,
+ Jinrong Liang <cloudliang@tencent.com>, Aaron Lewis <aaronlewis@google.com>,
+ Like Xu <likexu@tencent.com>
 References: <20231108003135.546002-1-seanjc@google.com>
- <20231108003135.546002-4-seanjc@google.com>
- <4281eee7-6423-4ec8-bb18-c6aeee1faf2c@linux.intel.com>
- <ZUvi6P7iKMtsS8wm@google.com>
+ <20231108003135.546002-3-seanjc@google.com>
 From: "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <ZUvi6P7iKMtsS8wm@google.com>
+In-Reply-To: <20231108003135.546002-3-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 2023-11-08 2:35 p.m., Sean Christopherson wrote:
-> On Wed, Nov 08, 2023, Kan Liang wrote:
->> On 2023-11-07 7:31 p.m., Sean Christopherson wrote:
->>> @@ -442,8 +396,29 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>>  	return 0;
->>>  }
->>>  
->>> +/*
->>> + * Map fixed counter events to architectural general purpose event encodings.
->>> + * Perf doesn't provide APIs to allow KVM to directly program a fixed counter,
->>> + * and so KVM instead programs the architectural event to effectively request
->>> + * the fixed counter.  Perf isn't guaranteed to use a fixed counter and may
->>> + * instead program the encoding into a general purpose counter, e.g. if a
->>> + * different perf_event is already utilizing the requested counter, but the end
->>> + * result is the same (ignoring the fact that using a general purpose counter
->>> + * will likely exacerbate counter contention).
->>> + *
->>> + * Note, reference cycles is counted using a perf-defined "psuedo-encoding",
->>> + * as there is no architectural general purpose encoding for reference cycles.
->>
->> It's not the case for the latest Intel platforms anymore. Please see
->> ffbe4ab0beda ("perf/x86/intel: Extend the ref-cycles event to GP counters").
+On 2023-11-07 7:31 p.m., Sean Christopherson wrote:
+> Remove KVM's bogus restriction that the guest can't program an event whose
+> encoding matches an unsupported architectural event.  The enumeration of
+> an architectural event only says that if a CPU supports an architectural
+> event, then the event can be programmed using the architectural encoding.
+> The enumeration does NOT say anything about the encoding when the CPU
+> doesn't report support the architectural event.
 > 
-> Ugh, yeah.  But that and should actually be easier to do on top.
+> Preventing the guest from counting events whose encoding happens to match
+> an architectural event breaks existing functionality whenever Intel adds
+> an architectural encoding that was *ever* used for a CPU that doesn't
+> enumerate support for the architectural event, even if the encoding is for
+> the exact same event!
 > 
->> Maybe perf should export .event_map to KVM somehow.
+> E.g. the architectural encoding for Top-Down Slots is 0x01a4.  Broadwell
+> CPUs, which do not support the Top-Down Slots architectural event, 0x10a4
+> is a valid, model-specific event.  Denying guest usage of 0x01a4 if/when
+> KVM adds support for Top-Down slots would break any Broadwell-based guest.
 > 
-> Oh for ***** sake, perf already does export this for KVM.  Untested, but the below
-> should do the trick.  If I need to spin another version of this series then I'll
-> fold it in, otherwise I'll post it as something on top.
-> 
-> There's also an optimization to be had for kvm_pmu_trigger_event(), which incurs
-> an indirect branch not only every invocation, but on every iteration.  I'll post
-> this one separately.
-> 
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 5fc5a62af428..a02e13c2e5e6 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -405,25 +405,32 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   * different perf_event is already utilizing the requested counter, but the end
->   * result is the same (ignoring the fact that using a general purpose counter
->   * will likely exacerbate counter contention).
-> - *
-> - * Note, reference cycles is counted using a perf-defined "psuedo-encoding",
-> - * as there is no architectural general purpose encoding for reference cycles.
->   */
->  static u64 intel_get_fixed_pmc_eventsel(int index)
->  {
-> -       const struct {
-> -               u8 eventsel;
-> -               u8 unit_mask;
-> -       } fixed_pmc_events[] = {
-> -               [0] = { 0xc0, 0x00 }, /* Instruction Retired / PERF_COUNT_HW_INSTRUCTIONS. */
-> -               [1] = { 0x3c, 0x00 }, /* CPU Cycles/ PERF_COUNT_HW_CPU_CYCLES. */
-> -               [2] = { 0x00, 0x03 }, /* Reference Cycles / PERF_COUNT_HW_REF_CPU_CYCLES*/
-> +       enum perf_hw_id perf_id;
-> +       u64 eventsel;
-> +
-> +       BUILD_BUG_ON(KVM_PMC_MAX_FIXED != 3);
-> +
-> +       switch (index) {
-> +       case 0:
-> +               perf_id = PERF_COUNT_HW_INSTRUCTIONS;
-> +               break;
-> +       case 1:
-> +               perf_id = PERF_COUNT_HW_CPU_CYCLES;
-> +               break;
-> +       case 2:
-> +               perf_id = PERF_COUNT_HW_REF_CPU_CYCLES;
-> +               break;
-> +       default:
-> +               WARN_ON_ONCE(1);
-> +               return 0;
->         };
->  
-> -       BUILD_BUG_ON(ARRAY_SIZE(fixed_pmc_events) != KVM_PMC_MAX_FIXED);
-> -
-> -       return (fixed_pmc_events[index].unit_mask << 8) |
-> -               fixed_pmc_events[index].eventsel;
-> +       eventsel = perf_get_hw_event_config(perf_id);
+> Reported-by: Kan Liang <kan.liang@linux.intel.com>
+> Closes: https://lore.kernel.org/all/2004baa6-b494-462c-a11f-8104ea152c6a@linux.intel.com
+> Fixes: a21864486f7e ("KVM: x86/pmu: Fix available_event_types check for REF_CPU_CYCLES event")
+> Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> Reviewed-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
 
-Yes, the perf_get_hw_event_config() can tell the updated event encoding.
+
+Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
 
 Thanks,
 Kan
 
-> +       WARN_ON_ONCE(!eventsel && index < kvm_pmu_cap.num_counters_fixed);
-> +       return eventsel;
+>  arch/x86/include/asm/kvm-x86-pmu-ops.h |  1 -
+>  arch/x86/kvm/pmu.c                     |  1 -
+>  arch/x86/kvm/pmu.h                     |  1 -
+>  arch/x86/kvm/svm/pmu.c                 |  6 ----
+>  arch/x86/kvm/vmx/pmu_intel.c           | 38 --------------------------
+>  5 files changed, 47 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm-x86-pmu-ops.h b/arch/x86/include/asm/kvm-x86-pmu-ops.h
+> index 6c98f4bb4228..884af8ef7657 100644
+> --- a/arch/x86/include/asm/kvm-x86-pmu-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-pmu-ops.h
+> @@ -12,7 +12,6 @@ BUILD_BUG_ON(1)
+>   * a NULL definition, for example if "static_call_cond()" will be used
+>   * at the call sites.
+>   */
+> -KVM_X86_PMU_OP(hw_event_available)
+>  KVM_X86_PMU_OP(pmc_idx_to_pmc)
+>  KVM_X86_PMU_OP(rdpmc_ecx_to_pmc)
+>  KVM_X86_PMU_OP(msr_idx_to_pmc)
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 9ae07db6f0f6..99ed72966528 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -374,7 +374,6 @@ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
+>  static bool pmc_event_is_allowed(struct kvm_pmc *pmc)
+>  {
+>  	return pmc_is_globally_enabled(pmc) && pmc_speculative_in_use(pmc) &&
+> -	       static_call(kvm_x86_pmu_hw_event_available)(pmc) &&
+>  	       check_pmu_event_filter(pmc);
 >  }
 >  
->  static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+> index 1d64113de488..10fe5bf02705 100644
+> --- a/arch/x86/kvm/pmu.h
+> +++ b/arch/x86/kvm/pmu.h
+> @@ -19,7 +19,6 @@
+>  #define VMWARE_BACKDOOR_PMC_APPARENT_TIME	0x10002
+>  
+>  struct kvm_pmu_ops {
+> -	bool (*hw_event_available)(struct kvm_pmc *pmc);
+>  	struct kvm_pmc *(*pmc_idx_to_pmc)(struct kvm_pmu *pmu, int pmc_idx);
+>  	struct kvm_pmc *(*rdpmc_ecx_to_pmc)(struct kvm_vcpu *vcpu,
+>  		unsigned int idx, u64 *mask);
+> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+> index 373ff6a6687b..5596fe816ea8 100644
+> --- a/arch/x86/kvm/svm/pmu.c
+> +++ b/arch/x86/kvm/svm/pmu.c
+> @@ -73,11 +73,6 @@ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
+>  	return amd_pmc_idx_to_pmc(pmu, idx);
+>  }
+>  
+> -static bool amd_hw_event_available(struct kvm_pmc *pmc)
+> -{
+> -	return true;
+> -}
+> -
+>  static bool amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
+>  {
+>  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> @@ -249,7 +244,6 @@ static void amd_pmu_reset(struct kvm_vcpu *vcpu)
+>  }
+>  
+>  struct kvm_pmu_ops amd_pmu_ops __initdata = {
+> -	.hw_event_available = amd_hw_event_available,
+>  	.pmc_idx_to_pmc = amd_pmc_idx_to_pmc,
+>  	.rdpmc_ecx_to_pmc = amd_rdpmc_ecx_to_pmc,
+>  	.msr_idx_to_pmc = amd_msr_idx_to_pmc,
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index c6e227edcf8e..7737ee2fc62f 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -101,43 +101,6 @@ static struct kvm_pmc *intel_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
+>  	}
+>  }
+>  
+> -static bool intel_hw_event_available(struct kvm_pmc *pmc)
+> -{
+> -	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+> -	u8 event_select = pmc->eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
+> -	u8 unit_mask = (pmc->eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
+> -	int i;
+> -
+> -	/*
+> -	 * Fixed counters are always available if KVM reaches this point.  If a
+> -	 * fixed counter is unsupported in hardware or guest CPUID, KVM doesn't
+> -	 * allow the counter's corresponding MSR to be written.  KVM does use
+> -	 * architectural events to program fixed counters, as the interface to
+> -	 * perf doesn't allow requesting a specific fixed counter, e.g. perf
+> -	 * may (sadly) back a guest fixed PMC with a general purposed counter.
+> -	 * But if _hardware_ doesn't support the associated event, KVM simply
+> -	 * doesn't enumerate support for the fixed counter.
+> -	 */
+> -	if (pmc_is_fixed(pmc))
+> -		return true;
+> -
+> -	BUILD_BUG_ON(ARRAY_SIZE(intel_arch_events) != NR_INTEL_ARCH_EVENTS);
+> -
+> -	/*
+> -	 * Disallow events reported as unavailable in guest CPUID.  Note, this
+> -	 * doesn't apply to pseudo-architectural events (see above).
+> -	 */
+> -	for (i = 0; i < NR_REAL_INTEL_ARCH_EVENTS; i++) {
+> -		if (intel_arch_events[i].eventsel != event_select ||
+> -		    intel_arch_events[i].unit_mask != unit_mask)
+> -			continue;
+> -
+> -		return pmu->available_event_types & BIT(i);
+> -	}
+> -
+> -	return true;
+> -}
+> -
+>  static bool intel_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
+>  {
+>  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> @@ -802,7 +765,6 @@ void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu)
+>  }
+>  
+>  struct kvm_pmu_ops intel_pmu_ops __initdata = {
+> -	.hw_event_available = intel_hw_event_available,
+>  	.pmc_idx_to_pmc = intel_pmc_idx_to_pmc,
+>  	.rdpmc_ecx_to_pmc = intel_rdpmc_ecx_to_pmc,
+>  	.msr_idx_to_pmc = intel_msr_idx_to_pmc,
 
