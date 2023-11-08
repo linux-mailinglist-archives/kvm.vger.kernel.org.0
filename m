@@ -1,173 +1,126 @@
-Return-Path: <kvm+bounces-1220-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1221-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F00D27E5BC8
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 17:56:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 079BF7E5BCC
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 17:57:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66EEDB20FAE
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 16:56:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6BB2281351
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 16:56:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B873032C;
-	Wed,  8 Nov 2023 16:55:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ADE73035C;
+	Wed,  8 Nov 2023 16:56:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YBBb5N7W"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gOeE82aC"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DAC18C21
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 16:55:54 +0000 (UTC)
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 023051FD7
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 08:55:54 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cc42d3f61eso55648375ad.3
-        for <kvm@vger.kernel.org>; Wed, 08 Nov 2023 08:55:53 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139E930326
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 16:56:52 +0000 (UTC)
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A0F51FE6
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 08:56:52 -0800 (PST)
+Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-40859c466efso51694085e9.3
+        for <kvm@vger.kernel.org>; Wed, 08 Nov 2023 08:56:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699462553; x=1700067353; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CO2pM5qIBGIHIMO4lmTRmf1V07gbvmlwqsAp7UxomaA=;
-        b=YBBb5N7WEYMBaAA5ux62ku+PbsXxhSvXuUUrpZjpoWOBT3fe0HV+9zVabIR1CgHzRK
-         upvphGrCm05yvgZ/wUeA8KAp+KKsESz0BFY4FmY/J9T1xC/5uuo13ocfCBOW55DrVO5C
-         IURtmCUepduiO9wYq93pjLfMh0v+rLVpD0wlkonSIDcueeSw8pMDSMRGvwiP3U3CEGYd
-         LdFyGpk7DpZETId0nO1Fl08JZDrs3nwezmB2Sd2/+q/zUyMXuZKZiQm+WEOaJdfb5we3
-         dDZvAQ6LBIkFpyWU3EVbRtqFS5MEaZx455OR2uEOXZiJ7LHJJIgYKLmFyiS9Qymb6V36
-         4PvQ==
+        d=google.com; s=20230601; t=1699462611; x=1700067411; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qruIr/ETrGJxH10qVl1iY9b34CtJjDDOG9qfLztL5mM=;
+        b=gOeE82aCXFYamQyYiCSFj5oEApae6ixkZnvVZF/e1eXM+gAXUIKtUNnvlELN2JZNrr
+         4EBiXBY/wi3VM+jr8HBiJGeppP/WLCHJMwoPggK6v4kyTMLxpRoGqKu7nqDjR+rl8LQt
+         NwB7Kt1zTrz/aPhA52dk/sfEK0eobmWBY/yGgxp56SjIaNC6A5udKxe+w7qH3QHaxhrb
+         MVBrsHMg1a3Bc8zbyIOVibRenOngTVLwJt51T+ZCLFCCEy2KpdaexAZcqzpaeslyoOeh
+         nEwm+iUjHL9IK9c4qFpmhloMTwpD/DC6Beuru/JTeWSljeTz0t/H0iTFYpZOwzCvIHoP
+         /00Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699462553; x=1700067353;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CO2pM5qIBGIHIMO4lmTRmf1V07gbvmlwqsAp7UxomaA=;
-        b=dKgcY7zF9fkwu0YNwYCL0NcK9x7PVkL1W6MPHK/H2MqKQ9j/LqEPeEFg5+GQI1xhNJ
-         4Ok80hOxljmgMyhC8n2Mx4Y0cV8TzdgPaRKMsH7NP0D23dnywAV9TAys6e0jNNBlRbe9
-         8ci0mTqWq4Gdf6OUV58lfiEDp1leBkKRGpg3fHUUEangh3MOkox3eHsWsipgZz/AAU1X
-         3DFZ3LrEbwu43etoc7wqHs0nT4LEg3B38NljBS7Dk3Q9lBbnOjBbkhHRAS1SszRR2JX/
-         V0/VBFzErszEEkMk0aa528yInb85x2lZz2EVT4iY/vHs8rRSgKAYYoq90T6hh/9NjY7H
-         kreQ==
-X-Gm-Message-State: AOJu0YwYu/mV8R5KLCSH5ofJ90ht0zRNf90i6UqN9liOFjY6+eGF+EsU
-	HVTZLAtM5OwtYxSp/3FvqgS5RAdWHz8=
-X-Google-Smtp-Source: AGHT+IEbMq7I/7xfJWRovgT43Hk7brbn1/glVCYaEVcm/QGognSV8XOqAs3MxDssM6rkTG0d5HCi76zXJBc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:f813:b0:1cc:29fb:f398 with SMTP id
- ix19-20020a170902f81300b001cc29fbf398mr50209plb.10.1699462553486; Wed, 08 Nov
- 2023 08:55:53 -0800 (PST)
-Date: Wed, 8 Nov 2023 08:55:51 -0800
-In-Reply-To: <20231108111806.92604-1-nsaenz@amazon.com>
+        d=1e100.net; s=20230601; t=1699462611; x=1700067411;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qruIr/ETrGJxH10qVl1iY9b34CtJjDDOG9qfLztL5mM=;
+        b=Bn4SxpuZOz1RG1BXKiCLen1vKbnh3E0jimwbFZEsdQI6D59FubbyWOeEV4QLeB2bCp
+         oAp+fiJW+/8ZbLGmVxQEiPraGaR1VRvrfxSq7iLCJg49wrCGC+/L0il3a/YcM3BOggCs
+         47+tEWD5dmhghwe6HsJvByKUp+2XZg4yFVmeR8a/U5fkPtT9iUSSyGJF/qWJRT+zAOCc
+         4KCCzDDrNTd7dQ9HNVNCUBGaoygFzUzEx4Ub1SQl0g1+JdighKJxC3c4Y1npCIyGKynZ
+         onHnvwRSYNlPt7KMOIsnePx/bJ/UykCjJ64RJcWuVd0RMtjCNbagA7E/+oAW2e3FxwMO
+         SjGA==
+X-Gm-Message-State: AOJu0YwToyHVDsss1VK5f/sNQ3ou+OU8adibekQ+x6RIZuZkAMwNzEu6
+	J1LI9Vo6P1ZtiWAzJJTPZn+M/1mawt0+JHC7EzdPdA==
+X-Google-Smtp-Source: AGHT+IGTR1gGEHKXjaJVoStFJ9UIN2oDksqvgCWq6h1aE0SmeGtUBbOU+mDXX0uUNn1qexKVXQeALwVBooU+VIFkiYk=
+X-Received: by 2002:a05:600c:4ece:b0:408:3d91:8251 with SMTP id
+ g14-20020a05600c4ece00b004083d918251mr2257656wmq.5.1699462610600; Wed, 08 Nov
+ 2023 08:56:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231108111806.92604-1-nsaenz@amazon.com>
-Message-ID: <ZUu9lwJHasi2vKGg@google.com>
-Subject: Re: [RFC 0/33] KVM: x86: hyperv: Introduce VSM support
-From: Sean Christopherson <seanjc@google.com>
-To: Nicolas Saenz Julienne <nsaenz@amazon.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com, 
-	anelkz@amazon.com, graf@amazon.com, dwmw@amazon.co.uk, jgowans@amazon.com, 
-	corbert@lwn.net, kys@microsoft.com, haiyangz@microsoft.com, 
-	decui@microsoft.com, x86@kernel.org, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <CALzav=d23P5uE=oYqMpjFohvn0CASMJxXB_XEOEi-jtqWcFTDA@mail.gmail.com>
+ <ZUlLLGLi1IyMyhm4@x1n> <fcef7c96-a1bb-4c1d-962b-1bdc2a3b4f19@redhat.com>
+ <CALzav=ejfDDRdjtx-ipFYrhNWPZnj3P0RSNHOQCP+OQf5YGX5w@mail.gmail.com>
+ <ZUqn0OwtNR19PDve@linux.dev> <CALzav=evOG04=mtnc9Tf=bevWq0PbW_2Q=2e=ErruXtE+3gDVQ@mail.gmail.com>
+ <ZUrj8IK__59kHixL@linux.dev>
+In-Reply-To: <ZUrj8IK__59kHixL@linux.dev>
+From: David Matlack <dmatlack@google.com>
+Date: Wed, 8 Nov 2023 08:56:22 -0800
+Message-ID: <CALzav=dXDh4xAzDEbKOxLZkgjEyNs8VLoCOuJg4YYrD0=QzvGw@mail.gmail.com>
+Subject: Re: RFC: A KVM-specific alternative to UserfaultFD
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, 
+	kvm list <kvm@vger.kernel.org>, Sean Christopherson <seanjc@google.com>, 
+	James Houghton <jthoughton@google.com>, Oliver Upton <oupton@google.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Mike Kravetz <mike.kravetz@oracle.com>, 
+	Andrea Arcangeli <aarcange@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 08, 2023, Nicolas Saenz Julienne wrote:
-> This RFC series introduces the necessary infrastructure to emulate VSM
-> enabled guests. It is a snapshot of the progress we made so far, and its
-> main goal is to gather design feedback.
+On Tue, Nov 7, 2023 at 5:27=E2=80=AFPM Oliver Upton <oliver.upton@linux.dev=
+> wrote:
+>
+> On Tue, Nov 07, 2023 at 01:34:34PM -0800, David Matlack wrote:
+> > On Tue, Nov 7, 2023 at 1:10=E2=80=AFPM Oliver Upton <oliver.upton@linux=
+.dev> wrote:
+> > Thanks Oliver. Maybe I'm being dense but I'm still not understanding
+> > how VGIC and UFFD interact :). I understand that VGIC is unaware of
+> > UFFD, but fundamentally they must interact in some way during
+> > post-copy. Can you spell out the sequence of events?
+>
+> Well it doesn't help that my abbreviated explanation glosses over some
+> details. So here's the verbose explanation, and I'm sure Marc will have
+> a set of corrections too :) I meant there's no _explicit_ interaction
+> between UFFD and the various bits of GIC that need to touch guest
+> memory.
+>
+> The GIC redistributors contain a set of MMIO registers that are
+> accessible through the KVM_GET_DEVICE_ATTR and KVM_SET_DEVICE_ATTR
+> ioctls. Writes to these are reflected directly into the KVM
+> representation, no biggie there.
+>
+> One of the registers (GICR_PENDBASER) is a pointer to guest memory,
+> containing a bitmap of pending LPIs managed by the redistributor. The
+> ITS takes this to the extreme, as it is effectively a bunch of page
+> tables for interrupts. All of this state actually lives in a KVM
+> representation, and is only flushed out to guest memory when explicitly
+> told to do so by userspace.
+>
+> On the target, we reread all the info when rebuilding interrupt
+> translations when userspace calls KVM_DEV_ARM_ITS_RESTORE_TABLES. All of
+> these guest memory accesses go through kvm_read_guest() and I expect the
+> usual UFFD handling for non-present pages kicks in from there.
 
-Heh, then please provide an overview of the design, and ideally context and/or
-justification for various design decisions.  It doesn't need to be a proper design
-doc, and you can certainly point at other documentation for explaining VSM/VTLs,
-but a few paragraphs and/or verbose bullet points would go a long way.
-
-The documentation in patch 33 provides an explanation of VSM itself, and a little
-insight into how userspace can utilize the KVM implementation.  But the documentation
-provides no explanation of the mechanics that KVM *developers* care about, e.g.
-the use of memory attributes, how memory attributes are enforced, whether or not
-an in-kernel local APIC is required, etc.
-
-Nor does the documentation explain *why*, e.g. why store a separate set of memory
-attributes per VTL "device", which by the by is broken and unnecessary.
-
-> Specifically on the KVM APIs we introduce. For a high level design overview,
-> see the documentation in patch 33.
-> 
-> Additionally, this topic will be discussed as part of the KVM
-> Micro-conference, in this year's Linux Plumbers Conference [2].
-> 
-> The series is accompanied by two repositories:
->  - A PoC QEMU implementation of VSM [3].
->  - VSM kvm-unit-tests [4].
-> 
-> Note that this isn't a full VSM implementation. For now it only supports
-> 2 VTLs, and only runs on uniprocessor guests. It is capable of booting
-> Windows Sever 2016/2019, but is unstable during runtime.
-> 
-> The series is based on the v6.6 kernel release, and depends on the
-> introduction of KVM memory attributes, which is being worked on
-> independently in "KVM: guest_memfd() and per-page attributes" [5].
-
-This doesn't actually apply on 6.6 with v14 of guest_memfd, because v14 of
-guest_memfd is based on kvm-6.7-1.  Ah, and looking at your github repo, this
-isn't based on v14 at all, it's based on v12.
-
-That's totally fine, but the cover letter needs to explicitly, clearly, and
-*accurately* state the dependencies.  I can obviously grab the full branch from
-github, but that's not foolproof, e.g. if you accidentally delete or force push
-to that branch.  And I also prefer to know that what I'm replying to on list is
-the exact same code that I am looking at.
-
-> A full Linux tree is also made available [6].
-> 
-> Series rundown:
->  - Patch 2 introduces the concept of APIC ID groups.
->  - Patches 3-12 introduce the VSM capability and basic VTL awareness into
->    Hyper-V emulation.
->  - Patch 13 introduces vCPU polling support.
->  - Patches 14-31 use KVM's memory attributes to implement VTL memory
->    protections. Introduces the VTL KMV device and secure memory
->    intercepts.
->  - Patch 32 is a temporary implementation of
->    HVCALL_TRANSLATE_VIRTUAL_ADDRESS necessary to boot Windows 2019.
->  - Patch 33 introduces documentation.
-> 
-> Our intention is to integrate feedback gathered in the RFC and LPC while
-> we finish the VSM implementation. In the future, we will split the series
-> into distinct feature patch sets and upstream these independently.
-> 
-> Thanks,
-> Nicolas
-> 
-> [1] https://raw.githubusercontent.com/Microsoft/Virtualization-Documentation/master/tlfs/Hypervisor%20Top%20Level%20Functional%20Specification%20v6.0b.pdf
-> [2] https://lpc.events/event/17/sessions/166/#20231114
-> [3] https://github.com/vianpl/qemu/tree/vsm-rfc-v1
-> [4] https://github.com/vianpl/kvm-unit-tests/tree/vsm-rfc-v1
-> [5] https://lore.kernel.org/lkml/20231105163040.14904-1-pbonzini@redhat.com/.
-> [6] Full tree: https://github.com/vianpl/linux/tree/vsm-rfc-v1. 
-
-When providing github links, my preference is to format the pointers as:
-
-  <repo> <branch>
-
-or
-  <repo> tags/<tag>
-
-e.g.
-
-  https://github.com/vianpl/linux vsm-rfc-v1
-
-so that readers can copy+paste the full thing directly into `git fetch`.  It's a
-minor thing, but AFAIK no one actually does review by clicking through github's
-webview.
-
->     There are also two small dependencies with
->     https://marc.info/?l=kvm&m=167887543028109&w=2 and
->     https://lkml.org/lkml/2023/10/17/972
-
-Please use lore links, there's zero reason to use anything else these days.  For
-those of us that use b4, lore links make life much easier.
+Thanks for the longer explanation. Yes kvm_read_guest() eventually
+calls __copy_from_user() which will trigger a page fault and
+UserfaultFD will notify userspace and wait for the page to become
+present. In the KVM-specific proposal I outlined, calling
+kvm_read_guest() will ultimately result in a check of the VM's present
+bitmap and KVM will nnotify userspace and wait for the page to become
+present if it's not, before calling __copy_from_user(). So I don't
+expect a KVM-specific solution to have any increased maintenance
+burden for VGIC (or any other widgets).
 
