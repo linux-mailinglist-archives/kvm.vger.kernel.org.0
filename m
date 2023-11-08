@@ -1,115 +1,113 @@
-Return-Path: <kvm+bounces-1223-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1224-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C012A7E5BE3
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 18:00:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A9AAA7E5BFB
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 18:08:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F123C1C20BEE
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 17:00:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA7981C20BCA
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 17:08:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9790030CF1;
-	Wed,  8 Nov 2023 17:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C06B30FB3;
+	Wed,  8 Nov 2023 17:08:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xm2zYdHd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rq1GDaZv"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C66199C7
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 17:00:43 +0000 (UTC)
-Received: from mail-oo1-xc30.google.com (mail-oo1-xc30.google.com [IPv6:2607:f8b0:4864:20::c30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40A191FF5
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 09:00:43 -0800 (PST)
-Received: by mail-oo1-xc30.google.com with SMTP id 006d021491bc7-58686e94ad7so3845201eaf.3
-        for <kvm@vger.kernel.org>; Wed, 08 Nov 2023 09:00:43 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E504D30349
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 17:08:48 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61FEEEA
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 09:08:48 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5afc00161daso84832977b3.1
+        for <kvm@vger.kernel.org>; Wed, 08 Nov 2023 09:08:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699462842; x=1700067642; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1LRS4MOzwpv79nEdyxX9W+Fzi/lnfht07XTGfi+1KqQ=;
-        b=xm2zYdHdATIPwMb+Pzb/gwvnCgP8i28SFAzA7dtEO+O8HxNrPvGKqOIxAgKbAS1phM
-         6YOhSIyIzYnTWXlbdcq9SOpw7lNuk+1kSLjK5jGwFaTslcIja4PlJIyLDccs9/Dn5Rd0
-         srSpi5K5vrY7tFa+XUXCbnzgQKlk8D9vrB+4Z7TPDNIZZnxS0eMmD7bIs2j+wuNvGbxt
-         yJ4xJEfTEfh2wPanjZt+6pwuZVTAwQuKD9izTG0NFMkKYdFDGu4Wd1lh1b88Bg+fmCGE
-         I00F/2td8Q1KdHM3zZii9aivQ00ulfdKTPA9i2cynCqGzeJJrVzt6I/BAvHmMKp0WlWc
-         L+SA==
+        d=google.com; s=20230601; t=1699463327; x=1700068127; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TmuUCnmsxcWhKpY6PDAYvg4ZjDKBI8XOwGtY/GkMtWw=;
+        b=rq1GDaZvMQJUd33Hq5d6Us3A4F4ZekFGSJ6IzgZpzJIAIPZ3y08u7g/iVrrLonT6WW
+         VzwqgFXM2E4wfrgQ03/oYPpTYE4VjFgTx2wo/d6vceDRMeypuSXIh0tiUlJkW4av5DZE
+         yANznrED3vp6sgWDdQP5ZpPqPwws4m4al9M6OivFnH43oInVTaJ6p95tLCxFu4hye7NM
+         wUEGjkpO5zjRg8n6yVzBUu9oZIqfAkKxe8ABPjHjupEKtKvuQEHWpi079k5tpELH01Uy
+         UL9+mc4ynZ9QuTVKXrB6kiXAs4P/qxfVSQD4u4e65PBZ0n4GtZamXqO0rpuqXruet8ni
+         Cegg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699462842; x=1700067642;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1LRS4MOzwpv79nEdyxX9W+Fzi/lnfht07XTGfi+1KqQ=;
-        b=LfE2WHtZiHvrnfuhOKObpWnTSx+eGFN0wHm3NVc6A0RWKsdInsAFbTttvuER7KbNbq
-         WhWFGVBP3iuceWbCzF5H8xaQRoQ18JsXojoW8deSAVpD86/lfTXEJUa8R4Qb1z3SzyKo
-         iqAuKFpSJ4/toa72q5IblwXk8p9pDdauzfkYJKXks6hn0HLiLp54hvZQ7xZ41SwBCwTS
-         IDU1JqOqxKUK8JLTPc4FbEJ1HoLzY4V23+/X+d4sP80LN9awp8whOtwaEaPn977FByXO
-         FG3wJEuyrI+ZTq5/ltHgDqBNtyxVfZQXfquCygo/hqspBMJxny68gu2cCzGJCC9pCQWH
-         EDuQ==
-X-Gm-Message-State: AOJu0YzmASy24QD8MDLmgdK6BEXkFzZCIxFOtTCJRLeKYDw7h6SvLMCJ
-	ZoHygybJ9iukkuFsrQ+7UWeG0V2bx29X09k6/Hascw==
-X-Google-Smtp-Source: AGHT+IFUowk4ELsOivnzaXxc0QlUV4Wvcfh03Hm5SSyMQjwcPTJCFQB+7xIvrXwxFUaSBNJXJhJv8dNqTjB0k78gAdI=
-X-Received: by 2002:a4a:bd87:0:b0:589:df75:2d83 with SMTP id
- k7-20020a4abd87000000b00589df752d83mr1373195oop.1.1699462842423; Wed, 08 Nov
- 2023 09:00:42 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699463327; x=1700068127;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TmuUCnmsxcWhKpY6PDAYvg4ZjDKBI8XOwGtY/GkMtWw=;
+        b=qTbrEq3Sr/W+1RLBO/GtxZQrNp7oMn+bbTDJrWIpoFhYVLCdQmpo4KbHrMtB9kNGpb
+         WaokClmnQ3eiqfextQamR2aFvvkeLM+FKDl7emXh7SdcLX2Qx8JOLSfTaT1Av2XhmkAp
+         IdmrEJNU8ioK6MDyI9/76Da8rTQn7UsmjypmJpMVK3fd+ejTG1asY+iZvipefu8/1pOn
+         3e+/KHz10T9r0xzKXrWn2ZCTAkTID/fbP32UrbhlFrrg4+2cOQIvKxNFjJ+Ya2Hpnv6y
+         uUPJ2sQCMJy3GKK2i/rujel97b20vl6pQzJ4GlI74mebedB4xB30cynFjLNDgRS4plXA
+         6/bQ==
+X-Gm-Message-State: AOJu0YxX1I71hzbzBZGa/qzU/UkhXMtWPH2UGnCdCrxRyXf140CcV45B
+	VwNui/uTXLTZSKbdbtc7xJOE83mk0Uo=
+X-Google-Smtp-Source: AGHT+IEUvQLF3BVsFAZtA/Akz9sUImZwW9cQuy2q9jQLuaSZdFfOebS0qYWIrABn6SnaGvlvWkhzzZxT0yQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:102:b0:da3:723b:b2a4 with SMTP id
+ o2-20020a056902010200b00da3723bb2a4mr43586ybh.7.1699463327583; Wed, 08 Nov
+ 2023 09:08:47 -0800 (PST)
+Date: Wed, 8 Nov 2023 09:08:46 -0800
+In-Reply-To: <20231108111806.92604-22-nsaenz@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-28-pbonzini@redhat.com>
-In-Reply-To: <20231105163040.14904-28-pbonzini@redhat.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Wed, 8 Nov 2023 09:00:00 -0800
-Message-ID: <CAF7b7mrGYuyjyEPAesYzZ6+KDuNAmvRxEonT7JC8NDPsSP+qDA@mail.gmail.com>
-Subject: Re: [PATCH 27/34] KVM: selftests: Introduce VM "shape" to allow tests
- to specify the VM type
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20231108111806.92604-1-nsaenz@amazon.com> <20231108111806.92604-22-nsaenz@amazon.com>
+Message-ID: <ZUvAnqAIsUP4Vd0J@google.com>
+Subject: Re: [RFC 21/33] KVM: Pass memory attribute array as a MMU notifier argument
+From: Sean Christopherson <seanjc@google.com>
+To: Nicolas Saenz Julienne <nsaenz@amazon.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com, 
+	anelkz@amazon.com, graf@amazon.com, dwmw@amazon.co.uk, jgowans@amazon.com, 
+	corbert@lwn.net, kys@microsoft.com, haiyangz@microsoft.com, 
+	decui@microsoft.com, x86@kernel.org, linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-This commit breaks the arm64 selftests build btw: looks like a simple overs=
-ight?
+On Wed, Nov 08, 2023, Nicolas Saenz Julienne wrote:
+> Pass the memory attribute array through struct kvm_mmu_notifier_arg and
+> use it in kvm_arch_post_set_memory_attributes() instead of defaulting on
+> kvm->mem_attr_array.
+> 
+> Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c   | 8 ++++----
+>  include/linux/kvm_host.h | 5 ++++-
+>  virt/kvm/kvm_main.c      | 1 +
+>  3 files changed, 9 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index c0fd3afd6be5..c2bec2be2ba9 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -7311,6 +7311,7 @@ static bool hugepage_has_attrs(struct xarray *mem_attr_array,
+>  bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+>  					 struct kvm_gfn_range *range)
+>  {
+> +	struct xarray *mem_attr_array = range->arg.mem_attr_array;
+>  	unsigned long attrs = range->arg.attributes;
+>  	struct kvm_memory_slot *slot = range->slot;
+>  	int level;
+> @@ -7344,8 +7345,8 @@ bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+>  			 * misaligned address regardless of memory attributes.
+>  			 */
+>  			if (gfn >= slot->base_gfn) {
+> -				if (hugepage_has_attrs(&kvm->mem_attr_array,
+> -						       slot, gfn, level, attrs))
+> +				if (hugepage_has_attrs(mem_attr_array, slot,
+> +						       gfn, level, attrs))
 
-$ cd ${LINUX_ROOT}/tools/testing/selftests/kvm
-$ CROSS_COMPILE=3Daarch64-linux-gnu- ARCH=3Darm64 make
-# ...
-aarch64/page_fault_test.c: In function =E2=80=98run_test=E2=80=99:
-aarch64/page_fault_test.c:708:28: error: incompatible type for
-argument 1 of =E2=80=98____vm_create=E2=80=99
-  708 |         vm =3D ____vm_create(mode);
-         |                            ^~~~
-         |                            |
-         |                            enum vm_guest_mode
-In file included from include/kvm_util.h:10,
-                 from aarch64/page_fault_test.c:14:
-include/kvm_util_base.h:806:46: note: expected =E2=80=98struct vm_shape=E2=
-=80=99 but
-argument is of type =E2=80=98enum vm_guest_mode=E2=80=99
-  806 | struct kvm_vm *____vm_create(struct vm_shape shape);
+This is wildly broken.  The hugepage tracking is per VM, whereas the attributes
+here are per-VTL.  I.e. KVM will (dis)allow hugepages based on whatever VTL last
+changed its protections.
 
