@@ -1,230 +1,157 @@
-Return-Path: <kvm+bounces-1149-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1150-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9F7E7E5309
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 11:06:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 971517E5338
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 11:20:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D9DE28163A
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 10:06:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C846F1C20DB4
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 10:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B52AC10A04;
-	Wed,  8 Nov 2023 10:06:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5519B11C93;
+	Wed,  8 Nov 2023 10:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nd3gSf9h"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="l4Y+SGy1"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48EA11094F
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 10:06:48 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3E81172A;
-	Wed,  8 Nov 2023 02:06:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699438007; x=1730974007;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=5m833ab3qSVu/sdk+jLw4K1ZbcbfYPcfhbGlcXhvGCA=;
-  b=Nd3gSf9hoi462HroX1EuPpNKSTAvKCFkWLNeQVXuQx+dmD1s7GfZYl9f
-   zleIDOF4niWMPqLS2eAMc5RWefzShvotZVixkbkyw0ik5XOuwwCAFmJvf
-   cR14cq20gO5RADdrgpm3IPjIdxMvT8vBGGQL/8frT1sQYCTeU97WupYge
-   Pqmdfzd0UrguAwynnmHbEHw6aH9K2WGgPEWD63jUoQzSalrZAbT5Uet41
-   9VuifoANNeqJ+TW6NxeXKitZgudhJ6BZ6XB/rwi4DnlBSk/43xV/wYvl9
-   0gbjeEdGP03Tn7Tq2lrugJ863qOM1k63UAtZMEDOCdNxutuwPbB7O9Tps
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10887"; a="11286602"
-X-IronPort-AV: E=Sophos;i="6.03,285,1694761200"; 
-   d="scan'208";a="11286602"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 02:06:46 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10887"; a="828921816"
-X-IronPort-AV: E=Sophos;i="6.03,285,1694761200"; 
-   d="scan'208";a="828921816"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.9.145]) ([10.93.9.145])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 02:06:42 -0800
-Message-ID: <0ee32216-e285-406f-b20d-dd193b791d2b@intel.com>
-Date: Wed, 8 Nov 2023 18:06:40 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D13811194
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 10:20:12 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 413E71BD6;
+	Wed,  8 Nov 2023 02:20:11 -0800 (PST)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A89F3xr017923;
+	Wed, 8 Nov 2023 10:20:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=MpBJpGijZohx3AcywvI1ehabXiYb/3V44jpSJazdoAY=;
+ b=l4Y+SGy1ZUcB+2YWXfb0NyREjgWE23n+ukjagfqrZdc+eQOwxqCLf+hrQFE4fOfcAH4N
+ ES3fHm9y303dm/zGjWzCXbA2BzcPtw3ofL67lEuBe/qsFAgP3G+D+M0+tCCX2XWG8nIC
+ mZiXhGy1Mz/7p+vhl93M+4T/xIO/BQPYB7gCL0t00ytgueFXSHk1/8aEAMswmSic9iNx
+ JSjV/MPJWddwXwRRQ0yUc+3DaZvJ6q/ML+fjOPxyjERgjq8FrjUnYBRagrtlOVYn7jXJ
+ KElcIXGxAUw/37tKaZYJu9K1vbNbBLbvBmnbL9hC/UP0QTK4gro5L24krYXWHmfOxbV6 tg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u87hfj85x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Nov 2023 10:20:10 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A8AFM0t006684;
+	Wed, 8 Nov 2023 10:20:09 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u87hfj84q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Nov 2023 10:20:09 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A88YJtn014332;
+	Wed, 8 Nov 2023 10:20:08 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u7w21v151-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Nov 2023 10:20:08 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A8AK6FN37355804
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 8 Nov 2023 10:20:06 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 738D22004F;
+	Wed,  8 Nov 2023 10:20:06 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 57BB22004E;
+	Wed,  8 Nov 2023 10:20:06 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  8 Nov 2023 10:20:06 +0000 (GMT)
+Date: Wed, 8 Nov 2023 11:20:05 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] selftests: kvm/s390x: use vm_create_barebones()
+Message-ID: <20231108112005.54e86585@p-imbrenda>
+In-Reply-To: <20231108094055.221234-1-pbonzini@redhat.com>
+References: <20231108094055.221234-1-pbonzini@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] KVM: selftests: Add logic to detect if ioctl()
- failed because VM was killed
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Michal Luczaj <mhal@rbox.co>, Oliver Upton <oliver.upton@linux.dev>,
- Colton Lewis <coltonlewis@google.com>
-References: <20231108010953.560824-1-seanjc@google.com>
- <20231108010953.560824-3-seanjc@google.com>
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20231108010953.560824-3-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: KAjCfeo6K7RSch_bhh7m6CVvIIeIMptn
+X-Proofpoint-ORIG-GUID: jFvB63MgjZ08D_h3RChgzVkAMs4UEMo7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-08_01,2023-11-08_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ impostorscore=0 malwarescore=0 phishscore=0 priorityscore=1501
+ suspectscore=0 bulkscore=0 clxscore=1015 adultscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311080085
 
-On 11/8/2023 9:09 AM, Sean Christopherson wrote:
-> Add yet another macro to the VM/vCPU ioctl() framework to detect when an
-> ioctl() failed because KVM killed/bugged the VM, i.e. when there was
-> nothing wrong with the ioctl() itself.  If KVM kills a VM, e.g. by way of
-> a failed KVM_BUG_ON(), all subsequent VM and vCPU ioctl()s will fail with
-> -EIO, which can be quite misleading and ultimately waste user/developer
-> time.
-> 
-> Use KVM_CHECK_EXTENSION on KVM_CAP_USER_MEMORY to detect if the VM is
-> dead and/or bug, as KVM doesn't provide a dedicated ioctl().  Using a
-> heuristic is obviously less than ideal, but practically speaking the logic
-> is bulletproof barring a KVM change, and any such change would arguably
-> break userspace, e.g. if KVM returns something other than -EIO.
+On Wed,  8 Nov 2023 04:40:55 -0500
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-We hit similar issue when testing TDX VMs. Most failure of SEMCALL is 
-handled with a KVM_BUG_ON(), which leads to vm dead. Then the following 
-IOCTL from userspace (QEMU) and gets -EIO.
+> This function does the same but makes it clearer why one would use
+> the "____"-prefixed version of vm_create().
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Can we return a new KVM_EXIT_VM_DEAD on KVM_REQ_VM_DEAD? and replace 
--EIO with 0? yes, it's a ABI change. But I'm wondering if any userspace 
-relies on -EIO behavior for VM DEAD case.
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-> Without the detection, tearing down a bugged VM yields a cryptic failure
-> when deleting memslots:
-> 
->    ==== Test Assertion Failure ====
->    lib/kvm_util.c:689: !ret
->    pid=45131 tid=45131 errno=5 - Input/output error
->       1	0x00000000004036c3: __vm_mem_region_delete at kvm_util.c:689
->       2	0x00000000004042f0: kvm_vm_free at kvm_util.c:724 (discriminator 12)
->       3	0x0000000000402929: race_sync_regs at sync_regs_test.c:193
->       4	0x0000000000401cab: main at sync_regs_test.c:334 (discriminator 6)
->       5	0x0000000000416f13: __libc_start_call_main at libc-start.o:?
->       6	0x000000000041855f: __libc_start_main_impl at ??:?
->       7	0x0000000000401d40: _start at ??:?
->    KVM_SET_USER_MEMORY_REGION failed, rc: -1 errno: 5 (Input/output error)
-> 
-> Which morphs into a more pointed error message with the detection:
-> 
->    ==== Test Assertion Failure ====
->    lib/kvm_util.c:689: false
->    pid=80347 tid=80347 errno=5 - Input/output error
->       1	0x00000000004039ab: __vm_mem_region_delete at kvm_util.c:689 (discriminator 5)
->       2	0x0000000000404660: kvm_vm_free at kvm_util.c:724 (discriminator 12)
->       3	0x0000000000402ac9: race_sync_regs at sync_regs_test.c:193
->       4	0x0000000000401cb7: main at sync_regs_test.c:334 (discriminator 6)
->       5	0x0000000000418263: __libc_start_call_main at libc-start.o:?
->       6	0x00000000004198af: __libc_start_main_impl at ??:?
->       7	0x0000000000401d90: _start at ??:?
->    KVM killed/bugged the VM, check the kernel log for clues
-> 
-> Suggested-by: Michal Luczaj <mhal@rbox.co>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: Colton Lewis <coltonlewis@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->   .../selftests/kvm/include/kvm_util_base.h     | 39 ++++++++++++++++---
->   tools/testing/selftests/kvm/lib/kvm_util.c    |  2 +-
->   2 files changed, 35 insertions(+), 6 deletions(-)
+>  tools/testing/selftests/kvm/s390x/cmma_test.c | 11 +++--------
+>  1 file changed, 3 insertions(+), 8 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> index 1f6193dc7d3a..c7717942ddbb 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -282,11 +282,40 @@ static __always_inline void static_assert_is_vm(struct kvm_vm *vm) { }
->   	kvm_do_ioctl((vm)->fd, cmd, arg);			\
->   })
->   
-> +/*
-> + * Assert that a VM or vCPU ioctl() succeeded, with extra magic to detect if
-> + * the ioctl() failed because KVM killed/bugged the VM.  To detect a dead VM,
-> + * probe KVM_CAP_USER_MEMORY, which (a) has been supported by KVM since before
-> + * selftests existed and (b) should never outright fail, i.e. is supposed to
-> + * return 0 or 1.  If KVM kills a VM, KVM returns -EIO for all ioctl()s for the
-> + * VM and its vCPUs, including KVM_CHECK_EXTENSION.
-> + */
-> +#define __TEST_ASSERT_VM_VCPU_IOCTL(cond, name, ret, vm)				\
-> +do {											\
-> +	int __errno = errno;								\
-> +											\
-> +	static_assert_is_vm(vm);							\
-> +											\
-> +	if (cond)									\
-> +		break;									\
-> +											\
-> +	if (errno == EIO &&								\
-> +	    __vm_ioctl(vm, KVM_CHECK_EXTENSION, (void *)KVM_CAP_USER_MEMORY) < 0) {	\
-> +		TEST_ASSERT(errno == EIO, "KVM killed the VM, should return -EIO");	\
-> +		TEST_FAIL("KVM killed/bugged the VM, check the kernel log for clues");	\
-> +	}										\
-> +	errno = __errno;								\
-> +	TEST_ASSERT(cond, __KVM_IOCTL_ERROR(name, ret));				\
-> +} while (0)
-> +
-> +#define TEST_ASSERT_VM_VCPU_IOCTL(cond, cmd, ret, vm)		\
-> +	__TEST_ASSERT_VM_VCPU_IOCTL(cond, #cmd, ret, vm)
-> +
->   #define vm_ioctl(vm, cmd, arg)					\
->   ({								\
->   	int ret = __vm_ioctl(vm, cmd, arg);			\
->   								\
-> -	TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(#cmd, ret));	\
-> +	__TEST_ASSERT_VM_VCPU_IOCTL(!ret, #cmd, ret, vm);		\
->   })
->   
->   static __always_inline void static_assert_is_vcpu(struct kvm_vcpu *vcpu) { }
-> @@ -301,7 +330,7 @@ static __always_inline void static_assert_is_vcpu(struct kvm_vcpu *vcpu) { }
->   ({								\
->   	int ret = __vcpu_ioctl(vcpu, cmd, arg);			\
->   								\
-> -	TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(#cmd, ret));	\
-> +	__TEST_ASSERT_VM_VCPU_IOCTL(!ret, #cmd, ret, (vcpu)->vm);	\
->   })
->   
->   /*
-> @@ -312,7 +341,7 @@ static inline int vm_check_cap(struct kvm_vm *vm, long cap)
->   {
->   	int ret =  __vm_ioctl(vm, KVM_CHECK_EXTENSION, (void *)cap);
->   
-> -	TEST_ASSERT(ret >= 0, KVM_IOCTL_ERROR(KVM_CHECK_EXTENSION, ret));
-> +	TEST_ASSERT_VM_VCPU_IOCTL(ret >= 0, KVM_CHECK_EXTENSION, ret, vm);
->   	return ret;
->   }
->   
-> @@ -371,7 +400,7 @@ static inline int vm_get_stats_fd(struct kvm_vm *vm)
->   {
->   	int fd = __vm_ioctl(vm, KVM_GET_STATS_FD, NULL);
->   
-> -	TEST_ASSERT(fd >= 0, KVM_IOCTL_ERROR(KVM_GET_STATS_FD, fd));
-> +	TEST_ASSERT_VM_VCPU_IOCTL(fd >= 0, KVM_GET_STATS_FD, fd, vm);
->   	return fd;
->   }
->   
-> @@ -583,7 +612,7 @@ static inline int vcpu_get_stats_fd(struct kvm_vcpu *vcpu)
->   {
->   	int fd = __vcpu_ioctl(vcpu, KVM_GET_STATS_FD, NULL);
->   
-> -	TEST_ASSERT(fd >= 0, KVM_IOCTL_ERROR(KVM_GET_STATS_FD, fd));
-> +	TEST_ASSERT_VM_VCPU_IOCTL(fd >= 0, KVM_CHECK_EXTENSION, fd, vcpu->vm);
->   	return fd;
->   }
->   
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 7a8af1821f5d..c847f942cd38 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -1227,7 +1227,7 @@ struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
->   	vcpu->vm = vm;
->   	vcpu->id = vcpu_id;
->   	vcpu->fd = __vm_ioctl(vm, KVM_CREATE_VCPU, (void *)(unsigned long)vcpu_id);
-> -	TEST_ASSERT(vcpu->fd >= 0, KVM_IOCTL_ERROR(KVM_CREATE_VCPU, vcpu->fd));
-> +	TEST_ASSERT_VM_VCPU_IOCTL(vcpu->fd >= 0, KVM_CREATE_VCPU, vcpu->fd, vm);
->   
->   	TEST_ASSERT(vcpu_mmap_sz() >= sizeof(*vcpu->run), "vcpu mmap size "
->   		"smaller than expected, vcpu_mmap_sz: %i expected_min: %zi",
+> diff --git a/tools/testing/selftests/kvm/s390x/cmma_test.c b/tools/testing/selftests/kvm/s390x/cmma_test.c
+> index c8e0a6495a63..626a2b8a2037 100644
+> --- a/tools/testing/selftests/kvm/s390x/cmma_test.c
+> +++ b/tools/testing/selftests/kvm/s390x/cmma_test.c
+> @@ -94,11 +94,6 @@ static void guest_dirty_test_data(void)
+>  	);
+>  }
+>  
+> -static struct kvm_vm *create_vm(void)
+> -{
+> -	return ____vm_create(VM_MODE_DEFAULT);
+> -}
+> -
+>  static void create_main_memslot(struct kvm_vm *vm)
+>  {
+>  	int i;
+> @@ -157,7 +152,7 @@ static struct kvm_vm *create_vm_two_memslots(void)
+>  {
+>  	struct kvm_vm *vm;
+>  
+> -	vm = create_vm();
+> +	vm = vm_create_barebones();
+>  
+>  	create_memslots(vm);
+>  
+> @@ -276,7 +271,7 @@ static void assert_exit_was_hypercall(struct kvm_vcpu *vcpu)
+>  
+>  static void test_migration_mode(void)
+>  {
+> -	struct kvm_vm *vm = create_vm();
+> +	struct kvm_vm *vm = vm_create_barebones();
+>  	struct kvm_vcpu *vcpu;
+>  	u64 orig_psw;
+>  	int rc;
+> @@ -670,7 +665,7 @@ struct testdef {
+>   */
+>  static int machine_has_cmma(void)
+>  {
+> -	struct kvm_vm *vm = create_vm();
+> +	struct kvm_vm *vm = vm_create_barebones();
+>  	int r;
+>  
+>  	r = !__kvm_has_device_attr(vm->fd, KVM_S390_VM_MEM_CTRL, KVM_S390_VM_MEM_ENABLE_CMMA);
 
 
