@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-1163-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1164-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19D867E5501
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 12:20:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 805577E5505
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 12:20:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C36B328142B
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 11:20:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EADEFB2135C
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 11:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C8315EAC;
-	Wed,  8 Nov 2023 11:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 479BF15EAB;
+	Wed,  8 Nov 2023 11:20:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="aykVI1Qf"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="B2oubJH9"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725C415E89;
-	Wed,  8 Nov 2023 11:20:29 +0000 (UTC)
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CC5F101;
-	Wed,  8 Nov 2023 03:20:28 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB4F215E96;
+	Wed,  8 Nov 2023 11:20:35 +0000 (UTC)
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08B351BEC;
+	Wed,  8 Nov 2023 03:20:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1699442429; x=1730978429;
+  t=1699442436; x=1730978436;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=O25EX7uu/BZNg+CriP/M93KalXQ52Vh7t09zkAv2Ya4=;
-  b=aykVI1QfFrWWdgvl5K28nJc2jLfTCZz/bsoiUlASsTpFbkDS41nZfZr3
-   D6azOjVhkVl7UL9tqeYijznMZNP5k8HOiCYJHwm4bfyvTjk6jYm4M++87
-   qhmwsdlgVGNs+hOQearaS91Oy2ZVQ5ATF/zBhTpyNuvjCuCQE0ToZBBkX
-   I=;
+  bh=QBVqEnmtZNOjPktuGk9xsojMAUYhuWQTJQf/5jldNU4=;
+  b=B2oubJH9/QQ5t5/Q0OeG0guV4eO6kmOmkBgbZF7D1k6BpayFGxHSYPhJ
+   F8aitM+eksavt7Zw8G7NNTM3kwknGEnRgkGHE9KAL0EiWwkevxBpVLCEV
+   etr9kWKoYI8QxvJhcB84JKM5YembBF0auUEjAUSHxKASziVievrPVAfPY
+   8=;
 X-IronPort-AV: E=Sophos;i="6.03,286,1694736000"; 
-   d="scan'208";a="593807472"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-529f0975.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 11:20:27 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
-	by email-inbound-relay-iad-1e-m6i4x-529f0975.us-east-1.amazon.com (Postfix) with ESMTPS id 527E148E12;
-	Wed,  8 Nov 2023 11:20:23 +0000 (UTC)
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.17.79:53919]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.33.209:2525] with esmtp (Farcaster)
- id 70e20ac2-f2b6-471e-8f0e-3ab2809c6acc; Wed, 8 Nov 2023 11:20:21 +0000 (UTC)
-X-Farcaster-Flow-ID: 70e20ac2-f2b6-471e-8f0e-3ab2809c6acc
+   d="scan'208";a="618315974"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 11:20:32 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
+	by email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com (Postfix) with ESMTPS id B84FB40D92;
+	Wed,  8 Nov 2023 11:20:29 +0000 (UTC)
+Received: from EX19MTAEUC002.ant.amazon.com [10.0.43.254:62810]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.4.34:2525] with esmtp (Farcaster)
+ id 3ff2c4a7-a3e7-46e0-936d-e9e005f722e6; Wed, 8 Nov 2023 11:20:28 +0000 (UTC)
+X-Farcaster-Flow-ID: 3ff2c4a7-a3e7-46e0-936d-e9e005f722e6
 Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
+ EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Wed, 8 Nov 2023 11:20:21 +0000
+ 15.2.1118.39; Wed, 8 Nov 2023 11:20:26 +0000
 Received: from dev-dsk-nsaenz-1b-189b39ae.eu-west-1.amazon.com (10.13.235.138)
  by EX19D004EUC001.ant.amazon.com (10.252.51.190) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Wed, 8 Nov 2023 11:20:16 +0000
+ 15.2.1118.39; Wed, 8 Nov 2023 11:20:21 +0000
 From: Nicolas Saenz Julienne <nsaenz@amazon.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-kernel@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
@@ -60,9 +60,9 @@ CC: <linux-kernel@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
 	<jgowans@amazon.com>, <corbert@lwn.net>, <kys@microsoft.com>,
 	<haiyangz@microsoft.com>, <decui@microsoft.com>, <x86@kernel.org>,
 	<linux-doc@vger.kernel.org>, Nicolas Saenz Julienne <nsaenz@amazon.com>
-Subject: [RFC 10/33] KVM: x86: hyper-v: Introduce KVM_HV_GET_VSM_STATE
-Date: Wed, 8 Nov 2023 11:17:43 +0000
-Message-ID: <20231108111806.92604-11-nsaenz@amazon.com>
+Subject: [RFC 11/33] KVM: x86: hyper-v: Handle GET/SET_VP_REGISTER hcall in user-space
+Date: Wed, 8 Nov 2023 11:17:44 +0000
+Message-ID: <20231108111806.92604-12-nsaenz@amazon.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231108111806.92604-1-nsaenz@amazon.com>
 References: <20231108111806.92604-1-nsaenz@amazon.com>
@@ -78,107 +78,69 @@ X-Originating-IP: [10.13.235.138]
 X-ClientProxiedBy: EX19D044UWB002.ant.amazon.com (10.13.139.188) To
  EX19D004EUC001.ant.amazon.com (10.252.51.190)
 
-HVCALL_GET_VP_REGISTERS exposes the VTL call hypercall page entry
-offsets to the guest. This hypercall is implemented in user-space while
-the hypercall page patching happens in-kernel. So expose it as part of
-the partition wide VSM state.
-
-NOTE: Alternatively there is the option of sharing this information
-through a VTL KVM device attribute (the device is introduced in
-subsequent patches).
+Let user-space handle HVCALL_GET_VP_REGISTERS and
+HVCALL_SET_VP_REGISTERS through the KVM_EXIT_HYPERV_HVCALL exit reason.
+Additionally, expose the cpuid bit.
 
 Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
 ---
- arch/x86/include/uapi/asm/kvm.h |  5 +++++
- arch/x86/kvm/hyperv.c           |  8 ++++++++
- arch/x86/kvm/hyperv.h           |  2 ++
- arch/x86/kvm/x86.c              | 18 ++++++++++++++++++
- include/uapi/linux/kvm.h        |  4 ++++
- 5 files changed, 37 insertions(+)
+ arch/x86/kvm/hyperv.c             | 9 +++++++++
+ include/asm-generic/hyperv-tlfs.h | 1 +
+ 2 files changed, 10 insertions(+)
 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index f73d137784d7..370483d5d5fd 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -570,4 +570,9 @@ struct kvm_apic_id_groups {
- 	__u8 n_bits; /* nr of bits used to represent group in the APIC ID */
- };
- 
-+/* for KVM_HV_GET_VSM_STATE */
-+struct kvm_hv_vsm_state {
-+	__u64 vsm_code_page_offsets;
-+};
-+
- #endif /* _ASM_X86_KVM_H */
 diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 2cf430f6ddd8..caaa859932c5 100644
+index caaa859932c5..a3970d52eef1 100644
 --- a/arch/x86/kvm/hyperv.c
 +++ b/arch/x86/kvm/hyperv.c
-@@ -2990,3 +2990,11 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
+@@ -2456,6 +2456,9 @@ static void kvm_hv_write_xmm(struct kvm_hyperv_xmm_reg *xmm)
  
- 	return 0;
- }
+ static bool kvm_hv_is_xmm_output_hcall(u16 code)
+ {
++	if (code == HVCALL_GET_VP_REGISTERS)
++		return true;
 +
-+int kvm_vm_ioctl_get_hv_vsm_state(struct kvm *kvm, struct kvm_hv_vsm_state *state)
-+{
-+	struct kvm_hv* hv = &kvm->arch.hyperv;
-+
-+	state->vsm_code_page_offsets = hv->vsm_code_page_offsets.as_u64;
-+	return 0;
-+}
-diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
-index 5433107e7cc8..b3d1113efe82 100644
---- a/arch/x86/kvm/hyperv.h
-+++ b/arch/x86/kvm/hyperv.h
-@@ -261,4 +261,6 @@ static inline bool kvm_hv_vsm_enabled(struct kvm *kvm)
-        return kvm->arch.hyperv.hv_enable_vsm;
+ 	return false;
  }
  
-+int kvm_vm_ioctl_get_hv_vsm_state(struct kvm *kvm, struct kvm_hv_vsm_state *state);
-+
- #endif
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b0512e433032..57f9c58e1e32 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7132,6 +7132,24 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- 		r = kvm_vm_ioctl_set_apic_id_groups(kvm, &groups);
- 		break;
+@@ -2520,6 +2523,8 @@ static bool is_xmm_fast_hypercall(struct kvm_hv_hcall *hc)
+ 	case HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX:
+ 	case HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX:
+ 	case HVCALL_SEND_IPI_EX:
++	case HVCALL_GET_VP_REGISTERS:
++	case HVCALL_SET_VP_REGISTERS:
+ 		return true;
  	}
-+	case KVM_HV_GET_VSM_STATE: {
-+		struct kvm_hv_vsm_state vsm_state;
-+
-+		r = -EINVAL;
-+		if (!kvm_hv_vsm_enabled(kvm))
-+			goto out;
-+
-+		r = kvm_vm_ioctl_get_hv_vsm_state(kvm, &vsm_state);
-+		if (r)
-+			goto out;
-+
-+		r = -EFAULT;
-+		if (copy_to_user(argp, &vsm_state, sizeof(vsm_state)))
-+			goto out;
-+
-+		r = 0;
-+		break;
-+	}
+ 
+@@ -2738,6 +2743,9 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+ 			break;
+ 		}
+ 		goto hypercall_userspace_exit;
++	case HVCALL_GET_VP_REGISTERS:
++	case HVCALL_SET_VP_REGISTERS:
++		goto hypercall_userspace_exit;
  	default:
- 		r = -ENOTTY;
- 	}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 168b6ac6ebe5..03f5c08fd7aa 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -2316,4 +2316,8 @@ struct kvm_create_guest_memfd {
- #define KVM_GUEST_MEMFD_ALLOW_HUGEPAGE		(1ULL << 0)
+ 		ret = HV_STATUS_INVALID_HYPERCALL_CODE;
+ 		break;
+@@ -2903,6 +2911,7 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
+ 			ent->ebx |= HV_POST_MESSAGES;
+ 			ent->ebx |= HV_SIGNAL_EVENTS;
+ 			ent->ebx |= HV_ENABLE_EXTENDED_HYPERCALLS;
++			ent->ebx |= HV_ACCESS_VP_REGISTERS;
  
- #define KVM_SET_APIC_ID_GROUPS _IOW(KVMIO, 0xd7, struct kvm_apic_id_groups)
-+
-+/* Get/Set Hyper-V VSM state. Available with KVM_CAP_HYPERV_VSM */
-+#define KVM_HV_GET_VSM_STATE _IOR(KVMIO, 0xd5, struct kvm_hv_vsm_state)
-+
- #endif /* __LINUX_KVM_H */
+ 			ent->edx |= HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE;
+ 			ent->edx |= HV_X64_HYPERCALL_XMM_OUTPUT_AVAILABLE;
+diff --git a/include/asm-generic/hyperv-tlfs.h b/include/asm-generic/hyperv-tlfs.h
+index 40d7dc793c03..24ea699a3d8e 100644
+--- a/include/asm-generic/hyperv-tlfs.h
++++ b/include/asm-generic/hyperv-tlfs.h
+@@ -89,6 +89,7 @@
+ #define HV_ACCESS_STATS				BIT(8)
+ #define HV_DEBUGGING				BIT(11)
+ #define HV_CPU_MANAGEMENT			BIT(12)
++#define HV_ACCESS_VP_REGISTERS			BIT(17)
+ #define HV_ENABLE_EXTENDED_HYPERCALLS		BIT(20)
+ #define HV_ISOLATION				BIT(22)
+ 
 -- 
 2.40.1
 
