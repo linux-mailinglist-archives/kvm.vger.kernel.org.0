@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-1153-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1154-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7945B7E54D7
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 12:18:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FB8E7E54DB
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 12:18:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9ECE1C20D84
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 11:18:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60EC61C20DCF
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 11:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F0515EA6;
-	Wed,  8 Nov 2023 11:18:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4057816404;
+	Wed,  8 Nov 2023 11:18:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="KFXFH01+"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="cY0+dRyP"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6570415487;
-	Wed,  8 Nov 2023 11:18:31 +0000 (UTC)
-Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2C83101;
-	Wed,  8 Nov 2023 03:18:30 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CC7156FD;
+	Wed,  8 Nov 2023 11:18:32 +0000 (UTC)
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7871186;
+	Wed,  8 Nov 2023 03:18:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1699442311; x=1730978311;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=YhNiCY6Yx16hIA8ic6bDnU8CklxIVvoOxjYhmVU762I=;
-  b=KFXFH01+WyKZVuGXSf+Ano1t5HqH4ywbQheqAJa6homt8uBTBLEo7NpO
-   mG65UaJQHbEmtZp6YhIXHpCCp/+Exe8ozrAhXA+i4sQ+O66EPO1Hsr+DZ
-   ftf8HaracbQVHh+VARBIggQLgn81310Sh/zYUHrSX+7HOACPx8iVcyWjr
+  t=1699442313; x=1730978313;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Uq8x7FLfoIR318BRKD0i4hgYzW68ONMdLEubh/+ZbLg=;
+  b=cY0+dRyPVwx/+v+HXR0Jhe77ryGubFD0miWlX3/F6w2LU8JJY03beq5H
+   UlHqWKLtYvOXKD9YLBb5CoWwh+l9/3uWt2XKQauGXUdroYEFFOz7AAtFO
+   G8lWw2z/bZWgPl7FrUHwDU7yi7pL+HkfHPkrhLjv/g2592ptsfSupSXi/
    o=;
 X-IronPort-AV: E=Sophos;i="6.03,286,1694736000"; 
-   d="scan'208";a="683505176"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-f05d30a1.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 11:18:25 +0000
-Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
-	by email-inbound-relay-iad-1d-m6i4x-f05d30a1.us-east-1.amazon.com (Postfix) with ESMTPS id 74C1080D5F;
-	Wed,  8 Nov 2023 11:18:21 +0000 (UTC)
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.43.254:31015]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.43.105:2525] with esmtp (Farcaster)
- id b8d2a861-c97a-4ec8-b470-7641a9da532f; Wed, 8 Nov 2023 11:18:20 +0000 (UTC)
-X-Farcaster-Flow-ID: b8d2a861-c97a-4ec8-b470-7641a9da532f
+   d="scan'208";a="361602176"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-44b6fc51.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 11:18:29 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
+	by email-inbound-relay-pdx-2a-m6i4x-44b6fc51.us-west-2.amazon.com (Postfix) with ESMTPS id 8BB26A07F7;
+	Wed,  8 Nov 2023 11:18:26 +0000 (UTC)
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.10.100:45371]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.26.101:2525] with esmtp (Farcaster)
+ id 58210a6b-8421-43e3-b3a6-2ece76fce745; Wed, 8 Nov 2023 11:18:25 +0000 (UTC)
+X-Farcaster-Flow-ID: 58210a6b-8421-43e3-b3a6-2ece76fce745
 Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
+ EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Wed, 8 Nov 2023 11:18:20 +0000
+ 15.2.1118.39; Wed, 8 Nov 2023 11:18:25 +0000
 Received: from dev-dsk-nsaenz-1b-189b39ae.eu-west-1.amazon.com (10.13.235.138)
  by EX19D004EUC001.ant.amazon.com (10.252.51.190) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Wed, 8 Nov 2023 11:18:15 +0000
+ 15.2.1118.39; Wed, 8 Nov 2023 11:18:20 +0000
 From: Nicolas Saenz Julienne <nsaenz@amazon.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-kernel@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
@@ -59,11 +59,13 @@ CC: <linux-kernel@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
 	<anelkz@amazon.com>, <graf@amazon.com>, <dwmw@amazon.co.uk>,
 	<jgowans@amazon.com>, <corbert@lwn.net>, <kys@microsoft.com>,
 	<haiyangz@microsoft.com>, <decui@microsoft.com>, <x86@kernel.org>,
-	<linux-doc@vger.kernel.org>
-Subject: [RFC 0/33] KVM: x86: hyperv: Introduce VSM support
-Date: Wed, 8 Nov 2023 11:17:33 +0000
-Message-ID: <20231108111806.92604-1-nsaenz@amazon.com>
+	<linux-doc@vger.kernel.org>, Nicolas Saenz Julienne <nsaenz@amazon.com>
+Subject: [RFC 01/33] KVM: x86: Decouple lapic.h from hyperv.h
+Date: Wed, 8 Nov 2023 11:17:34 +0000
+Message-ID: <20231108111806.92604-2-nsaenz@amazon.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20231108111806.92604-1-nsaenz@amazon.com>
+References: <20231108111806.92604-1-nsaenz@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,63 +78,42 @@ X-Originating-IP: [10.13.235.138]
 X-ClientProxiedBy: EX19D037UWC004.ant.amazon.com (10.13.139.254) To
  EX19D004EUC001.ant.amazon.com (10.252.51.190)
 
-Hyper-V's Virtual Secure Mode (VSM) is a virtualisation security feature
-that leverages the hypervisor to create secure execution environments
-within a guest. VSM is documented as part of Microsoft's Hypervisor Top
-Level Functional Specification [1]. Security features that build upon
-VSM, like Windows Credential Guard, are enabled by default on Windows 11,
-and are becoming a prerequisite in some industries.
+lapic.h has no dependencies with hyperv.h, so don't include it there.
 
-This RFC series introduces the necessary infrastructure to emulate VSM
-enabled guests. It is a snapshot of the progress we made so far, and its
-main goal is to gather design feedback. Specifically on the KVM APIs we
-introduce. For a high level design overview, see the documentation in
-patch 33.
+Additionally, cpuid.c implicitly relied on hyperv.h's inclusion through
+lapic.h, so include it explicitly there.
 
-Additionally, this topic will be discussed as part of the KVM
-Micro-conference, in this year's Linux Plumbers Conference [2].
+Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
+---
+ arch/x86/kvm/cpuid.c | 1 +
+ arch/x86/kvm/lapic.h | 1 -
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
-The series is accompanied by two repositories:
- - A PoC QEMU implementation of VSM [3].
- - VSM kvm-unit-tests [4].
-
-Note that this isn't a full VSM implementation. For now it only supports
-2 VTLs, and only runs on uniprocessor guests. It is capable of booting
-Windows Sever 2016/2019, but is unstable during runtime.
-
-The series is based on the v6.6 kernel release, and depends on the
-introduction of KVM memory attributes, which is being worked on
-independently in "KVM: guest_memfd() and per-page attributes" [5]. A full
-Linux tree is also made available [6].
-
-Series rundown:
- - Patch 2 introduces the concept of APIC ID groups.
- - Patches 3-12 introduce the VSM capability and basic VTL awareness into
-   Hyper-V emulation.
- - Patch 13 introduces vCPU polling support.
- - Patches 14-31 use KVM's memory attributes to implement VTL memory
-   protections. Introduces the VTL KMV device and secure memory
-   intercepts.
- - Patch 32 is a temporary implementation of
-   HVCALL_TRANSLATE_VIRTUAL_ADDRESS necessary to boot Windows 2019.
- - Patch 33 introduces documentation.
-
-Our intention is to integrate feedback gathered in the RFC and LPC while
-we finish the VSM implementation. In the future, we will split the series
-into distinct feature patch sets and upstream these independently.
-
-Thanks,
-Nicolas
-
-[1] https://raw.githubusercontent.com/Microsoft/Virtualization-Documentation/master/tlfs/Hypervisor%20Top%20Level%20Functional%20Specification%20v6.0b.pdf
-[2] https://lpc.events/event/17/sessions/166/#20231114
-[3] https://github.com/vianpl/qemu/tree/vsm-rfc-v1
-[4] https://github.com/vianpl/kvm-unit-tests/tree/vsm-rfc-v1
-[5] https://lore.kernel.org/lkml/20231105163040.14904-1-pbonzini@redhat.com/.
-[6] Full tree: https://github.com/vianpl/linux/tree/vsm-rfc-v1. 
-    There are also two small dependencies with
-    https://marc.info/?l=kvm&m=167887543028109&w=2 and
-    https://lkml.org/lkml/2023/10/17/972
-
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 773132c3bf5a..eabd5e9dc003 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -28,6 +28,7 @@
+ #include "trace.h"
+ #include "pmu.h"
+ #include "xen.h"
++#include "hyperv.h"
+ 
+ /*
+  * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index 0a0ea4b5dd8c..e1021517cf04 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -6,7 +6,6 @@
+ 
+ #include <linux/kvm_host.h>
+ 
+-#include "hyperv.h"
+ #include "smm.h"
+ 
+ #define KVM_APIC_INIT		0
+-- 
+2.40.1
 
 
