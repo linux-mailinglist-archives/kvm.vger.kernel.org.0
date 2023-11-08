@@ -1,235 +1,143 @@
-Return-Path: <kvm+bounces-1187-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1179-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88B9E7E556B
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 12:25:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C98597E5547
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 12:24:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA1D61C20E25
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 11:25:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89CFF1F21FE3
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 11:24:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48DE415EAE;
-	Wed,  8 Nov 2023 11:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A2F17987;
+	Wed,  8 Nov 2023 11:23:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="lpv9ixHt"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fXFFj9Ev"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF73101D2;
-	Wed,  8 Nov 2023 11:25:29 +0000 (UTC)
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE0251FE6;
-	Wed,  8 Nov 2023 03:25:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1699442729; x=1730978729;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=pKFAR2whklJOfx0aE2YbJs1djQGs6K3PfD1UPNSSZz8=;
-  b=lpv9ixHtv3vsCQrayxp3rZEZ1aMCCZtv2Ex0GTnkf7QGEq+jVR0RVBHD
-   Gt5PPp2pBc9vsTotBUFYExN9lLZt7EbH78gjtCU8pSc4kLzPE+s5b7wHC
-   +yAhecJ/HG2TTnxJrYXeP0ba+SYcm9xiM7Fv0/64ut0+/NK36E43X2T4F
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.03,286,1694736000"; 
-   d="scan'208";a="375132593"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-f253a3a3.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 11:25:28 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2b-m6i4x-f253a3a3.us-west-2.amazon.com (Postfix) with ESMTPS id BAE6980718;
-	Wed,  8 Nov 2023 11:25:27 +0000 (UTC)
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.43.254:32548]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.45.210:2525] with esmtp (Farcaster)
- id 5bc3b812-def8-49f3-9115-267bad567819; Wed, 8 Nov 2023 11:25:26 +0000 (UTC)
-X-Farcaster-Flow-ID: 5bc3b812-def8-49f3-9115-267bad567819
-Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Wed, 8 Nov 2023 11:25:26 +0000
-Received: from dev-dsk-nsaenz-1b-189b39ae.eu-west-1.amazon.com (10.13.235.138)
- by EX19D004EUC001.ant.amazon.com (10.252.51.190) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Wed, 8 Nov 2023 11:25:21 +0000
-From: Nicolas Saenz Julienne <nsaenz@amazon.com>
-To: <kvm@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
-	<pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-	<anelkz@amazon.com>, <graf@amazon.com>, <dwmw@amazon.co.uk>,
-	<jgowans@amazon.com>, <corbert@lwn.net>, <kys@microsoft.com>,
-	<haiyangz@microsoft.com>, <decui@microsoft.com>, <x86@kernel.org>,
-	<linux-doc@vger.kernel.org>, Nicolas Saenz Julienne <nsaenz@amazon.com>
-Subject: [RFC 33/33] Documentation: KVM: Introduce "Emulating Hyper-V VSM with KVM"
-Date: Wed, 8 Nov 2023 11:18:06 +0000
-Message-ID: <20231108111806.92604-34-nsaenz@amazon.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231108111806.92604-1-nsaenz@amazon.com>
-References: <20231108111806.92604-1-nsaenz@amazon.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE271774C
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 11:23:49 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E0FF2599;
+	Wed,  8 Nov 2023 03:23:47 -0800 (PST)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A8BIXjd005362;
+	Wed, 8 Nov 2023 11:23:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=jtWIZGyRTnMfkGH9XQM+li0IZT1L/GHYJT26KII8tH4=;
+ b=fXFFj9EvWZDQA6eYDjwMrkByFIwPeB5P/zqke8Fkr5DFqGGOe9G3L4XQqf9KoaZveO+R
+ F7/Vonbu8Xff82wxMCFSHtpYW4eMPGrU9WQ7z3t9jEuWqgfAc6tR3l235cCGIH2WwWOe
+ uZzXISBJ1tABFZZSGcafFZt6u9EvTMZ8tfpRf9YRuZs1WOo3RUR4KcittkRHynqEVx0N
+ 24QaZEIBj0aWeirW1zmjFCfdCMav926ed/WTJVqvHhpo4yBsH3GuIOyW/ocP8X4Vq4SD
+ aye+2niyWcjqmvoRkLA7dRuXwsNGaqaCRqaI6X6mUu6JNsAHoXnesVCSaUc98Rr5FsLm KA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u88uqt903-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Nov 2023 11:23:46 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A8BJBFH011564;
+	Wed, 8 Nov 2023 11:23:46 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u88uqt8xg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Nov 2023 11:23:46 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A8BHcaY014372;
+	Wed, 8 Nov 2023 11:23:44 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u7w21vam1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Nov 2023 11:23:43 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A8BNeuR19202686
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 8 Nov 2023 11:23:40 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2812320040;
+	Wed,  8 Nov 2023 11:23:40 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DC47220043;
+	Wed,  8 Nov 2023 11:23:39 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  8 Nov 2023 11:23:39 +0000 (GMT)
+Date: Wed, 8 Nov 2023 12:23:38 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Cc: Janosch Frank <frankja@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Christian
+ Borntraeger <borntraeger@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Sven Schnelle
+ <svens@linux.ibm.com>
+Subject: Re: [PATCH v2 2/4] KVM: s390: vsie: Fix length of facility list
+ shadowed
+Message-ID: <20231108122338.0ff2052e@p-imbrenda>
+In-Reply-To: <20231107123118.778364-3-nsg@linux.ibm.com>
+References: <20231107123118.778364-1-nsg@linux.ibm.com>
+	<20231107123118.778364-3-nsg@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="y"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.13.235.138]
-X-ClientProxiedBy: EX19D036UWC002.ant.amazon.com (10.13.139.242) To
- EX19D004EUC001.ant.amazon.com (10.252.51.190)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: GxDAHOQa6n4JoM46DkxvLLCBTAf_3boB
+X-Proofpoint-ORIG-GUID: 1YW4mzqluCbKw_l2-51fxetIjt6yvfcd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-08_01,2023-11-08_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 mlxlogscore=727 clxscore=1015 adultscore=0 mlxscore=0
+ spamscore=0 suspectscore=0 bulkscore=0 phishscore=0 malwarescore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311080095
 
-Introduce "Emulating Hyper-V VSM with KVM", which describes the KVM APIs
-made available to a VMM that wants to emulate Hyper-V's VSM.
+On Tue,  7 Nov 2023 13:31:16 +0100
+Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
 
-Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
----
- .../virt/kvm/x86/emulating-hyperv-vsm.rst     | 136 ++++++++++++++++++
- 1 file changed, 136 insertions(+)
- create mode 100644 Documentation/virt/kvm/x86/emulating-hyperv-vsm.rst
+[...]
 
-diff --git a/Documentation/virt/kvm/x86/emulating-hyperv-vsm.rst b/Documentation/virt/kvm/x86/emulating-hyperv-vsm.rst
-new file mode 100644
-index 000000000000..8f76bf09c530
---- /dev/null
-+++ b/Documentation/virt/kvm/x86/emulating-hyperv-vsm.rst
-@@ -0,0 +1,136 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+==============================
-+Emulating Hyper-V VSM with KVM
-+==============================
-+
-+Hyper-V's Virtual Secure Mode (VSM) is a virtualisation security feature
-+that leverages the hypervisor to create secure execution environments
-+within a guest. VSM is documented as part of Microsoft's Hypervisor Top
-+Level Functional Specification[1].
-+
-+Emulating Hyper-V's Virtual Secure Mode with KVM requires coordination
-+between KVM and the VMM. Most of the VSM state and configuration is left
-+to be handled by user-space, but some has made its way into KVM. This
-+document describes the mechanisms through which a VMM can implement VSM
-+support.
-+
-+Virtual Trust Levels
-+--------------------
-+
-+The main concept VSM introduces are Virtual Trust Levels or VTLs. Each
-+VTL is a CPU mode, with its own private CPU architectural state,
-+interrupt subsystem (limited to a local APIC), and memory access
-+permissions. VTLs are hierarchical, where VTL0 corresponds to normal
-+guest execution and VTL > 0 to privileged execution contexts. In
-+practice, when virtualising Windows on top of KVM, we only see VTL0 and
-+VTL1. Although the spec allows going all the way to VTL15. VTLs are
-+orthogonal to ring levels, so each VTL is capable of runnig its own
-+operating system and user-space[2].
-+
-+  ┌──────────────────────────────┐ ┌──────────────────────────────┐
-+  │ Normal Mode (VTL0)           │ │ Secure Mode (VTL1)           │
-+  │ ┌──────────────────────────┐ │ │ ┌──────────────────────────┐ │
-+  │ │   User-mode Processes    │ │ │ │Secure User-mode Processes│ │
-+  │ └──────────────────────────┘ │ │ └──────────────────────────┘ │
-+  │ ┌──────────────────────────┐ │ │ ┌──────────────────────────┐ │
-+  │ │         Kernel           │ │ │ │      Secure Kernel       │ │
-+  │ └──────────────────────────┘ │ │ └──────────────────────────┘ │
-+  └──────────────────────────────┘ └──────────────────────────────┘
-+  ┌───────────────────────────────────────────────────────────────┐
-+  │                         Hypervisor/KVM                        │
-+  └───────────────────────────────────────────────────────────────┘
-+  ┌───────────────────────────────────────────────────────────────┐
-+  │                           Hardware                            │
-+  └───────────────────────────────────────────────────────────────┘
-+
-+VTLs break the core assumption that a vCPU has a single architectural
-+state, lAPIC state, SynIC state, etc. As such, each VTL is modeled as a
-+distinct KVM vCPU, with the restriction that only one is allowed to run
-+at any moment in time. Having multiple KVM vCPUs tracking a single guest
-+CPU complicates vCPU numbering. VMs that enable VSM are expected to use
-+CAP_APIC_ID_GROUPS to segregate vCPUs (and their lAPICs) into different
-+groups. For example, a 4 CPU VSM VM will setup the APIC ID groups feature
-+so only the first two bits of the APIC ID are exposed to the guest. The
-+remaining bits represent the vCPU's VTL. The 'sibling' vCPU to VTL0's
-+vCPU2 at VTL3 will have an APIC ID of 0xE. Using this approach a VMM and
-+KVM are capable of querying a vCPU's VTL, or finding the vCPU associated
-+to a specific VTL.
-+
-+KVM's lAPIC implementation is aware of groups, and takes note of the
-+source vCPU's group when delivering IPIs. As such, it shouldn't be
-+possible to target a different VTL through the APIC. Interrupts are
-+delivered to the vCPU's lAPIC subsystem regardless of the VTL's runstate,
-+this also includes timers. Ultimately, any interrupt incoming from an
-+outside source (IOAPIC/MSIs) is routed to VTL0.
-+
-+Moving Between VTLs
-+-------------------
-+
-+All VSM configuration and VTL handling hypercalls are passed through to
-+user-space. Notably the two primitives that allow switching between VTLs.
-+All shared state synchronization and KVM vCPU scheduling is left to the
-+VMM to manage. For example, upon receiving a VTL call, the VMM stops the
-+vCPU that issued the hypercall, and schedules the vCPU corresponding to
-+the next privileged VTL. When that privileged vCPU is done executing, it
-+issues a VTL return hypercall, so the opposite operation happens. All
-+this is transparent to KVM, which limits itself to running vCPUs.
-+
-+An interrupt directed at a privileged VTL always has precedence over the
-+execution of lower VTLs. To honor this, the VMM can monitor events
-+targeted at privileged vCPUs with poll(), and should trigger an
-+asynchronous VTL switch whenever events become available. Additionally,
-+the target VTL's vCPU VP assist overlay page is used to notify the target
-+VTL with the reason for the switch. The VMM can keep track of the VP
-+assist page by installing an MSR filter for HV_X64_MSR_VP_ASSIST_PAGE.
-+
-+Hyper-V VP registers
-+--------------------
-+
-+VP register hypercalls are passed through to user-space. All requests can
-+be fulfilled either by using already existing KVM state ioctls, or are
-+related to VSM's configuration, which is already handled by the VMM. Note
-+that HV_REGISTER_VSM_CODE_PAGE_OFFSETS is the only VSM specific VP
-+register the kernel controls, as such it is made available through the
-+KVM_HV_GET_VSM_STATE ioctl.
-+
-+Per-VTL Memory Protections
-+--------------------------
-+
-+A privileged VTL can change the memory access restrictions of lower VTLs.
-+It does so to hide secrets from them, or to control what they are allowed
-+to execute. The list of memory protections allowed is[3]:
-+ - No access
-+ - Read-only, no execute
-+ - Read-only, execute
-+ - Read/write, no execute
-+ - Read/write, execute
-+
-+VTL memory protection hypercalls are passed through to user-space, but
-+KVM provides an interface that allows changing memory protections on a
-+per-VTL basis. This is made possible by the KVM VTL device. VMMs can
-+create one per VTL and it exposes a ioctl, KVM_SET_MEMORY_ATTRIBUTES,
-+that controls the memory protections applied to that VTL. The KVM TDP MMU
-+is VTL aware and page faults are resolved taking into account the
-+corresponding VTL device's memory attributes.
-+
-+When a memory access violates VTL memory protections, KVM issues a secure
-+memory intercept, which is passed as a SynIC message into the next
-+privileged VTL. This happens transparently for the VMM. Additionally, KVM
-+exits with a user-space memory fault. This allows the VMM to stop the
-+vCPU while the secure intercept is handled by the privileged VTL. In the
-+good case, the instruction that triggered the fault is emulated and
-+control is returned to the lower VTL, in the bad case, Windows crashes
-+gracefully.
-+
-+Hyper-V's TLFS also states that DMA should follow VTL0's memory access
-+restrictions. This is out of scope for this document, as IOMMU mappings
-+are not handled by KVM.
-+
-+[1] https://raw.githubusercontent.com/Microsoft/Virtualization-Documentation/master/tlfs/Hypervisor%20Top%20Level%20Functional%20Specification%20v6.0b.pdf
-+
-+[2] Conceptually this design is similar to arm's TrustZone: The
-+hypervisor plays the role of EL3. Windows (VTL0) runs in Non-Secure
-+(EL0/EL1) and the secure kernel (VTL1) in Secure World (EL1s/EL0s).
-+
-+[3] TLFS 15.9.3
--- 
-2.40.1
+> diff --git a/arch/s390/kernel/facility.c b/arch/s390/kernel/facility.c
+> new file mode 100644
+> index 000000000000..5e80a4f65363
+> --- /dev/null
+> +++ b/arch/s390/kernel/facility.c
+> @@ -0,0 +1,21 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright IBM Corp. 2023
+> + */
+> +
+> +#include <asm/facility.h>
+> +
+> +unsigned int stfle_size(void)
+> +{
+> +	static unsigned int size;
+> +	u64 dummy;
+> +	unsigned int r;
 
+reverse Christmas tree please :)
+
+
+with that fixed:
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+[...]
 
