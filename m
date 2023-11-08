@@ -1,255 +1,231 @@
-Return-Path: <kvm+bounces-1140-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1141-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A9727E50F3
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 08:28:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCA9F7E5148
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 08:43:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B6B41C20D50
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 07:28:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D72AB1C20D92
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 07:43:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 623EEDDA6;
-	Wed,  8 Nov 2023 07:27:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F2E4D505;
+	Wed,  8 Nov 2023 07:43:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="HqYz1f+q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gzfMoU13"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE2ED273;
-	Wed,  8 Nov 2023 07:27:49 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 073E8170D;
-	Tue,  7 Nov 2023 23:27:48 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 0698C100024;
-	Wed,  8 Nov 2023 10:27:47 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 0698C100024
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1699428467;
-	bh=RpkC5lfXlkMFYUw1ymgu4ywMbNeocePvX94SLreWShw=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=HqYz1f+qOByC8+Xdh71Jlne1jsd+gBV7aEZxjFrh2eHufZy8I7eDhlyBjD1hz0mTA
-	 r6KmRxK+VbNEzG+XL7Ip1Bw0fFqY352dq+0kKdro9chfjs2aXAEbkbKM4zNu/wyT0g
-	 mAigMZgyRx9HuJBhjUUv0QS5DQ2E+vJI09fhvmFJnNgV3PKjy4cJ22gnvNkztTjeqJ
-	 7JdWKO2+fsOl7dr3zhWJdknPvW+Mh7wJYybC4pjOq92HhHLT33flHMfA+3RNYsT1s6
-	 cvk0SS54bsehDigFqR9l5UbKly+BaGO6asi6xzRwgsqnEhhshG+ooNsRQ5+ewdfb/d
-	 fylXNVMS7vZkg==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Wed,  8 Nov 2023 10:27:46 +0300 (MSK)
-Received: from localhost.localdomain (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF56FD2EF
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 07:43:41 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DAAB1706;
+	Tue,  7 Nov 2023 23:43:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699429421; x=1730965421;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=LNvpcA/0bp1yfoy8AQ0iBwlhAZniXpI2f8Mudgao17c=;
+  b=gzfMoU13t4GHxv4veCnnWcCcOIbNn1ABCIo7lSQtD3DZki8iPECMWAnp
+   diC9rRv5MGnb3hnDnz6wAygGKIqLod4CmpGdgwvEkGrRDyaSR+EIZDg09
+   nto6t1slzS8evdOuImprJbhH9m3gVgSUeQ2nqqkAKIeIDOtciPk6eiGMD
+   VcOA7HR+icFIJCOaCdjr2ZOU0+Inlkj+9fBwzV6mqZeaFyZ+DwQmT6UBB
+   ULOwOANqKFjsvR9U3NMjwxqEWwA8iQS4mVVkJlv3zsQnB2b6pI+MRzkhn
+   61W6PP6iHEHxUGGvVxLNgy0IhBHiy4GVRaw5CH0srjahgzELaDL3/Fl2H
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10887"; a="374752676"
+X-IronPort-AV: E=Sophos;i="6.03,285,1694761200"; 
+   d="scan'208";a="374752676"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2023 23:43:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10887"; a="833403459"
+X-IronPort-AV: E=Sophos;i="6.03,285,1694761200"; 
+   d="scan'208";a="833403459"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Nov 2023 23:42:54 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Tue, 7 Nov 2023 23:42:53 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Tue, 7 Nov 2023 23:42:53 -0800
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.40) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Wed, 8 Nov 2023 10:27:46 +0300
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
-Subject: [RFC PATCH v1 2/2] vsock/test: SO_RCVLOWAT + deferred credit update test
-Date: Wed, 8 Nov 2023 10:20:04 +0300
-Message-ID: <20231108072004.1045669-3-avkrasnov@salutedevices.com>
-X-Mailer: git-send-email 2.35.0
-In-Reply-To: <20231108072004.1045669-1-avkrasnov@salutedevices.com>
-References: <20231108072004.1045669-1-avkrasnov@salutedevices.com>
+ 15.1.2507.34; Tue, 7 Nov 2023 23:42:53 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kssmyc9QldApz4ClJebsPQHAol2HIfi41tTYa1HTZxK1uhKnEqLzVfsH/KYJyzfn9jT6KJ05U9koOX9vVga1wOIPjOfOp1YAFhUV7MLCXc6IpFNgns3gfVye6yEt5FFI83GztbDjbMgd2lp/MwQU/mtSakeRKlP3x9CcXXg4E/+ET4392iVSH/yv7teWglXtS6PJxxneoGQFE4SG+vWPrO1i6+nv6xFKN6/v2LO15GET4r0JyrCa5rzzNGlm4SJXXSbVLCzIL2Z8O7gnwK04BqJt26lfwqjcsKARU1rcd5hypXSEbxCC26dwawAXlYGR/XXWFqUu04g5jA7hoDt9yw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BRzQC3EGAabLCZiR4j67gssJVDb8XBWcuiRRWx6tPmQ=;
+ b=EILEgPlkO4ixYzyrioPaoelJY1M35mWxapv1xSDALLy6gsWZDI1lkqbwRgRHLAt5EMM8XGmdjqSIyzvc5pBSgETMCLYZp9j52FgjsndmlszgRFgCjR/z//6Hda0uEp5MrFZTyoneZ6XESCEdtpQQooQVZlxDhgaEuj5rIxKSBa9dWf0wGjuS88e436WGikGjjKxqnPmHkL5/4vHrVMdvKbYa7nLJZ7sp0k4JMYtUurmbrWHUYAFwmT6xnAX4cqTA2clxwu3Bu8/6r6Q0cSMZAv+XwuH//+rD4Iq/ODSxpKhdQLpl4wQOVOqbVY5qDdXRtb7h34+C8dbmmRGjnSjXUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by SA1PR11MB6806.namprd11.prod.outlook.com (2603:10b6:806:24d::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.29; Wed, 8 Nov
+ 2023 07:42:50 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::e4ae:3948:1f55:547d]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::e4ae:3948:1f55:547d%4]) with mapi id 15.20.6954.024; Wed, 8 Nov 2023
+ 07:42:50 +0000
+Message-ID: <0ea819d9-1169-48b1-8579-3a054a0bd077@intel.com>
+Date: Wed, 8 Nov 2023 15:45:17 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 3/7] iommufd: Add iommufd_device_bind_pasid()
+Content-Language: en-US
+To: "Tian, Kevin" <kevin.tian@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
+	<jgg@nvidia.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
+CC: "cohuck@redhat.com" <cohuck@redhat.com>, "eric.auger@redhat.com"
+	<eric.auger@redhat.com>, "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mjrosato@linux.ibm.com"
+	<mjrosato@linux.ibm.com>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "yi.y.sun@linux.intel.com"
+	<yi.y.sun@linux.intel.com>, "peterx@redhat.com" <peterx@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
+	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
+ Zhenzhong" <zhenzhong.duan@intel.com>, "Martins, Joao"
+	<joao.m.martins@oracle.com>
+References: <20231009085123.463179-1-yi.l.liu@intel.com>
+ <20231009085123.463179-4-yi.l.liu@intel.com>
+ <BN9PR11MB5276BCF486E9E4F24913883E8CCDA@BN9PR11MB5276.namprd11.prod.outlook.com>
+From: Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <BN9PR11MB5276BCF486E9E4F24913883E8CCDA@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SI2PR01CA0015.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:191::15) To DS0PR11MB7529.namprd11.prod.outlook.com
+ (2603:10b6:8:141::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 181188 [Nov 08 2023]
-X-KSMG-AntiSpam-Version: 6.0.0.2
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4, {Tracking_from_domain_doesnt_match_to}, p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;salutedevices.com:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/11/08 04:00:00 #22424297
-X-KSMG-AntiVirus-Status: Clean, skipped
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|SA1PR11MB6806:EE_
+X-MS-Office365-Filtering-Correlation-Id: ce2082ae-b13d-4a6f-127d-08dbe02e4e79
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: tZFRKpOrtxrz/9Je/KqYYqWv0eYMnvB7Ci13V59o/auojaOcWKRtbxXUWVxrTmcQdRgG26Sr/8Nvrjf4cPunI/rKYT/1xJxziTqm2eeNqbGNVyjYGMuTE9q/I71AgpiGzAXB9KaFPzZPwfO5oWIMLhIBRtWj8lFaTLKhrdo9/oWZkbwWbcyKIviIi3FfT/lzmG7bkBMkDILODJ5/Wgem9VYU7nmKwFnn8/agRFhuSqHol1Qz6fK082Fi36qr79cfILYSOwYcKjxraEp7f6jsYkXqfceyQWZLFyDRSz5G5jdj0pmULZxFsHWrDFQP4qLKqgMF88YegfKxAzH1X6KUq8rRmRnp/AGm0MHtn/pIeylBIhw14rRV6kIoSlq2nZvzJRYT5RP6wYObgOo+2pXDBcIVKcbsmcBjjiitIfgpWB1gPcoVNTW9etqvSuQAnn6m+VVOfvnpwq8BuexniU0ICho/QszGYWtolk3P8DkK7UBlFTA/2ZUQr4UbS9dRaq6BcK0jITQj8ON6g0pbeBnVLZgFTeLUMpLhOJ367Gvxyi82xND+rpr3f1hF3QNB7DSmKKq4bRzvst4IePwuilt8y1p2FXdRX0VwfIsiIvWXcq3TPPc9P0YE2cJSkYOcpd8oaa2sOrHhjAz1jUDlurfWRQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(39860400002)(136003)(396003)(346002)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(31686004)(66899024)(6486002)(6666004)(478600001)(2616005)(53546011)(6506007)(6512007)(83380400001)(36756003)(38100700002)(86362001)(31696002)(82960400001)(66556008)(7416002)(5660300002)(66476007)(54906003)(66946007)(2906002)(41300700001)(26005)(110136005)(4326008)(8676002)(316002)(8936002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aFl3eXcxMWYwRFIwVzVHZTNQNndYWXJhMDFlUEI3aUI0dVpxVjNwM2NWM05p?=
+ =?utf-8?B?NjM5VVRIOHZZUW9oK3JnL1VlYXRUc0t0MC9nRHk3VlJVZ0hKVGdCSzBUalpI?=
+ =?utf-8?B?U0FRZ1AzS3pPQ09pRmZWVlVRS0xtK3pjb2R4V2kxSzNOVFBZZFlGdElDdHhV?=
+ =?utf-8?B?TkNSOWtFTUNBMFBVeFM4Nld3OW0rZENzOHhkcnFQL3p6eWNHQ0k1SGhxSWJB?=
+ =?utf-8?B?SWFmNWxNRWRrcmpzaWs5SHVzWDlwc1JTVVIyVFFRWjNhbzVVcjh5NVFQbmFr?=
+ =?utf-8?B?cFdiTFVPZVE2VU5SU294WHN5dVNGOVg5Tk5kVzlId2pBQm5odjFLbkllOVBE?=
+ =?utf-8?B?U0NkckJEY0VIK2RLcVlHOVVHeTdmd2RCYlVMRUEvSm50UllZSUJSd2Y3U3Yz?=
+ =?utf-8?B?YWZwaDl5N0I2YW1qdEF2a2lzak9SRFJsRWZyZTZWVUVQN2FkQlg3Z1R0Y09s?=
+ =?utf-8?B?eThVR0JGYVRLbVFUZlVOREpIZW5UK2lkSmNudVVrYnNidmJTWm5SeVZ5VG5h?=
+ =?utf-8?B?UjFJalVSVS9NenpWS09hcUwrTGdFdDE0K0p5NnJ6bDJOcmVIR3JDR3ZZRGhK?=
+ =?utf-8?B?bUhOSVVCMmdNamZ4Z0VReUEwWnRIQkJsZEFodERlU1p2MENWNjdMdGlOT1hx?=
+ =?utf-8?B?dUgvZ3lhaHRldFd2UndQT3BSOFdtU1F1RjJVWHVMem1mRUYyNGxPbElWT0NW?=
+ =?utf-8?B?OWI1dXJITC9sNG1wTEtRMVhJc3AvdzQ2ZHIrNkw2c2hTWTBha0VJN25pQXJZ?=
+ =?utf-8?B?WXdCYmpFVlU1M01xVGxRN24zYXdSaWEySFRPUzAxMStzWXNaSGdZYS9GL2Y0?=
+ =?utf-8?B?dzcrYzluMHkvWDd0Z3VhMTl5S2grOHBqMmRzdWhWcGFlenF1dXFOOTh0dFR6?=
+ =?utf-8?B?T2tSWmFRRjF6cjhBcC9JRUFIVElXV1pSRW05cVJYeXpGQ0tPMDd6N0ZJMHVD?=
+ =?utf-8?B?ZzJpaVY0SEtTL1JabXhqbmxGMUxQTkhDaHVud3h6allJeEVIR0xNeFJrd3pn?=
+ =?utf-8?B?VXNPbC9uQ2pxUnY1WnVxMEJDdmR5d3lDemowcGptbFRXNTR0dHFnVHJpbjR5?=
+ =?utf-8?B?b0MxYkt1V2gvbVM0STBTazhOQnl1QmliTU1peFI2T1B5NzQ1RU13T015TGJ6?=
+ =?utf-8?B?QTc2OEkrcTBNOXV0dk9Lc3h1VVNlY1RMYnRyczdTckZRNDhieHRDbkNGc2Jr?=
+ =?utf-8?B?ZTJ1bHZyTnBYbCtwb1JBNkZzeVpTZDRrVCtLVTQ1RU1HNEp0OUQ4Mm53Q1l5?=
+ =?utf-8?B?dlVIZStPZmJUMXpjaWVSdHo0V1d1RS9POURoU0pGbm5SU0FtTjVVd0ZpY0pw?=
+ =?utf-8?B?TEIvU0N0VVRndElnd1ZxNHpFM08xdUhUbVJXRnQ0eTBFRXpaNElhUW4ycWZQ?=
+ =?utf-8?B?VSsycVpjdkVpeFJlcmcvZUFNT2RqeVZqaEc2R1NoOG9xaXFySHhHZXd6TUFk?=
+ =?utf-8?B?T2wwUlFoVmljQk1DWTBKOTE5ZkJrUk5oOGsxbTJaSlArN2gramFkVWkzZHU0?=
+ =?utf-8?B?RlYrTWpkcWp6c08xbWpaSTF1NGM3K0o1SkhDUnFjRG55czdJOHREK2ZSVHhE?=
+ =?utf-8?B?ekdwNlN3dUJPdzc4Ly9MeUFzNnJRd2VRNTNhcUUyRnpUeVlVaFlYS0s1dzZI?=
+ =?utf-8?B?MEc0QVNDcE1IeTFvMmErRllYWGt0THVMV1FvaGI3SUZURG5vWHpIcDFSaER5?=
+ =?utf-8?B?QWFDWWpMNmtOTDVkVUV2NmMveDdZRHQzb2ZaVThnVUE2ZHN6YVBVd2RrLzc4?=
+ =?utf-8?B?Zkd5Y3c3R3BTd2hBbDdoc3h0eGgvK1krTVNaM2FJcFhTRmw3Z2p6bVQvOE1Z?=
+ =?utf-8?B?MFRBRWY3TGNHZ2xDRXV4T2VGWmEyZVdrelJhc0x2U3lheVQ1MWdvRW1kcEcz?=
+ =?utf-8?B?ZXFkaVhTaHVub1BHS3BNT2FrQXk0d1BrallSUVdWbjBFdzhVWjJkUUltbkdy?=
+ =?utf-8?B?SkM3cjhtRVg5MG5ZMGRmU2RaemFkaUE4QUFuUlJDQm1GM1doTFVuQmhWSFVl?=
+ =?utf-8?B?OGhmTFArZUYvQkttRkxQN3RLL2JKQXRvOHdMOXRPd3lJb015ZnJhR0dvMHk1?=
+ =?utf-8?B?dmoyYUJXeGFueDBoMDgrNVZXa1NoVldITU8vd0dJeDd3WlpLenZycWdNZTM0?=
+ =?utf-8?Q?w+WE2dIAeohp+c7R/PwgBDXfb?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ce2082ae-b13d-4a6f-127d-08dbe02e4e79
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2023 07:42:49.5949
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nKpwG1rMDqLjVf4x7J8BYs7gGHHuFAMQgYha7Nkj8JhwG8VZCUfh8bbnzS6QxurgLOwVn85TUUT29Mo63KK/wA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6806
+X-OriginatorOrg: intel.com
 
-This adds test which checks, that updating SO_RCVLOWAT value also sends
-credit update message. Otherwise mutual hungup may happen when receiver
-didn't send credit update and then calls 'poll()' with non default
-SO_RCVLOWAT value (e.g. waiting enough bytes to read), while sender
-waits for free space at receiver's side.
+On 2023/10/10 16:19, Tian, Kevin wrote:
+>> From: Liu, Yi L <yi.l.liu@intel.com>
+>> Sent: Monday, October 9, 2023 4:51 PM
+>>
+>> +struct iommufd_device *iommufd_device_bind_pasid(struct iommufd_ctx
+>> *ictx,
+>> +						 struct device *dev,
+>> +						 u32 pasid, u32 *id)
+>> +{
+>> +	struct iommufd_device *idev;
+>> +	int rc;
+>> +
+>> +	/*
+>> +	 * iommufd always sets IOMMU_CACHE because we offer no way for
+>> userspace
+>> +	 * to restore cache coherency.
+>> +	 */
+>> +	if (!device_iommu_capable(dev, IOMMU_CAP_CACHE_COHERENCY))
+>> +		return ERR_PTR(-EINVAL);
+>> +
+>> +	/*
+>> +	 * No iommu supports pasid-granular msi message today. Here we
+>> +	 * just check whether the parent device can do safe interrupts.
+>> +	 * Isolation between virtual devices within the parent device
+>> +	 * relies on the parent driver to enforce.
+>> +	 */
+>> +	if (!iommufd_selftest_is_mock_dev(dev) &&
+>> +	    !msi_device_has_isolated_msi(dev)) {
+>> +		rc = iommufd_allow_unsafe_interrupts(dev);
+>> +		if (rc)
+>> +			return ERR_PTR(rc);
+>> +	}
+>> +
+> 
+> Only MemWr w/o pasid can be interpreted as an interrupt message
+> then we need msi isolation to protect.
 
-Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
----
- tools/testing/vsock/vsock_test.c | 131 +++++++++++++++++++++++++++++++
- 1 file changed, 131 insertions(+)
+yes.
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index c1f7bc9abd22..c71b3875fd16 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -1180,6 +1180,132 @@ static void test_stream_shutrd_server(const struct test_opts *opts)
- 	close(fd);
- }
- 
-+#define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
-+#define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE	(1024 * 64)
-+
-+static void test_stream_rcvlowat_def_cred_upd_client(const struct test_opts *opts)
-+{
-+	size_t buf_size;
-+	void *buf;
-+	int fd;
-+
-+	fd = vsock_stream_connect(opts->peer_cid, 1234);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Send 1 byte more than peer's buffer size. */
-+	buf_size = RCVLOWAT_CREDIT_UPD_BUF_SIZE + 1;
-+
-+	buf = malloc(buf_size);
-+	if (!buf) {
-+		perror("malloc");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Wait until peer sets needed buffer size. */
-+	control_expectln("SRVREADY");
-+
-+	if (send(fd, buf, buf_size, 0) != buf_size) {
-+		perror("send failed");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	free(buf);
-+	close(fd);
-+}
-+
-+static void test_stream_rcvlowat_def_cred_upd_server(const struct test_opts *opts)
-+{
-+	size_t recv_buf_size;
-+	struct pollfd fds;
-+	size_t buf_size;
-+	void *buf;
-+	int fd;
-+
-+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	buf_size = RCVLOWAT_CREDIT_UPD_BUF_SIZE;
-+
-+	if (setsockopt(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
-+		       &buf_size, sizeof(buf_size))) {
-+		perror("setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	buf = malloc(buf_size);
-+	if (!buf) {
-+		perror("malloc");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_writeln("SRVREADY");
-+
-+	/* Wait until there will be 128KB of data in rx queue. */
-+	while (1) {
-+		ssize_t res;
-+
-+		res = recv(fd, buf, buf_size, MSG_PEEK);
-+		if (res == buf_size)
-+			break;
-+
-+		if (res <= 0) {
-+			fprintf(stderr, "unexpected 'recv()' return: %zi\n", res);
-+			exit(EXIT_FAILURE);
-+		}
-+	}
-+
-+	/* There is 128KB of data in the socket's rx queue,
-+	 * dequeue first 64KB, credit update is not sent.
-+	 */
-+	recv_buf_size = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
-+	recv_buf(fd, buf, recv_buf_size, 0, recv_buf_size);
-+	recv_buf_size++;
-+
-+	/* Updating SO_RCVLOWAT will send credit update. */
-+	if (setsockopt(fd, SOL_SOCKET, SO_RCVLOWAT,
-+		       &recv_buf_size, sizeof(recv_buf_size))) {
-+		perror("setsockopt(SO_RCVLOWAT)");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	memset(&fds, 0, sizeof(fds));
-+	fds.fd = fd;
-+	fds.events = POLLIN | POLLRDNORM | POLLERR |
-+		     POLLRDHUP | POLLHUP;
-+
-+	/* This 'poll()' will return once we receive last byte
-+	 * sent by client.
-+	 */
-+	if (poll(&fds, 1, -1) < 0) {
-+		perror("poll");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (fds.revents & POLLERR) {
-+		fprintf(stderr, "'poll()' error\n");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (fds.revents & (POLLIN | POLLRDNORM)) {
-+		recv_buf(fd, buf, recv_buf_size, 0, recv_buf_size);
-+	} else {
-+		/* These flags must be set, as there is at
-+		 * least 64KB of data ready to read.
-+		 */
-+		fprintf(stderr, "POLLIN | POLLRDNORM expected\n");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	free(buf);
-+	close(fd);
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -1285,6 +1411,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_stream_msgzcopy_empty_errq_client,
- 		.run_server = test_stream_msgzcopy_empty_errq_server,
- 	},
-+	{
-+		.name = "SOCK_STREAM virtio SO_RCVLOWAT + deferred cred update",
-+		.run_client = test_stream_rcvlowat_def_cred_upd_client,
-+		.run_server = test_stream_rcvlowat_def_cred_upd_server,
-+	},
- 	{},
- };
- 
+> 
+> But for SIOV all MemWr's are tagged with a pasid hence can never
+> trigger an interrupt. From this angle looks this check is unnecessary.
+
+But the interrupts out from a SIOV virtual device do not have pasid (at
+least today). Seems still need a check here if we consider this bind for
+a SIOV virtual device just like binding a physical device.
+
 -- 
-2.25.1
-
+Regards,
+Yi Liu
 
