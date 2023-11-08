@@ -1,147 +1,138 @@
-Return-Path: <kvm+bounces-1152-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1153-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05A4A7E54B9
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 12:08:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7945B7E54D7
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 12:18:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7DFD2815ED
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 11:08:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9ECE1C20D84
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 11:18:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2953A15EAA;
-	Wed,  8 Nov 2023 11:08:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F0515EA6;
+	Wed,  8 Nov 2023 11:18:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ezLT5BtM"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="KFXFH01+"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1672215E8F
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 11:08:26 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91D75186;
-	Wed,  8 Nov 2023 03:08:26 -0800 (PST)
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A8B2aRo011941;
-	Wed, 8 Nov 2023 11:08:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=wQfsumlE/4KoVpeoY1BBvoVwdlPJMYBZO0PvYuw9GAA=;
- b=ezLT5BtM23jrLTJz86sfNz+L2x30QhN11Nl1s7YeHiaHMh/LZ/XN2QzzmuFgnmNa00M3
- AkVRAzNUL68hRMU/hasm0WmBDaBvpVkuxxvGpvx+boG9QB3ncyJ12/HM7PJz2pRXdH0u
- RiLjcsJkJZu1yJ8cyZF9dS/oyfXpYilc7/ahfkZpIRx9i9Z6YFwuIainUJEkS623kvl3
- buIxe+0THqS00QCl9DE3P8suz341v/AZJPCVYzl8/sPZpZdPRw7cTha9k4481t/dBi/e
- Cx3dk1EOdavToMwOxKZv0JnrCj4ViGMDF7291datqNsUa33IhuxIbu6unz+Y4hsToCA3 HA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u893y8ja2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Nov 2023 11:08:25 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A8B3Oqi018887;
-	Wed, 8 Nov 2023 11:06:32 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u893y8j7j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Nov 2023 11:06:31 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A88V7u7019256;
-	Wed, 8 Nov 2023 11:06:29 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u7w23v6nf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Nov 2023 11:06:28 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A8B6Q4l39518652
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 8 Nov 2023 11:06:26 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E510520049;
-	Wed,  8 Nov 2023 11:06:25 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BE25520040;
-	Wed,  8 Nov 2023 11:06:25 +0000 (GMT)
-Received: from osiris (unknown [9.152.212.60])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed,  8 Nov 2023 11:06:25 +0000 (GMT)
-Date: Wed, 8 Nov 2023 12:06:24 +0100
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sven Schnelle <svens@linux.ibm.com>
-Subject: Re: [PATCH v2 2/4] KVM: s390: vsie: Fix length of facility list
- shadowed
-Message-ID: <20231108110624.7251-A-hca@linux.ibm.com>
-References: <20231107123118.778364-1-nsg@linux.ibm.com>
- <20231107123118.778364-3-nsg@linux.ibm.com>
- <20231107181105.3143f8f7@p-imbrenda>
- <2fb17d9dd20078bc995887a3699dd008403b50ff.camel@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6570415487;
+	Wed,  8 Nov 2023 11:18:31 +0000 (UTC)
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2C83101;
+	Wed,  8 Nov 2023 03:18:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1699442311; x=1730978311;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=YhNiCY6Yx16hIA8ic6bDnU8CklxIVvoOxjYhmVU762I=;
+  b=KFXFH01+WyKZVuGXSf+Ano1t5HqH4ywbQheqAJa6homt8uBTBLEo7NpO
+   mG65UaJQHbEmtZp6YhIXHpCCp/+Exe8ozrAhXA+i4sQ+O66EPO1Hsr+DZ
+   ftf8HaracbQVHh+VARBIggQLgn81310Sh/zYUHrSX+7HOACPx8iVcyWjr
+   o=;
+X-IronPort-AV: E=Sophos;i="6.03,286,1694736000"; 
+   d="scan'208";a="683505176"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-f05d30a1.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 11:18:25 +0000
+Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
+	by email-inbound-relay-iad-1d-m6i4x-f05d30a1.us-east-1.amazon.com (Postfix) with ESMTPS id 74C1080D5F;
+	Wed,  8 Nov 2023 11:18:21 +0000 (UTC)
+Received: from EX19MTAEUC002.ant.amazon.com [10.0.43.254:31015]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.43.105:2525] with esmtp (Farcaster)
+ id b8d2a861-c97a-4ec8-b470-7641a9da532f; Wed, 8 Nov 2023 11:18:20 +0000 (UTC)
+X-Farcaster-Flow-ID: b8d2a861-c97a-4ec8-b470-7641a9da532f
+Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
+ EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Wed, 8 Nov 2023 11:18:20 +0000
+Received: from dev-dsk-nsaenz-1b-189b39ae.eu-west-1.amazon.com (10.13.235.138)
+ by EX19D004EUC001.ant.amazon.com (10.252.51.190) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Wed, 8 Nov 2023 11:18:15 +0000
+From: Nicolas Saenz Julienne <nsaenz@amazon.com>
+To: <kvm@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
+	<pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+	<anelkz@amazon.com>, <graf@amazon.com>, <dwmw@amazon.co.uk>,
+	<jgowans@amazon.com>, <corbert@lwn.net>, <kys@microsoft.com>,
+	<haiyangz@microsoft.com>, <decui@microsoft.com>, <x86@kernel.org>,
+	<linux-doc@vger.kernel.org>
+Subject: [RFC 0/33] KVM: x86: hyperv: Introduce VSM support
+Date: Wed, 8 Nov 2023 11:17:33 +0000
+Message-ID: <20231108111806.92604-1-nsaenz@amazon.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2fb17d9dd20078bc995887a3699dd008403b50ff.camel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: k7cIoA4QfR4280xEaLLFQJ8u5442OXAy
-X-Proofpoint-GUID: 2APF8igC4Vy7ixo-aIW0JMT8yNeAXB_2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-08_01,2023-11-08_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
- lowpriorityscore=0 phishscore=0 spamscore=0 mlxscore=0 malwarescore=0
- impostorscore=0 bulkscore=0 adultscore=0 mlxlogscore=817
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311080093
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.13.235.138]
+X-ClientProxiedBy: EX19D037UWC004.ant.amazon.com (10.13.139.254) To
+ EX19D004EUC001.ant.amazon.com (10.252.51.190)
 
-On Wed, Nov 08, 2023 at 11:30:09AM +0100, Nina Schoetterl-Glausch wrote:
-> On Tue, 2023-11-07 at 18:11 +0100, Claudio Imbrenda wrote:
-> > On Tue,  7 Nov 2023 13:31:16 +0100
-> > Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
-> > 
-> > [...]
-> > 
-> > > -obj-y	+= smp.o text_amode31.o stacktrace.o abs_lowcore.o
-> > > +obj-y	+= smp.o text_amode31.o stacktrace.o abs_lowcore.o facility.o
-> > >  
-> > >  extra-y				+= vmlinux.lds
-> > >  
-> > > diff --git a/arch/s390/kernel/facility.c b/arch/s390/kernel/facility.c
-> > > new file mode 100644
-> > > index 000000000000..5e80a4f65363
-> > > --- /dev/null
-> > > +++ b/arch/s390/kernel/facility.c
-> > 
-> > I wonder if this is the right place for this?
-> 
-> I've wondered the same :D
-> > 
-> > This function seems to be used only for vsie, maybe you can just move
-> > it to vsie.c? or do you think it will be used elsewhere too?
-> 
-> It's a general STFLE function and if I put it into vsie.c I'm not sure
-> that, if the same functionality was required somewhere else, it would be
-> found and moved to a common location.
-> 
-> I was also somewhat resistant to calling a double underscore function from
-> vsie.c. Of course I could implement it with my own inline asm...
-> 
-> The way I did it seemed nicest, but if someone else has a strong opinion
-> I'll defer to that.
+Hyper-V's Virtual Secure Mode (VSM) is a virtualisation security feature
+that leverages the hypervisor to create secure execution environments
+within a guest. VSM is documented as part of Microsoft's Hypervisor Top
+Level Functional Specification [1]. Security features that build upon
+VSM, like Windows Credential Guard, are enabled by default on Windows 11,
+and are becoming a prerequisite in some industries.
 
-I think it is ok to have new file for just this. It is better than what
-we've done too often in the past: dump new functionality to some more or
-less random file instead. The usual victim would have been setup.c.
+This RFC series introduces the necessary infrastructure to emulate VSM
+enabled guests. It is a snapshot of the progress we made so far, and its
+main goal is to gather design feedback. Specifically on the KVM APIs we
+introduce. For a high level design overview, see the documentation in
+patch 33.
 
-So I prefer a new file, even if we end up with only one function there.
+Additionally, this topic will be discussed as part of the KVM
+Micro-conference, in this year's Linux Plumbers Conference [2].
+
+The series is accompanied by two repositories:
+ - A PoC QEMU implementation of VSM [3].
+ - VSM kvm-unit-tests [4].
+
+Note that this isn't a full VSM implementation. For now it only supports
+2 VTLs, and only runs on uniprocessor guests. It is capable of booting
+Windows Sever 2016/2019, but is unstable during runtime.
+
+The series is based on the v6.6 kernel release, and depends on the
+introduction of KVM memory attributes, which is being worked on
+independently in "KVM: guest_memfd() and per-page attributes" [5]. A full
+Linux tree is also made available [6].
+
+Series rundown:
+ - Patch 2 introduces the concept of APIC ID groups.
+ - Patches 3-12 introduce the VSM capability and basic VTL awareness into
+   Hyper-V emulation.
+ - Patch 13 introduces vCPU polling support.
+ - Patches 14-31 use KVM's memory attributes to implement VTL memory
+   protections. Introduces the VTL KMV device and secure memory
+   intercepts.
+ - Patch 32 is a temporary implementation of
+   HVCALL_TRANSLATE_VIRTUAL_ADDRESS necessary to boot Windows 2019.
+ - Patch 33 introduces documentation.
+
+Our intention is to integrate feedback gathered in the RFC and LPC while
+we finish the VSM implementation. In the future, we will split the series
+into distinct feature patch sets and upstream these independently.
+
+Thanks,
+Nicolas
+
+[1] https://raw.githubusercontent.com/Microsoft/Virtualization-Documentation/master/tlfs/Hypervisor%20Top%20Level%20Functional%20Specification%20v6.0b.pdf
+[2] https://lpc.events/event/17/sessions/166/#20231114
+[3] https://github.com/vianpl/qemu/tree/vsm-rfc-v1
+[4] https://github.com/vianpl/kvm-unit-tests/tree/vsm-rfc-v1
+[5] https://lore.kernel.org/lkml/20231105163040.14904-1-pbonzini@redhat.com/.
+[6] Full tree: https://github.com/vianpl/linux/tree/vsm-rfc-v1. 
+    There are also two small dependencies with
+    https://marc.info/?l=kvm&m=167887543028109&w=2 and
+    https://lkml.org/lkml/2023/10/17/972
+
+
 
