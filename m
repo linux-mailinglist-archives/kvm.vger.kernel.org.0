@@ -1,203 +1,184 @@
-Return-Path: <kvm+bounces-1135-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1136-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A7707E4FD0
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 06:00:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CB417E5040
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 07:15:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FB091C20D73
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 05:00:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 163E7281410
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 06:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7162D8F68;
-	Wed,  8 Nov 2023 05:00:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF6C7D268;
+	Wed,  8 Nov 2023 06:15:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vljzlbzw"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="IUXL2eqk"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485906123
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 05:00:39 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C39E8193
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 21:00:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699419638; x=1730955638;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=/L55t3YbgczX++vw40HKVhCG70vBB090ZtyDFruxa+o=;
-  b=Vljzlbzwr8nawFeKngyqS/sZ9jJUywRrjjbbCWhXNwcHvuKk4JmhB4yr
-   CMCCQ/R/YNs46iKFBV8V6K4CrKD3OjHSL0Y4rC4jzUBr0j3xBcbkY5GQB
-   tClmftUCTCfsmbfGMt3ybbm5Xz5S0Dm/zaZS5eWJ9N0xRVk7R8acrnADu
-   bYHAO/r42w/rM4YKEqCydLxwcwNabhSYQWlcuuFTNKJSY3La/USTAFj27
-   IMm5GTvbPKOqXTpNSq7QpwPp8G9EByhLmANqbosDfxDedizPtWArkc839
-   /h6d/5JTnKz658pgYqw3YdxL7bXck52wPAaGPsTa1fKiWVCGsbi8VIqo/
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10887"; a="420796432"
-X-IronPort-AV: E=Sophos;i="6.03,285,1694761200"; 
-   d="scan'208";a="420796432"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2023 21:00:38 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10887"; a="756433869"
-X-IronPort-AV: E=Sophos;i="6.03,285,1694761200"; 
-   d="scan'208";a="756433869"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Nov 2023 21:00:38 -0800
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Tue, 7 Nov 2023 21:00:37 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Tue, 7 Nov 2023 21:00:37 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Tue, 7 Nov 2023 21:00:37 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Tue, 7 Nov 2023 21:00:35 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fJGG6XK8qx4cy7YY+CFNT4jY7CGCtexPuzLLTvONKZ0Rj21owkdMQZH1XybMdoLXcaU2d+kxg2gQFXYKaKm8QHohNtvPo0tPOtBpJk566WM3DDASg9A+k7JvgFCC+GF6UeznhPrQxsXRVxqUDXC3/YDCLjwBtPZeLXA0dz+fxjJG0JXZ3wRa+qoIbGyWxAaIWVtF18iVRifLTbGJGmMp9dnAl9Ffqi/JsSQ7Dg7ZyZEl5olc3/FBQxIyM4W6lBXwCn0qg7A0GoeEqOW3eGXXxeqtRiFdyabOV1A7f9/BHN3HYV8JRlQHkC95hFg0KK1F2mZliqt58NPDkt68+IufCA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ckPsxoIhHss8wD2K2jnQBWymTj/NzpwIWZahQAJN2Q4=;
- b=m2UWeKXSXr0+IExol4AOjqmMWOxsd3oi//bsaxjIJYk1oAMNUzhezTUBnO70xqHs1ARqbre09+2wXDaboIrN8ohABurn1e2MSR1vsHeIJFIsshdDz/7+xLChavWDCuUWKe6KFbUU/1Lcdn5f9tMj/GkVg5tChO06PTmJyK29rLvi/6qKt16SFmXLvZZSlHXVw3a1KSlZf5p1GmAgwvCecmdLFEkta6bCrdE4lSS4HajZYOdvD38Qq7vRmnGhwjj5Re+/w/mEiO9XSxXaiTwe7QBolyVJS69r7oMssCOfXPa2Rxuz0rrpA3apuDvAatmqB9idOsuMrUCKpm9uhQ17Ug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- SA3PR11MB7416.namprd11.prod.outlook.com (2603:10b6:806:316::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.27; Wed, 8 Nov
- 2023 05:00:19 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::32a9:54b8:4253:31d4]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::32a9:54b8:4253:31d4%4]) with mapi id 15.20.6954.029; Wed, 8 Nov 2023
- 05:00:19 +0000
-Date: Wed, 8 Nov 2023 12:32:01 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Yibo Huang <ybhuang@cs.utexas.edu>, <kvm@vger.kernel.org>
-Subject: Re: A question about how the KVM emulates the effect of guest MTRRs
- on AMD platforms
-Message-ID: <ZUsPQTh9qLva81pA@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <2C868574-37F4-437D-8355-46A6D1615E51@cs.utexas.edu>
- <ZTxEIGmq69mUraOD@google.com>
- <ZT+eipbV5+mSjr+G@yzhao56-desk.sh.intel.com>
- <ZUAC0jvFE0auohL4@google.com>
- <ZUDQXbDDsGI3KiQ8@yzhao56-desk.sh.intel.com>
- <ZUEZ4QRjUcu7y3gN@google.com>
- <ZUIVfpAz0+7jVZvC@yzhao56-desk.sh.intel.com>
- <ZUlp4AgjvoG7zk_Y@google.com>
- <ZUoCxyNsc/dB4/eN@yzhao56-desk.sh.intel.com>
- <ZUp8iqBDm_Ylqiau@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZUp8iqBDm_Ylqiau@google.com>
-X-ClientProxiedBy: SI2PR01CA0048.apcprd01.prod.exchangelabs.com
- (2603:1096:4:193::17) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB305CA70;
+	Wed,  8 Nov 2023 06:15:05 +0000 (UTC)
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2397FD41;
+	Tue,  7 Nov 2023 22:15:05 -0800 (PST)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 544A240E01AA;
+	Wed,  8 Nov 2023 06:15:02 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id EHip46odZLin; Wed,  8 Nov 2023 06:14:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1699424099; bh=Siw88j4EN9rm3CCkm9p9kBj7DtmN6TqUD8LWLvzmcHw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IUXL2eqk5iLpWnofHuVYCsP6OCPH/V28fpddsfAb1c80YKs4+RqnST/ctXMB+LDRV
+	 U7+qji0J1fuqA6tKsG2M6v716OrADMZPIAq1BRaI6qT4sycj6JuLU8m36R2DGMVFKO
+	 mUwDg1kOt6pFcSoG7armcB4E7RNcE4K7qxrnIQzfqD46dRfPYkdPu1eiKCzD9Ky2sY
+	 tMm9AqRCnBlw6mVVL48rRg3HEM3dM+KssgEJ5sYV9Z7b3d9fyVg4+AusCxTs/wb54b
+	 bOyvODvw7C1CIGk8ZO3Rhn7/eyk3IMdtf2JtQtLaF4ExnhEizRrChjG6sPgudGPn+B
+	 JzidoulbJu60FTJfRqNgAdNCYgl3Pqguk/tKWjdnwRf1NfEfKXkk/qh69Bcwr50/QJ
+	 dickcZ2iV1b4J/TskV2N4ne4jPBWPGJSWkZGq4LdPlYS/11VmkkySj9Y0kLF6F7EQZ
+	 OCQIT5lXqmwhRFg1iDeev1s8oH56rmw68ft3k+5kSmwtyuz64DjhD8lld0DNMqdtnN
+	 8QArxkMPMKTDT8PEuMhAHhFqyV5XGB10heb5B4VDJrjWb57AnINBp8n0PZHuERbWzl
+	 M0hg+46dZ44U8KcNNwqw4OgKxla8lzhR86yKCpqV1ku9qkzZY2UpHkPY5zCBfF+A5/
+	 /3q8YGTcgTjG23Z2bCwe9PPU=
+Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D946840E014B;
+	Wed,  8 Nov 2023 06:14:18 +0000 (UTC)
+Date: Wed, 8 Nov 2023 07:14:13 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: "Kalra, Ashish" <ashish.kalra@amd.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+	linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+	tony.luck@intel.com, marcorr@google.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
+	liam.merwick@oracle.com, zhi.a.wang@intel.com,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v10 06/50] x86/sev: Add the host SEV-SNP initialization
+ support
+Message-ID: <20231108061413.GAZUsnNVcmYZNMw2Kr@fat_crate.local>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-7-michael.roth@amd.com>
+ <20231107163142.GAZUpmbt/i3himIf+E@fat_crate.local>
+ <4a2016d6-dc1f-ff68-9827-0b72b7c8eac2@amd.com>
+ <20231107191931.GCZUqNwxP8JcSbjZ0/@fat_crate.local>
+ <20231107202757.GEZUqdzYyzVBHTBhZX@fat_crate.local>
+ <250f5513-91c0-d0b5-cb59-439e26ba16dc@amd.com>
+ <20231107212740.GFZUqrzK7yzy41dRKp@fat_crate.local>
+ <20231107220852.GGZUq1dHJ2q9LYV2oG@fat_crate.local>
+ <4b68fd05-5d21-0472-42c3-6cf6f1f9f967@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|SA3PR11MB7416:EE_
-X-MS-Office365-Filtering-Correlation-Id: fb31efaf-e612-47e3-dc4f-08dbe0179af0
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: DIL10OxnBF0V6pLNtgANzuoh/Sm6X3z0kcktQhBaoi8jfJqhu1CNOIJtHg4pJ8YZV+gazuJUhfpAtgqN+bZhxXZmysRp7f1VPHCyAFg52putavr7mvDGK4Xnv1bP2Ji4xtVpk1vElscbhoJ2t+rxeBnOv5HwBWzS5rqaB2HPgdEpxlchfG0L1Y1estjoRq8ssz/yrBGEahj+QxOcP3MbpmA0A8s8Q3esx0INQNFGwC+Az+vy2w52vewlHVbx8miDMw60p0IOYfXSGboZx5qU+LfuP8aefd4mGcPPY0FWIHfuuBgex3ZQKsSxdNWAGpFX9G/o3MGedpsepQZebciA+UlVWWU/JHVrlLTp2IHUff+GpUBjX0c7yUbKFFTTuxCKO8SjvYCsEYG7/dbD6JLpTOARaPYQAB1jFrXZQIkUn6kvL3CA/LvnbpQrT5ciG4oTRqzoGI/FBFE77zu7uXE6Up6PgdOMWqT/KsivLvgpCLpS/zBzqszv/rA4wZX0hP4BwEQdLVPVE7OH/bw4VGvZJgEtAgOvJ2u+Mv7Jg74xUNpYgHfNN5rKcUCYQ4kQx8kC
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(136003)(366004)(396003)(346002)(230922051799003)(186009)(451199024)(1800799009)(64100799003)(26005)(6512007)(6666004)(6506007)(8936002)(41300700001)(38100700002)(82960400001)(86362001)(8676002)(2906002)(6486002)(3450700001)(5660300002)(83380400001)(4326008)(66946007)(6916009)(316002)(478600001)(66556008)(66476007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?RY4c68URNvBvhA/OvUn6VQgsVN4rDkO6qMkcNjJpTWmJU+pFJgIBZAkm5zkV?=
- =?us-ascii?Q?PACYGAKDuwVU4XhQzBIgLAlDlFS+6PC29cM4xo0W9DwT+eUW6rjCOnTaAQpU?=
- =?us-ascii?Q?OZoDwiNcK76ICMqRYBuXkF7v0FfxMFrMyq7WOhgbAJJpUsJzZJ/cyS1N0lHq?=
- =?us-ascii?Q?GMKy0zo/Tk19m3cinWHv+ad7Asn1FMzmH/n0fMpU5H6AVoLQBX+fQKvCp1dR?=
- =?us-ascii?Q?n/HsSm58+S0xUE8FpfsHn6hlBURkmbuQuxnV603M6l4dyfPYS/80RZ4ndLVs?=
- =?us-ascii?Q?DOw1jwmYRiD1nfTIAKJ//o1fHOzwVPuP3wvKKEMWP2w9Drck+BaU/BqRtUAW?=
- =?us-ascii?Q?h9DNul8L4c2DHHReD8KlwPfPhfXMwjClIhzxWp0h++J9d8GVbMmm2Hv+mALN?=
- =?us-ascii?Q?o99aijmk5oRbsb1iOa/xUmD9LbKn8Mx4ernXCAk2BQ406l38ArHw3BpwaPZI?=
- =?us-ascii?Q?QbTl02VJmTw0SGi81InWjGcHb7KG2sGkYnymo3JA4fOOaae2YlKs0kQAsftM?=
- =?us-ascii?Q?3ZZ8CwXCFeIEEzqdrpgNqnkWGn+sEYyMIYNWR3gGolByYOTEE5tdcbBqgL2W?=
- =?us-ascii?Q?7mVkt3XSfdvkx21myq5UktiKyzRoBcPWuQFbULJRzUtcPeq9l9q7HAyHx2p6?=
- =?us-ascii?Q?jwpYWcsMveARcuIF39gSWmTMrS3uwrzr0yJCYwgnOyd9p9fEBsRby62M+W29?=
- =?us-ascii?Q?CSFLPaSTTRYeo6U6ejuaUOHfS0A0yalC6gpX2/uHRKQMOUXB/dtzJWydv6Ia?=
- =?us-ascii?Q?7ekZc9LmArq3/0/b0dSSbLpCRkp2suXqIKIDgoRYTTizETPvXbU8VK00W7l4?=
- =?us-ascii?Q?vF7p30/eKL57/Z4cklftXZL935mBtX80QcNXSHQ3rrVhmwiCxjK4RJQKPej8?=
- =?us-ascii?Q?/lrUeETlNqwOkx5a41kI9uNy314C+nr0s2h+qLroa0pLnkT2UnWuKc6QVlpg?=
- =?us-ascii?Q?VncMzXwaeLVn2oBYSP5vwIWrIRPs81/mVoNz6F2EOQHx/ODnj+UPilxf/jv4?=
- =?us-ascii?Q?TZUI1mKViKD5inzcXCAw6E4vGxhfWH+D9TDMuDduI5x0ORW0tTHioWACApia?=
- =?us-ascii?Q?r6X3/7lIqLsP4xkF2hAd7Wb2frQaC+aPavLXoxkFzqeYFQu3vB6mloYu0BMx?=
- =?us-ascii?Q?PU4/Wf6hd2gXdsEHZBoZcG0a23++3FoCU24WRl4Wp15fGQHe3Y77jOt/OrK5?=
- =?us-ascii?Q?n29JXOtzh+jcwSfaYU7+VkzK9xrmgUgx6VLxA045TA8mdh9EayBYHt1dwP7X?=
- =?us-ascii?Q?rOlDTcqpB1wWLWJd8/ZWSTBNFqEbVgNxXhC5aNDchh7I4/qod5z/OugZ866S?=
- =?us-ascii?Q?cG4ZlNHzTcDyjgMYj0q3/jqDx6SRwtbvYWOFk9VCItmz/aNK1c5O2lTTwGPy?=
- =?us-ascii?Q?Hg/n5V6n5W9KELf6YzUKk1ikUmoJcNh3ZuN9gNsPCmQ7kRZ/u15ku3DMdLic?=
- =?us-ascii?Q?CZT7gzCK2TDBsUJz5QBrFElmrFf99aVh2SJCZiHWfy6jnB/OhXMA5ieVgrnV?=
- =?us-ascii?Q?Xw2l8xwL7cJwZlWUe+2eeO6e6XMWpI0xe6RZC7Aqh+jU/P2aVrhAd9ekIlO+?=
- =?us-ascii?Q?7EX05U6eKHGynW+HtJlOKIkYNv9UEZI9dDDd97j4?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: fb31efaf-e612-47e3-dc4f-08dbe0179af0
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2023 05:00:19.4423
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HMOsSSOsarJ/uacwsvwsipU2YpNL3XVT0rkYsctWxy/Qhb5zV64l0uFPZc/sF61sNI8LF3f6W/SCs1wcYhh+rg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB7416
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4b68fd05-5d21-0472-42c3-6cf6f1f9f967@amd.com>
 
-On Tue, Nov 07, 2023 at 10:06:02AM -0800, Sean Christopherson wrote:
-> On Tue, Nov 07, 2023, Yan Zhao wrote:
-> > On Mon, Nov 06, 2023 at 02:34:08PM -0800, Sean Christopherson wrote:
-> > > On Wed, Nov 01, 2023, Yan Zhao wrote:
-> > > > On Tue, Oct 31, 2023 at 08:14:41AM -0700, Sean Christopherson wrote:
-> > 
-> > > > If no #MC, could EPT type of guest RAM also be set to WB (without IPAT) even
-> > > > without non-coherent DMA?
-> > > 
-> > > No, there are snooping/ordering issues on Intel, and to a lesser extent AMD.  AMD's
-> > > WC+ solves the most straightfoward cases, e.g. WC+ snoops caches, and VMRUN and
-> > > #VMEXIT flush the WC buffers to ensure that guest writes are visible and #VMEXIT
-> > > (and vice versa).  That may or may not be sufficient for multi-threaded use cases,
-> > > but I've no idea if there is actually anything to worry about on that front.  I
-> > > think there's also a flaw with guest using UC, which IIUC doesn't snoop caches,
-> > > i.e. the guest could get stale data.
-> > > 
-> > > AFAIK, Intel CPUs don't provide anything like WC+, so KVM would have to provide
-> > > something similar to safely let the guest control memtypes.  Arguably, KVM should
-> > > have such mechansisms anyways, e.g. to make non-coherent DMA VMs more robust.
-> > > 
-> > > But even then, there's still the question of why, i.e. what would be the benefit
-> > > of letting the guest control memtypes when it's not required for functional
-> > > correctness, and would that benefit outweight the cost.
-> > 
-> > Ok, so for a coherent device , if it's assigned together with a non-coherent
-> > device, and if there's a page with host PAT = WB and guest PAT=UC, we need to
-> > ensure the host write is flushed before guest read/write and guest DMA though no
-> > need to worry about #MC, right?
-> 
-> It's not even about devices, it applies to all non-MMIO memory, i.e. unless the
-> host forces UC for a given page, there's potential for WB vs. WC/UC issues.
-Do you think we can have KVM to expose an ioctl for QEMU to call in QEMU's
-invalidate_and_set_dirty() or in cpu_physical_memory_set_dirty_range()?
+On Tue, Nov 07, 2023 at 04:33:41PM -0600, Kalra, Ashish wrote:
+> We will still need some method to tell the IOMMU driver if SNP
+> support/feature is disabled by this function, for example, when CPU family
+> and model is not supported by SNP and we jump to no_snp label.
 
-In this ioctl, it can do nothing if non-coherent DMA is not attached and
-call clflush otherwise.
+See below.
+
+> The reliable way for this to work is to ensure snp_rmptable_init() is called
+> before IOMMU initialization and then IOMMU initialization depends on SNP
+> feature flag setup by snp_rmptable_init() to enable SNP support on IOMMU or
+> not.
+
+Yes, this whole SNP initialization needs to be reworked and split this
+way:
+
+- early detection work which needs to be done once goes to
+  bsp_init_amd(): that's basically your early_detect_mem_encrypt() stuff
+  which needs to happen exactly only once and early.
+
+- Any work like:
+
+	 c->x86_phys_bits -= (cpuid_ebx(0x8000001f) >> 6) & 0x3f;
+
+  and the like which needs to happen on each AP, gets put in a function
+  which gets called by init_amd().
+
+By the time IOMMU gets to init, you already know whether it should
+enable SNP and check X86_FEATURE_SEV_SNP.
+
+Finally, you call __snp_rmptable_init() which does the *per-CPU* init
+work which is still pending.
+
+Ok?
+
+Ontop of the previous ontop patch:
+
+---
+diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
+index 6cc2074fcea3..a9c95e5d6b06 100644
+--- a/arch/x86/kernel/cpu/amd.c
++++ b/arch/x86/kernel/cpu/amd.c
+@@ -674,8 +674,19 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
+ 		if (!(msr & MSR_K7_HWCR_SMMLOCK))
+ 			goto clear_sev;
+ 
+-		if (cpu_has(c, X86_FEATURE_SEV_SNP) && !early_rmptable_check())
+-			goto clear_snp;
++		if (cpu_has(c, X86_FEATURE_SEV_SNP)) {
++			/*
++			 * RMP table entry format is not architectural and it can vary by processor
++			 * and is defined by the per-processor PPR. Restrict SNP support on the known
++			 * CPU model and family for which the RMP table entry format is currently
++			 * defined for.
++			 */
++			if (c->x86 != 0x19 || c->x86_model > 0xaf)
++				goto clear_snp;
++
++			if (!early_rmptable_check())
++				goto clear_snp;
++		}
+ 
+ 		return;
+ 
+diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+index 9237c327ad6d..5a71df9ae4cb 100644
+--- a/arch/x86/virt/svm/sev.c
++++ b/arch/x86/virt/svm/sev.c
+@@ -199,14 +199,6 @@ static int __init snp_rmptable_init(void)
+ 	if (!amd_iommu_snp_en)
+ 		return 0;
+ 
+-	/*
+-	 * RMP table entry format is not architectural and it can vary by processor and
+-	 * is defined by the per-processor PPR. Restrict SNP support on the known CPU
+-	 * model and family for which the RMP table entry format is currently defined for.
+-	 */
+-	if (boot_cpu_data.x86 != 0x19 || boot_cpu_data.x86_model > 0xaf)
+-		goto nosnp;
+-
+ 	if (__snp_rmptable_init())
+ 		goto nosnp;
+ 
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
