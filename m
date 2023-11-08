@@ -1,130 +1,142 @@
-Return-Path: <kvm+bounces-1123-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1124-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B916C7E4E8F
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 02:27:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 388C67E4E97
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 02:29:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72C2228155F
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 01:27:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC0CFB20C3B
+	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 01:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB701EC4;
-	Wed,  8 Nov 2023 01:27:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5DCB80D;
+	Wed,  8 Nov 2023 01:28:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ogxh70b4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pSneeyQb"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F27A4A
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 01:27:19 +0000 (UTC)
-Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [IPv6:2001:41d0:1004:224b::af])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2617195
-	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 17:27:18 -0800 (PST)
-Date: Wed, 8 Nov 2023 01:27:12 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1699406837;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qE81o0GD7F0fBZc8J6Vqjr9RUqx87RrnSBX42jF+tBk=;
-	b=Ogxh70b41FrW4G30LbRTY6Yf30alC9M2Voqa6/yzAkXmpnqXfWM0WprELRjKOyxYwDyDg3
-	uDb78BtFxxvOPS8VXII5O/xynJwaWN1+KUa0NpFhbPIqn+H1hVN9ZuuLkAMU/uzkhJi0+L
-	KQNnLG8wxtqJ6rgZtbQVTsUHn03MhC0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: David Matlack <dmatlack@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-	kvm list <kvm@vger.kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	James Houghton <jthoughton@google.com>,
-	Oliver Upton <oupton@google.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Mike Kravetz <mike.kravetz@oracle.com>,
-	Andrea Arcangeli <aarcange@redhat.com>
-Subject: Re: RFC: A KVM-specific alternative to UserfaultFD
-Message-ID: <ZUrj8IK__59kHixL@linux.dev>
-References: <CALzav=d23P5uE=oYqMpjFohvn0CASMJxXB_XEOEi-jtqWcFTDA@mail.gmail.com>
- <ZUlLLGLi1IyMyhm4@x1n>
- <fcef7c96-a1bb-4c1d-962b-1bdc2a3b4f19@redhat.com>
- <CALzav=ejfDDRdjtx-ipFYrhNWPZnj3P0RSNHOQCP+OQf5YGX5w@mail.gmail.com>
- <ZUqn0OwtNR19PDve@linux.dev>
- <CALzav=evOG04=mtnc9Tf=bevWq0PbW_2Q=2e=ErruXtE+3gDVQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62FAD65B
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 01:28:53 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7193410FE
+	for <kvm@vger.kernel.org>; Tue,  7 Nov 2023 17:28:52 -0800 (PST)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-54357417e81so6553a12.0
+        for <kvm@vger.kernel.org>; Tue, 07 Nov 2023 17:28:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699406931; x=1700011731; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tnA6mDB+2g1i1w3tpZYM9LGAfchwHqjZLzHC1al8HTo=;
+        b=pSneeyQbVmgFR1nZsHZnb/NdnHaLZRcjO8a2zEl1D9bdiMW3X74upcKqAaD60AA9+H
+         ptKFtVjewDo/KWr9hmailfu1ph5JGZosVZi5yXHLiqiAo9sDB2gJ/9JIjFy3WVkMCcnJ
+         sidS/58/f3fW365fYfmQ9AV4h/wth+g2bge+f8pyOW/yrYPDFstPgdV5Z0w2A3qvluEc
+         nceSJ7HWxjozhQo+yQG/Ael646RlXGaAydEbG2NqyiX+Zak3igr2kJjMSvXaMSX3QNW/
+         ESQuS8BZwiSRLxzfa18mnyL9L0tNCEMOIRjwuRGHSMY39SJbxCquFTOSqyjDc4QhmqtH
+         8BKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699406931; x=1700011731;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tnA6mDB+2g1i1w3tpZYM9LGAfchwHqjZLzHC1al8HTo=;
+        b=v/yxO23BDkYvzbH93/YIDGD8bSLXuGXKWqMG7hym78wixdzdtPud5YaO9+A/gvzT5q
+         3MN/eJCUKxe+pzaNxzdiThNowKT0J7cY/WcnikeLydXLMosOua6gH0BIBZ4GeQ+iUElG
+         gJoFf+5xuXlvsGz7T+ciz5EZ/yiym20jfe9e4hyQKNfGA49p5ZI7xoVd6DPSmjHbBTHg
+         DduCJSRdqCfKGyWwzxG+hWDqnGD2LfZlH9/wJTMIPKyKXDItFGdh59diTqqqZJvzK08F
+         8ihiZlE1mq2M9qMOHQERzv9PxXrriYNMGCtwTLTbltBwmkKA2PsjAvB2itK+N1sYtI9G
+         iiYg==
+X-Gm-Message-State: AOJu0Yz/xABq8WlW9lKwUlhGLTrW+dGgcYI/Q/0LxX+QtAfBP3eCvgZQ
+	/kXF4KxggzxOacSnvGpDqVz4KLZOETXjIgWone4+qGUEVcQgXMok6rLpkA==
+X-Google-Smtp-Source: AGHT+IFeq5fiAU5OR4oonDboJaKhD8Mzu3qeCZ5YPAgE6wkVpUsKYKUm21CUvEEOxTQ3PXwbNgilU2VM4B36cqtcfKE=
+X-Received: by 2002:a05:6402:3789:b0:545:279:d075 with SMTP id
+ et9-20020a056402378900b005450279d075mr113343edb.1.1699406930497; Tue, 07 Nov
+ 2023 17:28:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALzav=evOG04=mtnc9Tf=bevWq0PbW_2Q=2e=ErruXtE+3gDVQ@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20231108003135.546002-1-seanjc@google.com> <20231108003135.546002-5-seanjc@google.com>
+In-Reply-To: <20231108003135.546002-5-seanjc@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Tue, 7 Nov 2023 17:28:38 -0800
+Message-ID: <CALMp9eRcBi19yGS3+t+Hm0fLSB5+ESDGAygjwE_CYs-jWtU9Cg@mail.gmail.com>
+Subject: Re: [PATCH v7 04/19] KVM: x86/pmu: Setup fixed counters' eventsel
+ during PMU initialization
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kan Liang <kan.liang@linux.intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
+	Jinrong Liang <cloudliang@tencent.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Like Xu <likexu@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 07, 2023 at 01:34:34PM -0800, David Matlack wrote:
-> On Tue, Nov 7, 2023 at 1:10 PM Oliver Upton <oliver.upton@linux.dev> wrote:
-> Thanks Oliver. Maybe I'm being dense but I'm still not understanding
-> how VGIC and UFFD interact :). I understand that VGIC is unaware of
-> UFFD, but fundamentally they must interact in some way during
-> post-copy. Can you spell out the sequence of events?
+On Tue, Nov 7, 2023 at 4:31=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> Set the eventsel for all fixed counters during PMU initialization, the
+> eventsel is hardcoded and consumed if and only if the counter is supporte=
+d,
+> i.e. there is no reason to redo the setup every time the PMU is refreshed=
+.
+>
+> Configuring all KVM-supported fixed counter also eliminates a potential
+> pitfall if/when KVM supports discontiguous fixed counters, in which case
+> configuring only nr_arch_fixed_counters will be insufficient (ignoring th=
+e
+> fact that KVM will need many other changes to support discontiguous fixed
+> counters).
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/vmx/pmu_intel.c | 14 ++++----------
+>  1 file changed, 4 insertions(+), 10 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index c4f2c6a268e7..5fc5a62af428 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -409,7 +409,7 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, s=
+truct msr_data *msr_info)
+>   * Note, reference cycles is counted using a perf-defined "psuedo-encodi=
+ng",
+>   * as there is no architectural general purpose encoding for reference c=
+ycles.
+>   */
+> -static void setup_fixed_pmc_eventsel(struct kvm_pmu *pmu)
+> +static u64 intel_get_fixed_pmc_eventsel(int index)
+>  {
+>         const struct {
+>                 u8 eventsel;
+> @@ -419,17 +419,11 @@ static void setup_fixed_pmc_eventsel(struct kvm_pmu=
+ *pmu)
+>                 [1] =3D { 0x3c, 0x00 }, /* CPU Cycles/ PERF_COUNT_HW_CPU_=
+CYCLES. */
+>                 [2] =3D { 0x00, 0x03 }, /* Reference Cycles / PERF_COUNT_=
+HW_REF_CPU_CYCLES*/
+>         };
+> -       int i;
+>
+>         BUILD_BUG_ON(ARRAY_SIZE(fixed_pmc_events) !=3D KVM_PMC_MAX_FIXED)=
+;
+>
+> -       for (i =3D 0; i < pmu->nr_arch_fixed_counters; i++) {
+> -               int index =3D array_index_nospec(i, KVM_PMC_MAX_FIXED);
+> -               struct kvm_pmc *pmc =3D &pmu->fixed_counters[index];
+> -
+> -               pmc->eventsel =3D (fixed_pmc_events[index].unit_mask << 8=
+) |
+> -                                fixed_pmc_events[index].eventsel;
+> -       }
+> +       return (fixed_pmc_events[index].unit_mask << 8) |
+> +               fixed_pmc_events[index].eventsel;
 
-Well it doesn't help that my abbreviated explanation glosses over some
-details. So here's the verbose explanation, and I'm sure Marc will have
-a set of corrections too :) I meant there's no _explicit_ interaction
-between UFFD and the various bits of GIC that need to touch guest
-memory.
-
-The GIC redistributors contain a set of MMIO registers that are
-accessible through the KVM_GET_DEVICE_ATTR and KVM_SET_DEVICE_ATTR
-ioctls. Writes to these are reflected directly into the KVM
-representation, no biggie there.
-
-One of the registers (GICR_PENDBASER) is a pointer to guest memory,
-containing a bitmap of pending LPIs managed by the redistributor. The
-ITS takes this to the extreme, as it is effectively a bunch of page
-tables for interrupts. All of this state actually lives in a KVM
-representation, and is only flushed out to guest memory when explicitly
-told to do so by userspace.
-
-On the target, we reread all the info when rebuilding interrupt
-translations when userspace calls KVM_DEV_ARM_ITS_RESTORE_TABLES. All of
-these guest memory accesses go through kvm_read_guest() and I expect the
-usual UFFD handling for non-present pages kicks in from there.
-
-> >
-> > If UFFD is off the table then it would appear there are two options:
-> >
-> >  - Instrument these ioctls to request pages not marked as present in the
-> >    theorized KVM-owned demand paging interface
-> >
-> >  - Mandate that userspace has transferred all of the required VGIC / ITS
-> >    pages before resuming on the target
-> >
-> > The former increases the maintenance burden of supporting post-copy
-> > upstream and the latter *will* fail spectacularly. Ideally we use a
-> > mechanism that doesn't require us to think about instrumenting
-> > post-copy for every new widget that we will want to virtualize.
-> >
-> > > So in the short term we could provide a partial solution for
-> > > HugeTLB-backed VMs (at least unblocking Google's use-case) and in the
-> > > long-term there's line of sight of a unified solution.
-> >
-> > Who do we expect to look after the upstreamed short-term solution once
-> > Google has moved on to something else?
-> 
-> Note, the proposed long-term solution you are replying to is an
-> extension of the short-term solution, not something else.
-
-Ack, I just feel rather strongly that the priority should be making
-guest_memfd with whatever post-copy scheme we devise. Once we settle
-on a UAPI that works for the new and shiny thing then it's easier to
-rationalize applying the UAPI change to other memory backing types.
-
--- 
-Thanks,
-Oliver
+Can I just say that it's really confusing that the value returned by
+intel_get_fixed_pmc_eventsel() is the concatenation of an 8-bit "unit
+mask" and an 8-bit "eventsel"?
 
