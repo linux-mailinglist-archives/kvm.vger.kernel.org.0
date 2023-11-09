@@ -1,133 +1,131 @@
-Return-Path: <kvm+bounces-1354-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1355-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 542477E6F4D
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 17:39:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41B277E6F89
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 17:42:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 849941C20BDF
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 16:39:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A0631C20AB4
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 16:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F13EA24A17;
-	Thu,  9 Nov 2023 16:39:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE9C2225DD;
+	Thu,  9 Nov 2023 16:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MnXRvEml"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cxFerNQl"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F5738DD1
-	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 16:38:52 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2385E3C28;
-	Thu,  9 Nov 2023 08:38:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699547928; x=1731083928;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=soB8pRMkLG9aXZK8EmflhbiouvePcdMHUpWBXaUHVu0=;
-  b=MnXRvEmlWPUab1efZh4WhGbmw/mXIFoYCbF1ZNtAENeiUzS6lxkPnDeb
-   bIac/58r1AEFhNFaORu6nso0eGCO2mkNt/0WAvsabPgClkoIppForqhrQ
-   cDvKpy97SwTYMDEctGDeHpKkIZCVAmwWWLQVuSF62LP8+Z+KBi1MiJaM5
-   /ipYTmj70YHW0xzxSiyHKt+TFM1Glhcp6ddZ51tRNT+G6hh6aAOgjd6WU
-   cd2nD8K3EvpNziTwW+CfCU5dSBTdCfqCbIvrlR1rI5aB6LQcZg9QsWh2E
-   PQd4QBYGWxiOKxMxHV6HgrpApdDreka90akRgeBMZTOUNB8KhrVBQwvmy
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="375057575"
-X-IronPort-AV: E=Sophos;i="6.03,289,1694761200"; 
-   d="scan'208";a="375057575"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 08:38:46 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="854125798"
-X-IronPort-AV: E=Sophos;i="6.03,289,1694761200"; 
-   d="scan'208";a="854125798"
-Received: from tiwariv-mobl.amr.corp.intel.com (HELO [10.212.165.194]) ([10.212.165.194])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 08:38:45 -0800
-Message-ID: <e5646555-c265-4c55-b6b1-527460de5b34@intel.com>
-Date: Thu, 9 Nov 2023 08:38:44 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2E3225CF
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 16:42:04 +0000 (UTC)
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C8954C11
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 08:42:04 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-32da7ac5c4fso636551f8f.1
+        for <kvm@vger.kernel.org>; Thu, 09 Nov 2023 08:42:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699548122; x=1700152922; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JzQkbLCuMidm6Xjw+1NLPXS+0gvplCc7hnkCbAiJ1vY=;
+        b=cxFerNQlWyAu3PAMSAy3d41JID53B7xt0rmwOWs9mvmfu/vOyZHD9BVVl/sfCuDppF
+         sbgUkqsWngQfO80ibvJsKyoKWj0sH3YFLuoRpPFVVW6q+ifQyMbZshMkqBwYlYLbQh0Q
+         3RF7D6GmbYhCFH3XIHZf6kFEv4x81qHdP8DxXeDi2idEaUltXZCJJ/+QCAZXUijnoJ8v
+         dZRZ2hPpQqK3VZIz5sK0wBYt9zpMYuqA+NYgHeOlA6YEMpZqhhPLmdz4OhbnLYLoHmwP
+         3cXzqwk1SWy73IwU/JoSYqLweocPRs1EYUQ5PhHr7QI3joOdmJNf9eR3XZGWrLSrIR4q
+         EX0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699548122; x=1700152922;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JzQkbLCuMidm6Xjw+1NLPXS+0gvplCc7hnkCbAiJ1vY=;
+        b=Nqqa1eas2GYOg5F/F27lL4aW1Xw7gwekTgXO8j5DOtjdRoKIMUuvEjGspBoxAwAW/c
+         EGfL1k48pEKWf/syDKmhy5eeeTkhuzX+SUjv9x1B60CfQTKBvEJq3t0b0KEm3buNvZWr
+         HoEsPHO7mhvEb0w5+4Ov1/ifmn2a/6UWE87/OuTACBkpt7kjeByq1hQoE2KLBIPaUlF0
+         CMoTipzFeP5JMpbKgFxyzq3xxRG9IdEqL1FaJbn3QhBZtFWSufbbmuR2MCQFPwv6EVVb
+         NJTW5HsgueaTUSlv+MYsFWISzaXlNZaz4mOAs9pAmNRR/jTUyFcgonmIz4CbrnhBr6M9
+         +S0A==
+X-Gm-Message-State: AOJu0Yzunx2DFSdEb1PEshwfy7OSqUPX1X64XQde0eA7nBqW0aaXFyGT
+	LQ701AMkvoF223sdFjCPKGKBBC7lWV6ckdsqo3rcaQ==
+X-Google-Smtp-Source: AGHT+IGJn1Mqk4c9grqBIQZknp7AKef4IRwqtC4jj3BCjOclgyelpttEi8I6Pe/9xAZ2nUv6wBgSLP/HlmzPnEDkxTw=
+X-Received: by 2002:a5d:6d4d:0:b0:31f:d2dc:df26 with SMTP id
+ k13-20020a5d6d4d000000b0031fd2dcdf26mr4284751wri.28.1699548122488; Thu, 09
+ Nov 2023 08:42:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 05/23] x86/virt/tdx: Handle SEAMCALL no entropy error
- in common code
-Content-Language: en-US
-To: Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-Cc: x86@kernel.org, kirill.shutemov@linux.intel.com, peterz@infradead.org,
- tony.luck@intel.com, tglx@linutronix.de, bp@alien8.de, mingo@redhat.com,
- hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com, rafael@kernel.org,
- david@redhat.com, dan.j.williams@intel.com, len.brown@intel.com,
- ak@linux.intel.com, isaku.yamahata@intel.com, ying.huang@intel.com,
- chao.gao@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
- nik.borisov@suse.com, bagasdotme@gmail.com, sagis@google.com,
- imammedo@redhat.com
-References: <cover.1699527082.git.kai.huang@intel.com>
- <9565b2ccc347752607039e036fd8d19d78401b53.1699527082.git.kai.huang@intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <9565b2ccc347752607039e036fd8d19d78401b53.1699527082.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <CALzav=d23P5uE=oYqMpjFohvn0CASMJxXB_XEOEi-jtqWcFTDA@mail.gmail.com>
+ <ZUlLLGLi1IyMyhm4@x1n> <fcef7c96-a1bb-4c1d-962b-1bdc2a3b4f19@redhat.com> <ZUq6LJ+YppFlf43f@x1n>
+In-Reply-To: <ZUq6LJ+YppFlf43f@x1n>
+From: David Matlack <dmatlack@google.com>
+Date: Thu, 9 Nov 2023 08:41:33 -0800
+Message-ID: <CALzav=d_ZyNGmh0086c8D+arjb6NPABEuOGL=aj3DzhKJ12Vmw@mail.gmail.com>
+Subject: Re: RFC: A KVM-specific alternative to UserfaultFD
+To: Peter Xu <peterx@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm list <kvm@vger.kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, James Houghton <jthoughton@google.com>, 
+	Oliver Upton <oupton@google.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	Mike Kravetz <mike.kravetz@oracle.com>, Andrea Arcangeli <aarcange@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/9/23 03:55, Kai Huang wrote:
-> Some SEAMCALLs use the RDRAND hardware and can fail for the same reasons
-> as RDRAND.  Use the kernel RDRAND retry logic for them.
-> 
-> There are three __seamcall*() variants.  Do the SEAMCALL retry in common
-> code and add a wrapper for each of them.
+On Tue, Nov 7, 2023 at 2:29=E2=80=AFPM Peter Xu <peterx@redhat.com> wrote:
+> On Tue, Nov 07, 2023 at 05:25:06PM +0100, Paolo Bonzini wrote:
+> > On 11/6/23 21:23, Peter Xu wrote:
+> > > On Mon, Nov 06, 2023 at 10:25:13AM -0800, David Matlack wrote:
+> > >
+> >
+> > Once you have the implementation done for guest_memfd, it is interestin=
+g to
+> > see how easily it extends to other, userspace-mappable kinds of memory.=
+  But
+> > I still dislike the fact that you need some kind of extra protocol in
+> > userspace, for multi-process VMMs.  This is the kind of thing that the
+> > kernel is supposed to facilitate.  I'd like it to do _more_ of that (se=
+e
+> > above memfd pseudo-suggestion), not less.
+>
+> Is that our future plan to extend gmemfd to normal memories?
+>
+> I see that gmemfd manages folio on its own.  I think it'll make perfect
+> sense if it's for use in CoCo context, where the memory is so special to =
+be
+> generic anyway.
+>
+> However if to extend it to generic memories, I'm wondering how do we
+> support existing memory features of such memory which already exist with
+> KVM_SET_USER_MEMORY_REGION v1.  To name some:
+>
+>   - numa awareness
+>   - swapping
+>   - cgroup
+>   - punch hole (in a huge page, aka, thp split)
+>   - cma allocations for huge pages / page migrations
+>   - ...
 
-The new common wrapper looks great, thanks:
+Sean has stated that he doesn't want guest_memfd to support swap. So I
+don't think guest_memfd will one day replace all guest memory
+use-cases. That also means that my idea to extend my proposal to
+guest_memfd VMAs has limited value. VMs that do not use guest_memfd
+would not be able to use it.
 
-Reviewed-by: Dave Hansen <dave.hansen@linux.intel.com>
+Paolo, it sounds like overall my proposal has limited value outside of
+GCE's use-case. And even if it landed upstream, it would bifrucate KVM
+VM post-copy support. So I think it's probably not worth pursuing
+further. Do you think that's a fair assessment? Getting a clear NACK
+on pushing this proposal upstream would be a nice outcome here since
+it helps inform our next steps.
 
+That being said, we still don't have an upstream solution for 1G
+post-copy, which James pointed out is really the core issue. But there
+are other avenues we can explore in that direction such as cleaning up
+HugeTLB (very nebulous) or adding 1G+mmap()+userfaultfd support to
+guest_memfd. The latter seems promising.
 
