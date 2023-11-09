@@ -1,137 +1,206 @@
-Return-Path: <kvm+bounces-1357-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1360-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 498487E6F93
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 17:45:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA9047E70FB
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 18:59:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 037CC281156
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 16:45:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8919A2811D3
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 17:59:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ABC8225D2;
-	Thu,  9 Nov 2023 16:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDCB031A8B;
+	Thu,  9 Nov 2023 17:58:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="iLfPKHv3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XdFU0ZP9"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485BB20306
-	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 16:45:04 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97EF844A0;
-	Thu,  9 Nov 2023 08:45:03 -0800 (PST)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A9GZZ38012040;
-	Thu, 9 Nov 2023 16:45:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=gQ2tRQf+68bvSbGEJ8gu3v6Z8ALX4GNpA2mskZujjWU=;
- b=iLfPKHv3wmf7T/KHpuJA5hYZRJh00B/cQrxalHydO+9+5LooeDYYQ81bnIz/W3fydtS/
- KJDaNOm7SDEC00uDmzVkGHKVJykgpmlWEvLT+o2MvLflaYGTd/c9qJGTYyepYyTsI1E9
- Wk4rLJ3p2tLurIK8GuQbo7Y08vFX4HcrV78djqWuiShFIeKU0b72+m3KIVFflMxsc3Zj
- 6sLRAQAK0vbwv2geRaoiUmWXtU8oyZmc0QYyZsKiRUQt4zCJ81xg4phi1SiAOOgXCCz0
- De5prVAm2c+pyp58uPR/DmCYMdZbCsoyWd5cqQSeyRVL+UPyZvv8vWMZDyEmvhrP7UlL jg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u9332gcku-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Nov 2023 16:45:02 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A9GaJf2015609;
-	Thu, 9 Nov 2023 16:45:01 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u9332gck8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Nov 2023 16:45:01 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A9EMDGt019231;
-	Thu, 9 Nov 2023 16:45:01 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u7w2450t0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Nov 2023 16:45:01 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A9Gj0gQ11665926
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 9 Nov 2023 16:45:00 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 87F6D58056;
-	Thu,  9 Nov 2023 16:45:00 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 18EF758052;
-	Thu,  9 Nov 2023 16:44:59 +0000 (GMT)
-Received: from li-2c1e724c-2c76-11b2-a85c-ae42eaf3cb3d.ibm.com.com (unknown [9.61.74.193])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  9 Nov 2023 16:44:58 +0000 (GMT)
-From: Tony Krowiak <akrowiak@linux.ibm.com>
-To: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc: jjherne@linux.ibm.com, pasic@linux.ibm.com, borntraeger@linux.ibm.com,
-        frankja@linux.ibm.com, imbrenda@linux.ibm.com, david@redhat.com,
-        Matthew Rosato <mjrosato@linux.ibm.com>
-Subject: [PATCH v3 3/3] s390/vfio-ap: improve reaction to response code 07 from PQAP(AQIC) command
-Date: Thu,  9 Nov 2023 11:44:22 -0500
-Message-ID: <20231109164427.460493-4-akrowiak@linux.ibm.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231109164427.460493-1-akrowiak@linux.ibm.com>
-References: <20231109164427.460493-1-akrowiak@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E5230340
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 17:58:51 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D1613AA4
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 09:58:51 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d9caf486775so1371327276.2
+        for <kvm@vger.kernel.org>; Thu, 09 Nov 2023 09:58:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699552731; x=1700157531; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RFVfGsLBmL5i6JcHP880azf+XYiKofEmmYgiIz7F3i0=;
+        b=XdFU0ZP9fW52a8fkOE9MEm4ZU2M3uRIn3eT/5XsKrJ3oHYfY4DUNuZP+cZ7QOOyWzo
+         MHtcpAM+vQvxKIJaP32EPe0vT4hXKCD644EICaWB6prAq7OjP+zwfO/EioX93OQ31hvt
+         ADLqsVlepwNSTPpmNgpymXAECvetleN6Hl7lUv/2bHtL/sH3nuwxdV9V+QC9xg/U2Eko
+         GoQKHtHd0pyqlkeUQyvtsh9EVA4n8ShsmOZa2ESSURP55yOWiXPD8bZWp5bZWEsVdKj9
+         JJzOP8af5ta7/QtE1urqkQ05yS24QLaMQAfPmivZeu8wKRoZctquImK9OwI08GkFx3Or
+         9fLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699552731; x=1700157531;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=RFVfGsLBmL5i6JcHP880azf+XYiKofEmmYgiIz7F3i0=;
+        b=wpnVAkWT8oJ9yDeRXF0w5v7NIazYHD23VqqksGtt0QTNVfv2+qerqnurK8BpcrZysE
+         AXDT+lp7sX7Z54RTZzqnSJpEnsUaeIs3/R7SekR8uOGIe8HCH50Ud2M1qbmMG/66Y6bA
+         nzLEFTAjIPQZzaMskuljbFkqh7lfHHqy+XStzqDvG7RWTUUF6B7d9ESFfJSgilWCGeAS
+         3cDTw2Vi7uTVuGfUHY07I5f2WM1dNiLfGv+7m8QeOD22I1ad/CEymGBAdemVWYci1i7L
+         ophJyPxSeMESjq0PTzgDfVlTvcAc0q8xygTlkwRHbk5uwUWEunQyUzMYeRGhjtVpDEo8
+         7EdA==
+X-Gm-Message-State: AOJu0Yytdi4esNHsO38UZKO5Vqi74KRd6aVf2zXLnlBP+PdkrLWXcaHj
+	pbWbqDG7atDIEckmCT161p7es8Bw9m0=
+X-Google-Smtp-Source: AGHT+IHPrDSCvQr2sT08Pv40EnytCJNqx6afjozV4RKAshShvug9gavwMxGSel9NyADxoZZ9c0Ms78tabu4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a5b:f12:0:b0:da1:513d:8a3c with SMTP id
+ x18-20020a5b0f12000000b00da1513d8a3cmr133689ybr.11.1699552730763; Thu, 09 Nov
+ 2023 09:58:50 -0800 (PST)
+Date: Thu, 9 Nov 2023 09:58:49 -0800
+In-Reply-To: <CALzav=d_ZyNGmh0086c8D+arjb6NPABEuOGL=aj3DzhKJ12Vmw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: XZ8uLpD6hwxVgKkN7MZYFWq_TLcpGXCr
-X-Proofpoint-GUID: sUA7RPTBNSLoafyFgIiTZlVhD6pmQIi7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-09_14,2023-11-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 lowpriorityscore=0 bulkscore=0 impostorscore=0
- mlxscore=0 adultscore=0 suspectscore=0 mlxlogscore=999 phishscore=0
- spamscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311090127
+Mime-Version: 1.0
+References: <CALzav=d23P5uE=oYqMpjFohvn0CASMJxXB_XEOEi-jtqWcFTDA@mail.gmail.com>
+ <ZUlLLGLi1IyMyhm4@x1n> <fcef7c96-a1bb-4c1d-962b-1bdc2a3b4f19@redhat.com>
+ <ZUq6LJ+YppFlf43f@x1n> <CALzav=d_ZyNGmh0086c8D+arjb6NPABEuOGL=aj3DzhKJ12Vmw@mail.gmail.com>
+Message-ID: <ZU0d2fq5zah5jxf1@google.com>
+Subject: Re: RFC: A KVM-specific alternative to UserfaultFD
+From: Sean Christopherson <seanjc@google.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	kvm list <kvm@vger.kernel.org>, James Houghton <jthoughton@google.com>, 
+	Oliver Upton <oupton@google.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	Mike Kravetz <mike.kravetz@oracle.com>, Andrea Arcangeli <aarcange@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Let's improve the vfio_ap driver's reaction to reception of response code
-07 from the PQAP(AQIC) command when enabling interrupts on behalf of a
-guest:
+On Thu, Nov 09, 2023, David Matlack wrote:
+> On Tue, Nov 7, 2023 at 2:29=E2=80=AFPM Peter Xu <peterx@redhat.com> wrote=
+:
+> > On Tue, Nov 07, 2023 at 05:25:06PM +0100, Paolo Bonzini wrote:
+> > > On 11/6/23 21:23, Peter Xu wrote:
+> > > > On Mon, Nov 06, 2023 at 10:25:13AM -0800, David Matlack wrote:
+> > > >
+> > >
+> > > Once you have the implementation done for guest_memfd, it is interest=
+ing to
+> > > see how easily it extends to other, userspace-mappable kinds of memor=
+y.  But
+> > > I still dislike the fact that you need some kind of extra protocol in
+> > > userspace, for multi-process VMMs.  This is the kind of thing that th=
+e
+> > > kernel is supposed to facilitate.  I'd like it to do _more_ of that (=
+see
+> > > above memfd pseudo-suggestion), not less.
+> >
+> > Is that our future plan to extend gmemfd to normal memories?
+> >
+> > I see that gmemfd manages folio on its own.  I think it'll make perfect
+> > sense if it's for use in CoCo context, where the memory is so special t=
+o be
+> > generic anyway.
+> >
+> > However if to extend it to generic memories, I'm wondering how do we
+> > support existing memory features of such memory which already exist wit=
+h
+> > KVM_SET_USER_MEMORY_REGION v1.  To name some:
+> >
+> >   - numa awareness
 
-* Unregister the guest's ISC before the pages containing the notification
-  indicator bytes are unpinned.
+The plan is to add fbind() to mirror mbind().
 
-* Capture the return code from the kvm_s390_gisc_unregister function and
-  log a DBF warning if it fails.
+> >   - swapping
+> >   - cgroup
 
-Suggested-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
----
- drivers/s390/crypto/vfio_ap_ops.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Accounting is already supported.  Fine-grained reclaim will likely never be
+supported (see below re: swap).
 
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index 25d7ce2094f8..4e80c211ba47 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -476,8 +476,11 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
- 		break;
- 	case AP_RESPONSE_OTHERWISE_CHANGED:
- 		/* We could not modify IRQ settings: clear new configuration */
-+		ret = kvm_s390_gisc_unregister(kvm, isc);
-+		if (ret)
-+			VFIO_AP_DBF_WARN("%s: kvm_s390_gisc_unregister: rc=%d isc=%d, apqn=%#04x\n",
-+					 __func__, ret, isc, q->apqn);
- 		vfio_unpin_pages(&q->matrix_mdev->vdev, nib, 1);
--		kvm_s390_gisc_unregister(kvm, isc);
- 		break;
- 	default:
- 		pr_warn("%s: apqn %04x: response: %02x\n", __func__, q->apqn,
--- 
-2.41.0
+> >   - punch hole (in a huge page, aka, thp split)
 
+Already works.  What doesn't work is reconstituing a hugepage, but like swa=
+p,
+I think that's something KVM should deliberately not support.
+
+> >   - cma allocations for huge pages / page migrations
+
+I suspect the direction guest_memfd will take will be to support a dedicate=
+d pool
+of memory, a la hugetlbfs reservations.
+
+> >   - ...
+>=20
+> Sean has stated that he doesn't want guest_memfd to support swap. So I
+> don't think guest_memfd will one day replace all guest memory
+> use-cases. That also means that my idea to extend my proposal to
+> guest_memfd VMAs has limited value. VMs that do not use guest_memfd
+> would not be able to use it.
+
+Yep.  This is a hill I'm extremely willing to die on.  I feel very, very st=
+rongly
+that we should put a stake in the ground regarding swap and other tradition=
+al memory
+management stuff.  The intent of guest_memfd is that it's a vehicle for sup=
+porting
+use cases that don't fit into generic memory subsytems, e.g. CoCo VMs, and/=
+or where
+making guest memory inaccessible by default adds a lot of value at minimal =
+cost.
+
+guest_memfd isn't intended to be a wholesale replacement of VMA-based memor=
+y.
+IMO, use cases that want to dynamically manage guest memory should be firml=
+y
+out-of-scope for guest_memfd.
+
+> Paolo, it sounds like overall my proposal has limited value outside of
+> GCE's use-case. And even if it landed upstream, it would bifrucate KVM
+> VM post-copy support. So I think it's probably not worth pursuing
+> further. Do you think that's a fair assessment? Getting a clear NACK
+> on pushing this proposal upstream would be a nice outcome here since
+> it helps inform our next steps.
+>=20
+> That being said, we still don't have an upstream solution for 1G
+> post-copy, which James pointed out is really the core issue. But there
+> are other avenues we can explore in that direction such as cleaning up
+> HugeTLB (very nebulous) or adding 1G+mmap()+userfaultfd support to
+> guest_memfd. The latter seems promising.
+
+mmap()+userfaultfd is the answer for userspace and vhost, but it is most de=
+fintiely
+not the answer for guest_memfd within KVM.  The main selling point of guest=
+_memfd
+is that it doesn't require mapping the memory into userspace, i.e. userfaul=
+tfd
+can't be the answer for KVM accesses unless we bastardize the entire concep=
+t of
+guest_memfd.
+
+And as I've proposed internally, the other thing related to live migration =
+that I
+think KVM should support is the ability to performantly and non-destructive=
+ly freeze
+guest memory, e.g. to allowing blocking KVM accesses to guest memory during=
+ blackout
+without requiring userspace to destroy memslots to harden against memory co=
+rruption
+due to KVM writing guest memory after userspace has taken the final snapsho=
+t of the
+dirty bitmap.
+
+For both cases, KVM will need choke points on all accesses to guest memory.=
+  Once
+the choke points exist and we have signed up to maintain them, the extra bu=
+rden of
+gracefully handling "missing" memory versus frozen memory should be relativ=
+ely
+small, e.g. it'll mainly be the notify-and-wait uAPI.
+
+Don't get me wrong, I think Google's demand paging implementation should di=
+e a slow,
+horrible death.   But I don't think userfaultfd is the answer for guest_mem=
+fd.
 
