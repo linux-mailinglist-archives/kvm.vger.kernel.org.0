@@ -1,142 +1,125 @@
-Return-Path: <kvm+bounces-1317-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1318-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10B727E6756
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 11:06:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0FFD7E697F
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 12:25:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C776E2813A1
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 10:06:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A7122811CC
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 11:25:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792B715AC0;
-	Thu,  9 Nov 2023 10:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA8F31A714;
+	Thu,  9 Nov 2023 11:25:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Svu4rloa"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gwfLN6Nt"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164C914285
-	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 10:06:49 +0000 (UTC)
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6D102D79;
-	Thu,  9 Nov 2023 02:06:48 -0800 (PST)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2c50ec238aeso8481851fa.0;
-        Thu, 09 Nov 2023 02:06:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699524407; x=1700129207; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ziH0evbWe+MkV0AfceDy6ohEFNGYBOK5CmtTzEQCRBk=;
-        b=Svu4rloaqTvKWJznkkmEbTSi12m9NWSIYYE+3JkNvBD2ocih8/x93h7kERlfDxCGPu
-         DGXYCut5bKAte6jkv1XScxCn1Jp/7/HL8Ak+UsrVMHBpMjgoqLKFTpSSjyAUFTRvi5mb
-         LdHHDcfqyZpWW/RAsfpZYaL4+GxjCerkeF1f5ToB3DUmivR65+vzQ2XNPcmzkDIw/lIi
-         V7oFDfz4jV2iixTm1mXG9DPLXOKtZ03sMO28DAceENnLfehZGGTCymzMBVJpccVmnamH
-         B0F8OoQfOgMvVQp8CA44A08LsO2p5GYSUniylLUo9AlmnMJCj+QPrnDFzy1ghyotlV68
-         ILKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699524407; x=1700129207;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ziH0evbWe+MkV0AfceDy6ohEFNGYBOK5CmtTzEQCRBk=;
-        b=W8VHwb6cUDnGcxTnZhBEgSSt2h5Y+0sQBKzSRJb8l/xdyAzo7BXRNQAty8s97jjDDd
-         MZtcoySY78LNrghCAueyzs4jvlE+dNDqhaPlfaFsVwPgAujxQXzaoljV/SSj3/SD31KE
-         VZjikLp46xhVo+js+Xj/HqTZ05tQXb3yK7YQg4a0m64WJvh+HTpoCR9Mjd+sAmpYSSOf
-         9g7y9Rl2IQ9kIyGlwU4H0+jq32d3obTdovAkzIFhktPtYRx2MXPervto0k5NVNsV2aWf
-         Kx0EG6KmJX6OtDPeSFZC3gBNp58/q+kW2c99QPtOaLEvED1cLOAvGB8wcjzftvP6EtN/
-         dM9A==
-X-Gm-Message-State: AOJu0YwT+d/iy4dmYaz2CVz/yY52UzpMv0Sg0z5pXVl3VrLcogTLA+Vh
-	RwLd/wMqRzSR3umNSr4jWBI=
-X-Google-Smtp-Source: AGHT+IEXVZ/aDOimk6Eks94c9xbwgB5ss6PN7WwJfVoVAEWfsiJeVVPWfibJtnLANdc0DIO/eVeb6g==
-X-Received: by 2002:a05:6512:488a:b0:509:b3f:8a7b with SMTP id eq10-20020a056512488a00b005090b3f8a7bmr939296lfb.22.1699524406879;
-        Thu, 09 Nov 2023 02:06:46 -0800 (PST)
-Received: from [192.168.12.204] (54-240-197-239.amazon.com. [54.240.197.239])
-        by smtp.gmail.com with ESMTPSA id j6-20020a5d6046000000b0032fc5f5abafsm7034674wrt.96.2023.11.09.02.06.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Nov 2023 02:06:46 -0800 (PST)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <b7d0c879-3c44-4f44-b796-78c0d3855976@xen.org>
-Date: Thu, 9 Nov 2023 10:06:40 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3701107A6
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 11:25:22 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D8E02D63;
+	Thu,  9 Nov 2023 03:25:22 -0800 (PST)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A9BD52o001215;
+	Thu, 9 Nov 2023 11:25:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=eaMQhWSWr74b4jVdBAEoDMqw5DsQSen2oaQOTxFTJ6Q=;
+ b=gwfLN6Ntn6n/86NFzDi4jc02zLiEf7Ki0b4nHRZeyIc6ywFQpIOxEFFH6paGqsGZFOpd
+ e3RcfbCMndg96OxI/H7iUppe/aAdQGSScs3fjo+lx42BxG9CDZAOeFsR58JwNz3SWfEb
+ q9RzEAQ0oYJkvcHyPp0f+/xurKQraqNwzELhz5cKtrt6HoiNBgk4o/rOl8hxhlDlhIJG
+ fOqJFJUshXFgl24t+MKEC73JTzVg+9qTjgsl2ZGb7sR8i1E7RCndut4W031f2h+umS1T
+ BA2xg3QvreM/4wx9I3ov6mEe1lLIb23DGfXqB2/h40wkcVIsjVwtGYwmAcvBehwk3e60 tw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u8xbr0cey-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Nov 2023 11:25:21 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A9BPKt2007573;
+	Thu, 9 Nov 2023 11:25:20 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u8xbr0c2j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Nov 2023 11:25:19 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A9B5Hci014372;
+	Thu, 9 Nov 2023 11:22:01 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u7w223dpc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Nov 2023 11:22:01 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A9BLvkS29229492
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 9 Nov 2023 11:21:58 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E321220049;
+	Thu,  9 Nov 2023 11:21:57 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4D2B520040;
+	Thu,  9 Nov 2023 11:21:57 +0000 (GMT)
+Received: from osiris (unknown [9.171.80.120])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu,  9 Nov 2023 11:21:57 +0000 (GMT)
+Date: Thu, 9 Nov 2023 12:21:55 +0100
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH v3 2/4] KVM: s390: vsie: Fix length of facility list
+ shadowed
+Message-ID: <20231109112155.11754-A-hca@linux.ibm.com>
+References: <20231108171229.3404476-1-nsg@linux.ibm.com>
+ <20231108171229.3404476-3-nsg@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v7 00/11] KVM: xen: update shared_info and vcpu_info
- handling
-Content-Language: en-US
-To: David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Paul Durrant <pdurrant@amazon.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- Ingo Molnar <mingo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Thomas Gleixner
- <tglx@linutronix.de>, x86@kernel.org
-References: <20231002095740.1472907-1-paul@xen.org>
- <6629b7f0b56e0fb2bad575a1d598cce26b1c6432.camel@infradead.org>
- <bf34f990-4f32-4cd3-9dd0-df1cf9187b25@xen.org>
- <117d1e78e7277177236dabc616ade178fdc336fa.camel@infradead.org>
-Organization: Xen Project
-In-Reply-To: <117d1e78e7277177236dabc616ade178fdc336fa.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231108171229.3404476-3-nsg@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: QGBsi2CwgtrEZ7Cj0UFpKB2VgMETo9hf
+X-Proofpoint-GUID: ngbPnWhIMjSQa3qp08IuszVUWpslFLgI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-09_10,2023-11-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
+ clxscore=1015 impostorscore=0 phishscore=0 spamscore=0 mlxlogscore=518
+ mlxscore=0 lowpriorityscore=0 malwarescore=0 priorityscore=1501
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311090084
 
-On 09/11/2023 10:02, David Woodhouse wrote:
-> On Thu, 2023-10-05 at 09:36 +0100, Paul Durrant wrote:
->> On 05/10/2023 07:41, David Woodhouse wrote:
->>> On Mon, 2023-10-02 at 09:57 +0000, Paul Durrant wrote:
->>>> From: Paul Durrant <pdurrant@amazon.com>
->>>>
->>>> The following text from the original cover letter still serves as an
->>>> introduction to the series:
->>>>
->>>> "Currently we treat the shared_info page as guest memory and the VMM
->>>> informs KVM of its location using a GFN. However it is not guest memory as
->>>> such; it's an overlay page. So we pointlessly invalidate and re-cache a
->>>> mapping to the *same page* of memory every time the guest requests that
->>>> shared_info be mapped into its address space. Let's avoid doing that by
->>>> modifying the pfncache code to allow activation using a fixed userspace HVA
->>>> as well as a GPA."
->>>>
->>>> This version of the series is functionally the same as version 6. I have
->>>> simply added David Woodhouse's R-b to patch 11 to indicate that he has
->>>> now fully reviewed the series.
->>>
->>> Thanks. I believe Sean is probably waiting for us to stop going back
->>> and forth, and for the dust to settle. So for the record: I think I'm
->>> done heckling and this is ready to go in.
->>>
->>> Are you doing the QEMU patches or am I?
->>>
->>
->> I'll do the QEMU changes, once the patches hit kvm/next.
+On Wed, Nov 08, 2023 at 06:12:27PM +0100, Nina Schoetterl-Glausch wrote:
+> The length of the facility list accessed when interpretively executing
+> STFLE is the same as the hosts facility list (in case of format-0)
+> When shadowing, copy only those bytes.
+> The memory following the facility list need not be accessible, in which
+> case we'd wrongly inject a validity intercept.
 > 
-> Note that I disabled migration support in QEMU for emulated Xen
-> guests. You might want that for testing, since the reason for this work
-> is to enable pause/serialize workflows.
-> 
-> Migration does work all the way up to XenStore itself, and
-> https://gitlab.com/qemu-project/qemu/-/commit/766804b101d *was* tested
-> with migration enabled. There are also unit tests for XenStore
-> serialize/deserialize.
-> 
-> I disabled it because the PV backends on the XenBus don't have
-> suspend/resume support. But a guest using other emulated net/disk
-> devices should still be able to suspend/resume OK if we just remove the
-> 'unmigratable' flag from xen_xenstore, I believe.
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> ---
+>  arch/s390/include/asm/facility.h |  6 ++++++
+>  arch/s390/kernel/Makefile        |  2 +-
+>  arch/s390/kernel/facility.c      | 21 +++++++++++++++++++++
+>  arch/s390/kvm/vsie.c             | 12 +++++++++++-
+>  4 files changed, 39 insertions(+), 2 deletions(-)
+>  create mode 100644 arch/s390/kernel/facility.c
 
-Ok. Enabling suspend/resume for backends really ought not to be that 
-hard. The main reason for this series was to enable pause 
-for-for-memory-reconfiguration but I can look into 
-suspend/resume/migrate once I've done the necessary re-work.
-
+For the non-KVM part:
+Acked-by: Heiko Carstens <hca@linux.ibm.com>
 
