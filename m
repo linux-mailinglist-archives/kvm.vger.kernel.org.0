@@ -1,426 +1,160 @@
-Return-Path: <kvm+bounces-1342-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1343-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E48797E6A24
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 12:58:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AADA87E6A8F
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 13:28:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42D78B20E69
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 11:58:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC71C1C20A5D
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 12:28:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E56171DA35;
-	Thu,  9 Nov 2023 11:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C23661DA5F;
+	Thu,  9 Nov 2023 12:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H3SmWPsP"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KhanbO+B"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D819E1DA20
-	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 11:58:40 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BD903251;
-	Thu,  9 Nov 2023 03:58:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699531121; x=1731067121;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=S8k31sQJcwrbWSda49ADoHS4K9UVoQOMkuJARurWsC4=;
-  b=H3SmWPsPkkc1Mvwgf3x2vSBae7HKKgRdQonIZik2ksuj1oNpHxDYWaVQ
-   VEDd35EhoVpQF9AjhRYAldrpYBnWEDV40hYg5NLWC6pnYzVswkQUKRv0c
-   OxKzx0SfL7nd1c32ucfFTrs+HDI67AgY/cNNl5tpAtX5B/awc7n/ezyjk
-   GkCFgHwYRLAH2f1Ndpzf3uSxA+UyiU9Xyvcju5i7K3F9mF9Ezu0bt1SFv
-   SiOKkk5wyJHcfo5fwoysukKE8yjBoS2MnYEcfJn85JKbzJeE6S48Nwvs/
-   SOqJ52FLGkzdZl3z/64m2fADZE9619fM6CN3P3f31Xt7+LgD0nixSCrZq
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="2936850"
-X-IronPort-AV: E=Sophos;i="6.03,289,1694761200"; 
-   d="scan'208";a="2936850"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 03:58:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="766977119"
-X-IronPort-AV: E=Sophos;i="6.03,289,1694761200"; 
-   d="scan'208";a="766977119"
-Received: from shadphix-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.209.83.35])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 03:58:33 -0800
-From: Kai Huang <kai.huang@intel.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: x86@kernel.org,
-	dave.hansen@intel.com,
-	kirill.shutemov@linux.intel.com,
-	peterz@infradead.org,
-	tony.luck@intel.com,
-	tglx@linutronix.de,
-	bp@alien8.de,
-	mingo@redhat.com,
-	hpa@zytor.com,
-	seanjc@google.com,
-	pbonzini@redhat.com,
-	rafael@kernel.org,
-	david@redhat.com,
-	dan.j.williams@intel.com,
-	len.brown@intel.com,
-	ak@linux.intel.com,
-	isaku.yamahata@intel.com,
-	ying.huang@intel.com,
-	chao.gao@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com,
-	nik.borisov@suse.com,
-	bagasdotme@gmail.com,
-	sagis@google.com,
-	imammedo@redhat.com,
-	kai.huang@intel.com
-Subject: [PATCH v15 23/23] Documentation/x86: Add documentation for TDX host support
-Date: Fri, 10 Nov 2023 00:56:00 +1300
-Message-ID: <a9adc748ba9c222f4e1b7b5d5651544aa6284a5f.1699527082.git.kai.huang@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <cover.1699527082.git.kai.huang@intel.com>
-References: <cover.1699527082.git.kai.huang@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E661DA3F
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 12:28:21 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C29C2590;
+	Thu,  9 Nov 2023 04:28:20 -0800 (PST)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A9CIdWV014337;
+	Thu, 9 Nov 2023 12:28:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=UO8TBtetr+3y4KPTWx2Mhw6wIQnBNZu5oEvShmWfUEY=;
+ b=KhanbO+BVBGBzbmp6rCfwrYQLoP0CVWiV4TvkLcYv+OQhISC76NpUIbBx0pzqCtGrT5O
+ cWD7n8jF/x/gTtfXHWUtrHwOro2kRmXDkzVp1IVPNzvzZq0OdJjCDuCuiljk7rWcwX3a
+ p/JG1pHDMPrbKFjfpvU3yT87MMOAA8j1aUGi/YdYcNoFoQkoH4hQwY7UTwjQms3x7fzt
+ qycVZP1vcR/cDmfD8Jh1q5GQgziLdr595AIbYWCbVIyBco7uftwe7F/SIk0N96R18uQJ
+ zKY2Xy15+BlFMMU0oSEqbJZ/aFnuE9244OMSbWqSI9hdqvelX7sNIaA8hjie6v//dwDG Xg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u8y1x0txs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Nov 2023 12:28:19 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A9CK9xB020815;
+	Thu, 9 Nov 2023 12:28:18 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u8y1x0txf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Nov 2023 12:28:18 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A9BFMfD000657;
+	Thu, 9 Nov 2023 12:28:17 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u7w233ny7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Nov 2023 12:28:17 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A9CSE4u42271346
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 9 Nov 2023 12:28:14 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6795F2004B;
+	Thu,  9 Nov 2023 12:28:14 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2D86220040;
+	Thu,  9 Nov 2023 12:28:14 +0000 (GMT)
+Received: from [9.152.224.253] (unknown [9.152.224.253])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  9 Nov 2023 12:28:14 +0000 (GMT)
+Message-ID: <039518cc-379c-4800-b034-21ad8fbbc51a@linux.ibm.com>
+Date: Thu, 9 Nov 2023 13:28:14 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/4] KVM: s390: cpu model: Use proper define for
+ facility mask size
+Content-Language: en-US
+To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vasily Gorbik
+ <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>,
+        kvm@vger.kernel.org
+References: <20231108171229.3404476-1-nsg@linux.ibm.com>
+ <20231108171229.3404476-4-nsg@linux.ibm.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20231108171229.3404476-4-nsg@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 2dBgXTwUNZ_eh5cvs2LYgqir4qyl8hbQ
+X-Proofpoint-ORIG-GUID: 1JhIcpv8T77UUmMAuDtcRc4NnHg8SOLx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-09_10,2023-11-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 bulkscore=0 impostorscore=0 spamscore=0 lowpriorityscore=0
+ mlxlogscore=373 clxscore=1011 phishscore=0 adultscore=0 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311090092
 
-Add documentation for TDX host kernel support.  There is already one
-file Documentation/x86/tdx.rst containing documentation for TDX guest
-internals.  Also reuse it for TDX host kernel support.
+On 11/8/23 18:12, Nina Schoetterl-Glausch wrote:
+> Use the previously unused S390_ARCH_FAC_MASK_SIZE_U64 instead of
+> S390_ARCH_FAC_LIST_SIZE_U64 for defining the fac_mask array.
+> Note that both values are the same, there is no functional change.
+> 
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 
-Introduce a new level menu "TDX Guest Support" and move existing
-materials under it, and add a new menu for TDX host kernel support.
-
-Signed-off-by: Kai Huang <kai.huang@intel.com>
----
-
-v14 -> v15:
- - Removed the dmesg shows TDX module version (not printed anymore).
-
-v13 -> v14:
- - Added new sections for "Erratum" and "TDX vs S3/hibernation"
-
-
----
- Documentation/arch/x86/tdx.rst | 222 +++++++++++++++++++++++++++++++--
- 1 file changed, 211 insertions(+), 11 deletions(-)
-
-diff --git a/Documentation/arch/x86/tdx.rst b/Documentation/arch/x86/tdx.rst
-index dc8d9fd2c3f7..8969675568d0 100644
---- a/Documentation/arch/x86/tdx.rst
-+++ b/Documentation/arch/x86/tdx.rst
-@@ -10,6 +10,206 @@ encrypting the guest memory. In TDX, a special module running in a special
- mode sits between the host and the guest and manages the guest/host
- separation.
- 
-+TDX Host Kernel Support
-+=======================
-+
-+TDX introduces a new CPU mode called Secure Arbitration Mode (SEAM) and
-+a new isolated range pointed by the SEAM Ranger Register (SEAMRR).  A
-+CPU-attested software module called 'the TDX module' runs inside the new
-+isolated range to provide the functionalities to manage and run protected
-+VMs.
-+
-+TDX also leverages Intel Multi-Key Total Memory Encryption (MKTME) to
-+provide crypto-protection to the VMs.  TDX reserves part of MKTME KeyIDs
-+as TDX private KeyIDs, which are only accessible within the SEAM mode.
-+BIOS is responsible for partitioning legacy MKTME KeyIDs and TDX KeyIDs.
-+
-+Before the TDX module can be used to create and run protected VMs, it
-+must be loaded into the isolated range and properly initialized.  The TDX
-+architecture doesn't require the BIOS to load the TDX module, but the
-+kernel assumes it is loaded by the BIOS.
-+
-+TDX boot-time detection
-+-----------------------
-+
-+The kernel detects TDX by detecting TDX private KeyIDs during kernel
-+boot.  Below dmesg shows when TDX is enabled by BIOS::
-+
-+  [..] virt/tdx: BIOS enabled: private KeyID range: [16, 64)
-+
-+TDX module initialization
-+---------------------------------------
-+
-+The kernel talks to the TDX module via the new SEAMCALL instruction.  The
-+TDX module implements SEAMCALL leaf functions to allow the kernel to
-+initialize it.
-+
-+If the TDX module isn't loaded, the SEAMCALL instruction fails with a
-+special error.  In this case the kernel fails the module initialization
-+and reports the module isn't loaded::
-+
-+  [..] virt/tdx: module not loaded
-+
-+Initializing the TDX module consumes roughly ~1/256th system RAM size to
-+use it as 'metadata' for the TDX memory.  It also takes additional CPU
-+time to initialize those metadata along with the TDX module itself.  Both
-+are not trivial.  The kernel initializes the TDX module at runtime on
-+demand.
-+
-+Besides initializing the TDX module, a per-cpu initialization SEAMCALL
-+must be done on one cpu before any other SEAMCALLs can be made on that
-+cpu.
-+
-+The kernel provides two functions, tdx_enable() and tdx_cpu_enable() to
-+allow the user of TDX to enable the TDX module and enable TDX on local
-+cpu respectively.
-+
-+Making SEAMCALL requires VMXON has been done on that CPU.  Currently only
-+KVM implements VMXON.  For now both tdx_enable() and tdx_cpu_enable()
-+don't do VMXON internally (not trivial), but depends on the caller to
-+guarantee that.
-+
-+To enable TDX, the caller of TDX should: 1) temporarily disable CPU
-+hotplug; 2) do VMXON and tdx_enable_cpu() on all online cpus; 3) call
-+tdx_enable().  For example::
-+
-+        cpus_read_lock();
-+        on_each_cpu(vmxon_and_tdx_cpu_enable());
-+        ret = tdx_enable();
-+        cpus_read_unlock();
-+        if (ret)
-+                goto no_tdx;
-+        // TDX is ready to use
-+
-+And the caller of TDX must guarantee the tdx_cpu_enable() has been
-+successfully done on any cpu before it wants to run any other SEAMCALL.
-+A typical usage is do both VMXON and tdx_cpu_enable() in CPU hotplug
-+online callback, and refuse to online if tdx_cpu_enable() fails.
-+
-+User can consult dmesg to see whether the TDX module has been initialized.
-+
-+If the TDX module is initialized successfully, dmesg shows something
-+like below::
-+
-+  [..] virt/tdx: 262668 KBs allocated for PAMT
-+  [..] virt/tdx: module initialized
-+
-+If the TDX module failed to initialize, dmesg also shows it failed to
-+initialize::
-+
-+  [..] virt/tdx: module initialization failed ...
-+
-+TDX Interaction to Other Kernel Components
-+------------------------------------------
-+
-+TDX Memory Policy
-+~~~~~~~~~~~~~~~~~
-+
-+TDX reports a list of "Convertible Memory Region" (CMR) to tell the
-+kernel which memory is TDX compatible.  The kernel needs to build a list
-+of memory regions (out of CMRs) as "TDX-usable" memory and pass those
-+regions to the TDX module.  Once this is done, those "TDX-usable" memory
-+regions are fixed during module's lifetime.
-+
-+To keep things simple, currently the kernel simply guarantees all pages
-+in the page allocator are TDX memory.  Specifically, the kernel uses all
-+system memory in the core-mm "at the time of TDX module initialization"
-+as TDX memory, and in the meantime, refuses to online any non-TDX-memory
-+in the memory hotplug.
-+
-+Physical Memory Hotplug
-+~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Note TDX assumes convertible memory is always physically present during
-+machine's runtime.  A non-buggy BIOS should never support hot-removal of
-+any convertible memory.  This implementation doesn't handle ACPI memory
-+removal but depends on the BIOS to behave correctly.
-+
-+CPU Hotplug
-+~~~~~~~~~~~
-+
-+TDX module requires the per-cpu initialization SEAMCALL must be done on
-+one cpu before any other SEAMCALLs can be made on that cpu.  The kernel
-+provides tdx_cpu_enable() to let the user of TDX to do it when the user
-+wants to use a new cpu for TDX task.
-+
-+TDX doesn't support physical (ACPI) CPU hotplug.  During machine boot,
-+TDX verifies all boot-time present logical CPUs are TDX compatible before
-+enabling TDX.  A non-buggy BIOS should never support hot-add/removal of
-+physical CPU.  Currently the kernel doesn't handle physical CPU hotplug,
-+but depends on the BIOS to behave correctly.
-+
-+Note TDX works with CPU logical online/offline, thus the kernel still
-+allows to offline logical CPU and online it again.
-+
-+Kexec()
-+~~~~~~~
-+
-+There are two problems in terms of using kexec() to boot to a new kernel
-+when the old kernel has enabled TDX: 1) Part of the memory pages are
-+still TDX private pages; 2) There might be dirty cachelines associated
-+with TDX private pages.
-+
-+The first problem doesn't matter.  KeyID 0 doesn't have integrity check.
-+Even the new kernel wants use any non-zero KeyID, it needs to convert
-+the memory to that KeyID and such conversion would work from any KeyID.
-+
-+However the old kernel needs to guarantee there's no dirty cacheline
-+left behind before booting to the new kernel to avoid silent corruption
-+from later cacheline writeback (Intel hardware doesn't guarantee cache
-+coherency across different KeyIDs).
-+
-+Similar to AMD SME, the kernel does wbinvd() to flush cache before
-+booting to the new kernel.
-+
-+Erratum
-+~~~~~~~
-+
-+The first few generations of TDX hardware have an erratum.  A partial
-+write to a TDX private memory cacheline will silently "poison" the
-+line.  Subsequent reads will consume the poison and generate a machine
-+check.
-+
-+A partial write is a memory write where a write transaction of less than
-+cacheline lands at the memory controller.  The CPU does these via
-+non-temporal write instructions (like MOVNTI), or through UC/WC memory
-+mappings.  Devices can also do partial writes via DMA.
-+
-+Theoretically, a kernel bug could do partial write to TDX private memory
-+and trigger unexpected machine check.  What's more, the machine check
-+code will present these as "Hardware error" when they were, in fact, a
-+software-triggered issue.  But in the end, this issue is hard to trigger.
-+
-+If the platform has such erratum, the kernel does additional things:
-+1) resetting TDX private pages using MOVDIR64B in kexec before booting to
-+the new kernel; 2) Printing additional message in machine check handler
-+to tell user the machine check may be caused by kernel bug on TDX private
-+memory.
-+
-+Interaction vs S3 and deeper states
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+TDX cannot survive from S3 and deeper states.  The hardware resets and
-+disables TDX completely when platform goes to S3 and deeper.  Both TDX
-+guests and the TDX module get destroyed permanently.
-+
-+The kernel uses S3 for suspend-to-ram, and use S4 and deeper states for
-+hibernation.  Currently, for simplicity, the kernel chooses to make TDX
-+mutually exclusive with S3 and hibernation.
-+
-+The kernel disables TDX during early boot when hibernation support is
-+available::
-+
-+  [..] virt/tdx: initialization failed: Hibernation support is enabled
-+
-+Add 'nohibernate' kernel command line to disable hibernation in order to
-+use TDX.
-+
-+ACPI S3 is disabled during kernel early boot if TDX is enabled.  The user
-+needs to turn off TDX in the BIOS in order to use S3.
-+
-+TDX Guest Support
-+=================
- Since the host cannot directly access guest registers or memory, much
- normal functionality of a hypervisor must be moved into the guest. This is
- implemented using a Virtualization Exception (#VE) that is handled by the
-@@ -20,7 +220,7 @@ TDX includes new hypercall-like mechanisms for communicating from the
- guest to the hypervisor or the TDX module.
- 
- New TDX Exceptions
--==================
-+------------------
- 
- TDX guests behave differently from bare-metal and traditional VMX guests.
- In TDX guests, otherwise normal instructions or memory accesses can cause
-@@ -30,7 +230,7 @@ Instructions marked with an '*' conditionally cause exceptions.  The
- details for these instructions are discussed below.
- 
- Instruction-based #VE
-----------------------
-+~~~~~~~~~~~~~~~~~~~~~
- 
- - Port I/O (INS, OUTS, IN, OUT)
- - HLT
-@@ -41,7 +241,7 @@ Instruction-based #VE
- - CPUID*
- 
- Instruction-based #GP
-----------------------
-+~~~~~~~~~~~~~~~~~~~~~
- 
- - All VMX instructions: INVEPT, INVVPID, VMCLEAR, VMFUNC, VMLAUNCH,
-   VMPTRLD, VMPTRST, VMREAD, VMRESUME, VMWRITE, VMXOFF, VMXON
-@@ -52,7 +252,7 @@ Instruction-based #GP
- - RDMSR*,WRMSR*
- 
- RDMSR/WRMSR Behavior
----------------------
-+~~~~~~~~~~~~~~~~~~~~
- 
- MSR access behavior falls into three categories:
- 
-@@ -73,7 +273,7 @@ trapping and handling in the TDX module.  Other than possibly being slow,
- these MSRs appear to function just as they would on bare metal.
- 
- CPUID Behavior
----------------
-+~~~~~~~~~~~~~~
- 
- For some CPUID leaves and sub-leaves, the virtualized bit fields of CPUID
- return values (in guest EAX/EBX/ECX/EDX) are configurable by the
-@@ -93,7 +293,7 @@ not know how to handle. The guest kernel may ask the hypervisor for the
- value with a hypercall.
- 
- #VE on Memory Accesses
--======================
-+----------------------
- 
- There are essentially two classes of TDX memory: private and shared.
- Private memory receives full TDX protections.  Its content is protected
-@@ -107,7 +307,7 @@ entries.  This helps ensure that a guest does not place sensitive
- information in shared memory, exposing it to the untrusted hypervisor.
- 
- #VE on Shared Memory
----------------------
-+~~~~~~~~~~~~~~~~~~~~
- 
- Access to shared mappings can cause a #VE.  The hypervisor ultimately
- controls whether a shared memory access causes a #VE, so the guest must be
-@@ -127,7 +327,7 @@ be careful not to access device MMIO regions unless it is also prepared to
- handle a #VE.
- 
- #VE on Private Pages
----------------------
-+~~~~~~~~~~~~~~~~~~~~
- 
- An access to private mappings can also cause a #VE.  Since all kernel
- memory is also private memory, the kernel might theoretically need to
-@@ -145,7 +345,7 @@ The hypervisor is permitted to unilaterally move accepted pages to a
- to handle the exception.
- 
- Linux #VE handler
--=================
-+-----------------
- 
- Just like page faults or #GP's, #VE exceptions can be either handled or be
- fatal.  Typically, an unhandled userspace #VE results in a SIGSEGV.
-@@ -167,7 +367,7 @@ While the block is in place, any #VE is elevated to a double fault (#DF)
- which is not recoverable.
- 
- MMIO handling
--=============
-+-------------
- 
- In non-TDX VMs, MMIO is usually implemented by giving a guest access to a
- mapping which will cause a VMEXIT on access, and then the hypervisor
-@@ -189,7 +389,7 @@ MMIO access via other means (like structure overlays) may result in an
- oops.
- 
- Shared Memory Conversions
--=========================
-+-------------------------
- 
- All TDX guest memory starts out as private at boot.  This memory can not
- be accessed by the hypervisor.  However, some kernel users like device
--- 
-2.41.0
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
 
