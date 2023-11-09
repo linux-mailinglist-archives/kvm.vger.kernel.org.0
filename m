@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-1295-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1296-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BAAC7E6484
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 08:39:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 242087E6492
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 08:43:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A41CDB20F17
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 07:39:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DFA71C209A4
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 07:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33626DF78;
-	Thu,  9 Nov 2023 07:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AD15DF6A;
+	Thu,  9 Nov 2023 07:43:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EqNd1oFN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xi6ri2eG"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF8ADF40
-	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 07:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85DDEDDDB
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 07:43:13 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C71F42D62;
-	Wed,  8 Nov 2023 23:39:10 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BBDD271F;
+	Wed,  8 Nov 2023 23:43:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699515550; x=1731051550;
+  t=1699515793; x=1731051793;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=3ASWqM4COtSvfUNBd+qgXRsrc+ivOwB+ZSi3IbAEev4=;
-  b=EqNd1oFNlBeO0KCyYe3da2zZok6nEb8jiaKqdMpMmu6fHwBpVv9YKi1K
-   o60mtz8SKwDBdiZ/Ecm15oBIXlNFPKXsLoX3+ljJYM5MznKTDNEmv9ZD5
-   3AjTYlmDLaIjc8jhvkWSeSzUP/0Yd9cEkT32MerkGBqKSeXQXfY0ZzU38
-   N++nLL8tIIMK7l+18RMz3utZhPatHEYghSUnnAxQMgUfa3xv1lvm7J9sp
-   +HPZMyY/lDm87F5Fndam7r3Vp4qYDFF2S7cJmOs97YQsrh6LXOMjDqIfq
-   u1hCWMeiW6upXrIOPJkggkz3e7Mq5kvithfpFNsX5diSHQfZJg/4k5Tci
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="389739711"
+  bh=Jqubs9fYJv686NaIUFg20xBqeod3EjBkKJaXMFTyavM=;
+  b=Xi6ri2eGBstP7hKRJRKqj+6LgRPlcVjrtCD3Vw7/zHFkpVCVC288utdh
+   p10d5ajZgNp3osG8K6F55tFdBsdE/Nw2YQXEETWqwjmA2aU6R8akYpHXC
+   aqxt+b5ksGDZs5nYgStbRZ8m0UlpD0pLiuhblTo/5Ccwsq+cIXptDGFhY
+   n2PirGt8QW4AM8wAOjPbpZomBqmLFfikZDYXdM+vOvHZQ2PMaAIwUmbzD
+   c6v8OfsSv8QXHFWIGyEA8vOka7VPSUCALvlw2aHaPqIErHnYo0FEHI4pL
+   WTHDiyjarYENP5LR6sNb4soa3fVLzP+vBWvFw0LsJK9XvffaCK94lJIRZ
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="389740358"
 X-IronPort-AV: E=Sophos;i="6.03,288,1694761200"; 
-   d="scan'208";a="389739711"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 23:39:10 -0800
+   d="scan'208";a="389740358"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 23:43:12 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="886919486"
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="766910589"
 X-IronPort-AV: E=Sophos;i="6.03,288,1694761200"; 
-   d="scan'208";a="886919486"
+   d="scan'208";a="766910589"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.5.53]) ([10.93.5.53])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 23:39:07 -0800
-Message-ID: <b62e34cc-2756-4d69-b75a-26919a3e0ef7@linux.intel.com>
-Date: Thu, 9 Nov 2023 15:39:05 +0800
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 23:43:10 -0800
+Message-ID: <cb38a9c5-f068-45be-b018-fb9bcd7243d4@linux.intel.com>
+Date: Thu, 9 Nov 2023 15:43:07 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,8 +56,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 13/19] KVM: selftests: Add functional test for Intel's
- fixed PMU counters
+Subject: Re: [PATCH v7 14/19] KVM: selftests: Expand PMU counters test to
+ verify LLC events
 Content-Language: en-US
 To: Sean Christopherson <seanjc@google.com>,
  Paolo Bonzini <pbonzini@redhat.com>
@@ -66,97 +66,119 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  Jinrong Liang <cloudliang@tencent.com>, Aaron Lewis <aaronlewis@google.com>,
  Like Xu <likexu@tencent.com>
 References: <20231108003135.546002-1-seanjc@google.com>
- <20231108003135.546002-14-seanjc@google.com>
+ <20231108003135.546002-15-seanjc@google.com>
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20231108003135.546002-14-seanjc@google.com>
+In-Reply-To: <20231108003135.546002-15-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 On 11/8/2023 8:31 AM, Sean Christopherson wrote:
-> From: Jinrong Liang <cloudliang@tencent.com>
+> Expand the PMU counters test to verify that LLC references and misses have
+> non-zero counts when the code being executed while the LLC event(s) is
+> active is evicted via CFLUSH{,OPT}.  Note, CLFLUSH{,OPT} requires a fence
+> of some kind to ensure the cache lines are flushed before execution
+> continues.  Use MFENCE for simplicity (performance is not a concern).
 >
-> Extend the fixed counters test to verify that supported counters can
-> actually be enabled in the control MSRs, that unsupported counters cannot,
-> and that enabled counters actually count.
->
-> Co-developed-by: Like Xu <likexu@tencent.com>
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> [sean: fold into the rd/wr access test, massage changelog]
+> Suggested-by: Jim Mattson <jmattson@google.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->   .../selftests/kvm/x86_64/pmu_counters_test.c  | 31 ++++++++++++++++++-
->   1 file changed, 30 insertions(+), 1 deletion(-)
+>   .../selftests/kvm/x86_64/pmu_counters_test.c  | 59 +++++++++++++------
+>   1 file changed, 40 insertions(+), 19 deletions(-)
 >
 > diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> index 8c934e261f2d..b9c073d3ade9 100644
+> index b9c073d3ade9..90381382c51f 100644
 > --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
 > +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> @@ -324,7 +324,6 @@ static void guest_rd_wr_counters(uint32_t base_msr, uint8_t nr_possible_counters
->   		vector = wrmsr_safe(msr, 0);
->   		GUEST_ASSERT_PMC_MSR_ACCESS(WRMSR, msr, expect_gp, vector);
->   	}
-> -	GUEST_DONE();
+> @@ -14,9 +14,9 @@
+>   /*
+>    * Number of "extra" instructions that will be counted, i.e. the number of
+>    * instructions that are needed to set up the loop and then disabled the
+> - * counter.  2 MOV, 2 XOR, 1 WRMSR.
+> + * counter.  1 CLFLUSH/CLFLUSHOPT/NOP, 1 MFENCE, 2 MOV, 2 XOR, 1 WRMSR.
+>    */
+> -#define NUM_EXTRA_INSNS		5
+> +#define NUM_EXTRA_INSNS		7
+>   #define NUM_INSNS_RETIRED	(NUM_BRANCHES + NUM_EXTRA_INSNS)
+>   
+>   static uint8_t kvm_pmu_version;
+> @@ -107,6 +107,12 @@ static void guest_assert_event_count(uint8_t idx,
+>   	case INTEL_ARCH_BRANCHES_RETIRED_INDEX:
+>   		GUEST_ASSERT_EQ(count, NUM_BRANCHES);
+>   		break;
+> +	case INTEL_ARCH_LLC_REFERENCES_INDEX:
+> +	case INTEL_ARCH_LLC_MISSES_INDEX:
+> +		if (!this_cpu_has(X86_FEATURE_CLFLUSHOPT) &&
+> +		    !this_cpu_has(X86_FEATURE_CLFLUSH))
+> +			break;
+> +		fallthrough;
+>   	case INTEL_ARCH_CPU_CYCLES_INDEX:
+>   	case INTEL_ARCH_REFERENCE_CYCLES_INDEX:
+>   		GUEST_ASSERT_NE(count, 0);
+> @@ -123,29 +129,44 @@ static void guest_assert_event_count(uint8_t idx,
+>   	GUEST_ASSERT_EQ(_rdpmc(pmc), 0xdead);
 >   }
 >   
->   static void guest_test_gp_counters(void)
-> @@ -342,6 +341,7 @@ static void guest_test_gp_counters(void)
->   		base_msr = MSR_IA32_PERFCTR0;
->   
->   	guest_rd_wr_counters(base_msr, MAX_NR_GP_COUNTERS, nr_gp_counters, 0);
-> +	GUEST_DONE();
->   }
->   
->   static void test_gp_counters(uint8_t pmu_version, uint64_t perf_capabilities,
-> @@ -365,6 +365,7 @@ static void guest_test_fixed_counters(void)
+> +/*
+> + * Enable and disable the PMC in a monolithic asm blob to ensure that the
+> + * compiler can't insert _any_ code into the measured sequence.  Note, ECX
+> + * doesn't need to be clobbered as the input value, @pmc_msr, is restored
+> + * before the end of the sequence.
+> + *
+> + * If CLFUSH{,OPT} is supported, flush the cacheline containing (at least) the
+> + * start of the loop to force LLC references and misses, i.e. to allow testing
+> + * that those events actually count.
+> + */
+> +#define GUEST_MEASURE_EVENT(_msr, _value, clflush)				\
+> +do {										\
+> +	__asm__ __volatile__("wrmsr\n\t"					\
+> +			     clflush "\n\t"					\
+> +			     "mfence\n\t"					\
+> +			     "1: mov $" __stringify(NUM_BRANCHES) ", %%ecx\n\t"	\
+> +			     "loop .\n\t"					\
+> +			     "mov %%edi, %%ecx\n\t"				\
+> +			     "xor %%eax, %%eax\n\t"				\
+> +			     "xor %%edx, %%edx\n\t"				\
+> +			     "wrmsr\n\t"					\
+> +			     :: "a"((uint32_t)_value), "d"(_value >> 32),	\
+> +				"c"(_msr), "D"(_msr)				\
+> +	);									\
+> +} while (0)
+> +
+>   static void __guest_test_arch_event(uint8_t idx, struct kvm_x86_pmu_feature event,
+>   				    uint32_t pmc, uint32_t pmc_msr,
+>   				    uint32_t ctrl_msr, uint64_t ctrl_msr_value)
 >   {
->   	uint64_t supported_bitmask = 0;
->   	uint8_t nr_fixed_counters = 0;
-> +	uint8_t i;
+>   	wrmsr(pmc_msr, 0);
 >   
->   	/* Fixed counters require Architectural vPMU Version 2+. */
->   	if (guest_get_pmu_version() >= 2)
-> @@ -379,6 +380,34 @@ static void guest_test_fixed_counters(void)
+> -	/*
+> -	 * Enable and disable the PMC in a monolithic asm blob to ensure that
+> -	 * the compiler can't insert _any_ code into the measured sequence.
+> -	 * Note, ECX doesn't need to be clobbered as the input value, @pmc_msr,
+> -	 * is restored before the end of the sequence.
+> -	 */
+> -	__asm__ __volatile__("wrmsr\n\t"
+> -			     "mov $" __stringify(NUM_BRANCHES) ", %%ecx\n\t"
+> -			     "loop .\n\t"
+> -			     "mov %%edi, %%ecx\n\t"
+> -			     "xor %%eax, %%eax\n\t"
+> -			     "xor %%edx, %%edx\n\t"
+> -			     "wrmsr\n\t"
+> -			     :: "a"((uint32_t)ctrl_msr_value),
+> -				"d"(ctrl_msr_value >> 32),
+> -				"c"(ctrl_msr), "D"(ctrl_msr)
+> -			     );
+> +	if (this_cpu_has(X86_FEATURE_CLFLUSHOPT))
+> +		GUEST_MEASURE_EVENT(ctrl_msr, ctrl_msr_value, "clflushopt 1f");
+> +	else if (this_cpu_has(X86_FEATURE_CLFLUSH))
+> +		GUEST_MEASURE_EVENT(ctrl_msr, ctrl_msr_value, "clflush 1f");
+> +	else
+> +		GUEST_MEASURE_EVENT(ctrl_msr, ctrl_msr_value, "nop");
 >   
->   	guest_rd_wr_counters(MSR_CORE_PERF_FIXED_CTR0, MAX_NR_FIXED_COUNTERS,
->   			     nr_fixed_counters, supported_bitmask);
-> +
-> +	for (i = 0; i < MAX_NR_FIXED_COUNTERS; i++) {
-> +		uint8_t vector;
-> +		uint64_t val;
-> +
-> +		if (i >= nr_fixed_counters && !(supported_bitmask & BIT_ULL(i))) {
-> +			vector = wrmsr_safe(MSR_CORE_PERF_FIXED_CTR_CTRL,
-> +					    FIXED_PMC_CTRL(i, FIXED_PMC_KERNEL));
-> +			__GUEST_ASSERT(vector == GP_VECTOR,
-> +				       "Expected #GP for counter %u in FIXED_CTR_CTRL", i);
-> +
-> +			vector = wrmsr_safe(MSR_CORE_PERF_GLOBAL_CTRL,
-> +					    FIXED_PMC_GLOBAL_CTRL_ENABLE(i));
-> +			__GUEST_ASSERT(vector == GP_VECTOR,
-> +				       "Expected #GP for counter %u in PERF_GLOBAL_CTRL", i);
-> +			continue;
-> +		}
-> +
-> +		wrmsr(MSR_CORE_PERF_FIXED_CTR0 + i, 0);
-> +		wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, FIXED_PMC_CTRL(i, FIXED_PMC_KERNEL));
-> +		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, FIXED_PMC_GLOBAL_CTRL_ENABLE(i));
-> +		__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
+>   	guest_assert_event_count(idx, event, pmc, pmc_msr);
+>   }
 
-This assembly code seems to be called many times, we may wrap it into a 
-macro or function.
 
 Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
-
-> +		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
-> +		val = rdmsr(MSR_CORE_PERF_FIXED_CTR0 + i);
-> +
-> +		GUEST_ASSERT_NE(val, 0);
-> +	}
-> +	GUEST_DONE();
->   }
->   
->   static void test_fixed_counters(uint8_t pmu_version, uint64_t perf_capabilities,
 
