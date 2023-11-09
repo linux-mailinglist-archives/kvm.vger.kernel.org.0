@@ -1,108 +1,167 @@
-Return-Path: <kvm+bounces-1346-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1347-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3B0A7E6B0A
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 14:12:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B45E7E6C76
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 15:33:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9765B1C20A03
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 13:12:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14DC41F213C6
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 14:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA011DDC5;
-	Thu,  9 Nov 2023 13:11:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 945D92030E;
+	Thu,  9 Nov 2023 14:33:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tqTf21IS"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AgJSADrK"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954941DA43
-	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 13:11:55 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D5A81FEB;
-	Thu,  9 Nov 2023 05:11:54 -0800 (PST)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A9DBBOP010759;
-	Thu, 9 Nov 2023 13:11:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=8G0FDVfBrCxKOxsk8y+IddWYDC94RL4fGkRSMZeh3WM=;
- b=tqTf21ISCNcldh/pEP3qu8kjI//Sn3eP49Ib4LeBQltts2xYJT6DHo8IXR9WrMK/t+Kr
- Prdnnobmuc93Z1W1dDDFaSC/ZZfMh7WMH8WtWYK5LSXD/lpvpuCb+Tfm0zH8tuZdvEPX
- A8CRoy3ypvYFm9olDiRmZii+bly6NkmxI9e2KdPJXWCYAm4FeFHnlU1/nROe4TvAfttE
- XFStR5a7BO4mKYL5hx8+UlwWM+0QlOd7/DWpPIcHxJYuD/Jsx+fZeEqcCiM/66pDL7pm
- r9Ue2zg4FcXjGzejkWPL5A8pNKjf2skrExODOipcQuh0HZ3tGejXNT39p8n4oNPPLrky gw== 
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u8ykeh1j6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Nov 2023 13:11:54 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A9B12CJ028310;
-	Thu, 9 Nov 2023 13:11:53 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u7w22kvxp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Nov 2023 13:11:53 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A9DBolJ28181240
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 9 Nov 2023 13:11:50 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EB5D22004B;
-	Thu,  9 Nov 2023 13:11:49 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AC7C720049;
-	Thu,  9 Nov 2023 13:11:49 +0000 (GMT)
-Received: from [9.152.224.228] (unknown [9.152.224.228])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  9 Nov 2023 13:11:49 +0000 (GMT)
-Message-ID: <c64f27ac-3367-c58c-d8d5-075e7bf6b7f8@de.ibm.com>
-Date: Thu, 9 Nov 2023 14:11:48 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC0B200A0
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 14:33:20 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8924330EB
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 06:33:19 -0800 (PST)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-53e2308198eso1456201a12.1
+        for <kvm@vger.kernel.org>; Thu, 09 Nov 2023 06:33:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1699540397; x=1700145197; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p/p9yeW43NcSMER0YQpwehxYcbDOe/wAYZ9SJZyRksQ=;
+        b=AgJSADrKUTpsO3qMXnMf0V7+zJtO5o/xlnjS5N6Iev6Zy+zc63pNgCMPo8bHWOW3uH
+         KHeyUMbTyn5euTAAvRfJX0wxmlx5gUVOwFSCBeiXCM/gh1ADwfxqMZ5nI8xhh5AxGe8/
+         58mS5IES51h1squ24Ta+rwTOTpwN5ppzX/GhdUrkGlfq0qACah9aN5VCVyyqFm8e1pqp
+         o00lVJGi4biA84501dukFF6X/agy2vogg1y+U/WogTAGccFbKI7e4fD2tsOcy6Rxi8z3
+         e/rMoiZ0vtSv1Z+uz4inpRw5KiOujo3ii+18w4AFHHiJv3oKkFSntwFA29m4yUsxozXA
+         oM+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699540397; x=1700145197;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=p/p9yeW43NcSMER0YQpwehxYcbDOe/wAYZ9SJZyRksQ=;
+        b=ngqexuOtgjovhcBLovCykm4WjIu1SwpPcbY9bwke/5Qm6bQYpGAf55SIw45ebbLtTy
+         uVwjf5HWRVpjJyWfw1T5RHJoWTcvJVUlSfgI1O9TsrXktDKg9xzzFLEnrSwFG5WYW547
+         7ZtbHC2W5FIUekOinEbMmio3w+jWM0VBhSgh38yKIBAvDvJVCrCi34eE0LhW8yxLwOkb
+         PItMFTIIx4u4xqxm9PNcbVjdsqFoQlGHju/Xfs4HvMRE+g0QZY1agM5BPTVqVrSxiKUU
+         Ln/u3MbtUg/9865chYAXPr9QsBwPQNVy+QDuKuC9VXv5F7OknmIEZMbhLmLfwfEPDUvS
+         aHpw==
+X-Gm-Message-State: AOJu0Yx/ZLNzq7pKyBiS7F2BMXJ/4u260D+TtmPmqdlnxJn/136jYgB4
+	BuafEvG3FzufGU1xzokPh9+ZcSIOQZSTIrn41ZQ6Vg==
+X-Google-Smtp-Source: AGHT+IG357JpQyVxWaJjqbV8YiVbKX+wpl5yjOXXCxYoMHlCTyZk6gVT3AeKgF8otnbJuRZg7j8Xbtz/KkJPUM7pYnw=
+X-Received: by 2002:a17:907:a0b:b0:9e2:8206:2ea9 with SMTP id
+ bb11-20020a1709070a0b00b009e282062ea9mr3873060ejc.60.1699540396832; Thu, 09
+ Nov 2023 06:33:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v1 1/1] KVM: s390/mm: Properly reset no-dat
-Content-Language: en-US
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, svens@linux.ibm.com,
-        agordeev@linux.ibm.com,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>
-References: <20231109123624.37314-1-imbrenda@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-In-Reply-To: <20231109123624.37314-1-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: UrG5xTsnPoYJzUOA-xWRw1aNA0J6OCA7
-X-Proofpoint-GUID: UrG5xTsnPoYJzUOA-xWRw1aNA0J6OCA7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-09_10,2023-11-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- malwarescore=0 impostorscore=0 mlxlogscore=686 lowpriorityscore=0
- clxscore=1011 adultscore=0 phishscore=0 priorityscore=1501 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311090099
+References: <20231107092149.404842-1-dwmw2@infradead.org> <20231107092149.404842-7-dwmw2@infradead.org>
+In-Reply-To: <20231107092149.404842-7-dwmw2@infradead.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 9 Nov 2023 14:33:06 +0000
+Message-ID: <CAFEAcA8McSqwXyAg1+9_DOjy5PU==FRja_gjkdXAAqjr7QtLQA@mail.gmail.com>
+Subject: Re: [PULL 06/15] hw/xen: automatically assign device index to block devices
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>, 
+	Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, 
+	Paul Durrant <paul@xen.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, 
+	Richard Henderson <richard.henderson@linaro.org>, Eduardo Habkost <eduardo@habkost.net>, 
+	Jason Wang <jasowang@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-block@nongnu.org, 
+	xen-devel@lists.xenproject.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Am 09.11.23 um 13:36 schrieb Claudio Imbrenda:
-> When the CMMA state needs to be reset, the no-dat bit also needs to be
-> reset. Failure to do so could cause issues in the guest, since the
-> guest expects the bit to be cleared after a reset.
+On Tue, 7 Nov 2023 at 09:24, David Woodhouse <dwmw2@infradead.org> wrote:
+>
+> From: David Woodhouse <dwmw@amazon.co.uk>
+>
+> There's no need to force the user to assign a vdev. We can automatically
+> assign one, starting at xvda and searching until we find the first disk
+> name that's unused.
+>
+> This means we can now allow '-drive if=3Dxen,file=3Dxxx' to work without =
+an
+> explicit separate -driver argument, just like if=3Dvirtio.
+>
+> Rip out the legacy handling from the xenpv machine, which was scribbling
+> over any disks configured by the toolstack, and didn't work with anything
+> but raw images.
 
-This happens during reset of a guest (or whenever QEMU calls the CLR_CMMA thingi).
-I think after reset a normal Linux guest has no DAT tables and very likely
-a cpu reset (with explicit full guest flush) will happen. It will very likely
-also set the CMMA state during boot before setting up its DAT tables.
-So for the normal reboot this should be ok. But I can imagine cases that would
-not be ok. So maybe add cc stable?
+Hi; Coverity points out an issue in this code (CID 1523906):
+
+> +/*
+> + * Find a free device name in the xvda =E2=86=92 xvdfan range and set it=
+ in
+> + * blockdev->props.vdev. Our definition of "free" is that there must
+> + * be no other disk or partition with the same disk number.
+> + *
+> + * You are technically permitted to have all of hda, hda1, sda, sda1,
+> + * xvda and xvda1 as *separate* PV block devices with separate backing
+> + * stores. That doesn't make it a good idea. This code will skip xvda
+> + * if *any* of those "conflicting" devices already exists.
+> + *
+> + * The limit of xvdfan (disk 4095) is fairly arbitrary just to avoid a
+> + * stupidly sized bitmap, but Linux as of v6.6 doesn't support anything
+> + * higher than that anyway.
+> + */
+> +static bool xen_block_find_free_vdev(XenBlockDevice *blockdev, Error **e=
+rrp)
+> +{
+> +    XenBus *xenbus =3D XEN_BUS(qdev_get_parent_bus(DEVICE(blockdev)));
+> +    unsigned long used_devs[BITS_TO_LONGS(MAX_AUTO_VDEV)];
+> +    XenBlockVdev *vdev =3D &blockdev->props.vdev;
+> +    char fe_path[XENSTORE_ABS_PATH_MAX + 1];
+> +    char **existing_frontends;
+> +    unsigned int nr_existing =3D 0;
+> +    unsigned int vdev_nr;
+> +    int i, disk =3D 0;
+> +
+> +    snprintf(fe_path, sizeof(fe_path), "/local/domain/%u/device/vbd",
+> +             blockdev->xendev.frontend_id);
+> +
+> +    existing_frontends =3D qemu_xen_xs_directory(xenbus->xsh, XBT_NULL, =
+fe_path,
+> +                                               &nr_existing);
+> +    if (!existing_frontends && errno !=3D ENOENT) {
+
+Here we check whether existing_frontends is NULL, implying it
+might be NULL (and the && in the condition means we might not
+take this error-exit path even if it is NULL)...
+
+> +        error_setg_errno(errp, errno, "cannot read %s", fe_path);
+> +        return false;
+> +    }
+> +
+> +    memset(used_devs, 0, sizeof(used_devs));
+> +    for (i =3D 0; i < nr_existing; i++) {
+> +        if (qemu_strtoui(existing_frontends[i], NULL, 10, &vdev_nr)) {
+
+...but here we deref existing_frontends, implying it can't be NULL.
+
+> +            free(existing_frontends[i]);
+> +            continue;
+> +        }
+> +
+> +        free(existing_frontends[i]);
+> +
+> +        disk =3D vdev_to_diskno(vdev_nr);
+> +        if (disk < 0 || disk >=3D MAX_AUTO_VDEV) {
+> +            continue;
+> +        }
+> +
+> +        set_bit(disk, used_devs);
+> +    }
+> +    free(existing_frontends);
+
+thanks
+-- PMM
 
