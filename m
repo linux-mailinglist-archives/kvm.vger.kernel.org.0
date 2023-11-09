@@ -1,53 +1,54 @@
-Return-Path: <kvm+bounces-1292-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1293-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 457407E6452
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 08:30:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D81A7E6458
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 08:31:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61EF01C20A86
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 07:30:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCEF028117E
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 07:31:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5083EDF58;
-	Thu,  9 Nov 2023 07:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DE9FDF6A;
+	Thu,  9 Nov 2023 07:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mQMfyA0T"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eZXHOqmH"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3283DDAC
-	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 07:30:07 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D6C42726;
-	Wed,  8 Nov 2023 23:30:07 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D96CDDB8;
+	Thu,  9 Nov 2023 07:30:58 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1C32271F;
+	Wed,  8 Nov 2023 23:30:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699515007; x=1731051007;
+  t=1699515057; x=1731051057;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=Ah6awO6TJYPqEBY79QJnkjDCK8oLzOlTj/Ln8MgS0Ps=;
-  b=mQMfyA0TNodx/h4pGG+8um+Zbg7xhnkXLO44+KT0DoV3CmYJyqUj2LPa
-   pD2VmUhcFjla9BqPhmix8OC/vjy2SQ48MUSAI6UC7uCFPiG4C0zNkEVzE
-   MiqWVJEWYaHrFyL1UygDyYXeaibJ456kJaaAlj3f7CSHO3yNaW99jiakE
-   RXcH5B62sjwZMNuVLHlUZWI6YXmULqf8BmNmxDHgvmEJMtHksx2xJI2zg
-   39Q1oK5juAfoBb3dwQPC7KsrCe/m8FRnail/ea2TbHWCTg/YUtuSd3dh/
-   RPs39vi2tu7UKA5yZhQVHx+7zUgZ7/7kD9O3Og1oKbJRhBDicAThFjOZy
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="387098407"
+  bh=OmUu8rMFPk76SQQBpTj2WfQgKT+KOR/AADQ/USzLx/o=;
+  b=eZXHOqmHCwEuzALWD1gPFTTlTYp+UoTwic7UC7fsmOPaD1OkxBwusrvv
+   7SomEx0rhQ9e3QJpBpr411R/RNyXsUuiMxw+SWdFF9WmLIUOoERK5HH0W
+   7DT6NgTq50xql9j6Pblln4ychngmnhyDEtWpHiOFGk1TrZCV2HIuqi5zM
+   xNuT4NxfwlIIIz7l8v+j2EZENqGKd/kHIBZ3kqq/bvS1ua8x3HrCQCjtl
+   0WqacZmWP5rHdNFjPfwyq/CCDDmB106yvfVG2Fb4oUxIkg50dJkZKjjj+
+   dXMCnOwPw218rA9nRa9Wh7lBFLlACfR/XaQ3OY5OodxRA9Jb1no3sVX5r
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="389738162"
 X-IronPort-AV: E=Sophos;i="6.03,288,1694761200"; 
-   d="scan'208";a="387098407"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 23:30:07 -0800
+   d="scan'208";a="389738162"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 23:30:52 -0800
 X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="886918888"
 X-IronPort-AV: E=Sophos;i="6.03,288,1694761200"; 
-   d="scan'208";a="11062966"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.5.53]) ([10.93.5.53])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 23:30:05 -0800
-Message-ID: <ab10f933-b4ae-4784-a56c-b5d3bc2e3271@linux.intel.com>
-Date: Thu, 9 Nov 2023 15:30:04 +0800
+   d="scan'208";a="886918888"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.9.145]) ([10.93.9.145])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 23:30:40 -0800
+Message-ID: <ea0815cf-b773-4440-925b-6b8a64f16a34@intel.com>
+Date: Thu, 9 Nov 2023 15:30:37 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -55,129 +56,234 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 10/19] KVM: selftests: Test Intel PMU architectural
- events on fixed counters
+Subject: Re: [PATCH 09/34] KVM: Add KVM_EXIT_MEMORY_FAULT exit to report
+ faults to userspace
 Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Kan Liang <kan.liang@linux.intel.com>, Jim Mattson <jmattson@google.com>,
- Jinrong Liang <cloudliang@tencent.com>, Aaron Lewis <aaronlewis@google.com>,
- Like Xu <likexu@tencent.com>
-References: <20231108003135.546002-1-seanjc@google.com>
- <20231108003135.546002-11-seanjc@google.com>
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20231108003135.546002-11-seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Sean Christopherson <seanjc@google.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>,
+ Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+ Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>,
+ Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
+ =?UTF-8?Q?n?= <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>,
+ Vishal Annapurve <vannapurve@google.com>,
+ Ackerley Tng <ackerleytng@google.com>,
+ Maciej Szmigiero <mail@maciej.szmigiero.name>,
+ David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
+ Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+ Liam Merwick <liam.merwick@oracle.com>,
+ Isaku Yamahata <isaku.yamahata@gmail.com>,
+ "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20231105163040.14904-1-pbonzini@redhat.com>
+ <20231105163040.14904-10-pbonzini@redhat.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20231105163040.14904-10-pbonzini@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-
-On 11/8/2023 8:31 AM, Sean Christopherson wrote:
-> From: Jinrong Liang <cloudliang@tencent.com>
->
-> Extend the PMU counters test to validate architectural events using fixed
-> counters.  The core logic is largely the same, the biggest difference
-> being that if a fixed counter exists, its associated event is available
-> (the SDM doesn't explicitly state this to be true, but it's KVM's ABI and
-> letting software program a fixed counter that doesn't actually count would
-> be quite bizarre).
->
-> Note, fixed counters rely on PERF_GLOBAL_CTRL.
->
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-> Co-developed-by: Like Xu <likexu@tencent.com>
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
+On 11/6/2023 12:30 AM, Paolo Bonzini wrote:
+> From: Chao Peng <chao.p.peng@linux.intel.com>
+> 
+> Add a new KVM exit type to allow userspace to handle memory faults that
+> KVM cannot resolve, but that userspace *may* be able to handle (without
+> terminating the guest).
+> 
+> KVM will initially use KVM_EXIT_MEMORY_FAULT to report implicit
+> conversions between private and shared memory.  With guest private memory,
+> there will be two kind of memory conversions:
+> 
+>    - explicit conversion: happens when the guest explicitly calls into KVM
+>      to map a range (as private or shared)
+> 
+>    - implicit conversion: happens when the guest attempts to access a gfn
+>      that is configured in the "wrong" state (private vs. shared)
+> 
+> On x86 (first architecture to support guest private memory), explicit
+> conversions will be reported via KVM_EXIT_HYPERCALL+KVM_HC_MAP_GPA_RANGE,
+> but reporting KVM_EXIT_HYPERCALL for implicit conversions is undesriable
+> as there is (obviously) no hypercall, and there is no guarantee that the
+> guest actually intends to convert between private and shared, i.e. what
+> KVM thinks is an implicit conversion "request" could actually be the
+> result of a guest code bug.
+> 
+> KVM_EXIT_MEMORY_FAULT will be used to report memory faults that appear to
+> be implicit conversions.
+> 
+> Note!  To allow for future possibilities where KVM reports
+> KVM_EXIT_MEMORY_FAULT and fills run->memory_fault on _any_ unresolved
+> fault, KVM returns "-EFAULT" (-1 with errno == EFAULT from userspace's
+> perspective), not '0'!  Due to historical baggage within KVM, exiting to
+> userspace with '0' from deep callstacks, e.g. in emulation paths, is
+> infeasible as doing so would require a near-complete overhaul of KVM,
+> whereas KVM already propagates -errno return codes to userspace even when
+> the -errno originated in a low level helper.
+> 
+> Report the gpa+size instead of a single gfn even though the initial usage
+> is expected to always report single pages.  It's entirely possible, likely
+> even, that KVM will someday support sub-page granularity faults, e.g.
+> Intel's sub-page protection feature allows for additional protections at
+> 128-byte granularity.
+> 
+> Link: https://lore.kernel.org/all/20230908222905.1321305-5-amoorthy@google.com
+> Link: https://lore.kernel.org/all/ZQ3AmLO2SYv3DszH@google.com
+> Cc: Anish Moorthy <amoorthy@google.com>
+> Cc: David Matlack <dmatlack@google.com>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
 > Co-developed-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> Message-Id: <20231027182217.3615211-10-seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+
 > ---
->   .../selftests/kvm/x86_64/pmu_counters_test.c  | 54 +++++++++++++++----
->   1 file changed, 45 insertions(+), 9 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> index 5b8687bb4639..9cd308417aeb 100644
-> --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> @@ -150,26 +150,46 @@ static void __guest_test_arch_event(uint8_t idx, struct kvm_x86_pmu_feature even
->   	guest_assert_event_count(idx, event, pmc, pmc_msr);
->   }
+>   Documentation/virt/kvm/api.rst | 41 ++++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/x86.c             |  1 +
+>   include/linux/kvm_host.h       | 11 +++++++++
+>   include/uapi/linux/kvm.h       |  8 +++++++
+>   4 files changed, 61 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index bdea1423c5f8..481fb0e2ce90 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6846,6 +6846,26 @@ array field represents return values. The userspace should update the return
+>   values of SBI call before resuming the VCPU. For more details on RISC-V SBI
+>   spec refer, https://github.com/riscv/riscv-sbi-doc.
 >   
-> +#define X86_PMU_FEATURE_NULL						\
-> +({									\
-> +	struct kvm_x86_pmu_feature feature = {};			\
-> +									\
-> +	feature;							\
-> +})
+> +::
 > +
-> +static bool pmu_is_null_feature(struct kvm_x86_pmu_feature event)
+> +		/* KVM_EXIT_MEMORY_FAULT */
+> +		struct {
+> +			__u64 flags;
+> +			__u64 gpa;
+> +			__u64 size;
+> +		} memory_fault;
+> +
+> +KVM_EXIT_MEMORY_FAULT indicates the vCPU has encountered a memory fault that
+> +could not be resolved by KVM.  The 'gpa' and 'size' (in bytes) describe the
+> +guest physical address range [gpa, gpa + size) of the fault.  The 'flags' field
+> +describes properties of the faulting access that are likely pertinent.
+> +Currently, no flags are defined.
+> +
+> +Note!  KVM_EXIT_MEMORY_FAULT is unique among all KVM exit reasons in that it
+> +accompanies a return code of '-1', not '0'!  errno will always be set to EFAULT
+> +or EHWPOISON when KVM exits with KVM_EXIT_MEMORY_FAULT, userspace should assume
+> +kvm_run.exit_reason is stale/undefined for all other error numbers.
+> +
+>   ::
+>   
+>       /* KVM_EXIT_NOTIFY */
+> @@ -7880,6 +7900,27 @@ This capability is aimed to mitigate the threat that malicious VMs can
+>   cause CPU stuck (due to event windows don't open up) and make the CPU
+>   unavailable to host or other VMs.
+>   
+> +7.34 KVM_CAP_MEMORY_FAULT_INFO
+> +------------------------------
+> +
+> +:Architectures: x86
+> +:Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
+> +
+> +The presence of this capability indicates that KVM_RUN will fill
+> +kvm_run.memory_fault if KVM cannot resolve a guest page fault VM-Exit, e.g. if
+> +there is a valid memslot but no backing VMA for the corresponding host virtual
+> +address.
+> +
+> +The information in kvm_run.memory_fault is valid if and only if KVM_RUN returns
+> +an error with errno=EFAULT or errno=EHWPOISON *and* kvm_run.exit_reason is set
+> +to KVM_EXIT_MEMORY_FAULT.
+> +
+> +Note: Userspaces which attempt to resolve memory faults so that they can retry
+> +KVM_RUN are encouraged to guard against repeatedly receiving the same
+> +error/annotated fault.
+> +
+> +See KVM_EXIT_MEMORY_FAULT for more information.
+> +
+>   8. Other capabilities.
+>   ======================
+>   
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7b389f27dffc..8f9d8939b63b 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4625,6 +4625,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_ENABLE_CAP:
+>   	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
+>   	case KVM_CAP_IRQFD_RESAMPLE:
+> +	case KVM_CAP_MEMORY_FAULT_INFO:
+>   		r = 1;
+>   		break;
+>   	case KVM_CAP_EXIT_HYPERCALL:
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 4e741ff27af3..96aa930536b1 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2327,4 +2327,15 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+>   /* Max number of entries allowed for each kvm dirty ring */
+>   #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
+>   
+> +static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+> +						 gpa_t gpa, gpa_t size)
 > +{
-> +	return !(*(u64 *)&event);
+> +	vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
+> +	vcpu->run->memory_fault.gpa = gpa;
+> +	vcpu->run->memory_fault.size = size;
+> +
+> +	/* Flags are not (yet) defined or communicated to userspace. */
+> +	vcpu->run->memory_fault.flags = 0;
 > +}
 > +
->   static void guest_test_arch_event(uint8_t idx)
->   {
->   	const struct {
->   		struct kvm_x86_pmu_feature gp_event;
-> +		struct kvm_x86_pmu_feature fixed_event;
->   	} intel_event_to_feature[] = {
-> -		[INTEL_ARCH_CPU_CYCLES_INDEX]		 = { X86_PMU_FEATURE_CPU_CYCLES },
-> -		[INTEL_ARCH_INSTRUCTIONS_RETIRED_INDEX]	 = { X86_PMU_FEATURE_INSNS_RETIRED },
-> -		[INTEL_ARCH_REFERENCE_CYCLES_INDEX]	 = { X86_PMU_FEATURE_REFERENCE_CYCLES },
-> -		[INTEL_ARCH_LLC_REFERENCES_INDEX]	 = { X86_PMU_FEATURE_LLC_REFERENCES },
-> -		[INTEL_ARCH_LLC_MISSES_INDEX]		 = { X86_PMU_FEATURE_LLC_MISSES },
-> -		[INTEL_ARCH_BRANCHES_RETIRED_INDEX]	 = { X86_PMU_FEATURE_BRANCH_INSNS_RETIRED },
-> -		[INTEL_ARCH_BRANCHES_MISPREDICTED_INDEX] = { X86_PMU_FEATURE_BRANCHES_MISPREDICTED },
-> -		[INTEL_ARCH_TOPDOWN_SLOTS_INDEX]	 = { X86_PMU_FEATURE_TOPDOWN_SLOTS },
-> +		[INTEL_ARCH_CPU_CYCLES_INDEX]		 = { X86_PMU_FEATURE_CPU_CYCLES, X86_PMU_FEATURE_CPU_CYCLES_FIXED },
-> +		[INTEL_ARCH_INSTRUCTIONS_RETIRED_INDEX]	 = { X86_PMU_FEATURE_INSNS_RETIRED, X86_PMU_FEATURE_INSNS_RETIRED_FIXED },
-> +		/*
-> +		 * Note, the fixed counter for reference cycles is NOT the same
-> +		 * as the general purpose architectural event.  The fixed counter
-> +		 * explicitly counts at the same frequency as the TSC, whereas
-> +		 * the GP event counts at a fixed, but uarch specific, frequency.
-> +		 * Bundle them here for simplicity.
-> +		 */
-> +		[INTEL_ARCH_REFERENCE_CYCLES_INDEX]	 = { X86_PMU_FEATURE_REFERENCE_CYCLES, X86_PMU_FEATURE_REFERENCE_TSC_CYCLES_FIXED },
-> +		[INTEL_ARCH_LLC_REFERENCES_INDEX]	 = { X86_PMU_FEATURE_LLC_REFERENCES, X86_PMU_FEATURE_NULL },
-> +		[INTEL_ARCH_LLC_MISSES_INDEX]		 = { X86_PMU_FEATURE_LLC_MISSES, X86_PMU_FEATURE_NULL },
-> +		[INTEL_ARCH_BRANCHES_RETIRED_INDEX]	 = { X86_PMU_FEATURE_BRANCH_INSNS_RETIRED, X86_PMU_FEATURE_NULL },
-> +		[INTEL_ARCH_BRANCHES_MISPREDICTED_INDEX] = { X86_PMU_FEATURE_BRANCHES_MISPREDICTED, X86_PMU_FEATURE_NULL },
-> +		[INTEL_ARCH_TOPDOWN_SLOTS_INDEX]	 = { X86_PMU_FEATURE_TOPDOWN_SLOTS, X86_PMU_FEATURE_TOPDOWN_SLOTS_FIXED },
+>   #endif
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 308cc70bd6ab..59010a685007 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -275,6 +275,7 @@ struct kvm_xen_exit {
+>   #define KVM_EXIT_RISCV_CSR        36
+>   #define KVM_EXIT_NOTIFY           37
+>   #define KVM_EXIT_LOONGARCH_IOCSR  38
+> +#define KVM_EXIT_MEMORY_FAULT     39
+>   
+>   /* For KVM_EXIT_INTERNAL_ERROR */
+>   /* Emulate instruction failed. */
+> @@ -528,6 +529,12 @@ struct kvm_run {
+>   #define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
+>   			__u32 flags;
+>   		} notify;
+> +		/* KVM_EXIT_MEMORY_FAULT */
+> +		struct {
+> +			__u64 flags;
+> +			__u64 gpa;
+> +			__u64 size;
+> +		} memory_fault;
+>   		/* Fix the size of the union. */
+>   		char padding[256];
 >   	};
+> @@ -1212,6 +1219,7 @@ struct kvm_ppc_resize_hpt {
+>   #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
+>   #define KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES 230
+>   #define KVM_CAP_USER_MEMORY2 231
+> +#define KVM_CAP_MEMORY_FAULT_INFO 232
 >   
->   	uint32_t nr_gp_counters = this_cpu_property(X86_PROPERTY_PMU_NR_GP_COUNTERS);
->   	uint32_t pmu_version = guest_get_pmu_version();
->   	/* PERF_GLOBAL_CTRL exists only for Architectural PMU Version 2+. */
->   	bool guest_has_perf_global_ctrl = pmu_version >= 2;
-> -	struct kvm_x86_pmu_feature gp_event;
-> +	struct kvm_x86_pmu_feature gp_event, fixed_event;
->   	uint32_t base_pmc_msr;
->   	unsigned int i;
+>   #ifdef KVM_CAP_IRQ_ROUTING
 >   
-> @@ -199,6 +219,22 @@ static void guest_test_arch_event(uint8_t idx)
->   		__guest_test_arch_event(idx, gp_event, i, base_pmc_msr + i,
->   					MSR_P6_EVNTSEL0 + i, eventsel);
->   	}
-> +
-> +	if (!guest_has_perf_global_ctrl)
-> +		return;
-> +
-> +	fixed_event = intel_event_to_feature[idx].fixed_event;
-> +	if (pmu_is_null_feature(fixed_event) || !this_pmu_has(fixed_event))
-> +		return;
-> +
-> +	i = fixed_event.f.bit;
-> +
-> +	wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, FIXED_PMC_CTRL(i, FIXED_PMC_KERNEL));
-> +
-> +	__guest_test_arch_event(idx, fixed_event, FIXED_PMC_RDPMC_BASE + i,
-> +				MSR_CORE_PERF_FIXED_CTR0 + i,
-> +				MSR_CORE_PERF_GLOBAL_CTRL,
-> +				FIXED_PMC_GLOBAL_CTRL_ENABLE(i));
->   }
->   
->   static void guest_test_arch_events(void)
-
-Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
 
