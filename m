@@ -1,103 +1,131 @@
-Return-Path: <kvm+bounces-1351-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1352-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EC7C7E6D4C
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 16:23:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 567187E6E17
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 16:55:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDC312810BC
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 15:23:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1878A2810EE
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 15:55:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59DD220318;
-	Thu,  9 Nov 2023 15:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF38420B37;
+	Thu,  9 Nov 2023 15:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GgQtopqG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="elmMbCuH"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA7112B99
-	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 15:23:09 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C049530EB
-	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 07:23:08 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5af9b0850fdso13646767b3.1
-        for <kvm@vger.kernel.org>; Thu, 09 Nov 2023 07:23:08 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29743208BC
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 15:55:49 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 573FC270E
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 07:55:48 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a7cc433782so13386157b3.3
+        for <kvm@vger.kernel.org>; Thu, 09 Nov 2023 07:55:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699543388; x=1700148188; darn=vger.kernel.org;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kigI6ClI5egwqqPJrt8+IeHIdPDCUrXTRQpt6o3p25c=;
-        b=GgQtopqGyNnoJUxGoqLTpXHh3YJf0lYuQxp7mtAp7ewXWYpRa9r44HWdSyaudVaf9j
-         DkeKPgudRWU6SbEshZOLgaQ2FeTRjP2WCrnZaWX5rokTbFf+4Zy5o6hHqobYS5hfhBTu
-         dm64nZeo8lY3ceBejTD6mTkfUQqiwnJl1zxnSqFCHOIUYQs0ijjq1pauTlK+KceuEeHP
-         1m6HqJFY1/pARHn87eXGJysI/WUPElqMbiLP4LQcvs7dQDn9ocD8xt8qUvGVBomPg9fg
-         aCfELCr9UesRRKnYmNsdlp8mRUO1Ay7uM36X6ESFts2a+6RbpLi6GyS/WQH+pMoQtDhm
-         tHZA==
+        d=google.com; s=20230601; t=1699545347; x=1700150147; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LIV0OIBtO/qEXjcwFa8rlo/bkTpqYyvIzQur9Hu2Qhs=;
+        b=elmMbCuHGjmMGTYLrs9pdF/CJ9097pLAy+R7TYoStB/mA5LnEMcQqefeUu+cR4DaDw
+         dNIDJpPIkqFORFySnj2KZ0bpmw8AdWdCuq9IK8VSLikNaNApOr9XzMCVFrbwFMlrYOyb
+         d8afeYo0We9B/Jt6gVOQDGQ9JpNt/imEEezhIEcFfYXi8Pyv45NCN2qapcAYPXOnrK+Q
+         g8cERphO/Jp20EYPeOlfKaexzJysIg0OlfexqhaFLWwdHNlAeHaCE0E9ZsoqBZ/IunC8
+         dxH0pAiPycB3Z7IOEiMbGar/gpMascpfsM13FZCkvMD0zPVIw9N9Ym7RuMQYdWuo/70I
+         Q1gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699543388; x=1700148188;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kigI6ClI5egwqqPJrt8+IeHIdPDCUrXTRQpt6o3p25c=;
-        b=SMHeScfSF055rjigzhca5zHcvUVn7+2OrA/onpXueHhN6KpvjbugsJjC16qlTjLCYq
-         OhonStKhAh75GyY8xAx5HTqMJph29/vJKecHO0vV/RAfvyqB+ey+cgufeinCL2SQrLBh
-         TbyD2mEHuuYO4nzXlTKynUrLanFGT70pyaJ1d38NmSq3u+IM1A7t/gjZrVDS/enoR7Cl
-         kPMmk2yPTniKuhTXt9XQPOdg9uRTUKUIAHSuCRGcPVESqAAu4qzgzWgMuLSldQWRMtHy
-         7iBqPgXq5ASfewU4legXQSSh+6EPFEY5itLyv3M0e4zxDkZ2Sa1goenbUkasEdOfoV43
-         kuTw==
-X-Gm-Message-State: AOJu0YyuqoRj9zgWVzVJWZyAqsc8RLfXlsv8UBXCbu9dVJkxogp7x434
-	1jGCxg6Mji1FvE5bFHXtzswDJgDUq7k=
-X-Google-Smtp-Source: AGHT+IFXnzP17PCTQd37aYqPCT1uLviAELrNiOsHNVjcYyLHD22AsT92khPvu9YBl9QRnes7DTAeBrp7upE=
+        d=1e100.net; s=20230601; t=1699545347; x=1700150147;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LIV0OIBtO/qEXjcwFa8rlo/bkTpqYyvIzQur9Hu2Qhs=;
+        b=Q0Q0CfFY/woJOzNunw/GGi44uYR7MkYn0DNnNtWNhjDhJGsQjUDNjs96yMUaOMPUEy
+         XGjZgjw67ASQO3qicMUPZZ5La235xgdJqMWeYnu1cBWEKIHN6x5ZgCjokUQ0LQlcro1o
+         yvvE8LGOYqW8e52TYxA+cyTBKA7Lv3j8rNX2Hla5JsEIJtzj9Nisa1YszFoQOXOIhY6L
+         FZOfFZRrNWqtb5Aq5FBnkC5DmLUBOLecjoyjtK9wJuIi8CrdII87yRr8b0n75uuxQoCv
+         ZPS+kGfNuaivzGyPwL+O0xxQKUOFbARPMalhaHWt+T0wbHhMTCLCf5qHCo88UbsicpVk
+         2lhw==
+X-Gm-Message-State: AOJu0YxjH9FRU+5qRtmjfkyPC5uzIEeQE+sx6TJcAezv5TFWWZRLHJtg
+	hGkUkQ8/h3i3slLDglIgIUfTmZ4O7+0=
+X-Google-Smtp-Source: AGHT+IEMEShf0mykk0aG8QQsdHk7vwrzkzv/Ox7kVvv3Xl7bbuRdh2hiw2H6Gx6DhoX5AbdU/WOx4VMJWVk=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:4e95:0:b0:57a:118a:f31 with SMTP id
- c143-20020a814e95000000b0057a118a0f31mr149451ywb.7.1699543388029; Thu, 09 Nov
- 2023 07:23:08 -0800 (PST)
-Date: Thu, 9 Nov 2023 07:23:06 -0800
-In-Reply-To: <20231108003135.546002-11-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:310:b0:5bf:6098:58dc with SMTP id
+ bg16-20020a05690c031000b005bf609858dcmr88627ywb.9.1699545347576; Thu, 09 Nov
+ 2023 07:55:47 -0800 (PST)
+Date: Thu, 9 Nov 2023 07:55:45 -0800
+In-Reply-To: <20231108235456.GB1132821@ls.amr.corp.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231108003135.546002-1-seanjc@google.com> <20231108003135.546002-11-seanjc@google.com>
-Message-ID: <ZUz5WrxGf4blspae@google.com>
-Subject: Re: [PATCH v7 10/19] KVM: selftests: Test Intel PMU architectural
- events on fixed counters
+References: <cover.1699383993.git.isaku.yamahata@intel.com>
+ <20231107192933.GA1102144@ls.amr.corp.intel.com> <CALMp9eR8Jnn0g0XBpTKTfKKOtRmFwAWuLAKcozuOs6KAGZ6MQQ@mail.gmail.com>
+ <20231108235456.GB1132821@ls.amr.corp.intel.com>
+Message-ID: <ZU0BASXWcck85r90@google.com>
+Subject: Re: KVM: X86: Make bus clock frequency for vapic timer (bus lock ->
+ bus clock) (was Re: [PATCH 0/2] KVM: X86: Make bus lock frequency for vapic
+ timer) configurable
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Kan Liang <kan.liang@linux.intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
-	Jim Mattson <jmattson@google.com>, Jinrong Liang <cloudliang@tencent.com>, 
-	Aaron Lewis <aaronlewis@google.com>, Like Xu <likexu@tencent.com>
+To: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+Cc: Jim Mattson <jmattson@google.com>, isaku.yamahata@intel.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com, 
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com, 
+	Vishal Annapurve <vannapurve@google.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Nov 07, 2023, Sean Christopherson wrote:
-> @@ -199,6 +219,22 @@ static void guest_test_arch_event(uint8_t idx)
->  		__guest_test_arch_event(idx, gp_event, i, base_pmc_msr + i,
->  					MSR_P6_EVNTSEL0 + i, eventsel);
->  	}
-> +
-> +	if (!guest_has_perf_global_ctrl)
-> +		return;
-> +
-> +	fixed_event = intel_event_to_feature[idx].fixed_event;
-> +	if (pmu_is_null_feature(fixed_event) || !this_pmu_has(fixed_event))
-> +		return;
-> +
-> +	i = fixed_event.f.bit;
-> +
-> +	wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, FIXED_PMC_CTRL(i, FIXED_PMC_KERNEL));
-> +
-> +	__guest_test_arch_event(idx, fixed_event, FIXED_PMC_RDPMC_BASE + i,
+On Wed, Nov 08, 2023, Isaku Yamahata wrote:
+> On Tue, Nov 07, 2023 at 12:03:35PM -0800, Jim Mattson <jmattson@google.com> wrote:
+> > I think I know the answer, but do you have any tests for this new feature?
+> 
+> If you mean kvm kselftest, no.
+> I have
+> - TDX patched qemu
+> - kvm-unit-tests: test_apic_timer_one_shot() @ kvm-unit-tests/x86/apic.c
+>   TDX version is found at https://github.com/intel/kvm-unit-tests-tdx
+>   We're planning to upstream the changes for TDX
+> 
+> How far do we want to go?
+> - Run kvm-unit-tests with TDX. What I have right now.
+> - kvm-unit-tests: extend qemu for default VM case and update
+>   test_apic_timer_one_host()
 
-Grr, this should be an OR, not a SUM, i.e. "FIXED_PMC_RDPMC_BASE | i".  That's
-how Like/Jinrong originally had things, but I got confused by the BASE terminology
-and "fixed" it.  The end result is the name, but the PMU code is hard enough to
-follow as it is.
+Hrm, I'm not sure that we can do a whole lot for test_apic_timer_one_shot().  Or
+rather, I'm not sure it's worth the effort to try and add coverage beyond what's
+already there.
 
-I'm also going to rename FIXED_PMC_RDPMC_BASE, that is a terrible name that got
-copy+pasted from perf.  It's not a base value, it's a single flag that says "read
-fixed counters".
+As for TDX, *if* we extend KUT, please don't make it depend on TDX.  Very few people
+have access to TDX platforms and anything CoCo is pretty much guaranteed to be harder
+to debug.
+
+> - kselftest
+>   Right now kvm kselftest doesn't have test cases even for in-kernel IRQCHIP
+>   creation.
+
+Selftests always create an in-kernel APIC.  And I think selftests are perfectly
+suited to complement the coverage provided by KUT.  Specifically, the failure
+scenario for this is that KVM emulates at 1Ghz whereas TDX advertises 25Mhz, i.e.
+the test case we want is to verify that the APIC timer doesn't expire early.
+
+There's no need for any APIC infrastructure, e.g. a selftest doesn't even need to
+handle an interrupt.  Get the TSC frequency from KVM, program up an arbitrary APIC
+bus clock frequency, set TMICT such that it expires waaaay in the future, and then
+verify that the APIC timer counts reasonably close to the programmed frequency.
+E.g. if the test sets the bus clock to 25Mhz, the "drift" due to KVM counting at
+1Ghz should be super obvious.
+
+LOL, side topic, KUT has this:
+
+	/*
+	 * For LVT Timer clock, SDM vol 3 10.5.4 says it should be
+	 * derived from processor's bus clock (IIUC which is the same  <======
+	 * as TSC), however QEMU seems to be using nanosecond. In all
+	 * cases, the following should satisfy on all modern
+	 * processors.
+	 */
+	report((lvtt_counter == 1) && (tsc2 - tsc1 >= interval),
+	       "APIC LVT timer one shot");
 
