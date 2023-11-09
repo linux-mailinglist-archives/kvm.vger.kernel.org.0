@@ -1,199 +1,259 @@
-Return-Path: <kvm+bounces-1368-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1370-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5BC87E72AB
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 21:13:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8CAE7E733F
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 22:04:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84B1E281044
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 20:13:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F91FB21016
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 21:04:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34462374CF;
-	Thu,  9 Nov 2023 20:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 047C138DE1;
+	Thu,  9 Nov 2023 21:03:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gB9+gqf4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0Y9ycm4y"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D9CF37171
-	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 20:13:25 +0000 (UTC)
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79B8544B7
-	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 12:13:24 -0800 (PST)
-Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so21001a12.0
-        for <kvm@vger.kernel.org>; Thu, 09 Nov 2023 12:13:24 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA38D374DE
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 21:03:44 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C234F46B1
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 13:03:43 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7d261a84bso18619247b3.3
+        for <kvm@vger.kernel.org>; Thu, 09 Nov 2023 13:03:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699560803; x=1700165603; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ocUzg3FTzeoLXOisKd+4x7BoT7kOaFCafsophQHiPRo=;
-        b=gB9+gqf4zFKcks3982Hlt21j0xm+Sv3In9ZFDJhrbDRWNxf+dHrKoQu/rTf61Gcwsj
-         RAYzeF/H4p7neoBnGw11w1ufeIPq7Qngc+EGrQsPRLsXScFe75rz85fH0Trfpkvxr76u
-         /Cl1Evq1lu+lvcI+yEIVpBHxrXLa89a0DWoJlrqC45KMUva2WN9aBoUTmOo4xzpK6cYy
-         ZKYa+ymTEmQhCgwNkPu+B5h72rb/NEVr0jFI8Qfob1ieGAncL7h7JV5dxa+xYkf9DyCn
-         KMQ7n462oCPUWCCYrfpd1Z/So0s4u1j+Pzqvjxwh7EWWP/FyY6lusGGq9a0Wm/caW5bV
-         96Lg==
+        d=google.com; s=20230601; t=1699563823; x=1700168623; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Md8awSTbxdliEndjHBRSvaM0UbkXbzycQQEoteYw9Tc=;
+        b=0Y9ycm4y/3xf8sk9ZFzus83L5v0vk1DvDokawmnvuc1PrRrsduwYRT4wUDEEzQdJbU
+         0SFaGjrrgQwKlh3eLCX29Y1sv5P7jkXxFqiuy6jU0lZ+BI5DY5UtBau5l+LZ/Z0Mqfot
+         wjhZVTxN0lbNOFJEYuWOujTUoD7PDEDfOZnO8iK4OUloBeYpEN4P/ewC9NVALIZbWe1j
+         P8jAJwr+20s2c38S5vQviZspfkCIMk5XrM6lefIyg519sQX+B8FiZ0RkLnp37yg7okis
+         xiUHeF3EKSQLvbkh0dTrt4s7dmxzjMsbP51fg1v/GoDXltvAdI2iBccmngUDd/GPUwmg
+         EgRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699560803; x=1700165603;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ocUzg3FTzeoLXOisKd+4x7BoT7kOaFCafsophQHiPRo=;
-        b=soqaJ8Vko3kc6eYX3LcJryfn9OM49xGUKLcwBROmw7gy7cU0M1TnsNrUH3rLTenQld
-         czCICmIB1sh5nixbbE7Z+94nrjip70ePRqFOeCq1Yygkib9k7yZqxJ0eq0dH6Xqpp2cP
-         HYCDTY60/Mj1Kl1GDK+QTUljDgzj7bI6XAXaYKmJIZ3WXRgU3nqJB9UkPDCtw4oxLVmm
-         IZPmar+Pan9t1tGxy/41CtDMScmPlNcue3hJUTkXbFxHm+jzRFyf+eKXzjP23ASBhejT
-         o8E5iVUGUqXyrGZ40PCs0i3TKEKVUxSiwB+DU6zA6UVI/q3foiNd+5oVdDBVlYiSzMmr
-         DlSg==
-X-Gm-Message-State: AOJu0YxHWIX7ff+k/mbxRwLUHQJrfXec6L8vfHwVubPKACatOwBtnB7m
-	BG3/pEhl7dmPqOulBIaaLoAEIKrSHCfYni7w47L1A21FPhCzP4dPpinbug==
-X-Google-Smtp-Source: AGHT+IFl3f7I4jfsKcQ/FZf0kEtsWD15V5uxxnAkbhemH9QBkuW16e1KUvDsXvbC5KcxaO60TUay/oB5kkJSbVpYeBA=
-X-Received: by 2002:a05:6402:2b8a:b0:544:e2b8:ba6a with SMTP id
- fj10-20020a0564022b8a00b00544e2b8ba6amr662601edb.3.1699560802749; Thu, 09 Nov
- 2023 12:13:22 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699563823; x=1700168623;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Md8awSTbxdliEndjHBRSvaM0UbkXbzycQQEoteYw9Tc=;
+        b=D561uOO9SRXG3mb9SDTsPJuewkjL+IMoPvBzHlRFSzdU58nEfTw3e3BIZEh8SPcShe
+         pWB0KMNfeg22q7xTkJpz7fhjyTVL+1pO38Ji1xWuVuD7hbImRrx34lvshc5oFFVv3OCF
+         PN5X8p6NQUTnG3Qu+pFg9F5ipbqhCqncESrAgx+Jry6UEXoIKteVLrBrBTwgSpB6JWcg
+         xCbmozL8dz3AgRrJb6s/k+3ctQhsbU/EdFFuNZXGjxmq/laMGoNHdRt+McyXK2LP2+LU
+         Wj2D+KtDItnBhboteJ8IvyTRSzah8hvelZ/5cY++F0vWhk0BYtf/02Q3WUA3Yw2Lvhq9
+         g37Q==
+X-Gm-Message-State: AOJu0YzJdxj9Z+s/+bVnzJv4bl1sSOjGkxOURjVB/rYi2VkmO3Tn+YjY
+	NyoMOQqLIsrfFcPagOsQpuThmd5KAr01Uw==
+X-Google-Smtp-Source: AGHT+IHazvMpaROGKsZ1EdyOYmyWtakXaPvGow3k+KCEXn7elKNcy7SpAS0xnJiwHKh3oL++JOhdlVVRPcsYag==
+X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
+ (user=amoorthy job=sendgmr) by 2002:a5b:490:0:b0:da3:7a5c:69bb with SMTP id
+ n16-20020a5b0490000000b00da37a5c69bbmr153713ybp.8.1699563822927; Thu, 09 Nov
+ 2023 13:03:42 -0800 (PST)
+Date: Thu,  9 Nov 2023 21:03:11 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231109180646.2963718-1-khorenko@virtuozzo.com> <20231109180646.2963718-2-khorenko@virtuozzo.com>
-In-Reply-To: <20231109180646.2963718-2-khorenko@virtuozzo.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Thu, 9 Nov 2023 12:13:08 -0800
-Message-ID: <CALMp9eRpq+vYDD7s9t54ZMOK6WaXTY_trKzSE3R2vWP9PeSCOA@mail.gmail.com>
-Subject: Re: [PATCH 1/1] KVM: x86/vPMU: Check PMU is enabled for vCPU before
- searching for PMC
-To: Konstantin Khorenko <khorenko@virtuozzo.com>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"Denis V. Lunev" <den@virtuozzo.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
+Message-ID: <20231109210325.3806151-1-amoorthy@google.com>
+Subject: [PATCH v6 00/14] Improve KVM + userfaultfd performance via
+ KVM_MEMORY_FAULT_EXITs on stage-2 faults
+From: Anish Moorthy <amoorthy@google.com>
+To: seanjc@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: oliver.upton@linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	robert.hoo.linux@gmail.com, jthoughton@google.com, amoorthy@google.com, 
+	dmatlack@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 9, 2023 at 10:24=E2=80=AFAM Konstantin Khorenko
-<khorenko@virtuozzo.com> wrote:
->
-> The following 2 mainstream patches have introduced extra
-> events accounting:
->
->   018d70ffcfec ("KVM: x86: Update vPMCs when retiring branch instructions=
-")
->   9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions")
->
-> kvm_pmu_trigger_event() iterates over all PMCs looking for enabled and
-> this appeared to be fast on Intel CPUs and quite expensive for AMD CPUs.
->
-> kvm_pmu_trigger_event() can be optimized not to iterate over all PMCs in
-> the following cases:
->
->   * if PMU is completely disabled for a VM, which is the default
->     configuration
->   * if PMU v2 is enabled, but no PMCs are configured
->
-> For Intel CPUs:
->   * By default PMU is disabled for KVM VMs (<pmu state=3D'off'/> or absen=
-t
->     in the VM config xml which results in "-cpu pmu=3Doff" qemu option).
->     In this case pmu->version is reported as 0 for the appropriate vCPU.
->
->   * According to Intel=C2=AE 64 and IA-32 Architectures Software Develope=
-r=E2=80=99s
->     Manual PMU version 2 and higher provide IA32_PERF_GLOBAL_CTRL MSR
->     which in particular contains bits which can be used for efficient
->     detection which fixed-function performance and general-purpose
->     performance monitoring counters are enabled at the moment.
->
->   * Searching for enabled PMCs is fast and the optimization does not
->     bring noticeable performance increase.
->
-> For AMD CPUs:
->   * For CPUs older than Zen 4 pmu->version is always reported as "1" for
->     the appropriate vCPU, no matter if PMU is disabled for KVM VMs
->     (<pmu state=3D'off'/>) or enabled.
->     So for "old" CPUs currently it's impossible to detect when PMU is
->     disabled for a VM and skip the iteration by PMCs efficiently.
->
->   * Since Zen 4 AMD CPUs support PMU v2 and in this case pmu->version
->     should be reported as "2" and IA32_PERF_GLOBAL_CTRL MSR is available
->     and can be used for fast and efficient check for enabled PMCs.
->     https://www.phoronix.com/news/AMD-PerfMonV2-Linux-Patches
->     https://www.phoronix.com/news/AMD-PerfMonV2-Guests-KVM
->
->   * Optimized preliminary check for enabled PMCs on AMD Zen 4 CPUs
->     should give quite noticeable performance improvement.
->
-> AMD performance results:
-> CPU: AMD Zen 3 (three!): AMD EPYC 7443P 24-Core Processor
->
->  * The test binary is run inside an AlmaLinux 9 VM with their stock kerne=
-l
->    5.14.0-284.11.1.el9_2.x86_64.
->  * Test binary checks the CPUID instractions rate (instructions per sec).
->  * Default VM config (PMU is off, pmu->version is reported as 1).
->  * The Host runs the kernel under test.
->
->  # for i in 1 2 3 4 5 ; do ./at_cpu_cpuid.pub ; done | \
->    awk -e '{print $4;}' | \
->    cut -f1 --delimiter=3D'.' | \
->    ./avg.sh
->
-> Measurements:
-> 1. Host runs stock latest mainstream kernel commit 305230142ae0.
-> 2. Host runs same mainstream kernel + current patch.
-> 3. Host runs same mainstream kernel + current patch + force
->    guest_pmu_is_enabled() to always return "false" using following change=
-:
->
->    -       if (pmu->version >=3D 2 && !(pmu->global_ctrl & ~pmu->global_c=
-trl_mask))
->    +       if (pmu->version =3D=3D 1 && !(pmu->global_ctrl & ~pmu->global=
-_ctrl_mask))
->
->    --------------------------------------
->    | Kernels    | CPUID rate            |
->    --------------------------------------
->    | 1.         | 1360250               |
->    | 2.         | 1365536 (+ 0.4%)      |
->    | 3.         | 1541850 (+13.4%)      |
->    --------------------------------------
->
-> Measurement (2) gives some fluctuation, the performance is not increased
-> because the test was done on a Zen 3 CPU, so we are unable to use fast
-> check for active PMCs.
-> Measurement (3) shows expected performance boost on a Zen 4 CPU under
-> the same test.
->
-> Signed-off-by: Konstantin Khorenko <khorenko@virtuozzo.com>
-> ---
->  arch/x86/kvm/pmu.c | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
->
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index 9ae07db6f0f6..290d407f339b 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -731,12 +731,38 @@ static inline bool cpl_is_matched(struct kvm_pmc *p=
-mc)
->         return (static_call(kvm_x86_get_cpl)(pmc->vcpu) =3D=3D 0) ? selec=
-t_os : select_user;
->  }
->
-> +static inline bool guest_pmu_is_enabled(struct kvm_pmu *pmu)
-> +{
-> +       /*
-> +        * Currently VMs do not have PMU settings in configs which defaul=
-ts
-> +        * to "pmu=3Doff".
-> +        *
-> +        * For Intel currently this means pmu->version will be 0.
-> +        * For AMD currently PMU cannot be disabled:
+This series adds an option to cause stage-2 fault handlers to
+KVM_MEMORY_FAULT_EXIT when they would otherwise be required to fault in
+the userspace mappings. Doing so allows userspace to receive stage-2
+faults directly from KVM_RUN instead of through userfaultfd, which
+suffers from serious contention issues as the number of vCPUs scales.
 
-Isn't that what KVM_PMU_CAP_DISABLE is for?
+Support for the new option (KVM_CAP_EXIT_ON_MISSING) is added to the
+demand_paging_test, which demonstrates the scalability improvements:
+the following data was collected using [2] on an x86 machine with 256
+cores.
+
+vCPUs, Average Paging Rate (w/o new caps), Average Paging Rate (w/ new caps)
+1       150     340
+2       191     477
+4       210     809
+8       155     1239
+16      130     1595
+32      108     2299
+64      86      3482
+128     62      4134
+256     36      4012
+
+TODO
+~~~~
+No known issues/things to resolve. However, documentation/commit logs
+merit a close look given how much feedback I've received on those :/
+
+Base Commit
+~~~~~~~~~~~
+This series is based off of kvm/next (45b890f7689e) with v14 of the
+guest_memfd series applied, with some fixes on top [3].
+
+Links
+~~~~~
+[1] Original RFC from James Houghton:
+    https://lore.kernel.org/linux-mm/CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1B_kkNb0dNwiWiAN_Q@mail.gmail.com/
+
+[2] ./demand_paging_test -b 64M -u MINOR -s shmem -a -v <n> -r <n> [-w]
+    A quick rundown of the new flags (also detailed in later commits)
+        -a registers all of guest memory to a single uffd.
+        -r species the number of reader threads for polling the uffd.
+        -w is what actually enables the new capabilities.
+    All data was collected after applying the entire series
+
+[3] https://lore.kernel.org/kvm/20231105163040.14904-1-pbonzini@redhat.com/T/#m56361120ee1dd5265a5710e6a814906cda8e1020
+    The following fixes are required to get the KVM selftests to compile
+    on arm64
+    - https://lore.kernel.org/kvm/20231108233723.3380042-1-amoorthy@google.com/
+    - https://lore.kernel.org/kvm/affca7a8-116e-4b0f-9edf-6cdc05ba65ca@redhat.com/
+    - Unguarding the definitions of MEM_REGION_GPA/SLOT in set_memory_region_test
+      (not sure if this is the "right" fix for that test, but it compiles)
+
+---
+
+v6
+  - Rebase onto guest_memfd series [Anish/Sean]
+  - Set write fault flag properly in user_mem_abort() [Oliver]
+  - Reformat unnecessarily multi-line comments [Sean]
+  - Drop the kvm_vcpu_read|write_guest_page() annotations [Sean]
+  - Rename *USERFAULT_ON_MISSING to *EXIT_ON_MISSING [David]
+  - Remove unnecessary rounding in user_mem_abort() annotation [David]
+  - Rewrite logs for KVM_MEM_EXIT_ON_MISSING patches and squash
+    them with the stage-2 fault annotation patches [Sean]
+  - Undo the enum parameter addition to __gfn_to_pfn_memslot(), and just
+    add another boolean parameter instead [Sean]
+  - Better shortlog for the hva_to_pfn_fast() change [Anish]
+
+v5: https://lore.kernel.org/kvm/20230908222905.1321305-1-amoorthy@google.com/
+  - Rename APIs (again) [Sean]
+  - Initialize hardware_exit_reason along w/ exit_reason on x86 [Isaku]
+  - Reword hva_to_pfn_fast() change commit message [Sean]
+  - Correct style on terminal if statements [Sean]
+  - Switch to kconfig to signal KVM_CAP_USERFAULT_ON_MISSING [Sean]
+  - Add read fault flag for annotated faults [Sean]
+  - read/write_guest_page() changes
+      - Move the annotations into vcpu wrapper fns [Sean]
+      - Reorder parameters [Robert]
+  - Rename kvm_populate_efault_info() to
+    kvm_handle_guest_uaccess_fault() [Sean]
+  - Remove unnecessary EINVAL on trying to enable memory fault info cap [Sean]
+  - Correct description of the faults which hva_to_pfn_fast() can now
+    resolve [Sean]
+  - Eliminate unnecessary parameter added to __kvm_faultin_pfn() [Sean]
+  - Magnanimously accept Sean's rewrite of the handle_error_pfn()
+    annotation [Anish]
+  - Remove vcpu null check from kvm_handle_guest_uaccess_fault [Sean]
+
+v4: https://lore.kernel.org/kvm/20230602161921.208564-1-amoorthy@google.com/T/#t
+  - Fix excessive indentation [Robert, Oliver]
+  - Calculate final stats when uffd handler fn returns an error [Robert]
+  - Remove redundant info from uffd_desc [Robert]
+  - Fix various commit message typos [Robert]
+  - Add comment about suppressed EEXISTs in selftest [Robert]
+  - Add exit_reasons_known definition for KVM_EXIT_MEMORY_FAULT [Robert]
+  - Fix some include/logic issues in self test [Robert]
+  - Rename no-slow-gup cap to KVM_CAP_NOWAIT_ON_FAULT [Oliver, Sean]
+  - Make KVM_CAP_MEMORY_FAULT_INFO informational-only [Oliver, Sean]
+  - Drop most of the annotations from v3: see
+    https://lore.kernel.org/kvm/20230412213510.1220557-1-amoorthy@google.com/T/#mfe28e6a5015b7cd8c5ea1c351b0ca194aeb33daf
+  - Remove WARN on bare efaults [Sean, Oliver]
+  - Eliminate unnecessary UFFDIO_WAKE call from self test [James]
+
+v3: https://lore.kernel.org/kvm/ZEBXi5tZZNxA+jRs@x1n/T/#t
+  - Rework the implementation to be based on two orthogonal
+    capabilities (KVM_CAP_MEMORY_FAULT_INFO and
+    KVM_CAP_NOWAIT_ON_FAULT) [Sean, Oliver]
+  - Change return code of kvm_populate_efault_info [Isaku]
+  - Use kvm_populate_efault_info from arm code [Oliver]
+
+v2: https://lore.kernel.org/kvm/20230315021738.1151386-1-amoorthy@google.com/
+
+    This was a bit of a misfire, as I sent my WIP series on the mailing
+    list but was just targeting Sean for some feedback. Oliver Upton and
+    Isaku Yamahata ended up discovering the series and giving me some
+    feedback anyways, so thanks to them :) In the end, there was enough
+    discussion to justify retroactively labeling it as v2, even with the
+    limited cc list.
+
+  - Introduce KVM_CAP_X86_MEMORY_FAULT_EXIT.
+  - API changes:
+        - Gate KVM_CAP_MEMORY_FAULT_NOWAIT behind
+          KVM_CAP_x86_MEMORY_FAULT_EXIT (on x86 only: arm has no such
+          requirement).
+        - Switched to memslot flag
+  - Take Oliver's simplification to the "allow fast gup for readable
+    faults" logic.
+  - Slightly redefine the return code of user_mem_abort.
+  - Fix documentation errors brought up by Marc
+  - Reword commit messages in imperative mood
+
+v1: https://lore.kernel.org/kvm/20230215011614.725983-1-amoorthy@google.com/
+
+Anish Moorthy (14):
+  KVM: Documentation: Clarify meaning of hva_to_pfn()'s 'atomic'
+    parameter
+  KVM: Documentation: Add docstrings for __kvm_read/write_guest_page()
+  KVM: Simplify error handling in __gfn_to_pfn_memslot()
+  KVM: Define and communicate KVM_EXIT_MEMORY_FAULT RWX flags to
+    userspace
+  KVM: Try using fast GUP to resolve read faults
+  KVM: Add memslot flag to let userspace force an exit on missing hva
+    mappings
+  KVM: x86: Enable KVM_CAP_EXIT_ON_MISSING and annotate EFAULTs from
+    stage-2 fault handler
+  KVM: arm64: Enable KVM_CAP_MEMORY_FAULT_INFO
+  KVM: arm64: Enable KVM_CAP_EXIT_ON_MISSING and annotate an EFAULT from
+    stage-2 fault-handler
+  KVM: selftests: Report per-vcpu demand paging rate from demand paging
+    test
+  KVM: selftests: Allow many vCPUs and reader threads per UFFD in demand
+    paging test
+  KVM: selftests: Use EPOLL in userfaultfd_util reader threads and
+    signal errors via TEST_ASSERT
+  KVM: selftests: Add memslot_flags parameter to memstress_create_vm()
+  KVM: selftests: Handle memory fault exits in demand_paging_test
+
+ Documentation/virt/kvm/api.rst                |  33 +-
+ arch/arm64/kvm/Kconfig                        |   1 +
+ arch/arm64/kvm/arm.c                          |   1 +
+ arch/arm64/kvm/mmu.c                          |   7 +-
+ arch/powerpc/kvm/book3s_64_mmu_hv.c           |   2 +-
+ arch/powerpc/kvm/book3s_64_mmu_radix.c        |   2 +-
+ arch/x86/kvm/Kconfig                          |   1 +
+ arch/x86/kvm/mmu/mmu.c                        |   8 +-
+ include/linux/kvm_host.h                      |  21 +-
+ include/uapi/linux/kvm.h                      |   5 +
+ .../selftests/kvm/aarch64/page_fault_test.c   |   4 +-
+ .../selftests/kvm/access_tracking_perf_test.c |   2 +-
+ .../selftests/kvm/demand_paging_test.c        | 295 ++++++++++++++----
+ .../selftests/kvm/dirty_log_perf_test.c       |   2 +-
+ .../testing/selftests/kvm/include/memstress.h |   2 +-
+ .../selftests/kvm/include/userfaultfd_util.h  |  17 +-
+ tools/testing/selftests/kvm/lib/memstress.c   |   4 +-
+ .../selftests/kvm/lib/userfaultfd_util.c      | 159 ++++++----
+ .../kvm/memslot_modification_stress_test.c    |   2 +-
+ .../x86_64/dirty_log_page_splitting_test.c    |   2 +-
+ virt/kvm/Kconfig                              |   3 +
+ virt/kvm/kvm_main.c                           |  46 ++-
+ 22 files changed, 444 insertions(+), 175 deletions(-)
+
+-- 
+2.42.0.869.gea05f2083d-goog
+
 
