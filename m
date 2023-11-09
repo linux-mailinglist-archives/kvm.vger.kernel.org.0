@@ -1,135 +1,120 @@
-Return-Path: <kvm+bounces-1288-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1289-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36FD37E6139
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 00:55:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DE597E61B7
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 02:08:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5F3A2812E4
-	for <lists+kvm@lfdr.de>; Wed,  8 Nov 2023 23:55:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A26D281269
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 01:08:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06CA238DE8;
-	Wed,  8 Nov 2023 23:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5400710F3;
+	Thu,  9 Nov 2023 01:08:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AHsiVOFQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vhiF8HHM"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80726374E7
-	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 23:54:57 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 058A225BC;
-	Wed,  8 Nov 2023 15:54:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699487697; x=1731023697;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=RlYUE+lkNESY4winlQ/vFKHJhVPBJgGJcSYFyVCXbTY=;
-  b=AHsiVOFQC0PdptDClECaiqvLKQp7KXbAQZJDp6pAP2yz3rkiLGBOwgi1
-   ZPgke1Zeqc7Yr26n1D46YA6Q0w1oY/SLjSx2uklDadRf3Fl+h4fgbxyFo
-   fAqMJ0Y1qF5jM7DK9N/Qn/k9Yvy8Kwm1AUvSO3GS6/yVeU+G0W8IceAwe
-   IY7eu/iRyDEcoyZPmhrGb8V1O7171+uPT6WlroYMfzJf0Ygkz11/xtIkG
-   nQgGj9BJt7ZoSxkbLXcuW3dgJWIaISCIg/cIEW+K95a1iiC3p8tQD2Eby
-   mnZJC+DtAbyAayb/9J9b3JXx5tBN6crP99esKAhmi8CO2FwZxTUOmP8FA
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="370086260"
-X-IronPort-AV: E=Sophos;i="6.03,287,1694761200"; 
-   d="scan'208";a="370086260"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 15:54:56 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="906948872"
-X-IronPort-AV: E=Sophos;i="6.03,287,1694761200"; 
-   d="scan'208";a="906948872"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 15:54:56 -0800
-Date: Wed, 8 Nov 2023 15:54:56 -0800
-From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
-To: Jim Mattson <jmattson@google.com>
-Cc: Isaku Yamahata <isaku.yamahata@linux.intel.com>,
-	isaku.yamahata@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: KVM: X86: Make bus clock frequency for vapic timer (bus lock ->
- bus clock) (was Re: [PATCH 0/2] KVM: X86: Make bus lock frequency for vapic
- timer) configurable
-Message-ID: <20231108235456.GB1132821@ls.amr.corp.intel.com>
-References: <cover.1699383993.git.isaku.yamahata@intel.com>
- <20231107192933.GA1102144@ls.amr.corp.intel.com>
- <CALMp9eR8Jnn0g0XBpTKTfKKOtRmFwAWuLAKcozuOs6KAGZ6MQQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275A5805
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 01:08:38 +0000 (UTC)
+Received: from mail-oo1-xc2e.google.com (mail-oo1-xc2e.google.com [IPv6:2607:f8b0:4864:20::c2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7346258F
+	for <kvm@vger.kernel.org>; Wed,  8 Nov 2023 17:08:37 -0800 (PST)
+Received: by mail-oo1-xc2e.google.com with SMTP id 006d021491bc7-586753b0ab0so176859eaf.0
+        for <kvm@vger.kernel.org>; Wed, 08 Nov 2023 17:08:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699492117; x=1700096917; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7QtjMEn3JvZfL2+9Ot0aHfDjSbnUMOfTRHsLPFnN/cE=;
+        b=vhiF8HHMq4Wd8cn65pkEiTzZFRa9GxYRRZtdB96C6qVy7NACqOoJzmTeJiZyFWFmny
+         ARgHmOhotHju98RUn3mK9d4iZMGNKJSfyyss/ZULOD5dh/i1cx2TfHlRh6O+DVtmQpMM
+         Dt9+mi9o2Uj+vEnt84zDOdgT3j4C8Ytibet3WHgzmJX4mfsS6NfgRvq9WRy+yTf/qAvh
+         YsWKLLDiYJPc8Mf4hBxb7nxdVGsvuMemWO61R8M5YC8teqz7Nix6usKWXUfc1SdVDT8D
+         982RxBjYKNC9vEVJc/xbU8wP/1kBVn2/cSImQD/Lw8E9oMZbOiycrradqa2WkXNsWDVN
+         PyWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699492117; x=1700096917;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7QtjMEn3JvZfL2+9Ot0aHfDjSbnUMOfTRHsLPFnN/cE=;
+        b=LdK7Da9ZEAJ3MNL3Kpa1/uaPNHPgHIZhwWpTjtvAfxetgFy80qOHwqnZLPxzt9aQCj
+         q01t+8YKDvh1pyvYvaheLmauPXSiX7t3Wl3YLeATJD0UnMPYyQRICW+qLgMJ1HCFJ2gu
+         tY3q9UliZFI3zVWeHMBqMOo9ML9i9DA+cctqHcxJ9CkWCJ4VisrKUk7JKlkpY4b8E+ST
+         lM0bTBqv0j8jUb0qPvHbU1zEHpv0YLfqVyyvnyCsuRKax82EKMqLF9gGMSWpXkSNqYsA
+         M7vYQmK4JuzmGCYs/EdPM0s1bYL6/nIHgyy+KP4x5CoH45MJCGlQbUjWQU53CyxO3FYI
+         1bRQ==
+X-Gm-Message-State: AOJu0YyKCm5haNX4UxtvRbW8PzhxGiU8m44/BZEtOxKtN/+YR8Bxyg1E
+	uAJVtsy0SfVPG1GqZ08jcp1wT/9BzVjZZGymoFOS8A==
+X-Google-Smtp-Source: AGHT+IFaOEA03XuxazKl3zVOaUpDe2bAHjHbEU9NUIQA9ZcNh5LArgqxcn+4MTtdSbfjNu4oRqbtO3sH2+Wygyf9VBk=
+X-Received: by 2002:a4a:e088:0:b0:587:873d:7e2c with SMTP id
+ w8-20020a4ae088000000b00587873d7e2cmr3411182oos.1.1699492116891; Wed, 08 Nov
+ 2023 17:08:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALMp9eR8Jnn0g0XBpTKTfKKOtRmFwAWuLAKcozuOs6KAGZ6MQQ@mail.gmail.com>
+References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-35-pbonzini@redhat.com>
+In-Reply-To: <20231105163040.14904-35-pbonzini@redhat.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Wed, 8 Nov 2023 17:08:01 -0800
+Message-ID: <CAF7b7mpmuYLTY6OQfRRoOryfO-2e1ZumQ6SCQDHHPD5XFyhFTQ@mail.gmail.com>
+Subject: Re: [PATCH 34/34] KVM: selftests: Add a memory region subtest to
+ validate invalid flags
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Sean Christopherson <seanjc@google.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 07, 2023 at 12:03:35PM -0800,
-Jim Mattson <jmattson@google.com> wrote:
+Applying [1] and [2] reveals that this also breaks non-x86 builds- the
+MEM_REGION_GPA/SLOT definitions are guarded behind an #ifdef
+__x86_64__, while the usages introduced here aren't.
 
-> On Tue, Nov 7, 2023 at 11:29 AM Isaku Yamahata
-> <isaku.yamahata@linux.intel.com> wrote:
-> >
-> > I meant bus clock frequency, not bus lock. Sorry for typo.
-> >
-> > On Tue, Nov 07, 2023 at 11:22:32AM -0800,
-> > isaku.yamahata@intel.com wrote:
-> >
-> > > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > >
-> > > Add KVM_CAP_X86_BUS_FREQUENCY_CONTROL capability to configure the core
-> > > crystal clock (or processor's bus clock) for APIC timer emulation.  Allow
-> > > KVM_ENABLE_CAPABILITY(KVM_CAP_X86_BUS_FREUQNCY_CONTROL) to set the
-> > > frequency.  When using this capability, the user space VMM should configure
-> > > CPUID[0x15] to advertise the frequency.
-> > >
-> > > TDX virtualizes CPUID[0x15] for the core crystal clock to be 25MHz.  The
-> > > x86 KVM hardcodes its freuqncy for APIC timer to be 1GHz.  This mismatch
-> > > causes the vAPIC timer to fire earlier than the guest expects. [1] The KVM
-> > > APIC timer emulation uses hrtimer, whose unit is nanosecond.
-> > >
-> > > There are options to reconcile the mismatch.  1) Make apic bus clock frequency
-> > > configurable (this patch).  2) TDX KVM code adjusts TMICT value.  This is hacky
-> > > and it results in losing MSB bits from 32 bit width to 30 bit width.  3). Make
-> > > the guest kernel use tsc deadline timer instead of acpi oneshot/periodic timer.
-> > > This is guest kernel choice.  It's out of control of VMM.
-> > >
-> > > [1] https://lore.kernel.org/lkml/20231006011255.4163884-1-vannapurve@google.com/
-> > >
-> > > Isaku Yamahata (2):
-> > >   KVM: x86: Make the hardcoded APIC bus frequency vm variable
-> > >   KVM: X86: Add a capability to configure bus frequency for APIC timer
-> 
-> I think I know the answer, but do you have any tests for this new feature?
+Should
 
-If you mean kvm kselftest, no.
-I have
-- TDX patched qemu
-- kvm-unit-tests: test_apic_timer_one_shot() @ kvm-unit-tests/x86/apic.c
-  TDX version is found at https://github.com/intel/kvm-unit-tests-tdx
-  We're planning to upstream the changes for TDX
+On Sun, Nov 5, 2023 at 8:35=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>
+> +       test_invalid_memory_region_flags();
 
-How far do we want to go?
-- Run kvm-unit-tests with TDX. What I have right now.
-- kvm-unit-tests: extend qemu for default VM case and update
-  test_apic_timer_one_host()
-- kselftest
-  Right now kvm kselftest doesn't have test cases even for in-kernel IRQCHIP
-  creation.
-  - Add test cases to create/destory in-kernel IRQCHIP
-  - Add KVM_ENABLE_CAPABILITY(KVM_CAP_X86_BUS_FREQUENCY_CONTROL) test cases
-  - Test if apic timer frequency is as spcified.
+be #ifdef'd, perhaps? I'm not quite sure what the intent is.
 
--- 
-Isaku Yamahata <isaku.yamahata@linux.intel.com>
+Side note: I wasn't able to get [2] to apply by copy-pasting the diff
+and trying "git apply", and that was after checking out the relevant
+commit. Eventually I just did it manually. If anyone can successfully
+apply it, please let me know what you did so I can see what I was
+doing wrong :)
+
+[1] https://lore.kernel.org/kvm/20231108233723.3380042-1-amoorthy@google.co=
+m/
+[2] https://lore.kernel.org/kvm/affca7a8-116e-4b0f-9edf-6cdc05ba65ca@redhat=
+.com/
 
