@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-1332-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1333-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 879537E6A12
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 12:57:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF8C37E6A14
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 12:57:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E9E0281585
-	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 11:57:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFC211C20D1F
+	for <lists+kvm@lfdr.de>; Thu,  9 Nov 2023 11:57:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A94C1DA36;
-	Thu,  9 Nov 2023 11:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3F001DA36;
+	Thu,  9 Nov 2023 11:57:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LE7nQlN5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O9AGUOem"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 350C71DA26
-	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 11:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 178F01DA2C
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 11:57:45 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32EB830FE;
-	Thu,  9 Nov 2023 03:57:38 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D9503243;
+	Thu,  9 Nov 2023 03:57:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699531058; x=1731067058;
+  t=1699531064; x=1731067064;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=RHlgOZsOIJUhCVDRXAer6TRNiMxk0NS/WrXUfBy8xyQ=;
-  b=LE7nQlN53K7iLtL9qBfthhv5EUE7PEy93Ywn5h6bTVx0tl45S6VOlqJV
-   CPLXXJZsejqWnDMrViZecCFCUQLxcxfMFKJh7jRJVXJPkCmGHGQkBra5S
-   nwiFvDz5JCDk7Jgbp2J5G05KPXl7p6U+hGup5c32q4nTSygGDwgHtRriv
-   8h1BtaWSB2iTRw7Gn6sx3aDdFzMROt8KrSR8P9IKvqQ/LwPP+CmPn38Jr
-   qhQl4w2n5wRBAmGjQbB6RAJeDu31a3gpOrwpT3fYOaeKowpG0kfcWHI0D
-   BUhx5HcSbhvU86/wvF5j8Nn0Md1hQJ+Sd1OtUjyJGl8DV2TkRVo7pRsJc
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="2936614"
+  bh=UivIbwKOnuoRy52iq1LnnkoCBbVc6eDzrqha0yv46l0=;
+  b=O9AGUOemm6fVceECcMzUFbZfePU6zfGSfmAmYJpooKrKwjDjhqNk+7Al
+   0VJNckG6Crzyo5/Y9hNWp7k7eV0Nwh2uDb0tCyQrRgRpUqigSK3XtM0ES
+   imzY02V6ay3aoV7m1X3F+K0ISKhdwqQdYWGgAY+S6fOmDty164fAOUH03
+   cPWML7ZPauO8Dy9vwGdNi7jTgSkhCYXjwagGaFdVtqkixBA5Xcyrej6VZ
+   LCyriM3Tj37nWv7csIEd6/RLpyCs9rx4HCA4vnH5ag3OOp92hQWvSH4fF
+   KTiMSiNfWsf6vOGikHR/CmxuqU2HmaBHVdKr53fZCsRXfUQ4Df8Q2Fiqm
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="2936638"
 X-IronPort-AV: E=Sophos;i="6.03,289,1694761200"; 
-   d="scan'208";a="2936614"
+   d="scan'208";a="2936638"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 03:57:38 -0800
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 03:57:44 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="766976778"
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="766976787"
 X-IronPort-AV: E=Sophos;i="6.03,289,1694761200"; 
-   d="scan'208";a="766976778"
+   d="scan'208";a="766976787"
 Received: from shadphix-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.209.83.35])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 03:57:31 -0800
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 03:57:37 -0800
 From: Kai Huang <kai.huang@intel.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
@@ -75,9 +75,9 @@ Cc: x86@kernel.org,
 	sagis@google.com,
 	imammedo@redhat.com,
 	kai.huang@intel.com
-Subject: [PATCH v15 13/23] x86/virt/tdx: Designate reserved areas for all TDMRs
-Date: Fri, 10 Nov 2023 00:55:50 +1300
-Message-ID: <dac0fe43468de27797a2de2bd883c7a51c8d1041.1699527082.git.kai.huang@intel.com>
+Subject: [PATCH v15 14/23] x86/virt/tdx: Configure TDX module with the TDMRs and global KeyID
+Date: Fri, 10 Nov 2023 00:55:51 +1300
+Message-ID: <02423dbdd46c07016793290c6ed0300b5383d234.1699527082.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1699527082.git.kai.huang@intel.com>
 References: <cover.1699527082.git.kai.huang@intel.com>
@@ -89,10 +89,13 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-As the last step of constructing TDMRs, populate reserved areas for all
-TDMRs.  For each TDMR, put all memory holes within this TDMR to the
-reserved areas.  And for all PAMTs which overlap with this TDMR, put
-all the overlapping parts to reserved areas too.
+The TDX module uses a private KeyID as the "global KeyID" for mapping
+things like the PAMT and other TDX metadata.  This KeyID has already
+been reserved when detecting TDX during the kernel early boot.
+
+After the list of "TD Memory Regions" (TDMRs) has been constructed to
+cover all TDX-usable memory regions, the next step is to pass them to
+the TDX module together with the global KeyID.
 
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
@@ -101,7 +104,7 @@ Reviewed-by: Yuan Yao <yuan.yao@intel.com>
 ---
 
 v14 -> v15:
-  - 'struct tdsysinfo_struct' -> 'struct tdx_tdmr_sysinfo'.
+ - No change
 
 v13 -> v14:
  - No change
@@ -110,299 +113,134 @@ v12 -> v13:
  - Added Yuan's tag.
 
 v11 -> v12:
- - Code change due to tdmr_get_pamt() change from returning pfn/npages to
-   base/size
  - Added Kirill's tag
 
 v10 -> v11:
  - No update
 
 v9 -> v10:
- - No change.
+ - Code change due to change static 'tdx_tdmr_list' to local 'tdmr_list'.
 
 v8 -> v9:
- - Added comment around 'tdmr_add_rsvd_area()' to point out it doesn't do
-   optimization to save reserved areas. (Dave).
+ - Improved changlog to explain why initializing TDMRs can take long
+   time (Dave).
+ - Improved comments around 'next-to-initialize' address (Dave).
 
 v7 -> v8: (Dave)
- - "set_up" -> "populate" in function name change (Dave).
- - Improved comment suggested by Dave.
+ - Changelog:
+   - explicitly call out this is the last step of TDX module initialization.
+   - Trimed down changelog by removing SEAMCALL name and details.
+ - Removed/trimmed down unnecessary comments.
  - Other changes due to 'struct tdmr_info_list'.
 
-
-v13 -> v14:
- - No change
-
-v12 -> v13:
- - Added Yuan's tag.
-
-v11 -> v12:
- - Code change due to tdmr_get_pamt() change from returning pfn/npages to
-   base/size
- - Added Kirill's tag
-
-v10 -> v11:
- - No update
-
-v9 -> v10:
- - No change.
-
-v8 -> v9:
- - Added comment around 'tdmr_add_rsvd_area()' to point out it doesn't do
-   optimization to save reserved areas. (Dave).
-
-v7 -> v8: (Dave)
- - "set_up" -> "populate" in function name change (Dave).
- - Improved comment suggested by Dave.
- - Other changes due to 'struct tdmr_info_list'.
-
+v6 -> v7:
+ - Removed need_resched() check. -- Andi.
 
 ---
- arch/x86/virt/vmx/tdx/tdx.c | 217 ++++++++++++++++++++++++++++++++++--
- 1 file changed, 209 insertions(+), 8 deletions(-)
+ arch/x86/virt/vmx/tdx/tdx.c | 44 ++++++++++++++++++++++++++++++++++++-
+ arch/x86/virt/vmx/tdx/tdx.h |  2 ++
+ 2 files changed, 45 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 0f3149f23544..a3340a6e23c5 100644
+index a3340a6e23c5..aba851e11c72 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -23,6 +23,7 @@
- #include <linux/sizes.h>
+@@ -24,8 +24,10 @@
  #include <linux/pfn.h>
  #include <linux/align.h>
-+#include <linux/sort.h>
+ #include <linux/sort.h>
++#include <linux/log2.h>
  #include <asm/msr-index.h>
  #include <asm/msr.h>
++#include <asm/page.h>
  #include <asm/tdx.h>
-@@ -648,6 +649,207 @@ static unsigned long tdmrs_count_pamt_kb(struct tdmr_info_list *tdmr_list)
- 	return pamt_size / 1024;
+ #include "tdx.h"
+ 
+@@ -878,6 +880,41 @@ static int construct_tdmrs(struct list_head *tmb_list,
+ 	return ret;
  }
  
-+static int tdmr_add_rsvd_area(struct tdmr_info *tdmr, int *p_idx, u64 addr,
-+			      u64 size, u16 max_reserved_per_tdmr)
++static int config_tdx_module(struct tdmr_info_list *tdmr_list, u64 global_keyid)
 +{
-+	struct tdmr_reserved_area *rsvd_areas = tdmr->reserved_areas;
-+	int idx = *p_idx;
-+
-+	/* Reserved area must be 4K aligned in offset and size */
-+	if (WARN_ON(addr & ~PAGE_MASK || size & ~PAGE_MASK))
-+		return -EINVAL;
-+
-+	if (idx >= max_reserved_per_tdmr) {
-+		pr_warn("initialization failed: TDMR [0x%llx, 0x%llx): reserved areas exhausted.\n",
-+				tdmr->base, tdmr_end(tdmr));
-+		return -ENOSPC;
-+	}
-+
-+	/*
-+	 * Consume one reserved area per call.  Make no effort to
-+	 * optimize or reduce the number of reserved areas which are
-+	 * consumed by contiguous reserved areas, for instance.
-+	 */
-+	rsvd_areas[idx].offset = addr - tdmr->base;
-+	rsvd_areas[idx].size = size;
-+
-+	*p_idx = idx + 1;
-+
-+	return 0;
-+}
-+
-+/*
-+ * Go through @tmb_list to find holes between memory areas.  If any of
-+ * those holes fall within @tdmr, set up a TDMR reserved area to cover
-+ * the hole.
-+ */
-+static int tdmr_populate_rsvd_holes(struct list_head *tmb_list,
-+				    struct tdmr_info *tdmr,
-+				    int *rsvd_idx,
-+				    u16 max_reserved_per_tdmr)
-+{
-+	struct tdx_memblock *tmb;
-+	u64 prev_end;
-+	int ret;
-+
-+	/*
-+	 * Start looking for reserved blocks at the
-+	 * beginning of the TDMR.
-+	 */
-+	prev_end = tdmr->base;
-+	list_for_each_entry(tmb, tmb_list, list) {
-+		u64 start, end;
-+
-+		start = PFN_PHYS(tmb->start_pfn);
-+		end   = PFN_PHYS(tmb->end_pfn);
-+
-+		/* Break if this region is after the TDMR */
-+		if (start >= tdmr_end(tdmr))
-+			break;
-+
-+		/* Exclude regions before this TDMR */
-+		if (end < tdmr->base)
-+			continue;
-+
-+		/*
-+		 * Skip over memory areas that
-+		 * have already been dealt with.
-+		 */
-+		if (start <= prev_end) {
-+			prev_end = end;
-+			continue;
-+		}
-+
-+		/* Add the hole before this region */
-+		ret = tdmr_add_rsvd_area(tdmr, rsvd_idx, prev_end,
-+				start - prev_end,
-+				max_reserved_per_tdmr);
-+		if (ret)
-+			return ret;
-+
-+		prev_end = end;
-+	}
-+
-+	/* Add the hole after the last region if it exists. */
-+	if (prev_end < tdmr_end(tdmr)) {
-+		ret = tdmr_add_rsvd_area(tdmr, rsvd_idx, prev_end,
-+				tdmr_end(tdmr) - prev_end,
-+				max_reserved_per_tdmr);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+/*
-+ * Go through @tdmr_list to find all PAMTs.  If any of those PAMTs
-+ * overlaps with @tdmr, set up a TDMR reserved area to cover the
-+ * overlapping part.
-+ */
-+static int tdmr_populate_rsvd_pamts(struct tdmr_info_list *tdmr_list,
-+				    struct tdmr_info *tdmr,
-+				    int *rsvd_idx,
-+				    u16 max_reserved_per_tdmr)
-+{
++	struct tdx_module_args args = {};
++	u64 *tdmr_pa_array;
++	size_t array_sz;
 +	int i, ret;
 +
-+	for (i = 0; i < tdmr_list->nr_consumed_tdmrs; i++) {
-+		struct tdmr_info *tmp = tdmr_entry(tdmr_list, i);
-+		unsigned long pamt_base, pamt_size, pamt_end;
++	/*
++	 * TDMRs are passed to the TDX module via an array of physical
++	 * addresses of each TDMR.  The array itself also has certain
++	 * alignment requirement.
++	 */
++	array_sz = tdmr_list->nr_consumed_tdmrs * sizeof(u64);
++	array_sz = roundup_pow_of_two(array_sz);
++	if (array_sz < TDMR_INFO_PA_ARRAY_ALIGNMENT)
++		array_sz = TDMR_INFO_PA_ARRAY_ALIGNMENT;
 +
-+		tdmr_get_pamt(tmp, &pamt_base, &pamt_size);
-+		/* Each TDMR must already have PAMT allocated */
-+		WARN_ON_ONCE(!pamt_size || !pamt_base);
++	tdmr_pa_array = kzalloc(array_sz, GFP_KERNEL);
++	if (!tdmr_pa_array)
++		return -ENOMEM;
 +
-+		pamt_end = pamt_base + pamt_size;
-+		/* Skip PAMTs outside of the given TDMR */
-+		if ((pamt_end <= tdmr->base) ||
-+				(pamt_base >= tdmr_end(tdmr)))
-+			continue;
++	for (i = 0; i < tdmr_list->nr_consumed_tdmrs; i++)
++		tdmr_pa_array[i] = __pa(tdmr_entry(tdmr_list, i));
 +
-+		/* Only mark the part within the TDMR as reserved */
-+		if (pamt_base < tdmr->base)
-+			pamt_base = tdmr->base;
-+		if (pamt_end > tdmr_end(tdmr))
-+			pamt_end = tdmr_end(tdmr);
++	args.rcx = __pa(tdmr_pa_array);
++	args.rdx = tdmr_list->nr_consumed_tdmrs;
++	args.r8 = global_keyid;
++	ret = seamcall_prerr(TDH_SYS_CONFIG, &args);
 +
-+		ret = tdmr_add_rsvd_area(tdmr, rsvd_idx, pamt_base,
-+				pamt_end - pamt_base,
-+				max_reserved_per_tdmr);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+/* Compare function called by sort() for TDMR reserved areas */
-+static int rsvd_area_cmp_func(const void *a, const void *b)
-+{
-+	struct tdmr_reserved_area *r1 = (struct tdmr_reserved_area *)a;
-+	struct tdmr_reserved_area *r2 = (struct tdmr_reserved_area *)b;
-+
-+	if (r1->offset + r1->size <= r2->offset)
-+		return -1;
-+	if (r1->offset >= r2->offset + r2->size)
-+		return 1;
-+
-+	/* Reserved areas cannot overlap.  The caller must guarantee. */
-+	WARN_ON_ONCE(1);
-+	return -1;
-+}
-+
-+/*
-+ * Populate reserved areas for the given @tdmr, including memory holes
-+ * (via @tmb_list) and PAMTs (via @tdmr_list).
-+ */
-+static int tdmr_populate_rsvd_areas(struct tdmr_info *tdmr,
-+				    struct list_head *tmb_list,
-+				    struct tdmr_info_list *tdmr_list,
-+				    u16 max_reserved_per_tdmr)
-+{
-+	int ret, rsvd_idx = 0;
-+
-+	ret = tdmr_populate_rsvd_holes(tmb_list, tdmr, &rsvd_idx,
-+			max_reserved_per_tdmr);
-+	if (ret)
-+		return ret;
-+
-+	ret = tdmr_populate_rsvd_pamts(tdmr_list, tdmr, &rsvd_idx,
-+			max_reserved_per_tdmr);
-+	if (ret)
-+		return ret;
-+
-+	/* TDX requires reserved areas listed in address ascending order */
-+	sort(tdmr->reserved_areas, rsvd_idx, sizeof(struct tdmr_reserved_area),
-+			rsvd_area_cmp_func, NULL);
-+
-+	return 0;
-+}
-+
-+/*
-+ * Populate reserved areas for all TDMRs in @tdmr_list, including memory
-+ * holes (via @tmb_list) and PAMTs.
-+ */
-+static int tdmrs_populate_rsvd_areas_all(struct tdmr_info_list *tdmr_list,
-+					 struct list_head *tmb_list,
-+					 u16 max_reserved_per_tdmr)
-+{
-+	int i;
-+
-+	for (i = 0; i < tdmr_list->nr_consumed_tdmrs; i++) {
-+		int ret;
-+
-+		ret = tdmr_populate_rsvd_areas(tdmr_entry(tdmr_list, i),
-+				tmb_list, tdmr_list, max_reserved_per_tdmr);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
- /*
-  * Construct a list of TDMRs on the preallocated space in @tdmr_list
-  * to cover all TDX memory regions in @tmb_list based on the TDX module
-@@ -667,14 +869,13 @@ static int construct_tdmrs(struct list_head *tmb_list,
- 			tdmr_sysinfo->pamt_entry_size);
- 	if (ret)
- 		return ret;
--	/*
--	 * TODO:
--	 *
--	 *  - Designate reserved areas for each TDMR.
--	 *
--	 * Return -EINVAL until constructing TDMRs is done
--	 */
--	return -EINVAL;
-+
-+	ret = tdmrs_populate_rsvd_areas_all(tdmr_list, tmb_list,
-+			tdmr_sysinfo->max_reserved_per_tdmr);
-+	if (ret)
-+		tdmrs_free_pamt_all(tdmr_list);
++	/* Free the array as it is not required anymore. */
++	kfree(tdmr_pa_array);
 +
 +	return ret;
- }
- 
++}
++
  static int init_tdx_module(void)
+ {
+ 	struct tdx_tdmr_sysinfo tdmr_sysinfo;
+@@ -914,16 +951,21 @@ static int init_tdx_module(void)
+ 	if (ret)
+ 		goto out_free_tdmrs;
+ 
++	/* Pass the TDMRs and the global KeyID to the TDX module */
++	ret = config_tdx_module(&tdmr_list, tdx_global_keyid);
++	if (ret)
++		goto out_free_pamts;
++
+ 	/*
+ 	 * TODO:
+ 	 *
+-	 *  - Configure the TDMRs and the global KeyID to the TDX module.
+ 	 *  - Configure the global KeyID on all packages.
+ 	 *  - Initialize all TDMRs.
+ 	 *
+ 	 *  Return error before all steps are done.
+ 	 */
+ 	ret = -EINVAL;
++out_free_pamts:
+ 	if (ret)
+ 		tdmrs_free_pamt_all(&tdmr_list);
+ 	else
+diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+index 1b04efece9db..fa5bcf8b5a9c 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.h
++++ b/arch/x86/virt/vmx/tdx/tdx.h
+@@ -17,6 +17,7 @@
+ #define TDH_SYS_INIT		33
+ #define TDH_SYS_RD		34
+ #define TDH_SYS_LP_INIT		35
++#define TDH_SYS_CONFIG		45
+ 
+ /*
+  * Global scope metadata field ID.
+@@ -53,6 +54,7 @@ struct tdmr_reserved_area {
+ } __packed;
+ 
+ #define TDMR_INFO_ALIGNMENT	512
++#define TDMR_INFO_PA_ARRAY_ALIGNMENT	512
+ 
+ struct tdmr_info {
+ 	u64 base;
 -- 
 2.41.0
 
