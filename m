@@ -1,230 +1,142 @@
-Return-Path: <kvm+bounces-1398-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1399-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72FC37E75D0
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 01:18:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C58F37E75D7
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 01:18:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D56E1C20BCA
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 00:18:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B20AB21172
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 00:18:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1E137E8;
-	Fri, 10 Nov 2023 00:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9AC8643;
+	Fri, 10 Nov 2023 00:18:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d6U7dGrh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iNGqdTwS"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE10627
-	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 00:17:57 +0000 (UTC)
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBDE4211D
-	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 16:17:56 -0800 (PST)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-545557de8e6so17736a12.0
-        for <kvm@vger.kernel.org>; Thu, 09 Nov 2023 16:17:56 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360D17F
+	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 00:18:25 +0000 (UTC)
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBDE72D5E
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 16:18:24 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-2806501f8efso1569625a91.2
+        for <kvm@vger.kernel.org>; Thu, 09 Nov 2023 16:18:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699575475; x=1700180275; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r7AINGqD+uDcyCkNAuvVhFQmI+fmLnwrj5VTd+39JmM=;
-        b=d6U7dGrhdVKm3vluVOlW4tjLENLDM9DxAksFjh1MLjLYARi5EnMQ1DA4RYMB0y9pSh
-         /rJ5REA5IOYCnqpmIrkJS+s1h6mNYdS/5QYhiEZcf0pu1OZgGysR7oAHZEuRL4Bf071k
-         sTtUek3xFuDt0FWgdjjJ4nTwGXa7u6ouAeKWwLj3NoGzHHMK+Bybg0ocgo9I75Eq3vGi
-         8W/dx8pigk2V+skY77uI3RXN66HBdoq/6shwsSWsl22Gh/5CXCVwAnbrisEWwuv4mVhZ
-         cOUEqYaFItFiW46OUfyrUutjC4BMN7krCBBMo/1mTy8QzH/5aX+Q/jy9fv8pzp4/wAQi
-         PVMg==
+        d=google.com; s=20230601; t=1699575504; x=1700180304; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JDBX34Ax+xCPEejy7csuMsB+4xNqzo0HFpIJ9s7abJ8=;
+        b=iNGqdTwS334kCvkpGmB01FdlxQ61ywgdjF5fCNtxQqU43MAfj/xr1kvBT8WQ4VtZx1
+         bggRL/qWdVsfZpciqnIN050vwtp/GKzWNH0D96BmNHUDE7hmLtauk9Yi5Lw/yzwANNic
+         8Pkomd30z/G1jg2AnTactcLd62ca+//x/OYDlKtmNujkZUK9cwXzumFPM54lJVkMXB2y
+         BkXMP2BHx6lnp1X1mjCuVv72byU0nBwoTdoQ0uYbxFvtPWlfpQ4v1JhEAIinlopX5tNT
+         8OLwc/bx6SIxDyg1NVliFXWmmSg9QtyvWfVZe4/Mg6xK3h1xK3U701JowNPGax/IMRsm
+         m1Uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699575475; x=1700180275;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=r7AINGqD+uDcyCkNAuvVhFQmI+fmLnwrj5VTd+39JmM=;
-        b=MIL3aeu98coRLHJwroh+P48MNKJdH5SJJB+3tGGc08VUXIo7MCb4RfJKnqd+CehAzk
-         gVN98RM7GUOHYNmLog6IlIZnax8CnKQYduvtFhPFV/JLPlhZnrGIOvQicS62JfJnMaYN
-         +o8TLpvMqbCa1GHsWB85mQqQO/iey4bbojMMLI76xA+LmzvSACVppVBdCxFagmaPwAc/
-         ttpciECL0OLOMCddN4QdG6BPC6j/LlyBTEUN2zHfwPrnHy3n2Q86Oy4S49S3jCsEjrra
-         q9fiLx/iHmf15yyzSuj8kvTSbPOJoV0qlGjLc1leFDgfIZCISTqF9l2gSfyfr3Qj8ayw
-         wbSA==
-X-Gm-Message-State: AOJu0YzAdm5KkRm1Ehzf+RzZPRNS4pdGCILOXjHMoXwhBi9U1ULAbQFq
-	L7L9e45+39n1HbnArIq49WQAK0aKW18OSrhPLFgcYg==
-X-Google-Smtp-Source: AGHT+IESBd3cjsgylAurSqxlZheyZNpWVoWe6LpJQP2lCpStZcRcvuTY5HGrez1TCDbrh4u/T6jREH2S+kHpCTq7UXk=
-X-Received: by 2002:a05:6402:3709:b0:544:4762:608 with SMTP id
- ek9-20020a056402370900b0054447620608mr262760edb.2.1699575475098; Thu, 09 Nov
- 2023 16:17:55 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699575504; x=1700180304;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JDBX34Ax+xCPEejy7csuMsB+4xNqzo0HFpIJ9s7abJ8=;
+        b=C3SyiHUyyVuqMXClkbNzqBMJlW/lScr99LaQXKAsaCfN1R4dg8Jmu94Dq2mbfltAyN
+         SZywaROk6rW5Bskf/c2ud4sRYevFpcQQV+5wX4EAtlXClTpKhPqT4lGiYtOHymLk+vpG
+         62hieYU/tAGJrqDbv8DbqJacLE7ykZP1i7YdGUdkLIYBvRIgthv2WTuluIpYYqEyw9LS
+         r0dkB/6Ah10+guPdgrm3ZiEXOGNVbjQLXr9pJdMCjuj6hqFdDcuX6ZSLECDSC5LXhnMj
+         KlGp15ZuVxMEnzqMrTiUR2MjITseQSXI2A00NOUtDIwUviKPgmPLiHMMIO1SGZ2EpNR0
+         1h+A==
+X-Gm-Message-State: AOJu0Yz6y1C54yB+4vdI+Tx++hcuOprPqONKq9PVgk1c3Kb3ipA29CIR
+	BMfxXi0kAfN/l0f082Ry1fzV49rdAUo=
+X-Google-Smtp-Source: AGHT+IEwtMfwxGAR0B/H7IXPZ3vu/xybKiPnMknwG6Vs4SXQgsDZzBSqz7NL72vzZ/dKNEKuDabRDt2Rgms=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:738e:b0:281:1c2e:9e6c with SMTP id
+ j14-20020a17090a738e00b002811c2e9e6cmr829740pjg.5.1699575504122; Thu, 09 Nov
+ 2023 16:18:24 -0800 (PST)
+Date: Thu, 9 Nov 2023 16:18:22 -0800
+In-Reply-To: <SA1PR11MB67347A31E38D604FDF2BD606A8AFA@SA1PR11MB6734.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231109180646.2963718-1-khorenko@virtuozzo.com>
- <CALMp9eQGqqo66fQGwFJMc3y+9XdUrL7ageE8kvoAOV6NJGfJpw@mail.gmail.com> <ZU1ua1mHDZFTmkHX@google.com>
-In-Reply-To: <ZU1ua1mHDZFTmkHX@google.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Thu, 9 Nov 2023 16:17:40 -0800
-Message-ID: <CALMp9eTqdg32KGh38wQYW-fvyrjrc7VQAsA1wnHhoCn-tLwyYg@mail.gmail.com>
-Subject: Re: [PATCH 0/1] KVM: x86/vPMU: Speed up vmexit for AMD Zen 4 CPUs
-To: Sean Christopherson <seanjc@google.com>
-Cc: Konstantin Khorenko <khorenko@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"Denis V. Lunev" <den@virtuozzo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20231108183003.5981-1-xin3.li@intel.com> <20231108183003.5981-7-xin3.li@intel.com>
+ <ZUyjPtaxOgDQQUwA@chao-email> <SA1PR11MB67347A31E38D604FDF2BD606A8AFA@SA1PR11MB6734.namprd11.prod.outlook.com>
+Message-ID: <ZU12zoH8VtcZ_USh@google.com>
+Subject: Re: [PATCH v1 06/23] KVM: VMX: Defer enabling FRED MSRs save/load
+ until after set CPUID
+From: Sean Christopherson <seanjc@google.com>
+To: Xin3 Li <xin3.li@intel.com>
+Cc: Chao Gao <chao.gao@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>, 
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, 
+	"kys@microsoft.com" <kys@microsoft.com>, "haiyangz@microsoft.com" <haiyangz@microsoft.com>, 
+	"wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"hpa@zytor.com" <hpa@zytor.com>, "vkuznets@redhat.com" <vkuznets@redhat.com>, 
+	"peterz@infradead.org" <peterz@infradead.org>, Ravi V Shankar <ravi.v.shankar@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Nov 9, 2023 at 3:42=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Thu, Nov 09, 2023, Jim Mattson wrote:
-> > On Thu, Nov 9, 2023 at 10:24=E2=80=AFAM Konstantin Khorenko
-> > <khorenko@virtuozzo.com> wrote:
-> > >
-> > > We have detected significant performance drop of our atomic test whic=
-h
-> > > checks the rate of CPUID instructions rate inside an L1 VM on an AMD
-> > > node.
-> > >
-> > > Investigation led to 2 mainstream patches which have introduced extra
-> > > events accounting:
-> > >
-> > >    018d70ffcfec ("KVM: x86: Update vPMCs when retiring branch instruc=
-tions")
-> > >    9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions")
-> > >
-> > > And on an AMD Zen 3 CPU that resulted in immediate 43% drop in the CP=
-UID
-> > > rate.
-> > >
-> > > Checking latest mainsteam kernel the performance difference is much l=
-ess
-> > > but still quite noticeable: 13.4% and shows up on AMD CPUs only.
-> > >
-> > > Looks like iteration over all PMCs in kvm_pmu_trigger_event() is chea=
-p
-> > > on Intel and expensive on AMD CPUs.
-> > >
-> > > So the idea behind this patch is to skip iterations over PMCs at all =
-in
-> > > case PMU is disabled for a VM completely or PMU is enabled for a VM, =
-but
-> > > there are no active PMCs at all.
-> >
-> > A better solution may be to maintain two bitmaps of general purpose
-> > counters that need to be incremented, one for instructions retired and
-> > one for branch instructions retired. Set or clear these bits whenever
-> > the PerfEvtSelN MSRs are written. I think I would keep the PGC bits
-> > separate, on those microarchitectures that support PGC. Then,
-> > kvm_pmu_trigger_event() need only consult the appropriate bitmap (or
-> > the logical and of that bitmap with PGC). In most cases, the value
-> > will be zero, and the function can simply return.
-> >
-> > This would work even for AMD microarchitectures that don't support PGC.
->
-> Yeah.  There are multiple lower-hanging fruits to be picked though, most =
-of which
-> won't conflict with using dedicated per-event bitmaps, or at worst are tr=
-ivial
-> to resolve.
->
->  1. Don't call into perf to get the eventsel (which generates an indirect=
- call)
->     on every invocation, let alone every iteration.
->
->  2. Avoid getting the CPL when it's irrelevant.
->
->  3. Check the eventsel before querying the event filter.
->
->  4. Mask out PMCs that aren't globally enabled from the get-go (masking o=
-ut
->     PMCs based on eventsel would essentially be the same as per-event bit=
-maps).
+On Thu, Nov 09, 2023, Xin3 Li wrote:
+> > >+static void vmx_vcpu_config_fred_after_set_cpuid(struct kvm_vcpu *vcpu)
+> > >+{
+> > >+	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> > >+
+> > >+	if (!cpu_feature_enabled(X86_FEATURE_FRED) ||
+> > >+	    !guest_cpuid_has(vcpu, X86_FEATURE_FRED))
+> > >+		return;
+> > >+
+> > >+	/* Enable loading guest FRED MSRs from VMCS */
+> > >+	vm_entry_controls_setbit(vmx, VM_ENTRY_LOAD_IA32_FRED);
+> > >+
+> > >+	/*
+> > >+	 * Enable saving guest FRED MSRs into VMCS and loading host FRED MSRs
+> > >+	 * from VMCS.
+> > >+	 */
+> > >+	vm_exit_controls_setbit(vmx,
+> > VM_EXIT_ACTIVATE_SECONDARY_CONTROLS);
+> > >+	secondary_vm_exit_controls_setbit(vmx,
+> > >+					  SECONDARY_VM_EXIT_SAVE_IA32_FRED
+> > |
+> > >+
+> > SECONDARY_VM_EXIT_LOAD_IA32_FRED);
+> > 
+> > all above vmcs controls need to be cleared if guest doesn't enumerate FRED, see
+> > 
+> > https://lore.kernel.org/all/ZJYzPn7ipYfO0fLZ@google.com/
+> 
+> Good point, the user space could set cpuid multiple times...
+>  
+> > Clearing VM_EXIT_ACTIVATE_SECONDARY_CONTROLS may be problematic when
+> > new bits are added to secondary vmcs controls. Why not keep
+> > VM_EXIT_ACTIVATE_SECONDARY_CONTROLS always on if it is supported? or you
+> > see any perf impact?
+> 
+> I think it from the other way, why keeps hw loading it on every vmentry
+> even if it's not used by a guest?
 
-The code below only looks at PGC. Even on CPUs that support PGC, some
-PMU clients still use the enable bits in the PerfEvtSelN. Linux perf,
-for instance, can't seem to make up its mind whether to use PGC or
-PerfEvtSelN.EN.
+Oh, yeesh, this is clearing the activation control.  Yeah, NAK to that, just
+leave it set.  If it weren't for the fact that there is apparently a metrict ton
+of FRED state (I thought the whole point of FRED was to kill off legacy crap like
+CPL1 and CPL2 stacks?) _and_ that KVM needs to toggle MSR intercepts, I'd probably
+push back on toggling even the FRED controls.
 
-> I'm definitely not opposed to per-event bitmaps, but it'd be nice to avoi=
-d them,
-> e.g. if we can eke out 99% of the performance just by doing a few obvious
-> optimizations.
->
-> This is the end result of what I'm testing and will (hopefully) post shor=
-tly:
->
-> static inline bool pmc_is_eventsel_match(struct kvm_pmc *pmc, u64 eventse=
-l)
-> {
->         return !((pmc->eventsel ^ eventsel) & AMD64_RAW_EVENT_MASK_NB);
-> }
+> Different CPUs may implement it in different ways, which we can't assume.
 
-The top nybble of AMD's 3-nybble event select collides with Intel's
-IN_TX and IN_TXCP bits. I think we can assert that the vCPU can't be
-in a transaction if KVM is emulating an instruction, but this probably
-merits a comment. The function name should also be more descriptive,
-so that it doesn't get misused out of context. :)
+Implement what in a different way?  The VMCS fields and FRED are architectural.
+The internal layout of the VMCS is uarch specific, but the encodings and semantics
+absolutely cannot change without breaking software.  And if Intel does something
+asinine like make a control active-low then we have far, far bigger problems.
 
-> static inline bool cpl_is_matched(struct kvm_pmc *pmc)
-> {
->         bool select_os, select_user;
->         u64 config;
->
->         if (pmc_is_gp(pmc)) {
->                 config =3D pmc->eventsel;
->                 select_os =3D config & ARCH_PERFMON_EVENTSEL_OS;
->                 select_user =3D config & ARCH_PERFMON_EVENTSEL_USR;
->         } else {
->                 config =3D fixed_ctrl_field(pmc_to_pmu(pmc)->fixed_ctr_ct=
-rl,
->                                           pmc->idx - KVM_FIXED_PMC_BASE_I=
-DX);
->                 select_os =3D config & 0x1;
->                 select_user =3D config & 0x2;
->         }
->
->         /*
->          * Skip the CPL lookup, which isn't free on Intel, if the result =
-will
->          * be the same regardless of the CPL.
->          */
->         if (select_os =3D=3D select_user)
->                 return select_os;
->
->         return (static_call(kvm_x86_get_cpl)(pmc->vcpu) =3D=3D 0) ? selec=
-t_os : select_user;
-> }
->
-> void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 eventsel)
-> {
->         DECLARE_BITMAP(bitmap, X86_PMC_IDX_MAX);
->         struct kvm_pmu *pmu =3D vcpu_to_pmu(vcpu);
->         struct kvm_pmc *pmc;
->         int i;
->
->         BUILD_BUG_ON(sizeof(pmu->global_ctrl) * BITS_PER_BYTE !=3D X86_PM=
-C_IDX_MAX);
->
->         if (!kvm_pmu_has_perf_global_ctrl(pmu))
->                 bitmap_copy(bitmap, pmu->all_valid_pmc_idx, X86_PMC_IDX_M=
-AX);
->         else if (!bitmap_and(bitmap, pmu->all_valid_pmc_idx,
->                              (unsigned long *)&pmu->global_ctrl, X86_PMC_=
-IDX_MAX))
->                 return;
->
->         kvm_for_each_pmc(pmu, pmc, i, bitmap) {
->                 /* Ignore checks for edge detect, pin control, invert and=
- CMASK bits */
->                 if (!pmc_is_eventsel_match(pmc, eventsel) ||
->                     !pmc_event_is_allowed(pmc) || !cpl_is_matched(pmc))
->                         continue;
->
->                 kvm_pmu_incr_counter(pmc);
->         }
-> }
+> Other features needing it should set it separately, say with a refcount.
+
+Absolutely not.  Unless Intel screwed up the implementation, the cost of leaving
+VM_EXIT_ACTIVATE_SECONDARY_CONTROLS set when it's supported shouldn't even be
+measurable.
 
