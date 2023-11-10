@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-1406-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1407-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8B0A7E760E
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 01:52:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C8417E7671
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 02:14:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9994A28167B
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 00:52:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11E5A2816DB
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 01:14:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E45F4EA9;
-	Fri, 10 Nov 2023 00:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD859EA0;
+	Fri, 10 Nov 2023 01:14:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F7HaCclW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZOf4mzZk"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF0DA40
-	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 00:52:04 +0000 (UTC)
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 109FC3850
-	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 16:52:04 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-6b31cb3cc7eso1527618b3a.0
-        for <kvm@vger.kernel.org>; Thu, 09 Nov 2023 16:52:04 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19B9B7F1
+	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 01:14:07 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CA4C3C19
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 17:14:07 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a7cc433782so20601107b3.3
+        for <kvm@vger.kernel.org>; Thu, 09 Nov 2023 17:14:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699577523; x=1700182323; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1699578846; x=1700183646; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=CaXRIkgga9Mbd8IaWbzrZruI1+6G67OpEX1+PWQwT6Q=;
-        b=F7HaCclW92vWchWE6CS0/hgKUcrN61PEYhf3VNl59nGQU8HO2VmxWMtkkvITj6w/us
-         MZ/IYDF8qlQ+2FpzHJ0dXzcDgljvFIr71N7uf4/WbKbYyL1yEG3Z6qNCSqWl71SwVwln
-         saYcDRbH/F5tW09j0rK0RlDdxHG417GjJOyPN9sI8OcEqwcSkjgAYr47Nj3ajTBAIf8w
-         ILztUP+fkU8mn0SWujkyZ7EUalMltB2UsKMQvQ/qARnCx3jdqAqbljRT+KcO5jCsX9om
-         XUOxVEhxZ3CsBEQsGvhEhLzMa0TmhLcmHMA+y0cKJEnQyczEIq83GNTTX7sg2gZJRwEi
-         JD6w==
+        bh=lrQ+gxpnjkKgi3JxYTT73SI9ToeZhNDb+Kb3YH/r30w=;
+        b=ZOf4mzZkwVI5ykeDpPXjgoT7d/zNG+Cy4vNkCWrcDLBfsHlMh2aq/hXfZecoFxZkU8
+         xJ+XUur/T07N4oA0oRlS2WbjjrEquGIaIy37LTD7WkJfwNa5KU4DgICYQGn9PgnrIFoE
+         f3huelu1RzJV2vl+c7G5qgTNBtWOGdXKyeYjlVqK1/R4t2+5b5eg145Daa6SRTHz6L+e
+         7xAL7SH+1vR3ECwWkTTSYMKlGcsSDX5F08XQqLflTOye2+/ZShEoI18eNBPPvibVUoXq
+         Mb5Z4QmVkFy7B+w31GjRZw5exkI2KNUmSUXYf8wVLzb6rNMlGYJF4L82/qzOaR/9qi9B
+         G14A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699577523; x=1700182323;
+        d=1e100.net; s=20230601; t=1699578846; x=1700183646;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=CaXRIkgga9Mbd8IaWbzrZruI1+6G67OpEX1+PWQwT6Q=;
-        b=dUoU7hU5RrtSbh6dyMkpI/Z9OL5QzZI2/SyEZX+aCKPeOINMnyw0oOM1yFwcai4AoS
-         hSxK6GNHAO75M1BYNHIkWIYAgPhx5r2nUB1hA01z2t7dqZHe+cwwOO3aOaFxfYSzphvf
-         BODGjZJv2RWGFnen+clGJWvVvb/z0V7Ws05uW/y+wKzNYdZjMVzSYfhefP7tgD8kJTWf
-         qxH+Kf5AWXajnYI7Qp/PplrdGHumJku57vlO7KsVgVf7Cjcqgn7dN+NACqYUZdz8QQJO
-         ZIQ2hIbC0h7hCZjy1ykDS+weYxZI5GgAr7iy/tlrLC8w8lmhYUV6Uhm0uV/YJsi2FN3a
-         RfCA==
-X-Gm-Message-State: AOJu0YxEwf4H1cblwLly9biKkFsEytoEvUA0tZVldaMtQSdtzPMlWviL
-	J5K77vXCD4mZfqs4fGXcE9aDjDPuk80=
-X-Google-Smtp-Source: AGHT+IEleztEQXckmOw7ag1CDdfyMSONAMeNUT17fzoOAYUS0cSBFGncdHLVezawzVjGRkeJMyfugEhb/wU=
+        bh=lrQ+gxpnjkKgi3JxYTT73SI9ToeZhNDb+Kb3YH/r30w=;
+        b=EYtrDwPZNaJsXgOzLZubwnHtCQvjUdd84pHYk6XiLlGO0NNRxv2YSnVD1uelP/wzVa
+         UfQWWDjQ653l4y6K+djy6anDyXx8dCu2uprLiMlFLLPMGONiCn7fUd2tTiZQIHBD4DB3
+         mJyycajIBq6FwFzwsNoXHK6mRW5HFSdq/FzLfSO6aMoxj8jgAG44+/UCtBnl8md6XHzk
+         QDjvc8YtmeQKwxFbqLE9s6QXZkms28Kelfj78eqKoGg8m+4RbIHn1xfpw/7hPl6qoQvv
+         oiYknPnsiE1KOSG/GRApgeqJgYfSC+YcrKiIgmtSBUaST6qOfZvJ+UAVZdpKGTw0obnT
+         DksA==
+X-Gm-Message-State: AOJu0YzEkE/hKMpZx+dZJjaQhDaPHvHxoFmMURojDUgMr0bEbDk0PZDV
+	uyJApB04O9CCgmyJ0ha/29qBLv/sUlA=
+X-Google-Smtp-Source: AGHT+IGKWoeGsO4hriSx6DSWMVi29RAJ4A8gnoO4AttuaWGuavcDVTxU5cD+ixUslDVltoGGzYWeuPh1KAc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:84c1:b0:692:c216:8830 with SMTP id
- gl1-20020a056a0084c100b00692c2168830mr318481pfb.0.1699577523585; Thu, 09 Nov
- 2023 16:52:03 -0800 (PST)
-Date: Fri, 10 Nov 2023 00:52:01 +0000
-In-Reply-To: <CALMp9eTqdg32KGh38wQYW-fvyrjrc7VQAsA1wnHhoCn-tLwyYg@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:102:b0:da3:723b:b2a4 with SMTP id
+ o2-20020a056902010200b00da3723bb2a4mr170083ybh.7.1699578846684; Thu, 09 Nov
+ 2023 17:14:06 -0800 (PST)
+Date: Thu, 9 Nov 2023 17:14:05 -0800
+In-Reply-To: <ZU1-sTcb2fvU2TYZ@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,7 +67,8 @@ Mime-Version: 1.0
 References: <20231109180646.2963718-1-khorenko@virtuozzo.com>
  <CALMp9eQGqqo66fQGwFJMc3y+9XdUrL7ageE8kvoAOV6NJGfJpw@mail.gmail.com>
  <ZU1ua1mHDZFTmkHX@google.com> <CALMp9eTqdg32KGh38wQYW-fvyrjrc7VQAsA1wnHhoCn-tLwyYg@mail.gmail.com>
-Message-ID: <ZU1-sTcb2fvU2TYZ@google.com>
+ <ZU1-sTcb2fvU2TYZ@google.com>
+Message-ID: <ZU2D3f6kc0MDzNR5@google.com>
 Subject: Re: [PATCH 0/1] KVM: x86/vPMU: Speed up vmexit for AMD Zen 4 CPUs
 From: Sean Christopherson <seanjc@google.com>
 To: Jim Mattson <jmattson@google.com>
@@ -79,78 +80,28 @@ Cc: Konstantin Khorenko <khorenko@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 09, 2023, Jim Mattson wrote:
-> On Thu, Nov 9, 2023 at 3:42=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> >
-> > On Thu, Nov 09, 2023, Jim Mattson wrote:
-> > > A better solution may be to maintain two bitmaps of general purpose
-> > > counters that need to be incremented, one for instructions retired an=
-d
-> > > one for branch instructions retired. Set or clear these bits whenever
-> > > the PerfEvtSelN MSRs are written. I think I would keep the PGC bits
-> > > separate, on those microarchitectures that support PGC. Then,
-> > > kvm_pmu_trigger_event() need only consult the appropriate bitmap (or
-> > > the logical and of that bitmap with PGC). In most cases, the value
-> > > will be zero, and the function can simply return.
-> > >
-> > > This would work even for AMD microarchitectures that don't support PG=
-C.
-> >
-> > Yeah.  There are multiple lower-hanging fruits to be picked though, mos=
-t of which
-> > won't conflict with using dedicated per-event bitmaps, or at worst are =
-trivial
-> > to resolve.
-> >
-> >  1. Don't call into perf to get the eventsel (which generates an indire=
-ct call)
-> >     on every invocation, let alone every iteration.
-> >
-> >  2. Avoid getting the CPL when it's irrelevant.
-> >
-> >  3. Check the eventsel before querying the event filter.
-> >
-> >  4. Mask out PMCs that aren't globally enabled from the get-go (masking=
- out
-> >     PMCs based on eventsel would essentially be the same as per-event b=
-itmaps).
+On Fri, Nov 10, 2023, Sean Christopherson wrote:
+> On Thu, Nov 09, 2023, Jim Mattson wrote:
+> > On Thu, Nov 9, 2023 at 3:42=E2=80=AFPM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> > > static inline bool pmc_is_eventsel_match(struct kvm_pmc *pmc, u64 eve=
+ntsel)
+> > > {
+> > >         return !((pmc->eventsel ^ eventsel) & AMD64_RAW_EVENT_MASK_NB=
+);
+> > > }
+> >=20
+> > The top nybble of AMD's 3-nybble event select collides with Intel's
+> > IN_TX and IN_TXCP bits. I think we can assert that the vCPU can't be
+> > in a transaction if KVM is emulating an instruction, but this probably
+> > merits a comment.
 >=20
-> The code below only looks at PGC. Even on CPUs that support PGC, some
-> PMU clients still use the enable bits in the PerfEvtSelN. Linux perf,
-> for instance, can't seem to make up its mind whether to use PGC or
-> PerfEvtSelN.EN.
+> Argh, more pre-existing crud.  This is silly, the vendor mask is already =
+in
+> kvm_pmu_ops.EVENTSEL_EVENT.  What's one more patch...
 
-Ugh, as in perf leaves all GLOBAL_CTRL bits set and toggles only the events=
-el
-enable bit?  Lame.
-
-> > I'm definitely not opposed to per-event bitmaps, but it'd be nice to av=
-oid them,
-> > e.g. if we can eke out 99% of the performance just by doing a few obvio=
-us
-> > optimizations.
-> >
-> > This is the end result of what I'm testing and will (hopefully) post sh=
-ortly:
-> >
-> > static inline bool pmc_is_eventsel_match(struct kvm_pmc *pmc, u64 event=
-sel)
-> > {
-> >         return !((pmc->eventsel ^ eventsel) & AMD64_RAW_EVENT_MASK_NB);
-> > }
->=20
-> The top nybble of AMD's 3-nybble event select collides with Intel's
-> IN_TX and IN_TXCP bits. I think we can assert that the vCPU can't be
-> in a transaction if KVM is emulating an instruction, but this probably
-> merits a comment.
-
-Argh, more pre-existing crud.  This is silly, the vendor mask is already in
-kvm_pmu_ops.EVENTSEL_EVENT.  What's one more patch...
-
-> The function name should also be more descriptive, so that it doesn't get
-> misused out of context. :)
-
-Heh, I think I'll just delete the darn thing.  That also makes it easier to
-understand the comment about ignoring certain fields.
+Ah, I see what your saying.  Checking the bits is actually correct, probabl=
+y through
+sheer dumb luck.  I'll expand the comment to cover that and the reserved bi=
+ts.
 
