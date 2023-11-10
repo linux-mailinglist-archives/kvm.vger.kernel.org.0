@@ -1,187 +1,212 @@
-Return-Path: <kvm+bounces-1495-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1496-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49AF37E8135
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 19:25:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A8C87E81EE
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 19:47:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 931CAB20CF7
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 18:25:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D15B280FBB
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 18:47:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33B3538DE9;
-	Fri, 10 Nov 2023 18:25:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A6339878;
+	Fri, 10 Nov 2023 18:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kgceUlkF"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="QqVm33ZW"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 024A53A287
-	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 18:25:19 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 641B728102
-	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 10:23:02 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a8ee6a1801so31710987b3.3
-        for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 10:23:02 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BAE81DFDC;
+	Fri, 10 Nov 2023 18:47:01 +0000 (UTC)
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1299217530;
+	Fri, 10 Nov 2023 10:46:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699640581; x=1700245381; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/u2JG0fndtvz5StB0AokXkOquj7NpP7M8gj3x0QBG2E=;
-        b=kgceUlkFOWL5vxm8J4T3HW8CRJFhtUvNgQXZKG4NmhXHIykYFzOaH8R9t4BX7h6pcY
-         HnAGZDCjGPnos9hZqCDNV2l+emmhngiroS8qEFh+3weIBlUqS8XO242R4Zqy5ed49D/h
-         NAPXdCh011lwe3rpaMDBRWEQX1l7Z72wrQHpfKPLgk+HfW3rUsb0oX81O+V4HvUFf3+J
-         wa3wUoXgZf34b9iEXEEW9pJ76Rsj7Z1eFHQx5FB+ycxOuz1YOUa3cKpaFeuSRuBEQCyf
-         UU/rQZF+3oHacw25Ju4lyFult928U9vxNrPknXhgKTa4DoZ612/rCj4I5S8HYrEEEt4L
-         cPEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699640581; x=1700245381;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/u2JG0fndtvz5StB0AokXkOquj7NpP7M8gj3x0QBG2E=;
-        b=o6STpmrzmf8/JyKWfio9uVUUaLEQw+SMks5EVKySip1aoTesnf0Ls1fnYpMsEEdpj+
-         Ox8ywEP1qEPG2oI5YgA1+reEV7Ti3LWH6l9ZLQ9sVWIQqe+F2ttLQ1ydIoK2l8Bx8+AL
-         4+xGQJYzCoMhMW1rSsIgzwJFpvTi6uK/Krv9jNF8eBoPs5vqJ/GfLQV01NK21ihYt5Pw
-         hdkqOQJ6Q8J2fzXep6fFvdUzWJMx2mR9r0Nf/X4Kgy+cUB0Tkc3akcVTATtF86sZB+zE
-         85aMnWbM16mZ3zb9s1VUt8n79HqlnDZC+c8SjX6ev3xk3d80PIOUFhRXc3eHzwka4sNF
-         jCow==
-X-Gm-Message-State: AOJu0Yxl+oHaJeT9j96bW41j9ORJGzNCwjc7TnK73kve1+d/PyZrnwTK
-	KUwJ+5OXwEcyDwhqogBy0gG5YjkyC78=
-X-Google-Smtp-Source: AGHT+IFilgu1/Q1EZiEoL3sTFYKCQfnhtgAeMBBAfAGcs6DHfZF6Y3nZ5EepLJy80XYZ0ZRT2keQkzxRdJY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ef0c:0:b0:5be:ae71:d70a with SMTP id
- o12-20020a81ef0c000000b005beae71d70amr242444ywm.4.1699640580898; Fri, 10 Nov
- 2023 10:23:00 -0800 (PST)
-Date: Fri, 10 Nov 2023 10:22:59 -0800
-In-Reply-To: <956d8ee3-8b63-4a2d-b0c4-c0d3d74a0f6f@intel.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1699642019; x=1731178019;
+  h=mime-version:content-transfer-encoding:date:message-id:
+   cc:from:to:references:in-reply-to:subject;
+  bh=eUUQ7uJNPravSqJNpSE3V121J1GIxRJQS8MdayoT9IE=;
+  b=QqVm33ZW4UoBL9yG0WHc4Md3afUWpUx2fdaNDrZhoWJ9nWYthQUgS2+9
+   z6WAtBPYjwhb9SaX1zV/tvBbzqOr+MZju7dtSClv/vHFSioAo7tAkjDTB
+   pc3XW59UTQq+R4tZA4vQGaqqEEfbT7xLdOEeIxO51ycdlng+SR64og+bR
+   U=;
+X-IronPort-AV: E=Sophos;i="6.03,291,1694736000"; 
+   d="scan'208";a="362160415"
+Subject: Re: [RFC 02/33] KVM: x86: Introduce KVM_CAP_APIC_ID_GROUPS
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-26a610d2.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2023 18:46:55 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
+	by email-inbound-relay-pdx-2b-m6i4x-26a610d2.us-west-2.amazon.com (Postfix) with ESMTPS id 2D06440E71;
+	Fri, 10 Nov 2023 18:46:54 +0000 (UTC)
+Received: from EX19MTAEUB002.ant.amazon.com [10.0.10.100:14842]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.22.222:2525] with esmtp (Farcaster)
+ id 66695bcb-84df-4eee-8339-5eb6c43ea833; Fri, 10 Nov 2023 18:46:53 +0000 (UTC)
+X-Farcaster-Flow-ID: 66695bcb-84df-4eee-8339-5eb6c43ea833
+Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Fri, 10 Nov 2023 18:46:52 +0000
+Received: from localhost (10.13.235.138) by EX19D004EUC001.ant.amazon.com
+ (10.252.51.190) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Fri, 10 Nov
+ 2023 18:46:48 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-16-pbonzini@redhat.com>
- <956d8ee3-8b63-4a2d-b0c4-c0d3d74a0f6f@intel.com>
-Message-ID: <ZU51A3U6E3aZXayC@google.com>
-Subject: Re: [PATCH 15/34] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-From: Sean Christopherson <seanjc@google.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xu Yilun <yilun.xu@intel.com>, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
-	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 10 Nov 2023 18:46:44 +0000
+Message-ID: <CWVCT1QRMRUJ.3TCT5GYO1XMZ9@amazon.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-hyperv@vger.kernel.org>, <pbonzini@redhat.com>, <vkuznets@redhat.com>,
+	<anelkz@amazon.com>, <graf@amazon.com>, <dwmw@amazon.co.uk>,
+	<jgowans@amazon.com>, <corbert@lwn.net>, <kys@microsoft.com>,
+	<haiyangz@microsoft.com>, <decui@microsoft.com>, <x86@kernel.org>,
+	<linux-doc@vger.kernel.org>, Anel Orazgaliyeva <anelkz@amazon.de>
+From: Nicolas Saenz Julienne <nsaenz@amazon.com>
+To: Sean Christopherson <seanjc@google.com>
+X-Mailer: aerc 0.15.2-182-g389d89a9362e-dirty
+References: <20231108111806.92604-1-nsaenz@amazon.com>
+ <20231108111806.92604-3-nsaenz@amazon.com> <ZUvJp0XVVA_JrYDW@google.com>
+In-Reply-To: <ZUvJp0XVVA_JrYDW@google.com>
+X-Originating-IP: [10.13.235.138]
+X-ClientProxiedBy: EX19D033UWC004.ant.amazon.com (10.13.139.225) To
+ EX19D004EUC001.ant.amazon.com (10.252.51.190)
 
-On Fri, Nov 10, 2023, Xiaoyao Li wrote:
-> On 11/6/2023 12:30 AM, Paolo Bonzini wrote:
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 68a144cb7dbc..a6de526c0426 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -589,8 +589,20 @@ struct kvm_memory_slot {
-> >   	u32 flags;
-> >   	short id;
-> >   	u16 as_id;
-> > +
-> > +#ifdef CONFIG_KVM_PRIVATE_MEM
-> > +	struct {
-> > +		struct file __rcu *file;
-> > +		pgoff_t pgoff;
-> > +	} gmem;
-> > +#endif
-> >   };
-> > +static inline bool kvm_slot_can_be_private(const struct kvm_memory_slot *slot)
+On Wed Nov 8, 2023 at 5:47 PM UTC, Sean Christopherson wrote:
+> On Wed, Nov 08, 2023, Nicolas Saenz Julienne wrote:
+> > From: Anel Orazgaliyeva <anelkz@amazon.de>
+> >
+> > Introduce KVM_CAP_APIC_ID_GROUPS, this capability segments the VM's API=
+C
+> > ids into two. The lower bits, the physical APIC id, represent the part
+> > that's exposed to the guest. The higher bits, which are private to KVM,
+> > groups APICs together. APICs in different groups are isolated from each
+> > other, and IPIs can only be directed at APICs that share the same group
+> > as its source. Furthermore, groups are only relevant to IPIs, anything
+> > incoming from outside the local APIC complex: from the IOAPIC, MSIs, or
+> > PV-IPIs is targeted at the default APIC group, group 0.
+> >
+> > When routing IPIs with physical destinations, KVM will OR the source's
+> > vCPU APIC group with the ICR's destination ID and use that to resolve
+> > the target lAPIC.
+>
+> Is all of the above arbitrary KVM behavior or defined by the TLFS?
+
+All this matches VSM's expectations to how interrupts are to be handled.
+But APIC groups is a concept we created with the aim of generalizing the
+behaviour as much as possible.
+
+> > The APIC physical map is also made group aware in
+> > order to speed up this process. For the sake of simplicity, the logical
+> > map is not built while KVM_CAP_APIC_ID_GROUPS is in use and we defer IP=
+I
+> > routing to the slower per-vCPU scan method.
+>
+> Why?  I mean, I kinda sorta understand what it does for VSM, but it's not=
+ at all
+> obvious why this information needs to be shoved into the APIC IDs.  E.g. =
+why not
+> have an explicit group_id and then maintain separate optimization maps fo=
+r each?
+
+There are three tricks to APIC groups. One is IPI routing: for ex. the
+ICR phyical destination is mixed with the source vCPU's APIC group to
+find the destination vCPU. Another is presenting a coherent APIC ID
+across VTLs; switching VTLs shouldn't change the guest's view of the
+APIC ID. And ultimately keeps track of the vCPU's VTL level. I don't wee
+why we couldn't decouple them, as long as we keep filtering the APIC ID
+before it reaches the guest.
+
+> > This capability serves as a building block to implement virtualisation
+> > based security features like Hyper-V's Virtual Secure Mode (VSM). VSM
+> > introduces a para-virtualised switch that allows for guest CPUs to jump
+> > into a different execution context, this switches into a different CPU
+> > state, lAPIC state, and memory protections. We model this in KVM by
+>
+> Who is "we"?  As a general rule, avoid pronouns.  "we" and "us" in partic=
+ular
+> should never show up in a changelog.  I genuinely don't know if "we" mean=
+s
+> userspace or KVM, and the distinction matters because it clarifies whethe=
+r or
+> not KVM is actively involved in the modeling versus KVM being little more=
+ than a
+> dumb pipe to provide the plumbing.
+
+Sorry, I've been actively trying to avoid pronouns as you already
+mentioned it on a previous review. This one made it through the cracks.
+
+> > using distinct kvm_vcpus for each context.
+> >
+> > Moreover, execution contexts are hierarchical and its APICs are meant t=
+o
+> > remain functional even when the context isn't 'scheduled in'.
+>
+> Please explain the relationship and rules of execution contexts.  E.g. ar=
+e
+> execution contexts the same thing as VTLs?  Do all "real" vCPUs belong to=
+ every
+> execution context?  If so, is that a requirement?
+
+I left a note about this in my reply to your questions in the cover
+letter.
+
+> > For example, we have to keep track of
+> > timers' expirations, and interrupt execution of lesser priority context=
+s
+> > when relevant. Hence the need to alias physical APIC ids, while keeping
+> > the ability to target specific execution contexts.
+> >
+> > Signed-off-by: Anel Orazgaliyeva <anelkz@amazon.de>
+> > Co-developed-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
+> > Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
+> > ---
+>
+>
+> > diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+> > index e1021517cf04..542bd208e52b 100644
+> > --- a/arch/x86/kvm/lapic.h
+> > +++ b/arch/x86/kvm/lapic.h
+> > @@ -97,6 +97,8 @@ void kvm_lapic_set_tpr(struct kvm_vcpu *vcpu, unsigne=
+d long cr8);
+> >  void kvm_lapic_set_eoi(struct kvm_vcpu *vcpu);
+> >  void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value);
+> >  u64 kvm_lapic_get_base(struct kvm_vcpu *vcpu);
+> > +int kvm_vm_ioctl_set_apic_id_groups(struct kvm *kvm,
+> > +                                 struct kvm_apic_id_groups *groups);
+> >  void kvm_recalculate_apic_map(struct kvm *kvm);
+> >  void kvm_apic_set_version(struct kvm_vcpu *vcpu);
+> >  void kvm_apic_after_set_mcg_cap(struct kvm_vcpu *vcpu);
+> > @@ -277,4 +279,35 @@ static inline u8 kvm_xapic_id(struct kvm_lapic *ap=
+ic)
+> >       return kvm_lapic_get_reg(apic, APIC_ID) >> 24;
+> >  }
+> >
+> > +static inline u32 kvm_apic_id(struct kvm_vcpu *vcpu)
 > > +{
-> > +	return slot && (slot->flags & KVM_MEM_GUEST_MEMFD);
-> > +}
-> > +
-> 
-> maybe we can move this block and ...
-> 
-> <snip>
-> 
-> > @@ -2355,6 +2379,30 @@ bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
-> >   					struct kvm_gfn_range *range);
-> >   bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
-> >   					 struct kvm_gfn_range *range);
-> > +
-> > +static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
-> > +{
-> > +	return IS_ENABLED(CONFIG_KVM_PRIVATE_MEM) &&
-> > +	       kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
-> > +}
-> > +#else
-> > +static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
-> > +{
-> > +	return false;
-> > +}
-> >   #endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
-> 
-> this block to Patch 18?
+> > +     return vcpu->vcpu_id & ~vcpu->kvm->arch.apic_id_group_mask;
+>
+> This is *extremely* misleading.  KVM forces the x2APIC ID to match vcpu_i=
+d, but
+> in xAPIC mode the ID is fully writable.
 
-It would work, but my vote is to keep them here to minimize the changes to common
-KVM code in the x86 enabling.  It's not a strong preference though.  Of course,
-at this point, fiddling with this sort of thing is probably a bad idea in terms
-of landing guest_memfd.
+Yes, although I'm under the impression that no sane OS will do so. We
+can decouple the group from the APIC ID, but it still needs to be masked
+before presenting it to the guest. So I guess we'll have to deal with
+the eventuality of apic id writing one way or anoter (a warn only if VSM
+is enabled?).
 
-> > @@ -4844,6 +4875,10 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
-> >   #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> >   	case KVM_CAP_MEMORY_ATTRIBUTES:
-> >   		return kvm_supported_mem_attributes(kvm);
-> > +#endif
-> > +#ifdef CONFIG_KVM_PRIVATE_MEM
-> > +	case KVM_CAP_GUEST_MEMFD:
-> > +		return !kvm || kvm_arch_has_private_mem(kvm);
-> >   #endif
-> >   	default:
-> >   		break;
-> > @@ -5277,6 +5312,18 @@ static long kvm_vm_ioctl(struct file *filp,
-> >   	case KVM_GET_STATS_FD:
-> >   		r = kvm_vm_ioctl_get_stats_fd(kvm);
-> >   		break;
-> > +#ifdef CONFIG_KVM_PRIVATE_MEM
-> > +	case KVM_CREATE_GUEST_MEMFD: {
-> > +		struct kvm_create_guest_memfd guest_memfd;
-> 
-> Do we need a guard of below?
-> 
-> 		r = -EINVAL;
-> 		if (!kvm_arch_has_private_mem(kvm))
-> 			goto out;
+If we decide the APIC group uAPI is not worth it, we can always create
+an ad-hoc VSM one that explicitly sets the kvm_vcpu's VTL. Then route
+the VTL internally into the APIC which can use still groups (or a
+similar concept).
 
-Argh, yeah, that's weird since KVM_CAP_GUEST_MEMFD says "not supported" if the
-VM doesn't support private memory.
-
-Enforcing that would break guest_memfd_test.c though.  And having to create a
-"special" VM just to test basic guest_memfd functionality would be quite
-annoying.
-
-So my vote is to do:
-
-	case KVM_CAP_GUEST_MEMFD:
-		return IS_ENABLED(CONFIG_KVM_PRIVATE_MEM);
-
-There's no harm to KVM if userspace creates a file it can't use, and at some
-point KVM will hopefully support guest_memfd irrespective of private memory.
+Nicolas
 
