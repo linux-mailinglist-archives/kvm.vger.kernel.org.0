@@ -1,235 +1,279 @@
-Return-Path: <kvm+bounces-1500-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1501-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA5AD7E829C
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 20:32:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 862747E8550
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 23:08:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B264D1C20AD3
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 19:32:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEB5D1C20A8B
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 22:08:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B4783B29F;
-	Fri, 10 Nov 2023 19:32:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68253C6BF;
+	Fri, 10 Nov 2023 22:08:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kIY2MI5D"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Ets9i2x0"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C375D3B292
-	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 19:32:13 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54A4A688F
-	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 11:32:11 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-da0c7d27fb0so2816968276.1
-        for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 11:32:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699644730; x=1700249530; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rscOOVYju3IYaiMVnVP6ynDkK2d19s0rTRPZn172d+w=;
-        b=kIY2MI5DJM/qzI+uyaJ+zXU+ZLkWnPqKz4qr6Hbe0AIIZnNxy6OZyl8NAvbJYCWDO9
-         X8anEtkCWZioYhCqIV4l79Sf+3t0jb/YMpjyNDhbpgLmO6qRYCpFB50OmxkM8zSddNxn
-         fGAd/uraB1xQ8IVEI2i0mkh3tnnDFXoItoMyq3jlNJFp6R95LqGY9EL3jJRi+2H5V6C9
-         CM3SeGmJat1BcHy+idyBWYaJQqhbDaItOSh5cp94gO/xB+U11EGFTeJB2S0LVbDkG7fP
-         J5QwD13ehBl8oBW3qlPad/j6VmJu+HmRbkh+Y1BM5Nmervx4Z/W/Eb1fZHpgimydjqN5
-         IBMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699644730; x=1700249530;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=rscOOVYju3IYaiMVnVP6ynDkK2d19s0rTRPZn172d+w=;
-        b=wA2BwJ91H43WYlU8CmV5ANb5ZY8lo4l0INaz8+SdixMkOypoauUplxhYfx5oM05zYj
-         w7FMhyj3kwF62gmeEsHDsAg8vXUxpIda7vBfwZJ6+bU080/7sG95gKGxsBRwuLpoHY6Y
-         zP/wqgIxwX6LpFAzudnAI/+kW7RQrzyilUczT55AD3yakLZnySQ4O9w5ZJnnpDOT0lMS
-         Dz3DUWvxEsAli5VUP326m+htk9xPGxGMFf6XkeJiko3/6BH38C9WSqvIARa1Frici6Wy
-         szJuSgZa9UWghpKhyZdAhGXVDXYn/77G3yDrW1tbYkr0iCu5vqVyl7sZyPz0daEJcSGm
-         MEiQ==
-X-Gm-Message-State: AOJu0YwiEI4ad6ma8L+7vNvfseEw4qiJBhmPyQBGlU5+UdYXGtuK4o23
-	33Bt6TZIJ98PWdmc2WWUxA5mfjRxr/M=
-X-Google-Smtp-Source: AGHT+IHHBCWk9v52Oayu+9pKnzADg1rJkQ9vJxLG4FzLGShvKXoBpg0SlnafNs/DMgJlK4ypSOG/E3KH84E=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:9c03:0:b0:d9d:973:a78b with SMTP id
- c3-20020a259c03000000b00d9d0973a78bmr1918ybo.3.1699644730558; Fri, 10 Nov
- 2023 11:32:10 -0800 (PST)
-Date: Fri, 10 Nov 2023 11:32:08 -0800
-In-Reply-To: <CWVBQQ6GVQVG.2FKWLPBUF77UT@amazon.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A913C697;
+	Fri, 10 Nov 2023 22:08:17 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2079.outbound.protection.outlook.com [40.107.94.79])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A0374205;
+	Fri, 10 Nov 2023 14:08:16 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AtTV5tuSrQmacUVva3gQgEPlITnlswwmezhuONTzXoTTI8pI0NaWIyeZ6runTvLDab+3mm2PQ/5I0F6mT3S12woLvSOrkJhiIGLZIqRu62lrnT0PHb5pzHP40Pay3Vq+O6Z+fg7L6qHHCkrKDlOULqd0clAXXiwkMxDDvndMdNHUwbjtu8rUn2Fj34Ws1gr5rEw9u8RY+NtELBG+xwCVkfqJYgP3JV8MJy/JFBubLFN2wPOAqGbnHmFi3uO3jbGbc2LSK7Ym64DTK8mimgKkBpxGHgIpYByt2pCAdBAqW84kMLUq6lwnOeudhK+bmtKp0ac1/gFZZjxu9v1eEVVwOw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Qa3PqD4sOPR/HFdOo2x936pkipuYUXli9vflwTmetfw=;
+ b=OJTYiXFQkm5rjRjqYW3aCxREDyMcC7GiR/hGfZvLWDJV4jLC0D3Au6auy87PKmcpQYVskY1sGBlIk4AaYcDOc1yEyee+apbR46A8GLK5OUNPbtJEKcuWzBwqr/nD7z7eFRr8IUGXgoV/Taley5rhlxl9wlhmdHsa3Sd5GF+zgYJBl6EmUgTGgO+1l66M+eIYSjdN+RSyTY/tgVJXzfpn3js6dqlojYrR1SAlmpSHBa53owtlRJ4/gSJ+MpN0puV4YJvljaHgp+J7oc7MgUZD5ytgJdk9qJw8LhgQSq44hS+XdJ/wq6oa6hmd7VRpf9KC0bS/sn1yQKTl9kT/2qghqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Qa3PqD4sOPR/HFdOo2x936pkipuYUXli9vflwTmetfw=;
+ b=Ets9i2x0ODGncJohlvy4ilibYmZB/E+lEAFH3XVwlvkFi8+ud3SdciGy+wh8YVlReIwXyzpRCseFrTKmoRqCsucGJN/b8G/bYQwF5xNyEd/Z8gzFXfliChKO7javE/5jMG+MuemmLn5AWsLKnkCDcioMO8K4lZi0iBrMalbzwxA=
+Received: from CY5PR03CA0029.namprd03.prod.outlook.com (2603:10b6:930:8::30)
+ by CY8PR12MB7196.namprd12.prod.outlook.com (2603:10b6:930:58::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.19; Fri, 10 Nov
+ 2023 22:08:13 +0000
+Received: from CY4PEPF0000EE3B.namprd03.prod.outlook.com
+ (2603:10b6:930:8:cafe::22) by CY5PR03CA0029.outlook.office365.com
+ (2603:10b6:930:8::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.19 via Frontend
+ Transport; Fri, 10 Nov 2023 22:08:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000EE3B.mail.protection.outlook.com (10.167.242.15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6977.21 via Frontend Transport; Fri, 10 Nov 2023 22:08:12 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Fri, 10 Nov
+ 2023 16:08:12 -0600
+Date: Fri, 10 Nov 2023 16:07:56 -0600
+From: Michael Roth <michael.roth@amd.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: Alexey Kardashevskiy <aik@amd.com>, Dionna Amalie Glaze
+	<dionnaglaze@google.com>, <kvm@vger.kernel.org>,
+	<linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <pbonzini@redhat.com>, <vkuznets@redhat.com>,
+	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
+	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
+	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
+	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v10 48/50] KVM: SEV: Provide support for
+ SNP_GUEST_REQUEST NAE event
+Message-ID: <20231110220756.7hhiy36jc6jiu7nm@amd.com>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-49-michael.roth@amd.com>
+ <CAAH4kHb=hNH88poYw-fj+ewYgt8F-hseZcRuLDdvbgpSQ5FDZQ@mail.gmail.com>
+ <ZS614OSoritrE1d2@google.com>
+ <b9da2fed-b527-4242-a588-7fc3ee6c9070@amd.com>
+ <ZS_iS4UOgBbssp7Z@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231108111806.92604-1-nsaenz@amazon.com> <ZUu9lwJHasi2vKGg@google.com>
- <ZUvUZytj1AabvvrB@google.com> <CWVBQQ6GVQVG.2FKWLPBUF77UT@amazon.com>
-Message-ID: <ZU6FOF0qUAv8b1zm@google.com>
-Subject: Re: [RFC 0/33] KVM: x86: hyperv: Introduce VSM support
-From: Sean Christopherson <seanjc@google.com>
-To: Nicolas Saenz Julienne <nsaenz@amazon.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com, 
-	anelkz@amazon.com, graf@amazon.com, dwmw@amazon.co.uk, jgowans@amazon.com, 
-	corbert@lwn.net, kys@microsoft.com, haiyangz@microsoft.com, 
-	decui@microsoft.com, x86@kernel.org, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZS_iS4UOgBbssp7Z@google.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3B:EE_|CY8PR12MB7196:EE_
+X-MS-Office365-Filtering-Correlation-Id: 74160f65-08e6-4019-9370-08dbe2398842
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	1xpUF3nGWUErzC/4Un2J4zzu+1i3Q1dcMo1MGqVFf2IPWgXgdQdqk9+CLGeHDioH9D9KNuoFGXbXujCPyn149MjS8s7BPIyj/qvU23hhBfPdOPrUcgAHxSDkUaUXy7NHTwS/QvT9SlY49Ay7kX+YC8DdfPdEK1gOeHf47vDadSXPf3mwTM3gZYsgrZDV6Z/p7k1NR5DuCvABB6nXpmQJgJGuDXHrbP3MMqbxfxKjEracfEBCA3odA75c3M+jeqRftEcONhpp4WdIcfL3aua7uupBVHO/9KSDLwO3wojh9zby023Ik+DUQu+2BfTOn5A+iBgT/rWrkf+1BwuMhodcGQdOKxHIy+412MIi7SoVxLciwX8GYI5kykTp5HFhPPZdC6Plte9BM8KB/CrnGRMaCKqbb2+ruyKMv+N5a8R3EvrF9tvCc+DsYMRk27R3ZH9MRuw5C+PUzSYGEujZq3CHx9W1BI7mv6PT388CDMJ3ouAPi7B4dS2DCMTfZJRqTJ1KBlM+Cd5Ni/qJbMB53P8npXYichVe1KL1BT5kxL66k+CAPySJMjNlO2jXDwA5ODtb6qspwP2SKSlYDjhoVCt0Sc2Uu6GC8SrR2s+FsHbJR2QPZ6UzCdLR4ImKyFMHtULUTbxX0QQ+kcdfGXotyZXz75JbMxQQbS1rnrz0K+ky2QrY1IOeT6lu6bnXNMJplvkMxxJTy/cyI47K2C2zNLhG6EtbzCvyFqqH7uZBy+7coe3XZlwDCNQuSH1hsuNg1owEjTH8PiubDhaIdHZ6pcBBIg==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(39860400002)(346002)(396003)(136003)(230922051799003)(1800799009)(451199024)(64100799003)(82310400011)(186009)(46966006)(36840700001)(40470700004)(36860700001)(478600001)(53546011)(6666004)(47076005)(26005)(16526019)(83380400001)(426003)(54906003)(316002)(40480700001)(70586007)(6916009)(70206006)(2616005)(1076003)(7406005)(5660300002)(82740400003)(40460700003)(44832011)(8676002)(66899024)(4326008)(8936002)(336012)(7416002)(41300700001)(36756003)(86362001)(2906002)(356005)(81166007)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2023 22:08:12.8728
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74160f65-08e6-4019-9370-08dbe2398842
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE3B.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7196
 
-On Fri, Nov 10, 2023, Nicolas Saenz Julienne wrote:
-> On Wed Nov 8, 2023 at 6:33 PM UTC, Sean Christopherson wrote:
-> >  - What is the split between userspace and KVM?  How did you arrive at =
-that split?
->=20
-> Our original design, which we discussed in the KVM forum 2023 [1] and is
-> public [2], implemented most of VSM in-kernel. Notably we introduced VTL
-> awareness in struct kvm_vcpu.
+On Wed, Oct 18, 2023 at 06:48:59AM -0700, Sean Christopherson wrote:
+> On Wed, Oct 18, 2023, Alexey Kardashevskiy wrote:
+> > 
+> > On 18/10/23 03:27, Sean Christopherson wrote:
+> > > On Mon, Oct 16, 2023, Dionna Amalie Glaze wrote:
+> > > > > +
+> > > > > +       /*
+> > > > > +        * If a VMM-specific certificate blob hasn't been provided, grab the
+> > > > > +        * host-wide one.
+> > > > > +        */
+> > > > > +       snp_certs = sev_snp_certs_get(sev->snp_certs);
+> > > > > +       if (!snp_certs)
+> > > > > +               snp_certs = sev_snp_global_certs_get();
+> > > > > +
+> > > > 
+> > > > This is where the generation I suggested adding would get checked. If
+> > > > the instance certs' generation is not the global generation, then I
+> > > > think we need a way to return to the VMM to make that right before
+> > > > continuing to provide outdated certificates.
+> > > > This might be an unreasonable request, but the fact that the certs and
+> > > > reported_tcb can be set while a VM is running makes this an issue.
+> > > 
+> > > Before we get that far, the changelogs need to explain why the kernel is storing
+> > > userspace blobs in the first place.  The whole thing is a bit of a mess.
+> > > 
+> > > sev_snp_global_certs_get() has data races that could lead to variations of TOCTOU
+> > > bugs: sev_ioctl_snp_set_config() can overwrite psp_master->sev_data->snp_certs
+> > > while sev_snp_global_certs_get() is running.  If the compiler reloads snp_certs
+> > > between bumping the refcount and grabbing the pointer, KVM will end up leaking a
+> > > refcount and consuming a pointer without a refcount.
+> > > 
+> > > 	if (!kref_get_unless_zero(&certs->kref))
+> > > 		return NULL;
+> > > 
+> > > 	return certs;
+> > 
+> > I'm missing something here. The @certs pointer is on the stack,
+> 
+> No, nothing guarantees that @certs is on the stack and will never be reloaded.
+> sev_snp_certs_get() is in full view of sev_snp_global_certs_get(), so it's entirely
+> possible that it can be inlined.  Then you end up with:
+> 
+> 	struct sev_device *sev;
+> 
+> 	if (!psp_master || !psp_master->sev_data)
+> 		return NULL;
+> 
+> 	sev = psp_master->sev_data;
+> 	if (!sev->snp_initialized)
+> 		return NULL;
+> 
+> 	if (!sev->snp_certs)
+> 		return NULL;
+> 
+> 	if (!kref_get_unless_zero(&sev->snp_certs->kref))
+> 		return NULL;
+> 
+> 	return sev->snp_certs;
+> 
+> At which point the compiler could choose to omit a local variable entirely, it
+> could store @certs in a register and reload after kref_get_unless_zero(), etc.
+> If psp_master->sev_data->snp_certs is changed at any point, odd thing can happen.
+> 
+> That atomic operation in kref_get_unless_zero() might prevent a reload between
+> getting the kref and the return, but it wouldn't prevent a reload between the
+> !NULL check and kref_get_unless_zero().
+> 
+> > > If userspace wants to provide garbage to the guest, so be it, not KVM's problem.
+> > > That way, whether the VM gets the global cert or a per-VM cert is purely a userspace
+> > > concern.
+> > 
+> > The global cert lives in CCP (/dev/sev), the per VM cert lives in kvmvm_fd.
+> > "A la vcpu->run" is fine for the latter but for the former we need something
+> > else.
+> 
+> Why?  The cert ultimately comes from userspace, no?  Make userspace deal with it.
+> 
+> > And there is scenario when one global certs blob is what is needed and
+> > copying it over multiple VMs seems suboptimal.
+> 
+> That's a solvable problem.  I'm not sure I like the most obvious solution, but it
+> is a solution: let userspace define a KVM-wide blob pointer, either via .mmap()
+> or via an ioctl().
+> 
+> FWIW, there's no need to do .mmap() shenanigans, e.g. an ioctl() to set the
+> userspace pointer would suffice.  The benefit of a kernel controlled pointer is
+> that it doesn't require copying to a kernel buffer (or special code to copy from
+> userspace into guest).
+> 
+> Actually, looking at the flow again, AFAICT there's nothing special about the
+> target DATA_PAGE.  It must be SHARED *before* SVM_VMGEXIT_EXT_GUEST_REQUEST, i.e.
+> KVM doesn't need to do conversions, there's no kernel priveleges required, etc.
+> And the GHCB doesn't dictate ordering between storing the certificates and doing
+> the request.  That means the certificate stuff can be punted entirely to usersepace.
+> 
+> Heh, typing up the below, there's another bug: KVM will incorrectly "return" '0'
+> for non-SNP guests:
 
-...
+Thanks for the catch, will fix that up.
 
-> So we decided to move all this complexity outside of struct kvm_vcpu
-> and, as much as possible, out of the kernel. We figures out the basic
-> kernel building blocks that are absolutely necessary, and let user-space
-> deal with the rest.
+> 
+> 	unsigned long exitcode = 0;
+> 	u64 data_gpa;
+> 	int err, rc;
+> 
+> 	if (!sev_snp_guest(vcpu->kvm)) {
+> 		rc = SEV_RET_INVALID_GUEST; <= sets "rc", not "exitcode"
+> 		goto e_fail;
+> 	}
+> 
+> e_fail:
+> 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, exitcode);
+> 
+> Which really highlights that we need to get test infrastructure up and running
+> for SEV-ES, SNP, and TDX.
+> 
+> Anyways, back to punting to userspace.  Here's a rough sketch.  The only new uAPI
+> is the definition of KVM_HC_SNP_GET_CERTS and its arguments.
 
-Sorry, I should have been more clear.  What's the split in terms of respons=
-ibilities,
-i.e. what will KVM's ABI look like?  E.g. if the vCPU=3D>VTLs setup is nons=
-ensical,
-does KVM care?
+This sketch seems like a good, flexible way to handle per-VM certs, but
+it does complicate things from a userspace perspective. As a basic
+requirement, all userspaces will need to provide a way to specify the
+initial blob (either a very verbose base64-encoded userspace cmdline param,
+or a filepatch that needs additional management to store and handle
+permissions/etc.), and also a means to update it (e.g. a HMP/QMP command
+for QEMU, some libvirt wrappers, etc.).
 
-My general preference is for KVM to be as permissive as possible, i.e. let
-userspace do whatever it wants so long as it doesn't place undue burden on =
-KVM.
-But at the same time I don't to end up in a similar boat as many of the par=
-avirt
-features, where things just stop working if userspace or the guest makes a =
-goof.
+That's all well and good if you want to make use of per-VM certs, but we
+don't necessarily expect that most deployments will necessarily want to deal
+with per-VM certs, and would be happy with a system-wide one where they could
+simply issue the /dev/sev ioctl to inject one automatically for all guests.
 
-> >  - Why not make VTLs a first-party concept in KVM?  E.g. rather than bu=
-ry info
-> >    in a VTL device and APIC ID groups, why not modify "struct kvm" to s=
-upport
-> >    replicating state that needs to be tracked per-VTL?  Because of how =
-memory
-> >    attributes affect hugepages, duplicating *memslots* might actually b=
-e easier
-> >    than teaching memslots to be VTL-aware.
->=20
-> I do agree that we need to introduce some level VTL awareness into
-> memslots. There's the hugepages issues you pointed out. But it'll be
-> also necessary once we look at how to implement overlay pages that are
-> per-VTL. (A topic I didn't mention in the series as I though I had
-> managed to solve memory protections while avoiding the need for multiple
-> slots). What I have in mind is introducing a memory slot address space
-> per-VTL, similar to how we do things with SMM.
+So we're sort of complicating the more common case to support a more niche
+one (as far as userspace is concerned anyway; as far as kernel goes, your
+approach is certainly simplest :)).
 
-Noooooooo (I hate memslot address spaces :-) )
+Instead, maybe a compromise is warranted so the requirements on userspace
+side are less complicated for a more basic deployment:
 
-Why not represent each VTL with a separate "struct kvm" instance?  That wou=
-ld
-naturally provide per-VTL behavior for:
+  1) If /dev/sev is used to set a global certificate, then that will be
+     used unconditionally by KVM, protected by simple dumb mutex during
+     usage/update.
+  2) If /dev/sev is not used to set the global certificate is the value
+     is NULL, we assume userspace wants full responsibility for managing
+     certificates and exit to userspace to request the certs in the manner
+     you suggested.
 
-  - APIC groups
-  - memslot overlays
-  - memory attributes (and their impact on hugepages)
-  - MMU pages
+Sean, Dionna, would this cover your concerns and address the certificate
+update use-case?
 
-The only (obvious) issue with that approach would be cross-VTL operations. =
- IIUC,
-sending IPIs across VTLs isn't allowed, but even if it were, that should be=
- easy
-enough to solve, e.g. KVM already supports posting interrupts from non-KVM =
-sources.
-
-GVA=3D>GPA translation would be trickier, but that patch suggests you want =
-to handle
-that in userspace anyways.  And if translation is a rare/slow path, maybe i=
-t could
-simply be punted to userspace?
-
-  NOTE: The hypercall implementation is incomplete and only shared for
-  completion. Additionally we'd like to move the VTL aware parts to
-  user-space.
-
-Ewww, and looking at what it would take to support cross-VM translations sh=
-ows
-another problem with using vCPUs to model VTLs.  Nothing prevents userspace=
- from
-running a virtual CPU at multiple VTLs concurrently, which means that anyth=
-ing
-that uses kvm_hv_get_vtl_vcpu() is unsafe, e.g. walk_mmu->gva_to_gpa() coul=
-d be
-modified while kvm_hv_xlate_va_walk() is running.
-
-I suppose that's not too hard to solve, e.g. mutex_trylock() and bail if so=
-mething
-holds the other kvm_vcpu/VTL's mutex.  Though ideally, KVM would punt all c=
-ross-VTL
-operations to userspace.  :-)
-
-If punting to userspace isn't feasible, using a struct kvm per VTL probably=
- wouldn't
-make the locking and concurrency problems meaningfully easier or harder to =
-solve.
-E.g. KVM could require VTLs, i.e. "struct kvm" instances that are part of a=
- single
-virtual machine, to belong to the same process.  That'd avoid headaches wit=
-h
-mm_struct, at which point I don't _think_ getting and using a kvm_vcpu from=
- a
-different kvm would need special handling?
-
-Heh, another fun one, the VTL handling in kvm_hv_send_ipi() is wildly broke=
-n, the
-in_vtl field is consumed before send_ipi is read from userspace.
-
-	union hv_input_vtl *in_vtl;
-	u64 valid_bank_mask;
-	u32 vector;
-	bool all_cpus;
-	u8 vtl;
-
-	/* VTL is at the same offset on both IPI types */
-	in_vtl =3D &send_ipi.in_vtl;
-	vtl =3D in_vtl->use_target_vtl ? in_vtl->target_vtl : kvm_hv_get_active_vt=
-l(vcpu);
-
-> >    E.g. if 90% of the state is guaranteed to be identical for a given
-> >    vCPU across execution contexts, then modeling that with separate
-> >    kvm_vcpu structures is very inefficient.  I highly doubt it's 90%,
-> >    but it might be quite high depending on how much the TFLS restricts
-> >    the state of the vCPU, e.g. if it's 64-bit only.
->=20
-> For the record here's the private VTL state (TLFS 15.11.1):
->=20
-> "In general, each VTL has its own control registers, RIP register, RSP
->  register, and MSRs:
->=20
->  SYSENTER_CS, SYSENTER_ESP, SYSENTER_EIP, STAR, LSTAR, CSTAR, SFMASK,
->  EFER, PAT, KERNEL_GSBASE, FS.BASE, GS.BASE, TSC_AUX
->  HV_X64_MSR_HYPERCALL
->  HV_X64_MSR_GUEST_OS_ID
->  HV_X64_MSR_REFERENCE_TSC
->  HV_X64_MSR_APIC_FREQUENCY
->  HV_X64_MSR_EOI
->  HV_X64_MSR_ICR
->  HV_X64_MSR_TPR
->  HV_X64_MSR_APIC_ASSIST_PAGE
->  HV_X64_MSR_NPIEP_CONFIG
->  HV_X64_MSR_SIRBP
->  HV_X64_MSR_SCONTROL
->  HV_X64_MSR_SVERSION
->  HV_X64_MSR_SIEFP
->  HV_X64_MSR_SIMP
->  HV_X64_MSR_EOM
->  HV_X64_MSR_SINT0 =E2=80=93 HV_X64_MSR_SINT15
->  HV_X64_MSR_STIMER0_COUNT =E2=80=93 HV_X64_MSR_STIMER3_COUNT
->  Local APIC registers (including CR8/TPR)
-
-Ugh, the APIC state is quite the killer.  And I gotta image things like CET=
- and
-FRED are only going to increase that list.
+-Mike
 
