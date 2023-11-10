@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-1442-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1443-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB8147E777E
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 03:29:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20D157E777F
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 03:29:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7481D2814E4
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFEB6281385
 	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 02:29:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A89D4A3B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 633BA4C60;
 	Fri, 10 Nov 2023 02:29:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aGTsrWI6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bxd9OyhR"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8144B23C9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E6123D7
 	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 02:29:13 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9A2A4687
-	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 18:29:12 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-da0c6d62ec8so1930496276.1
-        for <kvm@vger.kernel.org>; Thu, 09 Nov 2023 18:29:12 -0800 (PST)
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C52446B0
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 18:29:13 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-6b31cb3cc7eso1613578b3a.0
+        for <kvm@vger.kernel.org>; Thu, 09 Nov 2023 18:29:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699583351; x=1700188151; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1699583353; x=1700188153; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=5SlrZj36n0KChIF9h7ClFhiP6zYdMuLYWl1Pm7fXb0o=;
-        b=aGTsrWI6rNx2REpLaZfKFSLSD/hcmTzs1814Pp82zEYuYvL3JggSLNVzAob/txjcJs
-         ldcP57jwqy9gnJNPzwVvM4qC/WOsXZ7+/5UblA3iyFsP5QK53pXs37YBELaYwv9NNLKi
-         9MMo2fBt40/WVfbubfj/RfJ0EscJyX9nTCODarsHSbV0xcYg7K56LU43PEoCWP5HgMSD
-         /QetNZmWomGIDPb1Cr7GObxq32cUg3hNIWqnoawoWGgckqVd9EijwzaM8IqocF3TeE65
-         MEJWuV4srT4g31h1NomwG3MmDAKyNMS/KNL/8cz/YvK5a19yS5e3zMLcosAI8G/qF2zu
-         Hs4g==
+        bh=oUplQH4QKJNeOGVBIGmyoAKP+5jCzgTgFjMw0NNsbV8=;
+        b=bxd9OyhRQfuVpkEeKnGJO9SydgcnMgzqO0QovgXETG/z0aCw3KhdoLNYUMUiwxCx3Z
+         mho76pDdNhzA1TR0VsXvgZ7Lsg5+4z+ZGkwt5cXC3vIJWXb2FjhRlcpByRsx7dIMexEr
+         45hD/HNiouVhXQ1YdZkzonuwFZ9mM0tTvpnh1aD7wJZmxRWpsi+92dv36pQl/LASUU6i
+         +5zC+9EispEhTtKs7C0mtKaLnWVaw8bjBV4C7MakHq7i6tBhSGLygXiAYoT5WryMck0J
+         xaTtnXPsngXix9N/bvseKFhdG3puqm/nRWFeXll13Xy0qKY8ZFXxkm2VbzX9ZJwPabZZ
+         BDPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699583351; x=1700188151;
+        d=1e100.net; s=20230601; t=1699583353; x=1700188153;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=5SlrZj36n0KChIF9h7ClFhiP6zYdMuLYWl1Pm7fXb0o=;
-        b=qvIgNAvz/gwK3Bt4MnV5CbMEfTnmHLcWpp0QA0O5xrlwbwl5hvIdEEfviyrs9ME6xV
-         TiahYRFWE5n2TIMAfPBa2UezX4o5JhoLqc8nAXZ+7rcbI+0WvUlcqWpEJe+K9G6PHO3T
-         wghaPILDsGPUzW4CcOG74KmV42kpHBonNjioSepr1LZkcZv89jzDB97jZW/PB1RtlpDx
-         kbW9tIwHOTkCZselFvjz/pftVXPjm673wwh+I5KgYvYmNAx3+JV4DLKEVGChKHFzJKkr
-         XOf7PGJWxFZ7yeUONCZL1xQESx+G134dfbm4ygIpOLWkNVZoBNEBw2qw2cGcyi3RKwjh
-         9kIA==
-X-Gm-Message-State: AOJu0YwepI25RMrl/z7i1UuUgXc4N2kBfmU/n3+uCoERHnKgd5KyG4lX
-	U9Fw9ZtZHDNKIiUpp7Sc7UwGMQFQHxc=
-X-Google-Smtp-Source: AGHT+IGFCa9KkZ81i+JJNjZhR4CIbz66m6zI5H/yCZMjmXJL+cscV1zQxhDZNMxmnsOJUKFv8SOM0ug181w=
+        bh=oUplQH4QKJNeOGVBIGmyoAKP+5jCzgTgFjMw0NNsbV8=;
+        b=wIKIs3RUmfSK+e7rCwGbuWxwW20h7XRg21YiwnNQ8Ce+qEd94l6Im+BN+FRmydkdJx
+         0IXO1Rk9Zl4qVQx9Pcyn05qpHhWwXBHSs3rdF/qJfqyoRO6YQsyUk/rsSfYez/J2cTAM
+         CiNS9tHpeDqvp4/MGnD13QDISFieY7ANLFR0Npx1xdJXWQB0XO4rR+3/n7JHlBwc2rsM
+         d04c1xJI/WEP/nR8B7W5204g1cWQ5JMIHL/lA3hB59WnfARmPDYlCSZtVg+Wv+yqIS3t
+         PEV9YzFDeLlEolSBSywhM7W3Mf0qMr5JYupabyvzedoyIVYSYTmTAdv5/beWeZAZizQ2
+         LVHA==
+X-Gm-Message-State: AOJu0Yxtj0CGs+VPlFFpwPBwJMGtKSiv28yHh5PdrrkdWJnSd8p1cEz4
+	rux/Qap0FoHTZl1zyu2nsaUGHGPnTkA=
+X-Google-Smtp-Source: AGHT+IEucuu8/wKbjkKW4lLWW91QLJUJ5SOAPQg86CMbuYGjka0qEOMY6aBvXFhk7y3bJLf4TgCoQArYkak=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a5b:f12:0:b0:da1:513d:8a3c with SMTP id
- x18-20020a5b0f12000000b00da1513d8a3cmr161843ybr.11.1699583351272; Thu, 09 Nov
- 2023 18:29:11 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:850a:b0:690:29c0:ef51 with SMTP id
+ ha10-20020a056a00850a00b0069029c0ef51mr307317pfb.1.1699583352940; Thu, 09 Nov
+ 2023 18:29:12 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  9 Nov 2023 18:28:52 -0800
+Date: Thu,  9 Nov 2023 18:28:53 -0800
 In-Reply-To: <20231110022857.1273836-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -66,126 +66,55 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20231110022857.1273836-1-seanjc@google.com>
 X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
-Message-ID: <20231110022857.1273836-6-seanjc@google.com>
-Subject: [PATCH 05/10] KVM: x86/pmu: Add macros to iterate over all PMCs given
- a bitmap
+Message-ID: <20231110022857.1273836-7-seanjc@google.com>
+Subject: [PATCH 06/10] KVM: x86/pmu: Process only enabled PMCs when emulating
+ events in software
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Konstantin Khorenko <khorenko@virtuozzo.com>, Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add and use kvm_for_each_pmc() to dedup a variety of open coded for-loops
-that iterate over valid PMCs given a bitmap (and because seeing checkpatch
-whine about bad macro style is always amusing).
+Mask off disabled counters based on PERF_GLOBAL_CTRL *before* iterating
+over PMCs to emulate (branch) instruction required events in software.  In
+the common case where the guest isn't utilizing the PMU, pre-checking for
+enabled counters turns a relatively expensive search into a few AND uops
+and a Jcc.
 
-No functional change intended.
+Sadly, PMUs without PERF_GLOBAL_CTRL, e.g. most existing AMD CPUs, are out
+of luck as there is no way to check that a PMC isn't being used without
+checking the PMC's event selector.
 
+Cc: Konstantin Khorenko <khorenko@virtuozzo.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/pmu.c           | 26 +++++++-------------------
- arch/x86/kvm/pmu.h           |  6 ++++++
- arch/x86/kvm/vmx/pmu_intel.c |  7 ++-----
- 3 files changed, 15 insertions(+), 24 deletions(-)
+ arch/x86/kvm/pmu.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index ee921b24d9e4..0e2175170038 100644
+index 0e2175170038..488d21024a92 100644
 --- a/arch/x86/kvm/pmu.c
 +++ b/arch/x86/kvm/pmu.c
-@@ -493,6 +493,7 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
+@@ -837,11 +837,20 @@ static inline bool cpl_is_matched(struct kvm_pmc *pmc)
+ 
+ void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 perf_hw_id)
  {
- 	DECLARE_BITMAP(bitmap, X86_PMC_IDX_MAX);
++	DECLARE_BITMAP(bitmap, X86_PMC_IDX_MAX);
  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-+	struct kvm_pmc *pmc;
- 	int bit;
- 
- 	bitmap_copy(bitmap, pmu->reprogram_pmi, X86_PMC_IDX_MAX);
-@@ -505,12 +506,7 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
- 	BUILD_BUG_ON(sizeof(bitmap) != sizeof(atomic64_t));
- 	atomic64_andnot(*(s64 *)bitmap, &pmu->__reprogram_pmi);
- 
--	for_each_set_bit(bit, bitmap, X86_PMC_IDX_MAX) {
--		struct kvm_pmc *pmc = kvm_pmc_idx_to_pmc(pmu, bit);
--
--		if (unlikely(!pmc))
--			continue;
--
-+	kvm_for_each_pmc(pmu, pmc, bit, bitmap) {
- 		/*
- 		 * If reprogramming fails, e.g. due to contention, re-set the
- 		 * regprogram bit set, i.e. opportunistically try again on the
-@@ -720,11 +716,7 @@ static void kvm_pmu_reset(struct kvm_vcpu *vcpu)
- 
- 	bitmap_zero(pmu->reprogram_pmi, X86_PMC_IDX_MAX);
- 
--	for_each_set_bit(i, pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX) {
--		pmc = kvm_pmc_idx_to_pmc(pmu, i);
--		if (!pmc)
--			continue;
--
-+	kvm_for_each_pmc(pmu, pmc, i, pmu->all_valid_pmc_idx) {
- 		pmc_stop_counter(pmc);
- 		pmc->counter = 0;
- 		pmc->emulated_counter = 0;
-@@ -796,10 +788,8 @@ void kvm_pmu_cleanup(struct kvm_vcpu *vcpu)
- 	bitmap_andnot(bitmask, pmu->all_valid_pmc_idx,
- 		      pmu->pmc_in_use, X86_PMC_IDX_MAX);
- 
--	for_each_set_bit(i, bitmask, X86_PMC_IDX_MAX) {
--		pmc = kvm_pmc_idx_to_pmc(pmu, i);
--
--		if (pmc && pmc->perf_event && !pmc_speculative_in_use(pmc))
-+	kvm_for_each_pmc(pmu, pmc, i, bitmask) {
-+		if (pmc->perf_event && !pmc_speculative_in_use(pmc))
- 			pmc_stop_counter(pmc);
- 	}
- 
-@@ -851,10 +841,8 @@ void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 perf_hw_id)
  	struct kvm_pmc *pmc;
  	int i;
  
--	for_each_set_bit(i, pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX) {
--		pmc = kvm_pmc_idx_to_pmc(pmu, i);
--
--		if (!pmc || !pmc_event_is_allowed(pmc))
-+	kvm_for_each_pmc(pmu, pmc, i, pmu->all_valid_pmc_idx) {
-+		if (!pmc_event_is_allowed(pmc))
- 			continue;
- 
- 		/* Ignore checks for edge detect, pin control, invert and CMASK bits */
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 2235772a495b..cb62a4e44849 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -83,6 +83,12 @@ static inline struct kvm_pmc *kvm_pmc_idx_to_pmc(struct kvm_pmu *pmu, int idx)
- 	return NULL;
- }
- 
-+#define kvm_for_each_pmc(pmu, pmc, i, bitmap)			\
-+	for_each_set_bit(i, bitmap, X86_PMC_IDX_MAX)		\
-+		if (!(pmc = kvm_pmc_idx_to_pmc(pmu, i)))	\
-+			continue;				\
-+		else						\
+-	kvm_for_each_pmc(pmu, pmc, i, pmu->all_valid_pmc_idx) {
++	BUILD_BUG_ON(sizeof(pmu->global_ctrl) * BITS_PER_BYTE != X86_PMC_IDX_MAX);
 +
- static inline u64 pmc_bitmask(struct kvm_pmc *pmc)
- {
- 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 4254411be467..ee3e122d3617 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -696,11 +696,8 @@ void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu)
- 	struct kvm_pmc *pmc = NULL;
- 	int bit, hw_idx;
- 
--	for_each_set_bit(bit, (unsigned long *)&pmu->global_ctrl,
--			 X86_PMC_IDX_MAX) {
--		pmc = kvm_pmc_idx_to_pmc(pmu, bit);
--
--		if (!pmc || !pmc_speculative_in_use(pmc) ||
-+	kvm_for_each_pmc(pmu, pmc, bit, (unsigned long *)&pmu->global_ctrl) {
-+		if (!pmc_speculative_in_use(pmc) ||
- 		    !pmc_is_globally_enabled(pmc) || !pmc->perf_event)
++	if (!kvm_pmu_has_perf_global_ctrl(pmu))
++		bitmap_copy(bitmap, pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX);
++	else if (!bitmap_and(bitmap, pmu->all_valid_pmc_idx,
++			     (unsigned long *)&pmu->global_ctrl, X86_PMC_IDX_MAX))
++		return;
++
++	kvm_for_each_pmc(pmu, pmc, i, bitmap) {
+ 		if (!pmc_event_is_allowed(pmc))
  			continue;
  
 -- 
