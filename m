@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-1465-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1464-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 066507E7CAE
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 14:54:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 33B3F7E7CAD
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 14:54:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DAFD281629
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 13:54:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E46B228143E
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 13:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342FC1C6A7;
-	Fri, 10 Nov 2023 13:54:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C1A01B28E;
+	Fri, 10 Nov 2023 13:54:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QtX4FM0A"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DENmvaXt"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75381A732
-	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 13:54:31 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 541763821D
-	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 05:54:30 -0800 (PST)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AADeF9O027646;
-	Fri, 10 Nov 2023 13:54:19 GMT
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615681A72B
+	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 13:54:30 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ED533821E
+	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 05:54:29 -0800 (PST)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AADaKcB001450;
+	Fri, 10 Nov 2023 13:54:21 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=ce6gVYV7PiiJzLq2PbHOazjELW14a6f83kuohnnrIcg=;
- b=QtX4FM0AMD4LSUNtkMrnfc9z7vqgpR5R3VDCMIxtcuAmaRYRtB5athVPP1rQ8+m9lUVw
- 6doH0CW/YLJsBX/HGrbH4taHOhEHYXGRABZaHhk6wp0PfLEpLtaebiLy+dV//q5MncQ4
- 1pbMxWHakn61mDChbGJbtZFc+NfmB27VkMev5ctSRMT9ZoUIOc/JChHm1NaxTAdJUFLo
- jZJQ2kG2TTaZJ5hqaAHhBonZua2GWHtTfApD1HY+UtmlbrKodzWHpLFoQtNDPo51rdXg
- EDIORur9B6SXXBx1aGfepPP2Vm6NL1iWl1O040sS0Jzk6z5Mf9ZU5LRLU48hCAc+ph8R xw== 
+ : mime-version; s=pp1; bh=u381LJxo4IZIaULGFVH+XDkA8mtFPi9CMzLicjJ5JPk=;
+ b=DENmvaXtYfPLcKX15xJkFT5aJ8eLsLMRyApCO24Yhe9bVNvA9QQNGXRa8SfKTAcoKm0V
+ /P0hOvVucv3eBDUH86oF8Fo8NfJwi6ZhL5ViuXeuh2wQSkXVpmxeTB02BG1j2e6p6Teo
+ mqO9oBqjT81OMmQfneKqXczJpsDwj6ihKNoc4oGKOV/qGzzeGx+zf0PDi79ZEf1Nvkl7
+ esukKMmJRH+r6q7s+TW7Qz50Za6ZwguZRJYsLlDOjRovQnEA03dQKtQ++CPm+GB+wf9r
+ 4AIdYwQr1+PK/GWwXx9p8Lkzo4ozq/dTvLIlmE+bbtGGEapaXYBY6I/Eio0JfYp+Ct4i RA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u9nkq0gdf-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u9mrn9rgm-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Nov 2023 13:54:18 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AADfrd3032745;
-	Fri, 10 Nov 2023 13:54:17 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u9nkq0gd6-1
+	Fri, 10 Nov 2023 13:54:21 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AADqYiL022564;
+	Fri, 10 Nov 2023 13:54:20 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u9mrn9rfv-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Nov 2023 13:54:17 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AABJBIs000675;
-	Fri, 10 Nov 2023 13:54:17 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u7w23b7d4-1
+	Fri, 10 Nov 2023 13:54:20 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAB4RVK014372;
+	Fri, 10 Nov 2023 13:54:19 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u7w22b7w5-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Nov 2023 13:54:16 +0000
+	Fri, 10 Nov 2023 13:54:19 +0000
 Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AADsDDh13107742
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AADsGUk37683840
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Nov 2023 13:54:14 GMT
+	Fri, 10 Nov 2023 13:54:16 GMT
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D3D632004F;
-	Fri, 10 Nov 2023 13:54:13 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 2741420043;
+	Fri, 10 Nov 2023 13:54:16 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8FD3F20043;
-	Fri, 10 Nov 2023 13:54:11 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 3EC182004F;
+	Fri, 10 Nov 2023 13:54:14 +0000 (GMT)
 Received: from t14-nrb.ibmuc.com (unknown [9.179.18.113])
 	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 10 Nov 2023 13:54:11 +0000 (GMT)
+	Fri, 10 Nov 2023 13:54:14 +0000 (GMT)
 From: Nico Boehr <nrb@linux.ibm.com>
 To: thuth@redhat.com, pbonzini@redhat.com, andrew.jones@linux.dev
 Cc: kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests GIT PULL 05/26] lib: s390x: sclp: Add line mode input handling
-Date: Fri, 10 Nov 2023 14:52:14 +0100
-Message-ID: <20231110135348.245156-6-nrb@linux.ibm.com>
+Subject: [kvm-unit-tests GIT PULL 06/26] s390x: spec_ex-sie: refactor to use snippet API
+Date: Fri, 10 Nov 2023 14:52:15 +0100
+Message-ID: <20231110135348.245156-7-nrb@linux.ibm.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231110135348.245156-1-nrb@linux.ibm.com>
 References: <20231110135348.245156-1-nrb@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7FUtMUGMBRmqGkVe2eXqI1ssmZBwCm73
-X-Proofpoint-ORIG-GUID: nqg7216hX-k1yv3gnzSwyMS8-TS4SLKi
+X-Proofpoint-ORIG-GUID: rq0EWCVaUlfKkHi-cy3GuXhccGdDvVJ4
+X-Proofpoint-GUID: -BlHLTGFDgU8CZDVGXoxIEGJmOirP40J
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
@@ -88,326 +88,54 @@ MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-11-10_10,2023-11-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
- mlxscore=0 lowpriorityscore=0 priorityscore=1501 bulkscore=0
- mlxlogscore=999 adultscore=0 suspectscore=0 phishscore=0 malwarescore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311100114
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ bulkscore=0 mlxlogscore=999 mlxscore=0 lowpriorityscore=0
+ priorityscore=1501 clxscore=1015 impostorscore=0 adultscore=0
+ suspectscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2311060000 definitions=main-2311100114
 
-From: Janosch Frank <frankja@linux.ibm.com>
+spec_ex-sie uses a snippet, but allocated the memory on its own without
+obvious reason to do so.
 
-Time to add line-mode input so we can use input handling under LPAR if
-there's no access to a ASCII console.
+Refactor the test to use snippet_init().
 
-Line-mode IO is pretty wild and the documentation could be improved a
-lot. Hence I've copied the input parsing functions from Linux.
-
-For some reason output is a type 2 event but input is a type 1
-event. This also means that the input and output structures are
-different from each other.
-
-The input can consist of multiple structures which don't contain text
-data before the input text data is reached. Hence we need a bunch of
-search functions to retrieve a pointer to the text data.
-
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Link: https://lore.kernel.org/r/20231031095519.73311-4-frankja@linux.ibm.com
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Link: https://lore.kernel.org/r/20231106170849.1184162-2-nrb@linux.ibm.com
 Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 ---
- lib/s390x/sclp.h         |  26 +++++-
- lib/s390x/sclp-console.c | 181 ++++++++++++++++++++++++++++++++++-----
- 2 files changed, 186 insertions(+), 21 deletions(-)
+ s390x/spec_ex-sie.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-index 6a611bc..22f120d 100644
---- a/lib/s390x/sclp.h
-+++ b/lib/s390x/sclp.h
-@@ -226,6 +226,7 @@ typedef struct SCCB {
- } __attribute__((packed)) SCCB;
+diff --git a/s390x/spec_ex-sie.c b/s390x/spec_ex-sie.c
+index 5fa135b..fe2f23e 100644
+--- a/s390x/spec_ex-sie.c
++++ b/s390x/spec_ex-sie.c
+@@ -17,19 +17,18 @@
+ #include <hardware.h>
  
- /* SCLP event types */
-+#define SCLP_EVENT_OP_CMD			0x01
- #define SCLP_EVENT_ASCII_CONSOLE_DATA           0x1a
- #define SCLP_EVENT_SIGNAL_QUIESCE               0x1d
+ static struct vm vm;
+-extern const char SNIPPET_NAME_START(c, spec_ex)[];
+-extern const char SNIPPET_NAME_END(c, spec_ex)[];
+ static bool strict;
  
-@@ -233,6 +234,7 @@ typedef struct SCCB {
- #define SCLP_EVENT_MASK_SIGNAL_QUIESCE          0x00000008
- #define SCLP_EVENT_MASK_MSG_ASCII               0x00000040
- #define SCLP_EVENT_MASK_MSG          		0x40000000
-+#define SCLP_EVENT_MASK_OPCMD			0x80000000
- 
- #define SCLP_UNCONDITIONAL_READ                 0x00
- #define SCLP_SELECTIVE_READ                     0x01
-@@ -296,6 +298,23 @@ struct mdb {
- 	struct mto mto;
- } __attribute__((packed));
- 
-+/* vector keys and ids */
-+#define GDS_ID_MDSMU		0x1310
-+#define GDS_ID_CPMSU		0x1212
-+#define GDS_ID_TEXTCMD		0x1320
-+#define GDS_KEY_SELFDEFTEXTMSG	0x31
-+#define EBC_MDB                 0xd4c4c240
-+
-+struct gds_vector {
-+	uint16_t     length;
-+	uint16_t     gds_id;
-+} __attribute__((packed));
-+
-+struct gds_subvector {
-+	uint8_t      length;
-+	uint8_t      key;
-+} __attribute__((packed));
-+
- typedef struct EventBufferHeader {
- 	uint16_t length;
- 	uint8_t  type;
-@@ -320,12 +339,17 @@ typedef struct ReadEventData {
- 
- #define SCLP_EVENT_ASCII_TYPE_DATA_STREAM_FOLLOWS 0
- typedef struct ReadEventDataAsciiConsole {
--	SCCBHeader h;
- 	EventBufferHeader ebh;
- 	uint8_t type;
- 	char data[];
- } __attribute__((packed)) ReadEventDataAsciiConsole;
- 
-+struct ReadEventDataLMConsole {
-+	SCCBHeader h;
-+	EventBufferHeader ebh;
-+	struct gds_vector v[];
-+};
-+
- extern char _sccb[];
- void sclp_setup_int(void);
- void sclp_handle_ext(void);
-diff --git a/lib/s390x/sclp-console.c b/lib/s390x/sclp-console.c
-index 6c965b6..5de3325 100644
---- a/lib/s390x/sclp-console.c
-+++ b/lib/s390x/sclp-console.c
-@@ -1,8 +1,13 @@
- /* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-- * SCLP ASCII access driver
-+ * SCLP line mode and ASCII console driver
-+ * Some parts taken from the Linux kernel.
-  *
-  * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
-+ *
-+ * Copyright IBM Corp. 1999
-+ * Author(s): Martin Peschke <mpeschke@de.ibm.com>
-+ *	      Martin Schwidefsky <schwidefsky@de.ibm.com>
-  */
- 
- #include <libcflat.h>
-@@ -86,6 +91,41 @@ static uint8_t _ascebc[256] = {
-      0x90, 0x3F, 0x3F, 0x3F, 0x3F, 0xEA, 0x3F, 0xFF
- };
- 
-+static const uint8_t _ebcasc[] = {
-+	0x00, 0x01, 0x02, 0x03, 0x07, 0x09, 0x07, 0x7F,
-+	0x07, 0x07, 0x07, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-+	0x10, 0x11, 0x12, 0x13, 0x07, 0x0A, 0x08, 0x07,
-+	0x18, 0x19, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07,
-+	0x07, 0x07, 0x1C, 0x07, 0x07, 0x0A, 0x17, 0x1B,
-+	0x07, 0x07, 0x07, 0x07, 0x07, 0x05, 0x06, 0x07,
-+	0x07, 0x07, 0x16, 0x07, 0x07, 0x07, 0x07, 0x04,
-+	0x07, 0x07, 0x07, 0x07, 0x14, 0x15, 0x07, 0x1A,
-+	0x20, 0xFF, 0x83, 0x84, 0x85, 0xA0, 0x07, 0x86,
-+	0x87, 0xA4, 0x5B, 0x2E, 0x3C, 0x28, 0x2B, 0x21,
-+	0x26, 0x82, 0x88, 0x89, 0x8A, 0xA1, 0x8C, 0x07,
-+	0x8D, 0xE1, 0x5D, 0x24, 0x2A, 0x29, 0x3B, 0x5E,
-+	0x2D, 0x2F, 0x07, 0x8E, 0x07, 0x07, 0x07, 0x8F,
-+	0x80, 0xA5, 0x07, 0x2C, 0x25, 0x5F, 0x3E, 0x3F,
-+	0x07, 0x90, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07,
-+	0x70, 0x60, 0x3A, 0x23, 0x40, 0x27, 0x3D, 0x22,
-+	0x07, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67,
-+	0x68, 0x69, 0xAE, 0xAF, 0x07, 0x07, 0x07, 0xF1,
-+	0xF8, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70,
-+	0x71, 0x72, 0xA6, 0xA7, 0x91, 0x07, 0x92, 0x07,
-+	0xE6, 0x7E, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78,
-+	0x79, 0x7A, 0xAD, 0xAB, 0x07, 0x07, 0x07, 0x07,
-+	0x9B, 0x9C, 0x9D, 0xFA, 0x07, 0x07, 0x07, 0xAC,
-+	0xAB, 0x07, 0xAA, 0x7C, 0x07, 0x07, 0x07, 0x07,
-+	0x7B, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
-+	0x48, 0x49, 0x07, 0x93, 0x94, 0x95, 0xA2, 0x07,
-+	0x7D, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, 0x50,
-+	0x51, 0x52, 0x07, 0x96, 0x81, 0x97, 0xA3, 0x98,
-+	0x5C, 0xF6, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58,
-+	0x59, 0x5A, 0xFD, 0x07, 0x99, 0x07, 0x07, 0x07,
-+	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
-+	0x38, 0x39, 0x07, 0x07, 0x9A, 0x07, 0x07, 0x07,
-+};
-+
- static bool lpar_ascii_compat;
- 
- static char lm_buff[120];
-@@ -226,7 +266,8 @@ static void sclp_write_event_mask(int receive_mask, int send_mask)
- 
- static void sclp_console_enable_read(void)
+ static void setup_guest(void)
  {
--	sclp_write_event_mask(SCLP_EVENT_MASK_MSG_ASCII, SCLP_EVENT_MASK_MSG_ASCII | SCLP_EVENT_MASK_MSG);
-+	sclp_write_event_mask(SCLP_EVENT_MASK_MSG_ASCII | SCLP_EVENT_MASK_OPCMD,
-+			      SCLP_EVENT_MASK_MSG_ASCII | SCLP_EVENT_MASK_MSG);
+-	char *guest;
+-	int binary_size = SNIPPET_LEN(c, spec_ex);
++	extern const char SNIPPET_NAME_START(c, spec_ex)[];
++	extern const char SNIPPET_NAME_END(c, spec_ex)[];
+ 
+ 	setup_vm();
+-	guest = alloc_pages(8);
+-	memcpy(guest, SNIPPET_NAME_START(c, spec_ex), binary_size);
+-	sie_guest_create(&vm, (uint64_t) guest, HPAGE_SIZE);
++
++	snippet_setup_guest(&vm, false);
++	snippet_init(&vm, SNIPPET_NAME_START(c, spec_ex),
++		     SNIPPET_LEN(c, spec_ex), SNIPPET_UNPACK_OFF);
  }
  
- static void sclp_console_disable_read(void)
-@@ -264,37 +305,137 @@ void sclp_print(const char *str)
- 	sclp_print_lm(str);
- }
- 
--static int console_refill_read_buffer(void)
-+static char *console_read_ascii(struct EventBufferHeader *ebh, int *len)
- {
-+	struct ReadEventDataAsciiConsole *evdata = (void *)ebh;
- 	const int max_event_buffer_len = SCCB_SIZE - offsetof(ReadEventDataAsciiConsole, ebh);
--	ReadEventDataAsciiConsole *sccb = (void *)_sccb;
--	const int event_buffer_ascii_recv_header_len = sizeof(sccb->ebh) + sizeof(sccb->type);
--	int ret = -1;
-+	const int event_buffer_ascii_recv_header_len = offsetof(ReadEventDataAsciiConsole, data);
-+
-+	assert(ebh->length <= max_event_buffer_len);
-+	assert(ebh->length > event_buffer_ascii_recv_header_len);
-+
-+	*len = ebh->length - event_buffer_ascii_recv_header_len;
-+	return evdata->data;
-+}
-+
-+
-+static struct gds_vector *sclp_find_gds_vector(void *start, void *end, uint16_t id)
-+{
-+	struct gds_vector *v;
-+
-+	for (v = start; (void *)v < end; v = (void *)v + v->length)
-+		if (v->gds_id == id)
-+			return v;
-+	return NULL;
-+}
-+
-+static struct gds_subvector *sclp_eval_selfdeftextmsg(struct gds_subvector *sv)
-+{
-+	void *end;
-+
-+	end = (void *)sv + sv->length;
-+	for (sv = sv + 1; (void *)sv < end; sv = (void *)sv + sv->length)
-+		if (sv->key == 0x30)
-+			return sv;
-+	return NULL;
-+}
-+
-+static struct gds_subvector *sclp_eval_textcmd(struct gds_vector *v)
-+{
-+	struct gds_subvector *sv;
-+	void *end;
-+
-+	end = (void *)v + v->length;
-+	for (sv = (struct gds_subvector *)(v + 1); (void *)sv < end;
-+	     sv = (void *)sv + sv->length)
-+		if (sv->key == GDS_KEY_SELFDEFTEXTMSG)
-+			return sclp_eval_selfdeftextmsg(sv);
-+	return NULL;
-+}
-+
-+static struct gds_subvector *sclp_eval_cpmsu(struct gds_vector *v)
-+{
-+	void *end;
-+
-+	end = (void *)v + v->length;
-+	for (v = v + 1; (void *)v < end; v = (void *)v + v->length)
-+		if (v->gds_id == GDS_ID_TEXTCMD)
-+			return sclp_eval_textcmd(v);
-+	return NULL;
-+}
-+
-+static struct gds_subvector *sclp_eval_mdsmu(struct gds_vector *v)
-+{
-+	v = sclp_find_gds_vector(v + 1, (void *)v + v->length, GDS_ID_CPMSU);
-+	if (v)
-+		return sclp_eval_cpmsu(v);
-+	return NULL;
-+}
-+
-+static char *console_read_lm(struct EventBufferHeader *ebh, int *len)
-+{
-+	struct gds_vector *v = (void *)ebh + sizeof(*ebh);
-+	struct gds_subvector *sv;
-+
-+	v = sclp_find_gds_vector(v, (void *)ebh + ebh->length,
-+				 GDS_ID_MDSMU);
-+	if (!v)
-+		return NULL;
-+
-+	sv = sclp_eval_mdsmu(v);
-+	if (!sv)
-+		return NULL;
-+
-+	*len = sv->length - (sizeof(*sv));
-+	return (char *)(sv + 1);
-+}
-+
-+static void ebc_to_asc(char *data, int len)
-+{
-+	int i;
-+
-+	for (i = 0; i < len; i++)
-+		data[i] = _ebcasc[(uint8_t)data[i]];
-+}
-+
-+static int console_refill_read_buffer(void)
-+{
-+	struct SCCBHeader *sccb = (struct SCCBHeader *)_sccb;
-+	struct EventBufferHeader *ebh = (void *)_sccb + sizeof(struct SCCBHeader);
-+	char *data;
-+	int ret = -1, len;
- 
- 	sclp_console_enable_read();
- 
- 	sclp_mark_busy();
--	memset(sccb, 0, SCCB_SIZE);
--	sccb->h.length = PAGE_SIZE;
--	sccb->h.function_code = SCLP_UNCONDITIONAL_READ;
--	sccb->h.control_mask[2] = SCLP_CM2_VARIABLE_LENGTH_RESPONSE;
-+	memset(_sccb, 0, SCCB_SIZE);
-+	sccb->length = PAGE_SIZE;
-+	sccb->function_code = SCLP_UNCONDITIONAL_READ;
-+	sccb->control_mask[2] = SCLP_CM2_VARIABLE_LENGTH_RESPONSE;
- 
- 	sclp_service_call(SCLP_CMD_READ_EVENT_DATA, sccb);
- 
--	if (sccb->h.response_code == SCLP_RC_NO_EVENT_BUFFERS_STORED ||
--	    sccb->ebh.type != SCLP_EVENT_ASCII_CONSOLE_DATA ||
--	    sccb->type != SCLP_EVENT_ASCII_TYPE_DATA_STREAM_FOLLOWS) {
--		ret = -1;
-+	if (sccb->response_code == SCLP_RC_NO_EVENT_BUFFERS_STORED)
- 		goto out;
--	}
- 
--	assert(sccb->ebh.length <= max_event_buffer_len);
--	assert(sccb->ebh.length > event_buffer_ascii_recv_header_len);
-+	switch (ebh->type) {
-+	case SCLP_EVENT_OP_CMD:
-+		data = console_read_lm(ebh, &len);
-+		if (data)
-+			ebc_to_asc(data, len);
-+		break;
-+	case SCLP_EVENT_ASCII_CONSOLE_DATA:
-+		data = console_read_ascii(ebh, &len);
-+		break;
-+	default:
-+		goto out;
-+	}
- 
--	read_buf_length = sccb->ebh.length - event_buffer_ascii_recv_header_len;
-+	if (!data)
-+		goto out;
- 
--	assert(read_buf_length <= sizeof(read_buf));
--	memcpy(read_buf, sccb->data, read_buf_length);
-+	assert(len <= sizeof(read_buf));
-+	memcpy(read_buf, data, len);
- 
- 	read_index = 0;
- 	ret = 0;
+ static void reset_guest(void)
 -- 
 2.41.0
 
