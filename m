@@ -1,207 +1,230 @@
-Return-Path: <kvm+bounces-1397-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1398-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE1367E75BE
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 01:13:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72FC37E75D0
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 01:18:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2486328145B
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 00:13:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D56E1C20BCA
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 00:18:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48D10A46;
-	Fri, 10 Nov 2023 00:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1E137E8;
+	Fri, 10 Nov 2023 00:18:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gt5ICco6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d6U7dGrh"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDB1367;
-	Fri, 10 Nov 2023 00:13:00 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2949C4680;
-	Thu,  9 Nov 2023 16:13:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699575180; x=1731111180;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=p8K7mN8+jXP5DDvxl0zPdfRv7L6g0orcLM+FriTJBcw=;
-  b=gt5ICco61+4wN0DWWBIFpHD48cqyuWGKbm2f8vMb9ML6JcIjCnOzzDgM
-   rymAqeCxxa6geSKwahqV4Pj06kp8LZNcLtDrybx5gnfoircXlkItQb1cs
-   K9yV3l+JJy69MzRDjdELqmNVL5vKYDBg5bk1Eh7EpvNz0hYnRdXQADOHZ
-   dQoqOImsY6suLY97kitSkv1HXa+LaBw3rBiQxxhPogqLnSzkme8hnsTrf
-   GjB9W9FyefWgXOVdvDIe4fZnzdZEPHjDCCk9r+NbhK3iDJ8YGB9hQIAfC
-   RwZJupEKYKKcbc87XSKpXRlFiLXLOwLNY7XAaYniJcuouDPoMcSdY/ryh
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="370309753"
-X-IronPort-AV: E=Sophos;i="6.03,290,1694761200"; 
-   d="scan'208";a="370309753"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 16:12:59 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="880786747"
-X-IronPort-AV: E=Sophos;i="6.03,290,1694761200"; 
-   d="scan'208";a="880786747"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Nov 2023 16:12:58 -0800
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 9 Nov 2023 16:12:58 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 9 Nov 2023 16:12:57 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Thu, 9 Nov 2023 16:12:57 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.101)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Thu, 9 Nov 2023 16:12:57 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=i4P2qK8rWiJ5MA6iHhdp5vSSoxBraycpXWASRZ30rF6WYG5zv9goxmqNDanMMyl/7MJwJ6G7crbJ2xvFPvQ5wYRRQIn1u5NhyOESlrd4CiV4+H+qNR0f98RY/bFNGUozN6wU2ApIo/k3vlU3owxLT1pUxoXsfvmeGWxbeeGPPVkHrnFmkWUGRIPokt6YroghpQw5sktSlTJUDpdzx6aCNVGCSDO1x302tpN84RGB03HpXhkl3F5HWAQpRiGVlw3pcpD0pWSIiwCMNmwGTBJle27cPCD0A16wJf3eSLmBaxAksqIRDGNi/N0Bh1VHsOKlpXYETAvgMjgMzcSxklTpPw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=p8K7mN8+jXP5DDvxl0zPdfRv7L6g0orcLM+FriTJBcw=;
- b=JvzwIhbrmWO9tNo+8FgKyFFUWzKg1mUH/F8uAfuomt4Jvk0mfFsyUQQv4NJIiPMrI/hgIDHuUPvWp48NmoWNyK8glNT7+jaHMbjbxwV//rMUdRpRHVfHno/+t0jQ7URysXZ+/Kd+tQkiJTi6gJjpqaJ82ittTeNZ8ojF1tz9ZKyrE+kjkgJ+/MVB9nIHfN4R21mQkIYZtAaHx9hFwA6VC3dcMo5+2xmcW26qi+/qnfYC7TI5MnqsU3C8CniuFJKVsByxcii7vFO5JCNmk8mpXlHnTERr9WoOjVQ7FG60fhaguN9nQLgyndA8wtqRKKWoxDum9NR0EoJ+bdWfbN1ymg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SA1PR11MB6734.namprd11.prod.outlook.com (2603:10b6:806:25d::22)
- by SA0PR11MB4560.namprd11.prod.outlook.com (2603:10b6:806:93::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.29; Fri, 10 Nov
- 2023 00:12:54 +0000
-Received: from SA1PR11MB6734.namprd11.prod.outlook.com
- ([fe80::3d98:6afd:a4b2:49e3]) by SA1PR11MB6734.namprd11.prod.outlook.com
- ([fe80::3d98:6afd:a4b2:49e3%6]) with mapi id 15.20.6954.028; Fri, 10 Nov 2023
- 00:12:54 +0000
-From: "Li, Xin3" <xin3.li@intel.com>
-To: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-hyperv@vger.kernel.org"
-	<linux-hyperv@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>
-CC: "Christopherson,, Sean" <seanjc@google.com>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, "kys@microsoft.com"
-	<kys@microsoft.com>, "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>, "Cui, Dexuan"
-	<decui@microsoft.com>, "tglx@linutronix.de" <tglx@linutronix.de>,
-	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org"
-	<x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "vkuznets@redhat.com"
-	<vkuznets@redhat.com>, "peterz@infradead.org" <peterz@infradead.org>,
-	"Shankar, Ravi V" <ravi.v.shankar@intel.com>
-Subject: RE: [PATCH v1 15/23] KVM: nVMX: Add support for the secondary VM exit
- controls
-Thread-Topic: [PATCH v1 15/23] KVM: nVMX: Add support for the secondary VM
- exit controls
-Thread-Index: AQHaEnYCzFnG3GUP+kCaRbBMUKVZALBxpomAgAEHtIA=
-Date: Fri, 10 Nov 2023 00:12:53 +0000
-Message-ID: <SA1PR11MB67349FBF8DBB1004FEC9CB3CA8AEA@SA1PR11MB6734.namprd11.prod.outlook.com>
-References: <20231108183003.5981-1-xin3.li@intel.com>
- <20231108183003.5981-16-xin3.li@intel.com>
- <02faa42b-7b10-40b4-8442-5f95a2934f5f@linux.microsoft.com>
-In-Reply-To: <02faa42b-7b10-40b4-8442-5f95a2934f5f@linux.microsoft.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR11MB6734:EE_|SA0PR11MB4560:EE_
-x-ms-office365-filtering-correlation-id: 8153bbed-5a8a-4c23-6c8d-08dbe181c8af
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 0CmEUwl3WZ7VtlBJ1sKY+E9hPthy40RFKY/lyOi0xMXgOCP9aKlO4PwDpMSyq4WmeUGO3bvOsXexOyVOKrR6SCWLl9q5sYlwdb2kajjmRLIKKY/UKqFIj06WBnTPR0Uzyq0jz3V3rj3dYnx0gKxauj/A8A49JKgwPSMtlkgq69ttM3arXogyy/0FJE8eKTAXdnNorsk/9jUmZcQlGLnpju+ko/jiAAUApXwU9TfwmYc4WwXbGN96eQ79l4REWLXQoK78dsbmNLRcDQfzrL+aaWoy3wj481bFN2abVLJwsk3G7N8aPJ/WC5FVgTX1bHVi6uLRSB5WKhfqTxIz4KAM5ueG+fCa+q6MzAVFF482OsPRlqU7zsCXt7Pa4CYku8OpkmASmOlaL6htb2LHS7kN0oL5uGH1ype+4njuA2Hy/U8YTLdLn4BPUQb7pIfuiUQPP7R9mlBSI0jfxHK2SlM+xRH4urjwHiBMi7PJOJRxc89Z2BW3xVjng0j2rlTXcEWswg72+tCDI70UMPcl7WA+I14Uh9Rm2M63UwYa3mQWzZaUEnKgni4oe828hTbYnyup57EMzv677pld+JsNPOHSMMaCOXB+g9ew52JC0ZCgqb6UDgZmT85b70e9hBh0gVoJ
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6734.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(366004)(346002)(396003)(136003)(230922051799003)(1800799009)(186009)(451199024)(64100799003)(9686003)(478600001)(6506007)(71200400001)(26005)(8676002)(2906002)(66556008)(66446008)(8936002)(54906003)(41300700001)(5660300002)(64756008)(76116006)(66946007)(110136005)(4326008)(316002)(7416002)(38070700009)(33656002)(38100700002)(52536014)(82960400001)(122000001)(86362001)(66476007)(7696005)(55016003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?TG9YY2N1RE1UYzNxZ2NFL1RCa01VWnl1WmI3SnBZSVZZeG14Uk9GcmhMdmIy?=
- =?utf-8?B?emxFYVpzdmpma3BvSGVic1NndjNEUmRCYkFqVndjMzdKSVB6S05pMDN5STky?=
- =?utf-8?B?N3pDN2NLamY5alRhalhxKzFoVllKbTZsWHdwWFQrK2orNnFySnhiMlhWdzhL?=
- =?utf-8?B?YU42ZGRpeUpVemFQQ0Y2SjBoSXVoTHlwd0RtMTVYTnNPYUd4eFVoY0lMUFZv?=
- =?utf-8?B?WkQ1blc1THdXSDhDamN1ZU91eTloQ01UMVRsekR0TUpRL05ONFFaRlExUlpk?=
- =?utf-8?B?ak9DYmdtazZINVpNQUFyVmUrS2ZKMStVK21BeHgwdFV5ZDlUVUFsNGtsVmpR?=
- =?utf-8?B?bWFzRVZrZmVoSW9UWGM2RG9adzhLK21PRENhaDluYkIvcFppb0crbEI0RjFn?=
- =?utf-8?B?QmkzL3poNGJYRnRCUTR6UU00bHdWWnRwQis5WVB0V2dOZG9TeHZnUDA2NHV6?=
- =?utf-8?B?bnNEa1dqSlZFV0xCRitka2xRYWMzSjAvVGNwUXliTFQ1YWQwdlpycE1adXFG?=
- =?utf-8?B?THpNbDF6QldwVmNGalB3VmZPOXJwK3pFVzJBcWlqVEg2VzVQTDl0MEErL0dS?=
- =?utf-8?B?YW56S09heTNQR0k0K2pJcG9UM0lhZUZqYUdJQm9lV053MStvQmNOQktrZW1z?=
- =?utf-8?B?clBEWVhlTFRwRlhKSnlCbGVpV3hrNUt6ZWxRaVdrU2VZdkpHeEd5WDJqMW9l?=
- =?utf-8?B?QU5xb2RuelRMS1BCQ0V4TnJDT2JWRExJKzhoUjI3OHAwaXZyMWdxRDJsa1Fy?=
- =?utf-8?B?czFobU9mOUtkbjFldUVUSkZuQ0VzVjVoVmloakcyN1lNbWdyU24xY0Y0TDFE?=
- =?utf-8?B?Sm1INjVJL2tsdXh0bGUwQVZLTmZCOUtBb3o5MGpIVGFjdno5LzluQXRyUjFF?=
- =?utf-8?B?WiszeVpNK2RsM3NNdExiamJBYmhKN2dtY01zQ0hOVDdBaUZ3T0JlY0NLL3pG?=
- =?utf-8?B?czAzdDBwbGFyRE53bWV5aGpsY20veG1MTTlDQ0UvMkZPREkwWXV4NkJqMWk0?=
- =?utf-8?B?L0VId1BDMzBIZTN4aHpJYTVNOWVUQ0xZWkorSCtpL2Y3S0kxVVpjUGJKOUYw?=
- =?utf-8?B?bVVhVG5PVjc2NDNvZjZRNzdUNFNFZkYwQmdPVWFNcW1pMGpXV1duaXFheDRS?=
- =?utf-8?B?ZjdmUGlxdy9WNXN6K3g2WksrVTAwSFcwTWdyeE5XY2FNeU45aEJoM0VLMUtD?=
- =?utf-8?B?bW1ETE1nb2szWHM4cW9NWlRDUVI1eHNVeW56dWUyYjdNaGlJcXhIQnhvL2Z3?=
- =?utf-8?B?MUxMZkxpUzBWVWdJRi9IcUU0aWlNajJldzZyLzZ1cWsvRXZXSkVERGJ4VHdh?=
- =?utf-8?B?UlVUdVMrK2ZKa2Zqem96Y2NicWNSTXl5cUx3RDlMb3Z5MEtMQTRDNllGSUtn?=
- =?utf-8?B?YjlMOS9LNTQ5TlZvVnc0Nmx3MXhMa3d3enRKckVaRFFsY1dKQkc4aXB1TUcv?=
- =?utf-8?B?ZDFnQ2c4YXJDbG41Ky93cjNKNFRKY1dGMGlZcDZCN014ZUlXNDMzNmNMRHJS?=
- =?utf-8?B?UU40eFRPSXF2d2JGQTZMV0ZqT1ZaNmtjV005RGdJR1gzUzhBcS94M0FpY2hv?=
- =?utf-8?B?VTNLRUxsY2kzdDJEVlBUWWw2UjFlSm9nL3YzYzVKbGRtVEY0MWxJY1JtL2c3?=
- =?utf-8?B?Z1dEYytvcHRjMEc2WGpFK0JCSTBvQktJdS8zcE5OQksxa0hDZ0RHZEVxWWE4?=
- =?utf-8?B?aHlPNEF2MnE3M1FDYWcxdmoyQkRGUkRoSlpnVmRpMlZoSkRnVnZPc2xTSHRY?=
- =?utf-8?B?TTBka3dMWkJKUnBubXQrdkJpckxiY0tydHlmZjdFdlNwcENMSkdxc0ZEVXo3?=
- =?utf-8?B?Q0wzS0Z5UG5IdmxHczBGeEJuY2swSTd0c2pHZzZGVTJWaVFwUjlxNjNVaVdQ?=
- =?utf-8?B?a3YvZjRmQlYyMDhGY09XRUNrbG9XWFUzNUVHTWJlOTlTM3VDdHJDNlcwZTI4?=
- =?utf-8?B?VUo4cE9ydmJwMDlnYzZ1VHdITnlBaWlnZjZXbkQ3aHlCOWs4MG4wMXZaWm13?=
- =?utf-8?B?RitjZ3dwZEdPNm9UR0dWSmUxcm1pbXBCalNVS09QK3NPOEtvYjEwM3FybjRq?=
- =?utf-8?B?VWtCZmw5bXBsNTBUcW1iSUJLRll1WFVJZ0U3UVNhZHFpd2Z3NUQzeXFTM3k0?=
- =?utf-8?Q?fJ2E=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE10627
+	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 00:17:57 +0000 (UTC)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBDE4211D
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 16:17:56 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-545557de8e6so17736a12.0
+        for <kvm@vger.kernel.org>; Thu, 09 Nov 2023 16:17:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699575475; x=1700180275; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r7AINGqD+uDcyCkNAuvVhFQmI+fmLnwrj5VTd+39JmM=;
+        b=d6U7dGrhdVKm3vluVOlW4tjLENLDM9DxAksFjh1MLjLYARi5EnMQ1DA4RYMB0y9pSh
+         /rJ5REA5IOYCnqpmIrkJS+s1h6mNYdS/5QYhiEZcf0pu1OZgGysR7oAHZEuRL4Bf071k
+         sTtUek3xFuDt0FWgdjjJ4nTwGXa7u6ouAeKWwLj3NoGzHHMK+Bybg0ocgo9I75Eq3vGi
+         8W/dx8pigk2V+skY77uI3RXN66HBdoq/6shwsSWsl22Gh/5CXCVwAnbrisEWwuv4mVhZ
+         cOUEqYaFItFiW46OUfyrUutjC4BMN7krCBBMo/1mTy8QzH/5aX+Q/jy9fv8pzp4/wAQi
+         PVMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699575475; x=1700180275;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r7AINGqD+uDcyCkNAuvVhFQmI+fmLnwrj5VTd+39JmM=;
+        b=MIL3aeu98coRLHJwroh+P48MNKJdH5SJJB+3tGGc08VUXIo7MCb4RfJKnqd+CehAzk
+         gVN98RM7GUOHYNmLog6IlIZnax8CnKQYduvtFhPFV/JLPlhZnrGIOvQicS62JfJnMaYN
+         +o8TLpvMqbCa1GHsWB85mQqQO/iey4bbojMMLI76xA+LmzvSACVppVBdCxFagmaPwAc/
+         ttpciECL0OLOMCddN4QdG6BPC6j/LlyBTEUN2zHfwPrnHy3n2Q86Oy4S49S3jCsEjrra
+         q9fiLx/iHmf15yyzSuj8kvTSbPOJoV0qlGjLc1leFDgfIZCISTqF9l2gSfyfr3Qj8ayw
+         wbSA==
+X-Gm-Message-State: AOJu0YzAdm5KkRm1Ehzf+RzZPRNS4pdGCILOXjHMoXwhBi9U1ULAbQFq
+	L7L9e45+39n1HbnArIq49WQAK0aKW18OSrhPLFgcYg==
+X-Google-Smtp-Source: AGHT+IESBd3cjsgylAurSqxlZheyZNpWVoWe6LpJQP2lCpStZcRcvuTY5HGrez1TCDbrh4u/T6jREH2S+kHpCTq7UXk=
+X-Received: by 2002:a05:6402:3709:b0:544:4762:608 with SMTP id
+ ek9-20020a056402370900b0054447620608mr262760edb.2.1699575475098; Thu, 09 Nov
+ 2023 16:17:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6734.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8153bbed-5a8a-4c23-6c8d-08dbe181c8af
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Nov 2023 00:12:53.6533
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ww4KOnC6tH5dN4USxScRi/2vcuXaFhlVbH7twebWcJau28TXHnyXx1ojy3UHl45e3tYbnR0+PpAUjxSxbK2/dQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4560
-X-OriginatorOrg: intel.com
+References: <20231109180646.2963718-1-khorenko@virtuozzo.com>
+ <CALMp9eQGqqo66fQGwFJMc3y+9XdUrL7ageE8kvoAOV6NJGfJpw@mail.gmail.com> <ZU1ua1mHDZFTmkHX@google.com>
+In-Reply-To: <ZU1ua1mHDZFTmkHX@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Thu, 9 Nov 2023 16:17:40 -0800
+Message-ID: <CALMp9eTqdg32KGh38wQYW-fvyrjrc7VQAsA1wnHhoCn-tLwyYg@mail.gmail.com>
+Subject: Re: [PATCH 0/1] KVM: x86/vPMU: Speed up vmexit for AMD Zen 4 CPUs
+To: Sean Christopherson <seanjc@google.com>
+Cc: Konstantin Khorenko <khorenko@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"Denis V. Lunev" <den@virtuozzo.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-PiA+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9oeXBlcnYtdGxmcy5oDQo+ID4g
-Yi9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9oeXBlcnYtdGxmcy5oDQo+ID4gaW5kZXggMmZmMjZmNTNj
-ZDYyLi4yOTk1NTQ3MDhlMzcgMTAwNjQ0DQo+ID4gLS0tIGEvYXJjaC94ODYvaW5jbHVkZS9hc20v
-aHlwZXJ2LXRsZnMuaA0KPiA+ICsrKyBiL2FyY2gveDg2L2luY2x1ZGUvYXNtL2h5cGVydi10bGZz
-LmgNCj4gPiBAQCAtNjE2LDYgKzYxNiw3IEBAIHN0cnVjdCBodl9lbmxpZ2h0ZW5lZF92bWNzIHsN
-Cj4gPiAgCXU2NCBob3N0X3NzcDsNCj4gPiAgCXU2NCBob3N0X2lhMzJfaW50X3NzcF90YWJsZV9h
-ZGRyOw0KPiA+ICAJdTY0IHBhZGRpbmc2NF82Ow0KPiA+ICsJdTY0IHNlY29uZGFyeV92bV9leGl0
-X2NvbnRyb2xzOw0KPiA+ICB9IF9fcGFja2VkOw0KPiA+ID4gICNkZWZpbmUgSFZfVk1YX0VOTElH
-SFRFTkVEX0NMRUFOX0ZJRUxEX05PTkUJCQkwDQo+IA0KPiBIaSBYaW4gTGksDQo+IA0KPiBUaGUg
-Y29tbWVudCBhdCB0aGUgdG9wIG9mIGh5cGVydi10bGZzLmggc2F5czoNCj4gIlRoaXMgZmlsZSBj
-b250YWlucyBkZWZpbml0aW9ucyBmcm9tIEh5cGVyLVYgSHlwZXJ2aXNvciBUb3AtTGV2ZWwgRnVu
-Y3Rpb25hbA0KPiBTcGVjaWZpY2F0aW9uIChUTEZTKSINCj4gDQo+IFRoZXNlIHN0cnVjdCBkZWZp
-bml0aW9ucyBhcmUgc2hhcmVkIHdpdGggdGhlIGh5cGVydmlzb3IsIHNvIHlvdSBjYW4ndCBqdXN0
-IGFkZCBmaWVsZHMNCj4gdG8gaXQuDQo+IFNhbWUgY29tbWVudCBmb3IgcGF0Y2ggMTYuDQoNCkkg
-dHJpZWQgbm90IHRvIHRvdWNoIGFueSBoeXBlcnYgc3R1ZmYgYnV0IGhpdCBzb21lIHByb2JsZW1z
-Lg0KDQo+IA0KPiBXb3VsZCBGUkVEIHdvcmsgaW4gbmVzdGVkIHZpcnR1YWxpemF0aW9uIGlmIHRo
-ZSBMMCBoeXBlcnZpc29yIGRvZXMgbm90IHN1cHBvcnQgaXQNCj4gKG9yIGRvZXNuJ3Qga25vdyBh
-Ym91dCBpdCk/DQoNCkkgZG9uJ3QgdGhpbmsgc28gQUZBSUNULiAgQnV0IEkgY291bGQgYmUgd3Jv
-bmcsIHNheSBhIFZNTSBpbXBsZW1lbnRzIEZSRUQNCmNvbXBsZXRlbHkgaW4gc29mdHdhcmUuICBP
-dGhlcndpc2UgTDAgbmVlZHMgdG8gYWRkIGNvZGUgdG8gaGF2ZSBoYXJkd2FyZQ0KdG8gc3dpdGNo
-IEZSRUQgY29udGV4dCBiZXR3ZWVuIGhvc3QgYW5kIGd1ZXN0LCB3aGljaCBjYW4ndCBiZSBkZWxh
-eWVkLg0KDQpUaGFua3MgYSBsb3QgZm9yIHlvdXIgcXVpY2sgcmV2aWV3IQ0K
+On Thu, Nov 9, 2023 at 3:42=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Thu, Nov 09, 2023, Jim Mattson wrote:
+> > On Thu, Nov 9, 2023 at 10:24=E2=80=AFAM Konstantin Khorenko
+> > <khorenko@virtuozzo.com> wrote:
+> > >
+> > > We have detected significant performance drop of our atomic test whic=
+h
+> > > checks the rate of CPUID instructions rate inside an L1 VM on an AMD
+> > > node.
+> > >
+> > > Investigation led to 2 mainstream patches which have introduced extra
+> > > events accounting:
+> > >
+> > >    018d70ffcfec ("KVM: x86: Update vPMCs when retiring branch instruc=
+tions")
+> > >    9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions")
+> > >
+> > > And on an AMD Zen 3 CPU that resulted in immediate 43% drop in the CP=
+UID
+> > > rate.
+> > >
+> > > Checking latest mainsteam kernel the performance difference is much l=
+ess
+> > > but still quite noticeable: 13.4% and shows up on AMD CPUs only.
+> > >
+> > > Looks like iteration over all PMCs in kvm_pmu_trigger_event() is chea=
+p
+> > > on Intel and expensive on AMD CPUs.
+> > >
+> > > So the idea behind this patch is to skip iterations over PMCs at all =
+in
+> > > case PMU is disabled for a VM completely or PMU is enabled for a VM, =
+but
+> > > there are no active PMCs at all.
+> >
+> > A better solution may be to maintain two bitmaps of general purpose
+> > counters that need to be incremented, one for instructions retired and
+> > one for branch instructions retired. Set or clear these bits whenever
+> > the PerfEvtSelN MSRs are written. I think I would keep the PGC bits
+> > separate, on those microarchitectures that support PGC. Then,
+> > kvm_pmu_trigger_event() need only consult the appropriate bitmap (or
+> > the logical and of that bitmap with PGC). In most cases, the value
+> > will be zero, and the function can simply return.
+> >
+> > This would work even for AMD microarchitectures that don't support PGC.
+>
+> Yeah.  There are multiple lower-hanging fruits to be picked though, most =
+of which
+> won't conflict with using dedicated per-event bitmaps, or at worst are tr=
+ivial
+> to resolve.
+>
+>  1. Don't call into perf to get the eventsel (which generates an indirect=
+ call)
+>     on every invocation, let alone every iteration.
+>
+>  2. Avoid getting the CPL when it's irrelevant.
+>
+>  3. Check the eventsel before querying the event filter.
+>
+>  4. Mask out PMCs that aren't globally enabled from the get-go (masking o=
+ut
+>     PMCs based on eventsel would essentially be the same as per-event bit=
+maps).
+
+The code below only looks at PGC. Even on CPUs that support PGC, some
+PMU clients still use the enable bits in the PerfEvtSelN. Linux perf,
+for instance, can't seem to make up its mind whether to use PGC or
+PerfEvtSelN.EN.
+
+> I'm definitely not opposed to per-event bitmaps, but it'd be nice to avoi=
+d them,
+> e.g. if we can eke out 99% of the performance just by doing a few obvious
+> optimizations.
+>
+> This is the end result of what I'm testing and will (hopefully) post shor=
+tly:
+>
+> static inline bool pmc_is_eventsel_match(struct kvm_pmc *pmc, u64 eventse=
+l)
+> {
+>         return !((pmc->eventsel ^ eventsel) & AMD64_RAW_EVENT_MASK_NB);
+> }
+
+The top nybble of AMD's 3-nybble event select collides with Intel's
+IN_TX and IN_TXCP bits. I think we can assert that the vCPU can't be
+in a transaction if KVM is emulating an instruction, but this probably
+merits a comment. The function name should also be more descriptive,
+so that it doesn't get misused out of context. :)
+
+> static inline bool cpl_is_matched(struct kvm_pmc *pmc)
+> {
+>         bool select_os, select_user;
+>         u64 config;
+>
+>         if (pmc_is_gp(pmc)) {
+>                 config =3D pmc->eventsel;
+>                 select_os =3D config & ARCH_PERFMON_EVENTSEL_OS;
+>                 select_user =3D config & ARCH_PERFMON_EVENTSEL_USR;
+>         } else {
+>                 config =3D fixed_ctrl_field(pmc_to_pmu(pmc)->fixed_ctr_ct=
+rl,
+>                                           pmc->idx - KVM_FIXED_PMC_BASE_I=
+DX);
+>                 select_os =3D config & 0x1;
+>                 select_user =3D config & 0x2;
+>         }
+>
+>         /*
+>          * Skip the CPL lookup, which isn't free on Intel, if the result =
+will
+>          * be the same regardless of the CPL.
+>          */
+>         if (select_os =3D=3D select_user)
+>                 return select_os;
+>
+>         return (static_call(kvm_x86_get_cpl)(pmc->vcpu) =3D=3D 0) ? selec=
+t_os : select_user;
+> }
+>
+> void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 eventsel)
+> {
+>         DECLARE_BITMAP(bitmap, X86_PMC_IDX_MAX);
+>         struct kvm_pmu *pmu =3D vcpu_to_pmu(vcpu);
+>         struct kvm_pmc *pmc;
+>         int i;
+>
+>         BUILD_BUG_ON(sizeof(pmu->global_ctrl) * BITS_PER_BYTE !=3D X86_PM=
+C_IDX_MAX);
+>
+>         if (!kvm_pmu_has_perf_global_ctrl(pmu))
+>                 bitmap_copy(bitmap, pmu->all_valid_pmc_idx, X86_PMC_IDX_M=
+AX);
+>         else if (!bitmap_and(bitmap, pmu->all_valid_pmc_idx,
+>                              (unsigned long *)&pmu->global_ctrl, X86_PMC_=
+IDX_MAX))
+>                 return;
+>
+>         kvm_for_each_pmc(pmu, pmc, i, bitmap) {
+>                 /* Ignore checks for edge detect, pin control, invert and=
+ CMASK bits */
+>                 if (!pmc_is_eventsel_match(pmc, eventsel) ||
+>                     !pmc_event_is_allowed(pmc) || !cpl_is_matched(pmc))
+>                         continue;
+>
+>                 kvm_pmu_incr_counter(pmc);
+>         }
+> }
 
