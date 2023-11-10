@@ -1,242 +1,187 @@
-Return-Path: <kvm+bounces-1494-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1495-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D5A97E7FBB
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 18:58:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49AF37E8135
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 19:25:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02E7A2812AE
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 17:58:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 931CAB20CF7
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 18:25:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC7973A268;
-	Fri, 10 Nov 2023 17:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33B3538DE9;
+	Fri, 10 Nov 2023 18:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gR8tRH/4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kgceUlkF"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBB030334;
-	Fri, 10 Nov 2023 17:58:27 +0000 (UTC)
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8088167754;
-	Fri, 10 Nov 2023 09:57:13 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 024A53A287
+	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 18:25:19 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 641B728102
+	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 10:23:02 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a8ee6a1801so31710987b3.3
+        for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 10:23:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1699639033; x=1731175033;
-  h=mime-version:content-transfer-encoding:date:message-id:
-   cc:from:to:references:in-reply-to:subject;
-  bh=99caKOHgzyDTXwWRsRksd059fQ4JKBbasT1uYz4fi50=;
-  b=gR8tRH/4AimvKaVg1udaJ6UkbZwkA7vL4djAvuGw54nDXEGIhgGaMdiY
-   uRrPT4yyezPIhhd0Lu5SRQpVCP9TYVtDyS57u4AnH18/D17Ycve+aleDh
-   N2wjLxyppSbC4PgDKWYzmTFKroJiT1xb9espARCX4mevFCHuiFDDK4Z+o
-   s=;
-X-IronPort-AV: E=Sophos;i="6.03,291,1694736000"; 
-   d="scan'208";a="42712469"
-Subject: Re: [RFC 0/33] KVM: x86: hyperv: Introduce VSM support
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-8a14c045.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2023 17:56:52 +0000
-Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
-	by email-inbound-relay-pdx-2a-m6i4x-8a14c045.us-west-2.amazon.com (Postfix) with ESMTPS id 8282689E8A;
-	Fri, 10 Nov 2023 17:56:51 +0000 (UTC)
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:31125]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.45.210:2525] with esmtp (Farcaster)
- id 62d1a24e-71c0-4a04-9bf1-9657fee25218; Fri, 10 Nov 2023 17:56:50 +0000 (UTC)
-X-Farcaster-Flow-ID: 62d1a24e-71c0-4a04-9bf1-9657fee25218
-Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Fri, 10 Nov 2023 17:56:49 +0000
-Received: from localhost (10.13.235.138) by EX19D004EUC001.ant.amazon.com
- (10.252.51.190) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Fri, 10 Nov
- 2023 17:56:45 +0000
+        d=google.com; s=20230601; t=1699640581; x=1700245381; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/u2JG0fndtvz5StB0AokXkOquj7NpP7M8gj3x0QBG2E=;
+        b=kgceUlkFOWL5vxm8J4T3HW8CRJFhtUvNgQXZKG4NmhXHIykYFzOaH8R9t4BX7h6pcY
+         HnAGZDCjGPnos9hZqCDNV2l+emmhngiroS8qEFh+3weIBlUqS8XO242R4Zqy5ed49D/h
+         NAPXdCh011lwe3rpaMDBRWEQX1l7Z72wrQHpfKPLgk+HfW3rUsb0oX81O+V4HvUFf3+J
+         wa3wUoXgZf34b9iEXEEW9pJ76Rsj7Z1eFHQx5FB+ycxOuz1YOUa3cKpaFeuSRuBEQCyf
+         UU/rQZF+3oHacw25Ju4lyFult928U9vxNrPknXhgKTa4DoZ612/rCj4I5S8HYrEEEt4L
+         cPEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699640581; x=1700245381;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/u2JG0fndtvz5StB0AokXkOquj7NpP7M8gj3x0QBG2E=;
+        b=o6STpmrzmf8/JyKWfio9uVUUaLEQw+SMks5EVKySip1aoTesnf0Ls1fnYpMsEEdpj+
+         Ox8ywEP1qEPG2oI5YgA1+reEV7Ti3LWH6l9ZLQ9sVWIQqe+F2ttLQ1ydIoK2l8Bx8+AL
+         4+xGQJYzCoMhMW1rSsIgzwJFpvTi6uK/Krv9jNF8eBoPs5vqJ/GfLQV01NK21ihYt5Pw
+         hdkqOQJ6Q8J2fzXep6fFvdUzWJMx2mR9r0Nf/X4Kgy+cUB0Tkc3akcVTATtF86sZB+zE
+         85aMnWbM16mZ3zb9s1VUt8n79HqlnDZC+c8SjX6ev3xk3d80PIOUFhRXc3eHzwka4sNF
+         jCow==
+X-Gm-Message-State: AOJu0Yxl+oHaJeT9j96bW41j9ORJGzNCwjc7TnK73kve1+d/PyZrnwTK
+	KUwJ+5OXwEcyDwhqogBy0gG5YjkyC78=
+X-Google-Smtp-Source: AGHT+IFilgu1/Q1EZiEoL3sTFYKCQfnhtgAeMBBAfAGcs6DHfZF6Y3nZ5EepLJy80XYZ0ZRT2keQkzxRdJY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ef0c:0:b0:5be:ae71:d70a with SMTP id
+ o12-20020a81ef0c000000b005beae71d70amr242444ywm.4.1699640580898; Fri, 10 Nov
+ 2023 10:23:00 -0800 (PST)
+Date: Fri, 10 Nov 2023 10:22:59 -0800
+In-Reply-To: <956d8ee3-8b63-4a2d-b0c4-c0d3d74a0f6f@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 10 Nov 2023 17:56:41 +0000
-Message-ID: <CWVBQQ6GVQVG.2FKWLPBUF77UT@amazon.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-hyperv@vger.kernel.org>, <pbonzini@redhat.com>, <vkuznets@redhat.com>,
-	<anelkz@amazon.com>, <graf@amazon.com>, <dwmw@amazon.co.uk>,
-	<jgowans@amazon.com>, <corbert@lwn.net>, <kys@microsoft.com>,
-	<haiyangz@microsoft.com>, <decui@microsoft.com>, <x86@kernel.org>,
-	<linux-doc@vger.kernel.org>
-From: Nicolas Saenz Julienne <nsaenz@amazon.com>
-To: Sean Christopherson <seanjc@google.com>
-X-Mailer: aerc 0.15.2-182-g389d89a9362e-dirty
-References: <20231108111806.92604-1-nsaenz@amazon.com>
- <ZUu9lwJHasi2vKGg@google.com> <ZUvUZytj1AabvvrB@google.com>
-In-Reply-To: <ZUvUZytj1AabvvrB@google.com>
-X-Originating-IP: [10.13.235.138]
-X-ClientProxiedBy: EX19D044UWA003.ant.amazon.com (10.13.139.43) To
- EX19D004EUC001.ant.amazon.com (10.252.51.190)
+Mime-Version: 1.0
+References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-16-pbonzini@redhat.com>
+ <956d8ee3-8b63-4a2d-b0c4-c0d3d74a0f6f@intel.com>
+Message-ID: <ZU51A3U6E3aZXayC@google.com>
+Subject: Re: [PATCH 15/34] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From: Sean Christopherson <seanjc@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xu Yilun <yilun.xu@intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
+	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Sean,
-Thanks for taking the time to review the series. I took note of your
-comments across the series, and will incorporate them into the LPC
-discussion.
+On Fri, Nov 10, 2023, Xiaoyao Li wrote:
+> On 11/6/2023 12:30 AM, Paolo Bonzini wrote:
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 68a144cb7dbc..a6de526c0426 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -589,8 +589,20 @@ struct kvm_memory_slot {
+> >   	u32 flags;
+> >   	short id;
+> >   	u16 as_id;
+> > +
+> > +#ifdef CONFIG_KVM_PRIVATE_MEM
+> > +	struct {
+> > +		struct file __rcu *file;
+> > +		pgoff_t pgoff;
+> > +	} gmem;
+> > +#endif
+> >   };
+> > +static inline bool kvm_slot_can_be_private(const struct kvm_memory_slot *slot)
+> > +{
+> > +	return slot && (slot->flags & KVM_MEM_GUEST_MEMFD);
+> > +}
+> > +
+> 
+> maybe we can move this block and ...
+> 
+> <snip>
+> 
+> > @@ -2355,6 +2379,30 @@ bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
+> >   					struct kvm_gfn_range *range);
+> >   bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+> >   					 struct kvm_gfn_range *range);
+> > +
+> > +static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+> > +{
+> > +	return IS_ENABLED(CONFIG_KVM_PRIVATE_MEM) &&
+> > +	       kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
+> > +}
+> > +#else
+> > +static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+> > +{
+> > +	return false;
+> > +}
+> >   #endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
+> 
+> this block to Patch 18?
 
-On Wed Nov 8, 2023 at 6:33 PM UTC, Sean Christopherson wrote:
-> On Wed, Nov 08, 2023, Sean Christopherson wrote:
-> > On Wed, Nov 08, 2023, Nicolas Saenz Julienne wrote:
-> > > This RFC series introduces the necessary infrastructure to emulate VS=
-M
-> > > enabled guests. It is a snapshot of the progress we made so far, and =
-its
-> > > main goal is to gather design feedback.
-> >
-> > Heh, then please provide an overview of the design, and ideally context=
- and/or
-> > justification for various design decisions.  It doesn't need to be a pr=
-oper design
-> > doc, and you can certainly point at other documentation for explaining =
-VSM/VTLs,
-> > but a few paragraphs and/or verbose bullet points would go a long way.
-> >
-> > The documentation in patch 33 provides an explanation of VSM itself, an=
-d a little
-> > insight into how userspace can utilize the KVM implementation.  But the=
- documentation
-> > provides no explanation of the mechanics that KVM *developers* care abo=
-ut, e.g.
-> > the use of memory attributes, how memory attributes are enforced, wheth=
-er or not
-> > an in-kernel local APIC is required, etc.
-> >
-> > Nor does the documentation explain *why*, e.g. why store a separate set=
- of memory
-> > attributes per VTL "device", which by the by is broken and unnecessary.
->
-> After speed reading the series..  An overview of the design, why you made=
- certain
-> choices, and the tradeoffs between various options is definitely needed.
->
-> A few questions off the top of my head:
->
->  - What is the split between userspace and KVM?  How did you arrive at th=
-at split?
+It would work, but my vote is to keep them here to minimize the changes to common
+KVM code in the x86 enabling.  It's not a strong preference though.  Of course,
+at this point, fiddling with this sort of thing is probably a bad idea in terms
+of landing guest_memfd.
 
-Our original design, which we discussed in the KVM forum 2023 [1] and is
-public [2], implemented most of VSM in-kernel. Notably we introduced VTL
-awareness in struct kvm_vcpu. This turned out to be way too complex: now
-vcpus have multiple CPU architectural states, events, apics, mmu, etc.
-First of all, the code turned out to be very intrusive, for example,
-most apic APIs had to be reworked one way or another to accommodate
-the fact there are multiple apics available. Also, we were forced to
-introduce VSM-specific semantics in x86 emulation code. But more
-importantly, the biggest pain has been dealing with state changes, they
-may be triggered remotely through requests, and some are already fairly
-delicate as-is. They involve a multitude of corner cases that almost
-never apply for a VTL aware kvm_vcpu. Especially if you factor in
-features like live migration. It's been a continuous source of
-regressions.
+> > @@ -4844,6 +4875,10 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+> >   #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> >   	case KVM_CAP_MEMORY_ATTRIBUTES:
+> >   		return kvm_supported_mem_attributes(kvm);
+> > +#endif
+> > +#ifdef CONFIG_KVM_PRIVATE_MEM
+> > +	case KVM_CAP_GUEST_MEMFD:
+> > +		return !kvm || kvm_arch_has_private_mem(kvm);
+> >   #endif
+> >   	default:
+> >   		break;
+> > @@ -5277,6 +5312,18 @@ static long kvm_vm_ioctl(struct file *filp,
+> >   	case KVM_GET_STATS_FD:
+> >   		r = kvm_vm_ioctl_get_stats_fd(kvm);
+> >   		break;
+> > +#ifdef CONFIG_KVM_PRIVATE_MEM
+> > +	case KVM_CREATE_GUEST_MEMFD: {
+> > +		struct kvm_create_guest_memfd guest_memfd;
+> 
+> Do we need a guard of below?
+> 
+> 		r = -EINVAL;
+> 		if (!kvm_arch_has_private_mem(kvm))
+> 			goto out;
 
-Memory protections were implemented by using memory slot modifications.
-We introduced a downstream API that allows updating memory slots
-concurrently with vCPUs running. I think there was a similar proposal
-upstream from Red Hat some time ago. The result is complex, hard to
-generalize and slow.
+Argh, yeah, that's weird since KVM_CAP_GUEST_MEMFD says "not supported" if the
+VM doesn't support private memory.
 
-So we decided to move all this complexity outside of struct kvm_vcpu
-and, as much as possible, out of the kernel. We figures out the basic
-kernel building blocks that are absolutely necessary, and let user-space
-deal with the rest.
+Enforcing that would break guest_memfd_test.c though.  And having to create a
+"special" VM just to test basic guest_memfd functionality would be quite
+annoying.
 
->  - How much *needs* to be in KVM?  I.e. how much can be pushed to userspa=
-ce while
->    maintaininly good performance?
+So my vote is to do:
 
-As I said above, the aim of the current design is to keep it as light as
-possible. The biggest move we made was moving VTL switching into
-user-space. We don't see any indication that performance is affected in
-a major way. But we will know for sure once we finish the implementation
-and test it under real use-cases.
+	case KVM_CAP_GUEST_MEMFD:
+		return IS_ENABLED(CONFIG_KVM_PRIVATE_MEM);
 
->  - Why not make VTLs a first-party concept in KVM?  E.g. rather than bury=
- info
->    in a VTL device and APIC ID groups, why not modify "struct kvm" to sup=
-port
->    replicating state that needs to be tracked per-VTL?  Because of how me=
-mory
->    attributes affect hugepages, duplicating *memslots* might actually be =
-easier
->    than teaching memslots to be VTL-aware.
-
-I do agree that we need to introduce some level VTL awareness into
-memslots. There's the hugepages issues you pointed out. But it'll be
-also necessary once we look at how to implement overlay pages that are
-per-VTL. (A topic I didn't mention in the series as I though I had
-managed to solve memory protections while avoiding the need for multiple
-slots). What I have in mind is introducing a memory slot address space
-per-VTL, similar to how we do things with SMM.
-
-It's important to note that requirements for overlay pages and memory
-protections are very different. Overlay pages are scarce, and are setup
-once and never change (AFAICT), so we think stopping all vCPUs, updating
-slots, and resuming execution will provide good enough performance.
-Memory protections happen very frequently, generally with page
-granularity, and may be short-lived.
-
->  - Is "struct kvm_vcpu" the best representation of an execution context (=
-if I'm
->    getting the terminology right)?
-
-Let's forget I ever mentioned execution contexts. I used it in the hopes
-of making the VTL concept a little more understandable for non-VSM aware
-people. It's meant to be interchangeable with VTL. But I see how it
-creates confusion.
-
->    E.g. if 90% of the state is guaranteed to be identical for a given
->    vCPU across execution contexts, then modeling that with separate
->    kvm_vcpu structures is very inefficient.  I highly doubt it's 90%,
->    but it might be quite high depending on how much the TFLS restricts
->    the state of the vCPU, e.g. if it's 64-bit only.
-
-For the record here's the private VTL state (TLFS 15.11.1):
-
-"In general, each VTL has its own control registers, RIP register, RSP
- register, and MSRs:
-
- SYSENTER_CS, SYSENTER_ESP, SYSENTER_EIP, STAR, LSTAR, CSTAR, SFMASK,
- EFER, PAT, KERNEL_GSBASE, FS.BASE, GS.BASE, TSC_AUX
- HV_X64_MSR_HYPERCALL
- HV_X64_MSR_GUEST_OS_ID
- HV_X64_MSR_REFERENCE_TSC
- HV_X64_MSR_APIC_FREQUENCY
- HV_X64_MSR_EOI
- HV_X64_MSR_ICR
- HV_X64_MSR_TPR
- HV_X64_MSR_APIC_ASSIST_PAGE
- HV_X64_MSR_NPIEP_CONFIG
- HV_X64_MSR_SIRBP
- HV_X64_MSR_SCONTROL
- HV_X64_MSR_SVERSION
- HV_X64_MSR_SIEFP
- HV_X64_MSR_SIMP
- HV_X64_MSR_EOM
- HV_X64_MSR_SINT0 =E2=80=93 HV_X64_MSR_SINT15
- HV_X64_MSR_STIMER0_COUNT =E2=80=93 HV_X64_MSR_STIMER3_COUNT
- Local APIC registers (including CR8/TPR)
-"
-
-The rest is shared.
-
-Note that we've observed that during normal operation, VTL switches
-don't happen that often. The boot process is the most affected by any
-performance impact VSM might introduce, which issues 100000s (mostly
-memory protections).
-
-Nicolas
-
-[1] https://kvm-forum.qemu.org/2023/talk/TK7YGD/
-[2] Partial rebase of our original implementation:
-    https://github.com/vianpl/linux vsm
+There's no harm to KVM if userspace creates a file it can't use, and at some
+point KVM will hopefully support guest_memfd irrespective of private memory.
 
