@@ -1,129 +1,119 @@
-Return-Path: <kvm+bounces-1400-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1401-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DAB37E75F0
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 01:30:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 166D47E75FE
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 01:37:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 434251C20D74
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 00:30:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F1851C20DBD
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 00:37:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F80D643;
-	Fri, 10 Nov 2023 00:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85D0F7EB;
+	Fri, 10 Nov 2023 00:37:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cDjwMwSq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W+crt5p0"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C11F366
-	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 00:29:55 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7A0A2D7C;
-	Thu,  9 Nov 2023 16:29:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699576194; x=1731112194;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=RXQEk8DTnU62l10vBMRLP0Yzm/Zzrw5CoP6dtFdQlqY=;
-  b=cDjwMwSq0bd4++enIL+e4q1XVoVh3humWpsqE73mR0JqcfCbGX25DwQS
-   ak8Rf7k0yz//07jWtpXsGwn9D1g+2XgOFlE/TKqcmqmBnToIr2B2jLmK6
-   Vs/vhh0TGHI9hamtE0YAbm/1aMmaoc7KJ14tLaLEKbwEADEMW1P0S4HYW
-   3FCCw8+zF5Srg601I7zqX50OhtRWJCoCyQ6UUjVm3YoT65iejrBeXJdxc
-   FuC22ase8Wh8wlrKVbTD51AmH1QL6fUXg9W1+103HOwhnMUclFjCOtaoy
-   MpMwHpvYjgIphGHNgJfJaJjorv3IwQINxgY26w4ghGMVFrvl64ggiuqIt
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="369437727"
-X-IronPort-AV: E=Sophos;i="6.03,290,1694761200"; 
-   d="scan'208";a="369437727"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 16:29:54 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="792716398"
-X-IronPort-AV: E=Sophos;i="6.03,290,1694761200"; 
-   d="scan'208";a="792716398"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 16:29:54 -0800
-Date: Thu, 9 Nov 2023 16:29:53 -0800
-From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Isaku Yamahata <isaku.yamahata@linux.intel.com>,
-	Jim Mattson <jmattson@google.com>, isaku.yamahata@intel.com,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-	erdemaktas@google.com, Vishal Annapurve <vannapurve@google.com>
-Subject: Re: KVM: X86: Make bus clock frequency for vapic timer (bus lock ->
- bus clock) (was Re: [PATCH 0/2] KVM: X86: Make bus lock frequency for vapic
- timer) configurable
-Message-ID: <20231110002953.GB1102144@ls.amr.corp.intel.com>
-References: <cover.1699383993.git.isaku.yamahata@intel.com>
- <20231107192933.GA1102144@ls.amr.corp.intel.com>
- <CALMp9eR8Jnn0g0XBpTKTfKKOtRmFwAWuLAKcozuOs6KAGZ6MQQ@mail.gmail.com>
- <20231108235456.GB1132821@ls.amr.corp.intel.com>
- <ZU0BASXWcck85r90@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B6D36C
+	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 00:37:46 +0000 (UTC)
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A99F8D5B
+	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 16:37:45 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cc5ef7e815so14233605ad.3
+        for <kvm@vger.kernel.org>; Thu, 09 Nov 2023 16:37:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699576665; x=1700181465; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+LGSbmax67eOY26Ujwp3uPRvs7lMuMeMZ8sMWFX4nEw=;
+        b=W+crt5p03v9hmS4OnQZhrhK2zd5nvXdVGZYu6cxj7fvl83/DyI8y0sFFDvhpLQJadS
+         yRdzYCdiJeNBC5GL/HqoYsR4M6SUWVFFKZWgbmp+ysoi6I65ytm01g0og5TLyWRpcfuy
+         G2BaYP+9Q3kfrgTeg4ul0Y+Y4VOXEco9v/tNbc1+SXOX2jJ8KwHIxkSB4S85eaOszAYX
+         vIXqTJt57KFmgskajAaiNDk5oNkRzI/3fhTAGXpFV6Hh/S7Ywtu7b/PfvaP3m5d/V2ub
+         4XIvR19mnofZmKQn4w0hUEl5hG4wwIDV4bqq6ijk18J32vAj/BO5qsqN7OMnturLt/El
+         5nkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699576665; x=1700181465;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+LGSbmax67eOY26Ujwp3uPRvs7lMuMeMZ8sMWFX4nEw=;
+        b=M7tsjVh5al+XXdQcPM/HZ4mlx0rDx559kP3ffoVGO2vNJuwWwYMiY7xqpw2hCRgb+g
+         eYlV/hso8oJ4Jk2e1dYb8htEOlbQzioyuJamuoKs/4bGpPM6xhoIrtD5yO89+00H+pH5
+         +HvSs2aeT4o3kQkyTM43cO9rSIbRNzRpx1yitxhRzHQ+zw3CO2Qix7cExM/o/Nv5W/uE
+         7qKvaNBlS2DJtolzTW9C5QKNQFqP9abbh24r7I7CVscv/jIWqXL4H6NVAJtTmiE9oVmP
+         nA+HWXSjp/R6IR1Wyl9HBWlXSGBN5Q5u76NLFrzd9EfXwMyhSCDjrMAJ/UFmw8t0XqHJ
+         hjQQ==
+X-Gm-Message-State: AOJu0Ywodw5tNWBRFgb6ja3ngaJkv/yXRAkMh1bNzeR4jO4q1RC+qTmW
+	+X81x9n7EEIEQDOQIEWSbtAEu4i9vnU=
+X-Google-Smtp-Source: AGHT+IG/7BR/bVgac0iyHRbkVYTFyj9QAWxK4SZ9Hsf+60bfWwLuN4JrhnYjogalBg02XIbV5VfpylQGo5Mm
+X-Received: from jackyli.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3b51])
+ (user=jackyli job=sendgmr) by 2002:a17:902:f80e:b0:1cc:2a6f:ab91 with SMTP id
+ ix14-20020a170902f80e00b001cc2a6fab91mr848597plb.0.1699576665105; Thu, 09 Nov
+ 2023 16:37:45 -0800 (PST)
+Date: Fri, 10 Nov 2023 00:37:30 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZU0BASXWcck85r90@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.rc0.421.g78406f8d94-goog
+Message-ID: <20231110003734.1014084-1-jackyli@google.com>
+Subject: [RFC PATCH 0/4] KVM: SEV: Limit cache flush operations in sev guest
+ memory reclaim events
+From: Jacky Li <jackyli@google.com>
+To: Sean Christpherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Ovidiu Panait <ovidiu.panait@windriver.com>, Liam Merwick <liam.merwick@oracle.com>, 
+	Ashish Kalra <Ashish.Kalra@amd.com>, David Rientjes <rientjes@google.com>, 
+	David Kaplan <david.kaplan@amd.com>, Peter Gonda <pgonda@google.com>, 
+	Mingwei Zhang <mizhang@google.com>, kvm@vger.kernel.org, Jacky Li <jackyli@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Nov 09, 2023 at 07:55:45AM -0800,
-Sean Christopherson <seanjc@google.com> wrote:
+The cache flush operation in sev guest memory reclaim events was
+originally introduced to prevent security issues due to cache
+incoherence and untrusted VMM. However when this operation gets
+triggered, it causes performance degradation to the whole machine.
 
-> On Wed, Nov 08, 2023, Isaku Yamahata wrote:
-> > On Tue, Nov 07, 2023 at 12:03:35PM -0800, Jim Mattson <jmattson@google.com> wrote:
-> > > I think I know the answer, but do you have any tests for this new feature?
-> > 
-> > If you mean kvm kselftest, no.
-> > I have
-> > - TDX patched qemu
-> > - kvm-unit-tests: test_apic_timer_one_shot() @ kvm-unit-tests/x86/apic.c
-> >   TDX version is found at https://github.com/intel/kvm-unit-tests-tdx
-> >   We're planning to upstream the changes for TDX
-> > 
-> > How far do we want to go?
-> > - Run kvm-unit-tests with TDX. What I have right now.
-> > - kvm-unit-tests: extend qemu for default VM case and update
-> >   test_apic_timer_one_host()
-> 
-> Hrm, I'm not sure that we can do a whole lot for test_apic_timer_one_shot().  Or
-> rather, I'm not sure it's worth the effort to try and add coverage beyond what's
-> already there.
-> 
-> As for TDX, *if* we extend KUT, please don't make it depend on TDX.  Very few people
-> have access to TDX platforms and anything CoCo is pretty much guaranteed to be harder
-> to debug.
+This cache flush operation is performed in mmu_notifiers, in particular,
+in the mmu_notifier_invalidate_range_start() function, unconditionally
+on all guest memory regions. Although the intention was to flush
+cache lines only when guest memory was deallocated, the excessive
+invocations include many other cases where this flush is unnecessary.
 
-It made the test cases work with TDX + UEFI bios by adjusting command line to
-invoke qemu.  And skip unsuitable tests.
-Maybe we can generalize the way to twist qemu command line.
+This RFC proposes using the mmu notifier event to determine whether a
+cache flush is needed. Specifically, only do the cache flush when the
+address range is unmapped, cleared, released or migrated. A bitmap
+module param is also introduced to provide flexibility when flush is
+needed in more events or no flush is needed depending on the hardware
+platform.
 
+Note that the cache flush operation in memory reclamation only targets
+SEV/SEV-ES platforms and no cache flush is needed in SEV-SNP VMs.
+Therefore the patch series does not apply to the SEV-SNP context.
 
-> > - kselftest
-> >   Right now kvm kselftest doesn't have test cases even for in-kernel IRQCHIP
-> >   creation.
-> 
-> Selftests always create an in-kernel APIC.  And I think selftests are perfectly
-> suited to complement the coverage provided by KUT.  Specifically, the failure
-> scenario for this is that KVM emulates at 1Ghz whereas TDX advertises 25Mhz, i.e.
-> the test case we want is to verify that the APIC timer doesn't expire early.
-> 
-> There's no need for any APIC infrastructure, e.g. a selftest doesn't even need to
-> handle an interrupt.  Get the TSC frequency from KVM, program up an arbitrary APIC
-> bus clock frequency, set TMICT such that it expires waaaay in the future, and then
-> verify that the APIC timer counts reasonably close to the programmed frequency.
-> E.g. if the test sets the bus clock to 25Mhz, the "drift" due to KVM counting at
-> 1Ghz should be super obvious.
+Jacky Li (4):
+  KVM: SEV: Drop wbinvd_on_all_cpus() as kvm mmu notifier would flush
+    the cache
+  KVM: SEV: Plumb mmu_notifier_event into sev function
+  KVM: SEV: Limit the call of WBINVDs based on the event type of mmu
+    notifier
+  KVM: SEV: Use a bitmap module param to decide whether a cache flush is
+    needed during the guest memory reclaim
 
-Oh, only check the register value without interrupt. Good idea.  Let me give it
-a try.
+ arch/x86/include/asm/kvm_host.h |  3 +-
+ arch/x86/kvm/svm/sev.c          | 62 ++++++++++++++++++++++++---------
+ arch/x86/kvm/svm/svm.h          |  3 +-
+ arch/x86/kvm/x86.c              |  5 +--
+ include/linux/kvm_host.h        |  3 +-
+ include/linux/mmu_notifier.h    |  4 +++
+ virt/kvm/kvm_main.c             | 14 +++++---
+ 7 files changed, 68 insertions(+), 26 deletions(-)
+
 -- 
-Isaku Yamahata <isaku.yamahata@linux.intel.com>
+2.43.0.rc0.421.g78406f8d94-goog
+
 
