@@ -1,142 +1,129 @@
-Return-Path: <kvm+bounces-1399-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1400-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C58F37E75D7
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 01:18:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DAB37E75F0
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 01:30:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B20AB21172
-	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 00:18:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 434251C20D74
+	for <lists+kvm@lfdr.de>; Fri, 10 Nov 2023 00:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9AC8643;
-	Fri, 10 Nov 2023 00:18:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F80D643;
+	Fri, 10 Nov 2023 00:29:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iNGqdTwS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cDjwMwSq"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360D17F
-	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 00:18:25 +0000 (UTC)
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBDE72D5E
-	for <kvm@vger.kernel.org>; Thu,  9 Nov 2023 16:18:24 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-2806501f8efso1569625a91.2
-        for <kvm@vger.kernel.org>; Thu, 09 Nov 2023 16:18:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699575504; x=1700180304; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JDBX34Ax+xCPEejy7csuMsB+4xNqzo0HFpIJ9s7abJ8=;
-        b=iNGqdTwS334kCvkpGmB01FdlxQ61ywgdjF5fCNtxQqU43MAfj/xr1kvBT8WQ4VtZx1
-         bggRL/qWdVsfZpciqnIN050vwtp/GKzWNH0D96BmNHUDE7hmLtauk9Yi5Lw/yzwANNic
-         8Pkomd30z/G1jg2AnTactcLd62ca+//x/OYDlKtmNujkZUK9cwXzumFPM54lJVkMXB2y
-         BkXMP2BHx6lnp1X1mjCuVv72byU0nBwoTdoQ0uYbxFvtPWlfpQ4v1JhEAIinlopX5tNT
-         8OLwc/bx6SIxDyg1NVliFXWmmSg9QtyvWfVZe4/Mg6xK3h1xK3U701JowNPGax/IMRsm
-         m1Uw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699575504; x=1700180304;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JDBX34Ax+xCPEejy7csuMsB+4xNqzo0HFpIJ9s7abJ8=;
-        b=C3SyiHUyyVuqMXClkbNzqBMJlW/lScr99LaQXKAsaCfN1R4dg8Jmu94Dq2mbfltAyN
-         SZywaROk6rW5Bskf/c2ud4sRYevFpcQQV+5wX4EAtlXClTpKhPqT4lGiYtOHymLk+vpG
-         62hieYU/tAGJrqDbv8DbqJacLE7ykZP1i7YdGUdkLIYBvRIgthv2WTuluIpYYqEyw9LS
-         r0dkB/6Ah10+guPdgrm3ZiEXOGNVbjQLXr9pJdMCjuj6hqFdDcuX6ZSLECDSC5LXhnMj
-         KlGp15ZuVxMEnzqMrTiUR2MjITseQSXI2A00NOUtDIwUviKPgmPLiHMMIO1SGZ2EpNR0
-         1h+A==
-X-Gm-Message-State: AOJu0Yz6y1C54yB+4vdI+Tx++hcuOprPqONKq9PVgk1c3Kb3ipA29CIR
-	BMfxXi0kAfN/l0f082Ry1fzV49rdAUo=
-X-Google-Smtp-Source: AGHT+IEwtMfwxGAR0B/H7IXPZ3vu/xybKiPnMknwG6Vs4SXQgsDZzBSqz7NL72vzZ/dKNEKuDabRDt2Rgms=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:738e:b0:281:1c2e:9e6c with SMTP id
- j14-20020a17090a738e00b002811c2e9e6cmr829740pjg.5.1699575504122; Thu, 09 Nov
- 2023 16:18:24 -0800 (PST)
-Date: Thu, 9 Nov 2023 16:18:22 -0800
-In-Reply-To: <SA1PR11MB67347A31E38D604FDF2BD606A8AFA@SA1PR11MB6734.namprd11.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C11F366
+	for <kvm@vger.kernel.org>; Fri, 10 Nov 2023 00:29:55 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7A0A2D7C;
+	Thu,  9 Nov 2023 16:29:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699576194; x=1731112194;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=RXQEk8DTnU62l10vBMRLP0Yzm/Zzrw5CoP6dtFdQlqY=;
+  b=cDjwMwSq0bd4++enIL+e4q1XVoVh3humWpsqE73mR0JqcfCbGX25DwQS
+   ak8Rf7k0yz//07jWtpXsGwn9D1g+2XgOFlE/TKqcmqmBnToIr2B2jLmK6
+   Vs/vhh0TGHI9hamtE0YAbm/1aMmaoc7KJ14tLaLEKbwEADEMW1P0S4HYW
+   3FCCw8+zF5Srg601I7zqX50OhtRWJCoCyQ6UUjVm3YoT65iejrBeXJdxc
+   FuC22ase8Wh8wlrKVbTD51AmH1QL6fUXg9W1+103HOwhnMUclFjCOtaoy
+   MpMwHpvYjgIphGHNgJfJaJjorv3IwQINxgY26w4ghGMVFrvl64ggiuqIt
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="369437727"
+X-IronPort-AV: E=Sophos;i="6.03,290,1694761200"; 
+   d="scan'208";a="369437727"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 16:29:54 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="792716398"
+X-IronPort-AV: E=Sophos;i="6.03,290,1694761200"; 
+   d="scan'208";a="792716398"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 16:29:54 -0800
+Date: Thu, 9 Nov 2023 16:29:53 -0800
+From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Isaku Yamahata <isaku.yamahata@linux.intel.com>,
+	Jim Mattson <jmattson@google.com>, isaku.yamahata@intel.com,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+	erdemaktas@google.com, Vishal Annapurve <vannapurve@google.com>
+Subject: Re: KVM: X86: Make bus clock frequency for vapic timer (bus lock ->
+ bus clock) (was Re: [PATCH 0/2] KVM: X86: Make bus lock frequency for vapic
+ timer) configurable
+Message-ID: <20231110002953.GB1102144@ls.amr.corp.intel.com>
+References: <cover.1699383993.git.isaku.yamahata@intel.com>
+ <20231107192933.GA1102144@ls.amr.corp.intel.com>
+ <CALMp9eR8Jnn0g0XBpTKTfKKOtRmFwAWuLAKcozuOs6KAGZ6MQQ@mail.gmail.com>
+ <20231108235456.GB1132821@ls.amr.corp.intel.com>
+ <ZU0BASXWcck85r90@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231108183003.5981-1-xin3.li@intel.com> <20231108183003.5981-7-xin3.li@intel.com>
- <ZUyjPtaxOgDQQUwA@chao-email> <SA1PR11MB67347A31E38D604FDF2BD606A8AFA@SA1PR11MB6734.namprd11.prod.outlook.com>
-Message-ID: <ZU12zoH8VtcZ_USh@google.com>
-Subject: Re: [PATCH v1 06/23] KVM: VMX: Defer enabling FRED MSRs save/load
- until after set CPUID
-From: Sean Christopherson <seanjc@google.com>
-To: Xin3 Li <xin3.li@intel.com>
-Cc: Chao Gao <chao.gao@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>, 
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, 
-	"kys@microsoft.com" <kys@microsoft.com>, "haiyangz@microsoft.com" <haiyangz@microsoft.com>, 
-	"wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"hpa@zytor.com" <hpa@zytor.com>, "vkuznets@redhat.com" <vkuznets@redhat.com>, 
-	"peterz@infradead.org" <peterz@infradead.org>, Ravi V Shankar <ravi.v.shankar@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZU0BASXWcck85r90@google.com>
 
-On Thu, Nov 09, 2023, Xin3 Li wrote:
-> > >+static void vmx_vcpu_config_fred_after_set_cpuid(struct kvm_vcpu *vcpu)
-> > >+{
-> > >+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > >+
-> > >+	if (!cpu_feature_enabled(X86_FEATURE_FRED) ||
-> > >+	    !guest_cpuid_has(vcpu, X86_FEATURE_FRED))
-> > >+		return;
-> > >+
-> > >+	/* Enable loading guest FRED MSRs from VMCS */
-> > >+	vm_entry_controls_setbit(vmx, VM_ENTRY_LOAD_IA32_FRED);
-> > >+
-> > >+	/*
-> > >+	 * Enable saving guest FRED MSRs into VMCS and loading host FRED MSRs
-> > >+	 * from VMCS.
-> > >+	 */
-> > >+	vm_exit_controls_setbit(vmx,
-> > VM_EXIT_ACTIVATE_SECONDARY_CONTROLS);
-> > >+	secondary_vm_exit_controls_setbit(vmx,
-> > >+					  SECONDARY_VM_EXIT_SAVE_IA32_FRED
-> > |
-> > >+
-> > SECONDARY_VM_EXIT_LOAD_IA32_FRED);
+On Thu, Nov 09, 2023 at 07:55:45AM -0800,
+Sean Christopherson <seanjc@google.com> wrote:
+
+> On Wed, Nov 08, 2023, Isaku Yamahata wrote:
+> > On Tue, Nov 07, 2023 at 12:03:35PM -0800, Jim Mattson <jmattson@google.com> wrote:
+> > > I think I know the answer, but do you have any tests for this new feature?
 > > 
-> > all above vmcs controls need to be cleared if guest doesn't enumerate FRED, see
+> > If you mean kvm kselftest, no.
+> > I have
+> > - TDX patched qemu
+> > - kvm-unit-tests: test_apic_timer_one_shot() @ kvm-unit-tests/x86/apic.c
+> >   TDX version is found at https://github.com/intel/kvm-unit-tests-tdx
+> >   We're planning to upstream the changes for TDX
 > > 
-> > https://lore.kernel.org/all/ZJYzPn7ipYfO0fLZ@google.com/
+> > How far do we want to go?
+> > - Run kvm-unit-tests with TDX. What I have right now.
+> > - kvm-unit-tests: extend qemu for default VM case and update
+> >   test_apic_timer_one_host()
 > 
-> Good point, the user space could set cpuid multiple times...
->  
-> > Clearing VM_EXIT_ACTIVATE_SECONDARY_CONTROLS may be problematic when
-> > new bits are added to secondary vmcs controls. Why not keep
-> > VM_EXIT_ACTIVATE_SECONDARY_CONTROLS always on if it is supported? or you
-> > see any perf impact?
+> Hrm, I'm not sure that we can do a whole lot for test_apic_timer_one_shot().  Or
+> rather, I'm not sure it's worth the effort to try and add coverage beyond what's
+> already there.
 > 
-> I think it from the other way, why keeps hw loading it on every vmentry
-> even if it's not used by a guest?
+> As for TDX, *if* we extend KUT, please don't make it depend on TDX.  Very few people
+> have access to TDX platforms and anything CoCo is pretty much guaranteed to be harder
+> to debug.
 
-Oh, yeesh, this is clearing the activation control.  Yeah, NAK to that, just
-leave it set.  If it weren't for the fact that there is apparently a metrict ton
-of FRED state (I thought the whole point of FRED was to kill off legacy crap like
-CPL1 and CPL2 stacks?) _and_ that KVM needs to toggle MSR intercepts, I'd probably
-push back on toggling even the FRED controls.
+It made the test cases work with TDX + UEFI bios by adjusting command line to
+invoke qemu.  And skip unsuitable tests.
+Maybe we can generalize the way to twist qemu command line.
 
-> Different CPUs may implement it in different ways, which we can't assume.
 
-Implement what in a different way?  The VMCS fields and FRED are architectural.
-The internal layout of the VMCS is uarch specific, but the encodings and semantics
-absolutely cannot change without breaking software.  And if Intel does something
-asinine like make a control active-low then we have far, far bigger problems.
+> > - kselftest
+> >   Right now kvm kselftest doesn't have test cases even for in-kernel IRQCHIP
+> >   creation.
+> 
+> Selftests always create an in-kernel APIC.  And I think selftests are perfectly
+> suited to complement the coverage provided by KUT.  Specifically, the failure
+> scenario for this is that KVM emulates at 1Ghz whereas TDX advertises 25Mhz, i.e.
+> the test case we want is to verify that the APIC timer doesn't expire early.
+> 
+> There's no need for any APIC infrastructure, e.g. a selftest doesn't even need to
+> handle an interrupt.  Get the TSC frequency from KVM, program up an arbitrary APIC
+> bus clock frequency, set TMICT such that it expires waaaay in the future, and then
+> verify that the APIC timer counts reasonably close to the programmed frequency.
+> E.g. if the test sets the bus clock to 25Mhz, the "drift" due to KVM counting at
+> 1Ghz should be super obvious.
 
-> Other features needing it should set it separately, say with a refcount.
-
-Absolutely not.  Unless Intel screwed up the implementation, the cost of leaving
-VM_EXIT_ACTIVATE_SECONDARY_CONTROLS set when it's supported shouldn't even be
-measurable.
+Oh, only check the register value without interrupt. Good idea.  Let me give it
+a try.
+-- 
+Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
