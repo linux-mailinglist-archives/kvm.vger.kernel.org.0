@@ -1,37 +1,37 @@
-Return-Path: <kvm+bounces-1538-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1539-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 583DC7E8FFC
-	for <lists+kvm@lfdr.de>; Sun, 12 Nov 2023 14:24:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 94A747E9003
+	for <lists+kvm@lfdr.de>; Sun, 12 Nov 2023 14:24:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30CB8280E19
-	for <lists+kvm@lfdr.de>; Sun, 12 Nov 2023 13:24:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F4B3280E26
+	for <lists+kvm@lfdr.de>; Sun, 12 Nov 2023 13:24:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67C2511C89;
-	Sun, 12 Nov 2023 13:23:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EFB612B80;
+	Sun, 12 Nov 2023 13:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NvIZDhET"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r3euS2Lp"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3746CCA51;
-	Sun, 12 Nov 2023 13:23:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0A23C433CD;
-	Sun, 12 Nov 2023 13:23:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F9811188;
+	Sun, 12 Nov 2023 13:24:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCDCAC433C7;
+	Sun, 12 Nov 2023 13:24:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699795438;
-	bh=OgUO47nzRbf6nmGJSZaeT0emMlcSWzNVcL5bEtyOJ5c=;
+	s=k20201202; t=1699795460;
+	bh=0ZYU/7uxellLjA0IsAd3Cg+c3PtgRULYiz9Y38bvhvM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NvIZDhETzL6dRrjwWZJy+ZXpkVaPvhRn1R0mx82oTcu5H97pHUykUvLxqtiVK4j+0
-	 4m5tIhvTyFGsyfuHRQtJk1tDe8CZYGEuMzzZddyYaoKmGTjrEPdq6mM6mDHh/d0wdW
-	 POWEIiGNL7xVCXLPCrYcfmnePulAdNRkcgo770rC2IrTwlOLtmZGTRkUddMC4ZUR4L
-	 sLJt+V+K0mRkDZXZ/ok3XL4LsS1S9C3ww27glAMWLRPCpP3SQ5bgqo1iJx2GttvQ0r
-	 gmurDDuw1leiRr1Db/hG4sMvuG2x7UYIx3Cf7sCcrlV/AL3Fi0BzIcEtjMldaHq4Kb
-	 UjubIGLCtUkKw==
+	b=r3euS2Lp+t+klHgkMFU/4rUNVTzAm2+4Ul2alOlDZpsXot8JJ41/xZmdetuoom0/s
+	 sJU9OLkuGqTM2/zqlnHQ+uIU1cR0HMCQAOkQFvJUNwr8cHWYUPpNlVNg2Ilo5vAHjo
+	 +5Tl+tTTb7Oxgv9MWfv0X3v5paUZPuJxFLtn1vQiEgrsXKpe0NbEOZt3zIU4LHy2w7
+	 I5Me0SWkHDwaPEprG5vF05mHiuy7K9gCEPmNzpS8LQTk1lv1NApKHOf2pElPyFIydH
+	 H5WJNZkhI7QlGToZm+bV63clczCQFXvahxXORxkmKSPp54XlGXPdnzgUP1WnaklAF1
+	 K2Pmh0HAj7A6g==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -44,12 +44,12 @@ Cc: Si-Wei Liu <si-wei.liu@oracle.com>,
 	kvm@vger.kernel.org,
 	virtualization@lists.linux.dev,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.5 6/7] vhost-vdpa: clean iotlb map during reset for older userspace
-Date: Sun, 12 Nov 2023 08:23:38 -0500
-Message-ID: <20231112132347.174334-6-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 5/6] vhost-vdpa: clean iotlb map during reset for older userspace
+Date: Sun, 12 Nov 2023 08:24:00 -0500
+Message-ID: <20231112132408.174499-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231112132347.174334-1-sashal@kernel.org>
-References: <20231112132347.174334-1-sashal@kernel.org>
+In-Reply-To: <20231112132408.174499-1-sashal@kernel.org>
+References: <20231112132408.174499-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -58,7 +58,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.5.11
+X-stable-base: Linux 6.1.62
 Content-Transfer-Encoding: 8bit
 
 From: Si-Wei Liu <si-wei.liu@oracle.com>
@@ -97,7 +97,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  3 files changed, 22 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index b43e8680eee8d..fb934a7e68bfb 100644
+index 31a156669a531..9e60a1d3b8166 100644
 --- a/drivers/vhost/vdpa.c
 +++ b/drivers/vhost/vdpa.c
 @@ -210,13 +210,24 @@ static void vhost_vdpa_unsetup_vq_irq(struct vhost_vdpa *v, u16 qid)
@@ -127,8 +127,8 @@ index b43e8680eee8d..fb934a7e68bfb 100644
 +	return _compat_vdpa_reset(v);
  }
  
- static long vhost_vdpa_bind_mm(struct vhost_vdpa *v)
-@@ -295,7 +306,7 @@ static long vhost_vdpa_set_status(struct vhost_vdpa *v, u8 __user *statusp)
+ static long vhost_vdpa_get_device_id(struct vhost_vdpa *v, u8 __user *argp)
+@@ -273,7 +284,7 @@ static long vhost_vdpa_set_status(struct vhost_vdpa *v, u8 __user *statusp)
  			vhost_vdpa_unsetup_vq_irq(v, i);
  
  	if (status == 0) {
@@ -137,7 +137,7 @@ index b43e8680eee8d..fb934a7e68bfb 100644
  		if (ret)
  			return ret;
  	} else
-@@ -1272,6 +1283,7 @@ static void vhost_vdpa_cleanup(struct vhost_vdpa *v)
+@@ -1202,6 +1213,7 @@ static void vhost_vdpa_cleanup(struct vhost_vdpa *v)
  	vhost_vdpa_free_domain(v);
  	vhost_dev_cleanup(&v->vdev);
  	kfree(v->vdev.vqs);
@@ -146,10 +146,10 @@ index b43e8680eee8d..fb934a7e68bfb 100644
  
  static int vhost_vdpa_open(struct inode *inode, struct file *filep)
 diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa.c
-index 06ce6d8c2e004..8d63e5923d245 100644
+index 9670cc79371d8..73d052b4fe4d2 100644
 --- a/drivers/virtio/virtio_vdpa.c
 +++ b/drivers/virtio/virtio_vdpa.c
-@@ -100,7 +100,7 @@ static void virtio_vdpa_reset(struct virtio_device *vdev)
+@@ -99,7 +99,7 @@ static void virtio_vdpa_reset(struct virtio_device *vdev)
  {
  	struct vdpa_device *vdpa = vd_get_vdpa(vdev);
  
@@ -159,10 +159,10 @@ index 06ce6d8c2e004..8d63e5923d245 100644
  
  static bool virtio_vdpa_notify(struct virtqueue *vq)
 diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
-index db1b0eaef4eb7..c287382b0a80b 100644
+index 6d0f5e4e82c25..2737f951fbd8f 100644
 --- a/include/linux/vdpa.h
 +++ b/include/linux/vdpa.h
-@@ -481,14 +481,17 @@ static inline struct device *vdpa_get_dma_dev(struct vdpa_device *vdev)
+@@ -427,14 +427,17 @@ static inline struct device *vdpa_get_dma_dev(struct vdpa_device *vdev)
  	return vdev->dma_dev;
  }
  
