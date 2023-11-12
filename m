@@ -1,50 +1,50 @@
-Return-Path: <kvm+bounces-1530-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1529-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F39F47E8E39
-	for <lists+kvm@lfdr.de>; Sun, 12 Nov 2023 05:13:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA0277E8E3A
+	for <lists+kvm@lfdr.de>; Sun, 12 Nov 2023 05:13:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E6081C20748
-	for <lists+kvm@lfdr.de>; Sun, 12 Nov 2023 04:13:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A8AFB20A4E
+	for <lists+kvm@lfdr.de>; Sun, 12 Nov 2023 04:13:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C55CFBE71;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADB224428;
 	Sun, 12 Nov 2023 04:12:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eng2LJO8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UW7JkIS8"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD788440E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A805A3C2C
 	for <kvm@vger.kernel.org>; Sun, 12 Nov 2023 04:12:13 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 086FA3840;
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5389B3850;
 	Sat, 11 Nov 2023 20:12:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1699762332; x=1731298332;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=bUqv9KmUqsXG7vFMJHl27FbTCB3T6tJUXKy8ifc6Wm4=;
-  b=eng2LJO8TCP7SkPzLh5v6ZEFHOlGOEoj89K6p9YRensaWSbAzvQoo+aF
-   +HrjA777KtW9PvfctnMYwOw3ahY1E9MoqUn82yx5pFeaXDeW2OVxZUhYy
-   5bthu/qMlnA0Ae9tkwu9E8IaTeJCRlDvJ5urn5HHLDiiIKOF2PpFbedTD
-   pVxteSnj10ytFz3i+5gYEEolU6Wzk8IP/whsT0ZmUiGL++/B/4mPo05f0
-   XXodrPtReCOZLAQAs8FAAOn3HrKPDYq0ql8wCrcZ3q4hTiM0qVR4pRBL8
-   xuoMPZJUPjhua4XaiiXdwNwIQucnw5E3+xyF+MRmxyx7ktuE8GvPZTvvu
+  bh=BmEOk8548DeJZDcMSeMiFjR9mep2QMzw5DJH2sJXQNs=;
+  b=UW7JkIS8jDXbq010IehICO2UZvcVq9JwKhc/Mk2sxHJz3fZWPx+t9MWb
+   V52R7LUwz4s3nc7EOta7pYpxbLZYwIXZS8Tedm1oqEaDK/xoWnosPys/l
+   6NElsnxO7xUBWjzkd7LK4UpStKP3fwYlTmsDXDIKPto+h0VmKp1dwv77e
+   kK8I8BejHlbCkL+bFNNPf6P8vhHdQ2X8bPgxRVF7Ea6OtAh5e3f+4m31F
+   ilJ/mE4tJq2xeu4iqA+cvG7ygoaavVZVlsOOL75iFsP3bys3nXbeR8u46
+   3rP0gdmRtr+/83Yd8XRs7ampMLUpbl0VUKrxxetHtVqGdeCkiAnRVph1e
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10891"; a="476533937"
+X-IronPort-AV: E=McAfee;i="6600,9927,10891"; a="476533951"
 X-IronPort-AV: E=Sophos;i="6.03,296,1694761200"; 
-   d="scan'208";a="476533937"
+   d="scan'208";a="476533951"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
   by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2023 20:12:09 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10891"; a="713936767"
+X-IronPort-AV: E=McAfee;i="6600,9927,10891"; a="713936770"
 X-IronPort-AV: E=Sophos;i="6.03,296,1694761200"; 
-   d="scan'208";a="713936767"
+   d="scan'208";a="713936770"
 Received: from srinivas-otcpl-7600.jf.intel.com (HELO jacob-builder.jf.intel.com) ([10.54.39.116])
   by orsmga003.jf.intel.com with ESMTP; 11 Nov 2023 20:12:09 -0800
 From: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -66,9 +66,9 @@ Cc: Raj Ashok <ashok.raj@intel.com>,
 	seanjc@google.com,
 	"Robin Murphy" <robin.murphy@arm.com>,
 	Jacob Pan <jacob.jun.pan@linux.intel.com>
-Subject: [PATCH RFC 10/13] x86/irq: Handle potential lost IRQ during migration and CPU offline
-Date: Sat, 11 Nov 2023 20:16:40 -0800
-Message-Id: <20231112041643.2868316-11-jacob.jun.pan@linux.intel.com>
+Subject: [PATCH RFC 11/13] iommu/vt-d: Add an irq_chip for posted MSIs
+Date: Sat, 11 Nov 2023 20:16:41 -0800
+Message-Id: <20231112041643.2868316-12-jacob.jun.pan@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231112041643.2868316-1-jacob.jun.pan@linux.intel.com>
 References: <20231112041643.2868316-1-jacob.jun.pan@linux.intel.com>
@@ -80,104 +80,131 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Though IRTE modification for IRQ affinity change is a atomic operation,
-it does not guarantee the timing of IRQ posting at PID.
+With posted MSIs, end of interrupt is handled by the notification
+handler. Each MSI handler does not go through local APIC IRR, ISR
+processing. There's no need to do apic_eoi() in those handlers.
 
-considered the following scenario:
-	Device		system agent		iommu		memory 		CPU/LAPIC
-1	FEEX_XXXX
-2			Interrupt request
-3						Fetch IRTE	->
-4						->Atomic Swap PID.PIR(vec)
-						Push to Global Observable(GO)
-5						if (ON*)
-	i						done;*
-						else
-6							send a notification ->
+Add a new acpi_ack_irq_no_eoi() for the posted MSI IR chip. At runtime
+the call trace looks like:
 
-* ON: outstanding notification, 1 will suppress new notifications
+__sysvec_posted_msi_notification() {
+  irq_chip_ack_parent() {
+    apic_ack_irq_no_eoi();
+  }
+  handle_irq_event() {
+    handle_irq_event_percpu() {
+       driver_handler()
+    }
+  }
 
-If IRQ affinity change happens between 3 and 5 in IOMMU, old CPU's PIR could
-have pending bit set for the vector being moved. We must check PID.PIR
-to prevent the lost of interrupts.
+IO-APIC IR is excluded the from posted MSI, we need to make sure it
+still performs EOI.
 
-Suggested-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 ---
- arch/x86/kernel/apic/vector.c |  8 +++++++-
- arch/x86/kernel/irq.c         | 20 +++++++++++++++++---
- 2 files changed, 24 insertions(+), 4 deletions(-)
+ arch/x86/include/asm/apic.h         |  1 +
+ arch/x86/kernel/apic/io_apic.c      |  2 +-
+ arch/x86/kernel/apic/vector.c       |  5 ++++
+ drivers/iommu/intel/irq_remapping.c | 38 ++++++++++++++++++++++++++++-
+ 4 files changed, 44 insertions(+), 2 deletions(-)
 
+diff --git a/arch/x86/include/asm/apic.h b/arch/x86/include/asm/apic.h
+index 5af4ec1a0f71..a88015d5638b 100644
+--- a/arch/x86/include/asm/apic.h
++++ b/arch/x86/include/asm/apic.h
+@@ -485,6 +485,7 @@ static inline void apic_setup_apic_calls(void) { }
+ #endif /* CONFIG_X86_LOCAL_APIC */
+ 
+ extern void apic_ack_irq(struct irq_data *data);
++extern void apic_ack_irq_no_eoi(struct irq_data *data);
+ 
+ static inline bool lapic_vector_set_in_irr(unsigned int vector)
+ {
+diff --git a/arch/x86/kernel/apic/io_apic.c b/arch/x86/kernel/apic/io_apic.c
+index 00da6cf6b07d..ca398ee9075b 100644
+--- a/arch/x86/kernel/apic/io_apic.c
++++ b/arch/x86/kernel/apic/io_apic.c
+@@ -1993,7 +1993,7 @@ static struct irq_chip ioapic_ir_chip __read_mostly = {
+ 	.irq_startup		= startup_ioapic_irq,
+ 	.irq_mask		= mask_ioapic_irq,
+ 	.irq_unmask		= unmask_ioapic_irq,
+-	.irq_ack		= irq_chip_ack_parent,
++	.irq_ack		= apic_ack_irq,
+ 	.irq_eoi		= ioapic_ir_ack_level,
+ 	.irq_set_affinity	= ioapic_set_affinity,
+ 	.irq_retrigger		= irq_chip_retrigger_hierarchy,
 diff --git a/arch/x86/kernel/apic/vector.c b/arch/x86/kernel/apic/vector.c
-index 319448d87b99..14fc33cfdb37 100644
+index 14fc33cfdb37..01223ac4f57a 100644
 --- a/arch/x86/kernel/apic/vector.c
 +++ b/arch/x86/kernel/apic/vector.c
-@@ -19,6 +19,7 @@
- #include <asm/apic.h>
- #include <asm/i8259.h>
- #include <asm/desc.h>
-+#include <asm/posted_intr.h>
- #include <asm/irq_remapping.h>
- 
- #include <asm/trace/irq_vectors.h>
-@@ -978,9 +979,14 @@ static void __vector_cleanup(struct vector_cleanup *cl, bool check_irr)
- 		 * Do not check IRR when called from lapic_offline(), because
- 		 * fixup_irqs() was just called to scan IRR for set bits and
- 		 * forward them to new destination CPUs via IPIs.
-+		 *
-+		 * If the vector to be cleaned is delivered as posted intr,
-+		 * it is possible that the interrupt has been posted but
-+		 * not made to the IRR due to coalesced notifications.
-+		 * Therefore, check PIR to see if the interrupt was posted.
- 		 */
- 		irr = check_irr ? apic_read(APIC_IRR + (vector / 32 * 0x10)) : 0;
--		if (irr & (1U << (vector % 32))) {
-+		if (irr & (1U << (vector % 32)) || is_pi_pending_this_cpu(vector)) {
- 			pr_warn_once("Moved interrupt pending in old target APIC %u\n", apicd->irq);
- 			rearm = true;
- 			continue;
-diff --git a/arch/x86/kernel/irq.c b/arch/x86/kernel/irq.c
-index 786c2c8330f4..7732cb9bbf0c 100644
---- a/arch/x86/kernel/irq.c
-+++ b/arch/x86/kernel/irq.c
-@@ -444,11 +444,26 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_posted_msi_notification)
+@@ -911,6 +911,11 @@ void apic_ack_irq(struct irq_data *irqd)
+ 	apic_eoi();
  }
- #endif /* X86_POSTED_MSI */
  
-+/*
-+ * Check if a given vector is pending in APIC IRR or PIR if posted interrupt
-+ * is enabled for coalesced interrupt delivery (CID).
-+ */
-+static inline bool is_vector_pending(unsigned int vector)
++void apic_ack_irq_no_eoi(struct irq_data *irqd)
 +{
-+	unsigned int irr;
-+
-+	irr = apic_read(APIC_IRR + (vector / 32 * 0x10));
-+	if (irr  & (1 << (vector % 32)))
-+		return true;
-+
-+	return is_pi_pending_this_cpu(vector);
++	irq_move_irq(irqd);
 +}
 +
- #ifdef CONFIG_HOTPLUG_CPU
- /* A cpu has been removed from cpu_online_mask.  Reset irq affinities. */
- void fixup_irqs(void)
+ void apic_ack_edge(struct irq_data *irqd)
  {
--	unsigned int irr, vector;
-+	unsigned int vector;
- 	struct irq_desc *desc;
- 	struct irq_data *data;
- 	struct irq_chip *chip;
-@@ -475,8 +490,7 @@ void fixup_irqs(void)
- 		if (IS_ERR_OR_NULL(__this_cpu_read(vector_irq[vector])))
- 			continue;
+ 	irq_complete_move(irqd_cfg(irqd));
+diff --git a/drivers/iommu/intel/irq_remapping.c b/drivers/iommu/intel/irq_remapping.c
+index 29b9e55dcf26..f2870d3c8313 100644
+--- a/drivers/iommu/intel/irq_remapping.c
++++ b/drivers/iommu/intel/irq_remapping.c
+@@ -1233,6 +1233,42 @@ static struct irq_chip intel_ir_chip = {
+ 	.irq_set_vcpu_affinity	= intel_ir_set_vcpu_affinity,
+ };
  
--		irr = apic_read(APIC_IRR + (vector / 32 * 0x10));
--		if (irr  & (1 << (vector % 32))) {
-+		if (is_vector_pending(vector)) {
- 			desc = __this_cpu_read(vector_irq[vector]);
++/*
++ * With posted MSIs, all vectors are multiplexed into a single notification
++ * vector. Devices MSIs are then dispatched in a demux loop where
++ * EOIs can be coalesced as well.
++ *
++ * IR chip "INTEL-IR-POST" does not do EOI on ACK instead letting posted
++ * interrupt notification handler to perform EOI.
++ *
++ * For the example below, 3 MSIs are coalesced in one CPU notification. Only
++ * one apic_eoi() is needed.
++ *
++ * __sysvec_posted_msi_notification() {
++ * irq_enter()
++ *	handle_edge_irq()
++ *		irq_chip_ack_parent()
++ *			apic_ack_irq_no_eoi()
++ *		handle_irq()
++ *	handle_edge_irq()
++ *		irq_chip_ack_parent()
++ *			apic_ack_irq_no_eoi()
++ *		handle_irq()
++ *	handle_edge_irq()
++ *		irq_chip_ack_parent()
++ *			apic_ack_irq_no_eoi()
++ *		handle_irq()
++ *	apic_eoi()
++ * irq_exit()
++ */
++static struct irq_chip intel_ir_chip_post_msi = {
++	.name			= "INTEL-IR-POST",
++	.irq_ack		= apic_ack_irq_no_eoi,
++	.irq_set_affinity	= intel_ir_set_affinity,
++	.irq_compose_msi_msg	= intel_ir_compose_msi_msg,
++	.irq_set_vcpu_affinity	= intel_ir_set_vcpu_affinity,
++};
++
+ static void fill_msi_msg(struct msi_msg *msg, u32 index, u32 subhandle)
+ {
+ 	memset(msg, 0, sizeof(*msg));
+@@ -1361,7 +1397,7 @@ static int intel_irq_remapping_alloc(struct irq_domain *domain,
  
- 			raw_spin_lock(&desc->lock);
+ 		irq_data->hwirq = (index << 16) + i;
+ 		irq_data->chip_data = ird;
+-		irq_data->chip = &intel_ir_chip;
++		irq_data->chip = posted_msi_supported() ? &intel_ir_chip_post_msi : &intel_ir_chip;
+ 		intel_irq_remapping_prepare_irte(ird, irq_cfg, info, index, i);
+ 		irq_set_status_flags(virq + i, IRQ_MOVE_PCNTXT);
+ 	}
 -- 
 2.25.1
 
