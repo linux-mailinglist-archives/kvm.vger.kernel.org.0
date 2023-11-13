@@ -1,222 +1,783 @@
-Return-Path: <kvm+bounces-1597-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1598-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34FB87E9D65
-	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 14:41:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1359A7E9DCF
+	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 14:51:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C85FBB208A0
-	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 13:41:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 952C41F21384
+	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 13:51:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E782208C2;
-	Mon, 13 Nov 2023 13:41:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A3320B02;
+	Mon, 13 Nov 2023 13:51:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="py4g605l"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SUcbKg9L"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5A92031B
-	for <kvm@vger.kernel.org>; Mon, 13 Nov 2023 13:40:58 +0000 (UTC)
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C848D73
-	for <kvm@vger.kernel.org>; Mon, 13 Nov 2023 05:40:56 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1cc252cbde2so45090665ad.0
-        for <kvm@vger.kernel.org>; Mon, 13 Nov 2023 05:40:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699882856; x=1700487656; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=grMhSA8EkJmQQzxh1GozgoQ7euxsD4+OSt/yXIyQHbI=;
-        b=py4g605lrblfDVOvgOlNY3ClyHPLDqbFW2UT1YTd4Ag7vaqwkThndPFqQ4VZNCcJz+
-         +8DH0t3HbJO8xFA0BC33MSD15ZBg73al+ozQfrYg2bG1I5hqS4yUvmz/nrA8FPpBxx9a
-         qiEm5RpiUDDMQ3TQkqDQJpB9CginyxgofCIK/svAuuLJn5mIqbeNAXIpjs3GSL7/I6KC
-         awsflbba6KnytqDFNQCk7qUCg314NwEXtMU53r3pNiMn/WR2zbl7UdMCBgSQzCUw+J7H
-         LKiS6s2AANzHVirwQ5sGegSQvEvc4RobaSgmr7X5KPv7b5PiLYi1IvAJ5+a6yEH+iYan
-         Te7g==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3444F1CAA7
+	for <kvm@vger.kernel.org>; Mon, 13 Nov 2023 13:51:14 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E89111A6
+	for <kvm@vger.kernel.org>; Mon, 13 Nov 2023 05:51:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699883470;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hMecMU79Z6NhGwWDpdGICSNPzYJ5kggvomSSqVVXb3w=;
+	b=SUcbKg9LyeOva5RPrFQ33r75BpQSp47j12nBD6PoGnxmj4BXIVfp7cClwqsOfjFjd/yaqS
+	3cwMtWLZsk4u+sRrqIb64ww4j5VgXS0Jtxcqbl+AUk+/8VixbQfJM5z13dRHqAk90S2odk
+	sxVRO6qlkijy3kafB31kOpBA4Y6egIU=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-421-SChURnebPB-kGNYfm7O9fw-1; Mon, 13 Nov 2023 08:51:06 -0500
+X-MC-Unique: SChURnebPB-kGNYfm7O9fw-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-543298e3cc8so3158671a12.3
+        for <kvm@vger.kernel.org>; Mon, 13 Nov 2023 05:51:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699882856; x=1700487656;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=grMhSA8EkJmQQzxh1GozgoQ7euxsD4+OSt/yXIyQHbI=;
-        b=p4eSF9u6vG62EkwcxfsvTaCkpH1FxnOYSaz9j9Hz8k9NNbZiDO2zv5qAkJYKrZU6jN
-         DUKjnn7jwIwzQJw4JLsSu8mFG0R7pa7eJjEvRH9xelEz5X+dtN2fMNhV9fyKs178B9Tf
-         fj9H+cwoiIX/NuX61xZ7K1akXGleLh/Vnu8kTxVJdjJSC3kCZBGr/8FTEzd129DzlU9C
-         AxrvVwwXHPqt8vfyOTulPWHuGuL0jm2vx6rBOBy5aSIrPB/1zyKXhJkIxTQ+qZCVJT3/
-         qsIoikDmRwgyH3uprJwhenAVOjhUcd0tJUux3HuHbS/nbmYC5r3N0HFmyok8kgd5ikxK
-         gVyA==
-X-Gm-Message-State: AOJu0Yw+LtyeB3x52Z58Be/6oR+GhYGjMGJIXBuHhBCE5+Q2aw5RyZ/4
-	Pb33Ox7bbmxvj51ClZ2226iile0qRiU=
-X-Google-Smtp-Source: AGHT+IGKkZbz8G134/I6ioIQ6rHAyKn4MTSEwp5YQNMnVY5eA3LBDtFO1zpdTitE4tEcg9M1FDie4oR41hs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:428a:b0:1cc:449a:7f4d with SMTP id
- ju10-20020a170903428a00b001cc449a7f4dmr1794531plb.12.1699882855839; Mon, 13
- Nov 2023 05:40:55 -0800 (PST)
-Date: Mon, 13 Nov 2023 05:40:54 -0800
-In-Reply-To: <feb599ea-89e6-1dd9-ba71-3c3d1e027e06@gmail.com>
+        d=1e100.net; s=20230601; t=1699883465; x=1700488265;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hMecMU79Z6NhGwWDpdGICSNPzYJ5kggvomSSqVVXb3w=;
+        b=Zhzf1NYf2QK+WheWvd2R0eQvGMDxw+ZgSUfcitld53z1nTqJjBpRg9EGSqGptIcj51
+         Mhiw+kddEip/H79sZNU69vZhRMa+T2KMK0ryu/thLF+jsbmR4srRb33FnO1wZPeO23eS
+         mI0D5maLiVgmxj0RmMH7GS6U23kKPKh+f2tvMCs3FEcPN3ytWIaSyQUZ9+sacie8/AMq
+         /pZL9Bn7rouVdhWuxEIaHxSLUmroFe58vboG+MPPfX9JidENeR/fL0asuK22wchyr5rO
+         NR2DnIGVjEAoE/m5dEzsLuUBcgtIXsGnUXY0kvvVgiy0vVpCvikym+pcvmZ2GYYV4Y7l
+         eP9Q==
+X-Gm-Message-State: AOJu0YzaXpxEtNKp0zl/iq5uuddm7zzs5WvlOY9jLn2/NgYB1skfwVRu
+	Yp1cIqfIdMSeoHmSQNpF0ArMP89ELaDbE2X5OTecR0HAMdSIexupPol0n0/iP4+W8LeaHOHkl5t
+	oMnyfQlfe0wwe
+X-Received: by 2002:aa7:db4d:0:b0:540:b0ec:bcd5 with SMTP id n13-20020aa7db4d000000b00540b0ecbcd5mr4947385edt.15.1699883465385;
+        Mon, 13 Nov 2023 05:51:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH6fMXchsiiBlfxJrZ4ZoiETk/uUjrlaOwY7vf8KAb2FgE9LQynmFsELKqCtFhnO5VS6fKTXQ==
+X-Received: by 2002:aa7:db4d:0:b0:540:b0ec:bcd5 with SMTP id n13-20020aa7db4d000000b00540b0ecbcd5mr4947359edt.15.1699883464799;
+        Mon, 13 Nov 2023 05:51:04 -0800 (PST)
+Received: from fedora (g2.ign.cz. [91.219.240.8])
+        by smtp.gmail.com with ESMTPSA id c4-20020a056402120400b0053f9578ec97sm3751111edw.56.2023.11.13.05.51.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Nov 2023 05:51:04 -0800 (PST)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, Paolo Bonzini
+ <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 10/14] KVM: x86: Make Hyper-V emulation optional
+In-Reply-To: <aa040db7f7766e2b84bae55a9e68b81d70051c68.camel@redhat.com>
+References: <20231025152406.1879274-1-vkuznets@redhat.com>
+ <20231025152406.1879274-11-vkuznets@redhat.com>
+ <aa040db7f7766e2b84bae55a9e68b81d70051c68.camel@redhat.com>
+Date: Mon, 13 Nov 2023 14:51:02 +0100
+Message-ID: <87msvhsqwp.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231110021306.1269082-1-seanjc@google.com> <20231110021306.1269082-27-seanjc@google.com>
- <feb599ea-89e6-1dd9-ba71-3c3d1e027e06@gmail.com>
-Message-ID: <ZVInZkwjbanQ2rkx@google.com>
-Subject: Re: [PATCH v8 26/26] KVM: selftests: Extend PMU counters test to
- validate RDPMC after WRMSR
-From: Sean Christopherson <seanjc@google.com>
-To: Jinrong Liang <ljr.kernel@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Kan Liang <kan.liang@linux.intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
-	Jim Mattson <jmattson@google.com>, Aaron Lewis <aaronlewis@google.com>, 
-	Like Xu <likexu@tencent.com>, Jinrong Liang <cloudliang@tencent.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Mon, Nov 13, 2023, Jinrong Liang wrote:
-> =E5=9C=A8 2023/11/10 10:13, Sean Christopherson =E5=86=99=E9=81=93:
-> > Extend the read/write PMU counters subtest to verify that RDPMC also re=
-ads
-> > back the written value.  Opportunsitically verify that attempting to us=
-e
-> > the "fast" mode of RDPMC fails, as the "fast" flag is only supported by
-> > non-architectural PMUs, which KVM doesn't virtualize.
-> >=20
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> > +		/* Redo the read tests with RDPMC, and with forced emulation. */
-> > +		vector =3D rdpmc_safe(rdpmc_idx, &val);
-> > +		GUEST_ASSERT_PMC_MSR_ACCESS(RDPMC, rdpmc_idx, !expect_success, vecto=
-r);
-> > +		if (expect_success)
-> > +			GUEST_ASSERT_PMC_VALUE(RDPMC, rdpmc_idx, val, expected_val);
-> > +
-> > +		vector =3D rdpmc_safe_fep(rdpmc_idx, &val);
-> > +		GUEST_ASSERT_PMC_MSR_ACCESS(RDPMC, rdpmc_idx, !expect_success, vecto=
-r);
-> > +		if (expect_success)
-> > +			GUEST_ASSERT_PMC_VALUE(RDPMC, rdpmc_idx, val, expected_val);
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-> This test case failed on my Intel machine.
->=20
-> Error message=EF=BC=9A
-> Testing arch events, PMU version 0, perf_caps =3D 0
-> Testing GP counters, PMU version 0, perf_caps =3D 0
-> =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
->   lib/x86_64/processor.c:1100: Unhandled exception in guest
->   pid=3D464480 tid=3D464480 errno=3D4 - Interrupted system call
->      1	0x00000000004120e1: assert_on_unhandled_exception =E4=BA=8E proces=
-sor.c:1146
->      2	0x00000000004062d9: _vcpu_run =E4=BA=8E kvm_util.c:1634
->      3	0x00000000004062fa: vcpu_run =E4=BA=8E kvm_util.c:1645
->      4	0x0000000000403697: run_vcpu =E4=BA=8E pmu_counters_test.c:56
->      5	0x00000000004026fc: test_gp_counters =E4=BA=8E pmu_counters_test.c=
-:434
->      6	(=E5=B7=B2=E5=86=85=E8=BF=9E=E5=85=A5)test_intel_counters =E4=BA=
-=8E pmu_counters_test.c:580
->      7	(=E5=B7=B2=E5=86=85=E8=BF=9E=E5=85=A5)main =E4=BA=8E pmu_counters_=
-test.c:604
->      8	0x00007f7a2f03ad84: ?? ??:0
->      9	0x00000000004028bd: _start =E4=BA=8E ??:?
->   Unhandled exception '0x6' at guest RIP '0x402bab'
+> On Wed, 2023-10-25 at 17:24 +0200, Vitaly Kuznetsov wrote:
+>> Hyper-V emulation in KVM is a fairly big chunk and in some cases it may be
+>> desirable to not compile it in to reduce module sizes as well as the attack
+>> surface. Introduce CONFIG_KVM_HYPERV option to make it possible.
+>> 
+>> Note, there's room for further nVMX/nSVM code optimizations when
+>> !CONFIG_KVM_HYPERV, this will be done in follow-up patches.
+>> 
+>> Reorganize Makefile a bit so all CONFIG_HYPERV and CONFIG_KVM_HYPERV files
+>> are grouped together.
+>> 
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  arch/x86/include/asm/kvm_host.h |  4 +++
+>>  arch/x86/kvm/Kconfig            | 14 ++++++++
+>>  arch/x86/kvm/Makefile           | 23 ++++++------
+>>  arch/x86/kvm/cpuid.c            |  6 ++++
+>>  arch/x86/kvm/hyperv.h           | 30 ++++++++++++++--
+>>  arch/x86/kvm/irq_comm.c         |  9 ++++-
+>>  arch/x86/kvm/svm/hyperv.h       |  7 ++++
+>>  arch/x86/kvm/vmx/hyperv.h       |  8 +++++
+>>  arch/x86/kvm/vmx/nested.c       | 15 ++++++++
+>>  arch/x86/kvm/x86.c              | 62 ++++++++++++++++++++++++---------
+>>  10 files changed, 147 insertions(+), 31 deletions(-)
+>> 
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index 7fb2810f4573..e5b881dda747 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -1095,6 +1095,7 @@ enum hv_tsc_page_status {
+>>  	HV_TSC_PAGE_BROKEN,
+>>  };
+>>  
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  /* Hyper-V emulation context */
+>>  struct kvm_hv {
+>>  	struct mutex hv_lock;
+>> @@ -1127,6 +1128,7 @@ struct kvm_hv {
+>>  
+>>  	struct kvm_hv_syndbg hv_syndbg;
+>>  };
+>> +#endif
+>>  
+>>  struct msr_bitmap_range {
+>>  	u32 flags;
+>> @@ -1349,7 +1351,9 @@ struct kvm_arch {
+>>  	/* reads protected by irq_srcu, writes by irq_lock */
+>>  	struct hlist_head mask_notifier_list;
+>>  
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	struct kvm_hv hyperv;
+>> +#endif
+>>  
+>>  #ifdef CONFIG_KVM_XEN
+>>  	struct kvm_xen xen;
+>> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+>> index 950c12868d30..93930cef9b3b 100644
+>> --- a/arch/x86/kvm/Kconfig
+>> +++ b/arch/x86/kvm/Kconfig
+>> @@ -129,6 +129,20 @@ config KVM_SMM
+>>  
+>>  	  If unsure, say Y.
+>>  
+>> +config KVM_HYPERV
+>> +	bool "Support for Microsoft Hyper-V emulation"
+>> +	depends on KVM
+>> +	default y
+>> +	help
+>> +	  Provides KVM support for emulating Microsoft Hyper-V.  This allows KVM
+>> +	  to expose a subset of the paravirtualized interfaces defined in the
+>> +	  Hyper-V Hypervisor Top-Level Functional Specification (TLFS):
+>> +	  https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/reference/tlfs
+>> +	  These interfaces are required for the correct and performant functioning
+>> +	  of Windows and Hyper-V guests on KVM.
+> Looks very good.
+>
+>> +
+>> +	  If unsure, say "Y".
+>> +
+>>  config KVM_XEN
+>>  	bool "Support for Xen hypercall interface"
+>>  	depends on KVM
+>> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+>> index 8ea872401cd6..b97b875ad75f 100644
+>> --- a/arch/x86/kvm/Makefile
+>> +++ b/arch/x86/kvm/Makefile
+>> @@ -11,32 +11,33 @@ include $(srctree)/virt/kvm/Makefile.kvm
+>>  
+>>  kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
+>>  			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
+>> -			   hyperv.o debugfs.o mmu/mmu.o mmu/page_track.o \
+>> +			   debugfs.o mmu/mmu.o mmu/page_track.o \
+>>  			   mmu/spte.o
+>>  
+>> -ifdef CONFIG_HYPERV
+>> -kvm-y			+= kvm_onhyperv.o
+>> -endif
+>> -
+>>  kvm-$(CONFIG_X86_64) += mmu/tdp_iter.o mmu/tdp_mmu.o
+>> +kvm-$(CONFIG_KVM_HYPERV) += hyperv.o
+>>  kvm-$(CONFIG_KVM_XEN)	+= xen.o
+>>  kvm-$(CONFIG_KVM_SMM)	+= smm.o
+>>  
+>>  kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+>> -			   vmx/hyperv.o vmx/hyperv_evmcs.o vmx/nested.o vmx/posted_intr.o
+>> -kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
+>> +			   vmx/nested.o vmx/posted_intr.o
+>>  
+>> -ifdef CONFIG_HYPERV
+>> -kvm-intel-y		+= vmx/vmx_onhyperv.o
+>> -endif
+>> +kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
+>>  
+>>  kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
+>> -			   svm/sev.o svm/hyperv.o
+>> +			   svm/sev.o
+>>  
+>>  ifdef CONFIG_HYPERV
+>> +kvm-y			+= kvm_onhyperv.o
+>> +kvm-intel-y		+= vmx/vmx_onhyperv.o vmx/hyperv_evmcs.o
+>>  kvm-amd-y		+= svm/svm_onhyperv.o
+>>  endif
+>>  
+>> +ifdef CONFIG_KVM_HYPERV
+>> +kvm-intel-y		+= vmx/hyperv.o vmx/hyperv_evmcs.o
+>> +kvm-amd-y		+= svm/hyperv.o
+>> +endif
+>> +
+>>  obj-$(CONFIG_KVM)	+= kvm.o
+>>  obj-$(CONFIG_KVM_INTEL)	+= kvm-intel.o
+>>  obj-$(CONFIG_KVM_AMD)	+= kvm-amd.o
+>
+> This also looks much better.
+>
+>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>> index 464b23ac5f93..da8e0873f63a 100644
+>> --- a/arch/x86/kvm/cpuid.c
+>> +++ b/arch/x86/kvm/cpuid.c
+>> @@ -314,11 +314,15 @@ EXPORT_SYMBOL_GPL(kvm_update_cpuid_runtime);
+>>  
+>>  static bool kvm_cpuid_has_hyperv(struct kvm_cpuid_entry2 *entries, int nent)
+>>  {
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	struct kvm_cpuid_entry2 *entry;
+>>  
+>>  	entry = cpuid_entry2_find(entries, nent, HYPERV_CPUID_INTERFACE,
+>>  				  KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+>>  	return entry && entry->eax == HYPERV_CPUID_SIGNATURE_EAX;
+>> +#else
+>> +	return false;
+>> +#endif
+>>  }
+>>  
+>>  static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>> @@ -433,11 +437,13 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
+>>  		return 0;
+>>  	}
+>>  
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	if (kvm_cpuid_has_hyperv(e2, nent)) {
+>>  		r = kvm_hv_vcpu_init(vcpu);
+>>  		if (r)
+>>  			return r;
+>>  	}
+>> +#endif
+>>  
+>>  	r = kvm_check_cpuid(vcpu, e2, nent);
+>>  	if (r)
+>> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
+>> index 75dcbe598fbc..5c5ec7015136 100644
+>> --- a/arch/x86/kvm/hyperv.h
+>> +++ b/arch/x86/kvm/hyperv.h
+>> @@ -24,6 +24,8 @@
+>>  #include <linux/kvm_host.h>
+>>  #include "x86.h"
+>>  
+>> +#ifdef CONFIG_KVM_HYPERV
+>> +
+>>  /* "Hv#1" signature */
+>>  #define HYPERV_CPUID_SIGNATURE_EAX 0x31237648
+>>  
+>> @@ -259,5 +261,29 @@ static inline void kvm_hv_nested_transtion_tlb_flush(struct kvm_vcpu *vcpu, bool
+>>  }
+>>  
+>>  int kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu);
+>> -
+>> -#endif
+>> +#else /* CONFIG_KVM_HYPERV */
+>> +static inline void kvm_hv_setup_tsc_page(struct kvm *kvm,
+>> +					 struct pvclock_vcpu_time_info *hv_clock) {}
+>> +static inline void kvm_hv_request_tsc_page_update(struct kvm *kvm) {}
+>> +static inline void kvm_hv_init_vm(struct kvm *kvm) {}
+>> +static inline void kvm_hv_destroy_vm(struct kvm *kvm) {}
+>> +static inline int kvm_hv_vcpu_init(struct kvm_vcpu *vcpu) { return 0; }
+>> +static inline void kvm_hv_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+>> +static inline bool kvm_hv_hypercall_enabled(struct kvm_vcpu *vcpu) { return false; }
+>> +static inline int kvm_hv_hypercall(struct kvm_vcpu *vcpu) { return HV_STATUS_ACCESS_DENIED; }
+>> +static inline void kvm_hv_vcpu_purge_flush_tlb(struct kvm_vcpu *vcpu) {}
+>> +static inline void kvm_hv_free_pa_page(struct kvm *kvm) {}
+>> +static inline bool kvm_hv_synic_has_vector(struct kvm_vcpu *vcpu, int vector) { return false; }
+>> +static inline bool kvm_hv_synic_auto_eoi_set(struct kvm_vcpu *vcpu, int vector) { return false; }
+>> +static inline void kvm_hv_synic_send_eoi(struct kvm_vcpu *vcpu, int vector) {}
+>> +static inline bool kvm_hv_invtsc_suppressed(struct kvm_vcpu *vcpu) { return false; }
+>> +static inline void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu, bool hyperv_enabled) {}
+>> +static inline bool kvm_hv_has_stimer_pending(struct kvm_vcpu *vcpu) { return false; }
+>> +static inline bool kvm_hv_is_tlb_flush_hcall(struct kvm_vcpu *vcpu) { return false; }
+>> +static inline bool guest_hv_cpuid_has_l2_tlb_flush(struct kvm_vcpu *vcpu) { return false; }
+>> +static inline int kvm_hv_verify_vp_assist(struct kvm_vcpu *vcpu) { return 0; }
+>> +static inline u32 kvm_hv_get_vpindex(struct kvm_vcpu *vcpu) { return vcpu->vcpu_idx; }
+>> +static inline void kvm_hv_nested_transtion_tlb_flush(struct kvm_vcpu *vcpu, bool tdp_enabled) {}
+>> +#endif /* CONFIG_KVM_HYPERV */
+>> +
+>> +#endif /* __ARCH_X86_KVM_HYPERV_H__ */
+>
+>
+>> diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+>> index 16d076a1b91a..68f3f6c26046 100644
+>> --- a/arch/x86/kvm/irq_comm.c
+>> +++ b/arch/x86/kvm/irq_comm.c
+>> @@ -144,7 +144,7 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+>>  	return kvm_irq_delivery_to_apic(kvm, NULL, &irq, NULL);
+>>  }
+>>  
+>> -
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  static int kvm_hv_set_sint(struct kvm_kernel_irq_routing_entry *e,
+>>  		    struct kvm *kvm, int irq_source_id, int level,
+>>  		    bool line_status)
+>> @@ -154,6 +154,7 @@ static int kvm_hv_set_sint(struct kvm_kernel_irq_routing_entry *e,
+>>  
+>>  	return kvm_hv_synic_set_irq(kvm, e->hv_sint.vcpu, e->hv_sint.sint);
+>>  }
+>> +#endif
+>>  
+>>  int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
+>>  			      struct kvm *kvm, int irq_source_id, int level,
+>> @@ -163,9 +164,11 @@ int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
+>>  	int r;
+>>  
+>>  	switch (e->type) {
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	case KVM_IRQ_ROUTING_HV_SINT:
+>>  		return kvm_hv_set_sint(e, kvm, irq_source_id, level,
+>>  				       line_status);
+>> +#endif
+>>  
+>>  	case KVM_IRQ_ROUTING_MSI:
+>>  		if (kvm_msi_route_invalid(kvm, e))
+>> @@ -314,11 +317,13 @@ int kvm_set_routing_entry(struct kvm *kvm,
+>>  		if (kvm_msi_route_invalid(kvm, e))
+>>  			return -EINVAL;
+>>  		break;
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	case KVM_IRQ_ROUTING_HV_SINT:
+>>  		e->set = kvm_hv_set_sint;
+>>  		e->hv_sint.vcpu = ue->u.hv_sint.vcpu;
+>>  		e->hv_sint.sint = ue->u.hv_sint.sint;
+>>  		break;
+>> +#endif
+>>  #ifdef CONFIG_KVM_XEN
+>>  	case KVM_IRQ_ROUTING_XEN_EVTCHN:
+>>  		return kvm_xen_setup_evtchn(kvm, e, ue);
+>> @@ -438,5 +443,7 @@ void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
+>>  
+>>  void kvm_arch_irq_routing_update(struct kvm *kvm)
+>>  {
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	kvm_hv_irq_routing_update(kvm);
+>> +#endif
+>>  }
+>> diff --git a/arch/x86/kvm/svm/hyperv.h b/arch/x86/kvm/svm/hyperv.h
+>> index 02f4784b5d44..14eec2d9b6be 100644
+>> --- a/arch/x86/kvm/svm/hyperv.h
+>> +++ b/arch/x86/kvm/svm/hyperv.h
+>> @@ -11,6 +11,7 @@
+>>  #include "../hyperv.h"
+>>  #include "svm.h"
+>>  
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu)
+>>  {
+>>  	struct vcpu_svm *svm = to_svm(vcpu);
+>> @@ -41,5 +42,11 @@ static inline bool nested_svm_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu)
+>>  }
+>>  
+>>  void svm_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu);
+>> +#else /* CONFIG_KVM_HYPERV */
+>> +static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu) {}
+>> +static inline bool nested_svm_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu) { return false; }
+>> +static inline void svm_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu) {}
+>> +#endif /* CONFIG_KVM_HYPERV */
+>> +
+>>  
+>>  #endif /* __ARCH_X86_KVM_SVM_HYPERV_H__ */
+>> diff --git a/arch/x86/kvm/vmx/hyperv.h b/arch/x86/kvm/vmx/hyperv.h
+>> index d4ed99008518..933ef6cad5e6 100644
+>> --- a/arch/x86/kvm/vmx/hyperv.h
+>> +++ b/arch/x86/kvm/vmx/hyperv.h
+>> @@ -20,6 +20,7 @@ enum nested_evmptrld_status {
+>>  	EVMPTRLD_ERROR,
+>>  };
+>>  
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  u64 nested_get_evmptr(struct kvm_vcpu *vcpu);
+>>  uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu);
+>>  int nested_enable_evmcs(struct kvm_vcpu *vcpu,
+>> @@ -28,5 +29,12 @@ void nested_evmcs_filter_control_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 *
+>>  int nested_evmcs_check_controls(struct vmcs12 *vmcs12);
+>>  bool nested_evmcs_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu);
+>>  void vmx_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu);
+>> +#else
+>> +static inline u64 nested_get_evmptr(struct kvm_vcpu *vcpu) { return EVMPTR_INVALID; }
+>> +static inline void nested_evmcs_filter_control_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 *pdata) {}
+>> +static inline bool nested_evmcs_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu) { return false; }
+>> +static inline int nested_evmcs_check_controls(struct vmcs12 *vmcs12) { return 0; }
+>> +#endif
+>> +
+>>  
+>>  #endif /* __KVM_X86_VMX_HYPERV_H */
+>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>> index 382c0746d069..d0d735974b2c 100644
+>> --- a/arch/x86/kvm/vmx/nested.c
+>> +++ b/arch/x86/kvm/vmx/nested.c
+>> @@ -226,6 +226,7 @@ static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
+>>  
+>>  static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
+>>  {
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+>>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>>  
+>> @@ -241,6 +242,7 @@ static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
+>>  		hv_vcpu->nested.vm_id = 0;
+>>  		hv_vcpu->nested.vp_id = 0;
+>>  	}
+>> +#endif
+>>  }
+>>  
+>>  static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
+>> @@ -1570,6 +1572,7 @@ static void copy_vmcs12_to_shadow(struct vcpu_vmx *vmx)
+>>  	vmcs_load(vmx->loaded_vmcs->vmcs);
+>>  }
+>>  
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields)
+>>  {
+>>  	struct vmcs12 *vmcs12 = vmx->nested.cached_vmcs12;
+>> @@ -2077,6 +2080,10 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+>>  
+>>  	return EVMPTRLD_SUCCEEDED;
+>>  }
+>> +#else /* CONFIG_KVM_HYPERV */
+>> +static inline void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields) {}
+>> +static inline void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx) {}
+>> +#endif /* CONFIG_KVM_HYPERV */
+>>  
+>>  void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu)
+>>  {
+>> @@ -3155,6 +3162,7 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
+>>  	return 0;
+>>  }
+>>  
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+>>  {
+>>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>> @@ -3182,6 +3190,9 @@ static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+>>  
+>>  	return true;
+>>  }
+>> +#else
+>> +static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu) { return true; }
+>> +#endif
+>>  
+>>  static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+>>  {
+>> @@ -3552,11 +3563,13 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+>>  	if (!nested_vmx_check_permission(vcpu))
+>>  		return 1;
+>>  
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	evmptrld_status = nested_vmx_handle_enlightened_vmptrld(vcpu, launch);
+>>  	if (evmptrld_status == EVMPTRLD_ERROR) {
+>>  		kvm_queue_exception(vcpu, UD_VECTOR);
+>>  		return 1;
+>>  	}
+>> +#endif
+>>  
+>>  	kvm_pmu_trigger_event(vcpu, PERF_COUNT_HW_BRANCH_INSTRUCTIONS);
+>>  
+>> @@ -7090,7 +7103,9 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
+>>  	.set_state = vmx_set_nested_state,
+>>  	.get_nested_state_pages = vmx_get_nested_state_pages,
+>>  	.write_log_dirty = nested_vmx_write_pml_buffer,
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	.enable_evmcs = nested_enable_evmcs,
+>>  	.get_evmcs_version = nested_get_evmcs_version,
+>>  	.hv_inject_synthetic_vmexit_post_tlb_flush = vmx_hv_inject_synthetic_vmexit_post_tlb_flush,
+>> +#endif
+>>  };
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index cc2524598368..8ef9898092cd 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -1504,6 +1504,8 @@ static unsigned num_msrs_to_save;
+>>  static const u32 emulated_msrs_all[] = {
+>>  	MSR_KVM_SYSTEM_TIME, MSR_KVM_WALL_CLOCK,
+>>  	MSR_KVM_SYSTEM_TIME_NEW, MSR_KVM_WALL_CLOCK_NEW,
+>> +
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	HV_X64_MSR_GUEST_OS_ID, HV_X64_MSR_HYPERCALL,
+>>  	HV_X64_MSR_TIME_REF_COUNT, HV_X64_MSR_REFERENCE_TSC,
+>>  	HV_X64_MSR_TSC_FREQUENCY, HV_X64_MSR_APIC_FREQUENCY,
+>> @@ -1521,6 +1523,7 @@ static const u32 emulated_msrs_all[] = {
+>>  	HV_X64_MSR_SYNDBG_CONTROL, HV_X64_MSR_SYNDBG_STATUS,
+>>  	HV_X64_MSR_SYNDBG_SEND_BUFFER, HV_X64_MSR_SYNDBG_RECV_BUFFER,
+>>  	HV_X64_MSR_SYNDBG_PENDING_BUFFER,
+>> +#endif
+>>  
+>>  	MSR_KVM_ASYNC_PF_EN, MSR_KVM_STEAL_TIME,
+>>  	MSR_KVM_PV_EOI_EN, MSR_KVM_ASYNC_PF_INT, MSR_KVM_ASYNC_PF_ACK,
+>> @@ -4022,6 +4025,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>  		 * the need to ignore the workaround.
+>>  		 */
+>>  		break;
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	case HV_X64_MSR_GUEST_OS_ID ... HV_X64_MSR_SINT15:
+>>  	case HV_X64_MSR_SYNDBG_CONTROL ... HV_X64_MSR_SYNDBG_PENDING_BUFFER:
+>>  	case HV_X64_MSR_SYNDBG_OPTIONS:
+>> @@ -4034,6 +4038,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>  	case HV_X64_MSR_TSC_INVARIANT_CONTROL:
+>>  		return kvm_hv_set_msr_common(vcpu, msr, data,
+>>  					     msr_info->host_initiated);
+>> +#endif
+>>  	case MSR_IA32_BBL_CR_CTL3:
+>>  		/* Drop writes to this legacy MSR -- see rdmsr
+>>  		 * counterpart for further detail.
+>> @@ -4378,6 +4383,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>  		 */
+>>  		msr_info->data = 0x20000000;
+>>  		break;
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	case HV_X64_MSR_GUEST_OS_ID ... HV_X64_MSR_SINT15:
+>>  	case HV_X64_MSR_SYNDBG_CONTROL ... HV_X64_MSR_SYNDBG_PENDING_BUFFER:
+>>  	case HV_X64_MSR_SYNDBG_OPTIONS:
+>> @@ -4391,6 +4397,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>  		return kvm_hv_get_msr_common(vcpu,
+>>  					     msr_info->index, &msr_info->data,
+>>  					     msr_info->host_initiated);
+>> +#endif
+>>  	case MSR_IA32_BBL_CR_CTL3:
+>>  		/* This legacy MSR exists but isn't fully documented in current
+>>  		 * silicon.  It is however accessed by winxp in very narrow
+>> @@ -4528,6 +4535,7 @@ static inline bool kvm_can_mwait_in_guest(void)
+>>  		boot_cpu_has(X86_FEATURE_ARAT);
+>>  }
+>>  
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  static int kvm_ioctl_get_supported_hv_cpuid(struct kvm_vcpu *vcpu,
+>>  					    struct kvm_cpuid2 __user *cpuid_arg)
+>>  {
+>> @@ -4548,6 +4556,7 @@ static int kvm_ioctl_get_supported_hv_cpuid(struct kvm_vcpu *vcpu,
+>>  
+>>  	return 0;
+>>  }
+>> +#endif
+>>  
+>>  int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  {
+>> @@ -4574,9 +4583,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  	case KVM_CAP_PIT_STATE2:
+>>  	case KVM_CAP_SET_IDENTITY_MAP_ADDR:
+>>  	case KVM_CAP_VCPU_EVENTS:
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	case KVM_CAP_HYPERV:
+>>  	case KVM_CAP_HYPERV_VAPIC:
+>>  	case KVM_CAP_HYPERV_SPIN:
+>> +	case KVM_CAP_HYPERV_TIME:
+>>  	case KVM_CAP_HYPERV_SYNIC:
+>>  	case KVM_CAP_HYPERV_SYNIC2:
+>>  	case KVM_CAP_HYPERV_VP_INDEX:
+>> @@ -4586,6 +4597,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  	case KVM_CAP_HYPERV_CPUID:
+>>  	case KVM_CAP_HYPERV_ENFORCE_CPUID:
+>>  	case KVM_CAP_SYS_HYPERV_CPUID:
+>> +#endif
+>>  	case KVM_CAP_PCI_SEGMENT:
+>>  	case KVM_CAP_DEBUGREGS:
+>>  	case KVM_CAP_X86_ROBUST_SINGLESTEP:
+>> @@ -4595,7 +4607,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  	case KVM_CAP_GET_TSC_KHZ:
+>>  	case KVM_CAP_KVMCLOCK_CTRL:
+>>  	case KVM_CAP_READONLY_MEM:
+>> -	case KVM_CAP_HYPERV_TIME:
+>>  	case KVM_CAP_IOAPIC_POLARITY_IGNORED:
+>>  	case KVM_CAP_TSC_DEADLINE_TIMER:
+>>  	case KVM_CAP_DISABLE_QUIRKS:
+>> @@ -4705,12 +4716,14 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  		r = kvm_x86_ops.nested_ops->get_state ?
+>>  			kvm_x86_ops.nested_ops->get_state(NULL, NULL, 0) : 0;
+>>  		break;
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	case KVM_CAP_HYPERV_DIRECT_TLBFLUSH:
+>>  		r = kvm_x86_ops.enable_l2_tlb_flush != NULL;
+>>  		break;
+>>  	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
+>>  		r = kvm_x86_ops.nested_ops->enable_evmcs != NULL;
+>>  		break;
+>> +#endif
+>>  	case KVM_CAP_SMALLER_MAXPHYADDR:
+>>  		r = (int) allow_smaller_maxphyaddr;
+>>  		break;
+>> @@ -4872,9 +4885,11 @@ long kvm_arch_dev_ioctl(struct file *filp,
+>>  	case KVM_GET_MSRS:
+>>  		r = msr_io(NULL, argp, do_get_msr_feature, 1);
+>>  		break;
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	case KVM_GET_SUPPORTED_HV_CPUID:
+>>  		r = kvm_ioctl_get_supported_hv_cpuid(NULL, argp);
+>>  		break;
+>> +#endif
+>>  	case KVM_GET_DEVICE_ATTR: {
+>>  		struct kvm_device_attr attr;
+>>  		r = -EFAULT;
+>> @@ -5700,14 +5715,11 @@ static int kvm_vcpu_ioctl_device_attr(struct kvm_vcpu *vcpu,
+>>  static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+>>  				     struct kvm_enable_cap *cap)
+>>  {
+>> -	int r;
+>> -	uint16_t vmcs_version;
+>> -	void __user *user_ptr;
+>> -
+>>  	if (cap->flags)
+>>  		return -EINVAL;
+>>  
+>>  	switch (cap->cap) {
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	case KVM_CAP_HYPERV_SYNIC2:
+>>  		if (cap->args[0])
+>>  			return -EINVAL;
+>> @@ -5719,16 +5731,22 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+>>  		return kvm_hv_activate_synic(vcpu, cap->cap ==
+>>  					     KVM_CAP_HYPERV_SYNIC2);
+>>  	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
+>> -		if (!kvm_x86_ops.nested_ops->enable_evmcs)
+>> -			return -ENOTTY;
+>> -		r = kvm_x86_ops.nested_ops->enable_evmcs(vcpu, &vmcs_version);
+>> -		if (!r) {
+>> -			user_ptr = (void __user *)(uintptr_t)cap->args[0];
+>> -			if (copy_to_user(user_ptr, &vmcs_version,
+>> -					 sizeof(vmcs_version)))
+>> -				r = -EFAULT;
+>> +		{
+>> +			int r;
+>> +			uint16_t vmcs_version;
+>> +			void __user *user_ptr;
+>> +
+>> +			if (!kvm_x86_ops.nested_ops->enable_evmcs)
+>> +				return -ENOTTY;
+>> +			r = kvm_x86_ops.nested_ops->enable_evmcs(vcpu, &vmcs_version);
+>> +			if (!r) {
+>> +				user_ptr = (void __user *)(uintptr_t)cap->args[0];
+>> +				if (copy_to_user(user_ptr, &vmcs_version,
+>> +						 sizeof(vmcs_version)))
+>> +					r = -EFAULT;
+>> +			}
+>> +			return r;
+>>  		}
+>> -		return r;
+>
+> Minor nitpick: Unless I missed something the above is just refactoring. Can this be split
+> into a separate patch?
 
-Argh, I didn't add a check to see if forced emulation is actually enabled (=
-forced
-emulation uses a magic "prefix" to trigger a #UD, which KVM intercepts; if =
-forced
-emulation isn't enabled, KVM ignores the magic prefix and reflects the #UD =
-back
-into the guest).
+Yea, it's even less than refactoring: basically, we just need to avoid
+"unused variable" warning when !CONFIG_KVM_HYPERV so we need to declare
+'vmcs_version' and 'user_ptr' locally. This can certainly be done in a
+separate patch but without CONFIG_KVM_HYPERV it would look like a
+no-op so I'm on the fence.
 
-This fixes the test for me:
+>
+>
+>>  	case KVM_CAP_HYPERV_DIRECT_TLBFLUSH:
+>>  		if (!kvm_x86_ops.enable_l2_tlb_flush)
+>>  			return -ENOTTY;
+>> @@ -5737,6 +5755,7 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+>>  
+>>  	case KVM_CAP_HYPERV_ENFORCE_CPUID:
+>>  		return kvm_hv_set_enforce_cpuid(vcpu, cap->args[0]);
+>> +#endif
+>>  
+>>  	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
+>>  		vcpu->arch.pv_cpuid.enforce = cap->args[0];
+>> @@ -6129,9 +6148,11 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>>  		srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>>  		break;
+>>  	}
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	case KVM_GET_SUPPORTED_HV_CPUID:
+>>  		r = kvm_ioctl_get_supported_hv_cpuid(vcpu, argp);
+>>  		break;
+>> +#endif
+>>  #ifdef CONFIG_KVM_XEN
+>>  	case KVM_XEN_VCPU_GET_ATTR: {
+>>  		struct kvm_xen_vcpu_attr xva;
+>> @@ -7189,6 +7210,7 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>>  		r = static_call(kvm_x86_mem_enc_unregister_region)(kvm, &region);
+>>  		break;
+>>  	}
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	case KVM_HYPERV_EVENTFD: {
+>>  		struct kvm_hyperv_eventfd hvevfd;
+>>  
+>> @@ -7198,6 +7220,7 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>>  		r = kvm_vm_ioctl_hv_eventfd(kvm, &hvevfd);
+>>  		break;
+>>  	}
+>> +#endif
+>>  	case KVM_SET_PMU_EVENT_FILTER:
+>>  		r = kvm_vm_ioctl_set_pmu_event_filter(kvm, argp);
+>>  		break;
+>> @@ -10576,19 +10599,20 @@ static void vcpu_scan_ioapic(struct kvm_vcpu *vcpu)
+>>  
+>>  static void vcpu_load_eoi_exitmap(struct kvm_vcpu *vcpu)
+>>  {
+>> -	u64 eoi_exit_bitmap[4];
+>> -
+>>  	if (!kvm_apic_hw_enabled(vcpu->arch.apic))
+>>  		return;
+>>  
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  	if (to_hv_vcpu(vcpu)) {
+>> +		u64 eoi_exit_bitmap[4];
+>> +
+>>  		bitmap_or((ulong *)eoi_exit_bitmap,
+>>  			  vcpu->arch.ioapic_handled_vectors,
+>>  			  to_hv_synic(vcpu)->vec_bitmap, 256);
+>>  		static_call_cond(kvm_x86_load_eoi_exitmap)(vcpu, eoi_exit_bitmap);
+>>  		return;
+>>  	}
+>> -
+>> +#endif
+>
+> Same here.
+>
 
----
- .../selftests/kvm/x86_64/pmu_counters_test.c  | 42 ++++++++++++-------
- 1 file changed, 26 insertions(+), 16 deletions(-)
+Yep, same story: 'eoi_exit_bitmap' is only used when CONFIG_KVM_HYPERV
+so we need to move it under #ifdef. I hope it's OK to keep it here as
+the change is really tiny and helps us to avoid second #ifdef.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools=
-/testing/selftests/kvm/x86_64/pmu_counters_test.c
-index 248ebe8c0577..ae5f6042f1e8 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-@@ -325,6 +325,26 @@ __GUEST_ASSERT(expect_gp ? vector =3D=3D GP_VECTOR : !=
-vector,			\
- 		       "Expected " #insn "(0x%x) to yield 0x%lx, got 0x%lx",	\
- 		       msr, expected_val, val);
-=20
-+static void guest_test_rdpmc(uint32_t rdpmc_idx, bool expect_success,
-+			     uint64_t expected_val)
-+{
-+	uint8_t vector;
-+	uint64_t val;
-+
-+	vector =3D rdpmc_safe(rdpmc_idx, &val);
-+	GUEST_ASSERT_PMC_MSR_ACCESS(RDPMC, rdpmc_idx, !expect_success, vector);
-+	if (expect_success)
-+		GUEST_ASSERT_PMC_VALUE(RDPMC, rdpmc_idx, val, expected_val);
-+
-+	if (!is_forced_emulation_enabled)
-+		return;
-+
-+	vector =3D rdpmc_safe_fep(rdpmc_idx, &val);
-+	GUEST_ASSERT_PMC_MSR_ACCESS(RDPMC, rdpmc_idx, !expect_success, vector);
-+	if (expect_success)
-+		GUEST_ASSERT_PMC_VALUE(RDPMC, rdpmc_idx, val, expected_val);
-+}
-+
- static void guest_rd_wr_counters(uint32_t base_msr, uint8_t nr_possible_co=
-unters,
- 				 uint8_t nr_counters, uint32_t or_mask)
- {
-@@ -367,20 +387,15 @@ static void guest_rd_wr_counters(uint32_t base_msr, u=
-int8_t nr_possible_counters
- 		if (!expect_gp)
- 			GUEST_ASSERT_PMC_VALUE(RDMSR, msr, val, expected_val);
-=20
-+		/*
-+		 * Redo the read tests with RDPMC, which has different indexing
-+		 * semantics and additional capabilities.
-+		 */
- 		rdpmc_idx =3D i;
- 		if (base_msr =3D=3D MSR_CORE_PERF_FIXED_CTR0)
- 			rdpmc_idx |=3D INTEL_RDPMC_FIXED;
-=20
--		/* Redo the read tests with RDPMC, and with forced emulation. */
--		vector =3D rdpmc_safe(rdpmc_idx, &val);
--		GUEST_ASSERT_PMC_MSR_ACCESS(RDPMC, rdpmc_idx, !expect_success, vector);
--		if (expect_success)
--			GUEST_ASSERT_PMC_VALUE(RDPMC, rdpmc_idx, val, expected_val);
--
--		vector =3D rdpmc_safe_fep(rdpmc_idx, &val);
--		GUEST_ASSERT_PMC_MSR_ACCESS(RDPMC, rdpmc_idx, !expect_success, vector);
--		if (expect_success)
--			GUEST_ASSERT_PMC_VALUE(RDPMC, rdpmc_idx, val, expected_val);
-+		guest_test_rdpmc(rdpmc_idx, expect_success, expected_val);
-=20
- 		/*
- 		 * KVM doesn't support non-architectural PMUs, i.e. it should
-@@ -389,12 +404,7 @@ static void guest_rd_wr_counters(uint32_t base_msr, ui=
-nt8_t nr_possible_counters
- 		 */
- 		GUEST_ASSERT(!expect_success || !pmu_has_fast_mode);
- 		rdpmc_idx |=3D INTEL_RDPMC_FAST;
--
--		vector =3D rdpmc_safe(rdpmc_idx, &val);
--		GUEST_ASSERT_PMC_MSR_ACCESS(RDPMC, rdpmc_idx, true, vector);
--
--		vector =3D rdpmc_safe_fep(rdpmc_idx, &val);
--		GUEST_ASSERT_PMC_MSR_ACCESS(RDPMC, rdpmc_idx, true, vector);
-+		guest_test_rdpmc(rdpmc_idx, false, -1ull);
-=20
- 		vector =3D wrmsr_safe(msr, 0);
- 		GUEST_ASSERT_PMC_MSR_ACCESS(WRMSR, msr, expect_gp, vector);
+>>  	static_call_cond(kvm_x86_load_eoi_exitmap)(
+>>  		vcpu, (u64 *)vcpu->arch.ioapic_handled_vectors);
+>>  }
+>> @@ -10679,9 +10703,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>>  		 * the flushes are considered "remote" and not "local" because
+>>  		 * the requests can be initiated from other vCPUs.
+>>  		 */
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  		if (kvm_check_request(KVM_REQ_HV_TLB_FLUSH, vcpu) &&
+>>  		    kvm_hv_vcpu_flush_tlb(vcpu))
+>>  			kvm_vcpu_flush_tlb_guest(vcpu);
+>> +#endif
+>>  
+>>  		if (kvm_check_request(KVM_REQ_REPORT_TPR_ACCESS, vcpu)) {
+>>  			vcpu->run->exit_reason = KVM_EXIT_TPR_ACCESS;
+>> @@ -10734,6 +10760,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>>  			vcpu_load_eoi_exitmap(vcpu);
+>>  		if (kvm_check_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu))
+>>  			kvm_vcpu_reload_apic_access_page(vcpu);
+>> +#ifdef CONFIG_KVM_HYPERV
+>>  		if (kvm_check_request(KVM_REQ_HV_CRASH, vcpu)) {
+>>  			vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+>>  			vcpu->run->system_event.type = KVM_SYSTEM_EVENT_CRASH;
+>> @@ -10764,6 +10791,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>>  		 */
+>>  		if (kvm_check_request(KVM_REQ_HV_STIMER, vcpu))
+>>  			kvm_hv_process_stimers(vcpu);
+>> +#endif
+>>  		if (kvm_check_request(KVM_REQ_APICV_UPDATE, vcpu))
+>>  			kvm_vcpu_update_apicv(vcpu);
+>>  		if (kvm_check_request(KVM_REQ_APF_READY, vcpu))
+>
+> Besides nitpicks,
+>
+> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+>
 
-base-commit: 743a1a6d106931691be32e081e929d9b3de5777f
---=20
+Thanks!
+
+>
+> Best regards,
+> 	Maxim Levitsky
+>
+>
+
+-- 
+Vitaly
 
 
