@@ -1,41 +1,41 @@
-Return-Path: <kvm+bounces-1544-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1551-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25A847E94DA
-	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 03:32:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 059D77E94F1
+	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 03:33:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74B5BB20A33
-	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 02:32:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEAC4281024
+	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 02:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E37F9FB;
-	Mon, 13 Nov 2023 02:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69EF51C6B3;
+	Mon, 13 Nov 2023 02:32:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="Wqdj2+CU"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="JKmMqdli"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425D88C11
-	for <kvm@vger.kernel.org>; Mon, 13 Nov 2023 02:31:55 +0000 (UTC)
-X-Greylist: delayed 426 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 12 Nov 2023 18:31:51 PST
-Received: from smtp-1909.mail.infomaniak.ch (smtp-1909.mail.infomaniak.ch [185.125.25.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2A2310C
-	for <kvm@vger.kernel.org>; Sun, 12 Nov 2023 18:31:51 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111BC18634
+	for <kvm@vger.kernel.org>; Mon, 13 Nov 2023 02:32:32 +0000 (UTC)
+X-Greylist: delayed 501 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 12 Nov 2023 18:32:28 PST
+Received: from smtp-8fac.mail.infomaniak.ch (smtp-8fac.mail.infomaniak.ch [83.166.143.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B401310D
+	for <kvm@vger.kernel.org>; Sun, 12 Nov 2023 18:32:28 -0800 (PST)
 Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
-	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4STCtW49lkzMq2Gn;
-	Mon, 13 Nov 2023 02:24:35 +0000 (UTC)
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4STCtV157dz3W;
-	Mon, 13 Nov 2023 03:24:34 +0100 (CET)
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4STCtb03xVzMpvcL;
+	Mon, 13 Nov 2023 02:24:39 +0000 (UTC)
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4STCtY6j2Kz3W;
+	Mon, 13 Nov 2023 03:24:37 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1699842275;
-	bh=o9nqKbiugyVsavDfBV6aqCgZeoXT/7P+XJT3zGIQ/Fs=;
+	s=20191114; t=1699842278;
+	bh=udX3yMbRw+y6U4YMfanKu8XE/62XvcB7w1fSqqDyDOI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Wqdj2+CUV44d4HuZMwuSPZXcGHSanzUo3Ulx4D8YehMH9U5vcbFl7jLW7UcFqNia4
-	 y2LVudO16hFYsUqLi3Nu+P7n0Bmi1mQVJg9RF5u2Z1azQ1wphiWgO5ISohde0JzGD5
-	 Oin1vdzYOHYknvXN+6DvT1FtaqYxe8GF44LgGvKQ=
+	b=JKmMqdlijgI0WHD2CFxV/y7DWfB+LUKrwQo0xOX8EfXAZsvA9YZ7OO5gDS9iDz+rl
+	 OhhkExnEBcdos98SON70W/UL9RJeu0hGR5koDZT8lkh5am5LEoQnacmgelAtWgQqxy
+	 GoKDTdCaRbpksDhhbdbuDq2zFJFNL69+pG5malPA=
 From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
 To: Borislav Petkov <bp@alien8.de>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
@@ -76,9 +76,9 @@ Cc: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
 	virtualization@lists.linux-foundation.org,
 	x86@kernel.org,
 	xen-devel@lists.xenproject.org
-Subject: [RFC PATCH v2 11/19] KVM: x86: Add new hypercall to set EPT permissions
-Date: Sun, 12 Nov 2023 21:23:18 -0500
-Message-ID: <20231113022326.24388-12-mic@digikod.net>
+Subject: [RFC PATCH v2 12/19] x86: Implement the Memory Table feature to store arbitrary per-page data
+Date: Sun, 12 Nov 2023 21:23:19 -0500
+Message-ID: <20231113022326.24388-13-mic@digikod.net>
 In-Reply-To: <20231113022326.24388-1-mic@digikod.net>
 References: <20231113022326.24388-1-mic@digikod.net>
 Precedence: bulk
@@ -93,506 +93,393 @@ X-Infomaniak-Routing: alpha
 
 From: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
 
-Add a new KVM_HC_PROTECT_MEMORY hypercall that enables a guest to set
-EPT permissions for guest pages.
+This feature can be used by a consumer to associate any arbitrary
+pointer with a physical page. The feature implements a page table format
+that mirrors the hardware page table. A leaf entry in the table points
+to consumer data for that page.
 
-Until now, all of the guest pages (except Page Tracked pages) are given
-RWX permissions in the EPT. In Heki, we want to restrict the permissions
-to what is strictly needed. For instance, a text page only needs R_X. A
-read-only data page only needs R__. A normal data page only needs RW_.
+The page table format has these advantages:
 
-The guest will pass a page list to the hypercall. The page list is a
-list of one or more physical pages each of which contains a array of
-guest ranges and attributes. Currently, the attributes only contain
-permissions. In the future, other attributes may be added.  The
-hypervisor will apply the specified permissions in the EPT.
+- The format allows for a sparse representation. This is useful since
+  the physical address space can be large and is typically sparsely
+  populated in a system.
 
-When a guest try to access its memory in a way which is not allowed, KVM
-creates a synthetic kernel page fault. This fault should be handled by
-the guest, which is not currently the case, making it try again and
-again.  This will be part of a follow-up patch series.
+- A consumer of this feature can choose to populate data just for the
+  pages he is interested in.
 
-When enabled, KASAN reveals a bug in the memory attributes patches. We
-didn't find the source of this issue yet.
+- Information can be stored for large pages, if a consumer wishes.
+
+For instance, for Heki, the guest kernel uses this to create permissions
+counters for each guest physical page. The permissions counters reflects
+the collective permissions for a guest physical page across all mappings
+to that page. This allows the guest to request the hypervisor to set
+only the necessary permissions for a guest physical page in the EPT
+(instead of RWX).
+
+This feature could also be used to improve the KVM's memory attribute
+and the write page tracking.
+
+We will support large page entries in mem_table in a future version
+thanks to extra mem_table_ops's merge() and split() operations.
 
 Cc: Borislav Petkov <bp@alien8.de>
 Cc: Dave Hansen <dave.hansen@linux.intel.com>
 Cc: H. Peter Anvin <hpa@zytor.com>
 Cc: Ingo Molnar <mingo@redhat.com>
 Cc: Kees Cook <keescook@chromium.org>
+Cc: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+Cc: Mickaël Salaün <mic@digikod.net>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Sean Christopherson <seanjc@google.com>
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc: Wanpeng Li <wanpengli@tencent.com>
-Co-developed-by: Mickaël Salaün <mic@digikod.net>
-Signed-off-by: Mickaël Salaün <mic@digikod.net>
 Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
 ---
 
 Changes since v1:
-
-The original hypercall contained support for statically defined sections
-(text, rodata, etc). It has been redesigned like this:
-
-- The previous version accepted an array of physically contiguous
-  ranges. This is appropriate for statically defined sections which are
-  loaded in contiguous memory.  But, for other cases like module
-  loading, the pages would be discontiguous. The current version of the
-  hypercall accepts a page list to fix this.
-
-- The previous version passed permission combinations. E.g.,
-  HEKI_MEM_ATTR_EXEC would imply R_X. The current version passes
-  permissions as memory attributes and each of the permissions must be
-  separately specified. E.g., for text, (MEM_ATTR_READ | MEM_ATTR_EXEC)
-  must be passed.
-
-- The previous version locked down the permissions for guest pages so
-  that once the permissions are set, they cannot be changed. In this
-  version, permissions can be changed dynamically, except when the
-  MEM_ATTR_IMMUTABLE is set.  So, the hypercall has been renamed from
-  KVM_HC_LOCK_MEM_PAGE_RANGES to KVM_HC_PROTECT_MEMORY. The dynamic
-  setting of permissions is needed by the following features (probably
-  not a complete list):
-  - Kprobes and Optprobes
-  - Static call optimization
-  - Jump Label optimization
-  - Ftrace and Livepatch
-  - Module loading and unloading
-  - eBPF JIT
-  - Kexec
-  - Kgdb
-
-Examples:
-- A text page can be made writable very briefly to install a probe or a
-  trace.
-- eBPF JIT can populate a writable page with code and make it
-  read-execute.
-- Module load can load read-only data into a writable page and make the
-  page read-only.
-- When pages are unmapped, their permissions in the EPT must revert to
-  read-write.
+* New patch and new file: kernel/mem_table.c
 ---
- Documentation/virt/kvm/x86/hypercalls.rst |  14 +++
- arch/x86/kvm/mmu/mmu.c                    |  77 +++++++++++++
- arch/x86/kvm/mmu/paging_tmpl.h            |   3 +
- arch/x86/kvm/mmu/spte.c                   |  15 ++-
- arch/x86/kvm/x86.c                        | 130 ++++++++++++++++++++++
- include/linux/heki.h                      |  29 +++++
- include/uapi/linux/kvm_para.h             |   1 +
- 7 files changed, 267 insertions(+), 2 deletions(-)
+ arch/x86/kernel/setup.c   |   2 +
+ include/linux/heki.h      |   1 +
+ include/linux/mem_table.h |  55 ++++++++++
+ kernel/Makefile           |   2 +
+ kernel/mem_table.c        | 219 ++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 279 insertions(+)
+ create mode 100644 include/linux/mem_table.h
+ create mode 100644 kernel/mem_table.c
 
-diff --git a/Documentation/virt/kvm/x86/hypercalls.rst b/Documentation/virt/kvm/x86/hypercalls.rst
-index 3178576f4c47..28865d111773 100644
---- a/Documentation/virt/kvm/x86/hypercalls.rst
-+++ b/Documentation/virt/kvm/x86/hypercalls.rst
-@@ -207,3 +207,17 @@ The hypercall lets a guest request control register flags to be pinned for
- itself.
+diff --git a/arch/x86/kernel/setup.c b/arch/x86/kernel/setup.c
+index b098b1fa2470..e7ae46953ae4 100644
+--- a/arch/x86/kernel/setup.c
++++ b/arch/x86/kernel/setup.c
+@@ -25,6 +25,7 @@
+ #include <linux/static_call.h>
+ #include <linux/swiotlb.h>
+ #include <linux/random.h>
++#include <linux/mem_table.h>
  
- Returns 0 on success or a KVM error code otherwise.
-+
-+10. KVM_HC_PROTECT_MEMORY
-+-------------------------
-+
-+:Architecture: x86
-+:Status: active
-+:Purpose: Request permissions to be set in EPT
-+
-+- a0: physical address of a struct heki_page_list
-+
-+The hypercall lets a guest request memory permissions to be set for a list
-+of physical pages.
-+
-+Returns 0 on success or a KVM error code otherwise.
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 2024ff21d036..2d09bcc35462 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -47,9 +47,11 @@
- #include <linux/sched/signal.h>
- #include <linux/uaccess.h>
- #include <linux/hash.h>
-+#include <linux/heki.h>
- #include <linux/kern_levels.h>
- #include <linux/kstrtox.h>
- #include <linux/kthread.h>
-+#include <linux/kvm_mem_attr.h>
+ #include <uapi/linux/mount.h>
  
- #include <asm/page.h>
- #include <asm/memtype.h>
-@@ -4446,6 +4448,75 @@ static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
- 	       mmu_invalidate_retry_gfn(vcpu->kvm, fault->mmu_seq, fault->gfn);
+@@ -1315,6 +1316,7 @@ void __init setup_arch(char **cmdline_p)
+ #endif
+ 
+ 	unwind_init();
++	mem_table_init(PG_LEVEL_4K);
  }
  
-+static bool mem_attr_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-+{
-+	unsigned long perm;
-+	bool noexec, nowrite;
-+
-+	if (unlikely(fault->rsvd))
-+		return false;
-+
-+	if (!fault->present)
-+		return false;
-+
-+	perm = kvm_permissions_get(vcpu->kvm, fault->gfn);
-+	noexec = !(perm & MEM_ATTR_EXEC);
-+	nowrite = !(perm & MEM_ATTR_WRITE);
-+
-+	if (fault->exec && noexec) {
-+		struct x86_exception exception = {
-+			.vector = PF_VECTOR,
-+			.error_code_valid = true,
-+			.error_code = fault->error_code,
-+			.nested_page_fault = false,
-+			/*
-+			 * TODO: This kind of kernel page fault needs to be
-+			 * handled by the guest, which is not currently the
-+			 * case, making it try again and again.
-+			 *
-+			 * You may want to test with cr2_or_gva to see the page
-+			 * fault caught by the guest kernel (thinking it is a
-+			 * user space fault).
-+			 */
-+			.address = static_call(kvm_x86_fault_gva)(vcpu),
-+			.async_page_fault = false,
-+		};
-+
-+		pr_warn_ratelimited(
-+			"heki: Creating fetch #PF at 0x%016llx GFN=%llx\n",
-+			exception.address, fault->gfn);
-+		kvm_inject_page_fault(vcpu, &exception);
-+		return true;
-+	}
-+
-+	if (fault->write && nowrite) {
-+		struct x86_exception exception = {
-+			.vector = PF_VECTOR,
-+			.error_code_valid = true,
-+			.error_code = fault->error_code,
-+			.nested_page_fault = false,
-+			/*
-+			 * TODO: This kind of kernel page fault needs to be
-+			 * handled by the guest, which is not currently the
-+			 * case, making it try again and again.
-+			 *
-+			 * You may want to test with cr2_or_gva to see the page
-+			 * fault caught by the guest kernel (thinking it is a
-+			 * user space fault).
-+			 */
-+			.address = static_call(kvm_x86_fault_gva)(vcpu),
-+			.async_page_fault = false,
-+		};
-+
-+		pr_warn_ratelimited(
-+			"heki: Creating write #PF at 0x%016llx GFN=%llx\n",
-+			exception.address, fault->gfn);
-+		kvm_inject_page_fault(vcpu, &exception);
-+		return true;
-+	}
-+	return false;
-+}
-+
- static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- {
- 	int r;
-@@ -4457,6 +4528,9 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	if (page_fault_handle_page_track(vcpu, fault))
- 		return RET_PF_EMULATE;
- 
-+	if (mem_attr_fault(vcpu, fault))
-+		return RET_PF_RETRY;
-+
- 	r = fast_page_fault(vcpu, fault);
- 	if (r != RET_PF_INVALID)
- 		return r;
-@@ -4537,6 +4611,9 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
- 	if (page_fault_handle_page_track(vcpu, fault))
- 		return RET_PF_EMULATE;
- 
-+	if (mem_attr_fault(vcpu, fault))
-+		return RET_PF_RETRY;
-+
- 	r = fast_page_fault(vcpu, fault);
- 	if (r != RET_PF_INVALID)
- 		return r;
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 08f0c8d28245..49e8295d62dd 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -820,6 +820,9 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 		return RET_PF_EMULATE;
- 	}
- 
-+	if (mem_attr_fault(vcpu, fault))
-+		return RET_PF_RETRY;
-+
- 	r = mmu_topup_memory_caches(vcpu, true);
- 	if (r)
- 		return r;
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index 386cc1e8aab9..d72dc149424c 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -10,6 +10,7 @@
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- 
- #include <linux/kvm_host.h>
-+#include <linux/kvm_mem_attr.h>
- #include "mmu.h"
- #include "mmu_internal.h"
- #include "x86.h"
-@@ -143,6 +144,11 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	int level = sp->role.level;
- 	u64 spte = SPTE_MMU_PRESENT_MASK;
- 	bool wrprot = false;
-+	unsigned long perm;
-+
-+	perm = kvm_permissions_get(vcpu->kvm, gfn);
-+	if (!(perm & MEM_ATTR_WRITE))
-+		pte_access &= ~ACC_WRITE_MASK;
- 
- 	WARN_ON_ONCE(!pte_access && !shadow_present_mask);
- 
-@@ -178,10 +184,15 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 		pte_access &= ~ACC_EXEC_MASK;
- 	}
- 
--	if (pte_access & ACC_EXEC_MASK)
-+	if (pte_access & ACC_EXEC_MASK) {
- 		spte |= shadow_x_mask;
--	else
-+#ifdef CONFIG_HEKI
-+		if (enable_mbec && !(perm & MEM_ATTR_EXEC))
-+			spte &= ~VMX_EPT_EXECUTABLE_MASK;
-+#endif
-+	} else {
- 		spte |= shadow_nx_mask;
-+	}
- 
- 	if (pte_access & ACC_USER_MASK)
- 		spte |= shadow_user_mask;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 43c28a6953bf..44f94b75ff16 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -62,6 +62,8 @@
- #include <linux/entry-kvm.h>
- #include <linux/suspend.h>
- #include <linux/smp.h>
-+#include <linux/heki.h>
-+#include <linux/kvm_mem_attr.h>
- 
- #include <trace/events/ipi.h>
- #include <trace/events/kvm.h>
-@@ -9983,6 +9985,131 @@ static void kvm_sched_yield(struct kvm_vcpu *vcpu, unsigned long dest_id)
- 	return;
- }
- 
-+#ifdef CONFIG_HEKI
-+
-+static int heki_protect_memory(struct kvm *const kvm, gpa_t list_pa)
-+{
-+	struct heki_page_list *list, *head;
-+	struct heki_pages *pages;
-+	size_t size;
-+	int i, npages, err = 0;
-+
-+	/* Read in the page list. */
-+	head = NULL;
-+	npages = 0;
-+	while (list_pa) {
-+		list = kmalloc(PAGE_SIZE, GFP_KERNEL);
-+		if (!list) {
-+			/* For want of a better error number. */
-+			err = -KVM_E2BIG;
-+			goto free;
-+		}
-+
-+		err = kvm_read_guest(kvm, list_pa, list, sizeof(*list));
-+		if (err) {
-+			pr_warn("heki: Can't read list %llx\n", list_pa);
-+			err = -KVM_EFAULT;
-+			goto free;
-+		}
-+		list_pa += sizeof(*list);
-+
-+		size = list->npages * sizeof(*pages);
-+		pages = list->pages;
-+		err = kvm_read_guest(kvm, list_pa, pages, size);
-+		if (err) {
-+			pr_warn("heki: Can't read pages %llx\n", list_pa);
-+			err = -KVM_EFAULT;
-+			goto free;
-+		}
-+
-+		list->next = head;
-+		head = list;
-+		npages += list->npages;
-+		list_pa = list->next_pa;
-+	}
-+
-+	/* For kvm_permissions_set() -> kvm_vm_set_mem_attributes() */
-+	mutex_lock(&kvm->slots_arch_lock);
-+
-+	/*
-+	 * Walk the page list, apply the permissions for each guest page and
-+	 * zap the EPT entry of each page. The pages will be faulted in on
-+	 * demand and the correct permissions will be applied at the correct
-+	 * level for the pages.
-+	 */
-+	for (list = head; list; list = list->next) {
-+		pages = list->pages;
-+
-+		for (i = 0; i < list->npages; i++) {
-+			gfn_t gfn_start, gfn_end;
-+			unsigned long permissions;
-+
-+			if (!PAGE_ALIGNED(pages[i].pa)) {
-+				pr_warn("heki: GPA not aligned: %llx\n",
-+					pages[i].pa);
-+				err = -KVM_EINVAL;
-+				goto unlock;
-+			}
-+			if (!PAGE_ALIGNED(pages[i].epa)) {
-+				pr_warn("heki: GPA not aligned: %llx\n",
-+					pages[i].epa);
-+				err = -KVM_EINVAL;
-+				goto unlock;
-+			}
-+
-+			gfn_start = gpa_to_gfn(pages[i].pa);
-+			gfn_end = gpa_to_gfn(pages[i].epa);
-+			permissions = pages[i].permissions;
-+
-+			if (!permissions || (permissions & ~MEM_ATTR_PROT)) {
-+				err = -KVM_EINVAL;
-+				goto unlock;
-+			}
-+
-+			if (!(permissions & MEM_ATTR_EXEC) && !enable_mbec) {
-+				/*
-+				 * Guests can check for MBEC support to avoid
-+				 * this error message. We will continue
-+				 * applying restrictions partially.
-+				 */
-+				pr_warn("heki: Clearing kernel exec "
-+					"depends on MBEC, which is disabled.");
-+				permissions |= MEM_ATTR_EXEC;
-+			}
-+
-+			pr_warn("heki: Request to protect GFNs %llx-%llx"
-+				" with %s permissions=%s%s%s\n",
-+				gfn_start, gfn_end,
-+				(permissions & MEM_ATTR_IMMUTABLE) ?
-+					"immutable" :
-+					"mutable",
-+				(permissions & MEM_ATTR_READ) ? "r" : "_",
-+				(permissions & MEM_ATTR_WRITE) ? "w" : "_",
-+				(permissions & MEM_ATTR_EXEC) ? "x" : "_");
-+
-+			err = kvm_permissions_set(kvm, gfn_start, gfn_end,
-+						  permissions);
-+			if (err) {
-+				pr_warn("heki: Failed to set permissions\n");
-+				goto unlock;
-+			}
-+		}
-+	}
-+
-+unlock:
-+	mutex_unlock(&kvm->slots_arch_lock);
-+
-+free:
-+	while (head) {
-+		list = head;
-+		head = head->next;
-+		kfree(list);
-+	}
-+	return err;
-+}
-+
-+#endif /* CONFIG_HEKI */
-+
- static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
- {
- 	u64 ret = vcpu->run->hypercall.ret;
-@@ -10097,6 +10224,9 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
- 				return ret;
- 		}
- 		break;
-+	case KVM_HC_PROTECT_MEMORY:
-+		ret = heki_protect_memory(vcpu->kvm, a0);
-+		break;
- #endif /* CONFIG_HEKI */
- 	default:
- 		ret = -KVM_ENOSYS;
+ #ifdef CONFIG_X86_32
 diff --git a/include/linux/heki.h b/include/linux/heki.h
-index 96ccb17657e5..89cc9273a968 100644
+index 89cc9273a968..9b0c966c50d1 100644
 --- a/include/linux/heki.h
 +++ b/include/linux/heki.h
-@@ -8,6 +8,7 @@
- #ifndef __HEKI_H__
- #define __HEKI_H__
- 
-+#include <linux/kvm_types.h>
- #include <linux/types.h>
- #include <linux/bug.h>
- #include <linux/cache.h>
-@@ -17,6 +18,32 @@
+@@ -15,6 +15,7 @@
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+ #include <linux/printk.h>
++#include <linux/slab.h>
  
  #ifdef CONFIG_HEKI
  
+diff --git a/include/linux/mem_table.h b/include/linux/mem_table.h
+new file mode 100644
+index 000000000000..738bf12309f3
+--- /dev/null
++++ b/include/linux/mem_table.h
+@@ -0,0 +1,55 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
-+ * This structure contains a guest physical range and its permissions (RWX).
-+ */
-+struct heki_pages {
-+	gpa_t pa;
-+	gpa_t epa;
-+	unsigned long permissions;
-+};
-+
-+/*
-+ * Guest ranges are passed to the VMM or hypervisor so they can be authenticated
-+ * and their permissions can be set in the host page table. When an array of
-+ * these is passed to the Hypervisor or VMM, the array must be in physically
-+ * contiguous memory.
++ * Memory table feature - Definitions.
 + *
-+ * This struct occupies one page. In each page, an array of guest ranges can
-+ * be passed. A guest request to the VMM/Hypervisor may contain a list of
-+ * these structs (linked by "next_pa").
++ * Copyright © 2023 Microsoft Corporation.
 + */
-+struct heki_page_list {
-+	struct heki_page_list *next;
-+	gpa_t next_pa;
-+	unsigned long npages;
-+	struct heki_pages pages[];
++
++#ifndef __MEM_TABLE_H__
++#define __MEM_TABLE_H__
++
++/* clang-format off */
++
++/*
++ * The MEM_TABLE bit is set on entries that point to an intermediate table.
++ * So, this bit is reserved. This means that pointers to consumer data must
++ * be at least two-byte aligned (so the MEM_TABLE bit is 0).
++ */
++#define MEM_TABLE		BIT(0)
++#define IS_LEAF(entry)		!((uintptr_t)entry & MEM_TABLE)
++
++/* clang-format on */
++
++/*
++ * A memory table is arranged exactly like a page table. The memory table
++ * configuration reflects the hardware page table configuration.
++ */
++
++/* Parameters at each level of the memory table hierarchy. */
++struct mem_table_level {
++	unsigned int number;
++	unsigned int nentries;
++	unsigned int shift;
++	unsigned int mask;
 +};
 +
- /*
-  * A hypervisor that supports Heki will instantiate this structure to
-  * provide hypervisor specific functions for Heki.
-@@ -36,6 +63,8 @@ struct heki {
- extern struct heki heki;
- extern bool heki_enabled;
- 
-+extern bool __read_mostly enable_mbec;
++struct mem_table {
++	struct mem_table_level *level;
++	struct mem_table_ops *ops;
++	bool changed;
++	void *entries[];
++};
 +
- void heki_early_init(void);
- void heki_late_init(void);
++/* Operations that need to be supplied by a consumer of memory tables. */
++struct mem_table_ops {
++	void (*free)(void *buf);
++};
++
++void mem_table_init(unsigned int base_level);
++struct mem_table *mem_table_alloc(struct mem_table_ops *ops);
++void mem_table_free(struct mem_table *table);
++void **mem_table_create(struct mem_table *table, phys_addr_t pa);
++void **mem_table_find(struct mem_table *table, phys_addr_t pa,
++		      unsigned int *level_num);
++
++#endif /* __MEM_TABLE_H__ */
+diff --git a/kernel/Makefile b/kernel/Makefile
+index 3947122d618b..dcef03ec5c54 100644
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -131,6 +131,8 @@ obj-$(CONFIG_WATCH_QUEUE) += watch_queue.o
+ obj-$(CONFIG_RESOURCE_KUNIT_TEST) += resource_kunit.o
+ obj-$(CONFIG_SYSCTL_KUNIT_TEST) += sysctl-test.o
  
-diff --git a/include/uapi/linux/kvm_para.h b/include/uapi/linux/kvm_para.h
-index 2ed418704603..938c9006e354 100644
---- a/include/uapi/linux/kvm_para.h
-+++ b/include/uapi/linux/kvm_para.h
-@@ -31,6 +31,7 @@
- #define KVM_HC_SCHED_YIELD		11
- #define KVM_HC_MAP_GPA_RANGE		12
- #define KVM_HC_LOCK_CR_UPDATE		13
-+#define KVM_HC_PROTECT_MEMORY		14
- 
- /*
-  * hypercalls use architecture specific
++obj-$(CONFIG_SPARSEMEM) += mem_table.o
++
+ CFLAGS_stackleak.o += $(DISABLE_STACKLEAK_PLUGIN)
+ obj-$(CONFIG_GCC_PLUGIN_STACKLEAK) += stackleak.o
+ KASAN_SANITIZE_stackleak.o := n
+diff --git a/kernel/mem_table.c b/kernel/mem_table.c
+new file mode 100644
+index 000000000000..280a1b5ddde0
+--- /dev/null
++++ b/kernel/mem_table.c
+@@ -0,0 +1,219 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Memory table feature.
++ *
++ * This feature can be used by a consumer to associate any arbitrary pointer
++ * with a physical page. The feature implements a page table format that
++ * mirrors the hardware page table. A leaf entry in the table points to
++ * consumer data for that page.
++ *
++ * The page table format has these advantages:
++ *
++ *	- The format allows for a sparse representation. This is useful since
++ *	  the physical address space can be large and is typically sparsely
++ *	  populated in a system.
++ *
++ *	- A consumer of this feature can choose to populate data just for
++ *	  the pages he is interested in.
++ *
++ *	- Information can be stored for large pages, if a consumer wishes.
++ *
++ * For instance, for Heki, the guest kernel uses this to create permissions
++ * counters for each guest physical page. The permissions counters reflects the
++ * collective permissions for a guest physical page across all mappings to that
++ * page. This allows the guest to request the hypervisor to set only the
++ * necessary permissions for a guest physical page in the EPT (instead of RWX).
++ *
++ * Copyright © 2023 Microsoft Corporation.
++ */
++
++/*
++ * Memory table functions use recursion for simplicity. The recursion is bounded
++ * by the number of hardware page table levels.
++ *
++ * Locking is left to the caller of these functions.
++ */
++#include <linux/heki.h>
++#include <linux/mem_table.h>
++#include <linux/pgtable.h>
++
++#define TABLE(entry) ((void *)((uintptr_t)entry & ~MEM_TABLE))
++#define ENTRY(table) ((void *)((uintptr_t)table | MEM_TABLE))
++
++/*
++ * Within this feature, the table levels start from 0. On X86, the base level
++ * is not 0.
++ */
++unsigned int mem_table_base_level __ro_after_init;
++unsigned int mem_table_nlevels __ro_after_init;
++struct mem_table_level mem_table_levels[CONFIG_PGTABLE_LEVELS] __ro_after_init;
++
++void __init mem_table_init(unsigned int base_level)
++{
++	struct mem_table_level *level;
++	unsigned long shift, delta_shift;
++	int physmem_bits;
++	int i, max_levels;
++
++	/*
++	 * Compute the actual number of levels present. Compute the parameters
++	 * for each level.
++	 */
++	shift = ilog2(PAGE_SIZE);
++	physmem_bits = PAGE_SHIFT;
++	max_levels = CONFIG_PGTABLE_LEVELS;
++
++	for (i = 0; i < max_levels && physmem_bits < MAX_PHYSMEM_BITS; i++) {
++		level = &mem_table_levels[i];
++
++		switch (i) {
++		case 0:
++			level->nentries = PTRS_PER_PTE;
++			break;
++		case 1:
++			level->nentries = PTRS_PER_PMD;
++			break;
++		case 2:
++			level->nentries = PTRS_PER_PUD;
++			break;
++		case 3:
++			level->nentries = PTRS_PER_P4D;
++			break;
++		case 4:
++			level->nentries = PTRS_PER_PGD;
++			break;
++		}
++		level->number = i;
++		level->shift = shift;
++		level->mask = level->nentries - 1;
++
++		delta_shift = ilog2(level->nentries);
++		shift += delta_shift;
++		physmem_bits += delta_shift;
++	}
++	mem_table_nlevels = i;
++	mem_table_base_level = base_level;
++}
++
++struct mem_table *mem_table_alloc(struct mem_table_ops *ops)
++{
++	struct mem_table_level *level;
++	struct mem_table *table;
++
++	level = &mem_table_levels[mem_table_nlevels - 1];
++
++	table = kzalloc(struct_size(table, entries, level->nentries),
++			GFP_KERNEL);
++	if (table) {
++		table->level = level;
++		table->ops = ops;
++		return table;
++	}
++	return NULL;
++}
++EXPORT_SYMBOL_GPL(mem_table_alloc);
++
++static void _mem_table_free(struct mem_table *table)
++{
++	struct mem_table_level *level = table->level;
++	void **entries = table->entries;
++	struct mem_table_ops *ops = table->ops;
++	int i;
++
++	for (i = 0; i < level->nentries; i++) {
++		if (!entries[i])
++			continue;
++		if (IS_LEAF(entries[i])) {
++			/* The consumer frees the pointer. */
++			ops->free(entries[i]);
++			continue;
++		}
++		_mem_table_free(TABLE(entries[i]));
++	}
++	kfree(table);
++}
++
++void mem_table_free(struct mem_table *table)
++{
++	_mem_table_free(table);
++}
++EXPORT_SYMBOL_GPL(mem_table_free);
++
++static void **_mem_table_find(struct mem_table *table, phys_addr_t pa,
++			      unsigned int *level_number)
++{
++	struct mem_table_level *level = table->level;
++	void **entries = table->entries;
++	unsigned long i;
++
++	i = (pa >> level->shift) & level->mask;
++
++	*level_number = level->number;
++	if (!entries[i])
++		return NULL;
++
++	if (IS_LEAF(entries[i]))
++		return &entries[i];
++
++	return _mem_table_find(TABLE(entries[i]), pa, level_number);
++}
++
++void **mem_table_find(struct mem_table *table, phys_addr_t pa,
++		      unsigned int *level_number)
++{
++	void **entry;
++
++	entry = _mem_table_find(table, pa, level_number);
++	level_number += mem_table_base_level;
++
++	return entry;
++}
++EXPORT_SYMBOL_GPL(mem_table_find);
++
++static void **_mem_table_create(struct mem_table *table, phys_addr_t pa)
++{
++	struct mem_table_level *level = table->level;
++	void **entries = table->entries;
++	unsigned long i;
++
++	table->changed = true;
++	i = (pa >> level->shift) & level->mask;
++
++	if (!level->number) {
++		/*
++		 * Reached the lowest level. Return a pointer to the entry
++		 * so that the consumer can populate it.
++		 */
++		return &entries[i];
++	}
++
++	/*
++	 * If the entry is NULL, then create a lower level table and make the
++	 * entry point to it. Or, if the entry is a leaf, then we need to
++	 * split the entry. In this case as well, create a lower level table
++	 * to split the entry.
++	 */
++	if (!entries[i] || IS_LEAF(entries[i])) {
++		struct mem_table *next;
++
++		/* Create next level table. */
++		level--;
++		next = kzalloc(struct_size(table, entries, level->nentries),
++			       GFP_KERNEL);
++		if (!next)
++			return NULL;
++
++		next->level = level;
++		next->ops = table->ops;
++		next->changed = true;
++		entries[i] = ENTRY(next);
++	}
++
++	return _mem_table_create(TABLE(entries[i]), pa);
++}
++
++void **mem_table_create(struct mem_table *table, phys_addr_t pa)
++{
++	return _mem_table_create(table, pa);
++}
++EXPORT_SYMBOL_GPL(mem_table_create);
 -- 
 2.42.1
 
