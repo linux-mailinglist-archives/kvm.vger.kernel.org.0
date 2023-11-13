@@ -1,41 +1,40 @@
-Return-Path: <kvm+bounces-1551-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1550-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 059D77E94F1
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E4A07E94F2
 	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 03:33:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEAC4281024
-	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 02:33:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 911191C20AFB
+	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 02:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69EF51C6B3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A7131C6B8;
 	Mon, 13 Nov 2023 02:32:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="JKmMqdli"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="K6v5KJH9"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111BC18634
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05CFA18632
 	for <kvm@vger.kernel.org>; Mon, 13 Nov 2023 02:32:32 +0000 (UTC)
-X-Greylist: delayed 501 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 12 Nov 2023 18:32:28 PST
-Received: from smtp-8fac.mail.infomaniak.ch (smtp-8fac.mail.infomaniak.ch [83.166.143.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B401310D
+Received: from smtp-190c.mail.infomaniak.ch (smtp-190c.mail.infomaniak.ch [185.125.25.12])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9CC810E
 	for <kvm@vger.kernel.org>; Sun, 12 Nov 2023 18:32:28 -0800 (PST)
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4STCtb03xVzMpvcL;
-	Mon, 13 Nov 2023 02:24:39 +0000 (UTC)
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4STCtY6j2Kz3W;
-	Mon, 13 Nov 2023 03:24:37 +0100 (CET)
+Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4STCtf4t44zMpvd2;
+	Mon, 13 Nov 2023 02:24:42 +0000 (UTC)
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4STCtd2zG3zMpnPr;
+	Mon, 13 Nov 2023 03:24:41 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1699842278;
-	bh=udX3yMbRw+y6U4YMfanKu8XE/62XvcB7w1fSqqDyDOI=;
+	s=20191114; t=1699842282;
+	bh=hEzwbKiCPTVRprt7TA2n5SNi5zwGnb2iVWTsgeipVHE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JKmMqdlijgI0WHD2CFxV/y7DWfB+LUKrwQo0xOX8EfXAZsvA9YZ7OO5gDS9iDz+rl
-	 OhhkExnEBcdos98SON70W/UL9RJeu0hGR5koDZT8lkh5am5LEoQnacmgelAtWgQqxy
-	 GoKDTdCaRbpksDhhbdbuDq2zFJFNL69+pG5malPA=
+	b=K6v5KJH9jR6IiLGfGMDtfMvhMpsRKAlNdnYP3VLP1tQYDJsD9yOa1l7BiqESRCqDJ
+	 cmZYiFVvTDYPtiXd2tBOhB0CrMCZj3y2+qczeM+o9M04Idv7FHkodSM7IbhjzC/hXd
+	 PiK+ofD1UU5HDgZ8vthIvlYSVcyE4os40daGAPbA=
 From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
 To: Borislav Petkov <bp@alien8.de>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
@@ -76,9 +75,9 @@ Cc: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
 	virtualization@lists.linux-foundation.org,
 	x86@kernel.org,
 	xen-devel@lists.xenproject.org
-Subject: [RFC PATCH v2 12/19] x86: Implement the Memory Table feature to store arbitrary per-page data
-Date: Sun, 12 Nov 2023 21:23:19 -0500
-Message-ID: <20231113022326.24388-13-mic@digikod.net>
+Subject: [RFC PATCH v2 13/19] heki: Implement a kernel page table walker
+Date: Sun, 12 Nov 2023 21:23:20 -0500
+Message-ID: <20231113022326.24388-14-mic@digikod.net>
 In-Reply-To: <20231113022326.24388-1-mic@digikod.net>
 References: <20231113022326.24388-1-mic@digikod.net>
 Precedence: bulk
@@ -93,34 +92,20 @@ X-Infomaniak-Routing: alpha
 
 From: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
 
-This feature can be used by a consumer to associate any arbitrary
-pointer with a physical page. The feature implements a page table format
-that mirrors the hardware page table. A leaf entry in the table points
-to consumer data for that page.
+The Heki feature needs to do the following:
 
-The page table format has these advantages:
+- Find kernel mappings.
 
-- The format allows for a sparse representation. This is useful since
-  the physical address space can be large and is typically sparsely
-  populated in a system.
+- Determine the permissions associated with each mapping.
 
-- A consumer of this feature can choose to populate data just for the
-  pages he is interested in.
+- Determine the collective permissions for a guest physical page across
+  all of its mappings.
 
-- Information can be stored for large pages, if a consumer wishes.
+This way, a guest physical page can reflect only the required
+permissions in the EPT thanks to the KVM_HC_PROTECT_MEMORY hypercall..
 
-For instance, for Heki, the guest kernel uses this to create permissions
-counters for each guest physical page. The permissions counters reflects
-the collective permissions for a guest physical page across all mappings
-to that page. This allows the guest to request the hypervisor to set
-only the necessary permissions for a guest physical page in the EPT
-(instead of RWX).
-
-This feature could also be used to improve the KVM's memory attribute
-and the write page tracking.
-
-We will support large page entries in mem_table in a future version
-thanks to extra mem_table_ops's merge() and split() operations.
+Implement a kernel page table walker that walks all of the kernel
+mappings and calls a callback function for each mapping.
 
 Cc: Borislav Petkov <bp@alien8.de>
 Cc: Dave Hansen <dave.hansen@linux.intel.com>
@@ -128,358 +113,207 @@ Cc: H. Peter Anvin <hpa@zytor.com>
 Cc: Ingo Molnar <mingo@redhat.com>
 Cc: Kees Cook <keescook@chromium.org>
 Cc: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
-Cc: Mickaël Salaün <mic@digikod.net>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Sean Christopherson <seanjc@google.com>
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc: Wanpeng Li <wanpengli@tencent.com>
+Co-developed-by: Mickaël Salaün <mic@digikod.net>
+Signed-off-by: Mickaël Salaün <mic@digikod.net>
 Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
 ---
 
-Changes since v1:
-* New patch and new file: kernel/mem_table.c
+Change since v1:
+* New patch and new file: virt/heki/walk.c
 ---
- arch/x86/kernel/setup.c   |   2 +
- include/linux/heki.h      |   1 +
- include/linux/mem_table.h |  55 ++++++++++
- kernel/Makefile           |   2 +
- kernel/mem_table.c        | 219 ++++++++++++++++++++++++++++++++++++++
- 5 files changed, 279 insertions(+)
- create mode 100644 include/linux/mem_table.h
- create mode 100644 kernel/mem_table.c
+ include/linux/heki.h |  16 +++++
+ virt/heki/Makefile   |   1 +
+ virt/heki/walk.c     | 140 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 157 insertions(+)
+ create mode 100644 virt/heki/walk.c
 
-diff --git a/arch/x86/kernel/setup.c b/arch/x86/kernel/setup.c
-index b098b1fa2470..e7ae46953ae4 100644
---- a/arch/x86/kernel/setup.c
-+++ b/arch/x86/kernel/setup.c
-@@ -25,6 +25,7 @@
- #include <linux/static_call.h>
- #include <linux/swiotlb.h>
- #include <linux/random.h>
-+#include <linux/mem_table.h>
- 
- #include <uapi/linux/mount.h>
- 
-@@ -1315,6 +1316,7 @@ void __init setup_arch(char **cmdline_p)
- #endif
- 
- 	unwind_init();
-+	mem_table_init(PG_LEVEL_4K);
- }
- 
- #ifdef CONFIG_X86_32
 diff --git a/include/linux/heki.h b/include/linux/heki.h
-index 89cc9273a968..9b0c966c50d1 100644
+index 9b0c966c50d1..a7ae0b387dfe 100644
 --- a/include/linux/heki.h
 +++ b/include/linux/heki.h
-@@ -15,6 +15,7 @@
- #include <linux/init.h>
- #include <linux/kernel.h>
- #include <linux/printk.h>
-+#include <linux/slab.h>
+@@ -61,6 +61,22 @@ struct heki {
+ 	struct heki_hypervisor *hypervisor;
+ };
  
- #ifdef CONFIG_HEKI
++/*
++ * The kernel page table is walked to locate kernel mappings. For each
++ * mapping, a callback function is called. The table walker passes information
++ * about the mapping to the callback using this structure.
++ */
++struct heki_args {
++	/* Information passed by the table walker to the callback. */
++	unsigned long va;
++	phys_addr_t pa;
++	size_t size;
++	unsigned long flags;
++};
++
++/* Callback function called by the table walker. */
++typedef void (*heki_func_t)(struct heki_args *args);
++
+ extern struct heki heki;
+ extern bool heki_enabled;
  
-diff --git a/include/linux/mem_table.h b/include/linux/mem_table.h
+diff --git a/virt/heki/Makefile b/virt/heki/Makefile
+index 354e567df71c..a5daa4ff7a4f 100644
+--- a/virt/heki/Makefile
++++ b/virt/heki/Makefile
+@@ -1,3 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ 
+ obj-y += main.o
++obj-y += walk.o
+diff --git a/virt/heki/walk.c b/virt/heki/walk.c
 new file mode 100644
-index 000000000000..738bf12309f3
+index 000000000000..e10b54226fcc
 --- /dev/null
-+++ b/include/linux/mem_table.h
-@@ -0,0 +1,55 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Memory table feature - Definitions.
-+ *
-+ * Copyright © 2023 Microsoft Corporation.
-+ */
-+
-+#ifndef __MEM_TABLE_H__
-+#define __MEM_TABLE_H__
-+
-+/* clang-format off */
-+
-+/*
-+ * The MEM_TABLE bit is set on entries that point to an intermediate table.
-+ * So, this bit is reserved. This means that pointers to consumer data must
-+ * be at least two-byte aligned (so the MEM_TABLE bit is 0).
-+ */
-+#define MEM_TABLE		BIT(0)
-+#define IS_LEAF(entry)		!((uintptr_t)entry & MEM_TABLE)
-+
-+/* clang-format on */
-+
-+/*
-+ * A memory table is arranged exactly like a page table. The memory table
-+ * configuration reflects the hardware page table configuration.
-+ */
-+
-+/* Parameters at each level of the memory table hierarchy. */
-+struct mem_table_level {
-+	unsigned int number;
-+	unsigned int nentries;
-+	unsigned int shift;
-+	unsigned int mask;
-+};
-+
-+struct mem_table {
-+	struct mem_table_level *level;
-+	struct mem_table_ops *ops;
-+	bool changed;
-+	void *entries[];
-+};
-+
-+/* Operations that need to be supplied by a consumer of memory tables. */
-+struct mem_table_ops {
-+	void (*free)(void *buf);
-+};
-+
-+void mem_table_init(unsigned int base_level);
-+struct mem_table *mem_table_alloc(struct mem_table_ops *ops);
-+void mem_table_free(struct mem_table *table);
-+void **mem_table_create(struct mem_table *table, phys_addr_t pa);
-+void **mem_table_find(struct mem_table *table, phys_addr_t pa,
-+		      unsigned int *level_num);
-+
-+#endif /* __MEM_TABLE_H__ */
-diff --git a/kernel/Makefile b/kernel/Makefile
-index 3947122d618b..dcef03ec5c54 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -131,6 +131,8 @@ obj-$(CONFIG_WATCH_QUEUE) += watch_queue.o
- obj-$(CONFIG_RESOURCE_KUNIT_TEST) += resource_kunit.o
- obj-$(CONFIG_SYSCTL_KUNIT_TEST) += sysctl-test.o
- 
-+obj-$(CONFIG_SPARSEMEM) += mem_table.o
-+
- CFLAGS_stackleak.o += $(DISABLE_STACKLEAK_PLUGIN)
- obj-$(CONFIG_GCC_PLUGIN_STACKLEAK) += stackleak.o
- KASAN_SANITIZE_stackleak.o := n
-diff --git a/kernel/mem_table.c b/kernel/mem_table.c
-new file mode 100644
-index 000000000000..280a1b5ddde0
---- /dev/null
-+++ b/kernel/mem_table.c
-@@ -0,0 +1,219 @@
++++ b/virt/heki/walk.c
+@@ -0,0 +1,140 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
-+ * Memory table feature.
++ * Hypervisor Enforced Kernel Integrity (Heki) - Kernel page table walker.
 + *
-+ * This feature can be used by a consumer to associate any arbitrary pointer
-+ * with a physical page. The feature implements a page table format that
-+ * mirrors the hardware page table. A leaf entry in the table points to
-+ * consumer data for that page.
++ * Copyright © 2023 Microsoft Corporation
 + *
-+ * The page table format has these advantages:
-+ *
-+ *	- The format allows for a sparse representation. This is useful since
-+ *	  the physical address space can be large and is typically sparsely
-+ *	  populated in a system.
-+ *
-+ *	- A consumer of this feature can choose to populate data just for
-+ *	  the pages he is interested in.
-+ *
-+ *	- Information can be stored for large pages, if a consumer wishes.
-+ *
-+ * For instance, for Heki, the guest kernel uses this to create permissions
-+ * counters for each guest physical page. The permissions counters reflects the
-+ * collective permissions for a guest physical page across all mappings to that
-+ * page. This allows the guest to request the hypervisor to set only the
-+ * necessary permissions for a guest physical page in the EPT (instead of RWX).
-+ *
-+ * Copyright © 2023 Microsoft Corporation.
++ * Cf. arch/x86/mm/init_64.c
 + */
 +
-+/*
-+ * Memory table functions use recursion for simplicity. The recursion is bounded
-+ * by the number of hardware page table levels.
-+ *
-+ * Locking is left to the caller of these functions.
-+ */
 +#include <linux/heki.h>
-+#include <linux/mem_table.h>
 +#include <linux/pgtable.h>
 +
-+#define TABLE(entry) ((void *)((uintptr_t)entry & ~MEM_TABLE))
-+#define ENTRY(table) ((void *)((uintptr_t)table | MEM_TABLE))
-+
-+/*
-+ * Within this feature, the table levels start from 0. On X86, the base level
-+ * is not 0.
-+ */
-+unsigned int mem_table_base_level __ro_after_init;
-+unsigned int mem_table_nlevels __ro_after_init;
-+struct mem_table_level mem_table_levels[CONFIG_PGTABLE_LEVELS] __ro_after_init;
-+
-+void __init mem_table_init(unsigned int base_level)
++static void heki_walk_pte(pmd_t *pmd, unsigned long va, unsigned long va_end,
++			  heki_func_t func, struct heki_args *args)
 +{
-+	struct mem_table_level *level;
-+	unsigned long shift, delta_shift;
-+	int physmem_bits;
-+	int i, max_levels;
++	pte_t *pte;
++	unsigned long next_va;
 +
-+	/*
-+	 * Compute the actual number of levels present. Compute the parameters
-+	 * for each level.
-+	 */
-+	shift = ilog2(PAGE_SIZE);
-+	physmem_bits = PAGE_SHIFT;
-+	max_levels = CONFIG_PGTABLE_LEVELS;
++	for (pte = pte_offset_kernel(pmd, va); va < va_end;
++	     va = next_va, pte++) {
++		next_va = (va + PAGE_SIZE) & PAGE_MASK;
 +
-+	for (i = 0; i < max_levels && physmem_bits < MAX_PHYSMEM_BITS; i++) {
-+		level = &mem_table_levels[i];
++		if (next_va > va_end)
++			next_va = va_end;
 +
-+		switch (i) {
-+		case 0:
-+			level->nentries = PTRS_PER_PTE;
-+			break;
-+		case 1:
-+			level->nentries = PTRS_PER_PMD;
-+			break;
-+		case 2:
-+			level->nentries = PTRS_PER_PUD;
-+			break;
-+		case 3:
-+			level->nentries = PTRS_PER_P4D;
-+			break;
-+		case 4:
-+			level->nentries = PTRS_PER_PGD;
-+			break;
-+		}
-+		level->number = i;
-+		level->shift = shift;
-+		level->mask = level->nentries - 1;
-+
-+		delta_shift = ilog2(level->nentries);
-+		shift += delta_shift;
-+		physmem_bits += delta_shift;
-+	}
-+	mem_table_nlevels = i;
-+	mem_table_base_level = base_level;
-+}
-+
-+struct mem_table *mem_table_alloc(struct mem_table_ops *ops)
-+{
-+	struct mem_table_level *level;
-+	struct mem_table *table;
-+
-+	level = &mem_table_levels[mem_table_nlevels - 1];
-+
-+	table = kzalloc(struct_size(table, entries, level->nentries),
-+			GFP_KERNEL);
-+	if (table) {
-+		table->level = level;
-+		table->ops = ops;
-+		return table;
-+	}
-+	return NULL;
-+}
-+EXPORT_SYMBOL_GPL(mem_table_alloc);
-+
-+static void _mem_table_free(struct mem_table *table)
-+{
-+	struct mem_table_level *level = table->level;
-+	void **entries = table->entries;
-+	struct mem_table_ops *ops = table->ops;
-+	int i;
-+
-+	for (i = 0; i < level->nentries; i++) {
-+		if (!entries[i])
++		if (!pte_present(*pte))
 +			continue;
-+		if (IS_LEAF(entries[i])) {
-+			/* The consumer frees the pointer. */
-+			ops->free(entries[i]);
++
++		args->va = va;
++		args->pa = pte_pfn(*pte) << PAGE_SHIFT;
++		args->size = PAGE_SIZE;
++		args->flags = pte_flags(*pte);
++
++		func(args);
++	}
++}
++
++static void heki_walk_pmd(pud_t *pud, unsigned long va, unsigned long va_end,
++			  heki_func_t func, struct heki_args *args)
++{
++	pmd_t *pmd;
++	unsigned long next_va;
++
++	for (pmd = pmd_offset(pud, va); va < va_end; va = next_va, pmd++) {
++		next_va = pmd_addr_end(va, va_end);
++
++		if (!pmd_present(*pmd))
 +			continue;
++
++		if (pmd_large(*pmd)) {
++			args->va = va;
++			args->pa = pmd_pfn(*pmd) << PAGE_SHIFT;
++			args->pa += va & (PMD_SIZE - 1);
++			args->size = next_va - va;
++			args->flags = pmd_flags(*pmd);
++
++			func(args);
++		} else {
++			heki_walk_pte(pmd, va, next_va, func, args);
 +		}
-+		_mem_table_free(TABLE(entries[i]));
 +	}
-+	kfree(table);
 +}
 +
-+void mem_table_free(struct mem_table *table)
++static void heki_walk_pud(p4d_t *p4d, unsigned long va, unsigned long va_end,
++			  heki_func_t func, struct heki_args *args)
 +{
-+	_mem_table_free(table);
-+}
-+EXPORT_SYMBOL_GPL(mem_table_free);
++	pud_t *pud;
++	unsigned long next_va;
 +
-+static void **_mem_table_find(struct mem_table *table, phys_addr_t pa,
-+			      unsigned int *level_number)
-+{
-+	struct mem_table_level *level = table->level;
-+	void **entries = table->entries;
-+	unsigned long i;
++	for (pud = pud_offset(p4d, va); va < va_end; va = next_va, pud++) {
++		next_va = pud_addr_end(va, va_end);
 +
-+	i = (pa >> level->shift) & level->mask;
++		if (!pud_present(*pud))
++			continue;
 +
-+	*level_number = level->number;
-+	if (!entries[i])
-+		return NULL;
++		if (pud_large(*pud)) {
++			args->va = va;
++			args->pa = pud_pfn(*pud) << PAGE_SHIFT;
++			args->pa += va & (PUD_SIZE - 1);
++			args->size = next_va - va;
++			args->flags = pud_flags(*pud);
 +
-+	if (IS_LEAF(entries[i]))
-+		return &entries[i];
-+
-+	return _mem_table_find(TABLE(entries[i]), pa, level_number);
-+}
-+
-+void **mem_table_find(struct mem_table *table, phys_addr_t pa,
-+		      unsigned int *level_number)
-+{
-+	void **entry;
-+
-+	entry = _mem_table_find(table, pa, level_number);
-+	level_number += mem_table_base_level;
-+
-+	return entry;
-+}
-+EXPORT_SYMBOL_GPL(mem_table_find);
-+
-+static void **_mem_table_create(struct mem_table *table, phys_addr_t pa)
-+{
-+	struct mem_table_level *level = table->level;
-+	void **entries = table->entries;
-+	unsigned long i;
-+
-+	table->changed = true;
-+	i = (pa >> level->shift) & level->mask;
-+
-+	if (!level->number) {
-+		/*
-+		 * Reached the lowest level. Return a pointer to the entry
-+		 * so that the consumer can populate it.
-+		 */
-+		return &entries[i];
++			func(args);
++		} else {
++			heki_walk_pmd(pud, va, next_va, func, args);
++		}
 +	}
-+
-+	/*
-+	 * If the entry is NULL, then create a lower level table and make the
-+	 * entry point to it. Or, if the entry is a leaf, then we need to
-+	 * split the entry. In this case as well, create a lower level table
-+	 * to split the entry.
-+	 */
-+	if (!entries[i] || IS_LEAF(entries[i])) {
-+		struct mem_table *next;
-+
-+		/* Create next level table. */
-+		level--;
-+		next = kzalloc(struct_size(table, entries, level->nentries),
-+			       GFP_KERNEL);
-+		if (!next)
-+			return NULL;
-+
-+		next->level = level;
-+		next->ops = table->ops;
-+		next->changed = true;
-+		entries[i] = ENTRY(next);
-+	}
-+
-+	return _mem_table_create(TABLE(entries[i]), pa);
 +}
 +
-+void **mem_table_create(struct mem_table *table, phys_addr_t pa)
++static void heki_walk_p4d(pgd_t *pgd, unsigned long va, unsigned long va_end,
++			  heki_func_t func, struct heki_args *args)
 +{
-+	return _mem_table_create(table, pa);
++	p4d_t *p4d;
++	unsigned long next_va;
++
++	for (p4d = p4d_offset(pgd, va); va < va_end; va = next_va, p4d++) {
++		next_va = p4d_addr_end(va, va_end);
++
++		if (!p4d_present(*p4d))
++			continue;
++
++		if (p4d_large(*p4d)) {
++			args->va = va;
++			args->pa = p4d_pfn(*p4d) << PAGE_SHIFT;
++			args->pa += va & (P4D_SIZE - 1);
++			args->size = next_va - va;
++			args->flags = p4d_flags(*p4d);
++
++			func(args);
++		} else {
++			heki_walk_pud(p4d, va, next_va, func, args);
++		}
++	}
 +}
-+EXPORT_SYMBOL_GPL(mem_table_create);
++
++void heki_walk(unsigned long va, unsigned long va_end, heki_func_t func,
++	       struct heki_args *args)
++{
++	pgd_t *pgd;
++	unsigned long next_va;
++
++	for (pgd = pgd_offset_k(va); va < va_end; va = next_va, pgd++) {
++		next_va = pgd_addr_end(va, va_end);
++
++		if (!pgd_present(*pgd))
++			continue;
++
++		if (pgd_large(*pgd)) {
++			args->va = va;
++			args->pa = pgd_pfn(*pgd) << PAGE_SHIFT;
++			args->pa += va & (PGDIR_SIZE - 1);
++			args->size = next_va - va;
++			args->flags = pgd_flags(*pgd);
++
++			func(args);
++		} else {
++			heki_walk_p4d(pgd, va, next_va, func, args);
++		}
++	}
++}
 -- 
 2.42.1
 
