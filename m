@@ -1,114 +1,104 @@
-Return-Path: <kvm+bounces-1609-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1610-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE6917EA204
-	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 18:37:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 887717EA243
+	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 18:43:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF5AD1C208E8
-	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 17:37:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B78F61C20964
+	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 17:43:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E50D224E7;
-	Mon, 13 Nov 2023 17:37:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C1EF224F1;
+	Mon, 13 Nov 2023 17:43:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="yDdz7RU+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HlPJj9La"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4C54224D3;
-	Mon, 13 Nov 2023 17:37:10 +0000 (UTC)
-Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BED2810F4;
-	Mon, 13 Nov 2023 09:37:09 -0800 (PST)
-Received: from [127.0.0.1] ([12.191.197.195])
-	(authenticated bits=0)
-	by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 3ADHaD5Q2879261
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Mon, 13 Nov 2023 09:36:14 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 3ADHaD5Q2879261
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2023111101; t=1699896975;
-	bh=SCbNEaKysaDENzp7ym8rKe0t6E54PmQIYjGt+gUaVHA=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=yDdz7RU+C8v9nYIEBzCAWgRm3F1WpeF12wJgCrA6ccgmNshH+SnO2sPhDYH9PySHL
-	 YyqF7gWVqnOyr+dQAlGtnI9JasuK7AwYlLy1Tt2yJ1F5ZtYRCDnhW+aPvp3RGHfPVB
-	 ysKh2MIXuyuYvp9nlGkCXC0QcYduFhDiMoxcqjQi9RkcMYie4H2Kw3TzoAxlI6tvXV
-	 rrRKQ+lxLK4B2iaxhdShSn2TR4kmpimd9HhJX0jQ6J/xPqAgC0pG4q/9GwQchMAeUS
-	 VQv4HAjGvUZ+w8UYh6+zktz0G+ELn42zjvoiL9UHu2Nr46sqxDE142BCoNIRfAyLDl
-	 nQ9dbCgQdGOGA==
-Date: Mon, 13 Nov 2023 12:36:04 -0500
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: Borislav Petkov <bp@alien8.de>, Xin Li <xin3.li@intel.com>
-CC: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
-        x86@kernel.org, luto@kernel.org, pbonzini@redhat.com,
-        seanjc@google.com, peterz@infradead.org, jgross@suse.com,
-        ravi.v.shankar@intel.com, mhiramat@kernel.org,
-        andrew.cooper3@citrix.com, jiangshanlai@gmail.com,
-        nik.borisov@suse.com
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v12_19/37=5D_x86/fred=3A_Update?= =?US-ASCII?Q?_MSR=5FIA32=5FFRED=5FRSP0_during_task_switch?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20231113093742.GAZVHuZk9CGTRIfAWb@fat_crate.local>
-References: <20231003062458.23552-1-xin3.li@intel.com> <20231003062458.23552-20-xin3.li@intel.com> <20231113093742.GAZVHuZk9CGTRIfAWb@fat_crate.local>
-Message-ID: <3BFEBDE8-6F90-43A5-AE34-07B0ED0CAAAE@zytor.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C031224E3
+	for <kvm@vger.kernel.org>; Mon, 13 Nov 2023 17:43:33 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3831110E5
+	for <kvm@vger.kernel.org>; Mon, 13 Nov 2023 09:43:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699897410;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Rqt89Efo92L9gQUjQREL1i3618rnBSc+Vh+WfUyKjto=;
+	b=HlPJj9La7spcJWRg2yYw3nl4u+0lGk0rTfV05kKhey/0pM+CIBeoa4hfq34Wocdv2hc8ZF
+	N67xOIprw1SwuBmw0nFufxi4OEoRLUVa8ZB2tTL/S/Ke6vHEqzGk3w2zkmPHQXOvnYopg/
+	Lax0b4PWxNrhG2KoP2GCGiTl4wU6oBs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-517-9iy_81rePDapSoTfL6QrKA-1; Mon, 13 Nov 2023 12:43:27 -0500
+X-MC-Unique: 9iy_81rePDapSoTfL6QrKA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1607F83B825;
+	Mon, 13 Nov 2023 17:43:27 +0000 (UTC)
+Received: from laptop.redhat.com (unknown [10.39.193.115])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5D7BC1121306;
+	Mon, 13 Nov 2023 17:43:25 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com,
+	eric.auger@redhat.com,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	andrew.jones@linux.dev,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	alexandru.elisei@arm.com
+Cc: jarichte@redhat.com
+Subject: [kvm-unit-tests PATCH v2 0/2] arm: pmu-overflow-interrupt: Fix failures on Amberwing
+Date: Mon, 13 Nov 2023 18:42:39 +0100
+Message-ID: <20231113174316.341630-1-eric.auger@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On November 13, 2023 4:37:42 AM EST, Borislav Petkov <bp@alien8=2Ede> wrote=
-:
->On Mon, Oct 02, 2023 at 11:24:40PM -0700, Xin Li wrote:
->> From: "H=2E Peter Anvin (Intel)" <hpa@zytor=2Ecom>
->>=20
->> MSR_IA32_FRED_RSP0 is used during ring 3 event delivery, and needs to
->> be updated to point to the top of next task stack during task switch=2E
->>=20
->> Signed-off-by: H=2E Peter Anvin (Intel) <hpa@zytor=2Ecom>
->> Tested-by: Shan Kang <shan=2Ekang@intel=2Ecom>
->> Signed-off-by: Xin Li <xin3=2Eli@intel=2Ecom>
->> ---
->>  arch/x86/include/asm/switch_to=2Eh | 8 ++++++--
->>  1 file changed, 6 insertions(+), 2 deletions(-)
->>=20
->> diff --git a/arch/x86/include/asm/switch_to=2Eh b/arch/x86/include/asm/=
-switch_to=2Eh
->> index f42dbf17f52b=2E=2Ec3bd0c0758c9 100644
->> --- a/arch/x86/include/asm/switch_to=2Eh
->> +++ b/arch/x86/include/asm/switch_to=2Eh
->> @@ -70,9 +70,13 @@ static inline void update_task_stack(struct task_str=
-uct *task)
->>  #ifdef CONFIG_X86_32
->>  	this_cpu_write(cpu_tss_rw=2Ex86_tss=2Esp1, task->thread=2Esp0);
->>  #else
->> -	/* Xen PV enters the kernel on the thread stack=2E */
->> -	if (cpu_feature_enabled(X86_FEATURE_XENPV))
->> +	if (cpu_feature_enabled(X86_FEATURE_FRED)) {
->> +		/* WRMSRNS is a baseline feature for FRED=2E */
->> +		wrmsrns(MSR_IA32_FRED_RSP0, (unsigned long)task_stack_page(task) + T=
-HREAD_SIZE);
->
->If this non-serializing write happens now and, AFAICT, the CR3 write
->during the task switch has already happened in switch_mm* earlier, what
->is the serialization point that's going to make sure that write is
->committed before the new task starts executing?
->
->Thx=2E
->
+On Qualcomm Amberwing, some pmu-overflow-interrupt failures can be observed.
+Although the even counter overflows, the interrupt is not seen as
+expected on guest side. This happens in the subtest after "promote to 64-b"
+comment.
 
-A resource cannot be consumed after the value has been written; this is th=
-e only necessary level of serialization, equivalent to, say, RAX=2E
+After analysis, the PMU overflow interrupt actually hits, ie.
+kvm_pmu_perf_overflow() gets called and KVM_REQ_IRQ_PENDING is set,
+as expected. However the PMCR.E is reset by the handle_exit path, at
+kvm_pmu_handle_pmcr() before the next guest entry and
+kvm_pmu_flush_hwstate/kvm_pmu_update_state subsequent call.
+There, since the enable bit has been reset, kvm_pmu_update_state() does
+not inject the interrupt into the guest.
 
-A serializing instruction stops the entire pipeline until everything has r=
-etired and any stores have become globally visible=2E
+This does not seem to be a KVM bug but rather an unfortunate
+scenario where the test disables the PMCR.E too closely to the
+advent of the overflow interrupt.
+
+Since it looks like a benign and inlikely case, let's resize the number
+of iterations to prevent the PMCR enable bit from being resetted
+immediately at the same time as the actual overflow event.
+
+Also make pmu_stats volatile to prevent any optimizations.
+
+Eric Auger (2):
+  arm: pmu: Declare pmu_stats as volatile
+  arm: pmu-overflow-interrupt: Increase count values
+
+ arm/pmu.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+-- 
+2.41.0
+
 
