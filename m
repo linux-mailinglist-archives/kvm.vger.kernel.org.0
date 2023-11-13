@@ -1,315 +1,178 @@
-Return-Path: <kvm+bounces-1595-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1596-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 460D17E9C09
-	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 13:21:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7024E7E9D49
+	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 14:36:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3278B1C2094C
-	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 12:21:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0E35B209A8
+	for <lists+kvm@lfdr.de>; Mon, 13 Nov 2023 13:36:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B8B91D6A6;
-	Mon, 13 Nov 2023 12:21:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50488208A7;
+	Mon, 13 Nov 2023 13:36:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yu7Hdo/5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gcXP02qJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 348351D68D
-	for <kvm@vger.kernel.org>; Mon, 13 Nov 2023 12:21:35 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 780C2195
-	for <kvm@vger.kernel.org>; Mon, 13 Nov 2023 04:21:33 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908131C6AB
+	for <kvm@vger.kernel.org>; Mon, 13 Nov 2023 13:36:04 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8C2A19E
+	for <kvm@vger.kernel.org>; Mon, 13 Nov 2023 05:36:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699878092;
+	s=mimecast20190719; t=1699882561;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=zIHSrYUcQnxoKXdjZZpZq5jMd/3daIfiQKpFrLHTsdU=;
-	b=Yu7Hdo/5plblCptHPcHHXf+9vRvOj/Zk8ApYb0pxBvJ66oGqymud4iKofR7RbBenSPB2SZ
-	i4CeNmmAZVYqgVegeajfF9gLmPOZYcbPHoP1x+LFH+ypB+/47TyRCHY7EcD/QcF50rd7T7
-	4Jy5iTD5qb94R8BKs3JXOJUpIzc6iVA=
-Received: from mail-ua1-f71.google.com (mail-ua1-f71.google.com
- [209.85.222.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-376-b7kxpx7gNWSJKb50ua_c2w-1; Mon, 13 Nov 2023 07:21:31 -0500
-X-MC-Unique: b7kxpx7gNWSJKb50ua_c2w-1
-Received: by mail-ua1-f71.google.com with SMTP id a1e0cc1a2514c-7bb4120b962so1570557241.0
-        for <kvm@vger.kernel.org>; Mon, 13 Nov 2023 04:21:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699878091; x=1700482891;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zIHSrYUcQnxoKXdjZZpZq5jMd/3daIfiQKpFrLHTsdU=;
-        b=JWXGt8D57Yl6IJ9/qC569fsE0wx+dujboueGTj3bV0xboiRwFwz98Ql/PrllFUhQ1Q
-         004ZKRD1dQ04AgBGOFN1dY07jhzIhJyTZEPQJ6laaJhZUCtIxZ1Oqg9R9N+TG27ZAlP3
-         IDsrBJZqWc1+kgnuJP0tuRGLE0E2lZr5iPitV9FlswyMykoeh2olMzfcV2iy4opO9ZsS
-         ugQV0A88KY9H8/tLfN2F9I0HNngymg0yG0Tm1tA7AX8DTlBUVfn/AfuomlSE4iWiSuc4
-         Qj4X8qNt+sd7cSHSyguQDcGZDIb/ziKYC0GT+pOvREd8L7ah4HeLx5GQHaaLvIlvpt+s
-         XawQ==
-X-Gm-Message-State: AOJu0YxWIUrB24TwmZ4rpGyWR30dn5EkWAh9e79SiwuiJPw9ufHohn7i
-	zyRvqB8HDlCFzkBFrY+3h1d1SP8+tLoORpx2Yp72pTw8xhnK6/uZTxxPHyZOjIhHjx7/A1kPqnS
-	1yMdFPHk7m8lC
-X-Received: by 2002:a67:f2c8:0:b0:457:670f:e2eb with SMTP id a8-20020a67f2c8000000b00457670fe2ebmr6417757vsn.20.1699878090984;
-        Mon, 13 Nov 2023 04:21:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFKSa6ruCnuzN9s2Ejc4l9S4h3ZVAauCQx41zE3qMS0kOL2lujOmHkFT5dC7rrBHQxe5Bi5+A==
-X-Received: by 2002:a67:f2c8:0:b0:457:670f:e2eb with SMTP id a8-20020a67f2c8000000b00457670fe2ebmr6417723vsn.20.1699878090682;
-        Mon, 13 Nov 2023 04:21:30 -0800 (PST)
-Received: from [192.168.157.67] ([12.191.197.195])
-        by smtp.googlemail.com with ESMTPSA id j22-20020ac874d6000000b00419801b1094sm1904299qtr.13.2023.11.13.04.21.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Nov 2023 04:21:29 -0800 (PST)
-Message-ID: <d3071794-7c02-4ca1-850d-1d5242de4f98@redhat.com>
-Date: Mon, 13 Nov 2023 13:21:28 +0100
+	 in-reply-to:in-reply-to:references:references;
+	bh=w0ScV907uadhC4WyMD57whs7/7sUsi6u8ESXYamvt98=;
+	b=gcXP02qJEqHBjXh4KZ9SfC3oQoavNZXEtfff7/eGuEHB7UMo4oWKqujgeztRk5HhTbFqhg
+	vjpCH/tbK8Sm/3zhdBmCnCaxS456V++7rvy0p0klATfk+h1UbDU6GXGFEO/dhkFe2ajFFo
+	yQzZKPLMum5vQtiL7qhcmXzKtsl4ArI=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-365-xXppnjgVMlujZnqNrkzkeA-1; Mon,
+ 13 Nov 2023 08:35:59 -0500
+X-MC-Unique: xXppnjgVMlujZnqNrkzkeA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9ED363822E80;
+	Mon, 13 Nov 2023 13:35:58 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.85])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 24B45492BFD;
+	Mon, 13 Nov 2023 13:35:57 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ opnfv-tech-discuss@lists.opnfv.org, dev@dpdk.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paul Knight
+ <paul.knight@oasis-open.org>
+Subject: Re: [virtio] Invitation to comment on Virtual I/O Device (VIRTIO)
+ Version 1.3 - ends December 8th
+In-Reply-To: <CADgeAH_67CQZoVGEB_ddGEZA5+kUzmQe_3yfA1U6-c-K2mJi7g@mail.gmail.com>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <CADgeAH_67CQZoVGEB_ddGEZA5+kUzmQe_3yfA1U6-c-K2mJi7g@mail.gmail.com>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date: Mon, 13 Nov 2023 14:35:56 +0100
+Message-ID: <87a5rhpygz.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 00/34] KVM: guest_memfd() and per-page attributes
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Sean Christopherson <seanjc@google.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Andrew Morton <akpm@linux-foundation.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- Xiaoyao Li <xiaoyao.li@intel.com>, Xu Yilun <yilun.xu@intel.com>,
- Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
- Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>,
- David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
- =?UTF-8?Q?n?= <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>,
- Vishal Annapurve <vannapurve@google.com>,
- Ackerley Tng <ackerleytng@google.com>,
- Maciej Szmigiero <mail@maciej.szmigiero.name>,
- David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
- Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
- Liam Merwick <liam.merwick@oracle.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>,
- "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20231105163040.14904-1-pbonzini@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20231105163040.14904-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-On 11/5/23 17:30, Paolo Bonzini wrote:
-> The "development cycle" for this version is going to be very short;
-> ideally, next week I will merge it as is in kvm/next, taking this through
-> the KVM tree for 6.8 immediately after the end of the merge window.
-> The series is still based on 6.6 (plus KVM changes for 6.7) so it
-> will require a small fixup for changes to get_file_rcu() introduced in
-> 6.7 by commit 0ede61d8589c ("file: convert to SLAB_TYPESAFE_BY_RCU").
-> The fixup will be done as part of the merge commit, and most of the text
-> above will become the commit message for the merge.
+It seems that the original mail did not make it to some of the mailing
+lists it was intended to go to, possibly due to the html part of the
+original mail. Therefore, I'm trying again, this time with plain text
+only. Apologies in advance for any duplicates.
 
-The changes from review are small enough and entirely in tests, so
-I went ahead and pushed it to kvm/next, together with "selftests: kvm/s390x: use vm_create_barebones()" which also fixed testcase failures (similar to the aarch64/page_fault_test.c hunk below).
+On Wed, Nov 08 2023, Paul Knight <paul.knight@oasis-open.org> wrote:
 
-The guestmemfd branch on kvm.git was force-pushed, and can be used for further
-development if you don't want to run 6.7-rc1 for whatever reason.
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 38882263278d..926241e23aeb 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -1359,7 +1359,6 @@ yet and must be cleared on entry.
-  	__u64 guest_phys_addr;
-  	__u64 memory_size; /* bytes */
-  	__u64 userspace_addr; /* start of the userspace allocated memory */
--	__u64 pad[16];
-    };
-  
-    /* for kvm_userspace_memory_region::flags */
-diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-index eb4217b7c768..08a5ca5bed56 100644
---- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-@@ -705,7 +705,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
-  
-  	print_test_banner(mode, p);
-  
--	vm = ____vm_create(mode);
-+	vm = ____vm_create(VM_SHAPE(mode));
-  	setup_memslots(vm, p);
-  	kvm_vm_elf_load(vm, program_invocation_name);
-  	setup_ucall(vm);
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index ea0ae7e25330..fd389663c49b 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -6,14 +6,6 @@
-   */
-  
-  #define _GNU_SOURCE
--#include "test_util.h"
--#include "kvm_util_base.h"
--#include <linux/bitmap.h>
--#include <linux/falloc.h>
--#include <sys/mman.h>
--#include <sys/types.h>
--#include <sys/stat.h>
--
-  #include <stdlib.h>
-  #include <string.h>
-  #include <unistd.h>
-@@ -21,6 +13,15 @@
-  #include <stdio.h>
-  #include <fcntl.h>
-  
-+#include <linux/bitmap.h>
-+#include <linux/falloc.h>
-+#include <sys/mman.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+
-+#include "test_util.h"
-+#include "kvm_util_base.h"
-+
-  static void test_file_read_write(int fd)
-  {
-  	char buf[64];
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index e4d2cd9218b2..1b58f943562f 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -819,6 +819,7 @@ static inline struct kvm_vm *vm_create_barebones(void)
-  	return ____vm_create(VM_SHAPE_DEFAULT);
-  }
-  
-+#ifdef __x86_64__
-  static inline struct kvm_vm *vm_create_barebones_protected_vm(void)
-  {
-  	const struct vm_shape shape = {
-@@ -828,6 +829,7 @@ static inline struct kvm_vm *vm_create_barebones_protected_vm(void)
-  
-  	return ____vm_create(shape);
-  }
-+#endif
-  
-  static inline struct kvm_vm *vm_create(uint32_t nr_runnable_vcpus)
-  {
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index d05d95cc3693..9b29cbf49476 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1214,7 +1214,7 @@ void vm_guest_mem_fallocate(struct kvm_vm *vm, uint64_t base, uint64_t size,
-  		TEST_ASSERT(region && region->region.flags & KVM_MEM_GUEST_MEMFD,
-  			    "Private memory region not found for GPA 0x%lx", gpa);
-  
--		offset = (gpa - region->region.guest_phys_addr);
-+		offset = gpa - region->region.guest_phys_addr;
-  		fd_offset = region->region.guest_memfd_offset + offset;
-  		len = min_t(uint64_t, end - gpa, region->region.memory_size - offset);
-  
-diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-index 343e807043e1..1efee1cfcff0 100644
---- a/tools/testing/selftests/kvm/set_memory_region_test.c
-+++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-@@ -433,6 +433,7 @@ static void test_add_max_memory_regions(void)
-  }
-  
-  
-+#ifdef __x86_64__
-  static void test_invalid_guest_memfd(struct kvm_vm *vm, int memfd,
-  				     size_t offset, const char *msg)
-  {
-@@ -523,14 +524,13 @@ static void test_add_overlapping_private_memory_regions(void)
-  	close(memfd);
-  	kvm_vm_free(vm);
-  }
-+#endif
-  
-  int main(int argc, char *argv[])
-  {
-  #ifdef __x86_64__
-  	int i, loops;
--#endif
-  
--#ifdef __x86_64__
-  	/*
-  	 * FIXME: the zero-memslot test fails on aarch64 and s390x because
-  	 * KVM_RUN fails with ENOEXEC or EFAULT.
-@@ -542,6 +542,7 @@ int main(int argc, char *argv[])
-  
-  	test_add_max_memory_regions();
-  
-+#ifdef __x86_64__
-  	if (kvm_has_cap(KVM_CAP_GUEST_MEMFD) &&
-  	    (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM))) {
-  		test_add_private_memory_region();
-@@ -550,7 +551,6 @@ int main(int argc, char *argv[])
-  		pr_info("Skipping tests for KVM_MEM_GUEST_MEMFD memory regions\n");
-  	}
-  
--#ifdef __x86_64__
-  	if (argc > 1)
-  		loops = atoi_positive("Number of iterations", argv[1]);
-  	else
-diff --git a/tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c b/tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
-index 2f02f6128482..13e72fcec8dd 100644
---- a/tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
-@@ -1,6 +1,6 @@
-  // SPDX-License-Identifier: GPL-2.0-only
-  /*
-- * Copyright (C) 2022, Google LLC.
-+ * Copyright (C) 2023, Google LLC.
-   */
-  #include <linux/kvm.h>
-  #include <pthread.h>
-
-Paolo
+> OASIS members and other interested parties,
+>
+> OASIS and the OASIS Virtual I/O Device (VIRTIO) TC are pleased to announce
+> that Virtual I/O Device (VIRTIO) Version 1.3 is now available for public
+> review and comment.
+>
+> Specification Overview:
+>
+> This document describes the specifications of the 'virtio' family of
+> devices. These devices are found in virtual environments, yet by design
+> they look like physical devices to the guest within the virtual machine -
+> and this document treats them as such. This similarity allows the guest to
+> use standard drivers and discovery mechanisms. The purpose of virtio and
+> this specification is that virtual environments and guests should have a
+> straightforward, efficient, standard and extensible mechanism for virtual
+> devices, rather than boutique per-environment or per-OS mechanisms.
+>
+> The documents and related files are available here:
+>
+> Virtual I/O Device (VIRTIO) Version 1.3
+> Committee Specification Draft 01
+> 06 October 2023
+>
+> Editable source (Authoritative):
+> https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/tex/
+> HTML:
+> https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html
+> PDF:
+> https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.pdf
+> Example driver listing:
+> https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/listings/
+> PDF file marked to indicate changes from Version 1.2 Committee
+> Specification 01:
+> https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01-diff-from-v1.2-cs01.pdf
+>
+> For your convenience, OASIS provides a complete package of the
+> specification document and any related files in ZIP distribution files. You
+> can download the ZIP file at:
+> https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.zip
+>
+> A public review metadata record documenting this and any previous public
+> reviews is available at:
+> https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01-public-review-metadata.html
+>
+> How to Provide Feedback
+>
+> OASIS and the OASIS Virtual I/O Device (VIRTIO) TC value your feedback. We
+> solicit input from developers, users and others, whether OASIS members or
+> not, for the sake of improving the interoperability and quality of its
+> technical work.
+>
+> The public review starts 09 November 2023 at 00:00 UTC and ends 08 December
+> 2023 at 23:59 UTC.
+>
+> Comments may be submitted to the TC by any person through the use of the
+> OASIS TC Comment Facility which can be used by following the instructions
+> on the TC's "Send A Comment" page (
+> https://www.oasis-open.org/committees/comments/index.php?wg_abbrev=virtio).
+>
+> Comments submitted by TC non-members for this work and for other work of
+> this TC are publicly archived and can be viewed at:
+>
+> https://lists.oasis-open.org/archives/virtio-comment/
+>
+> All comments submitted to OASIS are subject to the OASIS Feedback License,
+> which ensures that the feedback you provide carries the same obligations at
+> least as the obligations of the TC members. In connection with this public
+> review, we call your attention to the OASIS IPR Policy [1] applicable
+> especially [2] to the work of this technical committee. All members of the
+> TC should be familiar with this document, which may create obligations
+> regarding the disclosure and availability of a member's patent, copyright,
+> trademark and license rights that read on an approved OASIS specification.
+>
+> OASIS invites any persons who know of any such claims to disclose these if
+> they may be essential to the implementation of the above specification, so
+> that notice of them may be posted to the notice page for this TC's work.
+>
+> Additional information about the specification and the VIRTIO TC can be
+> found at the TC's public home page:
+> https://www.oasis-open.org/committees/virtio/
+>
+> ========== Additional references:
+>
+> [1] https://www.oasis-open.org/policies-guidelines/ipr/
+>
+> [2] https://github.com/oasis-tcs/virtio-admin/blob/master/IPR.md
+> https://www.oasis-open.org/policies-guidelines/ipr/#Non-Assertion-Mode
+> Non-Assertion Mode
+> -- 
+> Paul Knight <paul.knight@oasis-open.org>....Document Process Analyst
+> <https://www.oasis-open.org/people/staff/paul-knight>
+> OASIS <https://www.oasis-open.org/>...Setting the standard for open
+> collaboration
 
 
