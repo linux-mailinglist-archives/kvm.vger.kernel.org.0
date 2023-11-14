@@ -1,132 +1,127 @@
-Return-Path: <kvm+bounces-1697-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1698-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0605F7EB7C0
-	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 21:24:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB21F7EB817
+	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 22:02:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35E6B1C20AD2
-	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 20:24:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46B40B20B91
+	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 21:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC59B35F19;
-	Tue, 14 Nov 2023 20:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFF052FC3F;
+	Tue, 14 Nov 2023 21:01:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bvLMsIoP"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QWk2O0d+"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4B635F11
-	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 20:24:49 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CB8EF5
-	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 12:24:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699993487;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=AMPhiKJAbm8zeR4hjWFuhSxhTnmbxSsETxgcPx+yeuk=;
-	b=bvLMsIoPr+3baXZQh0mVsfjPBZ5es1S+UxR+Iqbs+FY2LeKQM2F2RIXmXBc2i/v9toY41I
-	Y+dpsl3yT9nsPNFf+9KRnJQlhlLHT2CGtHMp8CCWRWKAUKH45ZZzj1FTH+qkJU87jxDwnE
-	/ff06D9jB+93ka2Vr9YmYeKHDm0CX2E=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-479-Javyba9rNrmyca3zT_KbQQ-1; Tue, 14 Nov 2023 15:24:46 -0500
-X-MC-Unique: Javyba9rNrmyca3zT_KbQQ-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-408534c3ec7so39437215e9.1
-        for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 12:24:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699993482; x=1700598282;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AMPhiKJAbm8zeR4hjWFuhSxhTnmbxSsETxgcPx+yeuk=;
-        b=jXeQYTnN/YUoERDpRxvKtEP0e069jdZzjx6GogWIfSnwLeRh8UDnxQmDLV8WNjNv5K
-         s/o4kqNdkwBYC0tSvdTiZeZN1o5HrNiF49yXVDd2+wGNsNZuK3FLI5ICbI55/fUFASAd
-         iXNsPW31E0B5rw94y8eggQpJ/lGeQ6uzeiPK0gB5SHneJ1TLm+j0Of7WlnLvBmbDv5yE
-         07r43NxpiQS4XmLlcRdHSHV1v3qYWYSfq0RgcMMEsem3P+tJEvpbwrUJ/Vjz0d0eO90p
-         B3EkV++ynV+k3GpeOhazrFrq+14Av1efcPryBjv37/sQ1SAgOw+fqedfg6LbJWSojWtc
-         oITw==
-X-Gm-Message-State: AOJu0YwNti2oFJRCPWjQpZMT2wu57uEu95Whwwce8MbfC4feSkkzVvc6
-	PnP/EzGUx0MQSv2fBS/HRWtcZFCy+RUT7NdT5obiL/4uZVMWPIS9+66SJkt6VI2wLj3a2AEOV9R
-	3/+p146DgwYH3
-X-Received: by 2002:a05:600c:3b15:b0:40a:49c1:94d9 with SMTP id m21-20020a05600c3b1500b0040a49c194d9mr8706176wms.27.1699993482658;
-        Tue, 14 Nov 2023 12:24:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF8mSpIgY64wNwqmPqSR229VYTqr3lkVUkbVTKDvrSUJWsccUbrWwL5VGr9Xp2Iyf3uhHqJvg==
-X-Received: by 2002:a05:600c:3b15:b0:40a:49c1:94d9 with SMTP id m21-20020a05600c3b1500b0040a49c194d9mr8706157wms.27.1699993482303;
-        Tue, 14 Nov 2023 12:24:42 -0800 (PST)
-Received: from redhat.com ([2a02:14f:17a:44fb:a682:dfbc:c3ae:7cff])
-        by smtp.gmail.com with ESMTPSA id az19-20020a05600c601300b0040849ce7116sm18662069wmb.43.2023.11.14.12.24.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Nov 2023 12:24:41 -0800 (PST)
-Date: Tue, 14 Nov 2023 15:24:36 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	alistair.francis@wdc.com, bjorn@rivosinc.com, cleger@rivosinc.com,
-	dan.carpenter@linaro.org, eperezma@redhat.com, jakub@cloudflare.com,
-	jasowang@redhat.com, mst@redhat.com, sgarzare@redhat.com
-Subject: [GIT PULL] vhost,virtio,vdpa,firmware: bugfixes
-Message-ID: <20231114152436-mutt-send-email-mst@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA7B2FC29
+	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 21:01:48 +0000 (UTC)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2074.outbound.protection.outlook.com [40.107.93.74])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D2F7A1;
+	Tue, 14 Nov 2023 13:01:46 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Rn/ecIAw77oUpZ+xoORQGac7vxXJH3c2DkKMSIcbXZHvfYZVVH7ko7H+AgAzrS6dhGJHyaWYclm42Qq2kN6+V/lufBZazZVTlxadMyl7O1dtv50WDW3UdAuUckrocCAo54GDtYVxwuLF0xlmlteuq1paEsGx393PA6a23YoI8P38eeHHYn0H1RVO7aCahRXt0VY3P7rYfj7DVFZXO/+acmjxpHJhUZbMyLJMYq6Ravwn9aROzU0G8EiyCmMzK83YiQWHl1/YFuFPc5Y909cIpAf72QjOVthjFZYn2/b9WzmD0VGX20xbk9suAaLUmlTEM9SLOiTnzZYHDeRpIVJpNA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5jbeUg+HJ8fRTpw2rXxXdvCrsrLiJlw16RhTyzKnevc=;
+ b=dxDx0ZCX64YHyqRXoFYUEn0L1gMAUvFY2DZGluh6MwXnmMukG8v9CalmyZ75yFVnwFyFs3DBIDLI+YAYAqdrsWQKtsvPHLkR+lXcj+BBF9BtEOc7k2L71W2ypDya7rid9M7NJI3Sy7lf9irKfjaP4dLDOeV4vUsotgaW/xW3YGpiHwvQo3eOgjOnItja9nZ7kXx9ndP/xXBvGDdbXjP7A/c33iZL2Ko1lYoejIIP4vlPKbp+XdzHa6+yIWJO6f52n1QaFB8IeL7ANNufE280gXpkhyQpVa1MfVXFqDegnnQYv+L184inyv1kK+EO4zoByHIpwfciA+ZlGwZyeu0YmA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=ziepe.ca smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5jbeUg+HJ8fRTpw2rXxXdvCrsrLiJlw16RhTyzKnevc=;
+ b=QWk2O0d+lSoCOHw7dhFSugtr3FG11Gds7ntHrqsqLt9RQdZu+lIgk3kqoN0cXu7ePIYju5F6kej2/B5Owt9BWGdaywSKSE8p5r3zA26paH5OfNh9XeO49vo3q3iCc6ETX8UniaNEOUxljTEYDegSFnFaUgNq2sCGbDdQP1+78Yk=
+Received: from BLAPR05CA0004.namprd05.prod.outlook.com (2603:10b6:208:36e::8)
+ by SJ0PR12MB8613.namprd12.prod.outlook.com (2603:10b6:a03:44d::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.29; Tue, 14 Nov
+ 2023 21:01:44 +0000
+Received: from MN1PEPF0000F0E3.namprd04.prod.outlook.com
+ (2603:10b6:208:36e:cafe::2d) by BLAPR05CA0004.outlook.office365.com
+ (2603:10b6:208:36e::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.17 via Frontend
+ Transport; Tue, 14 Nov 2023 21:01:43 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MN1PEPF0000F0E3.mail.protection.outlook.com (10.167.242.41) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7002.14 via Frontend Transport; Tue, 14 Nov 2023 21:01:43 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Tue, 14 Nov
+ 2023 15:01:41 -0600
+From: Brett Creeley <brett.creeley@amd.com>
+To: <jgg@ziepe.ca>, <yishaih@nvidia.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+	<alex.williamson@redhat.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <shannon.nelson@amd.com>, <brett.creeley@amd.com>
+Subject: [PATCH vfio 0/5] pds-vfio-pci: Clean-ups and multi-region support
+Date: Tue, 14 Nov 2023 13:01:24 -0800
+Message-ID: <20231114210129.34318-1-brett.creeley@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-X-Mutt-Fcc: =sent
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0E3:EE_|SJ0PR12MB8613:EE_
+X-MS-Office365-Filtering-Correlation-Id: 26cff021-2572-4949-12fb-08dbe554e7f6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	at87GNbC/cqeEov95IQvW3jYI9WGpDXFXmhC5qbxT6/OKKnTlZAuSrUfY1YBsXB6bnMqAE4DdTNmNrpJ8SPirt3Ps60d9A3Q51MYGgIybXhS3auefwoZZVLh7GrRnMoHuPoFsGIKGQdH++ti10iPPN4VYFBQZO13v5jNvZ9UB71XHIse6gxXqjIw/eZoMwEGcAzlKLUo0GsIAsK61rl0cVEy/tHs1XxjH4gXjphjOQo7pXNPG6UkwFu7tazfHX+UaD74MHBkYoH1flzX5hWbX0geG3bNHc8hAUlvVuBePK6qoZNUOcdVkS3w62SZy9A/YPgrMGDkPPHbAiZIeKB26d2ktnUozf9TwTC2RP8UvQm1i/X97WO0du6pTZAYZ6oEhQ2IsaTPxzJ5FEXIfXXCoAwXA15PiXY5rTq18PmxsM94hvggwWrrjspsF8gFsSErpHcah253OVdPHIXn5aebVSLLWh18OqyxffxxFfCpVegN24bMEWuBk1sAg2+VHCglgG+UhN+GGtJe9kTfEZPpDmRXxPKP9vM0O4/c9kvSUJrhg2Q4uDMd5oX+xLC3Mh35pl+DQIKagKjnSHSpLhggcU6SzX+t09SRVZU8vzzRzQp4Ll0jV78MuGlRgKS5F0T3g0v6IrZOa33Jd37JmtghKyzKCtHuT6RxmKwSbw25uJU2K4LUIgaHjfrmeXJSvy7K4n5Jdrp7YsY3ASi0KuZorSZdxiul+W4GB+DcMOjsuq1aMYrrErh6GxDFWDYuPVkKAuHGbkxhZqg71kQh7Y8GTQ==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(346002)(376002)(136003)(396003)(230922051799003)(82310400011)(64100799003)(451199024)(186009)(1800799009)(40470700004)(36840700001)(46966006)(40480700001)(40460700003)(86362001)(2906002)(1076003)(2616005)(5660300002)(4744005)(41300700001)(36756003)(44832011)(82740400003)(356005)(36860700001)(8936002)(70586007)(81166007)(4326008)(47076005)(8676002)(336012)(16526019)(26005)(83380400001)(70206006)(316002)(6666004)(54906003)(478600001)(426003)(110136005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2023 21:01:43.3171
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 26cff021-2572-4949-12fb-08dbe554e7f6
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000F0E3.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8613
 
-The following changes since commit 86f6c224c97911b4392cb7b402e6a4ed323a449e:
+This series contains various clean-ups, improvements, and support
+for multiple dirty tracking regions. The majority of clean-up and
+improvements are in preparation for patch 5/5, which adds support
+for multiple dirty tracking regions.
 
-  vdpa_sim: implement .reset_map support (2023-11-01 09:20:00 -0400)
+Brett Creeley (5):
+  pds-vfio-pci: Only use a single SGL for both seq and ack
+  pds-vfio-pci: Move and rename region specific info
+  pds-vfio-pci: Pass region info to relevant functions
+  pds-vfio-pci: Move seq/ack bitmaps into region struct
+  pds-vfio-pci: Add multi-region support
 
-are available in the Git repository at:
+ drivers/vfio/pci/pds/dirty.c | 311 ++++++++++++++++++++++-------------
+ drivers/vfio/pci/pds/dirty.h |  18 +-
+ 2 files changed, 207 insertions(+), 122 deletions(-)
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-
-for you to fetch changes up to e07754e0a1ea2d63fb29574253d1fd7405607343:
-
-  vhost-vdpa: fix use after free in vhost_vdpa_probe() (2023-11-01 09:31:16 -0400)
-
-----------------------------------------------------------------
-vhost,virtio,vdpa,firmware: bugfixes
-
-bugfixes all over the place
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Björn Töpel (1):
-      riscv, qemu_fw_cfg: Add support for RISC-V architecture
-
-Dan Carpenter (1):
-      vhost-vdpa: fix use after free in vhost_vdpa_probe()
-
-Jakub Sitnicki (1):
-      virtio_pci: Switch away from deprecated irq_set_affinity_hint
-
-Michael S. Tsirkin (1):
-      virtio_pci: move structure to a header
-
-Stefano Garzarella (1):
-      vdpa_sim_blk: allocate the buffer zeroed
-
- drivers/firmware/Kconfig               |  2 +-
- drivers/firmware/qemu_fw_cfg.c         |  2 +-
- drivers/vdpa/vdpa_sim/vdpa_sim_blk.c   |  4 ++--
- drivers/vhost/vdpa.c                   |  1 -
- drivers/virtio/virtio_pci_common.c     |  6 +++---
- drivers/virtio/virtio_pci_modern_dev.c |  7 ++++---
- include/linux/virtio_pci_modern.h      |  7 -------
- include/uapi/linux/virtio_pci.h        | 11 +++++++++++
- 8 files changed, 22 insertions(+), 18 deletions(-)
+-- 
+2.17.1
 
 
