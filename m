@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-1666-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1667-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB6037EB28E
-	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 15:39:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4F9B7EB290
+	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 15:40:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CE321F252D8
-	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 14:39:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45D2BB20BD0
+	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 14:40:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A8C541749;
-	Tue, 14 Nov 2023 14:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8817A41755;
+	Tue, 14 Nov 2023 14:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o3Npxwaz"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lWtMoWwY"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F6141750
-	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 14:39:52 +0000 (UTC)
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A773D5C
-	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 06:39:50 -0800 (PST)
-Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-507cee17b00so7592768e87.2
-        for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 06:39:50 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0754174E
+	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 14:39:57 +0000 (UTC)
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BDC310D
+	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 06:39:56 -0800 (PST)
+Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-9df8d0c2505so1150163666b.0
+        for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 06:39:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699972788; x=1700577588; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1699972795; x=1700577595; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=x5X2FluBMHtEHwLVURbcbmArZUeMN34wqMB+9uG3SGg=;
-        b=o3Npxwaz9s6hA78UQ/Qd8X+pBDW/IodaRz6FH7xFXGkVqEQ3S0d1cVY3ziEgOAQuR4
-         ZHpXu+GQ1eZ8dKlD9yaS8tSaTpIZq3Rnm2HhkYOUosA3mOYk6gQN5GOBK5VHEHaeUR9f
-         HDsBxctU3zVj67QDKkJ69C6ZE0d/Q5h65Zqm3mjVgk62ZmMQQFCakioM96W3uIoD7+vJ
-         oBBF8liBPkwjtIASsIBMonsP7jcn7hFY/qqUTspzD07Q0f3Y4yDwdRPGzrIgGLZE2Ujk
-         8uTbJOW+0agwHi/XbERwjeYKIerUG71YSmvKgbIXL95KEAG/ENWEp02cxx3bHc/xf22q
-         zNzA==
+        bh=R1LXi3GoLl/gkTzQsgGS9qqbGm09JIagG9772ckn2qA=;
+        b=lWtMoWwYSJXjwoJOFHq05ry/Y8EgDgwVTS4YeTppe+cZZ+1KOORfUr5Z9luc0iFgKc
+         KEzOv2AxoYuKvnF6QDexCePDqE6Kyhm70RzHt+HGHlNqfr0ToORDqayLWJZhyz6BXVzr
+         EWTaZFQgSlDMBeyZZvduqpSqHxZIETF9+khxkoE+X4CrTKoM+ecgm3xoGElNiBpqcCee
+         hydEWfTjfH/chcoFnf1NBi6pLDcJIJl8P0jX82ldMy0nioqnVPx/YlDUe5kdc+k2bnM1
+         Dn+vDjsHfRL0S9kAuyBAPvCcPtqyGOgXUK68h4+w8r5EOcEOKofkNTNnnBCzGxaQ+RwO
+         gioQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699972788; x=1700577588;
+        d=1e100.net; s=20230601; t=1699972795; x=1700577595;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=x5X2FluBMHtEHwLVURbcbmArZUeMN34wqMB+9uG3SGg=;
-        b=jEYglzb/DlS9+omwWFHyUkC1BexdF8/TxbEyXsaoaqxIJLQDZQeVCh6RjCvw2KHGWq
-         MN6q7dHFHfkNtmhyALqztCzCatVoNshGUX6KHJMdr7pzOrZTYJrmqH+TX8JYxRIfYrSR
-         K2FrQEAQ1ixHv+1knyQZq2K6QTQLNu834smufHD8/EmB+lgriDlzF4AcA/w24rwgr4Ll
-         pNZ2tRHRcsgyWoTkQKxvXP5h9goVPyokVyTviU4zKLCMrl/xf/4f69sAM2XgpTvmFZac
-         aPXSU2mN/EJReQTbCmRQDD4UOHf/UyJzPOR6yJcwjHh920y6obYPlKadvLJNxvyRc3Jb
-         V8+w==
-X-Gm-Message-State: AOJu0Yyu7QLLiuHHlqUtgzbbItXzynvMIKjaWF5eHeRvDJyeMg9Rmq4n
-	0nFTSaq6QXutKMJpThEPRL6yoA==
-X-Google-Smtp-Source: AGHT+IEJ1DzMQPrVK6vmcQ1s/BHFe+ZR138ty+E3IEfmXhpEvhlt8hMy3AYRKnboRNNE1Pe2RYsE2w==
-X-Received: by 2002:a05:6512:b14:b0:509:8e3d:7cb0 with SMTP id w20-20020a0565120b1400b005098e3d7cb0mr9400030lfu.41.1699972788532;
-        Tue, 14 Nov 2023 06:39:48 -0800 (PST)
+        bh=R1LXi3GoLl/gkTzQsgGS9qqbGm09JIagG9772ckn2qA=;
+        b=kSZq7NXo6nwGdbuCC4FT3OQXMZRdT+OdRcOd8bl83qpyvz0iFlLY5mnehc22D/sBb9
+         RWKbIy5rp2OF/xo+muv5fI0n1Hjbj6xjEZxlJcECyMYQGKpJmlGxJNQJBacXtFVFeK5D
+         fIjmDM5zR/w+mJ7FATCoTSXAl0NyM7yjacvs42mqHZHHiBRKteUqoVVPy2yOvXgxA5E/
+         kT0bmkokFGLUVFAR9H10QWkIVUHEr+tUoU5LuVJvLyfZKvP4Zuc56ZQAKuyQk7nd2n8I
+         vJ+pawy1zfroRKVFeYvHP6o/r+pnLPyS6PnPb7byeybYMBd78puLd2NyYFTl5TuQKc3O
+         e4UQ==
+X-Gm-Message-State: AOJu0Yz7O1UXhNjsUWSFNC968kfZ+t20BofJcUW+urtMdVWfIVdh8Bk1
+	6Q5pi4cISUIv0m/LzTUnj4wptg==
+X-Google-Smtp-Source: AGHT+IFO0v0Kbx5mK0/IVC1YCc6AdDt4TudkiuPrPaddeZvjZPoy7Sp5UUV1A0HKtR5wjcSegxv9ZQ==
+X-Received: by 2002:a17:906:e51:b0:9ba:b5:cba6 with SMTP id q17-20020a1709060e5100b009ba00b5cba6mr2289558eji.14.1699972795126;
+        Tue, 14 Nov 2023 06:39:55 -0800 (PST)
 Received: from m1x-phil.lan (cac94-h02-176-184-25-155.dsl.sta.abo.bbox.fr. [176.184.25.155])
-        by smtp.gmail.com with ESMTPSA id l18-20020a50d6d2000000b00542db304680sm5268842edj.63.2023.11.14.06.39.46
+        by smtp.gmail.com with ESMTPSA id e10-20020a170906080a00b009a193a5acffsm5624675ejd.121.2023.11.14.06.39.53
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 14 Nov 2023 06:39:48 -0800 (PST)
+        Tue, 14 Nov 2023 06:39:54 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: David Woodhouse <dwmw@amazon.co.uk>,
 	qemu-devel@nongnu.org
@@ -74,9 +74,9 @@ Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	kvm@vger.kernel.org,
 	Thomas Huth <thuth@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [RFC PATCH-for-9.0 v2 13/19] hw/xen: Remove use of 'target_ulong' in handle_ioreq()
-Date: Tue, 14 Nov 2023 15:38:09 +0100
-Message-ID: <20231114143816.71079-14-philmd@linaro.org>
+Subject: [PATCH-for-9.0 v2 14/19] hw/xen: Use target-agnostic qemu_target_page_bits()
+Date: Tue, 14 Nov 2023 15:38:10 +0100
+Message-ID: <20231114143816.71079-15-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231114143816.71079-1-philmd@linaro.org>
 References: <20231114143816.71079-1-philmd@linaro.org>
@@ -89,74 +89,50 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Per commit f17068c1c7 ("xen-hvm: reorganize xen-hvm and move common
-function to xen-hvm-common"), handle_ioreq() is expected to be
-target-agnostic. However it uses 'target_ulong', which is a target
-specific definition.
-
-Per xen/include/public/hvm/ioreq.h header:
-
-  struct ioreq {
-    uint64_t addr;          /* physical address */
-    uint64_t data;          /* data (or paddr of data) */
-    uint32_t count;         /* for rep prefixes */
-    uint32_t size;          /* size in bytes */
-    uint32_t vp_eport;      /* evtchn for notifications to/from device model */
-    uint16_t _pad0;
-    uint8_t state:4;
-    uint8_t data_is_ptr:1;  /* if 1, data above is the guest paddr
-                             * of the real data to use. */
-    uint8_t dir:1;          /* 1=read, 0=write */
-    uint8_t df:1;
-    uint8_t _pad1:1;
-    uint8_t type;           /* I/O type */
-  };
-  typedef struct ioreq ioreq_t;
-
-If 'data' is not a pointer, it is a u64.
-
-- In PIO / VMWARE_PORT modes, only 32-bit are used.
-
-- In MMIO COPY mode, memory is accessed by chunks of 64-bit
-
-- In PCI_CONFIG mode, access is u8 or u16 or u32.
-
-- None of TIMEOFFSET / INVALIDATE use 'req'.
-
-- Fallback is only used in x86 for VMWARE_PORT.
-
-Masking the upper bits of 'data' to keep 'req->size' low bits
-is irrelevant of the target word size. Remove the word size
-check and always extract the relevant bits.
+Instead of the target-specific TARGET_PAGE_BITS definition,
+use qemu_target_page_bits() which is target agnostic.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- hw/xen/xen-hvm-common.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ hw/xen/xen-hvm-common.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/hw/xen/xen-hvm-common.c b/hw/xen/xen-hvm-common.c
-index bb3cfb200c..fb81bd8fbc 100644
+index fb81bd8fbc..73fa2c414d 100644
 --- a/hw/xen/xen-hvm-common.c
 +++ b/hw/xen/xen-hvm-common.c
-@@ -1,5 +1,6 @@
- #include "qemu/osdep.h"
+@@ -2,6 +2,7 @@
  #include "qemu/units.h"
-+#include "qemu/bitops.h"
+ #include "qemu/bitops.h"
  #include "qapi/error.h"
++#include "exec/target_page.h"
  #include "trace.h"
  
-@@ -426,9 +427,8 @@ static void handle_ioreq(XenIOState *state, ioreq_t *req)
-     trace_handle_ioreq(req, req->type, req->dir, req->df, req->data_is_ptr,
-                        req->addr, req->data, req->count, req->size);
+ #include "hw/pci/pci_host.h"
+@@ -14,6 +15,7 @@ MemoryRegion xen_memory;
+ void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size, MemoryRegion *mr,
+                    Error **errp)
+ {
++    unsigned target_page_bits = qemu_target_page_bits();
+     unsigned long nr_pfn;
+     xen_pfn_t *pfn_list;
+     int i;
+@@ -32,11 +34,11 @@ void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size, MemoryRegion *mr,
  
--    if (!req->data_is_ptr && (req->dir == IOREQ_WRITE) &&
--            (req->size < sizeof (target_ulong))) {
--        req->data &= ((target_ulong) 1 << (8 * req->size)) - 1;
-+    if (!req->data_is_ptr && (req->dir == IOREQ_WRITE)) {
-+        req->data = extract64(req->data, 0, BITS_PER_BYTE * req->size);
+     trace_xen_ram_alloc(ram_addr, size);
+ 
+-    nr_pfn = size >> TARGET_PAGE_BITS;
++    nr_pfn = size >> target_page_bits;
+     pfn_list = g_new(xen_pfn_t, nr_pfn);
+ 
+     for (i = 0; i < nr_pfn; i++) {
+-        pfn_list[i] = (ram_addr >> TARGET_PAGE_BITS) + i;
++        pfn_list[i] = (ram_addr >> target_page_bits) + i;
      }
  
-     if (req->dir == IOREQ_WRITE)
+     if (xc_domain_populate_physmap_exact(xen_xc, xen_domid, nr_pfn, 0, 0, pfn_list)) {
 -- 
 2.41.0
 
