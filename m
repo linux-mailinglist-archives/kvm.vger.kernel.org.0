@@ -1,157 +1,118 @@
-Return-Path: <kvm+bounces-1678-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1680-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 494AC7EB33D
-	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 16:14:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53EC97EB35B
+	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 16:20:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADB471F2514A
-	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 15:14:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 837331C20A8E
+	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 15:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F05141746;
-	Tue, 14 Nov 2023 15:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A5094175C;
+	Tue, 14 Nov 2023 15:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZjYbG3Jb"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MGoU06Rd"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95C94123A
-	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 15:14:28 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFE7DF9
-	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 07:14:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699974867;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Zevbj+27sluhLeonkisRMHT3igYPuh7OylaeV79/St4=;
-	b=ZjYbG3Jb4RK2mz73Lrhs0R9/lJtKq0rwUiYavSYt1R7fTMHd9RHnACYsopL4Zcr5iCLTFm
-	1YxPrU1yYTArafWlrf1zH/2ptJ8xYq3uWBdh5jpYF2Uc2leEa556/Bdey36Zg32+4SK6Q9
-	7sqgu7+A0v37B9MzBS7rtgTwaAxz4I4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-482-6qPt_wPUNJmyKfX7_Ikrwg-1; Tue, 14 Nov 2023 10:14:25 -0500
-X-MC-Unique: 6qPt_wPUNJmyKfX7_Ikrwg-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-32fd5f7b674so2494616f8f.0
-        for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 07:14:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699974864; x=1700579664;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Zevbj+27sluhLeonkisRMHT3igYPuh7OylaeV79/St4=;
-        b=RenCK4pBuCpcLhQQjz+vQUFWKGUqa8XnwJ7J04IE+jxaYSxfIkDIx5GnOcADkzIeU8
-         Aa6cHhP6vpQLCzCVbwAT/Z2zBdekFwNFb4GQZ0SakRBuiMWa7mK+OjZMoH4TX0v032Rj
-         7IO26uwo7qaxIbo6G9aojmc3CPAuhW6pGrgsrqjBLCeviZAF26i3rPD/UHA0IE4Ac8pP
-         oN88SaScQDXnYvv49BjD8KeePSbEkKXCJDaLtAE3JZEGCZ1Tz1U8GzHpsc4rnCZzfLdU
-         TwgntmN3IQfwEuS3BOcYCOADzNUoAWNvsmiH02++bCKIveeW4FsBUktGQKReYfBYFKDY
-         v3Xg==
-X-Gm-Message-State: AOJu0YwK9Ys1ecZb5Wj1FCLN1E4XcXqBGQk1y2s2GJ7JY0Wa1NeuTSTK
-	DFOPTCL2aesS9H0cA4yT+z9cgMI4knoAH2fbdmDKQHckDJa6U4YvS/LaYkh6fnhyePDDhQ4THms
-	WEqc5VxC803/N
-X-Received: by 2002:a5d:598b:0:b0:32f:77a6:52ea with SMTP id n11-20020a5d598b000000b0032f77a652eamr8145367wri.61.1699974864165;
-        Tue, 14 Nov 2023 07:14:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHWvp2RmJ//8fsFBdsIYlfatPRTWrCx9ePltVcGnpvlfrdHxaQugSb5f0/fufSXb+7rD+l7ow==
-X-Received: by 2002:a5d:598b:0:b0:32f:77a6:52ea with SMTP id n11-20020a5d598b000000b0032f77a652eamr8145338wri.61.1699974863739;
-        Tue, 14 Nov 2023 07:14:23 -0800 (PST)
-Received: from ?IPV6:2003:cb:c73e:8900:2d8:c9f0:f3fb:d4fd? (p200300cbc73e890002d8c9f0f3fbd4fd.dip0.t-ipconnect.de. [2003:cb:c73e:8900:2d8:c9f0:f3fb:d4fd])
-        by smtp.gmail.com with ESMTPSA id h15-20020a5d548f000000b0032fbe5b1e45sm8042334wrv.61.2023.11.14.07.14.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Nov 2023 07:14:23 -0800 (PST)
-Message-ID: <32e27c37-d208-4575-8807-99b6a91f7321@redhat.com>
-Date: Tue, 14 Nov 2023 16:14:22 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB1538DD0
+	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 15:20:12 +0000 (UTC)
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41C51120
+	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 07:20:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:Sender
+	:Reply-To:Content-ID:Content-Description;
+	bh=8oHKIB2Z25t55M8rg997hmml2qBzYjJja9p3MLoID9Q=; b=MGoU06Rd2CU4tijjS4zit7AS2o
+	EK5W2DNxSaap5vdRgr4lcPo4zGcIOq4atxzna3eoqsGisnNIWyNGw93pjsrw6oaP0WFFFgVLYBQZz
+	ClKfV7KrSJ1t1EoRo2xxMOh1jnYJshbl0jbHkjAa9cxj5rwxiL2k2+h7xbdzuUF4pLtlgUmOSkME0
+	Uq+kwwckEVCRyY9c0wqtGkbt3pl09tWIQNEMt3G1DMKTQtlMxIhdejhXq5Fe0Y7D6jA34FrWF434P
+	xU+RMJD/6Br8s11hd/K1O0XHW4bEY9r2voia+3nEj2IVrY/SvDOKzxr05FZJRtBMRX8gdRMisqfgH
+	oej8JDZQ==;
+Received: from [12.186.190.2] (helo=[127.0.0.1])
+	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1r2vCn-008fhY-Fa; Tue, 14 Nov 2023 15:19:57 +0000
+Date: Tue, 14 Nov 2023 10:19:51 -0500
+From: David Woodhouse <dwmw2@infradead.org>
+To: =?ISO-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@linaro.org>,
+ David Woodhouse <dwmw@amazon.co.uk>, qemu-devel@nongnu.org
+CC: =?ISO-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>,
+ Paul Durrant <paul@xen.org>, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ xen-devel@lists.xenproject.org, qemu-block@nongnu.org,
+ Anthony Perard <anthony.perard@citrix.com>, kvm@vger.kernel.org,
+ Thomas Huth <thuth@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH-for-9=2E0_v2_01/19=5D_tests/avocado=3A_A?= =?US-ASCII?Q?dd_=27guest=3Axen=27_tag_to_tests_running_Xen_guest?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <04917b57-d778-41a2-b320-c8c0afbe9ffb@linaro.org>
+References: <20231114143816.71079-1-philmd@linaro.org> <20231114143816.71079-2-philmd@linaro.org> <94D9484A-917D-4970-98DE-35B84BEDA1DC@infradead.org> <407f32ee-e489-4c05-9c3d-fa6c29bb1d99@linaro.org> <074BCACF-C8D0-440A-A805-CDB0DB21C416@infradead.org> <04917b57-d778-41a2-b320-c8c0afbe9ffb@linaro.org>
+Message-ID: <37D11113-662D-49FD-B1F1-757217EAFEEA@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH-for-9.0 v2 04/19] system/physmem: Do not include
- 'hw/xen/xen.h' but 'sysemu/xen.h'
-Content-Language: en-US
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- David Woodhouse <dwmw@amazon.co.uk>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Paul Durrant <paul@xen.org>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, David Woodhouse <dwmw2@infradead.org>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- xen-devel@lists.xenproject.org, qemu-block@nongnu.org,
- Anthony Perard <anthony.perard@citrix.com>, kvm@vger.kernel.org,
- Thomas Huth <thuth@redhat.com>, Peter Xu <peterx@redhat.com>
-References: <20231114143816.71079-1-philmd@linaro.org>
- <20231114143816.71079-5-philmd@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20231114143816.71079-5-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On 14.11.23 15:38, Philippe Mathieu-Daudé wrote:
-> physmem.c doesn't use any declaration from "hw/xen/xen.h",
-> it only requires "sysemu/xen.h" and "system/xen-mapcache.h".
-> 
-> Suggested-by: David Woodhouse <dwmw@amazon.co.uk>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> ---
+On 14 November 2023 10:13:14 GMT-05:00, "Philippe Mathieu-Daud=C3=A9" <phil=
+md@linaro=2Eorg> wrote:
+>On 14/11/23 16:08, David Woodhouse wrote:
+>> On 14 November 2023 10:00:09 GMT-05:00, "Philippe Mathieu-Daud=C3=A9" <=
+philmd@linaro=2Eorg> wrote:
+>>> On 14/11/23 15:50, David Woodhouse wrote:
+>>>> On 14 November 2023 09:37:57 GMT-05:00, "Philippe Mathieu-Daud=C3=A9"=
+ <philmd@linaro=2Eorg> wrote:
+>>>>> Add a tag to run all Xen-specific tests using:
+>>>>>=20
+>>>>>    $ make check-avocado AVOCADO_TAGS=3D'guest:xen'
+>>>>>=20
+>>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro=2Eorg>
+>>>>> ---
+>>>>> tests/avocado/boot_xen=2Epy      | 3 +++
+>>>>> tests/avocado/kvm_xen_guest=2Epy | 1 +
+>>>>> 2 files changed, 4 insertions(+)
+>>>>=20
+>>>> Those two are very different=2E One runs on Xen, the other on KVM=2E =
+Do we want to use the same tag for both?
+>>>=20
+>>> My understanding is,
+>>> - boot_xen=2Epy runs Xen on TCG
+>>> - kvm_xen_guest=2Epy runs Xen on KVM
+>>> so both runs Xen guests=2E
+>>=20
+>> Does boot_xen=2Epy actually boot *Xen*? And presumably at least one Xen=
+ guest *within* Xen?
+>
+>I'll let Alex confirm, but yes, I expect Xen guest within Xen guest withi=
+n TCG=2E So the tags "accel:tcg" (already present) and "guest:xen"=2E
+>
+>> kvm_xen_guest=2Epy boots a "Xen guest" under KVM directly without any r=
+eal Xen being present=2E It's *emulating* Xen=2E
+>
+>Yes, so the tag "guest:xen" is correct=2E
+>
+>> They do both run Xen guests (or at least guests which use Xen hypercall=
+s and *think* they're running under Xen)=2E But is that the important class=
+ification for lumping them together?
+>
+>The idea of AVOCADO_TAGS is to restrict testing to what you want to cover=
+=2E So here this allow running 'anything that can run Xen guest'
+>in a single command, for example it is handy on my macOS aarch64 host=2E
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Ok, that makes sense then=2E Thanks for your patience=2E
 
--- 
-Cheers,
-
-David / dhildenb
+Reviewed-by: David Woodhouse <dwmw@amazon=2Eco=2Euk>
 
 
