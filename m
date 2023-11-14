@@ -1,249 +1,184 @@
-Return-Path: <kvm+bounces-1651-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1652-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3D657EB20F
-	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 15:25:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A573A7EB25F
+	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 15:37:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BFE8281222
-	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 14:25:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 459411F24FCC
+	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 14:37:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1914122F;
-	Tue, 14 Nov 2023 14:25:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC7B41743;
+	Tue, 14 Nov 2023 14:37:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="M7fWSXjw"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="0V6piuLy"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A6141222;
-	Tue, 14 Nov 2023 14:25:36 +0000 (UTC)
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 234F4CA;
-	Tue, 14 Nov 2023 06:25:35 -0800 (PST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7515E40E0171;
-	Tue, 14 Nov 2023 14:25:32 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id NpxUmh6qH1xl; Tue, 14 Nov 2023 14:25:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1699971929; bh=S9j4pHyC5eZLovFq9DRdpMMk7CVfs5bDRVFiXlSpQno=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M7fWSXjw2JBel9ThmJ9QDNCHaD5NxcrsjiYGuZ4LFSYhzr8pwCXECZxnUwimfrnPa
-	 ZT9rJ7dRyg8oH+tiW56ux7lLMvP1KtI+FbygIUmL/jGCSSkXDoYS0A0VgYIiUCMA4H
-	 bPAqU7d/Kij5AFE9EDHJjIWUpf6jKdoReOKgjceyKEqZQtdbjvzG9FFuETFUvdMcHk
-	 x1y5yOAge4H7RuHmAXLyuxBoIh6vT/B+qKDOqvaflDoqGMEi+E4FGCxI3nxB6LOFPa
-	 23YOxOgVc93EVki++VYcVYmYETwDpbTg1OVWnlkmz3zV/i+VhwrQU3mnnyukh8Pa1y
-	 Z8rYS/I2/juroXA5McUNecg4yFIFOfnOe1th06HlaRw+cczqm25nkp1Ca9kr28KfH7
-	 Jid67JdK5aI+qwrWlxyxv6iGDkYtP/SMGTtvgmNL58RV5+bLZ4M9R3Qtx7rpL9/VcZ
-	 8l8NJPXXzULhWJbHP89JBGZNca7532vih3kd7jNu2AdSbGK6x+t3foNfol9CXjKC1k
-	 +3YZzfVz0Zy+CgOAao/tsmgtYQfzSbGILuVsSsjrGAA6w2jg2HIgkxabDldxFf80/6
-	 qJtedObJ0xgbMZB9p0vfuUl/t5UmB8i5Jo/YZ+/6TdZ28Mb3ocaKW1hFc1ApJEqR4V
-	 OU5lxwsBX1DQp6rpAf+drH3Y=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0548540E018F;
-	Tue, 14 Nov 2023 14:24:48 +0000 (UTC)
-Date: Tue, 14 Nov 2023 15:24:42 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-	tony.luck@intel.com, marcorr@google.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v10 07/50] x86/sev: Add RMP entry lookup helpers
-Message-ID: <20231114142442.GCZVODKh03BoMFdlmj@fat_crate.local>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-8-michael.roth@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED7E41239;
+	Tue, 14 Nov 2023 14:37:12 +0000 (UTC)
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2083.outbound.protection.outlook.com [40.107.8.83])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 213C5173E;
+	Tue, 14 Nov 2023 06:37:09 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jJl5dByr2EVDQNLIoDXezCs3afl66xMtVbvJLnZyVNtgnp9d7bgzyJtKqJVaEaTurPlHTklUEbHVDK/cXFf6woLvu/o6WjcbZEi4+njy/gJkjAkFVDJ7lckFb5Wh+kcZE0JMoimlwCDp6dT49+FdcFdFUMk31hrgUxNXBacSdYBOuEaJtVosOdNf+u6RzdZaKiJIGXehZvT6kqgcbmtcehG1UJSFfpcxhRev12mKkBfGKtqQ95vnzPs8IB2/1iiAcvaz4cMS1NRgTlwucNPzrnrfsCUrJ++kI3CgU9NDovyXfc94NyE0XQvEyeFAB54HkDWB0WVrbTBykzU7ygEQQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fIp7OUZzg+QhnQ96ayhhLPJF21ZFpnDr328N3mBePF4=;
+ b=iaVgV++ffTxZCBHT39XcUs06k+Eo+bvVjcNvipYzI06iXDVebXJagEPz4U0wD1teXddtb9pz+3AQfHMQGIaW+9dZfYalNYPhUfkU5oWItzrrslIk1mDvQFaQKcitB3kdTl+GBI6702DMfqBRqfbJlLAl53xgNcKOjlWNQdb2H6cmKqzCwlTXm7l8yAbETiRxQtVANv//MXa2aSWtDUFhTflxG2nH4NKNGrseqg2un/cMMb5csiztHB1Gcrbpn5CEtH0tL9eGOOIws6lfSgMApU4qg9OSW+a3QveB+KmksU5b79Va2ykbvHL5AUNErOSamXnOQbsKiGcUo+vwKiF3/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fIp7OUZzg+QhnQ96ayhhLPJF21ZFpnDr328N3mBePF4=;
+ b=0V6piuLy1Cq9SgD1vJgXEVP1f7iW9KB69EL1PHBqqHX/JYR7bZPSXnVwGMpv0JHqfRu1KwywO9IDm6QN6IHBn4MqudK8iTN1xI2FwMmXxPcXziXR/KPs3UZw8ylL6hEVGifBbGCkx2kV/WAZIIR3qswgj0Qsd9vHEjvwGB4g+IHpL+/cBh7XfAi4TBY62sHlusPasCz9ZRP7LUL3gIFeWnBb13ST8x7d32Ug2NmMPrByhSvvMFdd8CT9COiWbJgkmhuEK7UG8abCc0ROgaj+tETwocRkOc0mmIdXLz8TdwLRFs9TzUpeQMfnvnmn/BfvsmX4CHL+2HBf7SkIX5rp2A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=suse.com;
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com (2603:10a6:102:cc::8)
+ by AM9PR04MB8456.eurprd04.prod.outlook.com (2603:10a6:20b:3df::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.17; Tue, 14 Nov
+ 2023 14:37:06 +0000
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::e665:a062:c68b:dd17]) by PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::e665:a062:c68b:dd17%3]) with mapi id 15.20.7002.014; Tue, 14 Nov 2023
+ 14:37:05 +0000
+Message-ID: <71636309-3bf1-4e7a-b586-c61fea30f7c0@suse.com>
+Date: Tue, 14 Nov 2023 16:36:59 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 14/23] KVM: VMX: Dump FRED context in dump_vmcs()
+Content-Language: en-US
+To: Xin Li <xin3.li@intel.com>, kvm@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, corbet@lwn.net,
+ kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ vkuznets@redhat.com, peterz@infradead.org, ravi.v.shankar@intel.com
+References: <20231108183003.5981-1-xin3.li@intel.com>
+ <20231108183003.5981-15-xin3.li@intel.com>
+From: Nikolay Borisov <nik.borisov@suse.com>
+In-Reply-To: <20231108183003.5981-15-xin3.li@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ZR0P278CA0016.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:16::26) To PA4PR04MB7790.eurprd04.prod.outlook.com
+ (2603:10a6:102:cc::8)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231016132819.1002933-8-michael.roth@amd.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PA4PR04MB7790:EE_|AM9PR04MB8456:EE_
+X-MS-Office365-Filtering-Correlation-Id: f56ab1d0-0f47-4c60-4fd9-08dbe51f2c14
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	VuzdpoEvH9l5gF96VrW/BYUyPCtUMKYQH9UxfESN1ZOrnjflh5b+/lOU/WFsnuTgSnUUM8PNNJqtiXDrKbEHhAZx6w79yh7Ziotp+VBDZsg6STjkw9e4VctckE6XcpY/CLdNdn7kdxXViKhwGUOX7wTl1SUcfN8Yp2erWu363HbHUlGVHGp6MX1n7O6U2bjFZ3kkPSGe2lLH7Ro7ot1zxqRVKDR9dI/bd1ZJsTSLtnLn8hdA2zjsVotfgV1yu2t4uFwY4ZnG/YXKmMkl4tJrVeTGJC+0B6QZvDaI9b7R+3OhyNdVdUxC6rWrjA2O3Ohb71PcJTAVPQhF+1rCoUJFYXryWh6ssde23DwcQH6SbAdSpWf8zD+2xsNcj64U0J9Zqd4tm6+ON37ti3OG7clICg8DJmCbF/BUmhvVI3/vMgPDgBl+9MgpnF4P2x+p/ihvwmrzQdzlVM+u9n7dlNaIzFWktv5UkgdHf9xUkq4G8/bml0DJr96DirCWEMg3yV+GT7LXPd+XKliTm8if+fX+H5btrkM0hQJoOe+203ncxk546plz9qQCXHxUQronYBSiHPYNT+OthDCB5AXZX1wb+H0uEFjCyI4sqNk7RUdG/Xavc7tbpgKUorIPPIBYdk+A//zkfr40Mas+R8Gnu7C2Kw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7790.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(346002)(376002)(366004)(39860400002)(230922051799003)(1800799009)(186009)(451199024)(64100799003)(86362001)(31696002)(2616005)(6512007)(478600001)(6486002)(6506007)(6666004)(38100700002)(83380400001)(2906002)(41300700001)(316002)(66946007)(66476007)(66556008)(7416002)(5660300002)(8936002)(4326008)(8676002)(36756003)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ZTgvVTlyaUFMcUNuNXJ0VTM0QllRdmxuK0xUSlE2KzN6Zkx3aXJlMXhlRWNT?=
+ =?utf-8?B?Mm0ycytLUTVyWGNvUnMwM2dwK2QvMElYN0FXeTZmbU9kdG1YeWpQLzZVUGZv?=
+ =?utf-8?B?R215U0dUM1J1MGVlMWxuZlBjME5yOVJwL3A0UDA2Z2QzVkdBSWJVWjB5YTA1?=
+ =?utf-8?B?NFkwRXc5ZW42WVZJV1ZTL3pZdUlpcGtCbDlqNkIxY0hjcE5sbUc2eXNscE1P?=
+ =?utf-8?B?Mm4zNUN6KzBTTVYvUnV4NEdja3JRWUNCejlBaE9RVldpVWpiSUFGWGp6b2pu?=
+ =?utf-8?B?bWdVSDYzL2laakVxcWtCSFF2VmZJMWpUTThlOG1PU2VDSEJMbTFQZWcxdktm?=
+ =?utf-8?B?cGZDUWdPQmRwZlNHeitiVTdjTXpJam5adUxkNFhGdWxKSnNjQmtMd3MzWkVR?=
+ =?utf-8?B?cXVBZS9RcENRdXNOaHVDWkRyT0cyVHdmZkViUVd0Y3BZMnhqYVNXbTN1bHhT?=
+ =?utf-8?B?Q1JJcGFqbnU3WDhzOFVtNjBac2gzdkRvWmh4WTN5RjlKWWppQmNLaDhGTjM2?=
+ =?utf-8?B?ZEVVZHpoZGtiZkhVcDN3R0VzdTcyVzRhNHhKZ0hML3lwM2ZjNVQyZlVrNUpC?=
+ =?utf-8?B?Y2c1VkxsNmNRU1B3UGJNNmtRU3BiM0JlNE1sVjA1cWRsRjlCTGdvUGJJbVFE?=
+ =?utf-8?B?VVltb3g1S1ljSEQwMXJwMlozWEZ2Ky9SL2p1OFh3dlV1aXlkVGZDMW1zOHRN?=
+ =?utf-8?B?MUxGeEF6MEdWY21MS3hVRXk2bjBoVzFmYlhmSEJJZlp4N2Z0Q28xamh1U3Ux?=
+ =?utf-8?B?cmJZMGRzeHNoT2IrMmtPWFREYnh5VzJ0bTliZm5jdkNvUkxCb3JUYzk2ZmZa?=
+ =?utf-8?B?RWtpVGlEMXMvc2pvSmI4QmQyTmx0K05iVVhOYjZ4TUlWeEtQVkhzWjZMcEt4?=
+ =?utf-8?B?QkQzOFZLR1M3UnJqaHZYL0wxZkRrSmwvSkpxY1lyZFpydVkyamtUZTcyS0tU?=
+ =?utf-8?B?L29rRFJhNmdvMTEyQkdRdjYzQ0QzQUM0eThYU0F1b0lLaFpEVEJRMWhZcjNO?=
+ =?utf-8?B?a0psSytsYnJUeFFDb2pjeC9JdkovamZscXpCaUZteVlCdTByVTJOVkJqM01H?=
+ =?utf-8?B?NStzNFJoNHZUanhEQ3FmT2RjdnovVGhteExwalhuQ0xwS0FnLzBuQXFqanZ5?=
+ =?utf-8?B?RkRvRXMzb2x2UThXemoxUWlKWmx6cmhFeVZtM0lxV0REQm9MS3R0aFFKZlY0?=
+ =?utf-8?B?V3MrT040UUtDak10WXpVZGtJZG5LdDhuVDAzYWdhaWxxVEcrSGRmeUQ1NHNl?=
+ =?utf-8?B?bTh3SWhsTkJMMVBFUjZoRTliRk90bkdIRndxb0hKRzlEdnl5MDJ6Z2JDemp3?=
+ =?utf-8?B?eDBuZ1hGVHVJbWY2b0RjeGI0bmZERXY2RmFFOFJXQlJsTGZaRjVaT3ZmeVd0?=
+ =?utf-8?B?eHVMZk5Rd210MTNmYVZPS2dybDJTVitiUUtHcmo0WFJDdDdZcHVLNjl1YmVr?=
+ =?utf-8?B?dG1pczVwRVZGaW1MbnhPZk12NGJURzFQT2lFTCtQdkVjZHgzcDF6bkJaZGlI?=
+ =?utf-8?B?dGhaeElLODU4U0RNZnBPWFQvQUFqdmNsbEtQNmkxK0FqanJLbjQweVpoZTJr?=
+ =?utf-8?B?eTlCaVA5cTRSVVFRZWRhVGdpU2xEVlVtK015bmd0MjhFK1o5OERDQ3dBd1B6?=
+ =?utf-8?B?RFJpZVRScUV5YTJ1L3NuWlgrc1VqYkJLeW1uMVNZbmRUeCthNlBHY21Mb1Qx?=
+ =?utf-8?B?TmVvZE8vcVR6alB3V2VBb01ZN0F6MzN1R2lPV25Ia3ZwWHFyYWZhTWVKaWsx?=
+ =?utf-8?B?d0krVGlpSlVHaFdncVdiZGJHLzg1dGExRXQwdlpYWUpWdGxTTS9LZTJ2dE5u?=
+ =?utf-8?B?dlk0MzR6S0UvTHVBVjJVOHNBMXZnbkJWSlhZdE1EOEc3ZUIrM1Q3MXdnZW9I?=
+ =?utf-8?B?OEtPMEczT1BmVFY1TFg3NGdDTUVZWTRoMkEzOTZWWlNIc0JLV212QXhEdDNz?=
+ =?utf-8?B?VWpPdGx5RTZEbEJLTnFWUmdOQzdFb0F6RVZZcTdPbzc3NzNCRDliZFBVaTVR?=
+ =?utf-8?B?Q0x4S0ZRYmxvcGFpZTRZYnR3Q29IWi9admJrL2gzUU51ajNzcUM3SnhPT1pD?=
+ =?utf-8?B?b1BMN3VJWmN2MEJRRXR1U1hZNnI3anA4MXRWUUZjWlE1OEFrbHd3MkRDOG9a?=
+ =?utf-8?B?VkN0WHUxRnlZUXY5SXFjNUxtRE1vc2tSUU1ML3I1eUo1TjJxQUZCU1F0anFY?=
+ =?utf-8?Q?sVY3Tg/ZOd4OLo3gAIMeRo0lNw+i4H/0aWxFdK1MJBOM?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f56ab1d0-0f47-4c60-4fd9-08dbe51f2c14
+X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7790.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2023 14:37:05.3435
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RwdCejv0FO1iXWIkDXjjf/b+tOSEB4e2rpggmksbwcOKAxoaYCf0lBMLhVh1y+ShBgq/m5uiCileXgCV3aSAeg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8456
 
-On Mon, Oct 16, 2023 at 08:27:36AM -0500, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
+
+
+On 8.11.23 г. 20:29 ч., Xin Li wrote:
+> Add FRED related VMCS fields to dump_vmcs() to have it dump FRED context.
 > 
-> The snp_lookup_page_in_rmptable() can be used by the host to read the RMP
-
-$ git grep snp_lookup_page_in_rmptable
-$
-
-Stale commit message. And not very telling. Please rewrite.
-
-> entry for a given page. The RMP entry format is documented in AMD PPR, see
-> https://bugzilla.kernel.org/attachment.cgi?id=296015.
-
-<--- Brijesh's SOB comes first here if he's the primary author.
-
-> Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> [mdr: separate 'assigned' indicator from return code]
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Tested-by: Shan Kang <shan.kang@intel.com>
+> Signed-off-by: Xin Li <xin3.li@intel.com>
 > ---
->  arch/x86/include/asm/sev-common.h |  4 +++
->  arch/x86/include/asm/sev-host.h   | 22 +++++++++++++
->  arch/x86/virt/svm/sev.c           | 53 +++++++++++++++++++++++++++++++
->  3 files changed, 79 insertions(+)
->  create mode 100644 arch/x86/include/asm/sev-host.h
+>   arch/x86/kvm/vmx/vmx.c | 48 ++++++++++++++++++++++++++++++++++++------
+>   1 file changed, 41 insertions(+), 7 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-> index b463fcbd4b90..1e6fb93d8ab0 100644
-> --- a/arch/x86/include/asm/sev-common.h
-> +++ b/arch/x86/include/asm/sev-common.h
-> @@ -173,4 +173,8 @@ struct snp_psc_desc {
->  #define GHCB_ERR_INVALID_INPUT		5
->  #define GHCB_ERR_INVALID_EVENT		6
->  
-> +/* RMP page size */
-> +#define RMP_PG_SIZE_4K			0
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 518e68ee5a0d..b826dc188fc7 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6429,7 +6429,7 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
+>   	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>   	u32 vmentry_ctl, vmexit_ctl;
+>   	u32 cpu_based_exec_ctrl, pin_based_exec_ctrl, secondary_exec_control;
+> -	u64 tertiary_exec_control;
+> +	u64 tertiary_exec_control, secondary_vmexit_ctl;
+>   	unsigned long cr4;
+>   	int efer_slot;
+>   
+> @@ -6440,6 +6440,8 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
+>   
+>   	vmentry_ctl = vmcs_read32(VM_ENTRY_CONTROLS);
+>   	vmexit_ctl = vmcs_read32(VM_EXIT_CONTROLS);
+> +	secondary_vmexit_ctl = cpu_has_secondary_vmexit_ctrls() ?
+> +			       vmcs_read64(SECONDARY_VM_EXIT_CONTROLS) : 0;
+>   	cpu_based_exec_ctrl = vmcs_read32(CPU_BASED_VM_EXEC_CONTROL);
+>   	pin_based_exec_ctrl = vmcs_read32(PIN_BASED_VM_EXEC_CONTROL);
+>   	cr4 = vmcs_readl(GUEST_CR4);
+> @@ -6486,6 +6488,19 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
+>   	vmx_dump_sel("LDTR:", GUEST_LDTR_SELECTOR);
+>   	vmx_dump_dtsel("IDTR:", GUEST_IDTR_LIMIT);
+>   	vmx_dump_sel("TR:  ", GUEST_TR_SELECTOR);
+> +#ifdef CONFIG_X86_64
+> +	if (cpu_feature_enabled(X86_FEATURE_FRED)) {
 
-RMP_PG_LEVEL_4K just like the generic ones.
+Shouldn't this be gated on whether FRED is enabled in kvm aka the CPUID 
+bit is enumerated ?
 
-> +#define RMP_TO_X86_PG_LEVEL(level)	(((level) == RMP_PG_SIZE_4K) ? PG_LEVEL_4K : PG_LEVEL_2M)
-
-What else is there besides X86 PG level?
-
-IOW, RMP_TO_PG_LEVEL simply.
-
-> +
->  #endif
-> diff --git a/arch/x86/include/asm/sev-host.h b/arch/x86/include/asm/sev-host.h
-
-Nah, we don't need a third sev header:
-
-arch/x86/include/asm/sev-common.h
-arch/x86/include/asm/sev.h
-arch/x86/include/asm/sev-host.h
-
-Put it in sev.h pls.
-
-sev-common.h should be merged into sev.h too unless there's a compelling
-reason not to which I don't see atm.
-
-> new file mode 100644
-> index 000000000000..4c487ce8457f
-> --- /dev/null
-> +++ b/arch/x86/include/asm/sev-host.h
-
-...
-
-> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-> index 8b9ed72489e4..7d3802605376 100644
-> --- a/arch/x86/virt/svm/sev.c
-> +++ b/arch/x86/virt/svm/sev.c
-> @@ -53,6 +53,9 @@ struct rmpentry {
->   */
->  #define RMPTABLE_CPU_BOOKKEEPING_SZ	0x4000
->  
-> +/* Mask to apply to a PFN to get the first PFN of a 2MB page */
-> +#define PFN_PMD_MASK	(~((1ULL << (PMD_SHIFT - PAGE_SHIFT)) - 1))
-
-GENMASK_ULL
-
->  static struct rmpentry *rmptable_start __ro_after_init;
->  static u64 rmptable_max_pfn __ro_after_init;
->  
-> @@ -237,3 +240,53 @@ static int __init snp_rmptable_init(void)
->   * the page(s) used for DMA are hypervisor owned.
->   */
->  fs_initcall(snp_rmptable_init);
-> +
-> +static int rmptable_entry(u64 pfn, struct rmpentry *entry)
-
-The signature of this one should be:
-
-static struct rmpentry *get_rmp_entry(u64 pfn)
-
-and the callers should use the IS_ERR* macros to check whether it
-returns a valid pointer or a negative value for error.
-
-Ditto for the other two functions here.
-
-> +	if (WARN_ON_ONCE(pfn > rmptable_max_pfn))
-> +		return -EFAULT;
-> +
-> +	*entry = rmptable_start[pfn];
-
-This wants to be called rmptable[] then.
-
-> +
-> +	return 0;
-> +}
-> +
-> +static int __snp_lookup_rmpentry(u64 pfn, struct rmpentry *entry, int *level)
-> +{
-> +	struct rmpentry large_entry;
-> +	int ret;
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +		return -ENXIO;
-
-ENODEV or so.
-
-> +
-> +	ret = rmptable_entry(pfn, entry);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/*
-> +	 * Find the authoritative RMP entry for a PFN. This can be either a 4K
-> +	 * RMP entry or a special large RMP entry that is authoritative for a
-> +	 * whole 2M area.
-> +	 */
-> +	ret = rmptable_entry(pfn & PFN_PMD_MASK, &large_entry);
-> +	if (ret)
-> +		return ret;
-> +
-> +	*level = RMP_TO_X86_PG_LEVEL(large_entry.pagesize);
-> +
-> +	return 0;
-> +}
-> +
-> +int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level)
-> +{
-> +	struct rmpentry e;
-> +	int ret;
-> +
-> +	ret = __snp_lookup_rmpentry(pfn, &e, level);
-> +	if (ret)
-> +		return ret;
-> +
-> +	*assigned = !!e.assigned;
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
-> -- 
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+<snip>
 
