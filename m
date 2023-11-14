@@ -1,208 +1,385 @@
-Return-Path: <kvm+bounces-1618-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1619-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DABEC7EA7BE
-	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 01:43:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E31857EA7F8
+	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 01:57:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A0421F23B72
-	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 00:43:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 117A41C209FB
+	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 00:57:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A35C846B0;
-	Tue, 14 Nov 2023 00:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE8D46AE;
+	Tue, 14 Nov 2023 00:57:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EyJlDdcP"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="VumYyGzC"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D5FB747B;
-	Tue, 14 Nov 2023 00:43:46 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A00CD5A;
-	Mon, 13 Nov 2023 16:43:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699922624; x=1731458624;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=NKtNRhIUg7Mr+IyCpRpr8MQo5ET9Z7oU1fIbXO8JoU8=;
-  b=EyJlDdcPxXms6ymFlIx0pCzU2vgizm5kLrQINDv8R97iwBT+W2IA4bk3
-   QqTXvwxvqpuEmZOvqAM8CGZh054bSwMz39n5igbSgideDM5Va3TKZJFXj
-   5zXFDrFnjA43HuyTVbT5UKL1qwQCM5ORKsDsjJib4Yd9xdOaeKaVCVuMi
-   oejR7tF26APkonm6uqfG2RYB7dUb5iEdDb9aWpCQXjYerETagpNcp3Dof
-   CFYZyjcPKmlO3h/A6qOrOE3ylVWTsoWLMUiJ3a+fRn6lYEDUlwfcmZ82J
-   RolOk9caYhFRUAJtxifaBk+vRI9X9NQQUukiUiaDkp6m2aAWFDaWKT632
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="394446543"
-X-IronPort-AV: E=Sophos;i="6.03,299,1694761200"; 
-   d="scan'208";a="394446543"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2023 16:43:43 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="799340171"
-X-IronPort-AV: E=Sophos;i="6.03,299,1694761200"; 
-   d="scan'208";a="799340171"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Nov 2023 16:43:43 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 13 Nov 2023 16:43:43 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Mon, 13 Nov 2023 16:43:43 -0800
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.41) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Mon, 13 Nov 2023 16:43:42 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2001D440F
+	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 00:57:42 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2055.outbound.protection.outlook.com [40.107.223.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD5E6D51;
+	Mon, 13 Nov 2023 16:57:39 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NSPDeNCoXl3IHtoQGb8wPENcO4t60WfRnst39UGMz8Dbw96e0glvk8ZLEwcYIWXniWMZpTGqTay0zOU++PPGmQUGXQ5vrokx+C6yKv6goAIt413lNuWv7H/4Dxb8v8E/WdDanocvby+i6juv5NTps6fxBSladgKacSGvclVluZ88J9LUyStAfAt+SBwtUi1RUXjnk//Q1gSASrREdo4iTYpMZnslPd53onrqarkUC93ONnQ+unPFKP7v0l4bbzDN4hP/WuCIfpFnUavXIIgbkcAfU7ElVCL5lGnEGVTSun6AU5kLj3wWCPD2AzgdDsF8QdQymo09lYzQWRQM1dXWDg==
+ b=kHQNsYjapjIOvAcUfJ7H9K8k69VqGh6WJb630sYp1c0rYh8GqiUlsr5KQSXbkm7RMCMDvh9GVw1Ah1+OjefUhTRRoOqqKcY936K60ZS6kwPD8FFamPiIoXsBTQF1ECarGgIZ9lMe0OYzaBOR92IGHAmbFlDwmW3WAWCwjgfKcbQhKVOe+S7no15UQ2/a83UY79Z4XH9xdbly6wJ+sQRxN2pewOnNiGXXEla6c/nH60bJvmuyyHXMeYwP9chO1CltoHU5qEiBkwNLZGI4SuuMeM5FkOqRqpza/pOy7sV+D7cLVqx4tIOaNUNuUFNjKDQ5nDfDSRfgcVp3cZ0QlHPUqA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NKtNRhIUg7Mr+IyCpRpr8MQo5ET9Z7oU1fIbXO8JoU8=;
- b=jc/3kFpfvuGw7Y2GYmYDcSspPl2spaF7pmqmTyw8biUWeMJqCPSrqxFi6ai9yT/il1qr8KRzaNo4Ggo4OU7SQJr2amqWZgir3xnlzfB5gt7BzUUHINkqAEg1J0ZGm4FE88XYwlvZ0p2pFHyBK/ZA3fMI8Un3nZ+mIj63bocnEz28GbSf+SIuLtZNyAURKOL/X5tDftLhAU5tl1bxVDw7EcKwMBgDNufMfpBTvypiC6k2a38P+y1/4F4OX9SsL5VvBkdKCx9P6OAAPpKFdkeJeAKZOetkJ93crSAR4evA1c1N5YoV5MsN5WseL9SNC1O75ce1LCmnNFJZg2BzzKTaAg==
+ bh=J6y1jei7nFWXhWMzYGBZb3vLPn0CIxYrvBKAZklq0nE=;
+ b=MGnGLkJjFpe8o5/roJaR59YJr8/dp059YLfh+trJLr/Od7hLYgikewEIxhKk8oqMy4ErhtsDRP/3bAlD0f6Rg94isTvihXQcYpOIgdtEx7ncqq7HqJIJqqHrh56ytc5oYMutvk9SYqz0tUW4TVqiyIQRkus4XPviHgi/51u7iAuWSbjMWyoZRADiD6W+quQK3dh4kImhLFwqbmsQElf/pGJKi4GalTksPAPJ5c3NpzLA+k7Z6n2v/gWhA5PKJNHmxZGDWG1yfUj3AUBOCpS2Bptq/x4kCYDe2L+soS+N43FUdu2hUVHBf1US1sbpPV8fWXloh2AtB0xEZc0lsIlZXg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SA1PR11MB6734.namprd11.prod.outlook.com (2603:10b6:806:25d::22)
- by MN2PR11MB4518.namprd11.prod.outlook.com (2603:10b6:208:24f::24) with
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=J6y1jei7nFWXhWMzYGBZb3vLPn0CIxYrvBKAZklq0nE=;
+ b=VumYyGzC4kawbNZxf3/uRX4zYp1i+LeyEG2LTd/uXJ44vDkXATHjmrWHKyDqmlMlDg5xri2RhfmW3TRKg5wk5kIJWFPNewUM3TdTmH7nIvN1bplXNhfWu09vXB3VNkPX6lEFAXV1hNruCjedEnllBc9pPpI71zYjWwVxQoI54+w=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
+ by CY5PR12MB6431.namprd12.prod.outlook.com (2603:10b6:930:39::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.31; Tue, 14 Nov
- 2023 00:43:38 +0000
-Received: from SA1PR11MB6734.namprd11.prod.outlook.com
- ([fe80::3d98:6afd:a4b2:49e3]) by SA1PR11MB6734.namprd11.prod.outlook.com
- ([fe80::3d98:6afd:a4b2:49e3%7]) with mapi id 15.20.6977.029; Tue, 14 Nov 2023
- 00:43:38 +0000
-From: "Li, Xin3" <xin3.li@intel.com>
-To: Borislav Petkov <bp@alien8.de>
-CC: "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "xen-devel@lists.xenproject.org"
-	<xen-devel@lists.xenproject.org>, "tglx@linutronix.de" <tglx@linutronix.de>,
-	"mingo@redhat.com" <mingo@redhat.com>, "dave.hansen@linux.intel.com"
-	<dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>,
-	"hpa@zytor.com" <hpa@zytor.com>, "Lutomirski, Andy" <luto@kernel.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Christopherson,, Sean"
-	<seanjc@google.com>, "peterz@infradead.org" <peterz@infradead.org>, "Gross,
- Jurgen" <jgross@suse.com>, "Shankar, Ravi V" <ravi.v.shankar@intel.com>,
-	"mhiramat@kernel.org" <mhiramat@kernel.org>, "andrew.cooper3@citrix.com"
-	<andrew.cooper3@citrix.com>, "jiangshanlai@gmail.com"
-	<jiangshanlai@gmail.com>, "nik.borisov@suse.com" <nik.borisov@suse.com>
-Subject: RE: [PATCH v12 01/37] x86/cpufeatures: Add the cpu feature bit for
- WRMSRNS
-Thread-Topic: [PATCH v12 01/37] x86/cpufeatures: Add the cpu feature bit for
- WRMSRNS
-Thread-Index: AQHZ9caG3VIRGozoEkidJJiXW1l1kbBwlOyAgAieqDA=
-Date: Tue, 14 Nov 2023 00:43:38 +0000
-Message-ID: <SA1PR11MB673495967E44583FC36B5E39A8B2A@SA1PR11MB6734.namprd11.prod.outlook.com>
-References: <20231003062458.23552-1-xin3.li@intel.com>
- <20231003062458.23552-2-xin3.li@intel.com>
- <20231108123647.GBZUuA31zntox0W0gu@fat_crate.local>
-In-Reply-To: <20231108123647.GBZUuA31zntox0W0gu@fat_crate.local>
-Accept-Language: en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.29; Tue, 14 Nov
+ 2023 00:57:37 +0000
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::3112:5f54:2e51:cf89]) by CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::3112:5f54:2e51:cf89%5]) with mapi id 15.20.6977.029; Tue, 14 Nov 2023
+ 00:57:37 +0000
+Message-ID: <51bf9fed-2bad-4eb1-bbc7-239200bff668@amd.com>
+Date: Tue, 14 Nov 2023 11:57:34 +1100
+User-Agent: Mozilla Thunderbird
+Subject: Re: TDISP enablement
 Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR11MB6734:EE_|MN2PR11MB4518:EE_
-x-ms-office365-filtering-correlation-id: 9a6e5578-8a6c-45f6-3d07-08dbe4aabdb7
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 191my9q75Ck1wvghTTQhs1geZ00xzBfZU0e4D/aVd7PoVcZxC0WozSdBEfVQjVAWjs7+VFxIvug0cgNR9khJgjkD9Mq78a+OkDhvzg5BPlWhfqtx1Ye7K6mFvhpP89GJEgGXwaC5kRX7uwOA5Gyvjf1gzLIeWXoBfaRPICjpBhVbop6orATmkAIxW1L9t29NOVmb8mcTLPBKEB9tSVkQFP13rlh/P72R/o8s+ZoRp0ZqRieAnuJ9ug/PDpvsFUS8t3rO5A9PZnQnu5IEVCt6UPd2WytZr37CebQb16ITGQerAX4BVTfkYQEBOFhOGjAg5yWqaUjeiSfwJV5CMU7dsxT1FGfD45c1t8Lqma4qsjFGK14pt2Klr1ZM1C5wwC+lHs8sP8TawWGgcvfr4xgQx8R1rkTtvyOA4xvVNK4tbnPmHBJ369yAJ5Xq84++BCaiQKqeKSnkJW4r2nnDpbLCYI8VquRrvkmuqBD4/Ot7Ab+WJWMy2D5W8tX3XhDGc3Hy+/CqfROVtZqSXr4VbYB3G9r7b/iAq9qeRy2zMIV9x2Q+vu0XW00WD9AZTDODEHSDTVLxXzuCKJ6vi1NEwB7dWzSRbkT7YwGtKFyO2VmfLrfnOhRr3SHVFx9lnfpgiRxiykFfMDNK9FZ7akziBqNRiw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6734.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(376002)(366004)(136003)(346002)(230922051799003)(1800799009)(451199024)(64100799003)(186009)(38070700009)(122000001)(82960400001)(26005)(6506007)(478600001)(7696005)(71200400001)(966005)(9686003)(86362001)(55016003)(7416002)(5660300002)(52536014)(33656002)(41300700001)(2906002)(38100700002)(8676002)(8936002)(64756008)(316002)(6916009)(66476007)(66446008)(76116006)(4326008)(54906003)(66556008)(66946007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?QVdvRmZ6TG9MNjR1cE5CRGRqZjZ5R3RGeWlRK1FUYW9BVldMMmg2UmFpcjlL?=
- =?utf-8?B?eG0vOXZyUy8vQm9xeVlvWkFlMGpNQldDTDNIRllRWnVZVk1LYi84MkZiL25m?=
- =?utf-8?B?dU0zSm1PeEhyd29aWElQbW9McVY1VUcwY0VVcE9kRTFGeW93Q2QrYitZc2RM?=
- =?utf-8?B?bDFYa3cvZjBTV2tOQVloS3ZSUXhCVEpNZ05Kbk40RWUwR2tOWWRVUklSL3lM?=
- =?utf-8?B?NTRvQUU0V1NuOHo1cmxydTMyejlxNVVCQjI4SVQvU2kxdWFVMkpKMTZUMnBH?=
- =?utf-8?B?WmNmZjhXdktRZEZtZFYvNDRHM0JVODg1VGRycUNONmJMK3Y2UXgrLzRUdUZQ?=
- =?utf-8?B?UlByOWZwSExlWFpWdFZhbThLbVl5UW9xN09LVm9wakxQUFRiY3ZTNXJlTWJU?=
- =?utf-8?B?UjQyTG1VQXQ2SmpUcFlDamxZYi9tSndjY3QxSUMxZmRBTU1ibzhQR2JPNExH?=
- =?utf-8?B?cFBqUWFNM3pTelZ5VDFrS3NRcHhUQ1FRd1VtNGxzd3c1UWZyUU53M1QzbEFx?=
- =?utf-8?B?L0tUMlZid0FYbDFzOEo0eXJPa2hUK1BJKzNkd0MyMTREZUNic29NOC8wSkFR?=
- =?utf-8?B?ayt1ekl0elpRQUtHeVZGN254LzVDY1lFeERsbytqeVNIVmVIQ2Y3OUE1OXpP?=
- =?utf-8?B?Y1dvUXZURHFOUTNsMG9Fd29DdEVkRWMvYlZQS2JxWVcwWDZtOXdIN2R5SEUv?=
- =?utf-8?B?aE1oYlFZZWVXYXYzUzdFVDhxNlJWMTV5WWs2a0JYRk51NHMva3hVd3Bpdjgr?=
- =?utf-8?B?UmtpVHAwRjArMzdXeG1oQitOZUJ4VW5TNU5GdlN5TXNDRkFaR1BXMFRwVzJL?=
- =?utf-8?B?bm9SZ2lEY2loU2ZnaENTUEpMYUJKRFJBc0pkaXVFUlJwODVFR21oWSt3Rzd0?=
- =?utf-8?B?eWUzeXZ1VjUrbFU0M3RNRHlNYktDbXA3WGtsZHFUQUpTdjc0Q2VoanVVOWRG?=
- =?utf-8?B?TEUzelRuTEpYNU9oSm5BSG5odFdCQSt3U1RGZXJiTUdQZ0o2Y2t4WEI4UVRC?=
- =?utf-8?B?dDRjUDNYL0VwbzloZkRzSVd0ZXdMS2daY1AwbzdqRTFzbE80T1BqalA1MS9S?=
- =?utf-8?B?dFphb0R6WThwK0hQMnpDcFZHaFN6dmkwYW5USHB2OEM1bmRIRU5MSjJPR25w?=
- =?utf-8?B?dmNkSmRQRXdpakV5emZ0MTNiUDFjOUFMMlNhMm5GdWV4VGRLVVJKQWUxRWhF?=
- =?utf-8?B?eTI4bzUrSlNoN1NDWHQvUENKTGRhcVNzOHl3WjdjV29zOGpKbTh5clErSDJr?=
- =?utf-8?B?K3BMMG8vcnFva0FUSjlqMjVhQ1QrV0cwU1JtYUNrYlZteHBsRUZwekZJS08v?=
- =?utf-8?B?eEFEdU56WlhPd0ZkKzBJTitzVnR3b1JtYlBqb2hRT0pYR2MyRGRvN2I2d1dj?=
- =?utf-8?B?SDdiNC9XbmsrUmlZaUVGc2RDL25SYWRUUzk5MXdwQnJoVm1YamwvYW0xZlRT?=
- =?utf-8?B?TEtKQUVWV0xHWHNKWk5wQnRvbkNSSkV6NzVrSndlR2Q3bHAwUGRMd2IyL1B1?=
- =?utf-8?B?cXYvNmk3VFdjd2xTc2Y0Wk9RT21ObjIraEc0T0ZvQTM4UTBuSTREL3A1ek81?=
- =?utf-8?B?Uy84ajNNZzBMNEZIR1JPQXpUeWI5dEY4ZkkraGV4ZDF5cHp4NFNFenhFZUlp?=
- =?utf-8?B?YXFrdnFoOSs5aEhaeFl2NVV3U0dZUU9Rek00YTEwWFZrN0gwbHprUEora3BV?=
- =?utf-8?B?NHZ1UHlqLzVRNVA3REJFdzZzOWZBSmZSQ1h0ZUdiOFdFQ2ExZFVqUUxVQWRx?=
- =?utf-8?B?UkNaaWxCY0RLNy92T0RsR0xmV00wOU9VTmcyR1VhTlVtYjNNK1k4UURjU2Nk?=
- =?utf-8?B?ZVpDSlNsQU1DeWg1WUZXcUdBUUlSUjBLenpSNE9oVlE3NFpXeHpWM1h2U0Ro?=
- =?utf-8?B?eEpHUHpLREVNVEVPbkRLRkx5ak50YXN0NkRtMG5MeTh4MHZaZXBCaHBvQTZK?=
- =?utf-8?B?WTNEWDBkbkRFWTBlb3I5dG1MYk1OaWpqUjVTUWN1TTNJYVo5d2dGSlRGb3FB?=
- =?utf-8?B?T1M3SHFiVjNsTzJJS1poZWlCUnVDTDhDR1A5UnRKMU1mOFFPL09CREdiNDlI?=
- =?utf-8?B?ZVBybExrRE9kZVdFdlEzQ2ZQNGw0TlNJcTlGcHl4QXRPTEZEQnV5ZnNBMlRa?=
- =?utf-8?Q?hssM=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+To: Samuel Ortiz <sameo@rivosinc.com>
+Cc: linux-coco@lists.linux.dev, kvm@vger.kernel.org, linux-pci@vger.kernel.org
+References: <e05eafd8-04b3-4953-8bca-dc321c1a60b9@amd.com>
+ <ZVG3fREeTQqvHLb/@vermeer> <58a60211-1edc-4238-b4a3-fe7faf3b6458@amd.com>
+ <ZVI8Y8VICy/SwYy5@vermeer>
+From: Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <ZVI8Y8VICy/SwYy5@vermeer>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR13CA0116.namprd13.prod.outlook.com
+ (2603:10b6:806:24::31) To CH3PR12MB9194.namprd12.prod.outlook.com
+ (2603:10b6:610:19f::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|CY5PR12MB6431:EE_
+X-MS-Office365-Filtering-Correlation-Id: a845dd74-f0ec-41a1-ffed-08dbe4acb1d5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	4nc2YkyRRr5dS8kgPgoJ/PDCI/J/VUtnLHl4CYIyDX9r4yXaXE1hyVgJ8+91IfJdsM6/nxtnVSeKfr82Gb4ZyF0PBbuwR0CigQO8oJyTvzT7c8OyKBYRp7crJPNDRtuAvn8oGF6V8ov6PpOyJLWGScrShY4ifonzpIjC5DxCn7REl4lXpnt5ZvbtcKdH2v/L1QTBxn1zSaViPJWuC+X6+QSukJDxueLYTP1sl7c4Qdsie/BjL9wK/4bEbPIVNqVEj5DQ4lsIaNJPqXpz9uBVW+aUgPXrsaH+7BT/pSvMObYGrp+ymcBTDEMyVx02eRLUS0B5ZTvziWq499YahKinlyrekDPzu2LrAqFJSU74crdywv4rECJNpTyxZ7C+tfiCup0ThnkjY3em3Y+4YHHoolIQ9EIvL5Qp4Y2alLeOrxxz/itcV1zLSAlqQG0Lh/AZ1nwpYE/x+YC2jczlD6ZypgEKVfWyKgSOeacc83ZjdWBl0wFH6yvJfkjwndKcsqB9dw19wA16sq2nt9XJR7OcNBDS+8lyWIPlL3xXgx3sTr0fRrfMwFjRBy/S5+n5zJaXW8uXuXlN0i76TWWl+ZYd+qKpVB6xyT+NhMEaz8luPJA84V2dkY0lto2aZABhJOqFdWIev8XJRWHqN4D6lzjaSw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(346002)(396003)(376002)(136003)(230922051799003)(186009)(64100799003)(1800799009)(451199024)(53546011)(41300700001)(26005)(6506007)(6916009)(6486002)(478600001)(6666004)(316002)(6512007)(30864003)(2616005)(5660300002)(31696002)(83380400001)(36756003)(8936002)(2906002)(8676002)(7116003)(4326008)(66946007)(66476007)(66556008)(31686004)(38100700002)(3480700007)(66899024)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dXRYdHpXUHJkeVJaeklBZmhvVmNza0d3Tm50TjRmdmVIKzBBVFZ2ekNNVG1D?=
+ =?utf-8?B?MkZzbG53MGlMd3lTc3NhSFVKNlhzdGFaSDNkZHNBVE8xdzZqclRhV2JJWVp3?=
+ =?utf-8?B?OEd5T2l6Z1NtNlFRcnlFREI5UEN2NytOdmVtbXA3Mm83eXordEJadGRkSFVD?=
+ =?utf-8?B?aWJZSW1EWGJSTGpGaGgzdGRPeTdJMkt3enVWdnFRclRmaDNRR2RuTHZLcW9n?=
+ =?utf-8?B?dHdxSXNJZFpnVnlZTkFCU0hSd3kzL2ZQTDNLdGs0OXRpT0RwcDVkMmk4Zkw4?=
+ =?utf-8?B?OEJiQStyNnZTUFNZNER0YnZOaHE5WkNaa090anZYY0tlTXRMaDhCNW1xTG5m?=
+ =?utf-8?B?WTZGcHdqZVFUQnhwTFUxQkJKYXIzbVpwN3dra1JYZ1FqV1ltVlJkQ1hDRnZY?=
+ =?utf-8?B?VFlUSVI0OTExUnJLZXZvZHVBakVabVQ3Ty9GYUh2c0k0UDFaT2NwRHFJRlgv?=
+ =?utf-8?B?MlVPZTVTTHVVRnRmV3lSMTg0TWJyRXJZbWtITXZOUTJlQUhFR0lyVndMVGxv?=
+ =?utf-8?B?MDE1Q3B6ajdEakZvNlMzc3RIK2M5MTZOa3oxWkxteExDM0pVMzJCQVpESHBl?=
+ =?utf-8?B?aWtMdjVvbnA3SkdEUWkwY0x4eG9oNElBV0lGdTMydTBFYUJyeTYzUFJGOUh3?=
+ =?utf-8?B?N3JucHZGM3hpd0JJL3FmVGE2cUJLK0lWa21RdFBOUXl0cDV4cDZLOWthV3NU?=
+ =?utf-8?B?WnJSVW9xQ2dITFdXSExpM2hzMG83RXkzakZ3UnVIbjBSelpNa1NuSVpuM0lu?=
+ =?utf-8?B?OU1lWjdZSWoybkE5MUF2NXFEK0tpeGhiQmo4Mk5FWWppMnBuK3F1SGlYRVRq?=
+ =?utf-8?B?bVQ5em16cENSNWdwRkR5MjZlSDVJNWRvMTlRZy8rK0hXNWkrYmhSd1E1S004?=
+ =?utf-8?B?aXp0SW5kcGRFMkNTS3VQZzJBS09sNXZzN3FCNlQvTVpQcXpNbVpBbFJZL3pL?=
+ =?utf-8?B?MGRxeXRWc2x6NVQvRVpMdGhWTW5pOFRBUjFDRTdWMFVPNldLRUJXL2U0VjV0?=
+ =?utf-8?B?cE8wZ04wM2wvMGRXTE1tZVh4VkkveGxXdllDRGR0YWFJYW9FS1NGQy9DWUpO?=
+ =?utf-8?B?RUF2clJBNlFVK1RLTFNINWcwTmhnNmhwamloS3lZMzB2akpITGpSWm1yTTNp?=
+ =?utf-8?B?OGNRNVlpaTVJTXVXb1ozcUFMV1FvWkhNYnJuMEk0YUpMQUJZb0F1ck1TaDY4?=
+ =?utf-8?B?b08yZ0k0VFNIdHN5VmdhZEpLNDdiZlFXTWZkYkhFV2JtcGVONnlKSkFsTEhN?=
+ =?utf-8?B?cm5xUFNhalVRa09UYm9KZGhMalM5WXNuQWVjTllOaUVsT0l4SEtWR3NFMFp3?=
+ =?utf-8?B?VzN6amhTbFRNcjB5TG5Ub0hoTGl1dGhhcWJ0bGppUUZQWHhqWWFqU0RMM2lh?=
+ =?utf-8?B?ZjZnbno4Q1hyeTg3M2ZZRURGcWRjRnd4dkZUT3hrNGxJYmpCSVRLZnVZbXQr?=
+ =?utf-8?B?UkNPMnBPOHByZHdwRlFzMzNEUHlPbDBzdlJYSDY3a1lGNThGWnprTHRENTJH?=
+ =?utf-8?B?UnRyd2tOemhYUEhtWDNIenB1V3BCdHYwcksyVTlja3ZuTHBvQkd3WVR6d1F3?=
+ =?utf-8?B?U2xxZWtyTUQ4ZzZhOEJseDRVN1J6dSsvNlhKVkJJUTh2cTRlVjErZW50eU0r?=
+ =?utf-8?B?SHF0a1hOQmMwLzVGSHk5b3dVSE4xTHJXc21nMmVtYU5kSk1mclVLanpZMWIw?=
+ =?utf-8?B?aTFmN0JHU1JNY0U3MFh0cWdicVErNjI4Uk41eUlFblkwem5tYWhKRkdPZG4r?=
+ =?utf-8?B?NGxQQVA1R2JhblkrZHVhbEdSZnRaTE9rT25SdE44Z2ZBa0xlUllnaWR1MVQ3?=
+ =?utf-8?B?L2U3YVNuNW03Uk9JdGdQdWkzVkhsYno3UDVnTkhtTHcxa1VUVDVnYTcvUFNP?=
+ =?utf-8?B?ZVFoa1lIU01ST0U0U05wOXNLenViUGhmOG9zbjNkWVFNMXlTSEN0R3ZyNnMv?=
+ =?utf-8?B?dENBTy9jSHhlaEE0TEtIRWZnOXNxbkNLOWJqSnorbE4yMkc3VXBYdmsxRkJa?=
+ =?utf-8?B?MzNURkpFRG5lK3EzSUNuZ0J1dllnZkltLzhuQTQ5aXF4MndCWldCOG96eDVK?=
+ =?utf-8?B?N0RmQWV4S1hIQkFZMTQzamxFVlRvcUV5NWo0RDc4b0QyQkhSL0dSM0lmTEFR?=
+ =?utf-8?Q?PZnc/t2RGROdvTQwEUoEk8mxq?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a845dd74-f0ec-41a1-ffed-08dbe4acb1d5
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6734.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a6e5578-8a6c-45f6-3d07-08dbe4aabdb7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Nov 2023 00:43:38.1514
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2023 00:57:37.3209
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: klIHhrmQhTRhSjfJiHg4VlmRUYuZgdNQwVS0Rsltj7dt88KeT5qPeyp0yOAq6vKQkILvatMQItVYEU6DFVV+aQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4518
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fLGX+yQpXwRlUSMWu+qvm8UlUKKxC2LeLNhXPhzBf8t1l2Eizuqw1iBV5KBwsYdO+pHSFn/Y+icuSHrBO394JA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6431
 
-PiBUaGVuLCBmdXJ0aGVyIGRvd24gaW4gdGhlIHBhdGNoc2V0LCBpdCBzYXlzOg0KPiANCj4gKwlp
-ZiAoY3B1X2ZlYXR1cmVfZW5hYmxlZChYODZfRkVBVFVSRV9GUkVEKSkgew0KPiArCQkvKiBXUk1T
-Uk5TIGlzIGEgYmFzZWxpbmUgZmVhdHVyZSBmb3IgRlJFRC4gKi8NCj4gDQo+IGJ1dCBXUk1TUk5T
-IGlzIG5vdCBtZW50aW9uZWQgaW4gdGhlIEZSRUQgc3BlYyAiRG9jdW1lbnQgTnVtYmVyOg0KPiAz
-NDY0NDYtMDA1VVMsIFJldmlzaW9uOiA1LjAiIHdoaWNoLCBhY2NvcmRpbmcgdG8NCj4gDQo+IGh0
-dHBzOi8vd3d3LmludGVsLmNvbS9jb250ZW50L3d3dy91cy9lbi9jb250ZW50LWRldGFpbHMvNzgw
-MTIxL2ZsZXhpYmxlLQ0KPiByZXR1cm4tYW5kLWV2ZW50LWRlbGl2ZXJ5LWZyZWQtc3BlY2lmaWNh
-dGlvbi5odG1sDQo+IA0KPiBpcyB0aGUgbGF0ZXN0Lg0KPiANCj4gQW0gSSBsb29raW5nIGF0IHRo
-ZSB3cm9uZyBvbmU/DQoNCk5vLiAgdGdseCBhc2tlZCBmb3IgaXQ6DQpodHRwczovL2xrbWwua2Vy
-bmVsLm9yZy9rdm0vODd5MWg4MWh0NC5mZnNAdGdseC8NCg0KPiANCj4gQW5kIG5vdyBJJ20gd29u
-ZGVyaW5nOiB3aGVuIHlvdSdyZSBhZGRpbmcgYSBzZXBhcmF0ZSBDUFVJRCBiaXQsIHRoZW4gdGhl
-DQo+IGFib3ZlIHNob3VsZCBiZQ0KPiANCj4gKyAgICAgICBpZiAoY3B1X2ZlYXR1cmVfZW5hYmxl
-ZChYODZfRkVBVFVSRV9XUk1TUk5TKSkgew0KPiArICAgICAgICAgICAgICAgLyogV1JNU1JOUyBp
-cyBhIGJhc2VsaW5lIGZlYXR1cmUgZm9yIEZSRUQuICovDQoNCkJlY2F1c2Ugd2UgYXJlIGRvaW5n
-IA0KCQl3cm1zcm5zKE1TUl9JQTMyX0ZSRURfUlNQMCwgLi4uKQ0KaGVyZSwgYW5kIFg4Nl9GRUFU
-VVJFX1dSTVNSTlMgZG9lc24ndCBndWFyYW50ZWUgTVNSX0lBMzJfRlJFRF9SU1AwIGV4aXN0cy4N
-Cg0KT3IgSSBtaXNzZWQgc29tZXRoaW5nPw0KDQo+IA0KPiBJIHNlZSB0aGF0IHlvdSdyZSBhZGRp
-bmcgYSBkZXBlbmRlbmN5Og0KPiANCj4gKwl7IFg4Nl9GRUFUVVJFX0ZSRUQsCQkJWDg2X0ZFQVRV
-UkVfV1JNU1JOUyAgIH0sDQo+IA0KPiB3aGljaCB0aGVuIG1lYW5zIHlvdSBkb24ndCBuZWVkIHRo
-ZSBYODZfRkVBVFVSRV9XUk1TUk5TIGRlZmluaXRpb24gYXQgYWxsDQo+IGFuZCBjYW4gdXNlIFg4
-Nl9GRUFUVVJFX0ZSRUQgb25seS4NCj4gDQo+IFNvLCB3aGF0J3MgdXA/DQoNCkZSRUQganVzdCBn
-ZXRzIHRoZSBob25vciB0byBpbnRyb2R1Y2UgV1JNU1JOUyBhbmQgaXRzIGZpcnN0IHVzYWdlOg0K
-aHR0cHM6Ly9sa21sLmtlcm5lbC5vcmcva3ZtL2IwNWUzMDkyLThiYTMtZjRlMS1iNWEzLTIxMjU5
-NDQ5MzZmZEB6eXRvci5jb20vDQoNCkFub3RoZXIgcGF0Y2ggc2V0IHNob3VsZCByZXBsYWNlIFdS
-TVNSIHdpdGggV1JNU1JOUywgd2l0aCBTRVJJQUxJWkUgYWRkZWQNCndoZW4gbmVlZGVkLg0KDQpT
-b3JyeSBmb3IgdGhlIGxhdGUgcmVzcG9uc2UsIGl0IHdhcyBhIGxvbmcgd2Vla2VuZCBpbiB0aGUg
-VVMuDQoNClRoYW5rcyENCiAgICBYaW4NCg0K
+
+On 14/11/23 02:10, Samuel Ortiz wrote:
+> On Mon, Nov 13, 2023 at 05:46:35PM +1100, Alexey Kardashevskiy wrote:
+>>
+>> On 13/11/23 16:43, Samuel Ortiz wrote:
+>>> Hi Alexey,
+>>>
+>>> On Wed, Nov 01, 2023 at 09:56:11AM +1100, Alexey Kardashevskiy wrote:
+>>>> Hi everyone,
+>>>>
+>>>> Here is followup after the Dan's community call we had weeks ago.
+>>>>
+>>>> Our (AMD) goal at the moment is TDISP to pass through SRIOV VFs to
+>>>> confidential VMs without trusting the HV and with enabled IDE (encryption)
+>>>> and IOMMU (performance, compared to current SWIOTLB). I am aware of other
+>>>> uses and vendors and I spend hours unsuccessfully trying to generalize all
+>>>> this in a meaningful way.
+>>>>
+>>>> The AMD SEV TIO verbs can be simplified as:
+>>>>
+>>>> - device_connect - starts CMA/SPDM session, returns measurements/certs, runs
+>>>> IDE_KM to program the keys;
+>>>> - device_reclaim - undo the connect;
+>>>> - tdi_bind - transition the TDI to TDISP's LOCKED and RUN states, generates
+>>>> interface report;
+>>>
+>>>   From a VF to TVM use case, I think tdi_bind should only transition to
+>>> LOCKED, but not RUN. RUN should only be reached once the TVM approves
+>>> the device, and afaiu this is a host call.
+>>
+>> What is the point in separating these? What is that thing which requires the
+>> device to be in LOCKED but not RUN state (besides the obvious
+>> START_INTERFACE_REQUEST)?
+> 
+> Because they're two very different steps of the TDI assignment into a
+> TVM.
+> TDISP moves to RUN upon TVM accepting the TDI into its TCB.
+> LOCKED is typically driven by the host, in order to lock the TDI
+> configuration while the TVM verifies, attest and accept or reject it
+> from its TCB.
+> 
+> When the TSM moves the TDI to RUN, by TVM request, all IO paths (DMA and
+> MMIO) are supposed to be functional. I understand most architectures
+> have ways to prevent TDIs from accessing access confidential memory
+> regardless of their TDISP state, but a TDI in the RUN state should not
+> be forbidden from DMA'ing the TVM confidential memory. Preventing it
+> from doing so should be an error case, not the nominal flow.
+
+There is always a driver which has to enable the device and tell it 
+where it can DMA to/from anyway so the RUN state does not really let the 
+device start doing things once it is moved to RUN (except may be P2P but 
+this is not in our focus atm).
+
+
+>>>> - tdi_info - read measurements/certs/interface report;
+>>>> - tdi_validate - unlock TDI's MMIO and IOMMU (or invalidate, depends on the
+>>>> parameters).
+>>>
+>>> That's equivalent to the TVM accepting the TDI, and this should
+>>> transition the TDI from LOCKED to RUN.
+>>
+>> Even if the device was in RUN, it would not work until the validation is
+>> done == RMP+IOMMU are updated by the TSM.
+> 
+> Right, and that makes sense from a security perspective. But a device in
+> the RUN state will expect IO to work, because it's a TDISP semantic for
+> it being accepted into the TVM and as such the TVM allowed access to its
+> confidential memory.
+
+I've read about RUN that "TDI resources are operational and permitted to 
+be accessed and managed by the TVM". They are, the TDI setup is done at 
+this point. It is the TVM's responsibility to request the RC side of 
+things to be configured.
+
+
+>> This may be different for other
+>> architectures though, dunno. RMP == reverse map table, an SEV SNP thing used
+>> for verifying memory accesses.
+>>
+>>
+>>>> The first 4 called by the host OS, the last two by the TVM ("Trusted VM").
+>>>> These are implemented in the AMD PSP (platform processor).
+>>>> There are CMA/SPDM, IDE_KV, TDISP in use.
+>>>>
+>>>> Now, my strawman code does this on the host (I simplified a bit):
+>>>> - after PCI discovery but before probing: walk through all TDISP-capable
+>>>> (TEE-IO in PCIe caps) endpoint devices and call device_connect;
+>>>
+>>> Would the host call device_connect unconditionally for all TEE-IO device
+>>> probed on the host? Wouldn't you want to do so only before the first
+>>> tdi_bind for a TDI that belongs to the physical device?
+>>
+>>
+>> Well, in the SEV TIO, device_connect enables IDE which has value for the
+>> host on its own.
+> 
+> Ok, that makes sense to me. And the TSM would be responsible for
+> supporting this. Then TDISP is exercised on a particular TDI for the
+> device when this TDI is passed through to a specific TVM.
+>
+>>
+>>>> - when drivers probe - it is all set up and the device measurements are
+>>>> visible to the driver;
+>>>> - when constructing a TVM, tdi_bind is called;
+>>>
+>>> Here as well, the tdi_bind could be asynchronous to e.g. support hot
+>>> plugging TDIs into TVMs.
+>>
+>>
+>> I do not really see a huge difference between starting a VM with already
+>> bound TDISP device or hotplugging a device - either way the host calls
+>> tdi_bind and it does not really care about what the guest is doing at that
+>> moment and when the guest sees a TDISP device - it is always bound.
+> 
+> I agree. What I meant is that bind can be called at TVM construction
+> time, or asynchronously whenever the host decides to attach a TDI to the
+> previously constructed TVM.
+
++1.
+
+>>>> and then in the TVM:
+>>>> - after PCI discovery but before probing: walk through all TDIs (which will
+>>>> have TEE IO bit set) and call tdi_info, verify the report, if ok - call
+>>>> tdi_validate;
+>>>
+>>> By verify you mean verify the reported MMIO ranges? With support from
+>>> the TSM?
+>>
+>> The tdi_validate call to the PSP FW (==TSM) asks the PSP to validate the
+>> MMIO values and enable them in the RMP.
+> 
+> Sounds good.
+> 
+>>> We discussed that a few times, but the device measurements and
+>>> attestation report should also be attested, i.e. run against a relying
+>>> party. The kernel may not be the right place for that, and I'm proposing
+>>> for the guest kernel to rely on a user space component and offload the
+>>> attestation part to it. This userspace component would then
+>>> synchronously return to the guest kernel with an attestation result.
+>>
+>> What bothers me here is that the userspace works when PCI is probed so when
+>> the userspace is called for attestation - the device is up and running and
+>> hosting the rootfs.
+> 
+> I guess you're talking about a use case where one would pass a storage
+> device through, and that device would hold the guest rootfs?
+> With the approach we're proposing, attestation would be optional and
+> upon the kernel's decision. In that case, the kernel would not require
+> userspace to run attestation (because there is no userspace...) but the
+> actual guest attestation would still happen whenever the guest would
+> want to fetch an attestation gated secret. And that attestation flow
+> would include the storage device attestation report, because it's part
+> of the guest TCB. So, eventually, the device would be attested, but not
+> right when the device is attached to the guest.
+> 
+>> The userspace will need a knob which transitions the
+>> device into the trusted state (switch SWIOTLB to direct DMA, for example). I
+>> guess if the userspace is initramdisk, it could still reload the driver
+>> which is not doing useful work just yet...
+>>
+>>
+>>>> - when drivers probe - it is all set up and the driver decides if/which DMA
+>>>> mode to use (SWIOTLB or direct), or panic().
+>>>>
+>>>
+>>> When would it panic?
+>>
+>> When attestation failed.
+> 
+> Attestation failure should only trigger a rejection from the TVM, i.e.
+> the TDI would not be probed. That should be reported back to the host,
+> who may decide to call unbind on that TDI (and thus moved it back to
+> UNLOCKED).
+> 
+>>>> Uff. Too long already. Sorry. Now, go to the problems:
+>>>>
+>>>> If the user wants only CMA/SPDM,
+>>>
+>>> By user here, you mean the user controlling the host? Or the TVM
+>>> user/owner? I assume the former.
+>>
+>> Yes, the physical host owner.
+>>
+>>>> the Lukas'es patched will do that without
+>>>> the PSP. This may co-exist with the AMD PSP (if the endpoint allows multiple
+>>>> sessions).
+>>>>
+>>>> If the user wants only IDE, the AMD PSP's device_connect needs to be called
+>>>> and the host OS does not get to know the IDE keys. Other vendors allow
+>>>> programming IDE keys to the RC on the baremetal, and this also may co-exist
+>>>> with a TSM running outside of Linux - the host still manages trafic classes
+>>>> and streams.
+>>>>
+>>>> If the user wants TDISP for VMs, this assumes the user does not trust the
+>>>> host OS and therefore the TSM (which is trusted) has to do CMA/SPDM and IDE.
+>>>>
+>>>> The TSM code is not Linux and not shared among vendors. CMA/SPDM and IDE
+>>>> seem capable of co-existing, TDISP does not.
+>>>
+>>> Which makes sense, TDISP is not designed to be used outside of the
+>>> TEE-IO VFs assigned to TVM use case.
+>>>
+>>>>
+>>>> However there are common bits.
+>>>> - certificates/measurements/reports blobs: storing, presenting to the
+>>>> userspace (results of device_connect and tdi_bind);
+>>>> - place where we want to authenticate the device and enable IDE
+>>>> (device_connect);
+>>>> - place where we want to bind TDI to a TVM (tdi_bind).
+>>>>
+>>>> I've tried to address this with my (poorly named) drivers/pci/pcie/tdisp.ko
+>>>> and a hack for VFIO PCI device to call tdi_bind.
+>>>>
+>>>> The next steps:
+>>>> - expose blobs via configfs (like Dan did configfs-tsm);
+>>>> - s/tdisp.ko/coco.ko/;
+>>>> - ask the audience - what is missing to make it reusable for other vendors
+>>>> and uses?
+>>>
+>>> The connect-bind-run flow is similar to the one we have defined for
+>>> RISC-V [1]. There we are defining the TEE-IO flows for RISC-V in
+>>> details, but nothing there is architectural and could somehow apply to
+>>> other architectures.
+>>
+>> Yeah, it is good one!
+> 
+> Thanks. Comments and improvements proposal are welcome.
+> 
+>> I am still missing the need to have sbi_covg_start_interface() as a separate
+>> step though. Thanks,
+> 
+> Just to reiterate: start_interface is a guest call into the TSM, to let
+> it know that it accepts the TDI. That makes the TSM do two things:
+> 
+> 1. Enable the MMIO and DMA mappings.
+> 2. Move the TDI to RUN.
+> 
+> After that call, the TDI is usable from a TVM perspective. Before that
+> call it is not, but its configuration and state are locked.
+Right. I still wonder what bad thing can happen if we move to RUN before 
+starting the TVM (I suspect there is something), or it is all about 
+semantics (for the AMD TIO usecase, at least)?
+
+
+> Cheers,
+> Samuel.
+
+-- 
+Alexey
+
+
 
