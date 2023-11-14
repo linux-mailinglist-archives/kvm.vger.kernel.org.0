@@ -1,263 +1,184 @@
-Return-Path: <kvm+bounces-1632-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1633-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74A647EA9A2
-	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 05:36:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F5567EA9B5
+	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 05:42:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16CB3281097
-	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 04:36:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 518071C209FD
+	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 04:42:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10F4BC122;
-	Tue, 14 Nov 2023 04:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB544B66D;
+	Tue, 14 Nov 2023 04:42:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QaYJwHTd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ciCYDKPA"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A568801
-	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 04:35:39 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 237EAD4A;
-	Mon, 13 Nov 2023 20:35:36 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C058827;
+	Tue, 14 Nov 2023 04:42:32 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 549E711C;
+	Mon, 13 Nov 2023 20:42:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699936537; x=1731472537;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=yc6VKjNt+crImAjw3puzjZq+J/HZw6p8aCrfmOzXkLc=;
-  b=QaYJwHTdQSZH56a39qPdCksyeoKE+OagisWnDw6dIq/6pHFjXHG3NFlV
-   5fvFQzCiECFY/7EaF5MjvYgN0xa06IUpQL06DT5JUV8HFcEFjLRQqns+j
-   pLzVLMEN9sKkBvIXt8easIzhrWio+R0+zjFrf68t7QAiNxg2ZrA6yCVu9
-   pq3lLs+9AxcHQaNlc0i41/Tzb8o81Zs/c412sx0vhjMgai3K4ssD75GR6
-   EWNBM8VHC2QZ6YfUYwTet1h49DD5Fi5JGJVRk20p4LQR7kDGIeflf7iSW
-   5JNUnX++UvSaiknl8igFqy7I8BdHkS2zdJY+DMJYnO+Fcwb7Vjbch/wwZ
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="389437306"
+  t=1699936951; x=1731472951;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=9XnCf0y9drO+80R7CgYMtxrbeEqxUO7q87PG7aSrLK0=;
+  b=ciCYDKPA/BAExqyjYh0QKowFQY07lR0DVEamGbWk6o8UhcbGPyKD9ewj
+   +RnRwY5yGF2iRBEcGxqHrR6YlvzkkbYuXBcWk1DGSCVF2sAOLjUEJ+o/N
+   wK+sHUcv++Gyeys2nLPJRKz68fS/XPWkfWLT27oQkSxq1K3+CjSX3/arZ
+   7L5tVBu/E4iDZQK7kX3r5zGWKvBaMPbd5LctJ/PlsBVtfWQQpdz/h2DnC
+   UEasU/wSOI0RANRs3T2QnL6JcHr2dHqFVw4DHOpX3kPapgkEb1efNK5tl
+   XzCbpAeItGkSoFVsArcUCMG0M3jsJomSgUQYG2Vw9mfx9XcOC2O3Okl5g
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="380975527"
 X-IronPort-AV: E=Sophos;i="6.03,301,1694761200"; 
-   d="scan'208";a="389437306"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2023 20:35:32 -0800
+   d="scan'208";a="380975527"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2023 20:42:30 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="830467509"
 X-IronPort-AV: E=Sophos;i="6.03,301,1694761200"; 
-   d="scan'208";a="830467509"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2023 20:35:32 -0800
-From: isaku.yamahata@intel.com
-To: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: isaku.yamahata@intel.com,
-	isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Jim Mattson <jmattson@google.com>
-Subject: [PATCH v2 3/3] KVM: selftests: Add test case for x86 apic_bus_clock_frequency
-Date: Mon, 13 Nov 2023 20:35:04 -0800
-Message-Id: <232d64219c6df684f99f9072d41e8783f1a4fe46.1699936040.git.isaku.yamahata@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1699936040.git.isaku.yamahata@intel.com>
-References: <cover.1699936040.git.isaku.yamahata@intel.com>
+   d="scan'208";a="12671397"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Nov 2023 20:42:30 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 13 Nov 2023 20:42:29 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 13 Nov 2023 20:42:24 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Mon, 13 Nov 2023 20:42:24 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Mon, 13 Nov 2023 20:42:23 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=d2BG8A+d1WMf+pvRIF63m2oArDiu6OccjW+kxidBn0D6lFJ3Agl8Ze9YQdCUduQ7o/GZjqpBKcNZgndwx/ls3onPWlrVu4z+2x1Yd6DMtd/e0TqZzLcTcWk85WF7gfroqNQpmiuUNTPxdqwwqwr9MwhiGAbTVXJW1DYaWqLICfg+ndpYFbAlp3aG6ykdXw3PkMr0GEh8ZMkyPoIO0b27SZVj7osWEUxmyqC2bhqK+85e6zyFt6nFak4UHzaljRRYhz0P7ramxGCfbo5upgrXtvy9gjqk1oyYGCV8i/yUH6guBmDgJKpjfcXkIyr3g5mqvjP5PSWYr+NFj9FHUSrcqQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IU1m0rBYfUD/FOC2mLTgCTUBk4cQPR+fCCRNTMjmGG4=;
+ b=PcF4nAmPcKK5A6vauNtPKbVMcSn8fp4nCZoTt5uhXxqK97s1cBuk+4g3Jtox/5MkBMNnygO6ff3eS8bTRf46GSTsUOeyacV84s0MW5ngTpnsRL5/XQykDMUjBbMb6SoFjEUFJ7qcmqq7zaPEIo2ZkFvADcX2lXAptmNu0PIBV53gtpDO73LJXq73vKKOM0/irFTU3Rz+5KvO55AtyrRkUIkAzgVlBS+HEJ3Es/y//G6obeMk4B8A7bWvOj1DUtW3B2f5Dh2WJUyQvWGMbnnn4YjNeuQNRw0CKcQYBuN0nh5wnEcm0wYkaOKAuMPq4kvKxfZ9YubUPlecVAV5MqiaDQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SA1PR11MB6734.namprd11.prod.outlook.com (2603:10b6:806:25d::22)
+ by CO1PR11MB5074.namprd11.prod.outlook.com (2603:10b6:303:97::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.31; Tue, 14 Nov
+ 2023 04:42:14 +0000
+Received: from SA1PR11MB6734.namprd11.prod.outlook.com
+ ([fe80::3d98:6afd:a4b2:49e3]) by SA1PR11MB6734.namprd11.prod.outlook.com
+ ([fe80::3d98:6afd:a4b2:49e3%7]) with mapi id 15.20.6977.029; Tue, 14 Nov 2023
+ 04:42:13 +0000
+From: "Li, Xin3" <xin3.li@intel.com>
+To: "Gao, Chao" <chao.gao@intel.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-hyperv@vger.kernel.org"
+	<linux-hyperv@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>, "seanjc@google.com" <seanjc@google.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net"
+	<corbet@lwn.net>, "kys@microsoft.com" <kys@microsoft.com>,
+	"haiyangz@microsoft.com" <haiyangz@microsoft.com>, "wei.liu@kernel.org"
+	<wei.liu@kernel.org>, "Cui, Dexuan" <decui@microsoft.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com"
+	<mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org"
+	<x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "vkuznets@redhat.com"
+	<vkuznets@redhat.com>, "peterz@infradead.org" <peterz@infradead.org>,
+	"Shankar, Ravi V" <ravi.v.shankar@intel.com>
+Subject: RE: [PATCH v1 11/23] KVM: x86: Add kvm_is_fred_enabled()
+Thread-Topic: [PATCH v1 11/23] KVM: x86: Add kvm_is_fred_enabled()
+Thread-Index: AQHaEnYQluTSIDRVa0GExAiuYWhTULB34v2AgAFfwqA=
+Date: Tue, 14 Nov 2023 04:42:13 +0000
+Message-ID: <SA1PR11MB6734074A2E482AF6F911693BA8B2A@SA1PR11MB6734.namprd11.prod.outlook.com>
+References: <20231108183003.5981-1-xin3.li@intel.com>
+ <20231108183003.5981-12-xin3.li@intel.com> <ZVHRufhNmVTvJYWV@chao-email>
+In-Reply-To: <ZVHRufhNmVTvJYWV@chao-email>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR11MB6734:EE_|CO1PR11MB5074:EE_
+x-ms-office365-filtering-correlation-id: 100d8161-c21b-417d-0f27-08dbe4cc1245
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: V7oY8iydFgtJJVHf4SmS091Edzo14Nn1d6PhWEFxEfl+83/CWLxVMX4MSNLxf2NV2sgbiIaUiK+E9ynFmd8RezXexsxfFEAukB8uRaHo4vyyiTxJ15ntqyCVYepT9LG2GS4pqVgxcXD7tiWIMbHVYffJn+nAn3w9KaXegTVsvkzQhykO2EI1/FiKJ00czDr4cNXQ2cdJbLJYfyx48xEXFt/85ASX4iwGU6i9f0BYZjs9vT3034jxZLrwXi8VOFH/VxXs0JEGuveBzS+8kPmS4s19678nsky/sfhb5oYNmktCaYTL/pdAqUBIusfu/lS86XIj+zoSuh7pGNkQC24WvXze12ol67kNfotXMjJUe1Kt/7K3r1LY5oDzje6i4Mb0i9MR0lQaKfXHLebNQFJN7Ndr6475/d+CzlHPlJmvUzB2lZG3A89+VzB0kfi7++r92nwRb163ZLnovjIGVssxxmZzYmioLSqa/3sTe+VnPj4u8/IUw72CCVPsriVBUyULB90TsxRktwymg2z1EYg5JNi2OBIJoIJgQtBqw30zlKDknn9CSOE719+G9i3YRqrpfcBCnIv7XNCnTAOpHNdkgz2ckN8HQJHF9djG4s+fD7c=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6734.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(366004)(136003)(346002)(396003)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(38070700009)(122000001)(83380400001)(76116006)(26005)(82960400001)(7696005)(6506007)(478600001)(71200400001)(66946007)(9686003)(55016003)(86362001)(5660300002)(7416002)(52536014)(33656002)(41300700001)(2906002)(38100700002)(4744005)(316002)(54906003)(66556008)(66476007)(8676002)(64756008)(66446008)(8936002)(6862004)(6636002)(4326008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?a/M/rUy/RUJfqLIn47BsE354SDDzYmt5//puPxf3sCoXfCLoHyi+0jjvXF7t?=
+ =?us-ascii?Q?SVlF12JUE2XsmoANL0GlItGAJ8giRIFrvGRq9MLtEgW1CZzDtVG2H+N/c70q?=
+ =?us-ascii?Q?xagHwK1uvhQkkgdy1kxmTzSO9E/cAjQR2k6Et4osAHxYT4H8H+ICGe8tTsKV?=
+ =?us-ascii?Q?sogrWSjMww+4vuktfORdV9FDtj9oCcGSoVwdYiZcs1wPVGr/Q6vgMK/0fsz5?=
+ =?us-ascii?Q?4bJ6h5Sc/i9taBsYSFPt6Ub/XM0nrxVmrQCVj6DbU2+4PM5OI5cjb79kIM9L?=
+ =?us-ascii?Q?PfJUzCuqloWB/Yx9vV84qPqtDLEs3u4dsQYsvNnjhhVBkrf/yr3cH++hBtPa?=
+ =?us-ascii?Q?bjTRAsWxptJPU+k5cy/TyNiqPwqr91YrpNdVkT9awiNLL/G69E0RXBB1x20W?=
+ =?us-ascii?Q?kOSz2lnebpKIF5jqI0zD/PPG5tezFaJpc57QaeYbvROOxthlHbes1ffPzRQR?=
+ =?us-ascii?Q?QqPJYeAZ8PHrDmVXerrE5c6TQp21IVuNdArMgnbBkW2BJSkGTgNkxTLz2hv+?=
+ =?us-ascii?Q?B/gtuPs2ZVZ+vgjYJTNz1q9B8PnBkN1PASTDjN/wptLAaQMPyX0BDaoCLqje?=
+ =?us-ascii?Q?N9EABsnjz0qvCTBV/qWPST6+Ak/k4GItzqDsQlAKd33bZiWDXC+2VYj5q54C?=
+ =?us-ascii?Q?q4XjM4Yu9j+UI/W3jC19xi6nn35CWFlms/hbQz2becu8MtkUqMlGvMixKywX?=
+ =?us-ascii?Q?K1t7ri1y/Zqj9ihERDQ/2sTZ0dsuGDoK+vtJpHjctV10z4f/dNeKy9P2ebsJ?=
+ =?us-ascii?Q?KrMcVliCO7MAMsc+SpBnACJKQ38DP3Zh+6Y9/U792PZhctiS7B1ro0Ym6VgH?=
+ =?us-ascii?Q?NlBzS4ovLj6F+ajRqe6vkghiEWyNXtFB08HlaJKjFASErJSUVbL5+HFwhLRI?=
+ =?us-ascii?Q?6OuYXFGaTadBiHPmJQf47lm1kl42gpelnscaJ5MM8CYCGh3lBcTnivAvDp6g?=
+ =?us-ascii?Q?OdM0prsfu7hkedQUC9FKyAzR27jC85NX8LaBfEzNx9R5niAhhgwqV0s+YQ1H?=
+ =?us-ascii?Q?6tMXi1BRzi47nKtOL0T3D1TyhfPgQiVFCfX2U1uEQsooyQ/iBPCGUuOwWwEX?=
+ =?us-ascii?Q?NGTIuNK9k5YiZQeb7TJJ13qJy1N+5BknZien2McMn4aybZOOX93lEZLohQNN?=
+ =?us-ascii?Q?0xOQXNHGu1mRYShAf8uYaQSeByZoOupLE1M0B3bTsYGFEWOiL+vGlbMoOk20?=
+ =?us-ascii?Q?q3+WlpUYmtu0bWpFB8BPGzFSMj+BuNDlegYS8jDtfvVl+ne/f58b4rgAAf1D?=
+ =?us-ascii?Q?EyGirN69rwcBN4EGkETaQO0CxoFibDlf7JmvbyFaHSPU/E7lOtjeSJblNQyt?=
+ =?us-ascii?Q?ZXRVv35hsXEXNM/ypVq6WiaSspWttcDMn2uX1L0ou/59DJlYWzozOA7nshwf?=
+ =?us-ascii?Q?/qq7AZioax1mphr5QZLatfQJWeh7HKlkoGvQhc5+RN7vJqD1swZAAG5Sw3IM?=
+ =?us-ascii?Q?Fjfq4JrfDCG6SwDtKJ0BWWEMDzufaUe8RAnjMSBAk5Bd3xgKrtFj73ppZSs4?=
+ =?us-ascii?Q?4X+gvUSy2wtZ7Zm5ZDJsWoBKIEeDdcTWu1vp7pVN9ITBQUsKub1S6dbNh7rG?=
+ =?us-ascii?Q?C3+kyKM1Lqg9yIK1sbc=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6734.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 100d8161-c21b-417d-0f27-08dbe4cc1245
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Nov 2023 04:42:13.3464
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: jUVmlBUK2Abi5T33ecukzUv5rNG+6My/nNMN1C773BrCMMKNrpEYuIU+Zb+qTKechVvI3zEImM2aqClYK/8DSw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5074
+X-OriginatorOrg: intel.com
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+> >+	return cpu_feature_enabled(X86_FEATURE_FRED) &&
+> >+	       kvm_is_cr4_bit_set(vcpu, X86_CR4_FRED);
+>=20
+> FRED is enabled when CR4.FRED =3D IA32_EFER.LMA =3D 1. Any reason to omit=
+ the
+> check about long mode?
 
-Test if the apic bus clock frequency is exptected to the configured value.
-Set APIC TMICT to the maximum value and busy wait for 100 msec (any value
-is okay) with tsc value, and read TMCCT. Calculate apic bus clock frequency
-based on TSC frequency.
+It won' t allow CR4.FRED to be set if not in long mode, I don't expect it
+at runtime.  Or you have one?
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
-Changes v2:
-- Newly added
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/include/x86_64/apic.h       |   7 +
- .../kvm/x86_64/apic_bus_clock_test.c          | 132 ++++++++++++++++++
- 3 files changed, 140 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index a5963ab9215b..74ed3f71b6e8 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -115,6 +115,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_invalid_nested_guest_state
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_nested_tsc_scaling_test
-+TEST_GEN_PROGS_x86_64 += x86_64/apic_bus_clock_test
- TEST_GEN_PROGS_x86_64 += x86_64/xapic_ipi_test
- TEST_GEN_PROGS_x86_64 += x86_64/xapic_state_test
- TEST_GEN_PROGS_x86_64 += x86_64/xcr0_cpuid_test
-diff --git a/tools/testing/selftests/kvm/include/x86_64/apic.h b/tools/testing/selftests/kvm/include/x86_64/apic.h
-index bed316fdecd5..866a58d5fa11 100644
---- a/tools/testing/selftests/kvm/include/x86_64/apic.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/apic.h
-@@ -60,6 +60,13 @@
- #define		APIC_VECTOR_MASK	0x000FF
- #define	APIC_ICR2	0x310
- #define		SET_APIC_DEST_FIELD(x)	((x) << 24)
-+#define APIC_LVT0       0x350
-+#define         APIC_LVT_TIMER_ONESHOT          (0 << 17)
-+#define         APIC_LVT_TIMER_PERIODIC         (1 << 17)
-+#define         APIC_LVT_TIMER_TSCDEADLINE      (2 << 17)
-+#define APIC_TMICT	0x380
-+#define APIC_TMCCT	0x390
-+#define APIC_TDCR	0x3E0
- 
- void apic_disable(void);
- void xapic_enable(void);
-diff --git a/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c b/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
-new file mode 100644
-index 000000000000..91f558d7c624
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
-@@ -0,0 +1,132 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+
-+#include "apic.h"
-+#include "test_util.h"
-+
-+/* Pick one convenient value, 1Ghz.  No special meaning. */
-+#define TSC_HZ			(1 * 1000 * 1000 * 1000ULL)
-+
-+/* Wait for 100 msec, not too long, not too short value. */
-+#define LOOP_MSEC		100ULL
-+#define TSC_WAIT_DELTA		(TSC_HZ / 1000 * LOOP_MSEC)
-+
-+/* Pick up typical value.  Different enough from the default value, 1GHz.  */
-+#define APIC_BUS_CLOCK_FREQ	(25 * 1000 * 1000ULL)
-+
-+static void guest_code(void)
-+{
-+	/* Possible tdcr values and its divide count. */
-+	struct {
-+		u32 tdcr;
-+		u32 divide_count;
-+	} tdcrs[] = {
-+		{0x0, 2},
-+		{0x1, 4},
-+		{0x2, 8},
-+		{0x3, 16},
-+		{0x8, 32},
-+		{0x9, 64},
-+		{0xa, 128},
-+		{0xb, 1},
-+	};
-+
-+	u32 tmict, tmcct;
-+	u64 tsc0, tsc1;
-+	int i;
-+
-+	asm volatile("cli");
-+
-+	xapic_enable();
-+
-+	/*
-+	 * Setup one-shot timer.  Because we don't fire the interrupt, the
-+	 * vector doesn't matter.
-+	 */
-+	xapic_write_reg(APIC_LVT0, APIC_LVT_TIMER_ONESHOT);
-+
-+	for (i = 0; i < ARRAY_SIZE(tdcrs); i++) {
-+		xapic_write_reg(APIC_TDCR, tdcrs[i].tdcr);
-+
-+		/* Set the largest value to not trigger the interrupt. */
-+		tmict = ~0;
-+		xapic_write_reg(APIC_TMICT, tmict);
-+
-+		/* Busy wait for LOOP_MSEC */
-+		tsc0 = rdtsc();
-+		tsc1 = tsc0;
-+		while (tsc1 - tsc0 < TSC_WAIT_DELTA)
-+			tsc1 = rdtsc();
-+
-+		/* Read apic timer and tsc */
-+		tmcct = xapic_read_reg(APIC_TMCCT);
-+		tsc1 = rdtsc();
-+
-+		/* Stop timer */
-+		xapic_write_reg(APIC_TMICT, 0);
-+
-+		/* Report it. */
-+		GUEST_SYNC_ARGS(tdcrs[i].divide_count, tmict - tmcct,
-+				tsc1 - tsc0, 0, 0);
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+void test_apic_bus_clock(struct kvm_vcpu *vcpu)
-+{
-+	bool done = false;
-+	struct ucall uc;
-+
-+	while (!done) {
-+		vcpu_run(vcpu);
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_DONE:
-+			done = true;
-+			break;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		case UCALL_SYNC: {
-+			u32 divide_counter = uc.args[1];
-+			u32 apic_cycles = uc.args[2];
-+			u64 tsc_cycles = uc.args[3];
-+			u64 freq;
-+
-+			TEST_ASSERT(tsc_cycles > 0,
-+				    "tsc cycles must not be zero.");
-+
-+			/* Allow 1% slack. */
-+			freq = apic_cycles * divide_counter * TSC_HZ / tsc_cycles;
-+			TEST_ASSERT(freq < APIC_BUS_CLOCK_FREQ * 101 / 100,
-+				    "APIC bus clock frequency is too large");
-+			TEST_ASSERT(freq > APIC_BUS_CLOCK_FREQ * 99 / 100,
-+				    "APIC bus clock frequency is too small");
-+			break;
-+		}
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+			break;
-+		}
-+	}
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+
-+	vm = __vm_create(VM_MODE_DEFAULT, 1, 0);
-+	vm_ioctl(vm, KVM_SET_TSC_KHZ, (void *) (TSC_HZ / 1000));
-+	/*  KVM_CAP_X86_BUS_FREQUENCY_CONTROL requires that no vcpu is created. */
-+	vm_enable_cap(vm, KVM_CAP_X86_BUS_FREQUENCY_CONTROL,
-+		      APIC_BUS_CLOCK_FREQ);
-+	vcpu = vm_vcpu_add(vm, 0, guest_code);
-+
-+	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA);
-+
-+	test_apic_bus_clock(vcpu);
-+	kvm_vm_free(vm);
-+}
--- 
-2.25.1
-
+If you are talking about save/restore a corrupted vCPU state, a following
+VM entry should fail anyway.
 
