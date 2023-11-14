@@ -1,235 +1,246 @@
-Return-Path: <kvm+bounces-1644-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1645-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEF837EAC51
-	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 09:59:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5C817EACB0
+	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 10:12:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C72D1C208D4
-	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 08:59:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BDD01F233E2
+	for <lists+kvm@lfdr.de>; Tue, 14 Nov 2023 09:12:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6221156DD;
-	Tue, 14 Nov 2023 08:59:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9AA168B1;
+	Tue, 14 Nov 2023 09:12:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="glnImyLM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="abp/PJws"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DD4156C8;
-	Tue, 14 Nov 2023 08:59:20 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 348DBA4;
-	Tue, 14 Nov 2023 00:59:19 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B469416403
+	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 09:12:18 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05DBAFA;
+	Tue, 14 Nov 2023 01:12:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699952359; x=1731488359;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=QvaTaGk2DQ5nitvBuPs4aIJdUkfKrTAsbVZwFqvx9eo=;
-  b=glnImyLMgNIwQ4E0QnCAwT19+tSH5Rt4gBKwRQfi2axhGWu1xzajuH7w
-   NK3VK5vf2Uy6owlmX+k/Aak3Nq3oooTD8lM1EV8BIButQFcXx6MdfP9qu
-   WF+z1Ce+akiLAC3rwp6OwZ0ZS1WKoyR2Watdym3vKhKaaLrh+CfMkunLX
-   XqKkTkZ7DFeOVMxtT93NVQ3Tl9VAUoMHjG+jBF4+y1llZm7eWrXSz2Vv/
-   LZ6/G9fAalRAWRAdbKv7+DLZqb+owG91ZYqwhydpd62TJHYu7F7AGF4Yu
-   7HEHx99X8+VcXwGye+IcM+Xe1DwhOZX4vOEazdYszDG3YZ/C7KrdWQqj3
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="375657293"
+  t=1699953138; x=1731489138;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=x/uDVrG5M/HDXqdiwuRXkGmBYGt4nwjnv3V8VjCtkmM=;
+  b=abp/PJws1T6ndX8rk34qN44g7NECh48kgsgrkoEM24QH1CI61tNkysfD
+   Af0yGBmsGsID8DvxlIH2nvXr37nVNuCJ1XllaqG6wPdk3wSmAzVF5ONHM
+   B2dSLRM7i8gGH4/zMKr4N1phkZ37wTFmojY2Ke0ZlKxdtg4P9rk67JFmu
+   5ZNVL43oDboduaXCR+rSNv6ChZm7yV5PYNyCnZT4EX0WorhlFGuI03EAe
+   4Z9T9ScDYhVBJFwhw3qGPwmNhGq6f8xJFTDs5jN8ViM8PKgF8nCDfFxH3
+   a0NLtxn5ztpNplgRnKHVop71RNOVAYtb87aHv+tw4jHFxhWjGpEQe8an2
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="9255397"
 X-IronPort-AV: E=Sophos;i="6.03,301,1694761200"; 
-   d="scan'208";a="375657293"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 00:59:18 -0800
+   d="scan'208";a="9255397"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 01:12:17 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="830517736"
+X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="741036676"
 X-IronPort-AV: E=Sophos;i="6.03,301,1694761200"; 
-   d="scan'208";a="830517736"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Nov 2023 00:59:17 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Tue, 14 Nov 2023 00:59:17 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Tue, 14 Nov 2023 00:59:16 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Tue, 14 Nov 2023 00:59:16 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Tue, 14 Nov 2023 00:59:16 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Tna5+KUzu6k8s7cR7U/sPLnQ/GjEefJgGE0mxj9ZuGkhbOUVyZm0+CYfsvM2+UVskDjHIhjnj/hf72oaJ12e+QsCnFY9xE5E49zecS2Ho1vN3e/A/pawGfU5hKgGzkz8QgJmHzSR8IyS59KmZLvMGmSGr/Hevir3hCA63D4MHA4SyIZAne7WkVdDpjDSlJozET7o/0m7KSYBFCA1a70eENo7gQI2qAQHvX7CifQ7epX+eadWtTYtZrkgX3sNks1sfCYQNQwDoyy1NT3iCuLhf14rqFiMATjdnQVqR04cnIkbBOMxlj5EiglT6ou+giZ/KqFWxl/Y0yzCf7FyVvx96A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UNgAIguzSbh5yk7rmRs5Ud1iSw1cXu8yAsvM6Lj+buQ=;
- b=jc3UXS5IW/jyANaeADeRkFKV9tEj3tj4C0OpyJxCwaDz01mDHPqiSNgmc8vZeil0YNHnoZG3EO4D7mBpnXpXAS7PHP/IYPkeQF617P4ElKXgrpWvVcbdToKBFaXTJW+lVwuWklsf/R4isVc1Qa1Mv51k/+hn1+0UXvW5bT4R2ppwhEezSuRX5A+Jih5z0grvpZcWMGYt2x+8bmD9HWtZBSTK5nLa/upOFqusfuIpaMyStfn576QTJ41EcyIl5qZvSnORU28UHQwxPG3pK1PVlMthBzyIjVdoPux7IOPultES0q1wQFfWmM6rtLLdJPqIhUDM78f/unxgAaedbcSUBQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by PH8PR11MB7048.namprd11.prod.outlook.com (2603:10b6:510:214::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.29; Tue, 14 Nov
- 2023 08:59:13 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::66ec:5c08:f169:6038]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::66ec:5c08:f169:6038%3]) with mapi id 15.20.7002.015; Tue, 14 Nov 2023
- 08:59:12 +0000
-Date: Tue, 14 Nov 2023 16:58:59 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: "Li, Xin3" <xin3.li@intel.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-hyperv@vger.kernel.org"
-	<linux-hyperv@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "seanjc@google.com" <seanjc@google.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net"
-	<corbet@lwn.net>, "kys@microsoft.com" <kys@microsoft.com>,
-	"haiyangz@microsoft.com" <haiyangz@microsoft.com>, "wei.liu@kernel.org"
-	<wei.liu@kernel.org>, "Cui, Dexuan" <decui@microsoft.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com"
-	<mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org"
-	<x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "vkuznets@redhat.com"
-	<vkuznets@redhat.com>, "peterz@infradead.org" <peterz@infradead.org>,
-	"Shankar, Ravi V" <ravi.v.shankar@intel.com>
-Subject: Re: [PATCH v1 12/23] KVM: VMX: Handle FRED event data
-Message-ID: <ZVM203KI5D3o+ksS@chao-email>
-References: <20231108183003.5981-1-xin3.li@intel.com>
- <20231108183003.5981-13-xin3.li@intel.com>
- <ZVH3IUsfvzuPaj6L@chao-email>
- <SA1PR11MB6734B2389911D76A4B95319AA8B2A@SA1PR11MB6734.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <SA1PR11MB6734B2389911D76A4B95319AA8B2A@SA1PR11MB6734.namprd11.prod.outlook.com>
-X-ClientProxiedBy: SI2PR04CA0008.apcprd04.prod.outlook.com
- (2603:1096:4:197::20) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+   d="scan'208";a="741036676"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.2.39]) ([10.238.2.39])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 01:12:15 -0800
+Message-ID: <b8dae758-ece1-44bd-87b2-122c772c3f07@linux.intel.com>
+Date: Tue, 14 Nov 2023 17:12:12 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|PH8PR11MB7048:EE_
-X-MS-Office365-Filtering-Correlation-Id: b02dbee7-54c5-4baf-5075-08dbe4eff8b9
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RhutysPbHVrYsUdzyLc+So+8VaV3j3ylNgNyatkKMSp/HEpq6qo99xKszgiexfgVHRTr2a++0g+coljQD3ms4IDtVddUD4ltD91xM88BBzIcHr8zarewPEEwalj80fq63Tr4uUR+gjQtKJ37LDRgZ+ueauEk4a7paSGDYdsPfGxfPKqpBAYBQFlJoy4WGSXAxfiSQk26SU9ciGqMS4pu+J6CxNgna2ZsW5Yctoo8QbmfNpCl+OvThF4CkDJVzXflhBsS3r14wTT2XROsv5u7Beu0mnD5iA4RYVXs2JPDhtRk6GMKxGzjRSc9N5OmXomb8UZaW4XUYgbhqHZx42mahRrVvJ6fTUnsfJxA4HtO5d2dOmbutca5fYGp6riJNxIJQXYS5rCoR04dfmTpM38X7vMXXN05v19E8HNUw0VTHjPltnF6LBFRta0WAKpfL5zIvJiVsrD90QYPxSFcFmEsBXqo0xC5kdGOm0tkJyody+K2WZUKGN8+8u6ZOuNC8jZkew5uTYpIjEW/KEVHb9PieXUhQVYpItad5MKFjBcQ1/KqGaiby+e+Y0DfKT5h4CMEuAbK6XTkHd3W1l3LduzEvF7B3uLlSG+euO3myZCYcU4=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(396003)(136003)(39860400002)(366004)(346002)(230922051799003)(1800799009)(186009)(64100799003)(451199024)(82960400001)(26005)(38100700002)(44832011)(9686003)(6512007)(6506007)(316002)(6486002)(478600001)(6636002)(6666004)(54906003)(66476007)(66556008)(66946007)(41300700001)(6862004)(8936002)(4326008)(2906002)(8676002)(33716001)(86362001)(7416002)(5660300002)(67856001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?gi3PSN+rnPGAqgFQVPU8YyS21GwyNTgY4aZwKpYIlaoSTZn9tRZFsSchVLD4?=
- =?us-ascii?Q?75aqVND+OMHYZYduKy7z1UCJ0+RDJli7vR2Q+vpp30j808vOFYNNDvNe2nEv?=
- =?us-ascii?Q?MN5mQeWMDXQW7xtp3rT/NITqP3/xrIS3oONX+Vm3YTwFSQydioT4Jqn2oIlv?=
- =?us-ascii?Q?Pv1ddpD3Z/A+vuHa9WJsyi9E0KuAd/5VVCa0w5WRc9/uaOcwxhbHvz7Gkctp?=
- =?us-ascii?Q?Y6LaYjkeiSc6VuCY9Ua5YozNMjfHm2XYDm+EA5O28ONRC/gvDJuyXm/8xwLh?=
- =?us-ascii?Q?r8wcd1BR1gA9arSGp19mmqaT6QJPoreAg+cHkVGxws1GL6QfsUoU9OpAw31u?=
- =?us-ascii?Q?0gSkacKzd4ENhL0LN75vqtIzMlD04I3KE7EruyjS+PKqAZ3rnQ+DT0Svh2iJ?=
- =?us-ascii?Q?JTr2r4203BBU9gXavzOb6uYWLvcZDoJdCiwJjerX/9LMW4c8Kmz8rdzEmXbj?=
- =?us-ascii?Q?z7dcYNpXDMAjrNhYt+Msr8yBVpt3LWMMgZa5izvSbK7G5SdeJPMyNRtjYUx7?=
- =?us-ascii?Q?WGzZFC27Z9XVK7ObbOabkjBhoBUULKi3QZv5JVJIJ6ZyEC4gsHYT9tH9klLr?=
- =?us-ascii?Q?JDnbgmRfru4zd2Kz5YFAYBeXqLa9ltdaYvBVz9qsxjlfe9ofTLzOwK9zoj/v?=
- =?us-ascii?Q?TxTR/pgk53yU98SQDJJaQsAS27g4Y0i5rT/227pZOvOMrXyhl9+XvOIPM03N?=
- =?us-ascii?Q?oHekYAfL0zM+BkG1SKl5zZ8TagkQZnCNf1A7TVqIRBIcOkDPQvno6Xndd6ej?=
- =?us-ascii?Q?N/kT/wwzLj1d10ZbBhflqX6TOQUiDqR541LeP1yD9Uqhfno10WOUB0ED5JMR?=
- =?us-ascii?Q?CqLt7awyTxCA1haNhjWKi5IS0HH5qgEsNpotEYAwhX/1Id5G35oCzHbnXGy4?=
- =?us-ascii?Q?XDoImOVseIXqX4vXi1uAL2a+rwJ3EVuwvcfMssTYnP+zWSuVCFjAheRwTfdT?=
- =?us-ascii?Q?9xrk5L4+BTMAIE3dq3/Ek0cUXQKzSRmiRnf3oJ0uDP65fHmnq5eJjC4EVLtT?=
- =?us-ascii?Q?isosWtdueCLeB5+1c69ybTa2bLOMyxVegOUIPfFgCANjRpOWaeD7Giec9okG?=
- =?us-ascii?Q?liiCHh5/EYZP1i5pbHfCiErwH4TMWiY71m52jqsVk3+g08vKp2eHixZRKSQu?=
- =?us-ascii?Q?+LUKOrW9z84f1f8W0cEi0ctw+GGGOPkkPK4MILBBke5PUvVdYGPdcL7fULfO?=
- =?us-ascii?Q?kMbT4LvBWHSd3LzGnjgFOv1kGMO8G499CrCtk1ty+Vm6+Pd/s/DxWMky4deT?=
- =?us-ascii?Q?4S8qdMC+I6yI1FitTAboDP+t3pFq15Umx+UoAKX4VAE11t5JdYr7JkIEZDCF?=
- =?us-ascii?Q?oGJHY4KcnyOr2CZe0bjwYQgLlrKd4W5Z06B/FEe+joKSKXNiiFm1YPYARVFE?=
- =?us-ascii?Q?0laH4NEuC6SKLfHsEvwNZV/u0KmVmUzO/qVvrdQ146G4mEWRTX7w8zccrmlj?=
- =?us-ascii?Q?JcO2YpFb/0tlM3BUNsbdDUhV+tYyrSarRL72gHnJ7XCnzik3Ew/pUuxvOT8J?=
- =?us-ascii?Q?wfu8lbNVoYffARiC++LcUR5g6Mb7F5l/WCqQPNtoccpXcHe72iCkdt5Bq9SY?=
- =?us-ascii?Q?SPIv9/VWGlu02dYf7K/n+x6i2j3h8encumq+D870?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b02dbee7-54c5-4baf-5075-08dbe4eff8b9
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2023 08:59:12.6528
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rhP1BU1T3LJs5uIsgf0IFgcirhi0n6z6JbPKgcVL2C2eI7/A/sp4sOL2ohJdWd+gjpjt6ecp9AYz9ZkZ+bd+9A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7048
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/9] KVM: x86: Replace guts of "goverened" features with
+ comprehensive cpu_caps
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+References: <20231110235528.1561679-1-seanjc@google.com>
+ <20231110235528.1561679-3-seanjc@google.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20231110235528.1561679-3-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 14, 2023 at 12:34:02PM +0800, Li, Xin3 wrote:
->> >+			else if (is_nm_fault(intr_info) &&
->> >+				 vcpu->arch.guest_fpu.fpstate->xfd)
->> 
->> does this necessarily mean the #NM is caused by XFD?
+
+
+On 11/11/2023 7:55 AM, Sean Christopherson wrote:
+> Replace the internals of the governed features framework with a more
+> comprehensive "guest CPU capabilities" implementation, i.e. with a guest
+> version of kvm_cpu_caps.  Keep the skeleton of governed features around
+> for now as vmx_adjust_sec_exec_control() relies on detecting governed
+> features to do the right thing for XSAVES, and switching all guest feature
+> queries to guest_cpu_cap_has() requires subtle and non-trivial changes,
+> i.e. is best done as a standalone change.
 >
->Then the event data should be 0.  Or I missed something obvious? I.e.,
->it can be easily differentiated and we should just explicitly set it
->to 0.
-
-vcpu->arch.guest_fpu.fpstate->xfd just means the guest is enabling XFD.
-I don't think we can conclude that this #NM is caused by XFD only from
-this.  i.e., there may be some false positives.
-
->> >+			u64 event_data = vmcs_read64(event_data_field);
->> >+
->> >+			switch (vector) {
->> >+			case DB_VECTOR:
->> >+				get_debugreg(vcpu->arch.dr6, 6);
->> >+				WARN_ON(vcpu->arch.dr6 != (event_data ^
->> DR6_RESERVED));
->> >+				vcpu->arch.dr6 = event_data ^ DR6_RESERVED;
->> >+				break;
->> >+			case NM_VECTOR:
->> >+				if (vcpu->arch.guest_fpu.fpstate->xfd) {
->> >+					rdmsrl(MSR_IA32_XFD_ERR, vcpu-
->> >arch.guest_fpu.xfd_err);
->> >+					WARN_ON(vcpu-
->> >arch.guest_fpu.xfd_err != event_data);
->> >+					vcpu->arch.guest_fpu.xfd_err =
->> event_data;
->> >+				} else {
->> >+					WARN_ON(event_data != 0);
->> >+				}
->> >+				break;
->> >+			case PF_VECTOR:
->> >+				WARN_ON(vcpu->arch.cr2 != event_data);
->> >+				vcpu->arch.cr2 = event_data;
->> >+				break;
->> >+			default:
->> >+				WARN_ON(event_data != 0);
->> 
->> I am not sure if this WARN_ON() can be triggeded by nested VMX. It is legitimate
->> for L1 VMM to inject any event w/ an event_data.
->> 
->> FRED spec says:
->> 
->> Section 5.2.1 specifies the event data that FRED event delivery of certain events
->> saves on the stack. When FRED event delivery is used for an event injected by VM
->> entry, the event data saved is the value of the injected-event-data field in the
->> VMCS. This value is used instead of what is specified in Section 5.2.1 and is done
->> for __ALL__ injected events using FRED event delivery
+> Tracking *all* guest capabilities that KVM cares will allow excising the
+> poorly named "governed features" framework, and effectively optimizes all
+> KVM queries of guest capabilities, i.e. doesn't require making a
+> subjective decision as to whether or not a feature is worth "governing",
+> and doesn't require adding the code to do so.
 >
->5.2.1 Saving Information on the Regular Stack also says:
->- For any other event, the event data are not currently defined and will
->  be zero until they are.
+> The cost of tracking all features is currently 92 bytes per vCPU on 64-bit
+> kernels: 100 bytes for cpu_caps versus 8 bytes for governed_features.
+> That cost is well worth paying even if the only benefit was eliminating
+> the "governed features" terminology.  And practically speaking, the real
+> cost is zero unless those 92 bytes pushes the size of vcpu_vmx or vcpu_svm
+> into a new order-N allocation, and if that happens there are better ways
+> to reduce the footprint of kvm_vcpu_arch, e.g. making the PMU and/or MTRR
+> state separate allocations.
 >
->Or you mean something else?
+> Suggested-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+Nit: one typo in the short log, "goverened" -> "governed"
 
-IIUC, L1 KVM can inject a nested exception whose vector isn't #DB, or #NM or
-#PF with a non-zero event_data to L2. If delivering the nested exception causes a
-VM-exit to L0 KVM, the assertion that event_data is always 0 for vectors other
-than #DB/#NM/#PF fails.
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+
+> ---
+>   arch/x86/include/asm/kvm_host.h | 40 ++++++++++++++++++++-------------
+>   arch/x86/kvm/cpuid.c            |  4 +---
+>   arch/x86/kvm/cpuid.h            | 14 ++++++------
+>   arch/x86/kvm/reverse_cpuid.h    | 15 -------------
+>   4 files changed, 32 insertions(+), 41 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index d7036982332e..1d43dd5fdea7 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -722,6 +722,22 @@ struct kvm_queued_exception {
+>   	bool has_payload;
+>   };
+>   
+> +/*
+> + * Hardware-defined CPUID leafs that are either scattered by the kernel or are
+> + * unknown to the kernel, but need to be directly used by KVM.  Note, these
+> + * word values conflict with the kernel's "bug" caps, but KVM doesn't use those.
+> + */
+> +enum kvm_only_cpuid_leafs {
+> +	CPUID_12_EAX	 = NCAPINTS,
+> +	CPUID_7_1_EDX,
+> +	CPUID_8000_0007_EDX,
+> +	CPUID_8000_0022_EAX,
+> +	NR_KVM_CPU_CAPS,
+> +
+> +	NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
+> +};
+> +
+> +
+>   struct kvm_vcpu_arch {
+>   	/*
+>   	 * rip and regs accesses must go through
+> @@ -840,23 +856,15 @@ struct kvm_vcpu_arch {
+>   	struct kvm_hypervisor_cpuid kvm_cpuid;
+>   
+>   	/*
+> -	 * FIXME: Drop this macro and use KVM_NR_GOVERNED_FEATURES directly
+> -	 * when "struct kvm_vcpu_arch" is no longer defined in an
+> -	 * arch/x86/include/asm header.  The max is mostly arbitrary, i.e.
+> -	 * can be increased as necessary.
+> +	 * Track the effective guest capabilities, i.e. the features the vCPU
+> +	 * is allowed to use.  Typically, but not always, features can be used
+> +	 * by the guest if and only if both KVM and userspace want to expose
+> +	 * the feature to the guest.  A common exception is for virtualization
+> +	 * holes, i.e. when KVM can't prevent the guest from using a feature,
+> +	 * in which case the vCPU "has" the feature regardless of what KVM or
+> +	 * userspace desires.
+>   	 */
+> -#define KVM_MAX_NR_GOVERNED_FEATURES BITS_PER_LONG
+> -
+> -	/*
+> -	 * Track whether or not the guest is allowed to use features that are
+> -	 * governed by KVM, where "governed" means KVM needs to manage state
+> -	 * and/or explicitly enable the feature in hardware.  Typically, but
+> -	 * not always, governed features can be used by the guest if and only
+> -	 * if both KVM and userspace want to expose the feature to the guest.
+> -	 */
+> -	struct {
+> -		DECLARE_BITMAP(enabled, KVM_MAX_NR_GOVERNED_FEATURES);
+> -	} governed_features;
+> +	u32 cpu_caps[NR_KVM_CPU_CAPS];
+>   
+>   	u64 reserved_gpa_bits;
+>   	int maxphyaddr;
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 4f464187b063..4bf3c2d4dc7c 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -327,9 +327,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>   	struct kvm_cpuid_entry2 *best;
+>   	bool allow_gbpages;
+>   
+> -	BUILD_BUG_ON(KVM_NR_GOVERNED_FEATURES > KVM_MAX_NR_GOVERNED_FEATURES);
+> -	bitmap_zero(vcpu->arch.governed_features.enabled,
+> -		    KVM_MAX_NR_GOVERNED_FEATURES);
+> +	memset(vcpu->arch.cpu_caps, 0, sizeof(vcpu->arch.cpu_caps));
+>   
+>   	/*
+>   	 * If TDP is enabled, let the guest use GBPAGES if they're supported in
+> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+> index 245416ffa34c..9f18c4395b71 100644
+> --- a/arch/x86/kvm/cpuid.h
+> +++ b/arch/x86/kvm/cpuid.h
+> @@ -255,12 +255,12 @@ static __always_inline bool kvm_is_governed_feature(unsigned int x86_feature)
+>   }
+>   
+>   static __always_inline void guest_cpu_cap_set(struct kvm_vcpu *vcpu,
+> -						     unsigned int x86_feature)
+> +					      unsigned int x86_feature)
+>   {
+> -	BUILD_BUG_ON(!kvm_is_governed_feature(x86_feature));
+> +	unsigned int x86_leaf = __feature_leaf(x86_feature);
+>   
+> -	__set_bit(kvm_governed_feature_index(x86_feature),
+> -		  vcpu->arch.governed_features.enabled);
+> +	reverse_cpuid_check(x86_leaf);
+> +	vcpu->arch.cpu_caps[x86_leaf] |= __feature_bit(x86_feature);
+>   }
+>   
+>   static __always_inline void guest_cpu_cap_check_and_set(struct kvm_vcpu *vcpu,
+> @@ -273,10 +273,10 @@ static __always_inline void guest_cpu_cap_check_and_set(struct kvm_vcpu *vcpu,
+>   static __always_inline bool guest_cpu_cap_has(struct kvm_vcpu *vcpu,
+>   					      unsigned int x86_feature)
+>   {
+> -	BUILD_BUG_ON(!kvm_is_governed_feature(x86_feature));
+> +	unsigned int x86_leaf = __feature_leaf(x86_feature);
+>   
+> -	return test_bit(kvm_governed_feature_index(x86_feature),
+> -			vcpu->arch.governed_features.enabled);
+> +	reverse_cpuid_check(x86_leaf);
+> +	return vcpu->arch.cpu_caps[x86_leaf] & __feature_bit(x86_feature);
+>   }
+>   
+>   #endif
+> diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
+> index b81650678375..4b658491e8f8 100644
+> --- a/arch/x86/kvm/reverse_cpuid.h
+> +++ b/arch/x86/kvm/reverse_cpuid.h
+> @@ -6,21 +6,6 @@
+>   #include <asm/cpufeature.h>
+>   #include <asm/cpufeatures.h>
+>   
+> -/*
+> - * Hardware-defined CPUID leafs that are either scattered by the kernel or are
+> - * unknown to the kernel, but need to be directly used by KVM.  Note, these
+> - * word values conflict with the kernel's "bug" caps, but KVM doesn't use those.
+> - */
+> -enum kvm_only_cpuid_leafs {
+> -	CPUID_12_EAX	 = NCAPINTS,
+> -	CPUID_7_1_EDX,
+> -	CPUID_8000_0007_EDX,
+> -	CPUID_8000_0022_EAX,
+> -	NR_KVM_CPU_CAPS,
+> -
+> -	NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
+> -};
+> -
+>   /*
+>    * Define a KVM-only feature flag.
+>    *
+
 
