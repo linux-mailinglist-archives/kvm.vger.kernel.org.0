@@ -1,160 +1,338 @@
-Return-Path: <kvm+bounces-1838-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1839-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A80FE7ECA0E
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 18:56:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A788E7ECA1F
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 18:58:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3D6E1C20966
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 17:56:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 236651F28040
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 17:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5C0F446CC;
-	Wed, 15 Nov 2023 17:55:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CCF3DB8F;
+	Wed, 15 Nov 2023 17:58:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TxoSp/LU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MT5dkelq"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EA251AC
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 09:55:04 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF75E1A8
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 09:58:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700070903;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=rrb6M19WrHuGT/usUBDh4mmFfmysT90cKOTMO6FosIw=;
-	b=TxoSp/LUQ6Iyv9P9OgqNckAJEFX37QkD3vU8aFAuAFAHthGYRqwx/oLozc5sB8w6SiE5ae
-	scD9nLMkUOI2JuTD22OjaVckoPE3E/a3CPM+zpXSmnDFmMNfLzb4mMW0MIYJ0TXKaQ6a8i
-	S1pOIMVx1FeQLivVHCYNm8HH5AW4iUo=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	s=mimecast20190719; t=1700071105;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
+	bh=QDScL5roc4g5L03ZAfMhXcakH3uxr6va8ZZ65BPJ5b0=;
+	b=MT5dkelqLlJzLuF2kSjMBiICdjCMhA3SU0YnArE5K3cz6XJkzPw0S32xf79a6iq4di8scz
+	Df7OMucwMkeBUMERLJ7OrHrmlDeqsh/RGw6AO0lDdJVzDnna3RCD6L54kJ7BnBLtoVhkS6
+	UJ81jXkN8FW7IvNFOVliWHHq6H1cSJA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-455-bMMI3P2QM_-wkEsKcAETPQ-1; Wed, 15 Nov 2023 12:55:02 -0500
-X-MC-Unique: bMMI3P2QM_-wkEsKcAETPQ-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40839252e81so45517885e9.3
-        for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 09:55:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700070901; x=1700675701;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rrb6M19WrHuGT/usUBDh4mmFfmysT90cKOTMO6FosIw=;
-        b=eEMRMhCvzZR9mkqLt5i0vWo2VZ15pRc3r6PKOqP4JaoO7bs/fAHtIDwA9QmVBNrlOm
-         GbsSRdIsBuS381sUD1D394CGNbdAItrWHhRIHO1DiJ46QRn+owfv2EfR8HnjJdOGu4jK
-         hCsXcoqP7zS3cj6mKCgAmnhdX3yPobGGfvATlLMW70rYLALg+/a4bROjklmLd12ATF/R
-         aCxx/a3I/pKashnVNTpX5dYCRyf3OSRoLhblyormI4n1l4S3w2pjI8SzHL7QWIMeE+Lw
-         rOJ2KqQy4NhCb6jjRFhRCABVlMldzQyCKnflfddO2CPCHCXj0eE12JCUi/HMoRO8kbUY
-         ZbwQ==
-X-Gm-Message-State: AOJu0YzyyRlrvDGHbdJyjQbR6dafsJ5XPRaD4UCGvC7FDPqD6d8K5pCY
-	LuGLSN5uw8PClaB8je4hcsukez3Xi9eQoK0ijc7hT9gotzdj5ghW2F8FkLI54ePVf89fBuo7vG7
-	+LRX73KSguYhq
-X-Received: by 2002:a05:600c:3ca5:b0:408:492a:8f3 with SMTP id bg37-20020a05600c3ca500b00408492a08f3mr11011705wmb.5.1700070901261;
-        Wed, 15 Nov 2023 09:55:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IENgl857OXZFuAiB4vMOuOG+fz4OwkCGd44sN6ecy4wAdbOyw7R2x8xEe05Ol9ykmbRkq5QPA==
-X-Received: by 2002:a05:600c:3ca5:b0:408:492a:8f3 with SMTP id bg37-20020a05600c3ca500b00408492a08f3mr11011689wmb.5.1700070900857;
-        Wed, 15 Nov 2023 09:55:00 -0800 (PST)
-Received: from ?IPV6:2003:cb:c706:ed00:59ee:f048:4ed9:62a6? (p200300cbc706ed0059eef0484ed962a6.dip0.t-ipconnect.de. [2003:cb:c706:ed00:59ee:f048:4ed9:62a6])
-        by smtp.gmail.com with ESMTPSA id d15-20020a05600c34cf00b0040a4cc876e0sm407328wmq.40.2023.11.15.09.54.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Nov 2023 09:55:00 -0800 (PST)
-Message-ID: <ed599765-65b7-4253-8de2-61afba178e2d@redhat.com>
-Date: Wed, 15 Nov 2023 18:54:59 +0100
+ us-mta-206-HoHciA5eOoGhwPH7ZN57IQ-1; Wed, 15 Nov 2023 12:58:22 -0500
+X-MC-Unique: HoHciA5eOoGhwPH7ZN57IQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 88E96101A529;
+	Wed, 15 Nov 2023 17:58:21 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.144])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2020236EE;
+	Wed, 15 Nov 2023 17:58:16 +0000 (UTC)
+Date: Wed, 15 Nov 2023 17:58:14 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	David Hildenbrand <david@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Peter Xu <peterx@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Cornelia Huck <cohuck@redhat.com>, Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Claudio Fontana <cfontana@suse.de>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	Chenyi Qiang <chenyi.qiang@intel.com>
+Subject: Re: [PATCH v3 52/70] i386/tdx: handle TDG.VP.VMCALL<GetQuote>
+Message-ID: <ZVUGtpZDTW27F8Um@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
+ <20231115071519.2864957-53-xiaoyao.li@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 02/70] RAMBlock: Add support of KVM private guest memfd
-Content-Language: en-US
-To: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Michael Roth <michael.roth@amd.com>, Sean Christopherson
- <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>,
- Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
- <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
-References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
- <20231115071519.2864957-3-xiaoyao.li@intel.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20231115071519.2864957-3-xiaoyao.li@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231115071519.2864957-53-xiaoyao.li@intel.com>
+User-Agent: Mutt/2.2.10 (2023-03-25)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-On 15.11.23 08:14, Xiaoyao Li wrote:
-> Add KVM guest_memfd support to RAMBlock so both normal hva based memory
-> and kvm guest memfd based private memory can be associated in one RAMBlock.
+On Wed, Nov 15, 2023 at 02:15:01AM -0500, Xiaoyao Li wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> Introduce new flag RAM_GUEST_MEMFD. When it's set, it calls KVM ioctl to
-> create private guest_memfd during RAMBlock setup.
+> For GetQuote, delegate a request to Quote Generation Service.
+> Add property "quote-generation-socket" to tdx-guest, whihc is a property
+> of type SocketAddress to specify Quote Generation Service(QGS).
 > 
-> Note, RAM_GUEST_MEMFD is supposed to be set for memory backends of
-> confidential guests, such as TDX VM. How and when to set it for memory
-> backends will be implemented in the following patches.
+> On request, connect to the QGS, read request buffer from shared guest
+> memory, send the request buffer to the server and store the response
+> into shared guest memory and notify TD guest by interrupt.
+> 
+> command line example:
+>   qemu-system-x86_64 \
+>     -object '{"qom-type":"tdx-guest","id":"tdx0","quote-generation-socket":{"type": "vsock", "cid":"2","port":"1234"}}' \
+>     -machine confidential-guest-support=tdx0
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Codeveloped-by: Chenyi Qiang <chenyi.qiang@intel.com>
+> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+> Changes in v3:
+> - rename property "quote-generation-service" to "quote-generation-socket";
+> - change the type of "quote-generation-socket" from str to
+>   SocketAddress;
+> - squash next patch into this one;
+> ---
+>  qapi/qom.json         |   5 +-
+>  target/i386/kvm/tdx.c | 430 ++++++++++++++++++++++++++++++++++++++++++
+>  target/i386/kvm/tdx.h |   6 +
+>  3 files changed, 440 insertions(+), 1 deletion(-)
+> 
+> +static void tdx_handle_get_quote_connected(QIOTask *task, gpointer opaque)
+> +{
+> +    struct tdx_get_quote_task *t = opaque;
+> +    Error *err = NULL;
+> +    char *in_data = NULL;
+> +    MachineState *ms;
+> +    TdxGuest *tdx;
+> +
+> +    t->hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_ERROR);
+> +    if (qio_task_propagate_error(task, NULL)) {
+> +        t->hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_QGS_UNAVAILABLE);
+> +        goto error;
+> +    }
+> +
+> +    in_data = g_malloc(le32_to_cpu(t->hdr.in_len));
+> +    if (!in_data) {
+> +        goto error;
+> +    }
+> +
+> +    if (address_space_read(&address_space_memory, t->gpa + sizeof(t->hdr),
+> +                           MEMTXATTRS_UNSPECIFIED, in_data,
+> +                           le32_to_cpu(t->hdr.in_len)) != MEMTX_OK) {
+> +        goto error;
+> +    }
+> +
+> +    qio_channel_set_blocking(QIO_CHANNEL(t->ioc), false, NULL);
 
-Can you elaborate (and add to the patch description if there is good 
-reason) why we need that flag and why we cannot simply rely on the VM 
-type instead to decide whether to allocate a guest_memfd or not?
+You've set the channel to non-blocking, but....
 
+> +
+> +    if (qio_channel_write_all(QIO_CHANNEL(t->ioc), in_data,
+> +                              le32_to_cpu(t->hdr.in_len), &err) ||
+> +        err) {
+
+...this method will block execution of this thread, by either
+sleeping in poll() or doing a coroutine yield.
+
+I don't think this is in coroutine context, so presumably this
+is just blocking.  So what was the point in marking the channel
+non-blocking ?
+
+You are setting up a background watch to wait for the reply
+so we don't block this thread, so you seem to want non-blocking
+behaviour.
+
+Given this, you should not be using qio_channel_write_all()
+most likely. I think you need to be using qio_channel_add_watch
+to get notified when it is *writable*, to send 'in_data'
+incrementally & non-blocking. When that is finished then create
+another watch to wait for the reply.
+
+
+> +        t->hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_QGS_UNAVAILABLE);
+> +        goto error;
+> +    }
+> +
+> +    g_free(in_data);
+> +    qemu_set_fd_handler(t->ioc->fd, tdx_get_quote_read, NULL, t);
+> +
+> +    return;
+> +error:
+> +    t->hdr.out_len = cpu_to_le32(0);
+> +
+> +    if (address_space_write(
+> +            &address_space_memory, t->gpa,
+> +            MEMTXATTRS_UNSPECIFIED, &t->hdr, sizeof(t->hdr)) != MEMTX_OK) {
+> +        error_report("TDX: failed to update GetQuote header.\n");
+> +    }
+> +    tdx_td_notify(t);
+> +
+> +    qio_channel_close(QIO_CHANNEL(t->ioc), &err);
+> +    object_unref(OBJECT(t->ioc));
+> +    g_free(t);
+> +    g_free(in_data);
+> +
+> +    /* Maintain the number of in-flight requests. */
+> +    ms = MACHINE(qdev_get_machine());
+> +    tdx = TDX_GUEST(ms->cgs);
+> +    qemu_mutex_lock(&tdx->lock);
+> +    tdx->quote_generation_num--;
+> +    qemu_mutex_unlock(&tdx->lock);
+> +    return;
+> +}
+> +
+> +static void tdx_handle_get_quote(X86CPU *cpu, struct kvm_tdx_vmcall *vmcall)
+> +{
+> +    hwaddr gpa = vmcall->in_r12;
+> +    uint64_t buf_len = vmcall->in_r13;
+> +    struct tdx_get_quote_header hdr;
+> +    MachineState *ms;
+> +    TdxGuest *tdx;
+> +    QIOChannelSocket *ioc;
+> +    struct tdx_get_quote_task *t;
+> +
+> +    vmcall->status_code = TDG_VP_VMCALL_INVALID_OPERAND;
+> +
+> +    /* GPA must be shared. */
+> +    if (!(gpa & tdx_shared_bit(cpu))) {
+> +        return;
+> +    }
+> +    gpa &= ~tdx_shared_bit(cpu);
+> +
+> +    if (!QEMU_IS_ALIGNED(gpa, 4096) || !QEMU_IS_ALIGNED(buf_len, 4096)) {
+> +        vmcall->status_code = TDG_VP_VMCALL_ALIGN_ERROR;
+> +        return;
+> +    }
+> +    if (buf_len == 0) {
+> +        return;
+> +    }
+> +
+> +    if (address_space_read(&address_space_memory, gpa, MEMTXATTRS_UNSPECIFIED,
+> +                           &hdr, sizeof(hdr)) != MEMTX_OK) {
+> +        return;
+> +    }
+> +    if (le64_to_cpu(hdr.structure_version) != TDX_GET_QUOTE_STRUCTURE_VERSION) {
+> +        return;
+> +    }
+> +    /*
+> +     * Paranoid: Guest should clear error_code and out_len to avoid information
+> +     * leak.  Enforce it.  The initial value of them doesn't matter for qemu to
+> +     * process the request.
+> +     */
+> +    if (le64_to_cpu(hdr.error_code) != TDX_VP_GET_QUOTE_SUCCESS ||
+> +        le32_to_cpu(hdr.out_len) != 0) {
+> +        return;
+> +    }
+> +
+> +    /* Only safe-guard check to avoid too large buffer size. */
+> +    if (buf_len > TDX_GET_QUOTE_MAX_BUF_LEN ||
+> +        le32_to_cpu(hdr.in_len) > TDX_GET_QUOTE_MAX_BUF_LEN ||
+> +        le32_to_cpu(hdr.in_len) > buf_len) {
+> +        return;
+> +    }
+> +
+> +    /* Mark the buffer in-flight. */
+> +    hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_IN_FLIGHT);
+> +    if (address_space_write(&address_space_memory, gpa, MEMTXATTRS_UNSPECIFIED,
+> +                            &hdr, sizeof(hdr)) != MEMTX_OK) {
+> +        return;
+> +    }
+> +
+> +    ms = MACHINE(qdev_get_machine());
+> +    tdx = TDX_GUEST(ms->cgs);
+> +    ioc = qio_channel_socket_new();
+> +
+> +    t = g_malloc(sizeof(*t));
+> +    t->apic_id = tdx->event_notify_apic_id;
+> +    t->gpa = gpa;
+> +    t->buf_len = buf_len;
+> +    t->out_data = g_malloc(t->buf_len);
+> +    t->out_len = 0;
+> +    t->hdr = hdr;
+> +    t->ioc = ioc;
+> +
+> +    qemu_mutex_lock(&tdx->lock);
+> +    if (!tdx->quote_generation ||
+> +        /* Prevent too many in-flight get-quote request. */
+> +        tdx->quote_generation_num >= TDX_MAX_GET_QUOTE_REQUEST) {
+> +        qemu_mutex_unlock(&tdx->lock);
+> +        vmcall->status_code = TDG_VP_VMCALL_RETRY;
+> +        object_unref(OBJECT(ioc));
+> +        g_free(t->out_data);
+> +        g_free(t);
+> +        return;
+> +    }
+> +    tdx->quote_generation_num++;
+> +    t->event_notify_interrupt = tdx->event_notify_interrupt;
+> +    qio_channel_socket_connect_async(
+> +        ioc, tdx->quote_generation, tdx_handle_get_quote_connected, t, NULL,
+> +        NULL);
+> +    qemu_mutex_unlock(&tdx->lock);
+> +
+> +    vmcall->status_code = TDG_VP_VMCALL_SUCCESS;
+> +}
+> +
+>  static void tdx_handle_setup_event_notify_interrupt(X86CPU *cpu,
+>                                                      struct kvm_tdx_vmcall *vmcall)
+>  {
+> @@ -1005,6 +1432,9 @@ static void tdx_handle_vmcall(X86CPU *cpu, struct kvm_tdx_vmcall *vmcall)
+>      }
+>  
+>      switch (vmcall->subfunction) {
+> +    case TDG_VP_VMCALL_GET_QUOTE:
+> +        tdx_handle_get_quote(cpu, vmcall);
+> +        break;
+>      case TDG_VP_VMCALL_SETUP_EVENT_NOTIFY_INTERRUPT:
+>          tdx_handle_setup_event_notify_interrupt(cpu, vmcall);
+>          break;
+> diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
+> index 4a8d67cc9fdb..4a989805493e 100644
+> --- a/target/i386/kvm/tdx.h
+> +++ b/target/i386/kvm/tdx.h
+> @@ -5,8 +5,10 @@
+>  #include CONFIG_DEVICES /* CONFIG_TDX */
+>  #endif
+>  
+> +#include <linux/kvm.h>
+>  #include "exec/confidential-guest-support.h"
+>  #include "hw/i386/tdvf.h"
+> +#include "io/channel-socket.h"
+>  #include "sysemu/kvm.h"
+>  
+>  #define TYPE_TDX_GUEST "tdx-guest"
+> @@ -47,6 +49,10 @@ typedef struct TdxGuest {
+>      /* runtime state */
+>      int event_notify_interrupt;
+>      uint32_t event_notify_apic_id;
+> +
+> +    /* GetQuote */
+> +    int quote_generation_num;
+> +    SocketAddress *quote_generation;
+>  } TdxGuest;
+>  
+>  #ifdef CONFIG_TDX
+> -- 
+> 2.34.1
+> 
+
+With regards,
+Daniel
 -- 
-Cheers,
-
-David / dhildenb
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
