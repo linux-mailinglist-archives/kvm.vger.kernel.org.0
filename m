@@ -1,273 +1,256 @@
-Return-Path: <kvm+bounces-1847-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1846-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6761E7ECD5B
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 20:36:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 464067ECD5A
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 20:36:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B5E91C20971
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 19:36:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB1F1B20BC7
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 19:36:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1A4433B4;
-	Wed, 15 Nov 2023 19:36:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D6E6433C2;
+	Wed, 15 Nov 2023 19:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GhEzt9FB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LrS8Wyrp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDB93D4F;
-	Wed, 15 Nov 2023 11:36:04 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55D871AD;
+	Wed, 15 Nov 2023 11:35:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700076965; x=1731612965;
+  t=1700076953; x=1731612953;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=I7CizqM7NHJrb9+NwK27mDv9+sdcm9wG+0USwvgv+NI=;
-  b=GhEzt9FB3ZLW4dSYbSkPwea9H9JejPBFP4KSxbKaiznHmPdkBbHULI8M
-   65bS9r9PC0yNd6VWzaH7orFJt+Pdj4Ys4/D3fu7CvWxJkHzgslGxL6Hrj
-   O8cgDBFHUwne2M78MoHFBRczeYuKYCvUtb+keogEwIoGxCBis2io8PDpL
-   A5Gb5siBTDbVbYp8tlzMWUq79I1f7mdkCUFbMGf8aGuVoATBSo0/nU75l
-   V14SRNA2KtDkc15TH1fOPecX9WJkLjY/nKh0lV6ASvqM/OPKujL98AQgw
-   nP3vyzjyiy+tQ6fo2Y/cmA7O1TkH1Ri9YbgZQP1ib7EhCLSoQdoLMmgHH
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="12492193"
+  bh=GvYvx+mKWLKYJc2e+pAjgt0Tizth739YSXCTWMvC0Ao=;
+  b=LrS8WyrpCfuKe16qWWbksvx4ilHKbnIT5L1XMPJO2SbUL96lZ3n9J4XO
+   uchrsGnh8IYpedKUNNE9yHjeRCj2C+xdKjhEUVauEvE6dmV9dOgLv8ExZ
+   itb2XNLtVWWuCASfp2nN2dXECogsBjj6WHrPOM9E+pEupnqjnP8nXOeZw
+   gJBp8W6rKBVgTzK6UF6IVqIuPmPkpHnNOMu4RUFWCCt5fu83a6X7EMCIE
+   jgZbuuPJFU7TuWW9EbDqnnrl7WoX9VZNym7ofD+vEazJ25i8hLgzvFdFI
+   JbgRM4+zgFws8MyKzUKSn+8BKn8r65+sv1EwbYfbQMi+dWGJ4xWquQqEJ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="477162383"
 X-IronPort-AV: E=Sophos;i="6.03,305,1694761200"; 
-   d="scan'208";a="12492193"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 11:36:03 -0800
+   d="scan'208";a="477162383"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 11:35:52 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="758587268"
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="794256178"
 X-IronPort-AV: E=Sophos;i="6.03,305,1694761200"; 
-   d="scan'208";a="758587268"
-Received: from lkp-server02.sh.intel.com (HELO b8de5498638e) ([10.239.97.151])
-  by orsmga007.jf.intel.com with ESMTP; 15 Nov 2023 11:35:57 -0800
-Received: from kbuild by b8de5498638e with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1r3Lg3-0000l6-0C;
-	Wed, 15 Nov 2023 19:35:55 +0000
-Date: Thu, 16 Nov 2023 03:35:37 +0800
-From: kernel test robot <lkp@intel.com>
-To: Tianrui Zhao <zhaotianrui@loongson.cn>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-	Mark Brown <broonie@kernel.org>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-	Xi Ruoyao <xry111@xry111.site>, zhaotianrui@loongson.cn
-Subject: Re: [PATCH v1 1/2] LoongArch: KVM: Add lsx support
-Message-ID: <202311160322.46CT0b8t-lkp@intel.com>
-References: <20231115091921.85516-2-zhaotianrui@loongson.cn>
+   d="scan'208";a="794256178"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 11:35:51 -0800
+Date: Wed, 15 Nov 2023 11:35:50 -0800
+From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+	dave.hansen@intel.com, kirill.shutemov@linux.intel.com,
+	peterz@infradead.org, tony.luck@intel.com, tglx@linutronix.de,
+	bp@alien8.de, mingo@redhat.com, hpa@zytor.com, seanjc@google.com,
+	pbonzini@redhat.com, rafael@kernel.org, david@redhat.com,
+	dan.j.williams@intel.com, len.brown@intel.com, ak@linux.intel.com,
+	isaku.yamahata@intel.com, ying.huang@intel.com, chao.gao@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
+	bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v15 09/23] x86/virt/tdx: Get module global metadata for
+ module initialization
+Message-ID: <20231115193550.GC1109547@ls.amr.corp.intel.com>
+References: <cover.1699527082.git.kai.huang@intel.com>
+ <30906e3cf94fe48d713de21a04ffd260bd1a7268.1699527082.git.kai.huang@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231115091921.85516-2-zhaotianrui@loongson.cn>
+In-Reply-To: <30906e3cf94fe48d713de21a04ffd260bd1a7268.1699527082.git.kai.huang@intel.com>
 
-Hi Tianrui,
+On Fri, Nov 10, 2023 at 12:55:46AM +1300,
+Kai Huang <kai.huang@intel.com> wrote:
 
-kernel test robot noticed the following build errors:
+> The TDX module global metadata provides system-wide information about
+> the module.  The TDX module provides SEAMCALls to allow the kernel to
+> query one specific global metadata field (entry) or all fields.
+> 
+> TL;DR:
+> 
+> Use the TDH.SYS.RD SEAMCALL to read the essential global metadata for
+> module initialization, and at the same time, to only initialize TDX
+> module with version 1.5 and later.
+> 
+> Long Version:
+> 
+> 1) Only initialize TDX module with version 1.5 and later
+> 
+> TDX module 1.0 has some compatibility issues with the later versions of
+> module, as documented in the "Intel TDX module ABI incompatibilities
+> between TDX1.0 and TDX1.5" spec.  Basically there's no value to use TDX
+> module 1.0 when TDX module 1.5 and later versions are already available.
+> To keep things simple, just support initializing the TDX module 1.5 and
+> later.
+> 
+> 2) Get the essential global metadata for module initialization
+> 
+> TDX reports a list of "Convertible Memory Region" (CMR) to tell the
+> kernel which memory is TDX compatible.  The kernel needs to build a list
+> of memory regions (out of CMRs) as "TDX-usable" memory and pass them to
+> the TDX module.  The kernel does this by constructing a list of "TD
+> Memory Regions" (TDMRs) to cover all these memory regions and passing
+> them to the TDX module.
+> 
+> Each TDMR is a TDX architectural data structure containing the memory
+> region that the TDMR covers, plus the information to track (within this
+> TDMR): a) the "Physical Address Metadata Table" (PAMT) to track each TDX
+> memory page's status (such as which TDX guest "owns" a given page, and
+> b) the "reserved areas" to tell memory holes that cannot be used as TDX
+> memory.
+> 
+> The kernel needs to get below metadata from the TDX module to build the
+> list of TDMRs: a) the maximum number of supported TDMRs, b) the maximum
+> number of supported reserved areas per TDMR and, c) the PAMT entry size
+> for each TDX-supported page size.
+> 
+> Note the TDX module internally checks whether the "TDX-usable" memory
+> regions passed via TDMRs are truly convertible.  Just skipping reading
+> the CMRs and manually checking memory regions against them, but let the
+> TDX module do the check.
+> 
+> == Implementation ==
+> 
+> TDX module 1.0 uses TDH.SYS.INFO SEAMCALL to report the global metadata
+> in a fixed-size (1024-bytes) structure 'TDSYSINFO_STRUCT'.  TDX module
+> 1.5 adds more metadata fields, and introduces the new TDH.SYS.{RD|RDALL}
+> SEAMCALLs for reading the metadata.  The new metadata mechanism removes
+> the fixed-size limitation of the structure 'TDSYSINFO_STRUCT' and allows
+> the TDX module to support unlimited number of metadata fields.
+> 
+> TDX module 1.5 and later versions still support the TDH.SYS.INFO for
+> compatibility to the TDX module 1.0, but it may only report part of
+> metadata via the 'TDSYSINFO_STRUCT'.  For any new metadata the kernel
+> must use TDH.SYS.{RD|RDALL} to read.
+> 
+> To achieve the above two goals mentioned in 1) and 2), just use the
+> TDH.SYS.RD to read the essential metadata fields related to the TDMRs.
+> 
+> TDH.SYS.RD returns *one* metadata field at a given "Metadata Field ID".
+> It is enough for getting these few fields for module initialization.
+> On the other hand, TDH.SYS.RDALL reports all metadata fields to a 4KB
+> buffer provided by the kernel which is a little bit overkill here.
+> 
+> It may be beneficial to get all metadata fields at once here so they can
+> also be used by KVM (some are essential for creating basic TDX guests),
+> but technically it's unknown how many 4K pages are needed to fill all
+> the metadata.  Thus it's better to read metadata when needed.
+> 
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
+> 
+> v14 -> v15:
+>  - New patch to use TDH.SYS.RD to read TDX module global metadata for
+>    module initialization and stop initializing 1.0 module.
+> 
+> ---
+>  arch/x86/include/asm/shared/tdx.h |  1 +
+>  arch/x86/virt/vmx/tdx/tdx.c       | 75 ++++++++++++++++++++++++++++++-
+>  arch/x86/virt/vmx/tdx/tdx.h       | 39 ++++++++++++++++
+>  3 files changed, 114 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/shared/tdx.h b/arch/x86/include/asm/shared/tdx.h
+> index a4036149c484..fdfd41511b02 100644
+> --- a/arch/x86/include/asm/shared/tdx.h
+> +++ b/arch/x86/include/asm/shared/tdx.h
+> @@ -59,6 +59,7 @@
+>  #define TDX_PS_4K	0
+>  #define TDX_PS_2M	1
+>  #define TDX_PS_1G	2
+> +#define TDX_PS_NR	(TDX_PS_1G + 1)
+>  
+>  #ifndef __ASSEMBLY__
+>  
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index d1affb30f74d..d24027993983 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -235,8 +235,75 @@ static int build_tdx_memlist(struct list_head *tmb_list)
+>  	return ret;
+>  }
+>  
+> +static int read_sys_metadata_field(u64 field_id, u64 *data)
+> +{
+> +	struct tdx_module_args args = {};
+> +	int ret;
+> +
+> +	/*
+> +	 * TDH.SYS.RD -- reads one global metadata field
+> +	 *  - RDX (in): the field to read
+> +	 *  - R8 (out): the field data
+> +	 */
+> +	args.rdx = field_id;
+> +	ret = seamcall_prerr_ret(TDH_SYS_RD, &args);
+> +	if (ret)
+> +		return ret;
+> +
+> +	*data = args.r8;
+> +
+> +	return 0;
+> +}
+> +
+> +static int read_sys_metadata_field16(u64 field_id, u16 *data)
+> +{
+> +	u64 _data;
+> +	int ret;
+> +
+> +	if (WARN_ON_ONCE(MD_FIELD_ID_ELE_SIZE_CODE(field_id) !=
+> +			MD_FIELD_ID_ELE_SIZE_16BIT))
+> +		return -EINVAL;
+> +
+> +	ret = read_sys_metadata_field(field_id, &_data);
+> +	if (ret)
+> +		return ret;
+> +
+> +	*data = (u16)_data;
+> +
+> +	return 0;
+> +}
+> +
+> +static int get_tdx_tdmr_sysinfo(struct tdx_tdmr_sysinfo *tdmr_sysinfo)
+> +{
+> +	int ret;
+> +
+> +	ret = read_sys_metadata_field16(MD_FIELD_ID_MAX_TDMRS,
+> +			&tdmr_sysinfo->max_tdmrs);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = read_sys_metadata_field16(MD_FIELD_ID_MAX_RESERVED_PER_TDMR,
+> +			&tdmr_sysinfo->max_reserved_per_tdmr);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = read_sys_metadata_field16(MD_FIELD_ID_PAMT_4K_ENTRY_SIZE,
+> +			&tdmr_sysinfo->pamt_entry_size[TDX_PS_4K]);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = read_sys_metadata_field16(MD_FIELD_ID_PAMT_2M_ENTRY_SIZE,
+> +			&tdmr_sysinfo->pamt_entry_size[TDX_PS_2M]);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return read_sys_metadata_field16(MD_FIELD_ID_PAMT_1G_ENTRY_SIZE,
+> +			&tdmr_sysinfo->pamt_entry_size[TDX_PS_1G]);
+> +}
+> +
 
-[auto build test ERROR on kvm/queue]
-[also build test ERROR on linus/master v6.7-rc1 next-20231115]
-[cannot apply to mst-vhost/linux-next kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Tianrui-Zhao/LoongArch-KVM-Add-lsx-support/20231115-173658
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-patch link:    https://lore.kernel.org/r/20231115091921.85516-2-zhaotianrui%40loongson.cn
-patch subject: [PATCH v1 1/2] LoongArch: KVM: Add lsx support
-config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20231116/202311160322.46CT0b8t-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231116/202311160322.46CT0b8t-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202311160322.46CT0b8t-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   arch/loongarch/kvm/switch.S: Assembler messages:
->> arch/loongarch/kvm/switch.S:68: Error: no match insn: la.pcrel	,1f
-   arch/loongarch/kvm/switch.S:259:  Info: macro invoked from here
->> arch/loongarch/kvm/switch.S:69: Error: no match insn: alsl.d	,$r13,,3
-   arch/loongarch/kvm/switch.S:259:  Info: macro invoked from here
->> arch/loongarch/kvm/switch.S:70: Error: no match insn: jr	
-   arch/loongarch/kvm/switch.S:259:  Info: macro invoked from here
-
-
-vim +68 arch/loongarch/kvm/switch.S
-
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   43  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   44  /*
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   45   * Prepare switch to guest, save host regs and restore guest regs.
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   46   * a2: kvm_vcpu_arch, don't touch it until 'ertn'
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   47   * t0, t1: temp register
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   48   */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   49  .macro kvm_switch_to_guest
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   50  	/* Set host ECFG.VS=0, all exceptions share one exception entry */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   51  	csrrd		t0, LOONGARCH_CSR_ECFG
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   52  	bstrins.w	t0, zero, CSR_ECFG_VS_SHIFT_END, CSR_ECFG_VS_SHIFT
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   53  	csrwr		t0, LOONGARCH_CSR_ECFG
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   54  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   55  	/* Load up the new EENTRY */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   56  	ld.d	t0, a2, KVM_ARCH_GEENTRY
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   57  	csrwr	t0, LOONGARCH_CSR_EENTRY
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   58  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   59  	/* Set Guest ERA */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   60  	ld.d	t0, a2, KVM_ARCH_GPC
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   61  	csrwr	t0, LOONGARCH_CSR_ERA
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   62  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   63  	/* Save host PGDL */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   64  	csrrd	t0, LOONGARCH_CSR_PGDL
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   65  	st.d	t0, a2, KVM_ARCH_HPGD
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   66  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   67  	/* Switch to kvm */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  @68  	ld.d	t1, a2, KVM_VCPU_KVM - KVM_VCPU_ARCH
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  @69  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  @70  	/* Load guest PGDL */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   71  	li.w    t0, KVM_GPGD
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   72  	ldx.d   t0, t1, t0
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   73  	csrwr	t0, LOONGARCH_CSR_PGDL
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   74  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   75  	/* Mix GID and RID */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   76  	csrrd		t1, LOONGARCH_CSR_GSTAT
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   77  	bstrpick.w	t1, t1, CSR_GSTAT_GID_SHIFT_END, CSR_GSTAT_GID_SHIFT
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   78  	csrrd		t0, LOONGARCH_CSR_GTLBC
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   79  	bstrins.w	t0, t1, CSR_GTLBC_TGID_SHIFT_END, CSR_GTLBC_TGID_SHIFT
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   80  	csrwr		t0, LOONGARCH_CSR_GTLBC
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   81  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   82  	/*
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   83  	 * Enable intr in root mode with future ertn so that host interrupt
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   84  	 * can be responsed during VM runs
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   85  	 * Guest CRMD comes from separate GCSR_CRMD register
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   86  	 */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   87  	ori	t0, zero, CSR_PRMD_PIE
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   88  	csrxchg	t0, t0,   LOONGARCH_CSR_PRMD
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   89  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   90  	/* Set PVM bit to setup ertn to guest context */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   91  	ori	t0, zero, CSR_GSTAT_PVM
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   92  	csrxchg	t0, t0,   LOONGARCH_CSR_GSTAT
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   93  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   94  	/* Load Guest GPRs */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   95  	kvm_restore_guest_gprs a2
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   96  	/* Load KVM_ARCH register */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   97  	ld.d	a2, a2,	(KVM_ARCH_GGPR + 8 * REG_A2)
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   98  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02   99  	ertn /* Switch to guest: GSTAT.PGM = 1, ERRCTL.ISERR = 0, TLBRPRMD.ISTLBR = 0 */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  100  .endm
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  101  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  102  	/*
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  103  	 * Exception entry for general exception from guest mode
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  104  	 *  - IRQ is disabled
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  105  	 *  - kernel privilege in root mode
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  106  	 *  - page mode keep unchanged from previous PRMD in root mode
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  107  	 *  - Fixme: tlb exception cannot happen since registers relative with TLB
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  108  	 *  -        is still in guest mode, such as pgd table/vmid registers etc,
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  109  	 *  -        will fix with hw page walk enabled in future
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  110  	 * load kvm_vcpu from reserved CSR KVM_VCPU_KS, and save a2 to KVM_TEMP_KS
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  111  	 */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  112  	.text
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  113  	.cfi_sections	.debug_frame
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  114  SYM_CODE_START(kvm_exc_entry)
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  115  	csrwr	a2,   KVM_TEMP_KS
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  116  	csrrd	a2,   KVM_VCPU_KS
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  117  	addi.d	a2,   a2, KVM_VCPU_ARCH
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  118  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  119  	/* After save GPRs, free to use any GPR */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  120  	kvm_save_guest_gprs a2
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  121  	/* Save guest A2 */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  122  	csrrd	t0,	KVM_TEMP_KS
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  123  	st.d	t0,	a2,	(KVM_ARCH_GGPR + 8 * REG_A2)
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  124  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  125  	/* A2 is kvm_vcpu_arch, A1 is free to use */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  126  	csrrd	s1,   KVM_VCPU_KS
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  127  	ld.d	s0,   s1, KVM_VCPU_RUN
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  128  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  129  	csrrd	t0,   LOONGARCH_CSR_ESTAT
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  130  	st.d	t0,   a2, KVM_ARCH_HESTAT
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  131  	csrrd	t0,   LOONGARCH_CSR_ERA
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  132  	st.d	t0,   a2, KVM_ARCH_GPC
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  133  	csrrd	t0,   LOONGARCH_CSR_BADV
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  134  	st.d	t0,   a2, KVM_ARCH_HBADV
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  135  	csrrd	t0,   LOONGARCH_CSR_BADI
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  136  	st.d	t0,   a2, KVM_ARCH_HBADI
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  137  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  138  	/* Restore host ECFG.VS */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  139  	csrrd	t0, LOONGARCH_CSR_ECFG
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  140  	ld.d	t1, a2, KVM_ARCH_HECFG
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  141  	or	t0, t0, t1
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  142  	csrwr	t0, LOONGARCH_CSR_ECFG
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  143  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  144  	/* Restore host EENTRY */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  145  	ld.d	t0, a2, KVM_ARCH_HEENTRY
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  146  	csrwr	t0, LOONGARCH_CSR_EENTRY
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  147  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  148  	/* Restore host pgd table */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  149  	ld.d    t0, a2, KVM_ARCH_HPGD
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  150  	csrwr   t0, LOONGARCH_CSR_PGDL
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  151  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  152  	/*
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  153  	 * Disable PGM bit to enter root mode by default with next ertn
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  154  	 */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  155  	ori	t0, zero, CSR_GSTAT_PVM
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  156  	csrxchg	zero, t0, LOONGARCH_CSR_GSTAT
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  157  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  158  	/*
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  159  	 * Clear GTLBC.TGID field
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  160  	 *       0: for root  tlb update in future tlb instr
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  161  	 *  others: for guest tlb update like gpa to hpa in future tlb instr
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  162  	 */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  163  	csrrd	t0, LOONGARCH_CSR_GTLBC
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  164  	bstrins.w	t0, zero, CSR_GTLBC_TGID_SHIFT_END, CSR_GTLBC_TGID_SHIFT
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  165  	csrwr	t0, LOONGARCH_CSR_GTLBC
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  166  	ld.d	tp, a2, KVM_ARCH_HTP
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  167  	ld.d	sp, a2, KVM_ARCH_HSP
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  168  	/* restore per cpu register */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  169  	ld.d	u0, a2, KVM_ARCH_HPERCPU
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  170  	addi.d	sp, sp, -PT_SIZE
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  171  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  172  	/* Prepare handle exception */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  173  	or	a0, s0, zero
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  174  	or	a1, s1, zero
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  175  	ld.d	t8, a2, KVM_ARCH_HANDLE_EXIT
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  176  	jirl	ra, t8, 0
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  177  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  178  	or	a2, s1, zero
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  179  	addi.d	a2, a2, KVM_VCPU_ARCH
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  180  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  181  	/* Resume host when ret <= 0 */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  182  	blez	a0, ret_to_host
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  183  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  184  	/*
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  185           * Return to guest
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  186           * Save per cpu register again, maybe switched to another cpu
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  187           */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  188  	st.d	u0, a2, KVM_ARCH_HPERCPU
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  189  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  190  	/* Save kvm_vcpu to kscratch */
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  191  	csrwr	s1, KVM_VCPU_KS
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  192  	kvm_switch_to_guest
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  193  
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  194  ret_to_host:
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  195  	ld.d    a2, a2, KVM_ARCH_HSP
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  196  	addi.d  a2, a2, -PT_SIZE
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  197  	kvm_restore_host_gpr    a2
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  198  	jr      ra
-39fdf4be72f2b8 Tianrui Zhao 2023-10-02  199  
-
+Now we don't query the versions, build info, attributes, and etc.  Because it's
+important to know its version/attributes, can we query and print them
+as before? Maybe with another path.
+In long term, those info would be exported via sysfs, though.
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
