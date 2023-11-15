@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-1796-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1797-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C04B7EBE01
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 08:24:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 787947EBE02
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 08:24:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B7BF1C20B67
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 07:24:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05455B210FC
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 07:24:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B3DAD314;
-	Wed, 15 Nov 2023 07:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 058C1DF68;
+	Wed, 15 Nov 2023 07:24:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MDmHJhCb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GPZ9vrNI"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACDECA65
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 07:24:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720A5DDBB
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 07:24:17 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A77C9E
-	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 23:24:09 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD9C9D1
+	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 23:24:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700033049; x=1731569049;
+  t=1700033056; x=1731569056;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=W5dPWeIMVs+FKCu5dDuuuKZbhNMtoZy5PCiG2lAeQpo=;
-  b=MDmHJhCbPutZVEJ99jHXwGHtEVH9YrZuQz7vjT+FPzel6kpEU6tq3xqD
-   6j0mkRFc/rq7l4FXr9nEutaFWIJO22hlpefqNuQEdAvIVlnCB1SZukLwY
-   MLxcbvD2f9UfTX1WNlc3R4sZXP9TQYN88ztbB+xginePZ03A564eazqWa
-   p7wE7HHFMlHTlfc5anby/wH31znjaUmPupk4uOV5DdPn95I1+AyuSlBQZ
-   h+NyImEze96ZhmA74OWox0dDwvHFNDmBwJcg+sO8NQHDX92EhBNLEfwWo
-   J6QV3AQpqxpi2AA7AGm0NAw/Xg13g67baGP+BBxcTyZGRaetugkrQIe7w
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="390623723"
+  bh=PrWM5IKcBBzoUS1oE5zI3h+a4eXQwk7DCZxM+N2LTY0=;
+  b=GPZ9vrNI9v75Y1zcs5Q6DKONJMIxhv3Vfr4r3FnAm9LvWE1FOD7uIPaL
+   PlfvSoncatN4HrLb0D74t6Omd8TAyUDUN6r8ZsoVDh2kfytCxHz7zDu6G
+   KtMwC8+gN9Pgavp4YKGv0KacJUVMq/5iIss3wb38sGiCMBMpFPez7Bfan
+   055uGtGHCd/EFn9Fd61m5fKvasOfyr4cNTAd7joP3RFSlzFwfkBhT6MZl
+   wYJWiLP4odjrObebbJzhZdP0WNGp1Kbbd+2XmIxbq8Wk9QT7ojc8AbuoI
+   JR2hi79cKNkoRRJL8zz/lPJY8tvmaLhcW4SMb9MOEvosW7nJMVyy0HiLP
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="390623736"
 X-IronPort-AV: E=Sophos;i="6.03,304,1694761200"; 
-   d="scan'208";a="390623723"
+   d="scan'208";a="390623736"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 23:24:09 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 23:24:16 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="714800521"
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="714800574"
 X-IronPort-AV: E=Sophos;i="6.03,304,1694761200"; 
-   d="scan'208";a="714800521"
+   d="scan'208";a="714800574"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orsmga003.jf.intel.com with ESMTP; 14 Nov 2023 23:24:02 -0800
+  by orsmga003.jf.intel.com with ESMTP; 14 Nov 2023 23:24:09 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	David Hildenbrand <david@redhat.com>,
@@ -70,9 +70,9 @@ Cc: qemu-devel@nongnu.org,
 	Gerd Hoffmann <kraxel@redhat.com>,
 	Isaku Yamahata <isaku.yamahata@gmail.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v3 68/70] i386/tdx: Skip kvm_put_apicbase() for TDs
-Date: Wed, 15 Nov 2023 02:15:17 -0500
-Message-Id: <20231115071519.2864957-69-xiaoyao.li@intel.com>
+Subject: [PATCH v3 69/70] i386/tdx: Don't get/put guest state for TDX VMs
+Date: Wed, 15 Nov 2023 02:15:18 -0500
+Message-Id: <20231115071519.2864957-70-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231115071519.2864957-1-xiaoyao.li@intel.com>
 References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
@@ -84,30 +84,50 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-KVM doesn't allow wirting to MSR_IA32_APICBASE for TDs.
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
+Don't get/put state of TDX VMs since accessing/mutating guest state of
+production TDs is not supported.
+
+Note, it will be allowed for a debug TD. Corresponding support will be
+introduced when debug TD support is implemented in the future.
+
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- target/i386/kvm/kvm.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ target/i386/kvm/kvm.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 12d909d08862..5c5400c51cd1 100644
+index 5c5400c51cd1..56171dc76235 100644
 --- a/target/i386/kvm/kvm.c
 +++ b/target/i386/kvm/kvm.c
-@@ -3061,6 +3061,11 @@ void kvm_put_apicbase(X86CPU *cpu, uint64_t value)
- {
-     int ret;
+@@ -4621,6 +4621,11 @@ int kvm_arch_put_registers(CPUState *cpu, int level)
+ 
+     assert(cpu_is_stopped(cpu) || qemu_cpu_is_self(cpu));
  
 +    /* TODO: Allow accessing guest state for debug TDs. */
 +    if (is_tdx_vm()) {
-+        return;
++        return 0;
 +    }
 +
-     ret = kvm_put_one_msr(cpu, MSR_IA32_APICBASE, value);
-     assert(ret == 1);
- }
+     /*
+      * Put MSR_IA32_FEATURE_CONTROL first, this ensures the VM gets out of VMX
+      * root operation upon vCPU reset. kvm_put_msr_feature_control() should also
+@@ -4721,6 +4726,12 @@ int kvm_arch_get_registers(CPUState *cs)
+     if (ret < 0) {
+         goto out;
+     }
++
++    /* TODO: Allow accessing guest state for debug TDs. */
++    if (is_tdx_vm()) {
++        return 0;
++    }
++
+     ret = kvm_getput_regs(cpu, 0);
+     if (ret < 0) {
+         goto out;
 -- 
 2.34.1
 
