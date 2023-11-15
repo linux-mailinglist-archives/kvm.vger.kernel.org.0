@@ -1,102 +1,107 @@
-Return-Path: <kvm+bounces-1801-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1802-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47CD27EBE85
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 09:24:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 795B47EBE94
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 09:31:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E9851C20AFD
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 08:24:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9048B1C20A22
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 08:31:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 581D65249;
-	Wed, 15 Nov 2023 08:24:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 706CD944D;
+	Wed, 15 Nov 2023 08:31:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lai+BLV9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FNkabxS+"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7864E4419
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 08:24:06 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00ECCDF;
-	Wed, 15 Nov 2023 00:24:04 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6401525F
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 08:31:39 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF339DF;
+	Wed, 15 Nov 2023 00:31:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700036645; x=1731572645;
+  t=1700037098; x=1731573098;
   h=message-id:date:subject:to:cc:references:from:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=PgygN/KTsYVrp4YsOmXt+qsGvxlvwfzMxoDu3Y0F5Wk=;
-  b=lai+BLV9dt/fs1etCGP8aISrXQ/I0IX9rX8vNM0w6Jo2EtKGvWOpHPFk
-   nndeQjfnEAPxJor3cMZuoEdoaJLnmQ++7PHp8ZNs9YOyYFgtA4KI3LuCV
-   VmnxcctZeCpkbekTBEeDV5XhYAIYGETr1b6AYSUAnqWHYQFr7BVpbg5tJ
-   vozqI4xRWVnnp0KQ13rqgU4oqn8wWIwhBcN9yCOcvneS09vDPJvhuCSTm
-   a5imizZBpH3/UVHhnxGM+8D1RQ5FCD+gvCTFQzHcaX6UNt2dOWlNrFAQo
-   k59ME+7npt4cPstxCkBhk7BqE/7wpbQ5VWs8yD0wLfhYT8Yf1BjqlSApA
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="375872849"
+  bh=+7gQqGdK4ccBi5iG49UehUNCK/4aEKRAUlOU3Hj+V3g=;
+  b=FNkabxS+2ryIkwoiIY1xO6cUC1Zl+FW7WmMagjHRYnFgTwyTbaO7m14a
+   YZYfXMnrNGmMCLJukSZYv72LYWKI+9HeBGvi8gAuQ74OP1w6R4JOJySSh
+   4JI8kp5dd9tr5fIVT0Fn3htI1etd9Dt5ePA5Pd9i9bU08mIAt2JVnRBa5
+   HYQ1N/Qp6yLwQe0XUmSKhtH7/UVA7GsYvANpuzJjBqGxVozlM5u9Z7Rdk
+   P+YQqQz899YzSDQN7Y0KCqRgxm1KvE92M3m5ZQrpgI9ITghAEw7gnSFln
+   wLJpdYCz3/sLr1kIVbOVJM9aMvtpWsoPszXg55CAsL7/TQ5aoVZbPBWxk
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="381231137"
 X-IronPort-AV: E=Sophos;i="6.03,304,1694761200"; 
-   d="scan'208";a="375872849"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 00:24:04 -0800
+   d="scan'208";a="381231137"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 00:31:38 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.03,304,1694761200"; 
-   d="scan'208";a="6334745"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Nov 2023 00:24:04 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+   d="scan'208";a="6087914"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Nov 2023 00:31:38 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Wed, 15 Nov 2023 00:24:03 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ 15.1.2507.34; Wed, 15 Nov 2023 00:31:37 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Wed, 15 Nov 2023 00:24:03 -0800
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.41) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ 15.1.2507.34; Wed, 15 Nov 2023 00:31:37 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Wed, 15 Nov 2023 00:31:37 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Wed, 15 Nov 2023 00:24:03 -0800
+ 15.1.2507.34; Wed, 15 Nov 2023 00:31:37 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mTtV9XqKL8ZI3+X9U0mReomfSB8FX2HgjVF1XVCa4O1hQbCzXS4wLUDeB59MPeXdsrv+OPl/DBiStf+wCZFtuPnz1FGqSKbvFgmlLDICurYtCat8aelLroL9zfFe3kIdUR8zkEBWESKD+XPGrME8/z8qa9xfRaJDanK5ZDeaa504ez6cbWOMJAhsSzsuue7NyNgFSEGMu8HpGCN+1LsT9z2Cp8hl/tKLugtuZVEjkRG1+2jqq7OWfvPOCyS7zYg0Na+UuKbEYQRBXAelekdp/pJIzwPULtTGL34DLD7ts07Ks2ghG4C1xd6sUI+boFlI+821fg3sWoxKeywhlXhIgg==
+ b=HxOVKb0QexL10V92Nv41LgZCSdDgL5jSPehyr0G7viNhfe1yGbrp2OctQuqW2aFa199Ygwy42FgJadKmion6/tqft0ek/562S7XDc+yZKA3vrqeD+1Bkupp3ZE8myLopattQeFAsWIPiyzeaUgSx7sOKeIPpkM4tij/o2AxY0u2jOoLgIagZDC3J4GGYY7av7IJMiALJW7Dbe8T3rzEJzM05L+pHaR1ld5OvEEsxZDAryojL/fgo/fJ1zfFUsMbPl0J0ZISfgwvdMPKMf/cr/szgWHIgIPUFTj51cmbXcQS71PEJyusvMaSEio0RVulpBzPUMkKlmVTAtb56Lsb4Hw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hJeVucC5zztoGKTOqdtrxoxQ0H3JeQjpf8JHEULn6rU=;
- b=Zd9++3SFDJKEjR+Y2+Izm/dLvTAwge2c6rK9+X3tTpVjI2T/1xB+DA2t/enTGWfyMPk6fZd0jsS8kUOc3P1MRx90h1/Aeuci8yvXe3+9YCFCgYPMVk199YCOi4H4rJLohrhF+heYmzMkuyxnZlFEVrDCHijrwoL3UMoQG+sARqBqMlmRl6Hw0fKB7L+KSHxE1WZG/jPsXVkDZfc7yKw7AFikS5b/IGLMhdTbpFtsBc8BuXnKm3pajjnh72lEi8U9lrUHso4dwdPICTxua/2A8TQcFUhngIogJGEZNuA0FRoJYb5kh2YzINGBjd5BRNLk+VDo91DrOyxKM8HGwa9jRQ==
+ bh=wEpZXNMaUCVc2kG0q8T/K9jG2wr11xklNgXamEDT5zY=;
+ b=W37bSWuFY5YnnEBkMCVH6PbTTpqNFSi4ej5Bk6nx024qgrVGVxG9/vboMEoQSW3M3WmJVVIuqV1fGD6PSWJwD4NTZmSMdekh8DIuNvl1m24z3NAkaRrmvl/707qtOOYyhV48m/q3AoOucGJ57I3Ap2cHP/bzWFYa5h2r9iS12S+3MUeKFGBjw7jiNB6kIj5Dih++2oXtEVzbxZv+GmkbfgZ3sywXxY1ew89Hl+txqmTuTdTusFSYN5GZEYVWunI9mpTvBco9wt8FcVZFT2GpaY1brdeUGbSDQeqAsBdjsPATBLW8KHdxWu5E8+uzaO5eQiQdjew5luCTWN7+ljEB3Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
- by CH3PR11MB7771.namprd11.prod.outlook.com (2603:10b6:610:125::6) with
+ by DS0PR11MB7309.namprd11.prod.outlook.com (2603:10b6:8:13e::17) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.31; Wed, 15 Nov
- 2023 08:23:59 +0000
+ 2023 08:31:35 +0000
 Received: from PH0PR11MB4965.namprd11.prod.outlook.com
  ([fe80::ea04:122f:f20c:94e8]) by PH0PR11MB4965.namprd11.prod.outlook.com
  ([fe80::ea04:122f:f20c:94e8%2]) with mapi id 15.20.7002.015; Wed, 15 Nov 2023
- 08:23:59 +0000
-Message-ID: <33b452ec-c377-481f-b621-e1410ed28ff5@intel.com>
-Date: Wed, 15 Nov 2023 16:23:47 +0800
+ 08:31:35 +0000
+Message-ID: <d377806e-43af-4ac7-8e7a-291fb19a2091@intel.com>
+Date: Wed, 15 Nov 2023 16:31:25 +0800
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 25/25] KVM: nVMX: Enable CET support for nested guest
+Subject: Re: [PATCH v6 24/25] KVM: nVMX: Introduce new VMX_BASIC bit for event
+ error_code delivery to L1
+Content-Language: en-US
 To: Chao Gao <chao.gao@intel.com>
 CC: <seanjc@google.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <dave.hansen@intel.com>,
 	<peterz@infradead.org>, <rick.p.edgecombe@intel.com>, <john.allen@amd.com>
 References: <20230914063325.85503-1-weijiang.yang@intel.com>
- <20230914063325.85503-26-weijiang.yang@intel.com>
- <ZUGzZiF0Jn8GVcr+@chao-email>
-Content-Language: en-US
+ <20230914063325.85503-25-weijiang.yang@intel.com>
+ <ZUHSTEGpdWGjL93M@chao-email>
 From: "Yang, Weijiang" <weijiang.yang@intel.com>
-In-Reply-To: <ZUGzZiF0Jn8GVcr+@chao-email>
+In-Reply-To: <ZUHSTEGpdWGjL93M@chao-email>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI2PR02CA0041.apcprd02.prod.outlook.com
- (2603:1096:4:196::20) To PH0PR11MB4965.namprd11.prod.outlook.com
+X-ClientProxiedBy: SI2PR04CA0016.apcprd04.prod.outlook.com
+ (2603:1096:4:197::7) To PH0PR11MB4965.namprd11.prod.outlook.com
  (2603:10b6:510:34::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -105,145 +110,137 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|CH3PR11MB7771:EE_
-X-MS-Office365-Filtering-Correlation-Id: e69965ac-d78a-4fa6-adb1-08dbe5b4365e
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|DS0PR11MB7309:EE_
+X-MS-Office365-Filtering-Correlation-Id: a00d6314-20f9-456f-1b3f-08dbe5b5470b
 X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RoCG8EezIPqq6liH6eweqGCcQNGfZcSy81E+58MzWq2CffxpYog27tQk1WaTBB8OHjb03LDxRRAHVvp8inpBAMghAkXWCuzPqICfIJ6NUJkmP7VB1Id8uI9oRqq+qdMjDdwSiX4SwFfQM/7a9DOSqR1P8mY6Zht4DS/DKhEkPri1qnp0AMJlWIyZ2+4nzzBk0MB1VJW43ll26qiRYHwk9HyJ+6hbmZIAcafl4epKaGZkVb03BcdznqXuCpHkMrSxpdp0GfXOU78Yf29aSf6DkesLyAcEy0Lo+e01cztp6TMndL7+40Ap+FjwGdbJuPrIIiH1k+7wY2A3z71+QUcc94dN2eHS8pM7ittHkhktiXrt7ntG4EN44/A5/Kzl4bjEbx/Z2boYmblJEz2yrstTvCEKrirXVFDRyDPWA+XUVRyiL2XGBdRocEx1r2UfXqZSPvF7zBG3mTz21sZ73WfatnfglB3UNcb/gOjQuW/P1WI/yZ4otEX1LEdQNj+KXzg4K53kVz0Vei6k9/k+3jus3NhEoLTdaj6o22BWp5l7gK0yOhNiSTGgdolVIVd4McrGpCByAPWECRQ0IhPYNdQCSIzvfvgsk7RrfyoaVx8F08KPIjJztSzutVPl50+LE0J1jRLXL0jcZoWr0y7WKtzjsQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(136003)(376002)(396003)(366004)(230922051799003)(186009)(451199024)(1800799009)(64100799003)(31686004)(36756003)(86362001)(31696002)(82960400001)(83380400001)(38100700002)(37006003)(26005)(6512007)(2616005)(478600001)(6666004)(6506007)(6486002)(53546011)(6636002)(8936002)(6862004)(66946007)(5660300002)(66476007)(4326008)(66556008)(316002)(41300700001)(8676002)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: KRC5ZZUgY1BPlI1X0v5B3BYAcpTOtyHGJCmsV8TKUVj/tMoVSU5Z6jOxWwuqCoZUdXwv+MBifwvDOM1UWsubC4b2Y3R1aDTA3L5eaNZFr4tXsH0VRczWqgZOAkssRSJq96ESd/gKUR8qQGBgvp0Tab2PxqQcWGtWpthMAuBac/Z4qlTIdiKNPiMxwEgrHkpMNDecmraSKK4GEALXw/30AX3iAB9txUcVH+gZ/lMOgNbL3Kvz0axqstdXalO+7XOJ+bQFYeFHlDSYLCsHVM08QorC44aZf2Qcrr36HGdo5Sziy5gMDZOr+7JMHfJSMSV12tzTTLITphBwlSpCZ9+zhsRo6sAUGFwyRcvLP2F0iH746Es4x5IpfO0qLejpUMMIhvOK/77KBiavP21vEZlerqodrEMT6H93Fefax9MXAW6gDNtsO2zDrTwH5LCfqPU0pzwBLWXGHOMer0PoiALy8NBU5cav/qS7KWAKqlZ+/THVCOxMngargCD227z+Z8qecZvc0F2elV9zzy7aLz7y86sPyGPNna2FHfjMphJc1aK4Izm9FcvGy7lnz8CQB0OSLcpU1JdyRa5JhQkox+OKmzioRzr9PGR+CmMFIJVgX/qHe7KhI6lN/lfqqlNNXq8/vzC3T9nywob8WxRQw/AV7w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(376002)(346002)(39860400002)(396003)(230922051799003)(64100799003)(451199024)(1800799009)(186009)(4326008)(6506007)(53546011)(2616005)(31696002)(86362001)(5660300002)(8676002)(8936002)(38100700002)(6666004)(2906002)(478600001)(31686004)(66946007)(37006003)(316002)(66556008)(6512007)(66476007)(6636002)(26005)(6486002)(6862004)(82960400001)(41300700001)(36756003)(83380400001)(43740500002)(45980500001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?djRUSmN5R0lMZkVhWDhBRnMrZWF1UE5WQ2MySEJhMC9wRVZWUlU0NUYwQzlp?=
- =?utf-8?B?Q2RlWTVseVg0bDBUWnF4S21IaERqR3NEOEtQczhqNElTV0JaemJCRVNmZ28r?=
- =?utf-8?B?Ris2WUJrM3c0N01MOTFRSG5XWVN2UmthT2gzTktCRmpUWE5sN0xwQXdaWmh5?=
- =?utf-8?B?amsvNUhaamFDSEdRT05TbkRieHNnRzJNbnNxd3o1bmp0VFd2RFBpMUYvYjhw?=
- =?utf-8?B?bDVTVTZjWUE5YndoYlJEbHhSbDBlbHBIT1VieVNra2pNVlFHL2JYbGxqK1hX?=
- =?utf-8?B?eklzOXViYnJzajVUWFBQeUM4elFiTmVKV1RQM2w1eVhvcXdQbm9RWTRMVWUw?=
- =?utf-8?B?U0c3SURUbU4ybXdoOVk3VFZZNWZLdm12MkNlUzF6c2dlUkhxV2JMQzJHeUph?=
- =?utf-8?B?ZXdIejIyMGFxMVZsaE9adjloS3kxdUtydjBpbG1ZUzdKMVVSanNrenZDSFBH?=
- =?utf-8?B?SHd1OFdSRUN6bytwaEpQSFBsVml3c3VqNE5pYXV5WFo4SUVHNHdqZ0ZRRzd0?=
- =?utf-8?B?VDBaaHVJSTBsbGF2UXdiRHBLOVEwMHNSaWRjUlhEM0RHbFJDWU84TWU4dnl3?=
- =?utf-8?B?WmYyWmYxdjhjNDV2a3kxb1hwMGJQak1ldFYyZmNORkxLSXEzWEt1a1pmUkRa?=
- =?utf-8?B?TXFiN0wzVE16bTJpSngyblpQTkx2QnJJQUJEVWs3clV5allPdWZHUElyRndC?=
- =?utf-8?B?SnRyZXNMUzJwMWV1YVJrOXZ4QW5zSVFHQTgxbTVqMWl0Q0E1UjhGMEx4YXBY?=
- =?utf-8?B?elpQWUNkZXZubXZ5ODZxT2FmS2RrVUc5QXhZQWYzNzdUUVI1ZXlybmExV3NU?=
- =?utf-8?B?TS9QNE5SUG9TRGN5ais5aFppenM4VEZGMGdkOWdwMGxubVprdVRBVEtvdHFN?=
- =?utf-8?B?T3NwRDU1Y2dleGxONHQ1c1ZzbDkyQkNPVDlMMnJ0UXI2MVNZa0xLQ0Z3aStW?=
- =?utf-8?B?c3YzM3haQkQ0dmdmYWVBWEFyaThjQXI1Q0FaQVFodzE5aDR0THcreTZnNXBl?=
- =?utf-8?B?b1JTRmZpZENTWWxNRFZ3VjJKZzNQK2JZeW5rZ2JnS2JqY291elZ6TVVWSHFh?=
- =?utf-8?B?WWZMV2lQeVhpSmRzZE5hdjN6bGwxZGJXWmpQRGg2dGZyRytjYlF4MG5vU0ZX?=
- =?utf-8?B?cGoweFI2YWtYeHJLcHJzMmt4UXNBY01zbnU3YmczelFqR2tmbEhlVW9BTnhE?=
- =?utf-8?B?Ly9uOG9mUVc5RkR1RTdjeUFxcHZRM082ejYzbVdGNThVRlg0QTNXcjQ1dzdj?=
- =?utf-8?B?R0hyamlLeVFKMm44cC9KeHJEQWZIdk9tSENyUXpHZUwyTUxKS0l4S1hXTVNv?=
- =?utf-8?B?S3ZodmJVVndTVkpBMzhQclRiaGJtb3MwMU9Ra3lVU1dFN09SR1NmRHc5MGxW?=
- =?utf-8?B?cXY1QkgzOFdIYjFmdmRseGcrcE1OdmhJTXE2aFg2RGJGcGhYald1R210Snhz?=
- =?utf-8?B?TjBiTld6cjhVWE5GdGljV0NFa2tuVEJzYmZVb3dKcGRvZU12TEY3a2ptWjFF?=
- =?utf-8?B?Z2JoNW5vOG1FQ054SmtEOU5XUHNxYlJEdWY4bXBqSnJKQmZFTE0raEswcFor?=
- =?utf-8?B?azdEcVZiOE43d09uSVpINk05K2wrVXBFclZmMnVUUVBvU3FVMkh0NjNTZ01B?=
- =?utf-8?B?aTVObTJVdllxUHRVdjVZVzV6QkRhN3dPa25xOFRQQTdnbjFvMFJBbU5ES0U3?=
- =?utf-8?B?V1hzMjFzZ0lLR0IwYzhQWU1FbWljaEg1WVBVNWRQQTduajF2QUpLT2hSZ0pW?=
- =?utf-8?B?WEVhR2xMNUlYSGVJUG1vMTZMNzN0TDNTWC9mWDkvc2JlN0VselhNWUJobllE?=
- =?utf-8?B?cnpNZEdveFBoSmE5R0Q5ZkNlQlp3Nmd0UnZvS0VXZURFVHZDdkpHVGU0d1dy?=
- =?utf-8?B?QS9uSGM3QUdEUlpaNFBkZDNBbG9idXZ5YmJ6R2FTNnF2RURYQjVLZE40TGc4?=
- =?utf-8?B?NEJ6WTl6ei9xSUJLWEVKejQ1UUJhY0V0TVl1ZVRIVnRtY1p0NnlkNVZDR1E1?=
- =?utf-8?B?bklCUDRZK1lMZ1I3K29aN0NHajFhRnF3OEFBZjZ1cDgvMXE4Uk1WUHl5Q205?=
- =?utf-8?B?MitCVVJOUXk5Q1RmRWtuQ1NXNllhdEpObUUwbGZMU051aHhZbExveEVscU1Z?=
- =?utf-8?B?dUlWQ3BLZ0UwalN4UXRxbi8wSnM0ZGJUZTRkM2lXMHFrOTAwcnVYU3FoNkIx?=
- =?utf-8?B?MFE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e69965ac-d78a-4fa6-adb1-08dbe5b4365e
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dWVuRzh3ZERDMm9yajRBejhIVDdDaWE5dU5QamtmalVOaXRiWmhWRkQrVGRa?=
+ =?utf-8?B?cFJFbXNKRkc5Zzl2ajNGSVg0L0NjVzVFczZvZCswMEpwSVdJL2lyV1JmQ2VQ?=
+ =?utf-8?B?dGZJRUY3elZHdXdjK0ZzaGpDZFNrQ0dGZ3JwUEIzS3pRTkFXckdBWkVPU1lr?=
+ =?utf-8?B?YzhYazF5ckplbGN1Wm44N1BDeXN5TGJOOGlQUGVtdVJILzFqeW5CanVzVXRZ?=
+ =?utf-8?B?Wi9sbFhOcFZSUnBFeEVzVk16a05Xd0w1c0lOQ1FBdENCVk5adVppYW11R1hZ?=
+ =?utf-8?B?WTNDTnNGaFlMeUgzQWtkR0F6RnFBQk5HRkxJWTNVWnJ1TkxoZTJoZVBwakY0?=
+ =?utf-8?B?ZUgyNm03THo3d2o1Y2Q2d05HWHBxbWNrY20zVlBMa0hvMlhnUkFuUncyUXMv?=
+ =?utf-8?B?UDV0MzJrb2o2QktqOW1vc0RPak5YS1VsMVVIZVpTemhkR0YxQSs3bFI5OGw5?=
+ =?utf-8?B?R01BbDJsblAxckNMWXpBakZQaHI3aE5XM0RLSkUxV0JZTHRRVmxkZjFjUW5v?=
+ =?utf-8?B?N0llTnVGeTRHK1FqekNFWnlVU1JqU3VKQzVBNzBtaDR5VDB6OWEranZwKzlq?=
+ =?utf-8?B?RjlDR1BNSG1kUXEyOW9HRnNVTXFhUGRhZW9HMjFwZ2hSTmtqbVBObEljUTh2?=
+ =?utf-8?B?NkNiSmRad1lhcnlqTzdmdUt2eW4yTzQvaUlkL2E1dFBOc1FjK2x3V0tHM1JB?=
+ =?utf-8?B?VU84OHFEZUFUNGl3Y0FuWTM0ZVU5T3N6Q3c0OCtOMWZ6QXF2RURRbDRPSkFB?=
+ =?utf-8?B?ZWNPa2RuMnZiZGZJMWs2WmcyYTVnOHJqRjlXLzE5YVF4SlZHeVRSSTI4ZXpv?=
+ =?utf-8?B?ZE5OcWVMWGpuTDI5VG14dlZTV1c4ZGdBUVpBcUVnKzM2N203aXhCYUk2SXUw?=
+ =?utf-8?B?WUZ3SlRHSFQ1Z0ZxMm9zdnJNNWlSMXN1NU9EYytPOExSQ3o1TjN0NUVkZWNQ?=
+ =?utf-8?B?d0hsY1BDb2szaE42cnFQR2JVa21xcnIrSkgvUVFvNE95U3YyREZzMENSaWZZ?=
+ =?utf-8?B?cC9tMDJhc3k3U0ZNQ2tvU3VaR2RkczNsYitoekd2dC91eHZYOWMvNVgxSXZX?=
+ =?utf-8?B?ZzJjUy9WUjFEY1V2cXFOcmhIMC9IcWZBOW5mZzJxb1ZnVU9ubjhPdGR6M0N5?=
+ =?utf-8?B?MnNOTGUwMXB0UzZFY2xWSThoRng0WmZUK0tjSWp3OEkxeVpZRnQwWEd1SWo2?=
+ =?utf-8?B?ZUMxOXZMbUVSTFY5R3FTc2M5UEVVckxJTkVlR2JzQUljcURCY0RnU3FuTVlS?=
+ =?utf-8?B?TmtPWk9CYWFMdWNWUm96dzh4VXU0NFhUdjV2MTV5aU16NXR6QmNCc3lXSTYw?=
+ =?utf-8?B?UlZ0TSs2SnBreVoyd1lTYkNFaFJRb25tT09vSFhFRTdGOURNbUpXeWh5dGJP?=
+ =?utf-8?B?YkVBWFpETEVKUlR3Q3dFT3BYdHdtTmMwcXdlYzRwd0dDa292ZWNiVSs3Vllu?=
+ =?utf-8?B?MWVOSG52YUVZM1ZyNkoyZyt1ZDU3WmtnNlBJeHdjbGdxeGN4T1V0NnFJRFBm?=
+ =?utf-8?B?cTlUWERGcFdLdU5BQ3R2TTdRUkhzZnl1cHdYQ2FUbGIyQ2ZKUWxobzl5WjdH?=
+ =?utf-8?B?VHByTzJmRmNyMGIyQzBZclJnSGpORWR0NWFpK2swN3M0NzB2Yjh3RkQ4eGVQ?=
+ =?utf-8?B?L2Q2UU5oY2NLeSs2aXNRR3BRYVBDMEpVRWFpUjl4T2VjNzdqT0R1KzJSYnZR?=
+ =?utf-8?B?bzZOYzRqSkFUNVM0aXFtUFh1MkZuOUdBWGhaVmVVTnJiQ3VsSDFuVTZmdG9G?=
+ =?utf-8?B?eUhSOGUrQStKZmFtSmRuNTJBZ09zdHZqQ0h1bkNvS0txRGFIdjV5eG5Hemt1?=
+ =?utf-8?B?MExEcDFudjRWTXo0enFSZzRFdFV5VzV5MjZYRXRac3NLUjU4YnMxSzkvTjVr?=
+ =?utf-8?B?V1NDR2FxeEFkbTFScjN1RnB2QU5XQU1rVWpuam9uSFlydHRkNENBb2VJV0xP?=
+ =?utf-8?B?V29JNEc4dy9DaGJ4cTZNUnl3T1NIUEd4M1R6N2ZkNndvanNEMzAydWtiL2JK?=
+ =?utf-8?B?dm9lTFBHYllndWVXS1RJZzY5M092bXNCdjR2NDZudy9OUkRiakZxZ3hSOXQ4?=
+ =?utf-8?B?akNaRTFaY0FjdEtOZTJPUlZSeFcrczE0VUtKU29YL3VtY1RHTXRNeWJjM3E2?=
+ =?utf-8?B?Q1llaER1QURVSVhjZ3pwTUhaUVEvdEE2cDBSS3BrSEpGcmxWMXRiZVMydUQ4?=
+ =?utf-8?B?Z3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: a00d6314-20f9-456f-1b3f-08dbe5b5470b
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2023 08:23:57.7070
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2023 08:31:35.1560
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: G2FC7S5VrvLnlCDIRJxtkEhMHrdNI+8D7m/4q/Lc46njdiT6H9WFw9ty8Pz8pSYHjOnNN/hbmOX0x1PEFFLYlA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7771
+X-MS-Exchange-CrossTenant-UserPrincipalName: jvYLFHZu+Xk2SoMcO9mXtwswn8eOGtuoSYdWGhXXd4qOdtCcWvDqkmAf4WDINoA61w9Y/2IsOkObL49qdRp5Bg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7309
 X-OriginatorOrg: intel.com
 
-On 11/1/2023 10:09 AM, Chao Gao wrote:
-> On Thu, Sep 14, 2023 at 02:33:25AM -0400, Yang Weijiang wrote:
->> Set up CET MSRs, related VM_ENTRY/EXIT control bits and fixed CR4 setting
->> to enable CET for nested VM.
+On 11/1/2023 12:21 PM, Chao Gao wrote:
+> On Thu, Sep 14, 2023 at 02:33:24AM -0400, Yang Weijiang wrote:
+>> Per SDM description(Vol.3D, Appendix A.1):
+>> "If bit 56 is read as 1, software can use VM entry to deliver a hardware
+>> exception with or without an error code, regardless of vector"
+>>
+>> Modify has_error_code check before inject events to nested guest. Only
+>> enforce the check when guest is in real mode, the exception is not hard
+>> exception and the platform doesn't enumerate bit56 in VMX_BASIC, in all
+>> other case ignore the check to make the logic consistent with SDM.
 >>
 >> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 >> ---
->> arch/x86/kvm/vmx/nested.c | 27 +++++++++++++++++++++++++--
->> arch/x86/kvm/vmx/vmcs12.c |  6 ++++++
->> arch/x86/kvm/vmx/vmcs12.h | 14 +++++++++++++-
->> arch/x86/kvm/vmx/vmx.c    |  2 ++
->> 4 files changed, 46 insertions(+), 3 deletions(-)
+>> arch/x86/kvm/vmx/nested.c | 22 ++++++++++++++--------
+>> arch/x86/kvm/vmx/nested.h |  5 +++++
+>> 2 files changed, 19 insertions(+), 8 deletions(-)
 >>
 >> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> index 78a3be394d00..2c4ff13fddb0 100644
+>> index c5ec0ef51ff7..78a3be394d00 100644
 >> --- a/arch/x86/kvm/vmx/nested.c
 >> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -660,6 +660,28 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
->> 	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
->> 					 MSR_IA32_FLUSH_CMD, MSR_TYPE_W);
+>> @@ -1205,9 +1205,9 @@ static int vmx_restore_vmx_basic(struct vcpu_vmx *vmx, u64 data)
+>> {
+>> 	const u64 feature_and_reserved =
+>> 		/* feature (except bit 48; see below) */
+>> -		BIT_ULL(49) | BIT_ULL(54) | BIT_ULL(55) |
+>> +		BIT_ULL(49) | BIT_ULL(54) | BIT_ULL(55) | BIT_ULL(56) |
+>> 		/* reserved */
+>> -		BIT_ULL(31) | GENMASK_ULL(47, 45) | GENMASK_ULL(63, 56);
+>> +		BIT_ULL(31) | GENMASK_ULL(47, 45) | GENMASK_ULL(63, 57);
+>> 	u64 vmx_basic = vmcs_config.nested.basic;
 >>
->> +	/* Pass CET MSRs to nested VM if L0 and L1 are set to pass-through. */
->> +	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
->> +					 MSR_IA32_U_CET, MSR_TYPE_RW);
->> +
->> +	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
->> +					 MSR_IA32_S_CET, MSR_TYPE_RW);
->> +
->> +	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
->> +					 MSR_IA32_PL0_SSP, MSR_TYPE_RW);
->> +
->> +	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
->> +					 MSR_IA32_PL1_SSP, MSR_TYPE_RW);
->> +
->> +	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
->> +					 MSR_IA32_PL2_SSP, MSR_TYPE_RW);
->> +
->> +	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
->> +					 MSR_IA32_PL3_SSP, MSR_TYPE_RW);
->> +
->> +	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
->> +					 MSR_IA32_INT_SSP_TAB, MSR_TYPE_RW);
->> +
->> 	kvm_vcpu_unmap(vcpu, &vmx->nested.msr_bitmap_map, false);
+>> 	if (!is_bitwise_subset(vmx_basic, data, feature_and_reserved))
+>> @@ -2846,12 +2846,16 @@ static int nested_check_vm_entry_controls(struct kvm_vcpu *vcpu,
+>> 		    CC(intr_type == INTR_TYPE_OTHER_EVENT && vector != 0))
+>> 			return -EINVAL;
 >>
->> 	vmx->nested.force_msr_bitmap_recalc = false;
->> @@ -6794,7 +6816,7 @@ static void nested_vmx_setup_exit_ctls(struct vmcs_config *vmcs_conf,
->> 		VM_EXIT_HOST_ADDR_SPACE_SIZE |
->> #endif
->> 		VM_EXIT_LOAD_IA32_PAT | VM_EXIT_SAVE_IA32_PAT |
->> -		VM_EXIT_CLEAR_BNDCFGS;
->> +		VM_EXIT_CLEAR_BNDCFGS | VM_EXIT_LOAD_CET_STATE;
->> 	msrs->exit_ctls_high |=
->> 		VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR |
->> 		VM_EXIT_LOAD_IA32_EFER | VM_EXIT_SAVE_IA32_EFER |
->> @@ -6816,7 +6838,8 @@ static void nested_vmx_setup_entry_ctls(struct vmcs_config *vmcs_conf,
->> #ifdef CONFIG_X86_64
->> 		VM_ENTRY_IA32E_MODE |
->> #endif
->> -		VM_ENTRY_LOAD_IA32_PAT | VM_ENTRY_LOAD_BNDCFGS;
->> +		VM_ENTRY_LOAD_IA32_PAT | VM_ENTRY_LOAD_BNDCFGS |
->> +		VM_ENTRY_LOAD_CET_STATE;
->> 	msrs->entry_ctls_high |=
->> 		(VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR | VM_ENTRY_LOAD_IA32_EFER |
->> 		 VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL);
->> diff --git a/arch/x86/kvm/vmx/vmcs12.c b/arch/x86/kvm/vmx/vmcs12.c
->> index 106a72c923ca..4233b5ca9461 100644
->> --- a/arch/x86/kvm/vmx/vmcs12.c
->> +++ b/arch/x86/kvm/vmx/vmcs12.c
->> @@ -139,6 +139,9 @@ const unsigned short vmcs12_field_offsets[] = {
->> 	FIELD(GUEST_PENDING_DBG_EXCEPTIONS, guest_pending_dbg_exceptions),
->> 	FIELD(GUEST_SYSENTER_ESP, guest_sysenter_esp),
->> 	FIELD(GUEST_SYSENTER_EIP, guest_sysenter_eip),
->> +	FIELD(GUEST_S_CET, guest_s_cet),
->> +	FIELD(GUEST_SSP, guest_ssp),
->> +	FIELD(GUEST_INTR_SSP_TABLE, guest_ssp_tbl),
-> I think we need to sync guest states, e.g., guest_s_cet/guest_ssp/guest_ssp_tbl,
-> between vmcs02 and vmcs12 on nested VM entry/exit, probably in
-> sync_vmcs02_to_vmcs12() and prepare_vmcs12() or "_rare" variants of them.
+>> -		/* VM-entry interruption-info field: deliver error code */
+>> -		should_have_error_code =
+>> -			intr_type == INTR_TYPE_HARD_EXCEPTION && prot_mode &&
+>> -			x86_exception_has_error_code(vector);
+>> -		if (CC(has_error_code != should_have_error_code))
+>> -			return -EINVAL;
+>> +		if (!prot_mode || intr_type != INTR_TYPE_HARD_EXCEPTION ||
+>> +		    !nested_cpu_has_no_hw_errcode_cc(vcpu)) {
+>> +			/* VM-entry interruption-info field: deliver error code */
+>> +			should_have_error_code =
+>> +				intr_type == INTR_TYPE_HARD_EXCEPTION &&
+>> +				prot_mode &&
+>> +				x86_exception_has_error_code(vector);
+>> +			if (CC(has_error_code != should_have_error_code))
+>> +				return -EINVAL;
+>> +		}
+> prot_mode and intr_type are used twice, making the code a little hard to read.
+>
+> how about:
+> 		/*
+> 		 * Cannot deliver error code in real mode or if the
+> 		 * interruption type is not hardware exception. For other
+> 		 * cases, do the consistency check only if the vCPU doesn't
+> 		 * enumerate VMX_BASIC_NO_HW_ERROR_CODE_CC.
+> 		 */
+> 		if (!prot_mode || intr_type != INTR_TYPE_HARD_EXCEPTION) {
+> 			if (CC(has_error_code))
+> 				return -EINVAL;
+> 		} else if (!nested_cpu_has_no_hw_errcode_cc(vcpu)) {
+> 			if (CC(has_error_code != x86_exception_has_error_code(vector)))
+> 				return -EINVAL;
+> 		}
+>
+> and drop should_have_error_code.
 
-After checked around the code, it's necessary to sync related fields from vmcs02 to vmcs12
-at nested VM exit so that L1 or userspace can access correct values.
-I'll add this part, thanks!
+The change looks clearer, I'll take it, thanks!
+
+
 
