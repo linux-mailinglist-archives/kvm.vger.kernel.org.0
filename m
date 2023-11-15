@@ -1,168 +1,101 @@
-Return-Path: <kvm+bounces-1822-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1823-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 773E97EC20A
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 13:18:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 359AD7EC2AB
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 13:43:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31B512813DB
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 12:18:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 955B6B20A96
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 12:43:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 692EE18055;
-	Wed, 15 Nov 2023 12:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7599171D3;
+	Wed, 15 Nov 2023 12:42:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="APpOpNef"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dQZrzXJa"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C12179A5
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 12:18:05 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 838FBC7
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 04:18:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700050683;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uFSmPmJ9qLXHCirLCU1lG0SIBq8FZeGtn+2R0siKIYo=;
-	b=APpOpNefzoOstu5thSpn4QVyCcWbEIZroa1e2NCWAmc3zbWGfAPvkTVsDBrEhcuKM8WRZy
-	42wgmMkQc+V0uZ6f+dLAZT6H/plnZ/IfP4guGkaegAosevfuYojKwD2FxvO/sC+5iisrTg
-	OmgzsbG2jD3N4Rr4R52fD4zKlAltT1Q=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-615-fpO44AbIPE2v7bjhiffENg-1; Wed, 15 Nov 2023 07:18:02 -0500
-X-MC-Unique: fpO44AbIPE2v7bjhiffENg-1
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6d2a5a99311so6180265a34.2
-        for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 04:18:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700050681; x=1700655481;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uFSmPmJ9qLXHCirLCU1lG0SIBq8FZeGtn+2R0siKIYo=;
-        b=TTUCq0oBxkratu29wo0GPB/HdrBaZ+lBjy4A6UAw11uHpXpX34WG0QgtdRyzlGwl/3
-         Re4rracgsCQGe6hV6ISFcs8AKBm2PtC4JmuYy4p1Y92K8Q/gFbskrI1jHANlfhIi+Sfj
-         PXufPZjOVZ3WnIsJoSuPEXlZ7hZI2+bJmptskPyajRXunNlQU4WxWTCEDP1Pq6vFLlLi
-         h5IipEttL1UjkbNwLqNyswnccpOwA9ROPPgfD65A20jInHM/QvBDXqPWsDmyHrs/WSrH
-         CjN8tmCuBZi4tkp40O1M/xR3Sa8Oh2d7FJgrPEvPtDZXC+HWYD28nghRUi8AsN91er/p
-         p8lw==
-X-Gm-Message-State: AOJu0YxSybNCE5NlXGqrAhcIaWni+22IvspqYufpeqZX/W2c7S9uSb8L
-	lw65UOguDt0dN0aqeba8Kg+PioRua1iQH7rwlb5KqKH0OH5rKTPhAGw+jZWJjK7gXflb4zZV0c6
-	54GYYB9Pv94jW
-X-Received: by 2002:a05:6830:348c:b0:6c6:5053:66dc with SMTP id c12-20020a056830348c00b006c6505366dcmr5271625otu.21.1700050681749;
-        Wed, 15 Nov 2023 04:18:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGuteN+jkOs7Pk0h51R2XIAQA3l6e/ETSzK83KjygEg4ZKVNMaP0v6d/pJRWFe9lG1nPw9YZg==
-X-Received: by 2002:a05:6830:348c:b0:6c6:5053:66dc with SMTP id c12-20020a056830348c00b006c6505366dcmr5271611otu.21.1700050681510;
-        Wed, 15 Nov 2023 04:18:01 -0800 (PST)
-Received: from rh (p200300c93f306f0016d68197cd5f6027.dip0.t-ipconnect.de. [2003:c9:3f30:6f00:16d6:8197:cd5f:6027])
-        by smtp.gmail.com with ESMTPSA id dw15-20020a0562140a0f00b0067079ecca05sm489704qvb.108.2023.11.15.04.17.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Nov 2023 04:18:01 -0800 (PST)
-Date: Wed, 15 Nov 2023 13:17:56 +0100 (CET)
-From: Sebastian Ott <sebott@redhat.com>
-To: Shaoqin Huang <shahuang@redhat.com>
-cc: qemu-arm@nongnu.org, eric.auger@redhat.com, 
-    Paolo Bonzini <pbonzini@redhat.com>, 
-    Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, 
-    qemu-devel@nongnu.org
-Subject: Re: [PATCH v1] arm/kvm: Enable support for
- KVM_ARM_VCPU_PMU_V3_FILTER
-In-Reply-To: <20231113081713.153615-1-shahuang@redhat.com>
-Message-ID: <3a570842-aaec-6447-b043-d908e83717ec@redhat.com>
-References: <20231113081713.153615-1-shahuang@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFC6525F
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 12:42:53 +0000 (UTC)
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC26F125;
+	Wed, 15 Nov 2023 04:42:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=+r8ivjIfgLZ88YUedyxhSyz2DStbFMG0ACvLMyfn4T8=; b=dQZrzXJarcPyscofRf+ECdjQh3
+	s2ZanwodO9ept5SfgdHuqz+W3dpJJaRsGTClg1RCPbdW4uwkneSurlUMt6KsqbZ/eF6FB8TlgPlJ6
+	m1PPue2AYsmhzXh1mR5lgXggeZl4dGJ7Ka1275y6fMwAF0zeAMlb3uxXd367bWr5AuXHrC4bnFSVf
+	0jWyCxQm1IRy3oE/Mz+/H/t6I48ZPo1b9uLaeEXDNyJoAcPThLzw6OO/gxC4H0URpdJppHV+WuzzJ
+	496rAqlN0u8oycYWDFB9hetPDb225KM9vZnsqzjOnh31C8x4B4Tq+xHgT4I1ivsjg4wxvG7BmFMl1
+	CpjaXSDQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1r3FDq-00EEE7-0q; Wed, 15 Nov 2023 12:42:22 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id ABAE4300427; Wed, 15 Nov 2023 13:42:21 +0100 (CET)
+Date: Wed, 15 Nov 2023 13:42:21 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>,
+	iommu@lists.linux.dev, Thomas Gleixner <tglx@linutronix.de>,
+	Lu Baolu <baolu.lu@linux.intel.com>, kvm@vger.kernel.org,
+	Dave Hansen <dave.hansen@intel.com>, Joerg Roedel <joro@8bytes.org>,
+	"H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+	Ingo Molnar <mingo@redhat.com>, Raj Ashok <ashok.raj@intel.com>,
+	"Tian, Kevin" <kevin.tian@intel.com>, maz@kernel.org,
+	seanjc@google.com, Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [PATCH RFC 09/13] x86/irq: Install posted MSI notification
+ handler
+Message-ID: <20231115124221.GE3818@noisy.programming.kicks-ass.net>
+References: <20231112041643.2868316-1-jacob.jun.pan@linux.intel.com>
+ <20231112041643.2868316-10-jacob.jun.pan@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231112041643.2868316-10-jacob.jun.pan@linux.intel.com>
 
-Hi,
+On Sat, Nov 11, 2023 at 08:16:39PM -0800, Jacob Pan wrote:
 
-On Mon, 13 Nov 2023, Shaoqin Huang wrote:
-> +    ``pmu-filter={A,D}:start-end[;...]``
-> +        KVM implements pmu event filtering to prevent a guest from being able to
-> +	sample certain events. It has the following format:
-> +
-> +	pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
-> +
-> +	The A means "allow" and D means "deny", start if the first event of the
-                                                       ^
-                                                       is
-
-Also it should be stated that the first filter action defines if the whole
-list is an allow or a deny list.
-
-> +static void kvm_arm_pmu_filter_init(CPUState *cs)
+> +static __always_inline inline void handle_pending_pir(struct pi_desc *pid, struct pt_regs *regs)
 > +{
-> +    struct kvm_pmu_event_filter filter;
-> +    struct kvm_device_attr attr = {
-> +        .group      = KVM_ARM_VCPU_PMU_V3_CTRL,
-> +        .attr       = KVM_ARM_VCPU_PMU_V3_FILTER,
-> +    };
-> +    KVMState *kvm_state = cs->kvm_state;
-> +    char *tmp;
-> +    char *str, act;
+> +	int i, vec = FIRST_EXTERNAL_VECTOR;
+> +	u64 pir_copy[4];
 > +
-> +    if (!kvm_state->kvm_pmu_filter)
-> +        return;
-> +
-> +    tmp = g_strdup(kvm_state->kvm_pmu_filter);
-> +
-> +    for (str = strtok(tmp, ";"); str != NULL; str = strtok(NULL, ";")) {
-> +        unsigned short start = 0, end = 0;
-> +
-> +        sscanf(str, "%c:%hx-%hx", &act, &start, &end);
-> +        if ((act != 'A' && act != 'D') || (!start && !end)) {
-> +            error_report("skipping invalid filter %s\n", str);
-> +            continue;
-> +        }
-> +
-> +        filter = (struct kvm_pmu_event_filter) {
-> +            .base_event     = start,
-> +            .nevents        = end - start + 1,
-> +            .action         = act == 'A' ? KVM_PMU_EVENT_ALLOW :
-> +                                           KVM_PMU_EVENT_DENY,
-> +        };
-> +
-> +        attr.addr = (uint64_t)&filter;
+> +	/*
+> +	 * Make a copy of PIR which contains IRQ pending bits for vectors,
+> +	 * then invoke IRQ handlers for each pending vector.
+> +	 * If any new interrupts were posted while we are processing, will
+> +	 * do again before allowing new notifications. The idea is to
+> +	 * minimize the number of the expensive notifications if IRQs come
+> +	 * in a high frequency burst.
+> +	 */
+> +	for (i = 0; i < 4; i++)
+> +		pir_copy[i] = raw_atomic64_xchg((atomic64_t *)&pid->pir_l[i], 0);
 
-That could move to the initialization of attr (the address of filter
-doesn't change).
+Might as well use arch_xchg() and save the atomic64_t casting.
 
-> +        if (!kvm_arm_set_device_attr(cs, &attr, "PMU Event Filter")) {
-> +            error_report("Failed to init PMU Event Filter\n");
-> +            abort();
-> +        }
-> +    }
 > +
-> +    g_free(tmp);
+> +	/*
+> +	 * Ideally, we should start from the high order bits set in the PIR
+> +	 * since each bit represents a vector. Higher order bit position means
+> +	 * the vector has higher priority. But external vectors are allocated
+> +	 * based on availability not priority.
+> +	 *
+> +	 * EOI is included in the IRQ handlers call to apic_ack_irq, which
+> +	 * allows higher priority system interrupt to get in between.
+> +	 */
+> +	for_each_set_bit_from(vec, (unsigned long *)&pir_copy[0], 256)
+> +		call_irq_handler(vec, regs);
+> +
 > +}
-> +
-> void kvm_arm_pmu_init(CPUState *cs)
-> {
->     struct kvm_device_attr attr = {
->         .group = KVM_ARM_VCPU_PMU_V3_CTRL,
->         .attr = KVM_ARM_VCPU_PMU_V3_INIT,
->     };
-> +    static bool pmu_filter_init = false;
->
->     if (!ARM_CPU(cs)->has_pmu) {
->         return;
->     }
-> +    if (!pmu_filter_init) {
-> +        kvm_arm_pmu_filter_init(cs);
-> +        pmu_filter_init = true;
-
-pmu_filter_init could move inside kvm_arm_pmu_filter_init() - maybe
-together with a comment that this only needs to be called for 1 vcpu.
-
-Thanks,
-Sebastian
-
 
