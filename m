@@ -1,252 +1,203 @@
-Return-Path: <kvm+bounces-1798-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1751-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B5887EBE04
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 08:25:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 807247EBD9E
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 08:18:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 791E0280E8E
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 07:24:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEC9C1C20B34
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 07:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B970F9DA;
-	Wed, 15 Nov 2023 07:24:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47E5F9C8;
+	Wed, 15 Nov 2023 07:18:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fJgHRikk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BW6DGWOF"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB9EE559
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 07:24:25 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A76008E
-	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 23:24:23 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CBCE542
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 07:18:12 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31EB68E;
+	Tue, 14 Nov 2023 23:18:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700033063; x=1731569063;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=klfzRXQXY4gU48ZNC2oRdXZ/A2KblsfGhFWWh4dKX9U=;
-  b=fJgHRikkKJEfHi6x0gQfaDbw5pLm1YXehIjliIA1hB+qMQwSTpZjwtzW
-   xL2LgqTJVWn4A2e7QrJ2QxiO53dUNfHXGqKk0ofkZDjtuttI+0xCR+Y/N
-   ijG4QDxOoq1ho1eXXK3iZ3qhnAKBXY5JtG07XvxduJIN1G6tQ7DsruBqB
-   tlnF6sVbwSptrQ6TYL9bx+fQ+DCqqXo8BlHtiFX6qDqpIqjgEEKKl964G
-   uWs/bFLBVeetjtie8uBtetRQRcXH1cOy+1SZZN7zAwAyWvcY+K3HyP+lm
-   e9Suic3WJTOXJdRBoBHIzMo0yePX9TYT/H7TJ4/gE+f3psZPOWIp33cme
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="390623752"
+  t=1700032691; x=1731568691;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=K94+ZW5WqsqsHW+UUEKhHYET4SuOMIzEuNQ2zXPv0eg=;
+  b=BW6DGWOFBtiEIxIqq3Us6Jq71Fr24895cWGHDQ5NDfBm4ggtUUgmhrcV
+   4a9LzAta4m24RYZ9g7GHqTHOJqhxmJsPPowDrHno8a6phUsthLon6hSmb
+   H6MVLmngGGZFcIanPa1f+Ti2Ko96NnDnscIJ5kYVYcUvgTfNKW1SXi5GW
+   GoE7rRV19VzNgFBgqyN9uNKHo3ieFQOB0DcsPIUhEJ+BcvDMYzJxN5szD
+   DnwdYYG+Hz8nfMyj51tRMRnXD3zi/9UqWiSFHDeiZJYgwDYHNEbxKUvAE
+   CybfSUCBGgKwFo55OsEVLeaOXcaUkUs/UPK27s8n97fz28Tw+p6ISRP2B
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="3899959"
 X-IronPort-AV: E=Sophos;i="6.03,304,1694761200"; 
-   d="scan'208";a="390623752"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 23:24:23 -0800
+   d="scan'208";a="3899959"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 23:18:10 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="714800609"
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="799760959"
 X-IronPort-AV: E=Sophos;i="6.03,304,1694761200"; 
-   d="scan'208";a="714800609"
-Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orsmga003.jf.intel.com with ESMTP; 14 Nov 2023 23:24:16 -0800
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	David Hildenbrand <david@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Peter Xu <peterx@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Cornelia Huck <cohuck@redhat.com>,
-	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-	Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>
-Cc: qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	xiaoyao.li@intel.com,
-	Michael Roth <michael.roth@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Claudio Fontana <cfontana@suse.de>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v3 70/70] docs: Add TDX documentation
-Date: Wed, 15 Nov 2023 02:15:19 -0500
-Message-Id: <20231115071519.2864957-71-xiaoyao.li@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231115071519.2864957-1-xiaoyao.li@intel.com>
-References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
+   d="scan'208";a="799760959"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.2.39]) ([10.238.2.39])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 23:18:06 -0800
+Message-ID: <ed24d2a9-ab37-4807-b6a9-802943007591@linux.intel.com>
+Date: Wed, 15 Nov 2023 15:18:03 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 12/25] KVM: x86: Refresh CPUID on write to guest
+ MSR_IA32_XSS
+To: seanjc@google.com, pbonzini@redhat.com
+Cc: Yang Weijiang <weijiang.yang@intel.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, dave.hansen@intel.com, peterz@infradead.org,
+ chao.gao@intel.com, rick.p.edgecombe@intel.com, john.allen@amd.com,
+ Zhang Yi Z <yi.z.zhang@linux.intel.com>
+References: <20230914063325.85503-1-weijiang.yang@intel.com>
+ <20230914063325.85503-13-weijiang.yang@intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20230914063325.85503-13-weijiang.yang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Add docs/system/i386/tdx.rst for TDX support, and add tdx in
-confidential-guest-support.rst
 
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
----
-Changes since v1:
- - Add prerequisite of private gmem;
- - update example command to launch TD;
+On 9/14/2023 2:33 PM, Yang Weijiang wrote:
+> Update CPUID.(EAX=0DH,ECX=1).EBX to reflect current required xstate size
+> due to XSS MSR modification.
+> CPUID(EAX=0DH,ECX=1).EBX reports the required storage size of all enabled
+> xstate features in (XCR0 | IA32_XSS). The CPUID value can be used by guest
+> before allocate sufficient xsave buffer.
+>
+> Note, KVM does not yet support any XSS based features, i.e. supported_xss
+> is guaranteed to be zero at this time.
+>
+> Opportunistically modify XSS write access logic as: if !guest_cpuid_has(),
+> write initiated from host is allowed iff the write is reset operaiton,
+> i.e., data == 0, reject host_initiated non-reset write and any guest write.
+Hi Sean & Polo,
+During code review of Enable CET Virtualization v5 patchset, there were
+discussions about "do a wholesale cleanup of all the cases that essentially
+allow userspace to do KVM_SET_MSR before KVM_SET_CPUID2", i.e. force the 
+order
+between  KVM_SET_CPUID2 and KVM_SET_MSR, but allow the host_initiated 
+path with
+default (generally 0) value.
+https://lore.kernel.org/kvm/ZM1C+ILRMCfzJxx7@google.com/
+https://lore.kernel.org/kvm/CABgObfbvr8F8g5hJN6jn95m7u7m2+8ACkqO25KAZwRmJ9AncZg@mail.gmail.com/
 
-Changes since RFC v4:
- - add the restriction that kernel-irqchip must be split
----
- docs/system/confidential-guest-support.rst |   1 +
- docs/system/i386/tdx.rst                   | 113 +++++++++++++++++++++
- docs/system/target-i386.rst                |   1 +
- 3 files changed, 115 insertions(+)
- create mode 100644 docs/system/i386/tdx.rst
+I can take the task to do the code cleanup.
+Before going any further, I want to confirm it is still the direction 
+intended,
+right?
 
-diff --git a/docs/system/confidential-guest-support.rst b/docs/system/confidential-guest-support.rst
-index 0c490dbda2b7..66129fbab64c 100644
---- a/docs/system/confidential-guest-support.rst
-+++ b/docs/system/confidential-guest-support.rst
-@@ -38,6 +38,7 @@ Supported mechanisms
- Currently supported confidential guest mechanisms are:
- 
- * AMD Secure Encrypted Virtualization (SEV) (see :doc:`i386/amd-memory-encryption`)
-+* Intel Trust Domain Extension (TDX) (see :doc:`i386/tdx`)
- * POWER Protected Execution Facility (PEF) (see :ref:`power-papr-protected-execution-facility-pef`)
- * s390x Protected Virtualization (PV) (see :doc:`s390x/protvirt`)
- 
-diff --git a/docs/system/i386/tdx.rst b/docs/system/i386/tdx.rst
-new file mode 100644
-index 000000000000..1872e4f5a8be
---- /dev/null
-+++ b/docs/system/i386/tdx.rst
-@@ -0,0 +1,113 @@
-+Intel Trusted Domain eXtension (TDX)
-+====================================
-+
-+Intel Trusted Domain eXtensions (TDX) refers to an Intel technology that extends
-+Virtual Machine Extensions (VMX) and Multi-Key Total Memory Encryption (MKTME)
-+with a new kind of virtual machine guest called a Trust Domain (TD). A TD runs
-+in a CPU mode that is designed to protect the confidentiality of its memory
-+contents and its CPU state from any other software, including the hosting
-+Virtual Machine Monitor (VMM), unless explicitly shared by the TD itself.
-+
-+Prerequisites
-+-------------
-+
-+To run TD, the physical machine needs to have TDX module loaded and initialized
-+while KVM hypervisor has TDX support and has TDX enabled. If those requirements
-+are met, the ``KVM_CAP_VM_TYPES`` will report the support of ``KVM_X86_TDX_VM``.
-+
-+Trust Domain Virtual Firmware (TDVF)
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Trust Domain Virtual Firmware (TDVF) is required to provide TD services to boot
-+TD Guest OS. TDVF needs to be copied to guest private memory and measured before
-+a TD boots.
-+
-+The VM scope ``MEMORY_ENCRYPT_OP`` ioctl provides command ``KVM_TDX_INIT_MEM_REGION``
-+to copy the TDVF image to TD's private memory space.
-+
-+Since TDX doesn't support readonly memslot, TDVF cannot be mapped as pflash
-+device and it actually works as RAM. "-bios" option is chosen to load TDVF.
-+
-+OVMF is the opensource firmware that implements the TDVF support. Thus the
-+command line to specify and load TDVF is ``-bios OVMF.fd``
-+
-+KVM private gmem
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+TD's memory (RAM) needs to be able to be transformed between private and shared.
-+And its BIOS (OVMF/TDVF) needs to be mapped as private. Thus QEMU needs to
-+allocate private gmem for them via KVM's IOCTL (KVM_CREATE_GUEST_MEMFD), which
-+requires KVM is newer enough that reports KVM_CAP_GUEST_MEMFD.
-+
-+Feature Control
-+---------------
-+
-+Unlike non-TDX VM, the CPU features (enumerated by CPU or MSR) of a TD is not
-+under full control of VMM. VMM can only configure part of features of a TD on
-+``KVM_TDX_INIT_VM`` command of VM scope ``MEMORY_ENCRYPT_OP`` ioctl.
-+
-+The configurable features have three types:
-+
-+- Attributes:
-+  - PKS (bit 30) controls whether Supervisor Protection Keys is exposed to TD,
-+  which determines related CPUID bit and CR4 bit;
-+  - PERFMON (bit 63) controls whether PMU is exposed to TD.
-+
-+- XSAVE related features (XFAM):
-+  XFAM is a 64b mask, which has the same format as XCR0 or IA32_XSS MSR. It
-+  determines the set of extended features available for use by the guest TD.
-+
-+- CPUID features:
-+  Only some bits of some CPUID leaves are directly configurable by VMM.
-+
-+What features can be configured is reported via TDX capabilities.
-+
-+TDX capabilities
-+~~~~~~~~~~~~~~~~
-+
-+The VM scope ``MEMORY_ENCRYPT_OP`` ioctl provides command ``KVM_TDX_CAPABILITIES``
-+to get the TDX capabilities from KVM. It returns a data structure of
-+``struct kvm_tdx_capabilites``, which tells the supported configuration of
-+attributes, XFAM and CPUIDs.
-+
-+Launching a TD (TDX VM)
-+-----------------------
-+
-+To launch a TDX guest, below are new added and required:
-+
-+.. parsed-literal::
-+
-+    |qemu_system_x86| \\
-+        -object tdx-guest,id=tdx0 \\
-+        -machine ...,kernel-irqchip=split,confidential-guest-support=tdx0 \\
-+        -bios OVMF.fd \\
-+
-+Debugging
-+---------
-+
-+Bit 0 of TD attributes, is DEBUG bit, which decides if the TD runs in off-TD
-+debug mode. When in off-TD debug mode, TD's VCPU state and private memory are
-+accessible via given SEAMCALLs. This requires KVM to expose APIs to invoke those
-+SEAMCALLs and resonponding QEMU change.
-+
-+It's targeted as future work.
-+
-+restrictions
-+------------
-+
-+ - kernel-irqchip must be split;
-+
-+ - No readonly support for private memory;
-+
-+ - No SMM support: SMM support requires manipulating the guset register states
-+   which is not allowed;
-+
-+Live Migration
-+--------------
-+
-+TODO
-+
-+References
-+----------
-+
-+- `TDX Homepage <https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html>`__
-diff --git a/docs/system/target-i386.rst b/docs/system/target-i386.rst
-index 1b8a1f248abb..4d58cdbc4e06 100644
---- a/docs/system/target-i386.rst
-+++ b/docs/system/target-i386.rst
-@@ -29,6 +29,7 @@ Architectural features
-    i386/kvm-pv
-    i386/sgx
-    i386/amd-memory-encryption
-+   i386/tdx
- 
- OS requirements
- ~~~~~~~~~~~~~~~
--- 
-2.34.1
+
+>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
+> Signed-off-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h |  1 +
+>   arch/x86/kvm/cpuid.c            | 15 ++++++++++++++-
+>   arch/x86/kvm/x86.c              | 13 +++++++++----
+>   3 files changed, 24 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 0fc5e6312e93..d77b030e996c 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -803,6 +803,7 @@ struct kvm_vcpu_arch {
+>   
+>   	u64 xcr0;
+>   	u64 guest_supported_xcr0;
+> +	u64 guest_supported_xss;
+>   
+>   	struct kvm_pio_request pio;
+>   	void *pio_data;
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 1f206caec559..4e7a820cba62 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -275,7 +275,8 @@ static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_e
+>   	best = cpuid_entry2_find(entries, nent, 0xD, 1);
+>   	if (best && (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
+>   		     cpuid_entry_has(best, X86_FEATURE_XSAVEC)))
+> -		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
+> +		best->ebx = xstate_required_size(vcpu->arch.xcr0 |
+> +						 vcpu->arch.ia32_xss, true);
+>   
+>   	best = __kvm_find_kvm_cpuid_features(vcpu, entries, nent);
+>   	if (kvm_hlt_in_guest(vcpu->kvm) && best &&
+> @@ -312,6 +313,17 @@ static u64 vcpu_get_supported_xcr0(struct kvm_vcpu *vcpu)
+>   	return (best->eax | ((u64)best->edx << 32)) & kvm_caps.supported_xcr0;
+>   }
+>   
+> +static u64 vcpu_get_supported_xss(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_cpuid_entry2 *best;
+> +
+> +	best = kvm_find_cpuid_entry_index(vcpu, 0xd, 1);
+> +	if (!best)
+> +		return 0;
+> +
+> +	return (best->ecx | ((u64)best->edx << 32)) & kvm_caps.supported_xss;
+> +}
+> +
+>   static bool kvm_cpuid_has_hyperv(struct kvm_cpuid_entry2 *entries, int nent)
+>   {
+>   	struct kvm_cpuid_entry2 *entry;
+> @@ -358,6 +370,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>   	}
+>   
+>   	vcpu->arch.guest_supported_xcr0 = vcpu_get_supported_xcr0(vcpu);
+> +	vcpu->arch.guest_supported_xss = vcpu_get_supported_xss(vcpu);
+>   
+>   	/*
+>   	 * FP+SSE can always be saved/restored via KVM_{G,S}ET_XSAVE, even if
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 1258d1d6dd52..9a616d84bd39 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3795,20 +3795,25 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   			vcpu->arch.ia32_tsc_adjust_msr += adj;
+>   		}
+>   		break;
+> -	case MSR_IA32_XSS:
+> -		if (!msr_info->host_initiated &&
+> -		    !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
+> +	case MSR_IA32_XSS: {
+> +		bool host_msr_reset = msr_info->host_initiated && data == 0;
+> +
+> +		if (!guest_cpuid_has(vcpu, X86_FEATURE_XSAVES) &&
+> +		    (!host_msr_reset || !msr_info->host_initiated))
+>   			return 1;
+>   		/*
+>   		 * KVM supports exposing PT to the guest, but does not support
+>   		 * IA32_XSS[bit 8]. Guests have to use RDMSR/WRMSR rather than
+>   		 * XSAVES/XRSTORS to save/restore PT MSRs.
+>   		 */
+> -		if (data & ~kvm_caps.supported_xss)
+> +		if (data & ~vcpu->arch.guest_supported_xss)
+>   			return 1;
+> +		if (vcpu->arch.ia32_xss == data)
+> +			break;
+>   		vcpu->arch.ia32_xss = data;
+>   		kvm_update_cpuid_runtime(vcpu);
+>   		break;
+> +	}
+>   	case MSR_SMI_COUNT:
+>   		if (!msr_info->host_initiated)
+>   			return 1;
 
 
