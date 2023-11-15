@@ -1,285 +1,167 @@
-Return-Path: <kvm+bounces-1818-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1819-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11D457EC10C
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 12:02:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E37C7EC117
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 12:08:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B95E5B20B23
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 11:01:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31C412813AD
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 11:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84C8C156DE;
-	Wed, 15 Nov 2023 11:01:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EF9A168A3;
+	Wed, 15 Nov 2023 11:08:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZPZnQQ45"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hu/bNW6/"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642A814F76
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 11:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6BBC154B7
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 11:08:33 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8818595
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 03:01:44 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72B1AD8
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 03:08:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700046103;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
-	bh=xVxYyKJ0o6UCCa3NUBRh1/+ZZ0cMxtWvzO5pm3jMcHg=;
-	b=ZPZnQQ45orKZl5mc2Uu06HAN4fB0UZ4Z7sgTb7XwLzYT+af7OpHwxK/4K5fnKb8V9g/8mz
-	3wP14v9foYDZqcQaXAqMffgi0qOUQnXfSgHywrpGbc1j2BEhsP0kP+uvok+WscQToQ6VL6
-	ZcsY9G3r7vkWhpD92sfyVilrdrC1TEw=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-249-U4z8lEueMPKwovCpCVivpA-1; Wed,
- 15 Nov 2023 06:01:40 -0500
-X-MC-Unique: U4z8lEueMPKwovCpCVivpA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4026E28B72EF;
-	Wed, 15 Nov 2023 11:01:39 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.144])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D39D7AE5;
-	Wed, 15 Nov 2023 11:01:24 +0000 (UTC)
-Date: Wed, 15 Nov 2023 11:01:19 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	David Hildenbrand <david@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Peter Xu <peterx@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Cornelia Huck <cohuck@redhat.com>, Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Claudio Fontana <cfontana@suse.de>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: Re: [PATCH v3 26/70] i386/tdx: Initialize TDX before creating TD
- vcpus
-Message-ID: <ZVSk_-m-AAK7dYZ1@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
- <20231115071519.2864957-27-xiaoyao.li@intel.com>
+	s=mimecast20190719; t=1700046511;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=30YlxcbouoHUqbszSietM15X2VzsRmxEM5Z6VzVk+yg=;
+	b=hu/bNW6/3vyAHjwBIUmADTmarsYKaL0BcL/g/tetEtgEq6YwSgME7EzDbJ9zBO4sGpwqcg
+	BHxgJl1WVpLW0EoDCqkgZ/O9b2MfEQwFArs49k8R6q3YBTDZPibsSOShjNRDlcCb5KuSfE
+	EsJ3DLxvFHTG/h5okMMHZ4veEfoGtlM=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-529-qxEEPq3MN_eoFCe5ancMfA-1; Wed, 15 Nov 2023 06:08:30 -0500
+X-MC-Unique: qxEEPq3MN_eoFCe5ancMfA-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-9e644d94d85so98113966b.0
+        for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 03:08:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700046509; x=1700651309;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=30YlxcbouoHUqbszSietM15X2VzsRmxEM5Z6VzVk+yg=;
+        b=fZceo03B61kS7z3F7rixGyVFnxpLtX2MYYfCj6Aqg3sbC8KbeK8lfwQyvc7ZrdX0vu
+         8O0vXjCQmNnm3YHQDgwdf8XbipRBlUSKYWyhzi4ZZ8Fe91c1B70xVPCSR0PS9/J17VxA
+         l3ldOLaIGvD6p6O7jU1upQrzzJMdEnVzootXLdfmuFWr11lkn6ggz0f8DQyemaQMdYK9
+         G3kyIhn3SI2/PcSRT8DwDGnSz9OLWb8UQLUmBVyGxklLbayyvo0nEITBkcD0yaj/WBQX
+         HlTwuXtrFSKoHFSLuAc1Xh9994WSJrHni7MdcYMrmOA5XP+PtP0swJwSAdsCQzoqCt9O
+         yXEg==
+X-Gm-Message-State: AOJu0Yyhl9+FmXxoc+ZqAl2xvDETYf2MP22m4vOZK4w9utowUC6vjTzz
+	FUill+6pIIQkVRhBWcF7Q1HyOg3akQM/Gk47OokTC3dq+UtwdVQFwLhWba+R3yu/6WhO7W5SEZe
+	jDfa3tegdOZhm
+X-Received: by 2002:a17:906:66d9:b0:9e6:2c5a:450a with SMTP id k25-20020a17090666d900b009e62c5a450amr4490048ejp.26.1700046509096;
+        Wed, 15 Nov 2023 03:08:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHve6gIrQ6JWmFSezcPN9+P/sMdMQNqa9BHvI8TeelpKxEVC6UBoL04CyyICjC7dN059GHFfA==
+X-Received: by 2002:a17:906:66d9:b0:9e6:2c5a:450a with SMTP id k25-20020a17090666d900b009e62c5a450amr4490025ejp.26.1700046508757;
+        Wed, 15 Nov 2023 03:08:28 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-199.retail.telecomitalia.it. [79.46.200.199])
+        by smtp.gmail.com with ESMTPSA id v6-20020a056402174600b00530a9488623sm6410463edx.46.2023.11.15.03.08.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Nov 2023 03:08:28 -0800 (PST)
+Date: Wed, 15 Nov 2023 12:08:23 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v1 0/2] send credit update during setting SO_RCVLOWAT
+Message-ID: <fqhgsbepjwftqmpv6xn7oqizdgmp25ri66seiewiikreglmmsd@uyouhusmjtby>
+References: <20231108072004.1045669-1-avkrasnov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20231115071519.2864957-27-xiaoyao.li@intel.com>
-User-Agent: Mutt/2.2.10 (2023-03-25)
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+In-Reply-To: <20231108072004.1045669-1-avkrasnov@salutedevices.com>
 
-On Wed, Nov 15, 2023 at 02:14:35AM -0500, Xiaoyao Li wrote:
-> Invoke KVM_TDX_INIT in kvm_arch_pre_create_vcpu() that KVM_TDX_INIT
-> configures global TD configurations, e.g. the canonical CPUID config,
-> and must be executed prior to creating vCPUs.
-> 
-> Use kvm_x86_arch_cpuid() to setup the CPUID settings for TDX VM.
-> 
-> Note, this doesn't address the fact that QEMU may change the CPUID
-> configuration when creating vCPUs, i.e. punts on refactoring QEMU to
-> provide a stable CPUID config prior to kvm_arch_init().
-> 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
-> Changes in v3:
-> - Pass @errp in tdx_pre_create_vcpu() and pass error info to it. (Daniel)
-> ---
->  accel/kvm/kvm-all.c        |  9 +++++++-
->  target/i386/kvm/kvm.c      |  9 ++++++++
->  target/i386/kvm/tdx-stub.c |  5 +++++
->  target/i386/kvm/tdx.c      | 45 ++++++++++++++++++++++++++++++++++++++
->  target/i386/kvm/tdx.h      |  4 ++++
->  5 files changed, 71 insertions(+), 1 deletion(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 6b5f4d62f961..a92fff471b58 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -441,8 +441,15 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
->  
->      trace_kvm_init_vcpu(cpu->cpu_index, kvm_arch_vcpu_id(cpu));
->  
-> +    /*
-> +     * tdx_pre_create_vcpu() may call cpu_x86_cpuid(). It in turn may call
-> +     * kvm_vm_ioctl(). Set cpu->kvm_state in advance to avoid NULL pointer
-> +     * dereference.
-> +     */
-> +    cpu->kvm_state = s;
->      ret = kvm_arch_pre_create_vcpu(cpu, errp);
->      if (ret < 0) {
-> +        cpu->kvm_state = NULL;
->          goto err;
->      }
->  
-> @@ -450,11 +457,11 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
->      if (ret < 0) {
->          error_setg_errno(errp, -ret, "kvm_init_vcpu: kvm_get_vcpu failed (%lu)",
->                           kvm_arch_vcpu_id(cpu));
-> +        cpu->kvm_state = NULL;
->          goto err;
->      }
->  
->      cpu->kvm_fd = ret;
-> -    cpu->kvm_state = s;
->      cpu->vcpu_dirty = true;
->      cpu->dirty_pages = 0;
->      cpu->throttle_us_per_full = 0;
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index dafe4d262977..fc840653ceb6 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -2268,6 +2268,15 @@ int kvm_arch_init_vcpu(CPUState *cs)
->      return r;
->  }
->  
-> +int kvm_arch_pre_create_vcpu(CPUState *cpu, Error **errp)
-> +{
-> +    if (is_tdx_vm()) {
-> +        return tdx_pre_create_vcpu(cpu, errp);
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  int kvm_arch_destroy_vcpu(CPUState *cs)
->  {
->      X86CPU *cpu = X86_CPU(cs);
-> diff --git a/target/i386/kvm/tdx-stub.c b/target/i386/kvm/tdx-stub.c
-> index 1d866d5496bf..3877d432a397 100644
-> --- a/target/i386/kvm/tdx-stub.c
-> +++ b/target/i386/kvm/tdx-stub.c
-> @@ -6,3 +6,8 @@ int tdx_kvm_init(MachineState *ms, Error **errp)
->  {
->      return -EINVAL;
->  }
-> +
-> +int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
-> +{
-> +    return -EINVAL;
-> +}
-> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-> index 1f5d8117d1a9..122a37c93de3 100644
-> --- a/target/i386/kvm/tdx.c
-> +++ b/target/i386/kvm/tdx.c
-> @@ -467,6 +467,49 @@ int tdx_kvm_init(MachineState *ms, Error **errp)
->      return 0;
->  }
->  
-> +int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
-> +{
-> +    MachineState *ms = MACHINE(qdev_get_machine());
-> +    X86CPU *x86cpu = X86_CPU(cpu);
-> +    CPUX86State *env = &x86cpu->env;
-> +    struct kvm_tdx_init_vm *init_vm;
+On Wed, Nov 08, 2023 at 10:20:02AM +0300, Arseniy Krasnov wrote:
+>Hello,
+>
+>                               DESCRIPTION
+>
+>This patchset fixes old problem with hungup of both rx/tx sides and adds
+>test for it. This happens due to non-default SO_RCVLOWAT value and
+>deferred credit update in virtio/vsock. Link to previous old patchset:
+>https://lore.kernel.org/netdev/39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru/
+>
+>Here is what happens step by step:
+>
+>                                  TEST
+>
+>                            INITIAL CONDITIONS
+>
+>1) Vsock buffer size is 128KB.
+>2) Maximum packet size is also 64KB as defined in header (yes it is
+>   hardcoded, just to remind about that value).
+>3) SO_RCVLOWAT is default, e.g. 1 byte.
+>
+>
+>                                 STEPS
+>
+>            SENDER                              RECEIVER
+>1) sends 128KB + 1 byte in a
+>   single buffer. 128KB will
+>   be sent, but for 1 byte
+>   sender will wait for free
+>   space at peer. Sender goes
+>   to sleep.
+>
+>
+>2)                                     reads 64KB, credit update not sent
+>3)                                     sets SO_RCVLOWAT to 64KB + 1
+>4)                                     poll() -> wait forever, there is
+>                                       only 64KB available to read.
+>
+>So in step 4) receiver also goes to sleep, waiting for enough data or
+>connection shutdown message from the sender. Idea to fix it is that rx
+>kicks tx side to continue transmission (and may be close connection)
+>when rx changes number of bytes to be woken up (e.g. SO_RCVLOWAT) and
+>this value is bigger than number of available bytes to read.
+>
+>I've added small test for this, but not sure as it uses hardcoded value
 
-Mark this as auto-free to avoid the g_free() requirement
+Thanks for adding the test!
 
-  g_autofree  struct kvm_tdx_init_vm *init_vm = NULL;
+>for maximum packet length, this value is defined in kernel header and
+>used to control deferred credit update. And as this is not available to
+>userspace, I can't control test parameters correctly (if one day this
+>define will be changed - test may become useless).
 
-> +    int r = 0;
-> +
-> +    qemu_mutex_lock(&tdx_guest->lock);
+I see, I'll leave a comment in the patch!
 
-   QEMU_LOCK_GUARD(&tdx_guest->lock);
+Thanks,
+Stefano
 
-to eliminate the mutex_unlock requirement, thus eliminating all
-'goto' jumps and label targets, in favour of a plain 'return -1'
-everywhere.
-
-> +    if (tdx_guest->initialized) {
-> +        goto out;
-> +    }
-> +
-> +    init_vm = g_malloc0(sizeof(struct kvm_tdx_init_vm) +
-> +                        sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES);
-> +
-> +    r = kvm_vm_enable_cap(kvm_state, KVM_CAP_MAX_VCPUS, 0, ms->smp.cpus);
-> +    if (r < 0) {
-> +        error_setg(errp, "Unable to set MAX VCPUS to %d", ms->smp.cpus);
-> +        goto out_free;
-> +    }
-> +
-> +    init_vm->cpuid.nent = kvm_x86_arch_cpuid(env, init_vm->cpuid.entries, 0);
-> +
-> +    init_vm->attributes = tdx_guest->attributes;
-> +
-> +    do {
-> +        r = tdx_vm_ioctl(KVM_TDX_INIT_VM, 0, init_vm);
-> +    } while (r == -EAGAIN);
-> +    if (r < 0) {
-> +        error_setg_errno(errp, -r, "KVM_TDX_INIT_VM failed");
-> +        goto out_free;
-> +    }
-> +
-> +    tdx_guest->initialized = true;
-> +
-> +out_free:
-> +    g_free(init_vm);
-> +out:
-> +    qemu_mutex_unlock(&tdx_guest->lock);
-> +    return r;
-> +}
-> +
->  /* tdx guest */
->  OBJECT_DEFINE_TYPE_WITH_INTERFACES(TdxGuest,
->                                     tdx_guest,
-> @@ -479,6 +522,8 @@ static void tdx_guest_init(Object *obj)
->  {
->      TdxGuest *tdx = TDX_GUEST(obj);
->  
-> +    qemu_mutex_init(&tdx->lock);
-> +
->      tdx->attributes = 0;
->  }
->  
-> diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
-> index 06599b65b827..432077723ac5 100644
-> --- a/target/i386/kvm/tdx.h
-> +++ b/target/i386/kvm/tdx.h
-> @@ -17,6 +17,9 @@ typedef struct TdxGuestClass {
->  typedef struct TdxGuest {
->      ConfidentialGuestSupport parent_obj;
->  
-> +    QemuMutex lock;
-> +
-> +    bool initialized;
->      uint64_t attributes;    /* TD attributes */
->  } TdxGuest;
->  
-> @@ -29,5 +32,6 @@ bool is_tdx_vm(void);
->  int tdx_kvm_init(MachineState *ms, Error **errp);
->  void tdx_get_supported_cpuid(uint32_t function, uint32_t index, int reg,
-
->                               uint32_t *ret);
-> +int tdx_pre_create_vcpu(CPUState *cpu, Error **errp);
->  
->  #endif /* QEMU_I386_TDX_H */
-> -- 
-> 2.34.1
-> 
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+>
+>Head for this patchset is:
+>https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=ff269e2cd5adce4ae14f883fc9c8803bc43ee1e9
+>
+>Arseniy Krasnov (2):
+>  virtio/vsock: send credit update during setting SO_RCVLOWAT
+>  vsock/test: SO_RCVLOWAT + deferred credit update test
+>
+> drivers/vhost/vsock.c                   |   2 +
+> include/linux/virtio_vsock.h            |   1 +
+> net/vmw_vsock/virtio_transport.c        |   2 +
+> net/vmw_vsock/virtio_transport_common.c |  31 ++++++
+> net/vmw_vsock/vsock_loopback.c          |   2 +
+> tools/testing/vsock/vsock_test.c        | 131 ++++++++++++++++++++++++
+> 6 files changed, 169 insertions(+)
+>
+>-- 
+>2.25.1
+>
 
 
