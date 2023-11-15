@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-1761-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1762-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DC9F7EBDB0
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 08:19:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E1467EBDB1
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 08:19:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 087BA281312
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 07:19:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBA3E281312
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 07:19:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44D7CC8ED;
-	Wed, 15 Nov 2023 07:19:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6961CD516;
+	Wed, 15 Nov 2023 07:19:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bcE1+wrs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S+zcKqQd"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5813C12B
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 07:19:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0504D26D
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 07:19:44 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C50D38E
-	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 23:19:32 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA5B3D1
+	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 23:19:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700032772; x=1731568772;
+  t=1700032783; x=1731568783;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=bDn2RjuRFfQIgZQkWskSJy22Talnsr6AiwlkVu/nnqo=;
-  b=bcE1+wrsbcyq8BbW4VevHbE0ybp61qkPuOAKAXrlEhXszZiH71NpeS1b
-   +t+yTQVSRbeu+ft0YsAaN7XdlPQ9W+N7ZQBNbFprO3XaRyDXxr1Iy1ios
-   xxUyw2TcVDTGft/2GfKoqJKCbjT1J0DU7DbElXyCC97qVz/zeVvE50NEI
-   RzljTKJDG6EfHT0s2YTD/dfw511Y1tlHB41MhMvKLuANhSFpU/eJLExJx
-   XJ4WZ9nTNhgpNplirZ8zOz4SNgPJwbQbRobIOkxE1aqLBxaZDZSS6BPOQ
-   O4+0FrrgqhkHhDWmW3tbwmTRvxC6QKzLIlYpGK/dIIbyoxM1uyv/NJQAv
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="390622952"
+  bh=gPIv+EVFLCQuX/CLJsbN+BBY/kYZvm9tPwnOGusF8vY=;
+  b=S+zcKqQd/AIT2cLg3fRR5lbOjDsrPqRG4oQJer3qpul6fFVQ/dpgTw9q
+   dinxYrow9ZqLs5eE0zOhF0g80KmHjPRFkwGZNgM4E6jB85GJscEmrAasy
+   c8U0Jp36zdCNCseR8WZq7JL2wwijs2Q+FtgfoE0Ff40/DBxd7v5wDdVls
+   1meewICWMbi6NRQNCLT/d14eFcmgeSViYYeY4eyITQhJLbq4okQRqU/HL
+   UyLLIAMWwYNVxLWAiAIWnKp9zKe5bF6engtv5qIFvE93lnjZl+V4qVLzk
+   SwXkpIzyz+Yamz9pebUOvLxMKasD38XSzt9O+ntt3P/BgA/4ww1eILl/g
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="390622977"
 X-IronPort-AV: E=Sophos;i="6.03,304,1694761200"; 
-   d="scan'208";a="390622952"
+   d="scan'208";a="390622977"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 23:19:32 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 23:19:43 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="714799140"
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="714799205"
 X-IronPort-AV: E=Sophos;i="6.03,304,1694761200"; 
-   d="scan'208";a="714799140"
+   d="scan'208";a="714799205"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orsmga003.jf.intel.com with ESMTP; 14 Nov 2023 23:19:22 -0800
+  by orsmga003.jf.intel.com with ESMTP; 14 Nov 2023 23:19:32 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	David Hildenbrand <david@redhat.com>,
@@ -70,9 +70,9 @@ Cc: qemu-devel@nongnu.org,
 	Gerd Hoffmann <kraxel@redhat.com>,
 	Isaku Yamahata <isaku.yamahata@gmail.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v3 33/70] i386/tdx: Set kvm_readonly_mem_enabled to false for TDX VM
-Date: Wed, 15 Nov 2023 02:14:42 -0500
-Message-Id: <20231115071519.2864957-34-xiaoyao.li@intel.com>
+Subject: [PATCH v3 34/70] kvm/memory: Introduce the infrastructure to set the default shared/private value
+Date: Wed, 15 Nov 2023 02:14:43 -0500
+Message-Id: <20231115071519.2864957-35-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231115071519.2864957-1-xiaoyao.li@intel.com>
 References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
@@ -84,38 +84,88 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-TDX only supports readonly for shared memory but not for private memory.
+Introduce new flag RAM_DEFAULT_PRIVATE for RAMBlock. It's used to
+indicate the default attribute,  private or not.
 
-In the view of QEMU, it has no idea whether a memslot is used as shared
-memory of private. Thus just mark kvm_readonly_mem_enabled to false to
-TDX VM for simplicity.
+Set the RAM range to private explicitly when it's default private.
 
+Originated-from: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- target/i386/kvm/tdx.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ accel/kvm/kvm-all.c   | 10 ++++++++++
+ include/exec/memory.h |  6 ++++++
+ system/memory.c       | 13 +++++++++++++
+ 3 files changed, 29 insertions(+)
 
-diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index 05ca841d0b66..50e68f9c1a41 100644
---- a/target/i386/kvm/tdx.c
-+++ b/target/i386/kvm/tdx.c
-@@ -472,6 +472,15 @@ int tdx_kvm_init(MachineState *ms, Error **errp)
- 
-     update_tdx_cpuid_lookup_by_tdx_caps();
- 
-+    /*
-+     * Set kvm_readonly_mem_allowed to false, because TDX only supports readonly
-+     * memory for shared memory but not for private memory. Besides, whether a
-+     * memslot is private or shared is not determined by QEMU.
-+     *
-+     * Thus, just mark readonly memory not supported for simplicity.
-+     */
-+    kvm_readonly_mem_allowed = false;
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index a92fff471b58..316690d113d0 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -1467,6 +1467,16 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+                     strerror(-err));
+             abort();
+         }
 +
-     tdx_guest = tdx;
-     return 0;
++        if (memory_region_is_default_private(mr)) {
++            err = kvm_set_memory_attributes_private(start_addr, slot_size);
++            if (err) {
++                error_report("%s: failed to set memory attribute private: %s\n",
++                             __func__, strerror(-err));
++                exit(1);
++            }
++        }
++
+         start_addr += slot_size;
+         ram_start_offset += slot_size;
+         ram += slot_size;
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index f780367ab1bd..bdc4b98efe70 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -246,6 +246,9 @@ typedef struct IOMMUTLBEvent {
+ /* RAM can be private that has kvm gmem backend */
+ #define RAM_GUEST_MEMFD   (1 << 12)
+ 
++/* RAM is default private */
++#define RAM_DEFAULT_PRIVATE     (1 << 13)
++
+ static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
+                                        IOMMUNotifierFlag flags,
+                                        hwaddr start, hwaddr end,
+@@ -1715,6 +1718,9 @@ bool memory_region_is_protected(MemoryRegion *mr);
+  */
+ bool memory_region_has_guest_memfd(MemoryRegion *mr);
+ 
++void memory_region_set_default_private(MemoryRegion *mr);
++bool memory_region_is_default_private(MemoryRegion *mr);
++
+ /**
+  * memory_region_get_iommu: check whether a memory region is an iommu
+  *
+diff --git a/system/memory.c b/system/memory.c
+index 69741d91bbb7..b0c58232b6f7 100644
+--- a/system/memory.c
++++ b/system/memory.c
+@@ -1867,6 +1867,19 @@ bool memory_region_has_guest_memfd(MemoryRegion *mr)
+     return mr->ram_block && mr->ram_block->guest_memfd >= 0;
  }
+ 
++bool memory_region_is_default_private(MemoryRegion *mr)
++{
++    return memory_region_has_guest_memfd(mr) &&
++           (mr->ram_block->flags & RAM_DEFAULT_PRIVATE);
++}
++
++void memory_region_set_default_private(MemoryRegion *mr)
++{
++    if (memory_region_has_guest_memfd(mr)) {
++        mr->ram_block->flags |= RAM_DEFAULT_PRIVATE;
++    }
++}
++
+ uint8_t memory_region_get_dirty_log_mask(MemoryRegion *mr)
+ {
+     uint8_t mask = mr->dirty_log_mask;
 -- 
 2.34.1
 
