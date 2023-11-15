@@ -1,296 +1,319 @@
-Return-Path: <kvm+bounces-1726-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1727-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 271237EBD36
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 07:50:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 527B57EBD6B
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 08:15:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0E831F22B42
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 06:50:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD7701F2616B
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 07:15:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF954427;
-	Wed, 15 Nov 2023 06:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 977DE4427;
+	Wed, 15 Nov 2023 07:15:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n5IyyrMu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lWgZXUMY"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4B23D6C
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 06:50:07 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56594D0;
-	Tue, 14 Nov 2023 22:50:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F4A13D6C
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 07:15:33 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0C2BE6
+	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 23:15:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700031006; x=1731567006;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=azmQ9x7lcmsX/9QI+AnsuE83G/gHZzw6UwYJYlET6to=;
-  b=n5IyyrMun4WQ2e1+CButkLSgljG3VMPuNaMmnrGcZIj6rjlNPrWZn+jR
-   fgREANGG3PVsjsH1uFBHZR+YmZbnr8Jl87yAUZjrWfdG9Cym8+CDqQoOr
-   ebEyWEvuYVxTclFeYfybFMeTKmjJZPmPMVeX5pelY/aGIfUmWGZQq0tpP
-   flx8nacRkn6Otx1t2i9wsDWQGP/rFnqq1iw/bSubiaru/NnyBTBuqeoRO
-   UE79y0HgI2qXgi0CpzuA10yJjVW2ysvwtR6UnQlq058q83c4D5VSMhwz/
-   3t0YeydA5wOXJqOYS7cT9dXO9QZc0I19Bi7GR+/loSTQcXuC1Zqfe+jza
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="375858488"
+  t=1700032531; x=1731568531;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=7JwhGredXHnD1RqBKzopE/TrkoHj5/xfg3Y85ow5Vzg=;
+  b=lWgZXUMYobKvijElC3R6F1hSLBBY2TpWExaeu6YnN7m28bMwnA3luwfY
+   T5LyTj4/602yXRstFuP+0y2TymgEq8pu3ax2kAxtmzbkI+YUl8enk9k9F
+   EprAwkIwJEhFwzM3LpHx257Onouapkz6idg1o2jIFMvR+710DTYifJa4R
+   8QB1WwGBXC9BitULZ40t03shU8sQr29boQbMkZCDhGpCyomMLP3WTY9C8
+   Z2tKWyWYTqJ6KunfMYQWwJgKQVZQmfBxWyjXZLaKBOhizeL8vooyTPx0L
+   pLxbqABtoHOb+039JO5FhAro/TYKbpbML32A4F8kmqO6eDN9I4wuCm/gc
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="390621995"
 X-IronPort-AV: E=Sophos;i="6.03,304,1694761200"; 
-   d="scan'208";a="375858488"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 22:50:05 -0800
+   d="scan'208";a="390621995"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 23:15:31 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="764895489"
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="714796701"
 X-IronPort-AV: E=Sophos;i="6.03,304,1694761200"; 
-   d="scan'208";a="764895489"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by orsmga002.jf.intel.com with ESMTP; 14 Nov 2023 22:49:57 -0800
-Date: Wed, 15 Nov 2023 14:49:56 +0800
-From: Yuan Yao <yuan.yao@linux.intel.com>
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-	erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, David Matlack <dmatlack@google.com>,
-	Kai Huang <kai.huang@intel.com>,
-	Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-	hang.yuan@intel.com, tina.zhang@intel.com
-Subject: Re: [PATCH v17 071/116] KVM: TDX: handle vcpu migration over logical
- processor
-Message-ID: <20231115064956.du6qjjraqkxtjuud@yy-desk-7060>
-References: <cover.1699368322.git.isaku.yamahata@intel.com>
- <89926d400f0228384c9571c73208d7f1ab045fda.1699368322.git.isaku.yamahata@intel.com>
+   d="scan'208";a="714796701"
+Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
+  by orsmga003.jf.intel.com with ESMTP; 14 Nov 2023 23:15:23 -0800
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	David Hildenbrand <david@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Peter Xu <peterx@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Cornelia Huck <cohuck@redhat.com>,
+	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>
+Cc: qemu-devel@nongnu.org,
+	kvm@vger.kernel.org,
+	xiaoyao.li@intel.com,
+	Michael Roth <michael.roth@amd.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Claudio Fontana <cfontana@suse.de>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	Chenyi Qiang <chenyi.qiang@intel.com>
+Subject: [PATCH v3 00/70] QEMU Guest memfd + QEMU TDX support
+Date: Wed, 15 Nov 2023 02:14:09 -0500
+Message-Id: <20231115071519.2864957-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <89926d400f0228384c9571c73208d7f1ab045fda.1699368322.git.isaku.yamahata@intel.com>
-User-Agent: NeoMutt/20171215
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 07, 2023 at 06:56:37AM -0800, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> For vcpu migration, in the case of VMX, VMCS is flushed on the source pcpu,
-> and load it on the target pcpu.  There are corresponding TDX SEAMCALL APIs,
-> call them on vcpu migration.  The logic is mostly same as VMX except the
-> TDX SEAMCALLs are used.
->
-> When shutting down the machine, (VMX or TDX) vcpus needs to be shutdown on
-> each pcpu.  Do the similar for TDX with TDX SEAMCALL APIs.
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/kvm/vmx/main.c    |  32 ++++++-
->  arch/x86/kvm/vmx/tdx.c     | 190 ++++++++++++++++++++++++++++++++++++-
->  arch/x86/kvm/vmx/tdx.h     |   2 +
->  arch/x86/kvm/vmx/x86_ops.h |   4 +
->  4 files changed, 221 insertions(+), 7 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index e7c570686736..8b109d0fe764 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -44,6 +44,14 @@ static int vt_hardware_enable(void)
->  	return ret;
->  }
->
-......
-> -void tdx_mmu_release_hkid(struct kvm *kvm)
-> +static int __tdx_mmu_release_hkid(struct kvm *kvm)
->  {
->  	bool packages_allocated, targets_allocated;
->  	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
->  	cpumask_var_t packages, targets;
-> +	struct kvm_vcpu *vcpu;
-> +	unsigned long j;
-> +	int i, ret = 0;
->  	u64 err;
-> -	int i;
->
->  	if (!is_hkid_assigned(kvm_tdx))
-> -		return;
-> +		return 0;
->
->  	if (!is_td_created(kvm_tdx)) {
->  		tdx_hkid_free(kvm_tdx);
-> -		return;
-> +		return 0;
->  	}
->
->  	packages_allocated = zalloc_cpumask_var(&packages, GFP_KERNEL);
->  	targets_allocated = zalloc_cpumask_var(&targets, GFP_KERNEL);
->  	cpus_read_lock();
->
-> +	kvm_for_each_vcpu(j, vcpu, kvm)
-> +		tdx_flush_vp_on_cpu(vcpu);
-> +
->  	/*
->  	 * We can destroy multiple the guest TDs simultaneously.  Prevent
->  	 * tdh_phymem_cache_wb from returning TDX_BUSY by serialization.
-> @@ -236,6 +361,19 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
->  	 */
->  	write_lock(&kvm->mmu_lock);
->
-> +	err = tdh_mng_vpflushdone(kvm_tdx->tdr_pa);
-> +	if (err == TDX_FLUSHVP_NOT_DONE) {
+This v3 series combines previous QEMU gmem series[1] and TDX QEMU series[2].
+Because TDX is going to be the first user of gmem (guest memfd) in QEMU,
+bombining them together can provide us a full picture of how they work.
 
-Not sure IIUC, The __tdx_mmu_release_hkid() is called in MMU release
-callback, which means all threads of the process have dropped mm by
-do_exit() so they won't run kvm code anymore, and tdx_flush_vp_on_cpu()
-is called for each pcpu they run last time, so will this error really
-happen ?
+KVM provides guest memfd, which cannot be mapped, read, or written by
+userspace. It's designed to serve as private memory for confidential
+VMs, like Intel TDX and AMD sev-snp.
 
-> +		ret = -EBUSY;
-> +		goto out;
-> +	}
-> +	if (WARN_ON_ONCE(err)) {
-> +		pr_tdx_error(TDH_MNG_VPFLUSHDONE, err, NULL);
-> +		pr_err("tdh_mng_vpflushdone() failed. HKID %d is leaked.\n",
-> +		       kvm_tdx->hkid);
-> +		ret = -EIO;
-> +		goto out;
-> +	}
-> +
->  	for_each_online_cpu(i) {
->  		if (packages_allocated &&
->  		    cpumask_test_and_set_cpu(topology_physical_package_id(i),
-> @@ -258,14 +396,24 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
->  		pr_tdx_error(TDH_MNG_KEY_FREEID, err, NULL);
->  		pr_err("tdh_mng_key_freeid() failed. HKID %d is leaked.\n",
->  		       kvm_tdx->hkid);
-> +		ret = -EIO;
->  	} else
->  		tdx_hkid_free(kvm_tdx);
->
-> +out:
->  	write_unlock(&kvm->mmu_lock);
->  	mutex_unlock(&tdx_lock);
->  	cpus_read_unlock();
->  	free_cpumask_var(targets);
->  	free_cpumask_var(packages);
-> +
-> +	return ret;
-> +}
-> +
-> +void tdx_mmu_release_hkid(struct kvm *kvm)
-> +{
-> +	while (__tdx_mmu_release_hkid(kvm) == -EBUSY)
-> +		;
->  }
->
->  void tdx_vm_free(struct kvm *kvm)
-> @@ -429,6 +577,26 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
->  	return 0;
->  }
->
-> +void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-> +{
-> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
-> +
-> +	if (vcpu->cpu == cpu)
-> +		return;
-> +
-> +	tdx_flush_vp_on_cpu(vcpu);
-> +
-> +	local_irq_disable();
-> +	/*
-> +	 * Pairs with the smp_wmb() in tdx_disassociate_vp() to ensure
-> +	 * vcpu->cpu is read before tdx->cpu_list.
-> +	 */
-> +	smp_rmb();
-> +
-> +	list_add(&tdx->cpu_list, &per_cpu(associated_tdvcpus, cpu));
-> +	local_irq_enable();
-> +}
-> +
->  void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_tdx *tdx = to_tdx(vcpu);
-> @@ -469,6 +637,16 @@ void tdx_vcpu_free(struct kvm_vcpu *vcpu)
->  	struct vcpu_tdx *tdx = to_tdx(vcpu);
->  	int i;
->
-> +	/*
-> +	 * When destroying VM, kvm_unload_vcpu_mmu() calls vcpu_load() for every
-> +	 * vcpu after they already disassociated from the per cpu list by
-> +	 * tdx_mmu_release_hkid().  So we need to disassociate them again,
-> +	 * otherwise the freed vcpu data will be accessed when do
-> +	 * list_{del,add}() on associated_tdvcpus list later.
-> +	 */
-> +	tdx_disassociate_vp_on_cpu(vcpu);
-> +	WARN_ON_ONCE(vcpu->cpu != -1);
-> +
->  	/*
->  	 * This methods can be called when vcpu allocation/initialization
->  	 * failed. So it's possible that hkid, tdvpx and tdvpr are not assigned
-> @@ -1873,6 +2051,10 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
->  		return -EINVAL;
->  	}
->
-> +	/* tdx_hardware_disable() uses associated_tdvcpus. */
-> +	for_each_possible_cpu(i)
-> +		INIT_LIST_HEAD(&per_cpu(associated_tdvcpus, i));
-> +
->  	for (i = 0; i < ARRAY_SIZE(tdx_uret_msrs); i++) {
->  		/*
->  		 * Here it checks if MSRs (tdx_uret_msrs) can be saved/restored
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index c700792c08e2..4f803814126a 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -70,6 +70,8 @@ struct vcpu_tdx {
->  	unsigned long tdvpr_pa;
->  	unsigned long *tdvpx_pa;
->
-> +	struct list_head cpu_list;
-> +
->  	union tdx_exit_reason exit_reason;
->
->  	bool initialized;
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index 4c9793b5b30d..911ef1e8eeda 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -137,6 +137,7 @@ void vmx_setup_mce(struct kvm_vcpu *vcpu);
->  #ifdef CONFIG_INTEL_TDX_HOST
->  int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
->  void tdx_hardware_unsetup(void);
-> +void tdx_hardware_disable(void);
->  bool tdx_is_vm_type_supported(unsigned long type);
->  int tdx_offline_cpu(void);
->
-> @@ -153,6 +154,7 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
->  fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu);
->  void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu);
->  void tdx_vcpu_put(struct kvm_vcpu *vcpu);
-> +void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
->  u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
->
->  int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
-> @@ -164,6 +166,7 @@ void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
->  #else
->  static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
->  static inline void tdx_hardware_unsetup(void) {}
-> +static inline void tdx_hardware_disable(void) {}
->  static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
->  static inline int tdx_offline_cpu(void) { return 0; }
->
-> @@ -183,6 +186,7 @@ static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
->  static inline fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu) { return EXIT_FASTPATH_NONE; }
->  static inline void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu) {}
->  static inline void tdx_vcpu_put(struct kvm_vcpu *vcpu) {}
-> +static inline void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu) {}
->  static inline u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio) { return 0; }
->
->  static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
-> --
-> 2.25.1
->
->
+Patches 1 - 11 add support of guest memfd into QEMU, associating it with
+RAMBlock. For the VM types that require private memory (see
+tdx_kvm_init() in patch 17), QEMU will automatically create guest memfd
+for each RAM.
+
+Follwoing patches 12 to 70, enables TDX support to allow creating and
+booting a TD (TDX VM) with QEMU.
+
+The whole series needs to work with KVM guest memfd series[3] and KVM v17
+series[4].
+
+This series is also available in github:
+https://github.com/intel/qemu-tdx/tree/tdx-qemu-upstream-v3
+
+It's based on several patches that haven't get merged:
+https://lore.kernel.org/qemu-devel/20231007065819.27498-1-xiaoyao.li@intel.com/
+https://lore.kernel.org/qemu-devel/20230613131929.720453-1-xiaoyao.li@intel.com/
+https://lore.kernel.org/all/20220310122215.804233-1-xiaoyao.li@intel.com/
+
+Luckily, the absence of them doesn't block applying this series nor
+affecting the functionality.
+
+Note, I leave new qapi introduced in this series with 'since 8.2'
+because I don't know next version will be 8.3 or 9.0.
+
+
+[1] https://lore.kernel.org/qemu-devel/20230914035117.3285885-1-xiaoyao.li@intel.com/
+[2] https://lore.kernel.org/qemu-devel/20230818095041.1973309-1-xiaoyao.li@intel.com/
+[3] https://lore.kernel.org/all/20231105163040.14904-1-pbonzini@redhat.com/
+[4] https://lore.kernel.org/all/cover.1699368322.git.isaku.yamahata@intel.com/ 
+
+== Limitation and future work ==
+- Readonly memslot
+
+  TDX only support readonly (write protection) memslot for shared memory, but
+  not for private memory. For simplicity, just mark readonly memslot not
+  supported entirely for TDX.
+
+- CPU model
+
+  We cannot create a TD with arbitrary CPU model like what for non-TDX VMs,
+  because only a subset of features can be configured for TD.
+
+  - It's recommended to use '-cpu host' to create TD;
+  - '+feature/-feature' might not work as expected;
+
+  future work: To introduce specific CPU model for TDs and enhance ±features
+               for TDs.
+
+- gdb suppport
+
+  gdb support to debug a TD of off-debug mode is future work.
+
+===
+Main changes in v3:
+gmem memfd part: 
+ - Since KVM side renamed gmem to guest_memfd in the uapi, this version
+   renames it accordingly;
+ - Drop the 'private' property of memory backend. (see comment[5])
+   Now QEMU decides whether need to create guest memfd based on specific
+   vm type (or specific VM implementation, please see patch *X* and *Y*);
+ - Drop sw_protected_vm implementation;
+
+TDX part:
+ - improve the error report in various patches by utilizing 'errp';
+ - drop the vm-type interface;
+ - rename __tdx_ioctl() to tdx_ioctl_internal();
+ - refine the description of 'sept-ve-disable' in qom.json;
+ - use base64 for mrconfigif/mrowner/mrownerconfig instread of hex-string;
+ - use type SocketAddress for quote-generation-service;
+
+[5] https://lore.kernel.org/qemu-devel/a1e34896-c46d-c87c-0fda-971bbf3dcfbd@redhat.com/
+
+Chao Peng (3):
+  kvm: Enable KVM_SET_USER_MEMORY_REGION2 for memslot
+  kvm: handle KVM_EXIT_MEMORY_FAULT
+  i386/tdx: register TDVF as private memory
+
+Chenyi Qiang (1):
+  i386/tdx: setup a timer for the qio channel
+
+Isaku Yamahata (15):
+  trace/kvm: Add trace for page convertion between shared and private
+  i386/tdx: Make sept_ve_disable set by default
+  i386/tdx: Allows mrconfigid/mrowner/mrownerconfig for TDX_INIT_VM
+  kvm/tdx: Don't complain when converting vMMIO region to shared
+  kvm/tdx: Ignore memory conversion to shared of unassigned region
+  i386/tdvf: Introduce function to parse TDVF metadata
+  i386/tdx: Add TDVF memory via KVM_TDX_INIT_MEM_REGION
+  i386/tdx: handle TDG.VP.VMCALL<SetupEventNotifyInterrupt>
+  i386/tdx: handle TDG.VP.VMCALL<GetQuote>
+  i386/tdx: handle TDG.VP.VMCALL<MapGPA> hypercall
+  i386/tdx: Limit the range size for MapGPA
+  pci-host/q35: Move PAM initialization above SMRAM initialization
+  q35: Introduce smm_ranges property for q35-pci-host
+  hw/i386: add option to forcibly report edge trigger in acpi tables
+  i386/tdx: Don't synchronize guest tsc for TDs
+
+Sean Christopherson (2):
+  i386/kvm: Move architectural CPUID leaf generation to separate helper
+  i386/tdx: Don't get/put guest state for TDX VMs
+
+Xiaoyao Li (49):
+  *** HACK *** linux-headers: Update headers to pull in gmem APIs
+  RAMBlock: Add support of KVM private guest memfd
+  RAMBlock/guest_memfd: Enable KVM_GUEST_MEMFD_ALLOW_HUGEPAGE
+  HostMem: Add mechanism to opt in kvm guest memfd via MachineState
+  kvm: Introduce support for memory_attributes
+  physmem: Relax the alignment check of host_startaddr in
+    ram_block_discard_range()
+  physmem: replace function name with __func__ in
+    ram_block_discard_range()
+  physmem: Introduce ram_block_convert_range() for page conversion
+  *** HACK *** linux-headers: Update headers to pull in TDX API changes
+  i386: Introduce tdx-guest object
+  target/i386: Implement mc->kvm_type() to get VM type
+  target/i386: Parse TDX vm type
+  target/i386: Introduce kvm_confidential_guest_init()
+  i386/tdx: Implement tdx_kvm_init() to initialize TDX VM context
+  i386/tdx: Get tdx_capabilities via KVM_TDX_CAPABILITIES
+  i386/tdx: Introduce is_tdx_vm() helper and cache tdx_guest object
+  i386/tdx: Adjust the supported CPUID based on TDX restrictions
+  i386/tdx: Update tdx_cpuid_lookup[].tdx_fixed0/1 by
+    tdx_caps.cpuid_config[]
+  i386/tdx: Integrate tdx_caps->xfam_fixed0/1 into tdx_cpuid_lookup
+  i386/tdx: Integrate tdx_caps->attrs_fixed0/1 to tdx_cpuid_lookup
+  kvm: Introduce kvm_arch_pre_create_vcpu()
+  i386/tdx: Initialize TDX before creating TD vcpus
+  i386/tdx: Add property sept-ve-disable for tdx-guest object
+  i386/tdx: Wire CPU features up with attributes of TD guest
+  i386/tdx: Validate TD attributes
+  i386/tdx: Implement user specified tsc frequency
+  i386/tdx: Set kvm_readonly_mem_enabled to false for TDX VM
+  kvm/memory: Introduce the infrastructure to set the default
+    shared/private value
+  i386/tdx: Make memory type private by default
+  i386/tdx: Parse TDVF metadata for TDX VM
+  i386/tdx: Skip BIOS shadowing setup
+  i386/tdx: Don't initialize pc.rom for TDX VMs
+  i386/tdx: Track mem_ptr for each firmware entry of TDVF
+  i386/tdx: Track RAM entries for TDX VM
+  headers: Add definitions from UEFI spec for volumes, resources, etc...
+  i386/tdx: Setup the TD HOB list
+  memory: Introduce memory_region_init_ram_guest_memfd()
+  i386/tdx: Call KVM_TDX_INIT_VCPU to initialize TDX vcpu
+  i386/tdx: Finalize TDX VM
+  i386/tdx: Handle TDG.VP.VMCALL<REPORT_FATAL_ERROR>
+  i386/tdx: Wire TDX_REPORT_FATAL_ERROR with GuestPanic facility
+  i386/tdx: Disable SMM for TDX VMs
+  i386/tdx: Disable PIC for TDX VMs
+  i386/tdx: Don't allow system reset for TDX VMs
+  i386/tdx: LMCE is not supported for TDX
+  hw/i386: add eoi_intercept_unsupported member to X86MachineState
+  i386/tdx: Only configure MSR_IA32_UCODE_REV in kvm_init_msrs() for TDs
+  i386/tdx: Skip kvm_put_apicbase() for TDs
+  docs: Add TDX documentation
+
+ accel/kvm/kvm-all.c                        |  255 +++-
+ accel/kvm/trace-events                     |    4 +-
+ backends/hostmem-file.c                    |    1 +
+ backends/hostmem-memfd.c                   |    1 +
+ backends/hostmem-ram.c                     |    1 +
+ backends/hostmem.c                         |    1 +
+ configs/devices/i386-softmmu/default.mak   |    1 +
+ docs/system/confidential-guest-support.rst |    1 +
+ docs/system/i386/tdx.rst                   |  113 ++
+ docs/system/target-i386.rst                |    1 +
+ hw/core/machine.c                          |    5 +
+ hw/i386/Kconfig                            |    6 +
+ hw/i386/acpi-build.c                       |   99 +-
+ hw/i386/acpi-common.c                      |   50 +-
+ hw/i386/meson.build                        |    1 +
+ hw/i386/pc.c                               |   21 +-
+ hw/i386/pc_q35.c                           |    2 +
+ hw/i386/pc_sysfw.c                         |    7 +
+ hw/i386/tdvf-hob.c                         |  147 ++
+ hw/i386/tdvf-hob.h                         |   24 +
+ hw/i386/tdvf.c                             |  200 +++
+ hw/i386/x86.c                              |   51 +-
+ hw/pci-host/q35.c                          |   61 +-
+ include/exec/cpu-common.h                  |    2 +
+ include/exec/memory.h                      |   26 +
+ include/exec/ramblock.h                    |    1 +
+ include/hw/boards.h                        |    2 +
+ include/hw/i386/pc.h                       |    1 +
+ include/hw/i386/tdvf.h                     |   58 +
+ include/hw/i386/x86.h                      |    2 +
+ include/hw/pci-host/q35.h                  |    1 +
+ include/standard-headers/uefi/uefi.h       |  198 +++
+ include/sysemu/hostmem.h                   |    1 +
+ include/sysemu/kvm.h                       |    8 +
+ include/sysemu/kvm_int.h                   |    2 +
+ linux-headers/asm-x86/kvm.h                |   94 ++
+ linux-headers/linux/kvm.h                  |  140 ++
+ qapi/qom.json                              |   29 +
+ qapi/run-state.json                        |   27 +-
+ system/memory.c                            |   45 +
+ system/physmem.c                           |  151 +-
+ system/runstate.c                          |   54 +
+ target/i386/cpu-internal.h                 |    9 +
+ target/i386/cpu.c                          |   12 -
+ target/i386/cpu.h                          |   21 +
+ target/i386/kvm/kvm-cpu.c                  |    5 +
+ target/i386/kvm/kvm.c                      |  608 ++++----
+ target/i386/kvm/kvm_i386.h                 |    6 +
+ target/i386/kvm/meson.build                |    2 +
+ target/i386/kvm/tdx-stub.c                 |   23 +
+ target/i386/kvm/tdx.c                      | 1612 ++++++++++++++++++++
+ target/i386/kvm/tdx.h                      |   72 +
+ target/i386/sev.c                          |    1 -
+ target/i386/sev.h                          |    2 +
+ 54 files changed, 3861 insertions(+), 407 deletions(-)
+ create mode 100644 docs/system/i386/tdx.rst
+ create mode 100644 hw/i386/tdvf-hob.c
+ create mode 100644 hw/i386/tdvf-hob.h
+ create mode 100644 hw/i386/tdvf.c
+ create mode 100644 include/hw/i386/tdvf.h
+ create mode 100644 include/standard-headers/uefi/uefi.h
+ create mode 100644 target/i386/kvm/tdx-stub.c
+ create mode 100644 target/i386/kvm/tdx.c
+ create mode 100644 target/i386/kvm/tdx.h
+
+-- 
+2.34.1
+
 
