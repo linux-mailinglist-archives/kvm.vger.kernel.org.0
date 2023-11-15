@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-1777-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1778-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 024767EBDDA
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 08:22:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B6027EBDDB
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 08:22:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0BB32813E5
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 07:22:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FFB51F26640
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 07:22:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63D38F69;
-	Wed, 15 Nov 2023 07:22:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD56E8F67;
+	Wed, 15 Nov 2023 07:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dO20sydK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Jit6tu3a"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340B98F48
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 07:22:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238248F52
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 07:22:18 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 620798E
-	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 23:22:11 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F0559E
+	for <kvm@vger.kernel.org>; Tue, 14 Nov 2023 23:22:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700032931; x=1731568931;
+  t=1700032937; x=1731568937;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=NBS8vUiPCb3zZC3iRnxWY8cM+mUcB4hsvuGd8k/f4b8=;
-  b=dO20sydKaWqpjmE8T/mJQan9Jc3gOQ6FCnmkC/m5Pm8hlmi5HpKA1Q3s
-   IuhpODorjLnFYMwkZ0kChSx15TELx38UBXRzQcTmdiZpQpTCf9RIBoaEp
-   82rJ+bWOezukx9e9iaZHqgdThjBqAap0viMiPX1TRZo4hTyzU9Wpub5ny
-   cxLnFKPC5cTkAPKYwdg5tWcVxrzSUGz3jkf05/ecsZWkjbTIj5V3B6bAW
-   NkI5daYRTpICx84IHSNbRA/qjbxoltehU6kfzpyqoEg5VsusCzIJkTU5/
-   YJx5JR1gdMsgxaWzvk/R7d8dfn/J9pKq6RbhIzMiFY7gERnnckGdocWph
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="390623374"
+  bh=NW5fGd3688ZveqZUz9lT4/vc71ioQDBuzFpUQ8xl9AM=;
+  b=Jit6tu3aZpnS7b+erzcJggUDdD9dVID9ZRA/cjngL0E9J7Ep05QJKfg2
+   DFe3ZP6SEaia0x1mgjvotaosdZuBNZsxwcu6ammUalEyw2ppR1kUT6eQd
+   XeEOajrfY5U4VA2emJ5nqYHl7GkFH9MuWCs+PY65KyUTe1YiNsDPUKSJN
+   ie0Oyw/tIhavhqjQOMgwdVqTDoXpekoscsLfjN4J32/TEoOWh/UVdWVai
+   UDMtjMCBbOQQIcINUblKUIGwmsiribby+Qqkz5UaSuO/fuCvHepWfaY31
+   kOXcKfah7/5zmwiOw2lNoAqZP4yBE2+sTxeEy6R+7X3E2i2t4GWqje6+e
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="390623403"
 X-IronPort-AV: E=Sophos;i="6.03,304,1694761200"; 
-   d="scan'208";a="390623374"
+   d="scan'208";a="390623403"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 23:22:11 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 23:22:17 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="714800175"
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="714800189"
 X-IronPort-AV: E=Sophos;i="6.03,304,1694761200"; 
-   d="scan'208";a="714800175"
+   d="scan'208";a="714800189"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orsmga003.jf.intel.com with ESMTP; 14 Nov 2023 23:22:04 -0800
+  by orsmga003.jf.intel.com with ESMTP; 14 Nov 2023 23:22:10 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	David Hildenbrand <david@redhat.com>,
@@ -70,9 +70,9 @@ Cc: qemu-devel@nongnu.org,
 	Gerd Hoffmann <kraxel@redhat.com>,
 	Isaku Yamahata <isaku.yamahata@gmail.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v3 49/70] i386/tdx: Call KVM_TDX_INIT_VCPU to initialize TDX vcpu
-Date: Wed, 15 Nov 2023 02:14:58 -0500
-Message-Id: <20231115071519.2864957-50-xiaoyao.li@intel.com>
+Subject: [PATCH v3 50/70] i386/tdx: Finalize TDX VM
+Date: Wed, 15 Nov 2023 02:14:59 -0500
+Message-Id: <20231115071519.2864957-51-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231115071519.2864957-1-xiaoyao.li@intel.com>
 References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
@@ -84,54 +84,33 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-TDX vcpu needs to be initialized by SEAMCALL(TDH.VP.INIT) and KVM
-provides vcpu level IOCTL KVM_TDX_INIT_VCPU for it.
-
-KVM_TDX_INIT_VCPU needs the address of the HOB as input. Invoke it for
-each vcpu after HOB list is created.
+Invoke KVM_TDX_FINALIZE_VM to finalize the TD's measurement and make
+the TD vCPUs runnable once machine initialization is complete.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- target/i386/kvm/tdx.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ target/i386/kvm/tdx.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index 4b8c13890b11..e55c1190c27e 100644
+index e55c1190c27e..fc71038d7808 100644
 --- a/target/i386/kvm/tdx.c
 +++ b/target/i386/kvm/tdx.c
-@@ -585,6 +585,22 @@ static void tdx_init_ram_entries(void)
-     tdx_guest->nr_ram_entries = j;
+@@ -667,6 +667,13 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
+     /* Tdvf image was copied into private region above. It becomes unnecessary. */
+     ram_block = tdx_guest->tdvf_region->ram_block;
+     ram_block_discard_range(ram_block, 0, ram_block->max_length);
++
++    r = tdx_vm_ioctl(KVM_TDX_FINALIZE_VM, 0, NULL);
++    if (r < 0) {
++        error_report("KVM_TDX_FINALIZE_VM failed %s", strerror(-r));
++        exit(0);
++    }
++    tdx_guest->parent_obj.ready = true;
  }
  
-+static void tdx_post_init_vcpus(void)
-+{
-+    TdxFirmwareEntry *hob;
-+    CPUState *cpu;
-+    int r;
-+
-+    hob = tdx_get_hob_entry(tdx_guest);
-+    CPU_FOREACH(cpu) {
-+        r = tdx_vcpu_ioctl(cpu, KVM_TDX_INIT_VCPU, 0, (void *)hob->address);
-+        if (r < 0) {
-+            error_report("KVM_TDX_INIT_VCPU failed %s", strerror(-r));
-+            exit(1);
-+        }
-+    }
-+}
-+
- static void tdx_finalize_vm(Notifier *notifier, void *unused)
- {
-     TdxFirmware *tdvf = &tdx_guest->tdvf;
-@@ -617,6 +633,8 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
- 
-     tdvf_hob_create(tdx_guest, tdx_get_hob_entry(tdx_guest));
- 
-+    tdx_post_init_vcpus();
-+
-     for_each_tdx_fw_entry(tdvf, entry) {
-         struct kvm_tdx_init_mem_region mem_region = {
-             .source_addr = (__u64)entry->mem_ptr,
+ static Notifier tdx_machine_done_notify = {
 -- 
 2.34.1
 
