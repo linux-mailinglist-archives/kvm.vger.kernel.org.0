@@ -1,103 +1,270 @@
-Return-Path: <kvm+bounces-1848-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1849-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B68C57ECF5C
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 20:48:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC4207ED11A
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 20:59:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 685961F269B7
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 19:48:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 788B9281780
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 19:59:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5F173BB2C;
-	Wed, 15 Nov 2023 19:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B153EA62;
+	Wed, 15 Nov 2023 19:59:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="t6AnYRFJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ju/wWnCI"
 X-Original-To: kvm@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8828E1AB;
-	Wed, 15 Nov 2023 11:47:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=0CMykeQup+UcIXwLhRxd6ite3nv0zt1069OA+3hbP0Q=; b=t6AnYRFJPAtg1Cacp/8EbyRXN9
-	G3nX2VuCjMsM7wBmvwx+bxLvsGdxWF3P8c51k0ubkoZx1RsipJvigEwTrY5FnCLjuVxPqTo0cCcz3
-	LaY7msDUZ0FgrVZAf4wlCQ9fm8e+lpr0nLdYLupNHfGiSALppIOk/NnGQWFDgSKLpGuOZA0ZRquCd
-	vuWBmAXc/TrOFExXydIgGJYNmUtA/88KIA7+A2n+V8Jf28aTX37I85toPBWi+vijBTNaczrrnjZVM
-	Ebi+DPmwNCxUZ2MytyIzrmyqUahFDLDkXbahPraYzRu0aTuIuAYXjGO2jaC/ocLoI6pNJW4HcqqcS
-	PcY6k65Q==;
-Received: from [50.53.46.231] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1r3Lre-001cFD-18;
-	Wed, 15 Nov 2023 19:47:54 +0000
-Message-ID: <0f74ba84-a0fb-41cb-b22c-943f47c631da@infradead.org>
-Date: Wed, 15 Nov 2023 11:47:53 -0800
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14DD6AF;
+	Wed, 15 Nov 2023 11:59:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700078361; x=1731614361;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=nrWkTvCzWNuE40twGKi0g9x8mI/HOylHkbIgQH6YMTw=;
+  b=ju/wWnCIo1vMui4X1niumgsVsi6O2yJz7ZdSUwrPTOzgNc8GQ0HpWOm8
+   xLaZVllvoRfHWbrIfiA3UqRN35vk+4/G5K3TApor77t5jSG7O+vAs/bmN
+   NrVPKMlm/nBsGdfZmnv+voItFucz9uonTV0ofJgKmvcJ9jlwj95KTH6K2
+   hIsF1HhP+zhjYrU+XJOjY3Bp58DP8v6bEoupyeLrDUTXhs7aEZ6NQTLd/
+   sAslhXFgKlEIDxc9BEi9ZSJQvJwtl0k/pknKglTeKvvu2ZWKNZ5BqeE4u
+   LxxEE1SzGjcNnIMk1UMemLjgV5Y+OWjftCIGLNbh7jyINVwaNg0YoLUra
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="390743032"
+X-IronPort-AV: E=Sophos;i="6.03,305,1694761200"; 
+   d="scan'208";a="390743032"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 11:59:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,305,1694761200"; 
+   d="scan'208";a="12880278"
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.24.100.114])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 11:59:21 -0800
+Date: Wed, 15 Nov 2023 12:04:01 -0800
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>,
+ iommu@lists.linux.dev, Thomas Gleixner <tglx@linutronix.de>, Lu Baolu
+ <baolu.lu@linux.intel.com>, kvm@vger.kernel.org, Dave Hansen
+ <dave.hansen@intel.com>, Joerg Roedel <joro@8bytes.org>, "H. Peter Anvin"
+ <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar
+ <mingo@redhat.com>, Raj Ashok <ashok.raj@intel.com>, "Tian, Kevin"
+ <kevin.tian@intel.com>, maz@kernel.org, seanjc@google.com, Robin Murphy
+ <robin.murphy@arm.com>, jacob.jun.pan@linux.intel.com
+Subject: Re: [PATCH RFC 09/13] x86/irq: Install posted MSI notification
+ handler
+Message-ID: <20231115120401.3e02d977@jacob-builder>
+In-Reply-To: <20231115125624.GF3818@noisy.programming.kicks-ass.net>
+References: <20231112041643.2868316-1-jacob.jun.pan@linux.intel.com>
+	<20231112041643.2868316-10-jacob.jun.pan@linux.intel.com>
+	<20231115125624.GF3818@noisy.programming.kicks-ass.net>
+Organization: OTC
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] LoongArch: KVM: Fix build due to API changes
-Content-Language: en-US
-To: Huacai Chen <chenhuacai@loongson.cn>, Paolo Bonzini
- <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>
-Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org, Xuerui Wang <kernel@xen0n.name>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>
-References: <20231115090735.2404866-1-chenhuacai@loongson.cn>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20231115090735.2404866-1-chenhuacai@loongson.cn>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
+Hi Peter,
 
+On Wed, 15 Nov 2023 13:56:24 +0100, Peter Zijlstra <peterz@infradead.org>
+wrote:
 
-On 11/15/23 01:07, Huacai Chen wrote:
-> Commit 8569992d64b8f750e34b7858eac ("KVM: Use gfn instead of hva for
-> mmu_notifier_retry") replaces mmu_invalidate_retry_hva() usage with
-> mmu_invalidate_retry_gfn() for X86, LoongArch also need similar changes
-> to fix build.
+> On Sat, Nov 11, 2023 at 08:16:39PM -0800, Jacob Pan wrote:
 > 
-> Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
-
-Reported-by: Randy Dunlap <rdunlap@infradead.org>
-Tested-by: Randy Dunlap <rdunlap@infradead.org> # build-tested
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
-
-Thanks.
-
-> ---
->  arch/loongarch/kvm/mmu.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> > +static __always_inline inline void handle_pending_pir(struct pi_desc
+> > *pid, struct pt_regs *regs) +{  
 > 
-> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
-> index 80480df5f550..9463ebecd39b 100644
-> --- a/arch/loongarch/kvm/mmu.c
-> +++ b/arch/loongarch/kvm/mmu.c
-> @@ -627,7 +627,7 @@ static bool fault_supports_huge_mapping(struct kvm_memory_slot *memslot,
->   *
->   * There are several ways to safely use this helper:
->   *
-> - * - Check mmu_invalidate_retry_hva() after grabbing the mapping level, before
-> + * - Check mmu_invalidate_retry_gfn() after grabbing the mapping level, before
->   *   consuming it.  In this case, mmu_lock doesn't need to be held during the
->   *   lookup, but it does need to be held while checking the MMU notifier.
->   *
-> @@ -807,7 +807,7 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
->  
->  	/* Check if an invalidation has taken place since we got pfn */
->  	spin_lock(&kvm->mmu_lock);
-> -	if (mmu_invalidate_retry_hva(kvm, mmu_seq, hva)) {
-> +	if (mmu_invalidate_retry_gfn(kvm, mmu_seq, gfn)) {
->  		/*
->  		 * This can happen when mappings are changed asynchronously, but
->  		 * also synchronously if a COW is triggered by
+> __always_inline means that... (A)
+> 
+> > +	int i, vec = FIRST_EXTERNAL_VECTOR;
+> > +	u64 pir_copy[4];
+> > +
+> > +	/*
+> > +	 * Make a copy of PIR which contains IRQ pending bits for
+> > vectors,
+> > +	 * then invoke IRQ handlers for each pending vector.
+> > +	 * If any new interrupts were posted while we are processing,
+> > will
+> > +	 * do again before allowing new notifications. The idea is to
+> > +	 * minimize the number of the expensive notifications if IRQs
+> > come
+> > +	 * in a high frequency burst.
+> > +	 */
+> > +	for (i = 0; i < 4; i++)
+> > +		pir_copy[i] = raw_atomic64_xchg((atomic64_t
+> > *)&pid->pir_l[i], 0); +
+> > +	/*
+> > +	 * Ideally, we should start from the high order bits set in
+> > the PIR
+> > +	 * since each bit represents a vector. Higher order bit
+> > position means
+> > +	 * the vector has higher priority. But external vectors are
+> > allocated
+> > +	 * based on availability not priority.
+> > +	 *
+> > +	 * EOI is included in the IRQ handlers call to apic_ack_irq,
+> > which
+> > +	 * allows higher priority system interrupt to get in between.
+> > +	 */
+> > +	for_each_set_bit_from(vec, (unsigned long *)&pir_copy[0], 256)
+> > +		call_irq_handler(vec, regs);
+> > +
+> > +}
+> > +
+> > +/*
+> > + * Performance data shows that 3 is good enough to harvest 90+% of the
+> > benefit
+> > + * on high IRQ rate workload.
+> > + * Alternatively, could make this tunable, use 3 as default.
+> > + */
+> > +#define MAX_POSTED_MSI_COALESCING_LOOP 3
+> > +
+> > +/*
+> > + * For MSIs that are delivered as posted interrupts, the CPU
+> > notifications
+> > + * can be coalesced if the MSIs arrive in high frequency bursts.
+> > + */
+> > +DEFINE_IDTENTRY_SYSVEC(sysvec_posted_msi_notification)
+> > +{
+> > +	struct pt_regs *old_regs = set_irq_regs(regs);
+> > +	struct pi_desc *pid;
+> > +	int i = 0;
+> > +
+> > +	pid = this_cpu_ptr(&posted_interrupt_desc);
+> > +
+> > +	inc_irq_stat(posted_msi_notification_count);
+> > +	irq_enter();
+> > +
+> > +	while (i++ < MAX_POSTED_MSI_COALESCING_LOOP) {
+> > +		handle_pending_pir(pid, regs);
+> > +
+> > +		/*
+> > +		 * If there are new interrupts posted in PIR, do
+> > again. If
+> > +		 * nothing pending, no need to wait for more
+> > interrupts.
+> > +		 */
+> > +		if (is_pir_pending(pid))  
+> 
+> So this reads those same 4 words we xchg in handle_pending_pir(), right?
+> 
+> > +			continue;
+> > +		else
+> > +			break;
+> > +	}
+> > +
+> > +	/*
+> > +	 * Clear outstanding notification bit to allow new IRQ
+> > notifications,
+> > +	 * do this last to maximize the window of interrupt coalescing.
+> > +	 */
+> > +	pi_clear_on(pid);
+> > +
+> > +	/*
+> > +	 * There could be a race of PI notification and the clearing
+> > of ON bit,
+> > +	 * process PIR bits one last time such that handling the new
+> > interrupts
+> > +	 * are not delayed until the next IRQ.
+> > +	 */
+> > +	if (unlikely(is_pir_pending(pid)))
+> > +		handle_pending_pir(pid, regs);  
+> 
+> (A) ... we get _two_ copies of that thing in this function. Does that
+> make sense ?
+> 
+> > +
+> > +	apic_eoi();
+> > +	irq_exit();
+> > +	set_irq_regs(old_regs);
+> > +}
+> >  #endif /* X86_POSTED_MSI */  
+> 
+> Would it not make more sense to write things something like:
+> 
+it is a great idea, we can save expensive xchg if pir[i] is 0. But I have
+to tweak a little to let it perform better.
 
--- 
-~Randy
+> bool handle_pending_pir()
+> {
+> 	bool handled = false;
+> 	u64 pir_copy[4];
+> 
+> 	for (i = 0; i < 4; i++) {
+> 		if (!pid-pir_l[i]) {
+> 			pir_copy[i] = 0;
+> 			continue;
+> 		}
+> 
+> 		pir_copy[i] = arch_xchg(&pir->pir_l[i], 0);
+we are interleaving cacheline read and xchg. So made it to
+
+	for (i = 0; i < 4; i++) {
+		pir_copy[i] = pid->pir_l[i];
+	}
+
+	for (i = 0; i < 4; i++) {
+		if (pir_copy[i]) {
+			pir_copy[i] = arch_xchg(&pid->pir_l[i], 0);
+			handled = true;
+		}
+	}
+
+With DSA MEMFILL test just one queue one MSI, we are saving 3 xchg per loop.
+Here is the performance comparison in IRQ rate:
+
+Original RFC 9.29 m/sec, 
+Optimized in your email 8.82m/sec,
+Tweaked above: 9.54m/s
+
+I need to test with more MSI vectors spreading out to all 4 u64. I suspect
+the benefit will decrease since we need to do both read and xchg for
+non-zero entries.
+
+> 		handled |= true;
+> 	}
+
+
+> 
+> 	if (!handled)
+> 		return handled;
+> 
+> 	for_each_set_bit()
+> 		....
+> 
+> 	return handled.
+> }
+> 
+> sysvec_posted_blah_blah()
+> {
+> 	bool done = false;
+> 	bool handled;
+> 
+> 	for (;;) {
+> 		handled = handle_pending_pir();
+> 		if (done)
+> 			break;
+> 		if (!handled || ++loops > MAX_LOOPS) {
+> 			pi_clear_on(pid);
+> 			/* once more after clear_on */
+> 			done = true;
+> 		}
+> 	}
+> }
+> 
+> 
+> Hmm?
+
+
+
+
+Thanks,
+
+Jacob
 
