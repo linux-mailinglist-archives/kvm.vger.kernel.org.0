@@ -1,140 +1,168 @@
-Return-Path: <kvm+bounces-1830-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1831-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BA427EC6C0
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 16:09:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B6E47EC752
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 16:31:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BF2D1C208D8
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 15:09:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 166AA1F26B5C
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 15:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DBE7381AB;
-	Wed, 15 Nov 2023 15:09:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B55D39FDA;
+	Wed, 15 Nov 2023 15:31:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2Y16O+5x"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RZktU7jr"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C80381B6
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 15:09:19 +0000 (UTC)
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEC8A8E
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 07:09:18 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cc56cc8139so11196515ad.0
-        for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 07:09:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700060958; x=1700665758; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=r39GnHM5bN5YuWeX4taddVxZqZSztKdXAkWyIoY43Wo=;
-        b=2Y16O+5x6Jbce4BxgT6Z+vMDFfRVva3mDQMtTO8/W8t1P7qw1vD94TYr+BBFGmIKih
-         DyDpJtVwhFkXNRfI//1ZLFHNljMLI+4bdT3KT4P2AjPsKdt3qPIADeVNkRyEkY2lhT6W
-         UMju58oifU4eAzkVzDciUHmUJbDVe042sVpmV/ngmjOZgT3DAJ0u9c8O8qgVTBp+J+km
-         Gio6YnCprERGaujNjkVN106T0QmBsuaaBlWCRYzzymbBUoSF1R7SyhH5xUCY6rKtiqdL
-         +g5vixlaY2uocmpuDaGNFcLh/aawLjRgJCz9H3IeNQBBaUPPavGedswcUErYK+Rr4vfa
-         sMRA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA55381DD
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 15:31:45 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 050CA1A3
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 07:31:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700062303;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=D/U++RP8J87fTpffNLluzx5XIExdTU9ynmak8Mre+P4=;
+	b=RZktU7jr49koGscOk+YZGcJZn45sRaj4nqUQEDdRqRhmo/X9YFfVy/E0vjCxK0+zXp8/wX
+	V5kQhgoa2VVligDeznTggXjrL9525P5RhbYNwu10beVLdiKVC+wZqPtcMyQAW/0hmCvOph
+	n+OCKWcVE7Tr/aFrqvZjbFgEUA63I7A=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-664-38L7mlk_N8KLooPCkGTi9Q-1; Wed, 15 Nov 2023 10:31:41 -0500
+X-MC-Unique: 38L7mlk_N8KLooPCkGTi9Q-1
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-6bdc140103bso1690488b3a.1
+        for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 07:31:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700060958; x=1700665758;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=r39GnHM5bN5YuWeX4taddVxZqZSztKdXAkWyIoY43Wo=;
-        b=iYwHxOM8rYIlTHgBlE8ENByswfxKh71F6ZJJ462yj0n8WEyW29qpEbiv+Ndh/lOPIJ
-         e9F7Bk8hso2pyjBnP9wxUhCyPQz+Q5ccUAnXQDhnY2PYn3WjUBLg1BdhCO0LYWE0djQR
-         wrC2ayRX87Mx4GEkcPKUhfgL6RbFXMgnFDqZV25Sq/TNV6NsHXq55uFb5Rlqxy4P9nFo
-         V2/7Ng27EIcVwDs5G+QIwBaNOK8cMrK3DWJCBt4enDBwHASr8BexvdgZyfmrCSeShLn8
-         lnFdr9YJK8OcBEL7a7nKM45hFht4K3zlGDe6DZZQ8Arwu4UXKE1lVs7PVQKMkUB1bawW
-         w8cg==
-X-Gm-Message-State: AOJu0YwmJAu0Tq5epNL0hUbziHfeL/8t68imQRaaC655xPajhLKPYzj5
-	X78oxkFHd0THus9NnUI3Uyk1TEFxx1s=
-X-Google-Smtp-Source: AGHT+IG3qu3lFpMuQCfcgeEIlbULEmHkvJwhR5/zE7upNlxp4Rd+jCAiKWz5+AvxCJXFT41oeQkNPes24J4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:4292:b0:1cc:166f:91c8 with SMTP id
- ju18-20020a170903429200b001cc166f91c8mr1456351plb.1.1700060958209; Wed, 15
- Nov 2023 07:09:18 -0800 (PST)
-Date: Wed, 15 Nov 2023 07:09:15 -0800
-In-Reply-To: <9395d416-cc5c-536d-641e-ffd971b682d1@gmail.com>
+        d=1e100.net; s=20230601; t=1700062300; x=1700667100;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D/U++RP8J87fTpffNLluzx5XIExdTU9ynmak8Mre+P4=;
+        b=IYSQ+YOwdcjo5kkvZZeKEU2vWedvRJT6Eyd/MocYzwMZeLZI5nuEOToa5P3tFQAu3g
+         4L+NbYOq3gEX9U8+lIwAh6NEvapYDjZMmPE8IFecGuIT9YSL1r2HIlDfzHEFifr+Yh5R
+         wnhg6aBPsPtewWnYULZ8KYkUL1+Ydc4HivnW2Qxnvj5Vxx+QHCaZxR9/sWgLSEGK12vl
+         dX0TkF/MEOhEW4IHNZzsPSJxgzpthLOQJw9QGCUQiZ/yWbI5xPJC+XEskDPnahW0fV7R
+         LgZK3xTq7jndL4v4GA+oW3BcAkvWdwWUk7rQANsBO+RnACYP50uLc0gcO5YFFIkcqT30
+         BMXg==
+X-Gm-Message-State: AOJu0YwiSJD0yCx8ukFYC2tNKNsgyxVQO/z+IQBs050R/6ZEh18hoSIz
+	P36vzQdF7ihCGX/cixSMgs/PV8Ysl9pd6IVSok7wAZ/cGmUiZpgSjBSE+dpiyEVb9LCWP0LwrEP
+	SC6SzLc4iJ1fqLdpXtaFm31ECXRRuXs3e6p8bzj48FVB6oUsN+G3BIFIzMVKyvSec4KUw6FRNDH
+	U=
+X-Received: by 2002:a05:6a00:6894:b0:6c0:81a3:fe4c with SMTP id hr20-20020a056a00689400b006c081a3fe4cmr2631606pfb.3.1700062299936;
+        Wed, 15 Nov 2023 07:31:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG6wTglBWhG4nljh27JjPWJF2LXSzDl20T4s5YweTj0uHIb6TdJ4bD03xIAZOHx+3l4vNETfQ==
+X-Received: by 2002:a05:6a00:6894:b0:6c0:81a3:fe4c with SMTP id hr20-20020a056a00689400b006c081a3fe4cmr2631564pfb.3.1700062299414;
+        Wed, 15 Nov 2023 07:31:39 -0800 (PST)
+Received: from [10.72.112.25] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id e12-20020a6558cc000000b0058ee60f8e4dsm1174195pgu.34.2023.11.15.07.31.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Nov 2023 07:31:39 -0800 (PST)
+Message-ID: <f3f467bf-40d7-dd4d-7ee1-eef95eeed36d@redhat.com>
+Date: Wed, 15 Nov 2023 23:31:35 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231110235528.1561679-1-seanjc@google.com> <20231110235528.1561679-7-seanjc@google.com>
- <ffec2e93-cdb1-25e2-06ec-deccf8727ce4@gmail.com> <ZVN6w2Kc2AUmIiJO@google.com>
- <9395d416-cc5c-536d-641e-ffd971b682d1@gmail.com>
-Message-ID: <ZVTfG6mARiyttuKj@google.com>
-Subject: Re: [PATCH 6/9] KVM: x86: Update guest cpu_caps at runtime for
- dynamic CPUID-based features
-From: Sean Christopherson <seanjc@google.com>
-To: Robert Hoo <robert.hoo.linux@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Maxim Levitsky <mlevitsk@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] KVM: arm64: selftests: Clean up the GIC[D,R]_BASE_GPA
+Content-Language: en-US
+To: kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231115104757.15710-1-shahuang@redhat.com>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20231115104757.15710-1-shahuang@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 15, 2023, Robert Hoo wrote:
-> On 11/14/2023 9:48 PM, Sean Christopherson wrote:
-> > On Mon, Nov 13, 2023, Robert Hoo wrote:
-> ...
-> > > u32 *caps  = vcpu->arch.cpu_caps;
-> > > and update guest_cpu_cap_set(), guest_cpu_cap_clear(),
-> > > guest_cpu_cap_change() and guest_cpu_cap_restrict() to pass in
-> > > vcpu->arch.cpu_caps instead of vcpu, since all of them merely refer to vcpu
-> > > cap, rather than whole vcpu info.
-> > 
-> > No, because then every caller would need extra code to pass
-> > vcpu->cpu_caps,
+
+
+On 11/15/23 18:47, Shaoqin Huang wrote:
+> The GIC[D,R]_BASE_GPA has been defined in multiple files with the same
+> value, define it in one place to make the code clean.
 > 
-> Emm, I don't understand this. I tried to modified and compiled, all need to
-> do is simply substitute "vcpu" with "vcpu->arch.cpu_caps" in calling. (at
-> the end is my diff based on this patch set)
+> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+>   tools/testing/selftests/kvm/aarch64/arch_timer.c   | 3 ---
+>   tools/testing/selftests/kvm/aarch64/vgic_irq.c     | 3 ---
+>   tools/testing/selftests/kvm/dirty_log_perf_test.c  | 3 ---
+>   tools/testing/selftests/kvm/include/aarch64/vgic.h | 3 +++
 
-Yes, and I'm saying that
+Oops. Forget the kvm/aarch64/vpmu_counter_access.c. I will update a new one.
 
-	guest_cpu_cap_restrict(vcpu, X86_FEATURE_PAUSEFILTER);
-	guest_cpu_cap_restrict(vcpu, X86_FEATURE_PFTHRESHOLD);
-	guest_cpu_cap_restrict(vcpu, X86_FEATURE_VGIF);
-	guest_cpu_cap_restrict(vcpu, X86_FEATURE_VNMI);
-
-is harder to read and write than this
-
-	guest_cpu_cap_restrict(vcpu->arch.cpu_caps, X86_FEATURE_PAUSEFILTER);
-	guest_cpu_cap_restrict(vcpu->arch.cpu_caps, X86_FEATURE_PFTHRESHOLD);
-	guest_cpu_cap_restrict(vcpu->arch.cpu_caps, X86_FEATURE_VGIF);
-	guest_cpu_cap_restrict(vcpu->arch.cpu_caps, X86_FEATURE_VNMI);
-
-a one-time search-replace is easy, but the extra boilerplate has a non-zero cost
-for every future developer/reader.
-
-> > and passing 'u32 *' provides less type safety than 'struct kvm_vcpu *'.
-> > That tradeoff isn't worth making this one path slightly easier to read.
+>   4 files changed, 3 insertions(+), 9 deletions(-)
 > 
-> My point is also from vulnerability, long term, since as a principle, we'd
-> better pass in param/info to a function of its necessity.
+> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> index 274b8465b42a..818854007bfd 100644
+> --- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> @@ -59,9 +59,6 @@ static struct test_args test_args = {
+>   
+>   #define msecs_to_usecs(msec)		((msec) * 1000LL)
+>   
+> -#define GICD_BASE_GPA			0x8000000ULL
+> -#define GICR_BASE_GPA			0x80A0000ULL
+> -
+>   enum guest_stage {
+>   	GUEST_STAGE_VTIMER_CVAL = 1,
+>   	GUEST_STAGE_VTIMER_TVAL,
+> diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+> index 2e64b4856e38..a48aff110fb6 100644
+> --- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+> +++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+> @@ -19,9 +19,6 @@
+>   #include "gic_v3.h"
+>   #include "vgic.h"
+>   
+> -#define GICD_BASE_GPA		0x08000000ULL
+> -#define GICR_BASE_GPA		0x080A0000ULL
+> -
+>   /*
+>    * Stores the user specified args; it's passed to the guest and to every test
+>    * function.
+> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> index d374dbcf9a53..4971e8f77a0a 100644
+> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> @@ -22,9 +22,6 @@
+>   #ifdef __aarch64__
+>   #include "aarch64/vgic.h"
+>   
+> -#define GICD_BASE_GPA			0x8000000ULL
+> -#define GICR_BASE_GPA			0x80A0000ULL
+> -
+>   static int gic_fd;
+>   
+>   static void arch_setup_vm(struct kvm_vm *vm, unsigned int nr_vcpus)
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/vgic.h b/tools/testing/selftests/kvm/include/aarch64/vgic.h
+> index 0ac6f05c63f9..9dbb342fd808 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/vgic.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/vgic.h
+> @@ -33,4 +33,7 @@ void kvm_irq_write_isactiver(int gic_fd, uint32_t intid, struct kvm_vcpu *vcpu);
+>   
+>   #define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
+>   
+> +#define GICD_BASE_GPA		0x08000000ULL
+> +#define GICR_BASE_GPA		0x080A0000ULL
+> +
+>   #endif // SELFTEST_KVM_VGIC_H
 
-Attempting to apply the principle of least privilege to low level C helpers is
-nonsensical.  E.g. the helper can trivially get at the owning vcpu via container_of()
-(well, if not for typeof assertions not playing nice with arrays, but open coding
-container_of() is also trivial and illustrates the point).
+-- 
+Shaoqin
 
-	struct kvm_vcpu_arch *arch = (void *)caps -  offsetof(struct kvm_vcpu_arch, cpu_caps);
-	struct kvm_vcpu *vcpu = container_of(arch, struct kvm_vcpu, arch);
-
-	if (!kvm_cpu_cap_has(x86_feature))
-		guest_cpu_cap_clear(vcpu, x86_feature);
-
-And the intent behind that principle is to improve security/robustness; what I'm
-saying is that passing in a 'u32 *" makes the overall implementation _less_ robust,
-as it opens up the possibilities of passing in an unsafe/incorrect pointer.  E.g.
-a well-intentioned, not _that_ obviously broken example is:
-
-	guest_cpu_cap_restrict(&vcpu->arch.cpu_caps[CPUID_1_ECX], X86_FEATURE_XSAVE);
-
-> e.g. cpuid_entry2_find().
-
-The main reason cpuid_entry2_find() exists is because KVM checks the incoming
-array provided by KVM_SET_CPUID2, which is also the reason why
-__kvm_update_cpuid_runtime() takes an @entries array instead of just @vcpu.
 
