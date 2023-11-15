@@ -1,141 +1,606 @@
-Return-Path: <kvm+bounces-1836-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1837-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A197F7EC9E2
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 18:48:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D29F47EC9E6
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 18:51:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D18511C20B76
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 17:48:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86D40280F50
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 17:51:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 770534175C;
-	Wed, 15 Nov 2023 17:48:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D5C3EA94;
+	Wed, 15 Nov 2023 17:51:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lfPWiR9A";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="tD38coEF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y34xh5Bj"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56BC418E;
-	Wed, 15 Nov 2023 09:48:36 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D50A127
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 09:51:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700070691;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
+	bh=cBjFLRXFDH6X4i55ctUHRXTQufDk4VkHqoIYs5yvEh8=;
+	b=Y34xh5BjUD2+TDfHmQVb9ZLYTULuAXKjYYzvuVHeVBGlC/MNQauvePM+eDFjYJY0RvYvvX
+	Wjy0vUpVRseTIXQjCj4mvDpIwXYtQn3kXE4Aouqb8EEgMF5tb7ftfLbKy+SLeSaUD1Wp6i
+	fg/JB+VVoEct0hfhjdNDIY0nysTDics=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-367-dbsraTB5M2GH0y9EbB6e6Q-1; Wed, 15 Nov 2023 12:51:28 -0500
+X-MC-Unique: dbsraTB5M2GH0y9EbB6e6Q-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id F1CBC1F8BA;
-	Wed, 15 Nov 2023 17:48:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1700070515; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=dVirFhaoEoAX1LEzb5mRTEwNjUcyu3xWdfuMee0UoV8=;
-	b=lfPWiR9Atyz7OYGBbcWnddpsjMxEIsMt7yvvR42DgCwhHU87lj5wxD+Y/b3fDEhXpGzr3f
-	/HwtCDqYciAHIIjoBtY5k2/ou+/RbpfBcm8QSgWrR/uJyejRJU2n2Ci2jvgqAYPICvpt+6
-	1T7OCddHZL7liBBtsPAqY2vRO+4Z3kY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1700070515;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=dVirFhaoEoAX1LEzb5mRTEwNjUcyu3xWdfuMee0UoV8=;
-	b=tD38coEFHSEmEaDCjSnTkj9DKJrzJCISkjbbAXifYGSgZqY4Gztn4feNszGD5NqnQbHmqS
-	qJKrGhfGyWPfzNBw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9A21013587;
-	Wed, 15 Nov 2023 17:48:34 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id 6rL2InIEVWWzVQAAMHmgww
-	(envelope-from <clopez@suse.de>); Wed, 15 Nov 2023 17:48:34 +0000
-From: =?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Cc: =?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Subject: [PATCH] KVM: X86: improve documentation for KVM_CAP_X86_BUS_LOCK_EXIT
-Date: Wed, 15 Nov 2023 18:47:04 +0100
-Message-Id: <20231115174703.1996-1-clopez@suse.de>
-X-Mailer: git-send-email 2.35.3
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0CE1189F9E1;
+	Wed, 15 Nov 2023 17:51:27 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.144])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 95D2E492BFD;
+	Wed, 15 Nov 2023 17:51:22 +0000 (UTC)
+Date: Wed, 15 Nov 2023 17:51:19 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	David Hildenbrand <david@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Peter Xu <peterx@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Cornelia Huck <cohuck@redhat.com>, Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Claudio Fontana <cfontana@suse.de>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	Chenyi Qiang <chenyi.qiang@intel.com>
+Subject: Re: [PATCH v3 52/70] i386/tdx: handle TDG.VP.VMCALL<GetQuote>
+Message-ID: <ZVUFF-sm2aeCcDnr@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
+ <20231115071519.2864957-53-xiaoyao.li@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spam-Score: 1.46
-X-Spamd-Result: default: False [1.46 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 RCPT_COUNT_FIVE(0.00)[6];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 MID_CONTAINS_FROM(1.00)[];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 R_MIXED_CHARSET(0.56)[subject];
-	 RCVD_COUNT_TWO(0.00)[2];
-	 RCVD_TLS_ALL(0.00)[]
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231115071519.2864957-53-xiaoyao.li@intel.com>
+User-Agent: Mutt/2.2.10 (2023-03-25)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-Improve the description for the KVM_CAP_X86_BUS_LOCK_EXIT capability,
-fixing a few typos and improving grammar for overall clarity.
+On Wed, Nov 15, 2023 at 02:15:01AM -0500, Xiaoyao Li wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> For GetQuote, delegate a request to Quote Generation Service.
+> Add property "quote-generation-socket" to tdx-guest, whihc is a property
+> of type SocketAddress to specify Quote Generation Service(QGS).
+> 
+> On request, connect to the QGS, read request buffer from shared guest
+> memory, send the request buffer to the server and store the response
+> into shared guest memory and notify TD guest by interrupt.
+> 
+> command line example:
+>   qemu-system-x86_64 \
+>     -object '{"qom-type":"tdx-guest","id":"tdx0","quote-generation-socket":{"type": "vsock", "cid":"2","port":"1234"}}' \
+>     -machine confidential-guest-support=tdx0
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Codeveloped-by: Chenyi Qiang <chenyi.qiang@intel.com>
+> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+> Changes in v3:
+> - rename property "quote-generation-service" to "quote-generation-socket";
+> - change the type of "quote-generation-socket" from str to
+>   SocketAddress;
+> - squash next patch into this one;
+> ---
+>  qapi/qom.json         |   5 +-
+>  target/i386/kvm/tdx.c | 430 ++++++++++++++++++++++++++++++++++++++++++
+>  target/i386/kvm/tdx.h |   6 +
+>  3 files changed, 440 insertions(+), 1 deletion(-)
 
-Signed-off-by: Carlos López <clopez@suse.de>
----
- Documentation/virt/kvm/api.rst | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+> @@ -969,6 +1001,7 @@ static void tdx_guest_class_init(ObjectClass *oc, void *data)
+>  {
+>  }
+>  
+> +#define TDG_VP_VMCALL_GET_QUOTE                         0x10002ULL
+>  #define TDG_VP_VMCALL_SETUP_EVENT_NOTIFY_INTERRUPT      0x10004ULL
+>  
+>  #define TDG_VP_VMCALL_SUCCESS           0x0000000000000000ULL
+> @@ -977,6 +1010,400 @@ static void tdx_guest_class_init(ObjectClass *oc, void *data)
+>  #define TDG_VP_VMCALL_GPA_INUSE         0x8000000000000001ULL
+>  #define TDG_VP_VMCALL_ALIGN_ERROR       0x8000000000000002ULL
+>  
+> +#define TDX_GET_QUOTE_STRUCTURE_VERSION 1ULL
+> +
+> +#define TDX_VP_GET_QUOTE_SUCCESS                0ULL
+> +#define TDX_VP_GET_QUOTE_IN_FLIGHT              (-1ULL)
+> +#define TDX_VP_GET_QUOTE_ERROR                  0x8000000000000000ULL
+> +#define TDX_VP_GET_QUOTE_QGS_UNAVAILABLE        0x8000000000000001ULL
+> +
+> +/* Limit to avoid resource starvation. */
+> +#define TDX_GET_QUOTE_MAX_BUF_LEN       (128 * 1024)
+> +#define TDX_MAX_GET_QUOTE_REQUEST       16
+> +
+> +/* Format of pages shared with guest. */
+> +struct tdx_get_quote_header {
+> +    /* Format version: must be 1 in little endian. */
+> +    uint64_t structure_version;
+> +
+> +    /*
+> +     * GetQuote status code in little endian:
+> +     *   Guest must set error_code to 0 to avoid information leak.
+> +     *   Qemu sets this before interrupting guest.
+> +     */
+> +    uint64_t error_code;
+> +
+> +    /*
+> +     * in-message size in little endian: The message will follow this header.
+> +     * The in-message will be send to QGS.
+> +     */
+> +    uint32_t in_len;
+> +
+> +    /*
+> +     * out-message size in little endian:
+> +     * On request, out_len must be zero to avoid information leak.
+> +     * On return, message size from QGS. Qemu overwrites this field.
+> +     * The message will follows this header.  The in-message is overwritten.
+> +     */
+> +    uint32_t out_len;
+> +
+> +    /*
+> +     * Message buffer follows.
+> +     * Guest sets message that will be send to QGS.  If out_len > in_len, guest
+> +     * should zero remaining buffer to avoid information leak.
+> +     * Qemu overwrites this buffer with a message returned from QGS.
+> +     */
+> +};
+> +
+> +static hwaddr tdx_shared_bit(X86CPU *cpu)
+> +{
+> +    return (cpu->phys_bits > 48) ? BIT_ULL(51) : BIT_ULL(47);
+> +}
+> +
+> +struct tdx_get_quote_task {
+> +    uint32_t apic_id;
+> +    hwaddr gpa;
+> +    uint64_t buf_len;
+> +    char *out_data;
+> +    uint64_t out_len;
+> +    struct tdx_get_quote_header hdr;
+> +    int event_notify_interrupt;
+> +    QIOChannelSocket *ioc;
+> +};
+> +
+> +struct x86_msi {
+> +    union {
+> +        struct {
+> +            uint32_t    reserved_0              : 2,
+> +                        dest_mode_logical       : 1,
+> +                        redirect_hint           : 1,
+> +                        reserved_1              : 1,
+> +                        virt_destid_8_14        : 7,
+> +                        destid_0_7              : 8,
+> +                        base_address            : 12;
+> +        } QEMU_PACKED x86_address_lo;
+> +        uint32_t address_lo;
+> +    };
+> +    union {
+> +        struct {
+> +            uint32_t    reserved        : 8,
+> +                        destid_8_31     : 24;
+> +        } QEMU_PACKED x86_address_hi;
+> +        uint32_t address_hi;
+> +    };
+> +    union {
+> +        struct {
+> +            uint32_t    vector                  : 8,
+> +                        delivery_mode           : 3,
+> +                        dest_mode_logical       : 1,
+> +                        reserved                : 2,
+> +                        active_low              : 1,
+> +                        is_level                : 1;
+> +        } QEMU_PACKED x86_data;
+> +        uint32_t data;
+> +    };
+> +};
+> +
+> +static void tdx_td_notify(struct tdx_get_quote_task *t)
+> +{
+> +    struct x86_msi x86_msi;
+> +    struct kvm_msi msi;
+> +    int ret;
+> +
+> +    /* It is optional for host VMM to interrupt TD. */
+> +    if(!(32 <= t->event_notify_interrupt && t->event_notify_interrupt <= 255))
+> +        return;
+> +
+> +    x86_msi = (struct x86_msi) {
+> +        .x86_address_lo  = {
+> +            .reserved_0 = 0,
+> +            .dest_mode_logical = 0,
+> +            .redirect_hint = 0,
+> +            .reserved_1 = 0,
+> +            .virt_destid_8_14 = 0,
+> +            .destid_0_7 = t->apic_id & 0xff,
+> +        },
+> +        .x86_address_hi = {
+> +            .reserved = 0,
+> +            .destid_8_31 = t->apic_id >> 8,
+> +        },
+> +        .x86_data = {
+> +            .vector = t->event_notify_interrupt,
+> +            .delivery_mode = APIC_DM_FIXED,
+> +            .dest_mode_logical = 0,
+> +            .reserved = 0,
+> +            .active_low = 0,
+> +            .is_level = 0,
+> +        },
+> +    };
+> +    msi = (struct kvm_msi) {
+> +        .address_lo = x86_msi.address_lo,
+> +        .address_hi = x86_msi.address_hi,
+> +        .data = x86_msi.data,
+> +        .flags = 0,
+> +        .devid = 0,
+> +    };
+> +    ret = kvm_vm_ioctl(kvm_state, KVM_SIGNAL_MSI, &msi);
+> +    if (ret < 0) {
+> +        /* In this case, no better way to tell it to guest.  Log it. */
+> +        error_report("TDX: injection %d failed, interrupt lost (%s).\n",
+> +                     t->event_notify_interrupt, strerror(-ret));
+> +    }
+> +}
+> +
+> +static void tdx_get_quote_read(void *opaque)
+> +{
+> +    struct tdx_get_quote_task *t = opaque;
+> +    ssize_t size = 0;
+> +    Error *err = NULL;
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 7025b3751027..4be0a53d82a7 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7582,20 +7582,20 @@ KVM_BUS_LOCK_DETECTION_OFF and KVM_BUS_LOCK_DETECTION_EXIT are supported
- currently and mutually exclusive with each other. More bits can be added in
- the future.
- 
--With KVM_BUS_LOCK_DETECTION_OFF set, bus locks in guest will not cause vm exits
-+With KVM_BUS_LOCK_DETECTION_OFF set, bus locks in guest will not cause VM exits
- so that no additional actions are needed. This is the default mode.
- 
--With KVM_BUS_LOCK_DETECTION_EXIT set, vm exits happen when bus lock detected
--in VM. KVM just exits to userspace when handling them. Userspace can enforce
--its own throttling or other policy based mitigations.
--
--This capability is aimed to address the thread that VM can exploit bus locks to
--degree the performance of the whole system. Once the userspace enable this
--capability and select the KVM_BUS_LOCK_DETECTION_EXIT mode, KVM will set the
--KVM_RUN_BUS_LOCK flag in vcpu-run->flags field and exit to userspace. Concerning
--the bus lock vm exit can be preempted by a higher priority VM exit, the exit
--notifications to userspace can be KVM_EXIT_BUS_LOCK or other reasons.
--KVM_RUN_BUS_LOCK flag is used to distinguish between them.
-+With KVM_BUS_LOCK_DETECTION_EXIT set, VM exits happen when a bus lock is
-+detected in VM. KVM just exits to userspace when handling them. Userspace can
-+enforce its own throttling or other policy based mitigations.
-+
-+This capability is aimed to address the fact that a VM can exploit bus locks to
-+impact the performance of the whole system. Once userspace enables this
-+capability and selects the KVM_BUS_LOCK_DETECTION_EXIT mode, KVM will set the
-+KVM_RUN_BUS_LOCK flag in the vcpu->run->flags field and exit to userspace.
-+Concerning the bus lock, a VM exit can be preempted by a higher priority VM
-+exit, so the exit notification to userspace can be KVM_EXIT_BUS_LOCK or another
-+reason. KVM_RUN_BUS_LOCK flag is used to distinguish between them.
- 
- 7.23 KVM_CAP_PPC_DAWR1
- ----------------------
+This error is set, but never read and more importantly
+never freed.  If you're not going to use it just pass
+NULL to the methods, otherwise use error_report_err to
+print and free it.
+
+> +    MachineState *ms;
+> +    TdxGuest *tdx;
+> +
+> +    while (true) {
+> +        char *buf;
+> +        size_t buf_size;
+> +
+> +        if (t->out_len < t->buf_len) {
+> +            buf = t->out_data + t->out_len;
+> +            buf_size = t->buf_len - t->out_len;
+> +        } else {
+> +            /*
+> +             * The received data is too large to fit in the shared GPA.
+> +             * Discard the received data and try to know the data size.
+> +             */
+> +            buf = t->out_data;
+> +            buf_size = t->buf_len;
+> +        }
+> +
+> +        size = qio_channel_read(QIO_CHANNEL(t->ioc), buf, buf_size, &err);
+> +        if (!size) {
+> +            break;
+> +        }
+> +
+> +        if (size < 0) {
+> +            if (size == QIO_CHANNEL_ERR_BLOCK) {
+> +                return;
+> +            } else {
+> +                break;
+> +            }
+> +        }
+> +        t->out_len += size;
+> +    }
+> +    /*
+> +     * If partial read successfully but return error at last, also treat it
+> +     * as failure.
+> +     */
+> +    if (size < 0) {
+> +        t->hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_QGS_UNAVAILABLE);
+> +        goto error;
+> +    }
+> +    if (t->out_len > 0 && t->out_len > t->buf_len) {
+> +        /*
+> +         * There is no specific error code defined for this case(E2BIG) at the
+> +         * moment.
+> +         * TODO: Once an error code for this case is defined in GHCI spec ,
+> +         * update the error code.
+> +         */
+> +        t->hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_ERROR);
+> +        t->hdr.out_len = cpu_to_le32(t->out_len);
+> +        goto error_hdr;
+> +    }
+> +
+> +    if (address_space_write(
+> +            &address_space_memory, t->gpa + sizeof(t->hdr),
+> +            MEMTXATTRS_UNSPECIFIED, t->out_data, t->out_len) != MEMTX_OK) {
+> +        goto error;
+> +    }
+> +    /*
+> +     * Even if out_len == 0, it's a success.  It's up to the QGS-client contract
+> +     * how to interpret the zero-sized message as return message.
+> +     */
+> +    t->hdr.out_len = cpu_to_le32(t->out_len);
+> +    t->hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_SUCCESS);
+> +
+> +error:
+> +    if (t->hdr.error_code != cpu_to_le64(TDX_VP_GET_QUOTE_SUCCESS)) {
+> +        t->hdr.out_len = cpu_to_le32(0);
+> +    }
+> +error_hdr:
+> +    if (address_space_write(
+> +            &address_space_memory, t->gpa,
+> +            MEMTXATTRS_UNSPECIFIED, &t->hdr, sizeof(t->hdr)) != MEMTX_OK) {
+> +        error_report("TDX: failed to update GetQuote header.");
+> +    }
+> +    tdx_td_notify(t);
+> +
+> +    qemu_set_fd_handler(t->ioc->fd, NULL, NULL, NULL);
+> +    qio_channel_close(QIO_CHANNEL(t->ioc), &err);
+
+Likely overwriting a previously set 'err'
+
+> +    object_unref(OBJECT(t->ioc));
+> +    g_free(t->out_data);
+> +    g_free(t);
+> +
+> +    /* Maintain the number of in-flight requests. */
+> +    ms = MACHINE(qdev_get_machine());
+> +    tdx = TDX_GUEST(ms->cgs);
+> +    qemu_mutex_lock(&tdx->lock);
+> +    tdx->quote_generation_num--;
+> +    qemu_mutex_unlock(&tdx->lock);
+> +}
+> +
+> +/*
+> + * TODO: If QGS doesn't reply for long time, make it an error and interrupt
+> + * guest.
+> + */
+> +static void tdx_handle_get_quote_connected(QIOTask *task, gpointer opaque)
+> +{
+> +    struct tdx_get_quote_task *t = opaque;
+> +    Error *err = NULL;
+
+Same leak problem in this method
+
+> +    char *in_data = NULL;
+
+g_autofree for simpler cleanup
+
+> +    MachineState *ms;
+> +    TdxGuest *tdx;
+> +
+> +    t->hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_ERROR);
+> +    if (qio_task_propagate_error(task, NULL)) {
+> +        t->hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_QGS_UNAVAILABLE);
+> +        goto error;
+> +    }
+> +
+> +    in_data = g_malloc(le32_to_cpu(t->hdr.in_len));
+
+IF  't->hdr.in_len' is going from the guest then they needs
+bounds checking, otherwise its a trivial denial of service
+to make QEMU allocate all of host RAM.
+
+> +    if (!in_data) {
+> +        goto error;
+> +    }
+> +
+> +    if (address_space_read(&address_space_memory, t->gpa + sizeof(t->hdr),
+> +                           MEMTXATTRS_UNSPECIFIED, in_data,
+> +                           le32_to_cpu(t->hdr.in_len)) != MEMTX_OK) {
+> +        goto error;
+> +    }
+> +
+> +    qio_channel_set_blocking(QIO_CHANNEL(t->ioc), false, NULL);
+> +
+> +    if (qio_channel_write_all(QIO_CHANNEL(t->ioc), in_data,
+> +                              le32_to_cpu(t->hdr.in_len), &err) ||
+> +        err) {
+> +        t->hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_QGS_UNAVAILABLE);
+> +        goto error;
+> +    }
+> +
+> +    g_free(in_data);
+> +    qemu_set_fd_handler(t->ioc->fd, tdx_get_quote_read, NULL, t);
+
+Dn't use  qemu_set_fd_handler() with QIOChannel objects.
+qio_channel_add_watch() is the API for dealing with event
+callbacks
+
+> +
+> +    return;
+> +error:
+> +    t->hdr.out_len = cpu_to_le32(0);
+> +
+> +    if (address_space_write(
+> +            &address_space_memory, t->gpa,
+> +            MEMTXATTRS_UNSPECIFIED, &t->hdr, sizeof(t->hdr)) != MEMTX_OK) {
+> +        error_report("TDX: failed to update GetQuote header.\n");
+> +    }
+> +    tdx_td_notify(t);
+> +
+> +    qio_channel_close(QIO_CHANNEL(t->ioc), &err);
+> +    object_unref(OBJECT(t->ioc));
+> +    g_free(t);
+> +    g_free(in_data);
+> +
+> +    /* Maintain the number of in-flight requests. */
+> +    ms = MACHINE(qdev_get_machine());
+> +    tdx = TDX_GUEST(ms->cgs);
+> +    qemu_mutex_lock(&tdx->lock);
+> +    tdx->quote_generation_num--;
+> +    qemu_mutex_unlock(&tdx->lock);
+> +    return;
+> +}
+> +
+> +static void tdx_handle_get_quote(X86CPU *cpu, struct kvm_tdx_vmcall *vmcall)
+> +{
+> +    hwaddr gpa = vmcall->in_r12;
+> +    uint64_t buf_len = vmcall->in_r13;
+> +    struct tdx_get_quote_header hdr;
+> +    MachineState *ms;
+> +    TdxGuest *tdx;
+> +    QIOChannelSocket *ioc;
+> +    struct tdx_get_quote_task *t;
+> +
+> +    vmcall->status_code = TDG_VP_VMCALL_INVALID_OPERAND;
+> +
+> +    /* GPA must be shared. */
+> +    if (!(gpa & tdx_shared_bit(cpu))) {
+> +        return;
+> +    }
+> +    gpa &= ~tdx_shared_bit(cpu);
+> +
+> +    if (!QEMU_IS_ALIGNED(gpa, 4096) || !QEMU_IS_ALIGNED(buf_len, 4096)) {
+> +        vmcall->status_code = TDG_VP_VMCALL_ALIGN_ERROR;
+> +        return;
+> +    }
+> +    if (buf_len == 0) {
+> +        return;
+> +    }
+> +
+> +    if (address_space_read(&address_space_memory, gpa, MEMTXATTRS_UNSPECIFIED,
+> +                           &hdr, sizeof(hdr)) != MEMTX_OK) {
+> +        return;
+> +    }
+> +    if (le64_to_cpu(hdr.structure_version) != TDX_GET_QUOTE_STRUCTURE_VERSION) {
+> +        return;
+> +    }
+> +    /*
+> +     * Paranoid: Guest should clear error_code and out_len to avoid information
+> +     * leak.  Enforce it.  The initial value of them doesn't matter for qemu to
+> +     * process the request.
+> +     */
+> +    if (le64_to_cpu(hdr.error_code) != TDX_VP_GET_QUOTE_SUCCESS ||
+> +        le32_to_cpu(hdr.out_len) != 0) {
+> +        return;
+> +    }
+> +
+> +    /* Only safe-guard check to avoid too large buffer size. */
+> +    if (buf_len > TDX_GET_QUOTE_MAX_BUF_LEN ||
+> +        le32_to_cpu(hdr.in_len) > TDX_GET_QUOTE_MAX_BUF_LEN ||
+> +        le32_to_cpu(hdr.in_len) > buf_len) {
+> +        return;
+> +    }
+> +
+> +    /* Mark the buffer in-flight. */
+> +    hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_IN_FLIGHT);
+> +    if (address_space_write(&address_space_memory, gpa, MEMTXATTRS_UNSPECIFIED,
+> +                            &hdr, sizeof(hdr)) != MEMTX_OK) {
+> +        return;
+> +    }
+> +
+> +    ms = MACHINE(qdev_get_machine());
+> +    tdx = TDX_GUEST(ms->cgs);
+> +    ioc = qio_channel_socket_new();
+> +
+> +    t = g_malloc(sizeof(*t));
+> +    t->apic_id = tdx->event_notify_apic_id;
+> +    t->gpa = gpa;
+> +    t->buf_len = buf_len;
+> +    t->out_data = g_malloc(t->buf_len);
+> +    t->out_len = 0;
+> +    t->hdr = hdr;
+> +    t->ioc = ioc;
+> +
+> +    qemu_mutex_lock(&tdx->lock);
+> +    if (!tdx->quote_generation ||
+> +        /* Prevent too many in-flight get-quote request. */
+> +        tdx->quote_generation_num >= TDX_MAX_GET_QUOTE_REQUEST) {
+> +        qemu_mutex_unlock(&tdx->lock);
+> +        vmcall->status_code = TDG_VP_VMCALL_RETRY;
+> +        object_unref(OBJECT(ioc));
+> +        g_free(t->out_data);
+> +        g_free(t);
+> +        return;
+> +    }
+> +    tdx->quote_generation_num++;
+> +    t->event_notify_interrupt = tdx->event_notify_interrupt;
+> +    qio_channel_socket_connect_async(
+> +        ioc, tdx->quote_generation, tdx_handle_get_quote_connected, t, NULL,
+> +        NULL);
+> +    qemu_mutex_unlock(&tdx->lock);
+> +
+> +    vmcall->status_code = TDG_VP_VMCALL_SUCCESS;
+> +}
+> +
+>  static void tdx_handle_setup_event_notify_interrupt(X86CPU *cpu,
+>                                                      struct kvm_tdx_vmcall *vmcall)
+>  {
+> @@ -1005,6 +1432,9 @@ static void tdx_handle_vmcall(X86CPU *cpu, struct kvm_tdx_vmcall *vmcall)
+>      }
+>  
+>      switch (vmcall->subfunction) {
+> +    case TDG_VP_VMCALL_GET_QUOTE:
+> +        tdx_handle_get_quote(cpu, vmcall);
+> +        break;
+>      case TDG_VP_VMCALL_SETUP_EVENT_NOTIFY_INTERRUPT:
+>          tdx_handle_setup_event_notify_interrupt(cpu, vmcall);
+>          break;
+> diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
+> index 4a8d67cc9fdb..4a989805493e 100644
+> --- a/target/i386/kvm/tdx.h
+> +++ b/target/i386/kvm/tdx.h
+> @@ -5,8 +5,10 @@
+>  #include CONFIG_DEVICES /* CONFIG_TDX */
+>  #endif
+>  
+> +#include <linux/kvm.h>
+>  #include "exec/confidential-guest-support.h"
+>  #include "hw/i386/tdvf.h"
+> +#include "io/channel-socket.h"
+>  #include "sysemu/kvm.h"
+>  
+>  #define TYPE_TDX_GUEST "tdx-guest"
+> @@ -47,6 +49,10 @@ typedef struct TdxGuest {
+>      /* runtime state */
+>      int event_notify_interrupt;
+>      uint32_t event_notify_apic_id;
+> +
+> +    /* GetQuote */
+> +    int quote_generation_num;
+> +    SocketAddress *quote_generation;
+>  } TdxGuest;
+
+IMHO all the quote generation logic would benefit from being split
+out into a completely separate self contained files
+
+eg 'tdx-quote-generation.{c,h}'
+
+this should define an object "TdxQuoteGenerator" which  holds these
+two quote_generation_num and quote_generation  fields, and exposes
+a high level API for each command taking inputs & outputs,
+and doing serialization to/from the socket.  This API should do
+verification of all command inputs eg the length field to prevent
+guest denial of service.
+
+The tdx_handle_get_quote() method could then call into this API.
+
+This will give us clean separation between interaction with guest
+memory, and interaction with the socket.
+
+With regards,
+Daniel
 -- 
-2.35.3
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
