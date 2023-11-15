@@ -1,110 +1,140 @@
-Return-Path: <kvm+bounces-1829-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1830-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3565B7EC552
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 15:30:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BA427EC6C0
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 16:09:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E438F280E79
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 14:30:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BF2D1C208D8
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 15:09:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 909972E62E;
-	Wed, 15 Nov 2023 14:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DBE7381AB;
+	Wed, 15 Nov 2023 15:09:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="G8eCvNFF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2Y16O+5x"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD3D2D042
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 14:30:01 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73D5E127;
-	Wed, 15 Nov 2023 06:29:58 -0800 (PST)
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AFEQi3O029077;
-	Wed, 15 Nov 2023 14:29:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=US9zv12lGioUA6y3gUFsuEhdS9xvFgifGW5KNI8SMos=;
- b=G8eCvNFFmNRZufcYveqq8hXnYavhKfnyoXY55j8SOwtcQHTnj4JyaY6q1YESgIcvM1u1
- q4X+/9IQQPH5td/BPafiwt8r/0Cfk5XvHVLhvadwbSQQTkd5fwQqmlRJgl6ndmKVwGbB
- LRz/TvO9iOWCGH5qgxi+sN3xdb1YeuDLWTYxUf2f2aqCZtUWtwp1G6WgJc+YOT5mnrwW
- sjsdoNpSL+9v7jsa20RsW2XxzZkVRzfuRY5S+l2Vk4sj3lkElwNtqAK1jtyfdSHTDruA
- iWrRFLMWaVy14+g5l/2hHKey+B29KiREM47BL/H1/KAg88QciUFhXM5src78Ln8+PWL8 +g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ucyrk02hb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Nov 2023 14:29:57 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AFERdF0031403;
-	Wed, 15 Nov 2023 14:29:57 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ucyrk02gr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Nov 2023 14:29:56 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AFDn6rP031622;
-	Wed, 15 Nov 2023 14:29:56 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uapn1q800-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Nov 2023 14:29:56 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AFETr0f3670638
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 15 Nov 2023 14:29:53 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5910B20040;
-	Wed, 15 Nov 2023 14:29:53 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 27A0B2004B;
-	Wed, 15 Nov 2023 14:29:53 +0000 (GMT)
-Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.155.204.135])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 15 Nov 2023 14:29:53 +0000 (GMT)
-Date: Wed, 15 Nov 2023 15:29:51 +0100
-From: Alexander Gordeev <agordeev@linux.ibm.com>
-To: Tony Krowiak <akrowiak@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, pasic@linux.ibm.com,
-        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com
-Subject: Re: [PATCH v3 0/3] s390/vfio-ap: a couple of corrections to the IRQ
- enablement function
-Message-ID: <ZVTV37wqwu8cDmK7@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
-References: <20231109164427.460493-1-akrowiak@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C80381B6
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 15:09:19 +0000 (UTC)
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEC8A8E
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 07:09:18 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cc56cc8139so11196515ad.0
+        for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 07:09:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1700060958; x=1700665758; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=r39GnHM5bN5YuWeX4taddVxZqZSztKdXAkWyIoY43Wo=;
+        b=2Y16O+5x6Jbce4BxgT6Z+vMDFfRVva3mDQMtTO8/W8t1P7qw1vD94TYr+BBFGmIKih
+         DyDpJtVwhFkXNRfI//1ZLFHNljMLI+4bdT3KT4P2AjPsKdt3qPIADeVNkRyEkY2lhT6W
+         UMju58oifU4eAzkVzDciUHmUJbDVe042sVpmV/ngmjOZgT3DAJ0u9c8O8qgVTBp+J+km
+         Gio6YnCprERGaujNjkVN106T0QmBsuaaBlWCRYzzymbBUoSF1R7SyhH5xUCY6rKtiqdL
+         +g5vixlaY2uocmpuDaGNFcLh/aawLjRgJCz9H3IeNQBBaUPPavGedswcUErYK+Rr4vfa
+         sMRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700060958; x=1700665758;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=r39GnHM5bN5YuWeX4taddVxZqZSztKdXAkWyIoY43Wo=;
+        b=iYwHxOM8rYIlTHgBlE8ENByswfxKh71F6ZJJ462yj0n8WEyW29qpEbiv+Ndh/lOPIJ
+         e9F7Bk8hso2pyjBnP9wxUhCyPQz+Q5ccUAnXQDhnY2PYn3WjUBLg1BdhCO0LYWE0djQR
+         wrC2ayRX87Mx4GEkcPKUhfgL6RbFXMgnFDqZV25Sq/TNV6NsHXq55uFb5Rlqxy4P9nFo
+         V2/7Ng27EIcVwDs5G+QIwBaNOK8cMrK3DWJCBt4enDBwHASr8BexvdgZyfmrCSeShLn8
+         lnFdr9YJK8OcBEL7a7nKM45hFht4K3zlGDe6DZZQ8Arwu4UXKE1lVs7PVQKMkUB1bawW
+         w8cg==
+X-Gm-Message-State: AOJu0YwmJAu0Tq5epNL0hUbziHfeL/8t68imQRaaC655xPajhLKPYzj5
+	X78oxkFHd0THus9NnUI3Uyk1TEFxx1s=
+X-Google-Smtp-Source: AGHT+IG3qu3lFpMuQCfcgeEIlbULEmHkvJwhR5/zE7upNlxp4Rd+jCAiKWz5+AvxCJXFT41oeQkNPes24J4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:4292:b0:1cc:166f:91c8 with SMTP id
+ ju18-20020a170903429200b001cc166f91c8mr1456351plb.1.1700060958209; Wed, 15
+ Nov 2023 07:09:18 -0800 (PST)
+Date: Wed, 15 Nov 2023 07:09:15 -0800
+In-Reply-To: <9395d416-cc5c-536d-641e-ffd971b682d1@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231109164427.460493-1-akrowiak@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: kC2EzW4Z3rmaEjNTgnHdfJe61LQiG1Bv
-X-Proofpoint-ORIG-GUID: jNrMZyKUpeGzijisLF2RKK8DdBJofZSk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-15_13,2023-11-15_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
- bulkscore=0 lowpriorityscore=0 suspectscore=0 spamscore=0 mlxscore=0
- impostorscore=0 mlxlogscore=648 malwarescore=0 clxscore=1011
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311150111
+Mime-Version: 1.0
+References: <20231110235528.1561679-1-seanjc@google.com> <20231110235528.1561679-7-seanjc@google.com>
+ <ffec2e93-cdb1-25e2-06ec-deccf8727ce4@gmail.com> <ZVN6w2Kc2AUmIiJO@google.com>
+ <9395d416-cc5c-536d-641e-ffd971b682d1@gmail.com>
+Message-ID: <ZVTfG6mARiyttuKj@google.com>
+Subject: Re: [PATCH 6/9] KVM: x86: Update guest cpu_caps at runtime for
+ dynamic CPUID-based features
+From: Sean Christopherson <seanjc@google.com>
+To: Robert Hoo <robert.hoo.linux@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Maxim Levitsky <mlevitsk@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Nov 09, 2023 at 11:44:19AM -0500, Tony Krowiak wrote:
-> This series corrects two issues related to enablement of interrupts in 
-> response to interception of the PQAP(AQIC) command:
-...
+On Wed, Nov 15, 2023, Robert Hoo wrote:
+> On 11/14/2023 9:48 PM, Sean Christopherson wrote:
+> > On Mon, Nov 13, 2023, Robert Hoo wrote:
+> ...
+> > > u32 *caps  = vcpu->arch.cpu_caps;
+> > > and update guest_cpu_cap_set(), guest_cpu_cap_clear(),
+> > > guest_cpu_cap_change() and guest_cpu_cap_restrict() to pass in
+> > > vcpu->arch.cpu_caps instead of vcpu, since all of them merely refer to vcpu
+> > > cap, rather than whole vcpu info.
+> > 
+> > No, because then every caller would need extra code to pass
+> > vcpu->cpu_caps,
+> 
+> Emm, I don't understand this. I tried to modified and compiled, all need to
+> do is simply substitute "vcpu" with "vcpu->arch.cpu_caps" in calling. (at
+> the end is my diff based on this patch set)
 
-Hi Tony!
+Yes, and I'm saying that
 
-Via which tree this series is to be pulled?
+	guest_cpu_cap_restrict(vcpu, X86_FEATURE_PAUSEFILTER);
+	guest_cpu_cap_restrict(vcpu, X86_FEATURE_PFTHRESHOLD);
+	guest_cpu_cap_restrict(vcpu, X86_FEATURE_VGIF);
+	guest_cpu_cap_restrict(vcpu, X86_FEATURE_VNMI);
 
-Thanks!
+is harder to read and write than this
+
+	guest_cpu_cap_restrict(vcpu->arch.cpu_caps, X86_FEATURE_PAUSEFILTER);
+	guest_cpu_cap_restrict(vcpu->arch.cpu_caps, X86_FEATURE_PFTHRESHOLD);
+	guest_cpu_cap_restrict(vcpu->arch.cpu_caps, X86_FEATURE_VGIF);
+	guest_cpu_cap_restrict(vcpu->arch.cpu_caps, X86_FEATURE_VNMI);
+
+a one-time search-replace is easy, but the extra boilerplate has a non-zero cost
+for every future developer/reader.
+
+> > and passing 'u32 *' provides less type safety than 'struct kvm_vcpu *'.
+> > That tradeoff isn't worth making this one path slightly easier to read.
+> 
+> My point is also from vulnerability, long term, since as a principle, we'd
+> better pass in param/info to a function of its necessity.
+
+Attempting to apply the principle of least privilege to low level C helpers is
+nonsensical.  E.g. the helper can trivially get at the owning vcpu via container_of()
+(well, if not for typeof assertions not playing nice with arrays, but open coding
+container_of() is also trivial and illustrates the point).
+
+	struct kvm_vcpu_arch *arch = (void *)caps -  offsetof(struct kvm_vcpu_arch, cpu_caps);
+	struct kvm_vcpu *vcpu = container_of(arch, struct kvm_vcpu, arch);
+
+	if (!kvm_cpu_cap_has(x86_feature))
+		guest_cpu_cap_clear(vcpu, x86_feature);
+
+And the intent behind that principle is to improve security/robustness; what I'm
+saying is that passing in a 'u32 *" makes the overall implementation _less_ robust,
+as it opens up the possibilities of passing in an unsafe/incorrect pointer.  E.g.
+a well-intentioned, not _that_ obviously broken example is:
+
+	guest_cpu_cap_restrict(&vcpu->arch.cpu_caps[CPUID_1_ECX], X86_FEATURE_XSAVE);
+
+> e.g. cpuid_entry2_find().
+
+The main reason cpuid_entry2_find() exists is because KVM checks the incoming
+array provided by KVM_SET_CPUID2, which is also the reason why
+__kvm_update_cpuid_runtime() takes an @entries array instead of just @vcpu.
 
