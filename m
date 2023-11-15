@@ -1,259 +1,198 @@
-Return-Path: <kvm+bounces-1707-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1708-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18DAB7EBB0E
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 03:03:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CEF07EBB43
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 03:40:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C34C81F24F87
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 02:03:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F425B20B3C
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 02:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 459ABA55;
-	Wed, 15 Nov 2023 02:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F311A55;
+	Wed, 15 Nov 2023 02:40:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VgdDq2c5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UpglWHD1"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53DE642
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 02:02:55 +0000 (UTC)
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A4F1D6;
-	Tue, 14 Nov 2023 18:02:54 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id 41be03b00d2f7-5bd85b1939aso3981040a12.2;
-        Tue, 14 Nov 2023 18:02:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700013774; x=1700618574; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Id6MwfiB5Pv0ZXowasXpEYmbdbnPyV9LKqTkNMYOdRU=;
-        b=VgdDq2c51h8dbXgW6V4bJ2/jbGECKr/vC8GuqkzTZX8RM9SYxclFSCG4vh7mGz+UH6
-         ErMlldhsQcmfzL/XvN3RPr6s2aQa6ETZU8lss5qWTLUjnKeTLaP65TFjiKzRuDeEYB9o
-         YbuA1taMdK4PrQzEekaV0pM/9pN5Wc3u8TQS7SknRBiFQ9YyJGHpqf9b6Ppb/pMoiAq5
-         vLT960iK7IW+28GLD8l3vSJVtTTny2iKHJduGP6CkhSEDdsIMpnnIWmAc84mUNJHDEXs
-         XYEbBfYUDMYxNQezSInO2WWHYaY/lhpcnx7JRx2/gCqmSwkHDp2nMZ6lhhm0ZzBbcEpH
-         QvIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700013774; x=1700618574;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Id6MwfiB5Pv0ZXowasXpEYmbdbnPyV9LKqTkNMYOdRU=;
-        b=rL2J5eheCfREnAM1qy2tue/OvCxsUMAz3dLAfP1LjEIZqzpD8mYFFx8ATMmQYj7B+I
-         zlEw0kS0LD5sBVws3o0piTKqvrb8U+NdTD2hYBvvFQzKQhQEiJoANiPb8RksWz/XcllO
-         o2FsNa4B3v36CLQ3kwOGLjN5az7gSrHV6A4xDXtsQFwJE1iPt2vizRG1/dVwSkXKqLWa
-         V4qF1JJE1RocqwX6pS1L7coqyyV6U8+0D3YQsX1BRJmPiOvGeB2mEGK6Or8WFtafWWnY
-         J8FYTTiROICoCPIs7YQWQP0WuglmcUGLDUFqIBmH74XrTIH6xw8h/H3sn9VYp2JF1+5q
-         IXlA==
-X-Gm-Message-State: AOJu0Yyln2UA2aEc6tRbhlXKbYsIOYHbv4X+qhxp6tjVKPKGsdSekM67
-	Id7JItjq5VQy8QQu/2/r+c271d+ypdQ=
-X-Google-Smtp-Source: AGHT+IECqFiO91Ny+OyS59YpVdL1lmTnIs1B2YgfSXtT4EjIvM1numDH3Yb/LVXNQ6gNzbxcSMNmww==
-X-Received: by 2002:a17:90b:3886:b0:27d:3ecb:3cbb with SMTP id mu6-20020a17090b388600b0027d3ecb3cbbmr9591264pjb.37.1700013773692;
-        Tue, 14 Nov 2023 18:02:53 -0800 (PST)
-Received: from localhost.localdomain ([129.227.63.229])
-        by smtp.gmail.com with ESMTPSA id z5-20020a1709027e8500b001b8622c1ad2sm6487842pla.130.2023.11.14.18.02.50
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 14 Nov 2023 18:02:53 -0800 (PST)
-From: yaozhenguo <yaozhenguo1@gmail.com>
-X-Google-Original-From: yaozhenguo <yaozhenguo@jd.com>
-To: yaozhenguo@jd.com,
-	dwmw2@infradead.org,
-	baolu.lu@linux.intel.com,
-	joro@8bytes.org,
-	will@kernel.org,
-	robin.murphy@arm.com,
-	alex.williamson@redhat.com
-Cc: iommu@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	Zhenguo Yao <yaozhenguo1@gmail.com>,
-	Wenchao Yao <yaowenchao@jd.com>,
-	ZiHan Zhou <zhouzihan30@jd.com>
-Subject: [PATCH V1] vfio: add attach_group_by_node to control behavior of attaching group to domain
-Date: Wed, 15 Nov 2023 10:02:09 +0800
-Message-Id: <20231115020209.4665-1-yaozhenguo@jd.com>
-X-Mailer: git-send-email 2.32.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE6B644;
+	Wed, 15 Nov 2023 02:39:58 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C529DC4;
+	Tue, 14 Nov 2023 18:39:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700015997; x=1731551997;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=HuiQbswVLftVQT9NLZLk1PHTPXGXM3TfqCieK/uxDYM=;
+  b=UpglWHD1FdoApuoalGlesG47xssdW5Y9H7vgVDhKLtgWxZbKTAm9YHdJ
+   c6WUGVK7QaAvDrpzd0iDlVfQ0mrvOd1j0c0n1DHfF6BLlgthN6jsm3fr1
+   DDPingURpXXm7/Ls5GnLN3f6yEt06hyOejWjQFiJ+KISgBukFeDeEP+Ap
+   wDYAG9aDySsag7aom+HektJerBuOrMnzbHlnDHpnc71/IKvVVH063gP3p
+   IHTYqM3AiQUuHfJZI9CbvQ4rG9qhFs96mnKVn5dr6JcTukYvysFAzkz25
+   o1koHZNkrqhn+X1ItLKbSgrsBp/XNzwc0GqVKTUgsf8/NjCMo/StkePjD
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="370988357"
+X-IronPort-AV: E=Sophos;i="6.03,303,1694761200"; 
+   d="scan'208";a="370988357"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 18:39:57 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="1012122056"
+X-IronPort-AV: E=Sophos;i="6.03,303,1694761200"; 
+   d="scan'208";a="1012122056"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Nov 2023 18:39:57 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Tue, 14 Nov 2023 18:39:56 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Tue, 14 Nov 2023 18:39:56 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Tue, 14 Nov 2023 18:39:56 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Mb38Je/8LxXxs2ymSmrEeQtz4ZRiXiQM4hWepIy00eatt6apvWmRXFcxwQA3oBY3P/tFnnbtoZCtkjVa7VLx4SB2S3cNz0yW/x5j7ptN/9HbNlNEpFehWWdEvVV3/7WdGK4mlKs5NziGneOMQcmSqckvGMEZFrohOPwGSROztcrZj+SVT+2jIn20WEY0oVZ7DhfT7dlisvQ5KO3lMZ5ZfbomXYFmoYw7ga74ZiK+tAGVNLMfP+fadWz5B4l56fa9YJnBv4tNSDB3UIalYTebcMss5ukRXpo57T5JAF6Rz6MIxS5IzDR0Qj6OIwZUSs7GrB0IRIC4+Htng+dqGqhUnA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HuiQbswVLftVQT9NLZLk1PHTPXGXM3TfqCieK/uxDYM=;
+ b=eie86EJNPXo8mv3byZhflxeJ5Qvm5z3d4dUtYbLIyyF8uppVhfKoy9s7oIsniKlaW/0yCNpY1RuLBforVcYLtKJm2kurTOCFYcsgIFAEvsi5vAdYyBb7CXW9gY6cV2nnbUDbQR0930PFZaLkiSyNyT4vSZeuR9mqG2l32TRlZyouT2SkW96ac+O0raMIqa73GMmbCis+dEgnnP8xbCar/JMGJ5bCKT3sO5YfxZ8CnCf9g9D9F6tljs3qleev4Cdiq5hiaM4OmNQl9z4goBeWaN8wxc7bByhunkndqHtlar4rncN2gvNi/5O9IJS/5znm3mGEvKTWozV7JSMKUXDVYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SA1PR11MB6734.namprd11.prod.outlook.com (2603:10b6:806:25d::22)
+ by DS0PR11MB6422.namprd11.prod.outlook.com (2603:10b6:8:c6::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.31; Wed, 15 Nov
+ 2023 02:39:53 +0000
+Received: from SA1PR11MB6734.namprd11.prod.outlook.com
+ ([fe80::3d98:6afd:a4b2:49e3]) by SA1PR11MB6734.namprd11.prod.outlook.com
+ ([fe80::3d98:6afd:a4b2:49e3%7]) with mapi id 15.20.7002.019; Wed, 15 Nov 2023
+ 02:39:53 +0000
+From: "Li, Xin3" <xin3.li@intel.com>
+To: Nikolay Borisov <nik.borisov@suse.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-hyperv@vger.kernel.org"
+	<linux-hyperv@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>
+CC: "seanjc@google.com" <seanjc@google.com>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, "kys@microsoft.com"
+	<kys@microsoft.com>, "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>, "Cui, Dexuan"
+	<decui@microsoft.com>, "tglx@linutronix.de" <tglx@linutronix.de>,
+	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org"
+	<x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "vkuznets@redhat.com"
+	<vkuznets@redhat.com>, "peterz@infradead.org" <peterz@infradead.org>,
+	"Shankar, Ravi V" <ravi.v.shankar@intel.com>
+Subject: RE: [PATCH v1 05/23] KVM: VMX: Initialize FRED VM entry/exit controls
+ in vmcs_config
+Thread-Topic: [PATCH v1 05/23] KVM: VMX: Initialize FRED VM entry/exit
+ controls in vmcs_config
+Thread-Index: AQHaEnXtUpNORx09eEG1bKB7uAQ1LrB4hgCAgAIuZJA=
+Date: Wed, 15 Nov 2023 02:39:53 +0000
+Message-ID: <SA1PR11MB67345334BC2384D0785C8416A8B1A@SA1PR11MB6734.namprd11.prod.outlook.com>
+References: <20231108183003.5981-1-xin3.li@intel.com>
+ <20231108183003.5981-6-xin3.li@intel.com>
+ <9a4b7340-8ff8-426c-b25b-4ec340f96fd5@suse.com>
+In-Reply-To: <9a4b7340-8ff8-426c-b25b-4ec340f96fd5@suse.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR11MB6734:EE_|DS0PR11MB6422:EE_
+x-ms-office365-filtering-correlation-id: 26667d66-385e-4574-0d86-08dbe58425b5
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: uy8FDGik8V9uKQza7CoVIaRfgwYFC5Qb28nUV6b1LRhbEbQq1DkjrLsxFbgCYl2CcJlHxO1ZtEqJPfrim/J/qBoY9wXGYuPvhoAdVqztySvSmtR2ZFdpscuiwdDjw6URKM7B3yiCofFSjKnZ4VEYpTX0gndXj2Hhxn9eB1dTLxhHQUc7rXIRYWytuU8sZ8NNJomdsicXFiDSLRxL7WuHSceRUO31QOjbNnmTp8jHijdCgKo56UXX4fAcvsGYWT/jKJSKO+kOo1vSbzqWKYEFfk4/vsiVWQKcfsXdJy2NEalf+9uAEnTksA2q0KmoubiSTLpNXFyWWudMoVoVXaFc3muNTKOts1GbZMKOkoQBIm60rntgIHj+wz/2xFC8uVKISC0T8JlmrT+TvengM1uqz1+U1ctd/Ex4rVAtyE5gfj+sEWXju0KVO1Ie+bpO8+rHSBR5KJInAsJ79304Y1/mdyBrk1Xi9ou0Wm+GQCZMXdveMhB1e1NXP24KRgB3YVKbSIbWfrPEikUtnYDFVGp9esU6Zd+zwv7brjuHNyDpcdhtHvmXRwAQ3iRSYyI08BjxjE3+ni7GCgneowbOSniGTIZ3OSGAQJmAuQyXLeSbGTsiHCrsZZa9II4P4fCZHfBF
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6734.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(136003)(346002)(366004)(39860400002)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(9686003)(7696005)(6506007)(8936002)(26005)(82960400001)(478600001)(52536014)(4326008)(8676002)(33656002)(86362001)(7416002)(2906002)(4744005)(41300700001)(5660300002)(76116006)(38070700009)(66946007)(66446008)(66556008)(54906003)(66476007)(64756008)(110136005)(316002)(71200400001)(55016003)(38100700002)(122000001)(83380400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?bk1tWkRrYnhrZzZTSVZINXdWTmFrV2twcjF5NnJTa0FHdlJhd3JsM3MrNFB0?=
+ =?utf-8?B?UWZZOGdqajgyNExMbmJ2OG1xQ0hCQTFwWk5WNWJVRlQ0UTNGaS8rVnZiWHhl?=
+ =?utf-8?B?blh4MFowM3l5WHh1eStDY2xCdFI2YmNwUW12WW10YU9TdnBUbDkyd0Y0R1lJ?=
+ =?utf-8?B?UGlWUkFtdktYc2IwamVuQUZkWnExZkJtN3o5YW81ajhIRzdKL29UR0pRZk9r?=
+ =?utf-8?B?Mi9zN3dnRUp3UWlXbjVJeGZ0TTNTY0dnQ1hIbmQ1ZGJZR010UnlBczBWYlVq?=
+ =?utf-8?B?WG9ORjIwNGJSMWpOL3QwSzNOdXV0cW1oU3drQ1hUR1VZT1lUK1dKWld6OVJ5?=
+ =?utf-8?B?d3ZSd1dpOTFPNjFobHFDTGk5eXBQTTdnaFVIZlhhcGk4OVdUL2dnaFFnVW9i?=
+ =?utf-8?B?Z1J2dUFMWG55cHBLMXhZdlc1UzU2NEg2cjFBb0V1Ym04bnFjNTBUNHhDbDBr?=
+ =?utf-8?B?SFRRWksyUHJyaUx6NklSRHNWQjBQL1EwVE52enRGcDFQbml2b0JBU1ZkMnpS?=
+ =?utf-8?B?d0JweXJPK096VmFrYzlEaVpwNkFrUDZIakJxWEIzQ29BK3VFMlhUa216UFRY?=
+ =?utf-8?B?QWlJZkd4RWVubGZ6V3I3VHdFSEs5aFhLejd4ZS91a3J5MTZGa0V6cHViblgr?=
+ =?utf-8?B?NFJ1ckR3QjZhSmpGTFpDSG5TeTFMYlBhdGZORWoyVUc2eWZBVDVzdVpTSi9s?=
+ =?utf-8?B?a29pcE1JMFNWL2p5bmhBUWtWb2lva2N2SEJmQTAybTArWUEvUktvOVhQeU9n?=
+ =?utf-8?B?cGhVN2RXUnhqZjJpZEMzTGVML0U2NldkVm5LajVBRERPc3g0eGpoS2hZeGxj?=
+ =?utf-8?B?Qmt3TWkzMExHZUluWDJuSjh2MWpjbVN4M2NGdDF1d1l5bTYxL1VQOGhXOEIy?=
+ =?utf-8?B?VEFiQ3R2bjlackZTSGFFajY5N2R4L25ta1d3bU5mcElpa0JRV2ZaRzJlbTA4?=
+ =?utf-8?B?ZWxzVjVFUERLSExwc1RvdU9uOWV6UjZpTXVyQzZCeCtDaEhxVmEvM3NzS3dQ?=
+ =?utf-8?B?YUswUkVDQUwrNndVTlp3Uml1SVdxUC90RTVOSlh3QkoxQTJXZG5VN0V6cll4?=
+ =?utf-8?B?N3gyMkdQOGhyY3lyalpvSis5bUpNdjQzODhuSFltRjNZTndiQkpGMUNJZ09C?=
+ =?utf-8?B?SXkvWmRTMUp1N0ZxVU52cklzTjJrRDVNb1hPNG8zbWZZbEdnbGxhUFg2Tk9h?=
+ =?utf-8?B?QzFGZ2RBSSsrR2lhUWU2dzNXSU4yNmVqZklUMTFIbHZ6cnA4YS9hVExxL1ha?=
+ =?utf-8?B?cTNKUDQzNXl0WTAzdThWVzcxYnhoV2RRYyt1ZFNTY05DRFp1aEZJRVFhc0NW?=
+ =?utf-8?B?S0VIOG0xU3V0MzJ1a1gvMUFFU2dTNVd1WGVVdkozNS9ocnV5ajJiTnRFT2Q2?=
+ =?utf-8?B?cE1rYzUxQjBVTVNETGY5VkhRc1Y1dktvYmFEc2o3TVU2Q1FpalFMeERlY0JR?=
+ =?utf-8?B?a01OU3JsWXRzTWJYNldSNnJCZDg1dWFiTzgzbFRxRDIvU1ZiM2M0Q3ZYRnZ0?=
+ =?utf-8?B?UlBkZUtBN2NyL0JtRVoxNkhMS3lKcWJ1dFQ2dy8zWUl2NGtmTWcrNWxJV01r?=
+ =?utf-8?B?blFQVXFxUDdYcURrUjVhbXg0UCtYaG9tellYd2o3L3hxbHJFN1RzL3JqT2Nn?=
+ =?utf-8?B?V0NaM2dPQnltWDBJeHplWFowWEIxN3hGaVlOTFZ5c0lmUDZRWVZ1SXY0bzlr?=
+ =?utf-8?B?ZmpDMlg2dmRPQWlTcnZvWi9zckNxWHZSbVhNZC9nTTFmUW9LdGRXNlZsajNJ?=
+ =?utf-8?B?WElhU3JIYW05UGlwbmlLWnRqQThXVExCNGtWaWwxV1Y1eEZzUFEzdGI1TVdz?=
+ =?utf-8?B?YkpkSDV6ZEVEMm5LZDlmUzdMYW1HTElSQ0dLeUhyNGZSM2xtRGk0VEFjTHlm?=
+ =?utf-8?B?bElrYmVLSStNSGNJbVNUVnBLcFZ6SEtnR3Fkd29LNlZ6UjArcnAxaDFSZ29K?=
+ =?utf-8?B?TGNmMElLemkyUkMvamtLaTFVeCt3UE5DVzBXZitKeEN5THhDdWlURFlMcW5x?=
+ =?utf-8?B?eHhLS2lhRmpmRzZsN3hvUUFGNHNha0ZXYVpyUFNMSkJXYk9ScHlzN3JJM3Zp?=
+ =?utf-8?B?MlFmK3plTE5MLytEK0dXV0J2OWV3UVljZWpsQ2RLcjdpdXIvWTUvNldKMGVi?=
+ =?utf-8?Q?ISn7nyL3J7StM247R6c1/QR5d?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6734.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 26667d66-385e-4574-0d86-08dbe58425b5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Nov 2023 02:39:53.3503
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 8zssfQrRDSRzqNgOvs4MYsKJKzy5LNXwzj3/Mq0S/iFm8RPF/jdRxKrjZwd/zuPRyCCqQAbE0yeXUAjQS6ErjA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6422
+X-OriginatorOrg: intel.com
 
-From: Zhenguo Yao <yaozhenguo1@gmail.com>
-
-Groups will attach to one iommu_domain if ops and enforce_cache_coherency
-are equal. And all the iommu hardware share one pagetable by default.
-There are performance issue in some scenarios. For example:
-Host hardware topopy:
-
-node0 + PCIe RP0 ---+ GPU A100
-      |         |---+ GPU A100
-      |	        |---+ NIC Mellanox CX6
-      |	        |---+ NIC Mellanox CX6
-      + PCIe RP1 ---+ GPU A100
-                |---+ GPU A100
-      	        |---+ NIC Mellanox CX6
-                |---+ NIC Mellanox CX6
-node1 + PCIe RP0 ---+ GPU A100
-      |         |---+ GPU A100
-      |	        |---+ NIC Mellanox CX6
-      |	        |---+ NIC Mellanox CX6
-      + PCIe RP1 ---+ GPU A100
-                |---+ GPU A100
-      	        |---+ NIC Mellanox CX6
-                |---+ NIC Mellanox CX6
-
-We passthrough all NICs and GPU to VM, and emulate host hardware topopy.
-Mellanox CX6 ATS feature is enabled, GPU direct RDMA enabled.
-We test NCCL allreduce in VM at different cases.
-
-Case1: allreduce test use 4nic and 4GPU in numa0.
-Case2：allreduce test use 4nic and 4GPU in numa1.
-case3: allreduce test use 8nic and 8GPU.
-
-the result are below:
-
-|        | algbw (GB/S) |
-| ------ | -------------|
-| case1  | 24           |
-| case2  | 32           |
-| case3  | 45           |
-
-We checked that IOMMU pagetable is allocated in numa1 when VM boot up.
-So, if IOTLB miss happan, IOMMU hardware in numa0 will access remote
-pagetable in numa1. This will drop performance. After apply this patch and
-attach_group_by_node is 1. Group in same node will attach to one domain.
-IOMMU will access there local pagetable. Performance is improved:
-
-|        | algbw (GB/S) |
-| ------ | -------------|
-| case1  | 32           |
-| case2  | 32           |
-| case3  | 63           |
-
-Signed-off-by: Zhenguo Yao <yaozhenguo1@gmail.com>
-Co-developed-by: Wenchao Yao <yaowenchao@jd.com>
-Signed-off-by: Wenchao Yao <yaowenchao@jd.com>
-Co-developed-by: ZiHan Zhou <zhouzihan30@jd.com>
-Signed-off-by: ZiHan Zhou <zhouzihan30@jd.com>
----
- drivers/iommu/intel/iommu.c     |  8 +++++++-
- drivers/vfio/vfio_iommu_type1.c | 33 +++++++++++++++++++++------------
- include/linux/iommu.h           |  1 +
- 3 files changed, 29 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-index 3531b95..2c6d8f0 100644
---- a/drivers/iommu/intel/iommu.c
-+++ b/drivers/iommu/intel/iommu.c
-@@ -569,8 +569,10 @@ void domain_update_iommu_cap(struct dmar_domain *domain)
- 	 * If RHSA is missing, we should default to the device numa domain
- 	 * as fall back.
- 	 */
--	if (domain->nid == NUMA_NO_NODE)
-+	if (domain->nid == NUMA_NO_NODE) {
- 		domain->nid = domain_update_device_node(domain);
-+		domain->domain.nid = domain->nid;
-+	}
- 
- 	/*
- 	 * First-level translation restricts the input-address to a
-@@ -1767,6 +1769,7 @@ static struct dmar_domain *alloc_domain(unsigned int type)
- 		return NULL;
- 
- 	domain->nid = NUMA_NO_NODE;
-+	domain->domain.nid = NUMA_NO_NODE;
- 	if (first_level_by_default(type))
- 		domain->use_first_level = true;
- 	domain->has_iotlb_device = false;
-@@ -1808,6 +1811,8 @@ int domain_attach_iommu(struct dmar_domain *domain, struct intel_iommu *iommu)
- 	info->refcnt	= 1;
- 	info->did	= num;
- 	info->iommu	= iommu;
-+	domain->nid     = iommu->node;
-+	domain->domain.nid     = iommu->node;
- 	curr = xa_cmpxchg(&domain->iommu_array, iommu->seq_id,
- 			  NULL, info, GFP_ATOMIC);
- 	if (curr) {
-@@ -1837,6 +1842,7 @@ void domain_detach_iommu(struct dmar_domain *domain, struct intel_iommu *iommu)
- 		clear_bit(info->did, iommu->domain_ids);
- 		xa_erase(&domain->iommu_array, iommu->seq_id);
- 		domain->nid = NUMA_NO_NODE;
-+		domain->domain.nid = NUMA_NO_NODE;
- 		domain_update_iommu_cap(domain);
- 		kfree(info);
- 	}
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index eacd6ec..6a5641e 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -59,6 +59,11 @@
- module_param_named(dma_entry_limit, dma_entry_limit, uint, 0644);
- MODULE_PARM_DESC(dma_entry_limit,
- 		 "Maximum number of user DMA mappings per container (65535).");
-+static uint attach_group_by_node;
-+module_param_named(attach_group_by_node,
-+		attach_group_by_node, uint, 0644);
-+MODULE_PARM_DESC(attach_group_by_node,
-+		 "Attach group to domain when it's in same node");
- 
- struct vfio_iommu {
- 	struct list_head	domain_list;
-@@ -2287,19 +2292,23 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 		if (d->domain->ops == domain->domain->ops &&
- 		    d->enforce_cache_coherency ==
- 			    domain->enforce_cache_coherency) {
--			iommu_detach_group(domain->domain, group->iommu_group);
--			if (!iommu_attach_group(d->domain,
--						group->iommu_group)) {
--				list_add(&group->next, &d->group_list);
--				iommu_domain_free(domain->domain);
--				kfree(domain);
--				goto done;
--			}
-+			if ((attach_group_by_node == 1 &&
-+				d->domain->nid == domain->domain->nid) ||
-+				attach_group_by_node == 0) {
-+				iommu_detach_group(domain->domain, group->iommu_group);
-+				if (!iommu_attach_group(d->domain,
-+							group->iommu_group)) {
-+					list_add(&group->next, &d->group_list);
-+					iommu_domain_free(domain->domain);
-+					kfree(domain);
-+					goto done;
-+				}
- 
--			ret = iommu_attach_group(domain->domain,
--						 group->iommu_group);
--			if (ret)
--				goto out_domain;
-+				ret = iommu_attach_group(domain->domain,
-+						group->iommu_group);
-+				if (ret)
-+					goto out_domain;
-+			}
- 		}
- 	}
- 
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index ec289c1..c1330ed 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -123,6 +123,7 @@ struct iommu_domain {
- 			int users;
- 		};
- 	};
-+	int nid;
- };
- 
- static inline bool iommu_is_dma_domain(struct iommu_domain *domain)
--- 
-1.8.3.1
-
+PiA+IC0JaWYgKF92bWV4aXRfY29udHJvbCAmIFZNX0VYSVRfQUNUSVZBVEVfU0VDT05EQVJZX0NP
+TlRST0xTKQ0KPiA+ICsJaWYgKF92bWV4aXRfY29udHJvbCAmIFZNX0VYSVRfQUNUSVZBVEVfU0VD
+T05EQVJZX0NPTlRST0xTKSB7DQo+ID4gICAJCV9zZWNvbmRhcnlfdm1leGl0X2NvbnRyb2wgPQ0K
+PiA+DQo+IAlhZGp1c3Rfdm14X2NvbnRyb2xzNjQoS1ZNX09QVElPTkFMX1ZNWF9TRUNPTkRBUllf
+Vk1fRVhJVF9DTw0KPiBOVFJPTFMsDQo+ID4gICAJCQkJCSAgICAgIE1TUl9JQTMyX1ZNWF9FWElU
+X0NUTFMyKTsNCj4gPiArCQlpZiAoY3B1X2ZlYXR1cmVfZW5hYmxlZChYODZfRkVBVFVSRV9GUkVE
+KSAmJg0KPiA+ICsJCSAgICAhKF9zZWNvbmRhcnlfdm1leGl0X2NvbnRyb2wgJg0KPiBTRUNPTkRB
+UllfVk1fRVhJVF9TQVZFX0lBMzJfRlJFRCAmJg0KPiA+ICsJCSAgICAgIF9zZWNvbmRhcnlfdm1l
+eGl0X2NvbnRyb2wgJg0KPiBTRUNPTkRBUllfVk1fRVhJVF9MT0FEX0lBMzJfRlJFRCkpIHsNCj4g
+DQo+IENhbiB0aG9zZSBjaGVja3MgYWN0dWFsbHkgdHJpZ2dlcj8gSS5lIGlmIEZFQVRVUkVfRlJF
+RCBpcyBzZXQgaXQgbWVhbnMNCj4gdGhlIENQVSBpbXBsZW1lbnRzIHRoZSBGUkVEIHNwZWMuIEFj
+Y29yZGluZyB0byB0aGUgc3BlYyBpdCdzIGd1YXJhbnRlZWQNCj4gdGhhdCBWTVhfRVhJVF9DVExT
+MiB3aWxsIGNvbnRhaW4gdGhvc2UgYml0cyBzZXQgdG8gMS4gU28gYXJlbid0IHRob3NlDQo+IGNo
+ZWNrcyBzdXBlcmZsdW91cz8NCg0KU3VjaCBjaGVja3MgYXJlIGZvciBuVk1YIEZSRUQuDQoNCj4g
+PiArCWlmIChjcHVfZmVhdHVyZV9lbmFibGVkKFg4Nl9GRUFUVVJFX0ZSRUQpICYmDQo+ID4gKwkg
+ICAgIShfdm1lbnRyeV9jb250cm9sICYgVk1fRU5UUllfTE9BRF9JQTMyX0ZSRUQpKSB7DQo+IERJ
+VFRPDQo+IA0KPiA8c25pcD4NCg==
 
