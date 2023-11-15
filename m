@@ -1,210 +1,130 @@
-Return-Path: <kvm+bounces-1827-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1828-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F9BF7EC316
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 13:57:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 30D957EC392
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 14:27:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F04BD1F26DEC
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 12:57:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFC401F26ECE
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 13:27:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B40918AE5;
-	Wed, 15 Nov 2023 12:57:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA8631A712;
+	Wed, 15 Nov 2023 13:27:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Snfq2Cof"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a/oJLhc+"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94BA718053
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 12:57:02 +0000 (UTC)
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C16CB109;
-	Wed, 15 Nov 2023 04:57:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=HPjEWIhnSuL1f7Paftq9Sr+qAgNhcC6rAQvLdNO2Hjo=; b=Snfq2CofR7AgtxEF/jzHVtc8n6
-	dylBdVfNE8zwOO/gDzd/NTiavyZ54aOk9rUoS6qLTKHB1FkSucX2xNCtBzeC8O3OyR8Yko/L/OXT0
-	ITFOlahO+Q6TpPQbYmMo+t66jEWjfb/QplPmNB4HiB4FRCRy6lTkQVU1WLVNgRc9LiK+s6OSxfKBe
-	/GQ1fLmZjBhqLbDhINdY5/0mmUrIzYqcDfefUye/ov8V3idJZUWHOYqSQdxDgzZDcEewTPnt/cFVr
-	jl5RpF9ZZKid8zVeLcjhzpHh1auv1Momfv0DI5+1mS/LowQ3LMg8KhGINNslseI3fVOgw2/hoKc9m
-	/ryksRNw==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1r3FRR-0041qC-0g;
-	Wed, 15 Nov 2023 12:56:25 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id D1958300427; Wed, 15 Nov 2023 13:56:24 +0100 (CET)
-Date: Wed, 15 Nov 2023 13:56:24 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>,
-	iommu@lists.linux.dev, Thomas Gleixner <tglx@linutronix.de>,
-	Lu Baolu <baolu.lu@linux.intel.com>, kvm@vger.kernel.org,
-	Dave Hansen <dave.hansen@intel.com>, Joerg Roedel <joro@8bytes.org>,
-	"H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-	Ingo Molnar <mingo@redhat.com>, Raj Ashok <ashok.raj@intel.com>,
-	"Tian, Kevin" <kevin.tian@intel.com>, maz@kernel.org,
-	seanjc@google.com, Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH RFC 09/13] x86/irq: Install posted MSI notification
- handler
-Message-ID: <20231115125624.GF3818@noisy.programming.kicks-ass.net>
-References: <20231112041643.2868316-1-jacob.jun.pan@linux.intel.com>
- <20231112041643.2868316-10-jacob.jun.pan@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62353DDAA
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 13:27:13 +0000 (UTC)
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51A3FA1
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 05:27:12 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-6c334d2fcc5so6783962b3a.0
+        for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 05:27:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1700054832; x=1700659632; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=67VCtaGV/e+lwlaWVR9CnUK5q5agNeqRm+nDDRKAEZQ=;
+        b=a/oJLhc+8u1hy/keGxA5NPp0JULrhJVoRy1ikQCIK6eSYcCg0NLr1oG4tmnt973Wop
+         sZ9SxAfwO6j03IV26rt0JeLRUyERcA0/8VVr8ca2Us12xd6rUzCjmHWlljMPbLxJUWgP
+         PNmg4cKhkMoSbBD5SOgNutWOcMVDINCUg+Pd/MGoyeXmiV0ISo+xyI7f5KwrILT5nBvG
+         eMRZE1SHurgbvnkMrRFco0Q2bgTvg8zxJIZ4o9MUY3aqZXEzDm29mEx3bYj2o6E3PZae
+         1zVNauyCXIUHZCWt7TaVijMdwGcw+WrgTFYFEdREmB5SdUdZmvST0/iPO84BAY7d2r+i
+         umDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700054832; x=1700659632;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=67VCtaGV/e+lwlaWVR9CnUK5q5agNeqRm+nDDRKAEZQ=;
+        b=tH6P3pyj34Z0dQ/WlWxA7MK9LmI3jGGB3/ZQCgwJpuGRpFC/xlk9g341oUN6M9iiLS
+         vBTsnZMFzLgz0UxPaiVR4l3fDQwIuD+Yf2Yamj1sa28XiAOvbGXA/DTweWaSMhEEsJkm
+         j1wdYEPQ0V75o+hq1jE6LLoO2UWu2zL5LNweOeNXe7H47x7q5ZsgylFY5yAn9am33BL/
+         9TBCPmtD6ZUJpCnJdGigiJEad/FPLI+BkySZfi3lHJ4lOc79oVmWpWiEx2+G5QyLuB2Y
+         pjJUS+QJFJ7DGVHfyAvsfcZ2XpZFXNLK+htQfJzb3FhL4w/3zwqZgsbCmJS3Rp7qSb6g
+         d3Tg==
+X-Gm-Message-State: AOJu0YwlTZPT14GHvDmNsyHzVSK2+1X4NR8hlH2+nfNH5QOCstT2nLXs
+	VPkjHV4TgihrxV3TzWvfeNOO6snzWEo=
+X-Google-Smtp-Source: AGHT+IGQR9cTjt05emGJhEyHPqzcgKgeZVrV7cmq3OqY3waoSr8ME/Sjqg2R+aGyNwoMMrIHA0Zvr8M1Dm0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:8b83:b0:6c0:ec5b:bb2d with SMTP id
+ ig3-20020a056a008b8300b006c0ec5bbb2dmr3053306pfb.2.1700054831789; Wed, 15 Nov
+ 2023 05:27:11 -0800 (PST)
+Date: Wed, 15 Nov 2023 05:27:10 -0800
+In-Reply-To: <d377806e-43af-4ac7-8e7a-291fb19a2091@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231112041643.2868316-10-jacob.jun.pan@linux.intel.com>
+Mime-Version: 1.0
+References: <20230914063325.85503-1-weijiang.yang@intel.com>
+ <20230914063325.85503-25-weijiang.yang@intel.com> <ZUHSTEGpdWGjL93M@chao-email>
+ <d377806e-43af-4ac7-8e7a-291fb19a2091@intel.com>
+Message-ID: <ZVTGlLYViK07rE55@google.com>
+Subject: Re: [PATCH v6 24/25] KVM: nVMX: Introduce new VMX_BASIC bit for event
+ error_code delivery to L1
+From: Sean Christopherson <seanjc@google.com>
+To: Weijiang Yang <weijiang.yang@intel.com>
+Cc: Chao Gao <chao.gao@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, dave.hansen@intel.com, peterz@infradead.org, 
+	rick.p.edgecombe@intel.com, john.allen@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Sat, Nov 11, 2023 at 08:16:39PM -0800, Jacob Pan wrote:
+On Wed, Nov 15, 2023, Weijiang Yang wrote:
+> On 11/1/2023 12:21 PM, Chao Gao wrote:
+> > On Thu, Sep 14, 2023 at 02:33:24AM -0400, Yang Weijiang wrote:
+> > > @@ -2846,12 +2846,16 @@ static int nested_check_vm_entry_controls(struct kvm_vcpu *vcpu,
+> > > 		    CC(intr_type == INTR_TYPE_OTHER_EVENT && vector != 0))
+> > > 			return -EINVAL;
+> > > 
+> > > -		/* VM-entry interruption-info field: deliver error code */
+> > > -		should_have_error_code =
+> > > -			intr_type == INTR_TYPE_HARD_EXCEPTION && prot_mode &&
+> > > -			x86_exception_has_error_code(vector);
+> > > -		if (CC(has_error_code != should_have_error_code))
+> > > -			return -EINVAL;
+> > > +		if (!prot_mode || intr_type != INTR_TYPE_HARD_EXCEPTION ||
+> > > +		    !nested_cpu_has_no_hw_errcode_cc(vcpu)) {
+> > > +			/* VM-entry interruption-info field: deliver error code */
+> > > +			should_have_error_code =
+> > > +				intr_type == INTR_TYPE_HARD_EXCEPTION &&
+> > > +				prot_mode &&
+> > > +				x86_exception_has_error_code(vector);
+> > > +			if (CC(has_error_code != should_have_error_code))
+> > > +				return -EINVAL;
+> > > +		}
+> > prot_mode and intr_type are used twice, making the code a little hard to read.
+> > 
+> > how about:
+> > 		/*
+> > 		 * Cannot deliver error code in real mode or if the
+> > 		 * interruption type is not hardware exception. For other
+> > 		 * cases, do the consistency check only if the vCPU doesn't
+> > 		 * enumerate VMX_BASIC_NO_HW_ERROR_CODE_CC.
+> > 		 */
+> > 		if (!prot_mode || intr_type != INTR_TYPE_HARD_EXCEPTION) {
+> > 			if (CC(has_error_code))
+> > 				return -EINVAL;
+> > 		} else if (!nested_cpu_has_no_hw_errcode_cc(vcpu)) {
+> > 			if (CC(has_error_code != x86_exception_has_error_code(vector)))
+> > 				return -EINVAL;
+> > 		}
 
-> +static __always_inline inline void handle_pending_pir(struct pi_desc *pid, struct pt_regs *regs)
-> +{
+Or maybe go one step further and put the nested_cpu_has...() check inside the CC()
+macro so that it too will be captured on error.  It's a little uglier though, and
+I doubt providing that extra information will matter in practice, so definitely
+feel free to stick with Chao's version.
 
-__always_inline means that... (A)
-
-> +	int i, vec = FIRST_EXTERNAL_VECTOR;
-> +	u64 pir_copy[4];
-> +
-> +	/*
-> +	 * Make a copy of PIR which contains IRQ pending bits for vectors,
-> +	 * then invoke IRQ handlers for each pending vector.
-> +	 * If any new interrupts were posted while we are processing, will
-> +	 * do again before allowing new notifications. The idea is to
-> +	 * minimize the number of the expensive notifications if IRQs come
-> +	 * in a high frequency burst.
-> +	 */
-> +	for (i = 0; i < 4; i++)
-> +		pir_copy[i] = raw_atomic64_xchg((atomic64_t *)&pid->pir_l[i], 0);
-> +
-> +	/*
-> +	 * Ideally, we should start from the high order bits set in the PIR
-> +	 * since each bit represents a vector. Higher order bit position means
-> +	 * the vector has higher priority. But external vectors are allocated
-> +	 * based on availability not priority.
-> +	 *
-> +	 * EOI is included in the IRQ handlers call to apic_ack_irq, which
-> +	 * allows higher priority system interrupt to get in between.
-> +	 */
-> +	for_each_set_bit_from(vec, (unsigned long *)&pir_copy[0], 256)
-> +		call_irq_handler(vec, regs);
-> +
-> +}
-> +
-> +/*
-> + * Performance data shows that 3 is good enough to harvest 90+% of the benefit
-> + * on high IRQ rate workload.
-> + * Alternatively, could make this tunable, use 3 as default.
-> + */
-> +#define MAX_POSTED_MSI_COALESCING_LOOP 3
-> +
-> +/*
-> + * For MSIs that are delivered as posted interrupts, the CPU notifications
-> + * can be coalesced if the MSIs arrive in high frequency bursts.
-> + */
-> +DEFINE_IDTENTRY_SYSVEC(sysvec_posted_msi_notification)
-> +{
-> +	struct pt_regs *old_regs = set_irq_regs(regs);
-> +	struct pi_desc *pid;
-> +	int i = 0;
-> +
-> +	pid = this_cpu_ptr(&posted_interrupt_desc);
-> +
-> +	inc_irq_stat(posted_msi_notification_count);
-> +	irq_enter();
-> +
-> +	while (i++ < MAX_POSTED_MSI_COALESCING_LOOP) {
-> +		handle_pending_pir(pid, regs);
-> +
-> +		/*
-> +		 * If there are new interrupts posted in PIR, do again. If
-> +		 * nothing pending, no need to wait for more interrupts.
-> +		 */
-> +		if (is_pir_pending(pid))
-
-So this reads those same 4 words we xchg in handle_pending_pir(), right?
-
-> +			continue;
-> +		else
-> +			break;
-> +	}
-> +
-> +	/*
-> +	 * Clear outstanding notification bit to allow new IRQ notifications,
-> +	 * do this last to maximize the window of interrupt coalescing.
-> +	 */
-> +	pi_clear_on(pid);
-> +
-> +	/*
-> +	 * There could be a race of PI notification and the clearing of ON bit,
-> +	 * process PIR bits one last time such that handling the new interrupts
-> +	 * are not delayed until the next IRQ.
-> +	 */
-> +	if (unlikely(is_pir_pending(pid)))
-> +		handle_pending_pir(pid, regs);
-
-(A) ... we get _two_ copies of that thing in this function. Does that
-make sense ?
-
-> +
-> +	apic_eoi();
-> +	irq_exit();
-> +	set_irq_regs(old_regs);
-> +}
->  #endif /* X86_POSTED_MSI */
-
-Would it not make more sense to write things something like:
-
-bool handle_pending_pir()
-{
-	bool handled = false;
-	u64 pir_copy[4];
-
-	for (i = 0; i < 4; i++) {
-		if (!pid-pir_l[i]) {
-			pir_copy[i] = 0;
-			continue;
+		if (!prot_mode || intr_type != INTR_TYPE_HARD_EXCEPTION) {
+			if (CC(has_error_code))
+				return -EINVAL;
+		} else if (CC(!nested_cpu_has_no_hw_errcode_cc(vcpu) &&
+			      has_error_code != x86_exception_has_error_code(vector))) {
+			return -EINVAL;
 		}
-
-		pir_copy[i] = arch_xchg(&pir->pir_l[i], 0);
-		handled |= true;
-	}
-
-	if (!handled)
-		return handled;
-
-	for_each_set_bit()
-		....
-
-	return handled.
-}
-
-sysvec_posted_blah_blah()
-{
-	bool done = false;
-	bool handled;
-
-	for (;;) {
-		handled = handle_pending_pir();
-		if (done)
-			break;
-		if (!handled || ++loops > MAX_LOOPS) {
-			pi_clear_on(pid);
-			/* once more after clear_on */
-			done = true;
-		}
-	}
-}
-
-
-Hmm?
 
