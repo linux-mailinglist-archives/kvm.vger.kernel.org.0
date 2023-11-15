@@ -1,156 +1,145 @@
-Return-Path: <kvm+bounces-1844-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1845-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 262617ECA72
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 19:22:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EC197ECC2D
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 20:27:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 571481C20966
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 18:22:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C72B1C20B85
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 19:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B69364C0;
-	Wed, 15 Nov 2023 18:22:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B7B41223;
+	Wed, 15 Nov 2023 19:27:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i2jBA2xs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ipjzapR9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5EF5189
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 10:21:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700072516;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=HeQFEWozusee40QxB/6pvxCtDg/+NlX2VLTlztWDahQ=;
-	b=i2jBA2xs+86MggMfyc9zHlLJJ9EFxKmaP0Zv8uK6Gy38l4EVQygZavrm0Ymw7UHQPbVQ3+
-	A5iB6Xeg23AkHeMfJbDSbRB8KWEV73VM6SFDVk1O7yRf1Bf7ILtJ77WkDBtPqGy1WjOmCm
-	3Hu9tpFzk/OQJJoKKFEJQzk6CGJ/zlw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-398-Fs-EC8xHNbqeoEk-2s1nvQ-1; Wed, 15 Nov 2023 13:21:54 -0500
-X-MC-Unique: Fs-EC8xHNbqeoEk-2s1nvQ-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-32f8cb825c5so3373609f8f.2
-        for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 10:21:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700072513; x=1700677313;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HeQFEWozusee40QxB/6pvxCtDg/+NlX2VLTlztWDahQ=;
-        b=Vv+OJZxR+AreqTv8tS6QgS/G9aigTN5XV29y8FvPEbeMXTULJ2lAmbivdB1Fs6eqiG
-         49gqgXfTbRl9hI4dtFjbT+A80fSMsIX0wcnhFJBXuPRjkYQz114M54KeicTCtRYpWQhC
-         qhVS8UbNarMVEW8LIgOrzS1HFbiwi340csWYUJ9zAdlyANDvk6JVloIJj7D87NonxlGC
-         Y0v8TniRi0j+P5kqoq7GKGKgjhhPsNechaLNpECxsQAoKio8HGytGJans8x1Qzv3/Ow6
-         1YKDIRQyrQ8Qqb5t76xWiH945INzplHSN2QX7tkWslNZnKVsv2oBBjhiiyQBzfUXN4SR
-         uu9A==
-X-Gm-Message-State: AOJu0YyQzeP8jC1AxgS8uvQfiaqxnpJ3FIm8DYOTeet/IXy5LwBv+DRZ
-	rQxXwk3HZ766Dewe0BR5jBa3VheA4JvFZG9E6CPOwLDndize6EtuCPl5uXtIipFoQG5HR3cZdKs
-	Lupdzow5l2AML
-X-Received: by 2002:a5d:6e01:0:b0:32f:d88b:2245 with SMTP id h1-20020a5d6e01000000b0032fd88b2245mr9741986wrz.19.1700072513154;
-        Wed, 15 Nov 2023 10:21:53 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGofgoZT7Uag+xp80v+20zBdziueqm0kDtujikG7cglHrm6mgkJMtWQITgS0u0q+GhbiYLmog==
-X-Received: by 2002:a5d:6e01:0:b0:32f:d88b:2245 with SMTP id h1-20020a5d6e01000000b0032fd88b2245mr9741963wrz.19.1700072512727;
-        Wed, 15 Nov 2023 10:21:52 -0800 (PST)
-Received: from ?IPV6:2003:cb:c706:ed00:59ee:f048:4ed9:62a6? (p200300cbc706ed0059eef0484ed962a6.dip0.t-ipconnect.de. [2003:cb:c706:ed00:59ee:f048:4ed9:62a6])
-        by smtp.gmail.com with ESMTPSA id q12-20020a05600000cc00b0032db4e660d9sm11191172wrx.56.2023.11.15.10.21.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Nov 2023 10:21:52 -0800 (PST)
-Message-ID: <24521a5c-beec-4f08-8e89-2a413788bf8b@redhat.com>
-Date: Wed, 15 Nov 2023 19:21:51 +0100
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6FEF1AB;
+	Wed, 15 Nov 2023 11:27:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700076431; x=1731612431;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=I+mMbHRrdn5krrXbIHqhTFESIktjUGAwXJKl6TU3/ec=;
+  b=ipjzapR9PRyq61AZichvhS4svsfE/zIjMAtdfYmZJfi6SN9GdKzipuaU
+   deMjsUdqDCtoIvU21N/7vnoZOg7lJBbF/ZCVmFXXVu0fBC1OlUB/+fPuK
+   Ixj6x7kaZV8S++xx87Ti3flc3OJ63ASaaUdAE0iZ4U8ZzwouVUgD2MEW/
+   rzmQWcG5V0xWPMvrdWZ4+jJKGVO4G0DMLOUO6QL6VP7hU20+Kx3naWjd1
+   X4gdbRW3+M56ix3DPKZ1DjuYYzY7FHmxQlMZ2wm9GU8h87Tzpsjbeaqw9
+   wGqhiWCKJg1m4+bgDHfQEY4GtBWYAgAykKIVrxz748ThLGP3T1PI/vo4l
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="394858927"
+X-IronPort-AV: E=Sophos;i="6.03,305,1694761200"; 
+   d="scan'208";a="394858927"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 11:26:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="882482919"
+X-IronPort-AV: E=Sophos;i="6.03,305,1694761200"; 
+   d="scan'208";a="882482919"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 11:26:50 -0800
+Date: Wed, 15 Nov 2023 11:26:50 -0800
+From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+Cc: "isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"sathyanarayanan.kuppuswamy@linux.intel.com" <sathyanarayanan.kuppuswamy@linux.intel.com>,
+	"Hansen, Dave" <dave.hansen@intel.com>,
+	"david@redhat.com" <david@redhat.com>,
+	"bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+	"Luck, Tony" <tony.luck@intel.com>,
+	"ak@linux.intel.com" <ak@linux.intel.com>,
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"mingo@redhat.com" <mingo@redhat.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"nik.borisov@suse.com" <nik.borisov@suse.com>,
+	"hpa@zytor.com" <hpa@zytor.com>,
+	"peterz@infradead.org" <peterz@infradead.org>,
+	"Shahar, Sagi" <sagis@google.com>,
+	"imammedo@redhat.com" <imammedo@redhat.com>,
+	"bp@alien8.de" <bp@alien8.de>, "Gao, Chao" <chao.gao@intel.com>,
+	"rafael@kernel.org" <rafael@kernel.org>,
+	"Brown, Len" <len.brown@intel.com>,
+	"Huang, Ying" <ying.huang@intel.com>,
+	"Williams, Dan J" <dan.j.williams@intel.com>,
+	"x86@kernel.org" <x86@kernel.org>
+Subject: Re: [PATCH v15 05/23] x86/virt/tdx: Handle SEAMCALL no entropy error
+ in common code
+Message-ID: <20231115192650.GB1109547@ls.amr.corp.intel.com>
+References: <cover.1699527082.git.kai.huang@intel.com>
+ <9565b2ccc347752607039e036fd8d19d78401b53.1699527082.git.kai.huang@intel.com>
+ <20231114192447.GA1109547@ls.amr.corp.intel.com>
+ <63e9754ec059190cd1734650b8968952cbe00ee9.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 08/70] physmem: replace function name with __func__ in
- ram_block_discard_range()
-Content-Language: en-US
-To: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Michael Roth <michael.roth@amd.com>, Sean Christopherson
- <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>,
- Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
- <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
-References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
- <20231115071519.2864957-9-xiaoyao.li@intel.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20231115071519.2864957-9-xiaoyao.li@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <63e9754ec059190cd1734650b8968952cbe00ee9.camel@intel.com>
 
-On 15.11.23 08:14, Xiaoyao Li wrote:
-> Use __func__ to avoid hard-coded function name.
+On Wed, Nov 15, 2023 at 10:41:46AM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
+
 > 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
+> > > +#include <asm/archrandom.h>
+> > > +
+> > > +typedef u64 (*sc_func_t)(u64 fn, struct tdx_module_args *args);
+> > > +
+> > > +static inline u64 sc_retry(sc_func_t func, u64 fn,
+> > > +			   struct tdx_module_args *args)
+> > > +{
+> > > +	int retry = RDRAND_RETRY_LOOPS;
+> > > +	u64 ret;
+> > > +
+> > > +	do {
+> > > +		ret = func(fn, args);
+> > > +	} while (ret == TDX_RND_NO_ENTROPY && --retry);
+> > 
+> > This loop assumes that args isn't touched when TDX_RND_NO_ENTRYPOY is returned.
+> > It's not true.  TDH.SYS.INIT() and TDH.SYS.LP.INIT() clear RCX, RDX, etc on
+> > error including TDX_RND_NO_ENTRY.  Because TDH.SYS.INIT() takes RCX as input,
+> > this wrapper doesn't work.  TDH.SYS.LP.INIT() doesn't use RCX, RDX ... as
+> > input. So it doesn't matter.
+> > 
+> > Other SEAMCALLs doesn't touch registers on the no entropy error.
+> > TDH.EXPORTS.STATE.IMMUTABLE(), TDH.IMPORTS.STATE.IMMUTABLE(), TDH.MNG.ADDCX(),
+> > and TDX.MNG.CREATE().  TDH.SYS.INIT() is an exception.
+> 
+> If I am reading the spec (TDX module 1.5 ABI) correctly the TDH.SYS.INIT doesn't
+> return TDX_RND_NO_ENTROPY.
 
-That can be queued independently.
+The next updated spec would fix it.
+                                  
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+> TDH.SYS.LP.INIT indeed can return NO_ENTROPY but as
+> you said it doesn't take any register as input.  So technically the code works
+> fine.  (Even the TDH.SYS.INIT can return NO_ENTROPY the code still works fine
+> because the RCX must be 0 for TDH.SYS.INIT.)
 
+Ah yes, I agree with you. So it doesn't matter.
+
+
+> Also, I can hardly think out of any reason why TDX module needs to clobber input
+> registers in case of NO_ENTROPY for *ANY* SEAMCALL.  But despite that, I am not
+> opposing the idea that it *MIGHT* be better to "not assume" NO_ENTROPY will
+> never clobber registers either, e.g., for the sake of future extendibility.  In
+> this case, the below diff should address:
+
+Now we agreed that TDH.SYS.INIT() and TDH.SYS.LP.INIT() doesn't matter,
+I'm fine with this patch. (TDX KVM handles other SEAMCALLS itself.)
+
+Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
 -- 
-Cheers,
-
-David / dhildenb
-
+Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
