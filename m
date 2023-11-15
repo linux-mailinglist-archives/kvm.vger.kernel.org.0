@@ -1,293 +1,185 @@
-Return-Path: <kvm+bounces-1808-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1810-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19B3C7EBF86
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 10:32:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 289847EC03B
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 11:07:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EF411C20983
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 09:32:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFADD2813C9
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 10:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D7C5BA30;
-	Wed, 15 Nov 2023 09:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7D4C2EE;
+	Wed, 15 Nov 2023 10:07:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Xsv4uvfV"
 X-Original-To: kvm@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F336AB3
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 09:32:24 +0000 (UTC)
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 68F39116;
-	Wed, 15 Nov 2023 01:32:22 -0800 (PST)
-Received: from loongson.cn (unknown [10.2.5.185])
-	by gateway (Coremail) with SMTP id _____8BxXeskkFRlZTw6AA--.44269S3;
-	Wed, 15 Nov 2023 17:32:20 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.185])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Bx7twhkFRlq99CAA--.16093S4;
-	Wed, 15 Nov 2023 17:32:19 +0800 (CST)
-From: Tianrui Zhao <zhaotianrui@loongson.cn>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	loongarch@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>,
-	Mark Brown <broonie@kernel.org>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	maobibo@loongson.cn,
-	Xi Ruoyao <xry111@xry111.site>,
-	zhaotianrui@loongson.cn
-Subject: [PATCH v1 2/2] LoongArch: KVM: Add lasx support
-Date: Wed, 15 Nov 2023 17:19:21 +0800
-Message-Id: <20231115091921.85516-3-zhaotianrui@loongson.cn>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20231115091921.85516-1-zhaotianrui@loongson.cn>
-References: <20231115091921.85516-1-zhaotianrui@loongson.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B315946F
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 10:07:26 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11622C2;
+	Wed, 15 Nov 2023 02:07:24 -0800 (PST)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AFA4hoO004916;
+	Wed, 15 Nov 2023 10:07:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=RZrIIkGaAtl81QDB9c1wbYZafzw8AFUDCqnj2zs0/3k=;
+ b=Xsv4uvfVVKx26gP875au9Hex91+Zp5HKCv66xI+IpZD12wSsL/6yTPPrLhj4Yh19kDIO
+ 9teVwNAfIsxaEdqh2thg6XxFxTa7oM+vWbQesVKnHAOQzytYVdqUe1HEmjIBAOmK+mL1
+ 8JRTFY8z1wJFAMev7CX6kKiYp/fQsSi6TQ8WGSRbjAJcl1ohr+0k22Kbyz5J1cm4gsej
+ sYEe0rnmEOsHlM+1bWcbUwy9XlOG/8BNhC4rh5pgakktty4IylwlOJh4C8RSRuawGV5O
+ e0MrQvq+R7va4Ajff/qN6+wa0SUD3pUxcFEu7X9ytD2o2Vaq7Y7QPhyf8CIg7fnw6kpB 9Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ucuwr846b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Nov 2023 10:07:23 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AFA55G1006959;
+	Wed, 15 Nov 2023 10:07:23 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ucuwr845k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Nov 2023 10:07:23 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AF815h4023942;
+	Wed, 15 Nov 2023 10:07:23 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uamayekes-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Nov 2023 10:07:22 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AFA7JwG22479530
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 15 Nov 2023 10:07:19 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7945C20070;
+	Wed, 15 Nov 2023 10:07:19 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 51CC120071;
+	Wed, 15 Nov 2023 10:07:19 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 15 Nov 2023 10:07:19 +0000 (GMT)
+Date: Wed, 15 Nov 2023 11:07:17 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Nico Boehr <nrb@linux.ibm.com>
+Cc: frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v1] s390x: cmm: test no-translate bit
+ after reset
+Message-ID: <20231115110717.7d0f29a9@p-imbrenda>
+In-Reply-To: <20231115083848.17803-1-nrb@linux.ibm.com>
+References: <20231115083848.17803-1-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+Content-Type: text/plain; charset=US-ASCII
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: YHnXllp4kzfw5AJerKyzi3P62MHo0Fxp
+X-Proofpoint-ORIG-GUID: 3_zRYtv7WDW5_VDkAnGdBIU24Re6ctg3
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Bx7twhkFRlq99CAA--.16093S4
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
-	nUUI43ZEXa7xR_UUUUUUUUU==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-15_08,2023-11-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ priorityscore=1501 mlxscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0
+ adultscore=0 suspectscore=0 malwarescore=0 mlxlogscore=999 clxscore=1015
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311150076
 
-This patch adds LASX support for LoongArch KVM. The LASX means 
-LoongArch 256-bits vector instruction. 
-There will be LASX exception in KVM when guest use the LASX 
-instruction. KVM will enable LASX and restore the vector 
-registers for guest then return to guest to continue running.
+On Wed, 15 Nov 2023 09:38:32 +0100
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
----
- arch/loongarch/include/asm/kvm_host.h |  6 ++++
- arch/loongarch/include/asm/kvm_vcpu.h | 10 +++++++
- arch/loongarch/kernel/fpu.S           |  1 +
- arch/loongarch/kvm/exit.c             | 18 +++++++++++
- arch/loongarch/kvm/switch.S           | 16 ++++++++++
- arch/loongarch/kvm/trace.h            |  4 ++-
- arch/loongarch/kvm/vcpu.c             | 43 ++++++++++++++++++++++++++-
- 7 files changed, 96 insertions(+), 2 deletions(-)
+> KVM did not properly reset the no-translate bit after reset, see
+> https://lore.kernel.org/kvm/20231109123624.37314-1-imbrenda@linux.ibm.com/
+> 
+> Add a test which performs a load normal reset (includes a subsystem
+> reset) and verify that this clears the no-translate bit.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>  s390x/cmm.c | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+> 
+> diff --git a/s390x/cmm.c b/s390x/cmm.c
+> index af852838851e..8f10c107d81b 100644
+> --- a/s390x/cmm.c
+> +++ b/s390x/cmm.c
+> @@ -9,6 +9,7 @@
+>   */
+>  
+>  #include <libcflat.h>
+> +#include <bitops.h>
+>  #include <asm/asm-offsets.h>
+>  #include <asm/interrupt.h>
+>  #include <asm/page.h>
+> @@ -16,6 +17,8 @@
+>  
+>  static uint8_t pagebuf[PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
+>  
+> +extern int diag308_load_reset(u64);
+> +
+>  static void test_params(void)
+>  {
+>  	report_prefix_push("invalid ORC 8");
+> @@ -35,6 +38,26 @@ static void test_priv(void)
+>  	report_prefix_pop();
+>  }
+>  
+> +static void test_reset_no_translate(void)
+> +{
+> +	unsigned long state;
+> +	const uint64_t mask_no_translate = BIT(63 - 58);
 
-diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
-index 6c65c25169..4c05b5eca0 100644
---- a/arch/loongarch/include/asm/kvm_host.h
-+++ b/arch/loongarch/include/asm/kvm_host.h
-@@ -95,6 +95,7 @@ enum emulation_result {
- #define KVM_LARCH_SWCSR_LATEST	(0x1 << 1)
- #define KVM_LARCH_HWCSR_USABLE	(0x1 << 2)
- #define KVM_LARCH_LSX		(0x1 << 3)
-+#define KVM_LARCH_LASX		(0x1 << 4)
- 
- struct kvm_vcpu_arch {
- 	/*
-@@ -181,6 +182,11 @@ static inline bool kvm_guest_has_lsx(struct kvm_vcpu_arch *arch)
- 	return arch->cpucfg[2] & CPUCFG2_LSX;
- }
- 
-+static inline bool kvm_guest_has_lasx(struct kvm_vcpu_arch *arch)
-+{
-+	return arch->cpucfg[2] & CPUCFG2_LASX;
-+}
-+
- /* Debug: dump vcpu state */
- int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/loongarch/include/asm/kvm_vcpu.h b/arch/loongarch/include/asm/kvm_vcpu.h
-index c629771e12..4f87f16018 100644
---- a/arch/loongarch/include/asm/kvm_vcpu.h
-+++ b/arch/loongarch/include/asm/kvm_vcpu.h
-@@ -67,6 +67,16 @@ static inline void kvm_restore_lsx(struct loongarch_fpu *fpu) { }
- static inline void kvm_restore_lsx_upper(struct loongarch_fpu *fpu) { }
- #endif
- 
-+#ifdef CONFIG_CPU_HAS_LASX
-+void kvm_own_lasx(struct kvm_vcpu *vcpu);
-+void kvm_save_lasx(struct loongarch_fpu *fpu);
-+void kvm_restore_lasx(struct loongarch_fpu *fpu);
-+#else
-+static inline void kvm_own_lasx(struct kvm_vcpu *vcpu) { }
-+static inline void kvm_save_lasx(struct loongarch_fpu *fpu) { }
-+static inline void kvm_restore_lasx(struct loongarch_fpu *fpu) { }
-+#endif
-+
- void kvm_acquire_timer(struct kvm_vcpu *vcpu);
- void kvm_init_timer(struct kvm_vcpu *vcpu, unsigned long hz);
- void kvm_reset_timer(struct kvm_vcpu *vcpu);
-diff --git a/arch/loongarch/kernel/fpu.S b/arch/loongarch/kernel/fpu.S
-index d53ab10f46..f4524fe866 100644
---- a/arch/loongarch/kernel/fpu.S
-+++ b/arch/loongarch/kernel/fpu.S
-@@ -384,6 +384,7 @@ SYM_FUNC_START(_restore_lasx_upper)
- 	lasx_restore_all_upper a0 t0 t1
- 	jr	ra
- SYM_FUNC_END(_restore_lasx_upper)
-+EXPORT_SYMBOL(_restore_lasx_upper)
- 
- SYM_FUNC_START(_init_lasx_upper)
- 	lasx_init_all_upper t1
-diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
-index 1b1c58ccc8..57bd5bf562 100644
---- a/arch/loongarch/kvm/exit.c
-+++ b/arch/loongarch/kvm/exit.c
-@@ -676,6 +676,23 @@ static int kvm_handle_lsx_disabled(struct kvm_vcpu *vcpu)
- 	return RESUME_GUEST;
- }
- 
-+/*
-+ * kvm_handle_lasx_disabled() - Guest used LASX while disabled in root.
-+ * @vcpu:	Virtual CPU context.
-+ *
-+ * Handle when the guest attempts to use LASX when it is disabled in the root
-+ * context.
-+ */
-+static int kvm_handle_lasx_disabled(struct kvm_vcpu *vcpu)
-+{
-+	if (!kvm_guest_has_lasx(&vcpu->arch))
-+		kvm_queue_exception(vcpu, EXCCODE_INE, 0);
-+	else
-+		kvm_own_lasx(vcpu);
-+
-+	return RESUME_GUEST;
-+}
-+
- /*
-  * LoongArch KVM callback handling for unimplemented guest exiting
-  */
-@@ -705,6 +722,7 @@ static exit_handle_fn kvm_fault_tables[EXCCODE_INT_START] = {
- 	[EXCCODE_TLBM]			= kvm_handle_write_fault,
- 	[EXCCODE_FPDIS]			= kvm_handle_fpu_disabled,
- 	[EXCCODE_LSXDIS]                = kvm_handle_lsx_disabled,
-+	[EXCCODE_LASXDIS]               = kvm_handle_lasx_disabled,
- 	[EXCCODE_GSPR]			= kvm_handle_gspr,
- };
- 
-diff --git a/arch/loongarch/kvm/switch.S b/arch/loongarch/kvm/switch.S
-index 32ba092a44..a129f8e82c 100644
---- a/arch/loongarch/kvm/switch.S
-+++ b/arch/loongarch/kvm/switch.S
-@@ -267,6 +267,22 @@ SYM_FUNC_START(kvm_restore_lsx_upper)
- SYM_FUNC_END(kvm_restore_lsx_upper)
- #endif
- 
-+#ifdef CONFIG_CPU_HAS_LASX
-+SYM_FUNC_START(kvm_save_lasx)
-+	fpu_save_csr    a0 t1
-+	fpu_save_cc     a0 t1 t2
-+	lasx_save_data  a0 t1
-+
-+	jirl            zero, ra, 0
-+SYM_FUNC_END(kvm_save_lasx)
-+
-+SYM_FUNC_START(kvm_restore_lasx)
-+	lasx_restore_data a0 t1
-+	fpu_restore_cc    a0 t1 t2
-+	fpu_restore_csr   a0 t1
-+	jirl    zero, ra, 0
-+SYM_FUNC_END(kvm_restore_lasx)
-+#endif
- 	.section ".rodata"
- SYM_DATA(kvm_exception_size, .quad kvm_exc_entry_end - kvm_exc_entry)
- SYM_DATA(kvm_enter_guest_size, .quad kvm_enter_guest_end - kvm_enter_guest)
-diff --git a/arch/loongarch/kvm/trace.h b/arch/loongarch/kvm/trace.h
-index 7da4e230e8..c2484ad4cf 100644
---- a/arch/loongarch/kvm/trace.h
-+++ b/arch/loongarch/kvm/trace.h
-@@ -103,6 +103,7 @@ TRACE_EVENT(kvm_exit_gspr,
- 
- #define KVM_TRACE_AUX_FPU		1
- #define KVM_TRACE_AUX_LSX		2
-+#define KVM_TRACE_AUX_LASX		3
- 
- #define kvm_trace_symbol_aux_op				\
- 	{ KVM_TRACE_AUX_SAVE,		"save" },	\
-@@ -113,7 +114,8 @@ TRACE_EVENT(kvm_exit_gspr,
- 
- #define kvm_trace_symbol_aux_state			\
- 	{ KVM_TRACE_AUX_FPU,     "FPU" },		\
--	{ KVM_TRACE_AUX_LSX,     "LSX" }
-+	{ KVM_TRACE_AUX_LSX,     "LSX" },		\
-+	{ KVM_TRACE_AUX_LASX,    "LASX" }
- 
- TRACE_EVENT(kvm_aux,
- 	    TP_PROTO(struct kvm_vcpu *vcpu, unsigned int op,
-diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-index f0bb583353..204654a359 100644
---- a/arch/loongarch/kvm/vcpu.c
-+++ b/arch/loongarch/kvm/vcpu.c
-@@ -384,6 +384,10 @@ static int kvm_set_one_reg(struct kvm_vcpu *vcpu,
- 				vcpu->arch.cpucfg[id] &= ~CPUCFG2_LSX;
- 				ret = -EINVAL;
- 			}
-+			if (id == 2 && v & CPUCFG2_LASX && !cpu_has_lasx) {
-+				vcpu->arch.cpucfg[id] &= ~CPUCFG2_LASX;
-+				ret = -EINVAL;
-+			}
- 		} else
- 			ret = -EINVAL;
- 		break;
-@@ -595,12 +599,49 @@ void kvm_own_lsx(struct kvm_vcpu *vcpu)
- }
- #endif
- 
-+#ifdef CONFIG_CPU_HAS_LASX
-+/* Enable LASX for guest and restore context */
-+void kvm_own_lasx(struct kvm_vcpu *vcpu)
-+{
-+	preempt_disable();
-+
-+	set_csr_euen(CSR_EUEN_FPEN | CSR_EUEN_LSXEN | CSR_EUEN_LASXEN);
-+	switch (vcpu->arch.aux_inuse & (KVM_LARCH_FPU | KVM_LARCH_LSX)) {
-+	case KVM_LARCH_LSX | KVM_LARCH_FPU:
-+	case KVM_LARCH_LSX:
-+		/* Guest LSX state already loaded, only restore upper LASX state */
-+		_restore_lasx_upper(&vcpu->arch.fpu);
-+		break;
-+	case KVM_LARCH_FPU:
-+		/* Guest FP state already loaded, only restore 64~256 LASX state */
-+		kvm_restore_lsx_upper(&vcpu->arch.fpu);
-+		_restore_lasx_upper(&vcpu->arch.fpu);
-+		break;
-+	default:
-+		/* Neither FP or LSX already active, restore full LASX state */
-+		kvm_restore_lasx(&vcpu->arch.fpu);
-+		break;
-+	}
-+
-+	trace_kvm_aux(vcpu, KVM_TRACE_AUX_RESTORE, KVM_TRACE_AUX_LASX);
-+	vcpu->arch.aux_inuse |= KVM_LARCH_LASX | KVM_LARCH_LSX | KVM_LARCH_FPU;
-+	preempt_enable();
-+}
-+#endif
-+
- /* Save context and disable FPU */
- void kvm_lose_fpu(struct kvm_vcpu *vcpu)
- {
- 	preempt_disable();
- 
--	if (vcpu->arch.aux_inuse & KVM_LARCH_LSX) {
-+	if (vcpu->arch.aux_inuse & KVM_LARCH_LASX) {
-+		kvm_save_lasx(&vcpu->arch.fpu);
-+		vcpu->arch.aux_inuse &= ~(KVM_LARCH_LSX | KVM_LARCH_FPU | KVM_LARCH_LASX);
-+		trace_kvm_aux(vcpu, KVM_TRACE_AUX_SAVE, KVM_TRACE_AUX_LASX);
-+
-+		/* Disable LASX & LSX & FPU */
-+		clear_csr_euen(CSR_EUEN_FPEN | CSR_EUEN_LSXEN | CSR_EUEN_LASXEN);
-+	} else if (vcpu->arch.aux_inuse & KVM_LARCH_LSX) {
- 		kvm_save_lsx(&vcpu->arch.fpu);
- 		vcpu->arch.aux_inuse &= ~(KVM_LARCH_LSX | KVM_LARCH_FPU);
- 		trace_kvm_aux(vcpu, KVM_TRACE_AUX_SAVE, KVM_TRACE_AUX_LSX);
--- 
-2.39.1
+reverse Christmas tree, please :)
+
+also, maybe it's easier to read with just a numeric constant? i.e. 0x20 
+
+
+with the Christmas tree fixed (with or without numeric constant):
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Tested-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+
+> +
+> +	report_prefix_push("reset no-translate");
+> +	essa(ESSA_SET_STABLE_NODAT, (unsigned long)pagebuf);
+> +
+> +	state = essa(ESSA_GET_STATE, (unsigned long)pagebuf);
+> +	report(state & mask_no_translate, "no-translate bit set before reset");
+> +
+> +	/* Load normal reset - includes subsystem reset */
+> +	diag308_load_reset(1);
+> +
+> +	state = essa(ESSA_GET_STATE, (unsigned long)pagebuf);
+> +	report(!(state & mask_no_translate), "no-translate bit unset after reset");
+> +
+> +	report_prefix_pop();
+> +}
+> +
+>  int main(void)
+>  {
+>  	bool has_essa = check_essa_available();
+> @@ -47,6 +70,7 @@ int main(void)
+>  
+>  	test_priv();
+>  	test_params();
+> +	test_reset_no_translate();
+>  done:
+>  	report_prefix_pop();
+>  	return report_summary();
 
 
