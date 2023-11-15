@@ -1,67 +1,67 @@
-Return-Path: <kvm+bounces-1843-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1844-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A625A7ECA6D
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 19:20:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 262617ECA72
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 19:22:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDF6F1C20B48
-	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 18:20:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 571481C20966
+	for <lists+kvm@lfdr.de>; Wed, 15 Nov 2023 18:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30B62364B6;
-	Wed, 15 Nov 2023 18:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B69364C0;
+	Wed, 15 Nov 2023 18:22:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QshAZ26Y"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i2jBA2xs"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6803218B
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 10:20:29 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5EF5189
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 10:21:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700072428;
+	s=mimecast20190719; t=1700072516;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=HD4icerkSXDuFzc3QWH2GfX4IZAoWdNJxuLXkU5j7lg=;
-	b=QshAZ26Y+efqKLdYhuc8P/t/LbEF/e6dv4RvXFy74Q+sDrfvhpK2ItfLA+DCSIHMiio3X4
-	CrpymM9wrdhZIStb8vPtk7obuQthpbd8p/d0FB5VEKjmUsiOwhE/IbZYvcvYiWE65elEOw
-	BsWuNbGLzYqhRUlwjXnpRa7Bo7Y0poI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=HeQFEWozusee40QxB/6pvxCtDg/+NlX2VLTlztWDahQ=;
+	b=i2jBA2xs+86MggMfyc9zHlLJJ9EFxKmaP0Zv8uK6Gy38l4EVQygZavrm0Ymw7UHQPbVQ3+
+	A5iB6Xeg23AkHeMfJbDSbRB8KWEV73VM6SFDVk1O7yRf1Bf7ILtJ77WkDBtPqGy1WjOmCm
+	3Hu9tpFzk/OQJJoKKFEJQzk6CGJ/zlw=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-352-CgMt-UbSPgei3Hv8PitQYA-1; Wed, 15 Nov 2023 13:20:27 -0500
-X-MC-Unique: CgMt-UbSPgei3Hv8PitQYA-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-32de9f93148so3581408f8f.2
-        for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 10:20:26 -0800 (PST)
+ us-mta-398-Fs-EC8xHNbqeoEk-2s1nvQ-1; Wed, 15 Nov 2023 13:21:54 -0500
+X-MC-Unique: Fs-EC8xHNbqeoEk-2s1nvQ-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-32f8cb825c5so3373609f8f.2
+        for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 10:21:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700072426; x=1700677226;
+        d=1e100.net; s=20230601; t=1700072513; x=1700677313;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HD4icerkSXDuFzc3QWH2GfX4IZAoWdNJxuLXkU5j7lg=;
-        b=gJcWcJkoxkhUn/XR4TvEDlZnNunexXm91o6IMHWBO3/rYnVfRB3O8R1mK+DWIYzyLu
-         8QnZ2IzJCW5tFLni4BnHCEogoO0jr6SrdMjnifcCP+QDxpQjOIkDlaWRDuOy/FG1NmyS
-         lFK3emC8bUtAuTXQ6FYUD0S/4mNJsz7Us85RcF5DPqAyJ6I+RItinC0lBKHCqrnVKwL/
-         COamIE+1NJivXdWgXy0WtIB/UqyrC1yKqQWEEQHL34Em4r6A09s41EvlPoqPoiHLRGoF
-         lD/ILThwJvFDskBpeRSOHM9/PQZ5ePEu3iS0fFdYrdTvodZFSkbEdn1IEhStYrLaHE0P
-         szyA==
-X-Gm-Message-State: AOJu0YwmAFkYIVPTl22CXSCrHh5zYQrHDWmbul5cyJnSxkQDQp6F6MPq
-	qCyW15gZiqjVLt5ZACh4fZiEu4GtcCJZuXC2Iu5dnQi0bAuYhpYSF6OVsUc6IpR7UcCKca2VBRm
-	vV8H6Ot8hDUGA
-X-Received: by 2002:a05:6000:118c:b0:32d:ad44:cec1 with SMTP id g12-20020a056000118c00b0032dad44cec1mr117148wrx.3.1700072425872;
-        Wed, 15 Nov 2023 10:20:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGJCugW+hQi7qzlMw2hTAONeHHw9A9gBgxuyLctoWXex0jnCqanMmOlxqGmmLzJyUeTvQyfcw==
-X-Received: by 2002:a05:6000:118c:b0:32d:ad44:cec1 with SMTP id g12-20020a056000118c00b0032dad44cec1mr117121wrx.3.1700072425424;
-        Wed, 15 Nov 2023 10:20:25 -0800 (PST)
+        bh=HeQFEWozusee40QxB/6pvxCtDg/+NlX2VLTlztWDahQ=;
+        b=Vv+OJZxR+AreqTv8tS6QgS/G9aigTN5XV29y8FvPEbeMXTULJ2lAmbivdB1Fs6eqiG
+         49gqgXfTbRl9hI4dtFjbT+A80fSMsIX0wcnhFJBXuPRjkYQz114M54KeicTCtRYpWQhC
+         qhVS8UbNarMVEW8LIgOrzS1HFbiwi340csWYUJ9zAdlyANDvk6JVloIJj7D87NonxlGC
+         Y0v8TniRi0j+P5kqoq7GKGKgjhhPsNechaLNpECxsQAoKio8HGytGJans8x1Qzv3/Ow6
+         1YKDIRQyrQ8Qqb5t76xWiH945INzplHSN2QX7tkWslNZnKVsv2oBBjhiiyQBzfUXN4SR
+         uu9A==
+X-Gm-Message-State: AOJu0YyQzeP8jC1AxgS8uvQfiaqxnpJ3FIm8DYOTeet/IXy5LwBv+DRZ
+	rQxXwk3HZ766Dewe0BR5jBa3VheA4JvFZG9E6CPOwLDndize6EtuCPl5uXtIipFoQG5HR3cZdKs
+	Lupdzow5l2AML
+X-Received: by 2002:a5d:6e01:0:b0:32f:d88b:2245 with SMTP id h1-20020a5d6e01000000b0032fd88b2245mr9741986wrz.19.1700072513154;
+        Wed, 15 Nov 2023 10:21:53 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGofgoZT7Uag+xp80v+20zBdziueqm0kDtujikG7cglHrm6mgkJMtWQITgS0u0q+GhbiYLmog==
+X-Received: by 2002:a5d:6e01:0:b0:32f:d88b:2245 with SMTP id h1-20020a5d6e01000000b0032fd88b2245mr9741963wrz.19.1700072512727;
+        Wed, 15 Nov 2023 10:21:52 -0800 (PST)
 Received: from ?IPV6:2003:cb:c706:ed00:59ee:f048:4ed9:62a6? (p200300cbc706ed0059eef0484ed962a6.dip0.t-ipconnect.de. [2003:cb:c706:ed00:59ee:f048:4ed9:62a6])
-        by smtp.gmail.com with ESMTPSA id q12-20020a05600000cc00b0032db4e660d9sm11191172wrx.56.2023.11.15.10.20.23
+        by smtp.gmail.com with ESMTPSA id q12-20020a05600000cc00b0032db4e660d9sm11191172wrx.56.2023.11.15.10.21.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Nov 2023 10:20:24 -0800 (PST)
-Message-ID: <a61206eb-03c4-41e3-a876-bb67577e5204@redhat.com>
-Date: Wed, 15 Nov 2023 19:20:23 +0100
+        Wed, 15 Nov 2023 10:21:52 -0800 (PST)
+Message-ID: <24521a5c-beec-4f08-8e89-2a413788bf8b@redhat.com>
+Date: Wed, 15 Nov 2023 19:21:51 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -69,8 +69,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 07/70] physmem: Relax the alignment check of
- host_startaddr in ram_block_discard_range()
+Subject: Re: [PATCH v3 08/70] physmem: replace function name with __func__ in
+ ram_block_discard_range()
 Content-Language: en-US
 To: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
@@ -87,7 +87,7 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
  Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
  <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
 References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
- <20231115071519.2864957-8-xiaoyao.li@intel.com>
+ <20231115071519.2864957-9-xiaoyao.li@intel.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -134,55 +134,19 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20231115071519.2864957-8-xiaoyao.li@intel.com>
+In-Reply-To: <20231115071519.2864957-9-xiaoyao.li@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 15.11.23 08:14, Xiaoyao Li wrote:
-> Commit d3a5038c461 ("exec: ram_block_discard_range") introduced
-> ram_block_discard_range() which grabs some code from
-> ram_discard_range(). However, during code movement, it changed alignment
-> check of host_startaddr from qemu_host_page_size to rb->page_size.
-> 
-> When ramblock is back'ed by hugepage, it requires the startaddr to be
-> huge page size aligned, which is a overkill. e.g., TDX's private-shared
-> page conversion is done at 4KB granularity. Shared page is discarded
-> when it gets converts to private and when shared page back'ed by
-> hugepage it is going to fail on this check.
-> 
-> So change to alignment check back to qemu_host_page_size.
+> Use __func__ to avoid hard-coded function name.
 > 
 > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > ---
-> Changes in v3:
->   - Newly added in v3;
-> ---
->   system/physmem.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/system/physmem.c b/system/physmem.c
-> index c56b17e44df6..8a4e42c7cf60 100644
-> --- a/system/physmem.c
-> +++ b/system/physmem.c
-> @@ -3532,7 +3532,7 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
->   
->       uint8_t *host_startaddr = rb->host + start;
->   
-> -    if (!QEMU_PTR_IS_ALIGNED(host_startaddr, rb->page_size)) {
-> +    if (!QEMU_PTR_IS_ALIGNED(host_startaddr, qemu_host_page_size)) {
 
-For your use cases, rb->page_size should always match qemu_host_page_size.
+That can be queued independently.
 
-IIRC, we only set rb->page_size to different values for hugetlb. And 
-guest_memfd does not support hugetlb.
-
-Even if QEMU is using THP, rb->page_size should 4k.
-
-Please elaborate how you can actually trigger that. From what I recall, 
-guest_memfd is not compatible with hugetlb.
-
-And the check here makes perfect sense for existing callers of 
-ram_block_discard_range(): you cannot partially zap a hugetlb page.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Cheers,
