@@ -1,116 +1,134 @@
-Return-Path: <kvm+bounces-1863-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1864-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82B937ED9CC
-	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 03:55:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 80E8C7ED9CD
+	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 03:57:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CCFA281008
-	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 02:55:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 388F0281037
+	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 02:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CEE663BD;
-	Thu, 16 Nov 2023 02:55:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DAE779F2;
+	Thu, 16 Nov 2023 02:56:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CvyfsMcf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RJnikotC"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 588DF8F40
-	for <kvm@vger.kernel.org>; Thu, 16 Nov 2023 02:55:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED5F9C433C8;
-	Thu, 16 Nov 2023 02:55:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700103304;
-	bh=ZqesSgGnkVZM04RFsgA7wOog4cC0NwW8GeTDpVZM7eo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=CvyfsMcf7sdo3j1uzQfaol/ZITI27NtDWoHNx/qNQKZpvFsfY/6KxpizWMtjEjrzT
-	 UqGhkv1DYO428o1V7FLwOg6Yac70GG4dK5i9fvipUAHNLJldii5N/TV4uvNed/WCHu
-	 /lClVFSG7gQBt30snqdSOmd4KxBTPt/twxpCIMJiBnCzmDKxtxaiRbSO1ndINKHQf/
-	 89g1gfHkiwHdycnErF/bRmjdcUuAuo0+nyqMFXtqoIAv+y9NFwr72NE3wgNr+r9TK/
-	 qcImN6EKfXlTzqHYm6tLemYHtWue0Co/SOAF5J9LU4OfAd0rOFRC5hfLK+aPqgK1eQ
-	 o/UIsQ09s3WcA==
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5440f25dcc7so519139a12.0;
-        Wed, 15 Nov 2023 18:55:03 -0800 (PST)
-X-Gm-Message-State: AOJu0YyjKP8zYF02m2si6RyRwVY3aZblylmxzBy0Cma6cIzCgxwv7Nys
-	IiXXzvxCY0XDWO2GtQ1EFNwrCmSpe0IkofNdgh8=
-X-Google-Smtp-Source: AGHT+IGoyHYHxifCTEl8SsnAL1yE8tDDpUcvj5Qt/DgQNFhXKJlIPTjK+Dm+HM5u0H1F+5copmj1N5nmRNBShvMzuxs=
-X-Received: by 2002:a05:6402:1042:b0:540:c989:fcdd with SMTP id
- e2-20020a056402104200b00540c989fcddmr11265637edu.11.1700103302368; Wed, 15
- Nov 2023 18:55:02 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 443B398
+	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 18:56:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700103411; x=1731639411;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=zahvDV8ljj6cLCtFfmlAWUV43SQBtyl+ufuho/AJOds=;
+  b=RJnikotC86bJs5leaUXKRcNiYsyZ5MwKCGcuy8tvFDX/4rK3esmySC+p
+   wM1vJ1wbS5nFpDAPXxDow5LX4ZK1S/yPPKLsIIdP5lnc+lXByctLClgUh
+   bLZmb8K90dMeD3Gkrve1Wbb3ivfCW2LtI0s7tvJ0k3v+cX1Pk+dH5vpXo
+   LTWkNhXpRdUxhYzjUwz08Qzqp2qu6v/O5ICxB/fh5niU7gaEdiTEILeC2
+   qBUBPOzZZYACEAfcYQRWDTqtWtVG21kxJm4SIHc2XM/0UjZX6I8Ot3G0o
+   h0cuB8Icc2n/A7bdDD/YSNo0ZbyK//qf7BOpS0HtJ5wBqAZYEtP3ehQu3
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="457496195"
+X-IronPort-AV: E=Sophos;i="6.03,307,1694761200"; 
+   d="scan'208";a="457496195"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 18:56:50 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="888770880"
+X-IronPort-AV: E=Sophos;i="6.03,307,1694761200"; 
+   d="scan'208";a="888770880"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.6.77]) ([10.93.6.77])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 18:56:45 -0800
+Message-ID: <00b533ee-fbb1-4e78-bc8b-b6d87761bb92@intel.com>
+Date: Thu, 16 Nov 2023 10:56:42 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231116023036.2324371-1-maobibo@loongson.cn>
-In-Reply-To: <20231116023036.2324371-1-maobibo@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Thu, 16 Nov 2023 10:54:52 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H4Wyp-6_gFSfm8uWUMiEJnebk9n4JxQrx_nBdxkTF5wUA@mail.gmail.com>
-Message-ID: <CAAhV-H4Wyp-6_gFSfm8uWUMiEJnebk9n4JxQrx_nBdxkTF5wUA@mail.gmail.com>
-Subject: Re: [PATCH v4 0/3] LoongArch: KVM: Remove SW timer switch when vcpu
- is halt polling
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, 
-	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 07/70] physmem: Relax the alignment check of
+ host_startaddr in ram_block_discard_range()
+Content-Language: en-US
+To: David Hildenbrand <david@redhat.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
+ <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ Michael Roth <michael.roth@amd.com>, Sean Christopherson
+ <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>,
+ Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
+ <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
+References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
+ <20231115071519.2864957-8-xiaoyao.li@intel.com>
+ <a61206eb-03c4-41e3-a876-bb67577e5204@redhat.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <a61206eb-03c4-41e3-a876-bb67577e5204@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi, Bibo,
+On 11/16/2023 2:20 AM, David Hildenbrand wrote:
+> On 15.11.23 08:14, Xiaoyao Li wrote:
+>> Commit d3a5038c461 ("exec: ram_block_discard_range") introduced
+>> ram_block_discard_range() which grabs some code from
+>> ram_discard_range(). However, during code movement, it changed alignment
+>> check of host_startaddr from qemu_host_page_size to rb->page_size.
+>>
+>> When ramblock is back'ed by hugepage, it requires the startaddr to be
+>> huge page size aligned, which is a overkill. e.g., TDX's private-shared
+>> page conversion is done at 4KB granularity. Shared page is discarded
+>> when it gets converts to private and when shared page back'ed by
+>> hugepage it is going to fail on this check.
+>>
+>> So change to alignment check back to qemu_host_page_size.
+>>
+>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> ---
+>> Changes in v3:
+>>   - Newly added in v3;
+>> ---
+>>   system/physmem.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/system/physmem.c b/system/physmem.c
+>> index c56b17e44df6..8a4e42c7cf60 100644
+>> --- a/system/physmem.c
+>> +++ b/system/physmem.c
+>> @@ -3532,7 +3532,7 @@ int ram_block_discard_range(RAMBlock *rb, 
+>> uint64_t start, size_t length)
+>>       uint8_t *host_startaddr = rb->host + start;
+>> -    if (!QEMU_PTR_IS_ALIGNED(host_startaddr, rb->page_size)) {
+>> +    if (!QEMU_PTR_IS_ALIGNED(host_startaddr, qemu_host_page_size)) {
+> 
+> For your use cases, rb->page_size should always match qemu_host_page_size.
+> 
+> IIRC, we only set rb->page_size to different values for hugetlb. And 
+> guest_memfd does not support hugetlb.
+> 
+> Even if QEMU is using THP, rb->page_size should 4k.
+> 
+> Please elaborate how you can actually trigger that. From what I recall, 
+> guest_memfd is not compatible with hugetlb.
 
-I suggest submitting this series to the internal repo, too. Because we
-don't have enough resources to test the stability for the upstream
-version, while this is a fundamental change. On the other hand, the
-patch "LoongArch:LSVZ: set timer offset at first time once" can be
-submitted first because it is already in the internal repo.
+It's the shared memory that can be back'ed by hugetlb.
 
-Huacai
+Later patch 9 introduces ram_block_convert_page(), which will discard 
+shared memory when it gets converted to private. TD guest can request 
+convert a 4K to private while the page is previously back'ed by hugetlb 
+as 2M shared page.
 
-On Thu, Nov 16, 2023 at 10:33=E2=80=AFAM Bibo Mao <maobibo@loongson.cn> wro=
-te:
->
-> This patches removes SW timer switch during vcpu block stage. VM uses HW
-> timer rather than SW PV timer on LoongArch system, it can check pending
-> HW timer interrupt status directly, rather than switch to SW timer and
-> check injected SW timer interrupt.
->
-> When SW timer is not used in vcpu halt-polling mode, the relative
-> SW timer handling before entering guest can be removed also. Timer
-> emulation is simpler than before, SW timer emuation is only used in vcpu
-> thread context switch.
-> ---
-> Changes in v4:
->   If vcpu is scheduled out since there is no pending event, and timer is
-> fired during sched-out period. SW hrtimer is used to wake up vcpu thread
-> in time, rather than inject pending timer irq.
->
-> Changes in v3:
->   Add kvm_arch_vcpu_runnable checking before kvm_vcpu_halt.
->
-> Changes in v2:
->   Add halt polling support for idle instruction emulation, using api
-> kvm_vcpu_halt rather than kvm_vcpu_block in function kvm_emu_idle.
->
-> ---
-> Bibo Mao (3):
->   LoongArch: KVM: Remove SW timer switch when vcpu is halt polling
->   LoongArch: KVM: Allow to access HW timer CSR registers always
->   LoongArch: KVM: Remove kvm_acquire_timer before entering guest
->
->  arch/loongarch/include/asm/kvm_vcpu.h |  1 -
->  arch/loongarch/kvm/exit.c             | 13 +-----
->  arch/loongarch/kvm/main.c             |  1 -
->  arch/loongarch/kvm/timer.c            | 62 ++++++++++-----------------
->  arch/loongarch/kvm/vcpu.c             | 38 ++++------------
->  5 files changed, 32 insertions(+), 83 deletions(-)
->
->
-> base-commit: c42d9eeef8e5ba9292eda36fd8e3c11f35ee065c
-> --
-> 2.39.3
->
+> And the check here makes perfect sense for existing callers of 
+> ram_block_discard_range(): you cannot partially zap a hugetlb page.
+> 
+
 
