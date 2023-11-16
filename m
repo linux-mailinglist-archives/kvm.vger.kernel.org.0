@@ -1,98 +1,116 @@
-Return-Path: <kvm+bounces-1862-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1863-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1EE17ED9C7
-	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 03:53:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82B937ED9CC
+	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 03:55:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 678FD1F236A2
-	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 02:53:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CCFA281008
+	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 02:55:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 038258F6B;
-	Thu, 16 Nov 2023 02:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CEE663BD;
+	Thu, 16 Nov 2023 02:55:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="agyZMvc5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CvyfsMcf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A75B199
-	for <kvm@vger.kernel.org>; Wed, 15 Nov 2023 18:53:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700103221; x=1731639221;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=7YQsp0BB0MmC5NMWVPrWH3O7XPeWtRCU9nNABC8pwXk=;
-  b=agyZMvc5kKpdsdHhZGVwJC8zyxgf7RPAMyCDjWQ7j0sBUoorDb4cvp+t
-   fvvI3x9BGfEu4SmE4BnCcV2zDeBiDSdkvS98pKKWisib6vSDih2bU6VXj
-   yOBKKAbfsr3zMshQ6oOe5RPY4VZp8HSo6jPJuDXBc9U5QsZZ1NdrlbjA9
-   V+QISoi4l3+wHeVpjsHKJf9qfJrdj30Vr/HeGXfJyezsEh13RyHLuzYME
-   dGXEfczSVXBpOMgGUY5PHjnGNaCdg6aJw/lrx0tjgGeF2HJ2AgK5kuX7+
-   3kaAo5AWL/KeByFkGt2IZDpsqLoSghqUr/T22aACBok+TcQRlaEx3327y
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="422092961"
-X-IronPort-AV: E=Sophos;i="6.03,307,1694761200"; 
-   d="scan'208";a="422092961"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 18:53:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,307,1694761200"; 
-   d="scan'208";a="6603847"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.6.77]) ([10.93.6.77])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 18:53:35 -0800
-Message-ID: <6674dc2c-f1ed-496e-bc17-256869bdeae9@intel.com>
-Date: Thu, 16 Nov 2023 10:53:13 +0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 588DF8F40
+	for <kvm@vger.kernel.org>; Thu, 16 Nov 2023 02:55:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED5F9C433C8;
+	Thu, 16 Nov 2023 02:55:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700103304;
+	bh=ZqesSgGnkVZM04RFsgA7wOog4cC0NwW8GeTDpVZM7eo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=CvyfsMcf7sdo3j1uzQfaol/ZITI27NtDWoHNx/qNQKZpvFsfY/6KxpizWMtjEjrzT
+	 UqGhkv1DYO428o1V7FLwOg6Yac70GG4dK5i9fvipUAHNLJldii5N/TV4uvNed/WCHu
+	 /lClVFSG7gQBt30snqdSOmd4KxBTPt/twxpCIMJiBnCzmDKxtxaiRbSO1ndINKHQf/
+	 89g1gfHkiwHdycnErF/bRmjdcUuAuo0+nyqMFXtqoIAv+y9NFwr72NE3wgNr+r9TK/
+	 qcImN6EKfXlTzqHYm6tLemYHtWue0Co/SOAF5J9LU4OfAd0rOFRC5hfLK+aPqgK1eQ
+	 o/UIsQ09s3WcA==
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5440f25dcc7so519139a12.0;
+        Wed, 15 Nov 2023 18:55:03 -0800 (PST)
+X-Gm-Message-State: AOJu0YyjKP8zYF02m2si6RyRwVY3aZblylmxzBy0Cma6cIzCgxwv7Nys
+	IiXXzvxCY0XDWO2GtQ1EFNwrCmSpe0IkofNdgh8=
+X-Google-Smtp-Source: AGHT+IGoyHYHxifCTEl8SsnAL1yE8tDDpUcvj5Qt/DgQNFhXKJlIPTjK+Dm+HM5u0H1F+5copmj1N5nmRNBShvMzuxs=
+X-Received: by 2002:a05:6402:1042:b0:540:c989:fcdd with SMTP id
+ e2-20020a056402104200b00540c989fcddmr11265637edu.11.1700103302368; Wed, 15
+ Nov 2023 18:55:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 04/70] HostMem: Add mechanism to opt in kvm guest memfd
- via MachineState
-Content-Language: en-US
-To: David Hildenbrand <david@redhat.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Michael Roth <michael.roth@amd.com>, Sean Christopherson
- <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>,
- Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
- <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
-References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
- <20231115071519.2864957-5-xiaoyao.li@intel.com>
- <af2a5b80-f259-45b1-9d92-812e3c4bc06c@redhat.com>
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <af2a5b80-f259-45b1-9d92-812e3c4bc06c@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231116023036.2324371-1-maobibo@loongson.cn>
+In-Reply-To: <20231116023036.2324371-1-maobibo@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Thu, 16 Nov 2023 10:54:52 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H4Wyp-6_gFSfm8uWUMiEJnebk9n4JxQrx_nBdxkTF5wUA@mail.gmail.com>
+Message-ID: <CAAhV-H4Wyp-6_gFSfm8uWUMiEJnebk9n4JxQrx_nBdxkTF5wUA@mail.gmail.com>
+Subject: Re: [PATCH v4 0/3] LoongArch: KVM: Remove SW timer switch when vcpu
+ is halt polling
+To: Bibo Mao <maobibo@loongson.cn>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/16/2023 2:14 AM, David Hildenbrand wrote:
-> On 15.11.23 08:14, Xiaoyao Li wrote:
->> Add a new member "require_guest_memfd" to memory backends. When it's set
->> to true, it enables RAM_GUEST_MEMFD in ram_flags, thus private kvm
->> guest_memfd will be allocated during RAMBlock allocation.
->>
->> Memory backend's @require_guest_memfd is wired with @require_guest_memfd
->> field of MachineState. MachineState::require_guest_memfd is supposed to
->> be set by any VMs that requires KVM guest memfd as private memory, e.g.,
->> TDX VM.
->>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> 
-> I'm confused, why do we need this if it's going to be the same for all 
-> memory backends right now?
-> 
+Hi, Bibo,
 
-I want to provide a elegant (in my sense) way to configure "the need of 
-guest memfd" instead of checking x86machinestate->vm_type in physmem.c
+I suggest submitting this series to the internal repo, too. Because we
+don't have enough resources to test the stability for the upstream
+version, while this is a fundamental change. On the other hand, the
+patch "LoongArch:LSVZ: set timer offset at first time once" can be
+submitted first because it is already in the internal repo.
+
+Huacai
+
+On Thu, Nov 16, 2023 at 10:33=E2=80=AFAM Bibo Mao <maobibo@loongson.cn> wro=
+te:
+>
+> This patches removes SW timer switch during vcpu block stage. VM uses HW
+> timer rather than SW PV timer on LoongArch system, it can check pending
+> HW timer interrupt status directly, rather than switch to SW timer and
+> check injected SW timer interrupt.
+>
+> When SW timer is not used in vcpu halt-polling mode, the relative
+> SW timer handling before entering guest can be removed also. Timer
+> emulation is simpler than before, SW timer emuation is only used in vcpu
+> thread context switch.
+> ---
+> Changes in v4:
+>   If vcpu is scheduled out since there is no pending event, and timer is
+> fired during sched-out period. SW hrtimer is used to wake up vcpu thread
+> in time, rather than inject pending timer irq.
+>
+> Changes in v3:
+>   Add kvm_arch_vcpu_runnable checking before kvm_vcpu_halt.
+>
+> Changes in v2:
+>   Add halt polling support for idle instruction emulation, using api
+> kvm_vcpu_halt rather than kvm_vcpu_block in function kvm_emu_idle.
+>
+> ---
+> Bibo Mao (3):
+>   LoongArch: KVM: Remove SW timer switch when vcpu is halt polling
+>   LoongArch: KVM: Allow to access HW timer CSR registers always
+>   LoongArch: KVM: Remove kvm_acquire_timer before entering guest
+>
+>  arch/loongarch/include/asm/kvm_vcpu.h |  1 -
+>  arch/loongarch/kvm/exit.c             | 13 +-----
+>  arch/loongarch/kvm/main.c             |  1 -
+>  arch/loongarch/kvm/timer.c            | 62 ++++++++++-----------------
+>  arch/loongarch/kvm/vcpu.c             | 38 ++++------------
+>  5 files changed, 32 insertions(+), 83 deletions(-)
+>
+>
+> base-commit: c42d9eeef8e5ba9292eda36fd8e3c11f35ee065c
+> --
+> 2.39.3
+>
 
