@@ -1,38 +1,49 @@
-Return-Path: <kvm+bounces-1877-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1879-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD1177EDBDB
-	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 08:19:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 239367EDCC3
+	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 09:19:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEF1E1C209EA
-	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 07:19:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29239B20C37
+	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 08:18:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 641E1FBE2;
-	Thu, 16 Nov 2023 07:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF6E11704;
+	Thu, 16 Nov 2023 08:18:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="KA5J/G4U"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kyaZ9NZF"
 X-Original-To: kvm@vger.kernel.org
-X-Greylist: delayed 263 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 15 Nov 2023 23:19:25 PST
-Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81A96C5;
-	Wed, 15 Nov 2023 23:19:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
-	t=1700119163; bh=q2AuehPSVg0PAMSpgfi8EJzOTmrs6NwGqXh97Sh11+Y=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=KA5J/G4UWDHFRE1c0EwMstzoUwRQYy+31GHqhkrgTtAWX/o/FY1SZ+czziBtEZvQ0
-	 dzHnpB3y4OGJwtuBJ/hJQJBBEjd23BRQcHBVdWZBvPa+ZiQPPfGTYO8rqqRe3g7Tt8
-	 dWbA+U4QiRy6lUamE8A0a7NCfw+BNQmftIqM97r8=
-Received: from [IPV6:240e:388:8d26:bf00:6f50:1e00:d62c:dcf9] (unknown [IPv6:240e:388:8d26:bf00:6f50:1e00:d62c:dcf9])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 79AC16018A;
-	Thu, 16 Nov 2023 15:19:23 +0800 (CST)
-Message-ID: <f003f38d-37fd-43ed-ada6-fb2d5b282e91@xen0n.name>
-Date: Thu, 16 Nov 2023 15:19:23 +0800
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511FA196;
+	Thu, 16 Nov 2023 00:18:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700122726; x=1731658726;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=FbushCVIFv+PY/6S/x2mvxLk/35CqPa8wajnY9+0vW4=;
+  b=kyaZ9NZFtCurrk4S7363ZlZlZU0rJgxG6Y3bk8e2V/SOoBdCPwY8zDZ2
+   KXVnAJty3Ipi2UyPMJhHFzl6WlixeAv4ZeOSLiR8+zz99n0VqxEHXIS/Y
+   7ATWbOqMJT5fD8IA698XwI5grXp5xDKvbxMkxYUmaTb1f5R2h8SJKNJh+
+   6Zoyiz0p5ldzRx+/+qOGTAMXWb1+IScMV2ixy35uen+SL6UesCFW5J/91
+   D4Gx9zD6wZl6yAG/dD1Ru0vTd52JjHaviENAcU03p/pp3GptHMBKDw07d
+   wsWTeg3OGsiYtBshd/FdIPhtPlijA6BFuhbDL0cYIBO3kFANwg6BkC0Jn
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="389899556"
+X-IronPort-AV: E=Sophos;i="6.03,307,1694761200"; 
+   d="scan'208";a="389899556"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 00:18:34 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="768846727"
+X-IronPort-AV: E=Sophos;i="6.03,307,1694761200"; 
+   d="scan'208";a="768846727"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.126]) ([10.238.10.126])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 00:18:30 -0800
+Message-ID: <ab5978fe-998f-4407-ae57-307606d5fb74@linux.intel.com>
+Date: Thu, 16 Nov 2023 16:18:28 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -40,103 +51,126 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/2] LoongArch: KVM: Add lasx support
-Content-Language: en-US
-To: Tianrui Zhao <zhaotianrui@loongson.cn>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, loongarch@lists.linux.dev,
- Jens Axboe <axboe@kernel.dk>, Mark Brown <broonie@kernel.org>,
- Alex Deucher <alexander.deucher@amd.com>,
- Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
- Xi Ruoyao <xry111@xry111.site>
-References: <20231115091921.85516-1-zhaotianrui@loongson.cn>
- <20231115091921.85516-3-zhaotianrui@loongson.cn>
-From: WANG Xuerui <kernel@xen0n.name>
-In-Reply-To: <20231115091921.85516-3-zhaotianrui@loongson.cn>
+Subject: Re: [PATCH v6 03/16] KVM: TDX: Pass KVM page level to
+ tdh_mem_page_add() and tdh_mem_page_aug()
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, David Matlack <dmatlack@google.com>,
+ Kai Huang <kai.huang@intel.com>, Zhi Wang <zhi.wang.linux@gmail.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+ Xiaoyao Li <xiaoyao.li@intel.com>
+References: <cover.1699368363.git.isaku.yamahata@intel.com>
+ <d3b140b63e0dc9773475724d97d566917d444791.1699368363.git.isaku.yamahata@intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <d3b140b63e0dc9773475724d97d566917d444791.1699368363.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/15/23 17:19, Tianrui Zhao wrote:
-> This patch adds LASX support for LoongArch KVM. The LASX means
-> LoongArch 256-bits vector instruction.
-> There will be LASX exception in KVM when guest use the LASX
-> instruction. KVM will enable LASX and restore the vector
-> registers for guest then return to guest to continue running.
+
+
+On 11/7/2023 11:00 PM, isaku.yamahata@intel.com wrote:
+> From: Xiaoyao Li <xiaoyao.li@intel.com>
 >
-> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+> Level info is needed in tdh_clflush_page() to generate the correct page
+> size.
+
+tdh_clflush_page() -> tdx_clflush_page()
+
+>
+> Besides, explicitly pass level info to SEAMCALL instead of assuming
+> it's zero. It works naturally when 2MB support lands.
+>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > ---
->   arch/loongarch/include/asm/kvm_host.h |  6 ++++
->   arch/loongarch/include/asm/kvm_vcpu.h | 10 +++++++
->   arch/loongarch/kernel/fpu.S           |  1 +
->   arch/loongarch/kvm/exit.c             | 18 +++++++++++
->   arch/loongarch/kvm/switch.S           | 16 ++++++++++
->   arch/loongarch/kvm/trace.h            |  4 ++-
->   arch/loongarch/kvm/vcpu.c             | 43 ++++++++++++++++++++++++++-
->   7 files changed, 96 insertions(+), 2 deletions(-)
+>   arch/x86/kvm/vmx/tdx.c     |  7 ++++---
+>   arch/x86/kvm/vmx/tdx_ops.h | 19 ++++++++++++-------
+>   2 files changed, 16 insertions(+), 10 deletions(-)
 >
-> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
-> index 6c65c25169..4c05b5eca0 100644
-> --- a/arch/loongarch/include/asm/kvm_host.h
-> +++ b/arch/loongarch/include/asm/kvm_host.h
-> @@ -95,6 +95,7 @@ enum emulation_result {
->   #define KVM_LARCH_SWCSR_LATEST	(0x1 << 1)
->   #define KVM_LARCH_HWCSR_USABLE	(0x1 << 2)
->   #define KVM_LARCH_LSX		(0x1 << 3)
-> +#define KVM_LARCH_LASX		(0x1 << 4)
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 8b58d91bda4e..2d5c86e06c5f 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -1468,7 +1468,7 @@ static int tdx_sept_page_aug(struct kvm *kvm, gfn_t gfn,
+>   	union tdx_sept_entry entry;
+>   	u64 err;
 >   
->   struct kvm_vcpu_arch {
->   	/*
-> @@ -181,6 +182,11 @@ static inline bool kvm_guest_has_lsx(struct kvm_vcpu_arch *arch)
->   	return arch->cpucfg[2] & CPUCFG2_LSX;
->   }
+> -	err = tdh_mem_page_aug(kvm_tdx->tdr_pa, gpa, hpa, &out);
+> +	err = tdh_mem_page_aug(kvm_tdx->tdr_pa, gpa, tdx_level, hpa, &out);
+>   	if (unlikely(err == TDX_ERROR_SEPT_BUSY)) {
+>   		tdx_unpin(kvm, pfn);
+>   		return -EAGAIN;
+> @@ -1497,6 +1497,7 @@ static int tdx_sept_page_aug(struct kvm *kvm, gfn_t gfn,
+>   static int tdx_sept_page_add(struct kvm *kvm, gfn_t gfn,
+>   			     enum pg_level level, kvm_pfn_t pfn)
+>   {
+> +	int tdx_level = pg_level_to_tdx_sept_level(level);
+>   	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+>   	hpa_t hpa = pfn_to_hpa(pfn);
+>   	gpa_t gpa = gfn_to_gpa(gfn);
+> @@ -1531,8 +1532,8 @@ static int tdx_sept_page_add(struct kvm *kvm, gfn_t gfn,
+>   	kvm_tdx->source_pa = INVALID_PAGE;
 >   
-> +static inline bool kvm_guest_has_lasx(struct kvm_vcpu_arch *arch)
-> +{
-> +	return arch->cpucfg[2] & CPUCFG2_LASX;
-> +}
-> +
->   /* Debug: dump vcpu state */
->   int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu);
->   
-> diff --git a/arch/loongarch/include/asm/kvm_vcpu.h b/arch/loongarch/include/asm/kvm_vcpu.h
-> index c629771e12..4f87f16018 100644
-> --- a/arch/loongarch/include/asm/kvm_vcpu.h
-> +++ b/arch/loongarch/include/asm/kvm_vcpu.h
-> @@ -67,6 +67,16 @@ static inline void kvm_restore_lsx(struct loongarch_fpu *fpu) { }
->   static inline void kvm_restore_lsx_upper(struct loongarch_fpu *fpu) { }
+>   	do {
+> -		err = tdh_mem_page_add(kvm_tdx->tdr_pa, gpa, hpa, source_pa,
+> -				       &out);
+> +		err = tdh_mem_page_add(kvm_tdx->tdr_pa, gpa, tdx_level, hpa,
+> +				       source_pa, &out);
+>   		/*
+>   		 * This path is executed during populating initial guest memory
+>   		 * image. i.e. before running any vcpu.  Race is rare.
+> diff --git a/arch/x86/kvm/vmx/tdx_ops.h b/arch/x86/kvm/vmx/tdx_ops.h
+> index e726102d3523..0f2df7198bde 100644
+> --- a/arch/x86/kvm/vmx/tdx_ops.h
+> +++ b/arch/x86/kvm/vmx/tdx_ops.h
+> @@ -63,6 +63,11 @@ static inline u64 tdx_seamcall(u64 op, u64 rcx, u64 rdx, u64 r8, u64 r9,
+>   void pr_tdx_error(u64 op, u64 error_code, const struct tdx_module_args *out);
 >   #endif
 >   
-> +#ifdef CONFIG_CPU_HAS_LASX
-> +void kvm_own_lasx(struct kvm_vcpu *vcpu);
-> +void kvm_save_lasx(struct loongarch_fpu *fpu);
-> +void kvm_restore_lasx(struct loongarch_fpu *fpu);
-> +#else
-> +static inline void kvm_own_lasx(struct kvm_vcpu *vcpu) { }
-> +static inline void kvm_save_lasx(struct loongarch_fpu *fpu) { }
-> +static inline void kvm_restore_lasx(struct loongarch_fpu *fpu) { }
-> +#endif
+> +static inline enum pg_level tdx_sept_level_to_pg_level(int tdx_level)
+> +{
+> +	return tdx_level + 1;
+> +}
 > +
->   void kvm_acquire_timer(struct kvm_vcpu *vcpu);
->   void kvm_init_timer(struct kvm_vcpu *vcpu, unsigned long hz);
->   void kvm_reset_timer(struct kvm_vcpu *vcpu);
-> diff --git a/arch/loongarch/kernel/fpu.S b/arch/loongarch/kernel/fpu.S
-> index d53ab10f46..f4524fe866 100644
-> --- a/arch/loongarch/kernel/fpu.S
-> +++ b/arch/loongarch/kernel/fpu.S
-> @@ -384,6 +384,7 @@ SYM_FUNC_START(_restore_lasx_upper)
->   	lasx_restore_all_upper a0 t0 t1
->   	jr	ra
->   SYM_FUNC_END(_restore_lasx_upper)
-> +EXPORT_SYMBOL(_restore_lasx_upper)
+>   static inline void tdx_clflush_page(hpa_t addr, enum pg_level level)
+>   {
+>   	clflush_cache_range(__va(addr), KVM_HPAGE_SIZE(level));
+> @@ -104,11 +109,11 @@ static inline u64 tdh_mng_addcx(hpa_t tdr, hpa_t addr)
+>   	return tdx_seamcall(TDH_MNG_ADDCX, addr, tdr, 0, 0, NULL);
+>   }
+>   
+> -static inline u64 tdh_mem_page_add(hpa_t tdr, gpa_t gpa, hpa_t hpa, hpa_t source,
+> -				   struct tdx_module_args *out)
+> +static inline u64 tdh_mem_page_add(hpa_t tdr, gpa_t gpa, int level, hpa_t hpa,
+> +				   hpa_t source, struct tdx_module_args *out)
+>   {
+> -	tdx_clflush_page(hpa, PG_LEVEL_4K);
+> -	return tdx_seamcall_sept(TDH_MEM_PAGE_ADD, gpa, tdr, hpa, source, out);
+> +	tdx_clflush_page(hpa, tdx_sept_level_to_pg_level(level));
+> +	return tdx_seamcall_sept(TDH_MEM_PAGE_ADD, gpa | level, tdr, hpa, source, out);
+>   }
 
-Why the added export? It doesn't seem necessary, given the previous 
-patch doesn't have a similar export added for _restore_lsx_upper. (Or if 
-it's truly needed it should probably become EXPORT_SYMBOL_GPL.)
+For TDH_MEM_PAGE_ADD, only 4K page is supported, is this change necessary?
+Or maybe huge page can be supported by TDH_MEM_PAGE_ADD in the future?
 
--- 
-WANG "xen0n" Xuerui
-
-Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
+>   
+>   static inline u64 tdh_mem_sept_add(hpa_t tdr, gpa_t gpa, int level, hpa_t page,
+> @@ -143,11 +148,11 @@ static inline u64 tdh_mem_page_relocate(hpa_t tdr, gpa_t gpa, hpa_t hpa,
+>   	return tdx_seamcall_sept(TDH_MEM_PAGE_RELOCATE, gpa, tdr, hpa, 0, out);
+>   }
+>   
+> -static inline u64 tdh_mem_page_aug(hpa_t tdr, gpa_t gpa, hpa_t hpa,
+> +static inline u64 tdh_mem_page_aug(hpa_t tdr, gpa_t gpa, int level, hpa_t hpa,
+>   				   struct tdx_module_args *out)
+>   {
+> -	tdx_clflush_page(hpa, PG_LEVEL_4K);
+> -	return tdx_seamcall_sept(TDH_MEM_PAGE_AUG, gpa, tdr, hpa, 0, out);
+> +	tdx_clflush_page(hpa, tdx_sept_level_to_pg_level(level));
+> +	return tdx_seamcall_sept(TDH_MEM_PAGE_AUG, gpa | level, tdr, hpa, 0, out);
+>   }
+>   
+>   static inline u64 tdh_mem_range_block(hpa_t tdr, gpa_t gpa, int level,
 
 
