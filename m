@@ -1,186 +1,145 @@
-Return-Path: <kvm+bounces-1882-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1883-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71E057EDDA8
-	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 10:34:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 454F67EDDB4
+	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 10:35:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 296311F23B21
-	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 09:34:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E2421C209E0
+	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 09:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4788928DDD;
-	Thu, 16 Nov 2023 09:34:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 444D728E16;
+	Thu, 16 Nov 2023 09:35:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W3tqRaA+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jirn27/9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8451F1A3
-	for <kvm@vger.kernel.org>; Thu, 16 Nov 2023 01:34:34 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB9981BE
+	for <kvm@vger.kernel.org>; Thu, 16 Nov 2023 01:35:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700127273;
+	s=mimecast20190719; t=1700127346;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QuTQg4Oyw0769gWhs5zrEa0uRXRA0CYB8AH2mm3Alio=;
-	b=W3tqRaA+VMnUBqYtcEY+LDBteStjYe8kOWjRXThLZ2YskGiKctbcXylTXV9mPyoLpLxw1V
-	HY3LQgsy9s6wXUXHZUTlOOtI+PITSyy0G1s7WUi2tZOAfBsRDK63OW4dChaiZYQcbrZp+A
-	l1r32TEoSRVe7714KRdcDYjMltsObbg=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=s14OcYbNsy58OOft6vgyTif8IMy6gRwapu3+F+eWkNg=;
+	b=Jirn27/9VfOKUZ0rJkn3ShwJoxmWecsq4YYMDDGjsXYY54ElPAJOVCOe8QkXWHBw2erZEt
+	RKhHRF/+s+aFWL+Tgq5lTV6Wb+JyDBBFAcXLVy4F/aC9RgzQvk6rChvP6tQRnF8CzHfybH
+	Iipx/IEJomQU/KZoFBnsq/CVHakz5dQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-158-2G88DXnAPGilh6_9mftiZA-1; Thu, 16 Nov 2023 04:34:32 -0500
-X-MC-Unique: 2G88DXnAPGilh6_9mftiZA-1
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-5be2bce0dc9so84128a12.1
-        for <kvm@vger.kernel.org>; Thu, 16 Nov 2023 01:34:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700127271; x=1700732071;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QuTQg4Oyw0769gWhs5zrEa0uRXRA0CYB8AH2mm3Alio=;
-        b=uw6P6Lfyd3AdZ5OZMrLT1HX8WmMTY01rgQNvE/TfxkXLEKNJKLG7h9fRhnxauTpEDl
-         YApCvkKB/kK2rgMJirMKSN6F1AGHrnLFyeCP4UAQg8ZDbzgatW2UOhPClsLwq8Glns8o
-         2qdaT1yGANYGgQvc5hMG4wZxSOFBZF2EAMO4onU4Zho9l8nr/Znmy5GuZNzYPxL55tl4
-         /vGwdBgO7uSYpEGs18O2IXI2DRcuJ4UvxAnAJmHeChkvHvJHEv7LzoWf+qjL0XK+Vdg5
-         VK0+gSbW92uxnzr4xx7RQJJJy0RMGVdkAssq20Vd/Qs1DZjSFHMZ9ThX303voXaA/ZvJ
-         +8Uw==
-X-Gm-Message-State: AOJu0YyxIbufy8jR49ocdNlFFi5sMOJVFx6WaxZQQrUymT6rHrCxcC5K
-	WuMYkkpj7CMPOQKS8sNfkTeS9J/9x1/sS5YWq++Cn6h2rIpnK3c7tAYksDOyNLziaShX5QWy6k0
-	l0YmGmwUeh54b
-X-Received: by 2002:a17:902:e74f:b0:1cd:fbc7:270e with SMTP id p15-20020a170902e74f00b001cdfbc7270emr5851474plf.2.1700127271310;
-        Thu, 16 Nov 2023 01:34:31 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGJ3UeuSMW7xPsMYOmA57fbxtROXVUGVQani83bu2ED+ywYPs4rrxWnRJXXPCovjl8EldRadQ==
-X-Received: by 2002:a17:902:e74f:b0:1cd:fbc7:270e with SMTP id p15-20020a170902e74f00b001cdfbc7270emr5851458plf.2.1700127270996;
-        Thu, 16 Nov 2023 01:34:30 -0800 (PST)
-Received: from [10.72.112.142] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id l14-20020a170902f68e00b001ca4ad86357sm8743043plg.227.2023.11.16.01.34.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Nov 2023 01:34:30 -0800 (PST)
-Message-ID: <eb794c0d-51c8-ecbd-2b24-d93ae00466a0@redhat.com>
-Date: Thu, 16 Nov 2023 17:34:28 +0800
+ us-mta-271-_SrAnAy-M1iDTKAzeIVejQ-1; Thu, 16 Nov 2023 04:35:40 -0500
+X-MC-Unique: _SrAnAy-M1iDTKAzeIVejQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3EAF7185A780;
+	Thu, 16 Nov 2023 09:35:40 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 34BF5492BFD;
+	Thu, 16 Nov 2023 09:35:40 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v1] KVM: selftests: Initalize sem_vcpu_[cont|stop] before each test in dirty_log_test
+Date: Thu, 16 Nov 2023 04:35:36 -0500
+Message-Id: <20231116093536.22256-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v1] arm/kvm: Enable support for KVM_ARM_VCPU_PMU_V3_FILTER
-Content-Language: en-US
-To: Sebastian Ott <sebott@redhat.com>
-Cc: qemu-arm@nongnu.org, eric.auger@redhat.com,
- Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell
- <peter.maydell@linaro.org>, kvm@vger.kernel.org, qemu-devel@nongnu.org
-References: <20231113081713.153615-1-shahuang@redhat.com>
- <3a570842-aaec-6447-b043-d908e83717ec@redhat.com>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <3a570842-aaec-6447-b043-d908e83717ec@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-Hi Sebastian,
+When execute the dirty_log_test on some aarch64 machine, it sometimes
+trigger the ASSERT:
 
-On 11/15/23 20:17, Sebastian Ott wrote:
-> Hi,
-> 
-> On Mon, 13 Nov 2023, Shaoqin Huang wrote:
->> +    ``pmu-filter={A,D}:start-end[;...]``
->> +        KVM implements pmu event filtering to prevent a guest from 
->> being able to
->> +    sample certain events. It has the following format:
->> +
->> +    pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
->> +
->> +    The A means "allow" and D means "deny", start if the first event 
->> of the
->                                                        ^
->                                                        is
-> 
+==== Test Assertion Failure ====
+  dirty_log_test.c:384: dirty_ring_vcpu_ring_full
+  pid=14854 tid=14854 errno=22 - Invalid argument
+     1  0x00000000004033eb: dirty_ring_collect_dirty_pages at dirty_log_test.c:384
+     2  0x0000000000402d27: log_mode_collect_dirty_pages at dirty_log_test.c:505
+     3   (inlined by) run_test at dirty_log_test.c:802
+     4  0x0000000000403dc7: for_each_guest_mode at guest_modes.c:100
+     5  0x0000000000401dff: main at dirty_log_test.c:941 (discriminator 3)
+     6  0x0000ffff9be173c7: ?? ??:0
+     7  0x0000ffff9be1749f: ?? ??:0
+     8  0x000000000040206f: _start at ??:?
+  Didn't continue vcpu even without ring full
 
-Thanks for point it out.
+The dirty_log_test fails when execute the dirty-ring test, this is
+because the sem_vcpu_cont and the sem_vcpu_stop is non-zero value when
+execute the dirty_ring_collect_dirty_pages() function. When those two
+sem_t variables are non-zero, the dirty_ring_wait_vcpu() at the
+beginning of the dirty_ring_collect_dirty_pages() will not wait for the
+vcpu to stop, but continue to execute the following code. In this case,
+before vcpu stop, if the dirty_ring_vcpu_ring_full is true, and the
+dirty_ring_collect_dirty_pages() has passed the check for the
+dirty_ring_vcpu_ring_full but hasn't execute the check for the
+continued_vcpu, the vcpu stop, and set the dirty_ring_vcpu_ring_full to
+false. Then dirty_ring_collect_dirty_pages() will trigger the ASSERT.
 
-> Also it should be stated that the first filter action defines if the whole
-> list is an allow or a deny list.
-> 
->> +static void kvm_arm_pmu_filter_init(CPUState *cs)
->> +{
->> +    struct kvm_pmu_event_filter filter;
->> +    struct kvm_device_attr attr = {
->> +        .group      = KVM_ARM_VCPU_PMU_V3_CTRL,
->> +        .attr       = KVM_ARM_VCPU_PMU_V3_FILTER,
->> +    };
->> +    KVMState *kvm_state = cs->kvm_state;
->> +    char *tmp;
->> +    char *str, act;
->> +
->> +    if (!kvm_state->kvm_pmu_filter)
->> +        return;
->> +
->> +    tmp = g_strdup(kvm_state->kvm_pmu_filter);
->> +
->> +    for (str = strtok(tmp, ";"); str != NULL; str = strtok(NULL, ";")) {
->> +        unsigned short start = 0, end = 0;
->> +
->> +        sscanf(str, "%c:%hx-%hx", &act, &start, &end);
->> +        if ((act != 'A' && act != 'D') || (!start && !end)) {
->> +            error_report("skipping invalid filter %s\n", str);
->> +            continue;
->> +        }
->> +
->> +        filter = (struct kvm_pmu_event_filter) {
->> +            .base_event     = start,
->> +            .nevents        = end - start + 1,
->> +            .action         = act == 'A' ? KVM_PMU_EVENT_ALLOW :
->> +                                           KVM_PMU_EVENT_DENY,
->> +        };
->> +
->> +        attr.addr = (uint64_t)&filter;
-> 
-> That could move to the initialization of attr (the address of filter
-> doesn't change).
-> 
+Why sem_vcpu_cont and sem_vcpu_stop can be non-zero value? It's because
+the dirty_ring_before_vcpu_join() execute the sem_post(&sem_vcpu_cont)
+at the end of each dirty-ring test. It can cause two cases:
 
-It looks better. Will change it.
+1. sem_vcpu_cont be non-zero. When we set the host_quit to be true,
+   the vcpu_worker directly see the host_quit to be true, it quit. So
+   the log_mode_before_vcpu_join() function will set the sem_vcpu_cont
+   to 1, since the vcpu_worker has quit, it won't consume it.
+2. sem_vcpu_stop be non-zero. When we set the host_quit to be true,
+   the vcpu_worker has entered the guest state, the next time it exit
+   from guest state, it will set the sem_vcpu_stop to 1, and then see
+   the host_quit, no one will consume the sem_vcpu_stop.
 
->> +        if (!kvm_arm_set_device_attr(cs, &attr, "PMU Event Filter")) {
->> +            error_report("Failed to init PMU Event Filter\n");
->> +            abort();
->> +        }
->> +    }
->> +
->> +    g_free(tmp);
->> +}
->> +
->> void kvm_arm_pmu_init(CPUState *cs)
->> {
->>     struct kvm_device_attr attr = {
->>         .group = KVM_ARM_VCPU_PMU_V3_CTRL,
->>         .attr = KVM_ARM_VCPU_PMU_V3_INIT,
->>     };
->> +    static bool pmu_filter_init = false;
->>
->>     if (!ARM_CPU(cs)->has_pmu) {
->>         return;
->>     }
->> +    if (!pmu_filter_init) {
->> +        kvm_arm_pmu_filter_init(cs);
->> +        pmu_filter_init = true;
-> 
-> pmu_filter_init could move inside kvm_arm_pmu_filter_init() - maybe
-> together with a comment that this only needs to be called for 1 vcpu.
+When execute more and more dirty-ring tests, the sem_vcpu_cont and
+sem_vcpu_stop can be larger and larger, which makes many code paths
+don't wait for the sem_t. Thus finally cause the problem.
 
-Good idea. Will do that.
+Fix this problem is easy, simply initialize the sem_t before every test.
+Thus whatever the state previous test left, it won't interfere the next
+test.
 
-Thanks,
-Shaoqin
+Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+---
+ tools/testing/selftests/kvm/dirty_log_test.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-> 
-> Thanks,
-> Sebastian
-> 
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index 936f3a8d1b83..23b179534c0b 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -726,6 +726,9 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 		return;
+ 	}
+ 
++	sem_init(&sem_vcpu_stop, 0, 0);
++	sem_init(&sem_vcpu_cont, 0, 0);
++
+ 	/*
+ 	 * We reserve page table for 2 times of extra dirty mem which
+ 	 * will definitely cover the original (1G+) test range.  Here
+@@ -871,9 +874,6 @@ int main(int argc, char *argv[])
+ 	int opt, i;
+ 	sigset_t sigset;
+ 
+-	sem_init(&sem_vcpu_stop, 0, 0);
+-	sem_init(&sem_vcpu_cont, 0, 0);
+-
+ 	guest_modes_append_default();
+ 
+ 	while ((opt = getopt(argc, argv, "c:hi:I:p:m:M:")) != -1) {
+-- 
+2.40.1
 
 
