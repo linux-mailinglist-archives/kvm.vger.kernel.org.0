@@ -1,49 +1,49 @@
-Return-Path: <kvm+bounces-1879-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1880-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 239367EDCC3
-	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 09:19:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2197B7EDD2E
+	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 09:57:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29239B20C37
-	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 08:18:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7314B280FAB
+	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 08:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF6E11704;
-	Thu, 16 Nov 2023 08:18:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5012414F7A;
+	Thu, 16 Nov 2023 08:57:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kyaZ9NZF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HNe5gzl8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511FA196;
-	Thu, 16 Nov 2023 00:18:46 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CD4EA1;
+	Thu, 16 Nov 2023 00:57:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700122726; x=1731658726;
+  t=1700125054; x=1731661054;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=FbushCVIFv+PY/6S/x2mvxLk/35CqPa8wajnY9+0vW4=;
-  b=kyaZ9NZFtCurrk4S7363ZlZlZU0rJgxG6Y3bk8e2V/SOoBdCPwY8zDZ2
-   KXVnAJty3Ipi2UyPMJhHFzl6WlixeAv4ZeOSLiR8+zz99n0VqxEHXIS/Y
-   7ATWbOqMJT5fD8IA698XwI5grXp5xDKvbxMkxYUmaTb1f5R2h8SJKNJh+
-   6Zoyiz0p5ldzRx+/+qOGTAMXWb1+IScMV2ixy35uen+SL6UesCFW5J/91
-   D4Gx9zD6wZl6yAG/dD1Ru0vTd52JjHaviENAcU03p/pp3GptHMBKDw07d
-   wsWTeg3OGsiYtBshd/FdIPhtPlijA6BFuhbDL0cYIBO3kFANwg6BkC0Jn
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="389899556"
+  bh=6hF/KOy4geEzMKDye/KnnEK2zzobLNIQdCZGvFvFx7o=;
+  b=HNe5gzl8rRw3i7yMvw7P0d7YAv8/iO5RuqzW1q3r70wBr8No8yvrZJL8
+   WuGUilodLGmHGC7m5z9Ifpg0hiyxATSsjfsobYNNONri/1SHVeSrdR/Ar
+   q9DUJMc7gd/8MSe8bJwObtLVstBWQxTqQMGbcUnOY9nibmMFAdowKCit7
+   tVJ3KJwWZKRfCrEYLj03TsUI97/HFuPZhhUfKXvfD6Y/TDTb4zRXaaaez
+   TMLXQ58DBMbEEyLAflsSrPVM/vUy9uxbdVxkNYd1BUn4x8LnLI3dGhu2+
+   Ejsy/4Sl14DiRixdEryNMdrZuHUvgpk5hp2pWnaM/xRRunojDyUATEpry
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="9687822"
 X-IronPort-AV: E=Sophos;i="6.03,307,1694761200"; 
-   d="scan'208";a="389899556"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 00:18:34 -0800
+   d="scan'208";a="9687822"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 00:57:33 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="768846727"
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="794437255"
 X-IronPort-AV: E=Sophos;i="6.03,307,1694761200"; 
-   d="scan'208";a="768846727"
+   d="scan'208";a="794437255"
 Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.126]) ([10.238.10.126])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 00:18:30 -0800
-Message-ID: <ab5978fe-998f-4407-ae57-307606d5fb74@linux.intel.com>
-Date: Thu, 16 Nov 2023 16:18:28 +0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 00:57:28 -0800
+Message-ID: <00b167fa-6635-47a4-a219-1f4117fe6c97@linux.intel.com>
+Date: Thu, 16 Nov 2023 16:57:26 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -51,8 +51,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 03/16] KVM: TDX: Pass KVM page level to
- tdh_mem_page_add() and tdh_mem_page_aug()
+Subject: Re: [PATCH v6 04/16] KVM: TDX: Pass size to tdx_measure_page()
 To: isaku.yamahata@intel.com
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
@@ -62,115 +61,67 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
  Xiaoyao Li <xiaoyao.li@intel.com>
 References: <cover.1699368363.git.isaku.yamahata@intel.com>
- <d3b140b63e0dc9773475724d97d566917d444791.1699368363.git.isaku.yamahata@intel.com>
+ <7b024367db5909ffc22e6762acd0569c3a82ccd3.1699368363.git.isaku.yamahata@intel.com>
 From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <d3b140b63e0dc9773475724d97d566917d444791.1699368363.git.isaku.yamahata@intel.com>
+In-Reply-To: <7b024367db5909ffc22e6762acd0569c3a82ccd3.1699368363.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 
 
 On 11/7/2023 11:00 PM, isaku.yamahata@intel.com wrote:
 > From: Xiaoyao Li <xiaoyao.li@intel.com>
 >
-> Level info is needed in tdh_clflush_page() to generate the correct page
-> size.
-
-tdh_clflush_page() -> tdx_clflush_page()
-
->
-> Besides, explicitly pass level info to SEAMCALL instead of assuming
-> it's zero. It works naturally when 2MB support lands.
+> Extend tdx_measure_page() to pass size info so that it can measure
+> large page as well.
 >
 > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > ---
->   arch/x86/kvm/vmx/tdx.c     |  7 ++++---
->   arch/x86/kvm/vmx/tdx_ops.h | 19 ++++++++++++-------
->   2 files changed, 16 insertions(+), 10 deletions(-)
+>   arch/x86/kvm/vmx/tdx.c | 8 +++++---
+>   1 file changed, 5 insertions(+), 3 deletions(-)
 >
 > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 8b58d91bda4e..2d5c86e06c5f 100644
+> index 2d5c86e06c5f..a728175c4a6d 100644
 > --- a/arch/x86/kvm/vmx/tdx.c
 > +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -1468,7 +1468,7 @@ static int tdx_sept_page_aug(struct kvm *kvm, gfn_t gfn,
->   	union tdx_sept_entry entry;
+> @@ -1434,13 +1434,15 @@ void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
+>   	td_vmcs_write64(to_tdx(vcpu), SHARED_EPT_POINTER, root_hpa & PAGE_MASK);
+>   }
+>   
+> -static void tdx_measure_page(struct kvm_tdx *kvm_tdx, hpa_t gpa)
+> +static void tdx_measure_page(struct kvm_tdx *kvm_tdx, hpa_t gpa, int size)
+IMHO, it's better to pass kvm page level instead of size here to align with
+other APIs.
+
+>   {
+>   	struct tdx_module_args out;
 >   	u64 err;
+>   	int i;
 >   
-> -	err = tdh_mem_page_aug(kvm_tdx->tdr_pa, gpa, hpa, &out);
-> +	err = tdh_mem_page_aug(kvm_tdx->tdr_pa, gpa, tdx_level, hpa, &out);
->   	if (unlikely(err == TDX_ERROR_SEPT_BUSY)) {
->   		tdx_unpin(kvm, pfn);
->   		return -EAGAIN;
-> @@ -1497,6 +1497,7 @@ static int tdx_sept_page_aug(struct kvm *kvm, gfn_t gfn,
->   static int tdx_sept_page_add(struct kvm *kvm, gfn_t gfn,
->   			     enum pg_level level, kvm_pfn_t pfn)
->   {
-> +	int tdx_level = pg_level_to_tdx_sept_level(level);
->   	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
->   	hpa_t hpa = pfn_to_hpa(pfn);
->   	gpa_t gpa = gfn_to_gpa(gfn);
-> @@ -1531,8 +1532,8 @@ static int tdx_sept_page_add(struct kvm *kvm, gfn_t gfn,
->   	kvm_tdx->source_pa = INVALID_PAGE;
->   
->   	do {
-> -		err = tdh_mem_page_add(kvm_tdx->tdr_pa, gpa, hpa, source_pa,
-> -				       &out);
-> +		err = tdh_mem_page_add(kvm_tdx->tdr_pa, gpa, tdx_level, hpa,
-> +				       source_pa, &out);
->   		/*
->   		 * This path is executed during populating initial guest memory
->   		 * image. i.e. before running any vcpu.  Race is rare.
-> diff --git a/arch/x86/kvm/vmx/tdx_ops.h b/arch/x86/kvm/vmx/tdx_ops.h
-> index e726102d3523..0f2df7198bde 100644
-> --- a/arch/x86/kvm/vmx/tdx_ops.h
-> +++ b/arch/x86/kvm/vmx/tdx_ops.h
-> @@ -63,6 +63,11 @@ static inline u64 tdx_seamcall(u64 op, u64 rcx, u64 rdx, u64 r8, u64 r9,
->   void pr_tdx_error(u64 op, u64 error_code, const struct tdx_module_args *out);
->   #endif
->   
-> +static inline enum pg_level tdx_sept_level_to_pg_level(int tdx_level)
-> +{
-> +	return tdx_level + 1;
-> +}
+> -	for (i = 0; i < PAGE_SIZE; i += TDX_EXTENDMR_CHUNKSIZE) {
+> +	WARN_ON_ONCE(size % TDX_EXTENDMR_CHUNKSIZE);
+
+If passed level instead of size, then no need to check KVM_HPAGE_SIZE(level)
+against TDX_EXTENDMR_CHUNKSIZE
+
+But same qeustion, tdx_measure_page() is only for tdh_mem_page_add(), is 
+this
+change necessary?
+
 > +
->   static inline void tdx_clflush_page(hpa_t addr, enum pg_level level)
->   {
->   	clflush_cache_range(__va(addr), KVM_HPAGE_SIZE(level));
-> @@ -104,11 +109,11 @@ static inline u64 tdh_mng_addcx(hpa_t tdr, hpa_t addr)
->   	return tdx_seamcall(TDH_MNG_ADDCX, addr, tdr, 0, 0, NULL);
->   }
+> +	for (i = 0; i < size; i += TDX_EXTENDMR_CHUNKSIZE) {
+>   		err = tdh_mr_extend(kvm_tdx->tdr_pa, gpa + i, &out);
+>   		if (KVM_BUG_ON(err, &kvm_tdx->kvm)) {
+>   			pr_tdx_error(TDH_MR_EXTEND, err, &out);
+> @@ -1544,7 +1546,7 @@ static int tdx_sept_page_add(struct kvm *kvm, gfn_t gfn,
+>   		tdx_unpin(kvm, pfn);
+>   		return -EIO;
+>   	} else if (measure)
+> -		tdx_measure_page(kvm_tdx, gpa);
+> +		tdx_measure_page(kvm_tdx, gpa, KVM_HPAGE_SIZE(level));
 >   
-> -static inline u64 tdh_mem_page_add(hpa_t tdr, gpa_t gpa, hpa_t hpa, hpa_t source,
-> -				   struct tdx_module_args *out)
-> +static inline u64 tdh_mem_page_add(hpa_t tdr, gpa_t gpa, int level, hpa_t hpa,
-> +				   hpa_t source, struct tdx_module_args *out)
->   {
-> -	tdx_clflush_page(hpa, PG_LEVEL_4K);
-> -	return tdx_seamcall_sept(TDH_MEM_PAGE_ADD, gpa, tdr, hpa, source, out);
-> +	tdx_clflush_page(hpa, tdx_sept_level_to_pg_level(level));
-> +	return tdx_seamcall_sept(TDH_MEM_PAGE_ADD, gpa | level, tdr, hpa, source, out);
->   }
-
-For TDH_MEM_PAGE_ADD, only 4K page is supported, is this change necessary?
-Or maybe huge page can be supported by TDH_MEM_PAGE_ADD in the future?
-
+>   	return 0;
 >   
->   static inline u64 tdh_mem_sept_add(hpa_t tdr, gpa_t gpa, int level, hpa_t page,
-> @@ -143,11 +148,11 @@ static inline u64 tdh_mem_page_relocate(hpa_t tdr, gpa_t gpa, hpa_t hpa,
->   	return tdx_seamcall_sept(TDH_MEM_PAGE_RELOCATE, gpa, tdr, hpa, 0, out);
->   }
->   
-> -static inline u64 tdh_mem_page_aug(hpa_t tdr, gpa_t gpa, hpa_t hpa,
-> +static inline u64 tdh_mem_page_aug(hpa_t tdr, gpa_t gpa, int level, hpa_t hpa,
->   				   struct tdx_module_args *out)
->   {
-> -	tdx_clflush_page(hpa, PG_LEVEL_4K);
-> -	return tdx_seamcall_sept(TDH_MEM_PAGE_AUG, gpa, tdr, hpa, 0, out);
-> +	tdx_clflush_page(hpa, tdx_sept_level_to_pg_level(level));
-> +	return tdx_seamcall_sept(TDH_MEM_PAGE_AUG, gpa | level, tdr, hpa, 0, out);
->   }
->   
->   static inline u64 tdh_mem_range_block(hpa_t tdr, gpa_t gpa, int level,
 
 
