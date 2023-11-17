@@ -1,80 +1,73 @@
-Return-Path: <kvm+bounces-1961-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1962-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81C637EF3A7
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 14:18:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 775427EF506
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 16:20:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25D1D1F28A41
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 13:18:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B9EE9B20B0E
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 15:20:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5340321BF;
-	Fri, 17 Nov 2023 13:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38E8937174;
+	Fri, 17 Nov 2023 15:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KvkNphZw"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="msU9VZ3m"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BA26D57;
-	Fri, 17 Nov 2023 05:18:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700227101; x=1731763101;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=RidyZbnJH2WdtltNPSz30z+b1yF96itdW/+pcCRzRqI=;
-  b=KvkNphZwcQJDJPzACTFBEPDxSYNRnFcW9d8eykHnG0qqJxusfSZrpLD8
-   cZKoaeDM7/kKj/6XWfqtaOIypnGd0rZOtMHoMAQj6+mvxJHKRYMgS0h3L
-   VvhIz/XasdEfnAS/8/RAL/QPOLRU0PRpQWsco72StfmM4pIvoHpsPzSVG
-   l/GR4RhSVPNoQ0b5sniLBfVnIDGEz/LZ9wHrvFzUR6yBrGn3cEBbCV/QZ
-   G6tpSRq9bVWyn1quUFa3DG5JIEMYYDosnPha42LYgYO3FfBuvEdmHLbyg
-   oleSUcnHPZyEsJRPln3QO1A4OCUaW8dEl2lcWWnedPZfekwCYZ9JmpZn6
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="381685614"
-X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
-   d="scan'208";a="381685614"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2023 05:18:20 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="794831206"
-X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
-   d="scan'208";a="794831206"
-Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by orsmga008.jf.intel.com with ESMTP; 17 Nov 2023 05:18:20 -0800
-From: Yi Liu <yi.l.liu@intel.com>
-To: joro@8bytes.org,
-	alex.williamson@redhat.com,
-	jgg@nvidia.com,
-	kevin.tian@intel.com,
-	robin.murphy@arm.com,
-	baolu.lu@linux.intel.com
-Cc: cohuck@redhat.com,
-	eric.auger@redhat.com,
-	nicolinc@nvidia.com,
-	kvm@vger.kernel.org,
-	mjrosato@linux.ibm.com,
-	chao.p.peng@linux.intel.com,
-	yi.l.liu@intel.com,
-	yi.y.sun@linux.intel.com,
-	peterx@redhat.com,
-	jasowang@redhat.com,
-	shameerali.kolothum.thodi@huawei.com,
-	lulu@redhat.com,
-	suravee.suthikulpanit@amd.com,
-	iommu@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	zhenzhong.duan@intel.com,
-	joao.m.martins@oracle.com,
-	xin.zeng@intel.com,
-	yan.y.zhao@intel.com
-Subject: [PATCH v7 3/3] iommu/vt-d: Add iotlb flush for nested domain
-Date: Fri, 17 Nov 2023 05:18:16 -0800
-Message-Id: <20231117131816.24359-4-yi.l.liu@intel.com>
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F0BFD56;
+	Fri, 17 Nov 2023 07:20:00 -0800 (PST)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AHFAw2F032727;
+	Fri, 17 Nov 2023 15:20:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=KXauD0E8clPPZRroXgFKohZ76btumq7rs+fcoJOPbSs=;
+ b=msU9VZ3meNCghnmXGiT8I7YGBqMZq1KMaSHE/32ee1Yfujo0T5lMV9DVu/zZSc0Q1z43
+ cLk+hOH9VawKXrJ+yREGc9BExvNey1WZikuvOzRj2QMltTbjp57HoNa+WkjJ29tmSgB5
+ /cLM/e9fMEfYdULtwfhk0gLESr1u+842rYKiDO3OpnJG1MUz6Ippw8HFoTZDdeFz/oQx
+ j/BN3PfrTW7OG9SqMiAdFDqbt42f5LUbIFYuZf8hdvK+/KblljAJscIOFUou0QDSGCmw
+ pJ77IZwur2+NWTOArCm1IIQarSdQaV0yO3O5YyPZ901auw1Lw/3LSS3zPDSRNZdpOmGg 2w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ueaah8ynk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Nov 2023 15:19:59 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AHFBHjM001731;
+	Fri, 17 Nov 2023 15:19:59 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ueaah8ykv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Nov 2023 15:19:58 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AHD42iS005177;
+	Fri, 17 Nov 2023 15:19:57 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uakxtf7v7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Nov 2023 15:19:57 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AHFJsTi6816266
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 17 Nov 2023 15:19:55 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CFFD12004E;
+	Fri, 17 Nov 2023 15:19:54 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8EE5520043;
+	Fri, 17 Nov 2023 15:19:54 +0000 (GMT)
+Received: from a46lp67.. (unknown [9.152.108.100])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 17 Nov 2023 15:19:54 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, thuth@redhat.com,
+        david@redhat.com, nsg@linux.ibm.com, nrb@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v3 0/7] s390x: Add base AP support
+Date: Fri, 17 Nov 2023 15:19:32 +0000
+Message-Id: <20231117151939.971079-1-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231117131816.24359-1-yi.l.liu@intel.com>
-References: <20231117131816.24359-1-yi.l.liu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,84 +75,66 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: s6KA7sZPLlEAJucOtSSuB7QDcFAHkjEo
+X-Proofpoint-GUID: cTWw1TFezRx3htvK2NPTF_hnPXd8uQpb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-17_14,2023-11-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
+ bulkscore=0 suspectscore=0 malwarescore=0 mlxlogscore=987 phishscore=0
+ mlxscore=0 impostorscore=0 priorityscore=1501 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311170114
 
-This implements the .cache_invalidate_user() callback to support iotlb
-flush for nested domain.
+As KVM supports passing Adjunct Processor (AP) crypto devices to
+guests, we should make sure that the interface works as expected.
 
-Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- drivers/iommu/intel/nested.c | 54 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+Three instructions provide the interface to the AP devices:
+ - nqap: Enqueues a crypto request
+ - dqap: Dequeues a crypto request
+ - pqap: Provides information and processes support functions
 
-diff --git a/drivers/iommu/intel/nested.c b/drivers/iommu/intel/nested.c
-index b5a5563ab32c..44ad48db7ea0 100644
---- a/drivers/iommu/intel/nested.c
-+++ b/drivers/iommu/intel/nested.c
-@@ -73,9 +73,63 @@ static void intel_nested_domain_free(struct iommu_domain *domain)
- 	kfree(to_dmar_domain(domain));
- }
- 
-+static void domain_flush_iotlb_psi(struct dmar_domain *domain,
-+				   u64 addr, unsigned long npages)
-+{
-+	struct iommu_domain_info *info;
-+	unsigned long i;
-+
-+	xa_for_each(&domain->iommu_array, i, info)
-+		iommu_flush_iotlb_psi(info->iommu, domain,
-+				      addr >> VTD_PAGE_SHIFT, npages, 1, 0);
-+}
-+
-+static int intel_nested_cache_invalidate_user(struct iommu_domain *domain,
-+					      struct iommu_user_data_array *array,
-+					      u32 *cerror_idx)
-+{
-+	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
-+	struct iommu_hwpt_vtd_s1_invalidate inv_info;
-+	u32 index;
-+	int ret;
-+
-+	/* REVISIT:
-+	 * VT-d has defined ITE, ICE, IQE for invalidation failure per hardware,
-+	 * but no error code yet, so just set the error code to be 0.
-+	 */
-+	*cerror_idx = 0;
-+
-+	for (index = 0; index < array->entry_num; index++) {
-+		ret = iommu_copy_struct_from_user_array(&inv_info, array,
-+							IOMMU_HWPT_DATA_VTD_S1,
-+							index, __reserved);
-+		if (ret) {
-+			pr_err_ratelimited("Failed to fetch invalidation request\n");
-+			break;
-+		}
-+
-+		if (inv_info.__reserved || (inv_info.flags & ~IOMMU_VTD_INV_FLAGS_LEAF) ||
-+		    !IS_ALIGNED(inv_info.addr, VTD_PAGE_SIZE)) {
-+			ret = -EINVAL;
-+			break;
-+		}
-+
-+		if (inv_info.addr == 0 && inv_info.npages == -1)
-+			intel_flush_iotlb_all(domain);
-+		else
-+			domain_flush_iotlb_psi(dmar_domain,
-+					       inv_info.addr, inv_info.npages);
-+	}
-+
-+	array->entry_num = index;
-+
-+	return ret;
-+}
-+
- static const struct iommu_domain_ops intel_nested_domain_ops = {
- 	.attach_dev		= intel_nested_attach_dev,
- 	.free			= intel_nested_domain_free,
-+	.cache_invalidate_user	= intel_nested_cache_invalidate_user,
- };
- 
- struct iommu_domain *intel_nested_domain_alloc(struct iommu_domain *parent,
+nqap & dqap work on crypto requests for which we currently don't want
+to add tests due to their sheer complexity.
+
+Which leaves us with pqap which is partly emulated for a guest 2 and
+hence is a prime target for testing.
+
+v3:
+	- Renamed ap_check() to ap_setup() and added comment
+
+v2:
+	- Re-worked the ap_check() function to test for stfle 12 since
+          we rely on PQAP QCI in the library functions
+	- Re-worked APQN management
+	- Fixed faulty loop variable initializers in ap.c
+	- Fixed report messages
+	- Extended clobber lists
+	- Extended length bit checks for nqap
+	- Now using ARRAY_SIZE where applicabale
+	- NIB is now allocated as IO memory
+
+
+Janosch Frank (7):
+  lib: s390x: Add ap library
+  s390x: Add guest 2 AP test
+  lib: s390x: ap: Add proper ap setup code
+  s390x: ap: Add pqap aqic tests
+  s390x: ap: Add reset tests
+  lib: s390x: ap: Add tapq test facility bit
+  s390x: ap: Add nq/dq len test
+
+ lib/s390x/ap.c      | 278 ++++++++++++++++++++++
+ lib/s390x/ap.h      | 119 ++++++++++
+ s390x/Makefile      |   2 +
+ s390x/ap.c          | 564 ++++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg |   3 +
+ 5 files changed, 966 insertions(+)
+ create mode 100644 lib/s390x/ap.c
+ create mode 100644 lib/s390x/ap.h
+ create mode 100644 s390x/ap.c
+
 -- 
 2.34.1
 
