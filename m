@@ -1,271 +1,353 @@
-Return-Path: <kvm+bounces-1974-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1975-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FA927EF6BA
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 18:05:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5B077EF866
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 21:15:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D2B21C208E4
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 17:05:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97637281069
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 20:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B0D3374CE;
-	Fri, 17 Nov 2023 17:05:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A97E45BE2;
+	Fri, 17 Nov 2023 20:15:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WGUfYR8q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b2gHz9tE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDEDAD56
-	for <kvm@vger.kernel.org>; Fri, 17 Nov 2023 09:05:31 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1cc5b705769so19836625ad.0
-        for <kvm@vger.kernel.org>; Fri, 17 Nov 2023 09:05:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700240730; x=1700845530; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Kgzhy7wbn7KkIyv10eaxLSa7/5f+qIxp+Kv2J1VZjNo=;
-        b=WGUfYR8qdpq0uLIK4yP/XHqrJp2TMx8wvWiUvQ3TG35wPlczaVn47wInOMt/m79le6
-         amsRl75IbS2B01yZMiUQQxGuLFqulUTb5XWMoZCvc0R97UgRtmOYANBvd1q686yizJiK
-         oznz+o1jvgv+rYZCzDjbkC4WKWcymWJ7Wg80JhlHW9VwkKw47nHMyx5F5VvWfPRXqlIS
-         UcJk+V5+mtoxmZlBE1f2rHOSugzIm/qQcx31sk/aCv7zD245vhwZotg9+gO0aJXnCSJp
-         vfRb0K/N5DULKRLCRZvG3ITMGOpbsHguCRDD/zlt1Iorjf8kTpnFYLU2gVwMzvxc/9Oi
-         fmVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700240730; x=1700845530;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Kgzhy7wbn7KkIyv10eaxLSa7/5f+qIxp+Kv2J1VZjNo=;
-        b=a2aNUrKFPY1bjyEzAAtDUzMjXOGthL/cu4lUC29RSc5wNNidMVtEEbXTNBpq1PXoSn
-         qgLmSuRuoof+K7Kq7Un2n5ePTHGqlCIq7UHPhBcZ7qoJPkwPXYPZnasc9YfHK9iBIBTL
-         LMsEXs/nifn0I8MAIZpFy5u1ZRf94784lCF5U7XeJLuuKqTzXtoqatFS8a2fNXPS609s
-         OaMvvHxAPqSv4JE8bLrKZ9lcrTN2HAlgErXmd3J0jxAaHkuqT9gBaOWlcfmzuSv0dR5Z
-         pwHRRpqSC6gSIFT0Je56TloTBEi26YFWghxh49tAymlKIimUZ/A2Ly3kyOP/fqRcuGpU
-         lLtg==
-X-Gm-Message-State: AOJu0Yyy/1qSm2VRbO1tzbni0b1PeX9kWfx5nMUUjOam46bDHEjorgQo
-	58AMrCkx0vtJm47SusZ2GvS3mh/IsZeJJP9T
-X-Google-Smtp-Source: AGHT+IH6o7hghTG6FuHna/02jof5Cm1yqAM1261ACh5J0pm+JbWKX2pZaZSd1obwatH4KswJ4S/kQQ==
-X-Received: by 2002:a17:903:2289:b0:1cc:703d:20fe with SMTP id b9-20020a170903228900b001cc703d20femr109694plh.42.1700240730126;
-        Fri, 17 Nov 2023 09:05:30 -0800 (PST)
-Received: from archrox.. ([191.177.167.170])
-        by smtp.googlemail.com with ESMTPSA id t16-20020a170902e85000b001c46d04d001sm1610376plg.87.2023.11.17.09.05.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Nov 2023 09:05:29 -0800 (PST)
-From: Eduardo Bart <edub4rt@gmail.com>
-To: kvm@vger.kernel.org
-Cc: Eduardo Bart <edub4rt@gmail.com>,
-	jean-philippe@linaro.org,
-	will@kernel.org,
-	alex@mikhalevich.com
-Subject: [PATCH kvmtool v2 1/1] virtio: Cancel and join threads when exiting devices devices
-Date: Fri, 17 Nov 2023 14:04:15 -0300
-Message-ID: <20231117170455.80578-2-edub4rt@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231117170455.80578-1-edub4rt@gmail.com>
-References: <20231117170455.80578-1-edub4rt@gmail.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E44651FEF;
+	Fri, 17 Nov 2023 12:15:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700252125; x=1731788125;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/7+LjIS9p9ecKNObclU4C94lj+TYiKtZZXlq7W+6+hI=;
+  b=b2gHz9tE426xGyctT2ig1NQjHnP1fFZvCzN6Cg/NoFFlCuHsuOTxcPhK
+   wqSQ1Fflee65O9dCt2zoMDu74QNvRtZ2tNvzn+B9izYF+VHB1uSsYfZrD
+   7jWR+0Z/w/v+7jKN5r4ihCCI3ZmQ4hgoJoybSmMtaPyTI0eVqYsY+bclM
+   AH8k5VV6yijaFZCXgvievajxUT+pXgdsXaRegvtGzXpkYipdJ5sAOcqKz
+   3GHs9x5sBKnDRMJRVjTllI15dj/6/e6WNpeP2HsdUboBXiKQbqet+QSCk
+   C9wekRKHNyvz+LSqcvV9Hl/jde/DWQZm2iXJGi7YQFr9rpQDULxifwMLj
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10897"; a="12913558"
+X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
+   d="scan'208";a="12913558"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2023 12:15:24 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
+   d="scan'208";a="6951003"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2023 12:15:23 -0800
+Date: Fri, 17 Nov 2023 12:15:23 -0800
+From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	"Aktas, Erdem" <erdemaktas@google.com>,
+	"Christopherson,, Sean" <seanjc@google.com>,
+	"Shahar, Sagi" <sagis@google.com>,
+	David Matlack <dmatlack@google.com>,
+	"Huang, Kai" <kai.huang@intel.com>,
+	Zhi Wang <zhi.wang.linux@gmail.com>,
+	"Chen, Bo2" <chen.bo@intel.com>, "Yuan, Hang" <hang.yuan@intel.com>,
+	"Zhang, Tina" <tina.zhang@intel.com>,
+	"gkirkpatrick@google.com" <gkirkpatrick@google.com>,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v16 059/116] KVM: TDX: Create initial guest memory
+Message-ID: <20231117201523.GD1109547@ls.amr.corp.intel.com>
+References: <cover.1697471314.git.isaku.yamahata@intel.com>
+ <edccd3a8ee2ca8d96baca097546bc131f1ef3b79.1697471314.git.isaku.yamahata@intel.com>
+ <DS0PR11MB6373EC1033F88008D3B71568DCB7A@DS0PR11MB6373.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <DS0PR11MB6373EC1033F88008D3B71568DCB7A@DS0PR11MB6373.namprd11.prod.outlook.com>
 
-Signed-off-by: Eduardo Bart <edub4rt@gmail.com>
----
- include/kvm/virtio-9p.h |  1 +
- include/kvm/virtio.h    |  1 +
- virtio/9p.c             | 14 ++++++++++++++
- virtio/balloon.c        | 10 ++++++++++
- virtio/blk.c            |  1 +
- virtio/console.c        |  2 ++
- virtio/core.c           |  6 ++++++
- virtio/net.c            |  3 +++
- virtio/rng.c            | 10 +++++++++-
- 9 files changed, 47 insertions(+), 1 deletion(-)
+On Fri, Nov 17, 2023 at 12:56:32PM +0000,
+"Wang, Wei W" <wei.w.wang@intel.com> wrote:
 
-diff --git a/include/kvm/virtio-9p.h b/include/kvm/virtio-9p.h
-index 1dffc95..09f7e46 100644
---- a/include/kvm/virtio-9p.h
-+++ b/include/kvm/virtio-9p.h
-@@ -70,6 +70,7 @@ int virtio_9p_rootdir_parser(const struct option *opt, const char *arg, int unse
- int virtio_9p_img_name_parser(const struct option *opt, const char *arg, int unset);
- int virtio_9p__register(struct kvm *kvm, const char *root, const char *tag_name);
- int virtio_9p__init(struct kvm *kvm);
-+int virtio_9p__exit(struct kvm *kvm);
- int virtio_p9_pdu_readf(struct p9_pdu *pdu, const char *fmt, ...);
- int virtio_p9_pdu_writef(struct p9_pdu *pdu, const char *fmt, ...);
- 
-diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
-index 95b5142..8b7ec1b 100644
---- a/include/kvm/virtio.h
-+++ b/include/kvm/virtio.h
-@@ -251,6 +251,7 @@ struct virtio_ops {
- int __must_check virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 			     struct virtio_ops *ops, enum virtio_trans trans,
- 			     int device_id, int subsys_id, int class);
-+void virtio_exit(struct kvm *kvm, struct virtio_device *vdev);
- int virtio_compat_add_message(const char *device, const char *config);
- const char* virtio_trans_name(enum virtio_trans trans);
- void virtio_init_device_vq(struct kvm *kvm, struct virtio_device *vdev,
-diff --git a/virtio/9p.c b/virtio/9p.c
-index 513164e..2fa6f28 100644
---- a/virtio/9p.c
-+++ b/virtio/9p.c
-@@ -1562,6 +1562,20 @@ int virtio_9p__init(struct kvm *kvm)
- }
- virtio_dev_init(virtio_9p__init);
- 
-+int virtio_9p__exit(struct kvm *kvm)
-+{
-+	struct p9_dev *p9dev, *tmp;
-+
-+	list_for_each_entry_safe(p9dev, tmp, &devs, list) {
-+		list_del(&p9dev->list);
-+		virtio_exit(kvm, &p9dev->vdev);
-+		free(p9dev);
-+	}
-+
-+	return 0;
-+}
-+virtio_dev_exit(virtio_9p__exit);
-+
- int virtio_9p__register(struct kvm *kvm, const char *root, const char *tag_name)
- {
- 	struct p9_dev *p9dev;
-diff --git a/virtio/balloon.c b/virtio/balloon.c
-index 01d1982..5b3e062 100644
---- a/virtio/balloon.c
-+++ b/virtio/balloon.c
-@@ -221,6 +221,13 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq)
- 	return 0;
- }
- 
-+static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
-+{
-+	struct bln_dev *bdev = dev;
-+
-+	thread_pool__cancel_job(&bdev->jobs[vq]);
-+}
-+
- static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
- {
- 	struct bln_dev *bdev = dev;
-@@ -258,6 +265,7 @@ struct virtio_ops bln_dev_virtio_ops = {
- 	.get_config_size	= get_config_size,
- 	.get_host_features	= get_host_features,
- 	.init_vq		= init_vq,
-+	.exit_vq		= exit_vq,
- 	.notify_vq		= notify_vq,
- 	.get_vq			= get_vq,
- 	.get_size_vq		= get_size_vq,
-@@ -293,6 +301,8 @@ virtio_dev_init(virtio_bln__init);
- 
- int virtio_bln__exit(struct kvm *kvm)
- {
-+	virtio_exit(kvm, &bdev.vdev);
-+
- 	return 0;
- }
- virtio_dev_exit(virtio_bln__exit);
-diff --git a/virtio/blk.c b/virtio/blk.c
-index a58c745..b2d6180 100644
---- a/virtio/blk.c
-+++ b/virtio/blk.c
-@@ -345,6 +345,7 @@ static int virtio_blk__init_one(struct kvm *kvm, struct disk_image *disk)
- static int virtio_blk__exit_one(struct kvm *kvm, struct blk_dev *bdev)
- {
- 	list_del(&bdev->list);
-+	virtio_exit(kvm, &bdev->vdev);
- 	free(bdev);
- 
- 	return 0;
-diff --git a/virtio/console.c b/virtio/console.c
-index ebfbaf0..9a775f2 100644
---- a/virtio/console.c
-+++ b/virtio/console.c
-@@ -243,6 +243,8 @@ virtio_dev_init(virtio_console__init);
- 
- int virtio_console__exit(struct kvm *kvm)
- {
-+	virtio_exit(kvm, &cdev.vdev);
-+
- 	return 0;
- }
- virtio_dev_exit(virtio_console__exit);
-diff --git a/virtio/core.c b/virtio/core.c
-index a77e23b..b77e987 100644
---- a/virtio/core.c
-+++ b/virtio/core.c
-@@ -400,6 +400,12 @@ int virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 	return r;
- }
- 
-+void virtio_exit(struct kvm *kvm, struct virtio_device *vdev)
-+{
-+	if (vdev->ops && vdev->ops->exit)
-+		vdev->ops->exit(kvm, vdev);
-+}
-+
- int virtio_compat_add_message(const char *device, const char *config)
- {
- 	int len = 1024;
-diff --git a/virtio/net.c b/virtio/net.c
-index f09dd0a..492c576 100644
---- a/virtio/net.c
-+++ b/virtio/net.c
-@@ -969,10 +969,13 @@ int virtio_net__exit(struct kvm *kvm)
- 		if (ndev->mode == NET_MODE_TAP &&
- 		    strcmp(params->downscript, "none"))
- 			virtio_net_exec_script(params->downscript, ndev->tap_name);
-+		virtio_net_stop(ndev);
- 
- 		list_del(&ndev->list);
-+		virtio_exit(kvm, &ndev->vdev);
- 		free(ndev);
- 	}
-+
- 	return 0;
- }
- virtio_dev_exit(virtio_net__exit);
-diff --git a/virtio/rng.c b/virtio/rng.c
-index 6b36655..505c4b2 100644
---- a/virtio/rng.c
-+++ b/virtio/rng.c
-@@ -122,6 +122,13 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq)
- 	return 0;
- }
- 
-+static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
-+{
-+	struct rng_dev *rdev = dev;
-+
-+	thread_pool__cancel_job(&rdev->jobs[vq].job_id);
-+}
-+
- static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
- {
- 	struct rng_dev *rdev = dev;
-@@ -159,6 +166,7 @@ static struct virtio_ops rng_dev_virtio_ops = {
- 	.get_config_size	= get_config_size,
- 	.get_host_features	= get_host_features,
- 	.init_vq		= init_vq,
-+	.exit_vq		= exit_vq,
- 	.notify_vq		= notify_vq,
- 	.get_vq			= get_vq,
- 	.get_size_vq		= get_size_vq,
-@@ -209,7 +217,7 @@ int virtio_rng__exit(struct kvm *kvm)
- 
- 	list_for_each_entry_safe(rdev, tmp, &rdevs, list) {
- 		list_del(&rdev->list);
--		rdev->vdev.ops->exit(kvm, &rdev->vdev);
-+		virtio_exit(kvm, &rdev->vdev);
- 		free(rdev);
- 	}
- 
+> On Tuesday, October 17, 2023 12:14 AM, isaku.yamahata@intel.com wrote:
+> > Because the guest memory is protected in TDX, the creation of the initial guest
+> > memory requires a dedicated TDX module API, tdh_mem_page_add, instead of
+> > directly copying the memory contents into the guest memory in the case of
+> > the default VM type.  KVM MMU page fault handler callback, private_page_add,
+> > handles it.
+> > 
+> > Define new subcommand, KVM_TDX_INIT_MEM_REGION, of VM-scoped
+> > KVM_MEMORY_ENCRYPT_OP.  It assigns the guest page, copies the initial
+> > memory contents into the guest memory, encrypts the guest memory.  At the
+> > same time, optionally it extends memory measurement of the TDX guest.  It
+> > calls the KVM MMU page fault(EPT-violation) handler to trigger the callbacks
+> > for it.
+> > 
+> > Reported-by: gkirkpatrick@google.com
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > ---
+> > v15 -> v16:
+> > - add check if nr_pages isn't large with
+> >   (nr_page << PAGE_SHIFT) >> PAGE_SHIFT
+> > 
+> > v14 -> v15:
+> > - add a check if TD is finalized or not to tdx_init_mem_region()
+> > - return -EAGAIN when partial population
+> > ---
+> >  arch/x86/include/uapi/asm/kvm.h       |   9 ++
+> >  arch/x86/kvm/mmu/mmu.c                |   1 +
+> >  arch/x86/kvm/vmx/tdx.c                | 167 +++++++++++++++++++++++++-
+> >  arch/x86/kvm/vmx/tdx.h                |   2 +
+> >  tools/arch/x86/include/uapi/asm/kvm.h |   9 ++
+> >  5 files changed, 185 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/x86/include/uapi/asm/kvm.h
+> > b/arch/x86/include/uapi/asm/kvm.h index 311a7894b712..a1815fcbb0be
+> > 100644
+> > --- a/arch/x86/include/uapi/asm/kvm.h
+> > +++ b/arch/x86/include/uapi/asm/kvm.h
+> > @@ -572,6 +572,7 @@ enum kvm_tdx_cmd_id {
+> >  	KVM_TDX_CAPABILITIES = 0,
+> >  	KVM_TDX_INIT_VM,
+> >  	KVM_TDX_INIT_VCPU,
+> > +	KVM_TDX_INIT_MEM_REGION,
+> > 
+> >  	KVM_TDX_CMD_NR_MAX,
+> >  };
+> > @@ -645,4 +646,12 @@ struct kvm_tdx_init_vm {
+> >  	struct kvm_cpuid2 cpuid;
+> >  };
+> > 
+> > +#define KVM_TDX_MEASURE_MEMORY_REGION	(1UL << 0)
+> > +
+> > +struct kvm_tdx_init_mem_region {
+> > +	__u64 source_addr;
+> > +	__u64 gpa;
+> > +	__u64 nr_pages;
+> > +};
+> > +
+> >  #endif /* _ASM_X86_KVM_H */
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c index
+> > 107cf27505fe..63a4efd1e40a 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -5652,6 +5652,7 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
+> >  out:
+> >  	return r;
+> >  }
+> > +EXPORT_SYMBOL(kvm_mmu_load);
+> > 
+> >  void kvm_mmu_unload(struct kvm_vcpu *vcpu)  { diff --git
+> > a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c index
+> > a5f1b3e75764..dc17c212cb38 100644
+> > --- a/arch/x86/kvm/vmx/tdx.c
+> > +++ b/arch/x86/kvm/vmx/tdx.c
+> > @@ -470,6 +470,21 @@ void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu,
+> > hpa_t root_hpa, int pgd_level)
+> >  	td_vmcs_write64(to_tdx(vcpu), SHARED_EPT_POINTER, root_hpa &
+> > PAGE_MASK);  }
+> > 
+> > +static void tdx_measure_page(struct kvm_tdx *kvm_tdx, hpa_t gpa) {
+> > +	struct tdx_module_args out;
+> > +	u64 err;
+> > +	int i;
+> > +
+> > +	for (i = 0; i < PAGE_SIZE; i += TDX_EXTENDMR_CHUNKSIZE) {
+> > +		err = tdh_mr_extend(kvm_tdx->tdr_pa, gpa + i, &out);
+> > +		if (KVM_BUG_ON(err, &kvm_tdx->kvm)) {
+> > +			pr_tdx_error(TDH_MR_EXTEND, err, &out);
+> > +			break;
+> > +		}
+> > +	}
+> > +}
+> > +
+> >  static void tdx_unpin(struct kvm *kvm, kvm_pfn_t pfn)  {
+> >  	struct page *page = pfn_to_page(pfn);
+> > @@ -533,6 +548,61 @@ static int tdx_sept_page_aug(struct kvm *kvm, gfn_t
+> > gfn,
+> >  	return 0;
+> >  }
+> > 
+> > +static int tdx_sept_page_add(struct kvm *kvm, gfn_t gfn,
+> > +			     enum pg_level level, kvm_pfn_t pfn) {
+> > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> > +	hpa_t hpa = pfn_to_hpa(pfn);
+> > +	gpa_t gpa = gfn_to_gpa(gfn);
+> > +	struct tdx_module_args out;
+> > +	hpa_t source_pa;
+> > +	bool measure;
+> > +	u64 err;
+> > +
+> > +	/*
+> > +	 * KVM_INIT_MEM_REGION, tdx_init_mem_region(), supports only 4K
+> > page
+> > +	 * because tdh_mem_page_add() supports only 4K page.
+> > +	 */
+> > +	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
+> > +		return -EINVAL;
+> > +
+> > +	/*
+> > +	 * In case of TDP MMU, fault handler can run concurrently.  Note
+> > +	 * 'source_pa' is a TD scope variable, meaning if there are multiple
+> > +	 * threads reaching here with all needing to access 'source_pa', it
+> > +	 * will break.  However fortunately this won't happen, because below
+> > +	 * TDH_MEM_PAGE_ADD code path is only used when VM is being
+> > created
+> > +	 * before it is running, using KVM_TDX_INIT_MEM_REGION ioctl
+> > (which
+> > +	 * always uses vcpu 0's page table and protected by vcpu->mutex).
+> > +	 */
+> > +	if (KVM_BUG_ON(kvm_tdx->source_pa == INVALID_PAGE, kvm)) {
+> > +		tdx_unpin(kvm, pfn);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	source_pa = kvm_tdx->source_pa &
+> > ~KVM_TDX_MEASURE_MEMORY_REGION;
+> > +	measure = kvm_tdx->source_pa &
+> > KVM_TDX_MEASURE_MEMORY_REGION;
+> > +	kvm_tdx->source_pa = INVALID_PAGE;
+> > +
+> > +	do {
+> > +		err = tdh_mem_page_add(kvm_tdx->tdr_pa, gpa, hpa,
+> > source_pa,
+> > +				       &out);
+> > +		/*
+> > +		 * This path is executed during populating initial guest memory
+> > +		 * image. i.e. before running any vcpu.  Race is rare.
+> > +		 */
+> > +	} while (unlikely(err == TDX_ERROR_SEPT_BUSY));
+> > +	if (KVM_BUG_ON(err, kvm)) {
+> > +		pr_tdx_error(TDH_MEM_PAGE_ADD, err, &out);
+> > +		tdx_unpin(kvm, pfn);
+> > +		return -EIO;
+> > +	} else if (measure)
+> > +		tdx_measure_page(kvm_tdx, gpa);
+> > +
+> > +	return 0;
+> > +
+> > +}
+> > +
+> >  static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
+> >  				     enum pg_level level, kvm_pfn_t pfn)  { @@
+> > -555,9 +625,7 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t
+> > gfn,
+> >  	if (likely(is_td_finalized(kvm_tdx)))
+> >  		return tdx_sept_page_aug(kvm, gfn, level, pfn);
+> > 
+> > -	/* TODO: tdh_mem_page_add() comes here for the initial memory. */
+> > -
+> > -	return 0;
+> > +	return tdx_sept_page_add(kvm, gfn, level, pfn);
+> >  }
+> > 
+> >  static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn, @@ -1265,6
+> > +1333,96 @@ void tdx_flush_tlb_current(struct kvm_vcpu *vcpu)
+> >  	tdx_track(vcpu->kvm);
+> >  }
+> > 
+> > +#define TDX_SEPT_PFERR	(PFERR_WRITE_MASK |
+> > PFERR_GUEST_ENC_MASK)
+> > +
+> > +static int tdx_init_mem_region(struct kvm *kvm, struct kvm_tdx_cmd
+> > +*cmd) {
+> > +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> > +	struct kvm_tdx_init_mem_region region;
+> > +	struct kvm_vcpu *vcpu;
+> > +	struct page *page;
+> > +	int idx, ret = 0;
+> > +	bool added = false;
+> > +
+> > +	/* Once TD is finalized, the initial guest memory is fixed. */
+> > +	if (is_td_finalized(kvm_tdx))
+> > +		return -EINVAL;
+> > +
+> > +	/* The BSP vCPU must be created before initializing memory regions.
+> > */
+> > +	if (!atomic_read(&kvm->online_vcpus))
+> > +		return -EINVAL;
+> > +
+> > +	if (cmd->flags & ~KVM_TDX_MEASURE_MEMORY_REGION)
+> > +		return -EINVAL;
+> > +
+> > +	if (copy_from_user(&region, (void __user *)cmd->data, sizeof(region)))
+> > +		return -EFAULT;
+> > +
+> > +	/* Sanity check */
+> > +	if (!IS_ALIGNED(region.source_addr, PAGE_SIZE) ||
+> > +	    !IS_ALIGNED(region.gpa, PAGE_SIZE) ||
+> > +	    !region.nr_pages ||
+> > +	    region.nr_pages & GENMASK_ULL(63, 63 - PAGE_SHIFT) ||
+> > +	    region.gpa + (region.nr_pages << PAGE_SHIFT) <= region.gpa ||
+> > +	    !kvm_is_private_gpa(kvm, region.gpa) ||
+> > +	    !kvm_is_private_gpa(kvm, region.gpa + (region.nr_pages <<
+> > PAGE_SHIFT)))
+> > +		return -EINVAL;
+> > +
+> > +	vcpu = kvm_get_vcpu(kvm, 0);
+> > +	if (mutex_lock_killable(&vcpu->mutex))
+> > +		return -EINTR;
+> > +
+> > +	vcpu_load(vcpu);
+> > +	idx = srcu_read_lock(&kvm->srcu);
+> > +
+> > +	kvm_mmu_reload(vcpu);
+> > +
+> > +	while (region.nr_pages) {
+> > +		if (signal_pending(current)) {
+> > +			ret = -ERESTARTSYS;
+> > +			break;
+> > +		}
+> > +
+> > +		if (need_resched())
+> > +			cond_resched();
+> > +
+> > +		/* Pin the source page. */
+> > +		ret = get_user_pages_fast(region.source_addr, 1, 0, &page);
+> > +		if (ret < 0)
+> > +			break;
+> > +		if (ret != 1) {
+> > +			ret = -ENOMEM;
+> > +			break;
+> > +		}
+> > +
+> > +		kvm_tdx->source_pa = pfn_to_hpa(page_to_pfn(page)) |
+> > +				     (cmd->flags &
+> > KVM_TDX_MEASURE_MEMORY_REGION);
+> > +
+> 
+> Is it fundamentally correct to take a userspace mapped page to add as a TD private page?
+> Maybe take the corresponding page from gmem and do a copy to it?
+> For example:
+> ret = get_user_pages_fast(region.source_addr, 1, 0, &user_page);
+> ...
+> kvm_gmem_get_pfn(kvm, gfn_to_memslot(kvm, gfn), gfn, &gmem_pfn, NULL);
+> memcpy(__va(gmem_pfn << PAGE_SHIFT), page_to_virt(user_page), PAGE_SIZE);
+> kvm_tdx->source_pa = pfn_to_hpa(gmem_pfn) |
+>                                      (cmd->flags & KVM_TDX_MEASURE_MEMORY_REGION);
+
+Please refer to
+static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
+                                     enum pg_level level, kvm_pfn_t pfn)
+
+The guest memfd provides the page of gfn which is different from
+kvm_tdx->source_pa. The function calls tdh_mem_page_add().
+
+tdh_mem_page_add(kvm_tdx->tdr_pa, gpa, hpa, source_pa, &out);
+gpa: corresponds to the page from guest memfd
+source_pa: corresopnds to the page tdx_init_mem_region() pinned down.
+
+tdh_mem_page_add() copies the page contents from source_pa to gpa and
+gives gpa to the TD guest. not source_pa.
 -- 
-2.42.0
-
+Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
