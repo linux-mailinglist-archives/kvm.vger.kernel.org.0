@@ -1,156 +1,290 @@
-Return-Path: <kvm+bounces-1905-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1906-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14EF77EEAB1
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 02:28:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DF477EEADB
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 02:56:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4564B1C20849
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 01:28:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 328381F25E0C
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 01:56:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5521383;
-	Fri, 17 Nov 2023 01:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DSTVcNxC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 620C846AD;
+	Fri, 17 Nov 2023 01:56:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71928129;
-	Thu, 16 Nov 2023 17:28:20 -0800 (PST)
-Received: by mail-ot1-x331.google.com with SMTP id 46e09a7af769-6ce532451c7so827998a34.2;
-        Thu, 16 Nov 2023 17:28:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700184499; x=1700789299; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lYDCHTeKA1F33R/86cvSFZKdG5hmQV+VfLbjpN+enJ0=;
-        b=DSTVcNxC4243zfiSCo9VMtESOWUngsFbQfMyJIgK2MUgDTqxT2mUT0OBtflDVq9oF8
-         Jt18vGBGbPio0dHym0yf4b2auqHBoZP4aRtxQAtHPre52MGjOB7KfAFR8DFM6GNPaqri
-         hCJRsvc4CkSkOEu2QtA3w2qnZG+d1cS4YHJvTFG+WJ/hUv0shLG4xwAd+gG3fSrCZdvh
-         M/0Tw8GtPHZR2v0xan3mYuUDl14kid6UmHozKGRds6o3YeUopye6iOYVXs4jRpW1ej20
-         UPKmspRaKHIJVZcTSHK9BcTFKUWFKpPWzemRao0onfZIXv9UNKY0H8aGAAvPJCZRZUHi
-         GcYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700184499; x=1700789299;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lYDCHTeKA1F33R/86cvSFZKdG5hmQV+VfLbjpN+enJ0=;
-        b=hqVJMZmrP21vv3LIPR3ZHzBpSHYDxfnbfHDPJqpfyrcgpOupA7aPSXWiUx0fOb+7wH
-         NZdkZmezpgwJgow+YMUXk4FSK9ttohb7P7NrJJJ0NKDbNOep6TwuF34I+atiJntoGCTv
-         5mf9sUt7lwRWsqpo02q9h8FosIftjFjXpvdm6tLlQF4BYdWhRsORLTPueTqOrZYWZg91
-         hQrKn630x3cwR4KVEfO+hNBmGKeFvlw9xtLC0ZTModRJQePnWUD6GovIS5PY/z6Tpnep
-         EoFpwTq3rUwh8rQ5Bth35MBkcEYRMwv5qQ73pZFWbU1Z2fiP2128fpSHof8jfm3q3QTR
-         8jKA==
-X-Gm-Message-State: AOJu0YzQf3mm7WqVJDFHYnJjzijyEGG+dl5Dj0kMb4zoxgwEk4Cs8XUy
-	/20RJ0uyOIh3i414FiKaADo=
-X-Google-Smtp-Source: AGHT+IEsgixXfLg6kIFkjRgBidHel0mzOuGYjARnZw3eDm7uZ/q6eqjl74h+UiOeVAcH2M8w9R8LtQ==
-X-Received: by 2002:a05:6830:13cb:b0:6c6:4843:2abb with SMTP id e11-20020a05683013cb00b006c648432abbmr10553632otq.12.1700184499688;
-        Thu, 16 Nov 2023 17:28:19 -0800 (PST)
-Received: from [172.27.233.123] (ec2-16-163-40-128.ap-east-1.compute.amazonaws.com. [16.163.40.128])
-        by smtp.gmail.com with ESMTPSA id 204-20020a6301d5000000b005897bfc2ed3sm332193pgb.93.2023.11.16.17.28.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Nov 2023 17:28:19 -0800 (PST)
-Message-ID: <965bf6a9-97f7-4e20-bcb8-658e5cf459e5@gmail.com>
-Date: Fri, 17 Nov 2023 09:28:14 +0800
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 16C58195;
+	Thu, 16 Nov 2023 17:56:38 -0800 (PST)
+Received: from loongson.cn (unknown [10.40.46.156])
+	by gateway (Coremail) with SMTP id _____8AxJuhVyFZlaLQ6AA--.57183S3;
+	Fri, 17 Nov 2023 09:56:37 +0800 (CST)
+Received: from [192.168.100.135] (unknown [10.40.46.156])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxH91SyFZlxcxEAA--.22204S3;
+	Fri, 17 Nov 2023 09:56:35 +0800 (CST)
+Subject: Re: [PATCH v4 0/4] KVM: selftests: Add LoongArch support
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc: Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Vishal Annapurve <vannapurve@google.com>, Huacai Chen
+ <chenhuacai@kernel.org>, loongarch@lists.linux.dev,
+ Peter Xu <peterx@redhat.com>, Vipin Sharma <vipinsh@google.com>,
+ maobibo@loongson.cn, Sean Christopherson <seanjc@google.com>
+References: <20231108025134.2592663-1-zhaotianrui@loongson.cn>
+From: zhaotianrui <zhaotianrui@loongson.cn>
+Message-ID: <32b34bc1-f0f0-0155-6df0-ac7725527bb8@loongson.cn>
+Date: Fri, 17 Nov 2023 09:47:18 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 6/9] KVM: x86: Update guest cpu_caps at runtime for
- dynamic CPUID-based features
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
-References: <20231110235528.1561679-1-seanjc@google.com>
- <20231110235528.1561679-7-seanjc@google.com>
- <ffec2e93-cdb1-25e2-06ec-deccf8727ce4@gmail.com>
- <ZVN6w2Kc2AUmIiJO@google.com>
- <9395d416-cc5c-536d-641e-ffd971b682d1@gmail.com>
- <ZVTfG6mARiyttuKj@google.com>
+In-Reply-To: <20231108025134.2592663-1-zhaotianrui@loongson.cn>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-From: Robert Hoo <robert.hoo.linux@gmail.com>
-In-Reply-To: <ZVTfG6mARiyttuKj@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:AQAAf8AxH91SyFZlxcxEAA--.22204S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxKw1Uuw17Kr1kJFykKF1fKrX_yoWfCr1Dpa
+	yFqr1FkF4fJFy7Aw1xJ34kZ34S9as7CFWUCw13KrykZrnFy34kJry8Ka92y34fua4DXw1S
+	vay8CwnxW3WDGagCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4j6r4UJwAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
+	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_
+	Jw1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
+	CYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48J
+	MxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+	IxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcpBTUUUUU
 
-On 11/15/2023 11:09 PM, Sean Christopherson wrote:
-...
->>> No, because then every caller would need extra code to pass
->>> vcpu->cpu_caps,
->>
->> Emm, I don't understand this. I tried to modified and compiled, all need to
->> do is simply substitute "vcpu" with "vcpu->arch.cpu_caps" in calling. (at
->> the end is my diff based on this patch set)
-> 
-> Yes, and I'm saying that
-> 
-> 	guest_cpu_cap_restrict(vcpu, X86_FEATURE_PAUSEFILTER);
-> 	guest_cpu_cap_restrict(vcpu, X86_FEATURE_PFTHRESHOLD);
-> 	guest_cpu_cap_restrict(vcpu, X86_FEATURE_VGIF);
-> 	guest_cpu_cap_restrict(vcpu, X86_FEATURE_VNMI);
-> 
-> is harder to read and write than this
-> 
-> 	guest_cpu_cap_restrict(vcpu->arch.cpu_caps, X86_FEATURE_PAUSEFILTER);
-> 	guest_cpu_cap_restrict(vcpu->arch.cpu_caps, X86_FEATURE_PFTHRESHOLD);
-> 	guest_cpu_cap_restrict(vcpu->arch.cpu_caps, X86_FEATURE_VGIF);
-> 	guest_cpu_cap_restrict(vcpu->arch.cpu_caps, X86_FEATURE_VNMI);
-> 
-> a one-time search-replace is easy, but the extra boilerplate has a non-zero cost
-> for every future developer/reader.
+Hi, all:
+This is a PING message, please help to review the LoongArch KVM 
+selftests patches.
 
-Hmm, I think this is trivial. And can be solved/eased by other means, e.g. 
-Macro?. Rather than in the sacrifice of letting function's inside (easily) 
-access those info it shouldn't.
-> 
->>> and passing 'u32 *' provides less type safety than 'struct kvm_vcpu *'.
->>> That tradeoff isn't worth making this one path slightly easier to read.
->>
->> My point is also from vulnerability, long term, since as a principle, we'd
->> better pass in param/info to a function of its necessity.
-> 
-> Attempting to apply the principle of least privilege to low level C helpers is
-> nonsensical.  E.g. the helper can trivially get at the owning vcpu via container_of()
-> (well, if not for typeof assertions not playing nice with arrays, but open coding
-> container_of() is also trivial and illustrates the point).
-> 
-> 	struct kvm_vcpu_arch *arch = (void *)caps -  offsetof(struct kvm_vcpu_arch, cpu_caps);
-> 	struct kvm_vcpu *vcpu = container_of(arch, struct kvm_vcpu, arch);
-> 
-> 	if (!kvm_cpu_cap_has(x86_feature))
-> 		guest_cpu_cap_clear(vcpu, x86_feature);
-> 
-> And the intent behind that principle is to improve security/robustness; what I'm
-> saying is that passing in a 'u32 *" makes the overall implementation _less_ robust,
-> as it opens up the possibilities of passing in an unsafe/incorrect pointer.  E.g.
-> a well-intentioned, not _that_ obviously broken example is:
-> 
-> 	guest_cpu_cap_restrict(&vcpu->arch.cpu_caps[CPUID_1_ECX], X86_FEATURE_XSAVE);
-> 
->> e.g. cpuid_entry2_find().
-> 
-> The main reason cpuid_entry2_find() exists is because KVM checks the incoming
-> array provided by KVM_SET_CPUID2, which is also the reason why
-> __kvm_update_cpuid_runtime() takes an @entries array instead of just @vcpu.
-
-Thanks for detailed explanation, I understand your points deeper, though I would 
-still prefer to honoring the principle if it was me to write the function. The 
-concerns above can/should be addressed by other means. (If some really cannot be 
-solved in C, i.e. more stringent type check, it's C to blame ;) but it on the 
-other side offers those flexibility that other languages cannot, doesn't it?)
-Another pros of the principle is that, it's also a fence, prevent (at least 
-raise the bar) people in the future from doing something that shouldn't be in 
-the function, e.g.  for his convenience to quickly fix a bug etc.
-
-Anyway, it's a dilemma, and I said it's a less important point for this great 
-progress of vCPUID's implementation, thanks.
-
-Reviewed-by: Robert Hoo <robert.hoo.linux@gmail.com>
+Thanks
+Tianrui Zhao
+ÔÚ 2023/11/8 ÉÏÎç10:51, Tianrui Zhao Ð´µÀ:
+> We add LoongArch support into KVM selftests and there are some KVM
+> test cases we have passed:
+> 	demand_paging_test
+> 	dirty_log_perf_test
+> 	dirty_log_test
+> 	guest_print_test
+> 	kvm_binary_stats_test
+> 	kvm_create_max_vcpus
+> 	kvm_page_table_test
+> 	memslot_modification_stress_test
+> 	memslot_perf_test
+> 	set_memory_region_test
+>
+> Changes for v4:
+> 1. Remove the based-on flag, as the LoongArch KVM patch series
+> have been accepted by Linux kernel, so this can be applied directly
+> in kernel.
+>
+> Changes for v3:
+> 1. Improve implementation of LoongArch VM page walk.
+> 2. Add exception handler for LoongArch.
+> 3. Add dirty_log_test, dirty_log_perf_test, guest_print_test
+> test cases for LoongArch.
+> 4. Add __ASSEMBLER__ macro to distinguish asm file and c file.
+> 5. Move ucall_arch_do_ucall to the header file and make it as
+> static inline to avoid function calls.
+> 6. Change the DEFAULT_GUEST_TEST_MEM base addr for LoongArch.
+>
+> Changes for v2:
+> 1. We should use ".balign 4096" to align the assemble code with 4K in
+> exception.S instead of "align 12".
+> 2. LoongArch only supports 3 or 4 levels page tables, so we remove the
+> hanlders for 2-levels page table.
+> 3. Remove the DEFAULT_LOONGARCH_GUEST_STACK_VADDR_MIN and use the common
+> DEFAULT_GUEST_STACK_VADDR_MIN to allocate stack memory in guest.
+> 4. Reorganize the test cases supported by LoongArch.
+> 5. Fix some code comments.
+> 6. Add kvm_binary_stats_test test case into LoongArch KVM selftests.
+>
+> changes for v1:
+> 1. Add kvm selftests header files for LoongArch.
+> 2. Add processor tests for LoongArch KVM.
+> 3. Add ucall tests for LoongArch KVM.
+> 4. Add LoongArch tests into makefile.
+>
+> All of the test cases results:
+> 1..10
+> # timeout set to 120
+> # selftests: kvm: demand_paging_test
+> # Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+> # guest physical test memory: [0xfbfffc000, 0xfffffc000)
+> # Finished creating vCPUs and starting uffd threads
+> # Started all vCPUs
+> # All vCPU threads joined
+> # Total guest execution time: 0.200804700s
+> # Overall demand paging rate: 326366.862927 pgs/sec
+> ok 1 selftests: kvm: demand_paging_test
+> # timeout set to 120
+> # selftests: kvm: dirty_log_perf_test
+> # Test iterations: 2
+> # Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+> # guest physical test memory: [0xfbfffc000, 0xfffffc000)
+> # Random seed: 1
+> # Populate memory time: 0.201452560s
+> # Enabling dirty logging time: 0.000451670s
+> #
+> # Iteration 1 dirty memory time: 0.051582140s
+> # Iteration 1 get dirty log time: 0.000010510s
+> # Iteration 1 clear dirty log time: 0.000421730s
+> # Iteration 2 dirty memory time: 0.046593760s
+> # Iteration 2 get dirty log time: 0.000002110s
+> # Iteration 2 clear dirty log time: 0.000418020s
+> # Disabling dirty logging time: 0.002948490s
+> # Get dirty log over 2 iterations took 0.000012620s. (Avg 0.000006310s/iteration)
+> # Clear dirty log over 2 iterations took 0.000839750s. (Avg 0.000419875s/iteration)
+> ok 2 selftests: kvm: dirty_log_perf_test
+> # timeout set to 120
+> # selftests: kvm: dirty_log_test
+> # Test iterations: 32, interval: 10 (ms)
+> # Testing Log Mode 'dirty-log'
+> # Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+> # guest physical test memory offset: 0xfbfff0000
+> # Dirtied 453632 pages
+> # Total bits checked: dirty (436564), clear (1595145), track_next (70002)
+> # Testing Log Mode 'clear-log'
+> # Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+> # guest physical test memory offset: 0xfbfff0000
+> # Dirtied 425984 pages
+> # Total bits checked: dirty (414397), clear (1617312), track_next (68152)
+> # Testing Log Mode 'dirty-ring'
+> # Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+> # dirty ring count: 0x10000
+> # guest physical test memory offset: 0xfbfff0000
+> # vcpu stops because vcpu is kicked out...
+> # Notifying vcpu to continue
+> # vcpu continues now.
+> # Iteration 1 collected 3201 pages
+> # vcpu stops because dirty ring is full...
+> # vcpu continues now.
+> # vcpu stops because dirty ring is full...
+> # Notifying vcpu to continue
+> # Iteration 2 collected 65472 pages
+> # ......
+> # vcpu continues now.
+> # vcpu stops because vcpu is kicked out...
+> # vcpu continues now.
+> # vcpu stops because vcpu is kicked out...
+> # Notifying vcpu to continue
+> # vcpu continues now.
+> # Iteration 31 collected 12642 pages
+> # vcpu stops because dirty ring is full...
+> # vcpu continues now.
+> # Dirtied 7275520 pages
+> # Total bits checked: dirty (1165675), clear (866034), track_next (811358)
+> ok 3 selftests: kvm: dirty_log_test
+> # timeout set to 120
+> # selftests: kvm: guest_print_test
+> ok 4 selftests: kvm: guest_print_test
+> # timeout set to 120
+> # selftests: kvm: kvm_binary_stats_test
+> # TAP version 13
+> # 1..4
+> # ok 1 vm0
+> # ok 2 vm1
+> # ok 3 vm2
+> # ok 4 vm3
+> # # Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
+> ok 5 selftests: kvm: kvm_binary_stats_test
+> # timeout set to 120
+> # selftests: kvm: kvm_create_max_vcpus
+> # KVM_CAP_MAX_VCPU_ID: 256
+> # KVM_CAP_MAX_VCPUS: 256
+> # Testing creating 256 vCPUs, with IDs 0...255.
+> ok 6 selftests: kvm: kvm_create_max_vcpus
+> # timeout set to 120
+> # selftests: kvm: kvm_page_table_test
+> # Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+> # Testing memory backing src type: anonymous
+> # Testing memory backing src granularity: 0x4000
+> # Testing memory size(aligned): 0x40000000
+> # Guest physical test memory offset: 0xfbfffc000
+> # Host  virtual  test memory offset: 0x7fffb0860000
+> # Number of testing vCPUs: 1
+> # Started all vCPUs successfully
+> # KVM_CREATE_MAPPINGS: total execution time: 0.200919330s
+> #
+> # KVM_UPDATE_MAPPINGS: total execution time: 0.051182930s
+> #
+> # KVM_ADJUST_MAPPINGS: total execution time: 0.010083590s
+> #
+> ok 7 selftests: kvm: kvm_page_table_test
+> # timeout set to 120
+> # selftests: kvm: memslot_modification_stress_test
+> # Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+> # guest physical test memory: [0xfbfffc000, 0xfffffc000)
+> # Finished creating vCPUs
+> # Started all vCPUs
+> # All vCPU threads joined
+> ok 8 selftests: kvm: memslot_modification_stress_test
+> # timeout set to 120
+> # selftests: kvm: memslot_perf_test
+> # Testing map performance with 1 runs, 5 seconds each
+> # Memslot count too high for this test, decrease the cap (max is 2053)
+> #
+> # Testing unmap performance with 1 runs, 5 seconds each
+> # Memslot count too high for this test, decrease the cap (max is 8197)
+> #
+> # Testing unmap chunked performance with 1 runs, 5 seconds each
+> # Memslot count too high for this test, decrease the cap (max is 8197)
+> #
+> # Testing move active area performance with 1 runs, 5 seconds each
+> # Test took 0.761678900s for slot setup + 5.000014460s all iterations
+> # Done 120167 iterations, avg 0.000041608s each
+> # Best runtime result was 0.000041608s per iteration (with 120167 iterations)
+> #
+> # Testing move inactive area performance with 1 runs, 5 seconds each
+> # Test took 0.771796550s for slot setup + 5.000018520s all iterations
+> # Done 136354 iterations, avg 0.000036669s each
+> # Best runtime result was 0.000036669s per iteration (with 136354 iterations)
+> #
+> # Testing RW performance with 1 runs, 5 seconds each
+> # Test took 0.763568840s for slot setup + 5.002233800s all iterations
+> # Done 649 iterations, avg 0.007707602s each
+> # Best runtime result was 0.007707602s per iteration (with 649 iterations)
+> # Best slot setup time for the whole test area was 0.761678900s
+> ok 9 selftests: kvm: memslot_perf_test
+> # timeout set to 120
+> # selftests: kvm: set_memory_region_test
+> # Allowed number of memory slots: 32767
+> # Adding slots 0..32766, each memory region with 2048K size
+> ok 10 selftests: kvm: set_memory_region_test
+>
+> Tianrui Zhao (4):
+>    KVM: selftests: Add KVM selftests header files for LoongArch
+>    KVM: selftests: Add core KVM selftests support for LoongArch
+>    KVM: selftests: Add ucall test support for LoongArch
+>    KVM: selftests: Add test cases for LoongArch
+>
+>   tools/testing/selftests/kvm/Makefile          |  15 +
+>   .../selftests/kvm/include/kvm_util_base.h     |   5 +
+>   .../kvm/include/loongarch/processor.h         | 133 +++++++
+>   .../selftests/kvm/include/loongarch/ucall.h   |  20 ++
+>   .../testing/selftests/kvm/include/memstress.h |  10 +
+>   .../selftests/kvm/lib/loongarch/exception.S   |  59 ++++
+>   .../selftests/kvm/lib/loongarch/processor.c   | 333 ++++++++++++++++++
+>   .../selftests/kvm/lib/loongarch/ucall.c       |  38 ++
+>   8 files changed, 613 insertions(+)
+>   create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
+>   create mode 100644 tools/testing/selftests/kvm/include/loongarch/ucall.h
+>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
+>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
+>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
+>
 
 
