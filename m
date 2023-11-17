@@ -1,48 +1,48 @@
-Return-Path: <kvm+bounces-1977-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1978-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E3B57EF8D9
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 21:50:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4A827EF91F
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 22:03:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5DC6280D76
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 20:50:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 010D71C20E14
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 21:03:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C46446DD;
-	Fri, 17 Nov 2023 20:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A47C4642F;
+	Fri, 17 Nov 2023 21:03:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PKoiebV/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cKJ0RPpg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F698D52
-	for <kvm@vger.kernel.org>; Fri, 17 Nov 2023 12:50:30 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E6DFB6
+	for <kvm@vger.kernel.org>; Fri, 17 Nov 2023 13:03:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700254230; x=1731790230;
+  t=1700254987; x=1731790987;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=RFVvuGTL3ufLBRPYTUl62P95336f8JzOxnBgSPK8YSA=;
-  b=PKoiebV/Lt/lnHVo+xMRZ0BhvtCFTBGP/d7cp+vKpJjR/R6jqFawF0NQ
-   he0Az9d9DU8hQlDG+dXYr1uuRteX20d+/IDZVoQ2jGMIw2Na7ahue4kC+
-   UvrO/TvN6rizOUUGMgsQnNs0OyJJUTp2eGeA+LyCz4rPWVQ7YryjhywwN
-   8kIAm/32sKdKSQck0UXOxByA2AOdYb1IrRGTUmio44GqT1V2a7/BwutDV
-   JSzxU6b0TJxh/+tIKNNwEx0RQbwVbx6LgmTUPHsOKYkecijUHtHB7P8F3
-   6B0Yj1xJZOxYHwiu563/GgObSTTtVOHlA5nOe+Hua0nBb7dZl3DNAj7qt
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10897"; a="371544837"
+  bh=7JF/vWM+ZZeUdd9cPjB6/JC44J5sV6hwsvD6NCm73yU=;
+  b=cKJ0RPpg5RZ6NAHFbVfkrywYNtlQPQJ07LZTdt5goiE3g9zyV2lj54tD
+   qxK4p0FZviQF8mS7Y9I9oXTL8I9nj0xqIW3qmNmBGlrpB4lhYZuW0PbUz
+   z4nwcItYDApSy2jsjM94EwwMkacBxoHpFqhxR/ZB2WszdSN/OqOVGZ7gm
+   hENsx+4O0/E7/uBsErvv12th1l0TB7D6IJHrNG60tbjWavVpYPVvEgvjZ
+   VNcBgavYg3l6ptS0iznmK+KkxPJs49srStOuj1KM2MymDGd0/mJnM6kWw
+   taxyfHx+z3X/oSsNnmc11RvPEL9OpHNfYxSsZxKIdibb+AskYdkPCiogL
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10897"; a="391151602"
 X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
-   d="scan'208";a="371544837"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2023 12:50:29 -0800
+   d="scan'208";a="391151602"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2023 13:03:05 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10897"; a="742182242"
+X-IronPort-AV: E=McAfee;i="6600,9927,10897"; a="1013042135"
 X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
-   d="scan'208";a="742182242"
+   d="scan'208";a="1013042135"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2023 12:50:28 -0800
-Date: Fri, 17 Nov 2023 12:50:28 -0800
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2023 13:03:04 -0800
+Date: Fri, 17 Nov 2023 13:03:04 -0800
 From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
 To: Xiaoyao Li <xiaoyao.li@intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -65,11 +65,11 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	Isaku Yamahata <isaku.yamahata@gmail.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>,
 	isaku.yamahata@linux.intel.com, isaku.yamahata@intel.com
-Subject: Re: [PATCH v3 05/70] kvm: Enable KVM_SET_USER_MEMORY_REGION2 for
- memslot
-Message-ID: <20231117205028.GB1645850@ls.amr.corp.intel.com>
+Subject: Re: [PATCH v3 09/70] physmem: Introduce ram_block_convert_range()
+ for page conversion
+Message-ID: <20231117210304.GC1645850@ls.amr.corp.intel.com>
 References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
- <20231115071519.2864957-6-xiaoyao.li@intel.com>
+ <20231115071519.2864957-10-xiaoyao.li@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -78,120 +78,112 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231115071519.2864957-6-xiaoyao.li@intel.com>
+In-Reply-To: <20231115071519.2864957-10-xiaoyao.li@intel.com>
 
-On Wed, Nov 15, 2023 at 02:14:14AM -0500,
+On Wed, Nov 15, 2023 at 02:14:18AM -0500,
 Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 
-> From: Chao Peng <chao.p.peng@linux.intel.com>
+> It's used for discarding opposite memory after memory conversion, for
+> confidential guest.
 > 
-> Switch to KVM_SET_USER_MEMORY_REGION2 when supported by KVM.
+> When page is converted from shared to private, the original shared
+> memory can be discarded via ram_block_discard_range();
 > 
-> With KVM_SET_USER_MEMORY_REGION2, QEMU can set up memory region that
-> backend'ed both by hva-based shared memory and guest memfd based private
-> memory.
+> When page is converted from private to shared, the original private
+> memory is back'ed by guest_memfd. Introduce
+> ram_block_discard_guest_memfd_range() for discarding memory in
+> guest_memfd.
 > 
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Originally-from: Isaku Yamahata <isaku.yamahata@intel.com>
+> Codeveloped-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > ---
->  accel/kvm/kvm-all.c      | 56 ++++++++++++++++++++++++++++++++++------
->  accel/kvm/trace-events   |  2 +-
->  include/sysemu/kvm_int.h |  2 ++
->  3 files changed, 51 insertions(+), 9 deletions(-)
+>  include/exec/cpu-common.h |  2 ++
+>  system/physmem.c          | 50 +++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 52 insertions(+)
 > 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 9f751d4971f8..69afeb47c9c0 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -293,35 +293,69 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram,
->  static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, bool new)
->  {
->      KVMState *s = kvm_state;
-> -    struct kvm_userspace_memory_region mem;
-> +    struct kvm_userspace_memory_region2 mem;
-> +    static int cap_user_memory2 = -1;
->      int ret;
+> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+> index 41115d891940..de728a18eef2 100644
+> --- a/include/exec/cpu-common.h
+> +++ b/include/exec/cpu-common.h
+> @@ -175,6 +175,8 @@ typedef int (RAMBlockIterFunc)(RAMBlock *rb, void *opaque);
 >  
-> +    if (cap_user_memory2 == -1) {
-> +        cap_user_memory2 = kvm_check_extension(s, KVM_CAP_USER_MEMORY2);
-> +    }
-> +
-> +    if (!cap_user_memory2 && slot->guest_memfd >= 0) {
-> +        error_report("%s, KVM doesn't support KVM_CAP_USER_MEMORY2,"
-> +                     " which is required by guest memfd!", __func__);
-> +        exit(1);
-> +    }
-> +
->      mem.slot = slot->slot | (kml->as_id << 16);
->      mem.guest_phys_addr = slot->start_addr;
->      mem.userspace_addr = (unsigned long)slot->ram;
->      mem.flags = slot->flags;
-> +    mem.guest_memfd = slot->guest_memfd;
-> +    mem.guest_memfd_offset = slot->guest_memfd_offset;
+>  int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque);
+>  int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length);
+> +int ram_block_convert_range(RAMBlock *rb, uint64_t start, size_t length,
+> +                            bool shared_to_private);
 >  
->      if (slot->memory_size && !new && (mem.flags ^ slot->old_flags) & KVM_MEM_READONLY) {
->          /* Set the slot size to 0 before setting the slot to the desired
->           * value. This is needed based on KVM commit 75d61fbc. */
->          mem.memory_size = 0;
-> -        ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-> +
-> +        if (cap_user_memory2) {
-> +            ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION2, &mem);
-> +        } else {
-> +            ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-> +	    }
->          if (ret < 0) {
->              goto err;
->          }
->      }
->      mem.memory_size = slot->memory_size;
-> -    ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-> +    if (cap_user_memory2) {
-> +        ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION2, &mem);
-> +    } else {
-> +        ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-> +    }
->      slot->old_flags = mem.flags;
->  err:
->      trace_kvm_set_user_memory(mem.slot >> 16, (uint16_t)mem.slot, mem.flags,
->                                mem.guest_phys_addr, mem.memory_size,
-> -                              mem.userspace_addr, ret);
-> +                              mem.userspace_addr, mem.guest_memfd,
-> +                              mem.guest_memfd_offset, ret);
->      if (ret < 0) {
-> -        error_report("%s: KVM_SET_USER_MEMORY_REGION failed, slot=%d,"
-> -                     " start=0x%" PRIx64 ", size=0x%" PRIx64 ": %s",
-> -                     __func__, mem.slot, slot->start_addr,
-> -                     (uint64_t)mem.memory_size, strerror(errno));
-> +        if (cap_user_memory2) {
-> +                error_report("%s: KVM_SET_USER_MEMORY_REGION2 failed, slot=%d,"
-> +                        " start=0x%" PRIx64 ", size=0x%" PRIx64 ","
-> +                        " flags=0x%" PRIx32 ", guest_memfd=%" PRId32 ","
-> +                        " guest_memfd_offset=0x%" PRIx64 ": %s",
-> +                        __func__, mem.slot, slot->start_addr,
-> +                        (uint64_t)mem.memory_size, mem.flags,
-> +                        mem.guest_memfd, (uint64_t)mem.guest_memfd_offset,
-> +                        strerror(errno));
-> +        } else {
-> +                error_report("%s: KVM_SET_USER_MEMORY_REGION failed, slot=%d,"
-> +                            " start=0x%" PRIx64 ", size=0x%" PRIx64 ": %s",
-> +                            __func__, mem.slot, slot->start_addr,
-> +                            (uint64_t)mem.memory_size, strerror(errno));
-> +        }
->      }
+>  #endif
+>  
+> diff --git a/system/physmem.c b/system/physmem.c
+> index ddfecddefcd6..cd6008fa09ad 100644
+> --- a/system/physmem.c
+> +++ b/system/physmem.c
+> @@ -3641,6 +3641,29 @@ err:
 >      return ret;
 >  }
-> @@ -477,6 +511,9 @@ static int kvm_mem_flags(MemoryRegion *mr)
->      if (readonly && kvm_readonly_mem_allowed) {
->          flags |= KVM_MEM_READONLY;
->      }
-> +    if (memory_region_has_guest_memfd(mr)) {
-> +        flags |= KVM_MEM_PRIVATE;
+>  
+> +static int ram_block_discard_guest_memfd_range(RAMBlock *rb, uint64_t start,
+> +                                               size_t length)
+> +{
+> +    int ret = -1;
+> +
+> +#ifdef CONFIG_FALLOCATE_PUNCH_HOLE
+> +    ret = fallocate(rb->guest_memfd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+> +                    start, length);
+> +
+> +    if (ret) {
+> +        ret = -errno;
+> +        error_report("%s: Failed to fallocate %s:%" PRIx64 " +%zx (%d)",
+> +                     __func__, rb->idstr, start, length, ret);
 > +    }
+> +#else
+> +    ret = -ENOSYS;
+> +    error_report("%s: fallocate not available %s:%" PRIx64 " +%zx (%d)",
+> +                 __func__, rb->idstr, start, length, ret);
+> +#endif
+> +
+> +    return ret;
+> +}
+> +
+>  bool ramblock_is_pmem(RAMBlock *rb)
+>  {
+>      return rb->flags & RAM_PMEM;
+> @@ -3828,3 +3851,30 @@ bool ram_block_discard_is_required(void)
+>      return qatomic_read(&ram_block_discard_required_cnt) ||
+>             qatomic_read(&ram_block_coordinated_discard_required_cnt);
+>  }
+> +
+> +int ram_block_convert_range(RAMBlock *rb, uint64_t start, size_t length,
+> +                            bool shared_to_private)
+> +{
+> +    if (!rb || rb->guest_memfd < 0) {
+> +        return -1;
+> +    }
+> +
+> +    if (!QEMU_PTR_IS_ALIGNED(start, qemu_host_page_size) ||
+> +        !QEMU_PTR_IS_ALIGNED(length, qemu_host_page_size)) {
+> +        return -1;
+> +    }
+> +
+> +    if (!length) {
+> +        return -1;
+> +    }
+> +
+> +    if (start + length > rb->max_length) {
+> +        return -1;
+> +    }
+> +
+> +    if (shared_to_private) {
+> +        return ram_block_discard_range(rb, start, length);
+> +    } else {
+> +        return ram_block_discard_guest_memfd_range(rb, start, length);
+> +    }
+> +}
 
-Nitpick: it was renamed to KVM_MEM_GUEST_MEMFD
-As long as the value is defined to same value, it doesn't matter, though.
+Originally this function issued KVM_SET_MEMORY_ATTRIBUTES, the function name
+mad sense. But now it doesn't, and it issues only punch hole. We should rename
+it to represent what it actually does. discard_range?
 -- 
 Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
