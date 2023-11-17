@@ -1,289 +1,315 @@
-Return-Path: <kvm+bounces-1915-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1916-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB7497EEC97
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 08:20:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D4977EECBB
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 08:39:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09F8A1C20AD6
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 07:20:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80E80B20AFF
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 07:39:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E38DF53;
-	Fri, 17 Nov 2023 07:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CFC9DF63;
+	Fri, 17 Nov 2023 07:39:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="YjxB/p4q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kRgczKrO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96CE3D5E;
-	Thu, 16 Nov 2023 23:20:21 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 42D46100053;
-	Fri, 17 Nov 2023 10:20:20 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 42D46100053
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1700205620;
-	bh=TXUWzwEhbxgHVkn7xc8Va70O8zxsHqn90+mpouI8FXI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=YjxB/p4q7lGQMkqHj1iaTecDtBc+2MLOvH8esTIyX9HXuDAXC1YFwYsvOE8x9hUIV
-	 6vCAA3PnX66Im+M8Q7exm3jzILXBXMsOyTsc6ONN2toX7et3HguQRdZcROO3D9NOl4
-	 kPI2MIAxr/uOk719tbkPn12IDFhcXIQIpiyGuNDsxhhYz1hAq4DGHAHcFjoWAZt5+R
-	 ls/We6bbnInDdnXyk8bGR2jBsEqBn47tzeTSvfmszkpuhF/4t4XZVGOxRzPBzYThJB
-	 uNTzZeO45BbeRD3hCcvb+5TVrxXUnQH1ZYR2tsNI1rynY81O54PuB0RE4YnSnqo5il
-	 mxcJGP+3QT1VA==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Fri, 17 Nov 2023 10:20:20 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 17 Nov 2023 10:20:19 +0300
-Message-ID: <923a6149-3bd5-c5b4-766d-8301f9e7484a@salutedevices.com>
-Date: Fri, 17 Nov 2023 10:12:38 +0300
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D95B4109
+	for <kvm@vger.kernel.org>; Thu, 16 Nov 2023 23:39:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700206766; x=1731742766;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=YLHi6GRYPIUMX2jYGDwwXL31+PV0KAFU5NzaOOjNqB8=;
+  b=kRgczKrOuKx3veRGw4cVbkTGX+uEtu+zufG4HGjSQXWuz3ik4Ye+KtzS
+   V8PGh0KrU/oEitOgWg86avRnQNFPib1hS7WuKLCWTb/G8kZT79w4oFwh9
+   br0ABAHMUqm8cv0etcS6GzwHd14VWng8AHTOizHDWqKYNPBkYV3QAfXZO
+   w6HGmEvOh6vaL8ewOQmWpH5YG0Z84I94IyAJQbTDlt87Aw70JxH9NRJqT
+   wmhM2lAab1Sq304l8832C05ulLvjy93d/ZpVeDNtbddtvOowwFQbBuJHM
+   78uq2+pl56NfgpMFKksXHaLypGlYUuza02XswP9wnrx/k9+XabHs9aBd9
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="395180251"
+X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
+   d="scan'208";a="395180251"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 23:39:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="883042535"
+X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
+   d="scan'208";a="883042535"
+Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
+  by fmsmga002.fm.intel.com with ESMTP; 16 Nov 2023 23:39:21 -0800
+From: Zhao Liu <zhao1.liu@linux.intel.com>
+To: Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>
+Cc: qemu-devel@nongnu.org,
+	kvm@vger.kernel.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Zhuocheng Ding <zhuocheng.ding@intel.com>,
+	Babu Moger <babu.moger@amd.com>,
+	Yongwei Ma <yongwei.ma@intel.com>,
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: [PATCH v6 00/16] Support smp.clusters for x86 in QEMU
+Date: Fri, 17 Nov 2023 15:50:50 +0800
+Message-Id: <20231117075106.432499-1-zhao1.liu@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v1 2/2] vsock/test: SO_RCVLOWAT + deferred credit
- update test
-Content-Language: en-US
-To: Stefano Garzarella <sgarzare@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
-	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20231108072004.1045669-1-avkrasnov@salutedevices.com>
- <20231108072004.1045669-3-avkrasnov@salutedevices.com>
- <zukasb6k7ogta33c2wik6cgadg2rkacestat7pkexd45u53swh@ovso3hafta77>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <zukasb6k7ogta33c2wik6cgadg2rkacestat7pkexd45u53swh@ovso3hafta77>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 181429 [Nov 17 2023]
-X-KSMG-AntiSpam-Version: 6.0.0.2
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;docs.kernel.org:7.1.1;127.0.0.199:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2023/11/17 06:10:00
-X-KSMG-LinksScanning: Clean, bases: 2023/11/17 06:10:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/11/17 06:08:00 #22469568
-X-KSMG-AntiVirus-Status: Clean, skipped
+
+From: Zhao Liu <zhao1.liu@intel.com>
+
+Hi list,
+
+This is the our v6 patch series, rebased on the master branch at the
+commit 34a5cb6d8434 (Merge tag 'pull-tcg-20231114' of
+https://gitlab.com/rth7680/qemu into staging).
+
+Because the first four patches of v5 [1] have been merged, v6 contains
+the remaining patches and reabse on the latest master.
+
+No more change since v5 exclude the comment update about QEMU version
+(see Changelog).
+
+Welcome your comments!
 
 
+PS: About the idea to implement generic smp cache topology, we're
+considerring to port the original x-l2-cache-topo option to smp [2].
+Just like:
 
-On 15.11.2023 14:11, Stefano Garzarella wrote:
-> On Wed, Nov 08, 2023 at 10:20:04AM +0300, Arseniy Krasnov wrote:
->> This adds test which checks, that updating SO_RCVLOWAT value also sends
-> 
-> You can avoid "This adds", and write just "Add test ...".
-> 
-> See https://docs.kernel.org/process/submitting-patches.html#describe-your-changes
-> 
->     Describe your changes in imperative mood, e.g. "make xyzzy do frotz"
->     instead of "[This patch] makes xyzzy do frotz" or "[I] changed xyzzy
->     to do frotz", as if you are giving orders to the codebase to change
->     its behaviour.
-> 
-> Also in the other patch.
-> 
->> credit update message. Otherwise mutual hungup may happen when receiver
->> didn't send credit update and then calls 'poll()' with non default
->> SO_RCVLOWAT value (e.g. waiting enough bytes to read), while sender
->> waits for free space at receiver's side.
->>
->> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->> ---
->> tools/testing/vsock/vsock_test.c | 131 +++++++++++++++++++++++++++++++
->> 1 file changed, 131 insertions(+)
->>
->> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->> index c1f7bc9abd22..c71b3875fd16 100644
->> --- a/tools/testing/vsock/vsock_test.c
->> +++ b/tools/testing/vsock/vsock_test.c
->> @@ -1180,6 +1180,132 @@ static void test_stream_shutrd_server(const struct test_opts *opts)
->>     close(fd);
->> }
->>
->> +#define RCVLOWAT_CREDIT_UPD_BUF_SIZE    (1024 * 128)
->> +#define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE    (1024 * 64)
-> 
-> What about adding a comment like the one in the cover letter about
-> dependency with kernel values?
-> 
-> Please add it also in the commit description.
-> 
-> I'm thinking if we should move all the defines that depends on the
-> kernel in some special header.
+-smp cpus=4,sockets=2,cores=2,threads=1, \
+     l3-cache=socket,l2-cache=core,l1-i-cache=core,l1-d-cache=core
 
-IIUC it will be new header file in tools/testing/vsock, which includes such defines. At
-this moment in will contain only VIRTIO_VSOCK_MAX_PKT_BUF_SIZE. Idea is that such defines
-are not supposed to use by user (so do not move it to uapi headers), but needed by tests
-to check kernel behaviour. Please correct me if i'm wrong.
+Any feedback about this direction is also welcomed! ;-)
 
-Thanks, Arseniy
 
-> 
->> +
->> +static void test_stream_rcvlowat_def_cred_upd_client(const struct test_opts *opts)
->> +{
->> +    size_t buf_size;
->> +    void *buf;
->> +    int fd;
->> +
->> +    fd = vsock_stream_connect(opts->peer_cid, 1234);
->> +    if (fd < 0) {
->> +        perror("connect");
->> +        exit(EXIT_FAILURE);
->> +    }
->> +
->> +    /* Send 1 byte more than peer's buffer size. */
->> +    buf_size = RCVLOWAT_CREDIT_UPD_BUF_SIZE + 1;
->> +
->> +    buf = malloc(buf_size);
->> +    if (!buf) {
->> +        perror("malloc");
->> +        exit(EXIT_FAILURE);
->> +    }
->> +
->> +    /* Wait until peer sets needed buffer size. */
->> +    control_expectln("SRVREADY");
->> +
->> +    if (send(fd, buf, buf_size, 0) != buf_size) {
->> +        perror("send failed");
->> +        exit(EXIT_FAILURE);
->> +    }
->> +
->> +    free(buf);
->> +    close(fd);
->> +}
->> +
->> +static void test_stream_rcvlowat_def_cred_upd_server(const struct test_opts *opts)
->> +{
->> +    size_t recv_buf_size;
->> +    struct pollfd fds;
->> +    size_t buf_size;
->> +    void *buf;
->> +    int fd;
->> +
->> +    fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
->> +    if (fd < 0) {
->> +        perror("accept");
->> +        exit(EXIT_FAILURE);
->> +    }
->> +
->> +    buf_size = RCVLOWAT_CREDIT_UPD_BUF_SIZE;
->> +
->> +    if (setsockopt(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
->> +               &buf_size, sizeof(buf_size))) {
->> +        perror("setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
->> +        exit(EXIT_FAILURE);
->> +    }
->> +
->> +    buf = malloc(buf_size);
->> +    if (!buf) {
->> +        perror("malloc");
->> +        exit(EXIT_FAILURE);
->> +    }
->> +
->> +    control_writeln("SRVREADY");
->> +
->> +    /* Wait until there will be 128KB of data in rx queue. */
->> +    while (1) {
->> +        ssize_t res;
->> +
->> +        res = recv(fd, buf, buf_size, MSG_PEEK);
->> +        if (res == buf_size)
->> +            break;
->> +
->> +        if (res <= 0) {
->> +            fprintf(stderr, "unexpected 'recv()' return: %zi\n", res);
->> +            exit(EXIT_FAILURE);
->> +        }
->> +    }
->> +
->> +    /* There is 128KB of data in the socket's rx queue,
->> +     * dequeue first 64KB, credit update is not sent.
->> +     */
->> +    recv_buf_size = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
->> +    recv_buf(fd, buf, recv_buf_size, 0, recv_buf_size);
->> +    recv_buf_size++;
->> +
->> +    /* Updating SO_RCVLOWAT will send credit update. */
->> +    if (setsockopt(fd, SOL_SOCKET, SO_RCVLOWAT,
->> +               &recv_buf_size, sizeof(recv_buf_size))) {
->> +        perror("setsockopt(SO_RCVLOWAT)");
->> +        exit(EXIT_FAILURE);
->> +    }
->> +
->> +    memset(&fds, 0, sizeof(fds));
->> +    fds.fd = fd;
->> +    fds.events = POLLIN | POLLRDNORM | POLLERR |
->> +             POLLRDHUP | POLLHUP;
->> +
->> +    /* This 'poll()' will return once we receive last byte
->> +     * sent by client.
->> +     */
->> +    if (poll(&fds, 1, -1) < 0) {
->> +        perror("poll");
->> +        exit(EXIT_FAILURE);
->> +    }
->> +
->> +    if (fds.revents & POLLERR) {
->> +        fprintf(stderr, "'poll()' error\n");
->> +        exit(EXIT_FAILURE);
->> +    }
->> +
->> +    if (fds.revents & (POLLIN | POLLRDNORM)) {
->> +        recv_buf(fd, buf, recv_buf_size, 0, recv_buf_size);
->> +    } else {
->> +        /* These flags must be set, as there is at
->> +         * least 64KB of data ready to read.
->> +         */
->> +        fprintf(stderr, "POLLIN | POLLRDNORM expected\n");
->> +        exit(EXIT_FAILURE);
->> +    }
->> +
->> +    free(buf);
->> +    close(fd);
->> +}
->> +
->> static struct test_case test_cases[] = {
->>     {
->>         .name = "SOCK_STREAM connection reset",
->> @@ -1285,6 +1411,11 @@ static struct test_case test_cases[] = {
->>         .run_client = test_stream_msgzcopy_empty_errq_client,
->>         .run_server = test_stream_msgzcopy_empty_errq_server,
->>     },
->> +    {
->> +        .name = "SOCK_STREAM virtio SO_RCVLOWAT + deferred cred update",
->> +        .run_client = test_stream_rcvlowat_def_cred_upd_client,
->> +        .run_server = test_stream_rcvlowat_def_cred_upd_server,
->> +    },
->>     {},
->> };
->>
->> -- 
->> 2.25.1
->>
-> 
+---
+# Introduction
+
+This series adds the cluster support for x86 PC machine, which allows
+x86 can use smp.clusters to configure the module level CPU topology
+of x86.
+
+This series also is the preparation to help x86 to define the more
+flexible cache topology, such as having multiple cores share the
+same L2 cache at cluster level. (That was what x-l2-cache-topo did,
+and we will explore a generic way.)
+
+About why we don't share L2 cache at cluster and need a configuration
+way, pls see section: ## Why not share L2 cache in cluster directly.
+
+
+# Background
+
+The "clusters" parameter in "smp" is introduced by ARM [3], but x86
+hasn't supported it.
+
+At present, x86 defaults L2 cache is shared in one core, but this is
+not enough. There're some platforms that multiple cores share the
+same L2 cache, e.g., Alder Lake-P shares L2 cache for one module of
+Atom cores [4], that is, every four Atom cores shares one L2 cache.
+Therefore, we need the new CPU topology level (cluster/module).
+
+Another reason is for hybrid architecture. cluster support not only
+provides another level of topology definition in x86, but would also
+provide required code change for future our hybrid topology support.
+
+
+# Overview
+
+## Introduction of module level for x86
+
+"cluster" in smp is the CPU topology level which is between "core" and
+die.
+
+For x86, the "cluster" in smp is corresponding to the module level [4],
+which is above the core level. So use the "module" other than "cluster"
+in x86 code.
+
+And please note that x86 already has a cpu topology level also named
+"cluster" [5], this level is at the upper level of the package. Here,
+the cluster in x86 cpu topology is completely different from the
+"clusters" as the smp parameter. After the module level is introduced,
+the cluster as the smp parameter will actually refer to the module level
+of x86.
+
+
+## Why not share L2 cache in cluster directly
+
+Though "clusters" was introduced to help define L2 cache topology
+[3], using cluster to define x86's L2 cache topology will cause the
+compatibility problem:
+
+Currently, x86 defaults that the L2 cache is shared in one core, which
+actually implies a default setting "cores per L2 cache is 1" and
+therefore implicitly defaults to having as many L2 caches as cores.
+
+For example (i386 PC machine):
+-smp 16,sockets=2,dies=2,cores=2,threads=2,maxcpus=16 (*)
+
+Considering the topology of the L2 cache, this (*) implicitly means "1
+core per L2 cache" and "2 L2 caches per die".
+
+If we use cluster to configure L2 cache topology with the new default
+setting "clusters per L2 cache is 1", the above semantics will change
+to "2 cores per cluster" and "1 cluster per L2 cache", that is, "2
+cores per L2 cache".
+
+So the same command (*) will cause changes in the L2 cache topology,
+further affecting the performance of the virtual machine.
+
+Therefore, x86 should only treat cluster as a cpu topology level and
+avoid using it to change L2 cache by default for compatibility.
+
+
+## module level in CPUID
+
+Linux kernel (from v6.4, with commit edc0a2b595765 ("x86/topology: Fix
+erroneous smp_num_siblings on Intel Hybrid platforms") is able to
+handle platforms with Module level enumerated via CPUID.1F.
+
+Expose the module level in CPUID[0x1F] (for Intel CPUs) if the machine
+has more than 1 modules since v3.
+
+
+## New cache topology info in CPUCacheInfo
+
+(This is in preparation for users being able to configure cache topology
+from the cli later on.)
+
+Currently, by default, the cache topology is encoded as:
+1. i/d cache is shared in one core.
+2. L2 cache is shared in one core.
+3. L3 cache is shared in one die.
+
+This default general setting has caused a misunderstanding, that is, the
+cache topology is completely equated with a specific cpu topology, such
+as the connection between L2 cache and core level, and the connection
+between L3 cache and die level.
+
+In fact, the settings of these topologies depend on the specific
+platform and are not static. For example, on Alder Lake-P, every
+four Atom cores share the same L2 cache [3].
+
+Thus, in this patch set, we explicitly define the corresponding cache
+topology for different cpu models and this has two benefits:
+1. Easy to expand to new CPU models in the future, which has different
+   cache topology.
+2. It can easily support custom cache topology by some command.
+
+
+# Patch description
+
+patch 1 Fixes about x86 topology and Intel l1 cache topology.
+
+patch 2-3 Cleanups about topology related CPUID encoding and QEMU
+          topology variables.
+
+patch 4-5 Refactor CPUID[0x1F] encoding to prepare to introduce module
+          level.
+
+patch 6-12 Add the module as the new CPU topology level in x86, and it
+            is corresponding to the cluster level in generic code.
+
+patch 13,14,16 Add cache topology information in cache models.
+
+patch 15 Update AMD CPUs' cache topology encoding.
+
+
+[1]: https://lists.gnu.org/archive/html/qemu-devel/2023-10/msg08233.html
+[2]: https://lists.gnu.org/archive/html/qemu-devel/2023-10/msg01954.html
+[3]: https://patchew.org/QEMU/20211228092221.21068-1-wangyanan55@huawei.com/
+[4]: https://www.intel.com/content/www/us/en/products/platforms/details/alder-lake-p.html
+[5]: SDM, vol.3, ch.9, 9.9.1 Hierarchical Mapping of Shared Resources.
+
+Best Regards,
+Zhao
+---
+Changelog:
+
+Changes since v5:
+ * The first four patches of v5 [1] have been merged, v6 contains
+   the remaining patches.
+ * Reabse on the latest master.
+ * Update the comment when check cluster-id. Since current QEMU is
+   v8.2, the cluster-id support should at least start from v8.3.
+
+Changes since v4:
+ * Drop the "x-l2-cache-topo" option. (Michael)
+ * Add A/R/T tags.
+
+Changes since v3 (main changes):
+ * Expose module level in CPUID[0x1F].
+ * Fix compile warnings. (Babu)
+ * Fixes cache topology uninitialization bugs for some AMD CPUs. (Babu)
+
+Changes since v2:
+ * Add "Tested-by", "Reviewed-by" and "ACKed-by" tags.
+ * Use newly added wrapped helper to get cores per socket in
+   qemu_init_vcpu().
+
+Changes since v1:
+ * Reordered patches. (Yanan)
+ * Deprecated the patch to fix comment of machine_parse_smp_config().
+   (Yanan)
+ * Rename test-x86-cpuid.c to test-x86-topo.c. (Yanan)
+ * Split the intel's l1 cache topology fix into a new separate patch.
+   (Yanan)
+ * Combined module_id and APIC ID for module level support into one
+   patch. (Yanan)
+ * Make cache_into_passthrough case of cpuid 0x04 leaf in
+ * cpu_x86_cpuid() use max_processor_ids_for_cache() and
+   max_core_ids_in_package() to encode CPUID[4]. (Yanan)
+ * Add the prefix "CPU_TOPO_LEVEL_*" for CPU topology level names.
+   (Yanan)
+
+---
+Zhao Liu (10):
+  i386/cpu: Fix i/d-cache topology to core level for Intel CPU
+  i386/cpu: Use APIC ID offset to encode cache topo in CPUID[4]
+  i386/cpu: Consolidate the use of topo_info in cpu_x86_cpuid()
+  i386: Split topology types of CPUID[0x1F] from the definitions of
+    CPUID[0xB]
+  i386: Decouple CPUID[0x1F] subleaf with specific topology level
+  i386: Expose module level in CPUID[0x1F]
+  i386: Add cache topology info in CPUCacheInfo
+  i386: Use CPUCacheInfo.share_level to encode CPUID[4]
+  i386: Use offsets get NumSharingCache for CPUID[0x8000001D].EAX[bits
+    25:14]
+  i386: Use CPUCacheInfo.share_level to encode
+    CPUID[0x8000001D].EAX[bits 25:14]
+
+Zhuocheng Ding (6):
+  i386: Introduce module-level cpu topology to CPUX86State
+  i386: Support modules_per_die in X86CPUTopoInfo
+  i386: Support module_id in X86CPUTopoIDs
+  i386/cpu: Introduce cluster-id to X86CPU
+  tests: Add test case of APIC ID for module level parsing
+  hw/i386/pc: Support smp.clusters for x86 PC machine
+
+ hw/i386/pc.c               |   1 +
+ hw/i386/x86.c              |  49 ++++++-
+ include/hw/i386/topology.h |  35 ++++-
+ qemu-options.hx            |  10 +-
+ target/i386/cpu.c          | 289 +++++++++++++++++++++++++++++--------
+ target/i386/cpu.h          |  43 +++++-
+ target/i386/kvm/kvm.c      |   2 +-
+ tests/unit/test-x86-topo.c |  56 ++++---
+ 8 files changed, 379 insertions(+), 106 deletions(-)
+
+-- 
+2.34.1
+
 
