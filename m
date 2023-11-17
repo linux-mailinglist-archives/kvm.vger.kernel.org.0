@@ -1,166 +1,114 @@
-Return-Path: <kvm+bounces-1891-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1892-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A80667EE94A
-	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 23:29:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FDC17EEA1F
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 01:02:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6286D2810D9
-	for <lists+kvm@lfdr.de>; Thu, 16 Nov 2023 22:29:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A31881F24633
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 00:02:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CCD381CA;
-	Thu, 16 Nov 2023 22:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C555B8F78;
+	Fri, 17 Nov 2023 00:02:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WDBqCypK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JP2iU9SV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 158CED67
-	for <kvm@vger.kernel.org>; Thu, 16 Nov 2023 14:29:05 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5c5c760fc98so6967157b3.3
-        for <kvm@vger.kernel.org>; Thu, 16 Nov 2023 14:29:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700173744; x=1700778544; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EGIwhjjvgrhlrw+QQSLX3tkHhBU1bs3NPucIP+8y40A=;
-        b=WDBqCypKRfmdqyIZbx4YX1B8VtiZ6pA6Hww0p0FklcH6xr/6IvVVKfHibct+QfoTPo
-         hWkOGx0zD3MMwvLDaivC+dNoBgaK266d8xWj2j9Ey9IE05bSUx+G6KOh0eqyZdlDB8hJ
-         +h4yE7R+sJjvIYHBLq52s9oVLMWbEGNMOObLaC7fqNk8l9yAoTfZicJGf7q3+Bbj7v1d
-         Q0X9BR7h3XkncZ9A3RQcLumiYYfl+ahBstWmeSpFjn0Pul7vtA0NNjNJUM+XkNJ2gGKX
-         wol4BoRq8m4nESwhkbB0xlI+YAimQKd1/WNsWFeACQJpPBDGeDmEP4VEfHQbjzxNTYY1
-         ROcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700173744; x=1700778544;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=EGIwhjjvgrhlrw+QQSLX3tkHhBU1bs3NPucIP+8y40A=;
-        b=YewwTjcKm19woxyzCQvcVSdKah/J7Pmsvo/2C7XK9zjkMxGD+v1kfQby2Q7rD+gA50
-         wpAuJL4O89O9U6sgsRkY8mcit2y3G2CtzE1DAa4yEux5p1Kvw2q/C/bCZmMSsySoUnUM
-         QnYZkM4eyUqhsKLoSI5gdt6qIBo4zkJIVMpxcmu4pr/r5XHnEHwuRHRJe8TnaXSj5wY1
-         zhL/ZfoIw1c6Zmd+8PDtV5Oy+xxfm4lOYxOl1HXyNHoJdKpnp0SRA7npSds4E4X4Vgtm
-         9D2MdPEFDaji1iOfAJYoMOxS5eaOY5oyBLBYzOo04yX4CftABJA+1y5L05HzHORloNW/
-         Hd7Q==
-X-Gm-Message-State: AOJu0YyKPJVkI/GTnerTb6ieDgfQ6qcUmcKpcNfV21B/k//e2a9K9uRt
-	WwA5aTDNaHpZ0OZBluIeBJxRZ/y9dK4=
-X-Google-Smtp-Source: AGHT+IHmkM33E4jFA0/MUtJrzYod4Ks3z+LGFmRASfpJFYhl5YrBscD5jElQXrez+uXiBB14AafIAhwWLKc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:890a:0:b0:d9a:bce6:acf3 with SMTP id
- e10-20020a25890a000000b00d9abce6acf3mr520661ybl.0.1700173744305; Thu, 16 Nov
- 2023 14:29:04 -0800 (PST)
-Date: Thu, 16 Nov 2023 14:29:02 -0800
-In-Reply-To: <c9f65fc1-ab55-4959-a8ec-390aee51ee3a@intel.com>
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B050EA;
+	Thu, 16 Nov 2023 16:02:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700179326; x=1731715326;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jlgZtbFmLpOkbqAFRrH5mbiBpW6onu1KLogo8/lD2eA=;
+  b=JP2iU9SVQydZPPvmZnr+wU7CuV4Un9pYLSAA2xpr70iiVNlXMCfM00YN
+   sG5qR4FDU9iHyMjb59dx8bB9cRNtF54wHYRlsDP0GCfEGfdRHZMKR3n1r
+   cysNc/56j9oUojFQQZ6ACFBEQi3YmEEYK6lHqv+TwrOz/8QZU3POow11s
+   imDtcwRE1uOZU+cvMxQM0uUUoCnuD9UHUqhrM3vruiZQ2aRUOAyWGyI6G
+   4kwYbDxbrpHwZbX+CiPIvuXxGDco8WfbrSqZQiylXJUk0PkC+9J3HMlr5
+   XdzC5IivFURUuwpeIQiukkaz0WhyNPG3yyg2mmupAG4mOsePitbUhqyif
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="376255657"
+X-IronPort-AV: E=Sophos;i="6.04,205,1695711600"; 
+   d="scan'208";a="376255657"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 16:02:05 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="882937579"
+X-IronPort-AV: E=Sophos;i="6.04,205,1695711600"; 
+   d="scan'208";a="882937579"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 16:02:05 -0800
+Date: Thu, 16 Nov 2023 16:02:05 -0800
+From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+To: Chenyi Qiang <chenyi.qiang@intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+	Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, David Matlack <dmatlack@google.com>,
+	Kai Huang <kai.huang@intel.com>,
+	Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+	hang.yuan@intel.com, tina.zhang@intel.com,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v17 015/116] x86/cpu: Add helper functions to
+ allocate/free TDX private host key id
+Message-ID: <20231117000205.GA1277973@ls.amr.corp.intel.com>
+References: <cover.1699368322.git.isaku.yamahata@intel.com>
+ <69281f4f2e4d2c3c906518d83bc6ec9c0debda16.1699368322.git.isaku.yamahata@intel.com>
+ <35cd1aad-87b6-4606-9811-ab56530cf896@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231110235528.1561679-1-seanjc@google.com> <20231110235528.1561679-4-seanjc@google.com>
- <c9f65fc1-ab55-4959-a8ec-390aee51ee3a@intel.com>
-Message-ID: <ZVaXroTZQi1IcTvm@google.com>
-Subject: Re: [PATCH 3/9] KVM: x86: Initialize guest cpu_caps based on guest CPUID
-From: Sean Christopherson <seanjc@google.com>
-To: Weijiang Yang <weijiang.yang@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <35cd1aad-87b6-4606-9811-ab56530cf896@intel.com>
 
-On Thu, Nov 16, 2023, Weijiang Yang wrote:
-> On 11/11/2023 7:55 AM, Sean Christopherson wrote:
->=20
-> [...]
->=20
-> > -static __always_inline void guest_cpu_cap_check_and_set(struct kvm_vcp=
-u *vcpu,
-> > -							unsigned int x86_feature)
-> > +static __always_inline void guest_cpu_cap_clear(struct kvm_vcpu *vcpu,
-> > +						unsigned int x86_feature)
-> >   {
-> > -	if (kvm_cpu_cap_has(x86_feature) && guest_cpuid_has(vcpu, x86_feature=
-))
-> > +	unsigned int x86_leaf =3D __feature_leaf(x86_feature);
+On Wed, Nov 15, 2023 at 03:35:11PM +0800,
+Chenyi Qiang <chenyi.qiang@intel.com> wrote:
+
+> > diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> > index 38ec6815a42a..c01cbfc81fbb 100644
+> > --- a/arch/x86/virt/vmx/tdx/tdx.c
+> > +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> > @@ -37,7 +37,8 @@
+> >  #include <asm/tdx.h>
+> >  #include "tdx.h"
+> >  
+> > -static u32 tdx_global_keyid __ro_after_init;
+> > +u32 tdx_global_keyid __ro_after_init;
+> > +EXPORT_SYMBOL_GPL(tdx_global_keyid);
+> >  static u32 tdx_guest_keyid_start __ro_after_init;
+> >  static u32 tdx_nr_guest_keyids __ro_after_init;
+> >  
+> > @@ -105,6 +106,31 @@ static inline int sc_retry_prerr(sc_func_t func, sc_err_func_t err_func,
+> >  #define seamcall_prerr_ret(__fn, __args)					\
+> >  	sc_retry_prerr(__seamcall_ret, seamcall_err_ret, (__fn), (__args))
+> >  
+> > +/* TDX KeyID pool */
+> > +static DEFINE_IDA(tdx_guest_keyid_pool);
 > > +
-> > +	reverse_cpuid_check(x86_leaf);
-> > +	vcpu->arch.cpu_caps[x86_leaf] &=3D ~__feature_bit(x86_feature);
-> > +}
-> > +
-> > +static __always_inline void guest_cpu_cap_change(struct kvm_vcpu *vcpu=
-,
-> > +						 unsigned int x86_feature,
-> > +						 bool guest_has_cap)
+> > +int tdx_guest_keyid_alloc(void)
 > > +{
-> > +	if (guest_has_cap)
-> >   		guest_cpu_cap_set(vcpu, x86_feature);
-> > +	else
-> > +		guest_cpu_cap_clear(vcpu, x86_feature);
-> > +}
->=20
-> I don't see any necessity to add 3 functions, i.e., guest_cpu_cap_{set, c=
-lear, change}, for
-
-I want to have equivalents to the cpuid_entry_*() APIs so that we don't end=
- up
-with two different sets of names.  And the clear() API already has a second=
- user.
-
-> guest_cpu_cap update. IMHO one function is enough, e.g,:
-
-Hrm, I open coded the OR/AND logic in cpuid_entry_change() to try to force =
-CMOV
-instead of Jcc.  That honestly seems like a pointless optimization.  I woul=
-d
-rather use the helpers, which is less code.
-
-> static __always_inline void guest_cpu_cap_update(struct kvm_vcpu *vcpu,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned=
- int x86_feature,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool gue=
-st_has_cap)
-> {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned int x86_leaf =3D __fe=
-ature_leaf(x86_feature);
->=20
-> reverse_cpuid_check(x86_leaf);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (guest_has_cap)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 vcpu->arch.cpu_caps[x86_leaf] |=3D __feature_bit(x86_fea=
-ture);
-> else
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 vcpu->arch.cpu_caps[x86_leaf] &=3D ~__feature_bit(x86_fe=
-ature);
-> }
->=20
+> > +	if (WARN_ON_ONCE(!tdx_guest_keyid_start || !tdx_nr_guest_keyids))
+> > +		return -EINVAL;
 > > +
-> > +static __always_inline void guest_cpu_cap_restrict(struct kvm_vcpu *vc=
-pu,
-> > +						   unsigned int x86_feature)
-> > +{
-> > +	if (!kvm_cpu_cap_has(x86_feature))
-> > +		guest_cpu_cap_clear(vcpu, x86_feature);
-> >   }
->=20
-> _restrict is not clear to me for what the function actually does -- it
-> conditionally clears guest cap depending on KVM support of the feature.
->=20
-> How about renaming it to guest_cpu_cap_sync()?
+> > +	/* The first keyID is reserved for the global key. */
+> > +	return ida_alloc_range(&tdx_guest_keyid_pool, tdx_guest_keyid_start + 1,
+> 
+> Per
+> https://lore.kernel.org/all/121aab11b48b4e6550cfe6d23b4daab744ee2076.1697532085.git.kai.huang@intel.com/
+> tdx_guest_keyid_start has already reserved the first keyID for global
+> key, I think we don't need to reserve another one here.
 
-"sync" isn't correct because it's not synchronizing with KVM's capabilitiy,=
- e.g.
-the guest capability will remaing unset if the guest CPUID bit is clear but=
- the
-KVM capability is available.
+Nice catch. Will fix it with the next respin.
 
-How about constrain()?
+-- 
+Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
