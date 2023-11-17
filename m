@@ -1,290 +1,157 @@
-Return-Path: <kvm+bounces-1906-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1907-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DF477EEADB
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 02:56:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A30217EEB5A
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 04:19:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 328381F25E0C
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 01:56:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CB0B1C20AB3
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 03:19:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 620C846AD;
-	Fri, 17 Nov 2023 01:56:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 485C9611E;
+	Fri, 17 Nov 2023 03:19:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZVvqw9jt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 16C58195;
-	Thu, 16 Nov 2023 17:56:38 -0800 (PST)
-Received: from loongson.cn (unknown [10.40.46.156])
-	by gateway (Coremail) with SMTP id _____8AxJuhVyFZlaLQ6AA--.57183S3;
-	Fri, 17 Nov 2023 09:56:37 +0800 (CST)
-Received: from [192.168.100.135] (unknown [10.40.46.156])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxH91SyFZlxcxEAA--.22204S3;
-	Fri, 17 Nov 2023 09:56:35 +0800 (CST)
-Subject: Re: [PATCH v4 0/4] KVM: selftests: Add LoongArch support
-To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc: Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Vishal Annapurve <vannapurve@google.com>, Huacai Chen
- <chenhuacai@kernel.org>, loongarch@lists.linux.dev,
- Peter Xu <peterx@redhat.com>, Vipin Sharma <vipinsh@google.com>,
- maobibo@loongson.cn, Sean Christopherson <seanjc@google.com>
-References: <20231108025134.2592663-1-zhaotianrui@loongson.cn>
-From: zhaotianrui <zhaotianrui@loongson.cn>
-Message-ID: <32b34bc1-f0f0-0155-6df0-ac7725527bb8@loongson.cn>
-Date: Fri, 17 Nov 2023 09:47:18 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 756F3D4E
+	for <kvm@vger.kernel.org>; Thu, 16 Nov 2023 19:19:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700191179;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jAKFfPiqJuGzP2s6H3e1McPERpD8hKdLrmeMzG7k6Hw=;
+	b=ZVvqw9jt6GUS5tj0UDDAfa87si02ENsPtHXsKcFQSuzKXgk0aI8xouf0PMkFE3MLaUWCTv
+	mgdEBaAPuKb5oEKce2li79DPxVQA1ZJUfOjeHRVdNGL0HgbJ0706I4jSeC9CClJVxxGhKa
+	nglKTzbIn2Mu4L7px5JOe58W6nW3nfI=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-385-DCBMMYsTMQCOPJFOj31g4w-1; Thu, 16 Nov 2023 22:19:37 -0500
+X-MC-Unique: DCBMMYsTMQCOPJFOj31g4w-1
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-6c36adea2d6so510638b3a.1
+        for <kvm@vger.kernel.org>; Thu, 16 Nov 2023 19:19:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700191176; x=1700795976;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jAKFfPiqJuGzP2s6H3e1McPERpD8hKdLrmeMzG7k6Hw=;
+        b=OY7CiRsOi4xD0QqGl8Q5Qv5TrLzPe4cIqN1/Wy0MK9k+fVsB36QkG1MNYVrTszipr0
+         5L2oQDwJiGInsJ47M67cXkJ+guIal/QN1r1k9yhgkEGctfAznCCH2JLWPir3KBwbtN7B
+         Ia4cKhGhdmXnOVz/Nqo6WuoUFc2KPUmjbQp28ijxCvA2MeiJm3obN9b3NWBOTK7lIQaO
+         WLF1nJZeK8WYQlfyv/9fWR7Js0e8oU5PlTikp+o93iJRZR1DiKeigBueGjeHT6DfrBRr
+         2dj2fkKcN3eLsfxElpIPJCmBKT1TLI2VubY4Vs1mYPWUMR+6XHMZrTHeeySUrK6+NxIQ
+         DGLQ==
+X-Gm-Message-State: AOJu0YxnCpw23dcmqrKVgHWg45BiYNQjp1yzOETNnDwDZ7VSV1N7xY6T
+	urfdvnAeCf+PXsFFqvYk0H/fnjddJTddweMmvKO/p1XH+0UXzMFmHZpSXGoRYgcmQNY0tOXCjyy
+	Bz1yxCfO71g8s
+X-Received: by 2002:a05:6a00:8998:b0:6b3:c72d:b01 with SMTP id hx24-20020a056a00899800b006b3c72d0b01mr8240466pfb.1.1700191176689;
+        Thu, 16 Nov 2023 19:19:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFfpURZkDv/ezuJd6cSD4adKTKntnTXg/JeSPEJHMKPZoI8mQ8dl34F8ROKL9i11G2GXcaKFg==
+X-Received: by 2002:a05:6a00:8998:b0:6b3:c72d:b01 with SMTP id hx24-20020a056a00899800b006b3c72d0b01mr8240451pfb.1.1700191176340;
+        Thu, 16 Nov 2023 19:19:36 -0800 (PST)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id it14-20020a056a00458e00b006c8721330fesm455416pfb.74.2023.11.16.19.19.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Nov 2023 19:19:35 -0800 (PST)
+Message-ID: <041416db-1cb5-e84f-ce44-9d06707970a8@redhat.com>
+Date: Fri, 17 Nov 2023 11:19:32 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231108025134.2592663-1-zhaotianrui@loongson.cn>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v1] KVM: selftests: Initalize sem_vcpu_[cont|stop] before
+ each test in dirty_log_test
 Content-Language: en-US
-X-CM-TRANSID:AQAAf8AxH91SyFZlxcxEAA--.22204S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxKw1Uuw17Kr1kJFykKF1fKrX_yoWfCr1Dpa
-	yFqr1FkF4fJFy7Aw1xJ34kZ34S9as7CFWUCw13KrykZrnFy34kJry8Ka92y34fua4DXw1S
-	vay8CwnxW3WDGagCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4j6r4UJwAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
-	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_
-	Jw1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
-	CYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48J
-	MxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI
-	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
-	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
-	IxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcpBTUUUUU
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231116093536.22256-1-shahuang@redhat.com>
+ <ZVaxXJ4xUW1eyQEL@thinky-boi>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <ZVaxXJ4xUW1eyQEL@thinky-boi>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi, all:
-This is a PING message, please help to review the LoongArch KVM 
-selftests patches.
+Hi Oliver,
 
-Thanks
-Tianrui Zhao
-ÔÚ 2023/11/8 ÉÏÎç10:51, Tianrui Zhao Ð´µÀ:
-> We add LoongArch support into KVM selftests and there are some KVM
-> test cases we have passed:
-> 	demand_paging_test
-> 	dirty_log_perf_test
-> 	dirty_log_test
-> 	guest_print_test
-> 	kvm_binary_stats_test
-> 	kvm_create_max_vcpus
-> 	kvm_page_table_test
-> 	memslot_modification_stress_test
-> 	memslot_perf_test
-> 	set_memory_region_test
->
-> Changes for v4:
-> 1. Remove the based-on flag, as the LoongArch KVM patch series
-> have been accepted by Linux kernel, so this can be applied directly
-> in kernel.
->
-> Changes for v3:
-> 1. Improve implementation of LoongArch VM page walk.
-> 2. Add exception handler for LoongArch.
-> 3. Add dirty_log_test, dirty_log_perf_test, guest_print_test
-> test cases for LoongArch.
-> 4. Add __ASSEMBLER__ macro to distinguish asm file and c file.
-> 5. Move ucall_arch_do_ucall to the header file and make it as
-> static inline to avoid function calls.
-> 6. Change the DEFAULT_GUEST_TEST_MEM base addr for LoongArch.
->
-> Changes for v2:
-> 1. We should use ".balign 4096" to align the assemble code with 4K in
-> exception.S instead of "align 12".
-> 2. LoongArch only supports 3 or 4 levels page tables, so we remove the
-> hanlders for 2-levels page table.
-> 3. Remove the DEFAULT_LOONGARCH_GUEST_STACK_VADDR_MIN and use the common
-> DEFAULT_GUEST_STACK_VADDR_MIN to allocate stack memory in guest.
-> 4. Reorganize the test cases supported by LoongArch.
-> 5. Fix some code comments.
-> 6. Add kvm_binary_stats_test test case into LoongArch KVM selftests.
->
-> changes for v1:
-> 1. Add kvm selftests header files for LoongArch.
-> 2. Add processor tests for LoongArch KVM.
-> 3. Add ucall tests for LoongArch KVM.
-> 4. Add LoongArch tests into makefile.
->
-> All of the test cases results:
-> 1..10
-> # timeout set to 120
-> # selftests: kvm: demand_paging_test
-> # Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
-> # guest physical test memory: [0xfbfffc000, 0xfffffc000)
-> # Finished creating vCPUs and starting uffd threads
-> # Started all vCPUs
-> # All vCPU threads joined
-> # Total guest execution time: 0.200804700s
-> # Overall demand paging rate: 326366.862927 pgs/sec
-> ok 1 selftests: kvm: demand_paging_test
-> # timeout set to 120
-> # selftests: kvm: dirty_log_perf_test
-> # Test iterations: 2
-> # Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
-> # guest physical test memory: [0xfbfffc000, 0xfffffc000)
-> # Random seed: 1
-> # Populate memory time: 0.201452560s
-> # Enabling dirty logging time: 0.000451670s
-> #
-> # Iteration 1 dirty memory time: 0.051582140s
-> # Iteration 1 get dirty log time: 0.000010510s
-> # Iteration 1 clear dirty log time: 0.000421730s
-> # Iteration 2 dirty memory time: 0.046593760s
-> # Iteration 2 get dirty log time: 0.000002110s
-> # Iteration 2 clear dirty log time: 0.000418020s
-> # Disabling dirty logging time: 0.002948490s
-> # Get dirty log over 2 iterations took 0.000012620s. (Avg 0.000006310s/iteration)
-> # Clear dirty log over 2 iterations took 0.000839750s. (Avg 0.000419875s/iteration)
-> ok 2 selftests: kvm: dirty_log_perf_test
-> # timeout set to 120
-> # selftests: kvm: dirty_log_test
-> # Test iterations: 32, interval: 10 (ms)
-> # Testing Log Mode 'dirty-log'
-> # Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
-> # guest physical test memory offset: 0xfbfff0000
-> # Dirtied 453632 pages
-> # Total bits checked: dirty (436564), clear (1595145), track_next (70002)
-> # Testing Log Mode 'clear-log'
-> # Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
-> # guest physical test memory offset: 0xfbfff0000
-> # Dirtied 425984 pages
-> # Total bits checked: dirty (414397), clear (1617312), track_next (68152)
-> # Testing Log Mode 'dirty-ring'
-> # Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
-> # dirty ring count: 0x10000
-> # guest physical test memory offset: 0xfbfff0000
-> # vcpu stops because vcpu is kicked out...
-> # Notifying vcpu to continue
-> # vcpu continues now.
-> # Iteration 1 collected 3201 pages
-> # vcpu stops because dirty ring is full...
-> # vcpu continues now.
-> # vcpu stops because dirty ring is full...
-> # Notifying vcpu to continue
-> # Iteration 2 collected 65472 pages
-> # ......
-> # vcpu continues now.
-> # vcpu stops because vcpu is kicked out...
-> # vcpu continues now.
-> # vcpu stops because vcpu is kicked out...
-> # Notifying vcpu to continue
-> # vcpu continues now.
-> # Iteration 31 collected 12642 pages
-> # vcpu stops because dirty ring is full...
-> # vcpu continues now.
-> # Dirtied 7275520 pages
-> # Total bits checked: dirty (1165675), clear (866034), track_next (811358)
-> ok 3 selftests: kvm: dirty_log_test
-> # timeout set to 120
-> # selftests: kvm: guest_print_test
-> ok 4 selftests: kvm: guest_print_test
-> # timeout set to 120
-> # selftests: kvm: kvm_binary_stats_test
-> # TAP version 13
-> # 1..4
-> # ok 1 vm0
-> # ok 2 vm1
-> # ok 3 vm2
-> # ok 4 vm3
-> # # Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
-> ok 5 selftests: kvm: kvm_binary_stats_test
-> # timeout set to 120
-> # selftests: kvm: kvm_create_max_vcpus
-> # KVM_CAP_MAX_VCPU_ID: 256
-> # KVM_CAP_MAX_VCPUS: 256
-> # Testing creating 256 vCPUs, with IDs 0...255.
-> ok 6 selftests: kvm: kvm_create_max_vcpus
-> # timeout set to 120
-> # selftests: kvm: kvm_page_table_test
-> # Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
-> # Testing memory backing src type: anonymous
-> # Testing memory backing src granularity: 0x4000
-> # Testing memory size(aligned): 0x40000000
-> # Guest physical test memory offset: 0xfbfffc000
-> # Host  virtual  test memory offset: 0x7fffb0860000
-> # Number of testing vCPUs: 1
-> # Started all vCPUs successfully
-> # KVM_CREATE_MAPPINGS: total execution time: 0.200919330s
-> #
-> # KVM_UPDATE_MAPPINGS: total execution time: 0.051182930s
-> #
-> # KVM_ADJUST_MAPPINGS: total execution time: 0.010083590s
-> #
-> ok 7 selftests: kvm: kvm_page_table_test
-> # timeout set to 120
-> # selftests: kvm: memslot_modification_stress_test
-> # Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
-> # guest physical test memory: [0xfbfffc000, 0xfffffc000)
-> # Finished creating vCPUs
-> # Started all vCPUs
-> # All vCPU threads joined
-> ok 8 selftests: kvm: memslot_modification_stress_test
-> # timeout set to 120
-> # selftests: kvm: memslot_perf_test
-> # Testing map performance with 1 runs, 5 seconds each
-> # Memslot count too high for this test, decrease the cap (max is 2053)
-> #
-> # Testing unmap performance with 1 runs, 5 seconds each
-> # Memslot count too high for this test, decrease the cap (max is 8197)
-> #
-> # Testing unmap chunked performance with 1 runs, 5 seconds each
-> # Memslot count too high for this test, decrease the cap (max is 8197)
-> #
-> # Testing move active area performance with 1 runs, 5 seconds each
-> # Test took 0.761678900s for slot setup + 5.000014460s all iterations
-> # Done 120167 iterations, avg 0.000041608s each
-> # Best runtime result was 0.000041608s per iteration (with 120167 iterations)
-> #
-> # Testing move inactive area performance with 1 runs, 5 seconds each
-> # Test took 0.771796550s for slot setup + 5.000018520s all iterations
-> # Done 136354 iterations, avg 0.000036669s each
-> # Best runtime result was 0.000036669s per iteration (with 136354 iterations)
-> #
-> # Testing RW performance with 1 runs, 5 seconds each
-> # Test took 0.763568840s for slot setup + 5.002233800s all iterations
-> # Done 649 iterations, avg 0.007707602s each
-> # Best runtime result was 0.007707602s per iteration (with 649 iterations)
-> # Best slot setup time for the whole test area was 0.761678900s
-> ok 9 selftests: kvm: memslot_perf_test
-> # timeout set to 120
-> # selftests: kvm: set_memory_region_test
-> # Allowed number of memory slots: 32767
-> # Adding slots 0..32766, each memory region with 2048K size
-> ok 10 selftests: kvm: set_memory_region_test
->
-> Tianrui Zhao (4):
->    KVM: selftests: Add KVM selftests header files for LoongArch
->    KVM: selftests: Add core KVM selftests support for LoongArch
->    KVM: selftests: Add ucall test support for LoongArch
->    KVM: selftests: Add test cases for LoongArch
->
->   tools/testing/selftests/kvm/Makefile          |  15 +
->   .../selftests/kvm/include/kvm_util_base.h     |   5 +
->   .../kvm/include/loongarch/processor.h         | 133 +++++++
->   .../selftests/kvm/include/loongarch/ucall.h   |  20 ++
->   .../testing/selftests/kvm/include/memstress.h |  10 +
->   .../selftests/kvm/lib/loongarch/exception.S   |  59 ++++
->   .../selftests/kvm/lib/loongarch/processor.c   | 333 ++++++++++++++++++
->   .../selftests/kvm/lib/loongarch/ucall.c       |  38 ++
->   8 files changed, 613 insertions(+)
->   create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
->   create mode 100644 tools/testing/selftests/kvm/include/loongarch/ucall.h
->   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
->   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
->   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
->
+On 11/17/23 08:18, Oliver Upton wrote:
+> Hi Shaoqin,
+> 
+> On Thu, Nov 16, 2023 at 04:35:36AM -0500, Shaoqin Huang wrote:
+>> When execute the dirty_log_test on some aarch64 machine, it sometimes
+>> trigger the ASSERT:
+>>
+>> ==== Test Assertion Failure ====
+>>    dirty_log_test.c:384: dirty_ring_vcpu_ring_full
+>>    pid=14854 tid=14854 errno=22 - Invalid argument
+>>       1  0x00000000004033eb: dirty_ring_collect_dirty_pages at dirty_log_test.c:384
+>>       2  0x0000000000402d27: log_mode_collect_dirty_pages at dirty_log_test.c:505
+>>       3   (inlined by) run_test at dirty_log_test.c:802
+>>       4  0x0000000000403dc7: for_each_guest_mode at guest_modes.c:100
+>>       5  0x0000000000401dff: main at dirty_log_test.c:941 (discriminator 3)
+>>       6  0x0000ffff9be173c7: ?? ??:0
+>>       7  0x0000ffff9be1749f: ?? ??:0
+>>       8  0x000000000040206f: _start at ??:?
+>>    Didn't continue vcpu even without ring full
+>>
+>> The dirty_log_test fails when execute the dirty-ring test, this is
+>> because the sem_vcpu_cont and the sem_vcpu_stop is non-zero value when
+>> execute the dirty_ring_collect_dirty_pages() function. When those two
+>> sem_t variables are non-zero, the dirty_ring_wait_vcpu() at the
+>> beginning of the dirty_ring_collect_dirty_pages() will not wait for the
+>> vcpu to stop, but continue to execute the following code. In this case,
+>> before vcpu stop, if the dirty_ring_vcpu_ring_full is true, and the
+>> dirty_ring_collect_dirty_pages() has passed the check for the
+>> dirty_ring_vcpu_ring_full but hasn't execute the check for the
+>> continued_vcpu, the vcpu stop, and set the dirty_ring_vcpu_ring_full to
+>> false. Then dirty_ring_collect_dirty_pages() will trigger the ASSERT.
+>>
+>> Why sem_vcpu_cont and sem_vcpu_stop can be non-zero value? It's because
+>> the dirty_ring_before_vcpu_join() execute the sem_post(&sem_vcpu_cont)
+>> at the end of each dirty-ring test. It can cause two cases:
+>>
+>> 1. sem_vcpu_cont be non-zero. When we set the host_quit to be true,
+>>     the vcpu_worker directly see the host_quit to be true, it quit. So
+>>     the log_mode_before_vcpu_join() function will set the sem_vcpu_cont
+>>     to 1, since the vcpu_worker has quit, it won't consume it.
+>> 2. sem_vcpu_stop be non-zero. When we set the host_quit to be true,
+>>     the vcpu_worker has entered the guest state, the next time it exit
+>>     from guest state, it will set the sem_vcpu_stop to 1, and then see
+>>     the host_quit, no one will consume the sem_vcpu_stop.
+>>
+>> When execute more and more dirty-ring tests, the sem_vcpu_cont and
+>> sem_vcpu_stop can be larger and larger, which makes many code paths
+>> don't wait for the sem_t. Thus finally cause the problem.
+>>
+>> Fix this problem is easy, simply initialize the sem_t before every test.
+>> Thus whatever the state previous test left, it won't interfere the next
+>> test.
+> 
+> In your changelog you describe what sounds like a semaphore imbalance at
+> the time of test completion, yet your proposed fix is to just clobber
+> the error and start fresh.
+> 
+
+Yes. It's a semaphore imbalance problem.
+
+> Why not nip it at the bud and fix the logic bug instead?
+
+I have another patch which fix the logic bug, I will send it out later.
+
+> 
+
+-- 
+Shaoqin
 
 
