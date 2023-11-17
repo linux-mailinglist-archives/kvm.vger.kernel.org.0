@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-1916-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1917-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D4977EECBB
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 08:39:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B9567EECBC
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 08:39:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80E80B20AFF
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 07:39:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 214891F25BE8
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 07:39:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CFC9DF63;
-	Fri, 17 Nov 2023 07:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92FD5F4E8;
+	Fri, 17 Nov 2023 07:39:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kRgczKrO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fZZwUs1e"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D95B4109
-	for <kvm@vger.kernel.org>; Thu, 16 Nov 2023 23:39:26 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0028ED4E
+	for <kvm@vger.kernel.org>; Thu, 16 Nov 2023 23:39:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700206766; x=1731742766;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=YLHi6GRYPIUMX2jYGDwwXL31+PV0KAFU5NzaOOjNqB8=;
-  b=kRgczKrOuKx3veRGw4cVbkTGX+uEtu+zufG4HGjSQXWuz3ik4Ye+KtzS
-   V8PGh0KrU/oEitOgWg86avRnQNFPib1hS7WuKLCWTb/G8kZT79w4oFwh9
-   br0ABAHMUqm8cv0etcS6GzwHd14VWng8AHTOizHDWqKYNPBkYV3QAfXZO
-   w6HGmEvOh6vaL8ewOQmWpH5YG0Z84I94IyAJQbTDlt87Aw70JxH9NRJqT
-   wmhM2lAab1Sq304l8832C05ulLvjy93d/ZpVeDNtbddtvOowwFQbBuJHM
-   78uq2+pl56NfgpMFKksXHaLypGlYUuza02XswP9wnrx/k9+XabHs9aBd9
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="395180251"
+  t=1700206771; x=1731742771;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=R3Z7uxZagDkhosoPgaP6sRwRo8aIZ/hVeihVzIqOILg=;
+  b=fZZwUs1ezslBIkOGnPP4XLAsf1I9d0FzoK5uWMbslwU8Bv9d4uoErZq5
+   NmHOi23x5U7D52VxHcwsFlf06dSQT8/p3VZgAkklUeGYnfVnjoMrKNwjA
+   3f4qdgwji1eKQ8/Ml/6/wnPaL8jngCZmMMejyCgT0GQozTt0PMSdZf6e6
+   Q06HQkAm4o0j/El4E0cIv8/ePCiZOd2MrQ/NBxOOkWaY6jc0qaGGRyvSi
+   wy9+XV3j5spveNeQFnGbROVeI/lSEtkvVoO08EziYm99p7XdlR+8U8duh
+   6Iz7/tUJ7TDtfh11lcTPq/5ZuV/qgzCGDSezrUo0gNb2wcVWT83O5oB4M
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="395180270"
 X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
-   d="scan'208";a="395180251"
+   d="scan'208";a="395180270"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 23:39:26 -0800
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 23:39:29 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="883042535"
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="883042555"
 X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
-   d="scan'208";a="883042535"
+   d="scan'208";a="883042555"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmsmga002.fm.intel.com with ESMTP; 16 Nov 2023 23:39:21 -0800
+  by fmsmga002.fm.intel.com with ESMTP; 16 Nov 2023 23:39:24 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Eduardo Habkost <eduardo@habkost.net>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
@@ -55,11 +55,15 @@ Cc: qemu-devel@nongnu.org,
 	Zhuocheng Ding <zhuocheng.ding@intel.com>,
 	Babu Moger <babu.moger@amd.com>,
 	Yongwei Ma <yongwei.ma@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v6 00/16] Support smp.clusters for x86 in QEMU
-Date: Fri, 17 Nov 2023 15:50:50 +0800
-Message-Id: <20231117075106.432499-1-zhao1.liu@linux.intel.com>
+	Zhao Liu <zhao1.liu@intel.com>,
+	Robert Hoo <robert.hu@linux.intel.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: [PATCH v6 01/16] i386/cpu: Fix i/d-cache topology to core level for Intel CPU
+Date: Fri, 17 Nov 2023 15:50:51 +0800
+Message-Id: <20231117075106.432499-2-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231117075106.432499-1-zhao1.liu@linux.intel.com>
+References: <20231117075106.432499-1-zhao1.liu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -70,245 +74,70 @@ Content-Transfer-Encoding: 8bit
 
 From: Zhao Liu <zhao1.liu@intel.com>
 
-Hi list,
+For i-cache and d-cache, current QEMU hardcodes the maximum IDs for CPUs
+sharing cache (CPUID.04H.00H:EAX[bits 25:14] and CPUID.04H.01H:EAX[bits
+25:14]) to 0, and this means i-cache and d-cache are shared in the SMT
+level.
 
-This is the our v6 patch series, rebased on the master branch at the
-commit 34a5cb6d8434 (Merge tag 'pull-tcg-20231114' of
-https://gitlab.com/rth7680/qemu into staging).
+This is correct if there's single thread per core, but is wrong for the
+hyper threading case (one core contains multiple threads) since the
+i-cache and d-cache are shared in the core level other than SMT level.
 
-Because the first four patches of v5 [1] have been merged, v6 contains
-the remaining patches and reabse on the latest master.
+For AMD CPU, commit 8f4202fb1080 ("i386: Populate AMD Processor Cache
+Information for cpuid 0x8000001D") has already introduced i/d cache
+topology as core level by default.
 
-No more change since v5 exclude the comment update about QEMU version
-(see Changelog).
+Therefore, in order to be compatible with both multi-threaded and
+single-threaded situations, we should set i-cache and d-cache be shared
+at the core level by default.
 
-Welcome your comments!
+This fix changes the default i/d cache topology from per-thread to
+per-core. Potentially, this change in L1 cache topology may affect the
+performance of the VM if the user does not specifically specify the
+topology or bind the vCPU. However, the way to achieve optimal
+performance should be to create a reasonable topology and set the
+appropriate vCPU affinity without relying on QEMU's default topology
+structure.
 
-
-PS: About the idea to implement generic smp cache topology, we're
-considerring to port the original x-l2-cache-topo option to smp [2].
-Just like:
-
--smp cpus=4,sockets=2,cores=2,threads=1, \
-     l3-cache=socket,l2-cache=core,l1-i-cache=core,l1-d-cache=core
-
-Any feedback about this direction is also welcomed! ;-)
-
-
+Fixes: 7e3482f82480 ("i386: Helpers to encode cache information consistently")
+Suggested-by: Robert Hoo <robert.hu@linux.intel.com>
+Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Tested-by: Babu Moger <babu.moger@amd.com>
+Tested-by: Yongwei Ma <yongwei.ma@intel.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 ---
-# Introduction
-
-This series adds the cluster support for x86 PC machine, which allows
-x86 can use smp.clusters to configure the module level CPU topology
-of x86.
-
-This series also is the preparation to help x86 to define the more
-flexible cache topology, such as having multiple cores share the
-same L2 cache at cluster level. (That was what x-l2-cache-topo did,
-and we will explore a generic way.)
-
-About why we don't share L2 cache at cluster and need a configuration
-way, pls see section: ## Why not share L2 cache in cluster directly.
-
-
-# Background
-
-The "clusters" parameter in "smp" is introduced by ARM [3], but x86
-hasn't supported it.
-
-At present, x86 defaults L2 cache is shared in one core, but this is
-not enough. There're some platforms that multiple cores share the
-same L2 cache, e.g., Alder Lake-P shares L2 cache for one module of
-Atom cores [4], that is, every four Atom cores shares one L2 cache.
-Therefore, we need the new CPU topology level (cluster/module).
-
-Another reason is for hybrid architecture. cluster support not only
-provides another level of topology definition in x86, but would also
-provide required code change for future our hybrid topology support.
-
-
-# Overview
-
-## Introduction of module level for x86
-
-"cluster" in smp is the CPU topology level which is between "core" and
-die.
-
-For x86, the "cluster" in smp is corresponding to the module level [4],
-which is above the core level. So use the "module" other than "cluster"
-in x86 code.
-
-And please note that x86 already has a cpu topology level also named
-"cluster" [5], this level is at the upper level of the package. Here,
-the cluster in x86 cpu topology is completely different from the
-"clusters" as the smp parameter. After the module level is introduced,
-the cluster as the smp parameter will actually refer to the module level
-of x86.
-
-
-## Why not share L2 cache in cluster directly
-
-Though "clusters" was introduced to help define L2 cache topology
-[3], using cluster to define x86's L2 cache topology will cause the
-compatibility problem:
-
-Currently, x86 defaults that the L2 cache is shared in one core, which
-actually implies a default setting "cores per L2 cache is 1" and
-therefore implicitly defaults to having as many L2 caches as cores.
-
-For example (i386 PC machine):
--smp 16,sockets=2,dies=2,cores=2,threads=2,maxcpus=16 (*)
-
-Considering the topology of the L2 cache, this (*) implicitly means "1
-core per L2 cache" and "2 L2 caches per die".
-
-If we use cluster to configure L2 cache topology with the new default
-setting "clusters per L2 cache is 1", the above semantics will change
-to "2 cores per cluster" and "1 cluster per L2 cache", that is, "2
-cores per L2 cache".
-
-So the same command (*) will cause changes in the L2 cache topology,
-further affecting the performance of the virtual machine.
-
-Therefore, x86 should only treat cluster as a cpu topology level and
-avoid using it to change L2 cache by default for compatibility.
-
-
-## module level in CPUID
-
-Linux kernel (from v6.4, with commit edc0a2b595765 ("x86/topology: Fix
-erroneous smp_num_siblings on Intel Hybrid platforms") is able to
-handle platforms with Module level enumerated via CPUID.1F.
-
-Expose the module level in CPUID[0x1F] (for Intel CPUs) if the machine
-has more than 1 modules since v3.
-
-
-## New cache topology info in CPUCacheInfo
-
-(This is in preparation for users being able to configure cache topology
-from the cli later on.)
-
-Currently, by default, the cache topology is encoded as:
-1. i/d cache is shared in one core.
-2. L2 cache is shared in one core.
-3. L3 cache is shared in one die.
-
-This default general setting has caused a misunderstanding, that is, the
-cache topology is completely equated with a specific cpu topology, such
-as the connection between L2 cache and core level, and the connection
-between L3 cache and die level.
-
-In fact, the settings of these topologies depend on the specific
-platform and are not static. For example, on Alder Lake-P, every
-four Atom cores share the same L2 cache [3].
-
-Thus, in this patch set, we explicitly define the corresponding cache
-topology for different cpu models and this has two benefits:
-1. Easy to expand to new CPU models in the future, which has different
-   cache topology.
-2. It can easily support custom cache topology by some command.
-
-
-# Patch description
-
-patch 1 Fixes about x86 topology and Intel l1 cache topology.
-
-patch 2-3 Cleanups about topology related CPUID encoding and QEMU
-          topology variables.
-
-patch 4-5 Refactor CPUID[0x1F] encoding to prepare to introduce module
-          level.
-
-patch 6-12 Add the module as the new CPU topology level in x86, and it
-            is corresponding to the cluster level in generic code.
-
-patch 13,14,16 Add cache topology information in cache models.
-
-patch 15 Update AMD CPUs' cache topology encoding.
-
-
-[1]: https://lists.gnu.org/archive/html/qemu-devel/2023-10/msg08233.html
-[2]: https://lists.gnu.org/archive/html/qemu-devel/2023-10/msg01954.html
-[3]: https://patchew.org/QEMU/20211228092221.21068-1-wangyanan55@huawei.com/
-[4]: https://www.intel.com/content/www/us/en/products/platforms/details/alder-lake-p.html
-[5]: SDM, vol.3, ch.9, 9.9.1 Hierarchical Mapping of Shared Resources.
-
-Best Regards,
-Zhao
----
-Changelog:
-
-Changes since v5:
- * The first four patches of v5 [1] have been merged, v6 contains
-   the remaining patches.
- * Reabse on the latest master.
- * Update the comment when check cluster-id. Since current QEMU is
-   v8.2, the cluster-id support should at least start from v8.3.
-
-Changes since v4:
- * Drop the "x-l2-cache-topo" option. (Michael)
- * Add A/R/T tags.
-
-Changes since v3 (main changes):
- * Expose module level in CPUID[0x1F].
- * Fix compile warnings. (Babu)
- * Fixes cache topology uninitialization bugs for some AMD CPUs. (Babu)
-
-Changes since v2:
- * Add "Tested-by", "Reviewed-by" and "ACKed-by" tags.
- * Use newly added wrapped helper to get cores per socket in
-   qemu_init_vcpu().
+Changes since v3:
+ * Change the description of current i/d cache encoding status to avoid
+   misleading to "architectural rules". (Xiaoyao)
 
 Changes since v1:
- * Reordered patches. (Yanan)
- * Deprecated the patch to fix comment of machine_parse_smp_config().
-   (Yanan)
- * Rename test-x86-cpuid.c to test-x86-topo.c. (Yanan)
- * Split the intel's l1 cache topology fix into a new separate patch.
-   (Yanan)
- * Combined module_id and APIC ID for module level support into one
-   patch. (Yanan)
- * Make cache_into_passthrough case of cpuid 0x04 leaf in
- * cpu_x86_cpuid() use max_processor_ids_for_cache() and
-   max_core_ids_in_package() to encode CPUID[4]. (Yanan)
- * Add the prefix "CPU_TOPO_LEVEL_*" for CPU topology level names.
-   (Yanan)
-
+ * Split this fix from the patch named "i386/cpu: Fix number of
+   addressable IDs in CPUID.04H".
+ * Add the explanation of the impact on performance. (Xiaoyao)
 ---
-Zhao Liu (10):
-  i386/cpu: Fix i/d-cache topology to core level for Intel CPU
-  i386/cpu: Use APIC ID offset to encode cache topo in CPUID[4]
-  i386/cpu: Consolidate the use of topo_info in cpu_x86_cpuid()
-  i386: Split topology types of CPUID[0x1F] from the definitions of
-    CPUID[0xB]
-  i386: Decouple CPUID[0x1F] subleaf with specific topology level
-  i386: Expose module level in CPUID[0x1F]
-  i386: Add cache topology info in CPUCacheInfo
-  i386: Use CPUCacheInfo.share_level to encode CPUID[4]
-  i386: Use offsets get NumSharingCache for CPUID[0x8000001D].EAX[bits
-    25:14]
-  i386: Use CPUCacheInfo.share_level to encode
-    CPUID[0x8000001D].EAX[bits 25:14]
+ target/i386/cpu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Zhuocheng Ding (6):
-  i386: Introduce module-level cpu topology to CPUX86State
-  i386: Support modules_per_die in X86CPUTopoInfo
-  i386: Support module_id in X86CPUTopoIDs
-  i386/cpu: Introduce cluster-id to X86CPU
-  tests: Add test case of APIC ID for module level parsing
-  hw/i386/pc: Support smp.clusters for x86 PC machine
-
- hw/i386/pc.c               |   1 +
- hw/i386/x86.c              |  49 ++++++-
- include/hw/i386/topology.h |  35 ++++-
- qemu-options.hx            |  10 +-
- target/i386/cpu.c          | 289 +++++++++++++++++++++++++++++--------
- target/i386/cpu.h          |  43 +++++-
- target/i386/kvm/kvm.c      |   2 +-
- tests/unit/test-x86-topo.c |  56 ++++---
- 8 files changed, 379 insertions(+), 106 deletions(-)
-
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 358d9c0a655a..4a3621cc995a 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6112,12 +6112,12 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             switch (count) {
+             case 0: /* L1 dcache info */
+                 encode_cache_cpuid4(env->cache_info_cpuid4.l1d_cache,
+-                                    1, cs->nr_cores,
++                                    cs->nr_threads, cs->nr_cores,
+                                     eax, ebx, ecx, edx);
+                 break;
+             case 1: /* L1 icache info */
+                 encode_cache_cpuid4(env->cache_info_cpuid4.l1i_cache,
+-                                    1, cs->nr_cores,
++                                    cs->nr_threads, cs->nr_cores,
+                                     eax, ebx, ecx, edx);
+                 break;
+             case 2: /* L2 cache info */
 -- 
 2.34.1
 
