@@ -1,205 +1,168 @@
-Return-Path: <kvm+bounces-1957-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1958-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFC4A7EF38B
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 14:11:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE3E87EF3A0
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 14:18:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C5D51C20905
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 13:11:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B91C1C20AB7
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 13:18:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5774331741;
-	Fri, 17 Nov 2023 13:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB9B328A2;
+	Fri, 17 Nov 2023 13:18:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="0Jh9IEnc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OiLNxgOL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20312D57
-	for <kvm@vger.kernel.org>; Fri, 17 Nov 2023 05:11:35 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id 98e67ed59e1d1-28039ee1587so1533750a91.2
-        for <kvm@vger.kernel.org>; Fri, 17 Nov 2023 05:11:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1700226694; x=1700831494; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6E9rdo8qzUdOfFpLyb8P/NwaQhOJy8xXp5m1DZcVMbs=;
-        b=0Jh9IEncApe3dbjC0pYFA6uGR96saTAaIoi1TMkeMwBv+5Oswt9hbuRJ9gjctTfZVv
-         iMeoPeCv+tjez7DDFpZGYLpF/ix0UIse7qdmeKx/YKD6UZaOaF7s2Bl3/WoIOM9npcJd
-         k4/VCKT43U6Ra9sPQiQL9xyaRHnRTWiEf4CJTybfC2jSvKB1gUsMrvLdklhzT079E9Qx
-         5BnVRW2uSlZ6PyUutWCMgFdYUrAQzM88i0AJaWuN/lB0lsAmhPJ8HMEuP5gsxlx+c+XF
-         GIFUUTcqdZL38LIARq68Z1xfFsG4inBCIhfeqGKvd1EODnp9bSBmRUGQlvHWoiGIvVqs
-         sjiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700226694; x=1700831494;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6E9rdo8qzUdOfFpLyb8P/NwaQhOJy8xXp5m1DZcVMbs=;
-        b=YzmUnuzFwVwmCNmRbELpo/yDFYoBNLZr7/KjyTviKtDx6M6CahNfDI6zo5RWDD5PjE
-         mMlAl82KtmidBCDqOpQvzOL1I++TMA8IDMDPky8R3fxRtRGFBu+L0cl9ydRuAJ08x99F
-         hk9APxcO+YkeZv3USc5ouq4xN9NIzq4WnmkDg6pg8xbi/96FusS6xv3WydgJpCIIIcF5
-         5fZFvkkRN6uhgbMioYXI0zAg90NJ1ub5Rz2lpr9pWtc7ZHX+n0qM4+EVD8P5pFptzs1O
-         VWU7Ot3UxeBE/MjpKw8UqySIPaeUIp6NIHPxPd+sYIa4Eu1CAQO77lHd1N/kKMxB9dKz
-         s6Qw==
-X-Gm-Message-State: AOJu0YwAeOxGQASq28kvi++RJvTFSA1c2XfdLyZAzPD1q6BA1LFhmrl0
-	TJ3n2thEbK5YzLptNOrp/lLzKfGWvQLwJWA6soNFQg==
-X-Google-Smtp-Source: AGHT+IFgkLOaY0/DJgU/R9AI39sZ+6DPT8zwZKvyF4UaFzfmMFJIGvIF2iBAT0bJLBWK5QSv+GXZ5swJVYptGL1IhU4=
-X-Received: by 2002:a17:90a:974a:b0:281:3a4a:2e61 with SMTP id
- i10-20020a17090a974a00b002813a4a2e61mr14672875pjw.14.1700226694377; Fri, 17
- Nov 2023 05:11:34 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE3C1D4B;
+	Fri, 17 Nov 2023 05:18:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700227098; x=1731763098;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Xlos/TDjJ1TlU8lUh8JteOAv937jkZW/VG6cMFf2KwU=;
+  b=OiLNxgOLCddfTQV8DMhPBB+WkvdYzEiFcO55Ngi5kiTI9E/xSf0Z711F
+   BwQEHODmsRFe1BCiGF0gmoaMYKGrUVdILVvFlYeFu/hV3eQaK2ldNpsr6
+   PB+1pOr4sbbJfK2aEYS7lV8uKkMP2X2I1i4o7buYbUOe36cPoEwVGBP5A
+   JT5dDD1IgwsfkOvp8dabwKLDceE+8TZSjXqccghacvm97VLt/b+2DGOkr
+   wYHij09QCgXqfg3GfF89H6EssPMAih/QRAu+HJv6ASb/2OWQQsLZXjGKQ
+   jRPO0XAfR3D4i5fYX7cUqUZLr151JzFjqXoJ8i9+xl7qkgiG1p2Qfi8ra
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="381685576"
+X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
+   d="scan'208";a="381685576"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2023 05:18:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="794831176"
+X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
+   d="scan'208";a="794831176"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by orsmga008.jf.intel.com with ESMTP; 17 Nov 2023 05:18:17 -0800
+From: Yi Liu <yi.l.liu@intel.com>
+To: joro@8bytes.org,
+	alex.williamson@redhat.com,
+	jgg@nvidia.com,
+	kevin.tian@intel.com,
+	robin.murphy@arm.com,
+	baolu.lu@linux.intel.com
+Cc: cohuck@redhat.com,
+	eric.auger@redhat.com,
+	nicolinc@nvidia.com,
+	kvm@vger.kernel.org,
+	mjrosato@linux.ibm.com,
+	chao.p.peng@linux.intel.com,
+	yi.l.liu@intel.com,
+	yi.y.sun@linux.intel.com,
+	peterx@redhat.com,
+	jasowang@redhat.com,
+	shameerali.kolothum.thodi@huawei.com,
+	lulu@redhat.com,
+	suravee.suthikulpanit@amd.com,
+	iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	zhenzhong.duan@intel.com,
+	joao.m.martins@oracle.com,
+	xin.zeng@intel.com,
+	yan.y.zhao@intel.com
+Subject: [PATCH v7 0/3] Add Intel VT-d nested translation (part 2/2)
+Date: Fri, 17 Nov 2023 05:18:13 -0800
+Message-Id: <20231117131816.24359-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231020072140.900967-1-apatel@ventanamicro.com>
- <20231020072140.900967-9-apatel@ventanamicro.com> <2023102153-retread-narrow-54ee@gregkh>
-In-Reply-To: <2023102153-retread-narrow-54ee@gregkh>
-From: Anup Patel <anup@brainfault.org>
-Date: Fri, 17 Nov 2023 18:41:23 +0530
-Message-ID: <CAAhSdy1T-Ca7V21SSW=UCByujv39te7wRYGm40ZqDQ-JxH6pbA@mail.gmail.com>
-Subject: Re: [PATCH v3 8/9] tty: Add SBI debug console support to HVC SBI driver
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Anup Patel <apatel@ventanamicro.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Atish Patra <atishp@atishpatra.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Jiri Slaby <jirislaby@kernel.org>, 
-	Conor Dooley <conor@kernel.org>, Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-serial@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	linux-kernel@vger.kernel.org, Atish Patra <atishp@rivosinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Oct 21, 2023 at 10:16=E2=80=AFPM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> On Fri, Oct 20, 2023 at 12:51:39PM +0530, Anup Patel wrote:
-> > From: Atish Patra <atishp@rivosinc.com>
-> >
-> > RISC-V SBI specification supports advanced debug console
-> > support via SBI DBCN extension.
-> >
-> > Extend the HVC SBI driver to support it.
-> >
-> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> > ---
-> >  drivers/tty/hvc/Kconfig         |  2 +-
-> >  drivers/tty/hvc/hvc_riscv_sbi.c | 82 ++++++++++++++++++++++++++++++---
-> >  2 files changed, 76 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/drivers/tty/hvc/Kconfig b/drivers/tty/hvc/Kconfig
-> > index 4f9264d005c0..6e05c5c7bca1 100644
-> > --- a/drivers/tty/hvc/Kconfig
-> > +++ b/drivers/tty/hvc/Kconfig
-> > @@ -108,7 +108,7 @@ config HVC_DCC_SERIALIZE_SMP
-> >
-> >  config HVC_RISCV_SBI
-> >       bool "RISC-V SBI console support"
-> > -     depends on RISCV_SBI_V01
-> > +     depends on RISCV_SBI
-> >       select HVC_DRIVER
-> >       help
-> >         This enables support for console output via RISC-V SBI calls, w=
-hich
-> > diff --git a/drivers/tty/hvc/hvc_riscv_sbi.c b/drivers/tty/hvc/hvc_risc=
-v_sbi.c
-> > index 31f53fa77e4a..56da1a4b5aca 100644
-> > --- a/drivers/tty/hvc/hvc_riscv_sbi.c
-> > +++ b/drivers/tty/hvc/hvc_riscv_sbi.c
-> > @@ -39,21 +39,89 @@ static int hvc_sbi_tty_get(uint32_t vtermno, char *=
-buf, int count)
-> >       return i;
-> >  }
-> >
-> > -static const struct hv_ops hvc_sbi_ops =3D {
-> > +static const struct hv_ops hvc_sbi_v01_ops =3D {
-> >       .get_chars =3D hvc_sbi_tty_get,
-> >       .put_chars =3D hvc_sbi_tty_put,
-> >  };
-> >
-> > -static int __init hvc_sbi_init(void)
-> > +static int hvc_sbi_dbcn_tty_put(uint32_t vtermno, const char *buf, int=
- count)
-> >  {
-> > -     return PTR_ERR_OR_ZERO(hvc_alloc(0, 0, &hvc_sbi_ops, 16));
-> > +     phys_addr_t pa;
-> > +     struct sbiret ret;
-> > +
-> > +     if (is_vmalloc_addr(buf)) {
-> > +             pa =3D page_to_phys(vmalloc_to_page(buf)) + offset_in_pag=
-e(buf);
-> > +             if (PAGE_SIZE < (offset_in_page(buf) + count))
-> > +                     count =3D PAGE_SIZE - offset_in_page(buf);
-> > +     } else {
-> > +             pa =3D __pa(buf);
-> > +     }
-> > +
-> > +     if (IS_ENABLED(CONFIG_32BIT))
-> > +             ret =3D sbi_ecall(SBI_EXT_DBCN, SBI_EXT_DBCN_CONSOLE_WRIT=
-E,
-> > +                             count, lower_32_bits(pa), upper_32_bits(p=
-a),
-> > +                             0, 0, 0);
-> > +     else
-> > +             ret =3D sbi_ecall(SBI_EXT_DBCN, SBI_EXT_DBCN_CONSOLE_WRIT=
-E,
-> > +                             count, pa, 0, 0, 0, 0);
->
-> Again, you need a helper function here to keep you from having to keep
-> this all in sync.
+This is the second part to add Intel VT-d nested translation based on IOMMUFD
+nesting infrastructure. As the iommufd nesting infrastructure series [1],
+iommu core supports new ops to invalidate the cache after the modifictions
+in stage-1 page table. So far, the cache invalidation data is vendor specific,
+the data_type (IOMMU_HWPT_DATA_VTD_S1) defined for the vendor specific HWPT
+allocation is reused in the cache invalidation path. User should provide the
+correct data_type that suit with the type used in HWPT allocation.
 
-Sure, I will update.
+IOMMU_HWPT_INVALIDATE iotcl returns an error in @out_driver_error_code. However
+Intel VT-d does not define error code so far, so it's not easy to pre-define it
+in iommufd neither. As a result, this field should just be ignored on VT-d platform.
 
->
-> > +     if (ret.error)
-> > +             return 0;
-> > +
-> > +     return count;
-> >  }
-> > -device_initcall(hvc_sbi_init);
-> >
-> > -static int __init hvc_sbi_console_init(void)
-> > +static int hvc_sbi_dbcn_tty_get(uint32_t vtermno, char *buf, int count=
-)
-> >  {
-> > -     hvc_instantiate(0, 0, &hvc_sbi_ops);
-> > +     phys_addr_t pa;
-> > +     struct sbiret ret;
-> > +
-> > +     if (is_vmalloc_addr(buf)) {
-> > +             pa =3D page_to_phys(vmalloc_to_page(buf)) + offset_in_pag=
-e(buf);
-> > +             if (PAGE_SIZE < (offset_in_page(buf) + count))
-> > +                     count =3D PAGE_SIZE - offset_in_page(buf);
-> > +     } else {
-> > +             pa =3D __pa(buf);
-> > +     }
-> > +
-> > +     if (IS_ENABLED(CONFIG_32BIT))
-> > +             ret =3D sbi_ecall(SBI_EXT_DBCN, SBI_EXT_DBCN_CONSOLE_READ=
-,
-> > +                             count, lower_32_bits(pa), upper_32_bits(p=
-a),
-> > +                             0, 0, 0);
-> > +     else
-> > +             ret =3D sbi_ecall(SBI_EXT_DBCN, SBI_EXT_DBCN_CONSOLE_READ=
-,
-> > +                             count, pa, 0, 0, 0, 0);
->
-> And here too.
+Complete code can be found in [2], corresponding QEMU could can be found in [3].
 
-Okay.
+[1] https://lore.kernel.org/linux-iommu/20231117130717.19875-1-yi.l.liu@intel.com/#t
+[2] https://github.com/yiliu1765/iommufd/tree/iommufd_nesting
+[3] https://github.com/yiliu1765/qemu/tree/zhenzhong/wip/iommufd_nesting_rfcv1
 
->
-> thanks,
->
-> greg k-h
+Change log:
+
+v7:
+ - No much change, just rebase on top of 6.7-rc1
+
+v6: https://lore.kernel.org/linux-iommu/20231020093719.18725-1-yi.l.liu@intel.com/
+ - Address comments from Kevin
+ - Split the VT-d nesting series into two parts (Jason)
+
+v5: https://lore.kernel.org/linux-iommu/20230921075431.125239-1-yi.l.liu@intel.com/
+ - Add Kevin's r-b for patch 2, 3 ,5 8, 10
+ - Drop enforce_cache_coherency callback from the nested type domain ops (Kevin)
+ - Remove duplicate agaw check in patch 04 (Kevin)
+ - Remove duplicate domain_update_iommu_cap() in patch 06 (Kevin)
+ - Check parent's force_snooping to set pgsnp in the pasid entry (Kevin)
+ - uapi data structure check (Kevin)
+ - Simplify the errata handling as user can allocate nested parent domain
+
+v4: https://lore.kernel.org/linux-iommu/20230724111335.107427-1-yi.l.liu@intel.com/
+ - Remove ascii art tables (Jason)
+ - Drop EMT (Tina, Jason)
+ - Drop MTS and related definitions (Kevin)
+ - Rename macro IOMMU_VTD_PGTBL_ to IOMMU_VTD_S1_ (Kevin)
+ - Rename struct iommu_hwpt_intel_vtd_ to iommu_hwpt_vtd_ (Kevin)
+ - Rename struct iommu_hwpt_intel_vtd to iommu_hwpt_vtd_s1 (Kevin)
+ - Put the vendor specific hwpt alloc data structure before enuma iommu_hwpt_type (Kevin)
+ - Do not trim the higher page levels of S2 domain in nested domain attachment as the
+   S2 domain may have been used independently. (Kevin)
+ - Remove the first-stage pgd check against the maximum address of s2_domain as hw
+   can check it anyhow. It makes sense to check every pfns used in the stage-1 page
+   table. But it cannot make it. So just leave it to hw. (Kevin)
+ - Split the iotlb flush part into an order of uapi, helper and callback implementation (Kevin)
+ - Change the policy of VT-d nesting errata, disallow RO mapping once a domain is used
+   as parent domain of a nested domain. This removes the nested_users counting. (Kevin)
+ - Minor fix for "make htmldocs"
+
+v3: https://lore.kernel.org/linux-iommu/20230511145110.27707-1-yi.l.liu@intel.com/
+ - Further split the patches into an order of adding helpers for nested
+   domain, iotlb flush, nested domain attachment and nested domain allocation
+   callback, then report the hw_info to userspace.
+ - Add batch support in cache invalidation from userspace
+ - Disallow nested translation usage if RO mappings exists in stage-2 domain
+   due to errata on readonly mappings on Sapphire Rapids platform.
+
+v2: https://lore.kernel.org/linux-iommu/20230309082207.612346-1-yi.l.liu@intel.com/
+ - The iommufd infrastructure is split to be separate series.
+
+v1: https://lore.kernel.org/linux-iommu/20230209043153.14964-1-yi.l.liu@intel.com/
 
 Regards,
-Anup
+	Yi Liu
+
+Yi Liu (3):
+  iommufd: Add data structure for Intel VT-d stage-1 cache invalidation
+  iommu/vt-d: Make iotlb flush helpers to be extern
+  iommu/vt-d: Add iotlb flush for nested domain
+
+ drivers/iommu/intel/iommu.c  | 10 +++----
+ drivers/iommu/intel/iommu.h  |  6 ++++
+ drivers/iommu/intel/nested.c | 54 ++++++++++++++++++++++++++++++++++++
+ include/uapi/linux/iommufd.h | 36 ++++++++++++++++++++++++
+ 4 files changed, 101 insertions(+), 5 deletions(-)
+
+-- 
+2.34.1
+
 
