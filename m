@@ -1,176 +1,128 @@
-Return-Path: <kvm+bounces-1909-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1910-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6E6C7EEBED
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 06:22:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C352B7EEBF5
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 06:26:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47ECB28106A
-	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 05:22:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F7621F24596
+	for <lists+kvm@lfdr.de>; Fri, 17 Nov 2023 05:26:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D81BBA32;
-	Fri, 17 Nov 2023 05:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7B28D2E2;
+	Fri, 17 Nov 2023 05:26:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X0lYoHpQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QFYOBjul"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 597B1D4E
-	for <kvm@vger.kernel.org>; Thu, 16 Nov 2023 21:22:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700198550;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=GP1qDRaGGYNkvm0KV8/GWSP2DF/3SQkemClyjrO5cH0=;
-	b=X0lYoHpQVuEQla8IbFNODQ2Zltb1pvDmjXs+lNeNNt9zlTdqf4HLoDuusM9pbWqvSZXwU9
-	/oJ08uvZbURyPAVfwUSq9wswZ2XgAsHIonAP92eRfapFQphSf1bgxTvw+4qO57gqTAyij5
-	/S9lEyjI9cEUnDeI0IJMw5dgc4fdCUU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-385-FAvH0CbkOg-51Q-zciuaDQ-1; Fri, 17 Nov 2023 00:22:26 -0500
-X-MC-Unique: FAvH0CbkOg-51Q-zciuaDQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 173C6101A529;
-	Fri, 17 Nov 2023 05:22:26 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 064E5C15881;
-	Fri, 17 Nov 2023 05:22:26 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] KVM: selftests: Fix the dirty_log_test semaphore imbalance
-Date: Fri, 17 Nov 2023 00:22:09 -0500
-Message-Id: <20231117052210.26396-1-shahuang@redhat.com>
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9D50D4A;
+	Thu, 16 Nov 2023 21:26:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700198768; x=1731734768;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=RV8fvqjrUV0BSx8JFW/NdoI1Bmp5l5A2r3kiF0HPx54=;
+  b=QFYOBjul2qc/QbLeLs7Gv2lZoKw/dJmrzE0YWTV8pvDiEZpCDciTMrDF
+   jZOZYBGKJL4h/ZvlFFeZ7EcAuGTBkzvlrOa/fisD4e0gg4T1rnTPeJkSJ
+   +b+3gZvlbJ30ygT1xyBX2w4cgnvcjRlP12Xu+otDIxGqo1mrQBO1SkQ8w
+   UoL731OM9GUlSttZTgnEgGi8I4jaleocfFfvodjasTNdNyuOXAIUjHetk
+   LxOLQTa0GTkDP2r0Pjbh1lwOIAEHbIADnkGyD0cQXb3UlvOANiCFAnJl8
+   YzOw0ndi7Y7SqnusE82ok6w2MHSekqZ15Zj89w0CW5xu4dju5Kv870dy4
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="395163698"
+X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
+   d="scan'208";a="395163698"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 21:26:03 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="769127386"
+X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
+   d="scan'208";a="769127386"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.126]) ([10.238.10.126])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 21:25:59 -0800
+Message-ID: <e3e71256-3673-495e-a4b7-985c4aac4bd2@linux.intel.com>
+Date: Fri, 17 Nov 2023 13:25:57 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v17 059/116] KVM: TDX: Create initial guest memory
+To: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+ Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+ Sean Christopherson <seanjc@google.com>, Sagi Shahar <sagis@google.com>,
+ David Matlack <dmatlack@google.com>, Kai Huang <kai.huang@intel.com>,
+ Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com, hang.yuan@intel.com,
+ tina.zhang@intel.com, gkirkpatrick@google.com
+References: <cover.1699368322.git.isaku.yamahata@intel.com>
+ <e8fdc92439efeed0ee05f39b1cd2dc1023014c11.1699368322.git.isaku.yamahata@intel.com>
+ <c9413cb8-8aae-4233-b55f-fbac91459173@linux.intel.com>
+ <20231117000458.GB1277973@ls.amr.corp.intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20231117000458.GB1277973@ls.amr.corp.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-When execute the dirty_log_test on some aarch64 machine, it sometimes
-trigger the ASSERT:
 
-==== Test Assertion Failure ====
-  dirty_log_test.c:384: dirty_ring_vcpu_ring_full
-  pid=14854 tid=14854 errno=22 - Invalid argument
-     1  0x00000000004033eb: dirty_ring_collect_dirty_pages at dirty_log_test.c:384
-     2  0x0000000000402d27: log_mode_collect_dirty_pages at dirty_log_test.c:505
-     3   (inlined by) run_test at dirty_log_test.c:802
-     4  0x0000000000403dc7: for_each_guest_mode at guest_modes.c:100
-     5  0x0000000000401dff: main at dirty_log_test.c:941 (discriminator 3)
-     6  0x0000ffff9be173c7: ?? ??:0
-     7  0x0000ffff9be1749f: ?? ??:0
-     8  0x000000000040206f: _start at ??:?
-  Didn't continue vcpu even without ring full
 
-The dirty_log_test fails when execute the dirty-ring test, this is
-because the sem_vcpu_cont and the sem_vcpu_stop is non-zero value when
-execute the dirty_ring_collect_dirty_pages() function. When those two
-sem_t variables are non-zero, the dirty_ring_wait_vcpu() at the
-beginning of the dirty_ring_collect_dirty_pages() will not wait for the
-vcpu to stop, but continue to execute the following code. In this case,
-before vcpu stop, if the dirty_ring_vcpu_ring_full is true, and the
-dirty_ring_collect_dirty_pages() has passed the check for the
-dirty_ring_vcpu_ring_full but hasn't execute the check for the
-continued_vcpu, the vcpu stop, and set the dirty_ring_vcpu_ring_full to
-false. Then dirty_ring_collect_dirty_pages() will trigger the ASSERT.
+On 11/17/2023 8:04 AM, Isaku Yamahata wrote:
+> On Thu, Nov 16, 2023 at 02:35:33PM +0800,
+> Binbin Wu <binbin.wu@linux.intel.com> wrote:
+>
+>>
+>> On 11/7/2023 10:56 PM, isaku.yamahata@intel.com wrote:
+>>> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>>>
+>>> Because the guest memory is protected in TDX, the creation of the initial
+>>> guest memory requires a dedicated TDX module API, tdh_mem_page_add, instead
+>>> of directly copying the memory contents into the guest memory in the case
+>>> of the default VM type.  KVM MMU page fault handler callback,
+>>> private_page_add, handles it.
+>>>
+>>> Define new subcommand, KVM_TDX_INIT_MEM_REGION, of VM-scoped
+>>> KVM_MEMORY_ENCRYPT_OP.  It assigns the guest page, copies the initial
+>>> memory contents into the guest memory, encrypts the guest memory.  At the
+>>> same time, optionally it extends memory measurement of the TDX guest.  It
+>>> calls the KVM MMU page fault(EPT-violation) handler to trigger the
+>>> callbacks for it.
+>>>
+>>> Reported-by: gkirkpatrick@google.com
+>>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>>>
+>>> ---
+>>> v15 -> v16:
+>>> - add check if nr_pages isn't large with
+>>>     (nr_page << PAGE_SHIFT) >> PAGE_SHIFT
+>>>
+>>> v14 -> v15:
+>>> - add a check if TD is finalized or not to tdx_init_mem_region()
+>>> - return -EAGAIN when partial population
+>>> ---
+>>>    arch/x86/include/uapi/asm/kvm.h       |   9 ++
+>>>    arch/x86/kvm/mmu/mmu.c                |   1 +
+>>>    arch/x86/kvm/vmx/tdx.c                | 167 +++++++++++++++++++++++++-
+>>>    arch/x86/kvm/vmx/tdx.h                |   2 +
+>>>    tools/arch/x86/include/uapi/asm/kvm.h |   9 ++
+>>>    5 files changed, 185 insertions(+), 3 deletions(-)
+>>>
+>> [...]
+>>> +static int tdx_sept_page_add(struct kvm *kvm, gfn_t gfn,
+>>> +			     enum pg_level level, kvm_pfn_t pfn)
+>> For me, the function name is a bit confusing.
+>> I would relate it to a SEPT table page instead of a normal private page if
+>> only by the function name.
+>>
+>> Similar to tdx_sept_page_aug(), though it's less confusing due to there is
+>> no seam call to aug a sept table page.
+> How about tdx_mem_page_{add, aug}()?
 
-Why sem_vcpu_cont and sem_vcpu_stop can be non-zero value? It's because
-the dirty_ring_before_vcpu_join() execute the sem_post(&sem_vcpu_cont)
-at the end of each dirty-ring test. It can cause two cases:
+It looks good to me.
 
-1. sem_vcpu_cont be non-zero. When we set the host_quit to be true,
-   the vcpu_worker directly see the host_quit to be true, it quit. So
-   the log_mode_before_vcpu_join() function will set the sem_vcpu_cont
-   to 1, since the vcpu_worker has quit, it won't consume it.
-2. sem_vcpu_stop be non-zero. When we set the host_quit to be true,
-   the vcpu_worker has entered the guest state, the next time it exit
-   from guest state, it will set the sem_vcpu_stop to 1, and then see
-   the host_quit, no one will consume the sem_vcpu_stop.
-
-When execute more and more dirty-ring tests, the sem_vcpu_cont and
-sem_vcpu_stop can be larger and larger, which makes many code paths
-don't wait for the sem_t. Thus finally cause the problem.
-
-To fix this problem, we can wait a while before set the host_quit to
-true, which gives the vcpu time to enter the guest state, so it will
-exit again. Then we can wait the vcpu to exit, and let it continue
-again, then the vcpu will see the host_quit. Thus the sem_vcpu_cont and
-sem_vcpu_stop will be both zero when test finished.
-
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
-v1->v2:
-  - Fix the real logic bug, not just fresh the context.
-
-v1: https://lore.kernel.org/all/20231116093536.22256-1-shahuang@redhat.com/
----
- tools/testing/selftests/kvm/dirty_log_test.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index 936f3a8d1b83..a6e0ff46a07c 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -417,7 +417,8 @@ static void dirty_ring_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
- 
- static void dirty_ring_before_vcpu_join(void)
- {
--	/* Kick another round of vcpu just to make sure it will quit */
-+	/* Wait vcpu exit, and let it continue to see the host_quit. */
-+	dirty_ring_wait_vcpu();
- 	sem_post(&sem_vcpu_cont);
- }
- 
-@@ -719,6 +720,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	struct kvm_vm *vm;
- 	unsigned long *bmap;
- 	uint32_t ring_buf_idx = 0;
-+	int sem_val;
- 
- 	if (!log_mode_supported()) {
- 		print_skip("Log mode '%s' not supported",
-@@ -726,6 +728,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 		return;
- 	}
- 
-+	sem_getvalue(&sem_vcpu_stop, &sem_val);
-+	assert(sem_val == 0);
-+	sem_getvalue(&sem_vcpu_cont, &sem_val);
-+	assert(sem_val == 0);
-+
- 	/*
- 	 * We reserve page table for 2 times of extra dirty mem which
- 	 * will definitely cover the original (1G+) test range.  Here
-@@ -825,6 +832,13 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 		sync_global_to_guest(vm, iteration);
- 	}
- 
-+	/*
-+	 *
-+	 * Before we set the host_quit, let the vcpu has time to run, to make
-+	 * sure we consume the sem_vcpu_stop and the vcpu consume the
-+	 * sem_vcpu_cont, to keep the semaphore balance.
-+	 */
-+	usleep(p->interval * 1000);
- 	/* Tell the vcpu thread to quit */
- 	host_quit = true;
- 	log_mode_before_vcpu_join();
--- 
-2.40.1
 
 
