@@ -1,60 +1,60 @@
-Return-Path: <kvm+bounces-1985-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-1986-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BADDB7EFE49
-	for <lists+kvm@lfdr.de>; Sat, 18 Nov 2023 08:34:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 924807EFEF1
+	for <lists+kvm@lfdr.de>; Sat, 18 Nov 2023 11:39:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73DC42811DE
-	for <lists+kvm@lfdr.de>; Sat, 18 Nov 2023 07:34:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2D421C208EE
+	for <lists+kvm@lfdr.de>; Sat, 18 Nov 2023 10:39:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E2E61078C;
-	Sat, 18 Nov 2023 07:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA2210A10;
+	Sat, 18 Nov 2023 10:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="jJJB/G7W"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="OgOH+LU+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EE33C1
-	for <kvm@vger.kernel.org>; Fri, 17 Nov 2023 23:33:51 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6c34e87b571so2482921b3a.3
-        for <kvm@vger.kernel.org>; Fri, 17 Nov 2023 23:33:51 -0800 (PST)
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3949D75
+	for <kvm@vger.kernel.org>; Sat, 18 Nov 2023 02:39:06 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1ce5e65ba37so10127195ad.1
+        for <kvm@vger.kernel.org>; Sat, 18 Nov 2023 02:39:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1700292831; x=1700897631; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1700303946; x=1700908746; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=jvS+TEU7BLZ2Ws+wGWBvl7GPGDJLm60NOOheWwUlA+M=;
-        b=jJJB/G7WdT+AD22gsKqZTpe5tUgS6LBCADl+epd3dgrPilNAT4xihEAWfqpFnFhXfx
-         vXaEMNFqTp7W1bCrsTP5XQwAuV1ULrvBay87HMo3tZHRZq/y0m5ICtHh0r5NEfza8am8
-         ejuQhLV38aXfzpdK4xLW6lChimjQ6OlpcM8oI/mmZsx/ilSTZa4b05UzlYSQ/phKrcXd
-         bBYxZ+WJA7XHmiLlc7Xq/LthHccTUCw+5KqD7v7hDpFntUGMw8OoRGZSfR1CSIeNidNS
-         6pZQZEQ+FZbvBPjoI1AVZav5A9Dk4JsRw+WYc5Ogxvep46y7kj20BUz0jLNoolYtNk+0
-         HgOA==
+        bh=zy1KCU9oTgYlIGJ1CmWqV4X6k+RLxXAN+NT2CTiEe4g=;
+        b=OgOH+LU+DlnpLwQZuxxGIoOgEifApS1GwUrc/zmItgbKDpwXwQj0hKw2dQ9h8qisGG
+         31MHSx4nUFyYfqUOeC/KsC8vt5SgGRLy/I9zO62oysgiepVdv2LUStmtrQ9X/5xhn3uu
+         lKBuB2opDvL4jmKeuncrj7+HCzmR4QQNcnAJBWNNXWhg/x9ju08cZTqsCXgxtcZell1t
+         QmMgAU2E12RmFuBRC0Wk9Rxi4J/SDQivi2MuNFNb9l1EfpebPy4SaEuk0cONzx78Klwj
+         H7XiyXqGdxFW/TcDXpPSu1+n8Vzv+NGVm8jIv+Mx53l3el4WUk41UdohTbLybQherx48
+         SklA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700292831; x=1700897631;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=1e100.net; s=20230601; t=1700303946; x=1700908746;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jvS+TEU7BLZ2Ws+wGWBvl7GPGDJLm60NOOheWwUlA+M=;
-        b=pxgiedIklITe2eZwVEonjeakngZ8xbnxJtIAiJ84Ls6IP5yia64E/MDEGWX8fIsAVQ
-         tCHzYE0EYbCatLJrBf4X4Wo4tLuMG4+odsrk0EqSNqoh9uua98ano+Mpg+l5oKeOfL1o
-         B6z88Z2ztIYC0a7SMLExs7ee3TgNQERjQ6CrC8XbDHzwnVYc8OrSWJ97c5lyYW9SwPEr
-         KYMyBVZhbu6k5cio4tnXrU5dDZJwlUInt7ZznoxT5t74wTK1sjlekNj3HnRB4BJMNGj3
-         HZUS10i5aDHBqeXMZyWNYYYPxboSJhDDxuXRyt95DbYl+6JfrChOdMLp9CtBw7oxuZ1J
-         qkwg==
-X-Gm-Message-State: AOJu0Yzy291tvh9hzCPOIXZzO4oa6BER/J2pvyFpZQ6hvQr90mZxddAw
-	5hsoVRhC9wqrHLfrXkUZsCXc7g==
-X-Google-Smtp-Source: AGHT+IEumhuQYfV3o4Z721tq/oFbXwiRdHj0B+h8h6mYYmWoONPXZo9l/FJ3wWOkQ2FFk/eykNZFZQ==
-X-Received: by 2002:a05:6a20:e609:b0:186:5265:ed1c with SMTP id my9-20020a056a20e60900b001865265ed1cmr1471698pzb.6.1700292830919;
-        Fri, 17 Nov 2023 23:33:50 -0800 (PST)
-Received: from [10.254.46.51] ([139.177.225.228])
-        by smtp.gmail.com with ESMTPSA id je6-20020a170903264600b001b8a3e2c241sm2482044plb.14.2023.11.17.23.33.47
+        bh=zy1KCU9oTgYlIGJ1CmWqV4X6k+RLxXAN+NT2CTiEe4g=;
+        b=ikbSARCmMi2rC0kzxgFYw42gxKgTZ60eaT0V04sWNu4jB98/ApvW1jDLZo9LeeURt6
+         IdUZoSasqydF9urNMAIRAPZ+zpYJJU0s5KMy2F44MQn5JiVNcvPupRK2V8huyBDIjgxs
+         WByNNUUGRVQsgvdapNHL43wFa1+dvLROQ/scB5JVte5Bd2XrB6mGVt5YChUinKiPy+JU
+         TCVL9wnqaRfqKnjg3rnL3wW7oFo126dds3ZdTghRlqg5XzXU9VqOnL3WuxRAloXeYuq1
+         pRKxtXIO/9K3FsekMRQEbn6CrUS8u3GOL/lmal824oWrfWwojFSomS0wfVfVBWCLSq/h
+         Oqjw==
+X-Gm-Message-State: AOJu0YydA6pWG3/p4SIIeq5bnQbygRhBQi+PkIZay5whUL/ofbpUuij2
+	wf82jDSwkr2F58Ue5o2zk/KYLQ==
+X-Google-Smtp-Source: AGHT+IF5N3QYbHRaegOcdKOfyplWUxrNW29H3jMu8vldA9SOfJqtKJgbzZKkkQCNxUUc0PsWDQo6Hw==
+X-Received: by 2002:a17:902:e88e:b0:1cc:5aef:f2c3 with SMTP id w14-20020a170902e88e00b001cc5aeff2c3mr11314929plg.22.1700303946093;
+        Sat, 18 Nov 2023 02:39:06 -0800 (PST)
+Received: from [157.82.205.15] ([157.82.205.15])
+        by smtp.gmail.com with ESMTPSA id c11-20020a170902aa4b00b001b896686c78sm2745643plr.66.2023.11.18.02.38.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Nov 2023 23:33:50 -0800 (PST)
-Message-ID: <93c0f8f2-f40e-4dea-8260-6f610e77aa7f@bytedance.com>
-Date: Sat, 18 Nov 2023 15:33:44 +0800
+        Sat, 18 Nov 2023 02:39:05 -0800 (PST)
+Message-ID: <6253fb6b-9a53-484a-9be5-8facd46c051e@daynix.com>
+Date: Sat, 18 Nov 2023 19:38:58 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -62,57 +62,179 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6 sched/fair: Add
- lag based placement)
+Subject: Re: [RFC PATCH v2 1/7] bpf: Introduce BPF_PROG_TYPE_VNET_HASH
 Content-Language: en-US
-To: Tobias Huschle <huschle@linux.ibm.com>,
- Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org
-Cc: Peterz <peterz@infradead.org>, mst@redhat.com, jasowang@redhat.com
-References: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
-From: Abel Wu <wuyun.abel@bytedance.com>
-In-Reply-To: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Jason Wang <jasowang@redhat.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, bpf <bpf@vger.kernel.org>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org,
+ "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>
+References: <20231015141644.260646-1-akihiko.odaki@daynix.com>
+ <20231015141644.260646-2-akihiko.odaki@daynix.com>
+ <CAADnVQLfUDmgYng8Cw1hiZOMfWNWLjbn7ZGc4yOEz-XmeFEz5Q@mail.gmail.com>
+ <2594bb24-74dc-4785-b46d-e1bffcc3e7ed@daynix.com>
+ <CAADnVQ+J+bOtvEfdvgUse_Rr07rM5KOZ5DtAmHDgRmi70W68+g@mail.gmail.com>
+ <CACGkMEs22078F7rSLEz6eQabkZZ=kujSONUNMThZz5Gp=YiidQ@mail.gmail.com>
+ <CAADnVQLt8NWvP8qGWMPx=12PwWWE69P7aS2dbm=khAJkCnJEoQ@mail.gmail.com>
+ <9a4853ad-5ef4-4b15-a49e-9edb5ae4468e@daynix.com>
+In-Reply-To: <9a4853ad-5ef4-4b15-a49e-9edb5ae4468e@daynix.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 11/17/23 2:58 AM, Tobias Huschle Wrote:
-> #################### TRACE EXCERPT ####################
-> The sched_place trace event was added to the end of the place_entity function and outputs:
-> sev -> sched_entity vruntime
-> sed -> sched_entity deadline
-> sel -> sched_entity vlag
-> avg -> cfs_rq avg_vruntime
-> min -> cfs_rq min_vruntime
-> cpu -> cpu of cfs_rq
-> nr  -> cfs_rq nr_running
-> ---
->      CPU 3/KVM-2950    [014] d....   576.161432: sched_migrate_task: comm=vhost-2920 pid=2941 prio=120 orig_cpu=15 dest_cpu=14
-> --> migrates task from cpu 15 to 14
->      CPU 3/KVM-2950    [014] d....   576.161433: sched_place: comm=vhost-2920 pid=2941 sev=4242563284 sed=4245563284 sel=0 avg=4242563284 min=4242563284 cpu=14 nr=0
-> --> places vhost 2920 on CPU 14 with vruntime 4242563284
->      CPU 3/KVM-2950    [014] d....   576.161433: sched_place: comm= pid=0 sev=16329848593 sed=16334604010 sel=0 avg=16329848593 min=16329848593 cpu=14 nr=0
->      CPU 3/KVM-2950    [014] d....   576.161433: sched_place: comm= pid=0 sev=42560661157 sed=42627443765 sel=0 avg=42560661157 min=42560661157 cpu=14 nr=0
->      CPU 3/KVM-2950    [014] d....   576.161434: sched_place: comm= pid=0 sev=53846627372 sed=54125900099 sel=0 avg=53846627372 min=53846627372 cpu=14 nr=0
->      CPU 3/KVM-2950    [014] d....   576.161434: sched_place: comm= pid=0 sev=86640641980 sed=87255041979 sel=0 avg=86640641980 min=86640641980 cpu=14 nr=0
+On 2023/10/18 4:19, Akihiko Odaki wrote:
+> On 2023/10/18 4:03, Alexei Starovoitov wrote:
+>> On Mon, Oct 16, 2023 at 7:38 PM Jason Wang <jasowang@redhat.com> wrote:
+>>>
+>>> On Tue, Oct 17, 2023 at 7:53 AM Alexei Starovoitov
+>>> <alexei.starovoitov@gmail.com> wrote:
+>>>>
+>>>> On Sun, Oct 15, 2023 at 10:10 AM Akihiko Odaki 
+>>>> <akihiko.odaki@daynix.com> wrote:
+>>>>>
+>>>>> On 2023/10/16 1:07, Alexei Starovoitov wrote:
+>>>>>> On Sun, Oct 15, 2023 at 7:17 AM Akihiko Odaki 
+>>>>>> <akihiko.odaki@daynix.com> wrote:
+>>>>>>>
+>>>>>>> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+>>>>>>> index 0448700890f7..298634556fab 100644
+>>>>>>> --- a/include/uapi/linux/bpf.h
+>>>>>>> +++ b/include/uapi/linux/bpf.h
+>>>>>>> @@ -988,6 +988,7 @@ enum bpf_prog_type {
+>>>>>>>           BPF_PROG_TYPE_SK_LOOKUP,
+>>>>>>>           BPF_PROG_TYPE_SYSCALL, /* a program that can execute 
+>>>>>>> syscalls */
+>>>>>>>           BPF_PROG_TYPE_NETFILTER,
+>>>>>>> +       BPF_PROG_TYPE_VNET_HASH,
+>>>>>>
+>>>>>> Sorry, we do not add new stable program types anymore.
+>>>>>>
+>>>>>>> @@ -6111,6 +6112,10 @@ struct __sk_buff {
+>>>>>>>           __u8  tstamp_type;
+>>>>>>>           __u32 :24;              /* Padding, future use. */
+>>>>>>>           __u64 hwtstamp;
+>>>>>>> +
+>>>>>>> +       __u32 vnet_hash_value;
+>>>>>>> +       __u16 vnet_hash_report;
+>>>>>>> +       __u16 vnet_rss_queue;
+>>>>>>>    };
+>>>>>>
+>>>>>> we also do not add anything to uapi __sk_buff.
+>>>>>>
+>>>>>>> +const struct bpf_verifier_ops vnet_hash_verifier_ops = {
+>>>>>>> +       .get_func_proto         = sk_filter_func_proto,
+>>>>>>> +       .is_valid_access        = sk_filter_is_valid_access,
+>>>>>>> +       .convert_ctx_access     = bpf_convert_ctx_access,
+>>>>>>> +       .gen_ld_abs             = bpf_gen_ld_abs,
+>>>>>>> +};
+>>>>>>
+>>>>>> and we don't do ctx rewrites like this either.
+>>>>>>
+>>>>>> Please see how hid-bpf and cgroup rstat are hooking up bpf
+>>>>>> in _unstable_ way.
+>>>>>
+>>>>> Can you describe what "stable" and "unstable" mean here? I'm new to 
+>>>>> BPF
+>>>>> and I'm worried if it may mean the interface stability.
+>>>>>
+>>>>> Let me describe the context. QEMU bundles an eBPF program that is used
+>>>>> for the "eBPF steering program" feature of tun. Now I'm proposing to
+>>>>> extend the feature to allow to return some values to the userspace and
+>>>>> vhost_net. As such, the extension needs to be done in a way that 
+>>>>> ensures
+>>>>> interface stability.
+>>>>
+>>>> bpf is not an option then.
+>>>> we do not add stable bpf program types or hooks any more.
+>>>
+>>> Does this mean eBPF could not be used for any new use cases other than
+>>> the existing ones?
+>>
+>> It means that any new use of bpf has to be unstable for the time being.
+> 
+> Can you elaborate more about making new use unstable "for the time 
+> being?" Is it a temporary situation? What is the rationale for that? 
+> Such information will help devise a solution that is best for both of 
+> the BPF and network subsystems.
+> 
+> I would also appreciate if you have some documentation or link to 
+> relevant discussions on the mailing list. That will avoid having same 
+> discussion you may already have done in the past.
 
-As the following 2 lines indicates that vhost-2920 is on_rq so can be
-picked as next, thus its cfs_rq must have at least one entity.
+Hi,
 
-While the above 4 lines shows nr=0, so the "comm= pid=0" task(s) can't
-be in the same cgroup with vhost-2920.
+The discussion has been stuck for a month, but I'd still like to 
+continue figuring out the way best for the whole kernel to implement 
+this feature. I summarize the current situation and question that needs 
+to be answered before push this forward:
 
-Say vhost is in cgroupA, and "comm= pid=0" task with sev=86640641980
-is in cgroupB ...
+The goal of this RFC is to allow to report hash values calculated with 
+eBPF steering program. It's essentially just to report 4 bytes from the 
+kernel to the userspace.
 
->      CPU 3/KVM-2950    [014] dN...   576.161434: sched_stat_wait: comm=vhost-2920 pid=2941 delay=9958 [ns]
->      CPU 3/KVM-2950    [014] d....   576.161435: sched_switch: prev_comm=CPU 3/KVM prev_pid=2950 prev_prio=120 prev_state=S ==> next_comm=vhost-2920 next_pid=2941 next_prio=120
->     vhost-2920-2941    [014] D....   576.161439: sched_waking: comm=vhost-2286 pid=2309 prio=120 target_cpu=008
->     vhost-2920-2941    [014] d....   576.161446: sched_waking: comm=kworker/14:0 pid=6525 prio=120 target_cpu=014
->     vhost-2920-2941    [014] d....   576.161447: sched_place: comm=kworker/14:0 pid=6525 sev=86642125805 sed=86645125805 sel=0 avg=86642125805 min=86642125805 cpu=14 nr=1
-> --> places kworker 6525 on cpu 14 with vruntime 86642125805
-> -->  which is far larger than vhost vruntime of  4242563284
+Unfortunately, however, it is not acceptable for the BPF subsystem 
+because the "stable" BPF is completely fixed these days. The 
+"unstable/kfunc" BPF is an alternative, but the eBPF program will be 
+shipped with a portable userspace program (QEMU)[1] so the lack of 
+interface stability is not tolerable.
 
-Here nr=1 means there is another entity in the same cfs_rq with the
-newly woken kworker, but which? According to the vruntime, I would
-assume kworker is in cgroupB.
+Another option is to hardcode the algorithm that was conventionally 
+implemented with eBPF steering program in the kernel[2]. It is possible 
+because the algorithm strictly follows the virtio-net specification[3]. 
+However, there are proposals to add different algorithms to the 
+specification[4], and hardcoding the algorithm to the kernel will 
+require to add more UAPIs and code each time such a specification change 
+happens, which is not good for tuntap.
+
+In short, the proposed feature requires to make either of three compromises:
+
+1. Compromise on the BPF side: Relax the "stable" BPF feature freeze 
+once and allow eBPF steering program to report 4 more bytes to the kernel.
+
+2. Compromise on the tuntap side: Implement the algorithm to the kernel, 
+and abandon the capability to update the algorithm without changing the 
+kernel.
+
+IMHO, I think it's better to make a compromise on the BPF side (option 
+1). We should minimize the total UAPI changes in the whole kernel, and 
+option 1 is much superior in that sense.
+
+Yet I have to note that such a compromise on the BPF side can risk the 
+"stable" BPF feature freeze fragile and let other people complain like 
+"you allowed to change stable BPF for this, why do you reject [some 
+other request to change stable BPF]?" It is bad for BPF maintainers. (I 
+can imagine that introducing and maintaining widely different BPF 
+interfaces is too much burden.) And, of course, this requires an 
+approval from BPF maintainers.
+
+So I'd like to ask you that which of these compromises you think worse. 
+Please also tell me if you have another idea.
+
+Regards,
+Akihiko Odaki
+
+[1] https://qemu.readthedocs.io/en/v8.1.0/devel/ebpf_rss.html
+[2] 
+https://lore.kernel.org/all/20231008052101.144422-1-akihiko.odaki@daynix.com/
+[3] 
+https://docs.oasis-open.org/virtio/virtio/v1.2/csd01/virtio-v1.2-csd01.html#x1-2400003
+[4] 
+https://lore.kernel.org/all/CACGkMEuBbGKssxNv5AfpaPpWQfk2BHR83rM5AHXN-YVMf2NvpQ@mail.gmail.com/
 
