@@ -1,49 +1,49 @@
-Return-Path: <kvm+bounces-2009-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2010-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32AB87F048D
-	for <lists+kvm@lfdr.de>; Sun, 19 Nov 2023 07:30:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E93FA7F0492
+	for <lists+kvm@lfdr.de>; Sun, 19 Nov 2023 07:42:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1BE7280EE6
-	for <lists+kvm@lfdr.de>; Sun, 19 Nov 2023 06:30:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20EE01C2097B
+	for <lists+kvm@lfdr.de>; Sun, 19 Nov 2023 06:42:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC8A6FCF;
-	Sun, 19 Nov 2023 06:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D551E1FBB;
+	Sun, 19 Nov 2023 06:42:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="neLJOy/5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aC47tExS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 757AF192;
-	Sat, 18 Nov 2023 22:30:27 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60F25C6;
+	Sat, 18 Nov 2023 22:42:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700375427; x=1731911427;
+  t=1700376150; x=1731912150;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=fhSYPSwlbRdQhxu9SEMKRyeeuCTTrwd3mBt02oFDXq8=;
-  b=neLJOy/59k1fMHpsDrvyHL58ubIbLSO+X3/IL0uyAHQQJci2LcmYWxGI
-   8gv6Be5Ou+Odv4pNsQgUx4wySh1Ny6Bz2vhyQoxE5CtqqcZ6I8QJiXxuZ
-   Mu0DiKEpaBS6QgsUackE7m1ZsdAcu0Ae/65ZYrpcxcff9xL1D37qutu0u
-   meJHUVvJJqNAhgyBQOBcORSCqelbgSzZA5teOmPDiLbAvtx44RnJDMN5M
-   Yl6ErP8/RioyrxIepchIwKgDSJkoQbB6AVmGiL6hurkHMO/D7stOOG+fw
-   HAI4sTJLUScnztTGDjGDTgY765w/dDR+4FPHC8/ATujLcsbHORMxucW2m
+  bh=Y7x+P5+iP73mokjfVEHxVxgOTCxGtz9A6vm2FQBaeM0=;
+  b=aC47tExSKKFrypYGWTtQibJ5RyTYDFphgCMriHY11x5gSrRIKWTY33jS
+   NfG3T34QRWZvzFWn3NlrriDxGlDraviHMJfTHx4ffukR3AjtS42sdJ+Eg
+   JjqHAS2uUxesNFj+AUQjUfe8ObEXhzzWpFAK5LGV+8FV+6eyr9aCosFli
+   6gUo1Wt5DaCCjGc8pzKjT/vywPeb6jqDZm4XDEPl67I9Mz9ksM7vAx9B+
+   7Xu6Idpqck8HUVYNMsQMtbzwcCyjXmFguEs1FjfFqAFeTp/4GuoBmEtwy
+   CjSgFqDTZ5Yl8nVGRdVSHZrXjPjm8pe+kb297Xid4Ca4Of+Xf+SnAxX97
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10898"; a="390333290"
+X-IronPort-AV: E=McAfee;i="6600,9927,10898"; a="13026318"
 X-IronPort-AV: E=Sophos;i="6.04,210,1695711600"; 
-   d="scan'208";a="390333290"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2023 22:30:26 -0800
+   d="scan'208";a="13026318"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2023 22:42:30 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10898"; a="795180209"
+X-IronPort-AV: E=McAfee;i="6600,9927,10898"; a="909785704"
 X-IronPort-AV: E=Sophos;i="6.04,210,1695711600"; 
-   d="scan'208";a="795180209"
+   d="scan'208";a="909785704"
 Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.93.8.180]) ([10.93.8.180])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2023 22:30:22 -0800
-Message-ID: <2a5a38d9-28e2-4718-b8fc-2b8f27610706@linux.intel.com>
-Date: Sun, 19 Nov 2023 14:30:19 +0800
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2023 22:42:26 -0800
+Message-ID: <13937cd6-8dfa-493c-932c-71f878f447ef@linux.intel.com>
+Date: Sun, 19 Nov 2023 14:42:23 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -51,7 +51,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 020/116] KVM: TDX: create/destroy VM structure
+Subject: Re: [PATCH v6 05/16] KVM: TDX: Pass size to reclaim_page()
 To: isaku.yamahata@intel.com
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
@@ -59,87 +59,146 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  Sagi Shahar <sagis@google.com>, David Matlack <dmatlack@google.com>,
  Kai Huang <kai.huang@intel.com>, Zhi Wang <zhi.wang.linux@gmail.com>,
  chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
- Sean Christopherson <sean.j.christopherson@intel.com>
-References: <cover.1699368322.git.isaku.yamahata@intel.com>
- <997a92e4f667b497166ff8cc777ec8025b0f22bc.1699368322.git.isaku.yamahata@intel.com>
+ Xiaoyao Li <xiaoyao.li@intel.com>
+References: <cover.1699368363.git.isaku.yamahata@intel.com>
+ <31552f714f2fd8178f9467e9afaaf28ba3de3c7b.1699368363.git.isaku.yamahata@intel.com>
 From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <997a92e4f667b497166ff8cc777ec8025b0f22bc.1699368322.git.isaku.yamahata@intel.com>
+In-Reply-To: <31552f714f2fd8178f9467e9afaaf28ba3de3c7b.1699368363.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
 
 
-On 11/7/2023 10:55 PM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On 11/7/2023 11:00 PM, isaku.yamahata@intel.com wrote:
+> From: Xiaoyao Li <xiaoyao.li@intel.com>
 >
-> As the first step to create TDX guest, create/destroy VM struct.  Assign
-> TDX private Host Key ID (HKID) to the TDX guest for memory encryption and
-> allocate extra pages for the TDX guest. On destruction, free allocated
-> pages, and HKID.
+> A 2MB large page can be tdh_mem_page_aug()'ed to TD directly. In this case,
+> it needs to reclaim and clear the page as 2MB size.
 >
-> Before tearing down private page tables, TDX requires some resources of the
-> guest TD to be destroyed (i.e. HKID must have been reclaimed, etc).  Add
-> mmu notifier release callback before tearing down private page tables for
-> it.
->
-> Add vm_free() of kvm_x86_ops hook at the end of kvm_arch_destroy_vm()
-> because some per-VM TDX resources, e.g. TDR, need to be freed after other
-> TDX resources, e.g. HKID, were freed.
->
-> Co-developed-by: Kai Huang <kai.huang@intel.com>
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->
 > ---
-[...]
-> +
-> +static int tdx_reclaim_page(hpa_t pa)
-> +{
-> +	int r;
-> +
-> +	r = __tdx_reclaim_page(pa);
-> +	if (!r)
-> +		tdx_clear_page(pa);
-> +	return r;
-> +}
-> +
-> +static void tdx_reclaim_td_page(unsigned long td_page_pa)
+>   arch/x86/kvm/vmx/tdx.c | 27 +++++++++++++++------------
+>   1 file changed, 15 insertions(+), 12 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index a728175c4a6d..0fca863faeee 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -200,12 +200,13 @@ static void tdx_disassociate_vp_on_cpu(struct kvm_vcpu *vcpu)
+>   	smp_call_function_single(cpu, tdx_disassociate_vp_arg, vcpu, 1);
+>   }
+>   
+> -static void tdx_clear_page(unsigned long page_pa)
+> +static void tdx_clear_page(unsigned long page_pa, int size)
+Should use "unsigned long" instead of "int" for size to avoid implicit 
+type conversion.
 
-This function is used to reclaim td control sturcture pages like TDCX, 
-TDVPX,
-TDVPR. Should this function name be more specific?
-For me, it is a bit confusing.
+>   {
+>   	const void *zero_page = (const void *) __va(page_to_phys(ZERO_PAGE(0)));
+>   	void *page = __va(page_pa);
+>   	unsigned long i;
+>   
+> +	WARN_ON_ONCE(size % PAGE_SIZE);
+>   	/*
+>   	 * When re-assign one page from old keyid to a new keyid, MOVDIR64B is
+>   	 * required to clear/write the page with new keyid to prevent integrity
+> @@ -214,7 +215,7 @@ static void tdx_clear_page(unsigned long page_pa)
+>   	 * clflush doesn't flush cache with HKID set.  The cache line could be
+>   	 * poisoned (even without MKTME-i), clear the poison bit.
+>   	 */
+> -	for (i = 0; i < PAGE_SIZE; i += 64)
+> +	for (i = 0; i < size; i += 64)
+>   		movdir64b(page + i, zero_page);
+>   	/*
+>   	 * MOVDIR64B store uses WC buffer.  Prevent following memory reads
+> @@ -223,7 +224,7 @@ static void tdx_clear_page(unsigned long page_pa)
+>   	__mb();
+>   }
+>   
+> -static int __tdx_reclaim_page(hpa_t pa)
+> +static int __tdx_reclaim_page(hpa_t pa, enum pg_level level)
+>   {
+>   	struct tdx_module_args out;
+>   	u64 err;
+> @@ -241,17 +242,19 @@ static int __tdx_reclaim_page(hpa_t pa)
+>   		pr_tdx_error(TDH_PHYMEM_PAGE_RECLAIM, err, &out);
+>   		return -EIO;
+>   	}
+> +	/* out.r8 == tdx sept page level */
+> +	WARN_ON_ONCE(out.r8 != pg_level_to_tdx_sept_level(level));
+>   
+>   	return 0;
+>   }
+>   
+> -static int tdx_reclaim_page(hpa_t pa)
+> +static int tdx_reclaim_page(hpa_t pa, enum pg_level level)
+>   {
+>   	int r;
+>   
+> -	r = __tdx_reclaim_page(pa);
+> +	r = __tdx_reclaim_page(pa, level);
+>   	if (!r)
+> -		tdx_clear_page(pa);
+> +		tdx_clear_page(pa, KVM_HPAGE_SIZE(level));
+>   	return r;
+>   }
+>   
+> @@ -265,7 +268,7 @@ static void tdx_reclaim_td_page(unsigned long td_page_pa)
+>   	 * was already flushed by TDH.PHYMEM.CACHE.WB before here, So
+>   	 * cache doesn't need to be flushed again.
+>   	 */
+> -	if (tdx_reclaim_page(td_page_pa))
+> +	if (tdx_reclaim_page(td_page_pa, PG_LEVEL_4K))
+>   		/*
+>   		 * Leak the page on failure:
+>   		 * tdx_reclaim_page() returns an error if and only if there's an
+> @@ -497,7 +500,7 @@ void tdx_vm_free(struct kvm *kvm)
+>   
+>   	if (!kvm_tdx->tdr_pa)
+>   		return;
+> -	if (__tdx_reclaim_page(kvm_tdx->tdr_pa))
+> +	if (__tdx_reclaim_page(kvm_tdx->tdr_pa, PG_LEVEL_4K))
+>   		return;
+>   	/*
+>   	 * TDX module maps TDR with TDX global HKID.  TDX module may access TDR
+> @@ -510,7 +513,7 @@ void tdx_vm_free(struct kvm *kvm)
+>   		pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err, NULL);
+>   		return;
+>   	}
+> -	tdx_clear_page(kvm_tdx->tdr_pa);
+> +	tdx_clear_page(kvm_tdx->tdr_pa, PAGE_SIZE);
+>   
+>   	free_page((unsigned long)__va(kvm_tdx->tdr_pa));
+>   	kvm_tdx->tdr_pa = 0;
+> @@ -1597,7 +1600,7 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
+>   		 * The HKID assigned to this TD was already freed and cache
+>   		 * was already flushed. We don't have to flush again.
+>   		 */
+> -		err = tdx_reclaim_page(hpa);
+> +		err = tdx_reclaim_page(hpa, level);
+>   		if (KVM_BUG_ON(err, kvm))
+>   			return -EIO;
+>   		tdx_unpin(kvm, pfn);
+> @@ -1630,7 +1633,7 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
+>   		pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err, NULL);
+>   		return -EIO;
+>   	}
+> -	tdx_clear_page(hpa);
+> +	tdx_clear_page(hpa, PAGE_SIZE);
+Should here be KVM_HPAGE_SIZE(level) instead of  PAGE_SIZE?
 
-Or maybe do "td page" have specific meaning referring to these control 
-structures
-pages in TDX?
-
-
-
-> +{
-> +	WARN_ON_ONCE(!td_page_pa);
-> +
-> +	/*
-> +	 * TDCX are being reclaimed.  TDX module maps TDCX with HKID
-> +	 * assigned to the TD.  Here the cache associated to the TD
-> +	 * was already flushed by TDH.PHYMEM.CACHE.WB before here, So
-> +	 * cache doesn't need to be flushed again.
-> +	 */
-> +	if (tdx_reclaim_page(td_page_pa))
-> +		/*
-> +		 * Leak the page on failure:
-> +		 * tdx_reclaim_page() returns an error if and only if there's an
-> +		 * unexpected, fatal error, e.g. a SEAMCALL with bad params,
-> +		 * incorrect concurrency in KVM, a TDX Module bug, etc.
-> +		 * Retrying at a later point is highly unlikely to be
-> +		 * successful.
-> +		 * No log here as tdx_reclaim_page() already did.
-> +		 */
-> +		return;
-> +	free_page((unsigned long)__va(td_page_pa));
-> +}
-> +
-[...]
+>   	tdx_unpin(kvm, pfn);
+>   	return 0;
+>   }
+> @@ -1742,7 +1745,7 @@ static int tdx_sept_free_private_spt(struct kvm *kvm, gfn_t gfn,
+>   	 * already flushed. We don't have to flush again.
+>   	 */
+>   	if (!is_hkid_assigned(kvm_tdx))
+> -		return tdx_reclaim_page(__pa(private_spt));
+> +		return tdx_reclaim_page(__pa(private_spt), PG_LEVEL_4K);
+>   
+>   	/*
+>   	 * free_private_spt() is (obviously) called when a shadow page is being
 
 
