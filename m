@@ -1,317 +1,121 @@
-Return-Path: <kvm+bounces-2029-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2030-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA1667F0A52
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 02:29:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4974C7F0AE9
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 04:21:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BB49280C40
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 01:29:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5C1EB207AB
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 03:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DCD51861;
-	Mon, 20 Nov 2023 01:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACFD61FA4;
+	Mon, 20 Nov 2023 03:21:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 95BFDE5;
-	Sun, 19 Nov 2023 17:28:47 -0800 (PST)
-Received: from loongson.cn (unknown [10.20.42.183])
-	by gateway (Coremail) with SMTP id _____8DxqOpNtlplNxw7AA--.15489S3;
-	Mon, 20 Nov 2023 09:28:45 +0800 (CST)
-Received: from [10.20.42.183] (unknown [10.20.42.183])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cxjd5ItlplQCdHAA--.27386S3;
-	Mon, 20 Nov 2023 09:28:43 +0800 (CST)
-Subject: Re: [PATCH v1 1/2] LoongArch: KVM: Add lsx support
-To: maobibo <maobibo@loongson.cn>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>,
- WANG Xuerui <kernel@xen0n.name>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, loongarch@lists.linux.dev,
- Jens Axboe <axboe@kernel.dk>, Mark Brown <broonie@kernel.org>,
- Alex Deucher <alexander.deucher@amd.com>,
- Oliver Upton <oliver.upton@linux.dev>, Xi Ruoyao <xry111@xry111.site>
-References: <20231115091921.85516-1-zhaotianrui@loongson.cn>
- <20231115091921.85516-2-zhaotianrui@loongson.cn>
- <2161517e-1934-9d18-3bdf-1e397413b3a8@loongson.cn>
-From: zhaotianrui <zhaotianrui@loongson.cn>
-Message-ID: <7618adc1-9aa9-35a0-8d5a-756931e5bbc7@loongson.cn>
-Date: Mon, 20 Nov 2023 09:31:04 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1D26194;
+	Sun, 19 Nov 2023 19:21:10 -0800 (PST)
+X-QQ-mid: bizesmtp78t1700450355t9vmqoeh
+Received: from localhost.localdomain ( [183.211.219.254])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 20 Nov 2023 11:19:05 +0800 (CST)
+X-QQ-SSF: 01400000000000807000000A0000000
+X-QQ-FEAT: swyrzWPvyR3eYwFMS4ZuTZqaE5VECqJG2sDyi+/ZKc+iDJhV17Gi8UJfniNEZ
+	UKdk5us6A2u9/FPZHzcekiTA7dZT9YvTWY400JmkgVE9ej+k5xjf0y56TfVl3Yh19KTDxgo
+	D0WlmuHzsK2Hl/5+h1LAWYjPMuZm94QJiTGStCiWhjiQRWvLxyZn/OE+ByIM7bPEThbPbqh
+	HfhgAeo/rmyxXUtrXdW0e9MwHr6hnSSDvxAyV4bUfNqK2gq+lfAUHGUBH8jbhdc3b8B52xG
+	vqbpVuhUMhiK9vagf/K8hYbrt0uWvBKtUc+ncCB12dJZfKzg2sornVMjKYLAhi8D/Kr3VnZ
+	l7ASSF8elCPHmROQ2Sm13rwkalUgzaBkbgrf/p4RqkPu47aBQKR9UC74Rag3Q2uy0K6sSrw
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 10945035250043291984
+From: JianChunfu <chunfu.jian@shingroup.cn>
+To: alex.williamson@redhat.com,
+	cohuck@redhat.com
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	shenghui.qu@shingroup.cn,
+	JianChunfu <chunfu.jian@shingroup.cn>
+Subject: [PATCH] vfio/pci: Separate INTx-enabled vfio_pci_device from unenabled to make the code logic clearer.
+Date: Mon, 20 Nov 2023 11:17:52 +0800
+Message-Id: <20231120031752.522139-1-chunfu.jian@shingroup.cn>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <2161517e-1934-9d18-3bdf-1e397413b3a8@loongson.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:AQAAf8Cxjd5ItlplQCdHAA--.27386S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3Cr43Cry7Zw4DCry3Jw4rtFc_yoWDuw4Upr
-	1kArZ8JrWUGrn3tr1UJr1DXFy5Zr18Kw17XFy8XFy5JF1Utryjqr18XrWqgFyUJw48JF1I
-	qF18XrnxZFyUJ3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
-	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWU
-	twAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
-	k0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l
-	4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxV
-	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
-	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-	1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
-	42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUUUU=
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:shingroup.cn:qybglogicsvrgz:qybglogicsvrgz5a-1
 
+It seems a little unclear when dealing with vfio_intx_set_signal()
+because of vfio_pci_device which is irq_none,
+so separate the two situations.
 
-在 2023/11/17 下午4:24, maobibo 写道:
->
->
-> On 2023/11/15 下午5:19, Tianrui Zhao wrote:
->> This patch adds LSX support for LoongArch KVM. The LSX means
->> LoongArch 128-bits vector instruction.
->> There will be LSX exception in KVM when guest use the LSX
->> instruction. KVM will enable LSX and restore the vector
->> registers for guest then return to guest to continue running.
->>
->>
->> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
->> ---
->>   arch/loongarch/include/asm/kvm_host.h |  6 ++++
->>   arch/loongarch/include/asm/kvm_vcpu.h | 12 +++++++
->>   arch/loongarch/kvm/exit.c             | 18 ++++++++++
->>   arch/loongarch/kvm/switch.S           | 22 +++++++++++++
->>   arch/loongarch/kvm/trace.h            |  4 ++-
->>   arch/loongarch/kvm/vcpu.c             | 47 +++++++++++++++++++++++++--
->>   6 files changed, 105 insertions(+), 4 deletions(-)
->>
->> diff --git a/arch/loongarch/include/asm/kvm_host.h 
->> b/arch/loongarch/include/asm/kvm_host.h
->> index 11328700d4..6c65c25169 100644
->> --- a/arch/loongarch/include/asm/kvm_host.h
->> +++ b/arch/loongarch/include/asm/kvm_host.h
->> @@ -94,6 +94,7 @@ enum emulation_result {
->>   #define KVM_LARCH_FPU        (0x1 << 0)
->>   #define KVM_LARCH_SWCSR_LATEST    (0x1 << 1)
->>   #define KVM_LARCH_HWCSR_USABLE    (0x1 << 2)
->> +#define KVM_LARCH_LSX        (0x1 << 3)
->>     struct kvm_vcpu_arch {
->>       /*
->> @@ -175,6 +176,11 @@ static inline void writel_sw_gcsr(struct 
->> loongarch_csrs *csr, int reg, unsigned
->>       csr->csrs[reg] = val;
->>   }
->>   +static inline bool kvm_guest_has_lsx(struct kvm_vcpu_arch *arch)
->> +{
->> +    return arch->cpucfg[2] & CPUCFG2_LSX;
->> +}
->> +
->>   /* Debug: dump vcpu state */
->>   int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu);
->>   diff --git a/arch/loongarch/include/asm/kvm_vcpu.h 
->> b/arch/loongarch/include/asm/kvm_vcpu.h
->> index 553cfa2b2b..c629771e12 100644
->> --- a/arch/loongarch/include/asm/kvm_vcpu.h
->> +++ b/arch/loongarch/include/asm/kvm_vcpu.h
->> @@ -55,6 +55,18 @@ void kvm_save_fpu(struct loongarch_fpu *fpu);
->>   void kvm_restore_fpu(struct loongarch_fpu *fpu);
->>   void kvm_restore_fcsr(struct loongarch_fpu *fpu);
->>   +#ifdef CONFIG_CPU_HAS_LSX
->> +void kvm_own_lsx(struct kvm_vcpu *vcpu);
->> +void kvm_save_lsx(struct loongarch_fpu *fpu);
->> +void kvm_restore_lsx(struct loongarch_fpu *fpu);
->> +void kvm_restore_lsx_upper(struct loongarch_fpu *fpu);
->> +#else
->> +static inline void kvm_own_lsx(struct kvm_vcpu *vcpu) { }
->> +static inline void kvm_save_lsx(struct loongarch_fpu *fpu) { }
->> +static inline void kvm_restore_lsx(struct loongarch_fpu *fpu) { }
->> +static inline void kvm_restore_lsx_upper(struct loongarch_fpu *fpu) { }
->> +#endif
->> +
->>   void kvm_acquire_timer(struct kvm_vcpu *vcpu);
->>   void kvm_init_timer(struct kvm_vcpu *vcpu, unsigned long hz);
->>   void kvm_reset_timer(struct kvm_vcpu *vcpu);
->> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
->> index ce8de3fa47..1b1c58ccc8 100644
->> --- a/arch/loongarch/kvm/exit.c
->> +++ b/arch/loongarch/kvm/exit.c
->> @@ -659,6 +659,23 @@ static int kvm_handle_fpu_disabled(struct 
->> kvm_vcpu *vcpu)
->>       return RESUME_GUEST;
->>   }
->>   +/*
->> + * kvm_handle_lsx_disabled() - Guest used LSX while disabled in root.
->> + * @vcpu:      Virtual CPU context.
->> + *
->> + * Handle when the guest attempts to use LSX when it is disabled in 
->> the root
->> + * context.
->> + */
->> +static int kvm_handle_lsx_disabled(struct kvm_vcpu *vcpu)
->> +{
->> +    if (!kvm_guest_has_lsx(&vcpu->arch))
->> +        kvm_queue_exception(vcpu, EXCCODE_INE, 0);
->> +    else
->> +        kvm_own_lsx(vcpu);
->> +
->> +    return RESUME_GUEST;
->> +}
->> +
->>   /*
->>    * LoongArch KVM callback handling for unimplemented guest exiting
->>    */
->> @@ -687,6 +704,7 @@ static exit_handle_fn 
->> kvm_fault_tables[EXCCODE_INT_START] = {
->>       [EXCCODE_TLBS]            = kvm_handle_write_fault,
->>       [EXCCODE_TLBM]            = kvm_handle_write_fault,
->>       [EXCCODE_FPDIS]            = kvm_handle_fpu_disabled,
->> +    [EXCCODE_LSXDIS]                = kvm_handle_lsx_disabled,
->>       [EXCCODE_GSPR]            = kvm_handle_gspr,
->>   };
->>   diff --git a/arch/loongarch/kvm/switch.S b/arch/loongarch/kvm/switch.S
->> index 0ed9040307..32ba092a44 100644
->> --- a/arch/loongarch/kvm/switch.S
->> +++ b/arch/loongarch/kvm/switch.S
->> @@ -245,6 +245,28 @@ SYM_FUNC_START(kvm_restore_fpu)
->>       jr                 ra
->>   SYM_FUNC_END(kvm_restore_fpu)
->>   +#ifdef CONFIG_CPU_HAS_LSX
->> +SYM_FUNC_START(kvm_save_lsx)
->> +    fpu_save_csr    a0 t1
->> +    fpu_save_cc     a0 t1 t2
->> +    lsx_save_data   a0 t1
->> +    jirl            zero, ra, 0
->> +SYM_FUNC_END(kvm_save_lsx)
->> +
->> +SYM_FUNC_START(kvm_restore_lsx)
->> +    lsx_restore_data a0 t1
->> +    fpu_restore_cc   a0 t1 t2
->> +    fpu_restore_csr  a0 t1
->> +    jirl             zero, ra, 0
->> +SYM_FUNC_END(kvm_restore_lsx)
->> +
->> +SYM_FUNC_START(kvm_restore_lsx_upper)
->> +    lsx_restore_all_upper a0 t0 t1
->> +
->> +    jirl                  zero, ra, 0
->> +SYM_FUNC_END(kvm_restore_lsx_upper)
->> +#endif
->> +
->>       .section ".rodata"
->>   SYM_DATA(kvm_exception_size, .quad kvm_exc_entry_end - kvm_exc_entry)
->>   SYM_DATA(kvm_enter_guest_size, .quad kvm_enter_guest_end - 
->> kvm_enter_guest)
->> diff --git a/arch/loongarch/kvm/trace.h b/arch/loongarch/kvm/trace.h
->> index a1e35d6554..7da4e230e8 100644
->> --- a/arch/loongarch/kvm/trace.h
->> +++ b/arch/loongarch/kvm/trace.h
->> @@ -102,6 +102,7 @@ TRACE_EVENT(kvm_exit_gspr,
->>   #define KVM_TRACE_AUX_DISCARD        4
->>     #define KVM_TRACE_AUX_FPU        1
->> +#define KVM_TRACE_AUX_LSX        2
->>     #define kvm_trace_symbol_aux_op                \
->>       { KVM_TRACE_AUX_SAVE,        "save" },    \
->> @@ -111,7 +112,8 @@ TRACE_EVENT(kvm_exit_gspr,
->>       { KVM_TRACE_AUX_DISCARD,    "discard" }
->>     #define kvm_trace_symbol_aux_state            \
->> -    { KVM_TRACE_AUX_FPU,     "FPU" }
->> +    { KVM_TRACE_AUX_FPU,     "FPU" },        \
->> +    { KVM_TRACE_AUX_LSX,     "LSX" }
->>     TRACE_EVENT(kvm_aux,
->>           TP_PROTO(struct kvm_vcpu *vcpu, unsigned int op,
->> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
->> index 73d0c2b9c1..f0bb583353 100644
->> --- a/arch/loongarch/kvm/vcpu.c
->> +++ b/arch/loongarch/kvm/vcpu.c
->> @@ -378,9 +378,13 @@ static int kvm_set_one_reg(struct kvm_vcpu *vcpu,
->>           break;
->>       case KVM_REG_LOONGARCH_CPUCFG:
->>           id = KVM_GET_IOC_CPUCFG_IDX(reg->id);
->> -        if (id >= 0 && id < KVM_MAX_CPUCFG_REGS)
->> +        if (id >= 0 && id < KVM_MAX_CPUCFG_REGS) {
->>               vcpu->arch.cpucfg[id] = (u32)v;
->> -        else
->> +            if (id == 2 && v & CPUCFG2_LSX && !cpu_has_lsx) {
-> Hi Tianrui,
->
-> Can you add some annotations about these piece of codes? so that
-> people can understand easily.
->
-> And do we need interface to get host capabilities to user application?
-> Such as QEMU first gets supported capabilities from kvm and then sets 
-> the required ones.
->
-> Regards
-> Bibo Mao
-Thanks, I will add annotations for this and I think it is better to add 
-the checking LSX,LASX capabilities interfaces for user space and I will 
-supplement it later.
+Signed-off-by: JianChunfu <chunfu.jian@shingroup.cn>
+---
+ drivers/vfio/pci/vfio_pci_intrs.c | 31 +++++++++++++++----------------
+ 1 file changed, 15 insertions(+), 16 deletions(-)
 
-Thanks
-Tianrui Zhao
->> +                vcpu->arch.cpucfg[id] &= ~CPUCFG2_LSX;
->> +                ret = -EINVAL;
->> +            }
->> +        } else
->>               ret = -EINVAL;
->>           break;
->>       case KVM_REG_LOONGARCH_KVM:
->> @@ -561,12 +565,49 @@ void kvm_own_fpu(struct kvm_vcpu *vcpu)
->>       preempt_enable();
->>   }
->>   +#ifdef CONFIG_CPU_HAS_LSX
->> +/* Enable LSX for guest and restore context */
->> +void kvm_own_lsx(struct kvm_vcpu *vcpu)
->> +{
->> +    preempt_disable();
->> +
->> +    /* Enable LSX for guest */
->> +    set_csr_euen(CSR_EUEN_LSXEN | CSR_EUEN_FPEN);
->> +    switch (vcpu->arch.aux_inuse & KVM_LARCH_FPU) {
->> +    case KVM_LARCH_FPU:
->> +        /*
->> +         * Guest FPU state already loaded,
->> +         * only restore upper LSX state
->> +         */
->> +        kvm_restore_lsx_upper(&vcpu->arch.fpu);
->> +        break;
->> +    default:
->> +        /* Neither FP or LSX already active,
->> +         * restore full LSX state
->> +         */
->> +        kvm_restore_lsx(&vcpu->arch.fpu);
->> +    break;
->> +    }
->> +
->> +    trace_kvm_aux(vcpu, KVM_TRACE_AUX_RESTORE, KVM_TRACE_AUX_LSX);
->> +    vcpu->arch.aux_inuse |= KVM_LARCH_LSX | KVM_LARCH_FPU;
->> +    preempt_enable();
->> +}
->> +#endif
->> +
->>   /* Save context and disable FPU */
->>   void kvm_lose_fpu(struct kvm_vcpu *vcpu)
->>   {
->>       preempt_disable();
->>   -    if (vcpu->arch.aux_inuse & KVM_LARCH_FPU) {
->> +    if (vcpu->arch.aux_inuse & KVM_LARCH_LSX) {
->> +        kvm_save_lsx(&vcpu->arch.fpu);
->> +        vcpu->arch.aux_inuse &= ~(KVM_LARCH_LSX | KVM_LARCH_FPU);
->> +        trace_kvm_aux(vcpu, KVM_TRACE_AUX_SAVE, KVM_TRACE_AUX_LSX);
->> +
->> +        /* Disable LSX & FPU */
->> +        clear_csr_euen(CSR_EUEN_FPEN | CSR_EUEN_LSXEN);
->> +    } else if (vcpu->arch.aux_inuse & KVM_LARCH_FPU) {
->>           kvm_save_fpu(&vcpu->arch.fpu);
->>           vcpu->arch.aux_inuse &= ~KVM_LARCH_FPU;
->>           trace_kvm_aux(vcpu, KVM_TRACE_AUX_SAVE, KVM_TRACE_AUX_FPU);
->>
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index 6069a11fb51a..b6d126c48393 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -468,6 +468,8 @@ static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
+ 				     unsigned index, unsigned start,
+ 				     unsigned count, uint32_t flags, void *data)
+ {
++	int32_t fd = *(int32_t *)data;
++
+ 	if (is_intx(vdev) && !count && (flags & VFIO_IRQ_SET_DATA_NONE)) {
+ 		vfio_intx_disable(vdev);
+ 		return 0;
+@@ -476,28 +478,25 @@ static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
+ 	if (!(is_intx(vdev) || is_irq_none(vdev)) || start != 0 || count != 1)
+ 		return -EINVAL;
+ 
+-	if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
+-		int32_t fd = *(int32_t *)data;
++	if (!is_intx(vdev)) {
+ 		int ret;
++		if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
++			ret = vfio_intx_enable(vdev);
++			if (ret)
++				return ret;
+ 
+-		if (is_intx(vdev))
+-			return vfio_intx_set_signal(vdev, fd);
++			ret = vfio_intx_set_signal(vdev, fd);
++			if (ret)
++				vfio_intx_disable(vdev);
+ 
+-		ret = vfio_intx_enable(vdev);
+-		if (ret)
+ 			return ret;
+-
+-		ret = vfio_intx_set_signal(vdev, fd);
+-		if (ret)
+-			vfio_intx_disable(vdev);
+-
+-		return ret;
++		} else
++			return -EINVAL;
+ 	}
+ 
+-	if (!is_intx(vdev))
+-		return -EINVAL;
+-
+-	if (flags & VFIO_IRQ_SET_DATA_NONE) {
++	if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
++		return vfio_intx_set_signal(vdev, fd);
++	} else if (flags & VFIO_IRQ_SET_DATA_NONE) {
+ 		vfio_send_intx_eventfd(vdev, NULL);
+ 	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
+ 		uint8_t trigger = *(uint8_t *)data;
+-- 
+2.27.0
 
 
