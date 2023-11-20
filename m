@@ -1,43 +1,43 @@
-Return-Path: <kvm+bounces-2082-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2083-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 652417F13FF
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 14:12:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4D3E7F1400
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 14:12:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96F9F1C21792
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 13:12:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FE9C282210
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 13:12:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F081C6B5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA171CFA0;
 	Mon, 20 Nov 2023 13:10:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iGVMU/B3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ECLYfnYg"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14941BDD5;
-	Mon, 20 Nov 2023 13:10:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1A44C433B7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FDA21C281;
+	Mon, 20 Nov 2023 13:10:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E246FC433BA;
 	Mon, 20 Nov 2023 13:10:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1700485853;
-	bh=hWt078evTbLyUNlhN2en4CwHS1/cNEuwQ9rrpk3KOzU=;
+	bh=3s1ljDq33uH1qd1QwpvWXGoDd4Zc+Wqjt1c9Tusu5WA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iGVMU/B3TL8NrxW5zgkbNlj1OEnw65Km7UIPf+2G0iHJcUV/1SFOzSdM4V0k1RsuS
-	 iE66tqUVIuBi26qoUdCnTZND1fz/H3jGeRl99pHvLygfRf5mc1Octn92lXFkILLHql
-	 D/4xyIeEBpumn2+q0i472GJ8cg28w7VVU/+mQPKnCdIAtXbrgiSMvbPCGlfQ4noCbp
-	 LKCe4IbIfv8t7EkApTSMp7lDmmjQ1o9oHIEegiki02T3EbCOrlAU0P7puluF32KDCO
-	 NznsbTCwO8K5Ey+P/qrHU9eJOKPrCZSARlfAFYTpq6lYRrZdFXh43ajkau+gG2Fs/8
-	 fqKjjs3G0buQw==
+	b=ECLYfnYgFyKgZd0urReIZOBwa/mbEs7OHV/r8sWlKf8u+OxJwy27HwVhZ6xXQYZha
+	 tDNOgWrHvioGOv1wwTv87nJzcocVaRXisuAWCRPth+MK7EeTsjqdPLLDB/H+eomlkV
+	 iWsOvNzO3nBmL89Db3iRK4mGolY5o/Z5FZneZpxB/Q0HzoEiQhwiWxWGaVt+ect7DG
+	 OAxLTqBAEtkP1oGaVR9gZ5SZ7dznvvK33ucr6XuRw0ywwyZJhI8cs21YwDi4zFM65E
+	 fJ5UmEa1b+zW4TGtBXDJzr+tpMl1MbfiAhpggJEvWCBQbBIr8TMduXN/dZsQfTjLda
+	 +eR+HhwodnYTg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1r5439-00EjnU-Rd;
-	Mon, 20 Nov 2023 13:10:51 +0000
+	id 1r543A-00EjnU-4B;
+	Mon, 20 Nov 2023 13:10:52 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -55,9 +55,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v11 11/43] KVM: arm64: nv: Handle HCR_EL2.E2H specially
-Date: Mon, 20 Nov 2023 13:09:55 +0000
-Message-Id: <20231120131027.854038-12-maz@kernel.org>
+Subject: [PATCH v11 12/43] KVM: arm64: nv: Handle CNTHCTL_EL2 specially
+Date: Mon, 20 Nov 2023 13:09:56 +0000
+Message-Id: <20231120131027.854038-13-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231120131027.854038-1-maz@kernel.org>
 References: <20231120131027.854038-1-maz@kernel.org>
@@ -73,62 +73,82 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-HCR_EL2.E2H is nasty, as a flip of this bit completely changes the way
-we deal with a lot of the state. So when the guest flips this bit
-(sysregs are live), do the put/load dance so that we have a consistent
-state.
+Accessing CNTHCTL_EL2 is fraught with danger if running with
+HCR_EL2.E2H=1: half of the bits are held in CNTKCTL_EL1, and
+thus can be changed behind our back, while the rest lives
+in the CNTHCTL_EL2 shadow copy that is memory-based.
 
-Yes, this is slow. Don't do it.
+Yes, this is a lot of fun!
 
-Suggested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Make sure that we merge the two on read access, while we can
+write to CNTKCTL_EL1 in a more straightforward manner.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ arch/arm64/kvm/sys_regs.c    | 28 ++++++++++++++++++++++++++++
+ include/kvm/arm_arch_timer.h |  3 +++
+ 2 files changed, 31 insertions(+)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 92bb91e520a8..d5c0f29c121f 100644
+index d5c0f29c121f..f42f3ed3724c 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -178,9 +178,25 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 		goto memory_write;
- 
- 	if (unlikely(get_el2_to_el1_mapping(reg, &el1r, &xlate))) {
-+		bool need_put_load;
-+
+@@ -138,6 +138,21 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
  		if (!is_hyp_ctxt(vcpu))
- 			goto memory_write;
+ 			goto memory_read;
  
 +		/*
-+		 * HCR_EL2.E2H is nasty: it changes the way we interpret a
-+		 * lot of the EL2 state, so treat is as a full state
-+		 * transition.
++		 * CNTHCTL_EL2 requires some special treatment to
++		 * account for the bits that can be set via CNTKCTL_EL1.
 +		 */
-+		need_put_load = (!cpus_have_final_cap(ARM64_HCR_NV1_RES0) &&
-+				 (reg == HCR_EL2) &&
-+				 vcpu_el2_e2h_is_set(vcpu) != !!(val & HCR_E2H));
-+
-+		if (need_put_load) {
-+			preempt_disable();
-+			kvm_arch_vcpu_put(vcpu);
++		switch (reg) {
++		case CNTHCTL_EL2:
++			if (vcpu_el2_e2h_is_set(vcpu)) {
++				val = read_sysreg_el1(SYS_CNTKCTL);
++				val &= CNTKCTL_VALID_BITS;
++				val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
++				return val;
++			}
++			break;
 +		}
 +
  		/*
- 		 * Always store a copy of the write to memory to avoid having
- 		 * to reverse-translate virtual EL2 system registers for a
-@@ -188,6 +204,11 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 		 */
- 		__vcpu_sys_reg(vcpu, reg) = val;
+ 		 * If this register does not have an EL1 counterpart,
+ 		 * then read the stored EL2 version.
+@@ -209,6 +224,19 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+ 			preempt_enable();
+ 		}
  
-+		if (need_put_load) {
-+			kvm_arch_vcpu_load(vcpu, smp_processor_id());
-+			preempt_enable();
++		switch (reg) {
++		case CNTHCTL_EL2:
++			/*
++			 * If E2H=0, CNHTCTL_EL2 is a pure shadow register.
++			 * Otherwise, some of the bits are backed by
++			 * CNTKCTL_EL1, while the rest is kept in memory.
++			 * Yes, this is fun stuff.
++			 */
++			if (vcpu_el2_e2h_is_set(vcpu))
++				write_sysreg_el1(val, SYS_CNTKCTL);
++			return;
 +		}
 +
  		/* No EL1 counterpart? We're done here.? */
  		if (reg == el1r)
  			return;
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index c819c5d16613..fd650a8789b9 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -147,6 +147,9 @@ u64 timer_get_cval(struct arch_timer_context *ctxt);
+ void kvm_timer_cpu_up(void);
+ void kvm_timer_cpu_down(void);
+ 
++/* CNTKCTL_EL1 valid bits as of DDI0487J.a */
++#define CNTKCTL_VALID_BITS	(BIT(17) | GENMASK_ULL(9, 0))
++
+ static inline bool has_cntpoff(void)
+ {
+ 	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
 -- 
 2.39.2
 
