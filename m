@@ -1,43 +1,43 @@
-Return-Path: <kvm+bounces-2074-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2075-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32F6C7F13F7
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 14:11:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4625B7F13F8
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 14:11:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0B192820C5
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 13:11:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4BE11B21702
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 13:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40E1D1B28B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A86781BDC2;
 	Mon, 20 Nov 2023 13:10:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uy0Ph1o3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DhIiOQXm"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 005C81A594;
-	Mon, 20 Nov 2023 13:10:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1B93C433CB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 672CA1A72B;
+	Mon, 20 Nov 2023 13:10:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6D84C433CC;
 	Mon, 20 Nov 2023 13:10:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1700485851;
-	bh=dgLUJlyMxUAKdqqdhpOmey8AMEeht7uotRS4onPBaRo=;
+	bh=bhfUaHgu4t4+KncMo/Gv9rIeXsH61TjQMcvVDZSjdXk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Uy0Ph1o3emOIt4xRdo7VjBNdpYJyXJzvQPLCkqf70i0gh+5fJno3UGBsWx63tsUEy
-	 nErmMKFFGxEJVCHf+xBa/8nnP4ehTIyRB2QwFVdIoZIfo5GPF4vdlVzqM3Hgn701In
-	 Oly5Wz9dVfET6xD4yMJuke3s3EgYknzRXR5V+KZZwbeUlCFjkdJhhOQarZ4Q1bQeY1
-	 Il8ns8oTMHJECwNuomwUbb6B+/OxwaZgRwvguqxf+B39HCnRKKOGftzAzVeOJ/v8vG
-	 xYIxJPWqmr3dgyvZZ6W56DGDaLtympIOwhlmGqD/hbdthN1UeOMn5fSL3eNxrx1uv8
-	 bTeyxIiynpnaA==
+	b=DhIiOQXmRQmo8Cck4TsVcGH3CaHLKUT23NCY5t9kSON62E26Cz/JK3U7+vgvEkYkp
+	 +IcPMrZ/ub9ZfEwt8NaIGpemQsup1DjLtwmLuLtGf+WaqwgsIhx1Dc2+DvQ6dnNVjF
+	 MrWckMHNbVAkTR+gfrTasCT449zsvQSw2PUzmf1P2Y5zNJNNXTlr7QjTg+Rgro/RXG
+	 VZY/rEU5BDgJdb+AQK+LSaL0ORmg8GxZ9WltlPN0vXEBQTMOnmPyJuVC+SZhNeieGz
+	 PWIMnD8Ekssuw/5Z8rdwgR9bym1u21TtJBpAs8QtispDVPrNnZFGdxsB/fri+SlFFf
+	 Wi/1+h7iBzokg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1r5437-00EjnU-OL;
-	Mon, 20 Nov 2023 13:10:49 +0000
+	id 1r5438-00EjnU-1B;
+	Mon, 20 Nov 2023 13:10:50 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -55,9 +55,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v11 03/43] KVM: arm64: nv: Compute NV view of idregs as a one-off
-Date: Mon, 20 Nov 2023 13:09:47 +0000
-Message-Id: <20231120131027.854038-4-maz@kernel.org>
+Subject: [PATCH v11 04/43] KVM: arm64: nv: Drop EL12 register traps that are redirected to VNCR
+Date: Mon, 20 Nov 2023 13:09:48 +0000
+Message-Id: <20231120131027.854038-5-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231120131027.854038-1-maz@kernel.org>
 References: <20231120131027.854038-1-maz@kernel.org>
@@ -73,117 +73,44 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Now that we have a full copy of the idregs for each VM, there is
-no point in repainting the sysregs on each access. Instead, we
-can simply perform the transmation as a one-off and be done
-with it.
+With FEAT_NV2, a bunch of system register writes are turned into
+memory writes. This is specially the fate of the EL12 registers
+that the guest hypervisor manipulates out of context.
+
+Remove the trap descriptors for those, as they are never going
+to be used again.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h   |  1 +
- arch/arm64/include/asm/kvm_nested.h |  6 +-----
- arch/arm64/kvm/arm.c                |  6 ++++++
- arch/arm64/kvm/nested.c             | 22 +++++++++++++++-------
- arch/arm64/kvm/sys_regs.c           |  2 --
- 5 files changed, 23 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 15 ---------------
+ 1 file changed, 15 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 4103a12ecaaf..fce2e5f583a7 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -306,6 +306,7 @@ struct kvm_arch {
- 	 * Atomic access to multiple idregs are guarded by kvm_arch.config_lock.
- 	 */
- #define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
-+#define IDX_IDREG(idx)		sys_reg(3, 0, 0, ((idx) >> 3) + 1, (idx) & Op2_mask)
- #define IDREG(kvm, id)		((kvm)->arch.id_regs[IDREG_IDX(id)])
- #define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
- 	u64 id_regs[KVM_ARM_ID_REG_NUM];
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 6cec8e9c6c91..249b03fc2cce 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -14,10 +14,6 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
- 
- extern bool __check_nv_sr_forward(struct kvm_vcpu *vcpu);
- 
--struct sys_reg_params;
--struct sys_reg_desc;
--
--void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
--			  const struct sys_reg_desc *r);
-+int kvm_init_nv_sysregs(struct kvm *kvm);
- 
- #endif /* __ARM64_KVM_NESTED_H */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index e5f75f1f1085..b65df612b41b 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -669,6 +669,12 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- 			return ret;
- 	}
- 
-+	if (vcpu_has_nv(vcpu)) {
-+		ret = kvm_init_nv_sysregs(vcpu->kvm);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	ret = kvm_timer_enable(vcpu);
- 	if (ret)
- 		return ret;
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 3885f1c93979..66d05f5d39a2 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -23,13 +23,9 @@
-  * This list should get updated as new features get added to the NV
-  * support, and new extension to the architecture.
-  */
--void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
--			  const struct sys_reg_desc *r)
-+static u64 limit_nv_id_reg(u32 id, u64 val)
- {
--	u32 id = reg_to_encoding(r);
--	u64 val, tmp;
--
--	val = p->regval;
-+	u64 tmp;
- 
- 	switch (id) {
- 	case SYS_ID_AA64ISAR0_EL1:
-@@ -162,5 +158,17 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
- 		break;
- 	}
- 
--	p->regval = val;
-+	return val;
-+}
-+int kvm_init_nv_sysregs(struct kvm *kvm)
-+{
-+	mutex_lock(&kvm->arch.config_lock);
-+
-+	for (int i = 0; i < KVM_ARM_ID_REG_NUM; i++)
-+		kvm->arch.id_regs[i] = limit_nv_id_reg(IDX_IDREG(i),
-+						       kvm->arch.id_regs[i]);
-+
-+	mutex_unlock(&kvm->arch.config_lock);
-+
-+	return 0;
- }
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 9e1e3da2ed4a..4aacce494ee2 100644
+index 4aacce494ee2..6405d9ebc28a 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1505,8 +1505,6 @@ static bool access_id_reg(struct kvm_vcpu *vcpu,
- 		return write_to_read_only(vcpu, p, r);
+@@ -2577,21 +2577,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG(CNTVOFF_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(CNTHCTL_EL2, access_rw, reset_val, 0),
  
- 	p->regval = read_id_reg(vcpu, r);
--	if (vcpu_has_nv(vcpu))
--		access_nested_id_reg(vcpu, p, r);
+-	EL12_REG(SCTLR, access_vm_reg, reset_val, 0x00C50078),
+-	EL12_REG(CPACR, access_rw, reset_val, 0),
+-	EL12_REG(TTBR0, access_vm_reg, reset_unknown, 0),
+-	EL12_REG(TTBR1, access_vm_reg, reset_unknown, 0),
+-	EL12_REG(TCR, access_vm_reg, reset_val, 0),
+-	{ SYS_DESC(SYS_SPSR_EL12), access_spsr},
+-	{ SYS_DESC(SYS_ELR_EL12), access_elr},
+-	EL12_REG(AFSR0, access_vm_reg, reset_unknown, 0),
+-	EL12_REG(AFSR1, access_vm_reg, reset_unknown, 0),
+-	EL12_REG(ESR, access_vm_reg, reset_unknown, 0),
+-	EL12_REG(FAR, access_vm_reg, reset_unknown, 0),
+-	EL12_REG(MAIR, access_vm_reg, reset_unknown, 0),
+-	EL12_REG(AMAIR, access_vm_reg, reset_amair_el1, 0),
+-	EL12_REG(VBAR, access_rw, reset_val, 0),
+-	EL12_REG(CONTEXTIDR, access_vm_reg, reset_val, 0),
+ 	EL12_REG(CNTKCTL, access_rw, reset_val, 0),
  
- 	return true;
- }
+ 	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
 -- 
 2.39.2
 
