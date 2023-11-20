@@ -1,187 +1,244 @@
-Return-Path: <kvm+bounces-2065-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2064-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B2757F12BD
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 13:07:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B16E7F12B4
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 13:06:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5BE7B219C5
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 12:07:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACA621F23EE2
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 12:06:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1DD018E1C;
-	Mon, 20 Nov 2023 12:06:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78A4E18E2F;
+	Mon, 20 Nov 2023 12:06:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RM6Qx7Fc"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="HnO/ppiz"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA249BF;
-	Mon, 20 Nov 2023 04:06:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=/mR897q7LtgCvTlXKAE0rdoSN2j8b8aMcVPOdcccRpY=; b=RM6Qx7FcfEFB0lloIPereTideL
-	+AYJNf5egfv1iuCehLcwN8dJk66EVzSqwJnMMUEhuV5TAtoSStumIRWuKu1Tyuns+s0LKpLPy0t/5
-	dIo/vWXCY0oXNGJy/4xtNQC7ZgQDFV98EWphzMUqEf+Q/8iNT6nQzfdvQXpQ9vAaGzvlXIRF6fZg/
-	m4tn3ybZvEH8spXzjXsC9eUEiIZmhh6261gFuf/eZffQib5S8BO76T9UKU5plOA8hllIe+6H/NG6z
-	CV+4tZZ8Z7E7UWpvWTTqBjQOiogO3kSRrjo53cYWqKvLpVlRepARypnPJv9l8u1VOlAIaJp6Z0DTh
-	92xDf1bA==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1r532I-004Sv4-SR; Mon, 20 Nov 2023 12:05:55 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id F09DF300419; Mon, 20 Nov 2023 13:05:53 +0100 (CET)
-Date: Mon, 20 Nov 2023 13:05:53 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Valentin Schneider <vschneid@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-arch@vger.kernel.org, x86@kernel.org,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Borislav Petkov <bp@alien8.de>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Wanpeng Li <wanpengli@tencent.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>, Jason Baron <jbaron@akamai.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Feng Tang <feng.tang@intel.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"Mike Rapoport (IBM)" <rppt@kernel.org>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	David Hildenbrand <david@redhat.com>,
-	"ndesaulniers@google.com" <ndesaulniers@google.com>,
-	Michael Kelley <mikelley@microsoft.com>,
-	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>
-Subject: Re: [PATCH 5/5] x86/tsc: Make __use_tsc __ro_after_init
-Message-ID: <20231120120553.GU8262@noisy.programming.kicks-ass.net>
-References: <20231120105528.760306-1-vschneid@redhat.com>
- <20231120105528.760306-6-vschneid@redhat.com>
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2FDCB8
+	for <kvm@vger.kernel.org>; Mon, 20 Nov 2023 04:06:25 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1cc9b626a96so30843675ad.2
+        for <kvm@vger.kernel.org>; Mon, 20 Nov 2023 04:06:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1700481985; x=1701086785; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xVcC8hR/V0NYT0+DB0uWFXv4sVGxkELPBpe0/v11m1o=;
+        b=HnO/ppizM8cfSWaDgEGbMcPd5eBa6UOHmyWL7vaiT0FimNmOQS+KH/RwTiQQcMrcjb
+         zfW42PV534nwcpjPD254kGcioPcFz+CGzh56ywJ1SMT9tXEARKtKrEJBjWzzqolJpS0j
+         UMqXmD3v/LwBsp/hueOrfYFBXSAC5yHr2/Do6hcc/GgWTLzUFq68ERCpAkRiWpnkxVPF
+         OSplZVF+Lg1nqgqByLBnijiv5SmMEMe2NafCH66ay20UT18bM8KAZzgzofbSshuJ13do
+         kZOwDOUuew7681N/rnIuBkFME11xa/N01B/ttdl81/hnNDiFVgyjZyEILEMBR1Y2IwEx
+         J6Iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700481985; x=1701086785;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xVcC8hR/V0NYT0+DB0uWFXv4sVGxkELPBpe0/v11m1o=;
+        b=m68u1jJ3cDb+T78YGq7KvNgb8WcOvnO3pGRzBmCrKEk3AH23YjfHxfLGbdngJ9IvRp
+         Q86dDX5uC495I1jPGM7Q2awl3Pk1NmnWx4+DKpeGx8GhXm+gdp+ozxKFcPcMrb9hKS+3
+         m+fODOElvvseQBuyKnLpbJRf0PH+RMYYYgK82gdCgIxIabBSRFjbYOKM9+YCvi8kvocC
+         tWNkQIGLzf6I1rg7IbKRVAes94EUxGR5Swev+bo0e+MVCH+vAlbaLvwJ/lAnYKYqYVrF
+         OayDXmpGp992diO10qVaQLE2vK+bn/gfWKkFCKmKzhwqWRDbdJCRrXktW7aJtaCp0YFf
+         hpDA==
+X-Gm-Message-State: AOJu0YxlHda6espugnVb0x0pLSBeSeklgw9fw20Z1KsVRE18cxUpFnUq
+	KkO+J4RE746P2SjNWKdCw+33Fg==
+X-Google-Smtp-Source: AGHT+IGM1XuWCU5poSeUzc7w4cvTyjbzDfnxMsuQyhs+1L/NEmEH7PI3Hq6+FgbcpyTkz6qgnpHy0A==
+X-Received: by 2002:a17:902:c18b:b0:1cf:5673:3630 with SMTP id d11-20020a170902c18b00b001cf56733630mr3480320pld.6.1700481985103;
+        Mon, 20 Nov 2023 04:06:25 -0800 (PST)
+Received: from [10.4.27.171] ([139.177.225.255])
+        by smtp.gmail.com with ESMTPSA id t1-20020a170902bc4100b001c60a2b5c61sm2170268plz.134.2023.11.20.04.06.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Nov 2023 04:06:20 -0800 (PST)
+Message-ID: <06613204-b279-4f66-a786-e5e26bccd42e@bytedance.com>
+Date: Mon, 20 Nov 2023 20:06:08 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231120105528.760306-6-vschneid@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
+ sched/fair: Add lag based placement)
+Content-Language: en-US
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Tobias Huschle <huschle@linux.ibm.com>,
+ Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org, mst@redhat.com,
+ jasowang@redhat.com
+References: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
+ <20231117092318.GJ8262@noisy.programming.kicks-ass.net>
+ <2c7509e3-6db0-461e-991b-026553157dbe@bytedance.com>
+ <20231120105606.GQ8262@noisy.programming.kicks-ass.net>
+From: Abel Wu <wuyun.abel@bytedance.com>
+In-Reply-To: <20231120105606.GQ8262@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 20, 2023 at 11:55:28AM +0100, Valentin Schneider wrote:
-> __use_tsc is only ever enabled in __init tsc_enable_sched_clock(), so mark
-> it as __ro_after_init.
+On 11/20/23 6:56 PM, Peter Zijlstra Wrote:
+> On Sat, Nov 18, 2023 at 01:14:32PM +0800, Abel Wu wrote:
 > 
-> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
-> ---
->  arch/x86/kernel/tsc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>> Hi Peter, I'm a little confused here. As we adopt placement strategy #1
+>> when PLACE_LAG is enabled, the lag of that entity needs to be preserved.
+>> Given that the weight doesn't change, we have:
+>>
+>> 	vl' = vl
+>>
+>> But in fact it is scaled on placement:
+>>
+>> 	vl' = vl * W/(W + w)
 > 
-> diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
-> index 15f97c0abc9d0..f19b42ea40573 100644
-> --- a/arch/x86/kernel/tsc.c
-> +++ b/arch/x86/kernel/tsc.c
-> @@ -44,7 +44,7 @@ EXPORT_SYMBOL(tsc_khz);
->  static int __read_mostly tsc_unstable;
->  static unsigned int __initdata tsc_early_khz;
->  
-> -static DEFINE_STATIC_KEY_FALSE(__use_tsc);
-> +static DEFINE_STATIC_KEY_FALSE_RO(__use_tsc);
+> (W+w)/W
 
-So sure, we can absolutely do that, but do we want to take this one
-further perhaps? "notsc" on x86_64 makes no sense what so ever. Lets
-drag things into this millennium.
+Ah, right. I misunderstood (again) the comment which says:
 
----
+	vl_i = (W + w_i)*vl'_i / W
 
-diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
-index 15f97c0abc9d..4cfcf5946162 100644
---- a/arch/x86/kernel/tsc.c
-+++ b/arch/x86/kernel/tsc.c
-@@ -44,7 +44,9 @@ EXPORT_SYMBOL(tsc_khz);
- static int __read_mostly tsc_unstable;
- static unsigned int __initdata tsc_early_khz;
- 
-+#ifndef CONFIG_X86_64
- static DEFINE_STATIC_KEY_FALSE(__use_tsc);
-+#endif
- 
- int tsc_clocksource_reliable;
- 
-@@ -230,24 +232,26 @@ static void __init cyc2ns_init_secondary_cpus(void)
-  */
- noinstr u64 native_sched_clock(void)
- {
--	if (static_branch_likely(&__use_tsc)) {
--		u64 tsc_now = rdtsc();
-+#ifndef CONFIG_X86_64
-+	if (!static_branch_unlikely(&__use_tsc)) {
-+		/*
-+		 * Fall back to jiffies if there's no TSC available:
-+		 * ( But note that we still use it if the TSC is marked
-+		 *   unstable. We do this because unlike Time Of Day,
-+		 *   the scheduler clock tolerates small errors and it's
-+		 *   very important for it to be as fast as the platform
-+		 *   can achieve it. )
-+		 */
- 
--		/* return the value in ns */
--		return __cycles_2_ns(tsc_now);
-+		/* No locking but a rare wrong value is not a big deal: */
-+		return (jiffies_64 - INITIAL_JIFFIES) * (1000000000 / HZ);
- 	}
-+#endif
- 
--	/*
--	 * Fall back to jiffies if there's no TSC available:
--	 * ( But note that we still use it if the TSC is marked
--	 *   unstable. We do this because unlike Time Of Day,
--	 *   the scheduler clock tolerates small errors and it's
--	 *   very important for it to be as fast as the platform
--	 *   can achieve it. )
--	 */
-+	u64 tsc_now = rdtsc();
- 
--	/* No locking but a rare wrong value is not a big deal: */
--	return (jiffies_64 - INITIAL_JIFFIES) * (1000000000 / HZ);
-+	/* return the value in ns */
-+	return __cycles_2_ns(tsc_now);
- }
- 
- /*
-@@ -291,7 +295,8 @@ int check_tsc_unstable(void)
- }
- EXPORT_SYMBOL_GPL(check_tsc_unstable);
- 
--#ifdef CONFIG_X86_TSC
-+#ifndef CONFIG_X86_64
-+#if defined(CONFIG_X86_TSC
- int __init notsc_setup(char *str)
- {
- 	mark_tsc_unstable("boot parameter notsc");
-@@ -310,6 +315,7 @@ int __init notsc_setup(char *str)
- #endif
- 
- __setup("notsc", notsc_setup);
-+#endif
- 
- static int no_sched_irq_time;
- static int no_tsc_watchdog;
-@@ -1556,7 +1562,9 @@ static void __init tsc_enable_sched_clock(void)
- 	/* Sanitize TSC ADJUST before cyc2ns gets initialized */
- 	tsc_store_and_check_tsc_adjust(true);
- 	cyc2ns_init_boot_cpu();
-+#ifndef CONFIG_X86_64
- 	static_branch_enable(&__use_tsc);
-+#endif
- }
- 
- void __init tsc_early_init(void)
+So the current implementation is:
+
+	v' = V - vl'
+
+and what I was proposing is:
+
+	v' = V' - vl
+
+and they are equal in fact.
+
+> 
+>>
+>> Does this intended?
+> 
+> The scaling, yes that's intended and the comment explains why. So now
+> you have me confused too :-)
+> 
+> Specifically, I want the lag after placement to be equal to the lag we
+> come in with. Since placement will affect avg_vruntime (adding one
+> element to the average changes the average etc..) the placement also
+> affects the lag as measured after placement.
+
+Yes. You did the math in an iterative fashion and mine is facing the
+final state:
+
+	v' = V' - vlag
+	V' = (WV + wv') / (W + w)
+
+which gives:
+
+	V' = V - w * vlag / W
+
+> 
+> Or rather, if you enqueue and dequeue, I want the lag to be preserved.
+> If you do not take placement into consideration, lag will dissipate real
+> quick.
+> 
+>> And to illustrate my understanding of strategy #1:
+> 
+>> @@ -5162,41 +5165,17 @@ place_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
+>>   		 * vl_i is given by:
+>>   		 *
+>>   		 *   V' = (\Sum w_j*v_j + w_i*v_i) / (W + w_i)
+>> -		 *      = (W*V + w_i*(V - vl_i)) / (W + w_i)
+>> -		 *      = (W*V + w_i*V - w_i*vl_i) / (W + w_i)
+>> -		 *      = (V*(W + w_i) - w_i*l) / (W + w_i)
+>> -		 *      = V - w_i*vl_i / (W + w_i)
+>> -		 *
+>> -		 * And the actual lag after adding an entity with vl_i is:
+>> -		 *
+>> -		 *   vl'_i = V' - v_i
+>> -		 *         = V - w_i*vl_i / (W + w_i) - (V - vl_i)
+>> -		 *         = vl_i - w_i*vl_i / (W + w_i)
+>> -		 *
+>> -		 * Which is strictly less than vl_i. So in order to preserve lag
+>> -		 * we should inflate the lag before placement such that the
+>> -		 * effective lag after placement comes out right.
+>> -		 *
+>> -		 * As such, invert the above relation for vl'_i to get the vl_i
+>> -		 * we need to use such that the lag after placement is the lag
+>> -		 * we computed before dequeue.
+>> +		 *      = (W*V + w_i*(V' - vl_i)) / (W + w_i)
+>> +		 *      = V - w_i*vl_i / W
+>>   		 *
+>> -		 *   vl'_i = vl_i - w_i*vl_i / (W + w_i)
+>> -		 *         = ((W + w_i)*vl_i - w_i*vl_i) / (W + w_i)
+>> -		 *
+>> -		 *   (W + w_i)*vl'_i = (W + w_i)*vl_i - w_i*vl_i
+>> -		 *                   = W*vl_i
+>> -		 *
+>> -		 *   vl_i = (W + w_i)*vl'_i / W
+>>   		 */
+>>   		load = cfs_rq->avg_load;
+>>   		if (curr && curr->on_rq)
+>>   			load += scale_load_down(curr->load.weight);
+>> -
+>> -		lag *= load + scale_load_down(se->load.weight);
+>>   		if (WARN_ON_ONCE(!load))
+>>   			load = 1;
+>> -		lag = div_s64(lag, load);
+>> +
+>> +		vruntime -= div_s64(lag * scale_load_down(se->load.weight), load);
+>>   	}
+>>   	se->vruntime = vruntime - lag;
+> 
+> 
+> So you're proposing we do:
+> 
+> 	v = V - (lag * w) / (W + w) - lag
+
+What I 'm proposing is:
+
+	V' = V - w * vlag / W
+
+so we have:
+
+	v' = V' - vlag
+	   = V - vlag * w/W - vlag
+	   = V - vlag * (W + w)/W
+
+which is exactly the same as current implementation.
+
+> 
+> ?
+> 
+> That can be written like:
+> 
+> 	v = V - (lag * w) / (W+w) - (lag * (W+w)) / (W+w)
+> 	  = V - (lag * (W+w) + lag * w) / (W+w)
+> 	  = V - (lag * (W+2w)) / (W+w)
+> 
+> And that turns into a mess AFAICT.
+> 
+> 
+> Let me repeat my earlier argument. Suppose v,w,l are the new element.
+> V,W are the old avg_vruntime and sum-weight.
+> 
+> Then: V = V*W / W, and by extention: V' = (V*W + v*w) / (W + w).
+> 
+> The new lag, after placement:
+> 
+> l' = V' - v = (V*W + v*w) / (W+w) - v
+>              = (V*W + v*w) / (W+w) - v * (W+w) / (W+v)
+> 	    = (V*W + v*w -v*W - v*w) / (W+w)
+> 	    = (V*W - v*W) / (W+w)
+> 	    = W*(V-v) / (W+w)
+> 	    = W/(W+w) * (V-v)
+> 
+> Substitute: v = V - (W+w)/W * l, my scaling thing, to obtain:
+> 
+> l' = W/(W+w) * (V - (V - (W+w)/W * l))
+>     = W/(W+w) * (V - V + (W+w)/W * l)
+>     = W/(W+w) * (W+w)/W * l
+>     = l
+> 
+> So by scaling, we've preserved lag across placement.
+> 
+> That make sense?
+
+Yes, I think I won't misunderstand again for the 3rd time :)
+
+Thanks!
+	Abel
 
