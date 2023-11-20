@@ -1,43 +1,43 @@
-Return-Path: <kvm+bounces-2104-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2106-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3F6F7F1417
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 14:14:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A2D67F1418
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 14:14:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1FAFB21932
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 13:14:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B6CB1C215D3
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 13:14:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C6E20B1F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8195721A12;
 	Mon, 20 Nov 2023 13:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hGkv2qWY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="leRIynKs"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFB01F959;
-	Mon, 20 Nov 2023 13:10:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EB01C07615;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2835520310;
+	Mon, 20 Nov 2023 13:11:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F4047C433C8;
 	Mon, 20 Nov 2023 13:10:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700485859;
-	bh=Gb78xrJCbwzaA9er9NmF+iIBn24HN2v9V7S1q86rtS8=;
+	s=k20201202; t=1700485860;
+	bh=f2wnhl3iS5UjWwLnmUkNaAlpevGDuNY/t92e4wzTMrU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hGkv2qWYPDpfr0XrlPjc+XIBn3zPV6v+NtK+KguN7pb/VeJgYzfaoKA0F3smPWJap
-	 jjRnoVbA6whv/eXZ82DpAxlcLGyH1o4wNw8e+oiAvtbagzbqT63q50A+SREkyNIPTH
-	 QbHgC2HiHDCZ59QTT2/AakKeCvz7TpmIT2rinjuQEgJjOEJkxFWwYyXrEP4MtIPHmC
-	 caurG/SMrOqvZJ7LvFVCrCXetcZvRlOYnCzPmRu/FlXdhCF+wD3dYhkbz2TwtG3a3/
-	 8moFpQBZlce9BJmDg/kEhQ3YFOrfqg2xh4DxKrqStKRXdi8F7iPG+1aR0PeZhvmKg4
-	 wXDhF6tFqlKpA==
+	b=leRIynKs02vga32hLrfxV9KFM13y2IcEoDDpVZz7JBAejU4j/2rvFcgA3puYdwioY
+	 nYAxr59mXRyiVXzxaNYYR9fsf5GERxVzHlXvEgS8B3fpJ+noG3R1Gn8XOhwOGYWfsJ
+	 pH8HYr+lrX2qVUEH+grFYMBldLT/js+RSh4MjoSYPPNeUQIzbtEF712pu74bDTG1H3
+	 eoPxLHGC/Hsp+Z5TbAQxmB+7krVIus6LHfZChvDtnUBhUBUefvJQJuRRPNlrMsFVHT
+	 HPIGjR0xYLUafnIzCUtXKZ6QRVWAk1t+sDZwDZ39iF1uap/QCJHpLjENSyYVGwkgRN
+	 gsPYjj7tYD43A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1r543F-00EjnU-R1;
-	Mon, 20 Nov 2023 13:10:57 +0000
+	id 1r543G-00EjnU-45;
+	Mon, 20 Nov 2023 13:10:58 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -55,9 +55,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v11 34/43] KVM: arm64: nv: Deal with broken VGIC on maintenance interrupt delivery
-Date: Mon, 20 Nov 2023 13:10:18 +0000
-Message-Id: <20231120131027.854038-35-maz@kernel.org>
+Subject: [PATCH v11 35/43] KVM: arm64: nv: Add handling of FEAT_TTL TLB invalidation
+Date: Mon, 20 Nov 2023 13:10:19 +0000
+Message-Id: <20231120131027.854038-36-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231120131027.854038-1-maz@kernel.org>
 References: <20231120131027.854038-1-maz@kernel.org>
@@ -73,42 +73,172 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Normal, non-nesting KVM deals with maintenance interrupt in a very
-simple way: we don't even try to handle it and just turn it off
-as soon as we exit, long before the kernel can handle it.
-
-However, with NV, we rely on the actual handling of the interrupt
-to leave it active and pass it down to the L1 guest hypervisor
-(we effectively treat it as an assigned interrupt, just like the
-timer).
-
-This doesn't work with something like the Apple M2, which doesn't
-have an active state that allows the interrupt to be masked.
-
-Instead, just disable the vgic after having taken the interrupt and
-injected a virtual interrupt. This is enough for the guest to make
-forward progress, but will limit its ability to handle further
-interrupts until it next exits (IAR will always report "spurious").
-
-Oh well.
+Support guest-provided information information to find out about
+the range of required invalidation.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v3-nested.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/include/asm/kvm_nested.h |  2 +
+ arch/arm64/kvm/nested.c             | 90 +++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c           | 26 +--------
+ 3 files changed, 93 insertions(+), 25 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index b8f4dd39676c..ea76b1f7285c 100644
---- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -264,4 +264,7 @@ void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
- 		kvm_vgic_inject_irq(vcpu->kvm, vcpu,
- 				    vcpu->kvm->arch.vgic.maint_irq, state, vcpu);
- 	}
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 4f94aef8a750..b878577bc2ce 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -128,6 +128,8 @@ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+ extern bool forward_smc_trap(struct kvm_vcpu *vcpu);
+ extern bool __check_nv_sr_forward(struct kvm_vcpu *vcpu);
+ 
++unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val);
 +
-+	if (unlikely(kvm_vgic_global_state.no_hw_deactivation))
-+		sysreg_clear_set_s(SYS_ICH_HCR_EL2, ICH_HCR_EN, 0);
+ int kvm_init_nv_sysregs(struct kvm *kvm);
+ 
+ #endif /* __ARM64_KVM_NESTED_H */
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index ad1df851997d..6f574602b7df 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -351,6 +351,96 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ 	return ret;
  }
+ 
++static unsigned int ttl_to_size(u8 ttl)
++{
++	int level = ttl & 3;
++	int gran = (ttl >> 2) & 3;
++	unsigned int max_size = 0;
++
++	switch (gran) {
++	case TLBI_TTL_TG_4K:
++		switch (level) {
++		case 0:
++			break;
++		case 1:
++			max_size = SZ_1G;
++			break;
++		case 2:
++			max_size = SZ_2M;
++			break;
++		case 3:
++			max_size = SZ_4K;
++			break;
++		}
++		break;
++	case TLBI_TTL_TG_16K:
++		switch (level) {
++		case 0:
++		case 1:
++			break;
++		case 2:
++			max_size = SZ_32M;
++			break;
++		case 3:
++			max_size = SZ_16K;
++			break;
++		}
++		break;
++	case TLBI_TTL_TG_64K:
++		switch (level) {
++		case 0:
++		case 1:
++			/* No 52bit IPA support */
++			break;
++		case 2:
++			max_size = SZ_512M;
++			break;
++		case 3:
++			max_size = SZ_64K;
++			break;
++		}
++		break;
++	default:			/* No size information */
++		break;
++	}
++
++	return max_size;
++}
++
++unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
++{
++	unsigned long max_size;
++	u8 ttl;
++
++	ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
++
++	max_size = ttl_to_size(ttl);
++
++	if (!max_size) {
++		/* Compute the maximum extent of the invalidation */
++		switch (mmu->tlb_vtcr & VTCR_EL2_TG0_MASK) {
++		case VTCR_EL2_TG0_4K:
++			max_size = SZ_1G;
++			break;
++		case VTCR_EL2_TG0_16K:
++			max_size = SZ_32M;
++			break;
++		case VTCR_EL2_TG0_64K:
++			/*
++			 * No, we do not support 52bit IPA in nested yet. Once
++			 * we do, this should be 4TB.
++			 */
++			max_size = SZ_512M;
++			break;
++		default:
++			BUG();
++		}
++	}
++
++	WARN_ON(!max_size);
++	return max_size;
++}
++
+ /*
+  * We can have multiple *different* MMU contexts with the same VMID:
+  *
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c9e55c7697d5..9a82f42b45ed 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3229,36 +3229,12 @@ static void s2_mmu_unmap_stage2_ipa(struct kvm_s2_mmu *mmu,
+ 	 *
+ 	 * - NS bit: we're non-secure only.
+ 	 *
+-	 * - TTL field: We already have the granule size from the
+-	 *   VTCR_EL2.TG0 field, and the level is only relevant to the
+-	 *   guest's S2PT.
+-	 *
+ 	 * - IPA[51:48]: We don't support 52bit IPA just yet...
+ 	 *
+ 	 * And of course, adjust the IPA to be on an actual address.
+ 	 */
+ 	base_addr = (info->ipa.addr & GENMASK_ULL(35, 0)) << 12;
+-
+-	/* Compute the maximum extent of the invalidation */
+-	switch (mmu->tlb_vtcr & VTCR_EL2_TG0_MASK) {
+-	case VTCR_EL2_TG0_4K:
+-		max_size = SZ_1G;
+-		break;
+-	case VTCR_EL2_TG0_16K:
+-		max_size = SZ_32M;
+-		break;
+-	case VTCR_EL2_TG0_64K:
+-		/*
+-		 * No, we do not support 52bit IPA in nested yet. Once
+-		 * we do, this should be 4TB.
+-		 */
+-		/* FIXME: remove the 52bit PA support from the IDregs */
+-		max_size = SZ_512M;
+-		break;
+-	default:
+-		BUG();
+-	}
+-
++	max_size = compute_tlb_inval_range(mmu, info->ipa.addr);
+ 	base_addr &= ~(max_size - 1);
+ 
+ 	kvm_unmap_stage2_range(mmu, base_addr, max_size);
 -- 
 2.39.2
 
