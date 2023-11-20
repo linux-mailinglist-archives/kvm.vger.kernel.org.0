@@ -1,145 +1,337 @@
-Return-Path: <kvm+bounces-2118-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2127-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F172E7F15B1
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 15:29:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 432EA7F17E3
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 16:53:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FCAB1C21822
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 14:29:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7AF02826CA
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 15:53:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AEF11C6B4;
-	Mon, 20 Nov 2023 14:29:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8916F1DDC3;
+	Mon, 20 Nov 2023 15:53:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="W8E8Vgjc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S67fxGoX"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2089.outbound.protection.outlook.com [40.107.237.89])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B4F698;
-	Mon, 20 Nov 2023 06:29:34 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=m7TRiHOFwXViAWlxyWXu8YYLQrbRzd60F84+Hu9OozwexeZeSivnZxmCGacWQF5EI/uh3+sjAhpisOzWEk4rVGHXNIgEbRaXSs4f0aV39xeg03LVzqDOh63FR8R11OaDwyzWpH/KDzmGdxAhU5xbWE5E9DwzlXGX2pa+cl4a4vaj8BmISfeXunUy8xuqms/w5Kmahh7QkfBXhQoH1mhN+wvM1zhJmeRTAGlm+Lr3CoRay8J6+FlggVoUsb3Dk6bVTaf0kL4u1VkKxkchjjXYglBLT2vcSUBsJtEvDF2s3tS3UJMZC83h8UrB06R0fHD1ArpCQ2EmZ4SjfjaY9kzKOg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7by+eLfwHQCnYuH2fNiocsiIGHdDW/4/5Ty6E7ZoxLE=;
- b=BgA7bfsafquYwa/xvvMwa/k2hy5YOtm5gnMoxtntoHYYl+c8T8Pt6PG3bgbvHRb0V4sPBardakckApa0preze21IYW8U24WHa+0MRmeCmVIaO0UeeI0UcFBGe59q0VIt60jrQlhgfCaMz/msc/xUBsM56wqOwwp0ffnmrNdveLBfFJsLRHaMm24XDPPnEj9/qHFXyXTaO0NGE2L3In7KdmEz8185mO6VQ5OO50ENXnlsqOgptgvGRiIPz6VwGkUBt0arZpGdVPS5KTyZgMgnDaKOVLm0zuDnrSKI7Qv97uNPojskRrSmqns+HEPJhVTVfnZEKmG1o1X8ncujAdvceg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7by+eLfwHQCnYuH2fNiocsiIGHdDW/4/5Ty6E7ZoxLE=;
- b=W8E8VgjcaL/WxG9mmsCudrD4UwBCccky+x78mJ2UWVrjevWUgsQvGbceHqvrTSVqy1GNw1oF9mcShl4o0VxoAxCCNWR7WNaYIJYV/P2L7SZyaRoKFrTUec4cf0JlbLhtC/FxmDwXUQBmnI4mmpv02kVkhC7Bw15GdXB+oOs4toFmZGhoZFcedqJKgjQxzg57uoc4bygxS9fomcS7+jBTszOe6d5TkIDJdtKxXsmRSgQW2LbhDQ1vjb48tDsHtKrySWDzRbQ8QGnLlm0lRSXUTzRPa5q3q9Y6kGDoaDewgrqdjV1MpyMZbF6XkuroCdd7I8/J76nGZ1ylBUjAFwOglw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH7PR12MB7307.namprd12.prod.outlook.com (2603:10b6:510:20b::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.26; Mon, 20 Nov
- 2023 14:29:31 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7002.027; Mon, 20 Nov 2023
- 14:29:31 +0000
-Date: Mon, 20 Nov 2023 10:29:28 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	alex.williamson@redhat.com, yishaih@nvidia.com,
-	kevin.tian@intel.com, linuxarm@huawei.com, liulongfang@huawei.com
-Subject: Re: [PATCH] hisi_acc_vfio_pci: Update migration data pointer
- correctly on saving/resume
-Message-ID: <20231120142928.GC6083@nvidia.com>
-References: <20231120091406.780-1-shameerali.kolothum.thodi@huawei.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231120091406.780-1-shameerali.kolothum.thodi@huawei.com>
-X-ClientProxiedBy: SN4PR0501CA0110.namprd05.prod.outlook.com
- (2603:10b6:803:42::27) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65BC1191
+	for <kvm@vger.kernel.org>; Mon, 20 Nov 2023 07:53:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700495583;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zn51yV4A7RhZk0UeIHfR4p6ynwDwnU1J5TWyxUWG93E=;
+	b=S67fxGoXq5VCI95JQK4vw0UBJX4zstSX6UQBTaCag75knXUIwNvUQfatSmnGrC+glf16SK
+	DAU7pOWX4RWklqAyr9gmdciabok0WvBT2G0OBJvj8lPq4/N7uZu6fMAE5t5C/HHCtGHzGv
+	FwB9rsT+ifY76QOuSN9r+H9+zCeye7U=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-593-S5ke-kxnNYukL0hzkTrUXA-1; Mon, 20 Nov 2023 10:53:01 -0500
+X-MC-Unique: S5ke-kxnNYukL0hzkTrUXA-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9f7dce1428dso229499866b.2
+        for <kvm@vger.kernel.org>; Mon, 20 Nov 2023 07:53:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700495580; x=1701100380;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zn51yV4A7RhZk0UeIHfR4p6ynwDwnU1J5TWyxUWG93E=;
+        b=imKk9WgkdQzepACVt1uziCRzYJY9TQm8LXSWUprFgH1EydDY97UGHZpQosrm9Sunz5
+         Gv1FH6Gd2VxVUqgmPbmJlPoFr8SZhg1NV5ob+dRQ72Hir7jUuYrgoCqPgn4qU9n/Ac2H
+         OmPL4PZFSTzfafqgPJJa0yRVNoBMnVn55Iy/7bNyHGx6GtkxWY8mISuR3swFHoXcnK3V
+         LOl80LY/nxboWH+xfhhmEuCo+PiX1XEwaV9tfK8RjzY4LfrDr1qTWD0/zDyLiq7kTdZm
+         JG0hSOy2+DK/iFfw1t7+BLsFtnY6DwypPS5j7lK+MQydc0lW3o6TyQ5EYjg3V+X1xLK9
+         Ag/g==
+X-Gm-Message-State: AOJu0YwJkmdkVekg4MnvE2rtPQ9udR4SxV8a280Cq5iHtm3i/9655ar5
+	aGjKf/3d0DYjoAAjkyv33xjCc9/DPi+5UL7N7GebwZ9ALSWKPT/ZP7v7AP1P+XVse3iY7q9sQon
+	LW9e1rBaDKqtD
+X-Received: by 2002:a17:906:7488:b0:a00:53cc:8590 with SMTP id e8-20020a170906748800b00a0053cc8590mr1179925ejl.40.1700495580648;
+        Mon, 20 Nov 2023 07:53:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG5sMtyRpHUjgbzwprjL2YoVsjewZ8UqwgPZOBqJZlHSeGX8+LqSaoZUsqNrSdE2NhGJMS3Og==
+X-Received: by 2002:a17:906:7488:b0:a00:53cc:8590 with SMTP id e8-20020a170906748800b00a0053cc8590mr1179902ejl.40.1700495580289;
+        Mon, 20 Nov 2023 07:53:00 -0800 (PST)
+Received: from fedora (g2.ign.cz. [91.219.240.8])
+        by smtp.gmail.com with ESMTPSA id jz2-20020a170906bb0200b009ddf38056f8sm4022838ejb.118.2023.11.20.07.52.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Nov 2023 07:52:59 -0800 (PST)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Xin Li <xin3.li@intel.com>, kvm@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, corbet@lwn.net,
+ kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ peterz@infradead.org, ravi.v.shankar@intel.com
+Subject: Re: [PATCH v1 15/23] KVM: nVMX: Add support for the secondary VM
+ exit controls
+In-Reply-To: <20231108183003.5981-16-xin3.li@intel.com>
+References: <20231108183003.5981-1-xin3.li@intel.com>
+ <20231108183003.5981-16-xin3.li@intel.com>
+Date: Mon, 20 Nov 2023 16:52:58 +0100
+Message-ID: <87y1espgkl.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB7307:EE_
-X-MS-Office365-Filtering-Correlation-Id: c6848490-6953-44f7-ae52-08dbe9d51bfe
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	vkE4Jsx8NowdmTvC8KYcctSKSFMmCsUgS/WRLyl9vyBpD8uu7u347O/yjjxitbNIMHUQ/6+Gnu6+bgneVQerYk5oRlVPS+lq8vBn/xA9wkvLDG0HwrT7iEomBVJ1xE3uJCKJGTwn3He9WAsqzoUNq5F5AhNmpd/f1CzMzJSXgzPe2BoB0i97fsON1/sAu9HG5T6GVkhZq7+2/cOl2Z4gdKLJi9W9fqslzjc9gqAmOjAWfoShuPDpmsuzOEdfGMyNIpSCV6zIBqXmo/BA12LPvzCigE5ShFFTCL9t1HtsKfO33N/34go2FfdDTEZ34GWvd/mztR8EPhxxcVRFiwgST2OJo2AO43BuasPm3pWCNty5fA9r9z0ydWGyGYpRaseQhw2YanoFwotWI+bjb+6GTQP6VnGxOlJ4R4AmaskLfT652R0WunA++nZ4em/51grYgrBziIdYAdhHokJTqwCKFTLluZUq/T47iGn6ek423eWAnJhUw/27IM1j5/kL9KErIH4EptS4G7dQEZTp5LLeo9xLFoGpXvIsTmrKzbzQVlTN7UvwPSGC1Y2fCPvw+AOT
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(39860400002)(396003)(366004)(376002)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(83380400001)(36756003)(86362001)(33656002)(38100700002)(66946007)(66556008)(66476007)(6916009)(4326008)(8676002)(316002)(41300700001)(8936002)(15650500001)(5660300002)(2906002)(6512007)(1076003)(6506007)(2616005)(26005)(478600001)(6486002)(6666004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?xZfk56657jGwqquCaFd/cg7zG7bDT6KpGM5ZSTccH9BbmS7t2JyVmEOZpBRs?=
- =?us-ascii?Q?kkaslQ9gcyv5q1CqhUBDSg3apHsTABcVomOgX+YGtldNs6VCgV24kq/bUTDJ?=
- =?us-ascii?Q?U1BEUhJZgjeAI8grDlq7ghCiqoOWIVpy1F2ZTJW3sJuibShFSovU6jNRvyp6?=
- =?us-ascii?Q?YWlZZ0VZVi5f3267UkD3X9PmN9B+zGlKntP3B24n3OCDm57QqbVgfGyBHKhO?=
- =?us-ascii?Q?nudUriagPxEGJEmyNpB8I4YFNbi7K8Vqa814QGrTZspS6QIpbZorJ3Z+J674?=
- =?us-ascii?Q?78eRUTSJ9/zZr6F1qCO/8aeETNsbn9ceHTZGbLgJMvZ/ppd3ClsxUMXsvAnO?=
- =?us-ascii?Q?1OZmOyd76UHrCQQUxsGMDPrSSuR64BNygY8QSZkTfOWuKl3Rezbr9Bp3HJKt?=
- =?us-ascii?Q?VbsrDLlftpp2WTI3aNFllyLHawG/BrsIFZwN5nLBuA5y9ej4WoBKXP93bqUZ?=
- =?us-ascii?Q?t5r72MGkpXUUw/56sjZtgNRAQkNSly9h/jfw60/CzMjWhtjUGfEn6i8EA3Nl?=
- =?us-ascii?Q?KMtc1tKOX7AgCwoSX/bwSCYhWUVsTGvhIEEvU68QxJhcuITlpuK8lPh25kVm?=
- =?us-ascii?Q?n6ADZLni4bOkwRYI5Af0zvjeRqLidjACBLMBNbCMUFo1HmqrAxN/KMUgxEMw?=
- =?us-ascii?Q?TE198KQk61owGw2+m41Wi0Al/D9P9/T4pHBzcgb84Y0UyJ9ZOLQjbMRTr31b?=
- =?us-ascii?Q?zcyI2BYYB7dNJl8c57KVrwFdsBzUedAwiPMNc6SRcwABylxa/ogh0Wxqb0wr?=
- =?us-ascii?Q?ju/deidxPofzyPiK6yC4XUgNZXR/a8VfGr4pdVP+1n8XBgD832kn0Po1DbLD?=
- =?us-ascii?Q?D42QMKf+nqDI1KGKVjtRNk3b8ayrLP/bOHBuN0s+vtEl70Jj3cxVBhjvefQ2?=
- =?us-ascii?Q?eU8mm/MHc5ShQSV0z30QPITSwJcI6HcwhJnAsN1gGpPFxlwhag0yb5FJL+TE?=
- =?us-ascii?Q?n5kODW9QqeeRFSOrXi2c0N9dbL+KKshNP6DwST0IM++quYtAoW/JarcKQb2e?=
- =?us-ascii?Q?j0oJbIRhR7GD6BsehTaP8fGVxInS6DVG0RmhieBH3R6CoDmucv1zbLzh4Eoy?=
- =?us-ascii?Q?XayeQupqRYzWRX9oKnaCz3wxmxtzCLUrIU1bqg0zMEkw6F4A9NSZvsbTScWJ?=
- =?us-ascii?Q?GDU+9faYV3RHcQ952BIZdzqXYH1EzgFcw05xGNHkgtnpqP6u1EvLGXox/Vq/?=
- =?us-ascii?Q?qfrBsGxgijYWiNK5mwFfFBG3gvvav5eIH25/WAuIlDys8lE3rWqPSfabbqom?=
- =?us-ascii?Q?aQjABpiL2PoKCjN6PXkVMzgKFVrQi/lc1PDVEQsrQZGQOGUBWOwVFmlEYo0P?=
- =?us-ascii?Q?cjq+2rB8S7Pm4M0hOY5A5Vg0iFPHW3Ci0pUQJPuEI9i5C1Ow5btTE//odBVG?=
- =?us-ascii?Q?k/TgBGhcLpBDeyIY6YxutjamWrFUzShkNRHKTnhjUn8HP1UQLCSADFqnlMZ0?=
- =?us-ascii?Q?S37e5CA3CXrorR8RMdgtW/N/KYOL9YC/uslshZsw1eWq8WYf/DoPm6dOUnWY?=
- =?us-ascii?Q?mmRbLQriieM6OmMLDFoMveN8k/1SOTYSkaq6WP693OJvL0KoC6JDm6T2U5Zg?=
- =?us-ascii?Q?tr/MjIsbERxpkS6AvEtOR4VvpMwNrkBSQvosI0Zi?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c6848490-6953-44f7-ae52-08dbe9d51bfe
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2023 14:29:31.1138
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SUDzEokSZ0+obN3Cm/rmZ50fS94M1m9c6NO0bDuhT3ijAvB4VPqWbbQ6CeMMgqte
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7307
+Content-Type: text/plain
 
-On Mon, Nov 20, 2023 at 09:14:06AM +0000, Shameer Kolothum wrote:
-> When the optional PRE_COPY support was added to speed up the device
-> compatibility check, it failed to update the saving/resuming data
-> pointers based on the fd offset. This results in migration data
-> corruption and when the device gets started on the destination the
-> following error is reported in some cases,
-> 
-> [  478.907684] arm-smmu-v3 arm-smmu-v3.2.auto: event 0x10 received:
-> [  478.913691] arm-smmu-v3 arm-smmu-v3.2.auto:  0x0000310200000010
-> [  478.919603] arm-smmu-v3 arm-smmu-v3.2.auto:  0x000002088000007f
-> [  478.925515] arm-smmu-v3 arm-smmu-v3.2.auto:  0x0000000000000000
-> [  478.931425] arm-smmu-v3 arm-smmu-v3.2.auto:  0x0000000000000000
-> [  478.947552] hisi_zip 0000:31:00.0: qm_axi_rresp [error status=0x1] found
-> [  478.955930] hisi_zip 0000:31:00.0: qm_db_timeout [error status=0x400] found
-> [  478.955944] hisi_zip 0000:31:00.0: qm sq doorbell timeout in function 2
-> 
-> Fixes: d9a871e4a143 ("hisi_acc_vfio_pci: Introduce support for PRE_COPY state transitions")
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Xin Li <xin3.li@intel.com> writes:
+
+> Enable the secondary VM exit controls to prepare for nested FRED.
+>
+> Tested-by: Shan Kang <shan.kang@intel.com>
+> Signed-off-by: Xin Li <xin3.li@intel.com>
 > ---
->  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+>  Documentation/virt/kvm/x86/nested-vmx.rst |  1 +
+>  arch/x86/include/asm/hyperv-tlfs.h        |  1 +
+>  arch/x86/kvm/vmx/capabilities.h           |  1 +
+>  arch/x86/kvm/vmx/hyperv.c                 | 18 +++++++++++++++++-
+>  arch/x86/kvm/vmx/nested.c                 | 18 +++++++++++++++++-
+>  arch/x86/kvm/vmx/vmcs12.c                 |  1 +
+>  arch/x86/kvm/vmx/vmcs12.h                 |  2 ++
+>  arch/x86/kvm/x86.h                        |  2 +-
+>  8 files changed, 41 insertions(+), 3 deletions(-)
+>
+> diff --git a/Documentation/virt/kvm/x86/nested-vmx.rst b/Documentation/virt/kvm/x86/nested-vmx.rst
+> index ac2095d41f02..e64ef231f310 100644
+> --- a/Documentation/virt/kvm/x86/nested-vmx.rst
+> +++ b/Documentation/virt/kvm/x86/nested-vmx.rst
+> @@ -217,6 +217,7 @@ struct shadow_vmcs is ever changed.
+>  		u16 host_fs_selector;
+>  		u16 host_gs_selector;
+>  		u16 host_tr_selector;
+> +		u64 secondary_vm_exit_controls;
+>  	};
+>  
+>  
+> diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
+> index 2ff26f53cd62..299554708e37 100644
+> --- a/arch/x86/include/asm/hyperv-tlfs.h
+> +++ b/arch/x86/include/asm/hyperv-tlfs.h
+> @@ -616,6 +616,7 @@ struct hv_enlightened_vmcs {
+>  	u64 host_ssp;
+>  	u64 host_ia32_int_ssp_table_addr;
+>  	u64 padding64_6;
+> +	u64 secondary_vm_exit_controls;
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+(I think Jeremi has asked a similar question but just to be sure)
 
-Jason
+This doesn't seem to be present in the currently available TLFS version
+e.g. here:
+https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/datatypes/hv_vmx_enlightened_vmcs
+
+That wouldn't be the first time when TLFS lags behind but as I don't see
+anyone from Microsoft signing this off, let me ask: where did you get
+this information and, in case it came from someone @microsoft.com, can
+we get their sign-off on the patch?
+
+>  } __packed;
+>  
+>  #define HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE			0
+> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+> index e8f3ad0f79ee..caf38a54856c 100644
+> --- a/arch/x86/kvm/vmx/capabilities.h
+> +++ b/arch/x86/kvm/vmx/capabilities.h
+> @@ -38,6 +38,7 @@ struct nested_vmx_msrs {
+>  	u32 pinbased_ctls_high;
+>  	u32 exit_ctls_low;
+>  	u32 exit_ctls_high;
+> +	u64 secondary_exit_ctls;
+>  	u32 entry_ctls_low;
+>  	u32 entry_ctls_high;
+>  	u32 misc_low;
+> diff --git a/arch/x86/kvm/vmx/hyperv.c b/arch/x86/kvm/vmx/hyperv.c
+> index 313b8bb5b8a7..b8cd53601a00 100644
+> --- a/arch/x86/kvm/vmx/hyperv.c
+> +++ b/arch/x86/kvm/vmx/hyperv.c
+> @@ -103,7 +103,10 @@
+>  	 VM_EXIT_LOAD_IA32_EFER |					\
+>  	 VM_EXIT_CLEAR_BNDCFGS |					\
+>  	 VM_EXIT_PT_CONCEAL_PIP |					\
+> -	 VM_EXIT_CLEAR_IA32_RTIT_CTL)
+> +	 VM_EXIT_CLEAR_IA32_RTIT_CTL |					\
+> +	 VM_EXIT_ACTIVATE_SECONDARY_CONTROLS)
+> +
+> +#define EVMCS1_SUPPORTED_VMEXIT_CTRL2 (0ULL)
+>  
+>  #define EVMCS1_SUPPORTED_VMENTRY_CTRL					\
+>  	(VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR |				\
+> @@ -315,6 +318,8 @@ const struct evmcs_field vmcs_field_to_evmcs_1[] = {
+>  		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP1),
+>  	EVMCS1_FIELD(VM_EXIT_CONTROLS, vm_exit_controls,
+>  		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP1),
+> +	EVMCS1_FIELD(SECONDARY_VM_EXIT_CONTROLS, secondary_vm_exit_controls,
+> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP1),
+>  	EVMCS1_FIELD(SECONDARY_VM_EXEC_CONTROL, secondary_vm_exec_control,
+>  		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP1),
+>  	EVMCS1_FIELD(GUEST_ES_LIMIT, guest_es_limit,
+> @@ -464,6 +469,7 @@ enum evmcs_revision {
+>  
+>  enum evmcs_ctrl_type {
+>  	EVMCS_EXIT_CTRLS,
+> +	EVMCS_2NDEXIT,
+>  	EVMCS_ENTRY_CTRLS,
+>  	EVMCS_EXEC_CTRL,
+>  	EVMCS_2NDEXEC,
+> @@ -477,6 +483,9 @@ static const u32 evmcs_supported_ctrls[NR_EVMCS_CTRLS][NR_EVMCS_REVISIONS] = {
+>  	[EVMCS_EXIT_CTRLS] = {
+>  		[EVMCSv1_LEGACY] = EVMCS1_SUPPORTED_VMEXIT_CTRL,
+>  	},
+> +	[EVMCS_2NDEXIT] = {
+> +		[EVMCSv1_LEGACY] = EVMCS1_SUPPORTED_VMEXIT_CTRL2,
+> +	},
+>  	[EVMCS_ENTRY_CTRLS] = {
+>  		[EVMCSv1_LEGACY] = EVMCS1_SUPPORTED_VMENTRY_CTRL,
+>  	},
+
+What's the desired effect here? I.e. why exposing
+VM_EXIT_ACTIVATE_SECONDARY_CONTROLS when none of the controls are going
+to be exposed?
+
+> @@ -539,6 +548,9 @@ void nested_evmcs_filter_control_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 *
+>  			supported_ctrls &= ~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
+>  		ctl_high &= supported_ctrls;
+>  		break;
+> +	case MSR_IA32_VMX_EXIT_CTLS2:
+> +		ctl_low &= evmcs_get_supported_ctls(EVMCS_2NDEXIT);
+> +		break;
+>  	case MSR_IA32_VMX_ENTRY_CTLS:
+>  	case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
+>  		supported_ctrls = evmcs_get_supported_ctls(EVMCS_ENTRY_CTRLS);
+> @@ -589,6 +601,10 @@ int nested_evmcs_check_controls(struct vmcs12 *vmcs12)
+>  					       vmcs12->vm_exit_controls)))
+>  		return -EINVAL;
+>  
+> +	if (CC(!nested_evmcs_is_valid_controls(EVMCS_2NDEXIT,
+> +					       vmcs12->secondary_vm_exit_controls)))
+> +		return -EINVAL;
+> +
+>  	if (CC(!nested_evmcs_is_valid_controls(EVMCS_ENTRY_CTRLS,
+>  					       vmcs12->vm_entry_controls)))
+>  		return -EINVAL;
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index ff07d6e736a2..d6341845df43 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -1411,6 +1411,7 @@ int vmx_set_vmx_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 data)
+>  	case MSR_IA32_VMX_PINBASED_CTLS:
+>  	case MSR_IA32_VMX_PROCBASED_CTLS:
+>  	case MSR_IA32_VMX_EXIT_CTLS:
+> +	case MSR_IA32_VMX_EXIT_CTLS2:
+>  	case MSR_IA32_VMX_ENTRY_CTLS:
+>  		/*
+>  		 * The "non-true" VMX capability MSRs are generated from the
+> @@ -1489,6 +1490,9 @@ int vmx_get_vmx_msr(struct nested_vmx_msrs *msrs, u32 msr_index, u64 *pdata)
+>  		if (msr_index == MSR_IA32_VMX_EXIT_CTLS)
+>  			*pdata |= VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR;
+>  		break;
+> +	case MSR_IA32_VMX_EXIT_CTLS2:
+> +		*pdata = msrs->secondary_exit_ctls;
+> +		break;
+>  	case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
+>  	case MSR_IA32_VMX_ENTRY_CTLS:
+>  		*pdata = vmx_control_msr(
+> @@ -1692,6 +1696,8 @@ static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields
+>  		vmcs12->pin_based_vm_exec_control =
+>  			evmcs->pin_based_vm_exec_control;
+>  		vmcs12->vm_exit_controls = evmcs->vm_exit_controls;
+> +		vmcs12->secondary_vm_exit_controls =
+> +			evmcs->secondary_vm_exit_controls;
+>  		vmcs12->secondary_vm_exec_control =
+>  			evmcs->secondary_vm_exec_control;
+>  	}
+> @@ -1894,6 +1900,7 @@ static void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
+>  	 * evmcs->vmcs_link_pointer = vmcs12->vmcs_link_pointer;
+>  	 * evmcs->pin_based_vm_exec_control = vmcs12->pin_based_vm_exec_control;
+>  	 * evmcs->vm_exit_controls = vmcs12->vm_exit_controls;
+> +	 * evmcs->secondary_vm_exit_controls = vmcs12->secondary_vm_exit_controls;
+>  	 * evmcs->secondary_vm_exec_control = vmcs12->secondary_vm_exec_control;
+>  	 * evmcs->page_fault_error_code_mask =
+>  	 *		vmcs12->page_fault_error_code_mask;
+> @@ -2411,6 +2418,11 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct loaded_vmcs *vmcs0
+>  		exec_control &= ~VM_EXIT_LOAD_IA32_EFER;
+>  	vm_exit_controls_set(vmx, exec_control);
+>  
+> +	if (exec_control & VM_EXIT_ACTIVATE_SECONDARY_CONTROLS) {
+> +		exec_control = __secondary_vm_exit_controls_get(vmcs01);
+> +		secondary_vm_exit_controls_set(vmx, exec_control);
+> +	}
+> +
+>  	/*
+>  	 * Interrupt/Exception Fields
+>  	 */
+> @@ -6819,13 +6831,17 @@ static void nested_vmx_setup_exit_ctls(struct vmcs_config *vmcs_conf,
+>  		VM_EXIT_HOST_ADDR_SPACE_SIZE |
+>  #endif
+>  		VM_EXIT_LOAD_IA32_PAT | VM_EXIT_SAVE_IA32_PAT |
+> -		VM_EXIT_CLEAR_BNDCFGS;
+> +		VM_EXIT_CLEAR_BNDCFGS | VM_EXIT_ACTIVATE_SECONDARY_CONTROLS;
+>  	msrs->exit_ctls_high |=
+>  		VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR |
+>  		VM_EXIT_LOAD_IA32_EFER | VM_EXIT_SAVE_IA32_EFER |
+>  		VM_EXIT_SAVE_VMX_PREEMPTION_TIMER | VM_EXIT_ACK_INTR_ON_EXIT |
+>  		VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
+>  
+> +	/* secondary exit controls */
+> +	if (msrs->exit_ctls_high & VM_EXIT_ACTIVATE_SECONDARY_CONTROLS)
+> +		rdmsrl(MSR_IA32_VMX_EXIT_CTLS2, msrs->secondary_exit_ctls);
+> +
+>  	/* We support free control of debug control saving. */
+>  	msrs->exit_ctls_low &= ~VM_EXIT_SAVE_DEBUG_CONTROLS;
+>  }
+> diff --git a/arch/x86/kvm/vmx/vmcs12.c b/arch/x86/kvm/vmx/vmcs12.c
+> index 106a72c923ca..98457d7b2b23 100644
+> --- a/arch/x86/kvm/vmx/vmcs12.c
+> +++ b/arch/x86/kvm/vmx/vmcs12.c
+> @@ -73,6 +73,7 @@ const unsigned short vmcs12_field_offsets[] = {
+>  	FIELD(PAGE_FAULT_ERROR_CODE_MATCH, page_fault_error_code_match),
+>  	FIELD(CR3_TARGET_COUNT, cr3_target_count),
+>  	FIELD(VM_EXIT_CONTROLS, vm_exit_controls),
+> +	FIELD(SECONDARY_VM_EXIT_CONTROLS, secondary_vm_exit_controls),
+>  	FIELD(VM_EXIT_MSR_STORE_COUNT, vm_exit_msr_store_count),
+>  	FIELD(VM_EXIT_MSR_LOAD_COUNT, vm_exit_msr_load_count),
+>  	FIELD(VM_ENTRY_CONTROLS, vm_entry_controls),
+> diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
+> index 01936013428b..f50f897b9b5f 100644
+> --- a/arch/x86/kvm/vmx/vmcs12.h
+> +++ b/arch/x86/kvm/vmx/vmcs12.h
+> @@ -185,6 +185,7 @@ struct __packed vmcs12 {
+>  	u16 host_gs_selector;
+>  	u16 host_tr_selector;
+>  	u16 guest_pml_index;
+> +	u64 secondary_vm_exit_controls;
+>  };
+>  
+>  /*
+> @@ -358,6 +359,7 @@ static inline void vmx_check_vmcs12_offsets(void)
+>  	CHECK_OFFSET(host_gs_selector, 992);
+>  	CHECK_OFFSET(host_tr_selector, 994);
+>  	CHECK_OFFSET(guest_pml_index, 996);
+> +	CHECK_OFFSET(secondary_vm_exit_controls, 998);
+>  }
+>  
+>  extern const unsigned short vmcs12_field_offsets[];
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 63e543c6834b..96ad139adc3f 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -47,7 +47,7 @@ void kvm_spurious_fault(void);
+>   * associated feature that KVM supports for nested virtualization.
+>   */
+>  #define KVM_FIRST_EMULATED_VMX_MSR	MSR_IA32_VMX_BASIC
+> -#define KVM_LAST_EMULATED_VMX_MSR	MSR_IA32_VMX_VMFUNC
+> +#define KVM_LAST_EMULATED_VMX_MSR	MSR_IA32_VMX_EXIT_CTLS2
+>  
+>  #define KVM_DEFAULT_PLE_GAP		128
+>  #define KVM_VMX_DEFAULT_PLE_WINDOW	4096
+
+-- 
+Vitaly
+
 
