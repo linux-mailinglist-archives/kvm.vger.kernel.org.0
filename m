@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-2119-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2125-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B051A7F1705
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 16:16:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0C5A7F1719
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 16:17:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1E041C21867
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 15:16:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61A8BB211A9
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 15:17:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 752931D536;
-	Mon, 20 Nov 2023 15:16:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E151DDDF;
+	Mon, 20 Nov 2023 15:16:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="o58V0R8A"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="iWm+eqFD"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81496A4;
-	Mon, 20 Nov 2023 07:16:23 -0800 (PST)
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AKF2WHm027654;
-	Mon, 20 Nov 2023 15:15:24 GMT
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3503BE;
+	Mon, 20 Nov 2023 07:16:30 -0800 (PST)
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AKF2Z4M005926;
+	Mon, 20 Nov 2023 15:15:25 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2023-03-30;
- bh=hlNIjt1lJtZP47W7eO4KvEIII2+KWpAFpv+PlhUsURU=;
- b=o58V0R8A+E1zQ+SsMJvASydoOg6yhLfPoVow6VNQGEyTW8yuHUx78AxnBxqu+geBa3f4
- pAgkQjoWEuFGUbkNQVRkB0M8hWgptRafKNvfQrv8sOf/IhWCunOsjUvupuereHMTuh0H
- OHkE3T7Tuq4WEFXC7xvGpRVbvJrKtm99EkSUORzMMY8+rfMFd+Oi4VM1acNWPboHYliJ
- 0hqbi5Jbg/0S+8YYn+iQJ7BvwWLQC/VTmCBYpqqMSdKy3ZfsqPorEdImcv4hypc5H9jH
- 4E9G465XiumZTMhrkmPOdQEaiaREMPh/dtTaJHPSocWTi672AvCDnuNJqs/HM9FZGoc1 nw== 
+ bh=uAhbu4AUajdcQROPp7AvbiHI/LFlFhMVo6VGoxnZCWM=;
+ b=iWm+eqFDXMPL5yZeVVivDaYQytpZR3S/mzy8etq05l2MOlypXUEQv/NlVT9fec+oMhtz
+ n6qGjTv90sWy1upsgg/PIzkJFQu1Etcu5jo+g8rKD0xSjrOf6pp7oYpwgoQ5MNF6zwWE
+ 93OErUMGMZPhTtsrGMiM9TKbrZX2/fJxDJJ+12ujXGEaMvovc4UR2YbMvmPljXeynlgd
+ 01PhAiRt0XeHp/KUnWYeru74ECbsdn8TbZs5c2MMwCk548yK80dpJR+BLulGzaV7+Ana
+ 5a267z8ctt3NaKeDhr4sotvF63M/mOGOM4eu8A41OfAhDxjbB9WiXrDaWWT6dfZkWymQ QA== 
 Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3uekpejwf0-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3uemvuava8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 20 Nov 2023 15:15:25 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3AKF2uu1023572;
+	Mon, 20 Nov 2023 15:15:24 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3uekq5gr51-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Mon, 20 Nov 2023 15:15:24 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3AKF2wL7023702;
-	Mon, 20 Nov 2023 15:15:23 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3uekq5gr46-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 20 Nov 2023 15:15:23 +0000
 Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AKFFF8b037000;
-	Mon, 20 Nov 2023 15:15:22 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AKFFF8d037000;
+	Mon, 20 Nov 2023 15:15:24 GMT
 Received: from mihai.localdomain (ban25x6uut25.us.oracle.com [10.153.73.25])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3uekq5gqwc-7;
-	Mon, 20 Nov 2023 15:15:22 +0000
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3uekq5gqwc-8;
+	Mon, 20 Nov 2023 15:15:23 +0000
 From: Mihai Carabas <mihai.carabas@oracle.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, linux-pm@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: kvm@vger.kernel.org, linux-pm@vger.kernel.org,
         joao.m.martins@oracle.com, juerg.haefliger@canonical.com,
         mic@digikod.net, mihai.carabas@oracle.com, arnd@arndb.de,
         ankur.a.arora@oracle.com
-Subject: [PATCH 6/7] cpuidle-haltpoll: ARM64 support
-Date: Mon, 20 Nov 2023 16:01:37 +0200
-Message-Id: <1700488898-12431-7-git-send-email-mihai.carabas@oracle.com>
+Subject: [PATCH 7/7] cpuidle/poll_state: replace cpu_relax with smp_cond_load_relaxed
+Date: Mon, 20 Nov 2023 16:01:38 +0200
+Message-Id: <1700488898-12431-8-git-send-email-mihai.carabas@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1700488898-12431-1-git-send-email-mihai.carabas@oracle.com>
 References: <1700488898-12431-1-git-send-email-mihai.carabas@oracle.com>
@@ -71,50 +71,49 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulk
  mlxlogscore=999 phishscore=0 malwarescore=0 suspectscore=0 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
  definitions=main-2311200106
-X-Proofpoint-GUID: srZIfO3ZIE8aevxHjRldc4X9uOZ7nIZa
-X-Proofpoint-ORIG-GUID: srZIfO3ZIE8aevxHjRldc4X9uOZ7nIZa
+X-Proofpoint-GUID: nJCLzdI_KlVOa57CUYhmhyCxfgZd5UAK
+X-Proofpoint-ORIG-GUID: nJCLzdI_KlVOa57CUYhmhyCxfgZd5UAK
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 
-From: Joao Martins <joao.m.martins@oracle.com>
+cpu_relax on ARM64 does a simple "yield". Thus we replace it with
+smp_cond_load_relaxed which basically does a "wfe".
 
-To test whether it's a guest or not for the default cases, the haltpoll
-driver uses the kvm_para* helpers to find out if it's a guest or not.
-
-ARM64 doesn't have or defined any of these, so it remains disabled on
-the default. Although it allows to be force-loaded.
-
-Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+Suggested-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Mihai Carabas <mihai.carabas@oracle.com>
 ---
- drivers/cpuidle/Kconfig | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/cpuidle/poll_state.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/cpuidle/Kconfig b/drivers/cpuidle/Kconfig
-index cac5997dca50..067927eda466 100644
---- a/drivers/cpuidle/Kconfig
-+++ b/drivers/cpuidle/Kconfig
-@@ -35,7 +35,7 @@ config CPU_IDLE_GOV_TEO
+diff --git a/drivers/cpuidle/poll_state.c b/drivers/cpuidle/poll_state.c
+index 9b6d90a72601..440cd713e39a 100644
+--- a/drivers/cpuidle/poll_state.c
++++ b/drivers/cpuidle/poll_state.c
+@@ -26,12 +26,16 @@ static int __cpuidle poll_idle(struct cpuidle_device *dev,
  
- config CPU_IDLE_GOV_HALTPOLL
- 	bool "Haltpoll governor (for virtualized systems)"
--	depends on KVM_GUEST
-+	depends on (X86 && KVM_GUEST) || ARM64
- 	help
- 	  This governor implements haltpoll idle state selection, to be
- 	  used in conjunction with the haltpoll cpuidle driver, allowing
-@@ -73,7 +73,7 @@ endmenu
+ 		limit = cpuidle_poll_time(drv, dev);
  
- config HALTPOLL_CPUIDLE
- 	tristate "Halt poll cpuidle driver"
--	depends on X86 && KVM_GUEST
-+	depends on (X86 && KVM_GUEST) || ARM64
- 	select CPU_IDLE_GOV_HALTPOLL
- 	default y
- 	help
+-		while (!need_resched()) {
+-			cpu_relax();
+-			if (loop_count++ < POLL_IDLE_RELAX_COUNT)
+-				continue;
+-
++		for (;;) {
+ 			loop_count = 0;
++
++			smp_cond_load_relaxed(&current_thread_info()->flags,
++					      (VAL & _TIF_NEED_RESCHED) ||
++					      (loop_count++ >= POLL_IDLE_RELAX_COUNT));
++
++			if (loop_count < POLL_IDLE_RELAX_COUNT)
++				break;
++
+ 			if (local_clock_noinstr() - time_start > limit) {
+ 				dev->poll_time_limit = true;
+ 				break;
 -- 
 1.8.3.1
 
