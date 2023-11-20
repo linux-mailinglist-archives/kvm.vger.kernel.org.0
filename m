@@ -1,120 +1,130 @@
-Return-Path: <kvm+bounces-2125-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2116-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0C5A7F1719
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 16:17:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D190A7F1554
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 15:09:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61A8BB211A9
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 15:17:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EFC31C2187B
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 14:09:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E151DDDF;
-	Mon, 20 Nov 2023 15:16:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA3681C68E;
+	Mon, 20 Nov 2023 14:09:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="iWm+eqFD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r45lYZBB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3503BE;
-	Mon, 20 Nov 2023 07:16:30 -0800 (PST)
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AKF2Z4M005926;
-	Mon, 20 Nov 2023 15:15:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2023-03-30;
- bh=uAhbu4AUajdcQROPp7AvbiHI/LFlFhMVo6VGoxnZCWM=;
- b=iWm+eqFDXMPL5yZeVVivDaYQytpZR3S/mzy8etq05l2MOlypXUEQv/NlVT9fec+oMhtz
- n6qGjTv90sWy1upsgg/PIzkJFQu1Etcu5jo+g8rKD0xSjrOf6pp7oYpwgoQ5MNF6zwWE
- 93OErUMGMZPhTtsrGMiM9TKbrZX2/fJxDJJ+12ujXGEaMvovc4UR2YbMvmPljXeynlgd
- 01PhAiRt0XeHp/KUnWYeru74ECbsdn8TbZs5c2MMwCk548yK80dpJR+BLulGzaV7+Ana
- 5a267z8ctt3NaKeDhr4sotvF63M/mOGOM4eu8A41OfAhDxjbB9WiXrDaWWT6dfZkWymQ QA== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3uemvuava8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 20 Nov 2023 15:15:25 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3AKF2uu1023572;
-	Mon, 20 Nov 2023 15:15:24 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3uekq5gr51-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 20 Nov 2023 15:15:24 +0000
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AKFFF8d037000;
-	Mon, 20 Nov 2023 15:15:24 GMT
-Received: from mihai.localdomain (ban25x6uut25.us.oracle.com [10.153.73.25])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3uekq5gqwc-8;
-	Mon, 20 Nov 2023 15:15:23 +0000
-From: Mihai Carabas <mihai.carabas@oracle.com>
-To: linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, pbonzini@redhat.com, wanpengli@tencent.com,
-        vkuznets@redhat.com, rafael@kernel.org, daniel.lezcano@linaro.org,
-        akpm@linux-foundation.org, pmladek@suse.com, peterz@infradead.org,
-        dianders@chromium.org, npiggin@gmail.com, rick.p.edgecombe@intel.com,
-        joao.m.martins@oracle.com, juerg.haefliger@canonical.com,
-        mic@digikod.net, mihai.carabas@oracle.com, arnd@arndb.de,
-        ankur.a.arora@oracle.com
-Subject: [PATCH 7/7] cpuidle/poll_state: replace cpu_relax with smp_cond_load_relaxed
-Date: Mon, 20 Nov 2023 16:01:38 +0200
-Message-Id: <1700488898-12431-8-git-send-email-mihai.carabas@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1700488898-12431-1-git-send-email-mihai.carabas@oracle.com>
-References: <1700488898-12431-1-git-send-email-mihai.carabas@oracle.com>
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-20_15,2023-11-20_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 mlxscore=0
- mlxlogscore=999 phishscore=0 malwarescore=0 suspectscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
- definitions=main-2311200106
-X-Proofpoint-GUID: nJCLzdI_KlVOa57CUYhmhyCxfgZd5UAK
-X-Proofpoint-ORIG-GUID: nJCLzdI_KlVOa57CUYhmhyCxfgZd5UAK
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DEF1C280;
+	Mon, 20 Nov 2023 14:09:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A142C433C9;
+	Mon, 20 Nov 2023 14:09:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700489371;
+	bh=hoIhA8+0yRB+8xKNhUqRCTi4Cj0Q9PRSELx11+Gdf9k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=r45lYZBBqyt2qIC3VTWvXeFOLpp7CslcoudAqZHo3c3ToiD3advJLwF+LCeQTSM4V
+	 ian9GJtKKF/6WQNbnSlPU6HPsyneu0ZkHaso51fhQyb5HfooUycrugoOjqW3AvaFvH
+	 JbSyG7Q6aiUwYwnG9OQSQDRK4H2FDhgaP+yGZfOW9mvm9hc6UiF2csU75mRMpuJsB/
+	 u1dCYBO9SVZu1FuLumVUvtcx32ALSNqXSMdsp9G0IufrXorcmRf7kCkpyLAOe7IGza
+	 CZVtn9hq2ML7D6TA2ZoEM+IA98iwR0d/sA7ltvFzg0zveh92v1bjHGQjv6XIUZ6hjb
+	 x08JifS0gmx4Q==
+Date: Mon, 20 Nov 2023 14:09:17 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Sean Christopherson <seanjc@google.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
+	Xu Yilun <yilun.xu@intel.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+	David Matlack <dmatlack@google.com>,
+	Yu Zhang <yu.c.zhang@linux.intel.com>,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Maciej Szmigiero <mail@maciej.szmigiero.name>,
+	David Hildenbrand <david@redhat.com>,
+	Quentin Perret <qperret@google.com>,
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+	Liam Merwick <liam.merwick@oracle.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCH 34/34] KVM: selftests: Add a memory region subtest to
+ validate invalid flags
+Message-ID: <13677ced-e464-4cdb-82ae-4236536e169c@sirena.org.uk>
+References: <20231105163040.14904-1-pbonzini@redhat.com>
+ <20231105163040.14904-35-pbonzini@redhat.com>
+ <CAF7b7mpmuYLTY6OQfRRoOryfO-2e1ZumQ6SCQDHHPD5XFyhFTQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="61dY8WQ8Ox8wOW0h"
+Content-Disposition: inline
+In-Reply-To: <CAF7b7mpmuYLTY6OQfRRoOryfO-2e1ZumQ6SCQDHHPD5XFyhFTQ@mail.gmail.com>
+X-Cookie: Happiness is twin floppies.
 
-cpu_relax on ARM64 does a simple "yield". Thus we replace it with
-smp_cond_load_relaxed which basically does a "wfe".
 
-Suggested-by: Peter Zijlstra <peterz@infradead.org>
-Signed-off-by: Mihai Carabas <mihai.carabas@oracle.com>
----
- drivers/cpuidle/poll_state.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+--61dY8WQ8Ox8wOW0h
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/cpuidle/poll_state.c b/drivers/cpuidle/poll_state.c
-index 9b6d90a72601..440cd713e39a 100644
---- a/drivers/cpuidle/poll_state.c
-+++ b/drivers/cpuidle/poll_state.c
-@@ -26,12 +26,16 @@ static int __cpuidle poll_idle(struct cpuidle_device *dev,
- 
- 		limit = cpuidle_poll_time(drv, dev);
- 
--		while (!need_resched()) {
--			cpu_relax();
--			if (loop_count++ < POLL_IDLE_RELAX_COUNT)
--				continue;
--
-+		for (;;) {
- 			loop_count = 0;
-+
-+			smp_cond_load_relaxed(&current_thread_info()->flags,
-+					      (VAL & _TIF_NEED_RESCHED) ||
-+					      (loop_count++ >= POLL_IDLE_RELAX_COUNT));
-+
-+			if (loop_count < POLL_IDLE_RELAX_COUNT)
-+				break;
-+
- 			if (local_clock_noinstr() - time_start > limit) {
- 				dev->poll_time_limit = true;
- 				break;
--- 
-1.8.3.1
+On Wed, Nov 08, 2023 at 05:08:01PM -0800, Anish Moorthy wrote:
+> Applying [1] and [2] reveals that this also breaks non-x86 builds- the
+> MEM_REGION_GPA/SLOT definitions are guarded behind an #ifdef
+> __x86_64__, while the usages introduced here aren't.
+>=20
+> Should
+>=20
+> On Sun, Nov 5, 2023 at 8:35=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com=
+> wrote:
+> >
+> > +       test_invalid_memory_region_flags();
+>=20
+> be #ifdef'd, perhaps? I'm not quite sure what the intent is.
 
+This has been broken in -next for a week now, do we have any progress
+on a fix or should we just revert the patch?
+
+--61dY8WQ8Ox8wOW0h
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmVbaI0ACgkQJNaLcl1U
+h9Aj2Qf9EbUUwOLmAwUa3Jl4QMfiLrKntsPjxIsD9MYRWpqfdGr2gZb7wNXozUgD
+A1SOrSPxLG5lvE3dOdXD1O/mzrxVwLcfAssVQ6KjXu13pJtZDIQHAUpYQBJL28QR
+KIeV8OVDMKeFryWnyt+y92xYK+7d4TocCuAq2Ph3jQj/OIXp4bI5quuTV58jmIG4
+1QuJFi73b7JIL4Ksmg32pp3aWaoP7BqMqnDxx92GwdngF0Jrg1NBhgHoMkh/J28y
+zT6Vui1HZF2pSrrxexqXFLJKhveYmLyg3kaoEyvYeRwj/WjZSB3U/9LJrhBDctTJ
+2Y23Hu9kFWuPdJxy0l8BV7AiIxSr4Q==
+=GWvB
+-----END PGP SIGNATURE-----
+
+--61dY8WQ8Ox8wOW0h--
 
