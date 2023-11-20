@@ -1,72 +1,64 @@
-Return-Path: <kvm+bounces-2069-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2071-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B8527F134B
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 13:30:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF3E57F13F3
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 14:11:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24918B21A1C
-	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 12:30:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB26C1C216AC
+	for <lists+kvm@lfdr.de>; Mon, 20 Nov 2023 13:11:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 854AA1A71B;
-	Mon, 20 Nov 2023 12:29:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEDDC1B27D;
+	Mon, 20 Nov 2023 13:10:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UV9G9u7G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MRyaX1Ve"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8A12F7
-	for <kvm@vger.kernel.org>; Mon, 20 Nov 2023 04:29:47 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id 41be03b00d2f7-5bde80aad05so3414597a12.2
-        for <kvm@vger.kernel.org>; Mon, 20 Nov 2023 04:29:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700483387; x=1701088187; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rgx8LkV8H82w8tImzphDtH1iEDRz4SAPPUMfGtDicEM=;
-        b=UV9G9u7G3uQ/ta/vTHdo7fAak5P8r0tSEcHFF00TgvxrRJ12MBShX9xoShTf+DERQM
-         i1b9xOkoz4XGvzs7WnYV87T2BrbAKIDQQ/ffVSeleZ8zlYCYiB80pVzNzVjXET0217D3
-         liIoBvMx6uXsioehgjmk9rYI13WBb5YKueYZ75bJ4VeW2voboH3n07i7lTN6katEkyO9
-         d1eXYEYnlK337Xoj+IZsL3GrjtU6KBuiPZoLUn9NIlUYDpbfv8LiLJTaj44rl70HFHUd
-         Pla3xHXYZ/yxTgl7DX5UzCRjdC0P28hE3/B9scPq/+pjfhsv48Ig0VOx3Tw74nT0fZ0z
-         9XtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700483387; x=1701088187;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rgx8LkV8H82w8tImzphDtH1iEDRz4SAPPUMfGtDicEM=;
-        b=RtzOSvGHdTdGlppnU09xD3Y4ylSU8dD3WLWhdCnQycdCKIRttey54wxeTDNRNlTGHr
-         jQghx/mRM82GzcredUmOuIHIAkS4aUqIwHzAIikwx2zU6FB7a1JPkySMRO+tl1S8gpXc
-         /xVLNxJFGWikb7+RNorOAGW4G7s/BrnLT+fkTvj8upN0LDwBUHKFoQKAwhIWBemEE/Aj
-         uoVShNUJiumEaUdORaQXEf3YqZew4T69nT3WcJP2K8HSfopZIb5VRaozATEm0naym4eh
-         1t+CQMyzBYDP9LR9EL+m5GjDkeKRWVTYbXrQJQLUuaDK5uLK8FOQKR5qmzVUzUsslUaV
-         n1bA==
-X-Gm-Message-State: AOJu0Yyf9/gvGmkZRceZ+eYWYmcVFY7waS9dKXFQuDJlpUaFbDjZvZ4v
-	E0G2Y0y8bJ9daYrJGMqt6lru1wKlDJw=
-X-Google-Smtp-Source: AGHT+IEibB6+6VzrAmexQ6L9y13uR22ZWYNVN8FC5GZHCDTfmSbEJdroHwYxybkyfCXhWzRBWtMSrQ==
-X-Received: by 2002:a05:6a20:8f27:b0:186:8dc1:f4a with SMTP id b39-20020a056a208f2700b001868dc10f4amr9984281pzk.0.1700483386805;
-        Mon, 20 Nov 2023 04:29:46 -0800 (PST)
-Received: from wheely.local0.net (203-219-179-16.tpgi.com.au. [203.219.179.16])
-        by smtp.gmail.com with ESMTPSA id d13-20020a056a00244d00b00690fe1c928csm6047477pfj.147.2023.11.20.04.29.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 04:29:46 -0800 (PST)
-From: Nicholas Piggin <npiggin@gmail.com>
-To: kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: linuxppc-dev@lists.ozlabs.org,
-	Sean Christopherson <seanjc@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>,
-	Joel Stanley <joel@jms.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>
-Subject: [PATCH v4 4/4] KVM: PPC: selftests: powerpc enable kvm_create_max_vcpus test
-Date: Mon, 20 Nov 2023 22:29:20 +1000
-Message-ID: <20231120122920.293076-5-npiggin@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231120122920.293076-1-npiggin@gmail.com>
-References: <20231120122920.293076-1-npiggin@gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD14919471;
+	Mon, 20 Nov 2023 13:10:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0708AC433C8;
+	Mon, 20 Nov 2023 13:10:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700485851;
+	bh=pUlvWG8M+SDFFekGUUNwGmvmaHh6AlEO/Ns2Nv06A+8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=MRyaX1Ve/0g33CQZjPv2j6YAzlgjXzLJYjGUCzE1Q1Peo2IlOtp/DBi261sVBnEYh
+	 w1iMjx1gAQBBATzNFxe429GgVTmo1AqcaU3Oufm8KbpbOLKX/OzhLuiSAyaUlAhGb/
+	 oCx6cZAFOP162rS6v3F9Pu8Z2cS+JiDm2r80J6UhMmOA6aokjBLVd2qONOYLG6yy62
+	 yd0k9L2aaFMO4ptWFTRTIOr5nJkgA7eZi5U3eOskGljWhL3UUQkGVd8nTPu4PqGNJI
+	 24P9M4LQW8mHLckjPjNmHpRQz0isHMECcFxXDdYTVnAIKp3N9E4WgxNWi7WUByKJJh
+	 gZnWAX5jvK4Qg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1r5436-00EjnU-UB;
+	Mon, 20 Nov 2023 13:10:49 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Darren Hart <darren@os.amperecomputing.com>,
+	Jintack Lim <jintack@cs.columbia.edu>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Miguel Luis <miguel.luis@oracle.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support (FEAT_NV2 only)
+Date: Mon, 20 Nov 2023 13:09:44 +0000
+Message-Id: <20231120131027.854038-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -74,54 +66,157 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-powerpc's maximum permitted vCPU ID depends on the VM's SMT mode, and
-the maximum reported by KVM_CAP_MAX_VCPU_ID exceeds a simple non-SMT
-VM's limit.
+This is the 5th drop of NV support on arm64 for this year, and most
+probably the last one for this side of Christmas.
 
-The powerpc KVM selftest port uses non-SMT VMs, so add a workaround
-to the kvm_create_max_vcpus test case to limit vCPU IDs to
-KVM_CAP_MAX_VCPUS on powerpc. And enable the test case.
+For the previous episodes, see [1].
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- tools/testing/selftests/kvm/Makefile               | 1 +
- tools/testing/selftests/kvm/kvm_create_max_vcpus.c | 9 +++++++++
- 2 files changed, 10 insertions(+)
+What's changed:
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index a198fe6136c8..1e904d8871d7 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -211,6 +211,7 @@ TEST_GEN_PROGS_powerpc += dirty_log_test
- TEST_GEN_PROGS_powerpc += dirty_log_perf_test
- TEST_GEN_PROGS_powerpc += guest_print_test
- TEST_GEN_PROGS_powerpc += hardware_disable_test
-+TEST_GEN_PROGS_powerpc += kvm_create_max_vcpus
- TEST_GEN_PROGS_powerpc += kvm_page_table_test
- TEST_GEN_PROGS_powerpc += max_guest_memory_test
- TEST_GEN_PROGS_powerpc += memslot_modification_stress_test
-diff --git a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
-index 31b3cb24b9a7..330ede73c147 100644
---- a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
-+++ b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
-@@ -51,6 +51,15 @@ int main(int argc, char *argv[])
- 	pr_info("KVM_CAP_MAX_VCPU_ID: %d\n", kvm_max_vcpu_id);
- 	pr_info("KVM_CAP_MAX_VCPUS: %d\n", kvm_max_vcpus);
- 
-+#ifdef __powerpc64__
-+	/*
-+	 * powerpc has a particular format for the vcpu ID that depends on
-+	 * the guest SMT mode, and the max ID cap is too large for non-SMT
-+	 * modes, where the maximum ID is the same as the maximum vCPUs.
-+	 */
-+	kvm_max_vcpu_id = kvm_max_vcpus;
-+#endif
-+
- 	/*
- 	 * Check that we're allowed to open nr_fds_wanted file descriptors and
- 	 * try raising the limits if needed.
+- Drop support for the original FEAT_NV. No existing hardware supports
+  it without FEAT_NV2, and the architecture is deprecating the former
+  entirely. This results in fewer patches, and a slightly simpler
+  model overall.
+
+- Reorganise the series to make it a bit more logical now that FEAT_NV
+  is gone.
+
+- Apply the NV idreg restrictions on VM first run rather than on each
+  access.
+
+- Make the nested vgic shadow CPU interface a per-CPU structure rather
+  than per-vcpu.
+
+- Fix the EL0 timer fastpath
+
+- Work around the architecture deficiencies when trapping WFI from a
+  L2 guest.
+
+- Fix sampling of nested vgic state (MISR, ELRSR, EISR)
+
+- Drop the patches that have already been merged (NV trap forwarding,
+  per-MMU VTCR)
+
+- Rebased on top of 6.7-rc2 + the FEAT_E2H0 support [2].
+
+The branch containing these patches (and more) is at [3]. As for the
+previous rounds, my intention is to take a prefix of this series into
+6.8, provided that it gets enough reviewing.
+
+[1] https://lore.kernel.org/r/20230515173103.1017669-1-maz@kernel.org
+[2] https://lore.kernel.org/r/20231120123721.851738-1-maz@kernel.org
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-6.8-nv2-only
+
+Andre Przywara (1):
+  KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
+
+Christoffer Dall (2):
+  KVM: arm64: nv: Implement nested Stage-2 page table walk logic
+  KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+
+Jintack Lim (3):
+  KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
+  KVM: arm64: nv: Respect virtual CPTR_EL2.{TFP,FPEN} settings
+  KVM: arm64: nv: Trap and emulate TLBI instructions from virtual EL2
+
+Marc Zyngier (37):
+  arm64: cpufeatures: Restrict NV support to FEAT_NV2
+  KVM: arm64: nv: Hoist vcpu_has_nv() into is_hyp_ctxt()
+  KVM: arm64: nv: Compute NV view of idregs as a one-off
+  KVM: arm64: nv: Drop EL12 register traps that are redirected to VNCR
+  KVM: arm64: nv: Add non-VHE-EL2->EL1 translation helpers
+  KVM: arm64: nv: Add include containing the VNCR_EL2 offsets
+  KVM: arm64: Introduce a bad_trap() primitive for unexpected trap
+    handling
+  KVM: arm64: nv: Add EL2_REG_VNCR()/EL2_REG_REDIR() sysreg helpers
+  KVM: arm64: nv: Map VNCR-capable registers to a separate page
+  KVM: arm64: nv: Handle virtual EL2 registers in
+    vcpu_read/write_sys_reg()
+  KVM: arm64: nv: Handle HCR_EL2.E2H specially
+  KVM: arm64: nv: Handle CNTHCTL_EL2 specially
+  KVM: arm64: nv: Save/Restore vEL2 sysregs
+  KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2
+  KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+  KVM: arm64: nv: Handle shadow stage 2 page faults
+  KVM: arm64: nv: Restrict S2 RD/WR permissions to match the guest's
+  KVM: arm64: nv: Set a handler for the system instruction traps
+  KVM: arm64: nv: Trap and emulate AT instructions from virtual EL2
+  KVM: arm64: nv: Hide RAS from nested guests
+  KVM: arm64: nv: Add handling of EL2-specific timer registers
+  KVM: arm64: nv: Sync nested timer state with FEAT_NV2
+  KVM: arm64: nv: Publish emulated timer interrupt state in the
+    in-memory state
+  KVM: arm64: nv: Load timer before the GIC
+  KVM: arm64: nv: Nested GICv3 Support
+  KVM: arm64: nv: Don't block in WFI from nested state
+  KVM: arm64: nv: Fold GICv3 host trapping requirements into guest setup
+  KVM: arm64: nv: Deal with broken VGIC on maintenance interrupt
+    delivery
+  KVM: arm64: nv: Add handling of FEAT_TTL TLB invalidation
+  KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like
+    information
+  KVM: arm64: nv: Tag shadow S2 entries with nested level
+  KVM: arm64: nv: Allocate VNCR page when required
+  KVM: arm64: nv: Fast-track 'InHost' exception returns
+  KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
+  KVM: arm64: nv: Use FEAT_ECV to trap access to EL0 timers
+  KVM: arm64: nv: Accelerate EL0 timer read accesses when FEAT_ECV is on
+  KVM: arm64: nv: Allow userspace to request KVM_ARM_VCPU_NESTED_VIRT
+
+ .../virt/kvm/devices/arm-vgic-v3.rst          |  12 +-
+ arch/arm64/include/asm/esr.h                  |   1 +
+ arch/arm64/include/asm/kvm_arm.h              |   3 +
+ arch/arm64/include/asm/kvm_asm.h              |   4 +
+ arch/arm64/include/asm/kvm_emulate.h          |  53 +-
+ arch/arm64/include/asm/kvm_host.h             | 223 +++-
+ arch/arm64/include/asm/kvm_hyp.h              |   2 +
+ arch/arm64/include/asm/kvm_mmu.h              |  12 +
+ arch/arm64/include/asm/kvm_nested.h           | 130 ++-
+ arch/arm64/include/asm/sysreg.h               |   7 +
+ arch/arm64/include/asm/vncr_mapping.h         | 102 ++
+ arch/arm64/include/uapi/asm/kvm.h             |   1 +
+ arch/arm64/kernel/cpufeature.c                |  22 +-
+ arch/arm64/kvm/Makefile                       |   4 +-
+ arch/arm64/kvm/arch_timer.c                   | 115 +-
+ arch/arm64/kvm/arm.c                          |  46 +-
+ arch/arm64/kvm/at.c                           | 219 ++++
+ arch/arm64/kvm/emulate-nested.c               |  48 +-
+ arch/arm64/kvm/handle_exit.c                  |  29 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |   8 +-
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h    |   5 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c              |   2 +-
+ arch/arm64/kvm/hyp/nvhe/sysreg-sr.c           |   2 +-
+ arch/arm64/kvm/hyp/vgic-v3-sr.c               |   6 +-
+ arch/arm64/kvm/hyp/vhe/switch.c               | 211 +++-
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c            | 133 ++-
+ arch/arm64/kvm/hyp/vhe/tlb.c                  |  83 ++
+ arch/arm64/kvm/mmu.c                          | 248 ++++-
+ arch/arm64/kvm/nested.c                       | 813 ++++++++++++++-
+ arch/arm64/kvm/reset.c                        |   7 +
+ arch/arm64/kvm/sys_regs.c                     | 978 ++++++++++++++++--
+ arch/arm64/kvm/vgic/vgic-init.c               |  35 +
+ arch/arm64/kvm/vgic/vgic-kvm-device.c         |  29 +-
+ arch/arm64/kvm/vgic/vgic-v3-nested.c          | 270 +++++
+ arch/arm64/kvm/vgic/vgic-v3.c                 |  35 +-
+ arch/arm64/kvm/vgic/vgic.c                    |  29 +
+ arch/arm64/kvm/vgic/vgic.h                    |  10 +
+ arch/arm64/tools/cpucaps                      |   2 +
+ include/clocksource/arm_arch_timer.h          |   4 +
+ include/kvm/arm_arch_timer.h                  |  19 +
+ include/kvm/arm_vgic.h                        |  16 +
+ include/uapi/linux/kvm.h                      |   1 +
+ tools/arch/arm/include/uapi/asm/kvm.h         |   1 +
+ 43 files changed, 3725 insertions(+), 255 deletions(-)
+ create mode 100644 arch/arm64/include/asm/vncr_mapping.h
+ create mode 100644 arch/arm64/kvm/at.c
+ create mode 100644 arch/arm64/kvm/vgic/vgic-v3-nested.c
+
 -- 
-2.42.0
+2.39.2
 
 
