@@ -1,881 +1,205 @@
-Return-Path: <kvm+bounces-2153-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2154-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A09687F2463
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 03:52:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABB1E7F246A
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 03:54:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C409D1C218D9
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 02:52:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D38DD1C2192A
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 02:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8A715E92;
-	Tue, 21 Nov 2023 02:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F039134A7;
+	Tue, 21 Nov 2023 02:54:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lff22QW5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Szekib1I"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9D13D8;
-	Mon, 20 Nov 2023 18:50:40 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61BF1CB;
+	Mon, 20 Nov 2023 18:54:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700535040; x=1732071040;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=KCbEkyQgARUTCvODq4McBGNPO2St50S+X16hHLy9bas=;
-  b=Lff22QW5gepqaGiZCoPFd/RXen/o6Wny0YjJBxJ1RtCxLYk+76bbgIL3
-   cX5gfhBOafepmAhYYwgw8ol4ALDP1BcAaGC0ZNoi+f3k9ZLHFVYteAPu5
-   jGTg8cMCi/wAoVOxTpeuKr6pxQNSSJgRFFG0LL4jq9MwEIxhU8/rPH8he
-   P6Vv+yULP5EZYbW99mXaKxgNpwPG4NTMwBT8LZ1RxcapqJzp76KoHjSNM
-   W8oTrpH2AOhkzV8324/PpfFkgU1tUIUkQAr+PjHoPE/j6lr5An40AcJKj
-   tHWbTM3IKLe9dNYjCoBAykMu4DRse5ePozRnBVAaWGBgnV/f5O7tu2ULZ
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="458246179"
+  t=1700535267; x=1732071267;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=aO4z6xLgagxWJaDIUfe43jdVZBBqa+TxE61X3Wlwcs8=;
+  b=Szekib1I1nAoyBHkssFgvHHDtRAvVdpCGyx8nF2BIeaBz6EpA/Lz+VTi
+   DvyxamhSee4RyUmy9QGWxjuv3SLNHq173YMoN/ZJ8AUnxMbD7J2KqHajv
+   mZheLUTxsy0r4VbmddnE9Er9H4utcdyjsNWgbCROruYCy6wDE8525Tzfv
+   AOokuxhrYP0jD9oaE6emE6Y8Gucx6Pyen53SzdAoUiEEUxovtfVcvjT9g
+   V8aCdv/QLmrdDdP00yYNWBNEw7GUqD9YcVitA7yk0Eqw04HJSi8Ses7JC
+   mxu89OLvXCH5/79gpSdMfUftN8Fue+3M8LD8PaKi8gLKbz7m5q0uCIPTV
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="395681569"
 X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
-   d="scan'208";a="458246179"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 18:50:40 -0800
+   d="scan'208";a="395681569"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 18:54:26 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="832488648"
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="1097920675"
 X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
-   d="scan'208";a="832488648"
-Received: from dpdk-yahui-icx1.sh.intel.com ([10.67.111.85])
-  by fmsmga008.fm.intel.com with ESMTP; 20 Nov 2023 18:50:34 -0800
-From: Yahui Cao <yahui.cao@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: kvm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	lingyu.liu@intel.com,
-	kevin.tian@intel.com,
-	madhu.chittim@intel.com,
-	sridhar.samudrala@intel.com,
-	alex.williamson@redhat.com,
-	jgg@nvidia.com,
-	yishaih@nvidia.com,
-	shameerali.kolothum.thodi@huawei.com,
-	brett.creeley@amd.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH iwl-next v4 12/12] vfio/ice: Implement vfio_pci driver for E800 devices
-Date: Tue, 21 Nov 2023 02:51:11 +0000
-Message-Id: <20231121025111.257597-13-yahui.cao@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231121025111.257597-1-yahui.cao@intel.com>
-References: <20231121025111.257597-1-yahui.cao@intel.com>
+   d="scan'208";a="1097920675"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Nov 2023 18:54:25 -0800
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 20 Nov 2023 18:54:25 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Mon, 20 Nov 2023 18:54:25 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Mon, 20 Nov 2023 18:54:25 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NqP8Fv2lSNneLk0nZ7SvthtuSXNq5+2YQZwQbt0G6KjXoESVVINcRWd4GIdHIfmkLa+oqUmHD2fNFShyACfTkHZugxBCFqgN23na4kU/hQo0J+lnYEqicBwD+eMo4UA/YzGxkoqruLn5oGgwhE07X0sEzflKqWkkn1sOAEqxxx3nC7qyEH2Q0hO4UeUeT9IOwjV43E1WAUTDHKLxgt/1eHlNcl32y31I/Shzf+gkM8K48cRAl2LblKIZUf2xWrTLYWNUkafmo4+mT7IwSz5S6OKCzhzGOagLnpDd4Od1BqK6UGgmkamsG043HqcFnWUf/F57ZKcxXO/gh0IW9USgEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aO4z6xLgagxWJaDIUfe43jdVZBBqa+TxE61X3Wlwcs8=;
+ b=GTO5urHhyx5hdCEwyer0v2qGlsVEJIS0zgNeKe0Qy72Dv+tv0xqlKEjzMYyxQWLkgcjb7PXe9APs8SMRLbb3smkQK17Kq0oV+9ZLE/P7Y3YrhobNKnsvwg68bFyb3/fdJ8/cCn3ei0DZnjBfid3Nhzad/jwf2BYJpk/2M1M4Cwfu+9EECQV2RbEQdpHwIoRGv3/x2DT/8VEIoYGsh5PEdstXS9Hr81OU3cYS8sJhQJhfPmbOrnMKDadsYxeMDsOjlFHO/emsfCzRQBKp+sQiXWz9aIESg2zTLI+G6QSusPtmAcsGJ3Ebtn/7Pdapwao3D4BJJg4pVWlfFLQBUW8x5g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by DM6PR11MB4612.namprd11.prod.outlook.com (2603:10b6:5:2a8::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.27; Tue, 21 Nov
+ 2023 02:54:16 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::e7a4:a757:2f2e:f96a]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::e7a4:a757:2f2e:f96a%3]) with mapi id 15.20.7002.027; Tue, 21 Nov 2023
+ 02:54:16 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: "Liu, Yi L" <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"robin.murphy@arm.com" <robin.murphy@arm.com>, "baolu.lu@linux.intel.com"
+	<baolu.lu@linux.intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
+	"eric.auger@redhat.com" <eric.auger@redhat.com>, "nicolinc@nvidia.com"
+	<nicolinc@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>, "peterx@redhat.com"
+	<peterx@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
+	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
+ Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
+	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
+	<yan.y.zhao@intel.com>
+Subject: RE: [PATCH v7 1/3] iommufd: Add data structure for Intel VT-d stage-1
+ cache invalidation
+Thread-Topic: [PATCH v7 1/3] iommufd: Add data structure for Intel VT-d
+ stage-1 cache invalidation
+Thread-Index: AQHaGViOWXGe59nutU2rEx/0zRDvrrCC4vaggAD2R4CAAD710A==
+Date: Tue, 21 Nov 2023 02:54:15 +0000
+Message-ID: <BN9PR11MB5276EF10FCE9C96F593696E18CBBA@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20231117131816.24359-1-yi.l.liu@intel.com>
+ <20231117131816.24359-2-yi.l.liu@intel.com>
+ <BN9PR11MB52761D7A88BB2F655355A7728CB4A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20231120230451.GD6083@nvidia.com>
+In-Reply-To: <20231120230451.GD6083@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|DM6PR11MB4612:EE_
+x-ms-office365-filtering-correlation-id: 9bdd3356-dd6c-4f08-3af9-08dbea3d2649
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 1vfa5ep4rScKLaHUGeYFIL01nDCrJhrFU438gGQlh9pZ1Fb103wxtjvQQTISNma0ulaIpdpwZaYpsHbgwbADJyG6Wi2fG3+k7coT4jEgfVWPpHpC+JF7l7y5CJKZVOF6tAFVrJUWT4MTSAK4/fhhAmrxQQbDZbk9/40V/GarxJabc3M0rl4xN4o0MnXBgy2Uf/kJ1u5zyXb7P7uVzS28JD2CEAbhrcIrPImNB67eSbcstxJf++O97ShssPmy79RCyoghBtvfiS48qJXOiclmsZgdZ6GGVsMzcw83vsN1bKn+bv58nyPqKGrMelojdBZemXrQTw3k1w+o7u8aAMN+m+4hp4vdB4MDRMdQeyoOZgKTKXu9AeKWSJlgPJfa69MN+5ieXTMxQso4aV2RLhXV9+nTsHV6zM0Kf0+ayZg+Kp6Bdq9mvuIv19e/bw+MbeqaEE+FzW8pQwkeBejH7KcehtGRmEVgANclOj9si6EgFmTqqmscLJPLFHM719RCmoqVSmGS0jdE2aOKa6LY+dsCMOwPA7+uSieS94LvzQL20Sj7IfoLdvOX0DNnks6eqMPkuPqsFl7Q1uk2nkYe6u418WH6ila3KubnetGuWWnTTEhyKUCl36pwx+sl0oEpsJGV
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(376002)(39860400002)(346002)(136003)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(66446008)(66946007)(66476007)(66556008)(76116006)(6916009)(64756008)(54906003)(316002)(7696005)(9686003)(71200400001)(6506007)(26005)(478600001)(38070700009)(38100700002)(82960400001)(122000001)(83380400001)(33656002)(86362001)(55016003)(2906002)(5660300002)(7416002)(4326008)(8676002)(8936002)(52536014)(41300700001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?6aFTU0BbghT4hbWSacSEp2IoE2SwhaM4WySzagbpRg053oJugcyDUd+B4b3A?=
+ =?us-ascii?Q?kWsEPbdSoDqJD77ieQZ9R910/kQcmleugPPcWxaXi/ScUq0GcCP5y+AjBO1W?=
+ =?us-ascii?Q?0h7/hNfzTYvv8UDnbHklmrQD34JOfQuwjhHnW81xQq1WtBHiHNeH71dVUOHS?=
+ =?us-ascii?Q?afpom+Hh7go0G8cVg70UCXsmpP0bA0p/SnHhMJJpNmmYvg2K3NW4XSvb26oP?=
+ =?us-ascii?Q?XovqaRjiR06YT+z/6xLZZeP9CaiSOmmb/Dh+f5iMYGaOjwfKAziGfpFe2W3t?=
+ =?us-ascii?Q?RitIWZ9/trefUbOwvjdE+baAdG9mX3/3PpLdx4mLHsyrxeobPGwix16sUKt8?=
+ =?us-ascii?Q?aNHXXPyPYJgzHk6gxdXBGR5daKe7QoFsBWSAShGtN4EfAKO0sQyZloGd8HDb?=
+ =?us-ascii?Q?ahQ4TZbShnrQcHLc3HjheOXq6a0Vx+zbxnz8gu1WXkwnP+jCa70iGYoYaD0j?=
+ =?us-ascii?Q?/oJLuAc/OzqMyJLEz0CMgGeYhMNp+gqoQzv6H7qCHqeV1s1mgoDyOZ5i6avM?=
+ =?us-ascii?Q?pzQrqPQEEIiH4IZg92kbomX+Cd2jV8ceUygBHawPSymlsANJcxBIZtsg3Fgm?=
+ =?us-ascii?Q?raEBYt6EsDjllXOyEmplE4yJYVS+8wOn4zII8c3ZhI8bZj+nP1+e8L6v6fvF?=
+ =?us-ascii?Q?xhMmCPHhZoa4wHYyxMkzJJWNWrD2qYsmvBosECLfaQJaPDuEp4bdK5Fh6JDj?=
+ =?us-ascii?Q?zeNxgjneGecZnKDb3aJGNnzhZvnX4Pvs1ojtP9YG8EVNIObVSTJHNw/y0SPU?=
+ =?us-ascii?Q?QI50//WwQCVwyO/2+iLM6r6RkXp+MWcXXVfi4AL6oF7OApK1wCVNUcRnNZ9w?=
+ =?us-ascii?Q?tXnvWHrrSwL0Onl0HDnJmw+DygaTXtrZBCE0NOXng8+jRFiOh9xfdfIZs9yE?=
+ =?us-ascii?Q?GNsdyxQ7xoDXUJwhKrFoz3MjRA52gw8PBLuL4YrFjg5YOMxaGaki9Zbh7sw/?=
+ =?us-ascii?Q?kN8CxlTSYGkylei8dAGVRiYm6SJCVwHOt0oFyye1Ax+4hgprin5Wv0+LIkzS?=
+ =?us-ascii?Q?GJmTIrxla0A0lDFtbOYYR1qnwkbiD+W8OHV/t6L0Nr71qWYc28hRKP0fAeQN?=
+ =?us-ascii?Q?Jx7V642djRh+43uiocQ8sc95w0rvYWFBtlA9WetCmh/YAOdGMwXXUqmggkj7?=
+ =?us-ascii?Q?JvyL6tvAZDv1u64VRygLsYnPr19gpOfl0F060cfYxNeZvMYgzcAPFT3h2One?=
+ =?us-ascii?Q?JuXTR4hD07WGU6fRNw9+XKEWlmEM4+rwCMi3VSXdMyvaecAhLEm4y9Z2MIFc?=
+ =?us-ascii?Q?94rIRWePKDvp5z39N/D0UvAZUvW5YTegFCmk7x9RkYGP0SvfpqyDLr7QKvUR?=
+ =?us-ascii?Q?sOBb/aB7/CzgaIqdcw/q49tGAptY+4kzE9awaeeUtYm+az7+83o6cu1apdvn?=
+ =?us-ascii?Q?BBgN6880PJq2+4ou+s9bQ0quEAI3BPTxvLJz2pX7CfIlRwZEw0H0JNLIU2QN?=
+ =?us-ascii?Q?4Hz7Pv4JneqpuB8bhKFvnZuM+YXoB+W9EmCTQX2ydIWhhpxsmoKMGZ8mU+vz?=
+ =?us-ascii?Q?yU16KP0yxsk/6ToBd3+ibgTFbxXb0xs2U24nC4jrl/ea9eeqekzdId/5J7So?=
+ =?us-ascii?Q?Q+kLj/Fk4TxtGmD+qhSo9KITipTIqaxh7piBL0EB?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9bdd3356-dd6c-4f08-3af9-08dbea3d2649
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Nov 2023 02:54:15.8935
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pYLPao7YbX/GtBLF13MfnJOmG/tSL52sqC4Dh6vh8oAc5E0jV0fyIZZmPm7so0e2WNygOQeq9WeuxIkC9nO/rw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4612
+X-OriginatorOrg: intel.com
 
-From: Lingyu Liu <lingyu.liu@intel.com>
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Tuesday, November 21, 2023 7:05 AM
+>=20
+> On Mon, Nov 20, 2023 at 08:26:31AM +0000, Tian, Kevin wrote:
+> > > From: Liu, Yi L <yi.l.liu@intel.com>
+> > > Sent: Friday, November 17, 2023 9:18 PM
+> > >
+> > > This adds the data structure for flushing iotlb for the nested domain
+> > > allocated with IOMMU_HWPT_DATA_VTD_S1 type.
+> > >
+> > > This only supports invalidating IOTLB, but no for device-TLB as devic=
+e-TLB
+> > > invalidation will be covered automatically in the IOTLB invalidation =
+if the
+> > > underlying IOMMU driver has enabled ATS for the affected device.
+> >
+> > "no for device-TLB" is misleading. Here just say that cache invalidatio=
+n
+> > request applies to both IOTLB and device TLB (if ATS is enabled ...)
+>=20
+> I think we should forward the ATS invalidation from the guest too?
+> That is what ARM and AMD will have to do, can we keep them all
+> consistent?
+>=20
+> I understand Intel keeps track of enough stuff to know what the RIDs
+> are, but is it necessary to make it different?
+>=20
 
-Add a vendor-specific vfio_pci driver for E800 devices.
+probably ask the other way. Now intel-iommu driver always flushes
+iotlb and device tlb together then is it necessary to separate them
+in uAPI for no good (except doubled syscalls)? :)
 
-It uses vfio_pci_core to register to the VFIO subsystem and then
-implements the E800 specific logic to support VF live migration.
-
-It implements the device state transition flow for live
-migration.
-
-Signed-off-by: Lingyu Liu <lingyu.liu@intel.com>
-Signed-off-by: Yahui Cao <yahui.cao@intel.com>
----
- MAINTAINERS                         |   7 +
- drivers/vfio/pci/Kconfig            |   2 +
- drivers/vfio/pci/Makefile           |   2 +
- drivers/vfio/pci/ice/Kconfig        |  10 +
- drivers/vfio/pci/ice/Makefile       |   4 +
- drivers/vfio/pci/ice/ice_vfio_pci.c | 707 ++++++++++++++++++++++++++++
- 6 files changed, 732 insertions(+)
- create mode 100644 drivers/vfio/pci/ice/Kconfig
- create mode 100644 drivers/vfio/pci/ice/Makefile
- create mode 100644 drivers/vfio/pci/ice/ice_vfio_pci.c
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 97f51d5ec1cf..c8faf7fe1bd1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -22860,6 +22860,13 @@ L:	kvm@vger.kernel.org
- S:	Maintained
- F:	drivers/vfio/pci/mlx5/
- 
-+VFIO ICE PCI DRIVER
-+M:	Yahui Cao <yahui.cao@intel.com>
-+M:	Lingyu Liu <lingyu.liu@intel.com>
-+L:	kvm@vger.kernel.org
-+S:	Maintained
-+F:	drivers/vfio/pci/ice/
-+
- VFIO PCI DEVICE SPECIFIC DRIVERS
- R:	Jason Gunthorpe <jgg@nvidia.com>
- R:	Yishai Hadas <yishaih@nvidia.com>
-diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-index 8125e5f37832..6618208947af 100644
---- a/drivers/vfio/pci/Kconfig
-+++ b/drivers/vfio/pci/Kconfig
-@@ -65,4 +65,6 @@ source "drivers/vfio/pci/hisilicon/Kconfig"
- 
- source "drivers/vfio/pci/pds/Kconfig"
- 
-+source "drivers/vfio/pci/ice/Kconfig"
-+
- endmenu
-diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-index 45167be462d8..fc1df82df3ac 100644
---- a/drivers/vfio/pci/Makefile
-+++ b/drivers/vfio/pci/Makefile
-@@ -13,3 +13,5 @@ obj-$(CONFIG_MLX5_VFIO_PCI)           += mlx5/
- obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisilicon/
- 
- obj-$(CONFIG_PDS_VFIO_PCI) += pds/
-+
-+obj-$(CONFIG_ICE_VFIO_PCI) += ice/
-diff --git a/drivers/vfio/pci/ice/Kconfig b/drivers/vfio/pci/ice/Kconfig
-new file mode 100644
-index 000000000000..0b8cd1489073
---- /dev/null
-+++ b/drivers/vfio/pci/ice/Kconfig
-@@ -0,0 +1,10 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+config ICE_VFIO_PCI
-+	tristate "VFIO support for Intel(R) Ethernet Connection E800 Series"
-+	depends on ICE
-+	select VFIO_PCI_CORE
-+	help
-+	  This provides migration support for Intel(R) Ethernet connection E800
-+	  series devices using the VFIO framework.
-+
-+	  If you don't know what to do here, say N.
-diff --git a/drivers/vfio/pci/ice/Makefile b/drivers/vfio/pci/ice/Makefile
-new file mode 100644
-index 000000000000..259d4ab89105
---- /dev/null
-+++ b/drivers/vfio/pci/ice/Makefile
-@@ -0,0 +1,4 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_ICE_VFIO_PCI) += ice-vfio-pci.o
-+ice-vfio-pci-y := ice_vfio_pci.o
-+
-diff --git a/drivers/vfio/pci/ice/ice_vfio_pci.c b/drivers/vfio/pci/ice/ice_vfio_pci.c
-new file mode 100644
-index 000000000000..28a181aa2f3f
---- /dev/null
-+++ b/drivers/vfio/pci/ice/ice_vfio_pci.c
-@@ -0,0 +1,707 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (C) 2018-2023 Intel Corporation */
-+
-+#include <linux/device.h>
-+#include <linux/module.h>
-+#include <linux/types.h>
-+#include <linux/file.h>
-+#include <linux/pci.h>
-+#include <linux/vfio_pci_core.h>
-+#include <linux/net/intel/ice_migration.h>
-+#include <linux/anon_inodes.h>
-+
-+#define DRIVER_DESC     "ICE VFIO PCI - User Level meta-driver for Intel E800 device family"
-+
-+struct ice_vfio_pci_migration_file {
-+	struct file *filp;
-+	struct mutex lock; /* protect migration file access */
-+	bool disabled;
-+
-+	u8 mig_data[SZ_128K];
-+	size_t total_length;
-+};
-+
-+struct ice_vfio_pci_core_device {
-+	struct vfio_pci_core_device core_device;
-+	u8 deferred_reset:1;
-+	struct mutex state_mutex; /* protect migration state */
-+	enum vfio_device_mig_state mig_state;
-+	/* protect the reset_done flow */
-+	spinlock_t reset_lock;
-+	struct ice_vfio_pci_migration_file *resuming_migf;
-+	struct ice_vfio_pci_migration_file *saving_migf;
-+	struct vfio_device_migration_info mig_info;
-+	u8 *mig_data;
-+	struct ice_pf *pf;
-+	int vf_id;
-+};
-+
-+/**
-+ * ice_vfio_pci_load_state - VFIO device state reloading
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ *
-+ * Load device state. This function is called when the userspace VFIO uAPI
-+ * consumer wants to load the device state info from VFIO migration region and
-+ * load them into the device. This function should make sure all the device
-+ * state info is loaded successfully. As a result, return value is mandatory
-+ * to be checked.
-+ *
-+ * Return 0 for success, negative value for failure.
-+ */
-+static int __must_check
-+ice_vfio_pci_load_state(struct ice_vfio_pci_core_device *ice_vdev)
-+{
-+	struct ice_vfio_pci_migration_file *migf = ice_vdev->resuming_migf;
-+
-+	return ice_migration_load_devstate(ice_vdev->pf,
-+					   ice_vdev->vf_id,
-+					   migf->mig_data,
-+					   migf->total_length);
-+}
-+
-+/**
-+ * ice_vfio_pci_save_state - VFIO device state saving
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ * @migf: pointer to migration file
-+ *
-+ * Snapshot the device state and save it. This function is called when the
-+ * VFIO uAPI consumer wants to snapshot the current device state and saves
-+ * it into the VFIO migration region. This function should make sure all
-+ * of the device state info is collectted and saved successfully. As a
-+ * result, return value is mandatory to be checked.
-+ *
-+ * Return 0 for success, negative value for failure.
-+ */
-+static int __must_check
-+ice_vfio_pci_save_state(struct ice_vfio_pci_core_device *ice_vdev,
-+			struct ice_vfio_pci_migration_file *migf)
-+{
-+	migf->total_length = SZ_128K;
-+
-+	return ice_migration_save_devstate(ice_vdev->pf,
-+					   ice_vdev->vf_id,
-+					   migf->mig_data,
-+					   migf->total_length);
-+}
-+
-+/**
-+ * ice_vfio_migration_init - Initialization for live migration function
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ *
-+ * Returns 0 on success, negative value on error
-+ */
-+static int ice_vfio_migration_init(struct ice_vfio_pci_core_device *ice_vdev)
-+{
-+	struct pci_dev *pdev = ice_vdev->core_device.pdev;
-+
-+	ice_vdev->pf = ice_migration_get_pf(pdev);
-+	if (!ice_vdev->pf)
-+		return -EFAULT;
-+
-+	ice_vdev->vf_id = pci_iov_vf_id(pdev);
-+	if (ice_vdev->vf_id < 0)
-+		return -EINVAL;
-+
-+	return ice_migration_init_dev(ice_vdev->pf, ice_vdev->vf_id);
-+}
-+
-+/**
-+ * ice_vfio_migration_uninit - Cleanup for live migration function
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ */
-+static void ice_vfio_migration_uninit(struct ice_vfio_pci_core_device *ice_vdev)
-+{
-+	ice_migration_uninit_dev(ice_vdev->pf, ice_vdev->vf_id);
-+}
-+
-+/**
-+ * ice_vfio_pci_disable_fd - Close migration file
-+ * @migf: pointer to ice vfio pci migration file
-+ */
-+static void ice_vfio_pci_disable_fd(struct ice_vfio_pci_migration_file *migf)
-+{
-+	mutex_lock(&migf->lock);
-+	migf->disabled = true;
-+	migf->total_length = 0;
-+	migf->filp->f_pos = 0;
-+	mutex_unlock(&migf->lock);
-+}
-+
-+/**
-+ * ice_vfio_pci_disable_fds - Close migration files of ice vfio pci device
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ */
-+static void ice_vfio_pci_disable_fds(struct ice_vfio_pci_core_device *ice_vdev)
-+{
-+	if (ice_vdev->resuming_migf) {
-+		ice_vfio_pci_disable_fd(ice_vdev->resuming_migf);
-+		fput(ice_vdev->resuming_migf->filp);
-+		ice_vdev->resuming_migf = NULL;
-+	}
-+	if (ice_vdev->saving_migf) {
-+		ice_vfio_pci_disable_fd(ice_vdev->saving_migf);
-+		fput(ice_vdev->saving_migf->filp);
-+		ice_vdev->saving_migf = NULL;
-+	}
-+}
-+
-+/*
-+ * This function is called in all state_mutex unlock cases to
-+ * handle a 'deferred_reset' if exists.
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ */
-+static void
-+ice_vfio_pci_state_mutex_unlock(struct ice_vfio_pci_core_device *ice_vdev)
-+{
-+again:
-+	spin_lock(&ice_vdev->reset_lock);
-+	if (ice_vdev->deferred_reset) {
-+		ice_vdev->deferred_reset = false;
-+		spin_unlock(&ice_vdev->reset_lock);
-+		ice_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-+		ice_vfio_pci_disable_fds(ice_vdev);
-+		goto again;
-+	}
-+	mutex_unlock(&ice_vdev->state_mutex);
-+	spin_unlock(&ice_vdev->reset_lock);
-+}
-+
-+static void ice_vfio_pci_reset_done(struct pci_dev *pdev)
-+{
-+	struct ice_vfio_pci_core_device *ice_vdev =
-+		(struct ice_vfio_pci_core_device *)dev_get_drvdata(&pdev->dev);
-+
-+	/*
-+	 * As the higher VFIO layers are holding locks across reset and using
-+	 * those same locks with the mm_lock we need to prevent ABBA deadlock
-+	 * with the state_mutex and mm_lock.
-+	 * In case the state_mutex was taken already we defer the cleanup work
-+	 * to the unlock flow of the other running context.
-+	 */
-+	spin_lock(&ice_vdev->reset_lock);
-+	ice_vdev->deferred_reset = true;
-+	if (!mutex_trylock(&ice_vdev->state_mutex)) {
-+		spin_unlock(&ice_vdev->reset_lock);
-+		return;
-+	}
-+	spin_unlock(&ice_vdev->reset_lock);
-+	ice_vfio_pci_state_mutex_unlock(ice_vdev);
-+}
-+
-+/**
-+ * ice_vfio_pci_open_device - Called when a vfio device is probed by VFIO UAPI
-+ * @core_vdev: the vfio device to open
-+ *
-+ * Initialization of the vfio device
-+ *
-+ * Returns 0 on success, negative value on error
-+ */
-+static int ice_vfio_pci_open_device(struct vfio_device *core_vdev)
-+{
-+	struct ice_vfio_pci_core_device *ice_vdev = container_of(core_vdev,
-+			struct ice_vfio_pci_core_device, core_device.vdev);
-+	struct vfio_pci_core_device *vdev = &ice_vdev->core_device;
-+	int ret;
-+
-+	ret = vfio_pci_core_enable(vdev);
-+	if (ret)
-+		return ret;
-+
-+	ret = ice_vfio_migration_init(ice_vdev);
-+	if (ret) {
-+		vfio_pci_core_disable(vdev);
-+		return ret;
-+	}
-+	ice_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-+	vfio_pci_core_finish_enable(vdev);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_vfio_pci_close_device - Called when a vfio device fd is closed
-+ * @core_vdev: the vfio device to close
-+ */
-+static void ice_vfio_pci_close_device(struct vfio_device *core_vdev)
-+{
-+	struct ice_vfio_pci_core_device *ice_vdev = container_of(core_vdev,
-+			struct ice_vfio_pci_core_device, core_device.vdev);
-+
-+	ice_vfio_pci_disable_fds(ice_vdev);
-+	vfio_pci_core_close_device(core_vdev);
-+	ice_vfio_migration_uninit(ice_vdev);
-+}
-+
-+/**
-+ * ice_vfio_pci_release_file - release ice vfio pci migration file
-+ * @inode: pointer to inode
-+ * @filp: pointer to the file to release
-+ *
-+ * Return 0 for success, negative for error
-+ */
-+static int ice_vfio_pci_release_file(struct inode *inode, struct file *filp)
-+{
-+	struct ice_vfio_pci_migration_file *migf = filp->private_data;
-+
-+	ice_vfio_pci_disable_fd(migf);
-+	mutex_destroy(&migf->lock);
-+	kfree(migf);
-+	return 0;
-+}
-+
-+/**
-+ * ice_vfio_pci_save_read - save migration file data to user space
-+ * @filp: pointer to migration file
-+ * @buf: pointer to user space buffer
-+ * @len: data length to be saved
-+ * @pos: should be 0
-+ *
-+ * Return len of saved data, negative for error
-+ */
-+static ssize_t ice_vfio_pci_save_read(struct file *filp, char __user *buf,
-+				      size_t len, loff_t *pos)
-+{
-+	struct ice_vfio_pci_migration_file *migf = filp->private_data;
-+	loff_t *off = &filp->f_pos;
-+	ssize_t done = 0;
-+	int ret;
-+
-+	if (pos)
-+		return -ESPIPE;
-+
-+	mutex_lock(&migf->lock);
-+	if (*off > migf->total_length) {
-+		done = -EINVAL;
-+		goto out_unlock;
-+	}
-+
-+	if (migf->disabled) {
-+		done = -ENODEV;
-+		goto out_unlock;
-+	}
-+
-+	len = min_t(size_t, migf->total_length - *off, len);
-+	if (len) {
-+		ret = copy_to_user(buf, migf->mig_data + *off, len);
-+		if (ret) {
-+			done = -EFAULT;
-+			goto out_unlock;
-+		}
-+		*off += len;
-+		done = len;
-+	}
-+out_unlock:
-+	mutex_unlock(&migf->lock);
-+	return done;
-+}
-+
-+static const struct file_operations ice_vfio_pci_save_fops = {
-+	.owner = THIS_MODULE,
-+	.read = ice_vfio_pci_save_read,
-+	.release = ice_vfio_pci_release_file,
-+	.llseek = no_llseek,
-+};
-+
-+/**
-+ * ice_vfio_pci_stop_copy - create migration file and save migration state to it
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ *
-+ * Return migration file handler
-+ */
-+static struct ice_vfio_pci_migration_file *
-+ice_vfio_pci_stop_copy(struct ice_vfio_pci_core_device *ice_vdev)
-+{
-+	struct ice_vfio_pci_migration_file *migf;
-+	int ret;
-+
-+	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
-+	if (!migf)
-+		return ERR_PTR(-ENOMEM);
-+
-+	migf->filp = anon_inode_getfile("ice_vfio_pci_mig",
-+					&ice_vfio_pci_save_fops, migf,
-+					O_RDONLY);
-+	if (IS_ERR(migf->filp)) {
-+		int err = PTR_ERR(migf->filp);
-+
-+		kfree(migf);
-+		return ERR_PTR(err);
-+	}
-+
-+	stream_open(migf->filp->f_inode, migf->filp);
-+	mutex_init(&migf->lock);
-+
-+	ret = ice_vfio_pci_save_state(ice_vdev, migf);
-+	if (ret) {
-+		fput(migf->filp);
-+		kfree(migf);
-+		return ERR_PTR(ret);
-+	}
-+
-+	return migf;
-+}
-+
-+/**
-+ * ice_vfio_pci_resume_write- copy migration file data from user space
-+ * @filp: pointer to migration file
-+ * @buf: pointer to user space buffer
-+ * @len: data length to be copied
-+ * @pos: should be 0
-+ *
-+ * Return len of saved data, negative for error
-+ */
-+static ssize_t
-+ice_vfio_pci_resume_write(struct file *filp, const char __user *buf,
-+			  size_t len, loff_t *pos)
-+{
-+	struct ice_vfio_pci_migration_file *migf = filp->private_data;
-+	loff_t *off = &filp->f_pos;
-+	loff_t requested_length;
-+	ssize_t done = 0;
-+	int ret;
-+
-+	if (pos)
-+		return -ESPIPE;
-+
-+	if (*off < 0 ||
-+	    check_add_overflow((loff_t)len, *off, &requested_length))
-+		return -EINVAL;
-+
-+	if (requested_length > sizeof(migf->mig_data))
-+		return -ENOMEM;
-+
-+	mutex_lock(&migf->lock);
-+	if (migf->disabled) {
-+		done = -ENODEV;
-+		goto out_unlock;
-+	}
-+
-+	ret = copy_from_user(migf->mig_data + *off, buf, len);
-+	if (ret) {
-+		done = -EFAULT;
-+		goto out_unlock;
-+	}
-+	*off += len;
-+	done = len;
-+	migf->total_length += len;
-+out_unlock:
-+	mutex_unlock(&migf->lock);
-+	return done;
-+}
-+
-+static const struct file_operations ice_vfio_pci_resume_fops = {
-+	.owner = THIS_MODULE,
-+	.write = ice_vfio_pci_resume_write,
-+	.release = ice_vfio_pci_release_file,
-+	.llseek = no_llseek,
-+};
-+
-+/**
-+ * ice_vfio_pci_resume - create resuming migration file
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ *
-+ * Return migration file handler, negative value for failure
-+ */
-+static struct ice_vfio_pci_migration_file *
-+ice_vfio_pci_resume(struct ice_vfio_pci_core_device *ice_vdev)
-+{
-+	struct ice_vfio_pci_migration_file *migf;
-+
-+	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
-+	if (!migf)
-+		return ERR_PTR(-ENOMEM);
-+
-+	migf->filp = anon_inode_getfile("ice_vfio_pci_mig",
-+					&ice_vfio_pci_resume_fops, migf,
-+					O_WRONLY);
-+	if (IS_ERR(migf->filp)) {
-+		int err = PTR_ERR(migf->filp);
-+
-+		kfree(migf);
-+		return ERR_PTR(err);
-+	}
-+
-+	stream_open(migf->filp->f_inode, migf->filp);
-+	mutex_init(&migf->lock);
-+	return migf;
-+}
-+
-+/**
-+ * ice_vfio_pci_step_device_state_locked - process device state change
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ * @new: new device state
-+ * @final: final device state
-+ *
-+ * Return migration file handler or NULL for success, negative value for failure
-+ */
-+static struct file *
-+ice_vfio_pci_step_device_state_locked(struct ice_vfio_pci_core_device *ice_vdev,
-+				      u32 new, u32 final)
-+{
-+	u32 cur = ice_vdev->mig_state;
-+	int ret;
-+
-+	if (cur == VFIO_DEVICE_STATE_RUNNING &&
-+	    new == VFIO_DEVICE_STATE_RUNNING_P2P) {
-+		ice_migration_suspend_dev(ice_vdev->pf, ice_vdev->vf_id);
-+		return NULL;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P &&
-+	    new == VFIO_DEVICE_STATE_STOP)
-+		return NULL;
-+
-+	if (cur == VFIO_DEVICE_STATE_STOP &&
-+	    new == VFIO_DEVICE_STATE_STOP_COPY) {
-+		struct ice_vfio_pci_migration_file *migf;
-+
-+		migf = ice_vfio_pci_stop_copy(ice_vdev);
-+		if (IS_ERR(migf))
-+			return ERR_CAST(migf);
-+		get_file(migf->filp);
-+		ice_vdev->saving_migf = migf;
-+		return migf->filp;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_STOP_COPY &&
-+	    new == VFIO_DEVICE_STATE_STOP) {
-+		ice_vfio_pci_disable_fds(ice_vdev);
-+		return NULL;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_STOP &&
-+	    new == VFIO_DEVICE_STATE_RESUMING) {
-+		struct ice_vfio_pci_migration_file *migf;
-+
-+		migf = ice_vfio_pci_resume(ice_vdev);
-+		if (IS_ERR(migf))
-+			return ERR_CAST(migf);
-+		get_file(migf->filp);
-+		ice_vdev->resuming_migf = migf;
-+		return migf->filp;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_RESUMING && new == VFIO_DEVICE_STATE_STOP)
-+		return NULL;
-+
-+	if (cur == VFIO_DEVICE_STATE_STOP &&
-+	    new == VFIO_DEVICE_STATE_RUNNING_P2P) {
-+		ret = ice_vfio_pci_load_state(ice_vdev);
-+		if (ret)
-+			return ERR_PTR(ret);
-+		ice_vfio_pci_disable_fds(ice_vdev);
-+		return NULL;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P &&
-+	    new == VFIO_DEVICE_STATE_RUNNING)
-+		return NULL;
-+
-+	/*
-+	 * vfio_mig_get_next_state() does not use arcs other than the above
-+	 */
-+	WARN_ON(true);
-+	return ERR_PTR(-EINVAL);
-+}
-+
-+/**
-+ * ice_vfio_pci_set_device_state - Config device state
-+ * @vdev: pointer to vfio pci device
-+ * @new_state: device state
-+ *
-+ * Return 0 for success, negative value for failure.
-+ */
-+static struct file *
-+ice_vfio_pci_set_device_state(struct vfio_device *vdev,
-+			      enum vfio_device_mig_state new_state)
-+{
-+	struct ice_vfio_pci_core_device *ice_vdev =
-+			container_of(vdev,
-+				     struct ice_vfio_pci_core_device,
-+				     core_device.vdev);
-+	enum vfio_device_mig_state next_state;
-+	struct file *res = NULL;
-+	int ret;
-+
-+	mutex_lock(&ice_vdev->state_mutex);
-+	while (new_state != ice_vdev->mig_state) {
-+		ret = vfio_mig_get_next_state(vdev, ice_vdev->mig_state,
-+					      new_state, &next_state);
-+		if (ret) {
-+			res = ERR_PTR(ret);
-+			break;
-+		}
-+		res = ice_vfio_pci_step_device_state_locked(ice_vdev,
-+							    next_state,
-+							    new_state);
-+		if (IS_ERR(res))
-+			break;
-+		ice_vdev->mig_state = next_state;
-+		if (WARN_ON(res && new_state != ice_vdev->mig_state)) {
-+			fput(res);
-+			res = ERR_PTR(-EINVAL);
-+			break;
-+		}
-+	}
-+	ice_vfio_pci_state_mutex_unlock(ice_vdev);
-+	return res;
-+}
-+
-+/**
-+ * ice_vfio_pci_get_device_state - get device state
-+ * @vdev: pointer to vfio pci device
-+ * @curr_state: device state
-+ *
-+ * Return 0 for success
-+ */
-+static int ice_vfio_pci_get_device_state(struct vfio_device *vdev,
-+					 enum vfio_device_mig_state *curr_state)
-+{
-+	struct ice_vfio_pci_core_device *ice_vdev =
-+			container_of(vdev,
-+				     struct ice_vfio_pci_core_device,
-+				     core_device.vdev);
-+	mutex_lock(&ice_vdev->state_mutex);
-+	*curr_state = ice_vdev->mig_state;
-+	ice_vfio_pci_state_mutex_unlock(ice_vdev);
-+	return 0;
-+}
-+
-+/**
-+ * ice_vfio_pci_get_data_size - get migration data size
-+ * @vdev: pointer to vfio pci device
-+ * @stop_copy_length: migration data size
-+ *
-+ * Return 0 for success
-+ */
-+static int
-+ice_vfio_pci_get_data_size(struct vfio_device *vdev,
-+			   unsigned long *stop_copy_length)
-+{
-+	*stop_copy_length = SZ_128K;
-+	return 0;
-+}
-+
-+static const struct vfio_migration_ops ice_vfio_pci_migrn_state_ops = {
-+	.migration_set_state = ice_vfio_pci_set_device_state,
-+	.migration_get_state = ice_vfio_pci_get_device_state,
-+	.migration_get_data_size = ice_vfio_pci_get_data_size,
-+};
-+
-+/**
-+ * ice_vfio_pci_core_init_dev - initialize vfio device
-+ * @core_vdev: pointer to vfio device
-+ *
-+ * Return 0 for success
-+ */
-+static int ice_vfio_pci_core_init_dev(struct vfio_device *core_vdev)
-+{
-+	struct ice_vfio_pci_core_device *ice_vdev = container_of(core_vdev,
-+			struct ice_vfio_pci_core_device, core_device.vdev);
-+
-+	mutex_init(&ice_vdev->state_mutex);
-+	spin_lock_init(&ice_vdev->reset_lock);
-+
-+	core_vdev->migration_flags =
-+		VFIO_MIGRATION_STOP_COPY | VFIO_MIGRATION_P2P;
-+	core_vdev->mig_ops = &ice_vfio_pci_migrn_state_ops;
-+
-+	return vfio_pci_core_init_dev(core_vdev);
-+}
-+
-+static const struct vfio_device_ops ice_vfio_pci_ops = {
-+	.name		= "ice-vfio-pci",
-+	.init		= ice_vfio_pci_core_init_dev,
-+	.release	= vfio_pci_core_release_dev,
-+	.open_device	= ice_vfio_pci_open_device,
-+	.close_device	= ice_vfio_pci_close_device,
-+	.device_feature = vfio_pci_core_ioctl_feature,
-+	.read		= vfio_pci_core_read,
-+	.write		= vfio_pci_core_write,
-+	.ioctl		= vfio_pci_core_ioctl,
-+	.mmap		= vfio_pci_core_mmap,
-+	.request	= vfio_pci_core_request,
-+	.match		= vfio_pci_core_match,
-+	.bind_iommufd	= vfio_iommufd_physical_bind,
-+	.unbind_iommufd	= vfio_iommufd_physical_unbind,
-+	.attach_ioas	= vfio_iommufd_physical_attach_ioas,
-+	.detach_ioas	= vfio_iommufd_physical_detach_ioas,
-+};
-+
-+/**
-+ * ice_vfio_pci_probe - Device initialization routine
-+ * @pdev: PCI device information struct
-+ * @id: entry in ice_vfio_pci_table
-+ *
-+ * Returns 0 on success, negative on failure
-+ */
-+static int
-+ice_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-+{
-+	struct ice_vfio_pci_core_device *ice_vdev;
-+	int ret;
-+
-+	ice_vdev = vfio_alloc_device(ice_vfio_pci_core_device, core_device.vdev,
-+				     &pdev->dev, &ice_vfio_pci_ops);
-+	if (!ice_vdev)
-+		return -ENOMEM;
-+
-+	dev_set_drvdata(&pdev->dev, &ice_vdev->core_device);
-+
-+	ret = vfio_pci_core_register_device(&ice_vdev->core_device);
-+	if (ret)
-+		goto out_free;
-+
-+	return 0;
-+
-+out_free:
-+	vfio_put_device(&ice_vdev->core_device.vdev);
-+	return ret;
-+}
-+
-+/**
-+ * ice_vfio_pci_remove - Device removal routine
-+ * @pdev: PCI device information struct
-+ */
-+static void ice_vfio_pci_remove(struct pci_dev *pdev)
-+{
-+	struct ice_vfio_pci_core_device *ice_vdev =
-+		(struct ice_vfio_pci_core_device *)dev_get_drvdata(&pdev->dev);
-+
-+	vfio_pci_core_unregister_device(&ice_vdev->core_device);
-+	vfio_put_device(&ice_vdev->core_device.vdev);
-+}
-+
-+/* ice_pci_tbl - PCI Device ID Table
-+ *
-+ * Wildcard entries (PCI_ANY_ID) should come last
-+ * Last entry must be all 0s
-+ *
-+ * { Vendor ID, Device ID, SubVendor ID, SubDevice ID,
-+ *   Class, Class Mask, private data (not used) }
-+ */
-+static const struct pci_device_id ice_vfio_pci_table[] = {
-+	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, 0x1889) },
-+	{}
-+};
-+MODULE_DEVICE_TABLE(pci, ice_vfio_pci_table);
-+
-+static const struct pci_error_handlers ice_vfio_pci_core_err_handlers = {
-+	.reset_done = ice_vfio_pci_reset_done,
-+	.error_detected = vfio_pci_core_aer_err_detected,
-+};
-+
-+static struct pci_driver ice_vfio_pci_driver = {
-+	.name			= "ice-vfio-pci",
-+	.id_table		= ice_vfio_pci_table,
-+	.probe			= ice_vfio_pci_probe,
-+	.remove			= ice_vfio_pci_remove,
-+	.err_handler            = &ice_vfio_pci_core_err_handlers,
-+	.driver_managed_dma	= true,
-+};
-+
-+module_pci_driver(ice_vfio_pci_driver);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Intel Corporation, <linux.nics@intel.com>");
-+MODULE_DESCRIPTION(DRIVER_DESC);
--- 
-2.34.1
-
+anyway this is driver specific contract. I don't see a need to keep
+it consistent for all.
 
