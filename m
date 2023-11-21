@@ -1,50 +1,51 @@
-Return-Path: <kvm+bounces-2228-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2229-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 196DF7F3919
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 23:24:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0FB67F391D
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 23:26:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FA96282274
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 22:24:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59BC1282734
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 22:26:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F30D5647F;
-	Tue, 21 Nov 2023 22:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE565647F;
+	Tue, 21 Nov 2023 22:26:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Mn33OjYa"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dA2qu2yT"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5669113;
-	Tue, 21 Nov 2023 14:24:29 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2D4D191;
+	Tue, 21 Nov 2023 14:26:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=m52+IXebdwD+o47dWxkCvIIE+NowtwSOLHriCgg7Vsk=; b=Mn33OjYaHXs/9bBxpl60khi7DO
-	qJxp1c4rE6ZxjmNe0kps6nf9ZnnRllyRRVDuBtxbjvm8twRrDJrCS8UFLd0Wbaiu5N1uairH1a50R
-	5Q7xejt5ZKaiOuiEv9RFNgyqO4j4g7g/YDq45tmwf+OXy6wcsoHeDDwpjptYVYYeyBRAyaM8vcyoQ
-	P3Nj8Ez9hOLZVHFjaMqYIDiL/7sEH2b9q/kj9e0kFEqgQbheFqgRzmJfb3PYKOtMXq9jvmDSpRHxk
-	wWrDX9PEU9/DfHjmjssYDeVWTu4S5M4jVPCIedmAQ+H6h0FxUxOjTR1WUHgYf9UWJ9dCWzKr4reoY
-	wPL5qjFQ==;
+	bh=2fZr1mOnySmJPl/Y/EJ+vsBVASzJjZWY4v1+og3mauY=; b=dA2qu2yTXQDjwop8ybLnP9FxvQ
+	uEdHmFPtFO9IZbX7FrIxFGGO0SDA11zYvyPAPy0O6OOD/aeeXNXlogxJ92pGBRp7L4tcJTpUZZYYt
+	N528MMpgysAWQF4kU32YZ4M+xiP0MBI4PkuwefvpYmCoTTW1FFeLmRxWXviAs4c0ZboasReb5GnGa
+	hMYx/I+sxhC+HAWRVjWyU0fi3CFFHyE1iFZ5cVZkrZh5XHKQqJcpyTTO+FjcQs+ujycKuP+WUlHAs
+	cbRL10AjTlf7TSeWUvGi53WFcDxHSGZYJHCh4SrdE0h/sLsaKjlXQJoHLA9wQ9fsgzzl1IG5zYmVp
+	SssZkw8w==;
 Received: from [2001:8b0:10b:5:22b8:d80f:1c9c:f188] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1r5ZA9-005zAq-Bd; Tue, 21 Nov 2023 22:24:10 +0000
-Message-ID: <a1ebd80f87229fe513f9c2256982ef6c1d0cca2a.camel@infradead.org>
-Subject: Re: [PATCH v8 05/15] KVM: pfncache: remove KVM_GUEST_USES_PFN usage
+	id 1r5ZCC-005zLc-MA; Tue, 21 Nov 2023 22:26:16 +0000
+Message-ID: <9f786e00b336b67ef9b623b73db1caca226e8c68.camel@infradead.org>
+Subject: Re: [PATCH v8 06/15] KVM: pfncache: stop open-coding
+ offset_in_page()
 From: David Woodhouse <dwmw2@infradead.org>
 To: Paul Durrant <paul@xen.org>, Sean Christopherson <seanjc@google.com>, 
  Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
  Ingo Molnar <mingo@redhat.com>,  Borislav Petkov <bp@alien8.de>, Dave
  Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
  <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Tue, 21 Nov 2023 22:24:08 +0000
-In-Reply-To: <20231121180223.12484-6-paul@xen.org>
+Date: Tue, 21 Nov 2023 22:26:16 +0000
+In-Reply-To: <20231121180223.12484-7-paul@xen.org>
 References: <20231121180223.12484-1-paul@xen.org>
-	 <20231121180223.12484-6-paul@xen.org>
+	 <20231121180223.12484-7-paul@xen.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-/OqmNbqRFTsXEF4dgCOU"
+	boundary="=-XV+EXdqiSqcg+H+Xoe+e"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -55,60 +56,22 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-/OqmNbqRFTsXEF4dgCOU
+--=-XV+EXdqiSqcg+H+Xoe+e
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Tue, 2023-11-21 at 18:02 +0000, Paul Durrant wrote:
 > From: Paul Durrant <pdurrant@amazon.com>
 >=20
-> As noted in [1] the KVM_GUEST_USES_PFN usage flag is never set by any
-> callers of kvm_gpc_init(), which also makes the 'vcpu' argument redundant=
-.
-> Moreover, all existing callers specify KVM_HOST_USES_PFN so the usage
-> check in hva_to_pfn_retry() and hence the 'usage' argument to
-> kvm_gpc_init() are also redundant.
-> Remove the pfn_cache_usage enumeration and remove the redundant arguments=
-,
-> fields of struct gfn_to_hva_cache, and all the related code.
->=20
-> [1] https://lore.kernel.org/all/ZQiR8IpqOZrOpzHC@google.com/
+> Some code in pfncache uses offset_in_page() but in other places it is ope=
+n-
+> coded. Use offset_in_page() consistently everywhere.
 >=20
 > Signed-off-by: Paul Durrant <pdurrant@amazon.com>
 
-I think it's https://lore.kernel.org/all/ZBEEQtmtNPaEqU1i@google.com/
-which is the key reference. I'm not sure I'm 100% on board, but I never
-got round to replying to Sean's email because it was one of those "put
-up or shut up situations" and I didn't have the bandwidth to actually
-write the code to prove my point.
-
-I think it *is* important to support non-pinned pages. There's a reason
-we even made the vapic page migratable. We want to support memory
-hotplug, we want to cope with machine checks telling us to move certain
-pages (which I suppose is memory hotplug). See commit 38b9917350cb
-("kvm: vmx: Implement set_apic_access_page_addr") for example.
-
-I agree that in the first round of the nVMX code there were bugs. And
-sure, of *course* it isn't sufficient to wire up the invalidation
-without either a KVM_REQ_SOMETHIMG to put it back, or just a *check* on
-the corresponding gpc on the way back into the guest. We'd have worked
-that out.
-
-And yes, the gpc has had bugs as we implemented it, but the point was
-that we got to something which *is* working, and forms a usable
-building block.
-
-So I'm not really sold on the idea of ditching KVM_GUEST_USES_PFN. I
-think we could get it working, and I think it's worth it. But my
-opinion is worth very little unless I express it in 'diff -up' form
-instead of prose, and reverting this particular patch is the least of
-my barriers to doing so, so reluctantly...
-
-
 Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
-
---=-/OqmNbqRFTsXEF4dgCOU
+--=-XV+EXdqiSqcg+H+Xoe+e
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -200,25 +163,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTIxMjIyNDA4WjAvBgkqhkiG9w0BCQQxIgQgdxf9ne/9
-CjhCXmSAczZdKGh2z9yIMffkpjXu1X+d5yUwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTIxMjIyNjE2WjAvBgkqhkiG9w0BCQQxIgQgRgx8JtRz
+fvmJEete53+2GqDdoWmPERYwzdUJyDLdC0gwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBuLN7E1OpK9Fj4Vn4W4V6afY0RXZUKye9A
-SXRq8kT+fG76bTFnDwA8/7ZKWB8nlM4hAsz0GIDrnX+2Eg4YECHPpE+YrdTKEEqalp9R+l8uTanl
-gdLUy8p6LtC7ELdtTBgXCFCwkvX7icDzRHC2YISeFAwlLdHEyJJ/PPApo065tkv3Z6NmdiKYW4sc
-vm0L7Ar7uaAeaFiaSLhMbM+I84FqB8Y3Um5qIQd9znDlQOlkKBJrEsKLOjSOEmOABI54UuoHosZe
-NMi4CvQW8LzPAmWBn6FD6Ki762mjMWPxNxGRq3hEeVd7YU56JalwwSWa/nnZle/EfSKiQCmn9jFH
-xY7BqdyKaR7QhzPBj2KbNZicYbnDKttM+fczteWH13zC86VLrCH+FvYcLSHJDvr4EpmaZhuH2Jb2
-q0n6+Nh4i7j7WOPDbybVZYZ/Oe4LbVBDE4HGIo/2BlqEDwZW/tMkQjgMXZKiMmN+6vxW3JikJn5Q
-njsxoP4eHD4WABAa4unMKpW3WYEdKvljDZo0SuMFu49rD1fhDDZfyWY+MIZPApPCJMmcc+wg7CDy
-Pg9OYz/bk1FZ3ztw1Wj8iqIgEe7dIOLm/zdE4hDJJ/UqSl9efkmCh26hNpB8sUMxaaivCdryIvb4
-H8R0QBy6p4GZUNpY9bhuh7uWQjXFrZg8GLAis6p6TAAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBQb2e2YAFkAypPXImMpsGSjXxmD4feewFx
+wZro9WUkJGyL0KJrFXo2ub4rZel5uzwZeQo/S40HpZSXzzJ7/5pZSdHVuaoy55AshWeg8qS8kpkz
++13g6BpqlF159r+vqJzoqE5ukO6CNREH7dFXceztQ6u+HGW2bai/SjXtNGOuGaVBLi6j+4xDgkr5
+Bnf1QurYfF1m2DmIiPXj6yW74nRT09bCcYn3xD7wwX/tH9EJqn8DUcUUt2zQXzeF9ozLjnZl2jFy
+roblwxjSCqBmXrD1z8uUp33IjS8khGnaY/g8UYDBYQZBwstYouWtB9b1Qzmp7MZLKwuTEuPz7LN/
+TZ32rNu3u19sBUKJivTvMCQDo9NHUx+5ufMzQr2ZHV3QqkQIFNzf9dlMFKsWRlfFCunB35cF5Sac
+v2er1K6O7RWLQsfpW5HcgcjO+XfI21ohHH415+KAp+qjujEfRAlEu5Dqx0ucUZRmYgVqdLsg43vl
+LLhjLUl1TcRLgp4RgebuUMvXV6eexXkZGMCoTAS2Ah0hdyt5+kjTAvdM5JssqhLPCDKReC6mHxs1
+0Puv6Z5R+JolZ1NdEHjii6NANuWrXWug0rLgglO9AQQcqVNAHrV+oous4FI/6dN6EpkldyVSIB66
+Dobi2PNRWWeLnqDq5tFpYz5oAbT1m0/pDdup00qdcAAAAAAAAA==
 
 
---=-/OqmNbqRFTsXEF4dgCOU--
+--=-XV+EXdqiSqcg+H+Xoe+e--
 
