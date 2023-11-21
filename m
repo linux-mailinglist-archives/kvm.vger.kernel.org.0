@@ -1,158 +1,99 @@
-Return-Path: <kvm+bounces-2235-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2236-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A9047F399A
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 23:57:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8134A7F3A00
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 00:02:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC73CB2199F
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 22:57:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C3DA282B0C
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 23:02:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D29756740;
-	Tue, 21 Nov 2023 22:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440E33BB45;
+	Tue, 21 Nov 2023 23:02:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MtmmtrEV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T8Wkw69E"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D684DD;
-	Tue, 21 Nov 2023 14:56:58 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1cf6373ce31so2154975ad.0;
-        Tue, 21 Nov 2023 14:56:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700607418; x=1701212218; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pHi5YlXCcsX/D19JuU9Nw7CLS9+F6yhOBOO+wjnP29E=;
-        b=MtmmtrEVs8W0K7YmHL0aSsy4KlgbCiR/rzEoaxxd5xgwo6yySKIEcftF7a0eDvv5mW
-         sV3En1IQR2ITwWxA/VZvWTgYismKndDmu2SujOe6djQOnmzzw5WjZIG/jUf796bR1aMh
-         sh2pdnh1tpajr+3Mlca7eIzXmCJhVnnRAJ5DMHZO7Bmzhxs7oS0pe/9DI9kug2oTyeG/
-         JsF+ACBz/WxwiOu+PrN2SA/V4/lqhfbljF9Z19dghmlWxf/C2IstNvmhoPhbOF6VKUXI
-         dF+6V4pyoJoO00MS6/Yg4floS8gsSbgACoGnjkfmWA5weSVC/ixWDm+VfRESce3FI7d3
-         JoUA==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA0CA185
+	for <kvm@vger.kernel.org>; Tue, 21 Nov 2023 15:02:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700607740;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=35Vx+tN6z+QqmLpji6c9JPBO8+KdiIzwgrs9kWGJbWw=;
+	b=T8Wkw69EQYWGChwbXOKsU4Demxh2sUX4/9SuYYQWkfzoWR7hktjQUkkRbVcu+P6CBMu4lE
+	JQSK4GP/UtXK/bohnWUTjHeNYRrEJWwzUBDmqkhnxswo1jKJZ83DhPR5nUqHSI6QjgtFot
+	rwo9XA+WFDmgZ2TWY413bexLfpiUZA0=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-126-0TGc95F5NPCFzt6T6T8OkQ-1; Tue, 21 Nov 2023 18:02:19 -0500
+X-MC-Unique: 0TGc95F5NPCFzt6T6T8OkQ-1
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1cc49991f33so2552305ad.1
+        for <kvm@vger.kernel.org>; Tue, 21 Nov 2023 15:02:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700607418; x=1701212218;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=pHi5YlXCcsX/D19JuU9Nw7CLS9+F6yhOBOO+wjnP29E=;
-        b=iVwc9nEIheyTCs/+WJ+947PMVdO1zTldADUa5yo0JnccNN5/TOHzAd6HE5iwvqj6ih
-         QQuMihy4cGfbENu6+YvjKsWx5L9OUHt5L8jdzbukHqb/vcOszYzqT+iw6wz1JNEAFIsm
-         Xnr5JLAlqWhIcfoS6axPBhzgNsGE0oEENFztz6fIBzEglrJBg8jY78riOA/E8IbapcYb
-         Dc9/YcZ2XQd1hRBlBSgZ/YOXSrUZG4ecHIFrNp5yJFp2zRFKz2buE/VvGExSACXA+CCz
-         bntL2SVz7ABcJ3mywbqw9w2mdh5fJA4RadkIysAYFcK6PRR5fPhDJdhrKtFD3GvhXNaf
-         iq8g==
-X-Gm-Message-State: AOJu0YzMiCcI1hT2KwER33RCOLOmXYkzq2T7h6/cD4Yy6i7iHYd6jqxN
-	k5Jtk/ju2MK5utyvZoFCzXg=
-X-Google-Smtp-Source: AGHT+IE6s57NYG7jptMBdy5DVewa70KWUQtBlIN7PP5AfrSGIy85Ot97zH3PYYTC8wgjLQNl/n6VtQ==
-X-Received: by 2002:a17:902:c94b:b0:1c5:cf7c:4d50 with SMTP id i11-20020a170902c94b00b001c5cf7c4d50mr1008200pla.18.1700607418027;
-        Tue, 21 Nov 2023 14:56:58 -0800 (PST)
-Received: from bangji.hsd1.ca.comcast.net ([2601:647:6780:42e0:7377:923f:1ff3:266d])
-        by smtp.gmail.com with ESMTPSA id m12-20020a1709026bcc00b001cc47c1c29csm8413189plt.84.2023.11.21.14.56.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 14:56:57 -0800 (PST)
-Sender: Namhyung Kim <namhyung@gmail.com>
-From: Namhyung Kim <namhyung@kernel.org>
-To: Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>
-Cc: Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-perf-users@vger.kernel.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH 05/14] tools headers UAPI: Update tools's copy of vhost.h header
-Date: Tue, 21 Nov 2023 14:56:40 -0800
-Message-ID: <20231121225650.390246-5-namhyung@kernel.org>
-X-Mailer: git-send-email 2.43.0.rc1.413.gea7ed67945-goog
-In-Reply-To: <20231121225650.390246-1-namhyung@kernel.org>
-References: <20231121225650.390246-1-namhyung@kernel.org>
+        d=1e100.net; s=20230601; t=1700607738; x=1701212538;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=35Vx+tN6z+QqmLpji6c9JPBO8+KdiIzwgrs9kWGJbWw=;
+        b=a1yIyAitUjBIaMctmhtIFjfUz3JGelQGVPRfhQHFQGlBqZS2ZW/ed6vbNBRug5RxpV
+         py1BCUotpP/pjw7SK3+FxlqivBvKR+7WQRhJTLDElienBi3ea/eADfHzyeUwjCv3rjRd
+         p8+EOdt9B4PjnvvC7alWT7NpRHiaA7xf5xoF8jPL39KT7cG9+rFTQtEmuHPRHQ1trey5
+         uTkGR0IdHUPcrm7FIDVGehlN5srnAdcwIGOHM9Uob+DA5BqrG0bh72MLa58T8toUDkhh
+         H2AzHFl23hRVqN6+b+rFNiuAbBLXJ701QCW2RKA16RGJxOMWV4BHj/2gnJ/k5AtChckq
+         y8Vw==
+X-Gm-Message-State: AOJu0YwJ09Wm13wSe3QutXI7ShZpjSkk4eMhcv7lefggDm8WoG8YBl5K
+	vp81rDthiEa2PJB7wfdLFa2ZYCF2IbSFUcWJu+yx9SGC4tXvw7wIjhXQukEz9aseynlPiJqExIm
+	bBR4hzR9ZuCbiOM6Sdjmc
+X-Received: by 2002:a17:903:2341:b0:1cf:6832:46c with SMTP id c1-20020a170903234100b001cf6832046cmr903763plh.6.1700607738122;
+        Tue, 21 Nov 2023 15:02:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHQxNfDN/exMbNG8sxIbSIBwzNNSjvkEf3+l7v4sDzQROVAcylsUK1QJbli5gsAuBDSBNwd9g==
+X-Received: by 2002:a17:903:2341:b0:1cf:6832:46c with SMTP id c1-20020a170903234100b001cf6832046cmr903742plh.6.1700607737739;
+        Tue, 21 Nov 2023 15:02:17 -0800 (PST)
+Received: from ?IPV6:2001:8003:e5b0:9f00:b890:3e54:96bb:2a15? ([2001:8003:e5b0:9f00:b890:3e54:96bb:2a15])
+        by smtp.gmail.com with ESMTPSA id l14-20020a170902f68e00b001ca4ad86357sm8421321plg.227.2023.11.21.15.02.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Nov 2023 15:02:17 -0800 (PST)
+Message-ID: <647efdf8-66aa-4ea3-8625-bf657839f6f0@redhat.com>
+Date: Wed, 22 Nov 2023 09:02:13 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] selftests/kvm: fix compilation on non-x86_64 platforms
+Content-Language: en-US
+To: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+Cc: broonie@kernel.org
+References: <20231121165915.1170987-1-pbonzini@redhat.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20231121165915.1170987-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-tldr; Just FYI, I'm carrying this on the perf tools tree.
 
-Full explanation:
+On 11/22/23 02:59, Paolo Bonzini wrote:
+> MEM_REGION_SLOT and MEM_REGION_GPA are not really needed in
+> test_invalid_memory_region_flags; the VM never runs and there are no
+> other slots, so it is okay to use slot 0 and place it at address
+> zero.  This fixes compilation on architectures that do not
+> define them.
+> 
+> Fixes: 5d74316466f4 ("KVM: selftests: Add a memory region subtest to validate invalid flags", 2023-11-14)
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   tools/testing/selftests/kvm/set_memory_region_test.c | 12 ++++++------
+>   1 files changed, 6 insertions(+), 6 deletions(-)
+> 
 
-There used to be no copies, with tools/ code using kernel headers
-directly. From time to time tools/perf/ broke due to legitimate kernel
-hacking. At some point Linus complained about such direct usage. Then we
-adopted the current model.
-
-The way these headers are used in perf are not restricted to just
-including them to compile something.
-
-There are sometimes used in scripts that convert defines into string
-tables, etc, so some change may break one of these scripts, or new MSRs
-may use some different #define pattern, etc.
-
-E.g.:
-
-  $ ls -1 tools/perf/trace/beauty/*.sh | head -5
-  tools/perf/trace/beauty/arch_errno_names.sh
-  tools/perf/trace/beauty/drm_ioctl.sh
-  tools/perf/trace/beauty/fadvise.sh
-  tools/perf/trace/beauty/fsconfig.sh
-  tools/perf/trace/beauty/fsmount.sh
-  $
-  $ tools/perf/trace/beauty/fadvise.sh
-  static const char *fadvise_advices[] = {
-        [0] = "NORMAL",
-        [1] = "RANDOM",
-        [2] = "SEQUENTIAL",
-        [3] = "WILLNEED",
-        [4] = "DONTNEED",
-        [5] = "NOREUSE",
-  };
-  $
-
-The tools/perf/check-headers.sh script, part of the tools/ build
-process, points out changes in the original files.
-
-So its important not to touch the copies in tools/ when doing changes in
-the original kernel headers, that will be done later, when
-check-headers.sh inform about the change to the perf tools hackers.
-
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: kvm@vger.kernel.org
-Cc: virtualization@lists.linux.dev
-Cc: netdev@vger.kernel.org
-Signed-off-by: Namhyung Kim <namhyung@kernel.org>
----
- tools/include/uapi/linux/vhost.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/tools/include/uapi/linux/vhost.h b/tools/include/uapi/linux/vhost.h
-index f5c48b61ab62..649560c685f1 100644
---- a/tools/include/uapi/linux/vhost.h
-+++ b/tools/include/uapi/linux/vhost.h
-@@ -219,4 +219,12 @@
-  */
- #define VHOST_VDPA_RESUME		_IO(VHOST_VIRTIO, 0x7E)
- 
-+/* Get the group for the descriptor table including driver & device areas
-+ * of a virtqueue: read index, write group in num.
-+ * The virtqueue index is stored in the index field of vhost_vring_state.
-+ * The group ID of the descriptor table for this specific virtqueue
-+ * is returned via num field of vhost_vring_state.
-+ */
-+#define VHOST_VDPA_GET_VRING_DESC_GROUP	_IOWR(VHOST_VIRTIO, 0x7F,	\
-+					      struct vhost_vring_state)
- #endif
--- 
-2.43.0.rc1.413.gea7ed67945-goog
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 
 
