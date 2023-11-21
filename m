@@ -1,30 +1,30 @@
-Return-Path: <kvm+bounces-2160-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2161-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A28F7F2805
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 09:51:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 034067F285B
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 10:07:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7D20281D4B
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 08:51:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25C7D1C2115D
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 09:07:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A8D522335;
-	Tue, 21 Nov 2023 08:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B18331A87;
+	Tue, 21 Nov 2023 09:07:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="EOrskTKd"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="G63Feufj"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2133.outbound.protection.outlook.com [40.107.243.133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F57598
-	for <kvm@vger.kernel.org>; Tue, 21 Nov 2023 00:51:50 -0800 (PST)
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2132.outbound.protection.outlook.com [40.107.212.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F904E7
+	for <kvm@vger.kernel.org>; Tue, 21 Nov 2023 01:07:44 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cnAnzJaIsz7M5hztheHRROluS0e/J+Bt2/mWtLmL5A5KTk6fpTg+0/ywWMuXxOIRewaSmFGiCzbOAtUgA2t+12cJBuyBNOY+0f40B/ZLAwX7PiXxNnlOW9/VAWGXINjLy+FG5VJUwfwvXtlFnrUbKbuvQgpKyhrtjiQtocROXfxfHSyRKqIJHnCcXUOPb9kNGB2zdL2D0zoUuw/GqjVFWlgdjTnACKMLRSAGJZ5Ev3rLltAmnXxudofa5m3NxgCvZxIKPRjKS3hKwOpTaSKluyw4663YeWgt7fPoGPYGJ5y2yx6CHa5/tNCVkVda1LEXOSnIl6fd36aO+e6mRuShIw==
+ b=TSp440p9YJSZOj0Qr8P+R4M3IG+K8usMro+N12oBxGfrlDD41Il6Zw1jegI/U6BIxtldTsddsiFvE5qGAEdc+76QYXPcWSdqwE+TNEWbMxf7luGGJwOmfegPF4NzdOKoz0ucQIOltJjkffyBRYOEC2MsvKcc3oMQ0O3/XsY9DdGRuNZ+dPJCxSGKRWyq60HXSLoGRifhxufokPMLR3WCANnmVsFQs6EARKrqWOzOD7GqDOUYd4HFrWvttpTsMwB7nQn8Zu6I2XrVtAJV+1k0B2zINI53eqfI6VqKWWM6ZHyX3WBdQLTPWXGalbtj+A0Gz/0mmkq/sLneXfiSPFl/2A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BiZy5Aw5aw8eMFH/0/KMFLmy2xlGNPpYGimxXMvmF3Q=;
- b=YdOMtVE77lcjfk6LpqM+Hy9p5Ar70pleWWcR22DkM2Jealr0AUBLt+Zzf9kYd6dvmVH0NSG1pr/YIYnQ9e+Q7pz/AtSP35wdqTfaefBd5Hg4F76gnpmmsJoeK17HHhIIbR17eevC46+A/103RS1jYIoHLhkUw3SbGZChvrvORWuqUmdAUlU/AqKlOXhITALUXVs0FupfkMK7e7wq/Nc/hHqUJN+Q181niH86p99WLv3rgusn+q6BWV6FLDEI9EhOWnrQXuHlnlBGU+ht/3QM47WADDMAEtwYPjPs++II0hLsryoSzitGwMuNNnG4n/aX/L2SKldR7IwbwzferRK0QA==
+ bh=m0/QzgmTsOJ80XLBaSR8ZNBS3tn3t23lQ9NjqR36TWA=;
+ b=NcGF40gmBn1SIHg0JSlqCZJ7OJ8MflQJsXwK8j4rlTAGl9N9BWjw7mvEtIdDnp5P28i7lPwKB67zlUCF4a7HZ/C2/kkdTL/+wc+OLj5/3KLBxBt9E7krrG1OHL1E7+Ywm5Jm+g1RHPnLB0RdllvB2SS10JqcD8qIxvgoDez0+IdIDoFLKYlf6BrbdvDNoBveDEHViG1chGYglbX2MfoiUMq7boGRWSEaXxdgqvftGK9sCA0yv+dfDUc6YKo0Qc89c4kfZa+0znupBopQCD0yDUm9+LUkR03M+RTM8R7ehbuFoOOtPVLDqVrSoxAvGMMPY5Yf1J4LeVJ6NgC0Q37Ecw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
  header.from=os.amperecomputing.com; dkim=pass
@@ -32,23 +32,24 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BiZy5Aw5aw8eMFH/0/KMFLmy2xlGNPpYGimxXMvmF3Q=;
- b=EOrskTKdMcU1/lxT0fYx598afSqsyXm4ixRIJgWDcBZcM7B0iMc2o8nBHchfRzBgXIB56yCHCLzmIMqNK6iECFCvS4/RpgMBH4IJx7FTKcTD9WZ8rV3A9VYokX03mJAkHBG3UeUdXq1EkE9G0H4cd3mXbSHZPrOypOH+F3wcW9I=
+ bh=m0/QzgmTsOJ80XLBaSR8ZNBS3tn3t23lQ9NjqR36TWA=;
+ b=G63FeufjFBdeZAjfBo8GDkXa3bO5reR9KB5b9Xur1TiLgawy2+ctyKJQSV3wmU6RaimZumZ0efZviXHvSElGpuOmkB6UAndzzLoYd1E8bCTKJYekljHIWNYBwsgJIqvLHBdPjUpBVfLiOfRmxVypMgzO7VINN51ShrRCkNCmI74=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
 Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
- SA1PR01MB8061.prod.exchangelabs.com (2603:10b6:806:331::8) with Microsoft
+ SA1PR01MB6733.prod.exchangelabs.com (2603:10b6:806:1a0::12) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6954.28; Tue, 21 Nov 2023 08:51:46 +0000
+ 15.20.7002.28; Tue, 21 Nov 2023 09:07:41 +0000
 Received: from SJ2PR01MB8101.prod.exchangelabs.com
  ([fe80::9968:1c71:6cfe:6685]) by SJ2PR01MB8101.prod.exchangelabs.com
  ([fe80::9968:1c71:6cfe:6685%3]) with mapi id 15.20.7002.027; Tue, 21 Nov 2023
- 08:51:46 +0000
-Message-ID: <a44660c4-e43a-4663-94c0-9b290ea755e3@os.amperecomputing.com>
-Date: Tue, 21 Nov 2023 14:21:35 +0530
+ 09:07:41 +0000
+Message-ID: <2e25b427-9df6-42f7-99b3-bb2d01a0f0c4@os.amperecomputing.com>
+Date: Tue, 21 Nov 2023 14:37:30 +0530
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support
- (FEAT_NV2 only)
+Subject: Re: [PATCH v11 01/43] arm64: cpufeatures: Restrict NV support to
+ FEAT_NV2
+Content-Language: en-US
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
  kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -62,13 +63,13 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
  Suzuki K Poulose <suzuki.poulose@arm.com>,
  Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
 References: <20231120131027.854038-1-maz@kernel.org>
-Content-Language: en-US
+ <20231120131027.854038-2-maz@kernel.org>
 From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-In-Reply-To: <20231120131027.854038-1-maz@kernel.org>
+In-Reply-To: <20231120131027.854038-2-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH0PR13CA0039.namprd13.prod.outlook.com
- (2603:10b6:610:b2::14) To SJ2PR01MB8101.prod.exchangelabs.com
+X-ClientProxiedBy: CH2PR14CA0015.namprd14.prod.outlook.com
+ (2603:10b6:610:60::25) To SJ2PR01MB8101.prod.exchangelabs.com
  (2603:10b6:a03:4f6::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -77,224 +78,162 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|SA1PR01MB8061:EE_
-X-MS-Office365-Filtering-Correlation-Id: 788d7108-cf2e-4cbf-b74f-08dbea6f1799
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|SA1PR01MB6733:EE_
+X-MS-Office365-Filtering-Correlation-Id: 02be5001-5531-4eef-c3a4-08dbea715090
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	pVfNQUcXmQbexSK0HJUnQtqtdHd+44qWVOEvQtu2WyiaNhYlgiIr23W3ArcXZv6Mqty/duj50D0mMmlbwkjhKMHfI2+fFclehDvpaWTXYEgGsuTomJyGbI1h0Vs76Fipw/oL2SxGYVAU7t0kH9K/3ApjwMCV/a7EmdJHDleqfDLm2PyxD17CPqIaGg2LcDPtuoYVhjgxf0u8pFomu3q+p5esAPPJVkl7B20ey8CRLWFBoVV7D9VPTC9Zd87k3D/KD0dZysxHiydnkScxka7/Qqxb+h/G0RMJyC8FvhU18Nsym9pW9uocP5f68mtKPmvkrduMfpq6zYBa7XIN6FPb6r+6CzQ9QbUdL81XGc4Hb5ATN3dvWaKJWG+lYJPtIxgoqH/IzZFXWVdqNE+YIrHtV54U3O+zGQCWAUFyu6wjI8lkGFNjJnBqhk5adZtEjKrpnZJRUQIncbcc8HBLqjj+8LnuWmmDGguZjq+NCqehW9tsNWVxbGPC0NJTRxs3mifmSHLNKD0Yi4kollyqsAjEfZV5Arq2WgwPN/e55GEDOprEgU1NBiUPVGDMjZ+y5cSw57lABZcQsI9aqYeQBnxkTTirNegb6/3CSXVEBioY5FM=
+	lwrxLq2UQxTUm/dmSDmAd71TCJxFjqAAXuRJMK5kpHVJWkBqEFVNjWS8ZKcNfMNnjFAcK6CCDPsyKIY7hnBW2Bly8+tA2NpMpQKywi2R6sb7IZ5ikEPKsmp/iQnD2rsnySBvZGQOVDcEofF1wUv1hoVhCH4RvcYvA8oqn9WLR18/366ZmU5pKYG+3Zn53YPtMCyll+AQ7EAcSHpVFh0co6zb+SIa1MDtQiarh6hAdBTyAGXMpfm+wwqXfxEztQCu+uhqvC+cY2+JPGF2qFggmfVo5TX/TljRnzgO3PRjmVvyqUAmJyq//V43QoZvCQu2oIIPqFWihAJpG+2oZd/cUb7ryvXyYt7dukfNxUx5mWTn+9hRrPMgyGWt7u2KxePtW3HekLvw0yWQwt8h5wqHjGuOh40n6qUKKrvg7o1rOWIJP85a+J/MdoW4bR5hzFxmMFlvGYNI3laURitxzZkwrSw/InE/dcanO/lMUYQLwHySFB5mZIGjx6TQOIXLQ2VlRm1nwk9rkNYIE1hw8KPWU63HJCWm0Ugs3fquplYMr0MYDn/wV0p80HF2XsfdILJbYlavhso5BE7bxs73WzNQfukEpLHYWdqp3J6K2oDYBpxJNo5JOOLCKP4FEt+Rv0Su
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(346002)(136003)(366004)(39850400004)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(53546011)(83380400001)(6512007)(6506007)(2616005)(26005)(6666004)(66899024)(478600001)(66946007)(8676002)(4326008)(8936002)(54906003)(66556008)(2906002)(41300700001)(66476007)(6486002)(31696002)(5660300002)(7416002)(31686004)(316002)(38100700002)(86362001)(966005)(43740500002);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(39850400004)(376002)(346002)(366004)(136003)(396003)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(31686004)(6666004)(83380400001)(6512007)(478600001)(6506007)(66946007)(54906003)(66476007)(66556008)(316002)(38100700002)(8936002)(4326008)(8676002)(6486002)(53546011)(26005)(2616005)(31696002)(86362001)(7416002)(5660300002)(41300700001)(2906002)(43740500002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eWM2RGJvOFFXWlE0SVdZaVZLVzE3NjZreXhyV3UySDkxZXdGQ2hCUU5SYmlC?=
- =?utf-8?B?QytOdWRycitpSzAyZjJCQWI1U1ZSU21Ya2M2UStIZXh5dDlkc2JmNDU3ZVp1?=
- =?utf-8?B?T0RRUHdQbGNaRXhnNzR0OHBBVHR3c1k0dmF1L29GWGFQeFJTZ3pkYTJUYXNT?=
- =?utf-8?B?cXlsVmNCRUNQbC9PSFI3eFZtcy94UlRURzEvS094WXhzSlV2TkJlKzBGZ0R2?=
- =?utf-8?B?cW5JTXM2ZjBNOVRwSlVtWHVUUlIvL3d1Tm9Eb0xRVThjK0lwR2phN0tuVm85?=
- =?utf-8?B?MENpYUZLWFp2MUdCY3dzOTQzZmRYMm1jRUxTMGhsSmF4YXgzRVR0akVLenpj?=
- =?utf-8?B?L1lVV0F3L2tTd3ZHUmMvKzFrbnpKOHpCNlZPYmplaGJaZVUvOFFJbmNmeDl4?=
- =?utf-8?B?RDJ2NmE3K1gyZFFNSUVCRTdJK0ZUTm1xbDN6dWJOOXhEVVpuaWRwa1FwWXNk?=
- =?utf-8?B?eFpIdmU3WXp4blRBa2dXWGFuRkorbVVtdXB3cURUeEpHb1ZSeTdDcCtYRHJ4?=
- =?utf-8?B?S3h5bnYrR29TTmlmVVVpUzVzMjZiK3JwcG1Rb1duVjBabkVQblN4a0MvSGk2?=
- =?utf-8?B?eUkyS2J3ZHBXSG9RRXo2VWlJU0ttUE45QzdLY0VadHc1TE1UWm9ZcE1VRnB0?=
- =?utf-8?B?UjVtTGtnTHJtdHhPMEtZdjRIUjJqTnhqeVJyVXhYZEZMbWgzeWVzT2ozOGpo?=
- =?utf-8?B?RnZOZDRZK3VsY1I0ajRoL3Buc3gxMitwR3IxNmVoWGFBT3JiM1dRak92NHE4?=
- =?utf-8?B?VTNocVpnQUd0M1JRZ0RpVENBcFFXVEVFS1o0VkZwTmhFVjFicm1RalZGaGJG?=
- =?utf-8?B?bm1yNlZUaStTWWQ5MmxwOEtoV0t4SEtQY2t6RWtSNjJjM0VuQktZdXNqbms3?=
- =?utf-8?B?U1dtVWhlVHR0V3pKNEh4aHp6eklJdXo3SlRiRFFzRUQ3WnRxTHExNHJXVWNu?=
- =?utf-8?B?MW9LYlBLeXp6bUZ4VXlJTTBVME0rTW1sR2lBMFdJbjJRVDdNUkhONm9sZVBF?=
- =?utf-8?B?Vkpab284OEJVUlcvU0xja1VUdW1wNVhDWWNxc01aSjlodm0yZW00a2dpUDFP?=
- =?utf-8?B?dnA5ZkFXR1VYSDNjbUc2dHIwckdLMmxBK2pOcnZuTTZwMUhQYzI0MmFBUVNt?=
- =?utf-8?B?N1NoMnl1UmF2eVZ0eFo5WnNqUGJwQjdYSjhxUFNkNjVHN1pVRG9zN2Y1RzlM?=
- =?utf-8?B?ZGdRMWo1VUNhdVIzMlozWGtDUzMvSEtJeUZjUHczdlNvc1daVDJ3MDFNM0Iy?=
- =?utf-8?B?aGo4dDJoNTY0aElvNmY0UUxOZkhBVk1sc1BtQ0pYSlhRalRSeWozN25FV2lZ?=
- =?utf-8?B?N0MxaytRa1AvMkNubEhxMUNSdFNWcFI4aWwzdXBmN241UGppVWNiZFZsanBV?=
- =?utf-8?B?T2c1enNQcGpENWVseWV3WE1qK0FRekptak9oOUhUYjFERkRNM0djd3pMQUcw?=
- =?utf-8?B?dHRZK1FkUitSVWZMZm5PMWd4Nlg3OTdKSWppUHpyMDVyVXZaelR1elY3YjVt?=
- =?utf-8?B?b01taVB3NGZtOG1oMCt2TU82V0RMdFBIQ1cxWkRoNmxQMmZxQjVKMURUVkdJ?=
- =?utf-8?B?Y0VKcTRLK1FwNmVINzJGZlF2SmRmamNqVUJNdzc1ek9DeU1FUWQ5VDVGajB1?=
- =?utf-8?B?VnpERzVwWDExUkxQYzFyM21RU0c2aFhDVWMwdnI1cSszemVWUEdVSFVneVlZ?=
- =?utf-8?B?TnM0bFhJNnVscE52dU45RDdvU3pEQXBac0NDVlIrVkY3OTE3a2g4bkdYL3Fy?=
- =?utf-8?B?RVdqMzBERVl4dTJoOTRhTm9pbG5idEduZ2xoVU4rZWplSldhNGMwenRwSWxm?=
- =?utf-8?B?T2liQytacXovSHJna2NqdTBBSlpsSE54SnlVdFFUOW94d3Eyd1I4SENpL21h?=
- =?utf-8?B?V01MU0YrM0ZIMmRtTFlrNENXZzlFM3hBSVRDa0swcElvRU1oSEpBS3V1Undk?=
- =?utf-8?B?YUJGL1RZVFlrYWk4dXViYjg3M3hiYkcxSEg0bFEvcEpqYjN2V3FWRzJOeWMw?=
- =?utf-8?B?a0pYTE00K1g2SlpxZGtsaTNBV3picWN4NVhVS0I1Sm52Wjh0UHZsWTFpOFR1?=
- =?utf-8?B?RHR4ZHVHZnF5a3o0U1l3VUtxZlhTaWpIMkhJU2NZWnp1c2ErUW9xSWpMOGE4?=
- =?utf-8?B?dmhxMDJLREVrMWZGNmpuV3ZLay9oVjB5aHRpcDlMRjJwYjBRTUF4QXlwMzVU?=
- =?utf-8?Q?x92/dzCJWOV4jjd26TL/jYiqaZE203zXsS5VfiaKzGpt?=
+	=?utf-8?B?c0VpaklYMDk3UDU2ZWlpckxFem5BNE1Bd2VHWnVEWExNcDhmZldQcnJxb3Zv?=
+ =?utf-8?B?czNUQTMrRHhBbFJMYlRUTU05UW1YdW5HTW5Dd0FNYjVRU3pUWTV5QVZjbHE1?=
+ =?utf-8?B?Y1owY1ZycWJNZzRRZlpjWGU5NmhXOVpQQnNWU2l6Vi9TYUM2Q3ZaS2pRNDQ2?=
+ =?utf-8?B?TmxPcCtRcDVValh0RTlUWVlRQ2ZCa2g2SVhvYnVoV002bStKZi9qN0JMdkhH?=
+ =?utf-8?B?WFlhZ2o2NHhTRnV6SStFdlJEeU5QM0lseFc5Y1lTVzNCdFJzMGROcTNtR0k3?=
+ =?utf-8?B?VDFYYm85eU5TY01qYnpSeEhqa0V5bCtoN2M2N3VnQXRrZWM3RFBIME8xUlpZ?=
+ =?utf-8?B?a2luV2M0dkFleW9ZdWt1OXJ4dXk5VjdlbGJJY1N6a1dwRVI2b2N6TmJWRlRm?=
+ =?utf-8?B?dWZEZm43VnF6bUxvRUVVcXdLamdvenpSZ1pvZzFNTmJFcGszVWhFYzJTeHda?=
+ =?utf-8?B?RWtnK1JZZjgydDlLZE5RLzAxd2FBOGJzRm5pdVBrRFFmSGptVzJIRnYwc0JO?=
+ =?utf-8?B?NmtVSmVtZmZpemI5OWNqS0JRQ05DVURrdmVEMFhEanZEYzZDVXpZWDNrakE2?=
+ =?utf-8?B?aysvQlJzSFN6cjZGQURjbmJ2RFZlNkZqOUV3Tlh0UGZQdmt5N2h3RXdsc3NZ?=
+ =?utf-8?B?aWduaUVXQjJ6ckdROUQwaVlqRjl1eU1BNjBzYWVQeTlEV1Rzc05KdlR6Z3Az?=
+ =?utf-8?B?WjdRQ2oxMkRFRDYzdVhsdnQzRmRaL29JSE4rdEg4cXltSVRPR3R4ajhYdTNO?=
+ =?utf-8?B?czUrb2RscTMyb0Y1ajZuOXYxcmlDeW5IcjUzVEU4aldLSFl3TVRNL3BNUHF5?=
+ =?utf-8?B?WW5rd0VuYkRreUdtY3lOY1BXcW5JcFZYMW9UaG1TUG8zWGZFeE1BekI5aThE?=
+ =?utf-8?B?UFpESER2UVlsV1V3Y2xsYW1LN3Y1d2p1V3lpaFFWRE5DYWtVc25aUEk1ZE43?=
+ =?utf-8?B?ejZRbk9IUDhxQjlQRkhJZVAyN0FUemprWVpSV3lsQnd0RWsrUkEvS1hRM01u?=
+ =?utf-8?B?VUlJU3pUNnhUMlVERFV1Y1pZK3dLd2ZIU2hOd0wva2N0MXJseFZ6Q1F3M3dZ?=
+ =?utf-8?B?VG1KK2ZZN0M1NXF6UDBVYlhHV25DUDBnWVhLU0x4RWYveXJuRFJFa05XOW9L?=
+ =?utf-8?B?OW9mSGxtNG1RVkJUVDRJdmhuQ2tXVUlERnlaUmlnekl0ZWE5WHZBWnN5aHBz?=
+ =?utf-8?B?WjFGdmtYYlNyZUtuM3hjTEk4dzI3eG8zK0V0Y0lnenZOZmNLOERHME5ld0p6?=
+ =?utf-8?B?d0M4d1ZOYlFoaDA5Tm8xNGo5NnNFWUxJdnJkWFBmRWR1WnBUbkhCNGpxK0lj?=
+ =?utf-8?B?Q3BtbEgySjJtWmVSRWszRHlTWUtKVkdXcUlhODhOWGdMSXYxUXBENFRvdWtz?=
+ =?utf-8?B?dWVWdGRxMUMzTzFodk5PL3Q5d3hGdklCQTVqMDFzdXNiZllzbTcvY2wvbDVV?=
+ =?utf-8?B?MlV2bXcvTEZMME9FeEVEMzhlZW5pR1FYeWJvWnczSmRwcVA0RTB1a1oxSGYr?=
+ =?utf-8?B?SzcrOFBKOFN5cEwrTHlNOW9SOGwxZFBkU3hNRkoxVEtxK1d3UmdLZjdxQzls?=
+ =?utf-8?B?SFRWZDJBWFY0T3NwYkdZamNsQ1NBczBCTmticU83cUdZSjZyeHRRZzFiNngw?=
+ =?utf-8?B?NWVlKzhmNlpFeXBZNS9rVldnRHpvMkxnS0VqTjlvSFp0SkFpUEg2YVBKUitH?=
+ =?utf-8?B?M1lnQUtCRm1qT3BTcVc5cGc5Z25GT3ZsekJGck9lSU5DTm1Sb3dvQTExQjNW?=
+ =?utf-8?B?SlRpMmtsZVNuVUJ0N0hPdFk0Y2NFMUhwbjhYU2Q2emEwZ3Y2M3BsQ2N5dEV1?=
+ =?utf-8?B?bnRwalAxREttbU52NTZqa0tERnhOcjVPU1JqQ3pRWkZVYWg5Q25XZ2VCWGMr?=
+ =?utf-8?B?OTlEczhnM2JHY2phbURoVlc3MHZNTFoyOEVVN21yY0Rpd2RCdDUxN2lQYUE1?=
+ =?utf-8?B?dnJxOHRUTTBJcU1oU2hPNmZPUXNxT0R1NWNNSWpZMXFuRGpNV2hJUzY4ZVdK?=
+ =?utf-8?B?U2RNbklSWmRodEZrRktBSWxDSGdMVW9ESkRrZUNNOG9Ob0VpbTBqbkRpSWo4?=
+ =?utf-8?B?VVRaZk5CMmZqYUVzRnNrTkQvaXAyTGh2cmVrM28rYlFTa3o4SjF4MFhPOEk0?=
+ =?utf-8?B?YS9zQXE4THd6dU5mc3o3Sm5FenE5RTB0N2doRjRHbC9IazJ6dkg5czVtN29V?=
+ =?utf-8?Q?vCjJDaQy3rb4jTCtYc7cLVVigCX2fUcO+xy56nlv1ygK?=
 X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 788d7108-cf2e-4cbf-b74f-08dbea6f1799
+X-MS-Exchange-CrossTenant-Network-Message-Id: 02be5001-5531-4eef-c3a4-08dbea715090
 X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2023 08:51:46.2633
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2023 09:07:40.8077
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WwIQi2k0mkA3RwY7/dgcgqpZHjMc6gyPc7MSi4+Wi5czEZmPAWQgDVQkqjLnwWkn8gENurdgsJAxlOvN7Ak4d32Ue57O0RF/d37soq6hqUiJOkiqviklyfiOitzXQLrk
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR01MB8061
+X-MS-Exchange-CrossTenant-UserPrincipalName: mkkEALfOAsHRo0zNm4XD0Tdiki8Nrt0DEVE4K9PS4ALqD+uk2G/SE1sYVaEdc3s8VO1mA/d82V9IYM79ctFr1RzlbzfogPWrT7NlhDXD1Wb1wAEeIjORJSw0Phk/gk3Z
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR01MB6733
 
 
-Hi Marc,
 
 On 20-11-2023 06:39 pm, Marc Zyngier wrote:
-> This is the 5th drop of NV support on arm64 for this year, and most
-> probably the last one for this side of Christmas.
+> To anyone who has played with FEAT_NV, it is obvious that the level
+> of performance is rather low due to the trap amplification that it
+> imposes on the host hypervisor. FEAT_NV2 solves a number of the
+> problems that FEAT_NV had.
 > 
-> For the previous episodes, see [1].
+> It also turns out that all the existing hardware that has FEAT_NV
+> also has FEAT_NV2. Finally, it is now allowed by the architecture
+> to build FEAT_NV2 *only* (as denoted by ID_AA64MMFR4_EL1.NV_frac),
+> which effectively seals the fate of FEAT_NV.
 > 
-> What's changed:
+> Restrict the NV support to NV2, and be done with it. Nobody will
+> cry over the old crap.
 > 
-> - Drop support for the original FEAT_NV. No existing hardware supports
->    it without FEAT_NV2, and the architecture is deprecating the former
->    entirely. This results in fewer patches, and a slightly simpler
->    model overall.
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>   arch/arm64/kernel/cpufeature.c | 22 +++++++++++++++-------
+>   arch/arm64/tools/cpucaps       |  2 ++
+>   2 files changed, 17 insertions(+), 7 deletions(-)
 > 
-> - Reorganise the series to make it a bit more logical now that FEAT_NV
->    is gone.
-> 
-> - Apply the NV idreg restrictions on VM first run rather than on each
->    access.
-> 
-> - Make the nested vgic shadow CPU interface a per-CPU structure rather
->    than per-vcpu.
-> 
-> - Fix the EL0 timer fastpath
-> 
-> - Work around the architecture deficiencies when trapping WFI from a
->    L2 guest.
-> 
-> - Fix sampling of nested vgic state (MISR, ELRSR, EISR)
-> 
-> - Drop the patches that have already been merged (NV trap forwarding,
->    per-MMU VTCR)
-> 
-> - Rebased on top of 6.7-rc2 + the FEAT_E2H0 support [2].
-> 
-> The branch containing these patches (and more) is at [3]. As for the
-> previous rounds, my intention is to take a prefix of this series into
-> 6.8, provided that it gets enough reviewing.
-> 
-> [1] https://lore.kernel.org/r/20230515173103.1017669-1-maz@kernel.org
-> [2] https://lore.kernel.org/r/20231120123721.851738-1-maz@kernel.org
-> [3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-6.8-nv2-only
->
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 7dcda39537f8..95a677cf8c04 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -439,6 +439,7 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr3[] = {
+>   
+>   static const struct arm64_ftr_bits ftr_id_aa64mmfr4[] = {
+>   	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR4_EL1_E2H0_SHIFT, 4, 0),
+> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_HIGHER_SAFE, ID_AA64MMFR4_EL1_NV_frac_SHIFT, 4, 0),
+>   	ARM64_FTR_END,
+>   };
+>   
+> @@ -2080,12 +2081,8 @@ static bool has_nested_virt_support(const struct arm64_cpu_capabilities *cap,
+>   	if (kvm_get_mode() != KVM_MODE_NV)
+>   		return false;
+>   
+> -	if (!has_cpuid_feature(cap, scope)) {
+> -		pr_warn("unavailable: %s\n", cap->desc);
+> -		return false;
+> -	}
+> -
+> -	return true;
+> +	return (__system_matches_cap(ARM64_HAS_NV2) |
+> +		__system_matches_cap(ARM64_HAS_NV2_ONLY));
 
-V11 series is not booting on Ampere platform (I am yet to debug).
-With lkvm, it is stuck at the very early stage itself and no early boot 
-prints/logs.
+This seems to be typo and should it be logical OR?
 
-Are there any changes needed in kvmtool for V11?
+>   }
+>   
+>   static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
+> @@ -2391,12 +2388,23 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>   		.matches = runs_at_el2,
+>   		.cpu_enable = cpu_copy_el2regs,
+>   	},
+> +	{
+> +		.capability = ARM64_HAS_NV2,
+> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> +		.matches = has_cpuid_feature,
+> +		ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, NV, NV2)
+> +	},
+> +	{
+> +		.capability = ARM64_HAS_NV2_ONLY,
+> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> +		.matches = has_cpuid_feature,
+> +		ARM64_CPUID_FIELDS(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY)
+> +	},
+>   	{
+>   		.desc = "Nested Virtualization Support",
+>   		.capability = ARM64_HAS_NESTED_VIRT,
+>   		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+>   		.matches = has_nested_virt_support,
+> -		ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, NV, IMP)
 
-> Andre Przywara (1):
->    KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
-> 
-> Christoffer Dall (2):
->    KVM: arm64: nv: Implement nested Stage-2 page table walk logic
->    KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
-> 
-> Jintack Lim (3):
->    KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
->    KVM: arm64: nv: Respect virtual CPTR_EL2.{TFP,FPEN} settings
->    KVM: arm64: nv: Trap and emulate TLBI instructions from virtual EL2
-> 
-> Marc Zyngier (37):
->    arm64: cpufeatures: Restrict NV support to FEAT_NV2
->    KVM: arm64: nv: Hoist vcpu_has_nv() into is_hyp_ctxt()
->    KVM: arm64: nv: Compute NV view of idregs as a one-off
->    KVM: arm64: nv: Drop EL12 register traps that are redirected to VNCR
->    KVM: arm64: nv: Add non-VHE-EL2->EL1 translation helpers
->    KVM: arm64: nv: Add include containing the VNCR_EL2 offsets
->    KVM: arm64: Introduce a bad_trap() primitive for unexpected trap
->      handling
->    KVM: arm64: nv: Add EL2_REG_VNCR()/EL2_REG_REDIR() sysreg helpers
->    KVM: arm64: nv: Map VNCR-capable registers to a separate page
->    KVM: arm64: nv: Handle virtual EL2 registers in
->      vcpu_read/write_sys_reg()
->    KVM: arm64: nv: Handle HCR_EL2.E2H specially
->    KVM: arm64: nv: Handle CNTHCTL_EL2 specially
->    KVM: arm64: nv: Save/Restore vEL2 sysregs
->    KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2
->    KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
->    KVM: arm64: nv: Handle shadow stage 2 page faults
->    KVM: arm64: nv: Restrict S2 RD/WR permissions to match the guest's
->    KVM: arm64: nv: Set a handler for the system instruction traps
->    KVM: arm64: nv: Trap and emulate AT instructions from virtual EL2
->    KVM: arm64: nv: Hide RAS from nested guests
->    KVM: arm64: nv: Add handling of EL2-specific timer registers
->    KVM: arm64: nv: Sync nested timer state with FEAT_NV2
->    KVM: arm64: nv: Publish emulated timer interrupt state in the
->      in-memory state
->    KVM: arm64: nv: Load timer before the GIC
->    KVM: arm64: nv: Nested GICv3 Support
->    KVM: arm64: nv: Don't block in WFI from nested state
->    KVM: arm64: nv: Fold GICv3 host trapping requirements into guest setup
->    KVM: arm64: nv: Deal with broken VGIC on maintenance interrupt
->      delivery
->    KVM: arm64: nv: Add handling of FEAT_TTL TLB invalidation
->    KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like
->      information
->    KVM: arm64: nv: Tag shadow S2 entries with nested level
->    KVM: arm64: nv: Allocate VNCR page when required
->    KVM: arm64: nv: Fast-track 'InHost' exception returns
->    KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
->    KVM: arm64: nv: Use FEAT_ECV to trap access to EL0 timers
->    KVM: arm64: nv: Accelerate EL0 timer read accesses when FEAT_ECV is on
->    KVM: arm64: nv: Allow userspace to request KVM_ARM_VCPU_NESTED_VIRT
-> 
->   .../virt/kvm/devices/arm-vgic-v3.rst          |  12 +-
->   arch/arm64/include/asm/esr.h                  |   1 +
->   arch/arm64/include/asm/kvm_arm.h              |   3 +
->   arch/arm64/include/asm/kvm_asm.h              |   4 +
->   arch/arm64/include/asm/kvm_emulate.h          |  53 +-
->   arch/arm64/include/asm/kvm_host.h             | 223 +++-
->   arch/arm64/include/asm/kvm_hyp.h              |   2 +
->   arch/arm64/include/asm/kvm_mmu.h              |  12 +
->   arch/arm64/include/asm/kvm_nested.h           | 130 ++-
->   arch/arm64/include/asm/sysreg.h               |   7 +
->   arch/arm64/include/asm/vncr_mapping.h         | 102 ++
->   arch/arm64/include/uapi/asm/kvm.h             |   1 +
->   arch/arm64/kernel/cpufeature.c                |  22 +-
->   arch/arm64/kvm/Makefile                       |   4 +-
->   arch/arm64/kvm/arch_timer.c                   | 115 +-
->   arch/arm64/kvm/arm.c                          |  46 +-
->   arch/arm64/kvm/at.c                           | 219 ++++
->   arch/arm64/kvm/emulate-nested.c               |  48 +-
->   arch/arm64/kvm/handle_exit.c                  |  29 +-
->   arch/arm64/kvm/hyp/include/hyp/switch.h       |   8 +-
->   arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h    |   5 +-
->   arch/arm64/kvm/hyp/nvhe/switch.c              |   2 +-
->   arch/arm64/kvm/hyp/nvhe/sysreg-sr.c           |   2 +-
->   arch/arm64/kvm/hyp/vgic-v3-sr.c               |   6 +-
->   arch/arm64/kvm/hyp/vhe/switch.c               | 211 +++-
->   arch/arm64/kvm/hyp/vhe/sysreg-sr.c            | 133 ++-
->   arch/arm64/kvm/hyp/vhe/tlb.c                  |  83 ++
->   arch/arm64/kvm/mmu.c                          | 248 ++++-
->   arch/arm64/kvm/nested.c                       | 813 ++++++++++++++-
->   arch/arm64/kvm/reset.c                        |   7 +
->   arch/arm64/kvm/sys_regs.c                     | 978 ++++++++++++++++--
->   arch/arm64/kvm/vgic/vgic-init.c               |  35 +
->   arch/arm64/kvm/vgic/vgic-kvm-device.c         |  29 +-
->   arch/arm64/kvm/vgic/vgic-v3-nested.c          | 270 +++++
->   arch/arm64/kvm/vgic/vgic-v3.c                 |  35 +-
->   arch/arm64/kvm/vgic/vgic.c                    |  29 +
->   arch/arm64/kvm/vgic/vgic.h                    |  10 +
->   arch/arm64/tools/cpucaps                      |   2 +
->   include/clocksource/arm_arch_timer.h          |   4 +
->   include/kvm/arm_arch_timer.h                  |  19 +
->   include/kvm/arm_vgic.h                        |  16 +
->   include/uapi/linux/kvm.h                      |   1 +
->   tools/arch/arm/include/uapi/asm/kvm.h         |   1 +
->   43 files changed, 3725 insertions(+), 255 deletions(-)
->   create mode 100644 arch/arm64/include/asm/vncr_mapping.h
->   create mode 100644 arch/arm64/kvm/at.c
->   create mode 100644 arch/arm64/kvm/vgic/vgic-v3-nested.c
-> 
+Since only NV2 is supported, is it more appropriate to have description 
+as "Enhanced Nested Virtualization Support"?
+
+>   	},
+>   	{
+>   		.capability = ARM64_HAS_32BIT_EL0_DO_NOT_USE,
+> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+> index fea24bcd6252..480de648cd03 100644
+> --- a/arch/arm64/tools/cpucaps
+> +++ b/arch/arm64/tools/cpucaps
+> @@ -41,6 +41,8 @@ HAS_LSE_ATOMICS
+>   HAS_MOPS
+>   HAS_NESTED_VIRT
+>   HAS_NO_HW_PREFETCH
+> +HAS_NV2
+> +HAS_NV2_ONLY
+>   HAS_PAN
+>   HAS_S1PIE
+>   HAS_RAS_EXTN
+
 
 Thanks,
 Ganapat
-
 
