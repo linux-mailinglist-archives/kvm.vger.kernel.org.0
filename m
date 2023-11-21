@@ -1,194 +1,187 @@
-Return-Path: <kvm+bounces-2138-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2139-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24E887F2414
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 03:37:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A80C7F2430
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 03:49:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D33AB2821DF
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 02:37:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AD551C21907
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 02:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8578E199D3;
-	Tue, 21 Nov 2023 02:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BA43F9C1;
+	Tue, 21 Nov 2023 02:48:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="niYbVI4U"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 661DD9C;
-	Mon, 20 Nov 2023 18:36:59 -0800 (PST)
-Received: from loongson.cn (unknown [10.2.5.213])
-	by gateway (Coremail) with SMTP id _____8CxyOjHF1xlQW07AA--.16163S3;
-	Tue, 21 Nov 2023 10:36:56 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.213])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxE+TGF1xlEwtIAA--.29117S2;
-	Tue, 21 Nov 2023 10:36:54 +0800 (CST)
-From: Bibo Mao <maobibo@loongson.cn>
-To: Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Huacai Chen <chenhuacai@kernel.org>
-Cc: WANG Xuerui <kernel@xen0n.name>,
-	kvm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] LoongArch: KVM: Fix oneshot timer emulation
-Date: Tue, 21 Nov 2023 10:34:28 +0800
-Message-Id: <20231121023428.3400150-1-maobibo@loongson.cn>
-X-Mailer: git-send-email 2.39.3
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE940CB;
+	Mon, 20 Nov 2023 18:48:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700534928; x=1732070928;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=OiAuBvNvNBUWilHTsa+mIPF1Zbrt8eA/nmfUJvgp1JI=;
+  b=niYbVI4Uj6qrQBnlJvoINMpkjJ1mSoSe3LSBnBY9oXE+zg+yxzT7NZea
+   XoOidIdw+yvXlmqL44lgNb/hot+lYkfsoPZUYIuSaRuGt2gPO+x68LQw+
+   Zh84lH8ZpGVdOgP5pgMx+FcpM5wIPMQe6el50PFvpbC1paU26nTjC3ca1
+   uJpLyA7m4mLo2PrqRC2iTAHAZPspKvX4ZVaGqts6UYzUWbU61cOD3ezYM
+   DgHSN1q2GLM92RtKddyc3Jme8ocXxSe0GuFFB/3UXqIyApXEy+KPAmZ/Q
+   WfBRgyrKuv9QTq0bpwvQMQ6embjisIkhrSRagw/r25fbe4oqcsud8iRrj
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="456088386"
+X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
+   d="scan'208";a="456088386"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 18:48:48 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="742896571"
+X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
+   d="scan'208";a="742896571"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Nov 2023 18:48:48 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 20 Nov 2023 18:48:47 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Mon, 20 Nov 2023 18:48:47 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Mon, 20 Nov 2023 18:48:47 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g2Ddtq6HYio05LjhWKPWz1cQ8VxInojVSuQh5p26TBePQfMt43AyIPAGh3ezvlT9TkDoyu+Wgy8wMZIlVci+X9IGnGHSqZ6jqtf/ZO28XIHYzfEZpmPKAR3tiEQ6MiJWoly/xSR/iG6iyrB3YOr+B4YYhgRc6yb6vJho+r104qlZMeyOzAII5MewYkUZQOq9VpMseB/Ivk1sHOWsGmv9DmbiGgc/v8Vo+S8wVNKyu+xFq4P1KXaV3z7AiwCpc/K0jDXIbGmxyueVLDICG8I0raGJGrzGyWg7YQfkQ7CPFxg+5Qc/dlWNX6VZ1HcUT37hDUbSHFAVLI6kXLBDccpvbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OiAuBvNvNBUWilHTsa+mIPF1Zbrt8eA/nmfUJvgp1JI=;
+ b=VXriQ5rlr20iA9LtzXsrr2zUSDHQkoFEVI4iIKtIjp8RmmjHorv6uiVYVuCl5rjr0osb8QO/TweaofEaf9WxDi5NwFfVOLDGLwZaHeXEXVJTJBM7wKgB5NQ3mEatPArtjuW1aqViCenLADmONhr8UZaFuCD5D6UKsS8O4Lda9nQ/Yi1ekeSuvSID4BlxQ/kuxRiPTc6QkYxO2MS8McCT2QvDso3bTIyAi9jrOFrF6NihxvqEZ2ok+6pfI+kGXtMtq5RV0iU1fja+WTy+1K2Ry7gCiYFdhTulebS/fWvuozmQxyPVVYeu830a22af+PqqbjQY6K+jQNjwDkOPEso5oQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by DM6PR11MB4612.namprd11.prod.outlook.com (2603:10b6:5:2a8::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.27; Tue, 21 Nov
+ 2023 02:48:40 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::e7a4:a757:2f2e:f96a]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::e7a4:a757:2f2e:f96a%3]) with mapi id 15.20.7002.027; Tue, 21 Nov 2023
+ 02:48:40 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Nicolin Chen <nicolinc@nvidia.com>
+CC: "Liu, Yi L" <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
+	<jgg@nvidia.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>, "cohuck@redhat.com"
+	<cohuck@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mjrosato@linux.ibm.com"
+	<mjrosato@linux.ibm.com>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "yi.y.sun@linux.intel.com"
+	<yi.y.sun@linux.intel.com>, "peterx@redhat.com" <peterx@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
+	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
+ Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
+	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
+	<yan.y.zhao@intel.com>
+Subject: RE: [PATCH v6 3/6] iommu: Add iommu_copy_struct_from_user_array
+ helper
+Thread-Topic: [PATCH v6 3/6] iommu: Add iommu_copy_struct_from_user_array
+ helper
+Thread-Index: AQHaGVcISf8BaZEQJUSSGRR/7aBQN7CC4RvAgACZOwCAAJ1hAA==
+Date: Tue, 21 Nov 2023 02:48:40 +0000
+Message-ID: <BN9PR11MB5276B273F59D66A757B178AB8CBBA@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20231117130717.19875-1-yi.l.liu@intel.com>
+ <20231117130717.19875-4-yi.l.liu@intel.com>
+ <BN9PR11MB52763299F886D4A534D6E0BA8CB4A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZVuWdEwYw+9uAaUz@Asurada-Nvidia>
+In-Reply-To: <ZVuWdEwYw+9uAaUz@Asurada-Nvidia>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|DM6PR11MB4612:EE_
+x-ms-office365-filtering-correlation-id: e7bb829c-de4a-4356-a99e-08dbea3c5e13
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Fpt/lkk6o8eRfMe4hoU+km2539iG9XhSIZ1fEDXfquk4tNt+2piQ0RXYPtHFVM+JN/lkcP3Z55AE1xLX2dsGiUkr00vnzQxDh/2E4EqdrqFmGIKosqdczOdtnxrWFz/MqkCyy+rNQkI6wtd4XaaZG96lcP8KWOo8VwgO9Kr2+HiP5MBI7RdnSLk4yHlS7fuCcN9x6JMICaE9C0ehnlj1sBfBCrXyHnpfTZOU4ScdxGGM3zyR8P7Dej+7SUn0ybS+XuF22p+SxQ3GCwbchpDHDmSELku1mF6Kl4AF5fTt61I8DzAQ3q1AEqxnaeh/Si/wW5nBf9rfizNXj6kTGwM/+JEA+YTWLGyzwmEsw4vFgj+0k2CiVxBViL8rm+7P0BX5rWNIml2qfUUT3k1pU6sGh8FgdphMYjx4kkrMKYc+wk+FFPEi6sFKlaPptvBKvU0/l6RSFHLhFzl3IjAvOJ+EOKSVln/NhxczKEU22SrUMLF00iPEL5Aei/04b0s2PZFmcFDK4/viMJAhgJcV+bt56mx081SqiayH51qtK1L0wo5qacvo2Hyu6vUJHtG8D+6AnCxQcEHP0nj/P9f67l7NQL/oAsr2GSBkB3hgLhspRk2rid93Dlztkb9UqqsISkHC
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(376002)(39860400002)(346002)(136003)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(66446008)(66946007)(66476007)(66556008)(76116006)(6916009)(64756008)(54906003)(316002)(7696005)(9686003)(71200400001)(6506007)(26005)(478600001)(38070700009)(38100700002)(82960400001)(122000001)(33656002)(86362001)(55016003)(2906002)(5660300002)(7416002)(4744005)(4326008)(8676002)(8936002)(52536014)(41300700001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?n0rVZN2KLNh3JsPz/wc5sRXGuQxYFcOAClSffj/WUkVULYJ4oinIFLba/lJs?=
+ =?us-ascii?Q?8xh/F+YiUfHj5aD1FiLUwG6yscMgUggASinpypZYRvL3zWmOe5EQchfIEq8q?=
+ =?us-ascii?Q?fR9i3SZBmmOvdM5HvpO8RmZXBwL38Iw7YQiFUMkOuRohIoH2ntlvsQl6SWVJ?=
+ =?us-ascii?Q?F+WuVXo84VjQHMfMfG5WLtS7kUwH0hLmSn6F5fjIO4bthTZ8nMnh24rRknj8?=
+ =?us-ascii?Q?Uf3cDiFxHX3XOgXSXWYc89aXK7QNil3KSfNNXb87EyGQY5fFd0IblCCY61eD?=
+ =?us-ascii?Q?iYgY5VQc67qjh5bzzO7cfTQ4edkq22tSFhM2WPRtt0xFBOs4RSqtU6x6W8b7?=
+ =?us-ascii?Q?+6GjL4YaV0pj2f0OyFzm4qBBuWFnSeROA9kaU1DSCGGrOszNEzIG+NYBq2yL?=
+ =?us-ascii?Q?naCAROracVN3ijw7ce/urVNTzmmhPKxl1T0/2DG6SxvIbMYvt883y8CSpJpw?=
+ =?us-ascii?Q?GYKTVrKe4vB+2ZaGbt0vqnQQIsm5gcrPz/foljCFqprcbrccqxxk2FJQHZhJ?=
+ =?us-ascii?Q?rgyP4zT0ba0No/AjYPV1UAGs74vwzadyFBRtaCex8dSy3k1qGXiHeShE2lKx?=
+ =?us-ascii?Q?+BecbqyzF2yq4vP2sVu1foBdybxAvxY4BeVpNXbofDCYHwsgMU0SpPsJMJll?=
+ =?us-ascii?Q?Ty080S6+pSP5Se/HlcdjZP9bRxvBJHhHYPrMZ7iqnQ+j4gyeCNznUT2v2aiP?=
+ =?us-ascii?Q?lKXq2MXRxKGbNqNuUu74Xhq6PzIfS02IGIAQ4et+30eQsMrKzHQ2CDVoujEK?=
+ =?us-ascii?Q?3E+W6bQqCyo/XvVRTxkJfrVZ3jRvVRveZFH1BTnBSoqqPb16NZpV1AM4bcXt?=
+ =?us-ascii?Q?C5yj0cpiFDrXOOcEA3v6ZBGeoGhD8N7CPavvse95m6RCdh4dD2VXEGVZn1ni?=
+ =?us-ascii?Q?oxLNFiOdWnX0YS6UqZBre96iVjW8V3FZKoMD4O2nT3d0hzB/5/YMavPC9x49?=
+ =?us-ascii?Q?P9gjVykmNl7wwf5GbBgWcVhOtmI1EipwL6BWCb69ipkqtrRCOaUuAa5lTHai?=
+ =?us-ascii?Q?jBjbDPmi+cE9fOXsXxWto+TstTErTXzvQdejgB3A5p2YZZm6IiVg8wjDsLyJ?=
+ =?us-ascii?Q?eCwkvkb/QVpGJQJ+Uqss4T3MebjPHtxXGRTiNPA73ESK2k11/C8SxNWQE9Qy?=
+ =?us-ascii?Q?s80XNVYSwPpft+8L6GWP5qLuaim60kyBzR8qDQbGN0+qMiSNHdyW3Ni4jG6R?=
+ =?us-ascii?Q?tDT2vgVSklmvQS6p5Juq2GGMkTWH+by+Sqov1ldkpyqBfHD4pOKEEBcgjwJv?=
+ =?us-ascii?Q?fJSMcgjIWbJxBlNuDgjClTRmwEfwcjBsGkODRIw1oYwqjD4z3dcJk7DoUy1e?=
+ =?us-ascii?Q?HvWdkDiTwynUNiO/Kj6+SH+3gATP7VKPXBEIn4AgF0LXC3VgTkd85/sSgmsn?=
+ =?us-ascii?Q?vAqXH4OWqoEtJT2pg7210bUN+uddvNrh1hPqX1YoOCb3Nc1CU14l104MV9Jp?=
+ =?us-ascii?Q?xhFhYk0UiISxWzcXzW0SP+d5nebCaqaN0SA/0ItHLpaCE6HDiykPSZQgyqEt?=
+ =?us-ascii?Q?/7Miazgz2RGOSCe9MVEshXwqtmfgjfAbvnsqMR0fRFpWQMXrM9pnQ32XzDpn?=
+ =?us-ascii?Q?5Jekj/WnsgJzGI1Inv7caf/OoEIqhGkXJo8Ff/mE?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8BxE+TGF1xlEwtIAA--.29117S2
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxWFWfZr1kCrWfCrWxCr13KFX_yoWruw4DpF
-	WSkF1I9r18Gry7G3W3Xan8ZwnIq395t3WfCrnrWayIkwnxX345XFWxWr97JF45ArZ3JF1S
-	vryrAwn0vF4rX3gCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUk0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4j6r4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc
-	02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAF
-	wI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxAIw28IcxkI7V
-	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU7XTmDUUUU
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e7bb829c-de4a-4356-a99e-08dbea3c5e13
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Nov 2023 02:48:40.0338
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: OOnw/pYQaA590/zFldq2xoRkRb0kTv3RzJCNdPcgIKKJHsqUzaO5p5+38k7h6T1iVzYImaUATNFSIytaOgBm9Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4612
+X-OriginatorOrg: intel.com
 
-When oneshot timer is fired, CSR TVAL will be -1 rather than 0.
-There needs special handing for this situation. There are two
-scenarios when oneshot timer is fired. One scenario is that
-time is fired after exiting to host, CSR TVAL is set with 0
-in order to inject hw interrupt, and -1 will assigned to CSR TVAL
-soon.
+> From: Nicolin Chen <nicolinc@nvidia.com>
+> Sent: Tuesday, November 21, 2023 1:25 AM
+>=20
+> On Mon, Nov 20, 2023 at 08:17:47AM +0000, Tian, Kevin wrote:
+> > > From: Liu, Yi L <yi.l.liu@intel.com>
+> > > Sent: Friday, November 17, 2023 9:07 PM
+> > >
+> > > +/**
+> > > + * __iommu_copy_struct_from_user_array - Copy iommu driver specific
+> >
+> > __iommu_copy_entry_from_user_array?
+>=20
+> I think "struct" and "entry" are interchangeable. Yet, aligning
+> with the {__}iommu_copy_struct_from_user seems to be nicer?
 
-The other situation is that timer is fired in VM and guest kernel
-is hanlding timer IRQ and is ready to set next expired timer val,
-timer interrupt should not be injected at this point, else there
-will be spurious timer interrupt. After VM finished doing timer IRQ
-and timer IRQ will be triggered again, however the next expired
-timer val does not reach to 0, it is just spurious timer interrupt.
-
-Here hw timer irq status in CSR ESTAT is used to judge these
-two scenarios. If CSR TVAL is -1, the oneshot timer is fired;
-and if timer hw irq is on in CSR ESTAT register, it happens after
-exiting to host; else if timer hw irq is off, we think that it
-happens in vm and timer IRQ handler has already acked IRQ.
-
-With this patch, runltp with version ltp20230516 passes to run
-in vm. And this patch is based on the patch series.
-https://lore.kernel.org/lkml/20231116023036.2324371-1-maobibo@loongson.cn/
-
-Signed-off-by: Bibo Mao <maobibo@loongson.cn>
----
- arch/loongarch/kvm/timer.c | 61 ++++++++++++++++++++++++++++++--------
- 1 file changed, 49 insertions(+), 12 deletions(-)
-
-diff --git a/arch/loongarch/kvm/timer.c b/arch/loongarch/kvm/timer.c
-index 711982f9eeb5..00487d67f86d 100644
---- a/arch/loongarch/kvm/timer.c
-+++ b/arch/loongarch/kvm/timer.c
-@@ -70,6 +70,7 @@ void kvm_init_timer(struct kvm_vcpu *vcpu, unsigned long timer_hz)
- void kvm_restore_timer(struct kvm_vcpu *vcpu)
- {
- 	unsigned long cfg, delta, period;
-+	unsigned long ticks, estat;
- 	ktime_t expire, now;
- 	struct loongarch_csrs *csr = vcpu->arch.csr;
- 
-@@ -90,20 +91,46 @@ void kvm_restore_timer(struct kvm_vcpu *vcpu)
- 	 */
- 	hrtimer_cancel(&vcpu->arch.swtimer);
- 
-+	/*
-+	 * From LoongArch Reference Manual Volume 1 Chapter 7.6.2
-+	 * If oneshot timer is fired, CSR TVAL will be -1, there are two
-+	 * conditions:
-+	 *  1) timer is fired during exiting to host
-+	 *  2) timer is fired and vm is doing timer irq, and then exiting to
-+	 *     host. Host should not inject timer irq to avoid spurious
-+	 *     timer interrupt again
-+	 */
-+	ticks = kvm_read_sw_gcsr(csr, LOONGARCH_CSR_TVAL);
-+	estat = kvm_read_sw_gcsr(csr, LOONGARCH_CSR_ESTAT);
-+	if (!(cfg & CSR_TCFG_PERIOD) && (ticks > cfg)) {
-+		/*
-+		 * Writing 0 to LOONGARCH_CSR_TVAL will inject timer irq
-+		 * and set CSR TVAL with -1
-+		 *
-+		 * Writing ticks to LOONGARCH_CSR_TVAL will not inject timer
-+		 * irq, HW CSR TVAL will go down from value ticks, it avoids
-+		 * spurious timer interrupt
-+		 */
-+		if (estat & INT_TI)
-+			write_gcsr_timertick(0);
-+		else
-+			kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_TVAL);
-+		return;
-+	}
-+
- 	/*
- 	 * Set remainder tick value if not expired
- 	 */
- 	now = ktime_get();
- 	expire = vcpu->arch.expire;
-+	delta = 0;
- 	if (ktime_before(now, expire))
- 		delta = ktime_to_tick(vcpu, ktime_sub(expire, now));
--	else {
--		if (cfg & CSR_TCFG_PERIOD) {
--			period = cfg & CSR_TCFG_VAL;
--			delta = ktime_to_tick(vcpu, ktime_sub(now, expire));
--			delta = period - (delta % period);
--		} else
--			delta = 0;
-+	else if (cfg & CSR_TCFG_PERIOD) {
-+		period = cfg & CSR_TCFG_VAL;
-+		delta = ktime_to_tick(vcpu, ktime_sub(now, expire));
-+		delta = period - (delta % period);
-+
- 		/*
- 		 * Inject timer here though sw timer should inject timer
- 		 * interrupt async already, since sw timer may be cancelled
-@@ -122,15 +149,25 @@ void kvm_restore_timer(struct kvm_vcpu *vcpu)
-  */
- static void _kvm_save_timer(struct kvm_vcpu *vcpu)
- {
--	unsigned long ticks, delta;
-+	unsigned long ticks, delta, cfg;
- 	ktime_t expire;
- 	struct loongarch_csrs *csr = vcpu->arch.csr;
- 
- 	ticks = kvm_read_sw_gcsr(csr, LOONGARCH_CSR_TVAL);
--	delta = tick_to_ns(vcpu, ticks);
--	expire = ktime_add_ns(ktime_get(), delta);
--	vcpu->arch.expire = expire;
--	if (ticks) {
-+	cfg = kvm_read_sw_gcsr(csr, LOONGARCH_CSR_TCFG);
-+
-+	/*
-+	 * From LoongArch Reference Manual Volume 1 Chapter 7.6.2
-+	 * If period timer is fired, CSR TVAL will be reloaded from CSR TCFG
-+	 * If oneshot timer is fired, CSR TVAL will be -1
-+	 * Here judge one shot timer fired by checking whether TVAL is larger
-+	 * than TCFG
-+	 */
-+	if (ticks < cfg) {
-+		delta = tick_to_ns(vcpu, ticks);
-+		expire = ktime_add_ns(ktime_get(), delta);
-+		vcpu->arch.expire = expire;
-+
- 		/*
- 		 * HRTIMER_MODE_PINNED is suggested since vcpu may run in
- 		 * the same physical cpu in next time
-
-base-commit: 98b1cc82c4affc16f5598d4fa14b1858671b2263
--- 
-2.39.3
-
+ok
 
