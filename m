@@ -1,147 +1,162 @@
-Return-Path: <kvm+bounces-2186-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2176-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0E127F2C3F
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 12:56:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6FD07F2C2F
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 12:55:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3853CB21B99
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 11:56:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48467B21A01
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 11:55:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63DB051C34;
-	Tue, 21 Nov 2023 11:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 750EB48CE0;
+	Tue, 21 Nov 2023 11:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IiVajqij"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rym6yS6I"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E4F5112;
-	Tue, 21 Nov 2023 03:55:56 -0800 (PST)
-Received: by mail-pf1-x442.google.com with SMTP id d2e1a72fcca58-6c34e87b571so4378434b3a.3;
-        Tue, 21 Nov 2023 03:55:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700567756; x=1701172556; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dOxT43FDAQ5Xr6ouV6ennVtlCzo8xO0nJHSFrJt6nz4=;
-        b=IiVajqij9UsYMMk6Oje17e96U1r4I6l3nsFCYF0apFiNfDb2iGPB8Z2T51iV6tuV6R
-         lHQJH+TnZGeDtqh69sVN/QD7yYSQQtd9gjAWK1Bwk4rVHrtwp0q44SOp28gyaAVLZ02V
-         ThhbWwol0acelCHY3kkJRAujF/Al1QShCddgidYNn93Mnk9wRmMwercan+7IWtsSeH4U
-         acxo33Brr3LF8y7h/8i6GxRvOZZf+X7huq0kCpfsB4zPoO95vNhZI98oAvD7cwmQ8C3b
-         gTFOoxCFPznic2no255GoYRng9/uJFzpqHI8Z4VRDR5qzgJYLoqvjo0lQdpr+ZqR+oLd
-         ZHPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700567756; x=1701172556;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dOxT43FDAQ5Xr6ouV6ennVtlCzo8xO0nJHSFrJt6nz4=;
-        b=n5mzJhwkHc2yGjkP+mWq+vlS1TsblBsLccrML9z3TWtSegjwJm0Fipu0c2naPLnj07
-         eW8bhrgvDJpwM/2yUDh+nW2bv04wilWQjOEBKJ1M/p63aobJXLk+UMRymZRypReJ9gm0
-         bfQDThcmMZ9u3zNOUUQSqKewrbxjF+tG4Eo1D3OTULtpghH3NJCZ2Dz7xvc+savjujCb
-         3NTw3s+XXc+Uqu+aEMmFBY2sLNL8S1rG8ideQiXkLDHj8o3XES8yl7G2bqqoth3S/ExT
-         ZAAPnEXUf1yRfR8tPKsMMWsDuFlCTCgEeMRmRP+kK+5s5xUHsnMnnG9L7ZiMqNyPyPkQ
-         9Gww==
-X-Gm-Message-State: AOJu0YzmVvKkHCUFrycpBMVltcT3tn4NbidBAxeLI5wpRZ3FbvEkWyvY
-	rOrliIP7V7NurG4/gfGpHO4=
-X-Google-Smtp-Source: AGHT+IFghql4Rbf15JDxeEuYt95Vz/RngIzBoF2uPGTDd8wm25ZtSEbNG//EtMwT/wDjrcARhRrgBg==
-X-Received: by 2002:a05:6a20:9f89:b0:187:f549:e2e7 with SMTP id mm9-20020a056a209f8900b00187f549e2e7mr11003353pzb.7.1700567756010;
-        Tue, 21 Nov 2023 03:55:56 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id g10-20020a170902740a00b001cc1dff5b86sm7685431pll.244.2023.11.21.03.55.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 03:55:55 -0800 (PST)
-From: Jinrong Liang <ljr.kernel@gmail.com>
-X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Like Xu <likexu@tencent.com>,
-	Jim Mattson <jmattson@google.com>,
-	Aaron Lewis <aaronlewis@google.com>,
-	Wanpeng Li <wanpengli@tencent.com>,
-	Jinrong Liang <cloudliang@tencent.com>,
-	Jinrong Liang <ljr.kernel@gmail.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 9/9] KVM: selftests: Test AMD Guest PerfMonV2
-Date: Tue, 21 Nov 2023 19:54:57 +0800
-Message-Id: <20231121115457.76269-10-cloudliang@tencent.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231121115457.76269-1-cloudliang@tencent.com>
-References: <20231121115457.76269-1-cloudliang@tencent.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61220482DF
+	for <kvm@vger.kernel.org>; Tue, 21 Nov 2023 11:55:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0931C433C7;
+	Tue, 21 Nov 2023 11:55:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700567733;
+	bh=NbNT5zN14ASPakIUDj5Dgbng3gBVPQPgEtJ+oGscF5w=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Rym6yS6I+UjdTyS9eiu/es8/cT3FGCS9H1ybruTpI9QxIJSRo4oHhOzYDRLNzCvRj
+	 51lFp4qq9YZalaUsTtA6TQkChUp4S8+DZrSHB0cdP2NeJb7xtWrBT9s6/kEBXf6+rO
+	 /m/w/wDBJTMjHHQC+/3oyDoNNYH8cgEtSEXzpB2+XO5CSCBN2RyxyM4YJu+I0WIJRr
+	 4djjaXiXj42VKlFIxXKNCASWTXrKdqOsj3KSi7i2eiMzKR/BX/aJtyoTJcCQFCppe0
+	 rC2dIM19J8QKfbY67yfatQAdiW2qfDdzBLBIgpq48yps6j/7cFXbtukmKY8KpU8D47
+	 INIY/YU6pWvpQ==
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-53e2308198eso7742666a12.1;
+        Tue, 21 Nov 2023 03:55:32 -0800 (PST)
+X-Gm-Message-State: AOJu0YwlAjza2Nf3Fmkbs1VoMu8ND/eGvDS9Dk1xu/Hu05L0v8meaZe2
+	NcZk0y1OMhOs0T7gOlwD8DIiDFdvrMVGemxibkE=
+X-Google-Smtp-Source: AGHT+IE91ql6C6HLLlnfSwRVW7vXEWwt0jCtwSJuhc9ksIUkYLG23MxpSviJDMBoSB+9rPqP23kS3E07L/ZyWZoCrAI=
+X-Received: by 2002:aa7:da0d:0:b0:548:d29d:a4ca with SMTP id
+ r13-20020aa7da0d000000b00548d29da4camr1495144eds.42.1700567731470; Tue, 21
+ Nov 2023 03:55:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231115091921.85516-1-zhaotianrui@loongson.cn>
+ <20231115091921.85516-3-zhaotianrui@loongson.cn> <f003f38d-37fd-43ed-ada6-fb2d5b282e91@xen0n.name>
+ <6d9395b5-e8f1-3990-adb0-a52d03411fc6@loongson.cn>
+In-Reply-To: <6d9395b5-e8f1-3990-adb0-a52d03411fc6@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Tue, 21 Nov 2023 19:55:19 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H6Kq1gDvmAS9fnG4Lc4ot0H4tZftZvzSdd39fNjozo4bQ@mail.gmail.com>
+Message-ID: <CAAhV-H6Kq1gDvmAS9fnG4Lc4ot0H4tZftZvzSdd39fNjozo4bQ@mail.gmail.com>
+Subject: Re: [PATCH v1 2/2] LoongArch: KVM: Add lasx support
+To: zhaotianrui <zhaotianrui@loongson.cn>
+Cc: WANG Xuerui <kernel@xen0n.name>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>, 
+	Mark Brown <broonie@kernel.org>, Alex Deucher <alexander.deucher@amd.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn, 
+	Xi Ruoyao <xry111@xry111.site>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jinrong Liang <cloudliang@tencent.com>
+On Tue, Nov 21, 2023 at 5:59=E2=80=AFPM zhaotianrui <zhaotianrui@loongson.c=
+n> wrote:
+>
+>
+> =E5=9C=A8 2023/11/16 =E4=B8=8B=E5=8D=883:19, WANG Xuerui =E5=86=99=E9=81=
+=93:
+> > On 11/15/23 17:19, Tianrui Zhao wrote:
+> >> This patch adds LASX support for LoongArch KVM. The LASX means
+> >> LoongArch 256-bits vector instruction.
+> >> There will be LASX exception in KVM when guest use the LASX
+> >> instruction. KVM will enable LASX and restore the vector
+> >> registers for guest then return to guest to continue running.
+> >>
+> >> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+> >> ---
+> >>   arch/loongarch/include/asm/kvm_host.h |  6 ++++
+> >>   arch/loongarch/include/asm/kvm_vcpu.h | 10 +++++++
+> >>   arch/loongarch/kernel/fpu.S           |  1 +
+> >>   arch/loongarch/kvm/exit.c             | 18 +++++++++++
+> >>   arch/loongarch/kvm/switch.S           | 16 ++++++++++
+> >>   arch/loongarch/kvm/trace.h            |  4 ++-
+> >>   arch/loongarch/kvm/vcpu.c             | 43 +++++++++++++++++++++++++=
++-
+> >>   7 files changed, 96 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/arch/loongarch/include/asm/kvm_host.h
+> >> b/arch/loongarch/include/asm/kvm_host.h
+> >> index 6c65c25169..4c05b5eca0 100644
+> >> --- a/arch/loongarch/include/asm/kvm_host.h
+> >> +++ b/arch/loongarch/include/asm/kvm_host.h
+> >> @@ -95,6 +95,7 @@ enum emulation_result {
+> >>   #define KVM_LARCH_SWCSR_LATEST    (0x1 << 1)
+> >>   #define KVM_LARCH_HWCSR_USABLE    (0x1 << 2)
+> >>   #define KVM_LARCH_LSX        (0x1 << 3)
+> >> +#define KVM_LARCH_LASX        (0x1 << 4)
+> >>     struct kvm_vcpu_arch {
+> >>       /*
+> >> @@ -181,6 +182,11 @@ static inline bool kvm_guest_has_lsx(struct
+> >> kvm_vcpu_arch *arch)
+> >>       return arch->cpucfg[2] & CPUCFG2_LSX;
+> >>   }
+> >>   +static inline bool kvm_guest_has_lasx(struct kvm_vcpu_arch *arch)
+> >> +{
+> >> +    return arch->cpucfg[2] & CPUCFG2_LASX;
+> >> +}
+> >> +
+> >>   /* Debug: dump vcpu state */
+> >>   int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu);
+> >>   diff --git a/arch/loongarch/include/asm/kvm_vcpu.h
+> >> b/arch/loongarch/include/asm/kvm_vcpu.h
+> >> index c629771e12..4f87f16018 100644
+> >> --- a/arch/loongarch/include/asm/kvm_vcpu.h
+> >> +++ b/arch/loongarch/include/asm/kvm_vcpu.h
+> >> @@ -67,6 +67,16 @@ static inline void kvm_restore_lsx(struct
+> >> loongarch_fpu *fpu) { }
+> >>   static inline void kvm_restore_lsx_upper(struct loongarch_fpu *fpu)
+> >> { }
+> >>   #endif
+> >>   +#ifdef CONFIG_CPU_HAS_LASX
+> >> +void kvm_own_lasx(struct kvm_vcpu *vcpu);
+> >> +void kvm_save_lasx(struct loongarch_fpu *fpu);
+> >> +void kvm_restore_lasx(struct loongarch_fpu *fpu);
+> >> +#else
+> >> +static inline void kvm_own_lasx(struct kvm_vcpu *vcpu) { }
+> >> +static inline void kvm_save_lasx(struct loongarch_fpu *fpu) { }
+> >> +static inline void kvm_restore_lasx(struct loongarch_fpu *fpu) { }
+> >> +#endif
+> >> +
+> >>   void kvm_acquire_timer(struct kvm_vcpu *vcpu);
+> >>   void kvm_init_timer(struct kvm_vcpu *vcpu, unsigned long hz);
+> >>   void kvm_reset_timer(struct kvm_vcpu *vcpu);
+> >> diff --git a/arch/loongarch/kernel/fpu.S b/arch/loongarch/kernel/fpu.S
+> >> index d53ab10f46..f4524fe866 100644
+> >> --- a/arch/loongarch/kernel/fpu.S
+> >> +++ b/arch/loongarch/kernel/fpu.S
+> >> @@ -384,6 +384,7 @@ SYM_FUNC_START(_restore_lasx_upper)
+> >>       lasx_restore_all_upper a0 t0 t1
+> >>       jr    ra
+> >>   SYM_FUNC_END(_restore_lasx_upper)
+> >> +EXPORT_SYMBOL(_restore_lasx_upper)
+> >
+> > Why the added export? It doesn't seem necessary, given the previous
+> > patch doesn't have a similar export added for _restore_lsx_upper. (Or
+> > if it's truly needed it should probably become EXPORT_SYMBOL_GPL.)
+> It is needed to be exported, as it is called by kvm_own_lasx. However
+> the "_restore_lsx_upper" is not used in kvm.
+To keep consistency it is better to export both.
 
-Add test case for AMD Guest PerfMonV2.
+Huacai
 
-Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
----
- .../selftests/kvm/x86_64/pmu_counters_test.c  | 35 +++++++++++++++++++
- 1 file changed, 35 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-index ca5b352ea6ae..aa44f2282996 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-@@ -722,6 +722,38 @@ static void set_amd_counters(uint8_t *nr_amd_ounters, uint64_t *ctrl_msr,
- 	}
- }
- 
-+static void guest_test_amd_perfmonv2(void)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < AMD64_NR_COUNTERS_CORE; i++) {
-+		wrmsr(MSR_F15H_PERF_CTL0 + i * 2, 0);
-+		wrmsr(MSR_F15H_PERF_CTR0 + i * 2, ARCH_PERFMON_EVENTSEL_OS |
-+		      ARCH_PERFMON_EVENTSEL_ENABLE | AMD_ZEN_CORE_CYCLES);
-+
-+		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, 0);
-+		__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
-+		GUEST_ASSERT(!_rdpmc(i));
-+
-+		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, BIT_ULL(i));
-+		__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
-+		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, 0);
-+		GUEST_ASSERT(_rdpmc(i));
-+
-+		wrmsr(MSR_F15H_PERF_CTL0 + i * 2, (1ULL << 48) - 2);
-+		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR, 0xff);
-+		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, BIT_ULL(i));
-+		__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
-+		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, 0);
-+		GUEST_ASSERT(rdmsr(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS) &
-+			     BIT_ULL(i));
-+
-+		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR, BIT_ULL(i));
-+		GUEST_ASSERT(!(rdmsr(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS) &
-+			     BIT_ULL(i)));
-+	}
-+}
-+
- static void guest_test_amd_counters(void)
- {
- 	bool guest_pmu_is_perfmonv2 = this_cpu_has(X86_FEATURE_PERFMON_V2);
-@@ -747,6 +779,9 @@ static void guest_test_amd_counters(void)
- 		}
- 	}
- 
-+	if (guest_pmu_is_perfmonv2)
-+		guest_test_amd_perfmonv2();
-+
- 	GUEST_DONE();
- }
- 
--- 
-2.39.3
-
+>
+> Thanks
+> Tianrui Zhao
+>
 
