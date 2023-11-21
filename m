@@ -1,218 +1,205 @@
-Return-Path: <kvm+bounces-2233-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2234-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9978C7F398E
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 23:53:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0F0E7F3994
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 23:57:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F7C6B219A7
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 22:53:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1667CB21904
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 22:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4FF54BE6;
-	Tue, 21 Nov 2023 22:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C2A354BE7;
+	Tue, 21 Nov 2023 22:57:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="g8KfYtXr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ffnhW4Ze"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A36DD10EA;
-	Tue, 21 Nov 2023 14:53:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=H8N+oCSoC+H0ZODoe9Cu2j8t3Kw63Cr3ppY3F2+Oq3w=; b=g8KfYtXrDCSyp9IcK6l7Qc0ttU
-	reyKxgPhOM2ad08dx6wISloa8F+mcKLLVopdWcgXuiPeX8s0pzwtkLXCUGLrlJjmpTCqbfwbBSTG/
-	pq1mwQNmA/Yg2SrXfJuIpqNpCTDpT27fmH5qa8d+CsbDMBmZdlQfv20J+EOXMU9tetxQI1iLhJgXs
-	89OmgE2NShtsnGH6UjIL/laciQ/9268J7wF6r3Kyzk9YuA2YHjKxgnwKDJZqlSXRoRscQ71U3iRpd
-	+HnYTVMXV1ZKH7rrxjUIanzBYTQhWoulD4YK0Cq5u3iG6KAXyWZhEcm2y00AJLIlV/h34U9dK22S0
-	yt+vnrpw==;
-Received: from [2001:8b0:10b:5:22b8:d80f:1c9c:f188] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1r5ZcA-0060X8-Gh; Tue, 21 Nov 2023 22:53:06 +0000
-Message-ID: <4a76b7dc9055485d9e2592b395e60221dc349abf.camel@infradead.org>
-Subject: Re: [PATCH v8 15/15] KVM: xen: allow vcpu_info content to be
- 'safely' copied
-From: David Woodhouse <dwmw2@infradead.org>
-To: Paul Durrant <paul@xen.org>, Sean Christopherson <seanjc@google.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>,  Borislav Petkov <bp@alien8.de>, Dave
- Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
- <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Tue, 21 Nov 2023 22:53:05 +0000
-In-Reply-To: <20231121180223.12484-16-paul@xen.org>
-References: <20231121180223.12484-1-paul@xen.org>
-	 <20231121180223.12484-16-paul@xen.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-Sg32XlDwjZW/KftOP1NZ"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B90771A3;
+	Tue, 21 Nov 2023 14:56:55 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1cf6a67e290so17786575ad.1;
+        Tue, 21 Nov 2023 14:56:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700607415; x=1701212215; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JxF1JBOvpbEkbZ2xcwyAv8zJQ1WR68j2h9WNm5DzsV8=;
+        b=ffnhW4ZeHX7vb7c5PrFy5srl5TF2CCKXV5Mx2yaW4Aqj1gy7j+GEdcpsxa9zW0p550
+         jHwfUnpGaGMB4s5yGqn+1BmBKbURywxlXqnQyLoulGL0UmI4F3mJV1IFuAyqDdtrIBAB
+         e9CmWFDw+4eKXu7eBTVklbtuW5KFBIYrBehd+iufNVxcvai93utoZMhjaztha9MWhRdI
+         3Ds5CK03YF/iYQiUX7Fux6SclUPybdMqdf7GqsZpFa9Zkk4rEdcEnr5wF95zqD4YZz1i
+         bp0E9nHLeZJ56GfzjrHzHMPGFRa0r91Yp3JQGyLuKJCugKOe0V0WrrlMxxYTr3lVSRnO
+         uHwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700607415; x=1701212215;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=JxF1JBOvpbEkbZ2xcwyAv8zJQ1WR68j2h9WNm5DzsV8=;
+        b=jQi+UGj9uCgotj6zK0q0Wjo1qx1DDHgtrLJiRrb2BEeDY2KHBaC7lGOUUey4LV2iaO
+         JGOA0HX/H0w3Hfik6Weh3/7PBt7vcTIcypE+uX1QZ+JalZkfxAPQtRrlfbVbEVaAbe7I
+         la4uubJvrkpWMTk02wmYueBkVoA4/KG7p8FYqrrd1/egxewOxOHZPYovpAGr+lpN3P/i
+         pQPXYTLTbYf8OSbZW6XSLveYpEVv0v+462+MSI/twuxsa0v9IBbaMTsGyQl33RtuiRmb
+         1qspTiYLoSoPzc8NlsLOvXYtLwnAav6JJq/+33X6hnYX4AxCfKUpz0otMBYQnCR0yrOn
+         8HVw==
+X-Gm-Message-State: AOJu0Yy/zEIPf4zpNHe0nD7SIqQrpwypNSIMTy82eroFWGY31jI/xLCY
+	GGxatK2Sc87wXn6gLG6IqR4=
+X-Google-Smtp-Source: AGHT+IEwD5N2N/yS3WerIGGZK8EVLzzmxstnplnYe+9ptzxDn8R/KfwukCdJd9CyXbraAoaucA4SbA==
+X-Received: by 2002:a17:903:41c1:b0:1cc:665d:f818 with SMTP id u1-20020a17090341c100b001cc665df818mr526789ple.68.1700607415108;
+        Tue, 21 Nov 2023 14:56:55 -0800 (PST)
+Received: from bangji.hsd1.ca.comcast.net ([2601:647:6780:42e0:7377:923f:1ff3:266d])
+        by smtp.gmail.com with ESMTPSA id m12-20020a1709026bcc00b001cc47c1c29csm8413189plt.84.2023.11.21.14.56.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Nov 2023 14:56:54 -0800 (PST)
+Sender: Namhyung Kim <namhyung@gmail.com>
+From: Namhyung Kim <namhyung@kernel.org>
+To: Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>
+Cc: Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	linux-perf-users@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	kvm@vger.kernel.org
+Subject: [PATCH 03/14] tools headers UAPI: Update tools's copy of kvm.h header
+Date: Tue, 21 Nov 2023 14:56:38 -0800
+Message-ID: <20231121225650.390246-3-namhyung@kernel.org>
+X-Mailer: git-send-email 2.43.0.rc1.413.gea7ed67945-goog
+In-Reply-To: <20231121225650.390246-1-namhyung@kernel.org>
+References: <20231121225650.390246-1-namhyung@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 
+tldr; Just FYI, I'm carrying this on the perf tools tree.
 
---=-Sg32XlDwjZW/KftOP1NZ
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Full explanation:
 
-On Tue, 2023-11-21 at 18:02 +0000, Paul Durrant wrote:
-> From: Paul Durrant <pdurrant@amazon.com>
->=20
-> If the guest sets an explicit vcpu_info GPA then, for any of the first 32
-> vCPUs, the content of the default vcpu_info in the shared_info page must =
-be
-> copied into the new location. Because this copy may race with event
-> delivery (which updates the 'evtchn_pending_sel' field in vcpu_info) ther=
-e
-> needs to be a way to defer that until the copy is complete.
-> Happily there is already a shadow of 'evtchn_pending_sel' in kvm_vcpu_xen
-> that is used in atomic context if the vcpu_info PFN cache has been
-> invalidated so that the update of vcpu_info can be deferred until the
-> cache can be refreshed (on vCPU thread's the way back into guest context)=
-.
->=20
-> Also use this shadow if the vcpu_info cache has been *deactivated*, so th=
-at
-> the VMM can safely copy the vcpu_info content and then re-activate the
-> cache with the new GPA. To do this, stop considering an inactive vcpu_inf=
-o
-> cache as a hard error in kvm_xen_set_evtchn_fast().
->=20
-> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
-> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+There used to be no copies, with tools/ code using kernel headers
+directly. From time to time tools/perf/ broke due to legitimate kernel
+hacking. At some point Linus complained about such direct usage. Then we
+adopted the current model.
 
-Wait, didn't we realise that this leaves the bits set in the shadow
-evtchn_pending_sel that get lost on migration?
+The way these headers are used in perf are not restricted to just
+including them to compile something.
 
-The point in your previous patch which split out a shiny new
-set_shinfo_evtchn_pending() function was that you could then *call*
-that function to ensure that the corresponding index bit was set on the
-destination host after migration, if the bit in the shinfo is.
+There are sometimes used in scripts that convert defines into string
+tables, etc, so some change may break one of these scripts, or new MSRs
+may use some different #define pattern, etc.
 
-So we'd do that from kvm_xen_setup_evtchn(), kvm_xen_eventfd_assign(),
-and when setting KVM_XEN_VCPU_ATTR_TYPE_TIMER.
+E.g.:
 
- if (bit_is_set_in_shinfo)
-   set_shinfo_evtchn_pending()
+  $ ls -1 tools/perf/trace/beauty/*.sh | head -5
+  tools/perf/trace/beauty/arch_errno_names.sh
+  tools/perf/trace/beauty/drm_ioctl.sh
+  tools/perf/trace/beauty/fadvise.sh
+  tools/perf/trace/beauty/fsconfig.sh
+  tools/perf/trace/beauty/fsmount.sh
+  $
+  $ tools/perf/trace/beauty/fadvise.sh
+  static const char *fadvise_advices[] = {
+        [0] = "NORMAL",
+        [1] = "RANDOM",
+        [2] = "SEQUENTIAL",
+        [3] = "WILLNEED",
+        [4] = "DONTNEED",
+        [5] = "NOREUSE",
+  };
+  $
 
+The tools/perf/check-headers.sh script, part of the tools/ build
+process, points out changes in the original files.
 
+So its important not to touch the copies in tools/ when doing changes in
+the original kernel headers, that will be done later, when
+check-headers.sh inform about the change to the perf tools hackers.
 
---=-Sg32XlDwjZW/KftOP1NZ
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org
+Signed-off-by: Namhyung Kim <namhyung@kernel.org>
+---
+ tools/include/uapi/linux/kvm.h | 24 +++++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTIxMjI1MzA1WjAvBgkqhkiG9w0BCQQxIgQgx8sdU1Dp
-ARPWRIRbfwEkNd92OqbdzvBfTOx7wdAFGYIwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgC0EGvrrdwHftiLldK2B/qjCOYJsL/LDEyt
-oAvjY8ZRT996LVJQC1gJ7abxva59MYmd8AKE3iD6WiFxRSNpnMunKhWbYOFkkEZfThaDaOAe0nCd
-7rj9ktdBIz4vj2PkUcGz5ATChCPgsRSo4lZcTG5aB6y0pHHcgQxgk3+aNlWpKRSZwO73XTNMRpBK
-wMu6Uf4cUEZ1TltmwWgaLQ5FI0zgvZUc2WIJ8EBjRF3KJxLYPnQUJ30zlcABYJzXBJOReF+KJowE
-+WeiwLDOXZxOvh9DtlGTxw7otZ9ToQmys8zfQuVw6NLJevEqB8KAEkjXjV1k/zk+XVHK2j6235pa
-xxMHrUpwG2Po4+wkiRsiiNsSGJRk7rB+Sk4B1acGuTOmEmf5BBHmqHWtjlXlWoaf7R0hjwu39hKB
-jWCxUO2ZzEob473JVCRAcfRaA03w4rhv4RtgZBtn83esavzKAg6AjIRAZpLPedS1fF6M6AQZF2UQ
-V3tUauHYoosiBGz4CbUXMYGAR8ODrPaoJE1IpRJ+qEpG1rx6U3RUs2wgu7RY+kBDAQxYdqITnqaE
-S2mLlVVsQFdNmfxrtpkGZAAEVn6br+p3sG/JLvTz6+j1rvRRPEfoW/KOzlO7eLIPO48TbgWd4QBs
-QHqj42V04n2mScwmgww+Lkbst1+9ueSttu64Ti4cWgAAAAAAAA==
+diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
+index f089ab290978..211b86de35ac 100644
+--- a/tools/include/uapi/linux/kvm.h
++++ b/tools/include/uapi/linux/kvm.h
+@@ -264,6 +264,7 @@ struct kvm_xen_exit {
+ #define KVM_EXIT_RISCV_SBI        35
+ #define KVM_EXIT_RISCV_CSR        36
+ #define KVM_EXIT_NOTIFY           37
++#define KVM_EXIT_LOONGARCH_IOCSR  38
+ 
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+@@ -336,6 +337,13 @@ struct kvm_run {
+ 			__u32 len;
+ 			__u8  is_write;
+ 		} mmio;
++		/* KVM_EXIT_LOONGARCH_IOCSR */
++		struct {
++			__u64 phys_addr;
++			__u8  data[8];
++			__u32 len;
++			__u8  is_write;
++		} iocsr_io;
+ 		/* KVM_EXIT_HYPERCALL */
+ 		struct {
+ 			__u64 nr;
+@@ -1192,6 +1200,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_COUNTER_OFFSET 227
+ #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+ #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
++#define KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES 230
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1362,6 +1371,7 @@ struct kvm_dirty_tlb {
+ #define KVM_REG_ARM64		0x6000000000000000ULL
+ #define KVM_REG_MIPS		0x7000000000000000ULL
+ #define KVM_REG_RISCV		0x8000000000000000ULL
++#define KVM_REG_LOONGARCH	0x9000000000000000ULL
+ 
+ #define KVM_REG_SIZE_SHIFT	52
+ #define KVM_REG_SIZE_MASK	0x00f0000000000000ULL
+@@ -1418,9 +1428,16 @@ struct kvm_device_attr {
+ 	__u64	addr;		/* userspace address of attr data */
+ };
+ 
+-#define  KVM_DEV_VFIO_GROUP			1
+-#define   KVM_DEV_VFIO_GROUP_ADD			1
+-#define   KVM_DEV_VFIO_GROUP_DEL			2
++#define  KVM_DEV_VFIO_FILE			1
++
++#define   KVM_DEV_VFIO_FILE_ADD			1
++#define   KVM_DEV_VFIO_FILE_DEL			2
++
++/* KVM_DEV_VFIO_GROUP aliases are for compile time uapi compatibility */
++#define  KVM_DEV_VFIO_GROUP	KVM_DEV_VFIO_FILE
++
++#define   KVM_DEV_VFIO_GROUP_ADD	KVM_DEV_VFIO_FILE_ADD
++#define   KVM_DEV_VFIO_GROUP_DEL	KVM_DEV_VFIO_FILE_DEL
+ #define   KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE		3
+ 
+ enum kvm_device_type {
+@@ -1555,6 +1572,7 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_ARM_MTE_COPY_TAGS	  _IOR(KVMIO,  0xb4, struct kvm_arm_copy_mte_tags)
+ /* Available with KVM_CAP_COUNTER_OFFSET */
+ #define KVM_ARM_SET_COUNTER_OFFSET _IOW(KVMIO,  0xb5, struct kvm_arm_counter_offset)
++#define KVM_ARM_GET_REG_WRITABLE_MASKS _IOR(KVMIO,  0xb6, struct reg_mask_range)
+ 
+ /* ioctl for vm fd */
+ #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
+-- 
+2.43.0.rc1.413.gea7ed67945-goog
 
-
---=-Sg32XlDwjZW/KftOP1NZ--
 
