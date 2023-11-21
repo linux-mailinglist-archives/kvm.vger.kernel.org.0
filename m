@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-2152-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2153-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F70A7F2461
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 03:52:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A09687F2463
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 03:52:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA9EEB21EB0
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 02:51:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C409D1C218D9
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 02:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6AEA2D604;
-	Tue, 21 Nov 2023 02:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8A715E92;
+	Tue, 21 Nov 2023 02:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R8UW+tGi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lff22QW5"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F15ACFA;
-	Mon, 20 Nov 2023 18:50:35 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9D13D8;
+	Mon, 20 Nov 2023 18:50:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700535036; x=1732071036;
+  t=1700535040; x=1732071040;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=i8LrPqnDw7KutM9dMmDrGpORGJHz+x3QGV0jkRtM6zs=;
-  b=R8UW+tGi2VQc2Jvnx2u9uolYwnsz7e4bnn+DeJDrJtxXx64ChTp5i/tw
-   DTdQSCTfTdFsAUf4Or+HQfEykHsCfYNrRgYM5Vlupj/UghspaoUK8xvhA
-   AP18aPANKGWSXtxoz7A8LFzFgnIUCbIdgbpehJKcKppcgrQBsTWeGxiqu
-   QB/mKRqlpLk5KRC7tjB5d86KFTMIRV9VyDWqcGp7Y7gq1zlOoRo567h+p
-   ex/uefj6hQAVWPc05C2Og+pX+To0D91xMhGypq+tRvZi7e8/PR3t4YFph
-   ur4ErSzF2WH5WoMa1VnLxyD7d7H6a0XGDz+PM7VPuQmTEq9PT2lIouqJ0
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="458246155"
+  bh=KCbEkyQgARUTCvODq4McBGNPO2St50S+X16hHLy9bas=;
+  b=Lff22QW5gepqaGiZCoPFd/RXen/o6Wny0YjJBxJ1RtCxLYk+76bbgIL3
+   cX5gfhBOafepmAhYYwgw8ol4ALDP1BcAaGC0ZNoi+f3k9ZLHFVYteAPu5
+   jGTg8cMCi/wAoVOxTpeuKr6pxQNSSJgRFFG0LL4jq9MwEIxhU8/rPH8he
+   P6Vv+yULP5EZYbW99mXaKxgNpwPG4NTMwBT8LZ1RxcapqJzp76KoHjSNM
+   W8oTrpH2AOhkzV8324/PpfFkgU1tUIUkQAr+PjHoPE/j6lr5An40AcJKj
+   tHWbTM3IKLe9dNYjCoBAykMu4DRse5ePozRnBVAaWGBgnV/f5O7tu2ULZ
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="458246179"
 X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
-   d="scan'208";a="458246155"
+   d="scan'208";a="458246179"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 18:50:34 -0800
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 18:50:40 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="832488615"
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="832488648"
 X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
-   d="scan'208";a="832488615"
+   d="scan'208";a="832488648"
 Received: from dpdk-yahui-icx1.sh.intel.com ([10.67.111.85])
-  by fmsmga008.fm.intel.com with ESMTP; 20 Nov 2023 18:50:29 -0800
+  by fmsmga008.fm.intel.com with ESMTP; 20 Nov 2023 18:50:34 -0800
 From: Yahui Cao <yahui.cao@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: kvm@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: kvm@vger.kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Subject: [PATCH iwl-next v4 11/12] ice: Save and load mmio registers
-Date: Tue, 21 Nov 2023 02:51:10 +0000
-Message-Id: <20231121025111.257597-12-yahui.cao@intel.com>
+Subject: [PATCH iwl-next v4 12/12] vfio/ice: Implement vfio_pci driver for E800 devices
+Date: Tue, 21 Nov 2023 02:51:11 +0000
+Message-Id: <20231121025111.257597-13-yahui.cao@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231121025111.257597-1-yahui.cao@intel.com>
 References: <20231121025111.257597-1-yahui.cao@intel.com>
@@ -73,480 +73,808 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In E800 device model, VF takes direct control over the context of
-AdminQ, irq ctrl, TX tail and RX tail by accessing VF pci mmio. Rest of
-all the state can only be setup by PF and the procedure is that VF sends
-all these configuration to PF through virtual channel messages to setup
-the rest of the state.
+From: Lingyu Liu <lingyu.liu@intel.com>
 
-To migrate AdminQ/irq context successfully, only AdminQ/irq register
-needs to be loaded, rest of the part like generic msix is handled by
-migration stack.
+Add a vendor-specific vfio_pci driver for E800 devices.
 
-To migrate RX dma ring successfully, RX ring base, length(setup via
-virtual channel messages) and tail register (setup via VF pci mmio)
-must be loaded before RX queue is enabled.
+It uses vfio_pci_core to register to the VFIO subsystem and then
+implements the E800 specific logic to support VF live migration.
 
-To migrate TX dma ring successfully, TX ring base and length(setup via
-virtual channel messages) must be loaded before TX queue is enabled,
-and TX tail(setup via VF pci mmio) doesn't need to be loaded since TX
-queue is drained before migration and TX tail is stateless.
+It implements the device state transition flow for live
+migration.
 
-For simplicity, just load all the VF pci mmio before virtual channel
-messages are replayed so that all the TX/RX ring context are loaded
-before queue is enabled.
-
-However, there are 2 corner cases which need to be taken care of:
-- During device suspenion, irq register may be dirtied when stopping
-  queue. Hence save irq register into internal pre-saved area before
-  queue is stopped and fetch the pre-saved irq register value at device
-  saving stage.
-- When PF processes virtual channel VIRTCHNL_OP_CONFIG_VSI_QUEUES, irq
-  register may be dirtied. Hence load the affacted irq register after
-  virtual channel messages are replayed.
-
+Signed-off-by: Lingyu Liu <lingyu.liu@intel.com>
 Signed-off-by: Yahui Cao <yahui.cao@intel.com>
 ---
- .../net/ethernet/intel/ice/ice_hw_autogen.h   |   8 +
- .../net/ethernet/intel/ice/ice_migration.c    | 308 ++++++++++++++++++
- .../intel/ice/ice_migration_private.h         |   7 +
- drivers/net/ethernet/intel/ice/ice_vf_lib.h   |   2 +
- 4 files changed, 325 insertions(+)
+ MAINTAINERS                         |   7 +
+ drivers/vfio/pci/Kconfig            |   2 +
+ drivers/vfio/pci/Makefile           |   2 +
+ drivers/vfio/pci/ice/Kconfig        |  10 +
+ drivers/vfio/pci/ice/Makefile       |   4 +
+ drivers/vfio/pci/ice/ice_vfio_pci.c | 707 ++++++++++++++++++++++++++++
+ 6 files changed, 732 insertions(+)
+ create mode 100644 drivers/vfio/pci/ice/Kconfig
+ create mode 100644 drivers/vfio/pci/ice/Makefile
+ create mode 100644 drivers/vfio/pci/ice/ice_vfio_pci.c
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-index 7410da715ad4..389bf00411ff 100644
---- a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-+++ b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-@@ -31,8 +31,16 @@
- #define PF_FW_ATQLEN_ATQVFE_M			BIT(28)
- #define PF_FW_ATQLEN_ATQOVFL_M			BIT(29)
- #define PF_FW_ATQLEN_ATQCRIT_M			BIT(30)
-+#define VF_MBX_ARQBAH(_VF)			(0x0022B800 + ((_VF) * 4))
-+#define VF_MBX_ARQBAL(_VF)			(0x0022B400 + ((_VF) * 4))
-+#define VF_MBX_ARQH(_VF)			(0x0022C000 + ((_VF) * 4))
- #define VF_MBX_ARQLEN(_VF)			(0x0022BC00 + ((_VF) * 4))
-+#define VF_MBX_ARQT(_VF)			(0x0022C400 + ((_VF) * 4))
-+#define VF_MBX_ATQBAH(_VF)			(0x0022A400 + ((_VF) * 4))
-+#define VF_MBX_ATQBAL(_VF)			(0x0022A000 + ((_VF) * 4))
-+#define VF_MBX_ATQH(_VF)			(0x0022AC00 + ((_VF) * 4))
- #define VF_MBX_ATQLEN(_VF)			(0x0022A800 + ((_VF) * 4))
-+#define VF_MBX_ATQT(_VF)			(0x0022B000 + ((_VF) * 4))
- #define PF_FW_ATQLEN_ATQENABLE_M		BIT(31)
- #define PF_FW_ATQT				0x00080400
- #define PF_MBX_ARQBAH				0x0022E400
-diff --git a/drivers/net/ethernet/intel/ice/ice_migration.c b/drivers/net/ethernet/intel/ice/ice_migration.c
-index a11cd0d3ad3d..127d45be6767 100644
---- a/drivers/net/ethernet/intel/ice/ice_migration.c
-+++ b/drivers/net/ethernet/intel/ice/ice_migration.c
-@@ -25,6 +25,27 @@ struct ice_migration_virtchnl_msg_listnode {
- 	struct ice_migration_virtchnl_msg_slot msg_slot;
- };
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 97f51d5ec1cf..c8faf7fe1bd1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -22860,6 +22860,13 @@ L:	kvm@vger.kernel.org
+ S:	Maintained
+ F:	drivers/vfio/pci/mlx5/
  
-+struct ice_migration_mmio_regs {
-+	/* VF Interrupts */
-+	u32 int_dyn_ctl[ICE_MIG_VF_MSIX_MAX];
-+	u32 int_intr[ICE_MIG_VF_ITR_NUM][ICE_MIG_VF_MSIX_MAX];
++VFIO ICE PCI DRIVER
++M:	Yahui Cao <yahui.cao@intel.com>
++M:	Lingyu Liu <lingyu.liu@intel.com>
++L:	kvm@vger.kernel.org
++S:	Maintained
++F:	drivers/vfio/pci/ice/
 +
-+	/* VF Control Queues */
-+	u32 asq_bal;
-+	u32 asq_bah;
-+	u32 asq_len;
-+	u32 asq_head;
-+	u32 asq_tail;
-+	u32 arq_bal;
-+	u32 arq_bah;
-+	u32 arq_len;
-+	u32 arq_head;
-+	u32 arq_tail;
+ VFIO PCI DEVICE SPECIFIC DRIVERS
+ R:	Jason Gunthorpe <jgg@nvidia.com>
+ R:	Yishai Hadas <yishaih@nvidia.com>
+diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+index 8125e5f37832..6618208947af 100644
+--- a/drivers/vfio/pci/Kconfig
++++ b/drivers/vfio/pci/Kconfig
+@@ -65,4 +65,6 @@ source "drivers/vfio/pci/hisilicon/Kconfig"
+ 
+ source "drivers/vfio/pci/pds/Kconfig"
+ 
++source "drivers/vfio/pci/ice/Kconfig"
 +
-+	/* VF LAN RX */
-+	u32 rx_tail[ICE_MIG_VF_QRX_TAIL_MAX];
+ endmenu
+diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
+index 45167be462d8..fc1df82df3ac 100644
+--- a/drivers/vfio/pci/Makefile
++++ b/drivers/vfio/pci/Makefile
+@@ -13,3 +13,5 @@ obj-$(CONFIG_MLX5_VFIO_PCI)           += mlx5/
+ obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisilicon/
+ 
+ obj-$(CONFIG_PDS_VFIO_PCI) += pds/
++
++obj-$(CONFIG_ICE_VFIO_PCI) += ice/
+diff --git a/drivers/vfio/pci/ice/Kconfig b/drivers/vfio/pci/ice/Kconfig
+new file mode 100644
+index 000000000000..0b8cd1489073
+--- /dev/null
++++ b/drivers/vfio/pci/ice/Kconfig
+@@ -0,0 +1,10 @@
++# SPDX-License-Identifier: GPL-2.0-only
++config ICE_VFIO_PCI
++	tristate "VFIO support for Intel(R) Ethernet Connection E800 Series"
++	depends on ICE
++	select VFIO_PCI_CORE
++	help
++	  This provides migration support for Intel(R) Ethernet connection E800
++	  series devices using the VFIO framework.
++
++	  If you don't know what to do here, say N.
+diff --git a/drivers/vfio/pci/ice/Makefile b/drivers/vfio/pci/ice/Makefile
+new file mode 100644
+index 000000000000..259d4ab89105
+--- /dev/null
++++ b/drivers/vfio/pci/ice/Makefile
+@@ -0,0 +1,4 @@
++# SPDX-License-Identifier: GPL-2.0-only
++obj-$(CONFIG_ICE_VFIO_PCI) += ice-vfio-pci.o
++ice-vfio-pci-y := ice_vfio_pci.o
++
+diff --git a/drivers/vfio/pci/ice/ice_vfio_pci.c b/drivers/vfio/pci/ice/ice_vfio_pci.c
+new file mode 100644
+index 000000000000..28a181aa2f3f
+--- /dev/null
++++ b/drivers/vfio/pci/ice/ice_vfio_pci.c
+@@ -0,0 +1,707 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (C) 2018-2023 Intel Corporation */
++
++#include <linux/device.h>
++#include <linux/module.h>
++#include <linux/types.h>
++#include <linux/file.h>
++#include <linux/pci.h>
++#include <linux/vfio_pci_core.h>
++#include <linux/net/intel/ice_migration.h>
++#include <linux/anon_inodes.h>
++
++#define DRIVER_DESC     "ICE VFIO PCI - User Level meta-driver for Intel E800 device family"
++
++struct ice_vfio_pci_migration_file {
++	struct file *filp;
++	struct mutex lock; /* protect migration file access */
++	bool disabled;
++
++	u8 mig_data[SZ_128K];
++	size_t total_length;
 +};
 +
- struct ice_migration_dev_state {
- 	u32 magic;
- 	u32 version;
-@@ -33,6 +54,7 @@ struct ice_migration_dev_state {
- 	u16 num_txq;
- 	u16 num_rxq;
- 
-+	struct ice_migration_mmio_regs regs;
- 	u16 vsi_id;
- 	/* next RX desc index to be processed by the device */
- 	u16 rx_head[ICE_MIG_VF_QRX_TAIL_MAX];
-@@ -276,6 +298,57 @@ u32 ice_migration_supported_caps(void)
- 	return VIRTCHNL_VF_MIGRATION_SUPPORT_FEATURE;
- }
- 
-+/**
-+ * ice_migration_save_dirty_regs - save registers which may be dirtied
-+ * @vf: pointer to VF structure
-+ *
-+ * Return 0 for success, negative for error
-+ */
-+static int ice_migration_save_dirty_regs(struct ice_vf *vf)
-+{
-+	struct ice_migration_dirty_regs *dirty_regs = &vf->dirty_regs;
-+	struct device *dev = ice_pf_to_dev(vf->pf);
-+	struct ice_hw *hw = &vf->pf->hw;
-+	struct ice_vsi *vsi;
-+	int itr, v_id;
-+
-+	vsi = ice_get_vf_vsi(vf);
-+	if (!vsi) {
-+		dev_err(dev, "VF %d VSI is NULL\n", vf->vf_id);
-+		return -EINVAL;
-+	}
-+
-+	if (WARN_ON_ONCE(vsi->num_q_vectors + ICE_NONQ_VECS_VF >
-+			 ICE_MIG_VF_MSIX_MAX))
-+		return -EINVAL;
-+
-+	/* Save Mailbox Q vectors */
-+	dirty_regs->int_dyn_ctl[0] =
-+		rd32(hw, GLINT_DYN_CTL(vf->first_vector_idx));
-+	for (itr = 0; itr < ICE_MIG_VF_ITR_NUM; itr++)
-+		dirty_regs->int_intr[itr][0] =
-+			rd32(hw, GLINT_ITR(itr, vf->first_vector_idx));
-+
-+	/* Save Data Q vectors */
-+	for (v_id = 0; v_id < vsi->num_q_vectors; v_id++) {
-+		int irq = v_id + ICE_NONQ_VECS_VF;
-+		struct ice_q_vector *q_vector;
-+
-+		q_vector = vsi->q_vectors[v_id];
-+		if (!q_vector) {
-+			dev_err(dev, "VF %d invalid q vectors\n", vf->vf_id);
-+			return -EINVAL;
-+		}
-+		dirty_regs->int_dyn_ctl[irq] =
-+				rd32(hw, GLINT_DYN_CTL(q_vector->reg_idx));
-+		for (itr = 0; itr < ICE_MIG_VF_ITR_NUM; itr++)
-+			dirty_regs->int_intr[itr][irq] =
-+				rd32(hw, GLINT_ITR(itr, q_vector->reg_idx));
-+	}
-+
-+	return 0;
-+}
-+
- /**
-  * ice_migration_suspend_dev - suspend device
-  * @pf: pointer to PF of migration device
-@@ -324,6 +397,15 @@ int ice_migration_suspend_dev(struct ice_pf *pf, int vf_id)
- 	eth_zero_addr(vf->hw_lan_addr);
- 	eth_zero_addr(vf->dev_lan_addr);
- 
-+	/* Irq register may be dirtied when stopping queue. Hence save irq
-+	 * register into pre-saved area before queue is stopped.
-+	 */
-+	ret = ice_migration_save_dirty_regs(vf);
-+	if (ret) {
-+		dev_err(dev, "VF %d failed to save dirty register copy\n",
-+			vf->vf_id);
-+		goto out_put_vf;
-+	}
- 	ret = ice_vsi_stop_lan_tx_rings(vsi, ICE_NO_RESET, vf->vf_id);
- 	if (ret) {
- 		dev_err(dev, "VF %d failed to stop tx rings\n", vf->vf_id);
-@@ -447,6 +529,84 @@ ice_migration_save_tx_head(struct ice_vf *vf,
- 	return 0;
- }
- 
-+/**
-+ * ice_migration_save_regs - save mmio registers in migration region
-+ * @vf: pointer to VF structure
-+ * @devstate: pointer to migration device state
-+ *
-+ * Return 0 for success, negative for error
-+ */
-+static int
-+ice_migration_save_regs(struct ice_vf *vf,
-+			struct ice_migration_dev_state *devstate)
-+{
-+	struct ice_migration_dirty_regs *dirty_regs = &vf->dirty_regs;
-+	struct ice_migration_mmio_regs *regs = &devstate->regs;
-+	struct device *dev = ice_pf_to_dev(vf->pf);
-+	struct ice_hw *hw = &vf->pf->hw;
-+	struct ice_vsi *vsi;
-+	int i, itr, v_id;
-+
-+	vsi = ice_get_vf_vsi(vf);
-+	if (!vsi) {
-+		dev_err(dev, "VF %d VSI is NULL\n", vf->vf_id);
-+		return -EINVAL;
-+	}
-+
-+	if (WARN_ON_ONCE(vsi->num_q_vectors + ICE_NONQ_VECS_VF >
-+			 ICE_MIG_VF_MSIX_MAX))
-+		return -EINVAL;
-+
-+	/* For irq registers which may be dirtied when virtual channel message
-+	 * VIRTCHNL_OP_CONFIG_VSI_QUEUES is processed, load values from
-+	 * pre-saved area.
-+	 */
-+
-+	/* Save Mailbox Q vectors */
-+	regs->int_dyn_ctl[0] = dirty_regs->int_dyn_ctl[0];
-+	for (itr = 0; itr < ICE_MIG_VF_ITR_NUM; itr++)
-+		regs->int_intr[itr][0] = dirty_regs->int_intr[itr][0];
-+
-+	/* Save Data Q vectors */
-+	for (v_id = 0; v_id < vsi->num_q_vectors; v_id++) {
-+		int irq = v_id + ICE_NONQ_VECS_VF;
-+		struct ice_q_vector *q_vector;
-+
-+		q_vector = vsi->q_vectors[v_id];
-+		if (!q_vector) {
-+			dev_err(dev, "VF %d invalid q vectors\n", vf->vf_id);
-+			return -EINVAL;
-+		}
-+		regs->int_dyn_ctl[irq] = dirty_regs->int_dyn_ctl[irq];
-+		for (itr = 0; itr < ICE_MIG_VF_ITR_NUM; itr++)
-+			regs->int_intr[itr][irq] =
-+				dirty_regs->int_intr[itr][irq];
-+	}
-+
-+	regs->asq_bal = rd32(hw, VF_MBX_ATQBAL(vf->vf_id));
-+	regs->asq_bah = rd32(hw, VF_MBX_ATQBAH(vf->vf_id));
-+	regs->asq_len = rd32(hw, VF_MBX_ATQLEN(vf->vf_id));
-+	regs->asq_head = rd32(hw, VF_MBX_ATQH(vf->vf_id));
-+	regs->asq_tail = rd32(hw, VF_MBX_ATQT(vf->vf_id));
-+	regs->arq_bal = rd32(hw, VF_MBX_ARQBAL(vf->vf_id));
-+	regs->arq_bah = rd32(hw, VF_MBX_ARQBAH(vf->vf_id));
-+	regs->arq_len = rd32(hw,  VF_MBX_ARQLEN(vf->vf_id));
-+	regs->arq_head = rd32(hw, VF_MBX_ARQH(vf->vf_id));
-+	regs->arq_tail = rd32(hw, VF_MBX_ARQT(vf->vf_id));
-+
-+	ice_for_each_rxq(vsi, i) {
-+		struct ice_rx_ring *rx_ring = vsi->rx_rings[i];
-+
-+		regs->rx_tail[i] = 0;
-+		if (!test_bit(i, vf->rxq_ena))
-+			continue;
-+
-+		regs->rx_tail[i] = rd32(hw, QRX_TAIL(rx_ring->reg_idx));
-+	}
-+
-+	return 0;
-+}
-+
- /**
-  * ice_migration_save_devstate - save device state to migration buffer
-  * @pf: pointer to PF of migration device
-@@ -501,6 +661,12 @@ ice_migration_save_devstate(struct ice_pf *pf, int vf_id, u8 *buf, u64 buf_sz)
- 	buf = devstate->virtchnl_msgs;
- 	devstate->vsi_id = vf->vm_vsi_num;
- 
-+	ret = ice_migration_save_regs(vf, devstate);
-+	if (ret) {
-+		dev_err(dev, "VF %d failed to save mmio register\n", vf->vf_id);
-+		goto out_put_vf;
-+	}
-+
- 	ret = ice_migration_save_rx_head(vf, devstate);
- 	if (ret) {
- 		dev_err(dev, "VF %d failed to save rxq head\n", vf->vf_id);
-@@ -883,6 +1049,125 @@ ice_migration_load_tx_head(struct ice_vf *vf,
- 	return ret;
- }
- 
-+/**
-+ * ice_migration_load_regs - load mmio registers from device state buffer
-+ * @vf: pointer to VF structure
-+ * @devstate: pointer to migration device state
-+ *
-+ * Return 0 for success, negative for error
-+ */
-+static int
-+ice_migration_load_regs(struct ice_vf *vf,
-+			struct ice_migration_dev_state *devstate)
-+{
-+	struct ice_migration_mmio_regs *regs = &devstate->regs;
-+	struct device *dev = ice_pf_to_dev(vf->pf);
-+	struct ice_hw *hw = &vf->pf->hw;
-+	struct ice_vsi *vsi;
-+	int i, itr, v_id;
-+
-+	vsi = ice_get_vf_vsi(vf);
-+	if (!vsi) {
-+		dev_err(dev, "VF %d VSI is NULL\n", vf->vf_id);
-+		return -EINVAL;
-+	}
-+
-+	if (WARN_ON_ONCE(vsi->num_q_vectors + ICE_NONQ_VECS_VF >
-+			 ICE_MIG_VF_MSIX_MAX))
-+		return -EINVAL;
-+
-+	/* Restore Mailbox Q vectors */
-+	wr32(hw, GLINT_DYN_CTL(vf->first_vector_idx), regs->int_dyn_ctl[0]);
-+	for (itr = 0; itr < ICE_MIG_VF_ITR_NUM; itr++)
-+		wr32(hw, GLINT_ITR(itr, vf->first_vector_idx),
-+		     regs->int_intr[itr][0]);
-+
-+	/* Restore Data Q vectors */
-+	for (v_id = 0; v_id < vsi->num_q_vectors; v_id++) {
-+		int irq = v_id + ICE_NONQ_VECS_VF;
-+		struct ice_q_vector *q_vector;
-+
-+		q_vector = vsi->q_vectors[v_id];
-+		if (!q_vector) {
-+			dev_err(dev, "VF %d invalid q vectors\n", vf->vf_id);
-+			return -EINVAL;
-+		}
-+		wr32(hw, GLINT_DYN_CTL(q_vector->reg_idx),
-+		     regs->int_dyn_ctl[irq]);
-+		for (itr = 0; itr < ICE_MIG_VF_ITR_NUM; itr++)
-+			wr32(hw, GLINT_ITR(itr, q_vector->reg_idx),
-+			     regs->int_intr[itr][irq]);
-+	}
-+
-+	wr32(hw, VF_MBX_ATQBAL(vf->vf_id), regs->asq_bal);
-+	wr32(hw, VF_MBX_ATQBAH(vf->vf_id), regs->asq_bah);
-+	wr32(hw, VF_MBX_ATQLEN(vf->vf_id), regs->asq_len);
-+	wr32(hw, VF_MBX_ATQH(vf->vf_id), regs->asq_head);
-+	/* Since Mailbox ctrl tx queue tail is bumped by VF driver to notify
-+	 * HW to send pks, VF_MBX_ATQT is not necessry to be loaded here.
-+	 */
-+	wr32(hw, VF_MBX_ARQBAL(vf->vf_id), regs->arq_bal);
-+	wr32(hw, VF_MBX_ARQBAH(vf->vf_id), regs->arq_bah);
-+	wr32(hw, VF_MBX_ARQLEN(vf->vf_id), regs->arq_len);
-+	wr32(hw, VF_MBX_ARQH(vf->vf_id), regs->arq_head);
-+	wr32(hw, VF_MBX_ARQT(vf->vf_id), regs->arq_tail);
-+
-+	ice_for_each_rxq(vsi, i) {
-+		struct ice_rx_ring *rx_ring = vsi->rx_rings[i];
-+
-+		wr32(hw, QRX_TAIL(rx_ring->reg_idx), regs->rx_tail[i]);
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_migration_load_dirty_regs - load registers which may be dirtied
-+ * @vf: pointer to VF structure
-+ * @devstate: pointer to migration device state
-+ *
-+ * Return 0 for success, negative for error
-+ */
-+static int
-+ice_migration_load_dirty_regs(struct ice_vf *vf,
-+			      struct ice_migration_dev_state *devstate)
-+{
-+	struct ice_migration_mmio_regs *regs = &devstate->regs;
-+	struct device *dev = ice_pf_to_dev(vf->pf);
-+	struct ice_hw *hw = &vf->pf->hw;
-+	struct ice_vsi *vsi;
-+	int itr, v_id;
-+
-+	vsi = ice_get_vf_vsi(vf);
-+	if (!vsi) {
-+		dev_err(dev, "VF %d VSI is NULL\n", vf->vf_id);
-+		return -EINVAL;
-+	}
-+
-+	if (WARN_ON_ONCE(vsi->num_q_vectors + ICE_NONQ_VECS_VF >
-+			 ICE_MIG_VF_MSIX_MAX))
-+		return -EINVAL;
-+
-+	/* Restore Data Q vectors */
-+	for (v_id = 0; v_id < vsi->num_q_vectors; v_id++) {
-+		int irq = v_id + ICE_NONQ_VECS_VF;
-+		struct ice_q_vector *q_vector;
-+
-+		q_vector = vsi->q_vectors[v_id];
-+		if (!q_vector) {
-+			dev_err(dev, "VF %d invalid q vectors\n", vf->vf_id);
-+			return -EINVAL;
-+		}
-+		wr32(hw, GLINT_DYN_CTL(q_vector->reg_idx),
-+		     regs->int_dyn_ctl[irq]);
-+		for (itr = 0; itr < ICE_MIG_VF_ITR_NUM; itr++)
-+			wr32(hw, GLINT_ITR(itr, q_vector->reg_idx),
-+			     regs->int_intr[itr][irq]);
-+	}
-+
-+	return 0;
-+}
-+
- /**
-  * ice_migration_load_devstate - load device state at destination
-  * @pf: pointer to PF of migration device
-@@ -920,6 +1205,18 @@ int ice_migration_load_devstate(struct ice_pf *pf, int vf_id,
- 	devstate = (struct ice_migration_dev_state *)buf;
- 	vf->vm_vsi_num = devstate->vsi_id;
- 	dev_dbg(dev, "VF %d vm vsi num is:%d\n", vf->vf_id, vf->vm_vsi_num);
-+
-+	/* RX tail register must be loaded before queue is enabled. For
-+	 * simplicity, just load all the mmio before virtual channel messages
-+	 * are replayed.
-+	 */
-+	ret = ice_migration_load_regs(vf, devstate);
-+	if (ret) {
-+		dev_err(dev, "VF %d failed to load mmio registers\n",
-+			vf->vf_id);
-+		goto out_put_vf;
-+	}
-+
- 	msg_slot = (struct ice_migration_virtchnl_msg_slot *)
- 			devstate->virtchnl_msgs;
- 	set_bit(ICE_VF_STATE_REPLAYING_VC, vf->vf_states);
-@@ -971,6 +1268,17 @@ int ice_migration_load_devstate(struct ice_pf *pf, int vf_id,
- 		goto out_clear_replay;
- 	}
- 
-+	/* When PF processes virtual channel VIRTCHNL_OP_CONFIG_VSI_QUEUES, irq
-+	 * register may be dirtied. Hence load the affacted irq register again
-+	 * after virtual channel messages are replayed.
-+	 */
-+	ret = ice_migration_load_dirty_regs(vf, devstate);
-+	if (ret) {
-+		dev_err(dev, "VF %d failed to load dirty registers\n",
-+			vf->vf_id);
-+		goto out_clear_replay;
-+	}
-+
- out_clear_replay:
- 	clear_bit(ICE_VF_STATE_REPLAYING_VC, vf->vf_states);
- out_put_vf:
-diff --git a/drivers/net/ethernet/intel/ice/ice_migration_private.h b/drivers/net/ethernet/intel/ice/ice_migration_private.h
-index f72a488d9002..b76eb05747c8 100644
---- a/drivers/net/ethernet/intel/ice/ice_migration_private.h
-+++ b/drivers/net/ethernet/intel/ice/ice_migration_private.h
-@@ -10,6 +10,13 @@
-  * in ice-vfio-pic.ko should be exposed as part of ice_migration.h.
-  */
- 
-+#define ICE_MIG_VF_MSIX_MAX		65
-+#define ICE_MIG_VF_ITR_NUM		4
-+struct ice_migration_dirty_regs {
-+	u32 int_dyn_ctl[ICE_MIG_VF_MSIX_MAX];
-+	u32 int_intr[ICE_MIG_VF_ITR_NUM][ICE_MIG_VF_MSIX_MAX];
++struct ice_vfio_pci_core_device {
++	struct vfio_pci_core_device core_device;
++	u8 deferred_reset:1;
++	struct mutex state_mutex; /* protect migration state */
++	enum vfio_device_mig_state mig_state;
++	/* protect the reset_done flow */
++	spinlock_t reset_lock;
++	struct ice_vfio_pci_migration_file *resuming_migf;
++	struct ice_vfio_pci_migration_file *saving_migf;
++	struct vfio_device_migration_info mig_info;
++	u8 *mig_data;
++	struct ice_pf *pf;
++	int vf_id;
 +};
 +
- #if IS_ENABLED(CONFIG_ICE_VFIO_PCI)
- void ice_migration_init_vf(struct ice_vf *vf);
- void ice_migration_uninit_vf(struct ice_vf *vf);
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.h b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-index 49d99694e91f..c971fb47c2ff 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-@@ -14,6 +14,7 @@
- #include "ice_type.h"
- #include "ice_virtchnl_fdir.h"
- #include "ice_vsi_vlan_ops.h"
-+#include "ice_migration_private.h"
- 
- #define ICE_MAX_SRIOV_VFS		256
- 
-@@ -147,6 +148,7 @@ struct ice_vf {
- 	u64 virtchnl_msg_size;
- 	u32 virtchnl_retval;
- 	u16 vm_vsi_num;
-+	struct ice_migration_dirty_regs dirty_regs;
- };
- 
- /* Flags for controlling behavior of ice_reset_vf */
++/**
++ * ice_vfio_pci_load_state - VFIO device state reloading
++ * @ice_vdev: pointer to ice vfio pci core device structure
++ *
++ * Load device state. This function is called when the userspace VFIO uAPI
++ * consumer wants to load the device state info from VFIO migration region and
++ * load them into the device. This function should make sure all the device
++ * state info is loaded successfully. As a result, return value is mandatory
++ * to be checked.
++ *
++ * Return 0 for success, negative value for failure.
++ */
++static int __must_check
++ice_vfio_pci_load_state(struct ice_vfio_pci_core_device *ice_vdev)
++{
++	struct ice_vfio_pci_migration_file *migf = ice_vdev->resuming_migf;
++
++	return ice_migration_load_devstate(ice_vdev->pf,
++					   ice_vdev->vf_id,
++					   migf->mig_data,
++					   migf->total_length);
++}
++
++/**
++ * ice_vfio_pci_save_state - VFIO device state saving
++ * @ice_vdev: pointer to ice vfio pci core device structure
++ * @migf: pointer to migration file
++ *
++ * Snapshot the device state and save it. This function is called when the
++ * VFIO uAPI consumer wants to snapshot the current device state and saves
++ * it into the VFIO migration region. This function should make sure all
++ * of the device state info is collectted and saved successfully. As a
++ * result, return value is mandatory to be checked.
++ *
++ * Return 0 for success, negative value for failure.
++ */
++static int __must_check
++ice_vfio_pci_save_state(struct ice_vfio_pci_core_device *ice_vdev,
++			struct ice_vfio_pci_migration_file *migf)
++{
++	migf->total_length = SZ_128K;
++
++	return ice_migration_save_devstate(ice_vdev->pf,
++					   ice_vdev->vf_id,
++					   migf->mig_data,
++					   migf->total_length);
++}
++
++/**
++ * ice_vfio_migration_init - Initialization for live migration function
++ * @ice_vdev: pointer to ice vfio pci core device structure
++ *
++ * Returns 0 on success, negative value on error
++ */
++static int ice_vfio_migration_init(struct ice_vfio_pci_core_device *ice_vdev)
++{
++	struct pci_dev *pdev = ice_vdev->core_device.pdev;
++
++	ice_vdev->pf = ice_migration_get_pf(pdev);
++	if (!ice_vdev->pf)
++		return -EFAULT;
++
++	ice_vdev->vf_id = pci_iov_vf_id(pdev);
++	if (ice_vdev->vf_id < 0)
++		return -EINVAL;
++
++	return ice_migration_init_dev(ice_vdev->pf, ice_vdev->vf_id);
++}
++
++/**
++ * ice_vfio_migration_uninit - Cleanup for live migration function
++ * @ice_vdev: pointer to ice vfio pci core device structure
++ */
++static void ice_vfio_migration_uninit(struct ice_vfio_pci_core_device *ice_vdev)
++{
++	ice_migration_uninit_dev(ice_vdev->pf, ice_vdev->vf_id);
++}
++
++/**
++ * ice_vfio_pci_disable_fd - Close migration file
++ * @migf: pointer to ice vfio pci migration file
++ */
++static void ice_vfio_pci_disable_fd(struct ice_vfio_pci_migration_file *migf)
++{
++	mutex_lock(&migf->lock);
++	migf->disabled = true;
++	migf->total_length = 0;
++	migf->filp->f_pos = 0;
++	mutex_unlock(&migf->lock);
++}
++
++/**
++ * ice_vfio_pci_disable_fds - Close migration files of ice vfio pci device
++ * @ice_vdev: pointer to ice vfio pci core device structure
++ */
++static void ice_vfio_pci_disable_fds(struct ice_vfio_pci_core_device *ice_vdev)
++{
++	if (ice_vdev->resuming_migf) {
++		ice_vfio_pci_disable_fd(ice_vdev->resuming_migf);
++		fput(ice_vdev->resuming_migf->filp);
++		ice_vdev->resuming_migf = NULL;
++	}
++	if (ice_vdev->saving_migf) {
++		ice_vfio_pci_disable_fd(ice_vdev->saving_migf);
++		fput(ice_vdev->saving_migf->filp);
++		ice_vdev->saving_migf = NULL;
++	}
++}
++
++/*
++ * This function is called in all state_mutex unlock cases to
++ * handle a 'deferred_reset' if exists.
++ * @ice_vdev: pointer to ice vfio pci core device structure
++ */
++static void
++ice_vfio_pci_state_mutex_unlock(struct ice_vfio_pci_core_device *ice_vdev)
++{
++again:
++	spin_lock(&ice_vdev->reset_lock);
++	if (ice_vdev->deferred_reset) {
++		ice_vdev->deferred_reset = false;
++		spin_unlock(&ice_vdev->reset_lock);
++		ice_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
++		ice_vfio_pci_disable_fds(ice_vdev);
++		goto again;
++	}
++	mutex_unlock(&ice_vdev->state_mutex);
++	spin_unlock(&ice_vdev->reset_lock);
++}
++
++static void ice_vfio_pci_reset_done(struct pci_dev *pdev)
++{
++	struct ice_vfio_pci_core_device *ice_vdev =
++		(struct ice_vfio_pci_core_device *)dev_get_drvdata(&pdev->dev);
++
++	/*
++	 * As the higher VFIO layers are holding locks across reset and using
++	 * those same locks with the mm_lock we need to prevent ABBA deadlock
++	 * with the state_mutex and mm_lock.
++	 * In case the state_mutex was taken already we defer the cleanup work
++	 * to the unlock flow of the other running context.
++	 */
++	spin_lock(&ice_vdev->reset_lock);
++	ice_vdev->deferred_reset = true;
++	if (!mutex_trylock(&ice_vdev->state_mutex)) {
++		spin_unlock(&ice_vdev->reset_lock);
++		return;
++	}
++	spin_unlock(&ice_vdev->reset_lock);
++	ice_vfio_pci_state_mutex_unlock(ice_vdev);
++}
++
++/**
++ * ice_vfio_pci_open_device - Called when a vfio device is probed by VFIO UAPI
++ * @core_vdev: the vfio device to open
++ *
++ * Initialization of the vfio device
++ *
++ * Returns 0 on success, negative value on error
++ */
++static int ice_vfio_pci_open_device(struct vfio_device *core_vdev)
++{
++	struct ice_vfio_pci_core_device *ice_vdev = container_of(core_vdev,
++			struct ice_vfio_pci_core_device, core_device.vdev);
++	struct vfio_pci_core_device *vdev = &ice_vdev->core_device;
++	int ret;
++
++	ret = vfio_pci_core_enable(vdev);
++	if (ret)
++		return ret;
++
++	ret = ice_vfio_migration_init(ice_vdev);
++	if (ret) {
++		vfio_pci_core_disable(vdev);
++		return ret;
++	}
++	ice_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
++	vfio_pci_core_finish_enable(vdev);
++
++	return 0;
++}
++
++/**
++ * ice_vfio_pci_close_device - Called when a vfio device fd is closed
++ * @core_vdev: the vfio device to close
++ */
++static void ice_vfio_pci_close_device(struct vfio_device *core_vdev)
++{
++	struct ice_vfio_pci_core_device *ice_vdev = container_of(core_vdev,
++			struct ice_vfio_pci_core_device, core_device.vdev);
++
++	ice_vfio_pci_disable_fds(ice_vdev);
++	vfio_pci_core_close_device(core_vdev);
++	ice_vfio_migration_uninit(ice_vdev);
++}
++
++/**
++ * ice_vfio_pci_release_file - release ice vfio pci migration file
++ * @inode: pointer to inode
++ * @filp: pointer to the file to release
++ *
++ * Return 0 for success, negative for error
++ */
++static int ice_vfio_pci_release_file(struct inode *inode, struct file *filp)
++{
++	struct ice_vfio_pci_migration_file *migf = filp->private_data;
++
++	ice_vfio_pci_disable_fd(migf);
++	mutex_destroy(&migf->lock);
++	kfree(migf);
++	return 0;
++}
++
++/**
++ * ice_vfio_pci_save_read - save migration file data to user space
++ * @filp: pointer to migration file
++ * @buf: pointer to user space buffer
++ * @len: data length to be saved
++ * @pos: should be 0
++ *
++ * Return len of saved data, negative for error
++ */
++static ssize_t ice_vfio_pci_save_read(struct file *filp, char __user *buf,
++				      size_t len, loff_t *pos)
++{
++	struct ice_vfio_pci_migration_file *migf = filp->private_data;
++	loff_t *off = &filp->f_pos;
++	ssize_t done = 0;
++	int ret;
++
++	if (pos)
++		return -ESPIPE;
++
++	mutex_lock(&migf->lock);
++	if (*off > migf->total_length) {
++		done = -EINVAL;
++		goto out_unlock;
++	}
++
++	if (migf->disabled) {
++		done = -ENODEV;
++		goto out_unlock;
++	}
++
++	len = min_t(size_t, migf->total_length - *off, len);
++	if (len) {
++		ret = copy_to_user(buf, migf->mig_data + *off, len);
++		if (ret) {
++			done = -EFAULT;
++			goto out_unlock;
++		}
++		*off += len;
++		done = len;
++	}
++out_unlock:
++	mutex_unlock(&migf->lock);
++	return done;
++}
++
++static const struct file_operations ice_vfio_pci_save_fops = {
++	.owner = THIS_MODULE,
++	.read = ice_vfio_pci_save_read,
++	.release = ice_vfio_pci_release_file,
++	.llseek = no_llseek,
++};
++
++/**
++ * ice_vfio_pci_stop_copy - create migration file and save migration state to it
++ * @ice_vdev: pointer to ice vfio pci core device structure
++ *
++ * Return migration file handler
++ */
++static struct ice_vfio_pci_migration_file *
++ice_vfio_pci_stop_copy(struct ice_vfio_pci_core_device *ice_vdev)
++{
++	struct ice_vfio_pci_migration_file *migf;
++	int ret;
++
++	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
++	if (!migf)
++		return ERR_PTR(-ENOMEM);
++
++	migf->filp = anon_inode_getfile("ice_vfio_pci_mig",
++					&ice_vfio_pci_save_fops, migf,
++					O_RDONLY);
++	if (IS_ERR(migf->filp)) {
++		int err = PTR_ERR(migf->filp);
++
++		kfree(migf);
++		return ERR_PTR(err);
++	}
++
++	stream_open(migf->filp->f_inode, migf->filp);
++	mutex_init(&migf->lock);
++
++	ret = ice_vfio_pci_save_state(ice_vdev, migf);
++	if (ret) {
++		fput(migf->filp);
++		kfree(migf);
++		return ERR_PTR(ret);
++	}
++
++	return migf;
++}
++
++/**
++ * ice_vfio_pci_resume_write- copy migration file data from user space
++ * @filp: pointer to migration file
++ * @buf: pointer to user space buffer
++ * @len: data length to be copied
++ * @pos: should be 0
++ *
++ * Return len of saved data, negative for error
++ */
++static ssize_t
++ice_vfio_pci_resume_write(struct file *filp, const char __user *buf,
++			  size_t len, loff_t *pos)
++{
++	struct ice_vfio_pci_migration_file *migf = filp->private_data;
++	loff_t *off = &filp->f_pos;
++	loff_t requested_length;
++	ssize_t done = 0;
++	int ret;
++
++	if (pos)
++		return -ESPIPE;
++
++	if (*off < 0 ||
++	    check_add_overflow((loff_t)len, *off, &requested_length))
++		return -EINVAL;
++
++	if (requested_length > sizeof(migf->mig_data))
++		return -ENOMEM;
++
++	mutex_lock(&migf->lock);
++	if (migf->disabled) {
++		done = -ENODEV;
++		goto out_unlock;
++	}
++
++	ret = copy_from_user(migf->mig_data + *off, buf, len);
++	if (ret) {
++		done = -EFAULT;
++		goto out_unlock;
++	}
++	*off += len;
++	done = len;
++	migf->total_length += len;
++out_unlock:
++	mutex_unlock(&migf->lock);
++	return done;
++}
++
++static const struct file_operations ice_vfio_pci_resume_fops = {
++	.owner = THIS_MODULE,
++	.write = ice_vfio_pci_resume_write,
++	.release = ice_vfio_pci_release_file,
++	.llseek = no_llseek,
++};
++
++/**
++ * ice_vfio_pci_resume - create resuming migration file
++ * @ice_vdev: pointer to ice vfio pci core device structure
++ *
++ * Return migration file handler, negative value for failure
++ */
++static struct ice_vfio_pci_migration_file *
++ice_vfio_pci_resume(struct ice_vfio_pci_core_device *ice_vdev)
++{
++	struct ice_vfio_pci_migration_file *migf;
++
++	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
++	if (!migf)
++		return ERR_PTR(-ENOMEM);
++
++	migf->filp = anon_inode_getfile("ice_vfio_pci_mig",
++					&ice_vfio_pci_resume_fops, migf,
++					O_WRONLY);
++	if (IS_ERR(migf->filp)) {
++		int err = PTR_ERR(migf->filp);
++
++		kfree(migf);
++		return ERR_PTR(err);
++	}
++
++	stream_open(migf->filp->f_inode, migf->filp);
++	mutex_init(&migf->lock);
++	return migf;
++}
++
++/**
++ * ice_vfio_pci_step_device_state_locked - process device state change
++ * @ice_vdev: pointer to ice vfio pci core device structure
++ * @new: new device state
++ * @final: final device state
++ *
++ * Return migration file handler or NULL for success, negative value for failure
++ */
++static struct file *
++ice_vfio_pci_step_device_state_locked(struct ice_vfio_pci_core_device *ice_vdev,
++				      u32 new, u32 final)
++{
++	u32 cur = ice_vdev->mig_state;
++	int ret;
++
++	if (cur == VFIO_DEVICE_STATE_RUNNING &&
++	    new == VFIO_DEVICE_STATE_RUNNING_P2P) {
++		ice_migration_suspend_dev(ice_vdev->pf, ice_vdev->vf_id);
++		return NULL;
++	}
++
++	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P &&
++	    new == VFIO_DEVICE_STATE_STOP)
++		return NULL;
++
++	if (cur == VFIO_DEVICE_STATE_STOP &&
++	    new == VFIO_DEVICE_STATE_STOP_COPY) {
++		struct ice_vfio_pci_migration_file *migf;
++
++		migf = ice_vfio_pci_stop_copy(ice_vdev);
++		if (IS_ERR(migf))
++			return ERR_CAST(migf);
++		get_file(migf->filp);
++		ice_vdev->saving_migf = migf;
++		return migf->filp;
++	}
++
++	if (cur == VFIO_DEVICE_STATE_STOP_COPY &&
++	    new == VFIO_DEVICE_STATE_STOP) {
++		ice_vfio_pci_disable_fds(ice_vdev);
++		return NULL;
++	}
++
++	if (cur == VFIO_DEVICE_STATE_STOP &&
++	    new == VFIO_DEVICE_STATE_RESUMING) {
++		struct ice_vfio_pci_migration_file *migf;
++
++		migf = ice_vfio_pci_resume(ice_vdev);
++		if (IS_ERR(migf))
++			return ERR_CAST(migf);
++		get_file(migf->filp);
++		ice_vdev->resuming_migf = migf;
++		return migf->filp;
++	}
++
++	if (cur == VFIO_DEVICE_STATE_RESUMING && new == VFIO_DEVICE_STATE_STOP)
++		return NULL;
++
++	if (cur == VFIO_DEVICE_STATE_STOP &&
++	    new == VFIO_DEVICE_STATE_RUNNING_P2P) {
++		ret = ice_vfio_pci_load_state(ice_vdev);
++		if (ret)
++			return ERR_PTR(ret);
++		ice_vfio_pci_disable_fds(ice_vdev);
++		return NULL;
++	}
++
++	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P &&
++	    new == VFIO_DEVICE_STATE_RUNNING)
++		return NULL;
++
++	/*
++	 * vfio_mig_get_next_state() does not use arcs other than the above
++	 */
++	WARN_ON(true);
++	return ERR_PTR(-EINVAL);
++}
++
++/**
++ * ice_vfio_pci_set_device_state - Config device state
++ * @vdev: pointer to vfio pci device
++ * @new_state: device state
++ *
++ * Return 0 for success, negative value for failure.
++ */
++static struct file *
++ice_vfio_pci_set_device_state(struct vfio_device *vdev,
++			      enum vfio_device_mig_state new_state)
++{
++	struct ice_vfio_pci_core_device *ice_vdev =
++			container_of(vdev,
++				     struct ice_vfio_pci_core_device,
++				     core_device.vdev);
++	enum vfio_device_mig_state next_state;
++	struct file *res = NULL;
++	int ret;
++
++	mutex_lock(&ice_vdev->state_mutex);
++	while (new_state != ice_vdev->mig_state) {
++		ret = vfio_mig_get_next_state(vdev, ice_vdev->mig_state,
++					      new_state, &next_state);
++		if (ret) {
++			res = ERR_PTR(ret);
++			break;
++		}
++		res = ice_vfio_pci_step_device_state_locked(ice_vdev,
++							    next_state,
++							    new_state);
++		if (IS_ERR(res))
++			break;
++		ice_vdev->mig_state = next_state;
++		if (WARN_ON(res && new_state != ice_vdev->mig_state)) {
++			fput(res);
++			res = ERR_PTR(-EINVAL);
++			break;
++		}
++	}
++	ice_vfio_pci_state_mutex_unlock(ice_vdev);
++	return res;
++}
++
++/**
++ * ice_vfio_pci_get_device_state - get device state
++ * @vdev: pointer to vfio pci device
++ * @curr_state: device state
++ *
++ * Return 0 for success
++ */
++static int ice_vfio_pci_get_device_state(struct vfio_device *vdev,
++					 enum vfio_device_mig_state *curr_state)
++{
++	struct ice_vfio_pci_core_device *ice_vdev =
++			container_of(vdev,
++				     struct ice_vfio_pci_core_device,
++				     core_device.vdev);
++	mutex_lock(&ice_vdev->state_mutex);
++	*curr_state = ice_vdev->mig_state;
++	ice_vfio_pci_state_mutex_unlock(ice_vdev);
++	return 0;
++}
++
++/**
++ * ice_vfio_pci_get_data_size - get migration data size
++ * @vdev: pointer to vfio pci device
++ * @stop_copy_length: migration data size
++ *
++ * Return 0 for success
++ */
++static int
++ice_vfio_pci_get_data_size(struct vfio_device *vdev,
++			   unsigned long *stop_copy_length)
++{
++	*stop_copy_length = SZ_128K;
++	return 0;
++}
++
++static const struct vfio_migration_ops ice_vfio_pci_migrn_state_ops = {
++	.migration_set_state = ice_vfio_pci_set_device_state,
++	.migration_get_state = ice_vfio_pci_get_device_state,
++	.migration_get_data_size = ice_vfio_pci_get_data_size,
++};
++
++/**
++ * ice_vfio_pci_core_init_dev - initialize vfio device
++ * @core_vdev: pointer to vfio device
++ *
++ * Return 0 for success
++ */
++static int ice_vfio_pci_core_init_dev(struct vfio_device *core_vdev)
++{
++	struct ice_vfio_pci_core_device *ice_vdev = container_of(core_vdev,
++			struct ice_vfio_pci_core_device, core_device.vdev);
++
++	mutex_init(&ice_vdev->state_mutex);
++	spin_lock_init(&ice_vdev->reset_lock);
++
++	core_vdev->migration_flags =
++		VFIO_MIGRATION_STOP_COPY | VFIO_MIGRATION_P2P;
++	core_vdev->mig_ops = &ice_vfio_pci_migrn_state_ops;
++
++	return vfio_pci_core_init_dev(core_vdev);
++}
++
++static const struct vfio_device_ops ice_vfio_pci_ops = {
++	.name		= "ice-vfio-pci",
++	.init		= ice_vfio_pci_core_init_dev,
++	.release	= vfio_pci_core_release_dev,
++	.open_device	= ice_vfio_pci_open_device,
++	.close_device	= ice_vfio_pci_close_device,
++	.device_feature = vfio_pci_core_ioctl_feature,
++	.read		= vfio_pci_core_read,
++	.write		= vfio_pci_core_write,
++	.ioctl		= vfio_pci_core_ioctl,
++	.mmap		= vfio_pci_core_mmap,
++	.request	= vfio_pci_core_request,
++	.match		= vfio_pci_core_match,
++	.bind_iommufd	= vfio_iommufd_physical_bind,
++	.unbind_iommufd	= vfio_iommufd_physical_unbind,
++	.attach_ioas	= vfio_iommufd_physical_attach_ioas,
++	.detach_ioas	= vfio_iommufd_physical_detach_ioas,
++};
++
++/**
++ * ice_vfio_pci_probe - Device initialization routine
++ * @pdev: PCI device information struct
++ * @id: entry in ice_vfio_pci_table
++ *
++ * Returns 0 on success, negative on failure
++ */
++static int
++ice_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
++{
++	struct ice_vfio_pci_core_device *ice_vdev;
++	int ret;
++
++	ice_vdev = vfio_alloc_device(ice_vfio_pci_core_device, core_device.vdev,
++				     &pdev->dev, &ice_vfio_pci_ops);
++	if (!ice_vdev)
++		return -ENOMEM;
++
++	dev_set_drvdata(&pdev->dev, &ice_vdev->core_device);
++
++	ret = vfio_pci_core_register_device(&ice_vdev->core_device);
++	if (ret)
++		goto out_free;
++
++	return 0;
++
++out_free:
++	vfio_put_device(&ice_vdev->core_device.vdev);
++	return ret;
++}
++
++/**
++ * ice_vfio_pci_remove - Device removal routine
++ * @pdev: PCI device information struct
++ */
++static void ice_vfio_pci_remove(struct pci_dev *pdev)
++{
++	struct ice_vfio_pci_core_device *ice_vdev =
++		(struct ice_vfio_pci_core_device *)dev_get_drvdata(&pdev->dev);
++
++	vfio_pci_core_unregister_device(&ice_vdev->core_device);
++	vfio_put_device(&ice_vdev->core_device.vdev);
++}
++
++/* ice_pci_tbl - PCI Device ID Table
++ *
++ * Wildcard entries (PCI_ANY_ID) should come last
++ * Last entry must be all 0s
++ *
++ * { Vendor ID, Device ID, SubVendor ID, SubDevice ID,
++ *   Class, Class Mask, private data (not used) }
++ */
++static const struct pci_device_id ice_vfio_pci_table[] = {
++	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, 0x1889) },
++	{}
++};
++MODULE_DEVICE_TABLE(pci, ice_vfio_pci_table);
++
++static const struct pci_error_handlers ice_vfio_pci_core_err_handlers = {
++	.reset_done = ice_vfio_pci_reset_done,
++	.error_detected = vfio_pci_core_aer_err_detected,
++};
++
++static struct pci_driver ice_vfio_pci_driver = {
++	.name			= "ice-vfio-pci",
++	.id_table		= ice_vfio_pci_table,
++	.probe			= ice_vfio_pci_probe,
++	.remove			= ice_vfio_pci_remove,
++	.err_handler            = &ice_vfio_pci_core_err_handlers,
++	.driver_managed_dma	= true,
++};
++
++module_pci_driver(ice_vfio_pci_driver);
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Intel Corporation, <linux.nics@intel.com>");
++MODULE_DESCRIPTION(DRIVER_DESC);
 -- 
 2.34.1
 
