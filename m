@@ -1,50 +1,51 @@
-Return-Path: <kvm+bounces-2225-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2226-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7E3A7F387F
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 22:49:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 607ED7F3882
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 22:50:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B808D1C20E6E
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 21:49:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F2A7282AC5
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 21:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CD1F3D972;
-	Tue, 21 Nov 2023 21:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CCFC4204C;
+	Tue, 21 Nov 2023 21:50:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VQQ6MH6b"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="q8AqtD05"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C978110;
-	Tue, 21 Nov 2023 13:49:43 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECDAD19E;
+	Tue, 21 Nov 2023 13:50:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=G3Tw0OtWAeY5H5jzQ33G73DKMOrcjxFh3bwciSf6J1I=; b=VQQ6MH6bJuWppjGvQm624wpb0e
-	QejRGPPbu+h5naNRWV+o29CBHY5VAZl6W0AnmO0CHr5f3boJC+6mGr0D0hlSCLWE7DBEFMtHk97SC
-	3msnDJLpMN1Kl1gmNHTgtu97aoRS7gAujjHBGgJD1deZW0jtV/CvJh+ftFlOhiqsa7D6qg/bQfI3M
-	f9EVXXzeEURD8SXbY6SWG/WfOYCxxOOMxVYz9jWP0nI+TsJMb0WR0j1WECTJSsM4sLjXrMl5w0Mvo
-	1+A2CrLKaYzcfEY0e/6t4CiWsXc2zH5tdbwM8OGTIip+lR5fguM4VQw6/7p8dzTeiX0QFEIJuvjHw
-	aOeFc07g==;
+	bh=tR6u49LQ1LBhM925V/eXh7AlqbxrgxNMGgBmHoJqNsA=; b=q8AqtD05udavs43p3x+GJBnGlL
+	VBYJjP3FGtNBkN4lj2p+k1L9ArjLfxAfovzbDJhIVA/RVEX4gdFWyKUs2p3fZG8yMP3OYrSBfEAcq
+	KK2HIhWxvAZnWuXXlrwZ6OYNh1qh0rLeTm2Q83IFDdjqe3RmlS/jVEJKqV3toDMsuWwTSSAaC20iY
+	e6qVcFpUiTj4wCV43sVDMez3DNCtPV9y/dEAo9si0LysLUWB3Vigul6unfNoHJ1kDXmA9cgIHfYvp
+	chl9tg0xMzs3W9yKXtXHuKl0yAl/wQ0A+WovRcyrRVNp/aOJVFPKZ2npXGgUI7gAEifOmYlgLcG/r
+	M004/28A==;
 Received: from [2001:8b0:10b:5:22b8:d80f:1c9c:f188] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1r5Yc9-005xnh-07; Tue, 21 Nov 2023 21:49:01 +0000
-Message-ID: <3cf7281c619bb27d922688c4e7aff7608524fe22.camel@infradead.org>
-Subject: Re: [PATCH v8 02/15] KVM: pfncache: remove unnecessary exports
+	id 1r5Ycz-005xpi-Ao; Tue, 21 Nov 2023 21:49:53 +0000
+Message-ID: <a5fe536e045adb1c94bba39a47cb125740f079ca.camel@infradead.org>
+Subject: Re: [PATCH v8 03/15] KVM: xen: mark guest pages dirty with the
+ pfncache lock held
 From: David Woodhouse <dwmw2@infradead.org>
 To: Paul Durrant <paul@xen.org>, Sean Christopherson <seanjc@google.com>, 
  Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
  Ingo Molnar <mingo@redhat.com>,  Borislav Petkov <bp@alien8.de>, Dave
  Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
  <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Tue, 21 Nov 2023 21:49:00 +0000
-In-Reply-To: <20231121180223.12484-3-paul@xen.org>
+Date: Tue, 21 Nov 2023 21:49:52 +0000
+In-Reply-To: <20231121180223.12484-4-paul@xen.org>
 References: <20231121180223.12484-1-paul@xen.org>
-	 <20231121180223.12484-3-paul@xen.org>
+	 <20231121180223.12484-4-paul@xen.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-vn/b7FADzW8L7dFtLE/J"
+	boundary="=-abamlw54pBPXz+RrOZFU"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -55,26 +56,25 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-vn/b7FADzW8L7dFtLE/J
+--=-abamlw54pBPXz+RrOZFU
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Tue, 2023-11-21 at 18:02 +0000, Paul Durrant wrote:
 > From: Paul Durrant <pdurrant@amazon.com>
 >=20
-> There is need for the existing kvm_gpc_XXX() functions to be exported. Cl=
-ean
-> up now before additional functions are added in subsequent patches.
+> Sampling gpa and memslot from an unlocked pfncache may yield inconsistent
+> values so, since there is no problem with calling mark_page_dirty_in_slot=
+()
+> with the pfncache lock held, relocate the calls in
+> kvm_xen_update_runstate_guest() and kvm_xen_inject_pending_events()
+> accordingly.
 >=20
-
-I think you mean "no need".
-
 > Signed-off-by: Paul Durrant <pdurrant@amazon.com>
 
 Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
-
---=-vn/b7FADzW8L7dFtLE/J
+--=-abamlw54pBPXz+RrOZFU
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -166,25 +166,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTIxMjE0OTAwWjAvBgkqhkiG9w0BCQQxIgQgWVuRcW3W
-UX5jxD0zBPKd8+zRgYeNfyJqTk/2sRqMhE4wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTIxMjE0OTUyWjAvBgkqhkiG9w0BCQQxIgQg5wSTRcap
+O7Sbk3OtskUmhYR1JHdEwUERofg2Tm12TUQwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBa5f+7f3uHnwvFuAfdyncVlJoJNLLp+9vu
-/5TtxEVsfTIgW7ho8OC7c5Ni4tt9k76C6by0pcU11w19ucaDpsDiCrWl7o44CvcY5Twx2uqnqi/t
-R9yUH/VwQDcstKe+wPNCuR/sOVfjfXHghshrL0TbPdWP61iy23A+/xWlt8fadsSF5g/zlHn3+RK8
-khRaEsYyN4Z5sdT9hlt7Q/loDmpZmwF97He3Z3F18I79CzHEculj7Ibv39ukcGIgdQWvJfPqS1Aw
-oltve2KvR2N2U0eAavZAtMt5BcLbGsMLlCUhw36fmK9o0cbJRZXmguZIuo0U0G1D/mDEfmfvysu1
-YDbEBUFT9bPpgs3SgIuBD4gxC/tBwn3tua563otoLztOqwxde0n4+1/cQPOPzLrzWkaenyCwPsy0
-X0q2MQ48Q/maJRQquvbvG3381FmTw6uet+oqe3XAOeyyNs6iG8IZCwFe4RgQvJMEksVW0bhfQOH7
-kSdWeAhtBIZ3gX0JdcaoC0Yuyr6MJ8zPC1akflxfntIKfm/Pwkd8Ed6BwITNvzv/D9oa969XncaB
-BwKe2r9MpkjDnUDilqAvqbDYlYWCXNDEuqOElKgo1bBZb1MnFZrdiAnSAcuQ3+E2L788DzueiSJ+
-ZvoCc00+BsCXsE77VgeNBzGjHFOjKgl7BakEdyfI7QAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBQ5U9Mi4bZH7k8KIqVFMLH2XXAlheYd+Jd
+L8687AgxjHT1RPyw9RDtcuh2b0k5OGA1xr7CQIDPmA9+3o8CysCH7nlyWpPVuYp334gvvpJCucBY
+/fPWe9jLev71DCEjqDje0YwjBLj1/v16bS/9q/Yn8CrRhW61fyS3ct8A7fbckIXoU1KyJyTn4Jwo
+K8s5ufmcSoVPXRQV3NJoEMRaB44/UMQIZJF6BaHD5QroYyyVN6IB86x2gqJpAggHrLZpPkPTynJk
+Sh3p6NuV3aC1MuvGmGtcaEOQnMnSgT0tFIOJGYWsviQrO1k/xqz7psWW0XPWTFg6Q0fsL9221Bwe
+RsHPJH9bCFeWWHG4wXq5IvsOoMmJVsQfRCWVnh+GbwB5RRPL1DeF93/7JRM5XIliIMaj22W8zW7i
+Ix99AAB0hbORggMaGF6Sid9OeZX/V37bafpNN6eokZiuXCkzBJcuozvs5HpzElIeBJmyUl4zVRn3
+L5nLf/Ho6JaWDe9g3NQFVAcNs/vxoeDLheCUtUpxJIEfZj1Rg8Wfd2GgfdFVFMtajP5QozelZ1BA
+0ynHNI0xmQsxSjWafFHOUd1p4zDqFi9GWvzW3PUsOX5g3YE2hg4edwSP7/yU7lXsUzdrb3efy/V2
+IZW5YIfx1QQfNbsOc1QdQhvYWuVEVao5zZO6W5DLDQAAAAAAAA==
 
 
---=-vn/b7FADzW8L7dFtLE/J--
+--=-abamlw54pBPXz+RrOZFU--
 
