@@ -1,159 +1,107 @@
-Return-Path: <kvm+bounces-2168-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2169-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 490787F2991
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 11:00:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 877C17F29AE
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 11:02:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 797961C21964
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 10:00:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4218328223F
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 10:02:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F10C33C476;
-	Tue, 21 Nov 2023 09:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A3F03C6AD;
+	Tue, 21 Nov 2023 10:02:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DdEJoy7B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id D9ED011A;
-	Tue, 21 Nov 2023 01:59:48 -0800 (PST)
-Received: from loongson.cn (unknown [10.20.42.183])
-	by gateway (Coremail) with SMTP id _____8BxpPCTf1xlfoQ7AA--.52256S3;
-	Tue, 21 Nov 2023 17:59:47 +0800 (CST)
-Received: from [10.20.42.183] (unknown [10.20.42.183])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Axzy+Pf1xlGU1IAA--.28376S3;
-	Tue, 21 Nov 2023 17:59:45 +0800 (CST)
-Subject: Re: [PATCH v1 2/2] LoongArch: KVM: Add lasx support
-To: WANG Xuerui <kernel@xen0n.name>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, loongarch@lists.linux.dev,
- Jens Axboe <axboe@kernel.dk>, Mark Brown <broonie@kernel.org>,
- Alex Deucher <alexander.deucher@amd.com>,
- Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
- Xi Ruoyao <xry111@xry111.site>
-References: <20231115091921.85516-1-zhaotianrui@loongson.cn>
- <20231115091921.85516-3-zhaotianrui@loongson.cn>
- <f003f38d-37fd-43ed-ada6-fb2d5b282e91@xen0n.name>
-From: zhaotianrui <zhaotianrui@loongson.cn>
-Message-ID: <6d9395b5-e8f1-3990-adb0-a52d03411fc6@loongson.cn>
-Date: Tue, 21 Nov 2023 18:02:06 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFA3112C;
+	Tue, 21 Nov 2023 02:02:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700560962; x=1732096962;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=P53K9nuYns+G3kNjOrAT6WDUrhQtdzcmrGZfrt36JG4=;
+  b=DdEJoy7BLQPpraGlwMaUlxhU1r6bCQ+xy5OyfH5s8HAqzTuMS8gJHs4T
+   M6B4MEHBaSU+DE+fxq3qmtd3QewOPZT/lcmtwo+xx732vMRvvn5krhrNK
+   lRTLE06kiFRZRS4IY8wSfoE9SNk68qutKWYuAg8uFD41wlDPIeI7jPdi4
+   8UQKcFjeSzju9sNpBnnimo1qkZ4CUk20pK2K0FQoaydTiOFJ9OQp6WEDi
+   4eMI1s2D81z9twojdeuRKLk7hqqWU1nOKFdXoHeXmfGYErlvyYVXuK3Dr
+   D67w4NLfH35YxEqecVnCUa1uuejAn7bQqzBGx+KXh4C8wQCEEq8Q1QJcm
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="371980560"
+X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
+   d="scan'208";a="371980560"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 02:02:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
+   d="scan'208";a="8033718"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 02:02:42 -0800
+Date: Tue, 21 Nov 2023 02:02:41 -0800
+From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+	Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, David Matlack <dmatlack@google.com>,
+	Kai Huang <kai.huang@intel.com>,
+	Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+	hang.yuan@intel.com, tina.zhang@intel.com,
+	Xiaoyao Li <xiaoyao.li@intel.com>, isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v6 07/16] KVM: MMU: Introduce level info in PFERR code
+Message-ID: <20231121100241.GE1109547@ls.amr.corp.intel.com>
+References: <cover.1699368363.git.isaku.yamahata@intel.com>
+ <ea9057ece714a919664e0403a3e7f774e4b3fedf.1699368363.git.isaku.yamahata@intel.com>
+ <8e0934a0-c478-413a-8a58-36f7d20c23e9@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <f003f38d-37fd-43ed-ada6-fb2d5b282e91@xen0n.name>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:AQAAf8Axzy+Pf1xlGU1IAA--.28376S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxWr47Cry7WFWUuF1DGF4DAwc_yoWrXr4UpF
-	97Crs5JayrCFn3Gr9rtw1DZ345Xrs7Gw1aqa43ta43AF1Yqryjqr1kWrWqgFyUJw48KF1S
-	vF15tr13uF15AwbCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	tVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
-	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67
-	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
-	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14
-	v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4Xo7DU
-	UUU
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8e0934a0-c478-413a-8a58-36f7d20c23e9@linux.intel.com>
 
+On Mon, Nov 20, 2023 at 06:54:07PM +0800,
+Binbin Wu <binbin.wu@linux.intel.com> wrote:
 
-在 2023/11/16 下午3:19, WANG Xuerui 写道:
-> On 11/15/23 17:19, Tianrui Zhao wrote:
->> This patch adds LASX support for LoongArch KVM. The LASX means
->> LoongArch 256-bits vector instruction.
->> There will be LASX exception in KVM when guest use the LASX
->> instruction. KVM will enable LASX and restore the vector
->> registers for guest then return to guest to continue running.
->>
->> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
->> ---
->>   arch/loongarch/include/asm/kvm_host.h |  6 ++++
->>   arch/loongarch/include/asm/kvm_vcpu.h | 10 +++++++
->>   arch/loongarch/kernel/fpu.S           |  1 +
->>   arch/loongarch/kvm/exit.c             | 18 +++++++++++
->>   arch/loongarch/kvm/switch.S           | 16 ++++++++++
->>   arch/loongarch/kvm/trace.h            |  4 ++-
->>   arch/loongarch/kvm/vcpu.c             | 43 ++++++++++++++++++++++++++-
->>   7 files changed, 96 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/loongarch/include/asm/kvm_host.h 
->> b/arch/loongarch/include/asm/kvm_host.h
->> index 6c65c25169..4c05b5eca0 100644
->> --- a/arch/loongarch/include/asm/kvm_host.h
->> +++ b/arch/loongarch/include/asm/kvm_host.h
->> @@ -95,6 +95,7 @@ enum emulation_result {
->>   #define KVM_LARCH_SWCSR_LATEST    (0x1 << 1)
->>   #define KVM_LARCH_HWCSR_USABLE    (0x1 << 2)
->>   #define KVM_LARCH_LSX        (0x1 << 3)
->> +#define KVM_LARCH_LASX        (0x1 << 4)
->>     struct kvm_vcpu_arch {
->>       /*
->> @@ -181,6 +182,11 @@ static inline bool kvm_guest_has_lsx(struct 
->> kvm_vcpu_arch *arch)
->>       return arch->cpucfg[2] & CPUCFG2_LSX;
->>   }
->>   +static inline bool kvm_guest_has_lasx(struct kvm_vcpu_arch *arch)
->> +{
->> +    return arch->cpucfg[2] & CPUCFG2_LASX;
->> +}
->> +
->>   /* Debug: dump vcpu state */
->>   int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu);
->>   diff --git a/arch/loongarch/include/asm/kvm_vcpu.h 
->> b/arch/loongarch/include/asm/kvm_vcpu.h
->> index c629771e12..4f87f16018 100644
->> --- a/arch/loongarch/include/asm/kvm_vcpu.h
->> +++ b/arch/loongarch/include/asm/kvm_vcpu.h
->> @@ -67,6 +67,16 @@ static inline void kvm_restore_lsx(struct 
->> loongarch_fpu *fpu) { }
->>   static inline void kvm_restore_lsx_upper(struct loongarch_fpu *fpu) 
->> { }
->>   #endif
->>   +#ifdef CONFIG_CPU_HAS_LASX
->> +void kvm_own_lasx(struct kvm_vcpu *vcpu);
->> +void kvm_save_lasx(struct loongarch_fpu *fpu);
->> +void kvm_restore_lasx(struct loongarch_fpu *fpu);
->> +#else
->> +static inline void kvm_own_lasx(struct kvm_vcpu *vcpu) { }
->> +static inline void kvm_save_lasx(struct loongarch_fpu *fpu) { }
->> +static inline void kvm_restore_lasx(struct loongarch_fpu *fpu) { }
->> +#endif
->> +
->>   void kvm_acquire_timer(struct kvm_vcpu *vcpu);
->>   void kvm_init_timer(struct kvm_vcpu *vcpu, unsigned long hz);
->>   void kvm_reset_timer(struct kvm_vcpu *vcpu);
->> diff --git a/arch/loongarch/kernel/fpu.S b/arch/loongarch/kernel/fpu.S
->> index d53ab10f46..f4524fe866 100644
->> --- a/arch/loongarch/kernel/fpu.S
->> +++ b/arch/loongarch/kernel/fpu.S
->> @@ -384,6 +384,7 @@ SYM_FUNC_START(_restore_lasx_upper)
->>       lasx_restore_all_upper a0 t0 t1
->>       jr    ra
->>   SYM_FUNC_END(_restore_lasx_upper)
->> +EXPORT_SYMBOL(_restore_lasx_upper)
->
-> Why the added export? It doesn't seem necessary, given the previous 
-> patch doesn't have a similar export added for _restore_lsx_upper. (Or 
-> if it's truly needed it should probably become EXPORT_SYMBOL_GPL.)
-It is needed to be exported, as it is called by kvm_own_lasx. However 
-the "_restore_lsx_upper" is not used in kvm.
+> 
+> 
+> On 11/7/2023 11:00 PM, isaku.yamahata@intel.com wrote:
+> > From: Xiaoyao Li <xiaoyao.li@intel.com>
+> > 
+> > For TDX, EPT violation can happen when TDG.MEM.PAGE.ACCEPT.
+> > And TDG.MEM.PAGE.ACCEPT contains the desired accept page level of TD guest.
+> > 
+> > 1. KVM can map it with 4KB page while TD guest wants to accept 2MB page.
+> > 
+> >    TD geust will get TDX_PAGE_SIZE_MISMATCH and it should try to accept
+> s/geust/guest
+> 
+> >    4KB size.
+> > 
+> > 2. KVM can map it with 2MB page while TD guest wants to accept 4KB page.
+> > 
+> >    KVM needs to honor it because
+> >    a) there is no way to tell guest KVM maps it as 2MB size. And
+> >    b) guest accepts it in 4KB size since guest knows some other 4KB page
+> >       in the same 2MB range will be used as shared page.
+> > 
+> > For case 2, it need to pass desired page level to MMU's
+> > page_fault_handler. Use bit 29:31 of kvm PF error code for this purpose.
+> 
+> The level info is needed not only for case 2, KVM also needs the info so
+> that
+> it can map a 2MB page when TD guest wants to accept a 2MB page.
 
-Thanks
-Tianrui Zhao
-
+"MMU's page_fault_handler" = KVM MMU page fault handler, isn't it?
+I'll replace it with KVM MMU page fault handler for clarity.
+-- 
+Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
