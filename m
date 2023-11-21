@@ -1,79 +1,80 @@
-Return-Path: <kvm+bounces-2191-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2192-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC6577F2E6D
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 14:36:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CD7E7F3112
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 15:36:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 090E61C21881
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 13:36:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A18BEB220B6
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 14:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F26651C3C;
-	Tue, 21 Nov 2023 13:35:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0677D55C1B;
+	Tue, 21 Nov 2023 14:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GpsCAZbo"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WPXjxBmB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DF191BC;
-	Tue, 21 Nov 2023 05:35:49 -0800 (PST)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-59b5484fbe6so58247757b3.1;
-        Tue, 21 Nov 2023 05:35:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700573748; x=1701178548; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z1bgJgAbUzXysVXnmrbWD/Bln1YuJzIlRZNnYx7qdOA=;
-        b=GpsCAZboO6YGBYOUOgz+KS6unTVVh58N2qaugm3gwnFsiHvqzlA2KRpPNhwjIWnXLW
-         JFMKsIHNZgO7DB7svu6gmsTcpWphB/RACdepAtp7gLhjQJcu1K4avXdIr15Giq/zf910
-         zqW0JygpM/SEjmwqqkuhJ5k+NmrPOlhqxVaOGWyX0k/VNFuSloSo5BHlDJmsiq7VFKlL
-         IiMAw5PFibbX4XCLopd/yIvT/wCgVpMStXc2v3T4E2jIKTa/4P4IkCcwNMx9xrCLsbu7
-         uYOYhZg2I03olFUAF/TXFgOLCKlaVxWI3zcuYpNUlkTuWnbHc2Cd5sYMmJa90KwzTavn
-         8cFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700573748; x=1701178548;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z1bgJgAbUzXysVXnmrbWD/Bln1YuJzIlRZNnYx7qdOA=;
-        b=X+g68FcgokBxlgAR9UaqBzEmLlm7Wb9eS3/gptaM23fgB4d4GqdRGTDFAGVC7KhLRz
-         F5g2Ots0ad8CdGfe0CDIEMZqzLhKpxABrblcAxHd9kHqtjIrE+XURjQg6WQAhaQ5pgEl
-         kIF0omFy7F33wP/MP2BdnDHqWiZPQT5x2brz02YZvnSFnI2l9/ckGkko4HYH8mk/7gDD
-         C4dq/qTSjpF1nxp+OU9xVU+592vLLAIClVHVg8cYq8nE/DlFFPrPh0mznw/L/ekcOK13
-         xnCSbaN8BHnaTjx7vfA4SisyTKfY3IHTKG0oe3USdAywqMIB/+pBt0HiAR039D4RtdiT
-         sCMA==
-X-Gm-Message-State: AOJu0YyRJUIgGGHHbK83Z691Q9O6BtBGxp+jmfs21FvlwA1fJ0lTed16
-	y0Vz+qUJbhFHfCwDKpznhfA=
-X-Google-Smtp-Source: AGHT+IEL90mHMqgVQ28KIc1rABP+1ecwT8HRZ7oWNV+r45XFFS8JiwR8yRPw1PcVuYOVV+JKu0LmBQ==
-X-Received: by 2002:a05:690c:b19:b0:5ca:d579:52f with SMTP id cj25-20020a05690c0b1900b005cad579052fmr5118531ywb.35.1700573748564;
-        Tue, 21 Nov 2023 05:35:48 -0800 (PST)
-Received: from localhost ([2601:344:8301:57f0:e005:b808:45e:1b60])
-        by smtp.gmail.com with ESMTPSA id i78-20020a819151000000b005a7bf9749c8sm3013199ywg.4.2023.11.21.05.35.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 05:35:48 -0800 (PST)
-Date: Tue, 21 Nov 2023 05:35:47 -0800
-From: Yury Norov <yury.norov@gmail.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-	Jan Kara <jack@suse.cz>,
-	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
-	Matthew Wilcox <willy@infradead.org>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
-	Alexey Klimov <klimov.linux@gmail.com>
-Subject: Re: [PATCH 13/34] KVM: x86: hyper-v: optimize and cleanup
- kvm_hv_process_stimers()
-Message-ID: <ZVyyM4974UQtzoCX@yury-ThinkPad>
-References: <20231118155105.25678-1-yury.norov@gmail.com>
- <20231118155105.25678-14-yury.norov@gmail.com>
- <877cmcqz5r.fsf@redhat.com>
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E096C100;
+	Tue, 21 Nov 2023 06:36:16 -0800 (PST)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ALDM7M3027906;
+	Tue, 21 Nov 2023 14:36:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=kA0m7wG+q6zq5Ot/06C/knbcRiXmToTBkQjHd2VSm9A=;
+ b=WPXjxBmBjou4hv5nVV8VijrF45QzRA6yNwVHujX4ontVUzbOm6E6uFaqvbneKWGByLbH
+ MNgj3i/INyfOXaCgqUVFWXUru2WVzuIwttBYQLMUTNpwZdb7U65+4DLs0/XCxIA5jPQ/
+ SWn1ZGME1AUu2EE0amkkbJUpzUmG/llgTncuKzoR4fhRILbERl0Z3x4rBq1L9plq2PeU
+ CLd7Ouz6Q5FGtLGNE9XIOTYyKF3+6DqBI0E6uq4erEZANhDIo2dgUH8GBu5OETbQii+C
+ tuFxHE1UyzSXtCs5TM2udigAlz/CpC60C4zev8GIPK5O4ZBqeNA9I04PkOWF7zA/zJHC Mw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ugw0t37kq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Nov 2023 14:36:15 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3ALEBt8c020169;
+	Tue, 21 Nov 2023 14:36:15 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ugw0t37k0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Nov 2023 14:36:15 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3ALDnSN3005276;
+	Tue, 21 Nov 2023 14:36:14 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uf7kt1fh4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Nov 2023 14:36:14 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3ALEaBlV23331532
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Nov 2023 14:36:11 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 771712004E;
+	Tue, 21 Nov 2023 14:36:11 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 47DAC2004D;
+	Tue, 21 Nov 2023 14:36:10 +0000 (GMT)
+Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.171.5.131])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 21 Nov 2023 14:36:10 +0000 (GMT)
+Date: Tue, 21 Nov 2023 15:36:08 +0100
+From: Alexander Gordeev <agordeev@linux.ibm.com>
+To: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+        jjherne@linux.ibm.com, pasic@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, david@redhat.com,
+        Harald Freudenberger <freude@linux.ibm.com>
+Subject: Re: [PATCH v2] s390/vfio-ap: fix sysfs status attribute for AP queue
+ devices
+Message-ID: <ZVzAWPzAFR5JV2jZ@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+References: <20231108201135.351419-1-akrowiak@linux.ibm.com>
+ <17ef8d76-5dec-46a3-84e1-1b92fadd27b0@linux.ibm.com>
+ <f18f6993-17e8-cab4-6a7f-059f669fc890@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,69 +83,23 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <877cmcqz5r.fsf@redhat.com>
+In-Reply-To: <f18f6993-17e8-cab4-6a7f-059f669fc890@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: y9aVtmIUTagj-7RJiy6ntd7-SdFUurzL
+X-Proofpoint-GUID: 7J1_RtTdNV_bHcBsdJuS9BB7F6MsOe37
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-21_07,2023-11-21_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
+ suspectscore=0 bulkscore=0 spamscore=0 lowpriorityscore=0 mlxlogscore=508
+ mlxscore=0 adultscore=0 priorityscore=1501 clxscore=1015 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
+ definitions=main-2311210114
 
-On Mon, Nov 20, 2023 at 03:26:08PM +0100, Vitaly Kuznetsov wrote:
-> Yury Norov <yury.norov@gmail.com> writes:
-> 
-> > The function traverses stimer_pending_bitmap n a for-loop bit by bit.
-> > We can do it faster by using atomic find_and_set_bit().
-> >
-> > While here, refactor the logic by decreasing indentation level
-> > and dropping 2nd check for stimer->config.enable.
-> >
-> > Signed-off-by: Yury Norov <yury.norov@gmail.com>
-> > ---
-> >  arch/x86/kvm/hyperv.c | 39 +++++++++++++++++++--------------------
-> >  1 file changed, 19 insertions(+), 20 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> > index 238afd7335e4..460e300b558b 100644
-> > --- a/arch/x86/kvm/hyperv.c
-> > +++ b/arch/x86/kvm/hyperv.c
-> > @@ -870,27 +870,26 @@ void kvm_hv_process_stimers(struct kvm_vcpu *vcpu)
-> >  	if (!hv_vcpu)
-> >  		return;
-> >  
-> > -	for (i = 0; i < ARRAY_SIZE(hv_vcpu->stimer); i++)
-> > -		if (test_and_clear_bit(i, hv_vcpu->stimer_pending_bitmap)) {
-> > -			stimer = &hv_vcpu->stimer[i];
-> > -			if (stimer->config.enable) {
-> > -				exp_time = stimer->exp_time;
-> > -
-> > -				if (exp_time) {
-> > -					time_now =
-> > -						get_time_ref_counter(vcpu->kvm);
-> > -					if (time_now >= exp_time)
-> > -						stimer_expiration(stimer);
-> > -				}
-> > -
-> > -				if ((stimer->config.enable) &&
-> > -				    stimer->count) {
-> > -					if (!stimer->msg_pending)
-> > -						stimer_start(stimer);
-> > -				} else
-> > -					stimer_cleanup(stimer);
-> > -			}
-> > +	for_each_test_and_clear_bit(i, hv_vcpu->stimer_pending_bitmap,
-> > +					ARRAY_SIZE(hv_vcpu->stimer)) {
-> > +		stimer = &hv_vcpu->stimer[i];
-> > +		if (!stimer->config.enable)
-> > +			continue;
-> > +
-> > +		exp_time = stimer->exp_time;
-> > +
-> > +		if (exp_time) {
-> > +			time_now = get_time_ref_counter(vcpu->kvm);
-> > +			if (time_now >= exp_time)
-> > +				stimer_expiration(stimer);
-> >  		}
-> > +
-> > +		if (stimer->count) {
-> 
-> You can't drop 'stimer->config.enable' check here as stimer_expiration()
-> call above actually changes it. This is done on purpose: oneshot timers
-> fire only once so 'config.enable' is reset to 0.
+On Mon, Nov 20, 2023 at 10:16:10AM +0100, Christian Borntraeger wrote:
+> I think this can go via the s390 tree as well. Alexander do you want to take it?
 
-Ok, I see. Will fix in v2
+Applied, thanks!
+
+I assume, it does not need to wait until the merge window?
 
