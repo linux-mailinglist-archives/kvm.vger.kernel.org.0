@@ -1,45 +1,45 @@
-Return-Path: <kvm+bounces-2164-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2165-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A0217F28E9
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 10:27:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA6747F2917
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 10:41:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 755131C215AE
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 09:27:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 69EACB2179D
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 09:41:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7982B3B7BF;
-	Tue, 21 Nov 2023 09:27:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84893C06D;
+	Tue, 21 Nov 2023 09:41:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nm7fcIak"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F0U3uXef"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46576168C1;
-	Tue, 21 Nov 2023 09:27:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8FC2C433C8;
-	Tue, 21 Nov 2023 09:27:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B79C168C1;
+	Tue, 21 Nov 2023 09:41:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC07CC433C8;
+	Tue, 21 Nov 2023 09:41:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700558833;
-	bh=oYIQI8oRhTi2tBjIzh/yvP0I8sqoKDxOvxxRl8mbGwI=;
+	s=k20201202; t=1700559677;
+	bh=379g4h+2GfMItulHPNl9leppzk/chVF5EpjsGaRxLKg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Nm7fcIakdUO6O6TnwrI4vWIlSHpjpSUTT9BgASMU0Vbj/V31qVMeUUTowvOGw7HCh
-	 0SyVMarE+F9YX9THyYSWlRvKDNbojvNUFPEqGbyUW1ZhHTNhoEp5jcJgyHERPhQiKI
-	 cdWOpj5q4se+IX2dxvb3wK70kOjNOHPpsNrB6Tzoq9H0wuhMgi+Wm+BuEuk3pBYQnv
-	 um/z1EuUaRqgy+YxbDB2TkoWtJchyxt23R+8Q9tCtEZi2FbN8OSvIqwuKj22ZO15Bh
-	 OLrzrctbZtaVLcnb1aQjD14tBg0B8ttLgCe1+s3zYn4/975gaFydQUfs8FJ4cX87IG
-	 hX9AnEZr2CWZw==
+	b=F0U3uXefqiqfv6gEP6kKbCrQTl6bhCTRTjA6Tzfos2Gwwt86zW5CCJKAtCH3cUCoR
+	 hq2W/LfLiS8OyQt5pjq5YEXyXS4y5VD6wisLD2zF6fEAnK052HgG8J9raPalW3K6wQ
+	 FjZ+Iel9iS1Prpdptx8JSCt4wwM14La7c0lsAr5hvqRhhk/8fBNVFEJSrg2grESpBE
+	 +j8f00oSY/JScZ4vVdzxtsA7hrfqLcyzKomOz8Xyz1xvbNN7DnwjEmGJaHft2KAD84
+	 ygMQztfR3xJzA9D3/6eKINM5hulYJ3bl8aVhI3f45VoOymwEVK80s7Wg15MhLvVM6O
+	 lpYHo+oS3Bajg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1r5N2E-00F137-Mo;
-	Tue, 21 Nov 2023 09:27:10 +0000
-Date: Tue, 21 Nov 2023 09:27:10 +0000
-Message-ID: <86sf4zzcb5.wl-maz@kernel.org>
+	id 1r5NFq-00F1Iv-Go;
+	Tue, 21 Nov 2023 09:41:14 +0000
+Date: Tue, 21 Nov 2023 09:41:13 +0000
+Message-ID: <86r0kjzbnq.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 Cc: kvmarm@lists.linux.dev,
@@ -57,11 +57,12 @@ Cc: kvmarm@lists.linux.dev,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v11 01/43] arm64: cpufeatures: Restrict NV support to FEAT_NV2
-In-Reply-To: <2e25b427-9df6-42f7-99b3-bb2d01a0f0c4@os.amperecomputing.com>
+Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support (FEAT_NV2 only)
+In-Reply-To: <67082409-f432-44b6-bf40-1af9b4b7b569@os.amperecomputing.com>
 References: <20231120131027.854038-1-maz@kernel.org>
-	<20231120131027.854038-2-maz@kernel.org>
-	<2e25b427-9df6-42f7-99b3-bb2d01a0f0c4@os.amperecomputing.com>
+	<a44660c4-e43a-4663-94c0-9b290ea755e3@os.amperecomputing.com>
+	<86ttpfzd5k.wl-maz@kernel.org>
+	<67082409-f432-44b6-bf40-1af9b4b7b569@os.amperecomputing.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -77,100 +78,85 @@ X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, k
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 21 Nov 2023 09:07:30 +0000,
+On Tue, 21 Nov 2023 09:26:22 +0000,
 Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
 > 
 > 
-> On 20-11-2023 06:39 pm, Marc Zyngier wrote:
-> > To anyone who has played with FEAT_NV, it is obvious that the level
-> > of performance is rather low due to the trap amplification that it
-> > imposes on the host hypervisor. FEAT_NV2 solves a number of the
-> > problems that FEAT_NV had.
+> On 21-11-2023 02:38 pm, Marc Zyngier wrote:
+> > On Tue, 21 Nov 2023 08:51:35 +0000,
+> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >> 
+> >> 
+> >> Hi Marc,
+> >> 
+> >> On 20-11-2023 06:39 pm, Marc Zyngier wrote:
+> >>> This is the 5th drop of NV support on arm64 for this year, and most
+> >>> probably the last one for this side of Christmas.
+> >>> 
+> >>> For the previous episodes, see [1].
+> >>> 
+> >>> What's changed:
+> >>> 
+> >>> - Drop support for the original FEAT_NV. No existing hardware supports
+> >>>     it without FEAT_NV2, and the architecture is deprecating the former
+> >>>     entirely. This results in fewer patches, and a slightly simpler
+> >>>     model overall.
+> >>> 
+> >>> - Reorganise the series to make it a bit more logical now that FEAT_NV
+> >>>     is gone.
+> >>> 
+> >>> - Apply the NV idreg restrictions on VM first run rather than on each
+> >>>     access.
+> >>> 
+> >>> - Make the nested vgic shadow CPU interface a per-CPU structure rather
+> >>>     than per-vcpu.
+> >>> 
+> >>> - Fix the EL0 timer fastpath
+> >>> 
+> >>> - Work around the architecture deficiencies when trapping WFI from a
+> >>>     L2 guest.
+> >>> 
+> >>> - Fix sampling of nested vgic state (MISR, ELRSR, EISR)
+> >>> 
+> >>> - Drop the patches that have already been merged (NV trap forwarding,
+> >>>     per-MMU VTCR)
+> >>> 
+> >>> - Rebased on top of 6.7-rc2 + the FEAT_E2H0 support [2].
+> >>> 
+> >>> The branch containing these patches (and more) is at [3]. As for the
+> >>> previous rounds, my intention is to take a prefix of this series into
+> >>> 6.8, provided that it gets enough reviewing.
+> >>> 
+> >>> [1] https://lore.kernel.org/r/20230515173103.1017669-1-maz@kernel.org
+> >>> [2] https://lore.kernel.org/r/20231120123721.851738-1-maz@kernel.org
+> >>> [3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-6.8-nv2-only
+> >>> 
+> >> 
+> >> V11 series is not booting on Ampere platform (I am yet to debug).
+> >> With lkvm, it is stuck at the very early stage itself and no early
+> >> boot prints/logs.
+> >> 
+> >> Are there any changes needed in kvmtool for V11?
 > > 
-> > It also turns out that all the existing hardware that has FEAT_NV
-> > also has FEAT_NV2. Finally, it is now allowed by the architecture
-> > to build FEAT_NV2 *only* (as denoted by ID_AA64MMFR4_EL1.NV_frac),
-> > which effectively seals the fate of FEAT_NV.
-> > 
-> > Restrict the NV support to NV2, and be done with it. Nobody will
-> > cry over the old crap.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >   arch/arm64/kernel/cpufeature.c | 22 +++++++++++++++-------
-> >   arch/arm64/tools/cpucaps       |  2 ++
-> >   2 files changed, 17 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> > index 7dcda39537f8..95a677cf8c04 100644
-> > --- a/arch/arm64/kernel/cpufeature.c
-> > +++ b/arch/arm64/kernel/cpufeature.c
-> > @@ -439,6 +439,7 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr3[] = {
-> >     static const struct arm64_ftr_bits ftr_id_aa64mmfr4[] = {
-> >   	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR4_EL1_E2H0_SHIFT, 4, 0),
-> > +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_HIGHER_SAFE, ID_AA64MMFR4_EL1_NV_frac_SHIFT, 4, 0),
-> >   	ARM64_FTR_END,
-> >   };
-> >   @@ -2080,12 +2081,8 @@ static bool has_nested_virt_support(const
-> > struct arm64_cpu_capabilities *cap,
-> >   	if (kvm_get_mode() != KVM_MODE_NV)
-> >   		return false;
-> >   -	if (!has_cpuid_feature(cap, scope)) {
-> > -		pr_warn("unavailable: %s\n", cap->desc);
-> > -		return false;
-> > -	}
-> > -
-> > -	return true;
-> > +	return (__system_matches_cap(ARM64_HAS_NV2) |
-> > +		__system_matches_cap(ARM64_HAS_NV2_ONLY));
+> > Not really, I'm still using the version I had built for 6.5. Is the
+> > problem with L1 or L2?
 > 
-> This seems to be typo and should it be logical OR?
-
-Indeed, this is a bug. Not that it will have any effect as
-__system_matches_cap() returns a bool, so | and || are strictly
-equivalent.
-
-Worth addressing though.
-
+> Stuck in the L1 itself.
 > 
-> >   }
-> >     static bool hvhe_possible(const struct arm64_cpu_capabilities
-> > *entry,
-> > @@ -2391,12 +2388,23 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
-> >   		.matches = runs_at_el2,
-> >   		.cpu_enable = cpu_copy_el2regs,
-> >   	},
-> > +	{
-> > +		.capability = ARM64_HAS_NV2,
-> > +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> > +		.matches = has_cpuid_feature,
-> > +		ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, NV, NV2)
-> > +	},
-> > +	{
-> > +		.capability = ARM64_HAS_NV2_ONLY,
-> > +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> > +		.matches = has_cpuid_feature,
-> > +		ARM64_CPUID_FIELDS(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY)
-> > +	},
-> >   	{
-> >   		.desc = "Nested Virtualization Support",
-> >   		.capability = ARM64_HAS_NESTED_VIRT,
-> >   		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> >   		.matches = has_nested_virt_support,
-> > -		ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, NV, IMP)
-> 
-> Since only NV2 is supported, is it more appropriate to have
-> description as "Enhanced Nested Virtualization Support"?
+> I am using kvmtool from
+> https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvmtool.git/log/?h=arm64/nv-5.16
 
-Nah. There is nothing 'enhanced' about NV2. It is NV that should have
-been named "Unusable Nested Virt"... So I'm perfectly happy to leave
-it as is.
+Huh. That's positively ancient. Yet, you shouldn't get into a
+situation where the L1 guest locks up.
 
-And to be honest, I'd rather we display FEAT_* rather than some
-interpretation of it, but I'm not going to repaint cpufeature.c.
+I have pushed out my kvmtool branch[1]. Please give it a go.
+
+Thanks,
 
 	M.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvmtool.git/log/?h=arm64/nv-6.5
 
 -- 
 Without deviation from the norm, progress is not possible.
