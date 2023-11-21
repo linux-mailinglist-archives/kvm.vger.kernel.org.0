@@ -1,157 +1,100 @@
-Return-Path: <kvm+bounces-2222-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2223-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81BC77F369F
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 20:03:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 817977F36BB
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 20:16:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10C06B2171C
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 19:02:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B1CE2820C1
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 19:16:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5485A117;
-	Tue, 21 Nov 2023 19:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E5CA5B1F0;
+	Tue, 21 Nov 2023 19:16:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MnCEW1N0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lp9ZT9B5"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D971433B6;
-	Tue, 21 Nov 2023 19:02:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08C6CC433C7;
-	Tue, 21 Nov 2023 19:02:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700593369;
-	bh=gMXUYkt8knGRYiC1FvMF8r845HfVg7cwv39TXqrEy5I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MnCEW1N0LxDfOPc09T2ReT0kfnJ2b9YtIoC10Ee7i8zy+5bV/OvRCMkczMJkdRwhQ
-	 ZVH+iU0Ylz5TJgbLT15b+Yk762OByJD2kPfxNFykkc7tLDdtq6iUll9wiJzXU9kubY
-	 W9ViqImF93XBS3v3pcfplew6gsKg3ieF8rLH2C4Nas0NgDvFOYErD6DUB50TKdrv+6
-	 VZRH2VVM3bW3Mi1aG3ac/Ecearg+mFd6BhqXfpSyFqPxFenPMwuJSOrovkgEbFGow7
-	 g5wejdrrHQZlvrVXA/vNQkZBg5sL1UNzWTDoLXUYZeoey3UzlOUgqCtEjRqawduRxg
-	 gCPX+MfsKrDSA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1r5W1G-00FCTS-8w;
-	Tue, 21 Nov 2023 19:02:46 +0000
-Date: Tue, 21 Nov 2023 19:02:45 +0000
-Message-ID: <86msv7ylnu.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Miguel Luis <miguel.luis@oracle.com>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	Alexandru Elisei
-	<alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase
- Conklin <chase.conklin@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Darren Hart
-	<darren@os.amperecomputing.com>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton
-	<oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support (FEAT_NV2 only)
-In-Reply-To: <DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
-References: <20231120131027.854038-1-maz@kernel.org>
-	<DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF638110;
+	Tue, 21 Nov 2023 11:15:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700594159; x=1732130159;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=XcNHGE3mfkWpwt/actN7amxrbPAaFnHfr5Q3LoIXsAA=;
+  b=Lp9ZT9B5wsuaWAEVS2DxjZNZQO87aiEVl4+v5557Jn+8ZZG/UIe8u6xW
+   rd13w1tnZnLnNd4UiALWiwORyui2HPiDf0LdWm9sPw9pYHTR47J3aTT15
+   A2aBtllTZJ2STsMov/qGQ7muGgZNCKLJE9HEjlL4A2DmAtrs+//05j5G4
+   hyCtlFePg+3oUVvsDTqDuE04RhscXYFxF3vPfVA7tNjPn4lHPZoA4QuXY
+   UfOGXeSSg2R492J/JUyqv5k/Ql22Cig4x+/HbKdrrDbUHv/wK1VjoO2Mb
+   DD+argnhn/Y7H3h6P4Hp8fWajUqfSRx4Q1IQLEE09gLq6vvWcTqTE1xSI
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="395831982"
+X-IronPort-AV: E=Sophos;i="6.04,216,1695711600"; 
+   d="scan'208";a="395831982"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 11:15:58 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="910555576"
+X-IronPort-AV: E=Sophos;i="6.04,216,1695711600"; 
+   d="scan'208";a="910555576"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 11:15:58 -0800
+Date: Tue, 21 Nov 2023 11:15:57 -0800
+From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+	Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, David Matlack <dmatlack@google.com>,
+	Kai Huang <kai.huang@intel.com>,
+	Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+	hang.yuan@intel.com, tina.zhang@intel.com,
+	Sean Christopherson <sean.j.christopherson@intel.com>,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v17 020/116] KVM: TDX: create/destroy VM structure
+Message-ID: <20231121191557.GI1109547@ls.amr.corp.intel.com>
+References: <cover.1699368322.git.isaku.yamahata@intel.com>
+ <997a92e4f667b497166ff8cc777ec8025b0f22bc.1699368322.git.isaku.yamahata@intel.com>
+ <2a5a38d9-28e2-4718-b8fc-2b8f27610706@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2a5a38d9-28e2-4718-b8fc-2b8f27610706@linux.intel.com>
 
-On Tue, 21 Nov 2023 16:49:52 +0000,
-Miguel Luis <miguel.luis@oracle.com> wrote:
+On Sun, Nov 19, 2023 at 02:30:19PM +0800,
+Binbin Wu <binbin.wu@linux.intel.com> wrote:
+
+> > +static int tdx_reclaim_page(hpa_t pa)
+> > +{
+> > +	int r;
+> > +
+> > +	r = __tdx_reclaim_page(pa);
+> > +	if (!r)
+> > +		tdx_clear_page(pa);
+> > +	return r;
+> > +}
+> > +
+> > +static void tdx_reclaim_td_page(unsigned long td_page_pa)
 > 
-> Hi Marc,
+> This function is used to reclaim td control sturcture pages like TDCX,
+> TDVPX,
+> TDVPR. Should this function name be more specific?
+> For me, it is a bit confusing.
 > 
-> > On 20 Nov 2023, at 12:09, Marc Zyngier <maz@kernel.org> wrote:
-> > 
-> > This is the 5th drop of NV support on arm64 for this year, and most
-> > probably the last one for this side of Christmas.
-> > 
-> > For the previous episodes, see [1].
-> > 
-> > What's changed:
-> > 
-> > - Drop support for the original FEAT_NV. No existing hardware supports
-> >  it without FEAT_NV2, and the architecture is deprecating the former
-> >  entirely. This results in fewer patches, and a slightly simpler
-> >  model overall.
-> > 
-> > - Reorganise the series to make it a bit more logical now that FEAT_NV
-> >  is gone.
-> > 
-> > - Apply the NV idreg restrictions on VM first run rather than on each
-> >  access.
-> > 
-> > - Make the nested vgic shadow CPU interface a per-CPU structure rather
-> >  than per-vcpu.
-> > 
-> > - Fix the EL0 timer fastpath
-> > 
-> > - Work around the architecture deficiencies when trapping WFI from a
-> >  L2 guest.
-> > 
-> > - Fix sampling of nested vgic state (MISR, ELRSR, EISR)
-> > 
-> > - Drop the patches that have already been merged (NV trap forwarding,
-> >  per-MMU VTCR)
-> > 
-> > - Rebased on top of 6.7-rc2 + the FEAT_E2H0 support [2].
-> > 
-> > The branch containing these patches (and more) is at [3]. As for the
-> > previous rounds, my intention is to take a prefix of this series into
-> > 6.8, provided that it gets enough reviewing.
-> > 
-> > [1] https://lore.kernel.org/r/20230515173103.1017669-1-maz@kernel.org
-> > [2] https://lore.kernel.org/r/20231120123721.851738-1-maz@kernel.org
-> > [3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-6.8-nv2-only
-> > 
-> 
-> While I was testing this with kvmtool for 5.16 I noted the following on dmesg:
-> 
-> [  803.014258] kvm [19040]: Unsupported guest sys_reg access at: 8129fa50 [600003c9]
->                 { Op0( 3), Op1( 5), CRn( 1), CRm( 0), Op2( 2), func_read },
-> 
-> This is CPACR_EL12.
+> Or maybe do "td page" have specific meaning referring to these control
+> structures
+> pages in TDX?
 
-CPACR_EL12 is redirected to VNCR[0x100]. It really shouldn't trap...
-
-> Still need yet to debug.
-
-Can you disassemble the guest around the offending PC?
-
-> As for QEMU, it is having issues enabling _EL2 feature although EL2
-> is supported by checking KVM_CAP_ARM_EL2; need yet to debug this.
-
-The capability number changes at each release. Make sure you resync
-your includes.
-
-	M.
-
+As they are control page, how about tdx_reclaim_control_page()?
 -- 
-Without deviation from the norm, progress is not possible.
+Isaku Yamahata <isaku.yamahata@linux.intel.com>
 
