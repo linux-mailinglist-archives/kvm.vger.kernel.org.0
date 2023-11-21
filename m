@@ -1,50 +1,51 @@
-Return-Path: <kvm+bounces-2232-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2233-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34C587F3977
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 23:50:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9978C7F398E
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 23:53:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E201D2829E9
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 22:49:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F7C6B219A7
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 22:53:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D86F5645D;
-	Tue, 21 Nov 2023 22:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4FF54BE6;
+	Tue, 21 Nov 2023 22:53:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kD7zRTq/"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="g8KfYtXr"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74AD21A3;
-	Tue, 21 Nov 2023 14:49:48 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A36DD10EA;
+	Tue, 21 Nov 2023 14:53:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=T/VmpSKD09YTvYqLos3SBlJHCp7gffS//8+bqjHXCzk=; b=kD7zRTq/fLFEGq5632s3nVgFlf
-	JQnbRSnfluLMgMWQyMm+aYEvWVuIjpZzeq+EPDMVmmn9plVDw2oMrci2a/1KCd3GMxHk+g84x3nYq
-	nHfebvzszWP8s6OKpoVS45vRCImJsh1Twd7pAAjZCqB5D0ifAxqoXuX+Pcy2QDO2yuQ8OnQOXaCbP
-	Rl5GUuTncLAEGTc27Evq76WjCNlf3OVxC/vKYudWESh9sFTjWjr3FnuL8CB/qGQQaLmgfWJY/Z+XC
-	xVInZGHLUmtJ3NzJ1R9M1eC+nZTHHqzQEivP1zpxS+rqdxhCPJq71gUFfzzLBd+K7KUK3ouINcFzY
-	QapyQvag==;
+	bh=H8N+oCSoC+H0ZODoe9Cu2j8t3Kw63Cr3ppY3F2+Oq3w=; b=g8KfYtXrDCSyp9IcK6l7Qc0ttU
+	reyKxgPhOM2ad08dx6wISloa8F+mcKLLVopdWcgXuiPeX8s0pzwtkLXCUGLrlJjmpTCqbfwbBSTG/
+	pq1mwQNmA/Yg2SrXfJuIpqNpCTDpT27fmH5qa8d+CsbDMBmZdlQfv20J+EOXMU9tetxQI1iLhJgXs
+	89OmgE2NShtsnGH6UjIL/laciQ/9268J7wF6r3Kyzk9YuA2YHjKxgnwKDJZqlSXRoRscQ71U3iRpd
+	+HnYTVMXV1ZKH7rrxjUIanzBYTQhWoulD4YK0Cq5u3iG6KAXyWZhEcm2y00AJLIlV/h34U9dK22S0
+	yt+vnrpw==;
 Received: from [2001:8b0:10b:5:22b8:d80f:1c9c:f188] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1r5ZYg-0060Mb-8h; Tue, 21 Nov 2023 22:49:30 +0000
-Message-ID: <ffb8f0617e109fc46a547bef025572211940f9aa.camel@infradead.org>
-Subject: Re: [PATCH v8 14/15] KVM: xen: split up kvm_xen_set_evtchn_fast()
+	id 1r5ZcA-0060X8-Gh; Tue, 21 Nov 2023 22:53:06 +0000
+Message-ID: <4a76b7dc9055485d9e2592b395e60221dc349abf.camel@infradead.org>
+Subject: Re: [PATCH v8 15/15] KVM: xen: allow vcpu_info content to be
+ 'safely' copied
 From: David Woodhouse <dwmw2@infradead.org>
 To: Paul Durrant <paul@xen.org>, Sean Christopherson <seanjc@google.com>, 
  Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
  Ingo Molnar <mingo@redhat.com>,  Borislav Petkov <bp@alien8.de>, Dave
  Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
  <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Tue, 21 Nov 2023 22:49:29 +0000
-In-Reply-To: <20231121180223.12484-15-paul@xen.org>
+Date: Tue, 21 Nov 2023 22:53:05 +0000
+In-Reply-To: <20231121180223.12484-16-paul@xen.org>
 References: <20231121180223.12484-1-paul@xen.org>
-	 <20231121180223.12484-15-paul@xen.org>
+	 <20231121180223.12484-16-paul@xen.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-xGRGadYZn29I/tHAPjKO"
+	boundary="=-Sg32XlDwjZW/KftOP1NZ"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -55,30 +56,53 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-xGRGadYZn29I/tHAPjKO
+--=-Sg32XlDwjZW/KftOP1NZ
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Tue, 2023-11-21 at 18:02 +0000, Paul Durrant wrote:
 > From: Paul Durrant <pdurrant@amazon.com>
 >=20
-> The implementation of kvm_xen_set_evtchn_fast() is a rather lengthy piece
-> of code that performs two operations: updating of the shared_info
-> evtchn_pending mask, and updating of the vcpu_info evtchn_pending_sel
-> mask. Introdude a separate function to perform each of those operations a=
-nd
-
-I like the intro dude, but I think you meant introduce.
-
-> re-work kvm_xen_set_evtchn_fast() to use them.
+> If the guest sets an explicit vcpu_info GPA then, for any of the first 32
+> vCPUs, the content of the default vcpu_info in the shared_info page must =
+be
+> copied into the new location. Because this copy may race with event
+> delivery (which updates the 'evtchn_pending_sel' field in vcpu_info) ther=
+e
+> needs to be a way to defer that until the copy is complete.
+> Happily there is already a shadow of 'evtchn_pending_sel' in kvm_vcpu_xen
+> that is used in atomic context if the vcpu_info PFN cache has been
+> invalidated so that the update of vcpu_info can be deferred until the
+> cache can be refreshed (on vCPU thread's the way back into guest context)=
+.
 >=20
-> No functional change intended.
+> Also use this shadow if the vcpu_info cache has been *deactivated*, so th=
+at
+> the VMM can safely copy the vcpu_info content and then re-activate the
+> cache with the new GPA. To do this, stop considering an inactive vcpu_inf=
+o
+> cache as a hard error in kvm_xen_set_evtchn_fast().
 >=20
 > Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
-Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+Wait, didn't we realise that this leaves the bits set in the shadow
+evtchn_pending_sel that get lost on migration?
 
---=-xGRGadYZn29I/tHAPjKO
+The point in your previous patch which split out a shiny new
+set_shinfo_evtchn_pending() function was that you could then *call*
+that function to ensure that the corresponding index bit was set on the
+destination host after migration, if the bit in the shinfo is.
+
+So we'd do that from kvm_xen_setup_evtchn(), kvm_xen_eventfd_assign(),
+and when setting KVM_XEN_VCPU_ATTR_TYPE_TIMER.
+
+ if (bit_is_set_in_shinfo)
+   set_shinfo_evtchn_pending()
+
+
+
+--=-Sg32XlDwjZW/KftOP1NZ
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -170,25 +194,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTIxMjI0OTI5WjAvBgkqhkiG9w0BCQQxIgQgGY+5rO2r
-QTn7EPntbKHW4NUkxFFvX21zleXi0y7NyJMwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTIxMjI1MzA1WjAvBgkqhkiG9w0BCQQxIgQgx8sdU1Dp
+ARPWRIRbfwEkNd92OqbdzvBfTOx7wdAFGYIwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBTVyRmRwcIB5STUTIlkRyQJQZKdbQbROYK
-/F3f9B6kl6TDoRxUD+L5i1ZHj36LvR19+Gjnl5v3ugPVVNANsC4DKQ9100PKw9HdrObnBabyLA1X
-sLXKultdjq3j4BpqsculGk9Oj3uvgwLakq6OBf4Vw8R4DOt6EmqByRmWnch/LaHYISEV08BmyqC0
-ZhGEMaCj3Cy2bhML8YzPtirHs80fAavvN0RRHAI1w2NfvELme+TO3NsoiON7aO7E6pbY1hYRSF0A
-RdmkMTyjRlFGqfoaxgROFoyHkTCIYlAePG5rPbIgFnmqSmOPvLgjKGOSfZYg5dJduJ1uwHFmP4mZ
-lqwUaUJbAWJhfgVj5w6SDyvMSXQfJs5myUkrPoY1Vjgkzhi7E1W3Xq5kUMeg7UYjZWdqL5pTXwOY
-izFHiqSWsOcx655/C7ZDSDXRlYzuLqcQOv1dZr+QsQ0TEBtB5B1vce8GsxApTFnpeKvVuQHnCrcq
-Ut7JKvCL7a+ic6lhBkTRIdWathS3q7A9lVM3It/4Mqi4rRxacjjAERghtW1U4Kz0dLO45EU6lfXO
-Nc/c3tXuxe5lQ2vAeTtf1/L1T2MGbvnwkaCBTxL+GXBmJS8u4RFCrGmPeMl8milUSZ/ImLz5+Gaj
-agUOOjca9acbbDCQNaP9NA7+Xe1YxZ61CiXcVVXjuwAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgC0EGvrrdwHftiLldK2B/qjCOYJsL/LDEyt
+oAvjY8ZRT996LVJQC1gJ7abxva59MYmd8AKE3iD6WiFxRSNpnMunKhWbYOFkkEZfThaDaOAe0nCd
+7rj9ktdBIz4vj2PkUcGz5ATChCPgsRSo4lZcTG5aB6y0pHHcgQxgk3+aNlWpKRSZwO73XTNMRpBK
+wMu6Uf4cUEZ1TltmwWgaLQ5FI0zgvZUc2WIJ8EBjRF3KJxLYPnQUJ30zlcABYJzXBJOReF+KJowE
++WeiwLDOXZxOvh9DtlGTxw7otZ9ToQmys8zfQuVw6NLJevEqB8KAEkjXjV1k/zk+XVHK2j6235pa
+xxMHrUpwG2Po4+wkiRsiiNsSGJRk7rB+Sk4B1acGuTOmEmf5BBHmqHWtjlXlWoaf7R0hjwu39hKB
+jWCxUO2ZzEob473JVCRAcfRaA03w4rhv4RtgZBtn83esavzKAg6AjIRAZpLPedS1fF6M6AQZF2UQ
+V3tUauHYoosiBGz4CbUXMYGAR8ODrPaoJE1IpRJ+qEpG1rx6U3RUs2wgu7RY+kBDAQxYdqITnqaE
+S2mLlVVsQFdNmfxrtpkGZAAEVn6br+p3sG/JLvTz6+j1rvRRPEfoW/KOzlO7eLIPO48TbgWd4QBs
+QHqj42V04n2mScwmgww+Lkbst1+9ueSttu64Ti4cWgAAAAAAAA==
 
 
---=-xGRGadYZn29I/tHAPjKO--
+--=-Sg32XlDwjZW/KftOP1NZ--
 
