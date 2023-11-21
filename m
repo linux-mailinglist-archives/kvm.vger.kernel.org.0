@@ -1,163 +1,310 @@
-Return-Path: <kvm+bounces-2165-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2166-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA6747F2917
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 10:41:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB57E7F2967
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 10:54:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 69EACB2179D
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 09:41:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2FC128293D
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 09:54:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84893C06D;
-	Tue, 21 Nov 2023 09:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F0U3uXef"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 854DC3C095;
+	Tue, 21 Nov 2023 09:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B79C168C1;
-	Tue, 21 Nov 2023 09:41:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC07CC433C8;
-	Tue, 21 Nov 2023 09:41:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700559677;
-	bh=379g4h+2GfMItulHPNl9leppzk/chVF5EpjsGaRxLKg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=F0U3uXefqiqfv6gEP6kKbCrQTl6bhCTRTjA6Tzfos2Gwwt86zW5CCJKAtCH3cUCoR
-	 hq2W/LfLiS8OyQt5pjq5YEXyXS4y5VD6wisLD2zF6fEAnK052HgG8J9raPalW3K6wQ
-	 FjZ+Iel9iS1Prpdptx8JSCt4wwM14La7c0lsAr5hvqRhhk/8fBNVFEJSrg2grESpBE
-	 +j8f00oSY/JScZ4vVdzxtsA7hrfqLcyzKomOz8Xyz1xvbNN7DnwjEmGJaHft2KAD84
-	 ygMQztfR3xJzA9D3/6eKINM5hulYJ3bl8aVhI3f45VoOymwEVK80s7Wg15MhLvVM6O
-	 lpYHo+oS3Bajg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1r5NFq-00F1Iv-Go;
-	Tue, 21 Nov 2023 09:41:14 +0000
-Date: Tue, 21 Nov 2023 09:41:13 +0000
-Message-ID: <86r0kjzbnq.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Miguel Luis <miguel.luis@oracle.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support (FEAT_NV2 only)
-In-Reply-To: <67082409-f432-44b6-bf40-1af9b4b7b569@os.amperecomputing.com>
-References: <20231120131027.854038-1-maz@kernel.org>
-	<a44660c4-e43a-4663-94c0-9b290ea755e3@os.amperecomputing.com>
-	<86ttpfzd5k.wl-maz@kernel.org>
-	<67082409-f432-44b6-bf40-1af9b4b7b569@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 200C5126;
+	Tue, 21 Nov 2023 01:54:18 -0800 (PST)
+Received: from loongson.cn (unknown [10.20.42.183])
+	by gateway (Coremail) with SMTP id _____8AxJuhHflxl_4M7AA--.59056S3;
+	Tue, 21 Nov 2023 17:54:15 +0800 (CST)
+Received: from [10.20.42.183] (unknown [10.20.42.183])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxzdxCflxl80tIAA--.27825S3;
+	Tue, 21 Nov 2023 17:54:12 +0800 (CST)
+Subject: Re: [PATCH v1 1/2] LoongArch: KVM: Add lsx support
+To: WANG Xuerui <kernel@xen0n.name>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, loongarch@lists.linux.dev,
+ Jens Axboe <axboe@kernel.dk>, Mark Brown <broonie@kernel.org>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
+ Xi Ruoyao <xry111@xry111.site>
+References: <20231115091921.85516-1-zhaotianrui@loongson.cn>
+ <20231115091921.85516-2-zhaotianrui@loongson.cn>
+ <28c11122-4433-4302-bb09-95b3d458b457@xen0n.name>
+From: zhaotianrui <zhaotianrui@loongson.cn>
+Message-ID: <b5b11901-a19c-4b88-4c1a-c8b8c708a788@loongson.cn>
+Date: Tue, 21 Nov 2023 17:56:33 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+In-Reply-To: <28c11122-4433-4302-bb09-95b3d458b457@xen0n.name>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:AQAAf8DxzdxCflxl80tIAA--.27825S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3CF4rGr43AF1xAw4DAFWkGrX_yoWDuFy3pr
+	ykArZ8JrWUGrn3tr1UJr1DXFy5Zr18Kw17XFy8XFy5JF1Utryjqr18WrWqgFyUJw48JF1I
+	qF18XrnxZFyUJ3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
+	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUU
+	UU=
 
-On Tue, 21 Nov 2023 09:26:22 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> 
-> 
-> 
-> On 21-11-2023 02:38 pm, Marc Zyngier wrote:
-> > On Tue, 21 Nov 2023 08:51:35 +0000,
-> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> >> 
-> >> 
-> >> Hi Marc,
-> >> 
-> >> On 20-11-2023 06:39 pm, Marc Zyngier wrote:
-> >>> This is the 5th drop of NV support on arm64 for this year, and most
-> >>> probably the last one for this side of Christmas.
-> >>> 
-> >>> For the previous episodes, see [1].
-> >>> 
-> >>> What's changed:
-> >>> 
-> >>> - Drop support for the original FEAT_NV. No existing hardware supports
-> >>>     it without FEAT_NV2, and the architecture is deprecating the former
-> >>>     entirely. This results in fewer patches, and a slightly simpler
-> >>>     model overall.
-> >>> 
-> >>> - Reorganise the series to make it a bit more logical now that FEAT_NV
-> >>>     is gone.
-> >>> 
-> >>> - Apply the NV idreg restrictions on VM first run rather than on each
-> >>>     access.
-> >>> 
-> >>> - Make the nested vgic shadow CPU interface a per-CPU structure rather
-> >>>     than per-vcpu.
-> >>> 
-> >>> - Fix the EL0 timer fastpath
-> >>> 
-> >>> - Work around the architecture deficiencies when trapping WFI from a
-> >>>     L2 guest.
-> >>> 
-> >>> - Fix sampling of nested vgic state (MISR, ELRSR, EISR)
-> >>> 
-> >>> - Drop the patches that have already been merged (NV trap forwarding,
-> >>>     per-MMU VTCR)
-> >>> 
-> >>> - Rebased on top of 6.7-rc2 + the FEAT_E2H0 support [2].
-> >>> 
-> >>> The branch containing these patches (and more) is at [3]. As for the
-> >>> previous rounds, my intention is to take a prefix of this series into
-> >>> 6.8, provided that it gets enough reviewing.
-> >>> 
-> >>> [1] https://lore.kernel.org/r/20230515173103.1017669-1-maz@kernel.org
-> >>> [2] https://lore.kernel.org/r/20231120123721.851738-1-maz@kernel.org
-> >>> [3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-6.8-nv2-only
-> >>> 
-> >> 
-> >> V11 series is not booting on Ampere platform (I am yet to debug).
-> >> With lkvm, it is stuck at the very early stage itself and no early
-> >> boot prints/logs.
-> >> 
-> >> Are there any changes needed in kvmtool for V11?
-> > 
-> > Not really, I'm still using the version I had built for 6.5. Is the
-> > problem with L1 or L2?
-> 
-> Stuck in the L1 itself.
-> 
-> I am using kvmtool from
-> https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvmtool.git/log/?h=arm64/nv-5.16
 
-Huh. That's positively ancient. Yet, you shouldn't get into a
-situation where the L1 guest locks up.
+在 2023/11/16 下午3:15, WANG Xuerui 写道:
+>
+> On 11/15/23 17:19, Tianrui Zhao wrote:
+>> This patch adds LSX support for LoongArch KVM. The LSX means
+>> LoongArch 128-bits vector instruction.
+> Maybe we don't need to explain what "LSX" is; people working on 
+> LoongArch kernel should already know this through the kernel docs and 
+> the various occurrences in the code.
+Thanks, I will remove the explain about "LSX, LASX".
+>> There will be LSX exception in KVM when guest use the LSX
+>> instruction. KVM will enable LSX and restore the vector
+>> registers for guest then return to guest to continue running.
+>>
+> One more extra line that should get removed.
+Thanks, I will remove the extra line.
+>> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+>> ---
+>>   arch/loongarch/include/asm/kvm_host.h |  6 ++++
+>>   arch/loongarch/include/asm/kvm_vcpu.h | 12 +++++++
+>>   arch/loongarch/kvm/exit.c             | 18 ++++++++++
+>>   arch/loongarch/kvm/switch.S           | 22 +++++++++++++
+>>   arch/loongarch/kvm/trace.h            |  4 ++-
+>>   arch/loongarch/kvm/vcpu.c             | 47 +++++++++++++++++++++++++--
+>>   6 files changed, 105 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/loongarch/include/asm/kvm_host.h 
+>> b/arch/loongarch/include/asm/kvm_host.h
+>> index 11328700d4..6c65c25169 100644
+>> --- a/arch/loongarch/include/asm/kvm_host.h
+>> +++ b/arch/loongarch/include/asm/kvm_host.h
+>> @@ -94,6 +94,7 @@ enum emulation_result {
+>>   #define KVM_LARCH_FPU        (0x1 << 0)
+>>   #define KVM_LARCH_SWCSR_LATEST    (0x1 << 1)
+>>   #define KVM_LARCH_HWCSR_USABLE    (0x1 << 2)
+>> +#define KVM_LARCH_LSX        (0x1 << 3)
+>>     struct kvm_vcpu_arch {
+>>       /*
+>> @@ -175,6 +176,11 @@ static inline void writel_sw_gcsr(struct 
+>> loongarch_csrs *csr, int reg, unsigned
+>>       csr->csrs[reg] = val;
+>>   }
+>>   +static inline bool kvm_guest_has_lsx(struct kvm_vcpu_arch *arch)
+>> +{
+>> +    return arch->cpucfg[2] & CPUCFG2_LSX;
+>> +}
+>> +
+>>   /* Debug: dump vcpu state */
+>>   int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu);
+>>   diff --git a/arch/loongarch/include/asm/kvm_vcpu.h 
+>> b/arch/loongarch/include/asm/kvm_vcpu.h
+>> index 553cfa2b2b..c629771e12 100644
+>> --- a/arch/loongarch/include/asm/kvm_vcpu.h
+>> +++ b/arch/loongarch/include/asm/kvm_vcpu.h
+>> @@ -55,6 +55,18 @@ void kvm_save_fpu(struct loongarch_fpu *fpu);
+>>   void kvm_restore_fpu(struct loongarch_fpu *fpu);
+>>   void kvm_restore_fcsr(struct loongarch_fpu *fpu);
+>>   +#ifdef CONFIG_CPU_HAS_LSX
+>> +void kvm_own_lsx(struct kvm_vcpu *vcpu);
+>> +void kvm_save_lsx(struct loongarch_fpu *fpu);
+>> +void kvm_restore_lsx(struct loongarch_fpu *fpu);
+>> +void kvm_restore_lsx_upper(struct loongarch_fpu *fpu);
+>> +#else
+>> +static inline void kvm_own_lsx(struct kvm_vcpu *vcpu) { }
+>> +static inline void kvm_save_lsx(struct loongarch_fpu *fpu) { }
+>> +static inline void kvm_restore_lsx(struct loongarch_fpu *fpu) { }
+>> +static inline void kvm_restore_lsx_upper(struct loongarch_fpu *fpu) { }
+>> +#endif
+>> +
+>>   void kvm_acquire_timer(struct kvm_vcpu *vcpu);
+>>   void kvm_init_timer(struct kvm_vcpu *vcpu, unsigned long hz);
+>>   void kvm_reset_timer(struct kvm_vcpu *vcpu);
+>> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
+>> index ce8de3fa47..1b1c58ccc8 100644
+>> --- a/arch/loongarch/kvm/exit.c
+>> +++ b/arch/loongarch/kvm/exit.c
+>> @@ -659,6 +659,23 @@ static int kvm_handle_fpu_disabled(struct 
+>> kvm_vcpu *vcpu)
+>>       return RESUME_GUEST;
+>>   }
+>>   +/*
+>> + * kvm_handle_lsx_disabled() - Guest used LSX while disabled in root.
+>> + * @vcpu:      Virtual CPU context.
+>> + *
+>> + * Handle when the guest attempts to use LSX when it is disabled in 
+>> the root
+>> + * context.
+>> + */
+>> +static int kvm_handle_lsx_disabled(struct kvm_vcpu *vcpu)
+>> +{
+>> +    if (!kvm_guest_has_lsx(&vcpu->arch))
+>> +        kvm_queue_exception(vcpu, EXCCODE_INE, 0);
+>> +    else
+>> +        kvm_own_lsx(vcpu);
+>> +
+>> +    return RESUME_GUEST;
+>> +}
+>> +
+>>   /*
+>>    * LoongArch KVM callback handling for unimplemented guest exiting
+>>    */
+>> @@ -687,6 +704,7 @@ static exit_handle_fn 
+>> kvm_fault_tables[EXCCODE_INT_START] = {
+>>       [EXCCODE_TLBS]            = kvm_handle_write_fault,
+>>       [EXCCODE_TLBM]            = kvm_handle_write_fault,
+>>       [EXCCODE_FPDIS]            = kvm_handle_fpu_disabled,
+>> +    [EXCCODE_LSXDIS]                = kvm_handle_lsx_disabled,
+>>       [EXCCODE_GSPR]            = kvm_handle_gspr,
+>>   };
+>>   diff --git a/arch/loongarch/kvm/switch.S b/arch/loongarch/kvm/switch.S
+>> index 0ed9040307..32ba092a44 100644
+>> --- a/arch/loongarch/kvm/switch.S
+>> +++ b/arch/loongarch/kvm/switch.S
+>> @@ -245,6 +245,28 @@ SYM_FUNC_START(kvm_restore_fpu)
+>>       jr                 ra
+>>   SYM_FUNC_END(kvm_restore_fpu)
+>>   +#ifdef CONFIG_CPU_HAS_LSX
+>> +SYM_FUNC_START(kvm_save_lsx)
+>> +    fpu_save_csr    a0 t1
+>> +    fpu_save_cc     a0 t1 t2
+>> +    lsx_save_data   a0 t1
+>> +    jirl            zero, ra, 0
+> "jr ra" for consistency (e.g. with the function immediately above); 
+> similarly for other such usages.
+Thanks, I will use "jr ra" there.
 
-I have pushed out my kvmtool branch[1]. Please give it a go.
+Tianrui Zhao
+>> +SYM_FUNC_END(kvm_save_lsx)
+>> +
+>> +SYM_FUNC_START(kvm_restore_lsx)
+>> +    lsx_restore_data a0 t1
+>> +    fpu_restore_cc   a0 t1 t2
+>> +    fpu_restore_csr  a0 t1
+>> +    jirl             zero, ra, 0
+>> +SYM_FUNC_END(kvm_restore_lsx)
+>> +
+>> +SYM_FUNC_START(kvm_restore_lsx_upper)
+>> +    lsx_restore_all_upper a0 t0 t1
+>> +
+>> +    jirl                  zero, ra, 0
+>> +SYM_FUNC_END(kvm_restore_lsx_upper)
+>> +#endif
+>> +
+>>       .section ".rodata"
+>>   SYM_DATA(kvm_exception_size, .quad kvm_exc_entry_end - kvm_exc_entry)
+>>   SYM_DATA(kvm_enter_guest_size, .quad kvm_enter_guest_end - 
+>> kvm_enter_guest)
+>> diff --git a/arch/loongarch/kvm/trace.h b/arch/loongarch/kvm/trace.h
+>> index a1e35d6554..7da4e230e8 100644
+>> --- a/arch/loongarch/kvm/trace.h
+>> +++ b/arch/loongarch/kvm/trace.h
+>> @@ -102,6 +102,7 @@ TRACE_EVENT(kvm_exit_gspr,
+>>   #define KVM_TRACE_AUX_DISCARD        4
+>>     #define KVM_TRACE_AUX_FPU        1
+>> +#define KVM_TRACE_AUX_LSX        2
+>>     #define kvm_trace_symbol_aux_op                \
+>>       { KVM_TRACE_AUX_SAVE,        "save" },    \
+>> @@ -111,7 +112,8 @@ TRACE_EVENT(kvm_exit_gspr,
+>>       { KVM_TRACE_AUX_DISCARD,    "discard" }
+>>     #define kvm_trace_symbol_aux_state            \
+>> -    { KVM_TRACE_AUX_FPU,     "FPU" }
+>> +    { KVM_TRACE_AUX_FPU,     "FPU" },        \
+>> +    { KVM_TRACE_AUX_LSX,     "LSX" }
+>>     TRACE_EVENT(kvm_aux,
+>>           TP_PROTO(struct kvm_vcpu *vcpu, unsigned int op,
+>> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+>> index 73d0c2b9c1..f0bb583353 100644
+>> --- a/arch/loongarch/kvm/vcpu.c
+>> +++ b/arch/loongarch/kvm/vcpu.c
+>> @@ -378,9 +378,13 @@ static int kvm_set_one_reg(struct kvm_vcpu *vcpu,
+>>           break;
+>>       case KVM_REG_LOONGARCH_CPUCFG:
+>>           id = KVM_GET_IOC_CPUCFG_IDX(reg->id);
+>> -        if (id >= 0 && id < KVM_MAX_CPUCFG_REGS)
+>> +        if (id >= 0 && id < KVM_MAX_CPUCFG_REGS) {
+>>               vcpu->arch.cpucfg[id] = (u32)v;
+>> -        else
+>> +            if (id == 2 && v & CPUCFG2_LSX && !cpu_has_lsx) {
+>> +                vcpu->arch.cpucfg[id] &= ~CPUCFG2_LSX;
+>> +                ret = -EINVAL;
+>> +            }
+>> +        } else
+>>               ret = -EINVAL;
+>>           break;
+>>       case KVM_REG_LOONGARCH_KVM:
+>> @@ -561,12 +565,49 @@ void kvm_own_fpu(struct kvm_vcpu *vcpu)
+>>       preempt_enable();
+>>   }
+>>   +#ifdef CONFIG_CPU_HAS_LSX
+>> +/* Enable LSX for guest and restore context */
+>> +void kvm_own_lsx(struct kvm_vcpu *vcpu)
+>> +{
+>> +    preempt_disable();
+>> +
+>> +    /* Enable LSX for guest */
+>> +    set_csr_euen(CSR_EUEN_LSXEN | CSR_EUEN_FPEN);
+>> +    switch (vcpu->arch.aux_inuse & KVM_LARCH_FPU) {
+>> +    case KVM_LARCH_FPU:
+>> +        /*
+>> +         * Guest FPU state already loaded,
+>> +         * only restore upper LSX state
+>> +         */
+>> +        kvm_restore_lsx_upper(&vcpu->arch.fpu);
+>> +        break;
+>> +    default:
+>> +        /* Neither FP or LSX already active,
+>> +         * restore full LSX state
+>> +         */
+>> +        kvm_restore_lsx(&vcpu->arch.fpu);
+>> +    break;
+>> +    }
+>> +
+>> +    trace_kvm_aux(vcpu, KVM_TRACE_AUX_RESTORE, KVM_TRACE_AUX_LSX);
+>> +    vcpu->arch.aux_inuse |= KVM_LARCH_LSX | KVM_LARCH_FPU;
+>> +    preempt_enable();
+>> +}
+>> +#endif
+>> +
+>>   /* Save context and disable FPU */
+>>   void kvm_lose_fpu(struct kvm_vcpu *vcpu)
+>>   {
+>>       preempt_disable();
+>>   -    if (vcpu->arch.aux_inuse & KVM_LARCH_FPU) {
+>> +    if (vcpu->arch.aux_inuse & KVM_LARCH_LSX) {
+>> +        kvm_save_lsx(&vcpu->arch.fpu);
+>> +        vcpu->arch.aux_inuse &= ~(KVM_LARCH_LSX | KVM_LARCH_FPU);
+>> +        trace_kvm_aux(vcpu, KVM_TRACE_AUX_SAVE, KVM_TRACE_AUX_LSX);
+>> +
+>> +        /* Disable LSX & FPU */
+>> +        clear_csr_euen(CSR_EUEN_FPEN | CSR_EUEN_LSXEN);
+>> +    } else if (vcpu->arch.aux_inuse & KVM_LARCH_FPU) {
+>>           kvm_save_fpu(&vcpu->arch.fpu);
+>>           vcpu->arch.aux_inuse &= ~KVM_LARCH_FPU;
+>>           trace_kvm_aux(vcpu, KVM_TRACE_AUX_SAVE, KVM_TRACE_AUX_FPU);
+>
 
-Thanks,
-
-	M.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvmtool.git/log/?h=arm64/nv-6.5
-
--- 
-Without deviation from the norm, progress is not possible.
 
