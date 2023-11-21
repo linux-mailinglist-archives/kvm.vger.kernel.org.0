@@ -1,119 +1,157 @@
-Return-Path: <kvm+bounces-2217-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2222-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 125607F35F0
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 19:30:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81BC77F369F
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 20:03:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C89F92831B8
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 18:30:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10C06B2171C
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 19:02:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4D1851014;
-	Tue, 21 Nov 2023 18:30:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5485A117;
+	Tue, 21 Nov 2023 19:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xen.org header.i=@xen.org header.b="OF8rBuL3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MnCEW1N0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A36F12E;
-	Tue, 21 Nov 2023 10:30:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
-	s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:References:
-	In-Reply-To:Message-Id:Date:Subject:To:From;
-	bh=CPp0Qc6lsksup1D7/LciCKmODvP2NLwil1ZR7D0Jz3s=; b=OF8rBuL3cRtIL0H6LalhIYs6Uj
-	lUzSmdPd3UXsOfNZgD45+zNC+QQVAI4BN+pYXzmIHAAKL71LzsoRVAk1dhnEerAv9ioT8JTQj2u1b
-	hZNgKZ4377UolqqyMA2CgwcYTpzX/37KnUGCsz0ON5KWcXeena6FhBjbgrPN4TkiBBKQ=;
-Received: from xenbits.xenproject.org ([104.239.192.120])
-	by mail.xenproject.org with esmtp (Exim 4.92)
-	(envelope-from <paul@xen.org>)
-	id 1r5VVq-0000Bk-6T; Tue, 21 Nov 2023 18:30:18 +0000
-Received: from 54-240-197-231.amazon.com ([54.240.197.231] helo=REM-PW02S00X.ant.amazon.com)
-	by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <paul@xen.org>)
-	id 1r5V5u-0004Z3-CU; Tue, 21 Nov 2023 18:03:30 +0000
-From: Paul Durrant <paul@xen.org>
-To: David Woodhouse <dwmw2@infradead.org>,
-	Paul Durrant <paul@xen.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v8 15/15] KVM: xen: allow vcpu_info content to be 'safely' copied
-Date: Tue, 21 Nov 2023 18:02:23 +0000
-Message-Id: <20231121180223.12484-16-paul@xen.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231121180223.12484-1-paul@xen.org>
-References: <20231121180223.12484-1-paul@xen.org>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D971433B6;
+	Tue, 21 Nov 2023 19:02:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08C6CC433C7;
+	Tue, 21 Nov 2023 19:02:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700593369;
+	bh=gMXUYkt8knGRYiC1FvMF8r845HfVg7cwv39TXqrEy5I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MnCEW1N0LxDfOPc09T2ReT0kfnJ2b9YtIoC10Ee7i8zy+5bV/OvRCMkczMJkdRwhQ
+	 ZVH+iU0Ylz5TJgbLT15b+Yk762OByJD2kPfxNFykkc7tLDdtq6iUll9wiJzXU9kubY
+	 W9ViqImF93XBS3v3pcfplew6gsKg3ieF8rLH2C4Nas0NgDvFOYErD6DUB50TKdrv+6
+	 VZRH2VVM3bW3Mi1aG3ac/Ecearg+mFd6BhqXfpSyFqPxFenPMwuJSOrovkgEbFGow7
+	 g5wejdrrHQZlvrVXA/vNQkZBg5sL1UNzWTDoLXUYZeoey3UzlOUgqCtEjRqawduRxg
+	 gCPX+MfsKrDSA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1r5W1G-00FCTS-8w;
+	Tue, 21 Nov 2023 19:02:46 +0000
+Date: Tue, 21 Nov 2023 19:02:45 +0000
+Message-ID: <86msv7ylnu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Miguel Luis <miguel.luis@oracle.com>
+Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Alexandru Elisei
+	<alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase
+ Conklin <chase.conklin@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Darren Hart
+	<darren@os.amperecomputing.com>,
+	Jintack Lim <jintack@cs.columbia.edu>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton
+	<oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support (FEAT_NV2 only)
+In-Reply-To: <DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
+References: <20231120131027.854038-1-maz@kernel.org>
+	<DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Paul Durrant <pdurrant@amazon.com>
+On Tue, 21 Nov 2023 16:49:52 +0000,
+Miguel Luis <miguel.luis@oracle.com> wrote:
+> 
+> Hi Marc,
+> 
+> > On 20 Nov 2023, at 12:09, Marc Zyngier <maz@kernel.org> wrote:
+> > 
+> > This is the 5th drop of NV support on arm64 for this year, and most
+> > probably the last one for this side of Christmas.
+> > 
+> > For the previous episodes, see [1].
+> > 
+> > What's changed:
+> > 
+> > - Drop support for the original FEAT_NV. No existing hardware supports
+> >  it without FEAT_NV2, and the architecture is deprecating the former
+> >  entirely. This results in fewer patches, and a slightly simpler
+> >  model overall.
+> > 
+> > - Reorganise the series to make it a bit more logical now that FEAT_NV
+> >  is gone.
+> > 
+> > - Apply the NV idreg restrictions on VM first run rather than on each
+> >  access.
+> > 
+> > - Make the nested vgic shadow CPU interface a per-CPU structure rather
+> >  than per-vcpu.
+> > 
+> > - Fix the EL0 timer fastpath
+> > 
+> > - Work around the architecture deficiencies when trapping WFI from a
+> >  L2 guest.
+> > 
+> > - Fix sampling of nested vgic state (MISR, ELRSR, EISR)
+> > 
+> > - Drop the patches that have already been merged (NV trap forwarding,
+> >  per-MMU VTCR)
+> > 
+> > - Rebased on top of 6.7-rc2 + the FEAT_E2H0 support [2].
+> > 
+> > The branch containing these patches (and more) is at [3]. As for the
+> > previous rounds, my intention is to take a prefix of this series into
+> > 6.8, provided that it gets enough reviewing.
+> > 
+> > [1] https://lore.kernel.org/r/20230515173103.1017669-1-maz@kernel.org
+> > [2] https://lore.kernel.org/r/20231120123721.851738-1-maz@kernel.org
+> > [3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-6.8-nv2-only
+> > 
+> 
+> While I was testing this with kvmtool for 5.16 I noted the following on dmesg:
+> 
+> [  803.014258] kvm [19040]: Unsupported guest sys_reg access at: 8129fa50 [600003c9]
+>                 { Op0( 3), Op1( 5), CRn( 1), CRm( 0), Op2( 2), func_read },
+> 
+> This is CPACR_EL12.
 
-If the guest sets an explicit vcpu_info GPA then, for any of the first 32
-vCPUs, the content of the default vcpu_info in the shared_info page must be
-copied into the new location. Because this copy may race with event
-delivery (which updates the 'evtchn_pending_sel' field in vcpu_info) there
-needs to be a way to defer that until the copy is complete.
-Happily there is already a shadow of 'evtchn_pending_sel' in kvm_vcpu_xen
-that is used in atomic context if the vcpu_info PFN cache has been
-invalidated so that the update of vcpu_info can be deferred until the
-cache can be refreshed (on vCPU thread's the way back into guest context).
+CPACR_EL12 is redirected to VNCR[0x100]. It really shouldn't trap...
 
-Also use this shadow if the vcpu_info cache has been *deactivated*, so that
-the VMM can safely copy the vcpu_info content and then re-activate the
-cache with the new GPA. To do this, stop considering an inactive vcpu_info
-cache as a hard error in kvm_xen_set_evtchn_fast().
+> Still need yet to debug.
 
-Signed-off-by: Paul Durrant <pdurrant@amazon.com>
-Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
----
-Cc: David Woodhouse <dwmw2@infradead.org>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: x86@kernel.org
+Can you disassemble the guest around the offending PC?
 
-v8:
- - Update commit comment.
+> As for QEMU, it is having issues enabling _EL2 feature although EL2
+> is supported by checking KVM_CAP_ARM_EL2; need yet to debug this.
 
-v6:
- - New in this version.
----
- arch/x86/kvm/xen.c | 3 ---
- 1 file changed, 3 deletions(-)
+The capability number changes at each release. Make sure you resync
+your includes.
 
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index eff405eead1c..cfd5051e0800 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -1742,9 +1742,6 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe, struct kvm *kvm)
- 		WRITE_ONCE(xe->vcpu_idx, vcpu->vcpu_idx);
- 	}
- 
--	if (!vcpu->arch.xen.vcpu_info_cache.active)
--		return -EINVAL;
--
- 	if (xe->port >= max_evtchn_port(kvm))
- 		return -EINVAL;
- 
+	M.
+
 -- 
-2.39.2
-
+Without deviation from the norm, progress is not possible.
 
