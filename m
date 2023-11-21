@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-2148-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2149-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8F937F245A
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 03:51:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B70E07F245B
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 03:51:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1458B21EE3
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 02:51:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8B2D1C216AF
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 02:51:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 512E4524C;
-	Tue, 21 Nov 2023 02:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758BB199DF;
+	Tue, 21 Nov 2023 02:50:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MGdB1+BT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cF6Vef0y"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94D55CB;
-	Mon, 20 Nov 2023 18:50:30 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8CA5DC;
+	Mon, 20 Nov 2023 18:50:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700535030; x=1732071030;
+  t=1700535032; x=1732071032;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=5FesQkUHYNJNnWuZOuOfrR5+GtijYybwUR/0BVOAmsQ=;
-  b=MGdB1+BTiDRUXBy45GRecq5NWmqMqVHNqBGRXNlxo6N9vxGUPpxH8ZhX
-   UjPf0QKfPpv8wo2LNbevtjZasrX72/Tc3zca7G+kNx5M65HqQPBFxnbki
-   e/2dvZLE6KW/4Y3uBswz2zC1SA1n2yOtfy3JoYB6ICIJaB2mF4+lRzbyZ
-   3qiSU0PyLL88+6/su54rw56kNMj+gM0YdH9PN82LhKknZpbXnHH4cH0Ay
-   MMEr/3jJ/fwEOxXumrwbCUDDPhSDhsGsnN9IYLf0tMvxjEkH8mBsEkIxI
-   FKOGSINd7+uT65RQYPmsOlW1EB44sjRXp7D8n/jodsObyXZgg5qldOghN
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="458246065"
+  bh=chDhMbwAFTAOzcJ9fqd2u6cVrr/ul9wT1vFdAEszvfg=;
+  b=cF6Vef0yMIj3B28st8Tdxnvm1TaK2FooeOYIQ1opPRKxCNy+9PrN4JNh
+   LC/nL4IY/8ILcL6EBm/wdHYExVY/ep0/UgHrLbbLj3JZ+y6FD0YZWsM2X
+   nlDsS8qmasxtnHkhtFAw4o9Cu+xAy/TlzMC4ezNxQylJBYir9kNLvSpeP
+   h/UO5GGEbcpAWgaFvyzgbJl9kko0abMsSsml6XWSPX67KHK0g0Wz1Vw/J
+   IUntWW+vSzkfapPl8Re0hapwh5kHj08OEcHPvp9b082dk+LKij7xPX1TV
+   +O9r8bdqOlLG+QxF47Whis01sVIxgrk4Ki4lbec8HAS6565PkSmJ2zZjF
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="458246089"
 X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
-   d="scan'208";a="458246065"
+   d="scan'208";a="458246089"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 18:50:17 -0800
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 18:50:21 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="832488451"
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="832488481"
 X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
-   d="scan'208";a="832488451"
+   d="scan'208";a="832488481"
 Received: from dpdk-yahui-icx1.sh.intel.com ([10.67.111.85])
-  by fmsmga008.fm.intel.com with ESMTP; 20 Nov 2023 18:50:12 -0800
+  by fmsmga008.fm.intel.com with ESMTP; 20 Nov 2023 18:50:16 -0800
 From: Yahui Cao <yahui.cao@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: kvm@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: kvm@vger.kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Subject: [PATCH iwl-next v4 07/12] ice: Fix VSI id in virtual channel message for migration
-Date: Tue, 21 Nov 2023 02:51:06 +0000
-Message-Id: <20231121025111.257597-8-yahui.cao@intel.com>
+Subject: [PATCH iwl-next v4 08/12] ice: Save and load RX Queue head
+Date: Tue, 21 Nov 2023 02:51:07 +0000
+Message-Id: <20231121025111.257597-9-yahui.cao@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231121025111.257597-1-yahui.cao@intel.com>
 References: <20231121025111.257597-1-yahui.cao@intel.com>
@@ -75,210 +75,197 @@ Content-Transfer-Encoding: 8bit
 
 From: Lingyu Liu <lingyu.liu@intel.com>
 
-VSI id is a resource id for each VF and it is an absolute hardware id
-per PCI card. It is exposed to VF driver through virtual channel
-messages at the VF-PF negotiation stage. It is constant during the whole
-device lifecycle unless driver re-init.
+RX Queue head is a fundamental dma ring context which determines the
+next RX descriptor to be fetched. However, RX Queue head is not visible
+to VF while it is only visible in PF. As a result, PF needs to save and
+load RX Queue Head explicitly.
 
-Almost all of the virtual channel messages will contain the VSI id. Once
-PF receives message, it will check if VSI id in the message is equal to
-the VF's VSI id for security and other reason.  If a VM backed by VF VSI
-A is migrated to a VM backed by VF with VSI B, while in messages
-replaying stage, all the messages will be rejected by PF due to the
-invalid VSI id. Even after migration, VM runtime will get failure as
-well.
+Since network packets may come in at any time once RX Queue is enabled,
+RX Queue head needs to be loaded before Queue is enabled.
 
-Fix this gap by modifying the VSI id in the virtual channel message at
-migration device resuming stage and VM runtime stage. In most cases the
-VSI id will vary between migration source and destination side. And this
-is a slow path anyway.
+RX Queue head loading handler is implemented by reading and then
+overwriting queue context with specific HEAD value.
 
 Signed-off-by: Lingyu Liu <lingyu.liu@intel.com>
 Signed-off-by: Yahui Cao <yahui.cao@intel.com>
 ---
- .../net/ethernet/intel/ice/ice_migration.c    | 95 +++++++++++++++++++
- .../intel/ice/ice_migration_private.h         |  4 +
- drivers/net/ethernet/intel/ice/ice_vf_lib.h   |  1 +
- drivers/net/ethernet/intel/ice/ice_virtchnl.c |  1 +
- 4 files changed, 101 insertions(+)
+ .../net/ethernet/intel/ice/ice_migration.c    | 125 ++++++++++++++++++
+ 1 file changed, 125 insertions(+)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_migration.c b/drivers/net/ethernet/intel/ice/ice_migration.c
-index 981aa92bbe86..780d2183011a 100644
+index 780d2183011a..473be6a83cf3 100644
 --- a/drivers/net/ethernet/intel/ice/ice_migration.c
 +++ b/drivers/net/ethernet/intel/ice/ice_migration.c
-@@ -25,6 +25,7 @@ struct ice_migration_dev_state {
- 	u16 num_txq;
+@@ -2,9 +2,11 @@
+ /* Copyright (C) 2018-2023 Intel Corporation */
+ 
+ #include "ice.h"
++#include "ice_base.h"
+ 
+ #define ICE_MIG_DEVSTAT_MAGIC			0xE8000001
+ #define ICE_MIG_DEVSTAT_VERSION			0x1
++#define ICE_MIG_VF_QRX_TAIL_MAX			256
+ 
+ struct ice_migration_virtchnl_msg_slot {
+ 	u32 opcode;
+@@ -26,6 +28,8 @@ struct ice_migration_dev_state {
  	u16 num_rxq;
  
-+	u16 vsi_id;
+ 	u16 vsi_id;
++	/* next RX desc index to be processed by the device */
++	u16 rx_head[ICE_MIG_VF_QRX_TAIL_MAX];
  	u8 virtchnl_msgs[];
  } __aligned(8);
  
-@@ -50,6 +51,7 @@ void ice_migration_init_vf(struct ice_vf *vf)
- 	INIT_LIST_HEAD(&vf->virtchnl_msg_list);
- 	vf->virtchnl_msg_num = 0;
- 	vf->virtchnl_msg_size = 0;
-+	vf->vm_vsi_num = vf->lan_vsi_num;
+@@ -264,6 +268,54 @@ u32 ice_migration_supported_caps(void)
+ 	return VIRTCHNL_VF_MIGRATION_SUPPORT_FEATURE;
  }
  
++/**
++ * ice_migration_save_rx_head - save rx head into device state buffer
++ * @vf: pointer to VF structure
++ * @devstate: pointer to migration buffer
++ *
++ * Return 0 for success, negative for error
++ */
++static int
++ice_migration_save_rx_head(struct ice_vf *vf,
++			   struct ice_migration_dev_state *devstate)
++{
++	struct device *dev = ice_pf_to_dev(vf->pf);
++	struct ice_vsi *vsi;
++	int i;
++
++	vsi = ice_get_vf_vsi(vf);
++	if (!vsi) {
++		dev_err(dev, "VF %d VSI is NULL\n", vf->vf_id);
++		return -EINVAL;
++	}
++
++	ice_for_each_rxq(vsi, i) {
++		struct ice_rx_ring *rx_ring = vsi->rx_rings[i];
++		struct ice_rlan_ctx rlan_ctx = {};
++		struct ice_hw *hw = &vf->pf->hw;
++		u16 rxq_index;
++		int status;
++
++		if (WARN_ON_ONCE(!rx_ring))
++			return -EINVAL;
++
++		devstate->rx_head[i] = 0;
++		if (!test_bit(i, vf->rxq_ena))
++			continue;
++
++		rxq_index = rx_ring->reg_idx;
++		status = ice_read_rxq_ctx(hw, &rlan_ctx, rxq_index);
++		if (status) {
++			dev_err(dev, "Failed to read RXQ[%d] context, err=%d\n",
++				rx_ring->q_index, status);
++			return -EIO;
++		}
++		devstate->rx_head[i] = rlan_ctx.head;
++	}
++
++	return 0;
++}
++
  /**
-@@ -314,6 +316,7 @@ ice_migration_save_devstate(struct ice_pf *pf, int vf_id, u8 *buf, u64 buf_sz)
- 	devstate->num_txq = vsi->num_txq;
- 	devstate->num_rxq = vsi->num_rxq;
+  * ice_migration_save_devstate - save device state to migration buffer
+  * @pf: pointer to PF of migration device
+@@ -318,6 +370,12 @@ ice_migration_save_devstate(struct ice_pf *pf, int vf_id, u8 *buf, u64 buf_sz)
  	buf = devstate->virtchnl_msgs;
-+	devstate->vsi_id = vf->vm_vsi_num;
+ 	devstate->vsi_id = vf->vm_vsi_num;
  
++	ret = ice_migration_save_rx_head(vf, devstate);
++	if (ret) {
++		dev_err(dev, "VF %d failed to save rxq head\n", vf->vf_id);
++		goto out_put_vf;
++	}
++
  	list_for_each_entry(msg_listnode, &vf->virtchnl_msg_list, node) {
  		struct ice_migration_virtchnl_msg_slot *msg_slot;
-@@ -441,6 +444,8 @@ int ice_migration_load_devstate(struct ice_pf *pf, int vf_id,
- 		goto out_put_vf;
- 
- 	devstate = (struct ice_migration_dev_state *)buf;
-+	vf->vm_vsi_num = devstate->vsi_id;
-+	dev_dbg(dev, "VF %d vm vsi num is:%d\n", vf->vf_id, vf->vm_vsi_num);
- 	msg_slot = (struct ice_migration_virtchnl_msg_slot *)
- 			devstate->virtchnl_msgs;
- 	set_bit(ICE_VF_STATE_REPLAYING_VC, vf->vf_states);
-@@ -473,3 +478,93 @@ int ice_migration_load_devstate(struct ice_pf *pf, int vf_id,
- 	return ret;
+ 		u64 slot_size;
+@@ -409,6 +467,57 @@ ice_migration_check_match(struct ice_vf *vf, const u8 *buf, u64 buf_sz)
+ 	return 0;
  }
- EXPORT_SYMBOL(ice_migration_load_devstate);
-+
+ 
 +/**
-+ * ice_migration_fix_msg_vsi - change virtual channel msg VSI id
++ * ice_migration_load_rx_head - load rx head from device state buffer
++ * @vf: pointer to VF structure
++ * @devstate: pointer to migration device state
 + *
-+ * @vf: pointer to the VF structure
-+ * @v_opcode: virtchnl message operation code
-+ * @msg: pointer to the virtual channel message
-+ *
-+ * After migration, the VSI id saved by VF driver may be different from VF
-+ * VSI id. Some virtual channel commands will fail due to unmatch VSI id.
-+ * Change virtual channel message payload VSI id to real VSI id.
++ * Return 0 for success, negative for error
 + */
-+void ice_migration_fix_msg_vsi(struct ice_vf *vf, u32 v_opcode, u8 *msg)
++static int
++ice_migration_load_rx_head(struct ice_vf *vf,
++			   struct ice_migration_dev_state *devstate)
 +{
-+	if (!vf->migration_enabled)
-+		return;
++	struct device *dev = ice_pf_to_dev(vf->pf);
++	struct ice_vsi *vsi;
++	int i;
 +
-+	switch (v_opcode) {
-+	case VIRTCHNL_OP_ADD_ETH_ADDR:
-+	case VIRTCHNL_OP_DEL_ETH_ADDR:
-+	case VIRTCHNL_OP_ENABLE_QUEUES:
-+	case VIRTCHNL_OP_DISABLE_QUEUES:
-+	case VIRTCHNL_OP_CONFIG_RSS_KEY:
-+	case VIRTCHNL_OP_CONFIG_RSS_LUT:
-+	case VIRTCHNL_OP_GET_STATS:
-+	case VIRTCHNL_OP_CONFIG_PROMISCUOUS_MODE:
-+	case VIRTCHNL_OP_ADD_FDIR_FILTER:
-+	case VIRTCHNL_OP_DEL_FDIR_FILTER:
-+	case VIRTCHNL_OP_ADD_VLAN:
-+	case VIRTCHNL_OP_DEL_VLAN: {
-+		/* Read the beginning two bytes of message for VSI id */
-+		u16 *vsi_id = (u16 *)msg;
-+
-+		/* For VM runtime stage, vsi_id in the virtual channel message
-+		 * should be equal to the PF logged vsi_id and vsi_id is
-+		 * replaced by VF's VSI id to guarantee that messages are
-+		 * processed successfully. If vsi_id is not equal to the PF
-+		 * logged vsi_id, then this message must be sent by malicious
-+		 * VF and no replacement is needed. Just let virtual channel
-+		 * handler to fail this message.
-+		 *
-+		 * For virtual channel replaying stage, all of the PF logged
-+		 * virtual channel messages are trusted and vsi_id is replaced
-+		 * anyway to guarantee the messages are processed successfully.
-+		 */
-+		if (*vsi_id == vf->vm_vsi_num ||
-+		    test_bit(ICE_VF_STATE_REPLAYING_VC, vf->vf_states))
-+			*vsi_id = vf->lan_vsi_num;
-+		break;
++	vsi = ice_get_vf_vsi(vf);
++	if (!vsi) {
++		dev_err(dev, "VF %d VSI is NULL\n", vf->vf_id);
++		return -EINVAL;
 +	}
-+	case VIRTCHNL_OP_CONFIG_IRQ_MAP: {
-+		struct virtchnl_irq_map_info *irqmap_info;
-+		u16 num_q_vectors_mapped;
-+		int i;
 +
-+		irqmap_info = (struct virtchnl_irq_map_info *)msg;
-+		num_q_vectors_mapped = irqmap_info->num_vectors;
-+		for (i = 0; i < num_q_vectors_mapped; i++) {
-+			struct virtchnl_vector_map *map;
++	ice_for_each_rxq(vsi, i) {
++		struct ice_rx_ring *rx_ring = vsi->rx_rings[i];
++		struct ice_rlan_ctx rlan_ctx = {};
++		struct ice_hw *hw = &vf->pf->hw;
++		u16 rxq_index;
++		int status;
 +
-+			map = &irqmap_info->vecmap[i];
-+			if (map->vsi_id == vf->vm_vsi_num ||
-+			    test_bit(ICE_VF_STATE_REPLAYING_VC, vf->vf_states))
-+				map->vsi_id = vf->lan_vsi_num;
++		if (WARN_ON_ONCE(!rx_ring))
++			return -EINVAL;
++
++		rxq_index = rx_ring->reg_idx;
++		status = ice_read_rxq_ctx(hw, &rlan_ctx, rxq_index);
++		if (status) {
++			dev_err(dev, "Failed to read RXQ[%d] context, err=%d\n",
++				rx_ring->q_index, status);
++			return -EIO;
 +		}
-+		break;
++
++		rlan_ctx.head = devstate->rx_head[i];
++		status = ice_write_rxq_ctx(hw, &rlan_ctx, rxq_index);
++		if (status) {
++			dev_err(dev, "Failed to set LAN RXQ[%d] context, err=%d\n",
++				rx_ring->q_index, status);
++			return -EIO;
++		}
 +	}
-+	case VIRTCHNL_OP_CONFIG_VSI_QUEUES: {
-+		struct virtchnl_vsi_queue_config_info *qci;
 +
-+		qci = (struct virtchnl_vsi_queue_config_info *)msg;
-+		if (qci->vsi_id == vf->vm_vsi_num ||
-+		    test_bit(ICE_VF_STATE_REPLAYING_VC, vf->vf_states)) {
-+			int i;
++	return 0;
++}
 +
-+			qci->vsi_id = vf->lan_vsi_num;
-+			for (i = 0; i < qci->num_queue_pairs; i++) {
-+				struct virtchnl_queue_pair_info *qpi;
+ /**
+  * ice_migration_load_devstate - load device state at destination
+  * @pf: pointer to PF of migration device
+@@ -467,6 +576,22 @@ int ice_migration_load_devstate(struct ice_pf *pf, int vf_id,
+ 				vf->vf_id, msg_slot->opcode);
+ 			goto out_clear_replay;
+ 		}
 +
-+				qpi = &qci->qpair[i];
-+				qpi->txq.vsi_id = vf->lan_vsi_num;
-+				qpi->rxq.vsi_id = vf->lan_vsi_num;
++		/* Once RX Queue is enabled, network traffic may come in at any
++		 * time. As a result, RX Queue head needs to be loaded before
++		 * RX Queue is enabled.
++		 * For simplicity and integration, overwrite RX head just after
++		 * RX ring context is configured.
++		 */
++		if (msg_slot->opcode == VIRTCHNL_OP_CONFIG_VSI_QUEUES) {
++			ret = ice_migration_load_rx_head(vf, devstate);
++			if (ret) {
++				dev_err(dev, "VF %d failed to load rx head\n",
++					vf->vf_id);
++				goto out_clear_replay;
 +			}
 +		}
-+		break;
-+	}
-+	default:
-+		break;
-+	}
-+}
-diff --git a/drivers/net/ethernet/intel/ice/ice_migration_private.h b/drivers/net/ethernet/intel/ice/ice_migration_private.h
-index 676eb2d6c12e..f72a488d9002 100644
---- a/drivers/net/ethernet/intel/ice/ice_migration_private.h
-+++ b/drivers/net/ethernet/intel/ice/ice_migration_private.h
-@@ -17,6 +17,7 @@ int ice_migration_log_vf_msg(struct ice_vf *vf,
- 			     struct ice_rq_event_info *event);
- void ice_migration_unlog_vf_msg(struct ice_vf *vf, u32 v_opcode);
- u32 ice_migration_supported_caps(void);
-+void ice_migration_fix_msg_vsi(struct ice_vf *vf, u32 v_opcode, u8 *msg);
- #else
- static inline void ice_migration_init_vf(struct ice_vf *vf) { }
- static inline void ice_migration_uninit_vf(struct ice_vf *vf) { }
-@@ -33,6 +34,9 @@ ice_migration_supported_caps(void)
- {
- 	return 0xFFFFFFFF;
- }
 +
-+static inline void
-+ice_migration_fix_msg_vsi(struct ice_vf *vf, u32 v_opcode, u8 *msg) { }
- #endif /* CONFIG_ICE_VFIO_PCI */
- 
- #endif /* _ICE_MIGRATION_PRIVATE_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.h b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-index 318b6dfc016d..49d99694e91f 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-@@ -146,6 +146,7 @@ struct ice_vf {
- 	u64 virtchnl_msg_num;
- 	u64 virtchnl_msg_size;
- 	u32 virtchnl_retval;
-+	u16 vm_vsi_num;
- };
- 
- /* Flags for controlling behavior of ice_reset_vf */
-diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-index 54f441daa87e..8dbe558790af 100644
---- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-+++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-@@ -4060,6 +4060,7 @@ int ice_vc_process_vf_msg(struct ice_pf *pf, struct ice_rq_event_info *event,
- 	}
- 
- 	if (vf->migration_enabled) {
-+		ice_migration_fix_msg_vsi(vf, v_opcode, msg);
- 		if (ice_migration_log_vf_msg(vf, event)) {
- 			u32 status_code = VIRTCHNL_STATUS_ERR_NO_MEMORY;
- 
+ 		event.msg_buf = NULL;
+ 		msg_slot = (struct ice_migration_virtchnl_msg_slot *)
+ 					((char *)msg_slot + slot_sz);
 -- 
 2.34.1
 
