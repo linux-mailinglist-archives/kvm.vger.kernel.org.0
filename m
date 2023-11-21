@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-2229-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2230-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0FB67F391D
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 23:26:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCCF47F393B
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 23:36:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59BC1282734
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 22:26:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37D0CB2118C
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 22:36:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE565647F;
-	Tue, 21 Nov 2023 22:26:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 296085B1F1;
+	Tue, 21 Nov 2023 22:36:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dA2qu2yT"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ohe3/Ur6"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2D4D191;
-	Tue, 21 Nov 2023 14:26:32 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CF49191;
+	Tue, 21 Nov 2023 14:36:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=2fZr1mOnySmJPl/Y/EJ+vsBVASzJjZWY4v1+og3mauY=; b=dA2qu2yTXQDjwop8ybLnP9FxvQ
-	uEdHmFPtFO9IZbX7FrIxFGGO0SDA11zYvyPAPy0O6OOD/aeeXNXlogxJ92pGBRp7L4tcJTpUZZYYt
-	N528MMpgysAWQF4kU32YZ4M+xiP0MBI4PkuwefvpYmCoTTW1FFeLmRxWXviAs4c0ZboasReb5GnGa
-	hMYx/I+sxhC+HAWRVjWyU0fi3CFFHyE1iFZ5cVZkrZh5XHKQqJcpyTTO+FjcQs+ujycKuP+WUlHAs
-	cbRL10AjTlf7TSeWUvGi53WFcDxHSGZYJHCh4SrdE0h/sLsaKjlXQJoHLA9wQ9fsgzzl1IG5zYmVp
-	SssZkw8w==;
+	bh=d9eVPMvAg8Eqrfhpf7e1rkfnk6Nj6Ev6xMx5KgA/mKY=; b=ohe3/Ur6HdHcW4AcjFxRg7P/73
+	0piQB5UJheQpPqib1xww0xJ93fXCQj4jtcwMLsY9IYfshk6mdLC6R1+8WfD3AFRcBdfdTLc6yEJdF
+	/+14kpU+J0WavOlehgLD/xemmr2ID/aFnrSDF3pSh6mWGpbpb7SOjNRUWOZtm6dcalMOjyLPRKr3W
+	VqXUCchyWAOzJy5h3HxPUiMZXCnP+XUsw2ak23BBZgKMQoj25I1NGDCWCuL1zZmOh5QIyx7rwTbkR
+	WyNh0sN5JigkDd0y60y/3OrL/WjlZmJQapNUVPyAYNT9iKxfXIlfW98M4+ZfLertEIo91IPFFGSPK
+	Vqeg6z3Q==;
 Received: from [2001:8b0:10b:5:22b8:d80f:1c9c:f188] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1r5ZCC-005zLc-MA; Tue, 21 Nov 2023 22:26:16 +0000
-Message-ID: <9f786e00b336b67ef9b623b73db1caca226e8c68.camel@infradead.org>
-Subject: Re: [PATCH v8 06/15] KVM: pfncache: stop open-coding
- offset_in_page()
+	id 1r5ZLL-005zld-0b; Tue, 21 Nov 2023 22:35:43 +0000
+Message-ID: <5ffdf3ab49b047cd851289e5dc0697af0ffff45f.camel@infradead.org>
+Subject: Re: [PATCH v8 07/15] KVM: pfncache: include page offset in uhva and
+ use it consistently
 From: David Woodhouse <dwmw2@infradead.org>
 To: Paul Durrant <paul@xen.org>, Sean Christopherson <seanjc@google.com>, 
  Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
  Ingo Molnar <mingo@redhat.com>,  Borislav Petkov <bp@alien8.de>, Dave
  Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
  <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Tue, 21 Nov 2023 22:26:16 +0000
-In-Reply-To: <20231121180223.12484-7-paul@xen.org>
+Date: Tue, 21 Nov 2023 22:35:42 +0000
+In-Reply-To: <20231121180223.12484-8-paul@xen.org>
 References: <20231121180223.12484-1-paul@xen.org>
-	 <20231121180223.12484-7-paul@xen.org>
+	 <20231121180223.12484-8-paul@xen.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-XV+EXdqiSqcg+H+Xoe+e"
+	boundary="=-YP/rcsIQxcrNTtAj4r9O"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -56,22 +56,58 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-XV+EXdqiSqcg+H+Xoe+e
+--=-YP/rcsIQxcrNTtAj4r9O
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: base64
 
-On Tue, 2023-11-21 at 18:02 +0000, Paul Durrant wrote:
-> From: Paul Durrant <pdurrant@amazon.com>
->=20
-> Some code in pfncache uses offset_in_page() but in other places it is ope=
-n-
-> coded. Use offset_in_page() consistently everywhere.
->=20
-> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+T24gVHVlLCAyMDIzLTExLTIxIGF0IDE4OjAyICswMDAwLCBQYXVsIER1cnJhbnQgd3JvdGU6Cj4g
+QEAgLTI0Miw4ICsyNDIsNyBAQCBzdGF0aWMgaW50IF9fa3ZtX2dwY19yZWZyZXNoKHN0cnVjdCBn
+Zm5fdG9fcGZuX2NhY2hlICpncGMsIGdwYV90IGdwYSwKPiDCoMKgwqDCoMKgwqDCoMKgfQo+IMKg
+Cj4gwqDCoMKgwqDCoMKgwqDCoG9sZF9wZm4gPSBncGMtPnBmbjsKPiAtwqDCoMKgwqDCoMKgwqBv
+bGRfa2h2YSA9IGdwYy0+a2h2YSAtIG9mZnNldF9pbl9wYWdlKGdwYy0+a2h2YSk7Cj4gLcKgwqDC
+oMKgwqDCoMKgb2xkX3VodmEgPSBncGMtPnVodmE7Cj4gK8KgwqDCoMKgwqDCoMKgb2xkX2todmEg
+PSAodm9pZCAqKVBBR0VfQUxJR05fRE9XTigodWludHB0cl90KWdwYy0+a2h2YSk7Cj4gwqAKPiDC
+oMKgwqDCoMKgwqDCoMKgLyogSWYgdGhlIHVzZXJzcGFjZSBIVkEgaXMgaW52YWxpZCwgcmVmcmVz
+aCB0aGF0IGZpcnN0ICovCj4gwqDCoMKgwqDCoMKgwqDCoGlmIChncGMtPmdwYSAhPSBncGEgfHwg
+Z3BjLT5nZW5lcmF0aW9uICE9IHNsb3RzLT5nZW5lcmF0aW9uIHx8Cj4gQEAgLTI1OSwxMyArMjU4
+LDI1IEBAIHN0YXRpYyBpbnQgX19rdm1fZ3BjX3JlZnJlc2goc3RydWN0IGdmbl90b19wZm5fY2Fj
+aGUgKmdwYywgZ3BhX3QgZ3BhLAo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoHJldCA9IC1FRkFVTFQ7Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgZ290byBvdXQ7Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqB9CgoKVGhlcmUncyBhIHN1YnRsZSBiZWhhdmlvdXIgY2hhbmdlIGhlcmUsIGlzbid0
+IHRoZXJlPyBJJ2QgKnJlYWxseSogbGlrZQp5b3UgZG8gc2F5ICdObyBmdW5jdGlvbmFsIGNoYW5n
+ZSBpbnRlbmRlZCcgd2hlcmUgdGhhdCBpcyB0cnVlLCBhbmQgdGhlbgp0aGUgYWJzZW5jZSBvZiB0
+aGF0IHNlbnRlbmNlIGluIHRoaXMgb25lIHdvdWxkIGJlIG1lYW5pbmdmdWwuCgpZb3UgYXJlIG5v
+dyBjYWxsaW5nIGh2YV90b19wZm5fcmV0cnkoKSBldmVuIHdoZW4gdGhlIHVodmEgcGFnZSBoYXNu
+J3QKY2hhbmdlZC4gV2hpY2ggaXMgaGFybWxlc3MgYW5kIHByb2JhYmx5IG5vdCBpbXBvcnRhbnQs
+IGJ1dCBJSVVDIGZpeGFibGUKYnkgdGhlIGFkZGl0aW9uIG9mOgoKICsgICAgICAgICAgICAgIGlm
+IChncGMtPnVodmEgIT0gUEFHRV9BTElHTl9ET1dOKG9sZF91aHZhKSkgCj4gK8KgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoGh2YV9jaGFuZ2UgPSB0cnVlOwo+ICvCoMKgwqDCoMKgwqDCoH0g
+ZWxzZSB7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoC8qCj4gK8KgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCAqIE5vIG5lZWQgdG8gZG8gYW55IHJlLW1hcHBpbmcgaWYgdGhl
+IG9ubHkgdGhpbmcgdGhhdCBoYXMKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICog
+Y2hhbmdlZCBpcyB0aGUgcGFnZSBvZmZzZXQuIEp1c3QgcGFnZSBhbGlnbiBpdCB0byBhbGxvdyB0
+aGUKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICogbmV3IG9mZnNldCB0byBiZSBh
+ZGRlZCBpbi4KPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICovCj4gK8KgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdwYy0+dWh2YSA9IFBBR0VfQUxJR05fRE9XTihncGMtPnVo
+dmEpOwo+IMKgwqDCoMKgwqDCoMKgwqB9Cj4gwqAKPiArwqDCoMKgwqDCoMKgwqAvKiBOb3RlOiB0
+aGUgb2Zmc2V0IG11c3QgYmUgY29ycmVjdCBiZWZvcmUgY2FsbGluZyBodmFfdG9fcGZuX3JldHJ5
+KCkgKi8KPiArwqDCoMKgwqDCoMKgwqBncGMtPnVodmEgKz0gcGFnZV9vZmZzZXQ7Cj4gKwo+IMKg
+wqDCoMKgwqDCoMKgwqAvKgo+IMKgwqDCoMKgwqDCoMKgwqAgKiBJZiB0aGUgdXNlcnNwYWNlIEhW
+QSBjaGFuZ2VkIG9yIHRoZSBQRk4gd2FzIGFscmVhZHkgaW52YWxpZCwKPiDCoMKgwqDCoMKgwqDC
+oMKgICogZHJvcCB0aGUgbG9jayBhbmQgZG8gdGhlIEhWQSB0byBQRk4gbG9va3VwIGFnYWluLgo+
+IMKgwqDCoMKgwqDCoMKgwqAgKi8KPiAtwqDCoMKgwqDCoMKgwqBpZiAoIWdwYy0+dmFsaWQgfHwg
+b2xkX3VodmEgIT0gZ3BjLT51aHZhKSB7Cj4gK8KgwqDCoMKgwqDCoMKgaWYgKCFncGMtPnZhbGlk
+IHx8IGh2YV9jaGFuZ2UpIHsKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldCA9
+IGh2YV90b19wZm5fcmV0cnkoZ3BjKTsKPiDCoMKgwqDCoMKgwqDCoMKgfSBlbHNlIHsKPiDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoC8qCj4gLS0gCgpCdXQgSSBkb24ndCByZWFsbHkg
+dGhpbmsgaXQncyB0aGF0IGltcG9ydGFudCBpZiB5b3UgY2FuIGNvbWUgdXAgd2l0aCBhCmNvaGVy
+ZW50IGp1c3RpZmljYXRpb24gZm9yIHRoZSBjaGFuZ2UgYW5kIG5vdGUgaXQgaW4gdGhlIGNvbW1p
+dAptZXNzYWdlLiBTbyBlaXRoZXIgd2F5OgoKUmV2aWV3ZWQtYnk6IERhdmlkIFdvb2Rob3VzZSA8
+ZHdtd0BhbWF6b24uY28udWs+Cg==
 
-Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
---=-XV+EXdqiSqcg+H+Xoe+e
+--=-YP/rcsIQxcrNTtAj4r9O
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -163,25 +199,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTIxMjIyNjE2WjAvBgkqhkiG9w0BCQQxIgQgRgx8JtRz
-fvmJEete53+2GqDdoWmPERYwzdUJyDLdC0gwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTIxMjIzNTQyWjAvBgkqhkiG9w0BCQQxIgQgY1R0a3Yk
+p4+TsiqGclh456q5h/Nn+PulOWJ6IWsXB94wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBQb2e2YAFkAypPXImMpsGSjXxmD4feewFx
-wZro9WUkJGyL0KJrFXo2ub4rZel5uzwZeQo/S40HpZSXzzJ7/5pZSdHVuaoy55AshWeg8qS8kpkz
-+13g6BpqlF159r+vqJzoqE5ukO6CNREH7dFXceztQ6u+HGW2bai/SjXtNGOuGaVBLi6j+4xDgkr5
-Bnf1QurYfF1m2DmIiPXj6yW74nRT09bCcYn3xD7wwX/tH9EJqn8DUcUUt2zQXzeF9ozLjnZl2jFy
-roblwxjSCqBmXrD1z8uUp33IjS8khGnaY/g8UYDBYQZBwstYouWtB9b1Qzmp7MZLKwuTEuPz7LN/
-TZ32rNu3u19sBUKJivTvMCQDo9NHUx+5ufMzQr2ZHV3QqkQIFNzf9dlMFKsWRlfFCunB35cF5Sac
-v2er1K6O7RWLQsfpW5HcgcjO+XfI21ohHH415+KAp+qjujEfRAlEu5Dqx0ucUZRmYgVqdLsg43vl
-LLhjLUl1TcRLgp4RgebuUMvXV6eexXkZGMCoTAS2Ah0hdyt5+kjTAvdM5JssqhLPCDKReC6mHxs1
-0Puv6Z5R+JolZ1NdEHjii6NANuWrXWug0rLgglO9AQQcqVNAHrV+oous4FI/6dN6EpkldyVSIB66
-Dobi2PNRWWeLnqDq5tFpYz5oAbT1m0/pDdup00qdcAAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAznNGVLDRxJfjKj95+fItrRc36kmZE8YYS
+G+deG+RmfK9UIiyw8IRajkOTteZ31vWSwkMU51sh3lpC5qdLR4JKc+dmVUEe9+mPwAXa47evkD83
+7vjjVcbmRfIwGFf+X3iCHw+4VU2O7v1MsehUkxE9Ubd+jxu2Cpkibm7urbDdCVuw2vFkkdik6ZBQ
+tNExpLYlfx1MtS4PPCLdePSSvG7iZgZvrphJRZtAKtEmD8b4O64SeKGuAbHAyDUBlRudLELu68ft
+AkeQAuu5ZW+mLVW98zPJCwZQYMq5iTbg44Ohq1dvp7ku2+PMp5dkZilHQy1Rpm7/NgBLPssu9wsy
+P7IyAA44QY5GxaPQvcoOni25wwxE+ZfstzKkOlU4v3HGz/+msEwzUEWFn8pGTv69yYHCcSVL4ifg
+NtI1M24o3sgcZNaOxrUwXM7dpkRbxYUdImGyZf8bYHtEBkEa8Tv9HAj9xmZ/n9UiZ3ChtbNpNj+A
+Und0VJ8ud0Uy+zQas1jAdEE7XKzedLbj1lk3JlB9D8Ij3/hFv65+MzwYThwSOwzVhcJ8CAU/jWQ9
+9fAlD6L+JMJmO7PJEIhV4QWMkBzclEWsnZq77ckjuUL1T17SkdCTWCNf/a7ZX//Y2x472zJbBLd0
+rh6LXNPpxiqRDcKJwVx3r6+xo9nBGOrxUattUx42gAAAAAAAAA==
 
 
---=-XV+EXdqiSqcg+H+Xoe+e--
+--=-YP/rcsIQxcrNTtAj4r9O--
 
