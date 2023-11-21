@@ -1,58 +1,58 @@
-Return-Path: <kvm+bounces-2180-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2181-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12EA67F2C35
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 12:56:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94DCF7F2C37
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 12:56:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A830BB21EBF
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 11:56:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EA8F282C53
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 11:56:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B1349F8A;
-	Tue, 21 Nov 2023 11:55:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E0C4A98A;
+	Tue, 21 Nov 2023 11:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JcyGLbpb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZHQab0Dx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B74B1112;
-	Tue, 21 Nov 2023 03:55:40 -0800 (PST)
-Received: by mail-pf1-x443.google.com with SMTP id d2e1a72fcca58-6bee11456baso4596584b3a.1;
-        Tue, 21 Nov 2023 03:55:40 -0800 (PST)
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 431C7121;
+	Tue, 21 Nov 2023 03:55:43 -0800 (PST)
+Received: by mail-pl1-x644.google.com with SMTP id d9443c01a7336-1cc5b705769so48243745ad.0;
+        Tue, 21 Nov 2023 03:55:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700567740; x=1701172540; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1700567743; x=1701172543; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=maJ6auOp8L0b9qivkNZj20bUmfFTqIu0eFCNZfSuBj0=;
-        b=JcyGLbpbjM9C1isQ2bo06+B8NEJd4AUr8du5v4ybN68pv7GpjUXNCbEqTCX9lhjzop
-         BoEnfKZ6yzMMcmNEEN0QCjsf37kTGFAndfEqNE58OLej+sSJAEgEJBrrgoMsdLn8eLT3
-         Qill8FncNrhOH5Pj3AtzBiS/WJyyKUEkU14CZvqU7w+EKPfTGdRYQtJOyp5gRiOkOV+C
-         jB5qMJRpFH1qVffuAl9H0dJ8lTtoOfC+NQ5Z6d0nS5pD2+IH7UGkVm1IxaM1JdUdAtet
-         M/Ff/ml0FoUxbxENuQBs0wKhZA/lJLYtn8tEAzunSsiSaNLiFdEFBj14YdqQKjPtsHHa
-         TypQ==
+        bh=ZcIUiVFJ9kNUHsMFbutrGQOUAvjm4DvZ3i9nKoJpoeY=;
+        b=ZHQab0DxQkvijR8myKa62GvPPmtvhCNjI6tFcTMF/+ay2HwLWb6gnZJmdlyuV8lwCh
+         mTFxzzJbxRVMo4Z48ChrJ4iy5yvGdCCefgYW/nU0zpThdh7MVAXJ5LlMyj9rWb5cIPvw
+         Lgl2lD+o+KV15BJORAeWqqsWSkPgYD6+4Shdj7orAHKUpQJkmggVshGzr8uG0vDfIDON
+         ad9cQXDfm7vPorFQ/omkehvs/uu/lR73WrOhMVNCR1VAxZ7JtBN1RbjTh388qBOHANpl
+         Xlx4NF89wvUNCkB0f6KWRnkfGoiJw9VRqmuYZAxsIasvTHZN4SUTS2MX+gTVI1a+VVQO
+         cITA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700567740; x=1701172540;
+        d=1e100.net; s=20230601; t=1700567743; x=1701172543;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=maJ6auOp8L0b9qivkNZj20bUmfFTqIu0eFCNZfSuBj0=;
-        b=phXB2g1Khu9+4xvxZ82WVRWLFzSQ4UtQPzgItWwnckjS3lqwGE4g4YbXBZDkeGidxX
-         TRkzhwqj8b8RMH3/i6Go2s4Z/sjJ70Lo5UdXAnH9YqTPd92lstW3XHU/cu9sBeb1z7eZ
-         HLc+MX9u8rTWYwb4niAryDi1pYo75M8dt6e3dhDEiBCBC1XmAZJBGnCHsqLOWf77MKcm
-         05xUUETSzwkcH63WY7SG4zvjEGr5qrgXtY01xmj8oPUvyEY0h9qnPnYAnEWisWYWAKP4
-         iWo+xP0k8EsPMqYaJbhd1zPHeWaufUpyUFOI9umH5g/EijDK5Ji8YRppetQts/dbkPE1
-         CI9A==
-X-Gm-Message-State: AOJu0YxM/DqQPnhV6tq7+H7WOougxLydziyfIA3hQevsE8DqrpCNPWBa
-	+ntHQJbu0KXi5dPfHQaQbDghdhuzjU+b0Q9GfSw=
-X-Google-Smtp-Source: AGHT+IGmg76G1HFzflYvOXXqnwz6YbYp0uFoJFotAJKgtV8TfUQ0NSV4EmpR58mIZsO+Muftq+W4ag==
-X-Received: by 2002:a05:6a20:7f8d:b0:187:f2f7:2383 with SMTP id d13-20020a056a207f8d00b00187f2f72383mr8957676pzj.45.1700567740082;
-        Tue, 21 Nov 2023 03:55:40 -0800 (PST)
+        bh=ZcIUiVFJ9kNUHsMFbutrGQOUAvjm4DvZ3i9nKoJpoeY=;
+        b=bEceUq3yLmwhB/O6wueRKya0S/2D3jmREkbNNKOeQOpC4TPYTxxyArtWXhmqV81EhM
+         KDHls3cdSRNDmCEzLazCjpQvoZuE9R301+BfoS5NH9Fu3h84jtRZOnKtbuHLzJu2ow3C
+         9+0MPvHSnMVnKccR32dM+W6/ftge2GcsDwKLvuZMhzNnCa6zhftA++8DbJitOxktSR46
+         b2Jpp6RrQqO0Wzj0Pu6E6ZTVU3bJ66i4ijKGuJZ9AyjIdfWEKC/rW5CrhVuIC4AOItrL
+         Rl0jpSumUBuFYEJnQM4okWXHQyOEp74l3Ryft8okFEbelrzQBwP0DS8T+zQRhRmGxX59
+         McCg==
+X-Gm-Message-State: AOJu0YzpVADuv6FICXhxUHm0qNJLIGorKtehsgy5VTNfRg1Pfvv9+l89
+	Zc4Re4898HabrSky729QUpc=
+X-Google-Smtp-Source: AGHT+IETOPDqdGGWx+gtadvWxNkqg1/j3k0Gk8ZaufqAETHs1EWB2OAg0zqi98n2V+xUpD4J0t2h7w==
+X-Received: by 2002:a17:902:7244:b0:1cf:665a:925 with SMTP id c4-20020a170902724400b001cf665a0925mr4132100pll.38.1700567742755;
+        Tue, 21 Nov 2023 03:55:42 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id g10-20020a170902740a00b001cc1dff5b86sm7685431pll.244.2023.11.21.03.55.37
+        by smtp.gmail.com with ESMTPSA id g10-20020a170902740a00b001cc1dff5b86sm7685431pll.244.2023.11.21.03.55.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 03:55:39 -0800 (PST)
+        Tue, 21 Nov 2023 03:55:42 -0800 (PST)
 From: Jinrong Liang <ljr.kernel@gmail.com>
 X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
 To: Sean Christopherson <seanjc@google.com>
@@ -65,9 +65,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	Jinrong Liang <ljr.kernel@gmail.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 3/9] KVM: selftests: Test fixed counters overflow interrupt handling
-Date: Tue, 21 Nov 2023 19:54:51 +0800
-Message-Id: <20231121115457.76269-4-cloudliang@tencent.com>
+Subject: [PATCH 4/9] KVM: selftests: Add x86 feature and properties for AMD PMU in processor.h
+Date: Tue, 21 Nov 2023 19:54:52 +0800
+Message-Id: <20231121115457.76269-5-cloudliang@tencent.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231121115457.76269-1-cloudliang@tencent.com>
 References: <20231121115457.76269-1-cloudliang@tencent.com>
@@ -81,72 +81,43 @@ Content-Transfer-Encoding: 8bit
 
 From: Jinrong Liang <cloudliang@tencent.com>
 
-Add tests to verify that fixed counters overflow interrupt handling
-works as expected.
+Add x86 feature and properties for AMD PMU so that tests don't have
+to manually retrieve the correct CPUID leaf+register, and so that the
+resulting code is self-documenting.
 
 Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
 ---
- .../selftests/kvm/x86_64/pmu_counters_test.c  | 32 +++++++++++++++++--
- 1 file changed, 29 insertions(+), 3 deletions(-)
+ tools/testing/selftests/kvm/include/x86_64/processor.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-index 1b108e6718fc..efd8c61e1c16 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-@@ -551,9 +551,8 @@ static void test_pmi_init_x2apic(void)
- 	pmi_irq_called = false;
- }
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index ba16d714b451..250ace4f14b8 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -176,6 +176,7 @@ struct kvm_x86_cpu_feature {
+  * Extended Leafs, a.k.a. AMD defined
+  */
+ #define	X86_FEATURE_SVM			KVM_X86_CPU_FEATURE(0x80000001, 0, ECX, 2)
++#define	X86_FEATURE_PERFCTR_CORE	KVM_X86_CPU_FEATURE(0x80000001, 0, ECX, 23)
+ #define	X86_FEATURE_NX			KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 20)
+ #define	X86_FEATURE_GBPAGES		KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 26)
+ #define	X86_FEATURE_RDTSCP		KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 27)
+@@ -192,6 +193,7 @@ struct kvm_x86_cpu_feature {
+ #define	X86_FEATURE_VGIF		KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 16)
+ #define X86_FEATURE_SEV			KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 1)
+ #define X86_FEATURE_SEV_ES		KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 3)
++#define X86_FEATURE_PERFMON_V2		KVM_X86_CPU_FEATURE(0x80000022, 0, EAX, 0)
  
--static void guest_test_gp_counter_pmi(void)
-+static void guest_test_gp_counter_pmi(uint8_t guest_pmu_version)
- {
--	uint8_t guest_pmu_version = guest_get_pmu_version();
- 	uint32_t base_msr = get_pmc_msr();
+ /*
+  * KVM defined paravirt features.
+@@ -276,6 +278,7 @@ struct kvm_x86_cpu_property {
+ #define X86_PROPERTY_MAX_PHY_ADDR		KVM_X86_CPU_PROPERTY(0x80000008, 0, EAX, 0, 7)
+ #define X86_PROPERTY_MAX_VIRT_ADDR		KVM_X86_CPU_PROPERTY(0x80000008, 0, EAX, 8, 15)
+ #define X86_PROPERTY_PHYS_ADDR_REDUCTION	KVM_X86_CPU_PROPERTY(0x8000001F, 0, EBX, 6, 11)
++#define X86_PROPERTY_PMU_NR_CORE_COUNTERS	KVM_X86_CPU_PROPERTY(0x80000022, 0, EBX, 0, 3)
  
- 	test_pmi_init_x2apic();
-@@ -569,6 +568,33 @@ static void guest_test_gp_counter_pmi(void)
- 	guest_test_counters_pmi_workload();
+ #define X86_PROPERTY_MAX_CENTAUR_LEAF		KVM_X86_CPU_PROPERTY(0xC0000000, 0, EAX, 0, 31)
  
- 	GUEST_ASSERT(pmi_irq_called);
-+}
-+
-+static void guest_test_fixed_counter_pmi(uint8_t guest_pmu_version)
-+{
-+	if (guest_pmu_version < 2)
-+		return;
-+
-+	test_pmi_init_x2apic();
-+
-+	wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
-+	wrmsr(MSR_CORE_PERF_FIXED_CTR0,
-+	      (1ULL << this_cpu_property(X86_PROPERTY_PMU_FIXED_COUNTERS_BIT_WIDTH)) - 2);
-+	wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, FIXED_PMC_CTRL(0, FIXED_PMC_ENABLE_PMI));
-+
-+	wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, FIXED_PMC_GLOBAL_CTRL_ENABLE(0));
-+	guest_test_counters_pmi_workload();
-+
-+	GUEST_ASSERT(pmi_irq_called);
-+}
-+
-+static void guest_test_counters_pmi(void)
-+{
-+	uint8_t guest_pmu_version = guest_get_pmu_version();
-+
-+	guest_test_gp_counter_pmi(guest_pmu_version);
-+	guest_test_fixed_counter_pmi(guest_pmu_version);
-+
- 	GUEST_DONE();
- }
- 
-@@ -580,7 +606,7 @@ static void test_intel_ovf_pmi(uint8_t pmu_version, uint64_t perf_capabilities)
- 	if (!pmu_version)
- 		return;
- 
--	vm = intel_pmu_vm_create(&vcpu, guest_test_gp_counter_pmi, pmu_version,
-+	vm = intel_pmu_vm_create(&vcpu, guest_test_counters_pmi, pmu_version,
- 				 perf_capabilities);
- 
- 	vm_install_exception_handler(vm, PMI_VECTOR, pmi_irq_handler);
 -- 
 2.39.3
 
