@@ -1,51 +1,50 @@
-Return-Path: <kvm+bounces-2231-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2232-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4FE87F3972
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 23:48:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34C587F3977
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 23:50:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07705B21746
-	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 22:48:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E201D2829E9
+	for <lists+kvm@lfdr.de>; Tue, 21 Nov 2023 22:49:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D279A56474;
-	Tue, 21 Nov 2023 22:48:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D86F5645D;
+	Tue, 21 Nov 2023 22:49:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Yd9eZdon"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kD7zRTq/"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76A4BB9;
-	Tue, 21 Nov 2023 14:48:05 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74AD21A3;
+	Tue, 21 Nov 2023 14:49:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=dgwSa/JL7IWm7GLsGRORTXheIVSr1cCdo7K9omnLAHM=; b=Yd9eZdonDUJHVDHXNZt9mLhqAJ
-	8s9oEEvaoI7ACi6nwZruiK2CDhHyDRzHAdyPQqONFVSIx1dcegfTHbq7WMW4EqL56Vqp5TsllIi6E
-	4AXjM44DsaLhLxSnpGsHL2t6oMCMVGJjMqfftcfFu0ZxvkfazaDH/kX3TS3mSlfkQvB2QNYJ8aLaW
-	GGSq5IMt1r21udrSbePObSErgW5BXJMPZuj0gIaUcrMhtu+xpVBnnPO5D4RPFdWVE84VM38dAyLAW
-	x86XH30U+H8h7u5GbUvyVnfR/re8IsyZYZtK/q1PvP+QcxMAbc/SHht39SnLapvhj81HCgcRx+LKP
-	O+4XnV3g==;
+	bh=T/VmpSKD09YTvYqLos3SBlJHCp7gffS//8+bqjHXCzk=; b=kD7zRTq/fLFEGq5632s3nVgFlf
+	JQnbRSnfluLMgMWQyMm+aYEvWVuIjpZzeq+EPDMVmmn9plVDw2oMrci2a/1KCd3GMxHk+g84x3nYq
+	nHfebvzszWP8s6OKpoVS45vRCImJsh1Twd7pAAjZCqB5D0ifAxqoXuX+Pcy2QDO2yuQ8OnQOXaCbP
+	Rl5GUuTncLAEGTc27Evq76WjCNlf3OVxC/vKYudWESh9sFTjWjr3FnuL8CB/qGQQaLmgfWJY/Z+XC
+	xVInZGHLUmtJ3NzJ1R9M1eC+nZTHHqzQEivP1zpxS+rqdxhCPJq71gUFfzzLBd+K7KUK3ouINcFzY
+	QapyQvag==;
 Received: from [2001:8b0:10b:5:22b8:d80f:1c9c:f188] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1r5ZX1-0060Ig-PD; Tue, 21 Nov 2023 22:47:47 +0000
-Message-ID: <ec89ab12288426761ab5bd7d05562a4e8834e5f1.camel@infradead.org>
-Subject: Re: [PATCH v8 08/15] KVM: pfncache: allow a cache to be activated
- with a fixed (userspace) HVA
+	id 1r5ZYg-0060Mb-8h; Tue, 21 Nov 2023 22:49:30 +0000
+Message-ID: <ffb8f0617e109fc46a547bef025572211940f9aa.camel@infradead.org>
+Subject: Re: [PATCH v8 14/15] KVM: xen: split up kvm_xen_set_evtchn_fast()
 From: David Woodhouse <dwmw2@infradead.org>
 To: Paul Durrant <paul@xen.org>, Sean Christopherson <seanjc@google.com>, 
  Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
  Ingo Molnar <mingo@redhat.com>,  Borislav Petkov <bp@alien8.de>, Dave
  Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
  <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Tue, 21 Nov 2023 22:47:47 +0000
-In-Reply-To: <20231121180223.12484-9-paul@xen.org>
+Date: Tue, 21 Nov 2023 22:49:29 +0000
+In-Reply-To: <20231121180223.12484-15-paul@xen.org>
 References: <20231121180223.12484-1-paul@xen.org>
-	 <20231121180223.12484-9-paul@xen.org>
+	 <20231121180223.12484-15-paul@xen.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-G0Q2x1ML7/fvYCnNz2CT"
+	boundary="=-xGRGadYZn29I/tHAPjKO"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -56,60 +55,30 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-G0Q2x1ML7/fvYCnNz2CT
+--=-xGRGadYZn29I/tHAPjKO
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: quoted-printable
 
-T24gVHVlLCAyMDIzLTExLTIxIGF0IDE4OjAyICswMDAwLCBQYXVsIER1cnJhbnQgd3JvdGU6Cj4g
-Cj4gLXN0YXRpYyBpbnQgX19rdm1fZ3BjX3JlZnJlc2goc3RydWN0IGdmbl90b19wZm5fY2FjaGUg
-KmdwYywgZ3BhX3QgZ3BhLAo+ICtzdGF0aWMgaW50IF9fa3ZtX2dwY19yZWZyZXNoKHN0cnVjdCBn
-Zm5fdG9fcGZuX2NhY2hlICpncGMsIHU2NCBhZGRyLCBib29sIGFkZHJfaXNfZ3BhLAo+IMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHVuc2ln
-bmVkIGxvbmcgbGVuKQo+IMKgewo+IMKgwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qga3ZtX21lbXNsb3Rz
-ICpzbG90cyA9IGt2bV9tZW1zbG90cyhncGMtPmt2bSk7Cj4gLcKgwqDCoMKgwqDCoMKgdW5zaWdu
-ZWQgbG9uZyBwYWdlX29mZnNldCA9IG9mZnNldF9pbl9wYWdlKGdwYSk7Cj4gK8KgwqDCoMKgwqDC
-oMKgdW5zaWduZWQgbG9uZyBwYWdlX29mZnNldCA9IG9mZnNldF9pbl9wYWdlKGFkZHIpOwo+IMKg
-wqDCoMKgwqDCoMKgwqBib29sIHVubWFwX29sZCA9IGZhbHNlOwo+IMKgwqDCoMKgwqDCoMKgwqBr
-dm1fcGZuX3Qgb2xkX3BmbjsKPiDCoMKgwqDCoMKgwqDCoMKgYm9vbCBodmFfY2hhbmdlID0gZmFs
-c2U7Cj4gQEAgLTI0NCwxMiArMjQ0LDIxIEBAIHN0YXRpYyBpbnQgX19rdm1fZ3BjX3JlZnJlc2go
-c3RydWN0IGdmbl90b19wZm5fY2FjaGUgKmdwYywgZ3BhX3QgZ3BhLAo+IMKgwqDCoMKgwqDCoMKg
-wqBvbGRfcGZuID0gZ3BjLT5wZm47Cj4gwqDCoMKgwqDCoMKgwqDCoG9sZF9raHZhID0gKHZvaWQg
-KilQQUdFX0FMSUdOX0RPV04oKHVpbnRwdHJfdClncGMtPmtodmEpOwo+IMKgCj4gLcKgwqDCoMKg
-wqDCoMKgLyogSWYgdGhlIHVzZXJzcGFjZSBIVkEgaXMgaW52YWxpZCwgcmVmcmVzaCB0aGF0IGZp
-cnN0ICovCj4gLcKgwqDCoMKgwqDCoMKgaWYgKGdwYy0+Z3BhICE9IGdwYSB8fCBncGMtPmdlbmVy
-YXRpb24gIT0gc2xvdHMtPmdlbmVyYXRpb24gfHwKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqAga3Zt
-X2lzX2Vycm9yX2h2YShncGMtPnVodmEpKSB7Cj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoGdmbl90IGdmbiA9IGdwYV90b19nZm4oZ3BhKTsKPiArwqDCoMKgwqDCoMKgwqBpZiAoIWFk
-ZHJfaXNfZ3BhKSB7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdwYy0+Z3BhID0g
-S1ZNX1hFTl9JTlZBTElEX0dQQTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZ3Bj
-LT51aHZhID0gUEFHRV9BTElHTl9ET1dOKGdwYy0+dWh2YSk7Cj4gK8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoGFkZHIgPSBQQUdFX0FMSUdOX0RPV04oYWRkcik7Cj4gKwo+ICvCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAoZ3BjLT51aHZhICE9IGFkZHIpIHsKPiArwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdwYy0+dWh2YSA9IGFkZHI7
-Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBodmFfY2hh
-bmdlID0gdHJ1ZTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgfQo+ICvCoMKgwqDC
-oMKgwqDCoH0gZWxzZSBpZiAoZ3BjLT5ncGEgIT0gYWRkciB8fAo+ICvCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIGdwYy0+Z2VuZXJhdGlvbiAhPSBzbG90cy0+Z2VuZXJhdGlvbiB8
-fAo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGt2bV9pc19lcnJvcl9odmEo
-Z3BjLT51aHZhKSkgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBnZm5fdCBnZm4g
-PSBncGFfdG9fZ2ZuKGFkZHIpOwo+IMKgCj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oGdwYy0+Z3BhID0gZ3BhOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBncGMtPmdw
-YSA9IGFkZHI7Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBncGMtPmdlbmVyYXRp
-b24gPSBzbG90cy0+Z2VuZXJhdGlvbjsKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oGdwYy0+bWVtc2xvdCA9IF9fZ2ZuX3RvX21lbXNsb3Qoc2xvdHMsIGdmbik7Cj4gwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBncGMtPnVodmEgPSBnZm5fdG9faHZhX21lbXNsb3QoZ3Bj
-LT5tZW1zbG90LCBnZm4pOwoKSHJtLCBub3cgdGhhdCBhIHByZXZpb3VzIHBhdGNoIG1lYW5zIHdl
-J3JlIHByZXNlcnZpbmcgdGhlIGxvdyBiaXRzIG9mCmdwYy0+dWh2YSBzdXJlbHkgeW91IGRvbid0
-ICpuZWVkKiB0byBtZXNzIHdpdGggdGhlIGdwYyBzdHJ1Y3Q/IAoKSWYgZ3BjLT5ncGEgPT0gS1ZN
-X1hFTl9JTlZBTElEX0dQQSAoYnV0IGdwYy0+dWh2YSAhPSBLVk1fRVJSX0VSUl9CQUQgJiYKZ3Bj
-LT5hY3RpdmUpIHN1cmVseSB0aGF0J3MgZW5vdWdoIHRvIHNpZ25hbCB0aGF0IGdwYy0+dWh2YSBp
-cyBjYW5vbmljYWwKYW5kIGRvZXNuJ3QgbmVlZCB0byBiZSBsb29rZWQgdXAgZnJvbSB0aGUgR1BB
-PwoKQW5kIEkgdGhpbmsgdGhhdCBtZWFucyB0aGUgJ2Jvb2wgYWRkcl9pc19ncGEnIGFyZ3VtZW50
-IGNhbiBnbyBhd2F5IGZyb20KX19rdm1fZ3BjX3JlZnJlc2goKTsgeW91IGNhbiBzZXQgaXQgdXAg
-aW4ge19fLH1rdm1fZ3BjX2FjdGl2YXRlKigpCmluc3RlYWQ/Cg==
+On Tue, 2023-11-21 at 18:02 +0000, Paul Durrant wrote:
+> From: Paul Durrant <pdurrant@amazon.com>
+>=20
+> The implementation of kvm_xen_set_evtchn_fast() is a rather lengthy piece
+> of code that performs two operations: updating of the shared_info
+> evtchn_pending mask, and updating of the vcpu_info evtchn_pending_sel
+> mask. Introdude a separate function to perform each of those operations a=
+nd
 
+I like the intro dude, but I think you meant introduce.
 
---=-G0Q2x1ML7/fvYCnNz2CT
+> re-work kvm_xen_set_evtchn_fast() to use them.
+>=20
+> No functional change intended.
+>=20
+> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+
+--=-xGRGadYZn29I/tHAPjKO
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -201,25 +170,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTIxMjI0NzQ3WjAvBgkqhkiG9w0BCQQxIgQgI7xWzVZ8
-ZIJchrZQVdHU0FaEXwBLh7WTP8ABP2sIsiQwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTIxMjI0OTI5WjAvBgkqhkiG9w0BCQQxIgQgGY+5rO2r
+QTn7EPntbKHW4NUkxFFvX21zleXi0y7NyJMwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAHX8Xu3Yj9L4EGQUGVfqwFxmhgcM5ucNq+
-hqUQEqHwmtqziBb166SY1017mJVr/cwzbmS25OnuJuPH6Gd6ZQTYUjW17/XD4G7XIl8Rq9nyMeQw
-sWd276xTc8K8C+S+FERE3UrrQ1WiULlbD3+mD8HEbNFj7kBgqjzwEeyc2Y9b+eiaX+ZVR4uksddU
-6ZtlRq31bFWy7OAkd8UZ4nmwuOLD93A8ubMbKUcu3r/FjyqQoL+uuxVKywly8Tx0GOkFi3JBYWg+
-o+Z+sQiC/16Ns6vNydfW/o/qMtFPbHoNgwGf2d73Kshj0qDvhRS6HqEdkH4rXD9MgcJBoHAN7pVz
-sj3p4LJBPTIqq5DaLl3HHV1QkZN4SztnanKsyF88EV3iUV7WneC72xSl7Trw3teVjJstufxmmZVS
-6EhT1UPAYiSj1sTMHnHDEiro5Q03OcKjOmen4PVq00lTeQYgZnn/hkPpqBm6n2lEyXGwpRHTzUY0
-BiJ1AXybE40cGbvRjb/av8mhZLbZSGT0DhRzgVCDSdGv9mJxzJ2CVzrR5PYqte/LULQNDmDxvY+Y
-1T9vWMhvGO30tUYRNJ1xV95yvGoz986CQvwMAnz1CBu4jatl6uL/tNDB/Uf1AVNoHrfJshbwHM/w
-5/jIedZuMZ+enyGYGHrE1wrk2LleMpkIT3oCqdihngAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBTVyRmRwcIB5STUTIlkRyQJQZKdbQbROYK
+/F3f9B6kl6TDoRxUD+L5i1ZHj36LvR19+Gjnl5v3ugPVVNANsC4DKQ9100PKw9HdrObnBabyLA1X
+sLXKultdjq3j4BpqsculGk9Oj3uvgwLakq6OBf4Vw8R4DOt6EmqByRmWnch/LaHYISEV08BmyqC0
+ZhGEMaCj3Cy2bhML8YzPtirHs80fAavvN0RRHAI1w2NfvELme+TO3NsoiON7aO7E6pbY1hYRSF0A
+RdmkMTyjRlFGqfoaxgROFoyHkTCIYlAePG5rPbIgFnmqSmOPvLgjKGOSfZYg5dJduJ1uwHFmP4mZ
+lqwUaUJbAWJhfgVj5w6SDyvMSXQfJs5myUkrPoY1Vjgkzhi7E1W3Xq5kUMeg7UYjZWdqL5pTXwOY
+izFHiqSWsOcx655/C7ZDSDXRlYzuLqcQOv1dZr+QsQ0TEBtB5B1vce8GsxApTFnpeKvVuQHnCrcq
+Ut7JKvCL7a+ic6lhBkTRIdWathS3q7A9lVM3It/4Mqi4rRxacjjAERghtW1U4Kz0dLO45EU6lfXO
+Nc/c3tXuxe5lQ2vAeTtf1/L1T2MGbvnwkaCBTxL+GXBmJS8u4RFCrGmPeMl8milUSZ/ImLz5+Gaj
+agUOOjca9acbbDCQNaP9NA7+Xe1YxZ61CiXcVVXjuwAAAAAAAA==
 
 
---=-G0Q2x1ML7/fvYCnNz2CT--
+--=-xGRGadYZn29I/tHAPjKO--
 
