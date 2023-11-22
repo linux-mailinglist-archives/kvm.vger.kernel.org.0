@@ -1,236 +1,108 @@
-Return-Path: <kvm+bounces-2254-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2255-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07D2B7F3F3A
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 08:51:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 797307F3F64
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 09:01:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A04D1C20C7C
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 07:51:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A84E11C20B20
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 08:01:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB1820B18;
-	Wed, 22 Nov 2023 07:50:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 290AA20B35;
+	Wed, 22 Nov 2023 08:01:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YDcxlJpV"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="icZpjwJh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3D42110;
-	Tue, 21 Nov 2023 23:50:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700639449; x=1732175449;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=rnM1XrjEopEa5PyFu+BAEV7mf+8XNMj46MO9QuiExjg=;
-  b=YDcxlJpViwwqZZvOWIYh+eTnK5bUN9UXCBtTHlHqMuEFH0XXOI4haqD9
-   wovkr0/swYXRLbKK4mKefv7fCOe4/IiexTevv1b9um106bqhJnyCYXSkB
-   zlAa27PXq7BbIH76yfAi0bodn/COZAK1noko/thBdzjUKwVt2E+YhNojT
-   98DLDXwoTVwYtzth79jLHH8Xr0sRo291s4niQoWPNB9vo8gCUqB/urO9O
-   tV1WmSJxzGb2qduND3Eh1Yr1r1bKGx6rGD7UaiZTgineaU4+APHdc8NNb
-   +69GNe8pwYtRA8EZcWmBpBpUDx4CnTEjTslLxpt/ekFFuCipxo/0hAEGY
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="382400676"
-X-IronPort-AV: E=Sophos;i="6.04,218,1695711600"; 
-   d="scan'208";a="382400676"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 23:50:49 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="1098317199"
-X-IronPort-AV: E=Sophos;i="6.04,218,1695711600"; 
-   d="scan'208";a="1098317199"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.126]) ([10.238.10.126])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 23:50:45 -0800
-Message-ID: <9f322fd0-2c9e-4f34-9705-8e94224c68fd@linux.intel.com>
-Date: Wed, 22 Nov 2023 15:50:43 +0800
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EED2DF9
+	for <kvm@vger.kernel.org>; Wed, 22 Nov 2023 00:01:09 -0800 (PST)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-4084de32db5so35981645e9.0
+        for <kvm@vger.kernel.org>; Wed, 22 Nov 2023 00:01:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1700640068; x=1701244868; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=D9ADCjEI7o9dzGO9BsaR3z0G/sfMu5E5t4/ZTd2GGTs=;
+        b=icZpjwJh1sWUkCtAtuflLi5IEcMejHOvrHDiAqgoQRla9xec3R1DS2P5LF3Gyg3A7x
+         IrOpuPRwfGHatdcfsgkkyg4ExFMi2dWt1ZXj4Ik/LhpMkW9Ey8yhbysJFdiYLs2kgVYO
+         7wrVjOXBsBSLI5hnk9MUNWQDSia4Er3/PHcdNjqjfMppcYeZleCU6M/QYR/BzWYoYOtO
+         KKsDPAGxvoFBcvx/+ZN/x/RE4IbFC1e/0errSjjC2Ktv6MOIGN0u+3Oxk+ggk2cmbfkS
+         FpkHiMy+dPyA23Q1B+yvr7zs7Ju7LA/t5jb5xe/FbwN9lJCVPW09TCUvnalzUkNlEMsx
+         E4ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700640068; x=1701244868;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D9ADCjEI7o9dzGO9BsaR3z0G/sfMu5E5t4/ZTd2GGTs=;
+        b=HfuyeJY/Bk0CFUO08C0xHwT1nVpt/VWsYKFsIVL3Ok1KQ09Vq8sAb0Cir6b42eVlP+
+         x1eRfTqDsE3aBAwj/AixD7Zgq7SL5/f/Bm3WU+E0LPcxMcZ+h+wNdim1dqvrdZ87IbLe
+         gbQYM0FR3FFZsyD62xdlmf8TnjzQQ8PusrggDF575Mc1FWvv5z1DJD6AB+E34TMzNCH+
+         d5QwMj9Nbolwa2x4/gVaeQhq4fc1c+BJ5SO1aRzAAyE5EQsGOGF5Bht+2IEW3cPUJ7mh
+         Xxz+yF52PZs2pZr+b+XXQ+GhhQ2M0w7mFk31ji5AAdEA9RHkqDqAfutwGfF/ko0cM8Ls
+         CLrg==
+X-Gm-Message-State: AOJu0Yw6DoO864Vmw6AWRDlE8Y3nltpCoSTC08Ri7LrjuxGHwtF4n3RI
+	O4OsU85MXA+VkOBFvYDWIG0mh/DFy34py1Cmj20=
+X-Google-Smtp-Source: AGHT+IE1/C3weLHdhpWJSWXJPJYT4boAklbn3sgz4rb9EWKq6qitvv5j2eDGac4BGRWMcwTjthYjsw==
+X-Received: by 2002:a05:600c:4fcc:b0:40b:2b82:dad8 with SMTP id o12-20020a05600c4fcc00b0040b2b82dad8mr1190319wmq.5.1700640068378;
+        Wed, 22 Nov 2023 00:01:08 -0800 (PST)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id n44-20020a05600c502c00b004083a105f27sm1326932wmr.26.2023.11.22.00.01.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Nov 2023 00:01:08 -0800 (PST)
+Date: Wed, 22 Nov 2023 09:01:06 +0100
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] selftests/kvm: Fix issues with $(SPLIT_TESTS)
+Message-ID: <20231122-ef1578645fb74a7aa0fca822@orel>
+References: <20231121165631.1170797-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 14/16] KVM: x86/tdp_mmu: TDX: Implement merge pages
- into a large page
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, David Matlack <dmatlack@google.com>,
- Kai Huang <kai.huang@intel.com>, Zhi Wang <zhi.wang.linux@gmail.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
-References: <cover.1699368363.git.isaku.yamahata@intel.com>
- <db6681db72a7667c06687923232277ddde2d9949.1699368363.git.isaku.yamahata@intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <db6681db72a7667c06687923232277ddde2d9949.1699368363.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231121165631.1170797-1-pbonzini@redhat.com>
 
-
-
-On 11/7/2023 11:00 PM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> Implement merge_private_stp callback.
-
-Not just merge_private_stp, but also unzap_private_spte.
-
-Also, for the shortlog, should it be "KVM: VMX" instead of "KVM: 
-x86/tdp_mmu"?
-
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+On Tue, Nov 21, 2023 at 11:56:31AM -0500, Paolo Bonzini wrote:
+> The introduction of $(SPLIT_TESTS) also introduced a warning when
+> building selftests on architectures that include get-reg-lists:
+> 
+>     make: Entering directory '/root/kvm/tools/testing/selftests/kvm'
+>     Makefile:272: warning: overriding recipe for target '/root/kvm/tools/testing/selftests/kvm/get-reg-list'
+>     Makefile:267: warning: ignoring old recipe for target '/root/kvm/tools/testing/selftests/kvm/get-reg-list'
+>     make: Leaving directory '/root/kvm/tools/testing/selftests/kvm'
+> 
+> In addition, the rule for $(SPLIT_TESTS_TARGETS) includes _all_
+> the $(SPLIT_TESTS_OBJS), which only works because there is just one.
+> So fix both by adjusting the rules:
+> 
+> - remove $(SPLIT_TESTS_TARGETS) from the $(TEST_GEN_PROGS) rules,
+>   and rename it to $(SPLIT_TEST_GEN_PROGS)
+> 
+> - fix $(SPLIT_TESTS_OBJS) so that it plays well with $(OUTPUT),
+>   rename it to $(SPLIT_TEST_GEN_OBJ), and list the object file
+>   explicitly in the $(SPLIT_TEST_GEN_PROGS) link rule
+> 
+> Fixes: 17da79e009c3 ("KVM: arm64: selftests: Split get-reg-list test code", 2023-08-09)
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->   arch/x86/kvm/vmx/tdx.c       | 72 ++++++++++++++++++++++++++++++++++++
->   arch/x86/kvm/vmx/tdx_arch.h  |  1 +
->   arch/x86/kvm/vmx/tdx_errno.h |  2 +
->   arch/x86/kvm/vmx/tdx_ops.h   |  6 +++
->   4 files changed, 81 insertions(+)
+>  tools/testing/selftests/kvm/Makefile | 20 ++++++++++++--------
+>  1 file changed, 12 insertions(+), 8 deletions(-)
 >
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 91eca578a7da..df53a971ff21 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -1684,6 +1684,49 @@ static int tdx_sept_split_private_spt(struct kvm *kvm, gfn_t gfn,
->   	return 0;
->   }
->   
-> +static int tdx_sept_merge_private_spt(struct kvm *kvm, gfn_t gfn,
-> +				      enum pg_level level, void *private_spt)
-> +{
-> +	int tdx_level = pg_level_to_tdx_sept_level(level);
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	struct tdx_module_args out;
-> +	gpa_t gpa = gfn_to_gpa(gfn) & KVM_HPAGE_MASK(level);
-> +	u64 err;
-> +
-> +	/* See comment in tdx_sept_set_private_spte() */
-> +	err = tdh_mem_page_promote(kvm_tdx->tdr_pa, gpa, tdx_level, &out);
-> +	if (unlikely(err == TDX_ERROR_SEPT_BUSY))
-> +		return -EAGAIN;
-> +	if (unlikely(err == (TDX_EPT_INVALID_PROMOTE_CONDITIONS |
-> +			     TDX_OPERAND_ID_RCX)))
-> +		/*
-> +		 * Some pages are accepted, some pending.  Need to wait for TD
-> +		 * to accept all pages.  Tell it the caller.
-> +		 */
-> +		return -EAGAIN;
-> +	if (KVM_BUG_ON(err, kvm)) {
-> +		pr_tdx_error(TDH_MEM_PAGE_PROMOTE, err, &out);
-> +		return -EIO;
-> +	}
-> +	WARN_ON_ONCE(out.rcx != __pa(private_spt));
-> +
-> +	/*
-> +	 * TDH.MEM.PAGE.PROMOTE frees the Secure-EPT page for the lower level.
-Is it better to use "unlink" instead of "free" to avoid confusion?
 
-> +	 * Flush cache for reuse.
-> +	 */
-> +	do {
-> +		err = tdh_phymem_page_wbinvd(set_hkid_to_hpa(__pa(private_spt),
-> +							     to_kvm_tdx(kvm)->hkid));
-> +	} while (unlikely(err == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RCX)));
-> +	if (WARN_ON_ONCE(err)) {
-> +		pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err, NULL);
-> +		return -EIO;
-> +	}
-> +
-> +	tdx_clear_page(__pa(private_spt), PAGE_SIZE);
-> +	return 0;
-> +}
-> +
->   static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
->   				      enum pg_level level)
->   {
-> @@ -1758,6 +1801,33 @@ static void tdx_track(struct kvm *kvm)
->   
->   }
->   
-> +static int tdx_sept_unzap_private_spte(struct kvm *kvm, gfn_t gfn,
-> +				       enum pg_level level)
-> +{
-> +	int tdx_level = pg_level_to_tdx_sept_level(level);
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	gpa_t gpa = gfn_to_gpa(gfn) & KVM_HPAGE_MASK(level);
-> +	struct tdx_module_args out;
-> +	u64 err;
-> +
-> +	do {
-> +		err = tdh_mem_range_unblock(kvm_tdx->tdr_pa, gpa, tdx_level, &out);
-> +
-> +		/*
-> +		 * tdh_mem_range_block() is accompanied with tdx_track() via kvm
-> +		 * remote tlb flush.  Wait for the caller of
-> +		 * tdh_mem_range_block() to complete TDX track.
-> +		 */
-> +	} while (err == (TDX_TLB_TRACKING_NOT_DONE | TDX_OPERAND_ID_SEPT));
-> +	if (unlikely(err == TDX_ERROR_SEPT_BUSY))
-> +		return -EAGAIN;
-> +	if (KVM_BUG_ON(err, kvm)) {
-> +		pr_tdx_error(TDH_MEM_RANGE_UNBLOCK, err, &out);
-> +		return -EIO;
-> +	}
-> +	return 0;
-> +}
-> +
->   static int tdx_sept_free_private_spt(struct kvm *kvm, gfn_t gfn,
->   				     enum pg_level level, void *private_spt)
->   {
-> @@ -3204,9 +3274,11 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
->   	x86_ops->link_private_spt = tdx_sept_link_private_spt;
->   	x86_ops->free_private_spt = tdx_sept_free_private_spt;
->   	x86_ops->split_private_spt = tdx_sept_split_private_spt;
-> +	x86_ops->merge_private_spt = tdx_sept_merge_private_spt;
->   	x86_ops->set_private_spte = tdx_sept_set_private_spte;
->   	x86_ops->remove_private_spte = tdx_sept_remove_private_spte;
->   	x86_ops->zap_private_spte = tdx_sept_zap_private_spte;
-> +	x86_ops->unzap_private_spte = tdx_sept_unzap_private_spte;
->   
->   	return 0;
->   
-> diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
-> index cab6a74446a0..fb7e54953a85 100644
-> --- a/arch/x86/kvm/vmx/tdx_arch.h
-> +++ b/arch/x86/kvm/vmx/tdx_arch.h
-> @@ -29,6 +29,7 @@
->   #define TDH_MNG_KEY_FREEID		20
->   #define TDH_MNG_INIT			21
->   #define TDH_VP_INIT			22
-> +#define TDH_MEM_PAGE_PROMOTE		23
->   #define TDH_MEM_SEPT_RD			25
->   #define TDH_VP_RD			26
->   #define TDH_MNG_KEY_RECLAIMID		27
-> diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
-> index bb093e292fef..940d6de332eb 100644
-> --- a/arch/x86/kvm/vmx/tdx_errno.h
-> +++ b/arch/x86/kvm/vmx/tdx_errno.h
-> @@ -23,6 +23,8 @@
->   #define TDX_FLUSHVP_NOT_DONE			0x8000082400000000ULL
->   #define TDX_EPT_WALK_FAILED			0xC0000B0000000000ULL
->   #define TDX_EPT_ENTRY_NOT_FREE			0xC0000B0200000000ULL
-> +#define TDX_TLB_TRACKING_NOT_DONE		0xC0000B0800000000ULL
-> +#define TDX_EPT_INVALID_PROMOTE_CONDITIONS	0xC0000B0900000000ULL
->   #define TDX_EPT_ENTRY_STATE_INCORRECT		0xC0000B0D00000000ULL
->   
->   /*
-> diff --git a/arch/x86/kvm/vmx/tdx_ops.h b/arch/x86/kvm/vmx/tdx_ops.h
-> index 38ab0ab1509c..774fee3b2d46 100644
-> --- a/arch/x86/kvm/vmx/tdx_ops.h
-> +++ b/arch/x86/kvm/vmx/tdx_ops.h
-> @@ -190,6 +190,12 @@ static inline u64 tdh_mem_page_demote(hpa_t tdr, gpa_t gpa, int level, hpa_t pag
->   	return tdx_seamcall_sept(TDH_MEM_PAGE_DEMOTE, gpa | level, tdr, page, 0, out);
->   }
->   
-> +static inline u64 tdh_mem_page_promote(hpa_t tdr, gpa_t gpa, int level,
-> +				       struct tdx_module_args *out)
-> +{
-> +	return tdx_seamcall_sept(TDH_MEM_PAGE_PROMOTE, gpa | level, tdr, 0, 0, out);
-> +}
-> +
->   static inline u64 tdh_mr_extend(hpa_t tdr, gpa_t gpa,
->   				struct tdx_module_args *out)
->   {
+Thanks for these fixes, Paolo! And thanks for keeping my old @redhat.com
+address alive!
 
+I've tested this on riscv,
+
+Tested-by: Andrew Jones <ajones@ventanamicro.com>
+
+Thanks,
+drew
 
