@@ -1,180 +1,148 @@
-Return-Path: <kvm+bounces-2265-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2266-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 378407F431B
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 11:04:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81F207F433A
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 11:07:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36B211C20A61
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 10:04:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41101281457
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 10:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F93C5644C;
-	Wed, 22 Nov 2023 10:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE42C21A10;
+	Wed, 22 Nov 2023 10:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SjXtM+ft"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TZJHztzK"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48AE8D4A;
-	Wed, 22 Nov 2023 02:00:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=GD4bNNM15E1cJYaRe//tJkfYx4k2Jflbn5Zo9mdLKTw=; b=SjXtM+ft3WnregXt8o1Cq89gbu
-	N7byio5iMWHjPDRlP+StbGqPIPqD744/DwhZq8+VWKFIpEpVvCnttIr2LswYHplkpT6MfFYLQJeU0
-	KZ3KY1nEwg/rgqSWx8v4e3yY+jahpvKGCCVyVrocI6uKy3WCeBUdLR8AodWPZYlZxRSNPrR3gXRNa
-	OBLEwR0xEd9h98y3eCUMQ9hsy5o5TNoGsIY2OZ5A6zU/FbLStzctFcW10Sh6FO2zBQRIyhY1nIzd0
-	LKn3ayOVoMdfuJFVDc9hmhzsgn+nWBUyXq0O5IMdVQvk2ar1g186heq+I5x0ybktRuM3zX5TS8Ank
-	0IObH15g==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1r5k1q-00CH1O-04;
-	Wed, 22 Nov 2023 10:00:18 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id A2CF83005AA; Wed, 22 Nov 2023 11:00:16 +0100 (CET)
-Date: Wed, 22 Nov 2023 11:00:16 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Tobias Huschle <huschle@linux.ibm.com>
-Cc: Abel Wu <wuyun.abel@bytedance.com>,
-	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	mst@redhat.com, jasowang@redhat.com
-Subject: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6 sched/fair:
- Add lag based placement)
-Message-ID: <20231122100016.GO8262@noisy.programming.kicks-ass.net>
-References: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
- <20231117092318.GJ8262@noisy.programming.kicks-ass.net>
- <ZVdbdSXg4qefTNtg@DESKTOP-2CCOB1S.>
- <20231117123759.GP8262@noisy.programming.kicks-ass.net>
- <46a997c2-5a38-4b60-b589-6073b1fac677@bytedance.com>
- <ZVyt4UU9+XxunIP7@DESKTOP-2CCOB1S.>
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 784B7100;
+	Wed, 22 Nov 2023 02:07:04 -0800 (PST)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-507bd19eac8so8632762e87.0;
+        Wed, 22 Nov 2023 02:07:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700647623; x=1701252423; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:references:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=R0+XfKuM9Y0ZNl5hDp6sO3vLEtpG295qVGbb4kQD/kE=;
+        b=TZJHztzKokU2AJsd1GrGAHt82/OlV6Ehu7bDj0cFGR7iQt8TTUE/4cvv4XXqVI/MG9
+         O5KPdXOwblQihcgWOIR/XpY7BsWH1czzzN7jGBpNdqV1pAfD8eTgxb/RhiShZb3OOBci
+         9w6AcqQLRGopigKCDfd310r6xuq4ljBfgF+Ma20JhxqaLR4CmGQvyqakT9je0I27o7Ar
+         H7rXSVQT3vgbwrX8ycV0TQcK3jO4iuW5Asu+m6cGVJpZDwix+eLw3nexbs4PaAuyOrbH
+         uu9C0DqT8IS8XBdsSjOe5v/rkzKml671gOBVrA38DqEM+aphDICWALO/CAmMyhFHYSr+
+         i/Sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700647623; x=1701252423;
+        h=content-transfer-encoding:in-reply-to:organization:references:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R0+XfKuM9Y0ZNl5hDp6sO3vLEtpG295qVGbb4kQD/kE=;
+        b=FUjK7fL8+W7CuvdoP/EaPg2L8ZgUwGyT4w78ZUuOwQzNISrVfbtBLRykVPWa0ySfTh
+         5NO8qscP1YoVbaqRA4hSSnjPCmjK5HRE3P+t41g5106c40r8DqHNuqJ80CO9tiGEhL4Y
+         P3Sy6iIAJtgfe10KwIDaSUu45yEw2X1CHkS8Aqw49b5ZccVttMsqdUIN/EiYr3rPR1Vs
+         BCVADijH9hhqHPt+cDTJWr81B5+dlUW+GdUL6bx8ZHI+ID7qeI7zCWpbV+4VrsABdnAi
+         znMaKfTYRNnQswO0bnbgTtAsYlughbe27R7ULlyPx6eUU0w/WkX9lWpgj+yTIbApLf/E
+         Wegg==
+X-Gm-Message-State: AOJu0YxCnibB57vx8bBZEsui6WbwbI5wHP6hsJJHkWjQTlMbdV/scZDF
+	Dq+woBy6VrVh5nMMzM0N1uU=
+X-Google-Smtp-Source: AGHT+IFkDwjlMfSKlUr9YgNxElddYa6sPr9m+mc6ZuFXAoZcBTuttiiSXwheDeifmxdNw6IBTp1+8Q==
+X-Received: by 2002:ac2:5ec2:0:b0:503:2623:7cfa with SMTP id d2-20020ac25ec2000000b0050326237cfamr1009610lfq.35.1700647622328;
+        Wed, 22 Nov 2023 02:07:02 -0800 (PST)
+Received: from [10.95.134.92] (54-240-197-234.amazon.com. [54.240.197.234])
+        by smtp.gmail.com with ESMTPSA id p9-20020a5d6389000000b00332cc3e0817sm5510256wru.39.2023.11.22.02.07.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Nov 2023 02:07:02 -0800 (PST)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <5e0e13ea-3eee-41bd-a070-e7bd9ed5d2e9@xen.org>
+Date: Wed, 22 Nov 2023 10:07:00 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZVyt4UU9+XxunIP7@DESKTOP-2CCOB1S.>
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH v8 08/15] KVM: pfncache: allow a cache to be activated
+ with a fixed (userspace) HVA
+Content-Language: en-US
+To: David Woodhouse <dwmw2@infradead.org>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231121180223.12484-1-paul@xen.org>
+ <20231121180223.12484-9-paul@xen.org>
+ <ec89ab12288426761ab5bd7d05562a4e8834e5f1.camel@infradead.org>
+Organization: Xen Project
+In-Reply-To: <ec89ab12288426761ab5bd7d05562a4e8834e5f1.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 21, 2023 at 02:17:21PM +0100, Tobias Huschle wrote:
-
-> We applied both suggested patch options and ran the test again, so 
+On 21/11/2023 22:47, David Woodhouse wrote:
+> On Tue, 2023-11-21 at 18:02 +0000, Paul Durrant wrote:
+>>
+>> -static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa,
+>> +static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, u64 addr, bool addr_is_gpa,
+>>                               unsigned long len)
+>>   {
+>>          struct kvm_memslots *slots = kvm_memslots(gpc->kvm);
+>> -       unsigned long page_offset = offset_in_page(gpa);
+>> +       unsigned long page_offset = offset_in_page(addr);
+>>          bool unmap_old = false;
+>>          kvm_pfn_t old_pfn;
+>>          bool hva_change = false;
+>> @@ -244,12 +244,21 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa,
+>>          old_pfn = gpc->pfn;
+>>          old_khva = (void *)PAGE_ALIGN_DOWN((uintptr_t)gpc->khva);
+>>   
+>> -       /* If the userspace HVA is invalid, refresh that first */
+>> -       if (gpc->gpa != gpa || gpc->generation != slots->generation ||
+>> -           kvm_is_error_hva(gpc->uhva)) {
+>> -               gfn_t gfn = gpa_to_gfn(gpa);
+>> +       if (!addr_is_gpa) {
+>> +               gpc->gpa = KVM_XEN_INVALID_GPA;
+>> +               gpc->uhva = PAGE_ALIGN_DOWN(gpc->uhva);
+>> +               addr = PAGE_ALIGN_DOWN(addr);
+>> +
+>> +               if (gpc->uhva != addr) {
+>> +                       gpc->uhva = addr;
+>> +                       hva_change = true;
+>> +               }
+>> +       } else if (gpc->gpa != addr ||
+>> +                  gpc->generation != slots->generation ||
+>> +                  kvm_is_error_hva(gpc->uhva)) {
+>> +               gfn_t gfn = gpa_to_gfn(addr);
+>>   
+>> -               gpc->gpa = gpa;
+>> +               gpc->gpa = addr;
+>>                  gpc->generation = slots->generation;
+>>                  gpc->memslot = __gfn_to_memslot(slots, gfn);
+>>                  gpc->uhva = gfn_to_hva_memslot(gpc->memslot, gfn);
 > 
-> sched/eevdf: Fix vruntime adjustment on reweight
-> sched/fair: Update min_vruntime for reweight_entity() correctly
+> Hrm, now that a previous patch means we're preserving the low bits of
+> gpc->uhva surely you don't *need* to mess with the gpc struct?
 > 
-> and
+
+I'm not messing with it, am I?
+
+> If gpc->gpa == KVM_XEN_INVALID_GPA (but gpc->uhva != KVM_ERR_ERR_BAD &&
+> gpc->active) surely that's enough to signal that gpc->uhva is canonical
+> and doesn't need to be looked up from the GPA?
 > 
-> sched/eevdf: Delay dequeue
-> 
-> Unfortunately, both variants do NOT fix the problem.
-> The regression remains unchanged.
+> And I think that means the 'bool addr_is_gpa' argument can go away from
+> __kvm_gpc_refresh(); you can set it up in {__,}kvm_gpc_activate*()
+> instead?
 
-Thanks for testing.
+Alas not... __kvm_gpc_refresh() still needs to know *something* has 
+changed, otherwise the khva will be stale.
 
-> I will continue getting myself familiar with how cgroups are scheduled to dig 
-> deeper here. If there are any other ideas, I'd be happy to use them as a 
-> starting point for further analysis.
-> 
-> Would additional traces still be of interest? If so, I would be glad to
-> provide them.
+   Paul
 
-So, since it got bisected to the placement logic, but is a cgroup
-related issue, I was thinking that 'Delay dequeue' might not cut it,
-that only works for tasks, not the internal entities.
 
-The below should also work for internal entities, but last time I poked
-around with it I had some regressions elsewhere -- you know, fix one,
-wreck another type of situations on hand.
-
-But still, could you please give it a go -- it applies cleanly to linus'
-master and -rc2.
-
----
-Subject: sched/eevdf: Revenge of the Sith^WSleepers
-
-For tasks that have received excess service (negative lag) allow them to
-gain parity (zero lag) by sleeping.
-
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
----
- kernel/sched/fair.c     | 36 ++++++++++++++++++++++++++++++++++++
- kernel/sched/features.h |  6 ++++++
- 2 files changed, 42 insertions(+)
-
-diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index d7a3c63a2171..b975e4b07a68 100644
---- a/kernel/sched/fair.c
-+++ b/kernel/sched/fair.c
-@@ -5110,6 +5110,33 @@ static inline void update_misfit_status(struct task_struct *p, struct rq *rq) {}
- 
- #endif /* CONFIG_SMP */
- 
-+static inline u64
-+entity_vlag_sleeper(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
-+{
-+	u64 now, vdelta;
-+	s64 delta;
-+
-+	if (!(flags & ENQUEUE_WAKEUP))
-+		return se->vlag;
-+
-+	if (flags & ENQUEUE_MIGRATED)
-+		return 0;
-+
-+	now = rq_clock_task(rq_of(cfs_rq));
-+	delta = now - se->exec_start;
-+	if (delta < 0)
-+		return se->vlag;
-+
-+	if (sched_feat(GENTLE_SLEEPER))
-+		delta /= 2;
-+
-+	vdelta = __calc_delta(delta, NICE_0_LOAD, &cfs_rq->load);
-+	if (vdelta < -se->vlag)
-+		return se->vlag + vdelta;
-+
-+	return 0;
-+}
-+
- static void
- place_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
- {
-@@ -5133,6 +5160,15 @@ place_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
- 
- 		lag = se->vlag;
- 
-+		/*
-+		 * Allow tasks that have received too much service (negative
-+		 * lag) to (re)gain parity (zero lag) by sleeping for the
-+		 * equivalent duration. This ensures they will be readily
-+		 * eligible.
-+		 */
-+		if (sched_feat(PLACE_SLEEPER) && lag < 0)
-+			lag = entity_vlag_sleeper(cfs_rq, se, flags);
-+
- 		/*
- 		 * If we want to place a task and preserve lag, we have to
- 		 * consider the effect of the new entity on the weighted
-diff --git a/kernel/sched/features.h b/kernel/sched/features.h
-index a3ddf84de430..722282d3ed07 100644
---- a/kernel/sched/features.h
-+++ b/kernel/sched/features.h
-@@ -7,6 +7,12 @@
- SCHED_FEAT(PLACE_LAG, true)
- SCHED_FEAT(PLACE_DEADLINE_INITIAL, true)
- SCHED_FEAT(RUN_TO_PARITY, true)
-+/*
-+ * Let sleepers earn back lag, but not more than 0-lag. GENTLE_SLEEPERS earn at
-+ * half the speed.
-+ */
-+SCHED_FEAT(PLACE_SLEEPER, true)
-+SCHED_FEAT(GENTLE_SLEEPER, true)
- 
- /*
-  * Prefer to schedule the task we woke last (assuming it failed
 
