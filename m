@@ -1,205 +1,184 @@
-Return-Path: <kvm+bounces-2260-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2261-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B16877F414C
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 10:13:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A51C77F416A
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 10:16:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69B0D281887
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 09:13:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A36E61C2097D
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 09:16:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74613D966;
-	Wed, 22 Nov 2023 09:12:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE213D997;
+	Wed, 22 Nov 2023 09:16:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VF4vhMuB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QxdhiCdX"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B07883;
-	Wed, 22 Nov 2023 01:12:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=5vszG6SjDXixi9YijhHJdp8bl5UsHYIoASdnpdJSC8o=; b=VF4vhMuBLXN9IQj9fZMm6gR4+x
-	3KP2z7AlNUNJSn728uLPyhgZkMnZ2SUQt47eXOubacQjOaI5ag44Vis+5VDBJGwxRPZRgoG0QgXi+
-	2uKK3aCnfRE184r3dEKNGGJxIfvpxzR710xb6GB6xp2SIadPOfsJZSHOXWNYTWCYeGEir4LrQa28Y
-	pUNr5jsUsVOt3ge6Th6LPE9lagTL+YPXgD3HphO7J2EDDJ/JOB20hYL6MoG3UBLCmaeMfwrguJXj/
-	g/Wy1gv0g+FTZeoM6pYozigmPSdEXgan1cXcnrCuNM7ueeiMYVX/tA/sZsDUtx5JbVlF8wrYdia7J
-	n1QZCgiw==;
-Received: from [2001:8b0:10b:5:22b8:d80f:1c9c:f188] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1r5jHP-006O90-M2; Wed, 22 Nov 2023 09:12:19 +0000
-Message-ID: <b6b864e500cbb38f76739fcfb4dcc6e9c6705d0b.camel@infradead.org>
-Subject: Re: [PATCH v8 07/15] KVM: pfncache: include page offset in uhva and
- use it consistently
-From: David Woodhouse <dwmw2@infradead.org>
-To: Xu Yilun <yilun.xu@linux.intel.com>, Paul Durrant <paul@xen.org>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>,  Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
- <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
- <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
- <hpa@zytor.com>,  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Wed, 22 Nov 2023 09:12:18 +0000
-In-Reply-To: <ZV3Bwghwz63LmgMu@yilunxu-OptiPlex-7050>
-References: <20231121180223.12484-1-paul@xen.org>
-	 <20231121180223.12484-8-paul@xen.org>
-	 <ZV3Bwghwz63LmgMu@yilunxu-OptiPlex-7050>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-wSZ6G0f8pDlwWk6j+J/Z"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 370ABD6E
+	for <kvm@vger.kernel.org>; Wed, 22 Nov 2023 01:16:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700644584;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FvqBK0UZREQjTEFtoe+8dwMEyfkRZhPHhHrOq6zH23k=;
+	b=QxdhiCdX+e0UpV1YnY6TtkSow4lX4tk6dqXpuVpQEwF4jiY0B7v8eLSl4uhEIHcCJoHYRJ
+	+k04dECEeNXJorWvZDjBhJ4zIBT/ha8l+s8SEJ5D8TMvKi4r2eOMTMr2Giz3zja8kkALPq
+	JLDwCzkOhUtgeH+fKnwOjwQLmcz6aWA=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-645-spQKja0vPW-WwOKBimsUSg-1; Wed, 22 Nov 2023 04:16:22 -0500
+X-MC-Unique: spQKja0vPW-WwOKBimsUSg-1
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-5c59fa94f72so96286117b3.2
+        for <kvm@vger.kernel.org>; Wed, 22 Nov 2023 01:16:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700644582; x=1701249382;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FvqBK0UZREQjTEFtoe+8dwMEyfkRZhPHhHrOq6zH23k=;
+        b=kUqewK7R+lwQz0c7z9sPjeGnZFBpDzyoda+6jP95AGXBpY0JaiWde7EBiVT21LTuTj
+         F93hEqFSTsXd15z8/CyAD9Gn5l/SZH08Hvy7LfBBHVQGiY81uvh4556HPsI1zqoIWezR
+         /nL73eH18PizjdikWwbY2DKQB2vxEQ9yTYmutH9JWA2dzMPE6ADbvoYgL5oBSyGZMPnn
+         DUJDq1MjYTJXBHjnVYjRmL/48elYZGNJP98lwtvWsSLgqKb+19xUfaNjtv+olNdxPoRk
+         JfjsJ3G/9XPRWd4MAlqBcD4BmLRBSK4eIncL2G0Fy7mQ7QN+maOL9VMtoqa7hffgtANC
+         giOw==
+X-Gm-Message-State: AOJu0YzqtX5mEuhDT+P+xu6VaXATCo7sn+GKSb1nlW0XZTbL7G5iQifT
+	eG1vPKA+SGeJ2rK0NloIVi7gCKWFl2RQSA08aWz6bvDscjS37vd5NMa2P4U6sbwHCqKxhqGCT4n
+	Qnr1cYPpVHsEj
+X-Received: by 2002:a25:e812:0:b0:daf:81e5:d2fa with SMTP id k18-20020a25e812000000b00daf81e5d2famr1645688ybd.33.1700644582105;
+        Wed, 22 Nov 2023 01:16:22 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFgjChf8tYk5WRQhvlQx17JS9JtaEmIgWhz74vAPdVRs7d7DxN/bnfe4x0/ngk4fEhGpNP7Bw==
+X-Received: by 2002:a25:e812:0:b0:daf:81e5:d2fa with SMTP id k18-20020a25e812000000b00daf81e5d2famr1645672ybd.33.1700644581817;
+        Wed, 22 Nov 2023 01:16:21 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-199.retail.telecomitalia.it. [79.46.200.199])
+        by smtp.gmail.com with ESMTPSA id qd24-20020ad44818000000b0065b21b232bfsm4711765qvb.138.2023.11.22.01.16.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Nov 2023 01:16:21 -0800 (PST)
+Date: Wed, 22 Nov 2023 10:16:14 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com, Bogdan Marcynkov <bmarcynk@redhat.com>
+Subject: Re: [PATCH net v1] vsock/test: fix SEQPACKET message bounds test
+Message-ID: <zoq32fkokk2ygtiabxgf74xu6vkfdynrlfzdqguh67qlogzd7j@qfd57sgudzpw>
+References: <20231121211642.163474-1-avkrasnov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20231121211642.163474-1-avkrasnov@salutedevices.com>
 
+On Wed, Nov 22, 2023 at 12:16:42AM +0300, Arseniy Krasnov wrote:
+>Tune message length calculation to make this test work on machines
+>where 'getpagesize()' returns >32KB. Now maximum message length is not
+>hardcoded (on machines above it was smaller than 'getpagesize()' return
+>value, thus we get negative value and test fails), but calculated at
+>runtime and always bigger than 'getpagesize()' result. Reproduced on
+>aarch64 with 64KB page size.
 
---=-wSZ6G0f8pDlwWk6j+J/Z
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+It was reported to me by Bogdan, so we can add:
 
-T24gV2VkLCAyMDIzLTExLTIyIGF0IDE2OjU0ICswODAwLCBYdSBZaWx1biB3cm90ZToKPiAKPiA+
-IEBAIC0yNTksMTMgKzI1OCwyNSBAQCBzdGF0aWMgaW50IF9fa3ZtX2dwY19yZWZyZXNoKHN0cnVj
-dCBnZm5fdG9fcGZuX2NhY2hlICpncGMsIGdwYV90IGdwYSwKPiA+IMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldCA9IC1FRkFVTFQ7Cj4gPiDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBnb3RvIG91dDsKPiA+IMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgfQo+ID4gKwo+ID4gK8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoGh2YV9jaGFuZ2UgPSB0cnVlOwo+ID4gK8KgwqDCoMKgwqDCoMKgfSBl
-bHNlIHsKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAvKgo+ID4gK8KgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIE5vIG5lZWQgdG8gZG8gYW55IHJlLW1hcHBpbmcgaWYg
-dGhlIG9ubHkgdGhpbmcgdGhhdCBoYXMKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgKiBjaGFuZ2VkIGlzIHRoZSBwYWdlIG9mZnNldC4gSnVzdCBwYWdlIGFsaWduIGl0IHRvIGFs
-bG93IHRoZQo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIG5ldyBvZmZzZXQg
-dG8gYmUgYWRkZWQgaW4uCj4gCj4gSSBkb24ndCB1bmRlcnN0YW5kIGhvdyB0aGUgdWh2YSgncyBv
-ZmZzZXQpIGNvdWxkIGJlIGNoYW5nZWQgd2hlbiBib3RoIGdwYSBhbmQKPiBzbG90IGFyZSBub3Qg
-Y2hhbmdlZC4gTWF5YmUgSSBoYXZlIG5vIGtub3dsZWRnZSBvZiB4ZW4sIGJ1dCBpbiBsYXRlcgo+
-IHBhdGNoIHlvdSBzYWlkIHlvdXIgdWh2YSB3b3VsZCBuZXZlciBjaGFuZ2UuLi4KCkl0IGRvZXNu
-J3QgY2hhbmdlIG9uIGEgbm9ybWFsIHJlZnJlc2ggd2l0aCBrdm1fZ3BjX3JlZnJlc2goKSwgd2hp
-Y2ggaXMKanVzdCBmb3IgcmV2YWxpZGF0aW9uIGFmdGVyIG1lbXNsb3QgY2hhbmdlcyBvciBNTVUg
-aW52YWxpZGF0aW9uLgoKQnV0IGl0IGNhbiBjaGFuZ2UgaWYgdGhlIGdwYyBpcyBiZWluZyByZWlu
-aXRpYWxpemVkIHdpdGggYSBuZXcgYWRkcmVzcwoocGVyaGFwcyBiZWNhdXNlIHRoZSBndWVzdCBo
-YXMgbWFkZSBhbm90aGVyIGh5cGVyY2FsbCB0byBzZXQgdGhlCmFkZHJlc3MsIGV0Yy4pCgpUaGF0
-IG5ldyBhZGRyZXNzIGNvdWxkIGhhcHBlbiB0byBiZSBpbiB0aGUgKnNhbWUqIHBhZ2UgYXMgdGhl
-IHByZXZpb3VzCm9uZS4gSW4gZmFjdCB0aGUgeGVuX3NoaW5mb190ZXN0IGV4cGxpY2l0bHkgdGVz
-dHMgdGhhdCBjYXNlLCBJSVJDLgoKQW5kIGt2bV9ncGNfYWN0aXZhdGUoKSBhbHNvIGhhcHBlbnMg
-dG8gdXNlIF9fa3ZtX2dwY19yZWZyZXNoKCkKaW50ZXJuYWxseS4K
+Reported-by: Bogdan Marcynkov <bmarcynk@redhat.com>
 
+>
+>Fixes: 5c338112e48a ("test/vsock: rework message bounds test")
+>Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>---
+> tools/testing/vsock/vsock_test.c | 19 +++++++++++++------
+> 1 file changed, 13 insertions(+), 6 deletions(-)
 
---=-wSZ6G0f8pDlwWk6j+J/Z
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+The fix LGTM and it worked on aarch64 machine.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTIyMDkxMjE4WjAvBgkqhkiG9w0BCQQxIgQgg4spIrie
-bSRMe+2gbq/djSAdO+j0u3SfQb4K7h4xUacwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAbtzdm+AQQO+KdkQGb9JnxUu4aWy5lAG2Z
-cqJxDXMrOmC9XEnHtsNq4PN6SC7hYMPrD41MZu/WvVTvIza6ghgVVUw4kNBVrvrtuT6CFZuQJz+Q
-NgBn6eaaqX1vnEcfBoFD0KAZ+L+/5cBsGINrtOq+w4Q3yCxQG1OwG0dvrvLWwQfBSHMYFbg46NRs
-wYo2gYdP2s5sbvKX4aGVG3QNGW0uD0V9uDQMkm/gsFHHpd2YYZfWtMDlN4a8TVJ+3dE2SuIanSV0
-/SKNM3qUYFlXmCGDAVm6ZIsVW9i4TBnIjBGCnj7+qlmKdv9ocaqVVniRNkGP0jas9FY/hH0Ao14U
-iAjRBvAEQVCm2eAavS1z4AkiZcei9sduXHkOoYz6nnQjiBC5NQdxgaFT8lklC6fQnZOhwVUAANyi
-sbbYSiYN8iS7tucIeKXIQ7JD6mmUZ9vBD29bwU1xQ2gDH3EKFjBlChE7BWbWzGJWq4zd225AJvAI
-wQvXiDq50tPxwD65Se99Axgf9BvElhzRfD4ObsGve6Ttod3De5LJels363WYH2xUynuXbbe3b41Q
-oMh3mXbO3NGz5vSlAEuR7vTouQhxPeXtKftK6XMgd6X1yX8nV/UDyyuJbSxJfSWNEbXHdfEz/Exp
-AhL69gfzsW/mS2peKPLP1U6JW6jE+BDUxTaQ5rWtSgAAAAAAAA==
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
+Thanks for the fast fix!
+Stefano
 
---=-wSZ6G0f8pDlwWk6j+J/Z--
+>
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index f5623b8d76b7..691e44c746bf 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -353,11 +353,12 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
+> }
+>
+> #define SOCK_BUF_SIZE (2 * 1024 * 1024)
+>-#define MAX_MSG_SIZE (32 * 1024)
+>+#define MAX_MSG_PAGES 4
+>
+> static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
+> {
+> 	unsigned long curr_hash;
+>+	size_t max_msg_size;
+> 	int page_size;
+> 	int msg_count;
+> 	int fd;
+>@@ -373,7 +374,8 @@ static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
+>
+> 	curr_hash = 0;
+> 	page_size = getpagesize();
+>-	msg_count = SOCK_BUF_SIZE / MAX_MSG_SIZE;
+>+	max_msg_size = MAX_MSG_PAGES * page_size;
+>+	msg_count = SOCK_BUF_SIZE / max_msg_size;
+>
+> 	for (int i = 0; i < msg_count; i++) {
+> 		size_t buf_size;
+>@@ -383,7 +385,7 @@ static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
+> 		/* Use "small" buffers and "big" buffers. */
+> 		if (i & 1)
+> 			buf_size = page_size +
+>-					(rand() % (MAX_MSG_SIZE - page_size));
+>+					(rand() % (max_msg_size - page_size));
+> 		else
+> 			buf_size = 1 + (rand() % page_size);
+>
+>@@ -429,7 +431,6 @@ static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
+> 	unsigned long remote_hash;
+> 	unsigned long curr_hash;
+> 	int fd;
+>-	char buf[MAX_MSG_SIZE];
+> 	struct msghdr msg = {0};
+> 	struct iovec iov = {0};
+>
+>@@ -457,8 +458,13 @@ static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
+> 	control_writeln("SRVREADY");
+> 	/* Wait, until peer sends whole data. */
+> 	control_expectln("SENDDONE");
+>-	iov.iov_base = buf;
+>-	iov.iov_len = sizeof(buf);
+>+	iov.iov_len = MAX_MSG_PAGES * getpagesize();
+>+	iov.iov_base = malloc(iov.iov_len);
+>+	if (!iov.iov_base) {
+>+		perror("malloc");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+> 	msg.msg_iov = &iov;
+> 	msg.msg_iovlen = 1;
+>
+>@@ -483,6 +489,7 @@ static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
+> 		curr_hash += hash_djb2(msg.msg_iov[0].iov_base, recv_size);
+> 	}
+>
+>+	free(iov.iov_base);
+> 	close(fd);
+> 	remote_hash = control_readulong();
+>
+>-- 
+>2.25.1
+>
+
 
