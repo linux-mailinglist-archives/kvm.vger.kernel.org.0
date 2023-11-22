@@ -1,298 +1,205 @@
-Return-Path: <kvm+bounces-2271-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2272-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78D447F44B5
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 12:10:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37BFF7F44E2
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 12:26:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C17A9B210BF
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 11:10:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B2161C20A04
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 11:26:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80BCE4B5A0;
-	Wed, 22 Nov 2023 11:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB0455767;
+	Wed, 22 Nov 2023 11:26:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="BVJcd9sd"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cHWbIoJF"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2132.outbound.protection.outlook.com [40.107.93.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF03092
-	for <kvm@vger.kernel.org>; Wed, 22 Nov 2023 03:10:27 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ehu+/J+N9MWHegl++vdqI3nTsA4HODKwRrU5zg2pqj+A/GDhtoi+Unw+o5RISV21E+f1rLtSC5t2e/8U5MTY0mF9xOdAr3dQkIETtn2czzKXpxVB1ngmvAlrnc/yYPJRzPJGoR/GRr3p/G0dHavm+xeQD86gVdEfDsoaa5slBPhZgqaFPI/DFwHim/WQgmQG9ZLbAD3SYYQV5AQX+9b9MMdMtqcGqiFMAcCkhD4S+bfTFQ7WEa9Qi1SgTOEvqZfJh462LEakANfkBM5pC5fpNN7tVHVBlyWvJX095dOvUIGRfB/Yj/tMe07l49qlGa3G7xMcsfZeF/Jq0U00u5Jmmw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pJsboL0GXUSfU39kVfHTl+CkcXU63BWp31UEGf1buSo=;
- b=YD6YDZv+gjLvVk5nh7zTP+aIAmtvhBrDNdvbRhIgdfaumyic9FFqW8gPXco+MiF892knxc3CLpJCpoGlayvZkszpluXr1holHG4/kH4ts89UvXBv0R+EuvgJ4hwqR6AzrHXVAB7qyYfaCR570z4uXl6yPgqJkhLEp9hBojRmDtLwTcDv4ujmXtJ6n5jUnCU2b4yRf3mUD0UYij0j8Ir4+b6iUt1/pF0+UIx8BnIVK1RK70v1KSQgsMZG10rX2mO0ACed2+uYYtNNrJJu3bV+4k0yPlnpcEfxXO8UimqzwQbvlI4kG+kZ4p+foDRMVUANvNMESDBen/pX9+RjQqoWxA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pJsboL0GXUSfU39kVfHTl+CkcXU63BWp31UEGf1buSo=;
- b=BVJcd9sdUdx+7uq8caZSq7gIFzeGJ7kFRmh+Kg8MSHDxs4o/fsQgcSGLTZ7SVLGpsAzDbnrC0s5BFUvSJRl5iRAi5RaOiC4thOY3XiLfO2iVxUOZQsAglGzo6NZ+CF+SIgAnQLCuYyh033hEdkvoL65YIOsBUw4Vm1QySWHA0dQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
- BY3PR01MB6740.prod.exchangelabs.com (2603:10b6:a03:365::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7025.19; Wed, 22 Nov 2023 11:10:22 +0000
-Received: from SJ2PR01MB8101.prod.exchangelabs.com
- ([fe80::9968:1c71:6cfe:6685]) by SJ2PR01MB8101.prod.exchangelabs.com
- ([fe80::9968:1c71:6cfe:6685%3]) with mapi id 15.20.7002.027; Wed, 22 Nov 2023
- 11:10:22 +0000
-Message-ID: <64cdd9ea-fc7b-4108-a896-43b16eef1553@os.amperecomputing.com>
-Date: Wed, 22 Nov 2023 16:40:10 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support
- (FEAT_NV2 only)
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Andre Przywara <andre.przywara@arm.com>,
- Chase Conklin <chase.conklin@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>,
- Darren Hart <darren@os.amperecomputing.com>,
- Jintack Lim <jintack@cs.columbia.edu>,
- Russell King <rmk+kernel@armlinux.org.uk>,
- Miguel Luis <miguel.luis@oracle.com>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
-References: <20231120131027.854038-1-maz@kernel.org>
- <a44660c4-e43a-4663-94c0-9b290ea755e3@os.amperecomputing.com>
- <86ttpfzd5k.wl-maz@kernel.org>
- <67082409-f432-44b6-bf40-1af9b4b7b569@os.amperecomputing.com>
- <86r0kjzbnq.wl-maz@kernel.org>
-From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-In-Reply-To: <86r0kjzbnq.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH0PR08CA0024.namprd08.prod.outlook.com
- (2603:10b6:610:33::29) To SJ2PR01MB8101.prod.exchangelabs.com
- (2603:10b6:a03:4f6::10)
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74CCED8;
+	Wed, 22 Nov 2023 03:26:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=R1tJgVUqMBfrrFKHqi8zUTmtOCljYrVyHwjJtd1A0kM=; b=cHWbIoJFR1UVR3YAtYmSOarYfm
+	yBhinaFRfw/khmm2jRxiWZ0I/Gg0QCkQHFuLzRpSI4E20CiPNFseE0+Su/e2H3xD1a40+j90PnVSm
+	L/FpwEO+MvWR/s9BHJy35yZIAyEAE+gZIxxpLdWvS8AibG3xkz9Zzqc+qKUSGjob8fq2H1PWu7vuQ
+	iTuBP9cXkV0KpXYPaykkHJNgum+kgQdwZGHj4IR0iV9h0MlgmKhAiIIYdZhXfMKYtK1FeOEgpOpc3
+	7JJEViZpjjq7PFh/zqoM8H/gqLwXOIvA7BlilmSNeinf0lUVs2SAJJ2t+QnAOD/40eFPtNLc69D73
+	d2pwZjNg==;
+Received: from [2001:8b0:10b:5:22b8:d80f:1c9c:f188] (helo=u3832b3a9db3152.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1r5lMa-006UAW-4t; Wed, 22 Nov 2023 11:25:48 +0000
+Message-ID: <40d2e3051fbc70308cf0b6fc5298b65bf5737012.camel@infradead.org>
+Subject: Re: [PATCH v8 15/15] KVM: xen: allow vcpu_info content to be
+ 'safely' copied
+From: David Woodhouse <dwmw2@infradead.org>
+To: paul@xen.org, Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
+ <hpa@zytor.com>,  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Wed, 22 Nov 2023 11:25:47 +0000
+In-Reply-To: <94697586-7600-420d-a91b-2829019dab7c@xen.org>
+References: <20231121180223.12484-1-paul@xen.org>
+	 <20231121180223.12484-16-paul@xen.org>
+	 <4a76b7dc9055485d9e2592b395e60221dc349abf.camel@infradead.org>
+	 <7c7238a9c8b0dc6bc865407ba804a651cdfdb044.camel@infradead.org>
+	 <94697586-7600-420d-a91b-2829019dab7c@xen.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-Ej8SiaNBjrjbJBEJ86QV"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|BY3PR01MB6740:EE_
-X-MS-Office365-Filtering-Correlation-Id: 71d8b343-d2f2-42f0-b196-08dbeb4b9ea0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	iNEb6rNYpgSWtb8mCTjIkIYc2+jIzdFBRRQFKsdr2QbnR/lWtzeD3+l/tjOz840KYcLI3NOdYVSPYTFIdV6FfS1INyAmIssJzaMebnKH7b4J9Jm6XtgWxdmVLkqxpc5U8E/JH2qfNw/Y9M+oftpp2onwJvxUy/n/Ob1nXw/sXqFICBKcHOI5Ke4lbRpAhKkMmHq+dLz3w8fhKrjzgLH/Abw9KoFJzFQ2RRkHit/12CqmdLg8M4eMiEQCo0biVZ7BQJugYDt2gQtwcxhg2AYK0THwqzGPP9vHFv3Xys+EfaeS4yk3ciyEpYzpJhejhslnx7AEoFdkaZUgrQVnzC4Gubwc0tJAxr4KgUcrMZTtLQPao4rUJh4HiqSV1c+opcPQV2zjEqDmjND0NWggHxh/wwr0Z6j8p+D1P/YS8NoHvHTunFdScXef67qJFYTULdyhdSBkMaV1HKCBaO4VjQzgfyH7O2XpsggIMYTFvOrARV+I+ao29LK/sSbBgIQ1+AEbCWaQG4zK1xC1jg4quPqN30En2joLs7sklPFHL8Bt9wfTj+wj4RIWQtp8eM3e1Xx3oirB+hyN5zS85Z8SqiK3ebTUFxd6+vW0kziFO5DTB/g=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(39850400004)(366004)(396003)(376002)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(41300700001)(31686004)(2906002)(7416002)(5660300002)(8676002)(54906003)(316002)(4326008)(8936002)(66476007)(66556008)(66946007)(966005)(478600001)(6486002)(6666004)(6916009)(6506007)(53546011)(6512007)(26005)(2616005)(83380400001)(31696002)(86362001)(38100700002)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?U291RStNcFdTc3g3TFpSMEpaWW83bjJRRUNQcHN1TVFoQ21aeG4xQlB5cHhO?=
- =?utf-8?B?MlhpazBoRjBSc3RMNkxsNkxPaEJDWEJkMC9JNld0Um9WZEk2L2s4bVh3b1Zi?=
- =?utf-8?B?QlJYYzBDWTU5QnBSQ0cvWDJzYXRZTmpKS09aMFA1N0FKWGZwWFFtaHF0Y0wz?=
- =?utf-8?B?Sk8ydy81bUZoUWdvR3NycENMZlpHZ3V3R3hiT3JET3lFZXJDd3VqVTJrenF3?=
- =?utf-8?B?TWNnSDVGTEs3eWFhUnNmb210bnFRcVNsTlJnSUdSNjF6RXpOQkJ0RXFGVjl5?=
- =?utf-8?B?b0xkdm8vNmFWemlnNkFOb2lhdFFkazBYeEJxMDJ2NEZZazUyNXZybEFzTmEv?=
- =?utf-8?B?eVpXbTNTR2FDSVNWcEQyUXB5Skg4c0h3TDNGMSthU1hDWXlra1BjK2FxbXFt?=
- =?utf-8?B?OHgwampMVVZrTFZGQ3ZnZURtSHhpRGo2SmlGczk3d1dSZjFabDdlSVNwUG9a?=
- =?utf-8?B?dVpFU0hjYXVQU051ZUoyR3o5eXoxVE9VWTdwcHgzZERtRC95QmZtV3pDZXRI?=
- =?utf-8?B?Q2dYR29VSmZxckZobExNK1NuK2puL2xkTlVwcjNRWlhCTnlyMEFHdjBIUEFl?=
- =?utf-8?B?U3AvRHFBSmZFc0ZUYVJFZUdyTVV1ZmR2SWdRUDJBVzE1NHE5d2J0d1dpZ3JB?=
- =?utf-8?B?ZHNLK3RRNWd6aEduY2xpL1pFMmk2U214WUNMRmVrVjhqQ3BwTVpMUVMxMEsw?=
- =?utf-8?B?SEFOZjZQbXFlbGpVZElXb0xEQnFiRmJ4djE4RzhiL2cwYUNnZ1ArZWUyQmJs?=
- =?utf-8?B?WXJESTJWS2RoN1NTSVpuVXk2WWw0L2FOMFJ1Uzd1RXlBeXZBTUZhWWFWcG4v?=
- =?utf-8?B?TnFxSzUzR1lSTXM4cmFEZ3g5WnNEMkg0NmhmODcwUnVKQUtqUUFOSTR2Vitp?=
- =?utf-8?B?MUN4NzE3YlVXT0RlODZURXN3VWEzSU50emVVSEN5YzJZTVNEZ2VLdlNOUWtp?=
- =?utf-8?B?WHArRDFTUjhZRWNUOFBiZUhHeHA2MjVvWXlmcks4Y0ZGWklldHZBVFhiNHhN?=
- =?utf-8?B?QlB4Y0ZiaGQ3ZGNQNXA5NzN3NVQwdmMwQWYyclZxcWZQdmlJcmlSamp4S01o?=
- =?utf-8?B?VVA4VGgvZkJmbzdJUjVVb2o1UmxpRzdTTzUzQkp2amJ4QXJQYWxxWHpmeXlt?=
- =?utf-8?B?YnpSbGFLUWUxdlJBUDdrY2NNcHdZUkozWC8vanArQlkwUjl2eTZkL1RJV09S?=
- =?utf-8?B?R3VZN1RWUWZjNTM4blhER3d0UVFCenVIakFpSTdyQzNYM0g4Y1BGSWtSTlJm?=
- =?utf-8?B?dGY2OTJzcWxSYlk4aTlMVGs1VFRZMi91R243Z25yeldab09STVdDQzV5VW9v?=
- =?utf-8?B?eHZta0V0SWVMYU5scFZraXhNTFFuSzBMMTlySFBUbzBQaVhBdU9KZ01pTU1I?=
- =?utf-8?B?Y3RFMVdCdnppT2VKN3VJYlVqM0c1N1JDb09SUHJmVGxxbW9sV2FtRzM4WlQ1?=
- =?utf-8?B?c05Wa05oWmJzbzBIcFZPQVFiWjlJUTQ1OFY4STF5aGRsSUpVRlVCRnFaUm9O?=
- =?utf-8?B?UDM3U25pT1VxcGhBTXRLTm5WVmRwaWhmckZGTWJrNEZLZUFXTTFxRjRIWXpi?=
- =?utf-8?B?T3ZlSTd6by9Tby91N3lFZEVMVjdDQXpldVFWV3RRVkRKcFo2RjlkQ3JMdng3?=
- =?utf-8?B?WUg0UUVsY0poSWZoV3c5d1Q4b0RxV0toc092NW84clNnR2dReWhuSm0ycnRY?=
- =?utf-8?B?a242cnd4NEpOUEtIcm4vRXk0OElHa3JQMmNIMlR6TjloSjY2MExOZ291VUVH?=
- =?utf-8?B?WUl1ZFNyRDdaVGZidTBkaXJ0dkdnUU10Q2ZoZEJYTE51YXNVTmtXaUN3WTl4?=
- =?utf-8?B?bklJUDhKRTM4TXM1YXJ5ekJNWmFja1ZkWXlZWEl6Q0d1MVFPZ2d6MUw2T1VC?=
- =?utf-8?B?Z1RJNDJMYm5qT2xyY0FBSDd3dFZmS3pLanFpYzBGOXdLcUZXMTZPN09SZzQz?=
- =?utf-8?B?MU1uSlVXN3hSaTV6Qys4VkEvRVdMSjAvTmVITnlheFljSkJ5bVV6NFVXSzI2?=
- =?utf-8?B?Rk9pYnZiNUVsMW04bm1MZUpXcDJwQkQrZjlNUkZLd01HVGNnNFpTRjF3SDNL?=
- =?utf-8?B?Vkl5UDhvMGJYWXZsUWZIbEZGTFo5ZlVkZFhMeGpOSU5jRk1wQnFlNjVNWWM5?=
- =?utf-8?B?My9oRUZKaXQ1dHBpNVJaMGNJS0pJK0Q1RVl2Q0FDc25ON3h1ODd0M1A4V2x4?=
- =?utf-8?Q?AT+4UR8/O3NBMq7G4ktFB5M=3D?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 71d8b343-d2f2-42f0-b196-08dbeb4b9ea0
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2023 11:10:22.0581
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VQyX2DEMokDFcEXcE41T1waOfA03Vy9hyM1EUC59WiMlWbMp91W8WbUhUTMTKMfMN2Stmdlb7C418DFkhLdgMthw78Z9Kt+ZtA7HB/OybfCMaxfqVBcOCQUNZCX42fnO
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR01MB6740
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
+--=-Ej8SiaNBjrjbJBEJ86QV
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 21-11-2023 03:11 pm, Marc Zyngier wrote:
-> On Tue, 21 Nov 2023 09:26:22 +0000,
-> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
->>
->>
->>
->> On 21-11-2023 02:38 pm, Marc Zyngier wrote:
->>> On Tue, 21 Nov 2023 08:51:35 +0000,
->>> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
->>>>
->>>>
->>>> Hi Marc,
->>>>
->>>> On 20-11-2023 06:39 pm, Marc Zyngier wrote:
->>>>> This is the 5th drop of NV support on arm64 for this year, and most
->>>>> probably the last one for this side of Christmas.
->>>>>
->>>>> For the previous episodes, see [1].
->>>>>
->>>>> What's changed:
->>>>>
->>>>> - Drop support for the original FEAT_NV. No existing hardware supports
->>>>>      it without FEAT_NV2, and the architecture is deprecating the former
->>>>>      entirely. This results in fewer patches, and a slightly simpler
->>>>>      model overall.
->>>>>
->>>>> - Reorganise the series to make it a bit more logical now that FEAT_NV
->>>>>      is gone.
->>>>>
->>>>> - Apply the NV idreg restrictions on VM first run rather than on each
->>>>>      access.
->>>>>
->>>>> - Make the nested vgic shadow CPU interface a per-CPU structure rather
->>>>>      than per-vcpu.
->>>>>
->>>>> - Fix the EL0 timer fastpath
->>>>>
->>>>> - Work around the architecture deficiencies when trapping WFI from a
->>>>>      L2 guest.
->>>>>
->>>>> - Fix sampling of nested vgic state (MISR, ELRSR, EISR)
->>>>>
->>>>> - Drop the patches that have already been merged (NV trap forwarding,
->>>>>      per-MMU VTCR)
->>>>>
->>>>> - Rebased on top of 6.7-rc2 + the FEAT_E2H0 support [2].
->>>>>
->>>>> The branch containing these patches (and more) is at [3]. As for the
->>>>> previous rounds, my intention is to take a prefix of this series into
->>>>> 6.8, provided that it gets enough reviewing.
->>>>>
->>>>> [1] https://lore.kernel.org/r/20230515173103.1017669-1-maz@kernel.org
->>>>> [2] https://lore.kernel.org/r/20231120123721.851738-1-maz@kernel.org
->>>>> [3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-6.8-nv2-only
->>>>>
->>>>
->>>> V11 series is not booting on Ampere platform (I am yet to debug).
->>>> With lkvm, it is stuck at the very early stage itself and no early
->>>> boot prints/logs.
->>>>
->>>> Are there any changes needed in kvmtool for V11?
->>>
->>> Not really, I'm still using the version I had built for 6.5. Is the
->>> problem with L1 or L2?
->>
->> Stuck in the L1 itself.
->>
->> I am using kvmtool from
->> https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvmtool.git/log/?h=arm64/nv-5.16
-> 
-> Huh. That's positively ancient. Yet, you shouldn't get into a
-> situation where the L1 guest locks up.
-> 
-> I have pushed out my kvmtool branch[1]. Please give it a go.
-> 
-No change, still L1 hangs. Captured ftrace and the L1 is keep 
-looping/faulting around same address across kvm_entry and kvm_exits.
+On Wed, 2023-11-22 at 10:55 +0000, Paul Durrant wrote:
+>=20
+> > > Wait, didn't we realise that this leaves the bits set in the shadow
+> > > evtchn_pending_sel that get lost on migration?
+> > >=20
+>=20
+> Indeed we did not, but that's not something that *this* patch, or even=
+=20
+> this series, is dealing with.=C2=A0 We also know that setting the 'width'=
+ of=20
+> shared_info has some issues, but again, can we keep that for other=20
+> patches? The series is at v9 and has already suffered a fair amount of=
+=20
+> scope-creep.
 
-It is a weird behavior, L1 is faulting and looping around MDCR and 
-AA64MMFR3_EL1 access in function __finalise_el2.
+Hrm... OK, that makes sense. This series is attempting to address the
+fact that we can't do overlays on memslots without temporarily taking
+away GPA ranges that we didn't mean to change. This patch is sufficient
+to allow evtchn delivery to work while the memslots are being frobbed,
+because userspace takes the vcpu_info away during the update.
 
-asm:
-ffffffc080528a58:       d53dc000        mrs     x0, vbar_el12
-ffffffc080528a5c:       d518c000        msr     vbar_el1, x0
-ffffffc080528a60:       d53c1120        mrs     x0, mdcr_el2
-ffffffc080528a64:       9272f400        and     x0, x0, #0xffffffffffffcfff
-ffffffc080528a68:       9266f400        and     x0, x0, #0xfffffffffcffffff
-ffffffc080528a6c:       d51c1120        msr     mdcr_el2, x0
-ffffffc080528a70:       d53d2040        mrs     x0, tcr_el12
-ffffffc080528a74:       d5182040        msr     tcr_el1, x0
-ffffffc080528a78:       d53d2000        mrs     x0, ttbr0_el12
-ffffffc080528a7c:       d5182000        msr     ttbr0_el1, x0
-ffffffc080528a80:       d53d2020        mrs     x0, ttbr1_el12
-ffffffc080528a84:       d5182020        msr     ttbr1_el1, x0
-ffffffc080528a88:       d53da200        mrs     x0, mair_el12
-ffffffc080528a8c:       d518a200        msr     mair_el1, x0
-ffffffc080528a90:       d5380761        mrs     x1, s3_0_c0_c7_3
-ffffffc080528a94:       d3400c21        ubfx    x1, x1, #0, #4
-ffffffc080528a98:       b4000141        cbz     x1, ffffffc080528ac0 
-<__finalise_el2+0x270>
-ffffffc080528a9c:       d53d2060        mrs     x0, s3_5_c2_c0_3
+In that case the shadow works just fine.
 
-ftrace:
-       kvm-vcpu-0-88776   [001] ...1.  6076.581774: kvm_exit: TRAP: 
-HSR_EC: 0x0018 (SYS64), PC: 0x0000000080528a6c
-       kvm-vcpu-0-88776   [001] d..1.  6076.581774: kvm_entry: PC: 
-0x0000000080528a6c
-       kvm-vcpu-0-88776   [001] ...1.  6076.581775: kvm_exit: TRAP: 
-HSR_EC: 0x0018 (SYS64), PC: 0x0000000080528a90
-       kvm-vcpu-0-88776   [001] d..1.  6076.581776: kvm_entry: PC: 
-0x0000000080528a90
-       kvm-vcpu-0-88776   [001] ...1.  6076.581778: kvm_exit: TRAP: 
-HSR_EC: 0x0018 (SYS64), PC: 0x0000000080528a60
-       kvm-vcpu-0-88776   [001] d..1.  6076.581778: kvm_entry: PC: 
-0x0000000080528a60
-       kvm-vcpu-0-88776   [001] ...1.  6076.581779: kvm_exit: TRAP: 
-HSR_EC: 0x0018 (SYS64), PC: 0x0000000080528a6c
-       kvm-vcpu-0-88776   [001] d..1.  6076.581779: kvm_entry: PC: 
-0x0000000080528a6c
-       kvm-vcpu-0-88776   [001] ...1.  6076.581780: kvm_exit: TRAP: 
-HSR_EC: 0x0018 (SYS64), PC: 0x0000000080528a90
-       kvm-vcpu-0-88776   [001] d..1.  6076.581781: kvm_entry: PC: 
-0x0000000080528a90
-       kvm-vcpu-0-88776   [001] ...1.  6076.581783: kvm_exit: TRAP: 
-HSR_EC: 0x0018 (SYS64), PC: 0x0000000080528a60
-       kvm-vcpu-0-88776   [001] d..1.  6076.581783: kvm_entry: PC: 
-0x0000000080528a60
-       kvm-vcpu-0-88776   [001] ...1.  6076.581784: kvm_exit: TRAP: 
-HSR_EC: 0x0018 (SYS64), PC: 0x0000000080528a6c
-       kvm-vcpu-0-88776   [001] d..1.  6076.581784: kvm_entry: PC: 
-0x0000000080528a6c
-       kvm-vcpu-0-88776   [001] ...1.  6076.581785: kvm_exit: TRAP: 
-HSR_EC: 0x0018 (SYS64), PC: 0x0000000080528a90
-       kvm-vcpu-0-88776   [001] d..1.  6076.581786: kvm_entry: PC: 
-0x0000000080528a90
-       kvm-vcpu-0-88776   [001] ...1.  6076.581788: kvm_exit: TRAP: 
-HSR_EC: 0x0018 (SYS64), PC: 0x0000000080528a60
-       kvm-vcpu-0-88776   [001] d..1.  6076.581788: kvm_entry: PC: 
-0x0000000080528a60
-       kvm-vcpu-0-88776   [001] ...1.  6076.581789: kvm_exit: TRAP: 
-HSR_EC: 0x0018 (SYS64), PC: 0x0000000080528a6c
-       kvm-vcpu-0-88776   [001] d..1.  6076.581789: kvm_entry: PC: 
-0x0000000080528a6c
-       kvm-vcpu-0-88776   [001] ...1.  6076.581790: kvm_exit: TRAP: 
-HSR_EC: 0x0018 (SYS64), PC: 0x0000000080528a90
+So yeah, if you want to handle the migration case separately then that
+seems reasonable.
+
+--=-Ej8SiaNBjrjbJBEJ86QV
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTIyMTEyNTQ3WjAvBgkqhkiG9w0BCQQxIgQg9qXmpCB5
+kF2r9fz2SXpLVcrVXnvl6TLBbzbT8/D7YSEwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCiAXF+t7Monyri5LPqCNda3gV1TZPwaAv4
+8U7YVawnWWLQ36XvE3LP5piejUErZXK8lOqX1xlPLPxWVJzrnKAWZdZu6uATXoA8tAx+/qGKzMPm
+0aJh2CtspTm674afDZilvLK9IR4lihOk4yMJP1nOlAPmLtT4Oi4GU4vDNCNkdXmRWcVXucXjOach
+wFsOJBhEe+TdsZsUxtd2w+Q+JLJSv7UMD+Ujxk2GAj6pAzs1djtUh4OQt9HNNFIEs8oJd6+ta2iY
+brylfLgYdruO0mmaJMxwenNNTg0RUss2wVVCT+s5jTtV5FPgqEgpP4s8jVTG+to05rsuvb1i/f+A
+ZEmdj1eZIaouqEdtla1P0G19BKKeK2GN0bLi436KTqq3q/oOfIIC2LdcpRQnijHB95aqNaj/2po8
+osvjfRQm/uL2Ez/OkPyfyGN+Pte7bnYOPyotBJ+ksX2yekWamYKi5j7AzMNdzpX6wAE3bsl9RyyY
+PQ0cZS69OrKJaep29Mz2WbImQ+qzPcXyrFiAy3y4QRJ14iPHoVUlCOQTgemRvog9aV75fLuGsyBO
+JSiQcp34CDJ1rI5+MTanWCQzu424NbBMcXP4Bar0wKem0F0VMOVWMCA6f9/bNhLbROvy6Ps7CB4d
+ceGiFO43eqGPMbnupYy2AJxK5cUvp+OYZyC1opY2YwAAAAAAAA==
 
 
-
-Thanks,
-Ganapat
-
+--=-Ej8SiaNBjrjbJBEJ86QV--
 
