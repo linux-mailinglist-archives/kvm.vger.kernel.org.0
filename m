@@ -1,179 +1,218 @@
-Return-Path: <kvm+bounces-2240-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2241-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C14F7F3BAB
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 03:14:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED7087F3BB5
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 03:19:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B7E0282AAE
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 02:14:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EDF9282AC7
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 02:19:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04DAE881E;
-	Wed, 22 Nov 2023 02:14:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79CA18820;
+	Wed, 22 Nov 2023 02:19:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="LT5DOMUG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WzOZbcCQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA91298;
-	Tue, 21 Nov 2023 18:14:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1700619270;
-	bh=jMhp3OO1OuD6ZqqAsOzECGZ72/P154caojLkXwRL41U=;
-	h=Date:From:To:Cc:Subject:From;
-	b=LT5DOMUGm6oxoBluIfXnUbTw906Ry0buC3EaQQnVidLlrMLljA2K40T2xlof4w/Ag
-	 sHlnqbuLOtBbNeMAbIizkhafQEnta+dd7I8DQazbOL60zdUsWaB0X0U22xto88mjoR
-	 dykM7PJNh4DPm70zxYi+QbTX8SqsxcXpmU2Uhwv03hf5biTxjvrJVNRjoLS3jJYx9o
-	 6ovPPqQkk27PyjdBDCdAIZ1So3AXyRSHI6M1QIL7ECGuL8dlMBwUvGKc9e2LhyHlTd
-	 4XMyeh6A1UsNJUI+oljCmwjRr26EqQU7eDsekA33LwPZaw7jX3fnJlelBLFa6ZaMmz
-	 aOYz2AOtzsIHQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4SZlDj1X1Mz4xSQ;
-	Wed, 22 Nov 2023 13:14:29 +1100 (AEDT)
-Date: Wed, 22 Nov 2023 13:14:28 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Paolo Bonzini <pbonzini@redhat.com>, Christian Brauner
- <brauner@kernel.org>
-Cc: KVM <kvm@vger.kernel.org>, "Matthew Wilcox (Oracle)"
- <willy@infradead.org>, Ackerley Tng <ackerleytng@google.com>, Chao Peng
- <chao.p.peng@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>,
- "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Michael Roth
- <michael.roth@amd.com>, Sean Christopherson <seanjc@google.com>, Yu Zhang
- <yu.c.zhang@linux.intel.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: build failure after merge of the kvm tree
-Message-ID: <20231122131428.599f2931@canb.auug.org.au>
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6DC7199;
+	Tue, 21 Nov 2023 18:18:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700619534; x=1732155534;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=5o3KNyQ2NXiGAxcrlOf8yoPEXAyka3WGVL/Jm+8LiCw=;
+  b=WzOZbcCQD5kbdf8jVI3zoL37D+QcXO4ScNLedng71Ch6cuZdvUoXCdPi
+   NU4I89CRHFzU0uz2tHxxEza8qR5TK+JW2svqyZrE/b0ZmtKixnhZSEUK0
+   KBBlOB5lUJwrK1bj025/Mmu3w6EK6jVbODjDTq7xxxgz0k8M+w7CNopZ1
+   6jWFS5rS4ucGwzXfE5Kw1wnpUx38Djd8QEVhrYn64leror0hB5gAkDEh0
+   UEiDXVAZTi0THwAE6ZIB+vvJGZmbNvg23BgkcxY1qYXgEi3K/ytIWgpE8
+   liv1zMqTRhAk1uHtEZzHK6t0s1XHpAKCJBbWY5N6HAJ0VktrwRv2nAjST
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="395886240"
+X-IronPort-AV: E=Sophos;i="6.04,217,1695711600"; 
+   d="scan'208";a="395886240"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 18:18:54 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="760292891"
+X-IronPort-AV: E=Sophos;i="6.04,217,1695711600"; 
+   d="scan'208";a="760292891"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.126]) ([10.238.10.126])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 18:18:50 -0800
+Message-ID: <9810c96a-2156-4653-8055-701c0744528c@linux.intel.com>
+Date: Wed, 22 Nov 2023 10:18:47 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/GLQFgBlUXh5M6MunK=g/i._";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 11/16] KVM: x86/tdp_mmu: Split the large page when zap
+ leaf
+To: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+ Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+ Sean Christopherson <seanjc@google.com>, Sagi Shahar <sagis@google.com>,
+ David Matlack <dmatlack@google.com>, Kai Huang <kai.huang@intel.com>,
+ Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com, hang.yuan@intel.com,
+ tina.zhang@intel.com, Xiaoyao Li <xiaoyao.li@intel.com>
+References: <cover.1699368363.git.isaku.yamahata@intel.com>
+ <8b43a9203c34b5330c4ea5901da5dac3458ac98d.1699368363.git.isaku.yamahata@intel.com>
+ <5d9aadbd-975b-4c4d-ba18-ac6e0fb07ba1@linux.intel.com>
+ <20231121110045.GH1109547@ls.amr.corp.intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20231121110045.GH1109547@ls.amr.corp.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---Sig_/GLQFgBlUXh5M6MunK=g/i._
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
 
-After merging the kvm tree, today's linux-next build (x86_64 allmodconfig)
-failed like this:
+On 11/21/2023 7:00 PM, Isaku Yamahata wrote:
+> On Tue, Nov 21, 2023 at 05:57:28PM +0800,
+> Binbin Wu <binbin.wu@linux.intel.com> wrote:
+>
+>>> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+>>> index 7873e9ee82ad..a209a67decae 100644
+>>> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+>>> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+>>> @@ -964,6 +964,14 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+>>>    	return true;
+>>>    }
+>>> +
+>>> +static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
+>>> +						       struct tdp_iter *iter,
+>>> +						       bool shared);
+>>> +
+>>> +static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
+>>> +				   struct kvm_mmu_page *sp, bool shared);
+>>> +
+>>>    /*
+>>>     * If can_yield is true, will release the MMU lock and reschedule if the
+>>>     * scheduler needs the CPU or there is contention on the MMU lock. If this
+>>> @@ -975,13 +983,15 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
+>>>    			      gfn_t start, gfn_t end, bool can_yield, bool flush,
+>>>    			      bool zap_private)
+>>>    {
+>>> +	bool is_private = is_private_sp(root);
+>>> +	struct kvm_mmu_page *split_sp = NULL;
+>>>    	struct tdp_iter iter;
+>>>    	end = min(end, tdp_mmu_max_gfn_exclusive());
+>>>    	lockdep_assert_held_write(&kvm->mmu_lock);
+>>> -	WARN_ON_ONCE(zap_private && !is_private_sp(root));
+>>> +	WARN_ON_ONCE(zap_private && !is_private);
+>>>    	if (!zap_private && is_private_sp(root))
+>> Can use is_private instead of is_private_sp(root) here as well.
+> I'll update it.
+>
+>>>    		return false;
+>>> @@ -1006,12 +1016,66 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
+>>>    		    !is_last_spte(iter.old_spte, iter.level))
+>>>    			continue;
+>>> +		if (is_private && kvm_gfn_shared_mask(kvm) &&
+>>> +		    is_large_pte(iter.old_spte)) {
+>>> +			gfn_t gfn = iter.gfn & ~kvm_gfn_shared_mask(kvm);
+>>> +			gfn_t mask = KVM_PAGES_PER_HPAGE(iter.level) - 1;
+>>> +			struct kvm_memory_slot *slot;
+>>> +			struct kvm_mmu_page *sp;
+>>> +
+>>> +			slot = gfn_to_memslot(kvm, gfn);
+>>> +			if (kvm_hugepage_test_mixed(slot, gfn, iter.level) ||
+>>> +			    (gfn & mask) < start ||
+>>> +			    end < (gfn & mask) + KVM_PAGES_PER_HPAGE(iter.level)) {
+>>> +				WARN_ON_ONCE(!can_yield);
+>>> +				if (split_sp) {
+>>> +					sp = split_sp;
+>>> +					split_sp = NULL;
+>>> +					sp->role = tdp_iter_child_role(&iter);
+>>> +				} else {
+>>> +					WARN_ON(iter.yielded);
+>>> +					if (flush && can_yield) {
+>>> +						kvm_flush_remote_tlbs(kvm);
+>>> +						flush = false;
+>>> +					}
+>> Is it necessary to do the flush here?
+> Because tdp_mmu_alloc_sp_for_split() may unlock mmu_lock and block.
+> While blocking, other thread operates on KVM MMU and gets confused due to
+> remaining TLB cache.
+>
+>
+>>> +					sp = tdp_mmu_alloc_sp_for_split(kvm, &iter, false);
+>>> +					if (iter.yielded) {
+>>> +						split_sp = sp;
+>>> +						continue;
+>>> +					}
+>>> +				}
+>>> +				KVM_BUG_ON(!sp, kvm);
+>>> +
+>>> +				tdp_mmu_init_sp(sp, iter.sptep, iter.gfn);
+>>> +				if (tdp_mmu_split_huge_page(kvm, &iter, sp, false)) {
+>>> +					kvm_flush_remote_tlbs(kvm);
+>>> +					flush = false;
+>> Why it needs to flush TLB immediately if tdp_mmu_split_huge_page() fails?
+> Hmm, we don't need it.  When breaking up page table, we need to tlb flush
+> before issuing TDH.MEM.PAGE.DEMOTE(), not after it.  Will remove those two lines.
+>
+>
+>> Also, when KVM MMU write lock is held, it seems tdp_mmu_split_huge_page()
+>> will not fail.
+> This can happen with TDX_OPERAND_BUSY with secure-ept tree lock with other
+> vcpus TDH.VP.ENTER(). TDH.VP.ENTER() can take exclusive lock of secure-EPT.
+>
+>
+>> But let's assume this condition can be triggered, since sp is
+>> local
+>> variable, it will lost its value after continue, and split_sp is also NULL,
+>> it will try to allocate a new sp, memory leakage here?
+> Nice catch. I'll add split_sp = sp;
+>
+>
+>>> +					/* force retry on this gfn. */
+>>> +					iter.yielded = true;
+>>> +				} else
+>>> +					flush = true;
+>>> +				continue;
+>>> +			}
+>>> +		}
+>>> +
+>>>    		tdp_mmu_iter_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
+>>>    		flush = true;
+>>>    	}
+>>>    	rcu_read_unlock();
+>>> +	if (split_sp) {
+>>> +		WARN_ON(!can_yield);
+>>> +		if (flush) {
+>>> +			kvm_flush_remote_tlbs(kvm);
+>>> +			flush = false;
+>>> +		}
+>> Same here, why we need to do the flush here?
+>> Can we delay it till the caller do the flush?
+> No. Because we unlock mmu_lock and may block when freeing memory.
+But I don't find it may block during freeing memory.
+Did I miss anything?
 
-arch/x86/kvm/../../../virt/kvm/guest_memfd.c: In function 'kvm_gmem_punch_h=
-ole':
-arch/x86/kvm/../../../virt/kvm/guest_memfd.c:100:58: error: 'struct address=
-_space' has no member named 'private_list'; did you mean 'i_private_list'?
-  100 |         struct list_head *gmem_list =3D &inode->i_mapping->private_=
-list;
-      |                                                          ^~~~~~~~~~=
-~~
-      |                                                          i_private_=
-list
-arch/x86/kvm/../../../virt/kvm/guest_memfd.c: In function 'kvm_gmem_error_f=
-olio':
-arch/x86/kvm/../../../virt/kvm/guest_memfd.c:273:49: error: 'struct address=
-_space' has no member named 'private_list'; did you mean 'i_private_list'?
-  273 |         struct list_head *gmem_list =3D &mapping->private_list;
-      |                                                 ^~~~~~~~~~~~
-      |                                                 i_private_list
-arch/x86/kvm/../../../virt/kvm/guest_memfd.c: In function '__kvm_gmem_creat=
-e':
-arch/x86/kvm/../../../virt/kvm/guest_memfd.c:373:51: error: 'struct address=
-_space' has no member named 'private_list'; did you mean 'i_private_list'?
-  373 |         list_add(&gmem->entry, &inode->i_mapping->private_list);
-      |                                                   ^~~~~~~~~~~~
-      |                                                   i_private_list
 
-Caused by commit
+>
+>>> +
+>>> +		write_unlock(&kvm->mmu_lock);
+>>> +		tdp_mmu_free_sp(split_sp);
+>>> +		write_lock(&kvm->mmu_lock);
+>>> +	}
+>>> +
+>>>    	/*
+>>>    	 * Because this flow zaps _only_ leaf SPTEs, the caller doesn't need
+>>>    	 * to provide RCU protection as no 'struct kvm_mmu_page' will be freed.
+>>> @@ -1606,8 +1670,6 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
+>>>    	KVM_BUG_ON(kvm_mmu_page_role_is_private(role) !=
+>>>    		   is_private_sptep(iter->sptep), kvm);
+>>> -	/* TODO: Large page isn't supported for private SPTE yet. */
+>>> -	KVM_BUG_ON(kvm_mmu_page_role_is_private(role), kvm);
+>>>    	/*
+>>>    	 * Since we are allocating while under the MMU lock we have to be
+>>
 
-  a7800aa80ea4 ("KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific=
- backing memory")
-
-interacting with commit
-
-  488e2eea5100 ("fs: Rename mapping private members")
-
-from the vfs-brauner tree.
-
-I have applied the following merge fix patch.
-
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Date: Wed, 22 Nov 2023 13:10:06 +1100
-Subject: [PATCH] fix up for "KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for gu=
-est-specific backing memory"
-
-interacting with "fs: Rename mapping private members" from the vfs-brauner
-tree.
-
-Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
----
- virt/kvm/guest_memfd.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 451435123fe7..16d58806e913 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -97,7 +97,7 @@ static void kvm_gmem_invalidate_end(struct kvm_gmem *gmem=
-, pgoff_t start,
-=20
- static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t=
- len)
- {
--	struct list_head *gmem_list =3D &inode->i_mapping->private_list;
-+	struct list_head *gmem_list =3D &inode->i_mapping->i_private_list;
- 	pgoff_t start =3D offset >> PAGE_SHIFT;
- 	pgoff_t end =3D (offset + len) >> PAGE_SHIFT;
- 	struct kvm_gmem *gmem;
-@@ -270,7 +270,7 @@ static int kvm_gmem_migrate_folio(struct address_space =
-*mapping,
- static int kvm_gmem_error_folio(struct address_space *mapping,
- 		struct folio *folio)
- {
--	struct list_head *gmem_list =3D &mapping->private_list;
-+	struct list_head *gmem_list =3D &mapping->i_private_list;
- 	struct kvm_gmem *gmem;
- 	pgoff_t start, end;
-=20
-@@ -370,7 +370,7 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t si=
-ze, u64 flags)
- 	kvm_get_kvm(kvm);
- 	gmem->kvm =3D kvm;
- 	xa_init(&gmem->bindings);
--	list_add(&gmem->entry, &inode->i_mapping->private_list);
-+	list_add(&gmem->entry, &inode->i_mapping->i_private_list);
-=20
- 	fd_install(fd, file);
- 	return fd;
---=20
-2.40.1
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/GLQFgBlUXh5M6MunK=g/i._
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmVdZAQACgkQAVBC80lX
-0Gy7+wf8COi5Jx/3jUo0LmfleOMMQZcluv5ylZ8f9gfVZsxnt9C7gMoNVkAHzup0
-u1IY0VZss3/exLMzL6TOKOCQlzub5qmMkYdL7HD9YzKrbwU/EFm3nX2r60RsATc6
-fCWtDRcEludWMQemnW4ZiWKXylD7Nj4o4IReIVqdDDs98R7JnHwMRBB7bwSGe8Jx
-ZdijsunCXPehjZRcIOjUs452+ELXnF8f+JDc9nSkOe8PBEz9rhpv0iaHUnHV1/uE
-V651+TLvK5gcgXiz8lZesr3O2tSuXck6fyAbT3s8bXTjmNr6dnV6rZbzhWhUC5vm
-mtQltBcVO7y6wvxwfKNWlgwpa65RLg==
-=nvCs
------END PGP SIGNATURE-----
-
---Sig_/GLQFgBlUXh5M6MunK=g/i._--
 
