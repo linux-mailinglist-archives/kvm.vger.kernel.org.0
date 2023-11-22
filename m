@@ -1,115 +1,175 @@
-Return-Path: <kvm+bounces-2307-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2308-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FDFC7F48F1
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 15:29:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2B9D7F4963
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 15:52:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 819221C20BD5
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 14:29:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B1DF281492
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 14:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C414D596;
-	Wed, 22 Nov 2023 14:29:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22A5D5B1E1;
+	Wed, 22 Nov 2023 14:51:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kGNNK8zL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RFZTJARF"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9557419D;
-	Wed, 22 Nov 2023 06:29:19 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26EBE19E;
+	Wed, 22 Nov 2023 06:51:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700663359; x=1732199359;
+  t=1700664701; x=1732200701;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=BFl13xeC7OE11pBxBT1ZHjb6Yh6uZMtqWKK7X350nBU=;
-  b=kGNNK8zLM1ZRFIGAYL+/Gr7pCjlu8BhGbol0PQtpOcoggBeWpK+j9/YE
-   WSExscuL4HAspMB4KtXnfz/KzxD+8w2xwhep9TSbEI44/skFTHXrE/dzo
-   iw/4934kNAADSKZLArJg/LU1ODt9qD8pzOzdI7clBxksPCUvUw58qb7dd
-   2/W4Q07fTn6ziWk1OP0TdzLNlQopAXWsEYZoDkp5F0XMDX3Uqf+GjAQf2
-   muOGvURhBsYROYob/wJaW5jwv0c7fsUEK2Zk5Wtgoy/vAEacFjO9GLwaD
-   MYvF/M/mhZRal2m96bpdHNQwVLsSp4V2b1QK7gVJdPGkFeYjaREE3SYh0
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="10724610"
+   mime-version:in-reply-to;
+  bh=3Lp3IDM3ar4jYOzHbknAigUjAPfa74EA/HlhJuCNIfU=;
+  b=RFZTJARF7G0F4/0tmBnfccuZRtbRAgC9sUNRAVYBjn5Gy0GYQbXTH7Fl
+   AU4IGs1YEAxciute8I3PlHvJMcZs2hgTNMSNKrkAFc0LxImmN1OmVtm+X
+   qV7wVscQSNX3PSaqk5jF6KYb/mluYTiVh6aOW9rlx0CwH4JwmO7BOFMEP
+   9m55363ih+vtjNxuYg3dprwR3LRvG6K8VRnA/T9nUSt8AZ/Pb9gG25z22
+   re2zR5E3zUT3WDbCaDcYXg0IV0pwo3vtYzdkxtD7WdvUmfLWqYgAVvPcd
+   BwYJ+8vBN5/YwDNswBFnUYes4TJB1tqMMmb44i+UDAkp9SFRJZw8/dd8c
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="10729190"
 X-IronPort-AV: E=Sophos;i="6.04,219,1695711600"; 
-   d="scan'208";a="10724610"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2023 06:29:19 -0800
+   d="scan'208";a="10729190"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2023 06:51:40 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="837430258"
 X-IronPort-AV: E=Sophos;i="6.04,219,1695711600"; 
-   d="scan'208";a="837430258"
+   d="scan'208";a="14944713"
 Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmsmga004.fm.intel.com with ESMTP; 22 Nov 2023 06:29:15 -0800
-Date: Wed, 22 Nov 2023 22:27:22 +0800
+  by orviesa001.jf.intel.com with ESMTP; 22 Nov 2023 06:51:20 -0800
+Date: Wed, 22 Nov 2023 22:49:27 +0800
 From: Xu Yilun <yilun.xu@linux.intel.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Paul Durrant <paul@xen.org>, Sean Christopherson <seanjc@google.com>,
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+	Jan Kara <jack@suse.cz>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 07/15] KVM: pfncache: include page offset in uhva and
- use it consistently
-Message-ID: <ZV4PyvTBOohiRyLS@yilunxu-OptiPlex-7050>
-References: <20231121180223.12484-1-paul@xen.org>
- <20231121180223.12484-8-paul@xen.org>
- <ZV3Bwghwz63LmgMu@yilunxu-OptiPlex-7050>
- <b6b864e500cbb38f76739fcfb4dcc6e9c6705d0b.camel@infradead.org>
+	David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>,
+	Oded Gabbay <ogabbay@kernel.org>, Wu Hao <hao.wu@intel.com>,
+	Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
+	Xu Yilun <yilun.xu@intel.com>,
+	Zhenyu Wang <zhenyuw@linux.intel.com>,
+	Zhi Wang <zhi.a.wang@intel.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+	David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Frederic Barrat <fbarrat@linux.ibm.com>,
+	Andrew Donnellan <ajd@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Eric Farman <farman@linux.ibm.com>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Vineeth Vijayan <vneethv@linux.ibm.com>,
+	Peter Oberparleiter <oberpar@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Tony Krowiak <akrowiak@linux.ibm.com>,
+	Jason Herne <jjherne@linux.ibm.com>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Diana Craciun <diana.craciun@oss.nxp.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>, Fei Li <fei1.li@intel.com>,
+	Benjamin LaHaise <bcrl@kvack.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal Hocko <mhocko@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeelb@google.com>,
+	Muchun Song <muchun.song@linux.dev>,
+	Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linux-fpga@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-aio@kvack.org, cgroups@vger.kernel.org, linux-mm@kvack.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
+Subject: Re: [PATCH v2 2/4] eventfd: simplify eventfd_signal()
+Message-ID: <ZV4U96z12KSi4GGw@yilunxu-OptiPlex-7050>
+References: <20231122-vfs-eventfd-signal-v2-0-bd549b14ce0c@kernel.org>
+ <20231122-vfs-eventfd-signal-v2-2-bd549b14ce0c@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b6b864e500cbb38f76739fcfb4dcc6e9c6705d0b.camel@infradead.org>
+In-Reply-To: <20231122-vfs-eventfd-signal-v2-2-bd549b14ce0c@kernel.org>
 
-On Wed, Nov 22, 2023 at 09:12:18AM +0000, David Woodhouse wrote:
-> On Wed, 2023-11-22 at 16:54 +0800, Xu Yilun wrote:
-> > 
-> > > @@ -259,13 +258,25 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa,
-> > >                         ret = -EFAULT;
-> > >                         goto out;
-> > >                 }
-> > > +
-> > > +               hva_change = true;
-> > > +       } else {
-> > > +               /*
-> > > +                * No need to do any re-mapping if the only thing that has
-> > > +                * changed is the page offset. Just page align it to allow the
-> > > +                * new offset to be added in.
-> > 
-> > I don't understand how the uhva('s offset) could be changed when both gpa and
-> > slot are not changed. Maybe I have no knowledge of xen, but in later
-> > patch you said your uhva would never change...
+On Wed, Nov 22, 2023 at 01:48:23PM +0100, Christian Brauner wrote:
+> Ever since the evenfd type was introduced back in 2007 in commit
+> e1ad7468c77d ("signal/timer/event: eventfd core") the eventfd_signal()
+> function only ever passed 1 as a value for @n. There's no point in
+> keeping that additional argument.
 > 
-> It doesn't change on a normal refresh with kvm_gpc_refresh(), which is
-> just for revalidation after memslot changes or MMU invalidation.
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
+> ---
+>  arch/x86/kvm/hyperv.c                     |  2 +-
+>  arch/x86/kvm/xen.c                        |  2 +-
+>  drivers/accel/habanalabs/common/device.c  |  2 +-
+>  drivers/fpga/dfl.c                        |  2 +-
+>  drivers/gpu/drm/drm_syncobj.c             |  6 +++---
+>  drivers/gpu/drm/i915/gvt/interrupt.c      |  2 +-
+>  drivers/infiniband/hw/mlx5/devx.c         |  2 +-
+>  drivers/misc/ocxl/file.c                  |  2 +-
+>  drivers/s390/cio/vfio_ccw_chp.c           |  2 +-
+>  drivers/s390/cio/vfio_ccw_drv.c           |  4 ++--
+>  drivers/s390/cio/vfio_ccw_ops.c           |  6 +++---
+>  drivers/s390/crypto/vfio_ap_ops.c         |  2 +-
+>  drivers/usb/gadget/function/f_fs.c        |  4 ++--
+>  drivers/vdpa/vdpa_user/vduse_dev.c        |  6 +++---
+>  drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c    |  2 +-
+>  drivers/vfio/pci/vfio_pci_core.c          |  6 +++---
+>  drivers/vfio/pci/vfio_pci_intrs.c         | 12 ++++++------
+>  drivers/vfio/platform/vfio_platform_irq.c |  4 ++--
+>  drivers/vhost/vdpa.c                      |  4 ++--
+>  drivers/vhost/vhost.c                     | 10 +++++-----
+>  drivers/vhost/vhost.h                     |  2 +-
+>  drivers/virt/acrn/ioeventfd.c             |  2 +-
+>  drivers/xen/privcmd.c                     |  2 +-
+>  fs/aio.c                                  |  2 +-
+>  fs/eventfd.c                              |  9 +++------
+>  include/linux/eventfd.h                   |  4 ++--
+>  mm/memcontrol.c                           | 10 +++++-----
+>  mm/vmpressure.c                           |  2 +-
+>  samples/vfio-mdev/mtty.c                  |  4 ++--
+>  virt/kvm/eventfd.c                        |  4 ++--
+>  30 files changed, 60 insertions(+), 63 deletions(-)
 > 
-> But it can change if the gpc is being reinitialized with a new address
-> (perhaps because the guest has made another hypercall to set the
-> address, etc.)
-> 
-> That new address could happen to be in the *same* page as the previous
+> diff --git a/drivers/fpga/dfl.c b/drivers/fpga/dfl.c
+> index dd7a783d53b5..e73f88050f08 100644
+> --- a/drivers/fpga/dfl.c
+> +++ b/drivers/fpga/dfl.c
+> @@ -1872,7 +1872,7 @@ static irqreturn_t dfl_irq_handler(int irq, void *arg)
+>  {
+>  	struct eventfd_ctx *trigger = arg;
+>  
+> -	eventfd_signal(trigger, 1);
+> +	eventfd_signal(trigger);
 
-In this case, the lower bits of new gpa should be different to gpc->gpa,
-so will hit "if (gpc->gpa != gpa ...)" branch.
+For FPGA part,
 
-And I see this comment is deleted in v9, which makes sense to me.
+Acked-by: Xu Yilun <yilun.xu@intel.com>
 
-Thanks,
-Yilun
-
-> one. In fact the xen_shinfo_test explicitly tests that case, IIRC.
-> 
-> And kvm_gpc_activate() also happens to use __kvm_gpc_refresh()
-> internally.
-
-
+>  	return IRQ_HANDLED;
+>  }
 
