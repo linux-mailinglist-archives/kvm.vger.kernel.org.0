@@ -1,252 +1,205 @@
-Return-Path: <kvm+bounces-2259-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2260-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0F257F4131
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 10:06:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B16877F414C
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 10:13:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F5621C20A1D
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 09:06:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69B0D281887
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 09:13:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEE6A3C6A9;
-	Wed, 22 Nov 2023 09:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74613D966;
+	Wed, 22 Nov 2023 09:12:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B55z53qs"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VF4vhMuB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0940F359B;
-	Wed, 22 Nov 2023 01:05:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700643951; x=1732179951;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ZV4v3ZL1hjdt47vWaLz2wx1T0ywHDaLvuBT2yNfWDQU=;
-  b=B55z53qskeOkgCwg6Bw5mcIQFYNiDa43QuBq+YT7J2QP0fxFggsUtHVk
-   qijMPn1Xl0WwWcxds5zQ6EfibyDXmAtEPkJhN90H8zu3O5oPBQu80Xm9m
-   WWw84ZYyuKV/NUgHfh39xlVvfZ4Ry1ojcsVAWsjnJb+LcDXGEGYsPv7ns
-   ZplRFp3KohJ9g7FkqhWXEs68Ex1uQ11TTd21ShJlfIXvr0tHFgX/kw6w7
-   NstUrpUO2L3aHy5LmkHQwIIDNHzqwa7EZCKG9zbc8n5CspmNgT1LgbDbL
-   lP8K7EB5Luh91pLPEXSj+pChcMdIIAiwNTHYt7tKco9raDiv9Xly5fP7g
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="10678097"
-X-IronPort-AV: E=Sophos;i="6.04,218,1695711600"; 
-   d="scan'208";a="10678097"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2023 01:05:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="832946770"
-X-IronPort-AV: E=Sophos;i="6.04,218,1695711600"; 
-   d="scan'208";a="832946770"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.0.129]) ([10.238.0.129])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2023 01:05:45 -0800
-Message-ID: <376511f8-1d84-41fc-84ad-73d2f0ed3af1@linux.intel.com>
-Date: Wed, 22 Nov 2023 17:05:43 +0800
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B07883;
+	Wed, 22 Nov 2023 01:12:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=5vszG6SjDXixi9YijhHJdp8bl5UsHYIoASdnpdJSC8o=; b=VF4vhMuBLXN9IQj9fZMm6gR4+x
+	3KP2z7AlNUNJSn728uLPyhgZkMnZ2SUQt47eXOubacQjOaI5ag44Vis+5VDBJGwxRPZRgoG0QgXi+
+	2uKK3aCnfRE184r3dEKNGGJxIfvpxzR710xb6GB6xp2SIadPOfsJZSHOXWNYTWCYeGEir4LrQa28Y
+	pUNr5jsUsVOt3ge6Th6LPE9lagTL+YPXgD3HphO7J2EDDJ/JOB20hYL6MoG3UBLCmaeMfwrguJXj/
+	g/Wy1gv0g+FTZeoM6pYozigmPSdEXgan1cXcnrCuNM7ueeiMYVX/tA/sZsDUtx5JbVlF8wrYdia7J
+	n1QZCgiw==;
+Received: from [2001:8b0:10b:5:22b8:d80f:1c9c:f188] (helo=u3832b3a9db3152.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1r5jHP-006O90-M2; Wed, 22 Nov 2023 09:12:19 +0000
+Message-ID: <b6b864e500cbb38f76739fcfb4dcc6e9c6705d0b.camel@infradead.org>
+Subject: Re: [PATCH v8 07/15] KVM: pfncache: include page offset in uhva and
+ use it consistently
+From: David Woodhouse <dwmw2@infradead.org>
+To: Xu Yilun <yilun.xu@linux.intel.com>, Paul Durrant <paul@xen.org>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>,  Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
+ <hpa@zytor.com>,  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Wed, 22 Nov 2023 09:12:18 +0000
+In-Reply-To: <ZV3Bwghwz63LmgMu@yilunxu-OptiPlex-7050>
+References: <20231121180223.12484-1-paul@xen.org>
+	 <20231121180223.12484-8-paul@xen.org>
+	 <ZV3Bwghwz63LmgMu@yilunxu-OptiPlex-7050>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-wSZ6G0f8pDlwWk6j+J/Z"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 15/16] KVM: x86/mmu: Make kvm fault handler aware of
- large page of private memslot
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, David Matlack <dmatlack@google.com>,
- Kai Huang <kai.huang@intel.com>, Zhi Wang <zhi.wang.linux@gmail.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
-References: <cover.1699368363.git.isaku.yamahata@intel.com>
- <075de567893a2b09bdfb203ae7ecd1867e5c3d8e.1699368363.git.isaku.yamahata@intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <075de567893a2b09bdfb203ae7ecd1867e5c3d8e.1699368363.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
+--=-wSZ6G0f8pDlwWk6j+J/Z
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-On 11/7/2023 11:00 PM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> struct kvm_page_fault.req_level is the page level which takes care of the
-> faulted-in page size.  For now its calculation is only for the conventional
-> kvm memslot by host_pfn_mapping_level() that traverses page table.
->
-> However, host_pfn_mapping_level() cannot be used for private kvm memslot
-> because pages of private kvm memlost aren't mapped into user virtual
-> address space.
+T24gV2VkLCAyMDIzLTExLTIyIGF0IDE2OjU0ICswODAwLCBYdSBZaWx1biB3cm90ZToKPiAKPiA+
+IEBAIC0yNTksMTMgKzI1OCwyNSBAQCBzdGF0aWMgaW50IF9fa3ZtX2dwY19yZWZyZXNoKHN0cnVj
+dCBnZm5fdG9fcGZuX2NhY2hlICpncGMsIGdwYV90IGdwYSwKPiA+IMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldCA9IC1FRkFVTFQ7Cj4gPiDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBnb3RvIG91dDsKPiA+IMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgfQo+ID4gKwo+ID4gK8KgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoGh2YV9jaGFuZ2UgPSB0cnVlOwo+ID4gK8KgwqDCoMKgwqDCoMKgfSBl
+bHNlIHsKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAvKgo+ID4gK8KgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIE5vIG5lZWQgdG8gZG8gYW55IHJlLW1hcHBpbmcgaWYg
+dGhlIG9ubHkgdGhpbmcgdGhhdCBoYXMKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgKiBjaGFuZ2VkIGlzIHRoZSBwYWdlIG9mZnNldC4gSnVzdCBwYWdlIGFsaWduIGl0IHRvIGFs
+bG93IHRoZQo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIG5ldyBvZmZzZXQg
+dG8gYmUgYWRkZWQgaW4uCj4gCj4gSSBkb24ndCB1bmRlcnN0YW5kIGhvdyB0aGUgdWh2YSgncyBv
+ZmZzZXQpIGNvdWxkIGJlIGNoYW5nZWQgd2hlbiBib3RoIGdwYSBhbmQKPiBzbG90IGFyZSBub3Qg
+Y2hhbmdlZC4gTWF5YmUgSSBoYXZlIG5vIGtub3dsZWRnZSBvZiB4ZW4sIGJ1dCBpbiBsYXRlcgo+
+IHBhdGNoIHlvdSBzYWlkIHlvdXIgdWh2YSB3b3VsZCBuZXZlciBjaGFuZ2UuLi4KCkl0IGRvZXNu
+J3QgY2hhbmdlIG9uIGEgbm9ybWFsIHJlZnJlc2ggd2l0aCBrdm1fZ3BjX3JlZnJlc2goKSwgd2hp
+Y2ggaXMKanVzdCBmb3IgcmV2YWxpZGF0aW9uIGFmdGVyIG1lbXNsb3QgY2hhbmdlcyBvciBNTVUg
+aW52YWxpZGF0aW9uLgoKQnV0IGl0IGNhbiBjaGFuZ2UgaWYgdGhlIGdwYyBpcyBiZWluZyByZWlu
+aXRpYWxpemVkIHdpdGggYSBuZXcgYWRkcmVzcwoocGVyaGFwcyBiZWNhdXNlIHRoZSBndWVzdCBo
+YXMgbWFkZSBhbm90aGVyIGh5cGVyY2FsbCB0byBzZXQgdGhlCmFkZHJlc3MsIGV0Yy4pCgpUaGF0
+IG5ldyBhZGRyZXNzIGNvdWxkIGhhcHBlbiB0byBiZSBpbiB0aGUgKnNhbWUqIHBhZ2UgYXMgdGhl
+IHByZXZpb3VzCm9uZS4gSW4gZmFjdCB0aGUgeGVuX3NoaW5mb190ZXN0IGV4cGxpY2l0bHkgdGVz
+dHMgdGhhdCBjYXNlLCBJSVJDLgoKQW5kIGt2bV9ncGNfYWN0aXZhdGUoKSBhbHNvIGhhcHBlbnMg
+dG8gdXNlIF9fa3ZtX2dwY19yZWZyZXNoKCkKaW50ZXJuYWxseS4K
 
-The description here is not accurate.  A memslot can be private doesn't mean
-all pages of the memslot can't be mapped into user virtual address space.
 
-> Instead page order is given when getting pfn.  Remember it
-> in struct kvm_page_fault and use it.
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->   arch/x86/kvm/mmu/mmu.c          | 34 +++++++++++++++++----------------
->   arch/x86/kvm/mmu/mmu_internal.h | 12 +++++++++++-
->   arch/x86/kvm/mmu/tdp_mmu.c      |  2 +-
->   3 files changed, 30 insertions(+), 18 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 0bf043812644..0aec7c11f4e2 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3158,10 +3158,10 @@ static int host_pfn_mapping_level(struct kvm *kvm, gfn_t gfn,
->   
->   static int __kvm_mmu_max_mapping_level(struct kvm *kvm,
->   				       const struct kvm_memory_slot *slot,
-> -				       gfn_t gfn, int max_level, bool is_private)
-> +				       gfn_t gfn, int max_level, int host_level,
-> +				       bool is_private)
->   {
->   	struct kvm_lpage_info *linfo;
-> -	int host_level;
->   
->   	max_level = min(max_level, max_huge_page_level);
->   	for ( ; max_level > PG_LEVEL_4K; max_level--) {
-> @@ -3170,24 +3170,23 @@ static int __kvm_mmu_max_mapping_level(struct kvm *kvm,
->   			break;
->   	}
->   
-> -	if (is_private)
-> -		return max_level;
-> -
->   	if (max_level == PG_LEVEL_4K)
->   		return PG_LEVEL_4K;
->   
-> -	host_level = host_pfn_mapping_level(kvm, gfn, slot);
-> +	if (!is_private) {
-> +		WARN_ON_ONCE(host_level != PG_LEVEL_NONE);
-> +		host_level = host_pfn_mapping_level(kvm, gfn, slot);
-> +	}
-> +	WARN_ON_ONCE(host_level == PG_LEVEL_NONE);
->   	return min(host_level, max_level);
->   }
->   
->   int kvm_mmu_max_mapping_level(struct kvm *kvm,
->   			      const struct kvm_memory_slot *slot, gfn_t gfn,
-> -			      int max_level)
-> +			      int max_level, bool faultin_private)
+--=-wSZ6G0f8pDlwWk6j+J/Z
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-When the parameter "faultin_private" is added, the only valid value is
-"false".  If the caller passes in "faultin_private = true", then it 
-would be a
-problem based on this patch.
-It seems meaningless and confusing to introduce the parameter 
-"faultin_private"
-here.
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTIyMDkxMjE4WjAvBgkqhkiG9w0BCQQxIgQgg4spIrie
+bSRMe+2gbq/djSAdO+j0u3SfQb4K7h4xUacwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAbtzdm+AQQO+KdkQGb9JnxUu4aWy5lAG2Z
+cqJxDXMrOmC9XEnHtsNq4PN6SC7hYMPrD41MZu/WvVTvIza6ghgVVUw4kNBVrvrtuT6CFZuQJz+Q
+NgBn6eaaqX1vnEcfBoFD0KAZ+L+/5cBsGINrtOq+w4Q3yCxQG1OwG0dvrvLWwQfBSHMYFbg46NRs
+wYo2gYdP2s5sbvKX4aGVG3QNGW0uD0V9uDQMkm/gsFHHpd2YYZfWtMDlN4a8TVJ+3dE2SuIanSV0
+/SKNM3qUYFlXmCGDAVm6ZIsVW9i4TBnIjBGCnj7+qlmKdv9ocaqVVniRNkGP0jas9FY/hH0Ao14U
+iAjRBvAEQVCm2eAavS1z4AkiZcei9sduXHkOoYz6nnQjiBC5NQdxgaFT8lklC6fQnZOhwVUAANyi
+sbbYSiYN8iS7tucIeKXIQ7JD6mmUZ9vBD29bwU1xQ2gDH3EKFjBlChE7BWbWzGJWq4zd225AJvAI
+wQvXiDq50tPxwD65Se99Axgf9BvElhzRfD4ObsGve6Ttod3De5LJels363WYH2xUynuXbbe3b41Q
+oMh3mXbO3NGz5vSlAEuR7vTouQhxPeXtKftK6XMgd6X1yX8nV/UDyyuJbSxJfSWNEbXHdfEz/Exp
+AhL69gfzsW/mS2peKPLP1U6JW6jE+BDUxTaQ5rWtSgAAAAAAAA==
 
->   {
-> -	bool is_private = kvm_slot_can_be_private(slot) &&
-> -			  kvm_mem_is_private(kvm, gfn);
-> -
-> -	return __kvm_mmu_max_mapping_level(kvm, slot, gfn, max_level, is_private);
-> +	return __kvm_mmu_max_mapping_level(kvm, slot, gfn, max_level,
-> +					   PG_LEVEL_NONE, faultin_private);
->   }
->   
->   void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> @@ -3212,7 +3211,8 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->   	 */
->   	fault->req_level = __kvm_mmu_max_mapping_level(vcpu->kvm, slot,
->   						       fault->gfn, fault->max_level,
-> -						       fault->is_private);
-> +						       fault->host_level,
-> +						       kvm_is_faultin_private(fault));
->   	if (fault->req_level == PG_LEVEL_4K || fault->huge_page_disallowed)
->   		return;
->   
-> @@ -4336,6 +4336,7 @@ static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
->   				   struct kvm_page_fault *fault)
->   {
->   	int max_order, r;
-> +	u8 max_level;
->   
->   	if (!kvm_slot_can_be_private(fault->slot)) {
->   		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> @@ -4349,8 +4350,9 @@ static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
->   		return r;
->   	}
->   
-> -	fault->max_level = min(kvm_max_level_for_order(max_order),
-> -			       fault->max_level);
-> +	max_level = kvm_max_level_for_order(max_order);
-> +	fault->host_level = max_level;
-> +	fault->max_level = min(max_level, fault->max_level);
->   	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
->   
->   	return RET_PF_CONTINUE;
-> @@ -4400,7 +4402,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->   		return -EFAULT;
->   	}
->   
-> -	if (fault->is_private)
-> +	if (kvm_is_faultin_private(fault))
->   		return kvm_faultin_pfn_private(vcpu, fault);
->   
->   	async = false;
-> @@ -6809,7 +6811,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
->   		 */
->   		if (sp->role.direct &&
->   		    sp->role.level < kvm_mmu_max_mapping_level(kvm, slot, sp->gfn,
-> -							       PG_LEVEL_NUM)) {
-> +							       PG_LEVEL_NUM, false)) {
->   			kvm_zap_one_rmap_spte(kvm, rmap_head, sptep);
->   
->   			if (kvm_available_flush_remote_tlbs_range())
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index 653e96769956..6b540a10fd67 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -357,6 +357,9 @@ struct kvm_page_fault {
->   	 * is changing its own translation in the guest page tables.
->   	 */
->   	bool write_fault_to_shadow_pgtable;
-> +
-> +	/* valid only for private memslot && private gfn */
-> +	enum pg_level host_level;
->   };
->   
->   int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
-> @@ -451,7 +454,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->   
->   int kvm_mmu_max_mapping_level(struct kvm *kvm,
->   			      const struct kvm_memory_slot *slot, gfn_t gfn,
-> -			      int max_level);
-> +			      int max_level, bool faultin_private);
->   void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
->   void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_level);
->   
-> @@ -469,4 +472,11 @@ static inline bool kvm_hugepage_test_mixed(struct kvm_memory_slot *slot, gfn_t g
->   }
->   #endif
->   
-> +static inline bool kvm_is_faultin_private(const struct kvm_page_fault *fault)
-> +{
-> +	if (IS_ENABLED(CONFIG_KVM_GENERIC_PRIVATE_MEM))
-> +		return fault->is_private && kvm_slot_can_be_private(fault->slot);
-> +	return false;
-> +}
-> +
->   #endif /* __KVM_X86_MMU_INTERNAL_H */
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index c8a4bd052c71..173e4e9053fc 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -2179,7 +2179,7 @@ static void zap_collapsible_spte_range(struct kvm *kvm,
->   			continue;
->   
->   		max_mapping_level = kvm_mmu_max_mapping_level(kvm, slot,
-> -							      iter.gfn, PG_LEVEL_NUM);
-> +							      iter.gfn, PG_LEVEL_NUM, false);
->   		if (max_mapping_level < iter.level)
->   			continue;
->   
 
+--=-wSZ6G0f8pDlwWk6j+J/Z--
 
