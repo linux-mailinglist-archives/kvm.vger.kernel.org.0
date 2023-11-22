@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-2286-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2287-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED0D67F4638
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 13:30:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A3E37F463A
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 13:30:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71A92B2150C
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 12:30:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAE281C208CE
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 12:30:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 803D84D10C;
-	Wed, 22 Nov 2023 12:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FA44D11B;
+	Wed, 22 Nov 2023 12:29:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="URgiJM1t"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pg10GX2M"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3A37D77
-	for <kvm@vger.kernel.org>; Wed, 22 Nov 2023 04:27:55 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC25DD49
+	for <kvm@vger.kernel.org>; Wed, 22 Nov 2023 04:28:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700656075;
+	s=mimecast20190719; t=1700656094;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=kmeuOzatoB1VqjaoCkk5gWbxDgJvHLvoGt5Dq0KUC0Y=;
-	b=URgiJM1t/v3ai9lB+Utp1rcXBm1bZGkWgEM7Zcjr1IfbN+M3LTPg/zyQLma/lCvpf5LLIl
-	in/qHb2fj9y/aCCOLe9M9khn4kiJV6yn4w3dahUUCJG3CUi8ViURBq4CnH4bqUFfJ+8e0y
-	ggmcu/QgBITr3jpc14YwhBjXIbrrmvQ=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Pp2Gl0KW/Z+RCwOCfi+t86YZ332edwSLaDVYN3g/iXw=;
+	b=Pg10GX2MQkxvtevPotscnisOzUilPewWxfSZK2jFB1tY9e7dNTD42JxGShPYruh3qAca3e
+	gYtczdr+wGiMCkZenuMedo8pzEfZwoqGMxa6bFU0F81csIhv/tXbW9eAeiUzkAf7ie3UYx
+	9xFuQdOd7EM9LQdjblrUW5CobexDL7Y=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-534-_CyGwGx5M6icb1v2a3wT4Q-1; Wed, 22 Nov 2023 07:27:53 -0500
-X-MC-Unique: _CyGwGx5M6icb1v2a3wT4Q-1
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-58a1037ab81so7866386eaf.1
-        for <kvm@vger.kernel.org>; Wed, 22 Nov 2023 04:27:53 -0800 (PST)
+ us-mta-656-qcCoG8k9NGeNT-vG6jzCrA-1; Wed, 22 Nov 2023 07:28:12 -0500
+X-MC-Unique: qcCoG8k9NGeNT-vG6jzCrA-1
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-421ad98a611so92459521cf.3
+        for <kvm@vger.kernel.org>; Wed, 22 Nov 2023 04:28:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700656073; x=1701260873;
+        d=1e100.net; s=20230601; t=1700656092; x=1701260892;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kmeuOzatoB1VqjaoCkk5gWbxDgJvHLvoGt5Dq0KUC0Y=;
-        b=e5gzHarn8kIm7qdiGzAXmux+lY8jn/TJqgqvNgUNqCp7oYaw0KKXyGbBh0cM2D6P8i
-         6C3O3ApKSrXmPSb886ka5AskOzQnFWhoq7/3fbJO5zsCBzeYen3OnbNbsCmvjsbBNVyi
-         cEWH5UykijzZDOwjjvDKGrKXOIyRLKSG8QtOESNIRm/sbFRVrONB3XOQLHLD8ViVVQ5H
-         QhOpcMa1hCL/nHCo9vRF3rEg4/fyhgFsxJG4adJidCQp7dDavsx6NcXhch1IZoobgVtX
-         ktao8ToJKo9LcIamreb17FBZjPD8bksKRJZY0GfBKKgzb8i2ujL1Mv1toKN7UhbQcWVz
-         fKOA==
-X-Gm-Message-State: AOJu0YwRuozraxmeTvv5xGDi7mPGebyllGdHTSyqLc1kvqQpGi5PNJnB
-	zYNUerYz63sIouEda5W9NYCglLqdY8uy+JvWbnlN1gdEnHb1GCVvMUo1MitbRHYDI6nqeA18v75
-	JBXdhhcNvOuP1
-X-Received: by 2002:a05:6358:e4a4:b0:168:e26c:e91 with SMTP id by36-20020a056358e4a400b00168e26c0e91mr1667633rwb.20.1700656072971;
-        Wed, 22 Nov 2023 04:27:52 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEcFakwmqelUwIBZ1frDhXsoJ5VQce3Al66w5TP0n7saU167RvBMhcY6Q2eMA3qnC87hhoOTA==
-X-Received: by 2002:a05:6358:e4a4:b0:168:e26c:e91 with SMTP id by36-20020a056358e4a400b00168e26c0e91mr1667616rwb.20.1700656072690;
-        Wed, 22 Nov 2023 04:27:52 -0800 (PST)
+        bh=Pp2Gl0KW/Z+RCwOCfi+t86YZ332edwSLaDVYN3g/iXw=;
+        b=LxIZPW5dT3u2yxpqlYcLfLLMDetPv5HJq71uQXYVZLsnTYueumki5PzKxZN3aqgO2+
+         s1phfo+rxFc3GwrviABZhmJ6EONGn4oPGu6DHs7Nig2cMpkFK/jxRASyLa3GtVed01Gp
+         ibCzPDRDVr4rXntaNM+aCDPM842AX9wWrp5ahe+keAN97NvbZ8s2f7l7l6EyStDxCRVu
+         LuTXoMF5+N9nxGB0lIcG8a2gAXd+lbJtIOG0s2/m2mI/x4jEaDutx6rnkc89zypdnM5M
+         zG1hrt+X9raOhz9VZ2lG482OGZER92viOM4JKkdLeNKixia8kLBhw40NmVPl35j9SFoH
+         lhPg==
+X-Gm-Message-State: AOJu0Yylvafnct+EyfUkZ4ySaI7vpqvQQqgISlFW6h44Fu13pDAAX5kO
+	QHX0zHS5EuMuSO7Ra7i4UZgIqqSUtqcVV4bHAN/1m81TAKJRBDUvaPSqjnO4kLIeQtY5CvmBZqQ
+	NGakNRxTPKpD8
+X-Received: by 2002:a05:622a:182:b0:417:d1e7:5e9b with SMTP id s2-20020a05622a018200b00417d1e75e9bmr2519178qtw.26.1700656092302;
+        Wed, 22 Nov 2023 04:28:12 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGkWZVlwxpwbltKov8aew6gvbeG9Z+bN1qxoZu1nP6o4i5VCj8FFaTMnyX9iSu0lnbCDqaZqg==
+X-Received: by 2002:a05:622a:182:b0:417:d1e7:5e9b with SMTP id s2-20020a05622a018200b00417d1e75e9bmr2519165qtw.26.1700656092090;
+        Wed, 22 Nov 2023 04:28:12 -0800 (PST)
 Received: from [192.168.0.6] (ip-109-43-176-233.web.vodafone.de. [109.43.176.233])
-        by smtp.gmail.com with ESMTPSA id j1-20020ac874c1000000b0041eef6cacf4sm4384258qtr.81.2023.11.22.04.27.50
+        by smtp.gmail.com with ESMTPSA id j1-20020ac874c1000000b0041eef6cacf4sm4384258qtr.81.2023.11.22.04.28.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Nov 2023 04:27:52 -0800 (PST)
-Message-ID: <7e0e662f-7980-4986-9524-2853a0cf075d@redhat.com>
-Date: Wed, 22 Nov 2023 13:27:49 +0100
+        Wed, 22 Nov 2023 04:28:11 -0800 (PST)
+Message-ID: <faea955a-5ef3-42ac-b39a-6e074dd296f4@redhat.com>
+Date: Wed, 22 Nov 2023 13:28:09 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,15 +68,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v1 01/10] make: add target to check
- kernel-doc comments
+Subject: Re: [kvm-unit-tests PATCH v1 02/10] powerpc: properly format
+ non-kernel-doc comments
 Content-Language: en-US
 To: Nico Boehr <nrb@linux.ibm.com>, frankja@linux.ibm.com,
  imbrenda@linux.ibm.com, david@redhat.com, pbonzini@redhat.com,
  andrew.jones@linux.dev, lvivier@redhat.com
 Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
 References: <20231106125352.859992-1-nrb@linux.ibm.com>
- <20231106125352.859992-2-nrb@linux.ibm.com>
+ <20231106125352.859992-3-nrb@linux.ibm.com>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -120,24 +120,22 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20231106125352.859992-2-nrb@linux.ibm.com>
+In-Reply-To: <20231106125352.859992-3-nrb@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 06/11/2023 13.50, Nico Boehr wrote:
-> When we have a kernel-doc comment, it should be properly formatted.
-> Since this is a task that can be easily automated, add a new target
-> which checks all comments for proper kernel-doc formatting.
-> 
-> The kernel-doc script is copied as-is from the Linux kernel.
+> These comments do not follow the kernel-doc style, hence they should not
+> start with /**.
 > 
 > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 > ---
->   Makefile           |    3 +
->   scripts/kernel-doc | 2526 ++++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 2529 insertions(+)
->   create mode 100755 scripts/kernel-doc
+>   powerpc/emulator.c    | 2 +-
+>   powerpc/spapr_hcall.c | 6 +++---
+>   powerpc/spapr_vpa.c   | 4 ++--
+>   3 files changed, 6 insertions(+), 6 deletions(-)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+
 
 
