@@ -1,184 +1,151 @@
-Return-Path: <kvm+bounces-2261-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2262-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A51C77F416A
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 10:16:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A53737F41AA
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 10:30:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A36E61C2097D
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 09:16:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB79CB20E1E
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 09:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE213D997;
-	Wed, 22 Nov 2023 09:16:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9318851025;
+	Wed, 22 Nov 2023 09:29:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QxdhiCdX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gXA9XZLE"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 370ABD6E
-	for <kvm@vger.kernel.org>; Wed, 22 Nov 2023 01:16:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700644584;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FvqBK0UZREQjTEFtoe+8dwMEyfkRZhPHhHrOq6zH23k=;
-	b=QxdhiCdX+e0UpV1YnY6TtkSow4lX4tk6dqXpuVpQEwF4jiY0B7v8eLSl4uhEIHcCJoHYRJ
-	+k04dECEeNXJorWvZDjBhJ4zIBT/ha8l+s8SEJ5D8TMvKi4r2eOMTMr2Giz3zja8kkALPq
-	JLDwCzkOhUtgeH+fKnwOjwQLmcz6aWA=
-Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
- [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-645-spQKja0vPW-WwOKBimsUSg-1; Wed, 22 Nov 2023 04:16:22 -0500
-X-MC-Unique: spQKja0vPW-WwOKBimsUSg-1
-Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-5c59fa94f72so96286117b3.2
-        for <kvm@vger.kernel.org>; Wed, 22 Nov 2023 01:16:22 -0800 (PST)
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36B41BC;
+	Wed, 22 Nov 2023 01:29:49 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-332cc1f176bso1534251f8f.2;
+        Wed, 22 Nov 2023 01:29:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700645388; x=1701250188; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:references:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/Y7pziT/im3f9dxtYQCJMHC7zXrzbkMaL6w7pi5WdK0=;
+        b=gXA9XZLE7XQqIQxgVi4GVH7tXRyNgxW+IHwQHBWJKkVgEsO31wGqBX3Y5aGtp8vDLS
+         gOGS33ZCI0cwbTAvgZ9RfYryfaemYECXM0EO8RgnHbN70YosedY9dTclv9Dc6FrZjLmJ
+         vjaLI4SnhCGfR8JVf3kpoJ9Qlo/qGsLeX13XOPRZQkC+9NFfwSl1HX8QYzPNPHX75hrT
+         AFTMc/PZUfmdGJ2hfFE6JFrddBJl/gn2yCyaBX4ZQcUzfSFcOystgjHZk1nRCvwg005u
+         Q2sH8cFAGcnjyBlPQMEE/7s7yQIY8MHzaWGpW3zVpCXos20Pca1S2q4nZ2KUfXkIMH5J
+         g7mA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700644582; x=1701249382;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1700645388; x=1701250188;
+        h=content-transfer-encoding:in-reply-to:organization:references:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FvqBK0UZREQjTEFtoe+8dwMEyfkRZhPHhHrOq6zH23k=;
-        b=kUqewK7R+lwQz0c7z9sPjeGnZFBpDzyoda+6jP95AGXBpY0JaiWde7EBiVT21LTuTj
-         F93hEqFSTsXd15z8/CyAD9Gn5l/SZH08Hvy7LfBBHVQGiY81uvh4556HPsI1zqoIWezR
-         /nL73eH18PizjdikWwbY2DKQB2vxEQ9yTYmutH9JWA2dzMPE6ADbvoYgL5oBSyGZMPnn
-         DUJDq1MjYTJXBHjnVYjRmL/48elYZGNJP98lwtvWsSLgqKb+19xUfaNjtv+olNdxPoRk
-         JfjsJ3G/9XPRWd4MAlqBcD4BmLRBSK4eIncL2G0Fy7mQ7QN+maOL9VMtoqa7hffgtANC
-         giOw==
-X-Gm-Message-State: AOJu0YzqtX5mEuhDT+P+xu6VaXATCo7sn+GKSb1nlW0XZTbL7G5iQifT
-	eG1vPKA+SGeJ2rK0NloIVi7gCKWFl2RQSA08aWz6bvDscjS37vd5NMa2P4U6sbwHCqKxhqGCT4n
-	Qnr1cYPpVHsEj
-X-Received: by 2002:a25:e812:0:b0:daf:81e5:d2fa with SMTP id k18-20020a25e812000000b00daf81e5d2famr1645688ybd.33.1700644582105;
-        Wed, 22 Nov 2023 01:16:22 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFgjChf8tYk5WRQhvlQx17JS9JtaEmIgWhz74vAPdVRs7d7DxN/bnfe4x0/ngk4fEhGpNP7Bw==
-X-Received: by 2002:a25:e812:0:b0:daf:81e5:d2fa with SMTP id k18-20020a25e812000000b00daf81e5d2famr1645672ybd.33.1700644581817;
-        Wed, 22 Nov 2023 01:16:21 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-199.retail.telecomitalia.it. [79.46.200.199])
-        by smtp.gmail.com with ESMTPSA id qd24-20020ad44818000000b0065b21b232bfsm4711765qvb.138.2023.11.22.01.16.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Nov 2023 01:16:21 -0800 (PST)
-Date: Wed, 22 Nov 2023 10:16:14 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com, Bogdan Marcynkov <bmarcynk@redhat.com>
-Subject: Re: [PATCH net v1] vsock/test: fix SEQPACKET message bounds test
-Message-ID: <zoq32fkokk2ygtiabxgf74xu6vkfdynrlfzdqguh67qlogzd7j@qfd57sgudzpw>
-References: <20231121211642.163474-1-avkrasnov@salutedevices.com>
+        bh=/Y7pziT/im3f9dxtYQCJMHC7zXrzbkMaL6w7pi5WdK0=;
+        b=qtWyXh8ldX3Gole7RqVKcioFveYXgy84eMNMdajO/AfGDXErEVKhVOVVDXI8HEyuPp
+         SlNZf/GetGjSMzvZoxs+XJkCiQshg0yC/mcYmqKASwwjxQBiOm7ZnmiJlxGBb8nVcVEt
+         W85dAGX363B+nhT0UCVKWXhgzk7TNRRpoDA6plZAxEHLTURbfk8ll6/KzNIOmWIRAgqV
+         kMyeVKSDqO+crMDYlZ5F39W4mpAG0o/+LDmeVicI5HFH8gy234bZcU644QnElBqNiI82
+         UMJ6xWcW/gCeYMjZQsl4pi+rkCxNpfUYlCY48CUgNa7/FHIpN1CQylEAumoUpQURnCnd
+         0ldA==
+X-Gm-Message-State: AOJu0YykFKiQUFx4IF0esdq5T/egZYzI68DUDwx2cCJt+aKzHYRGuhky
+	YQyeDFXsFO6BLIua8rFO3Gw=
+X-Google-Smtp-Source: AGHT+IFmXzlEZVX0HMLcecziO/y9I+ie+riau/sstICRrqvumuVD83HR2onj79fdwWLIWF25eUhVyg==
+X-Received: by 2002:a5d:5c0c:0:b0:32d:9a17:2a72 with SMTP id cc12-20020a5d5c0c000000b0032d9a172a72mr1724308wrb.55.1700645387853;
+        Wed, 22 Nov 2023 01:29:47 -0800 (PST)
+Received: from [10.95.134.92] (54-240-197-234.amazon.com. [54.240.197.234])
+        by smtp.gmail.com with ESMTPSA id m3-20020adffa03000000b00323293bd023sm16628792wrr.6.2023.11.22.01.29.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Nov 2023 01:29:47 -0800 (PST)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <04530097-a3b2-4acf-bf41-fba48143d4e1@xen.org>
+Date: Wed, 22 Nov 2023 09:29:46 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20231121211642.163474-1-avkrasnov@salutedevices.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH v8 07/15] KVM: pfncache: include page offset in uhva and
+ use it consistently
+Content-Language: en-US
+To: David Woodhouse <dwmw2@infradead.org>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231121180223.12484-1-paul@xen.org>
+ <20231121180223.12484-8-paul@xen.org>
+ <5ffdf3ab49b047cd851289e5dc0697af0ffff45f.camel@infradead.org>
+Organization: Xen Project
+In-Reply-To: <5ffdf3ab49b047cd851289e5dc0697af0ffff45f.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 22, 2023 at 12:16:42AM +0300, Arseniy Krasnov wrote:
->Tune message length calculation to make this test work on machines
->where 'getpagesize()' returns >32KB. Now maximum message length is not
->hardcoded (on machines above it was smaller than 'getpagesize()' return
->value, thus we get negative value and test fails), but calculated at
->runtime and always bigger than 'getpagesize()' result. Reproduced on
->aarch64 with 64KB page size.
+On 21/11/2023 22:35, David Woodhouse wrote:
+> On Tue, 2023-11-21 at 18:02 +0000, Paul Durrant wrote:
+>> @@ -242,8 +242,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa,
+>>          }
+>>   
+>>          old_pfn = gpc->pfn;
+>> -       old_khva = gpc->khva - offset_in_page(gpc->khva);
+>> -       old_uhva = gpc->uhva;
+>> +       old_khva = (void *)PAGE_ALIGN_DOWN((uintptr_t)gpc->khva);
+>>   
+>>          /* If the userspace HVA is invalid, refresh that first */
+>>          if (gpc->gpa != gpa || gpc->generation != slots->generation ||
+>> @@ -259,13 +258,25 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa,
+>>                          ret = -EFAULT;
+>>                          goto out;
+>>                  }
+> 
+> 
+> There's a subtle behaviour change here, isn't there? I'd *really* like
+> you do say 'No functional change intended' where that is true, and then
+> the absence of that sentence in this one would be meaningful.
+> 
+> You are now calling hva_to_pfn_retry() even when the uhva page hasn't
+> changed. Which is harmless and probably not important, but IIUC fixable
+> by the addition of:
+> 
+>   +              if (gpc->uhva != PAGE_ALIGN_DOWN(old_uhva))
 
-It was reported to me by Bogdan, so we can add:
+True; I can keep that optimization and then I will indeed add 'no 
+functional change'... Didn't seem worth it at the time, but no harm.
 
-Reported-by: Bogdan Marcynkov <bmarcynk@redhat.com>
+>> +               hva_change = true;
+>> +       } else {
+>> +               /*
+>> +                * No need to do any re-mapping if the only thing that has
+>> +                * changed is the page offset. Just page align it to allow the
+>> +                * new offset to be added in.
+>> +                */
+>> +               gpc->uhva = PAGE_ALIGN_DOWN(gpc->uhva);
+>>          }
+>>   
+>> +       /* Note: the offset must be correct before calling hva_to_pfn_retry() */
+>> +       gpc->uhva += page_offset;
+>> +
+>>          /*
+>>           * If the userspace HVA changed or the PFN was already invalid,
+>>           * drop the lock and do the HVA to PFN lookup again.
+>>           */
+>> -       if (!gpc->valid || old_uhva != gpc->uhva) {
+>> +       if (!gpc->valid || hva_change) {
+>>                  ret = hva_to_pfn_retry(gpc);
+>>          } else {
+>>                  /*
+>> -- 
+> 
+> But I don't really think it's that important if you can come up with a
+> coherent justification for the change and note it in the commit
+> message. So either way:
+> 
+> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
->
->Fixes: 5c338112e48a ("test/vsock: rework message bounds test")
->Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->---
-> tools/testing/vsock/vsock_test.c | 19 +++++++++++++------
-> 1 file changed, 13 insertions(+), 6 deletions(-)
+Thanks,
 
-The fix LGTM and it worked on aarch64 machine.
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
-Thanks for the fast fix!
-Stefano
-
->
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index f5623b8d76b7..691e44c746bf 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -353,11 +353,12 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
-> }
->
-> #define SOCK_BUF_SIZE (2 * 1024 * 1024)
->-#define MAX_MSG_SIZE (32 * 1024)
->+#define MAX_MSG_PAGES 4
->
-> static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
-> {
-> 	unsigned long curr_hash;
->+	size_t max_msg_size;
-> 	int page_size;
-> 	int msg_count;
-> 	int fd;
->@@ -373,7 +374,8 @@ static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
->
-> 	curr_hash = 0;
-> 	page_size = getpagesize();
->-	msg_count = SOCK_BUF_SIZE / MAX_MSG_SIZE;
->+	max_msg_size = MAX_MSG_PAGES * page_size;
->+	msg_count = SOCK_BUF_SIZE / max_msg_size;
->
-> 	for (int i = 0; i < msg_count; i++) {
-> 		size_t buf_size;
->@@ -383,7 +385,7 @@ static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
-> 		/* Use "small" buffers and "big" buffers. */
-> 		if (i & 1)
-> 			buf_size = page_size +
->-					(rand() % (MAX_MSG_SIZE - page_size));
->+					(rand() % (max_msg_size - page_size));
-> 		else
-> 			buf_size = 1 + (rand() % page_size);
->
->@@ -429,7 +431,6 @@ static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
-> 	unsigned long remote_hash;
-> 	unsigned long curr_hash;
-> 	int fd;
->-	char buf[MAX_MSG_SIZE];
-> 	struct msghdr msg = {0};
-> 	struct iovec iov = {0};
->
->@@ -457,8 +458,13 @@ static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
-> 	control_writeln("SRVREADY");
-> 	/* Wait, until peer sends whole data. */
-> 	control_expectln("SENDDONE");
->-	iov.iov_base = buf;
->-	iov.iov_len = sizeof(buf);
->+	iov.iov_len = MAX_MSG_PAGES * getpagesize();
->+	iov.iov_base = malloc(iov.iov_len);
->+	if (!iov.iov_base) {
->+		perror("malloc");
->+		exit(EXIT_FAILURE);
->+	}
->+
-> 	msg.msg_iov = &iov;
-> 	msg.msg_iovlen = 1;
->
->@@ -483,6 +489,7 @@ static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
-> 		curr_hash += hash_djb2(msg.msg_iov[0].iov_base, recv_size);
-> 	}
->
->+	free(iov.iov_base);
-> 	close(fd);
-> 	remote_hash = control_readulong();
->
->-- 
->2.25.1
->
-
+   Paul
 
