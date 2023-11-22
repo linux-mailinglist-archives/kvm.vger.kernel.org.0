@@ -1,49 +1,48 @@
-Return-Path: <kvm+bounces-2241-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2242-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED7087F3BB5
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 03:19:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 846867F3BD0
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 03:36:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EDF9282AC7
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 02:19:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B66041C21093
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 02:36:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79CA18820;
-	Wed, 22 Nov 2023 02:19:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB41B8BE6;
+	Wed, 22 Nov 2023 02:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WzOZbcCQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DaEkRuTS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6DC7199;
-	Tue, 21 Nov 2023 18:18:54 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98242195;
+	Tue, 21 Nov 2023 18:36:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700619534; x=1732155534;
-  h=message-id:date:mime-version:subject:to:cc:references:
+  t=1700620604; x=1732156604;
+  h=message-id:date:mime-version:cc:subject:to:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=5o3KNyQ2NXiGAxcrlOf8yoPEXAyka3WGVL/Jm+8LiCw=;
-  b=WzOZbcCQD5kbdf8jVI3zoL37D+QcXO4ScNLedng71Ch6cuZdvUoXCdPi
-   NU4I89CRHFzU0uz2tHxxEza8qR5TK+JW2svqyZrE/b0ZmtKixnhZSEUK0
-   KBBlOB5lUJwrK1bj025/Mmu3w6EK6jVbODjDTq7xxxgz0k8M+w7CNopZ1
-   6jWFS5rS4ucGwzXfE5Kw1wnpUx38Djd8QEVhrYn64leror0hB5gAkDEh0
-   UEiDXVAZTi0THwAE6ZIB+vvJGZmbNvg23BgkcxY1qYXgEi3K/ytIWgpE8
-   liv1zMqTRhAk1uHtEZzHK6t0s1XHpAKCJBbWY5N6HAJ0VktrwRv2nAjST
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="395886240"
+  bh=XpeZeMNRKx6fjfNcJza/391hB0gfEObFGgA1WhB5A6k=;
+  b=DaEkRuTSS80XQxpWLqayarWDCR1gJwvwKfQGR5aTwKLm01QDG3baPoID
+   CWZ5zyU77eT5/DnZMCsyyez9DtKAAq+YyUJCOxEo2iheaUFW0CNfQkaI2
+   iAnujYSmWlgs3dpJfpkQQbQLr6FSs+mI22BN0Aq9kYskNx2y2Ov8ho/kg
+   VUQnucWC1I6L/Bjg4tH6JB8xqa/0/twgpovdLMq/v9VBWhmUcGEustbv7
+   ky/jEk7JzJd4AjA4bFLzTbPI3B9Hx/tbagG5zR1+x42zBOSmcct9Ic2lK
+   r1SlTJvuWiMKuioZJVnEI19i1AsTJFusr1NlQKnq2H+mYEfTIQJ58LTTs
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="394804919"
 X-IronPort-AV: E=Sophos;i="6.04,217,1695711600"; 
-   d="scan'208";a="395886240"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 18:18:54 -0800
+   d="scan'208";a="394804919"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 18:36:43 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="760292891"
 X-IronPort-AV: E=Sophos;i="6.04,217,1695711600"; 
-   d="scan'208";a="760292891"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.126]) ([10.238.10.126])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 18:18:50 -0800
-Message-ID: <9810c96a-2156-4653-8055-701c0744528c@linux.intel.com>
-Date: Wed, 22 Nov 2023 10:18:47 +0800
+   d="scan'208";a="8289961"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
+  by fmviesa002.fm.intel.com with ESMTP; 21 Nov 2023 18:36:38 -0800
+Message-ID: <f5b27724-7c86-4823-ae86-76c92a2760b4@linux.intel.com>
+Date: Wed, 22 Nov 2023 10:32:18 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -51,168 +50,105 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 11/16] KVM: x86/tdp_mmu: Split the large page when zap
- leaf
-To: Isaku Yamahata <isaku.yamahata@linux.intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
- Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
- Sean Christopherson <seanjc@google.com>, Sagi Shahar <sagis@google.com>,
- David Matlack <dmatlack@google.com>, Kai Huang <kai.huang@intel.com>,
- Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com, hang.yuan@intel.com,
- tina.zhang@intel.com, Xiaoyao Li <xiaoyao.li@intel.com>
-References: <cover.1699368363.git.isaku.yamahata@intel.com>
- <8b43a9203c34b5330c4ea5901da5dac3458ac98d.1699368363.git.isaku.yamahata@intel.com>
- <5d9aadbd-975b-4c4d-ba18-ac6e0fb07ba1@linux.intel.com>
- <20231121110045.GH1109547@ls.amr.corp.intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20231121110045.GH1109547@ls.amr.corp.intel.com>
+Cc: baolu.lu@linux.intel.com, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "joro@8bytes.org" <joro@8bytes.org>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "robin.murphy@arm.com" <robin.murphy@arm.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+ "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+ "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+ "peterx@redhat.com" <peterx@redhat.com>,
+ "jasowang@redhat.com" <jasowang@redhat.com>,
+ "shameerali.kolothum.thodi@huawei.com"
+ <shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
+ "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+ "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+ "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+ "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v7 1/3] iommufd: Add data structure for Intel VT-d stage-1
+ cache invalidation
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@nvidia.com>, "Tian, Kevin" <kevin.tian@intel.com>
+References: <20231117131816.24359-1-yi.l.liu@intel.com>
+ <20231117131816.24359-2-yi.l.liu@intel.com>
+ <BN9PR11MB52761D7A88BB2F655355A7728CB4A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20231120230451.GD6083@nvidia.com>
+ <BN9PR11MB5276EF10FCE9C96F593696E18CBBA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20231121121704.GE6083@nvidia.com>
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20231121121704.GE6083@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-
-
-On 11/21/2023 7:00 PM, Isaku Yamahata wrote:
-> On Tue, Nov 21, 2023 at 05:57:28PM +0800,
-> Binbin Wu <binbin.wu@linux.intel.com> wrote:
->
->>> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
->>> index 7873e9ee82ad..a209a67decae 100644
->>> --- a/arch/x86/kvm/mmu/tdp_mmu.c
->>> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
->>> @@ -964,6 +964,14 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
->>>    	return true;
->>>    }
->>> +
->>> +static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
->>> +						       struct tdp_iter *iter,
->>> +						       bool shared);
->>> +
->>> +static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
->>> +				   struct kvm_mmu_page *sp, bool shared);
->>> +
->>>    /*
->>>     * If can_yield is true, will release the MMU lock and reschedule if the
->>>     * scheduler needs the CPU or there is contention on the MMU lock. If this
->>> @@ -975,13 +983,15 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
->>>    			      gfn_t start, gfn_t end, bool can_yield, bool flush,
->>>    			      bool zap_private)
->>>    {
->>> +	bool is_private = is_private_sp(root);
->>> +	struct kvm_mmu_page *split_sp = NULL;
->>>    	struct tdp_iter iter;
->>>    	end = min(end, tdp_mmu_max_gfn_exclusive());
->>>    	lockdep_assert_held_write(&kvm->mmu_lock);
->>> -	WARN_ON_ONCE(zap_private && !is_private_sp(root));
->>> +	WARN_ON_ONCE(zap_private && !is_private);
->>>    	if (!zap_private && is_private_sp(root))
->> Can use is_private instead of is_private_sp(root) here as well.
-> I'll update it.
->
->>>    		return false;
->>> @@ -1006,12 +1016,66 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
->>>    		    !is_last_spte(iter.old_spte, iter.level))
->>>    			continue;
->>> +		if (is_private && kvm_gfn_shared_mask(kvm) &&
->>> +		    is_large_pte(iter.old_spte)) {
->>> +			gfn_t gfn = iter.gfn & ~kvm_gfn_shared_mask(kvm);
->>> +			gfn_t mask = KVM_PAGES_PER_HPAGE(iter.level) - 1;
->>> +			struct kvm_memory_slot *slot;
->>> +			struct kvm_mmu_page *sp;
->>> +
->>> +			slot = gfn_to_memslot(kvm, gfn);
->>> +			if (kvm_hugepage_test_mixed(slot, gfn, iter.level) ||
->>> +			    (gfn & mask) < start ||
->>> +			    end < (gfn & mask) + KVM_PAGES_PER_HPAGE(iter.level)) {
->>> +				WARN_ON_ONCE(!can_yield);
->>> +				if (split_sp) {
->>> +					sp = split_sp;
->>> +					split_sp = NULL;
->>> +					sp->role = tdp_iter_child_role(&iter);
->>> +				} else {
->>> +					WARN_ON(iter.yielded);
->>> +					if (flush && can_yield) {
->>> +						kvm_flush_remote_tlbs(kvm);
->>> +						flush = false;
->>> +					}
->> Is it necessary to do the flush here?
-> Because tdp_mmu_alloc_sp_for_split() may unlock mmu_lock and block.
-> While blocking, other thread operates on KVM MMU and gets confused due to
-> remaining TLB cache.
->
->
->>> +					sp = tdp_mmu_alloc_sp_for_split(kvm, &iter, false);
->>> +					if (iter.yielded) {
->>> +						split_sp = sp;
->>> +						continue;
->>> +					}
->>> +				}
->>> +				KVM_BUG_ON(!sp, kvm);
->>> +
->>> +				tdp_mmu_init_sp(sp, iter.sptep, iter.gfn);
->>> +				if (tdp_mmu_split_huge_page(kvm, &iter, sp, false)) {
->>> +					kvm_flush_remote_tlbs(kvm);
->>> +					flush = false;
->> Why it needs to flush TLB immediately if tdp_mmu_split_huge_page() fails?
-> Hmm, we don't need it.  When breaking up page table, we need to tlb flush
-> before issuing TDH.MEM.PAGE.DEMOTE(), not after it.  Will remove those two lines.
->
->
->> Also, when KVM MMU write lock is held, it seems tdp_mmu_split_huge_page()
->> will not fail.
-> This can happen with TDX_OPERAND_BUSY with secure-ept tree lock with other
-> vcpus TDH.VP.ENTER(). TDH.VP.ENTER() can take exclusive lock of secure-EPT.
->
->
->> But let's assume this condition can be triggered, since sp is
->> local
->> variable, it will lost its value after continue, and split_sp is also NULL,
->> it will try to allocate a new sp, memory leakage here?
-> Nice catch. I'll add split_sp = sp;
->
->
->>> +					/* force retry on this gfn. */
->>> +					iter.yielded = true;
->>> +				} else
->>> +					flush = true;
->>> +				continue;
->>> +			}
->>> +		}
->>> +
->>>    		tdp_mmu_iter_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
->>>    		flush = true;
->>>    	}
->>>    	rcu_read_unlock();
->>> +	if (split_sp) {
->>> +		WARN_ON(!can_yield);
->>> +		if (flush) {
->>> +			kvm_flush_remote_tlbs(kvm);
->>> +			flush = false;
->>> +		}
->> Same here, why we need to do the flush here?
->> Can we delay it till the caller do the flush?
-> No. Because we unlock mmu_lock and may block when freeing memory.
-But I don't find it may block during freeing memory.
-Did I miss anything?
-
-
->
->>> +
->>> +		write_unlock(&kvm->mmu_lock);
->>> +		tdp_mmu_free_sp(split_sp);
->>> +		write_lock(&kvm->mmu_lock);
->>> +	}
->>> +
->>>    	/*
->>>    	 * Because this flow zaps _only_ leaf SPTEs, the caller doesn't need
->>>    	 * to provide RCU protection as no 'struct kvm_mmu_page' will be freed.
->>> @@ -1606,8 +1670,6 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
->>>    	KVM_BUG_ON(kvm_mmu_page_role_is_private(role) !=
->>>    		   is_private_sptep(iter->sptep), kvm);
->>> -	/* TODO: Large page isn't supported for private SPTE yet. */
->>> -	KVM_BUG_ON(kvm_mmu_page_role_is_private(role), kvm);
->>>    	/*
->>>    	 * Since we are allocating while under the MMU lock we have to be
+On 11/21/23 8:17 PM, Jason Gunthorpe wrote:
+> On Tue, Nov 21, 2023 at 02:54:15AM +0000, Tian, Kevin wrote:
+>>> From: Jason Gunthorpe <jgg@nvidia.com>
+>>> Sent: Tuesday, November 21, 2023 7:05 AM
+>>>
+>>> On Mon, Nov 20, 2023 at 08:26:31AM +0000, Tian, Kevin wrote:
+>>>>> From: Liu, Yi L <yi.l.liu@intel.com>
+>>>>> Sent: Friday, November 17, 2023 9:18 PM
+>>>>>
+>>>>> This adds the data structure for flushing iotlb for the nested domain
+>>>>> allocated with IOMMU_HWPT_DATA_VTD_S1 type.
+>>>>>
+>>>>> This only supports invalidating IOTLB, but no for device-TLB as device-TLB
+>>>>> invalidation will be covered automatically in the IOTLB invalidation if the
+>>>>> underlying IOMMU driver has enabled ATS for the affected device.
+>>>>
+>>>> "no for device-TLB" is misleading. Here just say that cache invalidation
+>>>> request applies to both IOTLB and device TLB (if ATS is enabled ...)
+>>>
+>>> I think we should forward the ATS invalidation from the guest too?
+>>> That is what ARM and AMD will have to do, can we keep them all
+>>> consistent?
+>>>
+>>> I understand Intel keeps track of enough stuff to know what the RIDs
+>>> are, but is it necessary to make it different?
 >>
+>> probably ask the other way. Now intel-iommu driver always flushes
+>> iotlb and device tlb together then is it necessary to separate them
+>> in uAPI for no good (except doubled syscalls)? :)
+> 
+> I wish I knew more about Intel CC design to be able to answer that :|
+> 
+> Doesn't the VM issue the ATC flush command regardless? How does it
+> know it has a working ATC but does not need to flush it?
+> 
 
+The Intel VT-d spec doesn't require the driver to flush iotlb and device
+tlb together. Therefore, the current approach of relying on caching mode
+to determine whether device TLB invalidation is necessary appears to be
+a performance optimization rather than an architectural requirement.
+
+The vIOMMU driver assumes that it is running within a VM guest when
+caching mode is enabled. This assumption leads to an omission of device
+TLB invalidation, relying on the hypervisor to perform a combined flush
+of the IOLB and device TLB.
+
+While this optimization aims to reduce VMEXIT overhead, it introduces
+potential issues:
+
+- When a Linux guest running on a hypervisor other than KVM/QEMU, the
+   assumption of combined IOLB and device TLB flushing by the hypervisor
+   may be incorrect, potentially leading to missed device TLB
+   invalidation.
+
+- The caching mode doesn't apply to first-stage translation. Therefore,
+   if the driver uses first-stage translation and still relies on caching
+   mode to determine device TLB invalidation, the optimization fails.
+
+A more reasonable optimization would be to allocate a bit in the iommu
+capability registers. The vIOMMU driver could then leverage this bit to
+determine whether it could eliminate a device invalidation request.
+
+Best regards,
+baolu
 
