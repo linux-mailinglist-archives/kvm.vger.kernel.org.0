@@ -1,101 +1,102 @@
-Return-Path: <kvm+bounces-2273-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2277-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C49817F44FE
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 12:39:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D99437F45C6
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 13:20:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80B872815BA
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 11:39:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FA081C2085B
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 12:20:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC935584E2;
-	Wed, 22 Nov 2023 11:39:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943224AF61;
+	Wed, 22 Nov 2023 12:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sItovUyH"
+	dkim=pass (1024-bit key) header.d=xen.org header.i=@xen.org header.b="tZpORAkD"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B87012914;
-	Wed, 22 Nov 2023 11:39:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3751DC433B9;
-	Wed, 22 Nov 2023 11:39:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700653184;
-	bh=E4WcJC/nUGJW251PN1xEvRw6wmxZO7AcExQa/hcdZ9Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sItovUyHAWRnorRBtfLW/nCA5/Wo8wxv9VwqsPeoxkSIcUlkfelQ5axCpLqDszdO3
-	 k05vIircJHuElIGFDQsuYAzZjw4NMsa3cGpFu6D8WtQVcscbfcIwi8YB+F1GdDl6BM
-	 zwtPr1z+NEvd1a8lfwzPaRtNWpwGyrMaBvMYFP3iCQbXrMC6mfrCDniuCgMprxl+me
-	 Lo6vU14gbq0CVnM/K5j+wJ6SccrTf33zckeNjnuN7lSdBcPj+V/m5m50t04PNd6mSA
-	 q4+GwoJpqIlNd0Y3JrLsIe/nfYy2UujqOChV7Io8TVYDJYIHSG54c2HbAEq9WYSuQP
-	 sXwhMmh3t15FQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1r5la1-00FPOL-JL;
-	Wed, 22 Nov 2023 11:39:41 +0000
-Date: Wed, 22 Nov 2023 11:39:41 +0000
-Message-ID: <86jzqayq2q.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: kvmarm@lists.linux.dev,
+Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0F13212C;
+	Wed, 22 Nov 2023 04:19:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
+	s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:
+	Subject:To:From; bh=O6hLRXK6yeKR3L6pdrCbc5lhM310DUyC48DzYfsWYvk=; b=tZpORAkD1
+	lcnWLw/OnmyphFpsriRXatUnw457DwkIMeSpO9TOKgGUx2DJKDJ9q/8s3Wos8kTxEe5ZGTrL/WJ4W
+	5wRS6Y9gHPCxPcGegT9Vbd3yPxEswE543iuvQSxyG9mhx7yODKBehQ2+r08iMVefe6xHeW+oJ5uv2
+	sBGtTQ1A=;
+Received: from xenbits.xenproject.org ([104.239.192.120])
+	by mail.xenproject.org with esmtp (Exim 4.92)
+	(envelope-from <paul@xen.org>)
+	id 1r5mBn-0004vx-AU; Wed, 22 Nov 2023 12:18:43 +0000
+Received: from 54-240-197-231.amazon.com ([54.240.197.231] helo=REM-PW02S00X.ant.amazon.com)
+	by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <paul@xen.org>)
+	id 1r5mBn-0004y9-04; Wed, 22 Nov 2023 12:18:43 +0000
+From: Paul Durrant <paul@xen.org>
+To: David Woodhouse <dwmw2@infradead.org>,
+	Paul Durrant <paul@xen.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
 	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Miguel Luis <miguel.luis@oracle.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support (FEAT_NV2 only)
-In-Reply-To: <64cdd9ea-fc7b-4108-a896-43b16eef1553@os.amperecomputing.com>
-References: <20231120131027.854038-1-maz@kernel.org>
-	<a44660c4-e43a-4663-94c0-9b290ea755e3@os.amperecomputing.com>
-	<86ttpfzd5k.wl-maz@kernel.org>
-	<67082409-f432-44b6-bf40-1af9b4b7b569@os.amperecomputing.com>
-	<86r0kjzbnq.wl-maz@kernel.org>
-	<64cdd9ea-fc7b-4108-a896-43b16eef1553@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v9 00/15] KVM: xen: update shared_info and vcpu_info handling
+Date: Wed, 22 Nov 2023 12:18:07 +0000
+Message-Id: <20231122121822.1042-1-paul@xen.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Wed, 22 Nov 2023 11:10:10 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> 
-> 
-> No change, still L1 hangs. Captured ftrace and the L1 is keep
-> looping/faulting around same address across kvm_entry and kvm_exits.
-> 
-> It is a weird behavior, L1 is faulting and looping around MDCR and
-> AA64MMFR3_EL1 access in function __finalise_el2.
+From: Paul Durrant <pdurrant@amazon.com>
 
-I really can't see how this happens. There are no backward branches,
-and we don't seem to reach the ERET either. So something must affect
-the state after the trap of ID_AA64MMFR3_EL1.
+This is a minimal update to version 8 of the series [1]. The only material
+change is in "pfncache: allow a cache to be activated with a fixed
+(userspace) HVA".
 
-	M.
+[1] https://lore.kernel.org/kvm/20231121180223.12484-1-paul@xen.org/
 
+Paul Durrant (15):
+  KVM: pfncache: Add a map helper function
+  KVM: pfncache: remove unnecessary exports
+  KVM: xen: mark guest pages dirty with the pfncache lock held
+  KVM: pfncache: add a mark-dirty helper
+  KVM: pfncache: remove KVM_GUEST_USES_PFN usage
+  KVM: pfncache: stop open-coding offset_in_page()
+  KVM: pfncache: include page offset in uhva and use it consistently
+  KVM: pfncache: allow a cache to be activated with a fixed (userspace)
+    HVA
+  KVM: xen: allow shared_info to be mapped by fixed HVA
+  KVM: xen: allow vcpu_info to be mapped by fixed HVA
+  KVM: selftests / xen: map shared_info using HVA rather than GFN
+  KVM: selftests / xen: re-map vcpu_info using HVA rather than GPA
+  KVM: xen: advertize the KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA capability
+  KVM: xen: split up kvm_xen_set_evtchn_fast()
+  KVM: xen: allow vcpu_info content to be 'safely' copied
+
+ Documentation/virt/kvm/api.rst                |  53 +++-
+ arch/x86/kvm/x86.c                            |   7 +-
+ arch/x86/kvm/xen.c                            | 260 +++++++++++-------
+ include/linux/kvm_host.h                      |  38 ++-
+ include/linux/kvm_types.h                     |   8 -
+ include/uapi/linux/kvm.h                      |   9 +-
+ .../selftests/kvm/x86_64/xen_shinfo_test.c    |  59 +++-
+ virt/kvm/pfncache.c                           | 169 ++++++------
+ 8 files changed, 370 insertions(+), 233 deletions(-)
+
+
+base-commit: 45b890f7689eb0aba454fc5831d2d79763781677
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.2
+
 
