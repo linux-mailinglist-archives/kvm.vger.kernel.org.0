@@ -1,245 +1,123 @@
-Return-Path: <kvm+bounces-2268-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2269-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 274187F4408
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 11:39:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29A8C7F445D
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 11:55:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EDCC1C20AD7
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 10:39:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59DB01C20ABA
+	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 10:55:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 855F0584E2;
-	Wed, 22 Nov 2023 10:39:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 000AC20B28;
+	Wed, 22 Nov 2023 10:55:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pZaheaZa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HL/0JAtj"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E30B29F;
-	Wed, 22 Nov 2023 02:39:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=7D1NGz9yu/g1MKyLV5j8ZM/0i4AAF/s0oIT2t4wztVY=; b=pZaheaZa9w7Kgb3m7q5zIzfWMC
-	dEyHfZcXSLKt9MDvm0Vs7FCggbAaHMdFvaQLTFMIvJfD/w8Mns8S34J5T9LjePkgG2puvF4npgGBi
-	gTTGGLPP1NrTeWT4cfulXqtD5X6/A8PI0VeeSNIWfo4c+4tLggLCesW8e0p+ICvWsprkqXb2HcSMF
-	eC1EZIOVkw0U/BH0eFUu6VqS91EbT3YG030IZeASDTMKW0+tEv3iVtTP6+YqEtc/cyHe6soUjAXvS
-	1Z0q+z7zutDZscCI/+1cUChVsG3SnezzxO3yp5P3SeqX8VQkK2uuppktLcJsbJex91V7eiF8/Gsyd
-	jDMeNzUw==;
-Received: from [2001:8b0:10b:5:22b8:d80f:1c9c:f188] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1r5kdN-006S8C-1I; Wed, 22 Nov 2023 10:39:05 +0000
-Message-ID: <7c7238a9c8b0dc6bc865407ba804a651cdfdb044.camel@infradead.org>
-Subject: Re: [PATCH v8 15/15] KVM: xen: allow vcpu_info content to be
- 'safely' copied
-From: David Woodhouse <dwmw2@infradead.org>
-To: Paul Durrant <paul@xen.org>, Sean Christopherson <seanjc@google.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>,  Borislav Petkov <bp@alien8.de>, Dave
- Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
- <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Wed, 22 Nov 2023 10:39:04 +0000
-In-Reply-To: <4a76b7dc9055485d9e2592b395e60221dc349abf.camel@infradead.org>
-References: <20231121180223.12484-1-paul@xen.org>
-	 <20231121180223.12484-16-paul@xen.org>
-	 <4a76b7dc9055485d9e2592b395e60221dc349abf.camel@infradead.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-w8rojJzgTDFFtPqbqbDH"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C9F19E;
+	Wed, 22 Nov 2023 02:55:35 -0800 (PST)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2c87adce180so45605041fa.0;
+        Wed, 22 Nov 2023 02:55:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700650534; x=1701255334; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:references:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PDj4B8tTKHknHxb5LSqmGL6/2c2RSafLpktnB37g/4s=;
+        b=HL/0JAtjo0yLGYjma9U8XwcOXHuL18Hd+WHL33V99kWnb0DiY+Wh3t54xsmr9c24fW
+         5gTZx06IPFaJpeD6XgMYZ0wkxz4MbMzPoxnfrGrHV0wwDNTxfuVKLxkckM4PG6uEiS2R
+         6oCHwDuUtEsEBhETdaRKULM9R/AteByH8RtMYKU5UHMiIzEb8uDNIkhtTVf79dR51wVX
+         AVa0HYCU3HKgNIQKHy7NRy7fzbhRIJseQ7o8d2UcwpXo60CH+RVrTO9Au3ihGs2a3OBP
+         wiae3kzTqgnH7AE/JLeUt2Qyv+XmDBoOaMjN7w++b06/CB+1jlmrwcfGl2upXFnl+iPV
+         BIlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700650534; x=1701255334;
+        h=content-transfer-encoding:in-reply-to:organization:references:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PDj4B8tTKHknHxb5LSqmGL6/2c2RSafLpktnB37g/4s=;
+        b=Ucw2q2j//mzMO479Do0SyOgS6XtdQSpk2EfTXa0A9OvKVNeceoLRitGK9jwQCKIAkk
+         9lHO3Rk+9QAr8X251FKYjtjA/uz5lUgMveiHCoRV0NYXMcx24f0bGEjBBLTxTXsXe0TK
+         +8D+E5UgsFSo2iZSO08x3xjfqHxbfvVJWoFSfiFgb/cRf4N8z7tNgz1kGNjy8fIxNvf4
+         i4JCzS8a7SpnMBYf/igeiWfbuenUsl9z6OEkGsjJXDtXTjDx2KXAiU7Al0tufangwVGn
+         P99fWlmHldTFKH2jOwyS9Epj/843qI1ep/6alniofj4sp0DdAEiXOhKQh5s6qr6J3aJm
+         w9rg==
+X-Gm-Message-State: AOJu0YwRD2wTLjI+QuJ3SqpsX82WSPELotr2iLnHVgCuktW85pWXY1Lz
+	KQ+V13h94oHSjAuM/rLmCzg=
+X-Google-Smtp-Source: AGHT+IHnbvXvm8EJIvq93WQO/F7f6niG7Cc+eqUmPP4FrhRHF/fZxfAVe7xF7vnquqfdMCmL5tqvUQ==
+X-Received: by 2002:a2e:8e68:0:b0:2c6:ed5e:bbf0 with SMTP id t8-20020a2e8e68000000b002c6ed5ebbf0mr1251662ljk.34.1700650533262;
+        Wed, 22 Nov 2023 02:55:33 -0800 (PST)
+Received: from [10.95.134.92] (54-240-197-234.amazon.com. [54.240.197.234])
+        by smtp.gmail.com with ESMTPSA id v9-20020a05600c444900b0040836519dd9sm1835991wmn.25.2023.11.22.02.55.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Nov 2023 02:55:32 -0800 (PST)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <94697586-7600-420d-a91b-2829019dab7c@xen.org>
+Date: Wed, 22 Nov 2023 10:55:30 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH v8 15/15] KVM: xen: allow vcpu_info content to be 'safely'
+ copied
+Content-Language: en-US
+To: David Woodhouse <dwmw2@infradead.org>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231121180223.12484-1-paul@xen.org>
+ <20231121180223.12484-16-paul@xen.org>
+ <4a76b7dc9055485d9e2592b395e60221dc349abf.camel@infradead.org>
+ <7c7238a9c8b0dc6bc865407ba804a651cdfdb044.camel@infradead.org>
+Organization: Xen Project
+In-Reply-To: <7c7238a9c8b0dc6bc865407ba804a651cdfdb044.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 22/11/2023 10:39, David Woodhouse wrote:
+> On Tue, 2023-11-21 at 22:53 +0000, David Woodhouse wrote:
+>> On Tue, 2023-11-21 at 18:02 +0000, Paul Durrant wrote:
+>>> From: Paul Durrant <pdurrant@amazon.com>
+>>>
+>>> If the guest sets an explicit vcpu_info GPA then, for any of the first 32
+>>> vCPUs, the content of the default vcpu_info in the shared_info page must be
+>>> copied into the new location. Because this copy may race with event
+>>> delivery (which updates the 'evtchn_pending_sel' field in vcpu_info) there
+>>> needs to be a way to defer that until the copy is complete.
+>>> Happily there is already a shadow of 'evtchn_pending_sel' in kvm_vcpu_xen
+>>> that is used in atomic context if the vcpu_info PFN cache has been
+>>> invalidated so that the update of vcpu_info can be deferred until the
+>>> cache can be refreshed (on vCPU thread's the way back into guest context).
+>>>
+>>> Also use this shadow if the vcpu_info cache has been *deactivated*, so that
+>>> the VMM can safely copy the vcpu_info content and then re-activate the
+>>> cache with the new GPA. To do this, stop considering an inactive vcpu_info
+>>> cache as a hard error in kvm_xen_set_evtchn_fast().
+>>>
+>>> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+>>> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+>>
+>> Wait, didn't we realise that this leaves the bits set in the shadow
+>> evtchn_pending_sel that get lost on migration?
+>>
 
---=-w8rojJzgTDFFtPqbqbDH
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Indeed we did not, but that's not something that *this* patch, or even 
+this series, is dealing with.  We also know that setting the 'width' of 
+shared_info has some issues, but again, can we keep that for other 
+patches? The series is at v9 and has already suffered a fair amount of 
+scope-creep.
 
-On Tue, 2023-11-21 at 22:53 +0000, David Woodhouse wrote:
-> On Tue, 2023-11-21 at 18:02 +0000, Paul Durrant wrote:
-> > From: Paul Durrant <pdurrant@amazon.com>
-> >=20
-> > If the guest sets an explicit vcpu_info GPA then, for any of the first =
-32
-> > vCPUs, the content of the default vcpu_info in the shared_info page mus=
-t be
-> > copied into the new location. Because this copy may race with event
-> > delivery (which updates the 'evtchn_pending_sel' field in vcpu_info) th=
-ere
-> > needs to be a way to defer that until the copy is complete.
-> > Happily there is already a shadow of 'evtchn_pending_sel' in kvm_vcpu_x=
-en
-> > that is used in atomic context if the vcpu_info PFN cache has been
-> > invalidated so that the update of vcpu_info can be deferred until the
-> > cache can be refreshed (on vCPU thread's the way back into guest contex=
-t).
-> >=20
-> > Also use this shadow if the vcpu_info cache has been *deactivated*, so =
-that
-> > the VMM can safely copy the vcpu_info content and then re-activate the
-> > cache with the new GPA. To do this, stop considering an inactive vcpu_i=
-nfo
-> > cache as a hard error in kvm_xen_set_evtchn_fast().
-> >=20
-> > Signed-off-by: Paul Durrant <pdurrant@amazon.com>
-> > Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
->=20
-> Wait, didn't we realise that this leaves the bits set in the shadow
-> evtchn_pending_sel that get lost on migration?
->=20
-> The point in your previous patch which split out a shiny new
-> set_shinfo_evtchn_pending() function was that you could then *call*
-> that function to ensure that the corresponding index bit was set on the
-> destination host after migration, if the bit in the shinfo is.
->=20
-> So we'd do that from kvm_xen_setup_evtchn(), kvm_xen_eventfd_assign(),
-> and when setting KVM_XEN_VCPU_ATTR_TYPE_TIMER.
->=20
-> =C2=A0if (bit_is_set_in_shinfo)
-> =C2=A0=C2=A0 set_shinfo_evtchn_pending()
+   Paul
 
-I mean set_vcpu_info_evtchn_pending() of course. And we probably want
-to extend the xen_shinfo_test to test it, by setting the bit in the
-shinfo to mark the event as pending, and then doing each of
-
- =E2=80=A2 Set up timer (a bit like in TEST_TIMER_RESTORE at line 817).
- =E2=80=A2 Add incoming eventfd with KVM_SET_GSI_ROUTING (cf. line 563)
- =E2=80=A2 Add IPI with KVM_XEN_ATTR_TYPE_EVTCHN (cf. line 597)
-
-Each of those should set the index bit in the vcpu_info immediately if
-the evtchn port is already set (and unmasked) in the shinfo.
-
-
-(Ignore this part if you're cleverer than me or have had more coffee=E2=80=
-=A6)
-
-It took me a moment to get my head around the different setups we have
-for event channels, but that's because the standard KVM_SET_GSI_ROUTING
-one is for *incoming* events, just as we would for MSIs, and we use the
-standard way of attaching an eventfd to an incoming GSI/MSI/evtchn.
-
-The KVM_XEN_ATTR_TYPE_EVTCHN one is for *outbound* events where the
-guest does an EVTCHNOP_send. That can *raise* events on an eventfd, or
-it can be an IPI or loopback interdomain port, which is the case we
-need to test.
-
---=-w8rojJzgTDFFtPqbqbDH
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMTIyMTAzOTA0WjAvBgkqhkiG9w0BCQQxIgQgwvLvE/sp
-M/Bqz7k6kRHDTtoE/epf7MS7XsvsNuUZ9lMwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCbcooaA7PASSunvuVWMrGL7VMrAsMIOLA8
-rz94TDMHIhAU/IltLb3LM7Uk6UbpjPhIjQyuzjD5/HOe45x8UgVRzA3yj03y1s4g31ltlIVZ1w6G
-dNJsM0GW8/7cxPYd1bBnFoU3CI2eJ8VeS9gegBhWyoCOweQrOEswPFFlTFogM32UHvKCKypXFYvd
-upxe7IyfcimGGkQ1sUjtgwlUckXQ9eTmRNlmZGDNBu4GmHh9eDmDmVtUGPmAYm4jETIhgW1gstRd
-3Ha4GxHxfPehmfNz/rdSLFotkjogATUdyp310yWAF++lBYD0YT149th973ZqSLE8UmKFkR0geOAN
-S23Swb1Q0yXoi/eQRkftbRuhuhOidHTxuXn14KvS0z2YPyd+jE2ZptikqRY0Fk8NcJCqG2c5Rk66
-K2SMClODhSs5/Vbev6eQOAqiLG4pvKNx4mBS0jLf7zoyEnxLns0QdhCi/VX8ZGIG9wskP1JmUyQF
-4LW117y2QFxoU+a6iUz9qctWqPg9W+H3DbR0NURzYXKkOBQ1q6kFGTxBBd5J9G7PW27VZX1W/KPE
-0JLje9fbDS0wXdvJiPOhkAHyAQFx3CddDQ/yYqVFthZMgFTQvvtJx7oyKktFkQaC0Ijq8BXSpXzo
-zqVYmZObhnv2Sh8/uz/5QLvZkGrdv2DcKFKd8Wd4pQAAAAAAAA==
-
-
---=-w8rojJzgTDFFtPqbqbDH--
 
