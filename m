@@ -1,117 +1,109 @@
-Return-Path: <kvm+bounces-2385-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2386-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 135D67F665E
-	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 19:37:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 450827F66EB
+	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 20:07:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4024E1C210D1
-	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 18:36:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2D6F281D50
+	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 19:06:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A2DD4D595;
-	Thu, 23 Nov 2023 18:36:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r0KyoDmi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FCDE4BA9E;
+	Thu, 23 Nov 2023 19:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFB3CDD
-	for <kvm@vger.kernel.org>; Thu, 23 Nov 2023 10:36:50 -0800 (PST)
-Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-332e40315bdso490849f8f.1
-        for <kvm@vger.kernel.org>; Thu, 23 Nov 2023 10:36:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1700764609; x=1701369409; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jApUa9NwPbQ48ykKJDUlLJN0yCBFVC5cyFHqkJvQSW4=;
-        b=r0KyoDmiKEjbDZhXrzjeEUL4JxZTN9U45r871EpS5rMZgL3YnhI9CvCdYLqRvgc8UT
-         APwyvHPr7tkTMUwGaZAxtfrC8O9I2uMAb1e1ep2P4c4lpyCCl8ib/BKKoClIEyrVkycA
-         aNkLMxp+QhcFhuw/vplnL0INVVdPaluB4zou81xhTHrNBEFia5rt8D92FUD8SUzZ1CZk
-         pnfeZeAhSb36YnYGPq9v/zzswYlmqHgNxUd7VG2OiYG6U+uVreE6ijNlmn+iBaUWTf+B
-         3AThABwZNkyn3XScKE++5c9RR5P9eTBCtRi8KhsrSKKDjK0OTLDFKj95d6YM4SrTJxdB
-         V77g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700764609; x=1701369409;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jApUa9NwPbQ48ykKJDUlLJN0yCBFVC5cyFHqkJvQSW4=;
-        b=YQr76cXMnO4zym4KAz+HR/JAuU6Xin6d5r/tsGl+MQngsnMaI76cGZcAAGyaAVFvVJ
-         m1Tzo8ocNbjnRY1ChK6dPmcOPCn+XyBsLj764ztM4Lqhpf19v7J4wUNh9rNwzyUeNwBa
-         KE5sU8bldJkog5JkBNmc3yocsUmtGqYsUpVSGQ05Luh1LhaDSQsvx6ppvTw4HBMZ8v1x
-         4jSt7v7shgDWgN0DbKrweHhHeCemlQbYDVcNDS2ZHckiZFPc5+RD7Jpj3jYx4dk2MhPn
-         +mt3UaQJOEwKxk24I2bZpn/wBgeCMAKeUAeEWSXKpkpX25iCJifYR/OUN0YDFIK/vpAi
-         6kKA==
-X-Gm-Message-State: AOJu0YxQTJWzZLfbCF9U1CurtWpUb3rtMgQC5fm98v162oPf8mBqMYQb
-	7de4g1VRsY5PdP5RCJpTzARzyA==
-X-Google-Smtp-Source: AGHT+IGoH3/+9lMqDaE3gMOPiF0vZZLwfEqa9I1S+IVqZ94k9dU4tzrTTd1DiK72Wv7UvsKyi6Tjeg==
-X-Received: by 2002:adf:efca:0:b0:332:cfbc:cb44 with SMTP id i10-20020adfefca000000b00332cfbccb44mr191483wrp.43.1700764609133;
-        Thu, 23 Nov 2023 10:36:49 -0800 (PST)
-Received: from m1x-phil.lan ([176.176.165.237])
-        by smtp.gmail.com with ESMTPSA id i2-20020adffc02000000b0032f7f4089b7sm2318145wrr.43.2023.11.23.10.36.48
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 23 Nov 2023 10:36:48 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-arm@nongnu.org,
-	kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH-for-9.0 16/16] target/arm/kvm: Have kvm_arm_hw_debug_active take a ARMCPU argument
-Date: Thu, 23 Nov 2023 19:35:17 +0100
-Message-ID: <20231123183518.64569-17-philmd@linaro.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231123183518.64569-1-philmd@linaro.org>
-References: <20231123183518.64569-1-philmd@linaro.org>
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04B679E;
+	Thu, 23 Nov 2023 11:06:47 -0800 (PST)
+Received: from MUA
+	by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mail@maciej.szmigiero.name>)
+	id 1r6F2B-0007vm-O5; Thu, 23 Nov 2023 20:06:43 +0100
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86: Allow XSAVES on CPUs where host doesn't use it due to an errata
+Date: Thu, 23 Nov 2023 20:06:37 +0100
+Message-ID: <c858817d3e3be246a1a2278e3b42d06284e615e5.1700766316.git.maciej.szmigiero@oracle.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Unify the "kvm_arm.h" API: All functions related to ARM vCPUs
-take a ARMCPU* argument. Use the CPU() QOM cast macro When
-calling the generic vCPU API from "sysemu/kvm.h".
+From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Since commit b0563468eeac ("x86/CPU/AMD: Disable XSAVES on AMD family 0x17")
+kernel unconditionally clears the XSAVES CPU feature bit on Zen1/2 CPUs.
+
+Since KVM CPU caps are initialized from the kernel boot CPU features this
+makes the XSAVES feature also unavailable for KVM guests in this case, even
+though they might want to decide on their own whether they are affected by
+this errata.
+
+Allow KVM guests to make such decision by setting the XSAVES KVM CPU
+capability bit based on the actual CPU capability.
+
+This fixes booting Hyper-V enabled Windows Server 2016 VMs with more than
+one vCPU on Zen1/2 CPUs.
+
+Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 ---
- target/arm/kvm.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/x86/kvm/cpuid.c   | 16 ++++++++++++++++
+ arch/x86/kvm/svm/svm.c |  5 ++++-
+ 2 files changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 1f6da5529f..cbfea689cc 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -1455,11 +1455,11 @@ int kvm_arch_process_async_events(CPUState *cs)
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index dda6fc4cfae8..a8820460163a 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -679,6 +679,22 @@ void kvm_set_cpu_caps(void)
+ 		F(AMX_COMPLEX)
+ 	);
  
- /**
-  * kvm_arm_hw_debug_active:
-- * @cs: CPU State
-+ * @cpu: ARMCPU
-  *
-  * Return: TRUE if any hardware breakpoints in use.
-  */
--static bool kvm_arm_hw_debug_active(CPUState *cs)
-+static bool kvm_arm_hw_debug_active(ARMCPU *cpu)
- {
-     return ((cur_hw_wps > 0) || (cur_hw_bps > 0));
- }
-@@ -1493,7 +1493,7 @@ void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debug *dbg)
-     if (kvm_sw_breakpoints_active(cs)) {
-         dbg->control |= KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_BP;
-     }
--    if (kvm_arm_hw_debug_active(cs)) {
-+    if (kvm_arm_hw_debug_active(ARM_CPU(cs))) {
-         dbg->control |= KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_HW;
-         kvm_arm_copy_hw_debug_data(&dbg->arch);
-     }
--- 
-2.41.0
-
++	/*
++	 * It is possible that CPU supports XSAVES but the host kernel decided
++	 * not to use it, for example due to AMD Erratum 1386, and cleared the
++	 * relevant CPU feature bit.
++	 *
++	 * In such case let the guest decide on it own whether to make use of
++	 * this feature.
++	 */
++	if (boot_cpu_data.cpuid_level >= XSTATE_CPUID) {
++		unsigned int eax, ebx, ecx, edx;
++
++		cpuid_count(XSTATE_CPUID, 1, &eax, &ebx, &ecx, &edx);
++		if (eax & F(XSAVES))
++			kvm_cpu_cap_set(X86_FEATURE_XSAVES);
++	}
++
+ 	kvm_cpu_cap_mask(CPUID_D_1_EAX,
+ 		F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | F(XSAVES) | f_xfd
+ 	);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 712146312358..3cc36710eb21 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4306,9 +4306,12 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	 * whether it's advertised to the guest so that KVM context switches
+ 	 * XSS on VM-Enter/VM-Exit.  Failure to do so would effectively give
+ 	 * the guest read/write access to the host's XSS.
++	 *
++	 * Make sure to check for XSAVES in KVM CPU capabilities, since the
++	 * boot CPU feature bit might be disabled due to Erratum 1386.
+ 	 */
+ 	if (boot_cpu_has(X86_FEATURE_XSAVE) &&
+-	    boot_cpu_has(X86_FEATURE_XSAVES) &&
++	    kvm_cpu_cap_has(X86_FEATURE_XSAVES) &&
+ 	    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE))
+ 		kvm_governed_feature_set(vcpu, X86_FEATURE_XSAVES);
+ 
 
