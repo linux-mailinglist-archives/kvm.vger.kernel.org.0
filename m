@@ -1,113 +1,208 @@
-Return-Path: <kvm+bounces-2336-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2337-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E9997F5325
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 23:15:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA9857F554E
+	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 01:26:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B88B31F20CE1
-	for <lists+kvm@lfdr.de>; Wed, 22 Nov 2023 22:15:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41016B21095
+	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 00:26:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82CE6200AC;
-	Wed, 22 Nov 2023 22:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F191FC5;
+	Thu, 23 Nov 2023 00:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4nje9Ql0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a0RMRtdr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0E89AD
-	for <kvm@vger.kernel.org>; Wed, 22 Nov 2023 14:15:31 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-da033914f7cso323440276.0
-        for <kvm@vger.kernel.org>; Wed, 22 Nov 2023 14:15:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700691331; x=1701296131; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=rHQ5lVYi4/2MX2skoChLDy6Ocqhy29V3zUGeEPzVvPk=;
-        b=4nje9Ql02zOsTvSoAPAvpOBNu7wg0GEhOvHpvYlYXOFidCjelO2vDEHo7qUJZ9VTU4
-         xgnyqJZhshN0b1WfZk+ZvPvShKSbvthyw0HEKtWDGAGg6nfn9KXeCHkg4u9WSbMYyUvr
-         y0Fb+1bawhV8YtiH+tJ2MbrucEmYDruXoV0kME455LZd5F91cm+YJ9Nlclhs4d+PjCNs
-         9aa68yQMTXmq692YlD7PnPpZNjrWx5sgRnQB6urz2vIlE2+KzrxnueHo96POFFCrLxIP
-         M5YQNxbP9XALPBXEYqzk8BuYqtAAUjfHcv6evKKrg5f7uLqj+05o/Ui+AvSaJFtG246X
-         6vLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700691331; x=1701296131;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rHQ5lVYi4/2MX2skoChLDy6Ocqhy29V3zUGeEPzVvPk=;
-        b=UQq06CsoEeEUQ6oQlpdTs5FDuR8OTE7raVNWsWdPHP1YwCL2CzYI6m7caAtTF41gRE
-         jbNvbKJnuopxshlo/+3PIyppt8ISa8Ggd2A65B1Mau8VlmMDhzZUEmAHc2ZdJ5k5zAKa
-         O5MHnyIobwwWpi9YHf145yYQruzx/8Nm/Tf3Tf5rGXYFuZjkvbL+219wzMNxCvI+jpGG
-         FdZ/D63cU/T5KqJenr4R4fIIshF+0GZLfwQcqNVzf81nj8p2x9sHN9yWFg9vBDmPATMi
-         WOX4TXbtx+wSfHj49m/O45RAxVmQDAhgDsF2KW8OgM5RSZpTmvEBLLkC8LewpYNYT+um
-         +RAA==
-X-Gm-Message-State: AOJu0Yw1eIIONs2wv2OLZaDvt0ppNvnzL8vHtkvejqGWq/6+B9b7S5hg
-	0qb1W/v1xygWqI1COvJMuwzUyqUm55xY
-X-Google-Smtp-Source: AGHT+IEKPFb2EHSzpX16MEr8UpukYHRCQvq4K7GrE1lzHEciYPJMeZQvd7fCFY+au119NI7M63atWhaudwtg
-X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:20a1])
- (user=rananta job=sendgmr) by 2002:a25:ce4e:0:b0:da0:c6d7:8231 with SMTP id
- x75-20020a25ce4e000000b00da0c6d78231mr109435ybe.0.1700691330951; Wed, 22 Nov
- 2023 14:15:30 -0800 (PST)
-Date: Wed, 22 Nov 2023 22:15:26 +0000
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AAFA1B3;
+	Wed, 22 Nov 2023 16:26:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700699164; x=1732235164;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=kMJqNQrPFkouBUmP1tIxtozSsYheDkR/LnL4F11wiis=;
+  b=a0RMRtdr45SnsHLYk3kiLIfZs2Z292eQtCjDOGkSajq4kJgqoPyPz1Z8
+   xhWoNH51ino8oe9+Nmimsn7SFdTQgw8cA/qSM06asNrV9XlVmhWFA6efE
+   bx/KJxGEkz9CgKaAcRip2AVvQj244oSCMbQ2SV3R4DIR0CTNKXPPkI00S
+   8UPzwDbKGWrNEIvyOLU2GF23JoceIic+G88FMkrhNsWS/7MACg0sIjNMf
+   ijDW0ytrIcjGYvd6MSyu2liYjeaUIruC6bgfya5Y7v4Nc28NcFQbnBBQQ
+   f0zW1UCdi/Sb7g9NYp8o9b8iKurHqbTYEdk8doLf35VPgtN8OmhSA3u25
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="389323011"
+X-IronPort-AV: E=Sophos;i="6.04,220,1695711600"; 
+   d="asc'?scan'208";a="389323011"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2023 16:26:03 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="716903060"
+X-IronPort-AV: E=Sophos;i="6.04,220,1695711600"; 
+   d="asc'?scan'208";a="716903060"
+Received: from debian-skl.sh.intel.com (HELO debian-skl) ([10.239.160.45])
+  by orsmga003.jf.intel.com with ESMTP; 22 Nov 2023 16:25:45 -0800
+Date: Thu, 23 Nov 2023 08:24:24 +0800
+From: Zhenyu Wang <zhenyuw@linux.intel.com>
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+	Jan Kara <jack@suse.cz>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>,
+	Oded Gabbay <ogabbay@kernel.org>, Wu Hao <hao.wu@intel.com>,
+	Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
+	Xu Yilun <yilun.xu@intel.com>,
+	Zhenyu Wang <zhenyuw@linux.intel.com>,
+	Zhi Wang <zhi.a.wang@intel.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+	David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Frederic Barrat <fbarrat@linux.ibm.com>,
+	Andrew Donnellan <ajd@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Eric Farman <farman@linux.ibm.com>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Vineeth Vijayan <vneethv@linux.ibm.com>,
+	Peter Oberparleiter <oberpar@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Tony Krowiak <akrowiak@linux.ibm.com>,
+	Jason Herne <jjherne@linux.ibm.com>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Diana Craciun <diana.craciun@oss.nxp.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>, Fei Li <fei1.li@intel.com>,
+	Benjamin LaHaise <bcrl@kvack.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal Hocko <mhocko@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeelb@google.com>,
+	Muchun Song <muchun.song@linux.dev>,
+	Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linux-fpga@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-aio@kvack.org, cgroups@vger.kernel.org, linux-mm@kvack.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
+Subject: Re: [PATCH v2 1/4] i915: make inject_virtual_interrupt() void
+Message-ID: <ZV6buHrQy2+CJ7xX@debian-scheme>
+Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
+References: <20231122-vfs-eventfd-signal-v2-0-bd549b14ce0c@kernel.org>
+ <20231122-vfs-eventfd-signal-v2-1-bd549b14ce0c@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.rc1.413.gea7ed67945-goog
-Message-ID: <20231122221526.2750966-1-rananta@google.com>
-Subject: [PATCH] KVM: selftests: aarch64: Remove unused functions from vpmu test
-From: Raghavendra Rao Ananta <rananta@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Raghavendra Rao Anata <rananta@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ehCOKC0wDaVXxQlM"
+Content-Disposition: inline
+In-Reply-To: <20231122-vfs-eventfd-signal-v2-1-bd549b14ce0c@kernel.org>
 
-vpmu_counter_access's disable_counter() carries a bug that disables
-all the counters that are enabled, instead of just the requested one.
-Fortunately, it's not an issue as there are no callers of it. Hence,
-instead of fixing it, remove the definition entirely.
 
-Remove enable_counter() as it's unused as well.
+--ehCOKC0wDaVXxQlM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- .../selftests/kvm/aarch64/vpmu_counter_access.c  | 16 ----------------
- 1 file changed, 16 deletions(-)
+On 2023.11.22 13:48:22 +0100, Christian Brauner wrote:
+> The single caller of inject_virtual_interrupt() ignores the return value
+> anyway. This allows us to simplify eventfd_signal() in follow-up
+> patches.
+>=20
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
+> ---
+>  drivers/gpu/drm/i915/gvt/interrupt.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/drivers/gpu/drm/i915/gvt/interrupt.c b/drivers/gpu/drm/i915/=
+gvt/interrupt.c
+> index de3f5903d1a7..9665876b4b13 100644
+> --- a/drivers/gpu/drm/i915/gvt/interrupt.c
+> +++ b/drivers/gpu/drm/i915/gvt/interrupt.c
+> @@ -422,7 +422,7 @@ static void init_irq_map(struct intel_gvt_irq *irq)
+>  #define MSI_CAP_DATA(offset) (offset + 8)
+>  #define MSI_CAP_EN 0x1
+> =20
+> -static int inject_virtual_interrupt(struct intel_vgpu *vgpu)
+> +static void inject_virtual_interrupt(struct intel_vgpu *vgpu)
+>  {
+>  	unsigned long offset =3D vgpu->gvt->device_info.msi_cap_offset;
+>  	u16 control, data;
+> @@ -434,10 +434,10 @@ static int inject_virtual_interrupt(struct intel_vg=
+pu *vgpu)
+> =20
+>  	/* Do not generate MSI if MSIEN is disabled */
+>  	if (!(control & MSI_CAP_EN))
+> -		return 0;
+> +		return;
+> =20
+>  	if (WARN(control & GENMASK(15, 1), "only support one MSI format\n"))
+> -		return -EINVAL;
+> +		return;
+> =20
+>  	trace_inject_msi(vgpu->id, addr, data);
+> =20
+> @@ -451,10 +451,10 @@ static int inject_virtual_interrupt(struct intel_vg=
+pu *vgpu)
+>  	 * returned and don't inject interrupt into guest.
+>  	 */
+>  	if (!test_bit(INTEL_VGPU_STATUS_ATTACHED, vgpu->status))
+> -		return -ESRCH;
+> -	if (vgpu->msi_trigger && eventfd_signal(vgpu->msi_trigger, 1) !=3D 1)
+> -		return -EFAULT;
+> -	return 0;
+> +		return;
+> +	if (!vgpu->msi_trigger)
+> +		return;
+> +	eventfd_signal(vgpu->msi_trigger, 1);
+>  }
 
-diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-index 5ea78986e665f..e2f0b720cbfcf 100644
---- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-+++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-@@ -94,22 +94,6 @@ static inline void write_sel_evtyper(int sel, unsigned long val)
- 	isb();
- }
- 
--static inline void enable_counter(int idx)
--{
--	uint64_t v = read_sysreg(pmcntenset_el0);
--
--	write_sysreg(BIT(idx) | v, pmcntenset_el0);
--	isb();
--}
--
--static inline void disable_counter(int idx)
--{
--	uint64_t v = read_sysreg(pmcntenset_el0);
--
--	write_sysreg(BIT(idx) | v, pmcntenclr_el0);
--	isb();
--}
--
- static void pmu_disable_reset(void)
- {
- 	uint64_t pmcr = read_sysreg(pmcr_el0);
--- 
-2.43.0.rc1.413.gea7ed67945-goog
+I think it's a little simpler to write as
+    if (vgpu->msi_trigger)
+            eventfd_signal(vgpu->msi_trigger, 1);
 
+Looks fine with me.
+
+Reviewed-by: Zhenyu Wang <zhenyuw@linux.intel.com>
+
+Thanks!
+
+> =20
+>  static void propagate_event(struct intel_gvt_irq *irq,
+>=20
+> --=20
+> 2.42.0
+>=20
+
+--ehCOKC0wDaVXxQlM
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCZV6bswAKCRCxBBozTXgY
+JySHAJ4qE2jv0i0ZauQv+Bv/bGwHt0ZrbACeJadIIL6gQC6kmoICLhyqplCwOeo=
+=1+t0
+-----END PGP SIGNATURE-----
+
+--ehCOKC0wDaVXxQlM--
 
