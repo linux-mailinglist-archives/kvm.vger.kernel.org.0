@@ -1,82 +1,96 @@
-Return-Path: <kvm+bounces-2350-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2351-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E6CC7F5805
-	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 07:09:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EED67F5860
+	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 07:38:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B98BCB21058
-	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 06:09:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B9C08B20C45
+	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 06:38:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21F6CA41;
-	Thu, 23 Nov 2023 06:09:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 823B7125D6;
+	Thu, 23 Nov 2023 06:38:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hTYpzZlM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fy0yWJo9"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8976CE7
+	for <kvm@vger.kernel.org>; Wed, 22 Nov 2023 22:38:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700721490;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nWktWqMM4G/wXCLhrelXgnsFw3mwZMTHYGnEyrCPhDA=;
+	b=fy0yWJo9FodNosKAtbTMDFNaWJJSWiQKFfkqs2XPp4ZZ3fmSrbLS15tsGum6r4bIEbA1a8
+	36Gn4SUT1H2vUFSenP2jEamBaDCDXW8E9MhB0oWQ/ZFShHhOIP41TrPf/0fKcUDX7qvClK
+	fkfzEdEd6P1Bnq+0fmihWY+0N8rVltc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-358-AC3FAiN5OAO27fE9bMEl8A-1; Thu, 23 Nov 2023 01:38:06 -0500
+X-MC-Unique: AC3FAiN5OAO27fE9bMEl8A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92ACDC2C3
-	for <kvm@vger.kernel.org>; Thu, 23 Nov 2023 06:09:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 06D24C433C8
-	for <kvm@vger.kernel.org>; Thu, 23 Nov 2023 06:09:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700719743;
-	bh=B0ScQGNA/2bTbFldRauAN8+OaoWmtWxZO5w6jCxLv7A=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=hTYpzZlMFaCWHdcqWDzzhozOR3MVjvu2ZoHbR275hQLOl83jRjFo1pHpG/dqyZum2
-	 SXSvzEjbts9PlxETj6+6ouLso7l8hXq99c9IMM8p2s/PtUS1c6woPvX4QXAEypBlDW
-	 VyXxIaOfSJ2M/d/CmkvWl7/tHOTXtS1hQqB0523NqEoZhdO2zOAlk2YfFFf5w9ef+N
-	 Z9kjSWDc5RzjxvjUsbJVX9mZLC2EYkOm7WHtVenx1ew3jyLVElcnuFPf1Rpx3jkrmD
-	 Ms2wGmWY4LHmzYLLgwk/Rp67kB3qXOTsE1BQFJVSBWjJcpFXXhUNQquAbAtNmK27BF
-	 10Xh4ZYSuo59Q==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id E34D3C53BC6; Thu, 23 Nov 2023 06:09:02 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218177] qemu got sigabrt when using vpp in guest and dpdk for
- qemu
-Date: Thu, 23 Nov 2023 06:09:02 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: zhang.lei.fly@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218177-28872-UEAn7FoX13@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218177-28872@https.bugzilla.kernel.org/>
-References: <bug-218177-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3B813899EC2;
+	Thu, 23 Nov 2023 06:38:06 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id F04E21C060AE;
+	Thu, 23 Nov 2023 06:38:05 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v1 0/3] KVM: selftests: aarch64: Introduce pmu_event_filter_test
+Date: Thu, 23 Nov 2023 01:37:42 -0500
+Message-Id: <20231123063750.2176250-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218177
+The test is inspired by the pmu_event_filter_test which implemented by x86. On
+the arm64 platform, there is the same ability to set the pmu_event_filter
+through the KVM_ARM_VCPU_PMU_V3_FILTER attribute. So add the test for arm64.
 
---- Comment #5 from Jeffrey zhang (zhang.lei.fly@gmail.com) ---
-i also file a bug in qemu site:
-https://gitlab.com/qemu-project/qemu/-/issues/1999
+The series first move some pmu common code from vpmu_counter_access to lib/
+which can be used by pmu_event_filter_test. Then implements the test itself.
 
---=20
-You may reply to this email to add a comment.
+Shaoqin Huang (3):
+  KVM: selftests: aarch64: Make the [create|destroy]_vpmu_vm() can be
+    reused
+  KVM: selftests: aarch64: Move the pmu helper function into lib/
+  KVM: selftests: aarch64: Introduce pmu_event_filter_test
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+ tools/testing/selftests/kvm/Makefile          |   2 +
+ .../kvm/aarch64/pmu_event_filter_test.c       | 227 ++++++++++++++++++
+ .../kvm/aarch64/vpmu_counter_access.c         | 218 ++---------------
+ .../selftests/kvm/include/aarch64/vpmu.h      | 139 +++++++++++
+ .../testing/selftests/kvm/lib/aarch64/vpmu.c  |  74 ++++++
+ 5 files changed, 466 insertions(+), 194 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/vpmu.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vpmu.c
+
+-- 
+2.40.1
+
 
