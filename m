@@ -1,143 +1,128 @@
-Return-Path: <kvm+bounces-2355-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2356-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F30307F5880
-	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 07:43:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D63D37F59AC
+	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 08:58:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 926D4B210AA
-	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 06:43:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B0BBB20EA8
+	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 07:58:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F6313ACF;
-	Thu, 23 Nov 2023 06:43:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40BE518C34;
+	Thu, 23 Nov 2023 07:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BC3KbxyY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A1uiInaF"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0F6BDD
-	for <kvm@vger.kernel.org>; Wed, 22 Nov 2023 22:43:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700721802;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0Y6v5Xhwln7tu/9zxftOsUtL05MptTTj1UHVhZFfC54=;
-	b=BC3KbxyY1cqWZHExLgz5VzrUmHGWFze0yQzZNNjt96zxXpMgdGteh1fzFufC++tZZI2v7d
-	MZI2Zr8baoMJcwtrvTWetFhx8RZ37zeV84zS+IbUn1mlzHwNM9DS4iSkd1SGutJmJDl0hM
-	vYy1yOpDvSJyvYFeUQ5aYBA5HINYyOY=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-134-Byq_AQ2AN5CUjtnIAdTnKA-1; Thu, 23 Nov 2023 01:43:20 -0500
-X-MC-Unique: Byq_AQ2AN5CUjtnIAdTnKA-1
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1cf9577dd05so4835ad.0
-        for <kvm@vger.kernel.org>; Wed, 22 Nov 2023 22:43:20 -0800 (PST)
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80DE9DD;
+	Wed, 22 Nov 2023 23:58:46 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-6b1d1099a84so632218b3a.1;
+        Wed, 22 Nov 2023 23:58:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700726326; x=1701331126; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=q3vC/J3cIXPZBm8Pko+lyPgPSd9eGkIB3K0+4Ev4dyA=;
+        b=A1uiInaFXswshn632jXmttI8Il+oHfJCiYj0Ar1+MKDGn/XsoZRnqNzDErmYmC0arF
+         fszROVUzj+k3yd+3W7zegjMSKns9bfPHvkbzGPbeoMBbqueDTB+Lri0IltuYL9IRyOoB
+         XQ2ZpBCO1qFwjcMc34L+n1GcGdQa4sKwWh0I76jlQO/IkVk2RF4ouFqXwdx8+jUeR8bX
+         sQ6yr/SJe2jNc7kgJOMQ8Fjbpa0yGwozRvVIBsw3qg63FWtxoPlW54jmmjCFnwBzfhWn
+         C7Uh56RdmJdnRzphEAMTG5figJHO0bXgoFp+71l32+OHvA038/mRmhRDgm0/rjMV/aLR
+         cMdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700721799; x=1701326599;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Y6v5Xhwln7tu/9zxftOsUtL05MptTTj1UHVhZFfC54=;
-        b=vjpIC/3xjUHfucmm6ag8IuXy11ea2GMC/2TTMoLmlIjPv8XVKHy/CMjpGtlmpNC3wP
-         qNpKtsfZ4X2rVV5g7YCHX9Z8GSrHZAWl6hHD0dqaEj3hmSdiv6It0Wyyx2MEl7zUt0Fw
-         ORPtsMFTnez+ionA3c50Kw1O5KhXyT7+s7Sc5V3pBqd5sfmOrFuCu8VGa/z5Fjn9N9IN
-         p9h53Mo1UpcRDx5XDnR7eM/a/+CuN47mtsEpLdGsjJrYgv80haFV5A8USDJdQfCJNMDG
-         qTbfaIg/WxqK5AgcQbkxNjt8ivRkSe8It3RhQlJ+ndalBfuR8P4pNoUvNMSyli9KBQ27
-         k9Cw==
-X-Gm-Message-State: AOJu0Yx4E9v6Lgp9EfwJs3vM2un1gtHAGQR8rcfN5eM65oK52u663My2
-	mR7KKuOgZHuvIyEktKHJd7r7L0+6q9FIRBpt6vX5HST6uEOt2OujRu0kJx4Hi1Ypi1z8fj2jUXq
-	3XOFuXnszqlFs
-X-Received: by 2002:a17:902:d486:b0:1cc:3c2c:fa1a with SMTP id c6-20020a170902d48600b001cc3c2cfa1amr5191043plg.4.1700721799480;
-        Wed, 22 Nov 2023 22:43:19 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGqJ7t5K0G/lG65L6yMQON3n741jzN2NtB/hlBiB4j/kh7OASHj0JQgIsOvheK+O1VEnunV1Q==
-X-Received: by 2002:a17:902:d486:b0:1cc:3c2c:fa1a with SMTP id c6-20020a170902d48600b001cc3c2cfa1amr5191028plg.4.1700721799075;
-        Wed, 22 Nov 2023 22:43:19 -0800 (PST)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id a4-20020a1709027d8400b001c9d968563csm538754plm.79.2023.11.22.22.43.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Nov 2023 22:43:18 -0800 (PST)
-Message-ID: <d5cc3cf1-7b39-9ca3-adf2-224007c751fe@redhat.com>
-Date: Thu, 23 Nov 2023 14:43:15 +0800
+        d=1e100.net; s=20230601; t=1700726326; x=1701331126;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=q3vC/J3cIXPZBm8Pko+lyPgPSd9eGkIB3K0+4Ev4dyA=;
+        b=VlLvfttbYKYWxJGBMdIhX1Oj64ewGkaT8VqaYwIyrXWitym/8mrdxF/t74K3syqkhP
+         MZ+MKT0OU3CrlTX8RuhBpvpweX26G0BY3FZFAU8lABeFPgSZ9E2sHlcX7iEgYEft9qBc
+         xTVqV5UpWBZsMmw7N8WVdBydT6571y5ZZtTgRFiJqDrFW2pCc/d9tCwWUpG5M+e1xN3C
+         usol1MI1YFffvEuOIfODMQWhJTOmHlxV6KvMp252PcmqtoN5oRKDg8C+8PYimNY4257f
+         LHykO/Wa5hBZNZfb9YMGwLYAfrLumQEhsAtEXdD3zOJNx9yPbBteVEf9YzRZON7HUij/
+         9xUQ==
+X-Gm-Message-State: AOJu0YxJb6BYPQPqPG3ug8E2pXr6pX/+6KCb47dHAJVocsluldNMGSNP
+	d+nCwg2K+Whsjz5t50657RM=
+X-Google-Smtp-Source: AGHT+IGSQbxFVTSDHtkXkl2mrLrTC0aN8/10oVHBHhlFlyIC81cD8RDetRNtVsS/5GX3tGq1GojtVg==
+X-Received: by 2002:a05:6a21:3290:b0:162:ee29:d3c0 with SMTP id yt16-20020a056a21329000b00162ee29d3c0mr5396574pzb.42.1700726325838;
+        Wed, 22 Nov 2023 23:58:45 -0800 (PST)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id b24-20020aa78718000000b006cbb40669b1sm656434pfo.23.2023.11.22.23.58.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Nov 2023 23:58:45 -0800 (PST)
+From: Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86: Use get_cpl directly in case of vcpu_load to improve accuracy
+Date: Thu, 23 Nov 2023 15:58:18 +0800
+Message-ID: <20231123075818.12521-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH] KVM: selftests: aarch64: Remove unused functions from
- vpmu test
-Content-Language: en-US
-To: Raghavendra Rao Ananta <rananta@google.com>,
- Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20231122221526.2750966-1-rananta@google.com>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20231122221526.2750966-1-rananta@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Raghavendra,
+From: Like Xu <likexu@tencent.com>
 
-Those functions might be useful for other pmu tests. Recently I just 
-wrote a pmu_event_filter_test[1] and use the enable_counter().
+When vcpu is consistent with kvm_get_running_vcpu(), use get_cpl directly
+to return the current exact state for the callers of vcpu_in_kernel API.
 
-There may have more pmu tests which can use the helper functions, so I 
-think we can keep it now. And in my series[1], I have moved them into 
-the lib/ as the helper function.
+In scenarios where VM payload is profiled via perf-kvm, it's noticed that
+the value of vcpu->arch.preempted_in_kernel is not strictly synchronised
+with current vcpu_cpl.
 
-[1]https://lore.kernel.org/all/20231123063750.2176250-1-shahuang@redhat.com/
+This affects perf/core's ability to make use of the kvm_guest_state() API
+to tag guest RIP with PERF_RECORD_MISC_GUEST_{KERNEL|USER} and record it
+in the sample. This causes perf/tool to fail to connect the vcpu RIPs to
+the guest kernel space symbols when parsing these samples due to incorrect
+PERF_RECORD_MISC flags:
 
-Thanks,
-Shaoqin
+   Before (perf-report of a cpu-cycles sample):
+      1.23%  :58945   [unknown]         [u] 0xffffffff818012e0
 
-On 11/23/23 06:15, Raghavendra Rao Ananta wrote:
-> vpmu_counter_access's disable_counter() carries a bug that disables
-> all the counters that are enabled, instead of just the requested one.
-> Fortunately, it's not an issue as there are no callers of it. Hence,
-> instead of fixing it, remove the definition entirely.
-> 
-> Remove enable_counter() as it's unused as well.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> ---
->   .../selftests/kvm/aarch64/vpmu_counter_access.c  | 16 ----------------
->   1 file changed, 16 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> index 5ea78986e665f..e2f0b720cbfcf 100644
-> --- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> @@ -94,22 +94,6 @@ static inline void write_sel_evtyper(int sel, unsigned long val)
->   	isb();
->   }
->   
-> -static inline void enable_counter(int idx)
-> -{
-> -	uint64_t v = read_sysreg(pmcntenset_el0);
-> -
-> -	write_sysreg(BIT(idx) | v, pmcntenset_el0);
-> -	isb();
-> -}
-> -
-> -static inline void disable_counter(int idx)
-> -{
-> -	uint64_t v = read_sysreg(pmcntenset_el0);
-> -
-> -	write_sysreg(BIT(idx) | v, pmcntenclr_el0);
-> -	isb();
-> -}
-> -
->   static void pmu_disable_reset(void)
->   {
->   	uint64_t pmcr = read_sysreg(pmcr_el0);
+Given the semantics of preempted_in_kernel, it may not be easy (w/o extra
+effort) to reconcile changes between preempted_in_kernel and CPL values.
+Therefore to make this API more trustworthy, fallback to using get_cpl()
+directly when the vcpu is loaded:
+
+   After:
+      1.35%  :60703   [kernel.vmlinux]  [g] asm_exc_page_fault
+
+More performance squeezing is clearly possible, with priority given to
+correcting its accuracy as a basic move.
+
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ arch/x86/kvm/x86.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 2c924075f6f1..c454df904a45 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -13031,7 +13031,10 @@ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.guest_state_protected)
+ 		return true;
+ 
+-	return vcpu->arch.preempted_in_kernel;
++	if (vcpu != kvm_get_running_vcpu())
++		return vcpu->arch.preempted_in_kernel;
++
++	return static_call(kvm_x86_get_cpl)(vcpu) == 0;
+ }
+ 
+ unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
+
+base-commit: 45b890f7689eb0aba454fc5831d2d79763781677
+-- 
+2.43.0
 
 
