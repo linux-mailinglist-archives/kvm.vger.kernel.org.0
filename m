@@ -1,259 +1,85 @@
-Return-Path: <kvm+bounces-2367-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2368-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A90D7F6452
-	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 17:44:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19C637F64A1
+	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 18:00:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4F92281B4E
-	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 16:44:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 179B31C20ABA
+	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 17:00:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2D533CC3;
-	Thu, 23 Nov 2023 16:44:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52F673FE5B;
+	Thu, 23 Nov 2023 17:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m4ee7bnI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AVlUgOAd"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0CC222319;
-	Thu, 23 Nov 2023 16:44:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3091DC433C8;
-	Thu, 23 Nov 2023 16:44:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3433FB35;
+	Thu, 23 Nov 2023 17:00:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A0B39C43395;
+	Thu, 23 Nov 2023 17:00:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700757877;
-	bh=QE1UBMJM5H60d9fEa4rL89oCeBbt8rlDAZb/2FhqlaI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=m4ee7bnIn5Ijb6AndVKhEJr0ZWivopONg7hEb3TVLchy9JvnoWRQmHF8sLs3sY6QP
-	 NMvfo7239wYRLGCUsvaZNvxlY+oPtLiAKeDuI402UgA4mw4nloF5giDLIgOCH8wA3s
-	 Cen5lMU3swZjwdci+3HCPCYle8mm90QX51n+hBipNPCzxxl8x6fAgOVDuYn3pL0+gh
-	 wEL1K8e+1m3bnoJdIB/xFMae1/EFMKY3Ew7RHdl32PduRffruoziXSWYgRkhfyfSci
-	 zaWptwUBsl8fmx+R76L9bNkv3o5fi4nuYLFljWZof1IBUjwOgNkCmwnx6ZWM/8S1Pb
-	 jkAMXBTAqi1nw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1r6Coc-00Fpyj-Fa;
-	Thu, 23 Nov 2023 16:44:34 +0000
-Date: Thu, 23 Nov 2023 16:44:34 +0000
-Message-ID: <86a5r4zafh.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Miguel Luis <miguel.luis@oracle.com>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	James Morse
- <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support (FEAT_NV2 only)
-In-Reply-To: <05733774-4210-4097-9912-fb3aa8542fdd@oracle.com>
-References: <20231120131027.854038-1-maz@kernel.org>
-	<DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
-	<86msv7ylnu.wl-maz@kernel.org>
-	<05733774-4210-4097-9912-fb3aa8542fdd@oracle.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1700758826;
+	bh=QAhKOwmSyYL/06pMRYmwqRumPVYS4ikPDyPLMLk4BuA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AVlUgOAd/6Qj6nT4t8NFVdUtPwQ2l/VvAr/AsYAyEhcsdIDgNE74ytiYqDubRqE6S
+	 p0e/zkaOVwOAzshbkNW6MePqAsUbguzkjL48aPfFSqbNhpH1U70AWOr3jAAdyiSBic
+	 EVtmD37c45/gc21eptnlVFgYG/z2ZiNP1/wwzFi1VbaFCpzS2nJxCdUX/cVxQu7zld
+	 ezgZjc97kOLjvSYG9EPn/1PHIzVE04Gdl5kPsMZt1D8vH5sytLhN6Ytj/g0zSkZIGo
+	 rXjYt3gI0HhFVPv/fqpnNH1Wv5qV53VHTAMUFgwPGG3PHkHWZgiEPitcHT5BcrbR/o
+	 Uulq4AblryAaw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8277EE00087;
+	Thu, 23 Nov 2023 17:00:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v1] vsock/test: fix SEQPACKET message bounds test
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170075882653.541.9262158470588794948.git-patchwork-notify@kernel.org>
+Date: Thu, 23 Nov 2023 17:00:26 +0000
+References: <20231121211642.163474-1-avkrasnov@salutedevices.com>
+In-Reply-To: <20231121211642.163474-1-avkrasnov@salutedevices.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, mst@redhat.com,
+ jasowang@redhat.com, bobby.eshleman@bytedance.com, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel@sberdevices.ru, oxffffaa@gmail.com
 
-On Thu, 23 Nov 2023 16:21:48 +0000,
-Miguel Luis <miguel.luis@oracle.com> wrote:
->=20
-> Hi Marc,
->=20
-> On 21/11/2023 18:02, Marc Zyngier wrote:
-> > On Tue, 21 Nov 2023 16:49:52 +0000,
-> > Miguel Luis <miguel.luis@oracle.com> wrote:
-> >> Hi Marc,
-> >>
-> >>> On 20 Nov 2023, at 12:09, Marc Zyngier <maz@kernel.org> wrote:
-> >>>
-> >>> This is the 5th drop of NV support on arm64 for this year, and most
-> >>> probably the last one for this side of Christmas.
-> >>>
-> >>> For the previous episodes, see [1].
-> >>>
-> >>> What's changed:
-> >>>
-> >>> - Drop support for the original FEAT_NV. No existing hardware supports
-> >>>  it without FEAT_NV2, and the architecture is deprecating the former
-> >>>  entirely. This results in fewer patches, and a slightly simpler
-> >>>  model overall.
-> >>>
-> >>> - Reorganise the series to make it a bit more logical now that FEAT_NV
-> >>>  is gone.
-> >>>
-> >>> - Apply the NV idreg restrictions on VM first run rather than on each
-> >>>  access.
-> >>>
-> >>> - Make the nested vgic shadow CPU interface a per-CPU structure rather
-> >>>  than per-vcpu.
-> >>>
-> >>> - Fix the EL0 timer fastpath
-> >>>
-> >>> - Work around the architecture deficiencies when trapping WFI from a
-> >>>  L2 guest.
-> >>>
-> >>> - Fix sampling of nested vgic state (MISR, ELRSR, EISR)
-> >>>
-> >>> - Drop the patches that have already been merged (NV trap forwarding,
-> >>>  per-MMU VTCR)
-> >>>
-> >>> - Rebased on top of 6.7-rc2 + the FEAT_E2H0 support [2].
-> >>>
-> >>> The branch containing these patches (and more) is at [3]. As for the
-> >>> previous rounds, my intention is to take a prefix of this series into
-> >>> 6.8, provided that it gets enough reviewing.
-> >>>
-> >>> [1] https://lore.kernel.org/r/20230515173103.1017669-1-maz@kernel.org
-> >>> [2] https://lore.kernel.org/r/20231120123721.851738-1-maz@kernel.org
-> >>> [3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms=
-.git/log/?h=3Dkvm-arm64/nv-6.8-nv2-only
-> >>>
-> >> While I was testing this with kvmtool for 5.16 I noted the following o=
-n dmesg:
-> >>
-> >> [  803.014258] kvm [19040]: Unsupported guest sys_reg access at: 8129f=
-a50 [600003c9]
-> >>                 { Op0( 3), Op1( 5), CRn( 1), CRm( 0), Op2( 2), func_re=
-ad },
-> >>
-> >> This is CPACR_EL12.
-> > CPACR_EL12 is redirected to VNCR[0x100]. It really shouldn't trap...
-> >
-> >> Still need yet to debug.
-> > Can you disassemble the guest around the offending PC?
->=20
-> [ 1248.686350] kvm [7013]: Unsupported guest sys_reg access at: 812baa50 =
-[600003c9]
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 { Op0( 3), Op1( 5), CRn( 1), CRm( 0), Op2( 2), func_read=
- },
->=20
-> =C2=A012baa00:=C2=A0=C2=A0=C2=A0 14000008 =C2=A0=C2=A0=C2=A0 b=C2=A0=C2=
-=A0=C2=A0 0x12baa20
-> =C2=A012baa04:=C2=A0=C2=A0=C2=A0 d000d501 =C2=A0=C2=A0=C2=A0 adrp=C2=A0=
-=C2=A0=C2=A0 x1, 0x2d5c000
-> =C2=A012baa08:=C2=A0=C2=A0=C2=A0 91154021 =C2=A0=C2=A0=C2=A0 add=C2=A0=C2=
-=A0=C2=A0 x1, x1, #0x550
-> =C2=A012baa0c:=C2=A0=C2=A0=C2=A0 f9400022 =C2=A0=C2=A0=C2=A0 ldr=C2=A0=C2=
-=A0=C2=A0 x2, [x1]
-> =C2=A012baa10:=C2=A0=C2=A0=C2=A0 f9400421 =C2=A0=C2=A0=C2=A0 ldr=C2=A0=C2=
-=A0=C2=A0 x1, [x1, #8]
-> =C2=A012baa14:=C2=A0=C2=A0=C2=A0 8a010042 =C2=A0=C2=A0=C2=A0 and=C2=A0=C2=
-=A0=C2=A0 x2, x2, x1
-> =C2=A012baa18:=C2=A0=C2=A0=C2=A0 d3441c42 =C2=A0=C2=A0=C2=A0 ubfx=C2=A0=
-=C2=A0=C2=A0 x2, x2, #4, #4
-> =C2=A012baa1c:=C2=A0=C2=A0=C2=A0 b4000082 =C2=A0=C2=A0=C2=A0 cbz=C2=A0=C2=
-=A0=C2=A0 x2, 0x12baa2c
-> =C2=A012baa20:=C2=A0=C2=A0=C2=A0 d2a175a0 =C2=A0=C2=A0=C2=A0 mov=C2=A0=C2=
-=A0=C2=A0 x0, #0xbad0000=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 // #195887104
-> =C2=A012baa24:=C2=A0=C2=A0=C2=A0 f2994220 =C2=A0=C2=A0=C2=A0 movk=C2=A0=
-=C2=A0=C2=A0 x0, #0xca11
-> =C2=A012baa28:=C2=A0=C2=A0=C2=A0 d69f03e0 =C2=A0=C2=A0=C2=A0 eret
-> =C2=A012baa2c:=C2=A0=C2=A0=C2=A0 d2c00080 =C2=A0=C2=A0=C2=A0 mov=C2=A0=C2=
-=A0=C2=A0 x0, #0x400000000=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 // #17179869184
-> =C2=A012baa30:=C2=A0=C2=A0=C2=A0 f2b10000 =C2=A0=C2=A0=C2=A0 movk=C2=A0=
-=C2=A0=C2=A0 x0, #0x8800, lsl #16
-> =C2=A012baa34:=C2=A0=C2=A0=C2=A0 f2800000 =C2=A0=C2=A0=C2=A0 movk=C2=A0=
-=C2=A0=C2=A0 x0, #0x0
-> =C2=A012baa38:=C2=A0=C2=A0=C2=A0 d51c1100 =C2=A0=C2=A0=C2=A0 msr=C2=A0=C2=
-=A0=C2=A0 hcr_el2, x0
-> =C2=A012baa3c:=C2=A0=C2=A0=C2=A0 d5033fdf =C2=A0=C2=A0=C2=A0 isb
-> =C2=A012baa40:=C2=A0=C2=A0=C2=A0 d53c4100 =C2=A0=C2=A0=C2=A0 mrs=C2=A0=C2=
-=A0=C2=A0 x0, sp_el1
-> =C2=A012baa44:=C2=A0=C2=A0=C2=A0 9100001f =C2=A0=C2=A0=C2=A0 mov=C2=A0=C2=
-=A0=C2=A0 sp, x0
-> =C2=A012baa48:=C2=A0=C2=A0=C2=A0 d538d080 =C2=A0=C2=A0=C2=A0 mrs=C2=A0=C2=
-=A0=C2=A0 x0, tpidr_el1
-> =C2=A012baa4c:=C2=A0=C2=A0=C2=A0 d51cd040 =C2=A0=C2=A0=C2=A0 msr=C2=A0=C2=
-=A0=C2=A0 tpidr_el2, x0
-> =C2=A012baa50:=C2=A0=C2=A0=C2=A0 d53d1040 =C2=A0=C2=A0=C2=A0 mrs=C2=A0=C2=
-=A0=C2=A0 x0, cpacr_el12
-> =C2=A012baa54:=C2=A0=C2=A0=C2=A0 d5181040 =C2=A0=C2=A0=C2=A0 msr=C2=A0=C2=
-=A0=C2=A0 cpacr_el1, x0
-> =C2=A012baa58:=C2=A0=C2=A0=C2=A0 d53dc000 =C2=A0=C2=A0=C2=A0 mrs=C2=A0=C2=
-=A0=C2=A0 x0, vbar_el12
-> =C2=A012baa5c:=C2=A0=C2=A0=C2=A0 d518c000 =C2=A0=C2=A0=C2=A0 msr=C2=A0=C2=
-=A0=C2=A0 vbar_el1, x0
-> =C2=A012baa60:=C2=A0=C2=A0=C2=A0 d53c1120 =C2=A0=C2=A0=C2=A0 mrs=C2=A0=C2=
-=A0=C2=A0 x0, mdcr_el2
-> =C2=A012baa64:=C2=A0=C2=A0=C2=A0 9272f400 =C2=A0=C2=A0=C2=A0 and=C2=A0=C2=
-=A0=C2=A0 x0, x0, #0xffffffffffffcfff
-> =C2=A012baa68:=C2=A0=C2=A0=C2=A0 9266f400 =C2=A0=C2=A0=C2=A0 and=C2=A0=C2=
-=A0=C2=A0 x0, x0, #0xfffffffffcffffff
-> =C2=A012baa6c:=C2=A0=C2=A0=C2=A0 d51c1120 =C2=A0=C2=A0=C2=A0 msr=C2=A0=C2=
-=A0=C2=A0 mdcr_el2, x0
-> =C2=A012baa70:=C2=A0=C2=A0=C2=A0 d53d2040 =C2=A0=C2=A0=C2=A0 mrs=C2=A0=C2=
-=A0=C2=A0 x0, tcr_el12
-> =C2=A012baa74:=C2=A0=C2=A0=C2=A0 d5182040 =C2=A0=C2=A0=C2=A0 msr=C2=A0=C2=
-=A0=C2=A0 tcr_el1, x0
-> =C2=A012baa78:=C2=A0=C2=A0=C2=A0 d53d2000 =C2=A0=C2=A0=C2=A0 mrs=C2=A0=C2=
-=A0=C2=A0 x0, ttbr0_el12
-> =C2=A012baa7c:=C2=A0=C2=A0=C2=A0 d5182000 =C2=A0=C2=A0=C2=A0 msr=C2=A0=C2=
-=A0=C2=A0 ttbr0_el1, x0
-> =C2=A012baa80:=C2=A0=C2=A0=C2=A0 d53d2020 =C2=A0=C2=A0=C2=A0 mrs=C2=A0=C2=
-=A0=C2=A0 x0, ttbr1_el12
-> =C2=A012baa84:=C2=A0=C2=A0=C2=A0 d5182020 =C2=A0=C2=A0=C2=A0 msr=C2=A0=C2=
-=A0=C2=A0 ttbr1_el1, x0
-> =C2=A012baa88:=C2=A0=C2=A0=C2=A0 d53da200 =C2=A0=C2=A0=C2=A0 mrs=C2=A0=C2=
-=A0=C2=A0 x0, mair_el12
-> =C2=A012baa8c:=C2=A0=C2=A0=C2=A0 d518a200 =C2=A0=C2=A0=C2=A0 msr=C2=A0=C2=
-=A0=C2=A0 mair_el1, x0
-> =C2=A012baa90:=C2=A0=C2=A0=C2=A0 d5380761 =C2=A0=C2=A0=C2=A0 mrs=C2=A0=C2=
-=A0=C2=A0 x1, s3_0_c0_c7_3
-> =C2=A012baa94:=C2=A0=C2=A0=C2=A0 d3400c21 =C2=A0=C2=A0=C2=A0 ubfx=C2=A0=
-=C2=A0=C2=A0 x1, x1, #0, #4
-> =C2=A012baa98:=C2=A0=C2=A0=C2=A0 b4000141 =C2=A0=C2=A0=C2=A0 cbz=C2=A0=C2=
-=A0=C2=A0 x1, 0x12baac0
-> =C2=A012baa9c:=C2=A0=C2=A0=C2=A0 d53d2060 =C2=A0=C2=A0=C2=A0 mrs=C2=A0=C2=
-=A0=C2=A0 x0, s3_5_c2_c0_3
+Hello:
 
-OK, this is suspiciously close to the location Ganapatrao was having
-issues with. Are you running on the same hardware?
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-In any case, we should never take a trap for this access. Can you dump
-HCR_EL2 at the point where the guest traps (in switch.c)?
+On Wed, 22 Nov 2023 00:16:42 +0300 you wrote:
+> Tune message length calculation to make this test work on machines
+> where 'getpagesize()' returns >32KB. Now maximum message length is not
+> hardcoded (on machines above it was smaller than 'getpagesize()' return
+> value, thus we get negative value and test fails), but calculated at
+> runtime and always bigger than 'getpagesize()' result. Reproduced on
+> aarch64 with 64KB page size.
+> 
+> [...]
 
-> >> As for QEMU, it is having issues enabling _EL2 feature although EL2
-> >> is supported by checking KVM_CAP_ARM_EL2; need yet to debug this.
-> > The capability number changes at each release. Make sure you resync
-> > your includes.
->=20
-> Been there but it seems a different problem this time.
+Here is the summary with links:
+  - [net,v1] vsock/test: fix SEQPACKET message bounds test
+    https://git.kernel.org/netdev/net/c/f0863888f6cf
 
-Creating the VM with SVE? NV doesn't support it yet (and it has been
-the case for a long while).
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-	M.
 
---=20
-Without deviation from the norm, progress is not possible.
 
