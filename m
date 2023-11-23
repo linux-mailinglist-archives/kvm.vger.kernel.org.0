@@ -1,58 +1,58 @@
-Return-Path: <kvm+bounces-2375-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2376-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAB2E7F664C
-	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 19:36:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09A607F664D
+	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 19:36:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC31C1C20ED5
-	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 18:36:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A261B21510
+	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 18:36:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A9AE4D11E;
-	Thu, 23 Nov 2023 18:36:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 163814B5B2;
+	Thu, 23 Nov 2023 18:36:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZuezVE+4"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C0q+YThR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 222A6D43
-	for <kvm@vger.kernel.org>; Thu, 23 Nov 2023 10:35:56 -0800 (PST)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2c875207626so14111761fa.1
-        for <kvm@vger.kernel.org>; Thu, 23 Nov 2023 10:35:56 -0800 (PST)
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86DE810C6
+	for <kvm@vger.kernel.org>; Thu, 23 Nov 2023 10:36:01 -0800 (PST)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-507c5249d55so1658072e87.3
+        for <kvm@vger.kernel.org>; Thu, 23 Nov 2023 10:36:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1700764554; x=1701369354; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1700764560; x=1701369360; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=APkzUJ5V8QYL4MOU/zl88wqY6eeEqD/ibNzL1bZO05g=;
-        b=ZuezVE+4ZaCw9ZaZlShhg1h5p67an0qTAKQQ4poUfV2GNxne7Cn8vnxoFf3KtfK4Pn
-         qt3by1CS2MbCNlngk20BwpMbpiwhBUMU9KGk/4faMnoV5hlq0O/1WbKPFltD4rQugUY9
-         ZdAwSp2WZweto+nlSu6BL8T12+s8RP1a+Z3Li2CS5rzS1+m6GF6hIowlClic9r0j9oWn
-         TnJXy9DU/eE+9nf6ELfNw7MD5sFURNQqccysb24vi9usq4QLAxvad1+0lAI8JyoXkT9/
-         r8k+Wm0Fw9qyOrH8l8HPJAfdrdV6R46uzuXRaPbWD5aAP773XxJ1SvM+Ssws79bExy4g
-         xj1g==
+        bh=znNmY7edfJI2fYiqN/HJeKsLDF9NhHOuefv0PghAu5M=;
+        b=C0q+YThRk8Jj049ZITDnrVzHv0D18jT5lJbkRoXeB3mbE5JWhVz1LZ1KB82KjAIE3S
+         HxnVnnJBRa/Xz9KiqaN3tNAEFODXErwd81kTlj81il5WDwOmjwzla2YnAxSodikND3/u
+         iRLfD8VbTxsHbfp+V/Emk1g0XNKyERfmn69DAKNvtCiIAda+EBjmAmYWXwXhZdiEuHUc
+         dOZuNxWgmagIHAlHU2wZE5PkSj3Yb5eZJfFkScxM3lU4oGI2MUuf/r5HWTGHSlTuN0B1
+         dfxc5HQjhM0Zp/NWlNg/YIo7HMF2RJ5uSZORBv1bucLbdDe1CIp9syB4zQWhNnFNX6OP
+         OTtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700764554; x=1701369354;
+        d=1e100.net; s=20230601; t=1700764560; x=1701369360;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=APkzUJ5V8QYL4MOU/zl88wqY6eeEqD/ibNzL1bZO05g=;
-        b=iukLrNAL4zVVZ2N9n7u0DqJpY7Cyf453y3HHAJUJOgdoT5RAdcPyNUMtJG3WKBFjr/
-         ufFuOUE2nLKNLyWDUEyFzo0QXyH+4rVidX9CgBkvjhfRTp0XQE4SNKD0WTJfn/4om+KE
-         hLDJpxAD3Zx7vVoYoWSgdiZ/Cx0KClURKI5PlIudPGSL6xhfulAfq/4mYLEdMzUC0iqV
-         CQ+Ymm9E2Jn5EEJki/gzt74EPsBDq0E57I6LCIiQyQ9W4fNDq1zEYIk2mJHDEPHHQ36J
-         lu1Fph/bhOigMDGgN5R+VATAoj0oRVdRhrORuA2X/g6OSiHVE+LOF1JpnvKralKzXDjx
-         QMIQ==
-X-Gm-Message-State: AOJu0YxfaUDHKK3jJTVv2v/GhJdKsUNKbl/5v3f9xDaBma+o4BSN9YDz
-	Rr0Fmgaov2Gp7aKA0N1CGZDbzQ==
-X-Google-Smtp-Source: AGHT+IEMHSuxheCHpy3+JITp+0heG5juBUPBJg9h7cDu77hpzkqvd1orzB6IYTMkszJ7lWDnZPfVaA==
-X-Received: by 2002:a2e:9e09:0:b0:2bc:e330:660b with SMTP id e9-20020a2e9e09000000b002bce330660bmr180065ljk.9.1700764554485;
-        Thu, 23 Nov 2023 10:35:54 -0800 (PST)
+        bh=znNmY7edfJI2fYiqN/HJeKsLDF9NhHOuefv0PghAu5M=;
+        b=CGJK1VsyIUVGmlP4fNhqaO/c2ThMA5cC7GIJGGua+MNhuSlHpffXCqGJLnqxfqJfir
+         cNC9vzxmJGwr9f26HRIxq5Xim3hwLtflC0eW5TwLzgU0LXikIlnYNbnOVzKld9Kn5hC3
+         eSldHRbw5Luw2dl1EiGss1oB4LSHgW+aGK6jCWM+zO5pLGpJU17Yy1ovtBrIJuRyk8uo
+         V2CI7QDIkUaJ72Bq6nyzvAD9NuggEw9KcV//0fY3kNXWtoJzfYSg2bxuA+LSCQCixvKB
+         V52zosacvC+xAcpYV2TjqR1mQ/xygJyQxgXmbeQY+x/F11qU2efmphdrUeLhRRjMTdOU
+         rOpA==
+X-Gm-Message-State: AOJu0Yzr5B3p56Rgll6FS23QE4LqRi6jyNOBrCTWnvpjaMfh/bbeNeio
+	RURouUVuzY1Q/n0WQhNjfVpH5w==
+X-Google-Smtp-Source: AGHT+IHwNsCUBI8C+HAtmr6ne5j7ja7Y9f5/nmCmQj8iQdnpHgN1KUrN2rXfn6mGSeu6MN85RsnNzQ==
+X-Received: by 2002:a05:6512:39c4:b0:509:4655:d8d5 with SMTP id k4-20020a05651239c400b005094655d8d5mr92555lfu.11.1700764559795;
+        Thu, 23 Nov 2023 10:35:59 -0800 (PST)
 Received: from m1x-phil.lan ([176.176.165.237])
-        by smtp.gmail.com with ESMTPSA id bg11-20020a05600c3c8b00b0040b2c195523sm3477497wmb.31.2023.11.23.10.35.53
+        by smtp.gmail.com with ESMTPSA id f9-20020a0560001b0900b0032196c508e3sm2352293wrz.53.2023.11.23.10.35.58
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 23 Nov 2023 10:35:54 -0800 (PST)
+        Thu, 23 Nov 2023 10:35:59 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>,
@@ -60,9 +60,9 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
 	kvm@vger.kernel.org,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH-for-9.0 06/16] target/arm/kvm: Have kvm_arm_set_device_attr take a ARMCPU argument
-Date: Thu, 23 Nov 2023 19:35:07 +0100
-Message-ID: <20231123183518.64569-7-philmd@linaro.org>
+Subject: [PATCH-for-9.0 07/16] target/arm/kvm: Have kvm_arm_pvtime_init take a ARMCPU argument
+Date: Thu, 23 Nov 2023 19:35:08 +0100
+Message-ID: <20231123183518.64569-8-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231123183518.64569-1-philmd@linaro.org>
 References: <20231123183518.64569-1-philmd@linaro.org>
@@ -81,59 +81,78 @@ calling the generic vCPU API from "sysemu/kvm.h".
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/arm/kvm.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ target/arm/kvm_arm.h | 6 +++---
+ hw/arm/virt.c        | 5 +++--
+ target/arm/kvm.c     | 6 +++---
+ 3 files changed, 9 insertions(+), 8 deletions(-)
 
+diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+index 84f87f5ed7..0e12a008ab 100644
+--- a/target/arm/kvm_arm.h
++++ b/target/arm/kvm_arm.h
+@@ -205,12 +205,12 @@ void kvm_arm_pmu_init(CPUState *cs);
+ 
+ /**
+  * kvm_arm_pvtime_init:
+- * @cs: CPUState
++ * @cpu: ARMCPU
+  * @ipa: Per-vcpu guest physical base address of the pvtime structures
+  *
+  * Initializes PVTIME for the VCPU, setting the PVTIME IPA to @ipa.
+  */
+-void kvm_arm_pvtime_init(CPUState *cs, uint64_t ipa);
++void kvm_arm_pvtime_init(ARMCPU *cpu, uint64_t ipa);
+ 
+ int kvm_arm_set_irq(int cpu, int irqtype, int irq, int level);
+ 
+@@ -268,7 +268,7 @@ static inline void kvm_arm_pmu_init(CPUState *cs)
+     g_assert_not_reached();
+ }
+ 
+-static inline void kvm_arm_pvtime_init(CPUState *cs, uint64_t ipa)
++static inline void kvm_arm_pvtime_init(ARMCPU *cpu, uint64_t ipa)
+ {
+     g_assert_not_reached();
+ }
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index be2856c018..b6efe9da4d 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -2003,8 +2003,9 @@ static void virt_cpu_post_init(VirtMachineState *vms, MemoryRegion *sysmem)
+                 kvm_arm_pmu_init(cpu);
+             }
+             if (steal_time) {
+-                kvm_arm_pvtime_init(cpu, pvtime_reg_base +
+-                                         cpu->cpu_index * PVTIME_SIZE_PER_CPU);
++                kvm_arm_pvtime_init(ARM_CPU(cpu), pvtime_reg_base
++                                                  + cpu->cpu_index
++                                                    * PVTIME_SIZE_PER_CPU);
+             }
+         }
+     } else {
 diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 766a077bcf..73f4e5a0fa 100644
+index 73f4e5a0fa..82c5924ab5 100644
 --- a/target/arm/kvm.c
 +++ b/target/arm/kvm.c
-@@ -1691,18 +1691,18 @@ void kvm_arch_remove_all_hw_breakpoints(void)
+@@ -1744,7 +1744,7 @@ void kvm_arm_pmu_set_irq(CPUState *cs, int irq)
      }
  }
  
--static bool kvm_arm_set_device_attr(CPUState *cs, struct kvm_device_attr *attr,
-+static bool kvm_arm_set_device_attr(ARMCPU *cpu, struct kvm_device_attr *attr,
-                                     const char *name)
+-void kvm_arm_pvtime_init(CPUState *cs, uint64_t ipa)
++void kvm_arm_pvtime_init(ARMCPU *cpu, uint64_t ipa)
  {
-     int err;
+     struct kvm_device_attr attr = {
+         .group = KVM_ARM_VCPU_PVTIME_CTRL,
+@@ -1752,10 +1752,10 @@ void kvm_arm_pvtime_init(CPUState *cs, uint64_t ipa)
+         .addr = (uint64_t)&ipa,
+     };
  
--    err = kvm_vcpu_ioctl(cs, KVM_HAS_DEVICE_ATTR, attr);
-+    err = kvm_vcpu_ioctl(CPU(cpu), KVM_HAS_DEVICE_ATTR, attr);
-     if (err != 0) {
-         error_report("%s: KVM_HAS_DEVICE_ATTR: %s", name, strerror(-err));
-         return false;
-     }
- 
--    err = kvm_vcpu_ioctl(cs, KVM_SET_DEVICE_ATTR, attr);
-+    err = kvm_vcpu_ioctl(CPU(cpu), KVM_SET_DEVICE_ATTR, attr);
-     if (err != 0) {
-         error_report("%s: KVM_SET_DEVICE_ATTR: %s", name, strerror(-err));
-         return false;
-@@ -1721,7 +1721,7 @@ void kvm_arm_pmu_init(CPUState *cs)
-     if (!ARM_CPU(cs)->has_pmu) {
+-    if (ARM_CPU(cs)->kvm_steal_time == ON_OFF_AUTO_OFF) {
++    if (cpu->kvm_steal_time == ON_OFF_AUTO_OFF) {
          return;
      }
--    if (!kvm_arm_set_device_attr(cs, &attr, "PMU")) {
-+    if (!kvm_arm_set_device_attr(ARM_CPU(cs), &attr, "PMU")) {
-         error_report("failed to init PMU");
-         abort();
-     }
-@@ -1738,7 +1738,7 @@ void kvm_arm_pmu_set_irq(CPUState *cs, int irq)
-     if (!ARM_CPU(cs)->has_pmu) {
-         return;
-     }
--    if (!kvm_arm_set_device_attr(cs, &attr, "PMU")) {
-+    if (!kvm_arm_set_device_attr(ARM_CPU(cs), &attr, "PMU")) {
-         error_report("failed to set irq for PMU");
-         abort();
-     }
-@@ -1755,7 +1755,7 @@ void kvm_arm_pvtime_init(CPUState *cs, uint64_t ipa)
-     if (ARM_CPU(cs)->kvm_steal_time == ON_OFF_AUTO_OFF) {
-         return;
-     }
--    if (!kvm_arm_set_device_attr(cs, &attr, "PVTIME IPA")) {
-+    if (!kvm_arm_set_device_attr(ARM_CPU(cs), &attr, "PVTIME IPA")) {
+-    if (!kvm_arm_set_device_attr(ARM_CPU(cs), &attr, "PVTIME IPA")) {
++    if (!kvm_arm_set_device_attr(cpu, &attr, "PVTIME IPA")) {
          error_report("failed to init PVTIME IPA");
          abort();
      }
