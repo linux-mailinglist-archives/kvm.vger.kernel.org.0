@@ -1,58 +1,58 @@
-Return-Path: <kvm+bounces-2372-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2373-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C95947F6648
-	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 19:35:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E92ED7F6649
+	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 19:35:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FD8F282469
-	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 18:35:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EFC81C208DC
+	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 18:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 102F64BA9C;
-	Thu, 23 Nov 2023 18:35:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A144A4AF71;
+	Thu, 23 Nov 2023 18:35:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xeql+3OG"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YyrwSaN4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 947D1D7E
-	for <kvm@vger.kernel.org>; Thu, 23 Nov 2023 10:35:39 -0800 (PST)
-Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2c8879a1570so14777801fa.1
-        for <kvm@vger.kernel.org>; Thu, 23 Nov 2023 10:35:39 -0800 (PST)
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93A88D43
+	for <kvm@vger.kernel.org>; Thu, 23 Nov 2023 10:35:44 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-332e545e852so427821f8f.1
+        for <kvm@vger.kernel.org>; Thu, 23 Nov 2023 10:35:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1700764538; x=1701369338; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1700764543; x=1701369343; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LUz0XGe6SRMXqOSVJvQiXoUHGpw35/yPoukvsO1/DGo=;
-        b=xeql+3OGCWL9t/v0cQ6IvIDYEpA2Jir4JD63qBWyXMIxp6b5zX5HHEydg8vACcK5bu
-         /S6yvxapukhTn//OhCo7+ihtHkwL6AaQSDxkdrJK+g3A7FsTAkhOz/uUANoldJU99v35
-         T+amRZ9jNbSnNOjVTUbd4HfHaS0W5XqPn+sdzVW2vbcf7z20TfTmnINOwtfJKWDHklyh
-         ls5OJd6hJhB+pRPYp+RDZIRRgYWNl3GEPYcFK0vBeJBIQhO0xFivsnoAFLVMBvevJwSl
-         C8Em//p2aEoMLOTunRMdKcwRhNUrH7K943PHjednMHsGt5ZbtVaMvbl0XGqplm70V/ag
-         9F0w==
+        bh=+UF32mbiOniogqxmnEO/G/4hA+3MFqbkOICeJQxcwIQ=;
+        b=YyrwSaN4m+Bo00dgBGmFuwh5ojnY3DiQ5GNFCT9N7xWySYBsbsWddc2WD192Myiyd0
+         jTuDX+Pj4Rm7U3/5RGGo/PgvI4ayM0E/hruE/Ipw42qVzPhIZSgRDSmPRC//vmrRavaU
+         vj/0O+ZlO0M7OkZzt2mx4VkG/VbV2jPtR0cmjUJwjPyxB87LcU+ji/CvbtH+9/tuimTe
+         sCbtCIaZQDnp8ijrX8nvQtMQeGgZqkgcaf1MphPpMbLC0wkei7OhQ+kTjhGg05LndJlF
+         8gj5nGC2KeQN6xMIt+CanCDpl0yYbGkdlLU1HxXKV4qGwKCac1bCJkPXlZLGRhD2vplo
+         bt2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700764538; x=1701369338;
+        d=1e100.net; s=20230601; t=1700764543; x=1701369343;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LUz0XGe6SRMXqOSVJvQiXoUHGpw35/yPoukvsO1/DGo=;
-        b=AIijd5NESVI4+oJbaNnaZfrwIZHyqEFWJfWLL0E/pEotJwb7GLM9EKGEzrBkaLdqZL
-         DfiiUMDeHNgXWUWJ9IPQf+w92lHQ9coqE2HWSjH+rdt/sjaeW37Rw6jocdxZiKn4kHlm
-         0eien7AuEiPY5QU+6Me9UgEd7/WdRH7etT5okSOfiNif7L1uGlbGdUDzD/RRMa9Gft+B
-         NvCl7AagdLVb3ZA/DnKbJJSPYWC3Q3X/rKvf7egCH1AS1sNFuRxWTWKmkjlu/Vg/wJ/K
-         Qkwgx/bLksLYBOgDHsY5RG1rTD2l7xjxEQHCiaJS+C56UJldC0OqsGXKXvjMSGZ1LNOm
-         njmA==
-X-Gm-Message-State: AOJu0Yzr89zvCAd8jnUI9Gg8zD8Atil2KXeC4Vn+l2ba4qaB74Ng4Lk6
-	B1YiZo495X7NtaTWgwqv/+ewDpTRAc4/nHXg4aw=
-X-Google-Smtp-Source: AGHT+IEuvPz5wMMJnFnPWouwjZrhQZklg8n8Qlh0fxAWkPyyLyC5CqCfflm8sHoGFAVFUlWKAA2E+Q==
-X-Received: by 2002:a2e:b00e:0:b0:2c5:70f:614a with SMTP id y14-20020a2eb00e000000b002c5070f614amr155623ljk.17.1700764537845;
-        Thu, 23 Nov 2023 10:35:37 -0800 (PST)
+        bh=+UF32mbiOniogqxmnEO/G/4hA+3MFqbkOICeJQxcwIQ=;
+        b=gfooypR7cJ7yxA9fc1kLWwCkGRIXxsO4TXSaGmbIgCO/c93al+GL9KzAIoL7hNern+
+         p2NFXan8B4+EfigGAWSwlWE+qHJEg9hOspdr0DoHv3t1xMjAiPiIp1SP870ZPPUmFQTb
+         C1oieDVjCSxw1Y7bWqCOttaVHyg71yOpBaGAdGz/ODdjr1feAv3NtdfBKU737GE2akIj
+         1/jZdYN+usUmtfZ7Ytbek7XwFN+Uv3bAlwk+SUc0fXwIyyzPNUEQqlTphOqHPcE1ArUY
+         bX2/3+RN5332c4c1sDdQQcf7qdKexRG9sRy3RxtTmJshC3hkbX03A2U1i2sWV8Ig4F6P
+         ThzA==
+X-Gm-Message-State: AOJu0YxPMh4AVfTz2q5ALelpVX4kiUCi75iNQFiJA5hkFW85ieggJ8Qo
+	x8TJy5tinOUjuql/JiOIpf8Qww==
+X-Google-Smtp-Source: AGHT+IGltS3KwJOeq5TCm3ydg30w+N35sZn3hV62TeTHE6Z8rqYBJAB1D8TeLnzmMQ7S92iGYMJJ4Q==
+X-Received: by 2002:adf:e981:0:b0:332:c9f5:e5b5 with SMTP id h1-20020adfe981000000b00332c9f5e5b5mr54137wrm.0.1700764543126;
+        Thu, 23 Nov 2023 10:35:43 -0800 (PST)
 Received: from m1x-phil.lan ([176.176.165.237])
-        by smtp.gmail.com with ESMTPSA id o7-20020a5d6847000000b0032dab20e773sm2268980wrw.69.2023.11.23.10.35.36
+        by smtp.gmail.com with ESMTPSA id k15-20020a5d628f000000b0031ad5fb5a0fsm2315722wru.58.2023.11.23.10.35.42
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 23 Nov 2023 10:35:37 -0800 (PST)
+        Thu, 23 Nov 2023 10:35:42 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>,
@@ -60,9 +60,9 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
 	kvm@vger.kernel.org,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH-for-9.0 03/16] target/arm/kvm: Have kvm_arm_add_vcpu_properties take a ARMCPU argument
-Date: Thu, 23 Nov 2023 19:35:04 +0100
-Message-ID: <20231123183518.64569-4-philmd@linaro.org>
+Subject: [PATCH-for-9.0 04/16] target/arm/kvm: Have kvm_arm_sve_set_vls take a ARMCPU argument
+Date: Thu, 23 Nov 2023 19:35:05 +0100
+Message-ID: <20231123183518.64569-5-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231123183518.64569-1-philmd@linaro.org>
 References: <20231123183518.64569-1-philmd@linaro.org>
@@ -81,63 +81,39 @@ calling the generic vCPU API from "sysemu/kvm.h".
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/arm/kvm_arm.h | 4 ++--
- target/arm/cpu.c     | 2 +-
- target/arm/kvm.c     | 4 ++--
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ target/arm/kvm.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 50967f4ae9..6fb8a5f67e 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -153,7 +153,7 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
-  * Add all KVM specific CPU properties to the CPU object. These
-  * are the CPU properties with "kvm-" prefixed names.
-  */
--void kvm_arm_add_vcpu_properties(Object *obj);
-+void kvm_arm_add_vcpu_properties(ARMCPU *cpu);
- 
- /**
-  * kvm_arm_steal_time_finalize:
-@@ -243,7 +243,7 @@ static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
-     g_assert_not_reached();
- }
- 
--static inline void kvm_arm_add_vcpu_properties(Object *obj)
-+static inline void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
- {
-     g_assert_not_reached();
- }
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 25e9d2ae7b..97081e0c70 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1686,7 +1686,7 @@ void arm_cpu_post_init(Object *obj)
-     }
- 
-     if (kvm_enabled()) {
--        kvm_arm_add_vcpu_properties(obj);
-+        kvm_arm_add_vcpu_properties(cpu);
-     }
- 
- #ifndef CONFIG_USER_ONLY
 diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 6e3fea1879..03195f5627 100644
+index 03195f5627..71833a845a 100644
 --- a/target/arm/kvm.c
 +++ b/target/arm/kvm.c
-@@ -495,10 +495,10 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
+@@ -1857,14 +1857,13 @@ uint32_t kvm_arm_sve_get_vls(CPUState *cs)
+     return vls[0];
  }
  
- /* KVM VCPU properties should be prefixed with "kvm-". */
--void kvm_arm_add_vcpu_properties(Object *obj)
-+void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
+-static int kvm_arm_sve_set_vls(CPUState *cs)
++static int kvm_arm_sve_set_vls(ARMCPU *cpu)
  {
--    ARMCPU *cpu = ARM_CPU(obj);
-     CPUARMState *env = &cpu->env;
-+    Object *obj = OBJECT(cpu);
+-    ARMCPU *cpu = ARM_CPU(cs);
+     uint64_t vls[KVM_ARM64_SVE_VLS_WORDS] = { cpu->sve_vq.map };
  
-     if (arm_feature(env, ARM_FEATURE_GENERIC_TIMER)) {
-         cpu->kvm_adjvtime = true;
+     assert(cpu->sve_max_vq <= KVM_ARM64_SVE_VQ_MAX);
+ 
+-    return kvm_set_one_reg(cs, KVM_REG_ARM64_SVE_VLS, &vls[0]);
++    return kvm_set_one_reg(CPU(cpu), KVM_REG_ARM64_SVE_VLS, &vls[0]);
+ }
+ 
+ #define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
+@@ -1921,7 +1920,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     }
+ 
+     if (cpu_isar_feature(aa64_sve, cpu)) {
+-        ret = kvm_arm_sve_set_vls(cs);
++        ret = kvm_arm_sve_set_vls(cpu);
+         if (ret) {
+             return ret;
+         }
 -- 
 2.41.0
 
