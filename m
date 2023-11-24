@@ -1,226 +1,158 @@
-Return-Path: <kvm+bounces-2437-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2438-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 634357F765D
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 15:32:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E15F7F766D
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 15:37:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D5C028223F
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 14:32:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BDDF5B21522
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 14:37:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 572082E624;
-	Fri, 24 Nov 2023 14:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D9762D61F;
+	Fri, 24 Nov 2023 14:37:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jkenYbL4"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="C4ZWuUa1"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 280D519A4;
+	Fri, 24 Nov 2023 06:37:22 -0800 (PST)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7046940E0258;
+	Fri, 24 Nov 2023 14:37:19 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id PRqga3sbJpbf; Fri, 24 Nov 2023 14:37:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1700836637; bh=ohccp6emLwawWzvtIzIh09L/4m/V7F4sqEbEIpoSnq0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C4ZWuUa1L7kfp2HdFjJoJ/VJsOFVSUnC0gO9qFwTG3YmBCUPdTYsVqDGWCWhKhwWt
+	 bPMfC5FW5UvB9dmwy2CIqzCbKbi5cBjMdkDEa0CeXp+5M+QzDtnelk9TLL/EgQ5NHj
+	 McXjzfHSJsgjpj9MqRmHPWcJCCMrAogxjUm0/Jsc72ebMXkCNQAv2djjGq5eNffoAf
+	 OMq7FM/q2dgI4mAq6K/W2UfryaZEHOZo9PgaPQCJavHEyqMeOtbKdsxzha219KEvZA
+	 X4wIE/IZYEGPevYKN2YBtPnPL5DpnWEEeMQiu/VmvTlcQD+X7yrx99Yo3AdwDF84Ox
+	 hyEAoTZMYPGcbo29lPJ7jZX5gfw9buYqXMNsN85LAYacotEiG6IZhHOjIZnf6V/qGJ
+	 D4elq+EAdSdHpU94MOeTRjyBVHsxMDXkGH0vd/cN/mdU/okeck6NZxDB9cxZmMQxdS
+	 DdAcDBO8v99bXDYNhp74RKKFrlGzQVHoUWww+ITXNOeS5ImW+fkWgECNI4J6p5HHzc
+	 tWYWb2LREZVw1alEGmVBJNZW9xdLYefPQ2qHOTWEU8lOdrrttsoCdCD/HPkTNRKylD
+	 PudnxC5CBKqZvR0VTaguz2OUBxIbOEGUGX5BFTAzbznuxMmWe5UgIF62+gJycHagac
+	 eB1F7hjjZjigIKjjHsZGVU5M=
+Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FACA2E633;
-	Fri, 24 Nov 2023 14:32:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B6F3C433C8;
-	Fri, 24 Nov 2023 14:32:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700836359;
-	bh=gd9+eyKPQRosH6Zy3rvn5fSoMQYqPc0CQ/4F+lvxRpo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jkenYbL4C3P1ur7PB5kdTPPQR04bbX0G9eSIFprhwFfRMBWcAxkf+CQgmG8xq8Wfn
-	 xHKIixMBrlqATC9SpOsNVLxaxmyT/80R8N6mNrm4/erfoZUU14ZoTZw1Z1IYPK9uR6
-	 IBpxney2Z1GXn6Z7/PIJR1yYIEVDpIBzF4ACcjvW0izlpNmRtLZkwvIelHUheihOWD
-	 IqHAKRlGY/eBDcnBrxhY22eXA3gn+D8MsEvC11WvgU2ma2ElC4e8IfrToUsy04B3I9
-	 PZd29BXpSrPSD3yNgnqaVrFIk4lDI1brbVt7l94dS7Zg41pjxPuJ2AiuG8N6PUw0dj
-	 /JUXUV4d0MVNQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1r6XES-00G7hW-QL;
-	Fri, 24 Nov 2023 14:32:36 +0000
-Date: Fri, 24 Nov 2023 14:32:36 +0000
-Message-ID: <86leancjcr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: Miguel Luis <miguel.luis@oracle.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	James Morse
- <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support (FEAT_NV2 only)
-In-Reply-To: <e18700d4-061d-4489-8d8d-87c11b70eedb@os.amperecomputing.com>
-References: <20231120131027.854038-1-maz@kernel.org>
-	<DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
-	<86msv7ylnu.wl-maz@kernel.org>
-	<05733774-4210-4097-9912-fb3aa8542fdd@oracle.com>
-	<86a5r4zafh.wl-maz@kernel.org>
-	<134912e4-beed-4ab6-8ce1-33e69ec382b3@os.amperecomputing.com>
-	<868r6nzc5y.wl-maz@kernel.org>
-	<65dc2a93-0a17-4433-b3a5-430bf516ffe9@os.amperecomputing.com>
-	<86o7fjco13.wl-maz@kernel.org>
-	<e18700d4-061d-4489-8d8d-87c11b70eedb@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id AD93F40E014B;
+	Fri, 24 Nov 2023 14:36:36 +0000 (UTC)
+Date: Fri, 24 Nov 2023 15:36:30 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+	tony.luck@intel.com, marcorr@google.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v10 13/50] crypto: ccp: Define the SEV-SNP commands
+Message-ID: <20231124143630.GKZWC07hjqxkf60ni4@fat_crate.local>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-14-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231016132819.1002933-14-michael.roth@amd.com>
 
-On Fri, 24 Nov 2023 13:22:22 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
->=20
-> > How is this value possible if the write to HCR_EL2 has taken place?
-> > When do you sample this?
->=20
-> I am not sure how and where it got set. I think, whatever it is set,
-> it is due to false return of vcpu_el2_e2h_is_set(). Need to
-> understand/debug.
-> The vhcr_el2 value I have shared is traced along with hcr in function
-> __activate_traps/__compute_hcr.
+On Mon, Oct 16, 2023 at 08:27:42AM -0500, Michael Roth wrote:
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 7fd17e82bab4..a7f92e74564d 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -78,6 +78,36 @@ enum sev_cmd {
+>  	SEV_CMD_DBG_DECRYPT		= 0x060,
+>  	SEV_CMD_DBG_ENCRYPT		= 0x061,
+>
+> +	/* SNP specific commands */
+> +	SEV_CMD_SNP_INIT			= 0x81,
 
-Here's my hunch:
+The other commands start with "0x0" - pls do that too here or unify with
+a pre-patch.
 
-The guest boots with E2H=3D0, because we don't advertise anything else
-on your HW. So we run with NV1=3D1 until we try to *upgrade* to VHE. NV2
-means that HCR_EL2 is writable (to memory) without a trap. But we're
-still running with NV1=3D1.
+> +	SEV_CMD_SNP_SHUTDOWN			= 0x82,
+> +	SEV_CMD_SNP_PLATFORM_STATUS		= 0x83,
+> +	SEV_CMD_SNP_DF_FLUSH			= 0x84,
+> +	SEV_CMD_SNP_INIT_EX			= 0x85,
+> +	SEV_CMD_SNP_SHUTDOWN_EX			= 0x86,
+> +	SEV_CMD_SNP_DECOMMISSION		= 0x90,
+> +	SEV_CMD_SNP_ACTIVATE			= 0x91,
+> +	SEV_CMD_SNP_GUEST_STATUS		= 0x92,
+> +	SEV_CMD_SNP_GCTX_CREATE			= 0x93,
+> +	SEV_CMD_SNP_GUEST_REQUEST		= 0x94,
+> +	SEV_CMD_SNP_ACTIVATE_EX			= 0x95,
+> +	SEV_CMD_SNP_LAUNCH_START		= 0xA0,
+> +	SEV_CMD_SNP_LAUNCH_UPDATE		= 0xA1,
+> +	SEV_CMD_SNP_LAUNCH_FINISH		= 0xA2,
+> +	SEV_CMD_SNP_DBG_DECRYPT			= 0xB0,
+> +	SEV_CMD_SNP_DBG_ENCRYPT			= 0xB1,
+> +	SEV_CMD_SNP_PAGE_SWAP_OUT		= 0xC0,
+> +	SEV_CMD_SNP_PAGE_SWAP_IN		= 0xC1,
+> +	SEV_CMD_SNP_PAGE_MOVE			= 0xC2,
+> +	SEV_CMD_SNP_PAGE_MD_INIT		= 0xC3,
+> +	SEV_CMD_SNP_PAGE_SET_STATE		= 0xC6,
+> +	SEV_CMD_SNP_PAGE_RECLAIM		= 0xC7,
+> +	SEV_CMD_SNP_PAGE_UNSMASH		= 0xC8,
+> +	SEV_CMD_SNP_CONFIG			= 0xC9,
+> +	SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX	= 0xCA,
 
-Subsequently, we access a sysreg that should never trap for a VHE
-guest, but we're with the wrong config. Bad things happen.
+You don't have to vertically align those to a different column due to
+this command's name not fitting - just do:
 
-Unfortunately, NV2 is pretty much incompatible with E2H being updated,
-because it cannot perform the changes that this would result into at
-the point where they should happen. We can try and do a best effort
-handling, but you can always trick it.
-
-Anyway, can you see if the hack below helps? I'm not keen on it at
-all, but this would be a good data point.
-
-	M.
-
-=46rom c4b856221661393b884cbf673d100faaa8dc018a Mon Sep 17 00:00:00 2001
-From: Marc Zyngier <maz@kernel.org>
-Date: Fri, 26 May 2023 12:16:05 +0100
-Subject: [PATCH] KVM: arm64: Opportunistically track HCR_EL2.E2H being flip=
-ped
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h       |  9 +++++++--
- arch/arm64/kvm/hyp/include/hyp/switch.h | 13 +++++++++++++
- arch/arm64/kvm/hyp/vhe/switch.c         | 10 ++++++++--
- 3 files changed, 28 insertions(+), 4 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm=
-_host.h
-index c91f607e989d..d45ef41de5fb 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -655,6 +655,9 @@ struct kvm_vcpu_arch {
- 	/* State flags for kernel bookkeeping, unused by the hypervisor code */
- 	u8 sflags;
-=20
-+	/* Bookkeeping flags for NV */
-+	u8 nvflags;
-+
- 	/*
- 	 * Don't run the guest (internal implementation need).
- 	 *
-@@ -858,8 +861,6 @@ struct kvm_vcpu_arch {
- #define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
- /* Save TRBE context if active  */
- #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
--/* vcpu running in HYP context */
--#define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
-=20
- /* SVE enabled for host EL0 */
- #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
-@@ -878,6 +879,10 @@ struct kvm_vcpu_arch {
- /* WFI instruction trapped */
- #define IN_WFI			__vcpu_single_flag(sflags, BIT(7))
-=20
-+/* vcpu running in HYP context */
-+#define VCPU_HYP_CONTEXT	__vcpu_single_flag(nvflags, BIT(0))
-+/* vcpu entered with HCR_EL2.E2H set */
-+#define VCPU_HCR_E2H		__vcpu_single_flag(nvflags, BIT(1))
-=20
- /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
- #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/i=
-nclude/hyp/switch.h
-index aed2ea35082c..9c1346116d61 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -669,6 +669,19 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *v=
-cpu, u64 *exit_code)
- 	 */
- 	synchronize_vcpu_pstate(vcpu, exit_code);
-=20
-+	if (vcpu_has_nv(vcpu) &&
-+	    (!!vcpu_get_flag(vcpu, VCPU_HCR_E2H) ^ vcpu_el2_e2h_is_set(vcpu))) {
-+		if (vcpu_el2_e2h_is_set(vcpu)) {
-+			sysreg_clear_set(hcr_el2, HCR_NV1, 0);
-+			vcpu_set_flag(vcpu, VCPU_HCR_E2H);
-+		} else {
-+			sysreg_clear_set(hcr_el2, 0, HCR_NV1);
-+			vcpu_clear_flag(vcpu, VCPU_HCR_E2H);
-+		}
-+
-+		return true;
-+	}
-+
- 	/*
- 	 * Check whether we want to repaint the state one way or
- 	 * another.
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switc=
-h.c
-index 8d1e9d1adabe..395aaa06f358 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -447,10 +447,16 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	sysreg_restore_guest_state_vhe(guest_ctxt);
- 	__debug_switch_to_guest(vcpu);
-=20
--	if (is_hyp_ctxt(vcpu))
-+	if (is_hyp_ctxt(vcpu)) {
-+		if (vcpu_el2_e2h_is_set(vcpu))
-+			vcpu_set_flag(vcpu, VCPU_HCR_E2H);
-+		else
-+			vcpu_clear_flag(vcpu, VCPU_HCR_E2H);
-+
- 		vcpu_set_flag(vcpu, VCPU_HYP_CONTEXT);
--	else
-+	} else {
- 		vcpu_clear_flag(vcpu, VCPU_HYP_CONTEXT);
-+	}
-=20
- 	do {
- 		/* Jump in the fire! */
---=20
-2.39.2
+        SEV_CMD_SNP_CONFIG              = 0x0C9,
+        SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX = 0x0CA,
+        SEV_CMD_SNP_COMMIT              = 0x0CB,
 
 
---=20
-Without deviation from the norm, progress is not possible.
+
+
+> +	SEV_CMD_SNP_COMMIT			= 0xCB,
+> +	SEV_CMD_SNP_VLEK_LOAD			= 0xCD,
+> +
+>  	SEV_CMD_MAX,
+>  };
+
+...
+
+> +/**
+> + * struct sev_data_snp_launch_start - SNP_LAUNCH_START command params
+> + *
+> + * @gctx_addr: system physical address of guest context page
+> + * @policy: guest policy
+> + * @ma_gctx_addr: system physical address of migration agent
+> + * @imi_en: launch flow is launching an IMI for the purpose of
+
+What is an "IMI"?
+
+Define it once for the readers pls.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
