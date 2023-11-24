@@ -1,212 +1,388 @@
-Return-Path: <kvm+bounces-2446-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2447-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB2767F78E1
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 17:26:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 341C97F7C77
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 19:15:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 927D6281369
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 16:25:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDBAE281C46
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 18:15:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EFA235EFD;
-	Fri, 24 Nov 2023 16:25:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491EF39FDD;
+	Fri, 24 Nov 2023 18:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zoo640W5"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CED0CD41;
-	Fri, 24 Nov 2023 08:25:45 -0800 (PST)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.226])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ScL0J3zRqz67cSV;
-	Sat, 25 Nov 2023 00:24:16 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 24 Nov
- 2023 16:25:43 +0000
-Date: Fri, 24 Nov 2023 16:25:42 +0000
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Dan Williams <dan.j.williams@intel.com>
-CC: Lukas Wunner <lukas@wunner.de>, Alexey Kardashevskiy <aik@amd.com>,
-	<linux-coco@lists.linux.dev>, <kvm@vger.kernel.org>,
-	<linux-pci@vger.kernel.org>, Jonathan Cameron <jic23@kernel.org>,
-	<suzuki.poulose@arm.com>
-Subject: Re: TDISP enablement
-Message-ID: <20231124162542.00005d95@Huawei.com>
-In-Reply-To: <654ebd31be94a_46f0294a5@dwillia2-mobl3.amr.corp.intel.com.notmuch>
-References: <e05eafd8-04b3-4953-8bca-dc321c1a60b9@amd.com>
-	<20231101072717.GB25863@wunner.de>
-	<20231101110551.00003896@Huawei.com>
-	<654ebd31be94a_46f0294a5@dwillia2-mobl3.amr.corp.intel.com.notmuch>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 025D619B3
+	for <kvm@vger.kernel.org>; Fri, 24 Nov 2023 10:14:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700849689;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jayixR5r6VyMF6ruxCXdvNk+pP1D8SwAjs84TIg2nWE=;
+	b=Zoo640W5UvRuC98eSvXgzbJD22EL68xQVbCnnUhUN6rKGIWJTGu31LqdeozAtgjilfOs2L
+	bo6iS+WaCtcc5SmtqEyqayiyKsokQbhqUDPXcUD1s51uElwuhACtTVu9aetsXEse0p0xxF
+	/RhxLi0wR65IR8tLYUITL8Rj8yK3U/U=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-612-Q8nVVURaO_mG2cQPUdi0oQ-1; Fri, 24 Nov 2023 13:14:48 -0500
+X-MC-Unique: Q8nVVURaO_mG2cQPUdi0oQ-1
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6757f3d7911so21012016d6.1
+        for <kvm@vger.kernel.org>; Fri, 24 Nov 2023 10:14:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700849688; x=1701454488;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jayixR5r6VyMF6ruxCXdvNk+pP1D8SwAjs84TIg2nWE=;
+        b=cag+7Y+5fmCupe9C/aM/jAn+vTEPaMZ/OQt591HfMQsOi2PHdcgksGlzgmo0wUVqHz
+         8CfFvP/qorSytYNsVDnZvEi1vo65XT7XY+VvHxELuaXu6KPl2LvFo/W5aPkh0nO/xAAU
+         pdloDYJFmVUeGqgqvTkjghsl4woC6IFVWo0ZE0q7kv353WSC3hfTvP6iiAWnZtQyUgUq
+         s3UpAOgQr5Jdqcn6WlV3LSKpaPb7ChBDhHSpyaJRSaXZMkB/3CMHjbG5XklUEqqgP1Db
+         xucjAhZ2j1vhEzKAJNSujUjMKv1W8vKcYd2WDf/3aiUiKLXww+CC0XvBWxmzkOMKO8vz
+         3r7A==
+X-Gm-Message-State: AOJu0Yyfr5wt15Mb74IdJayOzU+M0KSaIjgPrFp9XCVG5cJtyPNxNI4r
+	Fj/uEdAUqIJHD7HI4B275Tu1E+BUtfqtb8bjqK80YJF+XY0h5XQO8umqiRypzc3+WOn2jhsWBy4
+	hsgry1aY0Wjco
+X-Received: by 2002:ad4:42a1:0:b0:679:e459:66 with SMTP id e1-20020ad442a1000000b00679e4590066mr3792208qvr.55.1700849687796;
+        Fri, 24 Nov 2023 10:14:47 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE9wpyuHWoHfdTHuBWyEG1G0mr4qBCQ3ozLCnEUmhsRho272BBXa5JXGDKRO/WBwS4a5ruh0g==
+X-Received: by 2002:ad4:42a1:0:b0:679:e459:66 with SMTP id e1-20020ad442a1000000b00679e4590066mr3792179qvr.55.1700849687550;
+        Fri, 24 Nov 2023 10:14:47 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id jy19-20020a0562142b5300b0067a165ccc72sm674469qvb.22.2023.11.24.10.14.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Nov 2023 10:14:46 -0800 (PST)
+Message-ID: <7b809e6b-aee8-4600-9f0c-07c10fa5d12b@redhat.com>
+Date: Fri, 24 Nov 2023 19:14:42 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 2/3] KVM: selftests: aarch64: Move the pmu helper
+ function into lib/
+Content-Language: en-US
+To: Shaoqin Huang <shahuang@redhat.com>, Oliver Upton
+ <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
+ kvmarm@lists.linux.dev
+Cc: James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231123063750.2176250-1-shahuang@redhat.com>
+ <20231123063750.2176250-3-shahuang@redhat.com>
+From: Eric Auger <eauger@redhat.com>
+In-Reply-To: <20231123063750.2176250-3-shahuang@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
 
-On Fri, 10 Nov 2023 15:30:57 -0800
-Dan Williams <dan.j.williams@intel.com> wrote:
+Hi Shaoqin,
 
-> Jonathan Cameron wrote:
-> > On Wed, 1 Nov 2023 08:27:17 +0100
-> > Lukas Wunner <lukas@wunner.de> wrote:
-> > 
-> > Thanks Alexy, this is a great discussion to kick off.
-> >   
-> > > On Wed, Nov 01, 2023 at 09:56:11AM +1100, Alexey Kardashevskiy wrote:  
-> > > > - device_connect - starts CMA/SPDM session, returns measurements/certs,
-> > > > runs IDE_KM to program the keys;    
-> > > 
-> > > Does the PSP have a set of trusted root certificates?
-> > > If so, where does it get them from?
-> > > 
-> > > If not, does the PSP just blindly trust the validity of the cert chain?
-> > > Who validates the cert chain, and when?
-> > > Which slot do you use?
-> > > Do you return only the cert chain of that single slot or of all slots?
-> > > Does the PSP read out all measurements available?  This may take a while
-> > > if the measurements are large and there are a lot of them.  
-> > 
-> > I'd definitely like their to be a path for certs and measurement to be
-> > checked by the Host OS (for the non TDISP path). Whether the
-> > policy setup cares about result is different question ;)
-> >   
-> > > 
-> > >   
-> > > > - tdi_info - read measurements/certs/interface report;    
-> > > 
-> > > Does this return cached cert chains and measurements from the device
-> > > or does it retrieve them anew?  (Measurements might have changed if
-> > > MEAS_FRESH_CAP is supported.)
-> > > 
-> > >   
-> > > > If the user wants only CMA/SPDM, the Lukas'es patched will do that without
-> > > > the PSP. This may co-exist with the AMD PSP (if the endpoint allows multiple
-> > > > sessions).    
-> > > 
-> > > It can co-exist if the pci_cma_claim_ownership() library call
-> > > provided by patch 12/12 is invoked upon device_connect.
-> > > 
-> > > It would seem advantageous if you could delay device_connect
-> > > until a device is actually passed through.  Then the OS can
-> > > initially authenticate and measure devices and the PSP takes
-> > > over when needed.  
-> > 
-> > Would that delay mean IDE isn't up - I think that wants to be
-> > available whether or not pass through is going on.
-> > 
-> > Given potential restrictions on IDE resources, I'd expect to see an explicit
-> > opt in from userspace on the host to start that process for a given
-> > device.  (udev rule or similar might kick it off for simple setups).
-> > 
-> > Would that work for the flows described?  
-> > 
-> > Next bit probably has holes...  Key is that a lot of the checks
-> > may fail, and it's up to host userspace policy to decide whether
-> > to proceed (other policy in the secure VM side of things obviously)
-> > 
-> > So my rough thinking is - for the two options (IDE / TDISP)
-> > 
-> > Comparing with Alexey's flow I think only real difference is that
-> > I call out explicit host userspace policy controls. I'd also like
-> > to use similar interfaces to convey state to host userspace as
-> > per Lukas' existing approaches.  Sure there will also be in
-> > kernel interfaces for driver to get data if it knows what to do
-> > with it.  I'd also like to enable the non tdisp flow to handle
-> > IDE setup 'natively' if that's possible on particular hardware.  
+On 11/23/23 07:37, Shaoqin Huang wrote:
+> Move those pmu helper function into lib/, thus it can be used by other
+functions
+
+Not really into lib but rather in vpmu.h header.
+> pmu test.
+
+no functional change intended
 > 
-> Are there any platforms that have IDE host capability that are not also
-> shipping a TSM. I know that some platform allow for either the TSM or
-> the OS to own that setup, but there are no standards there. I am not
-> opposed to the native path, but given a cross-vendor "TSM" concept is
-> needed and that a TSM is likely available on all IDE capable platforms
-> it seems reasonable for Linux to rely on TSM managed IDE for the near
-> term if not the long term as well.
-
-Just for completeness, (I mentioned it in the LPC discussion):
-IDE might well be link based between a switch inside the chassis and devices
-outside the chassis in which case it is all standards defined and the host
-isn't involved.  Not TDISP related though in that case.
-
+> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+>  .../kvm/aarch64/vpmu_counter_access.c         | 118 -----------------
+>  .../selftests/kvm/include/aarch64/vpmu.h      | 119 ++++++++++++++++++
+>  2 files changed, 119 insertions(+), 118 deletions(-)
 > 
-> > 
-> > 1. Host has a go at CMA/SPDM. Policy might say that a failure here is
-> >    a failure in general so reject device - or it might decide it's up to
-> >    the PSP etc.   (userspace can see if it succeeded)
-> >    I'd argue host software can launch this at any time.  It will
-> >    be a denial of service attack but so are many other things the host
-> >    can do.
-> > 2. TDISP policy decision from host (userspace policy control)
-> >    Need to know end goal.  
-> 
-> If the TSM owns the TDISP state what this policy decision rely comes
-> down to is IDE stream resource management, I otherwise struggle to
-> conceptualize "TDISP policy".
-> 
-> The policy is userspace deciding to assign an interface to a TVM, and
-> that TVM requests that the assigned interface be allowed to access
-> private memory. So it's not necessarily TDISP policy, its assigned
-> interface is allowed to transition to private operation.
-Agreed - that is probably enough. I was avoiding calling out specific
-policy method, just don't want it to all flow through in the kernel without
-a hook.  If we assume that we do stuff only when allocated to a TVM
-then that acts as the gate.
+> diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+> index 17305408a334..62d6315790ab 100644
+> --- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+> @@ -20,12 +20,6 @@
+>  #include <perf/arm_pmuv3.h>
+>  #include <linux/bitfield.h>
+>  
+> -/* The max number of the PMU event counters (excluding the cycle counter) */
+> -#define ARMV8_PMU_MAX_GENERAL_COUNTERS	(ARMV8_PMU_MAX_COUNTERS - 1)
+> -
+> -/* The cycle counter bit position that's common among the PMU registers */
+> -#define ARMV8_PMU_CYCLE_IDX		31
+> -
+>  static struct vpmu_vm *vpmu_vm;
+>  
+>  struct pmreg_sets {
+> @@ -35,118 +29,6 @@ struct pmreg_sets {
+>  
+>  #define PMREG_SET(set, clr) {.set_reg_id = set, .clr_reg_id = clr}
+>  
+> -static uint64_t get_pmcr_n(uint64_t pmcr)
+> -{
+> -	return (pmcr >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
+> -}
+> -
+> -static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
+> -{
+> -	*pmcr = *pmcr & ~(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
+> -	*pmcr |= (pmcr_n << ARMV8_PMU_PMCR_N_SHIFT);
+> -}
+> -
+> -static uint64_t get_counters_mask(uint64_t n)
+> -{
+> -	uint64_t mask = BIT(ARMV8_PMU_CYCLE_IDX);
+> -
+> -	if (n)
+> -		mask |= GENMASK(n - 1, 0);
+> -	return mask;
+> -}
+> -
+> -/* Read PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
+> -static inline unsigned long read_sel_evcntr(int sel)
+> -{
+> -	write_sysreg(sel, pmselr_el0);
+> -	isb();
+> -	return read_sysreg(pmxevcntr_el0);
+> -}
+> -
+> -/* Write PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
+> -static inline void write_sel_evcntr(int sel, unsigned long val)
+> -{
+> -	write_sysreg(sel, pmselr_el0);
+> -	isb();
+> -	write_sysreg(val, pmxevcntr_el0);
+> -	isb();
+> -}
+> -
+> -/* Read PMEVTYPER<n>_EL0 through PMXEVTYPER_EL0 */
+> -static inline unsigned long read_sel_evtyper(int sel)
+> -{
+> -	write_sysreg(sel, pmselr_el0);
+> -	isb();
+> -	return read_sysreg(pmxevtyper_el0);
+> -}
+> -
+> -/* Write PMEVTYPER<n>_EL0 through PMXEVTYPER_EL0 */
+> -static inline void write_sel_evtyper(int sel, unsigned long val)
+> -{
+> -	write_sysreg(sel, pmselr_el0);
+> -	isb();
+> -	write_sysreg(val, pmxevtyper_el0);
+> -	isb();
+> -}
+> -
+> -static inline void enable_counter(int idx)
+> -{
+> -	uint64_t v = read_sysreg(pmcntenset_el0);
+> -
+> -	write_sysreg(BIT(idx) | v, pmcntenset_el0);
+> -	isb();
+> -}
+> -
+> -static inline void disable_counter(int idx)
+> -{
+> -	uint64_t v = read_sysreg(pmcntenset_el0);
+> -
+> -	write_sysreg(BIT(idx) | v, pmcntenclr_el0);
+> -	isb();
+> -}
+> -
+> -static void pmu_disable_reset(void)
+> -{
+> -	uint64_t pmcr = read_sysreg(pmcr_el0);
+> -
+> -	/* Reset all counters, disabling them */
+> -	pmcr &= ~ARMV8_PMU_PMCR_E;
+> -	write_sysreg(pmcr | ARMV8_PMU_PMCR_P, pmcr_el0);
+> -	isb();
+> -}
+> -
+> -#define RETURN_READ_PMEVCNTRN(n) \
+> -	return read_sysreg(pmevcntr##n##_el0)
+> -static unsigned long read_pmevcntrn(int n)
+> -{
+> -	PMEVN_SWITCH(n, RETURN_READ_PMEVCNTRN);
+> -	return 0;
+> -}
+> -
+> -#define WRITE_PMEVCNTRN(n) \
+> -	write_sysreg(val, pmevcntr##n##_el0)
+> -static void write_pmevcntrn(int n, unsigned long val)
+> -{
+> -	PMEVN_SWITCH(n, WRITE_PMEVCNTRN);
+> -	isb();
+> -}
+> -
+> -#define READ_PMEVTYPERN(n) \
+> -	return read_sysreg(pmevtyper##n##_el0)
+> -static unsigned long read_pmevtypern(int n)
+> -{
+> -	PMEVN_SWITCH(n, READ_PMEVTYPERN);
+> -	return 0;
+> -}
+> -
+> -#define WRITE_PMEVTYPERN(n) \
+> -	write_sysreg(val, pmevtyper##n##_el0)
+> -static void write_pmevtypern(int n, unsigned long val)
+> -{
+> -	PMEVN_SWITCH(n, WRITE_PMEVTYPERN);
+> -	isb();
+> -}
+> -
+>  /*
+>   * The pmc_accessor structure has pointers to PMEV{CNTR,TYPER}<n>_EL0
+>   * accessors that test cases will use. Each of the accessors will
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/vpmu.h b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
+> index 0a56183644ee..e0cc1ca1c4b7 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/vpmu.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
+> @@ -1,10 +1,17 @@
+>  /* SPDX-License-Identifier: GPL-2.0 */
+>  
+>  #include <kvm_util.h>
+> +#include <perf/arm_pmuv3.h>
+>  
+>  #define GICD_BASE_GPA	0x8000000ULL
+>  #define GICR_BASE_GPA	0x80A0000ULL
+>  
+> +/* The max number of the PMU event counters (excluding the cycle counter) */
+> +#define ARMV8_PMU_MAX_GENERAL_COUNTERS	(ARMV8_PMU_MAX_COUNTERS - 1)
+> +
+> +/* The cycle counter bit position that's common among the PMU registers */
+> +#define ARMV8_PMU_CYCLE_IDX		31
+> +
+>  struct vpmu_vm {
+>  	struct kvm_vm *vm;
+>  	struct kvm_vcpu *vcpu;
+> @@ -14,3 +21,115 @@ struct vpmu_vm {
+>  struct vpmu_vm *create_vpmu_vm(void *guest_code);
+>  
+>  void destroy_vpmu_vm(struct vpmu_vm *vpmu_vm);
+> +
+> +static inline uint64_t get_pmcr_n(uint64_t pmcr)
+> +{
+> +	return (pmcr >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
+> +}
+> +
+> +static inline void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
+> +{
+> +	*pmcr = *pmcr & ~(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
+> +	*pmcr |= (pmcr_n << ARMV8_PMU_PMCR_N_SHIFT);
+> +}
+> +
+> +static inline uint64_t get_counters_mask(uint64_t n)
+> +{
+> +	uint64_t mask = BIT(ARMV8_PMU_CYCLE_IDX);
+> +
+> +	if (n)
+> +		mask |= GENMASK(n - 1, 0);
+> +	return mask;
+> +}
+> +
+> +/* Read PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
+> +static inline unsigned long read_sel_evcntr(int sel)
+> +{
+> +	write_sysreg(sel, pmselr_el0);
+> +	isb();
+> +	return read_sysreg(pmxevcntr_el0);
+> +}
+> +
+> +/* Write PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
+> +static inline void write_sel_evcntr(int sel, unsigned long val)
+> +{
+> +	write_sysreg(sel, pmselr_el0);
+> +	isb();
+> +	write_sysreg(val, pmxevcntr_el0);
+> +	isb();
+> +}
+> +
+> +/* Read PMEVTYPER<n>_EL0 through PMXEVTYPER_EL0 */
+> +static inline unsigned long read_sel_evtyper(int sel)
+> +{
+> +	write_sysreg(sel, pmselr_el0);
+> +	isb();
+> +	return read_sysreg(pmxevtyper_el0);
+> +}
+> +
+> +/* Write PMEVTYPER<n>_EL0 through PMXEVTYPER_EL0 */
+> +static inline void write_sel_evtyper(int sel, unsigned long val)
+> +{
+> +	write_sysreg(sel, pmselr_el0);
+> +	isb();
+> +	write_sysreg(val, pmxevtyper_el0);
+> +	isb();
+> +}
+> +
+> +static inline void enable_counter(int idx)
+> +{
+> +	uint64_t v = read_sysreg(pmcntenset_el0);
+> +
+> +	write_sysreg(BIT(idx) | v, pmcntenset_el0);
+> +	isb();
+> +}
+> +
+> +static inline void disable_counter(int idx)
+> +{
+> +	uint64_t v = read_sysreg(pmcntenset_el0);
+> +
+> +	write_sysreg(BIT(idx) | v, pmcntenclr_el0);
+> +	isb();
+> +}
+> +
+> +static inline void pmu_disable_reset(void)
+> +{
+> +	uint64_t pmcr = read_sysreg(pmcr_el0);
+> +
+> +	/* Reset all counters, disabling them */
+> +	pmcr &= ~ARMV8_PMU_PMCR_E;
+> +	write_sysreg(pmcr | ARMV8_PMU_PMCR_P, pmcr_el0);
+> +	isb();
+> +}
+> +
+> +#define RETURN_READ_PMEVCNTRN(n) \
+> +	return read_sysreg(pmevcntr##n##_el0)
+> +static inline unsigned long read_pmevcntrn(int n)
+> +{
+> +	PMEVN_SWITCH(n, RETURN_READ_PMEVCNTRN);
+> +	return 0;
+> +}
+> +
+> +#define WRITE_PMEVCNTRN(n) \
+> +	write_sysreg(val, pmevcntr##n##_el0)
+> +static inline void write_pmevcntrn(int n, unsigned long val)
+> +{
+> +	PMEVN_SWITCH(n, WRITE_PMEVCNTRN);
+> +	isb();
+> +}
+> +
+> +#define READ_PMEVTYPERN(n) \
+> +	return read_sysreg(pmevtyper##n##_el0)
+> +static inline unsigned long read_pmevtypern(int n)
+> +{
+> +	PMEVN_SWITCH(n, READ_PMEVTYPERN);
+> +	return 0;
+> +}
+> +
+> +#define WRITE_PMEVTYPERN(n) \
+> +	write_sysreg(val, pmevtyper##n##_el0)
+> +static inline void write_pmevtypern(int n, unsigned long val)
+> +{
+> +	PMEVN_SWITCH(n, WRITE_PMEVTYPERN);
+> +	isb();
+> +}
 
-> 
-> > 3. IDE opt in from userspace.  Policy decision.
-> >   - If not TDISP 
-> >     - device_connect(IDE ONLY) - bunch of proxying in host OS.
-> >     - Cert chain and measurements presented to host, host can then check if
-> >       it is happy and expose for next policy decision.
-> >     - Hooks exposed for host to request more measurements, key refresh etc.
-> >       Idea being that the flow is host driven with PSP providing required
-> >       services.  If host can just do setup directly that's fine too.
-> >   - If TDISP (technically you can run tdisp from host, but lets assume
-> >     for now no one wants to do that? (yet)).
-> >     - device_connect(TDISP) - bunch of proxying in host OS.
-> >     - Cert chain and measurements presented to host, host can then check if
-> >       it is happy and expose for next policy decision.
-> > 
-> > 4. Flow after this depends on early or late binding (lockdown)
-> >    but could load driver at this point.  Userspace policy.
-> >    tdi-bind etc.  
-> 
-> It is valid to load the driver and operate the device in shared mode, so
-> I am not sure that acceptance should gate driver loading. It also seems
-> like something that could be managed with module policy if someone
-> wanted to prevent shared operation before acceptance.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Indeed that might work.  Depends on device and whether it needs to be exposed
-in shared mode (which may well require driver code auditing etc that can be relaxed
-if it's up with TDISP and we know it's not a 'fake').
+Thanks
 
-> 
-> [..]
-> > > > The next steps:
-> > > > - expose blobs via configfs (like Dan did configfs-tsm);  
-> 
-> I am missing the context here, but for measurements I think those are
-> better in sysfs. configs was only to allow for multiple containers to grab
-> attestation reports, measurements are device local and containers can
-> all see the same measurements.
+Eric
 
-Ah. Fair point.
-
-> 
-> > > > - s/tdisp.ko/coco.ko/;  
-> 
-> My bikeshed contribution, perhaps tsm.ko? I am still not someone who can
-> say "coco" for confidential computing with a straight face.
-
-Then definitely should be coco.ko :)
-
-Jonathan
 
