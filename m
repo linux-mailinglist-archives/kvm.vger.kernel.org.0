@@ -1,321 +1,221 @@
-Return-Path: <kvm+bounces-2449-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2450-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02F507F7D8F
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 19:25:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6DBC7F86BF
+	for <lists+kvm@lfdr.de>; Sat, 25 Nov 2023 00:36:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 669E3B21678
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 18:25:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9607A282309
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 23:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 880DA39FFD;
-	Fri, 24 Nov 2023 18:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 664843D99A;
+	Fri, 24 Nov 2023 23:35:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eFD5qpEI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S/Y8AIQ0"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD6FE1BCF
-	for <kvm@vger.kernel.org>; Fri, 24 Nov 2023 10:24:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700850257;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sQNKNBWeod2+64J8ErFDWPzg6uRfL5WI32OFBNWO8sg=;
-	b=eFD5qpEIkGxqfcjlVW3t2Z6NANZQfG4K+a7IBJb8MhCS0AeTAVolMctl6mMZZixbFCjIk2
-	rtrC2J0VjYOPQRA01kITRrBOE5PzYAkoqpSW1vbRxJvJbN98SdybQeHpB8LaEPvwEi2Zrg
-	8r+dcpgklV1JPc1lN1FAJy45uXj/S0Y=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-55-k18pMOf9PSaLE9I-2Yejkg-1; Fri, 24 Nov 2023 13:24:15 -0500
-X-MC-Unique: k18pMOf9PSaLE9I-2Yejkg-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-77d6bade8d4so257466985a.1
-        for <kvm@vger.kernel.org>; Fri, 24 Nov 2023 10:24:15 -0800 (PST)
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC4341987;
+	Fri, 24 Nov 2023 15:35:50 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1cfa36bfe0cso7840935ad.1;
+        Fri, 24 Nov 2023 15:35:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700868950; x=1701473750; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8rCTuOTZLjqU1EAi1Ot/Eoexb0bjF9zepY/pVrUGWrc=;
+        b=S/Y8AIQ0rZpkxzc02ZIooQzI9HdkxOIY6juzAJIZNfYC09n61VeSzbIbjYG1H26rl+
+         i/dzCB7mkGcRhcl8q3XSvYNlrtlrsxurg3TKe+kzFq/R4pFtla7R1bV1YLciawCkumSA
+         ueItAo6pOyrErtRDYEFjmAxz8DJckKAOHvV1+pRcmv6/5oF4anOWbkY7uNi/s6VECm+6
+         2tuXkYF0O5nQGREYHIZMabinek2RM/W0un9hPxI9Hp7iXrNm8Ffk3nzZlcCvik/W0n29
+         YF73TxAfb4LFbadBXu5rXeO6IRD55yLJ6zU7Liek0rw8eADTBK1O2NO01w8JSOA+8qRI
+         6m4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700850255; x=1701455055;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sQNKNBWeod2+64J8ErFDWPzg6uRfL5WI32OFBNWO8sg=;
-        b=oDbWYHCe028P8zaZYPnLPlUHYnThQAwoH8eTxlI9e2BQk7wgJk7bLVyptoBiyrqPU8
-         N5mth/0X6OxWTPHqZC3kFINbWRCT2UOQP+0hzCs0v8EDWzhh1cDoKUZGXZBAYePzLpIx
-         UC3ZjbVcIZ61afkz08vvRMB2pAYaLLTOdOlwHsnLq0pzFASgd9TINe3Q/WEqQWY1xbmL
-         NtdYesgAkFo0i/QZ/KE4N5R/BgjTTARReFG0/jUh0V37nSKaqmcqlnpMgalwGgshTyNh
-         LJDanor6PFMKVzLX+Yn7BxonsHqqvhi0bxFonRPkJNJIP9IBMHbpvJB4FaOM1TONc0LE
-         VYkQ==
-X-Gm-Message-State: AOJu0YzuE3ob6mBrY8whJolppB0s7kR03mailzUsHtAfQ8hL9Z9JkvzJ
-	IIGwn3nY4LGyNp3mltiBChN+k+8YbnXmy6qAjLDNfM1HhbKVYIdXBnZGPpG+8iTEH7b95/z5PhW
-	rmS0YUVow8tt8
-X-Received: by 2002:a05:620a:8b0a:b0:77d:72b8:cc32 with SMTP id qw10-20020a05620a8b0a00b0077d72b8cc32mr3099366qkn.14.1700850255075;
-        Fri, 24 Nov 2023 10:24:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG2pMq6frzPLuG9cnd+mt0q4J9kdggHP6UueQSg1Njl1DQy92HDV3+0GjwH57E7GdzED/y9yg==
-X-Received: by 2002:a05:620a:8b0a:b0:77d:72b8:cc32 with SMTP id qw10-20020a05620a8b0a00b0077d72b8cc32mr3099349qkn.14.1700850254706;
-        Fri, 24 Nov 2023 10:24:14 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id py18-20020a05620a879200b007671678e325sm1398466qkn.88.2023.11.24.10.24.12
+        d=1e100.net; s=20230601; t=1700868950; x=1701473750;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=8rCTuOTZLjqU1EAi1Ot/Eoexb0bjF9zepY/pVrUGWrc=;
+        b=pnlnjMw/1BxRcTukYM8h/SGK8mKxWbmXGOjnzLa7dRLqWhg8SqVe8XYXgMdoDBBe69
+         kExMhytjEDzCApzB+yhk/EtctoLDJt/0zZuqkJHhtnR11wxrposzgXz07O8xiCmyYQeR
+         hk/cuikMh0PwSN7XVBIjmzQXqw6jXt+zq41MYEOcpSQnVFbAD3SuwstPQYdeXo04fYZ7
+         Uk7P/7L9bNfY23dgfmh7jn+LRAGbcxZ9ojh/GlCQrEd4YixF3reiwgkGcZ5kdb4ZyjF5
+         QU7aywUW5P6Ypq39ImucW37dB2bh7AlwcdyeiNlB/I0wVMk2Oz657QvKMeyoJjzAZsYc
+         FBUA==
+X-Gm-Message-State: AOJu0YwYJkQ7GGrztXW8Xrb/2dfRIEBHHss5+uW4+qU8vPDrZUgsxH6R
+	ix8ppjmOh1o+HI2VahXXYbG5Tmhpd/I=
+X-Google-Smtp-Source: AGHT+IHAQJ2ELJ94l1wPHi56ly0865tGTj4Uqv/dSxGe9cSb6rmoKUkYL5F50RyySSQjayJuQ7H48A==
+X-Received: by 2002:a17:902:868c:b0:1ce:b83f:bd0c with SMTP id g12-20020a170902868c00b001ceb83fbd0cmr8557698plo.7.1700868949824;
+        Fri, 24 Nov 2023 15:35:49 -0800 (PST)
+Received: from localhost (121-44-66-27.tpgi.com.au. [121.44.66.27])
+        by smtp.gmail.com with ESMTPSA id gx1-20020a17090b124100b0027e289ac436sm3453860pjb.8.2023.11.24.15.35.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Nov 2023 10:24:14 -0800 (PST)
-Message-ID: <d9e83b7a-0fca-406f-b58e-9014a5e14870@redhat.com>
-Date: Fri, 24 Nov 2023 19:24:11 +0100
+        Fri, 24 Nov 2023 15:35:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] arm/kvm: Enable support for KVM_ARM_VCPU_PMU_V3_FILTER
-Content-Language: en-US
-To: Shaoqin Huang <shahuang@redhat.com>, qemu-arm@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
- qemu-devel@nongnu.org
-References: <20231117060838.39723-1-shahuang@redhat.com>
-From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <20231117060838.39723-1-shahuang@redhat.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Date: Sat, 25 Nov 2023 09:35:41 +1000
+Message-Id: <CX7FPX15PN0F.W7PEA51B0KD6@wheely>
+Cc: <linuxppc-dev@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>,
+ <kvm@vger.kernel.org>, <shenghui.qu@shingroup.cn>,
+ <luming.yu@shingroup.cn>, <dawei.li@shingroup.cn>
+Subject: Re: [PATCH v1] powerpc: Add PVN support for HeXin C2000 processor
+From: "Nicholas Piggin" <npiggin@gmail.com>
+To: "Zhao Ke" <ke.zhao@shingroup.cn>, <mpe@ellerman.id.au>,
+ <christophe.leroy@csgroup.eu>, <fbarrat@linux.ibm.com>,
+ <ajd@linux.ibm.com>, <arnd@arndb.de>, <gregkh@linuxfoundation.org>
+X-Mailer: aerc 0.15.2
+References: <20231123093611.98313-1-ke.zhao@shingroup.cn>
+In-Reply-To: <20231123093611.98313-1-ke.zhao@shingroup.cn>
 
-Hi,
-
-On 11/17/23 07:08, Shaoqin Huang wrote:
-> The KVM_ARM_VCPU_PMU_V3_FILTER provide the ability to let the VMM decide
-> which PMU events are provided to the guest. Add a new option
-> `pmu-filter` as -accel sub-option to set the PMU Event Filtering.
-> 
-> The `pmu-filter` has such format:
-> 
->   pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
-> 
-> The A means "allow" and D means "deny", start is the first event of the
-> range and the end is the last one. The first filter action defines if the whole
-> event list is an allow or deny list, if the first filter action is "allow", all
-> other events are denied except start-end; if the first filter action is "deny",
-> all other events are allowed except start-end. For example:
-> 
->   pmu-filter="A:0x11-0x11;A:0x23-0x3a,D:0x30-0x30"
-> 
-> This will allow event 0x11 (The cycle counter), events 0x23 to 0x3a is
-> also allowed except the event 0x30 is denied, and all the other events
-> are disallowed.
-> 
-> Here is an real example shows how to use the PMU Event Filtering, when
-> we launch a guest by use kvm, add such command line:
-> 
->   # qemu-system-aarch64 \
-> 	-accel kvm,pmu-filter="D:0x11-0x11"
-> 
-> And then in guest, use the perf to count the cycle:
-> 
->   # perf stat sleep 1
-> 
->    Performance counter stats for 'sleep 1':
-> 
->               1.22 msec task-clock                       #    0.001 CPUs utilized
->                  1      context-switches                 #  820.695 /sec
->                  0      cpu-migrations                   #    0.000 /sec
->                 55      page-faults                      #   45.138 K/sec
->    <not supported>      cycles
->            1128954      instructions
->             227031      branches                         #  186.323 M/sec
->               8686      branch-misses                    #    3.83% of all branches
-> 
->        1.002492480 seconds time elapsed
-> 
->        0.001752000 seconds user
->        0.000000000 seconds sys
-> 
-> As we can see, the cycle counter has been disabled in the guest, but
-> other pmu events are still work.
-> 
-> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+On Thu Nov 23, 2023 at 7:36 PM AEST, Zhao Ke wrote:
+> HeXin Tech Co. has applied for a new PVN from the OpenPower Community
+> for its new processor C2000. The OpenPower has assigned a new PVN
+> and this newly assigned PVN is 0x0066, add pvr register related
+> support for this PVN.
+>
+> Signed-off-by: Zhao Ke <ke.zhao@shingroup.cn>
+> Link: https://discuss.openpower.foundation/t/how-to-get-a-new-pvr-for-pro=
+cessors-follow-power-isa/477/10
 > ---
-> v1->v2:
->   - Add more description for allow and deny meaning in 
->     commit message.                                     [Sebastian]
->   - Small improvement.                                  [Sebastian]
-> 
-> v1: https://lore.kernel.org/all/20231113081713.153615-1-shahuang@redhat.com/
+> 	v0 -> v1:
+> 	- Fix .cpu_name with the correct description
 > ---
->  include/sysemu/kvm_int.h |  1 +
->  qemu-options.hx          | 16 +++++++++++++
->  target/arm/kvm.c         | 22 +++++++++++++++++
->  target/arm/kvm64.c       | 51 ++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 90 insertions(+)
-> 
-> diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-> index fd846394be..8f4601474f 100644
-> --- a/include/sysemu/kvm_int.h
-> +++ b/include/sysemu/kvm_int.h
-> @@ -120,6 +120,7 @@ struct KVMState
->      uint32_t xen_caps;
->      uint16_t xen_gnttab_max_frames;
->      uint16_t xen_evtchn_max_pirq;
-> +    char *kvm_pmu_filter;
->  };
->  
->  void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 42fd09e4de..dd3518092c 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -187,6 +187,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
->      "                tb-size=n (TCG translation block cache size)\n"
->      "                dirty-ring-size=n (KVM dirty ring GFN count, default 0)\n"
->      "                eager-split-size=n (KVM Eager Page Split chunk size, default 0, disabled. ARM only)\n"
-> +    "                pmu-filter={A,D}:start-end[;...] (KVM PMU Event Filter, default no filter. ARM only)\n"
->      "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
->      "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
->  SRST
-> @@ -259,6 +260,21 @@ SRST
->          impact on the memory. By default, this feature is disabled
->          (eager-split-size=0).
->  
-> +    ``pmu-filter={A,D}:start-end[;...]``
-> +        KVM implements pmu event filtering to prevent a guest from being able to
-> +	sample certain events. It has the following format:
-> +
-> +	pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
-> +
-> +	The A means "allow" and D means "deny", start if the first event of the
-> +	range and the end is the last one. For example:
-> +
-> +	pmu-filter="A:0x11-0x11;A:0x23-0x3a,D:0x30-0x30"
-> +
-> +	This will allow event 0x11 (The cycle counter), events 0x23 to 0x3a is
-> +	also allowed except the event 0x30 is denied, and all the other events
-> +	are disallowed.
-> +
->      ``notify-vmexit=run|internal-error|disable,notify-window=n``
->          Enables or disables notify VM exit support on x86 host and specify
->          the corresponding notify window to trigger the VM exit if enabled.
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index 7903e2ddde..74796de055 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -1108,6 +1108,21 @@ static void kvm_arch_set_eager_split_size(Object *obj, Visitor *v,
->      s->kvm_eager_split_size = value;
->  }
->  
-> +static char *kvm_arch_get_pmu_filter(Object *obj, Error **errp)
-> +{
-> +    KVMState *s = KVM_STATE(obj);
-> +
-> +    return g_strdup(s->kvm_pmu_filter);
-> +}
-> +
-> +static void kvm_arch_set_pmu_filter(Object *obj, const char *pmu_filter,
-> +                                    Error **errp)
-> +{
-> +    KVMState *s = KVM_STATE(obj);
-> +
-> +    s->kvm_pmu_filter = g_strdup(pmu_filter);
-> +}
-> +
->  void kvm_arch_accel_class_init(ObjectClass *oc)
->  {
->      object_class_property_add(oc, "eager-split-size", "size",
-> @@ -1116,4 +1131,11 @@ void kvm_arch_accel_class_init(ObjectClass *oc)
->  
->      object_class_property_set_description(oc, "eager-split-size",
->          "Eager Page Split chunk size for hugepages. (default: 0, disabled)");
-> +
-> +    object_class_property_add_str(oc, "pmu-filter",
-> +                                  kvm_arch_get_pmu_filter,
-> +                                  kvm_arch_set_pmu_filter);
-> +
-> +    object_class_property_set_description(oc, "pmu-filter",
-> +        "PMU Event Filtering description for guest pmu. (default: NULL, disabled)");
->  }
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index 3c175c93a7..6eac328b48 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -10,6 +10,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include <asm-arm64/kvm.h>
->  #include <sys/ioctl.h>
->  #include <sys/ptrace.h>
->  
-> @@ -131,6 +132,53 @@ static bool kvm_arm_set_device_attr(CPUState *cs, struct kvm_device_attr *attr,
->      return true;
->  }
->  
-> +static void kvm_arm_pmu_filter_init(CPUState *cs)
-> +{
-> +    static bool pmu_filter_init = false;
-> +    struct kvm_pmu_event_filter filter;
-> +    struct kvm_device_attr attr = {
-> +        .group      = KVM_ARM_VCPU_PMU_V3_CTRL,
-> +        .attr       = KVM_ARM_VCPU_PMU_V3_FILTER,
-> +        .addr       = (uint64_t)&filter,
-> +    };
-> +    KVMState *kvm_state = cs->kvm_state;
-> +    char *tmp;
-> +    char *str, act;
-> +
-> +    if (!kvm_state->kvm_pmu_filter)
-> +        return;
-> +
-usually we check the kernel capability (here KVM_CAP_ARM_PMU_V3) before
-doing further actions. It allows you to give an inidication to the user
-that the kernel does not allow it. Also you should precise in the doc
-that this accel option requires host kernel caps I think.
-> +    /* This only needs to be called for 1 vcpu. */
-> +    if (!pmu_filter_init)
-> +        pmu_filter_init = true;
-> +
-> +    tmp = g_strdup(kvm_state->kvm_pmu_filter);
-> +
-> +    for (str = strtok(tmp, ";"); str != NULL; str = strtok(NULL, ";")) {
-> +        unsigned short start = 0, end = 0;
-> +
-> +        sscanf(str, "%c:%hx-%hx", &act, &start, &end);
-> +        if ((act != 'A' && act != 'D') || (!start && !end)) {
-> +            error_report("skipping invalid filter %s\n", str);
-> +            continue;
-> +        }
-> +
-> +        filter = (struct kvm_pmu_event_filter) {
-> +            .base_event     = start,
-> +            .nevents        = end - start + 1,
-> +            .action         = act == 'A' ? KVM_PMU_EVENT_ALLOW :
-> +                                           KVM_PMU_EVENT_DENY,
-> +        };
-> +
-> +        if (!kvm_arm_set_device_attr(cs, &attr, "PMU Event Filter")) {
-> +            error_report("Failed to init PMU Event Filter\n");
-if you do the above, here you know that the host allows to set filters
-but that the user input is incorrect.
+> ---
+>  arch/powerpc/include/asm/reg.h            |  1 +
+>  arch/powerpc/kernel/cpu_specs_book3s_64.h | 15 +++++++++++++++
+>  arch/powerpc/kvm/book3s_pr.c              |  1 +
+>  arch/powerpc/mm/book3s64/pkeys.c          |  3 ++-
+>  arch/powerpc/platforms/powernv/subcore.c  |  3 ++-
+>  drivers/misc/cxl/cxl.h                    |  3 ++-
+>  6 files changed, 23 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/powerpc/include/asm/reg.h b/arch/powerpc/include/asm/re=
+g.h
+> index 4ae4ab9090a2..7fd09f25452d 100644
+> --- a/arch/powerpc/include/asm/reg.h
+> +++ b/arch/powerpc/include/asm/reg.h
+> @@ -1361,6 +1361,7 @@
+>  #define PVR_POWER8E	0x004B
+>  #define PVR_POWER8NVL	0x004C
+>  #define PVR_POWER8	0x004D
+> +#define PVR_HX_C2000	0x0066
+>  #define PVR_POWER9	0x004E
+>  #define PVR_POWER10	0x0080
+>  #define PVR_BE		0x0070
+> diff --git a/arch/powerpc/kernel/cpu_specs_book3s_64.h b/arch/powerpc/ker=
+nel/cpu_specs_book3s_64.h
+> index c370c1b804a9..367c9f6d9be5 100644
+> --- a/arch/powerpc/kernel/cpu_specs_book3s_64.h
+> +++ b/arch/powerpc/kernel/cpu_specs_book3s_64.h
+> @@ -238,6 +238,21 @@ static struct cpu_spec cpu_specs[] __initdata =3D {
+>  		.machine_check_early	=3D __machine_check_early_realmode_p8,
+>  		.platform		=3D "power8",
+>  	},
+> +	{	/* 2.07-compliant processor, HeXin C2000 processor */
+> +		.pvr_mask		=3D 0xffffffff,
+> +		.pvr_value		=3D 0x00660000,
+> +		.cpu_name		=3D "POWER8 (raw)",
 
-Thanks
+If this is a raw mode, it should go with the raw POWER8 entry.
+The raw vs architected entries are already out of order with
+POWER6, but we should fix that too.
 
-Eric
-> +            abort();
-> +        }
-> +    }
-> +
-> +    g_free(tmp);
-> +}
-> +
->  void kvm_arm_pmu_init(CPUState *cs)
+You may want your PVR mask to follow the other raw examples too,
+but it depends on how you foresee PVR being used. Using 0xffff0000
+allows you to increment the low part of the PVR and existing
+kernels will continue to match it. You can then add a specific
+match for the older version if you need to add special handling
+for it (e.g., see how POWER9 is handled).
+
+Do you want .cpu_name to be "POWER8 (raw)"? You could call it
+"HX-C2000", as Michael suggested earlier.
+
+> +		.cpu_features		=3D CPU_FTRS_POWER8,
+> +		.cpu_user_features	=3D COMMON_USER_POWER8,
+> +		.cpu_user_features2	=3D COMMON_USER2_POWER8,
+> +		.mmu_features		=3D MMU_FTRS_POWER8,
+> +		.icache_bsize		=3D 128,
+> +		.dcache_bsize		=3D 128,
+> +		.cpu_setup		=3D __setup_cpu_power8,
+> +		.cpu_restore		=3D __restore_cpu_power8,
+> +		.machine_check_early	=3D __machine_check_early_realmode_p8,
+> +		.platform		=3D "power8",
+> +	},
+>  	{	/* 3.00-compliant processor, i.e. Power9 "architected" mode */
+>  		.pvr_mask		=3D 0xffffffff,
+>  		.pvr_value		=3D 0x0f000005,
+> diff --git a/arch/powerpc/kvm/book3s_pr.c b/arch/powerpc/kvm/book3s_pr.c
+> index 9118242063fb..5b92619a05fd 100644
+> --- a/arch/powerpc/kvm/book3s_pr.c
+> +++ b/arch/powerpc/kvm/book3s_pr.c
+> @@ -604,6 +604,7 @@ static void kvmppc_set_pvr_pr(struct kvm_vcpu *vcpu, =
+u32 pvr)
+>  	case PVR_POWER8:
+>  	case PVR_POWER8E:
+>  	case PVR_POWER8NVL:
+> +	case PVR_HX_C2000:
+>  	case PVR_POWER9:
+>  		vcpu->arch.hflags |=3D BOOK3S_HFLAG_MULTI_PGSIZE |
+>  			BOOK3S_HFLAG_NEW_TLBIE;
+> diff --git a/arch/powerpc/mm/book3s64/pkeys.c b/arch/powerpc/mm/book3s64/=
+pkeys.c
+> index 125733962033..c38f378e1942 100644
+> --- a/arch/powerpc/mm/book3s64/pkeys.c
+> +++ b/arch/powerpc/mm/book3s64/pkeys.c
+> @@ -89,7 +89,8 @@ static int __init scan_pkey_feature(void)
+>  			unsigned long pvr =3D mfspr(SPRN_PVR);
+> =20
+>  			if (PVR_VER(pvr) =3D=3D PVR_POWER8 || PVR_VER(pvr) =3D=3D PVR_POWER8E=
+ ||
+> -			    PVR_VER(pvr) =3D=3D PVR_POWER8NVL || PVR_VER(pvr) =3D=3D PVR_POWE=
+R9)
+> +			    PVR_VER(pvr) =3D=3D PVR_POWER8NVL || PVR_VER(pvr) =3D=3D PVR_POWE=
+R9 ||
+> +				PVR_VER(pvr) =3D=3D PVR_HX_C2000)
+>  				pkeys_total =3D 32;
+>  		}
+>  	}
+> diff --git a/arch/powerpc/platforms/powernv/subcore.c b/arch/powerpc/plat=
+forms/powernv/subcore.c
+> index 191424468f10..58e7331e1e7e 100644
+> --- a/arch/powerpc/platforms/powernv/subcore.c
+> +++ b/arch/powerpc/platforms/powernv/subcore.c
+> @@ -425,7 +425,8 @@ static int subcore_init(void)
+> =20
+>  	if (pvr_ver !=3D PVR_POWER8 &&
+>  	    pvr_ver !=3D PVR_POWER8E &&
+> -	    pvr_ver !=3D PVR_POWER8NVL)
+> +	    pvr_ver !=3D PVR_POWER8NVL &&
+> +		pvr_ver !=3D PVR_HX_C2000)
+>  		return 0;
+> =20
+>  	/*
+> diff --git a/drivers/misc/cxl/cxl.h b/drivers/misc/cxl/cxl.h
+> index 0562071cdd4a..9ac2991b29c7 100644
+> --- a/drivers/misc/cxl/cxl.h
+> +++ b/drivers/misc/cxl/cxl.h
+> @@ -836,7 +836,8 @@ static inline bool cxl_is_power8(void)
 >  {
->      struct kvm_device_attr attr = {
-> @@ -141,6 +189,9 @@ void kvm_arm_pmu_init(CPUState *cs)
->      if (!ARM_CPU(cs)->has_pmu) {
->          return;
->      }
-> +
-> +    kvm_arm_pmu_filter_init(cs);
-> +
->      if (!kvm_arm_set_device_attr(cs, &attr, "PMU")) {
->          error_report("failed to init PMU");
->          abort();
+>  	if ((pvr_version_is(PVR_POWER8E)) ||
+>  	    (pvr_version_is(PVR_POWER8NVL)) ||
+> -	    (pvr_version_is(PVR_POWER8)))
+> +	    (pvr_version_is(PVR_POWER8)) ||
+> +		(pvr_version_is(PVR_HX_C2000)))
+>  		return true;
+>  	return false;
+>  }
+
+These should follow the same alignment pattern as the other lines.
+
+Thanks,
+Nick
 
 
