@@ -1,160 +1,212 @@
-Return-Path: <kvm+bounces-2445-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2446-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D67EE7F78AE
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 17:11:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB2767F78E1
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 17:26:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14C691C20BED
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 16:11:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 927D6281369
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 16:25:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85D6E33CD9;
-	Fri, 24 Nov 2023 16:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZI+Umvxd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EFA235EFD;
+	Fri, 24 Nov 2023 16:25:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBBB21998
-	for <kvm@vger.kernel.org>; Fri, 24 Nov 2023 08:11:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700842303;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=gVnyc+iJ+KiZKpFBiD0j4BpZFWXYn4m5bglNqialQuQ=;
-	b=ZI+UmvxdNYSVt40L6awqf4XbVCwTR/ILyIqxES7h//XadsNlU78DYvf+klBeoqXw7dwHZB
-	w06+XYH2Ab5zL6JAT6RWVSzcDdx/VoQDeLshXG2ejGmEjDuggSbyiuZ7MCIhHAVA3eGxa5
-	a5Rfaj+XKF59xf93+QtYfDReyeZeFX0=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-172-BeBNjs7qOmmXx0ObdPi6SQ-1; Fri, 24 Nov 2023 11:11:40 -0500
-X-MC-Unique: BeBNjs7qOmmXx0ObdPi6SQ-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-77d7a92f883so109820085a.0
-        for <kvm@vger.kernel.org>; Fri, 24 Nov 2023 08:11:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700842300; x=1701447100;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gVnyc+iJ+KiZKpFBiD0j4BpZFWXYn4m5bglNqialQuQ=;
-        b=pE3Woc5B/vC5lKQ+54B3HfOim2640isTTbrO2g6BMhLXOjSl2IQNxoRRtE/t1W3um8
-         +V/kv3A2j8oo6CpkGH58iv7UMGyccEKev0eeadMttxHBgEaADc5DA9DtwzLMFwScWfQU
-         9zgeaSLjSoaaxbREGBQUEHTJ36pRWkIxbSXnd1saflpReXzz+Ughq70nqT+ACc4HvqWS
-         zLHD1PXBiA0V2mX1DTRe2IaErz7Mxu+SLGUp3LR28HI8KsnYIng5ghQwMW0zpIlLhoG7
-         ap9La8icgyIwpjKKJQtHW8ZMFjE2w3lu6N1mrhwwvFaAroZSdQj/SiCIgKi7G49e/0a9
-         FEQQ==
-X-Gm-Message-State: AOJu0YzMuzS/Fbxt4IFY9pxAwc2MyE3PUIZX7qslBekJLNdXYZDehvHq
-	r6OSYodxH83vn8TisN6yYk/nL2ZN7kqA6MgkQykKAotRlZkPiUSlrcIUIRGYxW8Q6ICYiL/VBX3
-	LYjzFxmuUV+HE8Jx6RLYB
-X-Received: by 2002:a05:620a:3792:b0:778:af06:640e with SMTP id pi18-20020a05620a379200b00778af06640emr3428402qkn.16.1700842300041;
-        Fri, 24 Nov 2023 08:11:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE4C0MFSdgRbt6SFbCLc2O4yqi2ZPuleRbYexSgR4VNJn+tjFGhceDh116YyF+ElQAT7ogDUg==
-X-Received: by 2002:a05:620a:3792:b0:778:af06:640e with SMTP id pi18-20020a05620a379200b00778af06640emr3428379qkn.16.1700842299748;
-        Fri, 24 Nov 2023 08:11:39 -0800 (PST)
-Received: from [10.32.181.74] (nat-pool-mxp-t.redhat.com. [149.6.153.186])
-        by smtp.googlemail.com with ESMTPSA id u21-20020ae9c015000000b0076efaec147csm1318135qkk.45.2023.11.24.08.11.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Nov 2023 08:11:39 -0800 (PST)
-Message-ID: <a10d3a01-939c-493c-b93c-b3821735e062@redhat.com>
-Date: Fri, 24 Nov 2023 17:11:36 +0100
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CED0CD41;
+	Fri, 24 Nov 2023 08:25:45 -0800 (PST)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.226])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ScL0J3zRqz67cSV;
+	Sat, 25 Nov 2023 00:24:16 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 24 Nov
+ 2023 16:25:43 +0000
+Date: Fri, 24 Nov 2023 16:25:42 +0000
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Dan Williams <dan.j.williams@intel.com>
+CC: Lukas Wunner <lukas@wunner.de>, Alexey Kardashevskiy <aik@amd.com>,
+	<linux-coco@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-pci@vger.kernel.org>, Jonathan Cameron <jic23@kernel.org>,
+	<suzuki.poulose@arm.com>
+Subject: Re: TDISP enablement
+Message-ID: <20231124162542.00005d95@Huawei.com>
+In-Reply-To: <654ebd31be94a_46f0294a5@dwillia2-mobl3.amr.corp.intel.com.notmuch>
+References: <e05eafd8-04b3-4953-8bca-dc321c1a60b9@amd.com>
+	<20231101072717.GB25863@wunner.de>
+	<20231101110551.00003896@Huawei.com>
+	<654ebd31be94a_46f0294a5@dwillia2-mobl3.amr.corp.intel.com.notmuch>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/4] KVM: x86: add new nested vmexit tracepoints
-Content-Language: en-US
-To: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc: Thomas Gleixner <tglx@linutronix.de>, "H. Peter Anvin" <hpa@zytor.com>,
- Sean Christopherson <seanjc@google.com>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
- x86@kernel.org, Dave Hansen <dave.hansen@linux.intel.com>
-References: <20230928103640.78453-1-mlevitsk@redhat.com>
- <20230928103640.78453-5-mlevitsk@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
- CxXPkIBTvYY+ZPkoTh5xF9oS1jqI8iRLzouzF8yXs3QjQIZ2SfuCxSVwlV65jotcjD2FTN04
- hVopm9llFijNZpVIOGUTqzM4U55sdsCcZUluWM6x4HSOdw5F5Utxfp1wOjD/v92Lrax0hjiX
- DResHSt48q+8FrZzY+AUbkUS+Jm34qjswdrgsC5uxeVcLkBgWLmov2kMaMROT0YmFY6A3m1S
- P/kXmHDXxhe23gKb3dgwxUTpENDBGcfEzrzilWueOeUWiOcWuFOed/C3SyijBx3Av/lbCsHU
- Vx6pMycNTdzU1BuAroB+Y3mNEuW56Yd44jlInzG2UOwt9XjjdKkJZ1g0P9dwptwLEgTEd3Fo
- UdhAQyRXGYO8oROiuh+RZ1lXp6AQ4ZjoyH8WLfTLf5g1EKCTc4C1sy1vQSdzIRu3rBIjAvnC
- tGZADei1IExLqB3uzXKzZ1BZ+Z8hnt2og9hb7H0y8diYfEk2w3R7wEr+Ehk5NQsT2MPI2QBd
- wEv1/Aj1DgUHZAHzG1QN9S8wNWQ6K9DqHZTBnI1hUlkp22zCSHK/6FwUCuYp1zcAEQEAAc0j
- UGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT7CwU0EEwECACMFAlRCcBICGwMH
- CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRB+FRAMzTZpsbceDp9IIN6BIA0Ol7MoB15E
- 11kRz/ewzryFY54tQlMnd4xxfH8MTQ/mm9I482YoSwPMdcWFAKnUX6Yo30tbLiNB8hzaHeRj
- jx12K+ptqYbg+cevgOtbLAlL9kNgLLcsGqC2829jBCUTVeMSZDrzS97ole/YEez2qFpPnTV0
- VrRWClWVfYh+JfzpXmgyhbkuwUxNFk421s4Ajp3d8nPPFUGgBG5HOxzkAm7xb1cjAuJ+oi/K
- CHfkuN+fLZl/u3E/fw7vvOESApLU5o0icVXeakfSz0LsygEnekDbxPnE5af/9FEkXJD5EoYG
- SEahaEtgNrR4qsyxyAGYgZlS70vkSSYJ+iT2rrwEiDlo31MzRo6Ba2FfHBSJ7lcYdPT7bbk9
- AO3hlNMhNdUhoQv7M5HsnqZ6unvSHOKmReNaS9egAGdRN0/GPDWr9wroyJ65ZNQsHl9nXBqE
- AukZNr5oJO5vxrYiAuuTSd6UI/xFkjtkzltG3mw5ao2bBpk/V/YuePrJsnPFHG7NhizrxttB
- nTuOSCMo45pfHQ+XYd5K1+Cv/NzZFNWscm5htJ0HznY+oOsZvHTyGz3v91pn51dkRYN0otqr
- bQ4tlFFuVjArBZcapSIe6NV8C4cEiSTOwE0EVEJx7gEIAMeHcVzuv2bp9HlWDp6+RkZe+vtl
- KwAHplb/WH59j2wyG8V6i33+6MlSSJMOFnYUCCL77bucx9uImI5nX24PIlqT+zasVEEVGSRF
- m8dgkcJDB7Tps0IkNrUi4yof3B3shR+vMY3i3Ip0e41zKx0CvlAhMOo6otaHmcxr35sWq1Jk
- tLkbn3wG+fPQCVudJJECvVQ//UAthSSEklA50QtD2sBkmQ14ZryEyTHQ+E42K3j2IUmOLriF
- dNr9NvE1QGmGyIcbw2NIVEBOK/GWxkS5+dmxM2iD4Jdaf2nSn3jlHjEXoPwpMs0KZsgdU0pP
- JQzMUMwmB1wM8JxovFlPYrhNT9MAEQEAAcLBMwQYAQIACQUCVEJx7gIbDAAKCRB+FRAMzTZp
- sadRDqCctLmYICZu4GSnie4lKXl+HqlLanpVMOoFNnWs9oRP47MbE2wv8OaYh5pNR9VVgyhD
- OG0AU7oidG36OeUlrFDTfnPYYSF/mPCxHttosyt8O5kabxnIPv2URuAxDByz+iVbL+RjKaGM
- GDph56ZTswlx75nZVtIukqzLAQ5fa8OALSGum0cFi4ptZUOhDNz1onz61klD6z3MODi0sBZN
- Aj6guB2L/+2ZwElZEeRBERRd/uommlYuToAXfNRdUwrwl9gRMiA0WSyTb190zneRRDfpSK5d
- usXnM/O+kr3Dm+Ui+UioPf6wgbn3T0o6I5BhVhs4h4hWmIW7iNhPjX1iybXfmb1gAFfjtHfL
- xRUr64svXpyfJMScIQtBAm0ihWPltXkyITA92ngCmPdHa6M1hMh4RDX+Jf1fiWubzp1voAg0
- JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
- dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
- b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20230928103640.78453-5-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
+X-CFilter-Loop: Reflected
 
-On 9/28/23 12:36, Maxim Levitsky wrote:
-> Add 3 new tracepoints for nested VM exits which are intended
-> to capture extra information to gain insights about the nested guest
-> behavior.
+On Fri, 10 Nov 2023 15:30:57 -0800
+Dan Williams <dan.j.williams@intel.com> wrote:
+
+> Jonathan Cameron wrote:
+> > On Wed, 1 Nov 2023 08:27:17 +0100
+> > Lukas Wunner <lukas@wunner.de> wrote:
+> > 
+> > Thanks Alexy, this is a great discussion to kick off.
+> >   
+> > > On Wed, Nov 01, 2023 at 09:56:11AM +1100, Alexey Kardashevskiy wrote:  
+> > > > - device_connect - starts CMA/SPDM session, returns measurements/certs,
+> > > > runs IDE_KM to program the keys;    
+> > > 
+> > > Does the PSP have a set of trusted root certificates?
+> > > If so, where does it get them from?
+> > > 
+> > > If not, does the PSP just blindly trust the validity of the cert chain?
+> > > Who validates the cert chain, and when?
+> > > Which slot do you use?
+> > > Do you return only the cert chain of that single slot or of all slots?
+> > > Does the PSP read out all measurements available?  This may take a while
+> > > if the measurements are large and there are a lot of them.  
+> > 
+> > I'd definitely like their to be a path for certs and measurement to be
+> > checked by the Host OS (for the non TDISP path). Whether the
+> > policy setup cares about result is different question ;)
+> >   
+> > > 
+> > >   
+> > > > - tdi_info - read measurements/certs/interface report;    
+> > > 
+> > > Does this return cached cert chains and measurements from the device
+> > > or does it retrieve them anew?  (Measurements might have changed if
+> > > MEAS_FRESH_CAP is supported.)
+> > > 
+> > >   
+> > > > If the user wants only CMA/SPDM, the Lukas'es patched will do that without
+> > > > the PSP. This may co-exist with the AMD PSP (if the endpoint allows multiple
+> > > > sessions).    
+> > > 
+> > > It can co-exist if the pci_cma_claim_ownership() library call
+> > > provided by patch 12/12 is invoked upon device_connect.
+> > > 
+> > > It would seem advantageous if you could delay device_connect
+> > > until a device is actually passed through.  Then the OS can
+> > > initially authenticate and measure devices and the PSP takes
+> > > over when needed.  
+> > 
+> > Would that delay mean IDE isn't up - I think that wants to be
+> > available whether or not pass through is going on.
+> > 
+> > Given potential restrictions on IDE resources, I'd expect to see an explicit
+> > opt in from userspace on the host to start that process for a given
+> > device.  (udev rule or similar might kick it off for simple setups).
+> > 
+> > Would that work for the flows described?  
+> > 
+> > Next bit probably has holes...  Key is that a lot of the checks
+> > may fail, and it's up to host userspace policy to decide whether
+> > to proceed (other policy in the secure VM side of things obviously)
+> > 
+> > So my rough thinking is - for the two options (IDE / TDISP)
+> > 
+> > Comparing with Alexey's flow I think only real difference is that
+> > I call out explicit host userspace policy controls. I'd also like
+> > to use similar interfaces to convey state to host userspace as
+> > per Lukas' existing approaches.  Sure there will also be in
+> > kernel interfaces for driver to get data if it knows what to do
+> > with it.  I'd also like to enable the non tdisp flow to handle
+> > IDE setup 'natively' if that's possible on particular hardware.  
 > 
-> The new tracepoints are:
+> Are there any platforms that have IDE host capability that are not also
+> shipping a TSM. I know that some platform allow for either the TSM or
+> the OS to own that setup, but there are no standards there. I am not
+> opposed to the native path, but given a cross-vendor "TSM" concept is
+> needed and that a TSM is likely available on all IDE capable platforms
+> it seems reasonable for Linux to rely on TSM managed IDE for the near
+> term if not the long term as well.
+
+Just for completeness, (I mentioned it in the LPC discussion):
+IDE might well be link based between a switch inside the chassis and devices
+outside the chassis in which case it is all standards defined and the host
+isn't involved.  Not TDISP related though in that case.
+
 > 
-> - kvm_nested_msr
-> - kvm_nested_hypercall
+> > 
+> > 1. Host has a go at CMA/SPDM. Policy might say that a failure here is
+> >    a failure in general so reject device - or it might decide it's up to
+> >    the PSP etc.   (userspace can see if it succeeded)
+> >    I'd argue host software can launch this at any time.  It will
+> >    be a denial of service attack but so are many other things the host
+> >    can do.
+> > 2. TDISP policy decision from host (userspace policy control)
+> >    Need to know end goal.  
 > 
-> These tracepoints capture extra register state to be able to know
-> which MSR or which hypercall was done.
+> If the TSM owns the TDISP state what this policy decision rely comes
+> down to is IDE stream resource management, I otherwise struggle to
+> conceptualize "TDISP policy".
 > 
-> - kvm_nested_page_fault
+> The policy is userspace deciding to assign an interface to a TVM, and
+> that TVM requests that the assigned interface be allowed to access
+> private memory. So it's not necessarily TDISP policy, its assigned
+> interface is allowed to transition to private operation.
+Agreed - that is probably enough. I was avoiding calling out specific
+policy method, just don't want it to all flow through in the kernel without
+a hook.  If we assume that we do stuff only when allocated to a TVM
+then that acts as the gate.
+
 > 
-> This tracepoint allows to capture extra info about which host pagefault
-> error code caused the nested page fault.
+> > 3. IDE opt in from userspace.  Policy decision.
+> >   - If not TDISP 
+> >     - device_connect(IDE ONLY) - bunch of proxying in host OS.
+> >     - Cert chain and measurements presented to host, host can then check if
+> >       it is happy and expose for next policy decision.
+> >     - Hooks exposed for host to request more measurements, key refresh etc.
+> >       Idea being that the flow is host driven with PSP providing required
+> >       services.  If host can just do setup directly that's fine too.
+> >   - If TDISP (technically you can run tdisp from host, but lets assume
+> >     for now no one wants to do that? (yet)).
+> >     - device_connect(TDISP) - bunch of proxying in host OS.
+> >     - Cert chain and measurements presented to host, host can then check if
+> >       it is happy and expose for next policy decision.
+> > 
+> > 4. Flow after this depends on early or late binding (lockdown)
+> >    but could load driver at this point.  Userspace policy.
+> >    tdi-bind etc.  
 > 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> It is valid to load the driver and operate the device in shared mode, so
+> I am not sure that acceptance should gate driver loading. It also seems
+> like something that could be managed with module policy if someone
+> wanted to prevent shared operation before acceptance.
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Indeed that might work.  Depends on device and whether it needs to be exposed
+in shared mode (which may well require driver code auditing etc that can be relaxed
+if it's up with TDISP and we know it's not a 'fake').
 
-with just one question below that can be fixed when applying:
+> 
+> [..]
+> > > > The next steps:
+> > > > - expose blobs via configfs (like Dan did configfs-tsm);  
+> 
+> I am missing the context here, but for measurements I think those are
+> better in sysfs. configs was only to allow for multiple containers to grab
+> attestation reports, measurements are device local and containers can
+> all see the same measurements.
 
-> @@ -1139,6 +1145,22 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
->   				       vmcb12->control.exit_int_info_err,
->   				       KVM_ISA_SVM);
->   
-> +	/* Collect some info about nested VM exits */
-> +	switch (vmcb12->control.exit_code) {
-> +	case SVM_EXIT_MSR:
-> +		trace_kvm_nested_msr(vmcb12->control.exit_info_1 == 1,
-> +				     kvm_rcx_read(vcpu),
-> +				     (vmcb12->save.rax & -1u) |
-> +				     (((u64)(kvm_rdx_read(vcpu) & -1u) << 32)));
+Ah. Fair point.
 
-Why the second "& -1u"?  (And I also prefer 0xFFFFFFFFull
+> 
+> > > > - s/tdisp.ko/coco.ko/;  
+> 
+> My bikeshed contribution, perhaps tsm.ko? I am still not someone who can
+> say "coco" for confidential computing with a straight face.
 
-Paolo
+Then definitely should be coco.ko :)
 
+Jonathan
 
