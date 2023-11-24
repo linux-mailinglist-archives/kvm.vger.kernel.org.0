@@ -1,165 +1,107 @@
-Return-Path: <kvm+bounces-2394-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2422-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 684EA7F6D29
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 08:48:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADDEA7F6E6F
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 09:40:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99AF21C20E04
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 07:48:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E22BB2107E
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 08:40:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F589B669;
-	Fri, 24 Nov 2023 07:48:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cgJMC0Yj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 896684436;
+	Fri, 24 Nov 2023 08:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A108C18;
-	Fri, 24 Nov 2023 07:48:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96C4BC433C7;
-	Fri, 24 Nov 2023 07:48:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700812116;
-	bh=wuXwn6H3IYOQTJYurH/LAKoS23w/GwU7ryzU1+Vs8b4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cgJMC0Yj3JRcUDF8O8XpdEdYA/5STjclZLwUWXfVMJwJnFCmcyrJDVup7Rscs2p84
-	 1lIevByzmjhiYL9n/DPGwW0r1qVsQ45xdWW1cCKjcoubJ/Np/IRSX/dXnPPAZi1lyB
-	 ETOprEE5xY+akdxk7DWnyVkIziLf3Nu7PWCfTmFB985JDwr0PPgc9yJ4BLOQhlh8Nx
-	 7J3VH6h2rRYlPJhbqQ9tIol8mM/LtKts+YBDNQd03tji9lqn5ZFKRzSp7zz5eJxPSA
-	 m4YJmobEWMvUVEr6S2NJRsz4v9jSzMIYOHwn/4yZmgFOE0FpvuIzzDTt4O8YISu59u
-	 jwN2CAG1O1gvw==
-From: Christian Brauner <brauner@kernel.org>
-To: linux-fsdevel@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Jan Kara <jack@suse.cz>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	David Woodhouse <dwmw2@infradead.org>,
-	Paul Durrant <paul@xen.org>,
-	Oded Gabbay <ogabbay@kernel.org>,
-	Wu Hao <hao.wu@intel.com>,
-	Tom Rix <trix@redhat.com>,
-	Moritz Fischer <mdf@kernel.org>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Zhenyu Wang <zhenyuw@linux.intel.com>,
-	Zhi Wang <zhi.a.wang@intel.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-	David Airlie <airlied@gmail.com>,
-	Daniel Vetter <daniel@ffwll.ch>,
-	Leon Romanovsky <leon@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Frederic Barrat <fbarrat@linux.ibm.com>,
-	Andrew Donnellan <ajd@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Eric Farman <farman@linux.ibm.com>,
-	Matthew Rosato <mjrosato@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Vineeth Vijayan <vneethv@linux.ibm.com>,
-	Peter Oberparleiter <oberpar@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Tony Krowiak <akrowiak@linux.ibm.com>,
-	Jason Herne <jjherne@linux.ibm.com>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Diana Craciun <diana.craciun@oss.nxp.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Fei Li <fei1.li@intel.com>,
-	Benjamin LaHaise <bcrl@kvack.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeelb@google.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	Kirti Wankhede <kwankhede@nvidia.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	linux-fpga@vger.kernel.org,
-	intel-gvt-dev@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org,
-	linux-rdma@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org,
-	linux-aio@kvack.org,
-	cgroups@vger.kernel.org,
-	linux-mm@kvack.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	io-uring@vger.kernel.org
-Subject: Re: [PATCH v2 0/4] eventfd: simplify signal helpers
-Date: Fri, 24 Nov 2023 08:47:57 +0100
-Message-ID: <20231124-traurig-halunken-6defdd66e8f2@brauner>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231122-vfs-eventfd-signal-v2-0-bd549b14ce0c@kernel.org>
-References: <20231122-vfs-eventfd-signal-v2-0-bd549b14ce0c@kernel.org>
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF7B091;
+	Fri, 24 Nov 2023 00:40:07 -0800 (PST)
+X-QQ-mid: bizesmtp75t1700815181tn312kbv
+Received: from [127.0.0.1] ( [125.94.202.196])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 24 Nov 2023 16:39:39 +0800 (CST)
+X-QQ-SSF: 01400000000000B0B000000A0000000
+X-QQ-FEAT: 7YFKcddXagjsJLt4wZABMUUDAYXCRnXo8g21GUIbQbqARChcnMawpeCfxN5Fh
+	FAL082/zTRzsvaYPmnb+ltvg7D100sX+qcklM2YJd+L8vMbcjpY9OqL2eOqhW1p8Cvdc6+S
+	n3X0wLAhgXvnScdmZmMjoMswETTFn/mVftkuT6WEGmZxAeP176I2oNHLa56qSaBNY2zkPnV
+	LG/ekKJr+W8uKDUe2TsrZtHezH3aWd6GKL0a1CrjhNx7iIrqc9e/TJPwUWvJ+S/sGB+QBnN
+	+VOvetNSVcAibP8cry0np7W6aAPaNzNIzGK3LUZ0PIax9d30jQgBbSUxYORpDCQMzSpElHf
+	oBn4V0aQ3rzyd4jviheIVNYpbQbGapXJhrdHfQNsxs4A+bcu9hddYlMiC3/u3vCkz4UNtbs
+	2bdxPaOa/uyDJUbaeEZ7rw==
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 14761653264302342047
+Message-ID: <F19DC40ACB796694+78dfb71e-a2db-473d-a9fc-fa35c5e61a27@shingroup.cn>
+Date: Fri, 24 Nov 2023 16:39:39 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1378; i=brauner@kernel.org; h=from:subject:message-id; bh=wuXwn6H3IYOQTJYurH/LAKoS23w/GwU7ryzU1+Vs8b4=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaQmhOr8Nb88ObVn73mvUyobyi/8m/y5yi2fL80o6/sb9 3cTN/yd21HKwiDGxSArpsji0G4SLrecp2KzUaYGzBxWJpAhDFycAjCR7iBGhq1L7YSDDTVSee+x X1xccNDei/91c9MuqdqsiYtj7lg17WdkWCP3faH/qkmK79OnL3ut4/Vo+e0nB564XJ5mY6ruNdX 4JgMA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] powerpc: Add PVN support for HeXin C2000 processor
+To: Michael Ellerman <mpe@ellerman.id.au>, gregkh@linuxfoundation.org
+References: <20231123093611.98313-1-ke.zhao@shingroup.cn>
+ <2023112317-ebook-dreamless-0cfe@gregkh> <871qcgspf8.fsf@mail.lhotse>
+Content-Language: en-US
+Cc: npiggin@gmail.com, christophe.leroy@csgroup.eu, fbarrat@linux.ibm.com,
+ ajd@linux.ibm.com, arnd@arndb.de, linuxppc-dev@lists.ozlabs.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, shenghui.qu@shingroup.cn,
+ luming.yu@shingroup.cn, dawei.li@shingroup.cn
+From: =?UTF-8?B?WmhhbyBLZSDotbUg5Y+v?= <ke.zhao@shingroup.cn>
+In-Reply-To: <871qcgspf8.fsf@mail.lhotse>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:shingroup.cn:qybglogicsvrsz:qybglogicsvrsz3a-0
 
-On Wed, 22 Nov 2023 13:48:21 +0100, Christian Brauner wrote:
-> Hey everyone,
-> 
-> This simplifies the eventfd_signal() and eventfd_signal_mask() helpers
-> significantly. They can be made void and not take any unnecessary
-> arguments.
-> 
-> I've added a few more simplifications based on Sean's suggestion.
-> 
-> [...]
+Hi Michael and Greg,
 
-Applied to the vfs.misc branch of the vfs/vfs.git tree.
-Patches in the vfs.misc branch should appear in linux-next soon.
+On 2023/11/23 19:02, Michael Ellerman wrote:
+> Greg KH <gregkh@linuxfoundation.org> writes:
+>> On Thu, Nov 23, 2023 at 05:36:11PM +0800, Zhao Ke wrote:
+>>> HeXin Tech Co. has applied for a new PVN from the OpenPower Community
+>>> for its new processor C2000. The OpenPower has assigned a new PVN
+>>> and this newly assigned PVN is 0x0066, add pvr register related
+>>> support for this PVN.
+>>>
+>>> Signed-off-by: Zhao Ke <ke.zhao@shingroup.cn>
+>>> Link: https://discuss.openpower.foundation/t/how-to-get-a-new-pvr-for-processors-follow-power-isa/477/10
+>>> ---
+>>> 	v0 -> v1:
+>>> 	- Fix .cpu_name with the correct description
+>>> ---
+>>> ---
+>>>   arch/powerpc/include/asm/reg.h            |  1 +
+>>>   arch/powerpc/kernel/cpu_specs_book3s_64.h | 15 +++++++++++++++
+>>>   arch/powerpc/kvm/book3s_pr.c              |  1 +
+>>>   arch/powerpc/mm/book3s64/pkeys.c          |  3 ++-
+>>>   arch/powerpc/platforms/powernv/subcore.c  |  3 ++-
+>>>   drivers/misc/cxl/cxl.h                    |  3 ++-
+>>>   6 files changed, 23 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/arch/powerpc/include/asm/reg.h b/arch/powerpc/include/asm/reg.h
+>>> index 4ae4ab9090a2..7fd09f25452d 100644
+>>> --- a/arch/powerpc/include/asm/reg.h
+>>> +++ b/arch/powerpc/include/asm/reg.h
+>>> @@ -1361,6 +1361,7 @@
+>>>   #define PVR_POWER8E	0x004B
+>>>   #define PVR_POWER8NVL	0x004C
+>>>   #define PVR_POWER8	0x004D
+>>> +#define PVR_HX_C2000	0x0066
+>>>   #define PVR_POWER9	0x004E
+>>>   #define PVR_POWER10	0x0080
+>>>   #define PVR_BE		0x0070
+>> Why is this not in sorted order?
+> It's semantically sorted :D
+> ie. HX_C2000 is most similar to POWER8, but is newer than it.
+Yes. This is what I mean. If you prefer to sort in another order, please 
+tell me and I will update this.
+>
+> PVR_BE is out of place, I'll fix that.
+>
+> cheers
+>
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
-
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.misc
-
-[1/4] i915: make inject_virtual_interrupt() void
-      https://git.kernel.org/vfs/vfs/c/858848719210
-[2/4] eventfd: simplify eventfd_signal()
-      https://git.kernel.org/vfs/vfs/c/ded0f31f825f
-[3/4] eventfd: simplify eventfd_signal_mask()
-      https://git.kernel.org/vfs/vfs/c/45ee1c990e88
-[4/4] eventfd: make eventfd_signal{_mask}() void
-      https://git.kernel.org/vfs/vfs/c/37d5d473e749
 
