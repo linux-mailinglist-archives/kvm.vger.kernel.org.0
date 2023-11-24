@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-2442-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2443-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A7C07F7890
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 17:07:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BF597F7895
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 17:08:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 266D228160D
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 16:07:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A784281345
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 16:08:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8896333CDF;
-	Fri, 24 Nov 2023 16:07:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93AF133CE9;
+	Fri, 24 Nov 2023 16:08:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z1OKq279"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zz534stY"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E52AB12B
-	for <kvm@vger.kernel.org>; Fri, 24 Nov 2023 08:07:41 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87F931998
+	for <kvm@vger.kernel.org>; Fri, 24 Nov 2023 08:08:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700842061;
+	s=mimecast20190719; t=1700842112;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=8WiGZAsybGzCzu36x4lL8eXrNHVFYUcQQ91mXJAV7RI=;
-	b=Z1OKq279ToEcMOOJ5W51sFHYSXXhUqSTjhebNxlaFR6ba2de2/cijkAWzf2o/mIvvOmTHM
-	54C83PFDNmU6JDh45YEsQDHYgc+C8JIyF8uPsGZOLVY5DAouCFV2TfhUGT7+JIpLIEBUsu
-	C5NSuqGp27K07RYqCcNWs6vI7/8iMcU=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=cmsrkiY67tdSL4I4FDP974bqK0BocuUfUMFhGGwoOH0=;
+	b=Zz534stYnlfhPYKGEf+Y0/zYMe3Ontdri2HIRSVDGhjfXXBDK2NashIiEty7dT1eRoo3wW
+	CwqZNaGNQiW69tpM0dClD52hNK0twltr+mvhcgFOGmvxdaPzhlNeBRoEaa3VH0Viz/koBU
+	+XeTriLFwRbr3hw2I5UJ1PbE17PuO9k=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-310-6mC_K8Y1Np2NjgCStewyBQ-1; Fri, 24 Nov 2023 11:07:39 -0500
-X-MC-Unique: 6mC_K8Y1Np2NjgCStewyBQ-1
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-67a16e9eedbso7692396d6.0
-        for <kvm@vger.kernel.org>; Fri, 24 Nov 2023 08:07:39 -0800 (PST)
+ us-mta-125-KtEr3TJQMzGqd3wOLtgn4g-1; Fri, 24 Nov 2023 11:08:31 -0500
+X-MC-Unique: KtEr3TJQMzGqd3wOLtgn4g-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-677fc5fa42aso26879506d6.2
+        for <kvm@vger.kernel.org>; Fri, 24 Nov 2023 08:08:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700842059; x=1701446859;
+        d=1e100.net; s=20230601; t=1700842110; x=1701446910;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8WiGZAsybGzCzu36x4lL8eXrNHVFYUcQQ91mXJAV7RI=;
-        b=KVyFQ03+OAUUNDnquvzERJg5rI6U9Xth89WLlUXOgi6+jnHXU60hITMHcmOIdv9pe4
-         QZ/L6kOMWOvyvuS66N9cgXYYhYyHFn2LZzGr57qgwIfps/1+GZmxb+/Xs0xcgXHM/DKY
-         uIyghXFC/EcaKwjJjQkZn9+vFkx9Tl/WFpfEazNndNtF5UEQh6PQQVDzG8hHD7oL6hDT
-         xeAzLMnInStv8t3FCj2vZdmBcwpezs8gNb/5hx6oDVskynRLe+nz8cIAuW3yRzdGoYWD
-         FbE6/FUj2EX6gsdGJ2yXSge/RlSlzHX3qK+UQjGoo1Z8WKC97SbS9lBQJWq3JTOKfNuz
-         ba+g==
-X-Gm-Message-State: AOJu0YyUmNOPSR0px6swHQ6EZXVXuWUGqlkIX1KSXvPQP8wt/b1yp+4b
-	9a/mgSxq1GzpwahIzryqCiFv6y7yx4kQA/+yF2gGnqhCKbHiEmtSI/ChTRxtoOu6IzAzc2VzlQn
-	gD40iMisseCgk
-X-Received: by 2002:a05:6214:419b:b0:66d:1100:7b81 with SMTP id ld27-20020a056214419b00b0066d11007b81mr4630217qvb.18.1700842059471;
-        Fri, 24 Nov 2023 08:07:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGoEGtM0E8HfCBi2iR3GLxfUKzyZLwKwRYwCmX/US+5L/fv1k0GQdeDYkir4tHFRBVRom7dFg==
-X-Received: by 2002:a05:6214:419b:b0:66d:1100:7b81 with SMTP id ld27-20020a056214419b00b0066d11007b81mr4630191qvb.18.1700842059230;
-        Fri, 24 Nov 2023 08:07:39 -0800 (PST)
+        bh=cmsrkiY67tdSL4I4FDP974bqK0BocuUfUMFhGGwoOH0=;
+        b=xPdV8PZjw8wU1/qJ8dHG11zu8axet0FIuxC7f9CYVl5OXs+9wE7Mpj6jpacLXmhf2O
+         LGlxnOaCYigy50hR77nDZFwXXCMkgMlXBUxLjChvdrpZj2j5aGlLzScbr1HyMDXcFz1a
+         TzVV2uZrSqrIUYRj5zuLfWb/NS+afioWQ9jWfYD3g0bJfu6MA8NhWNN6L5FxKDlX+3DO
+         bpCJ856RnNR+Ou/hiMytDv2xPxmeS8dMoSSc99d9FQtksNCQZpjts5i7iYsmBjNJAhtW
+         /9JG5Fta6fDy7z7DwC2TKpgECh3K0EwzQIt32ASHOzcAV69PLayF1qzhX2uYMcE+M/JN
+         t6gA==
+X-Gm-Message-State: AOJu0YztjCzK9CMAx+DU6OE+hz0nbaCrwXMzRO0Ik2sD0jhzHgLINAoZ
+	GWgBWl+0W/p7DqzaphM+FVgDhk+9gBi9vhiTya/lpbrf1tXrZbxY9AD3nCuLkVggJUIWgFGgnBv
+	7dBYw2EBV3iti
+X-Received: by 2002:a0c:efc8:0:b0:66f:bc3f:bd7 with SMTP id a8-20020a0cefc8000000b0066fbc3f0bd7mr3703821qvt.27.1700842110521;
+        Fri, 24 Nov 2023 08:08:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGXQy7rC3OFnwpDFz32XJyMJXH3K21FMQ2Wp7skKcym3brbTwQY0ByVOhsgcc9sEZN9TK9xqQ==
+X-Received: by 2002:a0c:efc8:0:b0:66f:bc3f:bd7 with SMTP id a8-20020a0cefc8000000b0066fbc3f0bd7mr3703805qvt.27.1700842110328;
+        Fri, 24 Nov 2023 08:08:30 -0800 (PST)
 Received: from [10.32.181.74] (nat-pool-mxp-t.redhat.com. [149.6.153.186])
-        by smtp.googlemail.com with ESMTPSA id p15-20020ad451cf000000b0067a1cf7737bsm333015qvq.130.2023.11.24.08.07.37
+        by smtp.googlemail.com with ESMTPSA id p15-20020ad451cf000000b0067a1cf7737bsm333015qvq.130.2023.11.24.08.08.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Nov 2023 08:07:38 -0800 (PST)
-Message-ID: <0c626505-a358-4d13-99e3-144356d136b3@redhat.com>
-Date: Fri, 24 Nov 2023 17:07:36 +0100
+        Fri, 24 Nov 2023 08:08:29 -0800 (PST)
+Message-ID: <da4b9e89-00c7-4067-b962-e86805a345c6@redhat.com>
+Date: Fri, 24 Nov 2023 17:08:27 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,7 +68,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/4] KVM: x86: refactor req_immediate_exit logic
+Subject: Re: [PATCH v3 2/4] KVM: x86: add more information to the kvm_entry
+ tracepoint
 Content-Language: en-US
 To: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
 Cc: Thomas Gleixner <tglx@linutronix.de>, "H. Peter Anvin" <hpa@zytor.com>,
@@ -76,7 +77,7 @@ Cc: Thomas Gleixner <tglx@linutronix.de>, "H. Peter Anvin" <hpa@zytor.com>,
  Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
  x86@kernel.org, Dave Hansen <dave.hansen@linux.intel.com>
 References: <20230928103640.78453-1-mlevitsk@redhat.com>
- <20230928103640.78453-2-mlevitsk@redhat.com>
+ <20230928103640.78453-3-mlevitsk@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -113,40 +114,156 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20230928103640.78453-2-mlevitsk@redhat.com>
+In-Reply-To: <20230928103640.78453-3-mlevitsk@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 9/28/23 12:36, Maxim Levitsky wrote:
-> @@ -4176,6 +4176,9 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
->   	clgi();
->   	kvm_load_guest_xsave_state(vcpu);
+> Add VMX/SVM specific interrupt injection info to vm entry tracepoint.
+> Also add a flag showing that immediate vm exit is set to happen after
+> the entry.
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>   arch/x86/include/asm/kvm-x86-ops.h |  1 +
+>   arch/x86/include/asm/kvm_host.h    |  5 ++++-
+>   arch/x86/kvm/svm/svm.c             | 17 +++++++++++++++++
+>   arch/x86/kvm/trace.h               | 15 +++++++++++++--
+>   arch/x86/kvm/vmx/vmx.c             | 12 ++++++++++++
+>   5 files changed, 47 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index f654a7f4cc8c0c..346fed6e3c33aa 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -99,6 +99,7 @@ KVM_X86_OP(get_l2_tsc_multiplier)
+>   KVM_X86_OP(write_tsc_offset)
+>   KVM_X86_OP(write_tsc_multiplier)
+>   KVM_X86_OP(get_exit_info)
+> +KVM_X86_OP(get_entry_info)
+>   KVM_X86_OP(check_intercept)
+>   KVM_X86_OP(handle_exit_irqoff)
+>   KVM_X86_OP(sched_in)
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 383a1d0cc0743b..321721813474f7 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1679,13 +1679,16 @@ struct kvm_x86_ops {
+>   	void (*write_tsc_multiplier)(struct kvm_vcpu *vcpu);
 >   
-> +	if (vcpu->arch.req_immediate_exit)
-> +		smp_send_reschedule(vcpu->cpu);
+>   	/*
+> -	 * Retrieve somewhat arbitrary exit information.  Intended to
+> +	 * Retrieve somewhat arbitrary exit/entry information.  Intended to
+>   	 * be used only from within tracepoints or error paths.
+>   	 */
+>   	void (*get_exit_info)(struct kvm_vcpu *vcpu, u32 *reason,
+>   			      u64 *info1, u64 *info2,
+>   			      u32 *exit_int_info, u32 *exit_int_info_err_code);
+>   
+> +	void (*get_entry_info)(struct kvm_vcpu *vcpu,
+> +				u32 *inj_info, u32 *inj_info_error_code);
 > +
+>   	int (*check_intercept)(struct kvm_vcpu *vcpu,
+>   			       struct x86_instruction_info *info,
+>   			       enum x86_intercept_stage stage,
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 60b130b7f9d510..cd65c04be3d0e2 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3504,6 +3504,22 @@ static void svm_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason,
+>   		*error_code = 0;
+>   }
+>   
+> +static void svm_get_entry_info(struct kvm_vcpu *vcpu,
+> +			u32 *inj_info,
+> +			u32 *inj_info_error_code)
+> +{
+> +	struct vmcb_control_area *control = &to_svm(vcpu)->vmcb->control;
+> +
+> +	*inj_info = control->event_inj;
+> +
+> +	if ((*inj_info & SVM_EXITINTINFO_VALID) &&
+> +	    (*inj_info & SVM_EXITINTINFO_VALID_ERR))
+> +		*inj_info_error_code = control->event_inj_err;
+> +	else
+> +		*inj_info_error_code = 0;
+> +
+> +}
+> +
+>   static int svm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+>   {
+>   	struct vcpu_svm *svm = to_svm(vcpu);
+> @@ -4992,6 +5008,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>   	.required_apicv_inhibits = AVIC_REQUIRED_APICV_INHIBITS,
+>   
+>   	.get_exit_info = svm_get_exit_info,
+> +	.get_entry_info = svm_get_entry_info,
+>   
+>   	.vcpu_after_set_cpuid = svm_vcpu_after_set_cpuid,
+>   
+> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+> index 83843379813ee3..28e8a63368cc02 100644
+> --- a/arch/x86/kvm/trace.h
+> +++ b/arch/x86/kvm/trace.h
+> @@ -21,14 +21,25 @@ TRACE_EVENT(kvm_entry,
+>   	TP_STRUCT__entry(
+>   		__field(	unsigned int,	vcpu_id		)
+>   		__field(	unsigned long,	rip		)
+> -	),
+> +		__field(	u32,		inj_info	)
+> +		__field(	u32,		inj_info_err	)
+> +		__field(	bool,		req_imm_exit	)
+> +		),
+>   
+>   	TP_fast_assign(
+>   		__entry->vcpu_id        = vcpu->vcpu_id;
+>   		__entry->rip		= kvm_rip_read(vcpu);
+> +		__entry->req_imm_exit	= vcpu->arch.req_immediate_exit;
+> +
+> +		static_call(kvm_x86_get_entry_info)(vcpu,
+> +					  &__entry->inj_info,
+> +					  &__entry->inj_info_err);
+>   	),
+>   
+> -	TP_printk("vcpu %u, rip 0x%lx", __entry->vcpu_id, __entry->rip)
+> +	TP_printk("vcpu %u, rip 0x%lx inj 0x%08x inj_error_code 0x%08x%s",
+> +			__entry->vcpu_id, __entry->rip,
+> +			__entry->inj_info, __entry->inj_info_err,
+> +			__entry->req_imm_exit ? " [req_imm_exit]" : "")
+>   );
+>   
+>   /*
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index eb7e42235e8811..9dd13f52d4999c 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6156,6 +6156,17 @@ static void vmx_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason,
+>   	}
+>   }
+>   
+> +static void vmx_get_entry_info(struct kvm_vcpu *vcpu,
+> +			      u32 *inj_info,
+> +			      u32 *inj_info_error_code)
+> +{
+> +	*inj_info = vmcs_read32(VM_ENTRY_INTR_INFO_FIELD);
+> +	if (is_exception_with_error_code(*inj_info))
+> +		*inj_info_error_code = vmcs_read32(VM_ENTRY_EXCEPTION_ERROR_CODE);
+> +	else
+> +		*inj_info_error_code = 0;
+> +}
+> +
+>   static void vmx_destroy_pml_buffer(struct vcpu_vmx *vmx)
+>   {
+>   	if (vmx->pml_pg) {
+> @@ -8297,6 +8308,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+>   	.get_mt_mask = vmx_get_mt_mask,
+>   
+>   	.get_exit_info = vmx_get_exit_info,
+> +	.get_entry_info = vmx_get_entry_info,
+>   
+>   	.vcpu_after_set_cpuid = vmx_vcpu_after_set_cpuid,
+>   
 
-This code is in a non-standard situation where IF=1 but interrupts are
-effectively disabled.  Better something like:
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index beea99c8e8e0..3b945de2d880 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4148,8 +4148,11 @@ static __no_kcsan fastpath_t svm_vcpu_run(
-  		 * is enough to force an immediate vmexit.
-  		 */
-  		disable_nmi_singlestep(svm);
-+		vcpu->arch.req_immediate_exit = true;
-+	}
-+
-+	if (vcpu->arch.req_immediate_exit)
-  		smp_send_reschedule(vcpu->cpu);
--	}
-
-  	pre_svm_run(vcpu);
-
-
-Paolo
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
 
