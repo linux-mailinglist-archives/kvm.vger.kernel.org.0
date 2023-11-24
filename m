@@ -1,157 +1,129 @@
-Return-Path: <kvm+bounces-2435-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2436-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D7B07F763E
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 15:21:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 873007F764A
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 15:23:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE537282078
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 14:21:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E60BB2170F
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 14:23:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4542D615;
-	Fri, 24 Nov 2023 14:21:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C0632D60E;
+	Fri, 24 Nov 2023 14:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Ctooe/e9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aevSnydD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A81D61992;
-	Fri, 24 Nov 2023 06:21:29 -0800 (PST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id EDE9D40E014B;
-	Fri, 24 Nov 2023 14:21:26 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id YSeBXnDxtyE4; Fri, 24 Nov 2023 14:21:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1700835684; bh=70iKoPUGxr70BVQmnLb6A91Gn+tCho1RWbxI7o21LXI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ctooe/e9xdy7g9A5Dt3Co0Eih6gkBFObocpqY9kf+AVVX2JHHnrhGw956oEpX2JSl
-	 pWLZ+ahyE8qbumSobifYHrDWkNgjqRE2iukzLYGxMCdUQe23vykj1F8o+tPwuVVJeX
-	 8FDKfwXuaG1ThoXbxS2ho06wnEKITKqosOxfM+NS+c5QbXPzFqdbQOnEv7pu3M1sAS
-	 ch19QwIEi5sim25VWG59lh+/w9JdOgZ3Pk9zZWj4KUKSCaQkY6V21JUmGpqCKJEDeq
-	 GeyndQcsiIhyBcDub9T5+b2SkMCQ3PAXXJX55NKbmMxfVWfNd/sIt1YcDglyMRKGD3
-	 Tw4vME3fA66qWtvNS0bhOMQo7RlE6dIOBNfdMuDqxRfDAvwOUuHaw0AA6KDANfVEA1
-	 gqSfIZGxL2/3bnUeNNZ3vhPytb603QwpgcLvmYQQDfpp51v+P3sULMlfBLI6VqutPx
-	 T2sjDy5Q66tOUvH9FVsBs8vCfKtjTc7MujYkFp88FWTDu6VmN9lMgpYsTCFENJ+0Gh
-	 9i8PFahOe9kp4ZGsyLzADxDhStdNLcg2Y3WYGs+G15F4ko4D83as9ax0X/aHqNuXE1
-	 vW6e47/s0EI/jlEnPXTx52prR/UIzAk2uwbVXPuoUvaDNBaRKKTBvkLWPm9WqvnnHk
-	 od6sd/wlEQNH5QrX5sJdyX44=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E2DD740E01A5;
-	Fri, 24 Nov 2023 14:20:43 +0000 (UTC)
-Date: Fri, 24 Nov 2023 15:20:43 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-	tony.luck@intel.com, marcorr@google.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v10 12/50] x86/sev: Invalidate pages from the direct map
- when adding them to the RMP table
-Message-ID: <20231124142043.GJZWCxOxeX0MLyZEWs@fat_crate.local>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-13-michael.roth@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071E12D03C
+	for <kvm@vger.kernel.org>; Fri, 24 Nov 2023 14:23:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA7D1C433B9;
+	Fri, 24 Nov 2023 14:23:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700835789;
+	bh=fxI4uXn2KfvV1R7R9iTkUg0DR5eIEK+BbuDI5r58j/w=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=aevSnydDZ4Uz+e2pC/C/kvwGX84Zj0aZfpEj+a9uSSjw36YDfHrl+gbR1scHc+VCv
+	 kP93iyjC8FJa5LBIfIC1xGfWDCY3ZJZ5a+vdQLdbEkPPADLUI+eEhh6hzM7p95Cv/M
+	 e9LkzYvdjfM3ZiawCRuta1Vff2dIXuNoV1woH+lhsBeJtGK8c9zmSRCJ4zyglBzR4v
+	 ODcVXntzHes75XCUMhBJb6mLkJ4AK45B2HsAykXZrlvRZZnIQn5VxJIxQFh2o08wzl
+	 gcttLHxCW3f2r8mVITkRGSrbxVsTugWompFGM+3a9HU6Iiy6Npwi9+3I56iTEwL0gu
+	 J715C7xHk7A5w==
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-54aecf9270fso1060633a12.0;
+        Fri, 24 Nov 2023 06:23:09 -0800 (PST)
+X-Gm-Message-State: AOJu0YwpvPjOCdkzYYwMGZBHVrpfO6jUnuJZYIwP0Gbtnt/gd8kqczsU
+	LNYKKvLfDB0+cIrU7jFCgia8bKzX4U59zIv+OWY=
+X-Google-Smtp-Source: AGHT+IGPovQWrXUW9VvdSCkq8lA5VR3r+K+n92IJb/FB7JmOHZ1l5GmXUGI8YDGzu2OFWBfLnjaFp1w9w/DhTWkNsgA=
+X-Received: by 2002:a50:a693:0:b0:548:68a3:618e with SMTP id
+ e19-20020a50a693000000b0054868a3618emr2333828edc.9.1700835788037; Fri, 24 Nov
+ 2023 06:23:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231016132819.1002933-13-michael.roth@amd.com>
+References: <20231115090735.2404866-1-chenhuacai@loongson.cn> <0f74ba84-a0fb-41cb-b22c-943f47c631da@infradead.org>
+In-Reply-To: <0f74ba84-a0fb-41cb-b22c-943f47c631da@infradead.org>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Fri, 24 Nov 2023 22:22:58 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H63QkfSw+Esn8oW2PDEsCnTRPFqkj8X-x8i9cH3AS0k9w@mail.gmail.com>
+Message-ID: <CAAhV-H63QkfSw+Esn8oW2PDEsCnTRPFqkj8X-x8i9cH3AS0k9w@mail.gmail.com>
+Subject: Re: [PATCH] LoongArch: KVM: Fix build due to API changes
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Huacai Chen <chenhuacai@loongson.cn>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, kvm@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Xuerui Wang <kernel@xen0n.name>, Jiaxun Yang <jiaxun.yang@flygoat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 16, 2023 at 08:27:41AM -0500, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> The integrity guarantee of SEV-SNP is enforced through the RMP table.
-> The RMP is used with standard x86 and IOMMU page tables to enforce
-> memory restrictions and page access rights. The RMP check is enforced as
-> soon as SEV-SNP is enabled globally in the system. When hardware
-> encounters an RMP-check failure, it raises a page-fault exception.
-> 
-> The rmp_make_private() and rmp_make_shared() helpers are used to add
-> or remove the pages from the RMP table. Improve the rmp_make_private()
-> to invalidate state so that pages cannot be used in the direct-map after
-> they are added the RMP table, and restored to their default valid
-> permission after the pages are removed from the RMP table.
+Hi, Paolo,
 
-Brijesh's SOB comes
+On Thu, Nov 16, 2023 at 3:48=E2=80=AFAM Randy Dunlap <rdunlap@infradead.org=
+> wrote:
+>
+>
+>
+> On 11/15/23 01:07, Huacai Chen wrote:
+> > Commit 8569992d64b8f750e34b7858eac ("KVM: Use gfn instead of hva for
+> > mmu_notifier_retry") replaces mmu_invalidate_retry_hva() usage with
+> > mmu_invalidate_retry_gfn() for X86, LoongArch also need similar changes
+> > to fix build.
+> >
+> > Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+>
+> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+> Tested-by: Randy Dunlap <rdunlap@infradead.org> # build-tested
+> Acked-by: Randy Dunlap <rdunlap@infradead.org>
+I think this patch should go through your kvm tree rather than the
+loongarch tree. Because the loongarch tree is based on 6.7 now, this
+patch can fix a build error for kvm tree, but will cause a build error
+on the loongarch tree.
 
-<--- here,
 
-then Ashish's two tags.
+Huacai
 
-Please audit your whole set for such inconsistencies.
-
-> @@ -404,6 +440,21 @@ static int rmpupdate(u64 pfn, struct rmp_state *val)
->  	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
->  		return -ENXIO;
->  
-> +	level = RMP_TO_X86_PG_LEVEL(val->pagesize);
-> +	npages = page_level_size(level) / PAGE_SIZE;
-> +
-> +	/*
-> +	 * If page is getting assigned in the RMP table then unmap it from the
-> +	 * direct map.
-
-Here I'm missing the explanation *why* the pages need to be unmapped
-from the direct map.
-
-What happens if not?
-
-> +	 */
-> +	if (val->assigned) {
-> +		if (invalidate_direct_map(pfn, npages)) {
-> +			pr_err("Failed to unmap %d pages at pfn 0x%llx from the direct_map\n",
-> +			       npages, pfn);
-
-invalidate_direct_map() already dumps an error message - no need to do
-that here too.
-
-> +			return -EFAULT;
-> +		}
-> +	}
-> +
->  	do {
->  		/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
->  		asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
-> @@ -422,6 +473,17 @@ static int rmpupdate(u64 pfn, struct rmp_state *val)
->  		return -EFAULT;
->  	}
->  
-> +	/*
-> +	 * Restore the direct map after the page is removed from the RMP table.
-> +	 */
-> +	if (!val->assigned) {
-> +		if (restore_direct_map(pfn, npages)) {
-> +			pr_err("Failed to map %d pages at pfn 0x%llx into the direct_map\n",
-> +			       npages, pfn);
-
-Ditto.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+>
+> Thanks.
+>
+> > ---
+> >  arch/loongarch/kvm/mmu.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+> > index 80480df5f550..9463ebecd39b 100644
+> > --- a/arch/loongarch/kvm/mmu.c
+> > +++ b/arch/loongarch/kvm/mmu.c
+> > @@ -627,7 +627,7 @@ static bool fault_supports_huge_mapping(struct kvm_=
+memory_slot *memslot,
+> >   *
+> >   * There are several ways to safely use this helper:
+> >   *
+> > - * - Check mmu_invalidate_retry_hva() after grabbing the mapping level=
+, before
+> > + * - Check mmu_invalidate_retry_gfn() after grabbing the mapping level=
+, before
+> >   *   consuming it.  In this case, mmu_lock doesn't need to be held dur=
+ing the
+> >   *   lookup, but it does need to be held while checking the MMU notifi=
+er.
+> >   *
+> > @@ -807,7 +807,7 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsi=
+gned long gpa, bool write)
+> >
+> >       /* Check if an invalidation has taken place since we got pfn */
+> >       spin_lock(&kvm->mmu_lock);
+> > -     if (mmu_invalidate_retry_hva(kvm, mmu_seq, hva)) {
+> > +     if (mmu_invalidate_retry_gfn(kvm, mmu_seq, gfn)) {
+> >               /*
+> >                * This can happen when mappings are changed asynchronous=
+ly, but
+> >                * also synchronously if a COW is triggered by
+>
+> --
+> ~Randy
 
