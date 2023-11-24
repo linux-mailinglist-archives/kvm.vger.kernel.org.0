@@ -1,142 +1,183 @@
-Return-Path: <kvm+bounces-2387-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2388-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E2997F67C2
-	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 20:43:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1D257F6A71
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 03:03:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECC9D281B09
-	for <lists+kvm@lfdr.de>; Thu, 23 Nov 2023 19:43:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76BAB281A3D
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 02:03:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E28D4D102;
-	Thu, 23 Nov 2023 19:43:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 739173D9F;
+	Fri, 24 Nov 2023 02:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dp3Pv+Rb"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ECGZCL00"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F00D8D7F
-	for <kvm@vger.kernel.org>; Thu, 23 Nov 2023 11:43:30 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-6bd20c30831so204685b3a.1
-        for <kvm@vger.kernel.org>; Thu, 23 Nov 2023 11:43:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1700768610; x=1701373410; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WpkzZHg09ad7VkHOnG/quo/T41ONjJ1411UTG4haLXU=;
-        b=dp3Pv+RbN7GZ2lrzjUffbQSF0LOT7BAeVxL6NUaQWXL7BGCA8WDsDwdIv1vBi/bJh+
-         x+kueLLHCLnZJPbC862Wr+FeUwslFH4KsQDxtO27+z0Knohfoc1/nZaiTZIc1t1+Rm5F
-         bvX5ONi4yF1JFQpbP3Y8QFG7vPyFuxrLoF8RUWAS0rpopJh1ZZOocP0Uy5U4Mbs71JTW
-         VqkNsfgKvCuwd0Zp3UY9OofwAtmwZAmjrrLLpSdFn8xdFL18Apgz7eraE8iP8965BEqc
-         m07TYmEVY2jR+/GcdHXejKJSgc79oFbqpKjLmiJQ2p1a0vrTf4zkItE1lOEdMbMyzUCQ
-         ca8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700768610; x=1701373410;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WpkzZHg09ad7VkHOnG/quo/T41ONjJ1411UTG4haLXU=;
-        b=JgQ4E4odRkC7DgRkFazvBd5oJngSE7mc2xJOjzi8oanCNsycOcyF+uBxVzpV1ev6/k
-         4U2+K/wQfYwBTc0y0E6A82UIaHF9eMNaGmQA0QAM6LMuwdXznQqF8bO1T/tK+65NIPzF
-         6HbJojU7vfb2rVZveeOr0ZodTjVEPxVwTSwVar/SgjpQDnuNBkoKthSoH5ghu/93mZ9o
-         aJkGM5Mo/J3N2hWCAnZQNARGleSrfUiNuTtxNCDABUpodd/0v4jOUWvUlM4WmzBvhGoi
-         Rle7EAGzhqw/gd25DVFATqNIvDK+2q4yWOAtQr2s0XnMDik3zw9Wl1etm2s6qz7BL97x
-         xLBw==
-X-Gm-Message-State: AOJu0YxQF7oaUY7DP2x3AnZsf1jidFlkEaGHZb0dKqcf4Y04wUKvCeMC
-	npEGevNOHtlb7hJuqKFeXN99MQ==
-X-Google-Smtp-Source: AGHT+IEPG4J941SLrpY4uC/ri/G2ja2akCNdtY4pHEKeo+HpcNnwpEYC41wSse9D2H40uEI86qohgw==
-X-Received: by 2002:a05:6a00:9381:b0:6bc:ff89:a2fc with SMTP id ka1-20020a056a00938100b006bcff89a2fcmr544106pfb.2.1700768610318;
-        Thu, 23 Nov 2023 11:43:30 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id n17-20020a056a0007d100b006cb65cfde6dsm1567524pfu.200.2023.11.23.11.43.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Nov 2023 11:43:29 -0800 (PST)
-Message-ID: <cb41cf91-1c75-4edc-b00f-59763344b15c@kernel.dk>
-Date: Thu, 23 Nov 2023 12:43:23 -0700
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23998D72;
+	Thu, 23 Nov 2023 18:02:45 -0800 (PST)
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AO1jNiO015266;
+	Fri, 24 Nov 2023 02:02:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=0Ng7PzLWRUN5PalkUI/r7oq/iQlhZgewM1sHhRV/b/k=;
+ b=ECGZCL00vygNh+PUV5gvGed1LpVpCU7AdG7pzF9Z8KI3aSTOrYALRwYA9iMrun3VFWzS
+ Cxhnp4ju5bJ41wqtCaH/lg7Wfikym+5857Jz4RkwtHSi2nA99Up9BuAFwb/8fYIx/KNA
+ HftBjFo5Bpbiw0XS5MNMcB7sGBhg7fd+foZx49RJNRTc4+s120bDWEU0j1NiZ7i8qNbK
+ l8STevmDmrn8thyn0PpsZPYsu9Z85uQ689/XPgwp6z254ghbikGvf3qX4FWrYG6G9S4j
+ QIlqy6X/Mf8hfmbRCiEsMfwjSZ9Jo7HVzzZUjUNvYLb3keI5NbExPrh0Zl9NoxjqUNZw BA== 
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ujjes89q9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Nov 2023 02:02:42 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3ANMn0lC010802;
+	Fri, 24 Nov 2023 02:02:41 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uf80030uu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Nov 2023 02:02:41 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AO22dBc3539676
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 24 Nov 2023 02:02:39 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5F86320049;
+	Fri, 24 Nov 2023 02:02:39 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7A2CD20040;
+	Fri, 24 Nov 2023 02:02:38 +0000 (GMT)
+Received: from ozlabs.au.ibm.com (unknown [9.192.253.14])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 24 Nov 2023 02:02:38 +0000 (GMT)
+Received: from jarvis.ozlabs.ibm.com (haven.au.ibm.com [9.192.254.114])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ozlabs.au.ibm.com (Postfix) with ESMTPSA id C622F60234;
+	Fri, 24 Nov 2023 13:02:35 +1100 (AEDT)
+Message-ID: <ef939be36737bba5d91aa6d5c8af19683aebd92c.camel@linux.ibm.com>
+Subject: Re: [PATCH v2 2/4] eventfd: simplify eventfd_signal()
+From: Andrew Donnellan <ajd@linux.ibm.com>
+To: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
+        Vitaly
+ Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org,
+        David Woodhouse
+ <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>,
+        Oded Gabbay
+ <ogabbay@kernel.org>, Wu Hao <hao.wu@intel.com>,
+        Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
+        Xu Yilun <yilun.xu@intel.com>, Zhenyu
+ Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Jani
+ Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen
+ <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        David Airlie
+ <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
+        Leon Romanovsky
+ <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Frederic Barrat
+ <fbarrat@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew
+ Rosato <mjrosato@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth
+ Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter
+ <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik
+ <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian
+ Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle
+ <svens@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Jason Herne
+ <jjherne@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Diana Craciun
+ <diana.craciun@oss.nxp.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>, Fei Li <fei1.li@intel.com>,
+        Benjamin
+ LaHaise <bcrl@kvack.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal
+ Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>,
+        Muchun Song <muchun.song@linux.dev>,
+        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-fpga@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        linux-usb@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-aio@kvack.org, cgroups@vger.kernel.org,
+        linux-mm@kvack.org, Jens Axboe <axboe@kernel.dk>,
+        Pavel Begunkov
+ <asml.silence@gmail.com>, io-uring@vger.kernel.org
+Date: Fri, 24 Nov 2023 13:02:25 +1100
+In-Reply-To: <20231122-vfs-eventfd-signal-v2-2-bd549b14ce0c@kernel.org>
+References: <20231122-vfs-eventfd-signal-v2-0-bd549b14ce0c@kernel.org>
+	 <20231122-vfs-eventfd-signal-v2-2-bd549b14ce0c@kernel.org>
+Autocrypt: addr=ajd@linux.ibm.com; prefer-encrypt=mutual;
+ keydata=mDMEZPaWfhYJKwYBBAHaRw8BAQdAAuMUoxVRwqphnsFua1W+WBz6I2cIn0+Ox4YypJSdBJ+0MEFuZHJldyBEb25uZWxsYW4gKElCTSBzdHVmZikgPGFqZEBsaW51eC5pYm0uY29tPoiTBBMWCgA7FiEE01kE3s9shZVYLX1Aj1Qx8QRYRqAFAmT2ln4CGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AACgkQj1Qx8QRYRqAdswD8DhIh4trRQYiPe+7LaM7q+0+Thz+CwUJCW3UFOf0SEO0BAPNdsi7aVV+4Oah6nYzqzH5Zbs4Tz5RY+Vsf+DD/EzUKuDgEZPaWfhIKKwYBBAGXVQEFAQEHQLN9moJRqN8Zop/kcyIjga+2qzLoVaNAL6+4diGnlr1xAwEIB4h4BBgWCgAgFiEE01kE3s9shZVYLX1Aj1Qx8QRYRqAFAmT2ln4CGwwACgkQj1Qx8QRYRqCYkwD/W+gIP9kITfU4wnLtueFUThxA0T/LF49M7k31Qb8rPCwBALeEYAlX648lzjSA07pJB68Jt39FuUno444dSVmhYtoH
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.1 (3.50.1-1.fc39) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/4] eventfd: simplify signal helpers
-Content-Language: en-US
-To: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
- Vitaly Kuznetsov <vkuznets@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>,
- Oded Gabbay <ogabbay@kernel.org>, Wu Hao <hao.wu@intel.com>,
- Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
- Xu Yilun <yilun.xu@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>,
- Zhi Wang <zhi.a.wang@intel.com>, Jani Nikula <jani.nikula@linux.intel.com>,
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
- David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
- Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
- Frederic Barrat <fbarrat@linux.ibm.com>, Andrew Donnellan
- <ajd@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Eric Farman <farman@linux.ibm.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
- Halil Pasic <pasic@linux.ibm.com>, Vineeth Vijayan <vneethv@linux.ibm.com>,
- Peter Oberparleiter <oberpar@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>,
- Jason Herne <jjherne@linux.ibm.com>,
- Harald Freudenberger <freude@linux.ibm.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Diana Craciun <diana.craciun@oss.nxp.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, Fei Li <fei1.li@intel.com>,
- Benjamin LaHaise <bcrl@kvack.org>, Johannes Weiner <hannes@cmpxchg.org>,
- Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeelb@google.com>, Muchun Song <muchun.song@linux.dev>,
- Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-fpga@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
- intel-gfx@lists.freedesktop.org, linux-rdma@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
- linux-usb@vger.kernel.org, virtualization@lists.linux-foundation.org,
- netdev@vger.kernel.org, linux-aio@kvack.org, cgroups@vger.kernel.org,
- linux-mm@kvack.org, Pavel Begunkov <asml.silence@gmail.com>,
- io-uring@vger.kernel.org
-References: <20231122-vfs-eventfd-signal-v2-0-bd549b14ce0c@kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20231122-vfs-eventfd-signal-v2-0-bd549b14ce0c@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 31fTWNmCyikAMfyiNj-46ApM598Jj2fJ
+X-Proofpoint-ORIG-GUID: 31fTWNmCyikAMfyiNj-46ApM598Jj2fJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-23_15,2023-11-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=513
+ lowpriorityscore=0 suspectscore=0 spamscore=0 adultscore=0 phishscore=0
+ priorityscore=1501 bulkscore=0 malwarescore=0 impostorscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311240014
 
-On 11/22/23 5:48 AM, Christian Brauner wrote:
-> Hey everyone,
-> 
-> This simplifies the eventfd_signal() and eventfd_signal_mask() helpers
-> significantly. They can be made void and not take any unnecessary
-> arguments.
-> 
-> I've added a few more simplifications based on Sean's suggestion.
-> 
+On Wed, 2023-11-22 at 13:48 +0100, Christian Brauner wrote:
+> Ever since the evenfd type was introduced back in 2007 in commit
+> e1ad7468c77d ("signal/timer/event: eventfd core") the
+> eventfd_signal()
+> function only ever passed 1 as a value for @n. There's no point in
+> keeping that additional argument.
+>=20
 > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> 
-> Changes in v2:
-> - further simplify helpers
-> - Link to v1: https://lore.kernel.org/r/20230713-vfs-eventfd-signal-v1-0-7fda6c5d212b@kernel.org
 
-Only oddity I spotted was the kerneldoc, which someone else already
-brought up.
+Acked-by: Andrew Donnellan <ajd@linux.ibm.com> # ocxl
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
-
--- 
-Jens Axboe
-
+--=20
+Andrew Donnellan    OzLabs, ADL Canberra
+ajd@linux.ibm.com   IBM Australia Limited
 
