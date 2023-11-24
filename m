@@ -1,233 +1,276 @@
-Return-Path: <kvm+bounces-2390-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2391-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DD7E7F6ACA
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 04:01:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A2427F6ACB
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 04:02:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7CBEB20D12
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 03:01:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B2811C20C6F
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 03:02:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 654A510FF;
-	Fri, 24 Nov 2023 03:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZlNtKC7S"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266BB3C1C;
+	Fri, 24 Nov 2023 03:01:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F7B2CB;
-	Thu, 23 Nov 2023 19:00:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700794851; x=1732330851;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=odA2AS4GZrnNZ/boXLINk7ax9m3ecF0sSynlO0A0r1I=;
-  b=ZlNtKC7SIn2/Z7oIyQHzYdifCfmXEyrjwSV9asmHxNmhJsEhyo3bp59C
-   SlQimUXzC+IxFqSC22hfK/pWOt6tAhv/nGgpbriblcqlvr1M81q7RGQJf
-   Piy1eYO9Uv1bWgMRRm/v+2LmIhRKEJ30xCoBggv2DDEaXHwVg8ihgfI4m
-   S8hfb+IrBf0rgE7USVdwZYeDKxQOp58grJVe6lkVWlHSAeo+PYfzmqRy6
-   0cgR39a6pidDwg9E+SVd+2fKXpUIqZV4AcYR0CJjshukXXyM8am8Wel4x
-   YxndUtMfWyWUfo+PzZ9xkz0FRd2eN5SVc0haPNM6OPvAphTeZqT6Su6gR
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="456697141"
-X-IronPort-AV: E=Sophos;i="6.04,223,1695711600"; 
-   d="scan'208";a="456697141"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2023 19:00:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,223,1695711600"; 
-   d="scan'208";a="8834140"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Nov 2023 19:00:50 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 23 Nov 2023 19:00:49 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 23 Nov 2023 19:00:49 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Thu, 23 Nov 2023 19:00:49 -0800
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.169)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Thu, 23 Nov 2023 19:00:49 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WSE1Wnlv6HfnVQ06nLX/Tq0nSWci4kSNNvWHosF7VIj+N4yQiZT/QQslQqlCQga7XKEaYkqURwL+eZtxdshOm/yutp2Ie1Pq6WibqrmOEuNTr8+aU8rdZTxRexc3kzby6rxFJGIcNmqqFoFAX4HTMIctACnHAF+bJlIz1sg9NBpNcu3uoRGR7TYaL88/Wfc+zS41z9J/QZV1PhlpbCiG1BqcVZg04QceWmaOUVrYa0Q8QtiwZQfw743SK+y8oEW9TnGLTwjSL9L1kajZukbtCQ5o4Bhp/QZ+xvGmtlWdaWzO7yJXg41Wlt8dnS+TKPlxleZUQBxELKJ4G9RNRzQyyQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=odA2AS4GZrnNZ/boXLINk7ax9m3ecF0sSynlO0A0r1I=;
- b=TjnA7IwN8JWW8R3XavMO36k6nhZDMJ7kN7KE4UqS4cJ4fBBP82DZtShBdsyAjbTxLbwPMy1dZJnzVUzJ6Evl/JlDXXdb5YLa2XItOQKd2cWrPjljty2SY7LDzVkso2ILod9aE9b9rEkl7esxIXdOQQ+CG6zduAkVJ+Xtkcg/A0uf2KVTnrh3p7gSZQy0M88VvUHfFGqz1SDIlgNyO4a4a6b2N5JITtscxxfEnAGI0yTNKz+Ud8K7qyOFJTOkuUxyn6FHNbxrTtlAXD0uiqc+PlGCuU+armoBsSGTe9AsP7+y1pzMeg0/oWc1RaSpAntUnCpGV4JJLkwxsrvDY9iBXw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by SJ0PR11MB5008.namprd11.prod.outlook.com (2603:10b6:a03:2d5::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.20; Fri, 24 Nov
- 2023 03:00:46 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a%3]) with mapi id 15.20.7025.021; Fri, 24 Nov 2023
- 03:00:46 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: "Liu, Yi L" <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"robin.murphy@arm.com" <robin.murphy@arm.com>, "baolu.lu@linux.intel.com"
-	<baolu.lu@linux.intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>, "nicolinc@nvidia.com"
-	<nicolinc@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>, "peterx@redhat.com"
-	<peterx@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
-	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
- Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
-	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
-	<yan.y.zhao@intel.com>
-Subject: RE: [PATCH v7 1/3] iommufd: Add data structure for Intel VT-d stage-1
- cache invalidation
-Thread-Topic: [PATCH v7 1/3] iommufd: Add data structure for Intel VT-d
- stage-1 cache invalidation
-Thread-Index: AQHaGViOWXGe59nutU2rEx/0zRDvrrCC4vaggAD2R4CAAD710IAAnmMAgAEUIFCAAJFiAIACb73g
-Date: Fri, 24 Nov 2023 03:00:45 +0000
-Message-ID: <BN9PR11MB52764F692E78C1B396D175DD8CB8A@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20231117131816.24359-1-yi.l.liu@intel.com>
- <20231117131816.24359-2-yi.l.liu@intel.com>
- <BN9PR11MB52761D7A88BB2F655355A7728CB4A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20231120230451.GD6083@nvidia.com>
- <BN9PR11MB5276EF10FCE9C96F593696E18CBBA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20231121121704.GE6083@nvidia.com>
- <BN9PR11MB5276BC5DD9824923C8A3ACC18CBAA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20231122132542.GM6083@nvidia.com>
-In-Reply-To: <20231122132542.GM6083@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SJ0PR11MB5008:EE_
-x-ms-office365-filtering-correlation-id: 31282b9d-065e-4318-e0a2-08dbec998df6
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: YvRtwwwjBHLyDrFAksNbY+XINfohmUPIf5CVF/gKFxwiORLWXUv2LuE4ml1RfMny4q5VKHG3FdFFiqUXG+HjrndyaQ7a5Ar8JEiidDLfhwNXSF2UvhNBLkufeP7ZXoBN1LwzNcmz7hz8p8/+UP/IBnyBWrSF6H0frI1hZFi/yX6ghbPbtlBQWl9R5IgaEQkE6406f9VOMarg6WHiBpfnl73pJKbkcaZpt0e4fUCgiK7ne/jzfSZ5ChRpGbimw57gv90Yl7uXLYFvBf9q3Z6x3ne4R5JAOztJMxT3D2PJIZgLJtZ9VhqysP3gtljsooXXPkfTFk/kJgZGZ4z3BSubc+JdMNryul9I75qal2LEcunEb88Z26X1kv45RIG/VFWvqHwBFW00amAQw+q3YeuRUECzsk3bQywfROWDANRIm/2al29E4Gn+rawQmRr6ucNkbxBDlTnxMmWzbNCpwy5zSui0yeCmq1TP6F8eaN4xBYLWFwMWVQsiHdmCL3HuX9BiCPU5t2Obt/ol3pW0w+x6C/toPU2mCIxWVYPe4LtbWXSplfpElVtCLun3K05hsRaJ9javeIJwwXNSmF+2ZcC/xEOffMK+TrYMPU2xpwj1UPo6mzS8jFWRT7xuUZCzDTSD
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(376002)(136003)(366004)(396003)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(86362001)(52536014)(7416002)(5660300002)(122000001)(38100700002)(55016003)(26005)(83380400001)(82960400001)(316002)(54906003)(6506007)(7696005)(9686003)(76116006)(6916009)(4326008)(66476007)(66556008)(66446008)(64756008)(66946007)(8936002)(8676002)(41300700001)(38070700009)(33656002)(71200400001)(478600001)(2906002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?dFc2TVJESnZqMjdyNmp1T2NhdTZoUjlHaU1YZlBsOXNhbXU5K0JNeEtJV2xx?=
- =?utf-8?B?bEcxVUZiVzJjeVdrdFhleHJYS2NrNUpoK1laYkVyRmVxcHl6aEU0RzlKU0R4?=
- =?utf-8?B?SEoxelNSOHlhbFhlbUV4WFFkMldnUkFTaUxlL3c1bjh3STZYSHllZXZVTU03?=
- =?utf-8?B?dGZFNTNLUTVnU3ZJYm42YnZndVBTVWkrZ2lHbUhQOFF6TkljMEVaTmJyWE1P?=
- =?utf-8?B?M1JydlhMdU5qejNSQjJBdXNEQTA1bS9kUUFxS2d3a2oyRk13VDRCa2twZFJl?=
- =?utf-8?B?V2xKQjBSckIrMnVVVjBSb0xtc3dzS0ZxNE1iOUkrUHRSNzlqR2tYQ2haWjhI?=
- =?utf-8?B?SWJzRU9KRS94aTJSaGRPTzA4ZUU4T3A0QlIvTkREUWM5NnFNS0w3Mm5XcjBp?=
- =?utf-8?B?WDF1RmR6Qk4xMGFNK3RUanZzcERHZjlVeVB0VndnYkRIdEpVdUtQZEZ2VDJr?=
- =?utf-8?B?SCtIQnV2OEZXV0pQa2VoWDBIQVpPZyt2YXA2MXpMSGRCall6OEhUbkdCbDQv?=
- =?utf-8?B?c3pyOUhCTjFiS1Z3U2NtUTlzMmYraVVYZnhUSmxNMnVtdmZTdXdyQ0hRalBI?=
- =?utf-8?B?cnovVkhURnBFMmJvZ2ZrWHJKN2xFRUNxZW9icSt4WFB2bXYrTzBaaVV0aUFq?=
- =?utf-8?B?cFBOR3NMUEtHb1dXZUp6WkJkVFJKbVpRNkNwZnZwbFVOR2xKZHdwZjFkSmx2?=
- =?utf-8?B?Q2NnZzJJVHFnNUpVRW9JSmNFcm0zdkNzMUx5cE1aaE1xNDdhQXBndXdIUlBN?=
- =?utf-8?B?RXJ1WWdWQm1xbzBKODVUNjRHVmRKVXJMUW1ZRHVCV201TE1RV3ptSkFTQjFX?=
- =?utf-8?B?VW95ODJscHl4YU1WOE5NM25va2FlZkxSQWdCTWdhY2NHUzVjVWFVNzFZQnpO?=
- =?utf-8?B?WjEwREVjQ2VJc1RIbzFuU2ZzZ2paVzloYXdKTUdFVWg0MUJ1a2E3K2dLYXZQ?=
- =?utf-8?B?WFVSbHVwaUk3ak9hNVZ0SjB3dXRLK1JTWFMvaVNod0tYNG9zUWZ3bVBOYWxJ?=
- =?utf-8?B?ellzdythbkViTkc5Y2Yxckc3RFJkTWM5dVZMTmVSR3JodWtQWkNIQTZSOUcw?=
- =?utf-8?B?KzRQOG5BbWNFQk9zUjE2YSt2T202TUVORlh1QnF3N2IxWnlZUkltYVhISUJI?=
- =?utf-8?B?L3lRMDRjWDJOOFdVeTJqdy9rd3dKQ2drWGdWalNQWndsMGxWSXZPN2xVNFJJ?=
- =?utf-8?B?c1JFMDB6WG41NFFxUXlzVTNOUFpTN0hCajhlTGl0dndpVjVaKy9GaUh2Szdz?=
- =?utf-8?B?cnZDSERtaUFpR2dMRXFNNnBka2NhaytiOTR4U0FJK0ZyUEJQNEVoTnoyODRk?=
- =?utf-8?B?VWlaVzJVVmxyMHdoc1BDM0V2TEhEQXphVzFOQzlQd1o3VEh2YjcxVkEyUGN1?=
- =?utf-8?B?ZFdEejlJcHdZZTRqMjNiQUlBU0RRTFAxKzlFTkRwaG5KTEhiMTRLSVEzRWNj?=
- =?utf-8?B?OG55T2dJZFVSUFc0RGtidGdxd0xhMEJESmxDWmVTRHZzZ3FTYTFlWldSWDdz?=
- =?utf-8?B?MFl2K3hOOFhEbm9WZVNQVnovSzAyVG10TFVHZm9na2pjeDNmTEJ1MmpKc2dS?=
- =?utf-8?B?ajRPWGI1bmhLYmhRNG1mNUNDMndtOVJRNEJJNExtQ3doSlQ2KzVvWnJ0Q1p2?=
- =?utf-8?B?bk5UenU1ZFNHa2lNTUpnRVdFR0FhTDg0RjloaEVic3dmNVNFREZzSkNpcm5I?=
- =?utf-8?B?dk1aRTJYYWkvZVhYcGk3WG9UNXdGdVg3d2lzd0NuNzYzbXE2aCtUQ0tNSldo?=
- =?utf-8?B?bEtsdjJjL2J2MFZLaDhuOTF6bXlTR2tJRTVHME5rY3pxZGQ4QWdqcmUyQ1Iz?=
- =?utf-8?B?N3JFb3NGLzI2b0VSc1BMWlZDRXN2M0dpWi9QRDlWNndKRm1WWkEwUzBnUXNz?=
- =?utf-8?B?VEVNUWdLaWtJemt0ajYvMHFWbllFN0Z2Z2xOM2gvK3FEQVVUSHBvWnphQm4x?=
- =?utf-8?B?aWZiT0E4WGlET0NOb05QRkZCd2pJTldBY203dzZDNnQ2Nk93RFlkYmVlKzN1?=
- =?utf-8?B?ZXJGSytPTUdBczJpZlBsU3F5Y3gzM1RVZW45cWxzbU9Cb3BzWCtNRE9heXBh?=
- =?utf-8?B?YnRSTys0Z2NaWmZLQlB5NjVTYnZDYk9UbEpncExvejN2SEJhc3poY09wRUU3?=
- =?utf-8?Q?bEiupa0OeXM4cqTuHA4N9ilZm?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C36F101
+	for <kvm@vger.kernel.org>; Thu, 23 Nov 2023 19:01:48 -0800 (PST)
+X-ASG-Debug-ID: 1700794904-1eb14e538c1e890001-HEqcsx
+Received: from ZXSHMBX1.zhaoxin.com (ZXSHMBX1.zhaoxin.com [10.28.252.163]) by mx2.zhaoxin.com with ESMTP id drTLcCUqm6PEvl2P (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Fri, 24 Nov 2023 11:01:44 +0800 (CST)
+X-Barracuda-Envelope-From: EwanHai-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
+Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHMBX1.zhaoxin.com
+ (10.28.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 24 Nov
+ 2023 11:01:44 +0800
+Received: from [10.28.66.55] (10.28.66.55) by zxbjmbx1.zhaoxin.com
+ (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 24 Nov
+ 2023 11:01:43 +0800
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
+Message-ID: <0dbf5f15-8165-420e-ae0e-5d7aac7053ff@zhaoxin.com>
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.66.55
+Date: Thu, 23 Nov 2023 22:01:42 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 31282b9d-065e-4318-e0a2-08dbec998df6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Nov 2023 03:00:45.8966
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5xntWWV5oRMHRlq5tH3D54IwvMnMjp/VKYmm/1Ghon3nzmKSIqHJ1Dsr9SE0733XRgkVgKdHnV0tRnI/P7N20A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5008
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+From: Ewan Hai <ewanhai-oc@zhaoxin.com>
+Subject: PING: VMX controls setting patch for backward compatibility
+To: Zhao Liu <zhao1.liu@intel.com>
+X-ASG-Orig-Subj: PING: VMX controls setting patch for backward compatibility
+CC: <pbonzini@redhat.com>, <mtosatti@redhat.com>, <kvm@vger.kernel.org>,
+	<qemu-devel@nongnu.org>, <ewanhai@zhaoxin.com>, <cobechen@zhaoxin.com>
+References: <20230925071453.14908-1-ewanhai-oc@zhaoxin.com>
+ <ZTnbFJrHeKhoUA6F@intel.com>
+ <eb9a08b2-a7c4-c45c-edd8-0585037194aa@zhaoxin.com>
+ <a75f0b92-4894-bee9-ecbd-78b849702f61@zhaoxin.com>
+Content-Language: en-US
+In-Reply-To: <a75f0b92-4894-bee9-ecbd-78b849702f61@zhaoxin.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ZXSHCAS2.zhaoxin.com (10.28.252.162) To
+ zxbjmbx1.zhaoxin.com (10.29.252.163)
+X-Barracuda-Connect: ZXSHMBX1.zhaoxin.com[10.28.252.163]
+X-Barracuda-Start-Time: 1700794904
+X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
+X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 7581
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.117174
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
 
-PiBGcm9tOiBKYXNvbiBHdW50aG9ycGUgPGpnZ0BudmlkaWEuY29tPg0KPiBTZW50OiBXZWRuZXNk
-YXksIE5vdmVtYmVyIDIyLCAyMDIzIDk6MjYgUE0NCj4gDQo+IE9uIFdlZCwgTm92IDIyLCAyMDIz
-IGF0IDA0OjU4OjI0QU0gKzAwMDAsIFRpYW4sIEtldmluIHdyb3RlOg0KPiA+IHRoZW4gd2UganVz
-dCBkZWZpbmUgaHdwdCAnY2FjaGUnIGludmFsaWRhdGlvbiBpbiB2dGQgYWx3YXlzIHJlZmVycyB0
-bw0KPiA+IGJvdGggaW90bGIgYW5kIGRldnRsYi4gVGhlbiB2aW9tbXUganVzdCBuZWVkcyB0byBj
-YWxsIGludmFsaWRhdGlvbg0KPiA+IHVhcGkgb25jZSB3aGVuIGVtdWxhdGluZyB2aXJ0dWFsIGlv
-dGxiIGludmFsaWRhdGlvbiBkZXNjcmlwdG9yDQo+ID4gd2hpbGUgZW11bGF0aW5nIHRoZSBmb2xs
-b3dpbmcgZGV2dGxiIGludmFsaWRhdGlvbiBkZXNjcmlwdG9yDQo+ID4gYXMgYSBub3AuDQo+IA0K
-PiBJbiBwcmluY2lwbGUgQVRDIGFuZCBJT01NVSBUTEIgaW52YWxpZGF0aW9ucyBzaG91bGQgbm90
-IGFsd2F5cyBiZQ0KPiBsaW5rZWQuDQo+IA0KPiBBbnkgc2NlbmFyaW8gdGhhdCBhbGxvd3MgZGV2
-aWNlcyB0byBzaGFyZSBhbiBJT1RMQiBjYWNoZSB0YWcgcmVxdWlyZXMNCj4gZmV3ZXIgSU9NTVUg
-VExCIGludmFsaWRhdGlvbnMgdGhhbiBBVEMgaW52YWxpZGF0aW9ucy4NCg0KYXMgbG9uZyBhcyB0
-aGUgaG9zdCBpb21tdSBkcml2ZXIgaGFzIHRoZSBzYW1lIGtub3dsZWRnZSB0aGVuIGl0IHdpbGwN
-CmFsd2F5cyBkbyB0aGUgcmlnaHQgdGhpbmcuDQoNCmUuZy4gb25lIGlvdGxiIGVudHJ5IHNoYXJl
-ZCBieSA0IGRldmljZXMuDQoNCmd1ZXN0IGlzc3VlczoNCgkxKSBpb3RsYiBpbnZhbGlkYXRpb24N
-CgkyKSBkZXZ0bGIgaW52YWxpZGF0aW9uIGZvciBkZXYxDQoJMykgZGV2dGxiIGludmFsaWRhdGlv
-biBmb3IgZGV2Mg0KCTQpIGRldnRsYiBpbnZhbGlkYXRpb24gZm9yIGRldjMNCgk1KSBkZXZ0bGIg
-aW52YWxpZGF0aW9uIGZvciBkZXY0DQoNCmludGVsLXZpb21tdSBjYWxscyBIV1BUIGNhY2hlIGlu
-dmFsaWRhdGlvbiBmb3IgMSkgYW5kIHRyZWF0cyAyLTUpIGFzIG5vcC4NCg0KaW50ZWwtaW9tbXUg
-ZHJpdmVyIGludGVybmFsbHkga25vd3MgdGhlIGlvdGxiIGlzIHNoYXJlZCBieSA0IGRldmljZXMg
-KGdpdmVuDQp0aGUgc2FtZSBkb21haW4gaXMgYXR0YWNoZWQgdG8gdGhvc2UgZGV2aWNlcykgdG8g
-aGFuZGxlIEhXUFQNCmNhY2hlIGludmFsaWRhdGlvbjoNCg0KCTEpIGlvdGxiIGludmFsaWRhdGlv
-bg0KCTIpIGRldnRsYiBpbnZhbGlkYXRpb24gZm9yIGRldjENCgkzKSBkZXZ0bGIgaW52YWxpZGF0
-aW9uIGZvciBkZXYyDQoJNCkgZGV2dGxiIGludmFsaWRhdGlvbiBmb3IgZGV2Mw0KCTUpIGRldnRs
-YiBpbnZhbGlkYXRpb24gZm9yIGRldjQNCg0KdGhpcyBpcyBhIGdvb2Qgb3B0aW1pemF0aW9uIGJ5
-IHJlZHVjaW5nIDUgc3lzY2FsbHMgdG8gMSwgd2l0aCB0aGUgDQphc3N1bXB0aW9uIHRoYXQgdGhl
-IGd1ZXN0IHNob3VsZG4ndCBleHBlY3QgYW55IGRldGVybWluaXN0aWMNCmJlaGF2aW9yIGJlZm9y
-ZSA1KSBpcyBjb21wbGV0ZWQgdG8gYnJpbmcgaW90bGIvZGV2dGxicyBpbiBzeW5jLg0KDQphbm90
-aGVyIGFsdGVybmF0aXZlIGlzIHRvIGhhdmUgZ3Vlc3QgYmF0Y2ggMS01KSBpbiBvbmUgcmVxdWVz
-dCB3aGljaA0KYWxsb3dzIHZpb21tdSB0byBiYXRjaCB0aGVtIGluIG9uZSBpbnZhbGlkYXRpb24g
-Y2FsbCB0b28uIEJ1dA0KdGhpcyBpcyBhbiBvcnRob2dvbmFsIG9wdGltaXphdGlvbiBpbiBndWVz
-dCB3aGljaCB3ZSBkb24ndCB3YW50DQp0byByZWx5IG9uLg0KDQo+IA0KPiBJIGxpa2UgdGhlIHZp
-ZXcgb2YgdGhpcyBpbnZhbGlkYXRpb24gaW50ZXJmYWNlIGFzIHJlZmxlY3RpbmcgdGhlDQo+IGFj
-dHVhbCBIVyBhbmQgbm90IHRyeWluZyB0byBiZSBzbWFydGVyIGFuIHJlYWwgSFcuDQoNCnRoZSBn
-dWVzdC1vcmllbnRlZCBpbnRlcmZhY2UgZS5nLiB2aW9tbXUgcmVmbGVjdHMgdGhlIEhXLg0KDQp1
-QVBJIGlzIGtpbmQgb2YgdmlvbW11IGludGVybmFsIGltcGxlbWVudGF0aW9uLiBJTUhPIGl0J3Mg
-bm90DQphIGJhZCB0aGluZyB0byBtYWtlIGl0IHNtYXJ0ZXIgYXMgbG9uZyBhcyBubyBndWVzdCBv
-YnNlcnZhYmxlDQpicmVha2FnZS4NCg0KPiANCj4gSSdtIGZ1bGx5IGV4cGVjdGluZyB0aGF0IElu
-dGVsIHdpbGwgYWRvcHQgYW4gZGlyZWN0LURNQSBmbHVzaCBxdWV1ZQ0KPiBsaWtlIFNNTVUgYW5k
-IEFNRCBoYXZlIGFscmVhZHkgZG9uZSBhcyBhIHBlcmZvcm1hbmNlIG9wdGltaXphdGlvbi4gSW4N
-Cj4gdGhpcyB3b3JsZCBpdCBtYWtlcyBubyBzZW5zZSB0aGF0IHRoZSBiZWhhdmlvciBvZiB0aGUg
-ZGlyZWN0IERNQSBxdWV1ZQ0KPiBhbmQgZHJpdmVyIG1lZGlhdGVkIHF1ZXVlIHdvdWxkIGJlIGRp
-ZmZlcmVudC4NCj4gDQoNCnRoYXQncyBhIG9ydGhvZ29uYWwgdG9waWMuIEkgZG9uJ3QgdGhpbmsg
-dGhlIHZhbHVlIG9mIGRpcmVjdC1ETUEgZmx1c2gNCnF1ZXVlIHNob3VsZCBwcmV2ZW50IHBvc3Np
-YmxlIG9wdGltaXphdGlvbiBpbiB0aGUgbWVkaWF0aW9uIHBhdGgNCihhcyBsb25nIGFzIGd1ZXN0
-LWV4cGVjdGVkIGRldGVybWluaXN0aWMgYmVoYXZpb3IgaXMgc3VzdGFpbmVkKS4NCg==
+Hi Zhao Liu and QEMU/KVM Community,
+
+I hope this email finds you well. I am writing to follow up on the
+conversation we had a month ago regarding my patch submission for
+refining the VMX controls setting for backward compatibility on
+QEMU-KVM.
+
+On October 27, I responded to the feedback and suggestions provided
+by Zhao Liu, making necessary corrections and improvements to the
+patch. However, since then, I haven't received any further responses
+or reviews.
+
+I understand that everyone is busy, and I appreciate the time and
+effort that goes into reviewing these submissions. I just wanted to
+check if there are any updates, additional feedback, or steps I should
+take next. I am more than willing to make further changes if needed.
+
+Please let me know if there is anything else required from my side for
+this patch to move forward. Thank you for your time and attention. I
+look forward to hearing from you.
+
+Best regards,
+Ewan Hai
+
+On 10/27/23 02:08, Ewan Hai wrote:
+> Hi Zhao,
+>
+> since I found last email contains non-plain-text content, 
+> andkvm@vger.kernel.org
+> rejected to receive my mail, so just re-send last mail here, to follow 
+> the rule of qemu
+> /kvm community.
+>
+> On 10/25/23 23:20, Zhao Liu wrote:
+>> On Mon, Sep 25, 2023 at 03:14:53AM -0400, EwanHai wrote:
+>>> Date: Mon, 25 Sep 2023 03:14:53 -0400
+>>> From: EwanHai<ewanhai-oc@zhaoxin.com>
+>>> Subject: [PATCH] target/i386/kvm: Refine VMX controls setting for 
+>>> backward
+>>>   compatibility
+>>> X-Mailer: git-send-email 2.34.1
+>>>
+>>> Commit 4a910e1 ("target/i386: do not set unsupported VMX secondary
+>>> execution controls") implemented a workaround for hosts that have
+>>> specific CPUID features but do not support the corresponding VMX
+>>> controls, e.g., hosts support RDSEED but do not support RDSEED-Exiting.
+>>>
+>>> In detail, commit 4a910e1 introduced a flag 
+>>> `has_msr_vmx_procbased_clts2`.
+>>> If KVM has `MSR_IA32_VMX_PROCBASED_CTLS2` in its msr list, QEMU would
+>>> use KVM's settings, avoiding any modifications to this MSR.
+>>>
+>>> However, this commit (4a910e1) didn’t account for cases in older Linux
+>> s/didn’t/didn't/
+>
+> I'll fix it.
+>
+>>> kernels(e.g., linux-4.19.90) where `MSR_IA32_VMX_PROCBASED_CTLS2` is
+>> For this old kernel, it's better to add the brief lifecycle note (e.g.,
+>> lts, EOL) to illustrate the value of considering such compatibility
+>> fixes.
+>
+> I've checked the linux-stable repo, found that
+> MSR_IA32_VMX_PROCBASED_CTLS2 is not included in kvm regular msr list
+> until linux-5.3, and in linux-4.19.x(EOL:Dec,2024), there is also no
+> MSR_IA32_VMX_PROCBASED_CTLS2 in kvm regular msr list.
+>
+> So maybe this is an important compatibility fix for kernel < 5.3.
+>
+>>> in `kvm_feature_msrs`—obtained by 
+>>> ioctl(KVM_GET_MSR_FEATURE_INDEX_LIST),
+>> s/—obtained/-obtained/
+>
+> I'll fix it.
+>
+>>> but not in `kvm_msr_list`—obtained by ioctl(KVM_GET_MSR_INDEX_LIST).
+>> s/—obtained/-obtained/
+>
+> I'll fix it.
+>
+>>> As a result,it did not set the `has_msr_vmx_procbased_clts2` flag based
+>>> on `kvm_msr_list` alone, even though KVM maintains the value of this 
+>>> MSR.
+>>>
+>>> This patch supplements the above logic, ensuring that
+>>> `has_msr_vmx_procbased_clts2` is correctly set by checking both MSR
+>>> lists, thus maintaining compatibility with older kernels.
+>>>
+>>> Signed-off-by: EwanHai<ewanhai-oc@zhaoxin.com>
+>>> ---
+>>>   target/i386/kvm/kvm.c | 6 ++++++
+>>>   1 file changed, 6 insertions(+)
+>>>
+>>> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+>>> index af101fcdf6..6299284de4 100644
+>>> --- a/target/i386/kvm/kvm.c
+>>> +++ b/target/i386/kvm/kvm.c
+>>> @@ -2343,6 +2343,7 @@ void kvm_arch_do_init_vcpu(X86CPU *cpu)
+>>>   static int kvm_get_supported_feature_msrs(KVMState *s)
+>>>   {
+>>>       int ret = 0;
+>>> +    int i;
+>>>         if (kvm_feature_msrs != NULL) {
+>>>           return 0;
+>>> @@ -2377,6 +2378,11 @@ static int 
+>>> kvm_get_supported_feature_msrs(KVMState *s)
+>>>           return ret;
+>>>       }
+>> It's worth adding a comment here to indicate that this is a
+>> compatibility fix.
+>>
+>> -Zhao
+>>
+>>>   +    for (i = 0; i < kvm_feature_msrs->nmsrs; i++) {
+>>> +        if (kvm_feature_msrs->indices[i] == 
+>>> MSR_IA32_VMX_PROCBASED_CTLS2) {
+>>> +            has_msr_vmx_procbased_ctls2 = true;
+>>> +        }
+>>> +    }
+>>>       return 0;
+>>>   }
+>>>   --
+>>> 2.34.1
+>>>
+> Plan to use patch bellow, any more suggestion?
+>
+>>  From a3006fcec3615d98ac1eb252a61952d44aa5029b Mon Sep 17 00:00:00 2001
+>> From: EwanHai<ewanhai-oc@zhaoxin.com>
+>> Date: Mon, 25 Sep 2023 02:11:59 -0400
+>> Subject: [PATCH] target/i386/kvm: Refine VMX controls setting for 
+>> backward
+>>   compatibility
+>>
+>> Commit 4a910e1 ("target/i386: do not set unsupported VMX secondary
+>> execution controls") implemented a workaround for hosts that have
+>> specific CPUID features but do not support the corresponding VMX
+>> controls, e.g., hosts support RDSEED but do not support RDSEED-Exiting.
+>>
+>> In detail, commit 4a910e1 introduced a flag 
+>> `has_msr_vmx_procbased_clts2`.
+>> If KVM has `MSR_IA32_VMX_PROCBASED_CTLS2` in its msr list, QEMU would
+>> use KVM's settings, avoiding any modifications to this MSR.
+>>
+>> However, this commit (4a910e1) didn't account for cases in older Linux
+>> kernels(<5.3) where `MSR_IA32_VMX_PROCBASED_CTLS2` is in
+>> `kvm_feature_msrs`-obtained by ioctl(KVM_GET_MSR_FEATURE_INDEX_LIST),
+>> but not in `kvm_msr_list`-obtained by ioctl(KVM_GET_MSR_INDEX_LIST).
+>> As a result,it did not set the `has_msr_vmx_procbased_clts2` flag based
+>> on `kvm_msr_list` alone, even though KVM maintains the value of this 
+>> MSR.
+>>
+>> This patch supplements the above logic, ensuring that
+>> `has_msr_vmx_procbased_clts2` is correctly set by checking both MSR
+>> lists, thus maintaining compatibility with older kernels.
+>>
+>> Signed-off-by: EwanHai<ewanhai-oc@zhaoxin.com>
+>> ---
+>>   target/i386/kvm/kvm.c | 14 ++++++++++++++
+>>   1 file changed, 14 insertions(+)
+>>
+>> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+>> index af101fcdf6..3cf95f8579 100644
+>> --- a/target/i386/kvm/kvm.c
+>> +++ b/target/i386/kvm/kvm.c
+>> @@ -2343,6 +2343,7 @@ void kvm_arch_do_init_vcpu(X86CPU *cpu)
+>>   static int kvm_get_supported_feature_msrs(KVMState *s)
+>>   {
+>>       int ret = 0;
+>> +    int i;
+>>
+>>       if (kvm_feature_msrs != NULL) {
+>>           return 0;
+>> @@ -2377,6 +2378,19 @@ static int 
+>> kvm_get_supported_feature_msrs(KVMState *s)
+>>           return ret;
+>>       }
+>>
+>> +    /*
+>> +     * Compatibility fix:
+>> +     * Older Linux kernels(<5.3) include the 
+>> MSR_IA32_VMX_PROCBASED_CTLS2
+>> +     * only in feature msr list, but not in regular msr list. This 
+>> lead to
+>> +     * an issue in older kernel versions where QEMU, through the 
+>> regular
+>> +     * MSR list check, assumes the kernel doesn't maintain this msr,
+>> +     * resulting in incorrect settings by QEMU for this msr.
+>> +     */
+>> +    for (i = 0; i < kvm_feature_msrs->nmsrs; i++) {
+>> +        if (kvm_feature_msrs->indices[i] == 
+>> MSR_IA32_VMX_PROCBASED_CTLS2) {
+>> +            has_msr_vmx_procbased_ctls2 = true;
+>> +        }
+>> +    }
+>>       return 0;
+>>   }
+>>
+>> -- 
+>> 2.34.1
+>
+> Best regards.
+>
 
