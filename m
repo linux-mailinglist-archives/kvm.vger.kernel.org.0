@@ -1,129 +1,110 @@
-Return-Path: <kvm+bounces-2424-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2425-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00F8E7F6EEA
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 09:51:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE6BD7F7040
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 10:43:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B92562817C7
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 08:51:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C16C1C20F73
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 09:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913518BFA;
-	Fri, 24 Nov 2023 08:51:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DECA1171B6;
+	Fri, 24 Nov 2023 09:42:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ONuzufwT"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CF6A1BD;
-	Fri, 24 Nov 2023 00:51:14 -0800 (PST)
-Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Sc7rb4SNRzSh5p;
-	Fri, 24 Nov 2023 16:46:55 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 24 Nov 2023 16:51:11 +0800
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.035;
- Fri, 24 Nov 2023 08:51:09 +0000
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Brett Creeley <brett.creeley@amd.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
-	"yishaih@nvidia.com" <yishaih@nvidia.com>, liulongfang
-	<liulongfang@huawei.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: "shannon.nelson@amd.com" <shannon.nelson@amd.com>
-Subject: RE: [PATCH vfio 2/2] hisi_acc_vfio_pci: Destroy the
- [state|reset]_mutex on release
-Thread-Topic: [PATCH vfio 2/2] hisi_acc_vfio_pci: Destroy the
- [state|reset]_mutex on release
-Thread-Index: AQHaHXtMt7sx3BVFf0S8PgAhqyIeL7CJKt8A
-Date: Fri, 24 Nov 2023 08:51:09 +0000
-Message-ID: <00df3a24ff594c409eb2ab92d20733f5@huawei.com>
-References: <20231122193634.27250-1-brett.creeley@amd.com>
- <20231122193634.27250-3-brett.creeley@amd.com>
-In-Reply-To: <20231122193634.27250-3-brett.creeley@amd.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B0B010F7;
+	Fri, 24 Nov 2023 01:42:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=4ImK8ZKf78iSxa2f5LHktOGbisjfNwWDxqqa3/kmr4s=; b=ONuzufwTHtkvCQAW4DtB+RrfFr
+	EQ0LsWwjDM3e03aVWmdppi37DHTj4eop+PdXeonJclwq3cNj6Pq6mAM0WJ71AAyiIgfNupl8fBuYW
+	9WWsm0+pbvX3YYec/NIlvTgSP0haxwRmnZ50TP0OVIJ1BsAgxed3wDtb/EzypBSf2mlKwk5972cXH
+	WMt0G//XSqCJNvTth39+8i89Qwz3WkI6kwPooQN2vHtRxhDzwLdgrRKgXFqobS3cea+OXVYKvoYt/
+	OGWxQeGgB5m8hqcBkN8FL/u5IVCaYKg7+ByPlO4lbxK9D0I6ASkcSycrI263I/7Ot9J/qDmrjt1s5
+	+22o8F7g==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1r6Sfm-00DpiA-0b;
+	Fri, 24 Nov 2023 09:42:33 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id D3CDB3002BE; Fri, 24 Nov 2023 10:40:29 +0100 (CET)
+Date: Fri, 24 Nov 2023 10:40:29 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Yang Weijiang <weijiang.yang@intel.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	chao.gao@intel.com, rick.p.edgecombe@intel.com, mlevitsk@redhat.com,
+	john.allen@amd.com
+Subject: Re: [PATCH v7 02/26] x86/fpu/xstate: Refine CET user xstate bit
+ enabling
+Message-ID: <20231124094029.GK3818@noisy.programming.kicks-ass.net>
+References: <20231124055330.138870-1-weijiang.yang@intel.com>
+ <20231124055330.138870-3-weijiang.yang@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231124055330.138870-3-weijiang.yang@intel.com>
 
-
-
-> -----Original Message-----
-> From: Brett Creeley [mailto:brett.creeley@amd.com]
-> Sent: 22 November 2023 19:37
-> To: jgg@ziepe.ca; yishaih@nvidia.com; liulongfang
-> <liulongfang@huawei.com>; Shameerali Kolothum Thodi
-> <shameerali.kolothum.thodi@huawei.com>; kevin.tian@intel.com;
-> alex.williamson@redhat.com; kvm@vger.kernel.org;
-> linux-kernel@vger.kernel.org
-> Cc: shannon.nelson@amd.com; brett.creeley@amd.com
-> Subject: [PATCH vfio 2/2] hisi_acc_vfio_pci: Destroy the [state|reset]_mu=
-tex
-> on release
->=20
-> The [state|reset]_mutex are initialized in vfio init, but
-> never destroyed. This isn't required as mutex_destroy()
-> doesn't do anything unless lock debugging is enabled.
-> However, for completeness, fix it by implementing a
-> driver specific release function.
->=20
-> No fixes tag is added as it doesn't seem worthwhile
-> for such a trivial and debug only change.
->=20
-> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
-
-Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-
-Thanks.
-
+On Fri, Nov 24, 2023 at 12:53:06AM -0500, Yang Weijiang wrote:
+> Remove XFEATURE_CET_USER entry from dependency array as the entry doesn't
+> reflect true dependency between CET features and the user xstate bit.
+> Enable the bit in fpu_kernel_cfg.max_features when either SHSTK or IBT is
+> available.
+> 
+> Both user mode shadow stack and indirect branch tracking features depend
+> on XFEATURE_CET_USER bit in XSS to automatically save/restore user mode
+> xstate registers, i.e., IA32_U_CET and IA32_PL3_SSP whenever necessary.
+> 
+> Note, the issue, i.e., CPUID only enumerates IBT but no SHSTK is resulted
+> from CET KVM series which synthesizes guest CPUIDs based on userspace
+> settings,in real world the case is rare. In other words, the exitings
+> dependency check is correct when only user mode SHSTK is available.
+> 
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 > ---
->  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> index 2c049b8de4b4..dc1e376e1b8a 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -1358,10 +1358,20 @@ static int
-> hisi_acc_vfio_pci_migrn_init_dev(struct vfio_device *core_vdev)
->  	return vfio_pci_core_init_dev(core_vdev);
->  }
->=20
-> +static void hisi_acc_vfio_pci_migrn_release_dev(struct vfio_device
-> *core_vdev)
-> +{
-> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =3D
-> container_of(core_vdev,
-> +			struct hisi_acc_vf_core_device, core_device.vdev);
-> +
-> +	mutex_destroy(&hisi_acc_vdev->reset_mutex);
-> +	mutex_destroy(&hisi_acc_vdev->state_mutex);
-> +	vfio_pci_core_release_dev(core_vdev);
-> +}
-> +
->  static const struct vfio_device_ops hisi_acc_vfio_pci_migrn_ops =3D {
->  	.name =3D "hisi-acc-vfio-pci-migration",
->  	.init =3D hisi_acc_vfio_pci_migrn_init_dev,
-> -	.release =3D vfio_pci_core_release_dev,
-> +	.release =3D hisi_acc_vfio_pci_migrn_release_dev,
->  	.open_device =3D hisi_acc_vfio_pci_open_device,
->  	.close_device =3D hisi_acc_vfio_pci_close_device,
->  	.ioctl =3D hisi_acc_vfio_pci_ioctl,
-> --
-> 2.17.1
+>  arch/x86/kernel/fpu/xstate.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+> index 73f6bc00d178..6e50a4251e2b 100644
+> --- a/arch/x86/kernel/fpu/xstate.c
+> +++ b/arch/x86/kernel/fpu/xstate.c
+> @@ -73,7 +73,6 @@ static unsigned short xsave_cpuid_features[] __initdata = {
+>  	[XFEATURE_PT_UNIMPLEMENTED_SO_FAR]	= X86_FEATURE_INTEL_PT,
+>  	[XFEATURE_PKRU]				= X86_FEATURE_OSPKE,
+>  	[XFEATURE_PASID]			= X86_FEATURE_ENQCMD,
+> -	[XFEATURE_CET_USER]			= X86_FEATURE_SHSTK,
+>  	[XFEATURE_XTILE_CFG]			= X86_FEATURE_AMX_TILE,
+>  	[XFEATURE_XTILE_DATA]			= X86_FEATURE_AMX_TILE,
+>  };
+> @@ -798,6 +797,14 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
+>  			fpu_kernel_cfg.max_features &= ~BIT_ULL(i);
+>  	}
+>  
+> +	/*
+> +	 * CET user mode xstate bit has been cleared by above sanity check.
+> +	 * Now pick it up if either SHSTK or IBT is available. Either feature
+> +	 * depends on the xstate bit to save/restore user mode states.
+> +	 */
+> +	if (boot_cpu_has(X86_FEATURE_SHSTK) || boot_cpu_has(X86_FEATURE_IBT))
+> +		fpu_kernel_cfg.max_features |= BIT_ULL(XFEATURE_CET_USER);
 
+So booting a host with "ibt=off" will clear the FEATURE_IBT, this was
+fine before this patch-set, but possibly not with.
+
+That kernel argument really only wants to tell the kernel not to use IBT
+itself, but not inhibit IBT from being used by guests.
 
