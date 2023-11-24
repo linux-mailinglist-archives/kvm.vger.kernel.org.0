@@ -1,107 +1,178 @@
-Return-Path: <kvm+bounces-2422-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2423-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADDEA7F6E6F
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 09:40:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E2FF7F6EC1
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 09:47:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E22BB2107E
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 08:40:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37CC5B20FA3
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 08:47:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 896684436;
-	Fri, 24 Nov 2023 08:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71E158BFA;
+	Fri, 24 Nov 2023 08:47:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF7B091;
-	Fri, 24 Nov 2023 00:40:07 -0800 (PST)
-X-QQ-mid: bizesmtp75t1700815181tn312kbv
-Received: from [127.0.0.1] ( [125.94.202.196])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 24 Nov 2023 16:39:39 +0800 (CST)
-X-QQ-SSF: 01400000000000B0B000000A0000000
-X-QQ-FEAT: 7YFKcddXagjsJLt4wZABMUUDAYXCRnXo8g21GUIbQbqARChcnMawpeCfxN5Fh
-	FAL082/zTRzsvaYPmnb+ltvg7D100sX+qcklM2YJd+L8vMbcjpY9OqL2eOqhW1p8Cvdc6+S
-	n3X0wLAhgXvnScdmZmMjoMswETTFn/mVftkuT6WEGmZxAeP176I2oNHLa56qSaBNY2zkPnV
-	LG/ekKJr+W8uKDUe2TsrZtHezH3aWd6GKL0a1CrjhNx7iIrqc9e/TJPwUWvJ+S/sGB+QBnN
-	+VOvetNSVcAibP8cry0np7W6aAPaNzNIzGK3LUZ0PIax9d30jQgBbSUxYORpDCQMzSpElHf
-	oBn4V0aQ3rzyd4jviheIVNYpbQbGapXJhrdHfQNsxs4A+bcu9hddYlMiC3/u3vCkz4UNtbs
-	2bdxPaOa/uyDJUbaeEZ7rw==
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 14761653264302342047
-Message-ID: <F19DC40ACB796694+78dfb71e-a2db-473d-a9fc-fa35c5e61a27@shingroup.cn>
-Date: Fri, 24 Nov 2023 16:39:39 +0800
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C50591;
+	Fri, 24 Nov 2023 00:47:04 -0800 (PST)
+Received: from kwepemm600005.china.huawei.com (unknown [172.30.72.55])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Sc7lC6dxRzMnNL;
+	Fri, 24 Nov 2023 16:42:15 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 24 Nov 2023 16:47:00 +0800
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.035;
+ Fri, 24 Nov 2023 08:46:58 +0000
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Brett Creeley <brett.creeley@amd.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
+	"yishaih@nvidia.com" <yishaih@nvidia.com>, liulongfang
+	<liulongfang@huawei.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+CC: "shannon.nelson@amd.com" <shannon.nelson@amd.com>
+Subject: RE: [PATCH vfio 1/2] hisi_acc_vfio_pci: Change reset_lock to
+ mutex_lock
+Thread-Topic: [PATCH vfio 1/2] hisi_acc_vfio_pci: Change reset_lock to
+ mutex_lock
+Thread-Index: AQHaHXtQ33FJcdWa9EiPkr1jMA8jDLCJKO2Q
+Date: Fri, 24 Nov 2023 08:46:58 +0000
+Message-ID: <eb2172d1e24044059e65d15b10391f65@huawei.com>
+References: <20231122193634.27250-1-brett.creeley@amd.com>
+ <20231122193634.27250-2-brett.creeley@amd.com>
+In-Reply-To: <20231122193634.27250-2-brett.creeley@amd.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] powerpc: Add PVN support for HeXin C2000 processor
-To: Michael Ellerman <mpe@ellerman.id.au>, gregkh@linuxfoundation.org
-References: <20231123093611.98313-1-ke.zhao@shingroup.cn>
- <2023112317-ebook-dreamless-0cfe@gregkh> <871qcgspf8.fsf@mail.lhotse>
-Content-Language: en-US
-Cc: npiggin@gmail.com, christophe.leroy@csgroup.eu, fbarrat@linux.ibm.com,
- ajd@linux.ibm.com, arnd@arndb.de, linuxppc-dev@lists.ozlabs.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, shenghui.qu@shingroup.cn,
- luming.yu@shingroup.cn, dawei.li@shingroup.cn
-From: =?UTF-8?B?WmhhbyBLZSDotbUg5Y+v?= <ke.zhao@shingroup.cn>
-In-Reply-To: <871qcgspf8.fsf@mail.lhotse>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:shingroup.cn:qybglogicsvrsz:qybglogicsvrsz3a-0
+X-CFilter-Loop: Reflected
 
-Hi Michael and Greg,
 
-On 2023/11/23 19:02, Michael Ellerman wrote:
-> Greg KH <gregkh@linuxfoundation.org> writes:
->> On Thu, Nov 23, 2023 at 05:36:11PM +0800, Zhao Ke wrote:
->>> HeXin Tech Co. has applied for a new PVN from the OpenPower Community
->>> for its new processor C2000. The OpenPower has assigned a new PVN
->>> and this newly assigned PVN is 0x0066, add pvr register related
->>> support for this PVN.
->>>
->>> Signed-off-by: Zhao Ke <ke.zhao@shingroup.cn>
->>> Link: https://discuss.openpower.foundation/t/how-to-get-a-new-pvr-for-processors-follow-power-isa/477/10
->>> ---
->>> 	v0 -> v1:
->>> 	- Fix .cpu_name with the correct description
->>> ---
->>> ---
->>>   arch/powerpc/include/asm/reg.h            |  1 +
->>>   arch/powerpc/kernel/cpu_specs_book3s_64.h | 15 +++++++++++++++
->>>   arch/powerpc/kvm/book3s_pr.c              |  1 +
->>>   arch/powerpc/mm/book3s64/pkeys.c          |  3 ++-
->>>   arch/powerpc/platforms/powernv/subcore.c  |  3 ++-
->>>   drivers/misc/cxl/cxl.h                    |  3 ++-
->>>   6 files changed, 23 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/arch/powerpc/include/asm/reg.h b/arch/powerpc/include/asm/reg.h
->>> index 4ae4ab9090a2..7fd09f25452d 100644
->>> --- a/arch/powerpc/include/asm/reg.h
->>> +++ b/arch/powerpc/include/asm/reg.h
->>> @@ -1361,6 +1361,7 @@
->>>   #define PVR_POWER8E	0x004B
->>>   #define PVR_POWER8NVL	0x004C
->>>   #define PVR_POWER8	0x004D
->>> +#define PVR_HX_C2000	0x0066
->>>   #define PVR_POWER9	0x004E
->>>   #define PVR_POWER10	0x0080
->>>   #define PVR_BE		0x0070
->> Why is this not in sorted order?
-> It's semantically sorted :D
-> ie. HX_C2000 is most similar to POWER8, but is newer than it.
-Yes. This is what I mean. If you prefer to sort in another order, please 
-tell me and I will update this.
->
-> PVR_BE is out of place, I'll fix that.
->
-> cheers
->
+
+> -----Original Message-----
+> From: Brett Creeley [mailto:brett.creeley@amd.com]
+> Sent: 22 November 2023 19:37
+> To: jgg@ziepe.ca; yishaih@nvidia.com; liulongfang
+> <liulongfang@huawei.com>; Shameerali Kolothum Thodi
+> <shameerali.kolothum.thodi@huawei.com>; kevin.tian@intel.com;
+> alex.williamson@redhat.com; kvm@vger.kernel.org;
+> linux-kernel@vger.kernel.org
+> Cc: shannon.nelson@amd.com; brett.creeley@amd.com
+> Subject: [PATCH vfio 1/2] hisi_acc_vfio_pci: Change reset_lock to mutex_l=
+ock
+>=20
+> Based on comments from other vfio vendors and the
+> maintainer the vfio/pds driver changed the reset_lock
+> to a mutex_lock. As part of that change it was requested
+> that the other vendor drivers be changed as well. So,
+> make the change.
+>=20
+> The comment that requested the change for reference:
+> https://lore.kernel.org/kvm/BN9PR11MB52769E037CB356AB15A0D9B88CA
+> 0A@BN9PR11MB5276.namprd11.prod.outlook.com/
+>=20
+> Also, make checkpatch happy by moving the lock comment.
+>=20
+> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+> ---
+>  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 13 +++++++------
+>  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h |  3 +--
+>  2 files changed, 8 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> index b2f9778c8366..2c049b8de4b4 100644
+> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> @@ -638,17 +638,17 @@ static void
+>  hisi_acc_vf_state_mutex_unlock(struct hisi_acc_vf_core_device
+> *hisi_acc_vdev)
+>  {
+>  again:
+> -	spin_lock(&hisi_acc_vdev->reset_lock);
+> +	mutex_lock(&hisi_acc_vdev->reset_mutex);
+>  	if (hisi_acc_vdev->deferred_reset) {
+>  		hisi_acc_vdev->deferred_reset =3D false;
+> -		spin_unlock(&hisi_acc_vdev->reset_lock);
+> +		mutex_unlock(&hisi_acc_vdev->reset_mutex);
+
+Don't think we have that sleeping while atomic case for this here.
+Same for mlx5 as well. But if the idea is to have a common locking
+across vendor drivers, it is fine.
+
+Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+
+Thanks,
+Shameer
+
+>  		hisi_acc_vdev->vf_qm_state =3D QM_NOT_READY;
+>  		hisi_acc_vdev->mig_state =3D VFIO_DEVICE_STATE_RUNNING;
+>  		hisi_acc_vf_disable_fds(hisi_acc_vdev);
+>  		goto again;
+>  	}
+>  	mutex_unlock(&hisi_acc_vdev->state_mutex);
+> -	spin_unlock(&hisi_acc_vdev->reset_lock);
+> +	mutex_unlock(&hisi_acc_vdev->reset_mutex);
+>  }
+>=20
+>  static void hisi_acc_vf_start_device(struct hisi_acc_vf_core_device
+> *hisi_acc_vdev)
+> @@ -1108,13 +1108,13 @@ static void
+> hisi_acc_vf_pci_aer_reset_done(struct pci_dev *pdev)
+>  	 * In case the state_mutex was taken already we defer the cleanup work
+>  	 * to the unlock flow of the other running context.
+>  	 */
+> -	spin_lock(&hisi_acc_vdev->reset_lock);
+> +	mutex_lock(&hisi_acc_vdev->reset_mutex);
+>  	hisi_acc_vdev->deferred_reset =3D true;
+>  	if (!mutex_trylock(&hisi_acc_vdev->state_mutex)) {
+> -		spin_unlock(&hisi_acc_vdev->reset_lock);
+> +		mutex_unlock(&hisi_acc_vdev->reset_mutex);
+>  		return;
+>  	}
+> -	spin_unlock(&hisi_acc_vdev->reset_lock);
+> +	mutex_unlock(&hisi_acc_vdev->reset_mutex);
+>  	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
+>  }
+>=20
+> @@ -1350,6 +1350,7 @@ static int hisi_acc_vfio_pci_migrn_init_dev(struct
+> vfio_device *core_vdev)
+>  	hisi_acc_vdev->pf_qm =3D pf_qm;
+>  	hisi_acc_vdev->vf_dev =3D pdev;
+>  	mutex_init(&hisi_acc_vdev->state_mutex);
+> +	mutex_init(&hisi_acc_vdev->reset_mutex);
+>=20
+>  	core_vdev->migration_flags =3D VFIO_MIGRATION_STOP_COPY |
+> VFIO_MIGRATION_PRE_COPY;
+>  	core_vdev->mig_ops =3D &hisi_acc_vfio_pci_migrn_state_ops;
+> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> index dcabfeec6ca1..ed5ab332d0f3 100644
+> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> @@ -109,8 +109,7 @@ struct hisi_acc_vf_core_device {
+>  	struct hisi_qm vf_qm;
+>  	u32 vf_qm_state;
+>  	int vf_id;
+> -	/* For reset handler */
+> -	spinlock_t reset_lock;
+> +	struct mutex reset_mutex; /* For reset handler */
+>  	struct hisi_acc_vf_migration_file *resuming_migf;
+>  	struct hisi_acc_vf_migration_file *saving_migf;
+>  };
+> --
+> 2.17.1
 
 
