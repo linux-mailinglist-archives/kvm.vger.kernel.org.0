@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-2448-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2449-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D9BB7F7C7E
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 19:15:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 02F507F7D8F
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 19:25:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86732B21577
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 18:15:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 669E3B21678
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 18:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 058202AF00;
-	Fri, 24 Nov 2023 18:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 880DA39FFD;
+	Fri, 24 Nov 2023 18:25:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QQBbodFD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eFD5qpEI"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 543531BD3
-	for <kvm@vger.kernel.org>; Fri, 24 Nov 2023 10:14:51 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD6FE1BCF
+	for <kvm@vger.kernel.org>; Fri, 24 Nov 2023 10:24:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700849690;
+	s=mimecast20190719; t=1700850257;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Zm7npic6hpdnvYBc9CxZ2JM6kBkxKJfDj7QUHeYYNcE=;
-	b=QQBbodFDJZmL+jEa6RWdJHlcrMj96sKcP3aNfpqup+uuIkRgic7vMUcsgj/0CV4YE09KkI
-	IgXUlSoV6J45Vi/8SIzGKHAJ9aEEDIn/fRXJQSRjXc9Hv7mu41KpaNq8JhVhztlHqK4lsA
-	0qxMgReHe1YaorNaiVPd/eby4aSHpCw=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=sQNKNBWeod2+64J8ErFDWPzg6uRfL5WI32OFBNWO8sg=;
+	b=eFD5qpEIkGxqfcjlVW3t2Z6NANZQfG4K+a7IBJb8MhCS0AeTAVolMctl6mMZZixbFCjIk2
+	rtrC2J0VjYOPQRA01kITRrBOE5PzYAkoqpSW1vbRxJvJbN98SdybQeHpB8LaEPvwEi2Zrg
+	8r+dcpgklV1JPc1lN1FAJy45uXj/S0Y=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-170-t5p46xRXPoGD1gUzAWdtkA-1; Fri, 24 Nov 2023 13:14:49 -0500
-X-MC-Unique: t5p46xRXPoGD1gUzAWdtkA-1
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3b8339b27e4so1967454b6e.3
-        for <kvm@vger.kernel.org>; Fri, 24 Nov 2023 10:14:49 -0800 (PST)
+ us-mta-55-k18pMOf9PSaLE9I-2Yejkg-1; Fri, 24 Nov 2023 13:24:15 -0500
+X-MC-Unique: k18pMOf9PSaLE9I-2Yejkg-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-77d6bade8d4so257466985a.1
+        for <kvm@vger.kernel.org>; Fri, 24 Nov 2023 10:24:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700849688; x=1701454488;
+        d=1e100.net; s=20230601; t=1700850255; x=1701455055;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zm7npic6hpdnvYBc9CxZ2JM6kBkxKJfDj7QUHeYYNcE=;
-        b=ja8MhJlt2oww1QpttliO2wvwHsL7Hkihld+b/PhGiiEmDT+c812zkuVJwruJA1nk6C
-         Q4QoeLZhwzK2wKiutM2yTBNymYzRBTp/HS3Kt6cfXH6y+0u5UOAul3YJW6aQ3obqNdXh
-         iiyG1NaHIfL2wZA8KNAZfV7dp+uOJvBU8ZRbUk1eDGWEIqRtYGONjgVq414NS6Vd5av2
-         71brIrC/vulN200l4hALckgNs/I0UkK3darfUCPYErl5coNXL+9BgN5s26o+1ke8I7iZ
-         g9FtKK0UkJAXrUQALFHLG04ttfo40j85Su81D1iqngxN6aJIJsA1ffT9zK7J8YLs2rRT
-         i1Sw==
-X-Gm-Message-State: AOJu0Ywhq1FXIuymtWk0+sJvGMBgc85UdR+99V7v7ROmlH5v/2AmfMjT
-	Gdg/7CBpX3cSl4iOYhZJ02lwUE69oI2KEMCrti7GQcUbY9V9ELBty1q4FfxzRz6zdMMVwOH5s9w
-	Tj1AREJjwuLEA
-X-Received: by 2002:a05:6808:1798:b0:3b8:44dc:7ce0 with SMTP id bg24-20020a056808179800b003b844dc7ce0mr4687196oib.2.1700849688352;
-        Fri, 24 Nov 2023 10:14:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEtGmM2eM47HzlOguDVKmn1lCm5hyLxe/kX5JAo4GtREYdwQJDRCUdA9WBI3RJNGHQMpo+kSQ==
-X-Received: by 2002:a05:6808:1798:b0:3b8:44dc:7ce0 with SMTP id bg24-20020a056808179800b003b844dc7ce0mr4687174oib.2.1700849688025;
-        Fri, 24 Nov 2023 10:14:48 -0800 (PST)
+        bh=sQNKNBWeod2+64J8ErFDWPzg6uRfL5WI32OFBNWO8sg=;
+        b=oDbWYHCe028P8zaZYPnLPlUHYnThQAwoH8eTxlI9e2BQk7wgJk7bLVyptoBiyrqPU8
+         N5mth/0X6OxWTPHqZC3kFINbWRCT2UOQP+0hzCs0v8EDWzhh1cDoKUZGXZBAYePzLpIx
+         UC3ZjbVcIZ61afkz08vvRMB2pAYaLLTOdOlwHsnLq0pzFASgd9TINe3Q/WEqQWY1xbmL
+         NtdYesgAkFo0i/QZ/KE4N5R/BgjTTARReFG0/jUh0V37nSKaqmcqlnpMgalwGgshTyNh
+         LJDanor6PFMKVzLX+Yn7BxonsHqqvhi0bxFonRPkJNJIP9IBMHbpvJB4FaOM1TONc0LE
+         VYkQ==
+X-Gm-Message-State: AOJu0YzuE3ob6mBrY8whJolppB0s7kR03mailzUsHtAfQ8hL9Z9JkvzJ
+	IIGwn3nY4LGyNp3mltiBChN+k+8YbnXmy6qAjLDNfM1HhbKVYIdXBnZGPpG+8iTEH7b95/z5PhW
+	rmS0YUVow8tt8
+X-Received: by 2002:a05:620a:8b0a:b0:77d:72b8:cc32 with SMTP id qw10-20020a05620a8b0a00b0077d72b8cc32mr3099366qkn.14.1700850255075;
+        Fri, 24 Nov 2023 10:24:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG2pMq6frzPLuG9cnd+mt0q4J9kdggHP6UueQSg1Njl1DQy92HDV3+0GjwH57E7GdzED/y9yg==
+X-Received: by 2002:a05:620a:8b0a:b0:77d:72b8:cc32 with SMTP id qw10-20020a05620a8b0a00b0077d72b8cc32mr3099349qkn.14.1700850254706;
+        Fri, 24 Nov 2023 10:24:14 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id cz9-20020a056214088900b0067a225ab63esm141629qvb.84.2023.11.24.10.14.44
+        by smtp.gmail.com with ESMTPSA id py18-20020a05620a879200b007671678e325sm1398466qkn.88.2023.11.24.10.24.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Nov 2023 10:14:46 -0800 (PST)
-Message-ID: <63c97950-2c12-4ee1-b8d1-0794e7603b25@redhat.com>
-Date: Fri, 24 Nov 2023 19:14:43 +0100
+        Fri, 24 Nov 2023 10:24:14 -0800 (PST)
+Message-ID: <d9e83b7a-0fca-406f-b58e-9014a5e14870@redhat.com>
+Date: Fri, 24 Nov 2023 19:24:11 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,346 +68,254 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/3] KVM: selftests: aarch64: Make the
- [create|destroy]_vpmu_vm() can be reused
+Subject: Re: [PATCH v2] arm/kvm: Enable support for KVM_ARM_VCPU_PMU_V3_FILTER
 Content-Language: en-US
-To: Shaoqin Huang <shahuang@redhat.com>, Oliver Upton
- <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
- kvmarm@lists.linux.dev
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <20231123063750.2176250-1-shahuang@redhat.com>
- <20231123063750.2176250-2-shahuang@redhat.com>
+To: Shaoqin Huang <shahuang@redhat.com>, qemu-arm@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org
+References: <20231117060838.39723-1-shahuang@redhat.com>
 From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <20231123063750.2176250-2-shahuang@redhat.com>
+In-Reply-To: <20231117060838.39723-1-shahuang@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Shaoqin,
+Hi,
 
-On 11/23/23 07:37, Shaoqin Huang wrote:
-> Move the [create|destroy]_vpmu_vm() into the lib/, which makes those
-some wording suggestions below:
-
-Move the implementation of .. into lib/aarch64/pmu.c and export their
-declaration in a header so that they can be reused by other tests. Also
-the title may be renamed: Make [create|destroy]_vpmu_vm() public
-> function can be used by other tests. Install the handler is specific to
-the sync exception handler install is test specific so we move it out of
-the helper function.
-> the vpmu_counter_access test, so create a wrapper function for it, and
-> only move the common part.
+On 11/17/23 07:08, Shaoqin Huang wrote:
+> The KVM_ARM_VCPU_PMU_V3_FILTER provide the ability to let the VMM decide
+> which PMU events are provided to the guest. Add a new option
+> `pmu-filter` as -accel sub-option to set the PMU Event Filtering.
 > 
-> No functional change.
-intended ;-)
+> The `pmu-filter` has such format:
+> 
+>   pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
+> 
+> The A means "allow" and D means "deny", start is the first event of the
+> range and the end is the last one. The first filter action defines if the whole
+> event list is an allow or deny list, if the first filter action is "allow", all
+> other events are denied except start-end; if the first filter action is "deny",
+> all other events are allowed except start-end. For example:
+> 
+>   pmu-filter="A:0x11-0x11;A:0x23-0x3a,D:0x30-0x30"
+> 
+> This will allow event 0x11 (The cycle counter), events 0x23 to 0x3a is
+> also allowed except the event 0x30 is denied, and all the other events
+> are disallowed.
+> 
+> Here is an real example shows how to use the PMU Event Filtering, when
+> we launch a guest by use kvm, add such command line:
+> 
+>   # qemu-system-aarch64 \
+> 	-accel kvm,pmu-filter="D:0x11-0x11"
+> 
+> And then in guest, use the perf to count the cycle:
+> 
+>   # perf stat sleep 1
+> 
+>    Performance counter stats for 'sleep 1':
+> 
+>               1.22 msec task-clock                       #    0.001 CPUs utilized
+>                  1      context-switches                 #  820.695 /sec
+>                  0      cpu-migrations                   #    0.000 /sec
+>                 55      page-faults                      #   45.138 K/sec
+>    <not supported>      cycles
+>            1128954      instructions
+>             227031      branches                         #  186.323 M/sec
+>               8686      branch-misses                    #    3.83% of all branches
+> 
+>        1.002492480 seconds time elapsed
+> 
+>        0.001752000 seconds user
+>        0.000000000 seconds sys
+> 
+> As we can see, the cycle counter has been disabled in the guest, but
+> other pmu events are still work.
 > 
 > Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 > ---
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../kvm/aarch64/vpmu_counter_access.c         | 100 +++++-------------
->  .../selftests/kvm/include/aarch64/vpmu.h      |  16 +++
->  .../testing/selftests/kvm/lib/aarch64/vpmu.c  |  64 +++++++++++
->  4 files changed, 105 insertions(+), 76 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/include/aarch64/vpmu.h
->  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vpmu.c
+> v1->v2:
+>   - Add more description for allow and deny meaning in 
+>     commit message.                                     [Sebastian]
+>   - Small improvement.                                  [Sebastian]
 > 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index a5963ab9215b..b60852c222ac 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -57,6 +57,7 @@ LIBKVM_aarch64 += lib/aarch64/processor.c
->  LIBKVM_aarch64 += lib/aarch64/spinlock.c
->  LIBKVM_aarch64 += lib/aarch64/ucall.c
->  LIBKVM_aarch64 += lib/aarch64/vgic.c
-> +LIBKVM_aarch64 += lib/aarch64/vpmu.c
+> v1: https://lore.kernel.org/all/20231113081713.153615-1-shahuang@redhat.com/
+> ---
+>  include/sysemu/kvm_int.h |  1 +
+>  qemu-options.hx          | 16 +++++++++++++
+>  target/arm/kvm.c         | 22 +++++++++++++++++
+>  target/arm/kvm64.c       | 51 ++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 90 insertions(+)
+> 
+> diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+> index fd846394be..8f4601474f 100644
+> --- a/include/sysemu/kvm_int.h
+> +++ b/include/sysemu/kvm_int.h
+> @@ -120,6 +120,7 @@ struct KVMState
+>      uint32_t xen_caps;
+>      uint16_t xen_gnttab_max_frames;
+>      uint16_t xen_evtchn_max_pirq;
+> +    char *kvm_pmu_filter;
+>  };
 >  
->  LIBKVM_s390x += lib/s390x/diag318_test_handler.c
->  LIBKVM_s390x += lib/s390x/processor.c
-> diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> index 5ea78986e665..17305408a334 100644
-> --- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> @@ -16,6 +16,7 @@
->  #include <processor.h>
->  #include <test_util.h>
->  #include <vgic.h>
-> +#include <vpmu.h>
->  #include <perf/arm_pmuv3.h>
->  #include <linux/bitfield.h>
+>  void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 42fd09e4de..dd3518092c 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -187,6 +187,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+>      "                tb-size=n (TCG translation block cache size)\n"
+>      "                dirty-ring-size=n (KVM dirty ring GFN count, default 0)\n"
+>      "                eager-split-size=n (KVM Eager Page Split chunk size, default 0, disabled. ARM only)\n"
+> +    "                pmu-filter={A,D}:start-end[;...] (KVM PMU Event Filter, default no filter. ARM only)\n"
+>      "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
+>      "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
+>  SRST
+> @@ -259,6 +260,21 @@ SRST
+>          impact on the memory. By default, this feature is disabled
+>          (eager-split-size=0).
 >  
-> @@ -25,13 +26,7 @@
->  /* The cycle counter bit position that's common among the PMU registers */
->  #define ARMV8_PMU_CYCLE_IDX		31
->  
-> -struct vpmu_vm {
-> -	struct kvm_vm *vm;
-> -	struct kvm_vcpu *vcpu;
-> -	int gic_fd;
-> -};
-> -
-> -static struct vpmu_vm vpmu_vm;
-> +static struct vpmu_vm *vpmu_vm;
->  
->  struct pmreg_sets {
->  	uint64_t set_reg_id;
-> @@ -421,64 +416,6 @@ static void guest_code(uint64_t expected_pmcr_n)
->  	GUEST_DONE();
->  }
->  
-> -#define GICD_BASE_GPA	0x8000000ULL
-> -#define GICR_BASE_GPA	0x80A0000ULL
-> -
-> -/* Create a VM that has one vCPU with PMUv3 configured. */
-> -static void create_vpmu_vm(void *guest_code)
-> -{
-> -	struct kvm_vcpu_init init;
-> -	uint8_t pmuver, ec;
-> -	uint64_t dfr0, irq = 23;
-> -	struct kvm_device_attr irq_attr = {
-> -		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-> -		.attr = KVM_ARM_VCPU_PMU_V3_IRQ,
-> -		.addr = (uint64_t)&irq,
-> -	};
-> -	struct kvm_device_attr init_attr = {
-> -		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-> -		.attr = KVM_ARM_VCPU_PMU_V3_INIT,
-> -	};
-> -
-> -	/* The test creates the vpmu_vm multiple times. Ensure a clean state */
-> -	memset(&vpmu_vm, 0, sizeof(vpmu_vm));
-> -
-> -	vpmu_vm.vm = vm_create(1);
-> -	vm_init_descriptor_tables(vpmu_vm.vm);
-> -	for (ec = 0; ec < ESR_EC_NUM; ec++) {
-> -		vm_install_sync_handler(vpmu_vm.vm, VECTOR_SYNC_CURRENT, ec,
-> -					guest_sync_handler);
-> -	}
-> -
-> -	/* Create vCPU with PMUv3 */
-> -	vm_ioctl(vpmu_vm.vm, KVM_ARM_PREFERRED_TARGET, &init);
-> -	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
-> -	vpmu_vm.vcpu = aarch64_vcpu_add(vpmu_vm.vm, 0, &init, guest_code);
-> -	vcpu_init_descriptor_tables(vpmu_vm.vcpu);
-> -	vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64,
-> -					GICD_BASE_GPA, GICR_BASE_GPA);
-> -	__TEST_REQUIRE(vpmu_vm.gic_fd >= 0,
-> -		       "Failed to create vgic-v3, skipping");
-> -
-> -	/* Make sure that PMUv3 support is indicated in the ID register */
-> -	vcpu_get_reg(vpmu_vm.vcpu,
-> -		     KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &dfr0);
-> -	pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), dfr0);
-> -	TEST_ASSERT(pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF &&
-> -		    pmuver >= ID_AA64DFR0_EL1_PMUVer_IMP,
-> -		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
-> -
-> -	/* Initialize vPMU */
-> -	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
-> -	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
-> -}
-> -
-> -static void destroy_vpmu_vm(void)
-> -{
-> -	close(vpmu_vm.gic_fd);
-> -	kvm_vm_free(vpmu_vm.vm);
-> -}
-> -
->  static void run_vcpu(struct kvm_vcpu *vcpu, uint64_t pmcr_n)
->  {
->  	struct ucall uc;
-> @@ -497,13 +434,24 @@ static void run_vcpu(struct kvm_vcpu *vcpu, uint64_t pmcr_n)
->  	}
->  }
->  
-> +static void create_vpmu_vm_with_handler(void *guest_code)
-> +{
-> +	uint8_t ec;
-> +	vpmu_vm = create_vpmu_vm(guest_code);
+> +    ``pmu-filter={A,D}:start-end[;...]``
+> +        KVM implements pmu event filtering to prevent a guest from being able to
+> +	sample certain events. It has the following format:
 > +
-> +	for (ec = 0; ec < ESR_EC_NUM; ec++) {
-> +		vm_install_sync_handler(vpmu_vm->vm, VECTOR_SYNC_CURRENT, ec,
-> +					guest_sync_handler);
-> +	}
+> +	pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
+> +
+> +	The A means "allow" and D means "deny", start if the first event of the
+> +	range and the end is the last one. For example:
+> +
+> +	pmu-filter="A:0x11-0x11;A:0x23-0x3a,D:0x30-0x30"
+> +
+> +	This will allow event 0x11 (The cycle counter), events 0x23 to 0x3a is
+> +	also allowed except the event 0x30 is denied, and all the other events
+> +	are disallowed.
+> +
+>      ``notify-vmexit=run|internal-error|disable,notify-window=n``
+>          Enables or disables notify VM exit support on x86 host and specify
+>          the corresponding notify window to trigger the VM exit if enabled.
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 7903e2ddde..74796de055 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -1108,6 +1108,21 @@ static void kvm_arch_set_eager_split_size(Object *obj, Visitor *v,
+>      s->kvm_eager_split_size = value;
+>  }
+>  
+> +static char *kvm_arch_get_pmu_filter(Object *obj, Error **errp)
+> +{
+> +    KVMState *s = KVM_STATE(obj);
+> +
+> +    return g_strdup(s->kvm_pmu_filter);
 > +}
 > +
->  static void test_create_vpmu_vm_with_pmcr_n(uint64_t pmcr_n, bool expect_fail)
->  {
->  	struct kvm_vcpu *vcpu;
->  	uint64_t pmcr, pmcr_orig;
->  
-> -	create_vpmu_vm(guest_code);
-> -	vcpu = vpmu_vm.vcpu;
-> +	create_vpmu_vm_with_handler(guest_code);
-> +	vcpu = vpmu_vm->vcpu;
->  
->  	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr_orig);
->  	pmcr = pmcr_orig;
-> @@ -539,7 +487,7 @@ static void run_access_test(uint64_t pmcr_n)
->  	pr_debug("Test with pmcr_n %lu\n", pmcr_n);
->  
->  	test_create_vpmu_vm_with_pmcr_n(pmcr_n, false);
-> -	vcpu = vpmu_vm.vcpu;
-> +	vcpu = vpmu_vm->vcpu;
->  
->  	/* Save the initial sp to restore them later to run the guest again */
->  	vcpu_get_reg(vcpu, ARM64_CORE_REG(sp_el1), &sp);
-> @@ -550,7 +498,7 @@ static void run_access_test(uint64_t pmcr_n)
->  	 * Reset and re-initialize the vCPU, and run the guest code again to
->  	 * check if PMCR_EL0.N is preserved.
->  	 */
-> -	vm_ioctl(vpmu_vm.vm, KVM_ARM_PREFERRED_TARGET, &init);
-> +	vm_ioctl(vpmu_vm->vm, KVM_ARM_PREFERRED_TARGET, &init);
->  	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
->  	aarch64_vcpu_setup(vcpu, &init);
->  	vcpu_init_descriptor_tables(vcpu);
-> @@ -559,7 +507,7 @@ static void run_access_test(uint64_t pmcr_n)
->  
->  	run_vcpu(vcpu, pmcr_n);
->  
-> -	destroy_vpmu_vm();
-> +	destroy_vpmu_vm(vpmu_vm);
->  }
->  
->  static struct pmreg_sets validity_check_reg_sets[] = {
-> @@ -580,7 +528,7 @@ static void run_pmregs_validity_test(uint64_t pmcr_n)
->  	uint64_t valid_counters_mask, max_counters_mask;
->  
->  	test_create_vpmu_vm_with_pmcr_n(pmcr_n, false);
-> -	vcpu = vpmu_vm.vcpu;
-> +	vcpu = vpmu_vm->vcpu;
->  
->  	valid_counters_mask = get_counters_mask(pmcr_n);
->  	max_counters_mask = get_counters_mask(ARMV8_PMU_MAX_COUNTERS);
-> @@ -621,7 +569,7 @@ static void run_pmregs_validity_test(uint64_t pmcr_n)
->  			    KVM_ARM64_SYS_REG(clr_reg_id), reg_val);
->  	}
->  
-> -	destroy_vpmu_vm();
-> +	destroy_vpmu_vm(vpmu_vm);
->  }
->  
->  /*
-> @@ -634,7 +582,7 @@ static void run_error_test(uint64_t pmcr_n)
->  	pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
->  
->  	test_create_vpmu_vm_with_pmcr_n(pmcr_n, true);
-> -	destroy_vpmu_vm();
-> +	destroy_vpmu_vm(vpmu_vm);
->  }
->  
->  /*
-> @@ -645,9 +593,9 @@ static uint64_t get_pmcr_n_limit(void)
->  {
->  	uint64_t pmcr;
->  
-> -	create_vpmu_vm(guest_code);
-> -	vcpu_get_reg(vpmu_vm.vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
-> -	destroy_vpmu_vm();
-> +	create_vpmu_vm_with_handler(guest_code);
-> +	vcpu_get_reg(vpmu_vm->vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
-> +	destroy_vpmu_vm(vpmu_vm);
->  	return get_pmcr_n(pmcr);
->  }
->  
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/vpmu.h b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
-> new file mode 100644
-> index 000000000000..0a56183644ee
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
-> @@ -0,0 +1,16 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +
-> +#include <kvm_util.h>
-> +
-> +#define GICD_BASE_GPA	0x8000000ULL
-> +#define GICR_BASE_GPA	0x80A0000ULL
-> +
-> +struct vpmu_vm {
-> +	struct kvm_vm *vm;
-> +	struct kvm_vcpu *vcpu;
-> +	int gic_fd;
-> +};
-> +
-> +struct vpmu_vm *create_vpmu_vm(void *guest_code);
-> +
-> +void destroy_vpmu_vm(struct vpmu_vm *vpmu_vm);
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/vpmu.c b/tools/testing/selftests/kvm/lib/aarch64/vpmu.c
-> new file mode 100644
-> index 000000000000..b3de8fdc555e
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/vpmu.c
-> @@ -0,0 +1,64 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +#include <kvm_util.h>
-> +#include <processor.h>
-> +#include <test_util.h>
-> +#include <vgic.h>
-> +#include <vpmu.h>
-> +#include <perf/arm_pmuv3.h>
-> +
-> +/* Create a VM that has one vCPU with PMUv3 configured. */
-> +struct vpmu_vm *create_vpmu_vm(void *guest_code)
+> +static void kvm_arch_set_pmu_filter(Object *obj, const char *pmu_filter,
+> +                                    Error **errp)
 > +{
-> +	struct kvm_vcpu_init init;
-> +	uint8_t pmuver;
-> +	uint64_t dfr0, irq = 23;
-> +	struct kvm_device_attr irq_attr = {
-> +		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-> +		.attr = KVM_ARM_VCPU_PMU_V3_IRQ,
-> +		.addr = (uint64_t)&irq,
-> +	};
-> +	struct kvm_device_attr init_attr = {
-> +		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-> +		.attr = KVM_ARM_VCPU_PMU_V3_INIT,
-> +	};
-> +	struct vpmu_vm *vpmu_vm;
+> +    KVMState *s = KVM_STATE(obj);
 > +
-> +	vpmu_vm = calloc(1, sizeof(*vpmu_vm));
-> +	TEST_ASSERT(vpmu_vm != NULL, "Insufficient Memory");
-> +	memset(vpmu_vm, 0, sizeof(vpmu_vm));
-> +
-> +	vpmu_vm->vm = vm_create(1);
-> +	vm_init_descriptor_tables(vpmu_vm->vm);
-> +
-> +	/* Create vCPU with PMUv3 */
-> +	vm_ioctl(vpmu_vm->vm, KVM_ARM_PREFERRED_TARGET, &init);
-> +	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
-> +	vpmu_vm->vcpu = aarch64_vcpu_add(vpmu_vm->vm, 0, &init, guest_code);
-> +	vcpu_init_descriptor_tables(vpmu_vm->vcpu);
-> +	vpmu_vm->gic_fd = vgic_v3_setup(vpmu_vm->vm, 1, 64,
-> +					GICD_BASE_GPA, GICR_BASE_GPA);
-> +	__TEST_REQUIRE(vpmu_vm->gic_fd >= 0,
-> +		       "Failed to create vgic-v3, skipping");
-> +
-> +	/* Make sure that PMUv3 support is indicated in the ID register */
-> +	vcpu_get_reg(vpmu_vm->vcpu,
-> +		     KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &dfr0);
-> +	pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), dfr0);
-> +	TEST_ASSERT(pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF &&
-> +		    pmuver >= ID_AA64DFR0_EL1_PMUVer_IMP,
-> +		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
-> +
-> +	/* Initialize vPMU */
-> +	vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
-> +	vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
-> +
-> +	return vpmu_vm;
+> +    s->kvm_pmu_filter = g_strdup(pmu_filter);
 > +}
 > +
-> +void destroy_vpmu_vm(struct vpmu_vm *vpmu_vm)
+>  void kvm_arch_accel_class_init(ObjectClass *oc)
+>  {
+>      object_class_property_add(oc, "eager-split-size", "size",
+> @@ -1116,4 +1131,11 @@ void kvm_arch_accel_class_init(ObjectClass *oc)
+>  
+>      object_class_property_set_description(oc, "eager-split-size",
+>          "Eager Page Split chunk size for hugepages. (default: 0, disabled)");
+> +
+> +    object_class_property_add_str(oc, "pmu-filter",
+> +                                  kvm_arch_get_pmu_filter,
+> +                                  kvm_arch_set_pmu_filter);
+> +
+> +    object_class_property_set_description(oc, "pmu-filter",
+> +        "PMU Event Filtering description for guest pmu. (default: NULL, disabled)");
+>  }
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index 3c175c93a7..6eac328b48 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -10,6 +10,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include <asm-arm64/kvm.h>
+>  #include <sys/ioctl.h>
+>  #include <sys/ptrace.h>
+>  
+> @@ -131,6 +132,53 @@ static bool kvm_arm_set_device_attr(CPUState *cs, struct kvm_device_attr *attr,
+>      return true;
+>  }
+>  
+> +static void kvm_arm_pmu_filter_init(CPUState *cs)
 > +{
-> +	close(vpmu_vm->gic_fd);
-> +	kvm_vm_free(vpmu_vm->vm);
-> +	free(vpmu_vm);
-> +}
-Besides looks good to me
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> +    static bool pmu_filter_init = false;
+> +    struct kvm_pmu_event_filter filter;
+> +    struct kvm_device_attr attr = {
+> +        .group      = KVM_ARM_VCPU_PMU_V3_CTRL,
+> +        .attr       = KVM_ARM_VCPU_PMU_V3_FILTER,
+> +        .addr       = (uint64_t)&filter,
+> +    };
+> +    KVMState *kvm_state = cs->kvm_state;
+> +    char *tmp;
+> +    char *str, act;
+> +
+> +    if (!kvm_state->kvm_pmu_filter)
+> +        return;
+> +
+usually we check the kernel capability (here KVM_CAP_ARM_PMU_V3) before
+doing further actions. It allows you to give an inidication to the user
+that the kernel does not allow it. Also you should precise in the doc
+that this accel option requires host kernel caps I think.
+> +    /* This only needs to be called for 1 vcpu. */
+> +    if (!pmu_filter_init)
+> +        pmu_filter_init = true;
+> +
+> +    tmp = g_strdup(kvm_state->kvm_pmu_filter);
+> +
+> +    for (str = strtok(tmp, ";"); str != NULL; str = strtok(NULL, ";")) {
+> +        unsigned short start = 0, end = 0;
+> +
+> +        sscanf(str, "%c:%hx-%hx", &act, &start, &end);
+> +        if ((act != 'A' && act != 'D') || (!start && !end)) {
+> +            error_report("skipping invalid filter %s\n", str);
+> +            continue;
+> +        }
+> +
+> +        filter = (struct kvm_pmu_event_filter) {
+> +            .base_event     = start,
+> +            .nevents        = end - start + 1,
+> +            .action         = act == 'A' ? KVM_PMU_EVENT_ALLOW :
+> +                                           KVM_PMU_EVENT_DENY,
+> +        };
+> +
+> +        if (!kvm_arm_set_device_attr(cs, &attr, "PMU Event Filter")) {
+> +            error_report("Failed to init PMU Event Filter\n");
+if you do the above, here you know that the host allows to set filters
+but that the user input is incorrect.
+
+Thanks
 
 Eric
-
+> +            abort();
+> +        }
+> +    }
+> +
+> +    g_free(tmp);
+> +}
+> +
+>  void kvm_arm_pmu_init(CPUState *cs)
+>  {
+>      struct kvm_device_attr attr = {
+> @@ -141,6 +189,9 @@ void kvm_arm_pmu_init(CPUState *cs)
+>      if (!ARM_CPU(cs)->has_pmu) {
+>          return;
+>      }
+> +
+> +    kvm_arm_pmu_filter_init(cs);
+> +
+>      if (!kvm_arm_set_device_attr(cs, &attr, "PMU")) {
+>          error_report("failed to init PMU");
+>          abort();
 
 
