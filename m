@@ -1,129 +1,226 @@
-Return-Path: <kvm+bounces-2436-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2437-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 873007F764A
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 15:23:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 634357F765D
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 15:32:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E60BB2170F
-	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 14:23:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D5C028223F
+	for <lists+kvm@lfdr.de>; Fri, 24 Nov 2023 14:32:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C0632D60E;
-	Fri, 24 Nov 2023 14:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 572082E624;
+	Fri, 24 Nov 2023 14:32:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aevSnydD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jkenYbL4"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071E12D03C
-	for <kvm@vger.kernel.org>; Fri, 24 Nov 2023 14:23:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA7D1C433B9;
-	Fri, 24 Nov 2023 14:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FACA2E633;
+	Fri, 24 Nov 2023 14:32:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B6F3C433C8;
+	Fri, 24 Nov 2023 14:32:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700835789;
-	bh=fxI4uXn2KfvV1R7R9iTkUg0DR5eIEK+BbuDI5r58j/w=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=aevSnydDZ4Uz+e2pC/C/kvwGX84Zj0aZfpEj+a9uSSjw36YDfHrl+gbR1scHc+VCv
-	 kP93iyjC8FJa5LBIfIC1xGfWDCY3ZJZ5a+vdQLdbEkPPADLUI+eEhh6hzM7p95Cv/M
-	 e9LkzYvdjfM3ZiawCRuta1Vff2dIXuNoV1woH+lhsBeJtGK8c9zmSRCJ4zyglBzR4v
-	 ODcVXntzHes75XCUMhBJb6mLkJ4AK45B2HsAykXZrlvRZZnIQn5VxJIxQFh2o08wzl
-	 gcttLHxCW3f2r8mVITkRGSrbxVsTugWompFGM+3a9HU6Iiy6Npwi9+3I56iTEwL0gu
-	 J715C7xHk7A5w==
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-54aecf9270fso1060633a12.0;
-        Fri, 24 Nov 2023 06:23:09 -0800 (PST)
-X-Gm-Message-State: AOJu0YwpvPjOCdkzYYwMGZBHVrpfO6jUnuJZYIwP0Gbtnt/gd8kqczsU
-	LNYKKvLfDB0+cIrU7jFCgia8bKzX4U59zIv+OWY=
-X-Google-Smtp-Source: AGHT+IGPovQWrXUW9VvdSCkq8lA5VR3r+K+n92IJb/FB7JmOHZ1l5GmXUGI8YDGzu2OFWBfLnjaFp1w9w/DhTWkNsgA=
-X-Received: by 2002:a50:a693:0:b0:548:68a3:618e with SMTP id
- e19-20020a50a693000000b0054868a3618emr2333828edc.9.1700835788037; Fri, 24 Nov
- 2023 06:23:08 -0800 (PST)
+	s=k20201202; t=1700836359;
+	bh=gd9+eyKPQRosH6Zy3rvn5fSoMQYqPc0CQ/4F+lvxRpo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jkenYbL4C3P1ur7PB5kdTPPQR04bbX0G9eSIFprhwFfRMBWcAxkf+CQgmG8xq8Wfn
+	 xHKIixMBrlqATC9SpOsNVLxaxmyT/80R8N6mNrm4/erfoZUU14ZoTZw1Z1IYPK9uR6
+	 IBpxney2Z1GXn6Z7/PIJR1yYIEVDpIBzF4ACcjvW0izlpNmRtLZkwvIelHUheihOWD
+	 IqHAKRlGY/eBDcnBrxhY22eXA3gn+D8MsEvC11WvgU2ma2ElC4e8IfrToUsy04B3I9
+	 PZd29BXpSrPSD3yNgnqaVrFIk4lDI1brbVt7l94dS7Zg41pjxPuJ2AiuG8N6PUw0dj
+	 /JUXUV4d0MVNQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1r6XES-00G7hW-QL;
+	Fri, 24 Nov 2023 14:32:36 +0000
+Date: Fri, 24 Nov 2023 14:32:36 +0000
+Message-ID: <86leancjcr.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: Miguel Luis <miguel.luis@oracle.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Darren Hart <darren@os.amperecomputing.com>,
+	Jintack Lim <jintack@cs.columbia.edu>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	James Morse
+ <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support (FEAT_NV2 only)
+In-Reply-To: <e18700d4-061d-4489-8d8d-87c11b70eedb@os.amperecomputing.com>
+References: <20231120131027.854038-1-maz@kernel.org>
+	<DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
+	<86msv7ylnu.wl-maz@kernel.org>
+	<05733774-4210-4097-9912-fb3aa8542fdd@oracle.com>
+	<86a5r4zafh.wl-maz@kernel.org>
+	<134912e4-beed-4ab6-8ce1-33e69ec382b3@os.amperecomputing.com>
+	<868r6nzc5y.wl-maz@kernel.org>
+	<65dc2a93-0a17-4433-b3a5-430bf516ffe9@os.amperecomputing.com>
+	<86o7fjco13.wl-maz@kernel.org>
+	<e18700d4-061d-4489-8d8d-87c11b70eedb@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231115090735.2404866-1-chenhuacai@loongson.cn> <0f74ba84-a0fb-41cb-b22c-943f47c631da@infradead.org>
-In-Reply-To: <0f74ba84-a0fb-41cb-b22c-943f47c631da@infradead.org>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Fri, 24 Nov 2023 22:22:58 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H63QkfSw+Esn8oW2PDEsCnTRPFqkj8X-x8i9cH3AS0k9w@mail.gmail.com>
-Message-ID: <CAAhV-H63QkfSw+Esn8oW2PDEsCnTRPFqkj8X-x8i9cH3AS0k9w@mail.gmail.com>
-Subject: Re: [PATCH] LoongArch: KVM: Fix build due to API changes
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Huacai Chen <chenhuacai@loongson.cn>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, kvm@vger.kernel.org, 
-	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Xuerui Wang <kernel@xen0n.name>, Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi, Paolo,
+On Fri, 24 Nov 2023 13:22:22 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+>=20
+> > How is this value possible if the write to HCR_EL2 has taken place?
+> > When do you sample this?
+>=20
+> I am not sure how and where it got set. I think, whatever it is set,
+> it is due to false return of vcpu_el2_e2h_is_set(). Need to
+> understand/debug.
+> The vhcr_el2 value I have shared is traced along with hcr in function
+> __activate_traps/__compute_hcr.
 
-On Thu, Nov 16, 2023 at 3:48=E2=80=AFAM Randy Dunlap <rdunlap@infradead.org=
-> wrote:
->
->
->
-> On 11/15/23 01:07, Huacai Chen wrote:
-> > Commit 8569992d64b8f750e34b7858eac ("KVM: Use gfn instead of hva for
-> > mmu_notifier_retry") replaces mmu_invalidate_retry_hva() usage with
-> > mmu_invalidate_retry_gfn() for X86, LoongArch also need similar changes
-> > to fix build.
-> >
-> > Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
->
-> Reported-by: Randy Dunlap <rdunlap@infradead.org>
-> Tested-by: Randy Dunlap <rdunlap@infradead.org> # build-tested
-> Acked-by: Randy Dunlap <rdunlap@infradead.org>
-I think this patch should go through your kvm tree rather than the
-loongarch tree. Because the loongarch tree is based on 6.7 now, this
-patch can fix a build error for kvm tree, but will cause a build error
-on the loongarch tree.
+Here's my hunch:
+
+The guest boots with E2H=3D0, because we don't advertise anything else
+on your HW. So we run with NV1=3D1 until we try to *upgrade* to VHE. NV2
+means that HCR_EL2 is writable (to memory) without a trap. But we're
+still running with NV1=3D1.
+
+Subsequently, we access a sysreg that should never trap for a VHE
+guest, but we're with the wrong config. Bad things happen.
+
+Unfortunately, NV2 is pretty much incompatible with E2H being updated,
+because it cannot perform the changes that this would result into at
+the point where they should happen. We can try and do a best effort
+handling, but you can always trick it.
+
+Anyway, can you see if the hack below helps? I'm not keen on it at
+all, but this would be a good data point.
+
+	M.
+
+=46rom c4b856221661393b884cbf673d100faaa8dc018a Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Fri, 26 May 2023 12:16:05 +0100
+Subject: [PATCH] KVM: arm64: Opportunistically track HCR_EL2.E2H being flip=
+ped
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_host.h       |  9 +++++++--
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 13 +++++++++++++
+ arch/arm64/kvm/hyp/vhe/switch.c         | 10 ++++++++--
+ 3 files changed, 28 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm=
+_host.h
+index c91f607e989d..d45ef41de5fb 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -655,6 +655,9 @@ struct kvm_vcpu_arch {
+ 	/* State flags for kernel bookkeeping, unused by the hypervisor code */
+ 	u8 sflags;
+=20
++	/* Bookkeeping flags for NV */
++	u8 nvflags;
++
+ 	/*
+ 	 * Don't run the guest (internal implementation need).
+ 	 *
+@@ -858,8 +861,6 @@ struct kvm_vcpu_arch {
+ #define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
+ /* Save TRBE context if active  */
+ #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+-/* vcpu running in HYP context */
+-#define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+=20
+ /* SVE enabled for host EL0 */
+ #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+@@ -878,6 +879,10 @@ struct kvm_vcpu_arch {
+ /* WFI instruction trapped */
+ #define IN_WFI			__vcpu_single_flag(sflags, BIT(7))
+=20
++/* vcpu running in HYP context */
++#define VCPU_HYP_CONTEXT	__vcpu_single_flag(nvflags, BIT(0))
++/* vcpu entered with HCR_EL2.E2H set */
++#define VCPU_HCR_E2H		__vcpu_single_flag(nvflags, BIT(1))
+=20
+ /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+ #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/i=
+nclude/hyp/switch.h
+index aed2ea35082c..9c1346116d61 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -669,6 +669,19 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *v=
+cpu, u64 *exit_code)
+ 	 */
+ 	synchronize_vcpu_pstate(vcpu, exit_code);
+=20
++	if (vcpu_has_nv(vcpu) &&
++	    (!!vcpu_get_flag(vcpu, VCPU_HCR_E2H) ^ vcpu_el2_e2h_is_set(vcpu))) {
++		if (vcpu_el2_e2h_is_set(vcpu)) {
++			sysreg_clear_set(hcr_el2, HCR_NV1, 0);
++			vcpu_set_flag(vcpu, VCPU_HCR_E2H);
++		} else {
++			sysreg_clear_set(hcr_el2, 0, HCR_NV1);
++			vcpu_clear_flag(vcpu, VCPU_HCR_E2H);
++		}
++
++		return true;
++	}
++
+ 	/*
+ 	 * Check whether we want to repaint the state one way or
+ 	 * another.
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switc=
+h.c
+index 8d1e9d1adabe..395aaa06f358 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -447,10 +447,16 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	sysreg_restore_guest_state_vhe(guest_ctxt);
+ 	__debug_switch_to_guest(vcpu);
+=20
+-	if (is_hyp_ctxt(vcpu))
++	if (is_hyp_ctxt(vcpu)) {
++		if (vcpu_el2_e2h_is_set(vcpu))
++			vcpu_set_flag(vcpu, VCPU_HCR_E2H);
++		else
++			vcpu_clear_flag(vcpu, VCPU_HCR_E2H);
++
+ 		vcpu_set_flag(vcpu, VCPU_HYP_CONTEXT);
+-	else
++	} else {
+ 		vcpu_clear_flag(vcpu, VCPU_HYP_CONTEXT);
++	}
+=20
+ 	do {
+ 		/* Jump in the fire! */
+--=20
+2.39.2
 
 
-Huacai
-
->
-> Thanks.
->
-> > ---
-> >  arch/loongarch/kvm/mmu.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
-> > index 80480df5f550..9463ebecd39b 100644
-> > --- a/arch/loongarch/kvm/mmu.c
-> > +++ b/arch/loongarch/kvm/mmu.c
-> > @@ -627,7 +627,7 @@ static bool fault_supports_huge_mapping(struct kvm_=
-memory_slot *memslot,
-> >   *
-> >   * There are several ways to safely use this helper:
-> >   *
-> > - * - Check mmu_invalidate_retry_hva() after grabbing the mapping level=
-, before
-> > + * - Check mmu_invalidate_retry_gfn() after grabbing the mapping level=
-, before
-> >   *   consuming it.  In this case, mmu_lock doesn't need to be held dur=
-ing the
-> >   *   lookup, but it does need to be held while checking the MMU notifi=
-er.
-> >   *
-> > @@ -807,7 +807,7 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsi=
-gned long gpa, bool write)
-> >
-> >       /* Check if an invalidation has taken place since we got pfn */
-> >       spin_lock(&kvm->mmu_lock);
-> > -     if (mmu_invalidate_retry_hva(kvm, mmu_seq, hva)) {
-> > +     if (mmu_invalidate_retry_gfn(kvm, mmu_seq, gfn)) {
-> >               /*
-> >                * This can happen when mappings are changed asynchronous=
-ly, but
-> >                * also synchronously if a COW is triggered by
->
-> --
-> ~Randy
+--=20
+Without deviation from the norm, progress is not possible.
 
