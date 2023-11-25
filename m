@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-2454-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2455-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C4877F892D
-	for <lists+kvm@lfdr.de>; Sat, 25 Nov 2023 09:21:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 381297F8934
+	for <lists+kvm@lfdr.de>; Sat, 25 Nov 2023 09:26:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EBAC1C20BF1
-	for <lists+kvm@lfdr.de>; Sat, 25 Nov 2023 08:21:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7BDA2817E2
+	for <lists+kvm@lfdr.de>; Sat, 25 Nov 2023 08:26:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B9AD944E;
-	Sat, 25 Nov 2023 08:21:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C009469;
+	Sat, 25 Nov 2023 08:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L+X8CXTl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YHzkIWq0"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82BC3D7
-	for <kvm@vger.kernel.org>; Sat, 25 Nov 2023 00:20:58 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F624B7
+	for <kvm@vger.kernel.org>; Sat, 25 Nov 2023 00:26:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700900457;
+	s=mimecast20190719; t=1700900790;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=zFft4eSCdOMrdpLaXue5iGXf4Itn7tLvD8L9yc/5DXM=;
-	b=L+X8CXTlraIwwh2FdBzIPhMnUzpkAS102xbZRH4B68eCtjQiD7EAtvap2BvRM5ioe7rSuk
-	oAW8iu6JiWsSF6pzqIDqjHN1AT81xtmSFx1FAC+VLxvXPHObphwAQGZkZ86KmVjGVCqEFz
-	E06/YsU2CQu3JT7lJAp9eQyd1OLoqPg=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-561-s8aJHvZZNQuTMHrAnoz3QA-1; Sat,
- 25 Nov 2023 03:20:55 -0500
-X-MC-Unique: s8aJHvZZNQuTMHrAnoz3QA-1
+	bh=cLt0kMstEnQMJTOsln80QC+cyRNJlJGmKrNPOs17POo=;
+	b=YHzkIWq0wxzP9zDsvsGeGVPHSAG14VBv04f+R98w6PRnWSodFJW7Juuab6adqM6zyRWGs2
+	VK9VtTttYT//qZjRCtfiZt26iCP9EphrvKrq+AaQAmGMrf1x0buxkxlHJuSmd2WlEW90WD
+	OrXSK9GtuoAFhEl5ynku8Llj1iq87co=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-611-CgxO-fdNPBCKacT9AHIE5g-1; Sat, 25 Nov 2023 03:26:25 -0500
+X-MC-Unique: CgxO-fdNPBCKacT9AHIE5g-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 251921C05AB2;
-	Sat, 25 Nov 2023 08:20:55 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7951985A58C;
+	Sat, 25 Nov 2023 08:26:25 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0C44AC1596F;
-	Sat, 25 Nov 2023 08:20:55 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 61817C1596F;
+	Sat, 25 Nov 2023 08:26:25 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
-Subject: [PATCH] KVM: remove CONFIG_HAVE_KVM_IRQFD
-Date: Sat, 25 Nov 2023 03:20:54 -0500
-Message-Id: <20231125082054.1388342-1-pbonzini@redhat.com>
+Subject: [PATCH] KVM: remove deprecated UAPIs
+Date: Sat, 25 Nov 2023 03:26:24 -0500
+Message-Id: <20231125082624.1397344-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -57,254 +57,190 @@ Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-All platforms with a kernel irqchip have support for irqfd.  Unify the
-two configuration items so that userspace can expect to use irqfd to
-inject interrupts into the irqchip.
+The deprecated interfaces were removed 15 years ago.  KVM's
+device assignment was deprecated in 4.2 and removed 6.5 years
+ago; the only interest might be in compiling ancient versions
+of QEMU, but QEMU has been using its own imported copy of the
+kernel headers since June 2011.  So again we go into archaeology
+territory; just remove the cruft.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/arm64/kvm/Kconfig     | 1 -
- arch/powerpc/kvm/Kconfig   | 2 --
- arch/powerpc/kvm/powerpc.c | 2 +-
- arch/riscv/kvm/Kconfig     | 1 -
- arch/s390/kvm/Kconfig      | 1 -
- arch/x86/kvm/Kconfig       | 1 -
- include/linux/kvm_host.h   | 9 ++++-----
- include/trace/events/kvm.h | 8 ++++----
- virt/kvm/Kconfig           | 3 ---
- virt/kvm/eventfd.c         | 6 +++---
- virt/kvm/kvm_main.c        | 4 ++--
- 11 files changed, 14 insertions(+), 24 deletions(-)
+ Documentation/virt/kvm/api.rst | 12 -----
+ include/uapi/linux/kvm.h       | 90 ----------------------------------
+ virt/kvm/kvm_main.c            |  5 --
+ 3 files changed, 107 deletions(-)
 
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 5d9b68b5a0b3..71ebc4dadcfd 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -29,7 +29,6 @@ menuconfig KVM
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select KVM_XFER_TO_GUEST_WORK
- 	select KVM_VFIO
--	select HAVE_KVM_IRQFD
- 	select HAVE_KVM_DIRTY_RING_ACQ_REL
- 	select NEED_KVM_DIRTY_RING_WITH_BITMAP
- 	select HAVE_KVM_MSI
-diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
-index 8a3d08559f11..b24da1c8699b 100644
---- a/arch/powerpc/kvm/Kconfig
-+++ b/arch/powerpc/kvm/Kconfig
-@@ -224,7 +224,6 @@ config KVM_MPIC
- 	bool "KVM in-kernel MPIC emulation"
- 	depends on KVM && PPC_E500
- 	select HAVE_KVM_IRQCHIP
--	select HAVE_KVM_IRQFD
- 	select HAVE_KVM_IRQ_ROUTING
- 	select HAVE_KVM_MSI
- 	help
-@@ -237,7 +236,6 @@ config KVM_XICS
- 	bool "KVM in-kernel XICS emulation"
- 	depends on KVM_BOOK3S_64 && !KVM_MPIC
- 	select HAVE_KVM_IRQCHIP
--	select HAVE_KVM_IRQFD
- 	default y
- 	help
- 	  Include support for the XICS (eXternal Interrupt Controller
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index f6af752698d0..df0a90b37c17 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -578,7 +578,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		break;
- #endif
- 
--#ifdef CONFIG_HAVE_KVM_IRQFD
-+#ifdef CONFIG_HAVE_KVM_IRQCHIP
- 	case KVM_CAP_IRQFD_RESAMPLE:
- 		r = !xive_enabled();
- 		break;
-diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
-index 642f8d95289b..267bbf85c7ea 100644
---- a/arch/riscv/kvm/Kconfig
-+++ b/arch/riscv/kvm/Kconfig
-@@ -21,7 +21,6 @@ config KVM
- 	tristate "Kernel-based Virtual Machine (KVM) support (EXPERIMENTAL)"
- 	depends on RISCV_SBI && MMU
- 	select HAVE_KVM_IRQCHIP
--	select HAVE_KVM_IRQFD
- 	select HAVE_KVM_IRQ_ROUTING
- 	select HAVE_KVM_MSI
- 	select HAVE_KVM_VCPU_ASYNC_IOCTL
-diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
-index ed567b858535..bb6d90351119 100644
---- a/arch/s390/kvm/Kconfig
-+++ b/arch/s390/kvm/Kconfig
-@@ -26,7 +26,6 @@ config KVM
- 	select KVM_ASYNC_PF
- 	select KVM_ASYNC_PF_SYNC
- 	select HAVE_KVM_IRQCHIP
--	select HAVE_KVM_IRQFD
- 	select HAVE_KVM_IRQ_ROUTING
- 	select HAVE_KVM_INVALID_WAKEUPS
- 	select HAVE_KVM_NO_POLL
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 2efda4fc6a21..7a1280ccb525 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -27,7 +27,6 @@ config KVM
- 	select MMU_NOTIFIER
- 	select HAVE_KVM_IRQCHIP
- 	select HAVE_KVM_PFNCACHE
--	select HAVE_KVM_IRQFD
- 	select HAVE_KVM_DIRTY_RING_TSO
- 	select HAVE_KVM_DIRTY_RING_ACQ_REL
- 	select IRQ_BYPASS_MANAGER
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index b043202dd0b4..06c57b02d54e 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -776,8 +776,7 @@ struct kvm {
- 	 * Update side is protected by irq_lock.
- 	 */
- 	struct kvm_irq_routing_table __rcu *irq_routing;
--#endif
--#ifdef CONFIG_HAVE_KVM_IRQFD
-+
- 	struct hlist_head irq_ack_notifier_list;
- #endif
- 
-@@ -963,7 +962,7 @@ static inline void kvm_arch_post_irq_routing_update(struct kvm *kvm)
- }
- #endif
- 
--#ifdef CONFIG_HAVE_KVM_IRQFD
-+#ifdef CONFIG_HAVE_KVM_IRQCHIP
- int kvm_irqfd_init(void);
- void kvm_irqfd_exit(void);
- #else
-@@ -2014,7 +2013,7 @@ int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
- void kvm_eventfd_init(struct kvm *kvm);
- int kvm_ioeventfd(struct kvm *kvm, struct kvm_ioeventfd *args);
- 
--#ifdef CONFIG_HAVE_KVM_IRQFD
-+#ifdef CONFIG_HAVE_KVM_IRQCHIP
- int kvm_irqfd(struct kvm *kvm, struct kvm_irqfd *args);
- void kvm_irqfd_release(struct kvm *kvm);
- bool kvm_notify_irqfd_resampler(struct kvm *kvm,
-@@ -2035,7 +2034,7 @@ static inline bool kvm_notify_irqfd_resampler(struct kvm *kvm,
- {
- 	return false;
- }
--#endif /* CONFIG_HAVE_KVM_IRQFD */
-+#endif /* CONFIG_HAVE_KVM_IRQCHIP */
- 
- void kvm_arch_irq_routing_update(struct kvm *kvm);
- 
-diff --git a/include/trace/events/kvm.h b/include/trace/events/kvm.h
-index 3bd31ea23fee..011fba6b5552 100644
---- a/include/trace/events/kvm.h
-+++ b/include/trace/events/kvm.h
-@@ -62,7 +62,7 @@ TRACE_EVENT(kvm_vcpu_wakeup,
- 		  __entry->valid ? "valid" : "invalid")
- );
- 
--#if defined(CONFIG_HAVE_KVM_IRQFD)
-+#if defined(CONFIG_HAVE_KVM_IRQCHIP)
- TRACE_EVENT(kvm_set_irq,
- 	TP_PROTO(unsigned int gsi, int level, int irq_source_id),
- 	TP_ARGS(gsi, level, irq_source_id),
-@@ -82,7 +82,7 @@ TRACE_EVENT(kvm_set_irq,
- 	TP_printk("gsi %u level %d source %d",
- 		  __entry->gsi, __entry->level, __entry->irq_source_id)
- );
--#endif /* defined(CONFIG_HAVE_KVM_IRQFD) */
-+#endif /* defined(CONFIG_HAVE_KVM_IRQCHIP) */
- 
- #if defined(__KVM_HAVE_IOAPIC)
- #define kvm_deliver_mode		\
-@@ -170,7 +170,7 @@ TRACE_EVENT(kvm_msi_set_irq,
- 
- #endif /* defined(__KVM_HAVE_IOAPIC) */
- 
--#if defined(CONFIG_HAVE_KVM_IRQFD)
-+#if defined(CONFIG_HAVE_KVM_IRQCHIP)
- 
- #ifdef kvm_irqchips
- #define kvm_ack_irq_string "irqchip %s pin %u"
-@@ -197,7 +197,7 @@ TRACE_EVENT(kvm_ack_irq,
- 	TP_printk(kvm_ack_irq_string, kvm_ack_irq_parm)
- );
- 
--#endif /* defined(CONFIG_HAVE_KVM_IRQFD) */
-+#endif /* defined(CONFIG_HAVE_KVM_IRQCHIP) */
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 7025b3751027..096d95a9d554 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -608,18 +608,6 @@ interrupt number dequeues the interrupt.
+ This is an asynchronous vcpu ioctl and can be invoked from any thread.
  
  
- 
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index 18b5a8fb491b..5cb3654b7fd8 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -11,9 +11,6 @@ config HAVE_KVM_PFNCACHE
- config HAVE_KVM_IRQCHIP
-        bool
- 
--config HAVE_KVM_IRQFD
--       bool
+-4.17 KVM_DEBUG_GUEST
+---------------------
 -
- config HAVE_KVM_IRQ_ROUTING
-        bool
+-:Capability: basic
+-:Architectures: none
+-:Type: vcpu ioctl
+-:Parameters: none)
+-:Returns: -1 on error
+-
+-Support for this has been removed.  Use KVM_SET_GUEST_DEBUG instead.
+-
+-
+ 4.18 KVM_GET_MSRS
+ -----------------
  
-diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-index 89912a17f5d5..19534156d48c 100644
---- a/virt/kvm/eventfd.c
-+++ b/virt/kvm/eventfd.c
-@@ -28,7 +28,7 @@
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 211b86de35ac..ebffc193a8bf 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -16,76 +16,6 @@
  
- #include <kvm/iodev.h>
+ #define KVM_API_VERSION 12
  
--#ifdef CONFIG_HAVE_KVM_IRQFD
-+#ifdef CONFIG_HAVE_KVM_IRQCHIP
- 
- static struct workqueue_struct *irqfd_cleanup_wq;
- 
-@@ -531,7 +531,7 @@ void kvm_unregister_irq_ack_notifier(struct kvm *kvm,
- void
- kvm_eventfd_init(struct kvm *kvm)
- {
--#ifdef CONFIG_HAVE_KVM_IRQFD
-+#ifdef CONFIG_HAVE_KVM_IRQCHIP
- 	spin_lock_init(&kvm->irqfds.lock);
- 	INIT_LIST_HEAD(&kvm->irqfds.items);
- 	INIT_LIST_HEAD(&kvm->irqfds.resampler_list);
-@@ -540,7 +540,7 @@ kvm_eventfd_init(struct kvm *kvm)
- 	INIT_LIST_HEAD(&kvm->ioeventfds);
- }
- 
--#ifdef CONFIG_HAVE_KVM_IRQFD
-+#ifdef CONFIG_HAVE_KVM_IRQCHIP
- /*
-  * shutdown any irqfd's that match fd+gsi
+-/* *** Deprecated interfaces *** */
+-
+-#define KVM_TRC_SHIFT           16
+-
+-#define KVM_TRC_ENTRYEXIT       (1 << KVM_TRC_SHIFT)
+-#define KVM_TRC_HANDLER         (1 << (KVM_TRC_SHIFT + 1))
+-
+-#define KVM_TRC_VMENTRY         (KVM_TRC_ENTRYEXIT + 0x01)
+-#define KVM_TRC_VMEXIT          (KVM_TRC_ENTRYEXIT + 0x02)
+-#define KVM_TRC_PAGE_FAULT      (KVM_TRC_HANDLER + 0x01)
+-
+-#define KVM_TRC_HEAD_SIZE       12
+-#define KVM_TRC_CYCLE_SIZE      8
+-#define KVM_TRC_EXTRA_MAX       7
+-
+-#define KVM_TRC_INJ_VIRQ         (KVM_TRC_HANDLER + 0x02)
+-#define KVM_TRC_REDELIVER_EVT    (KVM_TRC_HANDLER + 0x03)
+-#define KVM_TRC_PEND_INTR        (KVM_TRC_HANDLER + 0x04)
+-#define KVM_TRC_IO_READ          (KVM_TRC_HANDLER + 0x05)
+-#define KVM_TRC_IO_WRITE         (KVM_TRC_HANDLER + 0x06)
+-#define KVM_TRC_CR_READ          (KVM_TRC_HANDLER + 0x07)
+-#define KVM_TRC_CR_WRITE         (KVM_TRC_HANDLER + 0x08)
+-#define KVM_TRC_DR_READ          (KVM_TRC_HANDLER + 0x09)
+-#define KVM_TRC_DR_WRITE         (KVM_TRC_HANDLER + 0x0A)
+-#define KVM_TRC_MSR_READ         (KVM_TRC_HANDLER + 0x0B)
+-#define KVM_TRC_MSR_WRITE        (KVM_TRC_HANDLER + 0x0C)
+-#define KVM_TRC_CPUID            (KVM_TRC_HANDLER + 0x0D)
+-#define KVM_TRC_INTR             (KVM_TRC_HANDLER + 0x0E)
+-#define KVM_TRC_NMI              (KVM_TRC_HANDLER + 0x0F)
+-#define KVM_TRC_VMMCALL          (KVM_TRC_HANDLER + 0x10)
+-#define KVM_TRC_HLT              (KVM_TRC_HANDLER + 0x11)
+-#define KVM_TRC_CLTS             (KVM_TRC_HANDLER + 0x12)
+-#define KVM_TRC_LMSW             (KVM_TRC_HANDLER + 0x13)
+-#define KVM_TRC_APIC_ACCESS      (KVM_TRC_HANDLER + 0x14)
+-#define KVM_TRC_TDP_FAULT        (KVM_TRC_HANDLER + 0x15)
+-#define KVM_TRC_GTLB_WRITE       (KVM_TRC_HANDLER + 0x16)
+-#define KVM_TRC_STLB_WRITE       (KVM_TRC_HANDLER + 0x17)
+-#define KVM_TRC_STLB_INVAL       (KVM_TRC_HANDLER + 0x18)
+-#define KVM_TRC_PPC_INSTR        (KVM_TRC_HANDLER + 0x19)
+-
+-struct kvm_user_trace_setup {
+-	__u32 buf_size;
+-	__u32 buf_nr;
+-};
+-
+-#define __KVM_DEPRECATED_MAIN_W_0x06 \
+-	_IOW(KVMIO, 0x06, struct kvm_user_trace_setup)
+-#define __KVM_DEPRECATED_MAIN_0x07 _IO(KVMIO, 0x07)
+-#define __KVM_DEPRECATED_MAIN_0x08 _IO(KVMIO, 0x08)
+-
+-#define __KVM_DEPRECATED_VM_R_0x70 _IOR(KVMIO, 0x70, struct kvm_assigned_irq)
+-
+-struct kvm_breakpoint {
+-	__u32 enabled;
+-	__u32 padding;
+-	__u64 address;
+-};
+-
+-struct kvm_debug_guest {
+-	__u32 enabled;
+-	__u32 pad;
+-	struct kvm_breakpoint breakpoints[4];
+-	__u32 singlestep;
+-};
+-
+-#define __KVM_DEPRECATED_VCPU_W_0x87 _IOW(KVMIO, 0x87, struct kvm_debug_guest)
+-
+-/* *** End of deprecated interfaces *** */
+-
+-
+ /* for KVM_SET_USER_MEMORY_REGION */
+ struct kvm_userspace_memory_region {
+ 	__u32 slot;
+@@ -945,9 +875,6 @@ struct kvm_ppc_resize_hpt {
   */
+ #define KVM_GET_VCPU_MMAP_SIZE    _IO(KVMIO,   0x04) /* in bytes */
+ #define KVM_GET_SUPPORTED_CPUID   _IOWR(KVMIO, 0x05, struct kvm_cpuid2)
+-#define KVM_TRACE_ENABLE          __KVM_DEPRECATED_MAIN_W_0x06
+-#define KVM_TRACE_PAUSE           __KVM_DEPRECATED_MAIN_0x07
+-#define KVM_TRACE_DISABLE         __KVM_DEPRECATED_MAIN_0x08
+ #define KVM_GET_EMULATED_CPUID	  _IOWR(KVMIO, 0x09, struct kvm_cpuid2)
+ #define KVM_GET_MSR_FEATURE_INDEX_LIST    _IOWR(KVMIO, 0x0a, struct kvm_msr_list)
+ 
+@@ -1507,20 +1434,8 @@ struct kvm_s390_ucas_mapping {
+ 			_IOW(KVMIO,  0x67, struct kvm_coalesced_mmio_zone)
+ #define KVM_UNREGISTER_COALESCED_MMIO \
+ 			_IOW(KVMIO,  0x68, struct kvm_coalesced_mmio_zone)
+-#define KVM_ASSIGN_PCI_DEVICE     _IOR(KVMIO,  0x69, \
+-				       struct kvm_assigned_pci_dev)
+ #define KVM_SET_GSI_ROUTING       _IOW(KVMIO,  0x6a, struct kvm_irq_routing)
+-/* deprecated, replaced by KVM_ASSIGN_DEV_IRQ */
+-#define KVM_ASSIGN_IRQ            __KVM_DEPRECATED_VM_R_0x70
+-#define KVM_ASSIGN_DEV_IRQ        _IOW(KVMIO,  0x70, struct kvm_assigned_irq)
+ #define KVM_REINJECT_CONTROL      _IO(KVMIO,   0x71)
+-#define KVM_DEASSIGN_PCI_DEVICE   _IOW(KVMIO,  0x72, \
+-				       struct kvm_assigned_pci_dev)
+-#define KVM_ASSIGN_SET_MSIX_NR    _IOW(KVMIO,  0x73, \
+-				       struct kvm_assigned_msix_nr)
+-#define KVM_ASSIGN_SET_MSIX_ENTRY _IOW(KVMIO,  0x74, \
+-				       struct kvm_assigned_msix_entry)
+-#define KVM_DEASSIGN_DEV_IRQ      _IOW(KVMIO,  0x75, struct kvm_assigned_irq)
+ #define KVM_IRQFD                 _IOW(KVMIO,  0x76, struct kvm_irqfd)
+ #define KVM_CREATE_PIT2		  _IOW(KVMIO,  0x77, struct kvm_pit_config)
+ #define KVM_SET_BOOT_CPU_ID       _IO(KVMIO,   0x78)
+@@ -1537,9 +1452,6 @@ struct kvm_s390_ucas_mapping {
+ *  KVM_CAP_VM_TSC_CONTROL to set defaults for a VM */
+ #define KVM_SET_TSC_KHZ           _IO(KVMIO,  0xa2)
+ #define KVM_GET_TSC_KHZ           _IO(KVMIO,  0xa3)
+-/* Available with KVM_CAP_PCI_2_3 */
+-#define KVM_ASSIGN_SET_INTX_MASK  _IOW(KVMIO,  0xa4, \
+-				       struct kvm_assigned_pci_dev)
+ /* Available with KVM_CAP_SIGNAL_MSI */
+ #define KVM_SIGNAL_MSI            _IOW(KVMIO,  0xa5, struct kvm_msi)
+ /* Available with KVM_CAP_PPC_GET_SMMU_INFO */
+@@ -1592,8 +1504,6 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_SET_SREGS             _IOW(KVMIO,  0x84, struct kvm_sregs)
+ #define KVM_TRANSLATE             _IOWR(KVMIO, 0x85, struct kvm_translation)
+ #define KVM_INTERRUPT             _IOW(KVMIO,  0x86, struct kvm_interrupt)
+-/* KVM_DEBUG_GUEST is no longer supported, use KVM_SET_GUEST_DEBUG instead */
+-#define KVM_DEBUG_GUEST           __KVM_DEPRECATED_VCPU_W_0x87
+ #define KVM_GET_MSRS              _IOWR(KVMIO, 0x88, struct kvm_msrs)
+ #define KVM_SET_MSRS              _IOW(KVMIO,  0x89, struct kvm_msrs)
+ #define KVM_SET_CPUID             _IOW(KVMIO,  0x8a, struct kvm_cpuid)
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 486800a7024b..3bd98ff65945 100644
+index 3bd98ff65945..7ecf064673ec 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -1227,7 +1227,7 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
- 	if (r)
- 		goto out_err_no_disable;
- 
--#ifdef CONFIG_HAVE_KVM_IRQFD
-+#ifdef CONFIG_HAVE_KVM_IRQCHIP
- 	INIT_HLIST_HEAD(&kvm->irq_ack_notifier_list);
+@@ -5144,11 +5144,6 @@ static long kvm_dev_ioctl(struct file *filp,
+ 		r += PAGE_SIZE;    /* coalesced mmio ring page */
  #endif
- 
-@@ -4539,7 +4539,7 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- #ifdef CONFIG_HAVE_KVM_MSI
- 	case KVM_CAP_SIGNAL_MSI:
- #endif
--#ifdef CONFIG_HAVE_KVM_IRQFD
-+#ifdef CONFIG_HAVE_KVM_IRQCHIP
- 	case KVM_CAP_IRQFD:
- #endif
- 	case KVM_CAP_IOEVENTFD_ANY_LENGTH:
+ 		break;
+-	case KVM_TRACE_ENABLE:
+-	case KVM_TRACE_PAUSE:
+-	case KVM_TRACE_DISABLE:
+-		r = -EOPNOTSUPP;
+-		break;
+ 	default:
+ 		return kvm_arch_dev_ioctl(filp, ioctl, arg);
+ 	}
 -- 
 2.39.1
 
