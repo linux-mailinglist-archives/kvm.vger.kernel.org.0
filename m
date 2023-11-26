@@ -1,93 +1,118 @@
-Return-Path: <kvm+bounces-2459-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2461-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDA7D7F894A
-	for <lists+kvm@lfdr.de>; Sat, 25 Nov 2023 09:34:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AFB87F92EB
+	for <lists+kvm@lfdr.de>; Sun, 26 Nov 2023 14:59:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FD32B215C4
-	for <lists+kvm@lfdr.de>; Sat, 25 Nov 2023 08:34:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48BA61C209BA
+	for <lists+kvm@lfdr.de>; Sun, 26 Nov 2023 13:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEDD7C15D;
-	Sat, 25 Nov 2023 08:34:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA14D299;
+	Sun, 26 Nov 2023 13:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dEKqf8J9"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EjHqyitM"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6048E10F6
-	for <kvm@vger.kernel.org>; Sat, 25 Nov 2023 00:34:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700901245;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=37TsTYXqNHIurQZSI6nP6/rFe+8uy0S4I2sdRSNsCA0=;
-	b=dEKqf8J98lozGLkrP/CnBfMi83/qtD9qGrBwVEB9NP4kogEkKROXkSRUJ31T9r89T2P/4/
-	uzmwv7OtyWoQb5+yZgR2Frhmgl/MnCP72wiYKJr1nG06OAt+6FF0Jm6sMNtkVVTR8IsqLr
-	ZbIlh50dTka1vBN9P/MVAad8WAIvz9o=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-456-ekSR8i3BPkK372lj5BasCw-1; Sat, 25 Nov 2023 03:34:02 -0500
-X-MC-Unique: ekSR8i3BPkK372lj5BasCw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EAD6A82BA81;
-	Sat, 25 Nov 2023 08:34:01 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C8B081121306;
-	Sat, 25 Nov 2023 08:34:01 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: seanjc@google.com,
-	mlevitsk@redhat.com
-Subject: [PATCH v2 4/4] KVM: x86/mmu: fix comment about mmu_unsync_pages_lock
-Date: Sat, 25 Nov 2023 03:34:00 -0500
-Message-Id: <20231125083400.1399197-5-pbonzini@redhat.com>
-In-Reply-To: <20231125083400.1399197-1-pbonzini@redhat.com>
-References: <20231125083400.1399197-1-pbonzini@redhat.com>
+Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90B81FC
+	for <kvm@vger.kernel.org>; Sun, 26 Nov 2023 05:59:34 -0800 (PST)
+Received: by mail-ot1-x333.google.com with SMTP id 46e09a7af769-6d81580d696so638541a34.2
+        for <kvm@vger.kernel.org>; Sun, 26 Nov 2023 05:59:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1701007174; x=1701611974; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=R0tl1FznWRSZXjG/br/+doPbwrsA5NmyepPx25HwKuI=;
+        b=EjHqyitMGGbd7lgjZdAOSlAzCMNuBSPGgF8yYbWgiJtVa43qq760RJPquy/6kGIN3x
+         nWnFzxJ2hziOypHEcdNjhrK+xOEIUVuyQTslc4AHZBklhnJdkKqQG3rjOhEM+xdEWmcW
+         qkipo8rk2k9O3Vl769e8vBcran2YxpEtIs5nQGrAVem6B9u2NL2Rg54Kmik2kWaUI9wR
+         T/GQUHJWFTY12NnJ7bx+QfTsytEkDof9gQ18jLR7DJiXFgrHpojjhwsLU5uaoVSu2jB/
+         8oID7PGXAdXwE1ZNHT61PkyUIUrkj1H39uhBBe9s4Oe3wp4QseSvtvh/+wy3NzV1Z8xE
+         x+EQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701007174; x=1701611974;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=R0tl1FznWRSZXjG/br/+doPbwrsA5NmyepPx25HwKuI=;
+        b=pHRbkenGiQcAPpYmG9e2qeEUbQ0itMr+tGS5AwGV9RFxDE1vg3+KS5lx9KDxdWCiou
+         bZElGnA0imPVeKknLU+fkNLKbiJAMrjqb8+9UF1sSRHQ4pIACpkCiKjF4IToKMY4zcEK
+         HdGtQ7jSzWeYNNXB82gUhWbxp6lz1ymJc8SKs8SknDnQg7+g0XLs4vLadTJ0aDj3OvTQ
+         MAVH9le1mqNBg6zGBaec0jWct0XwPyHdDJT35eeFN5LxewxGjFN1gE59lXgxk/V60VmU
+         RF3P5cnpHH1uB27T3m06u64ApG5XG5Y5XywW5zCWW3tI47eaa3Iwxc6NSLhzFG6+pYm8
+         rtIw==
+X-Gm-Message-State: AOJu0YxiiWzrUNQY1M35O6eHXS/adnKK2Tn8QYby3JE1Em0U4+RmnMWE
+	pzB1BqTPu1fKGAcGCsYZM86zYw==
+X-Google-Smtp-Source: AGHT+IF7kW/awZBhcTnkmTfsTXsGwKE17/GAbOYH0WpjB8/6qRCu7XicdvDtLbhh0qKA5zhe9MhMag==
+X-Received: by 2002:a9d:7c86:0:b0:6c2:2bca:7a14 with SMTP id q6-20020a9d7c86000000b006c22bca7a14mr10801328otn.23.1701007173808;
+        Sun, 26 Nov 2023 05:59:33 -0800 (PST)
+Received: from [172.20.7.39] ([187.217.227.247])
+        by smtp.gmail.com with ESMTPSA id r8-20020a056830448800b006d3127234d7sm1058215otv.8.2023.11.26.05.59.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 26 Nov 2023 05:59:33 -0800 (PST)
+Message-ID: <c031bcb4-7b2b-4ca4-a25b-65e9c10430af@linaro.org>
+Date: Sun, 26 Nov 2023 07:59:30 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH-for-9.0 00/16] target/arm/kvm: Unify kvm_arm_FOO() API
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+References: <20231123183518.64569-1-philmd@linaro.org>
+Content-Language: en-US
+From: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20231123183518.64569-1-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+X-Spam-Level: *
 
-Fix the comment about what can and cannot happen when mmu_unsync_pages_lock
-is not help.  The comment correctly mentions "clearing sp->unsync", but then
-it talks about unsync going from 0 to 1.
+On 11/23/23 12:35, Philippe Mathieu-Daudé wrote:
+> Half of the API takes CPUState, the other ARMCPU...
+> 
+> $ git grep -F 'CPUState *' target/arm/kvm_arm.h | wc -l
+>        16
+> $ git grep -F 'ARMCPU *' target/arm/kvm_arm.h | wc -l
+>        14
+> 
+> Since this is ARM specific, have it always take ARMCPU, and
+> call the generic KVM API casting with the CPU() macro.
+> 
+> Based-on: <20231123044219.896776-1-richard.henderson@linaro.org>
+>    "target/arm: kvm cleanups"
+>    https://lore.kernel.org/qemu-devel/20231123044219.896776-1-richard.henderson@linaro.org/
+> 
+> Philippe Mathieu-Daudé (16):
+>    hw/intc/arm_gicv3: Include missing 'qemu/error-report.h' header
+>    target/arm/kvm: Remove unused includes
+>    target/arm/kvm: Have kvm_arm_add_vcpu_properties take a ARMCPU
+>      argument
+>    target/arm/kvm: Have kvm_arm_sve_set_vls take a ARMCPU argument
+>    target/arm/kvm: Have kvm_arm_sve_get_vls take a ARMCPU argument
+>    target/arm/kvm: Have kvm_arm_set_device_attr take a ARMCPU argument
+>    target/arm/kvm: Have kvm_arm_pvtime_init take a ARMCPU argument
+>    target/arm/kvm: Have kvm_arm_pmu_init take a ARMCPU argument
+>    target/arm/kvm: Have kvm_arm_pmu_set_irq take a ARMCPU argument
+>    target/arm/kvm: Have kvm_arm_vcpu_init take a ARMCPU argument
+>    target/arm/kvm: Have kvm_arm_vcpu_finalize take a ARMCPU argument
+>    target/arm/kvm: Have kvm_arm_[get|put]_virtual_time take ARMCPU
+>      argument
+>    target/arm/kvm: Have kvm_arm_verify_ext_dabt_pending take a ARMCPU arg
+>    target/arm/kvm: Have kvm_arm_handle_dabt_nisv take a ARMCPU argument
+>    target/arm/kvm: Have kvm_arm_handle_debug take a ARMCPU argument
+>    target/arm/kvm: Have kvm_arm_hw_debug_active take a ARMCPU argument
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/mmu/mmu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 1cb81573a60b..a71b8813febe 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2840,9 +2840,9 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
- 			/*
- 			 * Recheck after taking the spinlock, a different vCPU
- 			 * may have since marked the page unsync.  A false
--			 * positive on the unprotected check above is not
-+			 * negative on the unprotected check above is not
- 			 * possible as clearing sp->unsync _must_ hold mmu_lock
--			 * for write, i.e. unsync cannot transition from 0->1
-+			 * for write, i.e. unsync cannot transition from 1->0
- 			 * while this CPU holds mmu_lock for read (or write).
- 			 */
- 			if (READ_ONCE(sp->unsync))
--- 
-2.39.1
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
+
+r~
 
