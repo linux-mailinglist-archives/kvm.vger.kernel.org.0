@@ -1,137 +1,151 @@
-Return-Path: <kvm+bounces-2483-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2484-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 591077F9867
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 05:36:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23FF57F99E0
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 07:34:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E443BB20B57
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 04:36:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D45E6280F08
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 06:34:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D3E21879;
-	Mon, 27 Nov 2023 04:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E3FD291;
+	Mon, 27 Nov 2023 06:34:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YDgo6p9X"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K7drhoiJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E403A111
-	for <kvm@vger.kernel.org>; Sun, 26 Nov 2023 20:36:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701059786;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uB8RtCVtSAfV4uboXXib4r70O1crEDrMolu/UkoV8Y0=;
-	b=YDgo6p9XSS/vuPrtqeL4A0KCBwiN8hI9ABjdAgBwTpZ8SmLOUVQgFMQhoR972mkzOOI/N1
-	Bxt0LxoDeOfb/Xpw6cpshZmern/E1SuziPYZjPh0gIZXICrRZUBYT5IVghwS+htVFBE5ly
-	go7OuEU88+wga7vThTOCq3t1S6X05PY=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-609-zbgyYZH1P7KTuxXCRxwCbQ-1; Sun, 26 Nov 2023 23:36:24 -0500
-X-MC-Unique: zbgyYZH1P7KTuxXCRxwCbQ-1
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-6d646f61253so4625500a34.0
-        for <kvm@vger.kernel.org>; Sun, 26 Nov 2023 20:36:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701059784; x=1701664584;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uB8RtCVtSAfV4uboXXib4r70O1crEDrMolu/UkoV8Y0=;
-        b=X0u7MUQlV65iYgOQXO50IqCPJznH1PA3XrA2+f1hMtZac4VXirCp76js0k84maZU3F
-         p1FG//Q+65syz91hp1B2wymPNERTWDlSm8OklTG4nyNokfLlOE3IgJVH01UcFMqGeR/v
-         29J296S50RbCf8r+PPkQqNiJfkDiDlCMjlUCJNol4v2P33v61G2W2aX3CM9BElsEPWKo
-         qVjg30NoF1ukgSFTxnXfjjO0HcmXRZTm06Sqwl8R5aosAS9Z0qfMHNGyfdeF7R9NzwP3
-         7KtvIkL2vjGfxUris3w5BryNXegqNxa4K9taCFvWu9xjR/rIQE3lwo8Dz6tdaqbDFpua
-         /5HQ==
-X-Gm-Message-State: AOJu0YxnL3Hw1T2w9ew6aeqRp+WmsrBmWetiL/RkdIeC2XKx/0kKcNul
-	dlMn9bWcM/iq+rdEDcj4nt0yjEXH0RQWx/gxqbpLGyJuE5LMXIpNo+zf0BaMqTXaDdQMAfkOtc7
-	5GgL3S9X1GLDl
-X-Received: by 2002:a05:6870:ea08:b0:1fa:1efd:f65e with SMTP id g8-20020a056870ea0800b001fa1efdf65emr9308578oap.21.1701059784159;
-        Sun, 26 Nov 2023 20:36:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHS3kztNt48niItFPhRKBja756oNavjoZfrYv85qD4BdhzRiKHQ1nqW8EJ9HSaJNJ1pWad57w==
-X-Received: by 2002:a05:6870:ea08:b0:1fa:1efd:f65e with SMTP id g8-20020a056870ea0800b001fa1efdf65emr9308568oap.21.1701059783938;
-        Sun, 26 Nov 2023 20:36:23 -0800 (PST)
-Received: from [192.168.68.51] ([43.252.115.3])
-        by smtp.gmail.com with ESMTPSA id j25-20020a62e919000000b006930db1e6cfsm6334347pfh.62.2023.11.26.20.36.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Nov 2023 20:36:23 -0800 (PST)
-Message-ID: <9c1cb48a-9de0-45ed-80e3-2ea4d4d5bff3@redhat.com>
-Date: Mon, 27 Nov 2023 15:36:19 +1100
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E76C93;
+	Sun, 26 Nov 2023 22:34:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701066871; x=1732602871;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8V+xYNV0cvL7zGYJZTO/m6MOhpbNHj0iVzK6EBYh80Q=;
+  b=K7drhoiJf/htiubRmBicvkGBzdo3J/BfpcvT7+jtQjVbD+PRPzHfZUUd
+   IZJWGBKavfV7oJG30wrVVKtWEpMija2uVxB7LdDwQpz2h24Y/XCaIArQ1
+   CQ0O8ZaURMJe4ZXXUbOdJppS/8HEuFjU86qt5MrF7ZHFr71EUJUnSwhnV
+   PeuNlfktfDEybMfUDas4WbH81DnspB4SfgJzhhgHVzvRIdwlh6I5EwnyV
+   4fDAfSE7GeE+qpJ4PpKzP4u68P5SwReFKu0j8U6cWUl+whsMEQayKKuwX
+   iBF4Xlcw0J0Gbv+FHTV0Mnixyc+z7DbVN5pPEo+9gJsY34SxB7QfagDjx
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10906"; a="391518119"
+X-IronPort-AV: E=Sophos;i="6.04,230,1695711600"; 
+   d="scan'208";a="391518119"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2023 22:34:30 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10906"; a="838608923"
+X-IronPort-AV: E=Sophos;i="6.04,230,1695711600"; 
+   d="scan'208";a="838608923"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by fmsmga004.fm.intel.com with ESMTP; 26 Nov 2023 22:34:29 -0800
+From: Yi Liu <yi.l.liu@intel.com>
+To: joro@8bytes.org,
+	alex.williamson@redhat.com,
+	jgg@nvidia.com,
+	kevin.tian@intel.com,
+	robin.murphy@arm.com,
+	baolu.lu@linux.intel.com
+Cc: cohuck@redhat.com,
+	eric.auger@redhat.com,
+	nicolinc@nvidia.com,
+	kvm@vger.kernel.org,
+	mjrosato@linux.ibm.com,
+	chao.p.peng@linux.intel.com,
+	yi.l.liu@intel.com,
+	yi.y.sun@linux.intel.com,
+	peterx@redhat.com,
+	jasowang@redhat.com,
+	shameerali.kolothum.thodi@huawei.com,
+	lulu@redhat.com,
+	suravee.suthikulpanit@amd.com,
+	iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	zhenzhong.duan@intel.com,
+	joao.m.martins@oracle.com,
+	xin.zeng@intel.com,
+	yan.y.zhao@intel.com
+Subject: [PATCH 0/8] iommufd support pasid attach/replace
+Date: Sun, 26 Nov 2023 22:34:20 -0800
+Message-Id: <20231127063428.127436-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH-for-9.0 16/16] target/arm/kvm: Have
- kvm_arm_hw_debug_active take a ARMCPU argument
-Content-Language: en-US
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-References: <20231123183518.64569-1-philmd@linaro.org>
- <20231123183518.64569-17-philmd@linaro.org>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20231123183518.64569-17-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Phil,
+PASID (Process Address Space ID) is a PCIe extension to tag the DMA
+transactions out of a physical device, and most modern IOMMU hardware
+have supported PASID granular address translation. So a PASID-capable
+device can be attached to multiple hwpts (a.k.a. domains), each attachment
+is tagged with a pasid.
 
-On 11/24/23 05:35, Philippe Mathieu-Daudé wrote:
-> Unify the "kvm_arm.h" API: All functions related to ARM vCPUs
-> take a ARMCPU* argument. Use the CPU() QOM cast macro When
-> calling the generic vCPU API from "sysemu/kvm.h".
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> ---
->   target/arm/kvm.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
-> 
+This series first adds a missing iommu API to replace domain for a pasid,
+then adds iommufd APIs for device drivers to attach/replace/detach pasid
+to/from hwpt per userspace's request, and adds selftest to validate the
+iommufd APIs.
 
-With the following comments addressed:
+pasid attach/replace is mandatory on Intel VT-d given the PASID table
+locates in the physical address space hence must be managed by the kernel,
+both for supporting vSVA and coming SIOV. But it's optional on ARM/AMD
+which allow configuring the PASID/CD table either in host physical address
+space or nested on top of an GPA address space. This series only add VT-d
+support as the minimal requirement.
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+Complete code can be found in below link:
 
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index 1f6da5529f..cbfea689cc 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -1455,11 +1455,11 @@ int kvm_arch_process_async_events(CPUState *cs)
->   
->   /**
->    * kvm_arm_hw_debug_active:
-> - * @cs: CPU State
-> + * @cpu: ARMCPU
->    *
->    * Return: TRUE if any hardware breakpoints in use.
->    */
-> -static bool kvm_arm_hw_debug_active(CPUState *cs)
-> +static bool kvm_arm_hw_debug_active(ARMCPU *cpu)
->   {
->       return ((cur_hw_wps > 0) || (cur_hw_bps > 0));
->   }
+https://github.com/yiliu1765/iommufd/tree/iommufd_pasid
 
-Either @cs or @cpu isn't dereferenced in kvm_arm_hw_debug_active(). So I guess
-the argument can be simply droped?
+Change log:
 
-> @@ -1493,7 +1493,7 @@ void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debug *dbg)
->       if (kvm_sw_breakpoints_active(cs)) {
->           dbg->control |= KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_BP;
->       }
-> -    if (kvm_arm_hw_debug_active(cs)) {
-> +    if (kvm_arm_hw_debug_active(ARM_CPU(cs))) {
->           dbg->control |= KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_HW;
->           kvm_arm_copy_hw_debug_data(&dbg->arch);
->       }
+v1:
+ - Implemnet iommu_replace_device_pasid() to fall back to the original domain
+   if this replacement failed (Kevin)
+ - Add check in do_attach() to check corressponding attach_fn per the pasid value.
 
-Thanks,
-Gavin
+rfc: https://lore.kernel.org/linux-iommu/20230926092651.17041-1-yi.l.liu@intel.com/
+
+Regards,
+	Yi Liu
+
+Kevin Tian (1):
+  iommufd: Support attach/replace hwpt per pasid
+
+Lu Baolu (2):
+  iommu: Introduce a replace API for device pasid
+  iommu/vt-d: Add set_dev_pasid callback for nested domain
+
+Yi Liu (5):
+  iommufd: replace attach_fn with a structure
+  iommufd/selftest: Add set_dev_pasid and remove_dev_pasid in mock iommu
+  iommufd/selftest: Add a helper to get test device
+  iommufd/selftest: Add test ops to test pasid attach/detach
+  iommufd/selftest: Add coverage for iommufd pasid attach/detach
+
+ drivers/iommu/intel/nested.c                  |  47 +++++
+ drivers/iommu/iommu-priv.h                    |   2 +
+ drivers/iommu/iommu.c                         |  82 ++++++--
+ drivers/iommu/iommufd/Makefile                |   1 +
+ drivers/iommu/iommufd/device.c                |  50 +++--
+ drivers/iommu/iommufd/iommufd_private.h       |  23 +++
+ drivers/iommu/iommufd/iommufd_test.h          |  24 +++
+ drivers/iommu/iommufd/pasid.c                 | 138 ++++++++++++++
+ drivers/iommu/iommufd/selftest.c              | 176 ++++++++++++++++--
+ include/linux/iommufd.h                       |   6 +
+ tools/testing/selftests/iommu/iommufd.c       | 172 +++++++++++++++++
+ .../selftests/iommu/iommufd_fail_nth.c        |  28 ++-
+ tools/testing/selftests/iommu/iommufd_utils.h |  78 ++++++++
+ 13 files changed, 785 insertions(+), 42 deletions(-)
+ create mode 100644 drivers/iommu/iommufd/pasid.c
+
+-- 
+2.34.1
 
 
