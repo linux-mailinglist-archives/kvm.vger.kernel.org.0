@@ -1,282 +1,236 @@
-Return-Path: <kvm+bounces-2463-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2464-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E58A57F9745
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 02:44:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97CFE7F97B8
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 03:56:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 60975B20A50
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 01:44:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CC58280E90
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 02:56:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C3110FC;
-	Mon, 27 Nov 2023 01:44:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B04E23D1;
+	Mon, 27 Nov 2023 02:56:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NnIdgsQM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 05481CB;
-	Sun, 26 Nov 2023 17:44:15 -0800 (PST)
-Received: from loongson.cn (unknown [10.2.5.213])
-	by gateway (Coremail) with SMTP id _____8AxJuhs9GNlYPg8AA--.62322S3;
-	Mon, 27 Nov 2023 09:44:12 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.213])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Bxrdxq9GNlHlJNAA--.39309S2;
-	Mon, 27 Nov 2023 09:44:10 +0800 (CST)
-From: Bibo Mao <maobibo@loongson.cn>
-To: Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Huacai Chen <chenhuacai@kernel.org>
-Cc: WANG Xuerui <kernel@xen0n.name>,
-	kvm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] LoongArch: KVM: Optimization for memslot hugepage checking
-Date: Mon, 27 Nov 2023 09:44:10 +0800
-Message-Id: <20231127014410.4122997-1-maobibo@loongson.cn>
-X-Mailer: git-send-email 2.39.3
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F15D2111;
+	Sun, 26 Nov 2023 18:56:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701053762; x=1732589762;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=JFdamgichXSDOfaX0vpTlILFyIMKRiEIqXC7eh40eVM=;
+  b=NnIdgsQMFlCNJjwbadLsS+vFfGEzNQav9UVZzCS9GzV2cMGqZcyvFZP3
+   SO33wiUzt6eSmQjBDEFydSK9wyP8OwBav8zPfMLjEQqobE16tfJDWP8+/
+   TkxnI5j7dh6S8nAqU9C7SDBIz94EqjFQX+Wwgf//DRTFhyVPHTCwynUxi
+   JfEOD8M9vo1QZTV2mcn6ijk7uuSCgwUEm91weKNWI1FvGjjxk+Mhy1mNH
+   XFinNSXaQhXo3NzzQw+7o4NbvKd7+XEIM1eHLbxc//up9819U8aBAKbuB
+   dI0i7tlT8QvH8VzjzdKoYfKzplB5bpGT1X6rCPtgZ7Ilc4M6wTMLirx8y
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10906"; a="11326672"
+X-IronPort-AV: E=Sophos;i="6.04,229,1695711600"; 
+   d="scan'208";a="11326672"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2023 18:56:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,229,1695711600"; 
+   d="scan'208";a="9654240"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Nov 2023 18:56:01 -0800
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Sun, 26 Nov 2023 18:56:00 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Sun, 26 Nov 2023 18:56:00 -0800
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Sun, 26 Nov 2023 18:56:00 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jHB0AYbpydG7HAg3OUyhwTDdynwOP8rCOLOAf7jOZhuCdeEnt8ZayE0hplIOGe+1hzQRzei9bnLyXwv/+wQu1h2islWt7zjUvy3ew3oJ2gN88y4gXNN5qs8jFXedRLrtTUEQSrOMxrNfZyPSZPHCUfgx/cxyEB2NOlEOptI+g5BhI8J3oB7vtWYqwjShgoobNWo+NeT7I4sSVSJL4qAfBvwxvYwwVR/YD6ucvZfwRAz9/vEe7muqeA24tM2t/nFL6OehK5XHC0CohqReYC6mPk0TwfRtoX8oPfQFQ6oGi8pUde9FOx+hHLaYIf39JBRpjAgJ3ZTt6H4Qaqugtcfrcw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=F4zbvuNLp8O4e456synaPXqTJvyYdu27RmR7NFt7nI8=;
+ b=jHaMASO7owoQruDeSjjoHTSBZJsD3l3WF2mbF9lOXjuhBsCDKxQ9aaBYNRbP11nTm9nAIBpo4XWNHyGNIbpw4UTH9EvwzEOTKttOO33+moVcMJduQmP7wmNp0p+5DAPsLcysNVfWy3zjIWd9LMvweCiYH1u1inHLaY1d4D+hK5ZZW+/ND//DBgscz/slIwZWjUPqHT/jyKK2ma64hokKUu1f1RBaXd8gMpEmHmK/wqlm5R+ppFn7xveQ+XH+6n+XwNb5JYFVYBnWEDNg4xomyCJfR9W8UKZDyVcssThJH9GLBzZ47NRxL6fThmDJA2tCOr9E8KkH73AUmq5B0aE0Dw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SA2PR11MB4972.namprd11.prod.outlook.com (2603:10b6:806:fb::21)
+ by DM4PR11MB6142.namprd11.prod.outlook.com (2603:10b6:8:b2::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.27; Mon, 27 Nov
+ 2023 02:55:58 +0000
+Received: from SA2PR11MB4972.namprd11.prod.outlook.com
+ ([fe80::5a42:f2a5:98f7:7be4]) by SA2PR11MB4972.namprd11.prod.outlook.com
+ ([fe80::5a42:f2a5:98f7:7be4%3]) with mapi id 15.20.7025.022; Mon, 27 Nov 2023
+ 02:55:58 +0000
+Message-ID: <18f95549-8971-4b03-8569-61d9b1763364@intel.com>
+Date: Mon, 27 Nov 2023 10:55:48 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 02/26] x86/fpu/xstate: Refine CET user xstate bit
+ enabling
+To: Peter Zijlstra <peterz@infradead.org>
+CC: <seanjc@google.com>, <pbonzini@redhat.com>, <dave.hansen@intel.com>,
+	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <chao.gao@intel.com>,
+	<rick.p.edgecombe@intel.com>, <mlevitsk@redhat.com>, <john.allen@amd.com>
+References: <20231124055330.138870-1-weijiang.yang@intel.com>
+ <20231124055330.138870-3-weijiang.yang@intel.com>
+ <20231124094029.GK3818@noisy.programming.kicks-ass.net>
+Content-Language: en-US
+From: "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <20231124094029.GK3818@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SGBP274CA0007.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b0::19)
+ To SA2PR11MB4972.namprd11.prod.outlook.com (2603:10b6:806:fb::21)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Bxrdxq9GNlHlJNAA--.39309S2
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW3WFW5tF1Dtw47WFyrJr18WFX_yoW3Gr4UpF
-	43ArsxCrW5Jr13ursrtw1Duw15Aws5Gw17Ga47t34FvFn0yr15Ja1kA3y8Jry5JrW8ZFW2
-	qFWYyF4UW3yUt3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
-	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AK
-	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64
-	vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jUsqXUUUUU=
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PR11MB4972:EE_|DM4PR11MB6142:EE_
+X-MS-Office365-Filtering-Correlation-Id: 46ee3fec-8d6d-4a9f-4ded-08dbeef461ce
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /6lLMl0yzlq8JcdMl89rpGDGcrVBJ+VTHFq7TUqLn7yRijI0eojEe+cXn37j5P6SVD+qwxHAhgca8Wn27Fw3Q8DvUAF6JgDCBOnniVtslB0IBWgy5W+ObB4Gp72WT/cL8jXlgw+nwQjL+Q9OQ5qjds/nbHHeCURj42+NDqwtbQa9dXYlMcuwY9hdHWdfg6Dob/U/9PPTCsdSaDpgA6VfOdxq7ujeCVZ2dJR1Dn8csyG9bVIprllVluwAIinQpW7C+bpTzC07S4d0DOCvNRGi8OTvI6SGW2QiFpxeSMGid+zf6fdS76PsIGc/00Cnu301Blf0jRPQIk0L0U7BJl7LVYMi6+m18snQh7ez2Q8FLlnCTzCcMyM8Cof8yedHLu8IvzF/dqByWCVNtbj5XYx5A+2LdVmsIOTE7jcQpr3pbmgjBZmBxInWhK0jlRUmaT7UgHvjamcF62snhOXVEf9IdmAAGlyI2G23pXG7uasw9klaIHXatroF1JV7yWgOkvQHoQvw1KDyUC0vxzQ7g1qG3u96B52eu/P4FQpypWqiHv2nar+daXp6TS9T/+K+vsMfdVQn5KS4NHh+JuOPvENTVgW8l3+3i7K4gZQ5g4uNej6Uoy6U+Gv7iHc/69ZSQUuyhjTaraFe/GFMYFcr8nJV3A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA2PR11MB4972.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(376002)(366004)(136003)(346002)(230922051799003)(1800799012)(64100799003)(186009)(451199024)(38100700002)(36756003)(41300700001)(31686004)(2906002)(83380400001)(82960400001)(5660300002)(26005)(86362001)(2616005)(6506007)(53546011)(4326008)(8676002)(8936002)(6666004)(31696002)(6512007)(6486002)(478600001)(66476007)(66946007)(66556008)(316002)(6916009)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YnIwUGlablV6OXh2bExvYVZyVk1ib1JFaFNydUNQcjdVeDNYZjMvZXROaUZl?=
+ =?utf-8?B?Smt0bmdHVDkzM1RHbi9hZG5SNk9Vd2h0WkloVmJYcnBTOXJubGZ1NjlDSWxj?=
+ =?utf-8?B?ckM1d2VSZG94cEZ6TTVDcnBOQklJRUxaclVHRVlvVkNRaTl6SitIY2J1SDRM?=
+ =?utf-8?B?K3owRlpnbGt6T3orTE1aZkxYSllXb2cvQjhDU05OSW5qL29OSHNwek80SGdU?=
+ =?utf-8?B?QWtsYVpRSytWZnE4VFRYYXNqSE82dWo3VStFRGxTQitWZEZkZjRSL3BUWVdx?=
+ =?utf-8?B?YVEwV0NYQ3htWnpHb1JUcGYvdEUvSkdUbzVKa3NBcFRYOGlubkdQWVJXSk9S?=
+ =?utf-8?B?REFKZFMxVmZYWnBZN1FQK2xQUVEwWDNiZWwwdU0rR3NNVGNGbHZDN2htclVL?=
+ =?utf-8?B?M3Y1RllKcVZzWk9qOFZKcFFRbEJoMi9kbnBQODZFbXUxVENzdkN4QnJHNERL?=
+ =?utf-8?B?Tll6Q0xtem9iZFFoTFBaQUN0VkxNbVdyMDllbklWRk5wTTRmZ3RhYUtiR0pU?=
+ =?utf-8?B?SXRSVS9EaHdwM2pMT1FNK1lrcnpWOUcvNU9keGRhTEVwTW50SmIvN0FQcjYx?=
+ =?utf-8?B?eStrUVVtRDU5MUh6ZnhnWWNkeExFaUZveWFrbW1rZ1JmMHVlQ1U2amdQODgx?=
+ =?utf-8?B?MzRQZlc3V0NiSXVmWDNPd2JGTDNRKzJFVGx4V3dpT2dsTkFFTUl6bXRHTGJy?=
+ =?utf-8?B?RWM1R0pGRkdiUVpsdjl0UDBRRVEzc1NJMURDVEI1V25ydGwyRVdwVk93eExS?=
+ =?utf-8?B?TGFpa3RsVXl5TzRCRDJsZzhqMVVFaXhzdHR1V21YZlhlcks4ZjVyY0JCNUxt?=
+ =?utf-8?B?STl0ZDgrdEZBcktqUzAwTU5yU09obnFQSVlsUGN0aFFucXZBM084TkpzRUk2?=
+ =?utf-8?B?U05PdkpGcWZiV1NZZmhJcnNkaGd0eEJWaWxDY3UyNGZCUFdoalEzUDdaS2JK?=
+ =?utf-8?B?Kys1Q29yaGEzV1JZR1FhU1pJd0VmM09TYmRFV3dDaGJwd1VicGUyNVEwc3Iw?=
+ =?utf-8?B?VnpUeDhqS2pMWTBzWVlUZVdnV0J3aU5ndXp0dFNMQk1QYkIzYWdCSHJlbnp5?=
+ =?utf-8?B?NXVqMUI1YjlhWStUSVpGV0wwaTEyVW91ZlhBclFWM3d4WDVlY3NSeFUwV2ZV?=
+ =?utf-8?B?UzlGQlBvWHBwcnNnQmprTjdDb2lIVWx3TDcrQm5Sc3N3cHoxeGtxaGRzOXdn?=
+ =?utf-8?B?Vy8zMW40WTJESFZTTlg0cXJLRDVtM0xUWWt3ckRoK2FNdDZDYWhqaThQWjhi?=
+ =?utf-8?B?cGVZTUV0cG54UWNyeGhIWWV3RTF3cFZzajRBSGxnYjJOU0IzNzY5VGZLNk14?=
+ =?utf-8?B?YTdTUVY5ajZJZ0lJZGk5V2docW03aUtHOWpMbklRK3lMaE5XNTh3OGpDd2FQ?=
+ =?utf-8?B?ZGZIeDRrSUxLRE9wajVtWFhYbEYyOFU0clFnQVpXaVpSN2U5U0plV0ZpVGI0?=
+ =?utf-8?B?QTVsa1hCc0JZbGk5WEY1OFFDM0V3L3lqWHY4ck4rMGtPV1JRakZzMjBWUjVz?=
+ =?utf-8?B?dHdrNCtDT0pWMG9SSXF6blpjV21kS1RkWmZiWnJEVDdrSm1OM0laMzhXK1Vk?=
+ =?utf-8?B?S0pLckFqeHB2UnBzUTRsTU9SOU9DMThMeGI0WWZ3ZkZGanRia0NXSTk5VmI5?=
+ =?utf-8?B?Sk1GMTdZMHUxNEZoZU1ZOTkrYlBDaTlUV2t6NmYxM0F5ZDZFUEtFbVZ3ekFY?=
+ =?utf-8?B?d0QxMTVjLy9qeFJyam1UZTI3Nk54RUNSUjY0b3ZNOFd1Mm14NlBNQlM4WUF5?=
+ =?utf-8?B?VWd0TDdpNHcrajRsTERqYkhROGNCa2VvN01SaFJ3T01BZFR3eFRLTGZBazBG?=
+ =?utf-8?B?N05XS1UzdUd0QjI1Yndod1RrRVdKbmdwdS9GNkYxaWlyaDVZS0R0eGNtT1F2?=
+ =?utf-8?B?NFk0RjJUVnBiYzlsOGFYako1Q2R0aGRzcndHbFdMYUpIOUxlME5HTFRrOGFT?=
+ =?utf-8?B?ZDY2ZTFGcitkNWxMbHhjQm0xMlZEcjR2dXJ1SjVqS0Fpb01CaE5QTWh3UVFI?=
+ =?utf-8?B?L0dLUzhrYTdwQUtCMHFaUm5CdTZXdERJS0IxNFFNcHVWREJGOTdKOG9JVnVQ?=
+ =?utf-8?B?RDNsSzJLbm5CVytkVUFpd0pzQnJZVTY0K0pvdzNNd0VjYTJneVFlRGdKUkJG?=
+ =?utf-8?B?Q3VyUFc1MldPQ3FiWjZEeWRLNU1Vd0k5QWp3bjVRbWt6a1NCSXRQclFIbmIv?=
+ =?utf-8?B?TUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 46ee3fec-8d6d-4a9f-4ded-08dbeef461ce
+X-MS-Exchange-CrossTenant-AuthSource: SA2PR11MB4972.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2023 02:55:58.6217
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Rw+eJ+wWltp2LdnU3jsJaDxYJIGXIQ9V8yHJlHB0KRtQuNYY8fkxsfk7UEg/Zns+15mSxK9nADndEQOYtx95vw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6142
+X-OriginatorOrg: intel.com
 
-During shadow mmu page fault, there is checking for huge page for
-specified memslot. Page fault is hot path, check logic can be done
-when memslot is created. Here two flags are added for huge page
-checking, KVM_MEM_HUGEPAGE_CAPABLE and KVM_MEM_HUGEPAGE_INCAPABLE.
-Instead for optimization qemu, memslot for dram is always huge page
-aligned. The flag is firstly checked during hot page fault path.
+On 11/24/2023 5:40 PM, Peter Zijlstra wrote:
+> On Fri, Nov 24, 2023 at 12:53:06AM -0500, Yang Weijiang wrote:
+>> Remove XFEATURE_CET_USER entry from dependency array as the entry doesn't
+>> reflect true dependency between CET features and the user xstate bit.
+>> Enable the bit in fpu_kernel_cfg.max_features when either SHSTK or IBT is
+>> available.
+>>
+>> Both user mode shadow stack and indirect branch tracking features depend
+>> on XFEATURE_CET_USER bit in XSS to automatically save/restore user mode
+>> xstate registers, i.e., IA32_U_CET and IA32_PL3_SSP whenever necessary.
+>>
+>> Note, the issue, i.e., CPUID only enumerates IBT but no SHSTK is resulted
+>> from CET KVM series which synthesizes guest CPUIDs based on userspace
+>> settings,in real world the case is rare. In other words, the exitings
+>> dependency check is correct when only user mode SHSTK is available.
+>>
+>> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+>> Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+>> Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+>> ---
+>>   arch/x86/kernel/fpu/xstate.c | 9 ++++++++-
+>>   1 file changed, 8 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+>> index 73f6bc00d178..6e50a4251e2b 100644
+>> --- a/arch/x86/kernel/fpu/xstate.c
+>> +++ b/arch/x86/kernel/fpu/xstate.c
+>> @@ -73,7 +73,6 @@ static unsigned short xsave_cpuid_features[] __initdata = {
+>>   	[XFEATURE_PT_UNIMPLEMENTED_SO_FAR]	= X86_FEATURE_INTEL_PT,
+>>   	[XFEATURE_PKRU]				= X86_FEATURE_OSPKE,
+>>   	[XFEATURE_PASID]			= X86_FEATURE_ENQCMD,
+>> -	[XFEATURE_CET_USER]			= X86_FEATURE_SHSTK,
+>>   	[XFEATURE_XTILE_CFG]			= X86_FEATURE_AMX_TILE,
+>>   	[XFEATURE_XTILE_DATA]			= X86_FEATURE_AMX_TILE,
+>>   };
+>> @@ -798,6 +797,14 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
+>>   			fpu_kernel_cfg.max_features &= ~BIT_ULL(i);
+>>   	}
+>>   
+>> +	/*
+>> +	 * CET user mode xstate bit has been cleared by above sanity check.
+>> +	 * Now pick it up if either SHSTK or IBT is available. Either feature
+>> +	 * depends on the xstate bit to save/restore user mode states.
+>> +	 */
+>> +	if (boot_cpu_has(X86_FEATURE_SHSTK) || boot_cpu_has(X86_FEATURE_IBT))
+>> +		fpu_kernel_cfg.max_features |= BIT_ULL(XFEATURE_CET_USER);
+> So booting a host with "ibt=off" will clear the FEATURE_IBT, this was
+> fine before this patch-set, but possibly not with.
+>
+> That kernel argument really only wants to tell the kernel not to use IBT
+> itself, but not inhibit IBT from being used by guests.
 
-Now only huge page flag is supported, there is a long way for super
-page support in LoongArch system. Since super page size is 64G for
-16K pagesize and 1G for 4K pagesize, 64G physical address is rarely
-used and LoongArch kernel needs support super page for 4K. Also memory
-layout of LoongArch qemu VM should be 1G aligned.
+Thanks for pointing this out!
+If ibt=off actually causes XFEATURE_CET_USER unset in fpu_kernel_cfg.max_features, in KVM part (patch 24), we already have below check to disable SHSTK/IBT in this cases, so looks like it won't bring issues.
 
-Signed-off-by: Bibo Mao <maobibo@loongson.cn>
----
- arch/loongarch/include/asm/kvm_host.h |   3 +
- arch/loongarch/kvm/mmu.c              | 127 +++++++++++++++++---------
- 2 files changed, 89 insertions(+), 41 deletions(-)
++if ((kvm_caps.supported_xss & (XFEATURE_MASK_CET_USER |
 
-diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
-index 11328700d4fa..0e89db020481 100644
---- a/arch/loongarch/include/asm/kvm_host.h
-+++ b/arch/loongarch/include/asm/kvm_host.h
-@@ -45,7 +45,10 @@ struct kvm_vcpu_stat {
- 	u64 signal_exits;
- };
- 
-+#define KVM_MEM_HUGEPAGE_CAPABLE	(1UL << 0)
-+#define KVM_MEM_HUGEPAGE_INCAPABLE	(1UL << 1)
- struct kvm_arch_memory_slot {
-+	unsigned long flags;
- };
- 
- struct kvm_context {
-diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
-index 80480df5f550..6845733f37dc 100644
---- a/arch/loongarch/kvm/mmu.c
-+++ b/arch/loongarch/kvm/mmu.c
-@@ -13,6 +13,16 @@
- #include <asm/tlb.h>
- #include <asm/kvm_mmu.h>
- 
-+static inline bool kvm_hugepage_capable(struct kvm_memory_slot *slot)
-+{
-+	return slot->arch.flags & KVM_MEM_HUGEPAGE_CAPABLE;
++XFEATURE_MASK_CET_KERNEL)) !=
+
++(XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL)) {
+
++kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
+
++kvm_cpu_cap_clear(X86_FEATURE_IBT);
+
++kvm_caps.supported_xss &= ~XFEATURE_CET_USER;
+
++kvm_caps.supported_xss &= ~XFEATURE_CET_KERNEL;
+
 +}
+
 +
-+static inline bool kvm_hugepage_incapable(struct kvm_memory_slot *slot)
-+{
-+	return slot->arch.flags & KVM_MEM_HUGEPAGE_INCAPABLE;
-+}
-+
- static inline void kvm_ptw_prepare(struct kvm *kvm, kvm_ptw_ctx *ctx)
- {
- 	ctx->level = kvm->arch.root_level;
-@@ -365,6 +375,71 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 	kvm_ptw_top(kvm->arch.pgd, start << PAGE_SHIFT, end << PAGE_SHIFT, &ctx);
- }
- 
-+int kvm_arch_prepare_memory_region(struct kvm *kvm,
-+				const struct kvm_memory_slot *old,
-+				struct kvm_memory_slot *new,
-+				enum kvm_mr_change change)
-+{
-+	size_t size, gpa_offset, hva_offset;
-+	gpa_t gpa_start;
-+	hva_t hva_start;
-+
-+	if ((change != KVM_MR_MOVE) && (change != KVM_MR_CREATE))
-+		return 0;
-+	/*
-+	 * Prevent userspace from creating a memory region outside of the
-+	 * VM GPA address space
-+	 */
-+	if ((new->base_gfn + new->npages) > (kvm->arch.gpa_size >> PAGE_SHIFT))
-+		return -ENOMEM;
-+
-+	size = new->npages * PAGE_SIZE;
-+	gpa_start = new->base_gfn << PAGE_SHIFT;
-+	hva_start = new->userspace_addr;
-+	new->arch.flags = 0;
-+	if (IS_ALIGNED(size, PMD_SIZE) && IS_ALIGNED(gpa_start, PMD_SIZE)
-+			&& IS_ALIGNED(hva_start, PMD_SIZE))
-+		new->arch.flags |= KVM_MEM_HUGEPAGE_CAPABLE;
-+	else {
-+		/*
-+		 * Pages belonging to memslots that don't have the same
-+		 * alignment within a PMD for userspace and GPA cannot be
-+		 * mapped with PMD entries, because we'll end up mapping
-+		 * the wrong pages.
-+		 *
-+		 * Consider a layout like the following:
-+		 *
-+		 *    memslot->userspace_addr:
-+		 *    +-----+--------------------+--------------------+---+
-+		 *    |abcde|fgh  Stage-1 block  |    Stage-1 block tv|xyz|
-+		 *    +-----+--------------------+--------------------+---+
-+		 *
-+		 *    memslot->base_gfn << PAGE_SIZE:
-+		 *      +---+--------------------+--------------------+-----+
-+		 *      |abc|def  Stage-2 block  |    Stage-2 block   |tvxyz|
-+		 *      +---+--------------------+--------------------+-----+
-+		 *
-+		 * If we create those stage-2 blocks, we'll end up with this
-+		 * incorrect mapping:
-+		 *   d -> f
-+		 *   e -> g
-+		 *   f -> h
-+		 */
-+		gpa_offset = gpa_start & (PMD_SIZE - 1);
-+		hva_offset = hva_start & (PMD_SIZE - 1);
-+		if (gpa_offset != hva_offset) {
-+			new->arch.flags |= KVM_MEM_HUGEPAGE_INCAPABLE;
-+		} else {
-+			if (gpa_offset == 0)
-+				gpa_offset = PMD_SIZE;
-+			if ((size + gpa_offset) < (PMD_SIZE * 2))
-+				new->arch.flags |= KVM_MEM_HUGEPAGE_INCAPABLE;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				   struct kvm_memory_slot *old,
- 				   const struct kvm_memory_slot *new,
-@@ -562,47 +637,23 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool writ
- }
- 
- static bool fault_supports_huge_mapping(struct kvm_memory_slot *memslot,
--				unsigned long hva, unsigned long map_size, bool write)
-+				unsigned long hva, bool write)
- {
--	size_t size;
--	gpa_t gpa_start;
--	hva_t uaddr_start, uaddr_end;
-+	hva_t start, end;
- 
- 	/* Disable dirty logging on HugePages */
- 	if (kvm_slot_dirty_track_enabled(memslot) && write)
- 		return false;
- 
--	size = memslot->npages * PAGE_SIZE;
--	gpa_start = memslot->base_gfn << PAGE_SHIFT;
--	uaddr_start = memslot->userspace_addr;
--	uaddr_end = uaddr_start + size;
-+	if (kvm_hugepage_capable(memslot))
-+		return true;
- 
--	/*
--	 * Pages belonging to memslots that don't have the same alignment
--	 * within a PMD for userspace and GPA cannot be mapped with stage-2
--	 * PMD entries, because we'll end up mapping the wrong pages.
--	 *
--	 * Consider a layout like the following:
--	 *
--	 *    memslot->userspace_addr:
--	 *    +-----+--------------------+--------------------+---+
--	 *    |abcde|fgh  Stage-1 block  |    Stage-1 block tv|xyz|
--	 *    +-----+--------------------+--------------------+---+
--	 *
--	 *    memslot->base_gfn << PAGE_SIZE:
--	 *      +---+--------------------+--------------------+-----+
--	 *      |abc|def  Stage-2 block  |    Stage-2 block   |tvxyz|
--	 *      +---+--------------------+--------------------+-----+
--	 *
--	 * If we create those stage-2 blocks, we'll end up with this incorrect
--	 * mapping:
--	 *   d -> f
--	 *   e -> g
--	 *   f -> h
--	 */
--	if ((gpa_start & (map_size - 1)) != (uaddr_start & (map_size - 1)))
-+	if (kvm_hugepage_incapable(memslot))
- 		return false;
- 
-+	start = memslot->userspace_addr;
-+	end = start + memslot->npages * PAGE_SIZE;
-+
- 	/*
- 	 * Next, let's make sure we're not trying to map anything not covered
- 	 * by the memslot. This means we have to prohibit block size mappings
-@@ -615,8 +666,8 @@ static bool fault_supports_huge_mapping(struct kvm_memory_slot *memslot,
- 	 * userspace_addr or the base_gfn, as both are equally aligned (per
- 	 * the check above) and equally sized.
- 	 */
--	return (hva & ~(map_size - 1)) >= uaddr_start &&
--		(hva & ~(map_size - 1)) + map_size <= uaddr_end;
-+	return (hva >= ALIGN(start, PMD_SIZE)) &&
-+			(hva < ALIGN_DOWN(end, PMD_SIZE));
- }
- 
- /*
-@@ -842,7 +893,7 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
- 
- 	/* Disable dirty logging on HugePages */
- 	level = 0;
--	if (!fault_supports_huge_mapping(memslot, hva, PMD_SIZE, write)) {
-+	if (!fault_supports_huge_mapping(memslot, hva, write)) {
- 		level = 0;
- 	} else {
- 		level = host_pfn_mapping_level(kvm, gfn, memslot);
-@@ -901,12 +952,6 @@ void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
- {
- }
- 
--int kvm_arch_prepare_memory_region(struct kvm *kvm, const struct kvm_memory_slot *old,
--				   struct kvm_memory_slot *new, enum kvm_mr_change change)
--{
--	return 0;
--}
--
- void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
- 					const struct kvm_memory_slot *memslot)
- {
--- 
-2.39.3
+
+>
 
 
