@@ -1,464 +1,222 @@
-Return-Path: <kvm+bounces-2506-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2507-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05B747F9D04
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 11:00:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6616E7F9E0A
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 12:00:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2905B1C20CBB
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 10:00:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8977D1C20D78
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 11:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74633179AF;
-	Mon, 27 Nov 2023 10:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1858518E0A;
+	Mon, 27 Nov 2023 10:59:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="M6Rt7dYW"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="JKyyr8U1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [IPv6:2a01:4f9:3051:3f93::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D898183;
-	Mon, 27 Nov 2023 02:00:31 -0800 (PST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7ECCC40E0257;
-	Mon, 27 Nov 2023 10:00:27 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id BU3zEmMa-BjB; Mon, 27 Nov 2023 10:00:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1701079225; bh=TtlE36AUctgokR2LY9a4CvYQHcd567Ym1wq8sq+2ihM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M6Rt7dYWHGuYYMKKnLHdE+bsGHF4qtcXP+fynrgyym9GNI2DisXZC/Im1xT+/o7ky
-	 vPEWJVl69HWMWMtsPt4j7/Maw8VNJUX8xA6vTrjjh0hu6NjyPY74CNk2vOpPKAaRyr
-	 eKUaIRfaJ671zR1EZ7+EIHom+tYw3QpojOHy0Tvbnf9OWdz6YrRppAv4btNQ24JKAG
-	 ys+2POPXC2GIhcNbDyLmCPlW6bnhZhwmOOnOpKQpYBLmD56/gdjCoiQTQwJzW3rLW3
-	 BRjzUP2icnTuEN5XYI8+sryVJjw7KRTSqb+xDKhQBEOoJGxr/8ICUdFYK44slWI85j
-	 N3EYYhf8P/f2EDo95DHJ6iqXaRp2fyo0hoWARYy3s4mWnma41/nz2SFsWL+A5jZUN9
-	 kyIn1B88ZjyJH2l/W+Zt7XuJSDsWLa/k1N0P6zaD5b5BL/sH6lknLw63swIpXLtpXQ
-	 Sz+5D1rUWLIt7lNSiTx7krZmSV1RpOoP+4mguMQpVuHkXfcZEXI2TlxQFnrkIvz3nB
-	 rxu5dSBq25HD2LP5DOJdprHsyRqw3/r/B7X90yhqMyBRamWw7ZI4piTMVxxuOSsgPp
-	 Y5ZJgsTZuvZe4I2q3oZTtxYmyPqgHgvKlyVaDctG5MbOoTTQlisZcOge/khZj1o1Jp
-	 F4+/JjWMsZQKD/FINdCPRVsQ=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 00F5940E014B;
-	Mon, 27 Nov 2023 09:59:43 +0000 (UTC)
-Date: Mon, 27 Nov 2023 10:59:37 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-	tony.luck@intel.com, marcorr@google.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>,
-	Jarkko Sakkinen <jarkko@profian.com>
-Subject: Re: [PATCH v10 14/50] crypto: ccp: Add support to initialize the
- AMD-SP for SEV-SNP
-Message-ID: <20231127095937.GLZWRoiaqGlJMX54Xb@fat_crate.local>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-15-michael.roth@amd.com>
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A8CC10F
+	for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 02:59:53 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LXjrQm8ks56arJtK1T2PIm+YeWq60gV6Pl/3refGplyePLq8nA113f4Xg34kn68u0G87c+dQ9J2Ne/5t/eoajzAYNzD7iGWVzVhtL8BHJ6HyPfIBuLJP/encHQ+Ioc7dfxubyhuHPDBrH9s34+1ZH864EKspT/bgQvjY+TOQTcPY9qsyWve4sG2SFcg7ke6eOH3/6q8Znq15L3gqe6gE4Ks3sbM4AbwmXKPzRHV3Lk/l5tQWrDbHaOoHY/6dUbfwm71AHVeg58nwqrmuEyBdNLigvO9+8D6Q9vixFcXrEiD7HaUdkIbI6xBJBArET7LtLhqHMeLbLpHrrYcV/azgLA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/YiXXTAtbIILrAqQXQ0NPzUqRIuncb3OKrqbQlGbF2E=;
+ b=UoIFU7KWwDOVUKsR0Y9MhPpsBHrQftOemOdUAuSjvi674vKDLvjKdFKlkngtdFNtBesKwpUxNO86K9fzHHZc79YbyCFHQU+Jq0FgHuss66j+X+KxDjYXX0vzze0Pz3VKtacjri8qZJQn52jQiZk9TSjaAtjTPBlTsW77ygH1Vl259FmOrfBQmX7A1N8+egeXtPXlWwT6m7FKdTk5JMFYH0zsO5Glkh2gl3HbKEf3DrryEzHPeMt7AnS68B5Rl9CLJfuCSBWQ2ckpUh3q7zk3Qwany75FgtfkvQ9WbByLI0Q3ubbMwAintHV80nyYmKt2T5W7G1wdcdqlYoELZ1ZYIg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/YiXXTAtbIILrAqQXQ0NPzUqRIuncb3OKrqbQlGbF2E=;
+ b=JKyyr8U1QbhJdgLBYww3U+VGEL89lFTmTUSCg4P0OrVhBACHkelbdH6+chJgMW4dbPVC+5f2gpOYuKBwg1fxeg55wdGkJjN8NqA0mnMjgmNzko1G00biaS8jBkjrumoaLy7zFyd0Hqa24h5BME/sWUBKVr5e2SROG7rJi9EqaDg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
+ PH0PR01MB7489.prod.exchangelabs.com (2603:10b6:510:f0::6) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7025.29; Mon, 27 Nov 2023 10:59:47 +0000
+Received: from SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::9968:1c71:6cfe:6685]) by SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::9968:1c71:6cfe:6685%3]) with mapi id 15.20.7025.022; Mon, 27 Nov 2023
+ 10:59:46 +0000
+Message-ID: <1fe79744-f8a4-466f-8f1a-32e6fab78be9@os.amperecomputing.com>
+Date: Mon, 27 Nov 2023 16:29:36 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support
+ (FEAT_NV2 only)
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+Cc: Miguel Luis <miguel.luis@oracle.com>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Darren Hart <darren@os.amperecomputing.com>,
+ Jintack Lim <jintack@cs.columbia.edu>,
+ Russell King <rmk+kernel@armlinux.org.uk>, James Morse
+ <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20231120131027.854038-1-maz@kernel.org>
+ <DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
+ <86msv7ylnu.wl-maz@kernel.org>
+ <05733774-4210-4097-9912-fb3aa8542fdd@oracle.com>
+ <86a5r4zafh.wl-maz@kernel.org>
+ <134912e4-beed-4ab6-8ce1-33e69ec382b3@os.amperecomputing.com>
+ <868r6nzc5y.wl-maz@kernel.org>
+ <65dc2a93-0a17-4433-b3a5-430bf516ffe9@os.amperecomputing.com>
+ <86o7fjco13.wl-maz@kernel.org>
+ <e18700d4-061d-4489-8d8d-87c11b70eedb@os.amperecomputing.com>
+ <86leancjcr.wl-maz@kernel.org>
+ <9f8656c7-8036-4bd6-a0f5-4fa531f95b2f@os.amperecomputing.com>
+ <86jzq3d007.wl-maz@kernel.org>
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <86jzq3d007.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH5PR04CA0004.namprd04.prod.outlook.com
+ (2603:10b6:610:1f4::10) To SJ2PR01MB8101.prod.exchangelabs.com
+ (2603:10b6:a03:4f6::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231016132819.1002933-15-michael.roth@amd.com>
-
-On Mon, Oct 16, 2023 at 08:27:43AM -0500, Michael Roth wrote:
-> +/*
-> + * SEV_DATA_RANGE_LIST:
-> + *   Array containing range of pages that firmware transitions to HV-fixed
-> + *   page state.
-> + */
-> +struct sev_data_range_list *snp_range_list;
-> +static int __sev_snp_init_locked(int *error);
-
-Put the function above the caller instead of doing a forward
-declaration.
-
->  static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
->  {
->  	struct sev_device *sev = psp_master->sev_data;
-> @@ -466,9 +479,9 @@ static inline int __sev_do_init_locked(int *psp_ret)
->  		return __sev_init_locked(psp_ret);
->  }
->  
-> -static int __sev_platform_init_locked(int *error)
-> +static int ___sev_platform_init_locked(int *error, bool probe)
->  {
-> -	int rc = 0, psp_ret = SEV_RET_NO_FW_CALL;
-> +	int rc, psp_ret = SEV_RET_NO_FW_CALL;
->  	struct psp_device *psp = psp_master;
->  	struct sev_device *sev;
->  
-> @@ -480,6 +493,34 @@ static int __sev_platform_init_locked(int *error)
->  	if (sev->state == SEV_STATE_INIT)
->  		return 0;
->  
-> +	/*
-> +	 * Legacy guests cannot be running while SNP_INIT(_EX) is executing,
-> +	 * so perform SEV-SNP initialization at probe time.
-> +	 */
-> +	rc = __sev_snp_init_locked(error);
-> +	if (rc && rc != -ENODEV) {
-> +		/*
-> +		 * Don't abort the probe if SNP INIT failed,
-> +		 * continue to initialize the legacy SEV firmware.
-> +		 */
-> +		dev_err(sev->dev, "SEV-SNP: failed to INIT rc %d, error %#x\n", rc, *error);
-> +	}
-> +
-> +	/* Delay SEV/SEV-ES support initialization */
-> +	if (probe && !psp_init_on_probe)
-> +		return 0;
-> +
-> +	if (!sev_es_tmr) {
-> +		/* Obtain the TMR memory area for SEV-ES use */
-> +		sev_es_tmr = sev_fw_alloc(SEV_ES_TMR_SIZE);
-> +		if (sev_es_tmr)
-> +			/* Must flush the cache before giving it to the firmware */
-> +			clflush_cache_range(sev_es_tmr, SEV_ES_TMR_SIZE);
-> +		else
-> +			dev_warn(sev->dev,
-> +				 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
-> +		}
-> +
->  	if (sev_init_ex_buffer) {
->  		rc = sev_read_init_ex_file();
->  		if (rc)
-> @@ -522,6 +563,11 @@ static int __sev_platform_init_locked(int *error)
->  	return 0;
->  }
->  
-> +static int __sev_platform_init_locked(int *error)
-> +{
-> +	return ___sev_platform_init_locked(error, false);
-> +}
-
-Uff, this is silly. And it makes the code hard to follow and that meat
-of the platform init functionality in the ___-prefixed function a mess.
-
-And the problem is that that "probe" functionality is replicated from
-the one place where it is actually needed - sev_pci_init() which calls
-that new sev_platform_init_on_probe() function - to everything that
-calls __sev_platform_init_locked() for which you've added a wrapper.
-
-What you should do, instead, is split the code around
-__sev_snp_init_locked() in a separate function which does only that and
-is called something like __sev_platform_init_snp_locked() or so which
-does that unconditional work. And then you define:
-
-_sev_platform_init_locked(int *error, bool probe)
-
-note the *one* '_' - i.e., first layer:
-
-_sev_platform_init_locked(int *error, bool probe):
-{
-	__sev_platform_init_snp_locked(error);
-
-	if (!probe)
-		return 0;
-
-	if (psp_init_on_probe)
-		__sev_platform_init_locked(error);
-
-	...
-}
-
-and you do the probing in that function only so that it doesn't get lost
-in the bunch of things __sev_platform_init_locked() does.
-
-And then you call _sev_platform_init_locked() everywhere and no need for
-a second sev_platform_init_on_probe().
-
-> +
->  int sev_platform_init(int *error)
->  {
->  	int rc;
-> @@ -534,6 +580,17 @@ int sev_platform_init(int *error)
->  }
->  EXPORT_SYMBOL_GPL(sev_platform_init);
->  
-> +static int sev_platform_init_on_probe(int *error)
-> +{
-> +	int rc;
-> +
-> +	mutex_lock(&sev_cmd_mutex);
-> +	rc = ___sev_platform_init_locked(error, true);
-> +	mutex_unlock(&sev_cmd_mutex);
-> +
-> +	return rc;
-> +}
-> +
->  static int __sev_platform_shutdown_locked(int *error)
->  {
->  	struct sev_device *sev = psp_master->sev_data;
-> @@ -838,6 +895,191 @@ static int sev_update_firmware(struct device *dev)
->  	return ret;
->  }
->  
-> +static void snp_set_hsave_pa(void *arg)
-> +{
-> +	wrmsrl(MSR_VM_HSAVE_PA, 0);
-> +}
-> +
-> +static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
-> +{
-> +	struct sev_data_range_list *range_list = arg;
-> +	struct sev_data_range *range = &range_list->ranges[range_list->num_elements];
-> +	size_t size;
-> +
-> +	if ((range_list->num_elements * sizeof(struct sev_data_range) +
-> +	     sizeof(struct sev_data_range_list)) > PAGE_SIZE)
-> +		return -E2BIG;
-
-Why? A comment would be helpful like with the rest this patch adds.
-
-> +	switch (rs->desc) {
-> +	case E820_TYPE_RESERVED:
-> +	case E820_TYPE_PMEM:
-> +	case E820_TYPE_ACPI:
-> +		range->base = rs->start & PAGE_MASK;
-> +		size = (rs->end + 1) - rs->start;
-> +		range->page_count = size >> PAGE_SHIFT;
-> +		range_list->num_elements++;
-> +		break;
-> +	default:
-> +		break;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int __sev_snp_init_locked(int *error)
-> +{
-> +	struct psp_device *psp = psp_master;
-> +	struct sev_data_snp_init_ex data;
-> +	struct sev_device *sev;
-> +	int rc = 0;
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +		return -ENODEV;
-> +
-> +	if (!psp || !psp->sev_data)
-> +		return -ENODEV;
-
-Only caller checks this already.
-
-> +	sev = psp->sev_data;
-> +
-> +	if (sev->snp_initialized)
-
-Do we really need this silly boolean or is there a way to query the
-platform whether SNP has been initialized?
-
-> +		return 0;
-> +
-> +	if (!sev_version_greater_or_equal(SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR)) {
-> +		dev_dbg(sev->dev, "SEV-SNP support requires firmware version >= %d:%d\n",
-> +			SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR);
-> +		return 0;
-> +	}
-> +
-> +	/*
-> +	 * The SNP_INIT requires the MSR_VM_HSAVE_PA must be set to 0h
-> +	 * across all cores.
-> +	 */
-> +	on_each_cpu(snp_set_hsave_pa, NULL, 1);
-> +
-> +	/*
-> +	 * Starting in SNP firmware v1.52, the SNP_INIT_EX command takes a list of
-> +	 * system physical address ranges to convert into the HV-fixed page states
-> +	 * during the RMP initialization.  For instance, the memory that UEFI
-> +	 * reserves should be included in the range list. This allows system
-> +	 * components that occasionally write to memory (e.g. logging to UEFI
-> +	 * reserved regions) to not fail due to RMP initialization and SNP enablement.
-> +	 */
-> +	if (sev_version_greater_or_equal(SNP_MIN_API_MAJOR, 52)) {
-
-Is there a generic way to probe SNP_INIT_EX presence in the firmware or
-are FW version numbers the only way?
-
-> +		/*
-> +		 * Firmware checks that the pages containing the ranges enumerated
-> +		 * in the RANGES structure are either in the Default page state or in the
-
-"default"
-
-> +		 * firmware page state.
-> +		 */
-> +		snp_range_list = kzalloc(PAGE_SIZE, GFP_KERNEL);
-> +		if (!snp_range_list) {
-> +			dev_err(sev->dev,
-> +				"SEV: SNP_INIT_EX range list memory allocation failed\n");
-> +			return -ENOMEM;
-> +		}
-> +
-> +		/*
-> +		 * Retrieve all reserved memory regions setup by UEFI from the e820 memory map
-> +		 * to be setup as HV-fixed pages.
-> +		 */
-> +
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|PH0PR01MB7489:EE_
+X-MS-Office365-Filtering-Correlation-Id: 913fb0b3-54ef-4a5e-68ac-08dbef37f7c4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	L93Iu0OYxJg7yUfOpzhc8yPtEwWjRZmKLJtO/2Sijyf00LLmmRqpGpru+s6nnwhUpWO9DKVPR8p3OWh2GBEytVrAwJp6zlZDTjrwy/2KN30zLW6GNJi1ghhYQJJyRay24MXiUGh5VWVCEmkCUj7pbSHqoCTy2eozF4aMBI7nuMAPlW2Z6Kwe64DSmW/g9CLLQXJsWMz69WKEFyovh0mUJagJVNUD6aIFePXvcJFj/vazJ5m9L4qwE5B40+uth68//haEpchugxAMe3m2OTShw3v7C2UZRfcYGTOSVaSroDEb1hVrlMTSE5NhoA9i9S1KDmK4Jj4n/vFGIs0x8WOg0aUfcLLX5tChMIJnuyKpJtMbzfRa8R7hBc3gzTQ0EViZocQCQGK/7FZbYvQ3ClSnB/OBIfKIZUE6Bf9NqZaCNRypZCEK3lMzzuUZrxs5D9Xn9w10Rl/bGyZEXF6rlxfAOCVVRzulqSGmgRh4+8bqnmF6L6VsHHDvM7OAyEdirZO2JINPFiOGXE8RIGFtlkLvCFI+n8ISmR6ljt0TaKla/3XhfhsyKS+tzVPmvsB7jPeq9+eOK3JZCdLmNA6TWO3WQ9NltIZnH16u6UgKBl85zzL2G7s0QPIwObzgSDg0b6AL
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39840400004)(136003)(376002)(396003)(346002)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(31686004)(41300700001)(6666004)(86362001)(31696002)(5660300002)(2906002)(7416002)(83380400001)(4326008)(8676002)(8936002)(54906003)(66476007)(66556008)(66946007)(6916009)(6486002)(2616005)(53546011)(478600001)(316002)(26005)(6512007)(38100700002)(6506007)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VlhEb2dwaTRMWHNWaDBkcHNCQURrMUhiN2dsYWhSWU13Y0hqeG1mdnBpSEhQ?=
+ =?utf-8?B?cXR1U0tCemcxN29qTTNUalRwaCtDOHF6TWhvKzVLQ1UxdnhBR1ZlWmJPOExO?=
+ =?utf-8?B?dDhCb0hraTh3cjBINXdja3BNbkVzVGpnRk5HSENPL1UyaGJwcnArbGF2NWJL?=
+ =?utf-8?B?L3BZa1FkVDY1djdlUS9KV0tzTVc0Q01kV0c5RURxbUg2YzBjV2Rxd3BYSHRi?=
+ =?utf-8?B?bEE3OExKSnN1c3llUUt5SlNnSUJYeEFzNk0zZlJqR3JxRWg2Q3NhNkdwMWtv?=
+ =?utf-8?B?R2ZWQ29oVVNXQ3F6bXZjZndwblhuOVYvSHpleU9kelZaeGw2MWk5V0gyRUhs?=
+ =?utf-8?B?c01xcTFpWThIMlJwazhXL1M5VS9EcWxjMFRzdDFvQWJuSkI4WHJ5UmdVYlpz?=
+ =?utf-8?B?aUdMNkdlMEhUbkg0bzRoNjFFQ1Avc2o0L0FtTVFGMkpFTjBiRkpEWTEzYXkv?=
+ =?utf-8?B?aFgxK3poVWQzYW0vYkdUeWRJSlJBVE9Zb2hTNVNPSXlSUGtBb1hvSE56K0Ju?=
+ =?utf-8?B?OG5WNlRuRVY0Zkd0Q3A3d0puSWZtQm5lNmdWN0ZUSjJtSERLV2VPUENKU2hD?=
+ =?utf-8?B?eXBoTEFkUjBrZ3I5cEJFN1hhVUFsQXhnWG5kTE4vRjFacGV2dFZEWUNlemZz?=
+ =?utf-8?B?KytqanFXd3VtQk1CRXdLeGdzTDNlN1U3N2lxNUw4VDNlbHNhYnBTQkJGWXpj?=
+ =?utf-8?B?Y1B6dDU5alpQeDVUbzZPbkZFUW1KSHl4Sm1zUWQzTVhZUnVsWHhrOEpxblUv?=
+ =?utf-8?B?L2NYVTg0S2lqWmtUL2RUT29rM3hXalNmSDU2cE0wd3R1UWMxYjc5Q3BmRnVJ?=
+ =?utf-8?B?d2NPWmg5TEhXZVQ1YzBBYU1yZnJUMXVleFVISVJXUk9EVEdNdFV5Nk5IOUFl?=
+ =?utf-8?B?ckZhMlRHS2h4WE1FLzFRRWdIR2dRQ3A4akRuTkhKS1c4c0dkVXBpSEE3LzAz?=
+ =?utf-8?B?UDlWK3pFTVlFaWM2L2FMUXJWTkJtYTZpejlGUmVKK0VlcVJ2SGhYNFRmZVhB?=
+ =?utf-8?B?RG90Y2Uvdm1jWnZIS29QSThkcXhuZkMrVHNVWEU2RVdGcDY5cFVRL25VRXFP?=
+ =?utf-8?B?WjE4bnlNdzd4eTdTR3R1Z0paSWltMW90VkpYTWI0dWRScHBWV1lOaytOQnhk?=
+ =?utf-8?B?WnFFRjlva0VPSDh1YUlsc2Rlb2ljanFDc3dwb01yVVQ1emZmcDZZcHBJK3R3?=
+ =?utf-8?B?M0U1QnNKTmRUang4WDlCdFhMUzZTNDZjcHNyWnlSNUhjRWdVUUg1YzRVVGRX?=
+ =?utf-8?B?TUVJcktRQnczaHJQZ3lXSzM2dUhpT0RIOTFMZkEvMTZPYkZQUkY3Y1N6VGpE?=
+ =?utf-8?B?SkdoSFp1eDlPT05La3NHRWFrQ09hbUxGeTdzTWJrUitpbTd1clp0TllLUHNR?=
+ =?utf-8?B?dTRPODN2N1lobm56MWEzdnFRMjFCMHZRWWdwdVhvbGxWZ0Jsa1RmUzMvTnhs?=
+ =?utf-8?B?TDRhOW4wRE1ra3NKUzhyT1ppRUgxR2x0NFk0Mjg0OHc0R2ZpTEprZ0ttMFl6?=
+ =?utf-8?B?RCs1NmhZY0lLNitTc2pmZzhzRUlBWHNCdnJZYTZuekRSOWJXa0ZHaDh5R3RH?=
+ =?utf-8?B?UHMyTFI5eTV6QW8wUDZxU2JKc3hDcGg0QUN5bzE1QTV5MHdKT1U5MS9GaW1o?=
+ =?utf-8?B?RlNOZldVZk5DK1I0UVhqWUZTSnZZQ2V1dU52U3VxcE9VZERMeXJ5dGRqVEFu?=
+ =?utf-8?B?cjloaDFvbUhTN1FzbUM1bzVnNmRLREFnaUgyM3kxSHlEYkp3RjdSOThvRHUx?=
+ =?utf-8?B?cTlRN2lJODZ4aEhSUklkQitqcHJQUGR5VDgwK2w3UHA2VUhEalFCZmNqQ1Jp?=
+ =?utf-8?B?L0llQWVCY3Y1dEZVa044N2t5S1RselIwQ1lsc1hISk9xT3VGN0F4YWFTOU9s?=
+ =?utf-8?B?U1JQQlNYV2NZRTQ4TSs2WlZPcUxTa3ZrWG90TlhjQlVtV1VScVpGU2ovMGxz?=
+ =?utf-8?B?cTVQMzdXOUIvTWcxVEt5TXJJdkZLTFdYNmZ3TmtjZXhEdlRyVExOeGF3QU41?=
+ =?utf-8?B?QXppRnRxbkwvUko2K0EwTjduYTRZNXF0Y0JEYXpIQnRKMTY1R1V4cWZaVTlh?=
+ =?utf-8?B?YVlKWVUzU1FLMVRETU8zUHVjWm5WVENDZWtuNzI1NjVjSmR0aXUvR1BmNG1n?=
+ =?utf-8?B?Y0dEMERaYjBKaVpjaWkvTXJvNHQzWTJuUzZBV1lFQ3QvTlF2K3h6TGVnNkNR?=
+ =?utf-8?Q?8PSQzHfDVnKSHjKSt8HOduMjs6Fb5b3c3bkk5KixoFVq?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 913fb0b3-54ef-4a5e-68ac-08dbef37f7c4
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2023 10:59:46.3347
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rYtHxhyxtnJ75Au7uU1dyZukzttnWgce88loVWzx5TBx7v+H2HMCdQjNXH41OPOO+tzPlThMqz0vLyPIRX5oPumjPelJd4HxAXbcuzNlR0wvpqvBK2vKWfr9m0LIr27u
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR01MB7489
 
 
-^ Superfluous newline.
 
-> +		rc = walk_iomem_res_desc(IORES_DESC_NONE, IORESOURCE_MEM, 0, ~0,
-> +					 snp_range_list, snp_filter_reserved_mem_regions);
-> +		if (rc) {
-> +			dev_err(sev->dev,
-> +				"SEV: SNP_INIT_EX walk_iomem_res_desc failed rc = %d\n", rc);
-> +			return rc;
-> +		}
-> +
-> +		memset(&data, 0, sizeof(data));
-> +		data.init_rmp = 1;
-> +		data.list_paddr_en = 1;
-> +		data.list_paddr = __psp_pa(snp_range_list);
-> +
-> +		/*
-> +		 * Before invoking SNP_INIT_EX with INIT_RMP=1, make sure that
-> +		 * all dirty cache lines containing the RMP are flushed.
-> +		 *
-> +		 * NOTE: that includes writes via RMPUPDATE instructions, which
-> +		 * are also cacheable writes.
-> +		 */
-> +		wbinvd_on_all_cpus();
-> +
-> +		rc = __sev_do_cmd_locked(SEV_CMD_SNP_INIT_EX, &data, error);
-> +		if (rc)
-> +			return rc;
-> +	} else {
-> +		/*
-> +		 * SNP_INIT is equivalent to SNP_INIT_EX with INIT_RMP=1, so
-> +		 * just as with that case, make sure all dirty cache lines
-> +		 * containing the RMP are flushed.
-> +		 */
-> +		wbinvd_on_all_cpus();
-> +
-> +		rc = __sev_do_cmd_locked(SEV_CMD_SNP_INIT, NULL, error);
-> +		if (rc)
-> +			return rc;
-> +	}
+On 27-11-2023 02:52 pm, Marc Zyngier wrote:
+> On Mon, 27 Nov 2023 07:26:58 +0000,
+> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+>>
+>>
+>>
+>> On 24-11-2023 08:02 pm, Marc Zyngier wrote:
+>>> On Fri, 24 Nov 2023 13:22:22 +0000,
+>>> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+>>>>
+>>>>> How is this value possible if the write to HCR_EL2 has taken place?
+>>>>> When do you sample this?
+>>>>
+>>>> I am not sure how and where it got set. I think, whatever it is set,
+>>>> it is due to false return of vcpu_el2_e2h_is_set(). Need to
+>>>> understand/debug.
+>>>> The vhcr_el2 value I have shared is traced along with hcr in function
+>>>> __activate_traps/__compute_hcr.
+>>>
+>>> Here's my hunch:
+>>>
+>>> The guest boots with E2H=0, because we don't advertise anything else
+>>> on your HW. So we run with NV1=1 until we try to *upgrade* to VHE. NV2
+>>> means that HCR_EL2 is writable (to memory) without a trap. But we're
+>>> still running with NV1=1.
+>>>
+>>> Subsequently, we access a sysreg that should never trap for a VHE
+>>> guest, but we're with the wrong config. Bad things happen.
+>>>
+>>> Unfortunately, NV2 is pretty much incompatible with E2H being updated,
+>>> because it cannot perform the changes that this would result into at
+>>> the point where they should happen. We can try and do a best effort
+>>> handling, but you can always trick it.
+>>>
+>>> Anyway, can you see if the hack below helps? I'm not keen on it at
+>>> all, but this would be a good data point.
+>>
+>> Thanks Marc, this diff fixes the issue.
+>> Just wondering what is changed w.r.t to L1 handling from V10 to V11
+>> that it requires this trick?
+> 
+> Not completely sure. Before v11, anything that would trap would be
+> silently handled by the FEAT_NV code. Now, a trap for something that
+> is supposed to be redirected to VNCR results in an UNDEF exception.
+> 
+> I suspect that the exception is handled again as a call to
+> __finalise_el2(), probably because the write to VBAR_EL1 didn't do
+> what it was supposed to do.
+> 
+>> Also why this was not seen on your platform, is it E2H0 enabled?
+> 
+> It doesn't have FEAT_E2H0, and that's the whole point. No E2H0, no
+> problems, as the guest cannot trick the host into losing track of the
+> state (which I'm pretty sure can happen even with this ugly hack).
+> 
+> I will probably completely disable NV1 support in the next drop, and
+> make NV support only VHE guests. Which is the only mode that makes any
+> sense anyway.
+> 
 
-So instead of duplicating the code here at the end of the if-else
-branching, you can do:
+Thanks, absolutely makes sense to have *VHE-only* L1, looking forward to 
+a next drop.
 
-	void *arg = &data;
-
-	if () {
-		...
-		cmd = SEV_CMD_SNP_INIT_EX;
-	} else {
-		cmd = SEV_CMD_SNP_INIT;
-		arg = NULL;
-	}
-
-	wbinvd_on_all_cpus();
-	rc = __sev_do_cmd_locked(cmd, arg, error);
-	if (rc)
-		return rc;
-
-> +	/* Prepare for first SNP guest launch after INIT */
-> +	wbinvd_on_all_cpus();
-
-Why is that WBINVD needed?
-
-> +	rc = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, error);
-> +	if (rc)
-> +		return rc;
-> +
-> +	sev->snp_initialized = true;
-> +	dev_dbg(sev->dev, "SEV-SNP firmware initialized\n");
-> +
-> +	return rc;
-> +}
-> +
-> +static int __sev_snp_shutdown_locked(int *error)
-> +{
-> +	struct sev_device *sev = psp_master->sev_data;
-> +	struct sev_data_snp_shutdown_ex data;
-> +	int ret;
-> +
-> +	if (!sev->snp_initialized)
-> +		return 0;
-> +
-> +	memset(&data, 0, sizeof(data));
-> +	data.length = sizeof(data);
-> +	data.iommu_snp_shutdown = 1;
-> +
-> +	wbinvd_on_all_cpus();
-> +
-> +retry:
-> +	ret = __sev_do_cmd_locked(SEV_CMD_SNP_SHUTDOWN_EX, &data, error);
-> +	/* SHUTDOWN may require DF_FLUSH */
-> +	if (*error == SEV_RET_DFFLUSH_REQUIRED) {
-> +		ret = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, NULL);
-> +		if (ret) {
-> +			dev_err(sev->dev, "SEV-SNP DF_FLUSH failed\n");
-> +			return ret;
-
-When you return here,  sev->snp_initialized is still true but, in
-reality, it probably is in some half-broken state after issuing those
-commands you it is not really initialized anymore.
-
-> +		}
-> +		goto retry;
-
-This needs an upper limit from which to break out and not potentially
-endless-loop.
-
-> +	}
-> +	if (ret) {
-> +		dev_err(sev->dev, "SEV-SNP firmware shutdown failed\n");
-> +		return ret;
-> +	}
-> +
-> +	sev->snp_initialized = false;
-> +	dev_dbg(sev->dev, "SEV-SNP firmware shutdown\n");
-> +
-> +	return ret;
-> +}
-> +
-> +static int sev_snp_shutdown(int *error)
-> +{
-> +	int rc;
-> +
-> +	mutex_lock(&sev_cmd_mutex);
-> +	rc = __sev_snp_shutdown_locked(error);
-
-Why is this "locked" version even there if it is called only here?
-
-IOW, put all the logic in here - no need for
-__sev_snp_shutdown_locked().
-
-> +	mutex_unlock(&sev_cmd_mutex);
-> +
-> +	return rc;
-> +}
-
-...
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks,
+Ganapat
 
