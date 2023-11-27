@@ -1,104 +1,133 @@
-Return-Path: <kvm+bounces-2521-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2522-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24CE97FA7EC
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 18:27:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25FD77FA845
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 18:47:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D23732817D2
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 17:27:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93932B2114D
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 17:47:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6D03A8C9;
-	Mon, 27 Nov 2023 17:26:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ghhtlGG5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D22E3A8FE;
+	Mon, 27 Nov 2023 17:47:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B091381B6;
-	Mon, 27 Nov 2023 17:26:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E45E6C433CD;
-	Mon, 27 Nov 2023 17:26:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701106004;
-	bh=OZ0xz+tPj+uVKbyd3dsutFxXMsEOmGmF5yG9QPT/iuU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ghhtlGG5uG6BbHP2sK/ehis73IrLaRKD2dzk2d12KYVHsZCROJ8NQp01+LlIhQKuy
-	 /z1P+RSK1+heyobfFumzvt5rAiF0WEsRqf7QBOcSogmVbmMLfUrmFEZNWkt2bwbv1n
-	 CD3ULi2n80hRm5lFcVJ+sRf7ls28BqzSjcn+tNyi6Bcc2CPD19B5d5qX6zzdxU3s7S
-	 6jX9oF9Hd0olC4+tCgBedFw4a0iyDP0B1LXBMYDJVWnO4HitZTUig1NXm7vZZEHSAl
-	 6CV9h3TJKCYXzR4fV2JIu2z+Ddg+73hHa2Wk4Ss4Kz1fsPjN3t50qc9BSgIlXtjkeo
-	 JEneLXDgY0Huw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1r7fNZ-00GsGj-UN;
-	Mon, 27 Nov 2023 17:26:42 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 3/3] arm64: Rename reserved values for CTR_EL0.L1Ip
-Date: Mon, 27 Nov 2023 17:26:13 +0000
-Message-Id: <20231127172613.1490283-4-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231127172613.1490283-1-maz@kernel.org>
-References: <20231127172613.1490283-1-maz@kernel.org>
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5265A111;
+	Mon, 27 Nov 2023 09:47:20 -0800 (PST)
+Received: from MUA
+	by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <mail@maciej.szmigiero.name>)
+	id 1r7fhU-0000lN-D1; Mon, 27 Nov 2023 18:47:16 +0100
+Message-ID: <50076263-8b4f-4167-8419-e8baede7e9b0@maciej.szmigiero.name>
+Date: Mon, 27 Nov 2023 18:47:11 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, ardb@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: x86: Allow XSAVES on CPUs where host doesn't use it
+ due to an errata
+Content-Language: en-US, pl-PL
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <c858817d3e3be246a1a2278e3b42d06284e615e5.1700766316.git.maciej.szmigiero@oracle.com>
+ <ZWTQuRpwPkutHY-D@google.com>
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
+ 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
+Disposition-Notification-To: "Maciej S. Szmigiero"
+ <mail@maciej.szmigiero.name>
+In-Reply-To: <ZWTQuRpwPkutHY-D@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-We now have *two* values for CTR_EL0.L1Ip that are reserved.
-Which makes things a bit awkward. In order to lift the ambiguity,
-rename RESERVED (0b01) to RESERVED_AIVIVT, and VPIPT (0b00) to
-RESERVED_VPIPT.
+On 27.11.2023 18:24, Sean Christopherson wrote:
+> On Thu, Nov 23, 2023, Maciej S. Szmigiero wrote:
+>> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+>>
+>> Since commit b0563468eeac ("x86/CPU/AMD: Disable XSAVES on AMD family 0x17")
+>> kernel unconditionally clears the XSAVES CPU feature bit on Zen1/2 CPUs.
+>>
+>> Since KVM CPU caps are initialized from the kernel boot CPU features this
+>> makes the XSAVES feature also unavailable for KVM guests in this case, even
+>> though they might want to decide on their own whether they are affected by
+>> this errata.
+>>
+>> Allow KVM guests to make such decision by setting the XSAVES KVM CPU
+>> capability bit based on the actual CPU capability
+> 
+> This is not generally safe, as the guest can make such a decision if and only if
+> the Family/Model/Stepping information is reasonably accurate.
 
-This makes it clear which of these meant what, and I'm sure
-archeologists will find it useful...
+If one lies to the guest about the CPU it is running on then obviously
+things may work non-optimally.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/tools/sysreg | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+>> This fixes booting Hyper-V enabled Windows Server 2016 VMs with more than
+>> one vCPU on Zen1/2 CPUs.
+> 
+> How/why does lack of XSAVES break a multi-vCPU setup?  Is Windows blindly doing
+> XSAVES based on FMS?
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 96cbeeab4eec..5a217e0fce45 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -2004,9 +2004,10 @@ Field	27:24	CWG
- Field	23:20	ERG
- Field	19:16	DminLine
- Enum	15:14	L1Ip
--	0b00	VPIPT
-+	# This was named as VPIPT in the ARM but now documented as reserved
-+	0b00	RESERVED_VPIPT
- 	# This is named as AIVIVT in the ARM but documented as reserved
--	0b01	RESERVED
-+	0b01	RESERVED_AVIVT
- 	0b10	VIPT
- 	0b11	PIPT
- EndEnum
--- 
-2.39.2
+The hypercall from L2 Windows to L1 Hyper-V asking to boot the first AP
+returns HV_STATUS_CPUID_XSAVE_FEATURE_VALIDATION_ERROR.
+
+It's apparently a "should never happen" scenario for Windows since it
+crashes soon after.
+
+That's why uniprocessor configurations aren't broken - the BSP
+doesn't need to be specifically booted by the L2 guest.
+
+Unfortunately, Windows Server 2016 mainstream support has ended in
+Jan 2022 so it is only getting security updates.
+And you can't really break into an OS that you can't even start.
+
+Thanks,
+Maciej
 
 
