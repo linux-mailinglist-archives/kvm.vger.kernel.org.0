@@ -1,240 +1,290 @@
-Return-Path: <kvm+bounces-2497-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2498-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C17367F9A39
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 07:50:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 088DE7F9AEE
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 08:27:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F21801C204FC
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 06:50:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B5DF1C20980
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 07:27:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ABF4D52D;
-	Mon, 27 Nov 2023 06:50:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A5F710797;
+	Mon, 27 Nov 2023 07:27:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dJfXOmaJ"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="dDGTI0Uo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20962133;
-	Sun, 26 Nov 2023 22:50:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701067844; x=1732603844;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=tMayF5VmU4Ve89pE4SGyqoIeQPRuVuLvr90TFDjvuyI=;
-  b=dJfXOmaJGX2L3MXchrS0EdusCX0wgy4xivIGxV3gYBn82Qyj4kOlKZD/
-   +5uy8F7HjmRyqAZ26lzaGi1nthD3M3D/wuVc+6ADt5moD3rHCSe45yR4L
-   spKWG1wc0TiPzhVZOuFukhN3QNFHR+KyUWw5x3UYwIYKGRL+kElyEQs3V
-   P3i6+sG09UO3goD/j4JLpa687Nh9JzHBrIi9Wc+Of7avT6nNsQVvVW5bI
-   o9PYpNuKyKDb48E11QH3+LpjHZ2dfCcAAv9ralQbnHeCs4NB2I42h0w1E
-   864i5vmY8X5NzaBVZd3AuCl4S6/sdWLsrjNpwfX4uqQ20qe5AN7TXUm6C
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10906"; a="372803356"
-X-IronPort-AV: E=Sophos;i="6.04,230,1695711600"; 
-   d="scan'208";a="372803356"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2023 22:50:43 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10906"; a="838610782"
-X-IronPort-AV: E=Sophos;i="6.04,230,1695711600"; 
-   d="scan'208";a="838610782"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Nov 2023 22:50:43 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Sun, 26 Nov 2023 22:50:39 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Sun, 26 Nov 2023 22:50:39 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Sun, 26 Nov 2023 22:50:39 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Sun, 26 Nov 2023 22:50:39 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2115.outbound.protection.outlook.com [40.107.244.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FDD619B
+	for <kvm@vger.kernel.org>; Sun, 26 Nov 2023 23:27:14 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eDcj+dgdsxOEckUHGz6/sANvHPBk85M5gJ/5mdJx0Yq663dChPNHmFLpjkrV34DQq8NrDPe4Ce1MhiDjGFjNHlsleaiq56kwTpBAFzy1RqTDJQ7ydobfBgoKZt6ZhvWTAOIFEVwdzQEvY3SseygraML40eF+pVqlwyXA6f4bLWDi+fSeMjY5xTQFxLNVvWqnOgC5I7h3v0054EC+Xiw9raJo2kXlcLFeNOkqArmW7ojY3mMXKDXfU1hLmMdI17f5QuWjFxMO+WUGcSh9qN88SCg+eWL583JL36OhZrt+Fl73ayTFvjTIsDkgDuZajIULFR2ZmZuvBJKoULJXfhFVeA==
+ b=ElP7p7RjaVjjoGtFNuqAGdJvLdPd+ZzNX2ePbmajd60OGVpTTa5yKsTtYWt5Lvw6y0iqsyDJYyCoJ/0EKdfiSP3hEYnFVk6NMegARL+U7/qQ1L6e4H3Rs6iqyXt5rpqz0jh6uq6Jn7C6pfPYXUG5ritYicPkuyHkYyRR0/cc94I/gmSm+jyFImBtuVok7ET3MeC5BTb9uBESiw7oYwAibzzXWBEKLtRczgYyzyMAxjs2aExZ4+x2zI/ohcte1NS2dKheYCw89ZQVX8DO7gv/PUS804UF2sBlKAyqrA58sMKHlXudrfJDgr6WZk5T4AlrKLfHBcxrXzYvluIAzroJYw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DEU59tT/I7NAR/s1nUCv7/4jOUrvUnEUOped9eLRBvQ=;
- b=KwJ0KksXLf6CIdJJD02dI1NZK4A880P+K9oRQausluoLczLgw/6D3LU6lQy9YE0JtFbvboV8oEAAn4VLnCvN3JDg/bc+yslR3tI+wekkihUbJyM6AKCYEjeGLF6tIyDHQwziFeQOWQBsT71/We/dSRzr+nvnWBhC8scdXKIG6CIQWER8BCh9zQUka56VV9+dzBEyxIBft332Rv4flkQctp+TJldc/oEnOD1Z81T2kRpIAe6lidsSN3ZDrKg6VbE1c8Rpt269/q55WKOFWs0M4UNqHA5auy/TSKlZxeMx3eluP8jOZgb+uABt1GrHAz6eYqf48L4LajB18qHaYyY75A==
+ bh=pIGIhau9ByXWwOVnM1KVb1nPAtzPNMffomeRpF5rVIg=;
+ b=jNR7ydRD9UuznaTYa+iXl/JngQ65OV4s1b+J9tA/OlDa5XGuNDJGq/Lz4S7pmCvh5ffHLzuMnWgzDQ4zdyvchlNRdH6+Hj5e7AF7X6mXqlS31+b82JZMLXEiB9aUvqmba7yz7S7nl6nH1b9Lm8IQZgyzM6k3bJrzkLmDt0vlOOV/NDm8UFb1XOE1Gc2LG8wpkLUBZ7CgzWm6ulOCEHe0LtQW7zaR9N5SUzMTHw5Z4ITSoyUv1dXdaRQTtiA3pihJ/AUUqbw5kk/F8A2sAFEh57aVTqk26FQCSyPM4PHQsUA1Dfb9pDG5489A/0NtMKZRoawmOMyAc8C54Aiq++zVIg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ0PR11MB6744.namprd11.prod.outlook.com (2603:10b6:a03:47d::10)
- by CH3PR11MB7893.namprd11.prod.outlook.com (2603:10b6:610:12e::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29; Mon, 27 Nov
- 2023 06:50:37 +0000
-Received: from SJ0PR11MB6744.namprd11.prod.outlook.com
- ([fe80::a4bb:8de0:9dde:2fea]) by SJ0PR11MB6744.namprd11.prod.outlook.com
- ([fe80::a4bb:8de0:9dde:2fea%4]) with mapi id 15.20.7025.022; Mon, 27 Nov 2023
- 06:50:36 +0000
-From: "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-To: "Liu, Yi L" <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
-	<jgg@nvidia.com>, "Tian, Kevin" <kevin.tian@intel.com>,
-	"robin.murphy@arm.com" <robin.murphy@arm.com>, "baolu.lu@linux.intel.com"
-	<baolu.lu@linux.intel.com>
-CC: "cohuck@redhat.com" <cohuck@redhat.com>, "eric.auger@redhat.com"
-	<eric.auger@redhat.com>, "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mjrosato@linux.ibm.com"
-	<mjrosato@linux.ibm.com>, "chao.p.peng@linux.intel.com"
-	<chao.p.peng@linux.intel.com>, "yi.y.sun@linux.intel.com"
-	<yi.y.sun@linux.intel.com>, "peterx@redhat.com" <peterx@redhat.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
-	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>, "Zeng, Xin"
-	<xin.zeng@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>
-Subject: RE: [PATCH 2/3] vfio: Add VFIO_DEVICE_PASID_[AT|DE]TACH_IOMMUFD_PT
-Thread-Topic: [PATCH 2/3] vfio: Add VFIO_DEVICE_PASID_[AT|DE]TACH_IOMMUFD_PT
-Thread-Index: AQHaIPx2CEiCWPjIVEGBOBlj8kNZAbCNuTFg
-Date: Mon, 27 Nov 2023 06:50:36 +0000
-Message-ID: <SJ0PR11MB6744B5CAC867EE643958078D92BDA@SJ0PR11MB6744.namprd11.prod.outlook.com>
-References: <20231127063909.129153-1-yi.l.liu@intel.com>
- <20231127063909.129153-3-yi.l.liu@intel.com>
-In-Reply-To: <20231127063909.129153-3-yi.l.liu@intel.com>
-Accept-Language: en-US
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pIGIhau9ByXWwOVnM1KVb1nPAtzPNMffomeRpF5rVIg=;
+ b=dDGTI0UoHWLWyFmjLCx8g3+XShQMm4a9kHulLovzttmUTpHayPtlw5dx0ln0/NCZIPy2vMTjqns95VL4kharOGypMnmowGkdK7dul2UQKB/36VFy3IHpU9GKpzBUbV3J0YlKzGStIRJR9gmbSsUeA5NxstDdX3rQJDHl8Pp7hW4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
+ MW4PR01MB6356.prod.exchangelabs.com (2603:10b6:303:66::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7025.28; Mon, 27 Nov 2023 07:27:09 +0000
+Received: from SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::9968:1c71:6cfe:6685]) by SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::9968:1c71:6cfe:6685%3]) with mapi id 15.20.7025.022; Mon, 27 Nov 2023
+ 07:27:08 +0000
+Message-ID: <9f8656c7-8036-4bd6-a0f5-4fa531f95b2f@os.amperecomputing.com>
+Date: Mon, 27 Nov 2023 12:56:58 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support
+ (FEAT_NV2 only)
+To: Marc Zyngier <maz@kernel.org>
+Cc: Miguel Luis <miguel.luis@oracle.com>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Darren Hart <darren@os.amperecomputing.com>,
+ Jintack Lim <jintack@cs.columbia.edu>,
+ Russell King <rmk+kernel@armlinux.org.uk>, James Morse
+ <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20231120131027.854038-1-maz@kernel.org>
+ <DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
+ <86msv7ylnu.wl-maz@kernel.org>
+ <05733774-4210-4097-9912-fb3aa8542fdd@oracle.com>
+ <86a5r4zafh.wl-maz@kernel.org>
+ <134912e4-beed-4ab6-8ce1-33e69ec382b3@os.amperecomputing.com>
+ <868r6nzc5y.wl-maz@kernel.org>
+ <65dc2a93-0a17-4433-b3a5-430bf516ffe9@os.amperecomputing.com>
+ <86o7fjco13.wl-maz@kernel.org>
+ <e18700d4-061d-4489-8d8d-87c11b70eedb@os.amperecomputing.com>
+ <86leancjcr.wl-maz@kernel.org>
 Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR11MB6744:EE_|CH3PR11MB7893:EE_
-x-ms-office365-filtering-correlation-id: d93bc964-6260-475c-cca9-08dbef152916
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Q8NQxwQ7/Wr5UD0hpDvcTrxh85Hg6njfwcWpdtHWe60ByOKt9HZD9LoxptDtlJc5zdtDZUrG3UeGbFwKKLmqa9eFjpw0CNUSZR/9P3YDPhktH1v5vmT7ebXbl/6rrrfJtuAvQQKhZd3/hfrZzWJtROHwaeEW+IBr5j93+88Mk4H5NYuFDm2zTq75mCysBU3eHUlBmi2dST1TJas3Y+RW4DClFQILYUzS2bKQFFfJnwRRMBWwt2gzKpSDBtT+AJHqB8yuoNv96WX7yN2zEHQvVQiWKn5t/ujS5akCMLF3T1KLn377SksdmTSHVs3Dl48NtRFmCLVP8Xla67EYIdB+A2rDzlTyU7HaSyKa5BJ6rfvhze1+il5McqcLXOjDbzoTa72CG4wkrCDmOnewgM2uSqBLJ1YAMlUFTzjxUv1HhtbT5D3r0IJthgCI2wAaccgcPZJ/FG2fQECs5+6wySdbCJJWSzI9Y+/zOOgYRLhNxcW86Qw4X9lWzjg7M3qYy1eHUa1YE7VyUwdLTY960D2kgGz2s/XCr3HaHDmahT7uQBBhrG4wfAGKy+WSk492uoGmi1zxtyX2QxqlFSbTBom9VfhEwX0133ksT0GiBn1G+H9Lhj3DBICSwF3kg4arsnA9G6KN6NddOGJ7rMSQBrsv9w==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB6744.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(136003)(39860400002)(366004)(396003)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(71200400001)(4326008)(8676002)(8936002)(52536014)(7696005)(9686003)(6506007)(66476007)(66556008)(66946007)(66446008)(110136005)(76116006)(54906003)(316002)(478600001)(2906002)(122000001)(55016003)(33656002)(38100700002)(41300700001)(38070700009)(86362001)(26005)(82960400001)(7416002)(83380400001)(5660300002)(64756008)(83133001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?EHRn1zR6+2/6HkOm64cGEHHjoGNc52eYglHAJRlu7GqGsQHG6yOn3dXMwqvm?=
- =?us-ascii?Q?7GFeK71DO/EdLSVSE4jdK2NJAPW9c4EZKHS4hov0iO22h20ajBI2MlR40yGg?=
- =?us-ascii?Q?lJ8OwzuWSN5rENwbZXASjV5BO2k9E9ny5sm/CuaUIf1OgcNmxW0y+GtdUv/x?=
- =?us-ascii?Q?SvhDRQwvwq6HNyFtu4WZfeM6me3ZQr6+mfKXzX1CHgSBX0SMN9x6ba5+Xpjc?=
- =?us-ascii?Q?WA0OXavB/Dt7Tqf0vutkuwefojAnv0mf3B7Br1Npqytl6WcX+MZE+trW55g3?=
- =?us-ascii?Q?Q89Fym/ElN3ZAj6YtoR/SC1nPWhcVPyXgme5Eevq0KeyO/SKlS3cXUPnVeIl?=
- =?us-ascii?Q?4rfuiLUkgnp9kVQveJ9EiYZbCqkOv4SjL5uKILqzBh/g6Djo9LFuJmfov/ie?=
- =?us-ascii?Q?Esm9q+36p4Zo43l3ZAh+HLUpYBC56JH2j4z+GXxtFcBYvNN1nMIvuJLN3XK8?=
- =?us-ascii?Q?+JTAjXcb+l/NWYJn4hEP2QwLTjNIDniVwoDU6gZ5JZ25jAgHS+jM1t+ti5Cr?=
- =?us-ascii?Q?7t/SoxkUAtcHORilyZxvxDVvCJ5dbo9IJZeIUjUkgYKStPmGq4SdEKUAsCOF?=
- =?us-ascii?Q?eLoA4wXSsL9eX0Sz9OdBY2UJ5B81Th5/5EcrEJLyg9ElrexsTPfSPtIZUtwT?=
- =?us-ascii?Q?MyqR3o84hJh1H/GfpOJQYRYNX38yG7H0vWhLexPgr5KGVD13rVoejUhC0zZf?=
- =?us-ascii?Q?+cfj9Ct5UPv4877J2svvvZjgTSL+6Qx258j8Gz4bluwWzmxnkjjssdAarAga?=
- =?us-ascii?Q?z/JUPo7/tIWlraTKYnMGqMd1qLd+nSBjDGa64tdfJpjwlvFetXVtdTRKYCZ3?=
- =?us-ascii?Q?axUKpE1HUKg44acJmwssjkjJDBUFI+ZYz0Iizft0j0c8qtZOIrVgjFvi6Par?=
- =?us-ascii?Q?2w9DjKx4l+TElwOkIeaC2oX5frlEsV4SFPID10+7a0ez1zcGo1afbESdXlt/?=
- =?us-ascii?Q?rTJW89dU7zB9sM148g+rMnZee10sdwGUUxww5rHkChyuPni+R7C/2klU7230?=
- =?us-ascii?Q?nH+jBihf4+J6Hh3n+0Gl67MAzkMkERz9QBRXYB/IF2sxcZj5S9SrwW/Qwclk?=
- =?us-ascii?Q?jf9jNAQnuVecp3sDJwCADEz18sl2T29Luf/KZmTa/S/3hKId3q4Qt2vG28aN?=
- =?us-ascii?Q?/TaAyFloj+y27qQJ0//wMWF51hqzPAC/aDR/7jsDa7yxWzYAP5a5ytsBPJvJ?=
- =?us-ascii?Q?3SgSfpkw4obC7ZQuMz2W2zCQnXl92cexzyJqY+04lljjnrWv1AJ2ey8yYHQz?=
- =?us-ascii?Q?IdWbpRPoHsMGhniOVQf6S9IlXu25rcrvAM+B5Eih7For0dcqhM0WJ5FS1Xw1?=
- =?us-ascii?Q?b3biwndHATUy9GE683/4BpGYkz4H7jMm39xG+6M9Rb1HieoZL/LJ3+7MklyJ?=
- =?us-ascii?Q?qfSV3rIPawnvT19difbhZ9tnK4p0MiDCDA127vFq98ar/ox6MVom7u/vLjTD?=
- =?us-ascii?Q?/jbEE2Gft28UKi9WgZTzlLMmbaaQhkLQRWFrXPwhMPN3ZruuoAlzJ9eie0H7?=
- =?us-ascii?Q?p6MPwObMqeT17oXEbRICyz/5pyBrque0hb6U4T8Dy8zeSvgd8wUOUgHFPzCG?=
- =?us-ascii?Q?RWh/Pq+IIwANkaaWQp+9g8wjs5cbeoGAtK8ntjM8?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <86leancjcr.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH2PR02CA0011.namprd02.prod.outlook.com
+ (2603:10b6:610:4e::21) To SJ2PR01MB8101.prod.exchangelabs.com
+ (2603:10b6:a03:4f6::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|MW4PR01MB6356:EE_
+X-MS-Office365-Filtering-Correlation-Id: aa7277b3-0b9e-42f3-8d51-08dbef1a437d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	wucDELmjNcEMhGHdvUfR3YdVZprz44unvNgl3964EglTLWDjIBx6tjzv7G1+5eXiOrtqFJS270uLPgME4Ays5rZ9QG1jGSpV9h6tYtwi0JNG0j8NwpvB9l93A5FWb+0c6TAFA8I/hzrIorxhT+c1VO80HJ3byPMlk62AmK6k6UZeaRS3UxFXhAhLr5OPIRDAKkILLEQ9+lDBjg57y4SUI1L01JSCPTcavirmlvEdP0O7NKAJGqxrS5FUOP7hkyPIup9amf88gDDjQTUulaBVU4dmji7dW7hLxYDPirXbpzq7a8qfs0MGZNmZmBFSZdmolu9xWDZDXUoXk6eFzjfqz+CdM2aH22PnR8yPzMOL/1aRyZa8Ad9avtNegJkB058K+ozYNcUojHs4zm8JkJceUc5UEWJyYeGHfjGWGAIxTaHijYUEyB+0QXgZoyL0icDvl42fbJUse9DBqduFIGfLsfJ10KdN3i8F2HRgy/MuMi9ecbwZBAlYedTp5uwxzJtYUrVFdhRVr+1DQ8txOR1TzXLNk4pKnf1uHUJRHw0r79Sen6BuVbEALRhDJ7IlNkA/qVFw+2Gf6lHlPGc0uFvTLdJad8qDwxCDekGAhnUDWwOFbu6r+tEtcFXWcX7nCY2+
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(366004)(376002)(396003)(39850400004)(230922051799003)(186009)(451199024)(64100799003)(1800799012)(31696002)(86362001)(38100700002)(478600001)(6486002)(6916009)(316002)(54906003)(66946007)(66476007)(66556008)(26005)(6506007)(6666004)(2616005)(53546011)(6512007)(5660300002)(2906002)(7416002)(4326008)(41300700001)(8936002)(8676002)(31686004)(83380400001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VVRUSkFyQVJTTytGUERlb3hIdWhVRmtWVTJvS3pqemMrZ1V1c1pOR2lWYmMy?=
+ =?utf-8?B?UTVZOThPNTBTQmw5Z09xNFcrNkltNmIyMzRGTUd0L2RGbnVVTk9Uc1loSEFo?=
+ =?utf-8?B?SWx1MmFxUGE0VnZoc3F4MGZ3d2dYRnZxSkdRenFTZmh1VHFDcjBtaktmUmNX?=
+ =?utf-8?B?MERUa2NtZys1eHkzS1NZUzhjeHFxejZMTm5raWxHVDJBa1JkTmsxOHJpL1BX?=
+ =?utf-8?B?d0FxWlNZS01OZGZLUVd5ejgwRitWeloreEpoSG1Uc2hjeGxlaFU3YmRLT2Rz?=
+ =?utf-8?B?MzhTR29SZUhQUXFWVWZBbGd6S2Z1Y2wyaDYrVmNEQ056ZHBTR0NQY3NOWW1p?=
+ =?utf-8?B?bXRkelh4T3RNVVI1TUcwdVVDbU5FSFhBeWdGYXlGNXhpQWZZWDVsZHFLVGFs?=
+ =?utf-8?B?clZGYm5RYTlwNjFDYTlLRXE3ZVlXZWF0dStJajJHYzhmZHY5aWJkdGtMb2NC?=
+ =?utf-8?B?b2hBNTdoSXFHOFFmc1I3dFRJLzYrVnVpRlBscTJ4Sjhrd2NQTUVsTElvdTc2?=
+ =?utf-8?B?WjJWSVgyNUxYd1FLV1hncmZxMXBETDB0RmZzbTlrTU1Xb2pCNDE3UldtdXRI?=
+ =?utf-8?B?d0UwT2kxSzdadG05NHZqMzdPSjVKNHgxTXR2UTJYSkN3dnl0aUo4WHRUUVln?=
+ =?utf-8?B?MU5ibGF1dCsyMDg4WXZla0dhRWx3bXllbXVKZHZnMWpFN2lFaU5SKzE5NG5T?=
+ =?utf-8?B?QmU4RjR2ak5xelc1cGpBOXhqSEZQbDEwRWtVVWdlYmRBdTR6TWM5cGtJVkZv?=
+ =?utf-8?B?YVBiUWpWNG1IM1NmcnZ0YlVxbUtVcFVKMFpjWGpGWVhvNzZTUWhXaG8zSEVM?=
+ =?utf-8?B?dnNIcEUzYjljd3FIMnJETDIwNDlZSVF6RjJqRFZIMUMxOURuUnlRSHlvbjFo?=
+ =?utf-8?B?S21RMTNrTEpubmNZUTRZYyswZ0Z4S09JWjFjL05TWS9laks4YkhLS1pGS1lP?=
+ =?utf-8?B?U1VUWGhEYTAyalc2c01uN21jSC9Ncnh3dmFLaWZhMFlTU095YTdUbWJXQ0lt?=
+ =?utf-8?B?cHdXcUlJYnIzZGZQOWVBbURNRjNpQTI3eGtJRkQxKzh3eG1VWVNCVFpSZFBL?=
+ =?utf-8?B?RUlQcFdkczNaZzBDeUdkT2lsL2FheGU3M2poZ0Z4bk8yWCtoUkNYWmRVMTJV?=
+ =?utf-8?B?VFR3Q1ZtU0lURDkyV3lCUk9iWjZBTHRKclNiVmZBdk5aQTlBQ2RnSkF2Tmha?=
+ =?utf-8?B?Y2lmTzM3U2Y1eGM2SnpXcUNsYXRtK2c2c29NSlhuTWpnREQ2K25QYjhLUlNz?=
+ =?utf-8?B?bGVuS21rOHpjS2pCQ2E5NFRCd0ZTVmczSVM5NmQyaXdhUWRucDNuZkwzRWRa?=
+ =?utf-8?B?aDRZY3RPK3VJN0g1VVVwcGVRM0VXczRtYUVjbWo2YWZSZld4Vlc4UGluZXlG?=
+ =?utf-8?B?OXhJOVcxYlNCaktmalhVc0FLSGkyYURDMmE3U05iRmF2eXpNMW45ZndaVndC?=
+ =?utf-8?B?ZkZyTkpzM2JSTkVCNG13bzlXeW9weDhBNHNvNkQ1YVZabnROSENpeGJDNDBV?=
+ =?utf-8?B?MU5hY2lXK2ZaVnAxWjhQZ2VHakZXNnhoL01JUlNua1hEK2lSekh5eTVCaThL?=
+ =?utf-8?B?ODNNWExKTjBBNGg3NzJsSnF3bFBreTJnZmtjbW1YTnVSVmFBczlGa0JTMmlY?=
+ =?utf-8?B?bTUzeERiWXpiU3c4QTJ2MWFEUExyR3c1M04rdzd1cGJ5Z1o5NytSWEVMUXBn?=
+ =?utf-8?B?bHI2STh5blFkamNGTFlaZkt3SzVHbDkrRlVuVXUyYXVUUnBDTTBqM1dreHpj?=
+ =?utf-8?B?aXlMalhNNVdzY1hQdWljNFF6OFpnVFJiVkJOWG1FcGcyQldWN0gwZEg2SXpu?=
+ =?utf-8?B?M0lpRkpaQm9CNE9JS2xFSnNoQjE0WXBBSFFoZFdiT1V1d0drcGE2NStUNFZZ?=
+ =?utf-8?B?eTZyZEwrM25LRjdRbjg1eDhSZFh5S3d4cnU3UXA4ZnhiWHBoQm42ejlrMitE?=
+ =?utf-8?B?WDl1RytUZG53ejgvYTN3aWd0Y294WFIrQ3RLdGpIZjFsd0JPcFFYdzZGL1Jy?=
+ =?utf-8?B?eVNnNTFXdVdJMjdjT2FhQThKYlp4RS85UDBkdU5KRms4bXQ4cFBTNU00L2Ux?=
+ =?utf-8?B?U3FoUm5sTXFheUV0QmpYRFhncTRRb3o3NVU5NUhyZEoyV21aUzlIYXlwdHNT?=
+ =?utf-8?B?YW1OaHJIcUZOMnZYTTY4TUNuMFRuYm1mTDFiRi9ocE5YL3J0SkIrZVk1TnU1?=
+ =?utf-8?Q?NK5DdlVGF0NwiI8js7wjunawwCBXeElFwQNZRmpXH5SJ?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa7277b3-0b9e-42f3-8d51-08dbef1a437d
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB6744.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d93bc964-6260-475c-cca9-08dbef152916
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Nov 2023 06:50:36.5631
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2023 07:27:08.5258
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: v+BiwjYM9IO/bz8a/0hASQc932jrcbD8aGaC62JqMIdbv8VADEPAHH4SUJXKIPCnKh3slM5w19+ddd+OgiCZ3m1DRC3wSmfrzp5hd71ca1o=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7893
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MapSeSn0CvnuVPHDynUbA+H8XfqhSP2wfOrsti/uSNG0QHaZXVZctzn8B/e3MdyQ24H9WXmpcMizZNGDSF+FzJ3DkPG+tzLcYGxpTzY0R44aY8D5mlYHS90yBJgJhUcc
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR01MB6356
 
 
 
->-----Original Message-----
->From: Liu, Yi L <yi.l.liu@intel.com>
->Sent: Monday, November 27, 2023 2:39 PM
->Subject: [PATCH 2/3] vfio: Add
->VFIO_DEVICE_PASID_[AT|DE]TACH_IOMMUFD_PT
->
->This adds ioctls for the userspace to attach a given pasid of a vfio
->device to/from an IOAS/HWPT.
->
->Signed-off-by: Yi Liu <yi.l.liu@intel.com>
->---
-> drivers/vfio/device_cdev.c | 45 +++++++++++++++++++++++++++++++
-> drivers/vfio/vfio.h        |  4 +++
-> drivers/vfio/vfio_main.c   |  8 ++++++
-> include/uapi/linux/vfio.h  | 55 ++++++++++++++++++++++++++++++++++++++
-> 4 files changed, 112 insertions(+)
->
->diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
->index e75da0a70d1f..c2ac7ed44537 100644
->--- a/drivers/vfio/device_cdev.c
->+++ b/drivers/vfio/device_cdev.c
->@@ -210,6 +210,51 @@ int vfio_df_ioctl_detach_pt(struct vfio_device_file *=
-df,
-> 	return 0;
-> }
->
->+int vfio_df_ioctl_pasid_attach_pt(struct vfio_device_file *df,
->+				  struct vfio_device_pasid_attach_iommufd_pt
->__user *arg)
->+{
->+	struct vfio_device *device =3D df->device;
->+	struct vfio_device_pasid_attach_iommufd_pt attach;
->+	unsigned long minsz;
->+	int ret;
->+
->+	minsz =3D offsetofend(struct vfio_device_pasid_attach_iommufd_pt, pt_id)=
-;
->+
->+	if (copy_from_user(&attach, arg, minsz))
->+		return -EFAULT;
->+
->+	if (attach.argsz < minsz || attach.flags)
->+		return -EINVAL;
->+
->+	mutex_lock(&device->dev_set->lock);
->+	ret =3D device->ops->pasid_attach_ioas(device, attach.pasid,
->&attach.pt_id);
->+	mutex_unlock(&device->dev_set->lock);
->+
->+	return ret;
->+}
->+
->+int vfio_df_ioctl_pasid_detach_pt(struct vfio_device_file *df,
->+				  struct vfio_device_pasid_detach_iommufd_pt
->__user *arg)
->+{
->+	struct vfio_device *device =3D df->device;
->+	struct vfio_device_pasid_detach_iommufd_pt detach;
->+	unsigned long minsz;
->+
->+	minsz =3D offsetofend(struct vfio_device_pasid_detach_iommufd_pt, flags)=
-;
+On 24-11-2023 08:02 pm, Marc Zyngier wrote:
+> On Fri, 24 Nov 2023 13:22:22 +0000,
+> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+>>
+>>> How is this value possible if the write to HCR_EL2 has taken place?
+>>> When do you sample this?
+>>
+>> I am not sure how and where it got set. I think, whatever it is set,
+>> it is due to false return of vcpu_el2_e2h_is_set(). Need to
+>> understand/debug.
+>> The vhcr_el2 value I have shared is traced along with hcr in function
+>> __activate_traps/__compute_hcr.
+> 
+> Here's my hunch:
+> 
+> The guest boots with E2H=0, because we don't advertise anything else
+> on your HW. So we run with NV1=1 until we try to *upgrade* to VHE. NV2
+> means that HCR_EL2 is writable (to memory) without a trap. But we're
+> still running with NV1=1.
+> 
+> Subsequently, we access a sysreg that should never trap for a VHE
+> guest, but we're with the wrong config. Bad things happen.
+> 
+> Unfortunately, NV2 is pretty much incompatible with E2H being updated,
+> because it cannot perform the changes that this would result into at
+> the point where they should happen. We can try and do a best effort
+> handling, but you can always trick it.
+> 
+> Anyway, can you see if the hack below helps? I'm not keen on it at
+> all, but this would be a good data point.
 
-Pasid isn't copied, should use pasid here?
+Thanks Marc, this diff fixes the issue.
+Just wondering what is changed w.r.t to L1 handling from V10 to V11 that 
+it requires this trick?
+Also why this was not seen on your platform, is it E2H0 enabled?
 
-Thanks
-Zhenzhong
+> 
+> 	M.
+> 
+>  From c4b856221661393b884cbf673d100faaa8dc018a Mon Sep 17 00:00:00 2001
+> From: Marc Zyngier <maz@kernel.org>
+> Date: Fri, 26 May 2023 12:16:05 +0100
+> Subject: [PATCH] KVM: arm64: Opportunistically track HCR_EL2.E2H being flipped
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>   arch/arm64/include/asm/kvm_host.h       |  9 +++++++--
+>   arch/arm64/kvm/hyp/include/hyp/switch.h | 13 +++++++++++++
+>   arch/arm64/kvm/hyp/vhe/switch.c         | 10 ++++++++--
+>   3 files changed, 28 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index c91f607e989d..d45ef41de5fb 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -655,6 +655,9 @@ struct kvm_vcpu_arch {
+>   	/* State flags for kernel bookkeeping, unused by the hypervisor code */
+>   	u8 sflags;
+>   
+> +	/* Bookkeeping flags for NV */
+> +	u8 nvflags;
+> +
+>   	/*
+>   	 * Don't run the guest (internal implementation need).
+>   	 *
+> @@ -858,8 +861,6 @@ struct kvm_vcpu_arch {
+>   #define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
+>   /* Save TRBE context if active  */
+>   #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+> -/* vcpu running in HYP context */
+> -#define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+>   
+>   /* SVE enabled for host EL0 */
+>   #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+> @@ -878,6 +879,10 @@ struct kvm_vcpu_arch {
+>   /* WFI instruction trapped */
+>   #define IN_WFI			__vcpu_single_flag(sflags, BIT(7))
+>   
+> +/* vcpu running in HYP context */
+> +#define VCPU_HYP_CONTEXT	__vcpu_single_flag(nvflags, BIT(0))
+> +/* vcpu entered with HCR_EL2.E2H set */
+> +#define VCPU_HCR_E2H		__vcpu_single_flag(nvflags, BIT(1))
+>   
+>   /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+>   #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index aed2ea35082c..9c1346116d61 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -669,6 +669,19 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>   	 */
+>   	synchronize_vcpu_pstate(vcpu, exit_code);
+>   
+> +	if (vcpu_has_nv(vcpu) &&
+> +	    (!!vcpu_get_flag(vcpu, VCPU_HCR_E2H) ^ vcpu_el2_e2h_is_set(vcpu))) {
+> +		if (vcpu_el2_e2h_is_set(vcpu)) {
+> +			sysreg_clear_set(hcr_el2, HCR_NV1, 0);
+> +			vcpu_set_flag(vcpu, VCPU_HCR_E2H);
+> +		} else {
+> +			sysreg_clear_set(hcr_el2, 0, HCR_NV1);
+> +			vcpu_clear_flag(vcpu, VCPU_HCR_E2H);
+> +		}
+> +
+> +		return true;
+> +	}
+> +
+>   	/*
+>   	 * Check whether we want to repaint the state one way or
+>   	 * another.
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 8d1e9d1adabe..395aaa06f358 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -447,10 +447,16 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>   	sysreg_restore_guest_state_vhe(guest_ctxt);
+>   	__debug_switch_to_guest(vcpu);
+>   
+> -	if (is_hyp_ctxt(vcpu))
+> +	if (is_hyp_ctxt(vcpu)) {
+> +		if (vcpu_el2_e2h_is_set(vcpu))
+> +			vcpu_set_flag(vcpu, VCPU_HCR_E2H);
+> +		else
+> +			vcpu_clear_flag(vcpu, VCPU_HCR_E2H);
+> +
+>   		vcpu_set_flag(vcpu, VCPU_HYP_CONTEXT);
+> -	else
+> +	} else {
+>   		vcpu_clear_flag(vcpu, VCPU_HYP_CONTEXT);
+> +	}
+>   
+>   	do {
+>   		/* Jump in the fire! */
+
+Thanks,
+Ganapat
 
