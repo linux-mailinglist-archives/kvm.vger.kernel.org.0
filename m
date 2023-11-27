@@ -1,91 +1,107 @@
-Return-Path: <kvm+bounces-2517-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2518-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C14237FA7E0
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 18:24:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9760B7FA7E9
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 18:27:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 063281C20BE1
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 17:24:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DD1A2818A1
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 17:27:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC69381AC;
-	Mon, 27 Nov 2023 17:24:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6BE39FFF;
+	Mon, 27 Nov 2023 17:26:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dDeDJeVQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t4oJxuHW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF2E185
-	for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 09:24:11 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-28583d0fd4eso4888550a91.0
-        for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 09:24:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701105851; x=1701710651; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rL9LfDvcE9DBnUyEpS1p+L6oMlIKUpS9e4ZuAaaj8xo=;
-        b=dDeDJeVQHlQ994p98Okkt8Fi8rO1ymAvpvZY+lNMB0xLQP3k3YRPwn9ZU9FM10XfYP
-         MpWA0na4iyrnNjsT1acdT0xPP8jDcuoea7DyqVPE2BudYQTvoI4nvsdOXtnIxvyqE9m1
-         fqNWvqdHvZVzjONjkZAQVCua/7BOXMe1xSrmLKgk9Ac2Vs5kx8zUcTeWZoqNhqVerl1K
-         dpBkNjWJrHd8C8c+ubG39GQute/aj+q7GVgozK+sqjlEpTI17g3cIPVDJbYny4+OwWI5
-         7P464B7FJqQt+9EbtT/IrxqNel4bMvdakiNUUYr6hzJ69vYfrNJu+6r1HE2cXoZGrqjJ
-         VqKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701105851; x=1701710651;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rL9LfDvcE9DBnUyEpS1p+L6oMlIKUpS9e4ZuAaaj8xo=;
-        b=jaJeJnSdlf4wGMkDwRW1uD1OW2X428nP1+ezUAiEfQBXdaUg2aanba574UrmuIx8IB
-         tRR4p8QpjKYEag8oK1M6LjvIKQ8FFZw5qQ4A60IX7Brkg4cKD6t90kDIq0RiVE/sUm9g
-         RJ/9QQPKQGR/OGPHa6m7iSB7Ksq0F/gPJyzuB7elDqH2eHyQh/LOkAWYy3x+0Qz8rruw
-         JkCfzra+WWIUvKz21iGb3/K7LNfFBw67SfctIbJCWBKe4STKnM1Dzp5JqNaZy9zgp5Wr
-         MZZx1/JAbFmDQRw/uy2x6tmAYKi+DhD6Cojuio0/H4v4kVKCjpCwv8A+C8dCE3YI7FE4
-         921A==
-X-Gm-Message-State: AOJu0Yy9RiEc8AjlMXpJ6j/PvSo1td3Pn7nRYZuKuWdcNS9HI3On0+eY
-	IUEe0M5nyajVBsxa3mf5XFaMOP7QrdM=
-X-Google-Smtp-Source: AGHT+IECzk14EwMjjFb3/1urDD+Q4mbeNYdw2g1/0ksrRD/AQy7nqH1ycmu7b6tnBPlSMiaoFaFQgGrTeFU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:e8e:b0:285:b86b:6412 with SMTP id
- fv14-20020a17090b0e8e00b00285b86b6412mr1194032pjb.4.1701105850944; Mon, 27
- Nov 2023 09:24:10 -0800 (PST)
-Date: Mon, 27 Nov 2023 09:24:09 -0800
-In-Reply-To: <c858817d3e3be246a1a2278e3b42d06284e615e5.1700766316.git.maciej.szmigiero@oracle.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8B515AD2;
+	Mon, 27 Nov 2023 17:26:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4F5EC433C7;
+	Mon, 27 Nov 2023 17:26:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701106003;
+	bh=qdeoSw739uXFASMVA2HUXjXYhsiy55zqSkbdaliIcjk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=t4oJxuHWhnuU4+niH/KrsMaZq138qhMwrY/GrWhRXT7zdKOElkMnj867MX65TZ3Z8
+	 BDvW4S01Pf9dwMHBI1Q2YCkIlYiZAbnNlNV813pa3H1sJFksljNhKJJlqKhqtXKsEh
+	 xr4nenZE+SdlvRR4Ro8czvbtBC6wxWEKPZgmqD0X94amV9PaVWUMf3Pid11dQhwGmd
+	 QU93HPeAQp0CSB+p9KjXApZ2azSfQg2bXqXX2/E3yHDlKPxfQPESRf2cMBsbIHOrIX
+	 +cyTkmAq53hoxHWM1wtceG6ejjpn6QiGroJae07iBJuA6Dud5QvKS7134u4+lO1cIm
+	 uVhndnczzpJjg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1r7fNZ-00GsGj-8h;
+	Mon, 27 Nov 2023 17:26:41 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v2 0/3] arm64: Drop support for VPIPT i-cache policy
+Date: Mon, 27 Nov 2023 17:26:10 +0000
+Message-Id: <20231127172613.1490283-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <c858817d3e3be246a1a2278e3b42d06284e615e5.1700766316.git.maciej.szmigiero@oracle.com>
-Message-ID: <ZWTQuRpwPkutHY-D@google.com>
-Subject: Re: [PATCH] KVM: x86: Allow XSAVES on CPUs where host doesn't use it
- due to an errata
-From: Sean Christopherson <seanjc@google.com>
-To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, ardb@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Nov 23, 2023, Maciej S. Szmigiero wrote:
-> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-> 
-> Since commit b0563468eeac ("x86/CPU/AMD: Disable XSAVES on AMD family 0x17")
-> kernel unconditionally clears the XSAVES CPU feature bit on Zen1/2 CPUs.
-> 
-> Since KVM CPU caps are initialized from the kernel boot CPU features this
-> makes the XSAVES feature also unavailable for KVM guests in this case, even
-> though they might want to decide on their own whether they are affected by
-> this errata.
-> 
-> Allow KVM guests to make such decision by setting the XSAVES KVM CPU
-> capability bit based on the actual CPU capability
+ARMv8.2 introduced support for VPIPT i-caches, the V standing for
+VMID-tagged. Although this looks like a reasonable idea, no
+implementation has ever made it into the wild.
 
-This is not generally safe, as the guest can make such a decision if and only if
-the Family/Model/Stepping information is reasonably accurate.
+Linux has supported this for over 6 years (amusingly, just as the
+architecture was dropping support for AVIVT i-caches), but we had no
+way to even test it, and it is likely that this code was just
+bit-rotting.
 
-> This fixes booting Hyper-V enabled Windows Server 2016 VMs with more than
-> one vCPU on Zen1/2 CPUs.
+However, in a recent breakthrough (XML drop 2023-09, tagged as
+d55f5af8e09052abe92a02adf820deea2eaed717), the architecture has
+finally been purged of this option, making VIPT and PIPT the only two
+valid options.
 
-How/why does lack of XSAVES break a multi-vCPU setup?  Is Windows blindly doing
-XSAVES based on FMS?
+This really means this code is just dead code. Nobody will ever come
+up with such an implementation, and we can just get rid of it.
+
+Most of the impact is on KVM, where we drop a few large comment blocks
+(and a bit of code), while the core arch code loses the detection code
+itself.
+
+Marc Zyngier (3):
+  KVM: arm64: Remove VPIPT I-cache handling
+  arm64: Kill detection of VPIPT i-cache policy
+  arm64: Rename reserved values for CTR_EL0.L1Ip
+
+ arch/arm64/include/asm/cache.h   |  6 ----
+ arch/arm64/include/asm/kvm_mmu.h |  7 ----
+ arch/arm64/kernel/cpuinfo.c      |  5 ---
+ arch/arm64/kvm/hyp/nvhe/pkvm.c   |  2 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c    | 61 --------------------------------
+ arch/arm64/kvm/hyp/vhe/tlb.c     | 13 -------
+ arch/arm64/tools/sysreg          |  5 +--
+ 7 files changed, 4 insertions(+), 95 deletions(-)
+
+-- 
+2.39.2
+
 
