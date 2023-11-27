@@ -1,190 +1,162 @@
-Return-Path: <kvm+bounces-2514-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2515-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B3617FA614
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 17:18:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E39B7FA6D5
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 17:48:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CB571C20CEB
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 16:18:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2DB4B213D8
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 16:48:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AAC936AF2;
-	Mon, 27 Nov 2023 16:18:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F46436B18;
+	Mon, 27 Nov 2023 16:48:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RDetjsoN"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="aDtpsQCv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3CF4CE;
-	Mon, 27 Nov 2023 08:18:14 -0800 (PST)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ARGAmYN028142;
-	Mon, 27 Nov 2023 16:17:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=Nuqo+n/8UjwMTVEGeTCKZXosXYxmJFELkiNy1EQyEtU=;
- b=RDetjsoNSqPUBKvTXa+yBZv9cgM4/tRINJ+ZyFlcz1qb0NPkwaJ9GrMBibq2hn3f/5CW
- ND1Z7IaAgMUmx8uAabK1Nl5ilpXMpDVf5OETx+5lnUl5qjNiC64q4PtX+8SqtYwOBCmV
- cCdB5Av3LEQ8B9AclxR0DdyVukfpIFH1S5BSEVkhag7d6PmJLZ/11f75vPfjUtjUQPYI
- jOo6tGPT4DyW3BR3TU2aC4jIDdJImhwHQ23EQAgB/MazLxGxSnFqR3kagn1nPRlsiNCG
- WCPnPGg83TnSm3tABpWGa1/oTgd04gU/8Zbwm9/NU76VRx9DKmCqXe7D4H0BVmUgqgtH kg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3umxd509yt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 27 Nov 2023 16:17:19 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3ARGCcKr005148;
-	Mon, 27 Nov 2023 16:17:18 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3umxd509xr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 27 Nov 2023 16:17:18 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AREJqSO025580;
-	Mon, 27 Nov 2023 16:17:17 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ukvrk9n1b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 27 Nov 2023 16:17:17 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3ARGHGcJ22413978
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 27 Nov 2023 16:17:16 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 15FA45805A;
-	Mon, 27 Nov 2023 16:17:16 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3A9CF5803F;
-	Mon, 27 Nov 2023 16:17:11 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.23.212])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 27 Nov 2023 16:17:11 +0000 (GMT)
-Message-ID: <403a25d73a752da129affe0092e5b85a179f827b.camel@linux.ibm.com>
-Subject: Re: [PATCH v2 2/4] eventfd: simplify eventfd_signal()
-From: Eric Farman <farman@linux.ibm.com>
-To: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
-        Vitaly
- Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen
- <dave.hansen@linux.intel.com>, x86@kernel.org,
-        David Woodhouse
- <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>,
-        Oded Gabbay
- <ogabbay@kernel.org>, Wu Hao <hao.wu@intel.com>,
-        Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
-        Xu Yilun <yilun.xu@intel.com>, Zhenyu
- Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Jani
- Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen
- <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        David Airlie
- <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
-        Leon Romanovsky
- <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Frederic Barrat
- <fbarrat@linux.ibm.com>,
-        Andrew Donnellan <ajd@linux.ibm.com>, Arnd
- Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter
- <oberpar@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik
- <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian
- Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle
- <svens@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Jason Herne
- <jjherne@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Diana Craciun
- <diana.craciun@oss.nxp.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>, Fei Li <fei1.li@intel.com>,
-        Benjamin
- LaHaise <bcrl@kvack.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal
- Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Shakeel Butt <shakeelb@google.com>,
-        Muchun Song <muchun.song@linux.dev>,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-fpga@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        linux-usb@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-aio@kvack.org, cgroups@vger.kernel.org,
-        linux-mm@kvack.org, Jens Axboe <axboe@kernel.dk>,
-        Pavel Begunkov
- <asml.silence@gmail.com>, io-uring@vger.kernel.org
-Date: Mon, 27 Nov 2023 11:17:10 -0500
-In-Reply-To: <20231122-vfs-eventfd-signal-v2-2-bd549b14ce0c@kernel.org>
-References: <20231122-vfs-eventfd-signal-v2-0-bd549b14ce0c@kernel.org>
-	 <20231122-vfs-eventfd-signal-v2-2-bd549b14ce0c@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 57775189;
+	Mon, 27 Nov 2023 08:48:33 -0800 (PST)
+Received: from [192.168.4.26] (unknown [47.186.13.91])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 862F420B74C0;
+	Mon, 27 Nov 2023 08:48:30 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 862F420B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1701103712;
+	bh=jeMkp5Q+EKa19c6aqn2EEeUT1WIFRK1lWII/T1Aq+rQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aDtpsQCv5Z7lrnyBfZDtXIQ5YkOeXU+eDniqpgG5DSD+i9xBYSIgXtJO6yM/hN7oZ
+	 EiQi/S+Yjy2TnSaq8aWFJwrDCDQJ4E01iXdFLG0uIDqHbnx9CwBuz6XIqHOPh2NLet
+	 Jzp9sNlniTRePSjgypI8ZiHOZ0a54xSepS+7ZLF8=
+Message-ID: <a52d8885-43cc-4a4e-bb47-9a800070779e@linux.microsoft.com>
+Date: Mon, 27 Nov 2023 10:48:29 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: XoaaD6-mJ7FXgBebGO5fJDYPNfCOc-S6
-X-Proofpoint-GUID: dFRt_wiBkITiSbtkagN5iZ6G9Z4ZE_Ku
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-27_14,2023-11-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 phishscore=0
- mlxlogscore=786 impostorscore=0 spamscore=0 adultscore=0
- priorityscore=1501 mlxscore=0 malwarescore=0 bulkscore=0
- lowpriorityscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2311060000 definitions=main-2311270111
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 17/19] heki: x86: Update permissions counters
+ during text patching
+Content-Language: en-US
+To: Peter Zijlstra <peterz@infradead.org>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
+ =?UTF-8?Q?n?= <mic@digikod.net>
+Cc: Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, "H . Peter Anvin" <hpa@zytor.com>,
+ Ingo Molnar <mingo@redhat.com>, Kees Cook <keescook@chromium.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
+ <seanjc@google.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
+ Alexander Graf <graf@amazon.com>, Chao Peng <chao.p.peng@linux.intel.com>,
+ "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ Forrest Yuan Yu <yuanyu@google.com>, James Gowans <jgowans@amazon.com>,
+ James Morris <jamorris@linux.microsoft.com>,
+ John Andersen <john.s.andersen@intel.com>,
+ Marian Rotariu <marian.c.rotariu@gmail.com>,
+ =?UTF-8?Q?Mihai_Don=C8=9Bu?= <mdontu@bitdefender.com>,
+ =?UTF-8?B?TmljdciZb3IgQ8OuyJt1?= <nicu.citu@icloud.com>,
+ Thara Gopinath <tgopinath@microsoft.com>,
+ Trilok Soni <quic_tsoni@quicinc.com>, Wei Liu <wei.liu@kernel.org>,
+ Will Deacon <will@kernel.org>, Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Zahra Tarkhani <ztarkhani@microsoft.com>,
+ =?UTF-8?Q?=C8=98tefan_=C8=98icleru?= <ssicleru@bitdefender.com>,
+ dev@lists.cloudhypervisor.org, kvm@vger.kernel.org,
+ linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org,
+ qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
+ x86@kernel.org, xen-devel@lists.xenproject.org
+References: <20231113022326.24388-1-mic@digikod.net>
+ <20231113022326.24388-18-mic@digikod.net>
+ <20231113081929.GA16138@noisy.programming.kicks-ass.net>
+From: "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
+In-Reply-To: <20231113081929.GA16138@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-T24gV2VkLCAyMDIzLTExLTIyIGF0IDEzOjQ4ICswMTAwLCBDaHJpc3RpYW4gQnJhdW5lciB3cm90
-ZToKPiBFdmVyIHNpbmNlIHRoZSBldmVuZmQgdHlwZSB3YXMgaW50cm9kdWNlZCBiYWNrIGluIDIw
-MDcgaW4gY29tbWl0CgpzL2V2ZW5mZC9ldmVudGZkLwoKPiBlMWFkNzQ2OGM3N2QgKCJzaWduYWwv
-dGltZXIvZXZlbnQ6IGV2ZW50ZmQgY29yZSIpIHRoZQo+IGV2ZW50ZmRfc2lnbmFsKCkKPiBmdW5j
-dGlvbiBvbmx5IGV2ZXIgcGFzc2VkIDEgYXMgYSB2YWx1ZSBmb3IgQG4uIFRoZXJlJ3Mgbm8gcG9p
-bnQgaW4KPiBrZWVwaW5nIHRoYXQgYWRkaXRpb25hbCBhcmd1bWVudC4KPiAKPiBTaWduZWQtb2Zm
-LWJ5OiBDaHJpc3RpYW4gQnJhdW5lciA8YnJhdW5lckBrZXJuZWwub3JnPgo+IC0tLQo+IMKgYXJj
-aC94ODYva3ZtL2h5cGVydi5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCB8wqAgMiArLQo+IMKgYXJjaC94ODYva3ZtL3hlbi5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgMiArLQo+IMKgZHJpdmVycy9hY2NlbC9oYWJhbmFs
-YWJzL2NvbW1vbi9kZXZpY2UuY8KgIHzCoCAyICstCj4gwqBkcml2ZXJzL2ZwZ2EvZGZsLmPCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCAyICstCj4gwqBk
-cml2ZXJzL2dwdS9kcm0vZHJtX3N5bmNvYmouY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAg
-NiArKystLS0KPiDCoGRyaXZlcnMvZ3B1L2RybS9pOTE1L2d2dC9pbnRlcnJ1cHQuY8KgwqDCoMKg
-wqAgfMKgIDIgKy0KPiDCoGRyaXZlcnMvaW5maW5pYmFuZC9ody9tbHg1L2RldnguY8KgwqDCoMKg
-wqDCoMKgwqAgfMKgIDIgKy0KPiDCoGRyaXZlcnMvbWlzYy9vY3hsL2ZpbGUuY8KgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDIgKy0KPiDCoGRyaXZlcnMvczM5MC9jaW8vdmZp
-b19jY3dfY2hwLmPCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgMiArLQo+IMKgZHJpdmVycy9zMzkw
-L2Npby92ZmlvX2Njd19kcnYuY8KgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCA0ICsrLS0KPiDCoGRy
-aXZlcnMvczM5MC9jaW8vdmZpb19jY3dfb3BzLmPCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgNiAr
-KystLS0KPiDCoGRyaXZlcnMvczM5MC9jcnlwdG8vdmZpb19hcF9vcHMuY8KgwqDCoMKgwqDCoMKg
-wqAgfMKgIDIgKy0KCkFja2VkLWJ5OiBFcmljIEZhcm1hbiA8ZmFybWFuQGxpbnV4LmlibS5jb20+
-ICAjIHMzOTAKCg==
+Apologies for the late reply. I was on vacation. Please see my response below:
 
+On 11/13/23 02:19, Peter Zijlstra wrote:
+> On Sun, Nov 12, 2023 at 09:23:24PM -0500, Mickaël Salaün wrote:
+>> From: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+>>
+>> X86 uses a function called __text_poke() to modify executable code. This
+>> patching function is used by many features such as KProbes and FTrace.
+>>
+>> Update the permissions counters for the text page so that write
+>> permissions can be temporarily established in the EPT to modify the
+>> instructions in that page.
+>>
+>> Cc: Borislav Petkov <bp@alien8.de>
+>> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+>> Cc: H. Peter Anvin <hpa@zytor.com>
+>> Cc: Ingo Molnar <mingo@redhat.com>
+>> Cc: Kees Cook <keescook@chromium.org>
+>> Cc: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+>> Cc: Mickaël Salaün <mic@digikod.net>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Sean Christopherson <seanjc@google.com>
+>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> Cc: Wanpeng Li <wanpengli@tencent.com>
+>> Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+>> ---
+>>
+>> Changes since v1:
+>> * New patch
+>> ---
+>>  arch/x86/kernel/alternative.c |  5 ++++
+>>  arch/x86/mm/heki.c            | 49 +++++++++++++++++++++++++++++++++++
+>>  include/linux/heki.h          | 14 ++++++++++
+>>  3 files changed, 68 insertions(+)
+>>
+>> diff --git a/arch/x86/kernel/alternative.c b/arch/x86/kernel/alternative.c
+>> index 517ee01503be..64fd8757ba5c 100644
+>> --- a/arch/x86/kernel/alternative.c
+>> +++ b/arch/x86/kernel/alternative.c
+>> @@ -18,6 +18,7 @@
+>>  #include <linux/mmu_context.h>
+>>  #include <linux/bsearch.h>
+>>  #include <linux/sync_core.h>
+>> +#include <linux/heki.h>
+>>  #include <asm/text-patching.h>
+>>  #include <asm/alternative.h>
+>>  #include <asm/sections.h>
+>> @@ -1801,6 +1802,7 @@ static void *__text_poke(text_poke_f func, void *addr, const void *src, size_t l
+>>  	 */
+>>  	pgprot = __pgprot(pgprot_val(PAGE_KERNEL) & ~_PAGE_GLOBAL);
+>>  
+>> +	heki_text_poke_start(pages, cross_page_boundary ? 2 : 1, pgprot);
+>>  	/*
+>>  	 * The lock is not really needed, but this allows to avoid open-coding.
+>>  	 */
+>> @@ -1865,7 +1867,10 @@ static void *__text_poke(text_poke_f func, void *addr, const void *src, size_t l
+>>  	}
+>>  
+>>  	local_irq_restore(flags);
+>> +
+>>  	pte_unmap_unlock(ptep, ptl);
+>> +	heki_text_poke_end(pages, cross_page_boundary ? 2 : 1, pgprot);
+>> +
+>>  	return addr;
+>>  }
+> 
+> This makes no sense, we already use a custom CR3 with userspace alias
+> for the actual pages to write to, why are you then frobbing permissions
+> on that *again* ?
+
+Today, the permissions for a guest page in the extended page table (EPT) are RWX (unless permissions are
+restricted for some specific reason like for shadow page table pages). In this Heki feature, we don't allow
+RWX by default in the EPT. We only allow those permissions in the EPT that the guest page actually needs.
+E.g., for a text page, it is R_X in both the guest page table and the EPT.
+
+For text patching, the above code establishes an alternate mapping in the guest page table that is RW_ so
+that the text can be patched. That needs to be reflected in the EPT so that the EPT permissions will change
+from R_X to RWX. In other words, RWX is allowed only as necessary. At the end of patching, the EPT permissions
+are restored to R_X.
+
+Does that address your comment?
+
+Madhavan
 
