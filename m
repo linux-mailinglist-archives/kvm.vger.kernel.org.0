@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-2471-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2472-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87AB97F9826
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 05:12:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0FAC7F9828
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 05:14:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C6AD280DFE
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 04:12:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0B111C208EB
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 04:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D18C539D;
-	Mon, 27 Nov 2023 04:12:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19F753B8;
+	Mon, 27 Nov 2023 04:14:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SCgIMSBH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="euavnfzy"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E70FE8
-	for <kvm@vger.kernel.org>; Sun, 26 Nov 2023 20:12:20 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59B0912D
+	for <kvm@vger.kernel.org>; Sun, 26 Nov 2023 20:14:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701058339;
+	s=mimecast20190719; t=1701058444;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=67A6reGph7OBDqrRqdMlH2sW1EYf0zn15yqP5FYtCnU=;
-	b=SCgIMSBH92OjOB8dCLYUcRr03mo6LNPg5tp7/FFSBoyx0h6iKe5tmZ1kCSMlMeUF4pT6ue
-	Y2aMU+F0NhmtNv6MYcoTJED7EVeMqBK3U0jMHd4biAYd8pX3/KVTTcRkmUuPLVGFNKi3zQ
-	Q7IlPX+cxGse1J6s3Qm302Ckpu/XeGg=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=55HuZwlTrXr491X1QtFyKDqXPxkmAiZuFkdy/eIPI8k=;
+	b=euavnfzyjy4U0sLrND2qcYUPXW9oljr+oX/2ogP+MsBhapaam/6VFo/1OrH5QsGblXL4x1
+	MoIYto8jI09XgCkR4FCVOtzj3HV/4Nh4Koe67Qtrrhv0uTz45iLhRCOy8hxJmSdrF0xY9Z
+	e48+1lD//YAhtslgdC2Td6OmMRFZrEc=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-456-4UBrlDgiO9qnsGv4gZRKbw-1; Sun, 26 Nov 2023 23:12:15 -0500
-X-MC-Unique: 4UBrlDgiO9qnsGv4gZRKbw-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-5bd18d54a48so3735157a12.0
-        for <kvm@vger.kernel.org>; Sun, 26 Nov 2023 20:12:15 -0800 (PST)
+ us-mta-321-V2DVb81TM92Pdo20XIDsCQ-1; Sun, 26 Nov 2023 23:14:02 -0500
+X-MC-Unique: V2DVb81TM92Pdo20XIDsCQ-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-285a1530b7dso1826091a91.3
+        for <kvm@vger.kernel.org>; Sun, 26 Nov 2023 20:14:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701058335; x=1701663135;
+        d=1e100.net; s=20230601; t=1701058442; x=1701663242;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=67A6reGph7OBDqrRqdMlH2sW1EYf0zn15yqP5FYtCnU=;
-        b=pmeDLfiv+8ZyWw7vavVbSChfJVIT9VX8CUG9WOsqGqcY3Odj1oqOfMd4BnIWp4D8Nf
-         Te1esnhNpn4OO4T18PMp48fy4fNrrYNPI47hffaXQu0B4R/bwKgzCglx3jdN2eC/2ZBq
-         M62jL4lppCRiJBncCsnwDQwgry88yzSebcVtaVRsFOQQAIvy6024rac6aZQwgSBKLRFM
-         2FZSHEDd7LNiH4x8IdSEdktl1+YtSJ0omBVdnxJ4vi8nwLT4bWZyVpdJm5jQTN2XiEcW
-         U+5/2zs1999TYPSUMur3IH8EZ9XDXHvUSZB2KzOlpyedQO/b340QHjekDH9LiaRd8Ijb
-         +Iew==
-X-Gm-Message-State: AOJu0YwBbcGvy4Himft4mBDsZmNBN9ihFuGzdNSeNazjUPW5W5vmYTdy
-	LGBTX33Ojm26bNEF4mNuGfT6bfvo02vo41hFzXAelL2H/XbdVd9C2UrlraFcNWYfz57LpOI42UO
-	f/SCVzjE00Ykg
-X-Received: by 2002:a05:6a20:7d89:b0:189:b618:1736 with SMTP id v9-20020a056a207d8900b00189b6181736mr12382811pzj.57.1701058334718;
-        Sun, 26 Nov 2023 20:12:14 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHSDd4AtOdVN2L90B0w3l0OXzwCUCzv6le27hMT8UJkoQ+VC0ZETzVfDuabM5RN4XqjwPhDXA==
-X-Received: by 2002:a05:6a20:7d89:b0:189:b618:1736 with SMTP id v9-20020a056a207d8900b00189b6181736mr12382802pzj.57.1701058334453;
-        Sun, 26 Nov 2023 20:12:14 -0800 (PST)
+        bh=55HuZwlTrXr491X1QtFyKDqXPxkmAiZuFkdy/eIPI8k=;
+        b=Ic3ftUJHjLqgnyApZWN88hvmzMlqPBxtpLe9lsCw097E2B8JnnF4r/4UAJD8uHycda
+         gsKCtD88ckLQ+0jxo4ml7rp3PdUTi1pJuzsWayMFzb9hqqpwdCUQKb0LZ5yTmtJ1YCop
+         zKE5vnSWRGfcOc31sRAwmepEvCjiLaQt23JKwHet0DqaXvrlPR3/Dy184DC8GcYplJic
+         M8R4sgGiEFdQHJAbLK3pdglbcpbobfBFl/3OVHcrIiMr+cjJ+KNb7nwaaiKd9ATg/ORS
+         HEQ1xa5OZ/bmgM152JTiBAL+vaXxvZCZMYBDpIcqYk5w0V+NXGQjJVpvllwlAZ0tDhhG
+         aFbg==
+X-Gm-Message-State: AOJu0YzXWKEYuGKOCGWPlkEKb13E0OGZ1dIvNy2M3WSJOCZ2aPl6F7g0
+	HHZGTuSZtYEJF0gryt8Ut/yDmYnsZ5M+IEOgIXJs87NGgh9X0ne0Tvhshi5jMTjNj6/AODIRFdI
+	yGuTrSpVlzfw+
+X-Received: by 2002:a17:90b:1e44:b0:285:b019:1505 with SMTP id pi4-20020a17090b1e4400b00285b0191505mr4170791pjb.45.1701058441976;
+        Sun, 26 Nov 2023 20:14:01 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFZiNVDO0nxQJhb5s0jNV0CQb908dp3CHGjr/kwhWr8MLb4KG6gc60KOmx6iC8oEo5/7MYHEw==
+X-Received: by 2002:a17:90b:1e44:b0:285:b019:1505 with SMTP id pi4-20020a17090b1e4400b00285b0191505mr4170781pjb.45.1701058441675;
+        Sun, 26 Nov 2023 20:14:01 -0800 (PST)
 Received: from [192.168.68.51] ([43.252.115.3])
-        by smtp.gmail.com with ESMTPSA id a9-20020a170902ee8900b001ca86a9caccsm7173261pld.228.2023.11.26.20.12.11
+        by smtp.gmail.com with ESMTPSA id 102-20020a17090a09ef00b002800e0b4852sm7521850pjo.22.2023.11.26.20.13.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Nov 2023 20:12:14 -0800 (PST)
-Message-ID: <54a38178-18ca-4bea-9d5d-af34114dda5b@redhat.com>
-Date: Mon, 27 Nov 2023 15:12:10 +1100
+        Sun, 26 Nov 2023 20:14:01 -0800 (PST)
+Message-ID: <886ab4a1-02be-4345-8881-0f29f23283c7@redhat.com>
+Date: Mon, 27 Nov 2023 15:13:56 +1100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,21 +68,19 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH-for-9.0 05/16] target/arm/kvm: Have kvm_arm_sve_get_vls
- take a ARMCPU argument
+Subject: Re: [PATCH-for-9.0 06/16] target/arm/kvm: Have
+ kvm_arm_set_device_attr take a ARMCPU argument
 Content-Language: en-US
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
  kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 References: <20231123183518.64569-1-philmd@linaro.org>
- <20231123183518.64569-6-philmd@linaro.org>
+ <20231123183518.64569-7-philmd@linaro.org>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20231123183518.64569-6-philmd@linaro.org>
+In-Reply-To: <20231123183518.64569-7-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-
-Hi Phil,
 
 On 11/24/23 05:35, Philippe Mathieu-Daudé wrote:
 > Unify the "kvm_arm.h" API: All functions related to ARM vCPUs
@@ -91,72 +89,10 @@ On 11/24/23 05:35, Philippe Mathieu-Daudé wrote:
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->   target/arm/kvm_arm.h | 6 +++---
->   target/arm/cpu64.c   | 2 +-
->   target/arm/kvm.c     | 2 +-
->   3 files changed, 5 insertions(+), 5 deletions(-)
+>   target/arm/kvm.c | 12 ++++++------
+>   1 file changed, 6 insertions(+), 6 deletions(-)
 > 
-> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-> index 6fb8a5f67e..84f87f5ed7 100644
-> --- a/target/arm/kvm_arm.h
-> +++ b/target/arm/kvm_arm.h
-> @@ -129,13 +129,13 @@ void kvm_arm_destroy_scratch_host_vcpu(int *fdarray);
->   
->   /**
->    * kvm_arm_sve_get_vls:
-> - * @cs: CPUState
-> + * @cpu: ARMCPU
->    *
->    * Get all the SVE vector lengths supported by the KVM host, setting
->    * the bits corresponding to their length in quadwords minus one
->    * (vq - 1) up to ARM_MAX_VQ.  Return the resulting map.
->    */
-> -uint32_t kvm_arm_sve_get_vls(CPUState *cs);
-> +uint32_t kvm_arm_sve_get_vls(ARMCPU *cpu);
->   
 
-Either @cs or @cpu isn't dereferenced in kvm_arm_sve_get_vls(). So I guess
-the argument can be simply droped?
-
->   /**
->    * kvm_arm_set_cpu_features_from_host:
-> @@ -278,7 +278,7 @@ static inline void kvm_arm_steal_time_finalize(ARMCPU *cpu, Error **errp)
->       g_assert_not_reached();
->   }
->   
-> -static inline uint32_t kvm_arm_sve_get_vls(CPUState *cs)
-> +static inline uint32_t kvm_arm_sve_get_vls(ARMCPU *cpu)
->   {
->       g_assert_not_reached();
->   }
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 1e9c6c85ae..8e30a7993e 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -66,7 +66,7 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
->        */
->       if (kvm_enabled()) {
->           if (kvm_arm_sve_supported()) {
-> -            cpu->sve_vq.supported = kvm_arm_sve_get_vls(CPU(cpu));
-> +            cpu->sve_vq.supported = kvm_arm_sve_get_vls(cpu);
->               vq_supported = cpu->sve_vq.supported;
->           } else {
->               assert(!cpu_isar_feature(aa64_sve, cpu));
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index 71833a845a..766a077bcf 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -1803,7 +1803,7 @@ bool kvm_arm_sve_supported(void)
->   
->   QEMU_BUILD_BUG_ON(KVM_ARM64_SVE_VQ_MIN != 1);
->   
-> -uint32_t kvm_arm_sve_get_vls(CPUState *cs)
-> +uint32_t kvm_arm_sve_get_vls(ARMCPU *cpu)
->   {
->       /* Only call this function if kvm_arm_sve_supported() returns true. */
->       static uint64_t vls[KVM_ARM64_SVE_VLS_WORDS];
-
-Thanks,
-Gavin
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 
 
