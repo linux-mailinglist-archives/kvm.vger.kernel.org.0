@@ -1,172 +1,171 @@
-Return-Path: <kvm+bounces-2508-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2509-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A792F7F9E44
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 12:14:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D982F7F9EE1
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 12:45:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8BBB1C20C98
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 11:14:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D86611C20D6A
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 11:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53B281944D;
-	Mon, 27 Nov 2023 11:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E39B91A71F;
+	Mon, 27 Nov 2023 11:45:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TBT467Qj"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6E14136;
-	Mon, 27 Nov 2023 03:14:01 -0800 (PST)
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id E414521C6F;
-	Mon, 27 Nov 2023 11:13:59 +0000 (UTC)
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8C5491367B;
-	Mon, 27 Nov 2023 11:13:59 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Pc/rIfd5ZGXRZQAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Mon, 27 Nov 2023 11:13:59 +0000
-Message-ID: <81628606-ca9b-866f-5e71-91001e856871@suse.cz>
-Date: Mon, 27 Nov 2023 12:13:59 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE29101F2;
+	Mon, 27 Nov 2023 11:45:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20791C433C7;
+	Mon, 27 Nov 2023 11:45:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701085544;
+	bh=fR7axwwaqdOnZ7+hJpsO31cSOdlPA/4ws0EQLkXICwM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TBT467QjtZ/emVrJAaWgmbMkUb/5qwCubJokavxLNgqIOwvX6HCGspUnvcE+UYSi5
+	 Jj9fQ/Z4YVPrLjA52L3vtlR5/dh48Zv+ULQhcVKM3mI8VSqzsYTYbqwUrIDq6z7Fsl
+	 1XSj1FG5pUbKIWOAXQowWwSxL1mrF2QbSKrs93G2W6Fn9Khpf9VV+59tWMUROL3ZJ/
+	 LHzkhv+e+7126p+R5R+Vpr8QHz5TuyzyjJZIFi/6kne2+84vqWboQWHtFAbpNFGNkT
+	 hB8o1kmA9ILWUTE+DFBD4jd22+Sd4SU4593if0YuuIg05yJR3xzlIYXQ+FqHnDzlwp
+	 f34yubxBLkg+Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1r7a3Z-00Gldl-Ck;
+	Mon, 27 Nov 2023 11:45:41 +0000
+Date: Mon, 27 Nov 2023 11:45:40 +0000
+Message-ID: <86fs0rctcr.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: Miguel Luis <miguel.luis@oracle.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Darren Hart <darren@os.amperecomputing.com>,
+	Jintack Lim <jintack@cs.columbia.edu>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	James Morse
+ <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support (FEAT_NV2 only)
+In-Reply-To: <1fe79744-f8a4-466f-8f1a-32e6fab78be9@os.amperecomputing.com>
+References: <20231120131027.854038-1-maz@kernel.org>
+	<DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
+	<86msv7ylnu.wl-maz@kernel.org>
+	<05733774-4210-4097-9912-fb3aa8542fdd@oracle.com>
+	<86a5r4zafh.wl-maz@kernel.org>
+	<134912e4-beed-4ab6-8ce1-33e69ec382b3@os.amperecomputing.com>
+	<868r6nzc5y.wl-maz@kernel.org>
+	<65dc2a93-0a17-4433-b3a5-430bf516ffe9@os.amperecomputing.com>
+	<86o7fjco13.wl-maz@kernel.org>
+	<e18700d4-061d-4489-8d8d-87c11b70eedb@os.amperecomputing.com>
+	<86leancjcr.wl-maz@kernel.org>
+	<9f8656c7-8036-4bd6-a0f5-4fa531f95b2f@os.amperecomputing.com>
+	<86jzq3d007.wl-maz@kernel.org>
+	<1fe79744-f8a4-466f-8f1a-32e6fab78be9@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v13 17/35] KVM: Add transparent hugepage support for
- dedicated guest memory
-Content-Language: en-US
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
- Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, Xu Yilun <yilun.xu@intel.com>,
- Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
- Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>,
- David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
- =?UTF-8?Q?n?= <mic@digikod.net>, Vishal Annapurve <vannapurve@google.com>,
- Ackerley Tng <ackerleytng@google.com>,
- Maciej Szmigiero <mail@maciej.szmigiero.name>,
- David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
- Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
- Liam Merwick <liam.merwick@oracle.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20231027182217.3615211-18-seanjc@google.com>
- <7c0844d8-6f97-4904-a140-abeabeb552c1@intel.com>
- <ZUEML6oJXDCFJ9fg@google.com>
- <92ba7ddd-2bc8-4a8d-bd67-d6614b21914f@intel.com>
- <ZUJVfCkIYYFp5VwG@google.com>
- <CABgObfaw4Byuzj5J3k48jdwT0HCKXLJNiuaA9H8Dtg+GOq==Sw@mail.gmail.com>
- <ZUJ-cJfofk2d_I0B@google.com>
- <4ca2253d-276f-43c5-8e9f-0ded5d5b2779@redhat.com>
- <ZULSkilO-tdgDGyT@google.com>
- <CABgObfbq_Hg0B=jvsSDqYH3CSpX+RsxfwB-Tc-eYF4uq2Qw9cg@mail.gmail.com>
- <ZUPCWfO1iO77-KDA@google.com>
- <CABgObfa=DH7FySBviF63OS9sVog_wt-AqYgtUAGKqnY5Bizivw@mail.gmail.com>
-From: Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <CABgObfa=DH7FySBviF63OS9sVog_wt-AqYgtUAGKqnY5Bizivw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Bar: +++++++++++++++
-Authentication-Results: smtp-out1.suse.de;
-	dkim=none;
-	dmarc=none;
-	spf=softfail (smtp-out1.suse.de: 2a07:de40:b281:104:10:150:64:97 is neither permitted nor denied by domain of vbabka@suse.cz) smtp.mailfrom=vbabka@suse.cz
-X-Rspamd-Server: rspamd2
-X-Spamd-Result: default: False [15.89 / 50.00];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	 TO_DN_SOME(0.00)[];
-	 R_SPF_SOFTFAIL(4.60)[~all];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 MX_GOOD(-0.01)[];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 R_DKIM_NA(2.20)[];
-	 MIME_TRACE(0.00)[0:+];
-	 MID_RHS_MATCH_FROM(0.00)[];
-	 ARC_NA(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TAGGED_RCPT(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 DMARC_NA(1.20)[suse.cz];
-	 NEURAL_SPAM_SHORT(3.00)[1.000];
-	 NEURAL_SPAM_LONG(3.50)[1.000];
-	 RCPT_COUNT_TWELVE(0.00)[44];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FREEMAIL_CC(0.00)[intel.com,kernel.org,linux.dev,ellerman.id.au,brainfault.org,sifive.com,dabbelt.com,eecs.berkeley.edu,zeniv.linux.org.uk,infradead.org,linux-foundation.org,vger.kernel.org,lists.infradead.org,lists.linux.dev,lists.ozlabs.org,kvack.org,linux.intel.com,google.com,digikod.net,maciej.szmigiero.name,redhat.com,amd.com,oracle.com,gmail.com];
-	 RCVD_TLS_ALL(0.00)[];
-	 SUSPICIOUS_RECIPS(1.50)[]
-X-Spam-Score: 15.89
-X-Rspamd-Queue-Id: E414521C6F
-X-Spam: Yes
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 11/2/23 16:46, Paolo Bonzini wrote:
-> On Thu, Nov 2, 2023 at 4:38 PM Sean Christopherson <seanjc@google.com> wrote:
->> Actually, looking that this again, there's not actually a hard dependency on THP.
->> A THP-enabled kernel _probably_  gives a higher probability of using hugepages,
->> but mostly because THP selects COMPACTION, and I suppose because using THP for
->> other allocations reduces overall fragmentation.
+On Mon, 27 Nov 2023 10:59:36 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
-> Yes, that's why I didn't even bother enabling it unless THP is
-> enabled, but it makes even more sense to just try.
 > 
->> So rather than honor KVM_GUEST_MEMFD_ALLOW_HUGEPAGE iff THP is enabled, I think
->> we should do the below (I verified KVM can create hugepages with THP=n).  We'll
->> need another capability, but (a) we probably should have that anyways and (b) it
->> provides a cleaner path to adding PUD-sized hugepage support in the future.
 > 
-> I wonder if we need KVM_CAP_GUEST_MEMFD_HUGEPAGE_PMD_SIZE though. This
-> should be a generic kernel API and in fact the sizes are available in
-> a not-so-friendly format in /sys/kernel/mm/hugepages.
+> On 27-11-2023 02:52 pm, Marc Zyngier wrote:
+> > On Mon, 27 Nov 2023 07:26:58 +0000,
+> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >> 
+> >> 
+> >> 
+> >> On 24-11-2023 08:02 pm, Marc Zyngier wrote:
+> >>> On Fri, 24 Nov 2023 13:22:22 +0000,
+> >>> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >>>> 
+> >>>>> How is this value possible if the write to HCR_EL2 has taken place?
+> >>>>> When do you sample this?
+> >>>> 
+> >>>> I am not sure how and where it got set. I think, whatever it is set,
+> >>>> it is due to false return of vcpu_el2_e2h_is_set(). Need to
+> >>>> understand/debug.
+> >>>> The vhcr_el2 value I have shared is traced along with hcr in function
+> >>>> __activate_traps/__compute_hcr.
+> >>> 
+> >>> Here's my hunch:
+> >>> 
+> >>> The guest boots with E2H=0, because we don't advertise anything else
+> >>> on your HW. So we run with NV1=1 until we try to *upgrade* to VHE. NV2
+> >>> means that HCR_EL2 is writable (to memory) without a trap. But we're
+> >>> still running with NV1=1.
+> >>> 
+> >>> Subsequently, we access a sysreg that should never trap for a VHE
+> >>> guest, but we're with the wrong config. Bad things happen.
+> >>> 
+> >>> Unfortunately, NV2 is pretty much incompatible with E2H being updated,
+> >>> because it cannot perform the changes that this would result into at
+> >>> the point where they should happen. We can try and do a best effort
+> >>> handling, but you can always trick it.
+> >>> 
+> >>> Anyway, can you see if the hack below helps? I'm not keen on it at
+> >>> all, but this would be a good data point.
+> >> 
+> >> Thanks Marc, this diff fixes the issue.
+> >> Just wondering what is changed w.r.t to L1 handling from V10 to V11
+> >> that it requires this trick?
+> > 
+> > Not completely sure. Before v11, anything that would trap would be
+> > silently handled by the FEAT_NV code. Now, a trap for something that
+> > is supposed to be redirected to VNCR results in an UNDEF exception.
+> > 
+> > I suspect that the exception is handled again as a call to
+> > __finalise_el2(), probably because the write to VBAR_EL1 didn't do
+> > what it was supposed to do.
+> > 
+> >> Also why this was not seen on your platform, is it E2H0 enabled?
+> > 
+> > It doesn't have FEAT_E2H0, and that's the whole point. No E2H0, no
+> > problems, as the guest cannot trick the host into losing track of the
+> > state (which I'm pretty sure can happen even with this ugly hack).
+> > 
+> > I will probably completely disable NV1 support in the next drop, and
+> > make NV support only VHE guests. Which is the only mode that makes any
+> > sense anyway.
+> > 
 > 
-> We should just add /sys/kernel/mm/hugepages/sizes that contains
-> "2097152 1073741824" on x86 (only the former if 1G pages are not
-> supported).
-> 
-> Plus: is this the best API if we need something else for 1G pages?
-> 
-> Let's drop *this* patch and proceed incrementally. (Again, this is
-> what I want to do with this final review: identify places that are
-> stil sticky, and don't let them block the rest).
-> 
-> Coincidentially we have an open spot next week at plumbers. Let's
-> extend Fuad's section to cover more guestmem work.
+> Thanks, absolutely makes sense to have *VHE-only* L1, looking forward
+> to a next drop.
 
-Hi,
+Note that this won't be restricted to L1, but will affect *everything.
 
-was there any outcome wrt this one? Based on my experience with THP's it
-would be best if userspace didn't have to opt-in, nor care about the
-supported size. If the given size is unaligned, provide a mix of large pages
-up to an aligned size, and for the rest fallback to base pages, which should
-be better than -EINVAL on creation (is it possible with the current
-implementation? I'd hope so so?). A way to opt-out from huge pages could be
-useful although there's always the risk of some initial troubles resulting
-in various online sources cargo-cult recommending to opt-out forever.
+No non-VHE guest will be supported at any level whatsoever, and NV
+will always expose ID_AA64MMFR4_EL1.E2H0=0b1110, indicating that
+HCR_EL2.NV1 is RES0, on top of ID_AA64MMFR4_EL1.NV_frac=1 (NV2 only).
 
-Vlastimil
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
