@@ -1,339 +1,464 @@
-Return-Path: <kvm+bounces-2505-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2506-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF5A27F9CEF
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 10:54:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05B747F9D04
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 11:00:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 166CDB20CF0
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 09:54:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2905B1C20CBB
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 10:00:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E731798E;
-	Mon, 27 Nov 2023 09:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74633179AF;
+	Mon, 27 Nov 2023 10:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pj5ZfADw"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="M6Rt7dYW"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E3CFF0
-	for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 01:54:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701078868;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cM/r8MzsZGaaTECTb4VwCyR2TWXt7Icsvks5c3ZwKVc=;
-	b=Pj5ZfADwlFvdjHA7i2odMKauV2vyj+zx/AKPj5WkthwSKpXlB0QP43+Z/UZiJmM3YKeN6N
-	4ZKzJaldQEfZPxnbRjGd0gugpeupyzgKMr7GN9MYjAAL3dq6qNEe6h8fFL4vXsr9tyvMX9
-	nNU627zMKEh2upHgruHHiMSa6AqpDSM=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-501-B7BlvtTCO8eFIwzna1uv9w-1; Mon, 27 Nov 2023 04:54:24 -0500
-X-MC-Unique: B7BlvtTCO8eFIwzna1uv9w-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-285bec90888so362318a91.0
-        for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 01:54:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701078863; x=1701683663;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cM/r8MzsZGaaTECTb4VwCyR2TWXt7Icsvks5c3ZwKVc=;
-        b=Jb3bEgDKXildhholn5ldAIByv0Qp8Euy2B0QTgauGn+PRCTysM/ZCCFh+XttMTiaVE
-         wf/jVVuj4eqN2i+PMEiL9u8sbFCD4Bz6w16es9rPEv+K786qrXBWqzzIR/rIHL5aVECc
-         ET+TJxUCG4guZIJ3V1F89PmYd3uNdhMJZKUKd6fcguzaek7PUCg7H3xeA7V/K1fXh1v+
-         MULKio5Rk3emTQru6o2RIwsZMPdmhEr8z2AGoAEk/qtlpFc3avxeM1VMLULRNFFKnVxc
-         IV4B+I2/iu6PACrjV4MWa2+UnQNx6adMSxx6nbEPbYPoYVejkhJJjQXYpEt9UET+TUZm
-         we4Q==
-X-Gm-Message-State: AOJu0YxXgohi5W3h+PAS0p9uPs06T5xVwOHgiqIsrUFtdzhJ1A5y4H/h
-	YIMA2QYkqKuae2lKKLxBFedPX0bcJrorCz3F/rFTtHq1QAukIHOzCb4+jbI2WWUaaoAQNJ8wvQ4
-	gc8ceJtgwF66j
-X-Received: by 2002:a17:903:2308:b0:1ce:2fc1:60ef with SMTP id d8-20020a170903230800b001ce2fc160efmr12497967plh.0.1701078863269;
-        Mon, 27 Nov 2023 01:54:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFmyQ5vYknKazaiYRzfPMmlTZI4Y2vti37sd7I1XRJvOcAr1efGDRk0xXmMRFKdTQeTAp1jsA==
-X-Received: by 2002:a17:903:2308:b0:1ce:2fc1:60ef with SMTP id d8-20020a170903230800b001ce2fc160efmr12497955plh.0.1701078862891;
-        Mon, 27 Nov 2023 01:54:22 -0800 (PST)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id n17-20020a170902d2d100b001cfcfe3c1e5sm1387402plc.173.2023.11.27.01.54.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Nov 2023 01:54:22 -0800 (PST)
-Message-ID: <cdb65963-48a4-590b-b366-a43b61e9d22d@redhat.com>
-Date: Mon, 27 Nov 2023 17:54:19 +0800
+Received: from mail.alien8.de (mail.alien8.de [IPv6:2a01:4f9:3051:3f93::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D898183;
+	Mon, 27 Nov 2023 02:00:31 -0800 (PST)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7ECCC40E0257;
+	Mon, 27 Nov 2023 10:00:27 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id BU3zEmMa-BjB; Mon, 27 Nov 2023 10:00:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1701079225; bh=TtlE36AUctgokR2LY9a4CvYQHcd567Ym1wq8sq+2ihM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=M6Rt7dYWHGuYYMKKnLHdE+bsGHF4qtcXP+fynrgyym9GNI2DisXZC/Im1xT+/o7ky
+	 vPEWJVl69HWMWMtsPt4j7/Maw8VNJUX8xA6vTrjjh0hu6NjyPY74CNk2vOpPKAaRyr
+	 eKUaIRfaJ671zR1EZ7+EIHom+tYw3QpojOHy0Tvbnf9OWdz6YrRppAv4btNQ24JKAG
+	 ys+2POPXC2GIhcNbDyLmCPlW6bnhZhwmOOnOpKQpYBLmD56/gdjCoiQTQwJzW3rLW3
+	 BRjzUP2icnTuEN5XYI8+sryVJjw7KRTSqb+xDKhQBEOoJGxr/8ICUdFYK44slWI85j
+	 N3EYYhf8P/f2EDo95DHJ6iqXaRp2fyo0hoWARYy3s4mWnma41/nz2SFsWL+A5jZUN9
+	 kyIn1B88ZjyJH2l/W+Zt7XuJSDsWLa/k1N0P6zaD5b5BL/sH6lknLw63swIpXLtpXQ
+	 Sz+5D1rUWLIt7lNSiTx7krZmSV1RpOoP+4mguMQpVuHkXfcZEXI2TlxQFnrkIvz3nB
+	 rxu5dSBq25HD2LP5DOJdprHsyRqw3/r/B7X90yhqMyBRamWw7ZI4piTMVxxuOSsgPp
+	 Y5ZJgsTZuvZe4I2q3oZTtxYmyPqgHgvKlyVaDctG5MbOoTTQlisZcOge/khZj1o1Jp
+	 F4+/JjWMsZQKD/FINdCPRVsQ=
+Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 00F5940E014B;
+	Mon, 27 Nov 2023 09:59:43 +0000 (UTC)
+Date: Mon, 27 Nov 2023 10:59:37 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+	tony.luck@intel.com, marcorr@google.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+	Brijesh Singh <brijesh.singh@amd.com>,
+	Jarkko Sakkinen <jarkko@profian.com>
+Subject: Re: [PATCH v10 14/50] crypto: ccp: Add support to initialize the
+ AMD-SP for SEV-SNP
+Message-ID: <20231127095937.GLZWRoiaqGlJMX54Xb@fat_crate.local>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-15-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v2] arm/kvm: Enable support for KVM_ARM_VCPU_PMU_V3_FILTER
-Content-Language: en-US
-To: Eric Auger <eauger@redhat.com>, qemu-arm@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
- qemu-devel@nongnu.org
-References: <20231117060838.39723-1-shahuang@redhat.com>
- <d9e83b7a-0fca-406f-b58e-9014a5e14870@redhat.com>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <d9e83b7a-0fca-406f-b58e-9014a5e14870@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231016132819.1002933-15-michael.roth@amd.com>
 
-Hi Eric,
+On Mon, Oct 16, 2023 at 08:27:43AM -0500, Michael Roth wrote:
+> +/*
+> + * SEV_DATA_RANGE_LIST:
+> + *   Array containing range of pages that firmware transitions to HV-fixed
+> + *   page state.
+> + */
+> +struct sev_data_range_list *snp_range_list;
+> +static int __sev_snp_init_locked(int *error);
 
-On 11/25/23 02:24, Eric Auger wrote:
-> Hi,
-> 
-> On 11/17/23 07:08, Shaoqin Huang wrote:
->> The KVM_ARM_VCPU_PMU_V3_FILTER provide the ability to let the VMM decide
->> which PMU events are provided to the guest. Add a new option
->> `pmu-filter` as -accel sub-option to set the PMU Event Filtering.
->>
->> The `pmu-filter` has such format:
->>
->>    pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
->>
->> The A means "allow" and D means "deny", start is the first event of the
->> range and the end is the last one. The first filter action defines if the whole
->> event list is an allow or deny list, if the first filter action is "allow", all
->> other events are denied except start-end; if the first filter action is "deny",
->> all other events are allowed except start-end. For example:
->>
->>    pmu-filter="A:0x11-0x11;A:0x23-0x3a,D:0x30-0x30"
->>
->> This will allow event 0x11 (The cycle counter), events 0x23 to 0x3a is
->> also allowed except the event 0x30 is denied, and all the other events
->> are disallowed.
->>
->> Here is an real example shows how to use the PMU Event Filtering, when
->> we launch a guest by use kvm, add such command line:
->>
->>    # qemu-system-aarch64 \
->> 	-accel kvm,pmu-filter="D:0x11-0x11"
->>
->> And then in guest, use the perf to count the cycle:
->>
->>    # perf stat sleep 1
->>
->>     Performance counter stats for 'sleep 1':
->>
->>                1.22 msec task-clock                       #    0.001 CPUs utilized
->>                   1      context-switches                 #  820.695 /sec
->>                   0      cpu-migrations                   #    0.000 /sec
->>                  55      page-faults                      #   45.138 K/sec
->>     <not supported>      cycles
->>             1128954      instructions
->>              227031      branches                         #  186.323 M/sec
->>                8686      branch-misses                    #    3.83% of all branches
->>
->>         1.002492480 seconds time elapsed
->>
->>         0.001752000 seconds user
->>         0.000000000 seconds sys
->>
->> As we can see, the cycle counter has been disabled in the guest, but
->> other pmu events are still work.
->>
->> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
->> ---
->> v1->v2:
->>    - Add more description for allow and deny meaning in
->>      commit message.                                     [Sebastian]
->>    - Small improvement.                                  [Sebastian]
->>
->> v1: https://lore.kernel.org/all/20231113081713.153615-1-shahuang@redhat.com/
->> ---
->>   include/sysemu/kvm_int.h |  1 +
->>   qemu-options.hx          | 16 +++++++++++++
->>   target/arm/kvm.c         | 22 +++++++++++++++++
->>   target/arm/kvm64.c       | 51 ++++++++++++++++++++++++++++++++++++++++
->>   4 files changed, 90 insertions(+)
->>
->> diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
->> index fd846394be..8f4601474f 100644
->> --- a/include/sysemu/kvm_int.h
->> +++ b/include/sysemu/kvm_int.h
->> @@ -120,6 +120,7 @@ struct KVMState
->>       uint32_t xen_caps;
->>       uint16_t xen_gnttab_max_frames;
->>       uint16_t xen_evtchn_max_pirq;
->> +    char *kvm_pmu_filter;
->>   };
->>   
->>   void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
->> diff --git a/qemu-options.hx b/qemu-options.hx
->> index 42fd09e4de..dd3518092c 100644
->> --- a/qemu-options.hx
->> +++ b/qemu-options.hx
->> @@ -187,6 +187,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
->>       "                tb-size=n (TCG translation block cache size)\n"
->>       "                dirty-ring-size=n (KVM dirty ring GFN count, default 0)\n"
->>       "                eager-split-size=n (KVM Eager Page Split chunk size, default 0, disabled. ARM only)\n"
->> +    "                pmu-filter={A,D}:start-end[;...] (KVM PMU Event Filter, default no filter. ARM only)\n"
->>       "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
->>       "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
->>   SRST
->> @@ -259,6 +260,21 @@ SRST
->>           impact on the memory. By default, this feature is disabled
->>           (eager-split-size=0).
->>   
->> +    ``pmu-filter={A,D}:start-end[;...]``
->> +        KVM implements pmu event filtering to prevent a guest from being able to
->> +	sample certain events. It has the following format:
->> +
->> +	pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
->> +
->> +	The A means "allow" and D means "deny", start if the first event of the
->> +	range and the end is the last one. For example:
->> +
->> +	pmu-filter="A:0x11-0x11;A:0x23-0x3a,D:0x30-0x30"
->> +
->> +	This will allow event 0x11 (The cycle counter), events 0x23 to 0x3a is
->> +	also allowed except the event 0x30 is denied, and all the other events
->> +	are disallowed.
->> +
->>       ``notify-vmexit=run|internal-error|disable,notify-window=n``
->>           Enables or disables notify VM exit support on x86 host and specify
->>           the corresponding notify window to trigger the VM exit if enabled.
->> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->> index 7903e2ddde..74796de055 100644
->> --- a/target/arm/kvm.c
->> +++ b/target/arm/kvm.c
->> @@ -1108,6 +1108,21 @@ static void kvm_arch_set_eager_split_size(Object *obj, Visitor *v,
->>       s->kvm_eager_split_size = value;
->>   }
->>   
->> +static char *kvm_arch_get_pmu_filter(Object *obj, Error **errp)
->> +{
->> +    KVMState *s = KVM_STATE(obj);
->> +
->> +    return g_strdup(s->kvm_pmu_filter);
->> +}
->> +
->> +static void kvm_arch_set_pmu_filter(Object *obj, const char *pmu_filter,
->> +                                    Error **errp)
->> +{
->> +    KVMState *s = KVM_STATE(obj);
->> +
->> +    s->kvm_pmu_filter = g_strdup(pmu_filter);
->> +}
->> +
->>   void kvm_arch_accel_class_init(ObjectClass *oc)
->>   {
->>       object_class_property_add(oc, "eager-split-size", "size",
->> @@ -1116,4 +1131,11 @@ void kvm_arch_accel_class_init(ObjectClass *oc)
->>   
->>       object_class_property_set_description(oc, "eager-split-size",
->>           "Eager Page Split chunk size for hugepages. (default: 0, disabled)");
->> +
->> +    object_class_property_add_str(oc, "pmu-filter",
->> +                                  kvm_arch_get_pmu_filter,
->> +                                  kvm_arch_set_pmu_filter);
->> +
->> +    object_class_property_set_description(oc, "pmu-filter",
->> +        "PMU Event Filtering description for guest pmu. (default: NULL, disabled)");
->>   }
->> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
->> index 3c175c93a7..6eac328b48 100644
->> --- a/target/arm/kvm64.c
->> +++ b/target/arm/kvm64.c
->> @@ -10,6 +10,7 @@
->>    */
->>   
->>   #include "qemu/osdep.h"
->> +#include <asm-arm64/kvm.h>
->>   #include <sys/ioctl.h>
->>   #include <sys/ptrace.h>
->>   
->> @@ -131,6 +132,53 @@ static bool kvm_arm_set_device_attr(CPUState *cs, struct kvm_device_attr *attr,
->>       return true;
->>   }
->>   
->> +static void kvm_arm_pmu_filter_init(CPUState *cs)
->> +{
->> +    static bool pmu_filter_init = false;
->> +    struct kvm_pmu_event_filter filter;
->> +    struct kvm_device_attr attr = {
->> +        .group      = KVM_ARM_VCPU_PMU_V3_CTRL,
->> +        .attr       = KVM_ARM_VCPU_PMU_V3_FILTER,
->> +        .addr       = (uint64_t)&filter,
->> +    };
->> +    KVMState *kvm_state = cs->kvm_state;
->> +    char *tmp;
->> +    char *str, act;
->> +
->> +    if (!kvm_state->kvm_pmu_filter)
->> +        return;
->> +
-> usually we check the kernel capability (here KVM_CAP_ARM_PMU_V3) before
-> doing further actions. It allows you to give an inidication to the user
-> that the kernel does not allow it. Also you should precise in the doc
-> that this accel option requires host kernel caps I think.
+Put the function above the caller instead of doing a forward
+declaration.
 
-I get it.
+>  static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
+>  {
+>  	struct sev_device *sev = psp_master->sev_data;
+> @@ -466,9 +479,9 @@ static inline int __sev_do_init_locked(int *psp_ret)
+>  		return __sev_init_locked(psp_ret);
+>  }
+>  
+> -static int __sev_platform_init_locked(int *error)
+> +static int ___sev_platform_init_locked(int *error, bool probe)
+>  {
+> -	int rc = 0, psp_ret = SEV_RET_NO_FW_CALL;
+> +	int rc, psp_ret = SEV_RET_NO_FW_CALL;
+>  	struct psp_device *psp = psp_master;
+>  	struct sev_device *sev;
+>  
+> @@ -480,6 +493,34 @@ static int __sev_platform_init_locked(int *error)
+>  	if (sev->state == SEV_STATE_INIT)
+>  		return 0;
+>  
+> +	/*
+> +	 * Legacy guests cannot be running while SNP_INIT(_EX) is executing,
+> +	 * so perform SEV-SNP initialization at probe time.
+> +	 */
+> +	rc = __sev_snp_init_locked(error);
+> +	if (rc && rc != -ENODEV) {
+> +		/*
+> +		 * Don't abort the probe if SNP INIT failed,
+> +		 * continue to initialize the legacy SEV firmware.
+> +		 */
+> +		dev_err(sev->dev, "SEV-SNP: failed to INIT rc %d, error %#x\n", rc, *error);
+> +	}
+> +
+> +	/* Delay SEV/SEV-ES support initialization */
+> +	if (probe && !psp_init_on_probe)
+> +		return 0;
+> +
+> +	if (!sev_es_tmr) {
+> +		/* Obtain the TMR memory area for SEV-ES use */
+> +		sev_es_tmr = sev_fw_alloc(SEV_ES_TMR_SIZE);
+> +		if (sev_es_tmr)
+> +			/* Must flush the cache before giving it to the firmware */
+> +			clflush_cache_range(sev_es_tmr, SEV_ES_TMR_SIZE);
+> +		else
+> +			dev_warn(sev->dev,
+> +				 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
+> +		}
+> +
+>  	if (sev_init_ex_buffer) {
+>  		rc = sev_read_init_ex_file();
+>  		if (rc)
+> @@ -522,6 +563,11 @@ static int __sev_platform_init_locked(int *error)
+>  	return 0;
+>  }
+>  
+> +static int __sev_platform_init_locked(int *error)
+> +{
+> +	return ___sev_platform_init_locked(error, false);
+> +}
 
->> +    /* This only needs to be called for 1 vcpu. */
->> +    if (!pmu_filter_init)
->> +        pmu_filter_init = true;
->> +
->> +    tmp = g_strdup(kvm_state->kvm_pmu_filter);
->> +
->> +    for (str = strtok(tmp, ";"); str != NULL; str = strtok(NULL, ";")) {
->> +        unsigned short start = 0, end = 0;
->> +
->> +        sscanf(str, "%c:%hx-%hx", &act, &start, &end);
->> +        if ((act != 'A' && act != 'D') || (!start && !end)) {
->> +            error_report("skipping invalid filter %s\n", str);
->> +            continue;
->> +        }
->> +
->> +        filter = (struct kvm_pmu_event_filter) {
->> +            .base_event     = start,
->> +            .nevents        = end - start + 1,
->> +            .action         = act == 'A' ? KVM_PMU_EVENT_ALLOW :
->> +                                           KVM_PMU_EVENT_DENY,
->> +        };
->> +
->> +        if (!kvm_arm_set_device_attr(cs, &attr, "PMU Event Filter")) {
->> +            error_report("Failed to init PMU Event Filter\n");
-> if you do the above, here you know that the host allows to set filters
-> but that the user input is incorrect.
+Uff, this is silly. And it makes the code hard to follow and that meat
+of the platform init functionality in the ___-prefixed function a mess.
 
-I see. Thanks for your additional information.
+And the problem is that that "probe" functionality is replicated from
+the one place where it is actually needed - sev_pci_init() which calls
+that new sev_platform_init_on_probe() function - to everything that
+calls __sev_platform_init_locked() for which you've added a wrapper.
 
-Thanks,
-Shaoqin
+What you should do, instead, is split the code around
+__sev_snp_init_locked() in a separate function which does only that and
+is called something like __sev_platform_init_snp_locked() or so which
+does that unconditional work. And then you define:
 
-> 
-> Thanks
-> 
-> Eric
->> +            abort();
->> +        }
->> +    }
->> +
->> +    g_free(tmp);
->> +}
->> +
->>   void kvm_arm_pmu_init(CPUState *cs)
->>   {
->>       struct kvm_device_attr attr = {
->> @@ -141,6 +189,9 @@ void kvm_arm_pmu_init(CPUState *cs)
->>       if (!ARM_CPU(cs)->has_pmu) {
->>           return;
->>       }
->> +
->> +    kvm_arm_pmu_filter_init(cs);
->> +
->>       if (!kvm_arm_set_device_attr(cs, &attr, "PMU")) {
->>           error_report("failed to init PMU");
->>           abort();
-> 
+_sev_platform_init_locked(int *error, bool probe)
+
+note the *one* '_' - i.e., first layer:
+
+_sev_platform_init_locked(int *error, bool probe):
+{
+	__sev_platform_init_snp_locked(error);
+
+	if (!probe)
+		return 0;
+
+	if (psp_init_on_probe)
+		__sev_platform_init_locked(error);
+
+	...
+}
+
+and you do the probing in that function only so that it doesn't get lost
+in the bunch of things __sev_platform_init_locked() does.
+
+And then you call _sev_platform_init_locked() everywhere and no need for
+a second sev_platform_init_on_probe().
+
+> +
+>  int sev_platform_init(int *error)
+>  {
+>  	int rc;
+> @@ -534,6 +580,17 @@ int sev_platform_init(int *error)
+>  }
+>  EXPORT_SYMBOL_GPL(sev_platform_init);
+>  
+> +static int sev_platform_init_on_probe(int *error)
+> +{
+> +	int rc;
+> +
+> +	mutex_lock(&sev_cmd_mutex);
+> +	rc = ___sev_platform_init_locked(error, true);
+> +	mutex_unlock(&sev_cmd_mutex);
+> +
+> +	return rc;
+> +}
+> +
+>  static int __sev_platform_shutdown_locked(int *error)
+>  {
+>  	struct sev_device *sev = psp_master->sev_data;
+> @@ -838,6 +895,191 @@ static int sev_update_firmware(struct device *dev)
+>  	return ret;
+>  }
+>  
+> +static void snp_set_hsave_pa(void *arg)
+> +{
+> +	wrmsrl(MSR_VM_HSAVE_PA, 0);
+> +}
+> +
+> +static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
+> +{
+> +	struct sev_data_range_list *range_list = arg;
+> +	struct sev_data_range *range = &range_list->ranges[range_list->num_elements];
+> +	size_t size;
+> +
+> +	if ((range_list->num_elements * sizeof(struct sev_data_range) +
+> +	     sizeof(struct sev_data_range_list)) > PAGE_SIZE)
+> +		return -E2BIG;
+
+Why? A comment would be helpful like with the rest this patch adds.
+
+> +	switch (rs->desc) {
+> +	case E820_TYPE_RESERVED:
+> +	case E820_TYPE_PMEM:
+> +	case E820_TYPE_ACPI:
+> +		range->base = rs->start & PAGE_MASK;
+> +		size = (rs->end + 1) - rs->start;
+> +		range->page_count = size >> PAGE_SHIFT;
+> +		range_list->num_elements++;
+> +		break;
+> +	default:
+> +		break;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int __sev_snp_init_locked(int *error)
+> +{
+> +	struct psp_device *psp = psp_master;
+> +	struct sev_data_snp_init_ex data;
+> +	struct sev_device *sev;
+> +	int rc = 0;
+> +
+> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> +		return -ENODEV;
+> +
+> +	if (!psp || !psp->sev_data)
+> +		return -ENODEV;
+
+Only caller checks this already.
+
+> +	sev = psp->sev_data;
+> +
+> +	if (sev->snp_initialized)
+
+Do we really need this silly boolean or is there a way to query the
+platform whether SNP has been initialized?
+
+> +		return 0;
+> +
+> +	if (!sev_version_greater_or_equal(SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR)) {
+> +		dev_dbg(sev->dev, "SEV-SNP support requires firmware version >= %d:%d\n",
+> +			SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR);
+> +		return 0;
+> +	}
+> +
+> +	/*
+> +	 * The SNP_INIT requires the MSR_VM_HSAVE_PA must be set to 0h
+> +	 * across all cores.
+> +	 */
+> +	on_each_cpu(snp_set_hsave_pa, NULL, 1);
+> +
+> +	/*
+> +	 * Starting in SNP firmware v1.52, the SNP_INIT_EX command takes a list of
+> +	 * system physical address ranges to convert into the HV-fixed page states
+> +	 * during the RMP initialization.  For instance, the memory that UEFI
+> +	 * reserves should be included in the range list. This allows system
+> +	 * components that occasionally write to memory (e.g. logging to UEFI
+> +	 * reserved regions) to not fail due to RMP initialization and SNP enablement.
+> +	 */
+> +	if (sev_version_greater_or_equal(SNP_MIN_API_MAJOR, 52)) {
+
+Is there a generic way to probe SNP_INIT_EX presence in the firmware or
+are FW version numbers the only way?
+
+> +		/*
+> +		 * Firmware checks that the pages containing the ranges enumerated
+> +		 * in the RANGES structure are either in the Default page state or in the
+
+"default"
+
+> +		 * firmware page state.
+> +		 */
+> +		snp_range_list = kzalloc(PAGE_SIZE, GFP_KERNEL);
+> +		if (!snp_range_list) {
+> +			dev_err(sev->dev,
+> +				"SEV: SNP_INIT_EX range list memory allocation failed\n");
+> +			return -ENOMEM;
+> +		}
+> +
+> +		/*
+> +		 * Retrieve all reserved memory regions setup by UEFI from the e820 memory map
+> +		 * to be setup as HV-fixed pages.
+> +		 */
+> +
+
+
+^ Superfluous newline.
+
+> +		rc = walk_iomem_res_desc(IORES_DESC_NONE, IORESOURCE_MEM, 0, ~0,
+> +					 snp_range_list, snp_filter_reserved_mem_regions);
+> +		if (rc) {
+> +			dev_err(sev->dev,
+> +				"SEV: SNP_INIT_EX walk_iomem_res_desc failed rc = %d\n", rc);
+> +			return rc;
+> +		}
+> +
+> +		memset(&data, 0, sizeof(data));
+> +		data.init_rmp = 1;
+> +		data.list_paddr_en = 1;
+> +		data.list_paddr = __psp_pa(snp_range_list);
+> +
+> +		/*
+> +		 * Before invoking SNP_INIT_EX with INIT_RMP=1, make sure that
+> +		 * all dirty cache lines containing the RMP are flushed.
+> +		 *
+> +		 * NOTE: that includes writes via RMPUPDATE instructions, which
+> +		 * are also cacheable writes.
+> +		 */
+> +		wbinvd_on_all_cpus();
+> +
+> +		rc = __sev_do_cmd_locked(SEV_CMD_SNP_INIT_EX, &data, error);
+> +		if (rc)
+> +			return rc;
+> +	} else {
+> +		/*
+> +		 * SNP_INIT is equivalent to SNP_INIT_EX with INIT_RMP=1, so
+> +		 * just as with that case, make sure all dirty cache lines
+> +		 * containing the RMP are flushed.
+> +		 */
+> +		wbinvd_on_all_cpus();
+> +
+> +		rc = __sev_do_cmd_locked(SEV_CMD_SNP_INIT, NULL, error);
+> +		if (rc)
+> +			return rc;
+> +	}
+
+So instead of duplicating the code here at the end of the if-else
+branching, you can do:
+
+	void *arg = &data;
+
+	if () {
+		...
+		cmd = SEV_CMD_SNP_INIT_EX;
+	} else {
+		cmd = SEV_CMD_SNP_INIT;
+		arg = NULL;
+	}
+
+	wbinvd_on_all_cpus();
+	rc = __sev_do_cmd_locked(cmd, arg, error);
+	if (rc)
+		return rc;
+
+> +	/* Prepare for first SNP guest launch after INIT */
+> +	wbinvd_on_all_cpus();
+
+Why is that WBINVD needed?
+
+> +	rc = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, error);
+> +	if (rc)
+> +		return rc;
+> +
+> +	sev->snp_initialized = true;
+> +	dev_dbg(sev->dev, "SEV-SNP firmware initialized\n");
+> +
+> +	return rc;
+> +}
+> +
+> +static int __sev_snp_shutdown_locked(int *error)
+> +{
+> +	struct sev_device *sev = psp_master->sev_data;
+> +	struct sev_data_snp_shutdown_ex data;
+> +	int ret;
+> +
+> +	if (!sev->snp_initialized)
+> +		return 0;
+> +
+> +	memset(&data, 0, sizeof(data));
+> +	data.length = sizeof(data);
+> +	data.iommu_snp_shutdown = 1;
+> +
+> +	wbinvd_on_all_cpus();
+> +
+> +retry:
+> +	ret = __sev_do_cmd_locked(SEV_CMD_SNP_SHUTDOWN_EX, &data, error);
+> +	/* SHUTDOWN may require DF_FLUSH */
+> +	if (*error == SEV_RET_DFFLUSH_REQUIRED) {
+> +		ret = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, NULL);
+> +		if (ret) {
+> +			dev_err(sev->dev, "SEV-SNP DF_FLUSH failed\n");
+> +			return ret;
+
+When you return here,  sev->snp_initialized is still true but, in
+reality, it probably is in some half-broken state after issuing those
+commands you it is not really initialized anymore.
+
+> +		}
+> +		goto retry;
+
+This needs an upper limit from which to break out and not potentially
+endless-loop.
+
+> +	}
+> +	if (ret) {
+> +		dev_err(sev->dev, "SEV-SNP firmware shutdown failed\n");
+> +		return ret;
+> +	}
+> +
+> +	sev->snp_initialized = false;
+> +	dev_dbg(sev->dev, "SEV-SNP firmware shutdown\n");
+> +
+> +	return ret;
+> +}
+> +
+> +static int sev_snp_shutdown(int *error)
+> +{
+> +	int rc;
+> +
+> +	mutex_lock(&sev_cmd_mutex);
+> +	rc = __sev_snp_shutdown_locked(error);
+
+Why is this "locked" version even there if it is called only here?
+
+IOW, put all the logic in here - no need for
+__sev_snp_shutdown_locked().
+
+> +	mutex_unlock(&sev_cmd_mutex);
+> +
+> +	return rc;
+> +}
+
+...
 
 -- 
-Shaoqin
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
