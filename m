@@ -1,129 +1,91 @@
-Return-Path: <kvm+bounces-2516-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2517-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D9357FA779
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 18:05:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C14237FA7E0
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 18:24:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24290B21354
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 17:05:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 063281C20BE1
+	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 17:24:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD27F3714E;
-	Mon, 27 Nov 2023 17:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC69381AC;
+	Mon, 27 Nov 2023 17:24:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="rJ8cBOmh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dDeDJeVQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 933F52706;
-	Mon, 27 Nov 2023 09:05:26 -0800 (PST)
-Received: from [192.168.4.26] (unknown [47.186.13.91])
-	by linux.microsoft.com (Postfix) with ESMTPSA id D60A120B74C0;
-	Mon, 27 Nov 2023 09:05:23 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D60A120B74C0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1701104726;
-	bh=hQp9k1xmzkhJv53kIi+fGz0Bm7C0uUgSE5lwBZUzRAE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=rJ8cBOmhMjU1LJ0/8Jcu8Zs0D7K0IoJJgYpooleweR4JPTx8RVu3i076OKuSc40H8
-	 vQyhttx9sRNbXZhKrbp4uy9amwle/wkhxSgx+XSVVJGrDjkKV6ziAkv22z1oJr2gBV
-	 BrN8A1ek3f3VLgDmEE47gJhsasnKPJeYvbYTTmRg=
-Message-ID: <b1dc0963-ab99-4a79-af19-ef5ed981fa60@linux.microsoft.com>
-Date: Mon, 27 Nov 2023 11:05:23 -0600
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF2E185
+	for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 09:24:11 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-28583d0fd4eso4888550a91.0
+        for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 09:24:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701105851; x=1701710651; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rL9LfDvcE9DBnUyEpS1p+L6oMlIKUpS9e4ZuAaaj8xo=;
+        b=dDeDJeVQHlQ994p98Okkt8Fi8rO1ymAvpvZY+lNMB0xLQP3k3YRPwn9ZU9FM10XfYP
+         MpWA0na4iyrnNjsT1acdT0xPP8jDcuoea7DyqVPE2BudYQTvoI4nvsdOXtnIxvyqE9m1
+         fqNWvqdHvZVzjONjkZAQVCua/7BOXMe1xSrmLKgk9Ac2Vs5kx8zUcTeWZoqNhqVerl1K
+         dpBkNjWJrHd8C8c+ubG39GQute/aj+q7GVgozK+sqjlEpTI17g3cIPVDJbYny4+OwWI5
+         7P464B7FJqQt+9EbtT/IrxqNel4bMvdakiNUUYr6hzJ69vYfrNJu+6r1HE2cXoZGrqjJ
+         VqKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701105851; x=1701710651;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rL9LfDvcE9DBnUyEpS1p+L6oMlIKUpS9e4ZuAaaj8xo=;
+        b=jaJeJnSdlf4wGMkDwRW1uD1OW2X428nP1+ezUAiEfQBXdaUg2aanba574UrmuIx8IB
+         tRR4p8QpjKYEag8oK1M6LjvIKQ8FFZw5qQ4A60IX7Brkg4cKD6t90kDIq0RiVE/sUm9g
+         RJ/9QQPKQGR/OGPHa6m7iSB7Ksq0F/gPJyzuB7elDqH2eHyQh/LOkAWYy3x+0Qz8rruw
+         JkCfzra+WWIUvKz21iGb3/K7LNfFBw67SfctIbJCWBKe4STKnM1Dzp5JqNaZy9zgp5Wr
+         MZZx1/JAbFmDQRw/uy2x6tmAYKi+DhD6Cojuio0/H4v4kVKCjpCwv8A+C8dCE3YI7FE4
+         921A==
+X-Gm-Message-State: AOJu0Yy9RiEc8AjlMXpJ6j/PvSo1td3Pn7nRYZuKuWdcNS9HI3On0+eY
+	IUEe0M5nyajVBsxa3mf5XFaMOP7QrdM=
+X-Google-Smtp-Source: AGHT+IECzk14EwMjjFb3/1urDD+Q4mbeNYdw2g1/0ksrRD/AQy7nqH1ycmu7b6tnBPlSMiaoFaFQgGrTeFU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:e8e:b0:285:b86b:6412 with SMTP id
+ fv14-20020a17090b0e8e00b00285b86b6412mr1194032pjb.4.1701105850944; Mon, 27
+ Nov 2023 09:24:10 -0800 (PST)
+Date: Mon, 27 Nov 2023 09:24:09 -0800
+In-Reply-To: <c858817d3e3be246a1a2278e3b42d06284e615e5.1700766316.git.maciej.szmigiero@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 18/19] heki: x86: Protect guest kernel memory using
- the KVM hypervisor
-Content-Language: en-US
-To: Peter Zijlstra <peterz@infradead.org>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
- =?UTF-8?Q?n?= <mic@digikod.net>
-Cc: Borislav Petkov <bp@alien8.de>, Dave Hansen
- <dave.hansen@linux.intel.com>, "H . Peter Anvin" <hpa@zytor.com>,
- Ingo Molnar <mingo@redhat.com>, Kees Cook <keescook@chromium.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
- <seanjc@google.com>, Thomas Gleixner <tglx@linutronix.de>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
- Alexander Graf <graf@amazon.com>, Chao Peng <chao.p.peng@linux.intel.com>,
- "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- Forrest Yuan Yu <yuanyu@google.com>, James Gowans <jgowans@amazon.com>,
- James Morris <jamorris@linux.microsoft.com>,
- John Andersen <john.s.andersen@intel.com>,
- Marian Rotariu <marian.c.rotariu@gmail.com>,
- =?UTF-8?Q?Mihai_Don=C8=9Bu?= <mdontu@bitdefender.com>,
- =?UTF-8?B?TmljdciZb3IgQ8OuyJt1?= <nicu.citu@icloud.com>,
- Thara Gopinath <tgopinath@microsoft.com>,
- Trilok Soni <quic_tsoni@quicinc.com>, Wei Liu <wei.liu@kernel.org>,
- Will Deacon <will@kernel.org>, Yu Zhang <yu.c.zhang@linux.intel.com>,
- Zahra Tarkhani <ztarkhani@microsoft.com>,
- =?UTF-8?Q?=C8=98tefan_=C8=98icleru?= <ssicleru@bitdefender.com>,
- dev@lists.cloudhypervisor.org, kvm@vger.kernel.org,
- linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org,
- qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
- x86@kernel.org, xen-devel@lists.xenproject.org
-References: <20231113022326.24388-1-mic@digikod.net>
- <20231113022326.24388-19-mic@digikod.net>
- <20231113085403.GC16138@noisy.programming.kicks-ass.net>
-From: "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
-In-Reply-To: <20231113085403.GC16138@noisy.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <c858817d3e3be246a1a2278e3b42d06284e615e5.1700766316.git.maciej.szmigiero@oracle.com>
+Message-ID: <ZWTQuRpwPkutHY-D@google.com>
+Subject: Re: [PATCH] KVM: x86: Allow XSAVES on CPUs where host doesn't use it
+ due to an errata
+From: Sean Christopherson <seanjc@google.com>
+To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Apologies for the late reply. I was on vacation. Please see my response below:
-
-On 11/13/23 02:54, Peter Zijlstra wrote:
-> On Sun, Nov 12, 2023 at 09:23:25PM -0500, Mickaël Salaün wrote:
->> From: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
->>
->> Implement a hypervisor function, kvm_protect_memory() that calls the
->> KVM_HC_PROTECT_MEMORY hypercall to request the KVM hypervisor to
->> set specified permissions on a list of guest pages.
->>
->> Using the protect_memory() function, set proper EPT permissions for all
->> guest pages.
->>
->> Use the MEM_ATTR_IMMUTABLE property to protect the kernel static
->> sections and the boot-time read-only sections. This enables to make sure
->> a compromised guest will not be able to change its main physical memory
->> page permissions. However, this also disable any feature that may change
->> the kernel's text section (e.g., ftrace, Kprobes), but they can still be
->> used on kernel modules.
->>
->> Module loading/unloading, and eBPF JIT is allowed without restrictions
->> for now, but we'll need a way to authenticate these code changes to
->> really improve the guests' security. We plan to use module signatures,
->> but there is no solution yet to authenticate eBPF programs.
->>
->> Being able to use ftrace and Kprobes in a secure way is a challenge not
->> solved yet. We're looking for ideas to make this work.
->>
->> Likewise, the JUMP_LABEL feature cannot work because the kernel's text
->> section is read-only.
+On Thu, Nov 23, 2023, Maciej S. Szmigiero wrote:
+> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 > 
-> What is the actual problem? As is the kernel text map is already RO and
-> never changed.
+> Since commit b0563468eeac ("x86/CPU/AMD: Disable XSAVES on AMD family 0x17")
+> kernel unconditionally clears the XSAVES CPU feature bit on Zen1/2 CPUs.
+> 
+> Since KVM CPU caps are initialized from the kernel boot CPU features this
+> makes the XSAVES feature also unavailable for KVM guests in this case, even
+> though they might want to decide on their own whether they are affected by
+> this errata.
+> 
+> Allow KVM guests to make such decision by setting the XSAVES KVM CPU
+> capability bit based on the actual CPU capability
 
-For the JUMP_LABEL optimization, the text needs to be patched at some point.
-That patching requires a writable mapping of the text page at the time of
-patching.
+This is not generally safe, as the guest can make such a decision if and only if
+the Family/Model/Stepping information is reasonably accurate.
 
-In this Heki feature, we currently lock down the kernel text at the end of
-kernel boot just before kicking off the init process. The lockdown is
-implemented by setting the permissions of a text page to R_X in the extended
-page table and not allowing write permissions in the EPT after that. So, jump label
-patching during kernel boot is not a problem. But doing it after kernel
-boot is a problem.
+> This fixes booting Hyper-V enabled Windows Server 2016 VMs with more than
+> one vCPU on Zen1/2 CPUs.
 
-The lockdown is just for the current Heki implementation. In the future, we plan
-to have a way of authenticating guest requests to change permissions on a text page.
-Once that is in place, permissions on text pages can be changed on the fly to
-support features that depend on text patching - FTrace, KProbes, etc.
-
-Madhavan
+How/why does lack of XSAVES break a multi-vCPU setup?  Is Windows blindly doing
+XSAVES based on FMS?
 
