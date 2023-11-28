@@ -1,101 +1,357 @@
-Return-Path: <kvm+bounces-2589-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2590-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 925747FB458
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 09:37:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B0CEA7FB483
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 09:43:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C9012823C5
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 08:37:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F8EF281DE0
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 08:43:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D787199B0;
-	Tue, 28 Nov 2023 08:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 069FA199AD;
+	Tue, 28 Nov 2023 08:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="I8Kl7pOf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CFoaMaiD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FF90AA;
-	Tue, 28 Nov 2023 00:37:01 -0800 (PST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id D84A840E01A5;
-	Tue, 28 Nov 2023 08:36:58 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 1vHsmSMNDYS3; Tue, 28 Nov 2023 08:36:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1701160617; bh=DS2d99Cf/Tm1b0CoskKzTkSL4zfPSaK6CYmxmDpIDno=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=I8Kl7pOfZkDJ1aauL4p8L+PlN65c8sIR0dkdP1NbqWcLcQY6vEQjYeM/r0US8S9kF
-	 RYKot1G8DTIU2i/vJbZ1dY8cBcGfRTw5eFgwVvUfS9BBoA90TBlEUp24OXrYB919e/
-	 Oy9SPBMTF8mwOQGo4ENPJBFKDroY/sp19zB/SlzHi4KLsJ7dwdNlb1E3uwAjDanJoQ
-	 vo2I6xeoAedHIyLyWVbyRwoypXxt0W/z9QtACLsVB9EJOZcuTpIzfRI0WQVy6PL0gs
-	 lmvT8HdZT00moCakbNxG+hW2JFqsKP3UGOqM6ogwuTCRPnTt7vEHovr6BESHhP7Ghd
-	 PrmO7bjwnAbf9slrMSVBPDynMcWeQLLh9sCucQNJyRSFHTD1ls5zbvnTNuutqKbcVd
-	 2/D/sbPwNva3NafVp2mXa6fzDye7Dr0YJO74ghd0IpJ4svVag2MEsEKbllMGPOFaXB
-	 yZKZTGXbFd5A0XC5WOguBvIJ+ogDfpVmSLzBtQ8aaFnZiDT5roz378AGxU0Cs0Jl7g
-	 cOR129yb77LRWYUT6q9WwvjgaMIebKAbVM5H2TWl293NIL68arozCJwBKM7mI5u88B
-	 1N9KRnvXlfSALDR32hWnUk2p/Kit1WXMb19R1Wxy4zqEb1j33zwAYoVT0pWIswldS1
-	 cDLymiOsuFxx+9JUg1fX4yC8=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C01D840E0031;
-	Tue, 28 Nov 2023 08:36:34 +0000 (UTC)
-Date: Tue, 28 Nov 2023 09:36:29 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Xin Li <xin3.li@intel.com>
-Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-	tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, luto@kernel.org, pbonzini@redhat.com,
-	seanjc@google.com, peterz@infradead.org, jgross@suse.com,
-	ravi.v.shankar@intel.com, mhiramat@kernel.org,
-	andrew.cooper3@citrix.com, jiangshanlai@gmail.com,
-	nik.borisov@suse.com
-Subject: Re: [PATCH v12 15/37] x86/ptrace: Cleanup the definition of the
- pt_regs structure
-Message-ID: <20231128083629.GOZWWmjTe8l+IwXG5j@fat_crate.local>
-References: <20231003062458.23552-1-xin3.li@intel.com>
- <20231003062458.23552-16-xin3.li@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91E5156C2;
+	Tue, 28 Nov 2023 08:43:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CFE6C433C8;
+	Tue, 28 Nov 2023 08:43:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701161001;
+	bh=9Are99utxUpb51rSuMw8hi7bQqLnSrPy5eLlELhxogY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CFoaMaiDP3S4q1sWspDPyl/BDxvasrWH8wTZVNqFRdOjgYbfmvGeQNqS93I5MgHe1
+	 eByXUfqtI03yTIyNdSsveFZ8e/YqOKAAIbuxsdlyr2+N/80e9RidR66SaoaPF9uH5b
+	 u/kFTM0zIvyyl2hTacqQwAUXscaRj0kr1gWC4umNdgOOmTJXIJfjCjUGBbT5Rr7q+n
+	 zP50EOBPiFjOfifwtPz8OlpSMZP4qHtCz19W61fyv1/bcD6rUguROgtf6L9uKJTPWk
+	 piwwOSFmef2LnOXN/LDK4ZCPAt6GJZ1c4+sT/MdSclr5AKfgGtb+I+enmOKKgRb8le
+	 TQCKjDwW4Mbnw==
+Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1r7tgc-00H3Kk-8d;
+	Tue, 28 Nov 2023 08:43:18 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231003062458.23552-16-xin3.li@intel.com>
+Date: Tue, 28 Nov 2023 08:43:18 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Shaoqin Huang <shahuang@redhat.com>, Raghavendra Rao Ananta
+ <rananta@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, James
+ Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 2/3] KVM: selftests: aarch64: Move the pmu helper
+ function into lib/
+In-Reply-To: <CAJHc60wsEjjLmAVUrb3n9Tyftqi7UXWh7V1hE1E90bUXiUk+Tw@mail.gmail.com>
+References: <20231123063750.2176250-1-shahuang@redhat.com>
+ <20231123063750.2176250-3-shahuang@redhat.com>
+ <CAJHc60wsEjjLmAVUrb3n9Tyftqi7UXWh7V1hE1E90bUXiUk+Tw@mail.gmail.com>
+User-Agent: Roundcube Webmail/1.4.15
+Message-ID: <ae81aa3f6527b663ef73b64a3fb72e5b@kernel.org>
+X-Sender: maz@kernel.org
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 217.182.43.188
+X-SA-Exim-Rcpt-To: shahuang@redhat.com, rananta@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Oct 02, 2023 at 11:24:36PM -0700, Xin Li wrote:
-> -/* Return frame for iretq */
-> +
-> +	/* The IRETQ return frame starts here */
->  	unsigned long ip;
-> -	unsigned long cs;
-> +
-> +	union {
-> +		u64	csx;	// The full 64-bit data slot containing CS
-> +		u16	cs;	// CS selector
+On 2023-11-27 21:48, Raghavendra Rao Ananta wrote:
+> Hi Shaoqin,
+> 
+> On Wed, Nov 22, 2023 at 10:39 PM Shaoqin Huang <shahuang@redhat.com> 
+> wrote:
+>> 
+>> Move those pmu helper function into lib/, thus it can be used by other
+>> pmu test.
+>> 
+>> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+>> ---
+>>  .../kvm/aarch64/vpmu_counter_access.c         | 118 -----------------
+>>  .../selftests/kvm/include/aarch64/vpmu.h      | 119 
+>> ++++++++++++++++++
+>>  2 files changed, 119 insertions(+), 118 deletions(-)
+>> 
+>> diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c 
+>> b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+>> index 17305408a334..62d6315790ab 100644
+>> --- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+>> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+>> @@ -20,12 +20,6 @@
+>>  #include <perf/arm_pmuv3.h>
+>>  #include <linux/bitfield.h>
+>> 
+>> -/* The max number of the PMU event counters (excluding the cycle 
+>> counter) */
+>> -#define ARMV8_PMU_MAX_GENERAL_COUNTERS (ARMV8_PMU_MAX_COUNTERS - 1)
+>> -
+>> -/* The cycle counter bit position that's common among the PMU 
+>> registers */
+>> -#define ARMV8_PMU_CYCLE_IDX            31
+>> -
+>>  static struct vpmu_vm *vpmu_vm;
+>> 
+>>  struct pmreg_sets {
+>> @@ -35,118 +29,6 @@ struct pmreg_sets {
+>> 
+>>  #define PMREG_SET(set, clr) {.set_reg_id = set, .clr_reg_id = clr}
+>> 
+>> -static uint64_t get_pmcr_n(uint64_t pmcr)
+>> -{
+>> -       return (pmcr >> ARMV8_PMU_PMCR_N_SHIFT) & 
+>> ARMV8_PMU_PMCR_N_MASK;
+>> -}
+>> -
+>> -static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
+>> -{
+>> -       *pmcr = *pmcr & ~(ARMV8_PMU_PMCR_N_MASK << 
+>> ARMV8_PMU_PMCR_N_SHIFT);
+>> -       *pmcr |= (pmcr_n << ARMV8_PMU_PMCR_N_SHIFT);
+>> -}
+>> -
+>> -static uint64_t get_counters_mask(uint64_t n)
+>> -{
+>> -       uint64_t mask = BIT(ARMV8_PMU_CYCLE_IDX);
+>> -
+>> -       if (n)
+>> -               mask |= GENMASK(n - 1, 0);
+>> -       return mask;
+>> -}
+>> -
+>> -/* Read PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
+>> -static inline unsigned long read_sel_evcntr(int sel)
+>> -{
+>> -       write_sysreg(sel, pmselr_el0);
+>> -       isb();
+>> -       return read_sysreg(pmxevcntr_el0);
+>> -}
+>> -
+>> -/* Write PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
+>> -static inline void write_sel_evcntr(int sel, unsigned long val)
+>> -{
+>> -       write_sysreg(sel, pmselr_el0);
+>> -       isb();
+>> -       write_sysreg(val, pmxevcntr_el0);
+>> -       isb();
+>> -}
+>> -
+>> -/* Read PMEVTYPER<n>_EL0 through PMXEVTYPER_EL0 */
+>> -static inline unsigned long read_sel_evtyper(int sel)
+>> -{
+>> -       write_sysreg(sel, pmselr_el0);
+>> -       isb();
+>> -       return read_sysreg(pmxevtyper_el0);
+>> -}
+>> -
+>> -/* Write PMEVTYPER<n>_EL0 through PMXEVTYPER_EL0 */
+>> -static inline void write_sel_evtyper(int sel, unsigned long val)
+>> -{
+>> -       write_sysreg(sel, pmselr_el0);
+>> -       isb();
+>> -       write_sysreg(val, pmxevtyper_el0);
+>> -       isb();
+>> -}
+>> -
+>> -static inline void enable_counter(int idx)
+>> -{
+>> -       uint64_t v = read_sysreg(pmcntenset_el0);
+>> -
+>> -       write_sysreg(BIT(idx) | v, pmcntenset_el0);
+>> -       isb();
+>> -}
+>> -
+>> -static inline void disable_counter(int idx)
+>> -{
+>> -       uint64_t v = read_sysreg(pmcntenset_el0);
+>> -
+>> -       write_sysreg(BIT(idx) | v, pmcntenclr_el0);
+>> -       isb();
+>> -}
+>> -
+>> -static void pmu_disable_reset(void)
+>> -{
+>> -       uint64_t pmcr = read_sysreg(pmcr_el0);
+>> -
+>> -       /* Reset all counters, disabling them */
+>> -       pmcr &= ~ARMV8_PMU_PMCR_E;
+>> -       write_sysreg(pmcr | ARMV8_PMU_PMCR_P, pmcr_el0);
+>> -       isb();
+>> -}
+>> -
+>> -#define RETURN_READ_PMEVCNTRN(n) \
+>> -       return read_sysreg(pmevcntr##n##_el0)
+>> -static unsigned long read_pmevcntrn(int n)
+>> -{
+>> -       PMEVN_SWITCH(n, RETURN_READ_PMEVCNTRN);
+>> -       return 0;
+>> -}
+>> -
+>> -#define WRITE_PMEVCNTRN(n) \
+>> -       write_sysreg(val, pmevcntr##n##_el0)
+>> -static void write_pmevcntrn(int n, unsigned long val)
+>> -{
+>> -       PMEVN_SWITCH(n, WRITE_PMEVCNTRN);
+>> -       isb();
+>> -}
+>> -
+>> -#define READ_PMEVTYPERN(n) \
+>> -       return read_sysreg(pmevtyper##n##_el0)
+>> -static unsigned long read_pmevtypern(int n)
+>> -{
+>> -       PMEVN_SWITCH(n, READ_PMEVTYPERN);
+>> -       return 0;
+>> -}
+>> -
+>> -#define WRITE_PMEVTYPERN(n) \
+>> -       write_sysreg(val, pmevtyper##n##_el0)
+>> -static void write_pmevtypern(int n, unsigned long val)
+>> -{
+>> -       PMEVN_SWITCH(n, WRITE_PMEVTYPERN);
+>> -       isb();
+>> -}
+>> -
+>>  /*
+>>   * The pmc_accessor structure has pointers to PMEV{CNTR,TYPER}<n>_EL0
+>>   * accessors that test cases will use. Each of the accessors will
+>> diff --git a/tools/testing/selftests/kvm/include/aarch64/vpmu.h 
+>> b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
+>> index 0a56183644ee..e0cc1ca1c4b7 100644
+>> --- a/tools/testing/selftests/kvm/include/aarch64/vpmu.h
+>> +++ b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
+>> @@ -1,10 +1,17 @@
+>>  /* SPDX-License-Identifier: GPL-2.0 */
+>> 
+>>  #include <kvm_util.h>
+>> +#include <perf/arm_pmuv3.h>
+>> 
+>>  #define GICD_BASE_GPA  0x8000000ULL
+>>  #define GICR_BASE_GPA  0x80A0000ULL
+>> 
+>> +/* The max number of the PMU event counters (excluding the cycle 
+>> counter) */
+>> +#define ARMV8_PMU_MAX_GENERAL_COUNTERS (ARMV8_PMU_MAX_COUNTERS - 1)
+>> +
+>> +/* The cycle counter bit position that's common among the PMU 
+>> registers */
+>> +#define ARMV8_PMU_CYCLE_IDX            31
+>> +
+>>  struct vpmu_vm {
+>>         struct kvm_vm *vm;
+>>         struct kvm_vcpu *vcpu;
+>> @@ -14,3 +21,115 @@ struct vpmu_vm {
+>>  struct vpmu_vm *create_vpmu_vm(void *guest_code);
+>> 
+>>  void destroy_vpmu_vm(struct vpmu_vm *vpmu_vm);
+>> +
+>> +static inline uint64_t get_pmcr_n(uint64_t pmcr)
+>> +{
+>> +       return (pmcr >> ARMV8_PMU_PMCR_N_SHIFT) & 
+>> ARMV8_PMU_PMCR_N_MASK;
+>> +}
+>> +
+>> +static inline void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
+>> +{
+>> +       *pmcr = *pmcr & ~(ARMV8_PMU_PMCR_N_MASK << 
+>> ARMV8_PMU_PMCR_N_SHIFT);
+>> +       *pmcr |= (pmcr_n << ARMV8_PMU_PMCR_N_SHIFT);
+>> +}
+>> +
+>> +static inline uint64_t get_counters_mask(uint64_t n)
+>> +{
+>> +       uint64_t mask = BIT(ARMV8_PMU_CYCLE_IDX);
+>> +
+>> +       if (n)
+>> +               mask |= GENMASK(n - 1, 0);
+>> +       return mask;
+>> +}
+>> +
+>> +/* Read PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
+>> +static inline unsigned long read_sel_evcntr(int sel)
+>> +{
+>> +       write_sysreg(sel, pmselr_el0);
+>> +       isb();
+>> +       return read_sysreg(pmxevcntr_el0);
+>> +}
+>> +
+>> +/* Write PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
+>> +static inline void write_sel_evcntr(int sel, unsigned long val)
+>> +{
+>> +       write_sysreg(sel, pmselr_el0);
+>> +       isb();
+>> +       write_sysreg(val, pmxevcntr_el0);
+>> +       isb();
+>> +}
+>> +
+>> +/* Read PMEVTYPER<n>_EL0 through PMXEVTYPER_EL0 */
+>> +static inline unsigned long read_sel_evtyper(int sel)
+>> +{
+>> +       write_sysreg(sel, pmselr_el0);
+>> +       isb();
+>> +       return read_sysreg(pmxevtyper_el0);
+>> +}
+>> +
+>> +/* Write PMEVTYPER<n>_EL0 through PMXEVTYPER_EL0 */
+>> +static inline void write_sel_evtyper(int sel, unsigned long val)
+>> +{
+>> +       write_sysreg(sel, pmselr_el0);
+>> +       isb();
+>> +       write_sysreg(val, pmxevtyper_el0);
+>> +       isb();
+>> +}
+>> +
+>> +static inline void enable_counter(int idx)
+>> +{
+>> +       uint64_t v = read_sysreg(pmcntenset_el0);
+>> +
+>> +       write_sysreg(BIT(idx) | v, pmcntenset_el0);
+>> +       isb();
+>> +}
+>> +
+>> +static inline void disable_counter(int idx)
+>> +{
+>> +       uint64_t v = read_sysreg(pmcntenset_el0);
+>> +
+>> +       write_sysreg(BIT(idx) | v, pmcntenclr_el0);
+>> +       isb();
+>> +}
+>> +
+> As mentioned in [1], the current implementation of disable_counter()
+> is buggy and would end up disabling all the counters.
+> However if you intend to keep it (even though it would remain unused),
+> may be change the definition something to:
+> 
+> static inline void disable_counter(int idx)
+> {
+>     write_sysreg(BIT(idx), pmcntenclr_el0);
+>     isb();
+> }
 
-I know people want to start using those // one-line comments now but
-this struct already uses the /* multiline ones. Can we stick to one type
-pls, otherwise it'll turn into a mess.
+Same thing for the enable_counter() function, by the way.
+It doesn't have the same disastrous effect, but it is
+buggy (imagine an interrupt disabling a counter between
+the read and the write...).
 
-And pls put those comments ontop, not on the side.
+In general, the set/clr registers should always be used
+in their write form, never in a RMW form.
 
-Thx.
+Thanks,
 
+         M.
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Jazz is not dead. It just smells funny...
 
