@@ -1,168 +1,115 @@
-Return-Path: <kvm+bounces-2659-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2660-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2A867FC10F
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 19:10:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A7187FC375
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 19:37:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1BDF2B2131B
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 18:10:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAA47282AE5
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 18:37:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B3D39AD5;
-	Tue, 28 Nov 2023 18:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A193D0A5;
+	Tue, 28 Nov 2023 18:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VGgjns+B"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sXXfDUci"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E797D1
-	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 10:10:23 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-6cbe2845ebcso6160576b3a.2
-        for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 10:10:23 -0800 (PST)
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84C93109
+	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 10:36:58 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-6cbe2845ebcso6202532b3a.2
+        for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 10:36:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701195022; x=1701799822; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DOiYrhTklrC540+t5ukqyApuT4wG0jpTJi3hI0UhfFQ=;
-        b=VGgjns+B3qlLDQMqpsTGbuGiYSuUeEej/LMCPGNVZ5XMofihHWB9bKjmePABcYmYou
-         DMrFObCtH1YlAZ7ff0a1qxN1UylInoucoX9jpwEdhA6/V4pwpO0iOLIdKZPdp5TcP75g
-         UcVL7ALaXACBNQ0nUTEsLsDLPIfyupuRU+Ftbsna5ZzIPzdn6wE6hlP+6rPaHkv/GQ2/
-         JMFP4xlx4u+fVBxdFQIShuc9FLCWKhbCoz9bb9w2Ob4D4BqhuIXK2mRBxQvP3WQPDxtH
-         f8AMwWq7ngg2lRazCMFGaei8dBvpxaYqvPE/Ga9gNO+ZuroNNtK05WBb162TKF5BzDAL
-         mpEg==
+        d=google.com; s=20230601; t=1701196618; x=1701801418; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=O91Uupu7339NvmzBM4XpIhItH5W0W9g2NalbW1uqHV0=;
+        b=sXXfDUciz3s5t18qTXQqBPK0QRwHfDoXwAHLBU4FEbt76xy1CCyIfzYuINW0OGaZOc
+         XPzTg0drGDNmcCFF26U3n0TA3PCX281VYHUlfgar61NIF/yexlnBqzXat2Z5osQMPHzE
+         8AGltxMkbm2DKUvdmyFPb10AV1JVK7oMxll17zb3i13DMt/ybgcnaH3sVfBsw47QmkNc
+         uH47mDEfMcL/q5d7r8q7bfXf+NOlaJe/mNA1Q38Y2M+60IhIRrenlddv0U/HBxo8gi3j
+         bbk6WaNjlp7KxifGRbbyfDWH01VDgjWZudsdj1h+2QshJnUtl7Uy7aNlRy5XbbrroEwt
+         zG+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701195022; x=1701799822;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=DOiYrhTklrC540+t5ukqyApuT4wG0jpTJi3hI0UhfFQ=;
-        b=e9MD8fAI2mCoUGh4GX3DtVccvmP0Hx6dXw8OlNqR4r3xG2CvzRG/YNtre9IJ6uk5ZD
-         Ys8GaX9GXQWFQxUtba4ODGN1EOy+vxqpR7GT0i73AM28J893dGO77R/wPYGk8XRJ2Pve
-         sUBiupiQnq3Cg8XWtCPOoBjWqrib+6uyoj3zLPYPYnNqE31U61dQ8Q7IbKBA/nhPCjhm
-         dqmVcCkdZanxlfoGBkRt5EZ3RMeCrebNAGUgtRppn1KD+diz476xLFfjow5PcrMff4CQ
-         7I5fYSUq83bRlfwO5KbQcm6Vi7G9qA64pHyL41rNZg/N9cxMltuogokcmem5Q3kyhtgT
-         4RqQ==
-X-Gm-Message-State: AOJu0YxYiisMCB9/0JIDl8FWjCj9Z00q2zFkS/9b2EKArKm8nnxpLb+o
-	23YnrvSAPAuzR4TR07VUDjSeuUAH3wA=
-X-Google-Smtp-Source: AGHT+IHjIqdyme5cvmE+9a3rDtzHZcM7efoox+2SRXJe1b9Npk04rYqTs+Clo/bMnXFYVjpUy9ZwguCYWsc=
+        d=1e100.net; s=20230601; t=1701196618; x=1701801418;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=O91Uupu7339NvmzBM4XpIhItH5W0W9g2NalbW1uqHV0=;
+        b=An10aMCGyp5WsZkrrI25Nx0Q++A+I4mFosUnHApqGzz9RejubjjT2uy2MGpgOPTkPQ
+         IpyhFdkZclbMT0FYu8jf6rWrZwyFtE6wxjt+mxFPwj4gEMPOLDdaIkJICdd9TlbLZaq4
+         7mIVuxQhPxYQEOOqX/J4TaeZbQfALBhksM3pPIN8S+BFCjn5YL348lNH7fHTbouf/N2b
+         Rch6cVo3jvrEckPZPm8bb4kQJfxL/SFgSlrMDXQJYaFyuPRbsZ+NgHx3/0UTr8Fog834
+         TKCTfKSb/qzxoupHffflViqDEJBwyRqh5JBRrWvwz5Bk+8f6gmgA0QDwS98pdlsZ1CTf
+         huHg==
+X-Gm-Message-State: AOJu0YyCnxwh64pijXrAT2q3m/SB94Vt7zFihx5RmbIRDFWqlMnjz+1C
+	trB5+320eREX9FxLFNfihgmCETQr/MQ=
+X-Google-Smtp-Source: AGHT+IHHKYVk1YH4G56UI7cwpbQhbgUXkv7M9X5puoa7iZZH1O4DvGlAXRcA0vIVhRPQPUJ+/0kD/V/tQ/s=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1908:b0:690:d251:28b9 with SMTP id
- y8-20020a056a00190800b00690d25128b9mr3953437pfi.4.1701195022550; Tue, 28 Nov
- 2023 10:10:22 -0800 (PST)
-Date: Tue, 28 Nov 2023 10:10:20 -0800
-In-Reply-To: <CAJhGHyBtis3SkNZP8RSX5nKFcnQ4qvUrfTMD2RPc+w+Rzf30Zw@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1389:b0:6cb:95ab:cf8d with SMTP id
+ t9-20020a056a00138900b006cb95abcf8dmr4156728pfg.6.1701196618074; Tue, 28 Nov
+ 2023 10:36:58 -0800 (PST)
+Date: Tue, 28 Nov 2023 10:36:56 -0800
+In-Reply-To: <c964b29b08854b2779a75584cf2c3bb1e5ccb26a.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231107202002.667900-1-aghulati@google.com> <CAJhGHyBtis3SkNZP8RSX5nKFcnQ4qvUrfTMD2RPc+w+Rzf30Zw@mail.gmail.com>
-Message-ID: <ZWYtDGH5p4RpGYBw@google.com>
-Subject: Re: [RFC PATCH 00/14] Support multiple KVM modules on the same host
+References: <20231107182159.404770-1-seanjc@google.com> <c964b29b08854b2779a75584cf2c3bb1e5ccb26a.camel@redhat.com>
+Message-ID: <ZWYzSMWtwDiSFUR1@google.com>
+Subject: Re: [PATCH] KVM: selftests: Fix MWAIT error message when guest
+ assertion fails
 From: Sean Christopherson <seanjc@google.com>
-To: Lai Jiangshan <jiangshanlai@gmail.com>
-Cc: Anish Ghulati <aghulati@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	hpa@zytor.com, Vitaly Kuznetsov <vkuznets@redhat.com>, peterz@infradead.org, 
-	paulmck@kernel.org, Mark Rutland <mark.rutland@arm.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Nov 17, 2023, Lai Jiangshan wrote:
-> On Wed, Nov 8, 2023 at 4:20=E2=80=AFAM Anish Ghulati <aghulati@google.com=
-> wrote:
-> >
-> > This series is a rough, PoC-quality RFC to allow (un)loading and runnin=
-g
-> > multiple KVM modules simultaneously on a single host, e.g. to deploy
-> > fixes, mitigations, and/or new features without having to drain all VMs
-> > from the host. Multi-KVM will also allow running the "same" KVM module
-> > with different params, e.g. to run trusted VMs with different mitigatio=
-ns.
-> >
-> > The goal of this RFC is to get feedback on the idea itself and the
-> > high-level approach.  In particular, we're looking for input on:
-> >
-> >  - Combining kvm_intel.ko and kvm_amd.ko into kvm.ko
-> >  - Exposing multiple /dev/kvmX devices via Kconfig
-> >  - The name and prefix of the new base module
-> >
-> > Feedback on individual patches is also welcome, but please keep in mind
-> > that this is very much a work in-progress
->=20
-> Hello Anish
->=20
-> Scarce effort on multi-KVM can be seen in the mail list albeit many
-> companies enable multi-KVM internally.
->=20
-> I'm glad that you took a big step in upstreaming it.  And I hope it
-> can be materialized soon.
->=20
->=20
-> >
-> >  - Move system-wide virtualization resource management to a new base
-> >    module to avoid collisions between different KVM modules, e.g. VPIDs
-> >    and ASIDs need to be unique per VM, and callbacks from IRQ handlers =
-need
-> >    to be mediated so that things like PMIs get to the right KVM instanc=
-e.
->=20
-> perf_register_guest_info_callbacks() also accesses to system-wide resourc=
-es,
-> but I don't see its relating code including kvm_guest_cbs being moved to =
-AVC.
+On Sun, Nov 19, 2023, Maxim Levitsky wrote:
+> On Tue, 2023-11-07 at 10:21 -0800, Sean Christopherson wrote:
+> > Print out the test and vector as intended when a guest assert fails an
+> > assertion regarding MONITOR/MWAIT faulting.  Unfortunately, the guest
+> > printf support doesn't detect such issues at compile-time, so the bug
+> > manifests as a confusing error message, e.g. in the most confusing case,
+> > the test complains that it got vector "0" instead of expected vector "0".
+> > 
+> > Fixes: 0f52e4aaa614 ("KVM: selftests: Convert the MONITOR/MWAIT test to use printf guest asserts")
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/x86_64/monitor_mwait_test.c | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/x86_64/monitor_mwait_test.c b/tools/testing/selftests/kvm/x86_64/monitor_mwait_test.c
+> > index 80aa3d8b18f8..853802641e1e 100644
+> > --- a/tools/testing/selftests/kvm/x86_64/monitor_mwait_test.c
+> > +++ b/tools/testing/selftests/kvm/x86_64/monitor_mwait_test.c
+> > @@ -27,10 +27,12 @@ do {									\
+> >  									\
+> >  	if (fault_wanted)						\
+> >  		__GUEST_ASSERT((vector) == UD_VECTOR,			\
+> > -			       "Expected #UD on " insn " for testcase '0x%x', got '0x%x'", vector); \
+> > +			       "Expected #UD on " insn " for testcase '0x%x', got '0x%x'", \
+> > +			       testcase, vector);			\
+> >  	else								\
+> >  		__GUEST_ASSERT(!(vector),				\
+> > -			       "Expected success on " insn " for testcase '0x%x', got '0x%x'", vector); \
+> > +			       "Expected success on " insn " for testcase '0x%x', got '0x%x'", \
+> > +			       testcase, vector);			\
+> >  } while (0)
+> >  
+> >  static void guest_monitor_wait(int testcase)
+> > 
+> > base-commit: 45b890f7689eb0aba454fc5831d2d79763781677
+> 
+> I think that these days the gcc (and llvm likely) support printf annotations,
+> and usually complain, we should look at adding these to have a warning in
+> such cases.
 
-Yeah, that's on the TODO list.  IIRC, the plan is to have VAC register a si=
-ngle
-callback with perf, and then have VAC deal with invoking the callback(s) fo=
-r the
-correct KVM instance.
+Huh.  Well now I feel quite stupid for not realizing that's what
 
-> >  - Refactor KVM to make all upgradable assets visible only to KVM, i.e.
-> >    make KVM a black box, so that the layout/size of things like "struct
-> >    kvm_vcpu" isn't exposed to the kernel at-large.
-> >
-> >  - Fold kvm_intel.ko and kvm_amd.ko into kvm.ko to avoid complications
-> >    having to generate unique symbols for every symbol exported by kvm.k=
-o.
->=20
-> The sizes of kvm_intel.ko and kvm_amd.ko are big, and there
-> is only 1G in the kernel available for modules. So I don't think folding
-> two vendors' code into kvm.ko is a good idea.
->=20
-> Since the symbols in the new module are invisible outside, I recommend:
-> new kvm_intel.ko =3D kvm_intel.ko + kvm.ko
-> new kvm_amd.ko =3D kvm_amd.ko + kvm.ko
+	__attribute__((__format__(printf, ...)))
 
-Yeah, Paolo also suggested this at LPC.
-
-> >  - Add a Kconfig string to allow defining a device and module postfix a=
-t
-> >    build time, e.g. to create kvmX.ko and /dev/kvmX.
-> >
-> > The proposed name of the new base module is vac.ko, a.k.a.
-> > Virtualization Acceleration Code (Unupgradable Units Module). Childish
-> > humor aside, "vac" is a unique name in the kernel and hopefully in x86
-> > and hardware terminology, is a unique name in the kernel and hopefully
-> > in x86 and hardware terminology, e.g. `git grep vac_` yields no hits in
-> > the kernel. It also has the same number of characters as "kvm", e.g.
-> > the namespace can be modified without needing whitespace adjustment if
-> > we want to go that route.
->=20
-> How about the name kvm_base.ko?
->=20
-> And the variable/function name in it can still be kvm_foo (other than
-> kvm_base_foo).
-
-My preference is to have a unique name that allows us to differentitate bet=
-ween
-the "base" module/code and KVM code.  Verbal conversations about all of thi=
-s get
-quite confusing because it's not always clear whether "base KVM" refers to =
-what
-is currently kvm.ko, or what would become kvm_base.ko/vac.ko.
+is for.  There's even a handy dandy __printf() macro now.  I'll post a v2 with
+the annotations and fixes for all existing violations.
 
