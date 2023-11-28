@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-2645-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2646-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FBD87FBE1E
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 16:32:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FE777FBE28
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 16:34:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC4F7282E93
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 15:32:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CECE282910
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 15:34:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 131C85E0B1;
-	Tue, 28 Nov 2023 15:32:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC62D5E0B4;
+	Tue, 28 Nov 2023 15:34:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GE3baWR/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="al6VQ0gZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEE1410F6
-	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 07:32:31 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02E44D1
+	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 07:34:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701185550;
+	s=mimecast20190719; t=1701185684;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Tg6RYWeqCpwUoQCzRfUgguApc1UmfoSk7iO/0ub4xnQ=;
-	b=GE3baWR/Ic4lSqM+v8Iuv73mh2HZZpi9dI02qi8AP6pwNWJMpevamHRbSRMwxQpubAuAK7
-	XU6CxE6gfXMXA1yvWMEy3kAKNJ9cCws4XzqT0/XjxnntvgbRYPwFTTNuaswMkZ4lCDJO9R
-	2hJ/u8EliY199YwYpG+NOgjJP5HOjvo=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=D9lOQjODNv02P43/kZH/wGQ3w31tJS9+8fDtN67uTGI=;
+	b=al6VQ0gZmaO5cUAK8LObkne98U7txuUkzdUJ055/Tk7/NUrbDvgXMLTBHd4n1/GZ8TCCVE
+	8bxj/xiagKhIXs/1da9nz6dUWczlciN9cpMkwU0FFr5vU2t+m645bmriHaGxfuH+hvSqo4
+	kMFmXrY5NcLVzL1MVL4Wr+RVKelx3a8=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-144-BlJXkXZgPl-VmAsKJx4kSA-1; Tue, 28 Nov 2023 10:32:29 -0500
-X-MC-Unique: BlJXkXZgPl-VmAsKJx4kSA-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-548cf45e962so3941226a12.2
-        for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 07:32:26 -0800 (PST)
+ us-mta-643-Q7OM1teMNMe3L7JDLjL2iA-1; Tue, 28 Nov 2023 10:34:43 -0500
+X-MC-Unique: Q7OM1teMNMe3L7JDLjL2iA-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-50abbf4ee79so6032815e87.1
+        for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 07:34:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701185545; x=1701790345;
+        d=1e100.net; s=20230601; t=1701185682; x=1701790482;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Tg6RYWeqCpwUoQCzRfUgguApc1UmfoSk7iO/0ub4xnQ=;
-        b=bgv40ecW8bHiiTUnE/VPgqvoQuZCT3qWC6nQHLwFLifUrb+4BWWigj3xuUc6XFhqSB
-         /I46FfI+7wXXbkrdmDlHv6fLaj8u/q7zFBpZXUaNZpv/+V70x6KUwcItdpNGyp5WS4rR
-         lHu0SMYzyZdwn7lxnrWLaE9naLynQE4uJXcQzzD4+dfnZjByzyIA+Zdst8jXXpZy7COt
-         x5dGhEXXEMAVGx9aPnUWQmZrHVh14CZCplj7N5vQrk6Eb5xRCK5ft+jVwixCBQ+Vu0oj
-         l1WAlGPQnoMfJE6Y42LIJZd0f2jfPHOXURkbZbEQzOowoxI6gMwbQfSMo/ASsh/A2Rsw
-         +9+A==
-X-Gm-Message-State: AOJu0YydnhaASgxGLZomLFbPXx8U/6HCny1S8N1YOyhD0JGA1cvopKr8
-	ZKQsXBQchfHdJXk9idfwGOBaPm1EgXAEy40dEfaWSOvJjS/M9lj8KN8Hmsm8lI5KRzcVly/9CGV
-	30Lf/zQUgqJ8q
-X-Received: by 2002:a05:6402:ca9:b0:54b:8a3:33d4 with SMTP id cn9-20020a0564020ca900b0054b08a333d4mr8894228edb.21.1701185545212;
-        Tue, 28 Nov 2023 07:32:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHMGpmPt7p6iX1F5rrS2VkmRstyL767+5Ii7X39+PL6kV21emtghvT6KRos4CGfcShd+vt/lQ==
-X-Received: by 2002:a05:6402:ca9:b0:54b:8a3:33d4 with SMTP id cn9-20020a0564020ca900b0054b08a333d4mr8894200edb.21.1701185544908;
-        Tue, 28 Nov 2023 07:32:24 -0800 (PST)
+        bh=D9lOQjODNv02P43/kZH/wGQ3w31tJS9+8fDtN67uTGI=;
+        b=DBH7HK5cxGBYmrFEu0TMo+4Qh76OEmpWm7yLzkSP1kUXJ0ZS2TvmD0ak+Q7prsYXgn
+         PToaqQWSq+MN7bluN9hDot43sVNGVi7z3QFbhkzYcr0u7HwpQNxtAi60OHgJKEWs2byg
+         Kp59UwivDkCUbSKatn4P98eSJqBBEGaG7TBC9e/xFoZKkjnf+S/UE4Wnh1zn50uo9Ret
+         TRy0bCDR/5l26Wrk5BU+jABPEcAn6sgANlvgSaRb96DhjuTzKyOYupnKnL/5ywZvxbxP
+         WreEnv45zC4JuM1RU45gCk6DbdXvm54bsfAbvBFWbcaHtA9++q3S+EHOxwCDmha8rioW
+         EKTA==
+X-Gm-Message-State: AOJu0YyTNiXbZHPKOMtxCiClZW7gVaGDK2ZM8fZUsMa7eTfqYsk94/lG
+	BFERH6TB/X8TtEOjknM22rZzbPOfZZruHk0GDYQslMVslI/O0CsYuy9mwgf4J7tR/Qt192MVOfZ
+	f769FiMBM/s+6
+X-Received: by 2002:ac2:4acb:0:b0:50b:ac31:28e5 with SMTP id m11-20020ac24acb000000b0050bac3128e5mr5758122lfp.65.1701185682044;
+        Tue, 28 Nov 2023 07:34:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFVxWl5bdZvuMtpJUQ8Z+EaD52jviZNSCZAMpxb5IUoQ4q6GjfDoZU/DsJDwJO/WcMaVBCVag==
+X-Received: by 2002:ac2:4acb:0:b0:50b:ac31:28e5 with SMTP id m11-20020ac24acb000000b0050bac3128e5mr5758085lfp.65.1701185681511;
+        Tue, 28 Nov 2023 07:34:41 -0800 (PST)
 Received: from imammedo.users.ipa.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id z40-20020a509e2b000000b0054b79a10c5bsm2011932ede.1.2023.11.28.07.32.22
+        by smtp.gmail.com with ESMTPSA id d11-20020a056402000b00b0054851cd28d2sm6365832edu.79.2023.11.28.07.34.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 07:32:24 -0800 (PST)
-Date: Tue, 28 Nov 2023 16:32:21 +0100
+        Tue, 28 Nov 2023 07:34:41 -0800 (PST)
+Date: Tue, 28 Nov 2023 16:34:38 +0100
 From: Igor Mammedov <imammedo@redhat.com>
 To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>
 Cc: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini
@@ -93,11 +93,11 @@ Cc: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini
  <npiggin@gmail.com>, Greg Kurz <groug@kaod.org>, Michael Rolnik
  <mrolnik@gmail.com>, Eduardo Habkost <eduardo@habkost.net>, Markus
  Armbruster <armbru@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>
-Subject: Re: [PATCH 01/22] target/i386: Only realize existing APIC device
-Message-ID: <20231128163221.6c91e013@imammedo.users.ipa.redhat.com>
-In-Reply-To: <20230918160257.30127-2-philmd@linaro.org>
+Subject: Re: [PATCH 02/22] hw/intc/apic: Pass CPU using QOM link property
+Message-ID: <20231128163438.3d257bdd@imammedo.users.ipa.redhat.com>
+In-Reply-To: <20230918160257.30127-3-philmd@linaro.org>
 References: <20230918160257.30127-1-philmd@linaro.org>
-	<20230918160257.30127-2-philmd@linaro.org>
+	<20230918160257.30127-3-philmd@linaro.org>
 X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -108,82 +108,70 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 18 Sep 2023 18:02:34 +0200
+On Mon, 18 Sep 2023 18:02:35 +0200
 Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> wrote:
 
-> APIC state is created under a certain condition,
-> use the same condition to realize it.
-> Having a NULL APIC state is a bug: use assert().
+> QOM objects shouldn't access each other internals fields
+> except using the QOM API.
+>=20
+> Declare the 'cpu' and 'base-addr' properties, set them
+> using object_property_set_link() and qdev_prop_set_uint32()
+> respectively.
 >=20
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
 > ---
->  target/i386/cpu-sysemu.c | 9 +++------
->  target/i386/cpu.c        | 8 +++++---
->  2 files changed, 8 insertions(+), 9 deletions(-)
+>  hw/intc/apic_common.c    |  2 ++
+>  target/i386/cpu-sysemu.c | 11 ++++++-----
+>  2 files changed, 8 insertions(+), 5 deletions(-)
 >=20
+> diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+> index 68ad30e2f5..e28f7402ab 100644
+> --- a/hw/intc/apic_common.c
+> +++ b/hw/intc/apic_common.c
+> @@ -394,6 +394,8 @@ static Property apic_properties_common[] =3D {
+>                      true),
+>      DEFINE_PROP_BOOL("legacy-instance-id", APICCommonState, legacy_insta=
+nce_id,
+>                       false),
+> +    DEFINE_PROP_LINK("cpu", APICCommonState, cpu, TYPE_X86_CPU, X86CPU *=
+),
+> +    DEFINE_PROP_UINT32("base-addr", APICCommonState, apicbase, 0),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> =20
 > diff --git a/target/i386/cpu-sysemu.c b/target/i386/cpu-sysemu.c
-> index 2375e48178..6a164d3769 100644
+> index 6a164d3769..6edfb7e2af 100644
 > --- a/target/i386/cpu-sysemu.c
 > +++ b/target/i386/cpu-sysemu.c
-> @@ -272,9 +272,7 @@ void x86_cpu_apic_create(X86CPU *cpu, Error **errp)
->      APICCommonState *apic;
+> @@ -269,7 +269,6 @@ APICCommonClass *apic_get_class(Error **errp)
+> =20
+>  void x86_cpu_apic_create(X86CPU *cpu, Error **errp)
+>  {
+> -    APICCommonState *apic;
 >      APICCommonClass *apic_class =3D apic_get_class(errp);
 > =20
-> -    if (!apic_class) {
-> -        return;
-> -    }
-> +    assert(apic_class);
-
-if errp doesn't lead to error_fatal/abort, wouldn't that effectively mask
-following error
- apic_get_class():
-      error_setg(errp, "KVM does not support userspace APIC");
-      return NULL;
-???
-
+>      assert(apic_class);
+> @@ -279,11 +278,13 @@ void x86_cpu_apic_create(X86CPU *cpu, Error **errp)
+>                                OBJECT(cpu->apic_state));
+>      object_unref(OBJECT(cpu->apic_state));
 > =20
->      cpu->apic_state =3D DEVICE(object_new_with_class(OBJECT_CLASS(apic_c=
-lass)));
->      object_property_add_child(OBJECT(cpu), "lapic",
-> @@ -293,9 +291,8 @@ void x86_cpu_apic_realize(X86CPU *cpu, Error **errp)
->      APICCommonState *apic;
->      static bool apic_mmio_map_once;
+> +    if (!object_property_set_link(OBJECT(cpu->apic_state), "cpu",
+> +                                  OBJECT(cpu), errp)) {
+> +        return;
+> +    }
+>      qdev_prop_set_uint32(cpu->apic_state, "id", cpu->apic_id);
+> -    /* TODO: convert to link<> */
+> -    apic =3D APIC_COMMON(cpu->apic_state);
+> -    apic->cpu =3D cpu;
+> -    apic->apicbase =3D APIC_DEFAULT_ADDRESS | MSR_IA32_APICBASE_ENABLE;
+> +    qdev_prop_set_uint32(cpu->apic_state, "base-addr",
+> +                         APIC_DEFAULT_ADDRESS | MSR_IA32_APICBASE_ENABLE=
+);
+>  }
 > =20
-> -    if (cpu->apic_state =3D=3D NULL) {
-> -        return;
-> -    }
-> +    assert(cpu->apic_state);
-
-it would be better to explode in one place only inside apic_get_class(),
-provided !kvm_irqchip_in_kernel() case is dealt with properly.
-
-
->      qdev_realize(DEVICE(cpu->apic_state), NULL, errp);
-> =20
->      /* Map APIC MMIO area */
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index b2a20365e1..a23d4795e0 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -7448,9 +7448,11 @@ static void x86_cpu_realizefn(DeviceState *dev, Er=
-ror **errp)
->      }
-> =20
->  #ifndef CONFIG_USER_ONLY
-> -    x86_cpu_apic_realize(cpu, &local_err);
-> -    if (local_err !=3D NULL) {
-> -        goto out;
-> +    if (cpu->env.features[FEAT_1_EDX] & CPUID_APIC || ms->smp.cpus > 1) {
-> +        x86_cpu_apic_realize(cpu, &local_err);
-> +        if (local_err !=3D NULL) {
-> +            goto out;
-> +        }
-
-better move 'if (cpu->apic_state =3D=3D NULL) {' from x86_cpu_apic_realize()
-to the caller, instead of repeating test again.
-
->      }
->  #endif /* !CONFIG_USER_ONLY */
->      cpu_reset(cs);
+>  void x86_cpu_apic_realize(X86CPU *cpu, Error **errp)
 
 
