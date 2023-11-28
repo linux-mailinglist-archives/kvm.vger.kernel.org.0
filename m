@@ -1,136 +1,119 @@
-Return-Path: <kvm+bounces-2557-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2558-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D8867FB20A
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 07:42:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BFAF47FB20E
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 07:47:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F10C1C20BBE
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 06:42:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB4741C20A6B
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 06:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC94411726;
-	Tue, 28 Nov 2023 06:42:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B26DDCC;
+	Tue, 28 Nov 2023 06:46:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sv1be2va"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ERmBQKHB"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23AC3197
-	for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 22:42:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701153765;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UiaQdwESEYDh0OWSlkZl1xuzNRF7zyPvHRw34kcgm7E=;
-	b=Sv1be2vaCJKWqIbkKiyzb/mLTEhoL0Cib05aD0Q7IBuE321zL21q3gn9l51rlGzWwaU5NA
-	dqh7hEvZJv6Xmg/yEJF3CaPByoDbyFYvbjrwHzEFPaJSIPwS2CNnNdkGfsf66aqxYO2y7i
-	FRH3bWqRTrj8smmDIGmk3OUUBfY2iRk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-80-brmJFqadPXmVb11sGjt_3A-1; Tue, 28 Nov 2023 01:42:43 -0500
-X-MC-Unique: brmJFqadPXmVb11sGjt_3A-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40b29868c6eso29821795e9.3
-        for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 22:42:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701153762; x=1701758562;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7A901BB
+	for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 22:46:53 -0800 (PST)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-40b397793aaso22581245e9.0
+        for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 22:46:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1701154012; x=1701758812; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=UiaQdwESEYDh0OWSlkZl1xuzNRF7zyPvHRw34kcgm7E=;
-        b=UgDg8vYeJlU+n4fnPGjPziL+tV0JABs1xCljHlNK9X/1OExNqBLA6uJipZDESb7L9M
-         VhnjO2Sf07tJ74PowHJr/Z35TGI9u+Di/jrdnNtFayY6vCigkfRufTRRWM22d3wIqtGf
-         rZihKBp1VKEVgT8LI6uPAMVX042TC2WzIRvJYm2vbB3FLdCvlF9cYqsrJK/TovyFRJ7t
-         uMPgSze2/pa8/B4C4TPjjwfWDqf79pqkkxRbcKh0WYZN3IbQOlcJqDO+3ycbXoQlM/7E
-         IB+w3tr7sb+xckC4vrvbFuDf5NjlA49N22tv4Ww8PeR2/txMXCb1KzbgerkE0/gFE9UY
-         t4/Q==
-X-Gm-Message-State: AOJu0Ywx4YKdFB6DTRDHcbPsxHY+Ypl6a7iOciU2QwC2+Nap7EzvrLC8
-	tF27kDVup9RLidvNg/xb1AZYuPtmfzDnYRmHYEyLA7uibG14c344yo5H03z+Q0+iqqsSpf1+Nmf
-	wJPBG7SVPtMwB
-X-Received: by 2002:adf:da4a:0:b0:333:149:68f1 with SMTP id r10-20020adfda4a000000b00333014968f1mr2844111wrl.70.1701153762659;
-        Mon, 27 Nov 2023 22:42:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFzVPae2GApop6eWDvzDCz8sHV2p++din6DOfCUmKc7HNHTvntQTPElvh8JbWiI/6/j61K24A==
-X-Received: by 2002:adf:da4a:0:b0:333:149:68f1 with SMTP id r10-20020adfda4a000000b00333014968f1mr2844101wrl.70.1701153762332;
-        Mon, 27 Nov 2023 22:42:42 -0800 (PST)
-Received: from starship ([77.137.131.4])
-        by smtp.gmail.com with ESMTPSA id w27-20020adf8bdb000000b00332e5624a31sm13384035wra.84.2023.11.27.22.42.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Nov 2023 22:42:42 -0800 (PST)
-Message-ID: <69607670cc11c05658870ae07d1af543a9446fe8.camel@redhat.com>
-Subject: Re: [PATCH v3 4/4] KVM: x86: add new nested vmexit tracepoints
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc: Thomas Gleixner <tglx@linutronix.de>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Sean Christopherson
-	 <seanjc@google.com>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
-	 <bp@alien8.de>, linux-kernel@vger.kernel.org, x86@kernel.org, Dave Hansen
-	 <dave.hansen@linux.intel.com>
-Date: Tue, 28 Nov 2023 08:42:40 +0200
-In-Reply-To: <a10d3a01-939c-493c-b93c-b3821735e062@redhat.com>
-References: <20230928103640.78453-1-mlevitsk@redhat.com>
-	 <20230928103640.78453-5-mlevitsk@redhat.com>
-	 <a10d3a01-939c-493c-b93c-b3821735e062@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        bh=h0PjY0WHoOlgCesy1ZAomc2Q7r4AO6iN2dgUweHV9zw=;
+        b=ERmBQKHBkt1Ub5RqNPlAoCDwtF/2PFH89G1XrDH71bDht4EeZGm11mzMaRyVvGgCie
+         sbYHwgVHoPKishgnCaTvC8dYEjukva8kPxS5LRNgf6J7NlRyDQdCxQd1xRCBNefkiePf
+         9KVzD6vbp+K1sPybRRKVmdOiZjfY1a6xbB4BEGtdnuF+Zx4Q9WzAcymVrpwVTcNbQZxg
+         474CGK7JIwUIXDaCtGEFMa4ZZ9KhxLhNELbUL2sNziffs0p4J+p1bqiEiPlwVKul0VYS
+         YSoYjiw7mD0BT7Cn0OzSFamiUJpMQv/E8YzVnUmkmZrqTE7SDWH447DYvskVJ7FRhmCq
+         bL0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701154012; x=1701758812;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h0PjY0WHoOlgCesy1ZAomc2Q7r4AO6iN2dgUweHV9zw=;
+        b=hudIMMut+kEaScYCLHFeHPQ9C+JaEzioe7zBBeD+6yLesLZqJMaSdelcX7NpyIPIZS
+         BV3cs7s7tGCaGZ/oXAvAeAk+63FcbaIH7i23/t+5UyX6tJYdgPq3UejBVzP5FV6hbZod
+         OZPIfweT+/5eldl2Rc6IkQ+eMxa+hrzYgGhT+dR+eXeoAi5HnVU04ANhDMENLHvi2Z3a
+         orvhoeRyAMIlZYETqk6H1o0xa/UG//hrMo3PptFyJqIrY3wbRwEYYMAHDg9Jk+NoHIv2
+         z+pAiDf/eSgSFbhjq9Fj54x4PKZ5KcynHtIQLVzEAt/dwq83xx60J8LcY+npLBxjM6/N
+         a54w==
+X-Gm-Message-State: AOJu0YyV8eYfrlt4DcbVlQohu6ZeYdpw3BL28L0A3VYF0LD/VU4IFmYe
+	rvdlXBLZuMqHUZbtVsJN2iEuWhVBizxca9IahsQ=
+X-Google-Smtp-Source: AGHT+IGuLVjmN8UvCrWJLck2yUrDdplonq/4r15+/Y46RZpo7v1qql8cKLQSQIv6tFsOmEt8uy1Yow==
+X-Received: by 2002:a05:600c:4f86:b0:40b:305c:9c84 with SMTP id n6-20020a05600c4f8600b0040b305c9c84mr12036325wmq.12.1701154012110;
+        Mon, 27 Nov 2023 22:46:52 -0800 (PST)
+Received: from [192.168.69.100] (crb44-h02-176-184-13-61.dsl.sta.abo.bbox.fr. [176.184.13.61])
+        by smtp.gmail.com with ESMTPSA id j8-20020adfe508000000b00318147fd2d3sm14027125wrm.41.2023.11.27.22.46.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Nov 2023 22:46:51 -0800 (PST)
+Message-ID: <f9b24c09-547d-4590-9b73-9c5918ee022c@linaro.org>
+Date: Tue, 28 Nov 2023 07:46:49 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH-for-9.0 08/16] target/arm/kvm: Have kvm_arm_pmu_init take
+ a ARMCPU argument
+Content-Language: en-US
+To: Gavin Shan <gshan@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+References: <20231123183518.64569-1-philmd@linaro.org>
+ <20231123183518.64569-9-philmd@linaro.org>
+ <802e9dcd-68d2-4c38-95e8-fe99d46b911f@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <802e9dcd-68d2-4c38-95e8-fe99d46b911f@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, 2023-11-24 at 17:11 +0100, Paolo Bonzini wrote:
-> On 9/28/23 12:36, Maxim Levitsky wrote:
-> > Add 3 new tracepoints for nested VM exits which are intended
-> > to capture extra information to gain insights about the nested guest
-> > behavior.
-> > 
-> > The new tracepoints are:
-> > 
-> > - kvm_nested_msr
-> > - kvm_nested_hypercall
-> > 
-> > These tracepoints capture extra register state to be able to know
-> > which MSR or which hypercall was done.
-> > 
-> > - kvm_nested_page_fault
-> > 
-> > This tracepoint allows to capture extra info about which host pagefault
-> > error code caused the nested page fault.
-> > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+On 27/11/23 05:20, Gavin Shan wrote:
+> Hi Phil,
 > 
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> On 11/24/23 05:35, Philippe Mathieu-Daudé wrote:
+>> Unify the "kvm_arm.h" API: All functions related to ARM vCPUs
+>> take a ARMCPU* argument. Use the CPU() QOM cast macro When
+>> calling the generic vCPU API from "sysemu/kvm.h".
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+>> ---
+>>   target/arm/kvm_arm.h | 4 ++--
+>>   hw/arm/virt.c        | 2 +-
+>>   target/arm/kvm.c     | 6 +++---
+>>   3 files changed, 6 insertions(+), 6 deletions(-)
+>>
 > 
-> with just one question below that can be fixed when applying:
+> One nit below, but I guess it doesn't matter.
 > 
-> > @@ -1139,6 +1145,22 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
-> >   				       vmcb12->control.exit_int_info_err,
-> >   				       KVM_ISA_SVM);
-> >   
-> > +	/* Collect some info about nested VM exits */
-> > +	switch (vmcb12->control.exit_code) {
-> > +	case SVM_EXIT_MSR:
-> > +		trace_kvm_nested_msr(vmcb12->control.exit_info_1 == 1,
-> > +				     kvm_rcx_read(vcpu),
-> > +				     (vmcb12->save.rax & -1u) |
-> > +				     (((u64)(kvm_rdx_read(vcpu) & -1u) << 32)));
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
 > 
-> Why the second "& -1u"?  (And I also prefer 0xFFFFFFFFull
+>> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+>> index 0e12a008ab..fde1c45609 100644
+>> --- a/target/arm/kvm_arm.h
+>> +++ b/target/arm/kvm_arm.h
+>> @@ -200,8 +200,8 @@ int kvm_arm_get_max_vm_ipa_size(MachineState *ms, 
+>> bool *fixed_ipa);
+>>   int kvm_arm_vgic_probe(void);
+>> +void kvm_arm_pmu_init(ARMCPU *cpu);
+>>   void kvm_arm_pmu_set_irq(CPUState *cs, int irq);
+>> -void kvm_arm_pmu_init(CPUState *cs);
+> 
+> Why the order of the declaration is changed? I guess the reason would be
+> kvm_arm_pmu_init() is called prior to kvm_arm_pmu_set_irq().
 
-I think I copied it from somewhere but I can't seem to find where.
-I agree with both remarks, will fix.
+Yes, exactly. Not worth mentioning IMHO.
 
-Thanks,
-	Best regards,
-		Maxim Levitsky
-> 
-> Paolo
-> 
+Thanks!
 
+Phil.
 
 
