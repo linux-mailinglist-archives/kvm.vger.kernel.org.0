@@ -1,48 +1,48 @@
-Return-Path: <kvm+bounces-2602-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2603-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50D6B7FBABB
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 14:01:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55F2E7FBABD
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 14:01:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03655282B8B
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 13:01:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 645ADB22152
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 13:01:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC94856758;
-	Tue, 28 Nov 2023 13:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 606D457873;
+	Tue, 28 Nov 2023 13:01:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="GHSprKUW"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="5qBtNu8O"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2076.outbound.protection.outlook.com [40.107.243.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A038D1BC1;
-	Tue, 28 Nov 2023 05:01:17 -0800 (PST)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3DC81BDA;
+	Tue, 28 Nov 2023 05:01:22 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ABZ22H6aZf6fEmZ6QXkOqQXQVGMVoiljVawVUgKVONG9qbRtjpfrwQ4hYIR/1VN8WJ+4EH40B5zdNWJ9npVb0GgWsOjH1Bx7CoUWDHQgP0hRAk9FUYaQJibm1z+Moq+csZKwI6ziF5prr0WZuCg/AYr2jcPj2rAwNkUO0SP9vKrVLPyR+ZMmFoPVh31+UGzU/7DrEcs9hSGiYD/L8c4Wy0lz27aX+Xce42nfcWrBGTw0m0MtIDYIvntsCXOYf/uSrvaivJF3v0l83cN3ICEoXdlLA3pU4i/G7vMcqUEVTG0Am9jhXKlCecFShx/L2lkgDZj9tAdfaGctiFkhPioSZQ==
+ b=RnDCPWp5kvHO06BNbt4ZnrCroXMmT3uhhynnbgvvEr6fjg3sAegqZXETTM53ka6eZ+y2M6iL1J0nyt/nAUfWA7nPlYwNMIDwKaHCs64sY3EG+y8ytHQzS3ffZxITqV3aQS96WBSkdOtGMYO0xwIYPGbjHbFjajPIPY1c4RD+N6PSZAk1nUYpQhhcbrD9r8SwhzA/izIcjwgWdDPb6toBXS29T3fT+/B+u8J1YmzVifNQVOxTkwS5MmtDXZj+Le9PXNRxxMuHRJEDkzQCkzmNekwLQ40/8EQflS2hP2G2yP1yuuCU1AZnFICqCYmbUERLY9j2m5LIJNXKZ0U7bRWkvQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XrnedH1rkkWFeauA8mfF4Q4jsW8KfvunZSBh3cWrooE=;
- b=l1p61xm+jMrdhD7s+70ifQ0hv9EFu5d0FZYHk/RWGLtoTCc8VnAwmKc/j4uJ6i2K9Rpw5qnRoBp63LL/zAtoUcY9cPWGri18mF9cPmXval1j3NFvNZ3V5YgmwmP/h0/GAIqHYdBHU0mKE1S5m4ewxkP2pbdTukHZNG4b1V6m+bOw+6k+URbIsL09p6dSeFlbxZSaEYVBiw02p8sHQRexofXyBU6auFgoyU58oN++FQ/tYGJJh/IbgJxG22mIeg+1Kw33/Exa4gR7D9bO2CO76H2UHy6IpDpYQKBpjcmxGLkvqYen5JI8Ch4OWhptT5wumFq21DSeFz1dELeZo8Oqeg==
+ bh=EtoSEYU4xIwFMSzXfF6Gd+dIQ0h+iQs8FLK1igLUhwQ=;
+ b=Y1ASDVaYjLCEVy/o17dYc4N9erTpY9hfNBVSgBxNO6FUcmbYpfevhY6Xoa90+3ZLhZVTQzNp86lLQ3mbksKHjXZ8MsVpDFwaXmFoh5Vqa7zS5AKk+T5ek0FZMGZ0ZuIL2L40nZm8clQZ73UnnBtjmlxrnd+ITN1pJsQcKWjly+U/eltdJYcAMbO1miAstQxvQKbdEx1hjpKNm9tRp9YsDv3PSmM1KEdeRMAK4f8TKkwqII+GXZXdpa0ltJGPoK9kLICL/z42Oqn1VndT81jzNXtOmrB9286GS+I52/2uOGaSyfA6tFKxW9BrTcrTfX4MWT2tjTVwTj2nDZ96Pz7VVA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XrnedH1rkkWFeauA8mfF4Q4jsW8KfvunZSBh3cWrooE=;
- b=GHSprKUWyY/1P2wVSyFsVqUeHb5e3zek2+MTG+FvKozCPiwR5ATKbo+qc9N5V/xWJKE1xCetWZltncBFFB2K45p4rLCsaWDCbfohVwPO/KlEI3nvGeA39eheQYgQj4mDROkmIPHip1aK/2dUx8HohxHo7rg1b1PaJTPLa08wJWc=
-Received: from DS7PR05CA0027.namprd05.prod.outlook.com (2603:10b6:5:3b9::32)
- by CH0PR12MB5385.namprd12.prod.outlook.com (2603:10b6:610:d4::14) with
+ bh=EtoSEYU4xIwFMSzXfF6Gd+dIQ0h+iQs8FLK1igLUhwQ=;
+ b=5qBtNu8OlcScgrP7ckzWhaQOa8ZugjYFmBErNyRnDRKzz+NTM3eBX5MLjwbjfgRlMelofClIGcX79E8G6G+otBnmfoJjLnz4O0zSKI2Ui0II/Oe72xAsM1FmcLa7RUzNGsOPSletJnfK70M2Q9N+HBJadyWubCEgKjwSku8wGxU=
+Received: from DS7PR05CA0029.namprd05.prod.outlook.com (2603:10b6:5:3b9::34)
+ by BL3PR12MB6473.namprd12.prod.outlook.com (2603:10b6:208:3b9::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29; Tue, 28 Nov
- 2023 13:01:15 +0000
+ 2023 13:01:19 +0000
 Received: from CY4PEPF0000EE34.namprd05.prod.outlook.com
- (2603:10b6:5:3b9:cafe::9) by DS7PR05CA0027.outlook.office365.com
- (2603:10b6:5:3b9::32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.18 via Frontend
- Transport; Tue, 28 Nov 2023 13:01:15 +0000
+ (2603:10b6:5:3b9:cafe::c4) by DS7PR05CA0029.outlook.office365.com
+ (2603:10b6:5:3b9::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.19 via Frontend
+ Transport; Tue, 28 Nov 2023 13:01:18 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -52,20 +52,20 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  CY4PEPF0000EE34.mail.protection.outlook.com (10.167.242.40) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7046.17 via Frontend Transport; Tue, 28 Nov 2023 13:01:14 +0000
+ 15.20.7046.17 via Frontend Transport; Tue, 28 Nov 2023 13:01:18 +0000
 Received: from gomati.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Tue, 28 Nov
- 2023 07:01:10 -0600
+ 2023 07:01:14 -0600
 From: Nikunj A Dadhania <nikunj@amd.com>
 To: <linux-kernel@vger.kernel.org>, <thomas.lendacky@amd.com>,
 	<x86@kernel.org>, <kvm@vger.kernel.org>
 CC: <bp@alien8.de>, <mingo@redhat.com>, <tglx@linutronix.de>,
 	<dave.hansen@linux.intel.com>, <dionnaglaze@google.com>, <pgonda@google.com>,
 	<seanjc@google.com>, <pbonzini@redhat.com>, <nikunj@amd.com>
-Subject: [PATCH v6 05/16] virt: sev-guest: Add vmpck_id to snp_guest_dev struct
-Date: Tue, 28 Nov 2023 18:29:48 +0530
-Message-ID: <20231128125959.1810039-6-nikunj@amd.com>
+Subject: [PATCH v6 06/16] x86/sev: Cache the secrets page address
+Date: Tue, 28 Nov 2023 18:29:49 +0530
+Message-ID: <20231128125959.1810039-7-nikunj@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231128125959.1810039-1-nikunj@amd.com>
 References: <20231128125959.1810039-1-nikunj@amd.com>
@@ -81,252 +81,141 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE34:EE_|CH0PR12MB5385:EE_
-X-MS-Office365-Filtering-Correlation-Id: f09ec37d-8033-421c-bf59-08dbf0121aae
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE34:EE_|BL3PR12MB6473:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4a6f466a-6748-4e2d-a4d5-08dbf0121cfb
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	8aOX+1b1E+G2dNztQnLaYgqOuuHQ44RB4eoEYATbiR7/4u6BkwhWe7wGlj5VFTvZ6H4i1QHh0A9Wd0iNpb7tcAP2e+bt8YpuE4kqr4oY3293bRN0EraPXxXvGsNqz47SM0BZt9QCOlJhBtYh7rXwoQNqACxcD0B653J3wkNV2kABdV/PGsK9XtIwJevc2purgsV9GdNHxCCiOQIFiVd0t7UDQVNCHJ0E+DzyuMKGWktBiUKFiYorT2qWTmxWvWaWns1D4wl1sDRpNsvOBqPCAOyrmuySK5Gz7XK2mE8W/78LTpW8ZLbLSknoiNtttwsTmKT/9LCCmYBJQYce0W+3JESyVG8PUU2gNH3T8qQNO27gmK+CE69z1HkTzZ2QChQNRtsVYhJtyo8khVfoA9VSOBhaQZqH+nt7zm6f81MKNDbcdwSwUO9s5CXQwPZsGHhhQiwNIc1Mf7VF4IbyYrzUFe/aR79248TvuuDHgPBflP9vZGk0BufFz2R0hkvk2CGAZ9sTO2EB0n11hgcEB9iQ5U7CR3X3ibYqoAANlnUETm3MzMnAKfVbFU9N5ZRX/CtlSI5WWYpD6SFAzpLgw+INgJax+kylXEbk4+5Qll3c/LswbQWXiXaVBGb80ku4FroHylaLlrOatRr86a2nYrAbFUmqx69CKCu2khJtXVY4qCOFVFarKktkwL7mj9x5EnM0VafnI8XH3j2tWhB+IQoMXnMe0U78y4klCEuWV8/VMpmmGRU0KOBHXX1+QvmcMH4mj2KPd9B+Rxin1YQSFKU3nA==
+	i0nmacAWfMPNHcL1Za+PbWz6p+fEDfiFxCpK67Ouim3yTObeSQRwsWn0jymfnAfdl4XMpULglrLJySMaENSu7LgPVrC3UOW4/xeiDV+PwkonVuhcYmnGqWDZ/JtK2ewpQPUch8JhpHnh593HcKH2F3qKi88bzBVW+/B/FnYyUolI2nw3I+rX9uldAc54+GiXkXUfGYc3I9UapyHYAxyMP2n+1g8drGAG8pmOrWRyJqkVBn23EFXCROrI9oC14E09JKdBQUK5ozKh+NpZVyXYRZSXSIsgIwuFuLPJGS/Rqp5UUxmje1JCtxvsj+nddZzN50IeEF/KE0iBtp14Shca5aAiSuHdfI8YogM+fw8i6CZMHpoBpS0TomGi0Dn/FcDUs1BpNUTS2z8BD2TyIeg9liZNJNk4wlE0GutVJoZgMYwcJi5IlHTqax3APFLMZ4zFRFdE01qtf/SpNEgL1f8aiM/Pcz1IgpZZXHuY2IlaW6WPhCX48nX16L8gb2M7GBrtxW8POYiPwUUcMnKPPhIUV3RvtBbvLhwyw/ZWlTsooQ99F0pkTqrhZYCSg31MxqG8BbZ3wiri3ZOXUmCPb6DXGkOkomxlV3Crdq5Xd0iQqiQo9AA+bfgoiS+y9yhahWsDbEcAfQ4tYVTWUfwQE9vo5Q1W8jiNIHrDV8perA3ERKJoYs3JvDrqIzW+cBYj8gyD/VjudlkGJNPOMLBXOzmtHpSiocknqQ1vK2qVbSe44QYYwTL9gjlm/Al9E7TvRNxwSRMPOaTzsb/Pr3qZ2aZueQ==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(136003)(376002)(396003)(346002)(230922051799003)(82310400011)(1800799012)(451199024)(186009)(64100799003)(40470700004)(46966006)(36840700001)(83380400001)(81166007)(356005)(47076005)(336012)(8936002)(82740400003)(426003)(7696005)(8676002)(6666004)(110136005)(316002)(70206006)(70586007)(54906003)(36860700001)(4326008)(7416002)(478600001)(5660300002)(40480700001)(2906002)(41300700001)(36756003)(16526019)(1076003)(26005)(2616005)(40460700003)(36900700001);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(396003)(136003)(39860400002)(346002)(230922051799003)(82310400011)(186009)(451199024)(1800799012)(64100799003)(36840700001)(46966006)(40470700004)(2906002)(7416002)(40480700001)(5660300002)(40460700003)(6666004)(36860700001)(478600001)(36756003)(426003)(8676002)(8936002)(4326008)(41300700001)(81166007)(356005)(336012)(82740400003)(7696005)(70206006)(47076005)(16526019)(2616005)(83380400001)(70586007)(316002)(54906003)(110136005)(1076003)(26005)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2023 13:01:14.9700
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2023 13:01:18.8294
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f09ec37d-8033-421c-bf59-08dbf0121aae
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a6f466a-6748-4e2d-a4d5-08dbf0121cfb
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	CY4PEPF0000EE34.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5385
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6473
 
-Drop vmpck and os_area_msg_seqno pointers so that secret page layout
-does not need to be exposed to the sev-guest driver after the rework.
-Instead, add helper APIs to access vmpck and os_area_msg_seqno when
-needed.
-
-Also, change function is_vmpck_empty() to snp_is_vmpck_empty() in
-preparation for moving to sev.c.
+Save the secrets page address during snp_init() from the CC blob. Use
+secrets_pa instead of calling get_secrets_page() that remaps the CC
+blob for getting the secrets page every time.
 
 Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
 Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- drivers/virt/coco/sev-guest/sev-guest.c | 95 ++++++++++++-------------
- 1 file changed, 47 insertions(+), 48 deletions(-)
+ arch/x86/kernel/sev.c | 52 +++++++++++++------------------------------
+ 1 file changed, 16 insertions(+), 36 deletions(-)
 
-diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
-index 1579140d43ec..0f2134deca51 100644
---- a/drivers/virt/coco/sev-guest/sev-guest.c
-+++ b/drivers/virt/coco/sev-guest/sev-guest.c
-@@ -59,22 +59,29 @@ struct snp_guest_dev {
- 		struct snp_derived_key_req derived_key;
- 		struct snp_ext_report_req ext_report;
- 	} req;
--	u32 *os_area_msg_seqno;
--	u8 *vmpck;
-+	unsigned int vmpck_id;
- };
+diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+index 01a400681529..479ea61f40f3 100644
+--- a/arch/x86/kernel/sev.c
++++ b/arch/x86/kernel/sev.c
+@@ -72,6 +72,9 @@ static struct ghcb *boot_ghcb __section(".data");
+ /* Bitmap of SEV features supported by the hypervisor */
+ static u64 sev_hv_features __ro_after_init;
  
- static u32 vmpck_id;
- module_param(vmpck_id, uint, 0444);
- MODULE_PARM_DESC(vmpck_id, "The VMPCK ID to use when communicating with the PSP.");
- 
--static bool is_vmpck_empty(struct snp_guest_dev *snp_dev)
-+static inline u8 *snp_get_vmpck(struct snp_guest_dev *snp_dev)
- {
--	char zero_key[VMPCK_KEY_LEN] = {0};
-+	return snp_dev->layout->vmpck0 + snp_dev->vmpck_id * VMPCK_KEY_LEN;
-+}
- 
--	if (snp_dev->vmpck)
--		return !memcmp(snp_dev->vmpck, zero_key, VMPCK_KEY_LEN);
-+static inline u32 *snp_get_os_area_msg_seqno(struct snp_guest_dev *snp_dev)
-+{
-+	return &snp_dev->layout->os_area.msg_seqno_0 + snp_dev->vmpck_id;
-+}
- 
--	return true;
-+static bool snp_is_vmpck_empty(struct snp_guest_dev *snp_dev)
-+{
-+	char zero_key[VMPCK_KEY_LEN] = {0};
-+	u8 *key = snp_get_vmpck(snp_dev);
++/* Secrets page physical address from the CC blob */
++static u64 secrets_pa __ro_after_init;
 +
-+	return !memcmp(key, zero_key, VMPCK_KEY_LEN);
+ /* #VC handler runtime per-CPU data */
+ struct sev_es_runtime_data {
+ 	struct ghcb ghcb_page;
+@@ -598,45 +601,16 @@ void noinstr __sev_es_nmi_complete(void)
+ 	__sev_put_ghcb(&state);
  }
  
- /*
-@@ -96,20 +103,22 @@ static bool is_vmpck_empty(struct snp_guest_dev *snp_dev)
-  */
- static void snp_disable_vmpck(struct snp_guest_dev *snp_dev)
- {
--	dev_alert(snp_dev->dev, "Disabling vmpck_id %d to prevent IV reuse.\n",
--		  vmpck_id);
--	memzero_explicit(snp_dev->vmpck, VMPCK_KEY_LEN);
--	snp_dev->vmpck = NULL;
-+	u8 *key = snp_get_vmpck(snp_dev);
-+
-+	dev_alert(snp_dev->dev, "Disabling vmpck_id %u to prevent IV reuse.\n",
-+		  snp_dev->vmpck_id);
-+	memzero_explicit(key, VMPCK_KEY_LEN);
- }
- 
- static inline u64 __snp_get_msg_seqno(struct snp_guest_dev *snp_dev)
- {
-+	u32 *os_area_msg_seqno = snp_get_os_area_msg_seqno(snp_dev);
- 	u64 count;
- 
- 	lockdep_assert_held(&snp_dev->cmd_mutex);
- 
- 	/* Read the current message sequence counter from secrets pages */
--	count = *snp_dev->os_area_msg_seqno;
-+	count = *os_area_msg_seqno;
- 
- 	return count + 1;
- }
-@@ -137,11 +146,13 @@ static u64 snp_get_msg_seqno(struct snp_guest_dev *snp_dev)
- 
- static void snp_inc_msg_seqno(struct snp_guest_dev *snp_dev)
- {
-+	u32 *os_area_msg_seqno = snp_get_os_area_msg_seqno(snp_dev);
-+
- 	/*
- 	 * The counter is also incremented by the PSP, so increment it by 2
- 	 * and save in secrets page.
- 	 */
--	*snp_dev->os_area_msg_seqno += 2;
-+	*os_area_msg_seqno += 2;
- }
- 
- static inline struct snp_guest_dev *to_snp_dev(struct file *file)
-@@ -151,15 +162,22 @@ static inline struct snp_guest_dev *to_snp_dev(struct file *file)
- 	return container_of(dev, struct snp_guest_dev, misc);
- }
- 
--static struct aesgcm_ctx *snp_init_crypto(u8 *key, size_t keylen)
-+static struct aesgcm_ctx *snp_init_crypto(struct snp_guest_dev *snp_dev)
- {
- 	struct aesgcm_ctx *ctx;
-+	u8 *key;
-+
-+	if (snp_is_vmpck_empty(snp_dev)) {
-+		pr_err("VM communication key VMPCK%u is null\n", vmpck_id);
-+		return NULL;
-+	}
- 
- 	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL_ACCOUNT);
- 	if (!ctx)
- 		return NULL;
- 
--	if (aesgcm_expandkey(ctx, key, keylen, AUTHTAG_LEN)) {
-+	key = snp_get_vmpck(snp_dev);
-+	if (aesgcm_expandkey(ctx, key, VMPCK_KEY_LEN, AUTHTAG_LEN)) {
- 		pr_err("Crypto context initialization failed\n");
- 		kfree(ctx);
- 		return NULL;
-@@ -589,7 +607,7 @@ static long snp_guest_ioctl(struct file *file, unsigned int ioctl, unsigned long
- 	mutex_lock(&snp_dev->cmd_mutex);
- 
- 	/* Check if the VMPCK is not empty */
--	if (is_vmpck_empty(snp_dev)) {
-+	if (snp_is_vmpck_empty(snp_dev)) {
- 		dev_err_ratelimited(snp_dev->dev, "VMPCK is disabled\n");
- 		mutex_unlock(&snp_dev->cmd_mutex);
- 		return -ENOTTY;
-@@ -666,32 +684,14 @@ static const struct file_operations snp_guest_fops = {
- 	.unlocked_ioctl = snp_guest_ioctl,
- };
- 
--static u8 *get_vmpck(int id, struct snp_secrets_page_layout *layout, u32 **seqno)
-+bool snp_assign_vmpck(struct snp_guest_dev *dev, unsigned int vmpck_id)
- {
--	u8 *key = NULL;
-+	if (WARN_ON(vmpck_id > 3))
-+		return false;
- 
--	switch (id) {
--	case 0:
--		*seqno = &layout->os_area.msg_seqno_0;
--		key = layout->vmpck0;
--		break;
--	case 1:
--		*seqno = &layout->os_area.msg_seqno_1;
--		key = layout->vmpck1;
--		break;
--	case 2:
--		*seqno = &layout->os_area.msg_seqno_2;
--		key = layout->vmpck2;
--		break;
--	case 3:
--		*seqno = &layout->os_area.msg_seqno_3;
--		key = layout->vmpck3;
--		break;
--	default:
--		break;
+-static u64 __init get_secrets_page(void)
+-{
+-	u64 pa_data = boot_params.cc_blob_address;
+-	struct cc_blob_sev_info info;
+-	void *map;
+-
+-	/*
+-	 * The CC blob contains the address of the secrets page, check if the
+-	 * blob is present.
+-	 */
+-	if (!pa_data)
+-		return 0;
+-
+-	map = early_memremap(pa_data, sizeof(info));
+-	if (!map) {
+-		pr_err("Unable to locate SNP secrets page: failed to map the Confidential Computing blob.\n");
+-		return 0;
 -	}
-+	dev->vmpck_id = vmpck_id;
+-	memcpy(&info, map, sizeof(info));
+-	early_memunmap(map, sizeof(info));
+-
+-	/* smoke-test the secrets page passed */
+-	if (!info.secrets_phys || info.secrets_len != PAGE_SIZE)
+-		return 0;
+-
+-	return info.secrets_phys;
+-}
+-
+ static u64 __init get_snp_jump_table_addr(void)
+ {
+ 	struct snp_secrets_page_layout *layout;
+ 	void __iomem *mem;
+-	u64 pa, addr;
++	u64 addr;
  
--	return key;
-+	return true;
+-	pa = get_secrets_page();
+-	if (!pa)
++	if (!secrets_pa)
+ 		return 0;
+ 
+-	mem = ioremap_encrypted(pa, PAGE_SIZE);
++	mem = ioremap_encrypted(secrets_pa, PAGE_SIZE);
+ 	if (!mem) {
+ 		pr_err("Unable to locate AP jump table address: failed to map the SNP secrets page.\n");
+ 		return 0;
+@@ -2083,6 +2057,12 @@ static __init struct cc_blob_sev_info *find_cc_blob(struct boot_params *bp)
+ 	return cc_info;
  }
  
- struct snp_msg_report_resp_hdr {
-@@ -727,7 +727,7 @@ static int sev_report_new(struct tsm_report *report, void *data)
- 	guard(mutex)(&snp_dev->cmd_mutex);
++static void __init set_secrets_pa(const struct cc_blob_sev_info *cc_info)
++{
++	if (cc_info && cc_info->secrets_phys && cc_info->secrets_len == PAGE_SIZE)
++		secrets_pa = cc_info->secrets_phys;
++}
++
+ bool __init snp_init(struct boot_params *bp)
+ {
+ 	struct cc_blob_sev_info *cc_info;
+@@ -2094,6 +2074,8 @@ bool __init snp_init(struct boot_params *bp)
+ 	if (!cc_info)
+ 		return false;
  
- 	/* Check if the VMPCK is not empty */
--	if (is_vmpck_empty(snp_dev)) {
-+	if (snp_is_vmpck_empty(snp_dev)) {
- 		dev_err_ratelimited(snp_dev->dev, "VMPCK is disabled\n");
- 		return -ENOTTY;
- 	}
-@@ -847,22 +847,21 @@ static int __init sev_guest_probe(struct platform_device *pdev)
- 		goto e_unmap;
++	set_secrets_pa(cc_info);
++
+ 	setup_cpuid_table(cc_info);
  
- 	ret = -EINVAL;
--	snp_dev->vmpck = get_vmpck(vmpck_id, layout, &snp_dev->os_area_msg_seqno);
--	if (!snp_dev->vmpck) {
--		dev_err(dev, "invalid vmpck id %d\n", vmpck_id);
-+	snp_dev->layout = layout;
-+	if (!snp_assign_vmpck(snp_dev, vmpck_id)) {
-+		dev_err(dev, "invalid vmpck id %u\n", vmpck_id);
- 		goto e_unmap;
- 	}
+ 	/*
+@@ -2246,16 +2228,14 @@ static struct platform_device sev_guest_device = {
+ static int __init snp_init_platform_device(void)
+ {
+ 	struct sev_guest_platform_data data;
+-	u64 gpa;
  
- 	/* Verify that VMPCK is not zero. */
--	if (is_vmpck_empty(snp_dev)) {
--		dev_err(dev, "vmpck id %d is null\n", vmpck_id);
-+	if (snp_is_vmpck_empty(snp_dev)) {
-+		dev_err(dev, "vmpck id %u is null\n", vmpck_id);
- 		goto e_unmap;
- 	}
+ 	if (!cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
+ 		return -ENODEV;
  
- 	mutex_init(&snp_dev->cmd_mutex);
- 	platform_set_drvdata(pdev, snp_dev);
- 	snp_dev->dev = dev;
--	snp_dev->layout = layout;
+-	gpa = get_secrets_page();
+-	if (!gpa)
++	if (!secrets_pa)
+ 		return -ENODEV;
  
- 	/* Allocate the shared page used for the request and response message. */
- 	snp_dev->request = alloc_shared_pages(dev, sizeof(struct snp_guest_msg));
-@@ -878,7 +877,7 @@ static int __init sev_guest_probe(struct platform_device *pdev)
- 		goto e_free_response;
+-	data.secrets_gpa = gpa;
++	data.secrets_gpa = secrets_pa;
+ 	if (platform_device_add_data(&sev_guest_device, &data, sizeof(data)))
+ 		return -ENODEV;
  
- 	ret = -EIO;
--	snp_dev->ctx = snp_init_crypto(snp_dev->vmpck, VMPCK_KEY_LEN);
-+	snp_dev->ctx = snp_init_crypto(snp_dev);
- 	if (!snp_dev->ctx)
- 		goto e_free_cert_data;
- 
-@@ -903,7 +902,7 @@ static int __init sev_guest_probe(struct platform_device *pdev)
- 	if (ret)
- 		goto e_free_ctx;
- 
--	dev_info(dev, "Initialized SEV guest driver (using vmpck_id %d)\n", vmpck_id);
-+	dev_info(dev, "Initialized SEV guest driver (using vmpck_id %u)\n", vmpck_id);
- 	return 0;
- 
- e_free_ctx:
 -- 
 2.34.1
 
