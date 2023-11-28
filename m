@@ -1,207 +1,200 @@
-Return-Path: <kvm+bounces-2543-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2544-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9FA37FAF7F
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 02:24:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C1217FAF8C
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 02:30:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDBD81C20D87
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 01:24:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E2781C20DCB
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 01:30:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E64F0186B;
-	Tue, 28 Nov 2023 01:24:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA221875;
+	Tue, 28 Nov 2023 01:30:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OzMAYvxf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Vu8ZF9EQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C8B3137
-	for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 17:24:18 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cfb5471cd4so25965885ad.3
-        for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 17:24:18 -0800 (PST)
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B5B10CA
+	for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 17:30:44 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-6cd84f397bdso2322028b3a.1
+        for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 17:30:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701134658; x=1701739458; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1701135044; x=1701739844; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ccfuuY9Lz/COE9I6k14m7srCwypVDjwLLZgJ5DupFSA=;
-        b=OzMAYvxfy4t5tQroSUPHGiip+9tnKC82tO4jUuxNfDoJb27HQap7nRF0hVH7Rzr3Qq
-         zLSXvuGcrqr5X7UWPKosBY9NwenTXWMAb2imAq75bhsy+NsxcYRS4JJycLybcpOsuiiZ
-         tnZAKJU9QvpAh6dI95BFQeyb6foIIxkPvsOekspPdn5keGdS3FTDKgkGPpAsMziiw0FT
-         xA5tsvPwGKnjdZF7uh+WGj6DCRAJ2tphFkKcT1OxjplqtS0/iI729MYN9Nybk4uEaEAO
-         WVKLTylI7to+is7qDsB3J/crim961eUFnAYzjSrOutNQbMAZ0F+N3DEuYiqCoxBQvASr
-         d1Rw==
+        bh=Hp+Xb5HTxQd+WcWBC6dkBQcOYD3I4yHM6D8m4FcFzBE=;
+        b=Vu8ZF9EQdDBSSJLr1XGzVfeFOsVXR/sTDSd10y/vXjA/XRm+rAg9M0KIY8xTPEgeF/
+         l+LPK0i3igOjKwwpbN1WUoEpgoiXaQD8KdgVQ3f2vC5xJ6P9y0iJpgrd81NS4F/0tpdt
+         lTH0EYLA7tXrPGpHLkoFc8BhVkakwAFpv9IU6FOK+ndD2sI4G1gMgSveRW1oRxscCd/6
+         Mimphh9twOEakq/JszInP3Qmf09twbabSL/OznnnYawIc3ua3Ldgv81Fcrcc2Bye+UVk
+         xZHfMUBxJjbscUbQggFIGJsJZkjlH3rmn4Ly4YlZND5bwkYz67poOzRTIdxVnoORp/AY
+         5abw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701134658; x=1701739458;
+        d=1e100.net; s=20230601; t=1701135044; x=1701739844;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ccfuuY9Lz/COE9I6k14m7srCwypVDjwLLZgJ5DupFSA=;
-        b=DBk0HI8nDswEJ2+SM32gKgnVtTzd0/xx06dXwed0rOr4jWghO5kEcPbxXlaASzLOIm
-         bf2H/728dO3HtOBHCEIfUMOWn0BdnHOpm1v1WV82dd23IGycUcbxxU+sYlnnFRYm5eKd
-         K2azp8Y4iJ8j6hZ7H8vfuUk00LAC2VhpmNTOIhbSYsELDT7O36Q3IF6Zv6u/6DXwIrMA
-         GW6ei8g0aeUYgIDJ4WVPIw/3VOHLyqrSmpY/KKlyQxY+k0q5uhikOJdGLMhxQV6tuVAx
-         p8yYvSmo6HLTCqAda9EXw+7hrnLCS9kf32xn1io9vM0r3n5HVeK8ZTFbgYv9fpcrcZNK
-         0uhA==
-X-Gm-Message-State: AOJu0Yyp2/PGPh+GJafN/hvhAToIHERDMDgxz1k185Y5ruqxTvY75piR
-	DRPn6b3DGcacNaNkj20LfhUoSBszBAA=
-X-Google-Smtp-Source: AGHT+IGgTsSqDSRzspJot6Wq5LGYVHgmFwA+F770d+kNJgqhCjlA/9XgQZuTMJuYkXuMnbM/7RL4uRFRX9U=
+        bh=Hp+Xb5HTxQd+WcWBC6dkBQcOYD3I4yHM6D8m4FcFzBE=;
+        b=fCkMAjYog2+Zafgd/OwV+PEMPZOEs4zaPaOnOblYs/S0eh9rYF3YPZ3dpiZrD88Q/i
+         Gt0rzaOOkHoL1nZ7rUQq8EKjrnZLSIXPTa6b9u3GuwE3zpWn0zv/ijyewsoUnsd2COIr
+         pZqcxzPcuX+7i6WBuBEWPM0qXBWWg5A+b4yP0G62jbqPHzI4PDTzMe6bpwWxGj7CA+wr
+         mxws4HsmJkVzBGTaIB8hNdgWQ7X+ZPUnk0598YcNPdx7+fNXs+/yqU//YuI9cXEW89Y5
+         9wv2a0pu0w6ompIVaTDz8MBksLxi4BLiZi2z9VPZ5ttK3ODlFLvciqeDfN4vbNSk+u8Z
+         lofA==
+X-Gm-Message-State: AOJu0YwyWNuutt9zhDQoP07n1LOvPl7zRSpt37Dk6pBmo1qx7C8p1G3Z
+	9l3/evN26PcvysPgU4Lb0FZRIOAQ9LQ=
+X-Google-Smtp-Source: AGHT+IGqps34qbiD8dT8XbU3sbfmDNfirA7ng9g5HxgIXN7W8/L333ci2ftO2zEibWRwK+DT9E7rcPqFK+E=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:8341:b0:1cf:de4e:f8de with SMTP id
- z1-20020a170902834100b001cfde4ef8demr513394pln.12.1701134658042; Mon, 27 Nov
- 2023 17:24:18 -0800 (PST)
-Date: Mon, 27 Nov 2023 17:24:16 -0800
-In-Reply-To: <c38adc1dc0a7df1c902b8ffbc82076d6da527e2a.camel@redhat.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:3a12:b0:692:c216:8830 with SMTP id
+ fj18-20020a056a003a1200b00692c2168830mr3697668pfb.0.1701135044007; Mon, 27
+ Nov 2023 17:30:44 -0800 (PST)
+Date: Mon, 27 Nov 2023 17:30:42 -0800
+In-Reply-To: <20231123075818.12521-1-likexu@tencent.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231110235528.1561679-1-seanjc@google.com> <20231110235528.1561679-3-seanjc@google.com>
- <c38adc1dc0a7df1c902b8ffbc82076d6da527e2a.camel@redhat.com>
-Message-ID: <ZWVBQPjwG7gOcA66@google.com>
-Subject: Re: [PATCH 2/9] KVM: x86: Replace guts of "goverened" features with
- comprehensive cpu_caps
+References: <20231123075818.12521-1-likexu@tencent.com>
+Message-ID: <ZWVCwvoETD_NVOFG@google.com>
+Subject: Re: [PATCH] KVM: x86: Use get_cpl directly in case of vcpu_load to
+ improve accuracy
 From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
+To: Like Xu <like.xu.linux@gmail.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Sun, Nov 19, 2023, Maxim Levitsky wrote:
-> On Fri, 2023-11-10 at 15:55 -0800, Sean Christopherson wrote:
-> > @@ -840,23 +856,15 @@ struct kvm_vcpu_arch {
-> >  	struct kvm_hypervisor_cpuid kvm_cpuid;
-> >  
-> >  	/*
-> > -	 * FIXME: Drop this macro and use KVM_NR_GOVERNED_FEATURES directly
-> > -	 * when "struct kvm_vcpu_arch" is no longer defined in an
-> > -	 * arch/x86/include/asm header.  The max is mostly arbitrary, i.e.
-> > -	 * can be increased as necessary.
-> > +	 * Track the effective guest capabilities, i.e. the features the vCPU
-> > +	 * is allowed to use.  Typically, but not always, features can be used
-> > +	 * by the guest if and only if both KVM and userspace want to expose
-> > +	 * the feature to the guest.  A common exception is for virtualization
-> > +	 * holes, i.e. when KVM can't prevent the guest from using a feature,
-> > +	 * in which case the vCPU "has" the feature regardless of what KVM or
-> > +	 * userspace desires.
-> >  	 */
-> > -#define KVM_MAX_NR_GOVERNED_FEATURES BITS_PER_LONG
-> > -
-> > -	/*
-> > -	 * Track whether or not the guest is allowed to use features that are
-> > -	 * governed by KVM, where "governed" means KVM needs to manage state
-> > -	 * and/or explicitly enable the feature in hardware.  Typically, but
-> > -	 * not always, governed features can be used by the guest if and only
-> > -	 * if both KVM and userspace want to expose the feature to the guest.
-> > -	 */
-> > -	struct {
-> > -		DECLARE_BITMAP(enabled, KVM_MAX_NR_GOVERNED_FEATURES);
-> > -	} governed_features;
-> > +	u32 cpu_caps[NR_KVM_CPU_CAPS];
+On Thu, Nov 23, 2023, Like Xu wrote:
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+>  arch/x86/kvm/x86.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> Won't it be better to call this 'effective_cpu_caps' or something like that,
-> to put emphasis on the fact that these are not exactly the cpu caps that
-> userspace wants.  Although probably any name will still be somewhat
-> confusing.
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 2c924075f6f1..c454df904a45 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -13031,7 +13031,10 @@ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+>  	if (vcpu->arch.guest_state_protected)
+>  		return true;
+>  
+> -	return vcpu->arch.preempted_in_kernel;
+> +	if (vcpu != kvm_get_running_vcpu())
+> +		return vcpu->arch.preempted_in_kernel;
 
-I'd prefer to keep 'cpu_caps' so that the name is aligned with the APIs, e.g. I
-think having "effective" in the field but not e.g. guest_cpu_cap_set() would be
-even more confusing.
+Eww, KVM really shouldn't be reading vcpu->arch.preempted_in_kernel in a generic
+vcpu_in_kernel() API. 
 
-Also, looking at this again, "effective" isn't strictly correct (my comment about
-is also wrong), as virtualization holes that neither userspace nor KVM cares about
-aren't reflected in CPUID caps.  E.g. things like MOVBE and POPCNT have a CPUID
-flag but no way to prevent the guest from using them.
+Rather than fudge around that ugliness with a kvm_get_running_vcpu() check, what
+if we instead repurpose kvm_arch_dy_has_pending_interrupt(), which is effectively
+x86 specific, to deal with not being able to read the current CPL for a vCPU that
+is (possibly) not "loaded", which AFAICT is also x86 specific (or rather, Intel/VMX
+specific).
 
-So a truly accurate name would have to be something like
-effective_cpu_caps_that_kvm_cares_about.  :-)
+And if getting the CPL for a vCPU that may not be loaded is problematic for other
+architectures, then I think the correct fix is to move preempted_in_kernel into
+common code and check it directly in kvm_vcpu_on_spin().
 
-> >  	u64 reserved_gpa_bits;
-> >  	int maxphyaddr;
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index 4f464187b063..4bf3c2d4dc7c 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -327,9 +327,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> >  	struct kvm_cpuid_entry2 *best;
-> >  	bool allow_gbpages;
-> >  
-> > -	BUILD_BUG_ON(KVM_NR_GOVERNED_FEATURES > KVM_MAX_NR_GOVERNED_FEATURES);
-> > -	bitmap_zero(vcpu->arch.governed_features.enabled,
-> > -		    KVM_MAX_NR_GOVERNED_FEATURES);
-> > +	memset(vcpu->arch.cpu_caps, 0, sizeof(vcpu->arch.cpu_caps));
-> >  
-> >  	/*
-> >  	 * If TDP is enabled, let the guest use GBPAGES if they're supported in
-> > diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-> > index 245416ffa34c..9f18c4395b71 100644
-> > --- a/arch/x86/kvm/cpuid.h
-> > +++ b/arch/x86/kvm/cpuid.h
-> > @@ -255,12 +255,12 @@ static __always_inline bool kvm_is_governed_feature(unsigned int x86_feature)
-> >  }
-> >  
-> >  static __always_inline void guest_cpu_cap_set(struct kvm_vcpu *vcpu,
-> > -						     unsigned int x86_feature)
-> > +					      unsigned int x86_feature)
-> >  {
-> > -	BUILD_BUG_ON(!kvm_is_governed_feature(x86_feature));
-> > +	unsigned int x86_leaf = __feature_leaf(x86_feature);
-> >  
-> > -	__set_bit(kvm_governed_feature_index(x86_feature),
-> > -		  vcpu->arch.governed_features.enabled);
-> > +	reverse_cpuid_check(x86_leaf);
-> > +	vcpu->arch.cpu_caps[x86_leaf] |= __feature_bit(x86_feature);
-> >  }
-> >  
-> >  static __always_inline void guest_cpu_cap_check_and_set(struct kvm_vcpu *vcpu,
-> > @@ -273,10 +273,10 @@ static __always_inline void guest_cpu_cap_check_and_set(struct kvm_vcpu *vcpu,
-> >  static __always_inline bool guest_cpu_cap_has(struct kvm_vcpu *vcpu,
-> >  					      unsigned int x86_feature)
-> >  {
-> > -	BUILD_BUG_ON(!kvm_is_governed_feature(x86_feature));
-> > +	unsigned int x86_leaf = __feature_leaf(x86_feature);
-> >  
-> > -	return test_bit(kvm_governed_feature_index(x86_feature),
-> > -			vcpu->arch.governed_features.enabled);
-> > +	reverse_cpuid_check(x86_leaf);
-> > +	return vcpu->arch.cpu_caps[x86_leaf] & __feature_bit(x86_feature);
-> >  }
-> 
-> It might make sense to think about extracting the common code between
-> kvm_cpu_cap* and guest_cpu_cap*.
-> 
-> The whole notion of reverse cpuid, KVM only leaves, and other nice things
-> that it has is already very confusing, but as I understand there is
-> no better way of doing it.
-> But there must be a way to avoid at least duplicating this logic.
+This is what I'm thinking:
 
-Yeah, that thought crossed my mind too, but de-duplicating the interesting bits
-would require macros, which I think would be a net negative for this code.  I
-could definitely be convinced otherwise though, I do love me some macros :-)
+---
+ arch/x86/kvm/x86.c       | 22 +++++++++++++++-------
+ include/linux/kvm_host.h |  2 +-
+ virt/kvm/kvm_main.c      |  7 +++----
+ 3 files changed, 19 insertions(+), 12 deletions(-)
 
-Something easy I can, should, and will do regardless is to move reverse_cpuid_check()
-into __feature_leaf().  It's already in __feature_bit(), and that would cut down
-the copy+paste at least a little bit even if we do/don't use macros.
-
-> Also speaking of this logic, it would be nice to document it.
-> E.g for 'kvm_only_cpuid_leafs' it would be nice to have an explanation
-> for each entry on why it is needed.
-
-As in, which bits KVM cares about?  That's guaranteed to become stale, and the
-high level answer is always "because KVM needs it, but the kernel does not".  The
-actual bits are kinda sorta documented by KVM_X86_FEATURE() usage, and any
-conflicts with the kernel's cpufeatures.h should result in a build error due to
-KVM trying to redefined a macro.
-
-> Just curious: I wonder why Intel called them leaves?
-> CPUID leaves are just table entries, I don't see any tree there.
-
-LOL, I suppose a tree without branches can still have leaves?
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6d0772b47041..5c1a75c0dafe 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -13022,13 +13022,21 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
+ 	return kvm_vcpu_running(vcpu) || kvm_vcpu_has_events(vcpu);
+ }
  
-> Finally isn't plural of "leaf" is "leaves"?
+-bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu)
++static bool kvm_dy_has_pending_interrupt(struct kvm_vcpu *vcpu)
+ {
+-	if (kvm_vcpu_apicv_active(vcpu) &&
+-	    static_call(kvm_x86_dy_apicv_has_pending_interrupt)(vcpu))
+-		return true;
++	return kvm_vcpu_apicv_active(vcpu) &&
++	       static_call(kvm_x86_dy_apicv_has_pending_interrupt)(vcpu);
++}
+ 
+-	return false;
++bool kvm_arch_vcpu_preempted_in_kernel(struct kvm_vcpu *vcpu)
++{
++	/*
++	 * Treat the vCPU as being in-kernel if it has a pending interrupt, as
++	 * the vCPU trying to yield may be spinning on IPI delivery, i.e. the
++	 * the target vCPU is in-kernel for the purposes of directed yield.
++	 */
++	return vcpu->arch.preempted_in_kernel ||
++	       kvm_dy_has_pending_interrupt(vcpu);
+ }
+ 
+ bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu)
+@@ -13043,7 +13051,7 @@ bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu)
+ 		 kvm_test_request(KVM_REQ_EVENT, vcpu))
+ 		return true;
+ 
+-	return kvm_arch_dy_has_pending_interrupt(vcpu);
++	return kvm_dy_has_pending_interrupt(vcpu);
+ }
+ 
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+@@ -13051,7 +13059,7 @@ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.guest_state_protected)
+ 		return true;
+ 
+-	return vcpu->arch.preempted_in_kernel;
++	return static_call(kvm_x86_get_cpl)(vcpu);
+ }
+ 
+ unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index ea1523a7b83a..820c5b64230f 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1505,7 +1505,7 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
+ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
+ bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu);
+-bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
++bool kvm_arch_vcpu_preempted_in_kernel(struct kvm_vcpu *vcpu);
+ int kvm_arch_post_init_vm(struct kvm *kvm);
+ void kvm_arch_pre_destroy_vm(struct kvm *kvm);
+ int kvm_arch_create_vm_debugfs(struct kvm *kvm);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 8758cb799e18..e84be7e2e05e 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4049,9 +4049,9 @@ static bool vcpu_dy_runnable(struct kvm_vcpu *vcpu)
+ 	return false;
+ }
+ 
+-bool __weak kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu)
++bool __weak kvm_arch_vcpu_preempted_in_kernel(struct kvm_vcpu *vcpu)
+ {
+-	return false;
++	return kvm_arch_vcpu_in_kernel(vcpu);
+ }
+ 
+ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+@@ -4086,8 +4086,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+ 			if (kvm_vcpu_is_blocking(vcpu) && !vcpu_dy_runnable(vcpu))
+ 				continue;
+ 			if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
+-			    !kvm_arch_dy_has_pending_interrupt(vcpu) &&
+-			    !kvm_arch_vcpu_in_kernel(vcpu))
++			    kvm_arch_vcpu_preempted_in_kernel(vcpu))
+ 				continue;
+ 			if (!kvm_vcpu_eligible_for_directed_yield(vcpu))
+ 				continue;
 
-Heh, yes, "leaves" is the more standar plural form of "leaf".  And looking at the
-SDM, "leafs" is used mostly for GETSEC and ENCL{S,U} "leafs".  I spent a lot of
-my formative x86 years doing SMX stuff, and then way to much time on SGX, so I
-guess "leafs" just stuck with me.
+base-commit: e9e60c82fe391d04db55a91c733df4a017c28b2f
+-- 
+
 
