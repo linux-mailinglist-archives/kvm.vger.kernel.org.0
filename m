@@ -1,58 +1,58 @@
-Return-Path: <kvm+bounces-2635-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2636-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 253CA7FBD7F
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 15:57:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C0387FBD80
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 15:57:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5419281298
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 14:57:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6D71B22096
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 14:57:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B78915CD0E;
-	Tue, 28 Nov 2023 14:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 642245CD20;
+	Tue, 28 Nov 2023 14:57:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="MREn/27x"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="nFLP5A7l"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF14510C1
-	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 06:56:54 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1cfc2d03b3aso19333565ad.1
-        for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 06:56:54 -0800 (PST)
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11F68111
+	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 06:56:59 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1cfb3ee8bc7so27950605ad.1
+        for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 06:56:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1701183414; x=1701788214; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1701183418; x=1701788218; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=d0zuXKCmA/fCwgVtEEggMd6l7hk0jdC/LhoPoNgdg+I=;
-        b=MREn/27xkqfj8iFU7xESUbYI4OKjPrxXq4CP3i9nF5F908CF72kotDwj+wHkT03irI
-         vkSp4/7wFMiNbrDlHn8yvFnfe8bPb+4dXAjzp/GSWxmsrmhr0zHcy/fBOteY5haf0lcb
-         x3L5X2o0Qw72k7kdmFWAODSTY5ImbenJJ5h2hnwA7uwFzgw1Holb+ClEAlr8GdKZQYNx
-         MopptGtYln6iH8PQNEKrK55q9dMUaqOZ6CAZ/98O1oZzxq5DLf6LLvyHeAXbV/CP5z8C
-         5oTkM0CV3E25rqZwtobZwy60/8w9YOlrCNTNR692xbsW1ydaUMRPtvPodZfo062VMhuT
-         ZwPg==
+        bh=tdili8BtTS1M3baU+hZ81RVV3W9O2cLJnQYpN2vMBOw=;
+        b=nFLP5A7lte2k7NeqbrSkEk+a5NTsRJ9NLb8nKTohITc+iQhd/nm3ERn291YxyMgj7i
+         RXfRDKnMm9X/3xArNKXnc9LjZ1ZkqXBytECVIwGg/5qluKFNZFx21ZTRG8HsLpb1TjsP
+         +9pZWGa8d7plZoIwbwqAhdTFReymfkrhk6sv+ZkeYJ7Wbdcq2rYDjdJytlEftqS05ayO
+         b6DKiqIzRbeuRfrW0ngeke/9KBxCXGQ7tKk+acKqBSbGuFYKGJhCdTReTaH5g7gAOJlC
+         FPtjy2FQ/UEqlsNjxugrUTNFAOn7zEBeZzKHtU4TtcbFDymdSScv4VKIrMQ6DCgl9cXZ
+         jL0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701183414; x=1701788214;
+        d=1e100.net; s=20230601; t=1701183418; x=1701788218;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=d0zuXKCmA/fCwgVtEEggMd6l7hk0jdC/LhoPoNgdg+I=;
-        b=astqgqXnKtdcPSbDIGAP+oqGvbHCwkGTMQ4a6S56fngsDHy7RFoRmFOZs/XMaw6iYY
-         AMbLKuxzjDBQmqsMsXFLraO/W/bVKAzyziUiUL9GXNF0Bwlo3ipxh7U0jPQzmvbT7OeV
-         DwPcMm7QiKPS1VWuoe9+2ix+xjgxBmqd789SRHc5ElW3xXXcnel7DlqC6WNdKov18wtb
-         36e24z34bA0kjLeVRx6MITq3MHp7wjQ9U/zZXEVyGbcFrGhDoiNm5ppPDIghGrf386bW
-         vo6J+eqeYYoaUyo44aPB+/Lrk3Sn6J7ivp1ugrfWeC91EhUzvHYP0dylyBRxFwmcmD5T
-         meXg==
-X-Gm-Message-State: AOJu0Yw+4R5AdIHfUIMJBkvH2WaiPjVu4cRhaQyzBJUuZ0euccX8LLXV
-	pfXKyK5kNslV2I5s++vIMN/I8w==
-X-Google-Smtp-Source: AGHT+IFMvTCBlHbh81wYN3s3G7OgL1J0aZlGcfQICX60Aedc8bG47talciVsG9wOml2AbCSK9ZGjpg==
-X-Received: by 2002:a17:902:ce8a:b0:1cf:df4f:30d9 with SMTP id f10-20020a170902ce8a00b001cfdf4f30d9mr6152725plg.29.1701183414313;
-        Tue, 28 Nov 2023 06:56:54 -0800 (PST)
+        bh=tdili8BtTS1M3baU+hZ81RVV3W9O2cLJnQYpN2vMBOw=;
+        b=YGruW4jses8QpDpA8lr45zMP8a5hHxIqxBkqHeS6bsu1x7WW7dTEJmtA6HLZMO7xo4
+         dIKLAZB0b4RKgD76/Ky0jsTVNA5uJO99VaSq3fdTzywo7hPV8UeqN1VhwDdTtB2+pYQ9
+         OGeUbWHnf1LM8P5pjryWFjOSmHQ8FrDT9wjqTuzEE9zUH2wDNFgdZmW4EaWlE9zr5xZ6
+         qqX3HmX+Gme3BEqrOcmCEHaR3ntzWAv/+D4nS7NLrgdAoYTrYJWAijrezsWbycVHxpfC
+         3UsUo8BTDu7nrYEU3G+OXi6lDXMsVIpVq619z/okNHxnGQa1trsxuUI3YuCoFJHvCuN8
+         +HrQ==
+X-Gm-Message-State: AOJu0YzWDhOythvEzsWqQQd13D2SWdaK1w5jL114RCg3WyUrzikg9+EJ
+	sCeJHM3euvcI1PakqmtzJ66X/g==
+X-Google-Smtp-Source: AGHT+IHtOsF59+XMv3bPjl1d2IV98iItNDJlb3ZNbUY8c97idQ/4fFYABVJErS8fwmJJiAW/nQHLiw==
+X-Received: by 2002:a17:902:bf02:b0:1cf:ca03:a221 with SMTP id bi2-20020a170902bf0200b001cfca03a221mr8585431plb.24.1701183418467;
+        Tue, 28 Nov 2023 06:56:58 -0800 (PST)
 Received: from anup-ubuntu-vm.localdomain ([103.97.165.210])
-        by smtp.gmail.com with ESMTPSA id j1-20020a170902c08100b001ab39cd875csm9023580pld.133.2023.11.28.06.56.50
+        by smtp.gmail.com with ESMTPSA id j1-20020a170902c08100b001ab39cd875csm9023580pld.133.2023.11.28.06.56.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 06:56:53 -0800 (PST)
+        Tue, 28 Nov 2023 06:56:58 -0800 (PST)
 From: Anup Patel <apatel@ventanamicro.com>
 To: Will Deacon <will@kernel.org>,
 	julien.thierry.kdev@gmail.com,
@@ -64,9 +64,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
 	Anup Patel <apatel@ventanamicro.com>
-Subject: [kvmtool PATCH 04/10] riscv: Add Zba and Zbs extension support
-Date: Tue, 28 Nov 2023 20:26:22 +0530
-Message-Id: <20231128145628.413414-5-apatel@ventanamicro.com>
+Subject: [kvmtool PATCH 05/10] riscv: Add Zicntr and Zihpm extension support
+Date: Tue, 28 Nov 2023 20:26:23 +0530
+Message-Id: <20231128145628.413414-6-apatel@ventanamicro.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231128145628.413414-1-apatel@ventanamicro.com>
 References: <20231128145628.413414-1-apatel@ventanamicro.com>
@@ -78,7 +78,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When the Zba and Zbs extension is available expose it to the guest
+When the Zicntr and Zihpm extension is available expose it to the guest
 via device tree so that guest can use it.
 
 Signed-off-by: Anup Patel <apatel@ventanamicro.com>
@@ -88,39 +88,39 @@ Signed-off-by: Anup Patel <apatel@ventanamicro.com>
  2 files changed, 8 insertions(+)
 
 diff --git a/riscv/fdt.c b/riscv/fdt.c
-index 230d1f8..cfe4678 100644
+index cfe4678..19786af 100644
 --- a/riscv/fdt.c
 +++ b/riscv/fdt.c
-@@ -21,7 +21,9 @@ struct isa_ext_info isa_info_arr[] = {
- 	{"svinval", KVM_RISCV_ISA_EXT_SVINVAL},
- 	{"svnapot", KVM_RISCV_ISA_EXT_SVNAPOT},
- 	{"svpbmt", KVM_RISCV_ISA_EXT_SVPBMT},
-+	{"zba", KVM_RISCV_ISA_EXT_ZBA},
- 	{"zbb", KVM_RISCV_ISA_EXT_ZBB},
-+	{"zbs", KVM_RISCV_ISA_EXT_ZBS},
+@@ -26,7 +26,9 @@ struct isa_ext_info isa_info_arr[] = {
+ 	{"zbs", KVM_RISCV_ISA_EXT_ZBS},
  	{"zicbom", KVM_RISCV_ISA_EXT_ZICBOM},
  	{"zicboz", KVM_RISCV_ISA_EXT_ZICBOZ},
++	{"zicntr", KVM_RISCV_ISA_EXT_ZICNTR},
  	{"zihintpause", KVM_RISCV_ISA_EXT_ZIHINTPAUSE},
++	{"zihpm", KVM_RISCV_ISA_EXT_ZIHPM},
+ };
+ 
+ static void dump_fdt(const char *dtb_file, void *fdt)
 diff --git a/riscv/include/kvm/kvm-config-arch.h b/riscv/include/kvm/kvm-config-arch.h
-index 863baea..978037a 100644
+index 978037a..af5c4b8 100644
 --- a/riscv/include/kvm/kvm-config-arch.h
 +++ b/riscv/include/kvm/kvm-config-arch.h
-@@ -40,9 +40,15 @@ struct kvm_config_arch {
- 	OPT_BOOLEAN('\0', "disable-svpbmt",				\
- 		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_SVPBMT],	\
- 		    "Disable Svpbmt Extension"),			\
-+	OPT_BOOLEAN('\0', "disable-zba",				\
-+		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZBA],	\
-+		    "Disable Zba Extension"),				\
- 	OPT_BOOLEAN('\0', "disable-zbb",				\
- 		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZBB],	\
- 		    "Disable Zbb Extension"),				\
-+	OPT_BOOLEAN('\0', "disable-zbs",				\
-+		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZBS],	\
-+		    "Disable Zbs Extension"),				\
- 	OPT_BOOLEAN('\0', "disable-zicbom",				\
- 		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZICBOM],	\
- 		    "Disable Zicbom Extension"),			\
+@@ -55,9 +55,15 @@ struct kvm_config_arch {
+ 	OPT_BOOLEAN('\0', "disable-zicboz",				\
+ 		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZICBOZ],	\
+ 		    "Disable Zicboz Extension"),			\
++	OPT_BOOLEAN('\0', "disable-zicntr",				\
++		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZICNTR],	\
++		    "Disable Zicntr Extension"),			\
+ 	OPT_BOOLEAN('\0', "disable-zihintpause",			\
+ 		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZIHINTPAUSE],\
+ 		    "Disable Zihintpause Extension"),			\
++	OPT_BOOLEAN('\0', "disable-zihpm",				\
++		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZIHPM],	\
++		    "Disable Zihpm Extension"),				\
+ 	OPT_BOOLEAN('\0', "disable-sbi-legacy",				\
+ 		    &(cfg)->sbi_ext_disabled[KVM_RISCV_SBI_EXT_V01],	\
+ 		    "Disable SBI Legacy Extensions"),			\
 -- 
 2.34.1
 
