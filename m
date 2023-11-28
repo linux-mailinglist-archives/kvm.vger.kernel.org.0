@@ -1,136 +1,155 @@
-Return-Path: <kvm+bounces-2540-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2541-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47EDA7FAE6B
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 00:36:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A42C7FAF35
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 01:43:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F18022815E5
-	for <lists+kvm@lfdr.de>; Mon, 27 Nov 2023 23:36:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BDA3281B79
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 00:43:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12BA49F78;
-	Mon, 27 Nov 2023 23:36:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1F13110B;
+	Tue, 28 Nov 2023 00:43:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JJ51m+5w"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GWBB4P9e"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9847A1B1
-	for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 15:36:09 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-2859d83dfafso3672957a91.3
-        for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 15:36:09 -0800 (PST)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0FB11AA
+	for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 16:43:47 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5cb6271b225so73079227b3.1
+        for <kvm@vger.kernel.org>; Mon, 27 Nov 2023 16:43:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701128169; x=1701732969; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1701132227; x=1701737027; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=l2m9WeXChb3IZcdkKWz2g1bAMA6uELaN8nkmuyBZmHQ=;
-        b=JJ51m+5wRnTP7vn03VCHFIfTvAw0xvgRojQ6u5JK931ViOOx9HO8zWPrCjvp1Ou7t6
-         hc6vBHZ8Ob95+Tx49Yoxrx43E+duJ1T45hzXkEY4laEQfreEoDvJZSTdhtGL2bUlw2nx
-         ZIqcfGRr5rDdBdJJB1q4akp2y4t9ZVkfadWwVDODx8BBFWXXCFWPz2UW20exsOG1HmtN
-         7Op7jaJGXIzgL+yIcnruHcNn2jy+BISi1if2XFnTbaxj593IZ1PT5H8alRSVpoG+UwF2
-         YnICVbQ5CsDms0b5RGUzqbvqaq1ixWv4vjooSsZxJqMrDNygV1jMuoc50hnan9p53kFr
-         7ZOQ==
+        bh=YtTNWHQr6JsZpzzdQO0pOMuuw3cl8zP4tz9k1AzI5bE=;
+        b=GWBB4P9euSf2PsqBgmptV/iKxCZAc0B6rN4VZE2kxSEKpeqXCXZGLkzx0A2rXO+wIO
+         WsWPXw+Q1aGQqVParwqKkhAdlHKh/RJu0Q8IQzCypugJASVoE/L2l5womAft5DQ9BFI/
+         EcesBjCL36ES7czM00JNO0AdLMUQACkLsViiZ1KW+rvZMHWHSIgHn7Cp+v5wtEMQTkgg
+         hMZmtAAhDUPPzJbgyFlyXkI5xyTO70E1LnRLASmn1W1HxGsQPXEwdqJBKBsJ6DMSuC2k
+         kpsu18S6UnKGAEl+N29jQCnheaJjBCLnsNEbvcklqjg/AsZfiBFH1+mMVNATAZwz9hWL
+         AO7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701128169; x=1701732969;
+        d=1e100.net; s=20230601; t=1701132227; x=1701737027;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=l2m9WeXChb3IZcdkKWz2g1bAMA6uELaN8nkmuyBZmHQ=;
-        b=MpZrYIMwfMzDvuFJh2plWVEtm/MJuy0W5LAYcGKN4d4tPFl2j7VNDoz30CgTcCUSWo
-         vQaNTqTlX28Ua2rDIFZowlZcsiVrTLwTXbMteyqXV9Z/qN25SCAEPpkwUwnXNIYRDARk
-         3hjYTleDbvcKeyvG5KCAkY7NchXSg4M6qFoCj2k9tJUkUxtuRXic08hnmq49bpmrOulq
-         EE5I3um5ROjLXyvwUVqIbb55pV9sPvmykO3xDPkxVKqftKHN22nvXj0SbJ7epi5ittmu
-         EXF6EBBCwncskfEhDrNyve/0HlytSkPNFd1p+an2UEl17uedhELUIC4jfz2rD78SwU1Q
-         KL3Q==
-X-Gm-Message-State: AOJu0YzarBSMpBcmtJeZLx1/EY7QbesPqi6y3mpZqT0QJVsnBBYsM38v
-	auIUBOjN/UNTRLKE+gnmzirM0XihANU=
-X-Google-Smtp-Source: AGHT+IEl4S0gbL0JXiTGTFFkSpfut1kGjfX9yALNxNMX7MfX3x5UbA+DNYzB4IO60o0GRmpObK+5rcrVVuk=
+        bh=YtTNWHQr6JsZpzzdQO0pOMuuw3cl8zP4tz9k1AzI5bE=;
+        b=rfiOPAf9Lx0kNpV3mgTFexph67j8nZMy0iIRxcMIdrsxydynX/5/Temc9CQpNwMIqI
+         wP+aYpHJjdUTsSuvA2ysERdXA7Z8syUPKrqSolxrhS8lfsXOmzyWBu23Ex1ZZcA0++cm
+         nVO3aLC9KZUBMgBV5o5m+9/fkUPzhWUHKP/uBO+GUNCB+ng8mJTjKpIGLe+VtTfVnZAK
+         aqr3CRypeVNY2+Ofdsi4QrJBYw5yowf2oRBji5RM4bGZd3CV97zY007oGhDyz/vLHeui
+         NHWfnX5Ju+SzUHtbyh6PKBF3Bl0iBZhxMCVK2GqFQzrsul9lsqF4gK8Oj+3wXoHFPAV2
+         G8Kg==
+X-Gm-Message-State: AOJu0YwocqfdIie7bBa3A0JEYlj8D5BIxX6v4IiVvTsAwmcZlI2848vT
+	HbRGc+2jmlS3klkKTA4IIfwlxWrA8Ag=
+X-Google-Smtp-Source: AGHT+IESjIQv6/ICyS8yn8B9IgsMw0DggQwsK7hRc4UEvPR3TCet9e6B3QXr+ibINHgZvZ05JzvqN9k3GGM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:88:b0:285:860c:3359 with SMTP id
- bb8-20020a17090b008800b00285860c3359mr2734111pjb.4.1701128169103; Mon, 27 Nov
- 2023 15:36:09 -0800 (PST)
-Date: Mon, 27 Nov 2023 15:36:07 -0800
-In-Reply-To: <a1ebd80f87229fe513f9c2256982ef6c1d0cca2a.camel@infradead.org>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:fcd:b0:5ca:fea0:a798 with SMTP id
+ dg13-20020a05690c0fcd00b005cafea0a798mr585155ywb.6.1701132226944; Mon, 27 Nov
+ 2023 16:43:46 -0800 (PST)
+Date: Mon, 27 Nov 2023 16:43:45 -0800
+In-Reply-To: <ZWBDsOJpdi7hWaYV@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231121180223.12484-1-paul@xen.org> <20231121180223.12484-6-paul@xen.org>
- <a1ebd80f87229fe513f9c2256982ef6c1d0cca2a.camel@infradead.org>
-Message-ID: <ZWUn50A5vxiTd-ZT@google.com>
-Subject: Re: [PATCH v8 05/15] KVM: pfncache: remove KVM_GUEST_USES_PFN usage
+References: <20231110235528.1561679-1-seanjc@google.com> <20231110235528.1561679-7-seanjc@google.com>
+ <4484647425e2dbf92c76a173b7b14e346f60362d.camel@redhat.com> <ZWBDsOJpdi7hWaYV@yilunxu-OptiPlex-7050>
+Message-ID: <ZWU3wTElmiEOUg-I@google.com>
+Subject: Re: [PATCH 6/9] KVM: x86: Update guest cpu_caps at runtime for
+ dynamic CPUID-based features
 From: Sean Christopherson <seanjc@google.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Paul Durrant <paul@xen.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Nov 21, 2023, David Woodhouse wrote:
-> On Tue, 2023-11-21 at 18:02 +0000, Paul Durrant wrote:
-> > From: Paul Durrant <pdurrant@amazon.com>
+On Fri, Nov 24, 2023, Xu Yilun wrote:
+> On Sun, Nov 19, 2023 at 07:35:30PM +0200, Maxim Levitsky wrote:
+> > On Fri, 2023-11-10 at 15:55 -0800, Sean Christopherson wrote:
+> > >  static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *entries,
+> > >  				       int nent)
+> > >  {
+> > >  	struct kvm_cpuid_entry2 *best;
+> > > +	struct kvm_vcpu *caps = vcpu;
+> > > +
+> > > +	/*
+> > > +	 * Don't update vCPU capabilities if KVM is updating CPUID entries that
+> > > +	 * are coming in from userspace!
+> > > +	 */
+> > > +	if (entries != vcpu->arch.cpuid_entries)
+> > > +		caps = NULL;
 > > 
-> > As noted in [1] the KVM_GUEST_USES_PFN usage flag is never set by any
-> > callers of kvm_gpc_init(), which also makes the 'vcpu' argument redundant.
-> > Moreover, all existing callers specify KVM_HOST_USES_PFN so the usage
-> > check in hva_to_pfn_retry() and hence the 'usage' argument to
-> > kvm_gpc_init() are also redundant.
-> > Remove the pfn_cache_usage enumeration and remove the redundant arguments,
-> > fields of struct gfn_to_hva_cache, and all the related code.
-> > 
-> > [1] https://lore.kernel.org/all/ZQiR8IpqOZrOpzHC@google.com/
-> > 
-> > Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+> > I think that this should be decided by the caller. Just a boolean will suffice.
+
+I strongly disagree.  The _only_ time the caps should be updated is if
+entries == vcpu->arch.cpuid_entries, and if entries == cpuid_entires than the caps
+should _always_ be updated.
+
+> kvm_set_cpuid() calls this function only to validate/adjust the temporary
+> "entries" variable. While kvm_update_cpuid_runtime() calls it to do system
+> level changes.
 > 
-> I think it's https://lore.kernel.org/all/ZBEEQtmtNPaEqU1i@google.com/
-
-Yeah, that's the more important link.
-
-> which is the key reference. I'm not sure I'm 100% on board, but I never
-> got round to replying to Sean's email because it was one of those "put
-> up or shut up situations" and I didn't have the bandwidth to actually
-> write the code to prove my point.
+> So I kind of agree to make the caller fully awared, how about adding a
+> newly named wrapper for kvm_set_cpuid(), like:
 > 
-> I think it *is* important to support non-pinned pages. There's a reason
-> we even made the vapic page migratable. We want to support memory
-> hotplug, we want to cope with machine checks telling us to move certain
-> pages (which I suppose is memory hotplug). See commit 38b9917350cb
-> ("kvm: vmx: Implement set_apic_access_page_addr") for example.
+> 
+>   static void kvm_adjust_cpuid_entry(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *entries,
+> 				     int nent)
+> 
+>   {
+> 	WARN_ON(entries == vcpu->arch.cpuid_entries);
+> 	__kvm_update_cpuid_runtime(vcpu, entries, nent);
 
-The vAPIC page is slightly different in that it effectively never opened a window
-for page migration, i.e. once a vCPU was created that page was stuck.  For nested
-virtualization pages, the probability of being able to migrate a page at any given
-time might be relatively low, but it's extremely unlikely for a page to be pinned
-for the entire lifetime of a (L1) VM.
+But taking it a step further, we end up with
 
-> I agree that in the first round of the nVMX code there were bugs. And
-> sure, of *course* it isn't sufficient to wire up the invalidation
-> without either a KVM_REQ_SOMETHIMG to put it back, or just a *check* on
-> the corresponding gpc on the way back into the guest. We'd have worked
-> that out.
+	WARN_ON_ONCE(update_caps != (entries == vcpu->arch.cpuid_entries));
 
-Maybe.  I spent most of a day, maybe longer, hacking at the nVMX code and was
-unable to get line of sight to an end result that I felt would be worth pursuing.
+which is silly since any bugs that would result in the WARN firing can be avoided
+by doing:
 
-I'm definitely not saying it's impossible, and I'm not dead set against
-re-introducing KVM_GUEST_USES_PFN or similar, but a complete solution crosses the
-threshold where it's unreasonable to ask/expect someone to pick up the work in
-order to get their code/series merged.
+	update_caps = entries == vcpu->arch.cpuid_entries;
 
-Which is effectively what you said below, I just wanted to explain why I'm pushing
-to remove KVM_GUEST_USES_PFN, and to say that if you or someone else were to write
-the code it wouldn't be an automatic nak.
+which eventually distils down to the code I posted.
 
-> And yes, the gpc has had bugs as we implemented it, but the point was
-> that we got to something which *is* working, and forms a usable
-> building block.
->
-> So I'm not really sold on the idea of ditching KVM_GUEST_USES_PFN. I
-> think we could get it working, and I think it's worth it. But my
-> opinion is worth very little unless I express it in 'diff -up' form
-> instead of prose, and reverting this particular patch is the least of
-> my barriers to doing so, so reluctantly...
+> > Or even better: since the userspace CPUID update is really not important in
+> > terms of performance, why to special case it? 
+> > 
+> > Even if these guest caps are later overwritten, I don't see why we need to
+> > avoid updating them, and in fact introduce a small risk of them not being
+> > consistent
+> 
+> IIUC, for kvm_set_cpuid() case, KVM may then fail the userspace cpuid setting,
+> so we can't change guest caps at this phase.
+
+> Or even better: since the userspace CPUID update is really not important in
+> terms of performance, why to special case it? 
+
+Yep, and sadly __kvm_update_cpuid_runtime() *must* be invoked before kvm_set_cpuid()
+is guaranteed to succeed because the whole point is to massage guest CPUID before
+checking for divergences.
+
+> > With this we can avoid having the 'cap' variable which is *very* confusing as well.
+
+I agree the "caps" variable is confusing, but it's the least awful option I see.
+The alternatives I can think of are:
+
+  1. Update a dummy caps array
+  2. Take a snapshot of the caps and restore them
+  3. Have separate paths for updated guest CPUID versus guest caps
+
+#1 would require passing a "u32 *" to guest_cpu_cap_change() (or an equivalent),
+which I really, really don't want to do.  It' also a waste of cycles, and I'm
+skeptical that it would be any less confusing than the proposed code.
+
+#2 increases the complexity of kvm_set_cpuid() by introducing recovery paths, i.e.
+adds more things that can break, and again is wasteful (though copying ~100 bytes
+or so in a slow path isn't a big deal).
+
+#3 would create unnecessary maintenance burden as we'd have to ensure any changes
+hit both paths.
 
