@@ -1,132 +1,188 @@
-Return-Path: <kvm+bounces-2652-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2653-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D47FB7FBF3F
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 17:34:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A3BF17FBF58
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 17:42:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 049DD1C20B85
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 16:34:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D53F91C20D20
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 16:42:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 742C559149;
-	Tue, 28 Nov 2023 16:33:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D512B59149;
+	Tue, 28 Nov 2023 16:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NaNNIfLg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D+lX5dan"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C73510DC
-	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 08:33:54 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-db3fc4a1254so6771968276.3
-        for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 08:33:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701189233; x=1701794033; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vo/95/Uj9Fg4uJeKo+eJAx6dpBh0gdcUuvBHqXATckU=;
-        b=NaNNIfLgB93VcUkI9OpjV5L9tEcnng14sJr3vjy0Q0Z1j8TSQS7jFTvfS6Qk+vhNH9
-         IftTXZYyVs24Tm/f9sEZeWtq2MdPFTNlZmHeWvfzjQlkGq3zyUztRufC+Ae/f+HK/9pQ
-         tDW25YoSaXzX0dUundpAGiO7c2s2UjOdiP4rOK/CgTFEGg+KKcLpiI68c7v4QjYTmKO9
-         xIgCqxej0Yv4rg2ceCMe2b9DP+/uBcijwB+Car0nsTvaFB+R9MgJNOUSOnXbjqq17z7/
-         srTEWRmqK+1/pxlBb/oJMm5/e3L8+PxUJXDG4if1Mqx3mm8CRfClJqrzku7EmUWx9PIi
-         xjdA==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A853D4B
+	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 08:42:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701189742;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XYzWN6N52VkWv+bl9tnSg8e+Cw0sVqiE4LaeFAa1jRM=;
+	b=D+lX5dangZ5CdGUJKFv7g2jHZbOVbSWS+OU9Rh0XhUl0V67La8BCCTeF7r/4L/b5unkHpP
+	ZMQogQvCjU7MzHUOg3ppWMSjv6G9xp0+WN9PmkvSojtUm++CKhTlg2cpFCTAEQSbYT24SH
+	nrvgchMlMOcZk6oCXo+C6QoG6C2FONA=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-66-9xPsGUUdPJy26QNOUdaIJQ-1; Tue, 28 Nov 2023 11:42:20 -0500
+X-MC-Unique: 9xPsGUUdPJy26QNOUdaIJQ-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-54aa99b8e4dso4264769a12.3
+        for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 08:42:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701189233; x=1701794033;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vo/95/Uj9Fg4uJeKo+eJAx6dpBh0gdcUuvBHqXATckU=;
-        b=Lpyo7Zi5H4Js3XPxvjyVLvNecJ3+May2MyhLIikkL1AkuDVAnVeK19o9cqiHPJ4uNu
-         Ugzd14mhH0k9yDObvXM2IWSMxznqKlPigUUQinriiLLvtMvqdS6o/dTDP96tWR3IQFf4
-         yk7Ug8Nk3hoyo6nRwmtJ4dQc8ZsEVR+I61V1cY6pWqbgCNEGT711OYKAEGQ/cZBW7QEb
-         Bm+uW8pXwVfNZ+1P/zIO+Y/MRaa77JkyCImD9XFza3YZWB+jE0Xw9VxaHuBqo+jpXptF
-         eR2SR9wE5dbMiEZwh/pbSBljLvxjARQd9vuuDV4PGwHy31U4Clt9jm/3gX7O5npF2jkg
-         KN3g==
-X-Gm-Message-State: AOJu0YzgiLPf9mTtC80D0FhrE+AkCJU3yy6UicRGemkMcc+zMakzh1pA
-	tsxms0PBMDkQvVyoWZGB9XjSZhhOltA=
-X-Google-Smtp-Source: AGHT+IEo0YpirGMFLOQPu1+JPSR0DG5FDk303PQza9eOuDyOragnS042ndzE8Pd0ow1j/PtRzL0iHYgXDSU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:d081:0:b0:d9a:fd29:4fe6 with SMTP id
- h123-20020a25d081000000b00d9afd294fe6mr562511ybg.3.1701189233386; Tue, 28 Nov
- 2023 08:33:53 -0800 (PST)
-Date: Tue, 28 Nov 2023 08:33:51 -0800
-In-Reply-To: <f4495d1f697cf9a7ddfb786eaeeac90f554fc6db.camel@redhat.com>
+        d=1e100.net; s=20230601; t=1701189739; x=1701794539;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XYzWN6N52VkWv+bl9tnSg8e+Cw0sVqiE4LaeFAa1jRM=;
+        b=sxgOWo7PeVkAhQ0Ic39UINhlLhZssxfE4Qkj0x0MnXuoh0eD2Ci/wFVK3A2LM8lR+d
+         SFgZKokz5ZNFmtj23e6FnknT1lmiKtjBl0GOIQKgtu0Ww0w6BAM8tZoAlA/H5eDg31oL
+         xx6ryibdXgByHAFTs4PU+j84tus4uuG8mkG4CyTBLuYKAPjCyMK7TXzOGlbRG5XED5tv
+         ob09SQCoW9LJs/RK74w8wCIJne3dLa4erHFKDxIx6nN/jgMZRR5v0pyTYbOKydpIyW+W
+         qSAbXFvljwifusIuPS9uG7MOnHlgjXs6ihZ2FrwRCpHPe3If2lITY03WDFcr90HaE9VW
+         wLDQ==
+X-Gm-Message-State: AOJu0YzsLEL+DoavYKRW1z9erA19rGBVmAfYz2oEAtXrqvY4VgT5W0ZA
+	fbKe10GMuRH8cr1uEnTxIoNkAqQXc9vJW2E0xae0iuQlnndjlNIDfoXmCsuTXdlgXrjz5QbHTFO
+	SLnqTvTCzvP0E
+X-Received: by 2002:aa7:d658:0:b0:54b:1ca8:8522 with SMTP id v24-20020aa7d658000000b0054b1ca88522mr9152193edr.0.1701189739700;
+        Tue, 28 Nov 2023 08:42:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGuCR51xQlaXfT1DtLVqShBUrl6jPUKl6a6hM6V6WTL909JVVBwIS9wTuJVmR0NaRBsGRV6uQ==
+X-Received: by 2002:aa7:d658:0:b0:54b:1ca8:8522 with SMTP id v24-20020aa7d658000000b0054b1ca88522mr9152146edr.0.1701189739373;
+        Tue, 28 Nov 2023 08:42:19 -0800 (PST)
+Received: from imammedo.users.ipa.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id cn6-20020a0564020ca600b0054b2a9dc69csm3931520edb.40.2023.11.28.08.42.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Nov 2023 08:42:18 -0800 (PST)
+Date: Tue, 28 Nov 2023 17:42:15 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini
+ <pbonzini@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, David Hildenbrand
+ <david@redhat.com>, Peter Xu <peterx@redhat.com>, Anton Johansson
+ <anjo@rev.ng>, Peter Maydell <peter.maydell@linaro.org>,
+ kvm@vger.kernel.org, Marek Vasut <marex@denx.de>, David Gibson
+ <david@gibson.dropbear.id.au>, Brian Cain <bcain@quicinc.com>, Yoshinori
+ Sato <ysato@users.sourceforge.jp>, "Edgar E . Iglesias"
+ <edgar.iglesias@gmail.com>, Claudio Fontana <cfontana@suse.de>, Daniel
+ Henrique Barboza <dbarboza@ventanamicro.com>, Artyom Tarasenko
+ <atar4qemu@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-ppc@nongnu.org, Liu Zhiwei <zhiwei_liu@linux.alibaba.com>, Aurelien
+ Jarno <aurelien@aurel32.net>, Ilya Leoshkevich <iii@linux.ibm.com>, Daniel
+ Henrique Barboza <danielhb413@gmail.com>, Bastian Koppelmann
+ <kbastian@mail.uni-paderborn.de>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater
+ <clg@kaod.org>, Alistair Francis <alistair.francis@wdc.com>, Alessandro Di
+ Federico <ale@rev.ng>, Song Gao <gaosong@loongson.cn>, Marcel Apfelbaum
+ <marcel.apfelbaum@gmail.com>, Chris Wulff <crwulff@gmail.com>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Alistair Francis <alistair@alistair23.me>,
+ Fabiano Rosas <farosas@suse.de>, qemu-s390x@nongnu.org, Yanan Wang
+ <wangyanan55@huawei.com>, Luc Michel <luc@lmichel.fr>, Weiwei Li
+ <liweiwei@iscas.ac.cn>, Bin Meng <bin.meng@windriver.com>, Stafford Horne
+ <shorne@gmail.com>, Xiaojuan Yang <yangxiaojuan@loongson.cn>, "Daniel P .
+ Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-arm@nongnu.org, Jiaxun Yang <jiaxun.yang@flygoat.com>, Richard
+ Henderson <richard.henderson@linaro.org>, Aleksandar Rikalo
+ <aleksandar.rikalo@syrmia.com>, Bernhard Beschow <shentey@gmail.com>, Mark
+ Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-riscv@nongnu.org, Alex
+ =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, Nicholas Piggin
+ <npiggin@gmail.com>, Greg Kurz <groug@kaod.org>, Michael Rolnik
+ <mrolnik@gmail.com>, Eduardo Habkost <eduardo@habkost.net>, Markus
+ Armbruster <armbru@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>
+Subject: Re: [PATCH 06/22] exec/cpu: Call cpu_remove_sync() once in
+ cpu_common_unrealize()
+Message-ID: <20231128174215.32d2a350@imammedo.users.ipa.redhat.com>
+In-Reply-To: <20230918160257.30127-7-philmd@linaro.org>
+References: <20230918160257.30127-1-philmd@linaro.org>
+	<20230918160257.30127-7-philmd@linaro.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231108111806.92604-1-nsaenz@amazon.com> <20231108111806.92604-6-nsaenz@amazon.com>
- <f4495d1f697cf9a7ddfb786eaeeac90f554fc6db.camel@redhat.com>
-Message-ID: <ZWYWb3OQG3CaS7-f@google.com>
-Subject: Re: [RFC 05/33] KVM: x86: hyper-v: Introduce VTL call/return
- prologues in hypercall page
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Nicolas Saenz Julienne <nsaenz@amazon.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com, 
-	anelkz@amazon.com, graf@amazon.com, dwmw@amazon.co.uk, jgowans@amazon.com, 
-	corbert@lwn.net, kys@microsoft.com, haiyangz@microsoft.com, 
-	decui@microsoft.com, x86@kernel.org, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 28, 2023, Maxim Levitsky wrote:
-> On Wed, 2023-11-08 at 11:17 +0000, Nicolas Saenz Julienne wrote:
-> > diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> > index 78d053042667..d4b1b53ea63d 100644
-> > --- a/arch/x86/kvm/hyperv.c
-> > +++ b/arch/x86/kvm/hyperv.c
-> > @@ -259,7 +259,8 @@ static void synic_exit(struct kvm_vcpu_hv_synic *synic, u32 msr)
-> >  static int patch_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
-> >  {
-> >  	struct kvm *kvm = vcpu->kvm;
-> > -	u8 instructions[9];
-> > +	struct kvm_hv *hv = to_kvm_hv(kvm);
-> > +	u8 instructions[0x30];
-> >  	int i = 0;
-> >  	u64 addr;
-> >  
-> > @@ -285,6 +286,81 @@ static int patch_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
-> >  	/* ret */
-> >  	((unsigned char *)instructions)[i++] = 0xc3;
-> >  
-> > +	/* VTL call/return entries */
-> > +	if (!kvm_xen_hypercall_enabled(kvm) && kvm_hv_vsm_enabled(kvm)) {
-> > +#ifdef CONFIG_X86_64
-> > +		if (is_64_bit_mode(vcpu)) {
-> > +			/*
-> > +			 * VTL call 64-bit entry prologue:
-> > +			 * 	mov %rcx, %rax
-> > +			 * 	mov $0x11, %ecx
-> > +			 * 	jmp 0:
-> 
-> This isn't really 'jmp 0' as I first wondered but actually backward jump 32
-> bytes back (if I did the calculation correctly).  This is very dangerous
-> because code that was before can change and in fact I don't think that this
-> offset is even correct now, and on top of that it depends on support for xen
-> hypercalls as well.
-> 
-> This can be fixed by calculating the offset in runtime, however I am
-> thinking:
-> 
-> 
-> Since userspace will have to be aware of the offsets in this page, and since
-> pretty much everything else is done in userspace, it might make sense to
-> create the hypercall page in the userspace.
-> 
-> In fact, the fact that KVM currently overwrites the guest page, is a
-> violation of the HV spec.
-> 
-> It's more correct regardless of VTL to do userspace vm exit and let the
-> userspace put a memslot ("overlay") over the address, and put whatever
-> userspace wants there, including the above code.
-> 
-> Then we won't need the new ioctl as well.
-> 
-> To support this I think that we can add a userspace msr filter on the
-> HV_X64_MSR_HYPERCALL, although I am not 100% sure if a userspace msr filter
-> overrides the in-kernel msr handling.
+On Mon, 18 Sep 2023 18:02:39 +0200
+Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> wrote:
 
-Yep, userspace MSR filters override in-kernel handling.
+> While create_vcpu_thread() creates a vCPU thread, its counterpart
+> is cpu_remove_sync(), which join and destroy the thread.
+>=20
+> create_vcpu_thread() is called in qemu_init_vcpu(), itself called
+> in cpu_common_realizefn(). Since we don't have qemu_deinit_vcpu()
+> helper (we probably don't need any), simply destroy the thread in
+> cpu_common_unrealizefn().
+>=20
+> Note: only the PPC and X86 targets were calling cpu_remove_sync(),
+> meaning all other targets were leaking the thread when the vCPU
+> was unrealized (mostly when vCPU are hot-unplugged).
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+> ---
+>  hw/core/cpu-common.c  | 3 +++
+>  target/i386/cpu.c     | 1 -
+>  target/ppc/cpu_init.c | 2 --
+>  3 files changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/hw/core/cpu-common.c b/hw/core/cpu-common.c
+> index a3b8de7054..e5841c59df 100644
+> --- a/hw/core/cpu-common.c
+> +++ b/hw/core/cpu-common.c
+> @@ -221,6 +221,9 @@ static void cpu_common_unrealizefn(DeviceState *dev)
+> =20
+>      /* NOTE: latest generic point before the cpu is fully unrealized */
+>      cpu_exec_unrealizefn(cpu);
+> +
+> +    /* Destroy vCPU thread */
+> +    cpu_remove_sync(cpu);
+>  }
+> =20
+>  static void cpu_common_initfn(Object *obj)
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index cb41d30aab..d79797d963 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -7470,7 +7470,6 @@ static void x86_cpu_unrealizefn(DeviceState *dev)
+>      X86CPUClass *xcc =3D X86_CPU_GET_CLASS(dev);
+> =20
+>  #ifndef CONFIG_USER_ONLY
+> -    cpu_remove_sync(CPU(dev));
+>      qemu_unregister_reset(x86_cpu_machine_reset_cb, dev);
+>  #endif
+
+missing  followup context:
+    ...
+    xcc->parent_unrealize(dev);=20
+
+Before the patch, vcpu thread is stopped and onnly then
+clean up happens.
+
+After the patch we have cleanup while vcpu thread is still running.
+
+Even if it doesn't explode, such ordering still seems to be wrong.
+
+> diff --git a/target/ppc/cpu_init.c b/target/ppc/cpu_init.c
+> index e2c06c1f32..24d4e8fa7e 100644
+> --- a/target/ppc/cpu_init.c
+> +++ b/target/ppc/cpu_init.c
+> @@ -6853,8 +6853,6 @@ static void ppc_cpu_unrealize(DeviceState *dev)
+> =20
+>      pcc->parent_unrealize(dev);
+> =20
+> -    cpu_remove_sync(CPU(cpu));
+
+bug in current code?
+
+> -
+>      destroy_ppc_opcodes(cpu);
+>  }
+> =20
+
 
