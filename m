@@ -1,119 +1,225 @@
-Return-Path: <kvm+bounces-2682-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2683-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CB1E7FC927
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 23:11:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 752D87FC98E
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 23:32:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4188B215EE
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 22:11:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 301B92830C2
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 22:32:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E60D481B8;
-	Tue, 28 Nov 2023 22:11:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF5157305;
+	Tue, 28 Nov 2023 22:32:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XWiAnZH1"
+	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="hNWTXija"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92BBDD5D;
-	Tue, 28 Nov 2023 14:11:34 -0800 (PST)
-Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-777745f1541so344769885a.0;
-        Tue, 28 Nov 2023 14:11:34 -0800 (PST)
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C83210E7
+	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 14:32:32 -0800 (PST)
+Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-41cba6e8e65so31401771cf.2
+        for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 14:32:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701209493; x=1701814293; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=smmd9kiR3daHT08sErSgxntxOfc7UlUmITupKqw2V0c=;
-        b=XWiAnZH1uQkF9kS7WrjX+/xF+BkTowVcBwwx3KE4wOHEA9hvZ4Ua1SLH7hsRsBleDZ
-         p+ZnZFqV0WSTjh37+vbFrpuIx8h7cmxIjCCEX6dZMdQ6dAnUpgCfewpwEauY4SdXqsu2
-         u9OZXLJXqgtVRcI1v4l1zswsEgAY4XH2ce46t6FEjQEh9eD84/Z1LLKy00bjNvpPIXzJ
-         oK9G7sIT2tD1hLH6r5XnUJyNW9Ke8YmZadJC8X5pSADl3Ja4UcKaYb2GW7baoxzB0B10
-         weglkHMMHBmQGU7WgsgCl36r30Dztp8K9GwDpk4knYxHhU7+Jsb2q9WePO434v1sLoL7
-         DO4A==
+        d=soleen.com; s=google; t=1701210752; x=1701815552; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zXmxZJr3Rk1RKmtjvCLdJSQvKQY1rkK5dlcrmMuZJj4=;
+        b=hNWTXijaF5/80f98cfTTnZ6ba6x+wEh/fdlFcwentxd4sua8os6P5dQ+5lDh2JuOVi
+         fo99gFkEM7suv6QillI1aIsoJ9RZOdg85ps38EfUX9GFJhacXnbcJn1SbeG8HVVZGGgi
+         38G5Rx8UvoBp0E0sMqEtmYlcJL8f/12m3CVRkWg1pz7Axi+u0wVdTH9Tn8BEIcoj9DlI
+         RrSu/LjDWxpieVNLwyqWcRXA64/2tv0Nq6QaON0bDyn0Eu9LiN6qFO6a5YuGTvNqvqyp
+         d02JpkE+A2fY8H6Uo0+kbZm132ILbWyfEidOp3OEGoqFW1B8P6zgWLCLJ4EMeRT9JW3O
+         x3PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701209493; x=1701814293;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=smmd9kiR3daHT08sErSgxntxOfc7UlUmITupKqw2V0c=;
-        b=h5I9QJHQjh38VHqkk/A5aFJw7WujGYt4n/DPN6lCp/YIZ+ndZzdi2nrUhFuQN5+Ibf
-         foQfDHkJUu8mQE+NDKu7JzaQpRzYh4VUk1FtvDgXZPzEfD0ZMErTnFQf58KU8HVGROEE
-         MAS7Zm3g69DAkrMTiEPIcKLkcrq/VvxsrQP0tOjNpFwTHYLolRb6SNiCUbQjEpTRh402
-         rDoA/bIMV3EMxpznwuvIIxOVgSHZR04wPPFZi0peu3zfn8DFEuyzhflQrs720KsQ9uFl
-         k3m9zSfSsFG2UkaBOJqLQvLmBeYcNckkb6lmto05A4tj5DGuMEbW++fBX9LuRCI3e4ML
-         WjOg==
-X-Gm-Message-State: AOJu0YzaG35gIJS4yPo+eV89JLUTYy08aaYl4jAmgwJOsNIXC6gJhaJG
-	JBGejCTxXMGiIETyTfZJYkI=
-X-Google-Smtp-Source: AGHT+IHHqwVc8SvRXmif3h+061EREXCzwmz1UC8lMM25VJt2rpTg19U4o5b4qIr0XZad2Fj2jk4P1g==
-X-Received: by 2002:a05:620a:8718:b0:77d:5c49:b4f3 with SMTP id px24-20020a05620a871800b0077d5c49b4f3mr15289011qkn.47.1701209493722;
-        Tue, 28 Nov 2023 14:11:33 -0800 (PST)
-Received: from angquan-linux.. ([72.36.119.4])
-        by smtp.gmail.com with ESMTPSA id ea11-20020a05620a488b00b0077d93c7c785sm3144056qkb.119.2023.11.28.14.11.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 14:11:33 -0800 (PST)
-From: angquan yu <angquan21@gmail.com>
-X-Google-Original-From: angquan yu
-To: skhan@linuxfoundation.org
-Cc: shuah@kernel.org,
-	seanjc@google.com,
-	pbonzini@redhat.com,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	angquan yu <angquan21@gmail.com>
-Subject: [PATCH] Resolve Macro Expansion Warning in nx_huge_pages_test.c
-Date: Tue, 28 Nov 2023 16:11:05 -0600
-Message-Id: <20231128221105.63093-1-angquan21@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        d=1e100.net; s=20230601; t=1701210752; x=1701815552;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zXmxZJr3Rk1RKmtjvCLdJSQvKQY1rkK5dlcrmMuZJj4=;
+        b=h90BE/rR0RVgGoVNj1H9sb893LTLwA2jdwpxj04ucAWdRBWEUP10J5eZpXNZSFxtKR
+         bRKMkgz8SvR28WBkBaOYHcg+I8cn8+BqzBLxNaVpFfi+ctgiT/B8Ftenik8ZoX9ED3Pl
+         /0UWRgx9nwoxfIW4d81PThxGjAbxal9/bn5f8RzFFSu5aNqaXyKKzb42sa3Z79YrTtny
+         N0FBAXscODmtKUx/WyTqjOU6Yh2j+KzXYLU9hEVFdKKm4Ol8J95+106sChOSONHLzY3u
+         /4Mr/uk1+tJPPqNPqwxwtQhT4LFUJu6Ne6jhOWo+/SCpfgKtgQSlnGZu+cWo1UEMWATS
+         /4qA==
+X-Gm-Message-State: AOJu0YyC/9XiJcWzgpjokdpZO1PjQhbDqzKYmaZcyDSfIOgz4IgRTHsM
+	xMQ/GFZwgbABvgb+sv/RC9diLS6yY/84PkVySzd5/g==
+X-Google-Smtp-Source: AGHT+IGpMWKNhES/9/sulDYyAvK/WWWt51B5qkJu4RoDrGLcGdrRp1qT0nJmPQj10gvcniDpUMl30iZYOH63zrZzia0=
+X-Received: by 2002:a05:622a:5da6:b0:423:a0e1:c58f with SMTP id
+ fu38-20020a05622a5da600b00423a0e1c58fmr10804025qtb.59.1701210751688; Tue, 28
+ Nov 2023 14:32:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231128204938.1453583-1-pasha.tatashin@soleen.com> <CAJD7tkb1FqTqwONrp2nphBDkEamQtPCOFm0208H3tp0Gq2OLMQ@mail.gmail.com>
+In-Reply-To: <CAJD7tkb1FqTqwONrp2nphBDkEamQtPCOFm0208H3tp0Gq2OLMQ@mail.gmail.com>
+From: Pasha Tatashin <pasha.tatashin@soleen.com>
+Date: Tue, 28 Nov 2023 17:31:54 -0500
+Message-ID: <CA+CK2bB3nHfu1Z6_6fqN3YTAzKXMiJ12MOWpbs8JY7rQo4Fq0g@mail.gmail.com>
+Subject: Re: [PATCH 00/16] IOMMU memory observability
+To: Yosry Ahmed <yosryahmed@google.com>
+Cc: akpm@linux-foundation.org, alex.williamson@redhat.com, 
+	alim.akhtar@samsung.com, alyssa@rosenzweig.io, asahi@lists.linux.dev, 
+	baolu.lu@linux.intel.com, bhelgaas@google.com, cgroups@vger.kernel.org, 
+	corbet@lwn.net, david@redhat.com, dwmw2@infradead.org, hannes@cmpxchg.org, 
+	heiko@sntech.de, iommu@lists.linux.dev, jasowang@redhat.com, 
+	jernej.skrabec@gmail.com, jgg@ziepe.ca, jonathanh@nvidia.com, joro@8bytes.org, 
+	kevin.tian@intel.com, krzysztof.kozlowski@linaro.org, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, linux-rockchip@lists.infradead.org, 
+	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev, 
+	linux-tegra@vger.kernel.org, lizefan.x@bytedance.com, marcan@marcan.st, 
+	mhiramat@kernel.org, mst@redhat.com, m.szyprowski@samsung.com, 
+	netdev@vger.kernel.org, paulmck@kernel.org, rdunlap@infradead.org, 
+	robin.murphy@arm.com, samuel@sholland.org, suravee.suthikulpanit@amd.com, 
+	sven@svenpeter.dev, thierry.reding@gmail.com, tj@kernel.org, 
+	tomas.mudrunka@gmail.com, vdumpa@nvidia.com, virtualization@lists.linux.dev, 
+	wens@csie.org, will@kernel.org, yu-cheng.yu@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: angquan yu <angquan21@gmail.com>
+On Tue, Nov 28, 2023 at 4:34=E2=80=AFPM Yosry Ahmed <yosryahmed@google.com>=
+ wrote:
+>
+> On Tue, Nov 28, 2023 at 12:49=E2=80=AFPM Pasha Tatashin
+> <pasha.tatashin@soleen.com> wrote:
+> >
+> > From: Pasha Tatashin <tatashin@google.com>
+> >
+> > IOMMU subsystem may contain state that is in gigabytes. Majority of tha=
+t
+> > state is iommu page tables. Yet, there is currently, no way to observe
+> > how much memory is actually used by the iommu subsystem.
+> >
+> > This patch series solves this problem by adding both observability to
+> > all pages that are allocated by IOMMU, and also accountability, so
+> > admins can limit the amount if via cgroups.
+> >
+> > The system-wide observability is using /proc/meminfo:
+> > SecPageTables:    438176 kB
+> >
+> > Contains IOMMU and KVM memory.
+> >
+> > Per-node observability:
+> > /sys/devices/system/node/nodeN/meminfo
+> > Node N SecPageTables:    422204 kB
+> >
+> > Contains IOMMU and KVM memory memory in the given NUMA node.
+> >
+> > Per-node IOMMU only observability:
+> > /sys/devices/system/node/nodeN/vmstat
+> > nr_iommu_pages 105555
+> >
+> > Contains number of pages IOMMU allocated in the given node.
+>
+> Does it make sense to have a KVM-only entry there as well?
+>
+> In that case, if SecPageTables in /proc/meminfo is found to be
+> suspiciously high, it should be easy to tell which component is
+> contributing most usage through vmstat. I understand that users can do
+> the subtraction, but we wouldn't want userspace depending on that, in
+> case a third class of "secondary" page tables emerges that we want to
+> add to SecPageTables. The in-kernel implementation can do the
+> subtraction for now if it makes sense though.
 
-This commit fixes a compiler warning in the file
-x86_64/nx_huge_pages_test.c, which was caused by improper
-macro expansion of '__TEST_REQUIRE'.
+Hi Yosry,
 
-Warning addressed:
-- The warning was triggered by the expansion of the '__TEST_REQUIRE'
-macro, indicating a potential issue in how the macro was being
-used or expanded.
+Yes, another counter for KVM could be added. On the other hand KVM
+only can be computed by subtracting one from another as there are only
+two types of secondary page tables, KVM and IOMMU:
 
-Changes made:
-- Modified the usage of the '__TEST_REQUIRE' macro to ensure proper
-expansion. This involved explicitly passing the expected magic token
-(MAGIC_TOKEN) and a descriptive error message to the macro.
-- The fix enhances clarity in the macro usage and ensures that
-the compiler correctly interprets the intended logic, thereby
-resolving the warning.
+/sys/devices/system/node/node0/meminfo
+Node 0 SecPageTables:    422204 kB
 
-Signed-off-by: angquan yu <angquan21@gmail.com>
----
- tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ /sys/devices/system/node/nodeN/vmstat
+nr_iommu_pages 105555
 
-diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-index 18ac5c195..323ede6b6 100644
---- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-@@ -259,7 +259,8 @@ int main(int argc, char **argv)
- 	__TEST_REQUIRE(token == MAGIC_TOKEN,
- 		       "This test must be run with the magic token %d.\n"
- 		       "This is done by nx_huge_pages_test.sh, which\n"
--		       "also handles environment setup for the test.");
-+		       "also handles environment setup for the test.",
-+			   MAGIC_TOKEN);
- 
- 	run_test(reclaim_period_ms, false, reboot_permissions);
- 	run_test(reclaim_period_ms, true, reboot_permissions);
--- 
-2.39.2
+KVM only =3D SecPageTables - nr_iommu_pages * PAGE_SIZE / 1024
 
+Pasha
+
+>
+> >
+> > Accountability: using sec_pagetables cgroup-v2 memory.stat entry.
+> >
+> > With the change, iova_stress[1] stops as limit is reached:
+> >
+> > # ./iova_stress
+> > iova space:     0T      free memory:   497G
+> > iova space:     1T      free memory:   495G
+> > iova space:     2T      free memory:   493G
+> > iova space:     3T      free memory:   491G
+> >
+> > stops as limit is reached.
+> >
+> > This series encorporates suggestions that came from the discussion
+> > at LPC [2].
+> >
+> > [1] https://github.com/soleen/iova_stress
+> > [2] https://lpc.events/event/17/contributions/1466
+> >
+> > Pasha Tatashin (16):
+> >   iommu/vt-d: add wrapper functions for page allocations
+> >   iommu/amd: use page allocation function provided by iommu-pages.h
+> >   iommu/io-pgtable-arm: use page allocation function provided by
+> >     iommu-pages.h
+> >   iommu/io-pgtable-dart: use page allocation function provided by
+> >     iommu-pages.h
+> >   iommu/io-pgtable-arm-v7s: use page allocation function provided by
+> >     iommu-pages.h
+> >   iommu/dma: use page allocation function provided by iommu-pages.h
+> >   iommu/exynos: use page allocation function provided by iommu-pages.h
+> >   iommu/fsl: use page allocation function provided by iommu-pages.h
+> >   iommu/iommufd: use page allocation function provided by iommu-pages.h
+> >   iommu/rockchip: use page allocation function provided by iommu-pages.=
+h
+> >   iommu/sun50i: use page allocation function provided by iommu-pages.h
+> >   iommu/tegra-smmu: use page allocation function provided by
+> >     iommu-pages.h
+> >   iommu: observability of the IOMMU allocations
+> >   iommu: account IOMMU allocated memory
+> >   vhost-vdpa: account iommu allocations
+> >   vfio: account iommu allocations
+> >
+> >  Documentation/admin-guide/cgroup-v2.rst |   2 +-
+> >  Documentation/filesystems/proc.rst      |   4 +-
+> >  drivers/iommu/amd/amd_iommu.h           |   8 -
+> >  drivers/iommu/amd/init.c                |  91 +++++-----
+> >  drivers/iommu/amd/io_pgtable.c          |  13 +-
+> >  drivers/iommu/amd/io_pgtable_v2.c       |  20 +-
+> >  drivers/iommu/amd/iommu.c               |  13 +-
+> >  drivers/iommu/dma-iommu.c               |   8 +-
+> >  drivers/iommu/exynos-iommu.c            |  14 +-
+> >  drivers/iommu/fsl_pamu.c                |   5 +-
+> >  drivers/iommu/intel/dmar.c              |  10 +-
+> >  drivers/iommu/intel/iommu.c             |  47 ++---
+> >  drivers/iommu/intel/iommu.h             |   2 -
+> >  drivers/iommu/intel/irq_remapping.c     |  10 +-
+> >  drivers/iommu/intel/pasid.c             |  12 +-
+> >  drivers/iommu/intel/svm.c               |   7 +-
+> >  drivers/iommu/io-pgtable-arm-v7s.c      |   9 +-
+> >  drivers/iommu/io-pgtable-arm.c          |   7 +-
+> >  drivers/iommu/io-pgtable-dart.c         |  37 ++--
+> >  drivers/iommu/iommu-pages.h             | 231 ++++++++++++++++++++++++
+> >  drivers/iommu/iommufd/iova_bitmap.c     |   6 +-
+> >  drivers/iommu/rockchip-iommu.c          |  14 +-
+> >  drivers/iommu/sun50i-iommu.c            |   7 +-
+> >  drivers/iommu/tegra-smmu.c              |  18 +-
+> >  drivers/vfio/vfio_iommu_type1.c         |   8 +-
+> >  drivers/vhost/vdpa.c                    |   3 +-
+> >  include/linux/mmzone.h                  |   5 +-
+> >  mm/vmstat.c                             |   3 +
+> >  28 files changed, 415 insertions(+), 199 deletions(-)
+> >  create mode 100644 drivers/iommu/iommu-pages.h
+> >
+> > --
+> > 2.43.0.rc2.451.g8631bc7472-goog
+> >
+> >
 
