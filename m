@@ -1,66 +1,65 @@
-Return-Path: <kvm+bounces-2698-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2699-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44D0E7FCB04
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 00:51:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EC217FCB0B
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 00:52:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F4C7B218F8
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 23:50:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17316B21797
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 23:52:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C7C15C3FE;
-	Tue, 28 Nov 2023 23:50:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D16615D487;
+	Tue, 28 Nov 2023 23:52:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="fX+fCASa"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="m3IVwR2o"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FECD19AC
-	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 15:50:39 -0800 (PST)
-Received: by mail-oo1-xc32.google.com with SMTP id 006d021491bc7-58d06bfadf8so3650168eaf.1
-        for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 15:50:39 -0800 (PST)
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE5F819AC
+	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 15:52:16 -0800 (PST)
+Received: by mail-ot1-x32c.google.com with SMTP id 46e09a7af769-6d7eb7ff384so3991050a34.0
+        for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 15:52:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1701215438; x=1701820238; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=XYTfkI+bm13XmNm4VDm7JNv4il6+T5S3nBbruRBN+40=;
-        b=fX+fCASayAnz9s/y6EySKMP9JlABM2IIm4M5EtIiRXHeKCvQXb/5G/ut27GFa3Oxq2
-         1Sld3F4EfNF9LnNovl2mKaB2MwW8gT/ggwIdpQe8icye6hAABlt/PmsTc+bZwCK2C9Vf
-         J+DKW+a3oeh2L72QAgOSm1x8BgaHS+Acr+UrYKKPaca4NNBo/cMemL71HS6DaH9UPqfy
-         t42Kq8g+UvQngThwZ8zIn8dduNQEczgszqPAnrhaMg6XyDbi73zometA9+u5pgLITdfA
-         ew5dpaEm/NVrgvafpkIsfYrEyD8MK+xkJWQyZlunB503FSY9CBLvySosaqVx9BJqLEma
-         qRkQ==
+        d=ziepe.ca; s=google; t=1701215536; x=1701820336; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KGeDrNEnimmhtGEyy4xADkNVo65XsrpvCKCPlUM9+8M=;
+        b=m3IVwR2oyDwf9bDurHvyXgUEDv38joPWYYywCYsLXcvaCtUyChVXEsFDLqmlrj9tR9
+         6SsODG8fd1f7lMOFwx/GLB+Rne1Rp1UofI867dJ+XX6AjWKu24p4qaTPmIvLhoYMR1qx
+         HTwFeKWnNZ6h/t1W+3U9AOGUpypBu/RYzMePLZl2s4BMSHLiMkWvvD84lSSpQZQEoYdd
+         bn+tyPDPDD1oMlRdA7u8XHP61sAIw5rqEDj/9T4sg3cc/o8t94dm84VBVMq9L+dbXkWD
+         nUi/JL0VL5RaviK4pV1E3QEbDy/DmfWL+79AA+iGvWu6lAUAZG5g7uGDy/lJb/AWT/eY
+         NMHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701215438; x=1701820238;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XYTfkI+bm13XmNm4VDm7JNv4il6+T5S3nBbruRBN+40=;
-        b=IVhSUZvoOhk9vhqLXiW+QBhssGEXivDqrWzfkpYfA+h+ssYUuktzKJJejXM5QCm1v8
-         wH9n0uUn3fnvG8BOd2dbPb9+rSSZGgMd02KVyhsRv2pzUqab7mhVqrEVEhr6r6/c5EmH
-         dMNiRc/fFXjtfdSZ0OhuEgO4xpNJHT8hmE8pZHaYV0uudaLNS9pGfkMjhW2ku6hPrNMH
-         B7x1Sh+jMkrh1CjlVz1hOAjj3cQEHW6D5Osx4smvNrlrDo6zlK3d5nwAfffeUQnBD0vu
-         d8fJPI0BSGW0oIGmQS9eRhYbOZpmCTX13whzOP3NumWH9cpJZ9Zp62fNqDi8K9LBLM37
-         BiZw==
-X-Gm-Message-State: AOJu0YyFQV15skIPIDoGBzvxM2d00Z7fnr7Z2oKJD/guOPHn5z1HYVy9
-	1/o1J341liruzwC389HhUW3HvA==
-X-Google-Smtp-Source: AGHT+IGwgOr6qdtdfdMX4Rg2CnVVZBQ0aH/828IT9FkkN9y3SJG6wbzLt3OY2goWTqPUl1CtrUxcHA==
-X-Received: by 2002:a05:6820:809:b0:58d:a6ed:5601 with SMTP id bg9-20020a056820080900b0058da6ed5601mr6252111oob.1.1701215438416;
-        Tue, 28 Nov 2023 15:50:38 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701215536; x=1701820336;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KGeDrNEnimmhtGEyy4xADkNVo65XsrpvCKCPlUM9+8M=;
+        b=Kuss7RJHvjXGV0//vGgezEP0/oSv881ngbBVGlQYi8Fdi60WXJyMQomNtpM5j6fdun
+         mSjstSYdUVqo8Y30VzXLr70ahMlMNi7DnKxnHVd8gqGngyE8jasbxsfgIPu7w6qo2JGp
+         WuSL8eXBu+X/lY2n+82VsUEtcKFBIO1HNcEwwDFA900irMwQdu2PTx9L90kaWvbu8+8t
+         HnjEQold1261AYMNKUKPLDbCs6WSYJ0AK4CEJ3hhciR5WqqFrxgfuAl6ObEFs7STSx0Z
+         WXO6Omx6P3nn2TuZzj3/PAqR1x1SzoKee4z47ewL9CqEX7yclgwSo7PyfZ1mELnhU38N
+         G6Aw==
+X-Gm-Message-State: AOJu0YxnNQXTTw0LrXpMR+ynyyJxJFuYzS1uQrOAbGsccAOCL7Di1A+a
+	y07lYru4ZG69ZB9i/8MZBWK5wg==
+X-Google-Smtp-Source: AGHT+IH9LmWzJO7y47O3QlJBfbaegvjW4JiiPSyZGlFsMKhzquzPk2K8a5k6oldvIY99Eeb+EHerAg==
+X-Received: by 2002:a9d:6403:0:b0:6d6:4972:b7ae with SMTP id h3-20020a9d6403000000b006d64972b7aemr18597902otl.13.1701215536183;
+        Tue, 28 Nov 2023 15:52:16 -0800 (PST)
 Received: from ziepe.ca (hlfxns017vw-142-134-23-187.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.134.23.187])
-        by smtp.gmail.com with ESMTPSA id b35-20020a4a98e6000000b0058d2ea19475sm1934017ooj.11.2023.11.28.15.50.37
+        by smtp.gmail.com with ESMTPSA id v10-20020a056830140a00b006d834fd3399sm504997otp.59.2023.11.28.15.52.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 15:50:37 -0800 (PST)
+        Tue, 28 Nov 2023 15:52:15 -0800 (PST)
 Received: from jgg by wakko with local (Exim 4.95)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1r87qf-005jHH-5R;
-	Tue, 28 Nov 2023 19:50:37 -0400
-Date: Tue, 28 Nov 2023 19:50:37 -0400
+	id 1r87sE-005jI0-V5;
+	Tue, 28 Nov 2023 19:52:14 -0400
+Date: Tue, 28 Nov 2023 19:52:14 -0400
 From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Pasha Tatashin <pasha.tatashin@soleen.com>
-Cc: Robin Murphy <robin.murphy@arm.com>, akpm@linux-foundation.org,
+To: Yosry Ahmed <yosryahmed@google.com>
+Cc: Pasha Tatashin <pasha.tatashin@soleen.com>, akpm@linux-foundation.org,
 	alex.williamson@redhat.com, alim.akhtar@samsung.com,
 	alyssa@rosenzweig.io, asahi@lists.linux.dev,
 	baolu.lu@linux.intel.com, bhelgaas@google.com,
@@ -77,70 +76,52 @@ Cc: Robin Murphy <robin.murphy@arm.com>, akpm@linux-foundation.org,
 	linux-tegra@vger.kernel.org, lizefan.x@bytedance.com,
 	marcan@marcan.st, mhiramat@kernel.org, mst@redhat.com,
 	m.szyprowski@samsung.com, netdev@vger.kernel.org,
-	paulmck@kernel.org, rdunlap@infradead.org, samuel@sholland.org,
-	suravee.suthikulpanit@amd.com, sven@svenpeter.dev,
-	thierry.reding@gmail.com, tj@kernel.org, tomas.mudrunka@gmail.com,
-	vdumpa@nvidia.com, virtualization@lists.linux.dev, wens@csie.org,
-	will@kernel.org, yu-cheng.yu@intel.com
-Subject: Re: [PATCH 08/16] iommu/fsl: use page allocation function provided
- by iommu-pages.h
-Message-ID: <20231128235037.GC1312390@ziepe.ca>
+	paulmck@kernel.org, rdunlap@infradead.org, robin.murphy@arm.com,
+	samuel@sholland.org, suravee.suthikulpanit@amd.com,
+	sven@svenpeter.dev, thierry.reding@gmail.com, tj@kernel.org,
+	tomas.mudrunka@gmail.com, vdumpa@nvidia.com,
+	virtualization@lists.linux.dev, wens@csie.org, will@kernel.org,
+	yu-cheng.yu@intel.com
+Subject: Re: [PATCH 00/16] IOMMU memory observability
+Message-ID: <20231128235214.GD1312390@ziepe.ca>
 References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
- <20231128204938.1453583-9-pasha.tatashin@soleen.com>
- <1c6156de-c6c7-43a7-8c34-8239abee3978@arm.com>
- <CA+CK2bCOtwZxTUS60PHOQ3szXdCzau7OpopgFEbbC6a9Frxafg@mail.gmail.com>
+ <CAJD7tkb1FqTqwONrp2nphBDkEamQtPCOFm0208H3tp0Gq2OLMQ@mail.gmail.com>
+ <CA+CK2bB3nHfu1Z6_6fqN3YTAzKXMiJ12MOWpbs8JY7rQo4Fq0g@mail.gmail.com>
+ <CAJD7tkZZNhf4KGV+7N+z8NFpJrvyeNudXU-WdVeE8Rm9pobfgQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+CK2bCOtwZxTUS60PHOQ3szXdCzau7OpopgFEbbC6a9Frxafg@mail.gmail.com>
+In-Reply-To: <CAJD7tkZZNhf4KGV+7N+z8NFpJrvyeNudXU-WdVeE8Rm9pobfgQ@mail.gmail.com>
 
-On Tue, Nov 28, 2023 at 06:00:13PM -0500, Pasha Tatashin wrote:
-> On Tue, Nov 28, 2023 at 5:53 PM Robin Murphy <robin.murphy@arm.com> wrote:
+On Tue, Nov 28, 2023 at 03:03:30PM -0800, Yosry Ahmed wrote:
+> > Yes, another counter for KVM could be added. On the other hand KVM
+> > only can be computed by subtracting one from another as there are only
+> > two types of secondary page tables, KVM and IOMMU:
 > >
-> > On 2023-11-28 8:49 pm, Pasha Tatashin wrote:
-> > > Convert iommu/fsl_pamu.c to use the new page allocation functions
-> > > provided in iommu-pages.h.
+> > /sys/devices/system/node/node0/meminfo
+> > Node 0 SecPageTables:    422204 kB
 > >
-> > Again, this is not a pagetable. This thing doesn't even *have* pagetables.
+> >  /sys/devices/system/node/nodeN/vmstat
+> > nr_iommu_pages 105555
 > >
-> > Similar to patches #1 and #2 where you're lumping in configuration
-> > tables which belong to the IOMMU driver itself, as opposed to pagetables
-> > which effectively belong to an IOMMU domain's user. But then there are
-> > still drivers where you're *not* accounting similar configuration
-> > structures, so I really struggle to see how this metric is useful when
-> > it's so completely inconsistent in what it's counting :/
+> > KVM only = SecPageTables - nr_iommu_pages * PAGE_SIZE / 1024
+> >
 > 
-> The whole IOMMU subsystem allocates a significant amount of kernel
-> locked memory that we want to at least observe. The new field in
-> vmstat does just that: it reports ALL buddy allocator memory that
-> IOMMU allocates. However, for accounting purposes, I agree, we need to
-> do better, and separate at least iommu pagetables from the rest.
-> 
-> We can separate the metric into two:
-> iommu pagetable only
-> iommu everything
-> 
-> or into three:
-> iommu pagetable only
-> iommu dma
-> iommu everything
-> 
-> What do you think?
+> Right, but as I mention above, if userspace starts depending on this
+> equation, we won't be able to add any more classes of "secondary" page
+> tables to SecPageTables. I'd like to avoid that if possible. We can do
+> the subtraction in the kernel.
 
-I think I said this at LPC - if you want to have fine grained
-accounting of memory by owner you need to go talk to the cgroup people
-and come up with something generic. Adding ever open coded finer
-category breakdowns just for iommu doesn't make alot of sense.
-
-You can make some argument that the pagetable memory should be counted
-because kvm counts it's shadow memory, but I wouldn't go into further
-detail than that with hand coded counters..
+What Sean had suggested was that SecPageTables was always intended to
+account all the non-primary mmu memory used by page tables. If this is
+the case we shouldn't be trying to break it apart into finer
+counters. These are big picture counters, not detailed allocation by
+owner counters.
 
 Jason
 
