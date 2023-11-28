@@ -1,96 +1,152 @@
-Return-Path: <kvm+bounces-2657-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2658-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33D767FC0F3
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 19:01:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D481B7FC0F8
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 19:04:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 615731C20EF2
-	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 18:01:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7411FB21503
+	for <lists+kvm@lfdr.de>; Tue, 28 Nov 2023 18:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3436341C9A;
-	Tue, 28 Nov 2023 18:01:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EFDaRbTO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA33219E6;
+	Tue, 28 Nov 2023 18:04:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6633ADC
-	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 10:01:27 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-5c1f17f0198so5047352a12.1
-        for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 10:01:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701194487; x=1701799287; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eLq05PNDVda9aScY/SisztbkXwqXqd3sYjTGw5PUJeI=;
-        b=EFDaRbTODs3BrLwQvjzLNpQxJURlV70rN4ctLh/5vrYOgTcW20BBhtPEHzoxVPzZtB
-         tJ8Nj4QGZoqT0v2D+pNr0GbnzcilrX0TLY6wFgm0HuMYK4TZp5E2bmYfzp6MiycbtZMD
-         z6smNynd+a1HNprx8/XMHmqAiDwxJ6y5w0YQ/xRY9BkYN05qg4JdFUCJ7K45NdgylMSC
-         8JjDR403Gd6pBeLRjNHFc2JUk3WEs7Blni3P1BvWjneSrJKxS2wRk/CpIgCKavc+MCTX
-         1gXOOxIj7RV4Va3fPGirpnH8O2T1wi603kCsBHtNAwQ9NpuUgbdLcIY3kCM8TiLgkkB9
-         OVIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701194487; x=1701799287;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=eLq05PNDVda9aScY/SisztbkXwqXqd3sYjTGw5PUJeI=;
-        b=wjAdwHoW0Z6kCbs/0/W4jcafVvcfjK83ckqsV/fEvDYKUhKVQnkVoueaSEpm8KwJL7
-         HakNGtVB8wmE1WzJy+HdEeT14OcI/LaovuuJ0KO5esHqM7aVhGgRR3dDYTJaJnCLS3Ei
-         VlY86WSinawijhSim9C2jQNfEJ2HFuvHl/U4UJ+q/MbSxywqvbiehzJ8/o4+suQ01qyv
-         0WALXfbIPq/Siua7xldRaGu/GMq+dJELp765CBvbzSS08w451/v2y3OeDWAxGzUJMDec
-         TBrcEIoVGXe+hDJW1Hd9cvUORL31ZnRoowr6dmcxnS+R+ScIM4UXHtyY0EmKdu2S26EX
-         1Ddg==
-X-Gm-Message-State: AOJu0YxPSmsaNyGqvMjHwgUdB0yoL08ncofmu3QmM2HzJA5kA2wIkb/+
-	tj3qdx9+sCuhsBw5bgMkTDOABkhX8Jg=
-X-Google-Smtp-Source: AGHT+IFNpNFIXlxB0zt8OdAQTgvseJ7SAZR+7oHRbWOjuUMCt1O25ZyuOpH9EBjJdRLzVlyQWSuhW+kqEvA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:4a:0:b0:5bd:bf7a:d167 with SMTP id
- 71-20020a63004a000000b005bdbf7ad167mr2483762pga.9.1701194486901; Tue, 28 Nov
- 2023 10:01:26 -0800 (PST)
-Date: Tue, 28 Nov 2023 10:01:25 -0800
-In-Reply-To: <CAJhGHyAiYxyiC+oepgqHofBpKVXLyqOUS=PjXppesx4AS3++-w@mail.gmail.com>
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 242A291;
+	Tue, 28 Nov 2023 10:04:09 -0800 (PST)
+Received: from MUA
+	by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <mail@maciej.szmigiero.name>)
+	id 1r82RI-0008LK-P0; Tue, 28 Nov 2023 19:04:04 +0100
+Message-ID: <edaa230f-37c1-498c-8ff1-a9a238ed0cd7@maciej.szmigiero.name>
+Date: Tue, 28 Nov 2023 19:03:58 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231107202002.667900-1-aghulati@google.com> <20231107202002.667900-10-aghulati@google.com>
- <CAJhGHyAiYxyiC+oepgqHofBpKVXLyqOUS=PjXppesx4AS3++-w@mail.gmail.com>
-Message-ID: <ZWYq9W3D8JCAPoc8@google.com>
-Subject: Re: [RFC PATCH 09/14] KVM: x86: Move shared KVM state into VAC
-From: Sean Christopherson <seanjc@google.com>
-To: Lai Jiangshan <jiangshanlai@gmail.com>
-Cc: Anish Ghulati <aghulati@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	hpa@zytor.com, Vitaly Kuznetsov <vkuznets@redhat.com>, peterz@infradead.org, 
-	paulmck@kernel.org, Mark Rutland <mark.rutland@arm.com>, 
-	Venkatesh Srinivas <venkateshs@chromium.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: x86: Allow XSAVES on CPUs where host doesn't use it
+ due to an errata
+Content-Language: en-US, pl-PL
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <c858817d3e3be246a1a2278e3b42d06284e615e5.1700766316.git.maciej.szmigiero@oracle.com>
+ <ZWTQuRpwPkutHY-D@google.com>
+ <50076263-8b4f-4167-8419-e8baede7e9b0@maciej.szmigiero.name>
+ <ZWYZ1ldqQ1Q-7Jk0@google.com>
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
+ 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
+Disposition-Notification-To: "Maciej S. Szmigiero"
+ <mail@maciej.szmigiero.name>
+In-Reply-To: <ZWYZ1ldqQ1Q-7Jk0@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 17, 2023, Lai Jiangshan wrote:
-> On Wed, Nov 8, 2023 at 4:21=E2=80=AFAM Anish Ghulati <aghulati@google.com=
-> wrote:
-> >
-> > From: Venkatesh Srinivas <venkateshs@chromium.org>
-> >
-> > Move kcpu_kick_mask and vm_running_vcpu* from arch neutral KVM code int=
-o
-> > VAC.
->=20
-> Hello, Venkatesh, Anish
->=20
-> IMO, the allocation code for cpu_kick_mask has to be moved too.
+On 28.11.2023 17:48, Sean Christopherson wrote:
+> On Mon, Nov 27, 2023, Maciej S. Szmigiero wrote:
+>> On 27.11.2023 18:24, Sean Christopherson wrote:
+>>> On Thu, Nov 23, 2023, Maciej S. Szmigiero wrote:
+>>>> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+>>>>
+>>>> Since commit b0563468eeac ("x86/CPU/AMD: Disable XSAVES on AMD family 0x17")
+>>>> kernel unconditionally clears the XSAVES CPU feature bit on Zen1/2 CPUs.
+>>>>
+>>>> Since KVM CPU caps are initialized from the kernel boot CPU features this
+>>>> makes the XSAVES feature also unavailable for KVM guests in this case, even
+>>>> though they might want to decide on their own whether they are affected by
+>>>> this errata.
+>>>>
+>>>> Allow KVM guests to make such decision by setting the XSAVES KVM CPU
+>>>> capability bit based on the actual CPU capability
+>>>
+>>> This is not generally safe, as the guest can make such a decision if and only if
+>>> the Family/Model/Stepping information is reasonably accurate.
+>>
+>> If one lies to the guest about the CPU it is running on then obviously
+>> things may work non-optimally.
+> 
+> But this isn't about running optimally, it's about functional correctness.  And
+> "lying" to the guest about F/M/S is extremely common.
+> 
+>>>> This fixes booting Hyper-V enabled Windows Server 2016 VMs with more than
+>>>> one vCPU on Zen1/2 CPUs.
+>>>
+>>> How/why does lack of XSAVES break a multi-vCPU setup?  Is Windows blindly doing
+>>> XSAVES based on FMS?
+>>
+>> The hypercall from L2 Windows to L1 Hyper-V asking to boot the first AP
+>> returns HV_STATUS_CPUID_XSAVE_FEATURE_VALIDATION_ERROR.
+> 
+> If it's just about CPUID enumeration, then userspace can simply stuff the XSAVES
+> feature flag.  This is not something that belongs in KVM, because this is safe if
+> and only if F/M/S is accurate and the guest is actually aware of the erratum (or
+> will not actually use XSAVES for other reasons), neither of which KVM can guarantee.
 
-I'm pretty sure this patch should be dropped.  I can't think of any reason =
-why
-cpu_kick_mask needs to be in VAC, and kvm_running_vcpu definitely needs to =
-be
-per-KVM.
+In other words, your suggestion is that QEMU (or other VMM) not KVM
+should be the one setting the XSAVES CPUID bit back, correct?
+
+I don't think this would work with the current KVM code since it seems
+to make various decisions depending on presence of XSAVES bit in KVM
+caps rather than the guest CPUID and on boot_cpu_has(XSAVES) - one of
+such code blocks was even modified by this patch.
+
+It even says in the comment above that code that it is not possible to
+actually disable XSAVES without disabling all other variants on SVM so
+this has to be enabled if CPU supports it to switch the XSS MSR at
+guest entry/exit (in this case it looks harmless since Zen1/2
+supposedly don't support any supervisor extended states).
+
+So it looks like we would need changes to *both* KVM and QEMU to
+restore the XSAVES support this way.
+
+Thanks,
+Maciej
+
 
