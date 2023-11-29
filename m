@@ -1,48 +1,49 @@
-Return-Path: <kvm+bounces-2750-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2751-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 746787FD365
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 10:58:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CC0F7FD3A9
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 11:12:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FC98282DE9
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 09:58:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD06C282EC3
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 10:12:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF0B19475;
-	Wed, 29 Nov 2023 09:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EDFD1A5A8;
+	Wed, 29 Nov 2023 10:12:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GC2U2U9i"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PivL9517"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E26421AD;
-	Wed, 29 Nov 2023 01:58:44 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC3981AD;
+	Wed, 29 Nov 2023 02:12:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701251925; x=1732787925;
+  t=1701252752; x=1732788752;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=KucyGOqn1JyY5SGZU0/6/92QdqJqjUgPNGv4D39cu0s=;
-  b=GC2U2U9inwPhS8hiZZKKEXCAF306qghe0/6TiJj+iTfgSFeNPy7QIUKa
-   7+GQznJgKFDlDMlSXqKS5bngfUWAgq3OVpR1c8SR42h6MAmZZscABVmye
-   +vgXfBCBKSfZF0YE8aXkW/EXaaHi4UkrKEOhAbqOF+xGhxPjE6N2q2D/d
-   V76nEHmQqjVpZSN/HgYHmoZuJJW8MHgXavSS+wm/FhHWBFInESNiXfNfI
-   S2AM3weLY0tLsERBqCusKJ3RwFqqbThCtWDWRwaohzEcR9xlqubSm6gu7
-   sGKKCkHyKMlYhuXU+TzSXH7YhA0adxLdPnO89PrC7c4nrefguY9shxhDG
+  bh=T/nE2PLN0CkqTzjNu7omvvMU4nDr0lpxOaDVDfchUJ4=;
+  b=PivL9517X6vLt2ioRxCA3WMCQq6ZkuxOpoYuve1Hkkoq0hwxZKUVScbU
+   +lFZhFon4EldryJVEfKQO1pMLsxdq18VfeZcUvNxAFEKG9Q4kj/1NLYrY
+   GxUoW7cPteVpVtqiY0+EYK0oV4nS9WPZMuN+uBeLsGks+MVvgxp0Sl2FQ
+   6tisoUUpP4btNkksqZnCaBTMRri/DZ3SFty53vI27HQPa2OyUwnLKOkMW
+   G0hpoWhz171QU7tOpdXcF9geoRfLyRhytIL9WWXKLpT2KCO6KaxCdng9V
+   5zcKJsyhk8YRAYx56dYKllQqoKEdbrsw6Lf5HqvUWJAq4SV5ifuk80Xi0
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="383530941"
+X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="397037842"
 X-IronPort-AV: E=Sophos;i="6.04,235,1695711600"; 
-   d="scan'208";a="383530941"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 01:58:36 -0800
+   d="scan'208";a="397037842"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 02:12:31 -0800
 X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="886798488"
 X-IronPort-AV: E=Sophos;i="6.04,235,1695711600"; 
-   d="scan'208";a="10276578"
+   d="scan'208";a="886798488"
 Received: from hongyuni-mobl.ccr.corp.intel.com (HELO [10.238.2.21]) ([10.238.2.21])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 01:58:32 -0800
-Message-ID: <6d3e9993-4d5a-47fc-aef5-d6c14dee4621@linux.intel.com>
-Date: Wed, 29 Nov 2023 17:58:20 +0800
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 02:12:27 -0800
+Message-ID: <6f84bbad-62f9-43df-8134-a6836cc3b66c@linux.intel.com>
+Date: Wed, 29 Nov 2023 18:12:25 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -51,26 +52,28 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [GIT PULL] virtio: features
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: xuanzhuo@linux.alibaba.com, Linus Torvalds
- <torvalds@linux-foundation.org>, kvm@vger.kernel.org,
+Content-Language: en-US
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, xuanzhuo@linux.alibaba.com,
+ Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org,
  virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, eperezma@redhat.com, jasowang@redhat.com,
- shannon.nelson@amd.com, yuanyaogoog@chromium.org, yuehaibing@huawei.com,
+ linux-kernel@vger.kernel.org, eperezma@redhat.com, shannon.nelson@amd.com,
+ yuanyaogoog@chromium.org, yuehaibing@huawei.com,
  kirill.shutemov@linux.intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
  alexander.shishkin@linux.intel.com
 References: <20230903181338-mutt-send-email-mst@kernel.org>
  <647701d8-c99b-4ca8-9817-137eaefda237@linux.intel.com>
- <20231129044651-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
+ <CACGkMEvoGOO0jtq5T7arAjRoB_0_fHB2+hPJe1JsPqcAuvr98w@mail.gmail.com>
 From: "Ning, Hongyu" <hongyu.ning@linux.intel.com>
-In-Reply-To: <20231129044651-mutt-send-email-mst@kernel.org>
+In-Reply-To: <CACGkMEvoGOO0jtq5T7arAjRoB_0_fHB2+hPJe1JsPqcAuvr98w@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 
-On 2023/11/29 17:47, Michael S. Tsirkin wrote:
-> On Wed, Nov 29, 2023 at 05:03:50PM +0800, Ning, Hongyu wrote:
+On 2023/11/29 17:16, Jason Wang wrote:
+> On Wed, Nov 29, 2023 at 5:05 PM Ning, Hongyu
+> <hongyu.ning@linux.intel.com> wrote:
+>>
 >>
 >>
 >> On 2023/9/4 6:13, Michael S. Tsirkin wrote:
@@ -120,25 +123,36 @@ On 2023/11/29 17:47, Michael S. Tsirkin wrote:
 >>>         virtio_net: merge dma operations when filling mergeable buffers
 >>
 >> Hi,
->> above patch (upstream commit 295525e29a5b) seems causing a virtnet related
->> Call Trace after WARNING from kernel/dma/debug.c.
+>> above patch (upstream commit 295525e29a5b) seems causing a virtnet
+>> related Call Trace after WARNING from kernel/dma/debug.c.
 >>
 >> details (log and test setup) tracked in
 >> https://bugzilla.kernel.org/show_bug.cgi?id=218204
 >>
->> it's recently noticed in a TDX guest testing since v6.6.0 release cycle and
->> can still be reproduced in latest v6.7.0-rc3.
+>> it's recently noticed in a TDX guest testing since v6.6.0 release cycle
+>> and can still be reproduced in latest v6.7.0-rc3.
 >>
->> as local bisects results show, above WARNING and Call Trace is linked with
->> this patch, do you mind to take a look?
+>> as local bisects results show, above WARNING and Call Trace is linked
+>> with this patch, do you mind to take a look?
 > 
-> Does your testing tree include the fixup
-> 5720c43d5216b5dbd9ab25595f7c61e55d36d4fc ?
+> Looks like virtqueue_dma_sync_single_range_for_cpu() use
+> DMA_BIDIRECTIONAL unconditionally.
+> 
+> We should use dir here.
+> 
+> Mind to try?
+> 
+> Thanks
 > 
 
-yes, it's included:
-5720c43d5216 virtio_net: fix the missing of the dma cpu sync
+sure, but what I see in the code 
+virtqueue_dma_sync_single_range_for_cpu() is using DMA_FROM_DEVICE, 
+probably I misunderstood your point?
 
+Please let me know any patch/setting to try here.
+
+
+>>
 >>>
 >>> Yuan Yao (1):
 >>>         virtio_ring: fix avail_wrap_counter in virtqueue_add_packed
@@ -157,5 +171,6 @@ yes, it's included:
 >>>    include/uapi/linux/vhost_types.h   |   4 +
 >>>    9 files changed, 625 insertions(+), 90 deletions(-)
 >>>
+>>
 > 
 
