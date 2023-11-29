@@ -1,213 +1,230 @@
-Return-Path: <kvm+bounces-2736-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2737-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B0377FCFFF
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 08:36:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96FA47FD02E
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 08:56:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD98528270F
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 07:36:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B898E1C20A8C
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 07:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FDE610A3E;
-	Wed, 29 Nov 2023 07:36:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F364711C91;
+	Wed, 29 Nov 2023 07:55:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=jannau.net header.i=@jannau.net header.b="WS0m9G0n";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="rQPYt4rH"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2C50E1FFA
-	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 23:36:12 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5AC5E2F4;
-	Tue, 28 Nov 2023 23:36:59 -0800 (PST)
-Received: from [10.163.33.248] (unknown [10.163.33.248])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5BBF43F6C4;
-	Tue, 28 Nov 2023 23:36:08 -0800 (PST)
-Message-ID: <b9198f61-c3d1-462b-9cff-0342e26d9ba9@arm.com>
-Date: Wed, 29 Nov 2023 13:06:06 +0530
+X-Greylist: delayed 356 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 28 Nov 2023 23:55:47 PST
+Received: from new1-smtp.messagingengine.com (new1-smtp.messagingengine.com [66.111.4.221])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CEF91710;
+	Tue, 28 Nov 2023 23:55:47 -0800 (PST)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+	by mailnew.nyi.internal (Postfix) with ESMTP id 9064C580A2F;
+	Wed, 29 Nov 2023 02:49:50 -0500 (EST)
+Received: from imap53 ([10.202.2.103])
+  by compute1.internal (MEProxy); Wed, 29 Nov 2023 02:49:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jannau.net; h=cc
+	:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm3; t=1701244190; x=1701251390; bh=ww
+	kE8lsdD1lmCvJ6vHeRL3ETi3+Yj2miubjiEiAIJqc=; b=WS0m9G0nx6dD9iEji/
+	fBqlaAFY/rMIvdHqXU7tZxzaCT6/WaZqN24lhBSrCWbph5RWVn8OG0wIE3vLDiA7
+	dOWPtjwm4K1LXbVSgViqbhQnGAqsI7zVo/p5C5Cc2lkcP6BvkMMbJJPRLlk6Obqn
+	AHfiWue+I4lT9KO4M5IqOwcDkJ9k3rIoOQzzkgfdeVW+FPwIkWR8otEXHsC4vN5M
+	YRFUR7qjaXjm+/zVf+gwWpzm9l6TfNicjYV48mg69Jf51d7lmUwmWy0QDMagwX+h
+	my8WMJddQ84zOCl6wx49JlxbWBkrLfSX8dsYvVyefTTM6PDNHjgdqGvgdPI98pTh
+	CeVQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1701244190; x=1701251390; bh=wwkE8lsdD1lmC
+	vJ6vHeRL3ETi3+Yj2miubjiEiAIJqc=; b=rQPYt4rH1AA0LiTAAnJGE//YvqNCw
+	0qwLht7gsUZGiRgP8vOuUojrK3gXdkIqqQy8kh1RU6M48Z+Q1F0tnQhr+VVyl2w5
+	NmyzspDEFgY404mNlejNyplFYnmca/DQjbd3xvYN1Ln64vKHdITrMssLqBon8Ujn
+	P7Qb4qPDUzh92GrFKk6+AzOXk04amTS8z6iqjc442y/87PjOdgE3r4Ts0YSlpbOW
+	dquGLaB3VxWfcHpWrswAQY2/Rw9xn8Jq2WVIEzpZjj1/JtoUjjzbJm94BlKfxFeu
+	aDZFAe2s9qDxCwDO/RDxvPYqUWrMro5Rq5vNlH5XTTV2LcBscKUpE50kw==
+X-ME-Sender: <xms:HO1mZWwi-0PHwgZ7UGdDg2Nfu1cPQBmbtYZcjowlgAyQ0BQky2hXjA>
+    <xme:HO1mZSTMYD4qqQdTonZ8IGVDTRfv30PWEOnWS8uEzYlouq8tMUIbuyDbZitdKhK-h
+    lPnAf3-fMz25n81ToA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudeigedguddutdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefofgggkfgjfhffhffvufgtsehttdertderredtnecuhfhrohhmpedflfgr
+    nhhnvgcuifhruhhnrghufdcuoehjsehjrghnnhgruhdrnhgvtheqnecuggftrfgrthhtvg
+    hrnhepteeugeeltdelffetleetudejgfejieegudekleekleeifffffefgfefgfeeukeef
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhesjh
+    grnhhnrghurdhnvght
+X-ME-Proxy: <xmx:HO1mZYWbL-dzWpMIvCrcF_hkcPxVblMr6At8rrdkDOd5QKecybyP8A>
+    <xmx:HO1mZcghfi5RLWq0pFjhso2VXNF7V40Fof9Xj8XlOYXvC_owwh5wlQ>
+    <xmx:HO1mZYDWse66_RKIUSsZ-t0CzxR6dHcZEVv_0jTO_L-qPjoGwVzSYQ>
+    <xmx:Hu1mZerEKP658mX4LK_6tKFnkmAWe_WKTSc7PfS_s-S-h8Msb1Q_lw>
+Feedback-ID: i47b949f6:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 5DF0E3640069; Wed, 29 Nov 2023 02:49:48 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-1234-gac66594aae-fm-20231122.001-gac66594a
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/3] KVM: arm64: Remove VPIPT I-cache handling
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>
-References: <20231127172613.1490283-1-maz@kernel.org>
- <20231127172613.1490283-2-maz@kernel.org>
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20231127172613.1490283-2-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Message-Id: <ca7a025d-8154-4509-b8ab-2a17e53ccbef@app.fastmail.com>
+In-Reply-To: <20231128204938.1453583-5-pasha.tatashin@soleen.com>
+References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
+ <20231128204938.1453583-5-pasha.tatashin@soleen.com>
+Date: Wed, 29 Nov 2023 08:49:18 +0100
+From: "Janne Grunau" <j@jannau.net>
+To: "Pasha Tatashin" <pasha.tatashin@soleen.com>, akpm@linux-foundation.org,
+ alex.williamson@redhat.com, alim.akhtar@samsung.com,
+ "Alyssa Rosenzweig" <alyssa@rosenzweig.io>, asahi@lists.linux.dev,
+ "Lu Baolu" <baolu.lu@linux.intel.com>, bhelgaas@google.com,
+ cgroups@vger.kernel.org, corbet@lwn.net, david@redhat.com,
+ "David Woodhouse" <dwmw2@infradead.org>, hannes@cmpxchg.org,
+ heiko@sntech.de, iommu@lists.linux.dev, jasowang@redhat.com,
+ jernej.skrabec@gmail.com, jgg@ziepe.ca, jonathanh@nvidia.com,
+ "Joerg Roedel" <joro@8bytes.org>, "Kevin Tian" <kevin.tian@intel.com>,
+ krzysztof.kozlowski@linaro.org, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+ linux-mm@kvack.org, linux-rockchip@lists.infradead.org,
+ linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev,
+ linux-tegra@vger.kernel.org, lizefan.x@bytedance.com,
+ "Hector Martin" <marcan@marcan.st>, mhiramat@kernel.org, mst@redhat.com,
+ m.szyprowski@samsung.com, netdev@vger.kernel.org, paulmck@kernel.org,
+ rdunlap@infradead.org, "Robin Murphy" <robin.murphy@arm.com>,
+ samuel@sholland.org, suravee.suthikulpanit@amd.com,
+ "Sven Peter" <sven@svenpeter.dev>, thierry.reding@gmail.com,
+ tj@kernel.org, tomas.mudrunka@gmail.com, vdumpa@nvidia.com,
+ virtualization@lists.linux.dev, wens@csie.org,
+ "Will Deacon" <will@kernel.org>, yu-cheng.yu@intel.com
+Subject: Re: [PATCH 04/16] iommu/io-pgtable-dart: use page allocation function provided
+ by iommu-pages.h
+Content-Type: text/plain
 
+Hej,
 
-On 11/27/23 22:56, Marc Zyngier wrote:
-> We have some special handling for VPIPT I-cache in critical parts
-> of the cache and TLB maintenance. Remove it.
-
-Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
-
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On Tue, Nov 28, 2023, at 21:49, Pasha Tatashin wrote:
+> Convert iommu/io-pgtable-dart.c to use the new page allocation functions
+> provided in iommu-pages.h.
+>
+> Signed-off-by: Pasha Tatashin <pasha.tatashin@soleen.com>
 > ---
->  arch/arm64/include/asm/kvm_mmu.h |  7 ----
->  arch/arm64/kvm/hyp/nvhe/pkvm.c   |  2 +-
->  arch/arm64/kvm/hyp/nvhe/tlb.c    | 61 --------------------------------
->  arch/arm64/kvm/hyp/vhe/tlb.c     | 13 -------
->  4 files changed, 1 insertion(+), 82 deletions(-)
+>  drivers/iommu/io-pgtable-dart.c | 37 +++++++++++++--------------------
+>  1 file changed, 14 insertions(+), 23 deletions(-)
+>
+> diff --git a/drivers/iommu/io-pgtable-dart.c b/drivers/iommu/io-pgtable-dart.c
+> index 74b1ef2b96be..ad28031e1e93 100644
+> --- a/drivers/iommu/io-pgtable-dart.c
+> +++ b/drivers/iommu/io-pgtable-dart.c
+> @@ -23,6 +23,7 @@
+>  #include <linux/types.h>
 > 
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 49e0d4b36bd0..e3e793d0ec30 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -243,13 +243,6 @@ static inline size_t __invalidate_icache_max_range(void)
->  
->  static inline void __invalidate_icache_guest_page(void *va, size_t size)
+>  #include <asm/barrier.h>
+> +#include "iommu-pages.h"
+> 
+>  #define DART1_MAX_ADDR_BITS	36
+> 
+> @@ -106,18 +107,12 @@ static phys_addr_t iopte_to_paddr(dart_iopte pte,
+>  	return paddr;
+>  }
+> 
+> -static void *__dart_alloc_pages(size_t size, gfp_t gfp,
+> -				    struct io_pgtable_cfg *cfg)
+> +static void *__dart_alloc_pages(size_t size, gfp_t gfp)
 >  {
-> -	/*
-> -	 * VPIPT I-cache maintenance must be done from EL2. See comment in the
-> -	 * nVHE flavor of __kvm_tlb_flush_vmid_ipa().
-> -	 */
-> -	if (icache_is_vpipt() && read_sysreg(CurrentEL) != CurrentEL_EL2)
-> -		return;
+>  	int order = get_order(size);
+> -	struct page *p;
+> 
+>  	VM_BUG_ON((gfp & __GFP_HIGHMEM));
+> -	p = alloc_pages(gfp | __GFP_ZERO, order);
+> -	if (!p)
+> -		return NULL;
 > -
->  	/*
->  	 * Blow the whole I-cache if it is aliasing (i.e. VIPT) or the
->  	 * invalidation range exceeds our arbitrary limit on invadations by
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 9d23a51d7f75..b29f15418c0a 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -12,7 +12,7 @@
->  #include <nvhe/pkvm.h>
->  #include <nvhe/trap_handler.h>
->  
-> -/* Used by icache_is_vpipt(). */
-> +/* Used by icache_is_aliasing(). */
->  unsigned long __icache_flags;
->  
->  /* Used by kvm_get_vttbr(). */
-> diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> index 1b265713d6be..a60fb13e2192 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> @@ -105,28 +105,6 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
->  	dsb(ish);
->  	isb();
->  
-> -	/*
-> -	 * If the host is running at EL1 and we have a VPIPT I-cache,
-> -	 * then we must perform I-cache maintenance at EL2 in order for
-> -	 * it to have an effect on the guest. Since the guest cannot hit
-> -	 * I-cache lines allocated with a different VMID, we don't need
-> -	 * to worry about junk out of guest reset (we nuke the I-cache on
-> -	 * VMID rollover), but we do need to be careful when remapping
-> -	 * executable pages for the same guest. This can happen when KSM
-> -	 * takes a CoW fault on an executable page, copies the page into
-> -	 * a page that was previously mapped in the guest and then needs
-> -	 * to invalidate the guest view of the I-cache for that page
-> -	 * from EL1. To solve this, we invalidate the entire I-cache when
-> -	 * unmapping a page from a guest if we have a VPIPT I-cache but
-> -	 * the host is running at EL1. As above, we could do better if
-> -	 * we had the VA.
-> -	 *
-> -	 * The moral of this story is: if you have a VPIPT I-cache, then
-> -	 * you should be running with VHE enabled.
-> -	 */
-> -	if (icache_is_vpipt())
-> -		icache_inval_all_pou();
-> -
->  	__tlb_switch_to_host(&cxt);
+> -	return page_address(p);
+> +	return iommu_alloc_pages(gfp, order);
 >  }
->  
-> @@ -157,28 +135,6 @@ void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
->  	dsb(nsh);
->  	isb();
->  
-> -	/*
-> -	 * If the host is running at EL1 and we have a VPIPT I-cache,
-> -	 * then we must perform I-cache maintenance at EL2 in order for
-> -	 * it to have an effect on the guest. Since the guest cannot hit
-> -	 * I-cache lines allocated with a different VMID, we don't need
-> -	 * to worry about junk out of guest reset (we nuke the I-cache on
-> -	 * VMID rollover), but we do need to be careful when remapping
-> -	 * executable pages for the same guest. This can happen when KSM
-> -	 * takes a CoW fault on an executable page, copies the page into
-> -	 * a page that was previously mapped in the guest and then needs
-> -	 * to invalidate the guest view of the I-cache for that page
-> -	 * from EL1. To solve this, we invalidate the entire I-cache when
-> -	 * unmapping a page from a guest if we have a VPIPT I-cache but
-> -	 * the host is running at EL1. As above, we could do better if
-> -	 * we had the VA.
-> -	 *
-> -	 * The moral of this story is: if you have a VPIPT I-cache, then
-> -	 * you should be running with VHE enabled.
-> -	 */
-> -	if (icache_is_vpipt())
-> -		icache_inval_all_pou();
-> -
->  	__tlb_switch_to_host(&cxt);
+> 
+>  static int dart_init_pte(struct dart_io_pgtable *data,
+> @@ -262,13 +257,13 @@ static int dart_map_pages(struct io_pgtable_ops 
+> *ops, unsigned long iova,
+> 
+>  	/* no L2 table present */
+>  	if (!pte) {
+> -		cptep = __dart_alloc_pages(tblsz, gfp, cfg);
+> +		cptep = __dart_alloc_pages(tblsz, gfp);
+>  		if (!cptep)
+>  			return -ENOMEM;
+> 
+>  		pte = dart_install_table(cptep, ptep, 0, data);
+>  		if (pte)
+> -			free_pages((unsigned long)cptep, get_order(tblsz));
+> +			iommu_free_pages(cptep, get_order(tblsz));
+> 
+>  		/* L2 table is present (now) */
+>  		pte = READ_ONCE(*ptep);
+> @@ -419,8 +414,7 @@ apple_dart_alloc_pgtable(struct io_pgtable_cfg 
+> *cfg, void *cookie)
+>  	cfg->apple_dart_cfg.n_ttbrs = 1 << data->tbl_bits;
+> 
+>  	for (i = 0; i < cfg->apple_dart_cfg.n_ttbrs; ++i) {
+> -		data->pgd[i] = __dart_alloc_pages(DART_GRANULE(data), GFP_KERNEL,
+> -					   cfg);
+> +		data->pgd[i] = __dart_alloc_pages(DART_GRANULE(data), GFP_KERNEL);
+>  		if (!data->pgd[i])
+>  			goto out_free_data;
+>  		cfg->apple_dart_cfg.ttbr[i] = virt_to_phys(data->pgd[i]);
+> @@ -429,9 +423,10 @@ apple_dart_alloc_pgtable(struct io_pgtable_cfg 
+> *cfg, void *cookie)
+>  	return &data->iop;
+> 
+>  out_free_data:
+> -	while (--i >= 0)
+> -		free_pages((unsigned long)data->pgd[i],
+> -			   get_order(DART_GRANULE(data)));
+> +	while (--i >= 0) {
+> +		iommu_free_pages(data->pgd[i],
+> +				 get_order(DART_GRANULE(data)));
+> +	}
+>  	kfree(data);
+>  	return NULL;
 >  }
->  
-> @@ -205,10 +161,6 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
->  	dsb(ish);
->  	isb();
->  
-> -	/* See the comment in __kvm_tlb_flush_vmid_ipa() */
-> -	if (icache_is_vpipt())
-> -		icache_inval_all_pou();
-> -
->  	__tlb_switch_to_host(&cxt);
->  }
->  
-> @@ -246,18 +198,5 @@ void __kvm_flush_vm_context(void)
->  	/* Same remark as in __tlb_switch_to_guest() */
->  	dsb(ish);
->  	__tlbi(alle1is);
-> -
-> -	/*
-> -	 * VIPT and PIPT caches are not affected by VMID, so no maintenance
-> -	 * is necessary across a VMID rollover.
-> -	 *
-> -	 * VPIPT caches constrain lookup and maintenance to the active VMID,
-> -	 * so we need to invalidate lines with a stale VMID to avoid an ABA
-> -	 * race after multiple rollovers.
-> -	 *
-> -	 */
-> -	if (icache_is_vpipt())
-> -		asm volatile("ic ialluis");
-> -
->  	dsb(ish);
->  }
-> diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-> index b636b4111dbf..b32e2940df7d 100644
-> --- a/arch/arm64/kvm/hyp/vhe/tlb.c
-> +++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-> @@ -216,18 +216,5 @@ void __kvm_flush_vm_context(void)
+> @@ -439,6 +434,7 @@ apple_dart_alloc_pgtable(struct io_pgtable_cfg 
+> *cfg, void *cookie)
+>  static void apple_dart_free_pgtable(struct io_pgtable *iop)
 >  {
->  	dsb(ishst);
->  	__tlbi(alle1is);
+>  	struct dart_io_pgtable *data = io_pgtable_to_data(iop);
+> +	int order = get_order(DART_GRANULE(data));
+>  	dart_iopte *ptep, *end;
+>  	int i;
+> 
+> @@ -449,15 +445,10 @@ static void apple_dart_free_pgtable(struct 
+> io_pgtable *iop)
+>  		while (ptep != end) {
+>  			dart_iopte pte = *ptep++;
+> 
+> -			if (pte) {
+> -				unsigned long page =
+> -					(unsigned long)iopte_deref(pte, data);
 > -
-> -	/*
-> -	 * VIPT and PIPT caches are not affected by VMID, so no maintenance
-> -	 * is necessary across a VMID rollover.
-> -	 *
-> -	 * VPIPT caches constrain lookup and maintenance to the active VMID,
-> -	 * so we need to invalidate lines with a stale VMID to avoid an ABA
-> -	 * race after multiple rollovers.
-> -	 *
-> -	 */
-> -	if (icache_is_vpipt())
-> -		asm volatile("ic ialluis");
-> -
->  	dsb(ish);
->  }
+> -				free_pages(page, get_order(DART_GRANULE(data)));
+> -			}
+> +			if (pte)
+> +				iommu_free_pages(iopte_deref(pte, data), order);
+>  		}
+> -		free_pages((unsigned long)data->pgd[i],
+> -			   get_order(DART_GRANULE(data)));
+> +		iommu_free_pages(data->pgd[i], order);
+>  	}
+> 
+>  	kfree(data);
+
+Reviewed-by: Janne Grunau <j@jannau.net>
+
+Janne
 
