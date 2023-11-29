@@ -1,181 +1,211 @@
-Return-Path: <kvm+bounces-2738-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2739-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1D247FD04E
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 09:04:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E72127FD194
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 10:02:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D480B2168C
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 08:04:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20818283245
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 09:02:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5336611C91;
-	Wed, 29 Nov 2023 08:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9C212B9F;
+	Wed, 29 Nov 2023 09:01:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ClaKvL5N"
 X-Original-To: kvm@vger.kernel.org
-X-Greylist: delayed 282 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 29 Nov 2023 00:04:18 PST
-Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.233.22])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E93710F0;
-	Wed, 29 Nov 2023 00:04:17 -0800 (PST)
-X-QQ-mid: bizesmtp64t1701244736ta8gixpe
-Received: from HX01040049.powercore.com.cn ( [125.94.202.196])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 29 Nov 2023 15:58:49 +0800 (CST)
-X-QQ-SSF: 01400000000000708000000A0000000
-X-QQ-FEAT: gBprNiU+WNeRCxd1mFC0ek6Tr9pLWM0mTZ8midTMAGSwDIo4FTOPE7P8jVK5u
-	+jS+f0RV5CzN/+0yORbfyySXnusFmiK22mABedLLcYzyGgYY1frZEeKnDSQl8zoRdx90QJy
-	G/zOe6wfeheY/JSBeS+SmYGCxZbkSJiYeEiOkibXu9AaKfnYNSd1J1SqscQdVLaFoTCA9zN
-	9atgjRdl4GsXTkWfml6gExxq80YpEp/8gdZoGjwNktkdkCZumWt9uN3nEUQR7BV4w2x6Jh/
-	mf0OcdUJoF4M7awpTHrY26mXg61djVAzY/+1VZVZq0WhonU6SAilF4v3uT/9rDfTcR/FFNy
-	HF+Gvi4Z452yTWE5KoCxtLfp6j8ZTNwd9Qc0tkxi3r0bu7Gwd66E2IHEsFZsHIUX9Dd6g+2
-	Xiks/CqNkxmvGl6iz5vOGnr6Rlpn7cwC
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 3565711899021422489
-From: Zhao Ke <ke.zhao@shingroup.cn>
-To: mpe@ellerman.id.au,
-	npiggin@gmail.com,
-	christophe.leroy@csgroup.eu,
-	fbarrat@linux.ibm.com,
-	ajd@linux.ibm.com,
-	arnd@arndb.de,
-	gregkh@linuxfoundation.org
-Cc: linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	shenghui.qu@shingroup.cn,
-	luming.yu@shingroup.cn,
-	dawei.li@shingroup.cn,
-	Zhao Ke <ke.zhao@shingroup.cn>
-Subject: [PATCH v2] powerpc: Add PVN support for HeXin C2000 processor
-Date: Wed, 29 Nov 2023 15:58:45 +0800
-Message-Id: <20231129075845.57976-1-ke.zhao@shingroup.cn>
-X-Mailer: git-send-email 2.34.1
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A608D50
+	for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 01:01:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701248513;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zwc9ieluISalwFh3TyYZ4gcQacsA94sf6qSa2kEUESI=;
+	b=ClaKvL5NKcIJgeEC7015ezw7q4HePsEijIejXfOJ97W+Qr5y0WcnRTI6zSU1e8sQylIk2l
+	aeMsuE8eGzIDEtCv3kmpfFRgtnllXzzYqp31Lap885DRhTBoYq2M/DfuJeYBDuOkkouoNF
+	bUTTdCPdLSQoRHunR/znG1K8ccUIBhU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-626-wwWKikj9MHmvX6LrnnFAhg-1; Wed, 29 Nov 2023 04:01:51 -0500
+X-MC-Unique: wwWKikj9MHmvX6LrnnFAhg-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-332f3c6614bso3047511f8f.0
+        for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 01:01:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701248510; x=1701853310;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zwc9ieluISalwFh3TyYZ4gcQacsA94sf6qSa2kEUESI=;
+        b=QYWF4XYt+EgXn1EU5F6sPBUeKroT/Izb/ZP9Fh3OQ0vduhKxkU2Jej2S2ivBCcCEuy
+         nPh1FvupC45dewGKujT59M/mXNTrXLC8E3NQBPw7O1skF8MsW2/f3N1HebgOWA//+Xve
+         8BidDYp9WaGcobJ7b1gxEPl673saNQ+yuuWcMW7xUz3wtg60MoouBkmASV6dgqoVitDB
+         Xzr+LulmYm6dljDHKlIfQLdvyoYhOH6dzkv7V6FqM9W1U8xpEr4dFf3GzdQGOnXBt0EW
+         IYf10XCTzrIWTBc0bigPq4ySdlAlF7Ni1xg0ojj43e7gFq/Cbd739+ic4Zd3NpYc6QAm
+         Akxg==
+X-Gm-Message-State: AOJu0Yzwa1SWKk3nSV8bB4AvXqwpaGoQWiKZauM7k2eccIZRFvJM5Rcd
+	XmbLLW/LQ3QsJEwHODo3eWNLvHPrlRdFWVgplA/7IbkqU5F8EaJmS91+CFlBEciMdl+K0CrL380
+	zsGQNps8W9uq+
+X-Received: by 2002:adf:b1d5:0:b0:332:c441:70aa with SMTP id r21-20020adfb1d5000000b00332c44170aamr13788939wra.26.1701248510390;
+        Wed, 29 Nov 2023 01:01:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFP2F6dczPE089a3r9AZSuxONM+6MsCslUykG0rwB+wpDrF0PpgPS4SUfoLewfpzCdrG2iGkA==
+X-Received: by 2002:adf:b1d5:0:b0:332:c441:70aa with SMTP id r21-20020adfb1d5000000b00332c44170aamr13788889wra.26.1701248509534;
+        Wed, 29 Nov 2023 01:01:49 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-199.retail.telecomitalia.it. [79.46.200.199])
+        by smtp.gmail.com with ESMTPSA id c14-20020a056000104e00b00332f95ab44esm10548348wrx.57.2023.11.29.01.01.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Nov 2023 01:01:48 -0800 (PST)
+Date: Wed, 29 Nov 2023 10:01:43 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v3 2/3] virtio/vsock: send credit update during
+ setting SO_RCVLOWAT
+Message-ID: <etuukjyedcdvkdxsql5qquvla6tuaaayph7vj2jdskqjwmkmoy@h2hkgjfyawyi>
+References: <20231122180510.2297075-1-avkrasnov@salutedevices.com>
+ <20231122180510.2297075-3-avkrasnov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:shingroup.cn:qybglogicsvrsz:qybglogicsvrsz3a-0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20231122180510.2297075-3-avkrasnov@salutedevices.com>
 
-HeXin Tech Co. has applied for a new PVN from the OpenPower Community
-for its new processor C2000. The OpenPower has assigned a new PVN
-and this newly assigned PVN is 0x0066, add pvr register related
-support for this PVN.
+On Wed, Nov 22, 2023 at 09:05:09PM +0300, Arseniy Krasnov wrote:
+>Send credit update message when SO_RCVLOWAT is updated and it is bigger
+>than number of bytes in rx queue. It is needed, because 'poll()' will
+>wait until number of bytes in rx queue will be not smaller than
+>SO_RCVLOWAT, so kick sender to send more data. Otherwise mutual hungup
+>for tx/rx is possible: sender waits for free space and receiver is
+>waiting data in 'poll()'.
+>
+>Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>---
+> Changelog:
+> v1 -> v2:
+>  * Update commit message by removing 'This patch adds XXX' manner.
+>  * Do not initialize 'send_update' variable - set it directly during
+>    first usage.
+>
+> drivers/vhost/vsock.c                   |  2 ++
+> include/linux/virtio_vsock.h            |  1 +
+> net/vmw_vsock/virtio_transport.c        |  2 ++
+> net/vmw_vsock/virtio_transport_common.c | 28 +++++++++++++++++++++++++
+> net/vmw_vsock/vsock_loopback.c          |  2 ++
+> 5 files changed, 35 insertions(+)
+>
+>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>index f75731396b7e..ecfa5c11f5ee 100644
+>--- a/drivers/vhost/vsock.c
+>+++ b/drivers/vhost/vsock.c
+>@@ -451,6 +451,8 @@ static struct virtio_transport vhost_transport = {
+> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+>
+> 		.read_skb = virtio_transport_read_skb,
+>+
+>+		.set_rcvlowat             = virtio_transport_set_rcvlowat
 
-Signed-off-by: Zhao Ke <ke.zhao@shingroup.cn>
-Link: https://discuss.openpower.foundation/t/how-to-get-a-new-pvr-for-processors-follow-power-isa/477/10
----
-	v1 -> v2:
-	- Fix pvr_mask and cpu_name
-	- Fix alignment pattern to match other lines
-	v0 -> v1:
-	- Fix .cpu_name with the correct description
----
----
- arch/powerpc/include/asm/reg.h            |  1 +
- arch/powerpc/kernel/cpu_specs_book3s_64.h | 15 +++++++++++++++
- arch/powerpc/kvm/book3s_pr.c              |  1 +
- arch/powerpc/mm/book3s64/pkeys.c          |  3 ++-
- arch/powerpc/platforms/powernv/subcore.c  |  3 ++-
- drivers/misc/cxl/cxl.h                    |  3 ++-
- 6 files changed, 23 insertions(+), 3 deletions(-)
+Since now we don't set it anymore in the callback, what about following
+the notify_* callbacks and rename it in `notify_set_rcvlowat`?
 
-diff --git a/arch/powerpc/include/asm/reg.h b/arch/powerpc/include/asm/reg.h
-index 4ae4ab9090a2..7fd09f25452d 100644
---- a/arch/powerpc/include/asm/reg.h
-+++ b/arch/powerpc/include/asm/reg.h
-@@ -1361,6 +1361,7 @@
- #define PVR_POWER8E	0x004B
- #define PVR_POWER8NVL	0x004C
- #define PVR_POWER8	0x004D
-+#define PVR_HX_C2000	0x0066
- #define PVR_POWER9	0x004E
- #define PVR_POWER10	0x0080
- #define PVR_BE		0x0070
-diff --git a/arch/powerpc/kernel/cpu_specs_book3s_64.h b/arch/powerpc/kernel/cpu_specs_book3s_64.h
-index c370c1b804a9..3ff9757df4c0 100644
---- a/arch/powerpc/kernel/cpu_specs_book3s_64.h
-+++ b/arch/powerpc/kernel/cpu_specs_book3s_64.h
-@@ -238,6 +238,21 @@ static struct cpu_spec cpu_specs[] __initdata = {
- 		.machine_check_early	= __machine_check_early_realmode_p8,
- 		.platform		= "power8",
- 	},
-+	{	/* 2.07-compliant processor, HeXin C2000 processor */
-+		.pvr_mask		= 0xffff0000,
-+		.pvr_value		= 0x00660000,
-+		.cpu_name		= "HX-C2000",
-+		.cpu_features		= CPU_FTRS_POWER8,
-+		.cpu_user_features	= COMMON_USER_POWER8,
-+		.cpu_user_features2	= COMMON_USER2_POWER8,
-+		.mmu_features		= MMU_FTRS_POWER8,
-+		.icache_bsize		= 128,
-+		.dcache_bsize		= 128,
-+		.cpu_setup		= __setup_cpu_power8,
-+		.cpu_restore		= __restore_cpu_power8,
-+		.machine_check_early	= __machine_check_early_realmode_p8,
-+		.platform		= "power8",
-+	},
- 	{	/* 3.00-compliant processor, i.e. Power9 "architected" mode */
- 		.pvr_mask		= 0xffffffff,
- 		.pvr_value		= 0x0f000005,
-diff --git a/arch/powerpc/kvm/book3s_pr.c b/arch/powerpc/kvm/book3s_pr.c
-index 9118242063fb..5b92619a05fd 100644
---- a/arch/powerpc/kvm/book3s_pr.c
-+++ b/arch/powerpc/kvm/book3s_pr.c
-@@ -604,6 +604,7 @@ static void kvmppc_set_pvr_pr(struct kvm_vcpu *vcpu, u32 pvr)
- 	case PVR_POWER8:
- 	case PVR_POWER8E:
- 	case PVR_POWER8NVL:
-+	case PVR_HX_C2000:
- 	case PVR_POWER9:
- 		vcpu->arch.hflags |= BOOK3S_HFLAG_MULTI_PGSIZE |
- 			BOOK3S_HFLAG_NEW_TLBIE;
-diff --git a/arch/powerpc/mm/book3s64/pkeys.c b/arch/powerpc/mm/book3s64/pkeys.c
-index 125733962033..a974baf8f327 100644
---- a/arch/powerpc/mm/book3s64/pkeys.c
-+++ b/arch/powerpc/mm/book3s64/pkeys.c
-@@ -89,7 +89,8 @@ static int __init scan_pkey_feature(void)
- 			unsigned long pvr = mfspr(SPRN_PVR);
- 
- 			if (PVR_VER(pvr) == PVR_POWER8 || PVR_VER(pvr) == PVR_POWER8E ||
--			    PVR_VER(pvr) == PVR_POWER8NVL || PVR_VER(pvr) == PVR_POWER9)
-+			    PVR_VER(pvr) == PVR_POWER8NVL || PVR_VER(pvr) == PVR_POWER9 ||
-+			    PVR_VER(pvr) == PVR_HX_C2000)
- 				pkeys_total = 32;
- 		}
- 	}
-diff --git a/arch/powerpc/platforms/powernv/subcore.c b/arch/powerpc/platforms/powernv/subcore.c
-index 191424468f10..393e747541fb 100644
---- a/arch/powerpc/platforms/powernv/subcore.c
-+++ b/arch/powerpc/platforms/powernv/subcore.c
-@@ -425,7 +425,8 @@ static int subcore_init(void)
- 
- 	if (pvr_ver != PVR_POWER8 &&
- 	    pvr_ver != PVR_POWER8E &&
--	    pvr_ver != PVR_POWER8NVL)
-+	    pvr_ver != PVR_POWER8NVL &&
-+	    pvr_ver != PVR_HX_C2000)
- 		return 0;
- 
- 	/*
-diff --git a/drivers/misc/cxl/cxl.h b/drivers/misc/cxl/cxl.h
-index 0562071cdd4a..6ad0ab892675 100644
---- a/drivers/misc/cxl/cxl.h
-+++ b/drivers/misc/cxl/cxl.h
-@@ -836,7 +836,8 @@ static inline bool cxl_is_power8(void)
- {
- 	if ((pvr_version_is(PVR_POWER8E)) ||
- 	    (pvr_version_is(PVR_POWER8NVL)) ||
--	    (pvr_version_is(PVR_POWER8)))
-+	    (pvr_version_is(PVR_POWER8)) ||
-+	    (pvr_version_is(PVR_HX_C2000)))
- 		return true;
- 	return false;
- }
--- 
-2.34.1
+Eventually I think we can rename it in the previous patch.
+
+> 	},
+>
+> 	.send_pkt = vhost_transport_send_pkt,
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index ebb3ce63d64d..97dc1bebc69c 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -256,4 +256,5 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
+> void virtio_transport_deliver_tap_pkt(struct sk_buff *skb);
+> int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *list);
+> int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t read_actor);
+>+int virtio_transport_set_rcvlowat(struct vsock_sock *vsk, int val);
+> #endif /* _LINUX_VIRTIO_VSOCK_H */
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index af5bab1acee1..cf3431189d0c 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -539,6 +539,8 @@ static struct virtio_transport virtio_transport = {
+> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+>
+> 		.read_skb = virtio_transport_read_skb,
+>+
+>+		.set_rcvlowat             = virtio_transport_set_rcvlowat
+> 	},
+>
+> 	.send_pkt = virtio_transport_send_pkt,
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index f6dc896bf44c..4acee21b4350 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -1684,6 +1684,34 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
+> }
+> EXPORT_SYMBOL_GPL(virtio_transport_read_skb);
+>
+>+int virtio_transport_set_rcvlowat(struct vsock_sock *vsk, int val)
+>+{
+>+	struct virtio_vsock_sock *vvs = vsk->trans;
+>+	bool send_update;
+>+
+>+	spin_lock_bh(&vvs->rx_lock);
+>+
+>+	/* If number of available bytes is less than new
+>+	 * SO_RCVLOWAT value, kick sender to send more
+>+	 * data, because sender may sleep in its 'send()'
+>+	 * syscall waiting for enough space at our side.
+>+	 */
+
+Let's try to use at least the full 80 characters so we can reduce the
+lines in this comment block.
+
+>+	send_update = vvs->rx_bytes < val;
+>+
+>+	spin_unlock_bh(&vvs->rx_lock);
+>+
+>+	if (send_update) {
+>+		int err;
+>+
+>+		err = virtio_transport_send_credit_update(vsk);
+>+		if (err < 0)
+>+			return err;
+>+	}
+>+
+>+	return 0;
+>+}
+>+EXPORT_SYMBOL_GPL(virtio_transport_set_rcvlowat);
+>+
+> MODULE_LICENSE("GPL v2");
+> MODULE_AUTHOR("Asias He");
+> MODULE_DESCRIPTION("common code for virtio vsock");
+>diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+>index 048640167411..388c157f6633 100644
+>--- a/net/vmw_vsock/vsock_loopback.c
+>+++ b/net/vmw_vsock/vsock_loopback.c
+>@@ -98,6 +98,8 @@ static struct virtio_transport loopback_transport = {
+> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+>
+> 		.read_skb = virtio_transport_read_skb,
+>+
+>+		.set_rcvlowat             = virtio_transport_set_rcvlowat
+> 	},
+>
+> 	.send_pkt = vsock_loopback_send_pkt,
+>-- 
+>2.25.1
+>
+
 
