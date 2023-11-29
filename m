@@ -1,178 +1,170 @@
-Return-Path: <kvm+bounces-2784-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2785-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED4497FDE08
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 18:12:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 687D67FDE17
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 18:13:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 182E01C20D6E
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 17:12:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3C0EB211D5
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 17:13:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AAEF46B99;
-	Wed, 29 Nov 2023 17:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF6E446BBC;
+	Wed, 29 Nov 2023 17:13:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TTJrz2/B"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="l0EVZnTS"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3EB3B2BB;
-	Wed, 29 Nov 2023 17:12:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4FE7C433C9;
-	Wed, 29 Nov 2023 17:12:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701277949;
-	bh=cvu+1+jIJZ1kJKi0LvpvP5t3dupRwijJyikjtLVPy2E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TTJrz2/BtIJSe8hRoEUBtL308u/wXHime/r5OkYzx++/eRMGIerSmBtYd6+fik4rJ
-	 YYFVMmhLWoIYGpF4uzQYVT8e+zqf3qqoDYbnWT8kWS5ZgdES8EEa//bFIJYC5N6IOG
-	 v6pSWYMQWRR5qQyx2GGRa8zK9O0xwYrZhsZbJNWz/l/40wkzWK0EfrUiGGGUMacm2u
-	 G++eb0AoIvZ+OTh2ah4JXNmTLAaqND/djnVFeSKNA5Otq6MfynF1aGT8BDQORkEO2T
-	 cn7RcJnUDaJNLEHveS5BfGw+sCuB5I146NwneUzLfUNGt8V38sMiF+2FlJM6DsN+3A
-	 Tl6sGUGLIwiVA==
-Date: Wed, 29 Nov 2023 17:12:22 +0000
-From: Simon Horman <horms@kernel.org>
-To: Yahui Cao <yahui.cao@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, kvm@vger.kernel.org,
-	netdev@vger.kernel.org, lingyu.liu@intel.com, kevin.tian@intel.com,
-	madhu.chittim@intel.com, sridhar.samudrala@intel.com,
-	alex.williamson@redhat.com, jgg@nvidia.com, yishaih@nvidia.com,
-	shameerali.kolothum.thodi@huawei.com, brett.creeley@amd.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH iwl-next v4 05/12] ice: Log virtual channel messages in PF
-Message-ID: <20231129171222.GF43811@kernel.org>
-References: <20231121025111.257597-1-yahui.cao@intel.com>
- <20231121025111.257597-6-yahui.cao@intel.com>
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEB8CBC;
+	Wed, 29 Nov 2023 09:13:08 -0800 (PST)
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ATH70Ur005040;
+	Wed, 29 Nov 2023 17:13:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=azPyXhZAO1/LTSGf53Txxbl0DE8jhzL3YiN2cyuqFac=;
+ b=l0EVZnTSphWZ1qGZL+Sqz4tnQM9yZR09wdUK+E/dG2wKs9vTkJooo71/xSntJIGEswgw
+ xkD04Q1WWcWns82lyQ6G0XHQVkmqf2QyVJ8mrk/nAUu1uufgXFrXpC3Evnz6LVHquNVt
+ Ajlbd+JzBPw5rFF6L1ypJdHRG2vbeydfcI1O5ryMvfa47Vkl0fJIFNDYg9ZzK7XWqLiY
+ zCd4jqnpRd4GZ9NO1dPSHQe2f0EMRIlRp1JDhLC4daFIew7PpMZpYpddahkvHgd+32H4
+ zfawTDpKw666S9YilKWp9jqVI3j2NrSNiPKNqVCoRDrY5nLBwCXYwIkedVP188nL532p xg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3up9ds07hj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Nov 2023 17:13:04 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3ATH75Ha005199;
+	Wed, 29 Nov 2023 17:12:50 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3up9ds06hv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Nov 2023 17:12:50 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3ATGnLc7011187;
+	Wed, 29 Nov 2023 17:12:38 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ukwy2041w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Nov 2023 17:12:38 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3ATHCZdT12845702
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 29 Nov 2023 17:12:35 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1673020043;
+	Wed, 29 Nov 2023 17:12:35 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8178420040;
+	Wed, 29 Nov 2023 17:12:34 +0000 (GMT)
+Received: from [9.179.21.219] (unknown [9.179.21.219])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 29 Nov 2023 17:12:34 +0000 (GMT)
+Message-ID: <b43414ef-7aa4-9e5c-a706-41861f0d346c@linux.ibm.com>
+Date: Wed, 29 Nov 2023 18:12:34 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231121025111.257597-6-yahui.cao@intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] s390/vfio-ap: handle response code 01 on queue reset
+Content-Language: en-US
+To: Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc: jjherne@linux.ibm.com, pasic@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
+        david@redhat.com
+References: <20231129143529.260264-1-akrowiak@linux.ibm.com>
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20231129143529.260264-1-akrowiak@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: c0zicIJzmU0dgoEO2gJEoy8knN0XQPTy
+X-Proofpoint-GUID: MlZMYa1VOAevDuZn0VXzPwp02-1s7FQk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-29_15,2023-11-29_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 mlxscore=0
+ malwarescore=0 impostorscore=0 spamscore=0 mlxlogscore=999 suspectscore=0
+ priorityscore=1501 lowpriorityscore=0 bulkscore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311290131
 
-On Tue, Nov 21, 2023 at 02:51:04AM +0000, Yahui Cao wrote:
-> From: Lingyu Liu <lingyu.liu@intel.com>
+Am 29.11.23 um 15:35 schrieb Tony Krowiak:
+> In the current implementation, response code 01 (AP queue number not valid)
+> is handled as a default case along with other response codes returned from
+> a queue reset operation that are not handled specifically. Barring a bug,
+> response code 01 will occur only when a queue has been externally removed
+> from the host's AP configuration; nn this case, the queue must
+> be reset by the machine in order to avoid leaking crypto data if/when the
+> queue is returned to the host's configuration. The response code 01 case
+> will be handled specifically by logging a WARN message followed by cleaning
+> up the IRQ resources.
 > 
-> Save the virtual channel messages sent by VF on the source side during
-> runtime. The logged virtchnl messages will be transferred and loaded
-> into the device on the destination side during the device resume stage.
+
+To me it looks like this can be triggered by the LPAR admin, correct? So it
+is not desireable but possible.
+In that case I prefer to not use WARN, maybe use dev_warn or dev_err instead.
+WARN can be a disruptive event if panic_on_warn is set.
+
+
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>   drivers/s390/crypto/vfio_ap_ops.c | 31 +++++++++++++++++++++++++++++++
+>   1 file changed, 31 insertions(+)
 > 
-> For the feature which can not be migrated yet, it must be disabled or
-> blocked to prevent from being abused by VF. Otherwise, it may introduce
-> functional and security issue. Mask unsupported VF capability flags in
-> the VF-PF negotiaion stage.
-> 
-> Signed-off-by: Lingyu Liu <lingyu.liu@intel.com>
-> Signed-off-by: Yahui Cao <yahui.cao@intel.com>
-
-Hi Lingyu Liu and Yahui Cao,
-
-some minor feedback from my side.
-
-...
-
-> diff --git a/drivers/net/ethernet/intel/ice/ice_migration.c b/drivers/net/ethernet/intel/ice/ice_migration.c
-
-...
-
-> +/**
-> + * ice_migration_log_vf_msg - Log request message from VF
-> + * @vf: pointer to the VF structure
-> + * @event: pointer to the AQ event
-> + *
-> + * Log VF message for later device state loading during live migration
-> + *
-> + * Return 0 for success, negative for error
-> + */
-> +int ice_migration_log_vf_msg(struct ice_vf *vf,
-> +			     struct ice_rq_event_info *event)
-> +{
-> +	struct ice_migration_virtchnl_msg_listnode *msg_listnode;
-> +	u32 v_opcode = le32_to_cpu(event->desc.cookie_high);
-> +	struct device *dev = ice_pf_to_dev(vf->pf);
-> +	u16 msglen = event->msg_len;
-> +	u8 *msg = event->msg_buf;
-> +
-> +	if (!ice_migration_is_loggable_msg(v_opcode))
-> +		return 0;
-> +
-> +	if (vf->virtchnl_msg_num >= VIRTCHNL_MSG_MAX) {
-> +		dev_warn(dev, "VF %d has maximum number virtual channel commands\n",
-> +			 vf->vf_id);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	msg_listnode = (struct ice_migration_virtchnl_msg_listnode *)
-> +			kzalloc(struct_size(msg_listnode,
-> +					    msg_slot.msg_buffer,
-> +					    msglen),
-> +				GFP_KERNEL);
-
-nit: there is no need to cast the void * pointer returned by kzalloc().
-
-Flagged by Coccinelle.
-
-> +	if (!msg_listnode) {
-> +		dev_err(dev, "VF %d failed to allocate memory for msg listnode\n",
-> +			vf->vf_id);
-> +		return -ENOMEM;
-> +	}
-> +	dev_dbg(dev, "VF %d save virtual channel command, op code: %d, len: %d\n",
-> +		vf->vf_id, v_opcode, msglen);
-> +	msg_listnode->msg_slot.opcode = v_opcode;
-> +	msg_listnode->msg_slot.msg_len = msglen;
-> +	memcpy(msg_listnode->msg_slot.msg_buffer, msg, msglen);
-> +	list_add_tail(&msg_listnode->node, &vf->virtchnl_msg_list);
-> +	vf->virtchnl_msg_num++;
-> +	vf->virtchnl_msg_size += struct_size(&msg_listnode->msg_slot,
-> +					     msg_buffer,
-> +					     msglen);
-> +	return 0;
-> +}
-> +
-> +/**
-> + * ice_migration_unlog_vf_msg - revert logged message
-> + * @vf: pointer to the VF structure
-> + * @v_opcode: virtchnl message operation code
-> + *
-> + * Remove the last virtual channel message logged before.
-> + */
-> +void ice_migration_unlog_vf_msg(struct ice_vf *vf, u32 v_opcode)
-> +{
-> +	struct ice_migration_virtchnl_msg_listnode *msg_listnode;
-> +
-> +	if (!ice_migration_is_loggable_msg(v_opcode))
-> +		return;
-> +
-> +	if (WARN_ON_ONCE(list_empty(&vf->virtchnl_msg_list)))
-> +		return;
-> +
-> +	msg_listnode =
-> +		list_last_entry(&vf->virtchnl_msg_list,
-> +				struct ice_migration_virtchnl_msg_listnode,
-> +				node);
-> +	if (WARN_ON_ONCE(msg_listnode->msg_slot.opcode != v_opcode))
-> +		return;
-> +
-> +	list_del(&msg_listnode->node);
-> +	kfree(msg_listnode);
-
-msg_listnode is freed on the line above,
-but dereferenced in the usage of struct_size() below.
-
-As flagged by Smatch and Coccinelle.
-
-> +	vf->virtchnl_msg_num--;
-> +	vf->virtchnl_msg_size -= struct_size(&msg_listnode->msg_slot,
-> +					     msg_buffer,
-> +					     msg_listnode->msg_slot.msg_len);
-> +}
-
-...
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 4db538a55192..91d6334574d8 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -1652,6 +1652,21 @@ static int apq_status_check(int apqn, struct ap_queue_status *status)
+>   		 * a value indicating a reset needs to be performed again.
+>   		 */
+>   		return -EAGAIN;
+> +	case AP_RESPONSE_Q_NOT_AVAIL:
+> +		/*
+> +		 * This response code indicates the queue is not available.
+> +		 * Barring a bug, response code 01 will occur only when a queue
+> +		 * has been externally removed from the host's AP configuration;
+> +		 * in which case, the queue must be reset by the machine in
+> +		 * order to avoid leaking crypto data if/when the queue is
+> +		 * returned to the host's configuration. In this case, let's go
+> +		 * ahead and log a warning message and return 0 so the AQIC
+> +		 * resources get cleaned up by the caller.
+> +		 */
+> +		WARN(true,
+> +		     "Unable to reset queue %02x.%04x: not in host AP configuration\n",
+> +		     AP_QID_CARD(apqn), AP_QID_QUEUE(apqn));
+> +			return 0;
+>   	default:
+>   		WARN(true,
+>   		     "failed to verify reset of queue %02x.%04x: TAPQ rc=%u\n",
+> @@ -1736,6 +1751,22 @@ static void vfio_ap_mdev_reset_queue(struct vfio_ap_queue *q)
+>   		q->reset_status.response_code = 0;
+>   		vfio_ap_free_aqic_resources(q);
+>   		break;
+> +	case AP_RESPONSE_Q_NOT_AVAIL:
+> +		/*
+> +		 * This response code indicates the queue is not available.
+> +		 * Barring a bug, response code 01 will occur only when a queue
+> +		 * has been externally removed from the host's AP configuration;
+> +		 * in which case, the queue must be reset by the machine in
+> +		 * order to avoid leaking crypto data if/when the queue is
+> +		 * returned to the host's configuration. In this case, let's go
+> +		 * ahead and log a warning message then clean up the AQIC
+> +		 * resources.
+> +		 */
+> +		WARN(true,
+> +		     "Unable to reset queue %02x.%04x: not in host AP configuration\n",
+> +		     AP_QID_CARD(q->apqn), AP_QID_QUEUE(q->apqn));
+> +		vfio_ap_free_aqic_resources(q);
+> +		break;
+>   	default:
+>   		WARN(true,
+>   		     "PQAP/ZAPQ for %02x.%04x failed with invalid rc=%u\n",
 
