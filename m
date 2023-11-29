@@ -1,137 +1,144 @@
-Return-Path: <kvm+bounces-2710-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2711-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F6927FCC41
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 02:21:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 897177FCCD8
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 03:21:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E049B1C21058
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 01:21:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D1EF1C21074
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 02:21:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95A471FC1;
-	Wed, 29 Nov 2023 01:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C0DD442F;
+	Wed, 29 Nov 2023 02:21:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zWdzihm7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M95ovZ7T"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A08AB10C0
-	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 17:21:33 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-daf702bde7eso6387935276.3
-        for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 17:21:33 -0800 (PST)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 538B81707
+	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 18:21:45 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5cb92becbf6so92867867b3.2
+        for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 18:21:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701220893; x=1701825693; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1701224504; x=1701829304; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8xaAjFqVU5qqDjrAOLsosHck+47UkrNNUxTMBaKXJJI=;
-        b=zWdzihm7yZ+KOfeghLkuomkjljHlJRQk52R+2V8e6aqlRGP1ptAwVNCyOFurj7WCCZ
-         1CS8P8Vm5sSYVMwf7U6lF5gCInrTcsGXCTY3EJU4gS5Y0P98VHtR93piKJrIllyaYwgH
-         9U9q+pxP8vHxVZ3zKkJ2rqNuxDvwQFyslZtmWAwg+IHCMBG5TMBRLU0t/HhFtHjqAMEy
-         UFVpe3azRCaJmlGB1M4X9KEYxYakFHzwlxkw5nt6Y3Aah++0Qj2DkjDyTMUnNgq0ki8J
-         ubQW4AWNDpmRfLOrdkniNSkakB6reGQReUyfavA+/qnX5ZDy8C/zj2Sv+9WSFJTXs3Mj
-         AJBw==
+        bh=mJUgPg47d4/pgx8Qlc5dU8QTKw0KSk/PtK3yQegaG7g=;
+        b=M95ovZ7TNLzmq+j5+IX1g1ZfHxFQKjk+ewHZaDL1W5UFtAYOvqRozjKJwR1/lbE7cH
+         /WsodU+DtntTZUjSlxODDW1U9Yd/UuaGhJuIeYv3uSj1g6vlBao9kPqOuglriCwBokWA
+         e3fat/T/JnqmxevNvygyBZ+Opd7JjnE7KWmKhDpRdtxDTzP4b3q5Zf1MhHUgMr3ka+8o
+         vgLKhQ23JKbx6pnrvylqW8cVBdIafqJgC0e5ZFoFMgcIuruyKbnjyLiplxH6CitnCi/H
+         DbrEuCy4xSbkLrVm1NUT1cuBifLfJ5K4laDHd+i8qHkO4M0Hl+gdUoNuGrg/PwggEB8E
+         nteg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701220893; x=1701825693;
+        d=1e100.net; s=20230601; t=1701224504; x=1701829304;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8xaAjFqVU5qqDjrAOLsosHck+47UkrNNUxTMBaKXJJI=;
-        b=MhO2+qRs0RrEWmxsWHdlP4/lTMM+AsZLOVs8C+bt8pa+S4Snej2dSD64Gw0vTpc6Ks
-         gW5K8e70zD3WTy4ruWFav8cDAb+UshcMd5W/OdcLW9U0bexbdmlU/U0M7a1Vhw1coB+n
-         J1SIVt6RIheB85Rm0dEWzIDpc64vXkdX6cn9OoTBe9oAYUMKaoD0gqe4zUVsrnFWJq/q
-         v6QiOzsVe6uoduUBa6LfomZO5XZMEcIpVmCr5CHP+REOllkG2ontzgaSIRaWP0H4egAO
-         lVgFiUeqaFhyN6xACrPJX+PqrBnXH4CUVn1AJgZtx8cJLvnBDDrg6RbgAp+NtGHW35+u
-         naSQ==
-X-Gm-Message-State: AOJu0YztrVIq7144PbO6y2yoACAYHxIRXEZVtzTLPAar430/tmzjlQkr
-	/CQ9u6Is3wV4VPt1SLb0XJawTnKLd2M=
-X-Google-Smtp-Source: AGHT+IGpd9WstVZO70Jt8U6PKwHv8oE/6qIUi7h3VLJVSM8jUfzJpaYP6i8qC329knKj6ZItVSI11Idz3Bs=
+        bh=mJUgPg47d4/pgx8Qlc5dU8QTKw0KSk/PtK3yQegaG7g=;
+        b=Follv0PvseH9/U/UdIt2fczl1hQXgpXDSfvOwFeiL8sj+ZF/aSTDPrdZdCQaH/Ita8
+         +j6YkvUdH8Ynojl0egCOVdjgFSwDAPda6uFEfxumkeudyjVch24diNSoU5lWXBhprXxS
+         gmc4KbXLlHgrnFkFzMH7vJJ3uqE3jXTXhN4QtOhEj3kEDQkSWSpWbwDZg4RBFxHmKv8T
+         yqPxoBdX7GENhckMf5RNcGT6u/MxVi1LwfVvWT0ZGSa/6N0tLOatKlsHw96PuiznYinI
+         GwvVOV1/UXtHGfOc5iM2xWBimoNr/Oga9qB4QTBopVir2cDy1qzXXb4rutVhch/Bb1Zl
+         +dUQ==
+X-Gm-Message-State: AOJu0YyxQjbLFcf3bDSXZVp8dZaYKbGNvbtBZmPZVUPvhY4tMSa0LAUZ
+	7UU7kWai3m20IPqq9xxNCWxavNMFHEo=
+X-Google-Smtp-Source: AGHT+IEzvdnB4YF3ag5ypaUivwQ+a/1gSiOiue26Vf+Kzl2dkVc1+0BYVi7jXds4GjyyxEfKmNI6Cd+a9DA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:d114:0:b0:d9a:5e8f:1562 with SMTP id
- i20-20020a25d114000000b00d9a5e8f1562mr506949ybg.6.1701220892813; Tue, 28 Nov
- 2023 17:21:32 -0800 (PST)
-Date: Tue, 28 Nov 2023 17:21:31 -0800
-In-Reply-To: <20231128221105.63093-1-angquan21@gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a81:ff05:0:b0:5cd:c47d:d89a with SMTP id
+ k5-20020a81ff05000000b005cdc47dd89amr593254ywn.2.1701224504362; Tue, 28 Nov
+ 2023 18:21:44 -0800 (PST)
+Date: Tue, 28 Nov 2023 18:21:42 -0800
+In-Reply-To: <87edgy87ig.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231128221105.63093-1-angquan21@gmail.com>
-Message-ID: <ZWaSG4i6dsvj_qvP@google.com>
-Subject: Re: [PATCH] Resolve Macro Expansion Warning in nx_huge_pages_test.c
+References: <0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com> <87edgy87ig.fsf@mail.lhotse>
+Message-ID: <ZWagNsu1XQIqk5z9@google.com>
+Subject: Re: Ping? Re: [PATCH rc] kvm: Prevent compiling virt/kvm/vfio.c
+ unless VFIO is selected
 From: Sean Christopherson <seanjc@google.com>
-To: angquan yu <angquan21@gmail.com>
-Cc: skhan@linuxfoundation.org, shuah@kernel.org, pbonzini@redhat.com, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kernel-mentees@lists.linuxfoundation.org
+To: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Borislav Petkov <bp@alien8.de>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	David Hildenbrand <david@redhat.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, James Morse <james.morse@arm.com>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-s390@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	Marc Zyngier <maz@kernel.org>, Ingo Molnar <mingo@redhat.com>, Nicholas Piggin <npiggin@gmail.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, 
+	x86@kernel.org, Zenghui Yu <yuzenghui@huawei.com>
 Content-Type: text/plain; charset="us-ascii"
 
-For the shortlog, specify the scope/domain/namespace of the patch.  For KVM
-selftests, that's "KVM: selftests:".  And ideally, describe the impact of the
-change in a more conversational way, as opposed to stating the literal effect of
-the patch.  Stating that the patch fixes a warning is obviously accurate, but it
-doesn't provide any insight as to the severity of the issue, i.e. what's actually
-broken and being fixed.
-
-E.g.
-
-  KVM: selftests: Actually print out magic token in NX hugepages skip message
-
-On Tue, Nov 28, 2023, angquan yu wrote:
-> From: angquan yu <angquan21@gmail.com>
+On Fri, Nov 10, 2023, Michael Ellerman wrote:
+> Jason Gunthorpe <jgg@nvidia.com> writes:
+> > There are a bunch of reported randconfig failures now because of this,
+> > something like:
+> >
+> >>> arch/powerpc/kvm/../../../virt/kvm/vfio.c:89:7: warning: attribute declaration must precede definition [-Wignored-attributes]
+> >            fn = symbol_get(vfio_file_iommu_group);
+> >                 ^
+> >    include/linux/module.h:805:60: note: expanded from macro 'symbol_get'
+> >    #define symbol_get(x) ({ extern typeof(x) x __attribute__((weak,visibility("hidden"))); &(x); })
+> >
+> > It happens because the arch forces KVM_VFIO without knowing if VFIO is
+> > even enabled.
 > 
-> This commit fixes a compiler warning in the file
-> x86_64/nx_huge_pages_test.c, which was caused by improper
-> macro expansion of '__TEST_REQUIRE'.
+> This is still breaking some builds. Can we get this fix in please?
 > 
-> Warning addressed:
-> - The warning was triggered by the expansion of the '__TEST_REQUIRE'
-> macro, indicating a potential issue in how the macro was being
-> used or expanded.
+> cheers
 > 
-> Changes made:
-> - Modified the usage of the '__TEST_REQUIRE' macro to ensure proper
-> expansion. This involved explicitly passing the expected magic token
-> (MAGIC_TOKEN) and a descriptive error message to the macro.
-> - The fix enhances clarity in the macro usage and ensures that
-> the compiler correctly interprets the intended logic, thereby
-> resolving the warning.
+> > Split the kconfig so the arch selects the usual HAVE_KVM_ARCH_VFIO and
+> > then KVM_VFIO is only enabled if the arch wants it and VFIO is turned on.
 
-Fixing warnings is nice, but warnings are a means to an end, i.e. they identify
-things that *might* be actual problems.  The real issue is that the test will
-spit out garbage instead of the magic number.
+Heh, so I was trying to figure out why things like vfio_file_set_kvm() aren't
+problematic, i.e. why the existing mess didn't cause failures.  I can't repro the
+warning (requires clang-16?), but IIUC the reason only the group code is problematic
+is that vfio.h creates a stub for vfio_file_iommu_group() and thus there's no symbol,
+whereas vfio.h declares vfio_file_set_kvm() unconditionally.
 
-All that said, applied to kvm-x86 selftests, with a heavily rewritten shortlog
-and changelog (I had the same fix locally, so more or less just grabbed what I
-had already written).
+Because KVM is doing symbol_get() and not taking a direct dependency, the lack of
+an exported symbol doesn't cause problems, i.e. simply declaring the symbol makes
+the compiler happy.
 
-Thanks!
+Given that the vfio_file_iommu_group() stub shouldn't exist (KVM is the only user,
+and so if I'm correct the stub is worthless), what about this as a temporary "fix"?
 
-[1/1] KVM: selftests: Actually print out magic token in NX hugepages skip message
-      https://github.com/kvm-x86/linux/commit/3b99d46a1170
+I'm 100% on-board with fixing KVM properly, my motivation is purely to minimize
+the total amount of churn.  E.g. if this works, then the only extra churn is to
+move the declaration of vfio_file_iommu_group() back under the #if, versus having
+to churn all of the KVM Kconfigs twice (once now, and again for the full cleanup).
 
-> 
-> Signed-off-by: angquan yu <angquan21@gmail.com>
-> ---
->  tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-> index 18ac5c195..323ede6b6 100644
-> --- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-> @@ -259,7 +259,8 @@ int main(int argc, char **argv)
->  	__TEST_REQUIRE(token == MAGIC_TOKEN,
->  		       "This test must be run with the magic token %d.\n"
->  		       "This is done by nx_huge_pages_test.sh, which\n"
-> -		       "also handles environment setup for the test.");
-> +		       "also handles environment setup for the test.",
-> +			   MAGIC_TOKEN);
->  
->  	run_test(reclaim_period_ms, false, reboot_permissions);
->  	run_test(reclaim_period_ms, true, reboot_permissions);
-> -- 
-> 2.39.2
-> 
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 454e9295970c..a65b2513f8cd 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -289,16 +289,12 @@ void vfio_combine_iova_ranges(struct rb_root_cached *root, u32 cur_nodes,
+ /*
+  * External user API
+  */
+-#if IS_ENABLED(CONFIG_VFIO_GROUP)
+ struct iommu_group *vfio_file_iommu_group(struct file *file);
++
++#if IS_ENABLED(CONFIG_VFIO_GROUP)
+ bool vfio_file_is_group(struct file *file);
+ bool vfio_file_has_dev(struct file *file, struct vfio_device *device);
+ #else
+-static inline struct iommu_group *vfio_file_iommu_group(struct file *file)
+-{
+-       return NULL;
+-}
+-
+ static inline bool vfio_file_is_group(struct file *file)
+ {
+        return false;
+
 
