@@ -1,381 +1,118 @@
-Return-Path: <kvm+bounces-2721-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2722-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01C327FCDA9
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 04:52:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 394057FCDC0
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 05:14:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24CD11C210DA
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 03:52:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A7E61C20A5E
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 04:14:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92EC563AE;
-	Wed, 29 Nov 2023 03:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD79363BA;
+	Wed, 29 Nov 2023 04:14:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D/SH5M40"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QRTu5OA1"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3ECD1AD
-	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 19:52:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701229921;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RL0c3l03fnSRdfvhrTd6aq49DEaPt0ziC4ZLt8/nvFs=;
-	b=D/SH5M40CeUHla6dyR6EeKtBZ75CYMXMGqGlyhTsbEEC1sgwpEYKjXzK6K/Yrf3ZjFf88+
-	9hbetZdJ3zEJ5WRHaev//BJ9LhjOXxkiVykB/CcMpAWfMIFeseTfe0YZb4Di13RQjvNSWN
-	sXIlIjjbAoXF8t08JG2alapavHLt+aI=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-163-PjkmKf62Mg2pTpAGQpuoIg-1; Tue, 28 Nov 2023 22:51:59 -0500
-X-MC-Unique: PjkmKf62Mg2pTpAGQpuoIg-1
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-6cdc01c02a4so158253b3a.0
-        for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 19:51:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701229918; x=1701834718;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RL0c3l03fnSRdfvhrTd6aq49DEaPt0ziC4ZLt8/nvFs=;
-        b=MYRF3QLnaCa1rKuxBz8MHG6GD1t3dJczs/FiOnry1LCuuo6WO3d3mvqyEsvxkoh2bK
-         3N4w6DjnGo29zMBSg2Ch55qc3C5FkHFQfjkwxC9IOu83Z19H8QeW+ojgNG/2OI/xDo33
-         nRQcMdgmkjlSVOG7gKzbAHV8YmHOrtSXSyei9QyfAjJVX//WGQL3/xkzMhN7T5u+oah+
-         q1KRqYWfFAhaIUsK6R5vbqK1C1Wr9mxH5QILTZgM/iOP2IEPXYQfE2ReqA40D7whWTOI
-         yO5WhIio/Steg0wPKWJXtXX2RejUa5EZ/piDWQ7feEgw0rZrHygfq1YJqZzq+J1KwE9Y
-         3FDQ==
-X-Gm-Message-State: AOJu0Yx+xIKeJzBSTtvP0kKK4vPVwgF1oitfuvBerLiH+yxk2P/Mmmqx
-	N4W/OYzrHS7vLiGszJyNDz+oy3+uIg0twwsuGWZZdNzAt1bDW/fowBNXHnjhpngKpWd1nxA76Jx
-	Di9Nakp4x+CMo
-X-Received: by 2002:a05:6a21:a598:b0:18b:d26a:375c with SMTP id gd24-20020a056a21a59800b0018bd26a375cmr24224156pzc.1.1701229918445;
-        Tue, 28 Nov 2023 19:51:58 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGEuDrFqfI++q1HzePhrNvjhTKWNoYA3fmnYwqAztsr4+77Q0lO8uC6ksPK8HeU2Qvw5KciOw==
-X-Received: by 2002:a05:6a21:a598:b0:18b:d26a:375c with SMTP id gd24-20020a056a21a59800b0018bd26a375cmr24224130pzc.1.1701229918105;
-        Tue, 28 Nov 2023 19:51:58 -0800 (PST)
-Received: from [10.72.112.34] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id y10-20020a17090aca8a00b002851c9f7a77sm256560pjt.38.2023.11.28.19.51.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Nov 2023 19:51:57 -0800 (PST)
-Message-ID: <621ea04b-ae10-c2a5-8711-dcb8c6d2b322@redhat.com>
-Date: Wed, 29 Nov 2023 11:51:53 +0800
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7A6119A6;
+	Tue, 28 Nov 2023 20:14:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701231286; x=1732767286;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Fl/5cn9hNngOc4n73NbZ2cM/kbvfGFgm6/ehls/rwts=;
+  b=QRTu5OA1JoDbMKQ6Qd4lB+HxKHsQQgw5UzXZBRoiVHLQwZd0qNxLQxvl
+   tdtJ5eefTM4p7x8rOTDZ82y7XwbnGdovaA3AnngenPif0rIYjHe4+EDkB
+   WvTOeIfzQ2qb7VqTgtw5+1tULx4VjzO6CP509enD41mWNFN+HBYh8uk2y
+   PxXRXqJLVx2zmOGF25YYG5yGfAjXxxkAavImgjcN8Iak3m5J7RCAagEWi
+   NxcTzaZEc5Z7AvVfLbFk5RHmeSsKw6Hk3azUcrNw40rPH3w7EGeqANzq6
+   ZdzHlyPNiUveL6eseOIZfjo961Z4ihfliEsG2R/IPyN4Uiqx8Vtomyzhy
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="383483250"
+X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
+   d="scan'208";a="383483250"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 20:14:46 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="892314392"
+X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
+   d="scan'208";a="892314392"
+Received: from lkp-server01.sh.intel.com (HELO d584ee6ebdcc) ([10.239.97.150])
+  by orsmga004.jf.intel.com with ESMTP; 28 Nov 2023 20:14:42 -0800
+Received: from kbuild by d584ee6ebdcc with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r8ByC-0008Xq-2L;
+	Wed, 29 Nov 2023 04:14:40 +0000
+Date: Wed, 29 Nov 2023 12:08:29 +0800
+From: kernel test robot <lkp@intel.com>
+To: Nikunj A Dadhania <nikunj@amd.com>, linux-kernel@vger.kernel.org,
+	thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, bp@alien8.de,
+	mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
+	dionnaglaze@google.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com, nikunj@amd.com
+Subject: Re: [PATCH v6 10/16] x86/sev: Add Secure TSC support for SNP guests
+Message-ID: <202311291150.VUYNaQGy-lkp@intel.com>
+References: <20231128125959.1810039-11-nikunj@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v1 2/3] KVM: selftests: aarch64: Move the pmu helper
- function into lib/
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>, Raghavendra Rao Ananta <rananta@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231123063750.2176250-1-shahuang@redhat.com>
- <20231123063750.2176250-3-shahuang@redhat.com>
- <CAJHc60wsEjjLmAVUrb3n9Tyftqi7UXWh7V1hE1E90bUXiUk+Tw@mail.gmail.com>
- <ae81aa3f6527b663ef73b64a3fb72e5b@kernel.org>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <ae81aa3f6527b663ef73b64a3fb72e5b@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231128125959.1810039-11-nikunj@amd.com>
 
-Hi Marc,
+Hi Nikunj,
 
-On 11/28/23 16:43, Marc Zyngier wrote:
-> On 2023-11-27 21:48, Raghavendra Rao Ananta wrote:
->> Hi Shaoqin,
->>
->> On Wed, Nov 22, 2023 at 10:39 PM Shaoqin Huang <shahuang@redhat.com> 
->> wrote:
->>>
->>> Move those pmu helper function into lib/, thus it can be used by other
->>> pmu test.
->>>
->>> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
->>> ---
->>>  .../kvm/aarch64/vpmu_counter_access.c         | 118 -----------------
->>>  .../selftests/kvm/include/aarch64/vpmu.h      | 119 ++++++++++++++++++
->>>  2 files changed, 119 insertions(+), 118 deletions(-)
->>>
->>> diff --git 
->>> a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c 
->>> b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
->>> index 17305408a334..62d6315790ab 100644
->>> --- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
->>> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
->>> @@ -20,12 +20,6 @@
->>>  #include <perf/arm_pmuv3.h>
->>>  #include <linux/bitfield.h>
->>>
->>> -/* The max number of the PMU event counters (excluding the cycle 
->>> counter) */
->>> -#define ARMV8_PMU_MAX_GENERAL_COUNTERS (ARMV8_PMU_MAX_COUNTERS - 1)
->>> -
->>> -/* The cycle counter bit position that's common among the PMU 
->>> registers */
->>> -#define ARMV8_PMU_CYCLE_IDX            31
->>> -
->>>  static struct vpmu_vm *vpmu_vm;
->>>
->>>  struct pmreg_sets {
->>> @@ -35,118 +29,6 @@ struct pmreg_sets {
->>>
->>>  #define PMREG_SET(set, clr) {.set_reg_id = set, .clr_reg_id = clr}
->>>
->>> -static uint64_t get_pmcr_n(uint64_t pmcr)
->>> -{
->>> -       return (pmcr >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
->>> -}
->>> -
->>> -static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
->>> -{
->>> -       *pmcr = *pmcr & ~(ARMV8_PMU_PMCR_N_MASK << 
->>> ARMV8_PMU_PMCR_N_SHIFT);
->>> -       *pmcr |= (pmcr_n << ARMV8_PMU_PMCR_N_SHIFT);
->>> -}
->>> -
->>> -static uint64_t get_counters_mask(uint64_t n)
->>> -{
->>> -       uint64_t mask = BIT(ARMV8_PMU_CYCLE_IDX);
->>> -
->>> -       if (n)
->>> -               mask |= GENMASK(n - 1, 0);
->>> -       return mask;
->>> -}
->>> -
->>> -/* Read PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
->>> -static inline unsigned long read_sel_evcntr(int sel)
->>> -{
->>> -       write_sysreg(sel, pmselr_el0);
->>> -       isb();
->>> -       return read_sysreg(pmxevcntr_el0);
->>> -}
->>> -
->>> -/* Write PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
->>> -static inline void write_sel_evcntr(int sel, unsigned long val)
->>> -{
->>> -       write_sysreg(sel, pmselr_el0);
->>> -       isb();
->>> -       write_sysreg(val, pmxevcntr_el0);
->>> -       isb();
->>> -}
->>> -
->>> -/* Read PMEVTYPER<n>_EL0 through PMXEVTYPER_EL0 */
->>> -static inline unsigned long read_sel_evtyper(int sel)
->>> -{
->>> -       write_sysreg(sel, pmselr_el0);
->>> -       isb();
->>> -       return read_sysreg(pmxevtyper_el0);
->>> -}
->>> -
->>> -/* Write PMEVTYPER<n>_EL0 through PMXEVTYPER_EL0 */
->>> -static inline void write_sel_evtyper(int sel, unsigned long val)
->>> -{
->>> -       write_sysreg(sel, pmselr_el0);
->>> -       isb();
->>> -       write_sysreg(val, pmxevtyper_el0);
->>> -       isb();
->>> -}
->>> -
->>> -static inline void enable_counter(int idx)
->>> -{
->>> -       uint64_t v = read_sysreg(pmcntenset_el0);
->>> -
->>> -       write_sysreg(BIT(idx) | v, pmcntenset_el0);
->>> -       isb();
->>> -}
->>> -
->>> -static inline void disable_counter(int idx)
->>> -{
->>> -       uint64_t v = read_sysreg(pmcntenset_el0);
->>> -
->>> -       write_sysreg(BIT(idx) | v, pmcntenclr_el0);
->>> -       isb();
->>> -}
->>> -
->>> -static void pmu_disable_reset(void)
->>> -{
->>> -       uint64_t pmcr = read_sysreg(pmcr_el0);
->>> -
->>> -       /* Reset all counters, disabling them */
->>> -       pmcr &= ~ARMV8_PMU_PMCR_E;
->>> -       write_sysreg(pmcr | ARMV8_PMU_PMCR_P, pmcr_el0);
->>> -       isb();
->>> -}
->>> -
->>> -#define RETURN_READ_PMEVCNTRN(n) \
->>> -       return read_sysreg(pmevcntr##n##_el0)
->>> -static unsigned long read_pmevcntrn(int n)
->>> -{
->>> -       PMEVN_SWITCH(n, RETURN_READ_PMEVCNTRN);
->>> -       return 0;
->>> -}
->>> -
->>> -#define WRITE_PMEVCNTRN(n) \
->>> -       write_sysreg(val, pmevcntr##n##_el0)
->>> -static void write_pmevcntrn(int n, unsigned long val)
->>> -{
->>> -       PMEVN_SWITCH(n, WRITE_PMEVCNTRN);
->>> -       isb();
->>> -}
->>> -
->>> -#define READ_PMEVTYPERN(n) \
->>> -       return read_sysreg(pmevtyper##n##_el0)
->>> -static unsigned long read_pmevtypern(int n)
->>> -{
->>> -       PMEVN_SWITCH(n, READ_PMEVTYPERN);
->>> -       return 0;
->>> -}
->>> -
->>> -#define WRITE_PMEVTYPERN(n) \
->>> -       write_sysreg(val, pmevtyper##n##_el0)
->>> -static void write_pmevtypern(int n, unsigned long val)
->>> -{
->>> -       PMEVN_SWITCH(n, WRITE_PMEVTYPERN);
->>> -       isb();
->>> -}
->>> -
->>>  /*
->>>   * The pmc_accessor structure has pointers to PMEV{CNTR,TYPER}<n>_EL0
->>>   * accessors that test cases will use. Each of the accessors will
->>> diff --git a/tools/testing/selftests/kvm/include/aarch64/vpmu.h 
->>> b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
->>> index 0a56183644ee..e0cc1ca1c4b7 100644
->>> --- a/tools/testing/selftests/kvm/include/aarch64/vpmu.h
->>> +++ b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
->>> @@ -1,10 +1,17 @@
->>>  /* SPDX-License-Identifier: GPL-2.0 */
->>>
->>>  #include <kvm_util.h>
->>> +#include <perf/arm_pmuv3.h>
->>>
->>>  #define GICD_BASE_GPA  0x8000000ULL
->>>  #define GICR_BASE_GPA  0x80A0000ULL
->>>
->>> +/* The max number of the PMU event counters (excluding the cycle 
->>> counter) */
->>> +#define ARMV8_PMU_MAX_GENERAL_COUNTERS (ARMV8_PMU_MAX_COUNTERS - 1)
->>> +
->>> +/* The cycle counter bit position that's common among the PMU 
->>> registers */
->>> +#define ARMV8_PMU_CYCLE_IDX            31
->>> +
->>>  struct vpmu_vm {
->>>         struct kvm_vm *vm;
->>>         struct kvm_vcpu *vcpu;
->>> @@ -14,3 +21,115 @@ struct vpmu_vm {
->>>  struct vpmu_vm *create_vpmu_vm(void *guest_code);
->>>
->>>  void destroy_vpmu_vm(struct vpmu_vm *vpmu_vm);
->>> +
->>> +static inline uint64_t get_pmcr_n(uint64_t pmcr)
->>> +{
->>> +       return (pmcr >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
->>> +}
->>> +
->>> +static inline void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
->>> +{
->>> +       *pmcr = *pmcr & ~(ARMV8_PMU_PMCR_N_MASK << 
->>> ARMV8_PMU_PMCR_N_SHIFT);
->>> +       *pmcr |= (pmcr_n << ARMV8_PMU_PMCR_N_SHIFT);
->>> +}
->>> +
->>> +static inline uint64_t get_counters_mask(uint64_t n)
->>> +{
->>> +       uint64_t mask = BIT(ARMV8_PMU_CYCLE_IDX);
->>> +
->>> +       if (n)
->>> +               mask |= GENMASK(n - 1, 0);
->>> +       return mask;
->>> +}
->>> +
->>> +/* Read PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
->>> +static inline unsigned long read_sel_evcntr(int sel)
->>> +{
->>> +       write_sysreg(sel, pmselr_el0);
->>> +       isb();
->>> +       return read_sysreg(pmxevcntr_el0);
->>> +}
->>> +
->>> +/* Write PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
->>> +static inline void write_sel_evcntr(int sel, unsigned long val)
->>> +{
->>> +       write_sysreg(sel, pmselr_el0);
->>> +       isb();
->>> +       write_sysreg(val, pmxevcntr_el0);
->>> +       isb();
->>> +}
->>> +
->>> +/* Read PMEVTYPER<n>_EL0 through PMXEVTYPER_EL0 */
->>> +static inline unsigned long read_sel_evtyper(int sel)
->>> +{
->>> +       write_sysreg(sel, pmselr_el0);
->>> +       isb();
->>> +       return read_sysreg(pmxevtyper_el0);
->>> +}
->>> +
->>> +/* Write PMEVTYPER<n>_EL0 through PMXEVTYPER_EL0 */
->>> +static inline void write_sel_evtyper(int sel, unsigned long val)
->>> +{
->>> +       write_sysreg(sel, pmselr_el0);
->>> +       isb();
->>> +       write_sysreg(val, pmxevtyper_el0);
->>> +       isb();
->>> +}
->>> +
->>> +static inline void enable_counter(int idx)
->>> +{
->>> +       uint64_t v = read_sysreg(pmcntenset_el0);
->>> +
->>> +       write_sysreg(BIT(idx) | v, pmcntenset_el0);
->>> +       isb();
->>> +}
->>> +
->>> +static inline void disable_counter(int idx)
->>> +{
->>> +       uint64_t v = read_sysreg(pmcntenset_el0);
->>> +
->>> +       write_sysreg(BIT(idx) | v, pmcntenclr_el0);
->>> +       isb();
->>> +}
->>> +
->> As mentioned in [1], the current implementation of disable_counter()
->> is buggy and would end up disabling all the counters.
->> However if you intend to keep it (even though it would remain unused),
->> may be change the definition something to:
->>
->> static inline void disable_counter(int idx)
->> {
->>     write_sysreg(BIT(idx), pmcntenclr_el0);
->>     isb();
->> }
-> 
-> Same thing for the enable_counter() function, by the way.
-> It doesn't have the same disastrous effect, but it is
-> buggy (imagine an interrupt disabling a counter between
-> the read and the write...).
-> 
-> In general, the set/clr registers should always be used
-> in their write form, never in a RMW form.
-> 
+kernel test robot noticed the following build warnings:
 
-Thanks for your explaination. I will fix the enable_counter together 
-with the disable_counter.
+[auto build test WARNING on tip/x86/mm]
+[also build test WARNING on linus/master v6.7-rc3 next-20231128]
+[cannot apply to tip/x86/core kvm/queue kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thanks,
-Shaoqin
+url:    https://github.com/intel-lab-lkp/linux/commits/Nikunj-A-Dadhania/virt-sev-guest-Move-mutex-to-SNP-guest-device-structure/20231128-220026
+base:   tip/x86/mm
+patch link:    https://lore.kernel.org/r/20231128125959.1810039-11-nikunj%40amd.com
+patch subject: [PATCH v6 10/16] x86/sev: Add Secure TSC support for SNP guests
+config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20231129/202311291150.VUYNaQGy-lkp@intel.com/config)
+compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231129/202311291150.VUYNaQGy-lkp@intel.com/reproduce)
 
-> Thanks,
-> 
->          M.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311291150.VUYNaQGy-lkp@intel.com/
 
+All warnings (new ones prefixed by >>):
+
+>> arch/x86/mm/mem_encrypt_amd.c:216:13: warning: no previous prototype for function 'amd_enc_init' [-Wmissing-prototypes]
+   void __init amd_enc_init(void)
+               ^
+   arch/x86/mm/mem_encrypt_amd.c:216:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   void __init amd_enc_init(void)
+   ^
+   static 
+   1 warning generated.
+
+
+vim +/amd_enc_init +216 arch/x86/mm/mem_encrypt_amd.c
+
+   215	
+ > 216	void __init amd_enc_init(void)
+   217	{
+   218		snp_secure_tsc_prepare();
+   219	}
+   220	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
