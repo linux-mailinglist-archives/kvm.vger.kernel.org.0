@@ -1,145 +1,184 @@
-Return-Path: <kvm+bounces-2706-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2708-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01B937FCC17
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 01:55:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68FED7FCC1D
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 01:57:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C0ACB217A7
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 00:55:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A86D283358
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 00:57:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3249823C6;
-	Wed, 29 Nov 2023 00:54:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA6FA1878;
+	Wed, 29 Nov 2023 00:57:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="NBZBGb/8"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CDc8fvxr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D95319B0
-	for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 16:54:52 -0800 (PST)
-Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-1fa0885e1c2so2747738fac.0
-        for <kvm@vger.kernel.org>; Tue, 28 Nov 2023 16:54:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1701219291; x=1701824091; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=KD7A1Mi78WcdpTbacYeqydWRhhJC6MIZ9wADFHK3ceE=;
-        b=NBZBGb/8+4eEITunAzUMzigxc8uz6j8Dg75wyZQthgQUON4ZqrN+peLBlg8XoqnyxL
-         VzfbbSiO2lV6MNm9UL5EY3n8AZSt0kSidXdfjXdCir/k5UuGgrvCx6BJzGmE0WpMrqAg
-         scj6RRezMFx8SkhZqpj/Zz8ZGtyuCss6g3c/ywM4zwBSg1maf2tINNcQJOgAz7bA2zXp
-         KgKhrCTKmkjAsmCBk96zKknUm3+Q3dRWHkyW9UO5fKyYTAfTmbkzkWCTNEbDyVa8Y2HG
-         451mq05zv3EOdmPVl+h/+cRaKbiHjyXaeZgbzOMoKFUqItjWAfFRqXT0AUSxxcAymGRF
-         7SPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701219291; x=1701824091;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KD7A1Mi78WcdpTbacYeqydWRhhJC6MIZ9wADFHK3ceE=;
-        b=B7QLJ8mXE7acHUBGssDpQ00N7UXxCc18e2YleXgteZip7jhMuy4gTh/QeexEFBPA72
-         IyIQAYL1luYjwZC7DeaW/AoiVg6IdePMlOThmfm8wbe1ErB8+r8AxzdFfbeWnGzx4XG5
-         IpXaByEQQNVGXpnt7OdQL6zb6M3h1oee6gt/E9aWdB0CWbBbFrjJTXOydWBIJ83Nsv6z
-         KavyaqmAKNZrAuEv7QcnfEFCvbfl11r17MYhEAKt0XKW2vU0RMBLmBRlGiAlgKU+mrOB
-         AL1UdZ7geBOmXGKGn9aCgynHAW4EewNZkEqf1amqgVt7N0/hzeGBgSPxzKG0zSdN9n50
-         2OJw==
-X-Gm-Message-State: AOJu0YwmDze8vqPsGcOZVIaawX9uqtaltMhIWBqLeZD0Fl0FiR606xjG
-	2DyXsgUK3PQ9+HcK6cPDs+dNjA==
-X-Google-Smtp-Source: AGHT+IGKiwEuykqxh29J1y1VqvKSA4pC1uEUHtE7SoQBvdHo0iXpRqPiFg8DX/ZmKtSwphh/2Jx77g==
-X-Received: by 2002:a05:6870:c690:b0:1fa:2f8:c734 with SMTP id cv16-20020a056870c69000b001fa02f8c734mr16951479oab.5.1701219291679;
-        Tue, 28 Nov 2023 16:54:51 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-134-23-187.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.134.23.187])
-        by smtp.gmail.com with ESMTPSA id b1-20020a056830344100b006d81e704023sm945291otu.2.2023.11.28.16.54.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 16:54:51 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1r88qo-005kIY-2m;
-	Tue, 28 Nov 2023 20:54:50 -0400
-Date: Tue, 28 Nov 2023 20:54:50 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Yosry Ahmed <yosryahmed@google.com>
-Cc: Pasha Tatashin <pasha.tatashin@soleen.com>, akpm@linux-foundation.org,
-	alex.williamson@redhat.com, alim.akhtar@samsung.com,
-	alyssa@rosenzweig.io, asahi@lists.linux.dev,
-	baolu.lu@linux.intel.com, bhelgaas@google.com,
-	cgroups@vger.kernel.org, corbet@lwn.net, david@redhat.com,
-	dwmw2@infradead.org, hannes@cmpxchg.org, heiko@sntech.de,
-	iommu@lists.linux.dev, jasowang@redhat.com,
-	jernej.skrabec@gmail.com, jonathanh@nvidia.com, joro@8bytes.org,
-	kevin.tian@intel.com, krzysztof.kozlowski@linaro.org,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-rockchip@lists.infradead.org,
-	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev,
-	linux-tegra@vger.kernel.org, lizefan.x@bytedance.com,
-	marcan@marcan.st, mhiramat@kernel.org, mst@redhat.com,
-	m.szyprowski@samsung.com, netdev@vger.kernel.org,
-	paulmck@kernel.org, rdunlap@infradead.org, robin.murphy@arm.com,
-	samuel@sholland.org, suravee.suthikulpanit@amd.com,
-	sven@svenpeter.dev, thierry.reding@gmail.com, tj@kernel.org,
-	tomas.mudrunka@gmail.com, vdumpa@nvidia.com,
-	virtualization@lists.linux.dev, wens@csie.org, will@kernel.org,
-	yu-cheng.yu@intel.com
-Subject: Re: [PATCH 00/16] IOMMU memory observability
-Message-ID: <20231129005450.GH1312390@ziepe.ca>
-References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
- <CAJD7tkb1FqTqwONrp2nphBDkEamQtPCOFm0208H3tp0Gq2OLMQ@mail.gmail.com>
- <CA+CK2bB3nHfu1Z6_6fqN3YTAzKXMiJ12MOWpbs8JY7rQo4Fq0g@mail.gmail.com>
- <CAJD7tkZZNhf4KGV+7N+z8NFpJrvyeNudXU-WdVeE8Rm9pobfgQ@mail.gmail.com>
- <20231128235214.GD1312390@ziepe.ca>
- <CAJD7tkbbq6bHtPn7yE3wSS693OSthh1eBDvF-_MWZfDMXDYPKw@mail.gmail.com>
- <20231129002826.GG1312390@ziepe.ca>
- <CAJD7tkbxhK7XFcf7h+XE2poNuOsFBQFrxZyeFr=9DoEG_acssA@mail.gmail.com>
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2051.outbound.protection.outlook.com [40.107.94.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEE9F170B;
+	Tue, 28 Nov 2023 16:57:19 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TrL+gokNP954A9nLppYc9IQ0/zxA9L+Ky6e/636eunSLLR1kz5/Ek2pUbQKpEoZKsQRhPhZd8jm1e5hsMIluY/Nf4NiSeWPz+o2Mbirf8kBl+7gaaPkHhLefPQevHC844Iev38Cr6uORSvor6rPEsNZLEMzLeeXb/LGmfzW5fdNEWzTB5jk5hD7WPIU5DcJ8wNYKWYnqPrn57FRhIfZ64HHJVjPNuI7u0gPAZGdYW4OUkLiorHpALbsxmwJ7ImbQPQ+XsH/4rjXHOTDBHaRdOkqztGQU9/w7Cyi7GF+2NX798rKeCGUK8FD9Wh0s87kMYC6uy/6C9x9fn28cO1wwhQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=G85CKKGx76lm2ER+eX1sX8JHPXYo81UAgeZ5anJ5oaE=;
+ b=jmJH1vvA9+EiEKzMw3EPdJY7rzipQfDg+Ny326S+b+Av00+evcTHzp3KmiuR/4MbzZbgUv1f1preCvRqv+6awpgk7y8DANfMz0FebNB8cME6GXWykWIPN3E3gNqL/uL18RUFfA6PGQgYvAgFZOIAyFyAVIogqQ/D45zblSjWJEgm56uKJy8xQ7W8GAGcNDnTLoNrZfiZEpREa4AW20/3SL/q/x7vz/MBgy+z0qPWsuURn/HYvIWdW4VC4VEvEyn3VA/ftDvLJYTYRo2cdMRt8OF8JlccBWMVm0KPTN2mGXy+YUhYTx7WqXPFWmairUO/v8WC4qLVK+judSjARwzpzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G85CKKGx76lm2ER+eX1sX8JHPXYo81UAgeZ5anJ5oaE=;
+ b=CDc8fvxry+0usjKh4w0LUNtlL27rKxgU9pmnkLaiioL16wEM5gI9NgyYveIzoN/VeRgKhSPD3RyM/U5jgyFxxek7fgyHaeFBtfAtGPL7sP8ag6j15/AGu87Tqeye7dP3lti9HoZDu3kxHq+k2ysPtkmiEdSSganqkpFssOq8MpwJjQwXfBVIiLEeTavPlmIzQkUADfkWKWXnL7QzdAG3ObMtbel4T+N9x9UEdsUoCQ9nj5T4r3I+VFOwcEuEmiMIYt00iAkz/axzl3zwGzYTn4X+7qsqQwabsplws8Ps26OqyCjlTXirjsL3npHLEedHqQ9btLF74SQuu8OEo8FD9Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN0PR12MB5859.namprd12.prod.outlook.com (2603:10b6:208:37a::17)
+ by CO6PR12MB5411.namprd12.prod.outlook.com (2603:10b6:5:356::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.22; Wed, 29 Nov
+ 2023 00:57:17 +0000
+Received: from MN0PR12MB5859.namprd12.prod.outlook.com
+ ([fe80::7d0e:720a:6192:2e6b]) by MN0PR12MB5859.namprd12.prod.outlook.com
+ ([fe80::7d0e:720a:6192:2e6b%5]) with mapi id 15.20.7025.022; Wed, 29 Nov 2023
+ 00:57:16 +0000
+Date: Tue, 28 Nov 2023 20:57:15 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Nicolin Chen <nicolinc@nvidia.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+	"joro@8bytes.org" <joro@8bytes.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+	"cohuck@redhat.com" <cohuck@redhat.com>,
+	"eric.auger@redhat.com" <eric.auger@redhat.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+	"peterx@redhat.com" <peterx@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
+	"lulu@redhat.com" <lulu@redhat.com>,
+	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+	"Zeng, Xin" <xin.zeng@intel.com>,
+	"Zhao, Yan Y" <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v6 2/6] iommufd: Add IOMMU_HWPT_INVALIDATE
+Message-ID: <20231129005715.GS436702@nvidia.com>
+References: <BN9PR11MB5276D8406BF08B853329288C8CB4A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <fa736836-e136-4ed4-a6af-8ea2f0e7c0dd@intel.com>
+ <BN9PR11MB527659462CCB7280055858D98CB4A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZVuZOYFzAaCuJjXZ@Asurada-Nvidia>
+ <BN9PR11MB5276C8EACE2C300A646EA8A18CBBA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZVw/BXxgGCuCZCA6@Asurada-Nvidia>
+ <BN9PR11MB52761A9B48A25E89BEECE6308CB8A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZWTzoBTDDEWAKMs9@Asurada-Nvidia>
+ <BN9PR11MB5276FD60A0EDF8E3F231FCC88CBCA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZWaLCSAMIOXTlghk@Asurada-Nvidia>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZWaLCSAMIOXTlghk@Asurada-Nvidia>
+X-ClientProxiedBy: DM6PR13CA0018.namprd13.prod.outlook.com
+ (2603:10b6:5:bc::31) To MN0PR12MB5859.namprd12.prod.outlook.com
+ (2603:10b6:208:37a::17)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJD7tkbxhK7XFcf7h+XE2poNuOsFBQFrxZyeFr=9DoEG_acssA@mail.gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN0PR12MB5859:EE_|CO6PR12MB5411:EE_
+X-MS-Office365-Filtering-Correlation-Id: 82298f0f-4556-4cdf-9f88-08dbf07621ca
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	CS9po6gOME6iZJrsSAZQ59DWtQ0ptr08YRLZ1Pv8XlJocenVHAQGWPjC7/etnTSg5NffPgVPQkIO2BQWH4+bFSMLPIeQUtGE6xSMeHolxl/9ygbLQVMPZlth2pjJC8iY0OetuRZshm7TVjTYtV4UziFxmgg+sJOr27/SS/9L5EWFNhEzyLyu2VwKGogvwFsI7DOTMqlilLLfgKTypC+rbYKKJaeVunqbi+jV3Vz9vNhufTdbyqp9AzDkQujeD1/aXRoFLceWB6DuBGIkOca+NKcXHYvvttq/U6KAbyzR/38o3ZLsb/p327mRJfkZqi6+Qd9PiAyXihHdTIx82LKf8ifMHAVdGa+tfgU7Y6QP3BEvlHgiESFCq6ja0UcWGwJMVmlpv+ThdxEOR0MQunMv8ro579ZEWeMqyvGcESPpR/nusDorqq1OhDRyc/tou8rbjQ2SIrxFD/wz2JPBQ4N00nCSi4VTimBzPeYFvhuls9abU/j8MhyyRAZh7DJHmExwOg4UE6t9BBUlT71w1SSn1nP7uB3zlnLVLk+Je1vw4E4RGgcphrU5JMnMleB6jKyQkemg4iwlq7a9Va8AlZydm3JUwb/RhCHV5YEh1dj1rZ8cjsUSw4wSz31s0/gb/EOP
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB5859.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(396003)(346002)(376002)(39860400002)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(6512007)(2616005)(478600001)(1076003)(26005)(38100700002)(36756003)(86362001)(33656002)(7416002)(2906002)(41300700001)(83380400001)(6636002)(4326008)(37006003)(316002)(66556008)(66476007)(54906003)(6486002)(5660300002)(6506007)(66946007)(8676002)(8936002)(6862004)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?5SpzK+pZMWsPSacV9/PygGGyvz73woVEtHC5ljJjwidv6ls55wuC0XIhbQEg?=
+ =?us-ascii?Q?LlgPegTyBZX9kjlQnV9XDXWawmYBDPzzrESdDEz2rO+qkvpqUwxkSp9R329I?=
+ =?us-ascii?Q?V8HNAH/DcaQsjsW/qUA2ma4oJbiY4ZAozRKR8vARnDAw0OXAJy+vxC5DkwXR?=
+ =?us-ascii?Q?3lxCkjw3gkB0Ja+fl164XGqNajygWiVD2dZUdvgI1DPIM+xFsvy6gSm5Rdhg?=
+ =?us-ascii?Q?KWp4QVhtK31e//nqNrEpTwa+qNm9OJdwqZP3liwZZJFN3g/myyIz2TWHLJvq?=
+ =?us-ascii?Q?XyrU2I0zC1EDcM9K6rgt/9ZM79T22ionDPDERRAjZf5FU/Q4yjqRiHBJsvVO?=
+ =?us-ascii?Q?GQMDaqrUYJi0TPVyZamstbaXVQPtfV5WQk8jIx5jWux/IowyznA+4NdcPTNE?=
+ =?us-ascii?Q?oVJ3YDngk0z9baq6g7E42A8+WzSYpb374PbRd1J+rmarTMmjFnVHXjlEYl6u?=
+ =?us-ascii?Q?jn1gYyXePegZfVdqWfVd46vWEqnZsy/atdEUR8kG4NBFdbvKOwUGB9iKE9MS?=
+ =?us-ascii?Q?73gnp41whxStUDd+V3/HB07oIjuV4CiAajA0oJVZyLot/B45YFd/ts3VMbt1?=
+ =?us-ascii?Q?fK6mWTk7qmj7j8ppAgIDt1z0EOyc5PsDPa5rJVkYaKF3RRdM/w5UYsnimxMN?=
+ =?us-ascii?Q?+/uLzdJpAffo6us/NIcRPWpLivss988M6VGmNQRywvPdr1DLRx/mkR7ThRXk?=
+ =?us-ascii?Q?9U2J6qgphHZ18NQYFXYhc/gk/yhdAW+8Ed/dwW6SGR1URdf+AHmPazvlh72v?=
+ =?us-ascii?Q?cmKpjhK6cH3p34NzRX6CHU8d8eo/N5zEAly4n6tsm0ZtnJbNIF7HLDCUEB+4?=
+ =?us-ascii?Q?jBkfwlcliEP7DZPhy04lrOuvDT0WZMAKLT69MzBNzyOxjTj5P/sHMiC5U/OJ?=
+ =?us-ascii?Q?ZyXuwWGMj+lW7z5vhz5/B+3sKovI+IZ7sPZzUBzf+lCEM0hIv7CDeyTMzGJq?=
+ =?us-ascii?Q?5NhVIZ+DPp6htbrP2T6kp7MyZ+ENc3eyjEed9QtNVhHP49yuZjrcBnnteyAi?=
+ =?us-ascii?Q?XwzJ7nFSMSYnNeBPdxf2JVP46GHYJ2DTKtp8KY7n0nhxppkhGS6iR4WAJeap?=
+ =?us-ascii?Q?fCiReuFlIF9KJlIgJPZ5OxcYjf9a06DwNHkr3xXGLQXiUia5WNQa/Ea1jSop?=
+ =?us-ascii?Q?3owIAdhu0/v3+USdiq1QoD5z63qIfioaniGck+9ZOTDjqQ1qVYtsH99GX8Gl?=
+ =?us-ascii?Q?srIBzazlwlcehsMjoGFISfQNcJwZRigtJWd/7GyFMg4RaWEHlFuktjbEAJHE?=
+ =?us-ascii?Q?W61qzY+fZaRO4K/SM6DysrUmiB+vW44aKTOmIffn+ka+6ASu8GAUP40EqRct?=
+ =?us-ascii?Q?5PuFt2JQt636ry4hunboQhesB/jad5fAMJQKUEOFXqoxzwG5/fCZI4JqEwou?=
+ =?us-ascii?Q?G/RykORrOwDoDgxv/WTdpKdxoWTrsdD5hY1uw0XOwz30mBSbQ+xhc/rvnDne?=
+ =?us-ascii?Q?ilfOnwMKaCQVEfIxPY0iwV5kB1Tw0BS030sja1WUXmq9CUgVR+rp1m8ET4Fq?=
+ =?us-ascii?Q?Q1NscIW+872s/eCmMawqtCyI071W9uOmZJsJfBhUE4mNt0ZOQ2AZNAith4Zz?=
+ =?us-ascii?Q?Pyx1qY5Knk2kLtXY6GiGXAecL3aOpvl6yHMD0ueS?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 82298f0f-4556-4cdf-9f88-08dbf07621ca
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB5859.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2023 00:57:16.8090
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uaoWgxdX1Yx+e3tIQVeAhfCHA4r0tE7caqRA+qi0tX1q2LlQwuiFSrqYxtcVjN3q
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR12MB5411
 
-On Tue, Nov 28, 2023 at 04:30:27PM -0800, Yosry Ahmed wrote:
-> On Tue, Nov 28, 2023 at 4:28 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> >
-> > On Tue, Nov 28, 2023 at 04:25:03PM -0800, Yosry Ahmed wrote:
-> >
-> > > > > Right, but as I mention above, if userspace starts depending on this
-> > > > > equation, we won't be able to add any more classes of "secondary" page
-> > > > > tables to SecPageTables. I'd like to avoid that if possible. We can do
-> > > > > the subtraction in the kernel.
-> > > >
-> > > > What Sean had suggested was that SecPageTables was always intended to
-> > > > account all the non-primary mmu memory used by page tables. If this is
-> > > > the case we shouldn't be trying to break it apart into finer
-> > > > counters. These are big picture counters, not detailed allocation by
-> > > > owner counters.
+On Tue, Nov 28, 2023 at 04:51:21PM -0800, Nicolin Chen wrote:
+> > > I also thought about making this out_driver_error_code per HW.
+> > > Yet, an error can be either per array or per entry/quest. The
+> > > array-related error should be reported in the array structure
+> > > that is a core uAPI, v.s. the per-HW entry structure. Though
+> > > we could still report an array error in the entry structure
+> > > at the first entry (or indexed by "array->entry_num")?
 > > >
-> > > Right, I agree with that, but if SecPageTables includes page tables
-> > > from multiple sources, and it is observed to be suspiciously high, the
-> > > logical next step is to try to find the culprit, right?
-> >
-> > You can make that case already, if it is high wouldn't you want to
-> > find the exact VMM process that was making it high?
-> >
-> > It is a sign of fire, not a detailed debug tool.
+> > 
+> > why would there be an array error? array is just a software
+> > entity containing actual HW invalidation cmds. If there is
+> > any error with the array itself it should be reported via
+> > ioctl errno.
 > 
-> Fair enough. We can always add separate counters later if needed,
-> potentially under KVM stats to get more fine-grained details as you
-> mentioned.
-> 
-> I am only worried about users subtracting the iommu-only counter to
-> get a KVM counter. We should at least document that  SecPageTables may
-> be expanded to include other sources later to avoid that.
+> User array reading is a software operation, but kernel array
+> reading is a hardware operation that can raise an error when
+> the memory location to the array is incorrect or so.
 
-Well, we just broke it already, anyone thinking it was only kvm
-counters is going to be sad now :) As I understand it was already
-described to be more general that kvm so probably nothing to do really
+Well, we shouldn't get into a situation like that.. By the time the HW
+got the address it should be valid.
+
+> With that being said, I think errno (-EIO) could do the job,
+> as you suggested too.
+
+Do we have any idea what HW failures can be generated by the commands
+this will execture? IIRC I don't remember seeing any smmu specific
+codes related to invalid invalidation? Everything is a valid input?
+
+Can vt-d fail single commands? What about AMD?
+
+> > Jason, how about your opinion? I didn't spot big issues
+> > except this one. Hope it can make into 6.8.
+
+Yes, lets try
 
 Jason
 
