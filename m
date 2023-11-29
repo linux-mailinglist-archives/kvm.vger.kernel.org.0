@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-2803-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2804-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB13C7FE1E3
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 22:27:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FCB47FE1E5
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 22:27:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DAB71F20F04
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 21:27:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 164392831AA
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 21:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B23A2B9B5;
-	Wed, 29 Nov 2023 21:27:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2122B9CA;
+	Wed, 29 Nov 2023 21:27:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="acXmlbn+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gu8Ymmv4"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B0821730
-	for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 13:26:51 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23B341729
+	for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 13:26:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701293210;
+	s=mimecast20190719; t=1701293214;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HQwz+mgd+DCyta0fx7JwmRDq3fNNytwcrXDBy/aTKCk=;
-	b=acXmlbn+wNcSGbHlqoAyfNKAKdBmmOh+6WrCAAW2FZ2ZQzfnO7QTGLTdinXRBY1v5k2jLd
-	F514bqcqwqi6qB4ccTrUtYTaW2+y0SgrvkG1o0YW82hNZYnsGPylgdYdCLKeI7BUGkalsn
-	7/nhpnJKqAQ/zhamwW7mSbcPBKa+ywc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-684-jyXyfs3GMLq1imv_TC9s0Q-1; Wed, 29 Nov 2023 16:26:47 -0500
-X-MC-Unique: jyXyfs3GMLq1imv_TC9s0Q-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	bh=BpLNXxP4Yehpq7UvX9OuyGYKLdha9NvrROrpeAtoX0o=;
+	b=Gu8Ymmv44Elij5mK8jFXcUituPCnDLYAJpD9KXKFLVX9MubljpeNOfIwTcsSvP9jqYTB1P
+	LoyVPmeqlu8HMZqSUUsezu+7M6v0GUxt0cKJNErFjcdaKZYaG1Qhrje96yCL7jQiJ2WsVf
+	C4GQj6L64KW/yT8mcvzvDN1y5Fb5OHc=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-333-k_vygxEVMguyIFoRnuPTCg-1; Wed,
+ 29 Nov 2023 16:26:50 -0500
+X-MC-Unique: k_vygxEVMguyIFoRnuPTCg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BC12F85CE4C;
-	Wed, 29 Nov 2023 21:26:46 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 639F138049EF;
+	Wed, 29 Nov 2023 21:26:49 +0000 (UTC)
 Received: from localhost (unknown [10.39.192.91])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 61097492BFE;
-	Wed, 29 Nov 2023 21:26:45 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 41F60492BE0;
+	Wed, 29 Nov 2023 21:26:48 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
 Cc: Jean-Christophe Dubois <jcd@tribudubois.net>,
@@ -121,9 +121,9 @@ Cc: Jean-Christophe Dubois <jcd@tribudubois.net>,
 	Leonardo Bras <leobras@redhat.com>,
 	Nicholas Piggin <npiggin@gmail.com>,
 	Jiaxun Yang <jiaxun.yang@flygoat.com>
-Subject: [PATCH 5/6] Replace "iothread lock" with "BQL" in comments
-Date: Wed, 29 Nov 2023 16:26:24 -0500
-Message-ID: <20231129212625.1051502-6-stefanha@redhat.com>
+Subject: [PATCH 6/6] Rename "QEMU global mutex" to "BQL" in comments and docs
+Date: Wed, 29 Nov 2023 16:26:25 -0500
+Message-ID: <20231129212625.1051502-7-stefanha@redhat.com>
 In-Reply-To: <20231129212625.1051502-1-stefanha@redhat.com>
 References: <20231129212625.1051502-1-stefanha@redhat.com>
 Precedence: bulk
@@ -133,566 +133,289 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-The term "iothread lock" is obsolete. The APIs use Big QEMU Lock (BQL)
-in their names. Update the code comments to use "BQL" instead of
-"iothread lock".
+The term "QEMU global mutex" is identical to the more widely used Big
+QEMU Lock ("BQL"). Update the code comments and documentation to use
+"BQL" instead of "QEMU global mutex".
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- docs/devel/reset.rst             |  2 +-
- hw/display/qxl.h                 |  2 +-
- include/exec/cpu-common.h        |  2 +-
- include/exec/memory.h            |  4 ++--
- include/exec/ramblock.h          |  2 +-
- include/migration/register.h     |  8 ++++----
- target/arm/internals.h           |  4 ++--
- accel/tcg/cputlb.c               |  4 ++--
- accel/tcg/tcg-accel-ops-icount.c |  2 +-
- hw/remote/mpqemu-link.c          |  2 +-
- migration/block-dirty-bitmap.c   | 10 +++++-----
- migration/block.c                | 24 ++++++++++++------------
- migration/colo.c                 |  2 +-
- migration/migration.c            |  2 +-
- migration/ram.c                  |  4 ++--
- system/physmem.c                 |  6 +++---
- target/arm/helper.c              |  2 +-
- target/arm/tcg/m_helper.c        |  2 +-
- ui/spice-core.c                  |  2 +-
- util/rcu.c                       |  2 +-
- audio/coreaudio.m                |  4 ++--
- ui/cocoa.m                       |  6 +++---
- 22 files changed, 49 insertions(+), 49 deletions(-)
+ docs/devel/multi-thread-tcg.rst   |  7 +++----
+ docs/devel/qapi-code-gen.rst      |  2 +-
+ docs/devel/replay.rst             |  2 +-
+ docs/devel/multiple-iothreads.txt | 16 ++++++++--------
+ include/block/blockjob.h          |  6 +++---
+ include/io/task.h                 |  2 +-
+ include/qemu/coroutine-core.h     |  2 +-
+ include/qemu/coroutine.h          |  2 +-
+ hw/block/dataplane/virtio-blk.c   |  8 ++++----
+ hw/block/virtio-blk.c             |  2 +-
+ hw/scsi/virtio-scsi-dataplane.c   |  6 +++---
+ net/tap.c                         |  2 +-
+ 12 files changed, 28 insertions(+), 29 deletions(-)
 
-diff --git a/docs/devel/reset.rst b/docs/devel/reset.rst
-index 38ed1790f7..d4e79718ba 100644
---- a/docs/devel/reset.rst
-+++ b/docs/devel/reset.rst
-@@ -19,7 +19,7 @@ Triggering reset
+diff --git a/docs/devel/multi-thread-tcg.rst b/docs/devel/multi-thread-tcg.rst
+index c9541a7b20..7302c3bf53 100644
+--- a/docs/devel/multi-thread-tcg.rst
++++ b/docs/devel/multi-thread-tcg.rst
+@@ -226,10 +226,9 @@ instruction. This could be a future optimisation.
+ Emulated hardware state
+ -----------------------
  
- This section documents the APIs which "users" of a resettable object should use
- to control it. All resettable control functions must be called while holding
--the iothread lock.
-+the BQL.
+-Currently thanks to KVM work any access to IO memory is automatically
+-protected by the global iothread mutex, also known as the BQL (Big
+-QEMU Lock). Any IO region that doesn't use global mutex is expected to
+-do its own locking.
++Currently thanks to KVM work any access to IO memory is automatically protected
++by the BQL (Big QEMU Lock). Any IO region that doesn't use the BQL is expected
++to do its own locking.
  
- You can apply a reset to an object using ``resettable_assert_reset()``. You need
- to call ``resettable_release_reset()`` to release the object from reset. To
-diff --git a/hw/display/qxl.h b/hw/display/qxl.h
-index fdac14edad..e0a85a5ca4 100644
---- a/hw/display/qxl.h
-+++ b/hw/display/qxl.h
-@@ -159,7 +159,7 @@ OBJECT_DECLARE_SIMPLE_TYPE(PCIQXLDevice, PCI_QXL)
-  *
-  * Use with care; by the time this function returns, the returned pointer is
-  * not protected by RCU anymore.  If the caller is not within an RCU critical
-- * section and does not hold the iothread lock, it must have other means of
-+ * section and does not hold the BQL, it must have other means of
-  * protecting the pointer, such as a reference to the region that includes
-  * the incoming ram_addr_t.
-  *
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index 41115d8919..fef3138d29 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -92,7 +92,7 @@ RAMBlock *qemu_ram_block_by_name(const char *name);
-  *
-  * By the time this function returns, the returned pointer is not protected
-  * by RCU anymore.  If the caller is not within an RCU critical section and
-- * does not hold the iothread lock, it must have other means of protecting the
-+ * does not hold the BQL, it must have other means of protecting the
-  * pointer, such as a reference to the memory region that owns the RAMBlock.
-  */
- RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 831f7c996d..ad6466b07e 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -1962,7 +1962,7 @@ int memory_region_get_fd(MemoryRegion *mr);
-  *
-  * Use with care; by the time this function returns, the returned pointer is
-  * not protected by RCU anymore.  If the caller is not within an RCU critical
-- * section and does not hold the iothread lock, it must have other means of
-+ * section and does not hold the BQL, it must have other means of
-  * protecting the pointer, such as a reference to the region that includes
-  * the incoming ram_addr_t.
-  *
-@@ -1979,7 +1979,7 @@ MemoryRegion *memory_region_from_host(void *ptr, ram_addr_t *offset);
-  *
-  * Use with care; by the time this function returns, the returned pointer is
-  * not protected by RCU anymore.  If the caller is not within an RCU critical
-- * section and does not hold the iothread lock, it must have other means of
-+ * section and does not hold the BQL, it must have other means of
-  * protecting the pointer, such as a reference to the region that includes
-  * the incoming ram_addr_t.
-  *
-diff --git a/include/exec/ramblock.h b/include/exec/ramblock.h
-index 69c6a53902..a2bc0a345d 100644
---- a/include/exec/ramblock.h
-+++ b/include/exec/ramblock.h
-@@ -34,7 +34,7 @@ struct RAMBlock {
-     ram_addr_t max_length;
-     void (*resized)(const char*, uint64_t length, void *host);
-     uint32_t flags;
--    /* Protected by iothread lock.  */
-+    /* Protected by BQL.  */
-     char idstr[256];
-     /* RCU-enabled, writes protected by the ramlist lock */
-     QLIST_ENTRY(RAMBlock) next;
-diff --git a/include/migration/register.h b/include/migration/register.h
-index fed1d04a3c..9ab1f79512 100644
---- a/include/migration/register.h
-+++ b/include/migration/register.h
-@@ -17,7 +17,7 @@
- #include "hw/vmstate-if.h"
+ However IO memory isn't the only way emulated hardware state can be
+ modified. Some architectures have model specific registers that
+diff --git a/docs/devel/qapi-code-gen.rst b/docs/devel/qapi-code-gen.rst
+index 7f78183cd4..ea8228518c 100644
+--- a/docs/devel/qapi-code-gen.rst
++++ b/docs/devel/qapi-code-gen.rst
+@@ -594,7 +594,7 @@ blocking the guest and other background operations.
+ Coroutine safety can be hard to prove, similar to thread safety.  Common
+ pitfalls are:
  
- typedef struct SaveVMHandlers {
--    /* This runs inside the iothread lock.  */
-+    /* This runs inside the BQL.  */
-     SaveStateHandler *save_state;
+-- The global mutex isn't held across ``qemu_coroutine_yield()``, so
++- The BQL isn't held across ``qemu_coroutine_yield()``, so
+   operations that used to assume that they execute atomically may have
+   to be more careful to protect against changes in the global state.
+ 
+diff --git a/docs/devel/replay.rst b/docs/devel/replay.rst
+index 0244be8b9c..effd856f0c 100644
+--- a/docs/devel/replay.rst
++++ b/docs/devel/replay.rst
+@@ -184,7 +184,7 @@ modes.
+ Reading and writing requests are created by CPU thread of QEMU. Later these
+ requests proceed to block layer which creates "bottom halves". Bottom
+ halves consist of callback and its parameters. They are processed when
+-main loop locks the global mutex. These locks are not synchronized with
++main loop locks the BQL. These locks are not synchronized with
+ replaying process because main loop also processes the events that do not
+ affect the virtual machine state (like user interaction with monitor).
+ 
+diff --git a/docs/devel/multiple-iothreads.txt b/docs/devel/multiple-iothreads.txt
+index a3e949f6b3..828e5527a3 100644
+--- a/docs/devel/multiple-iothreads.txt
++++ b/docs/devel/multiple-iothreads.txt
+@@ -5,7 +5,7 @@ the COPYING file in the top-level directory.
+ 
+ 
+ This document explains the IOThread feature and how to write code that runs
+-outside the QEMU global mutex.
++outside the BQL.
+ 
+ The main loop and IOThreads
+ ---------------------------
+@@ -29,13 +29,13 @@ scalability bottleneck on hosts with many CPUs.  Work can be spread across
+ several IOThreads instead of just one main loop.  When set up correctly this
+ can improve I/O latency and reduce jitter seen by the guest.
+ 
+-The main loop is also deeply associated with the QEMU global mutex, which is a
+-scalability bottleneck in itself.  vCPU threads and the main loop use the QEMU
+-global mutex to serialize execution of QEMU code.  This mutex is necessary
+-because a lot of QEMU's code historically was not thread-safe.
++The main loop is also deeply associated with the BQL, which is a
++scalability bottleneck in itself.  vCPU threads and the main loop use the BQL
++to serialize execution of QEMU code.  This mutex is necessary because a lot of
++QEMU's code historically was not thread-safe.
+ 
+ The fact that all I/O processing is done in a single main loop and that the
+-QEMU global mutex is contended by all vCPU threads and the main loop explain
++BQL is contended by all vCPU threads and the main loop explain
+ why it is desirable to place work into IOThreads.
+ 
+ The experimental virtio-blk data-plane implementation has been benchmarked and
+@@ -66,7 +66,7 @@ There are several old APIs that use the main loop AioContext:
+ 
+ Since they implicitly work on the main loop they cannot be used in code that
+ runs in an IOThread.  They might cause a crash or deadlock if called from an
+-IOThread since the QEMU global mutex is not held.
++IOThread since the BQL is not held.
+ 
+ Instead, use the AioContext functions directly (see include/block/aio.h):
+  * aio_set_fd_handler() - monitor a file descriptor
+@@ -105,7 +105,7 @@ used in the block layer and can lead to hangs.
+ 
+ There is currently no lock ordering rule if a thread needs to acquire multiple
+ AioContexts simultaneously.  Therefore, it is only safe for code holding the
+-QEMU global mutex to acquire other AioContexts.
++BQL to acquire other AioContexts.
+ 
+ Side note: the best way to schedule a function call across threads is to call
+ aio_bh_schedule_oneshot().  No acquire/release or locking is needed.
+diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+index e594c10d23..b2bc7c04d6 100644
+--- a/include/block/blockjob.h
++++ b/include/block/blockjob.h
+@@ -54,7 +54,7 @@ typedef struct BlockJob {
+ 
+     /**
+      * Speed that was set with @block_job_set_speed.
+-     * Always modified and read under QEMU global mutex (GLOBAL_STATE_CODE).
++     * Always modified and read under BQL (GLOBAL_STATE_CODE).
+      */
+     int64_t speed;
+ 
+@@ -66,7 +66,7 @@ typedef struct BlockJob {
+ 
+     /**
+      * Block other operations when block job is running.
+-     * Always modified and read under QEMU global mutex (GLOBAL_STATE_CODE).
++     * Always modified and read under BQL (GLOBAL_STATE_CODE).
+      */
+     Error *blocker;
+ 
+@@ -89,7 +89,7 @@ typedef struct BlockJob {
+ 
+     /**
+      * BlockDriverStates that are involved in this block job.
+-     * Always modified and read under QEMU global mutex (GLOBAL_STATE_CODE).
++     * Always modified and read under BQL (GLOBAL_STATE_CODE).
+      */
+     GSList *nodes;
+ } BlockJob;
+diff --git a/include/io/task.h b/include/io/task.h
+index dc7d32ebd0..0b5342ee84 100644
+--- a/include/io/task.h
++++ b/include/io/task.h
+@@ -149,7 +149,7 @@ typedef void (*QIOTaskWorker)(QIOTask *task,
+  * lookups) to be easily run non-blocking. Reporting the
+  * results in the main thread context means that the caller
+  * typically does not need to be concerned about thread
+- * safety wrt the QEMU global mutex.
++ * safety wrt the BQL.
+  *
+  * For example, the socket_listen() method will block the caller
+  * while DNS lookups take place if given a name, instead of IP
+diff --git a/include/qemu/coroutine-core.h b/include/qemu/coroutine-core.h
+index 230bb56517..503bad6e0e 100644
+--- a/include/qemu/coroutine-core.h
++++ b/include/qemu/coroutine-core.h
+@@ -22,7 +22,7 @@
+  * rather than callbacks, for operations that need to give up control while
+  * waiting for events to complete.
+  *
+- * These functions are re-entrant and may be used outside the global mutex.
++ * These functions are re-entrant and may be used outside the BQL.
+  *
+  * Functions that execute in coroutine context cannot be called
+  * directly from normal functions.  Use @coroutine_fn to mark such
+diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
+index a65be6697f..e6aff45301 100644
+--- a/include/qemu/coroutine.h
++++ b/include/qemu/coroutine.h
+@@ -26,7 +26,7 @@
+  * rather than callbacks, for operations that need to give up control while
+  * waiting for events to complete.
+  *
+- * These functions are re-entrant and may be used outside the global mutex.
++ * These functions are re-entrant and may be used outside the BQL.
+  *
+  * Functions that execute in coroutine context cannot be called
+  * directly from normal functions.  Use @coroutine_fn to mark such
+diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
+index f83bb0f116..eafc573407 100644
+--- a/hw/block/dataplane/virtio-blk.c
++++ b/hw/block/dataplane/virtio-blk.c
+@@ -47,7 +47,7 @@ void virtio_blk_data_plane_notify(VirtIOBlockDataPlane *s, VirtQueue *vq)
+     virtio_notify_irqfd(s->vdev, vq);
+ }
+ 
+-/* Context: QEMU global mutex held */
++/* Context: BQL held */
+ bool virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
+                                   VirtIOBlockDataPlane **dataplane,
+                                   Error **errp)
+@@ -100,7 +100,7 @@ bool virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
+     return true;
+ }
+ 
+-/* Context: QEMU global mutex held */
++/* Context: BQL held */
+ void virtio_blk_data_plane_destroy(VirtIOBlockDataPlane *s)
+ {
+     VirtIOBlock *vblk;
+@@ -117,7 +117,7 @@ void virtio_blk_data_plane_destroy(VirtIOBlockDataPlane *s)
+     g_free(s);
+ }
+ 
+-/* Context: QEMU global mutex held */
++/* Context: BQL held */
+ int virtio_blk_data_plane_start(VirtIODevice *vdev)
+ {
+     VirtIOBlock *vblk = VIRTIO_BLK(vdev);
+@@ -261,7 +261,7 @@ static void virtio_blk_data_plane_stop_bh(void *opaque)
+     }
+ }
+ 
+-/* Context: QEMU global mutex held */
++/* Context: BQL held */
+ void virtio_blk_data_plane_stop(VirtIODevice *vdev)
+ {
+     VirtIOBlock *vblk = VIRTIO_BLK(vdev);
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index a1f8e15522..2a5f6544cc 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -1500,7 +1500,7 @@ static void virtio_blk_resize(void *opaque)
+     VirtIODevice *vdev = VIRTIO_DEVICE(opaque);
  
      /*
-@@ -30,7 +30,7 @@ typedef struct SaveVMHandlers {
-     int (*save_live_complete_postcopy)(QEMUFile *f, void *opaque);
-     int (*save_live_complete_precopy)(QEMUFile *f, void *opaque);
- 
--    /* This runs both outside and inside the iothread lock.  */
-+    /* This runs both outside and inside the BQL.  */
-     bool (*is_active)(void *opaque);
-     bool (*has_postcopy)(void *opaque);
- 
-@@ -43,14 +43,14 @@ typedef struct SaveVMHandlers {
+-     * virtio_notify_config() needs to acquire the global mutex,
++     * virtio_notify_config() needs to acquire the BQL,
+      * so it can't be called from an iothread. Instead, schedule
+      * it to be run in the main context BH.
       */
-     bool (*is_active_iterate)(void *opaque);
+diff --git a/hw/scsi/virtio-scsi-dataplane.c b/hw/scsi/virtio-scsi-dataplane.c
+index 1e684beebe..56ecc5b12e 100644
+--- a/hw/scsi/virtio-scsi-dataplane.c
++++ b/hw/scsi/virtio-scsi-dataplane.c
+@@ -20,7 +20,7 @@
+ #include "scsi/constants.h"
+ #include "hw/virtio/virtio-bus.h"
  
--    /* This runs outside the iothread lock in the migration case, and
-+    /* This runs outside the BQL in the migration case, and
-      * within the lock in the savevm case.  The callback had better only
-      * use data that is local to the migration thread or protected
-      * by other locks.
-      */
-     int (*save_live_iterate)(QEMUFile *f, void *opaque);
+-/* Context: QEMU global mutex held */
++/* Context: BQL held */
+ void virtio_scsi_dataplane_setup(VirtIOSCSI *s, Error **errp)
+ {
+     VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(s);
+@@ -93,7 +93,7 @@ static void virtio_scsi_dataplane_stop_bh(void *opaque)
+     }
+ }
  
--    /* This runs outside the iothread lock!  */
-+    /* This runs outside the BQL!  */
-     /* Note for save_live_pending:
-      * must_precopy:
-      * - must be migrated in precopy or in stopped state
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 143d57c0fe..71d6c70bf3 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -940,7 +940,7 @@ static inline const char *aarch32_mode_name(uint32_t psr)
-  *
-  * Update the CPU_INTERRUPT_VIRQ bit in cs->interrupt_request, following
-  * a change to either the input VIRQ line from the GIC or the HCR_EL2.VI bit.
-- * Must be called with the iothread lock held.
-+ * Must be called with the BQL held.
-  */
- void arm_cpu_update_virq(ARMCPU *cpu);
+-/* Context: QEMU global mutex held */
++/* Context: BQL held */
+ int virtio_scsi_dataplane_start(VirtIODevice *vdev)
+ {
+     int i;
+@@ -191,7 +191,7 @@ fail_guest_notifiers:
+     return -ENOSYS;
+ }
  
-@@ -949,7 +949,7 @@ void arm_cpu_update_virq(ARMCPU *cpu);
-  *
-  * Update the CPU_INTERRUPT_VFIQ bit in cs->interrupt_request, following
-  * a change to either the input VFIQ line from the GIC or the HCR_EL2.VF bit.
-- * Must be called with the iothread lock held.
-+ * Must be called with the BQL held.
-  */
- void arm_cpu_update_vfiq(ARMCPU *cpu);
+-/* Context: QEMU global mutex held */
++/* Context: BQL held */
+ void virtio_scsi_dataplane_stop(VirtIODevice *vdev)
+ {
+     BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
+diff --git a/net/tap.c b/net/tap.c
+index c23d0323c2..c698b70475 100644
+--- a/net/tap.c
++++ b/net/tap.c
+@@ -219,7 +219,7 @@ static void tap_send(void *opaque)
  
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 3c0b1658ee..a23d77e762 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -1975,7 +1975,7 @@ static void *atomic_mmu_lookup(CPUState *cpu, vaddr addr, MemOpIdx oi,
-  * @size: number of bytes
-  * @mmu_idx: virtual address context
-  * @ra: return address into tcg generated code, or 0
-- * Context: iothread lock held
-+ * Context: BQL held
-  *
-  * Load @size bytes from @addr, which is memory-mapped i/o.
-  * The bytes are concatenated in big-endian order with @ret_be.
-@@ -2521,7 +2521,7 @@ static Int128 do_ld16_mmu(CPUState *cpu, vaddr addr,
-  * @size: number of bytes
-  * @mmu_idx: virtual address context
-  * @ra: return address into tcg generated code, or 0
-- * Context: iothread lock held
-+ * Context: BQL held
-  *
-  * Store @size bytes at @addr, which is memory-mapped i/o.
-  * The bytes to store are extracted in little-endian order from @val_le;
-diff --git a/accel/tcg/tcg-accel-ops-icount.c b/accel/tcg/tcg-accel-ops-icount.c
-index 76b9bedc08..c886d16218 100644
---- a/accel/tcg/tcg-accel-ops-icount.c
-+++ b/accel/tcg/tcg-accel-ops-icount.c
-@@ -123,7 +123,7 @@ void icount_prepare_for_run(CPUState *cpu, int64_t cpu_budget)
- 
-     if (cpu->icount_budget == 0) {
          /*
--         * We're called without the iothread lock, so must take it while
-+         * We're called without the BQL, so must take it while
-          * we're calling timer handlers.
+          * When the host keeps receiving more packets while tap_send() is
+-         * running we can hog the QEMU global mutex.  Limit the number of
++         * running we can hog the BQL.  Limit the number of
+          * packets that are processed per tap_send() callback to prevent
+          * stalling the guest.
           */
-         qemu_bql_lock();
-diff --git a/hw/remote/mpqemu-link.c b/hw/remote/mpqemu-link.c
-index ffb2c25145..c6c8821313 100644
---- a/hw/remote/mpqemu-link.c
-+++ b/hw/remote/mpqemu-link.c
-@@ -58,7 +58,7 @@ bool mpqemu_msg_send(MPQemuMsg *msg, QIOChannel *ioc, Error **errp)
-     assert(qemu_in_coroutine() || !iothread);
- 
-     /*
--     * Skip unlocking/locking iothread lock when the IOThread is running
-+     * Skip unlocking/locking BQL when the IOThread is running
-      * in co-routine context. Co-routine context is asserted above
-      * for IOThread case.
-      * Also skip lock handling while in a co-routine in the main context.
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
-index b5a2d377db..f8bc70b45d 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -464,7 +464,7 @@ static void send_bitmap_bits(QEMUFile *f, DBMSaveState *s,
-     g_free(buf);
- }
- 
--/* Called with iothread lock taken.  */
-+/* Called with BQL taken.  */
- static void dirty_bitmap_do_save_cleanup(DBMSaveState *s)
- {
-     SaveBitmapState *dbms;
-@@ -479,7 +479,7 @@ static void dirty_bitmap_do_save_cleanup(DBMSaveState *s)
-     }
- }
- 
--/* Called with iothread lock taken. */
-+/* Called with BQL taken. */
- static int add_bitmaps_to_list(DBMSaveState *s, BlockDriverState *bs,
-                                const char *bs_name, GHashTable *alias_map)
- {
-@@ -598,7 +598,7 @@ static int add_bitmaps_to_list(DBMSaveState *s, BlockDriverState *bs,
-     return 0;
- }
- 
--/* Called with iothread lock taken. */
-+/* Called with BQL taken. */
- static int init_dirty_bitmap_migration(DBMSaveState *s)
- {
-     BlockDriverState *bs;
-@@ -607,7 +607,7 @@ static int init_dirty_bitmap_migration(DBMSaveState *s)
-     BlockBackend *blk;
-     GHashTable *alias_map = NULL;
- 
--    /* Runs in the migration thread, but holds the iothread lock */
-+    /* Runs in the migration thread, but holds the BQL */
-     GLOBAL_STATE_CODE();
-     GRAPH_RDLOCK_GUARD_MAINLOOP();
- 
-@@ -742,7 +742,7 @@ static int dirty_bitmap_save_iterate(QEMUFile *f, void *opaque)
-     return s->bulk_completed;
- }
- 
--/* Called with iothread lock taken.  */
-+/* Called with BQL taken.  */
- 
- static int dirty_bitmap_save_complete(QEMUFile *f, void *opaque)
- {
-diff --git a/migration/block.c b/migration/block.c
-index 87f36e6e35..464510e889 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -66,7 +66,7 @@ typedef struct BlkMigDevState {
-     /* Protected by block migration lock.  */
-     int64_t completed_sectors;
- 
--    /* During migration this is protected by iothread lock / AioContext.
-+    /* During migration this is protected by BQL / AioContext.
-      * Allocation and free happen during setup and cleanup respectively.
-      */
-     BdrvDirtyBitmap *dirty_bitmap;
-@@ -101,7 +101,7 @@ typedef struct BlkMigState {
-     int prev_progress;
-     int bulk_completed;
- 
--    /* Lock must be taken _inside_ the iothread lock and any AioContexts.  */
-+    /* Lock must be taken _inside_ the BQL and any AioContexts.  */
-     QemuMutex lock;
- } BlkMigState;
- 
-@@ -117,7 +117,7 @@ static void blk_mig_unlock(void)
-     qemu_mutex_unlock(&block_mig_state.lock);
- }
- 
--/* Must run outside of the iothread lock during the bulk phase,
-+/* Must run outside of the BQL during the bulk phase,
-  * or the VM will stall.
-  */
- 
-@@ -334,7 +334,7 @@ static int mig_save_device_bulk(QEMUFile *f, BlkMigDevState *bmds)
-     return (bmds->cur_sector >= total_sectors);
- }
- 
--/* Called with iothread lock taken.  */
-+/* Called with BQL taken.  */
- 
- static int set_dirty_tracking(void)
- {
-@@ -361,7 +361,7 @@ fail:
-     return ret;
- }
- 
--/* Called with iothread lock taken.  */
-+/* Called with BQL taken.  */
- 
- static void unset_dirty_tracking(void)
- {
-@@ -512,7 +512,7 @@ static void blk_mig_reset_dirty_cursor(void)
-     }
- }
- 
--/* Called with iothread lock and AioContext taken.  */
-+/* Called with BQL and AioContext taken.  */
- 
- static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
-                                  int is_async)
-@@ -594,7 +594,7 @@ error:
-     return ret;
- }
- 
--/* Called with iothread lock taken.
-+/* Called with BQL taken.
-  *
-  * return value:
-  * 0: too much data for max_downtime
-@@ -658,7 +658,7 @@ static int flush_blks(QEMUFile *f)
-     return ret;
- }
- 
--/* Called with iothread lock taken.  */
-+/* Called with BQL taken.  */
- 
- static int64_t get_remaining_dirty(void)
- {
-@@ -676,7 +676,7 @@ static int64_t get_remaining_dirty(void)
- 
- 
- 
--/* Called with iothread lock taken.  */
-+/* Called with BQL taken.  */
- static void block_migration_cleanup_bmds(void)
- {
-     BlkMigDevState *bmds;
-@@ -706,7 +706,7 @@ static void block_migration_cleanup_bmds(void)
-     }
- }
- 
--/* Called with iothread lock taken.  */
-+/* Called with BQL taken.  */
- static void block_migration_cleanup(void *opaque)
- {
-     BlkMigBlock *blk;
-@@ -783,7 +783,7 @@ static int block_save_iterate(QEMUFile *f, void *opaque)
-             }
-             ret = 0;
-         } else {
--            /* Always called with iothread lock taken for
-+            /* Always called with BQL taken for
-              * simplicity, block_save_complete also calls it.
-              */
-             qemu_bql_lock();
-@@ -811,7 +811,7 @@ static int block_save_iterate(QEMUFile *f, void *opaque)
-     return (delta_bytes > 0);
- }
- 
--/* Called with iothread lock taken.  */
-+/* Called with BQL taken.  */
- 
- static int block_save_complete(QEMUFile *f, void *opaque)
- {
-diff --git a/migration/colo.c b/migration/colo.c
-index 2e68107cfa..44c789b82b 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -945,7 +945,7 @@ int coroutine_fn colo_incoming_co(void)
-     qemu_thread_join(&th);
-     qemu_bql_lock();
- 
--    /* We hold the global iothread lock, so it is safe here */
-+    /* We hold the global BQL, so it is safe here */
-     colo_release_ram_cache();
- 
-     return 0;
-diff --git a/migration/migration.c b/migration/migration.c
-index b153133fba..ceb5b69c0c 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2566,7 +2566,7 @@ fail:
- 
- /**
-  * migration_maybe_pause: Pause if required to by
-- * migrate_pause_before_switchover called with the iothread locked
-+ * migrate_pause_before_switchover called with the BQL locked
-  * Returns: 0 on success
-  */
- static int migration_maybe_pause(MigrationState *s,
-diff --git a/migration/ram.c b/migration/ram.c
-index f274bcf655..0884affa54 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2395,7 +2395,7 @@ static void ram_save_cleanup(void *opaque)
- 
-     /* We don't use dirty log with background snapshots */
-     if (!migrate_background_snapshot()) {
--        /* caller have hold iothread lock or is in a bh, so there is
-+        /* caller have hold BQL or is in a bh, so there is
-          * no writing race against the migration bitmap
-          */
-         if (global_dirty_tracking & GLOBAL_DIRTY_MIGRATION) {
-@@ -3131,7 +3131,7 @@ out:
-  *
-  * Returns zero to indicate success or negative on error
-  *
-- * Called with iothread lock
-+ * Called with BQL
-  *
-  * @f: QEMUFile where to send the data
-  * @opaque: RAMState pointer
-diff --git a/system/physmem.c b/system/physmem.c
-index c136675876..9d0cd31ef5 100644
---- a/system/physmem.c
-+++ b/system/physmem.c
-@@ -799,7 +799,7 @@ static RAMBlock *qemu_get_ram_block(ram_addr_t addr)
-     abort();
- 
- found:
--    /* It is safe to write mru_block outside the iothread lock.  This
-+    /* It is safe to write mru_block outside the BQL.  This
-      * is what happens:
-      *
-      *     mru_block = xxx
-@@ -1597,7 +1597,7 @@ int qemu_ram_get_fd(RAMBlock *rb)
-     return rb->fd;
- }
- 
--/* Called with iothread lock held.  */
-+/* Called with BQL held.  */
- void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, DeviceState *dev)
- {
-     RAMBlock *block;
-@@ -1625,7 +1625,7 @@ void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, DeviceState *dev)
-     }
- }
- 
--/* Called with iothread lock held.  */
-+/* Called with BQL held.  */
- void qemu_ram_unset_idstr(RAMBlock *block)
- {
-     /* FIXME: arch_init.c assumes that this is not called throughout
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index f472043986..1262a33844 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -5824,7 +5824,7 @@ static void do_hcr_write(CPUARMState *env, uint64_t value, uint64_t valid_mask)
-      * Updates to VI and VF require us to update the status of
-      * virtual interrupts, which are the logical OR of these bits
-      * and the state of the input lines from the GIC. (This requires
--     * that we have the iothread lock, which is done by marking the
-+     * that we have the BQL, which is done by marking the
-      * reginfo structs as ARM_CP_IO.)
-      * Note that if a write to HCR pends a VIRQ or VFIQ it is never
-      * possible for it to be taken immediately, because VIRQ and
-diff --git a/target/arm/tcg/m_helper.c b/target/arm/tcg/m_helper.c
-index 5f38b9a4a1..78c339b526 100644
---- a/target/arm/tcg/m_helper.c
-+++ b/target/arm/tcg/m_helper.c
-@@ -373,7 +373,7 @@ void HELPER(v7m_preserve_fp_state)(CPUARMState *env)
-     bool ts = is_secure && (env->v7m.fpccr[M_REG_S] & R_V7M_FPCCR_TS_MASK);
-     bool take_exception;
- 
--    /* Take the iothread lock as we are going to touch the NVIC */
-+    /* Take the BQL as we are going to touch the NVIC */
-     qemu_bql_lock();
- 
-     /* Check the background context had access to the FPU */
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index 1d895d2fe8..40923bfa58 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -217,7 +217,7 @@ static void channel_event(int event, SpiceChannelEventInfo *info)
-      * not do that.  It isn't that easy to fix it in spice and even
-      * when it is fixed we still should cover the already released
-      * spice versions.  So detect that we've been called from another
--     * thread and grab the iothread lock if so before calling qemu
-+     * thread and grab the BQL if so before calling qemu
-      * functions.
-      */
-     bool need_lock = !qemu_thread_is_self(&me);
-diff --git a/util/rcu.c b/util/rcu.c
-index 8331f24288..88fc7479b2 100644
---- a/util/rcu.c
-+++ b/util/rcu.c
-@@ -409,7 +409,7 @@ static void rcu_init_complete(void)
- 
-     qemu_event_init(&rcu_call_ready_event, false);
- 
--    /* The caller is assumed to have iothread lock, so the call_rcu thread
-+    /* The caller is assumed to have BQL, so the call_rcu thread
-      * must have been quiescent even after forking, just recreate it.
-      */
-     qemu_thread_create(&thread, "call_rcu", call_rcu_thread,
-diff --git a/audio/coreaudio.m b/audio/coreaudio.m
-index 866d7a9436..b192fc6e83 100644
---- a/audio/coreaudio.m
-+++ b/audio/coreaudio.m
-@@ -299,7 +299,7 @@ static ret_type glue(coreaudio_, name)args_decl             \
- #undef COREAUDIO_WRAPPER_FUNC
- 
- /*
-- * callback to feed audiooutput buffer. called without iothread lock.
-+ * callback to feed audiooutput buffer. called without BQL.
-  * allowed to lock "buf_mutex", but disallowed to have any other locks.
-  */
- static OSStatus audioDeviceIOProc(
-@@ -538,7 +538,7 @@ static void update_device_playback_state(coreaudioVoiceOut *core)
-     }
- }
- 
--/* called without iothread lock. */
-+/* called without BQL. */
- static OSStatus handle_voice_change(
-     AudioObjectID in_object_id,
-     UInt32 in_number_addresses,
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 8a7d0a6f0c..51e41a6333 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -113,7 +113,7 @@ static void cocoa_switch(DisplayChangeListener *dcl,
- static QemuClipboardInfo *cbinfo;
- static QemuEvent cbevent;
- 
--// Utility functions to run specified code block with iothread lock held
-+// Utility functions to run specified code block with BQL held
- typedef void (^CodeBlock)(void);
- typedef bool (^BoolCodeBlock)(void);
- 
-@@ -548,7 +548,7 @@ - (void) setContentDimensions
- 
- - (void) updateUIInfoLocked
- {
--    /* Must be called with the iothread lock, i.e. via updateUIInfo */
-+    /* Must be called with the BQL, i.e. via updateUIInfo */
-     NSSize frameSize;
-     QemuUIInfo info;
- 
-@@ -2075,7 +2075,7 @@ static void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
-      * Create the menu entries which depend on QEMU state (for consoles
-      * and removable devices). These make calls back into QEMU functions,
-      * which is OK because at this point we know that the second thread
--     * holds the iothread lock and is synchronously waiting for us to
-+     * holds the BQL and is synchronously waiting for us to
-      * finish.
-      */
-     add_console_menu_entries();
 -- 
 2.42.0
 
