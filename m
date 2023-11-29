@@ -1,170 +1,191 @@
-Return-Path: <kvm+bounces-2785-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2786-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 687D67FDE17
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 18:13:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 375FF7FDF49
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 19:25:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3C0EB211D5
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 17:13:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 687251C20B6F
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 18:25:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF6E446BBC;
-	Wed, 29 Nov 2023 17:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 520625D4AB;
+	Wed, 29 Nov 2023 18:25:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="l0EVZnTS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gAgzZ6gR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEB8CBC;
-	Wed, 29 Nov 2023 09:13:08 -0800 (PST)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ATH70Ur005040;
-	Wed, 29 Nov 2023 17:13:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=azPyXhZAO1/LTSGf53Txxbl0DE8jhzL3YiN2cyuqFac=;
- b=l0EVZnTSphWZ1qGZL+Sqz4tnQM9yZR09wdUK+E/dG2wKs9vTkJooo71/xSntJIGEswgw
- xkD04Q1WWcWns82lyQ6G0XHQVkmqf2QyVJ8mrk/nAUu1uufgXFrXpC3Evnz6LVHquNVt
- Ajlbd+JzBPw5rFF6L1ypJdHRG2vbeydfcI1O5ryMvfa47Vkl0fJIFNDYg9ZzK7XWqLiY
- zCd4jqnpRd4GZ9NO1dPSHQe2f0EMRIlRp1JDhLC4daFIew7PpMZpYpddahkvHgd+32H4
- zfawTDpKw666S9YilKWp9jqVI3j2NrSNiPKNqVCoRDrY5nLBwCXYwIkedVP188nL532p xg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3up9ds07hj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 Nov 2023 17:13:04 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3ATH75Ha005199;
-	Wed, 29 Nov 2023 17:12:50 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3up9ds06hv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 Nov 2023 17:12:50 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3ATGnLc7011187;
-	Wed, 29 Nov 2023 17:12:38 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ukwy2041w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 Nov 2023 17:12:38 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3ATHCZdT12845702
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 29 Nov 2023 17:12:35 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1673020043;
-	Wed, 29 Nov 2023 17:12:35 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8178420040;
-	Wed, 29 Nov 2023 17:12:34 +0000 (GMT)
-Received: from [9.179.21.219] (unknown [9.179.21.219])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 29 Nov 2023 17:12:34 +0000 (GMT)
-Message-ID: <b43414ef-7aa4-9e5c-a706-41861f0d346c@linux.ibm.com>
-Date: Wed, 29 Nov 2023 18:12:34 +0100
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0244910F
+	for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 10:25:32 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cff359d156so816565ad.2
+        for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 10:25:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701282331; x=1701887131; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=u4fWnS8KCc7MNvbU8xpMSjs/sidzZbsAjD36ZdMftP0=;
+        b=gAgzZ6gRAXEtCjf3h8++bsepTJSayLwbPIITAx4f9U+360/8obVhpxnVDSe2LnRPWG
+         XgsK87v1UeCrv+FKHYeKQDRL6mM1hidpCfOmoCD3Qqf1W7OrQA4coFN5NfM3ti2ydTiq
+         Oa6M34bU9L0co198PlU7HA4Q4yH+ft+dhh9yW1ma+0VnyUuDWwas4myAWYiAN0jJ2d7h
+         cgZc+QjDFeeRP0DXvN1kHFjqNN7yux09HDIohtYRr4/Q5AabWgwoiCJZkZFhOC34DIEz
+         jQeN0j31qiQb9vysP/fVi5dbJetOL/Vnubj7c5+Hw/reIoWyp/jnC2PvOyJ2/kRM9qKy
+         IxYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701282331; x=1701887131;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u4fWnS8KCc7MNvbU8xpMSjs/sidzZbsAjD36ZdMftP0=;
+        b=GQUvqo3YYiXxp5rwB4sp9CvnM6y4uZTxMRxv22xNvPx2TSjgqOP491bUB/krnCPRRu
+         i8W9OREBSO6t1dmrRjefJIK8oMIjnf6DinC1uX0LuMYVPH4matBDvqT6mpWsA9qkqKwy
+         v1PEbvSewR+nK971627+S5Kur7+sKeetBw022kOYFCzugOiNDEkbMCT8SkLVAuKuhihz
+         u13te2al/WgVj+M6L8PX9AXhnjaRuOPyHJBFE819DJ8qMOE4DXoZM5BojxQqbWIR8ySd
+         q3x3D20fbVH/4tJQ0zzPa8HKFOjSSDoSxitP8LMgnR7QrnzGNaMLjEuOVRADLaw0m2sE
+         sh1Q==
+X-Gm-Message-State: AOJu0YzFmAHZZPQxHqHo5JxEtSErS5T+V2/0b6OEFZjeQRvDf/68QqCv
+	0RCc1qg0nvJ76bCdJM5qS6BK9nt1X6I=
+X-Google-Smtp-Source: AGHT+IGrxf40BQP7nniTAO79iKHLuD08KvDSxknYYYp6NltQ6nf9nJ8IH7FCZ/mjwcc3S3BbIHJ2rpL9t5Q=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:11d1:b0:1cf:5d59:8ecc with SMTP id
+ q17-20020a17090311d100b001cf5d598eccmr4755463plh.5.1701282331465; Wed, 29 Nov
+ 2023 10:25:31 -0800 (PST)
+Date: Wed, 29 Nov 2023 10:25:29 -0800
+In-Reply-To: <bcbc9d0f-8b52-468b-8c69-0e09ec168a39@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH] s390/vfio-ap: handle response code 01 on queue reset
-Content-Language: en-US
-To: Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc: jjherne@linux.ibm.com, pasic@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
-        david@redhat.com
-References: <20231129143529.260264-1-akrowiak@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20231129143529.260264-1-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: c0zicIJzmU0dgoEO2gJEoy8knN0XQPTy
-X-Proofpoint-GUID: MlZMYa1VOAevDuZn0VXzPwp02-1s7FQk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-29_15,2023-11-29_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 mlxscore=0
- malwarescore=0 impostorscore=0 spamscore=0 mlxlogscore=999 suspectscore=0
- priorityscore=1501 lowpriorityscore=0 bulkscore=0 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311290131
+Mime-Version: 1.0
+References: <20231123075818.12521-1-likexu@tencent.com> <ZWVCwvoETD_NVOFG@google.com>
+ <bcbc9d0f-8b52-468b-8c69-0e09ec168a39@gmail.com>
+Message-ID: <ZWeB_nfLPmyRnbAs@google.com>
+Subject: Re: [PATCH] KVM: x86: Use get_cpl directly in case of vcpu_load to
+ improve accuracy
+From: Sean Christopherson <seanjc@google.com>
+To: Like Xu <like.xu.linux@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Am 29.11.23 um 15:35 schrieb Tony Krowiak:
-> In the current implementation, response code 01 (AP queue number not valid)
-> is handled as a default case along with other response codes returned from
-> a queue reset operation that are not handled specifically. Barring a bug,
-> response code 01 will occur only when a queue has been externally removed
-> from the host's AP configuration; nn this case, the queue must
-> be reset by the machine in order to avoid leaking crypto data if/when the
-> queue is returned to the host's configuration. The response code 01 case
-> will be handled specifically by logging a WARN message followed by cleaning
-> up the IRQ resources.
+On Wed, Nov 29, 2023, Like Xu wrote:
+> > Rather than fudge around that ugliness with a kvm_get_running_vcpu() check, what
+> > if we instead repurpose kvm_arch_dy_has_pending_interrupt(), which is effectively
+> > x86 specific, to deal with not being able to read the current CPL for a vCPU that
+> > is (possibly) not "loaded", which AFAICT is also x86 specific (or rather, Intel/VMX
+> > specific).
 > 
-
-To me it looks like this can be triggered by the LPAR admin, correct? So it
-is not desireable but possible.
-In that case I prefer to not use WARN, maybe use dev_warn or dev_err instead.
-WARN can be a disruptive event if panic_on_warn is set.
-
-
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->   drivers/s390/crypto/vfio_ap_ops.c | 31 +++++++++++++++++++++++++++++++
->   1 file changed, 31 insertions(+)
+> I'd break it into two parts, the first step applying this simpler, more
+> straightforward fix (which is backport friendly compared to the diff below),
+> and the second step applying your insight for more decoupling and cleanup.
 > 
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 4db538a55192..91d6334574d8 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -1652,6 +1652,21 @@ static int apq_status_check(int apqn, struct ap_queue_status *status)
->   		 * a value indicating a reset needs to be performed again.
->   		 */
->   		return -EAGAIN;
-> +	case AP_RESPONSE_Q_NOT_AVAIL:
-> +		/*
-> +		 * This response code indicates the queue is not available.
-> +		 * Barring a bug, response code 01 will occur only when a queue
-> +		 * has been externally removed from the host's AP configuration;
-> +		 * in which case, the queue must be reset by the machine in
-> +		 * order to avoid leaking crypto data if/when the queue is
-> +		 * returned to the host's configuration. In this case, let's go
-> +		 * ahead and log a warning message and return 0 so the AQIC
-> +		 * resources get cleaned up by the caller.
-> +		 */
-> +		WARN(true,
-> +		     "Unable to reset queue %02x.%04x: not in host AP configuration\n",
-> +		     AP_QID_CARD(apqn), AP_QID_QUEUE(apqn));
-> +			return 0;
->   	default:
->   		WARN(true,
->   		     "failed to verify reset of queue %02x.%04x: TAPQ rc=%u\n",
-> @@ -1736,6 +1751,22 @@ static void vfio_ap_mdev_reset_queue(struct vfio_ap_queue *q)
->   		q->reset_status.response_code = 0;
->   		vfio_ap_free_aqic_resources(q);
->   		break;
-> +	case AP_RESPONSE_Q_NOT_AVAIL:
-> +		/*
-> +		 * This response code indicates the queue is not available.
-> +		 * Barring a bug, response code 01 will occur only when a queue
-> +		 * has been externally removed from the host's AP configuration;
-> +		 * in which case, the queue must be reset by the machine in
-> +		 * order to avoid leaking crypto data if/when the queue is
-> +		 * returned to the host's configuration. In this case, let's go
-> +		 * ahead and log a warning message then clean up the AQIC
-> +		 * resources.
-> +		 */
-> +		WARN(true,
-> +		     "Unable to reset queue %02x.%04x: not in host AP configuration\n",
-> +		     AP_QID_CARD(q->apqn), AP_QID_QUEUE(q->apqn));
-> +		vfio_ap_free_aqic_resources(q);
-> +		break;
->   	default:
->   		WARN(true,
->   		     "PQAP/ZAPQ for %02x.%04x failed with invalid rc=%u\n",
+> You'd prefer one move to fix it, right ?
+
+Yeah, I'll apply your patch first, though if you don't object I'd like to reword
+the shortlog+changelog to make it explicitly clear that this is a correctness fix,
+that the preemption case really needs to have a separate API, and that checking
+for vcpu->preempted isn't safe.
+
+I've applied it to kvm-x86/fixes with the below changelog, holler if you want to
+change anything.
+
+[1/1] KVM: x86: Get CPL directly when checking if loaded vCPU is in kernel mode
+      https://github.com/kvm-x86/linux/commit/8eedf4177184
+
+    KVM: x86: Get CPL directly when checking if loaded vCPU is in kernel mode
+    
+    When querying whether or not a vCPU "is" running in kernel mode, directly
+    get the CPL if the vCPU is the currently loaded vCPU.  In scenarios where
+    a guest is profiled via perf-kvm, querying vcpu->arch.preempted_in_kernel
+    from kvm_guest_state() is wrong the vCPU is actively running, i.e. hasn't
+    been preempted and so preempted_in_kernel is stale.
+    
+    This affects perf/core's ability to accurately tag guest RIP with
+    PERF_RECORD_MISC_GUEST_{KERNEL|USER} and record it in the sample.  This
+    causes perf/tool to fail to connect the vCPU RIPs to the guest kernel
+    space symbols when parsing these samples due to incorrect PERF_RECORD_MISC
+    flags:
+    
+       Before (perf-report of a cpu-cycles sample):
+          1.23%  :58945   [unknown]         [u] 0xffffffff818012e0
+    
+       After:
+          1.35%  :60703   [kernel.vmlinux]  [g] asm_exc_page_fault
+    
+    Note, checking preempted_in_kernel in kvm_arch_vcpu_in_kernel() is awful
+    as nothing in the API's suggests that it's safe to use if and only if the
+    vCPU was preempted.  That can be cleaned up in the future, for now just
+    fix the glaring correctness bug.
+    
+    Note #2, checking vcpu->preempted is NOT safe, as getting the CPL on VMX
+    requires VMREAD, i.e. is correct if and only if the vCPU is loaded.  If
+    the target vCPU *was* preempted, then it can be scheduled back in after
+    the check on vcpu->preempted in kvm_vcpu_on_spin(), i.e. KVM could end up
+    trying to do VMREAD on a VMCS that isn't loaded on the current pCPU.
+    
+    Signed-off-by: Like Xu <likexu@tencent.com>
+    Fixes: e1bfc24577cc ("KVM: Move x86's perf guest info callbacks to generic KVM")
+    Link: https://lore.kernel.org/r/20231123075818.12521-1-likexu@tencent.com
+    [sean: massage changelong, add Fixes]
+    Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+> > And if getting the CPL for a vCPU that may not be loaded is problematic for other
+> > architectures, then I think the correct fix is to move preempted_in_kernel into
+> > common code and check it directly in kvm_vcpu_on_spin().
+> 
+> Not sure which tests would cover this part of the change.
+
+It'd likely require a human to look at results, i.e. as you did.
+
+> > +bool kvm_arch_vcpu_preempted_in_kernel(struct kvm_vcpu *vcpu)
+> > +{
+> > +	/*
+> > +	 * Treat the vCPU as being in-kernel if it has a pending interrupt, as
+> > +	 * the vCPU trying to yield may be spinning on IPI delivery, i.e. the
+> > +	 * the target vCPU is in-kernel for the purposes of directed yield.
+> 
+> How about the case "vcpu->arch.guest_state_protected == true" ?
+
+Ah, right, the existing code considers vCPUs to always be in-kernel for preemption
+checks.
+
+> > +	return vcpu->arch.preempted_in_kernel ||
+> > +	       kvm_dy_has_pending_interrupt(vcpu);
+> >   }
+> >   bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu)
+> > @@ -13043,7 +13051,7 @@ bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu)
+> >   		 kvm_test_request(KVM_REQ_EVENT, vcpu))
+> >   		return true;
+> > -	return kvm_arch_dy_has_pending_interrupt(vcpu);
+> > +	return kvm_dy_has_pending_interrupt(vcpu);
+> >   }
+> >   bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+> > @@ -13051,7 +13059,7 @@ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+> >   	if (vcpu->arch.guest_state_protected)
+> >   		return true;
+> > -	return vcpu->arch.preempted_in_kernel;
+> > +	return static_call(kvm_x86_get_cpl)(vcpu);
+> 
+> We need "return static_call(kvm_x86_get_cpl)(vcpu) == 0;" here.
+
+Doh, I had fixed this locally but forgot to refresh the copy+paste with the updated
+diff.
+
+> > -bool __weak kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu)
+> > +bool __weak kvm_arch_vcpu_preempted_in_kernel(struct kvm_vcpu *vcpu)
+> >   {
+> > -	return false;
+> > +	return kvm_arch_vcpu_in_kernel(vcpu);
+> >   }
+> >   void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+> > @@ -4086,8 +4086,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+> >   			if (kvm_vcpu_is_blocking(vcpu) && !vcpu_dy_runnable(vcpu))
+> >   				continue;
+> >   			if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
+> > -			    !kvm_arch_dy_has_pending_interrupt(vcpu) &&
+> > -			    !kvm_arch_vcpu_in_kernel(vcpu))
+> > +			    kvm_arch_vcpu_preempted_in_kernel(vcpu))
+> 
+> Use !kvm_arch_vcpu_preempted_in_kernel(vcpu) ?
+
+Double doh.  Yeah, this is inverted.
 
