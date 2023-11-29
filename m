@@ -1,132 +1,153 @@
-Return-Path: <kvm+bounces-2788-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2789-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 591637FE041
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 20:22:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC91F7FE071
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 20:46:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0FDFB211EB
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 19:22:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CDEFB214EA
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 19:46:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB8B35DF3D;
-	Wed, 29 Nov 2023 19:22:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 823D25EE8B;
+	Wed, 29 Nov 2023 19:45:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VvkVbyMZ"
+	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="LXdK4D//"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 238E71A8
-	for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 11:22:12 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5be39ccc2e9so92905a12.3
-        for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 11:22:12 -0800 (PST)
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5C70E6
+	for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 11:45:44 -0800 (PST)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2c9c5d30b32so2312321fa.2
+        for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 11:45:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701285731; x=1701890531; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zm+VmJgtsDhhnZtgTitQtOHEZp/dUiGbrU1wdemhaX4=;
-        b=VvkVbyMZpBIEHXoL/pz/DHyw9r5iis0kPlBeiktc/qjUOAquMjPHnDDW0h3+A1HlId
-         Qvg8IT6YTjCsMbAi/0jFCzTFE/Yav5PcHo4MketSk+ZVMrFHEO/d0GYwwlKgyXGCTo9V
-         v/B/U8rnd80ng3HIeewZOyyk+bkB5eTUuCyKXWq6Rf9lu+m53FE8q5rLXxyjKXIFDo65
-         WHL1iDw1SgCveKuL8Tg7YPSvU1mf/5seObuRHPAnxxCumnj6NNX0WJac1I3VB4UrLkrB
-         bbaEEUBDGdSlZECaiqZTlkhUlugC1jgUufGDEUVA1/cBCMw8SgocvYS22IijyKcT8Int
-         RYfQ==
+        d=soleen.com; s=google; t=1701287143; x=1701891943; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=fNNsoM3smwE3RnQXjosvlH5YCUc/qVQE7cVYHj28TpE=;
+        b=LXdK4D//aEMP9BGxDDgf86iGwwP755ud2a5fDDm/H2p6QdLjemMKdW6OURufzQsPsY
+         0eLaXgTBlg6Ro0WFppwNRmOJLM1GDxyvkcB5TIzwaa1UbSsi7lsRSu+qu1QqrpGx2WuC
+         PMdM6kTA5x1LLeGlJbl22YhycJKkzgKrJu76H5g6PWBs4oxqQRSTNqluBFW5+ez9Jziz
+         4aIESjCEFR56CJFlo89lMbSGxS5kd6/vIt4XU6zdtPKVphOyJms1zwcJv0kWIeUQ3+tq
+         DwWxhQoRd48Vb+sQo8NASWDsRlac17f1RpzDbTnO7V3cede7ZgbiDEwo9K3QOihi0Ay/
+         uOvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701285731; x=1701890531;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zm+VmJgtsDhhnZtgTitQtOHEZp/dUiGbrU1wdemhaX4=;
-        b=wFM2TnVd0Raxlx0PLAtfVf451gjI5eP6DampvBU/DkXHgOYWd/0vVw+wa8L6fx/D8A
-         aOjaUqaVX5htwSMzLVikMEHi+PFwlSYuCBJnsVjLyJqb4ofUmqc2WmTs0AUZOp920r+L
-         Dh3r368DoT4X/C6dVHQtg+POPP416FXM8N86IYrgY88WjPABmG0Spua3+b3bQiJCk743
-         VEl/+ohEnx5wMtNyPNP5/yeXN3tEXMCMCfH0QuS+rWawYLILLTh7Sf+/ZnlleSkquUDO
-         V1s28lKTCNk3jCoMzFbfccMC94/+tPLTOeiaJ58c6pTlkBXIzXnpVjHGFBNQ8P91fKz1
-         zhnA==
-X-Gm-Message-State: AOJu0Yw0kmbXI1ZgYJqxK5vLdithOJNcCa+BnJWTmVPWyrl3c0BjmZn6
-	cETM6s3Gj5DXBKCmh3ZhCY/aKnkMN30=
-X-Google-Smtp-Source: AGHT+IFbnamXd5HIGOk9ycysykN0hM1eotS+NZRkIrasluqPuu9nCw73/x2uc9oduuUnuHto7tym2AJtkoA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:ef09:0:b0:5be:71:f35d with SMTP id
- u9-20020a63ef09000000b005be0071f35dmr3359653pgh.1.1701285731587; Wed, 29 Nov
- 2023 11:22:11 -0800 (PST)
-Date: Wed, 29 Nov 2023 11:22:10 -0800
-In-Reply-To: <22c602c9-4943-4a16-a12e-ffc5db29daa1@intel.com>
+        d=1e100.net; s=20230601; t=1701287143; x=1701891943;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fNNsoM3smwE3RnQXjosvlH5YCUc/qVQE7cVYHj28TpE=;
+        b=Idtnyu6Hmnr3WvZ+SP4s9g2ROKpMECY3GREbCIc0kJ/zWDZ7kE6YtRwu+Lfzwx/7b8
+         xYCiEOUDnBdB0hUbFYqldI4S3eItAQEJUv58YVs4N3r2/RLuGJfMgT5YJBalddVbtJk2
+         npRjcUUM6p4qyBfsMBkswEdhPkmWkvK80WoK5pyxCV/uSOI+idccsKTGKDdFbDNrF1Si
+         332xiVvZ0fsgR+QIPWVcCLNhkCBqVXuiD4+HNTAVuqPMzID0GrjJeiPjtctEBe07wIsK
+         mkNKeVmzjhiSvZ4B7Z6xz/2TGeEohbLVbW2W86k7VJFB+iN1r07KtNX14pa84FpHDTTG
+         XKqg==
+X-Gm-Message-State: AOJu0YxHMq9AM2xJFCzBjMVGQivEHKz6FCf6W6Kq1dBaltwwXnpahuTh
+	vbNUcroFc22yz6VvTS+H6hcGOJgRa1bUR6iZe6npXg==
+X-Google-Smtp-Source: AGHT+IHo1CBmTuUhAhmoXR/KJsiUOGXe0H72uTjo3bJ8/f4ydzGN+L/1B0mI7eNNH55dLwJ3p7aHezZlyWQqax7aj9w=
+X-Received: by 2002:a2e:9b59:0:b0:2c6:ece6:5b65 with SMTP id
+ o25-20020a2e9b59000000b002c6ece65b65mr12569535ljj.10.1701287142874; Wed, 29
+ Nov 2023 11:45:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231108010953.560824-1-seanjc@google.com> <20231108010953.560824-3-seanjc@google.com>
- <0ee32216-e285-406f-b20d-dd193b791d2b@intel.com> <ZUuyVfdKZG44T1ba@google.com>
- <22c602c9-4943-4a16-a12e-ffc5db29daa1@intel.com>
-Message-ID: <ZWePYnuK65GCOGYU@google.com>
-Subject: Re: [PATCH v2 2/2] KVM: selftests: Add logic to detect if ioctl()
- failed because VM was killed
-From: Sean Christopherson <seanjc@google.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Michal Luczaj <mhal@rbox.co>, Oliver Upton <oliver.upton@linux.dev>, 
-	Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
+ <20231128204938.1453583-9-pasha.tatashin@soleen.com> <1c6156de-c6c7-43a7-8c34-8239abee3978@arm.com>
+ <CA+CK2bCOtwZxTUS60PHOQ3szXdCzau7OpopgFEbbC6a9Frxafg@mail.gmail.com>
+ <20231128235037.GC1312390@ziepe.ca> <52de3aca-41b1-471e-8f87-1a77de547510@arm.com>
+In-Reply-To: <52de3aca-41b1-471e-8f87-1a77de547510@arm.com>
+From: Pasha Tatashin <pasha.tatashin@soleen.com>
+Date: Wed, 29 Nov 2023 14:45:03 -0500
+Message-ID: <CA+CK2bCcfS1Fo8RvTeGXj_ejPRX9--sh5Jz8nzhkZnut4juDmg@mail.gmail.com>
+Subject: Re: [PATCH 08/16] iommu/fsl: use page allocation function provided by iommu-pages.h
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, akpm@linux-foundation.org, alex.williamson@redhat.com, 
+	alim.akhtar@samsung.com, alyssa@rosenzweig.io, asahi@lists.linux.dev, 
+	baolu.lu@linux.intel.com, bhelgaas@google.com, cgroups@vger.kernel.org, 
+	corbet@lwn.net, david@redhat.com, dwmw2@infradead.org, hannes@cmpxchg.org, 
+	heiko@sntech.de, iommu@lists.linux.dev, jasowang@redhat.com, 
+	jernej.skrabec@gmail.com, jonathanh@nvidia.com, joro@8bytes.org, 
+	kevin.tian@intel.com, krzysztof.kozlowski@linaro.org, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, linux-rockchip@lists.infradead.org, 
+	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev, 
+	linux-tegra@vger.kernel.org, lizefan.x@bytedance.com, marcan@marcan.st, 
+	mhiramat@kernel.org, mst@redhat.com, m.szyprowski@samsung.com, 
+	netdev@vger.kernel.org, paulmck@kernel.org, rdunlap@infradead.org, 
+	samuel@sholland.org, suravee.suthikulpanit@amd.com, sven@svenpeter.dev, 
+	thierry.reding@gmail.com, tj@kernel.org, tomas.mudrunka@gmail.com, 
+	vdumpa@nvidia.com, virtualization@lists.linux.dev, wens@csie.org, 
+	will@kernel.org, yu-cheng.yu@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Nov 13, 2023, Xiaoyao Li wrote:
-> On 11/9/2023 12:07 AM, Sean Christopherson wrote:
-> > On Wed, Nov 08, 2023, Xiaoyao Li wrote:
-> > > On 11/8/2023 9:09 AM, Sean Christopherson wrote:
-> > > > Add yet another macro to the VM/vCPU ioctl() framework to detect when an
-> > > > ioctl() failed because KVM killed/bugged the VM, i.e. when there was
-> > > > nothing wrong with the ioctl() itself.  If KVM kills a VM, e.g. by way of
-> > > > a failed KVM_BUG_ON(), all subsequent VM and vCPU ioctl()s will fail with
-> > > > -EIO, which can be quite misleading and ultimately waste user/developer
-> > > > time.
-> > > > 
-> > > > Use KVM_CHECK_EXTENSION on KVM_CAP_USER_MEMORY to detect if the VM is
-> > > > dead and/or bug, as KVM doesn't provide a dedicated ioctl().  Using a
-> > > > heuristic is obviously less than ideal, but practically speaking the logic
-> > > > is bulletproof barring a KVM change, and any such change would arguably
-> > > > break userspace, e.g. if KVM returns something other than -EIO.
-> > > 
-> > > We hit similar issue when testing TDX VMs. Most failure of SEMCALL is
-> > > handled with a KVM_BUG_ON(), which leads to vm dead. Then the following
-> > > IOCTL from userspace (QEMU) and gets -EIO.
-> > > 
-> > > Can we return a new KVM_EXIT_VM_DEAD on KVM_REQ_VM_DEAD?
-> > 
-> > Why?  Even if KVM_EXIT_VM_DEAD somehow provided enough information to be useful
-> > from an automation perspective, the VM is obviously dead.  I don't see how the
-> > VMM can do anything but log the error and tear down the VM.  KVM_BUG_ON() comes
-> > with a WARN, which will be far more helpful for a human debugger, e.g. because
-> > all vCPUs would exit with KVM_EXIT_VM_DEAD, it wouldn't even identify which vCPU
-> > initially triggered the issue.
-> 
-> It's not about providing more helpful debugging info, but to provide a
-> dedicated notification for VMM that "the VM is dead, all the following
-> command may not response". With it, VMM can get rid of the tricky detection
-> like this patch.
+> >> We can separate the metric into two:
+> >> iommu pagetable only
+> >> iommu everything
+> >>
+> >> or into three:
+> >> iommu pagetable only
+> >> iommu dma
+> >> iommu everything
+> >>
+> >> What do you think?
+> >
+> > I think I said this at LPC - if you want to have fine grained
+> > accounting of memory by owner you need to go talk to the cgroup people
+> > and come up with something generic. Adding ever open coded finer
+> > category breakdowns just for iommu doesn't make alot of sense.
+> >
+> > You can make some argument that the pagetable memory should be counted
+> > because kvm counts it's shadow memory, but I wouldn't go into further
+> > detail than that with hand coded counters..
+>
+> Right, pagetable memory is interesting since it's something that any
+> random kernel user can indirectly allocate via iommu_domain_alloc() and
+> iommu_map(), and some of those users may even be doing so on behalf of
+> userspace. I have no objection to accounting and potentially applying
+> limits to *that*.
 
-But a VMM doesn't need this tricky detection, because this tricky detections isn't
-about detecting that the VM is dead, it's all about helping a human debug why a
-test failed.
+Yes, in the next version, I will separate pagetable only from the
+rest, for the limits.
 
--EIO already effectively says "the VM is dead", e.g. QEMU isn't going to keep trying
-to run vCPUs.  Similarly, selftests assert either way, the goal is purely to print
-out a unique error message to minimize the chances of confusing the human running
-the test (or looking at results).
+> Beyond that, though, there is nothing special about "the IOMMU
+> subsystem". The amount of memory an IOMMU driver needs to allocate for
+> itself in order to function is not of interest beyond curiosity, it just
+> is what it is; limiting it would only break the IOMMU, and if a user
 
-> > Definitely a "no" on this one.  As has been established by the guest_memfd series,
-> > it's ok to return -1/errno with a valid exit_reason.
-> > 
-> > > But I'm wondering if any userspace relies on -EIO behavior for VM DEAD case.
-> > 
-> > I doubt userspace relies on -EIO, but userpsace definitely relies on -1/errno being
-> > returned when a fatal error.
-> 
-> what about KVM_EXIT_SHUTDOWN? Or KVM_EXIT_INTERNAL_ERROR?
+Agree about the amount of memory IOMMU allocates for itself, but that
+should be small, if it is not, we have to at least show where the
+memory is used.
 
-I don't follow, those are vcpu_run.exit_reason values, not errno values.  Returning
-any flavor of KVM_EXIT_*, which are positive values, would break userspace, e.g.
-QEMU explicitly looks for "ret < 0", and glibc only treats small-ish negative
-values as errors, i.e. a postive return value will be propagated verbatim up to
-QEMU.
+> thinks it's "too much", the only actionable thing that might help is to
+> physically remove devices from the system. Similar for DMA buffers; it
+> might be intriguing to account those, but it's not really an actionable
+> metric - in the overwhelming majority of cases you can't simply tell a
+> driver to allocate less than what it needs. And that is of course
+> assuming if we were to account *all* DMA buffers, since whether they
+> happen to have an IOMMU translation or not is irrelevant (we'd have
+> already accounted the pagetables as pagetables if so).
+
+DMA mappings should be observable (do not have to be limited). At the
+very least, it can help with explaining the kernel memory overhead
+anomalies on production systems.
+
+> I bet "the networking subsystem" also consumes significant memory on the
+
+It does, and GPU drivers also may consume a significant amount of memory.
+
+> same kind of big systems where IOMMU pagetables would be of any concern.
+> I believe some of the some of the "serious" NICs can easily run up
+> hundreds of megabytes if not gigabytes worth of queues, SKB pools, etc.
+> - would you propose accounting those too?
+
+Yes. Any kind of kernel memory that is proportional to the workload
+should be accountable. Someone is using those resources compared to
+the idling system, and that someone should be charged.
+
+Pasha
 
