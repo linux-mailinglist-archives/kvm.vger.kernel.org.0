@@ -1,153 +1,147 @@
-Return-Path: <kvm+bounces-2789-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2790-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC91F7FE071
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 20:46:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C05C47FE076
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 20:47:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CDEFB214EA
-	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 19:46:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0379B210BC
+	for <lists+kvm@lfdr.de>; Wed, 29 Nov 2023 19:47:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 823D25EE8B;
-	Wed, 29 Nov 2023 19:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87EED5EE7C;
+	Wed, 29 Nov 2023 19:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="LXdK4D//"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="m2zcYwwK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5C70E6
-	for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 11:45:44 -0800 (PST)
-Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2c9c5d30b32so2312321fa.2
-        for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 11:45:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google; t=1701287143; x=1701891943; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fNNsoM3smwE3RnQXjosvlH5YCUc/qVQE7cVYHj28TpE=;
-        b=LXdK4D//aEMP9BGxDDgf86iGwwP755ud2a5fDDm/H2p6QdLjemMKdW6OURufzQsPsY
-         0eLaXgTBlg6Ro0WFppwNRmOJLM1GDxyvkcB5TIzwaa1UbSsi7lsRSu+qu1QqrpGx2WuC
-         PMdM6kTA5x1LLeGlJbl22YhycJKkzgKrJu76H5g6PWBs4oxqQRSTNqluBFW5+ez9Jziz
-         4aIESjCEFR56CJFlo89lMbSGxS5kd6/vIt4XU6zdtPKVphOyJms1zwcJv0kWIeUQ3+tq
-         DwWxhQoRd48Vb+sQo8NASWDsRlac17f1RpzDbTnO7V3cede7ZgbiDEwo9K3QOihi0Ay/
-         uOvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701287143; x=1701891943;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fNNsoM3smwE3RnQXjosvlH5YCUc/qVQE7cVYHj28TpE=;
-        b=Idtnyu6Hmnr3WvZ+SP4s9g2ROKpMECY3GREbCIc0kJ/zWDZ7kE6YtRwu+Lfzwx/7b8
-         xYCiEOUDnBdB0hUbFYqldI4S3eItAQEJUv58YVs4N3r2/RLuGJfMgT5YJBalddVbtJk2
-         npRjcUUM6p4qyBfsMBkswEdhPkmWkvK80WoK5pyxCV/uSOI+idccsKTGKDdFbDNrF1Si
-         332xiVvZ0fsgR+QIPWVcCLNhkCBqVXuiD4+HNTAVuqPMzID0GrjJeiPjtctEBe07wIsK
-         mkNKeVmzjhiSvZ4B7Z6xz/2TGeEohbLVbW2W86k7VJFB+iN1r07KtNX14pa84FpHDTTG
-         XKqg==
-X-Gm-Message-State: AOJu0YxHMq9AM2xJFCzBjMVGQivEHKz6FCf6W6Kq1dBaltwwXnpahuTh
-	vbNUcroFc22yz6VvTS+H6hcGOJgRa1bUR6iZe6npXg==
-X-Google-Smtp-Source: AGHT+IHo1CBmTuUhAhmoXR/KJsiUOGXe0H72uTjo3bJ8/f4ydzGN+L/1B0mI7eNNH55dLwJ3p7aHezZlyWQqax7aj9w=
-X-Received: by 2002:a2e:9b59:0:b0:2c6:ece6:5b65 with SMTP id
- o25-20020a2e9b59000000b002c6ece65b65mr12569535ljj.10.1701287142874; Wed, 29
- Nov 2023 11:45:42 -0800 (PST)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 38715E6;
+	Wed, 29 Nov 2023 11:47:11 -0800 (PST)
+Received: from [192.168.4.26] (unknown [47.186.13.91])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 170A820B74C0;
+	Wed, 29 Nov 2023 11:47:08 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 170A820B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1701287230;
+	bh=/AE04joHGbexNg6/1EM+o2YovtZhSbAJbfvFr6KppsI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=m2zcYwwKjEICCbmm6pNwRqAhVUCXZ16/8j+Rm7KklfOt+2Ayb4zeushfGcTbZxznq
+	 3hN7N2zKM0A0/gQ44k2UL+nPl6XrqJsEKFGafJpDqPaapCdFHry5gFf1f4pq+6pJ/l
+	 apo4cqq0Sd+X0a18QxRWb+mfxOTM3r6ttMVsuAlE=
+Message-ID: <e430efa3-6a7a-44c8-a1d2-9943c76f748e@linux.microsoft.com>
+Date: Wed, 29 Nov 2023 13:47:07 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
- <20231128204938.1453583-9-pasha.tatashin@soleen.com> <1c6156de-c6c7-43a7-8c34-8239abee3978@arm.com>
- <CA+CK2bCOtwZxTUS60PHOQ3szXdCzau7OpopgFEbbC6a9Frxafg@mail.gmail.com>
- <20231128235037.GC1312390@ziepe.ca> <52de3aca-41b1-471e-8f87-1a77de547510@arm.com>
-In-Reply-To: <52de3aca-41b1-471e-8f87-1a77de547510@arm.com>
-From: Pasha Tatashin <pasha.tatashin@soleen.com>
-Date: Wed, 29 Nov 2023 14:45:03 -0500
-Message-ID: <CA+CK2bCcfS1Fo8RvTeGXj_ejPRX9--sh5Jz8nzhkZnut4juDmg@mail.gmail.com>
-Subject: Re: [PATCH 08/16] iommu/fsl: use page allocation function provided by iommu-pages.h
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, akpm@linux-foundation.org, alex.williamson@redhat.com, 
-	alim.akhtar@samsung.com, alyssa@rosenzweig.io, asahi@lists.linux.dev, 
-	baolu.lu@linux.intel.com, bhelgaas@google.com, cgroups@vger.kernel.org, 
-	corbet@lwn.net, david@redhat.com, dwmw2@infradead.org, hannes@cmpxchg.org, 
-	heiko@sntech.de, iommu@lists.linux.dev, jasowang@redhat.com, 
-	jernej.skrabec@gmail.com, jonathanh@nvidia.com, joro@8bytes.org, 
-	kevin.tian@intel.com, krzysztof.kozlowski@linaro.org, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-rockchip@lists.infradead.org, 
-	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev, 
-	linux-tegra@vger.kernel.org, lizefan.x@bytedance.com, marcan@marcan.st, 
-	mhiramat@kernel.org, mst@redhat.com, m.szyprowski@samsung.com, 
-	netdev@vger.kernel.org, paulmck@kernel.org, rdunlap@infradead.org, 
-	samuel@sholland.org, suravee.suthikulpanit@amd.com, sven@svenpeter.dev, 
-	thierry.reding@gmail.com, tj@kernel.org, tomas.mudrunka@gmail.com, 
-	vdumpa@nvidia.com, virtualization@lists.linux.dev, wens@csie.org, 
-	will@kernel.org, yu-cheng.yu@intel.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 18/19] heki: x86: Protect guest kernel memory using
+ the KVM hypervisor
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+ Kees Cook <keescook@chromium.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, Thomas Gleixner
+ <tglx@linutronix.de>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Wanpeng Li <wanpengli@tencent.com>, Alexander Graf <graf@amazon.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>,
+ "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ Forrest Yuan Yu <yuanyu@google.com>, James Gowans <jgowans@amazon.com>,
+ James Morris <jamorris@linux.microsoft.com>,
+ John Andersen <john.s.andersen@intel.com>,
+ Marian Rotariu <marian.c.rotariu@gmail.com>,
+ =?UTF-8?Q?Mihai_Don=C8=9Bu?= <mdontu@bitdefender.com>,
+ =?UTF-8?B?TmljdciZb3IgQ8OuyJt1?= <nicu.citu@icloud.com>,
+ Thara Gopinath <tgopinath@microsoft.com>,
+ Trilok Soni <quic_tsoni@quicinc.com>, Wei Liu <wei.liu@kernel.org>,
+ Will Deacon <will@kernel.org>, Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Zahra Tarkhani <ztarkhani@microsoft.com>,
+ =?UTF-8?Q?=C8=98tefan_=C8=98icleru?= <ssicleru@bitdefender.com>,
+ dev@lists.cloudhypervisor.org, kvm@vger.kernel.org,
+ linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org,
+ qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
+ x86@kernel.org, xen-devel@lists.xenproject.org
+References: <20231113022326.24388-1-mic@digikod.net>
+ <20231113022326.24388-19-mic@digikod.net>
+ <20231113085403.GC16138@noisy.programming.kicks-ass.net>
+ <b1dc0963-ab99-4a79-af19-ef5ed981fa60@linux.microsoft.com>
+ <20231127200308.GY3818@noisy.programming.kicks-ass.net>
+Content-Language: en-US
+From: "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
+In-Reply-To: <20231127200308.GY3818@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-> >> We can separate the metric into two:
-> >> iommu pagetable only
-> >> iommu everything
-> >>
-> >> or into three:
-> >> iommu pagetable only
-> >> iommu dma
-> >> iommu everything
-> >>
-> >> What do you think?
-> >
-> > I think I said this at LPC - if you want to have fine grained
-> > accounting of memory by owner you need to go talk to the cgroup people
-> > and come up with something generic. Adding ever open coded finer
-> > category breakdowns just for iommu doesn't make alot of sense.
-> >
-> > You can make some argument that the pagetable memory should be counted
-> > because kvm counts it's shadow memory, but I wouldn't go into further
-> > detail than that with hand coded counters..
->
-> Right, pagetable memory is interesting since it's something that any
-> random kernel user can indirectly allocate via iommu_domain_alloc() and
-> iommu_map(), and some of those users may even be doing so on behalf of
-> userspace. I have no objection to accounting and potentially applying
-> limits to *that*.
 
-Yes, in the next version, I will separate pagetable only from the
-rest, for the limits.
 
-> Beyond that, though, there is nothing special about "the IOMMU
-> subsystem". The amount of memory an IOMMU driver needs to allocate for
-> itself in order to function is not of interest beyond curiosity, it just
-> is what it is; limiting it would only break the IOMMU, and if a user
+On 11/27/23 14:03, Peter Zijlstra wrote:
+> On Mon, Nov 27, 2023 at 11:05:23AM -0600, Madhavan T. Venkataraman wrote:
+>> Apologies for the late reply. I was on vacation. Please see my response below:
+>>
+>> On 11/13/23 02:54, Peter Zijlstra wrote:
+>>> On Sun, Nov 12, 2023 at 09:23:25PM -0500, Mickaël Salaün wrote:
+>>>> From: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+>>>>
+>>>> Implement a hypervisor function, kvm_protect_memory() that calls the
+>>>> KVM_HC_PROTECT_MEMORY hypercall to request the KVM hypervisor to
+>>>> set specified permissions on a list of guest pages.
+>>>>
+>>>> Using the protect_memory() function, set proper EPT permissions for all
+>>>> guest pages.
+>>>>
+>>>> Use the MEM_ATTR_IMMUTABLE property to protect the kernel static
+>>>> sections and the boot-time read-only sections. This enables to make sure
+>>>> a compromised guest will not be able to change its main physical memory
+>>>> page permissions. However, this also disable any feature that may change
+>>>> the kernel's text section (e.g., ftrace, Kprobes), but they can still be
+>>>> used on kernel modules.
+>>>>
+>>>> Module loading/unloading, and eBPF JIT is allowed without restrictions
+>>>> for now, but we'll need a way to authenticate these code changes to
+>>>> really improve the guests' security. We plan to use module signatures,
+>>>> but there is no solution yet to authenticate eBPF programs.
+>>>>
+>>>> Being able to use ftrace and Kprobes in a secure way is a challenge not
+>>>> solved yet. We're looking for ideas to make this work.
+>>>>
+>>>> Likewise, the JUMP_LABEL feature cannot work because the kernel's text
+>>>> section is read-only.
+>>>
+>>> What is the actual problem? As is the kernel text map is already RO and
+>>> never changed.
+>>
+>> For the JUMP_LABEL optimization, the text needs to be patched at some point.
+>> That patching requires a writable mapping of the text page at the time of
+>> patching.
+>>
+>> In this Heki feature, we currently lock down the kernel text at the end of
+>> kernel boot just before kicking off the init process. The lockdown is
+>> implemented by setting the permissions of a text page to R_X in the extended
+>> page table and not allowing write permissions in the EPT after that. So, jump label
+>> patching during kernel boot is not a problem. But doing it after kernel
+>> boot is a problem.
+> 
+> But you see, that's exactly what the kernel already does with the normal
+> permissions. They get set to RX after init and are never changed.
+> 
+> See the previous patch, we establish a read-write alias and write there.
+> 
+> You seem to lack basic understanding of how the kernel works in this
+> regard, which makes me very nervous about you touching any of this.
+> 
+> I must also say I really dislike your extra/random permssion calls all
+> over the place. They don't really get us anything afaict. Why can't you
+> plumb into the existing set_memory_*() family?
 
-Agree about the amount of memory IOMMU allocates for itself, but that
-should be small, if it is not, we have to at least show where the
-memory is used.
+I have responded to your comments on your other email. Please read my
+response there.
 
-> thinks it's "too much", the only actionable thing that might help is to
-> physically remove devices from the system. Similar for DMA buffers; it
-> might be intriguing to account those, but it's not really an actionable
-> metric - in the overwhelming majority of cases you can't simply tell a
-> driver to allocate less than what it needs. And that is of course
-> assuming if we were to account *all* DMA buffers, since whether they
-> happen to have an IOMMU translation or not is irrelevant (we'd have
-> already accounted the pagetables as pagetables if so).
+Thanks.
 
-DMA mappings should be observable (do not have to be limited). At the
-very least, it can help with explaining the kernel memory overhead
-anomalies on production systems.
-
-> I bet "the networking subsystem" also consumes significant memory on the
-
-It does, and GPU drivers also may consume a significant amount of memory.
-
-> same kind of big systems where IOMMU pagetables would be of any concern.
-> I believe some of the some of the "serious" NICs can easily run up
-> hundreds of megabytes if not gigabytes worth of queues, SKB pools, etc.
-> - would you propose accounting those too?
-
-Yes. Any kind of kernel memory that is proportional to the workload
-should be accountable. Someone is using those resources compared to
-the idling system, and that someone should be charged.
-
-Pasha
+Madhavan
 
