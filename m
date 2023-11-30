@@ -1,137 +1,195 @@
-Return-Path: <kvm+bounces-2885-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2886-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FABF7FECE7
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 11:35:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ACBC7FECE8
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 11:36:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C512B21137
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 10:35:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2C39B21112
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 10:35:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7963B7B2;
-	Thu, 30 Nov 2023 10:35:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="H434yxt+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D7B3C08C;
+	Thu, 30 Nov 2023 10:35:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2089.outbound.protection.outlook.com [40.107.93.89])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E5381703
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 02:35:30 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e5XNulks3L2Wb+zB3l6j9t5dN+mMZW+Smm2gVJcnjDt7l5FePdRcipsPfAO+YM0t633eHVPb++h+ifMVklAdMfNbk1SqE3xDp7jV6eKkBsqtJhRBM7zwUy8c0bVESC4b3+adQwSFUGI8FhJWGNLBClrf3fnITrlNMohNKF4mbE0blfVnHK/zd7dmUIbVfcB2u/+0XJxNJjtAO0x89QeylPThuzwZprpXix7xuNQJKAbqLeA0Y+61pcDpNjJsET3weki5TUYXqMmrPIjFmjqtkYAj22LQntijCsew7Ix2EfJxE2WLuyjuRq+syr7BxThcOeiUVxTZ05iSwuy1MAqcZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9DUPxF2LKB6in+WIqUyrYbxCRlnJZLppUIn05THCmb4=;
- b=GyS4ZZ3iWOF5JLQHKIQxOw4wAhuQfHjVGEsWdwWuFOLMUopnb44J1bs9eAKdI9X1KiEZ2cc2JVRN4BgrnDDFASMaTbnNC4FK9n8IylVCgnFOmtrfwpzBtl6JQXQjRBbK4tBBBilLV1TYLqe81fOSV7Qy/dKfpuWCmsbfnOnLt555pOsefJMQDnB32siXtaXI51Fi53AKKXjVUYsDe9oe3ndWpy6zrqLCnUVsoEpZxctsXXJO8h/nLN9GZdYfawGP5xn5DQo6Ciyh3hMabVcLumUY8kL2YcRiY/L/4TYA4vAtlV/3vZBWeumHE5eH0CIgXj/8F/6g9yxe7k1e+dnS6Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9DUPxF2LKB6in+WIqUyrYbxCRlnJZLppUIn05THCmb4=;
- b=H434yxt+xoL5MHmDOTNa4ekUIFxFSWLDFMg/R8dcXFVV6dUVLKlWELt/5efVKqiaNIBX4/BhrpY1pIy0fxHNI2/RFbNsAYCxDau+Yr16Yi5429M3Buz4Pq8rKucZ2z/q0/2OyHWHMYmk97jGAfUjKZQ9QjBV7QKM2aBNDydHRig0cq0MQ1kg4HCGVHnmt/UCsqUDk/9Aa1zis5A4SMgx9NBvinTLg0oIRj7gw/Gu8MSiyrNESDBky5wUKWwc5m636J4npI3R4JxBpaWQT6Vgkggczdy4/YveRrO9e4T5IR5jqpT2VD0c1IZa9IOFM3rh2g9AZVygxeOs2VrMauzJrw==
-Received: from MW4PR03CA0299.namprd03.prod.outlook.com (2603:10b6:303:b5::34)
- by CY8PR12MB7682.namprd12.prod.outlook.com (2603:10b6:930:85::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.24; Thu, 30 Nov
- 2023 10:35:28 +0000
-Received: from MWH0EPF000989EA.namprd02.prod.outlook.com
- (2603:10b6:303:b5:cafe::2b) by MW4PR03CA0299.outlook.office365.com
- (2603:10b6:303:b5::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29 via Frontend
- Transport; Thu, 30 Nov 2023 10:35:27 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- MWH0EPF000989EA.mail.protection.outlook.com (10.167.241.137) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7046.17 via Frontend Transport; Thu, 30 Nov 2023 10:35:27 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 30 Nov
- 2023 02:35:14 -0800
-Received: from [172.27.21.28] (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 30 Nov
- 2023 02:35:09 -0800
-Message-ID: <aaa83d6a-779d-44cb-a72e-83ba9c8db76b@nvidia.com>
-Date: Thu, 30 Nov 2023 12:35:09 +0200
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8CF5710D0
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 02:35:48 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D8A511042;
+	Thu, 30 Nov 2023 02:36:34 -0800 (PST)
+Received: from raptor (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 840DA3F6C4;
+	Thu, 30 Nov 2023 02:35:46 -0800 (PST)
+Date: Thu, 30 Nov 2023 10:35:43 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Shaoqin Huang <shahuang@redhat.com>
+Cc: Andrew Jones <andrew.jones@linux.dev>, kvmarm@lists.linux.dev,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
+	Laurent Vivier <lvivier@redhat.com>, linuxppc-dev@lists.ozlabs.org,
+	Nadav Amit <namit@vmware.com>, Nico Boehr <nrb@linux.ibm.com>,
+	Nikos Nikoleris <nikos.nikoleris@arm.com>,
+	Thomas Huth <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v1 00/18] arm/arm64: Rework cache
+ maintenance at boot
+Message-ID: <ZWhlf7ZLTZIZ3qcQ@raptor>
+References: <20231130090722.2897974-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V4 vfio 4/9] virtio-pci: Introduce admin commands
-To: "Michael S. Tsirkin" <mst@redhat.com>
-CC: <alex.williamson@redhat.com>, <jasowang@redhat.com>, <jgg@nvidia.com>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<parav@nvidia.com>, <feliu@nvidia.com>, <jiri@nvidia.com>,
-	<kevin.tian@intel.com>, <joao.m.martins@oracle.com>, <si-wei.liu@oracle.com>,
-	<leonro@nvidia.com>, <maorg@nvidia.com>
-References: <20231129143746.6153-1-yishaih@nvidia.com>
- <20231129143746.6153-5-yishaih@nvidia.com>
- <20231130044910-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Yishai Hadas <yishaih@nvidia.com>
-In-Reply-To: <20231130044910-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000989EA:EE_|CY8PR12MB7682:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1f9b685b-98e0-43d7-d3e6-08dbf19011c5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	60VQ0ShIifOflwFR2A+Bt+d0X4QFANF6xupIyVKNyHtHu0qwHibQ2q6AUVhwjie4Kxa4y2vfaE6CYZwVYdMn2KuL/VMyn0bwazBsMHuJC5huEFjCz7NE9YqdBvED0s7d1fLRilPgomwId6qltiLq0Vnaf1u7p9YTQbjzwCt3lqWhURjlMPUTpmbcOp35H8eIiLzjaLj1Uo6vO2jr/pSSIrOm0yGnYGFE1fwwOUzoODEXlQGGVUiCpUyuKKPqwcJuL/f+gdPMj8eTU8Z88+3zrfskRZ7J6vtXMB5+1hf5zxZAaEjAXX28yVMYv5yB/Obx2ADuGHdylQJ/jCnT46DUtlRQa8zbykyutBn/6CpSOHH9tsbg7Fqc5nJtbk/HDynOpvPmsEDmhkZvTV8/Qqnaer50nZUD2AXAuXx1yyw7F3gFJctC5bqkRvcVGmLX5XP8bCtiLZPiBAi+DhJwzRU27j09rmeqRY6JqGYI0PDBSc2rp0+BhPnxT6Qk6vAE5cQmtY+hE5Rgh1QoNKRbYkr3c5/rWcq7qo6B8KrYNquS9gh2uUxVtfqD89pSaeq6lNOSw2k7pBDjsSKOkr2UYzrHHNdGW7Lc/dYm4RkiELBcRNGIr40bDWMcJWEuwdNRVz00qcj49I3nnmJUaFlSzzDUpnZz01s9HjMvTLKKVv7yBgxI6iiF7zYwJ7XsvXnmg5RWiWrYXBC/Eg2uU13dyBxIEWll5SPdVyprJvCf84ibvmTzLvsAK0wRojCJXr7whMSFy02eo5PtUMXiu1Ynf/WIkJ9Swq47kbLt2KxaJDCsE0akKPZNc7W0E/3RvIW9pkLc
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(346002)(136003)(376002)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(82310400011)(36840700001)(40470700004)(46966006)(40460700003)(16526019)(26005)(336012)(83380400001)(426003)(107886003)(53546011)(2616005)(36860700001)(47076005)(5660300002)(4326008)(8676002)(8936002)(41300700001)(4744005)(2906002)(478600001)(316002)(16576012)(6916009)(54906003)(70206006)(70586007)(202311291699003)(31696002)(86362001)(36756003)(7636003)(82740400003)(356005)(40480700001)(31686004)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2023 10:35:27.7881
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1f9b685b-98e0-43d7-d3e6-08dbf19011c5
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000989EA.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7682
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231130090722.2897974-1-shahuang@redhat.com>
 
-On 30/11/2023 11:52, Michael S. Tsirkin wrote:
-> On Wed, Nov 29, 2023 at 04:37:41PM +0200, Yishai Hadas wrote:
->> +/* Transitional device admin command. */
->> +#define VIRTIO_ADMIN_CMD_LEGACY_COMMON_CFG_WRITE	0x2
->> +#define VIRTIO_ADMIN_CMD_LEGACY_COMMON_CFG_READ		0x3
->> +#define VIRTIO_ADMIN_CMD_LEGACY_DEV_CFG_WRITE		0x4
->> +#define VIRTIO_ADMIN_CMD_LEGACY_DEV_CFG_READ		0x5
->> +#define VIRTIO_ADMIN_CMD_LEGACY_NOTIFY_INFO		0x6
->> +
->> +/* Increment MAX_OPCODE to next value when new opcode is added */
->> +#define VIRTIO_ADMIN_MAX_CMD_OPCODE			0x6
+Hi,
+
+Thank you so much for reviving this, much appreciated.
+
+I wanted to let you know that I definitely plan to review the series as
+soon as possible, unfortunately I don't believe I won't be able to do that
+for at least 2 weeks.
+
+Thanks,
+Alex
+
+On Thu, Nov 30, 2023 at 04:07:02AM -0500, Shaoqin Huang wrote:
+> Hi,
 > 
-> Does anything need VIRTIO_ADMIN_MAX_CMD_OPCODE? Not in this
-> patchset...
+> I'm posting Alexandru's patch set[1] rebased on the latest branch with the
+> conflicts being resolved. No big changes compare to its original code.
 > 
-
-Right, once you suggested to move to 'u64 supported_cmds' it's not any 
-more in use.
-
-It still can be used in the future, however I can drop it if it's worth 
-a V5 sending.
-
-Yishai
+> As this version 1 of this series was posted one years ago, I would first let you
+> recall it, what's the intention of this series and what this series do. You can
+> view it by click the link[2] and view the cover-letter.
+> 
+> Since when writing the series[1], the efi support for arm64[3] hasn't been
+> merged into the kvm-unit-tests, but now the efi support for arm64 has been
+> merged. Directly rebase the series[1] onto the latest branch will break the efi
+> tests. This is mainly because the Patch #15 ("arm/arm64: Enable the MMU early")
+> moves the mmu_enable() out of the setup_mmu(), which causes the efi test will
+> not enable the mmu. So I do a small change in the efi_mem_init() which makes the
+> efi test also enable the MMU early, and make it works.
+> 
+> And another change should be noticed is in the Patch #17 ("arm/arm64: Perform
+> dcache maintenance"). In the efi_mem_init(), it will disable the mmu, and build
+> a new pagetable and re-enable the mmu, if the asm_mmu_disable clean and
+> invalidate the data caches for entire memory, we don't need to care the dcache
+> and after mmu disabled, we use the mmu_setup_early() to re-enable the mmu, which
+> takes care all the cache maintenance. But the situation changes since the Patch
+> #18 ("arm/arm64: Rework the cache maintenance in asm_mmu_disable") only clean
+> and invalidate the data caches for the stack memory area. So we need to clean
+> and invalidate the data caches manually before disable the mmu, I'm not
+> confident about current cache maintenance at the efi setup patch, so I ask for
+> your help to review it if it's right or not.
+> 
+> And I also drop one patch ("s390: Do not use the physical allocator") from[1]
+> since this cause s390 test to fail.
+> 
+> This series may include bug, so I really appreciate your review to improve this
+> series together.
+> 
+> You can get the code from:
+> 
+> $ git clone https://gitlab.com/shahuang/kvm-unit-tests.git \
+> 	-b arm-arm64-rework-cache-maintenance-at-boot-v1
+> 
+> [1] https://gitlab.arm.com/linux-arm/kvm-unit-tests-ae/-/tree/arm-arm64-rework-cache-maintenance-at-boot-v2-wip2
+> [2] https://lore.kernel.org/all/20220809091558.14379-1-alexandru.elisei@arm.com/
+> [3] https://patchwork.kernel.org/project/kvm/cover/20230530160924.82158-1-nikos.nikoleris@arm.com/
+> 
+> Changelog:
+> ----------
+> RFC->v1:
+>   - Gathered Reviewed-by tags.
+>   - Various changes to commit messages and comments to hopefully make the code
+>     easier to understand.
+>   - Patches #8 ("lib/alloc_phys: Expand documentation with usage and limitations")
+>     are new.
+>   - Folded patch "arm: page.h: Add missing libcflat.h include" into #17
+>     ("arm/arm64: Perform dcache maintenance at boot").
+>   - Reordered the series to group patches that touch aproximately the same code
+>     together - the patches that change the physical allocator are now first,
+>     followed come the patches that change how the secondaries are brought online.
+>   - Fixed several nasty bugs where the r4 register was being clobbered in the arm
+>     assembly.
+>   - Unmap the early UART address if the DTB address does not match the early
+>     address.
+>   - Added dcache maintenance when a page table is modified with the MMU disabled.
+>   - Moved the cache maintenance when disabling the MMU to be executed before the
+>     MMU is disabled.
+>   - Rebase it on lasted branch which efi support has been merged.
+>   - Make the efi test also enable MMU early.
+>   - Add cache maintenance on efi setup path especially before mmu_disable.
+> 
+> RFC: https://lore.kernel.org/all/20220809091558.14379-1-alexandru.elisei@arm.com/
+> 
+> Alexandru Elisei (18):
+>   Makefile: Define __ASSEMBLY__ for assembly files
+>   powerpc: Replace the physical allocator with the page allocator
+>   lib/alloc_phys: Initialize align_min
+>   lib/alloc_phys: Consolidate allocate functions into memalign_early()
+>   lib/alloc_phys: Remove locking
+>   lib/alloc_phys: Remove allocation accounting
+>   lib/alloc_phys: Add callback to perform cache maintenance
+>   lib/alloc_phys: Expand documentation with usage and limitations
+>   arm/arm64: Zero secondary CPUs' stack
+>   arm/arm64: Allocate secondaries' stack using the page allocator
+>   arm/arm64: assembler.h: Replace size with end address for
+>     dcache_by_line_op
+>   arm/arm64: Add C functions for doing cache maintenance
+>   arm/arm64: Configure secondaries' stack before enabling the MMU
+>   arm/arm64: Use pgd_alloc() to allocate mmu_idmap
+>   arm/arm64: Enable the MMU early
+>   arm/arm64: Map the UART when creating the translation tables
+>   arm/arm64: Perform dcache maintenance at boot
+>   arm/arm64: Rework the cache maintenance in asm_mmu_disable
+> 
+>  Makefile                   |   5 +-
+>  arm/Makefile.arm           |   4 +-
+>  arm/Makefile.arm64         |   4 +-
+>  arm/Makefile.common        |   6 +-
+>  arm/cstart.S               |  71 +++++++++++++++------
+>  arm/cstart64.S             |  76 +++++++++++++++++------
+>  lib/alloc_phys.c           | 122 ++++++++++++-------------------------
+>  lib/alloc_phys.h           |  28 ++++++---
+>  lib/arm/asm/assembler.h    |  15 ++---
+>  lib/arm/asm/cacheflush.h   |   1 +
+>  lib/arm/asm/mmu-api.h      |   1 +
+>  lib/arm/asm/mmu.h          |   6 --
+>  lib/arm/asm/page.h         |   2 +
+>  lib/arm/asm/pgtable.h      |  39 ++++++++++--
+>  lib/arm/asm/thread_info.h  |   3 +-
+>  lib/arm/cache.S            |  89 +++++++++++++++++++++++++++
+>  lib/arm/io.c               |  31 ++++++++++
+>  lib/arm/io.h               |   3 +
+>  lib/arm/mmu.c              |  37 ++++++++---
+>  lib/arm/processor.c        |   1 -
+>  lib/arm/setup.c            |  82 +++++++++++++++++++++----
+>  lib/arm/smp.c              |   5 ++
+>  lib/arm64/asm/assembler.h  |  11 ++--
+>  lib/arm64/asm/cacheflush.h |  37 +++++++++++
+>  lib/arm64/asm/mmu.h        |   5 --
+>  lib/arm64/asm/pgtable.h    |  50 +++++++++++++--
+>  lib/arm64/cache.S          |  85 ++++++++++++++++++++++++++
+>  lib/arm64/processor.c      |   1 -
+>  lib/devicetree.c           |   2 +-
+>  lib/powerpc/setup.c        |   9 ++-
+>  powerpc/Makefile.common    |   1 +
+>  powerpc/cstart64.S         |   1 -
+>  powerpc/spapr_hcall.c      |   5 +-
+>  33 files changed, 642 insertions(+), 196 deletions(-)
+>  create mode 100644 lib/arm/asm/cacheflush.h
+>  create mode 100644 lib/arm/cache.S
+>  create mode 100644 lib/arm64/asm/cacheflush.h
+>  create mode 100644 lib/arm64/cache.S
+> 
+> -- 
+> 2.40.1
+> 
 
