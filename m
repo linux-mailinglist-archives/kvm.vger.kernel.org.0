@@ -1,58 +1,56 @@
-Return-Path: <kvm+bounces-2873-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2862-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B7167FEB7A
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 10:09:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19EAF7FEB6B
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 10:08:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D16812825D6
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 09:09:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CC2228201E
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 09:08:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C57DF3BB56;
-	Thu, 30 Nov 2023 09:08:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C2C38FA0;
+	Thu, 30 Nov 2023 09:08:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e6nzTFq0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JmvkJhc9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E197610F0
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 01:08:01 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF119CF
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 01:07:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701335281;
+	s=mimecast20190719; t=1701335279;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0/Y8e3ElHU0aNJgIxvk1soi56PmSeGH3qsiqyO+Bp04=;
-	b=e6nzTFq03iNb5juf6zc4CTxE/fVh0sElaDA9y1fbYTRCFi0cW++/69rwtJjk9uTTZA+Bxb
-	rxQWwRWrhYdDXd9pzTq2eTDh/lOqq4ClvHHAF6mHcj4MG1KkEecl2NSi2zk8FjQeiIRHBn
-	FCFEFY7xZUr+nTdLn5gzO9XU/wfF/Ns=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-629-VgAp7QJwOV-s3wS_D8LoCw-1; Thu, 30 Nov 2023 04:07:57 -0500
-X-MC-Unique: VgAp7QJwOV-s3wS_D8LoCw-1
+	bh=t4R+HNRZJiFFN+ip5dfjGVsMX98ycCVsp2Ww3/n0/cY=;
+	b=JmvkJhc9myzfZWH1l6YaUoL8QEJGNxLUpEeEeHju+XkiQS6o1nrVIx/bhK15XuRv7GweRu
+	e+6TiwxpmRzsKD6NFsYHyjj7grv0xZuygraxqsGw9b0cI1d5qPW+qKeajj1mCM2wuZ2jNV
+	3XRHRNTFrBuTb/+36qSHmFh9iyKHtbk=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-346-Lw33qRLVNbyMgBVMVh1tnw-1; Thu,
+ 30 Nov 2023 04:07:57 -0500
+X-MC-Unique: Lw33qRLVNbyMgBVMVh1tnw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DD719185A780;
-	Thu, 30 Nov 2023 09:07:56 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0D4FA299E759;
+	Thu, 30 Nov 2023 09:07:57 +0000 (UTC)
 Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D07801C060AE;
-	Thu, 30 Nov 2023 09:07:56 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 00FDB1C060AE;
+	Thu, 30 Nov 2023 09:07:57 +0000 (UTC)
 From: Shaoqin Huang <shahuang@redhat.com>
 To: Andrew Jones <andrew.jones@linux.dev>,
 	kvmarm@lists.linux.dev
 Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
-	Nikos Nikoleris <nikos.nikoleris@arm.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v1 09/18] arm/arm64: Zero secondary CPUs' stack
-Date: Thu, 30 Nov 2023 04:07:11 -0500
-Message-Id: <20231130090722.2897974-10-shahuang@redhat.com>
+Subject: [kvm-unit-tests PATCH v1 10/18] arm/arm64: Allocate secondaries' stack using the page allocator
+Date: Thu, 30 Nov 2023 04:07:12 -0500
+Message-Id: <20231130090722.2897974-11-shahuang@redhat.com>
 In-Reply-To: <20231130090722.2897974-1-shahuang@redhat.com>
 References: <20231130090722.2897974-1-shahuang@redhat.com>
 Precedence: bulk
@@ -66,105 +64,62 @@ X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-For the boot CPU, the entire stack is zeroed in the entry code. For the
-secondaries, only struct thread_info, which lives at the bottom of the
-stack, is zeroed in thread_info_init().
+The vmalloc allocator returns non-id mapped addresses, where the virtual
+address is different than the physical address. As a result, it's
+impossible to access the stack of the secondary CPUs while the MMU is
+disabled (if AUXINFO_MMU_OFF is set, a test disables the MMU or an
+exception happens on the secondary before the MMU is enabled).
 
-Be consistent and zero the entire stack for the secondaries. This should
-also improve reproducibility of the testsuite, as all the stacks will start
-with the same contents, which is zero. And now that all the stacks are
-zeroed in the entry code, there is no need to explicitely zero struct
-thread_info in thread_info_init().
+It turns out that kvm-unit-tests always configures the stack size to be a
+power-of-two multiple of PAGE_SIZE: on arm, THREAD_SIZE is 16K and
+PAGE_SIZE is 4K; on arm64, THREAD_SIZE is 16K when PAGE_SIZE is 4K or 16K,
+and 64K when PAGE_SIZE is 64K. Use memalign_pages_flags() as a drop-in
+replacement for vmalloc's vm_memalign(), which is the value for
+alloc_ops->memalign when the stack is allocated, as it has the benefits:
 
-Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+1. The secondary CPUs' stack can be used with the MMU off.
+
+2. The secondary CPUs' stack is identity mapped, just like the stack for
+the primary CPU, making the configuration of the all the CPUs consistent.
+
+3. start_usr(), which can take a new stack to use at EL0/in user mode, now
+works if the function is called after the MMU has been disabled. This
+doesn't affect the vectors-user test, as the only way to run the test with
+the MMU disabled is by setting AUXINFO_MMU_INFO, in which case the vmalloc
+allocator is not initialized and alloc_ops->memalign resolves to
+memalign_pages().
+
+memalign_pages_flags() has been used instead of memalign_pages() to
+instruct the allocator not to zero the stack, as it's already zeroed in the
+entry code.
+
 Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 ---
- arm/cstart.S          |  6 ++++++
- arm/cstart64.S        | 11 +++++++----
- lib/arm/processor.c   |  1 -
- lib/arm64/processor.c |  1 -
- 4 files changed, 13 insertions(+), 6 deletions(-)
+ lib/arm/asm/thread_info.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arm/cstart.S b/arm/cstart.S
-index b24ecabc..2ecebd1d 100644
---- a/arm/cstart.S
-+++ b/arm/cstart.S
-@@ -151,7 +151,13 @@ secondary_entry:
- 	 */
- 	ldr	r1, =secondary_data
- 	ldr	r0, [r1]
-+	mov	r2, r0
-+	lsr	r2, #THREAD_SHIFT
-+	lsl	r2, #THREAD_SHIFT
-+	add	r3, r2, #THREAD_SIZE
-+	zero_range r2, r3, r4, r5
- 	mov	sp, r0
-+
- 	bl	exceptions_init
- 	bl	enable_vfp
+diff --git a/lib/arm/asm/thread_info.h b/lib/arm/asm/thread_info.h
+index eaa72582..190e082c 100644
+--- a/lib/arm/asm/thread_info.h
++++ b/lib/arm/asm/thread_info.h
+@@ -25,6 +25,7 @@
+ #ifndef __ASSEMBLY__
+ #include <asm/processor.h>
+ #include <alloc.h>
++#include <alloc_page.h>
  
-diff --git a/arm/cstart64.S b/arm/cstart64.S
-index a8ad6dc8..5ba2fb27 100644
---- a/arm/cstart64.S
-+++ b/arm/cstart64.S
-@@ -14,10 +14,6 @@
- #include <asm/thread_info.h>
- #include <asm/sysreg.h>
+ #ifdef __arm__
+ #include <asm/ptrace.h>
+@@ -40,7 +41,7 @@
  
--#ifdef CONFIG_EFI
--#include "efi/crt0-efi-aarch64.S"
--#else
--
- .macro zero_range, tmp1, tmp2
- 9998:	cmp	\tmp1, \tmp2
- 	b.eq	9997f
-@@ -26,6 +22,10 @@
- 9997:
- .endm
- 
-+#ifdef CONFIG_EFI
-+#include "efi/crt0-efi-aarch64.S"
-+#else
-+
- .section .init
- 
- /*
-@@ -162,6 +162,9 @@ secondary_entry:
- 	/* set the stack */
- 	adrp	x0, secondary_data
- 	ldr	x0, [x0, :lo12:secondary_data]
-+	and	x1, x0, #THREAD_MASK
-+	add	x2, x1, #THREAD_SIZE
-+	zero_range x1, x2
- 	mov	sp, x0
- 
- 	/* finish init in C code */
-diff --git a/lib/arm/processor.c b/lib/arm/processor.c
-index 9d575968..ceff1c0a 100644
---- a/lib/arm/processor.c
-+++ b/lib/arm/processor.c
-@@ -117,7 +117,6 @@ void do_handle_exception(enum vector v, struct pt_regs *regs)
- 
- void thread_info_init(struct thread_info *ti, unsigned int flags)
+ static inline void *thread_stack_alloc(void)
  {
--	memset(ti, 0, sizeof(struct thread_info));
- 	ti->cpu = mpidr_to_cpu(get_mpidr());
- 	ti->flags = flags;
+-	void *sp = memalign(THREAD_ALIGNMENT, THREAD_SIZE);
++	void *sp = memalign_pages_flags(THREAD_ALIGNMENT, THREAD_SIZE, FLAG_DONTZERO);
+ 	return sp + THREAD_START_SP;
  }
-diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
-index 5bcad679..a8ef8c59 100644
---- a/lib/arm64/processor.c
-+++ b/lib/arm64/processor.c
-@@ -233,7 +233,6 @@ void install_vector_handler(enum vector v, vector_fn fn)
  
- static void __thread_info_init(struct thread_info *ti, unsigned int flags)
- {
--	memset(ti, 0, sizeof(struct thread_info));
- 	ti->cpu = mpidr_to_cpu(get_mpidr());
- 	ti->flags = flags;
- }
 -- 
 2.40.1
 
