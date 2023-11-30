@@ -1,144 +1,189 @@
-Return-Path: <kvm+bounces-2837-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2838-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D42C7FE783
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 04:04:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5AB67FE79D
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 04:18:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DDD51C20B95
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 03:04:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 959492822CB
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 03:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6F45125C1;
-	Thu, 30 Nov 2023 03:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B01C134A9;
+	Thu, 30 Nov 2023 03:18:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SQwNECuH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZGo1AAXY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1589D6C;
-	Wed, 29 Nov 2023 19:04:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701313455; x=1732849455;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=GCiIaCw+VRboLufR/lMo0OoCNHsxCHgA0wMyBlShb1o=;
-  b=SQwNECuH1JCgOtntM9c3ytdKWjE+PxAzqLVvOaBfUVlssD49d2hUo8+3
-   EiEKnIDIB8yfL8nx2Lnk+u2z2jBBeyrpmm6eS0877gHDK0bbf099XlGYK
-   VFwMpRrJpWxtfH/UtbBFL5whKl2GwDWASiIOWNt0+OiEOayWh67q6yN1u
-   6tofHGzJYqsjMUqDJDm7l2NAacxlRRZOTa1R6ezPzumX+rVmOweDcUeoc
-   ve8pFGecz4wGHHgGoOsYytJHV6TPKDBQmiypgTuY0M7G8Zo6e3SmKBvZX
-   UM06DYaa4MJhzk9LfxK7PQ1fOKiDWEZxEfPfmTTVEWkItgi6lEKfmSBMT
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="245356"
-X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
-   d="scan'208";a="245356"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 19:04:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="1100767184"
-X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
-   d="scan'208";a="1100767184"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.29.154]) ([10.93.29.154])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 19:04:10 -0800
-Message-ID: <ebacaa61-4156-4948-a9f7-8ea7c0a49e4a@intel.com>
-Date: Thu, 30 Nov 2023 11:04:08 +0800
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F7B510CE
+	for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 19:18:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701314317;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=u+iSpIxtCVTh9BXoYftq0bmE/10+Op2Y3rwSgLPtBkY=;
+	b=ZGo1AAXYPnKIxN2k6JJbAvpOY8wsEiiDMyRl3mjBtKuEXBopA1ctwom0cua35TZb/0/Cd3
+	BTKK4Y7Vrj/JgbNiwGea4p4xxXfMW5FYS8OwUqlC+ZbUaHAgDLu6HNePfJ6/pBFUKTbr2i
+	exTl9jdB2LIt1Xu0o8s4MvpaW5fX15Q=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-351-7HPODpjqN12b9B_4cl4Cig-1; Wed, 29 Nov 2023 22:18:34 -0500
+X-MC-Unique: 7HPODpjqN12b9B_4cl4Cig-1
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1cfbeee2265so1304955ad.0
+        for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 19:18:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701314313; x=1701919113;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u+iSpIxtCVTh9BXoYftq0bmE/10+Op2Y3rwSgLPtBkY=;
+        b=iF3rsOp5c9TEQOJ00FnEl98am4QUJQ9/N+PIhvLF/yAP1c5wgOEpCf/iuAIkNTBj9d
+         ZJJPYnv/sVw7kjf3wv/keA+1Wn6pDDQ0kpQba++eWc3cH1H1honJKDcGQWQG2g4PFuxN
+         EXtx1NxGYgI6pcBZaixjdWQgDnwDxJSY9eZF1QuVtj9ENWN1K42sVtRnlV0OJtDVOa7Q
+         DjzLlR+F2mwNjQha6+A5QBe6FFNXQFGx+TAFlPBKfy0GSxTwskrDbTJBOVOB/v/p3nbi
+         SutG9LrG7XO33hzHIvChblGV9Ms68OC04vs9l4JrbkGjZAYcqO4+VvWB/qAUaATSphhp
+         MRbw==
+X-Gm-Message-State: AOJu0Yz6M5zOi2fUTTxEIU3jSBM5MJYY+c0ZnFWWw9PoXa9vb63QRpHK
+	U+3jJyAzs382EB85ay7hK8CqJuwtlKUoX439Mq7v/PqPk7pxRi1ZtjcvPXnW8dvL0kdR0wFciwt
+	Z2i7+SNyLuGrS
+X-Received: by 2002:a17:902:f683:b0:1cf:c680:f37f with SMTP id l3-20020a170902f68300b001cfc680f37fmr14239942plg.2.1701314313433;
+        Wed, 29 Nov 2023 19:18:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFm1n8ELJdp4RfPk7lYND0rjP6RFv0rZ+fw84nRZl7Y4mDKazCvnKOkvSgAXTtmo4jZAZfpqg==
+X-Received: by 2002:a17:902:f683:b0:1cf:c680:f37f with SMTP id l3-20020a170902f68300b001cfc680f37fmr14239928plg.2.1701314313097;
+        Wed, 29 Nov 2023 19:18:33 -0800 (PST)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id i18-20020a17090332d200b001cfb971edf3sm126724plr.8.2023.11.29.19.18.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Nov 2023 19:18:32 -0800 (PST)
+Message-ID: <75fd59f0-c47d-ae26-61b2-e6d800c33e90@redhat.com>
+Date: Thu, 30 Nov 2023 11:18:29 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] KVM: selftests: Add logic to detect if ioctl()
- failed because VM was killed
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Michal Luczaj <mhal@rbox.co>,
- Oliver Upton <oliver.upton@linux.dev>, Colton Lewis <coltonlewis@google.com>
-References: <20231108010953.560824-1-seanjc@google.com>
- <20231108010953.560824-3-seanjc@google.com>
- <0ee32216-e285-406f-b20d-dd193b791d2b@intel.com>
- <ZUuyVfdKZG44T1ba@google.com>
- <22c602c9-4943-4a16-a12e-ffc5db29daa1@intel.com>
- <ZWePYnuK65GCOGYU@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [kvm-unit-tests PATCH v1 3/3] arm64: efi: Make running tests on
+ EFI can be parallel
 Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <ZWePYnuK65GCOGYU@google.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvmarm@lists.linux.dev, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Eric Auger <eric.auger@redhat.com>, Nikos Nikoleris
+ <nikos.nikoleris@arm.com>, Ricardo Koller <ricarkol@google.com>,
+ kvm@vger.kernel.org
+References: <20231129032123.2658343-1-shahuang@redhat.com>
+ <20231129032123.2658343-4-shahuang@redhat.com>
+ <20231129-7fbc43944dc62a55cffe131c@orel>
+ <a574e4b6-4c1b-d939-e61c-6a97a245341e@redhat.com>
+ <20231129-cbddf8063ae5af7a37aa2e4a@orel>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20231129-cbddf8063ae5af7a37aa2e4a@orel>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/30/2023 3:22 AM, Sean Christopherson wrote:
-> On Mon, Nov 13, 2023, Xiaoyao Li wrote:
->> On 11/9/2023 12:07 AM, Sean Christopherson wrote:
->>> On Wed, Nov 08, 2023, Xiaoyao Li wrote:
->>>> On 11/8/2023 9:09 AM, Sean Christopherson wrote:
->>>>> Add yet another macro to the VM/vCPU ioctl() framework to detect when an
->>>>> ioctl() failed because KVM killed/bugged the VM, i.e. when there was
->>>>> nothing wrong with the ioctl() itself.  If KVM kills a VM, e.g. by way of
->>>>> a failed KVM_BUG_ON(), all subsequent VM and vCPU ioctl()s will fail with
->>>>> -EIO, which can be quite misleading and ultimately waste user/developer
->>>>> time.
->>>>>
->>>>> Use KVM_CHECK_EXTENSION on KVM_CAP_USER_MEMORY to detect if the VM is
->>>>> dead and/or bug, as KVM doesn't provide a dedicated ioctl().  Using a
->>>>> heuristic is obviously less than ideal, but practically speaking the logic
->>>>> is bulletproof barring a KVM change, and any such change would arguably
->>>>> break userspace, e.g. if KVM returns something other than -EIO.
->>>>
->>>> We hit similar issue when testing TDX VMs. Most failure of SEMCALL is
->>>> handled with a KVM_BUG_ON(), which leads to vm dead. Then the following
->>>> IOCTL from userspace (QEMU) and gets -EIO.
->>>>
->>>> Can we return a new KVM_EXIT_VM_DEAD on KVM_REQ_VM_DEAD?
->>>
->>> Why?  Even if KVM_EXIT_VM_DEAD somehow provided enough information to be useful
->>> from an automation perspective, the VM is obviously dead.  I don't see how the
->>> VMM can do anything but log the error and tear down the VM.  KVM_BUG_ON() comes
->>> with a WARN, which will be far more helpful for a human debugger, e.g. because
->>> all vCPUs would exit with KVM_EXIT_VM_DEAD, it wouldn't even identify which vCPU
->>> initially triggered the issue.
+Hi drew,
+
+On 11/29/23 19:43, Andrew Jones wrote:
+> On Wed, Nov 29, 2023 at 06:14:20PM +0800, Shaoqin Huang wrote:
+>> Hi drew,
 >>
->> It's not about providing more helpful debugging info, but to provide a
->> dedicated notification for VMM that "the VM is dead, all the following
->> command may not response". With it, VMM can get rid of the tricky detection
->> like this patch.
-> 
-> But a VMM doesn't need this tricky detection, because this tricky detections isn't
-> about detecting that the VM is dead, it's all about helping a human debug why a
-> test failed.
-> 
-> -EIO already effectively says "the VM is dead", e.g. QEMU isn't going to keep trying
-> to run vCPUs.  
-
-If -EIO for KVM ioctl denotes "the VM is dead" is to be the officially 
-announced API, I'm fine.
-
-
-> Similarly, selftests assert either way, the goal is purely to print
-> out a unique error message to minimize the chances of confusing the human running
-> the test (or looking at results).
-> 
->>> Definitely a "no" on this one.  As has been established by the guest_memfd series,
->>> it's ok to return -1/errno with a valid exit_reason.
+>> On 11/29/23 17:27, Andrew Jones wrote:
+>>> On Tue, Nov 28, 2023 at 10:21:23PM -0500, Shaoqin Huang wrote:
+>>>> Currently running tests on EFI in parallel can cause part of tests to
+>>>> fail, this is because arm/efi/run script use the EFI_CASE to create the
+>>>> subdir under the efi-tests, and the EFI_CASE is the filename of the
+>>>> test, when running tests in parallel, the multiple tests exist in the
+>>>> same filename will execute at the same time, which will use the same
+>>>> directory and write the test specific things into it, this cause
+>>>> chaotic and make some tests fail.
 >>>
->>>> But I'm wondering if any userspace relies on -EIO behavior for VM DEAD case.
+>>> How do they fail? iiuc, we're switching from having one of each unique
+>>> binary on the efi partition to multiple redundant binaries, since we
+>>> copy the binary for each test, even when it's the same as for other
+>>> tests. It seems like we should be able to keep single unique binaries
+>>> and resolve the parallel execution failure by just checking for existence
+>>> of the binaries or only creating test-specific data directories or
+>>> something.
 >>>
->>> I doubt userspace relies on -EIO, but userpsace definitely relies on -1/errno being
->>> returned when a fatal error.
 >>
->> what about KVM_EXIT_SHUTDOWN? Or KVM_EXIT_INTERNAL_ERROR?
+>> The problem comes from the arm/efi/run script, as you can see. If we
+>> parallel running multiple tests on efi, for example, running the pmu-sw-incr
+>> and pmu-chained-counters and other pmu tests at the same time, the EFI_CASE
+>> will be pmu. So they will write their $cmd_args to the
+>> $EFI/TEST/pmu/startup.nsh at the same time, which will corrupt the
+>> startup.nsh file.
+>>
+>> cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
+>> echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
+>> ...
+>> echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
+>>
+>> And I can get the log which outputs:
+>>
+>> * pmu-sw-incr.log:
+>>    - ABORT: pmu: Unknown sub-test 'pmu-mem-acce'
+>> * pmu-chained-counters.log
+>>    - ABORT: pmu: Unknown sub-test 'pmu-mem-access-reliab'
+>>
+>> And the efi-tests/pmu/startup.nsh:
+>>
+>> @echo -off
+>> setvar fdtfile -guid 97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823 -rt =L"dtb"
+>> pmu.efi pmu-mem-access-reliability
+>> setvar fdtfile -guid 97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823 -rt =L"dtb"
+>> pmu.efi pmu-chained-sw-incr
+>>
+>>
+>> Thus when running parallel, some of them will fail. So I create different
+>> sub-dir in the efi-tests for each small test.
 > 
-> I don't follow,
+> Ok, I was guessing it was something like that. Maybe we should create a
+> "bin" type of named directory for all the binaries and then create a
+> separate subdir for each test and its startup.nsh, rather than copying
+> the binaries multiple times.
+> 
 
-I was trying to ask if KVM_EXIT_SHUTDOWN and KVM_EXIT_INTERNAL_ERROR are 
-treated as fatal error by userspace.
+I can put this kind of improvement into another patch. Currently I want 
+to use the safety way to fix this problem, create different directory 
+and copy the .efi for each of them will not cause any interfere for each 
+of the test. We can tolerate the redundant, it doesn't cost many space.
 
-> those are vcpu_run.exit_reason values, not errno values.  Returning
-> any flavor of KVM_EXIT_*, which are positive values, would break userspace, e.g.
-> QEMU explicitly looks for "ret < 0", and glibc only treats small-ish negative
-> values as errors, i.e. a postive return value will be propagated verbatim up to
-> QEMU.
+Thanks,
+Shaoqin
+
+>>>>    : "${EFI_CASE:=$(basename $1 .efi)}"
+>>>>    : "${EFI_VAR_GUID:=97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823}"
+>>>> @@ -56,20 +58,20 @@ if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
+>>>>    	EFI_CASE=dummy
+>>>>    fi
+>>>> -: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_CASE"}"
+>>>> +: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_TESTNAME"}"
+>>>>    mkdir -p "$EFI_CASE_DIR"
+>>>> -cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
+>>>> -echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
+>>>> +cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_CASE_DIR/"
+>>>> +echo "@echo -off" > "$EFI_CASE_DIR/startup.nsh"
+>>>
+>>> Unrelated change, should be a separate patch.
+>>>
+>>
+>> Ok, Will separate it.
+> 
+> Actually, disregard my comment. I was too hasty here and thought the
+> '@echo -off' was getting added, but now I see only the path was getting
+> updated. It's correct to make this change here in this patch.
+> 
+> Thanks,
+> drew
+> 
+
+-- 
+Shaoqin
 
 
