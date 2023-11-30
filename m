@@ -1,85 +1,85 @@
-Return-Path: <kvm+bounces-2831-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2832-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCE097FE658
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 02:44:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EC427FE65B
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 02:44:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77AB1282327
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 01:44:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32277B20F33
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 01:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5443279EC;
-	Thu, 30 Nov 2023 01:44:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A9B079EB;
+	Thu, 30 Nov 2023 01:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xm3gWY18"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hLCQLMre"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2E3F1A3
-	for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 17:44:18 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5c5daf2baccso6201587b3.3
-        for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 17:44:18 -0800 (PST)
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BB6E10E0
+	for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 17:44:25 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1cfc3a062e8so5304395ad.1
+        for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 17:44:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701308658; x=1701913458; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1701308665; x=1701913465; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gMxLUnirB9hlBqYifVKy9Kl1l6BWOFWxKcWyIczHOPQ=;
-        b=Xm3gWY18Q8gpN1ZnDnYiEKqDPyrNMMgw3AVG48JYnOEDUQD2hmSws0V6yAu5cTWLSR
-         ZegNu8i92pzD9TGFPvxJb84gk2bxp5hLNfyfbqHSDqJ8wEVdfHekO9pPstqx+aXPTAjt
-         khgo7Ynyv/IaJU40dIz7pluESgUbW1ZFMxBqZ8+hJIvttg4Y0LoPfzOf4xcl2zIA0/Hc
-         3hoNuxV85lRlQNxVCZ73wz3gtiqCTwkQaw5KhaWEV/3VcphIipItEreMSYs/AdxvEMyN
-         Yt18ipquE7eupqBRyRCHyyyPGO2lran5XVrE8s7ruZFgaxMZQrllWnFMLWLlZJwb6N5z
-         eChA==
+        bh=Lln3JA/pL2zNGG8fnWXWFxt/sDS6XmKq9CUbeWSzI+U=;
+        b=hLCQLMreGSsOJb4PEsjjAZX5OBqORQsQ0vhdiAWLZuioy3zTgy6oGMa2s8q+PXMQjA
+         OFnirMnv1WQLWdKgACzf+kmNQvDay62Wm4lkfT/2oxPEr7B8otAMdBSSQNw2Kr7ubp/T
+         LZnr5wQYJ13pQb4fosgsUqgNv5q3naAnV/U7SDItKHLf7/d4/dH0OavYBrw6IQVT9hWn
+         wut9o0kRv8aVgNWaB6VFrtFGVXvyOgXBg6rXqob0GqRUw3jPsw7ICIJ7Tg71PRimIi9V
+         zt29wgc0MlnFkhqTAtblLgwPqTIGHqDTeuz7oGxFgo5qZjsg9dAJ00+2C2VsG7JdIA39
+         xrnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701308658; x=1701913458;
+        d=1e100.net; s=20230601; t=1701308665; x=1701913465;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gMxLUnirB9hlBqYifVKy9Kl1l6BWOFWxKcWyIczHOPQ=;
-        b=Ef1bYzcCeGdBvq+pzmPh25L1J5VpPrPj1UIkem6y/OvHt206SVSr+SwXjRNgPE5dQT
-         B4Gz1obUgbpi9vtb8owRT5HTU5FscdH/1T/9npTbIlHZT9S67uybkk9Uyac62zld/eVU
-         YHshaogbaoxFP6WFFVNGLdvaBt5BB0yfNbPit8KGVHdTdzL4D5pp1LPi8la40KyX9H0p
-         uRQcJk5NS17Vj/i1gXHhIvfVOa1OeF0+7N9Cz7TzA59zpuEmGh5ymvAl00e6+r+AbKBS
-         PtRXu5YqfgESRkCThJUbQOGu7jPJaBbkEAqoiFdthii8CZR8C9hf/GQLf36ZERo2tQdN
-         iemQ==
-X-Gm-Message-State: AOJu0YwI2Bb+v2LkSvr2Rd+MVbsdXNrCP2SoSgV1hZIJuJiLakpoXUxN
-	VNxmZE+qgfK6rqqL0WzsXK5SE6pRVMg=
-X-Google-Smtp-Source: AGHT+IH0VbxQs9f0utAeUg0aQHLKSIYznR55H8CyelgDvZ+FQgLUjl/M/snSfGWBq/yvxlw5sJ4ZnWjJu/U=
+        bh=Lln3JA/pL2zNGG8fnWXWFxt/sDS6XmKq9CUbeWSzI+U=;
+        b=FPuYgtXpcxoHilxmEoV97VtmBdeu6+BEXVMMC0jnd7m94LjDrrpyVIBvfLaryKWqqY
+         E9+efMMOqvVRdIB0pmR0UDOIHnz2PbSPZfzrD8AsSjNwnOrB7bQ+m5abpQSS+WSUC7Sz
+         xYPKkOTf/HdGxmlZayYC4zIMAmwKQkN1YB+oMGGtTdLMqVLcwcIKIhmPfEIUxpZFCL78
+         Of4wQg3PcMrTp/2yLk/hFkikBw9K2J+lUgX6D6jHkJL1FqASW8eedy7LmtGDFwd5QIYa
+         6rni6Xc22aXTSyU4o2RLTogaKRs6O77qINIRDt2SrpaLh2mMwX6fOy+2ys3nGhD4Yvae
+         ucBQ==
+X-Gm-Message-State: AOJu0YwWzCHgssUXnJJCDOO215AoPxtlPxKPFVhLn+7lDAFCwhNzE17n
+	m5nE3jYz2g09gAT+baVnQJycZ4PPdmc=
+X-Google-Smtp-Source: AGHT+IHhXzzYXOzUBShDv5PGX0Z4/O+DwcPcBk7HaqSRWwv0r6E6VgrGl95aCT63qnVH61WySbFupvW1SnI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:3209:b0:5cc:234f:1860 with SMTP id
- ff9-20020a05690c320900b005cc234f1860mr577492ywb.3.1701308657947; Wed, 29 Nov
- 2023 17:44:17 -0800 (PST)
-Date: Wed, 29 Nov 2023 17:44:08 -0800
-In-Reply-To: <20231018192325.1893896-1-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:903:452:b0:1cf:a2af:ee09 with SMTP id
+ iw18-20020a170903045200b001cfa2afee09mr3891848plb.5.1701308665015; Wed, 29
+ Nov 2023 17:44:25 -0800 (PST)
+Date: Wed, 29 Nov 2023 17:44:10 -0800
+In-Reply-To: <9fc8b5395321abbfcaf5d78477a9a7cd350b08e4.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231018192325.1893896-1-seanjc@google.com>
+References: <9fc8b5395321abbfcaf5d78477a9a7cd350b08e4.camel@infradead.org>
 X-Mailer: git-send-email 2.43.0.rc1.413.gea7ed67945-goog
-Message-ID: <170129829387.532906.5566625091888881968.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Declare flush_remote_tlbs{_range}() hooks
- iff HYPERV!=n
+Message-ID: <170129774172.531444.5273351479240082811.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: selftests: add -MP to CFLAGS
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
+	David Woodhouse <dwmw2@infradead.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Wed, 18 Oct 2023 12:23:25 -0700, Sean Christopherson wrote:
-> Declare the kvm_x86_ops hooks used to wire up paravirt TLB flushes when
-> running under Hyper-V if and only if CONFIG_HYPERV!=n.  Wrapping yet more
-> code with IS_ENABLED(CONFIG_HYPERV) eliminates a handful of conditional
-> branches, and makes it super obvious why the hooks *might* be valid.
+On Sat, 28 Oct 2023 20:34:53 +0100, David Woodhouse wrote:
+> Using -MD without -MP causes build failures when a header file is deleted
+> or moved. With -MP, the compiler will emit phony targets for the header
+> files it lists as dependencies, and the Makefiles won't refuse to attempt
+> to rebuild a C unit which no longer includes the deleted header.
 > 
 > 
 
-Applied to kvm-x86 hyperv, thanks!
+Applied to kvm-x86 selftests, thanks!
 
-[1/1] KVM: x86/mmu: Declare flush_remote_tlbs{_range}() hooks iff HYPERV!=n
-      https://github.com/kvm-x86/linux/commit/0277022a77a5
+[1/1] KVM: selftests: add -MP to CFLAGS
+      https://github.com/kvm-x86/linux/commit/fc6543bb55d4
 
 --
 https://github.com/kvm-x86/linux/tree/next
