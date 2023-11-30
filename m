@@ -1,186 +1,120 @@
-Return-Path: <kvm+bounces-3019-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3020-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52B6C7FFBFE
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 21:09:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04B8E7FFBFF
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 21:09:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05B41281A32
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:09:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35E341C20D00
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:09:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F9053E1D;
-	Thu, 30 Nov 2023 20:09:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8150D53E25;
+	Thu, 30 Nov 2023 20:09:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TUgxmHM9"
+	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="b5FIJOpV"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F96710EF
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 12:08:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701374937;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vQ5m3o7+UqdtWYSDU6QubOO0VIH9lcTK3EaDyGHvbxw=;
-	b=TUgxmHM9JwEJ2vungQdnKYHPrNSGZqPYc5G12Qf5g9KY/XcvcFZDxf2kyZMTYnTxddX9P5
-	0IsZ+/UFhuEVfaJ77yEAueTCv0zgJ8lHuI30DRBddkCPqkOQjkh7eNAWC4q0RC9qRd/yAX
-	+ofgjUeMscWwgOxvhnVg2HbG52LCOCk=
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
- [209.85.161.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-121-42pjk2rFPFGwcNpB_lgGHA-1; Thu, 30 Nov 2023 15:08:55 -0500
-X-MC-Unique: 42pjk2rFPFGwcNpB_lgGHA-1
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-58dba38a819so212705eaf.0
-        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 12:08:55 -0800 (PST)
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71671B9
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 12:09:04 -0800 (PST)
+Received: by mail-qt1-x82b.google.com with SMTP id d75a77b69052e-41ea8debcdaso7851871cf.1
+        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 12:09:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=soleen.com; s=google; t=1701374943; x=1701979743; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Be1KAg53A/Objdu3EOp617iDWrhswh7WogUdBagnrZg=;
+        b=b5FIJOpVYc3V2YCNIasCpGTREL3vAWocW8+79kcTkTMx0nfDV+HD1T2xJmBet1i9pu
+         rVyOq8XG7n6Y/YO4R9V6zuM9DjmwvNKMyeMoWrsmjDuN3tINbzflZJPjwVf+jr4PbdZa
+         yukFQo/OaZti3gowl5KJ5X3bJHheD0ukYFVwvOlxjgip4PrdFNyJAZajeCT1qRgZHCpo
+         Ria6nd/mH3TdWGxB+WsXFnBUSNOLBMzlkjOF4waX+eeEAC6dcHAA1b9aylAVkWsGekpC
+         4/LqhrdnoCeNX27w376QS/KneCBtzpm67TgBRyPc1Un7CiwmwzpDC9OHN+EaTjmTqEm7
+         9mBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701374935; x=1701979735;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vQ5m3o7+UqdtWYSDU6QubOO0VIH9lcTK3EaDyGHvbxw=;
-        b=G27B16TcKYopWYZfbaOrpSgcnp7/6CLqYtPr3+Nb42KbRsF4/+3i0LNDsuVSD3qYRu
-         e+Bt8oMzZjhX35BkFIPiaqoZ6RqWrKm5CP7eiYC9HoWyNBT3KSsX79d+4Fyq15x4e7ju
-         Kfqp46PbIf7rZ9Y6+IeX14yWvQArkKyHrIHHBVZc8PvA1UVUoLxztPh8Hyrk/2Q2fgMf
-         ioL92cGYN0L2opR1WbNpQ0H7uDiYdRDiXSAzyvqMLW5slVQ1rTrw4IdqoqgoVxcZss9M
-         Oql+hI/t0ugT4AALRQosIx4UvJD7v7tDwoyeZYoFsKe24LEOuvDHsM4Tq1RBYrpt5QTe
-         89gA==
-X-Gm-Message-State: AOJu0YyFtCO8xyJTwhkLez4MkB5I/MF19om7RZrG/6X+/Fq456fYZVBo
-	DAzhvJ+OwHGyfKfQTEJNacl3PGkTr+/bJeFW9TzHxzVwKrHyoZTDTZxypOPYqvhtjq1PoX9iDL/
-	oR7UfQjrgf7+U
-X-Received: by 2002:a05:6820:a8f:b0:58d:e3d3:ec72 with SMTP id de15-20020a0568200a8f00b0058de3d3ec72mr3219627oob.0.1701374934928;
-        Thu, 30 Nov 2023 12:08:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEFrVwMaTOwUyaQhegCiYW255oqkz3A1nA2DFXZquNCGnC+wsIvv9V9+I7etJ6uoaw71Bi5Lw==
-X-Received: by 2002:a05:6820:a8f:b0:58d:e3d3:ec72 with SMTP id de15-20020a0568200a8f00b0058de3d3ec72mr3219606oob.0.1701374934634;
-        Thu, 30 Nov 2023 12:08:54 -0800 (PST)
-Received: from x1n (cpe688f2e2cb7c3-cm688f2e2cb7c0.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id qr13-20020a05620a390d00b0077d5e1e4edesm790071qkn.57.2023.11.30.12.08.50
+        d=1e100.net; s=20230601; t=1701374943; x=1701979743;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Be1KAg53A/Objdu3EOp617iDWrhswh7WogUdBagnrZg=;
+        b=Q/4scVQwXPmhilcwlKd8x7nwhhUWyEJIbkSP2bExwnFRjtaSHMU2w8cSpvnfUB+bbx
+         IqN3wb9UriOBp7W1ZutSr1GAMmFfQSLmA8pZBXd09P4Qp0AtOu6FFT9g0qoQqx5O3PIH
+         6h4fKls1WdHMV/OqtCPc62Pbq7AMdpn20jgWKvSdX5BCic/lzUpHIvScsy6776vaqdkW
+         H2RybA8iML8eAp1Tiw5gAnhsqewbwlcnAZHur8bYbzRo01Acn8nVsd8pQz8qeYNHFBLL
+         MJx7sqpym8GhpvOiZ8fkM6tfGOuZriIQ2feF8zTPJRNoPVzJUnz3d/rkTQIT3FLxPmY3
+         qIqw==
+X-Gm-Message-State: AOJu0YwHK/4PuNRmPMWJ+F6QKxUSApgACgjfozalg2GwssJ+hyXr/XEB
+	dcyjLAU/88bXm7gmrF3aXPCJKw==
+X-Google-Smtp-Source: AGHT+IGyZ1MVJbpF5QMDxLNeNlkaL79u3htakyAB6E9jsA5aoQ8faIPkDh3Pm0do6EH90LCTcQ3f/g==
+X-Received: by 2002:a05:622a:1389:b0:41e:1d15:69a6 with SMTP id o9-20020a05622a138900b0041e1d1569a6mr28803241qtk.31.1701374943507;
+        Thu, 30 Nov 2023 12:09:03 -0800 (PST)
+Received: from soleen.c.googlers.com.com (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
+        by smtp.gmail.com with ESMTPSA id c7-20020ac86e87000000b0041cb8947ed2sm786258qtv.26.2023.11.30.12.09.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 12:08:54 -0800 (PST)
-Date: Thu, 30 Nov 2023 15:08:49 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Jean-Christophe Dubois <jcd@tribudubois.net>,
-	Fabiano Rosas <farosas@suse.de>, qemu-s390x@nongnu.org,
-	Song Gao <gaosong@loongson.cn>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Thomas Huth <thuth@redhat.com>, Hyman Huang <yong.huang@smartx.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Andrey Smirnov <andrew.smirnov@gmail.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Kevin Wolf <kwolf@redhat.com>, Ilya Leoshkevich <iii@linux.ibm.com>,
-	Artyom Tarasenko <atar4qemu@gmail.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	Max Filippov <jcmvbkbc@gmail.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Paul Durrant <paul@xen.org>,
-	Jagannathan Raman <jag.raman@oracle.com>,
-	Juan Quintela <quintela@redhat.com>,
-	Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-	qemu-arm@nongnu.org, Jason Wang <jasowang@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
-	=?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
-	BALATON Zoltan <balaton@eik.bme.hu>,
-	Daniel Henrique Barboza <danielhb413@gmail.com>,
-	Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	Hailiang Zhang <zhanghailiang@xfusion.com>,
-	Roman Bolshakov <rbolshakov@ddn.com>,
-	Huacai Chen <chenhuacai@kernel.org>, Fam Zheng <fam@euphon.net>,
-	Eric Blake <eblake@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
-	Alexander Graf <agraf@csgraf.de>,
-	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-	Weiwei Li <liwei1518@gmail.com>, Eric Farman <farman@linux.ibm.com>,
-	Stafford Horne <shorne@gmail.com>,
-	David Hildenbrand <david@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Reinoud Zandijk <reinoud@netbsd.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Cameron Esfahani <dirty@apple.com>, xen-devel@lists.xenproject.org,
-	Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, qemu-riscv@nongnu.org,
-	Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-	John Snow <jsnow@redhat.com>,
-	Sunil Muthuswamy <sunilmut@microsoft.com>,
-	Michael Roth <michael.roth@amd.com>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Bin Meng <bin.meng@windriver.com>,
-	Stefano Stabellini <sstabellini@kernel.org>, kvm@vger.kernel.org,
-	qemu-block@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
-	Anthony Perard <anthony.perard@citrix.com>,
-	Harsh Prateek Bora <harshpb@linux.ibm.com>,
-	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
-	=?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
-	qemu-ppc@nongnu.org,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Leonardo Bras <leobras@redhat.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Jiaxun Yang <jiaxun.yang@flygoat.com>
-Subject: Re: [PATCH 1/6] system/cpus: rename qemu_mutex_lock_iothread() to
- qemu_bql_lock()
-Message-ID: <ZWjr0TKxihlpd1jm@x1n>
-References: <20231129212625.1051502-1-stefanha@redhat.com>
- <20231129212625.1051502-2-stefanha@redhat.com>
+        Thu, 30 Nov 2023 12:09:03 -0800 (PST)
+From: Pasha Tatashin <pasha.tatashin@soleen.com>
+To: akpm@linux-foundation.org,
+	linux-mm@kvack.org,
+	pasha.tatashin@soleen.com,
+	alex.williamson@redhat.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] vfio: account iommu allocations
+Date: Thu, 30 Nov 2023 20:09:00 +0000
+Message-ID: <20231130200900.2320829-1-pasha.tatashin@soleen.com>
+X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231129212625.1051502-2-stefanha@redhat.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 29, 2023 at 04:26:20PM -0500, Stefan Hajnoczi wrote:
-> The Big QEMU Lock (BQL) has many names and they are confusing. The
-> actual QemuMutex variable is called qemu_global_mutex but it's commonly
-> referred to as the BQL in discussions and some code comments. The
-> locking APIs, however, are called qemu_mutex_lock_iothread() and
-> qemu_mutex_unlock_iothread().
-> 
-> The "iothread" name is historic and comes from when the main thread was
-> split into into KVM vcpu threads and the "iothread" (now called the main
-> loop thread). I have contributed to the confusion myself by introducing
-> a separate --object iothread, a separate concept unrelated to the BQL.
-> 
-> The "iothread" name is no longer appropriate for the BQL. Rename the
-> locking APIs to:
-> - void qemu_bql_lock(void)
-> - void qemu_bql_unlock(void)
-> - bool qemu_bql_locked(void)
-> 
-> There are more APIs with "iothread" in their names. Subsequent patches
-> will rename them. There are also comments and documentation that will be
-> updated in later patches.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+iommu allocations should be accounted in order to allow admins to
+monitor and limit the amount of iommu memory.
 
-Acked-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Pasha Tatashin <pasha.tatashin@soleen.com>
+---
+ drivers/vfio/vfio_iommu_type1.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Two nickpicks:
+This patch is spinned of from the series:
+https://lore.kernel.org/all/20231128204938.1453583-1-pasha.tatashin@soleen.com
 
-  - BQL contains "QEMU" as the 2nd character, so maybe easier to further
-    rename qemu_bql into bql_?
-
-  - Could we keep the full spell of BQL at some places, so people can still
-    reference it if not familiar?  IIUC most of the BQL helpers will root
-    back to the major three functions (_lock, _unlock, _locked), perhaps
-    add a comment of "BQL stands for..." over these three functions as
-    comment?
-
-Please take or ignore these nitpicks; my ACK will stand irrelevant.
-
-Thanks,
-
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index eacd6ec04de5..b2854d7939ce 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -1436,7 +1436,7 @@ static int vfio_iommu_map(struct vfio_iommu *iommu, dma_addr_t iova,
+ 	list_for_each_entry(d, &iommu->domain_list, next) {
+ 		ret = iommu_map(d->domain, iova, (phys_addr_t)pfn << PAGE_SHIFT,
+ 				npage << PAGE_SHIFT, prot | IOMMU_CACHE,
+-				GFP_KERNEL);
++				GFP_KERNEL_ACCOUNT);
+ 		if (ret)
+ 			goto unwind;
+ 
+@@ -1750,7 +1750,8 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
+ 			}
+ 
+ 			ret = iommu_map(domain->domain, iova, phys, size,
+-					dma->prot | IOMMU_CACHE, GFP_KERNEL);
++					dma->prot | IOMMU_CACHE,
++					GFP_KERNEL_ACCOUNT);
+ 			if (ret) {
+ 				if (!dma->iommu_mapped) {
+ 					vfio_unpin_pages_remote(dma, iova,
+@@ -1845,7 +1846,8 @@ static void vfio_test_domain_fgsp(struct vfio_domain *domain, struct list_head *
+ 			continue;
+ 
+ 		ret = iommu_map(domain->domain, start, page_to_phys(pages), PAGE_SIZE * 2,
+-				IOMMU_READ | IOMMU_WRITE | IOMMU_CACHE, GFP_KERNEL);
++				IOMMU_READ | IOMMU_WRITE | IOMMU_CACHE,
++				GFP_KERNEL_ACCOUNT);
+ 		if (!ret) {
+ 			size_t unmapped = iommu_unmap(domain->domain, start, PAGE_SIZE);
+ 
 -- 
-Peter Xu
+2.43.0.rc2.451.g8631bc7472-goog
 
 
