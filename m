@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-2959-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2960-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B08897FF21B
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 15:35:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C964F7FF21D
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 15:36:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26934B21B30
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 14:35:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B671283749
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 14:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E1AA51C30;
-	Thu, 30 Nov 2023 14:35:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A58E51013;
+	Thu, 30 Nov 2023 14:35:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M7bsHFAm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l0pIDfZg"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD2A210DB
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 06:35:45 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B53D50
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 06:35:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701354945; x=1732890945;
+  t=1701354954; x=1732890954;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=zMs3wimSwFi3OS/xT8fCJCLyivsPCu0OTNgeR6TOgP0=;
-  b=M7bsHFAmHv6VyHj9ouIwDoDgjxY5oCpoluUJ384DKhzt9rsYJYsY4i6M
-   mfAC3Y2IgKUAOcF+h9grFHDPPrRKhrA6dxj8Fw+lWbT5EvnJqHfbt+FgU
-   +sHExOQM3Sf+t5Xy7n93KUOafGeSuEETynKbrNGOolStIhwi6NMU1TlHd
-   jJ5KjwafF4n2bziINMCwMqVcy+H35+sNmzhGeoxN8WduL6k+1JmTfvF3q
-   kk2HiTl2ml2jstOeA6G9gCFcbC5gJsDjU0/Sy4ksOWBCrXgHdGo6U8sBb
-   KPuOdLNTI1gROOoM1WY2nWDEDLSg/eWy9uchS+GaB1FGL+2/9sVLIEmGF
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="479532487"
+  bh=/v8heKKPYeoDkQz9adBaYazg44MH5EQbkce1fx19vRE=;
+  b=l0pIDfZgboNahI+UlI3+k2pFRUdstp768V7QtapKssAhDvdcZ4hg5LwG
+   1MHcVLsjh8a9rj74w1sbzYtTHTvW0HUIl3BZq4AaymKbtfcOlUUJVAkf7
+   xM0wXdXmrMx3H9H7Okc7hiMa0RyY2a5yBtkI4cBCsBHWjn0tKZEhojXQB
+   Gifd+Se7wthTHsFcYmo5MmvT/02sjGzKTcvmpAtTY5LojM8pjQm+u+M2U
+   RZn3iXO8PG05ITMKfVKOqXF2cft4LePRfL0AW6A2CbFxs7CP6yWJbcdqa
+   JXvqWBan4XuqF+42g9DNOMLFAnaa8c+XqaFWRFrDCoBl84gEk/aPIuaQI
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="479532514"
 X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="479532487"
+   d="scan'208";a="479532514"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 06:35:45 -0800
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 06:35:54 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="942730310"
+X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="942730319"
 X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="942730310"
+   d="scan'208";a="942730319"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by orsmga005.jf.intel.com with ESMTP; 30 Nov 2023 06:35:35 -0800
+  by orsmga005.jf.intel.com with ESMTP; 30 Nov 2023 06:35:44 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
@@ -84,9 +84,9 @@ Cc: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
 	Zhenyu Wang <zhenyu.z.wang@intel.com>,
 	Yongwei Ma <yongwei.ma@intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 33/41] hw/machine: Validate smp topology tree without -smp
-Date: Thu, 30 Nov 2023 22:41:55 +0800
-Message-Id: <20231130144203.2307629-34-zhao1.liu@linux.intel.com>
+Subject: [RFC 34/41] hw/core/topo: Implement user-child to collect topology device from cli
+Date: Thu, 30 Nov 2023 22:41:56 +0800
+Message-Id: <20231130144203.2307629-35-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231130144203.2307629-1-zhao1.liu@linux.intel.com>
 References: <20231130144203.2307629-1-zhao1.liu@linux.intel.com>
@@ -100,205 +100,192 @@ Content-Transfer-Encoding: 8bit
 
 From: Zhao Liu <zhao1.liu@intel.com>
 
-QOM topology allows user to create topology tree from cli without -smp,
-in this case, validate the topology tree to meet the smp requirement.
+Support user-child for topology devices.
 
-Currently, for compatibility with MachineState.smp, initialize
-MachineState.smp from topology tree in this case.
+This will affect these 2 aspects:
+1. For the basic topology device (with DEVICE_CATEGORY_CPU_DEF
+   category), user could specify "parent" to build the topology
+   relationship from cli. And cpu-slot will collect all topology
+   devices.
+
+2. For the hotplug topology devices (ppc-core or CPUs of other arches),
+   user-child could help to search the correct topology parent in
+   topology tree with the index properties. This is compatible with
+   the original behavior of inserting CPU/core from cli. And this
+   requires arch to support QOM topology with a few arch-specific
+   modifications, before this support, hotplugged CPUs/cores are
+   inserted into cpu-slot by default.
 
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- hw/core/cpu-slot.c         | 146 +++++++++++++++++++++++++++++++++++++
- hw/core/machine.c          |  10 +++
- include/hw/core/cpu-slot.h |   1 +
- 3 files changed, 157 insertions(+)
+ hw/core/cpu-slot.c         | 44 ++++++++++++++++++++++++++++++++++++++
+ hw/core/cpu-topo.c         | 38 ++++++++++++++++++++++++++++++++
+ include/hw/core/cpu-slot.h |  3 +++
+ include/hw/core/cpu-topo.h |  4 ++++
+ 4 files changed, 89 insertions(+)
 
 diff --git a/hw/core/cpu-slot.c b/hw/core/cpu-slot.c
-index ade155baf60b..45b6aef0750a 100644
+index 45b6aef0750a..413daa66aaad 100644
 --- a/hw/core/cpu-slot.c
 +++ b/hw/core/cpu-slot.c
-@@ -413,3 +413,149 @@ void machine_create_smp_topo_tree(MachineState *ms, Error **errp)
-     }
-     slot->smp_parsed = true;
+@@ -559,3 +559,47 @@ bool machine_validate_cpu_topology(MachineState *ms, Error **errp)
+ 
+     return true;
  }
 +
-+static void set_smp_child_topo_info(CpuTopology *smp_info,
-+                                    CPUTopoStat *stat,
-+                                    CPUTopoLevel child_level)
++Object *cpu_slot_get_free_parent(CPUTopoState *child, Error **errp)
 +{
-+    unsigned int *smp_count;
-+    CPUTopoStatEntry *entry;
-+
-+    smp_count = get_smp_info_by_level(smp_info, child_level);
-+    entry = get_topo_stat_entry(stat, child_level);
-+    *smp_count = entry->max_units ? entry->max_units : 1;
-+
-+    return;
-+}
-+
-+typedef struct ValidateCbData {
-+    CPUTopoStat *stat;
-+    CpuTopology *smp_info;
-+    Error **errp;
-+} ValidateCbData;
-+
-+static int validate_topo_children(CPUTopoState *topo, void *opaque)
-+{
-+    CPUTopoLevel level = CPU_TOPO_LEVEL(topo), next_level;
-+    ValidateCbData *cb = opaque;
-+    unsigned int max_children;
-+    CPUTopoStatEntry *entry;
-+    Error **errp = cb->errp;
-+
-+    if (level != CPU_TOPO_THREAD && !topo->num_children &&
-+        !topo->max_children) {
-+        error_setg(errp, "Invalid topology: the CPU topology "
-+                   "(level: %s, index: %d) isn't completed.",
-+                   cpu_topo_level_to_string(level), topo->index);
-+        return TOPO_FOREACH_ERR;
-+    }
-+
-+    if (level == CPU_TOPO_UNKNOWN) {
-+        error_setg(errp, "Invalid CPU topology: unknown topology level.");
-+        return TOPO_FOREACH_ERR;
-+    }
-+
-+    /*
-+     * Only CPU_TOPO_THREAD level's child_level could be CPU_TOPO_UNKNOWN,
-+     * but machine_validate_cpu_topology() is before CPU creation.
-+     */
-+    if (topo->child_level == CPU_TOPO_UNKNOWN) {
-+        error_setg(errp, "Invalid CPU topology: incomplete topology "
-+                   "(level: %s, index: %d), no child?.",
-+                   cpu_topo_level_to_string(level), topo->index);
-+        return TOPO_FOREACH_ERR;
-+    }
-+
-+    /*
-+     * Currently hybrid topology isn't supported, so only SMP topology
-+     * is allowed.
-+     */
-+
-+    entry = get_topo_stat_entry(cb->stat, topo->child_level);
-+
-+    /* Max threads per core is pre-configured by "nr-threads". */
-+    max_children = topo->child_level != CPU_TOPO_THREAD ?
-+                   topo->num_children : topo->max_children;
-+
-+    if (entry->max_units != max_children) {
-+        error_setg(errp, "Invalid SMP topology: "
-+                   "The %s topology is asymmetric.",
-+                   cpu_topo_level_to_string(level));
-+        return TOPO_FOREACH_ERR;
-+    }
-+
-+    next_level = find_next_bit(cb->stat->curr_levels, USER_AVAIL_LEVEL_NUM,
-+                               topo->child_level + 1);
-+
-+    if (next_level != level) {
-+        error_setg(errp, "Invalid smp topology: "
-+                   "asymmetric CPU topology depth.");
-+        return TOPO_FOREACH_ERR;
-+    }
-+
-+    set_smp_child_topo_info(cb->smp_info, cb->stat, topo->child_level);
-+
-+    return TOPO_FOREACH_CONTINUE;
-+}
-+
-+/*
-+ * Only check the case user configures CPU topology via -device
-+ * without -smp. In this case, MachineState.smp also needs to be
-+ * initialized based on topology tree.
-+ */
-+bool machine_validate_cpu_topology(MachineState *ms, Error **errp)
-+{
++    MachineState *ms = MACHINE(qdev_get_machine());
 +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-+    CPUTopoState *slot_topo = CPU_TOPO(ms->topo);
-+    CPUTopoStat *stat = &ms->topo->stat;
-+    CpuTopology *smp_info = &ms->smp;
-+    unsigned int total_cpus;
-+    ValidateCbData cb;
++    CPUTopoLevel level = CPU_TOPO_LEVEL(child);
++    CPUSlot *slot = ms->topo;
 +
-+    if (ms->topo->smp_parsed) {
-+        return true;
-+    } else if (!slot_topo->num_children) {
-+        /*
-+         * If there's no -smp nor -device to add topology children,
-+         * then create the default topology.
-+         */
-+        machine_create_smp_topo_tree(ms, errp);
-+        if (*errp) {
-+            return false;
-+        }
-+        return true;
-+    }
-+
-+    if (test_bit(CPU_TOPO_CLUSTER, stat->curr_levels)) {
-+        mc->smp_props.has_clusters = true;
++    if (!slot) {
++        return NULL;
 +    }
 +
 +    /*
-+     * The next cpu_topo_child_foreach_recursive() doesn't cover the
-+     * parent topology unit. Update information for root here.
++     * For CPUs and cores that support hotplug, the behavior is to specify
++     * some topology sub ids. This requires special handling.
 +     */
-+    set_smp_child_topo_info(smp_info, stat, slot_topo->child_level);
++    if (level == mc->smp_props.possible_cpus_qom_granu) {
++        CPUTopoClass *child_tc = CPU_TOPO_GET_CLASS(child);
 +
-+    cb.stat = stat;
-+    cb.smp_info = smp_info;
-+    cb.errp = errp;
++        if (child_tc->search_parent_pre_plug) {
++            return child_tc->search_parent_pre_plug(child,
++                       CPU_TOPO(slot), errp);
++        }
++    }
 +
-+    cpu_topo_child_foreach_recursive(slot_topo, NULL,
-+                                     validate_topo_children, &cb);
-+    if (*errp) {
++    /*
++     * For other topology devices, just collect them into CPU slot.
++     * The realize() of CPUTopoClass will check no "parent" option case.
++     */
++    return OBJECT(slot);
++}
++
++char *cpu_slot_name_future_child(CPUTopoState *child)
++{
++    MachineState *ms = MACHINE(qdev_get_machine());
++    CPUTopoLevel level = CPU_TOPO_LEVEL(child);
++    CPUSlot *slot = ms->topo;
++
++    if (!slot) {
++        return NULL;
++    }
++
++    return get_topo_global_name(&slot->stat, level);
++}
+diff --git a/hw/core/cpu-topo.c b/hw/core/cpu-topo.c
+index 351112ca7a73..143b0a148b17 100644
+--- a/hw/core/cpu-topo.c
++++ b/hw/core/cpu-topo.c
+@@ -20,8 +20,10 @@
+ 
+ #include "qemu/osdep.h"
+ 
++#include "hw/core/cpu-slot.h"
+ #include "hw/core/cpu-topo.h"
+ #include "hw/qdev-properties.h"
++#include "monitor/user-child.h"
+ #include "qapi/error.h"
+ 
+ const char *cpu_topo_level_to_string(CPUTopoLevel level)
+@@ -272,10 +274,38 @@ static void cpu_topo_unrealize(DeviceState *dev)
+     }
+ }
+ 
++/*
++ * Prefer to insert topology device into topology tree where the CPU
++ * slot is the root.
++ */
++static Object *cpu_topo_get_parent(UserChild *uc, Error **errp)
++{
++    return cpu_slot_get_free_parent(CPU_TOPO(uc), errp);
++}
++
++static char *cpu_topo_get_child_name(UserChild *uc, Object *parent)
++{
++    return cpu_slot_name_future_child(CPU_TOPO(uc));
++}
++
++/* Only check type. Other topology details with be checked at realize(). */
++static bool cpu_topo_check_user_parent(UserChild *uc, Object *parent)
++{
++    CPUTopoState *topo;
++
++    topo = (CPUTopoState *)object_dynamic_cast(parent, TYPE_CPU_TOPO);
++    if (!topo) {
 +        return false;
 +    }
 +
-+    ms->smp.cpus = stat->pre_plugged_cpus ?
-+                   stat->pre_plugged_cpus : 1;
-+    ms->smp.max_cpus = stat->max_cpus ?
-+                       stat->max_cpus : 1;
-+
-+    total_cpus = ms->smp.drawers * ms->smp.books *
-+                 ms->smp.sockets * ms->smp.dies *
-+                 ms->smp.clusters * ms->smp.cores *
-+                 ms->smp.threads;
-+    g_assert(total_cpus == ms->smp.max_cpus);
-+
 +    return true;
 +}
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 0c1739814124..5fa0c826f35e 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -1505,6 +1505,16 @@ void machine_run_board_init(MachineState *machine, const char *mem_path, Error *
-                                    "on", false);
-     }
- 
-+    /*
-+     * TODO: drop this check and validate topology tree by default
-+     * when all arches support QOM topology.
-+     */
-+    if (machine_class->smp_props.possible_cpus_qom_granu) {
-+        if (!machine_validate_cpu_topology(machine, errp)) {
-+            return;
-+        }
-+    }
 +
-     accel_init_interfaces(ACCEL_GET_CLASS(machine->accelerator));
-     machine_class->init(machine);
-     phase_advance(PHASE_MACHINE_INITIALIZED);
+ static void cpu_topo_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(oc);
+     CPUTopoClass *tc = CPU_TOPO_CLASS(oc);
++    UserChildClass *ucc = USER_CHILD_CLASS(oc);
+ 
+     /* All topology devices belong to CPU property. */
+     set_bit(DEVICE_CATEGORY_CPU, dc->categories);
+@@ -290,6 +320,10 @@ static void cpu_topo_class_init(ObjectClass *oc, void *data)
+     dc->hotpluggable = false;
+ 
+     tc->level = CPU_TOPO_UNKNOWN;
++
++    ucc->get_parent = cpu_topo_get_parent;
++    ucc->get_child_name = cpu_topo_get_child_name;
++    ucc->check_parent = cpu_topo_check_user_parent;
+ }
+ 
+ static void cpu_topo_instance_init(Object *obj)
+@@ -310,6 +344,10 @@ static const TypeInfo cpu_topo_type_info = {
+     .class_init = cpu_topo_class_init,
+     .instance_size = sizeof(CPUTopoState),
+     .instance_init = cpu_topo_instance_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_USER_CHILD },
++        { }
++    }
+ };
+ 
+ static void cpu_topo_register_types(void)
 diff --git a/include/hw/core/cpu-slot.h b/include/hw/core/cpu-slot.h
-index de3d08fcb2ac..9e1c6d6b7ff2 100644
+index 9e1c6d6b7ff2..1a63f55f52c3 100644
 --- a/include/hw/core/cpu-slot.h
 +++ b/include/hw/core/cpu-slot.h
-@@ -100,5 +100,6 @@ struct CPUSlot {
- 
- void machine_plug_cpu_slot(MachineState *ms);
+@@ -102,4 +102,7 @@ void machine_plug_cpu_slot(MachineState *ms);
  void machine_create_smp_topo_tree(MachineState *ms, Error **errp);
-+bool machine_validate_cpu_topology(MachineState *ms, Error **errp);
+ bool machine_validate_cpu_topology(MachineState *ms, Error **errp);
  
++Object *cpu_slot_get_free_parent(CPUTopoState *child, Error **errp);
++char *cpu_slot_name_future_child(CPUTopoState *child);
++
  #endif /* CPU_SLOT_H */
+diff --git a/include/hw/core/cpu-topo.h b/include/hw/core/cpu-topo.h
+index d27da0335c42..6cef26cce0b7 100644
+--- a/include/hw/core/cpu-topo.h
++++ b/include/hw/core/cpu-topo.h
+@@ -48,6 +48,8 @@ OBJECT_DECLARE_TYPE(CPUTopoState, CPUTopoClass, CPU_TOPO)
+  *     new child (including direct child and non-direct child) is added.
+  * @check_topo_child: Method to check the support for new child (including
+  *     direct child and non-direct child) to be added.
++ * @search_parent_pre_plug: Method to search proper topology parent of @child
++ *     from @root.
+  */
+ struct CPUTopoClass {
+     /*< private >*/
+@@ -59,6 +61,8 @@ struct CPUTopoClass {
+                              bool is_realize);
+     void (*check_topo_child)(CPUTopoState *parent, CPUTopoState *child,
+                              Error **errp);
++    Object *(*search_parent_pre_plug)(CPUTopoState *child, CPUTopoState *root,
++                                      Error **errp);
+ };
+ 
+ /**
 -- 
 2.34.1
 
