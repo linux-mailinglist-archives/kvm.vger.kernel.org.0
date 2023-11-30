@@ -1,239 +1,217 @@
-Return-Path: <kvm+bounces-2880-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2881-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 393F37FEBAA
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 10:16:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6249D7FEC13
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 10:44:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2A01B20FC2
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 09:16:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 850A81C20A27
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 09:44:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CD47374C1;
-	Thu, 30 Nov 2023 09:16:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B1839869;
+	Thu, 30 Nov 2023 09:44:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AFBdvLer"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ABNAuljz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D80010EA
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 01:16:08 -0800 (PST)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AU9CGNH028745;
-	Thu, 30 Nov 2023 09:14:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=U7xhAiXyHYuSi9gQG6NV4CZH7LkdmdMB32D1ZOqvl2E=;
- b=AFBdvLera18ekFkEDQHSP2T6dJxy+bj5KW/jP/YQxVyqxiHZtRJXrFC+0ntnZuEvmXMl
- m5dICRXNSmZBGnKsumVVgBAXL4u0dvBZSGFJjow9KpyWozqGgg5e9lV0A3P1DYtJVgrk
- fcIAkenPAVxLZnA9inVImJFIRFFp84wVlNbQYq2PnUAD94eddwhNGmE1WEaq+o2oyHt9
- lgMLNpBO+kPcZI3+78p/T21qN3TQ/nrMIklnS6Mpmi8dOIQR1PJPM8F2VFLdmlnmfYt2
- bNGyD4yvrGuvjfFw260kty5gkpovVQqcuoFvY7pDIz7evPqH74AstesKRFOdN22SZxO6 0g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3upqj4g6aa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 30 Nov 2023 09:14:59 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AU9CSaJ029884;
-	Thu, 30 Nov 2023 09:14:58 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3upqj4g684-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 30 Nov 2023 09:14:58 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AU7Xw9A030737;
-	Thu, 30 Nov 2023 09:14:55 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uku8tddeu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 30 Nov 2023 09:14:55 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AU9EqIJ6750948
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 30 Nov 2023 09:14:52 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6F14720043;
-	Thu, 30 Nov 2023 09:14:52 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2CB6D20040;
-	Thu, 30 Nov 2023 09:14:48 +0000 (GMT)
-Received: from [9.171.32.92] (unknown [9.171.32.92])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 30 Nov 2023 09:14:48 +0000 (GMT)
-Message-ID: <c3ac8d9c2b9d611e84672436ce1a96aedcaacf5e.camel@linux.ibm.com>
-Subject: Re: [PATCH 2/6] qemu/main-loop: rename QEMU_IOTHREAD_LOCK_GUARD to
- QEMU_BQL_LOCK_GUARD
-From: Ilya Leoshkevich <iii@linux.ibm.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Jean-Christophe Dubois <jcd@tribudubois.net>,
-        Fabiano Rosas
- <farosas@suse.de>, qemu-s390x@nongnu.org,
-        Song Gao <gaosong@loongson.cn>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Thomas Huth
- <thuth@redhat.com>, Hyman Huang <yong.huang@smartx.com>,
-        Marcelo Tosatti
- <mtosatti@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Andrey
- Smirnov <andrew.smirnov@gmail.com>,
-        Peter Maydell
- <peter.maydell@linaro.org>,
-        Kevin Wolf <kwolf@redhat.com>, Artyom Tarasenko
- <atar4qemu@gmail.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Alistair Francis
- <alistair.francis@wdc.com>,
-        Paul Durrant <paul@xen.org>, Jagannathan Raman
- <jag.raman@oracle.com>,
-        Juan Quintela <quintela@redhat.com>,
-        "Daniel P."
- =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>,
-        qemu-arm@nongnu.org, Jason Wang <jasowang@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>, Hanna
- Reitz <hreitz@redhat.com>,
-        =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau
- <marcandre.lureau@redhat.com>,
-        BALATON Zoltan <balaton@eik.bme.hu>,
-        Daniel
- Henrique Barboza <danielhb413@gmail.com>,
-        Elena Ufimtseva
- <elena.ufimtseva@oracle.com>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        Hailiang Zhang <zhanghailiang@xfusion.com>,
-        Roman Bolshakov
- <rbolshakov@ddn.com>,
-        Huacai Chen <chenhuacai@kernel.org>, Fam Zheng
- <fam@euphon.net>,
-        Eric Blake <eblake@redhat.com>, Jiri Slaby
- <jslaby@suse.cz>,
-        Alexander Graf <agraf@csgraf.de>,
-        Liu Zhiwei
- <zhiwei_liu@linux.alibaba.com>,
-        Weiwei Li <liwei1518@gmail.com>, Eric
- Farman <farman@linux.ibm.com>,
-        Stafford Horne <shorne@gmail.com>,
-        David
- Hildenbrand <david@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Cameron Esfahani <dirty@apple.com>, xen-devel@lists.xenproject.org,
-        Pavel
- Dovgalyuk <pavel.dovgaluk@ispras.ru>, qemu-riscv@nongnu.org,
-        Aleksandar
- Rikalo <aleksandar.rikalo@syrmia.com>,
-        John Snow <jsnow@redhat.com>,
-        Sunil
- Muthuswamy <sunilmut@microsoft.com>,
-        Michael Roth <michael.roth@amd.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        "Michael S. Tsirkin"
- <mst@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Bin
- Meng <bin.meng@windriver.com>,
-        Stefano Stabellini <sstabellini@kernel.org>, kvm@vger.kernel.org,
-        qemu-block@nongnu.org, Halil Pasic
- <pasic@linux.ibm.com>,
-        Peter Xu <peterx@redhat.com>,
-        Anthony Perard
- <anthony.perard@citrix.com>,
-        Harsh Prateek Bora <harshpb@linux.ibm.com>,
-        Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-        Eduardo Habkost
- <eduardo@habkost.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vladimir
- Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
-        =?ISO-8859-1?Q?C=E9dric?=
- Le Goater <clg@kaod.org>,
-        qemu-ppc@nongnu.org,
-        Philippe
- =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Akihiko Odaki <akihiko.odaki@daynix.com>,
-        Leonardo Bras <leobras@redhat.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>
-Date: Thu, 30 Nov 2023 10:14:47 +0100
-In-Reply-To: <20231129212625.1051502-3-stefanha@redhat.com>
-References: <20231129212625.1051502-1-stefanha@redhat.com>
-	 <20231129212625.1051502-3-stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7B23D7F
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 01:44:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701337462;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CxCSv1JU9Ny4rjT7OLghWcyP96ZpHESLwySqeBe1CEg=;
+	b=ABNAuljzP1lQEPXXtWD6Y5gsUE1vH7ePaS5VuEXx6GXTqg7xh4Kmb2l81EhR8dJoU4tbiK
+	LpD7u/9kALWw+z4Z9XVlPdkj/9uBjTzOoXn2fEWwgv8Rthm2HgVjjj2+7hHpySL1mb4tQT
+	aVU67VERdoWTenH/SFvwGwsqkYguqKM=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-638-1W4E1r2qPjWJJjx2GNBhBQ-1; Thu, 30 Nov 2023 04:44:20 -0500
+X-MC-Unique: 1W4E1r2qPjWJJjx2GNBhBQ-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2c9c265c5bdso7953201fa.2
+        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 01:44:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701337458; x=1701942258;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CxCSv1JU9Ny4rjT7OLghWcyP96ZpHESLwySqeBe1CEg=;
+        b=HBhAAEjwkuwiWoMrnf8YTA3p3Up0TpFaBLozwenX6axF/G49y3LzDzHs/fixf6BhAq
+         yuJkF38t0qzhYeNrq6gC83QPrRPsNCMkSCGT0KuzVGsVQvqv1R3qP3QLXHvdA7z27xAe
+         RsTzAvTKxr33Xp9vlM0jamO7qaizteUwBUiStMnapzlZNEoPgM3cCCYcYaZIeSRfyDw9
+         8A68qfA5zJiZRuLIVZPPhGk7F/fIqdeUTzXTPa/NoUszal14s2f8HWjLfIjhFUNOk2OS
+         5vqQ6EjmtHmGyqcdVT0g0CPkEMJTT5Qny4u5o2eH+AHmyqJW8o55FS/2XYEzBljucpkz
+         yzCg==
+X-Gm-Message-State: AOJu0YyCZ2NEQjuckabwA4kb5inRAM7KvTPgL6qh9zjanpZK6bzA1H4Z
+	7FAY/zwRbxYjaTqWWf1o571D+BiqpNBjU2rKKCJeFtrRc37DdQFJeZLR0DVwJ8ClKCrnxu458cs
+	sciF/D8mNZacE
+X-Received: by 2002:a2e:80d6:0:b0:2c9:b1ff:f951 with SMTP id r22-20020a2e80d6000000b002c9b1fff951mr5651672ljg.25.1701337458769;
+        Thu, 30 Nov 2023 01:44:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGQ3ETQ8qMwSfAMQqyRN2zbxUusE+Cde6ncuv72WYiZ/hQyYq4rhX69dbPlKoUxjc6/4LtSUA==
+X-Received: by 2002:a2e:80d6:0:b0:2c9:b1ff:f951 with SMTP id r22-20020a2e80d6000000b002c9b1fff951mr5651646ljg.25.1701337458370;
+        Thu, 30 Nov 2023 01:44:18 -0800 (PST)
+Received: from redhat.com ([2.55.10.128])
+        by smtp.gmail.com with ESMTPSA id i2-20020adffc02000000b003330aede2aesm1023337wrr.112.2023.11.30.01.44.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Nov 2023 01:44:17 -0800 (PST)
+Date: Thu, 30 Nov 2023 04:44:13 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Ning, Hongyu" <hongyu.ning@linux.intel.com>,
+	xuanzhuo@linux.alibaba.com,
+	Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, eperezma@redhat.com,
+	shannon.nelson@amd.com, yuanyaogoog@chromium.org,
+	yuehaibing@huawei.com, kirill.shutemov@linux.intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com,
+	alexander.shishkin@linux.intel.com
+Subject: Re: [GIT PULL] virtio: features
+Message-ID: <20231130044045-mutt-send-email-mst@kernel.org>
+References: <20230903181338-mutt-send-email-mst@kernel.org>
+ <647701d8-c99b-4ca8-9817-137eaefda237@linux.intel.com>
+ <CACGkMEvoGOO0jtq5T7arAjRoB_0_fHB2+hPJe1JsPqcAuvr98w@mail.gmail.com>
+ <6f84bbad-62f9-43df-8134-a6836cc3b66c@linux.intel.com>
+ <CACGkMEvtus2BseZec8at6YORO=As1v9r9p=xtZjE1e2i=uhwhA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: k5g-bglZZ81amYqAueJeLCJOKEKz4uGW
-X-Proofpoint-GUID: hyHEB3c1P1gBAyQsdYHk4l82Bt-Qzmtx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-30_07,2023-11-29_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 mlxscore=0 bulkscore=0 adultscore=0 spamscore=0
- lowpriorityscore=0 suspectscore=0 clxscore=1011 impostorscore=0
- phishscore=0 mlxlogscore=810 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2311060000 definitions=main-2311300068
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEvtus2BseZec8at6YORO=As1v9r9p=xtZjE1e2i=uhwhA@mail.gmail.com>
 
-On Wed, 2023-11-29 at 16:26 -0500, Stefan Hajnoczi wrote:
-> The name "iothread" is overloaded. Use the term Big QEMU Lock (BQL)
-> instead, it is already widely used and unambiguous.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> =C2=A0include/qemu/main-loop.h=C2=A0 | 20 ++++++++++----------
-> =C2=A0hw/i386/kvm/xen_evtchn.c=C2=A0 | 14 +++++++-------
-> =C2=A0hw/i386/kvm/xen_gnttab.c=C2=A0 |=C2=A0 2 +-
-> =C2=A0hw/mips/mips_int.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=
-=A0 2 +-
-> =C2=A0hw/ppc/ppc.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +-
-> =C2=A0target/i386/kvm/xen-emu.c |=C2=A0 2 +-
-> =C2=A0target/ppc/excp_helper.c=C2=A0 |=C2=A0 2 +-
-> =C2=A0target/ppc/helper_regs.c=C2=A0 |=C2=A0 2 +-
-> =C2=A0target/riscv/cpu_helper.c |=C2=A0 4 ++--
-> =C2=A09 files changed, 25 insertions(+), 25 deletions(-)
->=20
-> diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
-> index d6f75e57bd..0b6a3e4824 100644
-> --- a/include/qemu/main-loop.h
-> +++ b/include/qemu/main-loop.h
-> @@ -344,13 +344,13 @@ void qemu_bql_lock_impl(const char *file, int
-> line);
-> =C2=A0void qemu_bql_unlock(void);
-> =C2=A0
-> =C2=A0/**
-> - * QEMU_IOTHREAD_LOCK_GUARD
-> + * QEMU_BQL_LOCK_GUARD
-> =C2=A0 *
-> - * Wrap a block of code in a conditional
-> qemu_mutex_{lock,unlock}_iothread.
-> + * Wrap a block of code in a conditional qemu_bql_{lock,unlock}.
-> =C2=A0 */
-> -typedef struct IOThreadLockAuto IOThreadLockAuto;
-> +typedef struct BQLLockAuto BQLLockAuto;
-> =C2=A0
-> -static inline IOThreadLockAuto *qemu_iothread_auto_lock(const char
-> *file,
-> +static inline BQLLockAuto *qemu_bql_auto_lock(const char *file,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int line)
+On Wed, Nov 29, 2023 at 06:20:31PM +0800, Jason Wang wrote:
+> On Wed, Nov 29, 2023 at 6:12 PM Ning, Hongyu
+> <hongyu.ning@linux.intel.com> wrote:
+> >
+> >
+> > On 2023/11/29 17:16, Jason Wang wrote:
+> > > On Wed, Nov 29, 2023 at 5:05 PM Ning, Hongyu
+> > > <hongyu.ning@linux.intel.com> wrote:
+> > >>
+> > >>
+> > >>
+> > >> On 2023/9/4 6:13, Michael S. Tsirkin wrote:
+> > >>> The following changes since commit 2dde18cd1d8fac735875f2e4987f11817cc0bc2c:
+> > >>>
+> > >>>     Linux 6.5 (2023-08-27 14:49:51 -0700)
+> > >>>
+> > >>> are available in the Git repository at:
+> > >>>
+> > >>>     https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+> > >>>
+> > >>> for you to fetch changes up to 1acfe2c1225899eab5ab724c91b7e1eb2881b9ab:
+> > >>>
+> > >>>     virtio_ring: fix avail_wrap_counter in virtqueue_add_packed (2023-09-03 18:10:24 -0400)
+> > >>>
+> > >>> ----------------------------------------------------------------
+> > >>> virtio: features
+> > >>>
+> > >>> a small pull request this time around, mostly because the
+> > >>> vduse network got postponed to next relase so we can be sure
+> > >>> we got the security store right.
+> > >>>
+> > >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > >>>
+> > >>> ----------------------------------------------------------------
+> > >>> Eugenio Pérez (4):
+> > >>>         vdpa: add VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK flag
+> > >>>         vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature
+> > >>>         vdpa: add get_backend_features vdpa operation
+> > >>>         vdpa_sim: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
+> > >>>
+> > >>> Jason Wang (1):
+> > >>>         virtio_vdpa: build affinity masks conditionally
+> > >>>
+> > >>> Xuan Zhuo (12):
+> > >>>         virtio_ring: check use_dma_api before unmap desc for indirect
+> > >>>         virtio_ring: put mapping error check in vring_map_one_sg
+> > >>>         virtio_ring: introduce virtqueue_set_dma_premapped()
+> > >>>         virtio_ring: support add premapped buf
+> > >>>         virtio_ring: introduce virtqueue_dma_dev()
+> > >>>         virtio_ring: skip unmap for premapped
+> > >>>         virtio_ring: correct the expression of the description of virtqueue_resize()
+> > >>>         virtio_ring: separate the logic of reset/enable from virtqueue_resize
+> > >>>         virtio_ring: introduce virtqueue_reset()
+> > >>>         virtio_ring: introduce dma map api for virtqueue
+> > >>>         virtio_ring: introduce dma sync api for virtqueue
+> > >>>         virtio_net: merge dma operations when filling mergeable buffers
+> > >>
+> > >> Hi,
+> > >> above patch (upstream commit 295525e29a5b) seems causing a virtnet
+> > >> related Call Trace after WARNING from kernel/dma/debug.c.
+> > >>
+> > >> details (log and test setup) tracked in
+> > >> https://bugzilla.kernel.org/show_bug.cgi?id=218204
+> > >>
+> > >> it's recently noticed in a TDX guest testing since v6.6.0 release cycle
+> > >> and can still be reproduced in latest v6.7.0-rc3.
+> > >>
+> > >> as local bisects results show, above WARNING and Call Trace is linked
+> > >> with this patch, do you mind to take a look?
+> > >
+> > > Looks like virtqueue_dma_sync_single_range_for_cpu() use
+> > > DMA_BIDIRECTIONAL unconditionally.
+> > >
+> > > We should use dir here.
+> > >
+> > > Mind to try?
+> > >
+> > > Thanks
+> > >
+> >
+> > sure, but what I see in the code
+> > virtqueue_dma_sync_single_range_for_cpu() is using DMA_FROM_DEVICE,
+> > probably I misunderstood your point?
+> >
+> > Please let me know any patch/setting to try here.
+> 
+> Something like attached.  (Not even compiling test).
+> 
+> Thanks
 
-The padding is not correct anymore.
+Forwarding it inline for the record - I am not sure all the
+0 day machinery handles attachments. Jason given it's reported to work
+can you please repost properly with a full commit log etc?
+I think we also need to fix virtqueue_dma_sync_single_range_for_device -
+please include that too.
+ 
 
-Other than this:
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 29 Nov 2023 17:14:15 +0800
+Subject: [PATCH] virtio_ring: fix DMA dir during sync
+Content-type: text/plain
 
-Acked-by: Ilya Leoshkevich <iii@linux.ibm.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+---
+ drivers/virtio/virtio_ring.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+index 81ecb29c88f1..91d869814373 100644
+--- a/drivers/virtio/virtio_ring.c
++++ b/drivers/virtio/virtio_ring.c
+@@ -3220,7 +3220,7 @@ void virtqueue_dma_sync_single_range_for_cpu(struct virtqueue *_vq,
+ 		return;
+ 
+ 	dma_sync_single_range_for_cpu(dev, addr, offset, size,
+-				      DMA_BIDIRECTIONAL);
++				      dir);
+ }
+ EXPORT_SYMBOL_GPL(virtqueue_dma_sync_single_range_for_cpu);
+ 
+-- 
+2.42.0
+
 
