@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-2956-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2957-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 645FD7FF212
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 15:35:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F33F17FF213
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 15:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA71AB2196D
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 14:35:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADC02282E35
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 14:35:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7D093C063;
-	Thu, 30 Nov 2023 14:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D071A482CB;
+	Thu, 30 Nov 2023 14:35:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gES64vdQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YCpFVBr6"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F209E93
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 06:35:15 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30E21B5
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 06:35:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701354915; x=1732890915;
+  t=1701354925; x=1732890925;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=HnOAO3NMx1dRMWQIeSpDRtg/0be+6N1pOpK/5nWbTXE=;
-  b=gES64vdQ2C88+sfEpHpL2svpTZ/OYw+BIJnl2BVHgyEklxqU7Qso7S1f
-   P7+01tXzYG6CKD+XV5HmgIWHluoa9DnbB0kVr38ZjWMrAil6uHmLRLvc/
-   Ee78GGzsx9cRP2ftLlrZmP90hN0+LPEL+DtMoFAewib+pda8SPkpf4C4d
-   sEC9EiuzGCEqOsnEJsDivo551H+xVZ6/vKutf7Ut6haR1isGR0v3gQAWD
-   0KqyuNJsfzK4uTUW1x7nQqFKxmXPIexBXyHK44UvJL97rbA/+TIYdX4JJ
-   MSal1E6oSaPa5gNE4t3+hnyIiuryte6yYwsiao64USaAXL1thmGMIcphG
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="479532376"
+  bh=f8dzVIiaV15FUJhTAcShJBTihquI/MGo+GvFSgqbGOs=;
+  b=YCpFVBr6n2t/Aq77RLSNbdfBF3e8MnBBnXxZaQeGMS58f5ZWT8cou6kV
+   FZfEkpfh/G4c+xkaCP6tCbwtTGVivbIjq7RAtz/WakKy99/GVGn5V4KeU
+   k7WkLHdEXrTYajfRYLvWfhgb1T5hN5Vf+oevP1hCznCRSfF0WwM7T6iyB
+   Egg8qFH3Zorz89lxsld9j+KTCOWOpFNfpiagyp1MQYKpktJozz8SD7QWa
+   DurKcjvqz/fVtw0IQCA7auMEsg4JjAMBk8pQ8nS+/N2/ja0QB1ZykMEi/
+   Ruie2xAPhqaj5dI5/JCCoxyqs8D1tB1UrHSi3WZ4sYBxH2RA20SfgDEDV
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="479532407"
 X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="479532376"
+   d="scan'208";a="479532407"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 06:35:15 -0800
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 06:35:24 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="942730225"
+X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="942730271"
 X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="942730225"
+   d="scan'208";a="942730271"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by orsmga005.jf.intel.com with ESMTP; 30 Nov 2023 06:35:05 -0800
+  by orsmga005.jf.intel.com with ESMTP; 30 Nov 2023 06:35:15 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
@@ -84,9 +84,9 @@ Cc: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
 	Zhenyu Wang <zhenyu.z.wang@intel.com>,
 	Yongwei Ma <yongwei.ma@intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 30/41] hw/core/slot: Check topology child to be added under CPU slot
-Date: Thu, 30 Nov 2023 22:41:52 +0800
-Message-Id: <20231130144203.2307629-31-zhao1.liu@linux.intel.com>
+Subject: [RFC 31/41] hw/machine: Plug cpu-slot into machine to maintain topology tree
+Date: Thu, 30 Nov 2023 22:41:53 +0800
+Message-Id: <20231130144203.2307629-32-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231130144203.2307629-1-zhao1.liu@linux.intel.com>
 References: <20231130144203.2307629-1-zhao1.liu@linux.intel.com>
@@ -100,130 +100,121 @@ Content-Transfer-Encoding: 8bit
 
 From: Zhao Liu <zhao1.liu@intel.com>
 
-Implement CPUTopoClass.check_topo_child() in cpu-slot to be compatible
-with the limitations of the current smp topology.
+Add a cpu-slot in machine as the root of topology tree to maintain the
+QOM topology.
 
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- hw/core/cpu-slot.c         | 37 +++++++++++++++++++++++++++++++++++++
- hw/core/cpu-topo.c         |  2 +-
- include/hw/core/cpu-slot.h |  2 ++
- include/hw/core/cpu-topo.h |  1 +
- 4 files changed, 41 insertions(+), 1 deletion(-)
+ hw/core/cpu-slot.c         | 31 +++++++++++++++++++++++++++++++
+ include/hw/boards.h        |  2 ++
+ include/hw/core/cpu-slot.h |  7 +++++++
+ system/vl.c                |  2 ++
+ 4 files changed, 42 insertions(+)
 
 diff --git a/hw/core/cpu-slot.c b/hw/core/cpu-slot.c
-index e8e6f4d25532..2a796ad5b6e7 100644
+index 2a796ad5b6e7..4b148440ed3d 100644
 --- a/hw/core/cpu-slot.c
 +++ b/hw/core/cpu-slot.c
-@@ -21,6 +21,7 @@
+@@ -20,6 +20,7 @@
+ 
  #include "qemu/osdep.h"
  
++#include "hw/boards.h"
  #include "hw/core/cpu-slot.h"
-+#include "qapi/error.h"
- 
- static inline
- CPUTopoStatEntry *get_topo_stat_entry(CPUTopoStat *stat,
-@@ -94,6 +95,37 @@ static void cpu_slot_update_topo_info(CPUTopoState *root, CPUTopoState *child,
-     }
- }
- 
-+static void cpu_slot_check_topo_support(CPUTopoState *root, CPUTopoState *child,
-+                                        Error **errp)
-+{
-+    CPUSlot *slot = CPU_SLOT(root);
-+    CPUTopoLevel child_level = CPU_TOPO_LEVEL(child);
-+
-+    if (!test_bit(child_level, slot->supported_levels)) {
-+        error_setg(errp, "cpu topo: the level %s is not supported",
-+                   cpu_topo_level_to_string(child_level));
-+        return;
-+    }
-+
-+    /*
-+     * Currently we doesn't support hybrid topology. For SMP topology,
-+     * each child under the same parent are same type.
-+     */
-+    if (child->parent->num_children) {
-+        CPUTopoState *sibling = QTAILQ_FIRST(&child->parent->children);
-+        const char *sibling_type = object_get_typename(OBJECT(sibling));
-+        const char *child_type = object_get_typename(OBJECT(child));
-+
-+        if (strcmp(sibling_type, child_type)) {
-+            error_setg(errp, "Invalid smp topology: different CPU "
-+                       "topology types (%s child vs %s sibling) "
-+                       "under the same parent (%s).",
-+                       child_type, sibling_type,
-+                       object_get_typename(OBJECT(child->parent)));
-+        }
-+    }
-+}
-+
- static void cpu_slot_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
-@@ -104,6 +136,7 @@ static void cpu_slot_class_init(ObjectClass *oc, void *data)
- 
-     tc->level = CPU_TOPO_ROOT;
-     tc->update_topo_info = cpu_slot_update_topo_info;
-+    tc->check_topo_child = cpu_slot_check_topo_support;
- }
- 
- static void cpu_slot_instance_init(Object *obj)
-@@ -112,6 +145,10 @@ static void cpu_slot_instance_init(Object *obj)
- 
-     QTAILQ_INIT(&slot->cores);
-     set_bit(CPU_TOPO_ROOT, slot->stat.curr_levels);
-+
-+    /* Set all levels by default. */
-+    bitmap_fill(slot->supported_levels, USER_AVAIL_LEVEL_NUM);
-+    clear_bit(CPU_TOPO_UNKNOWN, slot->supported_levels);
- }
- 
- static const TypeInfo cpu_slot_type_info = {
-diff --git a/hw/core/cpu-topo.c b/hw/core/cpu-topo.c
-index 687a4cc566ec..351112ca7a73 100644
---- a/hw/core/cpu-topo.c
-+++ b/hw/core/cpu-topo.c
-@@ -24,7 +24,7 @@
- #include "hw/qdev-properties.h"
  #include "qapi/error.h"
  
--static const char *cpu_topo_level_to_string(CPUTopoLevel level)
-+const char *cpu_topo_level_to_string(CPUTopoLevel level)
- {
-     switch (level) {
-     case CPU_TOPO_UNKNOWN:
+@@ -165,3 +166,33 @@ static void cpu_slot_register_types(void)
+ }
+ 
+ type_init(cpu_slot_register_types)
++
++void machine_plug_cpu_slot(MachineState *ms)
++{
++    MachineClass *mc = MACHINE_GET_CLASS(ms);
++
++    ms->topo = CPU_SLOT(qdev_new(TYPE_CPU_SLOT));
++
++    object_property_add_child(container_get(OBJECT(ms), "/peripheral"),
++                              "cpu-slot", OBJECT(ms->topo));
++    DEVICE(ms->topo)->id = g_strdup_printf("%s", "cpu-slot");
++
++    qdev_realize_and_unref(DEVICE(ms->topo), NULL, &error_abort);
++    ms->topo->ms = ms;
++
++    if (!mc->smp_props.clusters_supported) {
++        clear_bit(CPU_TOPO_CLUSTER, ms->topo->supported_levels);
++    }
++
++    if (!mc->smp_props.dies_supported) {
++        clear_bit(CPU_TOPO_DIE, ms->topo->supported_levels);
++    }
++
++    if (!mc->smp_props.books_supported) {
++        clear_bit(CPU_TOPO_BOOK, ms->topo->supported_levels);
++    }
++
++    if (!mc->smp_props.drawers_supported) {
++        clear_bit(CPU_TOPO_DRAWER, ms->topo->supported_levels);
++    }
++}
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index da85f86efb91..81a7b04ece86 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -10,6 +10,7 @@
+ #include "qemu/module.h"
+ #include "qom/object.h"
+ #include "hw/core/cpu.h"
++#include "hw/core/cpu-slot.h"
+ 
+ #define TYPE_MACHINE_SUFFIX "-machine"
+ 
+@@ -398,6 +399,7 @@ struct MachineState {
+     AccelState *accelerator;
+     CPUArchIdList *possible_cpus;
+     CpuTopology smp;
++    CPUSlot *topo;
+     struct NVDIMMState *nvdimms_state;
+     struct NumaState *numa_state;
+ };
 diff --git a/include/hw/core/cpu-slot.h b/include/hw/core/cpu-slot.h
-index fa2bd4af247d..7bf51988afb3 100644
+index 7bf51988afb3..1361af4ccfc0 100644
 --- a/include/hw/core/cpu-slot.h
 +++ b/include/hw/core/cpu-slot.h
-@@ -77,6 +77,7 @@ OBJECT_DECLARE_SIMPLE_TYPE(CPUSlot, CPU_SLOT)
-  *     queues for other topology levels to facilitate traversal
+@@ -78,6 +78,7 @@ OBJECT_DECLARE_SIMPLE_TYPE(CPUSlot, CPU_SLOT)
   *     when necessary.
   * @stat: Statistical topology information for topology tree.
-+ * @supported_levels: Supported topology levels for topology tree.
+  * @supported_levels: Supported topology levels for topology tree.
++ * @ms: Machine in which this cpu-slot is plugged.
   */
  struct CPUSlot {
      /*< private >*/
-@@ -85,6 +86,7 @@ struct CPUSlot {
-     /*< public >*/
+@@ -87,6 +88,12 @@ struct CPUSlot {
      QTAILQ_HEAD(, CPUCore) cores;
      CPUTopoStat stat;
-+    DECLARE_BITMAP(supported_levels, USER_AVAIL_LEVEL_NUM);
+     DECLARE_BITMAP(supported_levels, USER_AVAIL_LEVEL_NUM);
++    MachineState *ms;
  };
  
++#define MACHINE_CORE_FOREACH(ms, core) \
++    QTAILQ_FOREACH((core), &(ms)->topo->cores, node)
++
++void machine_plug_cpu_slot(MachineState *ms);
++
  #endif /* CPU_SLOT_H */
-diff --git a/include/hw/core/cpu-topo.h b/include/hw/core/cpu-topo.h
-index 453bacbb558b..d27da0335c42 100644
---- a/include/hw/core/cpu-topo.h
-+++ b/include/hw/core/cpu-topo.h
-@@ -102,5 +102,6 @@ int cpu_topo_child_foreach(CPUTopoState *topo, unsigned long *levels,
- int cpu_topo_child_foreach_recursive(CPUTopoState *topo,
-                                      unsigned long *levels,
-                                      topo_fn fn, void *opaque);
-+const char *cpu_topo_level_to_string(CPUTopoLevel level);
+diff --git a/system/vl.c b/system/vl.c
+index 65add2fb2460..637f708d2265 100644
+--- a/system/vl.c
++++ b/system/vl.c
+@@ -2128,6 +2128,8 @@ static void qemu_create_machine(QDict *qdict)
+                                           false, &error_abort);
+         qobject_unref(default_opts);
+     }
++
++    machine_plug_cpu_slot(current_machine);
+ }
  
- #endif /* CPU_TOPO_H */
+ static int global_init_func(void *opaque, QemuOpts *opts, Error **errp)
 -- 
 2.34.1
 
