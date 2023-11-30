@@ -1,109 +1,114 @@
-Return-Path: <kvm+bounces-2970-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2972-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC2067FF3EC
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 16:49:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4C537FF43D
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 17:01:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5DAE0B21102
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 15:49:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 525B8B20ED2
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 16:01:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54A53537FF;
-	Thu, 30 Nov 2023 15:49:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E9D654669;
+	Thu, 30 Nov 2023 16:01:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LOgMPLvS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KDVfgLK4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3A46C1;
-	Thu, 30 Nov 2023 07:49:13 -0800 (PST)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-40859dee28cso9262135e9.0;
-        Thu, 30 Nov 2023 07:49:13 -0800 (PST)
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05C2690
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 08:01:25 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-6cdd6205e41so1176232b3a.0
+        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 08:01:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701359352; x=1701964152; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=G8ImaGSq+yK32uci9kQ8gJDa7ZpsaoeN49Mmc0aXtG4=;
-        b=LOgMPLvSO1wo4/NWXGQZLGa4gzMaod1ajDjN+AmhtWIXIKpJHHvBjj8jbSPaB3tOzo
-         /y3Ak0CFwbpbbdM5crV7IYCTBGVxAaF5k34D1akQP1svwIrVGbzZd99uJGVa7MXfymg3
-         UoNVcI7kVuajnNwMwDMVAsdvKsJDIlNL5CfGtVkC6r4pDXtuJmIZuKkmGN+SJ0ehHXx1
-         hm6zpGOF8bCgav8wIDIraFjRBiTR3bhoDmOYKLknmszvYi3TX0x+An+uOjdXtaDKjNB+
-         OK8LmHyZ15Ko6GHTPxx0ZXEu+q+/dw+lEjjRw81mXmEa78qAjAwAWb83kJDENfPVsHub
-         NfQA==
+        d=google.com; s=20230601; t=1701360084; x=1701964884; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TBtFesakrb+Ah3nRlWp+HFJboe/l0BTz8gE0NQu+vCI=;
+        b=KDVfgLK4spVnLBNgJpTDKNHBpn+lE1tfkhlTwYG2RkZiO720s5toq2+zAL2ResZDO/
+         +TF12q3wcfRgagUZvye0NHz21+zJ3XKntpDlHMlEHGkhxdJKBwGl0lQPM5rIohvSFwam
+         OkE2JRx9drbwXIEvja18YVobgtBv44osizdPUrncS33AcOIr+uDGGo08NNYb0Xzqm9Rr
+         gJwmICNbdmYSdPXTGlyWpW6qApJtTyvXJUkHvUwG3eoIwYHMuHPc7QAoZjDRMfPDPsKc
+         x8SE6g70RGSLr5e9chw+tq7x2W+Q82ckGgOXBPILT753EBMOuZIiVFW5aMWuJ6kdR8NF
+         9Z0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701359352; x=1701964152;
-        h=content-transfer-encoding:in-reply-to:organization:references:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G8ImaGSq+yK32uci9kQ8gJDa7ZpsaoeN49Mmc0aXtG4=;
-        b=XizxQv0PLD9oUNACzbjz/j+Z7dAVcX0CPxiLOWT81vTbeS7fNCiAwbuwbVQg+R0kQJ
-         3kb0GFKCfSxU4qZQ+DP/2toX2onBLSMh4AameX243danvUi+gAhokavdBV7rMWdaAmKg
-         GCYulJJXyJi9+ylX+jw+S5z6HrIPn5r/u7zckvALcaQzIqbJGtOyClOVnlsZnB/qbryj
-         9KcueSJs2uDV5/CWu3y+cOEnHNXNefJh5J6k12BDOXS7fd4SyLJ4AZNWS4JLTpCjYzQK
-         C+GHYry7Ux8DrjLTT0kMHcN/E106iaT4FQlK8qUVmXmIGEKxzWvzDBx63zpab4hT0uZe
-         uKqw==
-X-Gm-Message-State: AOJu0YxxSUBj0wUfj0MfCuhoh1AnHnN+EF1y7CICkdtCC5jP0V5dgvTZ
-	myzkNltGlgPH7yje1DmXqScYL+tNni0ucMOF
-X-Google-Smtp-Source: AGHT+IEB9DPksNcsSDJF+gYbx+4U10uRUhKK0tMFC5I8x3MPbxcI5/dtvTBLoAnKpdVt/viAq1hJTw==
-X-Received: by 2002:adf:f985:0:b0:332:c9be:d9bd with SMTP id f5-20020adff985000000b00332c9bed9bdmr14938111wrr.45.1701359351919;
-        Thu, 30 Nov 2023 07:49:11 -0800 (PST)
-Received: from [192.168.17.228] (54-240-197-239.amazon.com. [54.240.197.239])
-        by smtp.gmail.com with ESMTPSA id d9-20020a056000114900b00332e8dd713fsm1846302wrx.74.2023.11.30.07.49.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Nov 2023 07:49:11 -0800 (PST)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <b28dc7d2-a83d-4e0e-8a01-524baeb23151@xen.org>
-Date: Thu, 30 Nov 2023 15:49:07 +0000
+        d=1e100.net; s=20230601; t=1701360084; x=1701964884;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TBtFesakrb+Ah3nRlWp+HFJboe/l0BTz8gE0NQu+vCI=;
+        b=GQ044Unl1ibnHA0w7qBwsWnnayMMNgC6436ENv5WJSCI/ekDGhq7X+wmhJ6lNOylGx
+         M7W+7Ia/RfxTaK1rpcnuCZqd4PuxG3k8XAPQcdJba21ZnSMGxEy7cLiA4TNZlYmFTxNe
+         f9OhXqoYuYHCU4nh8RVHOO0QdlaQySAIPZJqRRyS5PcANaUMnHRjHJQ0ShKH4y22g4r/
+         ATVA4MP5th/a+o6hZBprkYcXNdIC0Qz6KiUk5AEOoa2XyT6c5Oam5tcGkBAPOToRpnef
+         uztxyH+PJQTCT/XFvNghJtZ0rjLYqUECijWJ5c8ecpmRz/PCzow+lN5AZl7mbzFolY1K
+         kAAQ==
+X-Gm-Message-State: AOJu0YzyukBB+EZVgscZMEIGpIdZOhkt+lDzcQ4yEbRWulei19OcsRnP
+	w+3dtOMLMELghy7DT4015GCuihQbOhY=
+X-Google-Smtp-Source: AGHT+IHi1+aV1vTTHXffZIk3uV4OpjjgxAUEw1/XhdrYnAn5A/NF0XwlraUoBa+fvhAQi1+OPSaHBc3mP7A=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:21d3:b0:6cb:ba28:b6f1 with SMTP id
+ t19-20020a056a0021d300b006cbba28b6f1mr5640398pfj.5.1701360084488; Thu, 30 Nov
+ 2023 08:01:24 -0800 (PST)
+Date: Thu, 30 Nov 2023 08:01:22 -0800
+In-Reply-To: <45d28654-9565-46df-81b9-6563a4aef78c@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v5] KVM x86/xen: add an override for
- PVCLOCK_TSC_STABLE_BIT
-Content-Language: en-US
-To: David Woodhouse <dwmw2@infradead.org>, Paolo Bonzini
- <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- Sean Christopherson <seanjc@google.com>
-References: <20231102162128.2353459-1-paul@xen.org>
- <356a88e424a58990a1b83afa719662e75f42bf98.camel@infradead.org>
-Organization: Xen Project
-In-Reply-To: <356a88e424a58990a1b83afa719662e75f42bf98.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
+ <20231115071519.2864957-4-xiaoyao.li@intel.com> <bc84fa4f-4866-4321-8f30-1388eed7e64f@redhat.com>
+ <05f0e440-36a2-4d3a-8caa-842b34e50dce@intel.com> <0fbfc413-7c74-4b2a-bade-6f3f04ca82c2@redhat.com>
+ <4708c33a-bb8d-484e-ac7b-b7e8d3ed445a@intel.com> <45d28654-9565-46df-81b9-6563a4aef78c@redhat.com>
+Message-ID: <ZWixXm-sboNZ-mzG@google.com>
+Subject: Re: [PATCH v3 03/70] RAMBlock/guest_memfd: Enable KVM_GUEST_MEMFD_ALLOW_HUGEPAGE
+From: Sean Christopherson <seanjc@google.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, 
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, 
+	Richard Henderson <richard.henderson@linaro.org>, Peter Xu <peterx@redhat.com>, 
+	"Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?=" <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>, 
+	"Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?=" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, 
+	Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org, 
+	kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>, 
+	Claudio Fontana <cfontana@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, 
+	Isaku Yamahata <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 08/11/2023 18:39, David Woodhouse wrote:
-> On Thu, 2023-11-02 at 16:21 +0000, Paul Durrant wrote:
->> From: Paul Durrant <pdurrant@amazon.com>
->>
->> Unless explicitly told to do so (by passing 'clocksource=tsc' and
->> 'tsc=stable:socket', and then jumping through some hoops concerning
->> potential CPU hotplug) Xen will never use TSC as its clocksource.
->> Hence, by default, a Xen guest will not see PVCLOCK_TSC_STABLE_BIT set
->> in either the primary or secondary pvclock memory areas. This has
->> led to bugs in some guest kernels which only become evident if
->> PVCLOCK_TSC_STABLE_BIT *is* set in the pvclocks. Hence, to support
->> such guests, give the VMM a new Xen HVM config flag to tell KVM to
->> forcibly clear the bit in the Xen pvclocks.
->>
->> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+On Thu, Nov 30, 2023, David Hildenbrand wrote:
+> On 30.11.23 08:32, Xiaoyao Li wrote:
+> > On 11/20/2023 5:26 PM, David Hildenbrand wrote:
+> > > 
+> > > > > ... did you shamelessly copy that from hw/virtio/virtio-mem.c ? ;)
+> > > > 
+> > > > Get caught.
+> > > > 
+> > > > > This should be factored out into a common helper.
+> > > > 
+> > > > Sure, will do it in next version.
+> > > 
+> > > Factor it out in a separate patch. Then, this patch is get small that
+> > > you can just squash it into #2.
+> > > 
+> > > And my comment regarding "flags = 0" to patch #2 does no longer apply :)
+> > > 
+> > 
+> > I see.
+> > 
+> > But it depends on if KVM_GUEST_MEMFD_ALLOW_HUGEPAGE will appear together
+> > with initial guest memfd in linux (hopefully 6.8)
+> > https://lore.kernel.org/all/CABgObfa=DH7FySBviF63OS9sVog_wt-AqYgtUAGKqnY5Bizivw@mail.gmail.com/
+> > 
 > 
-> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+> Doesn't seem to be in -next if I am looking at the right tree:
+> 
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?h=next
 
-Sean,
-
-   Is any more work needed on this?
-
-   Paul
+Yeah, we punted on adding hugepage support for the initial guest_memfd merge so
+as not to rush in kludgy uABI.  The internal KVM code isn't problematic, we just
+haven't figured out exactly what the ABI should look like, e.g. should hugepages
+be dependent on THP being enabled, and if not, how does userspace discover the
+supported hugepage sizes?
 
