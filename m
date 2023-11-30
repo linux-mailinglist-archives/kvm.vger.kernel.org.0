@@ -1,183 +1,235 @@
-Return-Path: <kvm+bounces-2994-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3002-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B0817FF8FF
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:03:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2336F7FF955
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:29:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC4DBB2116B
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 18:02:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47A0FB211D1
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 18:29:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8A159143;
-	Thu, 30 Nov 2023 18:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162EF58AAF;
+	Thu, 30 Nov 2023 18:28:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y8mmai+4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nhtFn9ND"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9CAB103;
-	Thu, 30 Nov 2023 10:02:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701367370; x=1732903370;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=AIJigdIqQ3EvwIYDTIZCNMmQUTfpTSvIU9t0UY7yfE0=;
-  b=Y8mmai+4vgpkTWiWFupd6Usjrkq6U6jF2gpzoBlN6/sovTmIUAzDEBtr
-   3uI7EDraDZQkvUpsa4UUZOBARO2P9nOF62yTEsuQbJn+Fpf34wZL0w+lq
-   u1f/7bmPEvEYtP1AhVuOSLmkw7WhfvtBrjK09HD7HzCxJgId2TYk1uB/o
-   HZVJdNdEz7wk3cJyyn0a6dXB1QmorhCDRWPaLI6hw16tdp6b8sIpHBPmW
-   CJb3D643GlUsscTkbmOr8YU/V6Lgpnt+prpUDkAwNvcTcyzY/NshiOTVd
-   eibnpHMxz0eXb7/CQWY4c3ORRew1OoPanVEA5jTLoloq+7/kjbN6k0JOy
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="6643419"
-X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="6643419"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 10:02:49 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="892895916"
-X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="892895916"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Nov 2023 10:02:49 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 30 Nov 2023 10:02:48 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 30 Nov 2023 10:02:48 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Thu, 30 Nov 2023 10:02:48 -0800
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.41) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Thu, 30 Nov 2023 10:02:47 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eMz5vzTdvt3OeHXkPmybrXjXVlfmOfdRfaaY+wR9PFPfou6DABRtRFwsMTklIBOBNYZkWDndLYTG8xhRxGkL2izLYBXUy1eh5FBwmEpWhgkNSPscffF3i/ZeUBRJK+wFmEcaGLaKvs+3smt0SETGg8q2hi6s/5XSNYM/i0sfWB28xvFdhHe6u0SkIBxz8Giu7+NODQAvgrsgwukKHvfFfivodx++CSP+1d/hsTkzxSojYHZ79kJHZCdYeepR61oM+edW/1WXrIaklEWaLCPCDr/PC93JQAoLQYLfyUP3bTooZHrHqm5a6TA3Mu5Eoeskla5IbLO6Aj+j+1ALnhspXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AIJigdIqQ3EvwIYDTIZCNMmQUTfpTSvIU9t0UY7yfE0=;
- b=QRgimL/CDAjK51yXUEzszNjO/51v3ikCVzvm9VsluiH7/PkV5I7u+VINIZ06GxImtEf4mOSc7DwPUtY7qXXLdBMt5NX5CKu3IvU6md/OhOyvjISElPdmO2APDisKiNsQbxHTbVRWhnuLMejx9WL6ni5jMx/pa81NtgHxBYRoVyv63zJ+E0vYssBoRsHarplGWWVzBhZxABoINzEiVx9uxjlW0zJln11nBdKeDV+fgyPUL5ziKg+8Vt8YEyO6rSAXh52j9TmZ3dHO9GPcIFaRDjGTWkpq6j6PPNv52gR0ISHovypT5syVrw5nl4B0nGD00Z5YVAktUrPW/Slohd9UhA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by SJ1PR11MB6203.namprd11.prod.outlook.com (2603:10b6:a03:45a::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.23; Thu, 30 Nov
- 2023 18:02:45 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::6dc:cee5:b26b:7d93]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::6dc:cee5:b26b:7d93%4]) with mapi id 15.20.7046.023; Thu, 30 Nov 2023
- 18:02:45 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "Hansen, Dave" <dave.hansen@intel.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "Yang, Weijiang" <weijiang.yang@intel.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "seanjc@google.com"
-	<seanjc@google.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>
-CC: "peterz@infradead.org" <peterz@infradead.org>, "john.allen@amd.com"
-	<john.allen@amd.com>, "Gao, Chao" <chao.gao@intel.com>
-Subject: Re: [PATCH v7 05/26] x86/fpu/xstate: Introduce fpu_guest_cfg for
- guest FPU configuration
-Thread-Topic: [PATCH v7 05/26] x86/fpu/xstate: Introduce fpu_guest_cfg for
- guest FPU configuration
-Thread-Index: AQHaHqwJcLbwxqusyUagEZmr+deVnLCP2VSAgANOzICAAAlcgA==
-Date: Thu, 30 Nov 2023 18:02:44 +0000
-Message-ID: <624e948558c013904695cb66af6f299890e3612a.camel@intel.com>
-References: <20231124055330.138870-1-weijiang.yang@intel.com>
-	 <20231124055330.138870-6-weijiang.yang@intel.com>
-	 <742a95cece1998673aa360be10036c82c0c535ec.camel@intel.com>
-	 <90cb8be18da40c62f6acbf2bee19ec046e122e49.camel@redhat.com>
-In-Reply-To: <90cb8be18da40c62f6acbf2bee19ec046e122e49.camel@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|SJ1PR11MB6203:EE_
-x-ms-office365-filtering-correlation-id: 2ed15ff4-dc53-4454-16ec-08dbf1ce8dc6
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 5nm2A4/5OOziE0tQNz0f1jnqOryYK6VLR4ZJZFfvV4a8WCkrbSPcnQ2xm+kpWhWsmFvZEK25dDPgsU7GOGuqYMkvCqcLH/kbu+MlGJfJNmhrFzElKNJn+h21TfiB6aZJfDK5ehSApe+MDUPyNwhSfuSpCaVKRuTtdRehJRZiejTbFa2d7Fq1+Bg7NlKm5UEeRfxmO+7n628RVIFuZsQoP/Qc7JDicpQHiIcf0fT/DeYYk8gqSh9HxR9rdP8LgZR4vC4R+yeeP5WHtkE4zQKu/qMgG2emzlKoJf7nbzSanbR2qb1n1QgtJk1Qw7yfC4hDDnKG4bZDYjXv09wtYFJQOmzmiXT2F021r0wjkW848KmmdUHkegUGv6ueje+/QP1k6cL38r0DSWjmEUbHktJabWAmY+eeKIRPwpuS96xW4WZE5LWI3cxF+QrRNn4Gp0wCnkbg5xXEJSa7LOS1trxC9E+xYU2XDl1HL792Bf6rnX4DOHHBgojE0FznjyzlSOPfs7z5Zrb8H8lfyQwwKcUBTOdnQOu+8dpUiZhjX6/v/d8XMbKRP9U4eTWi5zh5R1t6v6gv8qvQoA5r3TF4GEXoJpzYXpYQkwDxKBL2QxrPvEWc3oOigKM7UUG2C/orRDLD
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(39860400002)(346002)(396003)(136003)(230922051799003)(186009)(451199024)(1800799012)(64100799003)(66446008)(38070700009)(26005)(107886003)(2616005)(54906003)(66556008)(76116006)(64756008)(66946007)(316002)(2906002)(110136005)(91956017)(4744005)(66476007)(8676002)(4001150100001)(5660300002)(4326008)(8936002)(86362001)(41300700001)(6506007)(36756003)(6512007)(478600001)(6486002)(71200400001)(82960400001)(122000001)(38100700002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?TldVVXdFWDRYcS9uWEVFSnRPc0p6Qm8wQndHaDltS3p1NWdyaGM2ZmxJWmxo?=
- =?utf-8?B?bngwTzk3eEJvbUlFZm1qenhhZzd5WEYydlYwTmxnQVpzLzFGa0h3cGZXZEVj?=
- =?utf-8?B?dmRVRmIzUGhsckR3ajZQSWVHejlZR05PalBKS051S0lpdUgyVEorMitEZTls?=
- =?utf-8?B?dzIyOGwzU0M2NGw3T2Zta2V2emF4TWtOeEJXYm0xdHFMK3JGQTlWdE0yL3Vy?=
- =?utf-8?B?OTByV1RSQzFUR0tLYnQ5VFB1Z3ZVUWlQcEJ3L0FZQklMSDVKVlhHTm1HaERT?=
- =?utf-8?B?MzFVSHBVY0dZL3ZGa1dPK2lndlBtQUtyc2FKOEIzVmtPSVd5eFptSDZEbUI1?=
- =?utf-8?B?U0dyMXUwdDdkbjd4VTlLZXFtRGp4OC8weUtqKzloTmd2SnJJQVBrdmlSZ2dm?=
- =?utf-8?B?OVlFZ2dOOHh6TTg0TWlTMkJFbXF5cGpjcWdUeXZjOXdtZmZzRjk4WFBRcEZs?=
- =?utf-8?B?OFc2dEF2SVdxZnNlMWxZcW5UYVhsTi9neXlnS3RVWmg5UjlleHE0QUtQWVNY?=
- =?utf-8?B?MkhFRk8xVndHeXNGVHJVd0kveENTcXpzQTZDVFJBc3NSZkZ0bFVyRTB5M3Yw?=
- =?utf-8?B?RDdNMDJ6ODhKZ0dXUDI4cWNNQmh6VDJMRDFQZEhsK0c1TUs3dTFwcFo3TDhz?=
- =?utf-8?B?b3RCTGduOXkzcEJ4aVFaMlNha0ZRK0J1N1JjS2Vvd1h2SFNiaTdGVXJZV2hX?=
- =?utf-8?B?Z2FYaDdrdHRSQ2M4RkhYL2d5bXFaRm5hOVhvNVdZREJCS2VNSDNGTWVGbEdD?=
- =?utf-8?B?RWg4Y0FuWG5lYmtFdE1IRmZaM0RMQktobEd4dkNLaFhScEtUcllMQTNjZkdV?=
- =?utf-8?B?RjRHcFFpSkVzWExNdTIyMC9QZHlORGh6S25XRFQxbUdlWFdXbzB2dkZFRDFD?=
- =?utf-8?B?SW84Nm9oU2NyTFBnWkhBYnpiMURESTNIc0NWWUhzWUdEMnV6dmtqdFJCME9K?=
- =?utf-8?B?QU04aEVsUm5kN0dNOWdoK2c0SlNsR0hOYk96aEIwZ1lZL0JhSWdxMmswYkJ2?=
- =?utf-8?B?UWpvSWpuNEZBbTVROGtxcjR5Q1RGVDNoTUFGUXlGdTl2cU1rdEZaWW93VDA5?=
- =?utf-8?B?TWtIeVJOMEdLWVRsMDV3ckhLVGg1RENCbDBnNE9qM0VvZE5IV0xFT0tHc1pp?=
- =?utf-8?B?QXRrbUhQelB3SEppanZtQVVLRjMwWHhNZ1hwNWUxK3kxNi9qVVlOY1l4MmpP?=
- =?utf-8?B?ZXlCWEU5a1Bid0VLdlkveGpyNTdGdWIzS3UrTG15K21MTFE3RzJSblNoSXBT?=
- =?utf-8?B?L2tJRHlLUzBaeHJEcnQzZm1qd3pTTm1PSVFIYzFZbkdZeTB0bVhkZkwzOUNF?=
- =?utf-8?B?bEgreHY1RmRBUkQvL1RIKzBtTm5TMVd0M1psc0U3WE83Z040U1NuZHo5NGJk?=
- =?utf-8?B?M256RjZtTEY0ckRQcWJidmhIQ0ZOZHZaTy85NVY2NGE5ZUFyU2FXR3hGZ0tZ?=
- =?utf-8?B?aDlOTkFWL3d2UmhIVzA4ZHpLbGRDSVpQZ3RLQnNVTlpGRUhyMDEybkRHY0hq?=
- =?utf-8?B?dHIzdTdGMW80Qm1qSThrZHBIOHZpK0tqQXZzK0FzL2xYc2lWUnlIMExaSzMx?=
- =?utf-8?B?VlVFTUZUZ1k1b3NDRW8zNlhIMklUSVFkcXNZbmNXVWUvR0gvcEhyT2pjVnVx?=
- =?utf-8?B?anc4dUl4eWloVldZd3lUcCtpVHRQRm0vZkZvOEE5YWtZOUFLeHJLMUtVcjIy?=
- =?utf-8?B?MVd3ODJZSUlRWTRNOTg1NHdQdHRMK3NHZFJSZHhLN3pGZXJUQ3NDWkdIYWNT?=
- =?utf-8?B?NGdzdEZyWGhidUxLSGtqSFJhWnVLcXN5Ym4zZ00raENxUVUzSGp4LzhrK2Fr?=
- =?utf-8?B?ODZibE81azV5NXJ6K1NWZlZsOFN1cjR0NUxwaUhrV1ZlenplTEQ3YWpBWW9i?=
- =?utf-8?B?ZDQ3RjY5OC9NbEFWYmlOd1pKNEJuUTI2cG01MG16Wnh6czhEeTJZSlA3aVZw?=
- =?utf-8?B?YjkrRlVmcHl6V2JyOFlJTGlxSXVhbTJ5KzlZQVNyM0tKbnRqb2ZRdDBBVW4z?=
- =?utf-8?B?U0VJWXkrN01GelpQNXg3aEpIUGdFZjJmSlMyeEtoZ0h2TDR2MFR1SlM4bzRo?=
- =?utf-8?B?OTdrN1hkR1BTMVBsVTZXR3pKTFF0MU9QWmJmd1A0aTBlelVVS0UxVUg3cG5u?=
- =?utf-8?B?NDMyVHJvN2YzM2hhVUkyeHhxTUJpK3NRVXZzYzU5S3ZiaXJqRno5SHRYTGow?=
- =?utf-8?B?WHc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8C3DE93FE9ACED42BC7D1E7D27EF79A7@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB84410D0
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 10:28:54 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5d1ed4b268dso22673437b3.0
+        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 10:28:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701368934; x=1701973734; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KCojnrKVSnfIdikNRS9eQkGQb5+JqWZFSYvF9pyN2fg=;
+        b=nhtFn9NDaNPt0A1+m+fE56vnx1mbADePWNqZ9blJ/+GV4jGh2fsC2SN+uOGIGv9kE2
+         FG66Nmk2jt2cIwPCVkdaveLgoqscdfsRQRN51I8JYbQErMXxdImFGKtQF8PBc4uTxxkh
+         vHoiYrKDL4zgHPiVUem9dpXEuuaMsOi/sBXZkMcC79B7ql2QdeRHvB3NnS4CPxF5Fa0C
+         omSukJBxBsa1BdsRsxNTZypLIY4BNLnhsdoHRrchEtfVzf1iVipEWKqca/3Ukst0s0rx
+         o+Y3EFmnktINvfemJQpV61jW28/tMD+flPbdJB/tuLUm+aXutvH3MR1POBudsidZVNY6
+         /v1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701368934; x=1701973734;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KCojnrKVSnfIdikNRS9eQkGQb5+JqWZFSYvF9pyN2fg=;
+        b=B8YASZrtSazSUmxWtQi549X5URZuWzDoW9uQjn/SSvAC8/iuK8tgTy7MXBI0kHAcTC
+         Z9dLejx6x8+4BHH0BalwYnrhPavqcAN3GZ3u9N5wGFbGCE2IE+S//oDd/0L8XG1rQJ1e
+         YX4xnPrwsNKBdZ2brpCoVjMzCITBCxcdJ3kqVGgeDhiGDLjFXjY+qCx5p4nrO1zwhWjI
+         0dvUmva2mvPHLj1TSKVxDgrQ9CPPlmZwcudzTEe9CLqFx+lTKzhOJtUsmE3Mi2Vs1POA
+         R5XgmAwehIaWmYABMsqye5e+KYFzxAfr/Pg5ySWpsUv11XoE0Y8ocJWKF1XidIQb3sV0
+         5s0g==
+X-Gm-Message-State: AOJu0YxVLq22+dfcJteA1ZVQ8uBK00fDyLCOI1QzBA8bfrDGCOOjDR23
+	vAumrPOVUQQBfqeiDzsf4WDdrNnqaso=
+X-Google-Smtp-Source: AGHT+IENTQ6puxM9lq8+5c9/fGwa/0WLqvX9/pdkv4tQrl3DVzSCYKkQNeWrlJXE6OVBjygmscKR2M9Z2T4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:a3e6:0:b0:db4:5d34:fa5 with SMTP id
+ e93-20020a25a3e6000000b00db45d340fa5mr708485ybi.0.1701368934202; Thu, 30 Nov
+ 2023 10:28:54 -0800 (PST)
+Date: Thu, 30 Nov 2023 10:28:52 -0800
+In-Reply-To: <87y1efmg28.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2ed15ff4-dc53-4454-16ec-08dbf1ce8dc6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Nov 2023 18:02:44.6733
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: xoH29BN+pPPDNp/KSVRBIe5C/al1bmuAIHZrEfzlCWVoh1FaRKudYO43ERRiykm88KYg8i6wyog/JIsaTfuRbQuHLfAnaCtwSg55YhjGGXs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6203
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+References: <20231025152406.1879274-1-vkuznets@redhat.com> <20231025152406.1879274-11-vkuznets@redhat.com>
+ <ZWfl3ahamXPPoIGB@google.com> <87y1efmg28.fsf@redhat.com>
+Message-ID: <ZWjUZPXCF2U9azWT@google.com>
+Subject: Re: [PATCH 10/14] KVM: x86: Make Hyper-V emulation optional
+From: Sean Christopherson <seanjc@google.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-T24gVGh1LCAyMDIzLTExLTMwIGF0IDE5OjI5ICswMjAwLCBNYXhpbSBMZXZpdHNreSB3cm90ZToN
-Cj4gMi4gSXQgd2lsbCBhZmZlY3Qgb3V0cHV0IHNpemUgb2YgdGhlIEtWTV9HRVRfWFNBVkUyIGlv
-Y3RsLCB3aGljaA0KPiBvdXRwdXRzIGJ1ZmZlciBzaW1pbGFyIHRvDQo+IG90aGVyIEZQVSBzdGF0
-ZSBidWZmZXJzIGV4cG9zZWQgdG8gdXNlcnNwYWNlIChsaWtlIG9uZSBzYXZlZCBvbg0KPiBzaWdu
-YWwgc3RhY2ssIG9yIG9uZSBvYnRhaW5lZCB2aWEgcHRyYWNlKS4NCg0KQWghIEkgbWlzc2VkIHRo
-aXMgcGFydC4gVGhhbmtzIGZvciB0aGUgY29ycmVjdGlvbi4gU28gdGhlIG9yaWdpbmFsDQpjb21t
-ZW50IGlzIGltcG9ydGFudCBhbmQgY29ycmVjdC4NCg==
+On Thu, Nov 30, 2023, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> 
+> ...
+> 
+> >
+> >>  static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+> >>  {
+> >> @@ -3552,11 +3563,13 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+> >>  	if (!nested_vmx_check_permission(vcpu))
+> >>  		return 1;
+> >>  
+> >> +#ifdef CONFIG_KVM_HYPERV
+> >>  	evmptrld_status = nested_vmx_handle_enlightened_vmptrld(vcpu, launch);
+> >>  	if (evmptrld_status == EVMPTRLD_ERROR) {
+> >>  		kvm_queue_exception(vcpu, UD_VECTOR);
+> >>  		return 1;
+> >>  	}
+> >> +#endif
+> >>  
+> >>  	kvm_pmu_trigger_event(vcpu, PERF_COUNT_HW_BRANCH_INSTRUCTIONS);
+> >
+> > This fails to build with CONFIG_KVM_HYPERV=n && CONFIG_KVM_WERROR=y:
+> >
+> > arch/x86/kvm/vmx/nested.c:3577:9: error: variable 'evmptrld_status' is uninitialized when used here [-Werror,-Wuninitialized]
+> >         if (CC(evmptrld_status == EVMPTRLD_VMFAIL))
+> >                ^~~~~~~~~~~~~~~
+> >
+> > Sadly, simply wrapping with an #ifdef also fails because then evmptrld_status
+> > becomes unused.  I'd really prefer to avoid having to tag it __maybe_unused, and
+> > adding more #ifdef would also be ugly.  Any ideas?
+> 
+> A couple,
+> 
+> - we can try putting all eVMPTR logic under 'if (1)' just to create a
+>   block where we can define evmptrld_status. Not sure this is nicer than
+>   another #ifdef wrapping evmptrld_status and I'm not sure what to do
+>   with kvm_pmu_trigger_event() -- can it just go above
+>   nested_vmx_handle_enlightened_vmptrld()?
+> 
+> - we can add a helper, e.g. 'evmptr_is_vmfail()' and make it just return
+>   'false' when !CONFIG_KVM_HYPERV.
+> 
+> - rewrite this as a switch to avoid the need for having the local
+>   variable, (untested)
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index c5ec0ef51ff7..b26ce7d596e9 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3553,22 +3553,23 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+>         enum nvmx_vmentry_status status;
+>         struct vcpu_vmx *vmx = to_vmx(vcpu);
+>         u32 interrupt_shadow = vmx_get_interrupt_shadow(vcpu);
+> -       enum nested_evmptrld_status evmptrld_status;
+>  
+>         if (!nested_vmx_check_permission(vcpu))
+>                 return 1;
+>  
+> -       evmptrld_status = nested_vmx_handle_enlightened_vmptrld(vcpu, launch);
+> -       if (evmptrld_status == EVMPTRLD_ERROR) {
+> +       switch (nested_vmx_handle_enlightened_vmptrld(vcpu, launch)) {
+> +       case EVMPTRLD_ERROR:
+>                 kvm_queue_exception(vcpu, UD_VECTOR);
+>                 return 1;
+> +       case EVMPTRLD_VMFAIL:
+> +               trace_kvm_nested_vmenter_failed("evmptrld_status", 0);
+> +               return nested_vmx_failInvalid(vcpu);
+> +       default:
+> +               break;
+>         }
+>  
+>         kvm_pmu_trigger_event(vcpu, PERF_COUNT_HW_BRANCH_INSTRUCTIONS);
+>  
+> -       if (CC(evmptrld_status == EVMPTRLD_VMFAIL))
+> -               return nested_vmx_failInvalid(vcpu);
+> -
+>         if (CC(!evmptr_is_valid(vmx->nested.hv_evmcs_vmptr) &&
+>                vmx->nested.current_vmptr == INVALID_GPA))
+>                 return nested_vmx_failInvalid(vcpu);
+> 
+> Unfortunately, I had to open code CC() ;-(
+> 
+> Or maybe just another "#ifdef" is not so ugly after all? :-)
+
+Ah, just have nested_vmx_handle_enlightened_vmptrld() return EVMPTRLD_DISABLED
+for its "stub", e.g. with some otehr tangentially de-stubbing:
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 4777d867419c..5a27a2ebbb32 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -2000,6 +2000,7 @@ static void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
+ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+        struct kvm_vcpu *vcpu, bool from_launch)
+ {
++#ifdef CONFIG_KVM_HYPERV
+        struct vcpu_vmx *vmx = to_vmx(vcpu);
+        bool evmcs_gpa_changed = false;
+        u64 evmcs_gpa;
+@@ -2081,11 +2082,10 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+        }
+ 
+        return EVMPTRLD_SUCCEEDED;
++#else
++       return EVMPTRLD_DISABLED;
++#endif
+ }
+-#else /* CONFIG_KVM_HYPERV */
+-static inline void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields) {}
+-static inline void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx) {}
+-#endif /* CONFIG_KVM_HYPERV */
+ 
+ void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu)
+ {
+@@ -3191,8 +3191,6 @@ static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+ 
+        return true;
+ }
+-#else
+-static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu) { return true; }
+ #endif
+ 
+ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+@@ -3285,6 +3283,7 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 
+ static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
+ {
++#ifdef CONFIG_KVM_HYPERV
+        /*
+         * Note: nested_get_evmcs_page() also updates 'vp_assist_page' copy
+         * in 'struct kvm_vcpu_hv' in case eVMCS is in use, this is mandatory
+@@ -3301,7 +3300,7 @@ static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
+ 
+                return false;
+        }
+-
++#endif
+        if (is_guest_mode(vcpu) && !nested_get_vmcs12_pages(vcpu))
+                return false;
+ 
+@@ -3564,7 +3563,6 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+        if (!nested_vmx_check_permission(vcpu))
+                return 1;
+ 
+-#ifdef CONFIG_KVM_HYPERV
+        evmptrld_status = nested_vmx_handle_enlightened_vmptrld(vcpu, launch);
+        if (evmptrld_status == EVMPTRLD_ERROR) {
+                kvm_queue_exception(vcpu, UD_VECTOR);
+@@ -4743,6 +4741,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+        WARN_ON_ONCE(vmx->nested.nested_run_pending);
+ 
+        if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
++#ifdef CONFIG_KVM_HYPERV
+                /*
+                 * KVM_REQ_GET_NESTED_STATE_PAGES is also used to map
+                 * Enlightened VMCS after migration and we still need to
+@@ -4750,6 +4749,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+                 * the first L2 run.
+                 */
+                (void)nested_get_evmcs_page(vcpu);
++#endif
+        }
+ 
+        /* Service pending TLB flush requests for L2 before switching to L1. */
 
