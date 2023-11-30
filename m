@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-2941-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2942-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C17C87FF1EE
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 15:33:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB8457FF1F0
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 15:33:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73E42282661
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 14:33:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 166AAB219B4
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 14:33:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C14D451C51;
-	Thu, 30 Nov 2023 14:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0846451014;
+	Thu, 30 Nov 2023 14:33:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fOj2I0aM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nd87b+Co"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1A8A85
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 06:32:59 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BF7B93
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 06:33:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701354780; x=1732890780;
+  t=1701354784; x=1732890784;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=HQNocPVaV+DgJS+Ld4DvaS6hVw4IdYUlBhgQdcIl19Q=;
-  b=fOj2I0aM2QNCyfRNGbDikP/OmKy6I5T0YVbWiz+S7ONMKJWjTCfDVs8h
-   GkSCejMyU6iZBFOvEWMt+egBlI3ui9FySkxh3Xqn4urPE4iH/A/kwHM25
-   2keeQiX3ANxPS7yT5GNR4tYa76wRg820jNBoUpXGGT3KhiXSBnp5R009Q
-   uk4MWwyFxe2quey3/TM7bkhcmSJSEk1eIDpJ3/8kch1hANJhSoGg+uLQR
-   2PRSQPspHyIrvHJeXLpFdczjd4LmHeKDW/8B79Z9bSqwbj+qRpSvQgtSx
-   G8J0J4tclEUDwizD5p1HlyO2PtI2afaWtt2JnwVPii2tWsXS+bGEKAFkw
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="479531803"
+  bh=/4XB1+0XSfZXJW6ggYvVG8+UQ24RT1LIudOfD5YSaJw=;
+  b=nd87b+ConG9yKkEy3y3r0pIAQ6enQIYkVPbicZH7YjpCDWLHnWIsg8Yf
+   8Ati+jYYFU/X4ZI7UM2Mv1ZG5V1j6Z2fptjTzXfFhoUZTGwEya8DRCFxX
+   kSm9K2QTy6qlnLipNkDesV4C/8AMGLTNQdbWZg74yVc9sZpwdVAz+Empz
+   BH0kf2Z1SfWiBlYCoCcapTCuyAmxlPwsqKTjYQhQ/iymgbWu1qGONdJ9w
+   hV9us2ZY8QWqOFaI7Q+6Qq1XsT/pCjJkurOLdec6RAS/TcfphvjjuMZAi
+   kKweD4tembUSJuAzTzdskxG07A0UxHfd5xA+OzSgLUBsAbRPZbVY9ajaW
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="479531856"
 X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="479531803"
+   d="scan'208";a="479531856"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 06:32:54 -0800
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 06:33:04 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="942729932"
+X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="942729971"
 X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="942729932"
+   d="scan'208";a="942729971"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by orsmga005.jf.intel.com with ESMTP; 30 Nov 2023 06:32:45 -0800
+  by orsmga005.jf.intel.com with ESMTP; 30 Nov 2023 06:32:54 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
@@ -84,9 +84,9 @@ Cc: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
 	Zhenyu Wang <zhenyu.z.wang@intel.com>,
 	Yongwei Ma <yongwei.ma@intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 15/41] hw/cpu/core: Allow to configure plugged threads for cpu-core
-Date: Thu, 30 Nov 2023 22:41:37 +0800
-Message-Id: <20231130144203.2307629-16-zhao1.liu@linux.intel.com>
+Subject: [RFC 16/41] PPC/ppc-core: Limit plugged-threads and nr-threads to be equal
+Date: Thu, 30 Nov 2023 22:41:38 +0800
+Message-Id: <20231130144203.2307629-17-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231130144203.2307629-1-zhao1.liu@linux.intel.com>
 References: <20231130144203.2307629-1-zhao1.liu@linux.intel.com>
@@ -100,191 +100,73 @@ Content-Transfer-Encoding: 8bit
 
 From: Zhao Liu <zhao1.liu@intel.com>
 
-When the core abstraction is applied for the architecture support CPU
-hotplug, the plugged CPUs and unplugged CPUs are distributed among the
-cores created in the topology tree.
+PPC supports CPU hotplug at core granularity, thus ppc-core only accepts
+all CPUs in a core are plugged.
 
-Add plugged_threads field to help cpu-core decide to how many CPUs to
-create.
+Check if plugged_threads and nr_threads are equal when ppc-core
+realizes.
 
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- hw/cpu/core.c                   | 33 +++++++++++++++++++++++++++++++++
- hw/ppc/pnv_core.c               |  6 +++++-
- hw/ppc/spapr_cpu_core.c         |  6 +++++-
- include/hw/cpu/core.h           |  9 +++++++++
- include/hw/ppc/pnv_core.h       |  2 ++
- include/hw/ppc/spapr_cpu_core.h |  2 ++
- 6 files changed, 56 insertions(+), 2 deletions(-)
+ hw/ppc/ppc_core.c         | 18 ++++++++++++++++++
+ include/hw/ppc/ppc_core.h |  1 +
+ 2 files changed, 19 insertions(+)
 
-diff --git a/hw/cpu/core.c b/hw/cpu/core.c
-index 7e274d6aebb7..15546b5b2339 100644
---- a/hw/cpu/core.c
-+++ b/hw/cpu/core.c
-@@ -36,6 +36,20 @@ static void core_prop_set_nr_threads(Object *obj, Visitor *v, const char *name,
-     core->nr_threads = value;
+diff --git a/hw/ppc/ppc_core.c b/hw/ppc/ppc_core.c
+index 4433b54af506..3857f3150052 100644
+--- a/hw/ppc/ppc_core.c
++++ b/hw/ppc/ppc_core.c
+@@ -53,20 +53,38 @@ static void powerpc_core_prop_set_core_id(Object *obj, Visitor *v,
+     core->core_id = value;
  }
  
-+static void core_prop_set_plugged_threads(Object *obj, Visitor *v,
-+                                          const char *name, void *opaque,
-+                                          Error **errp)
-+{
-+    CPUCore *core = CPU_CORE(obj);
-+    int64_t value;
-+
-+    if (!visit_type_int(v, name, &value, errp)) {
-+        return;
-+    }
-+
-+    core->plugged_threads = value;
-+}
-+
- static void cpu_core_instance_init(Object *obj)
- {
-     CPUCore *core = CPU_CORE(obj);
-@@ -48,6 +62,22 @@ static void cpu_core_instance_init(Object *obj)
-     if (current_machine) {
-         core->nr_threads = current_machine->smp.threads;
-     }
-+
-+    core->plugged_threads = -1;
-+}
-+
-+static void cpu_core_realize(DeviceState *dev, Error **errp)
++static void powerpc_core_realize(DeviceState *dev, Error **errp)
 +{
 +    CPUCore *core = CPU_CORE(dev);
++    PowerPCCoreClass *ppc_class = POWERPC_CORE_GET_CLASS(dev);
 +
-+    if (core->plugged_threads > core->nr_threads) {
-+        error_setg(errp, "Plugged threads (plugged-threads: %d) must "
-+                   "not be more than max threads (nr-threads: %d)",
-+                   core->plugged_threads, core->nr_threads);
++    if (core->plugged_threads != -1 &&
++        core->nr_threads != core->plugged_threads) {
++        error_setg(errp, "nr_threads and plugged-threads must be equal");
 +        return;
-+    } else if (core->plugged_threads == -1) {
-+        core->plugged_threads = core->nr_threads;
 +    }
- }
- 
- static void cpu_core_class_init(ObjectClass *oc, void *data)
-@@ -57,6 +87,9 @@ static void cpu_core_class_init(ObjectClass *oc, void *data)
-     set_bit(DEVICE_CATEGORY_CPU, dc->categories);
-     object_class_property_add(oc, "nr-threads", "int", core_prop_get_nr_threads,
-                               core_prop_set_nr_threads, NULL, NULL);
-+    object_class_property_add(oc, "plugged-threads", "int", NULL,
-+                              core_prop_set_plugged_threads, NULL, NULL);
-+    dc->realize = cpu_core_realize;
- }
- 
- static const TypeInfo cpu_core_type_info = {
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index a90d1ec92bd8..8b75739697d1 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -276,6 +276,8 @@ static void pnv_core_realize(DeviceState *dev, Error **errp)
- 
-     assert(pc->chip);
- 
-+    pcc->parent_realize(dev, errp);
 +
-     pc->threads = g_new(PowerPCCPU *, cc->nr_threads);
-     for (i = 0; i < cc->nr_threads; i++) {
-         PowerPCCPU *cpu;
-@@ -376,11 +378,13 @@ static void pnv_core_power10_class_init(ObjectClass *oc, void *data)
- static void pnv_core_class_init(ObjectClass *oc, void *data)
++    ppc_class->parent_realize(dev, errp);
++}
++
+ static void powerpc_core_class_init(ObjectClass *oc, void *data)
  {
      DeviceClass *dc = DEVICE_CLASS(oc);
-+    PnvCoreClass *pcc = PNV_CORE_CLASS(oc);
++    PowerPCCoreClass *ppc_class = POWERPC_CORE_CLASS(oc);
  
--    dc->realize = pnv_core_realize;
-     dc->unrealize = pnv_core_unrealize;
-     device_class_set_props(dc, pnv_core_properties);
-     dc->user_creatable = false;
-+    device_class_set_parent_realize(dc, pnv_core_realize,
-+                                    &pcc->parent_realize);
+     object_class_property_add(oc, "core-id", "int",
+                               powerpc_core_prop_get_core_id,
+                               powerpc_core_prop_set_core_id,
+                               NULL, NULL);
++    device_class_set_parent_realize(dc, powerpc_core_realize,
++                                    &ppc_class->parent_realize);
  }
  
- #define DEFINE_PNV_CORE_TYPE(family, cpu_model) \
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 7c2ea1424747..5533a386f350 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -331,6 +331,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-         (SpaprMachineState *) object_dynamic_cast(qdev_get_machine(),
-                                                   TYPE_SPAPR_MACHINE);
-     SpaprCpuCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-+    SpaprCpuCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(sc);
-     CPUCore *cc = CPU_CORE(OBJECT(dev));
-     int i;
- 
-@@ -339,6 +340,8 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    scc->parent_realize(dev, errp);
-+
-     qemu_register_reset(spapr_cpu_core_reset_handler, sc);
-     sc->threads = g_new0(PowerPCCPU *, cc->nr_threads);
-     for (i = 0; i < cc->nr_threads; i++) {
-@@ -363,11 +366,12 @@ static void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
-     SpaprCpuCoreClass *scc = SPAPR_CPU_CORE_CLASS(oc);
- 
--    dc->realize = spapr_cpu_core_realize;
-     dc->unrealize = spapr_cpu_core_unrealize;
-     dc->reset = spapr_cpu_core_reset;
-     device_class_set_props(dc, spapr_cpu_core_properties);
-     scc->cpu_type = data;
-+    device_class_set_parent_realize(dc, spapr_cpu_core_realize,
-+                                    &scc->parent_realize);
- }
- 
- #define DEFINE_SPAPR_CPU_CORE_TYPE(cpu_model) \
-diff --git a/include/hw/cpu/core.h b/include/hw/cpu/core.h
-index 17f117bd5225..87d50151ab01 100644
---- a/include/hw/cpu/core.h
-+++ b/include/hw/cpu/core.h
-@@ -21,7 +21,16 @@ struct CPUCore {
-     DeviceState parent_obj;
- 
-     /*< public >*/
-+    int core_id;
-+
-+    /* Maximum number of threads contained in this core. */
-     int nr_threads;
-+
-+    /*
-+     * How many threads should be plugged in this core via
-+     * "-device"/"device_add"?
-+     */
-+    int plugged_threads;
+ static const TypeInfo powerpc_core_type_info = {
+     .name = TYPE_POWERPC_CORE,
+     .parent = TYPE_CPU_CORE,
+     .abstract = true,
++    .class_size = sizeof(PowerPCCoreClass),
+     .class_init = powerpc_core_class_init,
+     .instance_size = sizeof(PowerPCCore),
  };
+diff --git a/include/hw/ppc/ppc_core.h b/include/hw/ppc/ppc_core.h
+index bcc83e426e3f..1207d220872a 100644
+--- a/include/hw/ppc/ppc_core.h
++++ b/include/hw/ppc/ppc_core.h
+@@ -34,6 +34,7 @@ struct PowerPCCoreClass {
+     CPUCoreClass parent_class;
  
- #endif
-diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
-index 56c3f6b51f2f..3b9edf69f9fb 100644
---- a/include/hw/ppc/pnv_core.h
-+++ b/include/hw/ppc/pnv_core.h
-@@ -49,6 +49,8 @@ struct PnvCoreClass {
      /*< public >*/
-     const MemoryRegionOps *xscom_ops;
-     uint64_t xscom_size;
-+
 +    DeviceRealize parent_realize;
  };
  
- #define PNV_CORE_TYPE_SUFFIX "-" TYPE_PNV_CORE
-diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
-index db3e515051ca..dabdbd4bcbc9 100644
---- a/include/hw/ppc/spapr_cpu_core.h
-+++ b/include/hw/ppc/spapr_cpu_core.h
-@@ -37,6 +37,8 @@ struct SpaprCpuCoreClass {
- 
-     /*< public >*/
-     const char *cpu_type;
-+
-+    DeviceRealize parent_realize;
- };
- 
- const char *spapr_get_cpu_core_type(const char *cpu_type);
+ struct PowerPCCore {
 -- 
 2.34.1
 
