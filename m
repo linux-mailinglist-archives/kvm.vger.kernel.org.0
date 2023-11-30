@@ -1,227 +1,283 @@
-Return-Path: <kvm+bounces-3014-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3013-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E8FB7FFB68
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:33:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9FB27FFB5A
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:29:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D311B21024
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:33:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 189161C2108E
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 855F352F7A;
-	Thu, 30 Nov 2023 19:33:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53DBC52F75;
+	Thu, 30 Nov 2023 19:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="caW8M3bt"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="VDlfnnuS"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E9C1D48
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:32:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701372776;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Qjaf65sYJb4n4hhLvJBOx5OBzpNWVRQ0P5glbBHxy5I=;
-	b=caW8M3btkEytl0omTp8WpelRM6wyh1yWulWFwR9Byk/r3wQo8QP4QANBITW+VLXLQEq1hT
-	VcK6NM194SrfOh1wIhEFymjiliLUIGT7NtIVi2bhDia5IGwrRcuT79GKAm1ueVAdVGjM83
-	6JYFbw1gcHyH/M0T/QP/3Yn58WUMRto=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-462-beEKJpt1MTW5_XBa5WEJ3g-1; Thu, 30 Nov 2023 14:32:54 -0500
-X-MC-Unique: beEKJpt1MTW5_XBa5WEJ3g-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-332f5ff511aso1218649f8f.2
-        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:32:54 -0800 (PST)
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BD4A93
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:29:30 -0800 (PST)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-a195e0145acso54958566b.2
+        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:29:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1701372569; x=1701977369; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qu/G57LnazjPF+hhit8sVOHNi2qaherFjM1RsRjPAGA=;
+        b=VDlfnnuSf8lFNoAtvEgqwyGmIFFgmC1gT0VDYbP44YR5hzvZO6fITUUgrje/w+TeUW
+         p+Za+jONVFpVXWHCRXzzSlUWC708OxJmajg+y60i7+CnwkFD0zPAQUV0kJ//Bd/8AsPD
+         xll/n8PFntgTMe4WgDNLWstR58d7Bmn/2ykaSd15BKlBqGwnV98ZmVgmq5r84X2P4S/6
+         cHjRt4OoPbtxMO0lApuoP2/uhTD/NpyXycLeH/0bOU7tvAbEKFC8zL7KCAENYKQLKw1G
+         zWTx0jlUO8ZS4r5hoWLMzLetIfxfr25iBVc35yBmPsL7Xsc5eEibYidpBDsWPS8AJ/KP
+         j0lQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701372773; x=1701977573;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Qjaf65sYJb4n4hhLvJBOx5OBzpNWVRQ0P5glbBHxy5I=;
-        b=mUKc+oNR7mKZmL1nsC+ARXilEUGB8Y746BT1lfENaUDycIW1QczzKwE+0Ove3NDJ//
-         4UMzfSVr+biDwjCR8t5QYK74Sd4lTzGsTR5m6gkQuEO28xwN6t7S3wixoIquQuy7MAq8
-         FFwglU0jXahjL4gg9QMCVKaWDMtgMV5H2jkqYFksdKqqvJmkTIdDNWnX2zvnwA5t9YD1
-         pHqxZRLaHwDl19YKLe5+0p8VNLy8r+ZgYwS8f1AGx3KQUK/z+fY60y3PN1dwLp7L1Ixl
-         iXH7fbwRFdFw864PkQOf0hZDtX0cShxdtlLNSVM+gmTEIpF0GS/zhJ20dOKJdF0Y2Cr3
-         /gOw==
-X-Gm-Message-State: AOJu0YwpfHrfHEV/JbHESp/LlYbWltGO2j8+1sURbNRJok+MChbc5jLy
-	hbrhU8UKDkih7ZqEmzPsBuDM2S4IQn0mwdG+E3oG2LbSOCBDjI/jCZsEYUhnToJJdqNU8C0gb3U
-	bWP5G+qIvc/BpYvoUyV+J
-X-Received: by 2002:a05:6000:111:b0:332:fefa:61e9 with SMTP id o17-20020a056000011100b00332fefa61e9mr26868wrx.48.1701372773596;
-        Thu, 30 Nov 2023 11:32:53 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGqn364UCK3zWIeHDdXEPkMmGl5Q8DM2/8EiKghmUnk3H/ax3i9ELgMszwNIW7rk8DR9IdIpQ==
-X-Received: by 2002:adf:f2d0:0:b0:333:2fd2:8138 with SMTP id d16-20020adff2d0000000b003332fd28138mr13458wrp.85.1701368544085;
-        Thu, 30 Nov 2023 10:22:24 -0800 (PST)
-Received: from ?IPV6:2003:cb:c71c:3600:33e6:971c:5f64:fab5? (p200300cbc71c360033e6971c5f64fab5.dip0.t-ipconnect.de. [2003:cb:c71c:3600:33e6:971c:5f64:fab5])
-        by smtp.gmail.com with ESMTPSA id r2-20020a056000014200b0032f7e832cabsm2141741wrx.90.2023.11.30.10.22.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Nov 2023 10:22:23 -0800 (PST)
-Message-ID: <8f7c9d65-362c-44cb-97c3-e4a63aff56e5@redhat.com>
-Date: Thu, 30 Nov 2023 19:22:22 +0100
+        d=1e100.net; s=20230601; t=1701372569; x=1701977369;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Qu/G57LnazjPF+hhit8sVOHNi2qaherFjM1RsRjPAGA=;
+        b=YwWmw0r2hLuJiGVpWx/7NZP4fwpweiecJUIoWX2KzKl8lamHkmnQekr9eCplOuBv15
+         KABGt+hMW1V7kKl/KrOJ7r+EqIzZ/YD5UwNXbGNCh3XhVN3Py7VLA88qOsP1q9HyVFv2
+         qxhmhqKTon8r4H6yy9NAy+Py0CgSA2TRhZzsXgF/NIupHNJrzCQ1fjNGhIetvQNY44f+
+         SMppg1/rA7HYHF0L14yb4TBLZYTw0/UJ4VRaFPY5EShD35fPgMB6BXrneGV8GMjMxaxS
+         i8Z/1JTbBXI/+pwjXqIHGWmFD2roAyzz9t2yWw5u/DZz8t6ebBDlNf/4OjdwdB8mT+ix
+         SM5A==
+X-Gm-Message-State: AOJu0YxGO/NtUeLZw1Y4bXWLZDHJDc1U2EDVBMpYhn0HRJPcRFXdNFsm
+	nn8wn55VLjKDfwWrsBUlZruHl74YPRt6g+ChWOU=
+X-Google-Smtp-Source: AGHT+IHa+HTBgwPhkJZoBMr5lzGTwWzN2zRvlyUhmTbPbO/HwbuZuUp4S65V/IpvSmICdp3auWh37g==
+X-Received: by 2002:a17:906:1091:b0:a19:a19b:422a with SMTP id u17-20020a170906109100b00a19a19b422amr4455eju.149.1701368913770;
+        Thu, 30 Nov 2023 10:28:33 -0800 (PST)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id jz22-20020a17090775f600b009fdcc65d720sm954665ejc.72.2023.11.30.10.28.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Nov 2023 10:28:33 -0800 (PST)
+From: Andrew Jones <ajones@ventanamicro.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: seanjc@google.com,
+	pbonzini@redhat.com,
+	maz@kernel.org,
+	oliver.upton@linux.dev
+Subject: [PATCH] KVM: selftests: Drop newline from __TEST_REQUIRE
+Date: Thu, 30 Nov 2023 19:28:33 +0100
+Message-ID: <20231130182832.54603-2-ajones@ventanamicro.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 03/70] RAMBlock/guest_memfd: Enable
- KVM_GUEST_MEMFD_ALLOW_HUGEPAGE
-Content-Language: en-US
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>, Xiaoyao Li
- <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
- Claudio Fontana <cfontana@suse.de>, Gerd Hoffmann <kraxel@redhat.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>,
- Chenyi Qiang <chenyi.qiang@intel.com>
-References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
- <20231115071519.2864957-4-xiaoyao.li@intel.com>
- <bc84fa4f-4866-4321-8f30-1388eed7e64f@redhat.com>
- <05f0e440-36a2-4d3a-8caa-842b34e50dce@intel.com>
- <0fbfc413-7c74-4b2a-bade-6f3f04ca82c2@redhat.com>
- <4708c33a-bb8d-484e-ac7b-b7e8d3ed445a@intel.com>
- <45d28654-9565-46df-81b9-6563a4aef78c@redhat.com>
- <ZWixXm-sboNZ-mzG@google.com>
- <d6bfd8be-7e8c-4a95-9e27-31775f8e352e@redhat.com>
- <ZWjLo57peucZMQIh@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <ZWjLo57peucZMQIh@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 
-On 30.11.23 18:51, Daniel P. Berrangé wrote:
-> On Thu, Nov 30, 2023 at 05:54:26PM +0100, David Hildenbrand wrote:
->> On 30.11.23 17:01, Sean Christopherson wrote:
->>> On Thu, Nov 30, 2023, David Hildenbrand wrote:
->>>> On 30.11.23 08:32, Xiaoyao Li wrote:
->>>>> On 11/20/2023 5:26 PM, David Hildenbrand wrote:
->>>>>>
->>>>>>>> ... did you shamelessly copy that from hw/virtio/virtio-mem.c ? ;)
->>>>>>>
->>>>>>> Get caught.
->>>>>>>
->>>>>>>> This should be factored out into a common helper.
->>>>>>>
->>>>>>> Sure, will do it in next version.
->>>>>>
->>>>>> Factor it out in a separate patch. Then, this patch is get small that
->>>>>> you can just squash it into #2.
->>>>>>
->>>>>> And my comment regarding "flags = 0" to patch #2 does no longer apply :)
->>>>>>
->>>>>
->>>>> I see.
->>>>>
->>>>> But it depends on if KVM_GUEST_MEMFD_ALLOW_HUGEPAGE will appear together
->>>>> with initial guest memfd in linux (hopefully 6.8)
->>>>> https://lore.kernel.org/all/CABgObfa=DH7FySBviF63OS9sVog_wt-AqYgtUAGKqnY5Bizivw@mail.gmail.com/
->>>>>
->>>>
->>>> Doesn't seem to be in -next if I am looking at the right tree:
->>>>
->>>> https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?h=next
->>>
->>> Yeah, we punted on adding hugepage support for the initial guest_memfd merge so
->>> as not to rush in kludgy uABI.  The internal KVM code isn't problematic, we just
->>> haven't figured out exactly what the ABI should look like, e.g. should hugepages
->>> be dependent on THP being enabled, and if not, how does userspace discover the
->>> supported hugepage sizes?
->>
->> Are we talking about THP or hugetlb? They are two different things, and
->> "KVM_GUEST_MEMFD_ALLOW_HUGEPAGE" doesn't make it clearer what we are talking
->> about.
->>
->> This patch here "get_thp_size()" indicates that we care about THP, not
->> hugetlb.
->>
->>
->> THP lives in:
->> 	/sys/kernel/mm/transparent_hugepage/
->> and hugetlb in:
->> 	/sys/kernel/mm/hugepages/
->>
->> THP for shmem+anon currently really only supports PMD-sized THP, that size
->> can be observed via:
->> 	/sys/kernel/mm/transparent_hugepage/hpage_pmd_size
->>
->> hugetlb sizes can be detected simply by looking at the folders inside
->> /sys/kernel/mm/hugepages/. "tools/testing/selftests/mm/vm_util.c" in the
->> kernel has a function "detect_hugetlb_page_sizes()" that uses that interface
->> to detect the sizes.
->>
->>
->> But likely we want THP support here. Because for hugetlb, one would actually
->> have to instruct the kernel which size to use, like we do for memfd with
->> hugetlb.
-> 
-> Would we not want both ultimately ?
+A few __TEST_REQUIRE callers are appending their own newline, resulting
+in an extra one being output. Rather than remove the newlines from
+those callers, remove it from __TEST_REQUIRE and add newlines to all
+the other callers, as __TEST_REQUIRE was the only output function
+appending newlines and consistency is a good thing.
 
-Likely we want both somehow, although I am not sure how to obtain either 
-cleanly and fully.
+Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+---
 
-My question is targeted at what the current interface/implementation 
-promises, and how it relates to both, THP and hugetlb.
+Applies to kvm-x86/selftests (I chose that branch to ensure I got the
+MAGIC_TOKEN change)
 
+ tools/testing/selftests/kvm/aarch64/arch_timer.c          | 4 ++--
+ tools/testing/selftests/kvm/aarch64/debug-exceptions.c    | 4 ++--
+ tools/testing/selftests/kvm/aarch64/vgic_irq.c            | 2 +-
+ tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c | 2 +-
+ tools/testing/selftests/kvm/access_tracking_perf_test.c   | 4 ++--
+ tools/testing/selftests/kvm/include/test_util.h           | 4 ++--
+ tools/testing/selftests/kvm/lib/kvm_util.c                | 2 +-
+ tools/testing/selftests/kvm/lib/x86_64/processor.c        | 4 ++--
+ tools/testing/selftests/kvm/rseq_test.c                   | 2 +-
+ tools/testing/selftests/kvm/system_counter_offset_test.c  | 2 +-
+ tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c   | 2 +-
+ 11 files changed, 16 insertions(+), 16 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+index 274b8465b42a..89b93e342654 100644
+--- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
++++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+@@ -392,7 +392,7 @@ static struct kvm_vm *test_vm_create(void)
+ 
+ 	test_init_timer_irq(vm);
+ 	gic_fd = vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
+-	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3");
++	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3\n");
+ 
+ 	/* Make all the test's cmdline args visible to the guest */
+ 	sync_global_to_guest(vm, test_args);
+@@ -470,7 +470,7 @@ int main(int argc, char *argv[])
+ 		exit(KSFT_SKIP);
+ 
+ 	__TEST_REQUIRE(!test_args.migration_freq_ms || get_nprocs() >= 2,
+-		       "At least two physical CPUs needed for vCPU migration");
++		       "At least two physical CPUs needed for vCPU migration\n");
+ 
+ 	vm = test_vm_create();
+ 	test_run(vm);
+diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+index 866002917441..19088a971b1f 100644
+--- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
++++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+@@ -540,7 +540,7 @@ void test_guest_debug_exceptions_all(uint64_t aa64dfr0)
+ 
+ 	/* Number of breakpoints */
+ 	brp_num = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_BRPs), aa64dfr0) + 1;
+-	__TEST_REQUIRE(brp_num >= 2, "At least two breakpoints are required");
++	__TEST_REQUIRE(brp_num >= 2, "At least two breakpoints are required\n");
+ 
+ 	/* Number of watchpoints */
+ 	wrp_num = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_WRPs), aa64dfr0) + 1;
+@@ -585,7 +585,7 @@ int main(int argc, char *argv[])
+ 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+ 	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &aa64dfr0);
+ 	__TEST_REQUIRE(debug_version(aa64dfr0) >= 6,
+-		       "Armv8 debug architecture not supported.");
++		       "Armv8 debug architecture not supported.\n");
+ 	kvm_vm_free(vm);
+ 
+ 	while ((opt = getopt(argc, argv, "i:")) != -1) {
+diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+index 2e64b4856e38..e4452c4b60c2 100644
+--- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
++++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+@@ -766,7 +766,7 @@ static void test_vgic(uint32_t nr_irqs, bool level_sensitive, bool eoi_split)
+ 
+ 	gic_fd = vgic_v3_setup(vm, 1, nr_irqs,
+ 			GICD_BASE_GPA, GICR_BASE_GPA);
+-	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3, skipping");
++	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3, skipping\n");
+ 
+ 	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT,
+ 		guest_irq_handlers[args.eoi_split][args.level_sensitive]);
+diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+index 5ea78986e665..3c5b83e0e776 100644
+--- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
++++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+@@ -458,7 +458,7 @@ static void create_vpmu_vm(void *guest_code)
+ 	vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64,
+ 					GICD_BASE_GPA, GICR_BASE_GPA);
+ 	__TEST_REQUIRE(vpmu_vm.gic_fd >= 0,
+-		       "Failed to create vgic-v3, skipping");
++		       "Failed to create vgic-v3, skipping\n");
+ 
+ 	/* Make sure that PMUv3 support is indicated in the ID register */
+ 	vcpu_get_reg(vpmu_vm.vcpu,
+diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+index 3c7defd34f56..65efec6f4f90 100644
+--- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
++++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+@@ -103,7 +103,7 @@ static uint64_t lookup_pfn(int pagemap_fd, struct kvm_vm *vm, uint64_t gva)
+ 		return 0;
+ 
+ 	pfn = entry & PAGEMAP_PFN_MASK;
+-	__TEST_REQUIRE(pfn, "Looking up PFNs requires CAP_SYS_ADMIN");
++	__TEST_REQUIRE(pfn, "Looking up PFNs requires CAP_SYS_ADMIN\n");
+ 
+ 	return pfn;
+ }
+@@ -385,7 +385,7 @@ int main(int argc, char *argv[])
+ 
+ 	page_idle_fd = open("/sys/kernel/mm/page_idle/bitmap", O_RDWR);
+ 	__TEST_REQUIRE(page_idle_fd >= 0,
+-		       "CONFIG_IDLE_PAGE_TRACKING is not enabled");
++		       "CONFIG_IDLE_PAGE_TRACKING is not enabled\n");
+ 	close(page_idle_fd);
+ 
+ 	for_each_guest_mode(run_test, &params);
+diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
+index a0c7dd3a5b30..88763f0e1b78 100644
+--- a/tools/testing/selftests/kvm/include/test_util.h
++++ b/tools/testing/selftests/kvm/include/test_util.h
+@@ -37,10 +37,10 @@ void __printf(1, 2) print_skip(const char *fmt, ...);
+ #define __TEST_REQUIRE(f, fmt, ...)				\
+ do {								\
+ 	if (!(f))						\
+-		ksft_exit_skip("- " fmt "\n", ##__VA_ARGS__);	\
++		ksft_exit_skip("- " fmt, ##__VA_ARGS__);	\
+ } while (0)
+ 
+-#define TEST_REQUIRE(f) __TEST_REQUIRE(f, "Requirement not met: %s", #f)
++#define TEST_REQUIRE(f) __TEST_REQUIRE(f, "Requirement not met: %s\n", #f)
+ 
+ ssize_t test_write(int fd, const void *buf, size_t count);
+ ssize_t test_read(int fd, void *buf, size_t count);
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 17a978b8a2c4..7b40990d9b08 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -27,7 +27,7 @@ int open_path_or_exit(const char *path, int flags)
+ 	int fd;
+ 
+ 	fd = open(path, flags);
+-	__TEST_REQUIRE(fd >= 0, "%s not available (errno: %d)", path, errno);
++	__TEST_REQUIRE(fd >= 0, "%s not available (errno: %d)\n", path, errno);
+ 
+ 	return fd;
+ }
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index d8288374078e..abd19059b236 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -719,12 +719,12 @@ void __vm_xsave_require_permission(uint64_t xfeature, const char *name)
+ 	close(kvm_fd);
+ 
+ 	if (rc == -1 && (errno == ENXIO || errno == EINVAL))
+-		__TEST_REQUIRE(0, "KVM_X86_XCOMP_GUEST_SUPP not supported");
++		__TEST_REQUIRE(0, "KVM_X86_XCOMP_GUEST_SUPP not supported\n");
+ 
+ 	TEST_ASSERT(rc == 0, "KVM_GET_DEVICE_ATTR(0, KVM_X86_XCOMP_GUEST_SUPP) error: %ld", rc);
+ 
+ 	__TEST_REQUIRE(bitmask & xfeature,
+-		       "Required XSAVE feature '%s' not supported", name);
++		       "Required XSAVE feature '%s' not supported\n", name);
+ 
+ 	TEST_REQUIRE(!syscall(SYS_arch_prctl, ARCH_REQ_XCOMP_GUEST_PERM, ilog2(xfeature)));
+ 
+diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
+index f74e76d03b7e..e825fe6807fa 100644
+--- a/tools/testing/selftests/kvm/rseq_test.c
++++ b/tools/testing/selftests/kvm/rseq_test.c
+@@ -183,7 +183,7 @@ static void calc_min_max_cpu(void)
+ 	}
+ 
+ 	__TEST_REQUIRE(cnt >= 2,
+-		       "Only one usable CPU, task migration not possible");
++		       "Only one usable CPU, task migration not possible\n");
+ }
+ 
+ int main(int argc, char *argv[])
+diff --git a/tools/testing/selftests/kvm/system_counter_offset_test.c b/tools/testing/selftests/kvm/system_counter_offset_test.c
+index 7f5b330b6a1b..46e4ca694e6d 100644
+--- a/tools/testing/selftests/kvm/system_counter_offset_test.c
++++ b/tools/testing/selftests/kvm/system_counter_offset_test.c
+@@ -30,7 +30,7 @@ static void check_preconditions(struct kvm_vcpu *vcpu)
+ {
+ 	__TEST_REQUIRE(!__vcpu_has_device_attr(vcpu, KVM_VCPU_TSC_CTRL,
+ 					       KVM_VCPU_TSC_OFFSET),
+-		       "KVM_VCPU_TSC_OFFSET not supported; skipping test");
++		       "KVM_VCPU_TSC_OFFSET not supported; skipping test\n");
+ }
+ 
+ static void setup_system_counter(struct kvm_vcpu *vcpu, struct test_case *test)
+diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+index 83e25bccc139..a3f4edbd9add 100644
+--- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
++++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+@@ -259,7 +259,7 @@ int main(int argc, char **argv)
+ 	__TEST_REQUIRE(token == MAGIC_TOKEN,
+ 		       "This test must be run with the magic token %d.\n"
+ 		       "This is done by nx_huge_pages_test.sh, which\n"
+-		       "also handles environment setup for the test.", MAGIC_TOKEN);
++		       "also handles environment setup for the test.\n", MAGIC_TOKEN);
+ 
+ 	run_test(reclaim_period_ms, false, reboot_permissions);
+ 	run_test(reclaim_period_ms, true, reboot_permissions);
 -- 
-Cheers,
-
-David / dhildenb
+2.43.0
 
 
