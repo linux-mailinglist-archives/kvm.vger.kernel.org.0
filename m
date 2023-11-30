@@ -1,31 +1,31 @@
-Return-Path: <kvm+bounces-2902-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2901-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54F5C7FEF99
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 13:58:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 024707FEF98
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 13:58:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3A13B20DB1
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 12:58:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 889D0281D87
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 12:58:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A595F374EF;
-	Thu, 30 Nov 2023 12:58:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25BBC3B7A0;
+	Thu, 30 Nov 2023 12:58:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
 Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 432AB10DB
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 04:58:29 -0800 (PST)
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	by gandalf.ozlabs.org (Postfix) with ESMTP id 4Sgx834kyNz4xhb;
-	Thu, 30 Nov 2023 23:58:27 +1100 (AEDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 658A910C2
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 04:58:27 -0800 (PST)
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+	by gandalf.ozlabs.org (Postfix) with ESMTP id 4Sgx815qg2z4xjW;
+	Thu, 30 Nov 2023 23:58:25 +1100 (AEDT)
 Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
 	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Sgx701Ypyz4xW7;
-	Thu, 30 Nov 2023 23:57:31 +1100 (AEDT)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Sgx716RjTz4xWv;
+	Thu, 30 Nov 2023 23:57:33 +1100 (AEDT)
 Message-ID: <53cb0a57-d8c4-4c59-b37f-60182410e0cd@kaod.org>
 Date: Thu, 30 Nov 2023 13:57:28 +0100
 Precedence: bulk
