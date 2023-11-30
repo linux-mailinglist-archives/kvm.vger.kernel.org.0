@@ -1,33 +1,33 @@
-Return-Path: <kvm+bounces-2908-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2909-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F12367FEFED
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 14:20:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FACE7FEFEF
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 14:21:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DB8A1C20D27
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 13:20:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EC59B20FF8
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 13:21:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85D3946435;
-	Thu, 30 Nov 2023 13:20:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A30C646435;
+	Thu, 30 Nov 2023 13:21:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
 Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C36E1B5
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 05:20:46 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4827B5
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 05:21:10 -0800 (PST)
 Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-	by gandalf.ozlabs.org (Postfix) with ESMTP id 4Sgxdj5LdSz4xhx;
-	Fri,  1 Dec 2023 00:20:41 +1100 (AEDT)
+	by gandalf.ozlabs.org (Postfix) with ESMTP id 4SgxfF5Jzvz4xhx;
+	Fri,  1 Dec 2023 00:21:09 +1100 (AEDT)
 Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
 	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Sgxck69gcz4xW7;
-	Fri,  1 Dec 2023 00:19:50 +1100 (AEDT)
-Message-ID: <f9b6941c-15b9-40ec-bc17-a154678d1a1c@kaod.org>
-Date: Thu, 30 Nov 2023 14:19:44 +0100
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4SgxdL6Gzsz4xdZ;
+	Fri,  1 Dec 2023 00:20:22 +1100 (AEDT)
+Message-ID: <d9164828-22fb-42a4-b71a-5ae14a172d50@kaod.org>
+Date: Thu, 30 Nov 2023 14:20:17 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -35,8 +35,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/6] qemu/main-loop: rename qemu_cond_wait_iothread() to
- qemu_cond_wait_bql()
+Subject: Re: [PATCH 4/6] system/cpus: rename qemu_global_mutex to qemu_bql
 Content-Language: en-US
 To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Cc: Jean-Christophe Dubois <jcd@tribudubois.net>,
@@ -91,15 +90,17 @@ Cc: Jean-Christophe Dubois <jcd@tribudubois.net>,
  <leobras@redhat.com>, Nicholas Piggin <npiggin@gmail.com>,
  Jiaxun Yang <jiaxun.yang@flygoat.com>
 References: <20231129212625.1051502-1-stefanha@redhat.com>
- <20231129212625.1051502-4-stefanha@redhat.com>
+ <20231129212625.1051502-5-stefanha@redhat.com>
 From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-In-Reply-To: <20231129212625.1051502-4-stefanha@redhat.com>
+In-Reply-To: <20231129212625.1051502-5-stefanha@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 11/29/23 22:26, Stefan Hajnoczi wrote:
-> The name "iothread" is overloaded. Use the term Big QEMU Lock (BQL)
-> instead, it is already widely used and unambiguous.
+> The APIs using qemu_global_mutex now follow the Big QEMU Lock (BQL)
+> nomenclature. It's a little strange that the actual QemuMutex variable
+> that embodies the BQL is called qemu_global_mutex instead of qemu_bql.
+> Rename it for consistency.
 > 
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
