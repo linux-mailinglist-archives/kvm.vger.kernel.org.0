@@ -1,67 +1,67 @@
-Return-Path: <kvm+bounces-3012-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3007-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 730F87FFB56
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:28:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBA267FFAE9
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:13:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A43661C21091
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:28:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 750A62819AB
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:13:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61BC552F70;
-	Thu, 30 Nov 2023 19:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A89125FF12;
+	Thu, 30 Nov 2023 19:12:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wn2aHS/K"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="agNSNjkX"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DB4ED48
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:28:14 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 175EF1722
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:12:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701372493;
+	s=mimecast20190719; t=1701371567;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=afJtp1/bOi8OTWHw9YFIvYdMpw6OpEAY6Zj/UXKihoM=;
-	b=Wn2aHS/K2a9ypQUy12KEFUchhVonL5Ber4K/Km1h8Tn930YizgW2ANubZNGFgEKoO/SNWR
-	f3f3hTq0zEwr4wGjbJoLja0/Jr/57F/MkKmTtESMSdzdlXFWpfaGTWTIpZn1PnTJbxSLLY
-	28AOtDU3ogLkX/kLSzDdeBpByVGWpOA=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=FnaIgPv4I8jNEtbAbtepXEookW4mdG5YQTpZSadpwPk=;
+	b=agNSNjkXW24PzYGOS2PTYIi7GlC5KEa+RBQe+HIks4//jarvRCc8zEmTNU1owbG28lEEa5
+	4sKQNNRgpXF9pJRcv37JvX9jMOXN6GDSUZo0rVtLkea5ocqJZp3K8q5/mzK2hPx0mR3WqR
+	IdqyrpD2wxA2+i0BJU6vsnZKDvS/nR8=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-151-iZMTFt6CMNGgf3pzhk5Png-1; Thu, 30 Nov 2023 14:28:12 -0500
-X-MC-Unique: iZMTFt6CMNGgf3pzhk5Png-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2c9c2d6a6b9so12295591fa.1
-        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:28:12 -0800 (PST)
+ us-mta-346-4V7ki4qROXazoJ-VAX72DQ-1; Thu, 30 Nov 2023 14:12:45 -0500
+X-MC-Unique: 4V7ki4qROXazoJ-VAX72DQ-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3330881541eso1076539f8f.1
+        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:12:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701372491; x=1701977291;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=afJtp1/bOi8OTWHw9YFIvYdMpw6OpEAY6Zj/UXKihoM=;
-        b=L/3nLS8KervneR2kTJiur5XK3K3NTKAhDu/rl2uarnGD4XTSc+pJhYEzeY2iyNvHNG
-         y1Hes1LeaZy0ZmgphMNf+Jwh3+8096aTPVU4CsBJdGHhSIRvGZJhhJb8/ENhyXfDvDKk
-         PiPwMIM7c2cnWRe3F5fTOzGhsmS9tmMtBMwJP+4BslNkzS3b4IUcmrKbuc6VNFMLOSQd
-         Q/gOZZMQRUnshFFhWiohROKsGIQ5aODnYsSZXNTxCRWYOjsPxZdE2aQjt4uE2FpT2O7K
-         CTO00dIlaO5PnMCV371AP6U0JXW2p3XLwCYpTJP8MmYiVzqzvZql9fm0s3MxM7oVLERA
-         STmw==
-X-Gm-Message-State: AOJu0YwjJyCqPZWH+5i8z/zfoPXPkg+0UJRxN40nwjzucJQvxFZRoNjb
-	f5Yn8l8DKI+akIP+k6vGjTR360/mO/2KEfrOo6+f7ERiUB5QLY+hMjKTJT8T/U/PJz+98ILglrX
-	g7clbHWs/8q7S
-X-Received: by 2002:a2e:924b:0:b0:2c9:ba9b:7281 with SMTP id v11-20020a2e924b000000b002c9ba9b7281mr3556ljg.0.1701367059321;
-        Thu, 30 Nov 2023 09:57:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFtUd8Ivz1Rur9xp1YhViXZEQxTK1dU3mOJ+EXLEJKCocWO1zpYngColK4vckxwYg8jR8U1CQ==
-X-Received: by 2002:a2e:924b:0:b0:2c9:ba9b:7281 with SMTP id v11-20020a2e924b000000b002c9ba9b7281mr3406ljg.0.1701367057298;
-        Thu, 30 Nov 2023 09:57:37 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701371564; x=1701976364;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :references:cc:to:from:content-language:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=FnaIgPv4I8jNEtbAbtepXEookW4mdG5YQTpZSadpwPk=;
+        b=DtwWbboT1Z4hF9dT7POvTfBGDcsAKPeNJTlphQNCloId+vLkuwQn8kpfMS5jD4gz/j
+         RLbJUiJAF6AhqDaYm8X2Tjx9p8WkP+tyPQE3gVPkbm3XPX9AbjnrxsZtE4Qxb2YoaAEk
+         grgBXh7A2gVQsk8cvJhFCrtBm+/l+mOhpsMw4QpRW/mq1N0470XQsuQzQvXV5fHxiXw7
+         50u32R6ruP8TRCggXilhu9n6i05klSeOYRCQEQcoq8paRTT1JxHWJXXzBRzHHx9SLrle
+         xQNWLWjDBQdFMMVEFzQTgKqKAjERCboCiAn4vTVbzTQd3C45WcZHeCswfUE8NcuBYEQ4
+         GsZg==
+X-Gm-Message-State: AOJu0Yy4Hrg+FTi2Q0GTMaXyUjQ0Kbgwz6b3KSPtyCqHVcQfnYmqgHKv
+	ngJyQxJbhpEkqOrmhNU1U/X00AFAfy/YFr7PAybbEB/GKjiGaH6J20iCk1fDtLLyy4VbOyMO26b
+	PbreqIdJ1HhqJXhVr2bqk
+X-Received: by 2002:a05:6512:3d9f:b0:50b:d764:8805 with SMTP id k31-20020a0565123d9f00b0050bd7648805mr3157lfv.81.1701371450599;
+        Thu, 30 Nov 2023 11:10:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGnomrPe+pQhw2chq1RLMvv18b9cz74eMnm0bIsWiXbofEono+ZuC6CFe9xXKGqqgo3ICCwQA==
+X-Received: by 2002:a05:600c:5487:b0:402:f55c:faee with SMTP id iv7-20020a05600c548700b00402f55cfaeemr1456wmb.26.1701367776206;
+        Thu, 30 Nov 2023 10:09:36 -0800 (PST)
 Received: from ?IPV6:2003:cb:c71c:3600:33e6:971c:5f64:fab5? (p200300cbc71c360033e6971c5f64fab5.dip0.t-ipconnect.de. [2003:cb:c71c:3600:33e6:971c:5f64:fab5])
-        by smtp.gmail.com with ESMTPSA id a13-20020a05600c348d00b0040b5377cf03sm6411656wmq.1.2023.11.30.09.57.35
+        by smtp.gmail.com with ESMTPSA id h6-20020a05600c350600b0040b43da0bbasm2742105wmq.30.2023.11.30.10.09.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Nov 2023 09:57:36 -0800 (PST)
-Message-ID: <a971db32-4867-4aaf-9da7-20627a867747@redhat.com>
-Date: Thu, 30 Nov 2023 18:57:35 +0100
+        Thu, 30 Nov 2023 10:09:35 -0800 (PST)
+Message-ID: <499000b3-091f-4bff-911f-c2506b056827@redhat.com>
+Date: Thu, 30 Nov 2023 19:09:34 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,6 +72,7 @@ User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v3 03/70] RAMBlock/guest_memfd: Enable
  KVM_GUEST_MEMFD_ALLOW_HUGEPAGE
 Content-Language: en-US
+From: David Hildenbrand <david@redhat.com>
 To: Peter Xu <peterx@redhat.com>
 Cc: Sean Christopherson <seanjc@google.com>, Xiaoyao Li
  <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
@@ -95,7 +96,7 @@ References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
  <45d28654-9565-46df-81b9-6563a4aef78c@redhat.com>
  <ZWixXm-sboNZ-mzG@google.com>
  <d6bfd8be-7e8c-4a95-9e27-31775f8e352e@redhat.com> <ZWjKiDy3UMq3cRkD@x1n>
-From: David Hildenbrand <david@redhat.com>
+ <a971db32-4867-4aaf-9da7-20627a867747@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -141,20 +142,49 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <ZWjKiDy3UMq3cRkD@x1n>
+In-Reply-To: <a971db32-4867-4aaf-9da7-20627a867747@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 30.11.23 18:46, Peter Xu wrote:
-> On Thu, Nov 30, 2023 at 05:54:26PM +0100, David Hildenbrand wrote:
->> But likely we want THP support here. Because for hugetlb, one would actually
->> have to instruct the kernel which size to use, like we do for memfd with
->> hugetlb.
+On 30.11.23 18:57, David Hildenbrand wrote:
+> On 30.11.23 18:46, Peter Xu wrote:
+>> On Thu, Nov 30, 2023 at 05:54:26PM +0100, David Hildenbrand wrote:
+>>> But likely we want THP support here. Because for hugetlb, one would actually
+>>> have to instruct the kernel which size to use, like we do for memfd with
+>>> hugetlb.
+>>
+>> I doubt it, as VM can still leverage larger sizes if possible?
 > 
-> I doubt it, as VM can still leverage larger sizes if possible?
+> What do you doubt? I am talking about the current implementation and
+> expected semantics of KVM_GUEST_MEMFD_ALLOW_HUGEPAGE.
+> 
 
-What do you doubt? I am talking about the current implementation and 
-expected semantics of KVM_GUEST_MEMFD_ALLOW_HUGEPAGE.
+I looked at the kernel implementation, and it simply allocates a 
+PMD-sized folio and puts it into the pagecache. So hugetlb is not involved.
+
+That raises various questions:
+
+1) What are the semantics if we ever allow migrating/compacting such
+    folios. Would we allow split them into smaller pages when required
+    (or compact into larger)? What happens when we would partially zap
+    them (fallocate?)right now? IOW, do they behave like THP, and do we
+    want them to behave like THP?
+
+2) If they behave like THP, wow would we able to compact them into
+    bigger pages? khugepaged only works on VMAs IIRC.
+
+3) How would you allocate gigantic pages if not by the help of hugetlb
+    and reserved pools? At least as of today, runtime allocation of
+    gigantic pages is extremely unreliable and compaction into gigantic
+    pages does not work. So gigantic pages would be something for that
+    far distant future.
+
+4) cont-pte-sizes folios?
+
+Maybe it's all clarified already, in that case I'd appreciate a pointer.
+
+Looking at the current code, it looks like it behaves like shmem thp, 
+just without any way to collapse afterwards (unless I am missing something).
 
 -- 
 Cheers,
