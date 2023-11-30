@@ -1,88 +1,181 @@
-Return-Path: <kvm+bounces-3009-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3010-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9810F7FFAFC
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:16:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D302C7FFB13
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:20:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 423E91F21003
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:16:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A3D02818F1
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7C122061;
-	Thu, 30 Nov 2023 19:16:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F1522075;
+	Thu, 30 Nov 2023 19:20:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NkeVa3Z6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MJglnYnL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8571D48
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:16:30 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5d032ab478fso22839707b3.0
-        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:16:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701371790; x=1701976590; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y5pHXwknceWGmaj8OtPnr1WYaFoTOExKtqzqtLwiZ8o=;
-        b=NkeVa3Z6eAGPfhlVFcEzrrGM8v8z0cy+WPcJLKZra1Nv3GthJ8W7rN0Hk8bP+PTGWO
-         k1NvXlLxQd6Z5BcLCHUnF9pae6Lj5zAT1wQc8fPbwIkAUI+F3HwtckjqAOVhGtbTh1Uz
-         C95QyYZ5zK/hDjaiXx7d2VCkRMDTNFFwYPTNEV6jIPv0P+AG35DM6AZMM6k8y/qlgj+T
-         3L8qdjLpUq8mOtVct+FMjqaejUsVANxxnip2aYxk2ORnay+dykdPK9DRWu1eW3DKbDnj
-         eX3uI+ieQ/6kfN4TQvGuIz/hFTfni1spFSZvnRCC2XoY0qCab6/DyzTkVDh70ZcvnWsj
-         prAA==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A413E10DE
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:20:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701372016;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gI+NHy4QsgVzIpGUJkuvfP+tzzElBrBrYlrvCXuyd6c=;
+	b=MJglnYnLdxtsDoZnQGMtX4z3N/qk6ItBPslVPfv5EshFGYWDJX6krnApWMD0B+jEU8HTk8
+	zdwDCcV92a7xbaDrUpisjq1gtSRWa/BffMoA+CwDqLk15SS8a/wi0tCJDIsmyT70MaZiPF
+	1gDwRs6QFFqWLbOyUPmaQ+FYcKH8E1w=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-19-71lNlJKZN3GWWOc7XQv86Q-1; Thu, 30 Nov 2023 14:20:14 -0500
+X-MC-Unique: 71lNlJKZN3GWWOc7XQv86Q-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7b40d154baeso76663739f.0
+        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:20:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701371790; x=1701976590;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y5pHXwknceWGmaj8OtPnr1WYaFoTOExKtqzqtLwiZ8o=;
-        b=pQ1CWheS9p25dGI8j1XJO3aixAnVMCpw6YVF3+D9T78OmpBwgzTu/hRHhluRIQy+He
-         EAj8XIQzdD/13VA9IleyYeffjD7cIjbDXZsTaiADUIVvPvSH/qi24gZLcyYPb+tiQDmn
-         jiSsRDB00mBEYfgvi77tWX3RdH2FuZCX99y3QwbKbU6irueT5NAd89njscAJPp4DabCI
-         /L5hLBeDOUllowwfFcA2Pcu0nNwUAi2e8Q1MkmPJx523vwaGw8I2b9u8Rcak6dREVgX4
-         iML0Exg4yDCem2Fqr8ffV/cfIu98fIRQENCw0QnDy6vH++fSKG9LAxT8ghG98e/q+KWz
-         MuMg==
-X-Gm-Message-State: AOJu0YwjmcmapseXEuMGr98FXhSXZdTlE5sluPBcMh1JdTipJbu0Gr5v
-	0lHA/BbT+Gu9ipoQldNqzBS9lfOlaOQ=
-X-Google-Smtp-Source: AGHT+IGVQZH2hOZFevHTov9IVKBE8YAxCPoqEmlg+QCfshG7BGBWF+3pFeFyRhsJII6JOxcwz7vPkyXZa3U=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:2e87:b0:5cc:3d0c:2b60 with SMTP id
- eu7-20020a05690c2e8700b005cc3d0c2b60mr620993ywb.4.1701371789943; Thu, 30 Nov
- 2023 11:16:29 -0800 (PST)
-Date: Thu, 30 Nov 2023 19:16:28 +0000
-In-Reply-To: <20231130182832.54603-2-ajones@ventanamicro.com>
+        d=1e100.net; s=20230601; t=1701372013; x=1701976813;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gI+NHy4QsgVzIpGUJkuvfP+tzzElBrBrYlrvCXuyd6c=;
+        b=lrUhyvyrfGB+er2apha7wJg7TxYbNo1fJxDiIdsHDe5ftCnlbxUycMEzI9+HWCAHg5
+         Aw6sRpe4gK77MwKVPruvdvSe+GOCeFAaAiO9qdvhmfp0kvHSI6hd9Uc5zbwr0ujXLxLK
+         t1IBJ68mFOaubTCroHMSojLL30DBEUFp6bF/Q4qq6QBsKgq5VYbdj1Uq5QIO2Jgz0zSc
+         u1VOT4tuyn5aPpbROrPpiIqaE4rU7hz0CReAtUj5EpaaGBCpkPGWCpsBmOvmnYkhFd6R
+         8bH3iHqxes6JGerSPmykwAPpeEyec+B64SlJHZ3kVR32BnSmAMZ0bQrumSKMEnuIjZzA
+         7yCg==
+X-Gm-Message-State: AOJu0YzHqDZ8lKh35jRYarW6CMBgLdgWOuuf87UcqAuP5p3CV/a9MtKP
+	+D6Swb9IJ0CAbki9jfOzUTH8d4T/nKpsdQRCvkdX1TOvOqvxuJ4BESAwOQl9C4kPaXQw+jtSR3S
+	w5EA9XYrnVKB2kcrQqpFi
+X-Received: by 2002:a5e:8613:0:b0:791:16ba:d764 with SMTP id z19-20020a5e8613000000b0079116bad764mr25053622ioj.16.1701372012878;
+        Thu, 30 Nov 2023 11:20:12 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFWZAGlxOOtEZV4cyIfR8XEUIGJn/VBf5TbyQKFfZMrEfeBiouv9jSp1k1yGD0s6K3Fb1D2/A==
+X-Received: by 2002:a5e:8613:0:b0:791:16ba:d764 with SMTP id z19-20020a5e8613000000b0079116bad764mr25053595ioj.16.1701372012621;
+        Thu, 30 Nov 2023 11:20:12 -0800 (PST)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id cc14-20020a056602424e00b007b35739a580sm509939iob.27.2023.11.30.11.20.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Nov 2023 11:20:12 -0800 (PST)
+Date: Thu, 30 Nov 2023 12:20:10 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yishai Hadas <yishaih@nvidia.com>
+Cc: <mst@redhat.com>, <jasowang@redhat.com>, <jgg@nvidia.com>,
+ <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+ <parav@nvidia.com>, <feliu@nvidia.com>, <jiri@nvidia.com>,
+ <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
+ <si-wei.liu@oracle.com>, <leonro@nvidia.com>, <maorg@nvidia.com>
+Subject: Re: [PATCH V4 vfio 8/9] vfio/pci: Expose
+ vfio_pci_iowrite/read##size()
+Message-ID: <20231130122010.3563bdee.alex.williamson@redhat.com>
+In-Reply-To: <20231129143746.6153-9-yishaih@nvidia.com>
+References: <20231129143746.6153-1-yishaih@nvidia.com>
+	<20231129143746.6153-9-yishaih@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231130182832.54603-2-ajones@ventanamicro.com>
-Message-ID: <ZWjfjAnZcomGa1Ey@google.com>
-Subject: Re: [PATCH] KVM: selftests: Drop newline from __TEST_REQUIRE
-From: Sean Christopherson <seanjc@google.com>
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
-	maz@kernel.org, oliver.upton@linux.dev
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 30, 2023, Andrew Jones wrote:
-> A few __TEST_REQUIRE callers are appending their own newline, resulting
-> in an extra one being output. Rather than remove the newlines from
-> those callers, remove it from __TEST_REQUIRE and add newlines to all
-> the other callers, as __TEST_REQUIRE was the only output function
-> appending newlines and consistency is a good thing.
+On Wed, 29 Nov 2023 16:37:45 +0200
+Yishai Hadas <yishaih@nvidia.com> wrote:
+
+> Expose vfio_pci_iowrite/read##size() to let it be used by drivers.
 > 
-> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+> This functionality is needed to enable direct access to some physical
+> BAR of the device with the proper locks/checks in place.
+> 
+> The next patches from this series will use this functionality on a data
+> path flow when a direct access to the BAR is needed.
+> 
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
 > ---
-> 
-> Applies to kvm-x86/selftests (I chose that branch to ensure I got the
-> MAGIC_TOKEN change)
+>  drivers/vfio/pci/vfio_pci_rdwr.c | 10 ++++++----
+>  include/linux/vfio_pci_core.h    | 19 +++++++++++++++++++
+>  2 files changed, 25 insertions(+), 4 deletions(-)
 
-Heh, and then I went and created a conflict anyways :-)
+I don't follow the inconsistency between this and the previous patch.
+Why did we move and rename the code to setup the barmap but we export
+the ioread/write functions in place?  Thanks,
 
-https://lore.kernel.org/all/20231129224042.530798-1-seanjc@google.com
+Alex
 
-If there are no objections, I'll grab this in kvm-x86/selftests and sort out the
-MAGIC_TOKEN conflict.
+
+> diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+> index 6f08b3ecbb89..817ec9a89123 100644
+> --- a/drivers/vfio/pci/vfio_pci_rdwr.c
+> +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+> @@ -38,7 +38,7 @@
+>  #define vfio_iowrite8	iowrite8
+>  
+>  #define VFIO_IOWRITE(size) \
+> -static int vfio_pci_iowrite##size(struct vfio_pci_core_device *vdev,		\
+> +int vfio_pci_iowrite##size(struct vfio_pci_core_device *vdev,		\
+>  			bool test_mem, u##size val, void __iomem *io)	\
+>  {									\
+>  	if (test_mem) {							\
+> @@ -55,7 +55,8 @@ static int vfio_pci_iowrite##size(struct vfio_pci_core_device *vdev,		\
+>  		up_read(&vdev->memory_lock);				\
+>  									\
+>  	return 0;							\
+> -}
+> +}									\
+> +EXPORT_SYMBOL_GPL(vfio_pci_iowrite##size);
+>  
+>  VFIO_IOWRITE(8)
+>  VFIO_IOWRITE(16)
+> @@ -65,7 +66,7 @@ VFIO_IOWRITE(64)
+>  #endif
+>  
+>  #define VFIO_IOREAD(size) \
+> -static int vfio_pci_ioread##size(struct vfio_pci_core_device *vdev,		\
+> +int vfio_pci_ioread##size(struct vfio_pci_core_device *vdev,		\
+>  			bool test_mem, u##size *val, void __iomem *io)	\
+>  {									\
+>  	if (test_mem) {							\
+> @@ -82,7 +83,8 @@ static int vfio_pci_ioread##size(struct vfio_pci_core_device *vdev,		\
+>  		up_read(&vdev->memory_lock);				\
+>  									\
+>  	return 0;							\
+> -}
+> +}									\
+> +EXPORT_SYMBOL_GPL(vfio_pci_ioread##size);
+>  
+>  VFIO_IOREAD(8)
+>  VFIO_IOREAD(16)
+> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+> index 67ac58e20e1d..22c915317788 100644
+> --- a/include/linux/vfio_pci_core.h
+> +++ b/include/linux/vfio_pci_core.h
+> @@ -131,4 +131,23 @@ int vfio_pci_core_setup_barmap(struct vfio_pci_core_device *vdev, int bar);
+>  pci_ers_result_t vfio_pci_core_aer_err_detected(struct pci_dev *pdev,
+>  						pci_channel_state_t state);
+>  
+> +#define VFIO_IOWRITE_DECLATION(size) \
+> +int vfio_pci_iowrite##size(struct vfio_pci_core_device *vdev,		\
+> +			bool test_mem, u##size val, void __iomem *io);
+> +
+> +VFIO_IOWRITE_DECLATION(8)
+> +VFIO_IOWRITE_DECLATION(16)
+> +VFIO_IOWRITE_DECLATION(32)
+> +#ifdef iowrite64
+> +VFIO_IOWRITE_DECLATION(64)
+> +#endif
+> +
+> +#define VFIO_IOREAD_DECLATION(size) \
+> +int vfio_pci_ioread##size(struct vfio_pci_core_device *vdev,		\
+> +			bool test_mem, u##size *val, void __iomem *io);
+> +
+> +VFIO_IOREAD_DECLATION(8)
+> +VFIO_IOREAD_DECLATION(16)
+> +VFIO_IOREAD_DECLATION(32)
+> +
+>  #endif /* VFIO_PCI_CORE_H */
+
 
