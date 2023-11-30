@@ -1,173 +1,146 @@
-Return-Path: <kvm+bounces-3004-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3006-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B12D97FFA03
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:50:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA9BA7FFAE3
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:11:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CBD928194F
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 18:50:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB6981C211D0
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:11:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130705A10A;
-	Thu, 30 Nov 2023 18:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8955FF16;
+	Thu, 30 Nov 2023 19:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CgICeYiZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WjHKIPkI"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C1DE10D1
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 10:50:28 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBDD810F1
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:11:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701370227;
+	s=mimecast20190719; t=1701371465;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lCwsLtFmW+kFN1Kj1fiGWPZkFIiqQ/RxZjKKxOIAVpA=;
-	b=CgICeYiZNyKcN+kLJK0Cu5hfi22vvNqhYnEPRNF9KWLC03Q/ViH99ufQQgRdvmDHbKZAwJ
-	c9xbgEmmGsKhLCOaHdijY2atBxMaJtZ8NBLic92oiUxaJy3FcfTKiBUIS9kbOKIxxpBgFY
-	lRD6EBkOc6nAWons0kxkz/0pqY+yyKs=
-Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com
- [209.85.160.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=EkCMhFpiP/sdJl9nslDpr6bpl6B4gQB+ldegoyD9sYM=;
+	b=WjHKIPkItRT5SF2RkACAkXeQgPi4ZqgagY18eYHIIElArWH3vvMZf0OqID5AiGU8yrKmoi
+	JjfXrZMqNxUUt3SQVF158OXJqucOSCBgM2Zp/1M5Gkh+0n1DXNyM2618QmCtAnyFPwYLb0
+	tYB2JcCuSTJzDkNoMRYB9/7BLuorHtQ=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-674-SsK48QXROR65DF1-8xXJAg-1; Thu, 30 Nov 2023 13:50:26 -0500
-X-MC-Unique: SsK48QXROR65DF1-8xXJAg-1
-Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-1fa182dc04aso1807741fac.1
-        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 10:50:25 -0800 (PST)
+ us-mta-542-cWeYNq3lMPqBUO9_bRGKhg-1; Thu, 30 Nov 2023 14:11:04 -0500
+X-MC-Unique: cWeYNq3lMPqBUO9_bRGKhg-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2c9cc4f6972so9172011fa.1
+        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:11:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701370224; x=1701975024;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lCwsLtFmW+kFN1Kj1fiGWPZkFIiqQ/RxZjKKxOIAVpA=;
-        b=hbTOsVNl4flXJc6GF9wehb0ANTBYZEQNth49Qg8a1aPuatlB+umGxZ19OdtH/C1aSM
-         NQ3F2nGQyMDXCmerPQeQKyv0M89PqlokAhn/SfZ26UUKaBtUzZ/vonWkU1HzGuNJtdLs
-         XwU97y6QjVND7noj++FR6lYrJP9mQCA7EItUDB6vZMpOWpyfdKFokf3EXRuZ4IiPRZfh
-         aheUpUxbrAIMSr6LIfnewmn+fx8dX2kdFfzhiu1UF9JQ4VzOWbpQFlu6yy5AT1p6cqNN
-         vfKG5DOCIG+u3Hz0s/9HE0EU9xZnFcdQcpc7e0FLqDlAmJgr4bmwxWWFXEaA0PNFlVbz
-         9KMg==
-X-Gm-Message-State: AOJu0YwWaMsVcD/pP221Zoyrfi58leB87mWc0KZ4u2MV+rzghnReKceG
-	zqOZIPkMKYYewMs2gNn/qWhpf+sZgpfks3cxcLNJl8B350lVvFzdPOIsEJz0/lj4FZzBK+OgT89
-	aMWPucbBCpebOSb5O24uo
-X-Received: by 2002:a05:6870:b49e:b0:1fa:1774:e6df with SMTP id y30-20020a056870b49e00b001fa1774e6dfmr23618822oap.44.1701370224663;
-        Thu, 30 Nov 2023 10:50:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG87HrOlypi7PlWvhmEmXj75rwcMMhyA4/AZHcMvyD77iGxKcXs3Mv+FkuQEVXfPdbnMWCH5Q==
-X-Received: by 2002:a05:6870:b49e:b0:1fa:1774:e6df with SMTP id y30-20020a056870b49e00b001fa1774e6dfmr23618810oap.44.1701370224457;
-        Thu, 30 Nov 2023 10:50:24 -0800 (PST)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id sf11-20020a056871230b00b001fa592385b9sm385063oab.40.2023.11.30.10.50.23
+        d=1e100.net; s=20230601; t=1701371461; x=1701976261;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EkCMhFpiP/sdJl9nslDpr6bpl6B4gQB+ldegoyD9sYM=;
+        b=QkkFNr578vblxNkxgq4WZX8EDAkFErUApQw56vKFvdvxlCHJcNuf0PvBO0ZuLmqJ9c
+         8IS6cXZORYtyT4E9yXLB6xM2IBuGjefrZTLfhh4B5Ffq3IwkGHL71iQSQgVd1QczDMpg
+         82dZQBxRvR+yHhUDUNefwDsFlZyujWzN/K8l/npjoTqPOPk75zbZlxyZb1Cpud3zIqj9
+         e+1YSdYgkhyZYYhWdV5OV8dOT2yeoAUtU3k46tqdorsojMN6RZur4/qliknYGrYzVS9i
+         UV+UGTSrQ39S4AeDWi0yZBmpXpWpjry2/cJ0DGc8fHIetq9xf1iNrWmkSo7v7FNCQuUd
+         jEBg==
+X-Gm-Message-State: AOJu0YwqkiSd746EIjqoNwo9OJucYT2hYEcIEa1aRWJ70/uLOrguB43o
+	jcioolIHb1kAvZet20V9uaNDrZg/3sjS+9qkOCgzE0Xsky+7y8Qfqpq030nN2jxgX/5TUFY8PX8
+	TohRVHBYa79YnEHP9YuO9
+X-Received: by 2002:a2e:2e05:0:b0:2c9:d5bc:d1e6 with SMTP id u5-20020a2e2e05000000b002c9d5bcd1e6mr2360lju.44.1701371460402;
+        Thu, 30 Nov 2023 11:11:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFza7U9/12615LfgTxmIGc5pXDaVHNaln+IrotDbqNHf6KkGfPK0Mfevm8RZ3Mrmt9N20hCeA==
+X-Received: by 2002:ac2:5397:0:b0:50a:40b6:2d37 with SMTP id g23-20020ac25397000000b0050a40b62d37mr2940lfh.40.1701365203737;
+        Thu, 30 Nov 2023 09:26:43 -0800 (PST)
+Received: from starship ([5.28.147.32])
+        by smtp.gmail.com with ESMTPSA id v10-20020a19740a000000b00507977e9a38sm209487lfe.35.2023.11.30.09.26.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 10:50:23 -0800 (PST)
-Date: Thu, 30 Nov 2023 11:50:22 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Nick Desaulniers
- <ndesaulniers@google.com>, Jason Gunthorpe <jgg@nvidia.com>, Michael
- Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH] vfio: Drop vfio_file_iommu_group() stub to fudge around
- a KVM wart
-Message-ID: <20231130115022.010ec041.alex.williamson@redhat.com>
-In-Reply-To: <20231130001000.543240-1-seanjc@google.com>
-References: <20231130001000.543240-1-seanjc@google.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+        Thu, 30 Nov 2023 09:26:43 -0800 (PST)
+Message-ID: <c22d17ab04bf5f27409518e3e79477d579b55071.camel@redhat.com>
+Subject: Re: [PATCH v7 02/26] x86/fpu/xstate: Refine CET user xstate bit
+ enabling
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Yang Weijiang <weijiang.yang@intel.com>, seanjc@google.com, 
+	pbonzini@redhat.com, dave.hansen@intel.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Cc: peterz@infradead.org, chao.gao@intel.com, rick.p.edgecombe@intel.com, 
+	john.allen@amd.com
+Date: Thu, 30 Nov 2023 19:26:40 +0200
+In-Reply-To: <20231124055330.138870-3-weijiang.yang@intel.com>
+References: <20231124055330.138870-1-weijiang.yang@intel.com>
+	 <20231124055330.138870-3-weijiang.yang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 29 Nov 2023 16:10:00 -0800
-Sean Christopherson <seanjc@google.com> wrote:
-
-> Drop the vfio_file_iommu_group() stub and instead unconditionally declare
-> the function to fudge around a KVM wart where KVM tries to do symbol_get()
-> on vfio_file_iommu_group() (and other VFIO symbols) even if CONFIG_VFIO=n.
+On Fri, 2023-11-24 at 00:53 -0500, Yang Weijiang wrote:
+> Remove XFEATURE_CET_USER entry from dependency array as the entry doesn't
+> reflect true dependency between CET features and the user xstate bit.
+> Enable the bit in fpu_kernel_cfg.max_features when either SHSTK or IBT is
+> available.
 > 
-> Ensuring the symbol is always declared fixes a PPC build error when
-> modules are also disabled, in which case symbol_get() simply points at the
-> address of the symbol (with some attributes shenanigans).  Because KVM
-> does symbol_get() instead of directly depending on VFIO, the lack of a
-> fully defined symbol is not problematic (ugly, but "fine").
+> Both user mode shadow stack and indirect branch tracking features depend
+> on XFEATURE_CET_USER bit in XSS to automatically save/restore user mode
+> xstate registers, i.e., IA32_U_CET and IA32_PL3_SSP whenever necessary.
 > 
->    arch/powerpc/kvm/../../../virt/kvm/vfio.c:89:7:
->    error: attribute declaration must precede definition [-Werror,-Wignored-attributes]
->            fn = symbol_get(vfio_file_iommu_group);
->                 ^
->    include/linux/module.h:805:60: note: expanded from macro 'symbol_get'
->    #define symbol_get(x) ({ extern typeof(x) x __attribute__((weak,visibility("hidden"))); &(x); })
->                                                               ^
->    include/linux/vfio.h:294:35: note: previous definition is here
->    static inline struct iommu_group *vfio_file_iommu_group(struct file *file)
->                                      ^
->    arch/powerpc/kvm/../../../virt/kvm/vfio.c:89:7:
->    error: attribute declaration must precede definition [-Werror,-Wignored-attributes]
->            fn = symbol_get(vfio_file_iommu_group);
->                 ^
->    include/linux/module.h:805:65: note: expanded from macro 'symbol_get'
->    #define symbol_get(x) ({ extern typeof(x) x __attribute__((weak,visibility("hidden"))); &(x); })
->                                                                    ^
->    include/linux/vfio.h:294:35: note: previous definition is here
->    static inline struct iommu_group *vfio_file_iommu_group(struct file *file)
->                                      ^
->    2 errors generated.
+> Note, the issue, i.e., CPUID only enumerates IBT but no SHSTK is resulted
+> from CET KVM series which synthesizes guest CPUIDs based on userspace
+> settings,in real world the case is rare. In other words, the exitings
+> dependency check is correct when only user mode SHSTK is available.
 > 
-> Although KVM is firmly in the wrong (there is zero reason for KVM to build
-> virt/kvm/vfio.c when VFIO is disabled), fudge around the error in VFIO as
-> the stub is unnecessary and doesn't serve its intended purpose (KVM is the
-> only external user of vfio_file_iommu_group()), and there is an in-flight
-> series to clean up the entire KVM<->VFIO interaction, i.e. fixing this in
-> KVM would result in more churn in the long run, and the stub needs to go
-> away regardless.
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202308251949.5IiaV0sz-lkp@intel.com
-> Closes: https://lore.kernel.org/oe-kbuild-all/202309030741.82aLACDG-lkp@intel.com
-> Closes: https://lore.kernel.org/oe-kbuild-all/202309110914.QLH0LU6L-lkp@intel.com
-> Link: https://lore.kernel.org/all/0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com
-> Link: https://lore.kernel.org/all/20230916003118.2540661-1-seanjc@google.com
-> Cc: Nick Desaulniers <ndesaulniers@google.com>
-> Cc: Jason Gunthorpe <jgg@nvidia.com>
-> Tested-by: Michael Ellerman <mpe@ellerman.id.au>
-> Fixes: c1cce6d079b8 ("vfio: Compile vfio_group infrastructure optionally")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 > ---
->  include/linux/vfio.h | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
+>  arch/x86/kernel/fpu/xstate.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
 > 
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index 454e9295970c..a65b2513f8cd 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -289,16 +289,12 @@ void vfio_combine_iova_ranges(struct rb_root_cached *root, u32 cur_nodes,
->  /*
->   * External user API
->   */
-> -#if IS_ENABLED(CONFIG_VFIO_GROUP)
->  struct iommu_group *vfio_file_iommu_group(struct file *file);
+> diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+> index 73f6bc00d178..6e50a4251e2b 100644
+> --- a/arch/x86/kernel/fpu/xstate.c
+> +++ b/arch/x86/kernel/fpu/xstate.c
+> @@ -73,7 +73,6 @@ static unsigned short xsave_cpuid_features[] __initdata = {
+>  	[XFEATURE_PT_UNIMPLEMENTED_SO_FAR]	= X86_FEATURE_INTEL_PT,
+>  	[XFEATURE_PKRU]				= X86_FEATURE_OSPKE,
+>  	[XFEATURE_PASID]			= X86_FEATURE_ENQCMD,
+> -	[XFEATURE_CET_USER]			= X86_FEATURE_SHSTK,
+>  	[XFEATURE_XTILE_CFG]			= X86_FEATURE_AMX_TILE,
+>  	[XFEATURE_XTILE_DATA]			= X86_FEATURE_AMX_TILE,
+>  };
+> @@ -798,6 +797,14 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
+>  			fpu_kernel_cfg.max_features &= ~BIT_ULL(i);
+>  	}
+>  
+> +	/*
+> +	 * CET user mode xstate bit has been cleared by above sanity check.
+> +	 * Now pick it up if either SHSTK or IBT is available. Either feature
+> +	 * depends on the xstate bit to save/restore user mode states.
+> +	 */
+> +	if (boot_cpu_has(X86_FEATURE_SHSTK) || boot_cpu_has(X86_FEATURE_IBT))
+> +		fpu_kernel_cfg.max_features |= BIT_ULL(XFEATURE_CET_USER);
 > +
-> +#if IS_ENABLED(CONFIG_VFIO_GROUP)
->  bool vfio_file_is_group(struct file *file);
->  bool vfio_file_has_dev(struct file *file, struct vfio_device *device);
->  #else
-> -static inline struct iommu_group *vfio_file_iommu_group(struct file *file)
-> -{
-> -	return NULL;
-> -}
-> -
->  static inline bool vfio_file_is_group(struct file *file)
->  {
->  	return false;
-> 
-> base-commit: ae2667cd8a479bb5abd6e24c12fcc9ef5bc06d75
+>  	if (!cpu_feature_enabled(X86_FEATURE_XFD))
+>  		fpu_kernel_cfg.max_features &= ~XFEATURE_MASK_USER_DYNAMIC;
+>  
 
-I think we've squashed all the outstanding concerns in the other
-thread, so I've pushed this to my for-linux branch for v6.7.  Speak up
-if I'm missing any unresolved issues.  Thanks!
+I am curious:
 
-Alex
+Any reason why my review feedback was not applied even though you did agree
+that it is reasonable?
+
+
+https://lore.kernel.org/lkml/c72dfaac-1622-94cf-a81d-9d7ed81b2f55@intel.com/
+
+Best regards,
+	Maxim Levitsky
 
 
