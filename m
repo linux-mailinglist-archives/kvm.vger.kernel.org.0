@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-3005-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3011-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B49317FFAC7
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:06:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E4CB7FFB1C
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:21:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6848E28198A
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:06:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 038521F20FF2
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:21:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4874A5FF07;
-	Thu, 30 Nov 2023 19:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C2922075;
+	Thu, 30 Nov 2023 19:21:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WdDldz1D"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GD6R9ETk"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFB11D48
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:06:12 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C15F10E5
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:21:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701371172;
+	s=mimecast20190719; t=1701372072;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qh2iQI1ztXeis76Y0kVKsrBeV19ZxrXIlDJBIndDl5E=;
-	b=WdDldz1DxpdyycgDEdyFadjyCgAQK9VA7Htv7wc/EwPU123SiFDdDALUB5XOlPh8v3kbnx
-	4k5H2GPuwgor/Kldx8PdItzC9sz47YIrjyY79rlGO6OAFpKTQrdqyXaEQwtahnNNdzUkEj
-	JuCN9ORm4PXAzQVWmet/9KD8Fna+Uk4=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=k1xrIynOc3yDB69n1RULdeleHvHvjuBPS0rAizzwpeI=;
+	b=GD6R9ETk6X+ZHS7UwwzYQWX/g2uAkJPhC+xVPyodBxvs8Vb+9xCvu6M3tocz7SNj9WF2ui
+	F3DgnWvcLc88n8cs78sJZkAZ5m8KeyA9DKm4bNGln7R1Jo81uzQzzz22HvORJpeuhqBRi0
+	nyQbnKzwIF79NpS20n7ALbee7cNyRL0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-683-WjfLGCUQOwmC6eZIqRoYrw-1; Thu, 30 Nov 2023 14:06:10 -0500
-X-MC-Unique: WjfLGCUQOwmC6eZIqRoYrw-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-50bbec0e9d9so1455069e87.2
-        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:06:10 -0800 (PST)
+ us-mta-232-85WwAwwBN_uxi3EOIvKh4w-1; Thu, 30 Nov 2023 14:21:11 -0500
+X-MC-Unique: 85WwAwwBN_uxi3EOIvKh4w-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33174d082b7so1026481f8f.0
+        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:21:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701371168; x=1701975968;
+        d=1e100.net; s=20230601; t=1701372069; x=1701976869;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=qh2iQI1ztXeis76Y0kVKsrBeV19ZxrXIlDJBIndDl5E=;
-        b=MZdXByOxH4tGfwZv6PRyv2NFX5w9GHg8Rk8ZCVUH43QIR2b3MotedEaQqWOTCCNLyM
-         OjYXNz6X/QBg7GlLaqKAJJ7lVu3V9ZYtuAvhMxe6wDR0sCcvkfnOwTYZBnoDXfmmKbL9
-         +l7rnDFypThZ/P9cYVYcHoXM9pBn9zEIj/s4YjwJ76xipvcCIuCrN99g5reEJv7uA3XZ
-         FBqr+zb5Zurwvl3IbzZUGaenBmpD4vmvghTZ3x8UzMNBYHUqHqp7b9CwB7NyUNFB5AGY
-         mppqfOcT+tdYuGpOI66Kyoiu5sYeqLb69x0Im4+8i9wUtfX9DKfgv8/qX3gGhTiTJ8Ub
-         sciA==
-X-Gm-Message-State: AOJu0YwwazjWPq+Xlxcip5NWAKxKWZWm6kFzBUDYZaNYlwLp1S0fiPwP
-	5sEDBxSZY0CWpU8Yoehm1MzY8EpVy2HK1/GkkcujCGJvLxyBEvSoHiQSwco9VSZaGg8O4PiETla
-	I2XeyldeHZYgzycu9nJlQ
-X-Received: by 2002:ac2:5495:0:b0:50b:c9e7:2942 with SMTP id t21-20020ac25495000000b0050bc9e72942mr15084lfk.14.1701366558570;
-        Thu, 30 Nov 2023 09:49:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH+6s4MYOhaFS5PKsAqpJ5K2jaDd7gb7TvhnIPf5H9XMi3/xfKGrICSbsosQ1R5HQsWb0dRIg==
-X-Received: by 2002:a2e:9cd1:0:b0:2c9:caf3:e748 with SMTP id g17-20020a2e9cd1000000b002c9caf3e748mr51910ljj.5.1701365884905;
-        Thu, 30 Nov 2023 09:38:04 -0800 (PST)
+        bh=k1xrIynOc3yDB69n1RULdeleHvHvjuBPS0rAizzwpeI=;
+        b=Yhy/873kgLNZtQC8ykYl490Gph9UnRW8D5NG3s18mR5+R3uLIvLIo/VA+INjIQI44J
+         WtvD8rAcdWush12SCsble2+883KMnnqG3Bj9sR9LhqE5iho4MAlnABYM3oJBdH8d9GqA
+         fniczvw0AgZITCcYoeID5dxyi+PkiKKw9x/Jes7wEtIbcF1kizc9aaAsawPf1Hb7bW0t
+         W8bmv2aUpsyScOi4fryWGUEeHvmrAgObe6qYhoFdwjN37FYF+8ZHoYKK2974I6EV5A1F
+         RMSrRlECI9HNkHXgHxESNvVwjePSalvj6gWrowFt7vVPqFL1ctujIAvINJ9phFjrmON9
+         +axg==
+X-Gm-Message-State: AOJu0YwgiiXPTnTlX5itClR27enCvo7+FcaWdL2nBZIw9/e4zl79bUcf
+	l96fshH9EY7jjgG0rHeOhkpQKzaevjoLUD5UXqZThBjOqkiltlykS4Rvlv8sTqqZ/x90IquHttd
+	BRZEg/vaq9G1lx5zqiB4t
+X-Received: by 2002:a50:c102:0:b0:54a:f8e9:a9a8 with SMTP id l2-20020a50c102000000b0054af8e9a9a8mr2150edf.20.1701368821161;
+        Thu, 30 Nov 2023 10:27:01 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHnZwxybDBa9d+1jyY55F9oLhZyquCMf4W1j/ajoNAp6Waooi/h9c1ywSFaPfo9Hba4Ac3Jdg==
+X-Received: by 2002:a19:4f06:0:b0:509:4ab3:a8a3 with SMTP id d6-20020a194f06000000b005094ab3a8a3mr48861lfb.22.1701366035828;
+        Thu, 30 Nov 2023 09:40:35 -0800 (PST)
 Received: from starship ([5.28.147.32])
-        by smtp.gmail.com with ESMTPSA id s30-20020a05651c201e00b002c887ca5a70sm197252ljo.51.2023.11.30.09.38.03
+        by smtp.gmail.com with ESMTPSA id o12-20020ac24e8c000000b0050bbf6b1f74sm213812lfr.232.2023.11.30.09.40.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 09:38:04 -0800 (PST)
-Message-ID: <ef8b40540c6cf1ed506928ec842e5602169ecdb6.camel@redhat.com>
-Subject: Re: [PATCH v7 15/26] KVM: x86: Load guest FPU state when access
- XSAVE-managed MSRs
+        Thu, 30 Nov 2023 09:40:29 -0800 (PST)
+Message-ID: <8ff392a0c2ddbd622fd86b1c6eaab38eefeb05c3.camel@redhat.com>
+Subject: Re: [PATCH v7 19/26] KVM: x86: Use KVM-governed feature framework
+ to track "SHSTK/IBT enabled"
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Yang Weijiang <weijiang.yang@intel.com>, seanjc@google.com, 
 	pbonzini@redhat.com, dave.hansen@intel.com, kvm@vger.kernel.org, 
 	linux-kernel@vger.kernel.org
 Cc: peterz@infradead.org, chao.gao@intel.com, rick.p.edgecombe@intel.com, 
 	john.allen@amd.com
-Date: Thu, 30 Nov 2023 19:38:02 +0200
-In-Reply-To: <20231124055330.138870-16-weijiang.yang@intel.com>
+Date: Thu, 30 Nov 2023 19:40:26 +0200
+In-Reply-To: <20231124055330.138870-20-weijiang.yang@intel.com>
 References: <20231124055330.138870-1-weijiang.yang@intel.com>
-	 <20231124055330.138870-16-weijiang.yang@intel.com>
+	 <20231124055330.138870-20-weijiang.yang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -83,142 +83,51 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
 On Fri, 2023-11-24 at 00:53 -0500, Yang Weijiang wrote:
-> From: Sean Christopherson <seanjc@google.com>
+> Use the governed feature framework to track whether X86_FEATURE_SHSTK
+> and X86_FEATURE_IBT features can be used by userspace and guest, i.e.,
+> the features can be used iff both KVM and guest CPUID can support them.
 > 
-> Load the guest's FPU state if userspace is accessing MSRs whose values
-> are managed by XSAVES. Introduce two helpers, kvm_{get,set}_xstate_msr(),
-> to facilitate access to such kind of MSRs.
+> TODO: remove this patch once Sean's refactor to "KVM-governed" framework
+> is upstreamed. See the work here [*].
 > 
-> If MSRs supported in kvm_caps.supported_xss are passed through to guest,
-> the guest MSRs are swapped with host's before vCPU exits to userspace and
-> after it reenters kernel before next VM-entry.
+> [*]: https://lore.kernel.org/all/20231110235528.1561679-1-seanjc@google.com/
 > 
-> Because the modified code is also used for the KVM_GET_MSRS device ioctl(),
-> explicitly check @vcpu is non-null before attempting to load guest state.
-> The XSAVE-managed MSRs cannot be retrieved via the device ioctl() without
-> loading guest FPU state (which doesn't exist).
-> 
-> Note that guest_cpuid_has() is not queried as host userspace is allowed to
-> access MSRs that have not been exposed to the guest, e.g. it might do
-> KVM_SET_MSRS prior to KVM_SET_CPUID2.
-> 
-> The two helpers are put here in order to manifest accessing xsave-managed MSRs
-> requires special check and handling to guarantee the correctness of read/write
-> to the MSRs.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Co-developed-by: Yang Weijiang <weijiang.yang@intel.com>
 > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 > ---
->  arch/x86/kvm/x86.c | 35 ++++++++++++++++++++++++++++++++++-
->  arch/x86/kvm/x86.h | 24 ++++++++++++++++++++++++
->  2 files changed, 58 insertions(+), 1 deletion(-)
+>  arch/x86/kvm/governed_features.h | 2 ++
+>  arch/x86/kvm/vmx/vmx.c           | 2 ++
+>  2 files changed, 4 insertions(+)
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 607082aca80d..fd48b825510c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -133,6 +133,9 @@ static int __set_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2);
->  static void __get_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2);
+> diff --git a/arch/x86/kvm/governed_features.h b/arch/x86/kvm/governed_features.h
+> index 423a73395c10..db7e21c5ecc2 100644
+> --- a/arch/x86/kvm/governed_features.h
+> +++ b/arch/x86/kvm/governed_features.h
+> @@ -16,6 +16,8 @@ KVM_GOVERNED_X86_FEATURE(PAUSEFILTER)
+>  KVM_GOVERNED_X86_FEATURE(PFTHRESHOLD)
+>  KVM_GOVERNED_X86_FEATURE(VGIF)
+>  KVM_GOVERNED_X86_FEATURE(VNMI)
+> +KVM_GOVERNED_X86_FEATURE(SHSTK)
+> +KVM_GOVERNED_X86_FEATURE(IBT)
 >  
->  static DEFINE_MUTEX(vendor_module_lock);
-> +static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu);
-> +static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu);
-> +
->  struct kvm_x86_ops kvm_x86_ops __read_mostly;
+>  #undef KVM_GOVERNED_X86_FEATURE
+>  #undef KVM_GOVERNED_FEATURE
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index d3d0d74fef70..f6ad5ba5d518 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7762,6 +7762,8 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>  		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_XSAVES);
 >  
->  #define KVM_X86_OP(func)					     \
-> @@ -4482,6 +4485,21 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  }
->  EXPORT_SYMBOL_GPL(kvm_get_msr_common);
+>  	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_VMX);
+> +	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_SHSTK);
+> +	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_IBT);
 >  
-> +/*
-> + *  Returns true if the MSR in question is managed via XSTATE, i.e. is context
-> + *  switched with the rest of guest FPU state.
-> + */
-> +static bool is_xstate_managed_msr(u32 index)
-> +{
-> +	switch (index) {
-> +	case MSR_IA32_U_CET:
-> +	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
->  /*
->   * Read or write a bunch of msrs. All parameters are kernel addresses.
->   *
-> @@ -4492,11 +4510,26 @@ static int __msr_io(struct kvm_vcpu *vcpu, struct kvm_msrs *msrs,
->  		    int (*do_msr)(struct kvm_vcpu *vcpu,
->  				  unsigned index, u64 *data))
->  {
-> +	bool fpu_loaded = false;
->  	int i;
+>  	vmx_setup_uret_msrs(vmx);
 >  
-> -	for (i = 0; i < msrs->nmsrs; ++i)
-> +	for (i = 0; i < msrs->nmsrs; ++i) {
-> +		/*
-> +		 * If userspace is accessing one or more XSTATE-managed MSRs,
-> +		 * temporarily load the guest's FPU state so that the guest's
-> +		 * MSR value(s) is resident in hardware, i.e. so that KVM can
-> +		 * get/set the MSR via RDMSR/WRMSR.
-> +		 */
-> +		if (vcpu && !fpu_loaded && kvm_caps.supported_xss &&
-> +		    is_xstate_managed_msr(entries[i].index)) {
-> +			kvm_load_guest_fpu(vcpu);
-> +			fpu_loaded = true;
-> +		}
->  		if (do_msr(vcpu, entries[i].index, &entries[i].data))
->  			break;
-> +	}
-> +	if (fpu_loaded)
-> +		kvm_put_guest_fpu(vcpu);
->  
->  	return i;
->  }
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index 5184fde1dc54..6e42ede335f5 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -541,4 +541,28 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
->  			 unsigned int port, void *data,  unsigned int count,
->  			 int in);
->  
-> +/*
-> + * Lock and/or reload guest FPU and access xstate MSRs. For accesses initiated
-> + * by host, guest FPU is loaded in __msr_io(). For accesses initiated by guest,
-> + * guest FPU should have been loaded already.
-> + */
-> +
-> +static inline void kvm_get_xstate_msr(struct kvm_vcpu *vcpu,
-> +				      struct msr_data *msr_info)
-> +{
-> +	KVM_BUG_ON(!vcpu->arch.guest_fpu.fpstate->in_use, vcpu->kvm);
-> +	kvm_fpu_get();
-> +	rdmsrl(msr_info->index, msr_info->data);
-> +	kvm_fpu_put();
-> +}
-> +
-> +static inline void kvm_set_xstate_msr(struct kvm_vcpu *vcpu,
-> +				      struct msr_data *msr_info)
-> +{
-> +	KVM_BUG_ON(!vcpu->arch.guest_fpu.fpstate->in_use, vcpu->kvm);
-> +	kvm_fpu_get();
-> +	wrmsrl(msr_info->index, msr_info->data);
-> +	kvm_fpu_put();
-> +}
-> +
->  #endif
-
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-
 Best regards,
 	Maxim Levitsky
-
-
 
 
