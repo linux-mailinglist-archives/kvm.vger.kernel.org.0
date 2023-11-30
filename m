@@ -1,150 +1,164 @@
-Return-Path: <kvm+bounces-3015-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3012-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 237AC7FFB6E
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:34:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 730F87FFB56
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:28:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9152B210EC
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:34:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A43661C21091
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6443A52F84;
-	Thu, 30 Nov 2023 19:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61BC552F70;
+	Thu, 30 Nov 2023 19:28:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cbmSuyw5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wn2aHS/K"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74D32D1
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:34:44 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DB4ED48
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:28:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701372883;
+	s=mimecast20190719; t=1701372493;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qytGX0MGJcOz7q/36mRvU0A100gsEwbWnP5WfFvyCcQ=;
-	b=cbmSuyw5DV33gLMdwcXoiRaAjHcQ3wbKwvdI/1CoyLUgTeu9WBtmiPHBxYWNpZEwTkPLnT
-	JJjAkFRncAIPeU+FxdBcXToDaI7HrAuADbp619SVXBurFvpA4HZH81yqp9QTDA8yS3Z8Nt
-	HYpWK5A2qmrqoWm7LQqmlpv0mV5fqCM=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=afJtp1/bOi8OTWHw9YFIvYdMpw6OpEAY6Zj/UXKihoM=;
+	b=Wn2aHS/K2a9ypQUy12KEFUchhVonL5Ber4K/Km1h8Tn930YizgW2ANubZNGFgEKoO/SNWR
+	f3f3hTq0zEwr4wGjbJoLja0/Jr/57F/MkKmTtESMSdzdlXFWpfaGTWTIpZn1PnTJbxSLLY
+	28AOtDU3ogLkX/kLSzDdeBpByVGWpOA=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-340-rOSotnwuN_mRAYZm025Vgg-1; Thu, 30 Nov 2023 14:34:42 -0500
-X-MC-Unique: rOSotnwuN_mRAYZm025Vgg-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2c9c3782740so15291411fa.2
-        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:34:42 -0800 (PST)
+ us-mta-151-iZMTFt6CMNGgf3pzhk5Png-1; Thu, 30 Nov 2023 14:28:12 -0500
+X-MC-Unique: iZMTFt6CMNGgf3pzhk5Png-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2c9c2d6a6b9so12295591fa.1
+        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:28:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701372881; x=1701977681;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qytGX0MGJcOz7q/36mRvU0A100gsEwbWnP5WfFvyCcQ=;
-        b=brqcoBqgE/McXNDn0QfAlpt+9eZKdSCImRWMVnJ8x85jmv3mUWYGFxlksrUthVrSGq
-         IepkDLaDbKuBBtWq4cUVgqmSYqbt2lcE+oLCWLlXOuUDcmosfOwsp4QUuwdlPFA3nOWc
-         HuGFdpkW86cYfKQjZCSZrmkvdofdoAO3ICY75navtoPGea6JhgGjn5hJYBT+v6tXjnKd
-         PFeKBA3aWLBFoTZcLSqM6Wq37RGIQmn1o94xbaOQI4irkGOICPOI2oGSCMwMQHFC5o8p
-         jHK//MKGYJh/xs2+FHjmCbSsW0Z//AD2Df1/sJKxKG0awbuYECMxB+RaxjnfqTAjk3T2
-         FhVg==
-X-Gm-Message-State: AOJu0YyW0SrFjTQa/ehk9dFmVGtWm2phAUNjrGGKMnIAZMqNsrDyaqcN
-	m7P3GsB008fIKO4ndvuxr1X8sGmgkDCWzbm9T/deB+wu7BRgBUU5iOZ8EXPs8m8eQPu5Kxx0xpq
-	OfCUMiK8XwGVbxCdbRlpb
-X-Received: by 2002:a2e:aa8b:0:b0:2c9:c662:715 with SMTP id bj11-20020a2eaa8b000000b002c9c6620715mr26255ljb.4.1701372880875;
-        Thu, 30 Nov 2023 11:34:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEPJcbCU4cufSDQv6f8QUMe1TA4X/6xNTeMQtfmLGplAXuJX2mk3hU8RkAtP5spjMsfxa0lKg==
-X-Received: by 2002:a17:906:2086:b0:a11:d323:c1bc with SMTP id 6-20020a170906208600b00a11d323c1bcmr57445ejq.19.1701366166815;
-        Thu, 30 Nov 2023 09:42:46 -0800 (PST)
-Received: from starship ([5.28.147.32])
-        by smtp.gmail.com with ESMTPSA id d27-20020ac25edb000000b0050933bb416csm214417lfq.74.2023.11.30.09.42.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 09:42:46 -0800 (PST)
-Message-ID: <d2be8a787969b76f71194ce65bd6f35426b60dcc.camel@redhat.com>
-Subject: Re: [PATCH v7 21/26] KVM: x86: Save and reload SSP to/from SMRAM
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Yang Weijiang <weijiang.yang@intel.com>, seanjc@google.com, 
-	pbonzini@redhat.com, dave.hansen@intel.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Cc: peterz@infradead.org, chao.gao@intel.com, rick.p.edgecombe@intel.com, 
-	john.allen@amd.com
-Date: Thu, 30 Nov 2023 19:42:44 +0200
-In-Reply-To: <20231124055330.138870-22-weijiang.yang@intel.com>
-References: <20231124055330.138870-1-weijiang.yang@intel.com>
-	 <20231124055330.138870-22-weijiang.yang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        d=1e100.net; s=20230601; t=1701372491; x=1701977291;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=afJtp1/bOi8OTWHw9YFIvYdMpw6OpEAY6Zj/UXKihoM=;
+        b=L/3nLS8KervneR2kTJiur5XK3K3NTKAhDu/rl2uarnGD4XTSc+pJhYEzeY2iyNvHNG
+         y1Hes1LeaZy0ZmgphMNf+Jwh3+8096aTPVU4CsBJdGHhSIRvGZJhhJb8/ENhyXfDvDKk
+         PiPwMIM7c2cnWRe3F5fTOzGhsmS9tmMtBMwJP+4BslNkzS3b4IUcmrKbuc6VNFMLOSQd
+         Q/gOZZMQRUnshFFhWiohROKsGIQ5aODnYsSZXNTxCRWYOjsPxZdE2aQjt4uE2FpT2O7K
+         CTO00dIlaO5PnMCV371AP6U0JXW2p3XLwCYpTJP8MmYiVzqzvZql9fm0s3MxM7oVLERA
+         STmw==
+X-Gm-Message-State: AOJu0YwjJyCqPZWH+5i8z/zfoPXPkg+0UJRxN40nwjzucJQvxFZRoNjb
+	f5Yn8l8DKI+akIP+k6vGjTR360/mO/2KEfrOo6+f7ERiUB5QLY+hMjKTJT8T/U/PJz+98ILglrX
+	g7clbHWs/8q7S
+X-Received: by 2002:a2e:924b:0:b0:2c9:ba9b:7281 with SMTP id v11-20020a2e924b000000b002c9ba9b7281mr3556ljg.0.1701367059321;
+        Thu, 30 Nov 2023 09:57:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFtUd8Ivz1Rur9xp1YhViXZEQxTK1dU3mOJ+EXLEJKCocWO1zpYngColK4vckxwYg8jR8U1CQ==
+X-Received: by 2002:a2e:924b:0:b0:2c9:ba9b:7281 with SMTP id v11-20020a2e924b000000b002c9ba9b7281mr3406ljg.0.1701367057298;
+        Thu, 30 Nov 2023 09:57:37 -0800 (PST)
+Received: from ?IPV6:2003:cb:c71c:3600:33e6:971c:5f64:fab5? (p200300cbc71c360033e6971c5f64fab5.dip0.t-ipconnect.de. [2003:cb:c71c:3600:33e6:971c:5f64:fab5])
+        by smtp.gmail.com with ESMTPSA id a13-20020a05600c348d00b0040b5377cf03sm6411656wmq.1.2023.11.30.09.57.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Nov 2023 09:57:36 -0800 (PST)
+Message-ID: <a971db32-4867-4aaf-9da7-20627a867747@redhat.com>
+Date: Thu, 30 Nov 2023 18:57:35 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 03/70] RAMBlock/guest_memfd: Enable
+ KVM_GUEST_MEMFD_ALLOW_HUGEPAGE
+Content-Language: en-US
+To: Peter Xu <peterx@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>, Xiaoyao Li
+ <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
+ <berrange@redhat.com>, Eric Blake <eblake@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti
+ <mtosatti@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ Michael Roth <michael.roth@amd.com>, Claudio Fontana <cfontana@suse.de>,
+ Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
+ <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
+References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
+ <20231115071519.2864957-4-xiaoyao.li@intel.com>
+ <bc84fa4f-4866-4321-8f30-1388eed7e64f@redhat.com>
+ <05f0e440-36a2-4d3a-8caa-842b34e50dce@intel.com>
+ <0fbfc413-7c74-4b2a-bade-6f3f04ca82c2@redhat.com>
+ <4708c33a-bb8d-484e-ac7b-b7e8d3ed445a@intel.com>
+ <45d28654-9565-46df-81b9-6563a4aef78c@redhat.com>
+ <ZWixXm-sboNZ-mzG@google.com>
+ <d6bfd8be-7e8c-4a95-9e27-31775f8e352e@redhat.com> <ZWjKiDy3UMq3cRkD@x1n>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <ZWjKiDy3UMq3cRkD@x1n>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Fri, 2023-11-24 at 00:53 -0500, Yang Weijiang wrote:
-> Save CET SSP to SMRAM on SMI and reload it on RSM. KVM emulates HW arch
-> behavior when guest enters/leaves SMM mode,i.e., save registers to SMRAM
-> at the entry of SMM and reload them at the exit to SMM. Per SDM, SSP is
-> one of such registers on 64bit Arch, so add the support for SSP.
+On 30.11.23 18:46, Peter Xu wrote:
+> On Thu, Nov 30, 2023 at 05:54:26PM +0100, David Hildenbrand wrote:
+>> But likely we want THP support here. Because for hugetlb, one would actually
+>> have to instruct the kernel which size to use, like we do for memfd with
+>> hugetlb.
 > 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> ---
->  arch/x86/kvm/smm.c | 8 ++++++++
->  arch/x86/kvm/smm.h | 2 +-
->  2 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
-> index 45c855389ea7..7aac9c54c353 100644
-> --- a/arch/x86/kvm/smm.c
-> +++ b/arch/x86/kvm/smm.c
-> @@ -275,6 +275,10 @@ static void enter_smm_save_state_64(struct kvm_vcpu *vcpu,
->  	enter_smm_save_seg_64(vcpu, &smram->gs, VCPU_SREG_GS);
->  
->  	smram->int_shadow = static_call(kvm_x86_get_interrupt_shadow)(vcpu);
-> +
-> +	if (guest_can_use(vcpu, X86_FEATURE_SHSTK))
-> +		KVM_BUG_ON(kvm_msr_read(vcpu, MSR_KVM_SSP, &smram->ssp),
-> +			   vcpu->kvm);
->  }
->  #endif
->  
-> @@ -564,6 +568,10 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
->  	static_call(kvm_x86_set_interrupt_shadow)(vcpu, 0);
->  	ctxt->interruptibility = (u8)smstate->int_shadow;
->  
-> +	if (guest_can_use(vcpu, X86_FEATURE_SHSTK))
-> +		KVM_BUG_ON(kvm_msr_write(vcpu, MSR_KVM_SSP, smstate->ssp),
-> +			   vcpu->kvm);
-> +
->  	return X86EMUL_CONTINUE;
->  }
->  #endif
-> diff --git a/arch/x86/kvm/smm.h b/arch/x86/kvm/smm.h
-> index a1cf2ac5bd78..1e2a3e18207f 100644
-> --- a/arch/x86/kvm/smm.h
-> +++ b/arch/x86/kvm/smm.h
-> @@ -116,8 +116,8 @@ struct kvm_smram_state_64 {
->  	u32 smbase;
->  	u32 reserved4[5];
->  
-> -	/* ssp and svm_* fields below are not implemented by KVM */
->  	u64 ssp;
-> +	/* svm_* fields below are not implemented by KVM */
->  	u64 svm_guest_pat;
->  	u64 svm_host_efer;
->  	u64 svm_host_cr4;
+> I doubt it, as VM can still leverage larger sizes if possible?
 
+What do you doubt? I am talking about the current implementation and 
+expected semantics of KVM_GUEST_MEMFD_ALLOW_HUGEPAGE.
 
-My review feedback from the previous patch series still applies, and I don't
-know why it was not addressed/replied to:
+-- 
+Cheers,
 
-I still think that it is worth it to have a check that CET is not enabled in
-enter_smm_save_state_32 which is called for pure 32 bit guests (guests that don't
-have X86_FEATURE_LM enabled)
-
-Best regards,
-	Maxim Levitsky
-
+David / dhildenb
 
 
