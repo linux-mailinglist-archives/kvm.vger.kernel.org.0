@@ -1,235 +1,173 @@
-Return-Path: <kvm+bounces-3002-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3004-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2336F7FF955
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:29:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B12D97FFA03
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:50:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47A0FB211D1
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 18:29:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CBD928194F
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 18:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162EF58AAF;
-	Thu, 30 Nov 2023 18:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130705A10A;
+	Thu, 30 Nov 2023 18:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nhtFn9ND"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CgICeYiZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB84410D0
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 10:28:54 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5d1ed4b268dso22673437b3.0
-        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 10:28:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701368934; x=1701973734; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KCojnrKVSnfIdikNRS9eQkGQb5+JqWZFSYvF9pyN2fg=;
-        b=nhtFn9NDaNPt0A1+m+fE56vnx1mbADePWNqZ9blJ/+GV4jGh2fsC2SN+uOGIGv9kE2
-         FG66Nmk2jt2cIwPCVkdaveLgoqscdfsRQRN51I8JYbQErMXxdImFGKtQF8PBc4uTxxkh
-         vHoiYrKDL4zgHPiVUem9dpXEuuaMsOi/sBXZkMcC79B7ql2QdeRHvB3NnS4CPxF5Fa0C
-         omSukJBxBsa1BdsRsxNTZypLIY4BNLnhsdoHRrchEtfVzf1iVipEWKqca/3Ukst0s0rx
-         o+Y3EFmnktINvfemJQpV61jW28/tMD+flPbdJB/tuLUm+aXutvH3MR1POBudsidZVNY6
-         /v1A==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C1DE10D1
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 10:50:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701370227;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lCwsLtFmW+kFN1Kj1fiGWPZkFIiqQ/RxZjKKxOIAVpA=;
+	b=CgICeYiZNyKcN+kLJK0Cu5hfi22vvNqhYnEPRNF9KWLC03Q/ViH99ufQQgRdvmDHbKZAwJ
+	c9xbgEmmGsKhLCOaHdijY2atBxMaJtZ8NBLic92oiUxaJy3FcfTKiBUIS9kbOKIxxpBgFY
+	lRD6EBkOc6nAWons0kxkz/0pqY+yyKs=
+Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com
+ [209.85.160.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-674-SsK48QXROR65DF1-8xXJAg-1; Thu, 30 Nov 2023 13:50:26 -0500
+X-MC-Unique: SsK48QXROR65DF1-8xXJAg-1
+Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-1fa182dc04aso1807741fac.1
+        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 10:50:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701368934; x=1701973734;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KCojnrKVSnfIdikNRS9eQkGQb5+JqWZFSYvF9pyN2fg=;
-        b=B8YASZrtSazSUmxWtQi549X5URZuWzDoW9uQjn/SSvAC8/iuK8tgTy7MXBI0kHAcTC
-         Z9dLejx6x8+4BHH0BalwYnrhPavqcAN3GZ3u9N5wGFbGCE2IE+S//oDd/0L8XG1rQJ1e
-         YX4xnPrwsNKBdZ2brpCoVjMzCITBCxcdJ3kqVGgeDhiGDLjFXjY+qCx5p4nrO1zwhWjI
-         0dvUmva2mvPHLj1TSKVxDgrQ9CPPlmZwcudzTEe9CLqFx+lTKzhOJtUsmE3Mi2Vs1POA
-         R5XgmAwehIaWmYABMsqye5e+KYFzxAfr/Pg5ySWpsUv11XoE0Y8ocJWKF1XidIQb3sV0
-         5s0g==
-X-Gm-Message-State: AOJu0YxVLq22+dfcJteA1ZVQ8uBK00fDyLCOI1QzBA8bfrDGCOOjDR23
-	vAumrPOVUQQBfqeiDzsf4WDdrNnqaso=
-X-Google-Smtp-Source: AGHT+IENTQ6puxM9lq8+5c9/fGwa/0WLqvX9/pdkv4tQrl3DVzSCYKkQNeWrlJXE6OVBjygmscKR2M9Z2T4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:a3e6:0:b0:db4:5d34:fa5 with SMTP id
- e93-20020a25a3e6000000b00db45d340fa5mr708485ybi.0.1701368934202; Thu, 30 Nov
- 2023 10:28:54 -0800 (PST)
-Date: Thu, 30 Nov 2023 10:28:52 -0800
-In-Reply-To: <87y1efmg28.fsf@redhat.com>
+        d=1e100.net; s=20230601; t=1701370224; x=1701975024;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lCwsLtFmW+kFN1Kj1fiGWPZkFIiqQ/RxZjKKxOIAVpA=;
+        b=hbTOsVNl4flXJc6GF9wehb0ANTBYZEQNth49Qg8a1aPuatlB+umGxZ19OdtH/C1aSM
+         NQ3F2nGQyMDXCmerPQeQKyv0M89PqlokAhn/SfZ26UUKaBtUzZ/vonWkU1HzGuNJtdLs
+         XwU97y6QjVND7noj++FR6lYrJP9mQCA7EItUDB6vZMpOWpyfdKFokf3EXRuZ4IiPRZfh
+         aheUpUxbrAIMSr6LIfnewmn+fx8dX2kdFfzhiu1UF9JQ4VzOWbpQFlu6yy5AT1p6cqNN
+         vfKG5DOCIG+u3Hz0s/9HE0EU9xZnFcdQcpc7e0FLqDlAmJgr4bmwxWWFXEaA0PNFlVbz
+         9KMg==
+X-Gm-Message-State: AOJu0YwWaMsVcD/pP221Zoyrfi58leB87mWc0KZ4u2MV+rzghnReKceG
+	zqOZIPkMKYYewMs2gNn/qWhpf+sZgpfks3cxcLNJl8B350lVvFzdPOIsEJz0/lj4FZzBK+OgT89
+	aMWPucbBCpebOSb5O24uo
+X-Received: by 2002:a05:6870:b49e:b0:1fa:1774:e6df with SMTP id y30-20020a056870b49e00b001fa1774e6dfmr23618822oap.44.1701370224663;
+        Thu, 30 Nov 2023 10:50:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG87HrOlypi7PlWvhmEmXj75rwcMMhyA4/AZHcMvyD77iGxKcXs3Mv+FkuQEVXfPdbnMWCH5Q==
+X-Received: by 2002:a05:6870:b49e:b0:1fa:1774:e6df with SMTP id y30-20020a056870b49e00b001fa1774e6dfmr23618810oap.44.1701370224457;
+        Thu, 30 Nov 2023 10:50:24 -0800 (PST)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id sf11-20020a056871230b00b001fa592385b9sm385063oab.40.2023.11.30.10.50.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Nov 2023 10:50:23 -0800 (PST)
+Date: Thu, 30 Nov 2023 11:50:22 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Nick Desaulniers
+ <ndesaulniers@google.com>, Jason Gunthorpe <jgg@nvidia.com>, Michael
+ Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH] vfio: Drop vfio_file_iommu_group() stub to fudge around
+ a KVM wart
+Message-ID: <20231130115022.010ec041.alex.williamson@redhat.com>
+In-Reply-To: <20231130001000.543240-1-seanjc@google.com>
+References: <20231130001000.543240-1-seanjc@google.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231025152406.1879274-1-vkuznets@redhat.com> <20231025152406.1879274-11-vkuznets@redhat.com>
- <ZWfl3ahamXPPoIGB@google.com> <87y1efmg28.fsf@redhat.com>
-Message-ID: <ZWjUZPXCF2U9azWT@google.com>
-Subject: Re: [PATCH 10/14] KVM: x86: Make Hyper-V emulation optional
-From: Sean Christopherson <seanjc@google.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 30, 2023, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
+On Wed, 29 Nov 2023 16:10:00 -0800
+Sean Christopherson <seanjc@google.com> wrote:
+
+> Drop the vfio_file_iommu_group() stub and instead unconditionally declare
+> the function to fudge around a KVM wart where KVM tries to do symbol_get()
+> on vfio_file_iommu_group() (and other VFIO symbols) even if CONFIG_VFIO=n.
 > 
-> ...
+> Ensuring the symbol is always declared fixes a PPC build error when
+> modules are also disabled, in which case symbol_get() simply points at the
+> address of the symbol (with some attributes shenanigans).  Because KVM
+> does symbol_get() instead of directly depending on VFIO, the lack of a
+> fully defined symbol is not problematic (ugly, but "fine").
 > 
-> >
-> >>  static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
-> >>  {
-> >> @@ -3552,11 +3563,13 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
-> >>  	if (!nested_vmx_check_permission(vcpu))
-> >>  		return 1;
-> >>  
-> >> +#ifdef CONFIG_KVM_HYPERV
-> >>  	evmptrld_status = nested_vmx_handle_enlightened_vmptrld(vcpu, launch);
-> >>  	if (evmptrld_status == EVMPTRLD_ERROR) {
-> >>  		kvm_queue_exception(vcpu, UD_VECTOR);
-> >>  		return 1;
-> >>  	}
-> >> +#endif
-> >>  
-> >>  	kvm_pmu_trigger_event(vcpu, PERF_COUNT_HW_BRANCH_INSTRUCTIONS);
-> >
-> > This fails to build with CONFIG_KVM_HYPERV=n && CONFIG_KVM_WERROR=y:
-> >
-> > arch/x86/kvm/vmx/nested.c:3577:9: error: variable 'evmptrld_status' is uninitialized when used here [-Werror,-Wuninitialized]
-> >         if (CC(evmptrld_status == EVMPTRLD_VMFAIL))
-> >                ^~~~~~~~~~~~~~~
-> >
-> > Sadly, simply wrapping with an #ifdef also fails because then evmptrld_status
-> > becomes unused.  I'd really prefer to avoid having to tag it __maybe_unused, and
-> > adding more #ifdef would also be ugly.  Any ideas?
+>    arch/powerpc/kvm/../../../virt/kvm/vfio.c:89:7:
+>    error: attribute declaration must precede definition [-Werror,-Wignored-attributes]
+>            fn = symbol_get(vfio_file_iommu_group);
+>                 ^
+>    include/linux/module.h:805:60: note: expanded from macro 'symbol_get'
+>    #define symbol_get(x) ({ extern typeof(x) x __attribute__((weak,visibility("hidden"))); &(x); })
+>                                                               ^
+>    include/linux/vfio.h:294:35: note: previous definition is here
+>    static inline struct iommu_group *vfio_file_iommu_group(struct file *file)
+>                                      ^
+>    arch/powerpc/kvm/../../../virt/kvm/vfio.c:89:7:
+>    error: attribute declaration must precede definition [-Werror,-Wignored-attributes]
+>            fn = symbol_get(vfio_file_iommu_group);
+>                 ^
+>    include/linux/module.h:805:65: note: expanded from macro 'symbol_get'
+>    #define symbol_get(x) ({ extern typeof(x) x __attribute__((weak,visibility("hidden"))); &(x); })
+>                                                                    ^
+>    include/linux/vfio.h:294:35: note: previous definition is here
+>    static inline struct iommu_group *vfio_file_iommu_group(struct file *file)
+>                                      ^
+>    2 errors generated.
 > 
-> A couple,
+> Although KVM is firmly in the wrong (there is zero reason for KVM to build
+> virt/kvm/vfio.c when VFIO is disabled), fudge around the error in VFIO as
+> the stub is unnecessary and doesn't serve its intended purpose (KVM is the
+> only external user of vfio_file_iommu_group()), and there is an in-flight
+> series to clean up the entire KVM<->VFIO interaction, i.e. fixing this in
+> KVM would result in more churn in the long run, and the stub needs to go
+> away regardless.
 > 
-> - we can try putting all eVMPTR logic under 'if (1)' just to create a
->   block where we can define evmptrld_status. Not sure this is nicer than
->   another #ifdef wrapping evmptrld_status and I'm not sure what to do
->   with kvm_pmu_trigger_event() -- can it just go above
->   nested_vmx_handle_enlightened_vmptrld()?
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202308251949.5IiaV0sz-lkp@intel.com
+> Closes: https://lore.kernel.org/oe-kbuild-all/202309030741.82aLACDG-lkp@intel.com
+> Closes: https://lore.kernel.org/oe-kbuild-all/202309110914.QLH0LU6L-lkp@intel.com
+> Link: https://lore.kernel.org/all/0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com
+> Link: https://lore.kernel.org/all/20230916003118.2540661-1-seanjc@google.com
+> Cc: Nick Desaulniers <ndesaulniers@google.com>
+> Cc: Jason Gunthorpe <jgg@nvidia.com>
+> Tested-by: Michael Ellerman <mpe@ellerman.id.au>
+> Fixes: c1cce6d079b8 ("vfio: Compile vfio_group infrastructure optionally")
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  include/linux/vfio.h | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
 > 
-> - we can add a helper, e.g. 'evmptr_is_vmfail()' and make it just return
->   'false' when !CONFIG_KVM_HYPERV.
-> 
-> - rewrite this as a switch to avoid the need for having the local
->   variable, (untested)
-> 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index c5ec0ef51ff7..b26ce7d596e9 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -3553,22 +3553,23 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
->         enum nvmx_vmentry_status status;
->         struct vcpu_vmx *vmx = to_vmx(vcpu);
->         u32 interrupt_shadow = vmx_get_interrupt_shadow(vcpu);
-> -       enum nested_evmptrld_status evmptrld_status;
->  
->         if (!nested_vmx_check_permission(vcpu))
->                 return 1;
->  
-> -       evmptrld_status = nested_vmx_handle_enlightened_vmptrld(vcpu, launch);
-> -       if (evmptrld_status == EVMPTRLD_ERROR) {
-> +       switch (nested_vmx_handle_enlightened_vmptrld(vcpu, launch)) {
-> +       case EVMPTRLD_ERROR:
->                 kvm_queue_exception(vcpu, UD_VECTOR);
->                 return 1;
-> +       case EVMPTRLD_VMFAIL:
-> +               trace_kvm_nested_vmenter_failed("evmptrld_status", 0);
-> +               return nested_vmx_failInvalid(vcpu);
-> +       default:
-> +               break;
->         }
->  
->         kvm_pmu_trigger_event(vcpu, PERF_COUNT_HW_BRANCH_INSTRUCTIONS);
->  
-> -       if (CC(evmptrld_status == EVMPTRLD_VMFAIL))
-> -               return nested_vmx_failInvalid(vcpu);
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 454e9295970c..a65b2513f8cd 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -289,16 +289,12 @@ void vfio_combine_iova_ranges(struct rb_root_cached *root, u32 cur_nodes,
+>  /*
+>   * External user API
+>   */
+> -#if IS_ENABLED(CONFIG_VFIO_GROUP)
+>  struct iommu_group *vfio_file_iommu_group(struct file *file);
+> +
+> +#if IS_ENABLED(CONFIG_VFIO_GROUP)
+>  bool vfio_file_is_group(struct file *file);
+>  bool vfio_file_has_dev(struct file *file, struct vfio_device *device);
+>  #else
+> -static inline struct iommu_group *vfio_file_iommu_group(struct file *file)
+> -{
+> -	return NULL;
+> -}
 > -
->         if (CC(!evmptr_is_valid(vmx->nested.hv_evmcs_vmptr) &&
->                vmx->nested.current_vmptr == INVALID_GPA))
->                 return nested_vmx_failInvalid(vcpu);
+>  static inline bool vfio_file_is_group(struct file *file)
+>  {
+>  	return false;
 > 
-> Unfortunately, I had to open code CC() ;-(
-> 
-> Or maybe just another "#ifdef" is not so ugly after all? :-)
+> base-commit: ae2667cd8a479bb5abd6e24c12fcc9ef5bc06d75
 
-Ah, just have nested_vmx_handle_enlightened_vmptrld() return EVMPTRLD_DISABLED
-for its "stub", e.g. with some otehr tangentially de-stubbing:
+I think we've squashed all the outstanding concerns in the other
+thread, so I've pushed this to my for-linux branch for v6.7.  Speak up
+if I'm missing any unresolved issues.  Thanks!
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 4777d867419c..5a27a2ebbb32 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2000,6 +2000,7 @@ static void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
- static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
-        struct kvm_vcpu *vcpu, bool from_launch)
- {
-+#ifdef CONFIG_KVM_HYPERV
-        struct vcpu_vmx *vmx = to_vmx(vcpu);
-        bool evmcs_gpa_changed = false;
-        u64 evmcs_gpa;
-@@ -2081,11 +2082,10 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
-        }
- 
-        return EVMPTRLD_SUCCEEDED;
-+#else
-+       return EVMPTRLD_DISABLED;
-+#endif
- }
--#else /* CONFIG_KVM_HYPERV */
--static inline void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields) {}
--static inline void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx) {}
--#endif /* CONFIG_KVM_HYPERV */
- 
- void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu)
- {
-@@ -3191,8 +3191,6 @@ static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
- 
-        return true;
- }
--#else
--static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu) { return true; }
- #endif
- 
- static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
-@@ -3285,6 +3283,7 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
- 
- static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
- {
-+#ifdef CONFIG_KVM_HYPERV
-        /*
-         * Note: nested_get_evmcs_page() also updates 'vp_assist_page' copy
-         * in 'struct kvm_vcpu_hv' in case eVMCS is in use, this is mandatory
-@@ -3301,7 +3300,7 @@ static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
- 
-                return false;
-        }
--
-+#endif
-        if (is_guest_mode(vcpu) && !nested_get_vmcs12_pages(vcpu))
-                return false;
- 
-@@ -3564,7 +3563,6 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
-        if (!nested_vmx_check_permission(vcpu))
-                return 1;
- 
--#ifdef CONFIG_KVM_HYPERV
-        evmptrld_status = nested_vmx_handle_enlightened_vmptrld(vcpu, launch);
-        if (evmptrld_status == EVMPTRLD_ERROR) {
-                kvm_queue_exception(vcpu, UD_VECTOR);
-@@ -4743,6 +4741,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
-        WARN_ON_ONCE(vmx->nested.nested_run_pending);
- 
-        if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
-+#ifdef CONFIG_KVM_HYPERV
-                /*
-                 * KVM_REQ_GET_NESTED_STATE_PAGES is also used to map
-                 * Enlightened VMCS after migration and we still need to
-@@ -4750,6 +4749,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
-                 * the first L2 run.
-                 */
-                (void)nested_get_evmcs_page(vcpu);
-+#endif
-        }
- 
-        /* Service pending TLB flush requests for L2 before switching to L1. */
+Alex
+
 
