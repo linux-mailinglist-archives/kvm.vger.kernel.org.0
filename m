@@ -1,283 +1,553 @@
-Return-Path: <kvm+bounces-3013-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3008-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9FB27FFB5A
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:29:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30F8D7FFAF0
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:14:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 189161C2108E
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:29:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B31E21F21016
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:14:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53DBC52F75;
-	Thu, 30 Nov 2023 19:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 702D83A286;
+	Thu, 30 Nov 2023 19:13:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="VDlfnnuS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NTjpiMu1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BD4A93
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:29:30 -0800 (PST)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-a195e0145acso54958566b.2
-        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:29:30 -0800 (PST)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9793106
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:13:48 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d9cb79eb417so1716677276.2
+        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:13:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1701372569; x=1701977369; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qu/G57LnazjPF+hhit8sVOHNi2qaherFjM1RsRjPAGA=;
-        b=VDlfnnuSf8lFNoAtvEgqwyGmIFFgmC1gT0VDYbP44YR5hzvZO6fITUUgrje/w+TeUW
-         p+Za+jONVFpVXWHCRXzzSlUWC708OxJmajg+y60i7+CnwkFD0zPAQUV0kJ//Bd/8AsPD
-         xll/n8PFntgTMe4WgDNLWstR58d7Bmn/2ykaSd15BKlBqGwnV98ZmVgmq5r84X2P4S/6
-         cHjRt4OoPbtxMO0lApuoP2/uhTD/NpyXycLeH/0bOU7tvAbEKFC8zL7KCAENYKQLKw1G
-         zWTx0jlUO8ZS4r5hoWLMzLetIfxfr25iBVc35yBmPsL7Xsc5eEibYidpBDsWPS8AJ/KP
-         j0lQ==
+        d=google.com; s=20230601; t=1701371628; x=1701976428; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=e+W+1lsPcrFNkkglDJA/1kIS/C9M7C7ste9mmX6izE0=;
+        b=NTjpiMu1l4qpZpRzAPmyFqIzPXEfU5myFPLURh9Wf2nj55V4++M5MnPeNYQY25pM1/
+         yFwdpnOuDQk9e6iyTFbtgrHK+X8h9d4jOVrjYJ7aYixEQwDd7EHo/paJf+rk7ZmRqBZw
+         oJwUWTtwKSI44noBro6wV7K14/GsH6D7fo3L8ILK6SzkkptM7kjVbVBoQ2rF6yZsHKq2
+         XdsmxYIorY5RT3Vqwl4zGPOMMmrUs34pGDzYMXrFtdtAuiudGvh7rZ92scBU99tHTq0G
+         uY/SaOXx4gcB1B98iofo0T4WWWk9KHq94zot5rq4+ztk39QsoCojLQGO2dUYhCjRtY/6
+         hlug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701372569; x=1701977369;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Qu/G57LnazjPF+hhit8sVOHNi2qaherFjM1RsRjPAGA=;
-        b=YwWmw0r2hLuJiGVpWx/7NZP4fwpweiecJUIoWX2KzKl8lamHkmnQekr9eCplOuBv15
-         KABGt+hMW1V7kKl/KrOJ7r+EqIzZ/YD5UwNXbGNCh3XhVN3Py7VLA88qOsP1q9HyVFv2
-         qxhmhqKTon8r4H6yy9NAy+Py0CgSA2TRhZzsXgF/NIupHNJrzCQ1fjNGhIetvQNY44f+
-         SMppg1/rA7HYHF0L14yb4TBLZYTw0/UJ4VRaFPY5EShD35fPgMB6BXrneGV8GMjMxaxS
-         i8Z/1JTbBXI/+pwjXqIHGWmFD2roAyzz9t2yWw5u/DZz8t6ebBDlNf/4OjdwdB8mT+ix
-         SM5A==
-X-Gm-Message-State: AOJu0YxGO/NtUeLZw1Y4bXWLZDHJDc1U2EDVBMpYhn0HRJPcRFXdNFsm
-	nn8wn55VLjKDfwWrsBUlZruHl74YPRt6g+ChWOU=
-X-Google-Smtp-Source: AGHT+IHa+HTBgwPhkJZoBMr5lzGTwWzN2zRvlyUhmTbPbO/HwbuZuUp4S65V/IpvSmICdp3auWh37g==
-X-Received: by 2002:a17:906:1091:b0:a19:a19b:422a with SMTP id u17-20020a170906109100b00a19a19b422amr4455eju.149.1701368913770;
-        Thu, 30 Nov 2023 10:28:33 -0800 (PST)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id jz22-20020a17090775f600b009fdcc65d720sm954665ejc.72.2023.11.30.10.28.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 10:28:33 -0800 (PST)
-From: Andrew Jones <ajones@ventanamicro.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: seanjc@google.com,
-	pbonzini@redhat.com,
-	maz@kernel.org,
-	oliver.upton@linux.dev
-Subject: [PATCH] KVM: selftests: Drop newline from __TEST_REQUIRE
-Date: Thu, 30 Nov 2023 19:28:33 +0100
-Message-ID: <20231130182832.54603-2-ajones@ventanamicro.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1701371628; x=1701976428;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e+W+1lsPcrFNkkglDJA/1kIS/C9M7C7ste9mmX6izE0=;
+        b=lTbiqdQezZ+gVphKRDkheRiiJsCINIVGNCt/TcmVTkiA19j2gmUOpRZMDko8EQZkh1
+         oysU7fTKD4RkROv07hj+YzQW0kpV75JrNURg5AL5jduVKLDdk3zWgvgcdB0NvrGfmG3N
+         nHJof9Fj5vjOFsTTNksL0mY6tsb2wNGTWIwCfTRJgRGBHCL5WBWSwNFcGyfuEpyhcyza
+         4D4bs+9Kx9cW2jpZ7lkvzv/vHw3B4VR3HorRcJls6xqR/5HMh2OpbRjN6OZyHDAN3/Ns
+         p3SXRJ943uAxqEo3PmxNwnJ8fRLs1gUk/bK6/LKtaRUH83HxkbZ029KWdJJIcNCRAPsr
+         1LGw==
+X-Gm-Message-State: AOJu0YxsjacJAaFqqLYztxRPeHev5AXzMgt9j35hZR6MOjHJEruD/CPq
+	VpTC9LQ57Q4WU2c0JBxvnPV+/thZ2tw=
+X-Google-Smtp-Source: AGHT+IEBFLmxm4Y5BdkxfRoLEp4j1TjuAhX6X1Q80dQbXNoABEOnBBvqKsimYdvN2O17/arFVyW7an8vCoA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:4b02:0:b0:d9a:6007:223a with SMTP id
+ y2-20020a254b02000000b00d9a6007223amr579265yba.8.1701371628090; Thu, 30 Nov
+ 2023 11:13:48 -0800 (PST)
+Date: Thu, 30 Nov 2023 11:13:46 -0800
+In-Reply-To: <20231025152406.1879274-12-vkuznets@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20231025152406.1879274-1-vkuznets@redhat.com> <20231025152406.1879274-12-vkuznets@redhat.com>
+Message-ID: <ZWje6mjCMDG5swG_@google.com>
+Subject: Re: [PATCH 11/14] KVM: nVMX: hyper-v: Introduce nested_vmx_evmptr12()
+ and nested_vmx_is_evmptr12_valid() helpers
+From: Sean Christopherson <seanjc@google.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-A few __TEST_REQUIRE callers are appending their own newline, resulting
-in an extra one being output. Rather than remove the newlines from
-those callers, remove it from __TEST_REQUIRE and add newlines to all
-the other callers, as __TEST_REQUIRE was the only output function
-appending newlines and consistency is a good thing.
+On Wed, Oct 25, 2023, Vitaly Kuznetsov wrote:
+>  #ifdef CONFIG_KVM_HYPERV
+> +static inline gpa_t nested_vmx_evmptr12(struct vcpu_vmx *vmx) { return vmx->nested.hv_evmcs_vmptr; }
+> +static inline bool nested_vmx_is_evmptr12_valid(struct vcpu_vmx *vmx)
+> +{
+> +	return evmptr_is_valid(vmx->nested.hv_evmcs_vmptr);
+> +}
 
-Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+...
+
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index d0d735974b2c..b45586588bae 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -179,7 +179,7 @@ static int nested_vmx_failValid(struct kvm_vcpu *vcpu,
+>  	 * VM_INSTRUCTION_ERROR is not shadowed. Enlightened VMCS 'shadows' all
+>  	 * fields and thus must be synced.
+>  	 */
+> -	if (to_vmx(vcpu)->nested.hv_evmcs_vmptr != EVMPTR_INVALID)
+> +	if (nested_vmx_evmptr12(to_vmx(vcpu)) != EVMPTR_INVALID)
+>  		to_vmx(vcpu)->nested.need_vmcs12_to_shadow_sync = true;
+>  
+>  	return kvm_skip_emulated_instruction(vcpu);
+> @@ -194,7 +194,7 @@ static int nested_vmx_fail(struct kvm_vcpu *vcpu, u32 vm_instruction_error)
+>  	 * can't be done if there isn't a current VMCS.
+>  	 */
+>  	if (vmx->nested.current_vmptr == INVALID_GPA &&
+> -	    !evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
+> +	    !nested_vmx_is_evmptr12_valid(vmx))
+
+Hrm, this results in a bit of a mess, because it's essentially a half-baked
+conversion, and the existing evmptr_is_valid() makes it extra confusing.
+
+Specifically, I don't think nested_vmx_evmptr12() should exist.  The only code
+that should ever care about the evmptr12 _value_ should be guarded with
+CONFIG_KVM_HYPERV, everything else should simply be checking for validity.
+
+I don't know what names would be best, but we should end up with two helpers:
+one that checks "evmptr != INVALID && evmptr != MAP_PENDING" and another that
+checks "evmptr != INVALID".
+
+And the inner helpers, e.g. evmptr_is_valid(), should also have stubs.  I doubt
+it will matter in practice, but I see no reason not to make it super duper obvious
+that evmptr_is_valid() can never be %true if CONFIG_KVM_HYPERV=n.
+
+> @@ -30,6 +38,8 @@ int nested_evmcs_check_controls(struct vmcs12 *vmcs12);
+>  bool nested_evmcs_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu);
+>  void vmx_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu);
+>  #else
+> +static inline gpa_t nested_vmx_evmptr12(struct vcpu_vmx *vmx) { return EVMPTR_INVALID; }
+> +static inline bool nested_vmx_is_evmptr12_valid(struct vcpu_vmx *vmx) { return false; }
+>  static inline u64 nested_get_evmptr(struct kvm_vcpu *vcpu) { return EVMPTR_INVALID; }
+>  static inline void nested_evmcs_filter_control_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 *pdata) {}
+>  static inline bool nested_evmcs_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu) { return false; }
+
+Pretty much all of these stubs are gratuitous.  They either have single users
+that can be wrapped with CONFIG_KVM_HYPERV, or can be eliminated by the adding
+the extra helper as above.
+
+Oh, and switching back to a topic that I think I brought up in a different response,
+the stubs for nested_get_evmcs_page() is *really* nasty, as it returns %true when
+eVMCS is disabled.  It's functionally correct for vmx_get_nested_state_pages(), but
+super odd because obviously KVM was unable to get any eVMCS pages.  That's one of
+the reasons why my preference is to avoid most stubs and instead either handle
+things entirely within the eVMCS helpers or use #ifdefs at the call sites (when
+there is only 1, maybe 2, callers).
+
+Pulling in another goof, hyperv_enabled and hyperv in struct kvm_vcpu_arch should
+be #ifdef'd away.
+
+Last thought, my fairly strong preference is to not squish any of these helpers
+into a single line, i.e. do
+
+	static inline bool evmptr_is_valid(u64 evmptr)
+	{
+		return false;
+	}
+
+which IMO is much easier to read.  It's quite easy to trim this down to five stubs,
+at which point making the code as dense as possible is a net negative, e.g. even
+with the multi-line stubs, the entirety of arch/x86/kvm/vmx/hyperv.h fits on my
+monitor without scrolling.
+
+This is what I ended up with after a bit of hacking.  It compiles, but otherwise
+is untested.  As above, I have no idea what to call evmptr_is_tbd() :-)
+
 ---
+ arch/x86/include/asm/kvm_host.h |  2 +
+ arch/x86/kvm/vmx/hyperv.h       | 57 ++++++++++++++++++-------
+ arch/x86/kvm/vmx/nested.c       | 73 +++++++++++++++++++++------------
+ arch/x86/kvm/vmx/nested.h       |  2 +-
+ arch/x86/kvm/vmx/vmx.c          |  2 +
+ arch/x86/kvm/vmx/vmx.h          | 10 -----
+ 6 files changed, 94 insertions(+), 52 deletions(-)
 
-Applies to kvm-x86/selftests (I chose that branch to ensure I got the
-MAGIC_TOKEN change)
-
- tools/testing/selftests/kvm/aarch64/arch_timer.c          | 4 ++--
- tools/testing/selftests/kvm/aarch64/debug-exceptions.c    | 4 ++--
- tools/testing/selftests/kvm/aarch64/vgic_irq.c            | 2 +-
- tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c | 2 +-
- tools/testing/selftests/kvm/access_tracking_perf_test.c   | 4 ++--
- tools/testing/selftests/kvm/include/test_util.h           | 4 ++--
- tools/testing/selftests/kvm/lib/kvm_util.c                | 2 +-
- tools/testing/selftests/kvm/lib/x86_64/processor.c        | 4 ++--
- tools/testing/selftests/kvm/rseq_test.c                   | 2 +-
- tools/testing/selftests/kvm/system_counter_offset_test.c  | 2 +-
- tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c   | 2 +-
- 11 files changed, 16 insertions(+), 16 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index 274b8465b42a..89b93e342654 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -392,7 +392,7 @@ static struct kvm_vm *test_vm_create(void)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 394dc11bf232..0ecfb16c611c 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -937,8 +937,10 @@ struct kvm_vcpu_arch {
+ 	/* used for guest single stepping over the given code position */
+ 	unsigned long singlestep_rip;
  
- 	test_init_timer_irq(vm);
- 	gic_fd = vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
--	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3");
-+	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3\n");
++#ifdef CONFIG_KVM_HYPERV
+ 	bool hyperv_enabled;
+ 	struct kvm_vcpu_hv *hyperv;
++#endif
+ #ifdef CONFIG_KVM_XEN
+ 	struct kvm_vcpu_xen xen;
+ #endif
+diff --git a/arch/x86/kvm/vmx/hyperv.h b/arch/x86/kvm/vmx/hyperv.h
+index 92bde3b75ca0..ce2b03ea2d30 100644
+--- a/arch/x86/kvm/vmx/hyperv.h
++++ b/arch/x86/kvm/vmx/hyperv.h
+@@ -9,11 +9,6 @@
+ #define EVMPTR_INVALID (-1ULL)
+ #define EVMPTR_MAP_PENDING (-2ULL)
  
- 	/* Make all the test's cmdline args visible to the guest */
- 	sync_global_to_guest(vm, test_args);
-@@ -470,7 +470,7 @@ int main(int argc, char *argv[])
- 		exit(KSFT_SKIP);
+-static inline bool evmptr_is_valid(u64 evmptr)
+-{
+-	return evmptr != EVMPTR_INVALID && evmptr != EVMPTR_MAP_PENDING;
+-}
+-
+ enum nested_evmptrld_status {
+ 	EVMPTRLD_DISABLED,
+ 	EVMPTRLD_SUCCEEDED,
+@@ -21,18 +16,41 @@ enum nested_evmptrld_status {
+ 	EVMPTRLD_ERROR,
+ };
  
- 	__TEST_REQUIRE(!test_args.migration_freq_ms || get_nprocs() >= 2,
--		       "At least two physical CPUs needed for vCPU migration");
-+		       "At least two physical CPUs needed for vCPU migration\n");
- 
- 	vm = test_vm_create();
- 	test_run(vm);
-diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-index 866002917441..19088a971b1f 100644
---- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-+++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-@@ -540,7 +540,7 @@ void test_guest_debug_exceptions_all(uint64_t aa64dfr0)
- 
- 	/* Number of breakpoints */
- 	brp_num = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_BRPs), aa64dfr0) + 1;
--	__TEST_REQUIRE(brp_num >= 2, "At least two breakpoints are required");
-+	__TEST_REQUIRE(brp_num >= 2, "At least two breakpoints are required\n");
- 
- 	/* Number of watchpoints */
- 	wrp_num = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_WRPs), aa64dfr0) + 1;
-@@ -585,7 +585,7 @@ int main(int argc, char *argv[])
- 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
- 	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &aa64dfr0);
- 	__TEST_REQUIRE(debug_version(aa64dfr0) >= 6,
--		       "Armv8 debug architecture not supported.");
-+		       "Armv8 debug architecture not supported.\n");
- 	kvm_vm_free(vm);
- 
- 	while ((opt = getopt(argc, argv, "i:")) != -1) {
-diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-index 2e64b4856e38..e4452c4b60c2 100644
---- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-+++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-@@ -766,7 +766,7 @@ static void test_vgic(uint32_t nr_irqs, bool level_sensitive, bool eoi_split)
- 
- 	gic_fd = vgic_v3_setup(vm, 1, nr_irqs,
- 			GICD_BASE_GPA, GICR_BASE_GPA);
--	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3, skipping");
-+	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3, skipping\n");
- 
- 	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT,
- 		guest_irq_handlers[args.eoi_split][args.level_sensitive]);
-diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-index 5ea78986e665..3c5b83e0e776 100644
---- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-+++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-@@ -458,7 +458,7 @@ static void create_vpmu_vm(void *guest_code)
- 	vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64,
- 					GICD_BASE_GPA, GICR_BASE_GPA);
- 	__TEST_REQUIRE(vpmu_vm.gic_fd >= 0,
--		       "Failed to create vgic-v3, skipping");
-+		       "Failed to create vgic-v3, skipping\n");
- 
- 	/* Make sure that PMUv3 support is indicated in the ID register */
- 	vcpu_get_reg(vpmu_vm.vcpu,
-diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-index 3c7defd34f56..65efec6f4f90 100644
---- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-+++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-@@ -103,7 +103,7 @@ static uint64_t lookup_pfn(int pagemap_fd, struct kvm_vm *vm, uint64_t gva)
- 		return 0;
- 
- 	pfn = entry & PAGEMAP_PFN_MASK;
--	__TEST_REQUIRE(pfn, "Looking up PFNs requires CAP_SYS_ADMIN");
-+	__TEST_REQUIRE(pfn, "Looking up PFNs requires CAP_SYS_ADMIN\n");
- 
- 	return pfn;
+-struct vcpu_vmx;
+-
+ #ifdef CONFIG_KVM_HYPERV
+-static inline gpa_t nested_vmx_evmptr12(struct vcpu_vmx *vmx) { return vmx->nested.hv_evmcs_vmptr; }
++static inline bool guest_cpuid_has_evmcs(struct kvm_vcpu *vcpu)
++{
++	/*
++	 * eVMCS is exposed to the guest if Hyper-V is enabled in CPUID and
++	 * eVMCS has been explicitly enabled by userspace.
++	 */
++	return vcpu->arch.hyperv_enabled &&
++	       to_vmx(vcpu)->nested.enlightened_vmcs_enabled;
++}
++static inline gpa_t nested_vmx_evmptr12(struct vcpu_vmx *vmx)
++{
++	return vmx->nested.hv_evmcs_vmptr;
++}
++static inline bool evmptr_is_valid(u64 evmptr)
++{
++	return evmptr != EVMPTR_INVALID && evmptr != EVMPTR_MAP_PENDING;
++}
+ static inline bool nested_vmx_is_evmptr12_valid(struct vcpu_vmx *vmx)
+ {
+ 	return evmptr_is_valid(vmx->nested.hv_evmcs_vmptr);
  }
-@@ -385,7 +385,7 @@ int main(int argc, char *argv[])
- 
- 	page_idle_fd = open("/sys/kernel/mm/page_idle/bitmap", O_RDWR);
- 	__TEST_REQUIRE(page_idle_fd >= 0,
--		       "CONFIG_IDLE_PAGE_TRACKING is not enabled");
-+		       "CONFIG_IDLE_PAGE_TRACKING is not enabled\n");
- 	close(page_idle_fd);
- 
- 	for_each_guest_mode(run_test, &params);
-diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-index a0c7dd3a5b30..88763f0e1b78 100644
---- a/tools/testing/selftests/kvm/include/test_util.h
-+++ b/tools/testing/selftests/kvm/include/test_util.h
-@@ -37,10 +37,10 @@ void __printf(1, 2) print_skip(const char *fmt, ...);
- #define __TEST_REQUIRE(f, fmt, ...)				\
- do {								\
- 	if (!(f))						\
--		ksft_exit_skip("- " fmt "\n", ##__VA_ARGS__);	\
-+		ksft_exit_skip("- " fmt, ##__VA_ARGS__);	\
- } while (0)
- 
--#define TEST_REQUIRE(f) __TEST_REQUIRE(f, "Requirement not met: %s", #f)
-+#define TEST_REQUIRE(f) __TEST_REQUIRE(f, "Requirement not met: %s\n", #f)
- 
- ssize_t test_write(int fd, const void *buf, size_t count);
- ssize_t test_read(int fd, void *buf, size_t count);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 17a978b8a2c4..7b40990d9b08 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -27,7 +27,7 @@ int open_path_or_exit(const char *path, int flags)
- 	int fd;
- 
- 	fd = open(path, flags);
--	__TEST_REQUIRE(fd >= 0, "%s not available (errno: %d)", path, errno);
-+	__TEST_REQUIRE(fd >= 0, "%s not available (errno: %d)\n", path, errno);
- 
- 	return fd;
++static inline bool evmptr_is_tbd(u64 evmptr)
++{
++	return evmptr != EVMPTR_INVALID;
++}
++static inline bool nested_vmx_is_evmptr12_tbd(struct vcpu_vmx *vmx)
++{
++	return evmptr_is_tbd(vmx->nested.hv_evmcs_vmptr);
++}
+ static inline struct hv_enlightened_vmcs *nested_vmx_evmcs(struct vcpu_vmx *vmx)
+ {
+ 	return vmx->nested.hv_evmcs;
  }
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index d8288374078e..abd19059b236 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -719,12 +719,12 @@ void __vm_xsave_require_permission(uint64_t xfeature, const char *name)
- 	close(kvm_fd);
++
+ u64 nested_get_evmptr(struct kvm_vcpu *vcpu);
+ uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu);
+ int nested_enable_evmcs(struct kvm_vcpu *vcpu,
+@@ -42,17 +60,26 @@ int nested_evmcs_check_controls(struct vmcs12 *vmcs12);
+ bool nested_evmcs_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu);
+ void vmx_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu);
+ #else
+-static inline gpa_t nested_vmx_evmptr12(struct vcpu_vmx *vmx) { return EVMPTR_INVALID; }
+-static inline bool nested_vmx_is_evmptr12_valid(struct vcpu_vmx *vmx) { return false; }
++static inline bool evmptr_is_valid(u64 evmptr)
++{
++	return false;
++}
++static inline bool nested_vmx_is_evmptr12_valid(struct vcpu_vmx *vmx)
++{
++	return false;
++}
++static inline bool evmptr_is_tbd(u64 evmptr)
++{
++	return false;
++}
++static inline bool nested_vmx_is_evmptr12_tbd(struct vcpu_vmx *vmx)
++{
++	return false;
++}
+ static inline struct hv_enlightened_vmcs *nested_vmx_evmcs(struct vcpu_vmx *vmx)
+ {
+ 	return NULL;
+ }
+-static inline u64 nested_get_evmptr(struct kvm_vcpu *vcpu) { return EVMPTR_INVALID; }
+-static inline void nested_evmcs_filter_control_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 *pdata) {}
+-static inline bool nested_evmcs_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu) { return false; }
+-static inline int nested_evmcs_check_controls(struct vmcs12 *vmcs12) { return 0; }
+ #endif
  
- 	if (rc == -1 && (errno == ENXIO || errno == EINVAL))
--		__TEST_REQUIRE(0, "KVM_X86_XCOMP_GUEST_SUPP not supported");
-+		__TEST_REQUIRE(0, "KVM_X86_XCOMP_GUEST_SUPP not supported\n");
+-
+ #endif /* __KVM_X86_VMX_HYPERV_H */
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 4777d867419c..0045d6a2da54 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -179,7 +179,7 @@ static int nested_vmx_failValid(struct kvm_vcpu *vcpu,
+ 	 * VM_INSTRUCTION_ERROR is not shadowed. Enlightened VMCS 'shadows' all
+ 	 * fields and thus must be synced.
+ 	 */
+-	if (nested_vmx_evmptr12(to_vmx(vcpu)) != EVMPTR_INVALID)
++	if (nested_vmx_is_evmptr12_tbd(to_vmx(vcpu)))
+ 		to_vmx(vcpu)->nested.need_vmcs12_to_shadow_sync = true;
  
- 	TEST_ASSERT(rc == 0, "KVM_GET_DEVICE_ATTR(0, KVM_X86_XCOMP_GUEST_SUPP) error: %ld", rc);
+ 	return kvm_skip_emulated_instruction(vcpu);
+@@ -245,6 +245,34 @@ static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
+ #endif
+ }
  
- 	__TEST_REQUIRE(bitmask & xfeature,
--		       "Required XSAVE feature '%s' not supported", name);
-+		       "Required XSAVE feature '%s' not supported\n", name);
++static bool nested_evmcs_handle_vmclear(struct kvm_vcpu *vcpu, gpa_t vmptr)
++{
++#ifdef CONFIG_KVM_HYPERV
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++
++	/*
++	 * When Enlightened VMEntry is enabled on the calling CPU we treat
++	 * memory area pointer by vmptr as Enlightened VMCS (as there's no good
++	 * way to distinguish it from VMCS12) and we must not corrupt it by
++	 * writing to the non-existent 'launch_state' field. The area doesn't
++	 * have to be the currently active EVMCS on the calling CPU and there's
++	 * nothing KVM has to do to transition it from 'active' to 'non-active'
++	 * state. It is possible that the area will stay mapped as
++	 * vmx->nested.hv_evmcs but this shouldn't be a problem.
++	 */
++	if (!guest_cpuid_has_evmcs(vcpu) ||
++	    !evmptr_is_valid(nested_get_evmptr(vcpu)))
++		return false;
++
++	if (nested_vmx_evmcs(vmx) && vmptr == nested_vmx_evmptr12(vmx))
++		nested_release_evmcs(vcpu);
++
++	return true;
++#else
++	return false;
++#endif
++}
++
+ static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
+ 				     struct loaded_vmcs *prev)
+ {
+@@ -1574,9 +1602,9 @@ static void copy_vmcs12_to_shadow(struct vcpu_vmx *vmx)
+ 	vmcs_load(vmx->loaded_vmcs->vmcs);
+ }
  
- 	TEST_REQUIRE(!syscall(SYS_arch_prctl, ARCH_REQ_XCOMP_GUEST_PERM, ilog2(xfeature)));
+-#ifdef CONFIG_KVM_HYPERV
+ static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields)
+ {
++#ifdef CONFIG_KVM_HYPERV
+ 	struct vmcs12 *vmcs12 = vmx->nested.cached_vmcs12;
+ 	struct hv_enlightened_vmcs *evmcs = nested_vmx_evmcs(vmx);
+ 	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(&vmx->vcpu);
+@@ -1817,10 +1845,12 @@ static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields
+ 	 */
  
-diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
-index f74e76d03b7e..e825fe6807fa 100644
---- a/tools/testing/selftests/kvm/rseq_test.c
-+++ b/tools/testing/selftests/kvm/rseq_test.c
-@@ -183,7 +183,7 @@ static void calc_min_max_cpu(void)
+ 	return;
++#endif
+ }
+ 
+ static void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
+ {
++#ifdef CONFIG_KVM_HYPERV
+ 	struct vmcs12 *vmcs12 = vmx->nested.cached_vmcs12;
+ 	struct hv_enlightened_vmcs *evmcs = nested_vmx_evmcs(vmx);
+ 
+@@ -1991,6 +2021,7 @@ static void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
+ 	evmcs->guest_bndcfgs = vmcs12->guest_bndcfgs;
+ 
+ 	return;
++#endif
+ }
+ 
+ /*
+@@ -2000,6 +2031,7 @@ static void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
+ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+ 	struct kvm_vcpu *vcpu, bool from_launch)
+ {
++#ifdef CONFIG_KVM_HYPERV
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	bool evmcs_gpa_changed = false;
+ 	u64 evmcs_gpa;
+@@ -2081,11 +2113,10 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
  	}
  
- 	__TEST_REQUIRE(cnt >= 2,
--		       "Only one usable CPU, task migration not possible");
-+		       "Only one usable CPU, task migration not possible\n");
+ 	return EVMPTRLD_SUCCEEDED;
++#else
++	return EVMPTRLD_DISABLED;
++#endif
  }
+-#else /* CONFIG_KVM_HYPERV */
+-static inline void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields) {}
+-static inline void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx) {}
+-#endif /* CONFIG_KVM_HYPERV */
  
- int main(int argc, char *argv[])
-diff --git a/tools/testing/selftests/kvm/system_counter_offset_test.c b/tools/testing/selftests/kvm/system_counter_offset_test.c
-index 7f5b330b6a1b..46e4ca694e6d 100644
---- a/tools/testing/selftests/kvm/system_counter_offset_test.c
-+++ b/tools/testing/selftests/kvm/system_counter_offset_test.c
-@@ -30,7 +30,7 @@ static void check_preconditions(struct kvm_vcpu *vcpu)
+ void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu)
  {
- 	__TEST_REQUIRE(!__vcpu_has_device_attr(vcpu, KVM_VCPU_TSC_CTRL,
- 					       KVM_VCPU_TSC_OFFSET),
--		       "KVM_VCPU_TSC_OFFSET not supported; skipping test");
-+		       "KVM_VCPU_TSC_OFFSET not supported; skipping test\n");
+@@ -2890,8 +2921,10 @@ static int nested_vmx_check_controls(struct kvm_vcpu *vcpu,
+ 	    nested_check_vm_entry_controls(vcpu, vmcs12))
+ 		return -EINVAL;
+ 
++#ifdef CONFIG_KVM_HYPERV
+ 	if (guest_cpuid_has_evmcs(vcpu))
+ 		return nested_evmcs_check_controls(vmcs12);
++#endif
+ 
+ 	return 0;
+ }
+@@ -3191,8 +3224,6 @@ static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+ 
+ 	return true;
+ }
+-#else
+-static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu) { return true; }
+ #endif
+ 
+ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+@@ -3285,6 +3316,7 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 
+ static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
+ {
++#ifdef CONFIG_KVM_HYPERV
+ 	/*
+ 	 * Note: nested_get_evmcs_page() also updates 'vp_assist_page' copy
+ 	 * in 'struct kvm_vcpu_hv' in case eVMCS is in use, this is mandatory
+@@ -3301,7 +3333,7 @@ static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
+ 
+ 		return false;
+ 	}
+-
++#endif
+ 	if (is_guest_mode(vcpu) && !nested_get_vmcs12_pages(vcpu))
+ 		return false;
+ 
+@@ -3564,13 +3596,11 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+ 	if (!nested_vmx_check_permission(vcpu))
+ 		return 1;
+ 
+-#ifdef CONFIG_KVM_HYPERV
+ 	evmptrld_status = nested_vmx_handle_enlightened_vmptrld(vcpu, launch);
+ 	if (evmptrld_status == EVMPTRLD_ERROR) {
+ 		kvm_queue_exception(vcpu, UD_VECTOR);
+ 		return 1;
+ 	}
+-#endif
+ 
+ 	kvm_pmu_trigger_event(vcpu, PERF_COUNT_HW_BRANCH_INSTRUCTIONS);
+ 
+@@ -4743,6 +4773,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+ 	WARN_ON_ONCE(vmx->nested.nested_run_pending);
+ 
+ 	if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
++#ifdef CONFIG_KVM_HYPERV
+ 		/*
+ 		 * KVM_REQ_GET_NESTED_STATE_PAGES is also used to map
+ 		 * Enlightened VMCS after migration and we still need to
+@@ -4750,6 +4781,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+ 		 * the first L2 run.
+ 		 */
+ 		(void)nested_get_evmcs_page(vcpu);
++#endif
+ 	}
+ 
+ 	/* Service pending TLB flush requests for L2 before switching to L1. */
+@@ -5302,18 +5334,7 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
+ 	if (vmptr == vmx->nested.vmxon_ptr)
+ 		return nested_vmx_fail(vcpu, VMXERR_VMCLEAR_VMXON_POINTER);
+ 
+-	/*
+-	 * When Enlightened VMEntry is enabled on the calling CPU we treat
+-	 * memory area pointer by vmptr as Enlightened VMCS (as there's no good
+-	 * way to distinguish it from VMCS12) and we must not corrupt it by
+-	 * writing to the non-existent 'launch_state' field. The area doesn't
+-	 * have to be the currently active EVMCS on the calling CPU and there's
+-	 * nothing KVM has to do to transition it from 'active' to 'non-active'
+-	 * state. It is possible that the area will stay mapped as
+-	 * vmx->nested.hv_evmcs but this shouldn't be a problem.
+-	 */
+-	if (likely(!guest_cpuid_has_evmcs(vcpu) ||
+-		   !evmptr_is_valid(nested_get_evmptr(vcpu)))) {
++	if (likely(!nested_evmcs_handle_vmclear(vcpu, vmptr))) {
+ 		if (vmptr == vmx->nested.current_vmptr)
+ 			nested_release_vmcs12(vcpu);
+ 
+@@ -5330,8 +5351,6 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
+ 					   vmptr + offsetof(struct vmcs12,
+ 							    launch_state),
+ 					   &zero, sizeof(zero));
+-	} else if (nested_vmx_evmcs(vmx) && vmptr == nested_vmx_evmptr12(vmx)) {
+-		nested_release_evmcs(vcpu);
+ 	}
+ 
+ 	return nested_vmx_succeed(vcpu);
+@@ -6218,11 +6237,13 @@ static bool nested_vmx_l0_wants_exit(struct kvm_vcpu *vcpu,
+ 		 * Handle L2's bus locks in L0 directly.
+ 		 */
+ 		return true;
++#ifdef CONFIG_KVM_HYPERV
+ 	case EXIT_REASON_VMCALL:
+ 		/* Hyper-V L2 TLB flush hypercall is handled by L0 */
+ 		return guest_hv_cpuid_has_l2_tlb_flush(vcpu) &&
+ 			nested_evmcs_l2_tlb_flush_enabled(vcpu) &&
+ 			kvm_hv_is_tlb_flush_hcall(vcpu);
++#endif
+ 	default:
+ 		break;
+ 	}
+@@ -6445,7 +6466,7 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+ 			kvm_state.size += sizeof(user_vmx_nested_state->vmcs12);
+ 
+ 			/* 'hv_evmcs_vmptr' can also be EVMPTR_MAP_PENDING here */
+-			if (nested_vmx_evmptr12(vmx) != EVMPTR_INVALID)
++			if (nested_vmx_is_evmptr12_tbd(vmx))
+ 				kvm_state.flags |= KVM_STATE_NESTED_EVMCS;
+ 
+ 			if (is_guest_mode(vcpu) &&
+diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+index 0cedb80c5c94..891cc1df6a60 100644
+--- a/arch/x86/kvm/vmx/nested.h
++++ b/arch/x86/kvm/vmx/nested.h
+@@ -58,7 +58,7 @@ static inline int vmx_has_valid_vmcs12(struct kvm_vcpu *vcpu)
+ 
+ 	/* 'hv_evmcs_vmptr' can also be EVMPTR_MAP_PENDING here */
+ 	return vmx->nested.current_vmptr != -1ull ||
+-		nested_vmx_evmptr12(vmx) != EVMPTR_INVALID;
++	       nested_vmx_is_evmptr12_tbd(vmx);
  }
  
- static void setup_system_counter(struct kvm_vcpu *vcpu, struct test_case *test)
-diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-index 83e25bccc139..a3f4edbd9add 100644
---- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-@@ -259,7 +259,7 @@ int main(int argc, char **argv)
- 	__TEST_REQUIRE(token == MAGIC_TOKEN,
- 		       "This test must be run with the magic token %d.\n"
- 		       "This is done by nx_huge_pages_test.sh, which\n"
--		       "also handles environment setup for the test.", MAGIC_TOKEN);
-+		       "also handles environment setup for the test.\n", MAGIC_TOKEN);
+ static inline u16 nested_get_vpid02(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 6e0ff015c5ff..942e10166777 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2048,6 +2048,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		if (vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
+ 				    &msr_info->data))
+ 			return 1;
++#ifdef CONFIG_KVM_HYPERV
+ 		/*
+ 		 * Enlightened VMCS v1 doesn't have certain VMCS fields but
+ 		 * instead of just ignoring the features, different Hyper-V
+@@ -2058,6 +2059,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		if (!msr_info->host_initiated && guest_cpuid_has_evmcs(vcpu))
+ 			nested_evmcs_filter_control_msr(vcpu, msr_info->index,
+ 							&msr_info->data);
++#endif
+ 		break;
+ 	case MSR_IA32_RTIT_CTL:
+ 		if (!vmx_pt_mode_is_host_guest())
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 55addb8eef01..8fe6eb2b4a34 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -747,14 +747,4 @@ static inline bool vmx_can_use_ipiv(struct kvm_vcpu *vcpu)
+ 	return  lapic_in_kernel(vcpu) && enable_ipiv;
+ }
  
- 	run_test(reclaim_period_ms, false, reboot_permissions);
- 	run_test(reclaim_period_ms, true, reboot_permissions);
+-static inline bool guest_cpuid_has_evmcs(struct kvm_vcpu *vcpu)
+-{
+-	/*
+-	 * eVMCS is exposed to the guest if Hyper-V is enabled in CPUID and
+-	 * eVMCS has been explicitly enabled by userspace.
+-	 */
+-	return vcpu->arch.hyperv_enabled &&
+-	       to_vmx(vcpu)->nested.enlightened_vmcs_enabled;
+-}
+-
+ #endif /* __KVM_X86_VMX_H */
+
+base-commit: 3f84682d96d3d77f35f661a3787ddb90c0477b75
 -- 
-2.43.0
 
 
