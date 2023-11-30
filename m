@@ -1,217 +1,191 @@
-Return-Path: <kvm+bounces-3025-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3026-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 163BB7FFCB5
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 21:37:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 25A7A7FFCDB
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 21:41:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FA381C20FCD
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:37:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48BA01C20C55
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:41:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F445B211;
-	Thu, 30 Nov 2023 20:37:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D7085674E;
+	Thu, 30 Nov 2023 20:41:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WoHDYjhk"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="UnNs42TM"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CA5F10DC
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 12:37:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701376650;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+iKxVT3Aoxm2ETYbHgSKpvUXyQ0XJ8rFvA2vgboplHU=;
-	b=WoHDYjhkWvUNMfzjEK6PZ0HXews1WDTt9so/SenbNYE1HA+vZFbBw3YmZQcZ/QHjg0PjGb
-	1gAkW1XaCsKosYmFfaxmPBGTDhz3bAhdgfoh2Ol8dZR/YjwqRH0rhBw6EGS3VNDm6d1zuR
-	EwzU0fYTJUyWoFmJufYYS7eT80IXIFQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-259-V_vuTiG0PmOl3weveDAFBQ-1; Thu, 30 Nov 2023 15:37:24 -0500
-X-MC-Unique: V_vuTiG0PmOl3weveDAFBQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5C821101389B;
-	Thu, 30 Nov 2023 20:37:21 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.46])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id DDF641C060BD;
-	Thu, 30 Nov 2023 20:37:19 +0000 (UTC)
-Date: Thu, 30 Nov 2023 15:37:18 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
-Cc: qemu-devel@nongnu.org, Jean-Christophe Dubois <jcd@tribudubois.net>,
-	Fabiano Rosas <farosas@suse.de>, qemu-s390x@nongnu.org,
-	Song Gao <gaosong@loongson.cn>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Thomas Huth <thuth@redhat.com>, Hyman Huang <yong.huang@smartx.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Andrey Smirnov <andrew.smirnov@gmail.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Kevin Wolf <kwolf@redhat.com>, Ilya Leoshkevich <iii@linux.ibm.com>,
-	Artyom Tarasenko <atar4qemu@gmail.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	Max Filippov <jcmvbkbc@gmail.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Paul Durrant <paul@xen.org>,
-	Jagannathan Raman <jag.raman@oracle.com>,
-	Juan Quintela <quintela@redhat.com>,
-	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-	qemu-arm@nongnu.org, Jason Wang <jasowang@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
-	=?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
-	BALATON Zoltan <balaton@eik.bme.hu>,
-	Daniel Henrique Barboza <danielhb413@gmail.com>,
-	Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	Hailiang Zhang <zhanghailiang@xfusion.com>,
-	Roman Bolshakov <rbolshakov@ddn.com>,
-	Huacai Chen <chenhuacai@kernel.org>, Fam Zheng <fam@euphon.net>,
-	Eric Blake <eblake@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
-	Alexander Graf <agraf@csgraf.de>,
-	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-	Weiwei Li <liwei1518@gmail.com>, Eric Farman <farman@linux.ibm.com>,
-	Stafford Horne <shorne@gmail.com>,
-	David Hildenbrand <david@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Reinoud Zandijk <reinoud@netbsd.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Cameron Esfahani <dirty@apple.com>, xen-devel@lists.xenproject.org,
-	Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, qemu-riscv@nongnu.org,
-	Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-	John Snow <jsnow@redhat.com>,
-	Sunil Muthuswamy <sunilmut@microsoft.com>,
-	Michael Roth <michael.roth@amd.com>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Bin Meng <bin.meng@windriver.com>,
-	Stefano Stabellini <sstabellini@kernel.org>, kvm@vger.kernel.org,
-	qemu-block@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
-	Peter Xu <peterx@redhat.com>,
-	Anthony Perard <anthony.perard@citrix.com>,
-	Harsh Prateek Bora <harshpb@linux.ibm.com>,
-	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
-	=?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
-	qemu-ppc@nongnu.org,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Leonardo Bras <leobras@redhat.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Jiaxun Yang <jiaxun.yang@flygoat.com>
-Subject: Re: [PATCH 6/6] Rename "QEMU global mutex" to "BQL" in comments and
- docs
-Message-ID: <20231130203718.GD1184658@fedora>
-References: <20231129212625.1051502-1-stefanha@redhat.com>
- <20231129212625.1051502-7-stefanha@redhat.com>
- <fcaff24d-0ced-4547-898f-a9b8bf49be45@linaro.org>
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2089.outbound.protection.outlook.com [40.107.243.89])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 089D810DF;
+	Thu, 30 Nov 2023 12:41:39 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fhtq8XHKH28IJIeGcwNGXmtn7is8LcFXtvPwroJF3xHJ6CSiOgyfHdGMOsCPrZjild+w4todwyO83bGcLqvN3rvgIoyqp9654D0xZ+xDvZgL8aRQW7uKSZyN82PRGplQKtkP9iUFcA48Y2EYiokkP77WlKyQRfNcBxT6D6UUDuN1U7gTnpoMjPXfZufKh8E1EUc2bYq77dyU7srLP4NNZySYeUdEqjdEtdEx523WyVie91ofOXQ0uITgkl51KfQlTUBe7eeN1uAbvwXBHPtoKwQmXXdVOP1ka6ZQ/N85H+6M5avD8lNctYtPajNEO3fZxyRV/6a1ugR9RDuSe2DCRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rg6XE4LP0MWCssOY70exAojC5zQyaQlr1CoEpz7a4G4=;
+ b=E0caypBJ0ekBpWpIydix8Ve3AoV0PnNQcjQBjIH78utQMeHFLspV55e/L9ENUqAjiTqJCbRVJZYiyNQkj9BOQk+Mjh2+Q1YCmcC1Nz7EHO2pifo3tQIuWJmgepw+Z4j4o+ml2IbfpllsWWD160lBoRCD5HMxiesEre3llF708cY5H7xu0CqIOAFTlIxFdoMFq44/oAy6qFtUf6QKKAxldo8JU5t8Qk/IX/qElPu5ONVaSSg/dTjb5LShc/IS4j4whrLf1UGYtW/q8vb1gJb/fdABUrXvOeRtrrVeNNnGvNbxzLTW1UUOcwQcqUt83Q3ldhBN+uZmzyuisP8giMj5Zw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=oracle.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rg6XE4LP0MWCssOY70exAojC5zQyaQlr1CoEpz7a4G4=;
+ b=UnNs42TM+vxTSwuUP4Niv+yjKR+1yw33g5nKVLjHsXzhOt3gZNpbaaZE649wE5W97ZLyiGRJCLr3SHd918BmLbkyRC/0M2kdQwGWI3tkgnff5aAj68tpZrxu0m4Vinr3CF1nkVgINh8OZ4mjMhGA4OoxXYDYxENSxBXdg0EuoB0VGfmKh/3YNygzpjcx4U8CyQWmCJrjL1xBN4HTxqR+4UFFdUeXM76xBy+/nAKkYLAAXtfTe/Ao6K6DIq49+6tBtasjmHD3utfa/xh8lnzhRpKnK05ykSdiMmqWknn5w9RbtjeRQy3DCBiJhK/DgIWVO/A8p4LUx3F7II8O/8UvZQ==
+Received: from DM6PR06CA0095.namprd06.prod.outlook.com (2603:10b6:5:336::28)
+ by PH7PR12MB9104.namprd12.prod.outlook.com (2603:10b6:510:2f3::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29; Thu, 30 Nov
+ 2023 20:41:36 +0000
+Received: from DS3PEPF000099DB.namprd04.prod.outlook.com
+ (2603:10b6:5:336:cafe::fc) by DM6PR06CA0095.outlook.office365.com
+ (2603:10b6:5:336::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29 via Frontend
+ Transport; Thu, 30 Nov 2023 20:41:36 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ DS3PEPF000099DB.mail.protection.outlook.com (10.167.17.197) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7046.17 via Frontend Transport; Thu, 30 Nov 2023 20:41:36 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 30 Nov
+ 2023 12:41:23 -0800
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 30 Nov
+ 2023 12:41:23 -0800
+Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41 via Frontend
+ Transport; Thu, 30 Nov 2023 12:41:21 -0800
+Date: Thu, 30 Nov 2023 12:41:20 -0800
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+	"joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>, "cohuck@redhat.com"
+	<cohuck@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mjrosato@linux.ibm.com"
+	<mjrosato@linux.ibm.com>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "yi.y.sun@linux.intel.com"
+	<yi.y.sun@linux.intel.com>, "peterx@redhat.com" <peterx@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
+	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
+ Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
+	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
+	<yan.y.zhao@intel.com>
+Subject: Re: [PATCH v6 2/6] iommufd: Add IOMMU_HWPT_INVALIDATE
+Message-ID: <ZWjzcEAAg8ptVH4A@Asurada-Nvidia>
+References: <ZVw/BXxgGCuCZCA6@Asurada-Nvidia>
+ <BN9PR11MB52761A9B48A25E89BEECE6308CB8A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZWTzoBTDDEWAKMs9@Asurada-Nvidia>
+ <BN9PR11MB5276FD60A0EDF8E3F231FCC88CBCA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZWaLCSAMIOXTlghk@Asurada-Nvidia>
+ <20231129005715.GS436702@nvidia.com>
+ <ZWaPM4p7yjJ0sEKk@Asurada-Nvidia>
+ <20231129195804.GF436702@nvidia.com>
+ <ZWe2PvatTkkyNCY5@Asurada-Nvidia>
+ <20231130000816.GB1389974@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="rAX955JzN10OrQ/Q"
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <fcaff24d-0ced-4547-898f-a9b8bf49be45@linaro.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+In-Reply-To: <20231130000816.GB1389974@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099DB:EE_|PH7PR12MB9104:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2209f2fa-1066-48a7-05a8-08dbf1e4bef8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	3pTn51y3BMQt7vlSQRy55wjzzcPZgNbopuWIbSGNt7Cn50SHsudaOoN4wlPvxbxai5MV8+Y2uKL1BNVqv3E2boqUgYlnNrgnFW0SOHleORXfyEhSeP74CARyBqA0X8ydxd5AxEft5PPNcqWq8C3LGKrx63W1Jj1YD+MyYVcZhHQ5+Ewm0LQdYfnOuRLitl1hFXbf6EgVHBVGIlazADm27K4lc7IUOxeK98mFfJ/p0KSUIiZRpyr9FYz8BgH+3vqxDbkWsEgQONg5bVgHYak4rs7FSK95M1zMmP/WdSxcuWJIk3CznvYZUmifT7P7I/fVqqdvf3nkylZvetJoj6jHSO118hpXdy3+q9kuN1yTUHVhx8lBQjBJpFaSOTRCTQUDDR1BSZhNZK6mPXmyR4BP5FkvSwJ6ZnyOmFrJY8QwcvSPIkNgvSfIcwpMWZzCLdfdaSzI49xPeGmQ9veTq377XyFD25qm9bfYEChlEWtOiNs/QJMeSQH6/IcX6Y75WEkkMJNDpIaPJuSnVOMxl0/L19WAA+rKNrj5SbWqy7XRutomDmPUj4QMDUjLFZ5kBLnHaOhoti7Viv/c/DjmfsyusaJ9NoNCp3h4BZYDnG+AymsBI0YbkA8XI83gSw1N63M0j8FCTosV2SQCQ4x3/8cKcLbovsWrjNWxRRz50K3v9cUInZlfLlqHoTAJc/h5etF+kwFQRoRqhHBP6JAwGUmSheILIwsfXXAhYYvQr/fp20KcXsJ1h8AsIVkI4rVcL2CM
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(39860400002)(346002)(136003)(396003)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(82310400011)(46966006)(40470700004)(36840700001)(2906002)(5660300002)(55016003)(7416002)(4326008)(6862004)(8676002)(8936002)(40480700001)(41300700001)(70586007)(70206006)(316002)(6636002)(54906003)(40460700003)(9686003)(86362001)(47076005)(7636003)(36860700001)(478600001)(83380400001)(336012)(26005)(426003)(33716001)(356005)(82740400003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2023 20:41:36.0413
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2209f2fa-1066-48a7-05a8-08dbf1e4bef8
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF000099DB.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9104
 
+On Wed, Nov 29, 2023 at 08:08:16PM -0400, Jason Gunthorpe wrote:
+> On Wed, Nov 29, 2023 at 02:07:58PM -0800, Nicolin Chen wrote:
+> > On Wed, Nov 29, 2023 at 03:58:04PM -0400, Jason Gunthorpe wrote:
+> > > On Tue, Nov 28, 2023 at 05:09:07PM -0800, Nicolin Chen wrote:
+> > > 
+> > > > > > With that being said, I think errno (-EIO) could do the job,
+> > > > > > as you suggested too.
+> > > > > 
+> > > > > Do we have any idea what HW failures can be generated by the commands
+> > > > > this will execture? IIRC I don't remember seeing any smmu specific
+> > > > > codes related to invalid invalidation? Everything is a valid input?
+> > > > 
+> > > > "7.1 Command queue errors" has the info.
+> > > 
+> > > Hmm CERROR_ATC_INV_SYNC needs to be forwarded to the guest somehow
+> > 
+> > Oh, for sure. That's typically triggered with an asynchronous
+> > timeout from the eventq, so we'd need the io page fault series
+> > as you previously remarked. Though I also wonder if an invalid
+> > vSID that doesn't link to a pSID should be CERROR_ATC_INV_SYNC
+> > also v.s. CERROR_ILL.
+> 
+> Yes, something like that make sense
+> 
+> Presumably sync becomes emulated and turns into something generated
+> when the ioctl returns.
 
---rAX955JzN10OrQ/Q
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+CMD_SYNC right? Yes. When the ioctl returns, VMM simply moves the
+CONS index next to CMD_SYNC upon a success, or stops the index at
+the faulty command upon a failure.
 
-On Thu, Nov 30, 2023 at 02:49:48PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> On 29/11/23 22:26, Stefan Hajnoczi wrote:
-> > The term "QEMU global mutex" is identical to the more widely used Big
-> > QEMU Lock ("BQL"). Update the code comments and documentation to use
-> > "BQL" instead of "QEMU global mutex".
-> >=20
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >   docs/devel/multi-thread-tcg.rst   |  7 +++----
-> >   docs/devel/qapi-code-gen.rst      |  2 +-
-> >   docs/devel/replay.rst             |  2 +-
-> >   docs/devel/multiple-iothreads.txt | 16 ++++++++--------
-> >   include/block/blockjob.h          |  6 +++---
-> >   include/io/task.h                 |  2 +-
-> >   include/qemu/coroutine-core.h     |  2 +-
-> >   include/qemu/coroutine.h          |  2 +-
-> >   hw/block/dataplane/virtio-blk.c   |  8 ++++----
-> >   hw/block/virtio-blk.c             |  2 +-
-> >   hw/scsi/virtio-scsi-dataplane.c   |  6 +++---
-> >   net/tap.c                         |  2 +-
-> >   12 files changed, 28 insertions(+), 29 deletions(-)
->=20
->=20
-> > diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-> > index e594c10d23..b2bc7c04d6 100644
-> > --- a/include/block/blockjob.h
-> > +++ b/include/block/blockjob.h
-> > @@ -54,7 +54,7 @@ typedef struct BlockJob {
-> >       /**
-> >        * Speed that was set with @block_job_set_speed.
-> > -     * Always modified and read under QEMU global mutex (GLOBAL_STATE_=
-CODE).
-> > +     * Always modified and read under BQL (GLOBAL_STATE_CODE).
->=20
-> "under the BQL"
->=20
-> >        */
-> >       int64_t speed;
-> > @@ -66,7 +66,7 @@ typedef struct BlockJob {
-> >       /**
-> >        * Block other operations when block job is running.
-> > -     * Always modified and read under QEMU global mutex (GLOBAL_STATE_=
-CODE).
-> > +     * Always modified and read under BQL (GLOBAL_STATE_CODE).
->=20
-> Ditto,
->=20
-> >        */
-> >       Error *blocker;
-> > @@ -89,7 +89,7 @@ typedef struct BlockJob {
-> >       /**
-> >        * BlockDriverStates that are involved in this block job.
-> > -     * Always modified and read under QEMU global mutex (GLOBAL_STATE_=
-CODE).
-> > +     * Always modified and read under BQL (GLOBAL_STATE_CODE).
->=20
-> Ditto.
->=20
-> >        */
-> >       GSList *nodes;
-> >   } BlockJob;
+> So userspace would have to read the event FD
+> before returning to be correct?
+> 
+> Maybe the kernel can somehow return a flag to indicate the event fd
+> has data in it?
+> 
+> If yes then all errors would flow through the event fd?
 
-Will fix in v2.
+I think it'd be nicer to return an immediate error to stop guest
+CMDQ to raise a fault there accordingly, similar to returning a
+-EIO for a bad STE in your SMMU part-3 series.
 
-Stefan
+If the "return a flag" is an errno of the ioctl, it could work by
+reading from a separate memory that belongs to the event fd. Yet,
+in this case, an eventfd signal (assuming there is one to trigger
+VMM's fault handler) becomes unnecessary, since the invalidation
+ioctl is already handling it?
 
---rAX955JzN10OrQ/Q
-Content-Type: application/pgp-signature; name="signature.asc"
+Thanks
+Nic
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmVo8n4ACgkQnKSrs4Gr
-c8hqqggAtuleOhegca1BHCQqICnBO4Olum6obo9K4B6RhmNaK9kIfqeO3kNFY9K0
-xy7SGfNACel07j3Lttl6p+xHJOe1zaE7IV2o9jKqMK0J09vpTZSXq06ssaTJrYZn
-p2hGeneWnTJU5O3qUpotRsBp19PdMJLL3o2V7fJ+FRmE+0bc1KTCfzaIDC0IWFQD
-rc5d8Et49WwA+aKWhDsn3GeRlvfxIxk/TFHsfdkLSdpU/LVU9lP/ExNVLqwYTNl9
-OChcXKr+5mvuONgflXwub4uzX8FbIS/HoPIIC7uBG5xE+gao+EYmNRXVFFHRC+CP
-/rjI7iW5qJHCSKa8tj2XY0KwbTSlcQ==
-=hoap
------END PGP SIGNATURE-----
-
---rAX955JzN10OrQ/Q--
-
+> Would Intel be basically the same too?
+> 
+> Jason
 
