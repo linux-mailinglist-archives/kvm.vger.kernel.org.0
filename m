@@ -1,203 +1,183 @@
-Return-Path: <kvm+bounces-3022-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3021-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 439B47FFC75
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 21:29:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 879C97FFC6E
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 21:28:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4A941F20F7B
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:29:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1AF21C20DB7
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:28:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86DBC59144;
-	Thu, 30 Nov 2023 20:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4498556459;
+	Thu, 30 Nov 2023 20:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dojmSyN3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JESR4D/S"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F492106
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 12:29:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701376162;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pspgY/UtbTR6ASTEqbHV7C5jZMpcDbn0C1ttaW0vK+0=;
-	b=dojmSyN3m3tzA6P/p0v/G9pk481wUe9Edsc89sWju0GwYJjHiGgy/QoMjnrDQolPT4Y1xD
-	VBlVDWTRU9wtHZSdYr9QfX/BzgZBmQb7Eew7YU/zbdae8SHeSWGmkFlzuN69SstGePipaq
-	PcGQzn0Q8fugRuAQt5KBTHA12JW+xio=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-519-wp0cEj35OVq_KJykWOUQuA-1; Thu, 30 Nov 2023 15:29:19 -0500
-X-MC-Unique: wp0cEj35OVq_KJykWOUQuA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6AB4B85A58B;
-	Thu, 30 Nov 2023 20:29:18 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.46])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1713E36E2;
-	Thu, 30 Nov 2023 20:27:34 +0000 (UTC)
-Date: Thu, 30 Nov 2023 15:27:32 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Ilya Leoshkevich <iii@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, Jean-Christophe Dubois <jcd@tribudubois.net>,
-	Fabiano Rosas <farosas@suse.de>, qemu-s390x@nongnu.org,
-	Song Gao <gaosong@loongson.cn>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Thomas Huth <thuth@redhat.com>, Hyman Huang <yong.huang@smartx.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Andrey Smirnov <andrew.smirnov@gmail.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Kevin Wolf <kwolf@redhat.com>,
-	Artyom Tarasenko <atar4qemu@gmail.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	Max Filippov <jcmvbkbc@gmail.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Paul Durrant <paul@xen.org>,
-	Jagannathan Raman <jag.raman@oracle.com>,
-	Juan Quintela <quintela@redhat.com>,
-	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-	qemu-arm@nongnu.org, Jason Wang <jasowang@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
-	=?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
-	BALATON Zoltan <balaton@eik.bme.hu>,
-	Daniel Henrique Barboza <danielhb413@gmail.com>,
-	Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	Hailiang Zhang <zhanghailiang@xfusion.com>,
-	Roman Bolshakov <rbolshakov@ddn.com>,
-	Huacai Chen <chenhuacai@kernel.org>, Fam Zheng <fam@euphon.net>,
-	Eric Blake <eblake@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
-	Alexander Graf <agraf@csgraf.de>,
-	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-	Weiwei Li <liwei1518@gmail.com>, Eric Farman <farman@linux.ibm.com>,
-	Stafford Horne <shorne@gmail.com>,
-	David Hildenbrand <david@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Reinoud Zandijk <reinoud@netbsd.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Cameron Esfahani <dirty@apple.com>, xen-devel@lists.xenproject.org,
-	Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, qemu-riscv@nongnu.org,
-	Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-	John Snow <jsnow@redhat.com>,
-	Sunil Muthuswamy <sunilmut@microsoft.com>,
-	Michael Roth <michael.roth@amd.com>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Bin Meng <bin.meng@windriver.com>,
-	Stefano Stabellini <sstabellini@kernel.org>, kvm@vger.kernel.org,
-	qemu-block@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
-	Peter Xu <peterx@redhat.com>,
-	Anthony Perard <anthony.perard@citrix.com>,
-	Harsh Prateek Bora <harshpb@linux.ibm.com>,
-	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
-	=?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
-	qemu-ppc@nongnu.org,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Leonardo Bras <leobras@redhat.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Jiaxun Yang <jiaxun.yang@flygoat.com>
-Subject: Re: [PATCH 2/6] qemu/main-loop: rename QEMU_IOTHREAD_LOCK_GUARD to
- QEMU_BQL_LOCK_GUARD
-Message-ID: <20231130202732.GA1184658@fedora>
-References: <20231129212625.1051502-1-stefanha@redhat.com>
- <20231129212625.1051502-3-stefanha@redhat.com>
- <c3ac8d9c2b9d611e84672436ce1a96aedcaacf5e.camel@linux.ibm.com>
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A6A41703
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 12:28:09 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5c27822f1b6so1382279a12.2
+        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 12:28:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701376089; x=1701980889; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4OV4iNp1w41nYYoXLoX47tRgNsubd9PkYcYHlp6v5Ac=;
+        b=JESR4D/SMy+tEtRVMEMg+JPiL8wFcuss6ItmFTbhNE8e+lzHHRvZy6etYTNArz/4Cc
+         TlK/UsDIkUJGV+AZtENwSYVa6py70kslDCpEuvGBsOgKrQa0Z/+10pLa3Uw8V+GXO9DF
+         rqz9K0i8L3p+1pcBPywdCM423eRWEKu+8qt17ikqEBOXyyEX+zO6ds90KyIjsHism/gk
+         nhzI3weejNOQriGzeGaMOdqhxf0zPtdY2+1crF6CXMeXOedsOZlCTZSazlJ9xJ5GsKvn
+         Vn+a78PIWoFH9iRup4Hb9w76OPCjRbKcaVb6lTXwM1yfQy70GgVd1uFseIvPuIeIcO4P
+         8KxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701376089; x=1701980889;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4OV4iNp1w41nYYoXLoX47tRgNsubd9PkYcYHlp6v5Ac=;
+        b=i6097o+k/a+dHgLVCqoTGxZTxJwLTKnC7Bm0olhaOuhkAaVxmWzv7eLym32SMPAQMu
+         dWxh/d9OP7vx2cC61iTef+ELZhII5BtjrYsvYybC+WaGI955wKeYhhS7fdsVgWLFLh/U
+         058OxYweP27J+elXiWX1eoWW5YLw64ZLBUb74dx3eS12iYIPENHZkIiZ5rWMSApj2wgW
+         EgwA+7Y7eSd7HVWQP2dvzll4S3rbNgdb7HVce15D4Qj7wjmfU9chZtwDwsjr4vTkjMBT
+         WhbUA+fkjYDDd26abRLL23ZubYzGzdC9pM2Z546pebWbn3AOH10SC8fUOF1kHYQvq/93
+         W5rg==
+X-Gm-Message-State: AOJu0Yx0d37yIq1kVZqzVwW1DQXaD7Ew3EnbWcLbY4CThp5VwCd6UDkr
+	HJp+XW4O+x271GtxXn1U9a/ycYGHda8=
+X-Google-Smtp-Source: AGHT+IHQaxLEqA5rxsivnhYLveGHXMN8rfV5UgZ8GpYx6Dig6VjxZKpBbPSRb9b7A6hv0E+T/P1KhLt82O8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:e84f:b0:1cf:ee4c:1200 with SMTP id
+ t15-20020a170902e84f00b001cfee4c1200mr1827241plg.5.1701376088878; Thu, 30 Nov
+ 2023 12:28:08 -0800 (PST)
+Date: Thu, 30 Nov 2023 12:28:07 -0800
+In-Reply-To: <ZTcO8M3T9DGYrN2M@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="IGy9nSmIZnwUahKG"
-Content-Disposition: inline
-In-Reply-To: <c3ac8d9c2b9d611e84672436ce1a96aedcaacf5e.camel@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+Mime-Version: 1.0
+References: <20231024001636.890236-1-jmattson@google.com> <20231024001636.890236-2-jmattson@google.com>
+ <ZTcO8M3T9DGYrN2M@google.com>
+Message-ID: <ZWjwV7rQ9i2NCf5A@google.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Use a switch statement in __feature_translate()
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"'Paolo Bonzini '" <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
+On Mon, Oct 23, 2023, Sean Christopherson wrote:
+> On Mon, Oct 23, 2023, Jim Mattson wrote:
+> > The compiler will probably do better than linear search.
+> 
+> It shouldn't matter, KVM relies on the compiler to resolve the translation at
+> compile time, e.g. the result is fed into reverse_cpuid_check().
+> 
+> I.e. we should pick whatever is least ugly.
 
---IGy9nSmIZnwUahKG
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+What if we add a macro to generate each case statement?  It's arguably a wee bit
+more readable, and also eliminates the possibility of returning the wrong feature
+due to copy+paste errors, e.g. nothing would break at compile time if we goofed
+and did:
 
-On Thu, Nov 30, 2023 at 10:14:47AM +0100, Ilya Leoshkevich wrote:
-> On Wed, 2023-11-29 at 16:26 -0500, Stefan Hajnoczi wrote:
-> > The name "iothread" is overloaded. Use the term Big QEMU Lock (BQL)
-> > instead, it is already widely used and unambiguous.
-> >=20
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> > =A0include/qemu/main-loop.h=A0 | 20 ++++++++++----------
-> > =A0hw/i386/kvm/xen_evtchn.c=A0 | 14 +++++++-------
-> > =A0hw/i386/kvm/xen_gnttab.c=A0 |=A0 2 +-
-> > =A0hw/mips/mips_int.c=A0=A0=A0=A0=A0=A0=A0 |=A0 2 +-
-> > =A0hw/ppc/ppc.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=A0 2 +-
-> > =A0target/i386/kvm/xen-emu.c |=A0 2 +-
-> > =A0target/ppc/excp_helper.c=A0 |=A0 2 +-
-> > =A0target/ppc/helper_regs.c=A0 |=A0 2 +-
-> > =A0target/riscv/cpu_helper.c |=A0 4 ++--
-> > =A09 files changed, 25 insertions(+), 25 deletions(-)
-> >=20
-> > diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
-> > index d6f75e57bd..0b6a3e4824 100644
-> > --- a/include/qemu/main-loop.h
-> > +++ b/include/qemu/main-loop.h
-> > @@ -344,13 +344,13 @@ void qemu_bql_lock_impl(const char *file, int
-> > line);
-> > =A0void qemu_bql_unlock(void);
-> > =A0
-> > =A0/**
-> > - * QEMU_IOTHREAD_LOCK_GUARD
-> > + * QEMU_BQL_LOCK_GUARD
-> > =A0 *
-> > - * Wrap a block of code in a conditional
-> > qemu_mutex_{lock,unlock}_iothread.
-> > + * Wrap a block of code in a conditional qemu_bql_{lock,unlock}.
-> > =A0 */
-> > -typedef struct IOThreadLockAuto IOThreadLockAuto;
-> > +typedef struct BQLLockAuto BQLLockAuto;
-> > =A0
-> > -static inline IOThreadLockAuto *qemu_iothread_auto_lock(const char
-> > *file,
-> > +static inline BQLLockAuto *qemu_bql_auto_lock(const char *file,
-> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0 int line)
->=20
-> The padding is not correct anymore.
+	case X86_FEATURE_SGX1:
+		return KVM_X86_FEATURE_SGX1;
+	case X86_FEATURE_SGX2:
+		return KVM_X86_FEATURE_SGX1;
 
-Good point, I didn't check the formatting after search-and-replace. I
-will fix this across the patch series in v2.
+If you've no objection, I'll push this:
 
-Stefan
+--
+Author: Jim Mattson <jmattson@google.com>
+Date:   Mon Oct 23 17:16:36 2023 -0700
 
---IGy9nSmIZnwUahKG
-Content-Type: application/pgp-signature; name="signature.asc"
+    KVM: x86: Use a switch statement and macros in __feature_translate()
+    
+    Use a switch statement with macro-generated case statements to handle
+    translating feature flags in order to reduce the probability of runtime
+    errors due to copy+paste goofs, to make compile-time errors easier to
+    debug, and to make the code more readable.
+    
+    E.g. the compiler won't directly generate an error for duplicate if
+    statements
+    
+            if (x86_feature == X86_FEATURE_SGX1)
+                    return KVM_X86_FEATURE_SGX1;
+            else if (x86_feature == X86_FEATURE_SGX2)
+                    return KVM_X86_FEATURE_SGX1;
+    
+    and so instead reverse_cpuid_check() will fail due to the untranslated
+    entry pointing at a Linux-defined leaf, which provides practically no
+    hint as to what is broken
+    
+      arch/x86/kvm/reverse_cpuid.h:108:2: error: call to __compiletime_assert_450 declared with 'error' attribute:
+                                          BUILD_BUG_ON failed: x86_leaf == CPUID_LNX_4
+              BUILD_BUG_ON(x86_leaf == CPUID_LNX_4);
+              ^
+    whereas duplicate case statements very explicitly point at the offending
+    code:
+    
+      arch/x86/kvm/reverse_cpuid.h:125:2: error: duplicate case value '361'
+              KVM_X86_TRANSLATE_FEATURE(SGX2);
+              ^
+      arch/x86/kvm/reverse_cpuid.h:124:2: error: duplicate case value '360'
+              KVM_X86_TRANSLATE_FEATURE(SGX1);
+              ^
+    
+    And without macros, the opposite type of copy+paste goof doesn't generate
+    any error at compile-time, e.g. this yields no complaints:
+    
+            case X86_FEATURE_SGX1:
+                    return KVM_X86_FEATURE_SGX1;
+            case X86_FEATURE_SGX2:
+                    return KVM_X86_FEATURE_SGX1;
+    
+    Note, __feature_translate() is forcibly inlined and the feature is known
+    at compile-time, so the code generation between an if-elif sequence and a
+    switch statement should be identical.
+    
+    Signed-off-by: Jim Mattson <jmattson@google.com>
+    Link: https://lore.kernel.org/r/20231024001636.890236-2-jmattson@google.com
+    [sean: use a macro, rewrite changelog]
+    Signed-off-by: Sean Christopherson <seanjc@google.com>
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmVo8DQACgkQnKSrs4Gr
-c8ge1wf+IIHG7oAMqIyOTOA/oFS2QG8uPyiFJQq8Zhme5LBuPIvsf8300Z76gAFP
-LqKNIp9tEHi376ORvR9zKqXs6EyrAjdTT9jBThkjo9Dsw8WtdpMy1OP3sRZ6RZ5Z
-BKv5+J0R2bvw5JBpc/wk7Fnypv5lgxFtWE/MiKDSG6jfjr6+6VDuHt3/CiBBs0cU
-XCtQeZrqhRpjJVA0k05LM+8lVbx8H27bqQxQ9kLFFGpiDm0mMNtiQ+VyXLsxprcW
-0OZ+iv46HtHiJtiBYEMxGxI7q3OJjnvS7fKklk3dLJAJxGHVUEedtOg9gzcMCec1
-64wQWmIUbq61hdMdbFULncGwAIGa0w==
-=I8on
------END PGP SIGNATURE-----
-
---IGy9nSmIZnwUahKG--
+diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
+index 17007016d8b5..aadefcaa9561 100644
+--- a/arch/x86/kvm/reverse_cpuid.h
++++ b/arch/x86/kvm/reverse_cpuid.h
+@@ -116,20 +116,19 @@ static __always_inline void reverse_cpuid_check(unsigned int x86_leaf)
+  */
+ static __always_inline u32 __feature_translate(int x86_feature)
+ {
+-       if (x86_feature == X86_FEATURE_SGX1)
+-               return KVM_X86_FEATURE_SGX1;
+-       else if (x86_feature == X86_FEATURE_SGX2)
+-               return KVM_X86_FEATURE_SGX2;
+-       else if (x86_feature == X86_FEATURE_SGX_EDECCSSA)
+-               return KVM_X86_FEATURE_SGX_EDECCSSA;
+-       else if (x86_feature == X86_FEATURE_CONSTANT_TSC)
+-               return KVM_X86_FEATURE_CONSTANT_TSC;
+-       else if (x86_feature == X86_FEATURE_PERFMON_V2)
+-               return KVM_X86_FEATURE_PERFMON_V2;
+-       else if (x86_feature == X86_FEATURE_RRSBA_CTRL)
+-               return KVM_X86_FEATURE_RRSBA_CTRL;
++#define KVM_X86_TRANSLATE_FEATURE(f)   \
++       case X86_FEATURE_##f: return KVM_X86_FEATURE_##f
+ 
+-       return x86_feature;
++       switch (x86_feature) {
++       KVM_X86_TRANSLATE_FEATURE(SGX1);
++       KVM_X86_TRANSLATE_FEATURE(SGX2);
++       KVM_X86_TRANSLATE_FEATURE(SGX_EDECCSSA);
++       KVM_X86_TRANSLATE_FEATURE(CONSTANT_TSC);
++       KVM_X86_TRANSLATE_FEATURE(PERFMON_V2);
++       KVM_X86_TRANSLATE_FEATURE(RRSBA_CTRL);
++       default:
++               return x86_feature;
++       }
+ }
+ 
+ static __always_inline u32 __feature_leaf(int x86_feature)
 
 
