@@ -1,56 +1,58 @@
-Return-Path: <kvm+bounces-2862-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2872-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19EAF7FEB6B
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 10:08:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E05EF7FEB78
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 10:09:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CC2228201E
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 09:08:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C4681C20D08
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 09:09:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C2C38FA0;
-	Thu, 30 Nov 2023 09:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A643B7B7;
+	Thu, 30 Nov 2023 09:08:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JmvkJhc9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CIa7t8Ts"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF119CF
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 01:07:59 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8909010E5
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 01:08:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701335279;
+	s=mimecast20190719; t=1701335280;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=t4R+HNRZJiFFN+ip5dfjGVsMX98ycCVsp2Ww3/n0/cY=;
-	b=JmvkJhc9myzfZWH1l6YaUoL8QEJGNxLUpEeEeHju+XkiQS6o1nrVIx/bhK15XuRv7GweRu
-	e+6TiwxpmRzsKD6NFsYHyjj7grv0xZuygraxqsGw9b0cI1d5qPW+qKeajj1mCM2wuZ2jNV
-	3XRHRNTFrBuTb/+36qSHmFh9iyKHtbk=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-346-Lw33qRLVNbyMgBVMVh1tnw-1; Thu,
- 30 Nov 2023 04:07:57 -0500
-X-MC-Unique: Lw33qRLVNbyMgBVMVh1tnw-1
+	bh=826NVfu+eMIjcXlJxCUcn0InDpeD0W3LQtFugetdO7M=;
+	b=CIa7t8Tsix2R1yj+uOBflqvPOC2sXWVo8ryRvHfEicHLPxxf7mGIheE4oWLhkA/BN1jZ3E
+	BqtM3sCSwyq2ckYBV5LuCOqYWAc1FD6Nl1qKSHw6vm7D/AvrTFh1CPJdFMooUYhE5zYdCH
+	sT1BZaFZowbUhvz/j3KT7j2TSUjhCio=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-77-chliv4KDO16qZ7ZqvsUF7w-1; Thu, 30 Nov 2023 04:07:57 -0500
+X-MC-Unique: chliv4KDO16qZ7ZqvsUF7w-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0D4FA299E759;
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 385A5101A550;
 	Thu, 30 Nov 2023 09:07:57 +0000 (UTC)
 Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 00FDB1C060AE;
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 297BF1C060AE;
 	Thu, 30 Nov 2023 09:07:57 +0000 (UTC)
 From: Shaoqin Huang <shahuang@redhat.com>
 To: Andrew Jones <andrew.jones@linux.dev>,
 	kvmarm@lists.linux.dev
 Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
+	Nikos Nikoleris <nikos.nikoleris@arm.com>,
 	Eric Auger <eric.auger@redhat.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v1 10/18] arm/arm64: Allocate secondaries' stack using the page allocator
-Date: Thu, 30 Nov 2023 04:07:12 -0500
-Message-Id: <20231130090722.2897974-11-shahuang@redhat.com>
+Subject: [kvm-unit-tests PATCH v1 11/18] arm/arm64: assembler.h: Replace size with end address for dcache_by_line_op
+Date: Thu, 30 Nov 2023 04:07:13 -0500
+Message-Id: <20231130090722.2897974-12-shahuang@redhat.com>
 In-Reply-To: <20231130090722.2897974-1-shahuang@redhat.com>
 References: <20231130090722.2897974-1-shahuang@redhat.com>
 Precedence: bulk
@@ -64,62 +66,135 @@ X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-The vmalloc allocator returns non-id mapped addresses, where the virtual
-address is different than the physical address. As a result, it's
-impossible to access the stack of the secondary CPUs while the MMU is
-disabled (if AUXINFO_MMU_OFF is set, a test disables the MMU or an
-exception happens on the secondary before the MMU is enabled).
+Commit b5f659be4775 ("arm/arm64: Remove dcache_line_size global
+variable") moved the dcache_by_line_op macro to assembler.h and changed
+it to take the size of the regions instead of the end address as
+parameter. This was done to keep the file in sync with the upstream
+Linux kernel implementation at the time.
 
-It turns out that kvm-unit-tests always configures the stack size to be a
-power-of-two multiple of PAGE_SIZE: on arm, THREAD_SIZE is 16K and
-PAGE_SIZE is 4K; on arm64, THREAD_SIZE is 16K when PAGE_SIZE is 4K or 16K,
-and 64K when PAGE_SIZE is 64K. Use memalign_pages_flags() as a drop-in
-replacement for vmalloc's vm_memalign(), which is the value for
-alloc_ops->memalign when the stack is allocated, as it has the benefits:
+But in both places where the macro is used, the code has the start and
+end address of the region, and it has to compute the size to pass it to
+dcache_by_line_op. Then the macro itsef computes the end by adding size
+to start.
 
-1. The secondary CPUs' stack can be used with the MMU off.
+Get rid of this massaging of parameters and change the macro to the end
+address as parameter directly.
 
-2. The secondary CPUs' stack is identity mapped, just like the stack for
-the primary CPU, making the configuration of the all the CPUs consistent.
+Besides slightly simplyfing the code by remove two unneeded arithmetic
+operations, this makes the macro compatible with the current upstream
+version of Linux (which was similarly changed to take the end address in
+commit 163d3f80695e ("arm64: dcache_by_line_op to take end parameter
+instead of size")), which will allow us to reuse (part of) the Linux C
+wrappers over the assembly macro.
 
-3. start_usr(), which can take a new stack to use at EL0/in user mode, now
-works if the function is called after the MMU has been disabled. This
-doesn't affect the vectors-user test, as the only way to run the test with
-the MMU disabled is by setting AUXINFO_MMU_INFO, in which case the vmalloc
-allocator is not initialized and alloc_ops->memalign resolves to
-memalign_pages().
+The change has been tested with the same snippet of code used to test
+commit 410b3bf09e76 ("arm/arm64: Perform dcache clean + invalidate after
+turning MMU off").
 
-memalign_pages_flags() has been used instead of memalign_pages() to
-instruct the allocator not to zero the stack, as it's already zeroed in the
-entry code.
-
+Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- lib/arm/asm/thread_info.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arm/cstart.S              |  1 -
+ arm/cstart64.S            |  1 -
+ lib/arm/asm/assembler.h   | 11 +++++------
+ lib/arm64/asm/assembler.h | 11 +++++------
+ 4 files changed, 10 insertions(+), 14 deletions(-)
 
-diff --git a/lib/arm/asm/thread_info.h b/lib/arm/asm/thread_info.h
-index eaa72582..190e082c 100644
---- a/lib/arm/asm/thread_info.h
-+++ b/lib/arm/asm/thread_info.h
-@@ -25,6 +25,7 @@
- #ifndef __ASSEMBLY__
- #include <asm/processor.h>
- #include <alloc.h>
-+#include <alloc_page.h>
+diff --git a/arm/cstart.S b/arm/cstart.S
+index 2ecebd1d..98d61230 100644
+--- a/arm/cstart.S
++++ b/arm/cstart.S
+@@ -226,7 +226,6 @@ asm_mmu_disable:
+ 	ldr	r0, [r0]
+ 	ldr	r1, =__phys_end
+ 	ldr	r1, [r1]
+-	sub	r1, r1, r0
+ 	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
  
- #ifdef __arm__
- #include <asm/ptrace.h>
-@@ -40,7 +41,7 @@
+ 	mov     pc, lr
+diff --git a/arm/cstart64.S b/arm/cstart64.S
+index 5ba2fb27..7fb44f42 100644
+--- a/arm/cstart64.S
++++ b/arm/cstart64.S
+@@ -264,7 +264,6 @@ asm_mmu_disable:
+ 	ldr	x0, [x0, :lo12:__phys_offset]
+ 	adrp	x1, __phys_end
+ 	ldr	x1, [x1, :lo12:__phys_end]
+-	sub	x1, x1, x0
+ 	dcache_by_line_op civac, sy, x0, x1, x2, x3
  
- static inline void *thread_stack_alloc(void)
- {
--	void *sp = memalign(THREAD_ALIGNMENT, THREAD_SIZE);
-+	void *sp = memalign_pages_flags(THREAD_ALIGNMENT, THREAD_SIZE, FLAG_DONTZERO);
- 	return sp + THREAD_START_SP;
- }
+ 	ret
+diff --git a/lib/arm/asm/assembler.h b/lib/arm/asm/assembler.h
+index 4200252d..db5f0f55 100644
+--- a/lib/arm/asm/assembler.h
++++ b/lib/arm/asm/assembler.h
+@@ -25,17 +25,16 @@
  
+ /*
+  * Macro to perform a data cache maintenance for the interval
+- * [addr, addr + size).
++ * [addr, end).
+  *
+  * 	op:		operation to execute
+  * 	domain		domain used in the dsb instruction
+  * 	addr:		starting virtual address of the region
+- * 	size:		size of the region
+- * 	Corrupts:	addr, size, tmp1, tmp2
++ * 	end:		the end of the region (non-inclusive)
++ * 	Corrupts:	addr, tmp1, tmp2
+  */
+-	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
++	.macro dcache_by_line_op op, domain, addr, end, tmp1, tmp2
+ 	dcache_line_size \tmp1, \tmp2
+-	add	\size, \addr, \size
+ 	sub	\tmp2, \tmp1, #1
+ 	bic	\addr, \addr, \tmp2
+ 9998:
+@@ -45,7 +44,7 @@
+ 	.err
+ 	.endif
+ 	add	\addr, \addr, \tmp1
+-	cmp	\addr, \size
++	cmp	\addr, \end
+ 	blo	9998b
+ 	dsb	\domain
+ 	.endm
+diff --git a/lib/arm64/asm/assembler.h b/lib/arm64/asm/assembler.h
+index aa8c65a2..1e09d65a 100644
+--- a/lib/arm64/asm/assembler.h
++++ b/lib/arm64/asm/assembler.h
+@@ -28,25 +28,24 @@
+ 
+ /*
+  * Macro to perform a data cache maintenance for the interval
+- * [addr, addr + size). Use the raw value for the dcache line size because
++ * [addr, end). Use the raw value for the dcache line size because
+  * kvm-unit-tests has no concept of scheduling.
+  *
+  * 	op:		operation passed to dc instruction
+  * 	domain:		domain used in dsb instruction
+  * 	addr:		starting virtual address of the region
+- * 	size:		size of the region
+- * 	Corrupts:	addr, size, tmp1, tmp2
++ * 	end:		the end of the region (non-inclusive)
++ * 	Corrupts:	addr, tmp1, tmp2
+  */
+ 
+-	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
++	.macro dcache_by_line_op op, domain, addr, end, tmp1, tmp2
+ 	raw_dcache_line_size \tmp1, \tmp2
+-	add	\size, \addr, \size
+ 	sub	\tmp2, \tmp1, #1
+ 	bic	\addr, \addr, \tmp2
+ 9998:
+ 	dc	\op, \addr
+ 	add	\addr, \addr, \tmp1
+-	cmp	\addr, \size
++	cmp	\addr, \end
+ 	b.lo	9998b
+ 	dsb	\domain
+ 	.endm
 -- 
 2.40.1
 
