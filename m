@@ -1,194 +1,111 @@
-Return-Path: <kvm+bounces-2845-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2846-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 344817FE8EA
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 07:02:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9C417FE8FB
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 07:10:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66E4B1C20CEB
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 06:02:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1682E1C20C38
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 06:10:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9641D55C;
-	Thu, 30 Nov 2023 06:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1EF31DA22;
+	Thu, 30 Nov 2023 06:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aC+u6x+L"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h+bv/rtf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42C1BD66;
-	Wed, 29 Nov 2023 22:01:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701324113; x=1732860113;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=OQH0nvmEJSvasFIaO1fOumPkczomqch7ZkEg2gd4lN0=;
-  b=aC+u6x+LuRphhD5zq+9NXrxHERVMQp6V8EbZ8n0EhkyzcNs+XlwRYwdt
-   gDfQ0PMsN2uGhBoUTKsvNYHTu4NqgzLhq9ZtVzlOlkFStT8VH+i9bv41x
-   iSR9ern92BoV0MX/5f2A2PwX95h7epff5byofjXZLlgB0aBA08A4eUQqy
-   m0DoVXu0RIBt8bei/zbi66l6ikqREVLy1bdDB6xfnP8AE42/bTV9qRcbD
-   0WCuPzrUQnKIB5681Hc8P+J2D5M5f5rkotWhcUlvgdVEaYjXSG/62qpvV
-   q3tNlVUksqw69rOtjA79g5XNMESbRQn422UizUnja1u4iw9kF8IOkkJlh
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="397166402"
-X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
-   d="scan'208";a="397166402"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 22:01:52 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="892699411"
-X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
-   d="scan'208";a="892699411"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Nov 2023 22:01:52 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Wed, 29 Nov 2023 22:01:52 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Wed, 29 Nov 2023 22:01:51 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Wed, 29 Nov 2023 22:01:51 -0800
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Wed, 29 Nov 2023 22:01:51 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b2Tb+VzD5d3XP4bpgKI4pyd7iYsHLR1A8zDsDxyHeOx4U95bnWZie1c7sLQ28sSUwzpQdclwd3Bd87d1QcW/fgE7c2V0RhBGCQKue/rJsHcafzuz76Rb62grqfsr8wi256BPG18irK3Uix0V7EfoU8gNTPETtYb40WUKp6anosqH+z+0QFtbnpR678PMdnFPpJwE7fVdO/uR0Ai24UrD9VwtjBMPi97pmulbqntfeKJM27nfWN81q7FkeqaZTYlr16W3hCeQB64G/Ep7NUOYpUkCelq65Jd/FIwDeSdhUDgGBjqZUjRimD61Mz+/CqnzmvCm4a73Etjy6UGOAm2sVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OQH0nvmEJSvasFIaO1fOumPkczomqch7ZkEg2gd4lN0=;
- b=YEAK3RGg8VacNN+bq572Wjdg98LZ0Mz4MLHuJAU/c58MLzvdLgpitWJQAxBCGgv6Pv/eFc8hp7TXZOxQpabrSh7JbB4DghffwTdK6kF2q4v18m6WciqH1ExIlFcNGtSEkYoX+IQ8TErT7AMxuBcLY0fvtksE5yrx7AmKCbZJR6XSL2FMZj7NHMas1EWXwjZYhGMC43snc3WTnlMBgNgBWjfjBp2e+AVReIsk//EvqIKnnmIFXCzLB6/vFL1lgaZp2TtuSFgYm86rPNdKe2UNZ+Qs1AkOiaNUsuJ3VY/vS/CxWuRPtnK9SCQ/J8+B0UnFyfG8lX6tZr1Om3JQBhcHrQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SA1PR11MB6734.namprd11.prod.outlook.com (2603:10b6:806:25d::22)
- by SN7PR11MB6677.namprd11.prod.outlook.com (2603:10b6:806:26b::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.24; Thu, 30 Nov
- 2023 06:01:42 +0000
-Received: from SA1PR11MB6734.namprd11.prod.outlook.com
- ([fe80::3d98:6afd:a4b2:49e3]) by SA1PR11MB6734.namprd11.prod.outlook.com
- ([fe80::3d98:6afd:a4b2:49e3%7]) with mapi id 15.20.7046.023; Thu, 30 Nov 2023
- 06:01:42 +0000
-From: "Li, Xin3" <xin3.li@intel.com>
-To: "Li, Xin3" <xin3.li@intel.com>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-edac@vger.kernel.org"
-	<linux-edac@vger.kernel.org>, "linux-hyperv@vger.kernel.org"
-	<linux-hyperv@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-CC: "tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com"
-	<mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org"
-	<x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "Lutomirski, Andy"
-	<luto@kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"Christopherson,, Sean" <seanjc@google.com>, "peterz@infradead.org"
-	<peterz@infradead.org>, "Gross, Jurgen" <jgross@suse.com>, "Shankar, Ravi V"
-	<ravi.v.shankar@intel.com>, "mhiramat@kernel.org" <mhiramat@kernel.org>,
-	"andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
-	"jiangshanlai@gmail.com" <jiangshanlai@gmail.com>, "nik.borisov@suse.com"
-	<nik.borisov@suse.com>
-Subject: RE: [PATCH v12 02/37] x86/opcode: Add the WRMSRNS instruction to the
- x86 opcode map
-Thread-Topic: [PATCH v12 02/37] x86/opcode: Add the WRMSRNS instruction to the
- x86 opcode map
-Thread-Index: AQHZ9caNSRx22/0yzUeT4gY0IluMT7CSuCFQ
-Date: Thu, 30 Nov 2023 06:01:41 +0000
-Message-ID: <SA1PR11MB6734FFBF0BE0CCC7532C2505A882A@SA1PR11MB6734.namprd11.prod.outlook.com>
-References: <20231003062458.23552-1-xin3.li@intel.com>
- <20231003062458.23552-3-xin3.li@intel.com>
-In-Reply-To: <20231003062458.23552-3-xin3.li@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR11MB6734:EE_|SN7PR11MB6677:EE_
-x-ms-office365-filtering-correlation-id: c08f1d2b-35a9-4d61-2be6-08dbf169d32d
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: TFRUNe31D7vVoVgVLE+Kbom2vwVKUpnUkidp9KDdYw46D5LDR6Dubx7t3YEmIhnHyGdqRDDKydcr25n6/3FdEeTC0DWoLeKlyuKugJMP4WGHdAiRtxzWLPpaToUQCm4c/FQkEYp6oXa6B+OVTNa2MujfrnBwwhPiUTC4b2rWX12FHZ3AYUl67yFJr365/imMuWOIomqMIesVXgByBcQCoReCK+UlsacWehP2eH94rlYWBmsCKf1rn+TJGTu1aCWLz89w1hc8wWOrE+jZfx84niB5QzREPnigqPMxdjBVTrY6zUzyy/BEySisDcy6KGee8md4aH/INaz7HKjkpEMSHVS9sb2/CplqZzk7r15fAWgflNvA2nm0rDzaeK0imGEdqr8iCd4Nncanv1Qyj60qNFRPJioBXHa8atYoaAwKxzodV8vt7MGtd8rMu8XIj5l14XAZHXbDwCUTnFB+oO/Xs4R5+O533q3yDxhe2sEjCd35hI0BMPLo5JkjqLb7mrYNrEc/yLtuysMRAjnrp4WMUCBjndpwcEubKwH35FBBK/7dTbSP9cRZE1z56N9OazSXjy+8vEdjBGaEGHQfssukqF84BMdaUdxuG+cCw9cxDIZFbVB5LPkRBl/9MQGbP+tu9PCvWdPfE9KwY1vLRw/GAWNiyEcn8kpJsKSumKbcglk=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6734.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(366004)(346002)(136003)(376002)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(26005)(83380400001)(6506007)(7696005)(9686003)(122000001)(5660300002)(4326008)(8676002)(52536014)(8936002)(41300700001)(4744005)(7416002)(2906002)(966005)(478600001)(316002)(110136005)(71200400001)(54906003)(64756008)(66446008)(66476007)(66556008)(66946007)(76116006)(202311291699003)(86362001)(33656002)(38100700002)(82960400001)(38070700009)(55016003)(133343001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ajZieWlzQVVtWVNLT1JEWWIvTlBtOGw3b3ZjK3Jka0VaU081QVcxaStReDNh?=
- =?utf-8?B?Sy9SWWdPWmhESU1GZUxpTVk2Vk5NY1dQNUw5cGE1T0IwMWRhYlZBM05lUEI1?=
- =?utf-8?B?WXRBZU1XdWJhZUFDcXIrenovcDRPclp2RndXK1llUzlxdmE0dmp5WDVta2hB?=
- =?utf-8?B?SUl4Q2xYSTlMWStFMjFyU296ZXJNQnl2K3R4SDhuOU5vUkRBVXNBM01Ec2xa?=
- =?utf-8?B?Zm9xN2ZnSEMwSDRYcnpKOVhzQm1KVFFKdi9QdFJRZUhRNDRzeXA1YTFwMHZY?=
- =?utf-8?B?TU1uckxQUGtIUG1SN3duQUlFWkpWSVRoeUIrd1hvL3ZjeHdkSFJKOXpmUEN2?=
- =?utf-8?B?bk9aUVJqWWNWUDFEdmxoVXhLNGxzOXRweHJqWFlYM3FnSGErcS9FN3pkYzQx?=
- =?utf-8?B?NkhlUnNlKzNxelFoQkxIUzZPd2t1Rm5Gbkh4MHZVRlhvTWIwdGRUSzQ0ZjdT?=
- =?utf-8?B?OVNUVm5vclhnd3lDZG9mTlN2eG9rWm1XditqS3UzQ0ZJcUxDYjdtWG9iTGJx?=
- =?utf-8?B?NUZBeUFYcWxDRUxtTFlrbEp4d1NCSVJOUHVhVmUreXhBWjFZOWh3bmloOEE1?=
- =?utf-8?B?MWFQQUI4MFd2L0VNOWxJbXVPZDRKS1lESVF5STQvZ3cxU3lZRyt1a1JDTmRq?=
- =?utf-8?B?QnRNL0FCUUhsY3h2WVp1OTk0MS9ZVHAzMUZpUmk0MUMvVHJ3QUdjMFZvbnlM?=
- =?utf-8?B?Z1QrUDhNV3M3SmV2Qnk5NlZXWW5MZXhjbFlNLzl5NGFpNVlLTGdTOWlqM3Z2?=
- =?utf-8?B?Y1N1c2lGQ3I2UzlvaDJQQkIrdkZlKzBFVnJFYXQ2NGkxeWxTOXh3TTdsbmFX?=
- =?utf-8?B?QTBRYmFGcFp4SFRtTm10dVZzWCtwd2pSVUlieGJsM3BJQittVnp6NjRQQ2Rj?=
- =?utf-8?B?eSt1di9QMk9GM09PSEZKMkMvYzNUUUYvcEdQL1IydUNzT1NPOGVkZVpIYUNz?=
- =?utf-8?B?RWMzM2dJSWNEK0d2MlE1NFVuWHVoNzkxSWxmaDNYL1ZkVnBVbGhmQ2FTR0o5?=
- =?utf-8?B?MUFTUk5jTWVBUkpGWGlXa2xsSDBjVHErOGlxTjhEQWxuM0JHOCs1QStCSGRq?=
- =?utf-8?B?WWNDS1FqR2lVL05MU0c2alMrc3hLVXRCT3pUdElhVERRSGowNFNLMEtObmJ4?=
- =?utf-8?B?V3k2OTlJK0FTUmxHcy90SFVMdG5zckNqVTJXbFJFbHJKU3hlbGZWS2d6RDlK?=
- =?utf-8?B?V1FGYTBjek85OWRqaC9YWnBhanBtbm5lcTlURVc1SnFDeEJTSmEwT0hGSU44?=
- =?utf-8?B?MTNEYUFmbDczN2F3ajhyTDlRQ1VCQXVXelZmbzlRL0hsbUpad1d1eWFpWGJI?=
- =?utf-8?B?emZmaTJqRzEvUkJ6dVA4aGxpblpZS1FCRytjTWViYTk0c1UrUTc5K2JaTk9K?=
- =?utf-8?B?enZrYTFBaHREWTN2NVI2em5aNDZucjZEVFJyKzE1TnlVWFl5VFNvM2w3Sytr?=
- =?utf-8?B?bWtPcDEzOWE5SGNObkhzMEFsVlNJNnB0YWYrd1gxVnNOMHJvV3hWdEtlaHFa?=
- =?utf-8?B?OFY2eVNqSzJ0em4zSm5RenZWbFd1TEwyOEcvSVgvVSttbzVVUUZUVE1ESmIx?=
- =?utf-8?B?eTdLN215RHQ0d1RLbjNGTjNCd1N3a0VUaWEyMVNmMGp3VUlIRXpLalJDNmdn?=
- =?utf-8?B?akNncU9lem9YUi9ZS05vcmhaSjR4eFd3RE1nMEtKQnBYVlpaVEZDd1lDaTBk?=
- =?utf-8?B?Q2JJeDZCOURJdGExcXdlTHpqWmRaVUJjRXNhaHNVMzQzaEE5SVhIdlFmUHZn?=
- =?utf-8?B?TGdrV3RwQ1AzOHE2dXlHNXIwM2ovOXdUakRkRld6NWRMamVRQmlSajQ4MkxU?=
- =?utf-8?B?b2M0blBjNWQzcjFpU3kvYVFQTm5HWmpIQjE5L2h2VnZ4Mkx1RFpMWkE3NWZw?=
- =?utf-8?B?dU1lUlVCalRWb0t2ZmphRHNQTmp4VE9RYW45bXB0bEoxWmNjQmFBRXpyY1h6?=
- =?utf-8?B?dnNJM09nc25idnhHV3FzdjVRK2ljaXNBYUY5dG1nNFMzdG9ITXJvYTdwbW4w?=
- =?utf-8?B?elNCR3NvT0FoRUd6QTdYVlpBcnh5OWJlVCt0Mk1HV0hzdThZWE51UC9FTFRw?=
- =?utf-8?B?bVpoS3A3djZ3VjI3SGNWM2xaeGNqUmF6OUNSbG5sVnJPZmphaUFRc2VDOWpl?=
- =?utf-8?Q?ZvZw=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A240910C9;
+	Wed, 29 Nov 2023 22:10:10 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-6cda22140f2so563484b3a.1;
+        Wed, 29 Nov 2023 22:10:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701324610; x=1701929410; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=B1if+FaxPFsagkd6FaxS0qG7gZ8HWUvLobcB5yNd8/Y=;
+        b=h+bv/rtfYz1UiS++vM1Xl73aXpbuieUpcdSWnFeJGOizuFAb4hsQT35p0VALTcb1Km
+         viGDPIwOeZ8k4QZjbDBpvpEc1uZFm59q8HNd3YrLj8QpKAfrKXLWQKU6Lr5xW8STdcGp
+         YE13MSQVSplTF76oTV8Z99qTgES9Q+7HbAHnZvNuaOcjNZj2GsE01AvALcNUGvn5nn3D
+         uKE2Monw8XWffSe0d6umWFBAWIPKFGyhS48olxEbLRMM0IW3uDjtKMlkAwFEC1NOxspg
+         EMdakBELr48F2/PwDa1Iys2uJQGqQ9stvpz2uHUeCrUvpNJncYn5LbrNJBXfg0ELSaYE
+         XJkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701324610; x=1701929410;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B1if+FaxPFsagkd6FaxS0qG7gZ8HWUvLobcB5yNd8/Y=;
+        b=dMovQYSqnEx+GLfcM0OkOee42103QdhUMoeYeX+bH/5Cv8GBAPvwDTsRTYEogoxq3D
+         aD2E93QiTfU6WPJPknq3ots+acX1Q7+Bf30owHFJ6S/j8xSQfMVX98dx1ZYTiZbU0bVi
+         1FdjdErgjTOwhlfO548X/DYdag/TuJUO1r7jECEbVeygi9bd0pJNxA9ZXcxFCGhsv/tD
+         IAPAzBTpnVvB/9WNyZPvOzbnaGWOFL6TZFNYtx60DQRbrAbugBf51PFSDQCGfqvPBdQX
+         lBC9VmekkF+jfhbXNgDdbglRB6ggS/+3A4+UiTRBNOs2SnmJNLF14AIq+MXhQ0Bg/2lB
+         CiLQ==
+X-Gm-Message-State: AOJu0Yxgt+s9FPev+ck/5TFKEXM9OMAONDPeTWECmiYGLK/1xuLwlyIT
+	Su3pLUqK7N7XeSXLyKkyZwQ=
+X-Google-Smtp-Source: AGHT+IGSpgI7z/zJoecmKlbsF3awMHC/e9Nfm/pF6FwG2Z3jnVudDFlFtY97wBlTwMfcyf2RlcRKCA==
+X-Received: by 2002:a05:6a20:3d11:b0:18c:9855:e949 with SMTP id y17-20020a056a203d1100b0018c9855e949mr14197707pzi.15.1701324609919;
+        Wed, 29 Nov 2023 22:10:09 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id w1-20020a636201000000b005b32d6b4f2fsm442926pgb.81.2023.11.29.22.10.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Nov 2023 22:10:09 -0800 (PST)
+Message-ID: <049e4892-fae8-4a1d-a069-70b0bf5ee755@gmail.com>
+Date: Thu, 30 Nov 2023 14:10:00 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6734.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c08f1d2b-35a9-4d61-2be6-08dbf169d32d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Nov 2023 06:01:41.9607
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ueZgCKrh2BKcoTuAHXRNZWTShdBNzYIqtxArp/3ASZC+XHP78B6JtcTYEW5b7VQssVvk8jvpKVF3Pw3Jq85GKQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6677
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: x86/xsave: Remove 'return void' expression for 'void
+ function'
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+References: <20231007064019.17472-1-likexu@tencent.com>
+ <e4d6c6a5030f49f44febf99ba4c7040938c3c483.camel@redhat.com>
+ <53d7caba-8b00-42ab-849a-d8c8d94aea37@gmail.com>
+ <ZTklnN2I3gYjGxVv@google.com> <ZTm8dH1GQ3vQtQua@google.com>
+Content-Language: en-US
+From: Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <ZTm8dH1GQ3vQtQua@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-PiBBZGQgdGhlIG9wY29kZSB1c2VkIGJ5IFdSTVNSTlMsIHdoaWNoIGlzIHRoZSBub24tc2VyaWFs
-aXppbmcgdmVyc2lvbiBvZg0KPiBXUk1TUiBhbmQgbWF5IHJlcGxhY2UgaXQgdG8gaW1wcm92ZSBw
-ZXJmb3JtYW5jZSwgdG8gdGhlIHg4NiBvcGNvZGUgbWFwLg0KPiANCj4gVGVzdGVkLWJ5OiBTaGFu
-IEthbmcgPHNoYW4ua2FuZ0BpbnRlbC5jb20+DQo+IFNpZ25lZC1vZmYtYnk6IFhpbiBMaSA8eGlu
-My5saUBpbnRlbC5jb20+DQo+IEFja2VkLWJ5OiBNYXNhbWkgSGlyYW1hdHN1IChHb29nbGUpIDxt
-aGlyYW1hdEBrZXJuZWwub3JnPg0KDQpIaSBNYXNhbWksDQoNCkJvcmlzIHByZWZlcnMgdG8gbWVy
-Z2UgdGhlIGZpcnN0IDMgcGF0Y2hlcyBpbnRvIG9uZToNCmh0dHBzOi8vbG9yZS5rZXJuZWwub3Jn
-L2xrbWwvMjAyMzExMDgxMjM2NDcuR0JaVXVBMzF6bnRveDBXMGd1QGZhdF9jcmF0ZS5sb2NhbC8j
-dA0KDQpTbyBJJ20gdGhpbmtpbmcgY291bGQgeW91IHBsZWFzZSBhbHNvIGFjayB0aGUgb3RoZXIg
-MiBwYXRjaGVzICgxc3QgYW5kIDNyZA0Kb2YgdGhpcyBwYXRjaCBzZXQpPw0KDQpUaHVzIEkgY2Fu
-IGtlZXAgeW91ciBhY2tlZC1ieSDwn5iKDQoNClRoYW5rcyENCiAgICBYaW4NCg0KPiAtLS0NCj4g
-IGFyY2gveDg2L2xpYi94ODYtb3Bjb2RlLW1hcC50eHQgICAgICAgfCAyICstDQo+ICB0b29scy9h
-cmNoL3g4Ni9saWIveDg2LW9wY29kZS1tYXAudHh0IHwgMiArLQ0KPiAgMiBmaWxlcyBjaGFuZ2Vk
-LCAyIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo=
+On 26/10/2023 9:10 am, Sean Christopherson wrote:
+> On Wed, Oct 25, 2023, Sean Christopherson wrote:
+>> On Wed, Oct 25, 2023, Like Xu wrote:
+>>> Emm, did we miss this little fix ?
+>>
+>> No, I have it earmarked, it's just not a priority because it doesn't truly fix
+>> anything.  Though I suppose it probably makes to apply it for 6.8, waiting one
+>> more day to send PULL requests to Paolo isn't a problem.
+> 
+> Heh, when I tried to apply this I got reminded of why I held it for later.  I
+> want to apply it to kvm-x86/misc, but that's based on ~6.6-rc2 (plus a few KVM
+> patches), i.e. doesn't have the "buggy" commit.  I don't want to rebase "misc",
+> nor do I want to create a branch and PULL request for a single trivial commit.
+> 
+> So for logistical reasons, I'm not going apply this right away, but I will make
+> sure it gets into v6.7.
+
+Thanks, and a similar pattern occurs with these functions:
+
+  'write_register_operand'
+  'account_shadowed'
+  'unaccount_shadowed'
+  'mtrr_lookup_fixed_next'
+  'pre_svm_run'
+  'svm_vcpu_deliver_sipi_vector'
+
+Although the compiler will do the right thing, use 'return void' expression
+deliberately without grounds for exemption may annoy some CI pipelines.
+
+If you need more cleanup or a new version to cover all these cases above,
+just let me know.
 
