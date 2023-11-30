@@ -1,237 +1,150 @@
-Return-Path: <kvm+bounces-3016-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3015-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E53537FFBA4
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:42:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 237AC7FFB6E
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 20:34:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A52F281FB0
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:42:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9152B210EC
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 19:34:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07CD052F98;
-	Thu, 30 Nov 2023 19:42:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6443A52F84;
+	Thu, 30 Nov 2023 19:34:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NltVcGmf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cbmSuyw5"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05693170F
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:41:44 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74D32D1
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:34:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701373304;
+	s=mimecast20190719; t=1701372883;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RZA0GAnzMmQmnt7J4v4F0BWd31On6guabFGK6t1c+KI=;
-	b=NltVcGmfILDfulkX+fTNVIRyhYJ6QyZhvxtkuoYJ9/JhldEqCGggWAzrWKswN9YiaJZaS8
-	k+DnEnNxuIgzwynPTrrYr8f0FUbGEXwwHM5UDhj8hnmcxXJDOw4xcWlp4rFwyY5PjeRXbI
-	rI6l17tZc6y7Ba0mJyY9gbp8OiSkA5c=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=qytGX0MGJcOz7q/36mRvU0A100gsEwbWnP5WfFvyCcQ=;
+	b=cbmSuyw5DV33gLMdwcXoiRaAjHcQ3wbKwvdI/1CoyLUgTeu9WBtmiPHBxYWNpZEwTkPLnT
+	JJjAkFRncAIPeU+FxdBcXToDaI7HrAuADbp619SVXBurFvpA4HZH81yqp9QTDA8yS3Z8Nt
+	HYpWK5A2qmrqoWm7LQqmlpv0mV5fqCM=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-82-rRZ2nzvDM5yyKz6GjlA1vw-1; Thu, 30 Nov 2023 14:41:42 -0500
-X-MC-Unique: rRZ2nzvDM5yyKz6GjlA1vw-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40b39377136so10084145e9.1
-        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:41:41 -0800 (PST)
+ us-mta-340-rOSotnwuN_mRAYZm025Vgg-1; Thu, 30 Nov 2023 14:34:42 -0500
+X-MC-Unique: rOSotnwuN_mRAYZm025Vgg-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2c9c3782740so15291411fa.2
+        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 11:34:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701373299; x=1701978099;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RZA0GAnzMmQmnt7J4v4F0BWd31On6guabFGK6t1c+KI=;
-        b=leeQKEvJg/VvMT6taqc7RNnFwBiUxamZkIYrudEfVt7ypJF8vb6P/aS+8K2eeFY5GA
-         nxBau41QLRFieorb+g0QJQuB3GgPRmtYsyeQpjfJV5p+EDjldz6iClsw7gEEma+8lft9
-         Blc4w5TAuEhtwe/PyhyQ+XjZagIyF3wGkDVTWUwKZJXq6tuAEpXyRMdvjJGkWYvIqnaF
-         bG8hvacXXgrGqTbsy1q0/CEKPOTK0xaTDfxLrd5n1mFmMgEj7lC47nFxGBxENrim5I4V
-         QjqMB6I1AI+R2hspv6r9LEU8MAcblZXG4AHP+3MRqws9fLGGqbwf5gYbvFcbdU4euedp
-         Ipag==
-X-Gm-Message-State: AOJu0YwzW+AGONsWGbMu1d5dNzvTCJEoLjm587m+z0TtnNs83JLdAG9S
-	i/io+JlWrf3v6g+BZB8t3YzdAlLNKzvBCjXTk0MwVZpJNHKBWVVm+E2SLdFryJ9oZcBavXFOX42
-	Q0gP/BjGzzos5vNMYJaV7
-X-Received: by 2002:adf:e80e:0:b0:333:2fd2:6f52 with SMTP id o14-20020adfe80e000000b003332fd26f52mr13302wrm.92.1701373299692;
-        Thu, 30 Nov 2023 11:41:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFJHdlKzDLGKZRCik8JIeZpJ/scQ9w1/+X1RYF1icQUTtUJPu1cnWdj/y1c9yXcUWnqvcXUQg==
-X-Received: by 2002:a05:600c:4e87:b0:40b:4fd5:2b31 with SMTP id f7-20020a05600c4e8700b0040b4fd52b31mr2100wmq.36.1701366048081;
-        Thu, 30 Nov 2023 09:40:48 -0800 (PST)
-Received: from redhat.com ([2.55.10.128])
-        by smtp.gmail.com with ESMTPSA id n26-20020a05600c3b9a00b0040b34409d43sm2727966wms.11.2023.11.30.09.40.45
+        d=1e100.net; s=20230601; t=1701372881; x=1701977681;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qytGX0MGJcOz7q/36mRvU0A100gsEwbWnP5WfFvyCcQ=;
+        b=brqcoBqgE/McXNDn0QfAlpt+9eZKdSCImRWMVnJ8x85jmv3mUWYGFxlksrUthVrSGq
+         IepkDLaDbKuBBtWq4cUVgqmSYqbt2lcE+oLCWLlXOuUDcmosfOwsp4QUuwdlPFA3nOWc
+         HuGFdpkW86cYfKQjZCSZrmkvdofdoAO3ICY75navtoPGea6JhgGjn5hJYBT+v6tXjnKd
+         PFeKBA3aWLBFoTZcLSqM6Wq37RGIQmn1o94xbaOQI4irkGOICPOI2oGSCMwMQHFC5o8p
+         jHK//MKGYJh/xs2+FHjmCbSsW0Z//AD2Df1/sJKxKG0awbuYECMxB+RaxjnfqTAjk3T2
+         FhVg==
+X-Gm-Message-State: AOJu0YyW0SrFjTQa/ehk9dFmVGtWm2phAUNjrGGKMnIAZMqNsrDyaqcN
+	m7P3GsB008fIKO4ndvuxr1X8sGmgkDCWzbm9T/deB+wu7BRgBUU5iOZ8EXPs8m8eQPu5Kxx0xpq
+	OfCUMiK8XwGVbxCdbRlpb
+X-Received: by 2002:a2e:aa8b:0:b0:2c9:c662:715 with SMTP id bj11-20020a2eaa8b000000b002c9c6620715mr26255ljb.4.1701372880875;
+        Thu, 30 Nov 2023 11:34:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEPJcbCU4cufSDQv6f8QUMe1TA4X/6xNTeMQtfmLGplAXuJX2mk3hU8RkAtP5spjMsfxa0lKg==
+X-Received: by 2002:a17:906:2086:b0:a11:d323:c1bc with SMTP id 6-20020a170906208600b00a11d323c1bcmr57445ejq.19.1701366166815;
+        Thu, 30 Nov 2023 09:42:46 -0800 (PST)
+Received: from starship ([5.28.147.32])
+        by smtp.gmail.com with ESMTPSA id d27-20020ac25edb000000b0050933bb416csm214417lfq.74.2023.11.30.09.42.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 09:40:47 -0800 (PST)
-Date: Thu, 30 Nov 2023 12:40:43 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Arseniy Krasnov <avkrasnov@salutedevices.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
-	oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v5 2/3] virtio/vsock: send credit update during
- setting SO_RCVLOWAT
-Message-ID: <20231130123815-mutt-send-email-mst@kernel.org>
-References: <20231130130840.253733-1-avkrasnov@salutedevices.com>
- <20231130130840.253733-3-avkrasnov@salutedevices.com>
- <20231130084044-mutt-send-email-mst@kernel.org>
- <02de8982-ec4a-b3b2-e8e5-1bca28cfc01b@salutedevices.com>
- <20231130085445-mutt-send-email-mst@kernel.org>
- <pbkiwezwlf6dmogx7exur6tjrtcfzxyn7eqlehqxivqifbkojv@xlziiuzekon4>
+        Thu, 30 Nov 2023 09:42:46 -0800 (PST)
+Message-ID: <d2be8a787969b76f71194ce65bd6f35426b60dcc.camel@redhat.com>
+Subject: Re: [PATCH v7 21/26] KVM: x86: Save and reload SSP to/from SMRAM
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Yang Weijiang <weijiang.yang@intel.com>, seanjc@google.com, 
+	pbonzini@redhat.com, dave.hansen@intel.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Cc: peterz@infradead.org, chao.gao@intel.com, rick.p.edgecombe@intel.com, 
+	john.allen@amd.com
+Date: Thu, 30 Nov 2023 19:42:44 +0200
+In-Reply-To: <20231124055330.138870-22-weijiang.yang@intel.com>
+References: <20231124055330.138870-1-weijiang.yang@intel.com>
+	 <20231124055330.138870-22-weijiang.yang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <pbkiwezwlf6dmogx7exur6tjrtcfzxyn7eqlehqxivqifbkojv@xlziiuzekon4>
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 30, 2023 at 03:11:19PM +0100, Stefano Garzarella wrote:
-> On Thu, Nov 30, 2023 at 08:58:58AM -0500, Michael S. Tsirkin wrote:
-> > On Thu, Nov 30, 2023 at 04:43:34PM +0300, Arseniy Krasnov wrote:
-> > > 
-> > > 
-> > > On 30.11.2023 16:42, Michael S. Tsirkin wrote:
-> > > > On Thu, Nov 30, 2023 at 04:08:39PM +0300, Arseniy Krasnov wrote:
-> > > >> Send credit update message when SO_RCVLOWAT is updated and it is bigger
-> > > >> than number of bytes in rx queue. It is needed, because 'poll()' will
-> > > >> wait until number of bytes in rx queue will be not smaller than
-> > > >> SO_RCVLOWAT, so kick sender to send more data. Otherwise mutual hungup
-> > > >> for tx/rx is possible: sender waits for free space and receiver is
-> > > >> waiting data in 'poll()'.
-> > > >>
-> > > >> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
-> > > >> ---
-> > > >>  Changelog:
-> > > >>  v1 -> v2:
-> > > >>   * Update commit message by removing 'This patch adds XXX' manner.
-> > > >>   * Do not initialize 'send_update' variable - set it directly during
-> > > >>     first usage.
-> > > >>  v3 -> v4:
-> > > >>   * Fit comment in 'virtio_transport_notify_set_rcvlowat()' to 80 chars.
-> > > >>  v4 -> v5:
-> > > >>   * Do not change callbacks order in transport structures.
-> > > >>
-> > > >>  drivers/vhost/vsock.c                   |  1 +
-> > > >>  include/linux/virtio_vsock.h            |  1 +
-> > > >>  net/vmw_vsock/virtio_transport.c        |  1 +
-> > > >>  net/vmw_vsock/virtio_transport_common.c | 27 +++++++++++++++++++++++++
-> > > >>  net/vmw_vsock/vsock_loopback.c          |  1 +
-> > > >>  5 files changed, 31 insertions(+)
-> > > >>
-> > > >> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> > > >> index f75731396b7e..4146f80db8ac 100644
-> > > >> --- a/drivers/vhost/vsock.c
-> > > >> +++ b/drivers/vhost/vsock.c
-> > > >> @@ -451,6 +451,7 @@ static struct virtio_transport vhost_transport = {
-> > > >>  		.notify_buffer_size       = virtio_transport_notify_buffer_size,
-> > > >>
-> > > >>  		.read_skb = virtio_transport_read_skb,
-> > > >> +		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat
-> > > >>  	},
-> > > >>
-> > > >>  	.send_pkt = vhost_transport_send_pkt,
-> > > >> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
-> > > >> index ebb3ce63d64d..c82089dee0c8 100644
-> > > >> --- a/include/linux/virtio_vsock.h
-> > > >> +++ b/include/linux/virtio_vsock.h
-> > > >> @@ -256,4 +256,5 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
-> > > >>  void virtio_transport_deliver_tap_pkt(struct sk_buff *skb);
-> > > >>  int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *list);
-> > > >>  int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t read_actor);
-> > > >> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk, int val);
-> > > >>  #endif /* _LINUX_VIRTIO_VSOCK_H */
-> > > >> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> > > >> index af5bab1acee1..8007593a3a93 100644
-> > > >> --- a/net/vmw_vsock/virtio_transport.c
-> > > >> +++ b/net/vmw_vsock/virtio_transport.c
-> > > >> @@ -539,6 +539,7 @@ static struct virtio_transport virtio_transport = {
-> > > >>  		.notify_buffer_size       = virtio_transport_notify_buffer_size,
-> > > >>
-> > > >>  		.read_skb = virtio_transport_read_skb,
-> > > >> +		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat
-> > > >>  	},
-> > > >>
-> > > >>  	.send_pkt = virtio_transport_send_pkt,
-> > > >> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> > > >> index f6dc896bf44c..1cb556ad4597 100644
-> > > >> --- a/net/vmw_vsock/virtio_transport_common.c
-> > > >> +++ b/net/vmw_vsock/virtio_transport_common.c
-> > > >> @@ -1684,6 +1684,33 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
-> > > >>  }
-> > > >>  EXPORT_SYMBOL_GPL(virtio_transport_read_skb);
-> > > >>
-> > > >> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk,
-> > > >> int val)
-> > > >> +{
-> > > >> +	struct virtio_vsock_sock *vvs = vsk->trans;
-> > > >> +	bool send_update;
-> > > >> +
-> > > >> +	spin_lock_bh(&vvs->rx_lock);
-> > > >> +
-> > > >> +	/* If number of available bytes is less than new SO_RCVLOWAT value,
-> > > >> +	 * kick sender to send more data, because sender may sleep in
-> > > >> its
-> > > >> +	 * 'send()' syscall waiting for enough space at our side.
-> > > >> +	 */
-> > > >> +	send_update = vvs->rx_bytes < val;
-> > > >> +
-> > > >> +	spin_unlock_bh(&vvs->rx_lock);
-> > > >> +
-> > > >> +	if (send_update) {
-> > > >> +		int err;
-> > > >> +
-> > > >> +		err = virtio_transport_send_credit_update(vsk);
-> > > >> +		if (err < 0)
-> > > >> +			return err;
-> > > >> +	}
-> > > >> +
-> > > >> +	return 0;
-> > > >> +}
-> > > >
-> > > >
-> > > > I find it strange that this will send a credit update
-> > > > even if nothing changed since this was called previously.
-> > > > I'm not sure whether this is a problem protocol-wise,
-> > > > but it certainly was not envisioned when the protocol was
-> > > > built. WDYT?
-> > > 
-> > > >From virtio spec I found:
-> > > 
-> > > It is also valid to send a VIRTIO_VSOCK_OP_CREDIT_UPDATE packet without previously receiving a
-> > > VIRTIO_VSOCK_OP_CREDIT_REQUEST packet. This allows communicating updates any time a change
-> > > in buffer space occurs.
-> > > So I guess there is no limitations to send such type of packet, e.g. it is not
-> > > required to be a reply for some another packet. Please, correct me if im wrong.
-> > > 
-> > > Thanks, Arseniy
-> > 
-> > 
-> > Absolutely. My point was different - with this patch it is possible
-> > that you are not adding any credits at all since the previous
-> > VIRTIO_VSOCK_OP_CREDIT_UPDATE.
+On Fri, 2023-11-24 at 00:53 -0500, Yang Weijiang wrote:
+> Save CET SSP to SMRAM on SMI and reload it on RSM. KVM emulates HW arch
+> behavior when guest enters/leaves SMM mode,i.e., save registers to SMRAM
+> at the entry of SMM and reload them at the exit to SMM. Per SDM, SSP is
+> one of such registers on 64bit Arch, so add the support for SSP.
 > 
-> I think the problem we're solving here is that since as an optimization we
-> avoid sending the update for every byte we consume, but we put a threshold,
-> then we make sure we update the peer.
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>  arch/x86/kvm/smm.c | 8 ++++++++
+>  arch/x86/kvm/smm.h | 2 +-
+>  2 files changed, 9 insertions(+), 1 deletion(-)
 > 
-> A credit update contains a snapshot and sending it the same as the previous
-> one should not create any problem.
+> diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
+> index 45c855389ea7..7aac9c54c353 100644
+> --- a/arch/x86/kvm/smm.c
+> +++ b/arch/x86/kvm/smm.c
+> @@ -275,6 +275,10 @@ static void enter_smm_save_state_64(struct kvm_vcpu *vcpu,
+>  	enter_smm_save_seg_64(vcpu, &smram->gs, VCPU_SREG_GS);
+>  
+>  	smram->int_shadow = static_call(kvm_x86_get_interrupt_shadow)(vcpu);
+> +
+> +	if (guest_can_use(vcpu, X86_FEATURE_SHSTK))
+> +		KVM_BUG_ON(kvm_msr_read(vcpu, MSR_KVM_SSP, &smram->ssp),
+> +			   vcpu->kvm);
+>  }
+>  #endif
+>  
+> @@ -564,6 +568,10 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
+>  	static_call(kvm_x86_set_interrupt_shadow)(vcpu, 0);
+>  	ctxt->interruptibility = (u8)smstate->int_shadow;
+>  
+> +	if (guest_can_use(vcpu, X86_FEATURE_SHSTK))
+> +		KVM_BUG_ON(kvm_msr_write(vcpu, MSR_KVM_SSP, smstate->ssp),
+> +			   vcpu->kvm);
+> +
+>  	return X86EMUL_CONTINUE;
+>  }
+>  #endif
+> diff --git a/arch/x86/kvm/smm.h b/arch/x86/kvm/smm.h
+> index a1cf2ac5bd78..1e2a3e18207f 100644
+> --- a/arch/x86/kvm/smm.h
+> +++ b/arch/x86/kvm/smm.h
+> @@ -116,8 +116,8 @@ struct kvm_smram_state_64 {
+>  	u32 smbase;
+>  	u32 reserved4[5];
+>  
+> -	/* ssp and svm_* fields below are not implemented by KVM */
+>  	u64 ssp;
+> +	/* svm_* fields below are not implemented by KVM */
+>  	u64 svm_guest_pat;
+>  	u64 svm_host_efer;
+>  	u64 svm_host_cr4;
 
-Well it consumes a buffer on the other side.
 
-> My doubt now is that we only do this when we set RCVLOWAT , should we also
-> do something when we consume bytes to avoid the optimization we have?
-> 
-> Stefano
+My review feedback from the previous patch series still applies, and I don't
+know why it was not addressed/replied to:
 
-Isn't this why we have credit request?
+I still think that it is worth it to have a check that CET is not enabled in
+enter_smm_save_state_32 which is called for pure 32 bit guests (guests that don't
+have X86_FEATURE_LM enabled)
 
--- 
-MST
+Best regards,
+	Maxim Levitsky
+
 
 
