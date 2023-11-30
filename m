@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-2947-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2948-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 255C67FF1FB
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 15:34:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B0B587FF1FC
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 15:34:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4A9B282751
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 14:34:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C9632825CF
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 14:34:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E986D51C47;
-	Thu, 30 Nov 2023 14:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93BBB51039;
+	Thu, 30 Nov 2023 14:34:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HFKmm7Ro"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JSEo6s3z"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E21A85
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 06:33:51 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18A06196
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 06:34:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701354831; x=1732890831;
+  t=1701354841; x=1732890841;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=TLbpY7EX///aEBUshQ9nHMg5QAVw4jJxDP0uMhZZdFI=;
-  b=HFKmm7Rol5h5fm15pg/BdwuLBRyUTUPNKgFkKrStTvqQJDP0pF7KnwgE
-   zB61HtAxH7Xf1ZylXBCTZizu2ZMfEASjRfAeXEoA3NwN6hPPvFwmGY+KQ
-   /g+vMlUJYGQEusnyqNA048nvUCXcydWue8oapA0oLZjTdgsxuoIwq63SM
-   XHkaeSyra04z7qycktm43gzuXJ3rlZsGwKxgFXniD/X+2Wy66vK55C18H
-   WLyYTyCKgUoVQSNdfZT/abbN4YoCrUcfgne4qnGN/xWgRii7DX0cNDrq5
-   lRfSFaJtRmCRnTB5r6pKXn1xj07mlKY3WEJfPEe+1t/Ozib8bknC4POXC
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="479532060"
+  bh=ojKaeiijveA4rQSsZpp2eyLul8UTXwtywNBoYac3pw0=;
+  b=JSEo6s3zJQZR1TPM9mhrEh48U3LNRhbKsemyt6FKP7sjTnvZJ5LZkENw
+   kYWgSvq6p+tyxSyiGIuyUTIk7QYVZxIQgt9jCn+uNV7h/yVPSwtJkRRD8
+   ngoG//sH9Xi8bHPEnuKQJ2TlDaoHo6so8+dfGiXhERlX2OxJEc44VB5YX
+   LVZVpLcCVv1uK6sr0one+bxL/Ibd8hZsZ1WqOH5O2zqH5z1tmC9rC7WhD
+   rQl0b/2g7vTLFPhgJMaGhWSAiK/VFS+cMS+hLPoPNYG/mSIT7TWd8UDlG
+   XDQHwWq83BWUpIyL3VGle3bRyn9yMN74kTP5Z7mORIVCM+YQwTb1JzPrq
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="479532117"
 X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="479532060"
+   d="scan'208";a="479532117"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 06:33:50 -0800
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 06:34:00 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="942730047"
+X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="942730060"
 X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="942730047"
+   d="scan'208";a="942730060"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by orsmga005.jf.intel.com with ESMTP; 30 Nov 2023 06:33:41 -0800
+  by orsmga005.jf.intel.com with ESMTP; 30 Nov 2023 06:33:50 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
@@ -84,9 +84,9 @@ Cc: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
 	Zhenyu Wang <zhenyu.z.wang@intel.com>,
 	Yongwei Ma <yongwei.ma@intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 21/41] hw/cpu/cluster: Allow cpu-cluster to be created by -device
-Date: Thu, 30 Nov 2023 22:41:43 +0800
-Message-Id: <20231130144203.2307629-22-zhao1.liu@linux.intel.com>
+Subject: [RFC 22/41] hw/cpu/cluster: Convert cpu-cluster from general device to topology device
+Date: Thu, 30 Nov 2023 22:41:44 +0800
+Message-Id: <20231130144203.2307629-23-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231130144203.2307629-1-zhao1.liu@linux.intel.com>
 References: <20231130144203.2307629-1-zhao1.liu@linux.intel.com>
@@ -100,28 +100,94 @@ Content-Transfer-Encoding: 8bit
 
 From: Zhao Liu <zhao1.liu@intel.com>
 
-Since we will extend cpu-cluster to build CPU topology in virtualization
-case via -device, remove the original limitition.
+Convert cpu-cluster to topology device then user could create cluster
+level topology from cli and later the cpu-clusters could be added into
+topology tree.
+
+In addition, mark the cpu-cluster as DEVICE_CATEGORY_CPU_DEF category to
+indicate it belongs to the basic CPU definition and should be created
+from cli before board initialization.
 
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- hw/cpu/cluster.c | 3 ---
- 1 file changed, 3 deletions(-)
+ hw/cpu/cluster.c         | 11 +++++++++--
+ include/hw/cpu/cluster.h |  7 +++++--
+ 2 files changed, 14 insertions(+), 4 deletions(-)
 
 diff --git a/hw/cpu/cluster.c b/hw/cpu/cluster.c
-index 27ab9e25a265..8a666c27d151 100644
+index 8a666c27d151..adf0ef23e8d4 100644
 --- a/hw/cpu/cluster.c
 +++ b/hw/cpu/cluster.c
-@@ -96,9 +96,6 @@ static void cpu_cluster_class_init(ObjectClass *klass, void *data)
-     device_class_set_props(dc, cpu_cluster_properties);
-     dc->realize = cpu_cluster_realize;
+@@ -86,15 +86,21 @@ static void cpu_cluster_realize(DeviceState *dev, Error **errp)
+     if (cc->tcg_clu_ops->collect_cpus) {
+         cc->tcg_clu_ops->collect_cpus(cluster, errp);
+     }
++
++    cc->parent_realize(dev, errp);
+ }
  
--    /* This is not directly for users, CPU children must be attached by code */
--    dc->user_creatable = false;
--
+ static void cpu_cluster_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
++    CPUTopoClass *tc = CPU_TOPO_CLASS(klass);
+     CPUClusterClass *cc = CPU_CLUSTER_CLASS(klass);
+ 
++    set_bit(DEVICE_CATEGORY_CPU_DEF, dc->categories);
+     device_class_set_props(dc, cpu_cluster_properties);
+-    dc->realize = cpu_cluster_realize;
++    device_class_set_parent_realize(dc, cpu_cluster_realize,
++                                    &cc->parent_realize);
++    tc->level = CPU_TOPO_CLUSTER;
+ 
  #ifdef CONFIG_TCG
      cc->tcg_clu_ops = &common_cluster_tcg_ops;
- #endif
+@@ -103,8 +109,9 @@ static void cpu_cluster_class_init(ObjectClass *klass, void *data)
+ 
+ static const TypeInfo cpu_cluster_type_info = {
+     .name = TYPE_CPU_CLUSTER,
+-    .parent = TYPE_DEVICE,
++    .parent = TYPE_CPU_TOPO,
+     .instance_size = sizeof(CPUCluster),
++    .class_size = sizeof(CPUClusterClass),
+     .class_init = cpu_cluster_class_init,
+ };
+ 
+diff --git a/include/hw/cpu/cluster.h b/include/hw/cpu/cluster.h
+index b3185e2f2566..888993c36da4 100644
+--- a/include/hw/cpu/cluster.h
++++ b/include/hw/cpu/cluster.h
+@@ -20,6 +20,7 @@
+ #ifndef HW_CPU_CLUSTER_H
+ #define HW_CPU_CLUSTER_H
+ 
++#include "hw/core/cpu-topo.h"
+ #include "hw/qdev-core.h"
+ #include "qom/object.h"
+ 
+@@ -84,11 +85,13 @@ struct TCGClusterOps {
+ 
+ struct CPUClusterClass {
+     /*< private >*/
+-    DeviceClass parent_class;
++    CPUTopoClass parent_class;
+ 
+     /*< public >*/
+     /* when TCG is not available, this pointer is NULL */
+     const struct TCGClusterOps *tcg_clu_ops;
++
++    DeviceRealize parent_realize;
+ };
+ 
+ /**
+@@ -100,7 +103,7 @@ struct CPUClusterClass {
+  */
+ struct CPUCluster {
+     /*< private >*/
+-    DeviceState parent_obj;
++    CPUTopoState parent_obj;
+ 
+     /*< public >*/
+     uint32_t cluster_id;
 -- 
 2.34.1
 
