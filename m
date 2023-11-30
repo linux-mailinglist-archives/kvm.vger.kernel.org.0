@@ -1,49 +1,49 @@
-Return-Path: <kvm+bounces-2850-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2851-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6213C7FE9C9
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 08:35:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA0F07FE9D0
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 08:38:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B8D728205B
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 07:35:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85299B20ACB
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 07:38:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D38E200C1;
-	Thu, 30 Nov 2023 07:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BCC1200C9;
+	Thu, 30 Nov 2023 07:38:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fwSXMkse"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UGd1e4k5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E64CB9
-	for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 23:35:41 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27D1F196
+	for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 23:38:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701329740; x=1732865740;
+  t=1701329882; x=1732865882;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=99FlI+lUby8pT37iELGoU1c/gT0psdPhOS/BFhYOTBY=;
-  b=fwSXMkseLRUvd+A7n2bPL+FUbsoNsMQ6cJk5e0O5rJlyGiAJRTejjsEl
-   m7iSYeobTOYT1wDwYQTV0tPAtf2W6cS+q+Kc+m0CwsiVvLFnT5pycas8S
-   MhqEtKRGbf7KtsLLLy4geqdQKsqpLgIQINL1b7f0jFP8DW42XMSkFdscR
-   Bn8GZZw8Leb/gROmkxkSzvZYC5sX3ZzO/Vf14BywMdv82jYoDiyhJJCKA
-   ubG++APuFveReWVMJLmhEHhF3qqsi3uertOf4lBcNBP+Ozz8trlVGMex4
-   TnYKagw7Plri6+Q8LAratgk+JNYJL5qfK6Hzip0psLKRnfCC83w6hnU2x
+  bh=nRsvxMK0xXLv2z475vawDPZCSbmouFr1izddt1pJqeY=;
+  b=UGd1e4k5gPcRiKmNpVbla/WEktammAXow7XVSNUA/asJnY1gLtJdMR7y
+   W7kIyCpyO5ZOZqktASqmMhIREEf1BolP/nECo2r7/86AAoRn79pa1u5n+
+   eJA1M2ahR3DZP7IRf74N/zKyKS3QyuydTMGh7BCGx0EOyZEfmGWTjvC26
+   Fg8drON3ioxFqtKHcHEXZWZExb3ZeAZDJ2u6fOJUknIZVWqzCxNVxCyJS
+   CFg05FkSO5/lQR3GVS24jhgUxZvGNidGcOFDoJB5jMR27UnBK7FmkL24g
+   Ysh36RhQyqvu59ZxOTognptaLgfyJRY3eyslrNAuT/prfYQCFJtpVl3xi
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="6555323"
+X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="424432595"
 X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
-   d="scan'208";a="6555323"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 23:35:40 -0800
+   d="scan'208";a="424432595"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 23:38:01 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="719045110"
+X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="798195854"
 X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
-   d="scan'208";a="719045110"
+   d="scan'208";a="798195854"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.29.154]) ([10.93.29.154])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 23:35:35 -0800
-Message-ID: <994afc73-1929-4706-9510-e33bb7048487@intel.com>
-Date: Thu, 30 Nov 2023 15:35:33 +0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 23:37:55 -0800
+Message-ID: <8b2800e3-989a-4c9f-b7e5-7b2e0702e3a0@intel.com>
+Date: Thu, 30 Nov 2023 15:37:49 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -70,52 +70,48 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
  <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
 References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
  <20231115071519.2864957-3-xiaoyao.li@intel.com>
- <ed599765-65b7-4253-8de2-61afba178e2d@redhat.com>
- <37b5ba85-021a-418b-8eda-8a716b7b7fb3@intel.com>
- <c3a7704f-12d8-457e-aad2-1c2ece896286@redhat.com>
+ <82ac9bf4-7463-48fc-b138-fcaa6314547f@redhat.com>
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <c3a7704f-12d8-457e-aad2-1c2ece896286@redhat.com>
+In-Reply-To: <82ac9bf4-7463-48fc-b138-fcaa6314547f@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/20/2023 5:19 PM, David Hildenbrand wrote:
-> On 16.11.23 03:45, Xiaoyao Li wrote:
->> On 11/16/2023 1:54 AM, David Hildenbrand wrote:
->>> On 15.11.23 08:14, Xiaoyao Li wrote:
->>>> Add KVM guest_memfd support to RAMBlock so both normal hva based memory
->>>> and kvm guest memfd based private memory can be associated in one
->>>> RAMBlock.
->>>>
->>>> Introduce new flag RAM_GUEST_MEMFD. When it's set, it calls KVM 
->>>> ioctl to
->>>> create private guest_memfd during RAMBlock setup.
->>>>
->>>> Note, RAM_GUEST_MEMFD is supposed to be set for memory backends of
->>>> confidential guests, such as TDX VM. How and when to set it for memory
->>>> backends will be implemented in the following patches.
->>>
->>> Can you elaborate (and add to the patch description if there is good
->>> reason) why we need that flag and why we cannot simply rely on the VM
->>> type instead to decide whether to allocate a guest_memfd or not?
->>>
->>
->> The reason is, relying on the VM type is sort of hack that we need to
->> get the MachineState instance and retrieve the vm type info. I think
->> it's better not to couple them.
->>
->> More importantly, it's not flexible and extensible for future case that
->> not all the memory need guest memfd.
->>
+On 11/20/2023 5:24 PM, David Hildenbrand wrote:
+>>   uint8_t memory_region_get_dirty_log_mask(MemoryRegion *mr)
+>>   {
+>>       uint8_t mask = mr->dirty_log_mask;
+>> diff --git a/system/physmem.c b/system/physmem.c
+>> index fc2b0fee0188..0af2213cbd9c 100644
+>> --- a/system/physmem.c
+>> +++ b/system/physmem.c
+>> @@ -1841,6 +1841,20 @@ static void ram_block_add(RAMBlock *new_block, 
+>> Error **errp)
+>>           }
+>>       }
+>> +#ifdef CONFIG_KVM
+>> +    if (kvm_enabled() && new_block->flags & RAM_GUEST_MEMFD &&
 > 
-> Okay. In that case, please update the documentation of all functions 
-> where we are allowed to pass in RAM_GUEST_MEMFD. There are a couple of 
-> them in include/exec/memory.h
-
-sure, thanks!
-
-> I'll note that the name/terminology of "RAM_GUEST_MEMFD" is extremely 
-> Linux+kvm specific. But I cannot really come up with something better 
-> right now.
 > 
+> I recall that we prefer to write this as
+> 
+>      if (kvm_enabled() && (new_block->flags & RAM_GUEST_MEMFD) &&
+
+get it.
+
+Thanks!
+
+>> +        new_block->guest_memfd < 0) {
+>> +        /* TODO: to decide if KVM_GUEST_MEMFD_ALLOW_HUGEPAGE is 
+>> supported */
+>> +        uint64_t flags = 0;
+>> +        new_block->guest_memfd = 
+>> kvm_create_guest_memfd(new_block->max_length,
+>> +                                                        flags, errp);
+> 
+> Get rid of "flags" and just pass 0". Whatever code wants to pass flags 
+> later can decide how to do that.
+
+
+How to handle it please see the reply to patch 3.
 
 
