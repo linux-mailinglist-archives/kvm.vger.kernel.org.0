@@ -1,183 +1,153 @@
-Return-Path: <kvm+bounces-2822-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2823-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 515387FE489
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 01:08:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCC987FE491
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 01:10:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67350B20F78
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 00:08:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 897C52822D6
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 00:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F379264D;
-	Thu, 30 Nov 2023 00:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7ABA636;
+	Thu, 30 Nov 2023 00:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="J5+sJXoJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KCOIPM7j"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2073.outbound.protection.outlook.com [40.107.237.73])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0D44CA;
-	Wed, 29 Nov 2023 16:08:21 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dnD8NNFXZ4Dv54t6NgzDSatk8KyYzSGyUJhUEnFZXnBCLb4h27ZTrnkiruIFBHvyz5/BOLH0T4eZuKJ1wPr9Ul+BdPy6VIHsh2/4KpEks1vReHSuGu1gp7gyDfv3Z77GPWLwKzHoeLLg+b9coV/6/roVT+MIbr/US5lgj0ony+GglMW4VrwZffFYRpQFHYkXjEh0IZuX/6ZYY3TrA3kGifabQ/F7ovyirXz9plYH1csU0/3hkSwv4xQ82yFhDn/am9y0SbWsWkMHKhX0GOR8xpM2dUWyqN18WAyo4TpqA3fEEaqhB4R8DUpYYDEdU6oED8ikSifFewoBQV0RCmz0mg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XE88+nCWAZZNSCLyGLpVZkQSDUQdOsJ6oiEbv52t+nA=;
- b=hYAK8G1nF7Rx4800skDiax6TYcGa068pf8XCOv7pJb7OkP9A71DZI1k9yXWSGtOmrOug1gl9jVasirf2iakmiLI0I2uOA5r7XUW5XzqdERhMjUT8mMSEoaLF7DbkfqtgInR1PR3IDE+Tx18x0D8HWDZsPXhRWB4DJTyHAeKrS3XCtEFVu/HHX8zeY+iOtmv0BkfdB7Rp0zGAGabpZuO7bs4tXyC2EAqKnmuhuMQYliHzLGnLQ9Pr8jQYoy5ZnSwsFFG9RQoMisIZwGE+/ovNTs6s5rLkbcCDWMimTnReq6axUFphWikqH4FnOGWB/Wa1ZB6RvlBkXTxhCoeN4hWmFg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XE88+nCWAZZNSCLyGLpVZkQSDUQdOsJ6oiEbv52t+nA=;
- b=J5+sJXoJrQh2Anzoau6oYmbBxzMg+78k9dAuGWjGSZ7nrH9idgArACvItCZkiiW5jgVTSVdfmGZel1aU/BvcPDhW6lf+hGDyegdcpiVXixr+DHWMjEDHvcWORTiU0m0vtykkn5feOOI0tbCv3gA/fJHVmdsylyvFUmlDVvtociwKHk80nWsvy6i4ef2kpmine271SOd4YxTcThU32XnGIhUfoLwygSMqa/5szhx8ujCsg2eaNHsYtI6ZkQ7lHFNRmpOpWAN+dQ7/JPS8fAV7H4dT8xaqMrMRzPHCDKWSEzCFTpdEIaxxK381fpXXNpiZzJXvbQk3dBqIIfVzpIkvkg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by BN9PR12MB5194.namprd12.prod.outlook.com (2603:10b6:408:11b::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.23; Thu, 30 Nov
- 2023 00:08:18 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7046.015; Thu, 30 Nov 2023
- 00:08:18 +0000
-Date: Wed, 29 Nov 2023 20:08:16 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Nicolin Chen <nicolinc@nvidia.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
-	"joro@8bytes.org" <joro@8bytes.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-	"cohuck@redhat.com" <cohuck@redhat.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-	"peterx@redhat.com" <peterx@redhat.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
-	"lulu@redhat.com" <lulu@redhat.com>,
-	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-	"Zeng, Xin" <xin.zeng@intel.com>,
-	"Zhao, Yan Y" <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v6 2/6] iommufd: Add IOMMU_HWPT_INVALIDATE
-Message-ID: <20231130000816.GB1389974@nvidia.com>
-References: <BN9PR11MB5276C8EACE2C300A646EA8A18CBBA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZVw/BXxgGCuCZCA6@Asurada-Nvidia>
- <BN9PR11MB52761A9B48A25E89BEECE6308CB8A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZWTzoBTDDEWAKMs9@Asurada-Nvidia>
- <BN9PR11MB5276FD60A0EDF8E3F231FCC88CBCA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZWaLCSAMIOXTlghk@Asurada-Nvidia>
- <20231129005715.GS436702@nvidia.com>
- <ZWaPM4p7yjJ0sEKk@Asurada-Nvidia>
- <20231129195804.GF436702@nvidia.com>
- <ZWe2PvatTkkyNCY5@Asurada-Nvidia>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZWe2PvatTkkyNCY5@Asurada-Nvidia>
-X-ClientProxiedBy: SA0PR11CA0095.namprd11.prod.outlook.com
- (2603:10b6:806:d1::10) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AACFCA
+	for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 16:10:03 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-da0737dcb26so388885276.3
+        for <kvm@vger.kernel.org>; Wed, 29 Nov 2023 16:10:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701303002; x=1701907802; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gmjQgaxxDn5r7HkZPUYCJ27qew3aSHzjX5AlpzkdkoY=;
+        b=KCOIPM7jBghjlaNvqZNIMzRxk+NyDgmjBQ89cFR2w0ohLu6aBrZjaYfEEiYwvuhv6v
+         6E8TuDuiCaH4aEZxU4K3bnKhrEIRIkJHQ1CXY5ZUeSuwIeAeDRSM2pDnNEi8WQrR7zMA
+         NMijg9ahLR8QEuRc7DP2Cr9XZl91t8aXq796sJKXQUTzxuuczXk3dmHQlN/UXLmZKsbX
+         kZhpkIGaQxkjYxjLGSaTdVOzPwMdNDLpauzMwVA+ihKnmCv7l18SDT4IKVU45amBwftL
+         4izK2uTpqlzYAOATDdVCYDLsIur9uhBGes3kpOPUSMS4sXt3diDBx5zeIeCbrEGPKCv3
+         1s3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701303002; x=1701907802;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gmjQgaxxDn5r7HkZPUYCJ27qew3aSHzjX5AlpzkdkoY=;
+        b=HWSKgfbtQ9HCeAm263HX+Mtdl89SzE1Qn3ErTxGp/zd7oSOrL9u6oHmQ2682zOJPxN
+         XkE1RdWsLvUDrLDwmaxeI188kdw4h+xd8wW7yxY9G/MlTfevZQM+o3ybokp+BRmaTIlc
+         wa8dtea7XoAuPnZp0S4R+iAUSCmlG2j+B/8lP4v5yHkDhIWg4lGm7lPlw9qW7i+/8cgy
+         wRkwWBUs3gPs0LeGe5cC6HwulKCGUn/pxysdL9JpQL5d7NIQnixa9nE6MBAXRmLdwWxB
+         Pe/K127TpNhaOl0HVPcIs7/8AanyKQNd0IevlkzE9dX/EqOZDETdNK++i3cLK8RaA7+t
+         HOkg==
+X-Gm-Message-State: AOJu0Yz7ckzO+RDRaw2am2xuu1NrXboFZ+3rSdm10vfsYZpH22DDjAj7
+	dzpXOXRmrW8uyHNEVDoase7QZ/moQc0=
+X-Google-Smtp-Source: AGHT+IGkmKVAkhUhDCuNHCF6qsZZjcgx0kXiwfuTem15ifyWvEMkuHM1uhjC+KfnOKjPGQulGYD2XibZdq8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:bac6:0:b0:db3:fd6a:7bdb with SMTP id
+ a6-20020a25bac6000000b00db3fd6a7bdbmr395765ybk.2.1701303002773; Wed, 29 Nov
+ 2023 16:10:02 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed, 29 Nov 2023 16:10:00 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BN9PR12MB5194:EE_
-X-MS-Office365-Filtering-Correlation-Id: c61fa23d-f448-4cea-2364-08dbf13874a5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	qlCS5fnmzD8kZWjahUXBUGaoMsQPoHzUw0FgCcrG4gJvsVnB9FD60rACgNj2OF9eWx6d5j6J5q9rb/e+BEI/2rQnMzC7OEJay/sTvMEyRE1P3m+VrET1Ad+oieZPG7Ygk94Kz4EPpFUnmBuN2dl3oY7KRf3HQ9pvmOoHkgnuG68aK9k9HA1Xd0Tz3omY3s3H1ujGJiCjRRXL83cBJ2tl84AJMbV0Cnp06JxGBO+mMeWtW3SqUHGDulUyaFL+T2C4ZyRDHCJxZf36nG3+NS+QXvKyyQTM5LlETfYQ283D0FQvT88c9zBjqR1yNu22Y3vjKoWN951w4e6D2g8B45dQsahMT4zkhL8nEf26A7sPHb8xx9YWb+bsyhEaRClDkQ8M8rTWlj3WnYyxg0zCvrPun5POOoAmkKUXpbPxrSeGhLKCNsZ1/YAkqLwKJYZ6/zayt+atj9xWsHsT8h//3crEmzaZDLCWC0wk+LOEamW8TIV9mgglbho5oAVU5LZO3WE5Ke5ON7qJLaMN4bC+sS5GYGr641a/t+KbQK+w7tRcegY1nVWYkrRK48YEJe4dOx4PmrkYD38Lzjv+muIfvfGmmy5JlpltM4e+60UsEBDROwnhSjW4zK+VygeTqqk1Xl3E
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(396003)(366004)(346002)(376002)(230922051799003)(64100799003)(1800799012)(186009)(451199024)(478600001)(2616005)(6512007)(26005)(6486002)(1076003)(6506007)(83380400001)(2906002)(7416002)(41300700001)(5660300002)(54906003)(66946007)(6636002)(66476007)(66556008)(316002)(37006003)(6862004)(8936002)(8676002)(4326008)(38100700002)(36756003)(33656002)(86362001)(202311291699003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?/r4Z81OPDtFfQIhYUp8rcAfxnSKFMFj8zb1QGLIzXYAPTTBSq7YNMzo/R6a7?=
- =?us-ascii?Q?nmQlSAME5vjlOo7I/mUksGoy0xeboHx/1cZAcQntoQ++L11LVzoakKh8V4XL?=
- =?us-ascii?Q?cW8duQEXvv5xYXPSAW2LL2UjwBXN21qq3/+ts+N0cWKN4+s10YCxIJVYA8Ir?=
- =?us-ascii?Q?E5QYP/KcrCG7saMFQVNWdH/ck/0j3JjZvUuPhSlCXY9Dy3GiN+5FIRbyD3Ud?=
- =?us-ascii?Q?o1bFPdkUCYZEHke5kLnRxaCpQAZ4Mj0WQ0wg1nfojfSZsaIARxlanNWpeDc7?=
- =?us-ascii?Q?0bzO3wkvron0q6vA61hwd1tQ/8alK+2P/PVIA0Zf3DiGNXJxEwZWsYM1kiui?=
- =?us-ascii?Q?5PJpNTYjF2spGrG6zcqFpOgu87lxyvvmfEaHK7JxBzDaunXvkBZN9aCPp9rn?=
- =?us-ascii?Q?j5xieXa+rZrR8Qz8NpZsI6cLkWNlhamjeL/j8DNmnkezwGvtCyczfu3f/lUN?=
- =?us-ascii?Q?M1EhLB9BJIZQHxl5cC85wpFNHOi9cVNrvlgT+Pf6Nv6DA4dBEnwfd0rc1dmk?=
- =?us-ascii?Q?ddj8FGlB+xJzQywoQNYRCsC4pUd9zSWtN+F4wi70Z0f5tRsGbRkONjRZ7V/1?=
- =?us-ascii?Q?JajHBJf7uSKhWQIyiin5FzRR1H7rkaHpTyheCRvBTqVXpPYcU59/ysDO9CiZ?=
- =?us-ascii?Q?UrfG/CyKkokTlRENUIW4SALZGvp9W7Ff8ZdPSATm0YM7ghHGlalxKEh5M7O1?=
- =?us-ascii?Q?YvzZ9fTbznNWWKT/XUAG/uXmNpPAMd90T4L9XLTlhV1rTHFfR5YrSqii/s+n?=
- =?us-ascii?Q?9Lixha8kk7mjAjHiUJCenXy0nuzrpRxoYKflcBlGn5nXlkYCiKjTIWRt1SpW?=
- =?us-ascii?Q?ZrUD+fs7vLGK762xBwQ0Eje5ISvnLEAielzSBXXumJhn+mrIj2CSrE7/mkKp?=
- =?us-ascii?Q?IMmutec9srDLWd6NsUhCvGDuzYrrM1hr6ERTSgGDaUzNhmiWrT/lEIhqA1IU?=
- =?us-ascii?Q?+pcXE+Vt1+hrjGQZ0BlQ367Ajjl+QFshEKgtYrAuDQ8g5A6InoEJBcptRM26?=
- =?us-ascii?Q?BegT9cYVse1p1frODAD+Skkxw52JXhbr8hYejaZn/hk3v0AiI4dBWVHnqU7F?=
- =?us-ascii?Q?b8gt4jrNd6adhQega5Ak+hQTmfu+aga9OeHngA2Zlec93YBqMAQP4Sw/bkrF?=
- =?us-ascii?Q?hHpsTwQz/EXAwuIay4WMeU80lf7MuuU1Nwu6bfRt/hiewWSC3ypQA3APrGTa?=
- =?us-ascii?Q?40GZCngzJEJKKfqSNxeNX3v83gBuWKDQfQZ8An8Q2a54Ff5LaT0RVmu81tcY?=
- =?us-ascii?Q?GhHfwZ5w3oG5lIASP/byzmf14XUJeA8oVtogsOncUBaO9vFb4sthpLW0ggPw?=
- =?us-ascii?Q?cRnOlkPpDa5vqIGRWzcAtFS4s3MF0w9rc+I2tiHFdLOU3wTXezZB4yOcEvhN?=
- =?us-ascii?Q?RujL8q9T2pVyGzQVpDv5clBX0SuVyjZsHUlcaQ8st0EpxSv6pOv75ipSo8Lt?=
- =?us-ascii?Q?IR6CgEEalji9UGmmbsryHMA7FI/ab1oT057n/2Q5JfRWO9JetLcZd1/2iNhJ?=
- =?us-ascii?Q?xUYb9SgCRvUZMWR1xPOUZH7Y9cD4gYpmzn+nBDgxjdYRVx6zSgl/bdTckAfa?=
- =?us-ascii?Q?c/EzZrbClV0jx2kIURd6xvhFA98DGtMcQhaxZpKk?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c61fa23d-f448-4cea-2364-08dbf13874a5
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2023 00:08:18.2123
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: L4nZmuRHYb60eN9dLVc3vIpwQWkDhYdbfEQSpOje5FVgebeiXH2wH3O3g6ioo95W
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5194
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.rc1.413.gea7ed67945-goog
+Message-ID: <20231130001000.543240-1-seanjc@google.com>
+Subject: [PATCH] vfio: Drop vfio_file_iommu_group() stub to fudge around a KVM wart
+From: Sean Christopherson <seanjc@google.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Nick Desaulniers <ndesaulniers@google.com>, Jason Gunthorpe <jgg@nvidia.com>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Nov 29, 2023 at 02:07:58PM -0800, Nicolin Chen wrote:
-> On Wed, Nov 29, 2023 at 03:58:04PM -0400, Jason Gunthorpe wrote:
-> > On Tue, Nov 28, 2023 at 05:09:07PM -0800, Nicolin Chen wrote:
-> > 
-> > > > > With that being said, I think errno (-EIO) could do the job,
-> > > > > as you suggested too.
-> > > > 
-> > > > Do we have any idea what HW failures can be generated by the commands
-> > > > this will execture? IIRC I don't remember seeing any smmu specific
-> > > > codes related to invalid invalidation? Everything is a valid input?
-> > > 
-> > > "7.1 Command queue errors" has the info.
-> > 
-> > Hmm CERROR_ATC_INV_SYNC needs to be forwarded to the guest somehow
-> 
-> Oh, for sure. That's typically triggered with an asynchronous
-> timeout from the eventq, so we'd need the io page fault series
-> as you previously remarked. Though I also wonder if an invalid
-> vSID that doesn't link to a pSID should be CERROR_ATC_INV_SYNC
-> also v.s. CERROR_ILL.
+Drop the vfio_file_iommu_group() stub and instead unconditionally declare
+the function to fudge around a KVM wart where KVM tries to do symbol_get()
+on vfio_file_iommu_group() (and other VFIO symbols) even if CONFIG_VFIO=n.
 
-Yes, something like that make sense
+Ensuring the symbol is always declared fixes a PPC build error when
+modules are also disabled, in which case symbol_get() simply points at the
+address of the symbol (with some attributes shenanigans).  Because KVM
+does symbol_get() instead of directly depending on VFIO, the lack of a
+fully defined symbol is not problematic (ugly, but "fine").
 
-Presumably sync becomes emulated and turns into something generated
-when the ioctl returns. So userspace would have to read the event FD
-before returning to be correct?
+   arch/powerpc/kvm/../../../virt/kvm/vfio.c:89:7:
+   error: attribute declaration must precede definition [-Werror,-Wignored-attributes]
+           fn = symbol_get(vfio_file_iommu_group);
+                ^
+   include/linux/module.h:805:60: note: expanded from macro 'symbol_get'
+   #define symbol_get(x) ({ extern typeof(x) x __attribute__((weak,visibility("hidden"))); &(x); })
+                                                              ^
+   include/linux/vfio.h:294:35: note: previous definition is here
+   static inline struct iommu_group *vfio_file_iommu_group(struct file *file)
+                                     ^
+   arch/powerpc/kvm/../../../virt/kvm/vfio.c:89:7:
+   error: attribute declaration must precede definition [-Werror,-Wignored-attributes]
+           fn = symbol_get(vfio_file_iommu_group);
+                ^
+   include/linux/module.h:805:65: note: expanded from macro 'symbol_get'
+   #define symbol_get(x) ({ extern typeof(x) x __attribute__((weak,visibility("hidden"))); &(x); })
+                                                                   ^
+   include/linux/vfio.h:294:35: note: previous definition is here
+   static inline struct iommu_group *vfio_file_iommu_group(struct file *file)
+                                     ^
+   2 errors generated.
 
-Maybe the kernel can somehow return a flag to indicate the event fd
-has data in it?
+Although KVM is firmly in the wrong (there is zero reason for KVM to build
+virt/kvm/vfio.c when VFIO is disabled), fudge around the error in VFIO as
+the stub is unnecessary and doesn't serve its intended purpose (KVM is the
+only external user of vfio_file_iommu_group()), and there is an in-flight
+series to clean up the entire KVM<->VFIO interaction, i.e. fixing this in
+KVM would result in more churn in the long run, and the stub needs to go
+away regardless.
 
-If yes then all errors would flow through the event fd?
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202308251949.5IiaV0sz-lkp@intel.com
+Closes: https://lore.kernel.org/oe-kbuild-all/202309030741.82aLACDG-lkp@intel.com
+Closes: https://lore.kernel.org/oe-kbuild-all/202309110914.QLH0LU6L-lkp@intel.com
+Link: https://lore.kernel.org/all/0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com
+Link: https://lore.kernel.org/all/20230916003118.2540661-1-seanjc@google.com
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Tested-by: Michael Ellerman <mpe@ellerman.id.au>
+Fixes: c1cce6d079b8 ("vfio: Compile vfio_group infrastructure optionally")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ include/linux/vfio.h | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-Would Intel be basically the same too?
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 454e9295970c..a65b2513f8cd 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -289,16 +289,12 @@ void vfio_combine_iova_ranges(struct rb_root_cached *root, u32 cur_nodes,
+ /*
+  * External user API
+  */
+-#if IS_ENABLED(CONFIG_VFIO_GROUP)
+ struct iommu_group *vfio_file_iommu_group(struct file *file);
++
++#if IS_ENABLED(CONFIG_VFIO_GROUP)
+ bool vfio_file_is_group(struct file *file);
+ bool vfio_file_has_dev(struct file *file, struct vfio_device *device);
+ #else
+-static inline struct iommu_group *vfio_file_iommu_group(struct file *file)
+-{
+-	return NULL;
+-}
+-
+ static inline bool vfio_file_is_group(struct file *file)
+ {
+ 	return false;
 
-Jason
+base-commit: ae2667cd8a479bb5abd6e24c12fcc9ef5bc06d75
+-- 
+2.43.0.rc1.413.gea7ed67945-goog
+
 
