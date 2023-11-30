@@ -1,191 +1,280 @@
-Return-Path: <kvm+bounces-2889-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-2893-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFDFD7FED73
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 12:01:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 904B77FEDED
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 12:31:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4EA06B2109E
-	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 11:01:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1C901C20FE6
+	for <lists+kvm@lfdr.de>; Thu, 30 Nov 2023 11:31:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83B883C084;
-	Thu, 30 Nov 2023 11:01:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OKAZdDhg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08E933D97A;
+	Thu, 30 Nov 2023 11:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74A0A10D0
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 03:01:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701342086;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=l3wmRdYP+Nt+wdNIbJBOj+az1z+eURn8MqPJ/8uHNVg=;
-	b=OKAZdDhgkptKS4KfP6aFsHgDdAaYfa9nErTJSKLSjrg4KT0JxfoEpS3xaqHypWGedWbpfI
-	XMYxPA5Axhd9vZCuaXWg0WD+5VyMNyGsocMH6BGuQL/gDrCz0Z3wMov3cirtbC+sQ1E633
-	BVmlD0JyvtR9yIOGgY/4vizpQPlgUhU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-78-5OgUz41TP0emJ82Z4M2kJg-1; Thu, 30 Nov 2023 06:01:25 -0500
-X-MC-Unique: 5OgUz41TP0emJ82Z4M2kJg-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33174d082b7so736768f8f.0
-        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 03:01:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701342084; x=1701946884;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l3wmRdYP+Nt+wdNIbJBOj+az1z+eURn8MqPJ/8uHNVg=;
-        b=i6tMUHADQQCJI39U5NLKSUzkavCG9ZV61kY11JmTLldsYwYgoGTLgwTdSEJnhRjB/q
-         lIQM4obxCOSwEzzrIxON9DEhsfUyxFSLyKQUqvAVhEPhWYn3J1JcIWUXLBcP8TqDqB4j
-         3roOlgzEEDsk0kbBS4hwI7CWuL0QE5WFDQoxLXlCM0Ghmt1lpkN/H49Td+S0qvJop2/W
-         ogrFfIwz/OmxWbQh3zbjubPmpWfHykgG/Fg7PmWGcVA9diNjyyabjKi52VHSfV6yDTfy
-         8DK3PiuppB30/eBqsznmtE9wiH+UPV/2XJzXe26ho+FuxIjBIzQVfMK+zaSC8GguPoq3
-         nWsQ==
-X-Gm-Message-State: AOJu0YzAqK42ynbxZuHVFYg+gPYHil/+Ti94H9juEAQcmIUZj+868RCv
-	pe1J9Z7KXl7x2X9aHsfw8Em2+DCyNPgRp0t1ulrngpGRPx8oL/1AVNIsiVa1C2EH+mT8PLPIOPd
-	CdNPfZOZddxll
-X-Received: by 2002:adf:ee49:0:b0:333:a27:2326 with SMTP id w9-20020adfee49000000b003330a272326mr6116304wro.25.1701342084123;
-        Thu, 30 Nov 2023 03:01:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IERi7Vl/C2pkm8b8DUARiQeDaES9B0XUzSKUxDt6kNOrKehnkOOLIQg3bluNuzyMr0A2IJG1g==
-X-Received: by 2002:adf:ee49:0:b0:333:a27:2326 with SMTP id w9-20020adfee49000000b003330a272326mr6116238wro.25.1701342083128;
-        Thu, 30 Nov 2023 03:01:23 -0800 (PST)
-Received: from ?IPV6:2a09:80c0:192:0:5dac:bf3d:c41:c3e7? ([2a09:80c0:192:0:5dac:bf3d:c41:c3e7])
-        by smtp.gmail.com with ESMTPSA id t14-20020adfe44e000000b00332cb846f21sm1213171wrm.27.2023.11.30.03.01.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Nov 2023 03:01:22 -0800 (PST)
-Message-ID: <dcaaf5a6-1187-4504-873d-151d65702eb8@redhat.com>
-Date: Thu, 30 Nov 2023 12:01:21 +0100
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 35321198C;
+	Thu, 30 Nov 2023 03:31:04 -0800 (PST)
+Received: from loongson.cn (unknown [10.2.5.185])
+	by gateway (Coremail) with SMTP id _____8AxV_F1cmhl+Oc9AA--.58360S3;
+	Thu, 30 Nov 2023 19:31:01 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.185])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxG9xycmhlNblQAA--.47327S2;
+	Thu, 30 Nov 2023 19:30:59 +0800 (CST)
+From: Tianrui Zhao <zhaotianrui@loongson.cn>
+To: Shuah Khan <shuah@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>
+Cc: Vishal Annapurve <vannapurve@google.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	loongarch@lists.linux.dev,
+	Peter Xu <peterx@redhat.com>,
+	Vipin Sharma <vipinsh@google.com>,
+	maobibo@loongson.cn,
+	zhaotianrui@loongson.cn
+Subject: [PATCH v5 0/4] KVM: selftests: Add LoongArch support
+Date: Thu, 30 Nov 2023 19:18:00 +0800
+Message-Id: <20231130111804.2227570-1-zhaotianrui@loongson.cn>
+X-Mailer: git-send-email 2.39.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 02/70] RAMBlock: Add support of KVM private guest memfd
-Content-Language: en-US
-To: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Michael Roth <michael.roth@amd.com>, Sean Christopherson
- <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>,
- Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
- <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
-References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
- <20231115071519.2864957-3-xiaoyao.li@intel.com>
- <82ac9bf4-7463-48fc-b138-fcaa6314547f@redhat.com>
- <8b2800e3-989a-4c9f-b7e5-7b2e0702e3a0@intel.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <8b2800e3-989a-4c9f-b7e5-7b2e0702e3a0@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8AxG9xycmhlNblQAA--.47327S2
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-On 30.11.23 08:37, Xiaoyao Li wrote:
-> On 11/20/2023 5:24 PM, David Hildenbrand wrote:
->>>    uint8_t memory_region_get_dirty_log_mask(MemoryRegion *mr)
->>>    {
->>>        uint8_t mask = mr->dirty_log_mask;
->>> diff --git a/system/physmem.c b/system/physmem.c
->>> index fc2b0fee0188..0af2213cbd9c 100644
->>> --- a/system/physmem.c
->>> +++ b/system/physmem.c
->>> @@ -1841,6 +1841,20 @@ static void ram_block_add(RAMBlock *new_block,
->>> Error **errp)
->>>            }
->>>        }
->>> +#ifdef CONFIG_KVM
->>> +    if (kvm_enabled() && new_block->flags & RAM_GUEST_MEMFD &&
->>
->>
->> I recall that we prefer to write this as
->>
->>       if (kvm_enabled() && (new_block->flags & RAM_GUEST_MEMFD) &&
-> 
-> get it.
-> 
-> Thanks!
-> 
->>> +        new_block->guest_memfd < 0) {
->>> +        /* TODO: to decide if KVM_GUEST_MEMFD_ALLOW_HUGEPAGE is
->>> supported */
->>> +        uint64_t flags = 0;
->>> +        new_block->guest_memfd =
->>> kvm_create_guest_memfd(new_block->max_length,
->>> +                                                        flags, errp);
->>
->> Get rid of "flags" and just pass 0". Whatever code wants to pass flags
->> later can decide how to do that.
-> 
-> 
-> How to handle it please see the reply to patch 3.
+We add LoongArch support into KVM selftests and there are some KVM
+test cases we have passed:
+	demand_paging_test
+	dirty_log_perf_test
+	dirty_log_test
+	guest_print_test
+	kvm_binary_stats_test
+	kvm_create_max_vcpus
+	kvm_page_table_test
+	memslot_modification_stress_test
+	memslot_perf_test
+	set_memory_region_test
 
-If patch #3 cannot go in now and has to be deferred, then please clean 
-this here up. Otherwise, as suggested, squash with #3.
+Changes for v5:
+1. In LoongArch kvm self tests, the DEFAULT_GUEST_TEST_MEM could be
+0x130000000, it is different from the default value in memstress.h.
+So we Move the definition of DEFAULT_GUEST_TEST_MEM into LoongArch
+ucall.h, and add 'ifndef' condition for DEFAULT_GUEST_TEST_MEM
+in memstress.h.
 
-Depending on KVM_GUEST_MEMFD_ALLOW_HUGEPAGE support :)
+Changes for v4:
+1. Remove the based-on flag, as the LoongArch KVM patch series
+have been accepted by Linux kernel, so this can be applied directly
+in kernel.
+
+Changes for v3:
+1. Improve implementation of LoongArch VM page walk.
+2. Add exception handler for LoongArch.
+3. Add dirty_log_test, dirty_log_perf_test, guest_print_test
+test cases for LoongArch.
+4. Add __ASSEMBLER__ macro to distinguish asm file and c file.
+5. Move ucall_arch_do_ucall to the header file and make it as
+static inline to avoid function calls.
+6. Change the DEFAULT_GUEST_TEST_MEM base addr for LoongArch.
+
+Changes for v2:
+1. We should use ".balign 4096" to align the assemble code with 4K in
+exception.S instead of "align 12".
+2. LoongArch only supports 3 or 4 levels page tables, so we remove the
+hanlders for 2-levels page table.
+3. Remove the DEFAULT_LOONGARCH_GUEST_STACK_VADDR_MIN and use the common
+DEFAULT_GUEST_STACK_VADDR_MIN to allocate stack memory in guest.
+4. Reorganize the test cases supported by LoongArch.
+5. Fix some code comments.
+6. Add kvm_binary_stats_test test case into LoongArch KVM selftests.
+
+changes for v1:
+1. Add kvm selftests header files for LoongArch.
+2. Add processor tests for LoongArch KVM.
+3. Add ucall tests for LoongArch KVM.
+4. Add LoongArch tests into makefile.
+
+All of the test cases results:
+1..10
+ timeout set to 120
+ selftests: kvm: demand_paging_test
+ Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+ guest physical test memory: [0xfbfffc000, 0xfffffc000)
+ Finished creating vCPUs and starting uffd threads
+ Started all vCPUs
+ All vCPU threads joined
+ Total guest execution time: 0.200804700s
+ Overall demand paging rate: 326366.862927 pgs/sec
+ok 1 selftests: kvm: demand_paging_test
+ timeout set to 120
+ selftests: kvm: dirty_log_perf_test
+ Test iterations: 2
+ Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+ guest physical test memory: [0xfbfffc000, 0xfffffc000)
+ Random seed: 1
+ Populate memory time: 0.201452560s
+ Enabling dirty logging time: 0.000451670s
+ 
+ Iteration 1 dirty memory time: 0.051582140s
+ Iteration 1 get dirty log time: 0.000010510s
+ Iteration 1 clear dirty log time: 0.000421730s
+ Iteration 2 dirty memory time: 0.046593760s
+ Iteration 2 get dirty log time: 0.000002110s
+ Iteration 2 clear dirty log time: 0.000418020s
+ Disabling dirty logging time: 0.002948490s
+ Get dirty log over 2 iterations took 0.000012620s. (Avg 0.000006310s/iteration)
+ Clear dirty log over 2 iterations took 0.000839750s. (Avg 0.000419875s/iteration)
+ok 2 selftests: kvm: dirty_log_perf_test
+ timeout set to 120
+ selftests: kvm: dirty_log_test
+ Test iterations: 32, interval: 10 (ms)
+ Testing Log Mode 'dirty-log'
+ Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+ guest physical test memory offset: 0xfbfff0000
+ Dirtied 453632 pages
+ Total bits checked: dirty (436564), clear (1595145), track_next (70002)
+ Testing Log Mode 'clear-log'
+ Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+ guest physical test memory offset: 0xfbfff0000
+ Dirtied 425984 pages
+ Total bits checked: dirty (414397), clear (1617312), track_next (68152)
+ Testing Log Mode 'dirty-ring'
+ Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+ dirty ring count: 0x10000
+ guest physical test memory offset: 0xfbfff0000
+ vcpu stops because vcpu is kicked out...
+ Notifying vcpu to continue
+ vcpu continues now.
+ Iteration 1 collected 3201 pages
+ vcpu stops because dirty ring is full...
+ vcpu continues now.
+ vcpu stops because dirty ring is full...
+ Notifying vcpu to continue
+ Iteration 2 collected 65472 pages
+ ......
+ vcpu continues now.
+ vcpu stops because vcpu is kicked out...
+ vcpu continues now.
+ vcpu stops because vcpu is kicked out...
+ Notifying vcpu to continue
+ vcpu continues now.
+ Iteration 31 collected 12642 pages
+ vcpu stops because dirty ring is full...
+ vcpu continues now.
+ Dirtied 7275520 pages
+ Total bits checked: dirty (1165675), clear (866034), track_next (811358)
+ok 3 selftests: kvm: dirty_log_test
+ timeout set to 120
+ selftests: kvm: guest_print_test
+ok 4 selftests: kvm: guest_print_test
+ timeout set to 120
+ selftests: kvm: kvm_binary_stats_test
+ TAP version 13
+ 1..4
+ ok 1 vm0
+ ok 2 vm1
+ ok 3 vm2
+ ok 4 vm3
+ # Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
+ok 5 selftests: kvm: kvm_binary_stats_test
+ timeout set to 120
+ selftests: kvm: kvm_create_max_vcpus
+ KVM_CAP_MAX_VCPU_ID: 256
+ KVM_CAP_MAX_VCPUS: 256
+ Testing creating 256 vCPUs, with IDs 0...255.
+ok 6 selftests: kvm: kvm_create_max_vcpus
+ timeout set to 120
+ selftests: kvm: kvm_page_table_test
+ Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+ Testing memory backing src type: anonymous
+ Testing memory backing src granularity: 0x4000
+ Testing memory size(aligned): 0x40000000
+ Guest physical test memory offset: 0xfbfffc000
+ Host  virtual  test memory offset: 0x7fffb0860000
+ Number of testing vCPUs: 1
+ Started all vCPUs successfully
+ KVM_CREATE_MAPPINGS: total execution time: 0.200919330s
+ 
+ KVM_UPDATE_MAPPINGS: total execution time: 0.051182930s
+ 
+ KVM_ADJUST_MAPPINGS: total execution time: 0.010083590s
+ 
+ok 7 selftests: kvm: kvm_page_table_test
+ timeout set to 120
+ selftests: kvm: memslot_modification_stress_test
+ Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+ guest physical test memory: [0xfbfffc000, 0xfffffc000)
+ Finished creating vCPUs
+ Started all vCPUs
+ All vCPU threads joined
+ok 8 selftests: kvm: memslot_modification_stress_test
+ timeout set to 120
+ selftests: kvm: memslot_perf_test
+ Testing map performance with 1 runs, 5 seconds each
+ Memslot count too high for this test, decrease the cap (max is 2053)
+ 
+ Testing unmap performance with 1 runs, 5 seconds each
+ Memslot count too high for this test, decrease the cap (max is 8197)
+ 
+ Testing unmap chunked performance with 1 runs, 5 seconds each
+ Memslot count too high for this test, decrease the cap (max is 8197)
+ 
+ Testing move active area performance with 1 runs, 5 seconds each
+ Test took 0.761678900s for slot setup + 5.000014460s all iterations
+ Done 120167 iterations, avg 0.000041608s each
+ Best runtime result was 0.000041608s per iteration (with 120167 iterations)
+ 
+ Testing move inactive area performance with 1 runs, 5 seconds each
+ Test took 0.771796550s for slot setup + 5.000018520s all iterations
+ Done 136354 iterations, avg 0.000036669s each
+ Best runtime result was 0.000036669s per iteration (with 136354 iterations)
+ 
+ Testing RW performance with 1 runs, 5 seconds each
+ Test took 0.763568840s for slot setup + 5.002233800s all iterations
+ Done 649 iterations, avg 0.007707602s each
+ Best runtime result was 0.007707602s per iteration (with 649 iterations)
+ Best slot setup time for the whole test area was 0.761678900s
+ok 9 selftests: kvm: memslot_perf_test
+ timeout set to 120
+ selftests: kvm: set_memory_region_test
+ Allowed number of memory slots: 32767
+ Adding slots 0..32766, each memory region with 2048K size
+ok 10 selftests: kvm: set_memory_region_test
+
+Tianrui Zhao (4):
+  KVM: selftests: Add KVM selftests header files for LoongArch
+  KVM: selftests: Add core KVM selftests support for LoongArch
+  KVM: selftests: Add ucall test support for LoongArch
+  KVM: selftests: Add test cases for LoongArch
+
+ tools/testing/selftests/kvm/Makefile          |  15 +
+ .../selftests/kvm/include/kvm_util_base.h     |   5 +
+ .../kvm/include/loongarch/processor.h         | 133 +++++++
+ .../selftests/kvm/include/loongarch/ucall.h   |  28 ++
+ .../testing/selftests/kvm/include/memstress.h |   2 +
+ .../selftests/kvm/lib/loongarch/exception.S   |  59 ++++
+ .../selftests/kvm/lib/loongarch/processor.c   | 333 ++++++++++++++++++
+ .../selftests/kvm/lib/loongarch/ucall.c       |  38 ++
+ 8 files changed, 613 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
+ create mode 100644 tools/testing/selftests/kvm/include/loongarch/ucall.h
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
 
 -- 
-Cheers,
-
-David / dhildenb
+2.39.1
 
 
