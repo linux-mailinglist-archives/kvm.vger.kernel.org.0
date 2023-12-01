@@ -1,147 +1,143 @@
-Return-Path: <kvm+bounces-3148-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3149-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55AF58010B3
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 18:05:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 312378010B8
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 18:08:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 782811C20C90
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 17:05:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1516E1C20D42
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 17:08:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD52C4D591;
-	Fri,  1 Dec 2023 17:04:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D8B4D59D;
+	Fri,  1 Dec 2023 17:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="noFyjEJv"
+	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="srJMT7xc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DDE8A2
-	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 09:04:53 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-db4004a8aa9so948034276.1
-        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 09:04:53 -0800 (PST)
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61C6CC1;
+	Fri,  1 Dec 2023 09:08:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701450292; x=1702055092; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YbmCSI5K+Qp+wla/FUZNboDkH6vkaCc9VLdnolKakNc=;
-        b=noFyjEJvzmVlRRLojlSuZXrCrc4Yzgu+xDbrsD/cVPN7F03GE6eMPPp2H+YzBE1dwq
-         R+pO5gCtR8CSLpl9WZGog5pt0o+51OULhEANXl1ORn/9U3Ib3uS4kVhhHjjw+QRjnlQb
-         iTobRKJhTmdnsnzXNvxcmnEVfBYI6g+xvpIe+Tn2XX1MxywHY4ZVtrqQmbs1EYx5S3XX
-         25t/M24RG29rgjcLg+dXhKtukBHzNIg4uz4B7MlaSLZ9EvMhB+pajfNMychzXyjUsg3/
-         fjgGd5Uu1js1Yj+iyPEA6TCAsGuHPdGgKVVNnpCKBgBMYuBiIll9KqM5lW05R0huS1IL
-         COgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701450292; x=1702055092;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YbmCSI5K+Qp+wla/FUZNboDkH6vkaCc9VLdnolKakNc=;
-        b=mMFS+RIPh18isvkrTO+aRT1R8LQUt6K5tFh++MCL3mvQ0jQDp3JOvwK5wOdVhJTZQQ
-         Ggwj/qIaU8Y5MjNSm75P2utkAyoOy463Avt9mxWv2W2uec530wKJCLOHrYgUuy9s5agG
-         faNpCxZ5zwwSGhOZ93nB0Pe/rM4OfZc+FszCoBIfG0d2NASr0fmO14VFjNdsPyEetxdQ
-         GEDeSNThYVxh2pvejFgC/uapXpQynpsxF8Zq+2G0S/lRcHRLblVX/sQxKGtPqJdptv1p
-         7vnkRiP76Ca36hi2PFIllZA/BcD0qC1w3cc6JuP+0DvgoETwyhaMCqw5+UivvBRz3BPB
-         2oLA==
-X-Gm-Message-State: AOJu0YwGiO2KfN+vaJTLRekiATiGstGfnSCeCuNvOPRzQuRfCcWJ0qGc
-	TkIRzr17soHbgbqcWZLMqWqu+QPtNvo=
-X-Google-Smtp-Source: AGHT+IEa3BfWc92nmp+AtwxI8x7qhWNabfXhEQhxlZ9l+TV5/mqVnAJW8EBvcmW340xIWHXBNkD9Ysp+RPg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:6e83:0:b0:d9a:e3d9:99bd with SMTP id
- j125-20020a256e83000000b00d9ae3d999bdmr780648ybc.5.1701450292702; Fri, 01 Dec
- 2023 09:04:52 -0800 (PST)
-Date: Fri, 1 Dec 2023 09:04:51 -0800
-In-Reply-To: <20231123003513.24292-3-ankita@nvidia.com>
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1701450520; x=1732986520;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=LWxdWq/DOS+9khhxJvYujS6PdOihOZyDd4a2PGV9kvA=;
+  b=srJMT7xc+Fvc62twit9fGUpSKTXlJnvtKFcvzhoGFTHfxL6a8gN2sAsG
+   TVySOIPUzxqA5u4sfWdreiQvanPkMLnXiZHsxlUW6CELrmTPSR21XJlLE
+   RklBfKPLkpg2zlZpf6bMqDpwaJG0Zi2rk1TslbDDqhZW6GFxYtn17yoYL
+   0=;
+X-IronPort-AV: E=Sophos;i="6.04,242,1695686400"; 
+   d="scan'208";a="366070872"
+Subject: RE: [PATCH 0/2] KVM: xen: update shared_info when long_mode is set
+Thread-Topic: [PATCH 0/2] KVM: xen: update shared_info when long_mode is set
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-96feee09.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 17:08:37 +0000
+Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
+	by email-inbound-relay-iad-1a-m6i4x-96feee09.us-east-1.amazon.com (Postfix) with ESMTPS id C88C24964F;
+	Fri,  1 Dec 2023 17:08:33 +0000 (UTC)
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:28276]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.32.35:2525] with esmtp (Farcaster)
+ id caf748da-6362-4926-9a93-c13b544c9c90; Fri, 1 Dec 2023 17:08:33 +0000 (UTC)
+X-Farcaster-Flow-ID: caf748da-6362-4926-9a93-c13b544c9c90
+Received: from EX19D032EUC003.ant.amazon.com (10.252.61.137) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 1 Dec 2023 17:08:32 +0000
+Received: from EX19D032EUC002.ant.amazon.com (10.252.61.185) by
+ EX19D032EUC003.ant.amazon.com (10.252.61.137) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 1 Dec 2023 17:08:32 +0000
+Received: from EX19D032EUC002.ant.amazon.com ([fe80::e696:121c:a227:174]) by
+ EX19D032EUC002.ant.amazon.com ([fe80::e696:121c:a227:174%3]) with mapi id
+ 15.02.1118.040; Fri, 1 Dec 2023 17:08:32 +0000
+From: "Durrant, Paul" <pdurrant@amazon.co.uk>
+To: Sean Christopherson <seanjc@google.com>, Paul Durrant <paul@xen.org>
+CC: David Woodhouse <dwmw2@infradead.org>, Paolo Bonzini
+	<pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, "H. Peter
+ Anvin" <hpa@zytor.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Thread-Index: AQHaJEOuWnzn0NGSpk+GH7VJCEKIN7CUozuAgAAF5dA=
+Date: Fri, 1 Dec 2023 17:08:32 +0000
+Message-ID: <a0c99edd584b47ce8f9f8aff86b2a568@amazon.co.uk>
+References: <20231201104536.947-1-paul@xen.org> <ZWoNzzYiZtloNQiv@google.com>
+In-Reply-To: <ZWoNzzYiZtloNQiv@google.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231123003513.24292-1-ankita@nvidia.com> <20231123003513.24292-3-ankita@nvidia.com>
-Message-ID: <ZWoSM_0xLJQo8De5@google.com>
-Subject: Re: [PATCH v2 2/4] mm: Add poison error check in fixup_user_fault()
- for mapped pfn
-From: Sean Christopherson <seanjc@google.com>
-To: ankita@nvidia.com
-Cc: jgg@nvidia.com, alex.williamson@redhat.com, naoya.horiguchi@nec.com, 
-	akpm@linux-foundation.org, tony.luck@intel.com, bp@alien8.de, 
-	linmiaohe@huawei.com, rafael@kernel.org, lenb@kernel.org, james.morse@arm.com, 
-	shiju.jose@huawei.com, bhelgaas@google.com, pabeni@redhat.com, 
-	yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com, 
-	kevin.tian@intel.com, aniketa@nvidia.com, cjia@nvidia.com, 
-	kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com, 
-	acurrid@nvidia.com, apopple@nvidia.com, anuaggarwal@nvidia.com, 
-	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mm@kvack.org, linux-edac@vger.kernel.org, linux-acpi@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 
-On Thu, Nov 23, 2023, ankita@nvidia.com wrote:
-> From: Ankit Agrawal <ankita@nvidia.com>
-> 
-> The fixup_user_fault() currently does not expect a VM_FAULT_HWPOISON
-> and hence does not check for it while calling vm_fault_to_errno(). Since
-> we now have a new code path which can trigger such case, change
-> fixup_user_fault to look for VM_FAULT_HWPOISON.
-> 
-> Also make hva_to_pfn_remapped check for -EHWPOISON and communicate the
-> poison fault up to the user_mem_abort().
+> -----Original Message-----
+> From: Sean Christopherson <seanjc@google.com>
+> Sent: 01 December 2023 16:46
+> To: Paul Durrant <paul@xen.org>
+> Cc: David Woodhouse <dwmw2@infradead.org>; Paolo Bonzini <pbonzini@redhat=
+.com>; Thomas Gleixner
+> <tglx@linutronix.de>; Ingo Molnar <mingo@redhat.com>; Borislav Petkov <bp=
+@alien8.de>; Dave Hansen
+> <dave.hansen@linux.intel.com>; x86@kernel.org; H. Peter Anvin <hpa@zytor.=
+com>; kvm@vger.kernel.org;
+> linux-kernel@vger.kernel.org
+> Subject: RE: [EXTERNAL] [PATCH 0/2] KVM: xen: update shared_info when lon=
+g_mode is set
+>=20
+> CAUTION: This email originated from outside of the organization. Do not c=
+lick links or open
+> attachments unless you can confirm the sender and know the content is saf=
+e.
+>=20
+>=20
+>=20
+> On Fri, Dec 01, 2023, Paul Durrant wrote:
+> > From: Paul Durrant <pdurrant@amazon.com>
+> >
+> > This series is based on my v9 of my "update shared_info and vcpu_info
+> > handling" series [1] and fixes an issue that was latent before the
+> > "allow shared_info to be mapped by fixed HVA" patch of that series allo=
+wed
+> > a VMM to set up shared_info before the VM booted and then leave it alon=
+e.
+>=20
+> Uh, what?   If this is fixing an existing bug then it really shouldn't ta=
+ke a
+> dependency on a rather large and non-trivial series.  If the bug can only=
+ manifest
+> as a result of said series, then the fix absolutely belongs in that serie=
+s.
+>=20
 
-I would much prefer the KVM change be split out to its own patch, I see no
-reason why it needs to be bundled with the fixup_user_fault() change.  KVM will
-set pfn to KVM_PFN_ERR_FAULT before and after the fixup_user_fault() change.
+There's been radio silence on that series for a while so I was unsure of th=
+e status.
 
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
-> ---
->  mm/gup.c            | 2 +-
->  virt/kvm/kvm_main.c | 6 ++++++
->  2 files changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/mm/gup.c b/mm/gup.c
-> index 231711efa390..b78af20a0f52 100644
-> --- a/mm/gup.c
-> +++ b/mm/gup.c
-> @@ -1414,7 +1414,7 @@ int fixup_user_fault(struct mm_struct *mm,
->  	}
->  
->  	if (ret & VM_FAULT_ERROR) {
-> -		int err = vm_fault_to_errno(ret, 0);
-> +		int err = vm_fault_to_errno(ret, FOLL_HWPOISON);
->  
->  		if (err)
->  			return err;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 486800a7024b..2ff067f21a7c 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2731,6 +2731,12 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool interruptible,
->  		r = hva_to_pfn_remapped(vma, addr, write_fault, writable, &pfn);
->  		if (r == -EAGAIN)
->  			goto retry;
-> +
-> +		if (r == -EHWPOISON) {
-> +			pfn = KVM_PFN_ERR_HWPOISON;
-> +			goto exit;
-> +		}
-> +
->  		if (r < 0)
->  			pfn = KVM_PFN_ERR_FAULT;
+> This change from patch 1 in particular:
+>=20
+>  -static int kvm_xen_shared_info_init(struct kvm *kvm, u64 addr, bool add=
+r_is_gfn)
+>  +static int kvm_xen_shared_info_init(struct kvm *kvm)
+>=20
+> practically screams for inclusion in that series which does:
+>=20
+>  -static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
+>  +static int kvm_xen_shared_info_init(struct kvm *kvm, u64 addr, bool add=
+r_is_gfn)
+>=20
+> Why not get the code right the first time instead of fixing it up in a co=
+mpletely
+> different series?
 
-I vote for
+Sure, I can fold it in.
 
-		if (r == -EHWPOISON)
-			pfn = KVM_PFN_ERR_HWPOISON;
-		else if (r < 0)
-			pfn = KVM_PFN_ERR_FAULT;
+  Paul
 
-or even opportunstically fix the < 0 weirdness:
-
-		if (r == -EHWPOISON)
-			pfn = KVM_PFN_ERR_HWPOISON;
-		else if (r)
-			pfn = KVM_PFN_ERR_FAULT;
-
-It's rather confusing to see a goto in one error path but an effective fallthrough
-in a different error path, i.e. gives the impression that KVM_PFN_ERR_HWPOISON
-has some special behavior that doesn't apply to KVM_PFN_ERR_FAULT.
 
