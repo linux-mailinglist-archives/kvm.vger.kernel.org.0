@@ -1,153 +1,102 @@
-Return-Path: <kvm+bounces-3133-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3134-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAC4A800EA4
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 16:32:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D78B800EBD
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 16:42:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5562BB21378
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 15:32:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07EADB21366
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 15:42:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2CB94AF77;
-	Fri,  1 Dec 2023 15:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F0C74AF9B;
+	Fri,  1 Dec 2023 15:42:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V0tQfgPc"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Ng68X9q7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E8F9194;
-	Fri,  1 Dec 2023 07:32:46 -0800 (PST)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-40b4a8db331so21440865e9.3;
-        Fri, 01 Dec 2023 07:32:46 -0800 (PST)
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAC581A6
+	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 07:42:32 -0800 (PST)
+Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-77d67000b69so117522185a.2
+        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 07:42:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701444764; x=1702049564; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dRp6E9n1PpmFcNuEF+xwWPt12aMl6+EMhLFak8Z0XWM=;
-        b=V0tQfgPcMwsVofxB7tF/PMo5GZBvBA39TQ7YpLFMfZDWIGcvJgm2gMMvk8scHolIXi
-         Bxpg9g/EuuyNt9I5mGSbFeq4IDsSrKYh5zE6jLu1hkMd0bbu3qPh3myZ4GX4pR55QPqy
-         7FoMveErcgjrRKsdgypqMikyly718Tk07zeTqPpHmzHgWpkIxYTLEbzfU8fDjaQWKgW8
-         g9H+25g1TKwMoiT0eYw/vCTkMkLUGjTWLL/9AvPWqNzyDshorwNczAEuC5JckseXaezC
-         4erHiDDsH9f+GG05ut4LwCHN+j07R3CHyFP3m3SsnBVutR/DCyifTSG8lp+bnWb2iaC1
-         GcEg==
+        d=ziepe.ca; s=google; t=1701445352; x=1702050152; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=M5OluPhgDT3nAw0/mpsAOoQF2zqQkql7YLDt75eO1Ow=;
+        b=Ng68X9q7uWhzgH8+vw3hnH3jIliA7sQWGau9BEHHVvKFw8t2vgwgzG3WLzdAlwV2h6
+         r2aQ/QZJci+VkwE1NXHabaeoIyQq17Naxj1N5Ox7DErwIW15zJ/lmofMIt2gXeKrDWfT
+         IzCykAfijXnBy+WVZxuIqdkJwpDPuqtYEJVktxqLcVvrKoW0ceLsPBlEHhs6mUMKum9y
+         +uwMJxtD/icDgF7fI6zZbGhGqBX0uLqhrl9hJsdeIhSTUNeAUM1cwncfMmxZdvqq+sao
+         BR4jkbxt/EQjZFm5d1Kv28TUr2STeNCCmVb0IGNMBkdzHofnvAEA44OuVY7DzFIgsR/c
+         gsvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701444764; x=1702049564;
-        h=content-transfer-encoding:in-reply-to:organization:references:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1701445352; x=1702050152;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dRp6E9n1PpmFcNuEF+xwWPt12aMl6+EMhLFak8Z0XWM=;
-        b=gP0wB9FBtKf8bssT/eVdanHe7n+VlfU2g5pQi4s1Co4nLQ8hQ2UAlqi+FuvNZtcV/p
-         RsrGXDo2KrYuyJJUh34eeQxyOkULII35pNPXOX0EDexq5K9cG3o4wq5qJTSD1Xg2Xrvs
-         rwmKbXQSo5dSgjHqA7XeQ+ia9trO1SEHbsdAWrPwdSYEAzVwOqWqK+8RReVr4S24B0Fy
-         zyIjARIZGSZLYFJvlpyel/dQWNVXvS/TyRsEIQKAd769T0aBUi4kNGp9IqSg9NaYdINP
-         ZGw2BrhmIokB+r38U5BD3nJyomo3eFVT3viIKWwXLqJuVlxrb8dYzF2NHSJMXDW6LK84
-         yuJw==
-X-Gm-Message-State: AOJu0Yzjt3QpncqZycOfm/KRPKFXewtsiNAlM9m/B6IN9hplTOxqqquf
-	vKaydVLkiQPSh5UYF6aiAxs=
-X-Google-Smtp-Source: AGHT+IHyHu37ZIqvjQD8gRxG/Xf6cc/VFe5a+Zw6YmS/qOk5OxLwxaySuqge8bA93Bnsjs5Saa2+hA==
-X-Received: by 2002:a05:600c:1c9c:b0:40b:5e21:d374 with SMTP id k28-20020a05600c1c9c00b0040b5e21d374mr475213wms.125.1701444764330;
-        Fri, 01 Dec 2023 07:32:44 -0800 (PST)
-Received: from [192.168.17.41] (54-240-197-239.amazon.com. [54.240.197.239])
-        by smtp.gmail.com with ESMTPSA id fs20-20020a05600c3f9400b0040b5517ae31sm8633529wmb.6.2023.12.01.07.32.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Dec 2023 07:32:43 -0800 (PST)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <00b3e1bf-4968-474a-ac45-9c8e9549346e@xen.org>
-Date: Fri, 1 Dec 2023 15:32:40 +0000
+        bh=M5OluPhgDT3nAw0/mpsAOoQF2zqQkql7YLDt75eO1Ow=;
+        b=ozVhnyYTzZYWJ8zOm3phhSZberSITb5Jhz6vkpegg5dd1BIEqW1IbOZkWsjKm9SSxI
+         tqBoORUydH3Ku2kPdRYjkv4jfY8+RGqWGKurIcKPNc6p+xUnHHF+nQ+QgPSP9KbU1Z3t
+         GXRVFQsGXifi3dv59XbyBdAXvylTuf66JzHEsV/TMRuvFD6fOHtyc+Xa4V2LdxtT22rk
+         f3mXttpze+lZn4FZxVPYmPjpP9dG0dSK1qgOynk2mXZS4i2sKa07cwUCcY2w3PwOCw30
+         SJ3GkCR9Cr2p+UUN35Bo7Bk0Z7gDy/9Vvy2Jlb4CSf7CHhcREpSsGqK3K77p3fczw5Gz
+         Wf/A==
+X-Gm-Message-State: AOJu0YzQwZSFOB3GEBUuMwvbdJBtwZo8vcP5WjraE7XXtb0tPlwAigO7
+	9sEGocXEAy4lMl95eHzvu5y+hQ==
+X-Google-Smtp-Source: AGHT+IGJqqOzBXgm1gG3l4eq+iJtvvsWrjEeRODObVtVODE5xSIuIkhfCOaHdl0inwKoRnlUy4vC5Q==
+X-Received: by 2002:a05:620a:4092:b0:77b:9bf1:6526 with SMTP id f18-20020a05620a409200b0077b9bf16526mr29808153qko.44.1701445351820;
+        Fri, 01 Dec 2023 07:42:31 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-134-23-187.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.134.23.187])
+        by smtp.gmail.com with ESMTPSA id 11-20020a05620a048b00b0076e1e2d6496sm1584171qkr.104.2023.12.01.07.42.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Dec 2023 07:42:31 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1r95ew-006GSJ-Ja;
+	Fri, 01 Dec 2023 11:42:30 -0400
+Date: Fri, 1 Dec 2023 11:42:30 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Lu Baolu <baolu.lu@linux.intel.com>
+Cc: Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
+	Jacob Pan <jacob.jun.pan@linux.intel.com>,
+	Yan Zhao <yan.y.zhao@intel.com>, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7 02/12] iommu/arm-smmu-v3: Remove unrecoverable faults
+ reporting
+Message-ID: <20231201154230.GC1489931@ziepe.ca>
+References: <20231115030226.16700-1-baolu.lu@linux.intel.com>
+ <20231115030226.16700-3-baolu.lu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH 2/2] KVM: xen: (re-)initialize shared_info if guest
- (32/64-bit) mode is set
-Content-Language: en-US
-To: David Woodhouse <dwmw2@infradead.org>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231201104536.947-1-paul@xen.org>
- <20231201104536.947-3-paul@xen.org>
-Organization: Xen Project
-In-Reply-To: <20231201104536.947-3-paul@xen.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231115030226.16700-3-baolu.lu@linux.intel.com>
 
-On 01/12/2023 10:45, Paul Durrant wrote:
-> From: Paul Durrant <pdurrant@amazon.com>
+On Wed, Nov 15, 2023 at 11:02:16AM +0800, Lu Baolu wrote:
+> No device driver registers fault handler to handle the reported
+> unrecoveraable faults. Remove it to avoid dead code.
 > 
-> If the shared_info PFN cache has already been initialized then the content
-> of the shared_info page needs to be (re-)initialized if the guest mode is
-> set. It is no lnger done when the PFN cache is activated.
-> Setting the guest mode is either done explicitly by the VMM via the
-> KVM_XEN_ATTR_TYPE_LONG_MODE attribute, or implicitly when the guest writes
-> the MSR to set up the hypercall page.
-> 
-> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 > ---
->   arch/x86/kvm/xen.c | 20 +++++++++++++++-----
->   1 file changed, 15 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index 7bead3f65e55..bfc8f6698cbc 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -624,8 +624,15 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
->   		} else {
->   			mutex_lock(&kvm->arch.xen.xen_lock);
->   			kvm->arch.xen.long_mode = !!data->u.long_mode;
-> +
-> +			/*
-> +			 * If shared_info has already been initialized
-> +			 * then re-initialize it with the new width.
-> +			 */
-> +			r = kvm->arch.xen.shinfo_cache.active ?
-> +				kvm_xen_shared_info_init(kvm) : 0;
-> +
->   			mutex_unlock(&kvm->arch.xen.xen_lock);
-> -			r = 0;
->   		}
->   		break;
->   
-> @@ -657,9 +664,6 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
->   		}
->   		srcu_read_unlock(&kvm->srcu, idx);
->   
-> -		if (!r && kvm->arch.xen.shinfo_cache.active)
-> -			r = kvm_xen_shared_info_init(kvm);
-> -
->   		mutex_unlock(&kvm->arch.xen.xen_lock);
->   		break;
->   	}
-> @@ -1144,7 +1148,13 @@ int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
->   	bool lm = is_long_mode(vcpu);
->   
->   	/* Latch long_mode for shared_info pages etc. */
-> -	vcpu->kvm->arch.xen.long_mode = lm;
-> +	kvm->arch.xen.long_mode = lm;
-> +
-> +	if (kvm->arch.xen.shinfo_cache.active &&
-> +	    kvm_xen_shared_info_init(kvm)) {
-> +		mutex_unlock(&kvm->arch.xen.xen_lock);
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 46 ++++++---------------
+>  1 file changed, 13 insertions(+), 33 deletions(-)
 
-This unlock is bogus; it should have been removed. I'll send a v2.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-   Paul
+If we do bring this back it will be in some form where the opaque
+driver event information is delivered to userspace to forward to the
+VM.
 
-> +		return 1;
-> +	}
->   
->   	/*
->   	 * If Xen hypercall intercept is enabled, fill the hypercall
-
+Jason
 
