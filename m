@@ -1,39 +1,39 @@
-Return-Path: <kvm+bounces-3108-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3109-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A24A800A42
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 13:02:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C4A7800A49
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 13:02:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 760851C20F12
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 12:02:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D790F281BD9
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 12:02:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E05124B21;
-	Fri,  1 Dec 2023 12:02:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C01125547;
+	Fri,  1 Dec 2023 12:02:29 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A03A1B4;
-	Fri,  1 Dec 2023 04:02:20 -0800 (PST)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.54])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4ShWlq02qgzShJS;
-	Fri,  1 Dec 2023 19:57:59 +0800 (CST)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 876AA171B;
+	Fri,  1 Dec 2023 04:02:24 -0800 (PST)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.55])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4ShWlF1GCdzMnPl;
+	Fri,  1 Dec 2023 19:57:29 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 1 Dec 2023 20:02:18 +0800
+ 15.1.2507.35; Fri, 1 Dec 2023 20:02:22 +0800
 From: Yunsheng Lin <linyunsheng@huawei.com>
 To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
-	<edumazet@google.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux.dev>, <linux-mm@kvack.org>
-Subject: [PATCH RFC 2/6] page_frag: unify gfp bit for order 3 page allocation
-Date: Fri, 1 Dec 2023 20:02:03 +0800
-Message-ID: <20231201120208.15080-3-linyunsheng@huawei.com>
+	<linyunsheng@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux.dev>, <bpf@vger.kernel.org>
+Subject: [PATCH RFC 4/6] vhost/net: remove vhost_net_page_frag_refill()
+Date: Fri, 1 Dec 2023 20:02:05 +0800
+Message-ID: <20231201120208.15080-5-linyunsheng@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20231201120208.15080-1-linyunsheng@huawei.com>
 References: <20231201120208.15080-1-linyunsheng@huawei.com>
@@ -49,74 +49,190 @@ X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  dggpemm500005.china.huawei.com (7.185.36.74)
 X-CFilter-Loop: Reflected
 
-Currently there seems to be three page frag implementions
-which all try to allocate order 3 page, if that fails, it
-then fail back to allocate order 0 page, and each of them
-all allow order 3 page allocation to fail under certain
-condition by using specific gfp bits.
+The page frag in vhost_net_page_frag_refill() uses the
+'struct page_frag' from skb_page_frag_refill(), but it's
+implementation is similar to page_frag_alloc_align() now.
 
-The gfp bits for order 3 page allocation are different
-between different implementation, __GFP_NOMEMALLOC is
-or'd to forbid access to emergency reserves memory for
-__page_frag_cache_refill(), but it is not or'd in other
-implementions, __GFP_DIRECT_RECLAIM is xor'd to avoid
-direct reclaim in skb_page_frag_refill(), but it is not
-xor'd in __page_frag_cache_refill().
+This patch removes vhost_net_page_frag_refill() by using
+'struct page_frag_cache' instead of 'struct page_frag',
+and allocating frag using page_frag_alloc_align().
 
-This patch unifies the gfp bits used between different
-implementions by or'ing __GFP_NOMEMALLOC and xor'ing
-__GFP_DIRECT_RECLAIM for order 3 page allocation to avoid
-possible pressure for mm.
+The added benefit is that not only unifying the page frag
+implementation a little, but also having about 0.5% performance
+boost testing by using the vhost_net_test introduced in the
+last patch.
 
 Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-CC: Alexander Duyck <alexander.duyck@gmail.com>
 ---
- drivers/vhost/net.c | 2 +-
- mm/page_alloc.c     | 4 ++--
- net/core/sock.c     | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/vhost/net.c | 93 ++++++++++++++-------------------------------
+ 1 file changed, 29 insertions(+), 64 deletions(-)
 
 diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index f2ed7167c848..e574e21cc0ca 100644
+index e574e21cc0ca..805e11d598e4 100644
 --- a/drivers/vhost/net.c
 +++ b/drivers/vhost/net.c
-@@ -670,7 +670,7 @@ static bool vhost_net_page_frag_refill(struct vhost_net *net, unsigned int sz,
- 		/* Avoid direct reclaim but allow kswapd to wake */
- 		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
- 					  __GFP_COMP | __GFP_NOWARN |
--					  __GFP_NORETRY,
-+					  __GFP_NORETRY | __GFP_NOMEMALLOC,
- 					  SKB_FRAG_PAGE_ORDER);
- 		if (likely(pfrag->page)) {
- 			pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index 9a16305cf985..1f0b36dd81b5 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -4693,8 +4693,8 @@ static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
- 	gfp_t gfp = gfp_mask;
+@@ -141,10 +141,8 @@ struct vhost_net {
+ 	unsigned tx_zcopy_err;
+ 	/* Flush in progress. Protected by tx vq lock. */
+ 	bool tx_flush;
+-	/* Private page frag */
+-	struct page_frag page_frag;
+-	/* Refcount bias of page frag */
+-	int refcnt_bias;
++	/* Private page frag cache */
++	struct page_frag_cache pf_cache;
+ };
  
- #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
--	gfp_mask |= __GFP_COMP | __GFP_NOWARN | __GFP_NORETRY |
--		    __GFP_NOMEMALLOC;
-+	gfp_mask = (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
-+		   __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
- 	page = alloc_pages_node(NUMA_NO_NODE, gfp_mask,
- 				PAGE_FRAG_CACHE_MAX_ORDER);
- 	nc->size = page ? PAGE_FRAG_CACHE_MAX_SIZE : PAGE_SIZE;
-diff --git a/net/core/sock.c b/net/core/sock.c
-index fef349dd72fa..4efa9cae4b0d 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -2904,7 +2904,7 @@ bool skb_page_frag_refill(unsigned int sz, struct page_frag *pfrag, gfp_t gfp)
- 		/* Avoid direct reclaim but allow kswapd to wake */
- 		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
- 					  __GFP_COMP | __GFP_NOWARN |
--					  __GFP_NORETRY,
-+					  __GFP_NORETRY | __GFP_NOMEMALLOC,
- 					  SKB_FRAG_PAGE_ORDER);
- 		if (likely(pfrag->page)) {
- 			pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
+ static unsigned vhost_net_zcopy_mask __read_mostly;
+@@ -655,41 +653,6 @@ static bool tx_can_batch(struct vhost_virtqueue *vq, size_t total_len)
+ 	       !vhost_vq_avail_empty(vq->dev, vq);
+ }
+ 
+-static bool vhost_net_page_frag_refill(struct vhost_net *net, unsigned int sz,
+-				       struct page_frag *pfrag, gfp_t gfp)
+-{
+-	if (pfrag->page) {
+-		if (pfrag->offset + sz <= pfrag->size)
+-			return true;
+-		__page_frag_cache_drain(pfrag->page, net->refcnt_bias);
+-	}
+-
+-	pfrag->offset = 0;
+-	net->refcnt_bias = 0;
+-	if (SKB_FRAG_PAGE_ORDER) {
+-		/* Avoid direct reclaim but allow kswapd to wake */
+-		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
+-					  __GFP_COMP | __GFP_NOWARN |
+-					  __GFP_NORETRY | __GFP_NOMEMALLOC,
+-					  SKB_FRAG_PAGE_ORDER);
+-		if (likely(pfrag->page)) {
+-			pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
+-			goto done;
+-		}
+-	}
+-	pfrag->page = alloc_page(gfp);
+-	if (likely(pfrag->page)) {
+-		pfrag->size = PAGE_SIZE;
+-		goto done;
+-	}
+-	return false;
+-
+-done:
+-	net->refcnt_bias = USHRT_MAX;
+-	page_ref_add(pfrag->page, USHRT_MAX - 1);
+-	return true;
+-}
+-
+ #define VHOST_NET_RX_PAD (NET_IP_ALIGN + NET_SKB_PAD)
+ 
+ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+@@ -699,7 +662,6 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 	struct vhost_net *net = container_of(vq->dev, struct vhost_net,
+ 					     dev);
+ 	struct socket *sock = vhost_vq_get_backend(vq);
+-	struct page_frag *alloc_frag = &net->page_frag;
+ 	struct virtio_net_hdr *gso;
+ 	struct xdp_buff *xdp = &nvq->xdp[nvq->batched_xdp];
+ 	struct tun_xdp_hdr *hdr;
+@@ -710,6 +672,7 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 	int sock_hlen = nvq->sock_hlen;
+ 	void *buf;
+ 	int copied;
++	int ret;
+ 
+ 	if (unlikely(len < nvq->sock_hlen))
+ 		return -EFAULT;
+@@ -719,18 +682,17 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 		return -ENOSPC;
+ 
+ 	buflen += SKB_DATA_ALIGN(len + pad);
+-	alloc_frag->offset = ALIGN((u64)alloc_frag->offset, SMP_CACHE_BYTES);
+-	if (unlikely(!vhost_net_page_frag_refill(net, buflen,
+-						 alloc_frag, GFP_KERNEL)))
++	buf = page_frag_alloc_align(&net->pf_cache, buflen, GFP_KERNEL,
++				    SMP_CACHE_BYTES);
++	if (unlikely(!buf))
+ 		return -ENOMEM;
+ 
+-	buf = (char *)page_address(alloc_frag->page) + alloc_frag->offset;
+-	copied = copy_page_from_iter(alloc_frag->page,
+-				     alloc_frag->offset +
+-				     offsetof(struct tun_xdp_hdr, gso),
+-				     sock_hlen, from);
+-	if (copied != sock_hlen)
+-		return -EFAULT;
++	copied = copy_from_iter(buf + offsetof(struct tun_xdp_hdr, gso),
++				sock_hlen, from);
++	if (copied != sock_hlen) {
++		ret = -EFAULT;
++		goto err;
++	}
+ 
+ 	hdr = buf;
+ 	gso = &hdr->gso;
+@@ -743,27 +705,30 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 			       vhost16_to_cpu(vq, gso->csum_start) +
+ 			       vhost16_to_cpu(vq, gso->csum_offset) + 2);
+ 
+-		if (vhost16_to_cpu(vq, gso->hdr_len) > len)
+-			return -EINVAL;
++		if (vhost16_to_cpu(vq, gso->hdr_len) > len) {
++			ret = -EINVAL;
++			goto err;
++		}
+ 	}
+ 
+ 	len -= sock_hlen;
+-	copied = copy_page_from_iter(alloc_frag->page,
+-				     alloc_frag->offset + pad,
+-				     len, from);
+-	if (copied != len)
+-		return -EFAULT;
++	copied = copy_from_iter(buf + pad, len, from);
++	if (copied != len) {
++		ret = -EFAULT;
++		goto err;
++	}
+ 
+ 	xdp_init_buff(xdp, buflen, NULL);
+ 	xdp_prepare_buff(xdp, buf, pad, len, true);
+ 	hdr->buflen = buflen;
+ 
+-	--net->refcnt_bias;
+-	alloc_frag->offset += buflen;
+-
+ 	++nvq->batched_xdp;
+ 
+ 	return 0;
++
++err:
++	page_frag_free(buf);
++	return ret;
+ }
+ 
+ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+@@ -1353,8 +1318,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
+ 			vqs[VHOST_NET_VQ_RX]);
+ 
+ 	f->private_data = n;
+-	n->page_frag.page = NULL;
+-	n->refcnt_bias = 0;
++	n->pf_cache.va = NULL;
+ 
+ 	return 0;
+ }
+@@ -1422,8 +1386,9 @@ static int vhost_net_release(struct inode *inode, struct file *f)
+ 	kfree(n->vqs[VHOST_NET_VQ_RX].rxq.queue);
+ 	kfree(n->vqs[VHOST_NET_VQ_TX].xdp);
+ 	kfree(n->dev.vqs);
+-	if (n->page_frag.page)
+-		__page_frag_cache_drain(n->page_frag.page, n->refcnt_bias);
++	if (n->pf_cache.va)
++		__page_frag_cache_drain(virt_to_head_page(n->pf_cache.va),
++					n->pf_cache.pagecnt_bias);
+ 	kvfree(n);
+ 	return 0;
+ }
 -- 
 2.33.0
 
