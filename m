@@ -1,87 +1,92 @@
-Return-Path: <kvm+bounces-3041-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3042-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97BFA800143
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 02:53:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A7B2800146
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 02:54:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8D431C20C4D
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 01:52:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAD1B1C20D53
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 01:54:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0844A4426;
-	Fri,  1 Dec 2023 01:52:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF46C17F3;
+	Fri,  1 Dec 2023 01:54:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qUMABBid"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q/tfciZT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2985512A
-	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 17:52:51 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5d1b2153ba1so28766117b3.2
-        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 17:52:51 -0800 (PST)
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 396D9A0
+	for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 17:54:32 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-6c415e09b2cso1912068b3a.2
+        for <kvm@vger.kernel.org>; Thu, 30 Nov 2023 17:54:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701395570; x=1702000370; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VmMRiyNlWj7E7DgTlLHv9EXBHs71X6661FunQt63Zuo=;
-        b=qUMABBidryf5/55E1JgDs6QBRarLv17hNYabXoUbaxIbgfg3ryD1w7R4iuaYBxVBrC
-         mwq+y+eeCNesQJZKjb6hvj3iuP8bCm2uUfyKMTV61DWCv/jH1/ScbeA8B6mTe7gNbKea
-         OqtAkRnJgcpxqRsqueNn/WaR5NcReM86aZvHjDnepcy2DYaurpfJz54lemSgsOQyJxS5
-         sGoW8Lt85oacUiOmZH17XobH5gGjBlPAHFPJTF7sFk3dojLPO/x+dMsHe9JRFJFpGt53
-         gspAuiD1D7DXYfTATT3q+cs8xMrkf5kbSJzkf1rMhSqmGjqxyKhc8oJm81E0RkJp2+tr
-         MzlA==
+        d=google.com; s=20230601; t=1701395671; x=1702000471; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PKWMAIjcAS8BeI7d93Q2buqUeQzLcxL2KToIl+B67YY=;
+        b=q/tfciZTHghwtQGUrzY9MTa1sD0lbKskkEVZRrTsrMkl+ZJX7awZrhHHgmIENLumUz
+         hLN9Mv+u8xhAlZhPOHivK4uBrBY8cqIyVrcLV+1EPP66YnPBy8zdAmFEbZcfvi2gLE5N
+         d72JySHtLfpQLfAFXa3T9RnUEz3/472AixJyjH3hFWoUTfkk6DbSfmCvKtmykNOGotgq
+         vW/OGcoFOTRIN6AqURqvEkbWswVZuK3cbX16PsfbveklJP0X7o7s0MqpaYlN+26nZdAj
+         KbJM84m9Fhe5C19IX38jWWaaPrP9dJh8+rHYdUZitg9jvVtPcKcuUffBlzrTHQB7cWH7
+         H/KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701395570; x=1702000370;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VmMRiyNlWj7E7DgTlLHv9EXBHs71X6661FunQt63Zuo=;
-        b=QnzITS8QvzPqQmVK3caCTU+t26IX/bsFu53vejYbK+tFH3T7lTZYFhaLKTItz1ugrC
-         OusUFTi4/IZaJt0l5JkGruiHY9bGrKI2UAHr5qtHYJU+uoYOXz4wPslWYuBp6I0cZCPE
-         G+uMVjNjyEeDQy1gnUOu44bjZV0Jlz+/eqXTpqnDWRqWyqBDljKrlTWtnNII2a+fbrSp
-         q1oxhoSn1mWAvtPijSsdWI10SlTo3YTMdFVT2LXxZrBXKoZKf+0lrI2xtE234RMeA8sg
-         MO4iarmsrWACf9/YUIx5jloG/BmCzen9J70D0M3aTcuqJl0ui3V7hZTY88NBV7G5kRzH
-         xXZQ==
-X-Gm-Message-State: AOJu0YwVhnvZhtaToILtlbXnWfxXdZRWX4S+4YB35NTgVEtJtTWnxKdN
-	PVTKq7gzcu1rRgGD7zc6LB12ginFUTM=
-X-Google-Smtp-Source: AGHT+IG0csC5MDjPOHcU6NEDOuOjQZAIXLHGqiPVTff1eLcelFsQF5L6YdMrleiiyf2icf/uD20FIF8jycU=
+        d=1e100.net; s=20230601; t=1701395671; x=1702000471;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PKWMAIjcAS8BeI7d93Q2buqUeQzLcxL2KToIl+B67YY=;
+        b=Vaf64o8htwhWiJwO6OlwsVLE45tLgoBhs36u73U7QeKz98vRi+y75HmHBN2IoXvlB4
+         RAOyHIBpkNxH4jEn8w9gTBNEOSpLZnoJI9NQiYMOrnmJ1a/A01aRg8u/6/QUFKb1oExn
+         Rh46sT9YNBDS3ih/LmL0gxwTy8YkDjUNxqmAK+BfZPm+hOCtwnq/xI19qOUXUTb8cylq
+         ySWzo23ZItWN0S8CI6z2t+1yEyjg5ptHpxJbP/kyuW012lzQZnIksQF+5ENlsTN4yvkd
+         NGkrMHGAOf7m5uIVcMvk1DHOboKOxn6TX0phvgMmkQYM5Jdx3FKI1FZ1YTEw4v108oFy
+         fSvg==
+X-Gm-Message-State: AOJu0YxzVYy4gzb9wLntRfLNNxqYsfRpACYYloLXo0Oz8b/Fy42Ld3Yg
+	1XNPlLNfGLC9hkupficNc5LhOOKVHnM=
+X-Google-Smtp-Source: AGHT+IGDV/0tldeZjg1P5I9SIGsp33yBLfURnsG/MQa2vzkfcUeFecZ6Xi1PNdITyY6nXlZX2Asi72r1Qfs=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:99d0:0:b0:5d4:1835:afe0 with SMTP id
- q199-20020a8199d0000000b005d41835afe0mr17243ywg.10.1701395570360; Thu, 30 Nov
- 2023 17:52:50 -0800 (PST)
-Date: Thu, 30 Nov 2023 17:52:08 -0800
-In-Reply-To: <20230315101606.10636-1-wei.w.wang@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2d29:b0:6cd:f18e:17d with SMTP id
+ fa41-20020a056a002d2900b006cdf18e017dmr382231pfb.1.1701395671646; Thu, 30 Nov
+ 2023 17:54:31 -0800 (PST)
+Date: Thu, 30 Nov 2023 17:52:10 -0800
+In-Reply-To: <20231024001636.890236-1-jmattson@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20230315101606.10636-1-wei.w.wang@intel.com>
+References: <20231024001636.890236-1-jmattson@google.com>
 X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
-Message-ID: <170137868908.667071.11420459240927661184.b4-ty@google.com>
-Subject: Re: [PATCH RESEND v2] KVM: move KVM_CAP_DEVICE_CTRL to the generic check
+Message-ID: <170137622057.658898.161602473001495929.b4-ty@google.com>
+Subject: Re: [PATCH 1/2] KVM: x86: Advertise CPUID.(EAX=7,ECX=2):EDX[5:0] to userspace
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, Wei Wang <wei.w.wang@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"'Paolo Bonzini '" <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Wed, 15 Mar 2023 18:16:06 +0800, Wei Wang wrote:
-> KVM_CAP_DEVICE_CTRL allows userspace to check if the kvm_device
-> framework (e.g. KVM_CREATE_DEVICE) is supported by KVM. Move
-> KVM_CAP_DEVICE_CTRL to the generic check for the two reasons:
-> 1) it already supports arch agnostic usages (i.e. KVM_DEV_TYPE_VFIO).
-> For example, userspace VFIO implementation may needs to create
-> KVM_DEV_TYPE_VFIO on x86, riscv, or arm etc. It is simpler to have it
-> checked at the generic code than at each arch's code.
-> 2) KVM_CREATE_DEVICE has been added to the generic code.
+On Mon, 23 Oct 2023 17:16:35 -0700, Jim Mattson wrote:
+> The low five bits {INTEL_PSFD, IPRED_CTRL, RRSBA_CTRL, DDPD_U, BHI_CTRL}
+> advertise the availability of specific bits in IA32_SPEC_CTRL. Since KVM
+> dynamically determines the legal IA32_SPEC_CTRL bits for the underlying
+> hardware, the hard work has already been done. Just let userspace know
+> that a guest can use these IA32_SPEC_CTRL bits.
+> 
+> The sixth bit (MCDT_NO) states that the processor does not exhibit MXCSR
+> Configuration Dependent Timing (MCDT) behavior. This is an inherent
+> property of the physical processor that is inherited by the virtual
+> CPU. Pass that information on to userspace.
 > 
 > [...]
 
-Applied to kvm-x86 generic, thanks!
+Applied to kvm-x86 misc, with macros to make Jim queasy (but they really do
+guard against copy+paste errors).
 
-[1/1] KVM: move KVM_CAP_DEVICE_CTRL to the generic check
-      https://github.com/kvm-x86/linux/commit/63912245c19d
+[1/2] KVM: x86: Advertise CPUID.(EAX=7,ECX=2):EDX[5:0] to userspace
+      https://github.com/kvm-x86/linux/commit/eefe5e668209
+[2/2] KVM: x86: Use a switch statement and macros in __feature_translate()
+      https://github.com/kvm-x86/linux/commit/80c883db87d9
 
 --
 https://github.com/kvm-x86/linux/tree/next
