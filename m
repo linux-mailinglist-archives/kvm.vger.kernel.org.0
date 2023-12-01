@@ -1,116 +1,243 @@
-Return-Path: <kvm+bounces-3146-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3147-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E584E80108E
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 17:51:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 019C88010A0
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 17:57:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 827ECB21342
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 16:51:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B19B2281B0A
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 16:57:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B07A4CE18;
-	Fri,  1 Dec 2023 16:50:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E87C64D110;
+	Fri,  1 Dec 2023 16:57:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="YGd1sdhU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aANx9KPk"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0D4DCF;
-	Fri,  1 Dec 2023 08:50:54 -0800 (PST)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D560D133
+	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 08:57:35 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5d10f5bf5d9so39855667b3.3
+        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 08:57:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1701449456; x=1732985456;
-  h=mime-version:content-transfer-encoding:date:message-id:
-   cc:from:to:references:in-reply-to:subject;
-  bh=jzcYp1+G+LJEnQ/Nf3Fzjvbwr6w5g4s4GfO6LThiCsM=;
-  b=YGd1sdhUJvsAsu+ui9H2wz6mzVWzUx+6XYufrcCwuMNs4l9CyHhCZ1+2
-   g4FIpKbc2GULZYhOhaq6mYNjODdsJdO6FFeIWuadHyDHATzQFghR+GOWa
-   CNCv4TH9Q5ZhS5RAPbVuZqRvzgQPbpj6lonoivQSEMN1DNbOMT0/3bo2H
-   k=;
-X-IronPort-AV: E=Sophos;i="6.04,242,1695686400"; 
-   d="scan'208";a="688377607"
-Subject: Re: [RFC 05/33] KVM: x86: hyper-v: Introduce VTL call/return prologues in
- hypercall page
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 16:50:50 +0000
-Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
-	by email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com (Postfix) with ESMTPS id D414C40DA8;
-	Fri,  1 Dec 2023 16:50:47 +0000 (UTC)
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.17.79:43089]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.14.81:2525] with esmtp (Farcaster)
- id 82517984-b528-4c7f-9edc-388069a39df6; Fri, 1 Dec 2023 16:50:46 +0000 (UTC)
-X-Farcaster-Flow-ID: 82517984-b528-4c7f-9edc-388069a39df6
-Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 1 Dec 2023 16:50:41 +0000
-Received: from localhost (10.13.235.138) by EX19D004EUC001.ant.amazon.com
- (10.252.51.190) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 1 Dec
- 2023 16:50:37 +0000
+        d=google.com; s=20230601; t=1701449855; x=1702054655; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=y4vWDcSleVuAcWWSVJ6UWPxa/+VR6wh4u65BESDtab8=;
+        b=aANx9KPk1pJtn96ycXmYA35ffAcJ8SWGumgDAuIx+BTXGfCuMt9YiiKxNyiT7rJRsh
+         m7mc8JXfYujVcL6CdFCuqMB3R91oBn1HvFwUpvb/mE3aI+fDVqY4RUlIxZmLzrOcaXIq
+         VM4hmGrrurgaG40Dc4VIbTk+AWorCMdJJ4CqQ1o53DkXzw9Y7nekaT+mqdykCz/uSGV6
+         q702yAc5D6Wa4knclim45ZYV3GV27CMftIbK22JzBc/KJ7lYIN1E5TvIcfIV2vr0vNzb
+         /G6JNFCjWa/pruiyKwTx7XR8TKT1tXZYrxiyZ/fkPYbSgqfRuzUMJEjyNGhrJsrapE7M
+         /nNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701449855; x=1702054655;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=y4vWDcSleVuAcWWSVJ6UWPxa/+VR6wh4u65BESDtab8=;
+        b=SCNhqChUqelCUh8nDWC1MQKFpVFdmqvMo5ANeDuIyqXLcnz231UMCc7s/AlGBrOMHH
+         khZVOmHISwkIQyrt5LQZenqn3GBQV01BNmAiZNCRb6Qmio8Hv5v2m13i7bLpdtKMZgm8
+         4OnjGML33SOOwNmij09AOhXeQMRJKzQpIoAZd4ebjSKQuKsRqglDrv1fkJHxLGhbxMZl
+         NSUPqXEJcIs0prZ9vVjBFvbk139WuT+i6v0cm6ohbcmjLpJWl10qWqvYuaO9bpD9FLhl
+         44i2307+ki1ebDgwcWxx4rt0epNgKnVdXiFKtqFHWtrvkLYhfYHBBSI4BbVlc3VPQH5D
+         oi8g==
+X-Gm-Message-State: AOJu0YzZJWaSwrQbEgDrWBaMY2rLIxYvAYoJqj5q1vunReUOhU71jE/K
+	pBIV5qKvt0z3uAtmRCCHi0t5PKsrltI=
+X-Google-Smtp-Source: AGHT+IE/RC2L17dLQQZPC7cr5oM/68maBfbYmwu2j63jta6vQs8pehJjrr3Dz6SNdp/rN4yrUhCMwlyuhMc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:be17:0:b0:5d0:a744:7197 with SMTP id
+ i23-20020a81be17000000b005d0a7447197mr588779ywn.3.1701449855131; Fri, 01 Dec
+ 2023 08:57:35 -0800 (PST)
+Date: Fri, 1 Dec 2023 08:57:33 -0800
+In-Reply-To: <20231123010424.10274-1-lirongqing@baidu.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 1 Dec 2023 16:50:33 +0000
-Message-ID: <CXD5HJ5LQMTE.11XP9UB9IL8LY@amazon.com>
-CC: Maxim Levitsky <mlevitsk@redhat.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
-	<pbonzini@redhat.com>, <vkuznets@redhat.com>, <anelkz@amazon.com>,
-	<graf@amazon.com>, <dwmw@amazon.co.uk>, <jgowans@amazon.com>,
-	<kys@microsoft.com>, <haiyangz@microsoft.com>, <decui@microsoft.com>,
-	<x86@kernel.org>, <linux-doc@vger.kernel.org>
-From: Nicolas Saenz Julienne <nsaenz@amazon.com>
-To: Sean Christopherson <seanjc@google.com>
-X-Mailer: aerc 0.15.2-182-g389d89a9362e-dirty
-References: <20231108111806.92604-1-nsaenz@amazon.com>
- <20231108111806.92604-6-nsaenz@amazon.com>
- <f4495d1f697cf9a7ddfb786eaeeac90f554fc6db.camel@redhat.com>
- <CXD4TVV5QWUK.3SH495QSBTTUF@amazon.com> <ZWoKlJUKJGGhRRgM@google.com>
-In-Reply-To: <ZWoKlJUKJGGhRRgM@google.com>
-X-ClientProxiedBy: EX19D032UWB004.ant.amazon.com (10.13.139.136) To
- EX19D004EUC001.ant.amazon.com (10.252.51.190)
+Mime-Version: 1.0
+References: <20231123010424.10274-1-lirongqing@baidu.com>
+Message-ID: <ZWoQfVxynCVv2_CB@google.com>
+Subject: Re: [PATCH v2] KVM: x86: fix kvm_has_noapic_vcpu updates when fail to
+ create vcpu
+From: Sean Christopherson <seanjc@google.com>
+To: Li RongQing <lirongqing@baidu.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, mlevitsk@redhat.com, 
+	yilun.xu@linux.intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri Dec 1, 2023 at 4:32 PM UTC, Sean Christopherson wrote:
-> On Fri, Dec 01, 2023, Nicolas Saenz Julienne wrote:
-> > > To support this I think that we can add a userspace msr filter on the=
- HV_X64_MSR_HYPERCALL,
-> > > although I am not 100% sure if a userspace msr filter overrides the i=
-n-kernel msr handling.
-> >
-> > I thought about it at the time. It's not that simple though, we should
-> > still let KVM set the hypercall bytecode, and other quirks like the Xen
-> > one.
->
-> Yeah, that Xen quirk is quite the killer.
->
-> Can you provide pseudo-assembly for what the final page is supposed to lo=
-ok like?
-> I'm struggling mightily to understand what this is actually trying to do.
+On Thu, Nov 23, 2023, Li RongQing wrote:
+> Static key kvm_has_noapic_vcpu should be reduced when fail to create
+> vcpu, opportunistically change to call kvm_free_lapic only when LAPIC
+> is in kernel in kvm_arch_vcpu_destroy
 
-I'll make it as simple as possible (diregard 32bit support and that xen
-exists):
+Heh, this has been on my todo list for a comically long time.
 
-vmcall	     <-  Offset 0, regular Hyper-V hypercalls enter here
-ret
-mov rax,rcx  <-  VTL call hypercall enters here
-mov rcx,0x11
-vmcall
-ret
-mov rax,rcx  <-  VTL return hypercall enters here
-mov rcx,0x12
-vmcall
-ret
+> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> ---
+> diff v1: call kvm_free_lapic conditionally in kvm_arch_vcpu_destroy
+> 
+>  arch/x86/kvm/x86.c | 14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 2c92407..3cadf28 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12079,7 +12079,10 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  	kfree(vcpu->arch.mci_ctl2_banks);
+>  	free_page((unsigned long)vcpu->arch.pio_data);
+>  fail_free_lapic:
+> -	kvm_free_lapic(vcpu);
+> +	if (lapic_in_kernel(vcpu))
+> +		kvm_free_lapic(vcpu);
+> +	else
+> +		static_branch_dec(&kvm_has_noapic_vcpu);
+>  fail_mmu_destroy:
+>  	kvm_mmu_destroy(vcpu);
+>  	return r;
+> @@ -12122,14 +12125,17 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  	kvm_pmu_destroy(vcpu);
+>  	kfree(vcpu->arch.mce_banks);
+>  	kfree(vcpu->arch.mci_ctl2_banks);
+> -	kvm_free_lapic(vcpu);
+> +
+> +	if (lapic_in_kernel(vcpu))
+> +		kvm_free_lapic(vcpu);
+> +	else
+> +		static_branch_dec(&kvm_has_noapic_vcpu);
 
-rcx needs to be saved as it contains a "VTL call control input to the
-hypervisor" (TLFS 15.6.1). I don't remember seeing it being used in
-practice. Then, KVM expects the hypercall code in rcx, hence the
-0x11/0x12 mov.
+Rather than split code like this, what if we let the APIC code deal with bumping
+the static branch?  The effect of this bug is purely just loss of an optimization
+that has *very* dubious value to begin with, i.e. having a minimal diff isn't a
+priority.  lapic.h already declares kvm_has_noapic_vcpu, so this would make lapic.*
+the sole owner of the code.
 
-Nicolas
+E.g. (untested)
+
+---
+ arch/x86/kvm/lapic.c | 27 ++++++++++++++++++++++++++-
+ arch/x86/kvm/x86.c   | 29 +++--------------------------
+ 2 files changed, 29 insertions(+), 27 deletions(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index f5fab29c827f..45ffc7d1e49e 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -124,6 +124,9 @@ static inline int __apic_test_and_clear_vector(int vec, void *bitmap)
+ 	return __test_and_clear_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
+ }
+ 
++__read_mostly DEFINE_STATIC_KEY_FALSE(kvm_has_noapic_vcpu);
++EXPORT_SYMBOL_GPL(kvm_has_noapic_vcpu);
++
+ __read_mostly DEFINE_STATIC_KEY_DEFERRED_FALSE(apic_hw_disabled, HZ);
+ __read_mostly DEFINE_STATIC_KEY_DEFERRED_FALSE(apic_sw_disabled, HZ);
+ 
+@@ -2467,8 +2470,10 @@ void kvm_free_lapic(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_lapic *apic = vcpu->arch.apic;
+ 
+-	if (!vcpu->arch.apic)
++	if (!vcpu->arch.apic) {
++		static_branch_dec(&kvm_has_noapic_vcpu);
+ 		return;
++	}
+ 
+ 	hrtimer_cancel(&apic->lapic_timer.timer);
+ 
+@@ -2810,6 +2815,11 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
+ 
+ 	ASSERT(vcpu != NULL);
+ 
++	if (!irqchip_in_kernel(vcpu->kvm)) {
++		static_branch_inc(&kvm_has_noapic_vcpu);
++		return 0;
++	}
++
+ 	apic = kzalloc(sizeof(*apic), GFP_KERNEL_ACCOUNT);
+ 	if (!apic)
+ 		goto nomem;
+@@ -2845,6 +2855,21 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
+ 	static_branch_inc(&apic_sw_disabled.key); /* sw disabled at reset */
+ 	kvm_iodevice_init(&apic->dev, &apic_mmio_ops);
+ 
++	/*
++	 * Defer evaluating inhibits until the vCPU is first run, as this vCPU
++	 * will not get notified of any changes until this vCPU is visible to
++	 * other vCPUs (marked online and added to the set of vCPUs).
++	 *
++	 * Opportunistically mark APICv active as VMX in particularly is highly
++	 * unlikely to have inhibits.  Ignore the current per-VM APICv state so
++	 * that vCPU creation is guaranteed to run with a deterministic value,
++	 * the request will ensure the vCPU gets the correct state before VM-Entry.
++	 */
++	if (enable_apicv) {
++		apic->apicv_active = true;
++		kvm_make_request(KVM_REQ_APICV_UPDATE, vcpu);
++	}
++
+ 	return 0;
+ nomem_free_apic:
+ 	kfree(apic);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 0572172f2e94..7d7d65c60276 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12014,27 +12014,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	if (r < 0)
+ 		return r;
+ 
+-	if (irqchip_in_kernel(vcpu->kvm)) {
+-		r = kvm_create_lapic(vcpu, lapic_timer_advance_ns);
+-		if (r < 0)
+-			goto fail_mmu_destroy;
+-
+-		/*
+-		 * Defer evaluating inhibits until the vCPU is first run, as
+-		 * this vCPU will not get notified of any changes until this
+-		 * vCPU is visible to other vCPUs (marked online and added to
+-		 * the set of vCPUs).  Opportunistically mark APICv active as
+-		 * VMX in particularly is highly unlikely to have inhibits.
+-		 * Ignore the current per-VM APICv state so that vCPU creation
+-		 * is guaranteed to run with a deterministic value, the request
+-		 * will ensure the vCPU gets the correct state before VM-Entry.
+-		 */
+-		if (enable_apicv) {
+-			vcpu->arch.apic->apicv_active = true;
+-			kvm_make_request(KVM_REQ_APICV_UPDATE, vcpu);
+-		}
+-	} else
+-		static_branch_inc(&kvm_has_noapic_vcpu);
++	r = kvm_create_lapic(vcpu, lapic_timer_advance_ns);
++	if (r < 0)
++		goto fail_mmu_destroy;
+ 
+ 	r = -ENOMEM;
+ 
+@@ -12155,8 +12137,6 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+ 	free_page((unsigned long)vcpu->arch.pio_data);
+ 	kvfree(vcpu->arch.cpuid_entries);
+-	if (!lapic_in_kernel(vcpu))
+-		static_branch_dec(&kvm_has_noapic_vcpu);
+ }
+ 
+ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+@@ -12433,9 +12413,6 @@ bool kvm_vcpu_is_bsp(struct kvm_vcpu *vcpu)
+ 	return (vcpu->arch.apic_base & MSR_IA32_APICBASE_BSP) != 0;
+ }
+ 
+-__read_mostly DEFINE_STATIC_KEY_FALSE(kvm_has_noapic_vcpu);
+-EXPORT_SYMBOL_GPL(kvm_has_noapic_vcpu);
+-
+ void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
+ {
+ 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+
+base-commit: 1d4405b36808dc8c2d9b65b627c2af4b62fe017e
+-- 
+
 
