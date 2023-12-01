@@ -1,125 +1,105 @@
-Return-Path: <kvm+bounces-3158-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3159-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5F1E801368
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 20:10:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CF80801384
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 20:20:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02D601C20B7B
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 19:10:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61EF5B212B1
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 19:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2394E4EB28;
-	Fri,  1 Dec 2023 19:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0142B4F20A;
+	Fri,  1 Dec 2023 19:20:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rl0Un9AR"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="IAsX0OPD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FE6B10DF
-	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 11:10:17 -0800 (PST)
-Received: by mail-qv1-xf2f.google.com with SMTP id 6a1803df08f44-67a9cba087aso4351856d6.3
-        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 11:10:17 -0800 (PST)
+Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19B36F2
+	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 11:20:29 -0800 (PST)
+Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-1fa22332ca1so420085fac.1
+        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 11:20:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701457816; x=1702062616; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3d5nvTaF8kuJagYDcGaeaUsaeVBNS6VEIq5mpqo9UmA=;
-        b=rl0Un9AROA+FYAFH3AqjlnyQdiuDrr1bxnOYd4a2OT+46KnikLND5KBKsCxTZN2fAb
-         9bOwxXsMfMivDY9xOuwa3FxIJT65eOw/6/E9vhvpRoiLtTaJruuwjN6ou53vQzi63wD+
-         YwX01Qh5kjNRdniAY1roJ5xmcNHDwdXnzn+j6GKCK69SnIMpdMX64smFewEr2SFYQeJn
-         9i4cF3wNjpC7tMqgvrvnuFbIMSVcvzYCxbglXwM95urTPH/lFrkvumTJ1UbW934S+tdb
-         bRFRoCBpZMLaAdt5VyPMBI/o8n9l1JVkkQU+ksaME+CB/8Zmwonzv/oVr3x8nlAxwuIf
-         kvlw==
+        d=ziepe.ca; s=google; t=1701458428; x=1702063228; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=I2OeVOQrD9mA7MkxNCDuZeDEn1PaLfVovbPcfbgEPHs=;
+        b=IAsX0OPD4NJxDKjHZYaPeA1RaI7SRW99J/WrY8IFv5YTzgiTai7tQYa9AIxQSYm+Gn
+         SQkGKtJELCPateOq6K3dVhgo6vURv6c2adEUDIi/jhsc7wiLKuKunKMSc2PnXt/r728X
+         xJ6b3raUyCZfwoduFdSCsITm7gU/yL0rh1J1glQDI/dvDyTioaFuK4FSwpG8z4yJ1sJG
+         lC/zDjw0D/qgqkjBn5Owu1kBQ1FDFwGigdpl7bA4bpLcF8PgIBt/AXci9z5NBsOmxe/L
+         LuPNK4ddissh94BT6jAxPklYE1mE7vg0oDpbQS9tg0njOyEz9wuROCwrr9q9s3fQrwt/
+         bsgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701457816; x=1702062616;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3d5nvTaF8kuJagYDcGaeaUsaeVBNS6VEIq5mpqo9UmA=;
-        b=lq1dqOroq5l4atdz/XmSyscxzGe7UAJYW5etRo0YnbcIYb/g1NYjuZqW5oXFb5CkMT
-         xlV9ycZAYONQWlL24r7hBJnjGiEHmSmuj6qBviUeBw4FipEET4QQPqVLKNCYP6943fQx
-         9EwTv+M3/HF1ABeHZxsEuxebi48IiFY2Lz1IYlX8gOng+rqnJLmhIn3zNaduNTR+Unnm
-         sqBy3pCsOF98BpSwBUeaDl5YJJdhFkStQ2bWhO1P6r9FIlAKfoqAhbrVDMBm8Vt6TM+W
-         oCgZHsV1zCo5a6GALzKzU2t8OnoZifkOolwFh0MBFcSfrD7O3WDCvS0O/KnQlNFF87mY
-         78Wg==
-X-Gm-Message-State: AOJu0YxXViiWkVgTYYDjUqwVwHQLCuOCtI9yETAh/Q8y3g85OOnca+Tv
-	srjMy0FF2VxSpD5pO1nPIkQwgDorEOFW5+ALekk8QPTxWg2/PaOM5/TqdhLa
-X-Google-Smtp-Source: AGHT+IGTb9xP3Y+0ydU1WznwApXxpeJWvaXzBuS7ilhu+ua5rvEhdeCKPMR+G3OAlX7g3lk4MFCHd20F8zZevl1SAqk=
-X-Received: by 2002:a05:6214:e62:b0:679:e2cb:2a30 with SMTP id
- jz2-20020a0562140e6200b00679e2cb2a30mr30256086qvb.52.1701457374338; Fri, 01
- Dec 2023 11:02:54 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701458428; x=1702063228;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I2OeVOQrD9mA7MkxNCDuZeDEn1PaLfVovbPcfbgEPHs=;
+        b=UIGB4oRKfuHocS4qP3XBgUaLEFmyHN3XYulzrxWDDvNrUaASukRq1+TfQgFHaixuz/
+         JeC9komGAqnf33ePcZOZvuudn34HlzW9uK+EL/iTOQ3TS5/SToRWjSLYdaQni+lnxZ/M
+         nw3yZkV90Q94dCg6ZWJAFPM/e2kn2YmVtJhkv/5Pm/NO8opWSY6awj8Gl50ubb++6Rih
+         trnM4MJHC1/8XoQOeSWmqNV6cUzs0UXa/AIsyJcqKSkfB4ePEGiEoI5wPthVcMrARE0A
+         lh4usCyh8/oXmRk/mjjvTvF2/EpYsAkigTVKCFjHkdhXil9+aAyFHI/SkTspDr9K26Vg
+         tMIw==
+X-Gm-Message-State: AOJu0Yzvh1MNToZZdvNxlk7j7CsfXcqWenDFOjAvq5+mOWMAbODXPFgd
+	xo+PSyDryEZfHO/k1S4V/UNMHablFQNzkZl4LYs=
+X-Google-Smtp-Source: AGHT+IEQWhwo+YQs87zSg16Es/DvsBvlD+J/VYbJsutxQ5RoA/cQ603E7sqNxOjxpSBkuubb9x+1Iw==
+X-Received: by 2002:ac8:7f8c:0:b0:421:b323:bffe with SMTP id z12-20020ac87f8c000000b00421b323bffemr88819qtj.10.1701457750139;
+        Fri, 01 Dec 2023 11:09:10 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-134-23-187.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.134.23.187])
+        by smtp.gmail.com with ESMTPSA id w2-20020ac87182000000b00423de58d3d8sm1731502qto.40.2023.12.01.11.09.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Dec 2023 11:09:09 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1r98sv-006Hqv-2W;
+	Fri, 01 Dec 2023 15:09:09 -0400
+Date: Fri, 1 Dec 2023 15:09:09 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Lu Baolu <baolu.lu@linux.intel.com>
+Cc: Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
+	Jacob Pan <jacob.jun.pan@linux.intel.com>,
+	Yan Zhao <yan.y.zhao@intel.com>, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7 07/12] iommu: Merge iommu_fault_event and iopf_fault
+Message-ID: <20231201190909.GD1489931@ziepe.ca>
+References: <20231115030226.16700-1-baolu.lu@linux.intel.com>
+ <20231115030226.16700-8-baolu.lu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231110003734.1014084-1-jackyli@google.com> <ZWogUHqoIwiHGehZ@google.com>
-In-Reply-To: <ZWogUHqoIwiHGehZ@google.com>
-From: Mingwei Zhang <mizhang@google.com>
-Date: Fri, 1 Dec 2023 11:02:18 -0800
-Message-ID: <CAL715WKVHJqpA=VsO3BZhs9bS9AXiy77+k-aMEh+FGOKZREp+g@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/4] KVM: SEV: Limit cache flush operations in sev
- guest memory reclaim events
-To: Sean Christopherson <seanjc@google.com>
-Cc: Jacky Li <jackyli@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ovidiu Panait <ovidiu.panait@windriver.com>, Liam Merwick <liam.merwick@oracle.com>, 
-	Ashish Kalra <Ashish.Kalra@amd.com>, David Rientjes <rientjes@google.com>, 
-	David Kaplan <david.kaplan@amd.com>, Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231115030226.16700-8-baolu.lu@linux.intel.com>
 
-On Fri, Dec 1, 2023 at 10:05=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Fri, Nov 10, 2023, Jacky Li wrote:
-> > The cache flush operation in sev guest memory reclaim events was
-> > originally introduced to prevent security issues due to cache
-> > incoherence and untrusted VMM. However when this operation gets
-> > triggered, it causes performance degradation to the whole machine.
-> >
-> > This cache flush operation is performed in mmu_notifiers, in particular=
-,
-> > in the mmu_notifier_invalidate_range_start() function, unconditionally
-> > on all guest memory regions. Although the intention was to flush
-> > cache lines only when guest memory was deallocated, the excessive
-> > invocations include many other cases where this flush is unnecessary.
-> >
-> > This RFC proposes using the mmu notifier event to determine whether a
-> > cache flush is needed. Specifically, only do the cache flush when the
-> > address range is unmapped, cleared, released or migrated. A bitmap
-> > module param is also introduced to provide flexibility when flush is
-> > needed in more events or no flush is needed depending on the hardware
-> > platform.
->
-> I'm still not at all convinced that this is worth doing.  We have clear l=
-ine of
-> sight to cleanly and optimally handling SNP and beyond.  If there is an a=
-ctual
-> use case that wants to run SEV and/or SEV-ES VMs, which can't support pag=
-e
-> migration, on the same host as traditional VMs, _and_ for some reason the=
-ir
-> userspace is incapable of providing reasonable NUMA locality, then the ow=
-ners of
-> that use case can speak up and provide justification for taking on this e=
-xtra
-> complexity in KVM.
+On Wed, Nov 15, 2023 at 11:02:21AM +0800, Lu Baolu wrote:
+> The iommu_fault_event and iopf_fault data structures store the same
+> information about an iopf fault. They are also used in the same way.
+> Merge these two data structures into a single one to make the code
+> more concise and easier to maintain.
+> 
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Tested-by: Yan Zhao <yan.y.zhao@intel.com>
+> ---
+>  include/linux/iommu.h                       | 27 ++++++---------------
+>  drivers/iommu/intel/iommu.h                 |  2 +-
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  4 +--
+>  drivers/iommu/intel/svm.c                   |  5 ++--
+>  drivers/iommu/io-pgfault.c                  |  5 ----
+>  drivers/iommu/iommu.c                       |  8 +++---
+>  6 files changed, 17 insertions(+), 34 deletions(-)
 
-Hi Sean,
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Jacky and I were looking at some cases like mmu_notifier calls
-triggered by the overloaded reason "MMU_NOTIFY_CLEAR". Even if we turn
-off page migration etc, splitting PMD may still happen at some point
-under this reason, and we will never be able to turn it off by
-tweaking kernel CONFIG options. So, I think this is the line of sight
-for this series.
-
-Handling SNP could be separate, since in SNP we have per-page
-properties, which allow KVM to know which page to flush individually.
-
-Thanks.
--Mingwei
+Jason
 
