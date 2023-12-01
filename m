@@ -1,134 +1,181 @@
-Return-Path: <kvm+bounces-3106-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3107-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75DAB8009E1
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 12:25:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE7FD800A07
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 12:47:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15319B20D29
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 11:25:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 032151C20AD0
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 11:47:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE67221378;
-	Fri,  1 Dec 2023 11:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AC30219F8;
+	Fri,  1 Dec 2023 11:47:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tHnqyxfO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GPoWitbd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BC7110DF;
-	Fri,  1 Dec 2023 03:25:29 -0800 (PST)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B1BLs6x025771;
-	Fri, 1 Dec 2023 11:25:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=JDUzZoo0usIHW1bL2X7anyVGvbWqKUEA7tIrv8v05tw=;
- b=tHnqyxfOpKCyJQS9Q2t6T+YBArVIO9T+BksB7CPM23mv787TWNE400l6B35o4efxzIgZ
- dTVPk64R5ES/U8fIEFZdkk6XmOqPOItJQeGIYkr4RTjVnoTUvos/sgpjBL7sHtasGumI
- IqsBtbExaSGm0U/D4mKfTxabVmwieN8VVL/Od1F4AAzYpQRMafuh25W1NVF4eyWsmDBm
- ow/7ypoop/jr4CS5zEI0eV/IiVMIlFaheuK9Vg9wHgXceJScHgJ+9UaKFFEIdZmnYJ8P
- zPqO1SZOKKYj14HDlUigQ0HYnNwAhJNBvJJHU7VgJ8EWBSVbpJ9T2dUxnzRq6IcGfA2X xA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uqej203cs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Dec 2023 11:25:03 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B1BMput029715;
-	Fri, 1 Dec 2023 11:25:02 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uqej203bx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Dec 2023 11:25:02 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B1AXt1j002633;
-	Fri, 1 Dec 2023 11:25:01 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ukv8p4nxt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Dec 2023 11:25:01 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B1BOveo11600416
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 1 Dec 2023 11:24:58 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D182D20049;
-	Fri,  1 Dec 2023 11:24:57 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7747820040;
-	Fri,  1 Dec 2023 11:24:57 +0000 (GMT)
-Received: from [9.152.224.222] (unknown [9.152.224.222])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  1 Dec 2023 11:24:57 +0000 (GMT)
-Message-ID: <fc436fea-b9af-5649-0b4e-ef6c0ef37ce9@linux.ibm.com>
-Date: Fri, 1 Dec 2023 12:24:56 +0100
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D5AA1704
+	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 03:47:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701431244;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6uHVtje56LWat5Vmv+PcEyAck+di+XL9VN6HEiOJE+M=;
+	b=GPoWitbd6ghvph4382uGlvJ8gRpNWuWmCjIVumwaw1h0HsuuL3vZk9Z/SRAfxQm8093/eP
+	6XAsJTsKD4UUKAiGhJ8nPxnMgLdAJ3CEburMVmReV4JRaCdh9koEQjvdoQGQdNTpMIMNcv
+	yqSMYV98lc5yxmHculR9LgEhBDsQYE4=
+Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
+ [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-541-UdzGCd2AOGKQx56PVrjMiw-1; Fri, 01 Dec 2023 06:47:23 -0500
+X-MC-Unique: UdzGCd2AOGKQx56PVrjMiw-1
+Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-5d1b2153ba1so35315277b3.2
+        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 03:47:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701431242; x=1702036042;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6uHVtje56LWat5Vmv+PcEyAck+di+XL9VN6HEiOJE+M=;
+        b=q276h+ro0xnj8v3X6pBwf1zKWxQYJRlD13C7W2B+xNpZ2ciOnA3hdqI3Y6oa75r5X4
+         zs7EQJM1Cb1LfYGCrhXlQS4JKS0W6RzNR7v93nd4QMj9DC3dzeCqM08RzQvjcSxkglY3
+         YEX3XBYxrBhDyXnyrd8a2ol7xbjkUJZqVviSs6IOjMN50MyarMCoah99S0sBlI71ErDr
+         cpnjbvSV+Dk7m2MhXJ0B12B8dpALZ84aukgpPu3K9OaaassyxGJeMmSwFT21nJLR+zI1
+         gKAOZZdgwe06k4dOxa8DWAtTvy4Uxbjpp5HVTMqpOdlSUSyBBBHij9RvRCK8rEhznTqt
+         qpLg==
+X-Gm-Message-State: AOJu0Yzz0/cK1BIc+Ms6zdzn+Hue666lbpjkjPYHjOUM9Wv2+0bIevLN
+	w4c5EeeXguQ76q0/4fjUf63bQAul17yL7PHhs8Ak7KpJEd/iQoqB4ZM+QIvXIFb18YoYqsg4WLu
+	DspELPmxrSxPthOeufhrz/MGkRpBB
+X-Received: by 2002:a81:b60c:0:b0:5d4:226f:69a4 with SMTP id u12-20020a81b60c000000b005d4226f69a4mr1446072ywh.28.1701431241868;
+        Fri, 01 Dec 2023 03:47:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGg2MuyiMF1tTj3uUQulmb0jD2AozD8K6xVD0pM3BW790ulvznuBYypSmkNfOvOQQkPXQZjksPtzVYkngc8Se0=
+X-Received: by 2002:a81:b60c:0:b0:5d4:226f:69a4 with SMTP id
+ u12-20020a81b60c000000b005d4226f69a4mr1446054ywh.28.1701431241604; Fri, 01
+ Dec 2023 03:47:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH 0/3] Use new wrappers to copy userspace arrays
-To: Sean Christopherson <seanjc@google.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Philipp Stanner <pstanner@redhat.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org
-References: <20231102181526.43279-1-pstanner@redhat.com>
- <170137909771.669092.7450781639631347445.b4-ty@google.com>
-Content-Language: en-US
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <170137909771.669092.7450781639631347445.b4-ty@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: LrfhoqbS-eviJ5_jMuCu1wAkL1ISHKbx
-X-Proofpoint-GUID: Xqwf_ASsKyrNP6BsfZQM4xXPHZMO1cS5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-01_09,2023-11-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- priorityscore=1501 lowpriorityscore=0 mlxlogscore=744 adultscore=0
- phishscore=0 impostorscore=0 mlxscore=0 suspectscore=0 malwarescore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2312010075
+References: <20231201104857.665737-1-dtatulea@nvidia.com> <20231201104857.665737-3-dtatulea@nvidia.com>
+In-Reply-To: <20231201104857.665737-3-dtatulea@nvidia.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Fri, 1 Dec 2023 12:46:45 +0100
+Message-ID: <CAJaqyWc3Xa9abmS+MxFbgQHUao0_=tcx4mres2AeDWqvtmZ5Jg@mail.gmail.com>
+Subject: Re: [PATCH vhost 2/7] vdpa/mlx5: Split function into locked and
+ unlocked variants
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Si-Wei Liu <si-wei.liu@oracle.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, virtualization@lists.linux-foundation.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Gal Pressman <galp@nvidia.com>, Parav Pandit <parav@nvidia.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Dec 1, 2023 at 11:49=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.com=
+> wrote:
+>
+> mlx5_vdpa_destroy_mr contains more logic than _mlx5_vdpa_destroy_mr.
+> There is no reason for this to be the case. All the logic can go into
+> the unlocked variant.
+>
+> Using the unlocked version is needed in a follow-up patch. And it also
+> makes it more consistent with mlx5_vdpa_create_mr.
+>
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
 
+Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 
-Am 01.12.23 um 02:52 schrieb Sean Christopherson:
-> On Thu, 02 Nov 2023 19:15:23 +0100, Philipp Stanner wrote:
->> Linus recently merged [1] the wrapper functions memdup_array_user() and
->> vmemdup_array_user() in include/linux/string.h for Kernel v6.7
->>
->> I am currently adding them to all places where (v)memdup_user() had been
->> used to copy arrays.
->>
->> The wrapper is different to the wrapped functions only in that it might
->> return -EOVERFLOW. So this new error code might get pushed up to
->> userspace. I hope this is fine.
->>
->> [...]
-> 
-> Applied to kvm-x86 generic.  Claudio (or anyone else from s390), holler if
-> you want to take the s390 patch through the s390 tree.
+> ---
+>  drivers/vdpa/mlx5/core/mr.c | 31 ++++++++++++++++---------------
+>  1 file changed, 16 insertions(+), 15 deletions(-)
+>
+> diff --git a/drivers/vdpa/mlx5/core/mr.c b/drivers/vdpa/mlx5/core/mr.c
+> index 2197c46e563a..8c80d9e77935 100644
+> --- a/drivers/vdpa/mlx5/core/mr.c
+> +++ b/drivers/vdpa/mlx5/core/mr.c
+> @@ -498,32 +498,32 @@ static void destroy_user_mr(struct mlx5_vdpa_dev *m=
+vdev, struct mlx5_vdpa_mr *mr
+>
+>  static void _mlx5_vdpa_destroy_mr(struct mlx5_vdpa_dev *mvdev, struct ml=
+x5_vdpa_mr *mr)
+>  {
+> +       if (!mr)
+> +               return;
+> +
+>         if (mr->user_mr)
+>                 destroy_user_mr(mvdev, mr);
+>         else
+>                 destroy_dma_mr(mvdev, mr);
+>
+> +       for (int i =3D 0; i < MLX5_VDPA_NUM_AS; i++) {
+> +               if (mvdev->mr[i] =3D=3D mr)
+> +                       mvdev->mr[i] =3D NULL;
+> +       }
+> +
+>         vhost_iotlb_free(mr->iotlb);
+> +
+> +       kfree(mr);
+>  }
+>
+>  void mlx5_vdpa_destroy_mr(struct mlx5_vdpa_dev *mvdev,
+>                           struct mlx5_vdpa_mr *mr)
+>  {
+> -       if (!mr)
+> -               return;
+> -
+>         mutex_lock(&mvdev->mr_mtx);
+>
+>         _mlx5_vdpa_destroy_mr(mvdev, mr);
+>
+> -       for (int i =3D 0; i < MLX5_VDPA_NUM_AS; i++) {
+> -               if (mvdev->mr[i] =3D=3D mr)
+> -                       mvdev->mr[i] =3D NULL;
+> -       }
+> -
+>         mutex_unlock(&mvdev->mr_mtx);
+> -
+> -       kfree(mr);
+>  }
+>
+>  void mlx5_vdpa_update_mr(struct mlx5_vdpa_dev *mvdev,
+> @@ -535,10 +535,7 @@ void mlx5_vdpa_update_mr(struct mlx5_vdpa_dev *mvdev=
+,
+>         mutex_lock(&mvdev->mr_mtx);
+>
+>         mvdev->mr[asid] =3D new_mr;
+> -       if (old_mr) {
+> -               _mlx5_vdpa_destroy_mr(mvdev, old_mr);
+> -               kfree(old_mr);
+> -       }
+> +       _mlx5_vdpa_destroy_mr(mvdev, old_mr);
+>
+>         mutex_unlock(&mvdev->mr_mtx);
+>
+> @@ -546,8 +543,12 @@ void mlx5_vdpa_update_mr(struct mlx5_vdpa_dev *mvdev=
+,
+>
+>  void mlx5_vdpa_destroy_mr_resources(struct mlx5_vdpa_dev *mvdev)
+>  {
+> +       mutex_lock(&mvdev->mr_mtx);
+> +
+>         for (int i =3D 0; i < MLX5_VDPA_NUM_AS; i++)
+> -               mlx5_vdpa_destroy_mr(mvdev, mvdev->mr[i]);
+> +               _mlx5_vdpa_destroy_mr(mvdev, mvdev->mr[i]);
+> +
+> +       mutex_unlock(&mvdev->mr_mtx);
+>
+>         prune_iotlb(mvdev->cvq.iotlb);
+>  }
+> --
+> 2.42.0
+>
 
-I think this is fine via your tree.
-
-Feel free to add
-Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-to patch 2 if the commit id is not yet final.
 
