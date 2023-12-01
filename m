@@ -1,86 +1,95 @@
-Return-Path: <kvm+bounces-3144-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3145-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B91E9801027
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 17:32:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F5F6801074
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 17:46:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74F822819F5
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 16:32:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AED7A281C21
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 16:46:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5309A4D5A2;
-	Fri,  1 Dec 2023 16:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B16495E4;
+	Fri,  1 Dec 2023 16:46:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sb81ttRM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="euADoSzL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B8A7193
-	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 08:32:22 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5c62c98f682so724046a12.2
-        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 08:32:22 -0800 (PST)
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B557EF1
+	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 08:46:09 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-5c6065d5e1bso753748a12.3
+        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 08:46:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701448342; x=1702053142; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1701449169; x=1702053969; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/K7HE0EB9COwZnWNHAn0RCBpw/EJerDEKjS1XCTH01o=;
-        b=sb81ttRMy+4zDNQ3pBlsxtaovroVp6bOprAEQjGOKZqjl1VlY+AH9qes2XuFym/dfG
-         6CuzeVxgDSh9s0x9SwuRY13U5jo+e2pb6iECKRbtETREHex7+URnpkgizRdvBlz1HXTW
-         76EyyQiNlpCB4mzeGDYPdrwL5DaneL/LhpWQpBczUPRDmyQYZnrX0syjuG/4EQ01t97R
-         SHPpnoajTXJ6aBkl5urglMFAJ/1iIU0lNpMN6zmXGl8X4HZUCkhXPPnT8hMRI4NbKcYl
-         JtcD83MLhirCDMETTLLZJEN7n5PAUn/i8+b4fZp2csdMq4EL0J4/GdFNWwm6osa5slxq
-         p/zQ==
+        bh=trs7IYTBAladXDE5IaepbZIO/2tonStqNHjIpFvn3vs=;
+        b=euADoSzLorY/O7MB9yfNpJpPfxoNMGBO3gjrEsVfcNQz9tRw6XmQ/1zpmS71Losjt3
+         CJHRuy/XC9ljcvoz5vNCUkuoG+AtKf1oV5AHeIvQLIZZ+0dAB6WherAiuFBBpdNzt/76
+         LPk/xT3A4NA96rQDeslproDTJJqCTFVb7Iff8vkHNQpSjG3ZwvQdT5JDBY2mIQ0LHjMY
+         uR+A5pAqsJUB7fkNUvycOfyAdpxKVJCrhgAHKpF1r4kiy9VdEX46e+Vct1InogC1s8aZ
+         Yxx4FSwb74EB8UyIL6zLDr9eixEFdsyzCeTa2jKyUUnpVgclXx+yKtPNstLsqYXcg3gy
+         gGGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701448342; x=1702053142;
+        d=1e100.net; s=20230601; t=1701449169; x=1702053969;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/K7HE0EB9COwZnWNHAn0RCBpw/EJerDEKjS1XCTH01o=;
-        b=kB402TWvFWE2cW4/kXlVqROGLbEhPUouE/m0acHHsOUdiuNay9jslYyoPOghNBpdGT
-         CMLCF9Lx60h3UeTcWCtilnDxav1K3qwl+eThR69nbnCR3UdS1aYadGEhDBmDwDCOCA+m
-         Dk1kiVexP7Yciw/U/feQXVvFDgVVRiCJBJF2DC9RR5xKXfKKQIWtuGz7dGVxLhgLwBq4
-         G5JHcSYDfZhN82qOJ8HXdEhLwBhjzhgqNw58z+XSEqin0C2SR6AGqcf2qjNqCDuEyeOm
-         +H2ZeQN6+34xJg490rFO3V9UBlb3sYRCKRBqNilYy7SlyyNnsP3KVV9X3KotbcY7CRka
-         /UuA==
-X-Gm-Message-State: AOJu0Yw0JUNoJsYE8s05SXq+G6eFLg7D+MNREauiaDmE6eiKQgZ2PCMo
-	5+Y2TIKGwlJGB7u4jxpCF8V434Qisn8=
-X-Google-Smtp-Source: AGHT+IH1lYPeVLhg1fK/372dKtjjpuPIbf/djPz/KyZw6BQ3OgmjhAtwIR2bi7SaI0dtlhyObZ26zc2sufk=
+        bh=trs7IYTBAladXDE5IaepbZIO/2tonStqNHjIpFvn3vs=;
+        b=OL7YcQxsgGmBWHGqvCuVsJ9ZL65JvdWsHeq2muR7AR2XHbwEGFAuq+hzDsWpgV2/Yk
+         8il0kpIik5CuwVWKRAwLmAtw/OyQmbEtVq3dQLsHOQSOvLRipnhq3j6upHp+C8g9zk3E
+         LHLYm4wnH6fcXuWlUaJx9pmjhhIgSPOFai7+SQ0TH1iiCZPV5mjtQkoaPeqX+wf08+9W
+         rCAbnL81kPDiuOC1h/uuj4DEW/57OuPspoUIv8cRB27VI/uZKMJQ0UG+ipU5ErvSW01P
+         oIosn6FJPuduqVCTS0nMuPsw39e0I7zYg4Has//jVLpxSbWmBp9UnZ51TASbheGl0BQy
+         li8w==
+X-Gm-Message-State: AOJu0Ywpy7Fb28ZnvELvpkCO62Lwoem+QChuh9Rf0Wy4pwEMUo06aQTE
+	b7Z51V1qxZAtlJ6KBOP7ElVMJPzP+yw=
+X-Google-Smtp-Source: AGHT+IHP6cpnWG2mRsa2jQK18nXdBIOg5lQS/IldF/fWR8ov2oZkzKlOr+NQV16UJWxtTBgPXNo0z0l997Q=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:211f:0:b0:5bd:bbb4:5275 with SMTP id
- h31-20020a63211f000000b005bdbbb45275mr3949230pgh.10.1701448342043; Fri, 01
- Dec 2023 08:32:22 -0800 (PST)
-Date: Fri, 1 Dec 2023 08:32:20 -0800
-In-Reply-To: <CXD4TVV5QWUK.3SH495QSBTTUF@amazon.com>
+ (user=seanjc job=sendgmr) by 2002:a65:620b:0:b0:5bd:3c9d:42aa with SMTP id
+ d11-20020a65620b000000b005bd3c9d42aamr3892944pgv.7.1701449169223; Fri, 01 Dec
+ 2023 08:46:09 -0800 (PST)
+Date: Fri, 1 Dec 2023 08:46:07 -0800
+In-Reply-To: <20231201104536.947-1-paul@xen.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231108111806.92604-1-nsaenz@amazon.com> <20231108111806.92604-6-nsaenz@amazon.com>
- <f4495d1f697cf9a7ddfb786eaeeac90f554fc6db.camel@redhat.com> <CXD4TVV5QWUK.3SH495QSBTTUF@amazon.com>
-Message-ID: <ZWoKlJUKJGGhRRgM@google.com>
-Subject: Re: [RFC 05/33] KVM: x86: hyper-v: Introduce VTL call/return
- prologues in hypercall page
+References: <20231201104536.947-1-paul@xen.org>
+Message-ID: <ZWoNzzYiZtloNQiv@google.com>
+Subject: Re: [PATCH 0/2] KVM: xen: update shared_info when long_mode is set
 From: Sean Christopherson <seanjc@google.com>
-To: Nicolas Saenz Julienne <nsaenz@amazon.com>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com, 
-	anelkz@amazon.com, graf@amazon.com, dwmw@amazon.co.uk, jgowans@amazon.com, 
-	kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com, 
-	x86@kernel.org, linux-doc@vger.kernel.org
+To: Paul Durrant <paul@xen.org>
+Cc: David Woodhouse <dwmw2@infradead.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Dec 01, 2023, Nicolas Saenz Julienne wrote:
-> > To support this I think that we can add a userspace msr filter on the HV_X64_MSR_HYPERCALL,
-> > although I am not 100% sure if a userspace msr filter overrides the in-kernel msr handling.
+On Fri, Dec 01, 2023, Paul Durrant wrote:
+> From: Paul Durrant <pdurrant@amazon.com>
 > 
-> I thought about it at the time. It's not that simple though, we should
-> still let KVM set the hypercall bytecode, and other quirks like the Xen
-> one.
+> This series is based on my v9 of my "update shared_info and vcpu_info
+> handling" series [1] and fixes an issue that was latent before the
+> "allow shared_info to be mapped by fixed HVA" patch of that series allowed
+> a VMM to set up shared_info before the VM booted and then leave it alone.
 
-Yeah, that Xen quirk is quite the killer.
+Uh, what?   If this is fixing an existing bug then it really shouldn't take a
+dependency on a rather large and non-trivial series.  If the bug can only manifest
+as a result of said series, then the fix absolutely belongs in that series.
 
-Can you provide pseudo-assembly for what the final page is supposed to look like?
-I'm struggling mightily to understand what this is actually trying to do.
+This change from patch 1 in particular:
+
+ -static int kvm_xen_shared_info_init(struct kvm *kvm, u64 addr, bool addr_is_gfn)
+ +static int kvm_xen_shared_info_init(struct kvm *kvm)
+
+practically screams for inclusion in that series which does:
+
+ -static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
+ +static int kvm_xen_shared_info_init(struct kvm *kvm, u64 addr, bool addr_is_gfn)
+
+Why not get the code right the first time instead of fixing it up in a completely
+different series?
 
