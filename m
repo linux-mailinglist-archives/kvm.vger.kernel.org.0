@@ -1,259 +1,247 @@
-Return-Path: <kvm+bounces-3073-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3074-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7DF98005CA
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 09:36:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C5FA8005FB
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 09:40:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B9ABB212E5
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 08:36:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A82C21F20ED2
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 08:40:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABA11C699;
-	Fri,  1 Dec 2023 08:36:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C3C1C29A;
+	Fri,  1 Dec 2023 08:40:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Uje+JAoo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d/JMISoE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB7121734;
-	Fri,  1 Dec 2023 00:36:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701419805; x=1732955805;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=MCgYLcYgkOax5YtbmCdjJgLnyCnJeNlAADAWrK5xm/U=;
-  b=Uje+JAooEq8wykulTUBsiK5S6YS81tbpwEnpSO02rd5exuGH/rZfsYv1
-   XjanPqwPxUQJkqp4rLa5e5xGPCeiPpsHFI62BKSpoS2l5RpjCd23jzcco
-   rboAmKnBbHfS0mIoYVBG19g1/OM/hxpMSAFXnBZYuJjT04XyZvtW5Jey1
-   PSh7bE6yD2eGLgXLc0Yd0cJtESLeoCKgYaxfboClGVXC/rsbdRtl+Z2IW
-   wFkXCjwJmRJO3GJRb+LWDyFp5Pc8VJ2CqBvjEqLFgY3mVuGvk/9U6kH0B
-   kSmuOkEj7wbwgseGy2jCz5npUSBmTOqROa3Qlgz8kXNVMbH/k9LvgMxIa
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="383858789"
-X-IronPort-AV: E=Sophos;i="6.04,241,1695711600"; 
-   d="scan'208";a="383858789"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 00:36:45 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="745921780"
-X-IronPort-AV: E=Sophos;i="6.04,241,1695711600"; 
-   d="scan'208";a="745921780"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Dec 2023 00:36:36 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Fri, 1 Dec 2023 00:36:35 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Fri, 1 Dec 2023 00:36:35 -0800
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.41) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Fri, 1 Dec 2023 00:36:35 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WB3zjnz89tYSXS/ZvxnZoMelfaQqEgUSrQYzCCPf/9208mn9WJzfGBKDjidy/voawvuylWcd+0gW781Q1HrulFIJsfBKTtK+3qSvtXMKahC3Okxct9B/JHawjyHAsz+6K4jiVn4Ar291/Z9EW0xJxAo8u66NxgXy7pZsCGwrFeH+b0zdhvzWkJfALaWzIRQ5h/AjOjs6oiptGoTtReKIu+AVOIYB+D/v6+i+gFMTBS2/KfIcNLvxbvq78KQ2qG0GY+XoL5QBE1xU0OMfTthgCgwU5dWMDnLRPvKInACumrjS/3uKlkSOcfooTQjaPep3Rx4CU7iy/mpOE4/KbgvdTw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FimKDzaa/dqn+BsDlHORWANuL00hza7iwFGj4qIxFtI=;
- b=K4OLg90agjCPOAr6Gg9aMl1iNSteL5fMBkJso0CLUaE6/VUVKpxPlUT7BTBZIOPpUsdV4VzJ4is/mgngO09IHDN8gpbD4Cw+xtOGt4O+O4VddPRVCraU0in6oQu7rbaSNwhHcPpAxWVxunzzKUTylKdVumIjLj6OeHo6Ul/1ZGV4k6Lmdab7h7ZhpGb3XNYozQUOZLkqE9/7oMwTPPS1TlxAzkq31bv0UsinSMSufCTFM5J1fB8hss1vdC5fvbnpwSh6zlpOCxd6uTg3KPOMpcDiEtegH26F3e6faxCRLySPA9Z3QH0RjyRD8cCCNct+Ar7h13r/dDQn9//pPkASww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
- by DS7PR11MB7907.namprd11.prod.outlook.com (2603:10b6:8:db::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.27; Fri, 1 Dec
- 2023 08:36:33 +0000
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::ea04:122f:f20c:94e8]) by PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::ea04:122f:f20c:94e8%2]) with mapi id 15.20.7046.027; Fri, 1 Dec 2023
- 08:36:33 +0000
-Message-ID: <0112b446-ee7e-4b78-b3a4-671d3ba67299@intel.com>
-Date: Fri, 1 Dec 2023 16:36:23 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 06/26] x86/fpu/xstate: Create guest fpstate with guest
- specific config
-Content-Language: en-US
-To: Maxim Levitsky <mlevitsk@redhat.com>
-CC: <dave.hansen@intel.com>, <pbonzini@redhat.com>, <seanjc@google.com>,
-	<peterz@infradead.org>, <chao.gao@intel.com>, <rick.p.edgecombe@intel.com>,
-	<john.allen@amd.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20231124055330.138870-1-weijiang.yang@intel.com>
- <20231124055330.138870-7-weijiang.yang@intel.com>
- <e1469c732e179dfd7870d0f4ba69f791af0b5d57.camel@redhat.com>
-From: "Yang, Weijiang" <weijiang.yang@intel.com>
-In-Reply-To: <e1469c732e179dfd7870d0f4ba69f791af0b5d57.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SGXP274CA0019.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b8::31)
- To PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 317221718
+	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 00:40:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701420040;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LGk4QvSN2JqDycRctvYjdFxpYw1DpmiQEHZnHJsO+SM=;
+	b=d/JMISoEYckzlpsmxLC7ihHWBjbT+V7IUImYCNDH3WrSFagfefIK+TO7HPlhv4tcTDmncX
+	tw/hNb6ZmcIxLIrVTYSTi7t+wYuo2ANGsuHTM7bbf8ySrkN5IYgRMXz6PA6miX2j9qMXVj
+	q0f5sPTay9BynHbjvYOV6Rgaj2iIn9c=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-rb5-KHCSMfmClUFmT9eCNA-1; Fri, 01 Dec 2023 03:40:39 -0500
+X-MC-Unique: rb5-KHCSMfmClUFmT9eCNA-1
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-6ce03f65b97so82019b3a.0
+        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 00:40:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701420038; x=1702024838;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LGk4QvSN2JqDycRctvYjdFxpYw1DpmiQEHZnHJsO+SM=;
+        b=FczsK+qzEhJlmv/19Htoo50WRjhPdZOn64pypR8ihAXLpH1ftEJ8A6gn+rUlKKz1Jj
+         M8qfmco0I133ZsIkyMJVOkrE3Bda3svCIXsd5CAZI+1mNKI7pO5YH9wwgYPUkqwhEPly
+         Ammsl3W01Yvk3dJhcwpefXLoJ6WayjGqE3YGv/UwbMFTSWQXNrSrmoltqwJxhTn8gKgP
+         x3ERL0rlGKAyYTqJ0C9OG4YXA3AMpGRJyDGy+gMP241PammV08rjqZI5RvWgECzHSynY
+         n7N8tO8OboRW/7rxYGPitS5Do7UxCwqN8H/skdi5zTAL5Nh4Tm9PNmSBBbk8/pv1RAI4
+         xQjw==
+X-Gm-Message-State: AOJu0YzNLsLduTPmbQir7jNXOjBEOvzk8BF/dw6lthQYbklIY44QIIz4
+	M2PYTC8QXxB62ih/2Ndb5c+Kw32BecmmcAxGcbmk5o2R0Yt2dYIMbdARrNqS8VIM/tFaNH8fLoP
+	o8LKLiE1TCSIt
+X-Received: by 2002:a05:6a20:42aa:b0:187:4a56:9a06 with SMTP id o42-20020a056a2042aa00b001874a569a06mr29345862pzj.5.1701420037888;
+        Fri, 01 Dec 2023 00:40:37 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFz3MKfwYqiw8IkFt7xxoAsTvTdxN5g5PACruI74hM2WEQIwJm8mzlNOuUNMVTm6CRhjqiO9g==
+X-Received: by 2002:a05:6a20:42aa:b0:187:4a56:9a06 with SMTP id o42-20020a056a2042aa00b001874a569a06mr29345847pzj.5.1701420037504;
+        Fri, 01 Dec 2023 00:40:37 -0800 (PST)
+Received: from [10.72.112.54] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id b10-20020a170902b60a00b001c613091aeasm2750920pls.297.2023.12.01.00.40.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Dec 2023 00:40:37 -0800 (PST)
+Message-ID: <bb0d7490-ca51-e98b-e5af-0f65bc044529@redhat.com>
+Date: Fri, 1 Dec 2023 16:40:32 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|DS7PR11MB7907:EE_
-X-MS-Office365-Filtering-Correlation-Id: 11b98808-49c5-4894-b95c-08dbf2489f69
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pIW9PHkNpjXwPlHm2c0J5+yrpkX6nm4Yfg2ps/wiU3KAkNskM0x7/DL4hRUP8oVRp4JPoZDcPYfv4o34LSTOnR2Kjx1FZxbGbrJBS0qG/lff6wBUI9+OokB/TbrwhKqv52nnzIvN3w19IW+XLVkGfDUZqnFyDSsfXHIx0hDUhbzLj2xRY48Mxf+eJejPa7McUmKMxZ0sJeLTh9yYLNSjZoowSdukuvaBME+aeoPvmXvyfhYF/vQWQyAX8x46BfM19wlrkkWJGvQ85iLkzKvQpZ9iKIh09Ggr9uAyXec8UQ4Zgv1kBcx48rUQBfMgpEKwVSkfujIa5OnZpejXc1qqREAlCqyuot3Hja+rNMTQF6oWCYTUX6yEVNoQYCUPjEtLJEM+IiMTh+ys4MGDN7gXYXaR4mPcvF4YQJ164zypHAge20fYRMErFWUGFVtBf3Pb2q8v10l/AnR70qDVUgxVva2z0GBFnXTHQeELCn0BGPARTJv0GrTTFE71RyrSWNfeQYEnbQLUOY7zvDm3wU78CyMMYVN0lDudniqhIkabOzgEnOYzZTIqnjs+u7+QYeoSgemhNwUZyojNp81q6OcP24UwT4PEbrh3RhTz8uIgp7CTwgPOdiMNXG/jlGLmTaRJmHv0RsTSIP++tQ6eSihSMw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(366004)(136003)(396003)(376002)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(2616005)(31686004)(8936002)(8676002)(86362001)(53546011)(6506007)(83380400001)(82960400001)(6512007)(4326008)(26005)(478600001)(6486002)(6666004)(66476007)(66946007)(66556008)(6916009)(316002)(2906002)(38100700002)(36756003)(41300700001)(31696002)(5660300002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?U0EvOGhOU2tEbG40OUZ0dnNRWEpyYkdlZ3Y4SFFackl0VU9ONTI0aVZvUDJp?=
- =?utf-8?B?U2ErV0Q1QnB2UWt3NEdDL1B3Q0pFMEYwUTNObVkvQXZhR3lack5LUXliTXlI?=
- =?utf-8?B?dG0rZGtLZjlnMkR2Q1JwOW13UFg1elJIa0Q5c1RPdzIyZWtFNVhxSlU0UHZj?=
- =?utf-8?B?RnNYZnJKTys5eWN2Z0dLdThLb0dleUlJcTRUcEdHRC9SWVZtemV2NnFhU3NC?=
- =?utf-8?B?Rlp4a3VJQ0Nwcmc0UmJqQlBHblhsV3JGa1NReVZrSUdCRlMxSHZrdWVnTHRy?=
- =?utf-8?B?NDVSYU96Z0llVzJNTXpJQmRQMW1DSlorMEZUY0tMSVRZWWE1UTNtalRjaTF3?=
- =?utf-8?B?S2UrYm03MUk3aVltMW82K2IycXViVjdpc1NLYXRLY3p0Zm5IdnM2bWV0SU1Y?=
- =?utf-8?B?SHllaTM2ejRUdHJQWkc5VWROUHVoaTRoalBJb3dTNnVQZTRIbG5ncGFOK2FB?=
- =?utf-8?B?d2NWMytqWWZrN2dTZC8yMzg0N3gvUjZab3loQ3hWVE9BQXV2YmFDYzZMcUl6?=
- =?utf-8?B?V3lOMEJBUUU3VkV6L0lxZG1pMkZBQ0dtR2lqOG9SK0ttVisrcUYyekswV2dl?=
- =?utf-8?B?a1hqYmQwT3BidlYyYzJDL0dINFNuMzV3ano1R3lzZDAvUjNOa21UNGJFL1lz?=
- =?utf-8?B?OW1mb3ZSeThYano0RDl4ZmdHVGwzYjhhNEw1SlROMHRtT3lidW1rVFZuMVlw?=
- =?utf-8?B?RWxheTJnckNvUG90RU9CeW9LQVBJZUVqRHFTbVRPamtTS3U5OVRJVEZlREg3?=
- =?utf-8?B?U0tHcXN1U3l5SngxY0lhMmVHblBEeWRlSWVPVGtTa2JYU2V2ZmttN0xacVZ6?=
- =?utf-8?B?K1BZdFhqcW5aYVFsdksxK01oZWpzK2hLUWNoTGpHeW9oS25nZEVCaTdDQmV0?=
- =?utf-8?B?dHZ1Y0FPYlZ2bGVQL015cFp0dkQ2NVVJSG5MdmRpc1lQeitWMms5ZnAzNFNs?=
- =?utf-8?B?MmtGdTJSQkVsMmJ1QklibFd2YTZwa0lzaUtjVGxrNWtqVEQ3SWkzSHlzMWFS?=
- =?utf-8?B?enNaYnVSU1VCdG1HNGxmMzZUb3RHWVhFWnhqcHYvOCtsUEljL09rR0tJSWQ0?=
- =?utf-8?B?bU5hMlZVejl0REsvZU9xUHhsRllzczRyY1ZFR2cvUFJOaWw3Qlp5aXNBTVNx?=
- =?utf-8?B?N1VTS242cG1HUnE2aHYrNlQwdE9SZVhxOC80UXpCRXpiTEU0dGRWMGpMTE5v?=
- =?utf-8?B?MDFBK2J2NUVoYzlneGdRV1lHU1o3bnd6cUhjbmNQMm9QcTRySnNyRjJKR2ZN?=
- =?utf-8?B?N1VJYUpGSlZqeDUrV0dxTnJOOXZ3V2hSM1RpbnNoazhkemhYRkpRYTJLM3Ba?=
- =?utf-8?B?MnZkZkZBdFFiOWNOM3BwcWZHcit2ZTBqUUFZVjEyckt0aFhVZSt2MzFCT24y?=
- =?utf-8?B?R2lFVGprTUFRaXNSbDAwcHA0azJlUSs3UEtRa0FkYmU1RDdiTDJlRXB6MlA0?=
- =?utf-8?B?TE4xMHExa1JHblVQN0VRekN5b0J5UEdQUDlnZk4rSlZSWWFPMFl0SEY4RktZ?=
- =?utf-8?B?bS9Iak9Dakdib1dUT2JnV3VQdFNWUm8ycDd4WkhGTmZmZkFvMndMS1hISHQ1?=
- =?utf-8?B?Z2IrNHZuc05McTdwU3lKcWYvR3lVYU9KNTF1dURBR3pzdEJUSVB1T0hyVmZk?=
- =?utf-8?B?SXdJa004NTRZTWVHajV6Y2JnUmlNOUJnVmhaS3M3NHlwK0RITE5WRjRPck0x?=
- =?utf-8?B?ZDQvVWtqUzZ1SUFwTXgyd2hiYm5SZmxtbkJYMjVYK3pXcUtPbTV3SnpLalYz?=
- =?utf-8?B?Vk1melBpMkgwTDBRSWlyMjlWYnEwdHRUU2Y0REtjd2dHaHU5U3MvR1B2bGMy?=
- =?utf-8?B?RC9PbUxUSUR2YzVKcUQvc2QvUG5RMUdxMzJVUVpKUlB0dVdYbnh6ZDBXUXpu?=
- =?utf-8?B?ODJ2aFhuZDN3TVpJcDNaOUwxbVl4cmNBRTRDVUlGMExsZFlEbkg3YUFyREw5?=
- =?utf-8?B?bmQrQ1ZOQ3I3RFNQVVNRc2NCd0NxR0t3YlRKS3hlRWFHMm1iL2pPVzRwSW84?=
- =?utf-8?B?UEk1b3FLTGVReUJIMzdiVGoyWlp0TzIvdFdRR0pvclErQWZUcUcwdC9aeVFJ?=
- =?utf-8?B?VVR2ZmZCTlV1SnRvOWZBcGhjMGFTSW8wbHVxc0cyZnZrdW9INVl1NWlTMGFW?=
- =?utf-8?B?MktyK1laWDFSTmFGc2xXekR3QkEyY2pzVEx4aWhTVFNPd3ltQ0orK0VmYUJK?=
- =?utf-8?B?Y1E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 11b98808-49c5-4894-b95c-08dbf2489f69
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2023 08:36:33.6413
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ecfrUcTKwG3DBY2b5/b0x7X3pggVVxGx+xn0lxeMeWlq5I/pK4kO5TqKCnHVVvWoY/kP7HLMmLVIOK870RIk6g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB7907
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [kvm-unit-tests PATCH v1 00/18] arm/arm64: Rework cache
+ maintenance at boot
+Content-Language: en-US
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Andrew Jones <andrew.jones@linux.dev>, kvmarm@lists.linux.dev,
+ David Woodhouse <dwmw@amazon.co.uk>, Eric Auger <eric.auger@redhat.com>,
+ kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
+ linuxppc-dev@lists.ozlabs.org, Nadav Amit <namit@vmware.com>,
+ Nico Boehr <nrb@linux.ibm.com>, Nikos Nikoleris <nikos.nikoleris@arm.com>,
+ Thomas Huth <thuth@redhat.com>
+References: <20231130090722.2897974-1-shahuang@redhat.com>
+ <ZWhlf7ZLTZIZ3qcQ@raptor>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <ZWhlf7ZLTZIZ3qcQ@raptor>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 12/1/2023 1:36 AM, Maxim Levitsky wrote:
+Hi Alexandru,
 
-[...]
+Just take your time. I also appreciate your work. :)
 
->> +	fpstate->user_size	= fpu_user_cfg.default_size;
->> +	fpstate->user_xfeatures	= fpu_user_cfg.default_features;
-> The whole thing makes my head spin like the good old CD/DVD writers used to ....
->
-> So just to summarize this is what we have:
->
->
-> KERNEL FPU CONFIG
->
-> /*
->     all known and CPU supported user and supervisor features except
->     - "dynamic" kernel features" (CET_S)
->     - "independent" kernel features (XFEATURE_LBR)
-> */
-> fpu_kernel_cfg.max_features;
->
-> /*
->     all known and CPU supported user and supervisor features except
->      - "dynamic" kernel features" (CET_S)
->      - "independent" kernel features (arch LBRs)
->      - "dynamic" userspace features (AMX state)
-> */
-> fpu_kernel_cfg.default_features;
->
->
-> // size of compacted buffer with 'fpu_kernel_cfg.max_features'
-> fpu_kernel_cfg.max_size;
->
->
-> // size of compacted buffer with 'fpu_kernel_cfg.default_features'
-> fpu_kernel_cfg.default_size;
->
->
-> USER FPU CONFIG
->
-> /*
->     all known and CPU supported user features
-> */
-> fpu_user_cfg.max_features;
->
-> /*
->     all known and CPU supported user features except
->     - "dynamic" userspace features (AMX state)
-> */
-> fpu_user_cfg.default_features;
->
-> // size of non compacted buffer with 'fpu_user_cfg.max_features'
-> fpu_user_cfg.max_size;
->
-> // size of non compacted buffer with 'fpu_user_cfg.default_features'
-> fpu_user_cfg.default_size;
->
->
-> GUEST FPU CONFIG
-> /*
->     all known and CPU supported user and supervisor features except
->     - "independent" kernel features (XFEATURE_LBR)
-> */
-> fpu_guest_cfg.max_features;
->
-> /*
->     all known and CPU supported user and supervisor features except
->      - "independent" kernel features (arch LBRs)
->      - "dynamic" userspace features (AMX state)
-> */
-> fpu_guest_cfg.default_features;
->
-> // size of compacted buffer with 'fpu_guest_cfg.max_features'
-> fpu_guest_cfg.max_size;
->
-> // size of compacted buffer with 'fpu_guest_cfg.default_features'
-> fpu_guest_cfg.default_size;
+Thanks,
+Shaoqin
 
-Good suggestion! Thanks!
-how about adding them in patch 5 to make the summaries manifested?
+On 11/30/23 18:35, Alexandru Elisei wrote:
+> Hi,
+> 
+> Thank you so much for reviving this, much appreciated.
+> 
+> I wanted to let you know that I definitely plan to review the series as
+> soon as possible, unfortunately I don't believe I won't be able to do that
+> for at least 2 weeks.
+> 
+> Thanks,
+> Alex
+> 
+> On Thu, Nov 30, 2023 at 04:07:02AM -0500, Shaoqin Huang wrote:
+>> Hi,
+>>
+>> I'm posting Alexandru's patch set[1] rebased on the latest branch with the
+>> conflicts being resolved. No big changes compare to its original code.
+>>
+>> As this version 1 of this series was posted one years ago, I would first let you
+>> recall it, what's the intention of this series and what this series do. You can
+>> view it by click the link[2] and view the cover-letter.
+>>
+>> Since when writing the series[1], the efi support for arm64[3] hasn't been
+>> merged into the kvm-unit-tests, but now the efi support for arm64 has been
+>> merged. Directly rebase the series[1] onto the latest branch will break the efi
+>> tests. This is mainly because the Patch #15 ("arm/arm64: Enable the MMU early")
+>> moves the mmu_enable() out of the setup_mmu(), which causes the efi test will
+>> not enable the mmu. So I do a small change in the efi_mem_init() which makes the
+>> efi test also enable the MMU early, and make it works.
+>>
+>> And another change should be noticed is in the Patch #17 ("arm/arm64: Perform
+>> dcache maintenance"). In the efi_mem_init(), it will disable the mmu, and build
+>> a new pagetable and re-enable the mmu, if the asm_mmu_disable clean and
+>> invalidate the data caches for entire memory, we don't need to care the dcache
+>> and after mmu disabled, we use the mmu_setup_early() to re-enable the mmu, which
+>> takes care all the cache maintenance. But the situation changes since the Patch
+>> #18 ("arm/arm64: Rework the cache maintenance in asm_mmu_disable") only clean
+>> and invalidate the data caches for the stack memory area. So we need to clean
+>> and invalidate the data caches manually before disable the mmu, I'm not
+>> confident about current cache maintenance at the efi setup patch, so I ask for
+>> your help to review it if it's right or not.
+>>
+>> And I also drop one patch ("s390: Do not use the physical allocator") from[1]
+>> since this cause s390 test to fail.
+>>
+>> This series may include bug, so I really appreciate your review to improve this
+>> series together.
+>>
+>> You can get the code from:
+>>
+>> $ git clone https://gitlab.com/shahuang/kvm-unit-tests.git \
+>> 	-b arm-arm64-rework-cache-maintenance-at-boot-v1
+>>
+>> [1] https://gitlab.arm.com/linux-arm/kvm-unit-tests-ae/-/tree/arm-arm64-rework-cache-maintenance-at-boot-v2-wip2
+>> [2] https://lore.kernel.org/all/20220809091558.14379-1-alexandru.elisei@arm.com/
+>> [3] https://patchwork.kernel.org/project/kvm/cover/20230530160924.82158-1-nikos.nikoleris@arm.com/
+>>
+>> Changelog:
+>> ----------
+>> RFC->v1:
+>>    - Gathered Reviewed-by tags.
+>>    - Various changes to commit messages and comments to hopefully make the code
+>>      easier to understand.
+>>    - Patches #8 ("lib/alloc_phys: Expand documentation with usage and limitations")
+>>      are new.
+>>    - Folded patch "arm: page.h: Add missing libcflat.h include" into #17
+>>      ("arm/arm64: Perform dcache maintenance at boot").
+>>    - Reordered the series to group patches that touch aproximately the same code
+>>      together - the patches that change the physical allocator are now first,
+>>      followed come the patches that change how the secondaries are brought online.
+>>    - Fixed several nasty bugs where the r4 register was being clobbered in the arm
+>>      assembly.
+>>    - Unmap the early UART address if the DTB address does not match the early
+>>      address.
+>>    - Added dcache maintenance when a page table is modified with the MMU disabled.
+>>    - Moved the cache maintenance when disabling the MMU to be executed before the
+>>      MMU is disabled.
+>>    - Rebase it on lasted branch which efi support has been merged.
+>>    - Make the efi test also enable MMU early.
+>>    - Add cache maintenance on efi setup path especially before mmu_disable.
+>>
+>> RFC: https://lore.kernel.org/all/20220809091558.14379-1-alexandru.elisei@arm.com/
+>>
+>> Alexandru Elisei (18):
+>>    Makefile: Define __ASSEMBLY__ for assembly files
+>>    powerpc: Replace the physical allocator with the page allocator
+>>    lib/alloc_phys: Initialize align_min
+>>    lib/alloc_phys: Consolidate allocate functions into memalign_early()
+>>    lib/alloc_phys: Remove locking
+>>    lib/alloc_phys: Remove allocation accounting
+>>    lib/alloc_phys: Add callback to perform cache maintenance
+>>    lib/alloc_phys: Expand documentation with usage and limitations
+>>    arm/arm64: Zero secondary CPUs' stack
+>>    arm/arm64: Allocate secondaries' stack using the page allocator
+>>    arm/arm64: assembler.h: Replace size with end address for
+>>      dcache_by_line_op
+>>    arm/arm64: Add C functions for doing cache maintenance
+>>    arm/arm64: Configure secondaries' stack before enabling the MMU
+>>    arm/arm64: Use pgd_alloc() to allocate mmu_idmap
+>>    arm/arm64: Enable the MMU early
+>>    arm/arm64: Map the UART when creating the translation tables
+>>    arm/arm64: Perform dcache maintenance at boot
+>>    arm/arm64: Rework the cache maintenance in asm_mmu_disable
+>>
+>>   Makefile                   |   5 +-
+>>   arm/Makefile.arm           |   4 +-
+>>   arm/Makefile.arm64         |   4 +-
+>>   arm/Makefile.common        |   6 +-
+>>   arm/cstart.S               |  71 +++++++++++++++------
+>>   arm/cstart64.S             |  76 +++++++++++++++++------
+>>   lib/alloc_phys.c           | 122 ++++++++++++-------------------------
+>>   lib/alloc_phys.h           |  28 ++++++---
+>>   lib/arm/asm/assembler.h    |  15 ++---
+>>   lib/arm/asm/cacheflush.h   |   1 +
+>>   lib/arm/asm/mmu-api.h      |   1 +
+>>   lib/arm/asm/mmu.h          |   6 --
+>>   lib/arm/asm/page.h         |   2 +
+>>   lib/arm/asm/pgtable.h      |  39 ++++++++++--
+>>   lib/arm/asm/thread_info.h  |   3 +-
+>>   lib/arm/cache.S            |  89 +++++++++++++++++++++++++++
+>>   lib/arm/io.c               |  31 ++++++++++
+>>   lib/arm/io.h               |   3 +
+>>   lib/arm/mmu.c              |  37 ++++++++---
+>>   lib/arm/processor.c        |   1 -
+>>   lib/arm/setup.c            |  82 +++++++++++++++++++++----
+>>   lib/arm/smp.c              |   5 ++
+>>   lib/arm64/asm/assembler.h  |  11 ++--
+>>   lib/arm64/asm/cacheflush.h |  37 +++++++++++
+>>   lib/arm64/asm/mmu.h        |   5 --
+>>   lib/arm64/asm/pgtable.h    |  50 +++++++++++++--
+>>   lib/arm64/cache.S          |  85 ++++++++++++++++++++++++++
+>>   lib/arm64/processor.c      |   1 -
+>>   lib/devicetree.c           |   2 +-
+>>   lib/powerpc/setup.c        |   9 ++-
+>>   powerpc/Makefile.common    |   1 +
+>>   powerpc/cstart64.S         |   1 -
+>>   powerpc/spapr_hcall.c      |   5 +-
+>>   33 files changed, 642 insertions(+), 196 deletions(-)
+>>   create mode 100644 lib/arm/asm/cacheflush.h
+>>   create mode 100644 lib/arm/cache.S
+>>   create mode 100644 lib/arm64/asm/cacheflush.h
+>>   create mode 100644 lib/arm64/cache.S
+>>
+>> -- 
+>> 2.40.1
+>>
+> 
 
-> ---
->
->
-> So in essence, guest FPU config is guest kernel fpu config and that is why
-> 'fpu_user_cfg.default_size' had to be used above.
->
-> How about that we have fpu_guest_kernel_config and fpu_guest_user_config instead
-> to make the whole horrible thing maybe even more complicated but at least a bit more orthogonal?
-
-I think it becomes necessary when there were more guest user/kernel xfeaures requiring
-special handling like CET-S MSRs, then it looks much reasonable to split guest config into two,
-but now we only have one single outstanding xfeature for guest. IMHO, existing definitions still
-work with a few comments.
-
-But I really like your ideas of making things clean and tidy :-)
-
+-- 
+Shaoqin
 
 
