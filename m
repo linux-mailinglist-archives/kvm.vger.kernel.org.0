@@ -1,67 +1,67 @@
-Return-Path: <kvm+bounces-3112-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3121-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAB8B800BCE
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 14:27:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6976B800C24
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 14:31:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96E41281B26
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 13:27:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB2CD281BA0
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 13:31:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F319C38DD6;
-	Fri,  1 Dec 2023 13:26:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BCEC38F9C;
+	Fri,  1 Dec 2023 13:31:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cutsJ9WW"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RIYsZjuB"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F85410FC;
-	Fri,  1 Dec 2023 05:26:54 -0800 (PST)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B1DKZuW024224;
-	Fri, 1 Dec 2023 13:26:42 GMT
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5831131;
+	Fri,  1 Dec 2023 05:31:19 -0800 (PST)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B1DUwZ3028267;
+	Fri, 1 Dec 2023 13:31:11 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=reBjbPAr8Lkq8KH0ouJiy4zNFmnDKKwSU4TDkA31Z8w=;
- b=cutsJ9WWoIoTfhaQcqd+PZgdeA2hm2jYz6ITFEi/7AMW+aupyNTuexfyYXcPLeB9FrKO
- KfkWGy88EuPsQ3vq56FAtZsruW/WT5cgUHc4qRBl3nzCgpGmhtvI1knU41t6KXEv1lpL
- bHl6eaktKL0EK432SxMBt4XgzQccUh1zOHR83td85TWh0F8zUDVCYLJG1JcXDl02+Oh+
- oQVrmdHYvSKi+aP73fqBIE3uxHui3LCJAPltO3vzICBnj2H1LgfkGQ2wQ55j44MbcAAS
- K8XLx8evFP+Omy3mxLqbK335gtQ16uk8CQEOxbHED6pbzzglR/LkYLBhAhRNvwo5ttfe Uw== 
+ bh=BWnJtPbJ3XZMPnoKoEcKPgJH5uYYE/qMtxR3t/1Rv3I=;
+ b=RIYsZjuBrCr1Zf3kogSap4u/AQPM0kqXp/70YAuequx2a6nxX5SSEUYg/fvd61ca0EzV
+ 21JdARQgzXjqaac0kqH69d7GfljceE4iT6ttgN52ql0faW39T4OCcF19gN5g8+rUruhO
+ Sx4ucoX7I2RV6egs900nA/Dg7mGmeCs4kjj8TLBoRGccKdakHiXQbUuyY4tRlxaAwTTS
+ ChyFTJeOweIaKhfk1JTPQNgDEYa0SsVw+WMKIrLiU/lyaaX+naccnwcocLNhl+ipemeB
+ lBz94JZy9CGmLXxoII7q6GK/I7JBfheATXEZGK07hP2jn79MNGxMaS8MJdYHcq0GDM/v Kw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uqg5pgas6-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uqf2m3ju5-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Dec 2023 13:26:42 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B1DKnWO026405;
-	Fri, 1 Dec 2023 13:26:42 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uqg5pgarp-1
+	Fri, 01 Dec 2023 13:31:10 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B1DV88Y029262;
+	Fri, 1 Dec 2023 13:31:10 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uqf2m3jgw-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Dec 2023 13:26:41 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B1AXqV2017327;
-	Fri, 1 Dec 2023 13:26:41 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ukwy2cpp8-1
+	Fri, 01 Dec 2023 13:31:10 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B1AXnOk006257;
+	Fri, 1 Dec 2023 13:26:46 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ukwfkmu6g-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Dec 2023 13:26:40 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B1DQcEi22020696
+	Fri, 01 Dec 2023 13:26:45 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B1DQhG947317472
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 1 Dec 2023 13:26:38 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1975C20043;
-	Fri,  1 Dec 2023 13:26:38 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 65F6520040;
-	Fri,  1 Dec 2023 13:26:34 +0000 (GMT)
+	Fri, 1 Dec 2023 13:26:43 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F208B2004B;
+	Fri,  1 Dec 2023 13:26:42 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2C5AE20040;
+	Fri,  1 Dec 2023 13:26:39 +0000 (GMT)
 Received: from vaibhav?linux.ibm.com (unknown [9.171.33.138])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Fri,  1 Dec 2023 13:26:34 +0000 (GMT)
-Received: by vaibhav@linux.ibm.com (sSMTP sendmail emulation); Fri, 01 Dec 2023 18:56:33 +0530
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Fri,  1 Dec 2023 13:26:38 +0000 (GMT)
+Received: by vaibhav@linux.ibm.com (sSMTP sendmail emulation); Fri, 01 Dec 2023 18:56:38 +0530
 From: Vaibhav Jain <vaibhav@linux.ibm.com>
 To: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
         kvm-ppc@vger.kernel.org
@@ -72,9 +72,9 @@ Cc: Vaibhav Jain <vaibhav@linux.ibm.com>, Nicholas Piggin <npiggin@gmail.com>,
         paulus@ozlabs.org, sbhat@linux.ibm.com, gautam@linux.ibm.com,
         kconsul@linux.vnet.ibm.com, amachhiw@linux.vnet.ibm.com,
         David.Laight@ACULAB.COM
-Subject: [PATCH 02/12] KVM: PPC: Book3S HV nestedv2: Avoid reloading the tb offset
-Date: Fri,  1 Dec 2023 18:56:07 +0530
-Message-ID: <20231201132618.555031-3-vaibhav@linux.ibm.com>
+Subject: [PATCH 03/12] KVM: PPC: Book3S HV nestedv2: Do not check msr on hcalls
+Date: Fri,  1 Dec 2023 18:56:08 +0530
+Message-ID: <20231201132618.555031-4-vaibhav@linux.ibm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231201132618.555031-1-vaibhav@linux.ibm.com>
 References: <20231201132618.555031-1-vaibhav@linux.ibm.com>
@@ -86,61 +86,51 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 81ERVNiWMnhXug-5T7_6O1UY1zhYZLRm
-X-Proofpoint-ORIG-GUID: toCyy_pzqNcXE-ExZ1Y6S_r9gSatfJc_
+X-Proofpoint-GUID: kX9HCWWBJV-DDTez68iHM7jwNN0-ZBrr
+X-Proofpoint-ORIG-GUID: nC_KWy1LXcwZLYSesdz9d97IvNnbpPdY
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-12-01_11,2023-11-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 adultscore=0 phishscore=0 mlxlogscore=696 spamscore=0
- malwarescore=0 impostorscore=0 mlxscore=0 bulkscore=0 clxscore=1015
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2312010092
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 spamscore=0 adultscore=0 phishscore=0 bulkscore=0
+ suspectscore=0 mlxlogscore=877 mlxscore=0 lowpriorityscore=0
+ impostorscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2311060000 definitions=main-2312010092
 
 From: Jordan Niethe <jniethe5@gmail.com>
 
-The kvmppc_get_tb_offset() getter reloads KVMPPC_GSID_TB_OFFSET from the
-L0 for nestedv2 host. This is unnecessary as the value does not change.
-KVMPPC_GSID_TB_OFFSET also need not be reloaded in
-kvmppc_{s,g}et_dec_expires().
+The check for a hcall coming from userspace is done for KVM-PR. This is
+not supported for nestedv2 and the L0 will directly inject the necessary
+exception to the L2 if userspace performs a hcall. Avoid checking the
+MSR and thus avoid a H_GUEST_GET_STATE hcall in the L1.
 
 Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
 ---
- arch/powerpc/include/asm/kvm_book3s.h | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
-index a37736ed3728..3e1e2a698c9e 100644
---- a/arch/powerpc/include/asm/kvm_book3s.h
-+++ b/arch/powerpc/include/asm/kvm_book3s.h
-@@ -594,13 +594,17 @@ static inline u##size kvmppc_get_##reg(struct kvm_vcpu *vcpu)		\
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 5543e8490cd9..069c336b6f3c 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -1688,7 +1688,7 @@ static int kvmppc_handle_exit_hv(struct kvm_vcpu *vcpu,
+ 	{
+ 		int i;
  
+-		if (unlikely(__kvmppc_get_msr_hv(vcpu) & MSR_PR)) {
++		if (!kvmhv_is_nestedv2() && unlikely(__kvmppc_get_msr_hv(vcpu) & MSR_PR)) {
+ 			/*
+ 			 * Guest userspace executed sc 1. This can only be
+ 			 * reached by the P9 path because the old path
+@@ -4949,7 +4949,7 @@ static int kvmppc_vcpu_run_hv(struct kvm_vcpu *vcpu)
+ 		if (run->exit_reason == KVM_EXIT_PAPR_HCALL) {
+ 			accumulate_time(vcpu, &vcpu->arch.hcall);
  
- KVMPPC_BOOK3S_VCORE_ACCESSOR(vtb, 64, KVMPPC_GSID_VTB)
--KVMPPC_BOOK3S_VCORE_ACCESSOR(tb_offset, 64, KVMPPC_GSID_TB_OFFSET)
- KVMPPC_BOOK3S_VCORE_ACCESSOR_GET(arch_compat, 32, KVMPPC_GSID_LOGICAL_PVR)
- KVMPPC_BOOK3S_VCORE_ACCESSOR_GET(lpcr, 64, KVMPPC_GSID_LPCR)
-+KVMPPC_BOOK3S_VCORE_ACCESSOR_SET(tb_offset, 64, KVMPPC_GSID_TB_OFFSET)
-+
-+static inline u64 kvmppc_get_tb_offset(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->arch.vcore->tb_offset;
-+}
- 
- static inline u64 kvmppc_get_dec_expires(struct kvm_vcpu *vcpu)
- {
--	WARN_ON(kvmhv_nestedv2_cached_reload(vcpu, KVMPPC_GSID_TB_OFFSET) < 0);
- 	WARN_ON(kvmhv_nestedv2_cached_reload(vcpu, KVMPPC_GSID_DEC_EXPIRY_TB) < 0);
- 	return vcpu->arch.dec_expires;
- }
-@@ -608,7 +612,6 @@ static inline u64 kvmppc_get_dec_expires(struct kvm_vcpu *vcpu)
- static inline void kvmppc_set_dec_expires(struct kvm_vcpu *vcpu, u64 val)
- {
- 	vcpu->arch.dec_expires = val;
--	WARN_ON(kvmhv_nestedv2_cached_reload(vcpu, KVMPPC_GSID_TB_OFFSET) < 0);
- 	kvmhv_nestedv2_mark_dirty(vcpu, KVMPPC_GSID_DEC_EXPIRY_TB);
- }
- 
+-			if (WARN_ON_ONCE(__kvmppc_get_msr_hv(vcpu) & MSR_PR)) {
++			if (!kvmhv_is_nestedv2() && WARN_ON_ONCE(__kvmppc_get_msr_hv(vcpu) & MSR_PR)) {
+ 				/*
+ 				 * These should have been caught reflected
+ 				 * into the guest by now. Final sanity check:
 -- 
 2.42.0
 
