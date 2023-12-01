@@ -1,93 +1,73 @@
-Return-Path: <kvm+bounces-3170-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3171-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06B858014BD
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 21:44:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED61C80155D
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 22:30:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEC1D281DFE
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 20:43:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3DB71F20FBE
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 21:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8BCB58AB7;
-	Fri,  1 Dec 2023 20:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A616959B5B;
+	Fri,  1 Dec 2023 21:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FdgPe+TR"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="5GwAGUSN"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2081.outbound.protection.outlook.com [40.107.220.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0F16F1;
-	Fri,  1 Dec 2023 12:43:45 -0800 (PST)
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2056.outbound.protection.outlook.com [40.107.96.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 593EC10D0
+	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 13:30:16 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dY1A/mR8MeSrmlAaMH9A7DphZKzDMiKjWjAnVTxxzkDisbistosZSHLsyvYqb9tejgDCuWgDufJ3u3JN5mZjGdBaF0gIdRIa+iitcZ5dSBbLXqSYSbSh8eOotNxav5UuliA9h8Y95C3rm+TLSPrt68kJbVrdk9ClFr6lnAtCw9DeYAgAQaF/aVEIB4D+hgjrGZUa9u8XbgnOu/2+ztOJoBYGbBsmlg6WSt6tEzyzIPfn1B8Uhxy03v0kE/NHy4v5mnKKzrW39UJ7tjugpxx2jmkn/ZblEQdZW0p2OWfen+x05gcgqzlakXuo/0YPJ7xeZKddyBfFP66rMJwZhUpY1Q==
+ b=EOfNVyo9uz2UZPHKStzsWyh5ANAJ5qP7ROiBFCr9RBwwFuyM2ILGN8Yfpmi0lQO0PUTnEKnjcYl43amJNRCaLtGDtr84L/m3Pd+CJpgadQ092ws1fGnyK/m+8IDHoSJMqsfJkEMnrWqWQ7/awGXXOnk1bTQ5uozuvzfuB3W+QlHeZj3noREKX5TFtgyQaklRduyD8WdptyPuK8FlKW0j8Og7/fQ1HxOJX1Xx4VuNJEGw58Ee+tKDejlAIEaEm5FVWy0sG9Cm2jOeZnug+/BBEiZ/owTnfaRnrZUqS/ehfcs0NLkPfOtVFUjv2pJ1gmoLJAMf8OYlywhCYFIwhC1TTA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qXhWGgPhFcPgX9xjyOaqsavFkzyBCViMhx9CiIVyDFU=;
- b=NumEE/HByvFbnaCTs+KOmIXkPJM3A8LErFYbr8lhH3bfzd7ywqbZ92lMkp+xTohpsCR/rJqDGnZA33N4+y5WqqOM9KIMI6PERYnum958REDcQE7YJDvwGiuY2q7bLbRDI2hQhHs7Ti9FO82tVZl1zYwe4+uw7ked/g+qHSL2M+KgSRrEZ2/1MpUObBNihBvFB7ZTgzo74k/H148wjjAAeEKm3fF2G1TABHgW9UC+XvmIvKRdf35jGHOYm4U4KLL4+kul0x64D5LXSLTujdozJ6hOHlAcFa33XoA4shJYmIcs1B7SO/4OmP5NjYFgwWJJ8ayfTai7+352hLPS+kXYtg==
+ bh=y7grFkskxn17T1GfjS2r+qgQycbs4+bd6fc/nGugBMs=;
+ b=UNkp8vOIOFSguXQiUu8DEo9i+Avo5E/V9EmZXM362N0Jdr1eJbSQkPTrhGx+q6uDViKKi9pchtz5Ga7OXCxmDc3ky3jTXdIQo4qzOzws+0AXNe1/3qEm+kCEkqa1KGACnfbDcbKEJ9/0Nj3UmaKEumALGT4dhM46Ai8wI46W4SXLVBpuTb73upUcLaGVOAorHI92ckdbD5rNok7mV3WUuzFHHUdIEEfsb1H7XGV2kl2B5+DX/7X3F1ExxY+ImgDxbJrW3CF1Uss/HFmQqkOPW5c/05kirIOU0rz9rzUdK1P8TLkZOFYZ4UD6YNXsiwn2Xj95oo9JneUQiAfHvjrzsw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qXhWGgPhFcPgX9xjyOaqsavFkzyBCViMhx9CiIVyDFU=;
- b=FdgPe+TRlCR62HtvsIrGU4biNBZaL7gZfmKyUYtShxmpfMbWThEinUh2KvAXmbBPeCF0bCMW7f3Fgxhifg8hPgbKd6HVMQyspnXVaINiC0injzqPbL5F+QgD3BvYzYhXG3xE37Dr/HmspikHbm1Px7pGwKzdbftwBQuMz8q3j/aTAmU1WH0XhsIar48659G7healPsb8DtRWZGzxsKLujLE4sSlgPw/NiGpHaLITKT4Cg5WfAtq09nVMbB9HXRfnWvNIjXL6Lm64UOrwJdZc5sYUT7f75tyxhcCcOGkeOMFVDoPFMXqu2U9HkoQz6tusDEY1qHy51mEZpXcxjMHFHA==
+ bh=y7grFkskxn17T1GfjS2r+qgQycbs4+bd6fc/nGugBMs=;
+ b=5GwAGUSNSMT27YnMezVOmbp2SqjIlqu3rzXUWX4l/ULeHj7Q8Z2ChwqOxi8+IvDyIx0iDG0BsRDoleI7E6ZZcu0e9uCDUDnn0wjQNCbVzvzhxgLbKtUg8iyaZ96Neec7hk2qTSYzpHDcPb4+m5Ur1tSczr4jcN4GfhNoZ50R7wU=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH8PR12MB8432.namprd12.prod.outlook.com (2603:10b6:510:25b::11) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by LV3PR12MB9329.namprd12.prod.outlook.com (2603:10b6:408:21c::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.23; Fri, 1 Dec
- 2023 20:43:42 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7046.027; Fri, 1 Dec 2023
- 20:43:42 +0000
-Date: Fri, 1 Dec 2023 16:43:40 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Nicolin Chen <nicolinc@nvidia.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
-	"joro@8bytes.org" <joro@8bytes.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-	"cohuck@redhat.com" <cohuck@redhat.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-	"peterx@redhat.com" <peterx@redhat.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
-	"lulu@redhat.com" <lulu@redhat.com>,
-	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-	"Zeng, Xin" <xin.zeng@intel.com>,
-	"Zhao, Yan Y" <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v6 2/6] iommufd: Add IOMMU_HWPT_INVALIDATE
-Message-ID: <20231201204340.GA1493156@nvidia.com>
-References: <20231129005715.GS436702@nvidia.com>
- <ZWaPM4p7yjJ0sEKk@Asurada-Nvidia>
- <20231129195804.GF436702@nvidia.com>
- <ZWe2PvatTkkyNCY5@Asurada-Nvidia>
- <20231130000816.GB1389974@nvidia.com>
- <ZWjzcEAAg8ptVH4A@Asurada-Nvidia>
- <20231201004523.GJ1389974@nvidia.com>
- <ZWlhLk3JVwX0hRt/@Asurada-Nvidia>
- <20231201125538.GK1389974@nvidia.com>
- <ZWo6z59tnmS8F2V7@Asurada-Nvidia>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZWo6z59tnmS8F2V7@Asurada-Nvidia>
-X-ClientProxiedBy: BLAPR03CA0164.namprd03.prod.outlook.com
- (2603:10b6:208:32f::20) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.27; Fri, 1 Dec
+ 2023 21:30:14 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::3341:faaf:5974:f152]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::3341:faaf:5974:f152%7]) with mapi id 15.20.7046.024; Fri, 1 Dec 2023
+ 21:30:14 +0000
+Message-ID: <f3299f0b-e5c8-9a60-a6e5-87bb5076d56f@amd.com>
+Date: Fri, 1 Dec 2023 15:30:11 -0600
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [RFC PATCH 0/4] KVM: SEV: Limit cache flush operations in sev
+ guest memory reclaim events
+Content-Language: en-US
+To: Mingwei Zhang <mizhang@google.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: Jacky Li <jackyli@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Ovidiu Panait <ovidiu.panait@windriver.com>,
+ Liam Merwick <liam.merwick@oracle.com>, David Rientjes
+ <rientjes@google.com>, David Kaplan <david.kaplan@amd.com>,
+ Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org,
+ Michael Roth <michael.roth@amd.com>
+References: <20231110003734.1014084-1-jackyli@google.com>
+ <ZWogUHqoIwiHGehZ@google.com>
+ <CAL715WKVHJqpA=VsO3BZhs9bS9AXiy77+k-aMEh+FGOKZREp+g@mail.gmail.com>
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <CAL715WKVHJqpA=VsO3BZhs9bS9AXiy77+k-aMEh+FGOKZREp+g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SN7PR04CA0236.namprd04.prod.outlook.com
+ (2603:10b6:806:127::31) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -95,109 +75,114 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH8PR12MB8432:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0bbd76af-52fa-4082-8b92-08dbf2ae345e
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|LV3PR12MB9329:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0cf1a59d-9f50-4934-d5fd-08dbf2b4b445
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	CNJwY14vg7JUj3g73X8ZpgOeTFSMv8Vz3yDYxO0jtWhj+iJSf2FnlzczQSeopXyJ8JxjGz/C6jyM3KZ9W3AvR0w5Up3ao+Y/54MoV81aEeJAqkuRNmJ3I5vJ1X+5GY9OYYFc2hqX1FOgUDq+8byWebUTsEhz5AAgECCrVD5Qp4fOqZ5hqdd6MQ02NaqtfsrsbFNafS84pM6BQnxxPyoZTPl3L7sSrZYdD6flXoWaSGXO9whGorx1wUfG/m5iRyfCqz06Ylf0qFyFhd+yq57Kw7e4i0nSYrOjxt9npgY05QYkZOfcsEBxMkIoE4L59WAxzZ1SF/gCwLmODw4CqYRj2FaR5OdnAVwCYnKYAQ1yDq5BBvOpANXSB9lAiMkhgVY0Sh6DzC/ub4oHew/dSy8O9VbQQYdh9qY/HDpE9SBbP6wYdrrjxhL2QdvpV56YrLgj1YnoqMJPuYisVr8+4SWhEDqfvFbd140c5Vc/QLQXSfLReBp2I3WlOo34/nZdzzepNIIBBua5orS6mtO41BayMGCQeklkKLB0uOXuKaZbtAkYIyEHxWnr/uzfvSvsqi8C
+	QQNXHDVgRmvV98Qmbyg+LzcnJl+OVKmYm81yJeB4k0HBX37nyTfkXlsdfpH7F63eigja8m4UBsISxCLlJfiddO9XDDAGEq67NERWuOhKbYkJJNGWeVtdv/ihKemgvDOrZtNXTAFegOE5eNxiBFqXJu39OqBMdyCoZOjYPLchRJP93aWJAYcBCTrK6k126wQj7YfXGO3e0daZlw5x7t2QBWEmieidvpr88R0mI7HEaUe1UUBMFwMYd5o7zy7SLWy2bLAnsUlcr6QHGBkdsVEQfv/ld3DY0kdIg1qoFcvPtv5JcyVuBDxQb9LrnNm0MTn0+zxYxWhe6OVmnD7Yc5knEDw6qM7yWSsApNHhfWhaqmJtCJC4YPlQeLZIZ02O5FUWydwpZI/zOyITEtV64D0S4JFjpSwXKqHNK71W/C/zYCwarimiZMFmSSL1RleMM+xlDGR1YwXFFtP+dS7/z6nQjJeoFm06m8LuDkJVNBzUIa1O/mTiHUad+qWAlR43pYXSNmXJg/aoaw1mGLZJYHLVRnDLtn44u56I88jxJ8ChLLiViM9p4m1fx8t8G74+6tuaW/yfaOPkku8pzeu3MhpLA5SHDJnvPgLzjfVYkRIG1GnocSy4tQGqtI1wB4s+4TNq9IsnROKYDIayZu5hqmVLlg==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(346002)(366004)(376002)(136003)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(83380400001)(33656002)(478600001)(2906002)(6512007)(36756003)(6506007)(8676002)(6862004)(4326008)(8936002)(41300700001)(6486002)(38100700002)(316002)(66476007)(66946007)(6636002)(66556008)(37006003)(5660300002)(7416002)(86362001)(26005)(54906003)(1076003)(2616005);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(39860400002)(136003)(376002)(366004)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(66899024)(83380400001)(38100700002)(31696002)(36756003)(86362001)(66946007)(110136005)(8936002)(4326008)(8676002)(54906003)(316002)(66556008)(66476007)(5660300002)(2906002)(31686004)(6512007)(53546011)(2616005)(478600001)(6486002)(6506007)(26005)(6666004)(41300700001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?IQuJB/I3jOxexilN3IvfYPLeNtha3jt57LFklCI4giHK7RJuBHaCAhH8DO4b?=
- =?us-ascii?Q?0OotVvrT451wdDeDh1jyOsYQF+/SVAZIaFw64i8ILurC7P+NDnYswT+xYOP7?=
- =?us-ascii?Q?ushO5ZL8N3/em4IVzPLai2IBi1UNsh7I+vFGPglMppUfi/D5IHngoG6rNusH?=
- =?us-ascii?Q?mPUu/JWEVk9i53cgC9O2/kMpJh3Vhwis+1loSvewfuGkoN0aj4Tf34f49acz?=
- =?us-ascii?Q?oq151ClLvKCU62uotMndQz4/RHDOiziBNjVe9vO4iS2FpvdM8wKp9ojUtKFD?=
- =?us-ascii?Q?cHlNs0xHzHiw6PcBA4X5/ykKsNnHpt5ZMerWWzBL8ZyJ0Y1Dw//v9/An4mpl?=
- =?us-ascii?Q?y7i+KUga2GzDVTPPavIw5iox/NK4LGBwKRv6kYEbMgp5R/zMrvFO1z53zE0E?=
- =?us-ascii?Q?N507OEP/l9nRVVCp7KrB+iMK51nB0vv4ryVNoNg6SsOnLZxvGrFVdJCAfoX/?=
- =?us-ascii?Q?e/Vn+NTGTX26TRWq1GyNDWsZ3cVkBYMhqbQFnu8rnJnRVs0ihLm5W8Asebbw?=
- =?us-ascii?Q?13TLOJgZsNS/qIigglwL5OD+2WSAI4j0uqxlhBRQ9aw2YI5r6F4FyBM4X2p+?=
- =?us-ascii?Q?uMFGa1JNkK8RoAwv/cve/QV1000Yun0ZwwaktOCQL/axevINKpx2uyuvLPKX?=
- =?us-ascii?Q?D1nOkQYZNXp1qtaX3pyGmzYNEJp5UJUIX7d9NkthIqHggJHInBHC3GpJ5SdD?=
- =?us-ascii?Q?uehocOMgq4Bk63LIHlyqvFo88li3KXajH3cYFrN7B/Wy+tAb/vwXW4XiAgjH?=
- =?us-ascii?Q?5TossCLaV9oppP9aX88/cjc+h9zP6zfm/08O/mgIlefKWGXIlOXEj2hNeDIP?=
- =?us-ascii?Q?2W4ZClqXeHRJx1Md908WEIlQRZUmT0xZvu9gKiQ424FyREiQEV1Dc3IkdXcd?=
- =?us-ascii?Q?0OWtJxFY03Ulmci47R1Hh61c3SjBnzB0C5+4+u9Dk7p958iMSNIoCxCqg6kt?=
- =?us-ascii?Q?307exeL8VED0baLMixC9ox0QDWNlic6/NJIXhKVyq7z3ovrXNzpANqmTEQMg?=
- =?us-ascii?Q?I653YD3ofb2RPr1F/r8goAi7GCmt/MFV8KU4mWY7mNIWUtbALTtcPxrEbiU/?=
- =?us-ascii?Q?H1uUZZJ8jHsCBDsIlF9GxXC0Z6BmVynu43Iu60ALuD+yUUOkYKvOiYxy72Ip?=
- =?us-ascii?Q?TNpBx4RWLHzkdn0PWk1hA/3kSpWIRPefPcmCSKQBlmVhFAuS9gpZnmBscq4W?=
- =?us-ascii?Q?aaIXC6+YgBcXTEVy3omrQX+vax+Muk6oW8vPO5PA/7Yn4+X18geRfAiUqzsV?=
- =?us-ascii?Q?01lBhoLIx3fcq417FPtKBEk21Qdi4ZeqG1iEVqdkmBftphAU0qOSKqUMxmS8?=
- =?us-ascii?Q?tFiwUSM0niPp0APsIZobOgpoGqNmrOMl2ywExt6zQnhqklTE5/52n5x3DSWJ?=
- =?us-ascii?Q?vQ0FHMYnnx40vBTyAIatborqBsm7Tj4Q7FOYl8QITbidjkyqmDUP19kCCZLF?=
- =?us-ascii?Q?VmzMwWoqTqY+alQ3MnvawGWuaJAUju6fnWascyo7pdvL6tlL5I4VwIQNAthU?=
- =?us-ascii?Q?Nm4zQCOmC6hRGscl1rjLOHwXl2lnsfm5l5wMfssvo0vOd9lTJ7WbQagIawTb?=
- =?us-ascii?Q?nWnngeZB/An44uVo9nhnQ7os4d35wqxQtzF3M7Go?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0bbd76af-52fa-4082-8b92-08dbf2ae345e
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+	=?utf-8?B?Rm82REU3UDRBbHFxdFhrejJYZTdZRUVPWHYrbWFudmVMNnQrWGdyTGZZOFdN?=
+ =?utf-8?B?VWJnWGl3SGdZMTkvNC9WYnFNcjk2MWRtdFpwQUdMOFg1cGIxaThzTStlRDNQ?=
+ =?utf-8?B?emRJckNGTlV0dnZseThub2IwYnlEOGg4RTdLWmRWdGJjS2F3YUZXRWpkamln?=
+ =?utf-8?B?czVBRTc4WFlPNVZPYnU4dGp2dDhEVmV3MTdSNTU0UGNGR2FFNHNLRVEyQlhJ?=
+ =?utf-8?B?bGZWWlZGRjQwVy9hZi9GeXc4V05iUmtGNEVuOEE0WFR6U0dGRXJqcE5Nb1pa?=
+ =?utf-8?B?dnJsQmtOSUdHS3JMd2N0aWdQQUxud2NkK0g2R1ZrckZBU2RJUTlZb1k2KzVE?=
+ =?utf-8?B?WGdFWjJTK3BZVk16cUZMZVo1WTZBc0dVQlBmeUZxMnp5R204R2RwS2t1VlBF?=
+ =?utf-8?B?UnQvUUgrWllVaWtCVXNzZzVOYURjY0NuNFlMQzFJNEFFNFpiZnU2Y2Vzb2RX?=
+ =?utf-8?B?ZVZsck1YR3o3Mmx6Ym8wL2VoTXUyV3RqbUVQQ3FNcHkySnV3ZlFmandOcnpk?=
+ =?utf-8?B?bHlEU2FGTDF5NDBuSXJHSXB4QjkrcTZaVFV0K001SUJ0dkdja204WVo4T2ZH?=
+ =?utf-8?B?TmZCZU5Ma3VJeUIzQzBZOEpONlJqbEpBWnlTRFcrOWpDaVgxOTE2WVFxU003?=
+ =?utf-8?B?RTVyZndqVnFMMGloa2pNZzBJWElYb29qZjhLclJpS2phTzFncTR2MlUzSlo2?=
+ =?utf-8?B?b1pDMDJNUGZSQlVoR2NLTFpPRnpGNU1la0tUTGowSmtMSytRK3NRZlNrL3BN?=
+ =?utf-8?B?SDM5Uk9KQkQ1djR1UjBDbzZ2ckVFV2p5RGZHWmlUblUzMFBTSDY5TEEvVVJH?=
+ =?utf-8?B?VTNXTyswbjdhQThDZ2ZpcTBHZXFSSkNSWlVwNlcyMlNCQTVyZTVkMGg0OTB0?=
+ =?utf-8?B?ZTVmakwzK1RyN2gyZWJmZFNCNFdPVTlpalF5VTJHODZIRk5iQTZwRkx3Y3FL?=
+ =?utf-8?B?QlpsOVNTRm4zRlhLa2U5dDRtVlFSYldCbHBURFIzLzVtWjJ3d3d4WlR0Wlhs?=
+ =?utf-8?B?d2NoaEZJS1ZIUGFuVVZZbWhvVCtJMzVnZWgreFRmei9FSjNpRE01eXBKYXRs?=
+ =?utf-8?B?eG1TVzlYSzhVU3BOM2NrdjluNjNWVjlhazlRWE1YRVMzZDlYd1pvUHQ0bEZT?=
+ =?utf-8?B?cU9ma3JCeDI0YmR1LytnckNiWHpKNG1Iam5VYnNaRTQxZlg1QVlIbGI0K0xP?=
+ =?utf-8?B?QmxXMXZpaC9FaG54ZFZrTDJYM3pZRjAvdmYyRmpXckVKWENHS2VJUmpNelpV?=
+ =?utf-8?B?d0FIQVhLQmVTem51NjBzelhpbjk0THBrNlVmUmY5cW9SWm12SFRmRnBUaVdK?=
+ =?utf-8?B?Vy9nKzJrOFJJNEVEcFdsU28zUHFQZ3pnS1Nmb0FjZjdPU01TbDVYckNxc0l3?=
+ =?utf-8?B?dlJ3aVllL3VHUCsxU3hNL2FJODlvY3d0QVNDdE0vNkxqdGNxWkNpdDNzUytl?=
+ =?utf-8?B?K3lPOVhxN1hpU3pBY2Vxd1RNcmgyVDZlYkY3OGppOUhidXJVZzh2WTlsdWhr?=
+ =?utf-8?B?VzJPSkxHRXg3YzNUSGc1TkY5Q2xaZm1jTTgvV3ZHd2ZXL2p6N0pZcFhuSVg1?=
+ =?utf-8?B?cDNLeHFLS01Fd05vSWV6Znp1MEtJdkFMR0xsd1hielZxWE80Y3UyRGJKZkxI?=
+ =?utf-8?B?NzA3M3BIN0J0emxWNmc0ZjVZdGF3RlNCdEVMVS9qVFFXMUJTV0YvSk9rNmxo?=
+ =?utf-8?B?cGVGaWpRS1pOTTdjMzVoZ1l1VE5hU2RpS3FrRUpKZ0t6USt1RkdDVVJDS1ky?=
+ =?utf-8?B?UlU5RmhYMTEyeDBFVmw1QmZCNzVSdE93QWovU3M1cWpGbCttOTd4OFJkeDdu?=
+ =?utf-8?B?YkpreUdZQmkyRTlNeEwrVU9YMG4wMFpBY0hlWmYxMnpIZnRBUU9jcUJWQTB2?=
+ =?utf-8?B?SW5pQnNOMWR4QkNtSER3Zkk1Yk52RVdjbFdmaWJTa0IvWUZzcS9UNnlWRWRn?=
+ =?utf-8?B?WnlkaDl6NS9Bek9ZSmlTU1UrcDJ3TzY2VU1Ua3FlbWh6RzJielpGSEhiNHhq?=
+ =?utf-8?B?THRNcXlCOFlHYWkvdXE1UVlnVmFWTFcrRGFQNFl1VlkzME02ZDN5aGQyRCtt?=
+ =?utf-8?B?VEltdC9pcUtDTnZHblBJMjZsUjFqR2J3dzhBU0hRN21yM2RjeVFzL3RmSldM?=
+ =?utf-8?Q?98kdUTKf7Cm93NvRfbVyKf10c?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0cf1a59d-9f50-4934-d5fd-08dbf2b4b445
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2023 20:43:42.1600
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2023 21:30:13.9578
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gPq+5zeepC6UKOLN/4yOMWGB54PRvRzeJ97Uv+wIPyODLxB44DqSHtK4COY1Bc0R
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB8432
+X-MS-Exchange-CrossTenant-UserPrincipalName: Lyl0pqbnuHPnU6zEzGd6cXV8z443CIpvQhbuTl8qrtLpuuQFuKCvafkgvu/IHXtp79VeypUR/HUDWDp0Mdq7lg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9329
 
-On Fri, Dec 01, 2023 at 11:58:07AM -0800, Nicolin Chen wrote:
-> > It seems there is not a simple way to realize this error back to
-> > userspace since we can't block the global command queue and we proceed
-> > to complete commands that the real HW would not have completed.
-> > 
-> > To actually emulate this the gerror handler would have to capture all
-> > the necessary registers, return them back to the thread doing
-> > invalidate_user and all of that would have to return back to userspace
-> > to go into the virtual version of all the same registers.
-> > 
-> > Yes, it can be synchronous it seems, but we don't have any
-> > infrastructure in the driver to do this.
-> >
-> > Given this is pretty niche maybe we just don't support error
-> > forwarding and simply ensure it could be added to the uapi later?
+On 12/1/2023 1:02 PM, Mingwei Zhang wrote:
+> On Fri, Dec 1, 2023 at 10:05 AM Sean Christopherson <seanjc@google.com> wrote:
+>>
+>> On Fri, Nov 10, 2023, Jacky Li wrote:
+>>> The cache flush operation in sev guest memory reclaim events was
+>>> originally introduced to prevent security issues due to cache
+>>> incoherence and untrusted VMM. However when this operation gets
+>>> triggered, it causes performance degradation to the whole machine.
+>>>
+>>> This cache flush operation is performed in mmu_notifiers, in particular,
+>>> in the mmu_notifier_invalidate_range_start() function, unconditionally
+>>> on all guest memory regions. Although the intention was to flush
+>>> cache lines only when guest memory was deallocated, the excessive
+>>> invocations include many other cases where this flush is unnecessary.
+>>>
+>>> This RFC proposes using the mmu notifier event to determine whether a
+>>> cache flush is needed. Specifically, only do the cache flush when the
+>>> address range is unmapped, cleared, released or migrated. A bitmap
+>>> module param is also introduced to provide flexibility when flush is
+>>> needed in more events or no flush is needed depending on the hardware
+>>> platform.
+>>
+>> I'm still not at all convinced that this is worth doing.  We have clear line of
+>> sight to cleanly and optimally handling SNP and beyond.  If there is an actual
+>> use case that wants to run SEV and/or SEV-ES VMs, which can't support page
+>> migration, on the same host as traditional VMs, _and_ for some reason their
+>> userspace is incapable of providing reasonable NUMA locality, then the owners of
+>> that use case can speak up and provide justification for taking on this extra
+>> complexity in KVM.
 > 
-> If arm_smmu_cmdq_issue_cmdlist in arm_smmu_cache_invalidate_user
-> fails with ETIMEOUT, we polls the CONS register to get the error
-> code. This can cover CERROR_ABT and CERROR_ATC_INV.
+> Hi Sean,
+> 
+> Jacky and I were looking at some cases like mmu_notifier calls
+> triggered by the overloaded reason "MMU_NOTIFY_CLEAR". Even if we turn
+> off page migration etc, splitting PMD may still happen at some point
+> under this reason, and we will never be able to turn it off by
+> tweaking kernel CONFIG options. So, I think this is the line of sight
+> for this series.
+> 
+> Handling SNP could be separate, since in SNP we have per-page
+> properties, which allow KVM to know which page to flush individually.
+> 
 
-Why is timeout linked to these two? Or rather, it doesn't have to be
-linked like that. Any gerror is effectively synchronous because it
-halts the queue and allows SW time to inspect which command failed and
-record the gerror flags. So each and every command can get an error
-indication.
+For SNP + gmem, where the HVA ranges covered by the MMU notifiers are 
+not acting on encrypted pages, we are ignoring MMU invalidation 
+notifiers for SNP guests as part of the SNP host patches being posted 
+upstream and instead relying on gmem own invalidation stuff to clean 
+them up on a per-folio basis.
 
-Restarting the queue is done by putting sync in there to effectively
-nop the failed command and we hope for the best and let it rip.
-
-> As you remarked that we can't block the global CMDQ, so we have
-> to let a real CERROR_ILL go. Yet, we can make sure commands to
-> be fully sanitized before being issued, as we should immediately
-> reject faulty commands anyway, for errors such as unsupported op
-> codes, unzero-ed reserved fields, and unlinked vSIDs. This can
-> at least largely reduce the probability of a real CERROR_ILL.
-
-I'm more a little more concerend with ATC_INV as a malfunctioning
-device can trigger this..
-
-> So, combining these two, we can still have a basic synchronous
-> way by returning an errno to the invalidate ioctl? I see Kevin
-> replied something similar too.
-
-It isn't enough information, you don't know which gerror bits to set
-and you don't know what cons index to stick to indicate the error
-triggering command with just a simple errno.
-
-It does need to return a bunch of data to get it all right.
-
-Though again, there is no driver infrastructure to do all this and it
-doesn't seem that important so maybe we can just ensure there is a
-future extension possiblity and have userspace understand an errno
-means to generate CERROR_ILL on the last command in the batch?
-
-Jason
+Thanks,
+Ashish
 
