@@ -1,138 +1,123 @@
-Return-Path: <kvm+bounces-3179-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3180-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 549488016CD
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 23:42:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3150980178D
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 00:22:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F224D1F210DA
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 22:42:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DECEA280FEC
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 23:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BD343F8DF;
-	Fri,  1 Dec 2023 22:42:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2FCF3F8F5;
+	Fri,  1 Dec 2023 23:22:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oXFPY1V9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EpPkzUDT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE552D67
-	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 14:42:16 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5c6072bc218so918844a12.1
-        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 14:42:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701470536; x=1702075336; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UHQP2r8tb6bd1CGRkfVIX9+3aPmO9CttmLCIdjw3P10=;
-        b=oXFPY1V9yIUShtwAQloV+IPuUneHKxiy9SGPGsJ7R+bSsFUiJeHhxSTR93DkwuoC4L
-         f3avR4iLVr6Y/MiuHqph7S3hrxlq6BWM4D8mSCelLcwWRhuWgXL0EFdGCRAqDjECjgk8
-         fAtnM14UIwHprfqZLkigcG8HBxgyDE8rs71LP9ROMKbmUR9Mo4kYZEL5NmxxiZ1DksK8
-         bMJVTBbXMJC1fYQSIJjHMvs5V9dIArG4/9Cg8L9Qsk0GWtW5/bPCMGzGoXvB4RqPQQvw
-         /mttsPe3yvAzv5NQhQC9hZZkDZbe3T3QArLWRfoPibQrH6StLTQ6SAhmYCzSew9MW9tH
-         AX+g==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAAD5FC
+	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 15:22:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701472933;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=2It67EXDhApMVqtGRDR3LyeWNVXSB0HYmIpaVAhnqBE=;
+	b=EpPkzUDTPWWVHvHN+rjYZHJQdcWlAtPerA334FyjcrbwMOb53Ve7kdzeD4473pvu9KH0Bp
+	B1cLUOC0XuEo9kc9MjaGB1PeR3edA9X8PK+qf4/IvBt7sxCM+8wF112FWaEazTXA/lGZjE
+	n033fas05FOuNGV6QgVCzVxyai5stw8=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-643-6xijDPXYObmU88hubWSzdg-1; Fri, 01 Dec 2023 18:22:12 -0500
+X-MC-Unique: 6xijDPXYObmU88hubWSzdg-1
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7b42af63967so6956439f.1
+        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 15:22:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701470536; x=1702075336;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=UHQP2r8tb6bd1CGRkfVIX9+3aPmO9CttmLCIdjw3P10=;
-        b=JVs5sTg/CjKQSpoJT/6FTYu3bBjd5RXa/QgoScOCAUNQMtvebUqyBaE/pH8zdeseRu
-         bqSurdJIhvfNAsPYjGaYIVrDyxmZLhTKunuUW0iAtlPqr8RCkI6iYVerIWo6U3KIt1+X
-         V96NcOkM6ByJ9XMTgqCuZ+MlIBpUNyV4B3f3+yvS0nuk5yphsBve5MWsfKpfm0eV0q8J
-         A0BPkKP5ZR3mn5BZF1QGF9H5PbEPQ9Yt2M9I0Jid8zALw8G+Kr4PneJMDx6NSbaUnMew
-         b1i5euYK/wIDoJr3PcpLN32Nh1g6OKEuSnQyHyACYAA2g+DBqkfAFdFkeyF8K7E/tuHk
-         3o5Q==
-X-Gm-Message-State: AOJu0YyWqzzys23zX9CkgEOqJMSH6I8SxzRUIlU+xFWeY68oI6vAbSeO
-	7nHbJRt/ZVdIMANU2J3z5/RnmW6KACA=
-X-Google-Smtp-Source: AGHT+IGY74ILiZ6kFcffavA5ziXE30cM9e2LiHHM8NPEBAqCg9a+sjLS36fwaaqRxQYNYiTXazm5J96YBuA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:370c:b0:283:98d1:89ee with SMTP id
- mg12-20020a17090b370c00b0028398d189eemr90056pjb.0.1701470536374; Fri, 01 Dec
- 2023 14:42:16 -0800 (PST)
-Date: Fri, 1 Dec 2023 14:42:14 -0800
-In-Reply-To: <9718326e9b187b075de2df1059325aaa58cac900.camel@infradead.org>
+        d=1e100.net; s=20230601; t=1701472932; x=1702077732;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2It67EXDhApMVqtGRDR3LyeWNVXSB0HYmIpaVAhnqBE=;
+        b=I87uU+O0dQHZ+OXzGlEmqIKh82O2C23SNA5jNpswlNYdYfZP8sUYoNI9XnMjN/XsVd
+         WmlmQn92xyhyJCaNGfXFPlhZOov56yYR4sTgIttriwVhYQmnGubjtZZswRz8vDGQWMET
+         mtb77XQ8K8ytuwCdZHaJYey0OIVTTIwfacCLMepWLiTa6LA18NPBQfAcYjOsueMibkd/
+         omO3u5Hmt/2rYJ3zGDxTkcDEqAva2WT6RITgg/RUuXaM4MtbHZ/wJI4aLy2BsLRbk/eV
+         ilm/j1QOZcVwBRzw2XNfFSkSwfL5nw4INBhkf2koCRz/8iSztyYLvph2Au8kX1teBGBJ
+         1Zxw==
+X-Gm-Message-State: AOJu0YyENITeNPG23avbvxody+mi3QUzkbKcBQVV+CauoA/703+IKUxd
+	ODKzHkkrTh4bqPorHRCzqJw3uhB/aWxyVXHRWBrXawahrF559cqejqgrIxNsm5YmEsNyDxe0sOk
+	z9qI0zq49yCeb
+X-Received: by 2002:a6b:e815:0:b0:7b4:28f8:2bf8 with SMTP id f21-20020a6be815000000b007b428f82bf8mr378567ioh.33.1701472931934;
+        Fri, 01 Dec 2023 15:22:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFazra/I71ZeyXPm/bApiqsfwZgJ1ogQvL8QHOBXoLZrytqb6Z7nk+emp8aFIg/bHDAdwCMNw==
+X-Received: by 2002:a6b:e815:0:b0:7b4:28f8:2bf8 with SMTP id f21-20020a6be815000000b007b428f82bf8mr378562ioh.33.1701472931716;
+        Fri, 01 Dec 2023 15:22:11 -0800 (PST)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id cw2-20020a05663849c200b004640db25da8sm1099439jab.131.2023.12.01.15.22.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Dec 2023 15:22:10 -0800 (PST)
+Date: Fri, 1 Dec 2023 16:22:09 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: [GIT PULL] VFIO fix for v6.7-rc4
+Message-ID: <20231201162209.1298a086.alex.williamson@redhat.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231102162128.2353459-1-paul@xen.org> <ZWi6IKGFtQGpu6oR@google.com>
- <504ca757-c5b9-4d3b-900c-c5f401a02027@xen.org> <9718326e9b187b075de2df1059325aaa58cac900.camel@infradead.org>
-Message-ID: <ZWphRnK_lwCyMSuN@google.com>
-Subject: Re: [PATCH v5] KVM x86/xen: add an override for PVCLOCK_TSC_STABLE_BIT
-From: Sean Christopherson <seanjc@google.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: paul@xen.org, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Andrew Cooper <andrew.cooper3@citrix.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 30, 2023, David Woodhouse wrote:
-> On Thu, 2023-11-30 at 16:41 +0000, Paul Durrant wrote:
-> > On 30/11/2023 16:36, Sean Christopherson wrote:
-> > > +Andrew
-> > >=20
-> > > On Thu, Nov 02, 2023, Paul Durrant wrote:
-> > > > From: Paul Durrant <pdurrant@amazon.com>
-> > > >=20
-> > > > Unless explicitly told to do so (by passing 'clocksource=3Dtsc' and
-> > > > 'tsc=3Dstable:socket', and then jumping through some hoops concerni=
-ng
-> > > > potential CPU hotplug) Xen will never use TSC as its clocksource.
-> > > > Hence, by default, a Xen guest will not see PVCLOCK_TSC_STABLE_BIT =
-set
-> > > > in either the primary or secondary pvclock memory areas. This has
-> > > > led to bugs in some guest kernels which only become evident if
-> > > > PVCLOCK_TSC_STABLE_BIT *is* set in the pvclocks. Hence, to support
-> > > > such guests, give the VMM a new Xen HVM config flag to tell KVM to
-> > > > forcibly clear the bit in the Xen pvclocks.
-> > >=20
-> > > ...
-> > >=20
-> > > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kv=
-m/api.rst
-> > > > index 7025b3751027..a9bdd25826d1 100644
-> > > > --- a/Documentation/virt/kvm/api.rst
-> > > > +++ b/Documentation/virt/kvm/api.rst
-> > > > @@ -8374,6 +8374,7 @@ PVHVM guests. Valid flags are::
-> > > > =C2=A0=C2=A0=C2=A0 #define KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(1 << 4)
-> > > > =C2=A0=C2=A0=C2=A0 #define KVM_XEN_HVM_CONFIG_EVTCHN_SEND=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-(1 << 5)
-> > > > =C2=A0=C2=A0=C2=A0 #define KVM_XEN_HVM_CONFIG_RUNSTATE_UPDATE_FLAG=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(1 << 6)
-> > > > +=C2=A0 #define KVM_XEN_HVM_CONFIG_PVCLOCK_TSC_UNSTABLE=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0(1 << 7)
-> > >=20
-> > > Does Xen actually support PVCLOCK_TSC_STABLE_BIT?=C2=A0 I.e. do we ne=
-ed new uAPI to
-> > > fix this, or can/should KVM simply _never_ set PVCLOCK_TSC_STABLE_BIT=
- for Xen
-> > > clocks?=C2=A0 At a glance, PVCLOCK_TSC_STABLE_BIT looks like it was a=
-dded as a purely
-> > > Linux/KVM-only thing.
-> >=20
-> > It's certainly tested in arch/x86/xen/time.c, in=20
-> > xen_setup_vsyscall_time_info() and xen_time_init(), so I'd guess it is=
-=20
-> > considered to be supported.
->=20
-> And yes, Xen does set it, if you jump through the right hoops to make
-> Xen actually use the TSC as its clocksource.
->=20
-> The new uAPI is just a single bit in the KVM_XEN_HVM_CONFIG
-> capabilities; I think it's reasonable enough.
+Hi Linus,
 
-Yeah, I was just hoping that maybe we could squeak by without it.  I'll get=
- this
-queued up next week, purely because I try to avoid (but often fail) pushing=
- to
--next on Fridays.
+The following changes since commit 2cc14f52aeb78ce3f29677c2de1f06c0e91471ab:
+
+  Linux 6.7-rc3 (2023-11-26 19:59:33 -0800)
+
+are available in the Git repository at:
+
+  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.7-rc4
+
+for you to fetch changes up to 4ea95c04fa6b9043a1a301240996aeebe3cb28ec:
+
+  vfio: Drop vfio_file_iommu_group() stub to fudge around a KVM wart (2023-11-30 11:27:17 -0700)
+
+----------------------------------------------------------------
+VFIO fixes for v6.7-rc4
+
+ - Fix the lifecycle of a mutex in the pds variant driver such that
+   a reset prior to opening the device won't find it uninitialized.
+   Implement the release path to symmetrically destroy the mutex.
+   Also switch a different lock from spinlock to mutex as the code
+   path has the potential to sleep and doesn't need the spinlock
+   context otherwise. (Brett Creeley)
+
+ - Fix an issue detected via randconfig where KVM tries to symbol_get
+   an undeclared function.  The symbol is temporarily declared
+   unconditionally here, which resolves the problem and avoids churn
+   relative to a series pending for the next merge window which
+   resolves some of this symbol ugliness, but also fixes Kconfig
+   dependencies. (Sean Christopherson)
+
+----------------------------------------------------------------
+Brett Creeley (2):
+      vfio/pds: Fix mutex lock->magic != lock warning
+      vfio/pds: Fix possible sleep while in atomic context
+
+Sean Christopherson (1):
+      vfio: Drop vfio_file_iommu_group() stub to fudge around a KVM wart
+
+ drivers/vfio/pci/pds/pci_drv.c  |  4 ++--
+ drivers/vfio/pci/pds/vfio_dev.c | 30 +++++++++++++++++++++---------
+ drivers/vfio/pci/pds/vfio_dev.h |  2 +-
+ include/linux/vfio.h            |  8 ++------
+ 4 files changed, 26 insertions(+), 18 deletions(-)
+
 
