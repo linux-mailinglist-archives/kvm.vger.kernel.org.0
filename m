@@ -1,201 +1,208 @@
-Return-Path: <kvm+bounces-3168-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3169-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7170A801488
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 21:35:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D18980148D
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 21:36:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DEF11C20C4A
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 20:35:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C0301C209D1
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 20:36:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFB5651C3E;
-	Fri,  1 Dec 2023 20:35:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1155453E3E;
+	Fri,  1 Dec 2023 20:36:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="OJLt+j7K"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HLmEZvFk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E771DF1
-	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 12:35:38 -0800 (PST)
-Received: by mail-qv1-xf2b.google.com with SMTP id 6a1803df08f44-67a2661560dso12557126d6.0
-        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 12:35:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1701462938; x=1702067738; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4AzPgky7GHZqZVCrwDwJ2TCTQsO5U4mu1ovBdK9ibFQ=;
-        b=OJLt+j7KnzmXZYy4ahD9VssbMGizUrYukvwM6gQ4LfJdLWK8XleQgkWmRCgnc+c7v/
-         8op0RxqTq9FaxWtyYB5Cy2gpaiBU4D+zCdqaTjgAXrHOlTb40ODJ51p7jvIi6vyeNYoq
-         XBHr+4FeMDs79xV/hxW8fvLhQV3zyTUyT0XKrSKsBZ1AjRxTGVPjnB1ip8jdP0B1+XSV
-         nyFU/90ZkZ/4xkig3Zc8X3oemfZMjRIhGR+rd5ocAFhRPrAcXNZaol8Er83+yV7Hwhx3
-         x1NRmo7gngHOjiRhRzqsfXTlTZnuj2VC1EeX3RmJz1UfgEY27ZcLIvsIUg8H04xYM1vS
-         cCBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701462938; x=1702067738;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4AzPgky7GHZqZVCrwDwJ2TCTQsO5U4mu1ovBdK9ibFQ=;
-        b=f7CXzTrz7v0ezuuYVE9gsYl8C1gjmEKIBMzmN4J3oSpsT0X12w7GviUvPfLQ9kDz6R
-         YEBujsyt4Tk5Lok2RZTavLm+8eq8kyq6P/LPnArnkC50iiW4ozX3AgmlZMFJfE+3a1fF
-         rfTDZxXVCDxbNprIYyJgZHpcI+htN5BHscTIzt3J+ZbG22NfZ5gL/okwSYLcAOKws5Da
-         JIyE6/O2gA9ooO+Z/6lmIFxU+4461zbm1nKaI/ZjIbN4g930DyBLIFYQqdxuQvMcWNZU
-         iHrDUe9A5eHoFK20WbcBKwavzpPcwZu49iWL+di3ZyQKG9eoFlVp8EVVjb9wmWw/yRbX
-         BYDg==
-X-Gm-Message-State: AOJu0YxGTWKXot/9MKLCenTROB3iQrXNx56AwGlA0MEG2yhG/KtTxa41
-	p827xv9SyPNFnW0i161/VRigtQ==
-X-Google-Smtp-Source: AGHT+IHOT0XKRw6+rggkJrfEQdv7Iu/MLVn36qFEZE0IsLTSurWkvGpPAL2i4HLowbNDECNd3sEozQ==
-X-Received: by 2002:a0c:efc1:0:b0:67a:a721:d761 with SMTP id a1-20020a0cefc1000000b0067aa721d761mr48951qvt.71.1701462937778;
-        Fri, 01 Dec 2023 12:35:37 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-134-23-187.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.134.23.187])
-        by smtp.gmail.com with ESMTPSA id y16-20020ac85250000000b00423f1a4f4e9sm1782170qtn.91.2023.12.01.12.35.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Dec 2023 12:35:37 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1r9AEa-006NSu-JR;
-	Fri, 01 Dec 2023 16:35:36 -0400
-Date: Fri, 1 Dec 2023 16:35:36 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Lu Baolu <baolu.lu@linux.intel.com>
-Cc: Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
-	Jacob Pan <jacob.jun.pan@linux.intel.com>,
-	Yan Zhao <yan.y.zhao@intel.com>, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 12/12] iommu: Improve iopf_queue_flush_dev()
-Message-ID: <20231201203536.GG1489931@ziepe.ca>
-References: <20231115030226.16700-1-baolu.lu@linux.intel.com>
- <20231115030226.16700-13-baolu.lu@linux.intel.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F318310E5;
+	Fri,  1 Dec 2023 12:35:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701462956; x=1732998956;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=LMf1fItzoZA3T76vtDhmr3DZRsMRth2RfoIKey8Owo0=;
+  b=HLmEZvFkXHlwS9hobsZN10QXNY9JajhFBVtEg22WrDjVpukCdzcVkJqB
+   WJ2xsk0oMqPm9XLfCGJ8N6PZZQqIJTVp5FJveNI1jBTE+T7FeYhJ4+XJL
+   bvHESli7uhAexuFFVtrRVrwbN/dBLQkKFROx8gmqPQlDRu2YD5ANVn/gy
+   v10+nmjcgadG3HoFiJlY5bBYuH7/Wc7Tlm6RFb317So+F6tFmQNQRKQ9z
+   SFnzjyUE6efx7lYq8jdjEkq7tmG+gmJuB3J0Jl3WGoiuLdNoXP6iitH6W
+   0Y/e+LAYPaG8vh38sI87bEUvRO6g+GBRlQ/5pckBL0UgcACG/hGroe3Sr
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="390714800"
+X-IronPort-AV: E=Sophos;i="6.04,242,1695711600"; 
+   d="scan'208";a="390714800"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 12:35:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="773551436"
+X-IronPort-AV: E=Sophos;i="6.04,242,1695711600"; 
+   d="scan'208";a="773551436"
+Received: from jturmaud-mobl1.amr.corp.intel.com (HELO [10.209.91.66]) ([10.209.91.66])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 12:35:53 -0800
+Message-ID: <b3b265f9-48fa-4574-a925-cbdaaa44a689@intel.com>
+Date: Fri, 1 Dec 2023 12:35:53 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231115030226.16700-13-baolu.lu@linux.intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 22/23] x86/mce: Improve error log of kernel space TDX
+ #MC due to erratum
+Content-Language: en-US
+To: Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+Cc: x86@kernel.org, kirill.shutemov@linux.intel.com, peterz@infradead.org,
+ tony.luck@intel.com, tglx@linutronix.de, bp@alien8.de, mingo@redhat.com,
+ hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com, rafael@kernel.org,
+ david@redhat.com, dan.j.williams@intel.com, len.brown@intel.com,
+ ak@linux.intel.com, isaku.yamahata@intel.com, ying.huang@intel.com,
+ chao.gao@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+ nik.borisov@suse.com, bagasdotme@gmail.com, sagis@google.com,
+ imammedo@redhat.com
+References: <cover.1699527082.git.kai.huang@intel.com>
+ <9e80873fac878aa5d697cbcd4d456d01e1009d1f.1699527082.git.kai.huang@intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <9e80873fac878aa5d697cbcd4d456d01e1009d1f.1699527082.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 15, 2023 at 11:02:26AM +0800, Lu Baolu wrote:
-> The iopf_queue_flush_dev() is called by the iommu driver before releasing
-> a PASID. It ensures that all pending faults for this PASID have been
-> handled or cancelled, and won't hit the address space that reuses this
-> PASID. The driver must make sure that no new fault is added to the queue.
-
-This needs more explanation, why should anyone care?
-
-More importantly, why is *discarding* the right thing to do?
-Especially why would we discard a partial page request group?
-
-After we change a translation we may have PRI requests in a
-queue. They need to be acknowledged, not discarded. The DMA in the
-device should be restarted and the device should observe the new
-translation - if it is blocking then it should take a DMA error.
-
-More broadly, we should just let things run their normal course. The
-domain to deliver the fault to should be determined very early. If we
-get a fault and there is no fault domain currently assigned then just
-restart it.
-
-The main reason to fence would be to allow the domain to become freed
-as the faults should be holding pointers to it. But I feel there are
-simpler options for that then this..
-
-> The SMMUv3 driver doesn't use it because it only implements the
-> Arm-specific stall fault model where DMA transactions are held in the SMMU
-> while waiting for the OS to handle iopf's. Since a device driver must
-> complete all DMA transactions before detaching domain, there are no
-> pending iopf's with the stall model. PRI support requires adding a call to
-> iopf_queue_flush_dev() after flushing the hardware page fault queue.
-
-This explanation doesn't make much sense, from a device driver
-perspective both PRI and stall cause the device to not complete DMAs.
-
-The difference between stall and PRI is fairly small, stall causes an
-internal bus to lock up while PRI does not.
-
-> -int iopf_queue_flush_dev(struct device *dev)
-> +int iopf_queue_discard_dev_pasid(struct device *dev, ioasid_t pasid)
->  {
->  	struct iommu_fault_param *iopf_param = iopf_get_dev_fault_param(dev);
-> +	const struct iommu_ops *ops = dev_iommu_ops(dev);
-> +	struct iommu_page_response resp;
-> +	struct iopf_fault *iopf, *next;
-> +	int ret = 0;
->  
->  	if (!iopf_param)
->  		return -ENODEV;
->  
->  	flush_workqueue(iopf_param->queue->wq);
+On 11/9/23 03:55, Kai Huang wrote:
+> +static bool is_pamt_page(unsigned long phys)
+> +{
+> +	struct tdmr_info_list *tdmr_list = &tdx_tdmr_list;
+> +	int i;
 > +
+> +	/*
+> +	 * This function is called from #MC handler, and theoretically
+> +	 * it could run in parallel with the TDX module initialization
+> +	 * on other logical cpus.  But it's not OK to hold mutex here
+> +	 * so just blindly check module status to make sure PAMTs/TDMRs
+> +	 * are stable to access.
+> +	 *
+> +	 * This may return inaccurate result in rare cases, e.g., when
+> +	 * #MC happens on a PAMT page during module initialization, but
+> +	 * this is fine as #MC handler doesn't need a 100% accurate
+> +	 * result.
+> +	 */
 
-A naked flush_workqueue like this is really suspicious, it needs a
-comment explaining why the queue can't get more work queued at this
-point. 
+It doesn't need perfect accuracy.  But how do we know it's not going to
+go, for instance, chase a bad pointer?
 
-I suppose the driver is expected to stop calling
-iommu_report_device_fault() before calling this function, but that
-doesn't seem like it is going to be possible. Drivers should be
-implementing atomic replace for the PASID updates and in that case
-there is no momement when it can say the HW will stop generating PRI.
+> +	if (tdx_module_status != TDX_MODULE_INITIALIZED)
+> +		return false;
 
-I'm looking at this code after these patches are applied and it still
-seems quite bonkers to me :(
+As an example, what prevents this CPU from observing
+tdx_module_status==TDX_MODULE_INITIALIZED while the PAMT structure is
+being assembled?
 
-Why do we allocate two copies of the memory on all fault paths?
+> +	for (i = 0; i < tdmr_list->nr_consumed_tdmrs; i++) {
+> +		unsigned long base, size;
+> +
+> +		tdmr_get_pamt(tdmr_entry(tdmr_list, i), &base, &size);
+> +
+> +		if (phys >= base && phys < (base + size))
+> +			return true;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +/*
+> + * Return whether the memory page at the given physical address is TDX
+> + * private memory or not.  Called from #MC handler do_machine_check().
+> + *
+> + * Note this function may not return an accurate result in rare cases.
+> + * This is fine as the #MC handler doesn't need a 100% accurate result,
+> + * because it cannot distinguish #MC between software bug and real
+> + * hardware error anyway.
+> + */
+> +bool tdx_is_private_mem(unsigned long phys)
+> +{
+> +	struct tdx_module_args args = {
+> +		.rcx = phys & PAGE_MASK,
+> +	};
+> +	u64 sret;
+> +
+> +	if (!platform_tdx_enabled())
+> +		return false;
+> +
+> +	/* Get page type from the TDX module */
+> +	sret = __seamcall_ret(TDH_PHYMEM_PAGE_RDMD, &args);
+> +	/*
+> +	 * Handle the case that CPU isn't in VMX operation.
+> +	 *
+> +	 * KVM guarantees no VM is running (thus no TDX guest)
+> +	 * when there's any online CPU isn't in VMX operation.
+> +	 * This means there will be no TDX guest private memory
+> +	 * and Secure-EPT pages.  However the TDX module may have
+> +	 * been initialized and the memory page could be PAMT.
+> +	 */
+> +	if (sret == TDX_SEAMCALL_UD)
+> +		return is_pamt_page(phys);
 
-Why do we have fault->type still that only has one value?
+Either this is comment is wonky or the module initialization is buggy.
 
-What is serializing iommu_get_domain_for_dev_pasid() in the fault
-path? It looks sort of like the plan is to use iopf_param->lock and
-ensure domain removal grabs that lock at least after the xarray is
-changed - but does that actually happen?
+config_global_keyid() goes and does SEAMCALLs on all CPUs.  There are
+zero checks or special handling in there for whether the CPU has done
+VMXON.  So, by the time we've started initializing the TDX module
+(including the PAMT), all online CPUs must be able to do SEAMCALLs.  Right?
 
-I would suggest, broadly, a flow for iommu_report_device_fault() sort
-of:
+So how can we have a working PAMT here when this CPU can't do SEAMCALLs?
 
-1) Allocate memory for the evt. Every path except errors needs this,
-   so just do it
-2) iopf_get_dev_fault_param() should not have locks in it! This is
-   fast path now. Use a refcount, atomic compare exchange to allocate,
-   and RCU free.
-3) Everything runs under the fault_param->lock
-4) Check if !IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE, set it aside and then
-   exit! This logic is really tortured and confusing
-5) Allocate memory and assemble the group
-6) Obtain the domain for this group and incr a per-domain counter that a
-   fault is pending on that domain
-7) Put the *group* into the WQ. Put the *group* on a list in fault_param
-   instead of the individual faults
-8) Don't linear search a linked list in iommu_page_response()! Pass
-   the group in that we got from the WQ that we *know* is still
-   active. Ack that passed group.
+I don't think we should even bother with this complexity.  I think we
+can just fix the whole thing by saying that unless you can make a
+non-init SEAMCALL, we just assume the memory can't be private.
 
-When freeing a domain wait for the per-domain counter to go to
-zero. This ensures that the WQ is flushed out and all the outside
-domain references are gone.
+The transition to being able to make non-init SEAMCALLs is also #MC safe
+*and* it's at a point when the tdmr_list is stable.
 
-When wanting to turn off PRI make sure a non-PRI domain is
-attached to everything. Fence against the HW's event queue. No new
-iommu_report_device_fault() is possible.
-
-Lock the fault_param->lock and go through every pending group and
-respond it. Mark the group memory as invalid so iommu_page_response()
-NOP's it. Unlock, fence the HW against queued responses, and turn off
-PRI.
-
-An *optimization* would be to lightly flush the domain when changing
-the translation. Lock the fault_param->lock and look for groups in the
-list with old_domain.  Do the same as for PRI-off: respond to the
-group, mark it as NOP. The WQ may still be chewing on something so the
-domain free still has to check and wait.
-
-Did I get it right??
-
-Jason
+Can anyone shoot any holes in that? :)
 
