@@ -1,263 +1,255 @@
-Return-Path: <kvm+bounces-3070-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3071-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5185800504
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 08:50:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 201A9800581
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 09:28:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D88C51C20CF7
-	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 07:50:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1177F1C20F3F
+	for <lists+kvm@lfdr.de>; Fri,  1 Dec 2023 08:28:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF2A15AF1;
-	Fri,  1 Dec 2023 07:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA5341B269;
+	Fri,  1 Dec 2023 08:28:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A53tIrpW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bEGxHlyd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4145F128;
-	Thu, 30 Nov 2023 23:50:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701417010; x=1732953010;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=TQypFe4cmLpL8dPVSh7VAX6tPQl5OFQm29gDdv00P2A=;
-  b=A53tIrpWvNPkCZPeMHwwwfiovLLPFboTHqsGzj75RGvX/igoJ2Qd3lDf
-   yB9B41t6IWux2A0yOqq7n0ytq+TvbSYFVjSghhjVl1MS8dzbdaGsGTW0P
-   lsYKxOUbahMvQdxZ71yeB/z0Mo9tNkZrNhdm0q9CQCVFIk59weRg0rcj3
-   t741XKVE7niJeQQrZOFMp9A57ZU+XnzIb3dEmhjGU75dkcr07ev6tqtgn
-   1C4/DVH+VkIpnx1Q02p6PwPv9GYvn/ODjMsWGgEkuCGLhV3/9+4rhoHQs
-   foGSu2Tuuli+5AZ1kspFUH1IzEcA22D///I4pM8xOYu5tr5c3uv+JOO3o
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="6699541"
-X-IronPort-AV: E=Sophos;i="6.04,241,1695711600"; 
-   d="scan'208";a="6699541"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 23:49:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="943005849"
-X-IronPort-AV: E=Sophos;i="6.04,241,1695711600"; 
-   d="scan'208";a="943005849"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Nov 2023 23:49:53 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 30 Nov 2023 23:49:53 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Thu, 30 Nov 2023 23:49:53 -0800
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.40) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Thu, 30 Nov 2023 23:49:53 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B23U9AVrVDzMfL82z0l80gv0+foCsegiP6fffWjUdmEykPtfVvpBBK55PwXd9AyxvS58Rn25HCKZ/k82IfbhVK23V1pSRb6mEMrHLrYABXsAbAw99FnXCXbqkKL0H1UFmoyOlYsdVwo7n/Q13E8dF2xG8d9L76a1YyZV5RKsePEg8liGjgbehvAOIoi2o7bKAVWoLhzDamEf8tdpwc+yXa0esBpedpwV9iiFbM/GHvz3DtdBKk2DDhQKkSmErwrruO0dMXeoySU+n1ZR7KG/1bNgf7PD/Kcpi+5fhO1dfHiLeCLhW8EFNIv4lgXcDt8133kvt9XYOeJLVM4xfX6KAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BdJGIZ4Z6/OCjP9YMUmGfVAnkWu9fRb6xKxPEk5i+UI=;
- b=T16YyBYx41zf7MTT3CU4Ju1UlLFzQlSHI45rkr0LeiKwLR+ZS/3FPZBD70S0VMwWasRTwxWhSbp3sAqig91Ej6JS32f3KEMQc+B51Nz3k8F40rim+CHEAl+Pw34LnbzwpAHFVer+rD8Ofx6TPQBbhwG6AJ7tg4ffKqttwyJgTCPmbzlXf0KdM/PuHyTmqyVQa9t5qpDq9nvTXDdWpOua9C/WNLtWkstWmbId//vIEmS/1QmheWAQ5H0dEFptcUJDwALBr/8cBXun70hNE2zN9R1HqwIYf/nkSUaznn2svwIAv7EiTCN6ycGaE0dF5sQdZHO0F6nIHMD7dfud5B0gng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
- by DS0PR11MB7999.namprd11.prod.outlook.com (2603:10b6:8:123::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.22; Fri, 1 Dec
- 2023 07:49:46 +0000
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::ea04:122f:f20c:94e8]) by PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::ea04:122f:f20c:94e8%2]) with mapi id 15.20.7046.027; Fri, 1 Dec 2023
- 07:49:46 +0000
-Message-ID: <9a7052ca-9c67-45b5-ba23-dbd23e69722c@intel.com>
-Date: Fri, 1 Dec 2023 15:49:36 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 04/26] x86/fpu/xstate: Introduce
- XFEATURE_MASK_KERNEL_DYNAMIC xfeature set
-Content-Language: en-US
-To: Maxim Levitsky <mlevitsk@redhat.com>
-CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<dave.hansen@intel.com>, <pbonzini@redhat.com>, <seanjc@google.com>,
-	<peterz@infradead.org>, <chao.gao@intel.com>, <rick.p.edgecombe@intel.com>,
-	<john.allen@amd.com>
-References: <20231124055330.138870-1-weijiang.yang@intel.com>
- <20231124055330.138870-5-weijiang.yang@intel.com>
- <3c16bb90532fbd2ec95b5a3d42a93bbbf77c4d37.camel@redhat.com>
-From: "Yang, Weijiang" <weijiang.yang@intel.com>
-In-Reply-To: <3c16bb90532fbd2ec95b5a3d42a93bbbf77c4d37.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR01CA0155.apcprd01.prod.exchangelabs.com
- (2603:1096:4:8f::35) To PH0PR11MB4965.namprd11.prod.outlook.com
- (2603:10b6:510:34::7)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF2CC1717
+	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 00:27:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701419274;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TXlehmG2X8bR464lQdsPhRNIsLgCTWHUZUf/l+hBZHs=;
+	b=bEGxHlydsGQvpoP0dKv+bg+i8q+l8Ikcv3Fmsqic9+e6O0FS36Hah486uz2h0Xstl69q5D
+	MPyDc9dMCdioMvYhr8dueQB9mXlFtfTW39O1t29/Ay6ErSyEUExSjfsdZEZvEcW0foIvFg
+	0EILgPpftF83hqEMn+QwI4gaWfyomTs=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-182-YNpK9rOaNDKC18G1awQBHw-1; Fri, 01 Dec 2023 03:27:53 -0500
+X-MC-Unique: YNpK9rOaNDKC18G1awQBHw-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-54c0a4d9624so1286309a12.1
+        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 00:27:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701419272; x=1702024072;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TXlehmG2X8bR464lQdsPhRNIsLgCTWHUZUf/l+hBZHs=;
+        b=wwUWjmhI6winH5pcwt4vojL3zY7WiQlhplrJcmRgp3H2M0ZaEBaQEpKomgQQmJmAdO
+         sgvwWGScoVrvOlmD7fUn9vOZEAlU7Tkr7WQ3yQ+7KN8ANaVnHVcdnxSioa1CjjcNNZDV
+         zAqAamHZ6qkx1ddl6LbXePHHjuFsM6TIRoIGw7BFEcK3bA+Fct4tFlghUWNvq7odrWsc
+         mI0T6VtwVwsHrVGfmk/21N1bbTf913Za8n36/eUobS7o01pPlvg9aXn6OhebmXEqFUgl
+         jg0LWKNdHZhSZNDU2oItR+LQFSiAInpD++KXTyk3sKZLQPnIcHvl8Q7a7tkw7ndklCSx
+         TYZw==
+X-Gm-Message-State: AOJu0YycAFnN0dGzeyoDkHciha6b7XFGjJuAvPIKvmcCiIHwzad8FHqt
+	bcGzhBCmK6osjQdiu1NCT+4cOP91+/qzBizR2Fk57Q0O03iFAbJeANB7w9S9U+KEkc9Theq8XBd
+	5jT9zyGQWGwOXIVXzkMtg
+X-Received: by 2002:a50:8e42:0:b0:54a:e87c:4951 with SMTP id 2-20020a508e42000000b0054ae87c4951mr622240edx.41.1701419272338;
+        Fri, 01 Dec 2023 00:27:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFhBuopBPFWwv/i2+HgEvjFGevJis2FETkAvTKcndNFDF37w40NnwfqHCDStPcJZ86f7bgYvQ==
+X-Received: by 2002:a50:8e42:0:b0:54a:e87c:4951 with SMTP id 2-20020a508e42000000b0054ae87c4951mr622226edx.41.1701419271994;
+        Fri, 01 Dec 2023 00:27:51 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-199.retail.telecomitalia.it. [79.46.200.199])
+        by smtp.gmail.com with ESMTPSA id bt15-20020a0564020a4f00b0054c63ebfa15sm125308edb.83.2023.12.01.00.27.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Dec 2023 00:27:51 -0800 (PST)
+Date: Fri, 1 Dec 2023 09:27:47 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Arseniy Krasnov <avkrasnov@salutedevices.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v5 2/3] virtio/vsock: send credit update during
+ setting SO_RCVLOWAT
+Message-ID: <smu77vmxw3ki36xhqnhtvujwswvkg5gkfwnt4vr5bnwljclseh@inbewbwkcqxs>
+References: <20231130130840.253733-1-avkrasnov@salutedevices.com>
+ <20231130130840.253733-3-avkrasnov@salutedevices.com>
+ <20231130084044-mutt-send-email-mst@kernel.org>
+ <02de8982-ec4a-b3b2-e8e5-1bca28cfc01b@salutedevices.com>
+ <20231130085445-mutt-send-email-mst@kernel.org>
+ <pbkiwezwlf6dmogx7exur6tjrtcfzxyn7eqlehqxivqifbkojv@xlziiuzekon4>
+ <20231130123815-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|DS0PR11MB7999:EE_
-X-MS-Office365-Filtering-Correlation-Id: 163e8412-282f-4bf4-9bf3-08dbf2421581
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: h6ebAzl3aMNTmztA/tjR37kxdbMtw7a6Z5HbkEYrcicZ6gxO4uirFU5zosW8qmTsEuQ6KAentwFkJzmdPtQ1mNdmc9UTAXgf7mRY0EZbrvgV0AFSoSTWy8I2XEHPW1MGlQl6iVSTBPGZiBvwtmJOTMcmY8FmosqAyhez+WWO1XKGxYXWyVrisYyLWcGnk7JDLIGr7u6NM3UYB++Sx+V3IfqAO6TqoMPVGMZhwcEn75qdc2dGqHGMsIF/0THWpUlEtOtR3PCZRBfgaDrkPks7HDLK3xYLm79vgtma/4mO/rppgb73bSn0V2mz8RhyBW0t/aiVDVjeJvpvRk016Z4CcLBVzIalfgepF4R/NUJgqIIcQpgktnNC36ge3JoKv/So/mbtVG2NqNzboc1OpGy/3HC0k8iFMnw7uDYIg8owTjT01UJPyyPvPX5HV+/28FiOhhvEDp+epdDQKxhCVK6UMp0HgRFGp+qrURCKBTUT0x39elFdho2etLl84k3gQnb3Wf5qnRwLt9YrnKQPs7jhgywg6Ek8Un3Tl22GytVxNT+NN6tEgWfdqAtF22J8EpttvlDVwDzk0y9uEd7Lo8HNlvpSema336iifWGxeRlkn4a8QElFPLBXeI7xWTZcqd9qxBP0pnhv9rQK1LSQCD3NUw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(396003)(376002)(366004)(39860400002)(230922051799003)(64100799003)(186009)(1800799012)(451199024)(6666004)(478600001)(6512007)(2616005)(26005)(66476007)(53546011)(2906002)(4001150100001)(83380400001)(5660300002)(6916009)(41300700001)(6486002)(8936002)(66946007)(66556008)(6506007)(4326008)(316002)(8676002)(82960400001)(36756003)(86362001)(38100700002)(31696002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bnp6RzFJcm1hL1BoMitiQWZ3bVVtemgwVDNxK0k1bkdyMnF3aDZNaHpzMktE?=
- =?utf-8?B?K2czSFMvLy9JSXNDU0VPRFRDUmhqQzN4aVhWcmd2dEhSUXowdGJ0U1BpNE1q?=
- =?utf-8?B?MVl0MkJYY0xnZDVxUEJQNUVWejNBRUZvN0RRZlhzTndkSVdxZEgwNGVsZDRs?=
- =?utf-8?B?T1lLcGdKcDh4TFlCR0lkT2NoeVlzeWRRZzZiUndiZDZPWFRxeFBLQW1BL2VI?=
- =?utf-8?B?NERkcEVlU1dwZUc4bkhVYlFXK2FvRWp2TzRXZGpXMVk3aWljNEFIMkJrUGcy?=
- =?utf-8?B?Z3RjQXpsZ0ZNMHR0Z2FERVpwOURKRVJVV0xQMnNXR2sweG1BRHExSnZZZk9I?=
- =?utf-8?B?d09wMWlVclhKaTF6Q0tHMldwRTluLzl2cW5DaEc2NXl3NkFZZUF4aHFWU2ZZ?=
- =?utf-8?B?dVFBRzhpZmVOSndHS1hGbTUzNXZqOC8yOTZpYitaT3l5NkRQemNWRkluOENT?=
- =?utf-8?B?SmluRnJZaDloNnZyRHpQTDAyV3hWaUd4cjVoU3plaVZnUTdBNGl1bHB1Mytt?=
- =?utf-8?B?MSsrTGhZb2grcHVkY2dDQzNyUE9qZlJ3WGJvQ2JaTjMvUUF3M1pRaFZoc2xE?=
- =?utf-8?B?emZaZHVKdnc3UGJkN29jeGNwejd2UzZ0SlFGQmRuUTdMd3RjNEFPaHNReWJz?=
- =?utf-8?B?bzB1eG8yRVBWWGVOUWE4NXlQLzlkS2JNZVg4S0hqNFpKR1lJdGdxMlJPNUhD?=
- =?utf-8?B?K2R2ZVlpdUlIcmNDVGJmY3lqSUZYZ09sVmRRREczOUc4Y0NzZlFtWmk4dktp?=
- =?utf-8?B?elpQT1FJTXFHMkw4U2hsSFUwWWoxUUNnbTdoQzdnMDhwNHNjaklMdUpmRzBz?=
- =?utf-8?B?OC9FZ0MwdWRZVStQRnZmbmVKbzk2cFQ1SFd6UXhtSC9QYnRPNXV4UC9hTE1X?=
- =?utf-8?B?M1V3YjBHbms0V0JpTS9paWxHRHl2OHoxWk5FdEcyZlc5NW9NcFBCWWZPYUh3?=
- =?utf-8?B?UTZIdkttMkw1Znk5OUVQWURUaVhnMk5lR2orVU9zQnNGa05KYzJWQmpXamhO?=
- =?utf-8?B?VU9OVUdVZyszekM4NGFuM0pDNkRiN0krNFlRRllYclZJNmdqZk5zK1luUnJz?=
- =?utf-8?B?WmRIUElSQkRJdzZZSVFkbzR2NHhTQVNUYm5QbGdCVnAxcXZzNkJIaHdrUWxs?=
- =?utf-8?B?ekJFWjBzYnd1WHEvdlBNNzVTUzJON0QxQXBrcW91MSt0cGRJSVZjUnhSY2JG?=
- =?utf-8?B?UzZ4YVFkcVJQaTFmelFvcEZQVjVKZjNGU2ZVVDEzcDBLamdsajFrUWlXTmdk?=
- =?utf-8?B?Wmc0QTFaNGlKUGptMnNDTFdyY05Cb0RNZnBCZjZ6YzRZTUM2MVVVZjN4ano3?=
- =?utf-8?B?NVNWczFNK3ltYUxUK3JUcGZsZUl6bnZVNXVDT2pEb05YU0ZLSUE2Vlh3eDNr?=
- =?utf-8?B?RzZ1VWdyN0xuemVMQlk3d1RleGFxQnRFNmU3djMyR0VVK2dOdlZFL2ZQaTlS?=
- =?utf-8?B?ZnE3Nm84WEh3QVZKUmp5anhCaWFEanYyUmxrVWM3VWZRNmViVGZ6Y25aSjZv?=
- =?utf-8?B?NU9TRWlwZ3VidHkvL1I2NXJyTmRmNG5EeGU5dU1hZHNLcFhXdTFGL2hQQk5i?=
- =?utf-8?B?cnpWY0d5UFhtUS9uMDFnek8zR3dBZWhKRmFRNU9JNm9SQzBjWm5zUTNrTEFh?=
- =?utf-8?B?djhuKzJWRDJUZVpRbmc0Z0Nrb2ozdEZMZDc4S0k5MmFpU0lxcHpnU05tM29z?=
- =?utf-8?B?Q3FxOHNOSnRYcVIzZ3VybWdMSW5YblNCeE5BMnM3cnhVK1hYOFlSbXIzelJQ?=
- =?utf-8?B?K2dkZzRBcnVsNTFnWGNtK1h6TkF3bXAya05tTWFzb2poblZHcmJGR0J5WDFp?=
- =?utf-8?B?WXhVK2JuNnZKbUlPRW5QbExQSG13Y1cxT1M3VGZOSE04KytIUXd2YzdDYTZq?=
- =?utf-8?B?R09YTFJ5VWNoam93QXJXS2ltU1AyR1RnbWhCRWtoS2g2QW1sQlZjVXdLS2RW?=
- =?utf-8?B?b3pWU3liQlJKdWdBOTljTWJLbld6eGZOYmxEQ3lYd1c1TExFbHJXT1FzUUV2?=
- =?utf-8?B?MTA0R0NXWGttWjlnNStibU5lRHZkSHExMVdObW1KdnVwYk1vZ2RKalRib0dK?=
- =?utf-8?B?MGUvTnBycEZpb01MeithUzNBK0FtQ2hhQWFtWXQ4VWpZTHFwZURKRWZEVkxx?=
- =?utf-8?B?NFFQai9pV0IvWHhSaDNXNU5aS1VoeHNrYzBhc0RGRURaMk5MNFFTYUppc2Np?=
- =?utf-8?B?cnc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 163e8412-282f-4bf4-9bf3-08dbf2421581
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2023 07:49:45.7435
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: s5FkJgZvmLXSJh65QCsBbds3516UwAD8YWVHSyRQv4P+ChtSIyEQZzP8G1JiKlZgnq9FfvWXSTQTNu7mWguNpg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7999
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20231130123815-mutt-send-email-mst@kernel.org>
 
-On 12/1/2023 1:33 AM, Maxim Levitsky wrote:
-> On Fri, 2023-11-24 at 00:53 -0500, Yang Weijiang wrote:
->> Define new XFEATURE_MASK_KERNEL_DYNAMIC set including the features can be
-> I am not sure though that this name is correct, but I don't know if I can
-> suggest a better name.
-
-It's a symmetry of XFEATURE_MASK_USER_DYNAMIC ;-)
->> optionally enabled by kernel components, i.e., the features are required by
->> specific kernel components. Currently it's used by KVM to configure guest
->> dedicated fpstate for calculating the xfeature and fpstate storage size etc.
+On Thu, Nov 30, 2023 at 12:40:43PM -0500, Michael S. Tsirkin wrote:
+>On Thu, Nov 30, 2023 at 03:11:19PM +0100, Stefano Garzarella wrote:
+>> On Thu, Nov 30, 2023 at 08:58:58AM -0500, Michael S. Tsirkin wrote:
+>> > On Thu, Nov 30, 2023 at 04:43:34PM +0300, Arseniy Krasnov wrote:
+>> > >
+>> > >
+>> > > On 30.11.2023 16:42, Michael S. Tsirkin wrote:
+>> > > > On Thu, Nov 30, 2023 at 04:08:39PM +0300, Arseniy Krasnov wrote:
+>> > > >> Send credit update message when SO_RCVLOWAT is updated and it is bigger
+>> > > >> than number of bytes in rx queue. It is needed, because 'poll()' will
+>> > > >> wait until number of bytes in rx queue will be not smaller than
+>> > > >> SO_RCVLOWAT, so kick sender to send more data. Otherwise mutual hungup
+>> > > >> for tx/rx is possible: sender waits for free space and receiver is
+>> > > >> waiting data in 'poll()'.
+>> > > >>
+>> > > >> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>> > > >> ---
+>> > > >>  Changelog:
+>> > > >>  v1 -> v2:
+>> > > >>   * Update commit message by removing 'This patch adds XXX' manner.
+>> > > >>   * Do not initialize 'send_update' variable - set it directly during
+>> > > >>     first usage.
+>> > > >>  v3 -> v4:
+>> > > >>   * Fit comment in 'virtio_transport_notify_set_rcvlowat()' to 80 chars.
+>> > > >>  v4 -> v5:
+>> > > >>   * Do not change callbacks order in transport structures.
+>> > > >>
+>> > > >>  drivers/vhost/vsock.c                   |  1 +
+>> > > >>  include/linux/virtio_vsock.h            |  1 +
+>> > > >>  net/vmw_vsock/virtio_transport.c        |  1 +
+>> > > >>  net/vmw_vsock/virtio_transport_common.c | 27 +++++++++++++++++++++++++
+>> > > >>  net/vmw_vsock/vsock_loopback.c          |  1 +
+>> > > >>  5 files changed, 31 insertions(+)
+>> > > >>
+>> > > >> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>> > > >> index f75731396b7e..4146f80db8ac 100644
+>> > > >> --- a/drivers/vhost/vsock.c
+>> > > >> +++ b/drivers/vhost/vsock.c
+>> > > >> @@ -451,6 +451,7 @@ static struct virtio_transport vhost_transport = {
+>> > > >>  		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+>> > > >>
+>> > > >>  		.read_skb = virtio_transport_read_skb,
+>> > > >> +		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat
+>> > > >>  	},
+>> > > >>
+>> > > >>  	.send_pkt = vhost_transport_send_pkt,
+>> > > >> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>> > > >> index ebb3ce63d64d..c82089dee0c8 100644
+>> > > >> --- a/include/linux/virtio_vsock.h
+>> > > >> +++ b/include/linux/virtio_vsock.h
+>> > > >> @@ -256,4 +256,5 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
+>> > > >>  void virtio_transport_deliver_tap_pkt(struct sk_buff *skb);
+>> > > >>  int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *list);
+>> > > >>  int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t read_actor);
+>> > > >> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk, int val);
+>> > > >>  #endif /* _LINUX_VIRTIO_VSOCK_H */
+>> > > >> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>> > > >> index af5bab1acee1..8007593a3a93 100644
+>> > > >> --- a/net/vmw_vsock/virtio_transport.c
+>> > > >> +++ b/net/vmw_vsock/virtio_transport.c
+>> > > >> @@ -539,6 +539,7 @@ static struct virtio_transport virtio_transport = {
+>> > > >>  		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+>> > > >>
+>> > > >>  		.read_skb = virtio_transport_read_skb,
+>> > > >> +		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat
+>> > > >>  	},
+>> > > >>
+>> > > >>  	.send_pkt = virtio_transport_send_pkt,
+>> > > >> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>> > > >> index f6dc896bf44c..1cb556ad4597 100644
+>> > > >> --- a/net/vmw_vsock/virtio_transport_common.c
+>> > > >> +++ b/net/vmw_vsock/virtio_transport_common.c
+>> > > >> @@ -1684,6 +1684,33 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
+>> > > >>  }
+>> > > >>  EXPORT_SYMBOL_GPL(virtio_transport_read_skb);
+>> > > >>
+>> > > >> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk,
+>> > > >> int val)
+>> > > >> +{
+>> > > >> +	struct virtio_vsock_sock *vvs = vsk->trans;
+>> > > >> +	bool send_update;
+>> > > >> +
+>> > > >> +	spin_lock_bh(&vvs->rx_lock);
+>> > > >> +
+>> > > >> +	/* If number of available bytes is less than new SO_RCVLOWAT value,
+>> > > >> +	 * kick sender to send more data, because sender may sleep in
+>> > > >> its
+>> > > >> +	 * 'send()' syscall waiting for enough space at our side.
+>> > > >> +	 */
+>> > > >> +	send_update = vvs->rx_bytes < val;
+>> > > >> +
+>> > > >> +	spin_unlock_bh(&vvs->rx_lock);
+>> > > >> +
+>> > > >> +	if (send_update) {
+>> > > >> +		int err;
+>> > > >> +
+>> > > >> +		err = virtio_transport_send_credit_update(vsk);
+>> > > >> +		if (err < 0)
+>> > > >> +			return err;
+>> > > >> +	}
+>> > > >> +
+>> > > >> +	return 0;
+>> > > >> +}
+>> > > >
+>> > > >
+>> > > > I find it strange that this will send a credit update
+>> > > > even if nothing changed since this was called previously.
+>> > > > I'm not sure whether this is a problem protocol-wise,
+>> > > > but it certainly was not envisioned when the protocol was
+>> > > > built. WDYT?
+>> > >
+>> > > >From virtio spec I found:
+>> > >
+>> > > It is also valid to send a VIRTIO_VSOCK_OP_CREDIT_UPDATE packet without previously receiving a
+>> > > VIRTIO_VSOCK_OP_CREDIT_REQUEST packet. This allows communicating updates any time a change
+>> > > in buffer space occurs.
+>> > > So I guess there is no limitations to send such type of packet, e.g. it is not
+>> > > required to be a reply for some another packet. Please, correct me if im wrong.
+>> > >
+>> > > Thanks, Arseniy
+>> >
+>> >
+>> > Absolutely. My point was different - with this patch it is possible
+>> > that you are not adding any credits at all since the previous
+>> > VIRTIO_VSOCK_OP_CREDIT_UPDATE.
 >>
->> The kernel dynamic xfeatures now only contain XFEATURE_CET_KERNEL, which is
->> supported by host as they're enabled in xsaves/xrstors operating xfeature set
->> (XCR0 | XSS), but the relevant CPU feature, i.e., supervisor shadow stack, is
->> not enabled in host kernel so it can be omitted for normal fpstate by default.
+>> I think the problem we're solving here is that since as an optimization we
+>> avoid sending the update for every byte we consume, but we put a threshold,
+>> then we make sure we update the peer.
 >>
->> Remove the kernel dynamic feature from fpu_kernel_cfg.default_features so that
->> the bits in xstate_bv and xcomp_bv are cleared and xsaves/xrstors can be
->> optimized by HW for normal fpstate.
+>> A credit update contains a snapshot and sending it the same as the previous
+>> one should not create any problem.
+>
+>Well it consumes a buffer on the other side.
+
+Sure, but we are already speculating by not updating the other side when
+we consume bytes before a certain threshold. This already avoids to
+consume many buffers.
+
+Here we're only sending it once, when the user sets RCVLOWAT, so
+basically I expect it won't affect performance.
+
+>
+>> My doubt now is that we only do this when we set RCVLOWAT , should we 
+>> also
+>> do something when we consume bytes to avoid the optimization we have?
 >>
->> Suggested-by: Dave Hansen <dave.hansen@intel.com>
->> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
->> ---
->>   arch/x86/include/asm/fpu/xstate.h | 5 ++++-
->>   arch/x86/kernel/fpu/xstate.c      | 1 +
->>   2 files changed, 5 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/include/asm/fpu/xstate.h b/arch/x86/include/asm/fpu/xstate.h
->> index 3b4a038d3c57..a212d3851429 100644
->> --- a/arch/x86/include/asm/fpu/xstate.h
->> +++ b/arch/x86/include/asm/fpu/xstate.h
->> @@ -46,9 +46,12 @@
->>   #define XFEATURE_MASK_USER_RESTORE	\
->>   	(XFEATURE_MASK_USER_SUPPORTED & ~XFEATURE_MASK_PKRU)
->>   
->> -/* Features which are dynamically enabled for a process on request */
->> +/* Features which are dynamically enabled per userspace request */
->>   #define XFEATURE_MASK_USER_DYNAMIC	XFEATURE_MASK_XTILE_DATA
->>   
->> +/* Features which are dynamically enabled per kernel side request */
-> I suggest to explain this a bit better. How about something like that:
+>> Stefano
 >
-> "Kernel features that are not enabled by default for all processes, but can
-> be still used by some processes, for example to support guest virtualization"
+>Isn't this why we have credit request?
 
-It looks good to me, will apply it in next version, thanks!
+Yep, but in practice we never use it. It would also consume 2 buffers,
+one at the transmitter and one at the receiver.
 
-> But feel free to keep it as is or propose something else. IMHO this will
-> be confusing this way or another.
->
->
-> Another question: kernel already has a notion of 'independent features'
-> which are currently kernel features that are enabled in IA32_XSS but not present in 'fpu_kernel_cfg.max_features'
->
-> Currently only 'XFEATURE_LBR' is in this set. These features are saved/restored manually
-> from independent buffer (in case of LBRs, perf code cares for this).
->
-> Does it make sense to add CET_S to there as well instead of having XFEATURE_MASK_KERNEL_DYNAMIC,
+However I agree that maybe we should start using it before we decide not
+to send any more data.
 
-CET_S here refers to PL{0,1,2}_SSP, right?
+To be compatible with older devices, though, I think for now we also
+need to send a credit update when the bytes in the receive queue are
+less than RCVLOWAT, as Arseniy proposed in the other series.
 
-IMHO, perf relies on dedicated code to switch LBR MSRs for various reason, e.g., overhead, the feature
-owns dozens of MSRs, remove xfeature bit will offload the burden of common FPU/xsave framework.
-
-But CET only has 3 supervisor MSRs and they need to be managed together with user mode MSRs.
-Enabling it in common FPU framework would make the switch/swap much easier without additional
-support code.
-
->   and maybe rename the
-> 'XFEATURE_MASK_INDEPENDENT' to something like 'XFEATURES_THE_KERNEL_DOESNT_CARE_ABOUT'
-> (terrible name, but you might think of a better name)
->
->
->> +#define XFEATURE_MASK_KERNEL_DYNAMIC	XFEATURE_MASK_CET_KERNEL
->> +
->>   /* All currently supported supervisor features */
->>   #define XFEATURE_MASK_SUPERVISOR_SUPPORTED (XFEATURE_MASK_PASID | \
->>   					    XFEATURE_MASK_CET_USER | \
->> diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
->> index b57d909facca..ba4172172afd 100644
->> --- a/arch/x86/kernel/fpu/xstate.c
->> +++ b/arch/x86/kernel/fpu/xstate.c
->> @@ -824,6 +824,7 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
->>   	/* Clean out dynamic features from default */
->>   	fpu_kernel_cfg.default_features = fpu_kernel_cfg.max_features;
->>   	fpu_kernel_cfg.default_features &= ~XFEATURE_MASK_USER_DYNAMIC;
->> +	fpu_kernel_cfg.default_features &= ~XFEATURE_MASK_KERNEL_DYNAMIC;
->>   
->>   	fpu_user_cfg.default_features = fpu_user_cfg.max_features;
->>   	fpu_user_cfg.default_features &= ~XFEATURE_MASK_USER_DYNAMIC;
->
->
-> Best regards,
-> 	Maxim Levitsky
->
->
->
->
+Thanks,
+Stefano
 
 
