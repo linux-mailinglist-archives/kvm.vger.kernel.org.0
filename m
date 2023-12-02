@@ -1,85 +1,102 @@
-Return-Path: <kvm+bounces-3263-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3264-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BD23801E9F
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 22:19:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BD93801FB6
+	for <lists+kvm@lfdr.de>; Sun,  3 Dec 2023 00:24:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D4B91C2082D
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 21:19:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D48E21F2108F
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 23:24:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2499D219F3;
-	Sat,  2 Dec 2023 21:19:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2917224D1;
+	Sat,  2 Dec 2023 23:24:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xof8o13W"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="iMB1Y3tk"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [IPv6:2001:41d0:1004:224b::b0])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAFDD102
-	for <kvm@vger.kernel.org>; Sat,  2 Dec 2023 13:19:06 -0800 (PST)
-Date: Sat, 2 Dec 2023 13:18:58 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1701551945;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=bt3lo3ErvssH39DRGX6dCA6xEOnxf5ofeDp/CVk4sm4=;
-	b=Xof8o13WrokB8K1TA+XUB7WVsjt8bLetDjwisEV+V/UdaBfChHJ4FPy7W5WsN63rSQQBOt
-	xmwOkNlfXcY/XbXKEYBWkI0zmdOdm4pxfmRl0Sp/RDxUXUzi1gPZgqe0X8/X8tcgtWEdyo
-	bnYaaj9LEf623Ocf56x6C8cME2GQhyE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Kunkun Jiang <jiangkunkun@huawei.com>
-Subject: [GIT PULL] KVM/arm64 fixes for 6.7, take #1
-Message-ID: <ZWufQneeJiBJLnPb@thinky-boi>
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3AD8124;
+	Sat,  2 Dec 2023 15:24:07 -0800 (PST)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 049B240E025E;
+	Sat,  2 Dec 2023 23:24:05 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id Niido9d84076; Sat,  2 Dec 2023 23:24:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1701559440; bh=9MUOeGeZ5B/ijKebEMHCI1M4SgxyUmLcB9iMR+JlMLs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iMB1Y3tkckvcPzSIMFzmO3QkTWIi54wspB5lmz1p3wTg6sxvgAQFS/nx36pDTM0Sq
+	 NgyyYA2BJjSs7mKalgZjLnssy9RIcogY/ezUBLtJSnSwvaN+XnU5Q5hoPq6ey5XoNV
+	 6i90Aks8zWvQzMrvKCE5JQCJaUAOU4vauU5u20R0RY+FOSPtmhNz7S07ruwEpCyljE
+	 Zb4HbsOKfUmciNg9PdeQk3uLL+uq60AT+D/jnZyFPFOlGc4/9lxSUnjq7/nrc6ngtY
+	 0knlTxmZsBU3V9L64c5k459EgRJwLOUS5s1LkhThC/cC5hR+QwuT0CTvf6tC2xwiou
+	 yepw3gnX7/Y6zWZ0dZqtIdVdM/aKXqa0GEY1vGHu4DKt5YznVMOr4f/+IqoEJMgxvP
+	 FqKfr1f5QsXC4gL42/Xiy15FtLlx/TfRSPZ08FFR8FHMIOGAG9ZQE9lEweuHN39f8x
+	 DkjCdnOJpfKb0NLaNGgStt710K9S2259FgCEMmkaaHH88Y+snZGFi6BcpkfHXAuwuM
+	 G+Gr0/GajAaNadrPeOZf03ISMk2hx9VOPR7KTqjZPfUWklUcKDe6raWSXDSZXRxgAS
+	 4hdDMInA/pVlpCBNIPHhSt1v1VTU4AAmV1i7LX110RdsrPcVsxU+SSFaTt6AF/cTVk
+	 CfeM1jrzHeYaLK5JmqqRPwG0=
+Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 05E0D40E024E;
+	Sat,  2 Dec 2023 23:23:26 +0000 (UTC)
+Date: Sun, 3 Dec 2023 00:23:19 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: ankita@nvidia.com
+Cc: jgg@nvidia.com, alex.williamson@redhat.com, naoya.horiguchi@nec.com,
+	akpm@linux-foundation.org, tony.luck@intel.com,
+	linmiaohe@huawei.com, rafael@kernel.org, lenb@kernel.org,
+	james.morse@arm.com, shiju.jose@huawei.com, bhelgaas@google.com,
+	pabeni@redhat.com, yishaih@nvidia.com,
+	shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+	aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
+	targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
+	apopple@nvidia.com, anuaggarwal@nvidia.com, jhubbard@nvidia.com,
+	danw@nvidia.com, mochs@nvidia.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mm@kvack.org, linux-edac@vger.kernel.org,
+	linux-acpi@vger.kernel.org
+Subject: Re: [PATCH v2 3/4] mm: Change ghes code to allow poison of
+ non-struct pfn
+Message-ID: <20231202232319.GAZWu8Z6gsLp1kI5Dw@fat_crate.local>
+References: <20231123003513.24292-1-ankita@nvidia.com>
+ <20231123003513.24292-4-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20231123003513.24292-4-ankita@nvidia.com>
 
-Hi Paolo,
+On Thu, Nov 23, 2023 at 06:05:11AM +0530, ankita@nvidia.com wrote:
+> -	pfn = PHYS_PFN(physical_addr);
+> -	if (!pfn_valid(pfn) && !arch_is_platform_page(physical_addr)) {
+> -		pr_warn_ratelimited(FW_WARN GHES_PFX
+> -		"Invalid address in generic error data: %#llx\n",
+> -		physical_addr);
+> -		return false;
+> -	}
 
-Here's the first set of fixes for 6.7. There hasn't been very many
-interesting issues that have come up this cycle, so it is only a single
-patch this time around.
+You don't just remove a pfn valid test just because your weird device
+can't stomach it - you extend it, like
 
-Please pull :)
+  3ad6fd77a2d6 ("x86/sgx: Add check for SGX pages to ghes_do_memory_failure()")
 
---
-Thanks,
-Oliver
+did, for example.
 
-The following changes since commit b85ea95d086471afb4ad062012a4d73cd328fa86:
+-- 
+Regards/Gruss,
+    Boris.
 
-  Linux 6.7-rc1 (2023-11-12 16:19:07 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.7-1
-
-for you to fetch changes up to 8e4ece6889a5b1836b6a135827ac831a5350602a:
-
-  KVM: arm64: GICv4: Do not perform a map to a mapped vLPI (2023-11-20 19:13:32 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.7, take #1
-
- - Avoid mapping vLPIs that have already been mapped
-
-----------------------------------------------------------------
-Kunkun Jiang (1):
-      KVM: arm64: GICv4: Do not perform a map to a mapped vLPI
-
- arch/arm64/kvm/vgic/vgic-v4.c | 4 ++++
- 1 file changed, 4 insertions(+)
+https://people.kernel.org/tglx/notes-about-netiquette
 
