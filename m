@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-3249-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3250-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A838801C04
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 11:01:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BB6A801C06
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 11:01:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 30138B20F34
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 10:01:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CBA91C20B2F
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 10:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78770156C8;
-	Sat,  2 Dec 2023 10:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19750156CE;
+	Sat,  2 Dec 2023 10:01:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ejFyGcms"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WwNJySS6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B9E1E3;
-	Sat,  2 Dec 2023 02:00:50 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C89FD197;
+	Sat,  2 Dec 2023 02:01:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701511250; x=1733047250;
+  t=1701511293; x=1733047293;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=cQ/PBVpj7VdBPsR5uXHKk49rWc/LsdPwooGhW6lyHNs=;
-  b=ejFyGcmsSgnKkdEkzBy7J5CqQhofODqM52qRnWmpWtRTqLicvdusE/UL
-   OGXkJyfGkuBRjQotDagPyCcjsXZxx6/FiRkB0rSO/6MAeRtDHqvAi7CaX
-   u6EZhrOgRE1i8aaC0DkDEfbO/mWPwzh+OD/CmmYHBi5yf6H/7ZJYfMLAK
-   nikAnxovFRhpSR+Bf3eCDMUs0PfjgDT7jgzNcKo55qfvZMOPTGeQce25k
-   e+rhcVZW4Iexa8TOS4m24XMbgLm/Zkps8XhUa2J8yKCaTo0VzajTKdAND
-   mYCNP2oC/o98MXvEizEk7wctaopMgLXPoAMiEB3NKdy5M86zEkZuK91bq
+  bh=uSoSY6TiRDOPE0HLSqzCfFuL+LmvcCuprKj793XIBHM=;
+  b=WwNJySS6Cr0O/UYFtRhXvzlgYvQtaB6XcPn+ZduIu0tpIeOqaHwQ1xiM
+   mgvFNrZtI4XggLjue5kigE/R458Ok89nlcSBPpVf0/hZmiZ2u+tr79+oK
+   NWO0PWHUlatzrwYxnzAN5XVbqDadwO5Pk/X8mG27b13nolLGoNJIZW469
+   20RchAugsiJIO4nB6uvP8pSmlj6BFM7GK9+mRrDSFbPqM3kLp/FT1Zloz
+   j6fRSOGrM+a/O/ptHBydRSEqdPcLsv05bzWkiD1+/mHZ/vbFXmcjDcjSB
+   cs2wmhcv1iBWHZlnHKwGvPkQ10l1h6VT0prNRpHdkziTLFoIlMoOkn506
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="372983418"
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="396395349"
 X-IronPort-AV: E=Sophos;i="6.04,245,1695711600"; 
-   d="scan'208";a="372983418"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 02:00:50 -0800
+   d="scan'208";a="396395349"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 02:01:33 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="773709825"
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="799015715"
 X-IronPort-AV: E=Sophos;i="6.04,245,1695711600"; 
-   d="scan'208";a="773709825"
+   d="scan'208";a="799015715"
 Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 02:00:46 -0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 02:01:17 -0800
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: iommu@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: alex.williamson@redhat.com,
 	dwmw2@infradead.org,
 	yi.l.liu@intel.com,
 	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [RFC PATCH 33/42] KVM: x86/mmu: add extra param "kvm" to make_spte()
-Date: Sat,  2 Dec 2023 17:31:46 +0800
-Message-Id: <20231202093146.15477-1-yan.y.zhao@intel.com>
+Subject: [RFC PATCH 34/42] KVM: x86/mmu: add extra param "kvm" to tdp_mmu_map_handle_target_level()
+Date: Sat,  2 Dec 2023 17:32:22 +0800
+Message-Id: <20231202093222.15534-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20231202091211.13376-1-yan.y.zhao@intel.com>
 References: <20231202091211.13376-1-yan.y.zhao@intel.com>
@@ -70,138 +70,95 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 
-Add an extra param "kvm" to make_spte() to allow param "vcpu" to be NULL in
-future to allow generating spte in non-vcpu context.
+Add an extra param "kvm" to tdp_mmu_map_handle_target_level() to allow for
+mapping in non-vCPU context in future.
 
-"vcpu" is only used in make_spte() to get memory type mask if
-shadow_memtype_mask is true, which applies only to VMX when EPT is enabled.
-VMX only requires param "vcpu" when non-coherent DMA devices are attached
-to check vcpu's CR0.CD and guest MTRRs.
-So, if non-coherent DMAs are not attached, make_spte() can call
-kvm_x86_get_default_mt_mask() to get default memory type for non-vCPU
-context.
+"vcpu" is only required in tdp_mmu_map_handle_target_level() for accounting
+of MMIO SPTEs. As kvm_faultin_pfn() now will return error for non-slot
+PFNs, no MMIO SPTEs should be generated and accounted in non-vCPU context.
+So, just let tdp_mmu_map_handle_target_level() warn if MMIO SPTEs are
+encountered in non-vCPU context.
 
 This is a preparation patch for later KVM MMU to export TDP.
 
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c         |  2 +-
- arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
- arch/x86/kvm/mmu/spte.c        | 18 ++++++++++++------
- arch/x86/kvm/mmu/spte.h        |  2 +-
- arch/x86/kvm/mmu/tdp_mmu.c     |  2 +-
- 5 files changed, 16 insertions(+), 10 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 26 +++++++++++++++++---------
+ 1 file changed, 17 insertions(+), 9 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index e4cae4ff20770..c9b587b30dae3 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2939,7 +2939,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
- 			was_rmapped = 1;
- 	}
- 
--	wrprot = make_spte(vcpu, &vcpu->arch.mmu->common,
-+	wrprot = make_spte(vcpu->kvm, vcpu, &vcpu->arch.mmu->common,
- 			   sp, slot, pte_access, gfn, pfn, *sptep, prefetch,
- 			   true, host_writable, &spte);
- 
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 054d1a203f0ca..fb4767a9e966e 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -960,7 +960,7 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
- 	spte = *sptep;
- 	host_writable = spte & shadow_host_writable_mask;
- 	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
--	make_spte(vcpu, &vcpu->arch.mmu->common, sp, slot, pte_access,
-+	make_spte(vcpu->kvm, vcpu, &vcpu->arch.mmu->common, sp, slot, pte_access,
- 		  gfn, spte_to_pfn(spte), spte, true, false, host_writable, &spte);
- 
- 	return mmu_spte_update(sptep, spte);
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index daeab3b9eee1e..5e73a679464c0 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -138,7 +138,7 @@ bool spte_has_volatile_bits(u64 spte)
- 	return false;
- }
- 
--bool make_spte(struct kvm_vcpu *vcpu,
-+bool make_spte(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 	       struct kvm_mmu_common *mmu_common, struct kvm_mmu_page *sp,
- 	       const struct kvm_memory_slot *slot,
- 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
-@@ -179,7 +179,7 @@ bool make_spte(struct kvm_vcpu *vcpu,
- 	 * just to optimize a mode that is anything but performance critical.
- 	 */
- 	if (level > PG_LEVEL_4K && (pte_access & ACC_EXEC_MASK) &&
--	    is_nx_huge_page_enabled(vcpu->kvm)) {
-+	    is_nx_huge_page_enabled(kvm)) {
- 		pte_access &= ~ACC_EXEC_MASK;
- 	}
- 
-@@ -194,9 +194,15 @@ bool make_spte(struct kvm_vcpu *vcpu,
- 	if (level > PG_LEVEL_4K)
- 		spte |= PT_PAGE_SIZE_MASK;
- 
--	if (shadow_memtype_mask)
--		spte |= static_call(kvm_x86_get_mt_mask)(vcpu, gfn,
-+	if (shadow_memtype_mask) {
-+		if (vcpu)
-+			spte |= static_call(kvm_x86_get_mt_mask)(vcpu, gfn,
- 							 kvm_is_mmio_pfn(pfn));
-+		else
-+			spte |= static_call(kvm_x86_get_default_mt_mask)(kvm,
-+							kvm_is_mmio_pfn(pfn));
-+	}
-+
- 	if (host_writable)
- 		spte |= shadow_host_writable_mask;
- 	else
-@@ -225,7 +231,7 @@ bool make_spte(struct kvm_vcpu *vcpu,
- 		 * e.g. it's write-tracked (upper-level SPs) or has one or more
- 		 * shadow pages and unsync'ing pages is not allowed.
- 		 */
--		if (mmu_try_to_unsync_pages(vcpu->kvm, slot, gfn, can_unsync, prefetch)) {
-+		if (mmu_try_to_unsync_pages(kvm, slot, gfn, can_unsync, prefetch)) {
- 			wrprot = true;
- 			pte_access &= ~ACC_WRITE_MASK;
- 			spte &= ~(PT_WRITABLE_MASK | shadow_mmu_writable_mask);
-@@ -246,7 +252,7 @@ bool make_spte(struct kvm_vcpu *vcpu,
- 	if ((spte & PT_WRITABLE_MASK) && kvm_slot_dirty_track_enabled(slot)) {
- 		/* Enforced by kvm_mmu_hugepage_adjust. */
- 		WARN_ON_ONCE(level > PG_LEVEL_4K);
--		mark_page_dirty_in_slot(vcpu->kvm, slot, gfn);
-+		mark_page_dirty_in_slot(kvm, slot, gfn);
- 	}
- 
- 	*new_spte = spte;
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 4ad19c469bd73..f1532589b7083 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -530,7 +530,7 @@ static inline u64 get_mmio_spte_generation(u64 spte)
- 
- bool spte_has_volatile_bits(u64 spte);
- 
--bool make_spte(struct kvm_vcpu *vcpu,
-+bool make_spte(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 	       struct kvm_mmu_common *mmu_common, struct kvm_mmu_page *sp,
- 	       const struct kvm_memory_slot *slot,
- 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 892cf1f5b57a8..a45d1b71cd62a 100644
+index a45d1b71cd62a..5edff3b4698b7 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -964,7 +964,7 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+@@ -949,7 +949,9 @@ void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm)
+  * Installs a last-level SPTE to handle a TDP page fault.
+  * (NPT/EPT violation/misconfiguration)
+  */
+-static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
++static int tdp_mmu_map_handle_target_level(struct kvm *kvm,
++					  struct kvm_vcpu *vcpu,
++					  struct kvm_mmu_common *mmu_common,
+ 					  struct kvm_page_fault *fault,
+ 					  struct tdp_iter *iter)
+ {
+@@ -958,24 +960,26 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+ 	int ret = RET_PF_FIXED;
+ 	bool wrprot = false;
+ 
++	WARN_ON(!kvm);
++
+ 	if (WARN_ON_ONCE(sp->role.level != fault->goal_level))
+ 		return RET_PF_RETRY;
+ 
  	if (unlikely(!fault->slot))
  		new_spte = make_mmio_spte(vcpu->kvm, vcpu, iter->gfn, ACC_ALL);
  	else
--		wrprot = make_spte(vcpu, &vcpu->arch.mmu->common, sp, fault->slot,
-+		wrprot = make_spte(vcpu->kvm, vcpu, &vcpu->arch.mmu->common, sp, fault->slot,
+-		wrprot = make_spte(vcpu->kvm, vcpu, &vcpu->arch.mmu->common, sp, fault->slot,
++		wrprot = make_spte(kvm, vcpu, mmu_common, sp, fault->slot,
  				   ACC_ALL, iter->gfn, fault->pfn, iter->old_spte,
  				   fault->prefetch, true, fault->map_writable,
  				   &new_spte);
+ 
+ 	if (new_spte == iter->old_spte)
+ 		ret = RET_PF_SPURIOUS;
+-	else if (tdp_mmu_set_spte_atomic(vcpu->kvm, iter, new_spte))
++	else if (tdp_mmu_set_spte_atomic(kvm, iter, new_spte))
+ 		return RET_PF_RETRY;
+ 	else if (is_shadow_present_pte(iter->old_spte) &&
+ 		 !is_last_spte(iter->old_spte, iter->level))
+-		kvm_flush_remote_tlbs_gfn(vcpu->kvm, iter->gfn, iter->level);
++		kvm_flush_remote_tlbs_gfn(kvm, iter->gfn, iter->level);
+ 
+ 	/*
+ 	 * If the page fault was caused by a write but the page is write
+@@ -989,10 +993,13 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+ 
+ 	/* If a MMIO SPTE is installed, the MMIO will need to be emulated. */
+ 	if (unlikely(is_mmio_spte(new_spte))) {
+-		vcpu->stat.pf_mmio_spte_created++;
+-		trace_mark_mmio_spte(rcu_dereference(iter->sptep), iter->gfn,
+-				     new_spte);
+-		ret = RET_PF_EMULATE;
++		/* if without vcpu, no mmio spte should be installed */
++		if (!WARN_ON(!vcpu)) {
++			vcpu->stat.pf_mmio_spte_created++;
++			trace_mark_mmio_spte(rcu_dereference(iter->sptep), iter->gfn,
++					new_spte);
++			ret = RET_PF_EMULATE;
++		}
+ 	} else {
+ 		trace_kvm_mmu_set_spte(iter->level, iter->gfn,
+ 				       rcu_dereference(iter->sptep));
+@@ -1114,7 +1121,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 	goto retry;
+ 
+ map_target_level:
+-	ret = tdp_mmu_map_handle_target_level(vcpu, fault, &iter);
++	ret = tdp_mmu_map_handle_target_level(vcpu->kvm, vcpu, &vcpu->arch.mmu->common,
++					      fault, &iter);
+ 
+ retry:
+ 	rcu_read_unlock();
 -- 
 2.17.1
 
