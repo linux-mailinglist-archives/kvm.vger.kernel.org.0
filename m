@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-3257-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3258-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CB38801C1F
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 11:05:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E821801C21
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 11:06:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFD51B20E58
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 10:05:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBBCE1F211C7
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 10:06:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A93A15AE1;
-	Sat,  2 Dec 2023 10:05:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D39BF15AE5;
+	Sat,  2 Dec 2023 10:06:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KceNHWxV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F8wGCTFZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E366B1A6;
-	Sat,  2 Dec 2023 02:05:31 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DAE01A4;
+	Sat,  2 Dec 2023 02:06:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701511531; x=1733047531;
+  t=1701511571; x=1733047571;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=2TvSYcYyRxZJXd7jYUAEf7Q9pF2z8JkVIapNJrcQxZk=;
-  b=KceNHWxVMoHHTCmvnwDci7v4XGhRA6PCaY/ADkAwT9wtdPMJuhU39Z95
-   lNJ5WhQo/wnsCjMXGFEtTODwDNVqzp9y1mUfL8dRoVhX4WCCqcQvtvaTk
-   4+3CCJHY3NTVG8LQiWyKwqMf1MIzguE8PFYHFVl+EFKwDwbYyLpfCm6Hg
-   5tiZDzi4uOg9vfXeHZispiHtTJHqZ26+4nIzECS3tCMCqJuzCWtS+SaHk
-   khXqUGefse4Nz4Tk7ZRAlBNHgCrZYzDzsK7jtC6kKOKe7JGac1QSwK5mK
-   qbEAKQNj5TDE4m0oIEe+vBaUlu2T/D/LTYsQ4EXVAO3p0pTaTtwDr/lmN
+  bh=Kur6VrDVtWtZgYRN/PKml2utDvkLe+OiXJiTkkUWmVs=;
+  b=F8wGCTFZk2QUknO7gbXDejUEEb48++ssQQ0oTcPgn+IvpZwj373BhywE
+   oBuan7FuN2fOBZtxFCvFyDuYB+uXrCiP9hLsI09Xk2EJXrBZPiTSWYt+E
+   +gepyrYcVIStGEJ9pYti4pyaUrjuURhupDe4W6pd8lc7V9UedhyVWf0Ft
+   ypAMK62lK2pZctfH8ScnM/Kjukr7QfHYTyAw5LsruhPudT6VpDABAdV1p
+   ffJxv4xL4sQl5ga9DmyWgd2WT4OBjNK7WPgqzqu0nggO40NOGrCwXEeM2
+   F3Mtpn3X0PHtz2PiffhMztIAKC7n839j5uoLFI5ci+eOZ4/K9F4TbLQC/
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="392459741"
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="383989384"
 X-IronPort-AV: E=Sophos;i="6.04,245,1695711600"; 
-   d="scan'208";a="392459741"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 02:05:31 -0800
+   d="scan'208";a="383989384"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 02:06:10 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="887939973"
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="913854410"
 X-IronPort-AV: E=Sophos;i="6.04,245,1695711600"; 
-   d="scan'208";a="887939973"
+   d="scan'208";a="913854410"
 Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 02:05:28 -0800
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 02:06:07 -0800
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: iommu@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: alex.williamson@redhat.com,
 	dwmw2@infradead.org,
 	yi.l.liu@intel.com,
 	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [RFC PATCH 41/42] KVM: VMX: Implement ops .flush_remote_tlbs* in VMX when EPT is on
-Date: Sat,  2 Dec 2023 17:36:33 +0800
-Message-Id: <20231202093633.15991-1-yan.y.zhao@intel.com>
+Subject: [RFC PATCH 42/42] KVM: VMX: Notify importers of exported TDP to flush TLBs on KVM flushes EPT
+Date: Sat,  2 Dec 2023 17:37:12 +0800
+Message-Id: <20231202093712.16049-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20231202091211.13376-1-yan.y.zhao@intel.com>
 References: <20231202091211.13376-1-yan.y.zhao@intel.com>
@@ -70,58 +70,28 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 
-Add VMX implementation of ops of flush_remote_tlbs* in kvm_x86_ops when
-enable_ept is on and CONFIG_HYPERV is off.
-
-Without ops flush_remote_tlbs* in VMX, kvm_flush_remote_tlbs*() just makes
-all cpus request KVM_REQ_TLB_FLUSH after finding the two ops are
-non-present.
-So, by also making all cpu requests KVM_REQ_TLB_FLUSH in ops
-flush_remote_tlbs* in VMX, no functional changes should be introduced.
-
-The two ops allow vendor code (e.g. VMX) to control when to notify IOMMU
-to flush TLBs. This is useful for contidions when sequence to flush CPU
-TLBs and IOTLBs is important.
+Call TDP FD helper to notify importers of exported TDP to flush TLBs when
+KVM flushes EPT.
 
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ arch/x86/kvm/vmx/vmx.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 7965bc32f87de..2fec351a3fa5b 100644
+index 2fec351a3fa5b..3a2b6ddcde108 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7544,6 +7544,17 @@ static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
- 	return err;
+@@ -7547,6 +7547,9 @@ static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
+ static int vmx_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, gfn_t nr_pages)
+ {
+ 	kvm_make_all_cpus_request(kvm, KVM_REQ_TLB_FLUSH);
++#if IS_ENABLED(CONFIG_KVM_INTEL_EXPORTED_EPT)
++	kvm_tdp_fd_flush_notify(kvm, gfn, nr_pages);
++#endif
+ 	return 0;
  }
  
-+static int vmx_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, gfn_t nr_pages)
-+{
-+	kvm_make_all_cpus_request(kvm, KVM_REQ_TLB_FLUSH);
-+	return 0;
-+}
-+
-+static int vmx_flush_remote_tlbs(struct kvm *kvm)
-+{
-+	return vmx_flush_remote_tlbs_range(kvm, 0, -1ULL);
-+}
-+
- #define L1TF_MSG_SMT "L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
- #define L1TF_MSG_L1D "L1TF CPU bug present and virtualization mitigation disabled, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
- 
-@@ -8528,6 +8539,11 @@ static __init int hardware_setup(void)
- 		vmx_x86_ops.flush_remote_tlbs = hv_flush_remote_tlbs;
- 		vmx_x86_ops.flush_remote_tlbs_range = hv_flush_remote_tlbs_range;
- 	}
-+#else
-+	if (enable_ept) {
-+		vmx_x86_ops.flush_remote_tlbs = vmx_flush_remote_tlbs;
-+		vmx_x86_ops.flush_remote_tlbs_range = vmx_flush_remote_tlbs_range;
-+	}
- #endif
- 
- 	if (!cpu_has_vmx_ple()) {
 -- 
 2.17.1
 
