@@ -1,161 +1,138 @@
-Return-Path: <kvm+bounces-3213-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3214-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D721C801921
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 01:52:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 273FD801AFD
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 07:21:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13EC31C20C9F
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 00:52:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 933421F2114D
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 06:21:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AFBD17D8;
-	Sat,  2 Dec 2023 00:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF98BBE5B;
+	Sat,  2 Dec 2023 06:21:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BrsRhSBS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q8Pyakv2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D73C5103
-	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 16:51:57 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-6cde4ac52bcso3596740b3a.2
-        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 16:51:57 -0800 (PST)
+Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4EA71A6
+	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 22:21:35 -0800 (PST)
+Received: by mail-oi1-x22c.google.com with SMTP id 5614622812f47-3b844e3e817so1012252b6e.0
+        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 22:21:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701478317; x=1702083117; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qf5LyHZHuBq8ET8yZ518WK6d/Ohu8OSBvuXvyN934wU=;
-        b=BrsRhSBSD3WXs1ti220jRiSqqW2dr71Ax39DiD4BQ0UNcXaNJfeQFYVrNVDHoS55zC
-         y9swqZPcBZSpBtAtMPw5opqheNWr+F0k35RZ/nqH4KrLaThcGoyc1iFef3y6QLl693vn
-         jWyDpf/trBqxP3W39teXhPRwhja2TgKbrUxw34gmaN7DI08CvdvsnLSGOX6hgz4kRe/j
-         DLW72mZNakDaT0kEsoXs6DlkD+D0poS5Kkf4if6cxKFUy/MiR73VZ5NfQ5lZn9/neV1K
-         709jINms3S19TPiA609w7wo8lw7BzN/H9RHVZ7X3u14+l/PQ5BIXvloMKS72Ofme80vN
-         +r4A==
+        d=google.com; s=20230601; t=1701498095; x=1702102895; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=5b8TkhNUEjXgRxqNFAYhkmQKz7n9iKCkNE5IDgOJ4cc=;
+        b=q8Pyakv2A8f51sHdGOWW1mv2q4O9WwY9iId0A1kFTBjGHya646SlDJEpCvIEsXhlar
+         mwdr0998PT51VcFk6Q9IUuH1XyTJ1Q/zwCkE3iXnOdO/wzJAOsRjKoHbEfrV/QYxAumB
+         0Ay6xSBomGd2arbz74oYEnEo9YPoCpVjmJ+kQLAN6wBNXGejFsslsjWaf+VKc7jQIrqg
+         +Qt5GDXcIlzgm5bsW3wkeQnGvNKtgiFVAa+QjktOXQPb6oZs09lH8g6jOH53RA3P2XB8
+         YF+jToV3ZGg4+uuIBQ0+q8F9tFbbV974JjQ6KHg9LHQaxbeoAOYIZa5nLhs1qtaBxnuO
+         7rjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701478317; x=1702083117;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qf5LyHZHuBq8ET8yZ518WK6d/Ohu8OSBvuXvyN934wU=;
-        b=pM58Bl+SVfnx+gdH23M5g6b0KFtSwVObmyDJatMJfhbW1qpV4vrDyvj5HNLfZJribu
-         KcYbC4lWWXaV7WwHRxaa1xq70un+h3ccti+b5FkUfbtPRZdiNq2foaNMamchiLt3VK3M
-         m2+RhnIJ2YODWEg8PDwtmsdhwH/m3EbvFbgK0SINT0raBv1WmjoCgr9dnffNwwVaKMw3
-         l+YYOVIF/S+pZpwsiPKET3qGcJOX6CteDDJ2k2XAqLX632X3smTgEgJJpD2zPkWD4oVa
-         or0DQ+mZgxE59wxWMWav5PITUUETLL6kiWIoBTwqG28clLYpFr6Wqg0+32nBZfjIbL3W
-         FqOA==
-X-Gm-Message-State: AOJu0YwY8IIliuGuJoJ/nL0SnTaFbm4cjcx4hdpFzIBBS6bK88Hh5G8Z
-	UNRkpbk/0kh1LCK+Y026iWz3VoJBLZQ=
-X-Google-Smtp-Source: AGHT+IEloABSTDcKm+41L5WpzazJRfhcCVpuae9X+15kKFthyi+8YQcZOmegDR+VoF+o36yu4wG4kUpnsoo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:5848:0:b0:5b8:fe99:152d with SMTP id
- i8-20020a635848000000b005b8fe99152dmr4028549pgm.7.1701478317322; Fri, 01 Dec
- 2023 16:51:57 -0800 (PST)
-Date: Fri, 1 Dec 2023 16:51:55 -0800
-In-Reply-To: <20230918160258.GL13795@ziepe.ca>
+        d=1e100.net; s=20230601; t=1701498095; x=1702102895;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5b8TkhNUEjXgRxqNFAYhkmQKz7n9iKCkNE5IDgOJ4cc=;
+        b=Aemp5TkGkopNQMpRTzqWBFrWNvErFt6DQIiMGkc4nIhtUkTEWJqsnFCTm52UtkJ3iS
+         nhhOsyLsrw4o3O+mi5/Ueakd464E3nQYbUTxcs1v50QQFGTXiOal3jK9Y3FhgFuTyTO3
+         52FpqxDtb5KboQD7K3tyXLle1wOtzMqMTUIRX/E+8CkzxBm0CaTZwrKpAkzjgh3L30n2
+         E3nBWex1SiQapBDUdbaP8d/aNSqmH8QIlucZRcmiTGynierwtKtvRMEDYQ1L0Wt9tUZG
+         /EzdRnT60fHOIhySnwtV4p84kXXlXKE3VQklacTHoCO/Sv68aOhyWO1mfesa3a8dXdlx
+         Cd3w==
+X-Gm-Message-State: AOJu0YwPF+wpjYOAH4bZw7L7PATo7JrgrbyL0Dkq/RJWs3FTTtQEEzxB
+	4TbGQ7bMy5wZoNmB+bFskdejbA==
+X-Google-Smtp-Source: AGHT+IGi2zDm+Qs4vKqwLkq6U/5M+to0EYxOa/zUjPYtdouHSnFLkscTF6VyT7ulY15O6AjaGZUylw==
+X-Received: by 2002:a05:6808:e85:b0:3b8:b063:9b6d with SMTP id k5-20020a0568080e8500b003b8b0639b6dmr1014391oil.95.1701498095001;
+        Fri, 01 Dec 2023 22:21:35 -0800 (PST)
+Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
+        by smtp.gmail.com with ESMTPSA id i5-20020aa787c5000000b006cb7e61cfa7sm3947324pfo.36.2023.12.01.22.21.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Dec 2023 22:21:34 -0800 (PST)
+Date: Sat, 2 Dec 2023 06:21:31 +0000
+From: Mingwei Zhang <mizhang@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Ashish Kalra <ashish.kalra@amd.com>, Jacky Li <jackyli@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ovidiu Panait <ovidiu.panait@windriver.com>,
+	Liam Merwick <liam.merwick@oracle.com>,
+	David Rientjes <rientjes@google.com>,
+	David Kaplan <david.kaplan@amd.com>,
+	Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org,
+	Michael Roth <michael.roth@amd.com>
+Subject: Re: [RFC PATCH 0/4] KVM: SEV: Limit cache flush operations in sev
+ guest memory reclaim events
+Message-ID: <ZWrM622xUb4pe7gS@google.com>
+References: <20231110003734.1014084-1-jackyli@google.com>
+ <ZWogUHqoIwiHGehZ@google.com>
+ <CAL715WKVHJqpA=VsO3BZhs9bS9AXiy77+k-aMEh+FGOKZREp+g@mail.gmail.com>
+ <f3299f0b-e5c8-9a60-a6e5-87bb5076d56f@amd.com>
+ <CAL715WK7zF3=HJf9qkA-pbs1VMMxSw_=2Z-e6e_621HnK-nC8g@mail.gmail.com>
+ <ZWpaoLpWNk_P_zum@google.com>
+ <CAL715W+x5hv=qYogs0smVAjakeS=4dsuDpGrTE-ovze8QECtKg@mail.gmail.com>
+ <ZWpec_P17GL01yL0@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230916003118.2540661-1-seanjc@google.com> <20230916003118.2540661-6-seanjc@google.com>
- <20230918152110.GI13795@ziepe.ca> <ZQhxpesyXeG+qbS6@google.com> <20230918160258.GL13795@ziepe.ca>
-Message-ID: <ZWp_q1w01NCZi8KX@google.com>
-Subject: Re: [PATCH 05/26] vfio: KVM: Pass get/put helpers from KVM to VFIO,
- don't do circular lookup
-From: Sean Christopherson <seanjc@google.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Tony Krowiak <akrowiak@linux.ibm.com>, 
-	Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>, 
-	Harald Freudenberger <freude@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	Andy Lutomirski <luto@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	Anish Ghulati <aghulati@google.com>, Venkatesh Srinivas <venkateshs@chromium.org>, 
-	Andrew Thornton <andrewth@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZWpec_P17GL01yL0@google.com>
 
-On Mon, Sep 18, 2023, Jason Gunthorpe wrote:
-> On Mon, Sep 18, 2023 at 08:49:57AM -0700, Sean Christopherson wrote:
-> > On Mon, Sep 18, 2023, Jason Gunthorpe wrote:
-> > > On Fri, Sep 15, 2023 at 05:30:57PM -0700, Sean Christopherson wrote:
-> > > > Explicitly pass KVM's get/put helpers to VFIO when attaching a VM to
-> > > > VFIO instead of having VFIO do a symbol lookup back into KVM.  Having both
-> > > > KVM and VFIO do symbol lookups increases the overall complexity and places
-> > > > an unnecessary dependency on KVM (from VFIO) without adding any value.
-> > > > 
-> > > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > > ---
-> > > >  drivers/vfio/vfio.h      |  2 ++
-> > > >  drivers/vfio/vfio_main.c | 74 +++++++++++++++++++---------------------
-> > > >  include/linux/vfio.h     |  4 ++-
-> > > >  virt/kvm/vfio.c          |  9 +++--
-> > > >  4 files changed, 47 insertions(+), 42 deletions(-)
-> > > 
-> > > I don't mind this, but Christoph had disliked my prior attempt to do
-> > > this with function pointers..
-> > > 
-> > > The get can be inlined, IIRC, what about putting a pointer to the put
-> > > inside the kvm struct?
+On Fri, Dec 01, 2023, Sean Christopherson wrote:
+> On Fri, Dec 01, 2023, Mingwei Zhang wrote:
+> > On Fri, Dec 1, 2023 at 2:13 PM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Fri, Dec 01, 2023, Mingwei Zhang wrote:
+> > > > On Fri, Dec 1, 2023 at 1:30 PM Kalra, Ashish <ashish.kalra@amd.com> wrote:
+> > > > > For SNP + gmem, where the HVA ranges covered by the MMU notifiers are
+> > > > > not acting on encrypted pages, we are ignoring MMU invalidation
+> > > > > notifiers for SNP guests as part of the SNP host patches being posted
+> > > > > upstream and instead relying on gmem own invalidation stuff to clean
+> > > > > them up on a per-folio basis.
+> > > > >
+> > > > > Thanks,
+> > > > > Ashish
+> > > >
+> > > > oh, I have no question about that. This series only applies to
+> > > > SEV/SEV-ES type of VMs.
+> > > >
+> > > > For SNP + guest_memfd, I don't see the implementation details, but I
+> > > > doubt you can ignore mmu_notifiers if the request does cover some
+> > > > encrypted memory in error cases or corner cases. Does the SNP enforce
+> > > > the usage of guest_memfd? How do we prevent exceptional cases? I am
+> > > > sure you guys already figured out the answers, so I don't plan to dig
+> > > > deeper until SNP host pages are accepted.
+> > >
+> > > KVM will not allow SNP guests to map VMA-based memory as encrypted/private, full
+> > > stop.  Any invalidations initiated by mmu_notifiers will therefore apply only to
+> > > shared memory.
 > > 
-> > That wouldn't allow us to achieve our goal, which is to hide the details of
-> > "struct kvm" from VFIO (and the rest of the kernel).
+> > Remind me. If I (as a SEV-SNP guest) flip the C-bit in my own x86 page
+> > table and write to some of the pages, am I generating encrypted dirty
+> > cache lines?
 > 
-> > What's the objection to handing VFIO a function pointer?
+> No.  See Table 15-39. "RMP Memory Access Checks" in the APM (my attempts to copy
+> it to plain test failed miserably).  
 > 
-> Hmm, looks like it was this thread:
+> For accesses with effective C-bit == 0, the page must be Hypervisor-Owned.  For
+> effective C-bit == 1, the page must be fully assigned to the guest.  Violation
+> of those rules generates #VMEXIT.
 > 
->  https://lore.kernel.org/r/0-v1-33906a626da1+16b0-vfio_kvm_no_group_jgg@nvidia.com
-> 
-> Your rational looks a little better to me.
-> 
-> > > The the normal kvm get/put don't have to exported symbols at all?
-> > 
-> > The export of kvm_get_kvm_safe() can go away (I forgot to do that in this series),
-> > but kvm_get_kvm() will hang around as it's needed by KVM sub-modules (PPC and x86),
-> > KVMGT (x86), and drivers/s390/crypto/vfio_ap_ops.c (no idea what to call that beast).
-> 
-> My thought would be to keep it as an inline, there should be some way
-> to do that without breaking your desire to hide the bulk of the kvm
-> struct content. Like put the refcount as the first element in the
-> struct and just don't ifdef it away?.
+> A missing Validated attribute causes a #VC, but that case has lower priority than
+> the about checks.
 
-That doesn't work because of the need to invoke kvm_destroy_vm() when the last
-reference is put, i.e. all of kvm_destroy_vm() would need to be inlined (LOL) or
-VFIO would need to do a symbol lookup on kvm_destroy_vm(), which puts back us at
-square one.
+Thank you. RMP check seems to be mandatory on all memory accesses when
+SNP is active. Hope that property remain an invarient regardless of any
+future optimization.
 
-There's one more wrinkle: this patch is buggy in that it doesn't ensure the liveliness
-of KVM-the-module, i.e. nothing prevents userspace from unloading kvm.ko while VFIO
-still holds a reference to a kvm structure, and so invoking ->put_kvm() could jump
-into freed code.  To fix that, KVM would also need to pass along a module pointer :-(
-
-One thought would be to have vac.ko (tentative name), which is the "base" module
-that will hold the KVM/virtualization bits that need to be singletons, i.e. can't
-be per-KVM, provide the symbols needed for VFIO to manage references.  But that
-just ends up moving the module reference trickiness into VAC+KVM, e.g. vac.ko would
-still need to be handed a function pointer in order to call back into the correct
-kvm.ko code.
-
-Hrm, but I suspect the vac.ko <=> kvm.ko interactions will need to deal with
-module shenanigans anyways, and the shenanigans would only affect crazy people
-like us that actually want multiple KVM modules.
-
-I'll plan on going that route.  The very worst case scenario is that it just punts
-this conversation down to a possibile future.  Dropping this patch and the previous
-prep patch won't meaningful affect the goals of this series, as only kvm_get_kvm_safe()
-and kvm_get_kvm() would need to be exposed outside of #ifdef __KVM__.  Then we can
-figure out what to do with them if/when the whole multi-KVM thing comes along.
+Thanks.
+-Mingwei
 
