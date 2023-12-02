@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-3194-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3195-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89DD0801881
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 01:05:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4339E801882
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 01:05:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9F6C1C20B87
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 00:05:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 745B61C20AC9
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 00:05:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFFA28467;
-	Sat,  2 Dec 2023 00:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D93927E3;
+	Sat,  2 Dec 2023 00:04:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AAY+Tv3H"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vkFmXeBr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43EC71BC6
-	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 16:04:40 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-2865a614ed6so1396129a91.1
-        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 16:04:40 -0800 (PST)
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92A00D63
+	for <kvm@vger.kernel.org>; Fri,  1 Dec 2023 16:04:42 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-6cdce03c11dso3253912b3a.3
+        for <kvm@vger.kernel.org>; Fri, 01 Dec 2023 16:04:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701475479; x=1702080279; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1701475481; x=1702080281; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=kARN2t1cDT1nPhBBpb3LTJ5yo8qfPIAw+yo3QqNarOE=;
-        b=AAY+Tv3HRsRRO7etlXqC0lCOCShST/GGftsFzjIet2J7cna2R5K4TW+Y61HpbcKnLf
-         sSm13SLogQ3Wex8o9pMrXgfes8g8h3edtoWHygcq2Nw89h/Esp3vVCX9u6StgV8ZbOr/
-         xp+dMlXlN3M8BeyHDnB8RWxkCPQuoTXhnXTMRCKeJi9/ypGqDa8hyDlGjhdfoLel7NFg
-         rp5Ph59GGvzjmxvsfB+liF6LhCgqcC8c6VNCZxXV2svH8cHUTcplApVgnI+LW8RfTZY3
-         cMyq/7FpSrVhNmePc9xljNXA/h2WYyj7sjS4BthD5+lum2rwrNFPqYl6AfXNAiZpvxP8
-         03mg==
+        bh=NWUMUOutKGtyIyuL4E6eg71BcaGpjE4r0WivmAjqhQo=;
+        b=vkFmXeBrnLA3KUT2Ag6XygeUQ6MXQduujfOuqBsOvo7RJKXRnBXBV3ATRejtSj4i29
+         mrWuRgX1UWxp0EpwihSkC6XWQfFRQI8cVt4bWhHqlo1RPCtqVh1DFQjRYR4KC2O0o/UC
+         OPnAelKxH+9QRoEgxK56Qh45Zy8O00nZFFgzL01xYXl6TwN4v9kCoj8aUOt/iDF9steF
+         StqVOjgk7A2kJbIq6fxFjkQI56NECaqEsmKSr5stGoPk+lIRazUEZNDNkiD0Kc5xu+UD
+         iRbV98Fimcs43Gyt0CdaJbAWt78KBJXWtvRoz3reolnCgSPWKNiWC2hc/5JWTR7yG2HV
+         F9qA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701475479; x=1702080279;
+        d=1e100.net; s=20230601; t=1701475481; x=1702080281;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=kARN2t1cDT1nPhBBpb3LTJ5yo8qfPIAw+yo3QqNarOE=;
-        b=Q385irUPPUaY/VijIPi0uofQWiemUyegaP1CJRFz/PMHU6x9FlZK4goiBGcTYBLgxf
-         3pnHH4e/jDdfmXtOB7Y58LY5bNDUWnBTCMxYgHCSXz6iq7DqdFFeK5kosTYPFo3lXjlU
-         XpOePwC9+/wkQidrU3wudZRiaSa2eE7BMBuS0Z+/YM5XdfNk/GnXmoaQo/w8lfY+Y9lc
-         mmbLdjVDsXo5cBkePoTcOGTMqldbZl/CuZfVKGA8urZ9LYFPQUWlsTT3LQO1xf7L07NA
-         7fMx127+SI3umwky2Z8Q04ek27ksaqei6FQeGt8jgpoxXIl9BK9wn/5/opI8eQCouQS/
-         OBcQ==
-X-Gm-Message-State: AOJu0YwwpJ7lfHRi374cxMpiASxiboUEkKgfNUboRyxAPT+3XQ4wf2hI
-	ZwfCqEgjgh0zLz27kpj8x53qbms0FMw=
-X-Google-Smtp-Source: AGHT+IGkgfpbdPCK5UBd6AozaX6YxWcy/rifmqb9aNIZ5Kc3MKHGLaSP/2ib181qUSOmDWEVRIzpY9ZYZqs=
+        bh=NWUMUOutKGtyIyuL4E6eg71BcaGpjE4r0WivmAjqhQo=;
+        b=mtvnRIC2FlalAGefV5+EXRFOf0ZFy4z//jWK/7C7PoMoz6fYej5Qb4ChXfIFohVOQ4
+         +Razo01V+etXAkci+uEAB3sk9bxi/N+P1xrMRMrFV/BkWAaB3C0HXgpKdwinNjCs4iFb
+         Uz75VhaU4DF/meS6B+X8a0tENmN3lbFNwHZWxl9mGeAkj4D4IP8Yl35TRWypWKmRGWtL
+         w4e16fRy6lKSPiz9Or6uqiXXnfX7NEGl9xbO4tkNWsu2x/OmDV19uubhgPTfsTr5GdTI
+         czeu20EEuHOMTazRdjGW+ziMZhZaL7XkI8vCj03tU8r5VvS3pN2IoX9GX8dpxV4jdVUH
+         52aA==
+X-Gm-Message-State: AOJu0YynA55+aIjJ8a9jgmHOMnAL8QLTXVKzcVU0Pk9v4dYcejvTG79s
+	4bXwOeZHsK5+wPbr7BDfT+JuMB/I9d8=
+X-Google-Smtp-Source: AGHT+IFLZ3n4QDdqu0zGYJAic2GBcG2EKc6qFz6tKfjhBAZX1ARziQITUdnBKgtaw6vShuyvqJ6bj5SgKYk=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:3291:b0:1cf:5cd7:8416 with SMTP id
- jh17-20020a170903329100b001cf5cd78416mr5059080plb.13.1701475479406; Fri, 01
- Dec 2023 16:04:39 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2d29:b0:6cd:f18e:17d with SMTP id
+ fa41-20020a056a002d2900b006cdf18e017dmr891277pfb.1.1701475481557; Fri, 01 Dec
+ 2023 16:04:41 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  1 Dec 2023 16:03:59 -0800
+Date: Fri,  1 Dec 2023 16:04:00 -0800
 In-Reply-To: <20231202000417.922113-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -61,9 +61,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20231202000417.922113-1-seanjc@google.com>
 X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
-Message-ID: <20231202000417.922113-11-seanjc@google.com>
-Subject: [PATCH v9 10/28] KVM: x86/pmu: Explicitly check for RDPMC of
- unsupported Intel PMC types
+Message-ID: <20231202000417.922113-12-seanjc@google.com>
+Subject: [PATCH v9 11/28] KVM: selftests: Add vcpu_set_cpuid_property() to set properties
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -72,49 +71,79 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Aaron Lewis <aaronlewis@google.com>, Like Xu <likexu@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Explicitly check for attempts to read unsupported PMC types instead of
-letting the bounds check fail.  Functionally, letting the check fail is
-ok, but it's unnecessarily subtle and does a poor job of documenting the
-architectural behavior that KVM is emulating.
+From: Jinrong Liang <cloudliang@tencent.com>
 
-Opportunistically add macros for the type vs. index to further document
-what is going on.
+Add vcpu_set_cpuid_property() helper function for setting properties, and
+use it instead of open coding an equivalent for MAX_PHY_ADDR.  Future vPMU
+testcases will also need to stuff various CPUID properties.
 
+Reviewed-by: Jim Mattson <jmattson@google.com>
+Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
+Co-developed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/pmu_intel.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ .../selftests/kvm/include/x86_64/processor.h      |  4 +++-
+ .../testing/selftests/kvm/lib/x86_64/processor.c  | 15 ++++++++++++---
+ .../x86_64/smaller_maxphyaddr_emulation_test.c    |  2 +-
+ 3 files changed, 16 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 644de27bd48a..bd4f4bdf5419 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -23,6 +23,9 @@
- /* Perf's "BASE" is wildly misleading, this is a single-bit flag, not a base. */
- #define INTEL_RDPMC_FIXED	INTEL_PMC_FIXED_RDPMC_BASE
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index a84863503fcb..932944c4ea01 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -995,7 +995,9 @@ static inline void vcpu_set_cpuid(struct kvm_vcpu *vcpu)
+ 	vcpu_ioctl(vcpu, KVM_GET_CPUID2, vcpu->cpuid);
+ }
  
-+#define INTEL_RDPMC_TYPE_MASK	GENMASK(31, 16)
-+#define INTEL_RDPMC_INDEX_MASK	GENMASK(15, 0)
-+
- #define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFCTR0)
+-void vcpu_set_cpuid_maxphyaddr(struct kvm_vcpu *vcpu, uint8_t maxphyaddr);
++void vcpu_set_cpuid_property(struct kvm_vcpu *vcpu,
++			     struct kvm_x86_cpu_property property,
++			     uint32_t value);
  
- static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
-@@ -82,9 +85,13 @@ static struct kvm_pmc *intel_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
- 	/*
- 	 * Fixed PMCs are supported on all architectural PMUs.  Note, KVM only
- 	 * emulates fixed PMCs for PMU v2+, but the flag itself is still valid,
--	 * i.e. let RDPMC fail due to accessing a non-existent counter.
-+	 * i.e. let RDPMC fail due to accessing a non-existent counter.  Reject
-+	 * attempts to read all other types, which are unknown/unsupported.
- 	 */
--	idx &= ~INTEL_RDPMC_FIXED;
-+	if (idx & INTEL_RDPMC_TYPE_MASK & ~INTEL_RDPMC_FIXED)
-+		return NULL;
+ void vcpu_clear_cpuid_entry(struct kvm_vcpu *vcpu, uint32_t function);
+ void vcpu_set_or_clear_cpuid_feature(struct kvm_vcpu *vcpu,
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index d8288374078e..67eb82a6c754 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -752,12 +752,21 @@ void vcpu_init_cpuid(struct kvm_vcpu *vcpu, const struct kvm_cpuid2 *cpuid)
+ 	vcpu_set_cpuid(vcpu);
+ }
+ 
+-void vcpu_set_cpuid_maxphyaddr(struct kvm_vcpu *vcpu, uint8_t maxphyaddr)
++void vcpu_set_cpuid_property(struct kvm_vcpu *vcpu,
++			     struct kvm_x86_cpu_property property,
++			     uint32_t value)
+ {
+-	struct kvm_cpuid_entry2 *entry = vcpu_get_cpuid_entry(vcpu, 0x80000008);
++	struct kvm_cpuid_entry2 *entry;
 +
-+	idx &= INTEL_RDPMC_INDEX_MASK;
- 	if (fixed) {
- 		counters = pmu->fixed_counters;
- 		num_counters = pmu->nr_arch_fixed_counters;
++	entry = __vcpu_get_cpuid_entry(vcpu, property.function, property.index);
++
++	(&entry->eax)[property.reg] &= ~GENMASK(property.hi_bit, property.lo_bit);
++	(&entry->eax)[property.reg] |= value << property.lo_bit;
+ 
+-	entry->eax = (entry->eax & ~0xff) | maxphyaddr;
+ 	vcpu_set_cpuid(vcpu);
++
++	/* Sanity check that @value doesn't exceed the bounds in any way. */
++	TEST_ASSERT_EQ(kvm_cpuid_property(vcpu->cpuid, property), value);
+ }
+ 
+ void vcpu_clear_cpuid_entry(struct kvm_vcpu *vcpu, uint32_t function)
+diff --git a/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
+index 06edf00a97d6..9b89440dff19 100644
+--- a/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
++++ b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
+@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
+ 	vm_init_descriptor_tables(vm);
+ 	vcpu_init_descriptor_tables(vcpu);
+ 
+-	vcpu_set_cpuid_maxphyaddr(vcpu, MAXPHYADDR);
++	vcpu_set_cpuid_property(vcpu, X86_PROPERTY_MAX_PHY_ADDR, MAXPHYADDR);
+ 
+ 	rc = kvm_check_cap(KVM_CAP_EXIT_ON_EMULATION_FAILURE);
+ 	TEST_ASSERT(rc, "KVM_CAP_EXIT_ON_EMULATION_FAILURE is unavailable");
 -- 
 2.43.0.rc2.451.g8631bc7472-goog
 
