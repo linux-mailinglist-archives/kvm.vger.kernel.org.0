@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-3244-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3245-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B6D6801BFA
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 10:58:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8689801BFC
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 10:58:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AEBE1C20944
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 09:58:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 631BD1F21178
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 09:58:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17FC15495;
-	Sat,  2 Dec 2023 09:58:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E80815496;
+	Sat,  2 Dec 2023 09:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g0FBx8eH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QNgizjN+"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4791E3;
-	Sat,  2 Dec 2023 01:58:23 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1933D48;
+	Sat,  2 Dec 2023 01:58:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701511103; x=1733047103;
+  t=1701511127; x=1733047127;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=/sZNp1HTRIQfF9DKgY191Av3Iz3lMdrk+plprrEgK+w=;
-  b=g0FBx8eHz1PxIow3zhCSsV9sgvMBKfNWPsderNGvX4z2P4Osbh2W+86+
-   Htv6ql1KBx9jl8Bi/Y2IJdgudgZhVqQHc4g69C89XHmAdHZ9UTfsX7Ix0
-   xgxE+xv43w+Ttt1ScmAWkCTMZVPdSiTckVk13M5xqwoUqx9nUXuFvyWWY
-   cvY6tmWpIB6SsisubCuda4vyfFdCZh8I+m37+tMkNmPq/cVP1+X8r2OjV
-   dtjIe02uxLQvkzruxukuwcLaGxFIY8mO3f+u/FkoMCbv+J6kNzhLHv5u4
-   j83luoNNQojQ+DjMFhHNf9pDH2hIab80iYrCqJz/hNdVDwFOXWizKyQx2
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="393322323"
+  bh=9hhVkoMnDMz5pGlI3lvmW362r0q8LSuE7t4ADMue25I=;
+  b=QNgizjN+13FOvANliVFwV8k6h+zGqT7x0n8BKu5LWYxPTOuGTbt+KP+k
+   X8pbvr14EsJrFHXcPOB+W/giYeGEAwVg89NXE61TU9tLldWNLM8f0DioU
+   g+KEKK5eCkbv56ngVkfBY0DJR2jPeTgOoMY2MfK8F+sbj5Y+SkuSTKZWi
+   UgmSq3qdc6EtXEOtUFHOHmSg5sVT/LWWgnpXlScsqz3DVHH47ooJtl8zG
+   Rg/nedfxtMw5FZu2E6m7MD2xCWV26qTrQBEylrIC/9PJdDHrBmZkHGa7Q
+   ixNNBO3nM2ETttdu9C8HD4dqrEsWxV1kIYDtPpPHZK8on7WEJ97SWjCuc
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="393322340"
 X-IronPort-AV: E=Sophos;i="6.04,245,1695711600"; 
-   d="scan'208";a="393322323"
+   d="scan'208";a="393322340"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 01:58:23 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 01:58:47 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="804337625"
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="804337647"
 X-IronPort-AV: E=Sophos;i="6.04,245,1695711600"; 
-   d="scan'208";a="804337625"
+   d="scan'208";a="804337647"
 Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 01:58:19 -0800
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 01:58:43 -0800
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: iommu@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: alex.williamson@redhat.com,
 	dwmw2@infradead.org,
 	yi.l.liu@intel.com,
 	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [RFC PATCH 28/42] KVM: x86/mmu: change "vcpu" to "kvm" in page_fault_handle_page_track()
-Date: Sat,  2 Dec 2023 17:29:20 +0800
-Message-Id: <20231202092920.15167-1-yan.y.zhao@intel.com>
+Subject: [RFC PATCH 29/42] KVM: x86/mmu: remove param "vcpu" from kvm_mmu_get_tdp_level()
+Date: Sat,  2 Dec 2023 17:29:48 +0800
+Message-Id: <20231202092948.15224-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20231202091211.13376-1-yan.y.zhao@intel.com>
 References: <20231202091211.13376-1-yan.y.zhao@intel.com>
@@ -70,70 +70,67 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 
-page_fault_handle_page_track() only uses param "vcpu" to refer to
-"vcpu->kvm", change it to "kvm" directly.
+kvm_mmu_get_tdp_level() only requires param "vcpu" for cpuid_maxphyaddr().
+So, pass in the value of cpuid_maxphyaddr() directly to avoid param "vcpu".
+
+This is a preparation patch for later KVM MMU to export TDP.
 
 No functional changes expected.
 
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c         | 8 ++++----
- arch/x86/kvm/mmu/paging_tmpl.h | 2 +-
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index b461bab51255e..73437c1b1943e 100644
+index 73437c1b1943e..abdf49b5cdd79 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4186,7 +4186,7 @@ static int handle_mmio_page_fault(struct kvm_vcpu *vcpu, u64 addr, bool direct)
- 	return RET_PF_RETRY;
+@@ -5186,14 +5186,14 @@ void __kvm_mmu_refresh_passthrough_bits(struct kvm_vcpu *vcpu,
+ 	reset_guest_paging_metadata(vcpu, mmu);
  }
  
--static bool page_fault_handle_page_track(struct kvm_vcpu *vcpu,
-+static bool page_fault_handle_page_track(struct kvm *kvm,
- 					 struct kvm_page_fault *fault)
+-static inline int kvm_mmu_get_tdp_level(struct kvm_vcpu *vcpu)
++static inline int kvm_mmu_get_tdp_level(int maxphyaddr)
  {
- 	if (unlikely(fault->rsvd))
-@@ -4199,7 +4199,7 @@ static bool page_fault_handle_page_track(struct kvm_vcpu *vcpu,
- 	 * guest is writing the page which is write tracked which can
- 	 * not be fixed by page fault handler.
+ 	/* tdp_root_level is architecture forced level, use it if nonzero */
+ 	if (tdp_root_level)
+ 		return tdp_root_level;
+ 
+ 	/* Use 5-level TDP if and only if it's useful/necessary. */
+-	if (max_tdp_level == 5 && cpuid_maxphyaddr(vcpu) <= 48)
++	if (max_tdp_level == 5 && maxphyaddr <= 48)
+ 		return 4;
+ 
+ 	return max_tdp_level;
+@@ -5211,7 +5211,7 @@ kvm_calc_tdp_mmu_root_page_role(struct kvm_vcpu *vcpu,
+ 	role.smm = cpu_role.base.smm;
+ 	role.guest_mode = cpu_role.base.guest_mode;
+ 	role.ad_disabled = !kvm_ad_enabled();
+-	role.level = kvm_mmu_get_tdp_level(vcpu);
++	role.level = kvm_mmu_get_tdp_level(cpuid_maxphyaddr(vcpu));
+ 	role.direct = true;
+ 	role.has_4_byte_gpte = false;
+ 
+@@ -5310,7 +5310,7 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, unsigned long cr0,
+ 	WARN_ON_ONCE(cpu_role.base.direct);
+ 
+ 	root_role = cpu_role.base;
+-	root_role.level = kvm_mmu_get_tdp_level(vcpu);
++	root_role.level = kvm_mmu_get_tdp_level(cpuid_maxphyaddr(vcpu));
+ 	if (root_role.level == PT64_ROOT_5LEVEL &&
+ 	    cpu_role.base.level == PT64_ROOT_4LEVEL)
+ 		root_role.passthrough = 1;
+@@ -6012,7 +6012,8 @@ static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+ 	 * other exception is for shadowing L1's 32-bit or PAE NPT on 64-bit
+ 	 * KVM; that horror is handled on-demand by mmu_alloc_special_roots().
  	 */
--	if (kvm_gfn_is_write_tracked(vcpu->kvm, fault->slot, fault->gfn))
-+	if (kvm_gfn_is_write_tracked(kvm, fault->slot, fault->gfn))
- 		return true;
+-	if (tdp_enabled && kvm_mmu_get_tdp_level(vcpu) > PT32E_ROOT_LEVEL)
++	if (tdp_enabled &&
++	    kvm_mmu_get_tdp_level(cpuid_maxphyaddr(vcpu)) > PT32E_ROOT_LEVEL)
+ 		return 0;
  
- 	return false;
-@@ -4378,7 +4378,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	if (WARN_ON_ONCE(kvm_mmu_is_dummy_root(vcpu->arch.mmu->common.root.hpa)))
- 		return RET_PF_RETRY;
- 
--	if (page_fault_handle_page_track(vcpu, fault))
-+	if (page_fault_handle_page_track(vcpu->kvm, fault))
- 		return RET_PF_EMULATE;
- 
- 	r = fast_page_fault(vcpu, fault);
-@@ -4458,7 +4458,7 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
- {
- 	int r;
- 
--	if (page_fault_handle_page_track(vcpu, fault))
-+	if (page_fault_handle_page_track(vcpu->kvm, fault))
- 		return RET_PF_EMULATE;
- 
- 	r = fast_page_fault(vcpu, fault);
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 13c6390824a3e..f685b036f6637 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -803,7 +803,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	fault->max_level = walker.level;
- 	fault->slot = kvm_vcpu_gfn_to_memslot(vcpu, fault->gfn);
- 
--	if (page_fault_handle_page_track(vcpu, fault)) {
-+	if (page_fault_handle_page_track(vcpu->kvm, fault)) {
- 		shadow_page_table_clear_flood(vcpu, fault->addr);
- 		return RET_PF_EMULATE;
- 	}
+ 	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_DMA32);
 -- 
 2.17.1
 
