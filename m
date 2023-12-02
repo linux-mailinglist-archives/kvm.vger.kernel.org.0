@@ -1,121 +1,312 @@
-Return-Path: <kvm+bounces-3259-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3261-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26ED7801DC3
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 17:36:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC46A801E6F
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 21:25:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 566E51C2096C
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 16:36:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5790928113D
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 20:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADFF116430;
-	Sat,  2 Dec 2023 16:36:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 814DE2136D;
+	Sat,  2 Dec 2023 20:24:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cyGcmui4"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="aPy5PMP9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B2DD11A
-	for <kvm@vger.kernel.org>; Sat,  2 Dec 2023 08:36:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701534973;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Yt4yCDhbgJbVqEjZGY+0zrwL/gtoQ/Q8nFWZ1u+3nY8=;
-	b=cyGcmui40LxaaDL147+fL4K1GV5zvfXhAQqptcYdDztAPPbtFhWLAEXnQKkS7upnB1cBqp
-	HrX6PokkYHfCy37HnizIrg51TG2+B5adPsT6qKSSGK/qLNA/2r29UttZFNfLWDemlml1lK
-	SuoLPbq5UKPXcSn0hKJNdlH3Z8lG5Fo=
-Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
- [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-206-Y8vwmrwBOuC64RbB9xF0SA-1; Sat, 02 Dec 2023 11:36:11 -0500
-X-MC-Unique: Y8vwmrwBOuC64RbB9xF0SA-1
-Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-5d0c4ba7081so56434147b3.0
-        for <kvm@vger.kernel.org>; Sat, 02 Dec 2023 08:36:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701534969; x=1702139769;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Yt4yCDhbgJbVqEjZGY+0zrwL/gtoQ/Q8nFWZ1u+3nY8=;
-        b=IQBwK3YQH/xehg+gwy8pa4SqDKaV6XD4I1FgSRApE9/CEdFFGClmgvhqh2f06Z8k7u
-         yv4jb+OweAbAMKwx8vWZC+QXFpjQLh9cdtCf5tgNiQKVKX3l3achD2m0ZgI6n+qXXDS6
-         d6oF0E/uB44wuKKZV/CcaCn8/YqyaVTg5WOdy8qGbcy02bk7e0KfnxdAXIOs/cfqWiGg
-         1mec7GYKPPgv3WP3YwKIbCxI920PFQ0UZLQSFhfMHvq6A9rcMvQo2hEpshYJO31NnEwW
-         71sa/woieI/O4fo/3811dZy9qLX2SAWTf7POd4Codv60Gei4ovKPC8oAhok1LaSezC4J
-         2KIg==
-X-Gm-Message-State: AOJu0Yx+rRF0XPs23y9YayODK2qvBU0F5uX/LDdgKyun661JcjCLvSy/
-	7pNwqoM+TOjz0249eulL83pgWvxPeGBrYSUzaaPtBdY4/eZaIlY0tkb8GG/hZFTe+wlMKggAZ1v
-	nahlv7zb2yHq8
-X-Received: by 2002:a25:ae8c:0:b0:db7:dacf:59e4 with SMTP id b12-20020a25ae8c000000b00db7dacf59e4mr769306ybj.88.1701534968787;
-        Sat, 02 Dec 2023 08:36:08 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEftyDWBBv+mMnPECb2rVK9oTYatxunIoB2W4Ql4AbzgDHuw14U6JLB0Zeu8QENlNaWlUxpXw==
-X-Received: by 2002:a25:ae8c:0:b0:db7:dacf:59e4 with SMTP id b12-20020a25ae8c000000b00db7dacf59e4mr769287ybj.88.1701534968536;
-        Sat, 02 Dec 2023 08:36:08 -0800 (PST)
-Received: from treble (fixed-187-191-47-119.totalplay.net. [187.191.47.119])
-        by smtp.gmail.com with ESMTPSA id b25-20020a67e999000000b0046450681113sm698807vso.9.2023.12.02.08.36.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Dec 2023 08:36:08 -0800 (PST)
-Date: Sat, 2 Dec 2023 10:36:05 -0600
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-To: Valentin Schneider <vschneid@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-arch@vger.kernel.org, x86@kernel.org,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Borislav Petkov <bp@alien8.de>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Wanpeng Li <wanpengli@tencent.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>, Jason Baron <jbaron@akamai.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Feng Tang <feng.tang@intel.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"Mike Rapoport (IBM)" <rppt@kernel.org>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	David Hildenbrand <david@redhat.com>,
-	"ndesaulniers@google.com" <ndesaulniers@google.com>,
-	Michael Kelley <mikelley@microsoft.com>,
-	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>
-Subject: Re: [PATCH 0/5] jump_label: Fix __ro_after_init keys for modules &
- annotate some keys
-Message-ID: <20231201204400.wckmtoe3kroiyv4s@treble>
-References: <20231120105528.760306-1-vschneid@redhat.com>
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 792A9A8;
+	Sat,  2 Dec 2023 12:24:46 -0800 (PST)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 52EC8120037;
+	Sat,  2 Dec 2023 23:24:42 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 52EC8120037
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1701548682;
+	bh=RWcwjSnHEAmOwjrvZ5XQTOp+kK9yRK6Dmvot+OW6x5o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=aPy5PMP98beRZYWPiCgQA+47fT9u2F+nyU2EN6OjaG9gX/q5wNrZsb2NmBXkzsNaq
+	 1X3SZDi8TYXYrbiWzAymKZxQXRtiSSCyTWvHmVd4L1+UUrW1tqdN6+2kIJGwrAH8/m
+	 1taq2zOZRPLtp3ymYbiSQhJt1jzr0IASn8EREf9wt0ha1qc5IhsV31IWoubJPg4vQD
+	 jU8hSoxfNnQxQNgL7ucEglpwZoQ9sZK1vFfcexVdFtT7ZVZxW/uiz+NC5Pg3DHpqy4
+	 JlINLTA2fqE69tkSc/b/TOt+TdkYoBcnr7n91n1ExcHdHQXPiapefs+JmnN1+QRZw9
+	 qu9tbZyMmC1lw==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Sat,  2 Dec 2023 23:24:41 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Sat, 2 Dec 2023 23:24:41 +0300
+Message-ID: <99a4fbce-e963-c49f-84ad-20580fc109c8@salutedevices.com>
+Date: Sat, 2 Dec 2023 23:16:39 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231120105528.760306-1-vschneid@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net-next v5 2/3] virtio/vsock: send credit update during
+ setting SO_RCVLOWAT
+Content-Language: en-US
+To: "Michael S. Tsirkin" <mst@redhat.com>
+CC: Stefano Garzarella <sgarzare@redhat.com>, Stefan Hajnoczi
+	<stefanha@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
+	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20231130130840.253733-3-avkrasnov@salutedevices.com>
+ <20231130084044-mutt-send-email-mst@kernel.org>
+ <02de8982-ec4a-b3b2-e8e5-1bca28cfc01b@salutedevices.com>
+ <20231130085445-mutt-send-email-mst@kernel.org>
+ <pbkiwezwlf6dmogx7exur6tjrtcfzxyn7eqlehqxivqifbkojv@xlziiuzekon4>
+ <20231130123815-mutt-send-email-mst@kernel.org>
+ <smu77vmxw3ki36xhqnhtvujwswvkg5gkfwnt4vr5bnwljclseh@inbewbwkcqxs>
+ <e58cf080-3611-0a19-c6e5-544d7101e975@salutedevices.com>
+ <vqlspza4hzs6i5eajidxgeqd7wesv43ajpo42mljm4leuxfym4@j3h6ux2xlxbi>
+ <214df55d-89e3-2c1d-250a-7428360b6b1b@salutedevices.com>
+ <20231202152108-mutt-send-email-mst@kernel.org>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <20231202152108-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 181782 [Dec 02 2023]
+X-KSMG-AntiSpam-Version: 6.0.0.2
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 5 0.3.5 98d108ddd984cca1d7e65e595eac546a62b0144b, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/12/02 19:14:00 #22610823
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On Mon, Nov 20, 2023 at 11:55:23AM +0100, Valentin Schneider wrote:
-> Hi folks,
+
+
+On 02.12.2023 23:22, Michael S. Tsirkin wrote:
+> On Fri, Dec 01, 2023 at 01:40:41PM +0300, Arseniy Krasnov wrote:
+>>
+>>
+>> On 01.12.2023 12:48, Stefano Garzarella wrote:
+>>> On Fri, Dec 01, 2023 at 11:35:56AM +0300, Arseniy Krasnov wrote:
+>>>>
+>>>>
+>>>> On 01.12.2023 11:27, Stefano Garzarella wrote:
+>>>>> On Thu, Nov 30, 2023 at 12:40:43PM -0500, Michael S. Tsirkin wrote:
+>>>>>> On Thu, Nov 30, 2023 at 03:11:19PM +0100, Stefano Garzarella wrote:
+>>>>>>> On Thu, Nov 30, 2023 at 08:58:58AM -0500, Michael S. Tsirkin wrote:
+>>>>>>>> On Thu, Nov 30, 2023 at 04:43:34PM +0300, Arseniy Krasnov wrote:
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> On 30.11.2023 16:42, Michael S. Tsirkin wrote:
+>>>>>>>>>> On Thu, Nov 30, 2023 at 04:08:39PM +0300, Arseniy Krasnov wrote:
+>>>>>>>>>>> Send credit update message when SO_RCVLOWAT is updated and it is bigger
+>>>>>>>>>>> than number of bytes in rx queue. It is needed, because 'poll()' will
+>>>>>>>>>>> wait until number of bytes in rx queue will be not smaller than
+>>>>>>>>>>> SO_RCVLOWAT, so kick sender to send more data. Otherwise mutual hungup
+>>>>>>>>>>> for tx/rx is possible: sender waits for free space and receiver is
+>>>>>>>>>>> waiting data in 'poll()'.
+>>>>>>>>>>>
+>>>>>>>>>>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>>>>>>>>>>> ---
+>>>>>>>>>>>   Changelog:
+>>>>>>>>>>>   v1 -> v2:
+>>>>>>>>>>>    * Update commit message by removing 'This patch adds XXX' manner.
+>>>>>>>>>>>    * Do not initialize 'send_update' variable - set it directly during
+>>>>>>>>>>>      first usage.
+>>>>>>>>>>>   v3 -> v4:
+>>>>>>>>>>>    * Fit comment in 'virtio_transport_notify_set_rcvlowat()' to 80 chars.
+>>>>>>>>>>>   v4 -> v5:
+>>>>>>>>>>>    * Do not change callbacks order in transport structures.
+>>>>>>>>>>>
+>>>>>>>>>>>   drivers/vhost/vsock.c                   |  1 +
+>>>>>>>>>>>   include/linux/virtio_vsock.h            |  1 +
+>>>>>>>>>>>   net/vmw_vsock/virtio_transport.c        |  1 +
+>>>>>>>>>>>   net/vmw_vsock/virtio_transport_common.c | 27 +++++++++++++++++++++++++
+>>>>>>>>>>>   net/vmw_vsock/vsock_loopback.c          |  1 +
+>>>>>>>>>>>   5 files changed, 31 insertions(+)
+>>>>>>>>>>>
+>>>>>>>>>>> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>>>>>>>>>>> index f75731396b7e..4146f80db8ac 100644
+>>>>>>>>>>> --- a/drivers/vhost/vsock.c
+>>>>>>>>>>> +++ b/drivers/vhost/vsock.c
+>>>>>>>>>>> @@ -451,6 +451,7 @@ static struct virtio_transport vhost_transport = {
+>>>>>>>>>>>           .notify_buffer_size       = virtio_transport_notify_buffer_size,
+>>>>>>>>>>>
+>>>>>>>>>>>           .read_skb = virtio_transport_read_skb,
+>>>>>>>>>>> +        .notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat
+>>>>>>>>>>>       },
+>>>>>>>>>>>
+>>>>>>>>>>>       .send_pkt = vhost_transport_send_pkt,
+>>>>>>>>>>> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>>>>>>>>>>> index ebb3ce63d64d..c82089dee0c8 100644
+>>>>>>>>>>> --- a/include/linux/virtio_vsock.h
+>>>>>>>>>>> +++ b/include/linux/virtio_vsock.h
+>>>>>>>>>>> @@ -256,4 +256,5 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
+>>>>>>>>>>>   void virtio_transport_deliver_tap_pkt(struct sk_buff *skb);
+>>>>>>>>>>>   int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *list);
+>>>>>>>>>>>   int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t read_actor);
+>>>>>>>>>>> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk, int val);
+>>>>>>>>>>>   #endif /* _LINUX_VIRTIO_VSOCK_H */
+>>>>>>>>>>> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>>>>>>>>>>> index af5bab1acee1..8007593a3a93 100644
+>>>>>>>>>>> --- a/net/vmw_vsock/virtio_transport.c
+>>>>>>>>>>> +++ b/net/vmw_vsock/virtio_transport.c
+>>>>>>>>>>> @@ -539,6 +539,7 @@ static struct virtio_transport virtio_transport = {
+>>>>>>>>>>>           .notify_buffer_size       = virtio_transport_notify_buffer_size,
+>>>>>>>>>>>
+>>>>>>>>>>>           .read_skb = virtio_transport_read_skb,
+>>>>>>>>>>> +        .notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat
+>>>>>>>>>>>       },
+>>>>>>>>>>>
+>>>>>>>>>>>       .send_pkt = virtio_transport_send_pkt,
+>>>>>>>>>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>>>>>>>>>> index f6dc896bf44c..1cb556ad4597 100644
+>>>>>>>>>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>>>>>>>>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>>>>>>>>>> @@ -1684,6 +1684,33 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
+>>>>>>>>>>>   }
+>>>>>>>>>>>   EXPORT_SYMBOL_GPL(virtio_transport_read_skb);
+>>>>>>>>>>>
+>>>>>>>>>>> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk,
+>>>>>>>>>>> int val)
+>>>>>>>>>>> +{
+>>>>>>>>>>> +    struct virtio_vsock_sock *vvs = vsk->trans;
+>>>>>>>>>>> +    bool send_update;
+>>>>>>>>>>> +
+>>>>>>>>>>> +    spin_lock_bh(&vvs->rx_lock);
+>>>>>>>>>>> +
+>>>>>>>>>>> +    /* If number of available bytes is less than new SO_RCVLOWAT value,
+>>>>>>>>>>> +     * kick sender to send more data, because sender may sleep in
+>>>>>>>>>>> its
+>>>>>>>>>>> +     * 'send()' syscall waiting for enough space at our side.
+>>>>>>>>>>> +     */
+>>>>>>>>>>> +    send_update = vvs->rx_bytes < val;
+>>>>>>>>>>> +
+>>>>>>>>>>> +    spin_unlock_bh(&vvs->rx_lock);
+>>>>>>>>>>> +
+>>>>>>>>>>> +    if (send_update) {
+>>>>>>>>>>> +        int err;
+>>>>>>>>>>> +
+>>>>>>>>>>> +        err = virtio_transport_send_credit_update(vsk);
+>>>>>>>>>>> +        if (err < 0)
+>>>>>>>>>>> +            return err;
+>>>>>>>>>>> +    }
+>>>>>>>>>>> +
+>>>>>>>>>>> +    return 0;
+>>>>>>>>>>> +}
+>>>>>>>>>>
+>>>>>>>>>>
+>>>>>>>>>> I find it strange that this will send a credit update
+>>>>>>>>>> even if nothing changed since this was called previously.
+>>>>>>>>>> I'm not sure whether this is a problem protocol-wise,
+>>>>>>>>>> but it certainly was not envisioned when the protocol was
+>>>>>>>>>> built. WDYT?
+>>>>>>>>>
+>>>>>>>>> >From virtio spec I found:
+>>>>>>>>>
+>>>>>>>>> It is also valid to send a VIRTIO_VSOCK_OP_CREDIT_UPDATE packet without previously receiving a
+>>>>>>>>> VIRTIO_VSOCK_OP_CREDIT_REQUEST packet. This allows communicating updates any time a change
+>>>>>>>>> in buffer space occurs.
+>>>>>>>>> So I guess there is no limitations to send such type of packet, e.g. it is not
+>>>>>>>>> required to be a reply for some another packet. Please, correct me if im wrong.
+>>>>>>>>>
+>>>>>>>>> Thanks, Arseniy
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> Absolutely. My point was different - with this patch it is possible
+>>>>>>>> that you are not adding any credits at all since the previous
+>>>>>>>> VIRTIO_VSOCK_OP_CREDIT_UPDATE.
+>>>>>>>
+>>>>>>> I think the problem we're solving here is that since as an optimization we
+>>>>>>> avoid sending the update for every byte we consume, but we put a threshold,
+>>>>>>> then we make sure we update the peer.
+>>>>>>>
+>>>>>>> A credit update contains a snapshot and sending it the same as the previous
+>>>>>>> one should not create any problem.
+>>>>>>
+>>>>>> Well it consumes a buffer on the other side.
+>>>>>
+>>>>> Sure, but we are already speculating by not updating the other side when
+>>>>> we consume bytes before a certain threshold. This already avoids to
+>>>>> consume many buffers.
+>>>>>
+>>>>> Here we're only sending it once, when the user sets RCVLOWAT, so
+>>>>> basically I expect it won't affect performance.
+>>>>
+>>>> Moreover I think in practice setting RCVLOWAT is rare case, while this patch
+>>>> fixes real problem I guess
+>>>>
+>>>>
+>>>>>
+>>>>>>
+>>>>>>> My doubt now is that we only do this when we set RCVLOWAT , should we also
+>>>>>>> do something when we consume bytes to avoid the optimization we have?
+>>>>>>>
+>>>>>>> Stefano
+>>>>>>
+>>>>>> Isn't this why we have credit request?
+>>>>>
+>>>>> Yep, but in practice we never use it. It would also consume 2 buffers,
+>>>>> one at the transmitter and one at the receiver.
+>>>>>
+>>>>> However I agree that maybe we should start using it before we decide not
+>>>>> to send any more data.
+>>>>>
+>>>>> To be compatible with older devices, though, I think for now we also
+>>>>> need to send a credit update when the bytes in the receive queue are
+>>>>> less than RCVLOWAT, as Arseniy proposed in the other series.
+>>>>
+>>>> Looks like (in theory of course), that credit request is considered to be
+>>>> paired with credit update. While current usage of credit update is something
+>>>> like ACK packet in TCP, e.g. telling peer that we are ready to receive more
+>>>> data.
+>>>
+>>> I don't honestly know what the original author's choice was, but I think we reduce latency this way.
+>>
+>> Ah I see,ok
+>>
+>>>
+>>> Effectively though, if we never send any credit update when we consume bytes and always leave it up to the transmitter to ask for an update before transmission, we save even more buffer than the optimization we have, but maybe the latency would grow a lot.
+>>
+>> I think:
+>> 1) Way where sender must request current credit status before sending packet requires rework of kernel part, and for me this approach is not
+>>    so clear than current simple implementation (send RW, reply with CREDIT_UPDATE if needed).
+>> 2) In theory yes, we need one more buffer for such CREDIT_UPDATE, but in practice I don't know how big is this trouble.
+>>
+>> Thanks, Arseniy
 > 
-> After chatting about deferring IPIs [1] at LPC I had another look at my patches
-> and realized a handful of them could already be sent as-is.
+> I just worry that yes, normal users will only call RCVLOWAT once,
+> but a bad user might call it many times causing a ton of
+> credit updates. This is why I feel it's prudent to at least
+> keep track of last credit update and if nothing changed
+> do not resend it on a repeated RCVLOWAT.
+
+I see, agree, I'll add this check in the next version!
+
+Thanks, Arseniy
+
 > 
-> This series contains the __ro_after_init static_key bits, which fixes
-> __ro_after_init keys used in modules (courtesy of PeterZ) and flags more keys as
-> __ro_after_init.
 > 
-> [1]: https://lore.kernel.org/lkml/20230720163056.2564824-1-vschneid@redhat.com/
-
-Acked-by: Josh Poimboeuf <jpoimboe@kernel.org>
-
--- 
-Josh
-
+> 
+> 
+>>>
+>>> Stefano
+>>>
+> 
 
