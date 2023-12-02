@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-3225-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3226-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A908801BD0
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 10:48:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 983A0801BD2
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 10:49:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E89AB20C5B
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 09:48:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 520B2281DC0
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 09:49:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 379FB13ACF;
-	Sat,  2 Dec 2023 09:48:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C31D13AF3;
+	Sat,  2 Dec 2023 09:49:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QSQzl9EO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UH2Q45X6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B44B172A;
-	Sat,  2 Dec 2023 01:48:22 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAC4C181;
+	Sat,  2 Dec 2023 01:49:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701510502; x=1733046502;
+  t=1701510545; x=1733046545;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=VQNKqC4SiqPXJcfo/UghgDuOyfAhw8F6DULvr3iToMM=;
-  b=QSQzl9EOyKhF+DQmNkW6v8gzChahCX1uo71w3nP8Xu6J3l25mC/LDsYI
-   ct2r1JO5D5R4AhBjF4TfO4c1azhHMTzA6XCmiWFLHZ2EvXyQIy2IGI/cN
-   MJ/JwdhktWJE8RfFCjXgsocv0I6BF7e7RdR0otX/HNQ0iZwbohS8FFqYh
-   ZKel5jg873KEGJjFoe3tLJVhtN4RPcZ5SFReBl9+r/njaaqDQ1UGiCrOV
-   mBNliID0ZSrswl9G2/am8snq9Kfsch3brJ8ittK0n1qPGhG22pg8mm6ge
-   s2bPnYIGFwF9VKI7e/UWnQAlwxei2ihJIU7J9ZVS1jJMFdXNpUsSZL72o
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="390756693"
+  bh=hOSJlPe1dfesUGDszntE2ySqLMhZ74ABDSSs+Yf065E=;
+  b=UH2Q45X6iGIkbfzmkiFKTDoRJ3efHQne4QGlODGJghZe/cMifXJu7CEF
+   4VkcJnLoPg/rSDMkEG9e6bYogWkfZjlwfaBMnnPPd7bT23iocz+lyp0Vu
+   CHG0loxZq0CfmJyjH+MInDs6M+0H5BIv9sk9Ey4+poykFickaTuguNDLe
+   vNX8k1KG9QPnLRjQW7jjSVahPrWmwI4zHhMYQYGr5cL4H1eOpiYuTtpBm
+   LxFCLOmrCOEkSeix+EuBD3+YKcTfT97bGM1U+37mPEIuZilIAS5o4ya/d
+   aBne3Jyhz7ObNjt5pdv1OxYxqeMl+KISILmVz4+hDrtKqwjXuC+VztpAP
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="373774703"
 X-IronPort-AV: E=Sophos;i="6.04,245,1695711600"; 
-   d="scan'208";a="390756693"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 01:48:22 -0800
+   d="scan'208";a="373774703"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 01:49:05 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="860818540"
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="1017293275"
 X-IronPort-AV: E=Sophos;i="6.04,245,1695711600"; 
-   d="scan'208";a="860818540"
+   d="scan'208";a="1017293275"
 Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 01:48:18 -0800
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 01:49:02 -0800
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: iommu@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: alex.williamson@redhat.com,
 	dwmw2@infradead.org,
 	yi.l.liu@intel.com,
 	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [RFC PATCH 09/42] iommu: Add IOMMU_DOMAIN_KVM
-Date: Sat,  2 Dec 2023 17:19:24 +0800
-Message-Id: <20231202091924.13947-1-yan.y.zhao@intel.com>
+Subject: [RFC PATCH 10/42] iommu: Add new iommu op to create domains managed by KVM
+Date: Sat,  2 Dec 2023 17:20:07 +0800
+Message-Id: <20231202092007.14026-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20231202091211.13376-1-yan.y.zhao@intel.com>
 References: <20231202091211.13376-1-yan.y.zhao@intel.com>
@@ -70,53 +70,64 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 
-Introduce a new domain type to share stage 2 mappings from KVM.
+Introduce a new iommu_domain op to create domains managed by KVM through
+IOMMUFD.
 
-Paging strcture allocation/free of this new domain are managed by KVM.
-IOMMU side just gets page table root address from KVM via parsing vendor
-specific data passed in from KVM through IOMMUFD and sets it to the IOMMU
-hardware.
+These domains have a few different properties compares to kernel owned
+domains and user owned domains:
 
-This new domain can be allocated by domain_alloc_kvm op, and attached to
-a device through the existing iommu_attach_device/group() interfaces.
+- They must not be PAGING domains. Page mapping/unmapping is controlled by
+  KVM.
 
-Page mapping/unmapping are managed by KVM too, therefore map/unmap ops are
-not implemented.
+- They must be stage 2 mappings translating GPA to HPA.
+
+- Paging structure allocation/free is not managed by IOMMU driver, but
+  by KVM.
+
+- TLBs flushes are notified by KVM.
+
+The new op clearly says the domain is being created by IOMMUFD.
+A driver specific structure to the meta data of paging structures from KVM
+is passed in via the op param "data".
+
+IOMMU drivers that cannot support VFIO/IOMMUFD should not support this op.
+
+This new op for now is only supposed to be used by IOMMUFD, hence no
+wrapper for it. IOMMUFD would call the callback directly. As for domain
+free, IOMMUFD would use iommu_domain_free().
 
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- include/linux/iommu.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/linux/iommu.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index c79378833c758..9ecee72e2d6c4 100644
+index 9ecee72e2d6c4..0ce23ee399d35 100644
 --- a/include/linux/iommu.h
 +++ b/include/linux/iommu.h
-@@ -171,6 +171,8 @@ struct iommu_domain_geometry {
- #define __IOMMU_DOMAIN_NESTED	(1U << 6)  /* User-managed address space nested
- 					      on a stage-2 translation        */
+@@ -522,6 +522,13 @@ __iommu_copy_struct_from_user_array(void *dst_data,
+  * @domain_alloc_paging: Allocate an iommu_domain that can be used for
+  *                       UNMANAGED, DMA, and DMA_FQ domain types.
+  * @domain_alloc_sva: Allocate an iommu_domain for Shared Virtual Addressing.
++ * @domain_alloc_kvm: Allocate an iommu domain with type IOMMU_DOMAIN_KVM.
++ *                    It's called by IOMMUFD and must fully initialize the new
++ *                    domain before return.
++ *                    The @data is of type "const void *" whose format is defined
++ *                    in kvm arch specific header "asm/kvm_exported_tdp.h".
++ *                    Unpon success, domain of type IOMMU_DOMAIN_KVM is returned.
++ *                    Upon failure, ERR_PTR is returned.
+  * @probe_device: Add device to iommu driver handling
+  * @release_device: Remove device from iommu driver handling
+  * @probe_finalize: Do final setup work after the device is added to an IOMMU
+@@ -564,6 +571,8 @@ struct iommu_ops {
+ 	struct iommu_domain *(*domain_alloc_paging)(struct device *dev);
+ 	struct iommu_domain *(*domain_alloc_sva)(struct device *dev,
+ 						 struct mm_struct *mm);
++	struct iommu_domain *(*domain_alloc_kvm)(struct device *dev, u32 flags,
++						 const void *data);
  
-+#define __IOMMU_DOMAIN_KVM	(1U << 7)  /* KVM-managed stage-2 translation */
-+
- #define IOMMU_DOMAIN_ALLOC_FLAGS ~__IOMMU_DOMAIN_DMA_FQ
- /*
-  * This are the possible domain-types
-@@ -187,6 +189,7 @@ struct iommu_domain_geometry {
-  *				  invalidation.
-  *	IOMMU_DOMAIN_SVA	- DMA addresses are shared process addresses
-  *				  represented by mm_struct's.
-+ *	IOMMU_DOMAIN_KVM	- DMA mappings on stage 2, managed by KVM.
-  *	IOMMU_DOMAIN_PLATFORM	- Legacy domain for drivers that do their own
-  *				  dma_api stuff. Do not use in new drivers.
-  */
-@@ -201,6 +204,7 @@ struct iommu_domain_geometry {
- #define IOMMU_DOMAIN_SVA	(__IOMMU_DOMAIN_SVA)
- #define IOMMU_DOMAIN_PLATFORM	(__IOMMU_DOMAIN_PLATFORM)
- #define IOMMU_DOMAIN_NESTED	(__IOMMU_DOMAIN_NESTED)
-+#define IOMMU_DOMAIN_KVM	(__IOMMU_DOMAIN_KVM)
- 
- struct iommu_domain {
- 	unsigned type;
+ 	struct iommu_device *(*probe_device)(struct device *dev);
+ 	void (*release_device)(struct device *dev);
 -- 
 2.17.1
 
