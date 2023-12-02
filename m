@@ -1,102 +1,71 @@
-Return-Path: <kvm+bounces-3264-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3265-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BD93801FB6
-	for <lists+kvm@lfdr.de>; Sun,  3 Dec 2023 00:24:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE09C801FCF
+	for <lists+kvm@lfdr.de>; Sun,  3 Dec 2023 00:52:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D48E21F2108F
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 23:24:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E45BB20A97
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 23:52:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2917224D1;
-	Sat,  2 Dec 2023 23:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D9A224D4;
+	Sat,  2 Dec 2023 23:52:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="iMB1Y3tk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aDCBgnXD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3AD8124;
-	Sat,  2 Dec 2023 15:24:07 -0800 (PST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 049B240E025E;
-	Sat,  2 Dec 2023 23:24:05 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id Niido9d84076; Sat,  2 Dec 2023 23:24:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1701559440; bh=9MUOeGeZ5B/ijKebEMHCI1M4SgxyUmLcB9iMR+JlMLs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iMB1Y3tkckvcPzSIMFzmO3QkTWIi54wspB5lmz1p3wTg6sxvgAQFS/nx36pDTM0Sq
-	 NgyyYA2BJjSs7mKalgZjLnssy9RIcogY/ezUBLtJSnSwvaN+XnU5Q5hoPq6ey5XoNV
-	 6i90Aks8zWvQzMrvKCE5JQCJaUAOU4vauU5u20R0RY+FOSPtmhNz7S07ruwEpCyljE
-	 Zb4HbsOKfUmciNg9PdeQk3uLL+uq60AT+D/jnZyFPFOlGc4/9lxSUnjq7/nrc6ngtY
-	 0knlTxmZsBU3V9L64c5k459EgRJwLOUS5s1LkhThC/cC5hR+QwuT0CTvf6tC2xwiou
-	 yepw3gnX7/Y6zWZ0dZqtIdVdM/aKXqa0GEY1vGHu4DKt5YznVMOr4f/+IqoEJMgxvP
-	 FqKfr1f5QsXC4gL42/Xiy15FtLlx/TfRSPZ08FFR8FHMIOGAG9ZQE9lEweuHN39f8x
-	 DkjCdnOJpfKb0NLaNGgStt710K9S2259FgCEMmkaaHH88Y+snZGFi6BcpkfHXAuwuM
-	 G+Gr0/GajAaNadrPeOZf03ISMk2hx9VOPR7KTqjZPfUWklUcKDe6raWSXDSZXRxgAS
-	 4hdDMInA/pVlpCBNIPHhSt1v1VTU4AAmV1i7LX110RdsrPcVsxU+SSFaTt6AF/cTVk
-	 CfeM1jrzHeYaLK5JmqqRPwG0=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 05E0D40E024E;
-	Sat,  2 Dec 2023 23:23:26 +0000 (UTC)
-Date: Sun, 3 Dec 2023 00:23:19 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: ankita@nvidia.com
-Cc: jgg@nvidia.com, alex.williamson@redhat.com, naoya.horiguchi@nec.com,
-	akpm@linux-foundation.org, tony.luck@intel.com,
-	linmiaohe@huawei.com, rafael@kernel.org, lenb@kernel.org,
-	james.morse@arm.com, shiju.jose@huawei.com, bhelgaas@google.com,
-	pabeni@redhat.com, yishaih@nvidia.com,
-	shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-	aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
-	targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
-	apopple@nvidia.com, anuaggarwal@nvidia.com, jhubbard@nvidia.com,
-	danw@nvidia.com, mochs@nvidia.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mm@kvack.org, linux-edac@vger.kernel.org,
-	linux-acpi@vger.kernel.org
-Subject: Re: [PATCH v2 3/4] mm: Change ghes code to allow poison of
- non-struct pfn
-Message-ID: <20231202232319.GAZWu8Z6gsLp1kI5Dw@fat_crate.local>
-References: <20231123003513.24292-1-ankita@nvidia.com>
- <20231123003513.24292-4-ankita@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F262136F
+	for <kvm@vger.kernel.org>; Sat,  2 Dec 2023 23:52:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4B19AC433CA;
+	Sat,  2 Dec 2023 23:52:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701561164;
+	bh=8pI1kBZE2n42eBSeESHipDtfuEYuFGMc4j17vAkRywE=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=aDCBgnXDl7rW1hCaanbXplMN5betDxiBuk/llN62tMnHO2UDrmXJBDEunpPI6yg/h
+	 vXYU+Qi0oLXw/RRBNWrU4KhqngUkky2WNulvnCkxZ49Uc3ONmIIkp6tQJ83xB+ftDx
+	 D4XDVJkbeHq7LTRtYsysh/ulMm2eazxQLJd3aF5R5/3JZugr9fKW2YsoyKBnSf/VCA
+	 V3sXVBqWkmTFjVOJAI8kRDtSxKaVmiYmggCzgfDY+D/q11/acei5WX1DVd07s5VTQA
+	 YxwL53gGzYELvHzbvRWPXhsP4KioSH87xVI9ktRPKicNTehAZiCmaq30/VRfB+SDYF
+	 T/v6c/z2ySgPA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3A3C8DFAA84;
+	Sat,  2 Dec 2023 23:52:44 +0000 (UTC)
+Subject: Re: [GIT PULL] VFIO fix for v6.7-rc4
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20231201162209.1298a086.alex.williamson@redhat.com>
+References: <20231201162209.1298a086.alex.williamson@redhat.com>
+X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20231201162209.1298a086.alex.williamson@redhat.com>
+X-PR-Tracked-Remote: https://github.com/awilliam/linux-vfio.git tags/vfio-v6.7-rc4
+X-PR-Tracked-Commit-Id: 4ea95c04fa6b9043a1a301240996aeebe3cb28ec
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 17b17be28d42f59f579ef9da2557b92a97291777
+Message-Id: <170156116423.30388.7214139415340277781.pr-tracker-bot@kernel.org>
+Date: Sat, 02 Dec 2023 23:52:44 +0000
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, linux-kernel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231123003513.24292-4-ankita@nvidia.com>
 
-On Thu, Nov 23, 2023 at 06:05:11AM +0530, ankita@nvidia.com wrote:
-> -	pfn = PHYS_PFN(physical_addr);
-> -	if (!pfn_valid(pfn) && !arch_is_platform_page(physical_addr)) {
-> -		pr_warn_ratelimited(FW_WARN GHES_PFX
-> -		"Invalid address in generic error data: %#llx\n",
-> -		physical_addr);
-> -		return false;
-> -	}
+The pull request you sent on Fri, 1 Dec 2023 16:22:09 -0700:
 
-You don't just remove a pfn valid test just because your weird device
-can't stomach it - you extend it, like
+> https://github.com/awilliam/linux-vfio.git tags/vfio-v6.7-rc4
 
-  3ad6fd77a2d6 ("x86/sgx: Add check for SGX pages to ghes_do_memory_failure()")
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/17b17be28d42f59f579ef9da2557b92a97291777
 
-did, for example.
+Thank you!
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
