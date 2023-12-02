@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-3224-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3225-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAD0C801BCD
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 10:48:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A908801BD0
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 10:48:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19DF11C20B36
-	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 09:48:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E89AB20C5B
+	for <lists+kvm@lfdr.de>; Sat,  2 Dec 2023 09:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB1A8134C9;
-	Sat,  2 Dec 2023 09:47:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 379FB13ACF;
+	Sat,  2 Dec 2023 09:48:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e4OnIPat"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QSQzl9EO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A29E181;
-	Sat,  2 Dec 2023 01:47:51 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B44B172A;
+	Sat,  2 Dec 2023 01:48:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701510471; x=1733046471;
+  t=1701510502; x=1733046502;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=fHaCSLze+0JkRVgR65Mc5+ZZ7ruPmv2R2QFTSzLWrGg=;
-  b=e4OnIPatRMyAfv2tmRqGQ1vaQsxcj35oTePJ234Poi9Vsfz2iDUfRCVk
-   Ocn3KhYphXUxKxgyW5ULzwWMQacit7VNtOogJfO3dV2+N9JkD+tATbcu1
-   trr5o91Bwx4X0qfkxE+lWNfotXccWJr584lYnmXJIlIoVrEHpchqSaycA
-   CuBMTz2Sjsdh73clU4KqY6eLPoBxaGLiNRDsKTcCNo5g/TyXAKa2lxFJ8
-   5k8ld7g8VEZ/tnhMeviV/ACW8iahZXgCGZmGFfg2JowxsQWfShYT32jY5
-   QuzoOYZxfQflqxNT4TzP6+ZbAc+06KWSla4kqwAh/A9oAVdCyhA+6GmjE
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="6886424"
+  bh=VQNKqC4SiqPXJcfo/UghgDuOyfAhw8F6DULvr3iToMM=;
+  b=QSQzl9EOyKhF+DQmNkW6v8gzChahCX1uo71w3nP8Xu6J3l25mC/LDsYI
+   ct2r1JO5D5R4AhBjF4TfO4c1azhHMTzA6XCmiWFLHZ2EvXyQIy2IGI/cN
+   MJ/JwdhktWJE8RfFCjXgsocv0I6BF7e7RdR0otX/HNQ0iZwbohS8FFqYh
+   ZKel5jg873KEGJjFoe3tLJVhtN4RPcZ5SFReBl9+r/njaaqDQ1UGiCrOV
+   mBNliID0ZSrswl9G2/am8snq9Kfsch3brJ8ittK0n1qPGhG22pg8mm6ge
+   s2bPnYIGFwF9VKI7e/UWnQAlwxei2ihJIU7J9ZVS1jJMFdXNpUsSZL72o
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="390756693"
 X-IronPort-AV: E=Sophos;i="6.04,245,1695711600"; 
-   d="scan'208";a="6886424"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 01:47:51 -0800
+   d="scan'208";a="390756693"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 01:48:22 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="746278898"
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="860818540"
 X-IronPort-AV: E=Sophos;i="6.04,245,1695711600"; 
-   d="scan'208";a="746278898"
+   d="scan'208";a="860818540"
 Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 01:47:47 -0800
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2023 01:48:18 -0800
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: iommu@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: alex.williamson@redhat.com,
 	dwmw2@infradead.org,
 	yi.l.liu@intel.com,
 	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [RFC PATCH 08/42] KVM: Add a helper to notify importers that KVM exported TDP is flushed
-Date: Sat,  2 Dec 2023 17:18:50 +0800
-Message-Id: <20231202091850.13890-1-yan.y.zhao@intel.com>
+Subject: [RFC PATCH 09/42] iommu: Add IOMMU_DOMAIN_KVM
+Date: Sat,  2 Dec 2023 17:19:24 +0800
+Message-Id: <20231202091924.13947-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20231202091211.13376-1-yan.y.zhao@intel.com>
 References: <20231202091211.13376-1-yan.y.zhao@intel.com>
@@ -70,77 +70,53 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 
-Introduce a helper in KVM TDP FD to notify importers that TDP page tables
-are invalidated. This helper will be called by arch code (e.g. VMX specific
-code).
+Introduce a new domain type to share stage 2 mappings from KVM.
 
-Currently, the helper will notify all importers of all KVM exported TDPs.
+Paging strcture allocation/free of this new domain are managed by KVM.
+IOMMU side just gets page table root address from KVM via parsing vendor
+specific data passed in from KVM through IOMMUFD and sets it to the IOMMU
+hardware.
+
+This new domain can be allocated by domain_alloc_kvm op, and attached to
+a device through the existing iommu_attach_device/group() interfaces.
+
+Page mapping/unmapping are managed by KVM too, therefore map/unmap ops are
+not implemented.
 
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- include/linux/kvm_host.h |  3 +++
- virt/kvm/tdp_fd.c        | 38 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 41 insertions(+)
+ include/linux/iommu.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index b76919eec9b72..a8af95194767f 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2366,5 +2366,8 @@ static inline int kvm_arch_fault_exported_tdp(struct kvm_exported_tdp *tdp,
- }
- #endif /* __KVM_HAVE_ARCH_EXPORTED_TDP */
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index c79378833c758..9ecee72e2d6c4 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -171,6 +171,8 @@ struct iommu_domain_geometry {
+ #define __IOMMU_DOMAIN_NESTED	(1U << 6)  /* User-managed address space nested
+ 					      on a stage-2 translation        */
  
-+void kvm_tdp_fd_flush_notify(struct kvm *kvm, unsigned long gfn, unsigned long npages);
++#define __IOMMU_DOMAIN_KVM	(1U << 7)  /* KVM-managed stage-2 translation */
 +
- #endif /* CONFIG_HAVE_KVM_EXPORTED_TDP */
-+
- #endif
-diff --git a/virt/kvm/tdp_fd.c b/virt/kvm/tdp_fd.c
-index 02c9066391ebe..8c16af685a061 100644
---- a/virt/kvm/tdp_fd.c
-+++ b/virt/kvm/tdp_fd.c
-@@ -304,3 +304,41 @@ void kvm_tdp_fd_put(struct kvm_tdp_fd *tdp_fd)
- 	fput(tdp_fd->file);
- }
- EXPORT_SYMBOL_GPL(kvm_tdp_fd_put);
-+
-+static void kvm_tdp_fd_flush(struct kvm_exported_tdp *tdp, unsigned long gfn,
-+			     unsigned long npages)
-+{
-+#define INVALID_NPAGES (-1UL)
-+	bool all = (gfn == 0) && (npages == INVALID_NPAGES);
-+	struct kvm_tdp_importer *importer;
-+	unsigned long start, size;
-+
-+	if (all) {
-+		start = 0;
-+		size = -1UL;
-+	} else {
-+		start = gfn << PAGE_SHIFT;
-+		size = npages << PAGE_SHIFT;
-+	}
-+
-+	spin_lock(&tdp->importer_lock);
-+
-+	list_for_each_entry(importer, &tdp->importers, node) {
-+		if (!importer->ops->invalidate)
-+			continue;
-+
-+		importer->ops->invalidate(importer->data, start, size);
-+	}
-+	spin_unlock(&tdp->importer_lock);
-+}
-+
-+void kvm_tdp_fd_flush_notify(struct kvm *kvm, unsigned long gfn, unsigned long npages)
-+{
-+	struct kvm_exported_tdp *tdp;
-+
-+	spin_lock(&kvm->exported_tdplist_lock);
-+	list_for_each_entry(tdp, &kvm->exported_tdp_list, list_node)
-+		kvm_tdp_fd_flush(tdp, gfn, npages);
-+	spin_unlock(&kvm->exported_tdplist_lock);
-+}
-+EXPORT_SYMBOL_GPL(kvm_tdp_fd_flush_notify);
+ #define IOMMU_DOMAIN_ALLOC_FLAGS ~__IOMMU_DOMAIN_DMA_FQ
+ /*
+  * This are the possible domain-types
+@@ -187,6 +189,7 @@ struct iommu_domain_geometry {
+  *				  invalidation.
+  *	IOMMU_DOMAIN_SVA	- DMA addresses are shared process addresses
+  *				  represented by mm_struct's.
++ *	IOMMU_DOMAIN_KVM	- DMA mappings on stage 2, managed by KVM.
+  *	IOMMU_DOMAIN_PLATFORM	- Legacy domain for drivers that do their own
+  *				  dma_api stuff. Do not use in new drivers.
+  */
+@@ -201,6 +204,7 @@ struct iommu_domain_geometry {
+ #define IOMMU_DOMAIN_SVA	(__IOMMU_DOMAIN_SVA)
+ #define IOMMU_DOMAIN_PLATFORM	(__IOMMU_DOMAIN_PLATFORM)
+ #define IOMMU_DOMAIN_NESTED	(__IOMMU_DOMAIN_NESTED)
++#define IOMMU_DOMAIN_KVM	(__IOMMU_DOMAIN_KVM)
+ 
+ struct iommu_domain {
+ 	unsigned type;
 -- 
 2.17.1
 
