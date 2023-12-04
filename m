@@ -1,157 +1,147 @@
-Return-Path: <kvm+bounces-3388-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3389-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE1AB803B0C
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 18:01:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DEA6803B1A
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 18:05:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EEDD2810E1
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 17:01:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE4991C20AE8
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 17:05:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988F72E631;
-	Mon,  4 Dec 2023 17:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62D5A2E636;
+	Mon,  4 Dec 2023 17:05:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DISm5HVS"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fzLLvkQb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F733CA
-	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 09:00:58 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5d1b2153ba1so61828937b3.2
-        for <kvm@vger.kernel.org>; Mon, 04 Dec 2023 09:00:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701709257; x=1702314057; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WYdbFfqQVc4k25YSG4S3L8dDRO2OtAWhg6g/c/qnL28=;
-        b=DISm5HVSTDHWxWsx9pJMw1fLI8xspxvb/i9Q29kkAKwu7u7goaWa1Xb2NeOH2MEG1q
-         atyghplHoyw3ibKcNJoN3oOw8m2dDjoYXzlynZlT1Oe0olU+P3ZjA/AkkE8oQz9Emaot
-         P5oWgB5i41HDmr5e0e0YMiYTSi0UVlKqnJt286w69OegqaFUV2PEHRSSrzBXChtZ0oqU
-         Qvo/1I/Zc7Ebj1EcFDJHgfR4auv9/SVlMPIlmRng/Gr65g6KpeycoRDEOwm1e32RckoW
-         jpZPwRvh4C+7T6AGq57hZQ6wvS3QzIrq1Ao0bUac3K1vMpX3UvIzCXruWxZp9SPHo53K
-         N3+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701709257; x=1702314057;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WYdbFfqQVc4k25YSG4S3L8dDRO2OtAWhg6g/c/qnL28=;
-        b=PHUzfy3RJ2u9YGPCRz8dSXHT0CSh4b1ChtFpoVRdY6bu3VWIE/myptIEX/pBAuiFu2
-         GGqQouOYdy0Z13qCbGUA/d9xHGvs4oQyb5h/KKa2BAxeoljnUopoOXf03vI1iQqrRFtS
-         lSgsbRd7aUy89zszMI8Whb9Y4fIJrrQ59Ky/Zouseg7ZAYEe6jewNW6CnQoNw6LBe/Wr
-         /RMK5E47kOpjWXLiz8AtWxNRSlKT6eW3YU27aXfFJ/taAtjv1xvLfeBYP/Q9nJFvd3OR
-         nARR+VqTE5FYOn1VjIqXUSXvtZ1aZKVT5G9JZN1k+dMtld6ChNgO3iw0DCyWbEuNWUWf
-         MyxQ==
-X-Gm-Message-State: AOJu0YzRTQdDc20l7RJGOguNoqQ+D94jawCVXqaQ9eJo3mcfExiZnVIk
-	CsPTaApW7cFEH3u/uwS/5JGxbEWYoAw=
-X-Google-Smtp-Source: AGHT+IEPCfmM37uwj/R0nZjh6f3LmvLyxTh2BlKFePY0Bda+oPcSkY5OKZC+FPUtCahZN6LQsjl4BmkVlA8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:300d:b0:5d3:a348:b0b7 with SMTP id
- ey13-20020a05690c300d00b005d3a348b0b7mr314719ywb.7.1701709257595; Mon, 04 Dec
- 2023 09:00:57 -0800 (PST)
-Date: Mon, 4 Dec 2023 09:00:55 -0800
-In-Reply-To: <20231202091211.13376-1-yan.y.zhao@intel.com>
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1BEDBB;
+	Mon,  4 Dec 2023 09:05:30 -0800 (PST)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B4GlQeQ027506;
+	Mon, 4 Dec 2023 17:05:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=2llLb1kIui/MWBK5f5v9qS/SbcOOe6s6AriAs60t8Ug=;
+ b=fzLLvkQb1DM2gdh/LTi4hceHSy7WHxg/kahmGee1PjA4qUbbTB55PtXtrnNEXf/vFYE7
+ 7p6cmnTVpEvtd18li++iH/lCJltYEvh0EOdcMjVH0emYOkYei84mtqqCI/fbhRlXsP7a
+ Ya6CcvP7cL41Sd8VUMz+Q5ww8hFkhgX8ttGaBml8cjVGOsaI6ATtqCkLDSD7j984j6wa
+ her+WZZm+hBox1T8CUvDHBtpv0YJJiqRELYPntWzWI627Wrq9ictmEuPf6UflSCOxIra
+ UuIjPruLRF9x9Q/FrfIUQveElaXueB8git7XZrbTwUh8mxQ6LQl/wl9qJ3HE4mXYL2rZ uQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3usjkm0xfw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 04 Dec 2023 17:05:28 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B4Glf3s029337;
+	Mon, 4 Dec 2023 17:05:28 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3usjkm0x63-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 04 Dec 2023 17:05:27 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B4GwtZ1030022;
+	Mon, 4 Dec 2023 17:05:23 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3urgdksdkr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 04 Dec 2023 17:05:23 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B4H5LjY17957484
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 4 Dec 2023 17:05:21 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E659C58061;
+	Mon,  4 Dec 2023 17:05:20 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B071358043;
+	Mon,  4 Dec 2023 17:05:19 +0000 (GMT)
+Received: from [9.61.175.104] (unknown [9.61.175.104])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  4 Dec 2023 17:05:19 +0000 (GMT)
+Message-ID: <a4b9079e-2175-44dc-b59f-13644b9ea6c3@linux.ibm.com>
+Date: Mon, 4 Dec 2023 12:05:19 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231202091211.13376-1-yan.y.zhao@intel.com>
-Message-ID: <ZW4Fx2U80L1PJKlh@google.com>
-Subject: Re: [RFC PATCH 00/42] Sharing KVM TDP to IOMMU
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: iommu@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	alex.williamson@redhat.com, jgg@nvidia.com, pbonzini@redhat.com, 
-	joro@8bytes.org, will@kernel.org, robin.murphy@arm.com, kevin.tian@intel.com, 
-	baolu.lu@linux.intel.com, dwmw2@infradead.org, yi.l.liu@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] s390/vfio-ap: handle response code 01 on queue reset
+Content-Language: en-US
+To: Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
+        david@redhat.com, Reinhard Buendgen <BUENDGEN@de.ibm.com>
+References: <20231129143529.260264-1-akrowiak@linux.ibm.com>
+ <b43414ef-7aa4-9e5c-a706-41861f0d346c@linux.ibm.com>
+ <1f4720d7-93f1-4e38-a3ad-abaf99596e7c@linux.ibm.com>
+ <05cfc382-d01d-4370-b8bb-d3805e957f2e@linux.ibm.com>
+ <20231204171506.42aa687f.pasic@linux.ibm.com>
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+Organization: IBM
+In-Reply-To: <20231204171506.42aa687f.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: SXw2yfieEr_ilkyrdHoK7SZ5XNph7GGM
+X-Proofpoint-ORIG-GUID: VHLfMhw46t83gHS96TO14pddBVkFGPeI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-04_16,2023-12-04_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 phishscore=0 spamscore=0 adultscore=0 malwarescore=0
+ impostorscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0
+ suspectscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2312040130
 
-On Sat, Dec 02, 2023, Yan Zhao wrote:
-> This RFC series proposes a framework to resolve IOPF by sharing KVM TDP
-> (Two Dimensional Paging) page table to IOMMU as its stage 2 paging
-> structure to support IOPF (IO page fault) on IOMMU's stage 2 paging
-> structure.
+
+
+On 12/4/23 11:15, Halil Pasic wrote:
+> On Mon, 4 Dec 2023 16:16:31 +0100
+> Christian Borntraeger <borntraeger@linux.ibm.com> wrote:
 > 
-> Previously, all guest pages have to be pinned and mapped in IOMMU stage 2 
-> paging structures after pass-through devices attached, even if the device
-> has IOPF capability. Such all-guest-memory pinning can be avoided when IOPF
-> handling for stage 2 paging structure is supported and if there are only
-> IOPF-capable devices attached to a VM.
+>> Am 04.12.23 um 15:53 schrieb Tony Krowiak:
+>>>
+>>>
+>>> On 11/29/23 12:12, Christian Borntraeger wrote:
+>>>> Am 29.11.23 um 15:35 schrieb Tony Krowiak:
+>>>>> In the current implementation, response code 01 (AP queue number not valid)
+>>>>> is handled as a default case along with other response codes returned from
+>>>>> a queue reset operation that are not handled specifically. Barring a bug,
+>>>>> response code 01 will occur only when a queue has been externally removed
+>>>>> from the host's AP configuration; nn this case, the queue must
+>>>>> be reset by the machine in order to avoid leaking crypto data if/when the
+>>>>> queue is returned to the host's configuration. The response code 01 case
+>>>>> will be handled specifically by logging a WARN message followed by cleaning
+>>>>> up the IRQ resources.
+>>>>>   
+>>>>
+>>>> To me it looks like this can be triggered by the LPAR admin, correct? So it
+>>>> is not desireable but possible.
+>>>> In that case I prefer to not use WARN, maybe use dev_warn or dev_err instead.
+>>>> WARN can be a disruptive event if panic_on_warn is set.
+>>>
+>>> Yes, it can be triggered by the LPAR admin. I can't use dev_warn here because we don't have a reference to any device, but I can use pr_warn if that suffices.
+>>
+>> Ok, please use pr_warn then.
 > 
-> There are 2 approaches to support IOPF on IOMMU stage 2 paging structures:
-> - Supporting by IOMMUFD/IOMMU alone
->   IOMMUFD handles IO page faults on stage-2 HWPT by calling GUPs and then
->   iommu_map() to setup IOVA mappings. (IOAS is required to keep info of GPA
->   to HVA, but page pinning/unpinning needs to be skipped.)
->   Then upon MMU notifiers on host primary MMU, iommu_unmap() is called to
->   adjust IOVA mappings accordingly.
->   IOMMU driver needs to support unmapping sub-ranges of a previous mapped
->   range and take care of huge page merge and split in atomic way. [1][2].
+> Shouldn't we rather make this an 'info'. I mean we probably do not want
+> people complaining about this condition. Yes it should be a best practice
+> to coordinate such things with the guest, and ideally remove the resource
+> from the guest first. But AFAIU our stack is supposed to be able to
+> handle something like this. IMHO issuing a warning is excessive measure.
+> I know Reinhard and Tony probably disagree with the last sentence
+> though.
+
+I don't feel strongly one way or the other. Anybody else?
+
 > 
-> - Sharing KVM TDP
->   IOMMUFD sets the root of KVM TDP page table (EPT/NPT in x86) as the root
->   of IOMMU stage 2 paging structure, and routes IO page faults to KVM.
->   (This assumes that the iommu hw supports the same stage-2 page table
->   format as CPU.)
->   In this model the page table is centrally managed by KVM (mmu notifier,
->   page mapping, subpage unmapping, atomic huge page split/merge, etc.),
->   while IOMMUFD only needs to invalidate iotlb/devtlb properly.
-
-There are more approaches beyond having IOMMUFD and KVM be completely separate
-entities.  E.g. extract the bulk of KVM's "TDP MMU" implementation to common code
-so that IOMMUFD doesn't need to reinvent the wheel.
-
-> Currently, there's no upstream code available to support stage 2 IOPF yet.
-> 
-> This RFC chooses to implement "Sharing KVM TDP" approach which has below
-> main benefits:
-
-Please list out the pros and cons for each.  In the cons column for piggybacking
-KVM's page tables:
-
- - *Significantly* increases the complexity in KVM
- - Puts constraints on what KVM can/can't do in the future (see the movement
-   of SPTE_MMU_PRESENT).
- - Subjects IOMMUFD to all of KVM's historical baggage, e.g. the memslot deletion
-   mess, the truly nasty MTRR emulation (which I still hope to delete), the NX
-   hugepage mitigation, etc.
-
-Please also explain the intended/expected/targeted use cases.  E.g. if the main
-use case is for device passthrough to slice-of-hardware VMs that aren't memory
-oversubscribed, 
-
-> - Unified page table management
->   The complexity of allocating guest pages per GPAs, registering to MMU
->   notifier on host primary MMU, sub-page unmapping, atomic page merge/split
-
-Please find different terminology than "sub-page".  With Sub-Page Protection, Intel
-has more or less established "sub-page" to mean "less than 4KiB granularity".  But
-that can't possibly what you mean here because KVM doesn't support (un)mapping
-memory at <4KiB granularity.  Based on context above, I assume you mean "unmapping
-arbitrary pages within a given range".
-
->   are only required to by handled in KVM side, which has been doing that
->   well for a long time.
-> 
-> - Reduced page faults:
->   Only one page fault is triggered on a single GPA, either caused by IO
->   access or by vCPU access. (compared to one IO page fault for DMA and one
->   CPU page fault for vCPUs in the non-shared approach.)
-
-This would be relatively easy to solve with bi-directional notifiers, i.e. KVM
-notifies IOMMUFD when a vCPU faults in a page, and vice versa.
- 
-> - Reduced memory consumption:
->   Memory of one page table are saved.
-
-I'm not convinced that memory consumption is all that interesting.  If a VM is
-mapping the majority of memory into a device, then odds are good that the guest
-is backed with at least 2MiB page, if not 1GiB pages, at which point the memory
-overhead for pages tables is quite small, especially relative to the total amount
-of memory overheads for such systems.
-
-If a VM is mapping only a small subset of its memory into devices, then the IOMMU
-page tables should be sparsely populated, i.e. won't consume much memory.
+> Regards,
+> Halil
 
