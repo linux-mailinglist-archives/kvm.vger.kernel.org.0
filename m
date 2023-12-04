@@ -1,188 +1,491 @@
-Return-Path: <kvm+bounces-3281-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3282-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B2EC8029EF
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 02:37:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75C33802A1D
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 03:05:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0D90280C8A
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 01:37:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E63F41F20F25
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 02:05:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 185E410F0;
-	Mon,  4 Dec 2023 01:37:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Sm16VVSj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E407517C8;
+	Mon,  4 Dec 2023 02:05:20 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD8E5E4;
-	Sun,  3 Dec 2023 17:37:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701653834; x=1733189834;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=RdAwYv1tCW3Sr0N3YOoYWWOcHVLJnlNtS3tq6G2IyzQ=;
-  b=Sm16VVSjvq3ODjQDSDhKyOLR7eSL2ejpKK4es6jMgZC4sjOJ4wOd7dIM
-   um9D7Ez/MtXFTPyHiDA49k80d8/yjDplyxQOj3OIqDNu3OnuTzqUydNap
-   iU49pBJSv64qhzDBjC4D11QwP0nNpDqfNhqqoy7jiNXAlS959IoxycuBe
-   mn/Av/DsOZ9r6Cus8qphwRmnEMCJGGKj9LVQo6d+/bABhcs+srUd+rKse
-   0ku+USbC5svJ2zT3P4fIyZO1OPhwL61llyODgKeBwuoNCi0W89gXQUVhC
-   2x1qlmWeWc5VvfFGH2TcFTQ5XmyfsMwxwpE9qJenTbIYq3jeudtesbCLa
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="730460"
-X-IronPort-AV: E=Sophos;i="6.04,248,1695711600"; 
-   d="scan'208";a="730460"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2023 17:37:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="943727892"
-X-IronPort-AV: E=Sophos;i="6.04,248,1695711600"; 
-   d="scan'208";a="943727892"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
-  by orsmga005.jf.intel.com with ESMTP; 03 Dec 2023 17:37:09 -0800
-Message-ID: <2354dd69-0179-4689-bc35-f4bf4ea5a886@linux.intel.com>
-Date: Mon, 4 Dec 2023 09:32:37 +0800
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2A6A6B3;
+	Sun,  3 Dec 2023 18:05:13 -0800 (PST)
+Received: from loongson.cn (unknown [10.20.42.173])
+	by gateway (Coremail) with SMTP id _____8Cxh+jWM21l3aE+AA--.23770S3;
+	Mon, 04 Dec 2023 10:05:10 +0800 (CST)
+Received: from [10.20.42.173] (unknown [10.20.42.173])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxjNzTM21lP8hTAA--.53749S3;
+	Mon, 04 Dec 2023 10:05:09 +0800 (CST)
+Subject: Re: [PATCH v5 2/4] KVM: selftests: Add core KVM selftests support for
+ LoongArch
+To: Tianrui Zhao <zhaotianrui@loongson.cn>, Shuah Khan <shuah@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
+Cc: Vishal Annapurve <vannapurve@google.com>,
+ Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
+ loongarch@lists.linux.dev, Peter Xu <peterx@redhat.com>,
+ Vipin Sharma <vipinsh@google.com>
+References: <20231130111804.2227570-1-zhaotianrui@loongson.cn>
+ <20231130111804.2227570-3-zhaotianrui@loongson.cn>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <2a2ef678-95f9-b6ff-8e32-f1aee26276a5@loongson.cn>
+Date: Mon, 4 Dec 2023 10:05:01 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
- iommu@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 12/12] iommu: Improve iopf_queue_flush_dev()
+In-Reply-To: <20231130111804.2227570-3-zhaotianrui@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-To: Jason Gunthorpe <jgg@ziepe.ca>
-References: <20231115030226.16700-1-baolu.lu@linux.intel.com>
- <20231115030226.16700-13-baolu.lu@linux.intel.com>
- <20231201203536.GG1489931@ziepe.ca>
- <a0ef3a4f-88fc-40fe-9891-495d1b6b365b@linux.intel.com>
- <20231203141414.GJ1489931@ziepe.ca>
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <20231203141414.GJ1489931@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8DxjNzTM21lP8hTAA--.53749S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj9fXoW3Cw18WrWUuFW5Kw1Dtry7Jwc_yoW8Jr4kKo
+	W3CFsF9r4rG342yr97Kr10qay2qw109an8CFy5Cr4rXa1vyFy5Ar15Kw4Fyr1fWF4kJryD
+	CasrWan7CF97Awn8l-sFpf9Il3svdjkaLaAFLSUrUUUU1b8apTn2vfkv8UJUUUU8wcxFpf
+	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
+	UjIYCTnIWjp_UUUOb7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
+	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+	Y2AK021l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+	v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4j6r4UJwAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
+	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_
+	JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
+	CYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48J
+	MxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+	IxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUc9a9UUUUU
 
-On 12/3/23 10:14 PM, Jason Gunthorpe wrote:
-> On Sun, Dec 03, 2023 at 04:53:08PM +0800, Baolu Lu wrote:
->> On 12/2/23 4:35 AM, Jason Gunthorpe wrote:
->>> On Wed, Nov 15, 2023 at 11:02:26AM +0800, Lu Baolu wrote:
->>>> The iopf_queue_flush_dev() is called by the iommu driver before releasing
->>>> a PASID. It ensures that all pending faults for this PASID have been
->>>> handled or cancelled, and won't hit the address space that reuses this
->>>> PASID. The driver must make sure that no new fault is added to the queue.
->>> This needs more explanation, why should anyone care?
->>>
->>> More importantly, why is*discarding*  the right thing to do?
->>> Especially why would we discard a partial page request group?
->>>
->>> After we change a translation we may have PRI requests in a
->>> queue. They need to be acknowledged, not discarded. The DMA in the
->>> device should be restarted and the device should observe the new
->>> translation - if it is blocking then it should take a DMA error.
->>>
->>> More broadly, we should just let things run their normal course. The
->>> domain to deliver the fault to should be determined very early. If we
->>> get a fault and there is no fault domain currently assigned then just
->>> restart it.
->>>
->>> The main reason to fence would be to allow the domain to become freed
->>> as the faults should be holding pointers to it. But I feel there are
->>> simpler options for that then this..
->>
->> In the iommu_detach_device_pasid() path, the domain is about to be
->> removed from the pasid of device. The IOMMU driver performs the
->> following steps sequentially:
-> 
-> I know that is why it does, but it doesn't explain at all why.
-> 
->> 1. Clears the pasid translation entry. Thus, all subsequent DMA
->>     transactions (translation requests, translated requests or page
->>     requests) targeting the iommu domain will be blocked.
->>
->> 2. Waits until all pending page requests for the device's PASID have
->>     been reported to upper layers via the iommu_report_device_fault().
->>     However, this does not guarantee that all page requests have been
->>     responded.
->>
->> 3. Free all partial page requests for this pasid since the page request
->>     response is only needed for a complete request group. There's no
->>     action required for the page requests which are not last of a request
->>     group.
-> 
-> But we expect the last to come eventually since everything should be
-> grouped properly, so why bother doing this?
-> 
-> Indeed if 2 worked, how is this even possible to have partials?
 
-Step 1 clears the pasid table entry, hence all subsequent page requests
-are blocked (hardware auto-respond the request but not put it in the
-queue).
 
-It is possible that a portion of a page fault group may have been queued
-for processing, but the last request is being blocked by hardware due
-to the pasid entry being in the blocking state.
-
-In reality, this may be a no-op as I haven't seen any real-world
-implementations of multiple-requests fault groups on Intel platforms.
-
->   
->> 5. Follow the IOMMU hardware requirements (for example, VT-d sepc,
->>     section 7.10, Software Steps to Drain Page Requests & Responses) to
->>     drain in-flight page requests and page group responses between the
->>     remapping hardware queues and the endpoint device.
->>
->> With above steps done in iommu_detach_device_pasid(), the pasid could be
->> re-used for any other address space.
+On 2023/11/30 下午7:18, Tianrui Zhao wrote:
+> Add core KVM selftests support for LoongArch.
 > 
-> As I said, that isn't even required. There is no issue with leaking
-> PRI's across attachments.
+> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+> ---
+>   .../selftests/kvm/lib/loongarch/exception.S   |  59 ++++
+>   .../selftests/kvm/lib/loongarch/processor.c   | 333 ++++++++++++++++++
+>   2 files changed, 392 insertions(+)
+>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
+>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
 > 
+> diff --git a/tools/testing/selftests/kvm/lib/loongarch/exception.S b/tools/testing/selftests/kvm/lib/loongarch/exception.S
+> new file mode 100644
+> index 00000000000..88bfa505c6f
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/lib/loongarch/exception.S
+> @@ -0,0 +1,59 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +
+> +#include "processor.h"
+> +
+> +/* address of refill exception should be 4K aligned */
+> +.balign	4096
+> +.global handle_tlb_refill
+> +handle_tlb_refill:
+> +	csrwr	t0, LOONGARCH_CSR_TLBRSAVE
+> +	csrrd	t0, LOONGARCH_CSR_PGD
+> +	lddir	t0, t0, 3
+> +	lddir	t0, t0, 1
+> +	ldpte	t0, 0
+> +	ldpte	t0, 1
+> +	tlbfill
+> +	csrrd	t0, LOONGARCH_CSR_TLBRSAVE
+> +	ertn
+> +
+> +	/*
+> +	 * save and restore all gprs except base register,
+> +	 * and default value of base register is sp ($r3).
+> +	 */
+> +.macro save_gprs base
+> +	.irp n,1,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
+> +	st.d    $r\n, \base, 8 * \n
+> +	.endr
+> +.endm
+> +
+> +.macro restore_gprs base
+> +	.irp n,1,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
+> +	ld.d    $r\n, \base, 8 * \n
+> +	.endr
+> +.endm
+> +
+> +/* address of general exception should be 4K aligned */
+> +.balign	4096
+> +.global handle_exception
+> +handle_exception:
+> +	csrwr  sp, LOONGARCH_CSR_KS0
+> +	csrrd  sp, LOONGARCH_CSR_KS1
+> +	addi.d sp, sp, -EXREGS_SIZE
+> +
+> +	save_gprs sp
+> +	/* save sp register to stack */
+> +	csrrd  t0, LOONGARCH_CSR_KS0
+> +	st.d   t0, sp, 3 * 8
+> +
+> +	csrrd  t0, LOONGARCH_CSR_ERA
+> +	st.d   t0, sp, PC_OFFSET_EXREGS
+> +	csrrd  t0, LOONGARCH_CSR_ESTAT
+> +	st.d   t0, sp, ESTAT_OFFSET_EXREGS
+> +	csrrd  t0, LOONGARCH_CSR_BADV
+> +	st.d   t0, sp, BADV_OFFSET_EXREGS
+> +
+> +	or     a0, sp, zero
+> +	bl route_exception
+> +	restore_gprs sp
+> +	csrrd  sp, LOONGARCH_CSR_KS0
+> +	ertn
+> diff --git a/tools/testing/selftests/kvm/lib/loongarch/processor.c b/tools/testing/selftests/kvm/lib/loongarch/processor.c
+> new file mode 100644
+> index 00000000000..82d8c1ec711
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/lib/loongarch/processor.c
+> @@ -0,0 +1,333 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +#include <assert.h>
+> +#include <linux/compiler.h>
+> +
+> +#include "kvm_util.h"
+> +#include "processor.h"
+> +
+> +static vm_paddr_t invalid_pgtable[4];
+> +static uint64_t virt_pte_index(struct kvm_vm *vm, vm_vaddr_t gva, int level)
+> +{
+> +	unsigned int shift;
+> +	uint64_t mask;
+> +
+> +	shift = level * (vm->page_shift - 3) + vm->page_shift;
+> +	mask = (1UL << (vm->page_shift - 3)) - 1;
+> +	return (gva >> shift) & mask;
+> +}
+> +
+> +static uint64_t pte_addr(struct kvm_vm *vm, uint64_t entry)
+> +{
+> +	return entry &  ~((0x1UL << vm->page_shift) - 1);
+> +}
+> +
+> +static uint64_t ptrs_per_pte(struct kvm_vm *vm)
+> +{
+> +	return 1 << (vm->page_shift - 3);
+> +}
+> +
+> +static void virt_set_pgtable(struct kvm_vm *vm, vm_paddr_t table, vm_paddr_t child)
+> +{
+> +	uint64_t *ptep;
+> +	int i, ptrs_per_pte;
+> +
+> +	ptep = addr_gpa2hva(vm, table);
+> +	ptrs_per_pte = 1 << (vm->page_shift - 3);
+> +	for (i = 0; i < ptrs_per_pte; i++)
+> +		*(ptep + i) = child;
+> +}
+> +
+> +void virt_arch_pgd_alloc(struct kvm_vm *vm)
+> +{
+> +	int i;
+> +	vm_paddr_t child, table;
+> +
+> +	if (vm->pgd_created)
+> +		return;
+> +	child = table = 0;
+> +	for (i = 0; i < vm->pgtable_levels; i++) {
+> +		invalid_pgtable[i] = child;
+> +		table = vm_phy_page_alloc(vm, DEFAULT_LOONARCH64_PAGE_TABLE_MIN,
+> +				vm->memslots[MEM_REGION_PT]);
+> +		TEST_ASSERT(table, "Fail to allocate page tale at level %d\n", i);
+> +		virt_set_pgtable(vm, table, child);
+> +		child = table;
+> +	}
+> +	vm->pgd = table;
+> +	vm->pgd_created = true;
+> +}
+> +
+> +static int virt_pte_none(uint64_t *ptep, int level)
+> +{
+> +	return *ptep == invalid_pgtable[level];
+> +}
+> +
+> +static uint64_t *virt_populate_pte(struct kvm_vm *vm, vm_vaddr_t gva, int alloc)
+> +{
+> +	uint64_t *ptep;
+> +	vm_paddr_t child;
+> +	int level;
+> +
+> +	if (!vm->pgd_created)
+> +		goto unmapped_gva;
+> +
+> +	level = vm->pgtable_levels - 1;
+> +	child = vm->pgd;
+> +	while (level > 0) {
+> +		ptep = addr_gpa2hva(vm, child) + virt_pte_index(vm, gva, level) * 8;
+> +		if (virt_pte_none(ptep, level)) {
+> +			if (alloc) {
+> +				child = vm_alloc_page_table(vm);
+> +				virt_set_pgtable(vm, child, invalid_pgtable[level - 1]);
+> +				*ptep = child;
+> +			} else
+> +				goto unmapped_gva;
+> +
+> +		} else
+> +			child = pte_addr(vm, *ptep);
+> +		level--;
+> +	}
+> +
+> +	ptep = addr_gpa2hva(vm, child) + virt_pte_index(vm, gva, level) * 8;
+> +	return ptep;
+> +
+> +unmapped_gva:
+> +	TEST_FAIL("No mapping for vm virtual address, gva: 0x%lx", gva);
+> +	exit(EXIT_FAILURE);
+> +}
+> +
+> +vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+> +{
+> +	uint64_t *ptep;
+> +
+> +	ptep = virt_populate_pte(vm, gva, 0);
+> +	TEST_ASSERT(*ptep != 0, "Virtual address vaddr: 0x%lx not mapped\n", gva);
+> +
+> +	return pte_addr(vm, *ptep) + (gva & (vm->page_size - 1));
+> +}
+> +
+> +void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+> +{
+> +	uint32_t prot_bits;
+> +	uint64_t *ptep;
+> +
+> +	TEST_ASSERT((vaddr % vm->page_size) == 0,
+> +			"Virtual address not on page boundary,\n"
+> +			"vaddr: 0x%lx vm->page_size: 0x%x", vaddr, vm->page_size);
+> +	TEST_ASSERT(sparsebit_is_set(vm->vpages_valid,
+> +			(vaddr >> vm->page_shift)),
+> +			"Invalid virtual address, vaddr: 0x%lx", vaddr);
+> +	TEST_ASSERT((paddr % vm->page_size) == 0,
+> +			"Physical address not on page boundary,\n"
+> +			"paddr: 0x%lx vm->page_size: 0x%x", paddr, vm->page_size);
+> +	TEST_ASSERT((paddr >> vm->page_shift) <= vm->max_gfn,
+> +			"Physical address beyond maximum supported,\n"
+> +			"paddr: 0x%lx vm->max_gfn: 0x%lx vm->page_size: 0x%x",
+> +			paddr, vm->max_gfn, vm->page_size);
+> +
+> +	ptep = virt_populate_pte(vm, vaddr, 1);
+> +	prot_bits = _PAGE_PRESENT | __READABLE | __WRITEABLE | _CACHE_CC;
+> +	prot_bits |= _PAGE_USER;
+> +	*ptep = paddr | prot_bits;
+> +}
+> +
+> +static void pte_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent, uint64_t page, int level)
+> +{
+> +	static const char * const type[] = { "pte", "pmd", "pud", "pgd"};
+> +	uint64_t pte, *ptep;
+> +
+> +	if (level < 0)
+> +		return;
+> +
+> +	for (pte = page; pte < page + ptrs_per_pte(vm) * 8; pte += 8) {
+> +		ptep = addr_gpa2hva(vm, pte);
+> +		if (virt_pte_none(ptep, level))
+> +			continue;
+> +		fprintf(stream, "%*s%s: %lx: %lx at %p\n",
+> +				indent, "", type[level], pte, *ptep, ptep);
+> +		pte_dump(stream, vm, indent + 1, pte_addr(vm, *ptep), level--);
+> +	}
+> +}
+> +
+> +void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
+> +{
+> +	int level;
+> +
+> +	if (!vm->pgd_created)
+> +		return;
+> +
+> +	level = vm->pgtable_levels - 1;
+> +	pte_dump(stream, vm, indent, vm->pgd, level);
+> +}
+> +
+> +void vcpu_arch_dump(FILE *stream, struct kvm_vcpu *vcpu, uint8_t indent)
+> +{
+> +}
+> +
+> +void assert_on_unhandled_exception(struct kvm_vcpu *vcpu)
+> +{
+> +	struct ucall uc;
+> +
+> +	if (get_ucall(vcpu, &uc) != UCALL_UNHANDLED)
+> +		return;
+> +
+> +	TEST_FAIL("Unexpected exception (pc:0x%lx, estat:0x%lx, badv:0x%lx)",
+> +			uc.args[0], uc.args[1], uc.args[2]);
+> +}
+> +
+> +void route_exception(struct ex_regs *regs)
+> +{
+> +	unsigned long pc, estat, badv;
+> +
+> +	pc = regs->pc;
+> +	estat = regs->estat;
+> +	badv  = regs->badv;
+> +	ucall(UCALL_UNHANDLED, 3, pc, estat, badv);
+> +	while (1)
+> +		;
+> +}
+> +
+> +void vcpu_args_set(struct kvm_vcpu *vcpu, unsigned int num, ...)
+> +{
+> +	va_list ap;
+> +	struct kvm_regs regs;
+> +	int i;
+> +
+> +	TEST_ASSERT(num >= 1 && num <= 8, "Unsupported number of args,\n"
+> +		    "num: %u\n", num);
+> +
+> +	vcpu_regs_get(vcpu, &regs);
+> +	va_start(ap, num);
+> +	for (i = 0; i < num; i++)
+> +		regs.gpr[i + 4] = va_arg(ap, uint64_t);
+> +	va_end(ap);
+> +	vcpu_regs_set(vcpu, &regs);
+> +}
+> +
+> +static void loongarch_get_csr(struct kvm_vcpu *vcpu, uint64_t id, void *addr)
+> +{
+> +	uint64_t csrid;
+> +
+> +	csrid = KVM_REG_LOONGARCH_CSR | KVM_REG_SIZE_U64 | 8 * id;
+> +	vcpu_get_reg(vcpu, csrid, addr);
+> +}
+> +
+> +static void loongarch_set_csr(struct kvm_vcpu *vcpu, uint64_t id, uint64_t val)
+> +{
+> +	uint64_t csrid;
+> +
+> +	csrid = KVM_REG_LOONGARCH_CSR | KVM_REG_SIZE_U64 | 8 * id;
+> +	vcpu_set_reg(vcpu, csrid, val);
+> +}
+> +
+> +static void loongarch_vcpu_setup(struct kvm_vcpu *vcpu)
+> +{
+> +	unsigned long val;
+> +	int width;
+> +	struct kvm_vm *vm = vcpu->vm;
+> +
+> +	switch (vm->mode) {
+> +	case VM_MODE_P48V48_16K:
+> +	case VM_MODE_P40V48_16K:
+> +	case VM_MODE_P36V48_16K:
+> +	case VM_MODE_P36V47_16K:
+> +		break;
+> +
+> +	default:
+> +		TEST_FAIL("Unknown guest mode, mode: 0x%x", vm->mode);
+> +	}
+> +
+> +	/* user mode and page enable mode */
+> +	val = PLV_USER | CSR_CRMD_PG;
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_CRMD, val);
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_PRMD, val);
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_EUEN, 1);
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_ECFG, 0);
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_TCFG, 0);
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_ASID, 1);
+> +
+> +	width = vm->page_shift - 3;
+> +	val = 0;
+> +	switch (vm->pgtable_levels) {
+> +	case 4:
+> +		/* pud page shift and width */
+> +		val = (vm->page_shift + width * 2) << 20 | (width << 25);
+> +		/* fall throuth */
+> +	case 3:
+> +		/* pmd page shift and width */
+> +		val |= (vm->page_shift + width) << 10 | (width << 15);
+> +		/* pte page shift and width */
+> +		val |= vm->page_shift | width << 5;
+> +		break;
+> +	default:
+> +		TEST_FAIL("Got %u page table levels, expected 3 or 4", vm->pgtable_levels);
+> +	}
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_PWCTL0, val);
+> +
+> +	/* pgd page shift and width */
+> +	val = (vm->page_shift + width * (vm->pgtable_levels - 1)) | width << 6;
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_PWCTL1, val);
+> +
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_PGDL, vm->pgd);
+> +
+> +	/*
+> +	 * refill exception runs on real mode, entry address should
+> +	 * be physical address
+> +	 */
+> +	val = addr_gva2gpa(vm, (unsigned long)handle_tlb_refill);
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_TLBRENTRY, val);
+> +
+> +	/*
+> +	 * general exception runs on page-enabled mode, entry address should
+> +	 * be virtual address
+> +	 */
+> +	val = (unsigned long)handle_exception;
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_EENTRY, val);
+> +
+> +	loongarch_get_csr(vcpu, LOONGARCH_CSR_TLBIDX, &val);
+> +	val &= ~CSR_TLBIDX_SIZEM;
+> +	val |= PS_DEFAULT_SIZE << CSR_TLBIDX_SIZE;
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_TLBIDX, val);
+> +
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_STLBPGSIZE, PS_DEFAULT_SIZE);
+> +
+> +	/* LOONGARCH_CSR_KS1 is used for exception stack */
+> +	val = __vm_vaddr_alloc(vm, vm->page_size,
+> +			DEFAULT_LOONARCH64_STACK_MIN, MEM_REGION_DATA);
+> +	TEST_ASSERT(val != 0,  "No memory for exception stack");
+> +	val = val + vm->page_size;
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_KS1, val);
+> +
+> +	loongarch_get_csr(vcpu, LOONGARCH_CSR_TLBREHI, &val);
+> +	val &= ~CSR_TLBREHI_PS;
+> +	val |= PS_DEFAULT_SIZE << CSR_TLBREHI_PS_SHIFT;
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_TLBREHI, val);
+> +
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_CPUID, vcpu->id);
+> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_TMID,  vcpu->id);
+> +}
+> +
+> +struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
+> +				  void *guest_code)
+> +{
+> +	size_t stack_size;
+> +	uint64_t stack_vaddr;
+> +	struct kvm_regs regs;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	vcpu = __vm_vcpu_add(vm, vcpu_id);
+> +	stack_size = vm->page_size;
+> +	stack_vaddr = __vm_vaddr_alloc(vm, stack_size,
+> +			DEFAULT_LOONARCH64_STACK_MIN, MEM_REGION_DATA);
+> +	TEST_ASSERT(stack_vaddr != 0,  "No memory for vm stack");
+> +
+> +	loongarch_vcpu_setup(vcpu);
+> +	/* Setup guest general purpose registers */
+> +	vcpu_regs_get(vcpu, &regs);
+> +	regs.gpr[3] = stack_vaddr + stack_size;
+> +	regs.pc = (uint64_t)guest_code;
+> +	vcpu_regs_set(vcpu, &regs);
+> +
+> +	return vcpu;
+> +}
 > 
->>> I suppose the driver is expected to stop calling
->>> iommu_report_device_fault() before calling this function, but that
->>> doesn't seem like it is going to be possible. Drivers should be
->>> implementing atomic replace for the PASID updates and in that case
->>> there is no momement when it can say the HW will stop generating PRI.
->>
->> Atomic domain replacement for a PASID is not currently implemented in
->> the core or driver.
-> 
-> It is, the driver should implement set_dev_pasid in such a way that
-> repeated calls do replacements, ideally atomically. This is what ARM
-> SMMUv3 does after my changes.
-> 
->> Even if atomic replacement were to be implemented,
->> it would be necessary to ensure that all translation requests,
->> translated requests, page requests and responses for the old domain are
->> drained before switching to the new domain.
-> 
-> Again, no it isn't required.
-> 
-> Requests simply have to continue to be acked, it doesn't matter if
-> they are acked against the wrong domain because the device will simply
-> re-issue them..
+Reviewed-by: Bibo Mao <maobibo@loongson.cn>
 
-Ah! I start to get your point now.
-
-Even a page fault response is postponed to a new address space, which
-possibly be another address space or hardware blocking state, the
-hardware just retries.
-
-As long as we flushes all caches (IOTLB and device TLB) during 
-switching, the mappings of the old domain won't leak. So it's safe to 
-keep page requests there.
-
-Do I get you correctly?
-
-Best regards,
-baolu
 
