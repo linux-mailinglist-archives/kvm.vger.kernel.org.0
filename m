@@ -1,174 +1,135 @@
-Return-Path: <kvm+bounces-3279-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3280-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 137288029A5
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 01:52:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 252388029AD
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 02:03:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3DB0280CA0
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 00:52:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 547CF1C20404
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 01:03:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5CAA49;
-	Mon,  4 Dec 2023 00:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF57A49;
+	Mon,  4 Dec 2023 01:02:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="PNAnU1fN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N5E2+top"
 X-Original-To: kvm@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09CCCDB;
-	Sun,  3 Dec 2023 16:51:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1701651110;
-	bh=Opj6twM4acMBCpY7T23VTzRC6W4CJ1xxdOLVZ0BFwGY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PNAnU1fNgJ32W0hGwE141ESRcRgmPsdmNRAmufzHkJKRI4Fiavz0IwFyvIRBtLUpf
-	 T9ClY2QGqGkGvGUTANJb9Lwqi/BzFxasMIX1jCuD4mn08IpedB0jswkpKUiLuJiHTv
-	 I7ujGXEgxPWKcU9XdSM0YKEzxvs4r9b7ztl0khRBEa0E2wypMSpBXQS8SckDP442cV
-	 D/vwINh0JzvHvgwPPqT5sgARdrR9Q7Ps7OxlZfBLH9Oa7oRnsqvn5dtyTZLVtkQGlI
-	 bV+/GUeaof+/di1naCRaKj1mQtR1YenzV7czHxy5gGqExytOSxomtVvKvKHPyTQyYB
-	 VJAvBfYlf78Kg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Sk4qn6b5hz4xhZ;
-	Mon,  4 Dec 2023 11:51:49 +1100 (AEDT)
-Date: Mon, 4 Dec 2023 11:51:48 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc: Christian Brauner <brauner@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>, Sean Christopherson
- <seanjc@google.com>, Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: linux-next: manual merge of the kvm tree with the vfs-brauner
- tree
-Message-ID: <20231204115148.0b09243b@canb.auug.org.au>
-In-Reply-To: <20231122125539.5a7df3a3@canb.auug.org.au>
-References: <20231122125539.5a7df3a3@canb.auug.org.au>
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEEA1D7;
+	Sun,  3 Dec 2023 17:02:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701651771; x=1733187771;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=/HuHnYJELZ3s+Pg2jAz1DP57zcUQSq+bWviBQSQi96k=;
+  b=N5E2+top27vVKlKN+wlezayPzxcBdEAwNHtWzvIr/M95ELBUyJTh9C6U
+   A9UprC/b3x5zZSg1swvHjXUWxImOO+6a+AYezGGzRxk9vp7a+BehlYga0
+   qQOBsuk69nPzxdIOfQeHkjnoUjpSpjTVg74dpOb5et8HhOf75J3PL4Oaz
+   LltmuQJf++RnBXLrBrMVE/bW3qArVAIK/CDUxMZdW3YxmeILM5w3UFPSe
+   Xu7pGwIBT/+YCyw1ihC1i20Rlq36rSEdFqnSEbMUln0v1BFQKcK4my3yL
+   jTAUzA/9e3t7Q30VLmI0EJ99HqR3v3pP1yPJG5By4nWZJyV2matHmf2G0
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="424834469"
+X-IronPort-AV: E=Sophos;i="6.04,248,1695711600"; 
+   d="scan'208";a="424834469"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2023 17:02:43 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="774101136"
+X-IronPort-AV: E=Sophos;i="6.04,248,1695711600"; 
+   d="scan'208";a="774101136"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
+  by fmsmga007.fm.intel.com with ESMTP; 03 Dec 2023 17:02:39 -0800
+Message-ID: <1b82e10f-bf5c-4fca-b558-ce2e4fe9f128@linux.intel.com>
+Date: Mon, 4 Dec 2023 08:58:07 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/8r2oWaKZaSmteXC+67jB/fz";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+User-Agent: Mozilla Thunderbird
+Cc: baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+ Kevin Tian <kevin.tian@intel.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
+ iommu@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7 11/12] iommu: Consolidate per-device fault data
+ management
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@ziepe.ca>
+References: <20231115030226.16700-1-baolu.lu@linux.intel.com>
+ <20231115030226.16700-12-baolu.lu@linux.intel.com>
+ <20231201194602.GF1489931@ziepe.ca>
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20231201194602.GF1489931@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---Sig_/8r2oWaKZaSmteXC+67jB/fz
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 12/2/23 3:46 AM, Jason Gunthorpe wrote:
+> On Wed, Nov 15, 2023 at 11:02:25AM +0800, Lu Baolu wrote:
+> 
+>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+>> index d19031c1b0e6..c17d5979d70d 100644
+>> --- a/include/linux/iommu.h
+>> +++ b/include/linux/iommu.h
+>> @@ -597,6 +597,8 @@ struct iommu_device {
+>>   /**
+>>    * struct iommu_fault_param - per-device IOMMU fault data
+>>    * @lock: protect pending faults list
+>> + * @users: user counter to manage the lifetime of the data, this field
+>> + *         is protected by dev->iommu->lock.
+>>    * @dev: the device that owns this param
+>>    * @queue: IOPF queue
+>>    * @queue_list: index into queue->devices
+>> @@ -606,6 +608,7 @@ struct iommu_device {
+>>    */
+>>   struct iommu_fault_param {
+>>   	struct mutex lock;
+>> +	int users;
+> 
+> Use refcount_t for the debugging features
 
-Hi all,
+Yes.
 
-On Wed, 22 Nov 2023 12:55:39 +1100 Stephen Rothwell <sfr@canb.auug.org.au> =
-wrote:
->
-> Today's linux-next merge of the kvm tree got a conflict in:
->=20
->   include/linux/pagemap.h
->=20
-> between commit:
->=20
->   762321dab9a7 ("filemap: add a per-mapping stable writes flag")
+> 
+>>   	struct device *dev;
+>>   	struct iopf_queue *queue;
+> 
+> But why do we need this to be refcounted? iopf_queue_remove_device()
+> is always called before we get to release? This struct isn't very big
+> so I'd just leave it allocated and free it during release?
 
-This is now in Linus' tree.
+iopf_queue_remove_device() should always be called before device
+release.
 
-> from the vfs-brauner tree and commit:
->=20
->   0003e2a41468 ("mm: Add AS_UNMOVABLE to mark mapping as completely unmov=
-able")
->=20
-> from the kvm tree.
->=20
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
+The reference counter is implemented to synchronize access to the fault
+parameter among different paths. For example, iopf_queue_remove_device()
+removes the parameter, while iommu_report_device_fault() and
+iommu_page_response() have needs to reference it. These three paths
+could possibly happen in different threads.
 
-The current resolution is below.
+> 
+>> @@ -72,23 +115,14 @@ static int iommu_handle_iopf(struct iommu_fault *fault, struct device *dev)
+>>   	struct iopf_group *group;
+>>   	struct iopf_fault *iopf, *next;
+>>   	struct iommu_domain *domain = NULL;
+>> -	struct iommu_fault_param *iopf_param;
+>> -	struct dev_iommu *param = dev->iommu;
+>> +	struct iommu_fault_param *iopf_param = dev->iommu->fault_param;
+>>   
+>> -	lockdep_assert_held(&param->lock);
+>> +	lockdep_assert_held(&iopf_param->lock);
+> 
+> This patch seems like it is doing a few things, can the locking
+> changes be kept in their own patch?
 
---=20
-Cheers,
-Stephen Rothwell
+Yes. Let me try to.
 
-diff --cc include/linux/pagemap.h
-index 06142ff7f9ce,bf2965b01b35..c2d90588c0bf
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@@ -203,9 -203,8 +203,10 @@@ enum mapping_flags=20
-  	/* writeback related tags are not used */
-  	AS_NO_WRITEBACK_TAGS =3D 5,
-  	AS_LARGE_FOLIO_SUPPORT =3D 6,
- -	AS_RELEASE_ALWAYS =3D 7,	/* Call ->release_folio(), even if no private d=
-ata */
- -	AS_UNMOVABLE	=3D 8,	/* The mapping cannot be moved, ever */
- +	AS_RELEASE_ALWAYS,	/* Call ->release_folio(), even if no private data */
- +	AS_STABLE_WRITES,	/* must wait for writeback before modifying
- +				   folio contents */
-++	AS_UNMOVABLE,		/* The mapping cannot be moved, ever */
-  };
- =20
-  /**
-@@@ -291,21 -290,22 +292,37 @@@ static inline void mapping_clear_releas
-  	clear_bit(AS_RELEASE_ALWAYS, &mapping->flags);
-  }
- =20
-+ static inline void mapping_set_unmovable(struct address_space *mapping)
-+ {
-+ 	/*
-+ 	 * It's expected unmovable mappings are also unevictable. Compaction
-+ 	 * migrate scanner (isolate_migratepages_block()) relies on this to
-+ 	 * reduce page locking.
-+ 	 */
-+ 	set_bit(AS_UNEVICTABLE, &mapping->flags);
-+ 	set_bit(AS_UNMOVABLE, &mapping->flags);
-+ }
-+=20
-+ static inline bool mapping_unmovable(struct address_space *mapping)
-+ {
-+ 	return test_bit(AS_UNMOVABLE, &mapping->flags);
-+ }
-+=20
- +static inline bool mapping_stable_writes(const struct address_space *mapp=
-ing)
- +{
- +	return test_bit(AS_STABLE_WRITES, &mapping->flags);
- +}
- +
- +static inline void mapping_set_stable_writes(struct address_space *mappin=
-g)
- +{
- +	set_bit(AS_STABLE_WRITES, &mapping->flags);
- +}
- +
- +static inline void mapping_clear_stable_writes(struct address_space *mapp=
-ing)
- +{
- +	clear_bit(AS_STABLE_WRITES, &mapping->flags);
- +}
- +
-  static inline gfp_t mapping_gfp_mask(struct address_space * mapping)
-  {
-  	return mapping->gfp_mask;
-
---Sig_/8r2oWaKZaSmteXC+67jB/fz
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmVtIqQACgkQAVBC80lX
-0GzjWAf/X1tCPBNu95zV0Mq9esX+qPvDhfWOLbieaYGzjpHNlL9AXomcCbRTg8GF
-8AtLG8v42IHH6GkeeETor1NiGcSv/BYyEa9ibvoO48x00YSKt8rAqUQKg4nBgXVa
-/FNzujmiXacB+a+cgb4tyqlBYGMzadQOvR4am1UkTq249AYUw4fhphJqpQ+ggPPo
-L/XsayunYH1AcUD1FpHLNmx2GeRrHuOXBFK3drqkK9JXlWNRHT5LW/5VuoTPUM/G
-I3ueJ//hmBZGStJaSK3wE+lqmK7B1iEYjAajupkwu4XdWlDK0wUsX5KJxn2gjPp/
-nhXaagOvwtGfZ1qv8sPuPf9HjmwWqA==
-=U7sa
------END PGP SIGNATURE-----
-
---Sig_/8r2oWaKZaSmteXC+67jB/fz--
+Best regards,
+baolu
 
