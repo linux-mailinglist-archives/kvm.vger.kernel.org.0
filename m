@@ -1,106 +1,132 @@
-Return-Path: <kvm+bounces-3386-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3387-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8BA3803A86
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 17:38:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9612C803AE4
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 17:52:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 599061F2124B
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 16:38:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FE531F21227
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 16:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F03282E41C;
-	Mon,  4 Dec 2023 16:38:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481982E415;
+	Mon,  4 Dec 2023 16:52:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ugkvx+DH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uey4/O6p"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5747BAC
-	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 08:38:19 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1d05f027846so16256375ad.2
-        for <kvm@vger.kernel.org>; Mon, 04 Dec 2023 08:38:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701707899; x=1702312699; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qDk8VCjkq3XxlHbdv1HgLMD6AIZzaNXkLSxsVVtlfDU=;
-        b=ugkvx+DHP4h3V/3/qYu0LuPwb9lAqPV+dulupC0KssmtHBP1Tpaumi3PxrGrbcq9MK
-         9weBh3Z259AeuD+nMjPDM5uv7Fbun/MYMp7h3svlIwI19jvBxCFe1HaVVmOPY099BakM
-         XzVliDimplLnuHzE7IX3BL8IW6tG0t4w31qHQy9TRQ52GpRSWJOfBndVP99NSqfPDCs2
-         PdyXMpm51l4WZEqqZEq1SdXEifBJ18N+ICz/E2DkKDU2iwKmBRYVdYtPqG2WI3UPqVXy
-         zbAadWjmTop2y4iYkc7MvUU1tfJ/DUIFpoRHyR256ihxYV01KJGeOzc6n22oHr3cT7eT
-         YhmQ==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B25EEE6
+	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 08:51:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701708715;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SapyimUGQGe0EmDwo46jv79iRuNiKKAe6T4mJuTcQno=;
+	b=Uey4/O6pzWk/pWvtR5cTvjvEZE8wyTgWWTxCguXDRrwZ8AnyZ8rNt+896aTKyCREEKX5z1
+	8pWch5UGJKVyz3cM3o2bMlOrnk/ThbIghD7zeabx3/Bvxxa5bBJhKF9LbnhKrvVed2WhnB
+	QObiyiYQwSdyCK9PZaBBCGxKXCIHypA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-124-pGRSU2OxO6upDecFygjtWw-1; Mon, 04 Dec 2023 11:51:53 -0500
+X-MC-Unique: pGRSU2OxO6upDecFygjtWw-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4083717431eso33191625e9.1
+        for <kvm@vger.kernel.org>; Mon, 04 Dec 2023 08:51:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701707899; x=1702312699;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qDk8VCjkq3XxlHbdv1HgLMD6AIZzaNXkLSxsVVtlfDU=;
-        b=oQq6/npbceMTJrzySrLXv5f6IsKj9AOTXasi1ijHQqvYg6F9pHIJ76GWcHsryrq0mx
-         wigFfcR6zysI6ox3TLaGqnpvKKbm8rRkaivhcI2ippHSAJFQxBvyMjItmGwUqTlrBTFS
-         To1kliNbT7UlgrD8Lr8K2qLg5nfphNcHR+X9YWVvjPmbWC6XxWWFHtGyS+zb0oeMZ/mf
-         WFFS4nUmvxbqWPeIYIYfqPGyRIhLBupNLd+8W3ekAh2cQ6jc5Q5voD/tUHtNzRpSDg0D
-         HWj3jxb+/a5cJ2dQuR8r+UYvXKCu/xwr7GYW6S8rVi7sAuNSmdWDCjJJb1B41sx56Coi
-         Ujvw==
-X-Gm-Message-State: AOJu0YxMyutao3tZCXjo50O2iw22Z0CBRGSjs+A/HoHdjNkM2PlTaWms
-	KMxcaTlvZWtYPFUO6u0bc16VLcS47HY=
-X-Google-Smtp-Source: AGHT+IH0KOf6e9SiOq5ykueCM2o/G5wmIdosmf1/SYoTYHBbgp+mKLWEKcRI/yzXpAEsOcbbgjKj2C8Ipoo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:8204:b0:1d0:71fc:b39c with SMTP id
- x4-20020a170902820400b001d071fcb39cmr163767pln.3.1701707898848; Mon, 04 Dec
- 2023 08:38:18 -0800 (PST)
-Date: Mon, 4 Dec 2023 08:38:17 -0800
-In-Reply-To: <20231204150800.GD1493156@nvidia.com>
+        d=1e100.net; s=20230601; t=1701708712; x=1702313512;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SapyimUGQGe0EmDwo46jv79iRuNiKKAe6T4mJuTcQno=;
+        b=DYe5JA3U+9UOFijsnFUmFjl1fHQizM/ha209GLqE78iWymmVjlGG82RNJULwa0Yj5f
+         7/GqpsVGwTxu4ow/ZV4yhA0iSIxmGGfRI08e0SszmPfI7UET7p821sp4yb/GtWD7Tzvw
+         1WZg02ZYI4r4tHOptl5DWRCAJxeJ/L+nFXsuHT70oOxTZsXIHji0l9pk+pTC9NABYk7y
+         PddaGUOXleitDF4MlZMk1lWkjMkHdp8ybXz57OZmA2RRMdc8W5jwTmmxhTxENMfBnA2M
+         U3c59L9MInZRUPz5O7M1YEicj3VgE+SwEmAisgKIa9qg/y6f95hk2O6ZDcIbI8r6cmy7
+         Go7Q==
+X-Gm-Message-State: AOJu0YxIZlwsDePHkjBXcEuqlt777w6PNb9gdEEHymXMIAEbMjI0V04c
+	Pp0DgUtq72PYmMjehk6N0Dv0F/fvbpLRzl+BVGY1ItFwhygXWELX+wz5V3mwKiwvZpYUPZQ/fPd
+	uOI0Eg/MNKaU8
+X-Received: by 2002:a05:600c:4f94:b0:40b:5e22:97e with SMTP id n20-20020a05600c4f9400b0040b5e22097emr3262138wmq.109.1701708712622;
+        Mon, 04 Dec 2023 08:51:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFh+TMH3imf5AUgkN8K1YnumS25NnssEHJszx6xAz27K36WgGTXX/q2RDadA1i84yY8uwaxOA==
+X-Received: by 2002:a05:600c:4f94:b0:40b:5e22:97e with SMTP id n20-20020a05600c4f9400b0040b5e22097emr3262113wmq.109.1701708712303;
+        Mon, 04 Dec 2023 08:51:52 -0800 (PST)
+Received: from vschneid-thinkpadt14sgen2i.remote.csb (213-44-141-166.abo.bbox.fr. [213.44.141.166])
+        by smtp.gmail.com with ESMTPSA id bg36-20020a05600c3ca400b003fe1fe56202sm15897195wmb.33.2023.12.04.08.51.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Dec 2023 08:51:51 -0800 (PST)
+From: Valentin Schneider <vschneid@redhat.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-arch@vger.kernel.org, x86@kernel.org, Thomas Gleixner
+ <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Josh Poimboeuf
+ <jpoimboe@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+ Ingo Molnar <mingo@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Wanpeng Li <wanpengli@tencent.com>, Vitaly Kuznetsov
+ <vkuznets@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Jason Baron
+ <jbaron@akamai.com>, Steven Rostedt <rostedt@goodmis.org>, Ard Biesheuvel
+ <ardb@kernel.org>, Frederic Weisbecker <frederic@kernel.org>, "Paul E.
+ McKenney" <paulmck@kernel.org>, Feng Tang <feng.tang@intel.com>, Andrew
+ Morton <akpm@linux-foundation.org>, "Mike Rapoport (IBM)"
+ <rppt@kernel.org>, Vlastimil Babka <vbabka@suse.cz>, David Hildenbrand
+ <david@redhat.com>, "ndesaulniers@google.com" <ndesaulniers@google.com>,
+ Michael Kelley <mikelley@microsoft.com>, "Masami Hiramatsu (Google)"
+ <mhiramat@kernel.org>
+Subject: Re: [PATCH 5/5] x86/tsc: Make __use_tsc __ro_after_init
+In-Reply-To: <20231120120553.GU8262@noisy.programming.kicks-ass.net>
+References: <20231120105528.760306-1-vschneid@redhat.com>
+ <20231120105528.760306-6-vschneid@redhat.com>
+ <20231120120553.GU8262@noisy.programming.kicks-ass.net>
+Date: Mon, 04 Dec 2023 17:51:49 +0100
+Message-ID: <xhsmhcyvlc3mi.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231202091211.13376-1-yan.y.zhao@intel.com> <20231204150800.GD1493156@nvidia.com>
-Message-ID: <ZW4AeZfCYgv6zcy4@google.com>
-Subject: Re: [RFC PATCH 00/42] Sharing KVM TDP to IOMMU
-From: Sean Christopherson <seanjc@google.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Yan Zhao <yan.y.zhao@intel.com>, iommu@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, alex.williamson@redhat.com, pbonzini@redhat.com, 
-	joro@8bytes.org, will@kernel.org, robin.murphy@arm.com, kevin.tian@intel.com, 
-	baolu.lu@linux.intel.com, dwmw2@infradead.org, yi.l.liu@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Mon, Dec 04, 2023, Jason Gunthorpe wrote:
-> On Sat, Dec 02, 2023 at 05:12:11PM +0800, Yan Zhao wrote:
-> > In this series, term "exported" is used in place of "shared" to avoid
-> > confusion with terminology "shared EPT" in TDX.
-> > 
-> > The framework contains 3 main objects:
-> > 
-> > "KVM TDP FD" object - The interface of KVM to export TDP page tables.
-> >                       With this object, KVM allows external components to
-> >                       access a TDP page table exported by KVM.
-> 
-> I don't know much about the internals of kvm, but why have this extra
-> user visible piece?
+On 20/11/23 13:05, Peter Zijlstra wrote:
+> On Mon, Nov 20, 2023 at 11:55:28AM +0100, Valentin Schneider wrote:
+>> __use_tsc is only ever enabled in __init tsc_enable_sched_clock(), so mark
+>> it as __ro_after_init.
+>>
+>> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
+>> ---
+>>  arch/x86/kernel/tsc.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
+>> index 15f97c0abc9d0..f19b42ea40573 100644
+>> --- a/arch/x86/kernel/tsc.c
+>> +++ b/arch/x86/kernel/tsc.c
+>> @@ -44,7 +44,7 @@ EXPORT_SYMBOL(tsc_khz);
+>>  static int __read_mostly tsc_unstable;
+>>  static unsigned int __initdata tsc_early_khz;
+>>
+>> -static DEFINE_STATIC_KEY_FALSE(__use_tsc);
+>> +static DEFINE_STATIC_KEY_FALSE_RO(__use_tsc);
+>
+> So sure, we can absolutely do that, but do we want to take this one
+> further perhaps? "notsc" on x86_64 makes no sense what so ever. Lets
+> drag things into this millennium.
+>
 
-That I don't know, I haven't looked at the gory details of this RFC.
+Just to make sure I follow: currently, for the static key to be enabled, we
+(mostly) need:
+o X86_FEATURE_TSC is in CPUID
+o determine_cpu_tsc_frequencies()->pit_hpet_ptimer_calibrate_cpu() passes
 
-> Isn't there only one "TDP" per kvm fd?
+IIUC all X86_64 systems have a TSC, so the CPUID feature should be a given.
 
-No.  In steady state, with TDP (EPT) enabled and assuming homogeneous capabilities
-across all vCPUs, KVM will have 3+ sets of TDP page tables *active* at any given time:
+AFAICT pit_hpt_ptimer_calibrate_cpu() relies on having either HPET or the
+ACPI PM timer, the latter should be widely available, though X86_PM_TIMER
+can be disabled via EXPERT - is that a fringe case we don't care about, or
+did I miss something? I don't really know this stuff, and I'm trying to
+write a changelog...
 
-  1. "Normal"
-  2. SMM
-  3-N. Guest (for L2, i.e. nested, VMs)
-
-The number of possible TDP page tables used for nested VMs is well bounded, but
-since devices obviously can't be nested VMs, I won't bother trying to explain the
-the various possibilities (nested NPT on AMD is downright ridiculous).
-
-Nested virtualization aside, devices are obviously not capable of running in SMM
-and so they all need to use the "normal" page tables.
-
-I highlighted "active" above because if _any_ memslot is deleted, KVM will invalidate
-*all* existing page tables and rebuild new page tables as needed.  So over the
-lifetime of a VM, KVM could theoretically use an infinite number of page tables.
 
