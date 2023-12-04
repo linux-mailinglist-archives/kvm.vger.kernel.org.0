@@ -1,133 +1,132 @@
-Return-Path: <kvm+bounces-3284-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3285-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57FF6802A2C
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 03:12:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F1C3802A67
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 03:42:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 091381F20F10
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 02:12:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDF221F20F5F
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 02:42:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F71117F4;
-	Mon,  4 Dec 2023 02:12:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A8F0186C;
+	Mon,  4 Dec 2023 02:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U2OuZqmu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id D28E8B3;
-	Sun,  3 Dec 2023 18:12:01 -0800 (PST)
-Received: from loongson.cn (unknown [10.20.42.173])
-	by gateway (Coremail) with SMTP id _____8Cx7+twNW1lJ6I+AA--.58446S3;
-	Mon, 04 Dec 2023 10:12:00 +0800 (CST)
-Received: from [10.20.42.173] (unknown [10.20.42.173])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxO9xsNW1le8lTAA--.53472S3;
-	Mon, 04 Dec 2023 10:11:58 +0800 (CST)
-Subject: Re: [PATCH v5 4/4] KVM: selftests: Add test cases for LoongArch
-To: Tianrui Zhao <zhaotianrui@loongson.cn>, Shuah Khan <shuah@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
-Cc: Vishal Annapurve <vannapurve@google.com>,
- Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
- loongarch@lists.linux.dev, Peter Xu <peterx@redhat.com>,
- Vipin Sharma <vipinsh@google.com>
-References: <20231130111804.2227570-1-zhaotianrui@loongson.cn>
- <20231130111804.2227570-5-zhaotianrui@loongson.cn>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <ebdc956b-6235-370f-97d1-c24540c05047@loongson.cn>
-Date: Mon, 4 Dec 2023 10:11:50 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A656D9;
+	Sun,  3 Dec 2023 18:42:38 -0800 (PST)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2ca03103155so4974391fa.0;
+        Sun, 03 Dec 2023 18:42:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701657756; x=1702262556; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SEUh6K5iutasnoMeRQbvniZJyhB8EqO9DGWeSRBdHG8=;
+        b=U2OuZqmucqFts8pAMt/wdD4lmr34uN6jJ/2bh2Hb8iYEpve6PK1jjBFcAMnW2jXsW0
+         s9qMLepYbliqh1PIAorSrtzuxrHMcl8wTU42TkZaBwZMKIKvZG6bUoX2Nsm4huEBBKal
+         kOV79Z5gP7m8T3TSMukeasr+T49wCsxWnRFS7+T38XWk7vivD2NqeRluCPmPEOA/7XXl
+         8gs75xOLkFR3BA8umg/sUY5wQfANIOAZCgUwA01z6gKkcQh12fnV2NzpfacFv/a3bNmr
+         4Ofk9fi7NdyeLyYg5BM9J7qyIlDB6S863h0geH75v3xQxjJVYF0M4OarjUVYPio0nvOj
+         g4mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701657756; x=1702262556;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SEUh6K5iutasnoMeRQbvniZJyhB8EqO9DGWeSRBdHG8=;
+        b=WIUeDHzytcpf0c/oZdrX7GeB/I9tDhKNEBoS46Wz/Zwqgw4x1E5WA/So1Wr04JSEDi
+         CNcG+HwMtydMbIfodpOfmBplpQPvBdncVDa08+MqTkR92TNtHnupWc525SytOhdEn74P
+         yASIHfkd+aIh+uL7x8fCe5rlRBAQergP4LQmVhoOZIFPt02vdkJndLx98/5Vx6hUfEfi
+         jWqVkDlGE9sYX7oiTGuzmvOf5mJu4bRnUWl85rbK+P1zRZ9tUqyX6cf/Am4afgV1EsxQ
+         n+Zd4pha3Undmp5tv1yZlwu302tQH7pY7GlLqr306SiOTvqnPxKmL+M0SJ56LlRza4Rs
+         mNHw==
+X-Gm-Message-State: AOJu0Yz8KemNXAHDqY4CmCvYkm1cpYqbyqyN2QzL+kcPLM5k2c4MGxgN
+	iUcjLfPC6+TZUnClqo7X5k3pYPQ9oTRT7X3dDnY=
+X-Google-Smtp-Source: AGHT+IFwUdfTpFRUP7l0fmhtGiz7fd+NP19pyuThwxbiypx7Ivz7rX5Zrc/KjwBbAY7wO0CJI2SrHgFWM/kImEvN9oM=
+X-Received: by 2002:a05:6512:ea1:b0:50b:f03c:1eaa with SMTP id
+ bi33-20020a0565120ea100b0050bf03c1eaamr553100lfb.95.1701657756237; Sun, 03
+ Dec 2023 18:42:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231130111804.2227570-5-zhaotianrui@loongson.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8CxO9xsNW1le8lTAA--.53472S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW7uw17Kr4DtFyDCF4kGFW3urX_yoW8KFWrpF
-	yI9r1jvFWxurs3Jwn3Gw4DZan3Cr9Fgr40gFy3Kw18ur98J348JF1xKasrKFsYgw45Xa1Y
-	v3WrKwnruayDA3XCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUP2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4j6r4UJwAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
-	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jw0_
-	WrylYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
-	CYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48J
-	MxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI
-	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
-	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r4j6ryUMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-	W8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1l
-	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU00eHDUUUU
-	U==
+References: <cover.1694421911.git.haibo1.xu@intel.com> <64e0637cd6f22dd7557ed44bd2242001e7830d1c.1694421911.git.haibo1.xu@intel.com>
+ <20230914-d2e594e7d84503ad14036e2d@orel> <CAJve8onhY534T=Hyncjfi4GfdZ+0D2xM+jRSaYCAWCdaKxPUcQ@mail.gmail.com>
+In-Reply-To: <CAJve8onhY534T=Hyncjfi4GfdZ+0D2xM+jRSaYCAWCdaKxPUcQ@mail.gmail.com>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Mon, 4 Dec 2023 10:42:24 +0800
+Message-ID: <CAJve8omitHDpijJaLV_wHk+5LXpsBUWF8_eTD4MeWKM-807Siw@mail.gmail.com>
+Subject: Re: [PATCH v3 9/9] KVM: riscv: selftests: Add sstc timer test
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Haibo Xu <haibo1.xu@intel.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Sean Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Vipin Sharma <vipinsh@google.com>, David Matlack <dmatlack@google.com>, 
+	Colton Lewis <coltonlewis@google.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Sep 15, 2023 at 2:21=E2=80=AFPM Haibo Xu <xiaobo55x@gmail.com> wrot=
+e:
+>
+> On Thu, Sep 14, 2023 at 5:52=E2=80=AFPM Andrew Jones <ajones@ventanamicro=
+.com> wrote:
+> >
+> > On Thu, Sep 14, 2023 at 09:37:03AM +0800, Haibo Xu wrote:
+> > > Add a KVM selftests to validate the Sstc timer functionality.
+> > > The test was ported from arm64 arch timer test.
+> >
+> > I just tried this test out. Running it over and over again on QEMU I se=
+e
+> > it works sometimes, but it frequently fails with the
+> > GUEST_ASSERT_EQ(config_iter + 1, irq_iter) assert and at least once I
+> > also saw the __GUEST_ASSERT(xcnt >=3D cmp) assert.
+> >
+>
+> Good catch!
+>
+> I can also reproduce this issue and it is a common problem for both
+> arm64 and riscv because it also happens in a arm64 Qemu VM.
+>
+> It seems like a synchronization issue between host and guest shared
+> variables. Will double check the test code.
+>
+> > Thanks,
+> > drew
 
+Hi Andrew,
 
-On 2023/11/30 下午7:18, Tianrui Zhao wrote:
-> There are some KVM common test cases supported by LoongArch:
-> 	demand_paging_test
-> 	dirty_log_perf_test
-> 	dirty_log_test
-> 	guest_print_test
-> 	kvm_binary_stats_test
-> 	kvm_create_max_vcpus
-> 	kvm_page_table_test
-> 	memslot_modification_stress_test
-> 	memslot_perf_test
-> 	set_memory_region_test
-> And other test cases are not supported by LoongArch. For example,
-> we do not support rseq_test, as the glibc do not support it.
-> 
-> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
-> ---
->   tools/testing/selftests/kvm/Makefile | 15 +++++++++++++++
->   1 file changed, 15 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index a5963ab9215..9d099d48013 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -65,6 +65,10 @@ LIBKVM_s390x += lib/s390x/ucall.c
->   LIBKVM_riscv += lib/riscv/processor.c
->   LIBKVM_riscv += lib/riscv/ucall.c
->   
-> +LIBKVM_loongarch += lib/loongarch/processor.c
-> +LIBKVM_loongarch += lib/loongarch/ucall.c
-> +LIBKVM_loongarch += lib/loongarch/exception.S
-> +
->   # Non-compiled test targets
->   TEST_PROGS_x86_64 += x86_64/nx_huge_pages_test.sh
->   
-> @@ -202,6 +206,17 @@ TEST_GEN_PROGS_riscv += kvm_binary_stats_test
->   
->   SPLIT_TESTS += get-reg-list
->   
-> +TEST_GEN_PROGS_loongarch += demand_paging_test
-> +TEST_GEN_PROGS_loongarch += dirty_log_perf_test
-> +TEST_GEN_PROGS_loongarch += dirty_log_test
-> +TEST_GEN_PROGS_loongarch += guest_print_test
-> +TEST_GEN_PROGS_loongarch += kvm_binary_stats_test
-> +TEST_GEN_PROGS_loongarch += kvm_create_max_vcpus
-> +TEST_GEN_PROGS_loongarch += kvm_page_table_test
-> +TEST_GEN_PROGS_loongarch += memslot_modification_stress_test
-> +TEST_GEN_PROGS_loongarch += memslot_perf_test
-> +TEST_GEN_PROGS_loongarch += set_memory_region_test
-rseq_test is not supported by LoongArch kernel, and get-reg-list 
-interface is not supported by KVM now, arch specific testcases
-will be added later also.
+After several rounds of regression testing, some findings:
+1. The intermittent failure also happened on ARM64 Qemu VM, and even
+in the initial arch_timer commit(4959d8650e9f4).
+2. it didn't happen on a ARM64 HW(but a different failure occured
+during stress test)
+3. The failure have a close relationship with
+TIMER_TEST_ERR_MARGIN_US(default 100), and after increasing
+     the macro to 300, the failure couldn't reproduced in 1000 loops
+stress test in RISC-V Qemu VM
 
-Reviewed-by: Bibo Mao <maobibo@loongson.cn>
-> +
->   TEST_PROGS += $(TEST_PROGS_$(ARCH_DIR))
->   TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
->   TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
-> 
+So my suggestion is we can expose the TIMER_TEST_ERR_MARGIN_US
+parameter as an arch_timer test arg parameter
+and tune it based on a specific test environment.
 
+What's your opinion?
+
+Regards,
+Haibo
 
