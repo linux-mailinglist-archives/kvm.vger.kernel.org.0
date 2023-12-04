@@ -1,376 +1,256 @@
-Return-Path: <kvm+bounces-3333-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3334-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22659803300
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 13:38:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC5A38033E9
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 14:08:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 453F11C209E9
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 12:38:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A0401C20AA1
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 13:08:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FEDE241FE;
-	Mon,  4 Dec 2023 12:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E6B6250F5;
+	Mon,  4 Dec 2023 13:07:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FrU/WiAO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="glYuk8RX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96D85A7;
-	Mon,  4 Dec 2023 04:38:01 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A384A7;
+	Mon,  4 Dec 2023 05:07:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701693481; x=1733229481;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=TZrVBVYHyMnaUFgD9Dz65E//PVH6mwgAZHswEzueOr4=;
-  b=FrU/WiAOu7wxNHaZ2i1xm1KOvGT0pzVlQXNU9dQijE1kjdtb1UMuxhc2
-   Mvg2cx1yX8l+ubkA0Jxl1eT/NEoc31gXq4/1GIDs4DK3Mj6tnaqPz9EHe
-   yETc9TgzEHXSLWx/dCwoRSGal+DygC/wH5NMJoxjsVu6MhyMvHdKCbdWj
-   1SceTdorrIRBri7nOTOsZSJaHr0sVoRTWRPsuG8vbABhaJuPmvqGITKBQ
-   afSzbN9UgH6EXrPXrH7+bTm8e000csMzIkuRuXh0hEH3p8bJsTWeDvSoH
-   xyTmxT39/cMAs7z0pgTbXv3LYXXw58DBpT7SXWIlXkfJXbCu0gE7Vkoe/
+  t=1701695265; x=1733231265;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UpKiTiLV03HLrMK8OyY7m+bGEMtR9L95NOiQzYClrhU=;
+  b=glYuk8RXPb0XnOqDmmVCjrF7jpJ9zshznGYsBwZnW6Lp6N9UB3wcJAfW
+   RcyKoR3vcNfNkawEw6PplM/CnnVsbAPCOO3ye8XRT4rN3XSwOLz9sb1hU
+   7C+6cD/D1sePV5R/GegF2Oygln5+FP4LpN8LETCbSj5emh7LU/EmbTFtR
+   dAUdaO++oeIOhU9+SvMmDwUTY7pfPCIkRyf2unXDWTJ2pYQAWOK2AA2Mv
+   93RpGe0s7/IwqU+loGPDWvrNJMvLWXNCZjdCDCe8Q32LqxnYlkjlPcodB
+   VrGEtbgUe6WUs5DZVI6UwsLf1e6rvg4sOZtvRq/3Q28morjoDvQUepAYu
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="7016041"
+X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="15275177"
 X-IronPort-AV: E=Sophos;i="6.04,249,1695711600"; 
-   d="scan'208";a="7016041"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 04:38:01 -0800
+   d="scan'208";a="15275177"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 05:07:37 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="893991056"
+X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="763935696"
 X-IronPort-AV: E=Sophos;i="6.04,249,1695711600"; 
-   d="scan'208";a="893991056"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Dec 2023 04:38:00 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 4 Dec 2023 04:38:00 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 4 Dec 2023 04:37:59 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Mon, 4 Dec 2023 04:37:59 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.101)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Mon, 4 Dec 2023 04:37:59 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AYDsUA3+VLtTR18m9B7pk4V1EoOPxk6ru5zeyHqlhTmk55DTuxExY9uvrbkYcCh/hYIMmqxJ/pT0QU91IeMa3Y2OFeb14drX6JItGbScOjqTG7PRihJI39yLbRSePrPs6ML/s6z3DAes6rqaFYRgtA/tpLNSMXKqYRYn1UwGDU4kzAoU5X159oSuw10oS1KQzdVAk2cTBaxZyjJFjwHoBCaq1pZ5/05psj9dVukq0Ns3TjMiLIAHTSlqWvcOK1uhfJj9l4zYAPKjdSHNInBE/q4t15jabKFxCvA+gR4UNWrSvrpP5NbJfwiS2TGv3MBLlRCl/PRqVwSNu6sqcjIUNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dSss1bREvyO33QhOIN2EObEDBcJ/t7XfRRsY1vBhJQY=;
- b=AzfdJWR5Kt6yzwg/TJv2rRWKjFW98O+oJvNUhOixylt4/8BtsrlBac4ZVEGbtGX4HIb7CUuvtBACGHx3k2Pv1SqaoCFIgRxAc32A6ifUE6iyVfiHUyowu7wR6sYtpLaHoadQ2BdwEtVWMhzxK06y2Qc9pzJvLCHPHeCFUrnJFbcHRsCSMKH/Y2HE/Vm0TVVlDNM8bJHztTTnWinuSmVx1up5725OSPqdiR5VuVzdtgorgBqZmvFjSzxPHkev8ZXDGDxcf1354mmACG604mVPhAQjjXeWenjj3ERO8mZ9GDh416qrAIbeQ6ycOxdT1YmuCeJiUeLA9462xNx6gw47Mw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by SN7PR11MB6851.namprd11.prod.outlook.com (2603:10b6:806:2a3::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.33; Mon, 4 Dec
- 2023 12:37:57 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::e4ae:3948:1f55:547d]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::e4ae:3948:1f55:547d%5]) with mapi id 15.20.7046.033; Mon, 4 Dec 2023
- 12:37:57 +0000
-Message-ID: <7e088129-866a-499d-8105-ba245c744f14@intel.com>
-Date: Mon, 4 Dec 2023 20:40:32 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 07/12] iommu: Merge iommu_fault_event and iopf_fault
-Content-Language: en-US
-To: Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>, "Will
- Deacon" <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, "Jason
- Gunthorpe" <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, "Jean-Philippe
- Brucker" <jean-philippe@linaro.org>, Nicolin Chen <nicolinc@nvidia.com>
-CC: Jacob Pan <jacob.jun.pan@linux.intel.com>, Yan Zhao
-	<yan.y.zhao@intel.com>, <iommu@lists.linux.dev>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20231115030226.16700-1-baolu.lu@linux.intel.com>
- <20231115030226.16700-8-baolu.lu@linux.intel.com>
-From: Yi Liu <yi.l.liu@intel.com>
-In-Reply-To: <20231115030226.16700-8-baolu.lu@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2P153CA0052.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c6::21)
- To DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+   d="scan'208";a="763935696"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 05:07:13 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1rA8fA-00000001kqj-2oCl;
+	Mon, 04 Dec 2023 15:07:04 +0200
+Date: Mon, 4 Dec 2023 15:07:04 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"James E.J. Bottomley" <jejb@linux.ibm.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	"Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+	Akinobu Mita <akinobu.mita@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Borislav Petkov <bp@alien8.de>, Chaitanya Kulkarni <kch@nvidia.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	David Disseldorp <ddiss@suse.de>,
+	Edward Cree <ecree.xilinx@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Fenghua Yu <fenghua.yu@intel.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Gregory Greenman <gregory.greenman@intel.com>,
+	Hans Verkuil <hverkuil@xs4all.nl>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Hugh Dickins <hughd@google.com>, Ingo Molnar <mingo@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+	Jiri Pirko <jiri@resnulli.us>, Jiri Slaby <jirislaby@kernel.org>,
+	Kalle Valo <kvalo@kernel.org>, Karsten Graul <kgraul@linux.ibm.com>,
+	Karsten Keil <isdn@linux-pingi.de>,
+	Kees Cook <keescook@chromium.org>,
+	Leon Romanovsky <leon@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Martin Habets <habetsm.xilinx@gmail.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Michal Simek <monstr@monstr.eu>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Oliver Neukum <oneukum@suse.com>, Paolo Abeni <pabeni@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ping-Ke Shih <pkshih@realtek.com>, Rich Felker <dalias@libc.org>,
+	Rob Herring <robh@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuai Xue <xueshuai@linux.alibaba.com>,
+	Stanislaw Gruszka <stf_xl@wp.pl>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>, Will Deacon <will@kernel.org>,
+	Yoshinori Sato <ysato@users.sourceforge.jp>,
+	GR-QLogic-Storage-Upstream@marvell.com, alsa-devel@alsa-project.org,
+	ath10k@lists.infradead.org, dmaengine@vger.kernel.org,
+	iommu@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
+	linux-media@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-net-drivers@amd.com, linux-pci@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-sh@vger.kernel.org, linux-sound@vger.kernel.org,
+	linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, mpi3mr-linuxdrv.pdl@broadcom.com,
+	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org,
+	Jan Kara <jack@suse.cz>,
+	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
+	Matthew Wilcox <willy@infradead.org>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
+	Alexey Klimov <klimov.linux@gmail.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>
+Subject: Re: [PATCH v2 00/35] bitops: add atomic find_bit() operations
+Message-ID: <ZW3O-P_98eubKxMU@smile.fi.intel.com>
+References: <20231203192422.539300-1-yury.norov@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|SN7PR11MB6851:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9748f84e-c82c-4564-890d-08dbf4c5d800
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ZJqQmk2pyUn9AJudASnRr2PbtZUk7of+MSEz5rvL4aiPANORYLItRcKv3jvmDYYXxuyflNNw5K/2EhpIcpMOelfJ32oRsETE2gQmRNzJTH0H5nDjdO3opoNZpJBJ7PVntwY5f1fDyxERBavYcsiA56J9VXlMEQhR7dyMAJRtsOY1r3KK6C/zCaiZExqa/J9wNsSDlaq0tIDHxAbm+NpwKSeecjp7prNoklUlJk9VBGJUPpUj4Mamo1yooMrQZRLwR6fGjBFDcNX2028YCIKNk27yJ2nDyP3/DLB2Kkv2lXDyXtYD2mg40C0CDHqoVCQvFacmrtjdeNi1VG4ZRpjhzst4uj4ORhW7MkAJ5asnuFjjZpnQw35z6XcywX/lSNss1P+lMxAqHNugjwrGecWq6+N4KMSTdXTcrXJeMcXaAuIq65aNIB6Ezv8ggLGbEpFOtwH0PNfgeubJWIgGFMwXcB9hRMYo8cpXOXd7Gyz4sZRRCK5aI9Or/PXpzUMLgXak2Dpbu/4hMAAWF1gxn6KqYl/bzLs7Q83WxMVN80gVQoVEzq7B1FxTfepKQQ/wgt7J8CP91A67tXcRal+dMCZnUbnH5wuxKEJdU687zSHTLIfWKtjsfS4WsdK+h7SQ2Ya7wnxa5yXFzG81xm0bHfEmpg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(136003)(396003)(376002)(346002)(230922051799003)(64100799003)(186009)(1800799012)(451199024)(478600001)(6512007)(2616005)(8936002)(8676002)(4326008)(38100700002)(66556008)(66476007)(66946007)(54906003)(110136005)(316002)(31686004)(26005)(83380400001)(6486002)(6666004)(53546011)(82960400001)(6506007)(31696002)(86362001)(5660300002)(7416002)(2906002)(41300700001)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Sm8rZFl0YjY4bzhWcnp5LzB5Y05aUUxraXY5c2ZpZUxOK3BhT2VNL0JnWVhk?=
- =?utf-8?B?cUV1UThQNktXWDQ2VlFNR1V4Tkhrd1pZejFEeWliem42MWVNNmVkZDZ3L1Bu?=
- =?utf-8?B?UUwvM2NtZ09CbktTZXNoai9mT2k0ZWNOTHhvYTN0ZjVzS3czMTZaYjJCOERo?=
- =?utf-8?B?cXJxZ3JLaU5WdjU1RGl6VkRPYU16aDZ4K2hPMmxDZVErTzNHdzBRWklIQ3Fh?=
- =?utf-8?B?bjllNlBRREFRaUovaXJVWEFTVmsyVGtXUkZWN0oxdEtYN21DZ2RrY1A2Mktj?=
- =?utf-8?B?ajVRVzQyeExjNXpmUzFrWUljM1gyNVhDV1pQOHdPZzVsMTJXbWdWWGJ3RUp3?=
- =?utf-8?B?M1pkVkM4N1lLV0dETkR1elNTUEZsaEg2WEFWSm9OVzFMZkg2bWJDMlVtM3ho?=
- =?utf-8?B?S1hsZTRST1drSDlIa2puRWVqakRtVVIwRUhhMGQ5RVRCYzdSS25kaVloNHVq?=
- =?utf-8?B?ZlJkRlVab0JBa2JndlcvUmRWbWJRUGxucE9WRFJLSmhGdXNQNW9FaHc2aE10?=
- =?utf-8?B?dENwVnZEOGpRcWhyUFVBVTZMaEwzYzJPVGVtclFnd1NPZ1E5aG1jemZSNTBv?=
- =?utf-8?B?K2Y1YjlkYVZpaUpZR3pMaElZWGg0Q1NyYWlNcEQvUlZhUU5kY2ZaU0wxa2Vw?=
- =?utf-8?B?SWN3d2swSHhFWmVNSUxZeHBaV3J6QTFlMlVTcVpZaDByKzRJY3g3c1hhbFJR?=
- =?utf-8?B?NUMyVitRbHJwQUR3c2RQRDdmeWwwWFhOVFJWUGhxUFBiRUYrRDJDZDVraUxZ?=
- =?utf-8?B?WmRvclBEZ2hBYnhlcFUyM1R3KzNNTkJLNkUyRnBpMHF1bHk2Q2ZRem40R3NO?=
- =?utf-8?B?OGhmdUc4NEFKb1ZXODZvNy9QMlV1bXIyUUw4cHRRRVpLL0lscGp3STR1SUhT?=
- =?utf-8?B?NnNxMzJHZFNpbWpySFZodDZ3Z1hITk1IYUExSGhiOThiRWpjVjNtVTFDU1Jt?=
- =?utf-8?B?RWRtYjllM3RQNFVqTG93TFArcW1EOHl0OFFldnk3WE5FeE5vcGxVWFVYUUdS?=
- =?utf-8?B?OVVraDJOa1ZENENsQy90c1A4MzJnbFhSWGpoRTd0THNPeWFCL250U1hqWHdR?=
- =?utf-8?B?NlRsS1ljY0o3NkRpbG1takorbjJ2L3lQam40YVZKUGtVamR5TXdyNDV0OWRX?=
- =?utf-8?B?M2xHbUhXai9GM2lDdHc0N25uam5MYWpGdk12aUFONDBFNmRKUklFUEFETGti?=
- =?utf-8?B?L0ZRWU9SS3pFOHdpYk4xOGhsYlU0dWNyQjdLeGc4amc1K2JwZ2Z3ZXQwbU5h?=
- =?utf-8?B?b2VrbTJ4WVFlMFlvZXpScTJxbW5xU2hOb1kyMzhRdjdYaUNWdUZYTUtrdStw?=
- =?utf-8?B?SEJCUFpVWDJSSStMZFdsclQycllrL3JrTWcwQkM1WkM3WXoveGRUdS85eXNK?=
- =?utf-8?B?SHNBeEw5bTZYSGJEQmdKOFdGTmc5RFZRdFNBT3ZlTC9jTlJvWENEdHFxU2ZS?=
- =?utf-8?B?UE9WSWluNi81WVFrZnZsbWl1UzVrNDZzS0YwUWIrZnFQSWVCa2JYSlFWZ2VY?=
- =?utf-8?B?SUxoeUdDT1BNVk1GWTJ0TU10OTM4NjBpUUFONmdkMHZlYytickt2bDgrTTAw?=
- =?utf-8?B?cHYrNjk5YjRXU3ROWDFKVkdsQnF6b1lQZ2kwKzIzVEg5RGYyTXJweHJtQVlZ?=
- =?utf-8?B?R3RqOS93N2MxNnpEMllBUkMvVmpBYzFKVjRDWGtDUXVFWHNmQ0xtVGRJdGJY?=
- =?utf-8?B?QVBYbEp2Mlp5N1UwQnBvMTN0RUJleXdONDBHMlBpSzdPY1dKZFhZNTM4VDY4?=
- =?utf-8?B?U1JvRXI3SXhWZkxuVXdGUEUzVjlMeGpPZnpyd0FJVXkvVDVLMkw0R3NNM0p5?=
- =?utf-8?B?aHRUTG91ZFRDNFZxWWQ1emQ1T3hJcmtTZU9oODhFblIyczVSNTVHcW91Tlgz?=
- =?utf-8?B?U2NiRzk0K0pkblY3OHNFRnJpWUFic2lXTGxCdGZOdWlQVGQrbFpUVDlWc083?=
- =?utf-8?B?KzVMV2s1WXUzNVROVyt3SXVOOEcrNmdiNm4vYkVkTW0yTEJVMHpMclgvRVNN?=
- =?utf-8?B?MUZOSlRoZXpjN0xSaXY1ak9qUTZRbmlqUTZDRS9uMkZXR3AvTTNHUllyMDRS?=
- =?utf-8?B?RzVtRkZTaVk5bEg0WVY3QmpVcHNSYnB3UW13cG13SWFYZk00T01iczlLOG44?=
- =?utf-8?Q?E1qqR1rSGYOz5pk2dqzhZ4F2k?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9748f84e-c82c-4564-890d-08dbf4c5d800
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2023 12:37:57.3771
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ly4V0R2hY0Nr2LKl90xmL7lx0d8zC6R/BuSzwCZssSSWUPBpp37Jf189tiyf+jOZUY+yDdV5C6kVOL0MrOOKRw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6851
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231203192422.539300-1-yury.norov@gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On 2023/11/15 11:02, Lu Baolu wrote:
-> The iommu_fault_event and iopf_fault data structures store the same
-> information about an iopf fault. They are also used in the same way.
-> Merge these two data structures into a single one to make the code
-> more concise and easier to maintain.
+On Sun, Dec 03, 2023 at 11:23:47AM -0800, Yury Norov wrote:
+> Add helpers around test_and_{set,clear}_bit() that allow to search for
+> clear or set bits and flip them atomically.
 > 
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Tested-by: Yan Zhao <yan.y.zhao@intel.com>
-> ---
->   include/linux/iommu.h                       | 27 ++++++---------------
->   drivers/iommu/intel/iommu.h                 |  2 +-
->   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  4 +--
->   drivers/iommu/intel/svm.c                   |  5 ++--
->   drivers/iommu/io-pgfault.c                  |  5 ----
->   drivers/iommu/iommu.c                       |  8 +++---
->   6 files changed, 17 insertions(+), 34 deletions(-)
+> The target patterns may look like this:
+> 
+> 	for (idx = 0; idx < nbits; idx++)
+> 		if (test_and_clear_bit(idx, bitmap))
+> 			do_something(idx);
+> 
+> Or like this:
+> 
+> 	do {
+> 		bit = find_first_bit(bitmap, nbits);
+> 		if (bit >= nbits)
+> 			return nbits;
+> 	} while (!test_and_clear_bit(bit, bitmap));
+> 	return bit;
+> 
+> In both cases, the opencoded loop may be converted to a single function
+> or iterator call. Correspondingly:
+> 
+> 	for_each_test_and_clear_bit(idx, bitmap, nbits)
+> 		do_something(idx);
+> 
+> Or:
+> 	return find_and_clear_bit(bitmap, nbits);
+> 
+> Obviously, the less routine code people have to write themself, the
+> less probability to make a mistake.
+> 
+> Those are not only handy helpers but also resolve a non-trivial
+> issue of using non-atomic find_bit() together with atomic
+> test_and_{set,clear)_bit().
+> 
+> The trick is that find_bit() implies that the bitmap is a regular
+> non-volatile piece of memory, and compiler is allowed to use such
+> optimization techniques like re-fetching memory instead of caching it.
+> 
+> For example, find_first_bit() is implemented like this:
+> 
+>       for (idx = 0; idx * BITS_PER_LONG < sz; idx++) {
+>               val = addr[idx];
+>               if (val) {
+>                       sz = min(idx * BITS_PER_LONG + __ffs(val), sz);
+>                       break;
+>               }
+>       }
+> 
+> On register-memory architectures, like x86, compiler may decide to
+> access memory twice - first time to compare against 0, and second time
+> to fetch its value to pass it to __ffs().
+> 
+> When running find_first_bit() on volatile memory, the memory may get
+> changed in-between, and for instance, it may lead to passing 0 to
+> __ffs(), which is undefined. This is a potentially dangerous call.
+> 
+> find_and_clear_bit() as a wrapper around test_and_clear_bit()
+> naturally treats underlying bitmap as a volatile memory and prevents
+> compiler from such optimizations.
+> 
+> Now that KCSAN is catching exactly this type of situations and warns on
+> undercover memory modifications. We can use it to reveal improper usage
+> of find_bit(), and convert it to atomic find_and_*_bit() as appropriate.
+> 
+> The 1st patch of the series adds the following atomic primitives:
+> 
+> 	find_and_set_bit(addr, nbits);
+> 	find_and_set_next_bit(addr, nbits, start);
+> 	...
+> 
+> Here find_and_{set,clear} part refers to the corresponding
+> test_and_{set,clear}_bit function. Suffixes like _wrap or _lock
+> derive their semantics from corresponding find() or test() functions.
+> 
+> For brevity, the naming omits the fact that we search for zero bit in
+> find_and_set, and correspondingly search for set bit in find_and_clear
+> functions.
+> 
+> The patch also adds iterators with atomic semantics, like
+> for_each_test_and_set_bit(). Here, the naming rule is to simply prefix
+> corresponding atomic operation with 'for_each'.
+> 
+> This series is a result of discussion [1]. All find_bit() functions imply
+> exclusive access to the bitmaps. However, KCSAN reports quite a number
+> of warnings related to find_bit() API. Some of them are not pointing
+> to real bugs because in many situations people intentionally allow
+> concurrent bitmap operations.
+> 
+> If so, find_bit() can be annotated such that KCSAN will ignore it:
+> 
+>         bit = data_race(find_first_bit(bitmap, nbits));
+> 
+> This series addresses the other important case where people really need
+> atomic find ops. As the following patches show, the resulting code
+> looks safer and more verbose comparing to opencoded loops followed by
+> atomic bit flips.
+> 
+> In [1] Mirsad reported 2% slowdown in a single-thread search test when
+> switching find_bit() function to treat bitmaps as volatile arrays. On
+> the other hand, kernel robot in the same thread reported +3.7% to the
+> performance of will-it-scale.per_thread_ops test.
+> 
+> Assuming that our compilers are sane and generate better code against
+> properly annotated data, the above discrepancy doesn't look weird. When
+> running on non-volatile bitmaps, plain find_bit() outperforms atomic
+> find_and_bit(), and vice-versa.
 
-Reviewed-by: Yi Liu <yi.l.liu@intel.com>
+...
 
-> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index a45d92cc31ec..42b62bc8737a 100644
-> --- a/include/linux/iommu.h
-> +++ b/include/linux/iommu.h
-> @@ -40,7 +40,6 @@ struct iommu_domain_ops;
->   struct iommu_dirty_ops;
->   struct notifier_block;
->   struct iommu_sva;
-> -struct iommu_fault_event;
->   struct iommu_dma_cookie;
->   struct iopf_queue;
->   
-> @@ -121,6 +120,11 @@ struct iommu_page_response {
->   	u32	code;
->   };
->   
-> +struct iopf_fault {
-> +	struct iommu_fault fault;
-> +	/* node for pending lists */
-> +	struct list_head list;
-> +};
->   
->   /* iommu fault flags */
->   #define IOMMU_FAULT_READ	0x0
-> @@ -480,7 +484,7 @@ struct iommu_ops {
->   	int (*dev_disable_feat)(struct device *dev, enum iommu_dev_features f);
->   
->   	int (*page_response)(struct device *dev,
-> -			     struct iommu_fault_event *evt,
-> +			     struct iopf_fault *evt,
->   			     struct iommu_page_response *msg);
->   
->   	int (*def_domain_type)(struct device *dev);
-> @@ -572,20 +576,6 @@ struct iommu_device {
->   	u32 max_pasids;
->   };
->   
-> -/**
-> - * struct iommu_fault_event - Generic fault event
-> - *
-> - * Can represent recoverable faults such as a page requests or
-> - * unrecoverable faults such as DMA or IRQ remapping faults.
-> - *
-> - * @fault: fault descriptor
-> - * @list: pending fault event list, used for tracking responses
-> - */
-> -struct iommu_fault_event {
-> -	struct iommu_fault fault;
-> -	struct list_head list;
-> -};
-> -
->   /**
->    * struct iommu_fault_param - per-device IOMMU fault data
->    * @lock: protect pending faults list
-> @@ -720,8 +710,7 @@ extern struct iommu_group *iommu_group_get(struct device *dev);
->   extern struct iommu_group *iommu_group_ref_get(struct iommu_group *group);
->   extern void iommu_group_put(struct iommu_group *group);
->   
-> -extern int iommu_report_device_fault(struct device *dev,
-> -				     struct iommu_fault_event *evt);
-> +extern int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt);
->   extern int iommu_page_response(struct device *dev,
->   			       struct iommu_page_response *msg);
->   
-> @@ -1128,7 +1117,7 @@ static inline void iommu_group_put(struct iommu_group *group)
->   }
->   
->   static inline
-> -int iommu_report_device_fault(struct device *dev, struct iommu_fault_event *evt)
-> +int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
->   {
->   	return -ENODEV;
->   }
-> diff --git a/drivers/iommu/intel/iommu.h b/drivers/iommu/intel/iommu.h
-> index 65d37a138c75..a1ddd5132aae 100644
-> --- a/drivers/iommu/intel/iommu.h
-> +++ b/drivers/iommu/intel/iommu.h
-> @@ -905,7 +905,7 @@ struct iommu_domain *intel_nested_domain_alloc(struct iommu_domain *parent,
->   void intel_svm_check(struct intel_iommu *iommu);
->   int intel_svm_enable_prq(struct intel_iommu *iommu);
->   int intel_svm_finish_prq(struct intel_iommu *iommu);
-> -int intel_svm_page_response(struct device *dev, struct iommu_fault_event *evt,
-> +int intel_svm_page_response(struct device *dev, struct iopf_fault *evt,
->   			    struct iommu_page_response *msg);
->   struct iommu_domain *intel_svm_domain_alloc(void);
->   void intel_svm_remove_dev_pasid(struct device *dev, ioasid_t pasid);
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index 505400538a2e..46780793b743 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -922,7 +922,7 @@ static int arm_smmu_cmdq_batch_submit(struct arm_smmu_device *smmu,
->   }
->   
->   static int arm_smmu_page_response(struct device *dev,
-> -				  struct iommu_fault_event *unused,
-> +				  struct iopf_fault *unused,
->   				  struct iommu_page_response *resp)
->   {
->   	struct arm_smmu_cmdq_ent cmd = {0};
-> @@ -1467,7 +1467,7 @@ static int arm_smmu_handle_evt(struct arm_smmu_device *smmu, u64 *evt)
->   	struct arm_smmu_master *master;
->   	bool ssid_valid = evt[0] & EVTQ_0_SSV;
->   	u32 sid = FIELD_GET(EVTQ_0_SID, evt[0]);
-> -	struct iommu_fault_event fault_evt = { };
-> +	struct iopf_fault fault_evt = { };
->   	struct iommu_fault *flt = &fault_evt.fault;
->   
->   	switch (FIELD_GET(EVTQ_0_ID, evt[0])) {
-> diff --git a/drivers/iommu/intel/svm.c b/drivers/iommu/intel/svm.c
-> index 50a481c895b8..9de349ea215c 100644
-> --- a/drivers/iommu/intel/svm.c
-> +++ b/drivers/iommu/intel/svm.c
-> @@ -543,13 +543,12 @@ static int prq_to_iommu_prot(struct page_req_dsc *req)
->   static int intel_svm_prq_report(struct intel_iommu *iommu, struct device *dev,
->   				struct page_req_dsc *desc)
->   {
-> -	struct iommu_fault_event event;
-> +	struct iopf_fault event = { };
->   
->   	if (!dev || !dev_is_pci(dev))
->   		return -ENODEV;
->   
->   	/* Fill in event data for device specific processing */
-> -	memset(&event, 0, sizeof(struct iommu_fault_event));
->   	event.fault.type = IOMMU_FAULT_PAGE_REQ;
->   	event.fault.prm.addr = (u64)desc->addr << VTD_PAGE_SHIFT;
->   	event.fault.prm.pasid = desc->pasid;
-> @@ -721,7 +720,7 @@ static irqreturn_t prq_event_thread(int irq, void *d)
->   }
->   
->   int intel_svm_page_response(struct device *dev,
-> -			    struct iommu_fault_event *evt,
-> +			    struct iopf_fault *evt,
->   			    struct iommu_page_response *msg)
->   {
->   	struct iommu_fault_page_request *prm;
-> diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
-> index 31832aeacdba..c45977bb7da3 100644
-> --- a/drivers/iommu/io-pgfault.c
-> +++ b/drivers/iommu/io-pgfault.c
-> @@ -25,11 +25,6 @@ struct iopf_queue {
->   	struct mutex			lock;
->   };
->   
-> -struct iopf_fault {
-> -	struct iommu_fault		fault;
-> -	struct list_head		list;
-> -};
-> -
->   struct iopf_group {
->   	struct iopf_fault		last_fault;
->   	struct list_head		faults;
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index 0c6700b6659a..36b597bb8a09 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -1312,10 +1312,10 @@ EXPORT_SYMBOL_GPL(iommu_group_put);
->    *
->    * Return 0 on success, or an error.
->    */
-> -int iommu_report_device_fault(struct device *dev, struct iommu_fault_event *evt)
-> +int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
->   {
->   	struct dev_iommu *param = dev->iommu;
-> -	struct iommu_fault_event *evt_pending = NULL;
-> +	struct iopf_fault *evt_pending = NULL;
->   	struct iommu_fault_param *fparam;
->   	int ret = 0;
->   
-> @@ -1328,7 +1328,7 @@ int iommu_report_device_fault(struct device *dev, struct iommu_fault_event *evt)
->   
->   	if (evt->fault.type == IOMMU_FAULT_PAGE_REQ &&
->   	    (evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE)) {
-> -		evt_pending = kmemdup(evt, sizeof(struct iommu_fault_event),
-> +		evt_pending = kmemdup(evt, sizeof(struct iopf_fault),
->   				      GFP_KERNEL);
->   		if (!evt_pending) {
->   			ret = -ENOMEM;
-> @@ -1357,7 +1357,7 @@ int iommu_page_response(struct device *dev,
->   {
->   	bool needs_pasid;
->   	int ret = -EINVAL;
-> -	struct iommu_fault_event *evt;
-> +	struct iopf_fault *evt;
->   	struct iommu_fault_page_request *prm;
->   	struct dev_iommu *param = dev->iommu;
->   	const struct iommu_ops *ops = dev_iommu_ops(dev);
+In some cases the better improvements can be achieved by switching
+the (very) old code to utilise IDA framework.
 
 -- 
-Regards,
-Yi Liu
+With Best Regards,
+Andy Shevchenko
+
+
 
