@@ -1,83 +1,79 @@
-Return-Path: <kvm+bounces-3335-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3336-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F962803401
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 14:09:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A512180340F
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 14:10:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDF6B280F25
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 13:09:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4F8E1C20AC4
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 13:10:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD49F24B2A;
-	Mon,  4 Dec 2023 13:09:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D7D24B2E;
+	Mon,  4 Dec 2023 13:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b5w/c0SR"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E60610EB
-	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 05:09:26 -0800 (PST)
-Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.55])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4SkP5759swz14L9q;
-	Mon,  4 Dec 2023 21:04:27 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 4 Dec 2023 21:09:23 +0800
-Subject: Re: [PATCH v2 0/3] arm64: Drop support for VPIPT i-cache policy
-To: Marc Zyngier <maz@kernel.org>
-CC: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
-	<kvm@vger.kernel.org>, Will Deacon <will@kernel.org>, Catalin Marinas
-	<catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, Ard
- Biesheuvel <ardb@kernel.org>, James Morse <james.morse@arm.com>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>
-References: <20231127172613.1490283-1-maz@kernel.org>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <6f859b31-dcbe-148d-cfde-e6119553b072@huawei.com>
-Date: Mon, 4 Dec 2023 21:09:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91862421D
+	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 13:10:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C485BC433C8;
+	Mon,  4 Dec 2023 13:10:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701695441;
+	bh=mH6UFinR2jS1kpwOBQ++DpQNO6L7gqAEnFvCgBuoLGY=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=b5w/c0SRgBX7jvWNhtbcglu86+s3q51ywjLP3jI4BbPueqnGvCE4mRLSYh6CwMJep
+	 BQ5wOt7tbnK0reMAMwxSJ5mYyrqf+bKyB1BO1Vo73kYNZw5DRm8gGYaQmihn/r7sjV
+	 QUQUN1nl+cK0kz6oI4jh9CaKFBla9wc/xnlBYah61rwfHR40DEbTS7VhCYYgQtRXHA
+	 X9+y24Pxug1KsnjC54SQ76+l/aScZcROHdhQxFJWg53/u3ppa0I0k3k8Rp067G9lz4
+	 iqmdJ0zJyHBgZ0pAzXMoAVq/e4qAsqhes2p+voBMI5trJm7ePTYCFpyAUWZDcAfrJz
+	 Abc3YWhRCACxg==
+From: Leon Romanovsky <leon@kernel.org>
+To: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Eugenio Perez Martin <eperezma@redhat.com>,
+ Si-Wei Liu <si-wei.liu@oracle.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ virtualization@lists.linux-foundation.org,
+ Dragos Tatulea <dtatulea@nvidia.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Gal Pressman <galp@nvidia.com>, Parav Pandit <parav@nvidia.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20231201104857.665737-1-dtatulea@nvidia.com>
+References: <20231201104857.665737-1-dtatulea@nvidia.com>
+Subject:
+ Re: (subset) [PATCH vhost 0/7] vdpa/mlx5: Add support for resumable vqs
+Message-Id: <170169543706.44375.3181832396401755311.b4-ty@kernel.org>
+Date: Mon, 04 Dec 2023 15:10:37 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231127172613.1490283-1-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm000007.china.huawei.com (7.193.23.189)
-X-CFilter-Loop: Reflected
+X-Mailer: b4 0.12-dev-a055d
 
-On 2023/11/28 1:26, Marc Zyngier wrote:
-> ARMv8.2 introduced support for VPIPT i-caches, the V standing for
-> VMID-tagged. Although this looks like a reasonable idea, no
-> implementation has ever made it into the wild.
-> 
-> Linux has supported this for over 6 years (amusingly, just as the
-> architecture was dropping support for AVIVT i-caches), but we had no
-> way to even test it, and it is likely that this code was just
-> bit-rotting.
-> 
-> However, in a recent breakthrough (XML drop 2023-09, tagged as
-> d55f5af8e09052abe92a02adf820deea2eaed717), the architecture has
-> finally been purged of this option, making VIPT and PIPT the only two
-> valid options.
-> 
-> This really means this code is just dead code. Nobody will ever come
-> up with such an implementation, and we can just get rid of it.
-> 
-> Most of the impact is on KVM, where we drop a few large comment blocks
-> (and a bit of code), while the core arch code loses the detection code
-> itself.
-> 
-> Marc Zyngier (3):
->   KVM: arm64: Remove VPIPT I-cache handling
->   arm64: Kill detection of VPIPT i-cache policy
->   arm64: Rename reserved values for CTR_EL0.L1Ip
 
-Series looks good to me.  With Anshuman's comment addressed,
+On Fri, 01 Dec 2023 12:48:50 +0200, Dragos Tatulea wrote:
+> Add support for resumable vqs in the driver. This is a firmware feature
+> that can be used for the following benefits:
+> - Full device .suspend/.resume.
+> - .set_map doesn't need to destroy and create new vqs anymore just to
+>   update the map. When resumable vqs are supported it is enough to
+>   suspend the vqs, set the new maps, and then resume the vqs.
+> 
+> [...]
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+Applied, thanks!
+
+[1/7] vdpa/mlx5: Expose resumable vq capability
+      https://git.kernel.org/rdma/rdma/c/b24910e1be0e76
+
+Best regards,
+-- 
+Leon Romanovsky <leon@kernel.org>
 
