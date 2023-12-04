@@ -1,78 +1,70 @@
-Return-Path: <kvm+bounces-3339-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3340-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AB048034DE
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 14:28:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2178680351A
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 14:38:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 362F31F2124C
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 13:28:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5412B20A09
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 13:38:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99DEE2576C;
-	Mon,  4 Dec 2023 13:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7074425567;
+	Mon,  4 Dec 2023 13:38:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="IFfed4nR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VtE0DQW7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 188EF271D
-	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 05:27:35 -0800 (PST)
-Received: by mail-qk1-x72c.google.com with SMTP id af79cd13be357-77efc30eee3so36350585a.1
-        for <kvm@vger.kernel.org>; Mon, 04 Dec 2023 05:27:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1701696454; x=1702301254; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=D9LwUnJIABIYXynmRpnw8pFA/pix8HVAwnnjKzJe6go=;
-        b=IFfed4nRNRW34bnfJg0K5t+m7Qs/6Ibys9PBnRhbntxFz1p70fTUj9Sdz7E2p89/GH
-         5ZnUmfpVDqcjJc8TVh29Zo8hnUMidkibRGpcbqM05hHTYkFMXk8BNhvVG9LW4wTYz1rU
-         FNcILSfSOzss+x55aKQykriC9tM3LEs37qV5Xom4E409/PyCK0mXt8ZltCslONcG9CXw
-         hYRq7Qwb8mqslU1Ss9XDxU6PZESOmTAyH1LDpkqIaWrWDXxHQU3E92EJo3AIU2rQQsBP
-         JmGmIQOWbVNmywxyHBZU1jo2mcMyLWkdhYvxRB5NMegtb1IpSaEZafkLIPy+vMFMqge0
-         QjEg==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48B20136
+	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 05:38:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701697101;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=5akfcmS88aMdBOZU2tgTkzn2BZ024jWxw0fAikE98gA=;
+	b=VtE0DQW7wlfLoFn+JC6Kj8+dEXzHuu85SpwTQcz7xkpG6nJ+84m8CsnSNbBQ/Gq1dWpkM3
+	3arhhUq8avt2VijUGtNRD+kI/yl5eRsn/EWtbTAjOrf/Dp4gWUBBsV5OWvJwm7eaupvE6D
+	jSmUxGqpjOSnHmTjFRL/wiOGMFFt6WY=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-607-C6b2bhUCP8a7rf8oe_Ii_A-1; Mon, 04 Dec 2023 08:38:15 -0500
+X-MC-Unique: C6b2bhUCP8a7rf8oe_Ii_A-1
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-423d293392bso63029611cf.2
+        for <kvm@vger.kernel.org>; Mon, 04 Dec 2023 05:38:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701696454; x=1702301254;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D9LwUnJIABIYXynmRpnw8pFA/pix8HVAwnnjKzJe6go=;
-        b=m+WHYCeLD1NZ6Vr0S+pqs8YbsSSrfRTl7GDhOgm9mF8GsfmVveo2vPkWOTiS5aQX4P
-         6+iKVOWvUq6PygXh7iWfLi6UuFGjMrDXFsOm96HzLT2ugzBwqQYEf0UWkUm6Lja+ZERw
-         g4THq9ypWuRcZc8it4BfD4yAhfWfNmOs0/D6Xptbmjun+yD7XilbsYv/kU+3Ki/PEiVR
-         U9xzswJ49O/aJ7zulNH9Nqk/Ra3WDOCLzkkSCOkS7GARCElKWeIffq+lFLcp5JADqpxB
-         nHrnpdv4+WNU+RXlpvUSX9iMCQ3bSZdHSqRsQgVH9JErs7LiMStJMcnVZHJUZfJdmayL
-         uaeQ==
-X-Gm-Message-State: AOJu0Yz7+lGHfbXkXtrKLNuFLzCOWlODszlHulW+l/Q/JP55RgCgTOMA
-	DxO/NX56X0nTj6iARe95QDuDFg==
-X-Google-Smtp-Source: AGHT+IFwJd+mm5yr9E/Hib/UfERIuq8yXaFwHF06npvbzKqM7QtB126feDLE1ZVHpqSCvPB5b1ED4w==
-X-Received: by 2002:a05:620a:1913:b0:77e:fba3:a787 with SMTP id bj19-20020a05620a191300b0077efba3a787mr2055508qkb.101.1701696454008;
-        Mon, 04 Dec 2023 05:27:34 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-134-23-187.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.134.23.187])
-        by smtp.gmail.com with ESMTPSA id l15-20020ae9f00f000000b0077da8c0936asm4239213qkg.107.2023.12.04.05.27.33
+        d=1e100.net; s=20230601; t=1701697094; x=1702301894;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5akfcmS88aMdBOZU2tgTkzn2BZ024jWxw0fAikE98gA=;
+        b=C9l5Wlxcmsk51Zn72CV/hiwiRVieUah2JxoyokB8issf5iW+0akL3Vpyz08fETYfWm
+         csA3Vt048eVr2b4BW+36j9Jciqjg+DPF2FNWFrzzwIy/gC04KthkTtayJGhXel4sTZ1V
+         xcUaNcF2qJ8t1HRc6o+fWAMEIgmzqGQOU+gPE6WfInvA2bJ+J8YhY3yZpHSYgEqeL0JA
+         9qQzzwoBtqiYNJdZnciZkTYK5bKeJAPEgB/uulkbk0XYgeFTzlIADku1WC5w0E8KkbES
+         u/GU3WVwTONhUbYOrGOjmWQ6FuEK2qlgB4gnXF5vPPnDjFUA0sCcqFEora00wHBD1Tpg
+         HKJQ==
+X-Gm-Message-State: AOJu0YwFoDigOHoLZUvjLYr3IdbpqRvBoyOUJ3+RszRFwfdBcm+IwxEl
+	3lxXYPcPrdeykPXSD9FtXq3wZY8VYiF6Sxl+bQKwIDZwPcAqggXuAUzqJmbWLrCuJ36D75AYPJL
+	d2TniwPB1HgIG
+X-Received: by 2002:a05:622a:282:b0:425:4043:18d0 with SMTP id z2-20020a05622a028200b00425404318d0mr5350678qtw.131.1701697094709;
+        Mon, 04 Dec 2023 05:38:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH+uydVke1bj6K3+VpqcvkS7K82S/AfCUqWL9s3clAKf0dXgfm1gbib9FuloJn1VamCnIS2mQ==
+X-Received: by 2002:a05:622a:282:b0:425:4043:18d0 with SMTP id z2-20020a05622a028200b00425404318d0mr5350660qtw.131.1701697094341;
+        Mon, 04 Dec 2023 05:38:14 -0800 (PST)
+Received: from redhat.com ([2.55.57.48])
+        by smtp.gmail.com with ESMTPSA id i14-20020ac8488e000000b004199c98f87dsm4284873qtq.74.2023.12.04.05.38.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 05:27:33 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1rA8yz-00AsTP-01;
-	Mon, 04 Dec 2023 09:27:33 -0400
-Date: Mon, 4 Dec 2023 09:27:32 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Baolu Lu <baolu.lu@linux.intel.com>
-Cc: Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
-	Jacob Pan <jacob.jun.pan@linux.intel.com>,
-	Yan Zhao <yan.y.zhao@intel.com>, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 12/12] iommu: Improve iopf_queue_flush_dev()
-Message-ID: <20231204132732.GM1489931@ziepe.ca>
-References: <20231115030226.16700-1-baolu.lu@linux.intel.com>
- <20231115030226.16700-13-baolu.lu@linux.intel.com>
- <20231201203536.GG1489931@ziepe.ca>
- <93a57e63-352c-407c-ac3f-4b91c11d925d@linux.intel.com>
+        Mon, 04 Dec 2023 05:38:13 -0800 (PST)
+Date: Mon, 4 Dec 2023 08:38:08 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	eperezma@redhat.com, jasowang@redhat.com, lkp@intel.com,
+	mst@redhat.com, shannon.nelson@amd.com, steven.sistare@oracle.com
+Subject: [GIT PULL] vdpa: bugfixes
+Message-ID: <20231204083808-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,18 +73,42 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <93a57e63-352c-407c-ac3f-4b91c11d925d@linux.intel.com>
+X-Mutt-Fcc: =sent
 
-On Mon, Dec 04, 2023 at 11:46:30AM +0800, Baolu Lu wrote:
-> On 12/2/23 4:35 AM, Jason Gunthorpe wrote:
+There's one other fix in my tree but it was only posted very
+recently so I am giving it a week in linux next, just in case.
 
-> I am wondering whether we can take patch 1/12 ~ 10/12 of this series as
-> a first step, a refactoring effort to support delivering iopf to
-> userspace? I will follow up with one or multiple series to add the
-> optimizations.
+The following changes since commit 2cc14f52aeb78ce3f29677c2de1f06c0e91471ab:
 
-I think that is reasonable, though I would change the earlier patch to
-use RCU to obtain the fault data.
+  Linux 6.7-rc3 (2023-11-26 19:59:33 -0800)
 
-Jason
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+for you to fetch changes up to cefc9ba6aed48a3aa085888e3262ac2aa975714b:
+
+  pds_vdpa: set features order (2023-12-01 09:55:01 -0500)
+
+----------------------------------------------------------------
+vdpa: bugfixes
+
+fixes in mlx5 and pds drivers.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Shannon Nelson (3):
+      pds_vdpa: fix up format-truncation complaint
+      pds_vdpa: clear config callback when status goes to 0
+      pds_vdpa: set features order
+
+Steve Sistare (1):
+      vdpa/mlx5: preserve CVQ vringh index
+
+ drivers/vdpa/mlx5/net/mlx5_vnet.c | 7 ++++++-
+ drivers/vdpa/pds/debugfs.c        | 2 +-
+ drivers/vdpa/pds/vdpa_dev.c       | 7 ++++---
+ 3 files changed, 11 insertions(+), 5 deletions(-)
+
 
