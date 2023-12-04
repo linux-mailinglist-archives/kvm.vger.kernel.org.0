@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-3379-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3381-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8C8F803934
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 16:51:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B76CB803944
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 16:55:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 637001F210D5
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 15:51:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7248328112E
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 15:55:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0251A2D036;
-	Mon,  4 Dec 2023 15:51:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0DC62D048;
+	Mon,  4 Dec 2023 15:55:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jUgGw6kQ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BalrrVvn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02F30A4;
-	Mon,  4 Dec 2023 07:51:21 -0800 (PST)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B4FlNeM018501;
-	Mon, 4 Dec 2023 15:51:20 GMT
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4779DFF;
+	Mon,  4 Dec 2023 07:55:18 -0800 (PST)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B4Fc39m014565;
+	Mon, 4 Dec 2023 15:55:17 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=iTbnsVnSKru5gD68uY8KZ7ZAV54k4ioCBOWcq0YapWU=;
- b=jUgGw6kQI4LPzo4RCB0fRgm0cCil+LWcoIt+ed89AzF8ocXRMbh8R9bnGpZ1nRavEb5t
- AD+9DYb6mbLc2/Q1RlbsTpHnIV/XADVZ+tZ4FQ3wLIlPuzE3XUA2ZObddfPgAmZagNWJ
- UtxR5HzhtbHT0dKw4u+9btfLC9DJEjQotiptUBxBdEksagyxqvBNd85JHVZqavK9seTe
- pqiIuzMPZoDZMrQKBS4ZDtvzwxpQtNP5+KpC926MmmAgUmt4+u6Yl+PTnShSTDLCdna6
- Ui4T2VK1v+SiNPMmVBczhOKKE0aeO9BIXvGZCbM90DHc6v20z2IPbJIwzAB36F4zuTVQ Yg== 
+ bh=UO8TBtetr+3y4KPTWx2Mhw6wIQnBNZu5oEvShmWfUEY=;
+ b=BalrrVvnZZJAcfUm4StBcC9y3l4kAKMknCzXW4hK5NM3tNytr29BOtZkosIBeSgC+E2j
+ 1G/uNLQ2Qn+ZC2mUCPI+fJYQ89BlxwpQJIp7zX9ucNgliEat+/AVzZ43Z0QzrP16gpvP
+ BcTZpxwnTMAmtDnluP3dUTV+UcAK2wI7/MwiVnEHTvJFa6s/79GJNdb3vWRiWrR1KcOm
+ UqHTIxBJEFSAERmmmzXwHiKhFRmV8p4E6PJWbCA1HprcHJZhCwXqECpkm7RHBzl81aIv
+ S31yF2g5yZCepTXubLsY0Y0lBjb9Nckvj8EmvzZlNTrdngqwNmtqZZzwjapT53xaj3cK Uw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ushqer46n-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ushk38g1h-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Dec 2023 15:51:20 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B4FlNhX018519;
-	Mon, 4 Dec 2023 15:51:19 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ushqer45t-1
+	Mon, 04 Dec 2023 15:55:17 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B4Fd7xC017049;
+	Mon, 4 Dec 2023 15:55:16 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ushk38fpj-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Dec 2023 15:51:19 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B4EJZPl013389;
-	Mon, 4 Dec 2023 15:51:18 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3urhm20gpa-1
+	Mon, 04 Dec 2023 15:55:14 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B4EJRJj020507;
+	Mon, 4 Dec 2023 15:52:08 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3urv8dnvkt-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Dec 2023 15:51:18 +0000
+	Mon, 04 Dec 2023 15:52:08 +0000
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B4FpEBM3342850
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B4Fq4Ub28181060
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 4 Dec 2023 15:51:14 GMT
+	Mon, 4 Dec 2023 15:52:05 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BAD8F2004D;
-	Mon,  4 Dec 2023 15:51:14 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id E35612004B;
+	Mon,  4 Dec 2023 15:52:04 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2C9C220049;
-	Mon,  4 Dec 2023 15:51:14 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 57CE320040;
+	Mon,  4 Dec 2023 15:52:04 +0000 (GMT)
 Received: from [9.171.80.190] (unknown [9.171.80.190])
 	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  4 Dec 2023 15:51:14 +0000 (GMT)
-Message-ID: <2c6b56f4-03ea-4669-a6a3-76200fe50b77@linux.ibm.com>
-Date: Mon, 4 Dec 2023 16:51:13 +0100
+	Mon,  4 Dec 2023 15:52:04 +0000 (GMT)
+Message-ID: <8072b7b6-adc9-476d-bbfa-87be13442131@linux.ibm.com>
+Date: Mon, 4 Dec 2023 16:52:04 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -70,21 +70,20 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/4] KVM: s390: vsie: Fix length of facility list
- shadowed
+Subject: Re: [PATCH v3 3/4] KVM: s390: cpu model: Use proper define for
+ facility mask size
 Content-Language: en-US
 To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Vasily Gorbik
- <gor@linux.ibm.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sven Schnelle <svens@linux.ibm.com>, linux-s390@vger.kernel.org
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vasily Gorbik
+ <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>,
+        kvm@vger.kernel.org
 References: <20231108171229.3404476-1-nsg@linux.ibm.com>
- <20231108171229.3404476-3-nsg@linux.ibm.com>
+ <20231108171229.3404476-4-nsg@linux.ibm.com>
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; keydata=
  xsFNBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -128,36 +127,28 @@ Autocrypt: addr=frankja@linux.ibm.com; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20231108171229.3404476-3-nsg@linux.ibm.com>
+In-Reply-To: <20231108171229.3404476-4-nsg@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: enKXztkcQtbEeqyW8jjH3vsMUMvGcyM1
-X-Proofpoint-GUID: obeMe1c14q6hIR0C0n9qFcBZ5UoOdhYu
+X-Proofpoint-ORIG-GUID: 4EHbCyiiM9YD0z9OVXdZ4GS3HKe3ZQ8s
+X-Proofpoint-GUID: RXXY4FslaGooaIRIoo3Wnl0-T-U8Q7di
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-12-04_15,2023-12-04_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 mlxscore=0 suspectscore=0 clxscore=1015 phishscore=0
- adultscore=0 lowpriorityscore=0 impostorscore=0 spamscore=0
- mlxlogscore=890 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2311060000 definitions=main-2312040120
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ lowpriorityscore=0 adultscore=0 mlxscore=0 phishscore=0 mlxlogscore=420
+ suspectscore=0 priorityscore=1501 clxscore=1015 spamscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
+ definitions=main-2312040120
 
 On 11/8/23 18:12, Nina Schoetterl-Glausch wrote:
-> The length of the facility list accessed when interpretively executing
-> STFLE is the same as the hosts facility list (in case of format-0)
-> When shadowing, copy only those bytes.
-> The memory following the facility list need not be accessible, in which
-
-...doesn't need to be accessible but the current implementation is 
-possibly checking for it to be accessible.
-
-Let's fix that by checking the length that stfle returns to KVM instead 
-of a fixed value.
-
+> Use the previously unused S390_ARCH_FAC_MASK_SIZE_U64 instead of
+> S390_ARCH_FAC_LIST_SIZE_U64 for defining the fac_mask array.
+> Note that both values are the same, there is no functional change.
 > 
-> Acked-by: David Hildenbrand <david@redhat.com>
 > Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-[...]
+
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
