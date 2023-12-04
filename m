@@ -1,132 +1,157 @@
-Return-Path: <kvm+bounces-3387-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3388-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9612C803AE4
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 17:52:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE1AB803B0C
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 18:01:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FE531F21227
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 16:52:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EEDD2810E1
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 17:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481982E415;
-	Mon,  4 Dec 2023 16:52:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988F72E631;
+	Mon,  4 Dec 2023 17:01:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uey4/O6p"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DISm5HVS"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B25EEE6
-	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 08:51:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701708715;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SapyimUGQGe0EmDwo46jv79iRuNiKKAe6T4mJuTcQno=;
-	b=Uey4/O6pzWk/pWvtR5cTvjvEZE8wyTgWWTxCguXDRrwZ8AnyZ8rNt+896aTKyCREEKX5z1
-	8pWch5UGJKVyz3cM3o2bMlOrnk/ThbIghD7zeabx3/Bvxxa5bBJhKF9LbnhKrvVed2WhnB
-	QObiyiYQwSdyCK9PZaBBCGxKXCIHypA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-124-pGRSU2OxO6upDecFygjtWw-1; Mon, 04 Dec 2023 11:51:53 -0500
-X-MC-Unique: pGRSU2OxO6upDecFygjtWw-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4083717431eso33191625e9.1
-        for <kvm@vger.kernel.org>; Mon, 04 Dec 2023 08:51:53 -0800 (PST)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F733CA
+	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 09:00:58 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5d1b2153ba1so61828937b3.2
+        for <kvm@vger.kernel.org>; Mon, 04 Dec 2023 09:00:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701709257; x=1702314057; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WYdbFfqQVc4k25YSG4S3L8dDRO2OtAWhg6g/c/qnL28=;
+        b=DISm5HVSTDHWxWsx9pJMw1fLI8xspxvb/i9Q29kkAKwu7u7goaWa1Xb2NeOH2MEG1q
+         atyghplHoyw3ibKcNJoN3oOw8m2dDjoYXzlynZlT1Oe0olU+P3ZjA/AkkE8oQz9Emaot
+         P5oWgB5i41HDmr5e0e0YMiYTSi0UVlKqnJt286w69OegqaFUV2PEHRSSrzBXChtZ0oqU
+         Qvo/1I/Zc7Ebj1EcFDJHgfR4auv9/SVlMPIlmRng/Gr65g6KpeycoRDEOwm1e32RckoW
+         jpZPwRvh4C+7T6AGq57hZQ6wvS3QzIrq1Ao0bUac3K1vMpX3UvIzCXruWxZp9SPHo53K
+         N3+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701708712; x=1702313512;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SapyimUGQGe0EmDwo46jv79iRuNiKKAe6T4mJuTcQno=;
-        b=DYe5JA3U+9UOFijsnFUmFjl1fHQizM/ha209GLqE78iWymmVjlGG82RNJULwa0Yj5f
-         7/GqpsVGwTxu4ow/ZV4yhA0iSIxmGGfRI08e0SszmPfI7UET7p821sp4yb/GtWD7Tzvw
-         1WZg02ZYI4r4tHOptl5DWRCAJxeJ/L+nFXsuHT70oOxTZsXIHji0l9pk+pTC9NABYk7y
-         PddaGUOXleitDF4MlZMk1lWkjMkHdp8ybXz57OZmA2RRMdc8W5jwTmmxhTxENMfBnA2M
-         U3c59L9MInZRUPz5O7M1YEicj3VgE+SwEmAisgKIa9qg/y6f95hk2O6ZDcIbI8r6cmy7
-         Go7Q==
-X-Gm-Message-State: AOJu0YxIZlwsDePHkjBXcEuqlt777w6PNb9gdEEHymXMIAEbMjI0V04c
-	Pp0DgUtq72PYmMjehk6N0Dv0F/fvbpLRzl+BVGY1ItFwhygXWELX+wz5V3mwKiwvZpYUPZQ/fPd
-	uOI0Eg/MNKaU8
-X-Received: by 2002:a05:600c:4f94:b0:40b:5e22:97e with SMTP id n20-20020a05600c4f9400b0040b5e22097emr3262138wmq.109.1701708712622;
-        Mon, 04 Dec 2023 08:51:52 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFh+TMH3imf5AUgkN8K1YnumS25NnssEHJszx6xAz27K36WgGTXX/q2RDadA1i84yY8uwaxOA==
-X-Received: by 2002:a05:600c:4f94:b0:40b:5e22:97e with SMTP id n20-20020a05600c4f9400b0040b5e22097emr3262113wmq.109.1701708712303;
-        Mon, 04 Dec 2023 08:51:52 -0800 (PST)
-Received: from vschneid-thinkpadt14sgen2i.remote.csb (213-44-141-166.abo.bbox.fr. [213.44.141.166])
-        by smtp.gmail.com with ESMTPSA id bg36-20020a05600c3ca400b003fe1fe56202sm15897195wmb.33.2023.12.04.08.51.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 08:51:51 -0800 (PST)
-From: Valentin Schneider <vschneid@redhat.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-arch@vger.kernel.org, x86@kernel.org, Thomas Gleixner
- <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Josh Poimboeuf
- <jpoimboe@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
- Ingo Molnar <mingo@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Wanpeng Li <wanpengli@tencent.com>, Vitaly Kuznetsov
- <vkuznets@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Jason Baron
- <jbaron@akamai.com>, Steven Rostedt <rostedt@goodmis.org>, Ard Biesheuvel
- <ardb@kernel.org>, Frederic Weisbecker <frederic@kernel.org>, "Paul E.
- McKenney" <paulmck@kernel.org>, Feng Tang <feng.tang@intel.com>, Andrew
- Morton <akpm@linux-foundation.org>, "Mike Rapoport (IBM)"
- <rppt@kernel.org>, Vlastimil Babka <vbabka@suse.cz>, David Hildenbrand
- <david@redhat.com>, "ndesaulniers@google.com" <ndesaulniers@google.com>,
- Michael Kelley <mikelley@microsoft.com>, "Masami Hiramatsu (Google)"
- <mhiramat@kernel.org>
-Subject: Re: [PATCH 5/5] x86/tsc: Make __use_tsc __ro_after_init
-In-Reply-To: <20231120120553.GU8262@noisy.programming.kicks-ass.net>
-References: <20231120105528.760306-1-vschneid@redhat.com>
- <20231120105528.760306-6-vschneid@redhat.com>
- <20231120120553.GU8262@noisy.programming.kicks-ass.net>
-Date: Mon, 04 Dec 2023 17:51:49 +0100
-Message-ID: <xhsmhcyvlc3mi.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+        d=1e100.net; s=20230601; t=1701709257; x=1702314057;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WYdbFfqQVc4k25YSG4S3L8dDRO2OtAWhg6g/c/qnL28=;
+        b=PHUzfy3RJ2u9YGPCRz8dSXHT0CSh4b1ChtFpoVRdY6bu3VWIE/myptIEX/pBAuiFu2
+         GGqQouOYdy0Z13qCbGUA/d9xHGvs4oQyb5h/KKa2BAxeoljnUopoOXf03vI1iQqrRFtS
+         lSgsbRd7aUy89zszMI8Whb9Y4fIJrrQ59Ky/Zouseg7ZAYEe6jewNW6CnQoNw6LBe/Wr
+         /RMK5E47kOpjWXLiz8AtWxNRSlKT6eW3YU27aXfFJ/taAtjv1xvLfeBYP/Q9nJFvd3OR
+         nARR+VqTE5FYOn1VjIqXUSXvtZ1aZKVT5G9JZN1k+dMtld6ChNgO3iw0DCyWbEuNWUWf
+         MyxQ==
+X-Gm-Message-State: AOJu0YzRTQdDc20l7RJGOguNoqQ+D94jawCVXqaQ9eJo3mcfExiZnVIk
+	CsPTaApW7cFEH3u/uwS/5JGxbEWYoAw=
+X-Google-Smtp-Source: AGHT+IEPCfmM37uwj/R0nZjh6f3LmvLyxTh2BlKFePY0Bda+oPcSkY5OKZC+FPUtCahZN6LQsjl4BmkVlA8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:300d:b0:5d3:a348:b0b7 with SMTP id
+ ey13-20020a05690c300d00b005d3a348b0b7mr314719ywb.7.1701709257595; Mon, 04 Dec
+ 2023 09:00:57 -0800 (PST)
+Date: Mon, 4 Dec 2023 09:00:55 -0800
+In-Reply-To: <20231202091211.13376-1-yan.y.zhao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
+Mime-Version: 1.0
+References: <20231202091211.13376-1-yan.y.zhao@intel.com>
+Message-ID: <ZW4Fx2U80L1PJKlh@google.com>
+Subject: Re: [RFC PATCH 00/42] Sharing KVM TDP to IOMMU
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: iommu@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	alex.williamson@redhat.com, jgg@nvidia.com, pbonzini@redhat.com, 
+	joro@8bytes.org, will@kernel.org, robin.murphy@arm.com, kevin.tian@intel.com, 
+	baolu.lu@linux.intel.com, dwmw2@infradead.org, yi.l.liu@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 20/11/23 13:05, Peter Zijlstra wrote:
-> On Mon, Nov 20, 2023 at 11:55:28AM +0100, Valentin Schneider wrote:
->> __use_tsc is only ever enabled in __init tsc_enable_sched_clock(), so mark
->> it as __ro_after_init.
->>
->> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
->> ---
->>  arch/x86/kernel/tsc.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
->> index 15f97c0abc9d0..f19b42ea40573 100644
->> --- a/arch/x86/kernel/tsc.c
->> +++ b/arch/x86/kernel/tsc.c
->> @@ -44,7 +44,7 @@ EXPORT_SYMBOL(tsc_khz);
->>  static int __read_mostly tsc_unstable;
->>  static unsigned int __initdata tsc_early_khz;
->>
->> -static DEFINE_STATIC_KEY_FALSE(__use_tsc);
->> +static DEFINE_STATIC_KEY_FALSE_RO(__use_tsc);
->
-> So sure, we can absolutely do that, but do we want to take this one
-> further perhaps? "notsc" on x86_64 makes no sense what so ever. Lets
-> drag things into this millennium.
->
+On Sat, Dec 02, 2023, Yan Zhao wrote:
+> This RFC series proposes a framework to resolve IOPF by sharing KVM TDP
+> (Two Dimensional Paging) page table to IOMMU as its stage 2 paging
+> structure to support IOPF (IO page fault) on IOMMU's stage 2 paging
+> structure.
+> 
+> Previously, all guest pages have to be pinned and mapped in IOMMU stage 2 
+> paging structures after pass-through devices attached, even if the device
+> has IOPF capability. Such all-guest-memory pinning can be avoided when IOPF
+> handling for stage 2 paging structure is supported and if there are only
+> IOPF-capable devices attached to a VM.
+> 
+> There are 2 approaches to support IOPF on IOMMU stage 2 paging structures:
+> - Supporting by IOMMUFD/IOMMU alone
+>   IOMMUFD handles IO page faults on stage-2 HWPT by calling GUPs and then
+>   iommu_map() to setup IOVA mappings. (IOAS is required to keep info of GPA
+>   to HVA, but page pinning/unpinning needs to be skipped.)
+>   Then upon MMU notifiers on host primary MMU, iommu_unmap() is called to
+>   adjust IOVA mappings accordingly.
+>   IOMMU driver needs to support unmapping sub-ranges of a previous mapped
+>   range and take care of huge page merge and split in atomic way. [1][2].
+> 
+> - Sharing KVM TDP
+>   IOMMUFD sets the root of KVM TDP page table (EPT/NPT in x86) as the root
+>   of IOMMU stage 2 paging structure, and routes IO page faults to KVM.
+>   (This assumes that the iommu hw supports the same stage-2 page table
+>   format as CPU.)
+>   In this model the page table is centrally managed by KVM (mmu notifier,
+>   page mapping, subpage unmapping, atomic huge page split/merge, etc.),
+>   while IOMMUFD only needs to invalidate iotlb/devtlb properly.
 
-Just to make sure I follow: currently, for the static key to be enabled, we
-(mostly) need:
-o X86_FEATURE_TSC is in CPUID
-o determine_cpu_tsc_frequencies()->pit_hpet_ptimer_calibrate_cpu() passes
+There are more approaches beyond having IOMMUFD and KVM be completely separate
+entities.  E.g. extract the bulk of KVM's "TDP MMU" implementation to common code
+so that IOMMUFD doesn't need to reinvent the wheel.
 
-IIUC all X86_64 systems have a TSC, so the CPUID feature should be a given.
+> Currently, there's no upstream code available to support stage 2 IOPF yet.
+> 
+> This RFC chooses to implement "Sharing KVM TDP" approach which has below
+> main benefits:
 
-AFAICT pit_hpt_ptimer_calibrate_cpu() relies on having either HPET or the
-ACPI PM timer, the latter should be widely available, though X86_PM_TIMER
-can be disabled via EXPERT - is that a fringe case we don't care about, or
-did I miss something? I don't really know this stuff, and I'm trying to
-write a changelog...
+Please list out the pros and cons for each.  In the cons column for piggybacking
+KVM's page tables:
 
+ - *Significantly* increases the complexity in KVM
+ - Puts constraints on what KVM can/can't do in the future (see the movement
+   of SPTE_MMU_PRESENT).
+ - Subjects IOMMUFD to all of KVM's historical baggage, e.g. the memslot deletion
+   mess, the truly nasty MTRR emulation (which I still hope to delete), the NX
+   hugepage mitigation, etc.
+
+Please also explain the intended/expected/targeted use cases.  E.g. if the main
+use case is for device passthrough to slice-of-hardware VMs that aren't memory
+oversubscribed, 
+
+> - Unified page table management
+>   The complexity of allocating guest pages per GPAs, registering to MMU
+>   notifier on host primary MMU, sub-page unmapping, atomic page merge/split
+
+Please find different terminology than "sub-page".  With Sub-Page Protection, Intel
+has more or less established "sub-page" to mean "less than 4KiB granularity".  But
+that can't possibly what you mean here because KVM doesn't support (un)mapping
+memory at <4KiB granularity.  Based on context above, I assume you mean "unmapping
+arbitrary pages within a given range".
+
+>   are only required to by handled in KVM side, which has been doing that
+>   well for a long time.
+> 
+> - Reduced page faults:
+>   Only one page fault is triggered on a single GPA, either caused by IO
+>   access or by vCPU access. (compared to one IO page fault for DMA and one
+>   CPU page fault for vCPUs in the non-shared approach.)
+
+This would be relatively easy to solve with bi-directional notifiers, i.e. KVM
+notifies IOMMUFD when a vCPU faults in a page, and vice versa.
+ 
+> - Reduced memory consumption:
+>   Memory of one page table are saved.
+
+I'm not convinced that memory consumption is all that interesting.  If a VM is
+mapping the majority of memory into a device, then odds are good that the guest
+is backed with at least 2MiB page, if not 1GiB pages, at which point the memory
+overhead for pages tables is quite small, especially relative to the total amount
+of memory overheads for such systems.
+
+If a VM is mapping only a small subset of its memory into devices, then the IOMMU
+page tables should be sparsely populated, i.e. won't consume much memory.
 
