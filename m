@@ -1,141 +1,106 @@
-Return-Path: <kvm+bounces-3385-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3386-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 940018039E2
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 17:15:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8BA3803A86
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 17:38:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C66321C20B0F
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 16:15:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 599061F2124B
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 16:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A09F2D784;
-	Mon,  4 Dec 2023 16:15:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F03282E41C;
+	Mon,  4 Dec 2023 16:38:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="E+xcD4+H"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ugkvx+DH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6EAFFD;
-	Mon,  4 Dec 2023 08:15:18 -0800 (PST)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B4G8IYW002645;
-	Mon, 4 Dec 2023 16:15:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=gIhamb+YTQS7+bRTda0XXQ3oydAJZG5OiZDJQU0Lp7k=;
- b=E+xcD4+HetHsxNPubUZE0D5xL7YsCnYF8fqqpl7ihyo+du5H0p4nG9JPYRuAB2C+FQZf
- H95Pc4JfAE6+PNwccpBnTY9OCGl/QmuG8JI1ERPdlm429S/lf9z2MSzuaRXOqwkeXtQZ
- f6c7Madj8hlj/Bk5R35KrgBUJZI82NbxGodBFxQyl9MmEPC0eFUiTvptR2s3TdioFGr2
- MMVBYn8r0UnyOCzxEqE1iM7lEbqFF54gYoLFHgpIRsLPSUBDafRsP/owx9dD0VE3hrHJ
- wIqSaAAxU0EUKK4/Pry1K6nnoExf26/tWq+QIHfRKpwSQ05wzfCWA3je0ah1yLIJmJyu 5g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3usj19ga9h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Dec 2023 16:15:16 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B4G8iDi003783;
-	Mon, 4 Dec 2023 16:15:15 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3usj19ga85-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Dec 2023 16:15:15 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B4EJYUb031969;
-	Mon, 4 Dec 2023 16:15:14 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3urh4k8tb2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Dec 2023 16:15:14 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B4GF97218350808
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 4 Dec 2023 16:15:09 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5E63E20040;
-	Mon,  4 Dec 2023 16:15:09 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 93DE520043;
-	Mon,  4 Dec 2023 16:15:08 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.42.250])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Mon,  4 Dec 2023 16:15:08 +0000 (GMT)
-Date: Mon, 4 Dec 2023 17:15:06 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        jjherne@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
-        david@redhat.com, Halil Pasic
- <pasic@linux.ibm.com>,
-        Reinhard Buendgen <BUENDGEN@de.ibm.com>
-Subject: Re: [PATCH] s390/vfio-ap: handle response code 01 on queue reset
-Message-ID: <20231204171506.42aa687f.pasic@linux.ibm.com>
-In-Reply-To: <05cfc382-d01d-4370-b8bb-d3805e957f2e@linux.ibm.com>
-References: <20231129143529.260264-1-akrowiak@linux.ibm.com>
-	<b43414ef-7aa4-9e5c-a706-41861f0d346c@linux.ibm.com>
-	<1f4720d7-93f1-4e38-a3ad-abaf99596e7c@linux.ibm.com>
-	<05cfc382-d01d-4370-b8bb-d3805e957f2e@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5747BAC
+	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 08:38:19 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1d05f027846so16256375ad.2
+        for <kvm@vger.kernel.org>; Mon, 04 Dec 2023 08:38:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701707899; x=1702312699; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qDk8VCjkq3XxlHbdv1HgLMD6AIZzaNXkLSxsVVtlfDU=;
+        b=ugkvx+DHP4h3V/3/qYu0LuPwb9lAqPV+dulupC0KssmtHBP1Tpaumi3PxrGrbcq9MK
+         9weBh3Z259AeuD+nMjPDM5uv7Fbun/MYMp7h3svlIwI19jvBxCFe1HaVVmOPY099BakM
+         XzVliDimplLnuHzE7IX3BL8IW6tG0t4w31qHQy9TRQ52GpRSWJOfBndVP99NSqfPDCs2
+         PdyXMpm51l4WZEqqZEq1SdXEifBJ18N+ICz/E2DkKDU2iwKmBRYVdYtPqG2WI3UPqVXy
+         zbAadWjmTop2y4iYkc7MvUU1tfJ/DUIFpoRHyR256ihxYV01KJGeOzc6n22oHr3cT7eT
+         YhmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701707899; x=1702312699;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qDk8VCjkq3XxlHbdv1HgLMD6AIZzaNXkLSxsVVtlfDU=;
+        b=oQq6/npbceMTJrzySrLXv5f6IsKj9AOTXasi1ijHQqvYg6F9pHIJ76GWcHsryrq0mx
+         wigFfcR6zysI6ox3TLaGqnpvKKbm8rRkaivhcI2ippHSAJFQxBvyMjItmGwUqTlrBTFS
+         To1kliNbT7UlgrD8Lr8K2qLg5nfphNcHR+X9YWVvjPmbWC6XxWWFHtGyS+zb0oeMZ/mf
+         WFFS4nUmvxbqWPeIYIYfqPGyRIhLBupNLd+8W3ekAh2cQ6jc5Q5voD/tUHtNzRpSDg0D
+         HWj3jxb+/a5cJ2dQuR8r+UYvXKCu/xwr7GYW6S8rVi7sAuNSmdWDCjJJb1B41sx56Coi
+         Ujvw==
+X-Gm-Message-State: AOJu0YxMyutao3tZCXjo50O2iw22Z0CBRGSjs+A/HoHdjNkM2PlTaWms
+	KMxcaTlvZWtYPFUO6u0bc16VLcS47HY=
+X-Google-Smtp-Source: AGHT+IH0KOf6e9SiOq5ykueCM2o/G5wmIdosmf1/SYoTYHBbgp+mKLWEKcRI/yzXpAEsOcbbgjKj2C8Ipoo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:8204:b0:1d0:71fc:b39c with SMTP id
+ x4-20020a170902820400b001d071fcb39cmr163767pln.3.1701707898848; Mon, 04 Dec
+ 2023 08:38:18 -0800 (PST)
+Date: Mon, 4 Dec 2023 08:38:17 -0800
+In-Reply-To: <20231204150800.GD1493156@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: xAz2SV2zrP2AZsKkNEJOoTfdsI4OnB3d
-X-Proofpoint-ORIG-GUID: rqJwcRd2Q9_vHLqIb00RNjAe9i4GewGO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-04_15,2023-12-04_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- lowpriorityscore=0 priorityscore=1501 suspectscore=0 mlxlogscore=999
- phishscore=0 mlxscore=0 clxscore=1015 adultscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2312040123
+Mime-Version: 1.0
+References: <20231202091211.13376-1-yan.y.zhao@intel.com> <20231204150800.GD1493156@nvidia.com>
+Message-ID: <ZW4AeZfCYgv6zcy4@google.com>
+Subject: Re: [RFC PATCH 00/42] Sharing KVM TDP to IOMMU
+From: Sean Christopherson <seanjc@google.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Yan Zhao <yan.y.zhao@intel.com>, iommu@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, alex.williamson@redhat.com, pbonzini@redhat.com, 
+	joro@8bytes.org, will@kernel.org, robin.murphy@arm.com, kevin.tian@intel.com, 
+	baolu.lu@linux.intel.com, dwmw2@infradead.org, yi.l.liu@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, 4 Dec 2023 16:16:31 +0100
-Christian Borntraeger <borntraeger@linux.ibm.com> wrote:
-
-> Am 04.12.23 um 15:53 schrieb Tony Krowiak:
+On Mon, Dec 04, 2023, Jason Gunthorpe wrote:
+> On Sat, Dec 02, 2023 at 05:12:11PM +0800, Yan Zhao wrote:
+> > In this series, term "exported" is used in place of "shared" to avoid
+> > confusion with terminology "shared EPT" in TDX.
 > > 
+> > The framework contains 3 main objects:
 > > 
-> > On 11/29/23 12:12, Christian Borntraeger wrote:  
-> >> Am 29.11.23 um 15:35 schrieb Tony Krowiak:  
-> >>> In the current implementation, response code 01 (AP queue number not valid)
-> >>> is handled as a default case along with other response codes returned from
-> >>> a queue reset operation that are not handled specifically. Barring a bug,
-> >>> response code 01 will occur only when a queue has been externally removed
-> >>> from the host's AP configuration; nn this case, the queue must
-> >>> be reset by the machine in order to avoid leaking crypto data if/when the
-> >>> queue is returned to the host's configuration. The response code 01 case
-> >>> will be handled specifically by logging a WARN message followed by cleaning
-> >>> up the IRQ resources.
-> >>>  
-> >>
-> >> To me it looks like this can be triggered by the LPAR admin, correct? So it
-> >> is not desireable but possible.
-> >> In that case I prefer to not use WARN, maybe use dev_warn or dev_err instead.
-> >> WARN can be a disruptive event if panic_on_warn is set.  
-> > 
-> > Yes, it can be triggered by the LPAR admin. I can't use dev_warn here because we don't have a reference to any device, but I can use pr_warn if that suffices.  
+> > "KVM TDP FD" object - The interface of KVM to export TDP page tables.
+> >                       With this object, KVM allows external components to
+> >                       access a TDP page table exported by KVM.
 > 
-> Ok, please use pr_warn then.
+> I don't know much about the internals of kvm, but why have this extra
+> user visible piece?
 
-Shouldn't we rather make this an 'info'. I mean we probably do not want
-people complaining about this condition. Yes it should be a best practice
-to coordinate such things with the guest, and ideally remove the resource
-from the guest first. But AFAIU our stack is supposed to be able to
-handle something like this. IMHO issuing a warning is excessive measure.
-I know Reinhard and Tony probably disagree with the last sentence
-though. 
+That I don't know, I haven't looked at the gory details of this RFC.
 
-Regards,
-Halil
+> Isn't there only one "TDP" per kvm fd?
+
+No.  In steady state, with TDP (EPT) enabled and assuming homogeneous capabilities
+across all vCPUs, KVM will have 3+ sets of TDP page tables *active* at any given time:
+
+  1. "Normal"
+  2. SMM
+  3-N. Guest (for L2, i.e. nested, VMs)
+
+The number of possible TDP page tables used for nested VMs is well bounded, but
+since devices obviously can't be nested VMs, I won't bother trying to explain the
+the various possibilities (nested NPT on AMD is downright ridiculous).
+
+Nested virtualization aside, devices are obviously not capable of running in SMM
+and so they all need to use the "normal" page tables.
+
+I highlighted "active" above because if _any_ memslot is deleted, KVM will invalidate
+*all* existing page tables and rebuild new page tables as needed.  So over the
+lifetime of a VM, KVM could theoretically use an infinite number of page tables.
 
