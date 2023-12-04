@@ -1,154 +1,160 @@
-Return-Path: <kvm+bounces-3381-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3380-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B76CB803944
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 16:55:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABF31803940
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 16:55:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7248328112E
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 15:55:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B22E1F211D9
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 15:55:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0DC62D048;
-	Mon,  4 Dec 2023 15:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C0BE2D04A;
+	Mon,  4 Dec 2023 15:55:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BalrrVvn"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nVd9GCsY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4779DFF;
-	Mon,  4 Dec 2023 07:55:18 -0800 (PST)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B4Fc39m014565;
-	Mon, 4 Dec 2023 15:55:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=UO8TBtetr+3y4KPTWx2Mhw6wIQnBNZu5oEvShmWfUEY=;
- b=BalrrVvnZZJAcfUm4StBcC9y3l4kAKMknCzXW4hK5NM3tNytr29BOtZkosIBeSgC+E2j
- 1G/uNLQ2Qn+ZC2mUCPI+fJYQ89BlxwpQJIp7zX9ucNgliEat+/AVzZ43Z0QzrP16gpvP
- BcTZpxwnTMAmtDnluP3dUTV+UcAK2wI7/MwiVnEHTvJFa6s/79GJNdb3vWRiWrR1KcOm
- UqHTIxBJEFSAERmmmzXwHiKhFRmV8p4E6PJWbCA1HprcHJZhCwXqECpkm7RHBzl81aIv
- S31yF2g5yZCepTXubLsY0Y0lBjb9Nckvj8EmvzZlNTrdngqwNmtqZZzwjapT53xaj3cK Uw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ushk38g1h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Dec 2023 15:55:17 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B4Fd7xC017049;
-	Mon, 4 Dec 2023 15:55:16 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ushk38fpj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Dec 2023 15:55:14 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B4EJRJj020507;
-	Mon, 4 Dec 2023 15:52:08 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3urv8dnvkt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Dec 2023 15:52:08 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B4Fq4Ub28181060
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 4 Dec 2023 15:52:05 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E35612004B;
-	Mon,  4 Dec 2023 15:52:04 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 57CE320040;
-	Mon,  4 Dec 2023 15:52:04 +0000 (GMT)
-Received: from [9.171.80.190] (unknown [9.171.80.190])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  4 Dec 2023 15:52:04 +0000 (GMT)
-Message-ID: <8072b7b6-adc9-476d-bbfa-87be13442131@linux.ibm.com>
-Date: Mon, 4 Dec 2023 16:52:04 +0100
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2043.outbound.protection.outlook.com [40.107.101.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E62CB0;
+	Mon,  4 Dec 2023 07:54:55 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iANpggWqCQu8AEYvud2IWjVu7j2hBbvD4Fmuoq8yV2dUPqHhX4+zP9lqAAfzSUBqJwbRIWJ6VuLHMH0DR7Ft/okEjFfHK3D4kTmby32MTthnHlDy151GDxNHurH8EeuJLnqcWjim5A9synwPxVXcKKawBQn9vI+WPlEUkBar0q5mQ8ksMQtEXitxwhnXX/+IJoQsYZL4wS0H/nZpCPkWLW1Ta4jrEjLEszGgrYG6Mn/Uk06qtGZbJNKHCquWVM46GQv9fWExsnvDChwRKSXYIxooI1lCq3cb/h4Mh3T0FQ/P6KWDbSKwJ0pMzDsmzT4o34+O1s62jPY76WanPFrVRQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7/+o9LzxPCagvrWXXJd66RcPmVqod3tJRttm82T6Q2A=;
+ b=lH8wHitA67/zVHJ1aAIYkHOOUI51KqfirrhLbyi7cGxb8LkQjrK9ijQw0c1W2KykfDdGKoV8M8FKNtyZsa6wEidElOayXYpZzt+xTn0UxI8EYgLy8B2rvTqIJtOinQfFefilEs9CtWJjwaIfeZG+638HlNknJhrOO8qAyvVdM2i4WUKasj2lo5x4u7YdUVzwWdV8rsUOuy0ukD540gNzGfupbPGLzrBZgyW3a1gvEDheiXvHwSUQZu8wuHDAqQcnozJ+NzkxSDLUXPkjNpxI7fLH2gwsltCFbfvqppgtNfi69gC/27i/RWs/BS+mULnJlsFOywRSOC2VACUHNfydrg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7/+o9LzxPCagvrWXXJd66RcPmVqod3tJRttm82T6Q2A=;
+ b=nVd9GCsYe82L46cMVvCzIZ2sC66DBaLBJBHN6lxvVuW3lHovKe7WniLuCJCIMHmmeJuEY0lb1YoKiouTVtwH/dRrKgCpZ5/oqMRzLF9v8zvblyeYX4b85hPBjgQfS3bVa6wgCn17esubxBNH6Hl8ybXD/kC398jdYBIUpT6ClYeHPyHujbiBQYJ2EEGM94TpIDobuSZIQPs0IVXJbgk0eniCIRE833+XzYfAYkbkKH/LLATsAJ1lr24yurGtbh7i/uFAVr0KT8udQR+ZPl7let8zkFgBO6sBuYJXTEmb1L3AqYTRt/3YIWPLBoAOXa+7OwnCxlAl/nR57vFhokiWmw==
+Received: from BY5PR12MB3763.namprd12.prod.outlook.com (2603:10b6:a03:1a8::24)
+ by BY5PR12MB4131.namprd12.prod.outlook.com (2603:10b6:a03:212::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.33; Mon, 4 Dec
+ 2023 15:54:52 +0000
+Received: from BY5PR12MB3763.namprd12.prod.outlook.com
+ ([fe80::946b:df84:1f08:737a]) by BY5PR12MB3763.namprd12.prod.outlook.com
+ ([fe80::946b:df84:1f08:737a%5]) with mapi id 15.20.7046.034; Mon, 4 Dec 2023
+ 15:54:52 +0000
+From: Ankit Agrawal <ankita@nvidia.com>
+To: Borislav Petkov <bp@alien8.de>, Jason Gunthorpe <jgg@nvidia.com>
+CC: "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"naoya.horiguchi@nec.com" <naoya.horiguchi@nec.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"tony.luck@intel.com" <tony.luck@intel.com>, "linmiaohe@huawei.com"
+	<linmiaohe@huawei.com>, "rafael@kernel.org" <rafael@kernel.org>,
+	"lenb@kernel.org" <lenb@kernel.org>, "james.morse@arm.com"
+	<james.morse@arm.com>, "shiju.jose@huawei.com" <shiju.jose@huawei.com>,
+	"bhelgaas@google.com" <bhelgaas@google.com>, "pabeni@redhat.com"
+	<pabeni@redhat.com>, Yishai Hadas <yishaih@nvidia.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "kevin.tian@intel.com"
+	<kevin.tian@intel.com>, Aniket Agashe <aniketa@nvidia.com>, Neo Jia
+	<cjia@nvidia.com>, Kirti Wankhede <kwankhede@nvidia.com>, "Tarun Gupta
+ (SW-GPU)" <targupta@nvidia.com>, Vikram Sethi <vsethi@nvidia.com>, Andy
+ Currid <acurrid@nvidia.com>, Alistair Popple <apopple@nvidia.com>, "Anuj
+ Aggarwal (SW-GPU)" <anuaggarwal@nvidia.com>, John Hubbard
+	<jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>, Matt Ochs
+	<mochs@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-mm@kvack.org"
+	<linux-mm@kvack.org>, "linux-edac@vger.kernel.org"
+	<linux-edac@vger.kernel.org>, "linux-acpi@vger.kernel.org"
+	<linux-acpi@vger.kernel.org>
+Subject: Re: [PATCH v2 3/4] mm: Change ghes code to allow poison of non-struct
+ pfn
+Thread-Topic: [PATCH v2 3/4] mm: Change ghes code to allow poison of
+ non-struct pfn
+Thread-Index: AQHaHaUO+eDazbYmyEKdCfPlady3ILCWsceAgAKRkACAABC/AIAABGgD
+Date: Mon, 4 Dec 2023 15:54:52 +0000
+Message-ID:
+ <BY5PR12MB3763A85483534C7FD50529C8B086A@BY5PR12MB3763.namprd12.prod.outlook.com>
+References: <20231123003513.24292-1-ankita@nvidia.com>
+ <20231123003513.24292-4-ankita@nvidia.com>
+ <20231202232319.GAZWu8Z6gsLp1kI5Dw@fat_crate.local>
+ <20231204143650.GB1493156@nvidia.com>
+ <20231204153646.GCZW3yDgal3gztpDRY@fat_crate.local>
+In-Reply-To: <20231204153646.GCZW3yDgal3gztpDRY@fat_crate.local>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BY5PR12MB3763:EE_|BY5PR12MB4131:EE_
+x-ms-office365-filtering-correlation-id: aae3f16b-fa31-4516-9ce9-08dbf4e15a5c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ yivIDu/YzHtS2ySM6bHsHGGz+AboQ1oDRIt86/MHapfYE6q/OW0rOI802Uq3hzc4+cZeTKbQ3W/CBpNZX/MVQsXEXwy7FIOjiD8jD4yK/4sR6QT1vYImw8pwIQn/wrv5U4vT1kI9sh5iVhUFRJ9+KeRajDTJ08reGEU6CfAOEU3SL4kqJBrn06w5hrTQKZ9vFwJqPb/PMHNvPJd9xpZN6E4qDYar9i0PS5RCQJZNS+JmQXqcqee2affzNcdfIEtvEVqUvDTC44K/0EhV7cG2fmSG/FU3a98BSZIbcqRhIaSuvgDQ/0X3IcHEo4Ngi7+iYJOFVwvzIvJYuSnSIzv84l9Z4+y2HBtmpB9VaQxSCmLQelpKOnjnlRWBHv2kRIdwuJTRBDkUBkfcyTW9kKdEuxz0f+yvNvOies7MDayy7E2RGfWTBsA8GllAI1DNgB8Q5mrK/Eav+zhCESlpHwG/lCNX+S3iQpYfNES1CkLymX99+Q9SFZAvglO8nzOooDFBYhAroyBHvV39oIbO8awP7BD+wqCKiZ2xiiMUJlako6XqbqjZGmDrI7O2POWCYFROqVg+2YkgBX4ejdqxfpfouQxUKaXpvy9JrpDy6L2x+i6iN/bQB9R0rDnfvnwPrfnD
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB3763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(136003)(39860400002)(376002)(346002)(230922051799003)(64100799003)(451199024)(1800799012)(186009)(66476007)(66556008)(66446008)(66946007)(6636002)(76116006)(316002)(110136005)(54906003)(64756008)(91956017)(38100700002)(7416002)(2906002)(5660300002)(558084003)(86362001)(33656002)(41300700001)(38070700009)(122000001)(4326008)(8936002)(8676002)(52536014)(9686003)(7696005)(6506007)(83380400001)(26005)(55016003)(71200400001)(478600001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?ztPvk0Irv//IqRpUJSjM5feVNIkN5S/YmB7yaATu0l+gvGzRwnvbfECLs1?=
+ =?iso-8859-1?Q?MzxZkNylJnjrV8SZ/o0wAE/E1qY8MB/ggg4bMMvsE91Nf8Et9gtyFE352k?=
+ =?iso-8859-1?Q?+0MuSHE+kMVDNVsLCBghOrc6dVQ+1ZWhhYp5rm+mKCuzm8lJjCZX01uSIJ?=
+ =?iso-8859-1?Q?a4C/K5ped3wGGRTyLPnowhzXaeRhaeqO9zur0zxG0CFBcOGD6OBbea7IRP?=
+ =?iso-8859-1?Q?8pwziAA5hz747u33Fx/wJxo57FVFUToEyOp+kfPZO5FnELA0ZX6aw7Xv9K?=
+ =?iso-8859-1?Q?CaImRnpG1Tt5EbJ4wMFAKQWjfyJMn3m4Xx0LqRA8l6V9Gfewv+IzBlQX3K?=
+ =?iso-8859-1?Q?t5grdfpYyIQJOcku1iH0xqCYQA/lq3Nz7mhzK8wi75NQJxYIYrd1+PWYSX?=
+ =?iso-8859-1?Q?+ZuhWwQPPQp0CjVN4d06WkE/ucwIIAcdqUfAu99VRD590crHf2fucl8jSd?=
+ =?iso-8859-1?Q?n7X0/12bD/GHknd1YhDupUX627NJoorr2Im/QmqCYpgLSKHwwO4llfU07l?=
+ =?iso-8859-1?Q?xOFoxnjJYdzB9zEajPCgvXjHwl4Y1mKhgbAxYFeQilFzacaJVXgl8GgHb1?=
+ =?iso-8859-1?Q?f4eqbz6I2A6Z/QPxVISOq2opPu0efH9hD6N+75pL/5w9V7hJ00A1CrPY5Q?=
+ =?iso-8859-1?Q?uyQ1TLzXouVn0tOktH85NBhMsg/4yVeE3tdQFMSHwjbM31KT2dtpQ2GXq6?=
+ =?iso-8859-1?Q?I1hCjLSm1NqTedfc/alNywL5WqzTc1iOrqX/aPj4BAOIWS8WLlsjM8iSPq?=
+ =?iso-8859-1?Q?QaYFFxWDMotxl/zb2wDwdwskIKpoU6UID11vXSjJ7F0ZR0TBmujS6s13EX?=
+ =?iso-8859-1?Q?mwlRsR6ZdOSC25L3xRvDNdLqz09Pgz8/znsmu85ROqtq22+AEdlZyfWR/X?=
+ =?iso-8859-1?Q?3I6wwW2utUhFwJaBpJLZn9lTIPVMfpT4kK7ZpntyycZLIg2hvBl0J0gBfV?=
+ =?iso-8859-1?Q?liTI0NhgDVEEr+pTc7Oa2JwreMeWnYaBpv1dYIz25BJDFTs9LGoAy1WEr0?=
+ =?iso-8859-1?Q?rsFLYceRc9qDFOgaoxgpuYW0ziVk5qX+BTNqJYenjAROfy6RAdJkPVflRY?=
+ =?iso-8859-1?Q?ZhzzOTXxYVZg169zJGL6oVWnnQAez+wdkxFrebq5yU5PtjBI6VJRHKo1/K?=
+ =?iso-8859-1?Q?70Ufwv/cypQrlWXI/0jfOPuUg6/iJuFSho1elYVyxSF8ngK8mcm8LUxJwB?=
+ =?iso-8859-1?Q?8jhBdLnQeo0pwiMdxC1mmSJe11TadE8TvDuCsJ7CrL8JD9QtcZsnmgN+qT?=
+ =?iso-8859-1?Q?tvT23VXI2W88AnmOS2kg027+2/Sb84U0iHZ5AlvBK5Tl1GJb9bErmt7qdY?=
+ =?iso-8859-1?Q?jVE69ALNumBOB6sPQc2RGizgCIxfJggl8yVfrKdBWNpmBAcW50tGX80cjg?=
+ =?iso-8859-1?Q?F/Qcr5gYvCJhWFUVi2NoLXcdY4GODWtSdWVS1u4keMGCyoJfweZeXHQ1cv?=
+ =?iso-8859-1?Q?oFI9Kck1eFvk+uLpcqKjr9EV/gp6+BNlXSEvrcZ3mz/Moxji/jMRNIvrRj?=
+ =?iso-8859-1?Q?2z3YsDVvwe0OLBv/ImLN1zRB/b3lMZ802k3kF/kZFBkMnjG0nuyPzoihnP?=
+ =?iso-8859-1?Q?J9ZwWNFtKzaVwZQbB53fS3Qi6+OHeCngedTsyBH2+K9u1R+4CsLwP/GHWh?=
+ =?iso-8859-1?Q?aPovZcmWag3Us=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/4] KVM: s390: cpu model: Use proper define for
- facility mask size
-Content-Language: en-US
-To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vasily Gorbik
- <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>,
-        kvm@vger.kernel.org
-References: <20231108171229.3404476-1-nsg@linux.ibm.com>
- <20231108171229.3404476-4-nsg@linux.ibm.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20231108171229.3404476-4-nsg@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 4EHbCyiiM9YD0z9OVXdZ4GS3HKe3ZQ8s
-X-Proofpoint-GUID: RXXY4FslaGooaIRIoo3Wnl0-T-U8Q7di
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-04_15,2023-12-04_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
- lowpriorityscore=0 adultscore=0 mlxscore=0 phishscore=0 mlxlogscore=420
- suspectscore=0 priorityscore=1501 clxscore=1015 spamscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
- definitions=main-2312040120
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB3763.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aae3f16b-fa31-4516-9ce9-08dbf4e15a5c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Dec 2023 15:54:52.3318
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: X5e0BfqWkvq6NfnWc9kFk05BonblBSkaXTtbQk0y9/XR7HO9WOzQelWZbi0UzhqSsojQ33EpP/USSnykg+KXrQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4131
 
-On 11/8/23 18:12, Nina Schoetterl-Glausch wrote:
-> Use the previously unused S390_ARCH_FAC_MASK_SIZE_U64 instead of
-> S390_ARCH_FAC_LIST_SIZE_U64 for defining the fac_mask array.
-> Note that both values are the same, there is no functional change.
-> 
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+>> It wasn't removed. patch 1 moved it to memory_failure() where it makes=
+=0A=
+>> a lot more sense.=0A=
+>=0A=
+> Why is this a separate patch then?=0A=
+=0A=
+This was done to keep ghes code separate from the memory failure code.=0A=
+I can merge them if that is preferable.=
 
