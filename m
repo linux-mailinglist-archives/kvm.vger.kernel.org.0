@@ -1,114 +1,96 @@
-Return-Path: <kvm+bounces-3340-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3341-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2178680351A
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 14:38:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75C0880368B
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 15:27:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5412B20A09
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 13:38:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A70791C20A57
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 14:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7074425567;
-	Mon,  4 Dec 2023 13:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 785BF28DBC;
+	Mon,  4 Dec 2023 14:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VtE0DQW7"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="J3vg7aAj"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48B20136
-	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 05:38:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701697101;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=5akfcmS88aMdBOZU2tgTkzn2BZ024jWxw0fAikE98gA=;
-	b=VtE0DQW7wlfLoFn+JC6Kj8+dEXzHuu85SpwTQcz7xkpG6nJ+84m8CsnSNbBQ/Gq1dWpkM3
-	3arhhUq8avt2VijUGtNRD+kI/yl5eRsn/EWtbTAjOrf/Dp4gWUBBsV5OWvJwm7eaupvE6D
-	jSmUxGqpjOSnHmTjFRL/wiOGMFFt6WY=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-607-C6b2bhUCP8a7rf8oe_Ii_A-1; Mon, 04 Dec 2023 08:38:15 -0500
-X-MC-Unique: C6b2bhUCP8a7rf8oe_Ii_A-1
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-423d293392bso63029611cf.2
-        for <kvm@vger.kernel.org>; Mon, 04 Dec 2023 05:38:15 -0800 (PST)
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 353AF2735
+	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 06:26:34 -0800 (PST)
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id DF9D6402D4
+	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 14:26:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1701699992;
+	bh=yrj69QBqcJ2/0+no6KMFGYnNPrNFydkA4S5q1Y5aJZw=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type;
+	b=J3vg7aAjNXfnVhLRb4Qi1RKB7+xK+ra1JfJ90fDolMS3l5dNTIHIgnBU2grA2Hec2
+	 aULyD3TXt3X/3EnodFBgXL6KIGgariG7YurhjK+ztkZCPpLAyW4L06u5Sd+imWSPdk
+	 d21leoJLEVTtocVtdDytV31M96XtUaJkoeZkpHmK/EZR57fLYgQ96zNL1/Or2JEgdN
+	 RMKH5pGeyScN3yOssQeej0U+cS9Q4iUEv5PvxbdActET/YWqTDL9+l3YtLQF5Rs3cJ
+	 ilOCS23GLTskCo6799D3OewnLZmuYuwT1rIAXfwEJJ+VJdD41NEVeoAk/uOGAsbL8/
+	 jJELu3vj/3hdw==
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-333120f8976so3885763f8f.3
+        for <kvm@vger.kernel.org>; Mon, 04 Dec 2023 06:26:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701697094; x=1702301894;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5akfcmS88aMdBOZU2tgTkzn2BZ024jWxw0fAikE98gA=;
-        b=C9l5Wlxcmsk51Zn72CV/hiwiRVieUah2JxoyokB8issf5iW+0akL3Vpyz08fETYfWm
-         csA3Vt048eVr2b4BW+36j9Jciqjg+DPF2FNWFrzzwIy/gC04KthkTtayJGhXel4sTZ1V
-         xcUaNcF2qJ8t1HRc6o+fWAMEIgmzqGQOU+gPE6WfInvA2bJ+J8YhY3yZpHSYgEqeL0JA
-         9qQzzwoBtqiYNJdZnciZkTYK5bKeJAPEgB/uulkbk0XYgeFTzlIADku1WC5w0E8KkbES
-         u/GU3WVwTONhUbYOrGOjmWQ6FuEK2qlgB4gnXF5vPPnDjFUA0sCcqFEora00wHBD1Tpg
-         HKJQ==
-X-Gm-Message-State: AOJu0YwFoDigOHoLZUvjLYr3IdbpqRvBoyOUJ3+RszRFwfdBcm+IwxEl
-	3lxXYPcPrdeykPXSD9FtXq3wZY8VYiF6Sxl+bQKwIDZwPcAqggXuAUzqJmbWLrCuJ36D75AYPJL
-	d2TniwPB1HgIG
-X-Received: by 2002:a05:622a:282:b0:425:4043:18d0 with SMTP id z2-20020a05622a028200b00425404318d0mr5350678qtw.131.1701697094709;
-        Mon, 04 Dec 2023 05:38:14 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH+uydVke1bj6K3+VpqcvkS7K82S/AfCUqWL9s3clAKf0dXgfm1gbib9FuloJn1VamCnIS2mQ==
-X-Received: by 2002:a05:622a:282:b0:425:4043:18d0 with SMTP id z2-20020a05622a028200b00425404318d0mr5350660qtw.131.1701697094341;
-        Mon, 04 Dec 2023 05:38:14 -0800 (PST)
-Received: from redhat.com ([2.55.57.48])
-        by smtp.gmail.com with ESMTPSA id i14-20020ac8488e000000b004199c98f87dsm4284873qtq.74.2023.12.04.05.38.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 05:38:13 -0800 (PST)
-Date: Mon, 4 Dec 2023 08:38:08 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	eperezma@redhat.com, jasowang@redhat.com, lkp@intel.com,
-	mst@redhat.com, shannon.nelson@amd.com, steven.sistare@oracle.com
-Subject: [GIT PULL] vdpa: bugfixes
-Message-ID: <20231204083808-mutt-send-email-mst@kernel.org>
+        d=1e100.net; s=20230601; t=1701699992; x=1702304792;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yrj69QBqcJ2/0+no6KMFGYnNPrNFydkA4S5q1Y5aJZw=;
+        b=Bbo3N+T4zyU2ppT4Dl5/7/lnilbn+/8QYDjG0ufXiGoPuLw25v9s0S2PHoM+zgQeFB
+         /IRE5UdNIVO6OhXrAjoot7XW+WzcixwRZ0gIrKOX/A2pBqD1ByBwTOS+rMsWOmeLzvZV
+         eROkMfH5bn+YKAiNFR1/SxYZsI+oWYGO0rfcIA7yv/wHjjg/LTCqSqVaWsVOGsNNAcES
+         lOBiPO0SzOAeKlANsO6bvctaMcNaa9yOG6IMarbMWWviAKCjjwriFYPIcM+m+R95duwE
+         cT03jVpnj4ru19brMLFfdWmCtkrfz+xHMHICmJe93eaFGLNYMkQhjAU+8uyweGXfUFy9
+         eNYA==
+X-Gm-Message-State: AOJu0YzaW/ktjvi+UirgyUyzLMm+lwYvW9nwZiYZBO1CTdjR+/3LB3l5
+	0Pqbm3hmhopCkXsJErFb5ysikV73R8zUcC1CaojneS/XfVhtJRd8/YkomXsABv2mdDgRJ/7NsiO
+	ljYuXmXNqLXCzI/0laR6xThxfJ6/of49uLE6fYvnLHUjQ4Q==
+X-Received: by 2002:a05:600c:54ef:b0:40c:33d:9b92 with SMTP id jb15-20020a05600c54ef00b0040c033d9b92mr1375218wmb.62.1701699992498;
+        Mon, 04 Dec 2023 06:26:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFvLlHhcU3Gc7h3Rn17LrfqyAPp8cApuaxpodpxOeyeSvrgZgV4xsXZkpEJttjlTW+azdLXQTQw0bYhJ6MkzM0=
+X-Received: by 2002:a05:600c:54ef:b0:40c:33d:9b92 with SMTP id
+ jb15-20020a05600c54ef00b0040c033d9b92mr1375215wmb.62.1701699992188; Mon, 04
+ Dec 2023 06:26:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+From: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+Date: Mon, 4 Dec 2023 14:25:56 +0000
+Message-ID: <CADWks+Z=kLTohq_3pk_PdXs54B6tLn25u6avn_Q1FyXN2-sVDQ@mail.gmail.com>
+Subject: Converting manpages from asciidoc to rst2man ?
+To: linux-doc@vger.kernel.org
+Cc: Jonathan Corbet <corbet@lwn.net>, linux-perf-users@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-There's one other fix in my tree but it was only posted very
-recently so I am giving it a week in linux next, just in case.
+Hi all,
 
-The following changes since commit 2cc14f52aeb78ce3f29677c2de1f06c0e91471ab:
+I was going through build-depends on linux kernel in Ubuntu and I
+noticed that whilst most documentation and man-pages are written in
+Rst format, there are a few that require asciidoc.
 
-  Linux 6.7-rc3 (2023-11-26 19:59:33 -0800)
+$ git grep -l asciidoc -- '*Makefile*'
+tools/kvm/kvm_stat/Makefile
+tools/lib/perf/Documentation/Makefile
+tools/perf/Documentation/Makefile
+tools/perf/Makefile.perf
 
-are available in the Git repository at:
+$ git grep -l rst2man -- '*Makefile*'
+Documentation/tools/rtla/Makefile
+Documentation/tools/rv/Makefile
+tools/bpf/bpftool/Documentation/Makefile
+tools/testing/selftests/bpf/Makefile.docs
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+Are both Rst and asciidoc preferred in the kernel Documentation? Or
+should we upgrade kvm_stat & perf manpages from asciidoc to rst2man?
 
-for you to fetch changes up to cefc9ba6aed48a3aa085888e3262ac2aa975714b:
-
-  pds_vdpa: set features order (2023-12-01 09:55:01 -0500)
-
-----------------------------------------------------------------
-vdpa: bugfixes
-
-fixes in mlx5 and pds drivers.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Shannon Nelson (3):
-      pds_vdpa: fix up format-truncation complaint
-      pds_vdpa: clear config callback when status goes to 0
-      pds_vdpa: set features order
-
-Steve Sistare (1):
-      vdpa/mlx5: preserve CVQ vringh index
-
- drivers/vdpa/mlx5/net/mlx5_vnet.c | 7 ++++++-
- drivers/vdpa/pds/debugfs.c        | 2 +-
- drivers/vdpa/pds/vdpa_dev.c       | 7 ++++---
- 3 files changed, 11 insertions(+), 5 deletions(-)
-
+-- 
+Dimitri
 
