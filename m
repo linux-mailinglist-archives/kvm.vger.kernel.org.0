@@ -1,132 +1,137 @@
-Return-Path: <kvm+bounces-3285-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3286-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F1C3802A67
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 03:42:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA02C802A9A
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 04:51:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDF221F20F5F
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 02:42:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B8C1B208A0
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 03:51:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A8F0186C;
-	Mon,  4 Dec 2023 02:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 916D64680;
+	Mon,  4 Dec 2023 03:51:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U2OuZqmu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="acvkaiZM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A656D9;
-	Sun,  3 Dec 2023 18:42:38 -0800 (PST)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2ca03103155so4974391fa.0;
-        Sun, 03 Dec 2023 18:42:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701657756; x=1702262556; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SEUh6K5iutasnoMeRQbvniZJyhB8EqO9DGWeSRBdHG8=;
-        b=U2OuZqmucqFts8pAMt/wdD4lmr34uN6jJ/2bh2Hb8iYEpve6PK1jjBFcAMnW2jXsW0
-         s9qMLepYbliqh1PIAorSrtzuxrHMcl8wTU42TkZaBwZMKIKvZG6bUoX2Nsm4huEBBKal
-         kOV79Z5gP7m8T3TSMukeasr+T49wCsxWnRFS7+T38XWk7vivD2NqeRluCPmPEOA/7XXl
-         8gs75xOLkFR3BA8umg/sUY5wQfANIOAZCgUwA01z6gKkcQh12fnV2NzpfacFv/a3bNmr
-         4Ofk9fi7NdyeLyYg5BM9J7qyIlDB6S863h0geH75v3xQxjJVYF0M4OarjUVYPio0nvOj
-         g4mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701657756; x=1702262556;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SEUh6K5iutasnoMeRQbvniZJyhB8EqO9DGWeSRBdHG8=;
-        b=WIUeDHzytcpf0c/oZdrX7GeB/I9tDhKNEBoS46Wz/Zwqgw4x1E5WA/So1Wr04JSEDi
-         CNcG+HwMtydMbIfodpOfmBplpQPvBdncVDa08+MqTkR92TNtHnupWc525SytOhdEn74P
-         yASIHfkd+aIh+uL7x8fCe5rlRBAQergP4LQmVhoOZIFPt02vdkJndLx98/5Vx6hUfEfi
-         jWqVkDlGE9sYX7oiTGuzmvOf5mJu4bRnUWl85rbK+P1zRZ9tUqyX6cf/Am4afgV1EsxQ
-         n+Zd4pha3Undmp5tv1yZlwu302tQH7pY7GlLqr306SiOTvqnPxKmL+M0SJ56LlRza4Rs
-         mNHw==
-X-Gm-Message-State: AOJu0Yz8KemNXAHDqY4CmCvYkm1cpYqbyqyN2QzL+kcPLM5k2c4MGxgN
-	iUcjLfPC6+TZUnClqo7X5k3pYPQ9oTRT7X3dDnY=
-X-Google-Smtp-Source: AGHT+IFwUdfTpFRUP7l0fmhtGiz7fd+NP19pyuThwxbiypx7Ivz7rX5Zrc/KjwBbAY7wO0CJI2SrHgFWM/kImEvN9oM=
-X-Received: by 2002:a05:6512:ea1:b0:50b:f03c:1eaa with SMTP id
- bi33-20020a0565120ea100b0050bf03c1eaamr553100lfb.95.1701657756237; Sun, 03
- Dec 2023 18:42:36 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D211B6;
+	Sun,  3 Dec 2023 19:51:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701661870; x=1733197870;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=x6EE+AhGPhDn7GdBQS0cdPrBG4VIAC2IhVhjOkZ66cc=;
+  b=acvkaiZMPhA22jq7pPg1G9w+4PbXE1Upx0BwrcT6jHHBNEe6VYk6luU8
+   R+ps/zUJ2V7ylfRlZn3Tjc/RzawdnNvGOK+X1W4nf61R0fVKE0yGBvcAM
+   9AJDF4nElkkcBFFemb3kqo124c9x2hCTsyCq8N6duHNVSkRF4HCTT/Th7
+   dXrFWcPcJFUcEREL0SHUjEgPsBRqSG1B8y+1Uxq1QUS8LQTu12rkWYXcA
+   u3xC65hPmDnD7HL/OQcPHbjBzEiimEp9xmFnHM070CPcTBpRJekx3sXr8
+   Z2sgjKAEEvn8JjYsinuhPd2kUefWIXRqx+5tMo7+EBAM43h8+DJWBX2Gk
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="397566700"
+X-IronPort-AV: E=Sophos;i="6.04,248,1695711600"; 
+   d="scan'208";a="397566700"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2023 19:51:09 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="836447404"
+X-IronPort-AV: E=Sophos;i="6.04,248,1695711600"; 
+   d="scan'208";a="836447404"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
+  by fmsmga008.fm.intel.com with ESMTP; 03 Dec 2023 19:51:05 -0800
+Message-ID: <93a57e63-352c-407c-ac3f-4b91c11d925d@linux.intel.com>
+Date: Mon, 4 Dec 2023 11:46:30 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1694421911.git.haibo1.xu@intel.com> <64e0637cd6f22dd7557ed44bd2242001e7830d1c.1694421911.git.haibo1.xu@intel.com>
- <20230914-d2e594e7d84503ad14036e2d@orel> <CAJve8onhY534T=Hyncjfi4GfdZ+0D2xM+jRSaYCAWCdaKxPUcQ@mail.gmail.com>
-In-Reply-To: <CAJve8onhY534T=Hyncjfi4GfdZ+0D2xM+jRSaYCAWCdaKxPUcQ@mail.gmail.com>
-From: Haibo Xu <xiaobo55x@gmail.com>
-Date: Mon, 4 Dec 2023 10:42:24 +0800
-Message-ID: <CAJve8omitHDpijJaLV_wHk+5LXpsBUWF8_eTD4MeWKM-807Siw@mail.gmail.com>
-Subject: Re: [PATCH v3 9/9] KVM: riscv: selftests: Add sstc timer test
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: Haibo Xu <haibo1.xu@intel.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Sean Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Vipin Sharma <vipinsh@google.com>, David Matlack <dmatlack@google.com>, 
-	Colton Lewis <coltonlewis@google.com>, Aaron Lewis <aaronlewis@google.com>, 
-	Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Cc: baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+ Kevin Tian <kevin.tian@intel.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
+ iommu@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7 12/12] iommu: Improve iopf_queue_flush_dev()
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@ziepe.ca>
+References: <20231115030226.16700-1-baolu.lu@linux.intel.com>
+ <20231115030226.16700-13-baolu.lu@linux.intel.com>
+ <20231201203536.GG1489931@ziepe.ca>
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20231201203536.GG1489931@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 15, 2023 at 2:21=E2=80=AFPM Haibo Xu <xiaobo55x@gmail.com> wrot=
-e:
->
-> On Thu, Sep 14, 2023 at 5:52=E2=80=AFPM Andrew Jones <ajones@ventanamicro=
-.com> wrote:
-> >
-> > On Thu, Sep 14, 2023 at 09:37:03AM +0800, Haibo Xu wrote:
-> > > Add a KVM selftests to validate the Sstc timer functionality.
-> > > The test was ported from arm64 arch timer test.
-> >
-> > I just tried this test out. Running it over and over again on QEMU I se=
-e
-> > it works sometimes, but it frequently fails with the
-> > GUEST_ASSERT_EQ(config_iter + 1, irq_iter) assert and at least once I
-> > also saw the __GUEST_ASSERT(xcnt >=3D cmp) assert.
-> >
->
-> Good catch!
->
-> I can also reproduce this issue and it is a common problem for both
-> arm64 and riscv because it also happens in a arm64 Qemu VM.
->
-> It seems like a synchronization issue between host and guest shared
-> variables. Will double check the test code.
->
-> > Thanks,
-> > drew
+On 12/2/23 4:35 AM, Jason Gunthorpe wrote:
+> I'm looking at this code after these patches are applied and it still
+> seems quite bonkers to me 🙁
+> 
+> Why do we allocate two copies of the memory on all fault paths?
+> 
+> Why do we have fault->type still that only has one value?
+> 
+> What is serializing iommu_get_domain_for_dev_pasid() in the fault
+> path? It looks sort of like the plan is to use iopf_param->lock and
+> ensure domain removal grabs that lock at least after the xarray is
+> changed - but does that actually happen?
+> 
+> I would suggest, broadly, a flow for iommu_report_device_fault() sort
+> of:
+> 
+> 1) Allocate memory for the evt. Every path except errors needs this,
+>     so just do it
+> 2) iopf_get_dev_fault_param() should not have locks in it! This is
+>     fast path now. Use a refcount, atomic compare exchange to allocate,
+>     and RCU free.
+> 3) Everything runs under the fault_param->lock
+> 4) Check if !IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE, set it aside and then
+>     exit! This logic is really tortured and confusing
+> 5) Allocate memory and assemble the group
+> 6) Obtain the domain for this group and incr a per-domain counter that a
+>     fault is pending on that domain
+> 7) Put the*group*  into the WQ. Put the*group*  on a list in fault_param
+>     instead of the individual faults
+> 8) Don't linear search a linked list in iommu_page_response()! Pass
+>     the group in that we got from the WQ that we*know*  is still
+>     active. Ack that passed group.
+> 
+> When freeing a domain wait for the per-domain counter to go to
+> zero. This ensures that the WQ is flushed out and all the outside
+> domain references are gone.
+> 
+> When wanting to turn off PRI make sure a non-PRI domain is
+> attached to everything. Fence against the HW's event queue. No new
+> iommu_report_device_fault() is possible.
+> 
+> Lock the fault_param->lock and go through every pending group and
+> respond it. Mark the group memory as invalid so iommu_page_response()
+> NOP's it. Unlock, fence the HW against queued responses, and turn off
+> PRI.
+> 
+> An*optimization*  would be to lightly flush the domain when changing
+> the translation. Lock the fault_param->lock and look for groups in the
+> list with old_domain.  Do the same as for PRI-off: respond to the
+> group, mark it as NOP. The WQ may still be chewing on something so the
+> domain free still has to check and wait.
 
-Hi Andrew,
+Very appreciated for all the ideas. I looked through the items and felt
+that all these are good optimizations.
 
-After several rounds of regression testing, some findings:
-1. The intermittent failure also happened on ARM64 Qemu VM, and even
-in the initial arch_timer commit(4959d8650e9f4).
-2. it didn't happen on a ARM64 HW(but a different failure occured
-during stress test)
-3. The failure have a close relationship with
-TIMER_TEST_ERR_MARGIN_US(default 100), and after increasing
-     the macro to 300, the failure couldn't reproduced in 1000 loops
-stress test in RISC-V Qemu VM
+I am wondering whether we can take patch 1/12 ~ 10/12 of this series as
+a first step, a refactoring effort to support delivering iopf to
+userspace? I will follow up with one or multiple series to add the
+optimizations.
 
-So my suggestion is we can expose the TIMER_TEST_ERR_MARGIN_US
-parameter as an arch_timer test arg parameter
-and tune it based on a specific test environment.
+Does this work for you? Or, you want to take any of above as the
+requirement for iommufd use case?
 
-What's your opinion?
-
-Regards,
-Haibo
+Best regards,
+baolu
 
