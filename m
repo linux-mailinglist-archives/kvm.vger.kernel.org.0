@@ -1,204 +1,162 @@
-Return-Path: <kvm+bounces-3297-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3298-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4253802D1F
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 09:28:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9E24802D7D
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 09:45:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D3F31C20A01
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 08:28:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5FB0B209CC
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 08:45:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 236FCE55F;
-	Mon,  4 Dec 2023 08:28:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LuVeBDeN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A907DFBE4;
+	Mon,  4 Dec 2023 08:45:49 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44E2FCB
-	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 00:28:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701678522; x=1733214522;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ZKx6aOAxCYxX3nIGvol2ORfDeTABYuzt1dyIIWAXVOE=;
-  b=LuVeBDeNZ62gP9qZxov3sbWTyjnTldNIT0Mju4YewR/mE7DTtGrbaRfV
-   LoBbzTQWfl+dG+6IsI8S9S2MY/C+sC0HesFcThEMUZwZ5QaJo9C49VO9e
-   J5xxXuekTWxs/angPXnfmkf+REw5aAANy/Nx85sqgGAWrMzkyjnWOiNg2
-   trHuqfi8LPnyX2ndd9c0sHU/esDbQFtTQqOAj7mvRXM9kCrVA0Z55MdCu
-   lGo2mh8Y//G4rmRdO1KAl37Sjtecir/EKYjMJSmjGjYX4CYS61QLY5cYb
-   /ss9LtLTkVuQsd18hgwxtBphxpnoYlxHq35VCPBiRQkicBC6+phcZwee6
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="743947"
-X-IronPort-AV: E=Sophos;i="6.04,249,1695711600"; 
-   d="scan'208";a="743947"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 00:28:41 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="1017759073"
-X-IronPort-AV: E=Sophos;i="6.04,249,1695711600"; 
-   d="scan'208";a="1017759073"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.29.154]) ([10.93.29.154])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 00:28:35 -0800
-Message-ID: <489b0ea2-f698-4bce-9b80-1ff516407934@intel.com>
-Date: Mon, 4 Dec 2023 16:28:30 +0800
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id C64F1199;
+	Mon,  4 Dec 2023 00:45:43 -0800 (PST)
+Received: from loongson.cn (unknown [10.20.42.183])
+	by gateway (Coremail) with SMTP id _____8AxqOi0kW1lsrM+AA--.23446S3;
+	Mon, 04 Dec 2023 16:45:41 +0800 (CST)
+Received: from [10.20.42.183] (unknown [10.20.42.183])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxXNyykW1lWhhUAA--.54576S3;
+	Mon, 04 Dec 2023 16:45:40 +0800 (CST)
+Subject: Re: [PATCH v4 1/3] LoongArch: KVM: Remove SW timer switch when vcpu
+ is halt polling
+To: Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>
+Cc: WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20231116023036.2324371-1-maobibo@loongson.cn>
+ <20231116023036.2324371-2-maobibo@loongson.cn>
+From: zhaotianrui <zhaotianrui@loongson.cn>
+Message-ID: <564a2fd3-ffba-3bc5-70b9-8a9fa9a0f1c6@loongson.cn>
+Date: Mon, 4 Dec 2023 16:48:01 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 26/70] i386/tdx: Initialize TDX before creating TD
- vcpus
-Content-Language: en-US
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand
- <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
- Sean Christopherson <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>,
- Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
- <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
-References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
- <20231115071519.2864957-27-xiaoyao.li@intel.com>
- <ZVSk_-m-AAK7dYZ1@redhat.com>
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <ZVSk_-m-AAK7dYZ1@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20231116023036.2324371-2-maobibo@loongson.cn>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:AQAAf8AxXNyykW1lWhhUAA--.54576S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxur1rur15ZF4rWFy8Kw1fZrc_yoW5Kw1fpF
+	W7CFnrXr4rGrnrtw13XF4Dur45X3ykKF1xWa47AayFyrsrtr1rJF48K39xXFyagw4rCrWx
+	Zr1rKas8ua1jy3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	XVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_
+	Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0
+	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
+	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
+	14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jjwZcUUUUU=
 
-On 11/15/2023 7:01 PM, Daniel P. BerrangÃ© wrote:
-> On Wed, Nov 15, 2023 at 02:14:35AM -0500, Xiaoyao Li wrote:
->> Invoke KVM_TDX_INIT in kvm_arch_pre_create_vcpu() that KVM_TDX_INIT
->> configures global TD configurations, e.g. the canonical CPUID config,
->> and must be executed prior to creating vCPUs.
->>
->> Use kvm_x86_arch_cpuid() to setup the CPUID settings for TDX VM.
->>
->> Note, this doesn't address the fact that QEMU may change the CPUID
->> configuration when creating vCPUs, i.e. punts on refactoring QEMU to
->> provide a stable CPUID config prior to kvm_arch_init().
->>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
->> ---
->> Changes in v3:
->> - Pass @errp in tdx_pre_create_vcpu() and pass error info to it. (Daniel)
->> ---
->>   accel/kvm/kvm-all.c        |  9 +++++++-
->>   target/i386/kvm/kvm.c      |  9 ++++++++
->>   target/i386/kvm/tdx-stub.c |  5 +++++
->>   target/i386/kvm/tdx.c      | 45 ++++++++++++++++++++++++++++++++++++++
->>   target/i386/kvm/tdx.h      |  4 ++++
->>   5 files changed, 71 insertions(+), 1 deletion(-)
->>
->> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->> index 6b5f4d62f961..a92fff471b58 100644
->> --- a/accel/kvm/kvm-all.c
->> +++ b/accel/kvm/kvm-all.c
->> @@ -441,8 +441,15 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
->>   
->>       trace_kvm_init_vcpu(cpu->cpu_index, kvm_arch_vcpu_id(cpu));
->>   
->> +    /*
->> +     * tdx_pre_create_vcpu() may call cpu_x86_cpuid(). It in turn may call
->> +     * kvm_vm_ioctl(). Set cpu->kvm_state in advance to avoid NULL pointer
->> +     * dereference.
->> +     */
->> +    cpu->kvm_state = s;
->>       ret = kvm_arch_pre_create_vcpu(cpu, errp);
->>       if (ret < 0) {
->> +        cpu->kvm_state = NULL;
->>           goto err;
->>       }
->>   
->> @@ -450,11 +457,11 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
->>       if (ret < 0) {
->>           error_setg_errno(errp, -ret, "kvm_init_vcpu: kvm_get_vcpu failed (%lu)",
->>                            kvm_arch_vcpu_id(cpu));
->> +        cpu->kvm_state = NULL;
->>           goto err;
->>       }
->>   
->>       cpu->kvm_fd = ret;
->> -    cpu->kvm_state = s;
->>       cpu->vcpu_dirty = true;
->>       cpu->dirty_pages = 0;
->>       cpu->throttle_us_per_full = 0;
->> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
->> index dafe4d262977..fc840653ceb6 100644
->> --- a/target/i386/kvm/kvm.c
->> +++ b/target/i386/kvm/kvm.c
->> @@ -2268,6 +2268,15 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>       return r;
->>   }
->>   
->> +int kvm_arch_pre_create_vcpu(CPUState *cpu, Error **errp)
->> +{
->> +    if (is_tdx_vm()) {
->> +        return tdx_pre_create_vcpu(cpu, errp);
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->>   int kvm_arch_destroy_vcpu(CPUState *cs)
->>   {
->>       X86CPU *cpu = X86_CPU(cs);
->> diff --git a/target/i386/kvm/tdx-stub.c b/target/i386/kvm/tdx-stub.c
->> index 1d866d5496bf..3877d432a397 100644
->> --- a/target/i386/kvm/tdx-stub.c
->> +++ b/target/i386/kvm/tdx-stub.c
->> @@ -6,3 +6,8 @@ int tdx_kvm_init(MachineState *ms, Error **errp)
->>   {
->>       return -EINVAL;
->>   }
->> +
->> +int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
->> +{
->> +    return -EINVAL;
->> +}
->> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
->> index 1f5d8117d1a9..122a37c93de3 100644
->> --- a/target/i386/kvm/tdx.c
->> +++ b/target/i386/kvm/tdx.c
->> @@ -467,6 +467,49 @@ int tdx_kvm_init(MachineState *ms, Error **errp)
->>       return 0;
->>   }
->>   
->> +int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
->> +{
->> +    MachineState *ms = MACHINE(qdev_get_machine());
->> +    X86CPU *x86cpu = X86_CPU(cpu);
->> +    CPUX86State *env = &x86cpu->env;
->> +    struct kvm_tdx_init_vm *init_vm;
-> 
-> Mark this as auto-free to avoid the g_free() requirement
-> 
->    g_autofree  struct kvm_tdx_init_vm *init_vm = NULL;
-> 
->> +    int r = 0;
->> +
->> +    qemu_mutex_lock(&tdx_guest->lock);
-> 
->     QEMU_LOCK_GUARD(&tdx_guest->lock);
-> 
-> to eliminate the mutex_unlock requirement, thus eliminating all
-> 'goto' jumps and label targets, in favour of a plain 'return -1'
-> everywhere.
-> 
+Reviewed-by: Tianrui Zhao <zhaotianrui@loongson.cn>
 
-Learned!
-
-thanks!
+ÔÚ 2023/11/16 ÉÏÎç10:30, Bibo Mao Ð´µÀ:
+> With halt-polling supported, there is checking for pending events
+> or interrupts when vcpu executes idle instruction. Pending interrupts
+> include injected SW interrupts and passthrough HW interrupts, such as
+> HW timer interrupts, since HW timer works still even if vcpu exists
+> from VM mode.
+>
+> Since HW timer pending interrupt can be set directly with CSR status
+> register, and pending HW timer interrupt checking is used in vcpu block
+> checking function, it is not necessary to switch to sw timer during
+> halt-polling. This patch adds preemption disabling in function
+> kvm_cpu_has_pending_timer, and removes SW timer switching in idle
+> instruction emulation function.
+>
+> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> ---
+>   arch/loongarch/kvm/exit.c  | 13 ++-----------
+>   arch/loongarch/kvm/timer.c | 13 ++++++++++---
+>   arch/loongarch/kvm/vcpu.c  |  9 ++++++++-
+>   3 files changed, 20 insertions(+), 15 deletions(-)
+>
+> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
+> index ce8de3fa472c..e708a1786d6b 100644
+> --- a/arch/loongarch/kvm/exit.c
+> +++ b/arch/loongarch/kvm/exit.c
+> @@ -200,17 +200,8 @@ int kvm_emu_idle(struct kvm_vcpu *vcpu)
+>   	++vcpu->stat.idle_exits;
+>   	trace_kvm_exit_idle(vcpu, KVM_TRACE_EXIT_IDLE);
+>   
+> -	if (!kvm_arch_vcpu_runnable(vcpu)) {
+> -		/*
+> -		 * Switch to the software timer before halt-polling/blocking as
+> -		 * the guest's timer may be a break event for the vCPU, and the
+> -		 * hypervisor timer runs only when the CPU is in guest mode.
+> -		 * Switch before halt-polling so that KVM recognizes an expired
+> -		 * timer before blocking.
+> -		 */
+> -		kvm_save_timer(vcpu);
+> -		kvm_vcpu_block(vcpu);
+> -	}
+> +	if (!kvm_arch_vcpu_runnable(vcpu))
+> +		kvm_vcpu_halt(vcpu);
+>   
+>   	return EMULATE_DONE;
+>   }
+> diff --git a/arch/loongarch/kvm/timer.c b/arch/loongarch/kvm/timer.c
+> index 284bf553fefe..437e960d8fdb 100644
+> --- a/arch/loongarch/kvm/timer.c
+> +++ b/arch/loongarch/kvm/timer.c
+> @@ -155,11 +155,18 @@ static void _kvm_save_timer(struct kvm_vcpu *vcpu)
+>   		 */
+>   		hrtimer_cancel(&vcpu->arch.swtimer);
+>   		hrtimer_start(&vcpu->arch.swtimer, expire, HRTIMER_MODE_ABS_PINNED);
+> -	} else
+> +	} else if (vcpu->stat.generic.blocking) {
+>   		/*
+> -		 * Inject timer interrupt so that hall polling can dectect and exit
+> +		 * Inject timer interrupt so that hall polling can dectect and
+> +		 * exit.
+> +		 * VCPU is scheduled out already and sleeps in rcuwait queue and
+> +		 * will not poll pending events again. kvm_queue_irq is not
+> +		 * enough, hrtimer swtimer should be used here.
+>   		 */
+> -		kvm_queue_irq(vcpu, INT_TI);
+> +		expire = ktime_add_ns(ktime_get(), 10);  // 10ns is enough here?
+> +		vcpu->arch.expire = expire;
+> +		hrtimer_start(&vcpu->arch.swtimer, expire, HRTIMER_MODE_ABS_PINNED);
+> +	}
+>   }
+>   
+>   /*
+> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> index 73d0c2b9c1a5..42663a345bd1 100644
+> --- a/arch/loongarch/kvm/vcpu.c
+> +++ b/arch/loongarch/kvm/vcpu.c
+> @@ -187,8 +187,15 @@ int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu,
+>   
+>   int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+>   {
+> -	return kvm_pending_timer(vcpu) ||
+> +	int ret;
+> +
+> +	/* protect from TOD sync and vcpu_load/put */
+> +	preempt_disable();
+> +	ret = kvm_pending_timer(vcpu) ||
+>   		kvm_read_hw_gcsr(LOONGARCH_CSR_ESTAT) & (1 << INT_TI);
+> +	preempt_enable();
+> +
+> +	return ret;
+>   }
+>   
+>   int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu)
 
 
