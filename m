@@ -1,159 +1,145 @@
-Return-Path: <kvm+bounces-3328-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3329-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 518C7803190
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 12:32:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C24F38031BB
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 12:48:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 826D31C20A5F
-	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 11:32:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7611B1F21025
+	for <lists+kvm@lfdr.de>; Mon,  4 Dec 2023 11:48:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 340F922F05;
-	Mon,  4 Dec 2023 11:32:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABA2022F1B;
+	Mon,  4 Dec 2023 11:48:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="DgEI5Nwv"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SJb8ovpu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BCF4BB
-	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 03:32:27 -0800 (PST)
-Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-40c09f5a7cfso11862925e9.0
-        for <kvm@vger.kernel.org>; Mon, 04 Dec 2023 03:32:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1701689545; x=1702294345; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=k24kTPlVkd21kNiwlx5AXtWzxUb1iLhkKqVaC17WY/Y=;
-        b=DgEI5NwvqWa1JxsCZlJaR1i7usMgEBVTqktWA5lLzSpDAcg/9u9JHtn97EJw7SLWs0
-         NzN5cuU73wiRRJJbEjCVKgWXaZrf9H6A43Sq0++8tMDK7x0mosDfCklfJKB8YGXQX/A1
-         buqijPUs8ySkWxQE80o7Ok3tINXSBmNi+12DjRuoYi8uROW6Sf7yv9bV8Wt7JL2pAG5n
-         T8p+eda8XEiBS9DWIAnNuAiuuzunEyRrivbf1+x2BMz2TEnRhIlqdTxbDBttfHSqJmuM
-         x1oFRM0fsN+q8UyLBJJ2O19jsoCODfZU/3WbkZbs0d3qHxdcC8znQr9p+E35Eis280MY
-         5eyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701689545; x=1702294345;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k24kTPlVkd21kNiwlx5AXtWzxUb1iLhkKqVaC17WY/Y=;
-        b=tNGGR618dUZhrOPhtThS15RqKpPfUY+Wmbh0QuGzpUHQHNEOD+VIxnXwRXZns0DDMj
-         trGNbzlaa7HtRYGKOlapSEK/HdNORRYQi+VTN3kfBKmNcW43f0sap0ESE5k8/ehNWKUd
-         F63FxG1f9rY6jesTm+HAra01fAfrnqcgyGGaei6prAQYvBnE+dObGgWrpyjXzl7YM6F6
-         78RgcrhLPpkdUKCwsRJ8JNaLvf1L9UeWUX8a3DCHwIcVizYAGe4pGH1d/6sdwOAd4Z7d
-         y1VpBOz+BcONqa26QwkgB5wRRnJyFHr/ub6iSId0pX3mITBRi3UjCiiHLVpVPJy9CiVe
-         Se3A==
-X-Gm-Message-State: AOJu0YyCVaCA3IaqiVI/uxJH9OZKNb30GLbLUlZlcBCn7FUn5c6Lo6Vy
-	0Yy3v8i6l2vFC20PP0AvtXhFzQ==
-X-Google-Smtp-Source: AGHT+IErNZnZcr/TyviXxvsAwPQtN/v+Nlqzyb1HJSfOFwnV8njyLvYHhsJtg7HkXjuZQ5dLEL6OcQ==
-X-Received: by 2002:a05:600c:5d5:b0:40b:5e21:ec33 with SMTP id p21-20020a05600c05d500b0040b5e21ec33mr2310718wmd.101.1701689545469;
-        Mon, 04 Dec 2023 03:32:25 -0800 (PST)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id u2-20020a05600c138200b00405d9a950a2sm18390025wmf.28.2023.12.04.03.32.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 03:32:24 -0800 (PST)
-Date: Mon, 4 Dec 2023 12:32:24 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Haibo Xu <xiaobo55x@gmail.com>
-Cc: Haibo Xu <haibo1.xu@intel.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Sean Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Vipin Sharma <vipinsh@google.com>, David Matlack <dmatlack@google.com>, 
-	Colton Lewis <coltonlewis@google.com>, Aaron Lewis <aaronlewis@google.com>, 
-	Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v3 9/9] KVM: riscv: selftests: Add sstc timer test
-Message-ID: <20231204-980c95cca344f718ac6a48b6@orel>
-References: <cover.1694421911.git.haibo1.xu@intel.com>
- <64e0637cd6f22dd7557ed44bd2242001e7830d1c.1694421911.git.haibo1.xu@intel.com>
- <20230914-d2e594e7d84503ad14036e2d@orel>
- <CAJve8onhY534T=Hyncjfi4GfdZ+0D2xM+jRSaYCAWCdaKxPUcQ@mail.gmail.com>
- <CAJve8omitHDpijJaLV_wHk+5LXpsBUWF8_eTD4MeWKM-807Siw@mail.gmail.com>
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E10EEB6;
+	Mon,  4 Dec 2023 03:48:46 -0800 (PST)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B4AqB6R007962;
+	Mon, 4 Dec 2023 11:48:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=jvnzeAMxLSa3R3RUGFBSlGOHPyXrSHn1fnjBGRZkCa0=;
+ b=SJb8ovpuwaH7ArxbbWtmUKsBnntbSViSL5kEMuUUCpVx96+Qlu2WCrQOU1il0VQ1Qv3r
+ ttEZMAQzmWezIwrRKtPqxlupO2bXBEQeDgMwe+0kwf3xHBka9juYw2o0kvRRLYDp8xMb
+ gBOHnzdJUy+HV9ynEQ5Mw2GxCQ4dTHNhUBNY8kalk12y9lN/4Hg0tmHu26+kAN1T+f8y
+ zfyOEPbTnUzBHggUYu6YOi7CFIPd7Eyvcp62b7wzqvSlaHAIAM8vyvyTCZ4+J90nkckd
+ NlHeEP9BxAosFdbV4Nq26P8NCom8QTEW1SsNpUjPHw4BO/fDJlBNo8oibuxhkze5eZB3 Ug== 
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3usb6s7bju-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 04 Dec 2023 11:48:46 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B4An2Tb022857;
+	Mon, 4 Dec 2023 11:48:45 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3urgdkqs25-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 04 Dec 2023 11:48:44 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B4Bmfbw15991386
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 4 Dec 2023 11:48:41 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D049120043;
+	Mon,  4 Dec 2023 11:48:41 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 12B2120040;
+	Mon,  4 Dec 2023 11:48:41 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.42.250])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Mon,  4 Dec 2023 11:48:40 +0000 (GMT)
+Date: Mon, 4 Dec 2023 12:48:39 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Eric Farman <farman@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank
+ <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Tony
+ Krowiak <akrowiak@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Sven
+ Schnelle <svens@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily
+ Gorbik <gor@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH] KVM: s390: fix cc for successful PQAP
+Message-ID: <20231204124839.093f4f76.pasic@linux.ibm.com>
+In-Reply-To: <20231201181657.1614645-1-farman@linux.ibm.com>
+References: <20231201181657.1614645-1-farman@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJve8omitHDpijJaLV_wHk+5LXpsBUWF8_eTD4MeWKM-807Siw@mail.gmail.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: cyD-Ub5VnEHi1APb4RmHCrtXYas5DJZ5
+X-Proofpoint-GUID: cyD-Ub5VnEHi1APb4RmHCrtXYas5DJZ5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-04_10,2023-11-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
+ mlxscore=0 lowpriorityscore=0 clxscore=1015 priorityscore=1501
+ phishscore=0 impostorscore=0 mlxlogscore=999 bulkscore=0 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2312040089
 
-On Mon, Dec 04, 2023 at 10:42:24AM +0800, Haibo Xu wrote:
-> On Fri, Sep 15, 2023 at 2:21 PM Haibo Xu <xiaobo55x@gmail.com> wrote:
-> >
-> > On Thu, Sep 14, 2023 at 5:52 PM Andrew Jones <ajones@ventanamicro.com> wrote:
-> > >
-> > > On Thu, Sep 14, 2023 at 09:37:03AM +0800, Haibo Xu wrote:
-> > > > Add a KVM selftests to validate the Sstc timer functionality.
-> > > > The test was ported from arm64 arch timer test.
-> > >
-> > > I just tried this test out. Running it over and over again on QEMU I see
-> > > it works sometimes, but it frequently fails with the
-> > > GUEST_ASSERT_EQ(config_iter + 1, irq_iter) assert and at least once I
-> > > also saw the __GUEST_ASSERT(xcnt >= cmp) assert.
-> > >
-> >
-> > Good catch!
-> >
-> > I can also reproduce this issue and it is a common problem for both
-> > arm64 and riscv because it also happens in a arm64 Qemu VM.
-> >
-> > It seems like a synchronization issue between host and guest shared
-> > variables. Will double check the test code.
-> >
-> > > Thanks,
-> > > drew
+On Fri,  1 Dec 2023 19:16:57 +0100
+Eric Farman <farman@linux.ibm.com> wrote:
+
+> The various errors that are possible when processing a PQAP
+> instruction (the absence of a driver hook, an error FROM that
+> hook), all correctly set the PSW condition code to 3. But if
+> that processing works successfully, CC0 needs to be set to
+> convey that everything was fine.
 > 
-> Hi Andrew,
+> Fix the check so that the guest can examine the condition code
+> to determine whether GPR1 has meaningful data.
 > 
-> After several rounds of regression testing, some findings:
-> 1. The intermittent failure also happened on ARM64 Qemu VM, and even
-> in the initial arch_timer commit(4959d8650e9f4).
-> 2. it didn't happen on a ARM64 HW(but a different failure occured
-> during stress test)
-> 3. The failure have a close relationship with
-> TIMER_TEST_ERR_MARGIN_US(default 100), and after increasing
->      the macro to 300, the failure couldn't reproduced in 1000 loops
-> stress test in RISC-V Qemu VM
+> Fixes: e5282de93105 ("s390: ap: kvm: add PQAP interception for AQIC")
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+
+> ---
+>  arch/s390/kvm/priv.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 > 
-> So my suggestion is we can expose the TIMER_TEST_ERR_MARGIN_US
-> parameter as an arch_timer test arg parameter
-> and tune it based on a specific test environment.
-> 
-> What's your opinion?
+> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+> index 621a17fd1a1b..f875a404a0a0 100644
+> --- a/arch/s390/kvm/priv.c
+> +++ b/arch/s390/kvm/priv.c
+> @@ -676,8 +676,12 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
+>  	if (vcpu->kvm->arch.crypto.pqap_hook) {
+>  		pqap_hook = *vcpu->kvm->arch.crypto.pqap_hook;
+>  		ret = pqap_hook(vcpu);
+> -		if (!ret && vcpu->run->s.regs.gprs[1] & 0x00ff0000)
+> -			kvm_s390_set_psw_cc(vcpu, 3);
 
-The concept of "timeout for an interrupt to arrive" is always going to
-leave us exposed to random failures. Your suggestion of making the
-timeout user configurable is probably the best we can do. I would
-suggest also adding more descriptive failure text and a hint about
-trying to adjust the timeout.
+Maybe a comment that tells pqap_hook() returns 0 or -EOPNOTSUPP
+that singnals this should be handled by QEMU. But that can certainly
+be done on top, and it is not a part of a minimal fix.
 
-Or, one thing we do in kvm-unit-tests, is to reduce typical delays while
-allowing expected delays to be longer by looping over a shorter delay and
-a non-fatal check, i.e.
+> +		if (!ret) {
+> +			if (vcpu->run->s.regs.gprs[1] & 0x00ff0000)
+> +				kvm_s390_set_psw_cc(vcpu, 3);
+> +			else
+> +				kvm_s390_set_psw_cc(vcpu, 0);
+> +		}
+>  		up_read(&vcpu->kvm->arch.crypto.pqap_hook_rwsem);
+>  		return ret;
+>  	}
 
- pass = false;
- for (i = 0; i < 10; i++) {
-   udelay(100);
-   if (check(...)) {
-      pass = true;
-      break;
-   }
- }
- assert(pass);
-
-We could try that approach here too.
-
-Thanks,
-drew
 
