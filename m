@@ -1,149 +1,905 @@
-Return-Path: <kvm+bounces-3583-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3584-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CCB28057E8
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 15:52:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 121CD8057E9
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 15:53:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 702751C21093
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 14:52:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 346BD1C210FD
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 14:53:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C56A67E6C;
-	Tue,  5 Dec 2023 14:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B70E67E60;
+	Tue,  5 Dec 2023 14:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tyVdkcEE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aRO1zKEe"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2061.outbound.protection.outlook.com [40.107.94.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FA0ECA;
-	Tue,  5 Dec 2023 06:52:33 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NCptVK+/g66y6SfclegRzNo9P1NgaPKifAn2ZXaFNZ8JtcmwpeW+RND8bt13oGpsFQX2KzjaYAixfbujKQOA5nh3r/k3sZcei+YwvFmHa4EjtZi1GA3uvGi4kc/uhag8T6BgKVSuuMl1IlKE265PX2opyg32nh4Ysuia7a/F9H1+IkIUofSQ+24W17ESY7qVy45jcMBueraThJRMdqhIxsYkwJFUHWipXn2cxqrGsP2Vm4CiFA/8qoeDrXDAPvekec/0h13ZlQeZwck+67JJei/+uKvwaUcpgXDSKcox6EW8+Bzql0Xsd8T0bib1Dn+6AewNJX1iGrchDVFMbRNeRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KSiAaaWrVHsQkZTihnn4ajcQnK/DO9o+eY4BoxLudbE=;
- b=nkFWae5ju9Fcv/N1fWG4Q0spWdZ+MS5PWmVNBESlIW5lZpau0uynUPvGRZaE6jNHM6TT6hWblB6ZZNfgoXYSDyil6nrbe09A0z4+rGrlEsPqLpxREPMo/p3IuE4Lb0e8HB2//6GqX5rJVanVniFTUYTdE8ad3t/4zEtqQhIF/TQqRn0+2EORKy3i1vLnKcYBLb0VRSvNCg1Kra+jr6blXN0f8uflI8bxOwjb9rsNwDX7c60/S69ZhKBqe1swX9jS3lDhyY04xbQt7FslWg2cXw8G3ghYxXvKTYMVkcYixxpXtbgg0EtqfEAEh4IhDJUvUYTS/UepC0fkUHtSdW93cQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KSiAaaWrVHsQkZTihnn4ajcQnK/DO9o+eY4BoxLudbE=;
- b=tyVdkcEEXKzy61eNbptxGDzbLz12x7ZtHpr0/FrBFnkE2cIa5KWjh6Pi0wHG3W4ajx+lPrsjr0TFh1nrfAtdR6KS0jk59z1tgZvVjuSlbaVw8EGjDIQkZ424c+O+zbxrm75Ebvbg51juHZoq/kEQKewnFi9IyEplg/9BXIjuKdlcfibJmHM7JPfW4Jj8XEy5MwXJfWJ5R0T7qNNfjDnFwNzwDF/fsr0k2CFgqnjwV/51qmr/JjZSRzBYPh91UF/SUV0L/QtjJSIxSh2tj3Y5J5hnSQpwf9DsSmZmYI7kOiB6YQKpyGUSKRjx8OP26yx2jNzRoE9rqGhiipQc7A5Wrw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM6PR12MB4169.namprd12.prod.outlook.com (2603:10b6:5:215::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Tue, 5 Dec
- 2023 14:52:28 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7046.034; Tue, 5 Dec 2023
- 14:52:28 +0000
-Date: Tue, 5 Dec 2023 10:52:27 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: iommu@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, alex.williamson@redhat.com,
-	pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
-	will@kernel.org, robin.murphy@arm.com, kevin.tian@intel.com,
-	baolu.lu@linux.intel.com, dwmw2@infradead.org, yi.l.liu@intel.com
-Subject: Re: [RFC PATCH 11/42] iommu: Add new domain op cache_invalidate_kvm
-Message-ID: <20231205145227.GD2787277@nvidia.com>
-References: <20231202091211.13376-1-yan.y.zhao@intel.com>
- <20231202092041.14084-1-yan.y.zhao@intel.com>
- <20231204150945.GF1493156@nvidia.com>
- <ZW7F3AJZe7vrqzcy@yzhao56-desk.sh.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZW7F3AJZe7vrqzcy@yzhao56-desk.sh.intel.com>
-X-ClientProxiedBy: BLAP220CA0020.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:208:32c::25) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96F1FCA
+	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 06:52:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701787978;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OMPk1P3iEwc4XgYkI0yJOhmvSCnGfV07fCsdg5Z+rRo=;
+	b=aRO1zKEe0DuLSPFyuJKtGv+vfXdK18LQJ72VAv7b9u430nEi5ItoeiEVdIRnRDoYfZ2UaG
+	7SdmTCIjc4tm/vDTw4C/EnQazXGR3ieScufHMInHHS6lw5TUcvl/pK5W/+yONlziR9KlPX
+	W2nXlHEStGGmiXwdulSv41fWWvhcpFI=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-358-5Dz4jDsINKqFwVCeaJGZWw-1; Tue, 05 Dec 2023 09:52:56 -0500
+X-MC-Unique: 5Dz4jDsINKqFwVCeaJGZWw-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40b3d4d6417so41207335e9.0
+        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 06:52:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701787975; x=1702392775;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=OMPk1P3iEwc4XgYkI0yJOhmvSCnGfV07fCsdg5Z+rRo=;
+        b=u4dAD/ij3ShDfSmIgS/yg022KVTRtWt8v1SXj22iNB2n9QQnoH67tRuNwo1gb7/44l
+         cwjmseeJuiQdzTB0QOtUE83oHKPcYfLFx93SHvGsmjLSMdRvSYEA0YZMUOMVuEA0nPS+
+         EBHtJVFNjuYAAybIwv3B3MZYOv27XVIEDepSjuLKSZuHioP3Ls97wjmA0zxCFS7nOPoO
+         EZuuZvIzfpHRqQEIqRqjy0DrPAyrisi7u0Zyh27jpTw/asZbUwQeXZuvUIBKeHKuCHqC
+         nELpB+2XlNHI7gJ6WBqqyN8uutoiCOuqGM8k6e636+ONmXYLHCFH8+/yulwQ9UACuOcY
+         N54A==
+X-Gm-Message-State: AOJu0YwKHYV9XM9VRpunBz6VmXGpYT50+tHgOyhw/yxn+xhv/B92Ite8
+	LPfugYyvU+6Lde466IjMglCtROEcAPP1QV7+1co4LdaFyjQqjWexffPutT671E06Cp9dNeYnBD7
+	Q7hwvPjMUErcOOXCB4XNj
+X-Received: by 2002:a05:600c:4755:b0:40b:5f03:b3cc with SMTP id w21-20020a05600c475500b0040b5f03b3ccmr1746097wmo.238.1701787975130;
+        Tue, 05 Dec 2023 06:52:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF/o2m9YOLIt/GwuN51Qje+wVOtXCCDhCi6I/za9pq6D38y0U43O4PNDrmxwbRUO7FngAq/7g==
+X-Received: by 2002:a05:600c:4755:b0:40b:5f03:b3cc with SMTP id w21-20020a05600c475500b0040b5f03b3ccmr1746091wmo.238.1701787974629;
+        Tue, 05 Dec 2023 06:52:54 -0800 (PST)
+Received: from starship ([89.237.98.20])
+        by smtp.gmail.com with ESMTPSA id o14-20020a056000010e00b00333359b522dsm10310983wrx.77.2023.12.05.06.52.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Dec 2023 06:52:54 -0800 (PST)
+Message-ID: <d5e7dfd0c48a2cfff1f333629a985b74a137be64.camel@redhat.com>
+Subject: Re: [PATCH v2 12/16] KVM: x86: Make Hyper-V emulation optional
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, Paolo
+ Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Date: Tue, 05 Dec 2023 16:52:52 +0200
+In-Reply-To: <20231205103630.1391318-13-vkuznets@redhat.com>
+References: <20231205103630.1391318-1-vkuznets@redhat.com>
+	 <20231205103630.1391318-13-vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM6PR12MB4169:EE_
-X-MS-Office365-Filtering-Correlation-Id: aa60f102-1b1c-40eb-a680-08dbf5a1cd0f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	rr0r+M70A7a8H2Qeg+BA/AGSPkgCkTSuttek4JncSLiLlDfKXWsoO8ru2nWzeV0wW/B9ZOeGnJOEkVFe/V6asO8p094WHr+HBwxZERs4Jkb9d8GzaANfotkopkmil8MZ36VK3zJY0F7uVjFG1HsOY17lH2yLLzol9ym4SijQi49Atlqa0zJaITDOgkE/h65Tkj/IgPg6TYl7GSrhaY/FYhtSvYviw4+y8qr3JmfohNyDb1ze0vAugQdAxdAlIVCUxzBQubxDXk5UQ1HGqq4gnYu8VPr2S9GnzDESFaS7tKWnlOeazyG15zCtzDxM0TKrdNw+Bd0O17YgQa25kAU/psjFI5lsOGrbZhyfa4VPlZ27MFJBB44EFw6USePzXJ3le05qa0tnQu0JsTdnAJn94PCaS/VS7bEMRMM1e0dBVJ/edVOGmyBCwDsenO/XeQLI4eLuVuHxSiB8q7XiQwoAVwuRyjSi2QXQWRdusig5SwJYEkyOUAzCMxtQNQEEC0xUM4ogcid+bPjmwjQXZSs74bf470wfejwUX4LOm4XQbC30uVcxdXSI0x5z7sSk5nFs
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(346002)(376002)(366004)(396003)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(36756003)(2906002)(83380400001)(38100700002)(41300700001)(2616005)(26005)(33656002)(7416002)(5660300002)(1076003)(6506007)(6512007)(86362001)(6486002)(478600001)(8936002)(4326008)(8676002)(6916009)(66556008)(66476007)(66946007)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?uMeeGNQN0kN2uDcY+Uy3Zeuk0gl1h0ne++C4YYN5LVwFTrjtRTwWccnJ+CLa?=
- =?us-ascii?Q?NmbqWc5JwjMr1V8lLzriiUfqNCb1MLLRaGJUGGv9rHVaaO74xVzB7/whirdr?=
- =?us-ascii?Q?2cDaBqalE5M3wU8dQUT3VLVwMIuzbcoP5CUfuz06EWbKfMjzYFmHfMx5zZG0?=
- =?us-ascii?Q?4jI3zlHvdB/N2RWEY0ih66szolRtLhiNLFWZTO90aatEcMIWkypvWqVuKQrR?=
- =?us-ascii?Q?AuYw77h32a2zKSf1tykmIPGM/W3OSKEBjej3kpp5f4vju1d6/wyc2LfO9oA9?=
- =?us-ascii?Q?l7Lsm8tAuq7enFmYm4IybnzAKqhzVudom7xJJ8CigFxeQw0MCtgWvKitls0Z?=
- =?us-ascii?Q?oohG/nN0izrMeMidAA+E5asfj/1UVkq+JarZdbuGJpiDzxJVUfG2WYacyqqv?=
- =?us-ascii?Q?X5ExbmeFd035uC3IZ6w4Y8kvjrXx5gLqaiLVeHTS4l9V8yx5I2977TokwApe?=
- =?us-ascii?Q?VGNGmE/Ygpz/ZZOyiyK6ZvWhXnmZD1Erp2e0Wl35jHaiLuy6bni5Ycyn8Hs4?=
- =?us-ascii?Q?Vnlhxa36cqMYcJUDx6+h73BQzXvDxtw/C7Av4GHl3t0wmUs/H49yu04FgWPC?=
- =?us-ascii?Q?/d9Gqm8efJtJ7Fb6ofAc6kATqf4sFSp20TrBcSpLCsHx9hkDj1gY3gfXaoXe?=
- =?us-ascii?Q?RZaHDeHEhGuQJ2DkpWzTmTpG9ocpr1/bopOmKGA2Kcq71X6xmN5ouTHbOnHO?=
- =?us-ascii?Q?+TcFzVJyWLUQvWJbyEb1/RJpwt9pHOqiT3U1EWyc6wUEepDnAF8rp9sC2TBQ?=
- =?us-ascii?Q?yRNh/YhUxMLzviH3hl+USCFgp6LwuZoogfEu6XnjxPcTkzzq0loHxAg0/dwF?=
- =?us-ascii?Q?/DroEvIu8s+dcoN8u+D+4v6pcZHTpv5c7+K71M9yNehG0W3V4qreN/HNBs73?=
- =?us-ascii?Q?+BTbjzs+LFvvr6OEZVEZiwSreLAZWkgTxzgnborBy0eYoZ+QtiN9UCJEqg02?=
- =?us-ascii?Q?dEvmzdX7uHI4dr6ixT4xqdtd7KQEmhKXQ/xkoQRWDATKJyU55hgenRbIFfxM?=
- =?us-ascii?Q?E02wr2fRzqveX2xDQ7ETYUgarKHV60sAPY+lQ5buehtNHm0in5AhkiYvW1w9?=
- =?us-ascii?Q?GPgIWEfhecbRo9Q3ey7phZxzzoGyDKPZFOFjFniPWRewY6mi2dQ51nRQLejM?=
- =?us-ascii?Q?Leqt1w7QispYclSPHHj0ZcPjoTe4+Il47wo0vA4iv6Xsvn7t/jFrbbaHOmWZ?=
- =?us-ascii?Q?KlHAQkiXhzfCP5GGXYRZ9dM+inf4Y98YaTRnB05jvzytnv4KecgtKflYQtp4?=
- =?us-ascii?Q?/fDAhD2rlDD5jSig/WmPGWLEQjuw4NF5HqSZzRmcNa0ie3OhLu8/rvO1vrv8?=
- =?us-ascii?Q?lb3opEUmDBe45W/GAnVQAVfl/P+K0uja7dnLVfl8FVlJT1yAVwV7xcBeya9u?=
- =?us-ascii?Q?yM+TrPhpA7BUNEZu7xAQLnq3eGSX4p5xnbkQ1jEbtNrwZahcAxoiiPwVAksz?=
- =?us-ascii?Q?ZWkzJIaCJWmX13F/1M2wnVv4YscFbw3oSTW6Y2voeBiDnFAuYkoBw7mqwb+s?=
- =?us-ascii?Q?gnKWH3BnNtFyD4Hf00CoizS8bmBUQ/uQSbcXjNCROyC0tJUJ4HYLlYPSqdHb?=
- =?us-ascii?Q?zmkkM96e7Ck6DJFrB5D+FO0KJ9pjLit6gnW0sP1d?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aa60f102-1b1c-40eb-a680-08dbf5a1cd0f
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2023 14:52:28.3456
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Sn/nwmoAHaoVN8KhXSZZqDhGM7IXEzOyKixmxZp6lc7bNOTSyq2qLf4mYPGP+558
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4169
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 05, 2023 at 02:40:28PM +0800, Yan Zhao wrote:
-> On Mon, Dec 04, 2023 at 11:09:45AM -0400, Jason Gunthorpe wrote:
-> > On Sat, Dec 02, 2023 at 05:20:41PM +0800, Yan Zhao wrote:
-> > > On KVM invalidates mappings that are shared to IOMMU stage 2 paging
-> > > structures, IOMMU driver needs to invalidate hardware TLBs accordingly.
-> > > 
-> > > The new op cache_invalidate_kvm is called from IOMMUFD to invalidate
-> > > hardware TLBs upon receiving invalidation notifications from KVM.
-> > 
-> > Why?
-> > 
-> > SVA hooks the invalidation directly to the mm, shouldn't KVM also hook
-> > the invalidation directly from the kvm? Why do we need to call a chain
-> > of function pointers? iommufd isn't adding any value in the chain
-> > here.
-> Do you prefer IOMMU vendor driver to register as importer to KVM directly?
-> Then IOMMUFD just passes "struct kvm_tdp_fd" to IOMMU vendor driver for domain
-> creation.
+On Tue, 2023-12-05 at 11:36 +0100, Vitaly Kuznetsov wrote:
+> Hyper-V emulation in KVM is a fairly big chunk and in some cases it may be
+> desirable to not compile it in to reduce module sizes as well as the attack
+> surface. Introduce CONFIG_KVM_HYPERV option to make it possible.
+> 
+> Note, there's room for further nVMX/nSVM code optimizations when
+> !CONFIG_KVM_HYPERV, this will be done in follow-up patches.
+> 
+> Reorganize Makefile a bit so all CONFIG_HYPERV and CONFIG_KVM_HYPERV files
+> are grouped together.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  6 ++++
+>  arch/x86/kvm/Kconfig            | 14 ++++++++
+>  arch/x86/kvm/Makefile           | 20 +++++------
+>  arch/x86/kvm/cpuid.c            |  6 ++++
+>  arch/x86/kvm/hyperv.h           | 61 +++++++++++++++++++++++++++++++-
+>  arch/x86/kvm/irq_comm.c         |  9 ++++-
+>  arch/x86/kvm/svm/hyperv.h       |  9 +++++
+>  arch/x86/kvm/vmx/hyperv.h       | 17 ++++++---
+>  arch/x86/kvm/vmx/nested.c       | 30 ++++++++++++++++
+>  arch/x86/kvm/vmx/vmx.c          |  2 ++
+>  arch/x86/kvm/x86.c              | 62 ++++++++++++++++++++++++---------
+>  11 files changed, 201 insertions(+), 35 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 9dab2f7de495..3b8c63767554 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -937,8 +937,10 @@ struct kvm_vcpu_arch {
+>  	/* used for guest single stepping over the given code position */
+>  	unsigned long singlestep_rip;
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  	bool hyperv_enabled;
+>  	struct kvm_vcpu_hv *hyperv;
+> +#endif
+>  #ifdef CONFIG_KVM_XEN
+>  	struct kvm_vcpu_xen xen;
+>  #endif
+> @@ -1095,6 +1097,7 @@ enum hv_tsc_page_status {
+>  	HV_TSC_PAGE_BROKEN,
+>  };
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  /* Hyper-V emulation context */
+>  struct kvm_hv {
+>  	struct mutex hv_lock;
+> @@ -1127,6 +1130,7 @@ struct kvm_hv {
+>  
+>  	struct kvm_hv_syndbg hv_syndbg;
+>  };
+> +#endif
+>  
+>  struct msr_bitmap_range {
+>  	u32 flags;
+> @@ -1349,7 +1353,9 @@ struct kvm_arch {
+>  	/* reads protected by irq_srcu, writes by irq_lock */
+>  	struct hlist_head mask_notifier_list;
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  	struct kvm_hv hyperv;
+> +#endif
+>  
+>  #ifdef CONFIG_KVM_XEN
+>  	struct kvm_xen xen;
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index c1716e83d176..34f2f47cadf2 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -141,6 +141,20 @@ config KVM_SMM
+>  
+>  	  If unsure, say Y.
+>  
+> +config KVM_HYPERV
+> +	bool "Support for Microsoft Hyper-V emulation"
+> +	depends on KVM
+> +	default y
+> +	help
+> +	  Provides KVM support for emulating Microsoft Hyper-V.  This allows KVM
+> +	  to expose a subset of the paravirtualized interfaces defined in the
+> +	  Hyper-V Hypervisor Top-Level Functional Specification (TLFS):
+> +	  https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/reference/tlfs
+> +	  These interfaces are required for the correct and performant functioning
+> +	  of Windows and Hyper-V guests on KVM.
+> +
+> +	  If unsure, say "Y".
+> +
+>  config KVM_XEN
+>  	bool "Support for Xen hypercall interface"
+>  	depends on KVM
+> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+> index 8ea872401cd6..475b5fa917a6 100644
+> --- a/arch/x86/kvm/Makefile
+> +++ b/arch/x86/kvm/Makefile
+> @@ -11,29 +11,27 @@ include $(srctree)/virt/kvm/Makefile.kvm
+>  
+>  kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
+>  			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
+> -			   hyperv.o debugfs.o mmu/mmu.o mmu/page_track.o \
+> +			   debugfs.o mmu/mmu.o mmu/page_track.o \
+>  			   mmu/spte.o
+>  
+> -ifdef CONFIG_HYPERV
+> -kvm-y			+= kvm_onhyperv.o
+> -endif
+> -
+>  kvm-$(CONFIG_X86_64) += mmu/tdp_iter.o mmu/tdp_mmu.o
+> +kvm-$(CONFIG_KVM_HYPERV) += hyperv.o
+>  kvm-$(CONFIG_KVM_XEN)	+= xen.o
+>  kvm-$(CONFIG_KVM_SMM)	+= smm.o
+>  
+>  kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+> -			   vmx/hyperv.o vmx/hyperv_evmcs.o vmx/nested.o vmx/posted_intr.o
+> -kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
+> +			   vmx/nested.o vmx/posted_intr.o
+>  
+> -ifdef CONFIG_HYPERV
+> -kvm-intel-y		+= vmx/vmx_onhyperv.o
+> -endif
+> +kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
+> +kvm-intel-$(CONFIG_KVM_HYPERV)	+= vmx/hyperv.o vmx/hyperv_evmcs.o
+>  
+>  kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
+> -			   svm/sev.o svm/hyperv.o
+> +			   svm/sev.o
+> +kvm-amd-$(CONFIG_KVM_HYPERV) += svm/hyperv.o
+>  
+>  ifdef CONFIG_HYPERV
+> +kvm-y			+= kvm_onhyperv.o
+> +kvm-intel-y		+= vmx/vmx_onhyperv.o vmx/hyperv_evmcs.o
+>  kvm-amd-y		+= svm/svm_onhyperv.o
+>  endif
+>  
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index dda6fc4cfae8..1b278a3f0689 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -314,11 +314,15 @@ EXPORT_SYMBOL_GPL(kvm_update_cpuid_runtime);
+>  
+>  static bool kvm_cpuid_has_hyperv(struct kvm_cpuid_entry2 *entries, int nent)
+>  {
+> +#ifdef CONFIG_KVM_HYPERV
+>  	struct kvm_cpuid_entry2 *entry;
+>  
+>  	entry = cpuid_entry2_find(entries, nent, HYPERV_CPUID_INTERFACE,
+>  				  KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+>  	return entry && entry->eax == HYPERV_CPUID_SIGNATURE_EAX;
+> +#else
+> +	return false;
+> +#endif
+>  }
+>  
+>  static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+> @@ -433,11 +437,13 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
+>  		return 0;
+>  	}
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  	if (kvm_cpuid_has_hyperv(e2, nent)) {
+>  		r = kvm_hv_vcpu_init(vcpu);
+>  		if (r)
+>  			return r;
+>  	}
+> +#endif
+>  
+>  	r = kvm_check_cpuid(vcpu, e2, nent);
+>  	if (r)
+> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
+> index 75dcbe598fbc..53eb3bf56bdf 100644
+> --- a/arch/x86/kvm/hyperv.h
+> +++ b/arch/x86/kvm/hyperv.h
+> @@ -24,6 +24,8 @@
+>  #include <linux/kvm_host.h>
+>  #include "x86.h"
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+> +
+>  /* "Hv#1" signature */
+>  #define HYPERV_CPUID_SIGNATURE_EAX 0x31237648
+>  
+> @@ -259,5 +261,62 @@ static inline void kvm_hv_nested_transtion_tlb_flush(struct kvm_vcpu *vcpu, bool
+>  }
+>  
+>  int kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu);
+> +#else /* CONFIG_KVM_HYPERV */
+> +static inline void kvm_hv_setup_tsc_page(struct kvm *kvm,
+> +					 struct pvclock_vcpu_time_info *hv_clock) {}
+> +static inline void kvm_hv_request_tsc_page_update(struct kvm *kvm) {}
+> +static inline void kvm_hv_init_vm(struct kvm *kvm) {}
+> +static inline void kvm_hv_destroy_vm(struct kvm *kvm) {}
+> +static inline int kvm_hv_vcpu_init(struct kvm_vcpu *vcpu)
+> +{
+> +	return 0;
+> +}
+> +static inline void kvm_hv_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+> +static inline bool kvm_hv_hypercall_enabled(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +static inline int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+> +{
+> +	return HV_STATUS_ACCESS_DENIED;
+> +}
+> +static inline void kvm_hv_vcpu_purge_flush_tlb(struct kvm_vcpu *vcpu) {}
+> +static inline void kvm_hv_free_pa_page(struct kvm *kvm) {}
+> +static inline bool kvm_hv_synic_has_vector(struct kvm_vcpu *vcpu, int vector)
+> +{
+> +	return false;
+> +}
+> +static inline bool kvm_hv_synic_auto_eoi_set(struct kvm_vcpu *vcpu, int vector)
+> +{
+> +	return false;
+> +}
+> +static inline void kvm_hv_synic_send_eoi(struct kvm_vcpu *vcpu, int vector) {}
+> +static inline bool kvm_hv_invtsc_suppressed(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +static inline void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu, bool hyperv_enabled) {}
+> +static inline bool kvm_hv_has_stimer_pending(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +static inline bool kvm_hv_is_tlb_flush_hcall(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +static inline bool guest_hv_cpuid_has_l2_tlb_flush(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +static inline int kvm_hv_verify_vp_assist(struct kvm_vcpu *vcpu)
+> +{
+> +	return 0;
+> +}
+> +static inline u32 kvm_hv_get_vpindex(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->vcpu_idx;
+> +}
+> +static inline void kvm_hv_nested_transtion_tlb_flush(struct kvm_vcpu *vcpu, bool tdp_enabled) {}
+> +#endif /* CONFIG_KVM_HYPERV */
+>  
+> -#endif
+> +#endif /* __ARCH_X86_KVM_HYPERV_H__ */
+> diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+> index 16d076a1b91a..68f3f6c26046 100644
+> --- a/arch/x86/kvm/irq_comm.c
+> +++ b/arch/x86/kvm/irq_comm.c
+> @@ -144,7 +144,7 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+>  	return kvm_irq_delivery_to_apic(kvm, NULL, &irq, NULL);
+>  }
+>  
+> -
+> +#ifdef CONFIG_KVM_HYPERV
+>  static int kvm_hv_set_sint(struct kvm_kernel_irq_routing_entry *e,
+>  		    struct kvm *kvm, int irq_source_id, int level,
+>  		    bool line_status)
+> @@ -154,6 +154,7 @@ static int kvm_hv_set_sint(struct kvm_kernel_irq_routing_entry *e,
+>  
+>  	return kvm_hv_synic_set_irq(kvm, e->hv_sint.vcpu, e->hv_sint.sint);
+>  }
+> +#endif
+>  
+>  int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
+>  			      struct kvm *kvm, int irq_source_id, int level,
+> @@ -163,9 +164,11 @@ int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
+>  	int r;
+>  
+>  	switch (e->type) {
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case KVM_IRQ_ROUTING_HV_SINT:
+>  		return kvm_hv_set_sint(e, kvm, irq_source_id, level,
+>  				       line_status);
+> +#endif
+>  
+>  	case KVM_IRQ_ROUTING_MSI:
+>  		if (kvm_msi_route_invalid(kvm, e))
+> @@ -314,11 +317,13 @@ int kvm_set_routing_entry(struct kvm *kvm,
+>  		if (kvm_msi_route_invalid(kvm, e))
+>  			return -EINVAL;
+>  		break;
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case KVM_IRQ_ROUTING_HV_SINT:
+>  		e->set = kvm_hv_set_sint;
+>  		e->hv_sint.vcpu = ue->u.hv_sint.vcpu;
+>  		e->hv_sint.sint = ue->u.hv_sint.sint;
+>  		break;
+> +#endif
+>  #ifdef CONFIG_KVM_XEN
+>  	case KVM_IRQ_ROUTING_XEN_EVTCHN:
+>  		return kvm_xen_setup_evtchn(kvm, e, ue);
+> @@ -438,5 +443,7 @@ void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
+>  
+>  void kvm_arch_irq_routing_update(struct kvm *kvm)
+>  {
+> +#ifdef CONFIG_KVM_HYPERV
+>  	kvm_hv_irq_routing_update(kvm);
+> +#endif
+>  }
+> diff --git a/arch/x86/kvm/svm/hyperv.h b/arch/x86/kvm/svm/hyperv.h
+> index 02f4784b5d44..d3f8bfc05832 100644
+> --- a/arch/x86/kvm/svm/hyperv.h
+> +++ b/arch/x86/kvm/svm/hyperv.h
+> @@ -11,6 +11,7 @@
+>  #include "../hyperv.h"
+>  #include "svm.h"
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+> @@ -41,5 +42,13 @@ static inline bool nested_svm_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu)
+>  }
+>  
+>  void svm_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu);
+> +#else /* CONFIG_KVM_HYPERV */
+> +static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu) {}
+> +static inline bool nested_svm_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +static inline void svm_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu) {}
+> +#endif /* CONFIG_KVM_HYPERV */
+>  
+>  #endif /* __ARCH_X86_KVM_SVM_HYPERV_H__ */
+> diff --git a/arch/x86/kvm/vmx/hyperv.h b/arch/x86/kvm/vmx/hyperv.h
+> index 6e1ee951e360..0e90ef4efe34 100644
+> --- a/arch/x86/kvm/vmx/hyperv.h
+> +++ b/arch/x86/kvm/vmx/hyperv.h
+> @@ -9,11 +9,6 @@
+>  #define EVMPTR_INVALID (-1ULL)
+>  #define EVMPTR_MAP_PENDING (-2ULL)
+>  
+> -static inline bool evmptr_is_valid(u64 evmptr)
+> -{
+> -	return evmptr != EVMPTR_INVALID && evmptr != EVMPTR_MAP_PENDING;
+> -}
+> -
+>  enum nested_evmptrld_status {
+>  	EVMPTRLD_DISABLED,
+>  	EVMPTRLD_SUCCEEDED,
+> @@ -21,6 +16,12 @@ enum nested_evmptrld_status {
+>  	EVMPTRLD_ERROR,
+>  };
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+> +static inline bool evmptr_is_valid(u64 evmptr)
+> +{
+> +	return evmptr != EVMPTR_INVALID && evmptr != EVMPTR_MAP_PENDING;
+> +}
+> +
+>  static inline bool guest_cpuid_has_evmcs(struct kvm_vcpu *vcpu)
+>  {
+>  	/*
+> @@ -39,5 +40,11 @@ void nested_evmcs_filter_control_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 *
+>  int nested_evmcs_check_controls(struct vmcs12 *vmcs12);
+>  bool nested_evmcs_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu);
+>  void vmx_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu);
+> +#else
+> +static inline bool evmptr_is_valid(u64 evmptr)
+> +{
+> +	return false;
+> +}
+> +#endif
+>  
+>  #endif /* __KVM_X86_VMX_HYPERV_H */
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 903b6f9ea2bd..01a94d290c12 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -226,6 +226,7 @@ static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
+>  
+>  static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
+>  {
+> +#ifdef CONFIG_KVM_HYPERV
+>  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>  
+> @@ -241,10 +242,12 @@ static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
+>  		hv_vcpu->nested.vm_id = 0;
+>  		hv_vcpu->nested.vp_id = 0;
+>  	}
+> +#endif
+>  }
+>  
+>  static bool nested_evmcs_handle_vmclear(struct kvm_vcpu *vcpu, gpa_t vmptr)
+>  {
+> +#ifdef CONFIG_KVM_HYPERV
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>  	/*
+>  	 * When Enlightened VMEntry is enabled on the calling CPU we treat
+> @@ -264,6 +267,9 @@ static bool nested_evmcs_handle_vmclear(struct kvm_vcpu *vcpu, gpa_t vmptr)
+>  		nested_release_evmcs(vcpu);
+>  
+>  	return true;
+> +#else
+> +	return false;
+> +#endif
+>  }
+>  
+>  static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
+> @@ -1595,6 +1601,7 @@ static void copy_vmcs12_to_shadow(struct vcpu_vmx *vmx)
+>  
+>  static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields)
+>  {
+> +#ifdef CONFIG_KVM_HYPERV
+>  	struct vmcs12 *vmcs12 = vmx->nested.cached_vmcs12;
+>  	struct hv_enlightened_vmcs *evmcs = vmx->nested.hv_evmcs;
+>  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(&vmx->vcpu);
+> @@ -1835,10 +1842,14 @@ static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields
+>  	 */
+>  
+>  	return;
+> +#else /* CONFIG_KVM_HYPERV */
+> +	KVM_BUG_ON(1, vmx->vcpu.kvm);
+> +#endif /* CONFIG_KVM_HYPERV */
+>  }
+>  
+>  static void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
+>  {
+> +#ifdef CONFIG_KVM_HYPERV
+>  	struct vmcs12 *vmcs12 = vmx->nested.cached_vmcs12;
+>  	struct hv_enlightened_vmcs *evmcs = vmx->nested.hv_evmcs;
+>  
+> @@ -2009,6 +2020,9 @@ static void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
+>  	evmcs->guest_bndcfgs = vmcs12->guest_bndcfgs;
+>  
+>  	return;
+> +#else /* CONFIG_KVM_HYPERV */
+> +	KVM_BUG_ON(1, vmx->vcpu.kvm);
+> +#endif /* CONFIG_KVM_HYPERV */
+>  }
+>  
+>  /*
+> @@ -2018,6 +2032,7 @@ static void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
+>  static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+>  	struct kvm_vcpu *vcpu, bool from_launch)
+>  {
+> +#ifdef CONFIG_KVM_HYPERV
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>  	bool evmcs_gpa_changed = false;
+>  	u64 evmcs_gpa;
+> @@ -2099,6 +2114,9 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+>  	}
+>  
+>  	return EVMPTRLD_SUCCEEDED;
+> +#else
+> +	return EVMPTRLD_DISABLED;
+> +#endif
+>  }
+>  
+>  void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu)
+> @@ -2905,8 +2923,10 @@ static int nested_vmx_check_controls(struct kvm_vcpu *vcpu,
+>  	    nested_check_vm_entry_controls(vcpu, vmcs12))
+>  		return -EINVAL;
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  	if (guest_cpuid_has_evmcs(vcpu))
+>  		return nested_evmcs_check_controls(vmcs12);
+> +#endif
+>  
+>  	return 0;
+>  }
+> @@ -3178,6 +3198,7 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
+>  	return 0;
+>  }
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> @@ -3205,6 +3226,7 @@ static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+>  
+>  	return true;
+>  }
+> +#endif
+>  
+>  static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+>  {
+> @@ -3296,6 +3318,7 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+>  
+>  static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
+>  {
+> +#ifdef CONFIG_KVM_HYPERV
+>  	/*
+>  	 * Note: nested_get_evmcs_page() also updates 'vp_assist_page' copy
+>  	 * in 'struct kvm_vcpu_hv' in case eVMCS is in use, this is mandatory
+> @@ -3312,6 +3335,7 @@ static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
+>  
+>  		return false;
+>  	}
+> +#endif
+>  
+>  	if (is_guest_mode(vcpu) && !nested_get_vmcs12_pages(vcpu))
+>  		return false;
+> @@ -4749,6 +4773,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+>  	/* trying to cancel vmlaunch/vmresume is a bug */
+>  	WARN_ON_ONCE(vmx->nested.nested_run_pending);
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  	if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
+>  		/*
+>  		 * KVM_REQ_GET_NESTED_STATE_PAGES is also used to map
+> @@ -4758,6 +4783,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+>  		 */
+>  		(void)nested_get_evmcs_page(vcpu);
+>  	}
+> +#endif
+>  
+>  	/* Service pending TLB flush requests for L2 before switching to L1. */
+>  	kvm_service_local_tlb_flush_requests(vcpu);
+> @@ -6212,11 +6238,13 @@ static bool nested_vmx_l0_wants_exit(struct kvm_vcpu *vcpu,
+>  		 * Handle L2's bus locks in L0 directly.
+>  		 */
+>  		return true;
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case EXIT_REASON_VMCALL:
+>  		/* Hyper-V L2 TLB flush hypercall is handled by L0 */
+>  		return guest_hv_cpuid_has_l2_tlb_flush(vcpu) &&
+>  			nested_evmcs_l2_tlb_flush_enabled(vcpu) &&
+>  			kvm_hv_is_tlb_flush_hcall(vcpu);
+> +#endif
+>  	default:
+>  		break;
+>  	}
+> @@ -7100,7 +7128,9 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
+>  	.set_state = vmx_set_nested_state,
+>  	.get_nested_state_pages = vmx_get_nested_state_pages,
+>  	.write_log_dirty = nested_vmx_write_pml_buffer,
+> +#ifdef CONFIG_KVM_HYPERV
+>  	.enable_evmcs = nested_enable_evmcs,
+>  	.get_evmcs_version = nested_get_evmcs_version,
+>  	.hv_inject_synthetic_vmexit_post_tlb_flush = vmx_hv_inject_synthetic_vmexit_post_tlb_flush,
+> +#endif
+>  };
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 552593a2ac14..3ff5c44dff9d 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2048,6 +2048,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		if (vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
+>  				    &msr_info->data))
+>  			return 1;
+> +#ifdef CONFIG_KVM_HYPERV
+>  		/*
+>  		 * Enlightened VMCS v1 doesn't have certain VMCS fields but
+>  		 * instead of just ignoring the features, different Hyper-V
+> @@ -2058,6 +2059,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		if (!msr_info->host_initiated && guest_cpuid_has_evmcs(vcpu))
+>  			nested_evmcs_filter_control_msr(vcpu, msr_info->index,
+>  							&msr_info->data);
+> +#endif
+>  		break;
+>  	case MSR_IA32_RTIT_CTL:
+>  		if (!vmx_pt_mode_is_host_guest())
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 81224b9676d9..598b057611e0 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1504,6 +1504,8 @@ static unsigned num_msrs_to_save;
+>  static const u32 emulated_msrs_all[] = {
+>  	MSR_KVM_SYSTEM_TIME, MSR_KVM_WALL_CLOCK,
+>  	MSR_KVM_SYSTEM_TIME_NEW, MSR_KVM_WALL_CLOCK_NEW,
+> +
+> +#ifdef CONFIG_KVM_HYPERV
+>  	HV_X64_MSR_GUEST_OS_ID, HV_X64_MSR_HYPERCALL,
+>  	HV_X64_MSR_TIME_REF_COUNT, HV_X64_MSR_REFERENCE_TSC,
+>  	HV_X64_MSR_TSC_FREQUENCY, HV_X64_MSR_APIC_FREQUENCY,
+> @@ -1521,6 +1523,7 @@ static const u32 emulated_msrs_all[] = {
+>  	HV_X64_MSR_SYNDBG_CONTROL, HV_X64_MSR_SYNDBG_STATUS,
+>  	HV_X64_MSR_SYNDBG_SEND_BUFFER, HV_X64_MSR_SYNDBG_RECV_BUFFER,
+>  	HV_X64_MSR_SYNDBG_PENDING_BUFFER,
+> +#endif
+>  
+>  	MSR_KVM_ASYNC_PF_EN, MSR_KVM_STEAL_TIME,
+>  	MSR_KVM_PV_EOI_EN, MSR_KVM_ASYNC_PF_INT, MSR_KVM_ASYNC_PF_ACK,
+> @@ -4020,6 +4023,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		 * the need to ignore the workaround.
+>  		 */
+>  		break;
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case HV_X64_MSR_GUEST_OS_ID ... HV_X64_MSR_SINT15:
+>  	case HV_X64_MSR_SYNDBG_CONTROL ... HV_X64_MSR_SYNDBG_PENDING_BUFFER:
+>  	case HV_X64_MSR_SYNDBG_OPTIONS:
+> @@ -4032,6 +4036,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  	case HV_X64_MSR_TSC_INVARIANT_CONTROL:
+>  		return kvm_hv_set_msr_common(vcpu, msr, data,
+>  					     msr_info->host_initiated);
+> +#endif
+>  	case MSR_IA32_BBL_CR_CTL3:
+>  		/* Drop writes to this legacy MSR -- see rdmsr
+>  		 * counterpart for further detail.
+> @@ -4377,6 +4382,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		 */
+>  		msr_info->data = 0x20000000;
+>  		break;
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case HV_X64_MSR_GUEST_OS_ID ... HV_X64_MSR_SINT15:
+>  	case HV_X64_MSR_SYNDBG_CONTROL ... HV_X64_MSR_SYNDBG_PENDING_BUFFER:
+>  	case HV_X64_MSR_SYNDBG_OPTIONS:
+> @@ -4390,6 +4396,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		return kvm_hv_get_msr_common(vcpu,
+>  					     msr_info->index, &msr_info->data,
+>  					     msr_info->host_initiated);
+> +#endif
+>  	case MSR_IA32_BBL_CR_CTL3:
+>  		/* This legacy MSR exists but isn't fully documented in current
+>  		 * silicon.  It is however accessed by winxp in very narrow
+> @@ -4527,6 +4534,7 @@ static inline bool kvm_can_mwait_in_guest(void)
+>  		boot_cpu_has(X86_FEATURE_ARAT);
+>  }
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  static int kvm_ioctl_get_supported_hv_cpuid(struct kvm_vcpu *vcpu,
+>  					    struct kvm_cpuid2 __user *cpuid_arg)
+>  {
+> @@ -4547,6 +4555,7 @@ static int kvm_ioctl_get_supported_hv_cpuid(struct kvm_vcpu *vcpu,
+>  
+>  	return 0;
+>  }
+> +#endif
+>  
+>  static bool kvm_is_vm_type_supported(unsigned long type)
+>  {
+> @@ -4580,9 +4589,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_PIT_STATE2:
+>  	case KVM_CAP_SET_IDENTITY_MAP_ADDR:
+>  	case KVM_CAP_VCPU_EVENTS:
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case KVM_CAP_HYPERV:
+>  	case KVM_CAP_HYPERV_VAPIC:
+>  	case KVM_CAP_HYPERV_SPIN:
+> +	case KVM_CAP_HYPERV_TIME:
+>  	case KVM_CAP_HYPERV_SYNIC:
+>  	case KVM_CAP_HYPERV_SYNIC2:
+>  	case KVM_CAP_HYPERV_VP_INDEX:
+> @@ -4592,6 +4603,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_HYPERV_CPUID:
+>  	case KVM_CAP_HYPERV_ENFORCE_CPUID:
+>  	case KVM_CAP_SYS_HYPERV_CPUID:
+> +#endif
+>  	case KVM_CAP_PCI_SEGMENT:
+>  	case KVM_CAP_DEBUGREGS:
+>  	case KVM_CAP_X86_ROBUST_SINGLESTEP:
+> @@ -4601,7 +4613,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_GET_TSC_KHZ:
+>  	case KVM_CAP_KVMCLOCK_CTRL:
+>  	case KVM_CAP_READONLY_MEM:
+> -	case KVM_CAP_HYPERV_TIME:
+>  	case KVM_CAP_IOAPIC_POLARITY_IGNORED:
+>  	case KVM_CAP_TSC_DEADLINE_TIMER:
+>  	case KVM_CAP_DISABLE_QUIRKS:
+> @@ -4712,12 +4723,14 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  		r = kvm_x86_ops.nested_ops->get_state ?
+>  			kvm_x86_ops.nested_ops->get_state(NULL, NULL, 0) : 0;
+>  		break;
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case KVM_CAP_HYPERV_DIRECT_TLBFLUSH:
+>  		r = kvm_x86_ops.enable_l2_tlb_flush != NULL;
+>  		break;
+>  	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
+>  		r = kvm_x86_ops.nested_ops->enable_evmcs != NULL;
+>  		break;
+> +#endif
+>  	case KVM_CAP_SMALLER_MAXPHYADDR:
+>  		r = (int) allow_smaller_maxphyaddr;
+>  		break;
+> @@ -4884,9 +4897,11 @@ long kvm_arch_dev_ioctl(struct file *filp,
+>  	case KVM_GET_MSRS:
+>  		r = msr_io(NULL, argp, do_get_msr_feature, 1);
+>  		break;
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case KVM_GET_SUPPORTED_HV_CPUID:
+>  		r = kvm_ioctl_get_supported_hv_cpuid(NULL, argp);
+>  		break;
+> +#endif
+>  	case KVM_GET_DEVICE_ATTR: {
+>  		struct kvm_device_attr attr;
+>  		r = -EFAULT;
+> @@ -5712,14 +5727,11 @@ static int kvm_vcpu_ioctl_device_attr(struct kvm_vcpu *vcpu,
+>  static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+>  				     struct kvm_enable_cap *cap)
+>  {
+> -	int r;
+> -	uint16_t vmcs_version;
+> -	void __user *user_ptr;
+> -
+>  	if (cap->flags)
+>  		return -EINVAL;
+>  
+>  	switch (cap->cap) {
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case KVM_CAP_HYPERV_SYNIC2:
+>  		if (cap->args[0])
+>  			return -EINVAL;
+> @@ -5731,16 +5743,22 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+>  		return kvm_hv_activate_synic(vcpu, cap->cap ==
+>  					     KVM_CAP_HYPERV_SYNIC2);
+>  	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
+> -		if (!kvm_x86_ops.nested_ops->enable_evmcs)
+> -			return -ENOTTY;
+> -		r = kvm_x86_ops.nested_ops->enable_evmcs(vcpu, &vmcs_version);
+> -		if (!r) {
+> -			user_ptr = (void __user *)(uintptr_t)cap->args[0];
+> -			if (copy_to_user(user_ptr, &vmcs_version,
+> -					 sizeof(vmcs_version)))
+> -				r = -EFAULT;
+> +		{
+> +			int r;
+> +			uint16_t vmcs_version;
+> +			void __user *user_ptr;
+> +
+> +			if (!kvm_x86_ops.nested_ops->enable_evmcs)
+> +				return -ENOTTY;
+> +			r = kvm_x86_ops.nested_ops->enable_evmcs(vcpu, &vmcs_version);
+> +			if (!r) {
+> +				user_ptr = (void __user *)(uintptr_t)cap->args[0];
+> +				if (copy_to_user(user_ptr, &vmcs_version,
+> +						 sizeof(vmcs_version)))
+> +					r = -EFAULT;
+> +			}
+> +			return r;
+>  		}
+> -		return r;
+>  	case KVM_CAP_HYPERV_DIRECT_TLBFLUSH:
+>  		if (!kvm_x86_ops.enable_l2_tlb_flush)
+>  			return -ENOTTY;
+> @@ -5749,6 +5767,7 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+>  
+>  	case KVM_CAP_HYPERV_ENFORCE_CPUID:
+>  		return kvm_hv_set_enforce_cpuid(vcpu, cap->args[0]);
+> +#endif
+>  
+>  	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
+>  		vcpu->arch.pv_cpuid.enforce = cap->args[0];
+> @@ -6141,9 +6160,11 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  		srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>  		break;
+>  	}
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case KVM_GET_SUPPORTED_HV_CPUID:
+>  		r = kvm_ioctl_get_supported_hv_cpuid(vcpu, argp);
+>  		break;
+> +#endif
+>  #ifdef CONFIG_KVM_XEN
+>  	case KVM_XEN_VCPU_GET_ATTR: {
+>  		struct kvm_xen_vcpu_attr xva;
+> @@ -7201,6 +7222,7 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>  		r = static_call(kvm_x86_mem_enc_unregister_region)(kvm, &region);
+>  		break;
+>  	}
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case KVM_HYPERV_EVENTFD: {
+>  		struct kvm_hyperv_eventfd hvevfd;
+>  
+> @@ -7210,6 +7232,7 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>  		r = kvm_vm_ioctl_hv_eventfd(kvm, &hvevfd);
+>  		break;
+>  	}
+> +#endif
+>  	case KVM_SET_PMU_EVENT_FILTER:
+>  		r = kvm_vm_ioctl_set_pmu_event_filter(kvm, argp);
+>  		break;
+> @@ -10588,19 +10611,20 @@ static void vcpu_scan_ioapic(struct kvm_vcpu *vcpu)
+>  
+>  static void vcpu_load_eoi_exitmap(struct kvm_vcpu *vcpu)
+>  {
+> -	u64 eoi_exit_bitmap[4];
+> -
+>  	if (!kvm_apic_hw_enabled(vcpu->arch.apic))
+>  		return;
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  	if (to_hv_vcpu(vcpu)) {
+> +		u64 eoi_exit_bitmap[4];
+> +
+>  		bitmap_or((ulong *)eoi_exit_bitmap,
+>  			  vcpu->arch.ioapic_handled_vectors,
+>  			  to_hv_synic(vcpu)->vec_bitmap, 256);
+>  		static_call_cond(kvm_x86_load_eoi_exitmap)(vcpu, eoi_exit_bitmap);
+>  		return;
+>  	}
+> -
+> +#endif
+>  	static_call_cond(kvm_x86_load_eoi_exitmap)(
+>  		vcpu, (u64 *)vcpu->arch.ioapic_handled_vectors);
+>  }
+> @@ -10691,9 +10715,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  		 * the flushes are considered "remote" and not "local" because
+>  		 * the requests can be initiated from other vCPUs.
+>  		 */
+> +#ifdef CONFIG_KVM_HYPERV
+>  		if (kvm_check_request(KVM_REQ_HV_TLB_FLUSH, vcpu) &&
+>  		    kvm_hv_vcpu_flush_tlb(vcpu))
+>  			kvm_vcpu_flush_tlb_guest(vcpu);
+> +#endif
+>  
+>  		if (kvm_check_request(KVM_REQ_REPORT_TPR_ACCESS, vcpu)) {
+>  			vcpu->run->exit_reason = KVM_EXIT_TPR_ACCESS;
+> @@ -10746,6 +10772,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  			vcpu_load_eoi_exitmap(vcpu);
+>  		if (kvm_check_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu))
+>  			kvm_vcpu_reload_apic_access_page(vcpu);
+> +#ifdef CONFIG_KVM_HYPERV
+>  		if (kvm_check_request(KVM_REQ_HV_CRASH, vcpu)) {
+>  			vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+>  			vcpu->run->system_event.type = KVM_SYSTEM_EVENT_CRASH;
+> @@ -10776,6 +10803,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  		 */
+>  		if (kvm_check_request(KVM_REQ_HV_STIMER, vcpu))
+>  			kvm_hv_process_stimers(vcpu);
+> +#endif
+>  		if (kvm_check_request(KVM_REQ_APICV_UPDATE, vcpu))
+>  			kvm_vcpu_update_apicv(vcpu);
+>  		if (kvm_check_request(KVM_REQ_APF_READY, vcpu))
 
-Yes, this is what we did for SVA
 
-Function pointers are slow these days, so it is preferred to go
-directly.
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-Jason
+Best regards,
+	Maxim Levitsky
+
 
