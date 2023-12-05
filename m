@@ -1,207 +1,182 @@
-Return-Path: <kvm+bounces-3444-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3446-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AC31804542
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 03:44:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7DE180458B
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 04:18:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05A7B281414
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 02:44:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3164F28142E
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 03:18:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19444D2E9;
-	Tue,  5 Dec 2023 02:43:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="V4V0HHwF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5AD8BF1;
+	Tue,  5 Dec 2023 03:18:36 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE2B810C7
-	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 18:43:48 -0800 (PST)
-Received: by mail-ot1-x32c.google.com with SMTP id 46e09a7af769-6d81faeefc4so2951524a34.2
-        for <kvm@vger.kernel.org>; Mon, 04 Dec 2023 18:43:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1701744228; x=1702349028; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o7KPiKrm0gOhakxC/Wb7OeJ/9kc5D1cjNr8HphWNKE8=;
-        b=V4V0HHwFqI7vfBLDpScjHw2i44uOEurGwxLEjtWphPdTQSegNJutLhV0J/UZwyJWwo
-         SIiv8c24ETDwTRWqFeu3orv0iFUBb15lOdB55bQzV1Daaz0IjKpjlYV7t7dQAsBOGx+V
-         WUDDyl7ruXw2D0gzHMAEy096vVwkkzqQCW1rAU7bX9nyEQ89un2MMHOCM4p7sVeL4ew6
-         7G+fbcQODMpsvSMJhUDswgOzBff8yTAbbW3OCZ9eFog7b9abK5Kmm3BPAE1poMgtUQ0B
-         h5YV5M//hihvVmFJN0F5tqgseWXIhv0PMN5eUiZ1m7zZ/ev4ehRSUHm3fYMPdMNcESEz
-         AO2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701744228; x=1702349028;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o7KPiKrm0gOhakxC/Wb7OeJ/9kc5D1cjNr8HphWNKE8=;
-        b=VoU7575UkowTnjLMAlCvZGxo7UN3+HuwZEAHR3cUPkjCt9ko6bShRoNKHATVlkZMJf
-         kpnvaeb8whYh5A2PRaX+o9SFnbXZ+M0u+rLGhrY8U8DkE392gi/FP4ZcPYG66qNUJCUh
-         pvVSoYPIhXs21bzSTJa9fEu6VHE78JTFQhJAGTYd1W5FIAnBVcOdOxODkhFOxSNN9tZn
-         Ou2E37CfzGsG/CfOX17WcaO4w9LnWtZpaefjGbI/Bspw5OB92CMeahdxX1pB1uImKDCe
-         L1isxpL82TGZ9c4jvYGQ8zGWZeooR8Ze6+KaMExyHWGvIjN3OcwWlD/5qDJKOhve5p7y
-         3Y9w==
-X-Gm-Message-State: AOJu0Yw+VrVYApd0h0tt/L71ssTziJrv3v37u52iYRHORdpkZbXtOGOX
-	zBV3fxWhCrFnDLEN+JB0+fXYrA==
-X-Google-Smtp-Source: AGHT+IFjpVDyqkSHbaNqwFBeSjOTvhTrHeLCZiADHAwpcAR48Wdh3tXdrlaF62vWprf7yMCdI/PbwA==
-X-Received: by 2002:a05:6830:1c8:b0:6d8:322d:e76d with SMTP id r8-20020a05683001c800b006d8322de76dmr5108332ota.38.1701744227938;
-        Mon, 04 Dec 2023 18:43:47 -0800 (PST)
-Received: from atishp.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id z17-20020a9d62d1000000b006b9848f8aa7sm2157655otk.45.2023.12.04.18.43.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 18:43:47 -0800 (PST)
-From: Atish Patra <atishp@rivosinc.com>
-To: linux-kernel@vger.kernel.org
-Cc: Atish Patra <atishp@rivosinc.com>,
-	Alexandre Ghiti <alexghiti@rivosinc.com>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Guo Ren <guoren@kernel.org>,
-	Icenowy Zheng <uwu@icenowy.me>,
-	kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Will Deacon <will@kernel.org>
-Subject: [RFC 9/9] RISC-V: KVM: Support 64 bit firmware counters on RV32
-Date: Mon,  4 Dec 2023 18:43:10 -0800
-Message-Id: <20231205024310.1593100-10-atishp@rivosinc.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231205024310.1593100-1-atishp@rivosinc.com>
-References: <20231205024310.1593100-1-atishp@rivosinc.com>
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 68EE785;
+	Mon,  4 Dec 2023 19:18:30 -0800 (PST)
+Received: from loongson.cn (unknown [10.20.42.173])
+	by gateway (Coremail) with SMTP id _____8Dxg_CDlm5lP_E+AA--.60337S3;
+	Tue, 05 Dec 2023 11:18:28 +0800 (CST)
+Received: from [10.20.42.173] (unknown [10.20.42.173])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Dxvi9+lm5lyxRVAA--.57025S3;
+	Tue, 05 Dec 2023 11:18:25 +0800 (CST)
+Subject: Re: [PATCH v4 1/3] LoongArch: KVM: Remove SW timer switch when vcpu
+ is halt polling
+To: Huacai Chen <chenhuacai@kernel.org>, zhaotianrui <zhaotianrui@loongson.cn>
+Cc: WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20231116023036.2324371-1-maobibo@loongson.cn>
+ <20231116023036.2324371-2-maobibo@loongson.cn>
+ <564a2fd3-ffba-3bc5-70b9-8a9fa9a0f1c6@loongson.cn>
+ <CAAhV-H4P_JUewDM7R1ByNR4PZa97=xM_rAJ239J-wFSd6_+0GA@mail.gmail.com>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <17c54ef9-9ce5-bc2b-0566-851fe4da9483@loongson.cn>
+Date: Tue, 5 Dec 2023 11:18:16 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <CAAhV-H4P_JUewDM7R1ByNR4PZa97=xM_rAJ239J-wFSd6_+0GA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Dxvi9+lm5lyxRVAA--.57025S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxXFy3WF48KrW8Cw43Zr48Zrc_yoWrCFWDpF
+	WxCFnrZr4rGr17G34aqan0qr42q3s3Kr1xWa47JFyFyrnrtr1xtF18GrZxuFy7Cw4fCFyI
+	vr1rKasIvF45A3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	XVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_
+	Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0
+	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
+	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
+	14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jjwZcUUUUU=
 
-The SBI v2.0 introduced a fw_read_hi function to read 64 bit firmware
-counters for RV32 based systems.
 
-Add infrastructure to support that.
 
-Signed-off-by: Atish Patra <atishp@rivosinc.com>
----
- arch/riscv/include/asm/kvm_vcpu_pmu.h |  6 ++++-
- arch/riscv/kvm/vcpu_pmu.c             | 38 ++++++++++++++++++++++++++-
- arch/riscv/kvm/vcpu_sbi_pmu.c         |  7 +++++
- 3 files changed, 49 insertions(+), 2 deletions(-)
+On 2023/12/5 上午10:20, Huacai Chen wrote:
+> This series looks good to me, If Paolo agrees, I will apply to
+> loongarch-next after [1] is taken into the kvm tree (otherwise there
+> will be build errors).
+> 
+> [1] https://lore.kernel.org/loongarch/CAAhV-H63QkfSw+Esn8oW2PDEsCnTRPFqkj8X-x8i9cH3AS0k9w@mail.gmail.com/T/#t
+> 
+Got it, and thanks for your information.
 
-diff --git a/arch/riscv/include/asm/kvm_vcpu_pmu.h b/arch/riscv/include/asm/kvm_vcpu_pmu.h
-index 64c75acad6ba..dd655315e706 100644
---- a/arch/riscv/include/asm/kvm_vcpu_pmu.h
-+++ b/arch/riscv/include/asm/kvm_vcpu_pmu.h
-@@ -20,7 +20,7 @@ static_assert(RISCV_KVM_MAX_COUNTERS <= 64);
- 
- struct kvm_fw_event {
- 	/* Current value of the event */
--	unsigned long value;
-+	uint64_t value;
- 
- 	/* Event monitoring status */
- 	bool started;
-@@ -91,6 +91,10 @@ int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_ba
- 				     struct kvm_vcpu_sbi_return *retdata);
- int kvm_riscv_vcpu_pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
- 				struct kvm_vcpu_sbi_return *retdata);
-+#if defined(CONFIG_32BIT)
-+int kvm_riscv_vcpu_pmu_fw_ctr_read_hi(struct kvm_vcpu *vcpu, unsigned long cidx,
-+				struct kvm_vcpu_sbi_return *retdata);
-+#endif
- void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu);
- int kvm_riscv_vcpu_pmu_setup_snapshot(struct kvm_vcpu *vcpu, unsigned long saddr_low,
- 				       unsigned long saddr_high, unsigned long flags,
-diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
-index 86c8e92f92d3..5b4a93647256 100644
---- a/arch/riscv/kvm/vcpu_pmu.c
-+++ b/arch/riscv/kvm/vcpu_pmu.c
-@@ -195,6 +195,28 @@ static int pmu_get_pmc_index(struct kvm_pmu *pmu, unsigned long eidx,
- 
- 	return kvm_pmu_get_programmable_pmc_index(pmu, eidx, cbase, cmask);
- }
-+#if defined(CONFIG_32BIT)
-+static int pmu_fw_ctr_read_hi(struct kvm_vcpu *vcpu, unsigned long cidx,
-+			      unsigned long *out_val)
-+{
-+	struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
-+	struct kvm_pmc *pmc;
-+	u64 enabled, running;
-+	int fevent_code;
-+
-+	pmc = &kvpmu->pmc[cidx];
-+
-+	if (pmc->cinfo.type != SBI_PMU_CTR_TYPE_FW)
-+		return -EINVAL;
-+
-+	fevent_code = get_event_code(pmc->event_idx);
-+	pmc->counter_val = kvpmu->fw_event[fevent_code].value;
-+
-+	*out_val = pmc->counter_val >> 32;
-+
-+	return 0;
-+}
-+#endif
- 
- static int pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
- 			unsigned long *out_val)
-@@ -696,6 +718,20 @@ int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_ba
- 	return 0;
- }
- 
-+#if defined(CONFIG_32BIT)
-+int kvm_riscv_vcpu_pmu_fw_ctr_read_hi(struct kvm_vcpu *vcpu, unsigned long cidx,
-+				   struct kvm_vcpu_sbi_return *retdata)
-+{
-+	int ret;
-+
-+	ret = pmu_fw_ctr_read_hi(vcpu, cidx, &retdata->out_val);
-+	if (ret == -EINVAL)
-+		retdata->err_val = SBI_ERR_INVALID_PARAM;
-+
-+	return 0;
-+}
-+#endif
-+
- int kvm_riscv_vcpu_pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
- 				struct kvm_vcpu_sbi_return *retdata)
- {
-@@ -769,7 +805,7 @@ void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu)
- 			pmc->cinfo.csr = CSR_CYCLE + i;
- 		} else {
- 			pmc->cinfo.type = SBI_PMU_CTR_TYPE_FW;
--			pmc->cinfo.width = BITS_PER_LONG - 1;
-+			pmc->cinfo.width = 63;
- 		}
- 	}
- 
-diff --git a/arch/riscv/kvm/vcpu_sbi_pmu.c b/arch/riscv/kvm/vcpu_sbi_pmu.c
-index 77c20a61fd7d..0cd051d5a448 100644
---- a/arch/riscv/kvm/vcpu_sbi_pmu.c
-+++ b/arch/riscv/kvm/vcpu_sbi_pmu.c
-@@ -64,6 +64,13 @@ static int kvm_sbi_ext_pmu_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	case SBI_EXT_PMU_COUNTER_FW_READ:
- 		ret = kvm_riscv_vcpu_pmu_ctr_read(vcpu, cp->a0, retdata);
- 		break;
-+	case SBI_EXT_PMU_COUNTER_FW_READ_HI:
-+#if defined(CONFIG_32BIT)
-+		ret = kvm_riscv_vcpu_pmu_fw_ctr_read_hi(vcpu, cp->a0, retdata);
-+#else
-+		retdata->out_val = 0;
-+#endif
-+		break;
- 	case SBI_EXT_PMU_SNAPSHOT_SET_SHMEM:
- 		ret = kvm_riscv_vcpu_pmu_setup_snapshot(vcpu, cp->a0, cp->a1, cp->a2, retdata);
- 		break;
--- 
-2.34.1
+Regards
+Bibo Mao
+
+> On Mon, Dec 4, 2023 at 4:45 PM zhaotianrui <zhaotianrui@loongson.cn> wrote:
+>>
+>> Reviewed-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+>>
+>> 在 2023/11/16 上午10:30, Bibo Mao 写道:
+>>> With halt-polling supported, there is checking for pending events
+>>> or interrupts when vcpu executes idle instruction. Pending interrupts
+>>> include injected SW interrupts and passthrough HW interrupts, such as
+>>> HW timer interrupts, since HW timer works still even if vcpu exists
+>>> from VM mode.
+>>>
+>>> Since HW timer pending interrupt can be set directly with CSR status
+>>> register, and pending HW timer interrupt checking is used in vcpu block
+>>> checking function, it is not necessary to switch to sw timer during
+>>> halt-polling. This patch adds preemption disabling in function
+>>> kvm_cpu_has_pending_timer, and removes SW timer switching in idle
+>>> instruction emulation function.
+>>>
+>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>>> ---
+>>>    arch/loongarch/kvm/exit.c  | 13 ++-----------
+>>>    arch/loongarch/kvm/timer.c | 13 ++++++++++---
+>>>    arch/loongarch/kvm/vcpu.c  |  9 ++++++++-
+>>>    3 files changed, 20 insertions(+), 15 deletions(-)
+>>>
+>>> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
+>>> index ce8de3fa472c..e708a1786d6b 100644
+>>> --- a/arch/loongarch/kvm/exit.c
+>>> +++ b/arch/loongarch/kvm/exit.c
+>>> @@ -200,17 +200,8 @@ int kvm_emu_idle(struct kvm_vcpu *vcpu)
+>>>        ++vcpu->stat.idle_exits;
+>>>        trace_kvm_exit_idle(vcpu, KVM_TRACE_EXIT_IDLE);
+>>>
+>>> -     if (!kvm_arch_vcpu_runnable(vcpu)) {
+>>> -             /*
+>>> -              * Switch to the software timer before halt-polling/blocking as
+>>> -              * the guest's timer may be a break event for the vCPU, and the
+>>> -              * hypervisor timer runs only when the CPU is in guest mode.
+>>> -              * Switch before halt-polling so that KVM recognizes an expired
+>>> -              * timer before blocking.
+>>> -              */
+>>> -             kvm_save_timer(vcpu);
+>>> -             kvm_vcpu_block(vcpu);
+>>> -     }
+>>> +     if (!kvm_arch_vcpu_runnable(vcpu))
+>>> +             kvm_vcpu_halt(vcpu);
+>>>
+>>>        return EMULATE_DONE;
+>>>    }
+>>> diff --git a/arch/loongarch/kvm/timer.c b/arch/loongarch/kvm/timer.c
+>>> index 284bf553fefe..437e960d8fdb 100644
+>>> --- a/arch/loongarch/kvm/timer.c
+>>> +++ b/arch/loongarch/kvm/timer.c
+>>> @@ -155,11 +155,18 @@ static void _kvm_save_timer(struct kvm_vcpu *vcpu)
+>>>                 */
+>>>                hrtimer_cancel(&vcpu->arch.swtimer);
+>>>                hrtimer_start(&vcpu->arch.swtimer, expire, HRTIMER_MODE_ABS_PINNED);
+>>> -     } else
+>>> +     } else if (vcpu->stat.generic.blocking) {
+>>>                /*
+>>> -              * Inject timer interrupt so that hall polling can dectect and exit
+>>> +              * Inject timer interrupt so that hall polling can dectect and
+>>> +              * exit.
+>>> +              * VCPU is scheduled out already and sleeps in rcuwait queue and
+>>> +              * will not poll pending events again. kvm_queue_irq is not
+>>> +              * enough, hrtimer swtimer should be used here.
+>>>                 */
+>>> -             kvm_queue_irq(vcpu, INT_TI);
+>>> +             expire = ktime_add_ns(ktime_get(), 10);  // 10ns is enough here?
+>>> +             vcpu->arch.expire = expire;
+>>> +             hrtimer_start(&vcpu->arch.swtimer, expire, HRTIMER_MODE_ABS_PINNED);
+>>> +     }
+>>>    }
+>>>
+>>>    /*
+>>> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+>>> index 73d0c2b9c1a5..42663a345bd1 100644
+>>> --- a/arch/loongarch/kvm/vcpu.c
+>>> +++ b/arch/loongarch/kvm/vcpu.c
+>>> @@ -187,8 +187,15 @@ int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu,
+>>>
+>>>    int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+>>>    {
+>>> -     return kvm_pending_timer(vcpu) ||
+>>> +     int ret;
+>>> +
+>>> +     /* protect from TOD sync and vcpu_load/put */
+>>> +     preempt_disable();
+>>> +     ret = kvm_pending_timer(vcpu) ||
+>>>                kvm_read_hw_gcsr(LOONGARCH_CSR_ESTAT) & (1 << INT_TI);
+>>> +     preempt_enable();
+>>> +
+>>> +     return ret;
+>>>    }
+>>>
+>>>    int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu)
+>>
+>>
 
 
