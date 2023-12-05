@@ -1,322 +1,204 @@
-Return-Path: <kvm+bounces-3515-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3516-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57DD080515C
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 11:56:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8D65805179
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 12:03:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A4661C20BA3
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 10:56:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7579B20C07
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 11:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0246B5102C;
-	Tue,  5 Dec 2023 10:56:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d8Gt9Sf0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA1B53818;
+	Tue,  5 Dec 2023 11:03:36 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFBFF1BC2
-	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 02:56:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701773764;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xHoHZN4aRFvNFdo4bu58j5O/6N2eNq1OsRYRF67Krww=;
-	b=d8Gt9Sf02byvnxxNLTbjEcn/xNV1Y+a4OJsK5ijBFATYxZ3XsSrpzdrq+OWKo+stqwYfTi
-	1RSBSmVTnNHiYY93PAZ5bgaLSeJZscj6WVhJA53UUhb6ciZXdNQvjs01hPXnqxw2b14YLl
-	QHSobBHj3HQhxkhwyyuT5dF24azcMJI=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-351-OofR6PLpOlmIEdUiQ4Rewg-1; Tue, 05 Dec 2023 05:56:02 -0500
-X-MC-Unique: OofR6PLpOlmIEdUiQ4Rewg-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a04b426b3c0so908670466b.0
-        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 02:56:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701773761; x=1702378561;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xHoHZN4aRFvNFdo4bu58j5O/6N2eNq1OsRYRF67Krww=;
-        b=ugsn3u/xkTJVftloGY52MO6DzpvcH8V88gnzJfwOKi22sKldxJS3Zj4J1DDCEE66OS
-         eMmFXZ6jRI/QJA0q3FAXi/T/pPN/UGa9aoxKE/nxLNEjBODW/dFMdtuA7OH9OsrxYSwa
-         xebrIk1M0zDRdc6JqmL+VK4NpYunWdKEsDFrLCtVgFpXxTu54XPkl9PC5YvRWRZZegki
-         OGa/SvD5Rt1U0UOqu4heb532jjXlIB6m9mlD9Lr2hRqEncutbMLmW0UvFtbyHRSEpQzR
-         WxfP04Q67Wc3pSSI7X+9NroHwjcbHFwo8i6m2S7EXC1O23oSEKaPLUE4sPeYok7eUOYZ
-         Yp+w==
-X-Gm-Message-State: AOJu0YwIyfk+jyL3bwH2VYuE3Mk2ULBEvc8nfE9dR+LKBfJh0EhWFVFD
-	QoZUDDSaJwDfYh1AyqeFEa8FZylbrhcCDCe6CIhGXjKp5rSvxOrI5T/sM/zYVksQqxv2rANxbZ7
-	xpOMCLNnWIM3H
-X-Received: by 2002:a17:906:2558:b0:a0f:c538:4612 with SMTP id j24-20020a170906255800b00a0fc5384612mr770815ejb.28.1701773761246;
-        Tue, 05 Dec 2023 02:56:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFodYj5wYSzJpUOxz5vmAW8yxE1ykvgpNcy8FOngHr66MXZwbO9eVpr4+yZyLwfPmeuRUBXfQ==
-X-Received: by 2002:a17:906:2558:b0:a0f:c538:4612 with SMTP id j24-20020a170906255800b00a0fc5384612mr770808ejb.28.1701773760965;
-        Tue, 05 Dec 2023 02:56:00 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-125.retail.telecomitalia.it. [79.46.200.125])
-        by smtp.gmail.com with ESMTPSA id ci9-20020a170907266900b00a1be80a0b69sm1143002ejc.58.2023.12.05.02.55.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 02:56:00 -0800 (PST)
-Date: Tue, 5 Dec 2023 11:55:58 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v6 4/4] vsock/test: two tests to check credit
- update logic
-Message-ID: <tcrlrx2iegveaioryasdvsnjvnrumvq4ky6qcq2p5tb4g65joa@ckin3ipduxvv>
-References: <20231205064806.2851305-1-avkrasnov@salutedevices.com>
- <20231205064806.2851305-5-avkrasnov@salutedevices.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 886C49A
+	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 03:03:32 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E040F139F;
+	Tue,  5 Dec 2023 03:04:18 -0800 (PST)
+Received: from FVFF77S0Q05N (unknown [10.57.42.51])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6C7E03F5A1;
+	Tue,  5 Dec 2023 03:03:30 -0800 (PST)
+Date: Tue, 5 Dec 2023 11:03:16 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 0/3] arm64: Drop support for VPIPT i-cache policy
+Message-ID: <ZW8DXGQCSWO1wB2m@FVFF77S0Q05N>
+References: <20231204143606.1806432-1-maz@kernel.org>
+ <ZW3l6Bq7ortEGB8I@FVFF77S0Q05N>
+ <86h6kxbz8u.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231205064806.2851305-5-avkrasnov@salutedevices.com>
+In-Reply-To: <86h6kxbz8u.wl-maz@kernel.org>
 
-On Tue, Dec 05, 2023 at 09:48:06AM +0300, Arseniy Krasnov wrote:
->Both tests are almost same, only differs in two 'if' conditions, so
->implemented in a single function. Tests check, that credit update
->message is sent:
->
->1) During setting SO_RCVLOWAT value of the socket.
->2) When number of 'rx_bytes' become smaller than SO_RCVLOWAT value.
->
->Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->---
-> Changelog:
-> v1 -> v2:
->  * Update commit message by removing 'This patch adds XXX' manner.
->  * Update commit message by adding details about dependency for this
->    test from kernel internal define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE.
->  * Add comment for this dependency in 'vsock_test.c' where this define
->    is duplicated.
-> v2 -> v3:
->  * Replace synchronization based on control TCP socket with vsock
->    data socket - this is needed to allow sender transmit data only
->    when new buffer size of receiver is visible to sender. Otherwise
->    there is race and test fails sometimes.
-> v3 -> v4:
->  * Replace 'recv_buf()' to 'recv(MSG_DONTWAIT)' in last read operation
->    in server part. This is needed to ensure that 'poll()' wake up us
->    when number of bytes ready to read is equal to SO_RCVLOWAT value.
-> v4 -> v5:
->  * Use 'recv_buf(MSG_DONTWAIT)' instead of 'recv(MSG_DONTWAIT)'.
-> v5 -> v6:
->  * Add second test which checks, that credit update is sent during
->    reading data from socket.
->  * Update commit message.
->
-> tools/testing/vsock/vsock_test.c | 175 +++++++++++++++++++++++++++++++
-> 1 file changed, 175 insertions(+)
+On Mon, Dec 04, 2023 at 06:26:25PM +0000, Marc Zyngier wrote:
+> On Mon, 04 Dec 2023 14:44:56 +0000,
+> Mark Rutland <mark.rutland@arm.com> wrote:
+> > 
+> > On Mon, Dec 04, 2023 at 02:36:03PM +0000, Marc Zyngier wrote:
+> > > ARMv8.2 introduced support for VPIPT i-caches, the V standing for
+> > > VMID-tagged. Although this looked like a reasonable idea, no
+> > > implementation has ever made it into the wild.
+> > > 
+> > > Linux has supported this for over 6 years (amusingly, just as the
+> > > architecture was dropping support for AIVIVT i-caches), but we had no
+> > > way to even test it, and it is likely that this code was just
+> > > bit-rotting.
+> > > 
+> > > However, in a recent breakthrough (XML drop 2023-09, tagged as
+> > > d55f5af8e09052abe92a02adf820deea2eaed717), the architecture has
+> > > finally been purged of this option, making VIPT and PIPT the only two
+> > > valid options.
+> > > 
+> > > This really means this code is just dead code. Nobody will ever come
+> > > up with such an implementation, and we can just get rid of it.
+> > > 
+> > > Most of the impact is on KVM, where we drop a few large comment blocks
+> > > (and a bit of code), while the core arch code loses the detection code
+> > > itself.
+> > > 
+> > > * From v2:
+> > >   - Fix reserved naming for RESERVED_AIVIVT
+> > >   - Collected RBs from Anshuman an Zenghui
+> > > 
+> > > Marc Zyngier (3):
+> > >   KVM: arm64: Remove VPIPT I-cache handling
+> > >   arm64: Kill detection of VPIPT i-cache policy
+> > >   arm64: Rename reserved values for CTR_EL0.L1Ip
+> > 
+> > For the series:
+> > 
+> > Acked-by: Mark Rutland <mark.rutland@arm.com>
+> 
+> Thanks.
+> 
+> > Looking forward, we can/should probably replace __icache_flags with a single
+> > ICACHE_NOALIASING or ICACHE_PIPT cpucap, which'd get rid of a bunch of
+> > duplicated logic and make that more sound in the case of races around cpu
+> > onlining.
+> 
+> As long as we refuse VIPT CPUs coming up late (i.e. after we have
+> patched the kernel to set ICACHE_PIPT), it should be doable. I guess
+> we already have this restriction as userspace is able to probe the
+> I-cache policy anyway.
+> 
+> How about the patch below (tested in a guest with a bunch of hacks to
+> expose different L1Ip values)?
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+That's roughly what I was thinking; the diff looks good, minor comments below.
 
->
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index 01fa816868bc..66246d81d654 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -1232,6 +1232,171 @@ static void test_double_bind_connect_client(const struct test_opts *opts)
-> 	}
-> }
->
->+#define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
->+/* This define is the same as in 'include/linux/virtio_vsock.h':
->+ * it is used to decide when to send credit update message during
->+ * reading from rx queue of a socket. Value and its usage in
->+ * kernel is important for this test.
->+ */
->+#define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE	(1024 * 64)
->+
->+static void test_stream_rcvlowat_def_cred_upd_client(const struct test_opts *opts)
->+{
->+	size_t buf_size;
->+	void *buf;
->+	int fd;
->+
->+	fd = vsock_stream_connect(opts->peer_cid, 1234);
->+	if (fd < 0) {
->+		perror("connect");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	/* Send 1 byte more than peer's buffer size. */
->+	buf_size = RCVLOWAT_CREDIT_UPD_BUF_SIZE + 1;
->+
->+	buf = malloc(buf_size);
->+	if (!buf) {
->+		perror("malloc");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	/* Wait until peer sets needed buffer size. */
->+	recv_byte(fd, 1, 0);
->+
->+	if (send(fd, buf, buf_size, 0) != buf_size) {
->+		perror("send failed");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	free(buf);
->+	close(fd);
->+}
->+
->+static void test_stream_credit_update_test(const struct test_opts *opts,
->+					   bool low_rx_bytes_test)
->+{
->+	size_t recv_buf_size;
->+	struct pollfd fds;
->+	size_t buf_size;
->+	void *buf;
->+	int fd;
->+
->+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
->+	if (fd < 0) {
->+		perror("accept");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	buf_size = RCVLOWAT_CREDIT_UPD_BUF_SIZE;
->+
->+	if (setsockopt(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
->+		       &buf_size, sizeof(buf_size))) {
->+		perror("setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	if (low_rx_bytes_test) {
->+		/* Set new SO_RCVLOWAT here. This enables sending credit
->+		 * update when number of bytes if our rx queue become <
->+		 * SO_RCVLOWAT value.
->+		 */
->+		recv_buf_size = 1 + VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
->+
->+		if (setsockopt(fd, SOL_SOCKET, SO_RCVLOWAT,
->+			       &recv_buf_size, sizeof(recv_buf_size))) {
->+			perror("setsockopt(SO_RCVLOWAT)");
->+			exit(EXIT_FAILURE);
->+		}
->+	}
->+
->+	/* Send one dummy byte here, because 'setsockopt()' above also
->+	 * sends special packet which tells sender to update our buffer
->+	 * size. This 'send_byte()' will serialize such packet with data
->+	 * reads in a loop below. Sender starts transmission only when
->+	 * it receives this single byte.
->+	 */
->+	send_byte(fd, 1, 0);
->+
->+	buf = malloc(buf_size);
->+	if (!buf) {
->+		perror("malloc");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	/* Wait until there will be 128KB of data in rx queue. */
->+	while (1) {
->+		ssize_t res;
->+
->+		res = recv(fd, buf, buf_size, MSG_PEEK);
->+		if (res == buf_size)
->+			break;
->+
->+		if (res <= 0) {
->+			fprintf(stderr, "unexpected 'recv()' return: %zi\n", res);
->+			exit(EXIT_FAILURE);
->+		}
->+	}
->+
->+	/* There is 128KB of data in the socket's rx queue, dequeue first
->+	 * 64KB, credit update is sent if 'low_rx_bytes_test' == true.
->+	 * Otherwise, credit update is sent in 'if (!low_rx_bytes_test)'.
->+	 */
->+	recv_buf_size = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
->+	recv_buf(fd, buf, recv_buf_size, 0, recv_buf_size);
->+
->+	if (!low_rx_bytes_test) {
->+		recv_buf_size++;
->+
->+		/* Updating SO_RCVLOWAT will send credit update. */
->+		if (setsockopt(fd, SOL_SOCKET, SO_RCVLOWAT,
->+			       &recv_buf_size, sizeof(recv_buf_size))) {
->+			perror("setsockopt(SO_RCVLOWAT)");
->+			exit(EXIT_FAILURE);
->+		}
->+	}
->+
->+	fds.fd = fd;
->+	fds.events = POLLIN | POLLRDNORM | POLLERR |
->+		     POLLRDHUP | POLLHUP;
->+
->+	/* This 'poll()' will return once we receive last byte
->+	 * sent by client.
->+	 */
->+	if (poll(&fds, 1, -1) < 0) {
->+		perror("poll");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	if (fds.revents & POLLERR) {
->+		fprintf(stderr, "'poll()' error\n");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	if (fds.revents & (POLLIN | POLLRDNORM)) {
->+		recv_buf(fd, buf, recv_buf_size, MSG_DONTWAIT, recv_buf_size);
->+	} else {
->+		/* These flags must be set, as there is at
->+		 * least 64KB of data ready to read.
->+		 */
->+		fprintf(stderr, "POLLIN | POLLRDNORM expected\n");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	free(buf);
->+	close(fd);
->+}
->+
->+static void test_stream_cred_upd_on_low_rx_bytes(const struct test_opts *opts)
->+{
->+	test_stream_credit_update_test(opts, true);
->+}
->+
->+static void test_stream_cred_upd_on_set_rcvlowat(const struct test_opts *opts)
->+{
->+	test_stream_credit_update_test(opts, false);
->+}
->+
-> static struct test_case test_cases[] = {
-> 	{
-> 		.name = "SOCK_STREAM connection reset",
->@@ -1342,6 +1507,16 @@ static struct test_case test_cases[] = {
-> 		.run_client = test_double_bind_connect_client,
-> 		.run_server = test_double_bind_connect_server,
-> 	},
->+	{
->+		.name = "SOCK_STREAM virtio credit update + SO_RCVLOWAT",
->+		.run_client = test_stream_rcvlowat_def_cred_upd_client,
->+		.run_server = test_stream_cred_upd_on_set_rcvlowat,
->+	},
->+	{
->+		.name = "SOCK_STREAM virtio credit update + low rx_bytes",
->+		.run_client = test_stream_rcvlowat_def_cred_upd_client,
->+		.run_server = test_stream_cred_upd_on_low_rx_bytes,
->+	},
-> 	{},
-> };
->
->-- 
->2.25.1
->
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> From 8f88afb0b317213dcbf18ea460a508bfccc18568 Mon Sep 17 00:00:00 2001
+> From: Marc Zyngier <maz@kernel.org>
+> Date: Mon, 4 Dec 2023 18:09:40 +0000
+> Subject: [PATCH] arm64: Make icache detection a cpu capability
+> 
+> Now that we only have two icache policies, we are in a good position
+> to make the whole detection business more robust.
+> 
+> Let's replace __icache_flags by a single capability (ICACHE_PIPT),
+> and use this if all CPUs are indeed PIPT. It means we can rely on
+> existing logic to mandate that a VIPT CPU coming up late will be
+> denied booting, which is the safe thing to do.
+> 
+> This also leads to some nice cleanups in pKVM, and KVM as a whole
+> can use ARM64_ICACHE_PIPT as a final cap.
+> 
+> Suggested-by: Mark Rutland <mark.rutland@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/cache.h   |  9 ++-------
+>  arch/arm64/include/asm/kvm_hyp.h |  1 -
+>  arch/arm64/include/asm/kvm_mmu.h |  2 +-
+>  arch/arm64/kernel/cpufeature.c   |  7 +++++++
+>  arch/arm64/kernel/cpuinfo.c      | 34 --------------------------------
+>  arch/arm64/kvm/arm.c             |  1 -
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c   |  3 ---
+>  arch/arm64/tools/cpucaps         |  1 +
+>  arch/arm64/tools/sysreg          |  2 +-
+>  9 files changed, 12 insertions(+), 48 deletions(-)
 
+Nice diffstat!
+
+[...]
+
+>  /*
+>   * Whilst the D-side always behaves as PIPT on AArch64, aliasing is
+>   * permitted in the I-cache.
+>   */
+>  static inline int icache_is_aliasing(void)
+>  {
+> -	return test_bit(ICACHEF_ALIASING, &__icache_flags);
+> +	return !cpus_have_cap(ARM64_ICACHE_PIPT);
+>  }
+
+It might be nicer to use alternative_has_cap_{likely,unlikely}(...) for
+consistency with other cap checks, though that won't matter for hyp code and I
+don't think the likely/unlikely part particularly matters either.
+
+[...]
+
+> -static void cpuinfo_detect_icache_policy(struct cpuinfo_arm64 *info)
+> -{
+> -	unsigned int cpu = smp_processor_id();
+> -	u32 l1ip = CTR_L1IP(info->reg_ctr);
+> -
+> -	switch (l1ip) {
+> -	case CTR_EL0_L1Ip_PIPT:
+> -		break;
+> -	case CTR_EL0_L1Ip_VIPT:
+> -	default:
+> -		/* Assume aliasing */
+> -		set_bit(ICACHEF_ALIASING, &__icache_flags);
+> -		break;
+> -	}
+> -
+> -	pr_info("Detected %s I-cache on CPU%d\n", icache_policy_str(l1ip), cpu);
+> -}
+
+Not printing this for each CPU is a nice bonus!
+
+[...]
+
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index c5af75b23187..db8c96841138 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -2003,7 +2003,7 @@ Field	28	IDC
+>  Field	27:24	CWG
+>  Field	23:20	ERG
+>  Field	19:16	DminLine
+> -Enum	15:14	L1Ip
+> +UnsignedEnum	15:14	L1Ip
+>  	# This was named as VPIPT in the ARM but now documented as reserved
+>  	0b00	RESERVED_VPIPT
+>  	# This is named as AIVIVT in the ARM but documented as reserved
+
+I was initially surprised by the use of UnsignedEnum, but given PIPT is 0b11, I
+can see that works. Otherwise, we can keep this as an enum and use a helper
+that checks for an exact match.
+
+Mark.
 
