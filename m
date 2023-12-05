@@ -1,73 +1,74 @@
-Return-Path: <kvm+bounces-3584-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3585-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 121CD8057E9
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 15:53:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E7E58057EA
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 15:53:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 346BD1C210FD
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 14:53:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71EB61C21169
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 14:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B70E67E60;
-	Tue,  5 Dec 2023 14:53:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB36F67E6E;
+	Tue,  5 Dec 2023 14:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aRO1zKEe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NHlGF83F"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96F1FCA
-	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 06:52:59 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B85A3AF
+	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 06:53:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701787978;
+	s=mimecast20190719; t=1701787987;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OMPk1P3iEwc4XgYkI0yJOhmvSCnGfV07fCsdg5Z+rRo=;
-	b=aRO1zKEe0DuLSPFyuJKtGv+vfXdK18LQJ72VAv7b9u430nEi5ItoeiEVdIRnRDoYfZ2UaG
-	7SdmTCIjc4tm/vDTw4C/EnQazXGR3ieScufHMInHHS6lw5TUcvl/pK5W/+yONlziR9KlPX
-	W2nXlHEStGGmiXwdulSv41fWWvhcpFI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=+Stv6xnVqgUnbeQvM6L3/ektSRJoDJKwwvfbqQlMhps=;
+	b=NHlGF83F9UW8c/Ppx4v8Dd8HZrrXa+Ck1CheU6eeN8CqsZvoxWjbSWhjzvcoYXZsg7BmD3
+	QwsJaCsb3ftzCA76PApsyb00yDf/mZroi5CQqNkgyH5cYt7Ue+LbfWFuuBqnVNF6q9HmJ/
+	d1TQjeonQ31Yypmg06Mu2mmveiCpQn4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-358-5Dz4jDsINKqFwVCeaJGZWw-1; Tue, 05 Dec 2023 09:52:56 -0500
-X-MC-Unique: 5Dz4jDsINKqFwVCeaJGZWw-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40b3d4d6417so41207335e9.0
-        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 06:52:56 -0800 (PST)
+ us-mta-10-x-qeWD8rMnyqZ03algzZqw-1; Tue, 05 Dec 2023 09:53:05 -0500
+X-MC-Unique: x-qeWD8rMnyqZ03algzZqw-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40b4e24adc7so40744345e9.0
+        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 06:53:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701787975; x=1702392775;
+        d=1e100.net; s=20230601; t=1701787984; x=1702392784;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=OMPk1P3iEwc4XgYkI0yJOhmvSCnGfV07fCsdg5Z+rRo=;
-        b=u4dAD/ij3ShDfSmIgS/yg022KVTRtWt8v1SXj22iNB2n9QQnoH67tRuNwo1gb7/44l
-         cwjmseeJuiQdzTB0QOtUE83oHKPcYfLFx93SHvGsmjLSMdRvSYEA0YZMUOMVuEA0nPS+
-         EBHtJVFNjuYAAybIwv3B3MZYOv27XVIEDepSjuLKSZuHioP3Ls97wjmA0zxCFS7nOPoO
-         EZuuZvIzfpHRqQEIqRqjy0DrPAyrisi7u0Zyh27jpTw/asZbUwQeXZuvUIBKeHKuCHqC
-         nELpB+2XlNHI7gJ6WBqqyN8uutoiCOuqGM8k6e636+ONmXYLHCFH8+/yulwQ9UACuOcY
-         N54A==
-X-Gm-Message-State: AOJu0YwKHYV9XM9VRpunBz6VmXGpYT50+tHgOyhw/yxn+xhv/B92Ite8
-	LPfugYyvU+6Lde466IjMglCtROEcAPP1QV7+1co4LdaFyjQqjWexffPutT671E06Cp9dNeYnBD7
-	Q7hwvPjMUErcOOXCB4XNj
-X-Received: by 2002:a05:600c:4755:b0:40b:5f03:b3cc with SMTP id w21-20020a05600c475500b0040b5f03b3ccmr1746097wmo.238.1701787975130;
-        Tue, 05 Dec 2023 06:52:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF/o2m9YOLIt/GwuN51Qje+wVOtXCCDhCi6I/za9pq6D38y0U43O4PNDrmxwbRUO7FngAq/7g==
-X-Received: by 2002:a05:600c:4755:b0:40b:5f03:b3cc with SMTP id w21-20020a05600c475500b0040b5f03b3ccmr1746091wmo.238.1701787974629;
-        Tue, 05 Dec 2023 06:52:54 -0800 (PST)
+        bh=+Stv6xnVqgUnbeQvM6L3/ektSRJoDJKwwvfbqQlMhps=;
+        b=WiZvB2lAjsTsgDqHOlEQ4goLGp4rUp0P8kuE3aaLEZEFroEtp/T0mCZkg+ob1eD75M
+         HMRSfXYWubgbF8pzZvdgxr2mG1d+MLSgpWSYiSb0fIF0y+PLJdwmebTdaT7i9IbK0Ge+
+         JuVyFSJsaS/PR6NeahF6Wq+Ac/iti18FHRDTS7kNnE+dJnvqS9AljD5JpI82SxSV5XnZ
+         R2BGOfsPpt0RZdoeOs8hPNccQ0t8XxcS0Lke+ZDhTG3CYGUrRbhqFXQXp+5QNCx+kcb6
+         wuRDuDiJxaK1Zw5JJSBYMRloZipEckDPdSV8RdeKStkZz01CtYkd7zcTkSBMKOdSQGjv
+         mlvA==
+X-Gm-Message-State: AOJu0Yz+T9S+47159yq8YhDmaSSYXyorEH7BF8kE41mIhAmkVwUI1pvs
+	+dmfp1QCLfmydCFQENYR74UDngMGf8vPWUpovpJfc22ICorROVs3c3r2KhE6Exn1cTv78INbaTF
+	eUoTMqZp5/vHe
+X-Received: by 2002:a05:600c:4504:b0:409:79df:7f9c with SMTP id t4-20020a05600c450400b0040979df7f9cmr3625929wmo.36.1701787984204;
+        Tue, 05 Dec 2023 06:53:04 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHBVMQ0oo9grbLrmRDndEJpIvgMOApDaklkJcd54Lvp4zGzXWaJEztSWLXwTxze870DQCXoAw==
+X-Received: by 2002:a05:600c:4504:b0:409:79df:7f9c with SMTP id t4-20020a05600c450400b0040979df7f9cmr3625918wmo.36.1701787983802;
+        Tue, 05 Dec 2023 06:53:03 -0800 (PST)
 Received: from starship ([89.237.98.20])
-        by smtp.gmail.com with ESMTPSA id o14-20020a056000010e00b00333359b522dsm10310983wrx.77.2023.12.05.06.52.53
+        by smtp.gmail.com with ESMTPSA id g14-20020a05600c310e00b0040b481222e3sm22780211wmo.41.2023.12.05.06.53.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 06:52:54 -0800 (PST)
-Message-ID: <d5e7dfd0c48a2cfff1f333629a985b74a137be64.camel@redhat.com>
-Subject: Re: [PATCH v2 12/16] KVM: x86: Make Hyper-V emulation optional
+        Tue, 05 Dec 2023 06:53:03 -0800 (PST)
+Message-ID: <aea89ad426793a72866a652e3de8f2e9562ca45f.camel@redhat.com>
+Subject: Re: [PATCH v2 13/16] KVM: nVMX: hyper-v: Introduce
+ nested_vmx_is_evmptr12_{valid,set}() helpers
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, Paolo
  Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Date: Tue, 05 Dec 2023 16:52:52 +0200
-In-Reply-To: <20231205103630.1391318-13-vkuznets@redhat.com>
+Date: Tue, 05 Dec 2023 16:53:02 +0200
+In-Reply-To: <20231205103630.1391318-14-vkuznets@redhat.com>
 References: <20231205103630.1391318-1-vkuznets@redhat.com>
-	 <20231205103630.1391318-13-vkuznets@redhat.com>
+	 <20231205103630.1391318-14-vkuznets@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -79,823 +80,261 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
 On Tue, 2023-12-05 at 11:36 +0100, Vitaly Kuznetsov wrote:
-> Hyper-V emulation in KVM is a fairly big chunk and in some cases it may be
-> desirable to not compile it in to reduce module sizes as well as the attack
-> surface. Introduce CONFIG_KVM_HYPERV option to make it possible.
+> In order to get rid of raw 'vmx->nested.hv_evmcs_vmptr' accesses when
+> !CONFIG_KVM_HYPERV, introduce a pair of helpers:
 > 
-> Note, there's room for further nVMX/nSVM code optimizations when
-> !CONFIG_KVM_HYPERV, this will be done in follow-up patches.
+> nested_vmx_is_evmptr12_valid() to check that eVMPTR points to a valid
+> address.
 > 
-> Reorganize Makefile a bit so all CONFIG_HYPERV and CONFIG_KVM_HYPERV files
-> are grouped together.
+> nested_vmx_is_evmptr12_valid() to check that eVMPTR either points to a
+> valid address or is in 'pending' port-migration state (meaning it is
+> supposed to be valid but the exact address wasn't acquired from guest's
+> memory yet).
+> 
+> No functional change intended.
 > 
 > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 > ---
->  arch/x86/include/asm/kvm_host.h |  6 ++++
->  arch/x86/kvm/Kconfig            | 14 ++++++++
->  arch/x86/kvm/Makefile           | 20 +++++------
->  arch/x86/kvm/cpuid.c            |  6 ++++
->  arch/x86/kvm/hyperv.h           | 61 +++++++++++++++++++++++++++++++-
->  arch/x86/kvm/irq_comm.c         |  9 ++++-
->  arch/x86/kvm/svm/hyperv.h       |  9 +++++
->  arch/x86/kvm/vmx/hyperv.h       | 17 ++++++---
->  arch/x86/kvm/vmx/nested.c       | 30 ++++++++++++++++
->  arch/x86/kvm/vmx/vmx.c          |  2 ++
->  arch/x86/kvm/x86.c              | 62 ++++++++++++++++++++++++---------
->  11 files changed, 201 insertions(+), 35 deletions(-)
+>  arch/x86/kvm/vmx/hyperv.h | 30 ++++++++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/nested.c | 38 +++++++++++++++++++-------------------
+>  arch/x86/kvm/vmx/nested.h |  2 +-
+>  3 files changed, 50 insertions(+), 20 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 9dab2f7de495..3b8c63767554 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -937,8 +937,10 @@ struct kvm_vcpu_arch {
->  	/* used for guest single stepping over the given code position */
->  	unsigned long singlestep_rip;
->  
-> +#ifdef CONFIG_KVM_HYPERV
->  	bool hyperv_enabled;
->  	struct kvm_vcpu_hv *hyperv;
-> +#endif
->  #ifdef CONFIG_KVM_XEN
->  	struct kvm_vcpu_xen xen;
->  #endif
-> @@ -1095,6 +1097,7 @@ enum hv_tsc_page_status {
->  	HV_TSC_PAGE_BROKEN,
->  };
->  
-> +#ifdef CONFIG_KVM_HYPERV
->  /* Hyper-V emulation context */
->  struct kvm_hv {
->  	struct mutex hv_lock;
-> @@ -1127,6 +1130,7 @@ struct kvm_hv {
->  
->  	struct kvm_hv_syndbg hv_syndbg;
->  };
-> +#endif
->  
->  struct msr_bitmap_range {
->  	u32 flags;
-> @@ -1349,7 +1353,9 @@ struct kvm_arch {
->  	/* reads protected by irq_srcu, writes by irq_lock */
->  	struct hlist_head mask_notifier_list;
->  
-> +#ifdef CONFIG_KVM_HYPERV
->  	struct kvm_hv hyperv;
-> +#endif
->  
->  #ifdef CONFIG_KVM_XEN
->  	struct kvm_xen xen;
-> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index c1716e83d176..34f2f47cadf2 100644
-> --- a/arch/x86/kvm/Kconfig
-> +++ b/arch/x86/kvm/Kconfig
-> @@ -141,6 +141,20 @@ config KVM_SMM
->  
->  	  If unsure, say Y.
->  
-> +config KVM_HYPERV
-> +	bool "Support for Microsoft Hyper-V emulation"
-> +	depends on KVM
-> +	default y
-> +	help
-> +	  Provides KVM support for emulating Microsoft Hyper-V.  This allows KVM
-> +	  to expose a subset of the paravirtualized interfaces defined in the
-> +	  Hyper-V Hypervisor Top-Level Functional Specification (TLFS):
-> +	  https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/reference/tlfs
-> +	  These interfaces are required for the correct and performant functioning
-> +	  of Windows and Hyper-V guests on KVM.
-> +
-> +	  If unsure, say "Y".
-> +
->  config KVM_XEN
->  	bool "Support for Xen hypercall interface"
->  	depends on KVM
-> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-> index 8ea872401cd6..475b5fa917a6 100644
-> --- a/arch/x86/kvm/Makefile
-> +++ b/arch/x86/kvm/Makefile
-> @@ -11,29 +11,27 @@ include $(srctree)/virt/kvm/Makefile.kvm
->  
->  kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
->  			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
-> -			   hyperv.o debugfs.o mmu/mmu.o mmu/page_track.o \
-> +			   debugfs.o mmu/mmu.o mmu/page_track.o \
->  			   mmu/spte.o
->  
-> -ifdef CONFIG_HYPERV
-> -kvm-y			+= kvm_onhyperv.o
-> -endif
-> -
->  kvm-$(CONFIG_X86_64) += mmu/tdp_iter.o mmu/tdp_mmu.o
-> +kvm-$(CONFIG_KVM_HYPERV) += hyperv.o
->  kvm-$(CONFIG_KVM_XEN)	+= xen.o
->  kvm-$(CONFIG_KVM_SMM)	+= smm.o
->  
->  kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
-> -			   vmx/hyperv.o vmx/hyperv_evmcs.o vmx/nested.o vmx/posted_intr.o
-> -kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
-> +			   vmx/nested.o vmx/posted_intr.o
->  
-> -ifdef CONFIG_HYPERV
-> -kvm-intel-y		+= vmx/vmx_onhyperv.o
-> -endif
-> +kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
-> +kvm-intel-$(CONFIG_KVM_HYPERV)	+= vmx/hyperv.o vmx/hyperv_evmcs.o
->  
->  kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
-> -			   svm/sev.o svm/hyperv.o
-> +			   svm/sev.o
-> +kvm-amd-$(CONFIG_KVM_HYPERV) += svm/hyperv.o
->  
->  ifdef CONFIG_HYPERV
-> +kvm-y			+= kvm_onhyperv.o
-> +kvm-intel-y		+= vmx/vmx_onhyperv.o vmx/hyperv_evmcs.o
->  kvm-amd-y		+= svm/svm_onhyperv.o
->  endif
->  
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index dda6fc4cfae8..1b278a3f0689 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -314,11 +314,15 @@ EXPORT_SYMBOL_GPL(kvm_update_cpuid_runtime);
->  
->  static bool kvm_cpuid_has_hyperv(struct kvm_cpuid_entry2 *entries, int nent)
->  {
-> +#ifdef CONFIG_KVM_HYPERV
->  	struct kvm_cpuid_entry2 *entry;
->  
->  	entry = cpuid_entry2_find(entries, nent, HYPERV_CPUID_INTERFACE,
->  				  KVM_CPUID_INDEX_NOT_SIGNIFICANT);
->  	return entry && entry->eax == HYPERV_CPUID_SIGNATURE_EAX;
-> +#else
-> +	return false;
-> +#endif
->  }
->  
->  static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> @@ -433,11 +437,13 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
->  		return 0;
->  	}
->  
-> +#ifdef CONFIG_KVM_HYPERV
->  	if (kvm_cpuid_has_hyperv(e2, nent)) {
->  		r = kvm_hv_vcpu_init(vcpu);
->  		if (r)
->  			return r;
->  	}
-> +#endif
->  
->  	r = kvm_check_cpuid(vcpu, e2, nent);
->  	if (r)
-> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
-> index 75dcbe598fbc..53eb3bf56bdf 100644
-> --- a/arch/x86/kvm/hyperv.h
-> +++ b/arch/x86/kvm/hyperv.h
-> @@ -24,6 +24,8 @@
->  #include <linux/kvm_host.h>
->  #include "x86.h"
->  
-> +#ifdef CONFIG_KVM_HYPERV
-> +
->  /* "Hv#1" signature */
->  #define HYPERV_CPUID_SIGNATURE_EAX 0x31237648
->  
-> @@ -259,5 +261,62 @@ static inline void kvm_hv_nested_transtion_tlb_flush(struct kvm_vcpu *vcpu, bool
->  }
->  
->  int kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu);
-> +#else /* CONFIG_KVM_HYPERV */
-> +static inline void kvm_hv_setup_tsc_page(struct kvm *kvm,
-> +					 struct pvclock_vcpu_time_info *hv_clock) {}
-> +static inline void kvm_hv_request_tsc_page_update(struct kvm *kvm) {}
-> +static inline void kvm_hv_init_vm(struct kvm *kvm) {}
-> +static inline void kvm_hv_destroy_vm(struct kvm *kvm) {}
-> +static inline int kvm_hv_vcpu_init(struct kvm_vcpu *vcpu)
-> +{
-> +	return 0;
-> +}
-> +static inline void kvm_hv_vcpu_uninit(struct kvm_vcpu *vcpu) {}
-> +static inline bool kvm_hv_hypercall_enabled(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +static inline int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
-> +{
-> +	return HV_STATUS_ACCESS_DENIED;
-> +}
-> +static inline void kvm_hv_vcpu_purge_flush_tlb(struct kvm_vcpu *vcpu) {}
-> +static inline void kvm_hv_free_pa_page(struct kvm *kvm) {}
-> +static inline bool kvm_hv_synic_has_vector(struct kvm_vcpu *vcpu, int vector)
-> +{
-> +	return false;
-> +}
-> +static inline bool kvm_hv_synic_auto_eoi_set(struct kvm_vcpu *vcpu, int vector)
-> +{
-> +	return false;
-> +}
-> +static inline void kvm_hv_synic_send_eoi(struct kvm_vcpu *vcpu, int vector) {}
-> +static inline bool kvm_hv_invtsc_suppressed(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +static inline void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu, bool hyperv_enabled) {}
-> +static inline bool kvm_hv_has_stimer_pending(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +static inline bool kvm_hv_is_tlb_flush_hcall(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +static inline bool guest_hv_cpuid_has_l2_tlb_flush(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +static inline int kvm_hv_verify_vp_assist(struct kvm_vcpu *vcpu)
-> +{
-> +	return 0;
-> +}
-> +static inline u32 kvm_hv_get_vpindex(struct kvm_vcpu *vcpu)
-> +{
-> +	return vcpu->vcpu_idx;
-> +}
-> +static inline void kvm_hv_nested_transtion_tlb_flush(struct kvm_vcpu *vcpu, bool tdp_enabled) {}
-> +#endif /* CONFIG_KVM_HYPERV */
->  
-> -#endif
-> +#endif /* __ARCH_X86_KVM_HYPERV_H__ */
-> diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-> index 16d076a1b91a..68f3f6c26046 100644
-> --- a/arch/x86/kvm/irq_comm.c
-> +++ b/arch/x86/kvm/irq_comm.c
-> @@ -144,7 +144,7 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
->  	return kvm_irq_delivery_to_apic(kvm, NULL, &irq, NULL);
->  }
->  
-> -
-> +#ifdef CONFIG_KVM_HYPERV
->  static int kvm_hv_set_sint(struct kvm_kernel_irq_routing_entry *e,
->  		    struct kvm *kvm, int irq_source_id, int level,
->  		    bool line_status)
-> @@ -154,6 +154,7 @@ static int kvm_hv_set_sint(struct kvm_kernel_irq_routing_entry *e,
->  
->  	return kvm_hv_synic_set_irq(kvm, e->hv_sint.vcpu, e->hv_sint.sint);
->  }
-> +#endif
->  
->  int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
->  			      struct kvm *kvm, int irq_source_id, int level,
-> @@ -163,9 +164,11 @@ int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
->  	int r;
->  
->  	switch (e->type) {
-> +#ifdef CONFIG_KVM_HYPERV
->  	case KVM_IRQ_ROUTING_HV_SINT:
->  		return kvm_hv_set_sint(e, kvm, irq_source_id, level,
->  				       line_status);
-> +#endif
->  
->  	case KVM_IRQ_ROUTING_MSI:
->  		if (kvm_msi_route_invalid(kvm, e))
-> @@ -314,11 +317,13 @@ int kvm_set_routing_entry(struct kvm *kvm,
->  		if (kvm_msi_route_invalid(kvm, e))
->  			return -EINVAL;
->  		break;
-> +#ifdef CONFIG_KVM_HYPERV
->  	case KVM_IRQ_ROUTING_HV_SINT:
->  		e->set = kvm_hv_set_sint;
->  		e->hv_sint.vcpu = ue->u.hv_sint.vcpu;
->  		e->hv_sint.sint = ue->u.hv_sint.sint;
->  		break;
-> +#endif
->  #ifdef CONFIG_KVM_XEN
->  	case KVM_IRQ_ROUTING_XEN_EVTCHN:
->  		return kvm_xen_setup_evtchn(kvm, e, ue);
-> @@ -438,5 +443,7 @@ void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
->  
->  void kvm_arch_irq_routing_update(struct kvm *kvm)
->  {
-> +#ifdef CONFIG_KVM_HYPERV
->  	kvm_hv_irq_routing_update(kvm);
-> +#endif
->  }
-> diff --git a/arch/x86/kvm/svm/hyperv.h b/arch/x86/kvm/svm/hyperv.h
-> index 02f4784b5d44..d3f8bfc05832 100644
-> --- a/arch/x86/kvm/svm/hyperv.h
-> +++ b/arch/x86/kvm/svm/hyperv.h
-> @@ -11,6 +11,7 @@
->  #include "../hyperv.h"
->  #include "svm.h"
->  
-> +#ifdef CONFIG_KVM_HYPERV
->  static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
-> @@ -41,5 +42,13 @@ static inline bool nested_svm_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu)
->  }
->  
->  void svm_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu);
-> +#else /* CONFIG_KVM_HYPERV */
-> +static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu) {}
-> +static inline bool nested_svm_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +static inline void svm_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu) {}
-> +#endif /* CONFIG_KVM_HYPERV */
->  
->  #endif /* __ARCH_X86_KVM_SVM_HYPERV_H__ */
 > diff --git a/arch/x86/kvm/vmx/hyperv.h b/arch/x86/kvm/vmx/hyperv.h
-> index 6e1ee951e360..0e90ef4efe34 100644
+> index 0e90ef4efe34..71e90a16f183 100644
 > --- a/arch/x86/kvm/vmx/hyperv.h
 > +++ b/arch/x86/kvm/vmx/hyperv.h
-> @@ -9,11 +9,6 @@
->  #define EVMPTR_INVALID (-1ULL)
->  #define EVMPTR_MAP_PENDING (-2ULL)
+> @@ -22,6 +22,21 @@ static inline bool evmptr_is_valid(u64 evmptr)
+>  	return evmptr != EVMPTR_INVALID && evmptr != EVMPTR_MAP_PENDING;
+>  }
 >  
-> -static inline bool evmptr_is_valid(u64 evmptr)
-> -{
-> -	return evmptr != EVMPTR_INVALID && evmptr != EVMPTR_MAP_PENDING;
-> -}
-> -
->  enum nested_evmptrld_status {
->  	EVMPTRLD_DISABLED,
->  	EVMPTRLD_SUCCEEDED,
-> @@ -21,6 +16,12 @@ enum nested_evmptrld_status {
->  	EVMPTRLD_ERROR,
->  };
->  
-> +#ifdef CONFIG_KVM_HYPERV
-> +static inline bool evmptr_is_valid(u64 evmptr)
+> +static inline bool nested_vmx_is_evmptr12_valid(struct vcpu_vmx *vmx)
 > +{
-> +	return evmptr != EVMPTR_INVALID && evmptr != EVMPTR_MAP_PENDING;
+> +	return evmptr_is_valid(vmx->nested.hv_evmcs_vmptr);
 > +}
+> +
+> +static inline bool evmptr_is_set(u64 evmptr)
+> +{
+> +	return evmptr != EVMPTR_INVALID;
+> +}
+> +
+> +static inline bool nested_vmx_is_evmptr12_set(struct vcpu_vmx *vmx)
+> +{
+> +	return evmptr_is_set(vmx->nested.hv_evmcs_vmptr);
+> +}
+
+
+Looks very good.
+
 > +
 >  static inline bool guest_cpuid_has_evmcs(struct kvm_vcpu *vcpu)
 >  {
 >  	/*
-> @@ -39,5 +40,11 @@ void nested_evmcs_filter_control_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 *
->  int nested_evmcs_check_controls(struct vmcs12 *vmcs12);
->  bool nested_evmcs_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu);
->  void vmx_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu);
-> +#else
-> +static inline bool evmptr_is_valid(u64 evmptr)
+> @@ -45,6 +60,21 @@ static inline bool evmptr_is_valid(u64 evmptr)
+>  {
+>  	return false;
+>  }
+> +
+> +static inline bool nested_vmx_is_evmptr12_valid(struct vcpu_vmx *vmx)
 > +{
 > +	return false;
 > +}
-> +#endif
+> +
+> +static inline bool evmptr_is_set(u64 evmptr)
+> +{
+> +	return false;
+> +}
+> +
+> +static inline bool nested_vmx_is_evmptr12_set(struct vcpu_vmx *vmx)
+> +{
+> +	return false;
+> +}
+>  #endif
 >  
 >  #endif /* __KVM_X86_VMX_HYPERV_H */
 > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 903b6f9ea2bd..01a94d290c12 100644
+> index 01a94d290c12..0507174750e0 100644
 > --- a/arch/x86/kvm/vmx/nested.c
 > +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -226,6 +226,7 @@ static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
+> @@ -179,7 +179,7 @@ static int nested_vmx_failValid(struct kvm_vcpu *vcpu,
+>  	 * VM_INSTRUCTION_ERROR is not shadowed. Enlightened VMCS 'shadows' all
+>  	 * fields and thus must be synced.
+>  	 */
+> -	if (to_vmx(vcpu)->nested.hv_evmcs_vmptr != EVMPTR_INVALID)
+> +	if (nested_vmx_is_evmptr12_set(to_vmx(vcpu)))
+>  		to_vmx(vcpu)->nested.need_vmcs12_to_shadow_sync = true;
 >  
->  static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
->  {
-> +#ifdef CONFIG_KVM_HYPERV
+>  	return kvm_skip_emulated_instruction(vcpu);
+> @@ -194,7 +194,7 @@ static int nested_vmx_fail(struct kvm_vcpu *vcpu, u32 vm_instruction_error)
+>  	 * can't be done if there isn't a current VMCS.
+>  	 */
+>  	if (vmx->nested.current_vmptr == INVALID_GPA &&
+> -	    !evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
+> +	    !nested_vmx_is_evmptr12_valid(vmx))
+>  		return nested_vmx_failInvalid(vcpu);
+>  
+>  	return nested_vmx_failValid(vcpu, vm_instruction_error);
+> @@ -230,7 +230,7 @@ static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
 >  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
 >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
 >  
-> @@ -241,10 +242,12 @@ static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
->  		hv_vcpu->nested.vm_id = 0;
->  		hv_vcpu->nested.vp_id = 0;
+> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
+> +	if (nested_vmx_is_evmptr12_valid(vmx)) {
+>  		kvm_vcpu_unmap(vcpu, &vmx->nested.hv_evmcs_map, true);
+>  		vmx->nested.hv_evmcs = NULL;
 >  	}
-> +#endif
->  }
->  
->  static bool nested_evmcs_handle_vmclear(struct kvm_vcpu *vcpu, gpa_t vmptr)
+> @@ -2123,7 +2123,7 @@ void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu)
 >  {
-> +#ifdef CONFIG_KVM_HYPERV
 >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>  
+> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
+> +	if (nested_vmx_is_evmptr12_valid(vmx))
+>  		copy_vmcs12_to_enlightened(vmx);
+>  	else
+>  		copy_vmcs12_to_shadow(vmx);
+> @@ -2277,7 +2277,7 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct loaded_vmcs *vmcs0
+>  	u32 exec_control;
+>  	u64 guest_efer = nested_vmx_calc_efer(vmx, vmcs12);
+>  
+> -	if (vmx->nested.dirty_vmcs12 || evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
+> +	if (vmx->nested.dirty_vmcs12 || nested_vmx_is_evmptr12_valid(vmx))
+>  		prepare_vmcs02_early_rare(vmx, vmcs12);
+>  
 >  	/*
->  	 * When Enlightened VMEntry is enabled on the calling CPU we treat
-> @@ -264,6 +267,9 @@ static bool nested_evmcs_handle_vmclear(struct kvm_vcpu *vcpu, gpa_t vmptr)
->  		nested_release_evmcs(vcpu);
+> @@ -2572,11 +2572,11 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>  	bool load_guest_pdptrs_vmcs12 = false;
 >  
->  	return true;
-> +#else
-> +	return false;
-> +#endif
->  }
+> -	if (vmx->nested.dirty_vmcs12 || evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
+> +	if (vmx->nested.dirty_vmcs12 || nested_vmx_is_evmptr12_valid(vmx)) {
+>  		prepare_vmcs02_rare(vmx, vmcs12);
+>  		vmx->nested.dirty_vmcs12 = false;
 >  
->  static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
-> @@ -1595,6 +1601,7 @@ static void copy_vmcs12_to_shadow(struct vcpu_vmx *vmx)
->  
->  static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields)
->  {
-> +#ifdef CONFIG_KVM_HYPERV
->  	struct vmcs12 *vmcs12 = vmx->nested.cached_vmcs12;
->  	struct hv_enlightened_vmcs *evmcs = vmx->nested.hv_evmcs;
->  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(&vmx->vcpu);
-> @@ -1835,10 +1842,14 @@ static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields
+> -		load_guest_pdptrs_vmcs12 = !evmptr_is_valid(vmx->nested.hv_evmcs_vmptr) ||
+> +		load_guest_pdptrs_vmcs12 = !nested_vmx_is_evmptr12_valid(vmx) ||
+>  			!(vmx->nested.hv_evmcs->hv_clean_fields &
+>  			  HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1);
+>  	}
+> @@ -2699,7 +2699,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>  	 * bits when it changes a field in eVMCS. Mark all fields as clean
+>  	 * here.
 >  	 */
+> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
+> +	if (nested_vmx_is_evmptr12_valid(vmx))
+>  		vmx->nested.hv_evmcs->hv_clean_fields |=
+>  			HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL;
 >  
->  	return;
-> +#else /* CONFIG_KVM_HYPERV */
-> +	KVM_BUG_ON(1, vmx->vcpu.kvm);
-> +#endif /* CONFIG_KVM_HYPERV */
+> @@ -3579,7 +3579,7 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+>  
+>  	load_vmcs12_host_state(vcpu, vmcs12);
+>  	vmcs12->vm_exit_reason = exit_reason.full;
+> -	if (enable_shadow_vmcs || evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
+> +	if (enable_shadow_vmcs || nested_vmx_is_evmptr12_valid(vmx))
+>  		vmx->nested.need_vmcs12_to_shadow_sync = true;
+>  	return NVMX_VMENTRY_VMEXIT;
 >  }
+> @@ -3610,7 +3610,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+>  	if (CC(evmptrld_status == EVMPTRLD_VMFAIL))
+>  		return nested_vmx_failInvalid(vcpu);
 >  
->  static void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
->  {
-> +#ifdef CONFIG_KVM_HYPERV
->  	struct vmcs12 *vmcs12 = vmx->nested.cached_vmcs12;
->  	struct hv_enlightened_vmcs *evmcs = vmx->nested.hv_evmcs;
+> -	if (CC(!evmptr_is_valid(vmx->nested.hv_evmcs_vmptr) &&
+> +	if (CC(!nested_vmx_is_evmptr12_valid(vmx) &&
+>  	       vmx->nested.current_vmptr == INVALID_GPA))
+>  		return nested_vmx_failInvalid(vcpu);
 >  
-> @@ -2009,6 +2020,9 @@ static void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
->  	evmcs->guest_bndcfgs = vmcs12->guest_bndcfgs;
+> @@ -3625,7 +3625,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+>  	if (CC(vmcs12->hdr.shadow_vmcs))
+>  		return nested_vmx_failInvalid(vcpu);
 >  
->  	return;
-> +#else /* CONFIG_KVM_HYPERV */
-> +	KVM_BUG_ON(1, vmx->vcpu.kvm);
-> +#endif /* CONFIG_KVM_HYPERV */
->  }
->  
->  /*
-> @@ -2018,6 +2032,7 @@ static void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
->  static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
->  	struct kvm_vcpu *vcpu, bool from_launch)
->  {
-> +#ifdef CONFIG_KVM_HYPERV
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  	bool evmcs_gpa_changed = false;
->  	u64 evmcs_gpa;
-> @@ -2099,6 +2114,9 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
->  	}
->  
->  	return EVMPTRLD_SUCCEEDED;
-> +#else
-> +	return EVMPTRLD_DISABLED;
-> +#endif
->  }
->  
->  void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu)
-> @@ -2905,8 +2923,10 @@ static int nested_vmx_check_controls(struct kvm_vcpu *vcpu,
->  	    nested_check_vm_entry_controls(vcpu, vmcs12))
->  		return -EINVAL;
->  
-> +#ifdef CONFIG_KVM_HYPERV
->  	if (guest_cpuid_has_evmcs(vcpu))
->  		return nested_evmcs_check_controls(vmcs12);
-> +#endif
->  
->  	return 0;
->  }
-> @@ -3178,6 +3198,7 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
->  	return 0;
->  }
->  
-> +#ifdef CONFIG_KVM_HYPERV
->  static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
+> +	if (nested_vmx_is_evmptr12_valid(vmx)) {
+>  		copy_enlightened_to_vmcs12(vmx, vmx->nested.hv_evmcs->hv_clean_fields);
+>  		/* Enlightened VMCS doesn't have launch state */
+>  		vmcs12->launch_state = !launch;
+> @@ -4370,11 +4370,11 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
 >  {
 >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> @@ -3205,6 +3226,7 @@ static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
 >  
->  	return true;
->  }
-> +#endif
+> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
+> +	if (nested_vmx_is_evmptr12_valid(vmx))
+>  		sync_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
 >  
->  static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
->  {
-> @@ -3296,6 +3318,7 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+>  	vmx->nested.need_sync_vmcs02_to_vmcs12_rare =
+> -		!evmptr_is_valid(vmx->nested.hv_evmcs_vmptr);
+> +		!nested_vmx_is_evmptr12_valid(vmx);
 >  
->  static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
->  {
-> +#ifdef CONFIG_KVM_HYPERV
->  	/*
->  	 * Note: nested_get_evmcs_page() also updates 'vp_assist_page' copy
->  	 * in 'struct kvm_vcpu_hv' in case eVMCS is in use, this is mandatory
-> @@ -3312,6 +3335,7 @@ static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
->  
->  		return false;
+>  	vmcs12->guest_cr0 = vmcs12_guest_cr0(vcpu, vmcs12);
+>  	vmcs12->guest_cr4 = vmcs12_guest_cr4(vcpu, vmcs12);
+> @@ -4897,7 +4897,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
 >  	}
-> +#endif
 >  
->  	if (is_guest_mode(vcpu) && !nested_get_vmcs12_pages(vcpu))
->  		return false;
-> @@ -4749,6 +4773,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
->  	/* trying to cancel vmlaunch/vmresume is a bug */
->  	WARN_ON_ONCE(vmx->nested.nested_run_pending);
+>  	if ((vm_exit_reason != -1) &&
+> -	    (enable_shadow_vmcs || evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)))
+> +	    (enable_shadow_vmcs || nested_vmx_is_evmptr12_valid(vmx)))
+>  		vmx->nested.need_vmcs12_to_shadow_sync = true;
 >  
-> +#ifdef CONFIG_KVM_HYPERV
->  	if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
+>  	/* in case we halted in L2 */
+> @@ -5390,7 +5390,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
+>  	/* Decode instruction info and find the field to read */
+>  	field = kvm_register_read(vcpu, (((instr_info) >> 28) & 0xf));
+>  
+> -	if (!evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
+> +	if (!nested_vmx_is_evmptr12_valid(vmx)) {
 >  		/*
->  		 * KVM_REQ_GET_NESTED_STATE_PAGES is also used to map
-> @@ -4758,6 +4783,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
->  		 */
->  		(void)nested_get_evmcs_page(vcpu);
->  	}
-> +#endif
+>  		 * In VMX non-root operation, when the VMCS-link pointer is INVALID_GPA,
+>  		 * any VMREAD sets the ALU flags for VMfailInvalid.
+> @@ -5616,7 +5616,7 @@ static int handle_vmptrld(struct kvm_vcpu *vcpu)
+>  		return nested_vmx_fail(vcpu, VMXERR_VMPTRLD_VMXON_POINTER);
 >  
->  	/* Service pending TLB flush requests for L2 before switching to L1. */
->  	kvm_service_local_tlb_flush_requests(vcpu);
-> @@ -6212,11 +6238,13 @@ static bool nested_vmx_l0_wants_exit(struct kvm_vcpu *vcpu,
->  		 * Handle L2's bus locks in L0 directly.
->  		 */
->  		return true;
-> +#ifdef CONFIG_KVM_HYPERV
->  	case EXIT_REASON_VMCALL:
->  		/* Hyper-V L2 TLB flush hypercall is handled by L0 */
->  		return guest_hv_cpuid_has_l2_tlb_flush(vcpu) &&
->  			nested_evmcs_l2_tlb_flush_enabled(vcpu) &&
->  			kvm_hv_is_tlb_flush_hcall(vcpu);
-> +#endif
->  	default:
->  		break;
->  	}
-> @@ -7100,7 +7128,9 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
->  	.set_state = vmx_set_nested_state,
->  	.get_nested_state_pages = vmx_get_nested_state_pages,
->  	.write_log_dirty = nested_vmx_write_pml_buffer,
-> +#ifdef CONFIG_KVM_HYPERV
->  	.enable_evmcs = nested_enable_evmcs,
->  	.get_evmcs_version = nested_get_evmcs_version,
->  	.hv_inject_synthetic_vmexit_post_tlb_flush = vmx_hv_inject_synthetic_vmexit_post_tlb_flush,
-> +#endif
->  };
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 552593a2ac14..3ff5c44dff9d 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2048,6 +2048,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		if (vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
->  				    &msr_info->data))
->  			return 1;
-> +#ifdef CONFIG_KVM_HYPERV
->  		/*
->  		 * Enlightened VMCS v1 doesn't have certain VMCS fields but
->  		 * instead of just ignoring the features, different Hyper-V
-> @@ -2058,6 +2059,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		if (!msr_info->host_initiated && guest_cpuid_has_evmcs(vcpu))
->  			nested_evmcs_filter_control_msr(vcpu, msr_info->index,
->  							&msr_info->data);
-> +#endif
->  		break;
->  	case MSR_IA32_RTIT_CTL:
->  		if (!vmx_pt_mode_is_host_guest())
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 81224b9676d9..598b057611e0 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1504,6 +1504,8 @@ static unsigned num_msrs_to_save;
->  static const u32 emulated_msrs_all[] = {
->  	MSR_KVM_SYSTEM_TIME, MSR_KVM_WALL_CLOCK,
->  	MSR_KVM_SYSTEM_TIME_NEW, MSR_KVM_WALL_CLOCK_NEW,
-> +
-> +#ifdef CONFIG_KVM_HYPERV
->  	HV_X64_MSR_GUEST_OS_ID, HV_X64_MSR_HYPERCALL,
->  	HV_X64_MSR_TIME_REF_COUNT, HV_X64_MSR_REFERENCE_TSC,
->  	HV_X64_MSR_TSC_FREQUENCY, HV_X64_MSR_APIC_FREQUENCY,
-> @@ -1521,6 +1523,7 @@ static const u32 emulated_msrs_all[] = {
->  	HV_X64_MSR_SYNDBG_CONTROL, HV_X64_MSR_SYNDBG_STATUS,
->  	HV_X64_MSR_SYNDBG_SEND_BUFFER, HV_X64_MSR_SYNDBG_RECV_BUFFER,
->  	HV_X64_MSR_SYNDBG_PENDING_BUFFER,
-> +#endif
+>  	/* Forbid normal VMPTRLD if Enlightened version was used */
+> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
+> +	if (nested_vmx_is_evmptr12_valid(vmx))
+>  		return 1;
 >  
->  	MSR_KVM_ASYNC_PF_EN, MSR_KVM_STEAL_TIME,
->  	MSR_KVM_PV_EOI_EN, MSR_KVM_ASYNC_PF_INT, MSR_KVM_ASYNC_PF_ACK,
-> @@ -4020,6 +4023,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		 * the need to ignore the workaround.
->  		 */
->  		break;
-> +#ifdef CONFIG_KVM_HYPERV
->  	case HV_X64_MSR_GUEST_OS_ID ... HV_X64_MSR_SINT15:
->  	case HV_X64_MSR_SYNDBG_CONTROL ... HV_X64_MSR_SYNDBG_PENDING_BUFFER:
->  	case HV_X64_MSR_SYNDBG_OPTIONS:
-> @@ -4032,6 +4036,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  	case HV_X64_MSR_TSC_INVARIANT_CONTROL:
->  		return kvm_hv_set_msr_common(vcpu, msr, data,
->  					     msr_info->host_initiated);
-> +#endif
->  	case MSR_IA32_BBL_CR_CTL3:
->  		/* Drop writes to this legacy MSR -- see rdmsr
->  		 * counterpart for further detail.
-> @@ -4377,6 +4382,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		 */
->  		msr_info->data = 0x20000000;
->  		break;
-> +#ifdef CONFIG_KVM_HYPERV
->  	case HV_X64_MSR_GUEST_OS_ID ... HV_X64_MSR_SINT15:
->  	case HV_X64_MSR_SYNDBG_CONTROL ... HV_X64_MSR_SYNDBG_PENDING_BUFFER:
->  	case HV_X64_MSR_SYNDBG_OPTIONS:
-> @@ -4390,6 +4396,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		return kvm_hv_get_msr_common(vcpu,
->  					     msr_info->index, &msr_info->data,
->  					     msr_info->host_initiated);
-> +#endif
->  	case MSR_IA32_BBL_CR_CTL3:
->  		/* This legacy MSR exists but isn't fully documented in current
->  		 * silicon.  It is however accessed by winxp in very narrow
-> @@ -4527,6 +4534,7 @@ static inline bool kvm_can_mwait_in_guest(void)
->  		boot_cpu_has(X86_FEATURE_ARAT);
+>  	if (vmx->nested.current_vmptr != vmptr) {
+> @@ -5679,7 +5679,7 @@ static int handle_vmptrst(struct kvm_vcpu *vcpu)
+>  	if (!nested_vmx_check_permission(vcpu))
+>  		return 1;
+>  
+> -	if (unlikely(evmptr_is_valid(to_vmx(vcpu)->nested.hv_evmcs_vmptr)))
+> +	if (unlikely(nested_vmx_is_evmptr12_valid(to_vmx(vcpu))))
+>  		return 1;
+>  
+>  	if (get_vmx_mem_address(vcpu, exit_qual, instr_info,
+> @@ -6467,7 +6467,7 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+>  			kvm_state.size += sizeof(user_vmx_nested_state->vmcs12);
+>  
+>  			/* 'hv_evmcs_vmptr' can also be EVMPTR_MAP_PENDING here */
+> -			if (vmx->nested.hv_evmcs_vmptr != EVMPTR_INVALID)
+> +			if (nested_vmx_is_evmptr12_set(vmx))
+>  				kvm_state.flags |= KVM_STATE_NESTED_EVMCS;
+>  
+>  			if (is_guest_mode(vcpu) &&
+> @@ -6523,7 +6523,7 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+>  	} else  {
+>  		copy_vmcs02_to_vmcs12_rare(vcpu, get_vmcs12(vcpu));
+>  		if (!vmx->nested.need_vmcs12_to_shadow_sync) {
+> -			if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
+> +			if (nested_vmx_is_evmptr12_valid(vmx))
+>  				/*
+>  				 * L1 hypervisor is not obliged to keep eVMCS
+>  				 * clean fields data always up-to-date while
+> diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+> index b0f2e26c1aea..cce4e2aa30fb 100644
+> --- a/arch/x86/kvm/vmx/nested.h
+> +++ b/arch/x86/kvm/vmx/nested.h
+> @@ -58,7 +58,7 @@ static inline int vmx_has_valid_vmcs12(struct kvm_vcpu *vcpu)
+>  
+>  	/* 'hv_evmcs_vmptr' can also be EVMPTR_MAP_PENDING here */
+>  	return vmx->nested.current_vmptr != -1ull ||
+> -		vmx->nested.hv_evmcs_vmptr != EVMPTR_INVALID;
+> +		nested_vmx_is_evmptr12_set(vmx);
 >  }
 >  
-> +#ifdef CONFIG_KVM_HYPERV
->  static int kvm_ioctl_get_supported_hv_cpuid(struct kvm_vcpu *vcpu,
->  					    struct kvm_cpuid2 __user *cpuid_arg)
->  {
-> @@ -4547,6 +4555,7 @@ static int kvm_ioctl_get_supported_hv_cpuid(struct kvm_vcpu *vcpu,
->  
->  	return 0;
->  }
-> +#endif
->  
->  static bool kvm_is_vm_type_supported(unsigned long type)
->  {
-> @@ -4580,9 +4589,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_PIT_STATE2:
->  	case KVM_CAP_SET_IDENTITY_MAP_ADDR:
->  	case KVM_CAP_VCPU_EVENTS:
-> +#ifdef CONFIG_KVM_HYPERV
->  	case KVM_CAP_HYPERV:
->  	case KVM_CAP_HYPERV_VAPIC:
->  	case KVM_CAP_HYPERV_SPIN:
-> +	case KVM_CAP_HYPERV_TIME:
->  	case KVM_CAP_HYPERV_SYNIC:
->  	case KVM_CAP_HYPERV_SYNIC2:
->  	case KVM_CAP_HYPERV_VP_INDEX:
-> @@ -4592,6 +4603,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_HYPERV_CPUID:
->  	case KVM_CAP_HYPERV_ENFORCE_CPUID:
->  	case KVM_CAP_SYS_HYPERV_CPUID:
-> +#endif
->  	case KVM_CAP_PCI_SEGMENT:
->  	case KVM_CAP_DEBUGREGS:
->  	case KVM_CAP_X86_ROBUST_SINGLESTEP:
-> @@ -4601,7 +4613,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_GET_TSC_KHZ:
->  	case KVM_CAP_KVMCLOCK_CTRL:
->  	case KVM_CAP_READONLY_MEM:
-> -	case KVM_CAP_HYPERV_TIME:
->  	case KVM_CAP_IOAPIC_POLARITY_IGNORED:
->  	case KVM_CAP_TSC_DEADLINE_TIMER:
->  	case KVM_CAP_DISABLE_QUIRKS:
-> @@ -4712,12 +4723,14 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  		r = kvm_x86_ops.nested_ops->get_state ?
->  			kvm_x86_ops.nested_ops->get_state(NULL, NULL, 0) : 0;
->  		break;
-> +#ifdef CONFIG_KVM_HYPERV
->  	case KVM_CAP_HYPERV_DIRECT_TLBFLUSH:
->  		r = kvm_x86_ops.enable_l2_tlb_flush != NULL;
->  		break;
->  	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
->  		r = kvm_x86_ops.nested_ops->enable_evmcs != NULL;
->  		break;
-> +#endif
->  	case KVM_CAP_SMALLER_MAXPHYADDR:
->  		r = (int) allow_smaller_maxphyaddr;
->  		break;
-> @@ -4884,9 +4897,11 @@ long kvm_arch_dev_ioctl(struct file *filp,
->  	case KVM_GET_MSRS:
->  		r = msr_io(NULL, argp, do_get_msr_feature, 1);
->  		break;
-> +#ifdef CONFIG_KVM_HYPERV
->  	case KVM_GET_SUPPORTED_HV_CPUID:
->  		r = kvm_ioctl_get_supported_hv_cpuid(NULL, argp);
->  		break;
-> +#endif
->  	case KVM_GET_DEVICE_ATTR: {
->  		struct kvm_device_attr attr;
->  		r = -EFAULT;
-> @@ -5712,14 +5727,11 @@ static int kvm_vcpu_ioctl_device_attr(struct kvm_vcpu *vcpu,
->  static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
->  				     struct kvm_enable_cap *cap)
->  {
-> -	int r;
-> -	uint16_t vmcs_version;
-> -	void __user *user_ptr;
-> -
->  	if (cap->flags)
->  		return -EINVAL;
->  
->  	switch (cap->cap) {
-> +#ifdef CONFIG_KVM_HYPERV
->  	case KVM_CAP_HYPERV_SYNIC2:
->  		if (cap->args[0])
->  			return -EINVAL;
-> @@ -5731,16 +5743,22 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
->  		return kvm_hv_activate_synic(vcpu, cap->cap ==
->  					     KVM_CAP_HYPERV_SYNIC2);
->  	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
-> -		if (!kvm_x86_ops.nested_ops->enable_evmcs)
-> -			return -ENOTTY;
-> -		r = kvm_x86_ops.nested_ops->enable_evmcs(vcpu, &vmcs_version);
-> -		if (!r) {
-> -			user_ptr = (void __user *)(uintptr_t)cap->args[0];
-> -			if (copy_to_user(user_ptr, &vmcs_version,
-> -					 sizeof(vmcs_version)))
-> -				r = -EFAULT;
-> +		{
-> +			int r;
-> +			uint16_t vmcs_version;
-> +			void __user *user_ptr;
-> +
-> +			if (!kvm_x86_ops.nested_ops->enable_evmcs)
-> +				return -ENOTTY;
-> +			r = kvm_x86_ops.nested_ops->enable_evmcs(vcpu, &vmcs_version);
-> +			if (!r) {
-> +				user_ptr = (void __user *)(uintptr_t)cap->args[0];
-> +				if (copy_to_user(user_ptr, &vmcs_version,
-> +						 sizeof(vmcs_version)))
-> +					r = -EFAULT;
-> +			}
-> +			return r;
->  		}
-> -		return r;
->  	case KVM_CAP_HYPERV_DIRECT_TLBFLUSH:
->  		if (!kvm_x86_ops.enable_l2_tlb_flush)
->  			return -ENOTTY;
-> @@ -5749,6 +5767,7 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
->  
->  	case KVM_CAP_HYPERV_ENFORCE_CPUID:
->  		return kvm_hv_set_enforce_cpuid(vcpu, cap->args[0]);
-> +#endif
->  
->  	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
->  		vcpu->arch.pv_cpuid.enforce = cap->args[0];
-> @@ -6141,9 +6160,11 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  		srcu_read_unlock(&vcpu->kvm->srcu, idx);
->  		break;
->  	}
-> +#ifdef CONFIG_KVM_HYPERV
->  	case KVM_GET_SUPPORTED_HV_CPUID:
->  		r = kvm_ioctl_get_supported_hv_cpuid(vcpu, argp);
->  		break;
-> +#endif
->  #ifdef CONFIG_KVM_XEN
->  	case KVM_XEN_VCPU_GET_ATTR: {
->  		struct kvm_xen_vcpu_attr xva;
-> @@ -7201,6 +7222,7 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->  		r = static_call(kvm_x86_mem_enc_unregister_region)(kvm, &region);
->  		break;
->  	}
-> +#ifdef CONFIG_KVM_HYPERV
->  	case KVM_HYPERV_EVENTFD: {
->  		struct kvm_hyperv_eventfd hvevfd;
->  
-> @@ -7210,6 +7232,7 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->  		r = kvm_vm_ioctl_hv_eventfd(kvm, &hvevfd);
->  		break;
->  	}
-> +#endif
->  	case KVM_SET_PMU_EVENT_FILTER:
->  		r = kvm_vm_ioctl_set_pmu_event_filter(kvm, argp);
->  		break;
-> @@ -10588,19 +10611,20 @@ static void vcpu_scan_ioapic(struct kvm_vcpu *vcpu)
->  
->  static void vcpu_load_eoi_exitmap(struct kvm_vcpu *vcpu)
->  {
-> -	u64 eoi_exit_bitmap[4];
-> -
->  	if (!kvm_apic_hw_enabled(vcpu->arch.apic))
->  		return;
->  
-> +#ifdef CONFIG_KVM_HYPERV
->  	if (to_hv_vcpu(vcpu)) {
-> +		u64 eoi_exit_bitmap[4];
-> +
->  		bitmap_or((ulong *)eoi_exit_bitmap,
->  			  vcpu->arch.ioapic_handled_vectors,
->  			  to_hv_synic(vcpu)->vec_bitmap, 256);
->  		static_call_cond(kvm_x86_load_eoi_exitmap)(vcpu, eoi_exit_bitmap);
->  		return;
->  	}
-> -
-> +#endif
->  	static_call_cond(kvm_x86_load_eoi_exitmap)(
->  		vcpu, (u64 *)vcpu->arch.ioapic_handled_vectors);
->  }
-> @@ -10691,9 +10715,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  		 * the flushes are considered "remote" and not "local" because
->  		 * the requests can be initiated from other vCPUs.
->  		 */
-> +#ifdef CONFIG_KVM_HYPERV
->  		if (kvm_check_request(KVM_REQ_HV_TLB_FLUSH, vcpu) &&
->  		    kvm_hv_vcpu_flush_tlb(vcpu))
->  			kvm_vcpu_flush_tlb_guest(vcpu);
-> +#endif
->  
->  		if (kvm_check_request(KVM_REQ_REPORT_TPR_ACCESS, vcpu)) {
->  			vcpu->run->exit_reason = KVM_EXIT_TPR_ACCESS;
-> @@ -10746,6 +10772,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  			vcpu_load_eoi_exitmap(vcpu);
->  		if (kvm_check_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu))
->  			kvm_vcpu_reload_apic_access_page(vcpu);
-> +#ifdef CONFIG_KVM_HYPERV
->  		if (kvm_check_request(KVM_REQ_HV_CRASH, vcpu)) {
->  			vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
->  			vcpu->run->system_event.type = KVM_SYSTEM_EVENT_CRASH;
-> @@ -10776,6 +10803,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  		 */
->  		if (kvm_check_request(KVM_REQ_HV_STIMER, vcpu))
->  			kvm_hv_process_stimers(vcpu);
-> +#endif
->  		if (kvm_check_request(KVM_REQ_APICV_UPDATE, vcpu))
->  			kvm_vcpu_update_apicv(vcpu);
->  		if (kvm_check_request(KVM_REQ_APF_READY, vcpu))
+>  static inline u16 nested_get_vpid02(struct kvm_vcpu *vcpu)
 
+
+Looks even better that previous version,
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
