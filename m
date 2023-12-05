@@ -1,344 +1,165 @@
-Return-Path: <kvm+bounces-3585-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3586-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E7E58057EA
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 15:53:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BA478057EB
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 15:53:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71EB61C21169
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 14:53:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DA861C2118D
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 14:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB36F67E6E;
-	Tue,  5 Dec 2023 14:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6A5567E60;
+	Tue,  5 Dec 2023 14:53:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NHlGF83F"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TghoPofQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B85A3AF
-	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 06:53:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701787987;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+Stv6xnVqgUnbeQvM6L3/ektSRJoDJKwwvfbqQlMhps=;
-	b=NHlGF83F9UW8c/Ppx4v8Dd8HZrrXa+Ck1CheU6eeN8CqsZvoxWjbSWhjzvcoYXZsg7BmD3
-	QwsJaCsb3ftzCA76PApsyb00yDf/mZroi5CQqNkgyH5cYt7Ue+LbfWFuuBqnVNF6q9HmJ/
-	d1TQjeonQ31Yypmg06Mu2mmveiCpQn4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-10-x-qeWD8rMnyqZ03algzZqw-1; Tue, 05 Dec 2023 09:53:05 -0500
-X-MC-Unique: x-qeWD8rMnyqZ03algzZqw-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40b4e24adc7so40744345e9.0
-        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 06:53:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701787984; x=1702392784;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+Stv6xnVqgUnbeQvM6L3/ektSRJoDJKwwvfbqQlMhps=;
-        b=WiZvB2lAjsTsgDqHOlEQ4goLGp4rUp0P8kuE3aaLEZEFroEtp/T0mCZkg+ob1eD75M
-         HMRSfXYWubgbF8pzZvdgxr2mG1d+MLSgpWSYiSb0fIF0y+PLJdwmebTdaT7i9IbK0Ge+
-         JuVyFSJsaS/PR6NeahF6Wq+Ac/iti18FHRDTS7kNnE+dJnvqS9AljD5JpI82SxSV5XnZ
-         R2BGOfsPpt0RZdoeOs8hPNccQ0t8XxcS0Lke+ZDhTG3CYGUrRbhqFXQXp+5QNCx+kcb6
-         wuRDuDiJxaK1Zw5JJSBYMRloZipEckDPdSV8RdeKStkZz01CtYkd7zcTkSBMKOdSQGjv
-         mlvA==
-X-Gm-Message-State: AOJu0Yz+T9S+47159yq8YhDmaSSYXyorEH7BF8kE41mIhAmkVwUI1pvs
-	+dmfp1QCLfmydCFQENYR74UDngMGf8vPWUpovpJfc22ICorROVs3c3r2KhE6Exn1cTv78INbaTF
-	eUoTMqZp5/vHe
-X-Received: by 2002:a05:600c:4504:b0:409:79df:7f9c with SMTP id t4-20020a05600c450400b0040979df7f9cmr3625929wmo.36.1701787984204;
-        Tue, 05 Dec 2023 06:53:04 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHBVMQ0oo9grbLrmRDndEJpIvgMOApDaklkJcd54Lvp4zGzXWaJEztSWLXwTxze870DQCXoAw==
-X-Received: by 2002:a05:600c:4504:b0:409:79df:7f9c with SMTP id t4-20020a05600c450400b0040979df7f9cmr3625918wmo.36.1701787983802;
-        Tue, 05 Dec 2023 06:53:03 -0800 (PST)
-Received: from starship ([89.237.98.20])
-        by smtp.gmail.com with ESMTPSA id g14-20020a05600c310e00b0040b481222e3sm22780211wmo.41.2023.12.05.06.53.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 06:53:03 -0800 (PST)
-Message-ID: <aea89ad426793a72866a652e3de8f2e9562ca45f.camel@redhat.com>
-Subject: Re: [PATCH v2 13/16] KVM: nVMX: hyper-v: Introduce
- nested_vmx_is_evmptr12_{valid,set}() helpers
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, Paolo
- Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Date: Tue, 05 Dec 2023 16:53:02 +0200
-In-Reply-To: <20231205103630.1391318-14-vkuznets@redhat.com>
-References: <20231205103630.1391318-1-vkuznets@redhat.com>
-	 <20231205103630.1391318-14-vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2079.outbound.protection.outlook.com [40.107.220.79])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E383CCA;
+	Tue,  5 Dec 2023 06:53:08 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hAiQzYkXqi75ydL4OEksUrYE9VoFziGx75ZLuYKtEcmoZlLSgioANLABCRJLUqyI+kWvHU2hnioT0bcj0DtGeDHRmMU+ClF4jnTom4qbiS1KGCn6koBaH2m4I1G7K2coc2CSpeLtSjgtW5VS7VI+AVlZC4ycF6HbDtYPsWZgRPU9Oo5IH0SaKGzSjBdq9nXCmM5Pmma2w36jquNRPx/K5EgRYdi2fOHrkMSGvl7JjbuV1Mf+2Wxru9USFQsvUNIKXKxdZg48265QLUj50RTDeMlvjUwDblyF+RQFagR8yZSdJOlo9DKbgdFDJ67qqNYqgB3cEm5QRcc5lOHnFznDNA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6M12LzFvjYNqN970jKbJPz0br8udIuZ1P4iRz+kbslk=;
+ b=gQlE3Ffiqqvk5AZgMJhPSzmR1gJlYstbBj8uK394PmFHqFCFmcHuabY+WXV2IJM3Va1sgfwM1z/24SGSZZzeJJ772zAJFrw6fjCEeJH8phuNNFWwD2RV7RaU2QSW5kfkbycRIDHK5VJaO3f5ni1MPfii0/mz0GhesRMcTVIjsRqs1wsX+QdDHbHktIV+P1LyuILOGebzDH38XlRje3Oj1RXFQxmYYdwOHXuFZYyqJDSCI2r3QYE/TvElz9nMoZ10gxqn9dGvNBAfF2kfnAuLYMsjazQZhbsVRJ7bqAbRdMWjvj2Os7KfviToA2LqopXl/vMC1Ok3I+tJE9pNNQAMGw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6M12LzFvjYNqN970jKbJPz0br8udIuZ1P4iRz+kbslk=;
+ b=TghoPofQLc7n+2DGa/zl4vDFr1S6v06Si9/4jwScgPhkofTlAtV/3SiXttO6MD2pusmo1nnzqKvSQVVpIU4ayu3hbpF6DUFmoN2aE+pa9SBFhamw/iKL4AJIo36Y4inwUeuVEDm38f7TXMAYb4Rns7jaAKx5gfqejPXdYm87COZXeDXHq6pIF6zATivV/NjTZIi3/TGS86LwGtvqH5X6ugo9X6hICg2xrl9T+ThhKuKpZOc0aj21X/vfy3YUC5SFkU6zwefxjQtFc/I8M7IeJ+ImdU5oxLhSJ3UD5eL35Kq8TabKRJ5C5MSipgNaNw0ImrJq0s/59hy+Q6byQq/fhQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DS0PR12MB7608.namprd12.prod.outlook.com (2603:10b6:8:13b::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Tue, 5 Dec
+ 2023 14:53:06 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7046.034; Tue, 5 Dec 2023
+ 14:53:05 +0000
+Date: Tue, 5 Dec 2023 10:53:04 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: iommu@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, alex.williamson@redhat.com,
+	pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
+	will@kernel.org, robin.murphy@arm.com, kevin.tian@intel.com,
+	baolu.lu@linux.intel.com, dwmw2@infradead.org, yi.l.liu@intel.com
+Subject: Re: [RFC PATCH 12/42] iommufd: Introduce allocation data info and
+ flag for KVM managed HWPT
+Message-ID: <20231205145304.GE2787277@nvidia.com>
+References: <20231202091211.13376-1-yan.y.zhao@intel.com>
+ <20231202092113.14141-1-yan.y.zhao@intel.com>
+ <20231204182928.GL1493156@nvidia.com>
+ <ZW7MU4L9vybiDqZt@yzhao56-desk.sh.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZW7MU4L9vybiDqZt@yzhao56-desk.sh.intel.com>
+X-ClientProxiedBy: BL1PR13CA0102.namprd13.prod.outlook.com
+ (2603:10b6:208:2b9::17) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS0PR12MB7608:EE_
+X-MS-Office365-Filtering-Correlation-Id: 75ad542f-1421-4843-5aa4-08dbf5a1e348
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	WIZJICya50JG7bbldotqZO7rjh5XPj1eJWjbsukYdvUqqLDgmoLXKMZOL+hClo1NkcV5SeLR0sXjqDF1UT0Wt5C3xLQ2GT33MYDMW1YxvKwZR+X53JW/rQp4nHxSjXB/npBQLdNfSNoOAK3AQx53AMof4QNp4P40hJW3yFBj8GaEOFElq2xceyqNDvtofAAMX+Na718rxvgefEnG6uvuCyRkheTWIXES9E0xSDnH/KoPkb/SlA/CDVBd8kU9eBEsJIWgAcWZRXXm9ZGzTyigRpLNbocI//fPm4GHGq1oSOlG4KeFpOZTJ2kqMvODZDBiruEwSnzmFjEaGUW2Ixou4ID5xlvmfgN2iiYtfSpd9FcKhdxHLdx0HRL/IxHXSIW118Y6ufNyQAIVrY/7paYujqMd9hKoII3Ut5PSqZdlqkBE4wnSg3sJ2Z1wuZ6SE3dEpVdw1TTF4CDj61YwxZ+38FOqSD/Ct3y6Prcv/p36azfmF2j6KEin6PRa5MDLGeUgv/O3mn57B7FwTbQXyr78lWl6jUc7vRiFNASRNDawB4djeDVZLjHHF20JDQnZg+zb
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(396003)(136003)(366004)(376002)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(1076003)(2616005)(41300700001)(6512007)(36756003)(86362001)(26005)(6486002)(316002)(6916009)(66476007)(66556008)(66946007)(4326008)(8676002)(8936002)(6506007)(478600001)(38100700002)(33656002)(7416002)(2906002)(5660300002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?PiUifFe2oiAGfW1vMqbGX6alOd8AAMW2ZxjwS81Gt0KtN8OadDYPLPtOHuKB?=
+ =?us-ascii?Q?H4zX1J+63eSpydiLoi+CzdPr/jiH43tpn92imuKvUYKjqsKRDTmJpzGTk8FH?=
+ =?us-ascii?Q?0UERwU8hnyB+lrT0K7y3jI9jQ/6dqgHCHmCh31DBvd57uEtngrcB4CdnRciy?=
+ =?us-ascii?Q?W/Uoo5ekc7qPM63dz7bg71XtazD/Bd3GIJFZQZjWf9eDEV0o0VJ2dfwequ79?=
+ =?us-ascii?Q?wGTnmYR/eClIZPBGrWCzYkIYuDGUShxx/Gg4auQd0lbLtrDc5YOyARzOj8TU?=
+ =?us-ascii?Q?XpgV0X3iweEuvNKpEpn8MMw3ghlIi+On8OTmXyyCJfafvHndpwLkPcq71dI+?=
+ =?us-ascii?Q?S/0cvBgRbrPyRTHupRXUK+AksfiEsXBvbs0c0DVE0OUnwI41Q/FARH8RNJe8?=
+ =?us-ascii?Q?0wic6lTi/ug9sFNdNiTVNcx3RxYNNQzueHPBUx8yQrSlJWi0ShSl5kILaKSa?=
+ =?us-ascii?Q?enDxjrsGID8B8kpGaK06OKySLdpZpbyzJLi5iHuRg7GMGocdgsdMFzjq5nXc?=
+ =?us-ascii?Q?1lxzkByVI1anucXRrtjuBELblE0h7dBQBYoJWVfqtSeJcSPVFW2dhk7+iJ1g?=
+ =?us-ascii?Q?bDzq4ZK3wl8HK2YVX9f2yPkDoseJAh0zkZE/VlySyQE7dzpHqivBZcNEcseS?=
+ =?us-ascii?Q?afwjKxl6Y3GpTev2UMVrS0DXOJwJKHioE6r6L18PWFblLLpEwq9ihEBnCqib?=
+ =?us-ascii?Q?mP1Axy4t9gCH/LqMj4CHRcuNglgNZi8xvvPyyFRm+f1Livwd2JzJ/o/FmqF1?=
+ =?us-ascii?Q?c4hy/1oTfPrFYnJKZqYJD492+eTs342b6TCpYQj0iNqQwieU7AZ+KpGwpSmt?=
+ =?us-ascii?Q?3AYatEreBRLeBs6sbWvv8AOizc+ig3bxHcG1OBrMSLw1TernX3tu5z2Ct+z+?=
+ =?us-ascii?Q?UXOYEXpKB1utyX2y4xpR1eIALvkp5cLLqAm5+QdDvFqouYfoLgQgz+ySKd8H?=
+ =?us-ascii?Q?eG6/Kfy8YNO2Scm2XT/d0Z/iUsXh2JmjBN/JsBBzUaV8kXFNSE7dlKTe9klw?=
+ =?us-ascii?Q?Q3+O9jw5H3D5zPE+Szggcjyk5C9n2w4HIwmi7QTLlF9Zy08SHjhkhjMSyW0l?=
+ =?us-ascii?Q?pl84Hq6eE5l5qyJfInr9HGm8xSP37+kT/BJjL8KO5qtYo1BcBWcDRf/wqug8?=
+ =?us-ascii?Q?IR3cVvCp6S/Emk9oCjbfkM3ZqLhMScwa6IEw595NjcskpcINvOc3UEuKImkv?=
+ =?us-ascii?Q?jQDMb2LwwlBL2P1mj6Yw1Z/MIvhVbHKE+ZK025+ITUt4judNVeO5DDXvGpf7?=
+ =?us-ascii?Q?VHRb4+RaBNprRaQipez3PKru+Vk/8b1+4KrHGvzffO/yNBIrpqrZ+7Rb6lTa?=
+ =?us-ascii?Q?rZUHfGXSpFNEXHcGoOiQK2XZpDpIqxr49ydA0UA3yUSjfP440DN3jwnMAzqb?=
+ =?us-ascii?Q?Q82RKnxFE8+PFabjLrFUWNHST0WLG1e+kGsREEotvgL/idZpa42UpTH8m08h?=
+ =?us-ascii?Q?3wMByw2AffQCfDYkLBVk7OQkC0kLiSuWVteg/T/iyeliXcUKRqrSFSxF0SDt?=
+ =?us-ascii?Q?Aw52Gow1Y15/P9USmjWmgTqt40TOXNckI8+0V0F/Z4nrY7KCi+a3TVn4BOVO?=
+ =?us-ascii?Q?A2kCtQvueDupsuAy6/UFZzEGdzdUXfO6ijEFz7VP?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 75ad542f-1421-4843-5aa4-08dbf5a1e348
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2023 14:53:05.5808
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DwMLqLLf/Cfe26Sm5Qfrhm638WaLAxszKotEp8BdQueeKg5Ezoni0VqvfB7rnCrv
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7608
 
-On Tue, 2023-12-05 at 11:36 +0100, Vitaly Kuznetsov wrote:
-> In order to get rid of raw 'vmx->nested.hv_evmcs_vmptr' accesses when
-> !CONFIG_KVM_HYPERV, introduce a pair of helpers:
+On Tue, Dec 05, 2023 at 03:08:03PM +0800, Yan Zhao wrote:
+> On Mon, Dec 04, 2023 at 02:29:28PM -0400, Jason Gunthorpe wrote:
+> > On Sat, Dec 02, 2023 at 05:21:13PM +0800, Yan Zhao wrote:
+> > 
+> > > @@ -413,11 +422,13 @@ struct iommu_hwpt_arm_smmuv3 {
+> > >   * @IOMMU_HWPT_DATA_NONE: no data
+> > >   * @IOMMU_HWPT_DATA_VTD_S1: Intel VT-d stage-1 page table
+> > >   * @IOMMU_HWPT_DATA_ARM_SMMUV3: ARM SMMUv3 Context Descriptor Table
+> > > + * @IOMMU_HWPT_DATA_KVM: KVM managed stage-2 page table
+> > >   */
+> > >  enum iommu_hwpt_data_type {
+> > >  	IOMMU_HWPT_DATA_NONE,
+> > >  	IOMMU_HWPT_DATA_VTD_S1,
+> > >  	IOMMU_HWPT_DATA_ARM_SMMUV3,
+> > > +	IOMMU_HWPT_DATA_KVM,
+> > >  };
+> > 
+> > Definately no, the HWPT_DATA is for the *driver* - it should not be
+> > "kvm".
+> > 
+> > Add the kvm fd to the main structure
+> >
+> Do you mean add a "int kvm_fd" to "struct iommu_hwpt_alloc" ?
+> struct iommu_hwpt_alloc {
+>         __u32 size;
+>         __u32 flags;
+>         __u32 dev_id;
+>         __u32 pt_id;
+>         __u32 out_hwpt_id;
+>         __u32 __reserved;
+>         __u32 data_type;
+>         __u32 data_len;
+>         __aligned_u64 data_uptr;
+> };
 > 
-> nested_vmx_is_evmptr12_valid() to check that eVMPTR points to a valid
-> address.
-> 
-> nested_vmx_is_evmptr12_valid() to check that eVMPTR either points to a
-> valid address or is in 'pending' port-migration state (meaning it is
-> supposed to be valid but the exact address wasn't acquired from guest's
-> memory yet).
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/kvm/vmx/hyperv.h | 30 ++++++++++++++++++++++++++++++
->  arch/x86/kvm/vmx/nested.c | 38 +++++++++++++++++++-------------------
->  arch/x86/kvm/vmx/nested.h |  2 +-
->  3 files changed, 50 insertions(+), 20 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/hyperv.h b/arch/x86/kvm/vmx/hyperv.h
-> index 0e90ef4efe34..71e90a16f183 100644
-> --- a/arch/x86/kvm/vmx/hyperv.h
-> +++ b/arch/x86/kvm/vmx/hyperv.h
-> @@ -22,6 +22,21 @@ static inline bool evmptr_is_valid(u64 evmptr)
->  	return evmptr != EVMPTR_INVALID && evmptr != EVMPTR_MAP_PENDING;
->  }
->  
-> +static inline bool nested_vmx_is_evmptr12_valid(struct vcpu_vmx *vmx)
-> +{
-> +	return evmptr_is_valid(vmx->nested.hv_evmcs_vmptr);
-> +}
-> +
-> +static inline bool evmptr_is_set(u64 evmptr)
-> +{
-> +	return evmptr != EVMPTR_INVALID;
-> +}
-> +
-> +static inline bool nested_vmx_is_evmptr12_set(struct vcpu_vmx *vmx)
-> +{
-> +	return evmptr_is_set(vmx->nested.hv_evmcs_vmptr);
-> +}
+> Then always create the HWPT as IOMMUFD_OBJ_HWPT_KVM as long as kvm_fd > 0 ?
 
+Yes, but 0 is a valid FD so you need to add a flag 'kvm_fd valid'
 
-Looks very good.
-
-> +
->  static inline bool guest_cpuid_has_evmcs(struct kvm_vcpu *vcpu)
->  {
->  	/*
-> @@ -45,6 +60,21 @@ static inline bool evmptr_is_valid(u64 evmptr)
->  {
->  	return false;
->  }
-> +
-> +static inline bool nested_vmx_is_evmptr12_valid(struct vcpu_vmx *vmx)
-> +{
-> +	return false;
-> +}
-> +
-> +static inline bool evmptr_is_set(u64 evmptr)
-> +{
-> +	return false;
-> +}
-> +
-> +static inline bool nested_vmx_is_evmptr12_set(struct vcpu_vmx *vmx)
-> +{
-> +	return false;
-> +}
->  #endif
->  
->  #endif /* __KVM_X86_VMX_HYPERV_H */
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 01a94d290c12..0507174750e0 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -179,7 +179,7 @@ static int nested_vmx_failValid(struct kvm_vcpu *vcpu,
->  	 * VM_INSTRUCTION_ERROR is not shadowed. Enlightened VMCS 'shadows' all
->  	 * fields and thus must be synced.
->  	 */
-> -	if (to_vmx(vcpu)->nested.hv_evmcs_vmptr != EVMPTR_INVALID)
-> +	if (nested_vmx_is_evmptr12_set(to_vmx(vcpu)))
->  		to_vmx(vcpu)->nested.need_vmcs12_to_shadow_sync = true;
->  
->  	return kvm_skip_emulated_instruction(vcpu);
-> @@ -194,7 +194,7 @@ static int nested_vmx_fail(struct kvm_vcpu *vcpu, u32 vm_instruction_error)
->  	 * can't be done if there isn't a current VMCS.
->  	 */
->  	if (vmx->nested.current_vmptr == INVALID_GPA &&
-> -	    !evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
-> +	    !nested_vmx_is_evmptr12_valid(vmx))
->  		return nested_vmx_failInvalid(vcpu);
->  
->  	return nested_vmx_failValid(vcpu, vm_instruction_error);
-> @@ -230,7 +230,7 @@ static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
->  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  
-> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
-> +	if (nested_vmx_is_evmptr12_valid(vmx)) {
->  		kvm_vcpu_unmap(vcpu, &vmx->nested.hv_evmcs_map, true);
->  		vmx->nested.hv_evmcs = NULL;
->  	}
-> @@ -2123,7 +2123,7 @@ void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  
-> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
-> +	if (nested_vmx_is_evmptr12_valid(vmx))
->  		copy_vmcs12_to_enlightened(vmx);
->  	else
->  		copy_vmcs12_to_shadow(vmx);
-> @@ -2277,7 +2277,7 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct loaded_vmcs *vmcs0
->  	u32 exec_control;
->  	u64 guest_efer = nested_vmx_calc_efer(vmx, vmcs12);
->  
-> -	if (vmx->nested.dirty_vmcs12 || evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
-> +	if (vmx->nested.dirty_vmcs12 || nested_vmx_is_evmptr12_valid(vmx))
->  		prepare_vmcs02_early_rare(vmx, vmcs12);
->  
->  	/*
-> @@ -2572,11 +2572,11 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  	bool load_guest_pdptrs_vmcs12 = false;
->  
-> -	if (vmx->nested.dirty_vmcs12 || evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
-> +	if (vmx->nested.dirty_vmcs12 || nested_vmx_is_evmptr12_valid(vmx)) {
->  		prepare_vmcs02_rare(vmx, vmcs12);
->  		vmx->nested.dirty_vmcs12 = false;
->  
-> -		load_guest_pdptrs_vmcs12 = !evmptr_is_valid(vmx->nested.hv_evmcs_vmptr) ||
-> +		load_guest_pdptrs_vmcs12 = !nested_vmx_is_evmptr12_valid(vmx) ||
->  			!(vmx->nested.hv_evmcs->hv_clean_fields &
->  			  HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1);
->  	}
-> @@ -2699,7 +2699,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
->  	 * bits when it changes a field in eVMCS. Mark all fields as clean
->  	 * here.
->  	 */
-> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
-> +	if (nested_vmx_is_evmptr12_valid(vmx))
->  		vmx->nested.hv_evmcs->hv_clean_fields |=
->  			HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL;
->  
-> @@ -3579,7 +3579,7 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
->  
->  	load_vmcs12_host_state(vcpu, vmcs12);
->  	vmcs12->vm_exit_reason = exit_reason.full;
-> -	if (enable_shadow_vmcs || evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
-> +	if (enable_shadow_vmcs || nested_vmx_is_evmptr12_valid(vmx))
->  		vmx->nested.need_vmcs12_to_shadow_sync = true;
->  	return NVMX_VMENTRY_VMEXIT;
->  }
-> @@ -3610,7 +3610,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
->  	if (CC(evmptrld_status == EVMPTRLD_VMFAIL))
->  		return nested_vmx_failInvalid(vcpu);
->  
-> -	if (CC(!evmptr_is_valid(vmx->nested.hv_evmcs_vmptr) &&
-> +	if (CC(!nested_vmx_is_evmptr12_valid(vmx) &&
->  	       vmx->nested.current_vmptr == INVALID_GPA))
->  		return nested_vmx_failInvalid(vcpu);
->  
-> @@ -3625,7 +3625,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
->  	if (CC(vmcs12->hdr.shadow_vmcs))
->  		return nested_vmx_failInvalid(vcpu);
->  
-> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
-> +	if (nested_vmx_is_evmptr12_valid(vmx)) {
->  		copy_enlightened_to_vmcs12(vmx, vmx->nested.hv_evmcs->hv_clean_fields);
->  		/* Enlightened VMCS doesn't have launch state */
->  		vmcs12->launch_state = !launch;
-> @@ -4370,11 +4370,11 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  
-> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
-> +	if (nested_vmx_is_evmptr12_valid(vmx))
->  		sync_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
->  
->  	vmx->nested.need_sync_vmcs02_to_vmcs12_rare =
-> -		!evmptr_is_valid(vmx->nested.hv_evmcs_vmptr);
-> +		!nested_vmx_is_evmptr12_valid(vmx);
->  
->  	vmcs12->guest_cr0 = vmcs12_guest_cr0(vcpu, vmcs12);
->  	vmcs12->guest_cr4 = vmcs12_guest_cr4(vcpu, vmcs12);
-> @@ -4897,7 +4897,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
->  	}
->  
->  	if ((vm_exit_reason != -1) &&
-> -	    (enable_shadow_vmcs || evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)))
-> +	    (enable_shadow_vmcs || nested_vmx_is_evmptr12_valid(vmx)))
->  		vmx->nested.need_vmcs12_to_shadow_sync = true;
->  
->  	/* in case we halted in L2 */
-> @@ -5390,7 +5390,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
->  	/* Decode instruction info and find the field to read */
->  	field = kvm_register_read(vcpu, (((instr_info) >> 28) & 0xf));
->  
-> -	if (!evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
-> +	if (!nested_vmx_is_evmptr12_valid(vmx)) {
->  		/*
->  		 * In VMX non-root operation, when the VMCS-link pointer is INVALID_GPA,
->  		 * any VMREAD sets the ALU flags for VMfailInvalid.
-> @@ -5616,7 +5616,7 @@ static int handle_vmptrld(struct kvm_vcpu *vcpu)
->  		return nested_vmx_fail(vcpu, VMXERR_VMPTRLD_VMXON_POINTER);
->  
->  	/* Forbid normal VMPTRLD if Enlightened version was used */
-> -	if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
-> +	if (nested_vmx_is_evmptr12_valid(vmx))
->  		return 1;
->  
->  	if (vmx->nested.current_vmptr != vmptr) {
-> @@ -5679,7 +5679,7 @@ static int handle_vmptrst(struct kvm_vcpu *vcpu)
->  	if (!nested_vmx_check_permission(vcpu))
->  		return 1;
->  
-> -	if (unlikely(evmptr_is_valid(to_vmx(vcpu)->nested.hv_evmcs_vmptr)))
-> +	if (unlikely(nested_vmx_is_evmptr12_valid(to_vmx(vcpu))))
->  		return 1;
->  
->  	if (get_vmx_mem_address(vcpu, exit_qual, instr_info,
-> @@ -6467,7 +6467,7 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
->  			kvm_state.size += sizeof(user_vmx_nested_state->vmcs12);
->  
->  			/* 'hv_evmcs_vmptr' can also be EVMPTR_MAP_PENDING here */
-> -			if (vmx->nested.hv_evmcs_vmptr != EVMPTR_INVALID)
-> +			if (nested_vmx_is_evmptr12_set(vmx))
->  				kvm_state.flags |= KVM_STATE_NESTED_EVMCS;
->  
->  			if (is_guest_mode(vcpu) &&
-> @@ -6523,7 +6523,7 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
->  	} else  {
->  		copy_vmcs02_to_vmcs12_rare(vcpu, get_vmcs12(vcpu));
->  		if (!vmx->nested.need_vmcs12_to_shadow_sync) {
-> -			if (evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
-> +			if (nested_vmx_is_evmptr12_valid(vmx))
->  				/*
->  				 * L1 hypervisor is not obliged to keep eVMCS
->  				 * clean fields data always up-to-date while
-> diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-> index b0f2e26c1aea..cce4e2aa30fb 100644
-> --- a/arch/x86/kvm/vmx/nested.h
-> +++ b/arch/x86/kvm/vmx/nested.h
-> @@ -58,7 +58,7 @@ static inline int vmx_has_valid_vmcs12(struct kvm_vcpu *vcpu)
->  
->  	/* 'hv_evmcs_vmptr' can also be EVMPTR_MAP_PENDING here */
->  	return vmx->nested.current_vmptr != -1ull ||
-> -		vmx->nested.hv_evmcs_vmptr != EVMPTR_INVALID;
-> +		nested_vmx_is_evmptr12_set(vmx);
->  }
->  
->  static inline u16 nested_get_vpid02(struct kvm_vcpu *vcpu)
-
-
-Looks even better that previous version,
-
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-Best regards,
-	Maxim Levitsky
-
+Jason
 
