@@ -1,55 +1,55 @@
-Return-Path: <kvm+bounces-3487-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3493-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAA2080508E
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 11:38:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3C2D80509A
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 11:38:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4B53281801
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 10:38:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25869B20DF0
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 10:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3185F56B69;
-	Tue,  5 Dec 2023 10:37:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB6E25C90B;
+	Tue,  5 Dec 2023 10:37:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VlgtQoSQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lz2RE+cT"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B52D1BFA
-	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 02:36:45 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5666318F
+	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 02:36:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701772604;
+	s=mimecast20190719; t=1701772603;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MLJSU/4UwoM7VC9xD7TyZKUiFxpyoD4EZFFtmiK2TOc=;
-	b=VlgtQoSQNeA4gx8JBagwYXWFVldnQJmZQgOw1dB4HFiDG6egPmfXGTxcf9nr7nkAWRrkQZ
-	6Sb7m3nb/u4vMsEWR8s1RLPnk8oUaZGhl5xSXskcp69VvB3lqgg0u1m3SR8wXnCX9JTUmA
-	3d+yfnOVDjjFOhiJw/y8KTZ/acLBbZU=
+	bh=p3Jm9wOI3aEYajV3fya67MUpt9R8ccLnW+4cSRJuTzU=;
+	b=Lz2RE+cTvXWcw702RdkFqOYuIMkZmkB2zGC6sxNB/5/eyv/NSAeSIbRSHu123g6T9Itfvc
+	eHauxP+j4tjApC0slQ2EAKA0RqxD3DdD/YB9G7dQf+mgEFITLhVlPuUg9COdwTGd1Q3fLt
+	h5wiNunptvKpYr0FTqZXsMa0ppu48SU=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-580-AeKtpomgONapvPT-BjQkHw-1; Tue,
- 05 Dec 2023 05:36:41 -0500
-X-MC-Unique: AeKtpomgONapvPT-BjQkHw-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-601-aUn60SuhNfqCI6C-By7YVw-1; Tue,
+ 05 Dec 2023 05:36:42 -0500
+X-MC-Unique: aUn60SuhNfqCI6C-By7YVw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E7E2938135E1;
-	Tue,  5 Dec 2023 10:36:40 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EBDD21C0690A;
+	Tue,  5 Dec 2023 10:36:41 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.45.224.46])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 242A22026D66;
-	Tue,  5 Dec 2023 10:36:40 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 283472026D66;
+	Tue,  5 Dec 2023 10:36:41 +0000 (UTC)
 From: Vitaly Kuznetsov <vkuznets@redhat.com>
 To: kvm@vger.kernel.org,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
 	Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v2 08/16] KVM: x86: hyper-v: Split off nested_evmcs_handle_vmclear()
-Date: Tue,  5 Dec 2023 11:36:22 +0100
-Message-ID: <20231205103630.1391318-9-vkuznets@redhat.com>
+Subject: [PATCH v2 09/16] KVM: selftests: Make all Hyper-V tests explicitly dependent on Hyper-V emulation support in KVM
+Date: Tue,  5 Dec 2023 11:36:23 +0100
+Message-ID: <20231205103630.1391318-10-vkuznets@redhat.com>
 In-Reply-To: <20231205103630.1391318-1-vkuznets@redhat.com>
 References: <20231205103630.1391318-1-vkuznets@redhat.com>
 Precedence: bulk
@@ -62,81 +62,118 @@ Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-To avoid overloading handle_vmclear() with Hyper-V specific details and to
-prepare the code to making Hyper-V emulation optional, create a dedicated
-nested_evmcs_handle_vmclear() helper.
+In preparation for conditional Hyper-V emulation enablement in KVM, make
+Hyper-V specific tests check skip gracefully instead of failing when the
+support is not there.
 
-No functional change intended.
-
-Suggested-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/kvm/vmx/nested.c | 38 ++++++++++++++++++++++++--------------
- 1 file changed, 24 insertions(+), 14 deletions(-)
+ tools/testing/selftests/kvm/x86_64/hyperv_clock.c            | 2 ++
+ tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c            | 5 +++--
+ .../selftests/kvm/x86_64/hyperv_extended_hypercalls.c        | 2 ++
+ tools/testing/selftests/kvm/x86_64/hyperv_features.c         | 2 ++
+ tools/testing/selftests/kvm/x86_64/hyperv_ipi.c              | 2 ++
+ tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c         | 1 +
+ tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c        | 2 ++
+ 7 files changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 382c0746d069..903b6f9ea2bd 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -243,6 +243,29 @@ static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
- 	}
- }
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
+index f25749eaa6a8..f5e1e98f04f9 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
+@@ -211,6 +211,8 @@ int main(void)
+ 	vm_vaddr_t tsc_page_gva;
+ 	int stage;
  
-+static bool nested_evmcs_handle_vmclear(struct kvm_vcpu *vcpu, gpa_t vmptr)
-+{
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	/*
-+	 * When Enlightened VMEntry is enabled on the calling CPU we treat
-+	 * memory area pointer by vmptr as Enlightened VMCS (as there's no good
-+	 * way to distinguish it from VMCS12) and we must not corrupt it by
-+	 * writing to the non-existent 'launch_state' field. The area doesn't
-+	 * have to be the currently active EVMCS on the calling CPU and there's
-+	 * nothing KVM has to do to transition it from 'active' to 'non-active'
-+	 * state. It is possible that the area will stay mapped as
-+	 * vmx->nested.hv_evmcs but this shouldn't be a problem.
-+	 */
-+	if (!guest_cpuid_has_evmcs(vcpu) ||
-+	    !evmptr_is_valid(nested_get_evmptr(vcpu)))
-+		return false;
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_TIME));
 +
-+	if (vmx->nested.hv_evmcs && vmptr == vmx->nested.hv_evmcs_vmptr)
-+		nested_release_evmcs(vcpu);
+ 	vm = vm_create_with_one_vcpu(&vcpu, guest_main);
+ 
+ 	vcpu_set_hv_cpuid(vcpu);
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c b/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
+index 7bde0c4dfdbd..4c7257ecd2a6 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
+@@ -240,11 +240,12 @@ int main(int argc, char *argv[])
+ 	struct ucall uc;
+ 	int stage;
+ 
+-	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+-
+ 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_NESTED_STATE));
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS));
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_DIRECT_TLBFLUSH));
 +
-+	return true;
-+}
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+ 
+ 	hcall_page = vm_vaddr_alloc_pages(vm, 1);
+ 	memset(addr_gva2hva(vm, hcall_page), 0x0,  getpagesize());
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
+index e036db1f32b9..949e08e98f31 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
+@@ -43,6 +43,8 @@ int main(void)
+ 	uint64_t *outval;
+ 	struct ucall uc;
+ 
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_CPUID));
 +
- static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
- 				     struct loaded_vmcs *prev)
+ 	/* Verify if extended hypercalls are supported */
+ 	if (!kvm_cpuid_has(kvm_get_supported_hv_cpuid(),
+ 			   HV_ENABLE_EXTENDED_HYPERCALLS)) {
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+index 9f28aa276c4e..387c605a3077 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+@@ -690,6 +690,8 @@ static void guest_test_hcalls_access(void)
+ 
+ int main(void)
  {
-@@ -5286,18 +5309,7 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
- 	if (vmptr == vmx->nested.vmxon_ptr)
- 		return nested_vmx_fail(vcpu, VMXERR_VMCLEAR_VMXON_POINTER);
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_ENFORCE_CPUID));
++
+ 	pr_info("Testing access to Hyper-V specific MSRs\n");
+ 	guest_test_msrs_access();
  
--	/*
--	 * When Enlightened VMEntry is enabled on the calling CPU we treat
--	 * memory area pointer by vmptr as Enlightened VMCS (as there's no good
--	 * way to distinguish it from VMCS12) and we must not corrupt it by
--	 * writing to the non-existent 'launch_state' field. The area doesn't
--	 * have to be the currently active EVMCS on the calling CPU and there's
--	 * nothing KVM has to do to transition it from 'active' to 'non-active'
--	 * state. It is possible that the area will stay mapped as
--	 * vmx->nested.hv_evmcs but this shouldn't be a problem.
--	 */
--	if (likely(!guest_cpuid_has_evmcs(vcpu) ||
--		   !evmptr_is_valid(nested_get_evmptr(vcpu)))) {
-+	if (likely(!nested_evmcs_handle_vmclear(vcpu, vmptr))) {
- 		if (vmptr == vmx->nested.current_vmptr)
- 			nested_release_vmcs12(vcpu);
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c b/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c
+index 6feb5ddb031d..65e5f4c05068 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c
+@@ -248,6 +248,8 @@ int main(int argc, char *argv[])
+ 	int stage = 1, r;
+ 	struct ucall uc;
  
-@@ -5314,8 +5326,6 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
- 					   vmptr + offsetof(struct vmcs12,
- 							    launch_state),
- 					   &zero, sizeof(zero));
--	} else if (vmx->nested.hv_evmcs && vmptr == vmx->nested.hv_evmcs_vmptr) {
--		nested_release_evmcs(vcpu);
- 	}
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_SEND_IPI));
++
+ 	vm = vm_create_with_one_vcpu(&vcpu[0], sender_guest_code);
  
- 	return nested_vmx_succeed(vcpu);
+ 	/* Hypercall input/output */
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
+index 6c1278562090..c9b18707edc0 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
+@@ -158,6 +158,7 @@ int main(int argc, char *argv[])
+ 	int stage;
+ 
+ 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM));
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_DIRECT_TLBFLUSH));
+ 
+ 	/* Create VM */
+ 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c b/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
+index 4758b6ef5618..c4443f71f8dd 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
+@@ -590,6 +590,8 @@ int main(int argc, char *argv[])
+ 	struct ucall uc;
+ 	int stage = 1, r, i;
+ 
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_TLBFLUSH));
++
+ 	vm = vm_create_with_one_vcpu(&vcpu[0], sender_guest_code);
+ 
+ 	/* Test data page */
 -- 
 2.43.0
 
