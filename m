@@ -1,57 +1,58 @@
-Return-Path: <kvm+bounces-3572-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3573-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 888BA805680
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 14:51:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8752B805681
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 14:51:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B983F1C20FB0
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 13:50:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8D0F1C20FFF
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 13:51:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF0E5FEF9;
-	Tue,  5 Dec 2023 13:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8970161682;
+	Tue,  5 Dec 2023 13:50:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="dW1W/uR0"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="J4uy7eJA"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3940BA8
-	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 05:50:49 -0800 (PST)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6cdde2aeb64so5447618b3a.2
-        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 05:50:49 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32E84D48
+	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 05:50:52 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6cc02e77a9cso5468175b3a.0
+        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 05:50:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1701784248; x=1702389048; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5tYmQsqbSCasY24iJ5yb8DOXoFWsecoLxSrfb0V9jc4=;
-        b=dW1W/uR0a7KvhRBQpjvHd/QPlHiBMLG8RSPeoC/k0obgBaaZzViwFNMiO8xOOTQyOi
-         /JYGU7ZTHxTh1HTnmHR4OHdD/cZG7Gr3g8x0WdT5ApXoQup9tv5aXZAlykEmU1ePMMTU
-         wkBUKCK5vW4foSJz4MhvRzA/kUHtKheiscGKZuNYt4BHhpTLW36AnI2DFLkzqjGMo4WX
-         1CzAB0or6UlAhCEQ/bMq5bBp1vI06i0XhgkSjDjwqRlHYgOXEZrhI4qbxEP895mUOkzK
-         AvfTXwb1B6g8H2/E7vO8QvdyzUD0G/2OlBVNwnTBwa+Kl1DMmsTXF+SfwI28UY2gZYNu
-         C7YQ==
+        d=ventanamicro.com; s=google; t=1701784251; x=1702389051; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Kw9lx7rfek+Fyxn9H19uerjKbw2z7hmkxzJlnytvErY=;
+        b=J4uy7eJAkgHRXlMqjYrZm55vQhViwdQpXKbi3SYOvt3WK+47p9hVeubN3W7/oL9WRz
+         O0ZNiZ2vbHMgKLw66y3ixNIV4kDzJNucmy7e4HzGXlrbdTXTEcRjECMANNgEQaIfqrfl
+         ynpEih9FRvmOLa1d5Pvl59Uy2vyf95UlBfdvAeZZLU7xzwBdWR+f1yV/UFRUgrpjq8qJ
+         kSdnipTOufEx2c+yCkAz9578cxGH2j5rXMuTM+LCezfqpr9D7i48YTOvPTcFGUuzIRGR
+         jqEPfeI7pkUh8thv1y0yImnfKDSJpOgFZFgvlr5ODntB3yonPadhyCVjdsycvw+z9pLs
+         NVjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701784248; x=1702389048;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5tYmQsqbSCasY24iJ5yb8DOXoFWsecoLxSrfb0V9jc4=;
-        b=KSd2Wyb0n+AgOZcx4GtFmFQPvuEmyYnEDPqv6UtqukrDtHb+OGChnccXtWJGLVsTxF
-         ChkXLr3y/YXnbrpXoaBp5qKZeyuL9W5xVrprb799wQQ8orlyrHjDECZGJ7VTI7RZ23IG
-         /OCoIuoUJcVy4mMrXJpXZykpnRnHJPq4YCQChPOKSXaN0gZ4ybaho5aEikM5ObJCZFVp
-         aMfe98VFKzALqrt9vIlPHw9ugC39WDonj56bML/E9dTl3WdOcvalBasgkwJUXn6Kn7rb
-         4UH6AxPQoX3uWOe3Y4WgMGsBEUJDwjQZTiLK9oEQ8VdDZubHiDhfhAmZfIHMHrdYufpq
-         eLKw==
-X-Gm-Message-State: AOJu0YxNH8HrbKDYrRYpTAXieLpCT+J51wsmzSjMbuJ6BKJSkmWxBW8H
-	z3TbXZ0J7RjsRlLkqAjssYoXWA==
-X-Google-Smtp-Source: AGHT+IF58FDgCNhIFgf4+jcYpbFJRPEkybjdmIZdZej549U3kiTnM5En7t4y+alYXvh+9RPZN62oTQ==
-X-Received: by 2002:aa7:99d2:0:b0:6ce:725f:7da9 with SMTP id v18-20020aa799d2000000b006ce725f7da9mr521727pfi.59.1701784248583;
-        Tue, 05 Dec 2023 05:50:48 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701784251; x=1702389051;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Kw9lx7rfek+Fyxn9H19uerjKbw2z7hmkxzJlnytvErY=;
+        b=nFLdQApIc6w2qQ/V/jVaExl2sPDzYl77WU8xRfFB3EqfSpuGSowi6zmc0eK3QATZY/
+         lYM+gsdGM2dPSV6ruMqeA1oFJtQCrWGMrd45QYGcuo4IDwWJX/uLWfJ7tEiAieLU6Qk5
+         NpgR4gtLU1X6CVACdJvNE2Q+xjbnoMTBMwUqk+pL6MR+16jp2OOeLrqXEnBAGOsLBWpu
+         Zv41OOsy8iybM8VwgEKcmwP7tfu/j78Sn5xNzUVQ7VICIRSA1MKorjbM1aR06c61/cN4
+         ciZ6tWBf36b1UdSGN6VyOaEbek6k8n3+Rx94ADYZM98nprpDQjXLyD+oowyrjvLw5F8b
+         61wg==
+X-Gm-Message-State: AOJu0YyP7wtzWdceG1zUjqUFj4owxZAgHKL4G1yqbhPqsxRCbXSzwZsS
+	BxMNunlXfJy1EqQa8/+PibWCOw==
+X-Google-Smtp-Source: AGHT+IE+MGZNocJKukR2PL4jO1pcCHJx5zeZaiZzHpSE59/id3BPfziDyZviksjyycnDyDaRfgGFtQ==
+X-Received: by 2002:a05:6a00:849:b0:6ce:60d4:234b with SMTP id q9-20020a056a00084900b006ce60d4234bmr1617686pfk.52.1701784251608;
+        Tue, 05 Dec 2023 05:50:51 -0800 (PST)
 Received: from grind.. (200-206-229-234.dsl.telesp.net.br. [200.206.229.234])
-        by smtp.gmail.com with ESMTPSA id c22-20020aa78c16000000b006ce77ffcc75sm673641pfd.165.2023.12.05.05.50.46
+        by smtp.gmail.com with ESMTPSA id c22-20020aa78c16000000b006ce77ffcc75sm673641pfd.165.2023.12.05.05.50.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 05:50:48 -0800 (PST)
+        Tue, 05 Dec 2023 05:50:51 -0800 (PST)
 From: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
 To: kvm-riscv@lists.infradead.org,
 	linux-riscv@lists.infradead.org,
@@ -61,10 +62,12 @@ Cc: anup@brainfault.org,
 	palmer@dabbelt.com,
 	ajones@ventanamicro.com,
 	Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-Subject: [PATCH v2 0/3] RISC-V, KVM: add 'vlenb' and vector CSRs to get-reg-list
-Date: Tue,  5 Dec 2023 10:50:38 -0300
-Message-ID: <20231205135041.2208004-1-dbarboza@ventanamicro.com>
+Subject: [PATCH v2 1/3] RISC-V: KVM: set 'vlenb' in kvm_riscv_vcpu_alloc_vector_context()
+Date: Tue,  5 Dec 2023 10:50:39 -0300
+Message-ID: <20231205135041.2208004-2-dbarboza@ventanamicro.com>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20231205135041.2208004-1-dbarboza@ventanamicro.com>
+References: <20231205135041.2208004-1-dbarboza@ventanamicro.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -73,25 +76,30 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+'vlenb', added to riscv_v_ext_state by commit c35f3aa34509 ("RISC-V:
+vector: export VLENB csr in __sc_riscv_v_state"), isn't being
+initialized in guest_context. If we export 'vlenb' as a KVM CSR,
+something we want to do in the next patch, it'll always return 0.
 
-This v2 has a build warning fix in patch 3 found by kernel test robot
-<lkp@intel.com>.
+Set 'vlenb' to riscv_v_size/32.
 
-Changes from v1:
-- patch 3:
-  - remove unused 'cntx' pointer
-- v1 link: https://lore.kernel.org/kvm/20231204182905.2163676-1-dbarboza@ventanamicro.com/
+Signed-off-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+---
+ arch/riscv/kvm/vcpu_vector.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Daniel Henrique Barboza (3):
-  RISC-V: KVM: set 'vlenb' in kvm_riscv_vcpu_alloc_vector_context()
-  RISC-V: KVM: add 'vlenb' Vector CSR
-  RISC-V: KVM: add vector CSRs in KVM_GET_REG_LIST
-
- arch/riscv/kvm/vcpu_onereg.c | 35 +++++++++++++++++++++++++++++++++++
- arch/riscv/kvm/vcpu_vector.c | 16 ++++++++++++++++
- 2 files changed, 51 insertions(+)
-
+diff --git a/arch/riscv/kvm/vcpu_vector.c b/arch/riscv/kvm/vcpu_vector.c
+index b339a2682f25..530e49c588d6 100644
+--- a/arch/riscv/kvm/vcpu_vector.c
++++ b/arch/riscv/kvm/vcpu_vector.c
+@@ -76,6 +76,7 @@ int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu *vcpu,
+ 	cntx->vector.datap = kmalloc(riscv_v_vsize, GFP_KERNEL);
+ 	if (!cntx->vector.datap)
+ 		return -ENOMEM;
++	cntx->vector.vlenb = riscv_v_vsize / 32;
+ 
+ 	vcpu->arch.host_context.vector.datap = kzalloc(riscv_v_vsize, GFP_KERNEL);
+ 	if (!vcpu->arch.host_context.vector.datap)
 -- 
 2.41.0
 
