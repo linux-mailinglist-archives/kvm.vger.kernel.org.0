@@ -1,161 +1,98 @@
-Return-Path: <kvm+bounces-3571-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3572-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EED3A8055E3
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 14:28:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 888BA805680
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 14:51:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2D2B1F21532
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 13:28:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B983F1C20FB0
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 13:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3355D8EE;
-	Tue,  5 Dec 2023 13:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF0E5FEF9;
+	Tue,  5 Dec 2023 13:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fINV4e0s"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="dW1W/uR0"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E720B41747;
-	Tue,  5 Dec 2023 13:28:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70AB7C433C7;
-	Tue,  5 Dec 2023 13:28:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701782901;
-	bh=DN0Ck4V6T8maLKGy2DJScQ19aj0jXGmxo0qjkMgLuqo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fINV4e0swP3QxF0ev7mBQAvzki1Es9fxlLKrYt4Ml5r6ebyNV47ZFG6KKJE58Sa0C
-	 3zh32m3cDUj9V9aiRX6klfygHY7Zpag/nUR3YzCt09RaFofNMBfi6QGt0XDc7fBlvZ
-	 YYHL4xNzxt56xHiSJqB7mte+HCJKJEYPM3/4y67n1Yu+swv5KT4LghhIlT0HhhLs31
-	 KsBt+NMgbYuzWxiY1Ej3G1zN8rizq2crCh9Nzyb15ZhtgtZJFEPHxMtqV/PbiNc4yY
-	 4X90gR8CZ55cZR0ozTQqIzuX3V77lEZhQWAI2x9K81K7qN1j6jcpTDu/AB1FujSAMz
-	 s36dw6OW5eU+g==
-Date: Tue, 5 Dec 2023 14:28:12 +0100
-From: Lorenzo Pieralisi <lpieralisi@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, ankita@nvidia.com,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	jgg@nvidia.com, oliver.upton@linux.dev, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, will@kernel.org, ardb@kernel.org,
-	akpm@linux-foundation.org, gshan@redhat.com, aniketa@nvidia.com,
-	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
-	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
-	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	james.morse@arm.com
-Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <ZW8lbK88bgdmBgl9@lpieralisi>
-References: <20231205033015.10044-1-ankita@nvidia.com>
- <86fs0hatt3.wl-maz@kernel.org>
- <ZW8MP2tDt4_9ROBz@arm.com>
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3940BA8
+	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 05:50:49 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6cdde2aeb64so5447618b3a.2
+        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 05:50:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1701784248; x=1702389048; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5tYmQsqbSCasY24iJ5yb8DOXoFWsecoLxSrfb0V9jc4=;
+        b=dW1W/uR0a7KvhRBQpjvHd/QPlHiBMLG8RSPeoC/k0obgBaaZzViwFNMiO8xOOTQyOi
+         /JYGU7ZTHxTh1HTnmHR4OHdD/cZG7Gr3g8x0WdT5ApXoQup9tv5aXZAlykEmU1ePMMTU
+         wkBUKCK5vW4foSJz4MhvRzA/kUHtKheiscGKZuNYt4BHhpTLW36AnI2DFLkzqjGMo4WX
+         1CzAB0or6UlAhCEQ/bMq5bBp1vI06i0XhgkSjDjwqRlHYgOXEZrhI4qbxEP895mUOkzK
+         AvfTXwb1B6g8H2/E7vO8QvdyzUD0G/2OlBVNwnTBwa+Kl1DMmsTXF+SfwI28UY2gZYNu
+         C7YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701784248; x=1702389048;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5tYmQsqbSCasY24iJ5yb8DOXoFWsecoLxSrfb0V9jc4=;
+        b=KSd2Wyb0n+AgOZcx4GtFmFQPvuEmyYnEDPqv6UtqukrDtHb+OGChnccXtWJGLVsTxF
+         ChkXLr3y/YXnbrpXoaBp5qKZeyuL9W5xVrprb799wQQ8orlyrHjDECZGJ7VTI7RZ23IG
+         /OCoIuoUJcVy4mMrXJpXZykpnRnHJPq4YCQChPOKSXaN0gZ4ybaho5aEikM5ObJCZFVp
+         aMfe98VFKzALqrt9vIlPHw9ugC39WDonj56bML/E9dTl3WdOcvalBasgkwJUXn6Kn7rb
+         4UH6AxPQoX3uWOe3Y4WgMGsBEUJDwjQZTiLK9oEQ8VdDZubHiDhfhAmZfIHMHrdYufpq
+         eLKw==
+X-Gm-Message-State: AOJu0YxNH8HrbKDYrRYpTAXieLpCT+J51wsmzSjMbuJ6BKJSkmWxBW8H
+	z3TbXZ0J7RjsRlLkqAjssYoXWA==
+X-Google-Smtp-Source: AGHT+IF58FDgCNhIFgf4+jcYpbFJRPEkybjdmIZdZej549U3kiTnM5En7t4y+alYXvh+9RPZN62oTQ==
+X-Received: by 2002:aa7:99d2:0:b0:6ce:725f:7da9 with SMTP id v18-20020aa799d2000000b006ce725f7da9mr521727pfi.59.1701784248583;
+        Tue, 05 Dec 2023 05:50:48 -0800 (PST)
+Received: from grind.. (200-206-229-234.dsl.telesp.net.br. [200.206.229.234])
+        by smtp.gmail.com with ESMTPSA id c22-20020aa78c16000000b006ce77ffcc75sm673641pfd.165.2023.12.05.05.50.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Dec 2023 05:50:48 -0800 (PST)
+From: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+To: kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: anup@brainfault.org,
+	atishp@atishpatra.org,
+	palmer@dabbelt.com,
+	ajones@ventanamicro.com,
+	Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+Subject: [PATCH v2 0/3] RISC-V, KVM: add 'vlenb' and vector CSRs to get-reg-list
+Date: Tue,  5 Dec 2023 10:50:38 -0300
+Message-ID: <20231205135041.2208004-1-dbarboza@ventanamicro.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZW8MP2tDt4_9ROBz@arm.com>
+Content-Transfer-Encoding: 8bit
 
-[+James]
+Hi,
 
-On Tue, Dec 05, 2023 at 11:40:47AM +0000, Catalin Marinas wrote:
+This v2 has a build warning fix in patch 3 found by kernel test robot
+<lkp@intel.com>.
 
-[...]
+Changes from v1:
+- patch 3:
+  - remove unused 'cntx' pointer
+- v1 link: https://lore.kernel.org/kvm/20231204182905.2163676-1-dbarboza@ventanamicro.com/
 
-> > - Will had unanswered questions in another part of the thread:
-> > 
-> >   https://lore.kernel.org/all/20231013092954.GB13524@willie-the-truck/
-> > 
-> >   Can someone please help concluding it?
-> 
-> Is this about reclaiming the device? I think we concluded that we can't
-> generalise this beyond PCIe, though not sure there was any formal
-> statement to that thread. The other point Will had was around stating
-> in the commit message why we only relax this to Normal NC. I haven't
-> checked the commit message yet, it needs careful reading ;).
+Daniel Henrique Barboza (3):
+  RISC-V: KVM: set 'vlenb' in kvm_riscv_vcpu_alloc_vector_context()
+  RISC-V: KVM: add 'vlenb' Vector CSR
+  RISC-V: KVM: add vector CSRs in KVM_GET_REG_LIST
 
-1) Reclaiming the device: I wrote a section that was reported in this
-   commit log hunk:
+ arch/riscv/kvm/vcpu_onereg.c | 35 +++++++++++++++++++++++++++++++++++
+ arch/riscv/kvm/vcpu_vector.c | 16 ++++++++++++++++
+ 2 files changed, 51 insertions(+)
 
-   "Relaxing S2 KVM device MMIO mappings to Normal-NC is not expected to
-   trigger any issue on guest device reclaim use cases either (i.e.
-   device MMIO unmap followed by a device reset) at least for PCIe
-   devices, in that in PCIe a device reset is architected and carried
-   out through PCI config space transactions that are naturally ordered
-   with respect to MMIO transactions according to the PCI ordering
-   rules."
+-- 
+2.41.0
 
-   It is not too verbose on purpose - I thought it is too
-   complicated to express the details in a commit log but
-   we can elaborate on that if it is beneficial, probably
-   in /Documentation, not in the log itself.
-
-2) On FWB: I added a full section to the log I posted here:
-
-   https://lore.kernel.org/all/ZUz78gFPgMupew+m@lpieralisi
-
-   but I think Ankit trimmed it and I can't certainly blame anyone
-   for that, it is a commit log, it is already hard to digest as it is.
-
-I added James because I think that most of the points I made in the logs
-are really RAS related (and without him I would not have understood half
-of them :)). It would be very beneficial to everyone to have those
-added to kernel documentation - especially to express in architectural
-terms why this it is a safe change to make (at least for PCIe devices).
-
-I am happy to work on the documentation changes - let's just agree what
-should be done next.
-
-Thanks,
-Lorenzo
-
-> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > index d14504821b79..1cb302457d3f 100644
-> > > --- a/arch/arm64/kvm/mmu.c
-> > > +++ b/arch/arm64/kvm/mmu.c
-> > > @@ -1071,7 +1071,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-> > >  	struct kvm_mmu_memory_cache cache = { .gfp_zero = __GFP_ZERO };
-> > >  	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-> > >  	struct kvm_pgtable *pgt = mmu->pgt;
-> > > -	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
-> > > +	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_NORMAL_NC |
-> > >  				     KVM_PGTABLE_PROT_R |
-> > >  				     (writable ? KVM_PGTABLE_PROT_W : 0);
-> > 
-> > Doesn't this affect the GICv2 VCPU interface, which is effectively a
-> > shared peripheral, now allowing a guest to affect another guest's
-> > interrupt distribution? If that is the case, this needs to be fixed.
-> > 
-> > In general, I don't think this should be a blanket statement, but be
-> > limited to devices that we presume can deal with this (i.e. PCIe, and
-> > not much else).
-> 
-> Based on other on-list and off-line discussions, I came to the same
-> conclusion that we can't relax this beyond PCIe. How we do this, it's up
-> for debate. Some ideas:
-> 
-> - something in the vfio-pci driver like a new VM_* flag that KVM can
->   consume (hard sell for an arch-specific thing)
-> 
-> - changing the vfio-pci driver to allow WC and NC mappings (x86
->   terminology) with additional knowledge about what it can safely map
->   as NC. KVM would mimic the vma attributes (it doesn't eliminate the
->   alias though, the guest can always go for Device while the VMM for
->   Normal)
-> 
-> - some per-SoC pfn ranges that are permitted as Normal NC. Can the arch
->   code figure out where these PCIe BARs are or is it only the vfio-pci
->   driver? I guess we can sort something out around the PCIe but I'm not
->   familiar with this subsystem. The alternative is some "safe" ranges in
->   firmware tables, assuming the firmware configures the PCIe BARs
->   location
-> 
-> -- 
-> Catalin
 
