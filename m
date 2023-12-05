@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-3478-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3479-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70198804FB1
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 11:02:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 329AA804FBD
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 11:04:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B76F7B20CFD
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 10:02:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F4151C20B41
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 10:04:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD7314C3B5;
-	Tue,  5 Dec 2023 10:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D07D4C3D8;
+	Tue,  5 Dec 2023 10:04:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Marm9RDD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ipk87mDF"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68658A0
-	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 02:02:17 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E896A0
+	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 02:04:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701770536;
+	s=mimecast20190719; t=1701770675;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YZXF7waANU5+mhguvuvh8JxjfsSebRKaX6sLaLZrogE=;
-	b=Marm9RDDfC8VcOWe21q6dRlhRPF283iN0TBVjSq6KxdIwS51GCMgJvQB8l0zZreqVNuXgY
-	+LHWQ3/cKON+GpnMep1Np69pfU2CKCxZPfWbWYfT+l6r5hd75x1eoSducmratsuK9SQEEu
-	txeFjAs1L7yCG/rTz2rmWfxTUAbVP0M=
+	bh=KOubTR6+i/dKgMYOWRW6MbbKL5pk1rIVNxgsZdiME4Q=;
+	b=Ipk87mDFIBM3yTZn3IdFamYv04JfePOulJDR32sQ87lp9vp2wV2rIhwKgMH7Ieaf5rhsMf
+	FMToghHDGx3GMet2mr12NpZMxVEAu9ncW7VumHuojmyMeC0s7lo21VND+2KWxw/ixVBgMx
+	UKOfrQ8gumf33gE7JbgaSaZ7MGyRe6s=
 Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
  [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-147-4-9dJqT5MiWnPVYU6OwsZQ-1; Tue, 05 Dec 2023 05:02:14 -0500
-X-MC-Unique: 4-9dJqT5MiWnPVYU6OwsZQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40b40234bd5so37860475e9.0
-        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 02:02:14 -0800 (PST)
+ us-mta-424-vA-4thirNSu_GR9E6wzvNQ-1; Tue, 05 Dec 2023 05:04:34 -0500
+X-MC-Unique: vA-4thirNSu_GR9E6wzvNQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40b349b9711so47284855e9.0
+        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 02:04:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701770533; x=1702375333;
+        d=1e100.net; s=20230601; t=1701770673; x=1702375473;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=YZXF7waANU5+mhguvuvh8JxjfsSebRKaX6sLaLZrogE=;
-        b=NH0orpvd1ZKutT4aF43uS6XlSjINWbP+R8/cAbHxLBqrEjV06DD3DWzojftA+IOl57
-         vj5IzCiKK7gBA6YYwM3a5hJIGS2q1O6ZkJy+Haz8sChtBQF2mNji0RTjvw1OmWfDP2Gk
-         JLgI4omDQK6F3H3tByf7Ae5M4SqSBvtWACHagCJKKZDhswMMPCvD9jxqVGQskFSXept8
-         gX/+FS0Oe1KA/jOPxl2+65O36est+VcNzzES+eIco3PDQUYQrBGPGCPEjPlercA1cKJS
-         SvMJCafNDwSXS+QkVKPf8oaOIJ80+E9RTfqgFo7YjdKh23Vt4xGQc1s/bmrh0VhYs1NS
-         JcTQ==
-X-Gm-Message-State: AOJu0YxRwm5Y7cqROhsLrXMbHYjPCFur8CuLjcjB+HPK/J+LHchUoDr6
-	FpTItXthEoK8dyPIMISaZhhYsG8wu1XY/qzkFmriSR/ST7rjlz1WgOW0QtxFaas4wYg5EZNZ384
-	G7pbC5CuPgHh3
-X-Received: by 2002:a05:600c:4593:b0:3fe:4cbc:c345 with SMTP id r19-20020a05600c459300b003fe4cbcc345mr297116wmo.41.1701770533521;
-        Tue, 05 Dec 2023 02:02:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHkyh6uz8tLTANh12Tdqz9NiKwahRoAQySUBBbY1KeDQe3kryYq6CKsi25SwLURKdLaHjSVWQ==
-X-Received: by 2002:a05:600c:4593:b0:3fe:4cbc:c345 with SMTP id r19-20020a05600c459300b003fe4cbcc345mr297101wmo.41.1701770533112;
-        Tue, 05 Dec 2023 02:02:13 -0800 (PST)
+        bh=KOubTR6+i/dKgMYOWRW6MbbKL5pk1rIVNxgsZdiME4Q=;
+        b=qva6K4T9v/Ml03pssNYoujOmFJweWa2EfIcmwK3/XVsR0YCyq0S+eD2fttVYTOkyre
+         YqqNCmQ0NyvtU9FyTebu3BAGX/S30YR6mBf499UQ/gGgLR6PN39xq/Q65+pVxHMLvLi8
+         pIsnRVFoNfGi5bNkjHMTnT6TdELWs3cPTFGIjSr8E3IHmxLtroByK+hfL1QjK8U6cUtm
+         msswAxGTUMdBDXC1ZCelYsiQHe2zkpM54MNahUD/7U97PJSw0QUXV3M7g2gE7Eg3F3T/
+         ee8E9L4WJh0QW0Ssq36JZvbbZruiQfFDepgQKd666FowPjhJQkOpg7g617nuYG8o74Zy
+         0byQ==
+X-Gm-Message-State: AOJu0Yx2qVswlDi5SIaZ94gXbj1C0/MaDNaQW1dTrBtVZq4NSSKEbvmr
+	vLklKeWMp+dokNNUSejfsp2HUzArno3NMsC/E8QtV7UBEBr502HP7Q82R4uySpPjq8shhiA/Lo0
+	X9HcTpqhxYj3r
+X-Received: by 2002:a05:600c:a383:b0:409:1841:3f42 with SMTP id hn3-20020a05600ca38300b0040918413f42mr325125wmb.13.1701770673118;
+        Tue, 05 Dec 2023 02:04:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE7ol268sBRFByr05mv0n0XJD0kcfH6hr9SRiFHI8BNFQb5oJ5ZyfY+vheXrGVvEARQMSuhcw==
+X-Received: by 2002:a05:600c:a383:b0:409:1841:3f42 with SMTP id hn3-20020a05600ca38300b0040918413f42mr325116wmb.13.1701770672753;
+        Tue, 05 Dec 2023 02:04:32 -0800 (PST)
 Received: from starship ([89.237.98.20])
-        by smtp.gmail.com with ESMTPSA id f11-20020a1c6a0b000000b0040523bef620sm497429wmc.0.2023.12.05.02.02.11
+        by smtp.gmail.com with ESMTPSA id c8-20020adfe708000000b003332aa97101sm12883419wrm.38.2023.12.05.02.04.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 02:02:12 -0800 (PST)
-Message-ID: <4f07482c7117b9d27b352621577d78e29ae951b7.camel@redhat.com>
-Subject: Re: [PATCH v7 21/26] KVM: x86: Save and reload SSP to/from SMRAM
+        Tue, 05 Dec 2023 02:04:32 -0800 (PST)
+Message-ID: <1ca09d771a72b5644bab81723b2952896a74194a.camel@redhat.com>
+Subject: Re: [PATCH v7 22/26] KVM: VMX: Set up interception for CET MSRs
 From: Maxim Levitsky <mlevitsk@redhat.com>
-To: "Yang, Weijiang" <weijiang.yang@intel.com>, Chao Gao <chao.gao@intel.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, dave.hansen@intel.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, peterz@infradead.org, 
-	rick.p.edgecombe@intel.com, john.allen@amd.com
-Date: Tue, 05 Dec 2023 12:02:11 +0200
-In-Reply-To: <7531921a-e7b2-4027-86c4-75fc91a45f26@intel.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: Yang Weijiang <weijiang.yang@intel.com>, seanjc@google.com, 
+ pbonzini@redhat.com, dave.hansen@intel.com, kvm@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, peterz@infradead.org,
+ rick.p.edgecombe@intel.com,  john.allen@amd.com
+Date: Tue, 05 Dec 2023 12:04:30 +0200
+In-Reply-To: <ZWl+K55yUaCLCtqw@chao-email>
 References: <20231124055330.138870-1-weijiang.yang@intel.com>
-	 <20231124055330.138870-22-weijiang.yang@intel.com>
-	 <d2be8a787969b76f71194ce65bd6f35426b60dcc.camel@redhat.com>
-	 <ZWlDhYBYGiX7ir4X@chao-email>
-	 <7531921a-e7b2-4027-86c4-75fc91a45f26@intel.com>
+	 <20231124055330.138870-23-weijiang.yang@intel.com>
+	 <393d82243b7f44731439717be82b20fbeda45c77.camel@redhat.com>
+	 <ZWl+K55yUaCLCtqw@chao-email>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -83,91 +83,134 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-On Mon, 2023-12-04 at 08:45 +0800, Yang, Weijiang wrote:
-> On 12/1/2023 10:23 AM, Chao Gao wrote:
-> > On Thu, Nov 30, 2023 at 07:42:44PM +0200, Maxim Levitsky wrote:
-> > > On Fri, 2023-11-24 at 00:53 -0500, Yang Weijiang wrote:
-> > > > Save CET SSP to SMRAM on SMI and reload it on RSM. KVM emulates HW arch
-> > > > behavior when guest enters/leaves SMM mode,i.e., save registers to SMRAM
-> > > > at the entry of SMM and reload them at the exit to SMM. Per SDM, SSP is
-> > > > one of such registers on 64bit Arch, so add the support for SSP.
-> > > > 
-> > > > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > > > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> > > > ---
-> > > >   arch/x86/kvm/smm.c | 8 ++++++++
-> > > >   arch/x86/kvm/smm.h | 2 +-
-> > > >   2 files changed, 9 insertions(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
-> > > > index 45c855389ea7..7aac9c54c353 100644
-> > > > --- a/arch/x86/kvm/smm.c
-> > > > +++ b/arch/x86/kvm/smm.c
-> > > > @@ -275,6 +275,10 @@ static void enter_smm_save_state_64(struct kvm_vcpu *vcpu,
-> > > >   	enter_smm_save_seg_64(vcpu, &smram->gs, VCPU_SREG_GS);
-> > > >   
-> > > >   	smram->int_shadow = static_call(kvm_x86_get_interrupt_shadow)(vcpu);
-> > > > +
-> > > > +	if (guest_can_use(vcpu, X86_FEATURE_SHSTK))
-> > > > +		KVM_BUG_ON(kvm_msr_read(vcpu, MSR_KVM_SSP, &smram->ssp),
-> > > > +			   vcpu->kvm);
-> > > >   }
-> > > >   #endif
-> > > >   
-> > > > @@ -564,6 +568,10 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
-> > > >   	static_call(kvm_x86_set_interrupt_shadow)(vcpu, 0);
-> > > >   	ctxt->interruptibility = (u8)smstate->int_shadow;
-> > > >   
-> > > > +	if (guest_can_use(vcpu, X86_FEATURE_SHSTK))
-> > > > +		KVM_BUG_ON(kvm_msr_write(vcpu, MSR_KVM_SSP, smstate->ssp),
-> > > > +			   vcpu->kvm);
-> > > > +
-> > > >   	return X86EMUL_CONTINUE;
-> > > >   }
-> > > >   #endif
-> > > > diff --git a/arch/x86/kvm/smm.h b/arch/x86/kvm/smm.h
-> > > > index a1cf2ac5bd78..1e2a3e18207f 100644
-> > > > --- a/arch/x86/kvm/smm.h
-> > > > +++ b/arch/x86/kvm/smm.h
-> > > > @@ -116,8 +116,8 @@ struct kvm_smram_state_64 {
-> > > >   	u32 smbase;
-> > > >   	u32 reserved4[5];
-> > > >   
-> > > > -	/* ssp and svm_* fields below are not implemented by KVM */
-> > > >   	u64 ssp;
-> > > > +	/* svm_* fields below are not implemented by KVM */
-> > > >   	u64 svm_guest_pat;
-> > > >   	u64 svm_host_efer;
-> > > >   	u64 svm_host_cr4;
+On Fri, 2023-12-01 at 14:33 +0800, Chao Gao wrote:
+> On Thu, Nov 30, 2023 at 07:44:45PM +0200, Maxim Levitsky wrote:
+> > On Fri, 2023-11-24 at 00:53 -0500, Yang Weijiang wrote:
+> > > Enable/disable CET MSRs interception per associated feature configuration.
+> > > Shadow Stack feature requires all CET MSRs passed through to guest to make
+> > > it supported in user and supervisor mode while IBT feature only depends on
+> > > MSR_IA32_{U,S}_CETS_CET to enable user and supervisor IBT.
 > > > 
-> > > My review feedback from the previous patch series still applies, and I don't
-> > > know why it was not addressed/replied to:
+> > > Note, this MSR design introduced an architectural limitation of SHSTK and
+> > > IBT control for guest, i.e., when SHSTK is exposed, IBT is also available
+> > > to guest from architectual perspective since IBT relies on subset of SHSTK
+> > > relevant MSRs.
 > > > 
-> > > I still think that it is worth it to have a check that CET is not enabled in
-> > > enter_smm_save_state_32 which is called for pure 32 bit guests (guests that don't
-> > > have X86_FEATURE_LM enabled)
-> > can KVM just reject a KVM_SET_CPUID ioctl which attempts to expose shadow stack
-> > (or even any CET feature) to 32-bit guest in the first place? I think it is simpler.
+> > > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> > > ---
+> > >  arch/x86/kvm/vmx/vmx.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+> > >  1 file changed, 42 insertions(+)
+> > > 
+> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > > index 554f665e59c3..e484333eddb0 100644
+> > > --- a/arch/x86/kvm/vmx/vmx.c
+> > > +++ b/arch/x86/kvm/vmx/vmx.c
+> > > @@ -699,6 +699,10 @@ static bool is_valid_passthrough_msr(u32 msr)
+> > >  	case MSR_LBR_CORE_TO ... MSR_LBR_CORE_TO + 8:
+> > >  		/* LBR MSRs. These are handled in vmx_update_intercept_for_lbr_msrs() */
+> > >  		return true;
+> > > +	case MSR_IA32_U_CET:
+> > > +	case MSR_IA32_S_CET:
+> > > +	case MSR_IA32_PL0_SSP ... MSR_IA32_INT_SSP_TAB:
+> > > +		return true;
+> > >  	}
+> > >  
+> > >  	r = possible_passthrough_msr_slot(msr) != -ENOENT;
+> > > @@ -7766,6 +7770,42 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
+> > >  		vmx->pt_desc.ctl_bitmask &= ~(0xfULL << (32 + i * 4));
+> > >  }
+> > >  
+> > > +static void vmx_update_intercept_for_cet_msr(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	bool incpt;
+> > > +
+> > > +	if (kvm_cpu_cap_has(X86_FEATURE_SHSTK)) {
+> > > +		incpt = !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK);
+> > > +
+> > > +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_U_CET,
+> > > +					  MSR_TYPE_RW, incpt);
+> > > +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_S_CET,
+> > > +					  MSR_TYPE_RW, incpt);
+> > > +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL0_SSP,
+> > > +					  MSR_TYPE_RW, incpt);
+> > > +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL1_SSP,
+> > > +					  MSR_TYPE_RW, incpt);
+> > > +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL2_SSP,
+> > > +					  MSR_TYPE_RW, incpt);
+> > > +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL3_SSP,
+> > > +					  MSR_TYPE_RW, incpt);
+> > > +		if (guest_cpuid_has(vcpu, X86_FEATURE_LM))
+> > > +			vmx_set_intercept_for_msr(vcpu, MSR_IA32_INT_SSP_TAB,
+> > > +						  MSR_TYPE_RW, incpt);
+> > > +		if (!incpt)
+> > > +			return;
+> > > +	}
+> > > +
+> > > +	if (kvm_cpu_cap_has(X86_FEATURE_IBT)) {
+> > > +		incpt = !guest_cpuid_has(vcpu, X86_FEATURE_IBT);
+> > > +
+> > > +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_U_CET,
+> > > +					  MSR_TYPE_RW, incpt);
+> > > +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_S_CET,
+> > > +					  MSR_TYPE_RW, incpt);
+> > > +	}
+> > > +}
+> > > +
+> > >  static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+> > >  {
+> > >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> > > @@ -7843,6 +7883,8 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+> > >  
+> > >  	/* Refresh #PF interception to account for MAXPHYADDR changes. */
+> > >  	vmx_update_exception_bitmap(vcpu);
+> > > +
+> > > +	vmx_update_intercept_for_cet_msr(vcpu);
+> > >  }
+> > >  
+> > >  static u64 vmx_get_perf_capabilities(void)
+> > 
+> > My review feedback from the previous patch still applies as well,
+> > 
+> > I still think that we should either try a best effort approach to plug
+> > this virtualization hole, or we at least should fail guest creation
+> > if the virtualization hole is present as I said:
+> > 
+> > "Another, much simpler option is to fail the guest creation if the shadow stack + indirect branch tracking
+> > state differs between host and the guest, unless both are disabled in the guest.
+> > (in essence don't let the guest be created if (2) or (3) happen)"
 > 
-> I favor adding an early defensive check for the issue under discussion if we want to handle the case.
-> Crashing the VM at runtime when guest SMI is kicked seems not user friendly.
+> Enforcing a "none" or "all" policy is a temporary solution. in future, if some
+> reserved bits in S/U_CET MSRs are extended for new features, there will be:
 > 
+> 	platform A supports SS + IBT
+> 	platform B supports SS + IBT + new feature
+> 
+> Guests running on B inevitably have the same virtualization hole. and if kvm
+> continues enforcing the policy on B, then VM migration from A to B would be
+> impossible.
+> 
+> To me, intercepting S/U_CET MSR and CET_S/U xsave components is intricate and
+> yields marginal benefits. And I also doubt any reasonable OS implementation
+> would depend on #GP of WRMSR to S/U_CET MSRs for functionalities. So, I vote
+> to leave the patch as-is.
 
-I don't mind. I remember that I was told that crashing a guest when #SMI arrives and a nested guest is running
-is ok for 32 bit guests, don't know what the justification was.
-Sean, Paolo, do you remember?
+To some extent I do agree with you but this can become a huge mess in the future.
+I think we need at least to tell Intel/AMD about this to ensure that they don't make this thing worse
+than it already is.
 
-IMHO the chances of pure 32 bit guest (only qemu-system-386 creates these) running with CET are very low,
-but I just wanted to have a cheap check just to keep the 32 bit and 64 bit smm save/restore code similar,
-so that nobody in the future will ask 'why this code does this or that'.
-
-Also it is trivial to add the ssp to 32 bit smmram image - the layout is not really compliant to x86 spec,
-and never consumed by the hardware, you can just put it somewhere in the image, instead of one of the reserved fields.
-
-From my point of view I want the code to be as orthogonal as possible.
+Also the very least we can do if we opt to keep things as is, 
+is to document this virtualization hole - we have Documentation/virt/kvm/x86/errata.rst for that.
 
 Best regards,
 	Maxim Levitsky
+
+> 
+> > Please at least tell me what do you think about this.
+> > Best regards,
+> > 	Maxim Levitsky
+> > 
+> > 
+> > 
 
 
 
