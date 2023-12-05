@@ -1,137 +1,140 @@
-Return-Path: <kvm+bounces-3624-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3625-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3C3E805E85
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 20:22:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75577805E97
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 20:24:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C2741C210A4
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 19:22:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2033B1F215D4
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 19:24:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C936D1DC;
-	Tue,  5 Dec 2023 19:21:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ev8Hh1P0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13E56D1DD;
+	Tue,  5 Dec 2023 19:24:44 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC4D81A1
-	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 11:21:53 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-db547d41413so117033276.0
-        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 11:21:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701804113; x=1702408913; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+PHueKnu6twn/8T3xEnp+ZFlbZ1HcVdnlRPtBHugQhw=;
-        b=Ev8Hh1P0Lkn6rpwHqo6XRBJORC5pIsg8zENzrjNDjrI56SN7yuJz1Rr68Pqz7l7lMx
-         k4WwCo2Tj7AurXyzwDuPABQKnj+HotokvhE+iZcsEaH0FqEVPtb8sm1k6FBkjiEEBeWV
-         BwwvoWxBDymDs1cTorQpvI7Drb04zj/BLheY9skbS05hzIuVUiesuLgv6IPO9wo7WwUz
-         BUJB/dnP/ln0HCkbQsh+xbBzASDLJc4XFAAis88NOyLWNZrAfl/ZGixx5n5kYLvTp3bw
-         RvuS6tSavP181mlYlLba8Upo+d2S2tzTyla9rR1tQopXZFG2fb15oy6QgDE82cAhBSym
-         xXkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701804113; x=1702408913;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+PHueKnu6twn/8T3xEnp+ZFlbZ1HcVdnlRPtBHugQhw=;
-        b=oMVPMBDJ4bdAecsNDoPq13stBeNk7O2mx1Xqu6w6+cbP4ObFgunTyABcy0rJhMujBm
-         IK7QJcESZePW2rNwm8Ko2s3W631892ioELcWICmMBAAWFohwsdneKPqEynArZcOJymec
-         PAAyqrlIIKHfDZ7Stzxcz+Jp0depjZ6cDClWIRs0k0o3CRsuukHwMJbNAOZY1YWFC4EI
-         5xf5Vnd9bASfLPPcUaAKTp1kwF+BH4XUTyos47FOLd6b4op/w+/muebNxrx5m0ndtG0J
-         w2OqODd52lyd4XFUC+o3y9Zb4cWxCowqQ/21Cglsl04wFI1iYvRChDCcwxM5FBrMqSTY
-         6RyQ==
-X-Gm-Message-State: AOJu0YzfT6cSKIwGed2LOgatQdAssrgRKqOCTYIxKYK1oOqiT4tMef1b
-	kT8r0yn3gg1YCceZXCxxiBOpAnGlqSU=
-X-Google-Smtp-Source: AGHT+IEDojI9r2jUP7SnFhGrIGalU4Ij3ADFSMH3T+bKNraCDRbJqd/r79BOcS/tAV9dHezzcWCAi9z33D0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:bccd:0:b0:d9a:ca20:1911 with SMTP id
- l13-20020a25bccd000000b00d9aca201911mr63207ybm.4.1701804113124; Tue, 05 Dec
- 2023 11:21:53 -0800 (PST)
-Date: Tue, 5 Dec 2023 11:21:51 -0800
-In-Reply-To: <CXD7AW5T9R7G.2REFR2IRSVRVZ@amazon.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F50F6D1A1;
+	Tue,  5 Dec 2023 19:24:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B199C433C7;
+	Tue,  5 Dec 2023 19:24:39 +0000 (UTC)
+Date: Tue, 5 Dec 2023 19:24:37 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Marc Zyngier <maz@kernel.org>, ankita@nvidia.com,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	oliver.upton@linux.dev, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, will@kernel.org, ardb@kernel.org,
+	akpm@linux-foundation.org, gshan@redhat.com, aniketa@nvidia.com,
+	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
+	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, lpieralisi@kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and
+ NORMAL_NC for IO memory
+Message-ID: <ZW949Tl3VmQfPk0L@arm.com>
+References: <20231205033015.10044-1-ankita@nvidia.com>
+ <86fs0hatt3.wl-maz@kernel.org>
+ <ZW8MP2tDt4_9ROBz@arm.com>
+ <20231205130517.GD2692119@nvidia.com>
+ <ZW9OSe8Z9gAmM7My@arm.com>
+ <20231205164318.GG2692119@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231108111806.92604-1-nsaenz@amazon.com> <20231108111806.92604-6-nsaenz@amazon.com>
- <f4495d1f697cf9a7ddfb786eaeeac90f554fc6db.camel@redhat.com>
- <CXD4TVV5QWUK.3SH495QSBTTUF@amazon.com> <ZWoKlJUKJGGhRRgM@google.com>
- <CXD5HJ5LQMTE.11XP9UB9IL8LY@amazon.com> <ZWocI-2ajwudA-S5@google.com> <CXD7AW5T9R7G.2REFR2IRSVRVZ@amazon.com>
-Message-ID: <ZW94T8Fx2eJpwKQS@google.com>
-Subject: Re: [RFC 05/33] KVM: x86: hyper-v: Introduce VTL call/return
- prologues in hypercall page
-From: Sean Christopherson <seanjc@google.com>
-To: Nicolas Saenz Julienne <nsaenz@amazon.com>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com, 
-	anelkz@amazon.com, graf@amazon.com, dwmw@amazon.co.uk, jgowans@amazon.com, 
-	kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com, 
-	x86@kernel.org, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231205164318.GG2692119@nvidia.com>
+X-TUID: nsHFPCYE/dW9
 
-On Fri, Dec 01, 2023, Nicolas Saenz Julienne wrote:
-> On Fri Dec 1, 2023 at 5:47 PM UTC, Sean Christopherson wrote:
-> > On Fri, Dec 01, 2023, Nicolas Saenz Julienne wrote:
-> > > On Fri Dec 1, 2023 at 4:32 PM UTC, Sean Christopherson wrote:
-> > > > On Fri, Dec 01, 2023, Nicolas Saenz Julienne wrote:
-> > > > > > To support this I think that we can add a userspace msr filter on the HV_X64_MSR_HYPERCALL,
-> > > > > > although I am not 100% sure if a userspace msr filter overrides the in-kernel msr handling.
-> > > > >
-> > > > > I thought about it at the time. It's not that simple though, we should
-> > > > > still let KVM set the hypercall bytecode, and other quirks like the Xen
-> > > > > one.
-> > > >
-> > > > Yeah, that Xen quirk is quite the killer.
-> > > >
-> > > > Can you provide pseudo-assembly for what the final page is supposed to look like?
-> > > > I'm struggling mightily to understand what this is actually trying to do.
-> > >
-> > > I'll make it as simple as possible (diregard 32bit support and that xen
-> > > exists):
-> > >
-> > > vmcall             <-  Offset 0, regular Hyper-V hypercalls enter here
-> > > ret
-> > > mov rax,rcx  <-  VTL call hypercall enters here
-> >
-> > I'm missing who/what defines "here" though.  What generates the CALL that points
-> > at this exact offset?  If the exact offset is dictated in the TLFS, then aren't
-> > we screwed with the whole Xen quirk, which inserts 5 bytes before that first VMCALL?
+On Tue, Dec 05, 2023 at 12:43:18PM -0400, Jason Gunthorpe wrote:
+> On Tue, Dec 05, 2023 at 04:22:33PM +0000, Catalin Marinas wrote:
+> > Yeah, I made this argument in the past. But it's a fair question to ask
+> > since the Arm world is different from x86. Just reusing an existing
+> > driver in a different context may break its expectations. Does Normal NC
+> > access complete by the time a TLBI (for Stage 2) and DSB (DVMsync) is
+> > completed? It does reach some point of serialisation with subsequent
+> > accesses to the same address but not sure how it is ordered with an
+> > access to a different location like the config space used for reset.
+> > Maybe it's not a problem at all or it is safe only for PCIe but it would
+> > be good to get to the bottom of this.
 > 
-> Yes, sorry, I should've included some more context.
+> IMHO, the answer is you can't know architecturally. The specific
+> vfio-platform driver must do an analysis of it's specific SOC and
+> determine what exactly is required to order the reset. The primary
+> purpose of the vfio-platform drivers is to provide this reset!
 > 
-> Here's a rundown (from memory) of how the first VTL call happens:
->  - CPU0 start running at VTL0.
->  - Hyper-V enables VTL1 on the partition.
->  - Hyper-V enabled VTL1 on CPU0, but doesn't yet switch to it. It passes
->    the initial VTL1 CPU state alongside the enablement hypercall
->    arguments.
->  - Hyper-V sets the Hypercall page overlay address through
->    HV_X64_MSR_HYPERCALL. KVM fills it.
->  - Hyper-V gets the VTL-call and VTL-return offset into the hypercall
->    page using the VP Register HvRegisterVsmCodePageOffsets (VP register
->    handling is in user-space).
+> In most cases I would expect some reads from the device to be required
+> before the reset.
 
-Ah, so the guest sets the offsets by "writing" HvRegisterVsmCodePageOffsets via
-a HvSetVpRegisters() hypercall.
+I can see in the vfio_platform_common.c code that the reset is either
+handled by an ACPI _RST method or some custom function in case of DT.
+Let's consider the ACPI method for now, I assume the AML code pokes some
+device registers but we can't say much about the ordering it expects
+without knowing the details. The AML may assume that the ioaddr mapped
+as Device-nRnRE (ioremap()) in the kernel has the same attributes
+wherever else is mapped in user or guests. Note that currently the
+vfio_platform and vfio_pci drivers only allow pgprot_noncached() in
+user, so they wouldn't worry about other mismatched aliases.
 
-I don't see a sane way to handle this in KVM if userspace handles HvSetVpRegisters().
-E.g. if the guest requests offsets that don't leave enough room for KVM to shove
-in its data, then presumably userspace needs to reject HvSetVpRegisters().  But
-that requires userspace to know exactly how many bytes KVM is going to write at
-each offsets.
+I think PCIe is slightly better documented but even here we'll have to
+rely on the TLBI+DSB to clear any prior writes on different CPUs.
 
-My vote is to have userspace do all the patching.  IIUC, all of this is going to
-be mutually exclusive with kvm_xen_hypercall_enabled(), i.e. userspace doesn't
-need to worry about setting RAX[31].  At that point, it's just VMCALL versus
-VMMCALL, and userspace is more than capable of identifying whether its running
-on Intel or AMD.
+It can be argued that it's the responsibility of whoever grants device
+access to know the details. However, it would help if we give some
+guidance, any expectations broken if an alias is Normal-NC? It's easier
+to start with PCIe first until we get some concrete request for other
+types of devices.
 
->  - Hyper-V performs the first VTL-call, and has all it needs to move
->    between VTL0/1.
+> > So, I think it would be easier to get this patch upstream if we limit
+> > the change to PCIe devices for now. We may relax this further in the
+> > future. Do you actually have a need for non-PCIe devices to support WC
+> > in the guest or it's more about the complexity of the logic to detect
+> > whether it's actually a PCIe BAR we are mapping into the guest? (I can
+> > see some Arm GPU folk asking for this but those devices are not easily
+> > virtualisable).
 > 
-> Nicolas
+> The complexity is my concern, and the disruption to the ecosystem with
+> some of the ideas given.
+> 
+> If there was a trivial way to convey in the VMA that it is safe then
+> sure, no objection from me.
+
+I suggested a new VM_* flag or some way to probe the iomem_resources for
+PCIe ranges (if they are described in there, not sure). We can invent
+other tree searching for ranges that get registers from the vfio driver,
+I don't think it's that difficult.
+
+Question is, do we need to do this for other types of devices or it's
+mostly theoretical at this point (what's theoretical goes both ways
+really).
+
+A more complex way is to change vfio to allow Normal mappings and KVM
+would mimic them. You were actually planning to do this for Cacheable
+anyway.
+
+> I would turn it around and ask we find a way to restrict platform
+> devices when someone comes with a platform device that wants to use
+> secure kvm and has a single well defined HW problem that is solved by
+> this work.
+
+We end up with similar search/validation mechanism, so not sure we gain
+much.
+
+> What if we change vfio-pci to use pgprot_device() like it already
+> really should and say the pgprot_noncached() is enforced as
+> DEVICE_nGnRnE and pgprot_device() may be DEVICE_nGnRE or NORMAL_NC?
+> Would that be acceptable?
+
+pgprot_device() needs to stay as Device, otherwise you'd get speculative
+reads with potential side-effects.
+
+-- 
+Catalin
 
