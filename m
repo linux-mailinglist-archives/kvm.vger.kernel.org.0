@@ -1,317 +1,173 @@
-Return-Path: <kvm+bounces-3459-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3462-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35B99804ABA
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 07:57:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EAF51804AEA
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 08:10:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A44F7B20D72
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 06:57:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46768B20D61
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 07:09:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D3C92D05D;
-	Tue,  5 Dec 2023 06:56:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A726415EB2;
+	Tue,  5 Dec 2023 07:09:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="cD2lWBOO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FEn/Sg9q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F088109;
-	Mon,  4 Dec 2023 22:56:33 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 2B85E12002C;
-	Tue,  5 Dec 2023 09:56:30 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 2B85E12002C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1701759390;
-	bh=andhfGlaITG4vQNjCIcqPKtWz9a8vqXXgsv+kE9yC1c=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=cD2lWBOOj6vtdcA3mj3/hHKSg+5cmLACgLqaq0Ys4sX+tVVYHi1GMmqn08ykw1vIq
-	 P7NwDnnica2MVI/Q07lDAKdqMGlYk9w5ZfXr2733XkMVSza864SlzI81CbvXURqDQJ
-	 VF212ulOpnTxlX1pVDDi+tFwspQRfjlVDcswCHKCIGcZvHVlU/Ozyj/kws+mgerEwc
-	 8ATorpi4kgAnIEBL1Gb8Hm+hdhymvq7swIOYn8F1w9J5E5aBW5RGdJhOx+/ZZVLzyy
-	 jc5XuiBAVPliwau0Rg++Nvx9kb2nPYJxm65EDHDegM06bAWm+ZaxZm7REXeLUaZKeR
-	 U2iJehlng8UYg==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Tue,  5 Dec 2023 09:56:30 +0300 (MSK)
-Received: from localhost.localdomain (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F2959C;
+	Mon,  4 Dec 2023 23:09:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701760180; x=1733296180;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=RtVmaOsriHQ0IdYTdBW44sHZOuW81B9/Txa3EIPaUoo=;
+  b=FEn/Sg9qohdFEx6JShrWSO67oXsJ4E7/cYR4jAyjfWSw4PuS+ISKPsb3
+   FiUut9Jat3TGFHgFxpB7QthvICS8W/7gslS3a0v/6onmVjv67WU7PkSpf
+   9Mpqt50gqKf/1kKsNblSrG2UXOZe/ydrjw3rAtPauFpHPw5BDMZNHIky0
+   ML6Lvqi9JRCI/5f0Ou/O+08e2P5DWb/sGojvlCqW5MwUssKAJS7hDneeb
+   cONL6wJGKKMhTeKzm7Zct4kztUuOXYhl+Ivff43kUgtNh3ioAk+liIh1L
+   3Brxl7iTY+v82Ul0lMVBDGBlSex6XspXTeI7BAKylK38hk6oahvjsQWqC
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="745406"
+X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
+   d="scan'208";a="745406"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 23:09:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="861655172"
+X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
+   d="scan'208";a="861655172"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by FMSMGA003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Dec 2023 23:09:39 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 4 Dec 2023 23:09:39 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 4 Dec 2023 23:09:39 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 5 Dec 2023 09:56:29 +0300
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
-Subject: [PATCH net-next v6 4/4] vsock/test: two tests to check credit update logic
-Date: Tue, 5 Dec 2023 09:48:06 +0300
-Message-ID: <20231205064806.2851305-5-avkrasnov@salutedevices.com>
-X-Mailer: git-send-email 2.35.0
-In-Reply-To: <20231205064806.2851305-1-avkrasnov@salutedevices.com>
-References: <20231205064806.2851305-1-avkrasnov@salutedevices.com>
+ 15.1.2507.34; Mon, 4 Dec 2023 23:09:39 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=l7S/KpRWcmvU/iSDFh3Xv682aAHXcQe4IeRCCjwjBKCl9csLJjR+EMOvzgpwSgZb5v3v7IAGjqMRizaDiYh9mmPMnl7ZWPaHoiuARmBIGks3Wh6PAt7dy5j5jqmZJL+ozp9RagiYparrSlinY7I4CQ0sx3ls8DNAkrc3d4ysXpVdw9NRL0xiKnsspKkXW8Knxwn28/uona9IvM3/+/o4PjPesCWUaCPoUabUdovs/InqbN+BE2YThfCsF4poSejnGAuC1kWUGRWBonMgUlG483rAfLFBuXmqTX9e9XGZZsq51TLJrOzhdN2BH5WQ1cJO0vUznQ86xx57GdGa/7Datg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PLgzQWJiRfEKnvAVcq8fmSQiipFxkp9rPUinz6LESVM=;
+ b=YEZx2Uat927J6LodXTC+a/VQa9Ys+7IO1v6cmTrGtVbJJRVbce0ahhkOTiRPz+0Jqfa1cEr69KvwFrJnkMX+hy0zLaphVLZeZTcDonACzvoIakbkLJn6DFFn4mBqpEGbkarYvt6Db9GkjaoDSzPCTQ7QzKTOUOy9GPHm1yIJ4v1pK+jlx7b8cP2aD8X05w1jk5kvF93ujLXqMrAoZPuSJJGxoQTD8GYRiyRJTc1rKJuR+unJnFzWGXyxMu0WxJoGhu9e0wG94xI4DH4/BT0Q0PBAkFqEIDgGvfOdk45FRRmGE9TeIT0a0/ogIQjiJVVofH7p6sSVUTr2HK0v3GmQhg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ PH7PR11MB6055.namprd11.prod.outlook.com (2603:10b6:510:1d3::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Tue, 5 Dec
+ 2023 07:09:31 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::32a9:54b8:4253:31d4]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::32a9:54b8:4253:31d4%4]) with mapi id 15.20.7046.034; Tue, 5 Dec 2023
+ 07:09:31 +0000
+Date: Tue, 5 Dec 2023 14:40:28 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: <iommu@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <alex.williamson@redhat.com>,
+	<pbonzini@redhat.com>, <seanjc@google.com>, <joro@8bytes.org>,
+	<will@kernel.org>, <robin.murphy@arm.com>, <kevin.tian@intel.com>,
+	<baolu.lu@linux.intel.com>, <dwmw2@infradead.org>, <yi.l.liu@intel.com>
+Subject: Re: [RFC PATCH 11/42] iommu: Add new domain op cache_invalidate_kvm
+Message-ID: <ZW7F3AJZe7vrqzcy@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20231202091211.13376-1-yan.y.zhao@intel.com>
+ <20231202092041.14084-1-yan.y.zhao@intel.com>
+ <20231204150945.GF1493156@nvidia.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231204150945.GF1493156@nvidia.com>
+X-ClientProxiedBy: SI1PR02CA0041.apcprd02.prod.outlook.com
+ (2603:1096:4:1f6::18) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 181836 [Dec 05 2023]
-X-KSMG-AntiSpam-Version: 6.0.0.2
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 5 0.3.5 98d108ddd984cca1d7e65e595eac546a62b0144b, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/12/05 03:59:00 #22607474
-X-KSMG-AntiVirus-Status: Clean, skipped
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH7PR11MB6055:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7a5cb472-e92f-4f9a-ffa5-08dbf5612065
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YJG4KCSZN15lJp1IHsfk/I3KIuS2EaJ24cUmUUEddker4Lkh+ymcLM3YVf+7XjQMTCDdFOoy57xlsksZb9+s8Z0jRz8o5tcvPzSMPmFlDWThSnrZvcfnlju/3Eas+t/GBeyrJ3VmUoILRagrRCChHhQt7gOrRu2rkAXozvO13x/axmNn2zSk/PxPEkYwkXOe714izPsjjX1ou73+EO0ZrG4BFlD4G/ZjBm3vlf8CgRpcHAh9vUN/HuM7/Xymbh4eqVQPido1b+NNQ0Y5or1RzR41OOcCktfgSi6giu2IoiIBH4t9yYJoDYfXK+qLNurSVnMAceJ5KnouOFM244NTFXXF4Q5LzEOd5GC+8drlP3X/c3xRT3y3smywnEQTwShbde9EOVwU5JSs95DLY/BFmrzvW+WpZuWGA8zhHk5qxrx9RMxINof7QhvVUllhmDp1e993rvmL7dxqJ2b/O3d2lGUB/RIUQjdjzHQe1zvqNAKpgHjhma8vewq8kDnu184phsA9mjpN0pyrRnpmTCEeE+pX3lv+SD9Qm/BhIzKjgadedgaDl/UurIWSfmP3+51q
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(396003)(376002)(39860400002)(366004)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(86362001)(6486002)(478600001)(6506007)(6512007)(6666004)(66476007)(66556008)(66946007)(54906003)(316002)(6916009)(8936002)(4326008)(8676002)(83380400001)(2906002)(82960400001)(7416002)(5660300002)(41300700001)(4744005)(38100700002)(3450700001)(26005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?aTpoKo7RGQ2kLPDNBie88/gNSkyf4wz3Ub6+djc1LMswSAwSKnoCCmjQlaIq?=
+ =?us-ascii?Q?A0Q16sH6yIb/hNDtOkzGEzuiyVrklyiCADlzv07HfZ5cYc63CHnkhGepjEgY?=
+ =?us-ascii?Q?pp9XQwGI6c2tFqF0ipbUNWAOB8R7FMazX8CbADKSp2OrLkTM4DkKDUnS7U5y?=
+ =?us-ascii?Q?JolscMWyQYsvJO1mY82nE/SlFDsDwCfb+YgSXpwcGOobc/I68oW3tHh4MhRQ?=
+ =?us-ascii?Q?o2k0aPS1ESDCJEq4QhLhsOMH5Itcz3sDHWTLe3RNNNXYrwYVIaSk1leeu/H0?=
+ =?us-ascii?Q?SZv4Mnru6OtbpIXb5PAn82CDAZPsgdbfbVwFCIaZr3t55qfCTg8r2O4Q38Gk?=
+ =?us-ascii?Q?pRX2T9IPwboFsR7uBUrPtJ3zE12FX8QpYM2bR+Xjt8yhBUqnEiTZMV+vDGzX?=
+ =?us-ascii?Q?8wtzYfIrT+jk2qeNE6jJU5avHJ6hskbEIgK+PORg1KXzfbUDeWOk3RDyzQWA?=
+ =?us-ascii?Q?H9aAeNHYLgINXWw4fXTFnHxSxajA0OHzafPBZOo/NtjxNQjHOMGLOWIhMq+4?=
+ =?us-ascii?Q?PDc4bdQ0hnc2oUKlS+c+kcgZHeAmM3OYU78fTzroVimjiGSGTEO+/h9H5e67?=
+ =?us-ascii?Q?PG3dz2xHcK+v2IQ9Kv58oB70ePC2YjUm2yBQRfDzxIwb55I49OQxG+rbee7Y?=
+ =?us-ascii?Q?LhVUZC8JlHouVfCYmBzO07sa/OJ49fiNKLrU1fHxD+OAXYg33YokDrOXTmDG?=
+ =?us-ascii?Q?Ni6wH4SXjlhaXlKx6gYKmoZbEi/3VdNMs/JOeRBeXcNi8XmACRQvOZsTaSix?=
+ =?us-ascii?Q?TwJBrBbTMFc8WxxDQGMXq1XPq2olH/uo3BHndtHI8AXEcJV7irTnMiqo67X6?=
+ =?us-ascii?Q?FgD3y8HJwJ1jZ+o3dkI5fWAzHVfcHXVZD1zw5l5RafsOsljxmC2GiOSt9x/g?=
+ =?us-ascii?Q?awg79e3cWdxBANTqQo9zHETNhdoU1N4KMFGBvYeazMtLiPZOFNVdaBCLA49Q?=
+ =?us-ascii?Q?s17cK0gZcLlNTV04z7/Yzi3Anue2C7hSiuJuxLt7A8Ll8VMxmhQ+ZLTIWdFP?=
+ =?us-ascii?Q?ja4sl5Og0/NM4WmKhji7/Bb4nqa5Cs3iyGJi2GHqY+LTYfkQ9eDqrgqOQSgg?=
+ =?us-ascii?Q?ut9UWbSJNWDYKzJSBEQsig71UyoXlrYVBSF2Ktkgje2F2GkY0Rh6Lv3NzCFt?=
+ =?us-ascii?Q?n8LpXkc1LV2CV1fpKqIUlCaTNfgfzLlkZKezqcDSBCwZCcHbqkAegZZl0quu?=
+ =?us-ascii?Q?3pt4HjIrJG3AC8jORNym1Y7Noqi0Ui9MaXPeVqLXkxH7VSpblek/oErUR/+e?=
+ =?us-ascii?Q?2z4AangWDmNaZU+m7tzqvk8SdaPkFtsemXtZfgJehZd6HFZ/YbDXFHjm9Nyl?=
+ =?us-ascii?Q?Xlzyi4iCqq0FiuSowksWMT3RBVQRFQGyD+4KXSWdpXv+CC4/omj3aknIDJbg?=
+ =?us-ascii?Q?XhUIFOAyoXU0CObUL4rCbFqQ4p+kze+UE8c3R4YGplagw9msrzgvS1KFD52/?=
+ =?us-ascii?Q?/rma+f1qm7xljG9AjL0bbbrDptcfit3cdDDdut/u6nBP3VIk9djLB3asli7y?=
+ =?us-ascii?Q?LVOSReZoc6pnAyOZ6d/oMnbTitqG12w6f8N79trIhn/fepHZ+lGSrvJntjMO?=
+ =?us-ascii?Q?EZu05ad3vXw7EfYmUUcm5rCYktNOXtRjQD7u6gIU?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7a5cb472-e92f-4f9a-ffa5-08dbf5612065
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2023 07:09:31.3228
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VXopE6X3Xvb+jOU7kPaU7g5Qo3r9WUNX/MToJKsqVMGrPSjn9GljN6fUoQUJBG+UT/KDKE1GqJDEt6Y9K0jLKw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6055
+X-OriginatorOrg: intel.com
 
-Both tests are almost same, only differs in two 'if' conditions, so
-implemented in a single function. Tests check, that credit update
-message is sent:
-
-1) During setting SO_RCVLOWAT value of the socket.
-2) When number of 'rx_bytes' become smaller than SO_RCVLOWAT value.
-
-Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
----
- Changelog:
- v1 -> v2:
-  * Update commit message by removing 'This patch adds XXX' manner.
-  * Update commit message by adding details about dependency for this
-    test from kernel internal define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE.
-  * Add comment for this dependency in 'vsock_test.c' where this define
-    is duplicated.
- v2 -> v3:
-  * Replace synchronization based on control TCP socket with vsock
-    data socket - this is needed to allow sender transmit data only
-    when new buffer size of receiver is visible to sender. Otherwise
-    there is race and test fails sometimes.
- v3 -> v4:
-  * Replace 'recv_buf()' to 'recv(MSG_DONTWAIT)' in last read operation
-    in server part. This is needed to ensure that 'poll()' wake up us
-    when number of bytes ready to read is equal to SO_RCVLOWAT value.
- v4 -> v5:
-  * Use 'recv_buf(MSG_DONTWAIT)' instead of 'recv(MSG_DONTWAIT)'.
- v5 -> v6:
-  * Add second test which checks, that credit update is sent during
-    reading data from socket.
-  * Update commit message.
-
- tools/testing/vsock/vsock_test.c | 175 +++++++++++++++++++++++++++++++
- 1 file changed, 175 insertions(+)
-
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 01fa816868bc..66246d81d654 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -1232,6 +1232,171 @@ static void test_double_bind_connect_client(const struct test_opts *opts)
- 	}
- }
- 
-+#define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
-+/* This define is the same as in 'include/linux/virtio_vsock.h':
-+ * it is used to decide when to send credit update message during
-+ * reading from rx queue of a socket. Value and its usage in
-+ * kernel is important for this test.
-+ */
-+#define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE	(1024 * 64)
-+
-+static void test_stream_rcvlowat_def_cred_upd_client(const struct test_opts *opts)
-+{
-+	size_t buf_size;
-+	void *buf;
-+	int fd;
-+
-+	fd = vsock_stream_connect(opts->peer_cid, 1234);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Send 1 byte more than peer's buffer size. */
-+	buf_size = RCVLOWAT_CREDIT_UPD_BUF_SIZE + 1;
-+
-+	buf = malloc(buf_size);
-+	if (!buf) {
-+		perror("malloc");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Wait until peer sets needed buffer size. */
-+	recv_byte(fd, 1, 0);
-+
-+	if (send(fd, buf, buf_size, 0) != buf_size) {
-+		perror("send failed");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	free(buf);
-+	close(fd);
-+}
-+
-+static void test_stream_credit_update_test(const struct test_opts *opts,
-+					   bool low_rx_bytes_test)
-+{
-+	size_t recv_buf_size;
-+	struct pollfd fds;
-+	size_t buf_size;
-+	void *buf;
-+	int fd;
-+
-+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	buf_size = RCVLOWAT_CREDIT_UPD_BUF_SIZE;
-+
-+	if (setsockopt(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
-+		       &buf_size, sizeof(buf_size))) {
-+		perror("setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (low_rx_bytes_test) {
-+		/* Set new SO_RCVLOWAT here. This enables sending credit
-+		 * update when number of bytes if our rx queue become <
-+		 * SO_RCVLOWAT value.
-+		 */
-+		recv_buf_size = 1 + VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
-+
-+		if (setsockopt(fd, SOL_SOCKET, SO_RCVLOWAT,
-+			       &recv_buf_size, sizeof(recv_buf_size))) {
-+			perror("setsockopt(SO_RCVLOWAT)");
-+			exit(EXIT_FAILURE);
-+		}
-+	}
-+
-+	/* Send one dummy byte here, because 'setsockopt()' above also
-+	 * sends special packet which tells sender to update our buffer
-+	 * size. This 'send_byte()' will serialize such packet with data
-+	 * reads in a loop below. Sender starts transmission only when
-+	 * it receives this single byte.
-+	 */
-+	send_byte(fd, 1, 0);
-+
-+	buf = malloc(buf_size);
-+	if (!buf) {
-+		perror("malloc");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Wait until there will be 128KB of data in rx queue. */
-+	while (1) {
-+		ssize_t res;
-+
-+		res = recv(fd, buf, buf_size, MSG_PEEK);
-+		if (res == buf_size)
-+			break;
-+
-+		if (res <= 0) {
-+			fprintf(stderr, "unexpected 'recv()' return: %zi\n", res);
-+			exit(EXIT_FAILURE);
-+		}
-+	}
-+
-+	/* There is 128KB of data in the socket's rx queue, dequeue first
-+	 * 64KB, credit update is sent if 'low_rx_bytes_test' == true.
-+	 * Otherwise, credit update is sent in 'if (!low_rx_bytes_test)'.
-+	 */
-+	recv_buf_size = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
-+	recv_buf(fd, buf, recv_buf_size, 0, recv_buf_size);
-+
-+	if (!low_rx_bytes_test) {
-+		recv_buf_size++;
-+
-+		/* Updating SO_RCVLOWAT will send credit update. */
-+		if (setsockopt(fd, SOL_SOCKET, SO_RCVLOWAT,
-+			       &recv_buf_size, sizeof(recv_buf_size))) {
-+			perror("setsockopt(SO_RCVLOWAT)");
-+			exit(EXIT_FAILURE);
-+		}
-+	}
-+
-+	fds.fd = fd;
-+	fds.events = POLLIN | POLLRDNORM | POLLERR |
-+		     POLLRDHUP | POLLHUP;
-+
-+	/* This 'poll()' will return once we receive last byte
-+	 * sent by client.
-+	 */
-+	if (poll(&fds, 1, -1) < 0) {
-+		perror("poll");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (fds.revents & POLLERR) {
-+		fprintf(stderr, "'poll()' error\n");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (fds.revents & (POLLIN | POLLRDNORM)) {
-+		recv_buf(fd, buf, recv_buf_size, MSG_DONTWAIT, recv_buf_size);
-+	} else {
-+		/* These flags must be set, as there is at
-+		 * least 64KB of data ready to read.
-+		 */
-+		fprintf(stderr, "POLLIN | POLLRDNORM expected\n");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	free(buf);
-+	close(fd);
-+}
-+
-+static void test_stream_cred_upd_on_low_rx_bytes(const struct test_opts *opts)
-+{
-+	test_stream_credit_update_test(opts, true);
-+}
-+
-+static void test_stream_cred_upd_on_set_rcvlowat(const struct test_opts *opts)
-+{
-+	test_stream_credit_update_test(opts, false);
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -1342,6 +1507,16 @@ static struct test_case test_cases[] = {
- 		.run_client = test_double_bind_connect_client,
- 		.run_server = test_double_bind_connect_server,
- 	},
-+	{
-+		.name = "SOCK_STREAM virtio credit update + SO_RCVLOWAT",
-+		.run_client = test_stream_rcvlowat_def_cred_upd_client,
-+		.run_server = test_stream_cred_upd_on_set_rcvlowat,
-+	},
-+	{
-+		.name = "SOCK_STREAM virtio credit update + low rx_bytes",
-+		.run_client = test_stream_rcvlowat_def_cred_upd_client,
-+		.run_server = test_stream_cred_upd_on_low_rx_bytes,
-+	},
- 	{},
- };
- 
--- 
-2.25.1
+On Mon, Dec 04, 2023 at 11:09:45AM -0400, Jason Gunthorpe wrote:
+> On Sat, Dec 02, 2023 at 05:20:41PM +0800, Yan Zhao wrote:
+> > On KVM invalidates mappings that are shared to IOMMU stage 2 paging
+> > structures, IOMMU driver needs to invalidate hardware TLBs accordingly.
+> > 
+> > The new op cache_invalidate_kvm is called from IOMMUFD to invalidate
+> > hardware TLBs upon receiving invalidation notifications from KVM.
+> 
+> Why?
+> 
+> SVA hooks the invalidation directly to the mm, shouldn't KVM also hook
+> the invalidation directly from the kvm? Why do we need to call a chain
+> of function pointers? iommufd isn't adding any value in the chain
+> here.
+Do you prefer IOMMU vendor driver to register as importer to KVM directly?
+Then IOMMUFD just passes "struct kvm_tdp_fd" to IOMMU vendor driver for domain
+creation.
+Actually both ways are ok for us.
+The current chaining way is just to let IOMMU domain only managed by IOMMUFD and
+decoupled to KVM.
 
 
