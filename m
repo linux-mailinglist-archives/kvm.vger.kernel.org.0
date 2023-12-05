@@ -1,196 +1,262 @@
-Return-Path: <kvm+bounces-3641-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3642-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 716268061C9
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 23:37:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DE8380621D
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 23:52:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C22BAB21216
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 22:37:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70B201C2110B
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 22:52:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9906EB6E;
-	Tue,  5 Dec 2023 22:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E21B405C5;
+	Tue,  5 Dec 2023 22:52:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zSH7BAHB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZG6ABtKt"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2060.outbound.protection.outlook.com [40.107.220.60])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADFD7196
-	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 14:37:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H4VntqbSkR8Npf6rtazG0P8wF/Y4ogHmXOrir1SxYjvaQmnh1/e76jQ2+Wd6/GAtKxtvhOczMPJCezImc40jC/oZZTNxQ9eLnHV3hCTlJaPba6jj61DtiBiILLPPLyai9PIC++Ufzqo+QrvK7JAULmPhehf0g8S1kNv4GQY2i8gS4X8QnltmkEPv54EjVPwY8fmMYqpU0Hbj88CdAQOG/uFL8WZSr8gy6oG1vhQouANxx4KV7xA1mUpZdAT4Yy680G1ib30U5hCcl7NbQbXMAtEuMQR03Lp+zI2VD+S06W75S8lwpdQTmm5lr5MS0RbrY4y3H67AS4/A+zChOAhrVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gaZ1YUcTGesqAH7YZoOQR1aPyQLq4gBP87zHRJET/iU=;
- b=GRZZvObskEb9dQfJeUYRQ5IUm6ssEM2KW2Jb47JpQhmdIQW3l7fM3u4gt4ArDBQkhlaDlhYIft8jmOuuxHgigMyGKz+dkADPkfMg5Jh5q+mNeMdKnofwD8F7OCqg02P+uza2kZfIUPxSWu3jIXsamoul/Cxwlqd8fhVKHuUPOZu+bVgMsGNqbVotT8vvHEkGSijmtJy29mUhPI2a/RYEz4+UnQjy9fDwdiQaBETycCnB5b029z2szbWKu/3c2rZ/j17NEmjYLe3tyTp6UFu5Xuw/zP7/qy23jGpzS1WWKNaLzqMvzHylNaqzp48AmqVn8LHlZLUxLytODTl48bMi7A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=nongnu.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gaZ1YUcTGesqAH7YZoOQR1aPyQLq4gBP87zHRJET/iU=;
- b=zSH7BAHBRccVQ3y2LAqejLk2nZFCTWcrVeMfVAfHZ69sHZLGOU9y3ZsDpkH+O1DUZJQIr1POn3m7V0pNyXnS8iRVzAb7sEy4ZoWhq+fEoVXixCssMyOmEetqLdB8oSZym15ykD+R5Hos/gs8wvyUS0qzCLEv/rJnYcNtOfhTELE=
-Received: from CY5PR22CA0064.namprd22.prod.outlook.com (2603:10b6:930:80::8)
- by PH7PR12MB8779.namprd12.prod.outlook.com (2603:10b6:510:26b::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Tue, 5 Dec
- 2023 22:36:59 +0000
-Received: from CY4PEPF0000EE33.namprd05.prod.outlook.com
- (2603:10b6:930:80:cafe::53) by CY5PR22CA0064.outlook.office365.com
- (2603:10b6:930:80::8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34 via Frontend
- Transport; Tue, 5 Dec 2023 22:36:59 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000EE33.mail.protection.outlook.com (10.167.242.39) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7068.20 via Frontend Transport; Tue, 5 Dec 2023 22:36:58 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Tue, 5 Dec
- 2023 16:36:57 -0600
-Content-Type: text/plain; charset="utf-8"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 279BB1B1
+	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 14:52:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701816719;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bp190EtfGjWCeA3brdN4OZ/TodkB+7ZXGXpd4KD/R9A=;
+	b=ZG6ABtKt8QNMdGVEjTic6laOVcdJgqGXkVmh0OQuagKlWciq46EWrX3uyWd/QIUU6Mw9Sf
+	7CRPuquB8kE19yYVAF4+jlHXW2ZaFvat9HDlhZjWUmepJHh8yBbHQM7p+72eeXODBKoUDA
+	nawi886hAra/6NPlYrsZ7P372akNGFw=
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
+ [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-212-l0Ghnvz4NI6_9lnWLPL4lw-1; Tue, 05 Dec 2023 17:51:57 -0500
+X-MC-Unique: l0Ghnvz4NI6_9lnWLPL4lw-1
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-58d5657b6bbso334124eaf.1
+        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 14:51:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701816716; x=1702421516;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bp190EtfGjWCeA3brdN4OZ/TodkB+7ZXGXpd4KD/R9A=;
+        b=qttq3PYHellbKbIGFv7GP5OvNWGMo8mEW3ffzQR2J0cG8MM07FYEgr4wkr7dmYHYFF
+         9wBpOoZ0GIOraUZvGQBdn6rTl1DfAHCVC9vIyO3nxBFDThy57g7nWhoI2U/gCrf3JF3q
+         Vr6ZYU2RE57SNpKku1UihsioEEXssvfrC2Ds4Y6AW+o4YOX+q9OwhxPPgvR6cJJMuHE/
+         bB4e7YnGBFapFWTMy84njdQDFOx/vE1BimXP9Wr0uJDDsDE1UuU9b0GXCP4XjrMTtHdz
+         3pTPnnzRoq0lHgnVmKIqSsm/3MKn449q3uU2XpkNpf4VUreYWcPpnQlJk0XjtuJe9nqx
+         t67g==
+X-Gm-Message-State: AOJu0YyyUQGdv0FAkxj+x6cBXPKWqeu300DI4SuHSst8aYrTVuf5GN4h
+	pBx0TtplB8LoZYmzKz11Z9JcI2J4USkMmZhJauAUKn5EmXc6osFArsgoNKmg+PsFtTtWHveooGd
+	7uzM4IIMIsRiG
+X-Received: by 2002:a05:6870:b14d:b0:1fb:788:e8a3 with SMTP id a13-20020a056870b14d00b001fb0788e8a3mr1044679oal.30.1701816716689;
+        Tue, 05 Dec 2023 14:51:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHX+wy1tCPko5PNZEieZRXLMkP4wf5109/rs8kmfxtsW8LCRjq2ZZRbnCa0Y7fVkzda+iRfsA==
+X-Received: by 2002:a05:6870:b14d:b0:1fb:788:e8a3 with SMTP id a13-20020a056870b14d00b001fb0788e8a3mr1044670oal.30.1701816716352;
+        Tue, 05 Dec 2023 14:51:56 -0800 (PST)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id pb15-20020a0568701e8f00b001fb17559927sm2426720oab.48.2023.12.05.14.51.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Dec 2023 14:51:55 -0800 (PST)
+Date: Tue, 5 Dec 2023 15:51:53 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yishai Hadas <yishaih@nvidia.com>
+Cc: <mst@redhat.com>, <jasowang@redhat.com>, <jgg@nvidia.com>,
+ <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+ <parav@nvidia.com>, <feliu@nvidia.com>, <jiri@nvidia.com>,
+ <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
+ <si-wei.liu@oracle.com>, <leonro@nvidia.com>, <maorg@nvidia.com>
+Subject: Re: [PATCH V5 vfio 8/9] vfio/pci: Expose
+ vfio_pci_core_iowrite/read##size()
+Message-ID: <20231205155153.2d5aceab.alex.williamson@redhat.com>
+In-Reply-To: <20231205170623.197877-9-yishaih@nvidia.com>
+References: <20231205170623.197877-1-yishaih@nvidia.com>
+	<20231205170623.197877-9-yishaih@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CAJSP0QWtnDAmfM7FAyU4dizhVzUWrfagrBVzh-31MPAn9p4X4g@mail.gmail.com>
-References: <20231205221219.1151930-1-michael.roth@amd.com> <CAJSP0QWtnDAmfM7FAyU4dizhVzUWrfagrBVzh-31MPAn9p4X4g@mail.gmail.com>
-Subject: Re: [PATCH for-8.2?] i386/sev: Avoid SEV-ES crash due to missing MSR_EFER_LMA bit
-From: Michael Roth <michael.roth@amd.com>
-CC: <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Marcelo
- Tosatti" <mtosatti@redhat.com>, Tom Lendacky <thomas.lendacky@amd.com>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>, <kvm@vger.kernel.org>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Tue, 5 Dec 2023 16:36:40 -0600
-Message-ID: <170181580081.1152985.16205289171748051855@amd.com>
-User-Agent: alot/0.9
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE33:EE_|PH7PR12MB8779:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9071019c-e9a4-460f-d88d-08dbf5e2b14d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	DKeMiEdXANUjHHASXVn0cquWplJ/M0B9UoQ/STZ4zelkEEtAX//VPBvYbtfYvxbrLrza/MIdIgEQuwpkmPVG5qy9lAX9TyOj3OBVWWxObOfkLG1vSfNerssC37qrAX/r8gYKS6UCTTAQnUuQCRMUT6mxg30cfsyWqTUxVe2pScDdyd0Oex1ewLAucVgN9oxLX3T7y6vP7xrnwEgSe/3C4yb4pqGAXO59tCMDEfUjR0zEswXA0iXQ/ibYcVaU6xn1AqURYJwQPebDnNae7NvW5UjXbG+bmwapB1s9QP3c8H9a0GbVNp9aJD6hPIyjIQXe052YMHoeRjjFzsS9Y0w3Tha9tazcmEPuPpnFVAzjN03RI6tfPCA7enAcDM9VwBVjQONwq13ILyD8b3vGll/z5GY/D4EVoJWH4VKvdX051C6N3WPpcPpJP3RueGtjwnnZx8a8r7bZkffot+BkA7ewAL2bLoG/0Kl7ildIAKswLuJiLfii25zFaQBqhjv678SVxu6hOMyt2reFLKcZBgjKyjHojvl5CldvQ/R0z6DxPw7IHQZOZx2Ctd03dMP6fr5Bv2ehOxK6vxJqjJl5C3NRCOlfWA0BpY6ZWyUlnzyRsphXPA5CCA5zFztsMT3PTFV1uMk76DCVBuM2iF1QNLLxi7005cr0UaXyg4o4JUaSZSZn/1yhbpPSpny01GoYvAgaizF0W/55VuQj+af1YqGkTXgniVZOctwCB1Am6WbwFVQWkyAXP/gJbG0SYwvJspOuLzykq3NR9mBaKySCWPObCA==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(376002)(346002)(136003)(396003)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(82310400011)(36840700001)(46966006)(40470700004)(40460700003)(44832011)(54906003)(8936002)(4326008)(8676002)(6916009)(316002)(86362001)(36756003)(478600001)(70586007)(70206006)(5660300002)(2906002)(41300700001)(36860700001)(356005)(47076005)(81166007)(82740400003)(26005)(2616005)(16526019)(6666004)(426003)(83380400001)(336012)(40480700001)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2023 22:36:58.1640
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9071019c-e9a4-460f-d88d-08dbf5e2b14d
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE33.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8779
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Quoting Stefan Hajnoczi (2023-12-05 16:27:51)
-> On Tue, 5 Dec 2023 at 17:12, Michael Roth <michael.roth@amd.com> wrote:
-> >
-> > Commit 7191f24c7fcf ("accel/kvm/kvm-all: Handle register access errors")
-> > added error checking for KVM_SET_SREGS/KVM_SET_SREGS2. In doing so, it
-> > exposed a long-running bug in current KVM support for SEV-ES where the
-> > kernel assumes that MSR_EFER_LMA will be set explicitly by the guest
-> > kernel, in which case EFER write traps would result in KVM eventually
-> > seeing MSR_EFER_LMA get set and recording it in such a way that it would
-> > be subsequently visible when accessing it via KVM_GET_SREGS/etc.
-> >
-> > However, guests kernels currently rely on MSR_EFER_LMA getting set
-> > automatically when MSR_EFER_LME is set and paging is enabled via
-> > CR0_PG_MASK. As a result, the EFER write traps don't actually expose the
-> > MSR_EFER_LMA even though it is set internally, and when QEMU
-> > subsequently tries to pass this EFER value back to KVM via
-> > KVM_SET_SREGS* it will fail various sanity checks and return -EINVAL,
-> > which is now considered fatal due to the aforementioned QEMU commit.
-> >
-> > This can be addressed by inferring the MSR_EFER_LMA bit being set when
-> > paging is enabled and MSR_EFER_LME is set, and synthesizing it to ensure
-> > the expected bits are all present in subsequent handling on the host
-> > side.
-> >
-> > Ultimately, this handling will be implemented in the host kernel, but to
-> > avoid breaking QEMU's SEV-ES support when using older host kernels, the
-> > same handling can be done in QEMU just after fetching the register
-> > values via KVM_GET_SREGS*. Implement that here.
->=20
-> Hi Mike,
-> I am holding off on tagging 8.2.0-rc3 for one day so agreement can be
-> reached on how to proceed with this fix.
+On Tue, 5 Dec 2023 19:06:22 +0200
+Yishai Hadas <yishaih@nvidia.com> wrote:
 
-Thanks Stefan. Sorry for the late fix, but without it SEV-ES is
-completely busted, so we're hoping it's simple/specific enough to justify
-for hard-freeze.
+> Expose vfio_pci_core_iowrite/read##size() to let it be used by drivers.
+> 
+> This functionality is needed to enable direct access to some physical
+> BAR of the device with the proper locks/checks in place.
+> 
+> The next patches from this series will use this functionality on a data
+> path flow when a direct access to the BAR is needed.
+> 
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_rdwr.c | 46 +++++++++++++++++---------------
+>  include/linux/vfio_pci_core.h    | 19 +++++++++++++
+>  2 files changed, 43 insertions(+), 22 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+> index a9887fd6de46..448ee90a3bb1 100644
+> --- a/drivers/vfio/pci/vfio_pci_rdwr.c
+> +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+> @@ -38,7 +38,7 @@
+>  #define vfio_iowrite8	iowrite8
+>  
+>  #define VFIO_IOWRITE(size) \
+> -static int vfio_pci_iowrite##size(struct vfio_pci_core_device *vdev,		\
+> +int vfio_pci_core_iowrite##size(struct vfio_pci_core_device *vdev,	\
+>  			bool test_mem, u##size val, void __iomem *io)	\
+>  {									\
+>  	if (test_mem) {							\
+> @@ -55,7 +55,8 @@ static int vfio_pci_iowrite##size(struct vfio_pci_core_device *vdev,		\
+>  		up_read(&vdev->memory_lock);				\
+>  									\
+>  	return 0;							\
+> -}
+> +}									\
+> +EXPORT_SYMBOL_GPL(vfio_pci_core_iowrite##size);
+>  
+>  VFIO_IOWRITE(8)
+>  VFIO_IOWRITE(16)
+> @@ -65,7 +66,7 @@ VFIO_IOWRITE(64)
+>  #endif
+>  
+>  #define VFIO_IOREAD(size) \
+> -static int vfio_pci_ioread##size(struct vfio_pci_core_device *vdev,		\
+> +int vfio_pci_core_ioread##size(struct vfio_pci_core_device *vdev,	\
+>  			bool test_mem, u##size *val, void __iomem *io)	\
+>  {									\
+>  	if (test_mem) {							\
+> @@ -82,7 +83,8 @@ static int vfio_pci_ioread##size(struct vfio_pci_core_device *vdev,		\
+>  		up_read(&vdev->memory_lock);				\
+>  									\
+>  	return 0;							\
+> -}
+> +}									\
+> +EXPORT_SYMBOL_GPL(vfio_pci_core_ioread##size);
+>  
+>  VFIO_IOREAD(8)
+>  VFIO_IOREAD(16)
+> @@ -119,13 +121,13 @@ static ssize_t do_io_rw(struct vfio_pci_core_device *vdev, bool test_mem,
+>  				if (copy_from_user(&val, buf, 4))
+>  					return -EFAULT;
+>  
+> -				ret = vfio_pci_iowrite32(vdev, test_mem,
+> -							 val, io + off);
+> +				ret = vfio_pci_core_iowrite32(vdev, test_mem,
+> +							      val, io + off);
+>  				if (ret)
+>  					return ret;
+>  			} else {
+> -				ret = vfio_pci_ioread32(vdev, test_mem,
+> -							&val, io + off);
+> +				ret = vfio_pci_core_ioread32(vdev, test_mem,
+> +							     &val, io + off);
+>  				if (ret)
+>  					return ret;
+>  
+> @@ -141,13 +143,13 @@ static ssize_t do_io_rw(struct vfio_pci_core_device *vdev, bool test_mem,
+>  				if (copy_from_user(&val, buf, 2))
+>  					return -EFAULT;
+>  
+> -				ret = vfio_pci_iowrite16(vdev, test_mem,
+> -							 val, io + off);
+> +				ret = vfio_pci_core_iowrite16(vdev, test_mem,
+> +							      val, io + off);
+>  				if (ret)
+>  					return ret;
+>  			} else {
+> -				ret = vfio_pci_ioread16(vdev, test_mem,
+> -							&val, io + off);
+> +				ret = vfio_pci_core_ioread16(vdev, test_mem,
+> +							     &val, io + off);
+>  				if (ret)
+>  					return ret;
+>  
+> @@ -163,13 +165,13 @@ static ssize_t do_io_rw(struct vfio_pci_core_device *vdev, bool test_mem,
+>  				if (copy_from_user(&val, buf, 1))
+>  					return -EFAULT;
+>  
+> -				ret = vfio_pci_iowrite8(vdev, test_mem,
+> -							val, io + off);
+> +				ret = vfio_pci_core_iowrite8(vdev, test_mem,
+> +							     val, io + off);
+>  				if (ret)
+>  					return ret;
+>  			} else {
+> -				ret = vfio_pci_ioread8(vdev, test_mem,
+> -						       &val, io + off);
+> +				ret = vfio_pci_core_ioread8(vdev, test_mem,
+> +							    &val, io + off);
+>  				if (ret)
+>  					return ret;
+>  
+> @@ -364,16 +366,16 @@ static void vfio_pci_ioeventfd_do_write(struct vfio_pci_ioeventfd *ioeventfd,
+>  {
+>  	switch (ioeventfd->count) {
+>  	case 1:
+> -		vfio_pci_iowrite8(ioeventfd->vdev, test_mem,
+> -				  ioeventfd->data, ioeventfd->addr);
+> +		vfio_pci_core_iowrite8(ioeventfd->vdev, test_mem,
+> +				       ioeventfd->data, ioeventfd->addr);
+>  		break;
+>  	case 2:
+> -		vfio_pci_iowrite16(ioeventfd->vdev, test_mem,
+> -				   ioeventfd->data, ioeventfd->addr);
+> +		vfio_pci_core_iowrite16(ioeventfd->vdev, test_mem,
+> +					ioeventfd->data, ioeventfd->addr);
+>  		break;
+>  	case 4:
+> -		vfio_pci_iowrite32(ioeventfd->vdev, test_mem,
+> -				   ioeventfd->data, ioeventfd->addr);
+> +		vfio_pci_core_iowrite32(ioeventfd->vdev, test_mem,
+> +					ioeventfd->data, ioeventfd->addr);
+>  		break;
+>  #ifdef iowrite64
+>  	case 8:
 
-Also, I just sent a v2 that adds similar handling for older kernels that
-don't support KVM_SET_SREGS2.
+There's a vfio_pci_iowrite64() call just below here that was missed.
+Otherwise the vfio parts of the series looks ok to me.  We still need
+to recruit another reviewer though.
 
--Mike
+My preferred merge approach would be that virtio maintainers take
+patches 1-6 and provide a branch or tag I can merge to bring 7-9 in
+through the vfio tree.  Thanks,
 
->=20
-> Stefan
->=20
-> >
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Marcelo Tosatti <mtosatti@redhat.com>
-> > Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> > Cc: Akihiko Odaki <akihiko.odaki@daynix.com>
-> > Cc: kvm@vger.kernel.org
-> > Fixes: 7191f24c7fcf ("accel/kvm/kvm-all: Handle register access errors")
-> > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> > ---
-> >  target/i386/kvm/kvm.c | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> >
-> > diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> > index 11b8177eff..0e9e4c1beb 100644
-> > --- a/target/i386/kvm/kvm.c
-> > +++ b/target/i386/kvm/kvm.c
-> > @@ -3654,6 +3654,7 @@ static int kvm_get_sregs2(X86CPU *cpu)
-> >  {
-> >      CPUX86State *env =3D &cpu->env;
-> >      struct kvm_sregs2 sregs;
-> > +    target_ulong cr0_old;
-> >      int i, ret;
-> >
-> >      ret =3D kvm_vcpu_ioctl(CPU(cpu), KVM_GET_SREGS2, &sregs);
-> > @@ -3676,12 +3677,18 @@ static int kvm_get_sregs2(X86CPU *cpu)
-> >      env->gdt.limit =3D sregs.gdt.limit;
-> >      env->gdt.base =3D sregs.gdt.base;
-> >
-> > +    cr0_old =3D env->cr[0];
-> >      env->cr[0] =3D sregs.cr0;
-> >      env->cr[2] =3D sregs.cr2;
-> >      env->cr[3] =3D sregs.cr3;
-> >      env->cr[4] =3D sregs.cr4;
-> >
-> >      env->efer =3D sregs.efer;
-> > +    if (sev_es_enabled() && env->efer & MSR_EFER_LME) {
-> > +        if (!(cr0_old & CR0_PG_MASK) && env->cr[0] & CR0_PG_MASK) {
-> > +            env->efer |=3D MSR_EFER_LMA;
-> > +        }
-> > +    }
-> >
-> >      env->pdptrs_valid =3D sregs.flags & KVM_SREGS2_FLAGS_PDPTRS_VALID;
-> >
-> > --
-> > 2.25.1
-> >
-> >
+Alex
+
+> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+> index 67ac58e20e1d..85e84b92751b 100644
+> --- a/include/linux/vfio_pci_core.h
+> +++ b/include/linux/vfio_pci_core.h
+> @@ -131,4 +131,23 @@ int vfio_pci_core_setup_barmap(struct vfio_pci_core_device *vdev, int bar);
+>  pci_ers_result_t vfio_pci_core_aer_err_detected(struct pci_dev *pdev,
+>  						pci_channel_state_t state);
+>  
+> +#define VFIO_IOWRITE_DECLATION(size) \
+> +int vfio_pci_core_iowrite##size(struct vfio_pci_core_device *vdev,	\
+> +			bool test_mem, u##size val, void __iomem *io);
+> +
+> +VFIO_IOWRITE_DECLATION(8)
+> +VFIO_IOWRITE_DECLATION(16)
+> +VFIO_IOWRITE_DECLATION(32)
+> +#ifdef iowrite64
+> +VFIO_IOWRITE_DECLATION(64)
+> +#endif
+> +
+> +#define VFIO_IOREAD_DECLATION(size) \
+> +int vfio_pci_core_ioread##size(struct vfio_pci_core_device *vdev,	\
+> +			bool test_mem, u##size *val, void __iomem *io);
+> +
+> +VFIO_IOREAD_DECLATION(8)
+> +VFIO_IOREAD_DECLATION(16)
+> +VFIO_IOREAD_DECLATION(32)
+> +
+>  #endif /* VFIO_PCI_CORE_H */
+
 
