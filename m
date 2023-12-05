@@ -1,325 +1,329 @@
-Return-Path: <kvm+bounces-3447-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3445-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE24C8045F7
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 04:23:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB8FB804581
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 04:16:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E3851C20CB0
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 03:23:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B012A1C20A2F
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 03:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F6A78BEA;
-	Tue,  5 Dec 2023 03:23:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3B98C03;
+	Tue,  5 Dec 2023 03:16:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kk6GO9hb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GSQkD0uC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39FAACE;
-	Mon,  4 Dec 2023 19:23:10 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CED7CD
+	for <kvm@vger.kernel.org>; Mon,  4 Dec 2023 19:16:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701746590; x=1733282590;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ak6o+u1ystFXcmm5arFJBN31u0uM4xCWBWhgAu3bzBo=;
-  b=kk6GO9hbnkBTZDBRGZdHl48bLsQmZhmXU5qcgWm2/Ex5XyHjdstTeKic
-   oAyUNZDPH2b6t9IimAmGZ7CZhEdRr6SIyvN4iJlN7+JxYcizT4yS+ebFH
-   A7bGiQJ6uFKvse4zhCUZynt6TzQmL1Y/OWIC+zcjdgXDvJ53aufmu8YTL
-   Vx/PA17CkeSpoDHSR0zdkwDTVmJnb+MyHXkuyxOCKnUuL3v9mLi7INz4N
-   TWmybV4JBBGDHpNPrZNiFjgtE33gGbkFeHvN/IdpIePmzdgsbhz7ez0yw
-   +/AZfoo7sXeGY4uS/0biUCkBycAdGSTKL5aQPvL8pWvvgzP3M/7VKsmeX
+  t=1701746169; x=1733282169;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=wYTu0593b2ZxnWujgrnnZbZVcAahmIkF+Tth6aFA88k=;
+  b=GSQkD0uCs1u379ixb1RxONL0DRlrJNhNdGIiqHdg+gs7sHHAma89oBbl
+   M5w8S7Y4T8WcKVGwhL5+UaL5WSSeBPgDseRwAHep95pO60QZ5h1kaLim1
+   7tdeJvwPxBqF6G8C044Wl1K/VHAS9Q4RoseIaBjF8N3LaEJiVKfjTtiqn
+   /p9F1U9UWaEe4F3tw4/FTvjMJPD/eahwUnW3Ez27tJUmCH2eHcfTm3pNC
+   HEfSSyDkXPp+WsveMg6TziE3chTeasO7NK75Cwd44/FIzn9HhkrwLMtSS
+   xnYD6cxUAXgzqctdcBw1PPVc+NH3shfo6nrFvI0AAI2+7LoUwk2I0vj8o
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="711027"
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="378862171"
 X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
-   d="scan'208";a="711027"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 19:23:09 -0800
+   d="scan'208";a="378862171"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 19:16:08 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="914647145"
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="841291102"
 X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
-   d="scan'208";a="914647145"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Dec 2023 19:23:09 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 4 Dec 2023 19:23:09 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Mon, 4 Dec 2023 19:23:09 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Mon, 4 Dec 2023 19:23:08 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bvc2yvvkuZzbJQHekVwTSZSUyoWBhJzv3SwxOLtdIOrGdNmiaz53smgXgrwQaePQ/rXNukJACcoKZbgt9nCp+9B35kpjKu9BFpLsukN73kZWQXgSj7hSAf9plheKx7UZDqC/4yrdu0wnEWSuYSfrJ7X4bUQvDjgaWDsKSSF+rWRjqpGceW4QkGtqYfHafHx6ltdcN3eRFsEKKh9P30dnBqrCDBFpOqdiSLyb6VNDKF3slxJQ7nAGPUaUR4SA1yesy9TF7jGF/7SLbteN05H689By2/ay7EhPFcCQVIaPoRa4fCYL5nT7OCR0l26K0X2jFCI5Nw1K/saPY5C9W6zbQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ak6o+u1ystFXcmm5arFJBN31u0uM4xCWBWhgAu3bzBo=;
- b=hzKkDYto5Bvh2cpg40eGC3ARzsOKih2fTOhYDc1wx+xlDvOpbPY9yniqsJnz84x+NadiWMGdw07ZGj3oYdyTmCR5pjWYl1nmv5db7obxIswbxeilKSzgxonulNDYnD7K0YWDjgwOGm4m9d7feYaeZcSh5GSPe2bJ6ICDZsSO0DnE1KigdE2hv0QQiL39sJCNv59Z3XnVvyfyZSKCRQFhI3F7YmUcIM5giYurnf0dO7DXGXa1t4zV7h5FdkFWmuxZ6fHziT6SmRYXKoO6JdE39P+it4Sd6zRO4+Cw3N9lLKaloUJ+VB7puqevBAvkOhnhtBPH7M57Q3pQt4cNFkmLAQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by MW4PR11MB7077.namprd11.prod.outlook.com (2603:10b6:303:223::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29; Tue, 5 Dec
- 2023 03:23:05 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a%3]) with mapi id 15.20.7046.034; Tue, 5 Dec 2023
- 03:23:05 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-CC: Baolu Lu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>, "Will
- Deacon" <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, Jean-Philippe
- Brucker <jean-philippe@linaro.org>, Nicolin Chen <nicolinc@nvidia.com>, "Liu,
- Yi L" <yi.l.liu@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>, "Zhao,
- Yan Y" <yan.y.zhao@intel.com>, "iommu@lists.linux.dev"
-	<iommu@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v7 12/12] iommu: Improve iopf_queue_flush_dev()
-Thread-Topic: [PATCH v7 12/12] iommu: Improve iopf_queue_flush_dev()
-Thread-Index: AQHaF3Dgz31tJTFbWk6dNEVbu0BBIbCU/P4AgAJgZgCAAFm2AIAAvYqAgAA+r0CAAIhegIAAwnlggAAOiACAAA38YA==
-Date: Tue, 5 Dec 2023 03:23:05 +0000
-Message-ID: <BN9PR11MB527687FD2CD3EB17F04B22458C85A@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20231115030226.16700-1-baolu.lu@linux.intel.com>
- <20231115030226.16700-13-baolu.lu@linux.intel.com>
- <20231201203536.GG1489931@ziepe.ca>
- <a0ef3a4f-88fc-40fe-9891-495d1b6b365b@linux.intel.com>
- <20231203141414.GJ1489931@ziepe.ca>
- <2354dd69-0179-4689-bc35-f4bf4ea5a886@linux.intel.com>
- <BN9PR11MB5276999D29A133F33C3C4FEA8C86A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20231204132503.GL1489931@ziepe.ca>
- <BN9PR11MB5276908231BA164E4AF8806F8C85A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20231205015306.GQ1489931@ziepe.ca>
-In-Reply-To: <20231205015306.GQ1489931@ziepe.ca>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|MW4PR11MB7077:EE_
-x-ms-office365-filtering-correlation-id: 7b21e1f4-ac2d-4c9a-e681-08dbf5417ef2
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: M/VmOrUIONiVFd2lFD03GFrdz6qPX9vO0E7lhagK+dNyl/cVd3SZBteuBzxRrQfADvFKgJBbmwD5AS0g+x6QkEvzGQKZzpMCrz6U2wXUFhZ1Y8EkpbR2h7E2Ffr9zfwnyxYeGVRtmWsYVHl4RUKfHT+F8HlXwmJG4F8M0jTSEGd3fpGmYUnQnNe7loh7QWEG0Qu3OBj66f/rwNCoS9ytKKvzXowi6k/Ugz9CJPlYyml2F/mkSgYip6zx7BYrot+3WX/4ojyvOH0RHqEFmbn9yUUaIcXi30C9jhAqnqyZKU8ztPAyXjKcN2bZFUOlQHmOiQAnJRK2Tj3UF43GwgdBbCP9rX9jdEVLUZmBf5xr2rrr5EinyOBbAZSqezb8goH+Mc84BCylrUC9fUV4FAt3UXGgv65g6L2PopcfhRR/tVokK3SgIU63QbRH2kVMsFwfR4ujfeNY8MIs3LQvbs9P/BCP8XzlH0Lb81Tqrhobjg0hsKmEpeW34qEQBh9c9sv81Z77wqMPT2W7Gb8VUMN9pr1bqpaQn15IMEiKLM6isej7N+5dq/nDcPt9rYUHqvzhtDdZDScJwyFzxBof3iMvVhQKYRICqanX8R/aiAuLJxCpGsRLNZ4I/352ATQOf/ZB
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(39860400002)(136003)(376002)(346002)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(2906002)(52536014)(6506007)(66556008)(53546011)(71200400001)(6916009)(8936002)(66946007)(64756008)(54906003)(76116006)(55016003)(316002)(7696005)(66476007)(8676002)(9686003)(4326008)(478600001)(5660300002)(7416002)(41300700001)(83380400001)(26005)(66446008)(38100700002)(86362001)(122000001)(38070700009)(33656002)(82960400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?OFEvVFplR2NwNmZaWnBDU0xUUzlDY2dGb21BTm9yOEo1TWI1dUpnQ2JOc0lW?=
- =?utf-8?B?NllpNlU2dmlKWndOMW5LS1pSVFZlbXgvVGRWZXRMNFE0NkJXYlRuTHdJemdt?=
- =?utf-8?B?emk3K0xFYzBSWjJEZWZ2SjdMTy8vT09TZkx5REZrTDZ1NVVkSGtuS2xRT0tm?=
- =?utf-8?B?V1JmcU1Xa1ZIV0txRTcvcytuK0NjWHVFazN2c09YdXdzMDgxQ0VlN0hJSDlZ?=
- =?utf-8?B?cTN1Q3pTVVNFVlB0bFB5YUNXanhPS2RKVFNyaGdPaGZLMG44SndyK0F3dEhK?=
- =?utf-8?B?MHd3aURwd1FWc0E3bXdNTWVwZ2kxWlRWb3V5a2pPbEJabFlkb3BIeEpQMnFL?=
- =?utf-8?B?dXZQeDA3NGFrMnlyY25KMVNsOXFIQWs1bktPakVvdWNhSGRjQnpnNUQ0ckgz?=
- =?utf-8?B?TFNHK0FUeGdmRzZQVSt2a2dxNUM2bmVLZU9TYk40UlRHdzF6QStZYVZoYjNu?=
- =?utf-8?B?eEpySEJDclVCRGJsbUlUQTNhRDNYSWt1TlhDbnJCQUJUQWpZSXU2SXBrUVVC?=
- =?utf-8?B?clRHbWs2bmpjME9vSnk2Q1BVaVIrR0VJbHFBa3d3aWpxZFRzbkFObGg5ZGlh?=
- =?utf-8?B?Nnl4YWdGZ2V2eEpNdy8zSHJleGxaOVd0NDFqN2kzT3VsNUMxSlJjTGhBbVNE?=
- =?utf-8?B?NVhNWFJyT3RDWEc1YkpqY2FwdmZKRCt3citVSEdJWmgrbmY2UlFnejlkdDQ2?=
- =?utf-8?B?YUgrSHU4Z0plNjhPS0RUZ0Z0RExyU1BEVFR3WGpudFhDb0s0enZaekVLb3Q3?=
- =?utf-8?B?N3BWb3VjaXJRVGlydDJ3Nmd2ZDhCSEJlVVdUT25haEljdDRsRmI2V2FSRHVG?=
- =?utf-8?B?bWpiRE9lQUs3b2QzTjFCWXQ0NjAwQ2VVYU1ZQXJmMnd4Uys3YVAwWkgvZXU2?=
- =?utf-8?B?cEdQRm9xNXZESjJ0Ym4rT0RzUHJPQVY4cDllWklKOHFtd0RjVCtySlg5WHN2?=
- =?utf-8?B?b1BsUXQvUVNIUlMyeHhFcmZYV2xwb0w1SDdtdFpaRUZxSGJUSmgyU01YMW1K?=
- =?utf-8?B?c3g4UUJodnNlbzZuNytkV0ZQUThOUFloODdlT1Fsa2pkcU42N3U3MkJ4OCtm?=
- =?utf-8?B?U0NEZXVveUh5emNxZ3ZTWWdHTnZCaUpuZ0Z2ckxjY0FPNmo4dUlmSjhHMjBN?=
- =?utf-8?B?MmZ4MVRQSDFzNzhDTDJUZDBYNVAxaUFHcjdPaWYyNDN3ZkVwVlJuVUpuNjFt?=
- =?utf-8?B?Qmt2QnQ0ckdoU3VWU2hXTk9OMUlNUjZwRlBCTWlORWlhclVkT1ZXa0c2bC9i?=
- =?utf-8?B?UlZmeE9CbVpaZk0rUElnV1JXb3YyMi9abXFNNEVJN0EvbStuQWpVVzh6akFh?=
- =?utf-8?B?TjNOdDhNamVSYXd6Qmxib3c3Yi96R1BWY1Nlb0NGZDVUV2FHUGZZZ1FVNGJq?=
- =?utf-8?B?WWdVeVRHb2g1bWlCWUJJQmpGdEpCU3czYjhlUDI2aFlUbVZNQjdEK3N1SmZk?=
- =?utf-8?B?UEdiZ1VkRHZ2NXE4blhRY1Z2UURpMzVGejhZMXh5dVRKMUhVbjR5VWFkN3BO?=
- =?utf-8?B?c3pWaDdpcUlKbC91bkc2K2N6WnpURkRtNzZuV0xUUytueEw1T1BocmQzNmRa?=
- =?utf-8?B?bnl5UjFWN1BrZVFieU9pRU1rZXFHZ0JRNlllV0RDRlRXNFJpcmdMOHRtZW1I?=
- =?utf-8?B?KzJ1UHM3cW5oRDBjYldETXN4REtEOTE3UkZSeldBcEQ3cUpjOFJERm5pMTdN?=
- =?utf-8?B?elN2N3ZjaUxwY0w5Vk1ERlhIRnNlTHE1VG9tVDA4UktxOVd3UjRxcmlhMjhh?=
- =?utf-8?B?N3FxSC9FbmlOd1JFUzg5amhuSGpVaGhsQThSclZkYmh6WnA1Um1CcmJVaE1C?=
- =?utf-8?B?TVFsZXV6SmhieG1XRkZqTHF5UTBQakVwelFCamV3bnlnaXVaeUJsTmxlRGJj?=
- =?utf-8?B?ZWlDdHRHTDNMQTZ3THNtVDlMbVZySEp0SkF2RVdYT3cxY0lnMUlSbWdPN1dv?=
- =?utf-8?B?a0VON1pyNDlKMlRjaVhEeWxVU3ovNDhpRmJKNVdyeWx3SHBESmgrM0hXTGtF?=
- =?utf-8?B?cjhyaElBUVc3Q3lCYUs4Q0J5RHdlYThZWVU0VVg3VjVzSm5WSjhHSkt5T0Jh?=
- =?utf-8?B?ZGJDMjdwcys5c1JSMVNEVXViQ0lQZG80REIwSk5JeVVEb0p5Wm55RlEzdzdN?=
- =?utf-8?Q?s8SM7c2ls5T74PCdjuLGGdtDe?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+   d="scan'208";a="841291102"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by fmsmga004.fm.intel.com with ESMTP; 04 Dec 2023 19:16:04 -0800
+Date: Tue, 5 Dec 2023 11:28:24 +0800
+From: Zhao Liu <zhao1.liu@linux.intel.com>
+To: Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Zhuocheng Ding <zhuocheng.ding@intel.com>,
+	Babu Moger <babu.moger@amd.com>, Yongwei Ma <yongwei.ma@intel.com>,
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: Re: [PATCH v6 00/16] Support smp.clusters for x86 in QEMU
+Message-ID: <ZW6Y2AYJZWYsodBq@intel.com>
+References: <20231117075106.432499-1-zhao1.liu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7b21e1f4-ac2d-4c9a-e681-08dbf5417ef2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Dec 2023 03:23:05.4222
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: XVWY8SddlmOz5U9r5ZiwEcRa4VJ+AuYdJd1zj8mHWUHveqgAAVu+anGPUYpa8ag59pgB4YOmQMfE5YbaiQcKfA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB7077
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231117075106.432499-1-zhao1.liu@linux.intel.com>
 
-PiBGcm9tOiBKYXNvbiBHdW50aG9ycGUgPGpnZ0B6aWVwZS5jYT4NCj4gU2VudDogVHVlc2RheSwg
-RGVjZW1iZXIgNSwgMjAyMyA5OjUzIEFNDQo+IA0KPiBPbiBUdWUsIERlYyAwNSwgMjAyMyBhdCAw
-MTozMjoyNkFNICswMDAwLCBUaWFuLCBLZXZpbiB3cm90ZToNCj4gPiA+IEZyb206IEphc29uIEd1
-bnRob3JwZSA8amdnQHppZXBlLmNhPg0KPiA+ID4gU2VudDogTW9uZGF5LCBEZWNlbWJlciA0LCAy
-MDIzIDk6MjUgUE0NCj4gPiA+DQo+ID4gPiBPbiBNb24sIERlYyAwNCwgMjAyMyBhdCAwNTozNzox
-M0FNICswMDAwLCBUaWFuLCBLZXZpbiB3cm90ZToNCj4gPiA+ID4gPiBGcm9tOiBCYW9sdSBMdSA8
-YmFvbHUubHVAbGludXguaW50ZWwuY29tPg0KPiA+ID4gPiA+IFNlbnQ6IE1vbmRheSwgRGVjZW1i
-ZXIgNCwgMjAyMyA5OjMzIEFNDQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBPbiAxMi8zLzIzIDEwOjE0
-IFBNLCBKYXNvbiBHdW50aG9ycGUgd3JvdGU6DQo+ID4gPiA+ID4gPiBPbiBTdW4sIERlYyAwMywg
-MjAyMyBhdCAwNDo1MzowOFBNICswODAwLCBCYW9sdSBMdSB3cm90ZToNCj4gPiA+ID4gPiA+PiBF
-dmVuIGlmIGF0b21pYyByZXBsYWNlbWVudCB3ZXJlIHRvIGJlIGltcGxlbWVudGVkLA0KPiA+ID4g
-PiA+ID4+IGl0IHdvdWxkIGJlIG5lY2Vzc2FyeSB0byBlbnN1cmUgdGhhdCBhbGwgdHJhbnNsYXRp
-b24gcmVxdWVzdHMsDQo+ID4gPiA+ID4gPj4gdHJhbnNsYXRlZCByZXF1ZXN0cywgcGFnZSByZXF1
-ZXN0cyBhbmQgcmVzcG9uc2VzIGZvciB0aGUgb2xkDQo+IGRvbWFpbg0KPiA+ID4gYXJlDQo+ID4g
-PiA+ID4gPj4gZHJhaW5lZCBiZWZvcmUgc3dpdGNoaW5nIHRvIHRoZSBuZXcgZG9tYWluLg0KPiA+
-ID4gPiA+ID4NCj4gPiA+ID4gPiA+IEFnYWluLCBubyBpdCBpc24ndCByZXF1aXJlZC4NCj4gPiA+
-ID4gPiA+DQo+ID4gPiA+ID4gPiBSZXF1ZXN0cyBzaW1wbHkgaGF2ZSB0byBjb250aW51ZSB0byBi
-ZSBhY2tlZCwgaXQgZG9lc24ndCBtYXR0ZXIgaWYNCj4gPiA+ID4gPiA+IHRoZXkgYXJlIGFja2Vk
-IGFnYWluc3QgdGhlIHdyb25nIGRvbWFpbiBiZWNhdXNlIHRoZSBkZXZpY2Ugd2lsbA0KPiBzaW1w
-bHkNCj4gPiA+ID4gPiA+IHJlLWlzc3VlIHRoZW0uLg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gQWgh
-IEkgc3RhcnQgdG8gZ2V0IHlvdXIgcG9pbnQgbm93Lg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gRXZl
-biBhIHBhZ2UgZmF1bHQgcmVzcG9uc2UgaXMgcG9zdHBvbmVkIHRvIGEgbmV3IGFkZHJlc3Mgc3Bh
-Y2UsDQo+IHdoaWNoDQo+ID4gPiA+ID4gcG9zc2libHkgYmUgYW5vdGhlciBhZGRyZXNzIHNwYWNl
-IG9yIGhhcmR3YXJlIGJsb2NraW5nIHN0YXRlLCB0aGUNCj4gPiA+ID4gPiBoYXJkd2FyZSBqdXN0
-IHJldHJpZXMuDQo+ID4gPiA+DQo+ID4gPiA+IGlmIGJsb2NraW5nIHRoZW4gdGhlIGRldmljZSBz
-aG91bGRuJ3QgcmV0cnkuDQo+ID4gPg0KPiA+ID4gSXQgZG9lcyByZXRyeS4NCj4gPiA+DQo+ID4g
-PiBUaGUgZGV2aWNlIGlzIHdhaXRpbmcgb24gYSBQUkksIGl0IGdldHMgYmFjayBhbiBjb21wbGV0
-aW9uLiBJdCBpc3N1ZXMNCj4gPiA+IGEgbmV3IEFUUyAodGhpcyBpcyB0aGUgcmV0eSkgYW5kIHRo
-ZSBuZXctZG9tYWluIHJlc3BvbmRzIGJhY2sgd2l0aCBhDQo+ID4gPiBmYWlsdXJlIGluZGljYXRp
-b24uDQo+ID4NCj4gPiBJJ20gbm90IHN1cmUgdGhhdCBpcyB0aGUgc3RhbmRhcmQgYmVoYXZpb3Ig
-ZGVmaW5lZCBieSBQQ0llIHNwZWMuDQo+IA0KPiA+IEFjY29yZGluZyB0byAiMTAuNC4yIFBhZ2Ug
-UmVxdWVzdCBHcm91cCBSZXNwb25zZSBNZXNzYWdlIiwgZnVuY3Rpb24ncw0KPiA+IHJlc3BvbnNl
-IHRvIFBhZ2UgUmVxdWVzdCBmYWlsdXJlIGlzIGltcGxlbWVudGF0aW9uIHNwZWNpZmljLg0KPiA+
-DQo+ID4gc28gYSBuZXcgQVRTIGlzIG9wdGlvbmFsIGFuZCBsaWtlbHkgdGhlIGRldmljZSB3aWxs
-IGluc3RlYWQgYWJvcnQgdGhlIERNQQ0KPiA+IGlmIFBSSSByZXNwb25zZSBhbHJlYWR5IGluZGlj
-YXRlcyBhIGZhaWx1cmUuDQo+IA0KPiBJIGRpZG4ndCBzYWlkIHRoZSBQUkkgd291bGQgZmFpbCwg
-SSBzYWlkIHRoZSBBVFMgd291bGQgZmFpbCB3aXRoIGENCj4gbm9uLXByZXNlbnQuDQo+IA0KPiBJ
-dCBoYXMgdG8gd29yayB0aGlzIHdheSBvciBpdCBpcyBjb21wbGV0ZWx5IGJyb2tlbiB3aXRoIHJl
-c3BlY3QgdG8NCj4gZXhpc3RpbmcgcmFjZXMgaW4gdGhlIG1tIHNpZGUuIEFnZW50cyBtdXN0IHJl
-dHJ5IG5vbi1wcmVzZW50IEFUUw0KPiBhbnN3ZXJzIHVudGlsIHlvdSBnZXQgYSBwcmVzZW50IG9y
-IGEgQVRTIGZhaWx1cmUuDQoNCk15IHVuZGVyc3RhbmRpbmcgb2YgdGhlIHNlcXVlbmNlIGlzIGxp
-a2UgYmVsb3c6DQoNCjwnRCcgZm9yIGRldmljZSwgJ0knIGZvciBJT01NVT4NCg0KICAoRCkgc2Vu
-ZCBhIEFUUyB0cmFuc2xhdGlvbiByZXF1ZXN0DQogIChJKSByZXNwb25kIHRyYW5zbGF0aW9uIHJl
-c3VsdA0KICAoRCkgSWYgc3VjY2VzcyB0aGVuIHNlbmRzIERNQSB0byB0aGUgdGFyZ2V0IHBhZ2UN
-CiAgICAgIG90aGVyd2lzZSBzZW5kIGEgUFJJIHJlcXVlc3QNCiAgICAgICAgKEkpIHJhaXNlIGFu
-IElPTU1VIGludGVycnVwdCBhbGxvd2luZyBzdyB0byBmaXggdGhlIHRyYW5zbGF0aW9uDQogICAg
-ICAgIChJKSBnZW5lcmF0ZSBhIFBSSSByZXNwb25zZSB0byBkZXZpY2UNCiAgICAgICAgKEQpIGlm
-IHN1Y2Nlc3MgdGhlbiBqdW1wIHRvIHRoZSBmaXJzdCBzdGVwIHRvIHJldHJ5DQogICAgICAgICAg
-ICBvdGhlcndpc2UgYWJvcnQgdGhlIGN1cnJlbnQgcmVxdWVzdA0KDQpJZiBtbSBjaGFuZ2VzIHRo
-ZSBtYXBwaW5nIGFmdGVyIGEgc3VjY2VzcyBQUkkgcmVzcG9uc2UsIG1tdSBub3RpZmllcg0KY2Fs
-bGJhY2sgaW4gaW9tbXUgZHJpdmVyIG5lZWRzIHRvIHdhaXQgZm9yIGRldmljZSB0bGIgaW52YWxp
-ZGF0aW9uIGNvbXBsZXRpb24NCndoaWNoIHRoZSBkZXZpY2Ugd2lsbCBvcmRlciBwcm9wZXJseSB3
-aXRoIG91dHN0YW5kaW5nIERNQSByZXF1ZXN0cyB1c2luZw0KdGhlIG9sZCB0cmFuc2xhdGlvbi4N
-Cg0KSWYgeW91IHJlZmVyIHRvIHRoZSAncmV0cnknIGFmdGVyIHJlY2VpdmluZyBhIHN1Y2Nlc3Mg
-UFJJIHJlc3BvbnNlLCB0aGVuIHllcy4NCg0KYnV0IHRoZXJlIGlzIHJlYWxseSBubyByZWFzb24g
-dG8gcmV0cnkgdXBvbiBhIFBSSSByZXNwb25zZSBmYWlsdXJlIHdoaWNoDQppbmRpY2F0ZXMgdGhh
-dCB0aGUgZmF1bHRpbmcgYWRkcmVzcyBpcyBub3QgYSB2YWxpZCBvbmUgd2hpY2ggT1Mgd291bGQg
-bGlrZQ0KdG8gZml4Lg0KDQo+IA0KPiA+ID4gQWdhaW4sIGFsbCByYWN5LiBJZiBhIERNQSBpcyBv
-bmdvaW5nIGF0IHRoZSBzYW1lIGluc3RhbnQgdGhpbmdzIGFyZQ0KPiA+ID4gY2hhbmdlZCB0aGVy
-ZSBpcyBubyBkZWZpbml0aXZlIHdheSB0byBzYXkgaWYgaXQgcmVzb2x2ZWQgYmVmb3JlIG9yDQo+
-ID4gPiBhZnRlci4NCj4gPiA+DQo+ID4gPiBUaGUgb25seSB0aGluZyB3ZSBjYXJlIGFib3V0IGlz
-IHRoYXQgZG1hcyB0aGF0IGFyZSBjb21wbGV0ZWQgYmVmb3JlDQo+ID4gPiBzZWUgdGhlIGJlZm9y
-ZSB0cmFuc2xhdGlvbiBhbmQgZG1hcyB0aGF0IGFyZSBzdGFydGVkIGFmdGVyIHNlZSB0aGUNCj4g
-PiA+IGFmdGVyIHRyYW5zbGF0aW9uLg0KPiA+ID4NCj4gPiA+IERNQXMgdGhhdCBjcm9zcyBjaG9v
-c2Ugb25lIGF0IHJhbmRvbS4NCj4gPg0KPiA+IFllcyB0aGF0IG1ha2VzIHNlbnNlIGZvciByZXBs
-YWNlbWVudC4NCj4gPg0KPiA+IEJ1dCBoZXJlIHdlIGFyZSB0YWxraW5nIGFib3V0IGEgZHJhaW5p
-bmcgcmVxdWlyZW1lbnQgd2hlbiBkaXNhYmxpbmcNCj4gPiBhIHBhc2lkIGVudHJ5LCB3aGljaCBp
-cyBjZXJ0YWlubHkgbm90IGludm9sdmVkIGluIHJlcGxhY2VtZW50Lg0KPiANCj4gSXQgaXMgdGhl
-IHNhbWUgYXJndW1lbnQsIHlvdSBhcmUgcmVwbGFjaW5nIGEgUFRFIHRoYXQgd2FzIG5vbi1wcmVz
-ZW50DQoNCnMvbm9uLXByZXNlbnQvcHJlc2VudC8NCg0KPiB3aXRoIG9uZSB0aGF0IGlzIGZhaWxp
-bmcvYmxvY2tpbmcgLSB0aGUgcmVzdWx0IG9mIGEgRE1BIHRoYXQgY3Jvc3Nlcw0KPiB0aGlzIGV2
-ZW50IGNhbiBiZSBlaXRoZXIuDQoNCmtpbmQgb2YNCg0KPiANCj4gPiA+ID4gSSBkb24ndCB0aGlu
-ayBhdG9taWMgcmVwbGFjZSBpcyB0aGUgbWFpbiB1c2FnZSBmb3IgdGhpcyBkcmFpbmluZw0KPiA+
-ID4gPiByZXF1aXJlbWVudC4gSW5zdGVhZCBJJ20gbW9yZSBpbnRlcmVzdGVkIGluIHRoZSBiYXNp
-YyBwb3B1bGFyIHVzYWdlOg0KPiA+ID4gPiBhdHRhY2gtZGV0YWNoLWF0dGFjaCBhbmQgbm90IGNv
-bnZpbmNlZCB0aGF0IG5vIGRyYWluaW5nIGlzIHJlcXVpcmVkDQo+ID4gPiA+IGJldHdlZW4gaW9t
-bXUvZGV2aWNlIHRvIGF2b2lkIGludGVyZmVyZW5jZSBiZXR3ZWVuIGFjdGl2aXRpZXMNCj4gPiA+
-ID4gZnJvbSBvbGQvbmV3IGFkZHJlc3Mgc3BhY2UuDQo+ID4gPg0KPiA+ID4gU29tZXRoaW5nIGxp
-a2UgSURYRCBuZWVkcyB0byBoYWx0IERNQXMgb24gdGhlIFBBU0lEIGFuZCBmbHVzaCBhbGwNCj4g
-PiA+IG91dHN0YW5kaW5nIERNQSB0byBnZXQgdG8gYSBzdGF0ZSB3aGVyZSB0aGUgUEFTSUQgaXMg
-cXVpZXQgZnJvbSB0aGUNCj4gPiA+IGRldmljZSBwZXJzcGVjdGl2ZS4gVGhpcyBpcyB0aGUgb25s
-eSB3YXkgdG8gc3RvcCBpbnRlcmZlcmVuY2UuDQo+ID4NCj4gPiB3aHkgaXMgaXQgSURYRCBzcGVj
-aWZpYyBiZWhhdmlvcj8gSSBzdXBwb3NlIGFsbCBkZXZpY2VzIG5lZWQgdG8gcXVpZXNjZQ0KPiA+
-IHRoZSBvdXRzdGFuZGluZyBETUFzIHdoZW4gdGVhcmluZyBkb3duIHRoZSBiaW5kaW5nIGJldHdl
-ZW4gdGhlDQo+ID4gUEFTSUQgYW5kIHByZXZpb3VzIGFkZHJlc3Mgc3BhY2UuDQo+IA0KPiBCZWNh
-dXNlIGl0IGlzIHNvIHNpbXBsZSBIVyBJIGFzc3VtZSB0aGlzIGlzIHdoeSB0aGlzIGNvZGUgaXMg
-YmVpbmcNCj4gcHVzaGVkIGhlcmUgOikNCj4gDQo+ID4gYnV0IHRoZXJlIGFyZSBhbHNvIHRlcm1p
-bmFsIGNvbmRpdGlvbnMgZS5nLiB3aGVuIGEgd29ya3F1ZXVlIGlzDQo+ID4gcmVzZXQgYWZ0ZXIg
-aGFuZyBoZW5jZSBhZGRpdGlvbmFsIGRyYWluaW5nIGlzIHJlcXVpcmVkIGZyb20gdGhlDQo+ID4g
-aW9tbXUgc2lkZSB0byBlbnN1cmUgYWxsIHRoZSBvdXRzdGFuZGluZyBwYWdlIHJlcXVlc3RzL3Jl
-c3BvbnNlcw0KPiA+IGFyZSBwcm9wZXJseSBoYW5kbGVkLg0KPiANCj4gVGhlbiBpdCBzaG91bGQg
-YmUgY29kZWQgYXMgYW4gZXhwbGljaXQgZHJhaW4gcmVxdWVzdCBmcm9tIGRldmljZSB3aGVuDQo+
-IGFuZCB3aGVyZSB0aGV5IG5lZWQgaXQuDQo+IA0KPiBJdCBzaG91bGQgbm90IGJlIGludGVncmF0
-ZWQgaW50byB0aGUgaW9tbXUgc2lkZSBiZWNhdXNlIGl0IGlzDQo+IG5vbnNlbnNpY2FsLiBEZXZp
-Y2VzIGV4cGVjdGluZyBjb25zaXN0ZW50IGJlaGF2aW9yIG11c3Qgc3RvcCBETUENCj4gYmVmb3Jl
-IGNoYW5naW5nIHRyYW5zbGF0aW9uLCBhbmQgaWYgdGhleSBuZWVkIGhlbHAgdG8gZG8gaXQgdGhl
-eSBtdXN0DQo+IGNhbGwgQVBJcy4gQ2hhbmdpbmcgdHJhbnNsYXRpb24gaXMgbm90IHJlcXVpcmVk
-IGFmdGVyIGEgc28gY2FsbGVkDQo+ICJ0ZXJtaW5hbCBldmVudCIuDQo+IA0KPiA+IHZ0LWQgc3Bl
-YyBkZWZpbmVzIGEgZHJhaW5pbmcgcHJvY2VzcyB0byBjb3BlIHdpdGggdGhvc2UgdGVybWluYWwN
-Cj4gPiBjb25kaXRpb25zIChzZWUgNy45IFBlbmRpbmcgUGFnZSBSZXF1ZXN0IEhhbmRsaW5nIG9u
-IFRlcm1pbmFsDQo+ID4gQ29uZGl0aW9ucykuIGludGVsLWlvbW11IGRyaXZlciBqdXN0IGltcGxl
-bWVudHMgaXQgYnkgZGVmYXVsdCBmb3INCj4gPiBzaW1wbGljaXR5IChvbmUgbWF5IGNvbnNpZGVy
-IHByb3ZpZGluZyBleHBsaWNpdCBBUEkgZm9yIGRyaXZlcnMgdG8NCj4gPiBjYWxsIGJ1dCBub3Qg
-c3VyZSBvZiB0aGUgbmVjZXNzaXR5IGlmIHN1Y2ggdGVybWluYWwgY29uZGl0aW9ucw0KPiA+IGFw
-cGx5IHRvIG1vc3QgZGV2aWNlcykuIGFueXdheSB0aGlzIGlzIG5vdCBhIGZhc3QgcGF0aC4NCj4g
-DQo+IEl0IGlzIG5vdCAiYnkgZGVmYXVsdCIgaXQgaXMgaW4gdGhlIHdyb25nIHBsYWNlLiBUaGVz
-ZSB0ZXJtaW5hbA0KPiBjb25kaXRpb25zIGFyZSB0aGluZ3MgbGlrZSBGTFIuIEZMUiBoYXMgbm90
-aGluZyB0byBkbyB3aXRoIGNoYW5naW5nDQo+IHRoZSB0cmFuc2xhdGlvbi4gSSBjYW4gdHJpZ2dl
-ciBGTFIgYW5kIGtlZXAgdGhlIGN1cnJlbnQgdHJhbnNsYXRpb24NCj4gYW5kIHN0aWxsIHdvdWxk
-IHdhbnQgdG8gZmx1c2ggb3V0IGFsbCB0aGUgUFJJcyBiZWZvcmUgc3RhcnRpbmcgRE1BDQo+IGFn
-YWluIHRvIGF2b2lkIHByb3RvY29sIGNvbmZ1c2lvbi4NCj4gDQo+IEFuIEFQSSBpcyBhYnNvbHV0
-ZWx5IG5lY2Vzc2FyeS4gQ29uZnVzaW5nIHRoZSBjYXNlcyB0aGF0IG5lZWQgZHJhaW5pbmcNCj4g
-d2l0aCB0cmFuc2xhdGlvbiBjaGFuZ2UgaXMganVzdCBub3QgbG9naWNhbGx5IHJpZ2h0Lg0KPiAN
-Cj4gZWcgd2UgZG8gbmVlZCB0byBtb2RpZnkgVkZJTyB0byBkbyB0aGUgZHJhaW4gb24gRkxSIGxp
-a2UgdGhlIHNwZWMNCj4gZXhwbGFpbnMhDQo+IA0KPiBEcmFpbmluZyBoYXMgdG8gYmUgb3JkZXJl
-ZCBjb3JyZWN0bHkgd2l0aCB3aGF0ZXZlciB0aGUgZGV2aWNlIGlzDQo+IGRvaW5nLiBEcmFpbiBu
-ZWVkcyB0byBjb21lIGFmdGVyIEZMUiwgZm9yIGluc3RhbmNlLiBJdCBuZWVkcyB0byBjb21lDQo+
-IGFmdGVyIGEgd29yayBxdWV1ZSByZXNldCwgYmVjYXVzZSBkcmFpbiBkb2Vzbid0IG1ha2UgYW55
-IHNlbnNlIHVubGVzcw0KPiBpdCBpcyBjb3VwbGVkIHdpdGggYSBETUEgc3RvcCBhdCB0aGUgZGV2
-aWNlLg0KDQpPa2F5IHRoYXQgbWFrZXMgc2Vuc2UuIEFzIEJhb2x1IGFuZCB5b3UgYWxyZWFkeSBh
-Z3JlZWQgbGV0J3Mgc2VwYXJhdGUNCnRoaXMgZml4IG91dCBvZiB0aGlzIHNlcmllcy4NCg0KVGhl
-IG1pbm9yIGludGVyZXN0aW5nIGFzcGVjdCBpcyBob3cgdG8gZG9jdW1lbnQgdGhpcyByZXF1aXJl
-bWVudA0KY2xlYXJseSBzbyBkcml2ZXJzIHdvbid0IHNraXAgY2FsbGluZyBpdCB3aGVuIHN2YSBp
-cyBlbmFibGVkLiANCg0KPiANCj4gSGFja2luZyBhIERNQSBzdG9wIGJ5IGZvcmNpbmcgYSBibG9j
-a2luZyB0cmFuc2xhdGlvbiBpcyBub3QgbG9naWNhbGx5DQo+IGNvcnJlY3QsIHdpdGggd3Jvbmcg
-b3JkZXJpbmcgdGhlIGRldmljZSBtYXkgc2VlIHVuZXhwZWN0ZWQgdHJhbnNsYXRpb24NCj4gZmFp
-bHVyZXMgd2hpY2ggbWF5IHRyaWdnZXIgQUVScyBvciBiYWQgdGhpbmdzLi4NCg0Kd2hlcmUgaXMg
-c3VjaCBoYWNrPyB0aG91Z2ggdGhlIGN1cnJlbnQgaW1wbGVtZW50YXRpb24gb2YgZHJhaW5pbmcN
-CmlzIG5vdCBjbGVhbiwgaXQncyBwdXQgaW5zaWRlIHBhc2lkLWRpc2FibGUtc2VxdWVuY2UgaW5z
-dGVhZCBvZiBmb3JjaW5nDQphIGJsb2NraW5nIHRyYW5zbGF0aW9uIGltcGxpY2l0bHkgaW4gaW9t
-bXUgZHJpdmVyIGkuZS4gaXQncyBzdGlsbCB0aGUgZHJpdmVyDQptYWtpbmcgZGVjaXNpb24gZm9y
-IHdoYXQgdHJhbnNsYXRpb24gdG8gYmUgdXNlZC4uLg0KDQo+IA0KPiA+IGFub3RoZXIgZXhhbXBs
-ZSBtaWdodCBiZSBzdG9wIG1hcmtlci4gQSBkZXZpY2UgdXNpbmcgc3RvcCBtYXJrZXINCj4gPiBk
-b2Vzbid0IG5lZWQgdG8gd2FpdCBmb3Igb3V0c3RhbmRpbmcgcGFnZSByZXF1ZXN0cy4gQWNjb3Jk
-aW5nIHRvIFBDSWUNCj4gPiBzcGVjICgxMC40LjEuMiBNYW5hZ2luZyBQQVNJRCBVc2FnZSBvbiBQ
-UkcgUmVxdWVzdHMpIHRoZSBkZXZpY2UNCj4gPiBzaW1wbHkgbWFya3Mgb3V0c3RhbmRpbmcgcGFn
-ZSByZXF1ZXN0IGFzIHN0YWxlIGFuZCBzZW5kcyBhIHN0b3ANCj4gPiBtYXJrZXIgbWVzc2FnZSB0
-byB0aGUgSU9NTVUuIFBhZ2UgcmVzcG9uc2VzIGZvciB0aG9zZSBzdGFsZQ0KPiA+IHJlcXVlc3Rz
-IGFyZSBpZ25vcmVkLiBCdXQgcHJlc3VtYWJseSB0aGUgaW9tbXUgZHJpdmVyIHN0aWxsIG5lZWRz
-DQo+ID4gdG8gZHJhaW4gdGhvc2UgcmVxdWVzdHMgdW50aWwgdGhlIHN0b3AgbWFya2VyIG1lc3Nh
-Z2UgaW4gdW5iaW5kDQo+ID4gdG8gYXZvaWQgdGhlbSBpbmNvcnJlY3RseSByb3V0ZWQgdG8gYSBu
-ZXcgYWRkcmVzcyBzcGFjZSBpbiBjYXNlIHRoZQ0KPiA+IFBBU0lEIGlzIHJlYm91bmQgdG8gYW5v
-dGhlciBwcm9jZXNzIGltbWVkaWF0ZWx5Lg0KPiANCj4gU3RvcCBtYXJrZXIgZG9lc24ndCBjaGFu
-Z2UgYW55dGhpbmcsIGluIGFsbCBwcm9jZXNzaW5nIGl0IGp1c3QgcmVtb3Zlcw0KPiByZXF1ZXN0
-cyB0aGF0IGhhdmUgeWV0IHRvIGNvbXBsZXRlLiBJZiBhIGRldmljZSBpcyB1c2luZyBzdG9wIHRo
-ZW4NCj4gbW9zdCBsaWtlbHkgdGhlIHdob2xlIHRoaW5nIGlzIHJhY3kgYW5kIHRoZSBPUyBzaW1w
-bHkgaGFzIHRvIGJlIHJlYWR5DQo+IHRvIGhhbmRsZSBzdG9wIGF0IGFueSB0aW1lLg0KPiANCg0K
-SSdtIG5vdCBzdXJlIHdoZXRoZXIgYSBkZXZpY2Ugc3VwcG9ydGluZyBzdG9wIG1hcmtlciBtYXkg
-cHJvdmlkZQ0KY2VydGFpbiBhYm9ydC1kbWEgY21kIHRvIG5vdCB3YWl0LiBCdXQgZ3Vlc3Mgc3Vj
-aCBhYm9ydCBzZW1hbnRpY3MNCndpbGwgYmUgbGlrZWx5IHVzZWQgaW4gdGVybWluYWwgY29uZGl0
-aW9uIHRvbyBzbyB0aGUgc2FtZSBhcmd1bWVudA0Kc3RpbGwgaG9sZC4gUHJlc3VtYWJseSBub3Jt
-YWwgdHJhbnNsYXRpb24gY2hhbmdlIHNob3VsZCBhbHdheXMgdXNlDQphIHN0b3Atd2FpdCBzZW1h
-bnRpY3MgZm9yIG91dHN0YW5kaW5nIERNQXMuIPCfmIoNCg==
+Hi maintainers,
+
+Just a friendly ping. Do I need to refresh another version?
+
+Thanks,
+Zhao
+
+On Fri, Nov 17, 2023 at 03:50:50PM +0800, Zhao Liu wrote:
+> Date: Fri, 17 Nov 2023 15:50:50 +0800
+> From: Zhao Liu <zhao1.liu@linux.intel.com>
+> Subject: [PATCH v6 00/16] Support smp.clusters for x86 in QEMU
+> X-Mailer: git-send-email 2.34.1
+> 
+> From: Zhao Liu <zhao1.liu@intel.com>
+> 
+> Hi list,
+> 
+> This is the our v6 patch series, rebased on the master branch at the
+> commit 34a5cb6d8434 (Merge tag 'pull-tcg-20231114' of
+> https://gitlab.com/rth7680/qemu into staging).
+> 
+> Because the first four patches of v5 [1] have been merged, v6 contains
+> the remaining patches and reabse on the latest master.
+> 
+> No more change since v5 exclude the comment update about QEMU version
+> (see Changelog).
+> 
+> Welcome your comments!
+> 
+> 
+> PS: About the idea to implement generic smp cache topology, we're
+> considerring to port the original x-l2-cache-topo option to smp [2].
+> Just like:
+> 
+> -smp cpus=4,sockets=2,cores=2,threads=1, \
+>      l3-cache=socket,l2-cache=core,l1-i-cache=core,l1-d-cache=core
+> 
+> Any feedback about this direction is also welcomed! ;-)
+> 
+> 
+> ---
+> # Introduction
+> 
+> This series adds the cluster support for x86 PC machine, which allows
+> x86 can use smp.clusters to configure the module level CPU topology
+> of x86.
+> 
+> This series also is the preparation to help x86 to define the more
+> flexible cache topology, such as having multiple cores share the
+> same L2 cache at cluster level. (That was what x-l2-cache-topo did,
+> and we will explore a generic way.)
+> 
+> About why we don't share L2 cache at cluster and need a configuration
+> way, pls see section: ## Why not share L2 cache in cluster directly.
+> 
+> 
+> # Background
+> 
+> The "clusters" parameter in "smp" is introduced by ARM [3], but x86
+> hasn't supported it.
+> 
+> At present, x86 defaults L2 cache is shared in one core, but this is
+> not enough. There're some platforms that multiple cores share the
+> same L2 cache, e.g., Alder Lake-P shares L2 cache for one module of
+> Atom cores [4], that is, every four Atom cores shares one L2 cache.
+> Therefore, we need the new CPU topology level (cluster/module).
+> 
+> Another reason is for hybrid architecture. cluster support not only
+> provides another level of topology definition in x86, but would also
+> provide required code change for future our hybrid topology support.
+> 
+> 
+> # Overview
+> 
+> ## Introduction of module level for x86
+> 
+> "cluster" in smp is the CPU topology level which is between "core" and
+> die.
+> 
+> For x86, the "cluster" in smp is corresponding to the module level [4],
+> which is above the core level. So use the "module" other than "cluster"
+> in x86 code.
+> 
+> And please note that x86 already has a cpu topology level also named
+> "cluster" [5], this level is at the upper level of the package. Here,
+> the cluster in x86 cpu topology is completely different from the
+> "clusters" as the smp parameter. After the module level is introduced,
+> the cluster as the smp parameter will actually refer to the module level
+> of x86.
+> 
+> 
+> ## Why not share L2 cache in cluster directly
+> 
+> Though "clusters" was introduced to help define L2 cache topology
+> [3], using cluster to define x86's L2 cache topology will cause the
+> compatibility problem:
+> 
+> Currently, x86 defaults that the L2 cache is shared in one core, which
+> actually implies a default setting "cores per L2 cache is 1" and
+> therefore implicitly defaults to having as many L2 caches as cores.
+> 
+> For example (i386 PC machine):
+> -smp 16,sockets=2,dies=2,cores=2,threads=2,maxcpus=16 (*)
+> 
+> Considering the topology of the L2 cache, this (*) implicitly means "1
+> core per L2 cache" and "2 L2 caches per die".
+> 
+> If we use cluster to configure L2 cache topology with the new default
+> setting "clusters per L2 cache is 1", the above semantics will change
+> to "2 cores per cluster" and "1 cluster per L2 cache", that is, "2
+> cores per L2 cache".
+> 
+> So the same command (*) will cause changes in the L2 cache topology,
+> further affecting the performance of the virtual machine.
+> 
+> Therefore, x86 should only treat cluster as a cpu topology level and
+> avoid using it to change L2 cache by default for compatibility.
+> 
+> 
+> ## module level in CPUID
+> 
+> Linux kernel (from v6.4, with commit edc0a2b595765 ("x86/topology: Fix
+> erroneous smp_num_siblings on Intel Hybrid platforms") is able to
+> handle platforms with Module level enumerated via CPUID.1F.
+> 
+> Expose the module level in CPUID[0x1F] (for Intel CPUs) if the machine
+> has more than 1 modules since v3.
+> 
+> 
+> ## New cache topology info in CPUCacheInfo
+> 
+> (This is in preparation for users being able to configure cache topology
+> from the cli later on.)
+> 
+> Currently, by default, the cache topology is encoded as:
+> 1. i/d cache is shared in one core.
+> 2. L2 cache is shared in one core.
+> 3. L3 cache is shared in one die.
+> 
+> This default general setting has caused a misunderstanding, that is, the
+> cache topology is completely equated with a specific cpu topology, such
+> as the connection between L2 cache and core level, and the connection
+> between L3 cache and die level.
+> 
+> In fact, the settings of these topologies depend on the specific
+> platform and are not static. For example, on Alder Lake-P, every
+> four Atom cores share the same L2 cache [3].
+> 
+> Thus, in this patch set, we explicitly define the corresponding cache
+> topology for different cpu models and this has two benefits:
+> 1. Easy to expand to new CPU models in the future, which has different
+>    cache topology.
+> 2. It can easily support custom cache topology by some command.
+> 
+> 
+> # Patch description
+> 
+> patch 1 Fixes about x86 topology and Intel l1 cache topology.
+> 
+> patch 2-3 Cleanups about topology related CPUID encoding and QEMU
+>           topology variables.
+> 
+> patch 4-5 Refactor CPUID[0x1F] encoding to prepare to introduce module
+>           level.
+> 
+> patch 6-12 Add the module as the new CPU topology level in x86, and it
+>             is corresponding to the cluster level in generic code.
+> 
+> patch 13,14,16 Add cache topology information in cache models.
+> 
+> patch 15 Update AMD CPUs' cache topology encoding.
+> 
+> 
+> [1]: https://lists.gnu.org/archive/html/qemu-devel/2023-10/msg08233.html
+> [2]: https://lists.gnu.org/archive/html/qemu-devel/2023-10/msg01954.html
+> [3]: https://patchew.org/QEMU/20211228092221.21068-1-wangyanan55@huawei.com/
+> [4]: https://www.intel.com/content/www/us/en/products/platforms/details/alder-lake-p.html
+> [5]: SDM, vol.3, ch.9, 9.9.1 Hierarchical Mapping of Shared Resources.
+> 
+> Best Regards,
+> Zhao
+> ---
+> Changelog:
+> 
+> Changes since v5:
+>  * The first four patches of v5 [1] have been merged, v6 contains
+>    the remaining patches.
+>  * Reabse on the latest master.
+>  * Update the comment when check cluster-id. Since current QEMU is
+>    v8.2, the cluster-id support should at least start from v8.3.
+> 
+> Changes since v4:
+>  * Drop the "x-l2-cache-topo" option. (Michael)
+>  * Add A/R/T tags.
+> 
+> Changes since v3 (main changes):
+>  * Expose module level in CPUID[0x1F].
+>  * Fix compile warnings. (Babu)
+>  * Fixes cache topology uninitialization bugs for some AMD CPUs. (Babu)
+> 
+> Changes since v2:
+>  * Add "Tested-by", "Reviewed-by" and "ACKed-by" tags.
+>  * Use newly added wrapped helper to get cores per socket in
+>    qemu_init_vcpu().
+> 
+> Changes since v1:
+>  * Reordered patches. (Yanan)
+>  * Deprecated the patch to fix comment of machine_parse_smp_config().
+>    (Yanan)
+>  * Rename test-x86-cpuid.c to test-x86-topo.c. (Yanan)
+>  * Split the intel's l1 cache topology fix into a new separate patch.
+>    (Yanan)
+>  * Combined module_id and APIC ID for module level support into one
+>    patch. (Yanan)
+>  * Make cache_into_passthrough case of cpuid 0x04 leaf in
+>  * cpu_x86_cpuid() use max_processor_ids_for_cache() and
+>    max_core_ids_in_package() to encode CPUID[4]. (Yanan)
+>  * Add the prefix "CPU_TOPO_LEVEL_*" for CPU topology level names.
+>    (Yanan)
+> 
+> ---
+> Zhao Liu (10):
+>   i386/cpu: Fix i/d-cache topology to core level for Intel CPU
+>   i386/cpu: Use APIC ID offset to encode cache topo in CPUID[4]
+>   i386/cpu: Consolidate the use of topo_info in cpu_x86_cpuid()
+>   i386: Split topology types of CPUID[0x1F] from the definitions of
+>     CPUID[0xB]
+>   i386: Decouple CPUID[0x1F] subleaf with specific topology level
+>   i386: Expose module level in CPUID[0x1F]
+>   i386: Add cache topology info in CPUCacheInfo
+>   i386: Use CPUCacheInfo.share_level to encode CPUID[4]
+>   i386: Use offsets get NumSharingCache for CPUID[0x8000001D].EAX[bits
+>     25:14]
+>   i386: Use CPUCacheInfo.share_level to encode
+>     CPUID[0x8000001D].EAX[bits 25:14]
+> 
+> Zhuocheng Ding (6):
+>   i386: Introduce module-level cpu topology to CPUX86State
+>   i386: Support modules_per_die in X86CPUTopoInfo
+>   i386: Support module_id in X86CPUTopoIDs
+>   i386/cpu: Introduce cluster-id to X86CPU
+>   tests: Add test case of APIC ID for module level parsing
+>   hw/i386/pc: Support smp.clusters for x86 PC machine
+> 
+>  hw/i386/pc.c               |   1 +
+>  hw/i386/x86.c              |  49 ++++++-
+>  include/hw/i386/topology.h |  35 ++++-
+>  qemu-options.hx            |  10 +-
+>  target/i386/cpu.c          | 289 +++++++++++++++++++++++++++++--------
+>  target/i386/cpu.h          |  43 +++++-
+>  target/i386/kvm/kvm.c      |   2 +-
+>  tests/unit/test-x86-topo.c |  56 ++++---
+>  8 files changed, 379 insertions(+), 106 deletions(-)
+> 
+> -- 
+> 2.34.1
+> 
+> 
 
