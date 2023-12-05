@@ -1,184 +1,329 @@
-Return-Path: <kvm+bounces-3471-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3472-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FCFE804BBB
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 09:04:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C143804D7E
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 10:21:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CE63281771
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 08:04:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0C351F213E5
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 09:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB23D38DF4;
-	Tue,  5 Dec 2023 08:04:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C3F3E485;
+	Tue,  5 Dec 2023 09:21:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lRfNWdXG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bX7MXlnr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF526127;
-	Tue,  5 Dec 2023 00:04:32 -0800 (PST)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B582q8c024915;
-	Tue, 5 Dec 2023 08:04:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=mime-version : date :
- from : to : cc : subject : reply-to : in-reply-to : references :
- message-id : content-type : content-transfer-encoding; s=pp1;
- bh=/aAESai4uDl4/7s45na8z6I4tJIt9dFN0EddPTE9jS8=;
- b=lRfNWdXG3nedK6jjI5linSKB/HEK9fYxuy2HsogQNs0GTQ0J0S23QhP3cp9aUxsI8POi
- RIFZQLp3UrnfuZcK237mb9qecDhPR3gyAmnRd2d+k+/IY9QnapZHsPUOoZsOmfIsHm2T
- BVgcDKw5YLJALD6zeJ44CI3aLv1fzOtPY/85Z23v4XLTZfSmE7jf2p3AYCow6b7eIX3/
- Kns+okcSwjlg54BK5xsIWIwyzoR/ywtb4+Dq2doVGG4fUfiIK55R6v0IOpZ2nMxFoLwL
- +n7iX4y9hzwXGQkYw45SAwxuA0+j2KLyrw19T+XphalpceID3v0U9Hq0yTG9keo1yvu2 MQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ut00m01fe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 05 Dec 2023 08:04:29 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B584TrX030361;
-	Tue, 5 Dec 2023 08:04:29 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ut00m01ey-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 05 Dec 2023 08:04:29 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B57YE5c009137;
-	Tue, 5 Dec 2023 08:04:28 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3urgdkw8nn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 05 Dec 2023 08:04:28 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B584OCh3932848
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 5 Dec 2023 08:04:25 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 94E105803F;
-	Tue,  5 Dec 2023 08:04:24 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2864B58061;
-	Tue,  5 Dec 2023 08:04:24 +0000 (GMT)
-Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  5 Dec 2023 08:04:24 +0000 (GMT)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A662E842;
+	Tue,  5 Dec 2023 09:21:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FDDDC433C7;
+	Tue,  5 Dec 2023 09:21:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701768092;
+	bh=CwTZMcUe712h6POb79Nr8ctnkPireFaHA042OQUBRjY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bX7MXlnrqiX+N/s9lIiTB5y2zP1dsnXKx7M5C9BPJzUpzX7pUMlRlaqLRMyXsZZEJ
+	 Ce66GVp8qzcmR1xKdC5UbuusvCU2hTXcaFXpCSY8PWjmDDqJ9IJlIUvFnEnnvE+mlY
+	 /lQLO7EsAC7QBQMVqA0k/H3itcsy2ip/OHM+hPKLFn5N1l3CQAniWgkmBgsc8bpXJL
+	 jyBDGr3PUW+XK/8e/e7dmR3U6DsqCPAt+qGQWxphRa8NkSyMeegGZdH5+Eo8o1lwXO
+	 WSX2Bvr9R+jPc0SfwC3KY963lnIW5iFVNN3HKfTAL+S5avMUSDgHna+odSwtyNNnc0
+	 6P5NOvkJbiUMg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rARcP-001UKy-HZ;
+	Tue, 05 Dec 2023 09:21:29 +0000
+Date: Tue, 05 Dec 2023 09:21:28 +0000
+Message-ID: <86fs0hatt3.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: <ankita@nvidia.com>
+Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, <jgg@nvidia.com>,
+	<oliver.upton@linux.dev>,
+	<suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>,
+	<catalin.marinas@arm.com>,
+	<will@kernel.org>,
+	<ardb@kernel.org>,
+	<akpm@linux-foundation.org>,
+	<gshan@redhat.com>,
+	<aniketa@nvidia.com>,
+	<cjia@nvidia.com>,
+	<kwankhede@nvidia.com>,
+	<targupta@nvidia.com>,
+	<vsethi@nvidia.com>,
+	<acurrid@nvidia.com>,
+	<apopple@nvidia.com>,
+	<jhubbard@nvidia.com>,
+	<danw@nvidia.com>,
+	<mochs@nvidia.com>,
+	<kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and NORMAL_NC for IO memory
+In-Reply-To: <20231205033015.10044-1-ankita@nvidia.com>
+References: <20231205033015.10044-1-ankita@nvidia.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Date: Tue, 05 Dec 2023 09:04:23 +0100
-From: Harald Freudenberger <freude@linux.ibm.com>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Tony Krowiak
- <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        jjherne@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
-        david@redhat.com, Reinhard Buendgen
- <BUENDGEN@de.ibm.com>
-Subject: Re: [PATCH] s390/vfio-ap: handle response code 01 on queue reset
-Reply-To: freude@linux.ibm.com
-Mail-Reply-To: freude@linux.ibm.com
-In-Reply-To: <20231204171506.42aa687f.pasic@linux.ibm.com>
-References: <20231129143529.260264-1-akrowiak@linux.ibm.com>
- <b43414ef-7aa4-9e5c-a706-41861f0d346c@linux.ibm.com>
- <1f4720d7-93f1-4e38-a3ad-abaf99596e7c@linux.ibm.com>
- <05cfc382-d01d-4370-b8bb-d3805e957f2e@linux.ibm.com>
- <20231204171506.42aa687f.pasic@linux.ibm.com>
-Message-ID: <d780a15a7c073e7d437f8120a72e8d29@linux.ibm.com>
-X-Sender: freude@linux.ibm.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: M3DHbSEQEfuZvzieLvJTu5EieaUC3_58
-X-Proofpoint-ORIG-GUID: ZEg1yn10AEgYly7F7nAwdI3-FSYkzfvN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-05_03,2023-12-04_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 lowpriorityscore=0 malwarescore=0 mlxscore=0 bulkscore=0
- adultscore=0 clxscore=1011 mlxlogscore=999 spamscore=0 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2312050064
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ankita@nvidia.com, shameerali.kolothum.thodi@huawei.com, jgg@nvidia.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, ardb@kernel.org, akpm@linux-foundation.org, gshan@redhat.com, aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2023-12-04 17:15, Halil Pasic wrote:
-> On Mon, 4 Dec 2023 16:16:31 +0100
-> Christian Borntraeger <borntraeger@linux.ibm.com> wrote:
-> 
->> Am 04.12.23 um 15:53 schrieb Tony Krowiak:
->> >
->> >
->> > On 11/29/23 12:12, Christian Borntraeger wrote:
->> >> Am 29.11.23 um 15:35 schrieb Tony Krowiak:
->> >>> In the current implementation, response code 01 (AP queue number not valid)
->> >>> is handled as a default case along with other response codes returned from
->> >>> a queue reset operation that are not handled specifically. Barring a bug,
->> >>> response code 01 will occur only when a queue has been externally removed
->> >>> from the host's AP configuration; nn this case, the queue must
->> >>> be reset by the machine in order to avoid leaking crypto data if/when the
->> >>> queue is returned to the host's configuration. The response code 01 case
->> >>> will be handled specifically by logging a WARN message followed by cleaning
->> >>> up the IRQ resources.
->> >>>
->> >>
->> >> To me it looks like this can be triggered by the LPAR admin, correct? So it
->> >> is not desireable but possible.
->> >> In that case I prefer to not use WARN, maybe use dev_warn or dev_err instead.
->> >> WARN can be a disruptive event if panic_on_warn is set.
->> >
->> > Yes, it can be triggered by the LPAR admin. I can't use dev_warn here because we don't have a reference to any device, but I can use pr_warn if that suffices.
->> 
->> Ok, please use pr_warn then.
-> 
-> Shouldn't we rather make this an 'info'. I mean we probably do not want
-> people complaining about this condition. Yes it should be a best 
-> practice
-> to coordinate such things with the guest, and ideally remove the 
-> resource
-> from the guest first. But AFAIU our stack is supposed to be able to
-> handle something like this. IMHO issuing a warning is excessive 
-> measure.
-> I know Reinhard and Tony probably disagree with the last sentence
-> though.
++ Shameer
 
-Halil, Tony, the thing about about info versus warning versus error is 
-our
-own stuff. Keep in mind that these messages end up in the "debug 
-feature"
-as FFDC data. So it comes to the point which FFDC data do you/Tony want 
-to
-see there ? It should be enough to explain to a customer what happened
-without the need to "recreate with higher debug level" if something 
-serious
-happened. So my private decision table is:
-1) is it something serious, something exceptional, something which may 
-not
-    come up again if tried to recreate ? Yes -> make it visible on the 
-first
-    occurrence as error msg.
-2) is it something you want to read when a customer hits it and you tell 
-him
-    to extract and examine the debug feature data ? Yes -> make it a 
-warning
-    and make sure your debug feature by default records warnings.
-3) still serious, but may flood the debug feature. Good enough and high
-    probability to reappear on a recreate ? Yes -> make it an info 
-message
-    and live with the risk that you may not be able to explain to a 
-customer
-    what happened without a recreate and higher debug level.
-4) not 1-3, -> maybe a debug msg but still think about what happens when 
-a
-    customer enables "debug feature" with highest level. Does it squeeze 
-out
-    more important stuff ? Maybe make it dynamic debug with pr_debug() 
-(see
-    kernel docu admin-guide/dynamic-debug-howto.rst).
+On Tue, 05 Dec 2023 03:30:15 +0000,
+<ankita@nvidia.com> wrote:
+> 
+> From: Ankit Agrawal <ankita@nvidia.com>
+> 
+> Currently, KVM for ARM64 maps at stage 2 memory that is considered device
+> (i.e. it is not RAM) with DEVICE_nGnRE memory attributes; this setting
+> overrides (as per the ARM architecture [1]) any device MMIO mapping
+> present at stage 1, resulting in a set-up whereby a guest operating
+> system cannot determine device MMIO mapping memory attributes on its
+> own but it is always overridden by the KVM stage 2 default.
+> 
+> This set-up does not allow guest operating systems to select device
+> memory attributes independently from KVM stage-2 mappings
+> (refer to [1], "Combining stage 1 and stage 2 memory type attributes"),
+> which turns out to be an issue in that guest operating systems
+> (e.g. Linux) may request to map devices MMIO regions with memory
+> attributes that guarantee better performance (e.g. gathering
+> attribute - that for some devices can generate larger PCIe memory
+> writes TLPs) and specific operations (e.g. unaligned transactions)
+> such as the NormalNC memory type.
+> 
+> The default device stage 2 mapping was chosen in KVM for ARM64 since
+> it was considered safer (i.e. it would not allow guests to trigger
+> uncontained failures ultimately crashing the machine) but this
+> turned out to be asynchronous (SError) defeating the purpose.
+> 
+> Failures containability is a property of the platform and is independent
+> from the memory type used for MMIO device memory mappings.
+> 
+> Actually, DEVICE_nGnRE memory type is even more problematic than
+> Normal-NC memory type in terms of faults containability in that e.g.
+> aborts triggered on DEVICE_nGnRE loads cannot be made, architecturally,
+> synchronous (i.e. that would imply that the processor should issue at
+> most 1 load transaction at a time - it cannot pipeline them - otherwise
+> the synchronous abort semantics would break the no-speculation attribute
+> attached to DEVICE_XXX memory).
+> 
+> This means that regardless of the combined stage1+stage2 mappings a
+> platform is safe if and only if device transactions cannot trigger
+> uncontained failures and that in turn relies on platform capabilities
+> and the device type being assigned (i.e. PCIe AER/DPC error containment
+> and RAS architecture[3]); therefore the default KVM device stage 2
+> memory attributes play no role in making device assignment safer
+> for a given platform (if the platform design adheres to design
+> guidelines outlined in [3]) and therefore can be relaxed.
+> 
+> For all these reasons, relax the KVM stage 2 device memory attributes
+> from DEVICE_nGnRE to Normal-NC. Add a new kvm_pgtable_prot flag for
+> Normal-NC.
+> 
+> The Normal-NC was chosen over a different Normal memory type default
+> at stage-2 (e.g. Normal Write-through) to avoid cache allocation/snooping.
+> 
+> Relaxing S2 KVM device MMIO mappings to Normal-NC is not expected to
+> trigger any issue on guest device reclaim use cases either (i.e. device
+> MMIO unmap followed by a device reset) at least for PCIe devices, in that
+> in PCIe a device reset is architected and carried out through PCI config
+> space transactions that are naturally ordered with respect to MMIO
+> transactions according to the PCI ordering rules.
+> 
+> Having Normal-NC S2 default puts guests in control (thanks to
+> stage1+stage2 combined memory attributes rules [1]) of device MMIO
+> regions memory mappings, according to the rules described in [1]
+> and summarized here ([(S1) - stage1], [(S2) - stage 2]):
+> 
+> S1           |  S2           | Result
+> NORMAL-WB    |  NORMAL-NC    | NORMAL-NC
+> NORMAL-WT    |  NORMAL-NC    | NORMAL-NC
+> NORMAL-NC    |  NORMAL-NC    | NORMAL-NC
+> DEVICE<attr> |  NORMAL-NC    | DEVICE<attr>
+> 
+> It is worth noting that currently, to map devices MMIO space to user
+> space in a device pass-through use case the VFIO framework applies memory
+> attributes derived from pgprot_noncached() settings applied to VMAs, which
+> result in device-nGnRnE memory attributes for the stage-1 VMM mappings.
+> 
+> This means that a userspace mapping for device MMIO space carried
+> out with the current VFIO framework and a guest OS mapping for the same
+> MMIO space may result in a mismatched alias as described in [2].
+> 
+> Defaulting KVM device stage-2 mappings to Normal-NC attributes does not
+> change anything in this respect, in that the mismatched aliases would
+> only affect (refer to [2] for a detailed explanation) ordering between
+> the userspace and GuestOS mappings resulting stream of transactions
+> (i.e. it does not cause loss of property for either stream of
+> transactions on its own), which is harmless given that the userspace
+> and GuestOS access to the device is carried out through independent
+> transactions streams.
+> 
+> [1] section D8.5 - DDI0487_I_a_a-profile_architecture_reference_manual.pdf
+> [2] section B2.8 - DDI0487_I_a_a-profile_architecture_reference_manual.pdf
+
+Can you please quote the latest specs?
+
+> [3] sections 1.7.7.3/1.8.5.2/appendix C - DEN0029H_SBSA_7.1.pdf
+> 
+> Applied over next-20231201
+> 
+> History
+> =======
+> v1 -> v2
+> - Updated commit log to the one posted by
+>   Lorenzo Pieralisi <lpieralisi@kernel.org> (Thanks!)
+> - Added new flag to represent the NORMAL_NC setting. Updated
+>   stage2_set_prot_attr() to handle new flag.
+> 
+> v1 Link:
+> https://lore.kernel.org/all/20230907181459.18145-3-ankita@nvidia.com/
+> 
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> Tested-by: Ankit Agrawal <ankita@nvidia.com>
+
+Despite the considerable increase in the commit message length, a
+number of questions are left unanswered:
+
+- Shameer reported a regression on non-FWB systems, breaking device
+  assignment:
+
+  https://lore.kernel.org/all/af13ed63dc9a4f26a6c958ebfa77d78a@huawei.com/
+
+  How has this been addressed?
+
+- Will had unanswered questions in another part of the thread:
+
+  https://lore.kernel.org/all/20231013092954.GB13524@willie-the-truck/
+
+  Can someone please help concluding it?
 
 > 
-> Regards,
-> Halil
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h |  2 ++
+>  arch/arm64/include/asm/memory.h      |  2 ++
+>  arch/arm64/kvm/hyp/pgtable.c         | 11 +++++++++--
+>  arch/arm64/kvm/mmu.c                 |  4 ++--
+>  4 files changed, 15 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index cfdf40f734b1..19278dfe7978 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -197,6 +197,7 @@ enum kvm_pgtable_stage2_flags {
+>   * @KVM_PGTABLE_PROT_W:		Write permission.
+>   * @KVM_PGTABLE_PROT_R:		Read permission.
+>   * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
+> + * @KVM_PGTABLE_PROT_NORMAL_NC:	Normal noncacheable attributes.
+>   * @KVM_PGTABLE_PROT_SW0:	Software bit 0.
+>   * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
+>   * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
+> @@ -208,6 +209,7 @@ enum kvm_pgtable_prot {
+>  	KVM_PGTABLE_PROT_R			= BIT(2),
+>  
+>  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
+> +	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(4),
+>  
+>  	KVM_PGTABLE_PROT_SW0			= BIT(55),
+>  	KVM_PGTABLE_PROT_SW1			= BIT(56),
+> diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+> index fde4186cc387..c247e5f29d5a 100644
+> --- a/arch/arm64/include/asm/memory.h
+> +++ b/arch/arm64/include/asm/memory.h
+> @@ -147,6 +147,7 @@
+>   * Memory types for Stage-2 translation
+>   */
+>  #define MT_S2_NORMAL		0xf
+> +#define MT_S2_NORMAL_NC		0x5
+>  #define MT_S2_DEVICE_nGnRE	0x1
+>  
+>  /*
+> @@ -154,6 +155,7 @@
+>   * Stage-2 enforces Normal-WB and Device-nGnRE
+>   */
+>  #define MT_S2_FWB_NORMAL	6
+> +#define MT_S2_FWB_NORMAL_NC	5
+>  #define MT_S2_FWB_DEVICE_nGnRE	1
+>  
+>  #ifdef CONFIG_ARM64_4K_PAGES
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index c651df904fe3..d4835d553c61 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -718,10 +718,17 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
+>  				kvm_pte_t *ptep)
+>  {
+>  	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
+> -	kvm_pte_t attr = device ? KVM_S2_MEMATTR(pgt, DEVICE_nGnRE) :
+> -			    KVM_S2_MEMATTR(pgt, NORMAL);
+> +	bool normal_nc = prot & KVM_PGTABLE_PROT_NORMAL_NC;
+> +	kvm_pte_t attr;
+>  	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
+>  
+> +	if (device)
+> +		attr = KVM_S2_MEMATTR(pgt, DEVICE_nGnRE);
+> +	else if (normal_nc)
+> +		attr = KVM_S2_MEMATTR(pgt, NORMAL_NC);
+> +	else
+> +		attr = KVM_S2_MEMATTR(pgt, NORMAL);
+> +
+>  	if (!(prot & KVM_PGTABLE_PROT_X))
+>  		attr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
+>  	else if (device)
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index d14504821b79..1cb302457d3f 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1071,7 +1071,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>  	struct kvm_mmu_memory_cache cache = { .gfp_zero = __GFP_ZERO };
+>  	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
+>  	struct kvm_pgtable *pgt = mmu->pgt;
+> -	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
+> +	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_NORMAL_NC |
+>  				     KVM_PGTABLE_PROT_R |
+>  				     (writable ? KVM_PGTABLE_PROT_W : 0);
+
+Doesn't this affect the GICv2 VCPU interface, which is effectively a
+shared peripheral, now allowing a guest to affect another guest's
+interrupt distribution? If that is the case, this needs to be fixed.
+
+In general, I don't think this should be a blanket statement, but be
+limited to devices that we presume can deal with this (i.e. PCIe, and
+not much else).
+
+>
+> @@ -1558,7 +1558,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		prot |= KVM_PGTABLE_PROT_X;
+>  
+>  	if (device)
+> -		prot |= KVM_PGTABLE_PROT_DEVICE;
+> +		prot |= KVM_PGTABLE_PROT_NORMAL_NC;
+>  	else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
+>  		prot |= KVM_PGTABLE_PROT_X;
+>  
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
