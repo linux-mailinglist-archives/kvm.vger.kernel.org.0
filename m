@@ -1,175 +1,219 @@
-Return-Path: <kvm+bounces-3629-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3630-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E1EA805F01
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 21:04:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFBD1805F1A
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 21:07:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C123A1C210A2
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 20:04:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C7BA281CE9
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 20:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9EAD69286;
-	Tue,  5 Dec 2023 20:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 777826DCF2;
+	Tue,  5 Dec 2023 20:06:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cVhlsFqL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Jdv2Wd5o"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E694183
-	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 12:04:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701806650;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+s/bFE6xgyjWjg9l0eDus09xn9qMoGdQv3xi9sP30Mo=;
-	b=cVhlsFqL0JrqqRbXmga4VASg4gw9US7Bo1spFnliCEG1urZIb4nwjOQykamiAvUUorufow
-	z4FMWNzbgEO9cKQ/vtcXyLSa+JlA84YVrzLaBXIku0R/RqJPPlpvXJcch3sfxR9+A1UC6f
-	42mV8Zr/K86enWkT90x0eM7WPu7rvrI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-304-p3AGOq4tMmmm3JrVgry2oA-1; Tue, 05 Dec 2023 15:04:09 -0500
-X-MC-Unique: p3AGOq4tMmmm3JrVgry2oA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40b53e5fc6bso47000525e9.3
-        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 12:04:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701806647; x=1702411447;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+s/bFE6xgyjWjg9l0eDus09xn9qMoGdQv3xi9sP30Mo=;
-        b=MB5GTnfPkLimMLwmaVqxz3UMbSN2SlzjALi/JoA+OFbgp3tUPKUJLkFBic28BNDAVd
-         d7alf/Fehxydwgf9nhiTcnGZHpqYTCG7N0kF1KzP3b/ZSUm23PgczoD56bjQybqn7y8N
-         ghH6tmY3wpuuNqQQkihfSSz4FUc73BoWqjnnlYxAgzKK/1iSsgiMnr2uYm8EXox2PDDc
-         yp6ciU+0pULlQIjLvepAZfdWWnn8zyHFWdARG3qI2Ru1jqjqH7e4TWeKTZkj7J6N8sZE
-         bb25oDNoUI0fh7xKEW92dMzvxXfA/28GKkMEkR7zyfPGd292wOy1nZflRxxRznKAK41t
-         UmFg==
-X-Gm-Message-State: AOJu0YyDxK/9kP/eCQv25/7n293UmOZL51cRZwFCkIpm2XK8t+A/iqRu
-	6uR5JDosHgne5TK6ZFM/RPI8YjlJ+8xJVp4sRdnRaIPAc4u2VVh82z3R54ueb1zMN+G6DPAAzjI
-	5iOdzRQn7uGvBEE+61Wdg
-X-Received: by 2002:a05:600c:4f49:b0:40b:5e21:cc19 with SMTP id m9-20020a05600c4f4900b0040b5e21cc19mr960063wmq.68.1701806647267;
-        Tue, 05 Dec 2023 12:04:07 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH+xDNPOikcr570KVQC6im6G/7epzJv3koIVlHQmahfi/k9ra/UMfu2LkaDap8die5Q9RRPsQ==
-X-Received: by 2002:a05:600c:4f49:b0:40b:5e21:cc19 with SMTP id m9-20020a05600c4f4900b0040b5e21cc19mr960051wmq.68.1701806646958;
-        Tue, 05 Dec 2023 12:04:06 -0800 (PST)
-Received: from starship ([89.237.98.20])
-        by smtp.gmail.com with ESMTPSA id d4-20020a05600c3ac400b0040b538047b4sm23151845wms.3.2023.12.05.12.04.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 12:04:06 -0800 (PST)
-Message-ID: <fc09fec34a89ba7655f344a31174d078a8248182.camel@redhat.com>
-Subject: Re: [RFC 05/33] KVM: x86: hyper-v: Introduce VTL call/return
- prologues in hypercall page
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>, Nicolas Saenz Julienne
-	 <nsaenz@amazon.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-hyperv@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com, 
- anelkz@amazon.com, graf@amazon.com, dwmw@amazon.co.uk, jgowans@amazon.com, 
- kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com,
- x86@kernel.org,  linux-doc@vger.kernel.org
-Date: Tue, 05 Dec 2023 22:04:04 +0200
-In-Reply-To: <ZW94T8Fx2eJpwKQS@google.com>
-References: <20231108111806.92604-1-nsaenz@amazon.com>
-	 <20231108111806.92604-6-nsaenz@amazon.com>
-	 <f4495d1f697cf9a7ddfb786eaeeac90f554fc6db.camel@redhat.com>
-	 <CXD4TVV5QWUK.3SH495QSBTTUF@amazon.com> <ZWoKlJUKJGGhRRgM@google.com>
-	 <CXD5HJ5LQMTE.11XP9UB9IL8LY@amazon.com> <ZWocI-2ajwudA-S5@google.com>
-	 <CXD7AW5T9R7G.2REFR2IRSVRVZ@amazon.com> <ZW94T8Fx2eJpwKQS@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C2D11A4;
+	Tue,  5 Dec 2023 12:06:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701806814; x=1733342814;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=2yxEZa4DBCf93II3k1pKkeoz4uIA2S0IS5QgfVkBQSk=;
+  b=Jdv2Wd5oN4CpdGTaNKrbEYL2AIh+fD47U1wALjs1ISqEKfpRNhNy0uC4
+   La4Fm9V+gRlUwYaTnPpHWpkUwrT7p56GU2hhJNsy9GYQDSgzehh5kg+Xr
+   SPP4nb8AkwF/+qNuU9GfgjlTmJhrIFPrifMWPDGsiGobamWE1Lg2sV9ht
+   16lNYpAi+mNokifKuNbgt2AYaaY76Q125HvXNBhwQFjm5NLAJ4N9JUsIV
+   RwkooEU078yaV9bJWTTAo0lxPh6AA0gl3eWHh7e71GDUZkxKryedjTVnl
+   hecJi+V0juDqfrV4Z5LdTnWMkZ9nKt0CwKQC1Eejw0p3G3v/6Q6/EsqTu
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="15501978"
+X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
+   d="scan'208";a="15501978"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 12:06:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="889059454"
+X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
+   d="scan'208";a="889059454"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Dec 2023 12:06:50 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 5 Dec 2023 12:06:50 -0800
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 5 Dec 2023 12:06:46 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 5 Dec 2023 12:06:46 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Tue, 5 Dec 2023 12:06:46 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Rn6mOdgbTVkiilntMhjoujlSgiaZUXBb6Y5I+fo3LaOG0uelyOExYTJn6BSWK8brN8GIBaf5O2sZMFVgigbUUpGD4sIgQMBoTXtFpq95ERK9Scjh0nWT8zrr4A6tPFO6RT40YbVJcpYJW9NYsfIHd7X2rtjcvbEQSXgKzyd6u7c75iE3mxmhWL3RndzdqTe+wjB2A0wJL+gC2Voz4h2qDHDpwhbY1VEogKEMwtUfIcd5aSViQzJDBML2H+cwZrqK0LCyOupQUsm1uZpKSqHAUo+7/TxCiFqq6uBkozUe10IYdmnB35x9bF/pptgpcnxREiU+ANYTWbOj0Fcvv92Urg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PIs+1DbSuB+l0FIbWtOWxxpV3Bjnvv0DUIP3OoUvrJc=;
+ b=IrcWnOvfzpWXMzW45OloKU5K9qPPZ0pw1Yojpwv3ThRAeT9QeHYZeeOfCGrJECbNmlRHYi2PtbA2c7L0ivxgk+3sDRj8AuH+972orKve1DWde59K2YNU1FXNrYADwtJEwbbPMpIifZBvVSzL9co96V3hZxHlIMDI0pneUZk+qn1Ci5yqbDFqAVFws6wNxxjH9RvfthU1wNiio9Tj615p9ETnBczo1gGFmJ7CV1BA8lB1mCEDAgFfdFoIFm/BGJPgbk8BlMBko2rV13Skgb7T/MPY8CyUkCQ96bVymyAkkEsMQjKLAJviNK4z1R2xIizQilOqBD4q549Ardj6lbvgHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by SJ0PR11MB5167.namprd11.prod.outlook.com (2603:10b6:a03:2d9::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Tue, 5 Dec
+ 2023 20:06:40 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6362:763e:f84b:4169]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6362:763e:f84b:4169%5]) with mapi id 15.20.7046.033; Tue, 5 Dec 2023
+ 20:06:39 +0000
+Date: Tue, 5 Dec 2023 12:06:12 -0800
+From: Dan Williams <dan.j.williams@intel.com>
+To: Dionna Amalie Glaze <dionnaglaze@google.com>, Dan Williams
+	<dan.j.williams@intel.com>
+CC: Sean Christopherson <seanjc@google.com>, Michael Roth
+	<michael.roth@amd.com>, Alexey Kardashevskiy <aik@amd.com>,
+	<kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <pbonzini@redhat.com>, <vkuznets@redhat.com>,
+	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
+	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
+	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
+	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
+	Brijesh Singh <brijesh.singh@amd.com>, <dan.middleton@intel.com>
+Subject: Re: [PATCH v10 48/50] KVM: SEV: Provide support for
+ SNP_GUEST_REQUEST NAE event
+Message-ID: <656f82b4b1972_45e012944e@dwillia2-xfh.jf.intel.com.notmuch>
+References: <20231016132819.1002933-49-michael.roth@amd.com>
+ <CAAH4kHb=hNH88poYw-fj+ewYgt8F-hseZcRuLDdvbgpSQ5FDZQ@mail.gmail.com>
+ <ZS614OSoritrE1d2@google.com>
+ <b9da2fed-b527-4242-a588-7fc3ee6c9070@amd.com>
+ <ZS_iS4UOgBbssp7Z@google.com>
+ <20231110220756.7hhiy36jc6jiu7nm@amd.com>
+ <ZU6zGgvfhga0Oiob@google.com>
+ <CAAH4kHYPAiS+_KKhb1=8q=OkS+XBsES8J3K_acJ_5YcNZPi=kA@mail.gmail.com>
+ <656e6f0aa1c5_4568a29451@dwillia2-xfh.jf.intel.com.notmuch>
+ <CAAH4kHb7cfMetpC=AYy=FjTTve6g0W8NZdeSwQ8uVxkqi2491Q@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <CAAH4kHb7cfMetpC=AYy=FjTTve6g0W8NZdeSwQ8uVxkqi2491Q@mail.gmail.com>
+X-ClientProxiedBy: MW2PR16CA0045.namprd16.prod.outlook.com
+ (2603:10b6:907:1::22) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|SJ0PR11MB5167:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9ce8f1d6-995f-4034-8a21-08dbf5cdb0d2
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: lkQZvQCRreMQlOf+bqT0H7VuhqWPLdED2qTJOc6QfLHN3hwaDYM0VCwa9CDJnJe68WkvqFepQyWQV9PSy5Ei/xfCbDEHGgOQIKA4bzwQexz3xILl004/fzHjfPMM6RJ5OAthjIq+3OqaRlnk87fJ7lYQ9wOnc2h4ISUKJ56IEcFmHQyiQ6Qx2wi9OGcPhpSjHPYgT9DC1ZP/hVL8/gqP0Akk933QOGPae+KGTQ8XhlynWGsKPKGelJe5dLHoiu8TSOCdaFFkFtmnCrd7klLIWuOQ6nJooqrBE46Ji2GX3GiJ98/1kirGe6Lqa18ZeLxM8vOIRdVjxMplyfF9ExtzBrk4S4lmZCFqguEOqwZdJ+GVy3dZJ9aTN4fHv5SlLKD9WXPJRlmfxbqEQLFtepGFv3DjEqIw70DpZGeVxhoJ5O3/Ve9n7JFTiTZORMi6fdeMbJbq7b9IHeGSCOIHEBmpfdRVxhz64H5TbFZjc8RvalKsInzoZ8GWQGe1eP2JfD/MnCA66WKWrbZGRbN0nWzxJRTAe3hXGlq1lHJ55lpuENw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(136003)(346002)(376002)(39860400002)(230922051799003)(451199024)(1800799012)(186009)(64100799003)(26005)(6512007)(6666004)(9686003)(6486002)(7406005)(83380400001)(6506007)(5660300002)(7416002)(2906002)(41300700001)(478600001)(966005)(4326008)(8676002)(66946007)(66476007)(8936002)(66556008)(54906003)(110136005)(316002)(82960400001)(86362001)(38100700002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?1yfMlUMOLIIrk59SQsDs835gSkScZiEOLnRTQUieyNjRTxqBfLnLxestWvYL?=
+ =?us-ascii?Q?cRqzJHb/axSlDGd+xStLJWflfIYGn0B075qYi6mv2qHF7aPY7r0bReZeqRj/?=
+ =?us-ascii?Q?+IWX9KBBHDZTV9900smx8ItaqqMm2VhdBTFakcP+H3ZLqwmvQLmv7rA0Ddfo?=
+ =?us-ascii?Q?+PRn83+upF6N44GZpVaJHCOK/GSJwrnzANRDr/9Um+18Jh17gqfzQ+uwQKwc?=
+ =?us-ascii?Q?YLhHOpE0pQcbv+xnxZ9IMOhV+HwQEgT+5eqQ19NOgXd2RrfNGeqYizvwTcRO?=
+ =?us-ascii?Q?Y2ZC8TfMTS94y5hR+NfPMD6wKgGkInXZW8IusLXizH/MpKSxLJkI3Zqzhb0J?=
+ =?us-ascii?Q?5DAmg14XP528o+NDff+3VYgWSDsY9H311y1TNhikfWvWCMrJNqZ0LCK7j0zp?=
+ =?us-ascii?Q?f18WizWvtnIJOkqIF81FDuLsG+CULgb+hWWW6rEwUEdMNVd6/zK18qoHPoLb?=
+ =?us-ascii?Q?EsL/3wTcmdvYHt4mdbCkBjrimsDTFhWZYXCDc3u3Vtj9vXa4PqoAH0B9POau?=
+ =?us-ascii?Q?ZXHaU81H2dY3Nmdy818pRZ5IHaUbQA2kVdeJnbfLy+5flMimcvqTX7d9u1TX?=
+ =?us-ascii?Q?FPSGnzeg8Mve2hq4wK57Oom02Ind0EyhBs8oB77aXF+rTULBdk72ZYBl9pfQ?=
+ =?us-ascii?Q?zL8UieaiFF9lVXjhriZUb3EzuGkwas+KO0mIXlQ9kgmf7GVsIa0l933KNQre?=
+ =?us-ascii?Q?0sH5aREGaG2HfG2lpS9aJPRD2DOk5mhe0akszxassZsrBeDbx1g1fmrC0heH?=
+ =?us-ascii?Q?ZJpHqHVU1if4JLOMfgjCJqWaugx4Aq/Hq934H2W+TNMewU0ZFx+2jMCegU8e?=
+ =?us-ascii?Q?3CrDk0vdvKLQ2rN9XEg55X2Zs92mFBm1ntqcT68uN+ezMY+pIhsYzywt3eUj?=
+ =?us-ascii?Q?WUw3eJL/p0G5v4pgCt/dRGu3gqdXYEeprXdYYwQSf/i2vwteLcLP1/AVmtsO?=
+ =?us-ascii?Q?56HHMI3WbacqMGVxc5awd7mqI/b1TrzZjdh30aDYI3s++7O+ejwnmBYAhh6R?=
+ =?us-ascii?Q?+r6q2tlfzZNdi8jM96+zFI027z9Uolp+I+9Ij0usWX49aqap09RlwJJ2VZ+d?=
+ =?us-ascii?Q?NALdGc6Hhncb1e2Q7O1ZTW92iGIuUQ9gSCTvHSNFLwdJkHR0jyGSgeaPvnIN?=
+ =?us-ascii?Q?cdr4RWahznsQpC432D7Bz75CszMy0kMWGXKSS9qj6C0o3pjewF3LmzFU66sS?=
+ =?us-ascii?Q?WFWpEV+uVTel8/khj8kabV7bzwSLa11KhIGIYaF1G4Fom1lLbd0QpX8lXyxd?=
+ =?us-ascii?Q?mGr4GAyBfoCMe8wJ0Exzh+GVF+IKG6InNZ8oCwEVcokzDCjOS6qxwFZjiBDp?=
+ =?us-ascii?Q?oUT0qD7yUuwjr1Wvixi8pcH92uxXseb5zfUs3wXVSotUJW2UAIfpZb+9TCoV?=
+ =?us-ascii?Q?Bml8HNwkWbENr/D43gH87SxIDFjMEBKt3XmF2cEfc8NKRoUiZch5TNR84JhX?=
+ =?us-ascii?Q?cJY1PbZbADIJJsnqUtZ9pu5WuJv5egeTdd/ywAtUemaTs6HbdOSg4fA6vepk?=
+ =?us-ascii?Q?IilZ27naokqvNv5aam0agVnW3e6duudbm/oUVPbaJPXhYDo1MfFBb+KIezk+?=
+ =?us-ascii?Q?b1krH53FoQrIoroxRQZbZxPAUESoo9r9mPztBtXcUJeKTkHPMXlCnktPGT51?=
+ =?us-ascii?Q?pw=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9ce8f1d6-995f-4034-8a21-08dbf5cdb0d2
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2023 20:06:39.1311
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7Te2ssBNr66jDI3RtjUytIKQmv04SysmLXqQqWLIQ42sT6/eGSMVDuM53R551BFC1CRlaR11/1YkGi19q/jtusdkGw5PxR7SFbz6TVzv8Fg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5167
+X-OriginatorOrg: intel.com
 
-On Tue, 2023-12-05 at 11:21 -0800, Sean Christopherson wrote:
-> On Fri, Dec 01, 2023, Nicolas Saenz Julienne wrote:
-> > On Fri Dec 1, 2023 at 5:47 PM UTC, Sean Christopherson wrote:
-> > > On Fri, Dec 01, 2023, Nicolas Saenz Julienne wrote:
-> > > > On Fri Dec 1, 2023 at 4:32 PM UTC, Sean Christopherson wrote:
-> > > > > On Fri, Dec 01, 2023, Nicolas Saenz Julienne wrote:
-> > > > > > > To support this I think that we can add a userspace msr filter on the HV_X64_MSR_HYPERCALL,
-> > > > > > > although I am not 100% sure if a userspace msr filter overrides the in-kernel msr handling.
-> > > > > > 
-> > > > > > I thought about it at the time. It's not that simple though, we should
-> > > > > > still let KVM set the hypercall bytecode, and other quirks like the Xen
-> > > > > > one.
-> > > > > 
-> > > > > Yeah, that Xen quirk is quite the killer.
-> > > > > 
-> > > > > Can you provide pseudo-assembly for what the final page is supposed to look like?
-> > > > > I'm struggling mightily to understand what this is actually trying to do.
-> > > > 
-> > > > I'll make it as simple as possible (diregard 32bit support and that xen
-> > > > exists):
-> > > > 
-> > > > vmcall             <-  Offset 0, regular Hyper-V hypercalls enter here
-> > > > ret
-> > > > mov rax,rcx  <-  VTL call hypercall enters here
-> > > 
-> > > I'm missing who/what defines "here" though.  What generates the CALL that points
-> > > at this exact offset?  If the exact offset is dictated in the TLFS, then aren't
-> > > we screwed with the whole Xen quirk, which inserts 5 bytes before that first VMCALL?
-> > 
-> > Yes, sorry, I should've included some more context.
-> > 
-> > Here's a rundown (from memory) of how the first VTL call happens:
-> >  - CPU0 start running at VTL0.
-> >  - Hyper-V enables VTL1 on the partition.
-> >  - Hyper-V enabled VTL1 on CPU0, but doesn't yet switch to it. It passes
-> >    the initial VTL1 CPU state alongside the enablement hypercall
-> >    arguments.
-> >  - Hyper-V sets the Hypercall page overlay address through
-> >    HV_X64_MSR_HYPERCALL. KVM fills it.
-> >  - Hyper-V gets the VTL-call and VTL-return offset into the hypercall
-> >    page using the VP Register HvRegisterVsmCodePageOffsets (VP register
-> >    handling is in user-space).
+[ add Ard for the SBOM sysfs ABI commentary ]
+
+Dionna Amalie Glaze wrote:
+[..]
+> > > My own plan for SEV-SNP was to have a bespoke signed measurement of
+> > > the UEFI in the GUID table, but that doesn't extend to TDX. If we're
+> > > looking more at an industry alignment on coRIM for SBOM formats (yes
+> > > please), then it'd be great to start getting that kind of info plumbed
+> > > to the user in a uniform way that doesn't have to rely on servers
+> > > providing the endorsements.
+> > >
+> > > [1] https://uefi.org/blog/firmware-sbom-proposal
+> >
+> > Honestly my first reaction for this ABI would be for a new file under
+> > /sys/firmware/efi/efivars or similar.
 > 
-> Ah, so the guest sets the offsets by "writing" HvRegisterVsmCodePageOffsets via
-> a HvSetVpRegisters() hypercall.
+> For UEFI specifically that could make sense, yes. Not everyone has
+> been mounting efivars, so it's been a bit of an uphill battle for that
+> one.
 
-No, you didn't understand this correctly. 
+I wonder what the concern is with mounting efivarfs vs configfs? In any
+event this seems distinct enough to be its own /sys/firmware/efi/sbom
+file. I would defer to Ard, but I think SBOM is a generally useful
+concept that would be out of place as a blob returned from configfs-tsm.
 
-The guest writes the HV_X64_MSR_HYPERCALL, and in the response hyperv fills the hypercall page,
-including the VSM thunks.
+> Still there's the matter of cached TDI RIMs. NVIDIA would have
 
-Then the guest can _read_ the offsets, hyperv chose there by issuing another hypercall. 
+I am not immediatly sure what a "TDI RIM" is?
 
-In the current implementation,
-the offsets that the kernel choose are first exposed to the userspace via new ioctl, and then the userspace
-exposes these offsets to the guest via that 'another hypercall' 
-(reading a pseudo partition register 'HvRegisterVsmCodePageOffsets')
+> everyone send attestation requests to their servers every quote
+> request in the NRAS architecture, but we're looking at other ways to
 
-I personally don't know for sure anymore if the userspace or kernel based hypercall page is better
-here, it's ugly regardless :(
+"NRAS" does not parse for me either.
 
+> provide reliable attestation without a third party service, albeit
+> with slightly different security properties.
 
-Best regards,
-	Maxim Levitsky
-
-> 
-> I don't see a sane way to handle this in KVM if userspace handles HvSetVpRegisters().
-> E.g. if the guest requests offsets that don't leave enough room for KVM to shove
-> in its data, then presumably userspace needs to reject HvSetVpRegisters().  But
-> that requires userspace to know exactly how many bytes KVM is going to write at
-> each offsets.
-> 
-> My vote is to have userspace do all the patching.  IIUC, all of this is going to
-> be mutually exclusive with kvm_xen_hypercall_enabled(), i.e. userspace doesn't
-> need to worry about setting RAX[31].  At that point, it's just VMCALL versus
-> VMMCALL, and userspace is more than capable of identifying whether its running
-> on Intel or AMD.
-> 
-> >  - Hyper-V performs the first VTL-call, and has all it needs to move
-> >    between VTL0/1.
-> > 
-> > Nicolas
-
-
+Setting the above confusion aside, I would just say that in general yes,
+the kernel needs to understand its role in an end-to-end attestation
+architecture that is not beholden to a single vendor, but also allows
+the kernel to enforce ABI stability / mitigate regressions based on
+binary format changes.
 
