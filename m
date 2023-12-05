@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-3535-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3538-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46681805276
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 12:23:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13A13805283
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 12:23:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 778901C20E52
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 11:23:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 448191C20DD5
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 11:23:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72F2961FDA;
-	Tue,  5 Dec 2023 11:21:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8041465EC6;
+	Tue,  5 Dec 2023 11:21:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z5Tq47ey"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bSXS6L4r"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E43A1187;
-	Tue,  5 Dec 2023 03:21:28 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2ED5191;
+	Tue,  5 Dec 2023 03:21:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701775290; x=1733311290;
+  t=1701775291; x=1733311291;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=hPsnAnmRCEio5pl6T3lxKlJogXHr45sRU/QYYYLaUzw=;
-  b=Z5Tq47eyrDr7px0HUR8QJ/kdeHe4FPlpSIQsmaYVWUagXRI0BdbByvIq
-   oy+sQ45WJeh6vfSAWHGANk5CfpJ8Np7dOJatmUPfZd37ikfMg76YVjuLy
-   qM+LNt8E6yDHk1C4Zc2pNCONnJphCt4m2wWrIHq2nKyiwgfCLxD+5IpkY
-   1tYkVhCSx0eOTJca0d4Add/RzTiV0lChojtB9K5/r4hD4ZS5K0BR1v7ID
-   K/KvRl28/1fiDspkHf2TS30ck8tb1ge9+BNw5KGl+OJC55kmmqU7fUIQP
-   Apj8NOHYo/3nTG9+tLRxAuF2Q3m7VAyEcTxB+xrULoGY5dKgQ2gDo3CVJ
+  bh=g+1BPOHGWOCmAN2ihj8vafw+Z+qq/YZJt19PCQv0I50=;
+  b=bSXS6L4rRWoTVSOpcVap6XvNVoD8BW+aww5jAQrZ4tiqKRGLeeGftAzo
+   I/j9hA2wBEdmgwWCpO/T3esiw3qHr+mywJlnULjh9WMlNmwwvlwfL16sS
+   5xPrZB4UM7dOgCUGFkmLx7xhBBS2Cy/PsDdEYTeAcU4yppRzql9vqDaJz
+   JOhyvs1tZeiUJi4d/AqTGsJbrCezCOXayyop6c3yycL6YYTRKopdBmX1J
+   lsYZjXMpFGLjZytjJuKHF7mk5WJbJ0averYf6g71Xef2/+w5sVMYUbbOj
+   Tuo+gwW/oBX8VsNfgMPweYAIDv9X2JLnoePmWRibL6ASeQPuZfPEEYXnI
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="942530"
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="942543"
 X-IronPort-AV: E=Sophos;i="6.04,252,1695711600"; 
-   d="scan'208";a="942530"
+   d="scan'208";a="942543"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 03:21:23 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="1018192965"
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="1018192968"
 X-IronPort-AV: E=Sophos;i="6.04,252,1695711600"; 
-   d="scan'208";a="1018192965"
+   d="scan'208";a="1018192968"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga006.fm.intel.com with ESMTP; 05 Dec 2023 03:21:21 -0800
+  by fmsmga006.fm.intel.com with ESMTP; 05 Dec 2023 03:21:22 -0800
 From: Xin Li <xin3.li@intel.com>
 To: linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
@@ -66,9 +66,9 @@ Cc: tglx@linutronix.de,
 	jiangshanlai@gmail.com,
 	nik.borisov@suse.com,
 	shan.kang@intel.com
-Subject: [PATCH v13 19/35] x86/fred: No ESPFIX needed when FRED is enabled
-Date: Tue,  5 Dec 2023 02:50:08 -0800
-Message-ID: <20231205105030.8698-20-xin3.li@intel.com>
+Subject: [PATCH v13 20/35] x86/fred: Allow single-step trap and NMI when starting a new task
+Date: Tue,  5 Dec 2023 02:50:09 -0800
+Message-ID: <20231205105030.8698-21-xin3.li@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231205105030.8698-1-xin3.li@intel.com>
 References: <20231205105030.8698-1-xin3.li@intel.com>
@@ -82,42 +82,93 @@ Content-Transfer-Encoding: 8bit
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Because FRED always restores the full value of %rsp, ESPFIX is
-no longer needed when it's enabled.
+Entering a new task is logically speaking a return from a system call
+(exec, fork, clone, etc.). As such, if ptrace enables single stepping
+a single step exception should be allowed to trigger immediately upon
+entering user space. This is not optional.
+
+NMI should *never* be disabled in user space. As such, this is an
+optional, opportunistic way to catch errors.
+
+Allow single-step trap and NMI when starting a new task, thus once
+the new task enters user space, single-step trap and NMI are both
+enabled immediately.
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/kernel/espfix_64.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
 
-diff --git a/arch/x86/kernel/espfix_64.c b/arch/x86/kernel/espfix_64.c
-index 16f9814c9be0..6726e0473d0b 100644
---- a/arch/x86/kernel/espfix_64.c
-+++ b/arch/x86/kernel/espfix_64.c
-@@ -106,6 +106,10 @@ void __init init_espfix_bsp(void)
- 	pgd_t *pgd;
- 	p4d_t *p4d;
+Changes since v8:
+* Use high-order 48 bits above the lowest 16 bit SS only when FRED
+  is enabled (Thomas Gleixner).
+---
+ arch/x86/kernel/process_64.c | 38 ++++++++++++++++++++++++++++++------
+ 1 file changed, 32 insertions(+), 6 deletions(-)
+
+diff --git a/arch/x86/kernel/process_64.c b/arch/x86/kernel/process_64.c
+index 7f66c0b14de6..7062b84dd467 100644
+--- a/arch/x86/kernel/process_64.c
++++ b/arch/x86/kernel/process_64.c
+@@ -56,6 +56,7 @@
+ #include <asm/resctrl.h>
+ #include <asm/unistd.h>
+ #include <asm/fsgsbase.h>
++#include <asm/fred.h>
+ #ifdef CONFIG_IA32_EMULATION
+ /* Not included via unistd.h */
+ #include <asm/unistd_32_ia32.h>
+@@ -528,7 +529,7 @@ void x86_gsbase_write_task(struct task_struct *task, unsigned long gsbase)
+ static void
+ start_thread_common(struct pt_regs *regs, unsigned long new_ip,
+ 		    unsigned long new_sp,
+-		    unsigned int _cs, unsigned int _ss, unsigned int _ds)
++		    u16 _cs, u16 _ss, u16 _ds)
+ {
+ 	WARN_ON_ONCE(regs != current_pt_regs());
  
-+	/* FRED systems always restore the full value of %rsp */
-+	if (cpu_feature_enabled(X86_FEATURE_FRED))
-+		return;
-+
- 	/* Install the espfix pud into the kernel page directory */
- 	pgd = &init_top_pgt[pgd_index(ESPFIX_BASE_ADDR)];
- 	p4d = p4d_alloc(&init_mm, pgd, ESPFIX_BASE_ADDR);
-@@ -129,6 +133,10 @@ void init_espfix_ap(int cpu)
- 	void *stack_page;
- 	pteval_t ptemask;
+@@ -545,11 +546,36 @@ start_thread_common(struct pt_regs *regs, unsigned long new_ip,
+ 	loadsegment(ds, _ds);
+ 	load_gs_index(0);
  
-+	/* FRED systems always restore the full value of %rsp */
-+	if (cpu_feature_enabled(X86_FEATURE_FRED))
-+		return;
+-	regs->ip		= new_ip;
+-	regs->sp		= new_sp;
+-	regs->cs		= _cs;
+-	regs->ss		= _ss;
+-	regs->flags		= X86_EFLAGS_IF;
++	regs->ip	= new_ip;
++	regs->sp	= new_sp;
++	regs->csx	= _cs;
++	regs->ssx	= _ss;
++	/*
++	 * Allow single-step trap and NMI when starting a new task, thus
++	 * once the new task enters user space, single-step trap and NMI
++	 * are both enabled immediately.
++	 *
++	 * Entering a new task is logically speaking a return from a
++	 * system call (exec, fork, clone, etc.). As such, if ptrace
++	 * enables single stepping a single step exception should be
++	 * allowed to trigger immediately upon entering user space.
++	 * This is not optional.
++	 *
++	 * NMI should *never* be disabled in user space. As such, this
++	 * is an optional, opportunistic way to catch errors.
++	 *
++	 * Paranoia: High-order 48 bits above the lowest 16 bit SS are
++	 * discarded by the legacy IRET instruction on all Intel, AMD,
++	 * and Cyrix/Centaur/VIA CPUs, thus can be set unconditionally,
++	 * even when FRED is not enabled. But we choose the safer side
++	 * to use these bits only when FRED is enabled.
++	 */
++	if (cpu_feature_enabled(X86_FEATURE_FRED)) {
++		regs->fred_ss.swevent	= true;
++		regs->fred_ss.nmi	= true;
++	}
 +
- 	/* We only have to do this once... */
- 	if (likely(per_cpu(espfix_stack, cpu)))
- 		return;		/* Already initialized */
++	regs->flags	= X86_EFLAGS_IF | X86_EFLAGS_FIXED;
+ }
+ 
+ void
 -- 
 2.43.0
 
