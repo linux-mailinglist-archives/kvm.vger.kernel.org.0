@@ -1,124 +1,162 @@
-Return-Path: <kvm+bounces-3469-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3470-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC476804B83
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 08:55:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F0E8804B97
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 08:58:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66CBA2810EF
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 07:55:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5F41B20D5A
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 07:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1C72F86B;
-	Tue,  5 Dec 2023 07:55:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95DBC35EE8;
+	Tue,  5 Dec 2023 07:58:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BcVbEOKW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BUyMscos"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6782CB;
-	Mon,  4 Dec 2023 23:55:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701762920; x=1733298920;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=fCgwQbmvhTGp/cZ+rEbeyXUndSz9BBuhWGQGGVR/rvY=;
-  b=BcVbEOKW0YAV8/qjhhIMDja5FD0UK6yiCqBWitK/3uWM+AcYS3yxW99y
-   wI8Pq1DZF0DWIpi8CDF60asDI6piTnX1ELD3BpUCNAD4GIx5ezTUPVdDX
-   I+LW0zEqilkbb1eyG3t6o5dizXl/ZShxydBYJ9NyOkpT/Gpy0S5sCNjAC
-   YPWGt/uJlyUbmd7H0EX1FJwbUlTHFiaijS02pSc/fXLhRDyO1Jwbi8wEh
-   jVXvIkZDkFVd70mZ9m/TjpBOI4Hp5vj0uG4lN01McTjmKVmkghEsd0hnE
-   ZUUWRUjyFv9IMB0qGleZYzGuNqufPTLYF7tKtdNlb7jH0MtiK+aFg20/h
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="384256515"
-X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
-   d="scan'208";a="384256515"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 23:55:20 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="747131975"
-X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
-   d="scan'208";a="747131975"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.126]) ([10.238.10.126])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 23:55:16 -0800
-Message-ID: <66b4cb9d-f26f-4ddd-b6c8-8ef4fc3744fd@linux.intel.com>
-Date: Tue, 5 Dec 2023 15:55:14 +0800
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3244911F;
+	Mon,  4 Dec 2023 23:58:16 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-50bee606265so2841880e87.2;
+        Mon, 04 Dec 2023 23:58:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701763094; x=1702367894; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mDaBQlGZ8UjeyvNNGC2XDs5wlZCfXV5wgyIn7Cj35I0=;
+        b=BUyMscos3p1dIHj8yoZ2M+4nlgLPQnWZXbDD1JPkl3uZBcGbVKfQmUej0vU5u4oHgL
+         rNbrtu9p6VamKz1EXMNagc2IwFvq2gGtFKtDrN6bknPXwH7yUWSTeklN5iqZKHETfq0Y
+         JpTWD+Y8wu5OZjoiHhyI4NbhiVXJGvhbCMXlu/MuhQjqyDqKkbkTxNlKR4ASO5ylYsph
+         X4uFhWE8Cwkm4iPXwx3wDdlOMTecARML++N6As+6a4UYLt4HH/T3llABCipXXTApspyv
+         bYZDj4jzeTJNRLDODFbjCnb5CkTn2mTMG+tAoi864EsQEwSlAqUAGXoQgf3n+HSA54NB
+         nCEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701763094; x=1702367894;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mDaBQlGZ8UjeyvNNGC2XDs5wlZCfXV5wgyIn7Cj35I0=;
+        b=Y47UCR6qCuA45sS15cEm3ZXTMtjvLZzD+F0T+q/XH3rKaaFlt4aKhXvJfpVYZX+Lfl
+         tFhpAiEzQkU7H2LWffCEX9NTc/dLBDKJJW/eXW6oTbvru42YEqX5G+S/DEn51oCHVZzz
+         0aEUFhcMberb2qzsk7UgiUpjIJoUIvPBFVDBUieQKAn70iaRnbNX3rxSWVVZxd++R02q
+         xHHGSDFyMSlLC3sUSO1jDn0X4DDmV3XmzGf7QefQcCHnhpKwYz5c2S4EdpoyWYLhCtIW
+         jSC3Nr58ULYchyDjXRcrzvbkxnfNAQ1MAvTJPYwFtxYQD+j7hWfkInFLDoRnVdhW/XHG
+         vFhA==
+X-Gm-Message-State: AOJu0YxgloMmyFvCl4m8PGCpCkBGdak/0CU8wTxFqPyrfzPpU/ddhEKv
+	AQiy7vJ+pTbbxdzIEbJcyilOE9V3k3T1ncbRHAI=
+X-Google-Smtp-Source: AGHT+IFB7AXgBvjJC6KXRzmHN5fiSmN/CqaafqDV8LUeWsssBRPFI6TrMLt6kXoA/HN17H0Nd9dUlNSsNYRV4on7U8I=
+X-Received: by 2002:a05:6512:3b8f:b0:50b:f019:366a with SMTP id
+ g15-20020a0565123b8f00b0050bf019366amr2333164lfv.109.1701763094196; Mon, 04
+ Dec 2023 23:58:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 004/116] KVM: VMX: Reorder vmx initialization with kvm
- vendor initialization
-To: Chao Gao <chao.gao@intel.com>, isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, David Matlack <dmatlack@google.com>,
- Kai Huang <kai.huang@intel.com>, Zhi Wang <zhi.wang.linux@gmail.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
-References: <cover.1699368322.git.isaku.yamahata@intel.com>
- <2ae2d7d2bdf795fe0e5ef648714d56bd1029755e.1699368322.git.isaku.yamahata@intel.com>
- <ZW2M55f/+m8dEQKE@chao-email>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <ZW2M55f/+m8dEQKE@chao-email>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <cover.1694421911.git.haibo1.xu@intel.com> <64e0637cd6f22dd7557ed44bd2242001e7830d1c.1694421911.git.haibo1.xu@intel.com>
+ <20230914-d2e594e7d84503ad14036e2d@orel> <CAJve8onhY534T=Hyncjfi4GfdZ+0D2xM+jRSaYCAWCdaKxPUcQ@mail.gmail.com>
+ <CAJve8omitHDpijJaLV_wHk+5LXpsBUWF8_eTD4MeWKM-807Siw@mail.gmail.com> <20231204-980c95cca344f718ac6a48b6@orel>
+In-Reply-To: <20231204-980c95cca344f718ac6a48b6@orel>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Tue, 5 Dec 2023 15:58:02 +0800
+Message-ID: <CAJve8okwyPwY3AZcA31=aoc1tyZN7hx_5AmF0KMmn-bZ1VnyHA@mail.gmail.com>
+Subject: Re: [PATCH v3 9/9] KVM: riscv: selftests: Add sstc timer test
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Haibo Xu <haibo1.xu@intel.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Sean Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Vipin Sharma <vipinsh@google.com>, David Matlack <dmatlack@google.com>, 
+	Colton Lewis <coltonlewis@google.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 12/4/2023 4:25 PM, Chao Gao wrote:
-> On Tue, Nov 07, 2023 at 06:55:30AM -0800, isaku.yamahata@intel.com wrote:
->> From: Isaku Yamahata <isaku.yamahata@intel.com>
->>
->> To match vmx_exit cleanup.
->>
->> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->> ---
->> arch/x86/kvm/vmx/main.c | 10 +++++-----
->> 1 file changed, 5 insertions(+), 5 deletions(-)
->>
->> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
->> index 266760865ed8..e07bec005eda 100644
->> --- a/arch/x86/kvm/vmx/main.c
->> +++ b/arch/x86/kvm/vmx/main.c
->> @@ -180,11 +180,11 @@ static int __init vt_init(void)
->> 	 */
->> 	hv_init_evmcs();
->>
->> -	r = kvm_x86_vendor_init(&vt_init_ops);
->> +	r = vmx_init();
->> 	if (r)
->> -		return r;
->> +		goto err_vmx_init;
-> this is incorrect. vmx_exit() shouldn't be called if
-> vmx_init() failed.
+On Mon, Dec 4, 2023 at 7:32=E2=80=AFPM Andrew Jones <ajones@ventanamicro.co=
+m> wrote:
 >
->> -	r = vmx_init();
->> +	r = kvm_x86_vendor_init(&vt_init_ops);
->> 	if (r)
->> 		goto err_vmx_init;
-And also, maybe better to rename the lable, e.g, err_vendor_init?
+> On Mon, Dec 04, 2023 at 10:42:24AM +0800, Haibo Xu wrote:
+> > On Fri, Sep 15, 2023 at 2:21=E2=80=AFPM Haibo Xu <xiaobo55x@gmail.com> =
+wrote:
+> > >
+> > > On Thu, Sep 14, 2023 at 5:52=E2=80=AFPM Andrew Jones <ajones@ventanam=
+icro.com> wrote:
+> > > >
+> > > > On Thu, Sep 14, 2023 at 09:37:03AM +0800, Haibo Xu wrote:
+> > > > > Add a KVM selftests to validate the Sstc timer functionality.
+> > > > > The test was ported from arm64 arch timer test.
+> > > >
+> > > > I just tried this test out. Running it over and over again on QEMU =
+I see
+> > > > it works sometimes, but it frequently fails with the
+> > > > GUEST_ASSERT_EQ(config_iter + 1, irq_iter) assert and at least once=
+ I
+> > > > also saw the __GUEST_ASSERT(xcnt >=3D cmp) assert.
+> > > >
+> > >
+> > > Good catch!
+> > >
+> > > I can also reproduce this issue and it is a common problem for both
+> > > arm64 and riscv because it also happens in a arm64 Qemu VM.
+> > >
+> > > It seems like a synchronization issue between host and guest shared
+> > > variables. Will double check the test code.
+> > >
+> > > > Thanks,
+> > > > drew
+> >
+> > Hi Andrew,
+> >
+> > After several rounds of regression testing, some findings:
+> > 1. The intermittent failure also happened on ARM64 Qemu VM, and even
+> > in the initial arch_timer commit(4959d8650e9f4).
+> > 2. it didn't happen on a ARM64 HW(but a different failure occured
+> > during stress test)
+> > 3. The failure have a close relationship with
+> > TIMER_TEST_ERR_MARGIN_US(default 100), and after increasing
+> >      the macro to 300, the failure couldn't reproduced in 1000 loops
+> > stress test in RISC-V Qemu VM
+> >
+> > So my suggestion is we can expose the TIMER_TEST_ERR_MARGIN_US
+> > parameter as an arch_timer test arg parameter
+> > and tune it based on a specific test environment.
+> >
+> > What's your opinion?
+>
+> The concept of "timeout for an interrupt to arrive" is always going to
+> leave us exposed to random failures. Your suggestion of making the
+> timeout user configurable is probably the best we can do. I would
+> suggest also adding more descriptive failure text and a hint about
+> trying to adjust the timeout.
+>
+> Or, one thing we do in kvm-unit-tests, is to reduce typical delays while
+> allowing expected delays to be longer by looping over a shorter delay and
+> a non-fatal check, i.e.
+>
+>  pass =3D false;
+>  for (i =3D 0; i < 10; i++) {
+>    udelay(100);
+>    if (check(...)) {
+>       pass =3D true;
+>       break;
+>    }
+>  }
+>  assert(pass);
+>
+> We could try that approach here too.
+>
+> Thanks,
+> drew
 
->>
->> @@ -201,9 +201,9 @@ static int __init vt_init(void)
->> 	return 0;
->>
->> err_kvm_init:
->> -	vmx_exit();
->> -err_vmx_init:
->> 	kvm_x86_vendor_exit();
->> +err_vmx_init:
->> +	vmx_exit();
->> 	return r;
->> }
->> module_init(vt_init);
->> -- 
->> 2.25.1
->>
->>
-
+Thanks for the feedback, I will send out patch set v4 soon!
 
