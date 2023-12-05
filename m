@@ -1,135 +1,157 @@
-Return-Path: <kvm+bounces-3587-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3588-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75C298057ED
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 15:53:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6282805824
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 16:03:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B4F2281D7B
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 14:53:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D0301F217A5
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 15:03:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A161F67E63;
-	Tue,  5 Dec 2023 14:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0222B67E86;
+	Tue,  5 Dec 2023 15:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SZVCGNiq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ePTpLsfB"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2084.outbound.protection.outlook.com [40.107.101.84])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1425A183;
-	Tue,  5 Dec 2023 06:53:47 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LarG7QPpuZQRsUja7qmSahka4l2vFMzKQX9DBg483U9crfVdfJJ6+NN5z1hSORCqvrNVCP54Pp6DoA/IcI3IiJw1HsK9wt60CHYJv32JiOBt/MrLVgzN+LC3LrjkxFCksSKalZVie1jDM8IgZgGdb8Nehi4HYzWl3VZF+dLxfk4Cx73YTZBDqvanNyG7wWKg2yOAXfbt2JhAwjWcP0Cv9+2MeTxzNX/l5qZhN5enUfs06yuoPmXPoaZ4d/idchLyRbX6ikHg74SR2rlIYF6FuR9jhMysyf90+mWMUB5ZMXRxowdE0/+BKfkw1Xv0KaL/Hz4eMenZd71zIxSDyIYZhA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+1VFyAdrqU+gZaRf2hA7rFQoVOCm4/6MYu79H/uQKPY=;
- b=CWtHs+8ccIwAsy4GVhsp5YWIHErNJKL1HRuqfOxbBPokCGtk4fqOOQEjTBSu/5wAZXcTzq1mKAlenky2O3aGT8TG+BXsKY24nnh1njwD5K6d9o3OeG0807h9ChtMEFnm6NuBXncNsESZ/uiLm73+45hD/qRH+TKhCMotGi/Udy55dV3Ll69LolJ5Ocbt9NlnvAh2tICaOSMSpZZe4Wc2zdtdXtLMr4rS4R0KFp9uOyFEFv05UJM8k+PnWGArek8hF0esVkku5faW87vTevJ19GJU7pmrBAwCqQMhzrTKIqYA3eJJh3Vvh1AEWM8kupBVvqEGJuQoe7JkcaaiTrIWCA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+1VFyAdrqU+gZaRf2hA7rFQoVOCm4/6MYu79H/uQKPY=;
- b=SZVCGNiqGZPPtQ62jgt++Us8Pr5oxZMxi3XrIZPNOrWYYg6174BjoZNYLtqTHbmT597wspsiQ2x33RksECsiuWJ5h6tfRijFeSabGUM8wHR7fS+BA5GjLqfS2vlrkegPdE9pSH9Q4FjeIFSzZjDMX4YwjRB5P50LCM1RrNhWeUSGjLZ3ekAWEPw9wFl7P1L6BxoeGsBg41q216Zalp5gggayDrot/4PCZ55VxtI3fIxql9TllS1Z1G30O7y7PLv8ZgNP8FIwZpcYVGQkyNkhldqW2Bdj79E7iNATQX87i7qifR8YTuk7TSK4vkA10UDiw6yoQSiP7BGicgLrZIaDhA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SJ2PR12MB9243.namprd12.prod.outlook.com (2603:10b6:a03:578::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Tue, 5 Dec
- 2023 14:53:42 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7046.034; Tue, 5 Dec 2023
- 14:53:42 +0000
-Date: Tue, 5 Dec 2023 10:53:41 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: iommu@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, alex.williamson@redhat.com,
-	pbonzini@redhat.com, seanjc@google.com, joro@8bytes.org,
-	will@kernel.org, robin.murphy@arm.com, kevin.tian@intel.com,
-	baolu.lu@linux.intel.com, dwmw2@infradead.org, yi.l.liu@intel.com
-Subject: Re: [RFC PATCH 16/42] iommufd: Enable device feature IOPF during
- device attachment to KVM HWPT
-Message-ID: <20231205145341.GF2787277@nvidia.com>
-References: <20231202091211.13376-1-yan.y.zhao@intel.com>
- <20231202092311.14392-1-yan.y.zhao@intel.com>
- <20231204183603.GN1493156@nvidia.com>
- <ZW7NwSCzswweHZh6@yzhao56-desk.sh.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZW7NwSCzswweHZh6@yzhao56-desk.sh.intel.com>
-X-ClientProxiedBy: BLAPR03CA0114.namprd03.prod.outlook.com
- (2603:10b6:208:32a::29) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05DB3C9
+	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 07:02:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701788575;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RVfnz9yEraI13QEVMWCv15KSWf2rbynT5uHuzX4Khhk=;
+	b=ePTpLsfB244PoNSMUqN/J7+/mCUxYwFG+Klo6c6MxrulyvoQMa5bG7n5EWEKPUw31qyDnl
+	bifl10K9g7j6M//dwNj21PZP/JKFvk/cHvJ6eGW3cWqKyTIBXbQ/g9H3HzP7RD1Fd1iNZS
+	1WgNq8Fvt49Flp4CBbINTb2kXcpLGKw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-601-t8DsjgwRPLOXOv0S2OozKw-1; Tue, 05 Dec 2023 10:02:46 -0500
+X-MC-Unique: t8DsjgwRPLOXOv0S2OozKw-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40bd5ea7aeaso23295985e9.2
+        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 07:02:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701788563; x=1702393363;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RVfnz9yEraI13QEVMWCv15KSWf2rbynT5uHuzX4Khhk=;
+        b=O7ddps9LfDX+PXJyHQvrhPtM/sGX063cnToqeJZxkEqzxFPir0EQO/a3cn+sl4Nup7
+         4d65zwIW5uLxGZ1FcrKekGg/RF1lmh6L5Hhi5UkcS3ytTwt9U2ktWXklTmQDJJox6ebI
+         EpGKwRF1ra1bRVEFCws8WPl8aPWKTU9AvkOvFM+A0OQBanmolc35dcJbTx+vJar28tAC
+         OfQv1LWcl/rEuxyV5qhTZeWfQ++bto7PBJPXOP0uTvbLoVw+uCuF/3xlCPmReOj99aww
+         iX/quYRm8YBJMhE5bpDUWJqyelWReFfG0awm1zH56a13WDuwqSTWjM9KkhDwZmlAWx51
+         8m0Q==
+X-Gm-Message-State: AOJu0YyeMmR1MBy/n8Cn+/wE2QmdcKMFmx6XJK8umpVybLaq/trh0px3
+	tgZ55cfWav5MAlHsKQFh3Yhjv4LlUf2mfrvRtRFM6LTdXcGmKG1z7dESwxueZyLuGi6svAupwCg
+	80glTQ1onIZKiQBvAGDaS
+X-Received: by 2002:a05:600c:4506:b0:40b:37ef:3671 with SMTP id t6-20020a05600c450600b0040b37ef3671mr4708324wmo.38.1701788563083;
+        Tue, 05 Dec 2023 07:02:43 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFw+ZIqFfTxBo1MNegF8bmaDRUQK0S0GcC3WZpfcXrIP2tAUAD/esumx04OeKShDkq6yYuUlA==
+X-Received: by 2002:a05:600c:4506:b0:40b:37ef:3671 with SMTP id t6-20020a05600c450600b0040b37ef3671mr4708304wmo.38.1701788562696;
+        Tue, 05 Dec 2023 07:02:42 -0800 (PST)
+Received: from starship ([89.237.98.20])
+        by smtp.gmail.com with ESMTPSA id g16-20020a05600c4ed000b0040b47c53610sm18964395wmq.14.2023.12.05.07.02.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Dec 2023 07:02:42 -0800 (PST)
+Message-ID: <72ab3fa2932dc661a4e0e124ac630e6bb269ebd4.camel@redhat.com>
+Subject: Re: [RFC 06/33] KVM: x86: hyper-v: Introduce VTL awareness to
+ Hyper-V's PV-IPIs
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Nicolas Saenz Julienne <nsaenz@amazon.com>, kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+ pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+ anelkz@amazon.com,  graf@amazon.com, dwmw@amazon.co.uk, jgowans@amazon.com,
+ corbert@lwn.net,  kys@microsoft.com, haiyangz@microsoft.com,
+ decui@microsoft.com, x86@kernel.org,  linux-doc@vger.kernel.org
+Date: Tue, 05 Dec 2023 17:02:40 +0200
+In-Reply-To: <CXD538WSGHGC.BMUQF0OJSSW4@amazon.com>
+References: <20231108111806.92604-1-nsaenz@amazon.com>
+	 <20231108111806.92604-7-nsaenz@amazon.com>
+	 <9249b4b84f7b84da2ea21fbbbabf35f22e5d9f2f.camel@redhat.com>
+	 <CXD538WSGHGC.BMUQF0OJSSW4@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ2PR12MB9243:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7be6020c-baa0-4b75-c379-08dbf5a1f934
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	C+PMaAofxZ1rPtcR8n2yluO72rNkzsB5kxkj/V8r3dFHSFygTZks6LpcGHqoqOxmTtjY3l923OIJqmZgLR9GdsT/h9Ok+mHUPMBzgQ39Wmp/d8tocabaQXO2eN6CgQumYdU0sG6ianxQDgfBn4vKXnxa3TScSklby6djVvv1X84vm2GaXaA9hqHmWG8EdK6Xe4hpaTBJQ1nRQk2Eoa3qK1g0DFi/Yh9UsepNhhywezFiBlaBq/+JRZl8GPmBf7R1AjJ7Hy3dMlU5oIsewEd8AJNqQyQccCc6V4I9IQhyKT5JDaoFEIpGEX4hyX8DuUf89oqwdxejoBPfRU7Z8w498gbVz6CuiifiU3VTxJc+64P/MYMH5FfZA+aek5eqkhAZ72QWSsm30lPksYIZwXYE+Uk5BP2V0mk5vO/Yo7BMrWs44BAz2iK5ZsMk8JElvgespRHQndJCNK+BoafquAoL6HLqjDdvf6oZ3buYF6/WEpau+zUi3KXdSmQMC2BwS7t6z9Ty0gh+QT++PvTtWCpmZWTbzS28U1Ey61AnuLGxhZHpOCxqPQCS0vZ3kdmN84ts
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(346002)(136003)(39860400002)(396003)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(66476007)(66946007)(316002)(6916009)(66556008)(478600001)(6486002)(7416002)(5660300002)(41300700001)(36756003)(558084003)(33656002)(2906002)(86362001)(8676002)(4326008)(8936002)(1076003)(2616005)(38100700002)(83380400001)(26005)(6506007)(6512007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?52iZaJ10FN49RvDXhAsdW0nQJCSBRZNxRRN092EgZHLn0eSDE9+ARv6SBmEO?=
- =?us-ascii?Q?kqy+ZlWgoP6nTTSOkkzm9LRhCFR4pBv1zA3ZuWUxWWqm5yWtuo4vjnSQazf2?=
- =?us-ascii?Q?YUYTi5xsJgbPjX6Q2eNN+H55F0nnDgSSF0hDRlFjfoa/VfYzVuNwPT+nDUxE?=
- =?us-ascii?Q?s/ds/vD9t0nvqJAatRj3dRw3zOYh2xU44w6qXghWmgxg1xxQBIxWVBOH/5Cn?=
- =?us-ascii?Q?IaInSShPimAStfbeSgoN3ZwkGwoZJw8rKJOtfB7g40GioWhPGW4Cio4bLr/F?=
- =?us-ascii?Q?2j+aq8q2Krdg7s5A1I5Q3IXvikoWAqHRkF59IzsgiiBHczJ3vEpa5nTyP1Qm?=
- =?us-ascii?Q?AIVUURFDMS/aqtCSXtzjqcGJHQ+znPPccxtM6MsQ4kdGPJM3anZ67sJemK8r?=
- =?us-ascii?Q?Ge4pg8Lbivi6yZ+1Jue4CVBQo+r2/QPp5uq+gV8d8gVnM6TzotbAvkoRoWfd?=
- =?us-ascii?Q?b8DNx7X5g1U97gdi3JOAiicyZgEG9FQsqhTgEHGxOWkzwHI25GVrjq4GMea9?=
- =?us-ascii?Q?BM+wgcbcZbjfOo28ID37K5UfnofNBSfNK/2/8zBWOgfVd6fjwlm160YIUpkv?=
- =?us-ascii?Q?FlwRoWGuWKsAfEJQwea1z7hhGRoN8ug27WDIxhSumgW5zr/1nHJ5b9tQTPE9?=
- =?us-ascii?Q?8HsWSc2r2mbUnbXt7sF2IRUhYE9s+aVH+AlVg9uDMHShdopd2uYqKwMh14Kj?=
- =?us-ascii?Q?My4tg0eNMbeRNEf9QwOTcdI4m5J4gEXGbW9X5Gmj686Cml/oUXbZLZ6X7zPd?=
- =?us-ascii?Q?XpefxpU1x9mjnn1hd544w743+ob6F46WTv0s3qh5Y8r9wDRTw4VFdsnexwSS?=
- =?us-ascii?Q?lZg33e/cxvZvt8R1/Yz9hGFHFzOMnIyD3q3TTKU/eQy8WY/HqsETAXYo9B9R?=
- =?us-ascii?Q?RswYf5fEfJqnD+lwImZyuWymLvt5ixKN5rvl52ycsNnGJ/iGcEGuR79xO4e+?=
- =?us-ascii?Q?GxDRyy0sR3lFv2MycCAnPJAKW7dDfCkfYfMSOFYlKg1F0LQHu2JCZC89TSM7?=
- =?us-ascii?Q?3htBe3cv9E5+3gYyTYuclGoBuuSp50WHoJrY47UnwXzWjZchcG3lVYtrZrgS?=
- =?us-ascii?Q?yz5g9latytPhvco/ZKkGwZEc2lYkDMQP9K5VKmQzpuYaUIfHYu96zQWcR+6Z?=
- =?us-ascii?Q?L/B3AeDiQNAqbZbewB1S1SEPqYrANobC+qjrrdiFWf3X8Z1lslSn2SQlBs7H?=
- =?us-ascii?Q?EkK/Debf0ZaUnC2QOWQsm5LnAHzcVzUhlRDXR82YFiMyBrMU3RJ6dfrcdenx?=
- =?us-ascii?Q?1gJjDYjfZUjCe3GPcUs6qWm+DYUzoYdrwydCLuJoJADr9yyCl+/N3aYa2b31?=
- =?us-ascii?Q?O4+u9YayZ+gTJtrqW4ccrgl2RYyS4RCB+7b5CAA92CDsULJMua40y4TQTZyM?=
- =?us-ascii?Q?4raGUqeC7X3m8HWJ94YojnYk3BfxIpYgfYC+mqBEtTbQAWrM5GNrCkHNABSm?=
- =?us-ascii?Q?7C7KxNAIr/i6vi8n751VujbJIFHWOBrKQ+i5YUIA90yD9jVjD7JKy5Jt2zji?=
- =?us-ascii?Q?fCCdXeqgOvN4cEFen2IIbYwDDIFAbIcl9eB5nBI2wu5RTTIMi/xDPiyIbQrD?=
- =?us-ascii?Q?L6RXDnENrhjvhehThq0+G2IN0JxzoR4S2tTZIkNx?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7be6020c-baa0-4b75-c379-08dbf5a1f934
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2023 14:53:42.3708
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /WvJE9sISbHV+tenJe+sMatNRNGWVcuVBS18nquIZBkYRZ1QSeE1ztaOZYQlO+Sx
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9243
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 05, 2023 at 03:14:09PM +0800, Yan Zhao wrote:
-
-> > I would like to remove IOMMU_DEV_FEAT_IOPF completely please
+On Fri, 2023-12-01 at 16:31 +0000, Nicolas Saenz Julienne wrote:
+> On Tue Nov 28, 2023 at 7:14 AM UTC, Maxim Levitsky wrote:
+> > On Wed, 2023-11-08 at 11:17 +0000, Nicolas Saenz Julienne wrote:
+> > > HVCALL_SEND_IPI and HVCALL_SEND_IPI_EX allow targeting specific a
+> > > specific VTL. Honour the requests.
+> > > 
+> > > Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
+> > > ---
+> > >  arch/x86/kvm/hyperv.c             | 24 +++++++++++++++++-------
+> > >  arch/x86/kvm/trace.h              | 20 ++++++++++++--------
+> > >  include/asm-generic/hyperv-tlfs.h |  6 ++++--
+> > >  3 files changed, 33 insertions(+), 17 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> > > index d4b1b53ea63d..2cf430f6ddd8 100644
+> > > --- a/arch/x86/kvm/hyperv.c
+> > > +++ b/arch/x86/kvm/hyperv.c
+> > > @@ -2230,7 +2230,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+> > >  }
+> > > 
+> > >  static void kvm_hv_send_ipi_to_many(struct kvm *kvm, u32 vector,
+> > > -                                 u64 *sparse_banks, u64 valid_bank_mask)
+> > > +                                 u64 *sparse_banks, u64 valid_bank_mask, int vtl)
+> > >  {
+> > >       struct kvm_lapic_irq irq = {
+> > >               .delivery_mode = APIC_DM_FIXED,
+> > > @@ -2245,6 +2245,9 @@ static void kvm_hv_send_ipi_to_many(struct kvm *kvm, u32 vector,
+> > >                                           valid_bank_mask, sparse_banks))
+> > >                       continue;
+> > > 
+> > > +             if (kvm_hv_get_active_vtl(vcpu) != vtl)
+> > > +                     continue;
+> > 
+> > Do I understand correctly that this is a temporary limitation?
+> > In other words, can a vCPU running in VTL1 send an IPI to a vCPU running VTL0,
+> > forcing the target vCPU to do async switch to VTL1?
+> > I think that this is possible.
 > 
-> So, turn on device PRI during device attachment in IOMMU vendor driver?
+> The diff is missing some context. See this simplified implementation
+> (when all_cpus is set in the parent function):
+> 
+> static void kvm_hv_send_ipi_to_many(struct kvm *kvm, u32 vector, int vtl)
+> {
+> 	[...]
+> 	kvm_for_each_vcpu(i, vcpu, kvm) {
+> 		if (kvm_hv_get_active_vtl(vcpu) != vtl)
+> 			continue;
+> 
+> 		kvm_apic_set_irq(vcpu, &irq, NULL);
+> 	}
+> }
+> 
+> With the one vCPU per VTL approach, kvm_for_each_vcpu() will iterate
+> over *all* vCPUs regardless of their VTL. The IPI is targetted at a
+> specific VTL, hence the need to filter.
+> 
+> VTL1 -> VTL0 IPIs are supported and happen (although they are extremely
+> rare).
 
-If a fault requesting domain is attached then PRI should just be
-enabled in the driver
+Makes sense now, thanks!
 
-Jason
+Best regards,
+	Maxim Levitsky
+
+> 
+> Nicolas
+> 
+
+
 
