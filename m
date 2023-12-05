@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-3474-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3475-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06579804EC2
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 10:53:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0D44804EC6
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 10:53:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B00B11F21390
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 09:53:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB9971C20D52
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 09:53:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70DD74B5C6;
-	Tue,  5 Dec 2023 09:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D0614B5C6;
+	Tue,  5 Dec 2023 09:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PDYoYaR0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PQ01vPfZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BEB2A7
-	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 01:53:31 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B5251A2
+	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 01:53:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701770010;
+	s=mimecast20190719; t=1701770022;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ru2Q8LqNVd+OfIoZSkL+gRLJdnRdSfTo4OU5DPaWpec=;
-	b=PDYoYaR0gMfqm8nCz99VnvoGVsdMZPpgrdy8aeSR/uK4m04pkzTqqDtJ8EUuRtAIumTAtL
-	PHsqjKDkl++hJjC6g8PUoxMKZYdg/0H5hipE9HoJdaJ5kdx5cWuctMCTqhAuipGfrSweZ6
-	/AAwqjjxtE4quNZRGeY8qMqD+VJj/eA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=LXBzOhyUVUCPThPCdSFCYEKRLtKLuc2WijKLedKWSC8=;
+	b=PQ01vPfZi1Bqk0MSKNp3KnvcePN3QRRHYOhy/nkWgHkUmaqtd7FX3hccYgPcG5uFzLiT5D
+	t7o/8q+g9Ll0RPjIMVIUnt8RUe8uRMVCo7BzaxpEcArLA4bAiX27za9HsX5UiRrwXWwLjz
+	KrtYEJqT2XL36PFD3W2KHefxDU7ZkF8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-178-y40nIjA9NOS_B1EOSdWo5g-1; Tue, 05 Dec 2023 04:53:29 -0500
-X-MC-Unique: y40nIjA9NOS_B1EOSdWo5g-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40b40234b64so42433625e9.0
-        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 01:53:28 -0800 (PST)
+ us-mta-357-nrcS9gqGPT-vW4JBD7Apjg-1; Tue, 05 Dec 2023 04:53:40 -0500
+X-MC-Unique: nrcS9gqGPT-vW4JBD7Apjg-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-332e2f70092so5028918f8f.0
+        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 01:53:40 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701770007; x=1702374807;
+        d=1e100.net; s=20230601; t=1701770020; x=1702374820;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ru2Q8LqNVd+OfIoZSkL+gRLJdnRdSfTo4OU5DPaWpec=;
-        b=AkDwEOnuPa3sLXaN9AC6GOKKfzvUSTeqhGHWNvsyaKuwqoBaZYzf+Y+PuLx3zs1e6E
-         xvoVDGHbVpTr9+iML1HtKXvU2XogQ441vihBqeyB/Ugy3kfZ1T6Mp3j3blU4DJalQEqo
-         MTX/UcCjSGTHRtKJvcjNqVvwXSvmdbHBELWpEVN+7o9xatQMXQ0C9O00csGuCUGshE1q
-         3qDHPMe8bq3ykUSHsjaIKSlnFuXuTlCwaN3ai5UcxyrlWj1zUmaeNTapniIJDVx518/G
-         KHAyZW+hIogINPgdVfl1pKoEMRVBUDPRscocu5g1fvmQqg+NnsXmoy6zbuYZIKniIukz
-         Yc0w==
-X-Gm-Message-State: AOJu0YynpM0LoDrR3ZuKuWGxG2PT/wdwBfO5vGEMzfVWM/R+a3YDZg4b
-	1JRDdoCBKRDMid78lTK1VanATy/jR2i+EP5EcVVy1wcRvGbxzCz5i8QcEG+GYr+au95eg+R9ADg
-	EppSw/ODXu6VCW1GDCF7y
-X-Received: by 2002:a05:600c:4688:b0:40a:20f3:d127 with SMTP id p8-20020a05600c468800b0040a20f3d127mr311558wmo.35.1701770007515;
-        Tue, 05 Dec 2023 01:53:27 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEUDPgWhFuD8g2XSbmPMaubU5h6S01wzv1LcabCc79waLe3iLvsP33xawM6QP4GRaBOLDkfxw==
-X-Received: by 2002:a05:600c:4688:b0:40a:20f3:d127 with SMTP id p8-20020a05600c468800b0040a20f3d127mr311544wmo.35.1701770007169;
-        Tue, 05 Dec 2023 01:53:27 -0800 (PST)
+        bh=LXBzOhyUVUCPThPCdSFCYEKRLtKLuc2WijKLedKWSC8=;
+        b=GwaQm7Z2KCBZZmJG+40v/w5GpuhM4CbFEdqqwT8AovfJAj6ppMsOjHuFumPD5rEglf
+         y4L1CZttJS7Y5XOJKn/HfAJF5/pjgkUWE236T1BhB+2Rlw8p3SzK5nW7PT8IGldEPskQ
+         +rq3IOh0diNfuHQZP7F9CLXrStU6Z7fNIuQDzSSRZYy28CcW9xrlB3IEuFI7cvyEnvWt
+         ilCHvqX548TZp9aDHYp/Uqs9NSmdCErmcceRRDHPrHeByPs9XA82dnAUa6wKA8afE49d
+         JHNnvbHl1KpsqbmUCZAwPbiH3VSsYC4R6+QSFAss+X39/AuBLHCkMxAJevSzWjCqV1mP
+         MLcQ==
+X-Gm-Message-State: AOJu0YwPjiOFVBKs9z7urOSWuERlWgBcSqtZKFfS2d1gmowqNNjlWO/T
+	LW0Bm/UxGuDSJI/+xBbB2bDs8zNa66cGxq0NaSOYfF+26drxg99EDx3xmf+06LQN86QUIsaRAox
+	0GeW3m/vSRKbr
+X-Received: by 2002:adf:f74c:0:b0:333:2fd2:51e4 with SMTP id z12-20020adff74c000000b003332fd251e4mr4457127wrp.93.1701770019877;
+        Tue, 05 Dec 2023 01:53:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEixdNSaQ7CenecOMM1PrlBZjkQmBN5BHbBoCkjJBIP8DQ4eFOT4s28S8Fz/YVErpQfmGl7pw==
+X-Received: by 2002:adf:f74c:0:b0:333:2fd2:51e4 with SMTP id z12-20020adff74c000000b003332fd251e4mr4457112wrp.93.1701770019524;
+        Tue, 05 Dec 2023 01:53:39 -0800 (PST)
 Received: from starship ([89.237.98.20])
-        by smtp.gmail.com with ESMTPSA id c12-20020a056000104c00b00333339e5f42sm10701380wrx.32.2023.12.05.01.53.25
+        by smtp.gmail.com with ESMTPSA id v15-20020a5d4a4f000000b0033328f47c83sm13128821wrs.2.2023.12.05.01.53.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 01:53:26 -0800 (PST)
-Message-ID: <20d45cb6adaa4a8203822535e069cdbbf3b8ba2d.camel@redhat.com>
-Subject: Re: [PATCH v7 02/26] x86/fpu/xstate: Refine CET user xstate bit
- enabling
+        Tue, 05 Dec 2023 01:53:39 -0800 (PST)
+Message-ID: <ca7c3071f17be6fa1f29f2d62cd53a66c97ea289.camel@redhat.com>
+Subject: Re: [PATCH v7 03/26] x86/fpu/xstate: Add CET supervisor mode state
+ support
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: "Yang, Weijiang" <weijiang.yang@intel.com>
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
  dave.hansen@intel.com,  pbonzini@redhat.com, seanjc@google.com,
  peterz@infradead.org, chao.gao@intel.com,  rick.p.edgecombe@intel.com,
  john.allen@amd.com
-Date: Tue, 05 Dec 2023 11:53:24 +0200
-In-Reply-To: <cdf53e44-62d0-452d-9c06-5c2d2ce3ce66@intel.com>
+Date: Tue, 05 Dec 2023 11:53:37 +0200
+In-Reply-To: <ba6dc90a-64a7-4124-a9b9-c600f3bdbd19@intel.com>
 References: <20231124055330.138870-1-weijiang.yang@intel.com>
-	 <20231124055330.138870-3-weijiang.yang@intel.com>
-	 <c22d17ab04bf5f27409518e3e79477d579b55071.camel@redhat.com>
-	 <cdf53e44-62d0-452d-9c06-5c2d2ce3ce66@intel.com>
+	 <20231124055330.138870-4-weijiang.yang@intel.com>
+	 <13aaf1272737737c29ab1de22438695637944d24.camel@redhat.com>
+	 <ba6dc90a-64a7-4124-a9b9-c600f3bdbd19@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -84,104 +84,166 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-On Fri, 2023-12-01 at 14:51 +0800, Yang, Weijiang wrote:
-> On 12/1/2023 1:26 AM, Maxim Levitsky wrote:
+On Fri, 2023-12-01 at 15:01 +0800, Yang, Weijiang wrote:
+> On 12/1/2023 1:27 AM, Maxim Levitsky wrote:
 > > On Fri, 2023-11-24 at 00:53 -0500, Yang Weijiang wrote:
-> > > Remove XFEATURE_CET_USER entry from dependency array as the entry doesn't
-> > > reflect true dependency between CET features and the user xstate bit.
-> > > Enable the bit in fpu_kernel_cfg.max_features when either SHSTK or IBT is
-> > > available.
+> > > Add supervisor mode state support within FPU xstate management framework.
+> > > Although supervisor shadow stack is not enabled/used today in kernel,KVM
+> > > requires the support because when KVM advertises shadow stack feature to
+> > > guest, architecturally it claims the support for both user and supervisor
+> > > modes for guest OSes(Linux or non-Linux).
 > > > 
-> > > Both user mode shadow stack and indirect branch tracking features depend
-> > > on XFEATURE_CET_USER bit in XSS to automatically save/restore user mode
-> > > xstate registers, i.e., IA32_U_CET and IA32_PL3_SSP whenever necessary.
+> > > CET supervisor states not only includes PL{0,1,2}_SSP but also IA32_S_CET
+> > > MSR, but the latter is not xsave-managed. In virtualization world, guest
+> > > IA32_S_CET is saved/stored into/from VM control structure. With supervisor
+> > > xstate support, guest supervisor mode shadow stack state can be properly
+> > > saved/restored when 1) guest/host FPU context is swapped 2) vCPU
+> > > thread is sched out/in.
 > > > 
-> > > Note, the issue, i.e., CPUID only enumerates IBT but no SHSTK is resulted
-> > > from CET KVM series which synthesizes guest CPUIDs based on userspace
-> > > settings,in real world the case is rare. In other words, the exitings
-> > > dependency check is correct when only user mode SHSTK is available.
+> > > The alternative is to enable it in KVM domain, but KVM maintainers NAKed
+> > > the solution. The external discussion can be found at [*], it ended up
+> > > with adding the support in kernel instead of KVM domain.
+> > > 
+> > > Note, in KVM case, guest CET supervisor state i.e., IA32_PL{0,1,2}_MSRs,
+> > > are preserved after VM-Exit until host/guest fpstates are swapped, but
+> > > since host supervisor shadow stack is disabled, the preserved MSRs won't
+> > > hurt host.
+> > > 
+> > > [*]: https://lore.kernel.org/all/806e26c2-8d21-9cc9-a0b7-7787dd231729@intel.com/
 > > > 
 > > > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> > > Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> > > Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 > > > ---
-> > >   arch/x86/kernel/fpu/xstate.c | 9 ++++++++-
-> > >   1 file changed, 8 insertions(+), 1 deletion(-)
+> > >   arch/x86/include/asm/fpu/types.h  | 14 ++++++++++++--
+> > >   arch/x86/include/asm/fpu/xstate.h |  6 +++---
+> > >   arch/x86/kernel/fpu/xstate.c      |  6 +++++-
+> > >   3 files changed, 20 insertions(+), 6 deletions(-)
 > > > 
+> > > diff --git a/arch/x86/include/asm/fpu/types.h b/arch/x86/include/asm/fpu/types.h
+> > > index eb810074f1e7..c6fd13a17205 100644
+> > > --- a/arch/x86/include/asm/fpu/types.h
+> > > +++ b/arch/x86/include/asm/fpu/types.h
+> > > @@ -116,7 +116,7 @@ enum xfeature {
+> > >   	XFEATURE_PKRU,
+> > >   	XFEATURE_PASID,
+> > >   	XFEATURE_CET_USER,
+> > > -	XFEATURE_CET_KERNEL_UNUSED,
+> > > +	XFEATURE_CET_KERNEL,
+> > >   	XFEATURE_RSRVD_COMP_13,
+> > >   	XFEATURE_RSRVD_COMP_14,
+> > >   	XFEATURE_LBR,
+> > > @@ -139,7 +139,7 @@ enum xfeature {
+> > >   #define XFEATURE_MASK_PKRU		(1 << XFEATURE_PKRU)
+> > >   #define XFEATURE_MASK_PASID		(1 << XFEATURE_PASID)
+> > >   #define XFEATURE_MASK_CET_USER		(1 << XFEATURE_CET_USER)
+> > > -#define XFEATURE_MASK_CET_KERNEL	(1 << XFEATURE_CET_KERNEL_UNUSED)
+> > > +#define XFEATURE_MASK_CET_KERNEL	(1 << XFEATURE_CET_KERNEL)
+> > >   #define XFEATURE_MASK_LBR		(1 << XFEATURE_LBR)
+> > >   #define XFEATURE_MASK_XTILE_CFG		(1 << XFEATURE_XTILE_CFG)
+> > >   #define XFEATURE_MASK_XTILE_DATA	(1 << XFEATURE_XTILE_DATA)
+> > > @@ -264,6 +264,16 @@ struct cet_user_state {
+> > >   	u64 user_ssp;
+> > >   };
+> > >   
+> > > +/*
+> > > + * State component 12 is Control-flow Enforcement supervisor states
+> > > + */
+> > > +struct cet_supervisor_state {
+> > > +	/* supervisor ssp pointers  */
+> > > +	u64 pl0_ssp;
+> > > +	u64 pl1_ssp;
+> > > +	u64 pl2_ssp;
+> > > +};
+> > > +
+> > >   /*
+> > >    * State component 15: Architectural LBR configuration state.
+> > >    * The size of Arch LBR state depends on the number of LBRs (lbr_depth).
+> > > diff --git a/arch/x86/include/asm/fpu/xstate.h b/arch/x86/include/asm/fpu/xstate.h
+> > > index d4427b88ee12..3b4a038d3c57 100644
+> > > --- a/arch/x86/include/asm/fpu/xstate.h
+> > > +++ b/arch/x86/include/asm/fpu/xstate.h
+> > > @@ -51,7 +51,8 @@
+> > >   
+> > >   /* All currently supported supervisor features */
+> > >   #define XFEATURE_MASK_SUPERVISOR_SUPPORTED (XFEATURE_MASK_PASID | \
+> > > -					    XFEATURE_MASK_CET_USER)
+> > > +					    XFEATURE_MASK_CET_USER | \
+> > > +					    XFEATURE_MASK_CET_KERNEL)
+> > >   
+> > >   /*
+> > >    * A supervisor state component may not always contain valuable information,
+> > > @@ -78,8 +79,7 @@
+> > >    * Unsupported supervisor features. When a supervisor feature in this mask is
+> > >    * supported in the future, move it to the supported supervisor feature mask.
+> > >    */
+> > > -#define XFEATURE_MASK_SUPERVISOR_UNSUPPORTED (XFEATURE_MASK_PT | \
+> > > -					      XFEATURE_MASK_CET_KERNEL)
+> > > +#define XFEATURE_MASK_SUPERVISOR_UNSUPPORTED (XFEATURE_MASK_PT)
+> > >   
+> > >   /* All supervisor states including supported and unsupported states. */
+> > >   #define XFEATURE_MASK_SUPERVISOR_ALL (XFEATURE_MASK_SUPERVISOR_SUPPORTED | \
 > > > diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-> > > index 73f6bc00d178..6e50a4251e2b 100644
+> > > index 6e50a4251e2b..b57d909facca 100644
 > > > --- a/arch/x86/kernel/fpu/xstate.c
 > > > +++ b/arch/x86/kernel/fpu/xstate.c
-> > > @@ -73,7 +73,6 @@ static unsigned short xsave_cpuid_features[] __initdata = {
+> > > @@ -51,7 +51,7 @@ static const char *xfeature_names[] =
+> > >   	"Protection Keys User registers",
+> > >   	"PASID state",
+> > >   	"Control-flow User registers",
+> > > -	"Control-flow Kernel registers (unused)",
+> > > +	"Control-flow Kernel registers",
+> > >   	"unknown xstate feature",
+> > >   	"unknown xstate feature",
+> > >   	"unknown xstate feature",
+> > > @@ -73,6 +73,7 @@ static unsigned short xsave_cpuid_features[] __initdata = {
 > > >   	[XFEATURE_PT_UNIMPLEMENTED_SO_FAR]	= X86_FEATURE_INTEL_PT,
 > > >   	[XFEATURE_PKRU]				= X86_FEATURE_OSPKE,
 > > >   	[XFEATURE_PASID]			= X86_FEATURE_ENQCMD,
-> > > -	[XFEATURE_CET_USER]			= X86_FEATURE_SHSTK,
+> > > +	[XFEATURE_CET_KERNEL]			= X86_FEATURE_SHSTK,
 > > >   	[XFEATURE_XTILE_CFG]			= X86_FEATURE_AMX_TILE,
 > > >   	[XFEATURE_XTILE_DATA]			= X86_FEATURE_AMX_TILE,
 > > >   };
-> > > @@ -798,6 +797,14 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
-> > >   			fpu_kernel_cfg.max_features &= ~BIT_ULL(i);
-> > >   	}
+> > > @@ -277,6 +278,7 @@ static void __init print_xstate_features(void)
+> > >   	print_xstate_feature(XFEATURE_MASK_PKRU);
+> > >   	print_xstate_feature(XFEATURE_MASK_PASID);
+> > >   	print_xstate_feature(XFEATURE_MASK_CET_USER);
+> > > +	print_xstate_feature(XFEATURE_MASK_CET_KERNEL);
+> > >   	print_xstate_feature(XFEATURE_MASK_XTILE_CFG);
+> > >   	print_xstate_feature(XFEATURE_MASK_XTILE_DATA);
+> > >   }
+> > > @@ -346,6 +348,7 @@ static __init void os_xrstor_booting(struct xregs_state *xstate)
+> > >   	 XFEATURE_MASK_BNDCSR |			\
+> > >   	 XFEATURE_MASK_PASID |			\
+> > >   	 XFEATURE_MASK_CET_USER |		\
+> > > +	 XFEATURE_MASK_CET_KERNEL |		\
+> > >   	 XFEATURE_MASK_XTILE)
 > > >   
-> > > +	/*
-> > > +	 * CET user mode xstate bit has been cleared by above sanity check.
-> > > +	 * Now pick it up if either SHSTK or IBT is available. Either feature
-> > > +	 * depends on the xstate bit to save/restore user mode states.
-> > > +	 */
-> > > +	if (boot_cpu_has(X86_FEATURE_SHSTK) || boot_cpu_has(X86_FEATURE_IBT))
-> > > +		fpu_kernel_cfg.max_features |= BIT_ULL(XFEATURE_CET_USER);
-> > > +
-> > >   	if (!cpu_feature_enabled(X86_FEATURE_XFD))
-> > >   		fpu_kernel_cfg.max_features &= ~XFEATURE_MASK_USER_DYNAMIC;
-> > >   
-> > I am curious:
-> > 
-> > Any reason why my review feedback was not applied even though you did agree
-> > that it is reasonable?
+> > >   /*
+> > > @@ -546,6 +549,7 @@ static bool __init check_xstate_against_struct(int nr)
+> > >   	case XFEATURE_PASID:	  return XCHECK_SZ(sz, nr, struct ia32_pasid_state);
+> > >   	case XFEATURE_XTILE_CFG:  return XCHECK_SZ(sz, nr, struct xtile_cfg);
+> > >   	case XFEATURE_CET_USER:	  return XCHECK_SZ(sz, nr, struct cet_user_state);
+> > > +	case XFEATURE_CET_KERNEL: return XCHECK_SZ(sz, nr, struct cet_supervisor_state);
+> > >   	case XFEATURE_XTILE_DATA: check_xtile_data_against_struct(sz); return true;
+> > >   	default:
+> > >   		XSTATE_WARN_ON(1, "No structure for xstate: %d\n", nr);
+> > Any reason why my reviewed-by was not added to this patch?
 > 
-> My apology! I changed the patch per you feedback but found XFEATURE_CET_USER didn't
-> work before sending out v7 version, after a close look at the existing code:
+> My apology again! I missed the Reviewed-by tag for this patch!
 > 
->          for (i = 0; i < ARRAY_SIZE(xsave_cpuid_features); i++) {
->                  unsigned short cid = xsave_cpuid_features[i];
-> 
->                  /* Careful: X86_FEATURE_FPU is 0! */
->                  if ((i != XFEATURE_FP && !cid) || !boot_cpu_has(cid))
->                          fpu_kernel_cfg.max_features &= ~BIT_ULL(i);
->          }
-> 
-> With removal of XFEATURE_CET_USER entry from xsave_cpuid_features, actually
-> above check will clear the bit from fpu_kernel_cfg.max_features. 
+> Appreciated for your careful review for this series!
 
-Are you sure about this? If we remove the XFEATURE_CET_USER from the xsave_cpuid_features,
-then the above loop will not touch it - it loops only over the items in the xsave_cpuid_features
-array.
-
-What I suggested was that we remove the XFEATURE_CET_USER from the xsave_cpuid_features
-and instead do this after the above loop.
-
-if (!boot_cpu_has(X86_FEATURE_SHSTK) && !boot_cpu_has(X86_FEATURE_IBT))
-   fpu_kernel_cfg.max_features &= ~BIT_ULL(XFEATURE_CET_USER);
-
-Which is pretty much just a manual iteration of the loop, just instead of checking
-for absence of single feature, it checks that both features are absent.
+Thank you very much!
 
 Best regards,
 	Maxim Levitsky
 
-
-> So now I need
-> to add it back conditionally.
-> Your sample code is more consistent with existing code in style, but I don't want to
-> hack into the loop and handle XFEATURE_CET_USER specifically.  Just keep the handling
-> and rewording the comments which is also straightforward.
 > 
-> > 
-> > https://lore.kernel.org/lkml/c72dfaac-1622-94cf-a81d-9d7ed81b2f55@intel.com/
+> > Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 > > 
 > > Best regards,
 > > 	Maxim Levitsky
+> > 
+> > 
 > > 
 
 
