@@ -1,56 +1,56 @@
-Return-Path: <kvm+bounces-3596-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3597-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 641DD805A88
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 17:54:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 518DA805A99
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 17:57:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DD97281967
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 16:54:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82E0B1C21217
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 16:57:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6608A61FD9;
-	Tue,  5 Dec 2023 16:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8A563DFF;
+	Tue,  5 Dec 2023 16:57:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jKUL6Pb2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aOevY/Qe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6090B1712
-	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 08:53:50 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1d08acaab7fso15364075ad.1
-        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 08:53:50 -0800 (PST)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8951819B
+	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 08:57:36 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5d942a656b7so25304227b3.1
+        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 08:57:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701795230; x=1702400030; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1701795455; x=1702400255; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XMQYF2quagt/GPGUodoc4MiIW5ZQeF7Y4GziD01rWxY=;
-        b=jKUL6Pb2ELt3dBIcP8SfhUzC2eRufsrPX+BPDTaA6tkwYPYCQJEAQHDG11BWQS9xME
-         KBaPHlUeak7SGC/WHLeCJ2WRLzgTDsKROnHd2r2O7UxR66/i2tAwB2CiwYo72gOuG0l0
-         8kSdblTIhXmsAjNdAXCejlwHNbozSfjUu6VO28TFyl1Oue3+fPMss2cNDsmHBUvSTATO
-         YK3T0G+qzrPlnrPIHfnkQtZC4GNHGy0Dzvq536Q9nPqUJC85/R/k0y0fpaib/tS3YlZr
-         MHIfI4y/FAFPWOA5CX/enymHMqpEdzur0J8JMl3nZipCYDwgt/Vu8MQaWZu2yuoWI5mZ
-         QmuA==
+        bh=jK7s+QAqQUTPUwpooiy5GVM6IbU9OMdsdVHDH5OFNq4=;
+        b=aOevY/Qe7zUcXkFFuv4sbeDRgX2s2dMIMYU38YRJMA3jSFDQfypw3w+KH5AlPPUv0w
+         D8dt/0bTkQXcn1gfG1mEK61F0x5t9vHyDj5+V51NPzmoaCYUhvsSbRy7MLjVG++p5/tU
+         p4BABMJSdN2GtIHBBHI/68XeG/e2jjGk6xi8Qmqma7Mvd2sEDs/QUv3TMS6G5Db28pNo
+         YDAsya+vzspvw2FdeMQoEo0CXiT9fCxXckkRa7ou5gpkeJdlaSi+XaDOwXcL7rfFqS1C
+         tA8inX0axpPuuR+cMZx7ojqdvmCVi9oAbPFNg5YSY3IToePjS1v37mj8QOoPTe5UiyjV
+         CKXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701795230; x=1702400030;
+        d=1e100.net; s=20230601; t=1701795455; x=1702400255;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XMQYF2quagt/GPGUodoc4MiIW5ZQeF7Y4GziD01rWxY=;
-        b=fPN11Zus6u0aHdUNYdwkk2Hb1SrQaZBOGIXBnWWMDRibUezkn059olWluTwcTkDeNh
-         DYlMPS0dNBJyQbXBvUSXs3o0mTv2XyyWCfrCzb5esh458FNcs/Z+naSCo2ybs5tMSeMu
-         /MJcJiaOjBPQVTl2h+xvBkqnbUSf68/r0QwG6C1lGuzZ1Yq4G4i5wczA18veiaSoJJJL
-         AT8iyqi1Aj8DGPNqtuvwyHUZiwsS1ix5nFeFYOeuH1UIVusQXQ3JfSSXuyte9ODSFssG
-         49iof8tiDZjHPuSq94wJnoWewX1CZkvKCzihZ9RA737waoBl6MBaM4h1wn6xj8YCEhQ5
-         WNjw==
-X-Gm-Message-State: AOJu0YzvxVSbfKc2jBWip6hOzpPCcK4py7ZZMVwYa5C9lcXjNILtEWEd
-	E7OPdTjhtFJ2tgm/3UivciQq1KlhaTc=
-X-Google-Smtp-Source: AGHT+IEkDPF5kg0eFiaPieQqBbhN1nYVZJAxhuI3lfBP6e8BzlpfCIUB7mriD7s7nOD1m+hVQsJUWt4xndE=
+        bh=jK7s+QAqQUTPUwpooiy5GVM6IbU9OMdsdVHDH5OFNq4=;
+        b=w/iDWNDZtxOcl7FVYMQwN0ZmOZj1X33WYENqqMF+vtd/caKaCkFGAnox8xYQwZrIrq
+         aqqnKIetpY1b5xosiA0a5EtWpDtMA9VG148tMwMaPFGUQ8P8tTH8TDaeYy8ppflDH7P3
+         DDQeRf4cOjqHABUqXi3ALYCCJPWrEZJfm0UllpRzggiGXvzGVv402cCL9i2lcIH+1Ep5
+         ezBn1RX1KbjpgdNf6SYYkZleHMNEIlJgFnWjeQXiH4i6lwhZ/8PFQMI0UvnxaiTOjCNX
+         wkVkw2X/hoWRUOYPt/Ngq3n8pS3hbHJtg0VtQXPADTCpAl7wyDgwwTH8jHDkYfVCOBWb
+         PqPg==
+X-Gm-Message-State: AOJu0YzldhGPQMdY1/+9hD9h1PJGqa2iOwqTI+/QVMPDVjIjqZMofBYZ
+	HT/GsHDX3HTPDdIs1zBUVuTVt/lao3I=
+X-Google-Smtp-Source: AGHT+IFNCZti+PtUeZbrU9k1NsaHVuTOlCh5gYjHVW73ZX9BwSndogpBysvCVDd/UehToxHvmP0NS9TQa3s=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:8504:b0:1d0:96b7:7f4 with SMTP id
- bj4-20020a170902850400b001d096b707f4mr104464plb.12.1701795229655; Tue, 05 Dec
- 2023 08:53:49 -0800 (PST)
-Date: Tue, 5 Dec 2023 08:53:48 -0800
-In-Reply-To: <ae972860-cc45-48b0-ba3e-bb2fbad5856a@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a81:9bd6:0:b0:5d3:8857:b78e with SMTP id
+ s205-20020a819bd6000000b005d38857b78emr418668ywg.10.1701795455593; Tue, 05
+ Dec 2023 08:57:35 -0800 (PST)
+Date: Tue, 5 Dec 2023 08:57:33 -0800
+In-Reply-To: <DS7PR11MB60774E0BC0F8EFA103310D27FC85A@DS7PR11MB6077.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -62,17 +62,17 @@ References: <9e80873fac878aa5d697cbcd4d456d01e1009d1f.1699527082.git.kai.huang@i
  <bcff605a-3b8d-4dcc-a5cb-63dab1a74ed4@intel.com> <dfbfe327704f65575219d8b895cf9f55985758da.camel@intel.com>
  <9b221937-42df-4381-b79f-05fb41155f7a@intel.com> <c12073937fcca2c2e72f9964675ef4ac5dddb6fb.camel@intel.com>
  <1a5b18b2-3072-46d9-9d44-38589cb54e40@intel.com> <ZW6FRBnOwYV-UCkY@google.com>
- <ae972860-cc45-48b0-ba3e-bb2fbad5856a@intel.com>
-Message-ID: <ZW9VnKLSMGh9PAJy@google.com>
+ <DS7PR11MB60774E0BC0F8EFA103310D27FC85A@DS7PR11MB6077.namprd11.prod.outlook.com>
+Message-ID: <ZW9WfR5Wlk3dgNvy@google.com>
 Subject: Re: [PATCH v15 22/23] x86/mce: Improve error log of kernel space TDX
  #MC due to erratum
 From: Sean Christopherson <seanjc@google.com>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Kai Huang <kai.huang@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+To: Tony Luck <tony.luck@intel.com>
+Cc: Dave Hansen <dave.hansen@intel.com>, Kai Huang <kai.huang@intel.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "rafael@kernel.org" <rafael@kernel.org>, 
-	Chao Gao <chao.gao@intel.com>, Tony Luck <tony.luck@intel.com>, 
-	"david@redhat.com" <david@redhat.com>, "bagasdotme@gmail.com" <bagasdotme@gmail.com>, 
-	"ak@linux.intel.com" <ak@linux.intel.com>, 
+	Chao Gao <chao.gao@intel.com>, "david@redhat.com" <david@redhat.com>, 
+	"bagasdotme@gmail.com" <bagasdotme@gmail.com>, "ak@linux.intel.com" <ak@linux.intel.com>, 
 	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, "mingo@redhat.com" <mingo@redhat.com>, 
 	"pbonzini@redhat.com" <pbonzini@redhat.com>, "tglx@linutronix.de" <tglx@linutronix.de>, 
 	Isaku Yamahata <isaku.yamahata@intel.com>, "nik.borisov@suse.com" <nik.borisov@suse.com>, 
@@ -84,24 +84,43 @@ Cc: Kai Huang <kai.huang@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 	"x86@kernel.org" <x86@kernel.org>
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Dec 05, 2023, Dave Hansen wrote:
-> On 12/4/23 18:04, Sean Christopherson wrote:
-> > Joking aside, why shove TDX module ownership into KVM?  It honestly sounds like
-> > a terrible fit, even without the whole TDX-IO mess.  KVM state is largely ephemeral,
-> > in the sense that loading and unloading kvm.ko doesn't allocate/free much memory
-> > or do all that much initialization or teardown.
+On Tue, Dec 05, 2023, Tony Luck wrote:
+> >> Fine.  This doesn't need to change ... until you load TDX.  Once you
+> >> initialize the TDX module, no more out-of-tree VMMs for you.
+> >
+> > It's not just out-of-tree hypervisors, which IMO should be little more than an
+> > afterthought.  The other more important issue is that being post-VMXON blocks INIT,
 > 
-> Yeah, you have a good point there.  We really do need some core code to
-> manage VMXON/OFF now that there is increased interest outside of
-> _purely_ running VMs.
-> 
-> For the purposes of _this_ patch, I think I'm happy to leave open the
-> possibility that SEAMCALL can simply fail due to VMXOFF.  For now, it
-> means that we can't attribute #MC's to the PAMT unless a VM is running
-> but that seems like a reasonable compromise for the moment.
+> Does that make CPU offline a one-way process? Linux uses INIT to bring a CPU back
+> online again.
 
-+1
+No, KVM does VMXOFF on the CPU being offlined, and then VMXON if/when the CPU is
+onlined again.  This also handles secondary CPUs for suspend/resume (the primary
+CPU hooks .suspend() and .resume()).
 
-> Once TDX gains the ability to "pin" VMXON, the added precision here will
-> be appreciated.
+static int kvm_offline_cpu(unsigned int cpu)
+{
+	mutex_lock(&kvm_lock);
+	if (kvm_usage_count)
+		hardware_disable_nolock(NULL);
+	mutex_unlock(&kvm_lock);
+	return 0;
+}
+
+
+static int kvm_online_cpu(unsigned int cpu)
+{
+	int ret = 0;
+
+	/*
+	 * Abort the CPU online process if hardware virtualization cannot
+	 * be enabled. Otherwise running VMs would encounter unrecoverable
+	 * errors when scheduled to this CPU.
+	 */
+	mutex_lock(&kvm_lock);
+	if (kvm_usage_count)
+		ret = __hardware_enable_nolock();
+	mutex_unlock(&kvm_lock);
+	return ret;
+}
 
