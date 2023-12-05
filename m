@@ -1,136 +1,104 @@
-Return-Path: <kvm+bounces-3559-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3560-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 366CC80538B
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 12:53:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F109805394
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 12:56:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 646AD1C20EC7
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 11:53:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A829B20D5F
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 11:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CF159E45;
-	Tue,  5 Dec 2023 11:53:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 645FE59E4A;
+	Tue,  5 Dec 2023 11:55:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O4bP9iWr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MDAr5BS1"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CB056B66;
-	Tue,  5 Dec 2023 11:53:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB7FDC433C7;
-	Tue,  5 Dec 2023 11:53:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701777203;
-	bh=3FNV8+wfCMDASEiBW/vL/W4Y2i6lE5IM3WZTeM1IX38=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=O4bP9iWrlyozBbKrXNsNhog3Mm9QqGvL9vfSwTty8f+HK+IC5/3D8E2aM/Tdp4kzy
-	 NWeGxw+QSlYt1fzPR33wtusXp9oTbILbXMoezjPO2xQCVnGHsdaQ03ZdAngDIEWXce
-	 WLr2K0335Z6bTbKyNwwWUnJ1K/yf2fEb2zC3tb1Wjo8b18Xqm40JYKZAdyOedeagM9
-	 iWkgFDHgjzu+yV9WQQ/DFDlozYMo120D+b3gWvcPARB4SnGzeHR7caxwO7U6RJ9i1x
-	 ZhPMgMT/eFYurr3UXi3UueT15KP/69phPAoU0VZlDZd+bs3xj7Zv5AOTkcvBMe2UYQ
-	 kCKB0j2tBKCNw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rATzN-001XhJ-EX;
-	Tue, 05 Dec 2023 11:53:21 +0000
-Date: Tue, 05 Dec 2023 11:53:20 +0000
-Message-ID: <86cyvkc1cf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 0/3] arm64: Drop support for VPIPT i-cache policy
-In-Reply-To: <ZW8DXGQCSWO1wB2m@FVFF77S0Q05N>
-References: <20231204143606.1806432-1-maz@kernel.org>
-	<ZW3l6Bq7ortEGB8I@FVFF77S0Q05N>
-	<86h6kxbz8u.wl-maz@kernel.org>
-	<ZW8DXGQCSWO1wB2m@FVFF77S0Q05N>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91D0198;
+	Tue,  5 Dec 2023 03:55:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701777349; x=1733313349;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=e3cGY29NO2TW5wcDKR/uxU5ISJOcURe7TpDGtZtP95Q=;
+  b=MDAr5BS1LPykCRcsIlmHFRzoII+yWmkZXlJBlSM6cY2+hnTpZ/gTsKL/
+   HXZlsNaUnrreZOW3BIGqJlm9CN0zo4xDbkmauIidS9+NWiOfKp25UVYxw
+   lcs/SVl/pGKONKUWqmL2KuMSsZ2GLbzgp1n/ueWONHaw0H/WiPjKQU3He
+   3sB/2lGX08vaZlwW/EgcpBNmRFPzhl30sUVo5BsGi3ko111uBL3F7eOEn
+   OkppWhKUp3cM8Y/3NNUJdIsvWZXaZjcyynIx0uSSRJEqkM7WJ5FPcxT69
+   4k1qmI4JPPFjedWAmuJrdMsqpreoG5Ovs4304Jx7E98BuxLybAXjNq7B7
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="7180384"
+X-IronPort-AV: E=Sophos;i="6.04,252,1695711600"; 
+   d="scan'208";a="7180384"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 03:55:48 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="861717965"
+X-IronPort-AV: E=Sophos;i="6.04,252,1695711600"; 
+   d="scan'208";a="861717965"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.255.31.68]) ([10.255.31.68])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 03:55:42 -0800
+Message-ID: <fb4b2617-4b8e-4f83-84c6-c5523591803f@linux.intel.com>
+Date: Tue, 5 Dec 2023 19:55:40 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will@kernel.org, catalin.marinas@arm.com, ardb@kernel.org, anshuman.khandual@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: baolu.lu@linux.intel.com, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, iommu@lists.linux.dev, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v7 03/12] iommu: Remove unrecoverable fault data
+Content-Language: en-US
+To: Yi Liu <yi.l.liu@intel.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Nicolin Chen <nicolinc@nvidia.com>
+References: <20231115030226.16700-1-baolu.lu@linux.intel.com>
+ <20231115030226.16700-4-baolu.lu@linux.intel.com>
+ <50b9684c-e018-4e1c-9aac-67e0ffd9bc27@intel.com>
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <50b9684c-e018-4e1c-9aac-67e0ffd9bc27@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, 05 Dec 2023 11:03:16 +0000,
-Mark Rutland <mark.rutland@arm.com> wrote:
+On 2023/12/4 18:58, Yi Liu wrote:
+> On 2023/11/15 11:02, Lu Baolu wrote:
+>> The unrecoverable fault data is not used anywhere. Remove it to avoid
+>> dead code.
+>>
+>> Suggested-by: Kevin Tian <kevin.tian@intel.com>
+>> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+>> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+>> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+>> ---
+>>   include/linux/iommu.h | 70 +------------------------------------------
+>>   1 file changed, 1 insertion(+), 69 deletions(-)
+>>
+>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+>> index c2e2225184cf..81eee1afec72 100644
+>> --- a/include/linux/iommu.h
+>> +++ b/include/linux/iommu.h
+>> @@ -50,69 +50,9 @@ struct iommu_dma_cookie;
+>>   /* Generic fault types, can be expanded IRQ remapping fault */
+>>   enum iommu_fault_type {
+>> -    IOMMU_FAULT_DMA_UNRECOV = 1,    /* unrecoverable fault */
+>>       IOMMU_FAULT_PAGE_REQ,        /* page request fault */
 > 
-> On Mon, Dec 04, 2023 at 06:26:25PM +0000, Marc Zyngier wrote:
-> > How about the patch below (tested in a guest with a bunch of hacks to
-> > expose different L1Ip values)?
-> 
-> That's roughly what I was thinking; the diff looks good, minor comments below.
-> 
-> [...]
-> 
-> >  /*
-> >   * Whilst the D-side always behaves as PIPT on AArch64, aliasing is
-> >   * permitted in the I-cache.
-> >   */
-> >  static inline int icache_is_aliasing(void)
-> >  {
-> > -	return test_bit(ICACHEF_ALIASING, &__icache_flags);
-> > +	return !cpus_have_cap(ARM64_ICACHE_PIPT);
-> >  }
-> 
-> It might be nicer to use alternative_has_cap_{likely,unlikely}(...) for
-> consistency with other cap checks, though that won't matter for hyp code and I
-> don't think the likely/unlikely part particularly matters either.
+> a nit, do you kno why this enum was starting from 1? Should it still
+> start from 1 after deleting UNRECOV?
 
-Right, this should be marginally better. I was initially worried of
-the cap not being configured yet, but since we start by assuming VIPT
-and only flip to PIPT once we have seen all CPUs, this stays correct
-by construction.
+As Jason suggested in another thread, we will address this issue in
+another thread. I am not sure for now whether we will remove the fault
+type field or re-use the previous scheme.
 
-> [...]
-> 
-> > diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> > index c5af75b23187..db8c96841138 100644
-> > --- a/arch/arm64/tools/sysreg
-> > +++ b/arch/arm64/tools/sysreg
-> > @@ -2003,7 +2003,7 @@ Field	28	IDC
-> >  Field	27:24	CWG
-> >  Field	23:20	ERG
-> >  Field	19:16	DminLine
-> > -Enum	15:14	L1Ip
-> > +UnsignedEnum	15:14	L1Ip
-> >  	# This was named as VPIPT in the ARM but now documented as reserved
-> >  	0b00	RESERVED_VPIPT
-> >  	# This is named as AIVIVT in the ARM but documented as reserved
-> 
-> I was initially surprised by the use of UnsignedEnum, but given PIPT is 0b11, I
-> can see that works. Otherwise, we can keep this as an enum and use a helper
-> that checks for an exact match.
-
-Yeah, I hesitated either way, but maybe the helper approach is
-cleaner.  I'll give it a go and repost this patch.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Best regards,
+baolu
 
