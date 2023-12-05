@@ -1,329 +1,301 @@
-Return-Path: <kvm+bounces-3472-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3473-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C143804D7E
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 10:21:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DDCF804E1C
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 10:40:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0C351F213E5
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 09:21:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 707DA1F2131F
+	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 09:40:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C3F3E485;
-	Tue,  5 Dec 2023 09:21:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85AAE41205;
+	Tue,  5 Dec 2023 09:40:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bX7MXlnr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M/0nVqu3"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A662E842;
-	Tue,  5 Dec 2023 09:21:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FDDDC433C7;
-	Tue,  5 Dec 2023 09:21:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701768092;
-	bh=CwTZMcUe712h6POb79Nr8ctnkPireFaHA042OQUBRjY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bX7MXlnrqiX+N/s9lIiTB5y2zP1dsnXKx7M5C9BPJzUpzX7pUMlRlaqLRMyXsZZEJ
-	 Ce66GVp8qzcmR1xKdC5UbuusvCU2hTXcaFXpCSY8PWjmDDqJ9IJlIUvFnEnnvE+mlY
-	 /lQLO7EsAC7QBQMVqA0k/H3itcsy2ip/OHM+hPKLFn5N1l3CQAniWgkmBgsc8bpXJL
-	 jyBDGr3PUW+XK/8e/e7dmR3U6DsqCPAt+qGQWxphRa8NkSyMeegGZdH5+Eo8o1lwXO
-	 WSX2Bvr9R+jPc0SfwC3KY963lnIW5iFVNN3HKfTAL+S5avMUSDgHna+odSwtyNNnc0
-	 6P5NOvkJbiUMg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rARcP-001UKy-HZ;
-	Tue, 05 Dec 2023 09:21:29 +0000
-Date: Tue, 05 Dec 2023 09:21:28 +0000
-Message-ID: <86fs0hatt3.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: <ankita@nvidia.com>
-Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, <jgg@nvidia.com>,
-	<oliver.upton@linux.dev>,
-	<suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>,
-	<catalin.marinas@arm.com>,
-	<will@kernel.org>,
-	<ardb@kernel.org>,
-	<akpm@linux-foundation.org>,
-	<gshan@redhat.com>,
-	<aniketa@nvidia.com>,
-	<cjia@nvidia.com>,
-	<kwankhede@nvidia.com>,
-	<targupta@nvidia.com>,
-	<vsethi@nvidia.com>,
-	<acurrid@nvidia.com>,
-	<apopple@nvidia.com>,
-	<jhubbard@nvidia.com>,
-	<danw@nvidia.com>,
-	<mochs@nvidia.com>,
-	<kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and NORMAL_NC for IO memory
-In-Reply-To: <20231205033015.10044-1-ankita@nvidia.com>
-References: <20231205033015.10044-1-ankita@nvidia.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9CA510F4;
+	Tue,  5 Dec 2023 01:40:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701769221; x=1733305221;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=+aFL7daZnf4Wu6nMRzJmrQS8C8iY+2iKH6YKfjt/76o=;
+  b=M/0nVqu30OsMW7frmK7PzJgxr6t5TqSjra6Ex7clrrkx/55WwFa9eM8Q
+   PF/dMF6WSGwZTLRoRIxY3+sQZAKXcqEQ6LqqN3595TeBvQ+3EiDJxVwA8
+   C6/d6hqtGtBYOfv82NE7MUmauPVkNdQPDZ0xRNI/dDXvoTbkpN5WXl0WQ
+   04rrjbYwfR7Q/MbzRknEBPanlJqURrQbFZHyHiGqC5sXXyAQEvzay90XS
+   4KP+Hd/B87bNt/upHyqz3ALFQIqnvDoCQVRdkUwyOEPtnbm8L5TajSJzg
+   VJ1hx6lxo3AUo0Wy6XTRNRyJ4940+BP8fWEuVGGCf3Q2vBTbZo1Nb5eaT
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="15418078"
+X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
+   d="scan'208";a="15418078"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 01:40:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="836920083"
+X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
+   d="scan'208";a="836920083"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.126]) ([10.238.10.126])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 01:40:16 -0800
+Message-ID: <f011f979-35e9-4f23-be00-4b189777fb13@linux.intel.com>
+Date: Tue, 5 Dec 2023 17:40:14 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ankita@nvidia.com, shameerali.kolothum.thodi@huawei.com, jgg@nvidia.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, ardb@kernel.org, akpm@linux-foundation.org, gshan@redhat.com, aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v17 005/116] KVM: TDX: Initialize the TDX module when
+ loading the KVM intel kernel module
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, David Matlack <dmatlack@google.com>,
+ Kai Huang <kai.huang@intel.com>, Zhi Wang <zhi.wang.linux@gmail.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
+References: <cover.1699368322.git.isaku.yamahata@intel.com>
+ <9cda464625f085499cd92191dc5d4cd51ad20554.1699368322.git.isaku.yamahata@intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <9cda464625f085499cd92191dc5d4cd51ad20554.1699368322.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-+ Shameer
 
-On Tue, 05 Dec 2023 03:30:15 +0000,
-<ankita@nvidia.com> wrote:
-> 
-> From: Ankit Agrawal <ankita@nvidia.com>
-> 
-> Currently, KVM for ARM64 maps at stage 2 memory that is considered device
-> (i.e. it is not RAM) with DEVICE_nGnRE memory attributes; this setting
-> overrides (as per the ARM architecture [1]) any device MMIO mapping
-> present at stage 1, resulting in a set-up whereby a guest operating
-> system cannot determine device MMIO mapping memory attributes on its
-> own but it is always overridden by the KVM stage 2 default.
-> 
-> This set-up does not allow guest operating systems to select device
-> memory attributes independently from KVM stage-2 mappings
-> (refer to [1], "Combining stage 1 and stage 2 memory type attributes"),
-> which turns out to be an issue in that guest operating systems
-> (e.g. Linux) may request to map devices MMIO regions with memory
-> attributes that guarantee better performance (e.g. gathering
-> attribute - that for some devices can generate larger PCIe memory
-> writes TLPs) and specific operations (e.g. unaligned transactions)
-> such as the NormalNC memory type.
-> 
-> The default device stage 2 mapping was chosen in KVM for ARM64 since
-> it was considered safer (i.e. it would not allow guests to trigger
-> uncontained failures ultimately crashing the machine) but this
-> turned out to be asynchronous (SError) defeating the purpose.
-> 
-> Failures containability is a property of the platform and is independent
-> from the memory type used for MMIO device memory mappings.
-> 
-> Actually, DEVICE_nGnRE memory type is even more problematic than
-> Normal-NC memory type in terms of faults containability in that e.g.
-> aborts triggered on DEVICE_nGnRE loads cannot be made, architecturally,
-> synchronous (i.e. that would imply that the processor should issue at
-> most 1 load transaction at a time - it cannot pipeline them - otherwise
-> the synchronous abort semantics would break the no-speculation attribute
-> attached to DEVICE_XXX memory).
-> 
-> This means that regardless of the combined stage1+stage2 mappings a
-> platform is safe if and only if device transactions cannot trigger
-> uncontained failures and that in turn relies on platform capabilities
-> and the device type being assigned (i.e. PCIe AER/DPC error containment
-> and RAS architecture[3]); therefore the default KVM device stage 2
-> memory attributes play no role in making device assignment safer
-> for a given platform (if the platform design adheres to design
-> guidelines outlined in [3]) and therefore can be relaxed.
-> 
-> For all these reasons, relax the KVM stage 2 device memory attributes
-> from DEVICE_nGnRE to Normal-NC. Add a new kvm_pgtable_prot flag for
-> Normal-NC.
-> 
-> The Normal-NC was chosen over a different Normal memory type default
-> at stage-2 (e.g. Normal Write-through) to avoid cache allocation/snooping.
-> 
-> Relaxing S2 KVM device MMIO mappings to Normal-NC is not expected to
-> trigger any issue on guest device reclaim use cases either (i.e. device
-> MMIO unmap followed by a device reset) at least for PCIe devices, in that
-> in PCIe a device reset is architected and carried out through PCI config
-> space transactions that are naturally ordered with respect to MMIO
-> transactions according to the PCI ordering rules.
-> 
-> Having Normal-NC S2 default puts guests in control (thanks to
-> stage1+stage2 combined memory attributes rules [1]) of device MMIO
-> regions memory mappings, according to the rules described in [1]
-> and summarized here ([(S1) - stage1], [(S2) - stage 2]):
-> 
-> S1           |  S2           | Result
-> NORMAL-WB    |  NORMAL-NC    | NORMAL-NC
-> NORMAL-WT    |  NORMAL-NC    | NORMAL-NC
-> NORMAL-NC    |  NORMAL-NC    | NORMAL-NC
-> DEVICE<attr> |  NORMAL-NC    | DEVICE<attr>
-> 
-> It is worth noting that currently, to map devices MMIO space to user
-> space in a device pass-through use case the VFIO framework applies memory
-> attributes derived from pgprot_noncached() settings applied to VMAs, which
-> result in device-nGnRnE memory attributes for the stage-1 VMM mappings.
-> 
-> This means that a userspace mapping for device MMIO space carried
-> out with the current VFIO framework and a guest OS mapping for the same
-> MMIO space may result in a mismatched alias as described in [2].
-> 
-> Defaulting KVM device stage-2 mappings to Normal-NC attributes does not
-> change anything in this respect, in that the mismatched aliases would
-> only affect (refer to [2] for a detailed explanation) ordering between
-> the userspace and GuestOS mappings resulting stream of transactions
-> (i.e. it does not cause loss of property for either stream of
-> transactions on its own), which is harmless given that the userspace
-> and GuestOS access to the device is carried out through independent
-> transactions streams.
-> 
-> [1] section D8.5 - DDI0487_I_a_a-profile_architecture_reference_manual.pdf
-> [2] section B2.8 - DDI0487_I_a_a-profile_architecture_reference_manual.pdf
 
-Can you please quote the latest specs?
-
-> [3] sections 1.7.7.3/1.8.5.2/appendix C - DEN0029H_SBSA_7.1.pdf
-> 
-> Applied over next-20231201
-> 
-> History
-> =======
-> v1 -> v2
-> - Updated commit log to the one posted by
->   Lorenzo Pieralisi <lpieralisi@kernel.org> (Thanks!)
-> - Added new flag to represent the NORMAL_NC setting. Updated
->   stage2_set_prot_attr() to handle new flag.
-> 
-> v1 Link:
-> https://lore.kernel.org/all/20230907181459.18145-3-ankita@nvidia.com/
-> 
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
-> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> Tested-by: Ankit Agrawal <ankita@nvidia.com>
-
-Despite the considerable increase in the commit message length, a
-number of questions are left unanswered:
-
-- Shameer reported a regression on non-FWB systems, breaking device
-  assignment:
-
-  https://lore.kernel.org/all/af13ed63dc9a4f26a6c958ebfa77d78a@huawei.com/
-
-  How has this been addressed?
-
-- Will had unanswered questions in another part of the thread:
-
-  https://lore.kernel.org/all/20231013092954.GB13524@willie-the-truck/
-
-  Can someone please help concluding it?
-
-> 
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h |  2 ++
->  arch/arm64/include/asm/memory.h      |  2 ++
->  arch/arm64/kvm/hyp/pgtable.c         | 11 +++++++++--
->  arch/arm64/kvm/mmu.c                 |  4 ++--
->  4 files changed, 15 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index cfdf40f734b1..19278dfe7978 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -197,6 +197,7 @@ enum kvm_pgtable_stage2_flags {
->   * @KVM_PGTABLE_PROT_W:		Write permission.
->   * @KVM_PGTABLE_PROT_R:		Read permission.
->   * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
-> + * @KVM_PGTABLE_PROT_NORMAL_NC:	Normal noncacheable attributes.
->   * @KVM_PGTABLE_PROT_SW0:	Software bit 0.
->   * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
->   * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
-> @@ -208,6 +209,7 @@ enum kvm_pgtable_prot {
->  	KVM_PGTABLE_PROT_R			= BIT(2),
->  
->  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
-> +	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(4),
->  
->  	KVM_PGTABLE_PROT_SW0			= BIT(55),
->  	KVM_PGTABLE_PROT_SW1			= BIT(56),
-> diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-> index fde4186cc387..c247e5f29d5a 100644
-> --- a/arch/arm64/include/asm/memory.h
-> +++ b/arch/arm64/include/asm/memory.h
-> @@ -147,6 +147,7 @@
->   * Memory types for Stage-2 translation
->   */
->  #define MT_S2_NORMAL		0xf
-> +#define MT_S2_NORMAL_NC		0x5
->  #define MT_S2_DEVICE_nGnRE	0x1
->  
->  /*
-> @@ -154,6 +155,7 @@
->   * Stage-2 enforces Normal-WB and Device-nGnRE
->   */
->  #define MT_S2_FWB_NORMAL	6
-> +#define MT_S2_FWB_NORMAL_NC	5
->  #define MT_S2_FWB_DEVICE_nGnRE	1
->  
->  #ifdef CONFIG_ARM64_4K_PAGES
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index c651df904fe3..d4835d553c61 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -718,10 +718,17 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
->  				kvm_pte_t *ptep)
->  {
->  	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
-> -	kvm_pte_t attr = device ? KVM_S2_MEMATTR(pgt, DEVICE_nGnRE) :
-> -			    KVM_S2_MEMATTR(pgt, NORMAL);
-> +	bool normal_nc = prot & KVM_PGTABLE_PROT_NORMAL_NC;
-> +	kvm_pte_t attr;
->  	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
->  
-> +	if (device)
-> +		attr = KVM_S2_MEMATTR(pgt, DEVICE_nGnRE);
-> +	else if (normal_nc)
-> +		attr = KVM_S2_MEMATTR(pgt, NORMAL_NC);
-> +	else
-> +		attr = KVM_S2_MEMATTR(pgt, NORMAL);
-> +
->  	if (!(prot & KVM_PGTABLE_PROT_X))
->  		attr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
->  	else if (device)
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index d14504821b79..1cb302457d3f 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1071,7 +1071,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->  	struct kvm_mmu_memory_cache cache = { .gfp_zero = __GFP_ZERO };
->  	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
->  	struct kvm_pgtable *pgt = mmu->pgt;
-> -	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
-> +	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_NORMAL_NC |
->  				     KVM_PGTABLE_PROT_R |
->  				     (writable ? KVM_PGTABLE_PROT_W : 0);
-
-Doesn't this affect the GICv2 VCPU interface, which is effectively a
-shared peripheral, now allowing a guest to affect another guest's
-interrupt distribution? If that is the case, this needs to be fixed.
-
-In general, I don't think this should be a blanket statement, but be
-limited to devices that we presume can deal with this (i.e. PCIe, and
-not much else).
-
+On 11/7/2023 10:55 PM, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >
-> @@ -1558,7 +1558,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		prot |= KVM_PGTABLE_PROT_X;
->  
->  	if (device)
-> -		prot |= KVM_PGTABLE_PROT_DEVICE;
-> +		prot |= KVM_PGTABLE_PROT_NORMAL_NC;
->  	else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
->  		prot |= KVM_PGTABLE_PROT_X;
->  
+> TDX requires several initialization steps for KVM to create guest TDs.
+> Detect CPU feature, enable VMX (TDX is based on VMX) on all online CPUs,
+> detect the TDX module availability, initialize it and disable VMX.
+>
+> To enable/disable VMX on all online CPUs, utilize
+> vmx_hardware_enable/disable().  The method also initializes each CPU for
+> TDX.  TDX requires calling a TDX initialization function per logical
+> processor (LP) before the LP uses TDX.  When the CPU is becoming online,
+> call the TDX LP initialization API.  If it fails to initialize TDX, refuse
+> CPU online for simplicity instead of TDX avoiding the failed LP.
+>
+> There are several options on when to initialize the TDX module.  A.) kernel
+> module loading time, B.) the first guest TD creation time.  A.) was chosen.
+> With B.), a user may hit an error of the TDX initialization when trying to
+> create the first guest TD.  The machine that fails to initialize the TDX
+> module can't boot any guest TD further.  Such failure is undesirable and a
+> surprise because the user expects that the machine can accommodate guest
+> TD, but not.  So A.) is better than B.).
+>
+> Introduce a module parameter, kvm_intel.tdx, to explicitly enable TDX KVM
+> support.  It's off by default to keep the same behavior for those who don't
+> use TDX.  Implement hardware_setup method to detect TDX feature of CPU and
+> initialize TDX module.
+>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>   arch/x86/kvm/Makefile      |  1 +
+>   arch/x86/kvm/vmx/main.c    | 34 ++++++++++++++-
+>   arch/x86/kvm/vmx/tdx.c     | 84 ++++++++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/x86_ops.h |  8 ++++
+>   4 files changed, 125 insertions(+), 2 deletions(-)
+>   create mode 100644 arch/x86/kvm/vmx/tdx.c
+>
+> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+> index 0e894ae23cbc..4b01ab842ab7 100644
+> --- a/arch/x86/kvm/Makefile
+> +++ b/arch/x86/kvm/Makefile
+> @@ -25,6 +25,7 @@ kvm-$(CONFIG_KVM_SMM)	+= smm.o
+>   kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+>   			   vmx/hyperv.o vmx/nested.o vmx/posted_intr.o vmx/main.o
+>   kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
+> +kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o
+>   
+>   kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
+>   			   svm/sev.o svm/hyperv.o
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index e07bec005eda..5f89d6b41568 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -6,6 +6,36 @@
+>   #include "nested.h"
+>   #include "pmu.h"
+>   
+> +static bool enable_tdx __ro_after_init;
+> +module_param_named(tdx, enable_tdx, bool, 0444);
+> +
+> +static int vt_hardware_enable(void)
+> +{
+> +	int ret;
+> +
+> +	ret = vmx_hardware_enable();
+> +	if (ret || !enable_tdx)
+> +		return ret;
+> +
+> +	ret = tdx_cpu_enable();
 
-Thanks,
+Maybe it's worth a comment to describe this function can only fail on CPU
+online path. So if it fails, the CPU will not online.
+IMHO, without any comment, it's not so easy to understand the call of
+vmx_hardware_disable() on failure.
 
-	M.
+> +	if (ret)
+> +		vmx_hardware_disable();
+> +	return ret;
+> +}
+> +
+> +static __init int vt_hardware_setup(void)
+> +{
+> +	int ret;
+> +
+> +	ret = vmx_hardware_setup();
+> +	if (ret)
+> +		return ret;
+> +
+> +	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
+> +
+> +	return 0;
+> +}
+> +
+>   #define VMX_REQUIRED_APICV_INHIBITS				\
+>   	(BIT(APICV_INHIBIT_REASON_DISABLE)|			\
+>   	 BIT(APICV_INHIBIT_REASON_ABSENT) |			\
+> @@ -22,7 +52,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>   
+>   	.hardware_unsetup = vmx_hardware_unsetup,
+>   
+> -	.hardware_enable = vmx_hardware_enable,
+> +	.hardware_enable = vt_hardware_enable,
+>   	.hardware_disable = vmx_hardware_disable,
+>   	.has_emulated_msr = vmx_has_emulated_msr,
+>   
+> @@ -159,7 +189,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>   };
+>   
+>   struct kvm_x86_init_ops vt_init_ops __initdata = {
+> -	.hardware_setup = vmx_hardware_setup,
+> +	.hardware_setup = vt_hardware_setup,
+>   	.handle_intel_pt_intr = NULL,
+>   
+>   	.runtime_ops = &vt_x86_ops,
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> new file mode 100644
+> index 000000000000..8a378fb6f1d4
+> --- /dev/null
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -0,0 +1,84 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +#include <linux/cpu.h>
+> +
+> +#include <asm/tdx.h>
+> +
+> +#include "capabilities.h"
+> +#include "x86_ops.h"
+> +#include "x86.h"
+> +
+> +#undef pr_fmt
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +
+> +static int __init tdx_module_setup(void)
+> +{
+> +	int ret;
+> +
+> +	ret = tdx_enable();
+> +	if (ret) {
+> +		pr_info("Failed to initialize TDX module.\n");
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +struct vmx_tdx_enabled {
+> +	cpumask_var_t vmx_enabled;
+> +	atomic_t err;
+> +};
+> +
+> +static void __init vmx_tdx_on(void *_vmx_tdx)
+> +{
+> +	struct vmx_tdx_enabled *vmx_tdx = _vmx_tdx;
+> +	int r;
+> +
+> +	r = vmx_hardware_enable();
+> +	if (!r) {
+> +		cpumask_set_cpu(smp_processor_id(), vmx_tdx->vmx_enabled);
+> +		r = tdx_cpu_enable();
+> +	}
+> +	if (r)
+> +		atomic_set(&vmx_tdx->err, r);
+> +}
+> +
+> +static void __init vmx_off(void *_vmx_enabled)
+> +{
+> +	cpumask_var_t *vmx_enabled = (cpumask_var_t *)_vmx_enabled;
+> +
+> +	if (cpumask_test_cpu(smp_processor_id(), *vmx_enabled))
+> +		vmx_hardware_disable();
+> +}
+> +
+> +int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+> +{
+> +	struct vmx_tdx_enabled vmx_tdx = {
+> +		.err = ATOMIC_INIT(0),
+> +	};
+> +	int r = 0;
+> +
+> +	if (!enable_ept) {
+> +		pr_warn("Cannot enable TDX with EPT disabled\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (!zalloc_cpumask_var(&vmx_tdx.vmx_enabled, GFP_KERNEL)) {
+> +		r = -ENOMEM;
+> +		goto out;
+> +	}
+> +
+> +	/* tdx_enable() in tdx_module_setup() requires cpus lock. */
+> +	cpus_read_lock();
+> +	on_each_cpu(vmx_tdx_on, &vmx_tdx, true);	/* TDX requires vmxon. */
+> +	r = atomic_read(&vmx_tdx.err);
+> +	if (!r)
+> +		r = tdx_module_setup();
+> +	else
+> +		r = -EIO;
+> +	on_each_cpu(vmx_off, &vmx_tdx.vmx_enabled, true);
+> +	cpus_read_unlock();
+> +	free_cpumask_var(vmx_tdx.vmx_enabled);
+> +
+> +out:
+> +	return r;
+> +}
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index c4e3ae971f94..86c8ee6954e5 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -18,6 +18,8 @@ bool kvm_is_vmx_supported(void);
+>   int __init vmx_init(void);
+>   void vmx_exit(void);
+>   
+> +__init int vmx_hardware_setup(void);
+> +
+>   extern struct kvm_x86_ops vt_x86_ops __initdata;
+>   extern struct kvm_x86_init_ops vt_init_ops __initdata;
+>   
+> @@ -133,4 +135,10 @@ void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu);
+>   #endif
+>   void vmx_setup_mce(struct kvm_vcpu *vcpu);
+>   
+> +#ifdef CONFIG_INTEL_TDX_HOST
+> +int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
+> +#else
+> +static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
+> +#endif
+> +
+>   #endif /* __KVM_X86_VMX_X86_OPS_H */
 
--- 
-Without deviation from the norm, progress is not possible.
 
