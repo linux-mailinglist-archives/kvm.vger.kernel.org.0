@@ -1,96 +1,158 @@
-Return-Path: <kvm+bounces-3747-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3749-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 045C18077DE
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 19:45:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9725807819
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 19:51:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6BD11F2123D
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 18:45:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DCA728219D
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 18:51:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B46236F;
-	Wed,  6 Dec 2023 18:45:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EAC54654A;
+	Wed,  6 Dec 2023 18:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PRJHfTZI"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QXlC+IZ2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5904D44
-	for <kvm@vger.kernel.org>; Wed,  6 Dec 2023 10:45:47 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso967a12.1
-        for <kvm@vger.kernel.org>; Wed, 06 Dec 2023 10:45:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701888346; x=1702493146; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=47YAkdkayM6J9ol4Fq0c4j+8eoetSWIWg4LqcP0jJzg=;
-        b=PRJHfTZIczZsZYAn34J6/q3HE7+nI0wRfZVSngzDQQijt8dyIqYZZL/Z6jbZ8H0+pU
-         keLGwGyOc2kolqAmjn9b3nYy3PSLA35KwLZjtR+MP0/rSlSvGWe+vZk8a7YLJztQwp61
-         Ias+OCUjaLTYJUWJnqnF1zb0R3LrYvPQ/JEvo0YyA4zHSZtYccGfhhIJUqlp3MDhnQKH
-         cLu5HDNs/CV18g8HEQKpcXX522lWs+sRAxXeDmcQZGiRi0MBGfB5dIX9akS3g+QGhU1U
-         1G/oD1VFmjDEjf3hVt+Wo5jmKBD27Ja1SpR2n+w9ORMRWqUN9JO8YNFfAE79f0eXnV6b
-         qLEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701888346; x=1702493146;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=47YAkdkayM6J9ol4Fq0c4j+8eoetSWIWg4LqcP0jJzg=;
-        b=knscryDsmHcXJWgJhAhSofcaL1j8ZPARlxWHwuFLOlldMAfaMM2yezSYNi30pqy9WL
-         nqbIZMsSG4ipQy/PMSFgoLokq5j8OW9uzZ6ytD0zdi6lUS2I/kcz7w6gZrrscK2gWxKq
-         nwtsRXQdKiGayJ/fMy36dLTeNhqj+EkdIXMRXwpM8RXY0ZmRyoXca6j8ejjl9dHCghga
-         gGqy80DAB/+YCBvgZS0sNUxHBSSQItYstuhyQtunMHLB9BRctFTHpBnAoDQDbdqyzjNS
-         gMy41qkUcMDrNU6vHWz6FS49PzO6C55zPARWh/3R03llakiK5CVbVnxM6XYEMGyFBKYG
-         f51w==
-X-Gm-Message-State: AOJu0YyBUfVXlLQ5T1nhRoUvF/IWs32vbs9S/rugzu08+h5TSeSvl62x
-	fbTwdsEYd2VfrxkZkiJdgO+GHXgjUrK1v0gFRasmiw==
-X-Google-Smtp-Source: AGHT+IGZOreuXPIcmrKjukLTpQoCpsI5n2yTrCleugNY8KzuTUesi1Ys8axBY3GggxFOEafw5nNhGSdq9pVMiyinY4Y=
-X-Received: by 2002:a50:d0cc:0:b0:54c:9996:7833 with SMTP id
- g12-20020a50d0cc000000b0054c99967833mr104496edf.7.1701888346145; Wed, 06 Dec
- 2023 10:45:46 -0800 (PST)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52B8610C6;
+	Wed,  6 Dec 2023 10:50:37 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UqxS5DbEH8sTIZ4p5Ma2s9Nk/3CJlrAfYRd/5CRuOZm2p8wFBViAoOKr3yBzZl3U8PV6BhKS1kxaWBC/fjDpi3zaoNlz6KYU92Hx5zucqVEjhsqw4SiYj3wtPZGRFmlsP94VU3ILgO1NdNgaW40agEnH2bw2CdYuuZ+9yPjR9JfV2Ph1AWak5viv38qQk+OiuGlXo3Vy+/EKEmQ3v7xhWzhbt04ethFTX/Ey6p61rUWX7kOJI8jGf848FHIXyqMQAhUS0EG90q/unZPv7m5li33eFpcgCESOjOjeuco0qvr566HVgUyPkARPxYuOTDwSxFRrND6gXtRt4w6SC+vxuQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SatkdO+hNE2tu2QrTSOMjkTks5OvAKaScLVkTEWvIKE=;
+ b=QV29APwhdfKzxspoAl+/P9bjBe07QjCY22NM8yq3AJePbEG/rXyROP4612Y/X4YpqyfZpypQWFNep+JTas6+U1OMWzNFxUJILZzVRj35ctS9vHAHet1/VdiuVz3Hao+IgR1B5GgbJTC+7UNV4VGZYAT9+C7vlJ7bGBV6xA9m4N9WDRo/38mv+viWVsSZRohdhEGZiD2NIwXECHCuDuuQKP3+HPmXrWtFL2BzwVvRbC1Z2saNa7cAmc2YA0/Nu1QSUgqy9HeYu+cfR+4wYWROwufghHrNgUlH3Vttcs8fuhWWcBpe9OUY9v2GccjXtvhqMBL+nMc1jMR+4NEF1XKNwA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SatkdO+hNE2tu2QrTSOMjkTks5OvAKaScLVkTEWvIKE=;
+ b=QXlC+IZ2Wvn5B3bDa5AOhbMDbZjvyL/gSvJdu9OItYTPtGCuffo8qFSuWtiSOvEzEUcNLJkhPrVRsCn5tZGPjLQ+Ww/C/l9suHVOrbtNxjnJSPuV1r22P3+AoiAUMucoWtJEFXi8wgwc6YxHO7lz3pNdNmhpuakjnep+Fp/lBXZ9EaLZ1TIXAjuiPRT5/2XM80Ui6fvErsyVGj5acOuIzHTAqZSz1hZDGv6C9AymWwLOKjLuO2leepuasLzZ7mFQMox6ns8enbOQ+ZXQeeMXF4e4ipjft9vyhxIFXoL+7F65/E7Y3EU+3PoxKHf0AZ+zSqpfUaCejtWyPfuPZsawaw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by PH7PR12MB9152.namprd12.prod.outlook.com (2603:10b6:510:2ec::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Wed, 6 Dec
+ 2023 18:50:33 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7046.034; Wed, 6 Dec 2023
+ 18:50:32 +0000
+Date: Wed, 6 Dec 2023 14:50:31 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Nicolin Chen <nicolinc@nvidia.com>
+Cc: Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org,
+	alex.williamson@redhat.com, kevin.tian@intel.com,
+	robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
+	eric.auger@redhat.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+	chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+	peterx@redhat.com, jasowang@redhat.com,
+	shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+	suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	zhenzhong.duan@intel.com, joao.m.martins@oracle.com,
+	xin.zeng@intel.com, yan.y.zhao@intel.com
+Subject: Re: [PATCH v6 1/6] iommu: Add cache_invalidate_user op
+Message-ID: <20231206185031.GB2692119@nvidia.com>
+References: <20231117130717.19875-1-yi.l.liu@intel.com>
+ <20231117130717.19875-2-yi.l.liu@intel.com>
+ <20231206183209.GZ2692119@nvidia.com>
+ <ZXDA1uUzvxmLf/o4@Asurada-Nvidia>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXDA1uUzvxmLf/o4@Asurada-Nvidia>
+X-ClientProxiedBy: MN2PR16CA0065.namprd16.prod.outlook.com
+ (2603:10b6:208:234::34) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231128125959.1810039-1-nikunj@amd.com> <20231128125959.1810039-13-nikunj@amd.com>
- <CAAH4kHYL9A4+F0cN1VT1EbaHACFjB6Crbsdzp3hwjz+GuK_CSg@mail.gmail.com> <dbffc58e-e720-42fc-8c8d-44cd3f0281e3@amd.com>
-In-Reply-To: <dbffc58e-e720-42fc-8c8d-44cd3f0281e3@amd.com>
-From: Dionna Amalie Glaze <dionnaglaze@google.com>
-Date: Wed, 6 Dec 2023 10:45:31 -0800
-Message-ID: <CAAH4kHZVdZtU3MGLTuuxMZyBF1xO=UzpdVhqSE6szCxMLkHFvQ@mail.gmail.com>
-Subject: Re: [PATCH v6 12/16] x86/sev: Prevent RDTSC/RDTSCP interception for
- Secure TSC enabled guests
-To: nikunj@amd.com
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org, 
-	kvm@vger.kernel.org, bp@alien8.de, mingo@redhat.com, tglx@linutronix.de, 
-	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com, 
-	pbonzini@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB9152:EE_
+X-MS-Office365-Filtering-Correlation-Id: d80301f4-1b72-4497-5df1-08dbf68c39b0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	XDgCs/KbTMuf4bWdjH3COZu/Jv1IW2MynqDWAF3KSVPC/2wtuSxl6MDlmfDBMmngTgGxLN99/eMCQM41/6ZYBZWoI9PXyfFuQb3i0whxCfrICtXo+re5a1OHJeAexdz1BfocdTSJpSwn4likAnNgCrjas4D25IHs2hdFqyxnPhR3uGrLDqrprnv0cAyfTJB4qtuGkK0tLKKS2XMjQ+j/IjKU7xwZfeMDijibcK4RD664GwXNLV+gFOLgQsjB/K4uQHlcg2gnnpZJeuIKNhAqCX78Z6mX9oJzrO/wnQoVBN7Ip1BAxGb8SDRBz5HjtKhTAtvr7E1w3psy0V6n6FKZ5Y5aqOH4PeXfZ0fC6ojlN0WVkIq641mMl+exDt0gXFnF6G/3fJy9yJcN0k7yKgAEoIWnWGw1xEtEOLgfSMYm0Ovj8B7Aev0EFET6BgTQbmu9tm5eAtdNotyK0sGPPs+rptXi5IKwrxPIlhx8aa9/K5yOrEmvGjX0Srd+mli3yNaX0f1JN0ZdqR7bxzFCQNpYOiCF23lsAmeOpjKUJRZ8yGY2vvYB9Drk5lTnqiKln8ba
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(376002)(136003)(396003)(346002)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(6512007)(6506007)(8936002)(2616005)(6486002)(26005)(1076003)(66556008)(4326008)(66476007)(8676002)(6862004)(66946007)(37006003)(6636002)(316002)(83380400001)(38100700002)(7416002)(33656002)(478600001)(36756003)(2906002)(5660300002)(41300700001)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?edxxcNqAi3vwqB5kKA2ONn01Huk9XHgjcV+QyuzFW21okKB8PE9QEpWZYWlS?=
+ =?us-ascii?Q?IcNGuPqNtpCQPiFjMIc2KhRPH4qKGb8GKxoAmr60P0Jcp79/MAz4CbogwZez?=
+ =?us-ascii?Q?diEQRXQsgAraMZydYvwkFSLXNQ9lgsZ6Yng6qOslLsxIKbkxU3bhQxN2l9Sa?=
+ =?us-ascii?Q?asKtP51esXLqxS3p3BJNCUHYeev4YZD9YgVDI9NAzO/YIriiIJkcCt9REU85?=
+ =?us-ascii?Q?qunTFMCQFF/ixdvcFHhy3/hySB8Z5Hq7xXsd5q+2G2OIf6ASt/BubzpjMAg5?=
+ =?us-ascii?Q?pXDXSUx4+RJGulLp84i3bQhPJrMydntbHYVaDXqChHxtg3zhabGR65MhaW+n?=
+ =?us-ascii?Q?wRDQpQSFLzVPFrvp7cYEupAIgGuwvpz8fgHifDJcJ+nsE0DVXptHO5dURxsA?=
+ =?us-ascii?Q?D3TcjXgBQhsYf+tjAie3KsPODDIyXfRpIT+PNZUdNzjB6iWcb9V0SwPksxev?=
+ =?us-ascii?Q?FUtae3c4ggiHn7R6SCHIVOFa0HwmU4lLYjs7prFze6alprC8BV1+0f/DAnLu?=
+ =?us-ascii?Q?w8eDvU0HS/EARt+ez5717lX9X+CMjXb5sc73aitso8M8Y4zbZyKA5MYFwXAS?=
+ =?us-ascii?Q?v9kA9lS1bLkz3VVZWZlkw3w/Tba0T8HN7i7Jxlg1SCdZFGwyy5e693YbLnTo?=
+ =?us-ascii?Q?RtEuf3jSy6Z6BDGNYIoI6hSAXF9ZPMYlrv779SdM2w4YTfunq2M8n5TnbMtH?=
+ =?us-ascii?Q?M1rfNnusagMKmZGFRqNGGhCrdZc/O5lw5HI4H+4zdCC9e/ExAYs2VyrivwwN?=
+ =?us-ascii?Q?93n9jr4MiRpt0go0+LwoTSbQa2LGy5uKolssbMwFbjvEiQ2l0LRcAvZD7ZbK?=
+ =?us-ascii?Q?8NfhXYZYd0Qo9de4wN0LLmStDasLe8SHJFw4uw1Y6j+c6E4DIZy9WIsMYxIn?=
+ =?us-ascii?Q?ClxHpjPr4oiuNFPSuVeO1qdDrgVob0DEUTahsOd21CNBtEqffwAKE12mXeq+?=
+ =?us-ascii?Q?pldpg6ToUEQo2H9fOVIoELvt4XZ1fJCjfgvWIBrwVUkdDx8+EIGZzot3Eh7I?=
+ =?us-ascii?Q?aTV+8EIeZoQeyA0HezWQ3aS/WuNlY78wNcXkjCvejwbKwpwt283DxE2KyZfh?=
+ =?us-ascii?Q?2HqlGIeIliHvgfiL/C60lOhR0hyCaByznO5SOKRozj3UtRGGHnpyGl44JSQ5?=
+ =?us-ascii?Q?MvRggO5G3fmB5wS9YlxcSnRBP1vTTG8nuLUIrexgTzMrF20pFDNbrX2XBrjt?=
+ =?us-ascii?Q?97+o4KdCuXbsgWBJy01A8enEx0iQjbVKt8e0IzrlC6Kk/UuOVU9lh13uXtyk?=
+ =?us-ascii?Q?H44Z87yDZdpjjIRFnl4JJyCw4s2cfgH2Bk2uE+QhiXUjfbuk3J70nWPm+n1J?=
+ =?us-ascii?Q?jhqPs9ymf9wiCf4Y3VZOJ86wZ/3rAoVNN+zsdPEUUKs9qG9STOO4IsQvBq9f?=
+ =?us-ascii?Q?m5DfuUxx1obriqT+WbEEwM7afjLFEewZ54JUxvd8gpEPYCFQNDS1nU6i0bjT?=
+ =?us-ascii?Q?1k/FfE1Qgj7V1bahRviOKV6h4/2ZrjGhSnRRBaTOTaz56JD7Hywc4Pb6zoWj?=
+ =?us-ascii?Q?kzwWcb5cdS6UKGJxYWZio5ZbEDHSoW+H8ZwZyuxbwD7FocHQoKdAV1Vl/4Yp?=
+ =?us-ascii?Q?vVwZHPNy8p2YopwNCRBOAz4ra9l4NgVFqCUs6aus?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d80301f4-1b72-4497-5df1-08dbf68c39b0
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2023 18:50:32.8174
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UGa0nsXNt3+vEf/j0jgUo0t92/J4UDPsDlmgzeUozc/DGyQA+2Y3+Brwq55GZHYW
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9152
 
-> >> +       if (sev_status & MSR_AMD64_SNP_SECURE_TSC)
-> >> +               return ES_VMM_ERROR;
-> >
-> > Is this not a cc_platform_has situation? I don't recall how the
-> > conversation shook out for TDX's forcing X86_FEATURE_TSC_RELIABLE
-> > versus having a cc_attr_secure_tsc
->
-> For SNP, SecureTSC is an opt-in feature. AFAIU, for TDX the feature is
-> turned on by default. So SNP guests need to check if the VMM has enabled
-> the feature before moving forward with SecureTSC initializations.
->
-> The idea was to have some generic name instead of AMD specific SecureTSC
-> (cc_attr_secure_tsc), and I had sought comments from Kirill [1]. After
-> that discussion I have added a synthetic flag for Secure TSC[2].
->
+On Wed, Dec 06, 2023 at 10:43:34AM -0800, Nicolin Chen wrote:
+> On Wed, Dec 06, 2023 at 02:32:09PM -0400, Jason Gunthorpe wrote:
+> > On Fri, Nov 17, 2023 at 05:07:12AM -0800, Yi Liu wrote:
+>  
+> > > @@ -465,6 +492,9 @@ struct iommu_domain_ops {
+> > >  			      size_t size);
+> > >  	void (*iotlb_sync)(struct iommu_domain *domain,
+> > >  			   struct iommu_iotlb_gather *iotlb_gather);
+> > > +	int (*cache_invalidate_user)(struct iommu_domain *domain,
+> > > +				     struct iommu_user_data_array *array,
+> > > +				     u32 *error_code);
+> > 
+> > Regarding the other conversation I worry a u32 error_code is too small.
+> > 
+> > Unfortunately there is no obvious place to put something better so if
+> > we reach it we will have to add more error_code space via normal
+> > extension.
+> > 
+> > Maybe expand this to u64? That is 64 bits of error register data and
+> > the consumer index. It should do for SMMUv3 at least?
+> 
+> I think Yi is moving the error_code to the entry data structure,
+> where we can even define a list of error_codes as a driver data
+> needs. So, I assume this u32 pointer would be gone too.
 
-So with regards to [2], this sev_status flag check should be
-cpu_has_feature(X86_FEATURE_SNP_SECURE_TSC)? I'm not sure if that's
-available in early boot where this code is used, so if it isn't,
-probably that's worth a comment.
+Oh, lets see that then..
 
--- 
--Dionna Glaze, PhD (she/her)
+Jason
 
