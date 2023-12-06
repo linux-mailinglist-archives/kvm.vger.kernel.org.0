@@ -1,118 +1,95 @@
-Return-Path: <kvm+bounces-3694-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3695-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C47D807110
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 14:44:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1E8980711B
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 14:47:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 264F81C20C5D
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 13:44:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 566831F2125E
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 13:47:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194AF3A8D9;
-	Wed,  6 Dec 2023 13:43:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC39D3A8EB;
+	Wed,  6 Dec 2023 13:46:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U8Xo+D1D"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XHF5OnZ+"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD975C7
-	for <kvm@vger.kernel.org>; Wed,  6 Dec 2023 05:43:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701870233;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cGbNWein5+1xHR10S1uc1ylcdJmgisND/IaKWA1UWts=;
-	b=U8Xo+D1DMdnqNguHr4SCsSKwh4P+KonC6cjmconVFwlb6n2St3ttTfyFoZ20NTfyDGPy1l
-	CD2/c4fFLi+sG3abXuzBwI8W60UsXGqdVntLZC2M7xg7//X513glijM1TvJ5Ws+YgdohQx
-	eGYxF/MPuj237JyxxGvKXZ89bLFzcz8=
-Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
- [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-336-sEn03FmjOcCHLHfVoWbjkg-1; Wed, 06 Dec 2023 08:43:52 -0500
-X-MC-Unique: sEn03FmjOcCHLHfVoWbjkg-1
-Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-7c41e0d3de3so1829955241.2
-        for <kvm@vger.kernel.org>; Wed, 06 Dec 2023 05:43:52 -0800 (PST)
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A71F6C7
+	for <kvm@vger.kernel.org>; Wed,  6 Dec 2023 05:46:52 -0800 (PST)
+Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-50bf32c0140so4462343e87.1
+        for <kvm@vger.kernel.org>; Wed, 06 Dec 2023 05:46:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1701870411; x=1702475211; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cx5g+5SMQxcicok5kYvCUK6eBKquWgCzB86sfFem4PI=;
+        b=XHF5OnZ+sP9TONNa4B4M8V4wwS3S5xh/cM2K6DpM+xYlhyL9f+HFKUrB/zJm+kW4uk
+         LMZFb/3NHkA1tg/38CPQOjhPqZQywwuXIYmdkTNLbOr+/K3TglSW27S9mt7d8p5dw+g5
+         gAv00fuX1zou/WVdQvI6kdHCWpcrl5rLzed9KY8MFaB17stWfB6zMYdNXknpYL5tajfw
+         r9aJvlJq726XByUh2+UWkTEmPDZU185MFcUfUHFaEY6oxT4W2Y3dmt57iOwC+zwVkkmE
+         Rp76K9s1LauUx/+Iz1QZT0rMjGZjvPY4qlrtL4wEJvsCUtf7HliXdA1vvuFwrc8qAiOE
+         D38g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701870232; x=1702475032;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cGbNWein5+1xHR10S1uc1ylcdJmgisND/IaKWA1UWts=;
-        b=hlJvaP1aeZXo2QyIXs9PKmDCMJJwElxaA8sqDfmV9iiaSSuzph1LILH0L+wqQ3IQn4
-         3Ksnd1ok80EISuJMxRz/rQdHY0HjWglXikdrWP148RE/rp64YQM++nzuxLDyb1FRxKba
-         LuW9fAZt8L0raX5hhCWnnY+3FJys21RkiOWs2jEk0IoiyDmWpxoe8mSCqPClWIzInISj
-         XW9M8M45T+jhmdVML2RDjeN820L2KoMSRXEbx/M6xTlYTxBIZoz93VjFo43nQtlT9XOi
-         ZnmFkSRy+y4+6ZlZzkET78vMmIhlWMGz/VtKl9BOaKVu5z3qM9+fAjLqEzRri3jkJyKq
-         MvJA==
-X-Gm-Message-State: AOJu0Yz1G+16kXItd401912o/pKgBW2Zvrp5+hFPmdQlH07gexkfmJGm
-	5YnvUj6Hu3n+99JyZelAXFkr3nof5t2HfanxmH4E/BXnFXPYGiKJ9uIXf0y7DLHJlpwLBr+f6Et
-	yK1MEuuhM+fc6hkYhO854aSPrTr6D
-X-Received: by 2002:a05:6122:4e26:b0:4b2:c554:ef03 with SMTP id ge38-20020a0561224e2600b004b2c554ef03mr940412vkb.21.1701870232153;
-        Wed, 06 Dec 2023 05:43:52 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGYw/IwMhZjw8QhOHqgPBLvQOT8KiowIQ+XS74Wf/xU6c5/sE8vHDL7fpQ0FUEh8TQE+7xHAguLn5NGS3q/sJ8=
-X-Received: by 2002:a05:6122:4e26:b0:4b2:c554:ef03 with SMTP id
- ge38-20020a0561224e2600b004b2c554ef03mr940401vkb.21.1701870231925; Wed, 06
- Dec 2023 05:43:51 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701870411; x=1702475211;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Cx5g+5SMQxcicok5kYvCUK6eBKquWgCzB86sfFem4PI=;
+        b=WngeW2zs4+is7yS4dhnT9ICvXQ9BHXZ5531TalF51Zzm5qILcXX+iIlvCKIpluG0JL
+         8gnYjW0UT7YgE3YCFKaWgz3gShR9WJefGV1zK2bBqbYXc94EgLQMa+9AQMcGazRT1o99
+         fwstG+VG1IZ0D4cM3JbtBTMskv5WbRIpIbMcj+zeOrkyDg7E4TkELuwE60VQSDM7OepJ
+         GhPwuSCrGnNSwwbdz6inqfOEFpgHs1nlMGcqTpn5b32fltB6VtlhL0sPVL9s4Nk73QbC
+         bYJzWtXyC4Ozxg3maIwIXsGiowg71kRdJjhJwvj5YQeNW2q7jPXe405pRLd1fw8rxpEa
+         Y0HA==
+X-Gm-Message-State: AOJu0YylDbgFWdZD2u1jtdCf3xdIy7fbRVox5fqeJMNd8CS+Q+1616+L
+	qY/PocIi2rMrmcaWFiF4IcIzSVCQBkG+DBsNLEYJiQ==
+X-Google-Smtp-Source: AGHT+IFDPczFKh5GMvs5SBPQNG9ZyK/pZsKfhVA9gUmBbF0dGQ7YqvGAQFTEpGYilkKRMT/TRZA9w5RZm2ZVFqdXvnc=
+X-Received: by 2002:a05:6512:e97:b0:50c:17d6:fff6 with SMTP id
+ bi23-20020a0565120e9700b0050c17d6fff6mr314987lfb.1.1701870410783; Wed, 06 Dec
+ 2023 05:46:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231205222816.1152720-1-michael.roth@amd.com>
- <4e78f214-43ee-4c3a-ba49-d3b54aff8737@linaro.org> <20231206131248.q2yfrrfpfga7zfie@amd.com>
-In-Reply-To: <20231206131248.q2yfrrfpfga7zfie@amd.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 6 Dec 2023 14:43:39 +0100
-Message-ID: <CABgObfYbBbjXVR6YXBwt9v6Nmy-DNrCm4+kAEmWUJ-wMjjD09A@mail.gmail.com>
-Subject: Re: [PATCH v2 for-8.2?] i386/sev: Avoid SEV-ES crash due to missing
- MSR_EFER_LMA bit
-To: Michael Roth <michael.roth@amd.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	qemu-devel@nongnu.org, Marcelo Tosatti <mtosatti@redhat.com>, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Akihiko Odaki <akihiko.odaki@daynix.com>, kvm@vger.kernel.org, 
-	Lara Lazier <laramglazier@gmail.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>
+References: <20231206005727.46150-1-zhangfei.gao@linaro.org> <20231206095717.GA2643771@myrica>
+In-Reply-To: <20231206095717.GA2643771@myrica>
+From: Zhangfei Gao <zhangfei.gao@linaro.org>
+Date: Wed, 6 Dec 2023 21:46:39 +0800
+Message-ID: <CABQgh9E5GH4xm=+doz=FO+yJuFa0w5f6D2hovj0kUhgkr_sr0w@mail.gmail.com>
+Subject: Re: [PATCH] iommu/arm-smmu-v3: disable stall for quiet_cd
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>, 
+	iommu@lists.linux.dev, kvm@vger.kernel.org, 
+	Wenkai Lin <linwenkai6@hisilicon.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 6, 2023 at 2:13=E2=80=AFPM Michael Roth <michael.roth@amd.com> =
-wrote:
-> > This 'Fixes:' tag is misleading, since as you mentioned this commit
-> > only exposes the issue.
+On Wed, 6 Dec 2023 at 17:57, Jean-Philippe Brucker
+<jean-philippe@linaro.org> wrote:
 >
-> That's true, a "Workaround-for: " tag or something like that might be mor=
-e
-> appropriate. I just wanted to make it clear that SEV-ES support is no lon=
-ger
-> working with that patch applied, so I used Fixes: and elaborated on the
-> commit message. I can change it if there's a better way to convey this
-> though.
-
-That's fine, Fixes is also for automated checks, like "if you have
-this commit you also want this one".
-
+> On Wed, Dec 06, 2023 at 08:57:27AM +0800, Zhangfei Gao wrote:
+> > From: Wenkai Lin <linwenkai6@hisilicon.com>
 > >
-> > Commit d499f196fe ("target/i386: Added consistency checks for EFER")
-> > or around it seems more appropriate.
+> > In the stall model, invalid transactions were expected to be
+> > stalled and aborted by the IOPF handler.
+> >
+> > However, when killing a test case with a huge amount of data, the
+> > accelerator streamline can not stop until all data is consumed
+> > even if the page fault handler reports errors. As a result, the
+> > kill may take a long time, about 10 seconds with numerous iopf
+> > interrupts.
+> >
+> > So disable stall for quiet_cd in the non-force stall model, since
+> > force stall model (STALL_MODEL==0b10) requires CD.S must be 1.
+> >
+> > Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
+> > Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
+> > Suggested-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 >
-> Those checks seem to be more for TCG.
+> Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
-Yes, that's 100% TCG code.
-
-> The actual bug is in the host
-> kernel, and it seems to have been there basically since the original
-> SEV-ES host support went in in 2020. I've also sent a patch to address
-> this in KVM:
->
->   https://lore.kernel.org/lkml/20231205234956.1156210-1-michael.roth@amd.=
-com/T/#u
-
-Thanks, looking at it.
-
-Paolo
-
+Thanks Jean.
 
