@@ -1,143 +1,147 @@
-Return-Path: <kvm+bounces-3745-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3746-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 023ED8077BD
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 19:42:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA11F8077CE
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 19:44:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B233E2821FF
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 18:42:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D812B20F7C
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 18:44:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A973FE3E;
-	Wed,  6 Dec 2023 18:42:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67E62E62B;
+	Wed,  6 Dec 2023 18:44:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="AAV+fcuh"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lbt/gkRh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20C13D67;
-	Wed,  6 Dec 2023 10:42:40 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 32B6710008B;
-	Wed,  6 Dec 2023 21:42:37 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 32B6710008B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1701888157;
-	bh=PAf3gWYNr1X6Etoo5fn0Vczq30SXtQKZGFNGORjRGC8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=AAV+fcuhHm0Evps55dof7IXXSARFQOz4XCrLKyDmqV/MHnMv+FBbH20vGfXDcx+DZ
-	 vVGUzbH1+BI16V3d8jpitWxYN/JE+rvI2+PlqHJPY0b4tw+oYpbcIJnp3fZiFDoNCH
-	 0BZoEqwFlLTZ36xUwhqX2A32xzhPAhMJ0kbFG+TXn53QKR6RncJ62fnvp9u+kYYrOj
-	 ZeksIl0PPQx2XYMQjx3O2yejtKDzcx7/UF1Z5nHc3pXOCrXUr+KMU/Jj3hyKvZ0EZM
-	 7TgUzpJ4nNNEx810vz6MtHB701dA/QCLJRiMBLOK8zwezjeAk0e7Rr1qAVJvFJ6D+a
-	 2fQBHpWr1thXA==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Wed,  6 Dec 2023 21:42:36 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Wed, 6 Dec 2023 21:42:36 +0300
-Message-ID: <44c8b8dd-24e4-24c9-c7f9-3d7db892095d@salutedevices.com>
-Date: Wed, 6 Dec 2023 21:34:27 +0300
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2059.outbound.protection.outlook.com [40.107.96.59])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C3C7D40;
+	Wed,  6 Dec 2023 10:43:56 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=faWeVgvY4frH0iUqBBNHwh398+0kfEX9QsUIHXtkGYzFg6t6L/ii9fdmamxHhZzij7buLoyAVfVihg9v66OFln3RlEJ5/8MUlzthGKRCioeeTuSVc5n3ycXHCO8ppNmoJ7YVIrxb6Inky9skWdzip0sNNVqJ2YPDKlweII+EKYBiIzWblIwcxwWp/2HBNl3zOepRxktFqtPkQBOwyjWkClLq1VeQ6brgTtLefd58wrNAiVwgnSmLl4mpaQXRFZeNH4rMVGAG/6B5f/vihjvt7G+TPeQq+mhyHvxX9y13VdD+T6Bwr7xVkd9PA2xhE/ad/JQE0xUuTqjn6Uuqfaf5nQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xNBRVZTpqs5BJWVrHkRWGJNgbQ61ipFJNMOg8ju3HTE=;
+ b=laa4SqfjGBRMvCuuyCqJZkdWZimoiA0onaH0ZxTZqph1FcDXR/qoj95HevyL3NPRrVR7ChYtiGJBr5lkF95+sHzQYTYAjlvG0gVX0WXnPHacsc6WDKhTx/wfku+lsuS6oGHi+IgfeogNajwAD0k7ae2OTvcSUOSGDTfmgDEwUs4ahJU4Bn1qGY5mlo9oqqSvqKsU74KYBzknlMYUBiLVhtJ0AUyf622qo7Ui+180k8RU1gB1WlAT2oSPrINqsRg9/NE4D1ANqx1jkUFPgUFQne32zsXi7pmEt+gNdTORqrKPjFADmtxDruJwIXMFVK4dFBkkJSczOqNYZxNI5xVhnw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=oracle.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xNBRVZTpqs5BJWVrHkRWGJNgbQ61ipFJNMOg8ju3HTE=;
+ b=lbt/gkRhrzrsqdaGRpBB6hh68Sjmj+0BdLugnxQYzXr9d5PegP7RE8g3oxrI1eELwHiTLs9jLvQoPHKBbOKk6wJpdMmQxyqDSHdl6vGbsgayFkgAFD+NnRd/IzCOiq9CVmNamnPVu8Nm8VOrelwfpzMs8aNqEnpMfbqQ4A+3aQ6pyTU9jbtBTgcZUIebQ6RaWXRsZe/lfaJhwMawKY4CnBpLdFPMGeHrNTbCFr/ZbM+UDjLYEYIGT2WWFZd2oySSmGv0zeu1f0tTpJ713wGCLvucWsFHfKn8fdpRpMNhB64t5mNf9YTfl1HSM55P5zWcac91VPis0UZauv+Di5YQhg==
+Received: from CH5P220CA0008.NAMP220.PROD.OUTLOOK.COM (2603:10b6:610:1ef::12)
+ by PH7PR12MB6906.namprd12.prod.outlook.com (2603:10b6:510:1b8::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Wed, 6 Dec
+ 2023 18:43:53 +0000
+Received: from DS2PEPF00003441.namprd04.prod.outlook.com
+ (2603:10b6:610:1ef:cafe::73) by CH5P220CA0008.outlook.office365.com
+ (2603:10b6:610:1ef::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.25 via Frontend
+ Transport; Wed, 6 Dec 2023 18:43:53 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ DS2PEPF00003441.mail.protection.outlook.com (10.167.17.68) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7068.20 via Frontend Transport; Wed, 6 Dec 2023 18:43:53 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 6 Dec 2023
+ 10:43:38 -0800
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 6 Dec 2023
+ 10:43:38 -0800
+Received: from Asurada-Nvidia (10.127.8.11) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41 via Frontend
+ Transport; Wed, 6 Dec 2023 10:43:35 -0800
+Date: Wed, 6 Dec 2023 10:43:34 -0800
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Yi Liu <yi.l.liu@intel.com>, <joro@8bytes.org>,
+	<alex.williamson@redhat.com>, <kevin.tian@intel.com>, <robin.murphy@arm.com>,
+	<baolu.lu@linux.intel.com>, <cohuck@redhat.com>, <eric.auger@redhat.com>,
+	<kvm@vger.kernel.org>, <mjrosato@linux.ibm.com>,
+	<chao.p.peng@linux.intel.com>, <yi.y.sun@linux.intel.com>,
+	<peterx@redhat.com>, <jasowang@redhat.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
+	<suravee.suthikulpanit@amd.com>, <iommu@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<zhenzhong.duan@intel.com>, <joao.m.martins@oracle.com>,
+	<xin.zeng@intel.com>, <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v6 1/6] iommu: Add cache_invalidate_user op
+Message-ID: <ZXDA1uUzvxmLf/o4@Asurada-Nvidia>
+References: <20231117130717.19875-1-yi.l.liu@intel.com>
+ <20231117130717.19875-2-yi.l.liu@intel.com>
+ <20231206183209.GZ2692119@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net] vsock/virtio: fix "comparison of distinct pointer
- types lacks a cast" warning
-Content-Language: en-US
-To: Stefano Garzarella <sgarzare@redhat.com>, <netdev@vger.kernel.org>
-CC: Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	<virtualization@lists.linux.dev>, "Michael S. Tsirkin" <mst@redhat.com>,
-	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Stefan Hajnoczi
-	<stefanha@redhat.com>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>
-References: <20231206164143.281107-1-sgarzare@redhat.com>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <20231206164143.281107-1-sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 181917 [Dec 06 2023]
-X-KSMG-AntiSpam-Version: 6.0.0.2
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 5 0.3.5 98d108ddd984cca1d7e65e595eac546a62b0144b, {Tracking_from_domain_doesnt_match_to}, p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/12/06 17:41:00 #22621737
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231206183209.GZ2692119@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS2PEPF00003441:EE_|PH7PR12MB6906:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9589f116-762a-48f4-8ae2-08dbf68b4bb2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	0LYVTZKJZz5eh3kE8tbA8M3XX52dGX3ra6x0XKKydWzNe2lIz/E886e8/l8QvPyPraLQ/9SjJYDjVB8oFpRmrbL3R4pMyvxlGEO39W9e4lDCm4zUyUKcMulcrnW4L4N/g8EoU5HXdNexctpIxIUmRfVdtNwMs5eMJCkldgL4uRBO+bY9JXvd94GWFMLmn7XSvvSMJCp6sQ8SgdkwFAuOhBA3Z122KSuzhXQ/7WUwuDU++Cv48080AZPNYeoYGwyzfizXji7UFhR4mrqNP1VozeNGNhv0/yWmt1BKlg6z/PoUW3n0f1LaRWkDH4xwarH31GOrAJQgDHc9yAhqsUEbPii6YhFMigIJB8k6CkWx3arJg4YiBSzsMfsgLZpkJaOiSqQmn9PGR+Kzq276c0DSNMc1fjP3jU8tFejV+VUndKTCqmu8W4HbzUxYhQg3Kc+NY8Q+6UmGm9R7BU6GuOL7luFxt9rdcL4OrVkLR/qr4U3zUOgi4dvmyJN1BfuaNDGx7nUCYeud9vXDHQgCDp9vVCDe20YCR3KYC536eaPj7ZOFD7EazQPNmmtiAnMiJLyr1B8roirXqCpeR6Jd0BwEpsG/XdObKusTcV0L4KRyyws1eNwF0l4XhOcTqpLfVTqbrUsrzXfRgz5Gsm8ogRLLrNdOelcC6oZyo2ht0L2/wU9CZHnzd9Kww0ua60B/fIBAa+Al7ACU7gXQhC0Let70PQAstN1DCNgJz9jN6g/c5vfxuxASmhTfqJYJqVlKCL9y
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(346002)(396003)(376002)(39860400002)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(82310400011)(36840700001)(46966006)(40470700004)(40460700003)(426003)(83380400001)(478600001)(9686003)(26005)(336012)(316002)(7636003)(6862004)(54906003)(6636002)(55016003)(86362001)(41300700001)(8936002)(70586007)(70206006)(8676002)(4326008)(36860700001)(40480700001)(7416002)(4744005)(2906002)(5660300002)(356005)(82740400003)(47076005)(33716001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2023 18:43:53.2373
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9589f116-762a-48f4-8ae2-08dbf68b4bb2
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS2PEPF00003441.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6906
 
-
-
-On 06.12.2023 19:41, Stefano Garzarella wrote:
-> After backporting commit 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY
-> flag support") in CentOS Stream 9, CI reported the following error:
+On Wed, Dec 06, 2023 at 02:32:09PM -0400, Jason Gunthorpe wrote:
+> On Fri, Nov 17, 2023 at 05:07:12AM -0800, Yi Liu wrote:
+ 
+> > @@ -465,6 +492,9 @@ struct iommu_domain_ops {
+> >  			      size_t size);
+> >  	void (*iotlb_sync)(struct iommu_domain *domain,
+> >  			   struct iommu_iotlb_gather *iotlb_gather);
+> > +	int (*cache_invalidate_user)(struct iommu_domain *domain,
+> > +				     struct iommu_user_data_array *array,
+> > +				     u32 *error_code);
 > 
->     In file included from ./include/linux/kernel.h:17,
->                      from ./include/linux/list.h:9,
->                      from ./include/linux/preempt.h:11,
->                      from ./include/linux/spinlock.h:56,
->                      from net/vmw_vsock/virtio_transport_common.c:9:
->     net/vmw_vsock/virtio_transport_common.c: In function ‘virtio_transport_can_zcopy‘:
->     ./include/linux/minmax.h:20:35: error: comparison of distinct pointer types lacks a cast [-Werror]
->        20 |         (!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
->           |                                   ^~
->     ./include/linux/minmax.h:26:18: note: in expansion of macro ‘__typecheck‘
->        26 |                 (__typecheck(x, y) && __no_side_effects(x, y))
->           |                  ^~~~~~~~~~~
->     ./include/linux/minmax.h:36:31: note: in expansion of macro ‘__safe_cmp‘
->        36 |         __builtin_choose_expr(__safe_cmp(x, y), \
->           |                               ^~~~~~~~~~
->     ./include/linux/minmax.h:45:25: note: in expansion of macro ‘__careful_cmp‘
->        45 | #define min(x, y)       __careful_cmp(x, y, <)
->           |                         ^~~~~~~~~~~~~
->     net/vmw_vsock/virtio_transport_common.c:63:37: note: in expansion of macro ‘min‘
->        63 |                 int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
+> Regarding the other conversation I worry a u32 error_code is too small.
 > 
-> We could solve it by using min_t(), but this operation seems entirely
-> unnecessary, because we also pass MAX_SKB_FRAGS to iov_iter_npages(),
-> which performs almost the same check, returning at most MAX_SKB_FRAGS
-> elements. So, let's eliminate this unnecessary comparison.
+> Unfortunately there is no obvious place to put something better so if
+> we reach it we will have to add more error_code space via normal
+> extension.
 > 
-> Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
-> Cc: avkrasnov@salutedevices.com
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
+> Maybe expand this to u64? That is 64 bits of error register data and
+> the consumer index. It should do for SMMUv3 at least?
 
-Reviewed-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+I think Yi is moving the error_code to the entry data structure,
+where we can even define a list of error_codes as a driver data
+needs. So, I assume this u32 pointer would be gone too.
 
->  net/vmw_vsock/virtio_transport_common.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index f6dc896bf44c..c8e162c9d1df 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -59,8 +59,7 @@ static bool virtio_transport_can_zcopy(const struct virtio_transport *t_ops,
->  	t_ops = virtio_transport_get_ops(info->vsk);
->  
->  	if (t_ops->can_msgzerocopy) {
-> -		int pages_in_iov = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
-> -		int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
-> +		int pages_to_send = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
->  
->  		/* +1 is for packet header. */
->  		return t_ops->can_msgzerocopy(pages_to_send + 1);
+Thanks
+Nicolin
 
