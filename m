@@ -1,69 +1,103 @@
-Return-Path: <kvm+bounces-3659-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3660-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C403806647
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 05:37:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B6FC80665C
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 05:43:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BA52B2130E
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 04:37:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1428C1F21807
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 04:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3428F10973;
-	Wed,  6 Dec 2023 04:37:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9AFCA64;
+	Wed,  6 Dec 2023 04:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="5Rux5oqe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Wbouh+jz"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2058.outbound.protection.outlook.com [40.107.93.58])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58A3618D;
-	Tue,  5 Dec 2023 20:37:28 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D7BD1BC;
+	Tue,  5 Dec 2023 20:43:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701837787; x=1733373787;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=7TjjfuIrDxHvq3J1LuDKkwzJWHZempJkLsUwdcaQSn8=;
+  b=Wbouh+jzsCI405/kjjiEDQ5nXEIpPvqapvW6sxnJCnoB4SRWeoQ0Up0B
+   QGj/Zi5pvliwfCXaCiix7+8cShZVWpRns3hVqlaqwG3YtTiW66ofH+uHe
+   Vq0Nly+iVtkwTNVO0UEh0OY6xakIyr/V11NMuUXz4+V3kjqMSX+HY2jJB
+   NLfOcufAEaeJDw9OpRpgLEy2WHVNahK7ECrNJ6tt2rhcyOssJRNZbXrij
+   2gbHP4BnAm0lYmh/87B2H/erezC/QoVm3hmRwesPHudqYsO4CVudaNUj3
+   utVr9R0Omry45bMyGH9EsOrosisHoOk4kaTOKnMlK7hZto+ZglFd0QGq6
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="1099596"
+X-IronPort-AV: E=Sophos;i="6.04,254,1695711600"; 
+   d="scan'208";a="1099596"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 20:43:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="1018449133"
+X-IronPort-AV: E=Sophos;i="6.04,254,1695711600"; 
+   d="scan'208";a="1018449133"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Dec 2023 20:43:06 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 5 Dec 2023 20:43:06 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 5 Dec 2023 20:43:06 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 5 Dec 2023 20:43:06 -0800
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 5 Dec 2023 20:43:05 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CUXdciVUVW15MLpejlUvQyLR0G8bSOFRlzHhVZe3DG2fyikqWhvsunzQXNBbqdGFEc/qisZe5oDmwi55DDl9M9GFY/8QjbnGpsd9lSQWcnN3fWDOKYwBdprCTfxF8Qx5GpxQGul06zDTlqY88dC+JhReQnWoTDGKqOPGsuyoleOZ4unIl8FYHyYRTI5plMZqf1Pewy2+S/7R0ASJFuM490Lc+REGPorfmBwzMb5jKa1xXMGTgXN+RRDBBoY0D9bQyEUBVuPATMoXT8R8xETOSz9kB60kCFVrj59aXUmm3TsRrMzEisPS4mxB8+iH1YqGRfbRSwz8TToulFx8cMKEHg==
+ b=HrzLhluz+eCvaiC2vIadMqNnw0TTHz8aKNon4wzSr088cecGtnBxc8cGhH4dNBTWkXcAIq10JH19TUSnh9cdfcXkx25NXExxlbSbzsoTpNy20/Kzvs8DqkE3T86X8wN53Tz6UogZmMKaN53Jna9hevMf632nWTFOWMUVx788Ucw6Wn+lnXeUwTAnBSpoeENURxvgZDc6BRJU4wmJwg+U0ECDMXO4vvNUU8i4ZMH+09nWMr0lKAjrutt75+nwLhWamZvuPdzIZXjURStVIpl7agTDk2icbY54xktsWULIcQ3/aplEsv0fk1LVUae/1DzQSlpmF4Y/atlJkh1XP3V/gQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W5JsrJxlqcx3qFQQ8C1R/jSc4CjoHmd3m65qg7S2nyQ=;
- b=bqDKX9zwDzKUwHO32GGuStEKh4rKVC0dvIdDXFRoCIOjmRx5V10zf2Oey97V7PS8ikWG1DaMkue9N22UqxjZtMWPcLBko8tOdYgQQrNmtc6LglMd076292rD+RcBR0ef0dq06kO8KVUz8BJ3lAs+qx30o7ZM0qx7BALqkURe4PIir0hj5qTVY5zqEErFAPHYl2YTDqImTLHGNBqYpDcKTamz7wU6G0uByeCb/TuC69NZvYgNTeEbjceJRKSqQf1DMWLq2Pul57bFyjqRiT8B5tNBCcfW1cwu0kgDnU/eH+s2wX3YFIVBMjtL+/ZKqTF2wDtwTpIZcyFQ5RHPVgMVrg==
+ bh=JtWYyjCJm1YqZ3/CgwUPLl2TR3yRSgXfXpO46vDoXyA=;
+ b=kcmJqu4sj+HP3DWAXbKj+U1B/ZZeA4xExWweC79lfAVpWM7Pi6TKUE2HGX5BXwO34WwccwrO+UVAx7TpvYeOk+gm30c5ItLxhLhc9bWGSEjxtB+M9c7IJ8GfqQQO3yWXYg4xxkmxn1aa3dxedElV3Al27G1WIVEsOd7caLEozTyPFKJ5bVx3RR3W/smMFZC0FYoOxsZszOEY8fYXrmbXdtvz4JWk/lpgFLb+Qf01MwRDPt4BdFyIyhBjkEvt81dnkUoLMhJt5+MIhP0THGC/yILelj1umwhX4CMi6fq6URnymCOz/h9xh0VNWnjZP8TwIvYqQS4IJfS5N88lBFd5sw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=W5JsrJxlqcx3qFQQ8C1R/jSc4CjoHmd3m65qg7S2nyQ=;
- b=5Rux5oqeku+wb8LSQyy2UR6hze75BTQpRZjXyzPj7Iy2YQXpPb7CP0i021oPX8FhLpOTNc/zMKCDgcTCifjcWh5RAVT7cFP64BxaUrxWEpkWoMg4DjHpMhqEvCABjQQw0ud+/+3IHOcAnq0qgCkefdi9tn0SF4qZPF1JW+FeCiA=
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
- DS0PR12MB6536.namprd12.prod.outlook.com (2603:10b6:8:d3::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7046.34; Wed, 6 Dec 2023 04:37:25 +0000
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::d320:6e6c:d4c4:7fda]) by DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::d320:6e6c:d4c4:7fda%3]) with mapi id 15.20.7046.034; Wed, 6 Dec 2023
- 04:37:25 +0000
-Message-ID: <dbffc58e-e720-42fc-8c8d-44cd3f0281e3@amd.com>
-Date: Wed, 6 Dec 2023 10:07:14 +0530
-User-Agent: Mozilla Thunderbird
-Reply-To: nikunj@amd.com
-Subject: Re: [PATCH v6 12/16] x86/sev: Prevent RDTSC/RDTSCP interception for
- Secure TSC enabled guests
-Content-Language: en-US
-To: Dionna Amalie Glaze <dionnaglaze@google.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
- kvm@vger.kernel.org, bp@alien8.de, mingo@redhat.com, tglx@linutronix.de,
- dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
- pbonzini@redhat.com
-References: <20231128125959.1810039-1-nikunj@amd.com>
- <20231128125959.1810039-13-nikunj@amd.com>
- <CAAH4kHYL9A4+F0cN1VT1EbaHACFjB6Crbsdzp3hwjz+GuK_CSg@mail.gmail.com>
-From: "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <CAAH4kHYL9A4+F0cN1VT1EbaHACFjB6Crbsdzp3hwjz+GuK_CSg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PN3PR01CA0118.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:96::19) To DS7PR12MB6309.namprd12.prod.outlook.com
- (2603:10b6:8:96::19)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by MN6PR11MB8218.namprd11.prod.outlook.com (2603:10b6:208:47c::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Wed, 6 Dec
+ 2023 04:43:03 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6362:763e:f84b:4169]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6362:763e:f84b:4169%5]) with mapi id 15.20.7068.025; Wed, 6 Dec 2023
+ 04:43:03 +0000
+Date: Tue, 5 Dec 2023 20:43:00 -0800
+From: Dan Williams <dan.j.williams@intel.com>
+To: Samuel Ortiz <sameo@rivosinc.com>, Alexey Kardashevskiy <aik@amd.com>
+CC: <linux-coco@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-pci@vger.kernel.org>
+Subject: Re: TDISP enablement
+Message-ID: <656ffbd4e2a39_4568a294c5@dwillia2-xfh.jf.intel.com.notmuch>
+References: <e05eafd8-04b3-4953-8bca-dc321c1a60b9@amd.com>
+ <ZVG3fREeTQqvHLb/@vermeer>
+ <58a60211-1edc-4238-b4a3-fe7faf3b6458@amd.com>
+ <ZVI8Y8VICy/SwYy5@vermeer>
+ <51bf9fed-2bad-4eb1-bbc7-239200bff668@amd.com>
+ <ZVOTsEhQTYxOpxA8@vermeer>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZVOTsEhQTYxOpxA8@vermeer>
+X-ClientProxiedBy: MW4PR04CA0388.namprd04.prod.outlook.com
+ (2603:10b6:303:81::33) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,112 +105,101 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|DS0PR12MB6536:EE_
-X-MS-Office365-Filtering-Correlation-Id: d7fc2f8a-b4ef-4b77-c82b-08dbf6150b44
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|MN6PR11MB8218:EE_
+X-MS-Office365-Filtering-Correlation-Id: 63f6dc9b-2800-42fc-6061-08dbf615d51e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Gfu3TZFGJhauou/C2IKc8v4iHRLNZsXqYywB35NiZvUc4g+KdKMKemufSfyaXepHQuOPD5Or/SzE5nbCo8hYSyG+QrIhOQFggbe+1elWZPiC1c0uveNvHKvWsXdNw1SEl+oqoyJND708H/dg60hF0rGkHHr3cHNsjxppmYw/cNWV0xXxEnT2mQWpm2iRnTa1JrQ3UrhxQWxQZ0Kp9259nN7E+gsvY0dtZJzH1K1rbG3IzLRKHj24Mnx9EW4pe2YTgIdn0766vnYcQl8DvC1sjE2/XJV2YA0vd7OnPhgdQxSf6iJtYYVrPyqq1QdCFYh9JH26wagIPe5umYLsnDM9Ne9z7GWZeABO12HAGv/EKkpB1L6AVQ3IGFCzO0mPKembLx298QuVYSoIn49IwMmB/Xyva7Vo0/wHh1c1pDqIpEXqC9z/EesR89M9HdnCDrMZMEgyusI3QHlvbzYNfCikhUeY1WtQddiMtkqyC+QWeoVNEPcUiqdalb8mbWUzOip+7/FlEKxvYWlTVnFMCna0aJrToMieZipWJaJUcw0iTjf7oVdQGgYLTm+v+wD7UvoSkBkCijkeXVf+8CZSlaIyjJWDDLDmi1Fc6/mp7NVjW4MA07SiHJ2NQUJs6M60YRg8l3Oz/v6EyEd4bupxcLH/ZlvIthw8E7o9Oa2SO1IoOHw=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(346002)(376002)(366004)(39860400002)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(38100700002)(3450700001)(36756003)(7416002)(5660300002)(31696002)(41300700001)(2906002)(966005)(6486002)(26005)(2616005)(53546011)(6506007)(478600001)(6512007)(8936002)(66946007)(8676002)(4326008)(66556008)(66476007)(6916009)(316002)(6666004)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: cfYUefsIjEBc2+oVKU1bspR8NcPUYcnhOtJpY3OK+7+EPa8Xq5rQAhAaHIf65J1YerTEIaW1rpemrhe2LAEM6/8Iy3alzvosh3xqFLsGuAUy80ZARxkA5Gg9APcAllEuDqvFnT9EEzAVFo5uwF/B5J2ZcSrBFcE30oECnD5/uHjo40VrHEr356jZp5IzGJfJTOu4jNJk5QFhd7s+4Fg09XzvM6RAAhHwHdl1980KdKsbxCN/gWlRb7GAdSGiO8EDe6+ai9XlvGUPmmQoq6sfc+IHKymWSvhA4d19tOXGEV2Tf2ZSsZ0PxqSYclx6EUadW3Zst4GkLw9iHXtjbqz+oPwmErb/40HIMM6dQbe+IcoOTWi0JYlrMSGn+4UpWk9KFhm8EksySbT/1L9MBbJ/D9BLTMOrxibRjR6c6pCgPO5fuMA1Mozu2GvQc+vBXkDoaBeGMNSgYGegwHFUPv5JhkV4jyQepKuqO9dB+XWPVbhiAWg1gIsIoTg/h35D6ViLCDD40mfv9CqthwHUTVpYIJds5fiHBQ5jNV14EvtoKSXwD8mr36z6A9MjVp233mJ/
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(136003)(346002)(366004)(39860400002)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(66946007)(110136005)(66476007)(316002)(66556008)(478600001)(38100700002)(6486002)(5660300002)(41300700001)(2906002)(7116003)(86362001)(8936002)(4326008)(8676002)(83380400001)(26005)(3480700007)(82960400001)(9686003)(6512007)(6506007);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ckFWMVNYMmZqUjd6dXp2akpOeFpDVVVxLzJrV2UrL2wwUmFoQkVLdkx0aFpR?=
- =?utf-8?B?aE9scE5QRElxUjAwVTJpRTl5RkMxdzhaZjNXWWNIdEJ0VjJJZ1lydkcvRGYz?=
- =?utf-8?B?Q0VacDU1bVI2S05PeFlGMkxqb1lGUkRLaVhlaWxIUjhRaU9za2tiSlBybEF0?=
- =?utf-8?B?VjFMQnRQdHMzV0d0K0hEZUpKWWZybjZ6MFEzcmxBdDlsR2JaWnFtdTllQjc5?=
- =?utf-8?B?ZndMdGUwODhjMjFVZ2xjWjhOeE1tQWJWQ1BvNklqcC82YWczaC90aDNCaGRt?=
- =?utf-8?B?NlNKamFmZ0RNNTNUS3RoTnJ1T3kweFBwOTJ1SnlqVzg1dFNCcDZ3OThQRWxK?=
- =?utf-8?B?MS9YS090NnViSnk3ZUJyTkNKd1lkTG5KYjFJR0VWdEZmMzZWTTRnWmZPU1N0?=
- =?utf-8?B?T01QMml0dGRvOW5LNFFUb1gwNWpPWHZqZWtONkV6ZzFPL1o2WlA1TlhWRkg5?=
- =?utf-8?B?YkN3TzlSQ2t0VE9pU09maUpzajlRWUlTekdSaWdtRmNESEtuaUxTNXcxcmlx?=
- =?utf-8?B?L0VQQWJaZ2dndHdnVWxUVSt2SzRaQlJHYURPL3RtQ0xwMDlYaXBucmlhSzFF?=
- =?utf-8?B?ZnlTMmhLRUgvK1BzVWxpL0Y0S2JOVGg5SHFrVWJ3eTQwYlk1UGZua2NzVE45?=
- =?utf-8?B?eCt5bmZGRWlKdWdLN1p4NVNsKzBnYXpUNnZVcmZTK3E0RVhVSXl6M0hhbkpS?=
- =?utf-8?B?WUZjSXd2R1kyMExrb1dMVDRzVTJxUk9ValBHQ3daTk1sQjFIdEgybE1uWS9z?=
- =?utf-8?B?QWVqb2dZQlVKRlNlY3ZwTXlNL2JNcWJMWG1odGxwK2VYcnJqQjlNUzFsdWxC?=
- =?utf-8?B?ekRHZmFQc0lOOXBxTExSQWlFdTNqVW9MTFVNejQ1NUtOcGxXMnUyNmh5WTVm?=
- =?utf-8?B?NlJyanV4cURZbHJMS2RmTkhWdjh6MHBKc2JyM3dxcGFaeHI1azNyRGpnSUxh?=
- =?utf-8?B?TG5WbW5hZFp3UFU0N2dldjk3ZzFwaUV6anEwY21PMmlWWDloeTRPQ0UvYVhH?=
- =?utf-8?B?b2FYMjRCK0hmMlovUXUweVpWSGU5R1NCb2lZK3lYcmI4QkFZd3piTmpjMnd3?=
- =?utf-8?B?UGowSndiakd3cnRMOGtRcXpwTGxIeDFQVzVlME9uai8yVGZYQzlpdGhWRTVr?=
- =?utf-8?B?aEpFTzVEc3c0NGVGSHNnMzVQelZobzNGczVKd2pkclVUYXNlYjBjSGg3bEtD?=
- =?utf-8?B?UUt4QnV3UE4wVWV0bTRzU2dFUjdSNTY2NEt4eG9SVjBkWFdzVHVkZzJpMlN0?=
- =?utf-8?B?d3krZ0Z6UmFDQlUyL05yRFNaZjQ1bCtzNGxnTU9DemRoZW9WeU1RekJhM1dL?=
- =?utf-8?B?M0pWNkRBbzdwaGRXNnFibTFLR2xVaE5HTTNvMWo1R2M1YlMwVkw1WVZKMnpD?=
- =?utf-8?B?bFB4bkRoc2xLNXZSVmVacEN3MDJkcWxNNlhmWXVnSEJzbWh6NWxkRDBoOHcv?=
- =?utf-8?B?akEraUF1OEdOdWJhc0JZWlkwUmY3VTBDMGVzOW5GNXlIK1dZMHRjNEJmb3pi?=
- =?utf-8?B?TnkxMzA4YmJqSVFBazc1YmhyWFEzYXdoTS9iMmpHSHVJTnlhZXdYbUdEMzAr?=
- =?utf-8?B?REdMVWgwYm9VeUpCWTV0WEFuVGsrVEk2NmFqNk1ETTNzZVYrU0prT2F5Vktw?=
- =?utf-8?B?U1d1ZlUyTm5qaEdOQnFqeXdINzMwME1TaEMvc05BWW8ybVhUalh0b2ZLZTQx?=
- =?utf-8?B?bi9kVUZhN0U3NEo2Q2hJU0R1a1JhYjQzL3JBbVJrZ3BkZE5wVWZyYlZrTTBN?=
- =?utf-8?B?K3pHLzlZRTJTbGhZSDhQKzhnQm5oK25QMUxtZFNIa0VFb1Z5NUM3bEMvdDdM?=
- =?utf-8?B?aTU5aVY1anh2VHFTUjFHVHkza2w1UzM5RWh6S1FXM2ZNMGc0TDdkcEhXNXBX?=
- =?utf-8?B?SXJSTEMrc2RZNFBXR0d6c2wvdFcrQ2dFQ1NDVkthWTE2azVHTk9oRG5KM1dl?=
- =?utf-8?B?OWtKZGFLSFhZbUlCSHFQRThWKzRKVUFFemZuNWdOeitsdm9UUFJvYnU1OE1G?=
- =?utf-8?B?M21hNEdDT01wUkhNb0pIUURzR0ZHZHZLRW10QlRxbmVKTXFoVnEvcEpnR1Fr?=
- =?utf-8?B?YlVtSHZUWlczNnVkTCtybHR4VERKN0JkVzhJQllrWWEvREhuVXNWVklFR0dZ?=
- =?utf-8?Q?eQdkS8a3PeDn0mqKllCehB40c?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d7fc2f8a-b4ef-4b77-c82b-08dbf6150b44
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?C/RfKV3D0rqN6u8RQ2yWWr0Q7BUjjx6grBIsh44zdvYIstUjt8oMl3NSv6kP?=
+ =?us-ascii?Q?1DL9mbGibjTWP51QXqxoApYAn/a5qvCAIdBMfy6O3qROTIh3crDAmoN7gvDj?=
+ =?us-ascii?Q?w9dblbBzZn7gKxuj3B2NwvBzzH+0PSx5TyjptWef61hTT4ZTk2HhUZNFRFpn?=
+ =?us-ascii?Q?nmGzC77L5pH5rLKpoB6CPtHOsXiRfb/1dQP7oNKXBpGRcvBsgowPPQjMtfra?=
+ =?us-ascii?Q?SolSTt6hm+Rb7PQ+XDLfV1eWSu9MEXtqhsow4+x37S2xfFUQYwu4f/f9NwuK?=
+ =?us-ascii?Q?Kb9Wv9zqbKyCh+ExL1JpjWRh9cGfdfjfX0mV31j59ej5Ik9sLc1ua+Fctutl?=
+ =?us-ascii?Q?2527CUhYDQJEdvFCH9DKqUsYrNUFT1b30jZLh9hpWrLj+kC0Ryi7ixtY/w9E?=
+ =?us-ascii?Q?APzxH2lBN28+0NgoVPIdHdKByfSocN1gGpJLHRTl/6AKYKwDTcrXYQkuGR5U?=
+ =?us-ascii?Q?YivqS8OTPb/0H4TBPqfIPMBQqo7GdXY2R4dmq2ZT4PYFAk0Dr0M7KkGzANUa?=
+ =?us-ascii?Q?KEez64EZB6KElm8FLMEWz0Z1HB7gBf2OlzdriHF7lNAYrqmWAJQYMR9Uvzqq?=
+ =?us-ascii?Q?pZSJ/zwX6HZ1IjrfGXrge0l1mSvW55TYhtVsaNdqsDWf3eUEvHIrQ3UCClXW?=
+ =?us-ascii?Q?MJJQaLm/Ovfep0huc3fUSv94EVJXzyxNE6ylx9Eu5wTckgUavokTV7mF+bGE?=
+ =?us-ascii?Q?KAasbiU+Z4OZ+c+tAn7Re0TUtvpL1/bv3R/e1kM+Z9lL7Hcjl1wrWXBgXIvl?=
+ =?us-ascii?Q?1z65sO+yqCYIIxyflJeVFNjgfiwNyhMikNyFfOJ2jXUzp36iWjCouaELOqcU?=
+ =?us-ascii?Q?yaIfYZrj5KTLwhclj6AMEUfLqs3gYHS3gFdOjSws9U6gtc6RqsbQB4ETCRSJ?=
+ =?us-ascii?Q?Kdl0sjHaQRae5Q0KUrZKSPi+Lx9VfkwKbcYF0X61VG0/ZBR4eVAtsfbUmczW?=
+ =?us-ascii?Q?7CjWfUABt0rgMGedITMEmVZEQ6+h4rHtGxMbBVMPVVW2Opy/2D6X8zglDPHb?=
+ =?us-ascii?Q?SSmGo7OT5kUC1E3wKlLi17Eh1dgWidDFobFmZKF5uNUPMyBcB1jskPqtAwD0?=
+ =?us-ascii?Q?QaG8T1UawjlQwK68OBLRCRSIAL+LoHy283evLlzz2pvH5yu9bKMXjLv7xi6N?=
+ =?us-ascii?Q?0UCyMFJsI0BABnwasff51I85Hx3iTLeopeHoY7dkiJmy5GGN4vydG8OP+iW0?=
+ =?us-ascii?Q?4URmcIbXff7jwaX9JZOpcuRWskdnEtvj3izsk3UAH65OeYMX+JkrxuJM0U6y?=
+ =?us-ascii?Q?rLZsFAvD7SSPRJE10B60UnuJlIRBhS3JXJJsTvjTkOgCBMV08wkqD476RjQS?=
+ =?us-ascii?Q?cGw7LaketXfDktxCCiyCWFdToWEyTbrY6yfqcwNW489Nent7noQjqD4C2wGT?=
+ =?us-ascii?Q?bM8QeSPTGxVUChvHX46rkxS8TrgLIJht7ZLjCkVjD0TsfYsoLNB3DmZFIXFs?=
+ =?us-ascii?Q?oawsu0VDbo9+VWGxG4WPq6LueugTT7vKyB2aEMJzAPD6mTcckJV7PwEpxpb1?=
+ =?us-ascii?Q?c3KT04VPh74NLVD12jmqbmxXk0dD2BwlEkwM/N/8vnVu0oqN8X1hfIHGy/LU?=
+ =?us-ascii?Q?Tz3WMfmivoaHdS8d7lqJXH2sSTiWqqwiGGuN3QJL+5H313b+dvbifQl5yTi6?=
+ =?us-ascii?Q?PA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 63f6dc9b-2800-42fc-6061-08dbf615d51e
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2023 04:37:25.3158
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2023 04:43:03.5538
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: C9Y8HkV0S2qtFDAxpwJtjCZGIoX9alDKgz4JPXGJyGN9GVAaRRrxvzYEc/rZW7zQ5RwgRm8K+G6yg0Yizo91Dw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6536
+X-MS-Exchange-CrossTenant-UserPrincipalName: y3PHVzVVVyjMLf/99Do8z6qabQiuD0calh9yckmPxu9QZ9OwuqS8jmHwLWh2EpHxxAW47Tu285UMsOArKTHTC8D6Z0YwHZxT3QConE0FYW8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR11MB8218
+X-OriginatorOrg: intel.com
 
-On 12/5/2023 10:46 PM, Dionna Amalie Glaze wrote:
-> On Tue, Nov 28, 2023 at 5:02 AM Nikunj A Dadhania <nikunj@amd.com> wrote:
->>
->> The hypervisor should not be intercepting RDTSC/RDTSCP when Secure TSC
->> is enabled. A #VC exception will be generated if the RDTSC/RDTSCP
->> instructions are being intercepted. If this should occur and Secure
->> TSC is enabled, terminate guest execution.
->>
->> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
->> ---
->>  arch/x86/kernel/sev-shared.c | 10 ++++++++++
->>  1 file changed, 10 insertions(+)
->>
->> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
->> index ccb0915e84e1..6d9ef5897421 100644
->> --- a/arch/x86/kernel/sev-shared.c
->> +++ b/arch/x86/kernel/sev-shared.c
->> @@ -991,6 +991,16 @@ static enum es_result vc_handle_rdtsc(struct ghcb *ghcb,
->>         bool rdtscp = (exit_code == SVM_EXIT_RDTSCP);
->>         enum es_result ret;
->>
->> +       /*
->> +        * RDTSC and RDTSCP should not be intercepted when Secure TSC is
->> +        * enabled. Terminate the SNP guest when the interception is enabled.
->> +        * This file is included from kernel/sev.c and boot/compressed/sev.c,
->> +        * use sev_status here as cc_platform_has() is not available when
->> +        * compiling boot/compressed/sev.c.
->> +        */
->> +       if (sev_status & MSR_AMD64_SNP_SECURE_TSC)
->> +               return ES_VMM_ERROR;
+Samuel Ortiz wrote:
+[..]
+> > There is always a driver which has to enable the device and tell it where it
+> > can DMA to/from anyway so the RUN state does not really let the device start
+> > doing things once it is moved to RUN 
 > 
-> Is this not a cc_platform_has situation? I don't recall how the
-> conversation shook out for TDX's forcing X86_FEATURE_TSC_RELIABLE
-> versus having a cc_attr_secure_tsc
+> I agree. But setting RUN from the host means that the guest can start
+> configuring and using that device at any point in time, i.e. even before
+> any guest component could verify, validate and attest to the TDI. RUN is
+> precisely defined for that purpose: Telling the TDI that it should now
+> accept T-bit TLPs, and you want to do that *after* the TVM accepts the
+> TDI. Here, by having the host move the TDI to RUN, potentially even before
+> the TVM has even booted, you're not giving the guest a chance to explictly
+> accept the TDI.
 
-For SNP, SecureTSC is an opt-in feature. AFAIU, for TDX the feature is 
-turned on by default. So SNP guests need to check if the VMM has enabled 
-the feature before moving forward with SecureTSC initializations.
+I wanted to circle back to this to agree about allowing the guest to
+control the transition from LOCKED to RUN. Recall the Plumbers
+conversation where I mentioned TDX moving closer to TIO to streamline
+the common TSM interface in Linux, and foreshadowing other vendors
+making similar concessions. This is an example where the "as simple as
+possible, but no simpler" threshold looks to have been crossed.
 
-The idea was to have some generic name instead of AMD specific SecureTSC
-(cc_attr_secure_tsc), and I had sought comments from Kirill [1]. After 
-that discussion I have added a synthetic flag for Secure TSC[2].
+TDX like COVE allows for guest to trigger LOCKED to RUN transition. For
+vendor alignment purposes this looks like an opportunity for TIO to
+enable the same and prevent a vendor-specific semantic difference in the
+TSM common infrastructure.
 
-Regards
-Nikunj
+[..]
+[inclue Samuel's further justification that I also Ack]
+> > > After that call, the TDI is usable from a TVM perspective. Before that
+> > > call it is not, but its configuration and state are locked.
+> > Right. I still wonder what bad thing can happen if we move to RUN before
+> > starting the TVM (I suspect there is something), or it is all about
+> > semantics (for the AMD TIO usecase, at least)?
+> 
+> It's not only about semantics, it's about ownership. By moving to RUN
+> before the TVM starts, you're basically saying the host decides if the
+> TDI is acceptable by the TVM or not. The TVM is responsible for making
+> that decision and does not trust the host VMM to do so on its behalf, at
+> least in the confidential computing threat model.
+> 
+> Is there any specific reason why you wouldn't move the TDI to RUN when
+> the SEV guest calls into the validat ABI?
+> 
+> Cheers,
+> Samuel.
+> 
 
-1. https://lore.kernel.org/lkml/55de810b-66f9-49e3-8459-b7cac1532a0c@amd.com/
-2. https://lore.kernel.org/lkml/20231128125959.1810039-10-nikunj@amd.com/
 
 
