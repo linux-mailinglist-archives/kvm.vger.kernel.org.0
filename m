@@ -1,227 +1,208 @@
-Return-Path: <kvm+bounces-3697-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3698-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0CB08071E4
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 15:12:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C592F8072F0
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 15:47:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E7FF281DE1
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 14:11:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3228AB20E3E
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 14:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AC9D3DBA1;
-	Wed,  6 Dec 2023 14:11:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74AF23EA70;
+	Wed,  6 Dec 2023 14:46:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="nUkGuZlf"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="HIydW5o1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD184D49
-	for <kvm@vger.kernel.org>; Wed,  6 Dec 2023 06:11:48 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-40c09ba723eso43660525e9.2
-        for <kvm@vger.kernel.org>; Wed, 06 Dec 2023 06:11:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=citrix.com; s=google; t=1701871907; x=1702476707; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/J/0AouVBy2ul+ViGYcNfPUia+BakLB5GkfP7lR2gNQ=;
-        b=nUkGuZlf+Y1Z1F1+OQ5AT+w14Y+6oJ1lKcdwS3+glw+64GuP8tRqvZPLzC/730I3Ci
-         3o9QLMMOW1dtCa9bnhvoq6aSLxp6G8FbBPl6NXoGCW6SxXZf8Fe3VnSDpL4iWz2JnYpR
-         RvaHwjHcEJ4lkoobY6DkqPKKq7sQu3yi6ivSI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701871907; x=1702476707;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/J/0AouVBy2ul+ViGYcNfPUia+BakLB5GkfP7lR2gNQ=;
-        b=rQxTpIUDgTDWPm4fCfVA0/6q+f6FyEztQeVPtoan9XO4TxY3jNPTTZUIjMDSU8D0uz
-         uvmsRE8K+qdfFJZkh32/0Agy1OiKwc4Su6ncISgl/YDtSox1h94j95JJSYEk3iR3D3es
-         wu/Gt8y8CR1235cpRwLjbT8AHYnuS4mjf0/HT1G0ZOnAyx6NQgfj+STn7773wAx+wiZk
-         20Tm6aZxtAIAF49bgoLvXfe/f7C0Bi/I4OIfEcz/nNlXUI/C5isVtRQtzOh/usqk2paV
-         VTHzXGXpahGwlR4P7m5htqfXH8ljOqiVfd36br+lc1Cod2i6pF2RcCg1urThKFJvch6W
-         lTXQ==
-X-Gm-Message-State: AOJu0Yw2G60Q+VX7zrPGZaKskG0kG/IDZqzCUw7ZvdJANaCoqOnfLhN4
-	LQi8T/K5f5GGfI7Xio6KSIpA8Q==
-X-Google-Smtp-Source: AGHT+IFNMx+Klo1CEPaJ26/dBlw3sjXlNL46V08+iyKrIoZzyUVgJsGVXWSyD7pSk5JuLC7WZwHGiw==
-X-Received: by 2002:a05:600c:5253:b0:40b:5e4a:4081 with SMTP id fc19-20020a05600c525300b0040b5e4a4081mr623446wmb.161.1701871907211;
-        Wed, 06 Dec 2023 06:11:47 -0800 (PST)
-Received: from [10.80.67.30] (default-46-102-197-194.interdsl.co.uk. [46.102.197.194])
-        by smtp.gmail.com with ESMTPSA id c1-20020adfa301000000b003333a216682sm11793864wrb.97.2023.12.06.06.11.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Dec 2023 06:11:46 -0800 (PST)
-Message-ID: <4e41b658-f49e-424c-8a86-08c8ab8e384d@citrix.com>
-Date: Wed, 6 Dec 2023 14:11:46 +0000
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39EBA10C4
+	for <kvm@vger.kernel.org>; Wed,  6 Dec 2023 06:46:46 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Rcn8Y4Yafq93mZqWT8qqp9F+MHB9+IVLOdyGUcK/FaADjiy/kvvxlXDgKuAMirMnqlIWGccDPxb6IYqXIJ2yXryroBiT1M3kRO0iUQKH8R4Dpth8kphxGn1UlU9LT5LoQKWA3/ed7KePeRPoTETE89AFzwWo7m+ZKIBeV4GFx6P0jGN+Eu5E2KUpJvEfbnLBIvSJNYwuacyRE2z3P0vAHzFilgGu8h9yAGWNBrMCaJ4Rhnv2kH3u8uxHCaf7bX4HwBjrTD0KOQzfP45v6Xx79OO6J5PaFrsErcSX60diX8WTxP65ytI/7tvOKHL2VxVgkIZSC+68ljWBabySjVqDHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=I3TgDCQrFFaW9hai/kmxeUSCWih52LF09YCnLdhQ5mE=;
+ b=IbnmynhAVxi9plWi4KJjmzWd16w5VjiUKDohVmalPTQiRp4xDRRftwHzIXPt+Zlw0JIuODk8wPVimraKEQeaARGfQwubJvJKoXNL5LAq2EIIHxRQ/eNeFBc3CY9JxBDyRVc9YyylM9qsDfIxXPNhpGzVvZNHXBRd7XYN+HWU/n3qqWG4/Y1/2t+25unNs45MZEfEOQKe4wOYIbGp3JZTipPfUS3fTHSC1wvs8pjDD0FK1czQ0X135jOI6qIb652MnFMZrfdItqcrrorkRfp7QM5VzRytjmHfyw4IpPqF+mAorvSDubeLoUrwnEjvn3Oh0tYy7s9TxYZ8Zi4lWMD8Eg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=I3TgDCQrFFaW9hai/kmxeUSCWih52LF09YCnLdhQ5mE=;
+ b=HIydW5o17QPW3USe7+5yhBqzblS1/p1GQXKrvyj/kYXi6HEN70x7720am5ipIzKpCzzGI20uaFE25LWeH5KuHEZ7+iett7rdPnkVAoT64tCgiqEhVi74M+/7zPjx6T4ZlJ2rwrMlBkvn1Efrec4mXEU55GzitObPgAi5o6mzXzI=
+Received: from BL0PR02CA0023.namprd02.prod.outlook.com (2603:10b6:207:3c::36)
+ by DS7PR12MB5718.namprd12.prod.outlook.com (2603:10b6:8:71::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.25; Wed, 6 Dec
+ 2023 14:46:42 +0000
+Received: from BL6PEPF0001AB77.namprd02.prod.outlook.com
+ (2603:10b6:207:3c:cafe::76) by BL0PR02CA0023.outlook.office365.com
+ (2603:10b6:207:3c::36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34 via Frontend
+ Transport; Wed, 6 Dec 2023 14:46:42 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL6PEPF0001AB77.mail.protection.outlook.com (10.167.242.170) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7068.20 via Frontend Transport; Wed, 6 Dec 2023 14:46:42 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Wed, 6 Dec
+ 2023 08:46:22 -0600
+Date: Wed, 6 Dec 2023 08:46:05 -0600
+From: Michael Roth <michael.roth@amd.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+CC: <qemu-devel@nongnu.org>, Marcelo Tosatti <mtosatti@redhat.com>, "Tom
+ Lendacky" <thomas.lendacky@amd.com>, Akihiko Odaki
+	<akihiko.odaki@daynix.com>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v2 for-8.2?] i386/sev: Avoid SEV-ES crash due to missing
+ MSR_EFER_LMA bit
+Message-ID: <20231206144605.mwphsaggqumiqh3k@amd.com>
+References: <20231205222816.1152720-1-michael.roth@amd.com>
+ <CABgObfb0YmHuw6v9AGK6FpsYA1F3eV2=4RKaxkmVrp97QCDM3A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 26/35] x86/fred: FRED entry/exit and dispatch code
-Content-Language: en-GB
-To: "Li, Xin3" <xin3.li@intel.com>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-Cc: "tglx@linutronix.de" <tglx@linutronix.de>,
- "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "Lutomirski, Andy" <luto@kernel.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "seanjc@google.com" <seanjc@google.com>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "Gross, Jurgen" <jgross@suse.com>, "Shankar, Ravi V"
- <ravi.v.shankar@intel.com>, "mhiramat@kernel.org" <mhiramat@kernel.org>,
- "jiangshanlai@gmail.com" <jiangshanlai@gmail.com>,
- "nik.borisov@suse.com" <nik.borisov@suse.com>,
- "Kang, Shan" <shan.kang@intel.com>
-References: <20231205105030.8698-1-xin3.li@intel.com>
- <20231205105030.8698-27-xin3.li@intel.com>
- <f260ddf9-be67-48e0-8121-6f58d46f7978@citrix.com>
- <SA1PR11MB67343544B0CEB6C82002790DA884A@SA1PR11MB6734.namprd11.prod.outlook.com>
-From: Andrew Cooper <andrew.cooper3@citrix.com>
-Autocrypt: addr=andrew.cooper3@citrix.com; keydata=
- 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
- 6+ahAA==
-In-Reply-To: <SA1PR11MB67343544B0CEB6C82002790DA884A@SA1PR11MB6734.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CABgObfb0YmHuw6v9AGK6FpsYA1F3eV2=4RKaxkmVrp97QCDM3A@mail.gmail.com>
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB77:EE_|DS7PR12MB5718:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2a6edda3-3dcb-40a1-ea34-08dbf66a294e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	qQv7J/R+3HUl2yP5Z7V0dWlAA1GVHjxTs+hyLml5Oe9B0nZOp+3Ok5csmhCrFZqdgOUySWfOUAW0ZA/utDB/qPGEyg6ll44kiPuENFkdGM8+kudf5xElkpPXqKXz4PXXV8EAqSQ19FcLTIFyKAsN/ftsaybz8VqnLXRH4kupsMuSNX1h6UICPISKSFKtMbsycT+f9UtOm88xyvKz4QeYYdCxnrxX/dSEuN2xsItkhcMsuhL+f6Qp+saMALCvMdCzGGs00ON2bfr7n1KEfOQM52Nrw1Ig0hyczbk4eVPEMYGNPz65Ym2qFSRlo552z+jJc0lkPfJr2H7L8xsK1vxXAR92Z1ksQFU/e+kO4ajYLemsxQ86MGICE7sCTec025eb/kzkmLo50X4av7U684Ohk0rVzxSIrMCZ7cVtEEpLSWEv6Xd0VkNblBMubIOWQLmNO4WPZ2uhGBMMPD8M/yIh9b3uZfGiiFh70U0loeoQ1fguiIKW+/EVSqOEi8a7fbanaD6gSApVTTckxbRWM+k8fT/TswqqD+VKwq+cgtzPP+rxWFe42eWdttahce1aXEKOaIbzedU0Z9bFj4YBjDicmlks+c/mBtDNZ8Z3nU5+xGKRANGDzRCF6oeboQq9wQ/YWBHWpRkvDMoiUFuWCz+tsrkWbqB33oEg5nEYkX9/fNUObNbSYw4NWLBGTewLWyWd9UnpVzWzNxtO2igFK6Ie2HyzuU/n8/SbEC28meBAUxCepWof2kTR4I/j3tYyPlkS4g+4/pEcrst6MDDdnjbFCQ==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(136003)(39860400002)(376002)(346002)(230922051799003)(186009)(451199024)(64100799003)(82310400011)(1800799012)(46966006)(40470700004)(36840700001)(40480700001)(40460700003)(36860700001)(81166007)(47076005)(356005)(2906002)(5660300002)(82740400003)(83380400001)(16526019)(53546011)(336012)(426003)(6666004)(1076003)(26005)(2616005)(478600001)(70206006)(70586007)(54906003)(36756003)(41300700001)(4326008)(8676002)(44832011)(6916009)(8936002)(316002)(86362001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2023 14:46:42.2592
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2a6edda3-3dcb-40a1-ea34-08dbf66a294e
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB77.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5718
 
-On 06/12/2023 7:45 am, Li, Xin3 wrote:
->>> +	case X86_TRAP_OF:
->>> +		exc_overflow(regs);
->>> +		return;
->>> +
->>> +	/* INT3 */
->>> +	case X86_TRAP_BP:
->>> +		exc_int3(regs);
->>> +		return;
->> ... neither OF nor BP will ever enter fred_intx() because they're type SWEXC not
->> SWINT.
-> Per FRED spec 5.0, section 7.3 Software Interrupts and Related Instructions:
-> INT n (opcode CD followed by an immediate byte): There are 256 such
-> software interrupt instructions, one for each value n of the immediate
-> byte (0–255).
->
-> And appendix B Event Stack Levels:
-> If the event is an execution of INT n (opcode CD n for 8-bit value n),
-> the event stack level is 0. The event type is 4 (software interrupt)
-> and the vector is n.
->
-> So int $0x4 and int $0x3 (use asm(".byte 0xCD, 0x03")) get here.
->
-> But into (0xCE) and int3 (0xCC) do use event type SWEXC. 
->
-> BTW, into is NOT allowed in 64-bit mode but "int $0x4" is allowed.
+On Wed, Dec 06, 2023 at 02:41:13PM +0100, Paolo Bonzini wrote:
+> On Tue, Dec 5, 2023 at 11:28 PM Michael Roth <michael.roth@amd.com> wrote:
+> > @@ -3637,12 +3638,18 @@ static int kvm_get_sregs(X86CPU *cpu)
+> >      env->gdt.limit = sregs.gdt.limit;
+> >      env->gdt.base = sregs.gdt.base;
+> >
+> > +    cr0_old = env->cr[0];
+> >      env->cr[0] = sregs.cr0;
+> >      env->cr[2] = sregs.cr2;
+> >      env->cr[3] = sregs.cr3;
+> >      env->cr[4] = sregs.cr4;
+> >
+> >      env->efer = sregs.efer;
+> > +    if (sev_es_enabled() && env->efer & MSR_EFER_LME) {
+> > +        if (!(cr0_old & CR0_PG_MASK) && env->cr[0] & CR0_PG_MASK) {
+> > +            env->efer |= MSR_EFER_LMA;
+> > +        }
+> > +    }
+> 
+> There is no need to check cr0_old or sev_es_enabled(); EFER.LMA is
+> simply EFER.LME && CR0.PG.
 
-There is certainly fun to be had with CD 03 and CD 04 byte patterns, but
-if you meant to mean those here, then the comments are wrong.
+Yah, I originally had it like that, but svm_set_cr0() in the kernel only
+sets it in vcpu->arch.efer it when setting CR0.PG, so I thought it might
+be safer to be more selective and mirror that handling on the QEMU side
+so we can leave as much of any other sanity checks on kernel/QEMU side
+intact as possible. E.g., if some other bug in the kernel ends up
+unsetting EFER.LMA while paging is still enabled, we'd still notice that
+when passing it back in via KVM_SET_SREGS*.
 
-Vectors 3 and 4 are installed with DPL3 because that is necessary to
-make CC and CE function in userspace.  It also suggests that the SWINT
-vs SWEXC distinction was retrofitted to architecture after the 286,
-because exceptions don't check DPL and ICEBP delivers #DB from userspace
-even when Vector 1 has a DPL of 0.
+But agree it's simpler to just always set it based on CR0.PG and EFER.LMA
+and can send a v3 if that's preferred.
 
-While CC is for most cases indistinguishable from CD 03, CE behaves
-entirely differently to CD 04.  CD 04 doesn't #UD in 64bit mode, and
-will trigger exc_overflow() irrespective of the state of EFLAGS.OF.
+> 
+> Alternatively, sev_es_enabled() could be an assertion, that is:
+> 
+>     if ((env->efer & MSR_EFER_LME) && (env->cr[0] & CR0_PG_MASK) &&
+>        !(env->efer & MSR_EFER_LMA)) {
+>         /* Workaround for... */
+>         assert(sev_es_enabled());
+>         env->efer |= MSR_EFER_LMA;
+>     }
+> 
+> What do you think?
 
+I'm a little apprehensive about this approach for similar reasons as
+above. The current patch is guaranteed to only affect SEV-ES, whereas
+this approach could trigger assertions for other edge-cases we aren't
+aware of that could further impact the release. For instance, "in
+theory", QEMU or KVM might have some handling where EFER.LMA is set
+somewhere after (or outside of) KVM_GET_SREGS, but now with this
+proposed change QEMU would become more restrictive and generate an
+assert for those cases.
 
-The SDM goes out of it's way to say not to use the CD 03 byte pattern
-(and it does take effort to emit this byte pattern - e.g. GAS will
-silently translate "int $3" to "int3"), and there's no plausible way
-software is using CD 04 in place of CE.
+I don't think that's actually the case, but in the off-chance that such
+a case exists there could be more fall-out such as further delays, or
+the need for a stable fix. But no strong opinion there either if that
+ends up being the preferred approach, just trying to consider the
+pros/cons.
 
-So why do we care about containing to make mistakes of the IDT era work
-in a FRED world?
+Thanks,
 
-Is there anything (other than perhaps the selftests) which would even
-notice?
+Mike
 
->>> +		instrumentation_end();
->>> +		irqentry_exit(regs, state);
->>> +	} else {
->>> +		common_interrupt(regs, vector);
->>> +	}
->>> +}
->>> +
->>> +static noinstr void fred_exception(struct pt_regs *regs, unsigned
->>> +long error_code) {
->>> +	/* Optimize for #PF. That's the only exception which matters performance
->> wise */
->>> +	if (likely(regs->fred_ss.vector == X86_TRAP_PF)) {
->>> +		exc_page_fault(regs, error_code);
->>> +		return;
->>> +	}
->>> +
->>> +	switch (regs->fred_ss.vector) {
->>> +	case X86_TRAP_DE: return exc_divide_error(regs);
->>> +	case X86_TRAP_DB: return fred_exc_debug(regs);
->>> +	case X86_TRAP_BP: return exc_int3(regs);
->>> +	case X86_TRAP_OF: return exc_overflow(regs);
->> Depending on what you want to do with BP/OF vs fred_intx(), this may need
->> adjusting.
->>
->> If you are cross-checking type and vector, then these should be rejected for not
->> being of type HWEXC.
-> You're right, the event type needs to be SWEXC for into and int3.
->
-> However, would it be overkilling?  Assuming hardware and VMM are sane.
-
-You either care about cross checking, or not.  Right now, this patch is
-a mix of the two approaches.
-
-In my opinion, cross-checking is the better approach, because it means
-that violations of the assumptions get noticed more quickly, and
-hopefully by whomever is working on the new feature which alters the
-assumptions.
-
-~Andrew
+> 
+> Thanks,
+> 
+> Paolo
+> 
+> >      /* changes to apic base and cr8/tpr are read back via kvm_arch_post_run */
+> >      x86_update_hflags(env);
+> > @@ -3654,6 +3661,7 @@ static int kvm_get_sregs2(X86CPU *cpu)
+> >  {
+> >      CPUX86State *env = &cpu->env;
+> >      struct kvm_sregs2 sregs;
+> > +    target_ulong cr0_old;
+> >      int i, ret;
+> >
+> >      ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_SREGS2, &sregs);
+> > @@ -3676,12 +3684,18 @@ static int kvm_get_sregs2(X86CPU *cpu)
+> >      env->gdt.limit = sregs.gdt.limit;
+> >      env->gdt.base = sregs.gdt.base;
+> >
+> > +    cr0_old = env->cr[0];
+> >      env->cr[0] = sregs.cr0;
+> >      env->cr[2] = sregs.cr2;
+> >      env->cr[3] = sregs.cr3;
+> >      env->cr[4] = sregs.cr4;
+> >
+> >      env->efer = sregs.efer;
+> > +    if (sev_es_enabled() && env->efer & MSR_EFER_LME) {
+> > +        if (!(cr0_old & CR0_PG_MASK) && env->cr[0] & CR0_PG_MASK) {
+> > +            env->efer |= MSR_EFER_LMA;
+> > +        }
+> > +    }
+> >
+> >      env->pdptrs_valid = sregs.flags & KVM_SREGS2_FLAGS_PDPTRS_VALID;
+> >
+> > --
+> > 2.25.1
+> >
+> 
 
