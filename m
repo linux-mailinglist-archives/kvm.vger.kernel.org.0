@@ -1,91 +1,164 @@
-Return-Path: <kvm+bounces-3760-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3761-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6699C8078DB
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 20:48:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0CE58078E4
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 20:50:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B7E0281E47
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 19:48:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22AC1B20FF4
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 19:50:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E80347F78;
-	Wed,  6 Dec 2023 19:48:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E7147F7F;
+	Wed,  6 Dec 2023 19:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g5qLmFoQ"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="v+urtsd1";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="lGzQtl9x"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26A0BD51
-	for <kvm@vger.kernel.org>; Wed,  6 Dec 2023 11:48:00 -0800 (PST)
-Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-3334d9b57adso118016f8f.1
-        for <kvm@vger.kernel.org>; Wed, 06 Dec 2023 11:48:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701892078; x=1702496878; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YT1b51nW9x4n5/UPb1xMUN5rntY0KxjYvUTljx6Ob0E=;
-        b=g5qLmFoQgsBQTUrwNuR8G9t8hpkc6JhFcXTTEjJJyuQsbudR5656TOBzlMZy9zeERh
-         UTYCR9OsHkI2lnUW0k4PSI25oRTNU+kS6tDHqSNOzSyAUFwE1N6TNU0urD8AFbCtmr0D
-         3VaF5f0i2kQNbokdXwzMzJqZvNOixRQVERzonKvJGs0LvQ2BwnibFzZKlRjBWYn0zw07
-         tbS//SXKKRTr507dhzcJMpz/aBzUHH4BTpYYpUHbMBY/WNMzOphY0aB7bh7iEcE46qvg
-         pEVXXOyKZaZzPc+GrxjgPUYddbP2whc8JR3I7TTJK9rFmcCeqKdRQMs/qTmauKY2Jkib
-         8QIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701892078; x=1702496878;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YT1b51nW9x4n5/UPb1xMUN5rntY0KxjYvUTljx6Ob0E=;
-        b=gAAhaZEL/ffX8O8l28HYngfCYCsWkKE/yPYG7xNQXNUT+MzEcnUkI4j4pS4gxnu1MN
-         sw4THDMSeK3eRjnCx9/BvHiDI0O86HyWOPU0B/i2q9uGSu440OWSw2JPA2AcG6rgwRX8
-         R+Eh80Mf1OmAJJ4roHxURg9lwWijPAazTDvirVa7Woyxq+woDSF1OP+kx46kPZGyn7lk
-         B8hK7S16ln1UWEjMzCDuOqfJ4SIWkPmLeCMdWO+OVEb30LttEV3tVIZY6FFemJBFyhLD
-         GXrLmwhoiTP5rDBH7wC9g59SIPmfym733nPtHUrtdwzk768UqDp62gCWQf5ZqB8QQlRQ
-         8F7Q==
-X-Gm-Message-State: AOJu0YwN4E52z7COMIHt6aGl+86URafQ3ZgVDLHCOtnVd6HhA3N0BIDj
-	hM1xqi9OOzLqUqVZbDhHcc0A2YYxDEsa3SHMq9mvzg==
-X-Google-Smtp-Source: AGHT+IHAwyoTP5J7OG6U+wcBRTF3R8R8kD7KZULCCYRyyqcAhA2n4V45Lyg780D277EB1x9ciS11nYjXAXGtEy9lyOg=
-X-Received: by 2002:a5d:5258:0:b0:333:1a1c:50fe with SMTP id
- k24-20020a5d5258000000b003331a1c50femr806489wrc.59.1701892078525; Wed, 06 Dec
- 2023 11:47:58 -0800 (PST)
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50A2CFA;
+	Wed,  6 Dec 2023 11:50:27 -0800 (PST)
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1701892225;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9Dhk4+zCj2bSVdaz1f+DwCjhCz2nloe+08Lq1HubewE=;
+	b=v+urtsd1FTU9ZhLnfNMCVE4t5FHdgO9qBV8ZKGd9TpMRxHH/CEWRGbEy4B+0vGbO4suTau
+	wkZdYWlpRePNfzJLQy0BJa0Rh5RCB44e1qerQk/+rqH2Kuxw1JD5rXXd38vUPHy/UaNfD7
+	CuB044qCEi9KUXNO4sdAO5+XlNWUFZr+rKjuYaZ45SI2Tr1BVqhKMx/ElfSYpG8SqoBKQl
+	i5d9YiXVBrEUTzLU+M+B8U1EhdRdYXYjwtG+Inz5kqy416Tc2thKlKAt2VcOgX5ZLSfzzD
+	av1/CKw9UkzTHaJ5OGGwop03VQVPbDBCweKuV1mA0BYPlLNulU2MD3+7iOvLag==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1701892225;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9Dhk4+zCj2bSVdaz1f+DwCjhCz2nloe+08Lq1HubewE=;
+	b=lGzQtl9x+ofH+fpqUAxl6pXbPHwEXsgGEzAYM7ctVOK90MAjAnLeYQaVWkrQ4Jcv/RiiwP
+	ECczWzS12VAPxEBA==
+To: Peter Zijlstra <peterz@infradead.org>, Jacob Pan
+ <jacob.jun.pan@linux.intel.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>,
+ iommu@lists.linux.dev, Lu Baolu <baolu.lu@linux.intel.com>,
+ kvm@vger.kernel.org, Dave Hansen <dave.hansen@intel.com>, Joerg Roedel
+ <joro@8bytes.org>, "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov
+ <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, Raj Ashok
+ <ashok.raj@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+ maz@kernel.org, seanjc@google.com, Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [PATCH RFC 09/13] x86/irq: Install posted MSI notification handler
+In-Reply-To: <20231115125624.GF3818@noisy.programming.kicks-ass.net>
+References: <20231112041643.2868316-1-jacob.jun.pan@linux.intel.com>
+ <20231112041643.2868316-10-jacob.jun.pan@linux.intel.com>
+ <20231115125624.GF3818@noisy.programming.kicks-ass.net>
+Date: Wed, 06 Dec 2023 20:50:24 +0100
+Message-ID: <87cyvjun3z.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: David Matlack <dmatlack@google.com>
-Date: Wed, 6 Dec 2023 11:47:29 -0800
-Message-ID: <CALzav=c=C3q9SwB340-mSJeT7FN55omeVZv4+LZiWwoaeA0Ufg@mail.gmail.com>
-Subject: 12/13 PUCK: Post-copy support for guest_memfd
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	kvm list <kvm@vger.kernel.org>
-Cc: James Houghton <jthoughton@google.com>, "cc: Peter Xu" <peterx@redhat.com>, 
-	Andrea Arcangeli <aarcange@redhat.com>, Mike Kravetz <mike.kravetz@oracle.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-Hi everyone,
+On Wed, Nov 15 2023 at 13:56, Peter Zijlstra wrote:
+>
+> Would it not make more sense to write things something like:
+>
+> bool handle_pending_pir()
+> {
+> 	bool handled = false;
+> 	u64 pir_copy[4];
+>
+> 	for (i = 0; i < 4; i++) {
+> 		if (!pid-pir_l[i]) {
+> 			pir_copy[i] = 0;
+> 			continue;
+> 		}
+>
+> 		pir_copy[i] = arch_xchg(&pir->pir_l[i], 0);
+> 		handled |= true;
+> 	}
+>
+> 	if (!handled)
+> 		return handled;
+>
+> 	for_each_set_bit()
+> 		....
+>
+> 	return handled.
+> }
 
-I'd like to schedule a PUCK to continue the discussion on post-copy
-support for guest_memfd [1]. If you're Cc'd on this email it's because
-you were Cc'd on that thread.
+I don't understand what the whole copy business is about. It's
+absolutely not required.
 
-Requested Attendees: Paolo, Peter Xu, James, Sean, Oliver
-Proposed Date: 12/13 (next week)
+static bool handle_pending_pir(unsigned long *pir)
+{
+        unsigned int idx, vec;
+	bool handled = false;
+        unsigned long pend;
+        
+        for (idx = 0; offs < 4; idx++) {
+                if (!pir[idx])
+                	continue;
+		pend = arch_xchg(pir + idx, 0);
+                for_each_set_bit(vec, &pend, 64)
+			call_irq_handler(vec + idx * 64, NULL);
+                handled = true;
+	}
+        return handled;
+}
 
-I can present some material on the problem (post-copy support for
-guest_memfd) and the possible solutions discussed in the email thread
-(KVM-based demand paging, file-based demand paging). Then I'm hoping
-we can discuss what direction we want to go in, and what information
-we'd need to make a call either way.
+No?
 
-Please let me know if you can attend. This isn't super time critical
-so I'm fine with rescheduling, e.g. to after the holidays, if
-necessary.
+> sysvec_posted_blah_blah()
+> {
+> 	bool done = false;
+> 	bool handled;
+>
+> 	for (;;) {
+> 		handled = handle_pending_pir();
+> 		if (done)
+> 			break;
+> 		if (!handled || ++loops > MAX_LOOPS) {
 
-Thanks.
---David
+That does one loop too many. Should be ++loops == MAX_LOOPS. No?
 
-[1] https://lore.kernel.org/kvm/CALzav=d23P5uE=oYqMpjFohvn0CASMJxXB_XEOEi-jtqWcFTDA@mail.gmail.com/
+> 			pi_clear_on(pid);
+> 			/* once more after clear_on */
+> 			done = true;
+> 		}
+> 	}
+> }
+>
+>
+> Hmm?
+
+I think that can be done less convoluted.
+
+{
+	struct pi_desc *pid = this_cpu_ptr(&posted_interrupt_desc);
+	struct pt_regs *old_regs = set_irq_regs(regs);
+        int loops;
+
+	for (loops = 0;;) {
+        	bool handled = handle_pending_pir((unsigned long)pid->pir);
+
+                if (++loops > MAX_LOOPS)
+                	break;
+
+                if (!handled || loops == MAX_LOOPS) {
+                	pi_clear_on(pid);
+                        /* Break the loop after handle_pending_pir()! */
+                        loops = MAX_LOOPS;
+                }
+	}
+
+	...
+	set_irq_regs(old_regs);
+}
+
+Hmm? :)
 
