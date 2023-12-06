@@ -1,165 +1,311 @@
-Return-Path: <kvm+bounces-3654-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3655-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7355B806427
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 02:31:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96F4280642A
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 02:33:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEAF11F21743
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 01:31:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35E7C281596
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 01:33:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA36010F3;
-	Wed,  6 Dec 2023 01:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NZedMS4t"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10FBF10FC;
+	Wed,  6 Dec 2023 01:33:33 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2058.outbound.protection.outlook.com [40.107.223.58])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B81521AA
-	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 17:30:52 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Z5vA++seuxp/i5xh7bRxVrwAYTWKAlVFjSlFo1RiNNOQZhQb74gpF+BWpa5+GngWx93fnn7k7g8/6VEyzYqYk7PRjCGi+cn0Kp6xZ20RkZh6jFK7KnYuS0mm73obWRvXWL9Yu4ncgmigASbq/Mf4+82+owtcWBOYP+8+vjfXmSOTP3bw0uhKHHMQNdtLl1JrQ01yv/Y3RPwF+OTYh4CVuyxd+8V8Vhr2tS3ByNEkQ2oUa8iTaOMmj+3tKTzta6ztkEg+yxxTlWFb/KeZQiKVxAHaTN2kcoNkqpaeck03SJfQGTuoa9b8iCoNYMuNdgnsJXf5Z03lIPAiz8JxyHQuLQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aZKVRlPtMnSbCXthrXj6sCe71qmiohhSnAhUOFeg1Oc=;
- b=Ld5Xr53aSUdr19iPvsrosiWhHlA3b6hFoiCsrHzAxQ1iYKcFeLhLS6r/VVXU5yj6uYDSi5CgfiU8+ZRaooyg02pIVGwjQAcOe/G6lJkYYEjPlT2uMl1v+qS7MCxGmyXUGC+WLtRECvvC6isMAqjK4IurRNSHTz8uHQAoEi9ghDy+p7dLxAUx25Le5k4OA1R9gd8b7v1y3zszTF8D9ARbHZv6Pj2qx9x2V6siD4LYQV4ofJ5/GjSqlTR1CsoDkKLRMNEQ43ihnHrfVNEsVwMJsrJxT8eGS5IVwyLq3w0HHfjt3eJOLcQFE+qm5KikNnsHtgAy6wP4MAmc2ss3zXKacQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aZKVRlPtMnSbCXthrXj6sCe71qmiohhSnAhUOFeg1Oc=;
- b=NZedMS4tFGZlh5PiOVJsfXJ8G05XqVPYJTfbwwEgqu5h8JQG6IK1908vvX+AjjiTCuhBSQ0EGTnZGU0eHZv/m5QM1RHIvnJkf8EHSSWNBGTlyCkvVFU6j/2B7tNJxxFjPpgOJPd/3llCKZylwlFiYgXF4XFURmq/sgbwYhjBnOdyAwhjVXmNRiyDfQB/FEbJhEUdj0mFYkaZ9DhsjWQZ6VkJUhhGaWziCYugpN72f6qg2tvhuFE5aZSks5RZ/lsM2u/QfZ4XjisJ78lGXkv1eC+wYDluhVAuHErmxDOz9NRQvA381N9dJcoN+tcR4JV3+hzZfr948FTdPb4yJiC3yA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SJ0PR12MB8092.namprd12.prod.outlook.com (2603:10b6:a03:4ee::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.25; Wed, 6 Dec
- 2023 01:30:46 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7046.034; Wed, 6 Dec 2023
- 01:30:40 +0000
-Date: Tue, 5 Dec 2023 21:30:39 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Zhangfei Gao <zhangfei.gao@linaro.org>
-Cc: Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	jean-philippe <jean-philippe@linaro.org>, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, Wenkai Lin <linwenkai6@hisilicon.com>
-Subject: Re: [PATCH] iommu/arm-smmu-v3: disable stall for quiet_cd
-Message-ID: <20231206013039.GN2692119@nvidia.com>
-References: <20231206005727.46150-1-zhangfei.gao@linaro.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231206005727.46150-1-zhangfei.gao@linaro.org>
-X-ClientProxiedBy: BL0PR02CA0008.namprd02.prod.outlook.com
- (2603:10b6:207:3c::21) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6C7C91B9;
+	Tue,  5 Dec 2023 17:33:27 -0800 (PST)
+Received: from loongson.cn (unknown [10.20.42.173])
+	by gateway (Coremail) with SMTP id _____8Bxyeplz29lWC8_AA--.51037S3;
+	Wed, 06 Dec 2023 09:33:25 +0800 (CST)
+Received: from [10.20.42.173] (unknown [10.20.42.173])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cx7y9hz29lMwtWAA--.58800S3;
+	Wed, 06 Dec 2023 09:33:23 +0800 (CST)
+Subject: Re: [PATCH v2 2/2] LoongArch: KVM: Add LASX support
+To: Tianrui Zhao <zhaotianrui@loongson.cn>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>,
+ WANG Xuerui <kernel@xen0n.name>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, loongarch@lists.linux.dev,
+ Jens Axboe <axboe@kernel.dk>, Mark Brown <broonie@kernel.org>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ Oliver Upton <oliver.upton@linux.dev>
+References: <20231201084619.2255983-1-zhaotianrui@loongson.cn>
+ <20231201084619.2255983-3-zhaotianrui@loongson.cn>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <b3fc2c52-4bc6-b46d-1f5a-83a37eb1204b@loongson.cn>
+Date: Wed, 6 Dec 2023 09:33:15 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ0PR12MB8092:EE_
-X-MS-Office365-Filtering-Correlation-Id: a677fd9c-fccd-4228-954b-08dbf5faf4a2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	uFVcKAPm+OFAyV/u32/MZcTztsl+HwfubmTRRESRzKPMtsLOyL8liVpfqBzGqivcC/q/zyH5/hC6YZJkQ5j/laEsoaXgTtDvAtsm7NnPa6JU2gi3CTPqFihpV/sBQ49oow5CB7vPmCOymMnK6HQ0qzng1zidSOaEmMak0q+44bbpg2NbrG5469Aon5aF1LB5nhAsaAHkRd5M83qKXGzwziyxq4MoVhIDsbNRD32uNOoFf7x3fGYqdSkB7Ke4ofEYVpV7NW9q5Rjc6lVJkkKOsOPcNab0wX8TZ2cB6b+t4Le9aGbCSsS9B7jsTCYyxxRbQ70yC4TrMM5Txy5zC5BV/SLXIoDZOJ5/dnZfIOAp415CJQZkK+7fo8sbuGMhJEbdHBmbx5mITAG+BvDBN9B+hFkvnh5vQQExP3xtiL+Ptxf8/hiye3bd2/9nQQH/Y4gUeOJ9GsR0WVNPL85kqC3YLuZERJksxWOiTwipyhHYo5BDVyQYzv2viehkPSzFeeTe3uxw9C/avH8Fd/QyfZFZlL+RvovZXSOnNjX55k+620x/puBv45UZ/Qo0pQZDvl/D
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(396003)(346002)(39860400002)(366004)(230922051799003)(64100799003)(1800799012)(186009)(451199024)(38100700002)(41300700001)(86362001)(33656002)(83380400001)(1076003)(2616005)(6512007)(36756003)(6506007)(2906002)(8936002)(8676002)(6486002)(478600001)(316002)(54906003)(26005)(4326008)(66946007)(5660300002)(66556008)(6916009)(66476007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?vRoBT6cCtBCETK9toa780eJqKmJjz8WQsg4PF/Rkx29r/QY9bLi6dl5WMqwh?=
- =?us-ascii?Q?QScrSzCPaXpiAZ3AQSEWC9QuS2Fh0kVhFcXIu7bu4S8mqunIfowGTVASFbMT?=
- =?us-ascii?Q?Oq2WEU/FViM/5y8rWKhHmGkjpXd2dGHPc9CULeZ2lmMqiGK/YD0XQ4zzwQ/8?=
- =?us-ascii?Q?bU7mO3At3Zq4BD7mKE61wHFrHHUihgdjCdEVUTn628zpFrA8ukCr9EHAqphR?=
- =?us-ascii?Q?aoiohyz1fQCuiSYIBG4tA97Y0OJmMcWvldMcltSVBOp38jybpW36QRMiH4aM?=
- =?us-ascii?Q?EBvLl+NC+WRKbRrGHhVH2LBMeWROP1w0bTLf5aaFelr5E01XTLGCFZ8w0Uol?=
- =?us-ascii?Q?uth55iMYDFNMBapEKwcyVxV1ShPIGlRLgdBZXo18hE9utNT8CGZ3Zcp8ESan?=
- =?us-ascii?Q?yXPsNmv34jPzbAtcKY+46pKXsdhVe2OHtlJPfPTixSsCys5qQn9PePEFiP8F?=
- =?us-ascii?Q?JUIrRyxD8Ok0nr7ppyCcZW+FP3mfs1Xq+AxiqlOz7kTHvUZROQpizUI8YZai?=
- =?us-ascii?Q?vcv5DdWWGNH4jZ0KlYPgryd61DPSDzNnUmiYIEsVcAWD9TZvViFVFiRFge8G?=
- =?us-ascii?Q?Eek3/LzJ5tHkLZHGOKADssoOJBXdp7TCyEaI8UucRQZtcjkMx0jsYopTCHQO?=
- =?us-ascii?Q?ZvK+9ELQKnAUwqfoMDHZw0pp1WJtFCnPtI0Pzlol6wP9F5QPsLRydz6Q74+V?=
- =?us-ascii?Q?nglCF56iNNrKx+RKz50ptjKabmp8p8fQF2OLXYPXCBsN6PdLxpXrhAS1KtJv?=
- =?us-ascii?Q?lOCN/uZWUVS8HHIhm+MNviE7/kryjJiR2b1Cxsa8/BCL1I5acERqvyXbuzxo?=
- =?us-ascii?Q?Ywv8YDwB+BXFpBkvtz5M3U7Hdg+JE8xlCJ6jAtv49kn3mPRd9DlalewsAUzj?=
- =?us-ascii?Q?rie+UUrT/h3qqaQLM4fgjZwYUVXZwas/aeA6R3CmXTxaPCeuGudnWXPcvpSB?=
- =?us-ascii?Q?0kU40wrPbUg/QIvmScU7GHBlRnaCWOtq7kdbJxLAgEH3E3L+pziJkEgDezdw?=
- =?us-ascii?Q?8T4pYBigcGbONcqFVyqmsoOc4MCnbjcKQaKD5f8XBUH5xFVGl2ayqOniDyfY?=
- =?us-ascii?Q?u7MuASM4OSzgrJFSvh8YaaeP/JfJMI1Y/MwfC13FOUrjy+cMtJLqB+FgVgdu?=
- =?us-ascii?Q?Ym4P/anv03Pshbf7dX/V3+rnZRUqtH12SVZl/+dFqKISAwNzrRmiZcq+tKiU?=
- =?us-ascii?Q?NgsA/F4X19HFQY+FJu2woWGPjmBBLU4X6mlx3OpdKJQPKbQ/oyxpsFYPnJYy?=
- =?us-ascii?Q?v+wgZZAxlsPv+geN+5rzt9ffeyItdJk+wcZUwFcrhrM9EGea6ityflHXACeX?=
- =?us-ascii?Q?nIwGtZCBnKr3kC2OFn54/OeUoB3vPLj0M+PvaviYbfSXji0ea7rZAhBPsWXS?=
- =?us-ascii?Q?xEemyZk4i+rFaVeK352iYTrWUlXckobRo6DrwHloMy02lvAoA2Z5VdViMWM0?=
- =?us-ascii?Q?eirdpiK7mb0sD+fAxKSybtga7US1GgGfC/Y2SsQ03DylhkmFQE4HRGkljMPF?=
- =?us-ascii?Q?y8oKgDmkrFhYSAZ/IjKrssLcKrLlE+frjcyAIBEaomkDear0Vf/gwMZuXYjx?=
- =?us-ascii?Q?mlVb4aPTgmErlzho8TFHsjfa9zNa34DSQx1xSvYe?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a677fd9c-fccd-4228-954b-08dbf5faf4a2
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2023 01:30:39.9302
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fNAC6b33akEA1g1ilNkU9M2FVSkD61uAXJaR7ng3ZC57uYJPGJqHcvfYHhRx7xBL
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8092
+In-Reply-To: <20231201084619.2255983-3-zhaotianrui@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Cx7y9hz29lMwtWAA--.58800S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxKF4DJrWDtr1xAr47Wry8Zwc_yoWfJF4rpF
+	Zrurn0ya18WFn293srJ3Wq9rn8ZrZ2gryIga9rta4fGF1qqry5XF4kKrWDXFWrGw1rJFyS
+	qF1rJr15ZayUJwbCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWU
+	twAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+	k0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l
+	4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxV
+	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
+	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+	1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
+	42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUUUU=
 
-On Wed, Dec 06, 2023 at 08:57:27AM +0800, Zhangfei Gao wrote:
-> From: Wenkai Lin <linwenkai6@hisilicon.com>
+
+
+On 2023/12/1 下午4:46, Tianrui Zhao wrote:
+> This patch adds LASX support for LoongArch KVM.
+> There will be LASX exception in KVM when guest use the LASX
+> instruction. KVM will enable LASX and restore the vector
+> registers for guest then return to guest to continue running.
 > 
-> In the stall model, invalid transactions were expected to be
-> stalled and aborted by the IOPF handler.
+> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+> ---
+>   arch/loongarch/include/asm/kvm_host.h |  6 ++++
+>   arch/loongarch/include/asm/kvm_vcpu.h | 10 ++++++
+>   arch/loongarch/kernel/fpu.S           |  2 ++
+>   arch/loongarch/kvm/exit.c             | 18 +++++++++++
+>   arch/loongarch/kvm/switch.S           | 15 +++++++++
+>   arch/loongarch/kvm/trace.h            |  4 ++-
+>   arch/loongarch/kvm/vcpu.c             | 46 ++++++++++++++++++++++++++-
+>   7 files changed, 99 insertions(+), 2 deletions(-)
 > 
-> However, when killing a test case with a huge amount of data, the
-> accelerator streamline can not stop until all data is consumed
-> even if the page fault handler reports errors. As a result, the
-> kill may take a long time, about 10 seconds with numerous iopf
-> interrupts.
+> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
+> index a53b47093f4..dc817481b30 100644
+> --- a/arch/loongarch/include/asm/kvm_host.h
+> +++ b/arch/loongarch/include/asm/kvm_host.h
+> @@ -97,6 +97,7 @@ enum emulation_result {
+>   #define KVM_LARCH_SWCSR_LATEST	(0x1 << 1)
+>   #define KVM_LARCH_HWCSR_USABLE	(0x1 << 2)
+>   #define KVM_LARCH_LSX		(0x1 << 3)
+> +#define KVM_LARCH_LASX		(0x1 << 4)
+>   
+>   struct kvm_vcpu_arch {
+>   	/*
+> @@ -183,6 +184,11 @@ static inline bool kvm_guest_has_lsx(struct kvm_vcpu_arch *arch)
+>   	return arch->cpucfg[2] & CPUCFG2_LSX;
+>   }
+>   
+> +static inline bool kvm_guest_has_lasx(struct kvm_vcpu_arch *arch)
+> +{
+> +	return arch->cpucfg[2] & CPUCFG2_LASX;
+> +}
+> +
+>   /* Debug: dump vcpu state */
+>   int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu);
+>   
+> diff --git a/arch/loongarch/include/asm/kvm_vcpu.h b/arch/loongarch/include/asm/kvm_vcpu.h
+> index c629771e122..4f87f160185 100644
+> --- a/arch/loongarch/include/asm/kvm_vcpu.h
+> +++ b/arch/loongarch/include/asm/kvm_vcpu.h
+> @@ -67,6 +67,16 @@ static inline void kvm_restore_lsx(struct loongarch_fpu *fpu) { }
+>   static inline void kvm_restore_lsx_upper(struct loongarch_fpu *fpu) { }
+>   #endif
+>   
+> +#ifdef CONFIG_CPU_HAS_LASX
+> +void kvm_own_lasx(struct kvm_vcpu *vcpu);
+> +void kvm_save_lasx(struct loongarch_fpu *fpu);
+> +void kvm_restore_lasx(struct loongarch_fpu *fpu);
+> +#else
+> +static inline void kvm_own_lasx(struct kvm_vcpu *vcpu) { }
+> +static inline void kvm_save_lasx(struct loongarch_fpu *fpu) { }
+> +static inline void kvm_restore_lasx(struct loongarch_fpu *fpu) { }
+> +#endif
+> +
+>   void kvm_acquire_timer(struct kvm_vcpu *vcpu);
+>   void kvm_init_timer(struct kvm_vcpu *vcpu, unsigned long hz);
+>   void kvm_reset_timer(struct kvm_vcpu *vcpu);
+> diff --git a/arch/loongarch/kernel/fpu.S b/arch/loongarch/kernel/fpu.S
+> index d53ab10f464..4382e36ae3d 100644
+> --- a/arch/loongarch/kernel/fpu.S
+> +++ b/arch/loongarch/kernel/fpu.S
+> @@ -349,6 +349,7 @@ SYM_FUNC_START(_restore_lsx_upper)
+>   	lsx_restore_all_upper a0 t0 t1
+>   	jr	ra
+>   SYM_FUNC_END(_restore_lsx_upper)
+> +EXPORT_SYMBOL(_restore_lsx_upper)
+>   
+>   SYM_FUNC_START(_init_lsx_upper)
+>   	lsx_init_all_upper t1
+> @@ -384,6 +385,7 @@ SYM_FUNC_START(_restore_lasx_upper)
+>   	lasx_restore_all_upper a0 t0 t1
+>   	jr	ra
+>   SYM_FUNC_END(_restore_lasx_upper)
+> +EXPORT_SYMBOL(_restore_lasx_upper)
+>   
+>   SYM_FUNC_START(_init_lasx_upper)
+>   	lasx_init_all_upper t1
+> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
+> index 1b1c58ccc83..57bd5bf562a 100644
+> --- a/arch/loongarch/kvm/exit.c
+> +++ b/arch/loongarch/kvm/exit.c
+> @@ -676,6 +676,23 @@ static int kvm_handle_lsx_disabled(struct kvm_vcpu *vcpu)
+>   	return RESUME_GUEST;
+>   }
+>   
+> +/*
+> + * kvm_handle_lasx_disabled() - Guest used LASX while disabled in root.
+> + * @vcpu:	Virtual CPU context.
+> + *
+> + * Handle when the guest attempts to use LASX when it is disabled in the root
+> + * context.
+> + */
+> +static int kvm_handle_lasx_disabled(struct kvm_vcpu *vcpu)
+> +{
+> +	if (!kvm_guest_has_lasx(&vcpu->arch))
+> +		kvm_queue_exception(vcpu, EXCCODE_INE, 0);
+> +	else
+> +		kvm_own_lasx(vcpu);
+> +
+> +	return RESUME_GUEST;
+> +}
+> +
+>   /*
+>    * LoongArch KVM callback handling for unimplemented guest exiting
+>    */
+> @@ -705,6 +722,7 @@ static exit_handle_fn kvm_fault_tables[EXCCODE_INT_START] = {
+>   	[EXCCODE_TLBM]			= kvm_handle_write_fault,
+>   	[EXCCODE_FPDIS]			= kvm_handle_fpu_disabled,
+>   	[EXCCODE_LSXDIS]                = kvm_handle_lsx_disabled,
+> +	[EXCCODE_LASXDIS]               = kvm_handle_lasx_disabled,
+>   	[EXCCODE_GSPR]			= kvm_handle_gspr,
+>   };
+>   
+> diff --git a/arch/loongarch/kvm/switch.S b/arch/loongarch/kvm/switch.S
+> index 6c48f7d1ca5..215c70b2de3 100644
+> --- a/arch/loongarch/kvm/switch.S
+> +++ b/arch/loongarch/kvm/switch.S
+> @@ -266,6 +266,21 @@ SYM_FUNC_START(kvm_restore_lsx_upper)
+>   SYM_FUNC_END(kvm_restore_lsx_upper)
+>   #endif
+>   
+> +#ifdef CONFIG_CPU_HAS_LASX
+> +SYM_FUNC_START(kvm_save_lasx)
+> +	fpu_save_csr    a0 t1
+> +	fpu_save_cc     a0 t1 t2
+> +	lasx_save_data  a0 t1
+> +	jr              ra
+> +SYM_FUNC_END(kvm_save_lasx)
+> +
+> +SYM_FUNC_START(kvm_restore_lasx)
+> +	lasx_restore_data a0 t1
+> +	fpu_restore_cc    a0 t1 t2
+> +	fpu_restore_csr   a0 t1 t2
+> +	jr                ra
+> +SYM_FUNC_END(kvm_restore_lasx)
+> +#endif
+>   	.section ".rodata"
+>   SYM_DATA(kvm_exception_size, .quad kvm_exc_entry_end - kvm_exc_entry)
+>   SYM_DATA(kvm_enter_guest_size, .quad kvm_enter_guest_end - kvm_enter_guest)
+> diff --git a/arch/loongarch/kvm/trace.h b/arch/loongarch/kvm/trace.h
+> index 7da4e230e89..c2484ad4cff 100644
+> --- a/arch/loongarch/kvm/trace.h
+> +++ b/arch/loongarch/kvm/trace.h
+> @@ -103,6 +103,7 @@ TRACE_EVENT(kvm_exit_gspr,
+>   
+>   #define KVM_TRACE_AUX_FPU		1
+>   #define KVM_TRACE_AUX_LSX		2
+> +#define KVM_TRACE_AUX_LASX		3
+>   
+>   #define kvm_trace_symbol_aux_op				\
+>   	{ KVM_TRACE_AUX_SAVE,		"save" },	\
+> @@ -113,7 +114,8 @@ TRACE_EVENT(kvm_exit_gspr,
+>   
+>   #define kvm_trace_symbol_aux_state			\
+>   	{ KVM_TRACE_AUX_FPU,     "FPU" },		\
+> -	{ KVM_TRACE_AUX_LSX,     "LSX" }
+> +	{ KVM_TRACE_AUX_LSX,     "LSX" },		\
+> +	{ KVM_TRACE_AUX_LASX,    "LASX" }
+>   
+>   TRACE_EVENT(kvm_aux,
+>   	    TP_PROTO(struct kvm_vcpu *vcpu, unsigned int op,
+> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> index 4820c95091f..7802ae68197 100644
+> --- a/arch/loongarch/kvm/vcpu.c
+> +++ b/arch/loongarch/kvm/vcpu.c
+> @@ -329,6 +329,13 @@ static int kvm_get_cpucfg_supported(int id, u64 *v)
+>   		 */
+>   		if (cpu_has_lsx)
+>   			*v |= CPUCFG2_LSX;
+> +		/*
+> +		 * if LASX is supported by CPU, it is also supported by KVM,
+> +		 * as we implement it.
+> +		 */
+> +		if (cpu_has_lasx)
+> +			*v |= CPUCFG2_LASX;
+> +
+>   		break;
+>   	default:
+>   		ret = -EINVAL;
+> @@ -653,12 +660,49 @@ void kvm_own_lsx(struct kvm_vcpu *vcpu)
+>   }
+>   #endif
+>   
+> +#ifdef CONFIG_CPU_HAS_LASX
+> +/* Enable LASX for guest and restore context */
+> +void kvm_own_lasx(struct kvm_vcpu *vcpu)
+> +{
+> +	preempt_disable();
+> +
+> +	set_csr_euen(CSR_EUEN_FPEN | CSR_EUEN_LSXEN | CSR_EUEN_LASXEN);
+> +	switch (vcpu->arch.aux_inuse & (KVM_LARCH_FPU | KVM_LARCH_LSX)) {
+> +	case KVM_LARCH_LSX | KVM_LARCH_FPU:
+> +	case KVM_LARCH_LSX:
+> +		/* Guest LSX state already loaded, only restore upper LASX state */
+> +		_restore_lasx_upper(&vcpu->arch.fpu);
+> +		break;
+> +	case KVM_LARCH_FPU:
+> +		/* Guest FP state already loaded, only restore 64~256 LASX state */
+> +		kvm_restore_lsx_upper(&vcpu->arch.fpu);
+> +		_restore_lasx_upper(&vcpu->arch.fpu);
+> +		break;
+> +	default:
+> +		/* Neither FP or LSX already active, restore full LASX state */
+> +		kvm_restore_lasx(&vcpu->arch.fpu);
+> +		break;
+> +	}
+> +
+> +	trace_kvm_aux(vcpu, KVM_TRACE_AUX_RESTORE, KVM_TRACE_AUX_LASX);
+> +	vcpu->arch.aux_inuse |= KVM_LARCH_LASX | KVM_LARCH_LSX | KVM_LARCH_FPU;
+> +	preempt_enable();
+> +}
+> +#endif
+> +
+>   /* Save context and disable FPU */
+>   void kvm_lose_fpu(struct kvm_vcpu *vcpu)
+>   {
+>   	preempt_disable();
+>   
+> -	if (vcpu->arch.aux_inuse & KVM_LARCH_LSX) {
+> +	if (vcpu->arch.aux_inuse & KVM_LARCH_LASX) {
+> +		kvm_save_lasx(&vcpu->arch.fpu);
+> +		vcpu->arch.aux_inuse &= ~(KVM_LARCH_LSX | KVM_LARCH_FPU | KVM_LARCH_LASX);
+> +		trace_kvm_aux(vcpu, KVM_TRACE_AUX_SAVE, KVM_TRACE_AUX_LASX);
+> +
+> +		/* Disable LASX & LSX & FPU */
+> +		clear_csr_euen(CSR_EUEN_FPEN | CSR_EUEN_LSXEN | CSR_EUEN_LASXEN);
+> +	} else if (vcpu->arch.aux_inuse & KVM_LARCH_LSX) {
+>   		kvm_save_lsx(&vcpu->arch.fpu);
+>   		vcpu->arch.aux_inuse &= ~(KVM_LARCH_LSX | KVM_LARCH_FPU);
+>   		trace_kvm_aux(vcpu, KVM_TRACE_AUX_SAVE, KVM_TRACE_AUX_LSX);
 > 
-> So disable stall for quiet_cd in the non-force stall model, since
-> force stall model (STALL_MODEL==0b10) requires CD.S must be 1.
+Reviewed-by: Bibo Mao <maobibo@loongson.cn>
 
-I think this force-stall thing should get a closer look, it doesn't
-look completely implemented and what does it mean for, eg, non-SVA
-domains attached to the device (as we now support with S2 and soon
-with PASID)
-
-The manual says:
-
-0b10 Stall is forced (all faults eligible to stall cause stall),
-     STE.S2S and CD.S must be 1.
-
-And there is a note:
-
- Note: For faulting transactions that are associated with client
- devices that have been configured to stall, but where
- the system has not explicitly advertised the client devices to be
- usable with the stall model, Arm recommends for
- software to expect that events might be recorded with Stall == 0.
-
-Which makes it seem like it isn't actually "force" per-say, but
-something else.
-
-I notice the driver never sets STE.S2S, and it isn't entirely clear
-what software should even do for a standard non-faulting domain where
-non-present means failure? Take the fault event and always respond
-with failure? What is the purpose?
-
-Aside from that the change looks OK to me:
-
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-
-Jason
 
