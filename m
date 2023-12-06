@@ -1,149 +1,208 @@
-Return-Path: <kvm+bounces-3735-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3736-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F676807662
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 18:20:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B107807663
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 18:20:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEE9E1C20B07
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 17:20:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A152B281F71
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 17:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE46565EDD;
-	Wed,  6 Dec 2023 17:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C892765EDD;
+	Wed,  6 Dec 2023 17:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="c0fIEMg8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Odh/hjOX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38773D3
-	for <kvm@vger.kernel.org>; Wed,  6 Dec 2023 09:20:08 -0800 (PST)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B6H75P6014781;
-	Wed, 6 Dec 2023 17:18:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=iLAZtBgfavIW2C/yCiLsLl0/0C/qHx0UAu0Tli0IL34=;
- b=c0fIEMg8AbD3L87lbvVuocEwAob4ifzRolzpWrdtOmceYFnAN6ISjsVvoaKcYK9ku6xL
- yABR6W1fhwSasph0TbEH7nFrNgBbnWT/iJchSEv7qJOWkI3L6g7+tcbhEVmZUd069sNw
- xqGhd/lJdE35VbsBNW8d5H3K3Os1CGFXKntrk2BNQnqmtHVRhN7CJMhbxFdvUOUNqvaa
- 4+44L4zb1+/e9sfVXswj8EsFuy9ttiUTlRK6NSduOINkP6VnsnMKThGw7MP1Be9DEXg1
- 7idfP5o3FOk7ECvy0K46IDsvu3bs8GpR26+E0sLA9KNmGrXllkkXqzxaVq6Psu/X7kIn RQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3utw2t8b3e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 06 Dec 2023 17:18:27 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B6H7ujh019086;
-	Wed, 6 Dec 2023 17:18:27 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3utw2t8b31-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 06 Dec 2023 17:18:26 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B6GD7I9027003;
-	Wed, 6 Dec 2023 17:18:26 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3utav2wu5a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 06 Dec 2023 17:18:26 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B6HIN5Y43582182
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 6 Dec 2023 17:18:23 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0912020043;
-	Wed,  6 Dec 2023 17:18:23 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8DB0720040;
-	Wed,  6 Dec 2023 17:18:22 +0000 (GMT)
-Received: from [9.179.6.71] (unknown [9.179.6.71])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  6 Dec 2023 17:18:22 +0000 (GMT)
-Message-ID: <387136aa-dfc7-4a1b-a7a6-31c7ecad1013@linux.ibm.com>
-Date: Wed, 6 Dec 2023 18:18:22 +0100
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C066DE
+	for <kvm@vger.kernel.org>; Wed,  6 Dec 2023 09:20:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701883222;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SsLFzQv2YNuDCZra2Kj0iJALxsgAF/x7Gz2Slw1HQQQ=;
+	b=Odh/hjOXg4LRA/Ip4tOAkrH72wYbNVqsO3Dd2DpqBgOkh3tj/ToufKhVJWH/CUS78v7Qf6
+	LdIhUTLy5qhxOWAYhEW+gumy3Z9OTvplc42QIXcAvZLXHgOU839LuB73RP9B620Nu2V3O9
+	qq2dKVsBClBC88ClgKgZhUlV8TMckyw=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-157-i090KJ4XMhib0qxlNrpDqQ-1; Wed, 06 Dec 2023 12:20:21 -0500
+X-MC-Unique: i090KJ4XMhib0qxlNrpDqQ-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-332e2f70092so23437f8f.0
+        for <kvm@vger.kernel.org>; Wed, 06 Dec 2023 09:20:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701883217; x=1702488017;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SsLFzQv2YNuDCZra2Kj0iJALxsgAF/x7Gz2Slw1HQQQ=;
+        b=erbroTwGsJSageMIitXgDB2AAdwGu8BspzuLMVkhErkhrFFVbI0ELZcoFlWRFOEOVy
+         VECf4Nqf5GI+P5MF1PmNXPix4A4kyA+c/RveZdu+VFyaHP9ZKJulZ0LTWAQ+sMMAxo6E
+         A6cTpC1I1BJhYeyArisXbwf1k0P21XjNJVMqB6EDNJbPZ2m6sUG0ffNKnIiLInrF5FG+
+         X09nSbzldEsnkgoIjsyf4T/4/+5NlDET0xAUjrYAkfmKS0BhoDeiuUYw31OuSzXNDDmD
+         T2gRtq+0ubYKaJ2fXdRmz9axxEluPfAlqIX43HCHB7u/wjR0ydwPjFssSoE+oawKOUeI
+         ZLDw==
+X-Gm-Message-State: AOJu0YwyaKzHtXnjUaoLPN+Z6mj/WIbzeZUJz7xmL1FJA7t3jnSMep0Q
+	AGIRAzOLplE2LC5oiW88N0oWO4nL5iE0Lr6f4z9ahiGrKdMKLhh6wGKbmjHpLzpMVb+0XmaaHGx
+	HDKvByFZ1KcFSMOOauhly
+X-Received: by 2002:a05:600c:152:b0:40c:711:f492 with SMTP id w18-20020a05600c015200b0040c0711f492mr755828wmm.181.1701883216911;
+        Wed, 06 Dec 2023 09:20:16 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEEDaeszLqwAe0nU5bPLurT8kY29VuNk8fXrhQGAvKHABN9JIws3HuahPDdf6VZlB5WEBMVQQ==
+X-Received: by 2002:a05:600c:152:b0:40c:711:f492 with SMTP id w18-20020a05600c015200b0040c0711f492mr755819wmm.181.1701883216571;
+        Wed, 06 Dec 2023 09:20:16 -0800 (PST)
+Received: from starship ([89.237.98.20])
+        by smtp.gmail.com with ESMTPSA id v16-20020a05600c471000b0040b43da0bbasm215072wmo.30.2023.12.06.09.20.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 09:20:16 -0800 (PST)
+Message-ID: <9eae0513c912faa04a11db378ea3ca176ab45f0d.camel@redhat.com>
+Subject: Re: [PATCH v2 for-8.2?] i386/sev: Avoid SEV-ES crash due to missing
+ MSR_EFER_LMA bit
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti
+ <mtosatti@redhat.com>,  Tom Lendacky <thomas.lendacky@amd.com>, Akihiko
+ Odaki <akihiko.odaki@daynix.com>, kvm@vger.kernel.org
+Date: Wed, 06 Dec 2023 19:20:14 +0200
+In-Reply-To: <20231205222816.1152720-1-michael.roth@amd.com>
+References: <20231205222816.1152720-1-michael.roth@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/5] KVM: selftests: s390x: Remove redundant newlines
-Content-Language: en-US
-To: Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-Cc: seanjc@google.com, pbonzini@redhat.com, maz@kernel.org,
-        oliver.upton@linux.dev, anup@brainfault.org, borntraeger@linux.ibm.com,
-        imbrenda@linux.ibm.com
-References: <20231206170241.82801-7-ajones@ventanamicro.com>
- <20231206170241.82801-11-ajones@ventanamicro.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20231206170241.82801-11-ajones@ventanamicro.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: xzV3MHUDjJdbVfr7x-9rZ1jhYyXvY1qd
-X-Proofpoint-ORIG-GUID: Y_r8UmplnxgKD645XqSGjFYdOcTqSmrx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-06_15,2023-12-06_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- bulkscore=0 mlxlogscore=449 lowpriorityscore=0 spamscore=0 mlxscore=0
- suspectscore=0 clxscore=1011 impostorscore=0 adultscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312060140
 
-On 12/6/23 18:02, Andrew Jones wrote:
-> TEST_* functions append their own newline. Remove newlines from
-> TEST_* callsites to avoid extra newlines in output.
+On Tue, 2023-12-05 at 16:28 -0600, Michael Roth wrote:
+> Commit 7191f24c7fcf ("accel/kvm/kvm-all: Handle register access errors")
+> added error checking for KVM_SET_SREGS/KVM_SET_SREGS2. In doing so, it
+> exposed a long-running bug in current KVM support for SEV-ES where the
+> kernel assumes that MSR_EFER_LMA will be set explicitly by the guest
+> kernel, in which case EFER write traps would result in KVM eventually
+> seeing MSR_EFER_LMA get set and recording it in such a way that it would
+> be subsequently visible when accessing it via KVM_GET_SREGS/etc.
 > 
-> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+> However, guests kernels currently rely on MSR_EFER_LMA getting set
+> automatically when MSR_EFER_LME is set and paging is enabled via
+> CR0_PG_MASK. As a result, the EFER write traps don't actually expose the
+> MSR_EFER_LMA even though it is set internally, and when QEMU
+> subsequently tries to pass this EFER value back to KVM via
+> KVM_SET_SREGS* it will fail various sanity checks and return -EINVAL,
+> which is now considered fatal due to the aforementioned QEMU commit.
+> 
+> This can be addressed by inferring the MSR_EFER_LMA bit being set when
+> paging is enabled and MSR_EFER_LME is set, and synthesizing it to ensure
+> the expected bits are all present in subsequent handling on the host
+> side.
+> 
+> Ultimately, this handling will be implemented in the host kernel, but to
+> avoid breaking QEMU's SEV-ES support when using older host kernels, the
+> same handling can be done in QEMU just after fetching the register
+> values via KVM_GET_SREGS*. Implement that here.
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Marcelo Tosatti <mtosatti@redhat.com>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Akihiko Odaki <akihiko.odaki@daynix.com>
+> Cc: kvm@vger.kernel.org
+> Fixes: 7191f24c7fcf ("accel/kvm/kvm-all: Handle register access errors")
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+> v2:
+>   - Add handling for KVM_GET_SREGS, not just KVM_GET_SREGS2
+> 
+>  target/i386/kvm/kvm.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+> 
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index 11b8177eff..8721c1bf8f 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -3610,6 +3610,7 @@ static int kvm_get_sregs(X86CPU *cpu)
+>  {
+>      CPUX86State *env = &cpu->env;
+>      struct kvm_sregs sregs;
+> +    target_ulong cr0_old;
+>      int ret;
+>  
+>      ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_SREGS, &sregs);
+> @@ -3637,12 +3638,18 @@ static int kvm_get_sregs(X86CPU *cpu)
+>      env->gdt.limit = sregs.gdt.limit;
+>      env->gdt.base = sregs.gdt.base;
+>  
+> +    cr0_old = env->cr[0];
+>      env->cr[0] = sregs.cr0;
+>      env->cr[2] = sregs.cr2;
+>      env->cr[3] = sregs.cr3;
+>      env->cr[4] = sregs.cr4;
+>  
+>      env->efer = sregs.efer;
+> +    if (sev_es_enabled() && env->efer & MSR_EFER_LME) {
+> +        if (!(cr0_old & CR0_PG_MASK) && env->cr[0] & CR0_PG_MASK) {
+> +            env->efer |= MSR_EFER_LMA;
+> +        }
+> +    }
 
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
+I think that we should not check that CR0_PG has changed, and just blindly assume
+that if EFER.LME is set and CR0.PG is set, then EFER.LMA must be set as defined in x86 spec.
 
-[...]
+Otherwise, suppose qemu calls kvm_get_sregs twice: First time it will work,
+but second time CR0.PG will match one that is stored in the env, and thus the workaround
+will not be executed, and instead we will revert back to wrong EFER value 
+reported by the kernel.
+
+How about something like that:
+
+
+if (sev_es_enabled() && env->efer & MSR_EFER_LME && env->cr[0] & CR0_PG_MASK) {
+	/* 
+         * Workaround KVM bug, because of which KVM might not be aware of the 
+         * fact that EFER.LMA was toggled by the hardware 
+         */
+	env->efer |= MSR_EFER_LMA;
+}
+
+
+Best regards,
+	Maxim Levitsky
+
+>  
+>      /* changes to apic base and cr8/tpr are read back via kvm_arch_post_run */
+>      x86_update_hflags(env);
+> @@ -3654,6 +3661,7 @@ static int kvm_get_sregs2(X86CPU *cpu)
+>  {
+>      CPUX86State *env = &cpu->env;
+>      struct kvm_sregs2 sregs;
+> +    target_ulong cr0_old;
+>      int i, ret;
+>  
+>      ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_SREGS2, &sregs);
+> @@ -3676,12 +3684,18 @@ static int kvm_get_sregs2(X86CPU *cpu)
+>      env->gdt.limit = sregs.gdt.limit;
+>      env->gdt.base = sregs.gdt.base;
+>  
+> +    cr0_old = env->cr[0];
+>      env->cr[0] = sregs.cr0;
+>      env->cr[2] = sregs.cr2;
+>      env->cr[3] = sregs.cr3;
+>      env->cr[4] = sregs.cr4;
+>  
+>      env->efer = sregs.efer;
+> +    if (sev_es_enabled() && env->efer & MSR_EFER_LME) {
+> +        if (!(cr0_old & CR0_PG_MASK) && env->cr[0] & CR0_PG_MASK) {
+> +            env->efer |= MSR_EFER_LMA;
+> +        }
+> +    }
+>  
+>      env->pdptrs_valid = sregs.flags & KVM_SREGS2_FLAGS_PDPTRS_VALID;
+>  
+
+
 
