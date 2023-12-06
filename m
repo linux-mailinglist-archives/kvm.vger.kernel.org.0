@@ -1,220 +1,174 @@
-Return-Path: <kvm+bounces-3709-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3710-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8FC0807417
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 16:57:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7F7D807436
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 16:59:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8A0FB20F4F
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 15:57:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3EAB1B20E5D
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 15:59:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B072145BEB;
-	Wed,  6 Dec 2023 15:57:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86A5445C0F;
+	Wed,  6 Dec 2023 15:59:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dAEFV/8X"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="i4W4BKzw"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B950C137
-	for <kvm@vger.kernel.org>; Wed,  6 Dec 2023 07:57:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701878247;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8sfdxoKgydhasOw2S4cUX/lHBXVSYArPHOpqmrg8Q+0=;
-	b=dAEFV/8XXUGX9GHqrLIkBdmRmMJEsBLEKmB+iGI75uxL98SWfwrQ+0etKqqfLU4y/NhM4m
-	Agh1p67gRD1XafrJ9Oggf9uy9LSyuLrdI/7kka7O7evCU8PcYkvMKpD6UNBaDOFM1UwVtI
-	0Bt+VrBNx1ezEkbGgTiYrpb/mDPBcFs=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-342--yd3y7R1OZu_D-get9SNgA-1; Wed, 06 Dec 2023 10:57:25 -0500
-X-MC-Unique: -yd3y7R1OZu_D-get9SNgA-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40b4a837eb8so59410425e9.3
-        for <kvm@vger.kernel.org>; Wed, 06 Dec 2023 07:57:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701878244; x=1702483044;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8sfdxoKgydhasOw2S4cUX/lHBXVSYArPHOpqmrg8Q+0=;
-        b=lmzWgArdkY2SWN8Y5ITac8Wl/04+9Y4hXMz13Msa/TqgkKDtDUJx8b22XyV/sgDFTN
-         0lQXreVER5sXN4u6vZNCmhL1UbhImb//HEj26f/xjT40uwrWkPxCSxVB5YXpiyRkyvbn
-         Myh06fFOnudRPu8ryu3a30kqgoraa9K8958K0Uj+jZLS5aUd8seM0HjRkwmwRmNvnoIY
-         X6SZ6OkTpDJNZNWhD9AM3IdQqDlj0kcgdu+aGNuTIbsby7ZDdp1EgDpqVgEKgIlbueDV
-         26lBNe5NVwcmdxQxdpL+IBAXX+zLHfCHWFnISmk1bKR2oBffqyzWEIbBlWQE+l3ErMDE
-         BS2w==
-X-Gm-Message-State: AOJu0YyJYTPxXgMmry7UywCBjEOCoLnzA/yqpxnQhBsmfFvVViO/ehjB
-	qHNv4AcnCRR1UW5BRMW1kWe30nkpfpZBCzR/J1uYjqWFZV5imU+Yq8ntA4xoVMjRE4YVNATGkGt
-	9UChOL7Gd9SeX
-X-Received: by 2002:a05:600c:2044:b0:40b:5e59:da9d with SMTP id p4-20020a05600c204400b0040b5e59da9dmr760889wmg.176.1701878244345;
-        Wed, 06 Dec 2023 07:57:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHxJ/hfBS9snUizlX9qsHL4DO/N1vW1ATTIz2jHA5+RV3BQEgPiq2ZyCOSdbJL9p8BpS3UlUw==
-X-Received: by 2002:a05:600c:2044:b0:40b:5e59:da9d with SMTP id p4-20020a05600c204400b0040b5e59da9dmr760883wmg.176.1701878243952;
-        Wed, 06 Dec 2023 07:57:23 -0800 (PST)
-Received: from starship ([89.237.98.20])
-        by smtp.gmail.com with ESMTPSA id o17-20020a05600c4fd100b0040b4fca8620sm84489wmq.37.2023.12.06.07.57.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 07:57:23 -0800 (PST)
-Message-ID: <039eaa7c35020774b74dc5e2d03bb0ecfa7c6d60.camel@redhat.com>
-Subject: Re: [PATCH v7 02/26] x86/fpu/xstate: Refine CET user xstate bit
- enabling
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: "Yang, Weijiang" <weijiang.yang@intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- dave.hansen@intel.com,  pbonzini@redhat.com, seanjc@google.com,
- peterz@infradead.org, chao.gao@intel.com,  rick.p.edgecombe@intel.com,
- john.allen@amd.com
-Date: Wed, 06 Dec 2023 17:57:21 +0200
-In-Reply-To: <a3a14562-db72-4c19-9f40-7778f14fc516@intel.com>
-References: <20231124055330.138870-1-weijiang.yang@intel.com>
-	 <20231124055330.138870-3-weijiang.yang@intel.com>
-	 <c22d17ab04bf5f27409518e3e79477d579b55071.camel@redhat.com>
-	 <cdf53e44-62d0-452d-9c06-5c2d2ce3ce66@intel.com>
-	 <20d45cb6adaa4a8203822535e069cdbbf3b8ba2d.camel@redhat.com>
-	 <a3a14562-db72-4c19-9f40-7778f14fc516@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2059.outbound.protection.outlook.com [40.107.237.59])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC233D46
+	for <kvm@vger.kernel.org>; Wed,  6 Dec 2023 07:59:05 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Grh6tpMUlgfX9Jy7d8sj70YkHCOD6Y3ijp/S9v/bB3wgdA/1+1BG8zhNIg/Jt5klDkFh1IYWFR2iU/A8xKFaZ5ChtGvqtXdrbh5HZ7t2wniW/smyEAko2gGFpurCiMzQ6i4b0QS2ZE0agYqm3mUljhIbhvs/1Gcaa/gZnurLhNnbfg4eigmb901zM0Y0qQxbMvibiTqaeyjVdfyLGxqmtgGtU+Wmj9u+Nssee+BiGBN+SeS5ZdwpMPbn+/cDAbLg95oIM2mLD9spSKAXSVlKeF5ObAjdkgTt1fzMY4M7SkAUjL8jJrMegfq32uRvMAQJziqUY5np78PHZPEdiXn2Iw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=80T7DJv+lZOjy9DTWu2VgFrUpT8q2+yxhOI0LNXDF8E=;
+ b=ocqfp5DVCKSyFPi/MKB46+AOYhUkGK60CAwZDq76DTeINNKgp3Rk+pg9SW/JRYnMcOcElm5ZnjX+GucYNe2vMPFLNa+lzBI3uAU9Ct3cFjxHdT8e6cB5CBQHX9W/P3xHcJM+TPj7Aie0gmqRN8JF+CGyuD+qo/68NmrJAENU98e1VJf0DqNNJyE3Ka2IVRNVWJcu/Fkt0SMZW+sQkcV/oxpGSPlOJujl41KnXEv0t2t7BVlCCFulDAu0ZQMwCz8MTJtk+quY8/2mPiGdI6HIlAZ/u1csBDY/6Tbtd/SUB5x6kaoCtK39oZQG2VbH2tO8whQ3Pk8wjDqEZhlEteG6xg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=nongnu.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=80T7DJv+lZOjy9DTWu2VgFrUpT8q2+yxhOI0LNXDF8E=;
+ b=i4W4BKzw8ONhtpBu3WT5lHr5MRa7a69MgIyR0jOu5YjPvz4EfzlDjQ42B5VPZqUafQL0tqW2qVeZSv7R22ATuJzJfyxoOlmBFArRmEKHFPIrPVk6jOsKWkt2j+Hu/ALsd/o+0hEZg+12Yw6VAWNtz+gMkMmk2RQZ1ad6+BH4Pjs=
+Received: from SCZP152CA0010.LAMP152.PROD.OUTLOOK.COM (2603:10d6:300:53::7) by
+ DM3PR12MB9433.namprd12.prod.outlook.com (2603:10b6:0:47::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7068.25; Wed, 6 Dec 2023 15:59:01 +0000
+Received: from DS3PEPF000099D7.namprd04.prod.outlook.com
+ (2603:10d6:300:53:cafe::53) by SCZP152CA0010.outlook.office365.com
+ (2603:10d6:300:53::7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.32 via Frontend
+ Transport; Wed, 6 Dec 2023 15:58:59 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DS3PEPF000099D7.mail.protection.outlook.com (10.167.17.8) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7068.20 via Frontend Transport; Wed, 6 Dec 2023 15:58:59 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Wed, 6 Dec
+ 2023 09:58:58 -0600
+From: Michael Roth <michael.roth@amd.com>
+To: <qemu-devel@nongnu.org>
+CC: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti
+	<mtosatti@redhat.com>, Tom Lendacky <thomas.lendacky@amd.com>, Akihiko Odaki
+	<akihiko.odaki@daynix.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?=
+	<philmd@linaro.org>, Lara Lazier <laramglazier@gmail.com>, Vitaly Kuznetsov
+	<vkuznets@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+	<kvm@vger.kernel.org>
+Subject: [PATCH v3 for-8.2] i386/sev: Avoid SEV-ES crash due to missing MSR_EFER_LMA bit
+Date: Wed, 6 Dec 2023 09:58:21 -0600
+Message-ID: <20231206155821.1194551-1-michael.roth@amd.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099D7:EE_|DM3PR12MB9433:EE_
+X-MS-Office365-Filtering-Correlation-Id: 79a83fa6-3f35-499c-e9c0-08dbf6744272
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	213xM9hF0vAyrr058KEslyxjfDgp4KGtsvhjowMW6HwXJZD5i3Uu0t8O55XtV7p7lWHg/UwIb3pfgjEgTWJF8xuRKyl9XDpPNCOo/kcsNwndJGJf0MkFAktAp93TR217sC6z5Tzmi6zwPY6zsHDvKlrnhGGH3CirBO1QyFMLfdFDpzfuEuu30J2qdm3SLUsP0DEKzJRlNe7XMruD/sLfsPAt+CMn9l9dUIhqfLyuX9PDiIB6oCK64OjS3iCdssc6dpI4hX/qW8z6MrwiIYose/H61anWEt6cK6uL9fa1SeiryBOV8LPK+TvPJjv2287lpAg6CSWdk1+8x4CMjWNWtnGCrkzcN8t6i1NSDZPBrOL+w9p1D/lbMgLecb/wWHcCVjCLC5NCiqvdodEC/2ml1bG5zrMV9rQGZplNAk24sfiWKEnPQYdI83hX6+kf559x9Ep1d7e/GPeSvFss38Jqhp9TrTODLM6rE/m+GX50RL+XgahmHJX+oOY62QN/LXm2W6bXsYKG05y46jMYpmZq6CV7Fk3qpAtMqbiX7npKDgiGiAJ13+kWkHNLNH5pTtSSNPcr2HuAnMb5ckelFb7etuQRMkosXXiPDgW7aLWmsUPLvi2ILrfx4V3xWaPGd3AaBxTsRRJ7FK37zFCB+vKYYfeOGmnp2DuAbY0RiPQH2dUKeyWTzO7ViPRuYittYX5jJraPxNVt826+n/aLoOoPgWzs+R6z7hDPk056CzGjp9ITWZ1LRqt9p0tGB2gp9YFCjO9M7C6VWj2n3YgWeUmcKw==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(346002)(376002)(396003)(136003)(230922051799003)(186009)(82310400011)(64100799003)(451199024)(1800799012)(36840700001)(40470700004)(46966006)(70586007)(70206006)(36860700001)(356005)(83380400001)(82740400003)(426003)(336012)(16526019)(26005)(2616005)(1076003)(6666004)(478600001)(44832011)(316002)(6916009)(54906003)(86362001)(8676002)(4326008)(8936002)(5660300002)(2906002)(40480700001)(36756003)(41300700001)(47076005)(81166007)(40460700003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2023 15:58:59.3742
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 79a83fa6-3f35-499c-e9c0-08dbf6744272
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF000099D7.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9433
 
-On Wed, 2023-12-06 at 09:03 +0800, Yang, Weijiang wrote:
-> On 12/5/2023 5:53 PM, Maxim Levitsky wrote:
-> > On Fri, 2023-12-01 at 14:51 +0800, Yang, Weijiang wrote:
-> > > On 12/1/2023 1:26 AM, Maxim Levitsky wrote:
-> > > > On Fri, 2023-11-24 at 00:53 -0500, Yang Weijiang wrote:
-> > > > > Remove XFEATURE_CET_USER entry from dependency array as the entry doesn't
-> > > > > reflect true dependency between CET features and the user xstate bit.
-> > > > > Enable the bit in fpu_kernel_cfg.max_features when either SHSTK or IBT is
-> > > > > available.
-> > > > > 
-> > > > > Both user mode shadow stack and indirect branch tracking features depend
-> > > > > on XFEATURE_CET_USER bit in XSS to automatically save/restore user mode
-> > > > > xstate registers, i.e., IA32_U_CET and IA32_PL3_SSP whenever necessary.
-> > > > > 
-> > > > > Note, the issue, i.e., CPUID only enumerates IBT but no SHSTK is resulted
-> > > > > from CET KVM series which synthesizes guest CPUIDs based on userspace
-> > > > > settings,in real world the case is rare. In other words, the exitings
-> > > > > dependency check is correct when only user mode SHSTK is available.
-> > > > > 
-> > > > > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> > > > > Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> > > > > Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> > > > > ---
-> > > > >    arch/x86/kernel/fpu/xstate.c | 9 ++++++++-
-> > > > >    1 file changed, 8 insertions(+), 1 deletion(-)
-> > > > > 
-> > > > > diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-> > > > > index 73f6bc00d178..6e50a4251e2b 100644
-> > > > > --- a/arch/x86/kernel/fpu/xstate.c
-> > > > > +++ b/arch/x86/kernel/fpu/xstate.c
-> > > > > @@ -73,7 +73,6 @@ static unsigned short xsave_cpuid_features[] __initdata = {
-> > > > >    	[XFEATURE_PT_UNIMPLEMENTED_SO_FAR]	= X86_FEATURE_INTEL_PT,
-> > > > >    	[XFEATURE_PKRU]				= X86_FEATURE_OSPKE,
-> > > > >    	[XFEATURE_PASID]			= X86_FEATURE_ENQCMD,
-> > > > > -	[XFEATURE_CET_USER]			= X86_FEATURE_SHSTK,
-> > > > >    	[XFEATURE_XTILE_CFG]			= X86_FEATURE_AMX_TILE,
-> > > > >    	[XFEATURE_XTILE_DATA]			= X86_FEATURE_AMX_TILE,
-> > > > >    };
-> > > > > @@ -798,6 +797,14 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
-> > > > >    			fpu_kernel_cfg.max_features &= ~BIT_ULL(i);
-> > > > >    	}
-> > > > >    
-> > > > > +	/*
-> > > > > +	 * CET user mode xstate bit has been cleared by above sanity check.
-> > > > > +	 * Now pick it up if either SHSTK or IBT is available. Either feature
-> > > > > +	 * depends on the xstate bit to save/restore user mode states.
-> > > > > +	 */
-> > > > > +	if (boot_cpu_has(X86_FEATURE_SHSTK) || boot_cpu_has(X86_FEATURE_IBT))
-> > > > > +		fpu_kernel_cfg.max_features |= BIT_ULL(XFEATURE_CET_USER);
-> > > > > +
-> > > > >    	if (!cpu_feature_enabled(X86_FEATURE_XFD))
-> > > > >    		fpu_kernel_cfg.max_features &= ~XFEATURE_MASK_USER_DYNAMIC;
-> > > > >    
-> > > > I am curious:
-> > > > 
-> > > > Any reason why my review feedback was not applied even though you did agree
-> > > > that it is reasonable?
-> > > My apology! I changed the patch per you feedback but found XFEATURE_CET_USER didn't
-> > > work before sending out v7 version, after a close look at the existing code:
-> > > 
-> > >           for (i = 0; i < ARRAY_SIZE(xsave_cpuid_features); i++) {
-> > >                   unsigned short cid = xsave_cpuid_features[i];
-> > > 
-> > >                   /* Careful: X86_FEATURE_FPU is 0! */
-> > >                   if ((i != XFEATURE_FP && !cid) || !boot_cpu_has(cid))
-> > >                           fpu_kernel_cfg.max_features &= ~BIT_ULL(i);
-> > >           }
-> > > 
-> > > With removal of XFEATURE_CET_USER entry from xsave_cpuid_features, actually
-> > > above check will clear the bit from fpu_kernel_cfg.max_features.
-> > Are you sure about this? If we remove the XFEATURE_CET_USER from the xsave_cpuid_features,
-> > then the above loop will not touch it - it loops only over the items in the xsave_cpuid_features
-> > array.
-> 
-> No,  the code is a bit tricky, the actual array size is XFEATURE_XTILE_DATA( ie, 18) + 1, those xfeature bits not listed in init code leave a blank entry with xsave_cpuid_features[i] == 0, so for the blank elements, the loop hits (i != XFEATURE_FP && !cid) then the relevant xfeature bit for i is cleared in fpu_kernel_cfg.max_features. I had the same illusion at first when I replied your comments in v6, and modified the code as you suggested but found the issue during tests. Please double check it.
+Commit 7191f24c7fcf ("accel/kvm/kvm-all: Handle register access errors")
+added error checking for KVM_SET_SREGS/KVM_SET_SREGS2. In doing so, it
+exposed a long-running bug in current KVM support for SEV-ES where the
+kernel assumes that MSR_EFER_LMA will be set explicitly by the guest
+kernel, in which case EFER write traps would result in KVM eventually
+seeing MSR_EFER_LMA get set and recording it in such a way that it would
+be subsequently visible when accessing it via KVM_GET_SREGS/etc.
 
-Oh I see now. IMHO the current code is broken, or at least it violates the 
-'Clear XSAVE features that are disabled in the normal CPUID' comment, because
-it also clears all xfeatures which have no CPUID bit in the table (except FPU,
-for which we have a workaround).
+However, guest kernels currently rely on MSR_EFER_LMA getting set
+automatically when MSR_EFER_LME is set and paging is enabled via
+CR0_PG_MASK. As a result, the EFER write traps don't actually expose the
+MSR_EFER_LMA bit, even though it is set internally, and when QEMU
+subsequently tries to pass this EFER value back to KVM via
+KVM_SET_SREGS* it will fail various sanity checks and return -EINVAL,
+which is now considered fatal due to the aforementioned QEMU commit.
 
+This can be addressed by inferring the MSR_EFER_LMA bit being set when
+paging is enabled and MSR_EFER_LME is set, and synthesizing it to ensure
+the expected bits are all present in subsequent handling on the host
+side.
 
-How about we do this instead:
+Ultimately, this handling will be implemented in the host kernel, but to
+avoid breaking QEMU's SEV-ES support when using older host kernels, the
+same handling can be done in QEMU just after fetching the register
+values via KVM_GET_SREGS*. Implement that here.
 
-	for (i = 0; i < ARRAY_SIZE(xsave_cpuid_features); i++) {
-		unsigned short cid = xsave_cpuid_features[i];
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marcelo Tosatti <mtosatti@redhat.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Philippe Mathieu-Daudé <philmd@linaro.org>
+Cc: Lara Lazier <laramglazier@gmail.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvm@vger.kernel.org
+Fixes: 7191f24c7fcf ("accel/kvm/kvm-all: Handle register access errors")
+Signed-off-by: Michael Roth <michael.roth@amd.com>
+---
+ target/i386/kvm/kvm.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-		if (cid && !boot_cpu_has(cid))
-			fpu_kernel_cfg.max_features &= ~BIT_ULL(i);
-	}
-
-
-The only side effect is that this code will not clear features bits for which kernel knows
-no CPUID bit but kernel anyway clears _all_ features that it knows nothing about so there
-is no net change in behavior.
-
-(That is kernel only allows XFEATURE_MASK_USER_SUPPORTED | XFEATURE_MASK_SUPERVISOR_SUPPORTED)
-
-Best regards,
-	Maxim Levitsky
-
-
-
-> > What I suggested was that we remove the XFEATURE_CET_USER from the xsave_cpuid_features
-> > and instead do this after the above loop.
-> > 
-> > if (!boot_cpu_has(X86_FEATURE_SHSTK) && !boot_cpu_has(X86_FEATURE_IBT))
-> >     fpu_kernel_cfg.max_features &= ~BIT_ULL(XFEATURE_CET_USER);
-> > 
-> > Which is pretty much just a manual iteration of the loop, just instead of checking
-> > for absence of single feature, it checks that both features are absent.
-> > 
-> > Best regards,
-> > 	Maxim Levitsky
-> > 
-> > 
-> > > So now I need
-> > > to add it back conditionally.
-> > > Your sample code is more consistent with existing code in style, but I don't want to
-> > > hack into the loop and handle XFEATURE_CET_USER specifically.  Just keep the handling
-> > > and rewording the comments which is also straightforward.
-> > > 
-> > > > https://lore.kernel.org/lkml/c72dfaac-1622-94cf-a81d-9d7ed81b2f55@intel.com/
-> > > > 
-> > > > Best regard
-> > > > 	Maxim Levitsky
-> > > > 
-> > 
-> > 
-
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 11b8177eff..4ce80555b4 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -3643,6 +3643,10 @@ static int kvm_get_sregs(X86CPU *cpu)
+     env->cr[4] = sregs.cr4;
+ 
+     env->efer = sregs.efer;
++    if (sev_es_enabled() && env->efer & MSR_EFER_LME &&
++        env->cr[0] & CR0_PG_MASK) {
++        env->efer |= MSR_EFER_LMA;
++    }
+ 
+     /* changes to apic base and cr8/tpr are read back via kvm_arch_post_run */
+     x86_update_hflags(env);
+@@ -3682,6 +3686,10 @@ static int kvm_get_sregs2(X86CPU *cpu)
+     env->cr[4] = sregs.cr4;
+ 
+     env->efer = sregs.efer;
++    if (sev_es_enabled() && env->efer & MSR_EFER_LME &&
++        env->cr[0] & CR0_PG_MASK) {
++        env->efer |= MSR_EFER_LMA;
++    }
+ 
+     env->pdptrs_valid = sregs.flags & KVM_SREGS2_FLAGS_PDPTRS_VALID;
+ 
+-- 
+2.25.1
 
 
