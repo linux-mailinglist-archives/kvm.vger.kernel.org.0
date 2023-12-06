@@ -1,150 +1,143 @@
-Return-Path: <kvm+bounces-3744-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3745-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F2A380779E
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 19:33:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 023ED8077BD
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 19:42:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA8E528215D
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 18:33:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B233E2821FF
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 18:42:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41F2241865;
-	Wed,  6 Dec 2023 18:33:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A973FE3E;
+	Wed,  6 Dec 2023 18:42:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MNCKfz0I"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="AAV+fcuh"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2052.outbound.protection.outlook.com [40.107.92.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AB7E122;
-	Wed,  6 Dec 2023 10:33:04 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k5+ZP/FAGdyUz6fZ4qa+W92H69Rc5ca+ou8I/eocnBpG5a8tYwsNoU8yZM/Vv4GnDtPR44DrFRbOYGb2voUc0wf0Okc8ne3mU8Q1BxdImBC7fREjsC3D0O0Safqn0hUYUzLUivBiRFWrrTXCckCKBgWTGkQrAi1XVrD1gJnGMifLHB/G2xdvW1cDI9YupQwKo1abHq7/6M8xpChBSlsajFQcCmCS6GROw2WgMl2By5jKBCOlc/ahmdHism9gW3ZX9VJZqS7y8Y61X2QG8X0er+gXZ+TDNKHaUh5KKmnWvDjJ0MKJlYCKEUeY99IJMWP1ed7agfajoIiH680KjsyEDA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pVpyAn4mPlzj0VTK+lRp34jsIrjhl7sz/wv9bulDzWs=;
- b=GrlUOB3S2CYFx7Dfe2kRiT7XooX4ebJsaeDaLzLwRnB7AQR1hgI8CYwq3p+vO+f96b02UxRgL3bcuQJPX2VjddgB3tiorXgY5cXQag5/2tx77sU1BryiAzD+O7AaVQFbPKtRAfdcR+cQjyQWX8pEApv8p+2aLgrt36ptmtr+/8Vr5Hyc0cqyGszhzCL+xi+UBy6TKd6CGA01zLoMfifMnxVyyipKcF1VADAD/swqF2uSg9XTdKb3CRhAhYm2QFZqiIADyNOib7TifzIezNPVNn1mEkjhHurFOztCwL7Y56Ga3+TEV0CzcYDUWgMLPrQb9Gp9zuNvDjz3HJHZBndqeA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pVpyAn4mPlzj0VTK+lRp34jsIrjhl7sz/wv9bulDzWs=;
- b=MNCKfz0IzVWCoiImUD2fd4ZlRkxUtISsXEcbeRTQWq/qpRZWSPLUhFyYADBzd60Viizokow1ylhzQ/v6qzms1I7XGrAaa9QcF+Usp2Zp9SWXqlinXQ94NvW7TKQBSQMm79fzOg96+UtAZ8+lZsARaCUnR0BlkZZ/ffmqCvXQc2Q6FxZHULIxs8mTd4TD5UcYrq6DdfJrP7UOKn6Jofiv1gQeQ87cowx9UbfaRf/+trjxfKU8Eky9vUEn+UdxD/hmcmZs69/eLytL2oXtal3R+O5C9swpHbJ3Gplu/7RXabR28IXqTPjL5xNeV7wifFxyWYFZuQfqXSGbGaOlJ4TGNA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by IA0PR12MB8930.namprd12.prod.outlook.com (2603:10b6:208:481::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Wed, 6 Dec
- 2023 18:33:01 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7046.034; Wed, 6 Dec 2023
- 18:33:01 +0000
-Date: Wed, 6 Dec 2023 14:33:00 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Yi Liu <yi.l.liu@intel.com>
-Cc: joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
-	robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
-	eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
-	mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
-	yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
-	shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-	suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	zhenzhong.duan@intel.com, joao.m.martins@oracle.com,
-	xin.zeng@intel.com, yan.y.zhao@intel.com
-Subject: Re: [PATCH v6 2/6] iommufd: Add IOMMU_HWPT_INVALIDATE
-Message-ID: <20231206183300.GA2692119@nvidia.com>
-References: <20231117130717.19875-1-yi.l.liu@intel.com>
- <20231117130717.19875-3-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231117130717.19875-3-yi.l.liu@intel.com>
-X-ClientProxiedBy: MN2PR15CA0065.namprd15.prod.outlook.com
- (2603:10b6:208:237::34) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20C13D67;
+	Wed,  6 Dec 2023 10:42:40 -0800 (PST)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 32B6710008B;
+	Wed,  6 Dec 2023 21:42:37 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 32B6710008B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1701888157;
+	bh=PAf3gWYNr1X6Etoo5fn0Vczq30SXtQKZGFNGORjRGC8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=AAV+fcuhHm0Evps55dof7IXXSARFQOz4XCrLKyDmqV/MHnMv+FBbH20vGfXDcx+DZ
+	 vVGUzbH1+BI16V3d8jpitWxYN/JE+rvI2+PlqHJPY0b4tw+oYpbcIJnp3fZiFDoNCH
+	 0BZoEqwFlLTZ36xUwhqX2A32xzhPAhMJ0kbFG+TXn53QKR6RncJ62fnvp9u+kYYrOj
+	 ZeksIl0PPQx2XYMQjx3O2yejtKDzcx7/UF1Z5nHc3pXOCrXUr+KMU/Jj3hyKvZ0EZM
+	 7TgUzpJ4nNNEx810vz6MtHB701dA/QCLJRiMBLOK8zwezjeAk0e7Rr1qAVJvFJ6D+a
+	 2fQBHpWr1thXA==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Wed,  6 Dec 2023 21:42:36 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Wed, 6 Dec 2023 21:42:36 +0300
+Message-ID: <44c8b8dd-24e4-24c9-c7f9-3d7db892095d@salutedevices.com>
+Date: Wed, 6 Dec 2023 21:34:27 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA0PR12MB8930:EE_
-X-MS-Office365-Filtering-Correlation-Id: 610beef8-f223-4ee4-fd38-08dbf689c727
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	i3z5EsCRAaz0WH0FR0oexnXLqRrITUsMpbhLi+YhH/+a1Cw1vnUEOj0KK/wIq8xMfA1HJKmiVeWQxbiwsjUfTOKiuU1Uqfw008M7mBUEmpjVA/G0iReHo7/N3vTf/lg2hToyJLBinIFqoxXI02sxE6tnimFw8ETMhELhbYdbzGS561i9P5FqUCUHfyM0Em5r4dT8IPwjRVua3E4FmQ8sOgzXHbJFy3fHrI6WZpWcTM4zHK4l1BInxligW2deXr+jAnbnzF4Q0VDOncwOV1H+MahTREZkBl0VSYvH7KNmcHe6yPOXp30Um5iMybTlFZljy1kVLRDfXXszxkVZ5SF1/bkcGuVHBn5a94XBM16H5nQ8gXOO35p3qgE8NcUEvlB5vnlfqDSLEEj5GJbl2hOMzPEJ/bx6voa2JfxUBJRFRAnDQKnlQ8EQw29ALehnPP0NKByx3eS/mRocjcmD1fc+Tg46R10HECOrQnYc/7f/1pP9lEHrmDnKr7VbI1g67C+N1rrODbbmkqt6LRW8h+cmU/IFE9lJFvrV+gywnRWHy/BMqAyZow5ClDHg1HgFP7Ud
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(396003)(346002)(366004)(136003)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(7416002)(33656002)(2906002)(316002)(66476007)(6916009)(66556008)(66946007)(4326008)(8676002)(86362001)(36756003)(8936002)(41300700001)(5660300002)(38100700002)(6486002)(83380400001)(478600001)(26005)(1076003)(2616005)(6512007)(6506007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?WiLUZytmuPZlz3vru5XraXNa8BC6puODwl23wpgb8ZB23aPyYWMON17wio2U?=
- =?us-ascii?Q?LTuV7HwAMFVhTZyJrOHvELi3hLY7zjbMVVFnGlhDvAOhR+mk/nLJF19Ver5Q?=
- =?us-ascii?Q?INQliH7D+s/ni6XY3rwdBUD3OPuSkPog0xmHbxgwJJjVAPL2PABcs5EwhgqC?=
- =?us-ascii?Q?3ExMg0P2D/87M1CtPDG95KR0qPXzg5pOY5wF6O0pFmE+aVdFwd8YCSjCegzU?=
- =?us-ascii?Q?Od5zBCdzT4ZgTz+TREhQLK7AM1leOZ6wIH7p7qHBY8PNlCY8pGQHObo+mlFW?=
- =?us-ascii?Q?b+DvArYIFS3M0qpPSfAjJoA9ZeoNP5coHTtJTdcec0wxu8VZNPXOSFrPbLmT?=
- =?us-ascii?Q?maJCcjr95djv1qhjfZnO5dqLJofI3RiIBumJ7iDJQlNmVYM8cYUEZyVl9XbE?=
- =?us-ascii?Q?ue3x+SM6EQqmGboEc71gNwjJJEK5Q0vG5RaOkDxIASCGwRj5wVez5SKJxXlC?=
- =?us-ascii?Q?LDnMbgqC0OpPUOUFj89MOo6LkU/usPUCtFj4cMFaZx49EsqrdzO+Y9jjobYt?=
- =?us-ascii?Q?P1Mz2iAVr35R8vKATG1q/HRwQITOrjFzvE11GzVcpM7/WEeXzbumIAuZKChe?=
- =?us-ascii?Q?wLeYuttdBmPbdWMDQA5+Ri3+Hz71CphVEivo3JVruAqSqEvz/OwTriplGBgw?=
- =?us-ascii?Q?pFD1XEEFHvoG4xlm+lAq0NWKDZkY8OMrx7Xn5DIkxN7hH67/9ZvRjEZfHw6u?=
- =?us-ascii?Q?mph+A5yHM8LoPd4fS4APFTqiaE+EPEFVsn0mmXyML2v25PB49uOzUbfJJNj6?=
- =?us-ascii?Q?H6nvEFjqtDVqVw1R2f7FSJ2FnspfCFcEMk17DUXzVBAS7fxNxHufz64Q6+68?=
- =?us-ascii?Q?k6TT96b0kT72qRd7iXZxzXzXbJNbWlJYbrHYGal3jlrN5Bxq3W2h9Uy7fD3Y?=
- =?us-ascii?Q?b6nrnNVbQfPYA5DJVq7Rq8YqK3zsK99+Hy/E2zjpNH6cOyuygVjVVt1J4pQn?=
- =?us-ascii?Q?Zdry8XMVI+vVkGc5ekueORdQ8JeqgW+7Ukc/L/jBumR6B57ZHCTKFzhulNUE?=
- =?us-ascii?Q?2lZCxOfnQW5wBfU1h39TWvtDY3/5x9OIicDFGvv3nfhBb12Cvt/G/xCQ/l8u?=
- =?us-ascii?Q?AzOXWg/+iWGcRaTOn/eWVY+Z/mxGg7Sm64ghXq/YuSBsfB+Y1ttxU94m5wXN?=
- =?us-ascii?Q?NxqBAur01Rugu6irt6lQGmishMsn+SO9yHCEjAkKlYoCZkNeH0f+bWui95Pv?=
- =?us-ascii?Q?PMNb+LX8PojHHACxJpCb/3yywuve/y9yq9DOg4Qq0CU5g3WsAM3jR6Tbw2VA?=
- =?us-ascii?Q?yC7/CWb6IPObPhOkh/q/4AjT040y6L/Whl+VQWYOgIBZxsPKAOegM0vcQHr9?=
- =?us-ascii?Q?sADyLBTi2ayGodFgLR1QtDL51De63GMVdbzQGjCpW7RzMJ0Cx7H4bglFypzl?=
- =?us-ascii?Q?Nh0at99SBzdf5l1GTUSXv7id35Tmp3YY6+1II1kRv2Hx0PQOs0OKfKGf4DS5?=
- =?us-ascii?Q?fzYfdloNxZvguk8RRRaRkA8RuZ34XSnVt9zKPs1TyDjK9DG0aaZX5tM9zFyw?=
- =?us-ascii?Q?V2Eu2NW6zC+WdPE3cH7Y3IE/YSAqMtye8MKLq6pD5+qQbF4k9x1IOHP2cUxw?=
- =?us-ascii?Q?ISxOLRlg09DkhdPx3yC8Khnt/arB0mWt2WVJi7zv?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 610beef8-f223-4ee4-fd38-08dbf689c727
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2023 18:33:01.6918
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3/xBm6NlJJCQr8Jpk2PG8b0wLMUggv/SNTinlQjS+Pc9fx73ZgLBPxVd1nVyPKfM
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8930
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net] vsock/virtio: fix "comparison of distinct pointer
+ types lacks a cast" warning
+Content-Language: en-US
+To: Stefano Garzarella <sgarzare@redhat.com>, <netdev@vger.kernel.org>
+CC: Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	<virtualization@lists.linux.dev>, "Michael S. Tsirkin" <mst@redhat.com>,
+	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Stefan Hajnoczi
+	<stefanha@redhat.com>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>
+References: <20231206164143.281107-1-sgarzare@redhat.com>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <20231206164143.281107-1-sgarzare@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 181917 [Dec 06 2023]
+X-KSMG-AntiSpam-Version: 6.0.0.2
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 5 0.3.5 98d108ddd984cca1d7e65e595eac546a62b0144b, {Tracking_from_domain_doesnt_match_to}, p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/12/06 17:41:00 #22621737
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On Fri, Nov 17, 2023 at 05:07:13AM -0800, Yi Liu wrote:
-> +/**
-> + * struct iommu_hwpt_invalidate - ioctl(IOMMU_HWPT_INVALIDATE)
-> + * @size: sizeof(struct iommu_hwpt_invalidate)
-> + * @hwpt_id: HWPT ID of a nested HWPT for cache invalidation
-> + * @reqs_uptr: User pointer to an array having @req_num of cache invalidation
-> + *             requests. The request entries in the array are of fixed width
-> + *             @req_len, and contain a user data structure for invalidation
-> + *             request specific to the given hardware page table.
-> + * @req_type: One of enum iommu_hwpt_data_type, defining the data type of all
-> + *            the entries in the invalidation request array. It should suit
-> + *            with the data_type passed per the allocation of the hwpt pointed
-> + *            by @hwpt_id.
-> + * @req_len: Length (in bytes) of a request entry in the request array
-> + * @req_num: Input the number of cache invalidation requests in the array.
-> + *           Output the number of requests successfully handled by kernel.
-> + * @out_driver_error_code: Report a driver speicifc error code upon failure.
-> + *                         It's optional, driver has a choice to fill it or
-> + *                         not.
 
-"specific"
 
-Jason
+On 06.12.2023 19:41, Stefano Garzarella wrote:
+> After backporting commit 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY
+> flag support") in CentOS Stream 9, CI reported the following error:
+> 
+>     In file included from ./include/linux/kernel.h:17,
+>                      from ./include/linux/list.h:9,
+>                      from ./include/linux/preempt.h:11,
+>                      from ./include/linux/spinlock.h:56,
+>                      from net/vmw_vsock/virtio_transport_common.c:9:
+>     net/vmw_vsock/virtio_transport_common.c: In function ‘virtio_transport_can_zcopy‘:
+>     ./include/linux/minmax.h:20:35: error: comparison of distinct pointer types lacks a cast [-Werror]
+>        20 |         (!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
+>           |                                   ^~
+>     ./include/linux/minmax.h:26:18: note: in expansion of macro ‘__typecheck‘
+>        26 |                 (__typecheck(x, y) && __no_side_effects(x, y))
+>           |                  ^~~~~~~~~~~
+>     ./include/linux/minmax.h:36:31: note: in expansion of macro ‘__safe_cmp‘
+>        36 |         __builtin_choose_expr(__safe_cmp(x, y), \
+>           |                               ^~~~~~~~~~
+>     ./include/linux/minmax.h:45:25: note: in expansion of macro ‘__careful_cmp‘
+>        45 | #define min(x, y)       __careful_cmp(x, y, <)
+>           |                         ^~~~~~~~~~~~~
+>     net/vmw_vsock/virtio_transport_common.c:63:37: note: in expansion of macro ‘min‘
+>        63 |                 int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
+> 
+> We could solve it by using min_t(), but this operation seems entirely
+> unnecessary, because we also pass MAX_SKB_FRAGS to iov_iter_npages(),
+> which performs almost the same check, returning at most MAX_SKB_FRAGS
+> elements. So, let's eliminate this unnecessary comparison.
+> 
+> Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
+> Cc: avkrasnov@salutedevices.com
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+
+Reviewed-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+
+>  net/vmw_vsock/virtio_transport_common.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index f6dc896bf44c..c8e162c9d1df 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -59,8 +59,7 @@ static bool virtio_transport_can_zcopy(const struct virtio_transport *t_ops,
+>  	t_ops = virtio_transport_get_ops(info->vsk);
+>  
+>  	if (t_ops->can_msgzerocopy) {
+> -		int pages_in_iov = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
+> -		int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
+> +		int pages_to_send = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
+>  
+>  		/* +1 is for packet header. */
+>  		return t_ops->can_msgzerocopy(pages_to_send + 1);
 
