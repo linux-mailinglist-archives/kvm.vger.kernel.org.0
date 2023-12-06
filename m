@@ -1,165 +1,212 @@
-Return-Path: <kvm+bounces-3644-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3645-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C14DF806318
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 00:50:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D02080632E
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 01:07:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 748DF1F21764
-	for <lists+kvm@lfdr.de>; Tue,  5 Dec 2023 23:50:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7F752820C1
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 00:07:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE7434123E;
-	Tue,  5 Dec 2023 23:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E07DB624;
+	Wed,  6 Dec 2023 00:07:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="lQh7+nYv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xR8t6mUk"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2073.outbound.protection.outlook.com [40.107.93.73])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 408F618C;
-	Tue,  5 Dec 2023 15:50:25 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j538p6M9GejfRI64TfQBZPEaPkDtYn5aRxBDjZsg8iLkcLwb/IR5BvC6WFP7TztpHBuTmMw4gUY+BCLyk3wwxszPnqBXJjkp79cRf7XxiTq5LbaGMlBIOBo0g0e70VE09vOaFMkOxwivIm+0VQNmlXHTSQw4mt7dr1FJGjlvf+46deMxZHSJPQP5Nthx2g3x1xh8XsHqoemRr8lmtYm8FzKbuwqSYJBvVRWAuiLiAGRn/M8sioed682ugKK9OR0izHbozbFpnL24dBfShMvDFytlC/L/8OeGY6qFqWI1WV9XjYBddB8gxzJz2WOE4ptTvTXVgv9TXjOTvgC+gvEAtA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PMdYy3O1Cpgbmo1vLEbA3kKWDu536YFAQ55nLgD2apg=;
- b=aPjAEWq0bgvtYZVMvir/vDqOUCUWAEyBBHA+4HrZ/x8d4anYH3TXRZSCh+0+OEYi5pZphTNI71hS/NrpnF4mI2CmU0I6caiK58wr4NSUlzty27cdp9mtufBGrXRpZps+1sYWOGDXN05HI568oAwPzmTiQm9pTBzD0DYzohAKa5+Kes/Ie8lw+W995fOlThoUT3D2yGuPPyBMBhptes9WTJ7xa8qrTvXvY1Um3QVMCza/Imj0aGkgJ32fdB6Dd2pABjL6i0kbrSRdoi8jmo+TY3Vz9pAJ+RqGUrMKrX3To2JQL9Smyi3bfQmJ4mE/Yr/Lw5DuvHANCkk2HbMWDrYBxQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PMdYy3O1Cpgbmo1vLEbA3kKWDu536YFAQ55nLgD2apg=;
- b=lQh7+nYvgJyyQPx2zUV/fVyx7PKED6eQ72UMfwgWhUBD+pTs9yquNUqL/NZmsh7MlKn7RH01vOOuKhhpXtP6yyoPQEkg021t1rmUIYXTt4qX1oDr2FXb4rh+wZtB1aQwLaWg9c+kSCS1Wq3E9LIw90PNHob6jaL/Bs+O/nToGFI=
-Received: from SA1P222CA0111.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:3c5::8)
- by PH0PR12MB8007.namprd12.prod.outlook.com (2603:10b6:510:28e::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Tue, 5 Dec
- 2023 23:50:22 +0000
-Received: from SN1PEPF0002BA4E.namprd03.prod.outlook.com
- (2603:10b6:806:3c5:cafe::25) by SA1P222CA0111.outlook.office365.com
- (2603:10b6:806:3c5::8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.26 via Frontend
- Transport; Tue, 5 Dec 2023 23:50:22 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF0002BA4E.mail.protection.outlook.com (10.167.242.71) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7068.20 via Frontend Transport; Tue, 5 Dec 2023 23:50:22 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Tue, 5 Dec
- 2023 17:50:21 -0600
-From: Michael Roth <michael.roth@amd.com>
-To: <kvm@vger.kernel.org>
-CC: Tom Lendacky <thomas.lendacky@amd.com>, Sean Christopherson
-	<seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner
-	<tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
-	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin"
-	<hpa@zytor.com>, <x86@kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] KVM: SEV: Fix handling of EFER_LMA bit when SEV-ES is enabled
-Date: Tue, 5 Dec 2023 17:49:56 -0600
-Message-ID: <20231205234956.1156210-1-michael.roth@amd.com>
-X-Mailer: git-send-email 2.25.1
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE9EF1A5
+	for <kvm@vger.kernel.org>; Tue,  5 Dec 2023 16:07:17 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5d032ab478fso101197207b3.0
+        for <kvm@vger.kernel.org>; Tue, 05 Dec 2023 16:07:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701821237; x=1702426037; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=B09jNl/6ew1fQLf1zTOLuFX5OzlF3p6K7osCTShEz6M=;
+        b=xR8t6mUk4YlLTCwB3wzAVW+pbILw5/x9O7C9Ot8cC5Eacn2DbevSTZUw1/uk8+IUH3
+         ffDD6LfXxy26tQN5nZ4m39/EejSIRlbTV4iqOHFSpdCOfyzh739uRUElkDNCbyoZuwMv
+         AHB0kMv9w7K++aVN+nE15SYKf7zPrbiahaCSr0uRgHu8ePf3J22npjoBHA4mTmvilEdj
+         iwZdtCjfY0NkJV7Tlyggt7tWKF3O0IUUgHh3WP7o3GyRpwTrhQa3VYU3Cx51Wpwfx4Il
+         pdiv6B2MkJUK+vU10QGQM+bRZ4/HzOK+a/BXGCDcvrocDdU0hhW2R5Qpw3CajRXprFqM
+         P+Ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701821237; x=1702426037;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=B09jNl/6ew1fQLf1zTOLuFX5OzlF3p6K7osCTShEz6M=;
+        b=IA3NzsJCQbLdX1Iwx4yqA+86auuZ+Yzc1lJZActCh9HDSZc+g7u0u90NrN5PqeIQj9
+         pG8E0hCEbaP54uPUq0j9xJtmkW2V4l2fXsPdljeu/8HR7Q2P7C1ViJhLFq9PDsfQ/Vh3
+         IkiDto578xKnlaXJoNc2AxyXWz/cVRrh3uaK60mbO9ZtcgV31fC6hdJirGumsayUzUl+
+         2SR1XMQtpW2rih4oMUBdsv6Q5vOBLTOtBdjoneNCNbsOf/yxGCPFdEpm9B4HbE8A/uM1
+         EJsaBRORGS4YqXVSZgr+Te5ppm3TpLCdUcMY/ouXRCR3hwtE+UHbvkxki7iFj16izIi/
+         bQXA==
+X-Gm-Message-State: AOJu0Ywj716tof8Z0KJXKSHaBtpe8pSzAo/g1rA95r9SrDeA0vP4RQ1f
+	Hz77ILzmwB4Ci54xPqeEX+ry2NsIaRY=
+X-Google-Smtp-Source: AGHT+IGlfl1pdAmtDrLxND8bxut+yVt9lXSa4fXaozYVUGEQmSGwKI62StziH/FVo2cPUM7O/ofYJDYTrcI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:2f0b:b0:5d4:3013:25d4 with SMTP id
+ ev11-20020a05690c2f0b00b005d4301325d4mr282162ywb.5.1701821237087; Tue, 05 Dec
+ 2023 16:07:17 -0800 (PST)
+Date: Tue, 5 Dec 2023 16:07:15 -0800
+In-Reply-To: <fc09fec34a89ba7655f344a31174d078a8248182.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA4E:EE_|PH0PR12MB8007:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7b1e1d2b-b18c-44d4-5f21-08dbf5ecf1fc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	GuaMXyFiH5KwMkUhcxdZanD/tai+Dkxcjt2PRouHZgw05cMsWOXs7aPcdqVwoEMCnj8WnhdxiGeHip7RklcSlgbsPUoQVe6aND6uqnE9Ib7UEKgYLVGpdVEibJDTDeUYAX2OtAsLtoXtalQu2xu0nx4YFI1OujaNvwLvnGxfs6L3QnSAk0wSXccpuIzykCiebU65k1XeRFaQx6y33Y4pTQ6TNraKzfOH8r5KEUJSOMz255CLGW+HAK4d3s/krsXBvw7IKRaUaLPn6r6uBrHl+DcmPKp+0OlSePnqyY+DnoZ6XxLWMJsEvAp7TaekUfe6hWLAfE97IzXi6bQLxTfx0b0L+0txhw6Vk92VYb7lyhYhD+/Im9J+o6gaBZ8tdyeZBFjuPUgPsPA12h2s4OT8p94ojJaCWjH2mcX9LH0y8nswsdb6HP5q/wGC3Xw2FXjaTuJRQ3PrBAtC5911uaX115D1AAjdn8roOqkB/O0CVTBDSPnV8OyR0GT5wRB20FVX3XHqvgrFJ7v2R8ryeJ0gsRllg5Q1jauGvhmLlkcYOO1Hv/qn/oCdH/ctBWPuX9YCH4JVKp9AOLBWpKU0atmS6c7aMZ5+0HoC9bIdaray+vUFXC3JFgki0bd+NnTPcCHX15sr2sYkb7VBWfSg1BG4ctwoniST7YS6IA4dHAeDf9n494mxysX+rSlU55A5uIU5lSYVlRuKivY7oLTGkdL3Y/ZxiebCbYMRSUmzU79peSe3dFvxFRpy58kIbAToIULWX0xmtOrN2p9DnCUAsBgeYg==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(346002)(396003)(376002)(230922051799003)(1800799012)(82310400011)(64100799003)(451199024)(186009)(46966006)(40470700004)(36840700001)(7416002)(2906002)(40460700003)(478600001)(8936002)(8676002)(4326008)(6666004)(44832011)(86362001)(70586007)(54906003)(6916009)(70206006)(5660300002)(36860700001)(47076005)(356005)(81166007)(82740400003)(26005)(16526019)(40480700001)(83380400001)(36756003)(336012)(426003)(41300700001)(2616005)(316002)(1076003)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2023 23:50:22.3367
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7b1e1d2b-b18c-44d4-5f21-08dbf5ecf1fc
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002BA4E.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8007
+Mime-Version: 1.0
+References: <20231108111806.92604-1-nsaenz@amazon.com> <20231108111806.92604-6-nsaenz@amazon.com>
+ <f4495d1f697cf9a7ddfb786eaeeac90f554fc6db.camel@redhat.com>
+ <CXD4TVV5QWUK.3SH495QSBTTUF@amazon.com> <ZWoKlJUKJGGhRRgM@google.com>
+ <CXD5HJ5LQMTE.11XP9UB9IL8LY@amazon.com> <ZWocI-2ajwudA-S5@google.com>
+ <CXD7AW5T9R7G.2REFR2IRSVRVZ@amazon.com> <ZW94T8Fx2eJpwKQS@google.com> <fc09fec34a89ba7655f344a31174d078a8248182.camel@redhat.com>
+Message-ID: <ZW-7Mwev4Ilf541L@google.com>
+Subject: Re: [RFC 05/33] KVM: x86: hyper-v: Introduce VTL call/return
+ prologues in hypercall page
+From: Sean Christopherson <seanjc@google.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Nicolas Saenz Julienne <nsaenz@amazon.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com, 
+	anelkz@amazon.com, graf@amazon.com, dwmw@amazon.co.uk, jgowans@amazon.com, 
+	kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com, 
+	x86@kernel.org, linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-In general, activating long mode involves setting the EFER_LME bit in
-the EFER register and then enabling the X86_CR0_PG bit in the CR0
-register. At this point, the EFER_LMA bit will be set automatically by
-hardware.
+On Tue, Dec 05, 2023, Maxim Levitsky wrote:
+> On Tue, 2023-12-05 at 11:21 -0800, Sean Christopherson wrote:
+> > On Fri, Dec 01, 2023, Nicolas Saenz Julienne wrote:
+> > > On Fri Dec 1, 2023 at 5:47 PM UTC, Sean Christopherson wrote:
+> > > > On Fri, Dec 01, 2023, Nicolas Saenz Julienne wrote:
+> > > > > On Fri Dec 1, 2023 at 4:32 PM UTC, Sean Christopherson wrote:
+> > > > > > On Fri, Dec 01, 2023, Nicolas Saenz Julienne wrote:
+> > > > > > > > To support this I think that we can add a userspace msr fil=
+ter on the HV_X64_MSR_HYPERCALL,
+> > > > > > > > although I am not 100% sure if a userspace msr filter overr=
+ides the in-kernel msr handling.
+> > > > > > >=20
+> > > > > > > I thought about it at the time. It's not that simple though, =
+we should
+> > > > > > > still let KVM set the hypercall bytecode, and other quirks li=
+ke the Xen
+> > > > > > > one.
+> > > > > >=20
+> > > > > > Yeah, that Xen quirk is quite the killer.
+> > > > > >=20
+> > > > > > Can you provide pseudo-assembly for what the final page is supp=
+osed to look like?
+> > > > > > I'm struggling mightily to understand what this is actually try=
+ing to do.
+> > > > >=20
+> > > > > I'll make it as simple as possible (diregard 32bit support and th=
+at xen
+> > > > > exists):
+> > > > >=20
+> > > > > vmcall             <-  Offset 0, regular Hyper-V hypercalls enter=
+ here
+> > > > > ret
+> > > > > mov rax,rcx  <-  VTL call hypercall enters here
+> > > >=20
+> > > > I'm missing who/what defines "here" though.  What generates the CAL=
+L that points
+> > > > at this exact offset?  If the exact offset is dictated in the TLFS,=
+ then aren't
+> > > > we screwed with the whole Xen quirk, which inserts 5 bytes before t=
+hat first VMCALL?
+> > >=20
+> > > Yes, sorry, I should've included some more context.
+> > >=20
+> > > Here's a rundown (from memory) of how the first VTL call happens:
+> > >  - CPU0 start running at VTL0.
+> > >  - Hyper-V enables VTL1 on the partition.
+> > >  - Hyper-V enabled VTL1 on CPU0, but doesn't yet switch to it. It pas=
+ses
+> > >    the initial VTL1 CPU state alongside the enablement hypercall
+> > >    arguments.
+> > >  - Hyper-V sets the Hypercall page overlay address through
+> > >    HV_X64_MSR_HYPERCALL. KVM fills it.
+> > >  - Hyper-V gets the VTL-call and VTL-return offset into the hypercall
+> > >    page using the VP Register HvRegisterVsmCodePageOffsets (VP regist=
+er
+> > >    handling is in user-space).
+> >=20
+> > Ah, so the guest sets the offsets by "writing" HvRegisterVsmCodePageOff=
+sets via
+> > a HvSetVpRegisters() hypercall.
+>=20
+> No, you didn't understand this correctly.=20
+>=20
+> The guest writes the HV_X64_MSR_HYPERCALL, and in the response hyperv fil=
+ls
 
-In the case of SVM/SEV guests where writes to CR0 are intercepted, it's
-necessary for the host to set EFER_LMA on behalf of the guest since
-hardware does not see the actual CR0 write.
+When people say "Hyper-V", do y'all mean "root partition"?  If so, can we j=
+ust
+say "root partition"?  Part of my confusion is that I don't instinctively k=
+now
+whether things like "Hyper-V enables VTL1 on the partition" are talking abo=
+ut the
+root partition (or I guess parent partition?) or the hypervisor.  Functiona=
+lly it
+probably doesn't matter, it's just hard to reconcile things with the TLFS, =
+which
+is written largely to describe the hypervisor's behavior.
 
-In the case of SEV-ES guests where writes to CR0 are trapped instead of
-intercepted, the hardware *does* see/record the write to CR0 before
-exiting and passing the value on to the host, so as part of enabling
-SEV-ES support commit f1c6366e3043 ("KVM: SVM: Add required changes to
-support intercepts under SEV-ES") dropped special handling of the
-EFER_LMA bit with the understanding that it would be set automatically.
+> the hypercall page, including the VSM thunks.
+>
+> Then the guest can _read_ the offsets, hyperv chose there by issuing anot=
+her hypercall.=20
 
-However, since the guest never explicitly sets the EFER_LMA bit, the
-host never becomes aware that it has been set. This becomes problematic
-when userspace tries to get/set the EFER values via
-KVM_GET_SREGS/KVM_SET_SREGS, since the EFER contents tracked by the host
-will be missing the EFER_LMA bit, and when userspace attempts to pass
-the EFER value back via KVM_SET_SREGS it will fail a sanity check that
-asserts that EFER_LMA should always be set when X86_CR0_PG and EFER_LME
-are set.
+Hrm, now I'm really confused.  Ah, the TLFS contradicts itself.  The blurb =
+for
+AccessVpRegisters says:
 
-Fix this by always inferring the value of EFER_LMA based on X86_CR0_PG
-and EFER_LME, regardless of whether or not SEV-ES is enabled.
+  The partition can invoke the hypercalls HvSetVpRegisters and HvGetVpRegis=
+ters.
 
-Fixes: f1c6366e3043 ("KVM: SVM: Add required changes to support intercepts under SEV-ES")
-Suggested-by: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: x86@kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Michael Roth <michael.roth@amd.com>
----
- arch/x86/kvm/svm/svm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+And HvSetVpRegisters confirms that requirement:
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 5d75a1732da4..b31d4f2deb66 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1869,7 +1869,7 @@ void svm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
- 	bool old_paging = is_paging(vcpu);
- 
- #ifdef CONFIG_X86_64
--	if (vcpu->arch.efer & EFER_LME && !vcpu->arch.guest_state_protected) {
-+	if (vcpu->arch.efer & EFER_LME) {
- 		if (!is_paging(vcpu) && (cr0 & X86_CR0_PG)) {
- 			vcpu->arch.efer |= EFER_LMA;
- 			svm->vmcb->save.efer |= EFER_LMA | EFER_LME;
--- 
-2.25.1
+  The caller must either be the parent of the partition specified by Partit=
+ionId,
+  or the partition specified must be =E2=80=9Cself=E2=80=9D and the partiti=
+on must have the
+  AccessVpRegisters privilege
 
+But it's absent from HvGetVpRegisters:
+
+  The caller must be the parent of the partition specified by PartitionId o=
+r the
+  partition specifying its own partition ID.
+
+> In the current implementation, the offsets that the kernel choose are fir=
+st
+> exposed to the userspace via new ioctl, and then the userspace exposes th=
+ese
+> offsets to the guest via that 'another hypercall' (reading a pseudo parti=
+tion
+> register 'HvRegisterVsmCodePageOffsets')
+>=20
+> I personally don't know for sure anymore if the userspace or kernel based
+> hypercall page is better here, it's ugly regardless :(
+
+Hrm.  Requiring userspace to intercept the WRMSR will be a mess because the=
+n KVM
+will have zero knowledge of the hypercall page, e.g. userspace would be for=
+ced to
+intercept HV_X64_MSR_GUEST_OS_ID as well.  That's not the end of the world,=
+ but
+it's not exactly ideal either.
+
+What if we exit to userspace with a new kvm_hyperv_exit reason that require=
+s
+completion?  I.e. punt to userspace if VSM is enabled, but still record the=
+ data
+in KVM?  Ugh, but even that's a mess because kvm_hv_set_msr_pw() is deep in=
+ the
+WRMSR emulation call stack and can't easily signal that an exit to userspac=
+e is
+needed.  Blech.
 
