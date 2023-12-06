@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-3693-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3694-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0D0D807106
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 14:41:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C47D807110
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 14:44:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 894851F215D0
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 13:41:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 264F81C20C5D
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 13:44:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0AB93A8D8;
-	Wed,  6 Dec 2023 13:41:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194AF3A8D9;
+	Wed,  6 Dec 2023 13:43:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IBj8EMkJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U8Xo+D1D"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52EE8C7
-	for <kvm@vger.kernel.org>; Wed,  6 Dec 2023 05:41:29 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD975C7
+	for <kvm@vger.kernel.org>; Wed,  6 Dec 2023 05:43:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701870088;
+	s=mimecast20190719; t=1701870233;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0GZjGNK8/DC3s6qdUCadE3q9dujctUbyOyDNt2HX170=;
-	b=IBj8EMkJCfD2kMuRfT1cMJs/+5dtsUwIgeE0AsdUTweYAmYvRXd1lat+dhMHxkNriPeouf
-	dyNbpnMZdgfLEa16EgAZ3i/PbzgJ7m4KRv/p3LRPmB86WA0QvPB/PjZbma7i/yX5kI+b9R
-	Ry5Rd5doNvB8kGzLwl3FQwa3P0MiWJE=
-Received: from mail-vk1-f200.google.com (mail-vk1-f200.google.com
- [209.85.221.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=cGbNWein5+1xHR10S1uc1ylcdJmgisND/IaKWA1UWts=;
+	b=U8Xo+D1DMdnqNguHr4SCsSKwh4P+KonC6cjmconVFwlb6n2St3ttTfyFoZ20NTfyDGPy1l
+	CD2/c4fFLi+sG3abXuzBwI8W60UsXGqdVntLZC2M7xg7//X513glijM1TvJ5Ws+YgdohQx
+	eGYxF/MPuj237JyxxGvKXZ89bLFzcz8=
+Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
+ [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-632-Dyeo0AveMoG2Tv4E0_svnw-1; Wed, 06 Dec 2023 08:41:27 -0500
-X-MC-Unique: Dyeo0AveMoG2Tv4E0_svnw-1
-Received: by mail-vk1-f200.google.com with SMTP id 71dfb90a1353d-4b24730bfefso2215649e0c.3
-        for <kvm@vger.kernel.org>; Wed, 06 Dec 2023 05:41:27 -0800 (PST)
+ us-mta-336-sEn03FmjOcCHLHfVoWbjkg-1; Wed, 06 Dec 2023 08:43:52 -0500
+X-MC-Unique: sEn03FmjOcCHLHfVoWbjkg-1
+Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-7c41e0d3de3so1829955241.2
+        for <kvm@vger.kernel.org>; Wed, 06 Dec 2023 05:43:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701870086; x=1702474886;
+        d=1e100.net; s=20230601; t=1701870232; x=1702475032;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0GZjGNK8/DC3s6qdUCadE3q9dujctUbyOyDNt2HX170=;
-        b=flpNASCTfk7Yv59hUCVoII99hDOB/WQENVqG6W+MUnbwxY1cvcDQMBefnj9JArNI64
-         LJpu4kNfbJLAx6j7pQf2rD7T7lB2jAe7Z7DY8gcewE1e1spJv4pxorVPsraeN0RBK5ww
-         zIVu0REAdTlTAtFlw1QUT6ipASnHGOjpmyg3l4wlyYL6xknFaFdmQvewl73UCTljiu46
-         yMRkWZp3irKYWCWBVaJpPSkYs8cBsaBY3ZqhOpqW5zYmG1hIsQmAnDU5+SDP6ILwvfsY
-         HKjzQhKAvcSNnbFchtAg/+RxcpdPDJCfBopdKgXVlvxVQVv4hq8mQNdTG56j/CJ+LkRM
-         4yjA==
-X-Gm-Message-State: AOJu0YwCYQn5rOZqX6X1LIzjXe5CXMFo19Ke5+puvL5DplJ+mxHjVIMm
-	aaOPUSWd+Spo8jRArqL6NTbNTSVMkaI8OYB97els9aqVQZq66UiI+UvlFgc4OQhW2hB7KPzjDP+
-	QRGD0/ULfVPItCc6s0hwXdquRNJL2
-X-Received: by 2002:a05:6122:2001:b0:4b2:8e2a:4c2 with SMTP id l1-20020a056122200100b004b28e2a04c2mr951304vkd.3.1701870086651;
-        Wed, 06 Dec 2023 05:41:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEMIdluJ65K5e+nf0OBCTBEj1801D04ARu3sY9ieE5OU9sLovvMyZGzWqcks9pKUkwpoQQx8b9elR3/fAOcZlI=
-X-Received: by 2002:a05:6122:2001:b0:4b2:8e2a:4c2 with SMTP id
- l1-20020a056122200100b004b28e2a04c2mr951298vkd.3.1701870086456; Wed, 06 Dec
- 2023 05:41:26 -0800 (PST)
+        bh=cGbNWein5+1xHR10S1uc1ylcdJmgisND/IaKWA1UWts=;
+        b=hlJvaP1aeZXo2QyIXs9PKmDCMJJwElxaA8sqDfmV9iiaSSuzph1LILH0L+wqQ3IQn4
+         3Ksnd1ok80EISuJMxRz/rQdHY0HjWglXikdrWP148RE/rp64YQM++nzuxLDyb1FRxKba
+         LuW9fAZt8L0raX5hhCWnnY+3FJys21RkiOWs2jEk0IoiyDmWpxoe8mSCqPClWIzInISj
+         XW9M8M45T+jhmdVML2RDjeN820L2KoMSRXEbx/M6xTlYTxBIZoz93VjFo43nQtlT9XOi
+         ZnmFkSRy+y4+6ZlZzkET78vMmIhlWMGz/VtKl9BOaKVu5z3qM9+fAjLqEzRri3jkJyKq
+         MvJA==
+X-Gm-Message-State: AOJu0Yz1G+16kXItd401912o/pKgBW2Zvrp5+hFPmdQlH07gexkfmJGm
+	5YnvUj6Hu3n+99JyZelAXFkr3nof5t2HfanxmH4E/BXnFXPYGiKJ9uIXf0y7DLHJlpwLBr+f6Et
+	yK1MEuuhM+fc6hkYhO854aSPrTr6D
+X-Received: by 2002:a05:6122:4e26:b0:4b2:c554:ef03 with SMTP id ge38-20020a0561224e2600b004b2c554ef03mr940412vkb.21.1701870232153;
+        Wed, 06 Dec 2023 05:43:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGYw/IwMhZjw8QhOHqgPBLvQOT8KiowIQ+XS74Wf/xU6c5/sE8vHDL7fpQ0FUEh8TQE+7xHAguLn5NGS3q/sJ8=
+X-Received: by 2002:a05:6122:4e26:b0:4b2:c554:ef03 with SMTP id
+ ge38-20020a0561224e2600b004b2c554ef03mr940401vkb.21.1701870231925; Wed, 06
+ Dec 2023 05:43:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -63,87 +63,56 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20231205222816.1152720-1-michael.roth@amd.com>
-In-Reply-To: <20231205222816.1152720-1-michael.roth@amd.com>
+ <4e78f214-43ee-4c3a-ba49-d3b54aff8737@linaro.org> <20231206131248.q2yfrrfpfga7zfie@amd.com>
+In-Reply-To: <20231206131248.q2yfrrfpfga7zfie@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 6 Dec 2023 14:41:13 +0100
-Message-ID: <CABgObfb0YmHuw6v9AGK6FpsYA1F3eV2=4RKaxkmVrp97QCDM3A@mail.gmail.com>
+Date: Wed, 6 Dec 2023 14:43:39 +0100
+Message-ID: <CABgObfYbBbjXVR6YXBwt9v6Nmy-DNrCm4+kAEmWUJ-wMjjD09A@mail.gmail.com>
 Subject: Re: [PATCH v2 for-8.2?] i386/sev: Avoid SEV-ES crash due to missing
  MSR_EFER_LMA bit
 To: Michael Roth <michael.roth@amd.com>
-Cc: qemu-devel@nongnu.org, Marcelo Tosatti <mtosatti@redhat.com>, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Akihiko Odaki <akihiko.odaki@daynix.com>, kvm@vger.kernel.org
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	qemu-devel@nongnu.org, Marcelo Tosatti <mtosatti@redhat.com>, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Akihiko Odaki <akihiko.odaki@daynix.com>, kvm@vger.kernel.org, 
+	Lara Lazier <laramglazier@gmail.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 5, 2023 at 11:28=E2=80=AFPM Michael Roth <michael.roth@amd.com>=
- wrote:
-> @@ -3637,12 +3638,18 @@ static int kvm_get_sregs(X86CPU *cpu)
->      env->gdt.limit =3D sregs.gdt.limit;
->      env->gdt.base =3D sregs.gdt.base;
+On Wed, Dec 6, 2023 at 2:13=E2=80=AFPM Michael Roth <michael.roth@amd.com> =
+wrote:
+> > This 'Fixes:' tag is misleading, since as you mentioned this commit
+> > only exposes the issue.
 >
-> +    cr0_old =3D env->cr[0];
->      env->cr[0] =3D sregs.cr0;
->      env->cr[2] =3D sregs.cr2;
->      env->cr[3] =3D sregs.cr3;
->      env->cr[4] =3D sregs.cr4;
+> That's true, a "Workaround-for: " tag or something like that might be mor=
+e
+> appropriate. I just wanted to make it clear that SEV-ES support is no lon=
+ger
+> working with that patch applied, so I used Fixes: and elaborated on the
+> commit message. I can change it if there's a better way to convey this
+> though.
+
+That's fine, Fixes is also for automated checks, like "if you have
+this commit you also want this one".
+
+> >
+> > Commit d499f196fe ("target/i386: Added consistency checks for EFER")
+> > or around it seems more appropriate.
 >
->      env->efer =3D sregs.efer;
-> +    if (sev_es_enabled() && env->efer & MSR_EFER_LME) {
-> +        if (!(cr0_old & CR0_PG_MASK) && env->cr[0] & CR0_PG_MASK) {
-> +            env->efer |=3D MSR_EFER_LMA;
-> +        }
-> +    }
+> Those checks seem to be more for TCG.
 
-There is no need to check cr0_old or sev_es_enabled(); EFER.LMA is
-simply EFER.LME && CR0.PG.
+Yes, that's 100% TCG code.
 
-Alternatively, sev_es_enabled() could be an assertion, that is:
+> The actual bug is in the host
+> kernel, and it seems to have been there basically since the original
+> SEV-ES host support went in in 2020. I've also sent a patch to address
+> this in KVM:
+>
+>   https://lore.kernel.org/lkml/20231205234956.1156210-1-michael.roth@amd.=
+com/T/#u
 
-    if ((env->efer & MSR_EFER_LME) && (env->cr[0] & CR0_PG_MASK) &&
-       !(env->efer & MSR_EFER_LMA)) {
-        /* Workaround for... */
-        assert(sev_es_enabled());
-        env->efer |=3D MSR_EFER_LMA;
-    }
-
-What do you think?
-
-Thanks,
+Thanks, looking at it.
 
 Paolo
-
->      /* changes to apic base and cr8/tpr are read back via kvm_arch_post_=
-run */
->      x86_update_hflags(env);
-> @@ -3654,6 +3661,7 @@ static int kvm_get_sregs2(X86CPU *cpu)
->  {
->      CPUX86State *env =3D &cpu->env;
->      struct kvm_sregs2 sregs;
-> +    target_ulong cr0_old;
->      int i, ret;
->
->      ret =3D kvm_vcpu_ioctl(CPU(cpu), KVM_GET_SREGS2, &sregs);
-> @@ -3676,12 +3684,18 @@ static int kvm_get_sregs2(X86CPU *cpu)
->      env->gdt.limit =3D sregs.gdt.limit;
->      env->gdt.base =3D sregs.gdt.base;
->
-> +    cr0_old =3D env->cr[0];
->      env->cr[0] =3D sregs.cr0;
->      env->cr[2] =3D sregs.cr2;
->      env->cr[3] =3D sregs.cr3;
->      env->cr[4] =3D sregs.cr4;
->
->      env->efer =3D sregs.efer;
-> +    if (sev_es_enabled() && env->efer & MSR_EFER_LME) {
-> +        if (!(cr0_old & CR0_PG_MASK) && env->cr[0] & CR0_PG_MASK) {
-> +            env->efer |=3D MSR_EFER_LMA;
-> +        }
-> +    }
->
->      env->pdptrs_valid =3D sregs.flags & KVM_SREGS2_FLAGS_PDPTRS_VALID;
->
-> --
-> 2.25.1
->
 
 
