@@ -1,406 +1,247 @@
-Return-Path: <kvm+bounces-3661-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3662-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1BF6806677
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 06:18:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 510BC80668E
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 06:25:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EB33282133
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 05:18:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08C55281948
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 05:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B76FC01;
-	Wed,  6 Dec 2023 05:17:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3983610A16;
+	Wed,  6 Dec 2023 05:25:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E06NyFeD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QGidZ4iR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A820518F;
-	Tue,  5 Dec 2023 21:17:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701839872; x=1733375872;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=y5/P58aNVpKUNoICGBsX+fZr9CJIgnK2Uh0KLwFcSJ8=;
-  b=E06NyFeDJ8YigGQL6TByZDLUfQxiqEeLt+reTkJYT1aYvPS9Dee87VOu
-   Oaarue5pOiidN/be62lijAr8sIPJ1XAK54bdeh6e+vGcfLVWeLsYjWc6O
-   sIBkmKLQ+vrYPlRTxfYkrI9kKgdLR75i3Z5qbTJoxwhy4nuD+LZDi3/Yy
-   6hoV018eumKYaYCPaf+YJmeNKfjeYtiFUBLtGvjR9N9PGTIZN/6mo0AN7
-   Xy1NO+6ieZewuCAuCK9iRXG6WvXqVmMIbpWZaI7U5qaag3aLopaxpflQ4
-   JFEnk95vWl/sHvYGuuMjCmrx9gcfh+t/vulFty7V6Vbw2qmZehwI+XY5t
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="7357262"
-X-IronPort-AV: E=Sophos;i="6.04,254,1695711600"; 
-   d="scan'208";a="7357262"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 21:17:52 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="915055169"
-X-IronPort-AV: E=Sophos;i="6.04,254,1695711600"; 
-   d="scan'208";a="915055169"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.126]) ([10.238.10.126])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 21:17:47 -0800
-Message-ID: <47892232-6ae3-44e6-aef8-5c5987f9b208@linux.intel.com>
-Date: Wed, 6 Dec 2023 13:17:45 +0800
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06F7618F;
+	Tue,  5 Dec 2023 21:25:16 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-6ce6dd83945so1359304b3a.3;
+        Tue, 05 Dec 2023 21:25:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701840315; x=1702445115; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6huBbZbAII0X6eZV6S+b7knvK6KuHJo8Bh0bkLgUxxE=;
+        b=QGidZ4iRu5/YncLQwNVlWgTHz7jez7T2YHYyySJDAUl1LybKELv67VrH6KN+e8TxRh
+         /s5VSFFVvQRiwkXNmKLJi/wEnIBiOGQwnngb6oYZMoG6eQc0QbJ/T0Ec0db6vzr1k+Dx
+         srQWLLbmQFs5EhWEp5zC/IaHKoTJiY8bXU5IS602EgbG9LYXq+G5ffcY+0jnsGCyRyAk
+         7+ZWoAymYRZSRJgPK/kil/e23SdlpEsI7jueZ//dM4yB7IHleHRJ+/PQQLHSiUNJ84tI
+         tOtIp+BHegPALNw4/RtwVHj2rBou199ZGUBCDO3mLTFwdzB+80PTnm4Fc0QdTZHYALAf
+         NEJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701840315; x=1702445115;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6huBbZbAII0X6eZV6S+b7knvK6KuHJo8Bh0bkLgUxxE=;
+        b=J2b0FKDZyCK+e5YG3hPYVqsm96iXFc1DuCjGft3nU29htWngmgXURBAKy6LSskvXsc
+         OlwaUaL+5EN/6u7FgAONCyt94/N94DvXh3D4HeMkqLpjiugMkbh9I8T/h8ecFBGT6oo+
+         bBF7PUATUXLdMVYFO7IvwjBNP0iu5NE6arIG4eYzZ8D+aFktqrYfj6JhEcs9DQMBWBDf
+         kbBFrkua9jujvMMFVH6lL8lpzV+nmnybr/z6ilzjRywIN/dJlnLy2pCqZ+YCTKLfpKDl
+         b87csaO4/TXV8CcKaJT3HFSgWjWds5g9kbrD67w6oNhQhjh5fZK0GbncA1Te8IJg3p16
+         SAoQ==
+X-Gm-Message-State: AOJu0YyH7TAIz+i+HfbrAQNnJb8M6GbmVheSEHS7vLvZsf7l4/8SFM7S
+	B7EPEUC20m7UnlvO5u56YqE=
+X-Google-Smtp-Source: AGHT+IFMxfqg8FxPkhbWeYw87iiXO3hRoVhFhH1xtCbWG3FZaVDEj9UfTpo1oYq4IqfLZ3ft2t7YHQ==
+X-Received: by 2002:a05:6a00:98e:b0:6ce:6420:e174 with SMTP id u14-20020a056a00098e00b006ce6420e174mr407397pfg.36.1701840315262;
+        Tue, 05 Dec 2023 21:25:15 -0800 (PST)
+Received: from localhost ([216.228.127.130])
+        by smtp.gmail.com with ESMTPSA id ka32-20020a056a0093a000b006ce455a7faasm5350125pfb.150.2023.12.05.21.25.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Dec 2023 21:25:14 -0800 (PST)
+Date: Tue, 5 Dec 2023 21:22:59 -0800
+From: Yury Norov <yury.norov@gmail.com>
+To: Jan Kara <jack@suse.cz>
+Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"James E.J. Bottomley" <jejb@linux.ibm.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	"Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+	Akinobu Mita <akinobu.mita@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Borislav Petkov <bp@alien8.de>, Chaitanya Kulkarni <kch@nvidia.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	David Disseldorp <ddiss@suse.de>,
+	Edward Cree <ecree.xilinx@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Fenghua Yu <fenghua.yu@intel.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Gregory Greenman <gregory.greenman@intel.com>,
+	Hans Verkuil <hverkuil@xs4all.nl>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Hugh Dickins <hughd@google.com>, Ingo Molnar <mingo@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+	Jiri Pirko <jiri@resnulli.us>, Jiri Slaby <jirislaby@kernel.org>,
+	Kalle Valo <kvalo@kernel.org>, Karsten Graul <kgraul@linux.ibm.com>,
+	Karsten Keil <isdn@linux-pingi.de>,
+	Kees Cook <keescook@chromium.org>,
+	Leon Romanovsky <leon@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Martin Habets <habetsm.xilinx@gmail.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Michal Simek <monstr@monstr.eu>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Oliver Neukum <oneukum@suse.com>, Paolo Abeni <pabeni@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ping-Ke Shih <pkshih@realtek.com>, Rich Felker <dalias@libc.org>,
+	Rob Herring <robh@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuai Xue <xueshuai@linux.alibaba.com>,
+	Stanislaw Gruszka <stf_xl@wp.pl>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>, Will Deacon <will@kernel.org>,
+	Yoshinori Sato <ysato@users.sourceforge.jp>,
+	GR-QLogic-Storage-Upstream@marvell.com, alsa-devel@alsa-project.org,
+	ath10k@lists.infradead.org, dmaengine@vger.kernel.org,
+	iommu@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
+	linux-media@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-net-drivers@amd.com, linux-pci@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-sh@vger.kernel.org, linux-sound@vger.kernel.org,
+	linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, mpi3mr-linuxdrv.pdl@broadcom.com,
+	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org,
+	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
+	Matthew Wilcox <willy@infradead.org>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
+	Alexey Klimov <klimov.linux@gmail.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>
+Subject: Re: [PATCH v2 00/35] bitops: add atomic find_bit() operations
+Message-ID: <ZXAFM2VZugdhM3oE@yury-ThinkPad>
+References: <20231203192422.539300-1-yury.norov@gmail.com>
+ <20231204185101.ddmkvsr2xxsmoh2u@quack3>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 011/116] KVM: TDX: Add C wrapper functions for
- SEAMCALLs to the TDX module
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, David Matlack <dmatlack@google.com>,
- Kai Huang <kai.huang@intel.com>, Zhi Wang <zhi.wang.linux@gmail.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
- Sean Christopherson <sean.j.christopherson@intel.com>
-References: <cover.1699368322.git.isaku.yamahata@intel.com>
- <27d60b4bf79499c3bcda00cdb969ea215ecf05e9.1699368322.git.isaku.yamahata@intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <27d60b4bf79499c3bcda00cdb969ea215ecf05e9.1699368322.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231204185101.ddmkvsr2xxsmoh2u@quack3>
 
+On Mon, Dec 04, 2023 at 07:51:01PM +0100, Jan Kara wrote:
+> Hello Yury!
+> 
+> On Sun 03-12-23 11:23:47, Yury Norov wrote:
+> > Add helpers around test_and_{set,clear}_bit() that allow to search for
+> > clear or set bits and flip them atomically.
+> > 
+> > The target patterns may look like this:
+> > 
+> > 	for (idx = 0; idx < nbits; idx++)
+> > 		if (test_and_clear_bit(idx, bitmap))
+> > 			do_something(idx);
+> > 
+> > Or like this:
+> > 
+> > 	do {
+> > 		bit = find_first_bit(bitmap, nbits);
+> > 		if (bit >= nbits)
+> > 			return nbits;
+> > 	} while (!test_and_clear_bit(bit, bitmap));
+> > 	return bit;
+> > 
+> > In both cases, the opencoded loop may be converted to a single function
+> > or iterator call. Correspondingly:
+> > 
+> > 	for_each_test_and_clear_bit(idx, bitmap, nbits)
+> > 		do_something(idx);
+> > 
+> > Or:
+> > 	return find_and_clear_bit(bitmap, nbits);
+> 
+> These are fine cleanups but they actually don't address the case that has
+> triggered all these changes - namely the xarray use of find_next_bit() in
+> xas_find_chunk().
+> 
+> ...
+> > This series is a result of discussion [1]. All find_bit() functions imply
+> > exclusive access to the bitmaps. However, KCSAN reports quite a number
+> > of warnings related to find_bit() API. Some of them are not pointing
+> > to real bugs because in many situations people intentionally allow
+> > concurrent bitmap operations.
+> > 
+> > If so, find_bit() can be annotated such that KCSAN will ignore it:
+> > 
+> >         bit = data_race(find_first_bit(bitmap, nbits));
+> 
+> No, this is not a correct thing to do. If concurrent bitmap changes can
+> happen, find_first_bit() as it is currently implemented isn't ever a safe
+> choice because it can call __ffs(0) which is dangerous as you properly note
+> above. I proposed adding READ_ONCE() into find_first_bit() / find_next_bit()
+> implementation to fix this issue but you disliked that. So other option we
+> have is adding find_first_bit() and find_next_bit() variants that take
+> volatile 'addr' and we have to use these in code like xas_find_chunk()
+> which cannot be converted to your new helpers.
 
+Here is some examples when concurrent operations with plain find_bit()
+are acceptable:
 
-On 11/7/2023 10:55 PM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> A VMM interacts with the TDX module using a new instruction (SEAMCALL).
-> For instance, a TDX VMM does not have full access to the VM control
-> structure corresponding to VMX VMCS.  Instead, a VMM induces the TDX module
-> to act on behalf via SEAMCALLs.
->
-> Export __seamcall and define C wrapper functions for SEAMCALLs for
-> readability.
->
-> Some SEAMCALL APIs donate host pages to TDX module or guest TD, and the
-> donated pages are encrypted.  Those require the VMM to flush the cache
-> lines to avoid cache line alias.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+ - two threads running find_*_bit(): safe wrt ffs(0) and returns correct
+   value, because underlying bitmap is unchanged;
+ - find_next_bit() in parallel with set or clear_bit(), when modifying
+   a bit prior to the start bit to search: safe and correct;
+ - find_first_bit() in parallel with set_bit(): safe, but may return wrong
+   bit number;
+ - find_first_zero_bit() in parallel with clear_bit(): same as above.
 
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+In last 2 cases find_bit() may not return a correct bit number, but
+it may be OK if caller requires any (not exactly first) set or clear
+bit, correspondingly.
 
->
-> ---
-> v15 -> v16:
-> - use struct tdx_module_args instead of struct tdx_module_output
-> - Add tdh_mem_sept_rd() for SEPT_VE_DISABLE=1.
-> ---
->   arch/x86/include/asm/asm-prototypes.h |   1 +
->   arch/x86/include/asm/tdx.h            |  12 ++
->   arch/x86/kvm/vmx/tdx_ops.h            | 226 ++++++++++++++++++++++++++
->   arch/x86/virt/vmx/tdx/seamcall.S      |   4 +
->   4 files changed, 243 insertions(+)
->   create mode 100644 arch/x86/kvm/vmx/tdx_ops.h
->
-> diff --git a/arch/x86/include/asm/asm-prototypes.h b/arch/x86/include/asm/asm-prototypes.h
-> index b1a98fa38828..1a8feb440252 100644
-> --- a/arch/x86/include/asm/asm-prototypes.h
-> +++ b/arch/x86/include/asm/asm-prototypes.h
-> @@ -6,6 +6,7 @@
->   #include <asm/page.h>
->   #include <asm/checksum.h>
->   #include <asm/mce.h>
-> +#include <asm/tdx.h>
->   
->   #include <asm-generic/asm-prototypes.h>
->   
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index b2d9d569818e..b7cfdf084860 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -115,6 +115,18 @@ int tdx_enable(void);
->   void tdx_reset_memory(void);
->   bool tdx_is_private_mem(unsigned long phys);
->   #else
-> +static inline u64 __seamcall(u64 fn, struct tdx_module_args *args)
-> +{
-> +	return TDX_SEAMCALL_UD;
-> +}
-> +static inline u64 __seamcall_ret(u64 fn, struct tdx_module_args *args)
-> +{
-> +	return TDX_SEAMCALL_UD;
-> +}
-> +static inline u64 __seamcall_saved_ret(u64 fn, struct tdx_module_args *args)
-> +{
-> +	return TDX_SEAMCALL_UD;
-> +}
->   static inline bool platform_tdx_enabled(void) { return false; }
->   static inline int tdx_cpu_enable(void) { return -ENODEV; }
->   static inline int tdx_enable(void)  { return -ENODEV; }
-> diff --git a/arch/x86/kvm/vmx/tdx_ops.h b/arch/x86/kvm/vmx/tdx_ops.h
-> new file mode 100644
-> index 000000000000..12fd6b8d49e0
-> --- /dev/null
-> +++ b/arch/x86/kvm/vmx/tdx_ops.h
-> @@ -0,0 +1,226 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/* constants/data definitions for TDX SEAMCALLs */
-> +
-> +#ifndef __KVM_X86_TDX_OPS_H
-> +#define __KVM_X86_TDX_OPS_H
-> +
-> +#include <linux/compiler.h>
-> +
-> +#include <asm/cacheflush.h>
-> +#include <asm/asm.h>
-> +#include <asm/kvm_host.h>
-> +
-> +#include "tdx_errno.h"
-> +#include "tdx_arch.h"
-> +#include "x86.h"
-> +
-> +static inline u64 tdx_seamcall(u64 op, u64 rcx, u64 rdx, u64 r8, u64 r9,
-> +			       struct tdx_module_args *out)
-> +{
-> +	u64 ret;
-> +
-> +	if (out) {
-> +		*out = (struct tdx_module_args) {
-> +			.rcx = rcx,
-> +			.rdx = rdx,
-> +			.r8 = r8,
-> +			.r9 = r9,
-> +		};
-> +		ret = __seamcall_ret(op, out);
-> +	} else {
-> +		struct tdx_module_args args = {
-> +			.rcx = rcx,
-> +			.rdx = rdx,
-> +			.r8 = r8,
-> +			.r9 = r9,
-> +		};
-> +		ret = __seamcall(op, &args);
-> +	}
-> +	if (unlikely(ret == TDX_SEAMCALL_UD)) {
-> +		/*
-> +		 * SEAMCALLs fail with TDX_SEAMCALL_UD returned when VMX is off.
-> +		 * This can happen when the host gets rebooted or live
-> +		 * updated. In this case, the instruction execution is ignored
-> +		 * as KVM is shut down, so the error code is suppressed. Other
-> +		 * than this, the error is unexpected and the execution can't
-> +		 * continue as the TDX features reply on VMX to be on.
-> +		 */
-> +		kvm_spurious_fault();
-> +		return 0;
-> +	}
-> +	return ret;
-> +}
-> +
-> +static inline u64 tdh_mng_addcx(hpa_t tdr, hpa_t addr)
-> +{
-> +	clflush_cache_range(__va(addr), PAGE_SIZE);
-> +	return tdx_seamcall(TDH_MNG_ADDCX, addr, tdr, 0, 0, NULL);
-> +}
-> +
-> +static inline u64 tdh_mem_page_add(hpa_t tdr, gpa_t gpa, hpa_t hpa, hpa_t source,
-> +				   struct tdx_module_args *out)
-> +{
-> +	clflush_cache_range(__va(hpa), PAGE_SIZE);
-> +	return tdx_seamcall(TDH_MEM_PAGE_ADD, gpa, tdr, hpa, source, out);
-> +}
-> +
-> +static inline u64 tdh_mem_sept_add(hpa_t tdr, gpa_t gpa, int level, hpa_t page,
-> +				   struct tdx_module_args *out)
-> +{
-> +	clflush_cache_range(__va(page), PAGE_SIZE);
-> +	return tdx_seamcall(TDH_MEM_SEPT_ADD, gpa | level, tdr, page, 0, out);
-> +}
-> +
-> +static inline u64 tdh_mem_sept_rd(hpa_t tdr, gpa_t gpa, int level,
-> +				  struct tdx_module_args *out)
-> +{
-> +	return tdx_seamcall(TDH_MEM_SEPT_RD, gpa | level, tdr, 0, 0, out);
-> +}
-> +
-> +static inline u64 tdh_mem_sept_remove(hpa_t tdr, gpa_t gpa, int level,
-> +				      struct tdx_module_args *out)
-> +{
-> +	return tdx_seamcall(TDH_MEM_SEPT_REMOVE, gpa | level, tdr, 0, 0, out);
-> +}
-> +
-> +static inline u64 tdh_vp_addcx(hpa_t tdvpr, hpa_t addr)
-> +{
-> +	clflush_cache_range(__va(addr), PAGE_SIZE);
-> +	return tdx_seamcall(TDH_VP_ADDCX, addr, tdvpr, 0, 0, NULL);
-> +}
-> +
-> +static inline u64 tdh_mem_page_relocate(hpa_t tdr, gpa_t gpa, hpa_t hpa,
-> +					struct tdx_module_args *out)
-> +{
-> +	clflush_cache_range(__va(hpa), PAGE_SIZE);
-> +	return tdx_seamcall(TDH_MEM_PAGE_RELOCATE, gpa, tdr, hpa, 0, out);
-> +}
-> +
-> +static inline u64 tdh_mem_page_aug(hpa_t tdr, gpa_t gpa, hpa_t hpa,
-> +				   struct tdx_module_args *out)
-> +{
-> +	clflush_cache_range(__va(hpa), PAGE_SIZE);
-> +	return tdx_seamcall(TDH_MEM_PAGE_AUG, gpa, tdr, hpa, 0, out);
-> +}
-> +
-> +static inline u64 tdh_mem_range_block(hpa_t tdr, gpa_t gpa, int level,
-> +				      struct tdx_module_args *out)
-> +{
-> +	return tdx_seamcall(TDH_MEM_RANGE_BLOCK, gpa | level, tdr, 0, 0, out);
-> +}
-> +
-> +static inline u64 tdh_mng_key_config(hpa_t tdr)
-> +{
-> +	return tdx_seamcall(TDH_MNG_KEY_CONFIG, tdr, 0, 0, 0, NULL);
-> +}
-> +
-> +static inline u64 tdh_mng_create(hpa_t tdr, int hkid)
-> +{
-> +	clflush_cache_range(__va(tdr), PAGE_SIZE);
-> +	return tdx_seamcall(TDH_MNG_CREATE, tdr, hkid, 0, 0, NULL);
-> +}
-> +
-> +static inline u64 tdh_vp_create(hpa_t tdr, hpa_t tdvpr)
-> +{
-> +	clflush_cache_range(__va(tdvpr), PAGE_SIZE);
-> +	return tdx_seamcall(TDH_VP_CREATE, tdvpr, tdr, 0, 0, NULL);
-> +}
-> +
-> +static inline u64 tdh_mng_rd(hpa_t tdr, u64 field, struct tdx_module_args *out)
-> +{
-> +	return tdx_seamcall(TDH_MNG_RD, tdr, field, 0, 0, out);
-> +}
-> +
-> +static inline u64 tdh_mr_extend(hpa_t tdr, gpa_t gpa,
-> +				struct tdx_module_args *out)
-> +{
-> +	return tdx_seamcall(TDH_MR_EXTEND, gpa, tdr, 0, 0, out);
-> +}
-> +
-> +static inline u64 tdh_mr_finalize(hpa_t tdr)
-> +{
-> +	return tdx_seamcall(TDH_MR_FINALIZE, tdr, 0, 0, 0, NULL);
-> +}
-> +
-> +static inline u64 tdh_vp_flush(hpa_t tdvpr)
-> +{
-> +	return tdx_seamcall(TDH_VP_FLUSH, tdvpr, 0, 0, 0, NULL);
-> +}
-> +
-> +static inline u64 tdh_mng_vpflushdone(hpa_t tdr)
-> +{
-> +	return tdx_seamcall(TDH_MNG_VPFLUSHDONE, tdr, 0, 0, 0, NULL);
-> +}
-> +
-> +static inline u64 tdh_mng_key_freeid(hpa_t tdr)
-> +{
-> +	return tdx_seamcall(TDH_MNG_KEY_FREEID, tdr, 0, 0, 0, NULL);
-> +}
-> +
-> +static inline u64 tdh_mng_init(hpa_t tdr, hpa_t td_params,
-> +			       struct tdx_module_args *out)
-> +{
-> +	return tdx_seamcall(TDH_MNG_INIT, tdr, td_params, 0, 0, out);
-> +}
-> +
-> +static inline u64 tdh_vp_init(hpa_t tdvpr, u64 rcx)
-> +{
-> +	return tdx_seamcall(TDH_VP_INIT, tdvpr, rcx, 0, 0, NULL);
-> +}
-> +
-> +static inline u64 tdh_vp_rd(hpa_t tdvpr, u64 field,
-> +			    struct tdx_module_args *out)
-> +{
-> +	return tdx_seamcall(TDH_VP_RD, tdvpr, field, 0, 0, out);
-> +}
-> +
-> +static inline u64 tdh_mng_key_reclaimid(hpa_t tdr)
-> +{
-> +	return tdx_seamcall(TDH_MNG_KEY_RECLAIMID, tdr, 0, 0, 0, NULL);
-> +}
-> +
-> +static inline u64 tdh_phymem_page_reclaim(hpa_t page,
-> +					  struct tdx_module_args *out)
-> +{
-> +	return tdx_seamcall(TDH_PHYMEM_PAGE_RECLAIM, page, 0, 0, 0, out);
-> +}
-> +
-> +static inline u64 tdh_mem_page_remove(hpa_t tdr, gpa_t gpa, int level,
-> +				      struct tdx_module_args *out)
-> +{
-> +	return tdx_seamcall(TDH_MEM_PAGE_REMOVE, gpa | level, tdr, 0, 0, out);
-> +}
-> +
-> +static inline u64 tdh_sys_lp_shutdown(void)
-> +{
-> +	return tdx_seamcall(TDH_SYS_LP_SHUTDOWN, 0, 0, 0, 0, NULL);
-> +}
-> +
-> +static inline u64 tdh_mem_track(hpa_t tdr)
-> +{
-> +	return tdx_seamcall(TDH_MEM_TRACK, tdr, 0, 0, 0, NULL);
-> +}
-> +
-> +static inline u64 tdh_mem_range_unblock(hpa_t tdr, gpa_t gpa, int level,
-> +					struct tdx_module_args *out)
-> +{
-> +	return tdx_seamcall(TDH_MEM_RANGE_UNBLOCK, gpa | level, tdr, 0, 0, out);
-> +}
-> +
-> +static inline u64 tdh_phymem_cache_wb(bool resume)
-> +{
-> +	return tdx_seamcall(TDH_PHYMEM_CACHE_WB, resume ? 1 : 0, 0, 0, 0, NULL);
-> +}
-> +
-> +static inline u64 tdh_phymem_page_wbinvd(hpa_t page)
-> +{
-> +	return tdx_seamcall(TDH_PHYMEM_PAGE_WBINVD, page, 0, 0, 0, NULL);
-> +}
-> +
-> +static inline u64 tdh_vp_wr(hpa_t tdvpr, u64 field, u64 val, u64 mask,
-> +			    struct tdx_module_args *out)
-> +{
-> +	return tdx_seamcall(TDH_VP_WR, tdvpr, field, val, mask, out);
-> +}
-> +
-> +#endif /* __KVM_X86_TDX_OPS_H */
-> diff --git a/arch/x86/virt/vmx/tdx/seamcall.S b/arch/x86/virt/vmx/tdx/seamcall.S
-> index 5b1f2286aea9..73042f7f23be 100644
-> --- a/arch/x86/virt/vmx/tdx/seamcall.S
-> +++ b/arch/x86/virt/vmx/tdx/seamcall.S
-> @@ -1,5 +1,6 @@
->   /* SPDX-License-Identifier: GPL-2.0 */
->   #include <linux/linkage.h>
-> +#include <asm/export.h>
->   #include <asm/frame.h>
->   
->   #include "tdxcall.S"
-> @@ -21,6 +22,7 @@
->   SYM_FUNC_START(__seamcall)
->   	TDX_MODULE_CALL host=1
->   SYM_FUNC_END(__seamcall)
-> +EXPORT_SYMBOL_GPL(__seamcall)
->   
->   /*
->    * __seamcall_ret() - Host-side interface functions to SEAM software
-> @@ -40,6 +42,7 @@ SYM_FUNC_END(__seamcall)
->   SYM_FUNC_START(__seamcall_ret)
->   	TDX_MODULE_CALL host=1 ret=1
->   SYM_FUNC_END(__seamcall_ret)
-> +EXPORT_SYMBOL_GPL(__seamcall_ret)
->   
->   /*
->    * __seamcall_saved_ret() - Host-side interface functions to SEAM software
-> @@ -59,3 +62,4 @@ SYM_FUNC_END(__seamcall_ret)
->   SYM_FUNC_START(__seamcall_saved_ret)
->   	TDX_MODULE_CALL host=1 ret=1 saved=1
->   SYM_FUNC_END(__seamcall_saved_ret)
-> +EXPORT_SYMBOL_GPL(__seamcall_saved_ret)
+In such cases, KCSAN may be safely silenced.
+ 
+> > This series addresses the other important case where people really need
+> > atomic find ops. As the following patches show, the resulting code
+> > looks safer and more verbose comparing to opencoded loops followed by
+> > atomic bit flips.
+> > 
+> > In [1] Mirsad reported 2% slowdown in a single-thread search test when
+> > switching find_bit() function to treat bitmaps as volatile arrays. On
+> > the other hand, kernel robot in the same thread reported +3.7% to the
+> > performance of will-it-scale.per_thread_ops test.
+> 
+> It was actually me who reported the regression here [2] but whatever :)
+> 
+> [2] https://lore.kernel.org/all/20231011150252.32737-1-jack@suse.cz
 
+My apologize.
+
+> > Assuming that our compilers are sane and generate better code against
+> > properly annotated data, the above discrepancy doesn't look weird. When
+> > running on non-volatile bitmaps, plain find_bit() outperforms atomic
+> > find_and_bit(), and vice-versa.
+> > 
+> > So, all users of find_bit() API, where heavy concurrency is expected,
+> > are encouraged to switch to atomic find_and_bit() as appropriate.
+> 
+> Well, all users where any concurrency can happen should switch. Otherwise
+> they are prone to the (admittedly mostly theoretical) data race issue.
+> 
+> 								Honza
+> -- 
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
 
