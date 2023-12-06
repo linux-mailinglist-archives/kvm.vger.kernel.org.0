@@ -1,123 +1,111 @@
-Return-Path: <kvm+bounces-3689-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3690-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6885806F81
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 13:14:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 80E5D806FDD
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 13:36:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F85C1C20B4C
-	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 12:14:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1A741C20BA2
+	for <lists+kvm@lfdr.de>; Wed,  6 Dec 2023 12:36:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 296E035F1F;
-	Wed,  6 Dec 2023 12:14:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3551A364C7;
+	Wed,  6 Dec 2023 12:36:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JQUjDZ6x"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DBF3456A;
-	Wed,  6 Dec 2023 12:14:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D996C433C7;
-	Wed,  6 Dec 2023 12:14:20 +0000 (UTC)
-Date: Wed, 6 Dec 2023 12:14:18 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, ankita@nvidia.com,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	oliver.upton@linux.dev, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, will@kernel.org, ardb@kernel.org,
-	akpm@linux-foundation.org, gshan@redhat.com, aniketa@nvidia.com,
-	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
-	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
-	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, lpieralisi@kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <ZXBlmt88dKmZLCU9@arm.com>
-References: <86fs0hatt3.wl-maz@kernel.org>
- <ZW8MP2tDt4_9ROBz@arm.com>
- <20231205130517.GD2692119@nvidia.com>
- <ZW9OSe8Z9gAmM7My@arm.com>
- <20231205164318.GG2692119@nvidia.com>
- <86bkb4bn2v.wl-maz@kernel.org>
- <ZW9ezSGSDIvv5MsQ@arm.com>
- <86a5qobkt8.wl-maz@kernel.org>
- <ZW9uqu7yOtyZfmvC@arm.com>
- <868r67blwo.wl-maz@kernel.org>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 946BD135
+	for <kvm@vger.kernel.org>; Wed,  6 Dec 2023 04:36:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701866209;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+wWTErr4+br/lS77xstExEId531sIBb8lR0RHgVRhdw=;
+	b=JQUjDZ6xTV+ibSOSlp2+HgXsIfqyVRkSlikrG2sadrAAWNdyy0FjhvDOy/3osKyPdh0VKL
+	OoteY+AipPv7rvkQ2Sjj8hCuA7SGNQ2hAYKO7aCL8Jdv1vpI76yqeu98HiA0Ng0LC6A5C2
+	Y7KzEotrixphocxW8ndfSthyzVQivTQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-300-7pSqiMlkPDqVtEmBBOhnBA-1; Wed, 06 Dec 2023 07:36:46 -0500
+X-MC-Unique: 7pSqiMlkPDqVtEmBBOhnBA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33342e25313so662810f8f.3
+        for <kvm@vger.kernel.org>; Wed, 06 Dec 2023 04:36:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701866205; x=1702471005;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+wWTErr4+br/lS77xstExEId531sIBb8lR0RHgVRhdw=;
+        b=P+by2lbbw35WOKKg7bU0Qon2EiofUdgR/T9pbANAOR7Ob7yeUwhpnfu5XO+SLy6DPF
+         UcPYJIz1Cs8hcO790br8fLm/seV6UCNM5nBPbgAX2Y290Ue2M13O8MD35N0oq+of3gRW
+         RhNzQsT1ZJPy9lTYrUtwkhaJ2dudkYpmZuAYzMMsxDnsdXu6m6ZGMqJa4XQM4XFhlxcg
+         kuw090M2bQCGBYb8QAaYNdJISrpTLF/dleX4ajnoGIET0dZW0sGFAv62/yriNRWYHt4X
+         lHoflOOv3qunyqLqpCrNXMltxcQvdK50ohh7otkm7kWMM6Sc4LfvPIg71hXjjTqLj4if
+         uDnw==
+X-Gm-Message-State: AOJu0YxcwuezktlGIoJQA+DiZhGPEXQYt1vdaTvB2ZVRRNFviIajLK9/
+	NwyQxCW7JnaIk4VSTdwseAd9/uUhRaFUYIFFJk8YvDuGncai42YozqZGyfoYa7Z6arobP7sPfQ4
+	PHr9aQcsPipaY
+X-Received: by 2002:a05:600c:54c4:b0:40b:5e59:c566 with SMTP id iw4-20020a05600c54c400b0040b5e59c566mr576839wmb.144.1701866205435;
+        Wed, 06 Dec 2023 04:36:45 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH/vEGZCJkYxH9m/asg6eOY10xJd724rHM6KqP77CdEjZ+725bWvQSDJ2vM9F7BQVO2ePLQTw==
+X-Received: by 2002:a05:600c:54c4:b0:40b:5e59:c566 with SMTP id iw4-20020a05600c54c400b0040b5e59c566mr576828wmb.144.1701866205110;
+        Wed, 06 Dec 2023 04:36:45 -0800 (PST)
+Received: from fedora (g2.ign.cz. [91.219.240.8])
+        by smtp.gmail.com with ESMTPSA id z19-20020a05600c0a1300b0040596352951sm1259464wmp.5.2023.12.06.04.36.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 04:36:44 -0800 (PST)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Sean
+ Christopherson <seanjc@google.com>, Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH v2 12/16] KVM: x86: Make Hyper-V emulation optional
+In-Reply-To: <46235.123120606372000354@us-mta-490.us.mimecast.lan>
+References: <20231205103630.1391318-1-vkuznets@redhat.com>
+ <20231205103630.1391318-13-vkuznets@redhat.com>
+ <46235.123120606372000354@us-mta-490.us.mimecast.lan>
+Date: Wed, 06 Dec 2023 13:36:43 +0100
+Message-ID: <878r67mrs4.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <868r67blwo.wl-maz@kernel.org>
+Content-Type: text/plain
 
-On Wed, Dec 06, 2023 at 11:39:03AM +0000, Marc Zyngier wrote:
-> On Tue, 05 Dec 2023 18:40:42 +0000,
-> Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > On Tue, Dec 05, 2023 at 05:50:27PM +0000, Marc Zyngier wrote:
-> > > On Tue, 05 Dec 2023 17:33:01 +0000,
-> > > Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > > > Ideally we should do this for vfio only but we don't have an easy
-> > > > way to convey this to KVM.
-> > > 
-> > > But if we want to limit this to PCIe, we'll have to find out. The
-> > > initial proposal (a long while ago) had a flag conveying some
-> > > information, and I'd definitely feel more confident having something
-> > > like that.
-> > 
-> > We can add a VM_PCI_IO in the high vma flags to be set by
-> > vfio_pci_core_mmap(), though it limits it to 64-bit architectures. KVM
-> > knows this is PCI and relaxes things a bit. It's not generic though if
-> > we need this later for something else.
-> 
-> Either that, or something actually describing the attributes that VFIO
-> wants.
-> 
-> And I very much want it to be a buy-in behaviour, not something that
-> automagically happens and changes the default behaviour for everyone
-> based on some hand-wavy assertions.
-> 
-> If that means a userspace change, fine by me. The VMM better know what
-> is happening.
+Jeremi Piotrowski <jpiotrowski@linux.microsoft.com> writes:
 
-Driving the attributes from a single point like the VFIO driver is
-indeed better. The problem is that write-combining on Arm doesn't come
-without speculative loads, otherwise we would have solved it by now. I
-also recall the VFIO maintainer pushing back on relaxing the
-pgprot_noncached() for the user mapping but I don't remember the
-reasons.
+> On Tue, Dec 05, 2023 at 11:36:26AM +0100, Vitaly Kuznetsov wrote:
+>> Hyper-V emulation in KVM is a fairly big chunk and in some cases it may be
+>> desirable to not compile it in to reduce module sizes as well as the attack
+>> surface. Introduce CONFIG_KVM_HYPERV option to make it possible.
+>> 
+>> Note, there's room for further nVMX/nSVM code optimizations when
+>> !CONFIG_KVM_HYPERV, this will be done in follow-up patches.
+>> 
+>> Reorganize Makefile a bit so all CONFIG_HYPERV and CONFIG_KVM_HYPERV files
+>> are grouped together.
+>> 
+>
+> Wanted to test this for the case where KVM is running as a nested hypervisor on
+> Hyper-V but it doesn't apply cleanly - what base did you use? Tried v6.6,
+> v6.7-rc1, and v6.7-rc4.
 
-We could do with a pgprot_maybewritecombine() or
-pgprot_writecombinenospec() (similar to Jason's idea but without
-changing the semantics of pgprot_device()). For the user mapping on
-arm64 this would be Device (even _GRE) since it can't disable
-speculation but stage 2 would leave the decision to the guest since the
-speculative loads aren't much different from committed loads done
-wrongly.
+Hi Jeremi,
 
-If we want the VMM to drive this entirely, we could add a new mmap()
-flag like MAP_WRITECOMBINE or PROT_WRITECOMBINE. They do feel a bit
-weird but there is precedent with PROT_MTE to describe a memory type.
-One question is whether the VFIO driver still needs to have the
-knowledge and sanitise the requests from the VMM within a single BAR. If
-there are no security implications to such mappings, the VMM can map
-parts of the BAR as pgprot_noncached(), other parts as
-pgprot_writecombine() and KVM just follows them (similarly if we need a
-cacheable mapping).
+the base was 'kvm/next' (git://git.kernel.org/pub/scm/virt/kvm/kvm.git,
+'next' branch):
 
-The latter has some benefits for DPDK but it's a lot more involved with
-having to add device-specific knowledge into the VMM. The VMM would also
-have to present the whole BAR contiguously to the guest even if there
-are different mapping attributes within the range. So a lot of MAP_FIXED
-uses. I'd rather leaving this decision with the guest than the VMM, it
-looks like more hassle to create those mappings. The VMM or the VFIO
-could only state write-combine and speculation allowed.
+commit e9e60c82fe391d04db55a91c733df4a017c28b2f (kvm/next)
+Author: Paolo Bonzini <pbonzini@redhat.com>
+Date:   Tue Nov 21 11:24:08 2023 -0500
+
+    selftests/kvm: fix compilation on non-x86_64 platforms
 
 -- 
-Catalin
+Vitaly
+
 
