@@ -1,604 +1,180 @@
-Return-Path: <kvm+bounces-3859-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3860-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2D318088CA
-	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 14:06:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9245E808955
+	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 14:38:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38F47B2164B
-	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 13:06:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04BC91F2138D
+	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 13:38:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C951B3EA72;
-	Thu,  7 Dec 2023 13:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C580540BF9;
+	Thu,  7 Dec 2023 13:38:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="WmKeE0uq"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RhCZKxKE"
 X-Original-To: kvm@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DBC510CA;
-	Thu,  7 Dec 2023 05:06:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1701954386; x=1733490386;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=2WEjfcI2m+oq1ciSqCuc34s2aUTsgkGBvyLJkB6HBO0=;
-  b=WmKeE0uqLvuc7uf4quAODffDuPaiP0PlOVa8IaYgnao0gfpt1TXAo+7f
-   jr+yO7GachDK64WaLSFxCKY4O/9HSmVnw3PlBOGe9T0H6edJneiDPBwLX
-   dw2xRcoYvCVRA8Cm+8Xf54L9hyAx3TsAFL+9hNrq/BOIfXuBjicXqLHi5
-   subjb1527RSZk+kjXjA2Epe1gqBDncGG3pypxNR8YptCajhHU0sb5B1Oz
-   RJqqUTQldb7+DFJn2jmx+I1paMswUF+iRqNEHx1WlKIfwm3Gty8Z4fG3+
-   LBaPZSU+/g3Sae4pCpvmGg3c+nX7qsOLj3lMbjf0tozSQyhZQXNj2sSOY
-   Q==;
-X-CSE-ConnectionGUID: P/ypik10Sp+WkZ/8sFmEdA==
-X-CSE-MsgGUID: qUAya2P+REiDwwvEHGBUhw==
-X-ThreatScanner-Verdict: Negative
-X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="asc'?scan'208";a="12931036"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Dec 2023 06:06:25 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 7 Dec 2023 06:06:15 -0700
-Received: from wendy (10.10.85.11) by chn-vm-ex01.mchp-main.com (10.10.85.143)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
- Transport; Thu, 7 Dec 2023 06:06:12 -0700
-Date: Thu, 7 Dec 2023 13:05:42 +0000
-From: Conor Dooley <conor.dooley@microchip.com>
-To: Atish Patra <atishp@rivosinc.com>
-CC: <linux-kernel@vger.kernel.org>, Alexandre Ghiti <alexghiti@rivosinc.com>,
-	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, Icenowy
- Zheng <uwu@icenowy.me>, <kvm-riscv@lists.infradead.org>,
-	<kvm@vger.kernel.org>, <linux-riscv@lists.infradead.org>, Mark Rutland
-	<mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley
-	<paul.walmsley@sifive.com>, Will Deacon <will@kernel.org>
-Subject: Re: [RFC 6/9] drivers/perf: riscv: Implement SBI PMU snapshot
- function
-Message-ID: <20231207-daycare-manager-2f4817171422@wendy>
-References: <20231205024310.1593100-1-atishp@rivosinc.com>
- <20231205024310.1593100-7-atishp@rivosinc.com>
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2045.outbound.protection.outlook.com [40.107.223.45])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4C4ED54;
+	Thu,  7 Dec 2023 05:38:29 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=j6btKgnBF2db8ZZxk47wou3rGEWdiWf/eh8ASiNB13C0E9Ioq0N4SwqX9Dc6YPj9qtHcNBSKnPc2EkT9CedmcWyXNHF6vvOuoH1BtfGL0CsJQ1p/oljZXL64FQVVK9gNAnBWEfr/HseQsh5Agh3djmBegFOlsCYXNzbxT0E19XTnFD4hYOUQXBGn/IA4rJFhC6miBNx+uwB4tBgHVSv0Or1+UHyR4bu0P72/rr++2aPRQXYvwzKbcuV19Ahe40trkQhLBGgzG3OH78oz7IbKoyJpOmNHR0uQ2CR7mILkCzusd7e1PZfdY0dhI70wuq6LHebbEkw6D5wqWdM77E9hFQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CNkJqALxPIloVQQyRq9w66yUKQ75s1OxQOBMXkXLLOY=;
+ b=bpOZYbJb/5ieINi8OXkzkqCyG0yoPk3R2+JgdZ/y479itdbMucxSJiJ94gwX287Rv6Bb+9Q1ZR/MnoJwDjj38lTCWRLmsfvL5qQ+aXyCmoVCHT7QDblBi1xvEOXDfGI9Kz1Bx8DWqy0J37cg0kVioabBTpK0VJtOyOG+O5k3eUIGnucHsKJjCvKDfaR6XvjW/wCKNlrTXST7dkYKQc7Rntwr84xUUmBrkmqiDSxTWqliCxjpA2tN/puk3AD8asL796glCKlLDBW1Ux2U9DoGZVsCdxFZqJHKM6ovFMsjnk9066aUJAd5jxh7AyypnZUzSWKi3EcPxW0MhmzFdjQQYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CNkJqALxPIloVQQyRq9w66yUKQ75s1OxQOBMXkXLLOY=;
+ b=RhCZKxKEg64gyT0b3j6M/kiF0VwmTEP3Vbzr65E4uYfcxx6SigYudTEJyaCC0JIzcyUs23wWsWO9XfD9Cxw5D3FVzaTKBLzmVlqPGSo1ckyEKpbWeQ0ujKipKI4KQ0vxsHgnBqtXdUHUZzu5ZHuli0Dfo97f6DAIQaKvaqc4Mc/2SJQEL28O2iQqvnFA+MCynuQJEv32XZDnMhTnUnzuyPe3lo/WaKJfsC9bdl45aR9r96MC7dQMVXoBmOd5k8B2LNGK8IIm2ygW5xN+B7zf9PIGxkCYYtvpx6t8Jm9xqigEjSpYqkdn+Wsy+9L6PmuWlFTxY0qx6C+h+e8d2LAMiw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DS7PR12MB8289.namprd12.prod.outlook.com (2603:10b6:8:d8::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7046.34; Thu, 7 Dec 2023 13:38:26 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7046.038; Thu, 7 Dec 2023
+ 13:38:25 +0000
+Date: Thu, 7 Dec 2023 09:38:25 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Lorenzo Pieralisi <lpieralisi@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, ankita@nvidia.com,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	oliver.upton@linux.dev, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, will@kernel.org, ardb@kernel.org,
+	akpm@linux-foundation.org, gshan@redhat.com, aniketa@nvidia.com,
+	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
+	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and
+ NORMAL_NC for IO memory
+Message-ID: <20231207133825.GI2692119@nvidia.com>
+References: <20231205164318.GG2692119@nvidia.com>
+ <ZW949Tl3VmQfPk0L@arm.com>
+ <20231205194822.GL2692119@nvidia.com>
+ <ZXCJ3pVbKuHJ3LTz@arm.com>
+ <20231206150556.GQ2692119@nvidia.com>
+ <ZXCQrTbf6q0BIhSw@lpieralisi>
+ <20231206153809.GS2692119@nvidia.com>
+ <ZXCf_e-ACqrj6VrV@arm.com>
+ <20231206164802.GT2692119@nvidia.com>
+ <ZXGa4A6rfxLtkTB2@lpieralisi>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXGa4A6rfxLtkTB2@lpieralisi>
+X-ClientProxiedBy: BL1PR13CA0254.namprd13.prod.outlook.com
+ (2603:10b6:208:2ba::19) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="cJ3G311iH0naEK6r"
-Content-Disposition: inline
-In-Reply-To: <20231205024310.1593100-7-atishp@rivosinc.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS7PR12MB8289:EE_
+X-MS-Office365-Filtering-Correlation-Id: d83d53c0-7edb-445a-1e14-08dbf729c9f7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	+PLS9XJa84XgId/39fpR6mjL4zlOYkDm6EAMMNlxDWH27P/4vPSLDV6SzEl8RCXk7+9FZmLvNgYQVxzcfIajAo6TsFYJSDO3A3HgZ2dvuH8xhIDJZIU6dHpk/kY/Z4wxagzZxFiJjBrpRCVKkJv1rxfIxA8jxfwxHEg/vXIU5kbV+qktZXreKR98OmKY9LJdqX5zx9ew/FgSbHIoCr8K8ZVIHiAYUQO5NPM5wwtdZEd8Nb/a+1nffPNqX+ZTFyv4aIY8QnTO8Oz/cZoGB5083Og9afox625RegVqaT5Saz+lwDf0H/z3l4JLAinb/cIo6LYzdlcAe+jesEIz9yN0e3mdZC7JooXo1LoZhoptqLvBB76UJ72r6WaaKLSDhFrdjikxDWGvXANdC6fV368szwllxc4ROk819oSYjyr/W7dem2VBdZo5J1IvkibhYDLNpBMscBwFWI0Ji/IDJ/gWhyLvd9tvudONLsY/i4Rb7cBNCarVpJILhbDXxo9gqVffm5rMSJc+xKNExsBA+zJwc8ZmM7bVtJA6OCunbnduI1DwPtqKGBJ4F+S/xddqlnQh
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(366004)(136003)(346002)(396003)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(4326008)(54906003)(316002)(83380400001)(5660300002)(7416002)(6486002)(6916009)(66946007)(66476007)(66556008)(8936002)(2906002)(478600001)(8676002)(6506007)(6512007)(2616005)(26005)(41300700001)(33656002)(1076003)(36756003)(38100700002)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?p2lInPG7+HvFJ/QV4Rl9Pvm7Y77r9O7E/I6Xf3z4jkELZr+qOxGlbQqqrYUf?=
+ =?us-ascii?Q?qN/HoMOdLX2facLQDoFUJ2Bo7dGXSELZ9Elo8OPqvU1HYmxjfAS/fe6OMPEo?=
+ =?us-ascii?Q?1MRHgF5aw7YNEax9dBHazay20Ei6LJq+I0zgsJFAuE2ESQNkYJhvTMTBAInV?=
+ =?us-ascii?Q?KDMmww/FOR/lVNUR2fB7k3QS8ZktIiRKvTr6xxJgUh+9vmuPqqLXBqVrfYUN?=
+ =?us-ascii?Q?NdGPFWRSDiBg9nZapq8gDIqvRV7IkHtwp33ejaH+g8NByk9euxZJf4gmqQmg?=
+ =?us-ascii?Q?T+zxg5ChCvw5gBYJCXLBfWgXdArmQG3UIk7I1+ICYA5KlMkFGPBItpF30cEb?=
+ =?us-ascii?Q?+86KovZeDxNE1BwPhMST54VLAeyXOCY3Vz7JHG8xRlynxHsINJQDN7wH7dpx?=
+ =?us-ascii?Q?crCgkkL7rn81C7/chzxjQ/hMNz0oRQErYsG4bbNwRTs5fo7iN7L8VGyub/wp?=
+ =?us-ascii?Q?3tM5yZUk5ZBE64Br+yonfAPYIPEsmpeuxPgdXLR8yerYcDj0UqhaYnTOXgtk?=
+ =?us-ascii?Q?N5ImNumSTqtSdsrYXNrwf2YQ01FoCDPKxaajoQodFjtKzyzQ5p9wCIR9z9vo?=
+ =?us-ascii?Q?j2M9T/+QiLF35nHRBzzi1zWn3FjF7Lmr5WE3yswGMFgoE4IPWDiVyQRIFu+O?=
+ =?us-ascii?Q?uYIWn+r1GCK6CyD7eprlexPu9vnK+223UFzodwlkHHxViAbsBiu96J2nLYGP?=
+ =?us-ascii?Q?CbIrPYzmmi0ptReY+8Wsaxz0preIsOwJRtfrRAw8NKNc0kHPWs3BqwkWcLxz?=
+ =?us-ascii?Q?5AXVt+1xG99yZrdFgV6G+fbsXyP3PMkZMY6F/I8oLVGjMxcftE3p1x+K7iRN?=
+ =?us-ascii?Q?l51byr1YABmErO06oT3huHy/ReFME6Wh6bl7Jiw1rDWCr0LUxZMDAD9XgPaX?=
+ =?us-ascii?Q?1YGaotSuPWPVeHAO2oz7jvlU4UruUjtu1VbLZmCPSq5OkvjtEWm5YHTe0erS?=
+ =?us-ascii?Q?VcPorsbEMJiBgmWzbgX1s+Zqz9GxlEkw+IfAAT2Na1oQybWd1xsRcRBbkeif?=
+ =?us-ascii?Q?sLp5dsmmlYVvSYeLi7hWh+pvQ0ZrIl6/EedEIQA0ZcYJJpf9oiSk4ojB3RWC?=
+ =?us-ascii?Q?ey0SWOvL1CHcJLW9V2dmigk1/t8BYmT3leVnAgzVYRDFes5MrsmOFdAYkB9F?=
+ =?us-ascii?Q?ojibFeU1lir5DdfctevO/ZYxevXt0dRDivdRRiTD7okp9nD09qi2093eMKQ1?=
+ =?us-ascii?Q?LG6M/u8RtCQaG1vN5g25HMeg2j7JT8NusM8hzcBwO7ZDZXFBbBrcIdHkP9rf?=
+ =?us-ascii?Q?IEn2Ph5SCwcFneU7uAEpbNNCrbV2qB1t+QUZw7OBmJIhDITgP5+1xjiZDZXq?=
+ =?us-ascii?Q?bbArTDONijhOFf3GvlvpbN5r/H9jOuHTnvkjEdO5K9iu2DZ0XAND5WyaaGXO?=
+ =?us-ascii?Q?RCddAqhzS5SP4gJsXxyjyoZSWrUmJVOKJurhQs8SlrNxZSoZpDtDzJvXfnBx?=
+ =?us-ascii?Q?bURMvRKkz1qBRvzL7aUGiIIRV8Ohz1BcciEftkC+D/wRG/Ir03sdNtl/2kjp?=
+ =?us-ascii?Q?XZ4HmO65cOqTUKl5X5Ah0rdJmnyUYnAwPk9wBQToI7IeXbFb2CyB6Waid60I?=
+ =?us-ascii?Q?Eo4S7T6CxLmsPtX69uakGzJWvMNCaVHVOcuRc+7H?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d83d53c0-7edb-445a-1e14-08dbf729c9f7
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Dec 2023 13:38:25.8836
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3BvC8BnVt6ea0X/JCkPQw/WlLk6usmY0nQ6sEn+u20QWJ+uAlP6Jw9+VPKEYuDM2
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8289
 
---cJ3G311iH0naEK6r
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Thu, Dec 07, 2023 at 11:13:52AM +0100, Lorenzo Pieralisi wrote:
+> > > What about the other way around - would we have a prefetchable BAR that
+> > > has portions which are unprefetchable?
+> > 
+> > I would say possibly.
+> > 
+> > Prefetch is a dead concept in PCIe, it was obsoleted in PCI-X about 20
+> > years ago. No PCIe system has ever done prefetch.
+> > 
+> > There is a strong incentive to mark BAR's as prefetchable because it
+> > allows 64 bit addressing in configurations with bridges.
+> 
+> If by strong incentive you mean the "Additional guidance on the
+> Prefetchable Bit in Memory Space BARs" in the PCI express specifications,
+> I think it has been removed from the spec and the criteria that had to be
+> met to implement it were basically impossible to fulfill on ARM systems,
+> it did not make any sense in the first place.
 
-Hey Atish,
+No, I mean many systems don't have room to accommodate large 32 bit
+BARs and the only real way to make stuff work is to have a 64 bit BAR
+by setting prefetchable. Given mis-marking a read-side-effect region
+as prefetchable has no actual consequence on PCI-E I would not be
+surprised to learn people have done this.
 
-On Mon, Dec 04, 2023 at 06:43:07PM -0800, Atish Patra wrote:
-> SBI v2.0 SBI introduced PMU snapshot feature which adds the following
-> features.
->=20
-> 1. Read counter values directly from the shared memory instead of
-> csr read.
-> 2. Start multiple counters with initial values with one SBI call.
->=20
-> These functionalities optimizes the number of traps to the higher
-> privilege mode. If the kernel is in VS mode while the hypervisor
-> deploy trap & emulate method, this would minimize all the hpmcounter
-> CSR read traps. If the kernel is running in S-mode, the benfits
-> reduced to CSR latency vs DRAM/cache latency as there is no trap
-> involved while accessing the hpmcounter CSRs.
->=20
-> In both modes, it does saves the number of ecalls while starting
-> multiple counter together with an initial values. This is a likely
-> scenario if multiple counters overflow at the same time.
->=20
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> ---
->  drivers/perf/riscv_pmu.c       |   1 +
->  drivers/perf/riscv_pmu_sbi.c   | 203 ++++++++++++++++++++++++++++++---
->  include/linux/perf/riscv_pmu.h |   6 +
->  3 files changed, 197 insertions(+), 13 deletions(-)
->=20
-> diff --git a/drivers/perf/riscv_pmu.c b/drivers/perf/riscv_pmu.c
-> index 0dda70e1ef90..5b57acb770d3 100644
-> --- a/drivers/perf/riscv_pmu.c
-> +++ b/drivers/perf/riscv_pmu.c
-> @@ -412,6 +412,7 @@ struct riscv_pmu *riscv_pmu_alloc(void)
->  		cpuc->n_events =3D 0;
->  		for (i =3D 0; i < RISCV_MAX_COUNTERS; i++)
->  			cpuc->events[i] =3D NULL;
-> +		cpuc->snapshot_addr =3D NULL;
->  	}
->  	pmu->pmu =3D (struct pmu) {
->  		.event_init	=3D riscv_pmu_event_init,
-> diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
-> index 1c9049e6b574..1b8b6de63b69 100644
-> --- a/drivers/perf/riscv_pmu_sbi.c
-> +++ b/drivers/perf/riscv_pmu_sbi.c
-> @@ -36,6 +36,9 @@ PMU_FORMAT_ATTR(event, "config:0-47");
->  PMU_FORMAT_ATTR(firmware, "config:63");
-> =20
->  static bool sbi_v2_available;
-> +static DEFINE_STATIC_KEY_FALSE(sbi_pmu_snapshot_available);
-> +#define sbi_pmu_snapshot_available() \
-> +	static_branch_unlikely(&sbi_pmu_snapshot_available)
-> =20
->  static struct attribute *riscv_arch_formats_attr[] =3D {
->  	&format_attr_event.attr,
-> @@ -485,14 +488,101 @@ static int pmu_sbi_event_map(struct perf_event *ev=
-ent, u64 *econfig)
->  	return ret;
->  }
-> =20
-> +static void pmu_sbi_snapshot_free(struct riscv_pmu *pmu)
-> +{
-> +	int cpu;
+> I agree on your statement related to the prefetchable concept but I
+> believe that a prefetchable BAR containing regions that have
+> read side-effects is essentially a borked design unless at system level
+> speculative reads are prevented (as far as I understand the
+> implementation note this could only be an endpoint integrated in a
+> system where read speculation can't just happen (?)).
 
-> +	struct cpu_hw_events *cpu_hw_evt;
+IMHO the PCIe concept of prefetchable has no intersection with the
+CPU. The CPU chooses entirely on its own what rules to apply to the
+PCI MMIO regions and no OS should drive that decision based on the
+prefetchable BAR flag.
 
-This is only used inside the scope of the for loop.
+The *only* purpose of the prefetchable flag was to permit a classical
+33/66MHz PCI bridge to prefetch reads because the physical bus
+protocol back then did not include a read length.
 
-> +
-> +	for_each_possible_cpu(cpu) {
-> +		cpu_hw_evt =3D per_cpu_ptr(pmu->hw_events, cpu);
-> +		if (!cpu_hw_evt->snapshot_addr)
-> +			continue;
+For any system that does not have an ancient PCI bridge the indication
+is totally useless.
 
-Could you add a blank line here please?
-
-> +		free_page((unsigned long)cpu_hw_evt->snapshot_addr);
-> +		cpu_hw_evt->snapshot_addr =3D NULL;
-> +		cpu_hw_evt->snapshot_addr_phys =3D 0;
-
-Why do these need to be explicitly zeroed?
-
-> +	}
-> +}
-> +
-> +static int pmu_sbi_snapshot_alloc(struct riscv_pmu *pmu)
-> +{
-> +	int cpu;
-
-> +	struct page *snapshot_page;
-> +	struct cpu_hw_events *cpu_hw_evt;
-
-Same here re scope
-
-> +
-> +	for_each_possible_cpu(cpu) {
-> +		cpu_hw_evt =3D per_cpu_ptr(pmu->hw_events, cpu);
-> +		if (cpu_hw_evt->snapshot_addr)
-> +			continue;
-
-Same here re blank line
-
-> +		snapshot_page =3D alloc_page(GFP_ATOMIC | __GFP_ZERO);
-> +		if (!snapshot_page) {
-> +			pmu_sbi_snapshot_free(pmu);
-> +			return -ENOMEM;
-> +		}
-> +		cpu_hw_evt->snapshot_addr =3D page_to_virt(snapshot_page);
-> +		cpu_hw_evt->snapshot_addr_phys =3D page_to_phys(snapshot_page);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void pmu_sbi_snapshot_disable(void)
-> +{
-> +	sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_SNAPSHOT_SET_SHMEM, -1,
-> +		  -1, 0, 0, 0, 0);
-> +}
-> +
-> +static int pmu_sbi_snapshot_setup(struct riscv_pmu *pmu, int cpu)
-> +{
-> +	struct cpu_hw_events *cpu_hw_evt;
-> +	struct sbiret ret =3D {0};
-> +	int rc;
-> +
-> +	cpu_hw_evt =3D per_cpu_ptr(pmu->hw_events, cpu);
-> +	if (!cpu_hw_evt->snapshot_addr_phys)
-> +		return -EINVAL;
-> +
-> +	if (cpu_hw_evt->snapshot_set_done)
-> +		return 0;
-> +
-> +#if defined(CONFIG_32BIT)
-
-Why does this need to be an `#if defined()`? Does the code not compile
-if you use IS_ENABLED()?
-
-> +	ret =3D sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_SNAPSHOT_SET_SHMEM, cpu_hw_e=
-vt->snapshot_addr_phys,
-> +		       (u64)(cpu_hw_evt->snapshot_addr_phys) >> 32, 0, 0, 0, 0);
-> +#else
-> +	ret =3D sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_SNAPSHOT_SET_SHMEM, cpu_hw_e=
-vt->snapshot_addr_phys,
-> +			0, 0, 0, 0, 0);
-> +#endif
-
-> +	/* Free up the snapshot area memory and fall back to default SBI */
-
-What does "fall back to the default SBI mean"? SBI is an interface so I
-don't understand what it means in this context. Secondly,=20
-> +	if (ret.error) {
-> +		if (ret.error !=3D SBI_ERR_NOT_SUPPORTED)
-> +			pr_warn("%s: pmu snapshot setup failed with error %ld\n", __func__,
-> +				ret.error);
-
-Why is the function relevant here? Is the error message in-and-of-itself
-not sufficient here? Where else would one be setting up the snapshots
-other than the setup function?
-
-> +		rc =3D sbi_err_map_linux_errno(ret.error);
-
-> +		if (rc)
-> +			return rc;
-
-Is it even possible for !rc at this point? You've already checked that
-ret.error is non zero, so this just becomes
-`return sbi_err_map_linux_errno(ret.error);`?
-
-> +	}
-> +
-> +	cpu_hw_evt->snapshot_set_done =3D true;
-> +
-> +	return 0;
-> +}
-> +
->  static u64 pmu_sbi_ctr_read(struct perf_event *event)
->  {
->  	struct hw_perf_event *hwc =3D &event->hw;
->  	int idx =3D hwc->idx;
->  	struct sbiret ret;
->  	u64 val =3D 0;
-> +	struct riscv_pmu *pmu =3D to_riscv_pmu(event->pmu);
-> +	struct cpu_hw_events *cpu_hw_evt =3D this_cpu_ptr(pmu->hw_events);
-> +	struct riscv_pmu_snapshot_data *sdata =3D cpu_hw_evt->snapshot_addr;
->  	union sbi_pmu_ctr_info info =3D pmu_ctr_list[idx];
-> =20
-> +	/* Read the value from the shared memory directly */
-
-Statement of the obvious, no?
-
-> +	if (sbi_pmu_snapshot_available()) {
-> +		val =3D sdata->ctr_values[idx];
-> +		goto done;
-
-s/goto done/return val/
-There's no cleanup to be done here, what purpose does the goto serve?
-
-> +	}
-> +
->  	if (pmu_sbi_is_fw_event(event)) {
->  		ret =3D sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_FW_READ,
->  				hwc->idx, 0, 0, 0, 0, 0);
-> @@ -512,6 +602,7 @@ static u64 pmu_sbi_ctr_read(struct perf_event *event)
->  			val =3D ((u64)riscv_pmu_ctr_read_csr(info.csr + 0x80)) << 31 | val;
->  	}
-> =20
-> +done:
->  	return val;
->  }
-> =20
-> @@ -539,6 +630,7 @@ static void pmu_sbi_ctr_start(struct perf_event *even=
-t, u64 ival)
->  	struct hw_perf_event *hwc =3D &event->hw;
->  	unsigned long flag =3D SBI_PMU_START_FLAG_SET_INIT_VALUE;
-> =20
-> +	/* There is no benefit setting SNAPSHOT FLAG for a single counter */
->  #if defined(CONFIG_32BIT)
->  	ret =3D sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_START, hwc->idx,
->  			1, flag, ival, ival >> 32, 0);
-> @@ -559,16 +651,29 @@ static void pmu_sbi_ctr_stop(struct perf_event *eve=
-nt, unsigned long flag)
->  {
->  	struct sbiret ret;
->  	struct hw_perf_event *hwc =3D &event->hw;
-> +	struct riscv_pmu *pmu =3D to_riscv_pmu(event->pmu);
-> +	struct cpu_hw_events *cpu_hw_evt =3D this_cpu_ptr(pmu->hw_events);
-> +	struct riscv_pmu_snapshot_data *sdata =3D cpu_hw_evt->snapshot_addr;
-> =20
->  	if ((hwc->flags & PERF_EVENT_FLAG_USER_ACCESS) &&
->  	    (hwc->flags & PERF_EVENT_FLAG_USER_READ_CNT))
->  		pmu_sbi_reset_scounteren((void *)event);
-> =20
-> +	if (sbi_pmu_snapshot_available())
-> +		flag |=3D SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT;
-> +
->  	ret =3D sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP, hwc->idx, 1, f=
-lag, 0, 0, 0);
-> -	if (ret.error && (ret.error !=3D SBI_ERR_ALREADY_STOPPED) &&
-> -		flag !=3D SBI_PMU_STOP_FLAG_RESET)
-> +	if (!ret.error && sbi_pmu_snapshot_available()) {
-
-> +		/* Snapshot is taken relative to the counter idx base. Apply a fixup. =
-*/
-> +		if (hwc->idx > 0) {
-> +			sdata->ctr_values[hwc->idx] =3D sdata->ctr_values[0];
-> +			sdata->ctr_values[0] =3D 0;
-
-Why is this being zeroed in this manner? Why is zeroing it not required
-if hwc->idx =3D=3D 0? You've got a comment there that could probably do with
-elaboration.
-
-> +		}
-> +	} else if (ret.error && (ret.error !=3D SBI_ERR_ALREADY_STOPPED) &&
-> +		flag !=3D SBI_PMU_STOP_FLAG_RESET) {
->  		pr_err("Stopping counter idx %d failed with error %d\n",
->  			hwc->idx, sbi_err_map_linux_errno(ret.error));
-> +	}
->  }
-> =20
->  static int pmu_sbi_find_num_ctrs(void)
-> @@ -626,10 +731,14 @@ static inline void pmu_sbi_stop_all(struct riscv_pm=
-u *pmu)
->  static inline void pmu_sbi_stop_hw_ctrs(struct riscv_pmu *pmu)
->  {
->  	struct cpu_hw_events *cpu_hw_evt =3D this_cpu_ptr(pmu->hw_events);
-> +	unsigned long flag =3D 0;
-> +
-> +	if (sbi_pmu_snapshot_available())
-> +		flag =3D SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT;
-> =20
->  	/* No need to check the error here as we can't do anything about the er=
-ror */
->  	sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP, 0,
-> -		  cpu_hw_evt->used_hw_ctrs[0], 0, 0, 0, 0);
-> +		  cpu_hw_evt->used_hw_ctrs[0], flag, 0, 0, 0);
->  }
-> =20
->  /*
-> @@ -638,11 +747,10 @@ static inline void pmu_sbi_stop_hw_ctrs(struct risc=
-v_pmu *pmu)
->   * while the overflowed counters need to be started with updated initial=
-ization
->   * value.
->   */
-> -static inline void pmu_sbi_start_overflow_mask(struct riscv_pmu *pmu,
-> -					       unsigned long ctr_ovf_mask)
-> +static noinline void pmu_sbi_start_ovf_ctrs_sbi(struct cpu_hw_events *cp=
-u_hw_evt,
-> +						   unsigned long ctr_ovf_mask)
->  {
->  	int idx =3D 0;
-> -	struct cpu_hw_events *cpu_hw_evt =3D this_cpu_ptr(pmu->hw_events);
->  	struct perf_event *event;
->  	unsigned long flag =3D SBI_PMU_START_FLAG_SET_INIT_VALUE;
->  	unsigned long ctr_start_mask =3D 0;
-> @@ -677,6 +785,49 @@ static inline void pmu_sbi_start_overflow_mask(struc=
-t riscv_pmu *pmu,
->  	}
->  }
-> =20
-> +static noinline void pmu_sbi_start_ovf_ctrs_snapshot(struct cpu_hw_event=
-s *cpu_hw_evt,
-> +						   unsigned long ctr_ovf_mask)
-> +{
-> +	int idx =3D 0;
-> +	struct perf_event *event;
-> +	unsigned long flag =3D SBI_PMU_START_FLAG_INIT_FROM_SNAPSHOT;
-> +	uint64_t max_period;
-> +	struct hw_perf_event *hwc;
-> +	u64 init_val =3D 0;
-> +	unsigned long ctr_start_mask =3D 0;
-> +	struct riscv_pmu_snapshot_data *sdata =3D cpu_hw_evt->snapshot_addr;
-> +
-> +	for_each_set_bit(idx, cpu_hw_evt->used_hw_ctrs, RISCV_MAX_COUNTERS) {
-> +		if (ctr_ovf_mask & (1 << idx)) {
-> +			event =3D cpu_hw_evt->events[idx];
-> +			hwc =3D &event->hw;
-> +			max_period =3D riscv_pmu_ctr_get_width_mask(event);
-> +			init_val =3D local64_read(&hwc->prev_count) & max_period;
-> +			sdata->ctr_values[idx] =3D init_val;
-> +		}
-> +		/* We donot need to update the non-overflow counters the previous
-
-		/*
-		 * We don't need to update the non-overflow counters as the previous
-
-
-> +		 * value should have been there already.
-> +		 */
-> +	}
-> +
-> +	ctr_start_mask =3D cpu_hw_evt->used_hw_ctrs[0];
-> +
-> +	/* Start all the counters in a single shot */
-> +	sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_START, 0, ctr_start_mask,
-> +		  flag, 0, 0, 0);
-> +}
-> +
-> +static void pmu_sbi_start_overflow_mask(struct riscv_pmu *pmu,
-> +					unsigned long ctr_ovf_mask)
-> +{
-> +	struct cpu_hw_events *cpu_hw_evt =3D this_cpu_ptr(pmu->hw_events);
-> +
-> +	if (sbi_pmu_snapshot_available())
-> +		pmu_sbi_start_ovf_ctrs_snapshot(cpu_hw_evt, ctr_ovf_mask);
-> +	else
-> +		pmu_sbi_start_ovf_ctrs_sbi(cpu_hw_evt, ctr_ovf_mask);
-> +}
-> +
->  static irqreturn_t pmu_sbi_ovf_handler(int irq, void *dev)
->  {
->  	struct perf_sample_data data;
-> @@ -690,6 +841,7 @@ static irqreturn_t pmu_sbi_ovf_handler(int irq, void =
-*dev)
->  	unsigned long overflowed_ctrs =3D 0;
->  	struct cpu_hw_events *cpu_hw_evt =3D dev;
->  	u64 start_clock =3D sched_clock();
-> +	struct riscv_pmu_snapshot_data *sdata =3D cpu_hw_evt->snapshot_addr;
-> =20
->  	if (WARN_ON_ONCE(!cpu_hw_evt))
->  		return IRQ_NONE;
-> @@ -711,8 +863,10 @@ static irqreturn_t pmu_sbi_ovf_handler(int irq, void=
- *dev)
->  	pmu_sbi_stop_hw_ctrs(pmu);
-> =20
->  	/* Overflow status register should only be read after counter are stopp=
-ed */
-> -	ALT_SBI_PMU_OVERFLOW(overflow);
-> -
-> +	if (sbi_pmu_snapshot_available())
-> +		overflow =3D sdata->ctr_overflow_mask;
-> +	else
-> +		ALT_SBI_PMU_OVERFLOW(overflow);
->  	/*
->  	 * Overflow interrupt pending bit should only be cleared after stopping
->  	 * all the counters to avoid any race condition.
-> @@ -774,6 +928,7 @@ static int pmu_sbi_starting_cpu(unsigned int cpu, str=
-uct hlist_node *node)
->  {
->  	struct riscv_pmu *pmu =3D hlist_entry_safe(node, struct riscv_pmu, node=
-);
->  	struct cpu_hw_events *cpu_hw_evt =3D this_cpu_ptr(pmu->hw_events);
-> +	int ret =3D 0;
-> =20
->  	/*
->  	 * We keep enabling userspace access to CYCLE, TIME and INSTRET via the
-> @@ -794,7 +949,10 @@ static int pmu_sbi_starting_cpu(unsigned int cpu, st=
-ruct hlist_node *node)
->  		enable_percpu_irq(riscv_pmu_irq, IRQ_TYPE_NONE);
->  	}
-> =20
-> -	return 0;
-> +	if (sbi_pmu_snapshot_available())
-> +		ret =3D pmu_sbi_snapshot_setup(pmu, cpu);
-> +
-> +	return ret;
-
-I'd just write this as
-
-	if (sbi_pmu_snapshot_available())
-		return pmu_sbi_snapshot_setup(pmu, cpu);
-
-	return 0;
-
-and drop the newly added variable I think.
-
->  }
-> =20
->  static int pmu_sbi_dying_cpu(unsigned int cpu, struct hlist_node *node)
-> @@ -807,6 +965,9 @@ static int pmu_sbi_dying_cpu(unsigned int cpu, struct=
- hlist_node *node)
->  	/* Disable all counters access for user mode now */
->  	csr_write(CSR_SCOUNTEREN, 0x0);
-> =20
-> +	if (sbi_pmu_snapshot_available())
-> +		pmu_sbi_snapshot_disable();
-> +
->  	return 0;
->  }
-> =20
-> @@ -1076,10 +1237,6 @@ static int pmu_sbi_device_probe(struct platform_de=
-vice *pdev)
->  	pmu->event_unmapped =3D pmu_sbi_event_unmapped;
->  	pmu->csr_index =3D pmu_sbi_csr_index;
-> =20
-> -	ret =3D cpuhp_state_add_instance(CPUHP_AP_PERF_RISCV_STARTING, &pmu->no=
-de);
-> -	if (ret)
-> -		return ret;
-> -
->  	ret =3D riscv_pm_pmu_register(pmu);
->  	if (ret)
->  		goto out_unregister;
-> @@ -1088,8 +1245,28 @@ static int pmu_sbi_device_probe(struct platform_de=
-vice *pdev)
->  	if (ret)
->  		goto out_unregister;
-> =20
-> +	/* SBI PMU Snasphot is only available in SBI v2.0 */
-
-s/Snasphot/Snapshot/
-
-> +	if (sbi_v2_available) {
-> +		ret =3D pmu_sbi_snapshot_alloc(pmu);
-> +		if (ret)
-> +			goto out_unregister;
-
-A blank line here aids readability by breaking up the reuse of ret.
-
-> +		ret =3D pmu_sbi_snapshot_setup(pmu, smp_processor_id());
-> +		if (!ret) {
-> +			pr_info("SBI PMU snapshot is available to optimize the PMU traps\n");
-
-Why the verbose message? Could we standardise on one wording for the SBI
-function probing stuff? Most users seem to be "SBI FOO extension detected".
-Only IPI has additional wording and PMU differs slightly.
-
-> +			/* We enable it once here for the boot cpu. If snapshot shmem fails d=
-uring
-
-Again, comment style here. What does "snapshot shmem" mean? I think
-there's a missing action here. Registration? Allocation?
-
-> +			 * cpu hotplug on, it should bail out.
-
-Should or will? What action does "bail out" correspond to?
-
-Thanks,
-Conor.
-
-> +			 */
-> +			static_branch_enable(&sbi_pmu_snapshot_available);
-> +		}
-> +		/* Snapshot is an optional feature. Continue if not available */
-> +	}
-> +
->  	register_sysctl("kernel", sbi_pmu_sysctl_table);
-> =20
-> +	ret =3D cpuhp_state_add_instance(CPUHP_AP_PERF_RISCV_STARTING, &pmu->no=
-de);
-> +	if (ret)
-> +		return ret;
-> +
->  	return 0;
-> =20
->  out_unregister:
-> diff --git a/include/linux/perf/riscv_pmu.h b/include/linux/perf/riscv_pm=
-u.h
-> index 43282e22ebe1..c3fa90970042 100644
-> --- a/include/linux/perf/riscv_pmu.h
-> +++ b/include/linux/perf/riscv_pmu.h
-> @@ -39,6 +39,12 @@ struct cpu_hw_events {
->  	DECLARE_BITMAP(used_hw_ctrs, RISCV_MAX_COUNTERS);
->  	/* currently enabled firmware counters */
->  	DECLARE_BITMAP(used_fw_ctrs, RISCV_MAX_COUNTERS);
-> +	/* The virtual address of the shared memory where counter snapshot will=
- be taken */
-> +	void *snapshot_addr;
-> +	/* The physical address of the shared memory where counter snapshot wil=
-l be taken */
-> +	phys_addr_t snapshot_addr_phys;
-> +	/* Boolean flag to indicate setup is already done */
-> +	bool snapshot_set_done;
->  };
-> =20
->  struct riscv_pmu {
-> --=20
-> 2.34.1
->=20
-
---cJ3G311iH0naEK6r
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZXHDJgAKCRB4tDGHoIJi
-0rkgAP9s2tO7dLNrds98Vj2FNb9jim6cWml00RYcOuqpMOVnrwD+Mcr7P2fNoKQq
-jDNf4s2i4U+mBgmAKLMJ/23Lb2vk9ww=
-=hPnG
------END PGP SIGNATURE-----
-
---cJ3G311iH0naEK6r--
+Jason
 
