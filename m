@@ -1,228 +1,437 @@
-Return-Path: <kvm+bounces-3876-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3877-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD16D808CFF
-	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 17:20:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09F73808D02
+	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 17:21:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 286281F2139A
-	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 16:20:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B7251C2095D
+	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 16:21:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E18144C92;
-	Thu,  7 Dec 2023 16:20:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65CED46BAE;
+	Thu,  7 Dec 2023 16:21:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="xxTXJx3G";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="TGD6PJiW";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="xxTXJx3G";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="TGD6PJiW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="24Qafe0j"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 373E3D4A;
-	Thu,  7 Dec 2023 08:20:38 -0800 (PST)
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 49D4A1FB8F;
-	Thu,  7 Dec 2023 16:20:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1701966036; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R9gDJpilOFtri5BMtSk1bR16VKzmy1EoAMg8XN+4Hs8=;
-	b=xxTXJx3GPoOl7SBcxIJqOQY+tneUAmrvullQZsq6Y0AdZHg7xq11tltLJ6XCWQKwQxYcwk
-	HT33a4nMU2w3w9MG+rUa8S0IjxZBChoNpEM/Fk61JsRbYhku/KT2ETpZ6RCdOFtcJMjyDz
-	IKKnYkKtyOjkwmj0q+ZaOkeGmOSUCXE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1701966036;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R9gDJpilOFtri5BMtSk1bR16VKzmy1EoAMg8XN+4Hs8=;
-	b=TGD6PJiW4rWFAKNCxeLhi1pT83vgP+nsYq+vHBQVED9NbLzgVnBTcoOEz45J5WokkGcnPi
-	EpQoh63MFcmvc0Bw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1701966036; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R9gDJpilOFtri5BMtSk1bR16VKzmy1EoAMg8XN+4Hs8=;
-	b=xxTXJx3GPoOl7SBcxIJqOQY+tneUAmrvullQZsq6Y0AdZHg7xq11tltLJ6XCWQKwQxYcwk
-	HT33a4nMU2w3w9MG+rUa8S0IjxZBChoNpEM/Fk61JsRbYhku/KT2ETpZ6RCdOFtcJMjyDz
-	IKKnYkKtyOjkwmj0q+ZaOkeGmOSUCXE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1701966036;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R9gDJpilOFtri5BMtSk1bR16VKzmy1EoAMg8XN+4Hs8=;
-	b=TGD6PJiW4rWFAKNCxeLhi1pT83vgP+nsYq+vHBQVED9NbLzgVnBTcoOEz45J5WokkGcnPi
-	EpQoh63MFcmvc0Bw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E7DE013B6A;
-	Thu,  7 Dec 2023 16:20:35 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id liI5ONPwcWWzXwAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Thu, 07 Dec 2023 16:20:35 +0000
-Message-ID: <0e84720f-bb52-c77f-e496-40d91e94a4f6@suse.cz>
-Date: Thu, 7 Dec 2023 17:20:35 +0100
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D838B10F3
+	for <kvm@vger.kernel.org>; Thu,  7 Dec 2023 08:21:04 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5be09b7d01fso734206a12.1
+        for <kvm@vger.kernel.org>; Thu, 07 Dec 2023 08:21:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701966064; x=1702570864; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qu6FC32SBtAr1FBSSRnd4pDu4bqXXMJSa9WKDaWrJhM=;
+        b=24Qafe0jBuJfND7+fl63At7I8QvGsQhvSX5Izk7ElZoBWB/H7T0E+ANENiwESV3mKl
+         /pAOItZpqHPApDMyd3Vvj+ivKuCXlvXIhwTv9ABens0PLwwQRHnHtTmcMGGtHdAHOV/r
+         uPiBRWNMT0gedKoNPvS8+nN2lwGvvPhywaO2wDj+6gCy4yPJxCHAkhIZZR1sM2cxAxvn
+         fQRKL8ec3Um1uFJ1B5HSS7t3Jc//sdqv519+ka48JntEb5B6tkxAqVrV0lmTqsYgkml6
+         F+aviiNYO9EaOqpMapr3hKaTAoy2ZZ99DA0DVM3rzc8OEMcmO86daKruIy8qIfu4dghE
+         px4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701966064; x=1702570864;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qu6FC32SBtAr1FBSSRnd4pDu4bqXXMJSa9WKDaWrJhM=;
+        b=DB6NK2o0Cr3TKbR3HspFo+VPRs8w16ETroHedHvyexbWyOIgV+EJgEhaVTdZjowAyA
+         4HldliUvYoN/kkGby1KISmoIfvTGaYYnKU6wcZrdfiYOLUBE9NWMZkAtkuYd58BcAuFA
+         RhqBEEorfbPrzNfNLb4pGgqG377zuPkeaHwdXYWjx1sf723PWudEB4bxb7d2R30Rtjez
+         LC0nvD6y5MfBt2C6BnK92C1cRRic/L0V59N/KouTwA2hWmv7MVsJwGjhJKLZ9gpbQfLH
+         LwQZJGBfxsuey8HcJ1KQvk3iw+FJmXdIfJ4L7rdoa89H3fFNzltrP7pLBTfCQxIFx1o+
+         LDfQ==
+X-Gm-Message-State: AOJu0Yx1A6QgSdYCZCTiaxz1Kc6RMlQ3d0bzy0H3r0nb0EHo3PsdNB+F
+	54MtPFpezuARP0HQzpKE3rmMtTwOQJw=
+X-Google-Smtp-Source: AGHT+IEumjsGPB0Bwt/MbCXBoLpOMrGFmI1s+bm0EGTpUeKcWOUwZoTE5cn1fY0A411hu/l+2tMnJBrKbD0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:e743:b0:1d0:737b:2850 with SMTP id
+ p3-20020a170902e74300b001d0737b2850mr29887plf.11.1701966064312; Thu, 07 Dec
+ 2023 08:21:04 -0800 (PST)
+Date: Thu, 7 Dec 2023 08:21:02 -0800
+In-Reply-To: <20231207010302.2240506-1-jmattson@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v10 16/50] x86/sev: Introduce snp leaked pages list
-To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
- thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
- pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
- jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
- slp@redhat.com, pgonda@google.com, peterz@infradead.org,
- srinivas.pandruvada@linux.intel.com, rientjes@google.com,
- dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, kirill@shutemov.name,
- ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
- sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
- jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
- pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-17-michael.roth@amd.com>
-Content-Language: en-US
-From: Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <20231016132819.1002933-17-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-X-Spam-Score: -4.30
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-3.10 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 BAYES_HAM(-3.00)[100.00%];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 R_RATELIMIT(0.00)[to_ip_from(RL81e5qggtdx371s8ik49ru6xr)];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 RCPT_COUNT_TWELVE(0.00)[39];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -3.10
+Mime-Version: 1.0
+References: <20220921003201.1441511-11-seanjc@google.com> <20231207010302.2240506-1-jmattson@google.com>
+Message-ID: <ZXHw7tykubfG04Um@google.com>
+Subject: Re: [PATCH v4 10/12] KVM: x86: never write to memory from kvm_vcpu_check_block()
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: aleksandar.qemu.devel@gmail.com, alexandru.elisei@arm.com, 
+	anup@brainfault.org, aou@eecs.berkeley.edu, atishp@atishpatra.org, 
+	borntraeger@linux.ibm.com, chenhuacai@kernel.org, david@redhat.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, james.morse@arm.com, 
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, 
+	maz@kernel.org, mlevitsk@redhat.com, oliver.upton@linux.dev, 
+	palmer@dabbelt.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
+	suzuki.poulose@arm.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 10/16/23 15:27, Michael Roth wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
+On Wed, Dec 06, 2023, Jim Mattson wrote:
+> kvm_vcpu_check_block() is called while not in TASK_RUNNING, and therefore
+> it cannot sleep.  Writing to guest memory is therefore forbidden, but it
+> can happen on AMD processors if kvm_check_nested_events() causes a vmexit.
 > 
-> Pages are unsafe to be released back to the page-allocator, if they
-> have been transitioned to firmware/guest state and can't be reclaimed
-> or transitioned back to hypervisor/shared state. In this case add
-> them to an internal leaked pages list to ensure that they are not freed
-
-Note the adding to the list doesn't ensure anything like that. Not dropping
-the refcount to zero does. But tracking them might indeed not be bad for
-e.g. crashdump investigations so no objection there.
-
-> or touched/accessed to cause fatal page faults.
+> Fortunately, all events that are caught by kvm_check_nested_events() are
+> also recognized by kvm_vcpu_has_events() through vendor callbacks such as
+> kvm_x86_interrupt_allowed() or kvm_x86_ops.nested_ops->has_events(), so
+> remove the call and postpone the actual processing to vcpu_block().
 > 
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> [mdr: relocate to arch/x86/coco/sev/host.c]
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Opportunistically honor the return of kvm_check_nested_events().  KVM
+> punted on the check in kvm_vcpu_running() because the only error path is
+> if vmx_complete_nested_posted_interrupt() fails, in which case KVM exits
+> to userspace with "internal error" i.e. the VM is likely dead anyways so
+> it wasn't worth overloading the return of kvm_vcpu_running().
+> 
+> Add the check mostly so that KVM is consistent with itself; the return of
+> the call via kvm_apic_accept_events()=>kvm_check_nested_events() that
+> immediately follows  _is_ checked.
+> 
+> Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> [sean: check and handle return of kvm_check_nested_events()]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/include/asm/sev-host.h |  3 +++
->  arch/x86/virt/svm/sev.c         | 28 ++++++++++++++++++++++++++++
->  2 files changed, 31 insertions(+)
+>  arch/x86/kvm/x86.c | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/sev-host.h b/arch/x86/include/asm/sev-host.h
-> index 1df989411334..7490a665e78f 100644
-> --- a/arch/x86/include/asm/sev-host.h
-> +++ b/arch/x86/include/asm/sev-host.h
-> @@ -19,6 +19,8 @@ void sev_dump_hva_rmpentry(unsigned long address);
->  int psmash(u64 pfn);
->  int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable);
->  int rmp_make_shared(u64 pfn, enum pg_level level);
-> +void snp_leak_pages(u64 pfn, unsigned int npages);
-> +
->  #else
->  static inline int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level) { return -ENXIO; }
->  static inline void sev_dump_hva_rmpentry(unsigned long address) {}
-> @@ -29,6 +31,7 @@ static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int as
->  	return -ENXIO;
->  }
->  static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENXIO; }
-> +static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
->  #endif
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index dcc675d4e44b..8aeacbc2bff9 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10815,6 +10815,17 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
+>  			return 1;
+>  	}
 >  
->  #endif
-> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-> index bf9b97046e05..29a69f4b8cfb 100644
-> --- a/arch/x86/virt/svm/sev.c
-> +++ b/arch/x86/virt/svm/sev.c
-> @@ -59,6 +59,12 @@ struct rmpentry {
->  static struct rmpentry *rmptable_start __ro_after_init;
->  static u64 rmptable_max_pfn __ro_after_init;
->  
-> +/* list of pages which are leaked and cannot be reclaimed */
-> +static LIST_HEAD(snp_leaked_pages_list);
-> +static DEFINE_SPINLOCK(snp_leaked_pages_list_lock);
-> +
-> +static atomic_long_t snp_nr_leaked_pages = ATOMIC_LONG_INIT(0);
-> +
->  #undef pr_fmt
->  #define pr_fmt(fmt)	"SEV-SNP: " fmt
->  
-> @@ -518,3 +524,25 @@ int rmp_make_shared(u64 pfn, enum pg_level level)
->  	return rmpupdate(pfn, &val);
->  }
->  EXPORT_SYMBOL_GPL(rmp_make_shared);
-> +
-> +void snp_leak_pages(u64 pfn, unsigned int npages)
-> +{
-> +	struct page *page = pfn_to_page(pfn);
-> +
-> +	pr_debug("%s: leaking PFN range 0x%llx-0x%llx\n", __func__, pfn, pfn + npages);
-> +
-> +	spin_lock(&snp_leaked_pages_list_lock);
-> +	while (npages--) {
-> +		/*
-> +		 * Reuse the page's buddy list for chaining into the leaked
-> +		 * pages list. This page should not be on a free list currently
-> +		 * and is also unsafe to be added to a free list.
-> +		 */
-> +		list_add_tail(&page->buddy_list, &snp_leaked_pages_list);
-> +		sev_dump_rmpentry(pfn);
-> +		pfn++;
-
-You increment pfn, but not page, which is always pointing to the page of the
-initial pfn, so need to do page++ too.
-But that assumes it's all order-0 pages (hard to tell for me whether that's
-true as we start with a pfn), if there can be compound pages, it would be
-best to only add the head page and skip the tail pages - it's not expected
-to use page->buddy_list of tail pages.
-
+> +	/*
+> +	 * Evaluate nested events before exiting the halted state.  This allows
+> +	 * the halt state to be recorded properly in the VMCS12's activity
+> +	 * state field (AMD does not have a similar field and a VM-Exit always
+> +	 * causes a spurious wakeup from HLT).
+> +	 */
+> +	if (is_guest_mode(vcpu)) {
+> +		if (kvm_check_nested_events(vcpu) < 0)
+> +			return 0;
 > +	}
-> +	spin_unlock(&snp_leaked_pages_list_lock);
-> +	atomic_long_inc(&snp_nr_leaked_pages);
-> +}
-> +EXPORT_SYMBOL_GPL(snp_leak_pages);
+> +
+>  	if (kvm_apic_accept_events(vcpu) < 0)
+>  		return 0;
+>  	switch(vcpu->arch.mp_state) {
+> @@ -10837,9 +10848,6 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
+>  
+>  static inline bool kvm_vcpu_running(struct kvm_vcpu *vcpu)
+>  {
+> -	if (is_guest_mode(vcpu))
+> -		kvm_check_nested_events(vcpu);
+> -
+>  	return (vcpu->arch.mp_state == KVM_MP_STATE_RUNNABLE &&
+>  		!vcpu->arch.apf.halted);
+>  }
+> 
+> This commit breaks delivery of a (virtualized) posted interrupt from
+> an L1 vCPU to a halted L2 vCPU.
+> 
+> Looking back at commit e6c67d8cf117 ("KVM: nVMX: Wake blocked vCPU in
+> guest-mode if pending interrupt in virtual APICv"), Liran wrote:
+> 
+>     Note that this also handles the case of nested posted-interrupt by the
+>     fact RVI is updated in vmx_complete_nested_posted_interrupt() which is
+>     called from kvm_vcpu_check_block() -> kvm_arch_vcpu_runnable() ->
+>     kvm_vcpu_running() -> vmx_check_nested_events() ->
+>     vmx_complete_nested_posted_interrupt().
+> 
+> Clearly, that is no longer the case.
+
+Doh.  We got the less obvious cases and missed the obvious one.
+
+Ugh, and we also missed a related mess in kvm_guest_apic_has_interrupt().  That
+thing should really be folded into vmx_has_nested_events().
+
+Good gravy.  And vmx_interrupt_blocked() does the wrong thing because that
+specifically checks if L1 interrupts are blocked.
+
+Compile tested only, and definitely needs to be chunked into multiple patches,
+but I think something like this mess?
+
+---
+ arch/x86/include/asm/kvm-x86-ops.h |  1 -
+ arch/x86/include/asm/kvm_host.h    |  1 -
+ arch/x86/kvm/lapic.c               | 20 ++---------------
+ arch/x86/kvm/lapic.h               | 12 ++++++++++
+ arch/x86/kvm/vmx/nested.c          | 36 ++++++++++++++++++++++++++++--
+ arch/x86/kvm/vmx/vmx.c             | 34 ++++++++--------------------
+ arch/x86/kvm/vmx/vmx.h             |  1 +
+ arch/x86/kvm/x86.c                 | 10 +--------
+ 8 files changed, 59 insertions(+), 56 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 378ed944b849..6f81774c1dd0 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -85,7 +85,6 @@ KVM_X86_OP_OPTIONAL(update_cr8_intercept)
+ KVM_X86_OP(refresh_apicv_exec_ctrl)
+ KVM_X86_OP_OPTIONAL(hwapic_irr_update)
+ KVM_X86_OP_OPTIONAL(hwapic_isr_update)
+-KVM_X86_OP_OPTIONAL_RET0(guest_apic_has_interrupt)
+ KVM_X86_OP_OPTIONAL(load_eoi_exitmap)
+ KVM_X86_OP_OPTIONAL(set_virtual_apic_mode)
+ KVM_X86_OP_OPTIONAL(set_apic_access_page_addr)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index c8c7e2475a18..fc1466035a8c 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1685,7 +1685,6 @@ struct kvm_x86_ops {
+ 	void (*refresh_apicv_exec_ctrl)(struct kvm_vcpu *vcpu);
+ 	void (*hwapic_irr_update)(struct kvm_vcpu *vcpu, int max_irr);
+ 	void (*hwapic_isr_update)(int isr);
+-	bool (*guest_apic_has_interrupt)(struct kvm_vcpu *vcpu);
+ 	void (*load_eoi_exitmap)(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap);
+ 	void (*set_virtual_apic_mode)(struct kvm_vcpu *vcpu);
+ 	void (*set_apic_access_page_addr)(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 245b20973cae..6d74c42accdf 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -55,7 +55,6 @@
+ #define APIC_VERSION			0x14UL
+ #define LAPIC_MMIO_LENGTH		(1 << 12)
+ /* followed define is not in apicdef.h */
+-#define MAX_APIC_VECTOR			256
+ #define APIC_VECTORS_PER_REG		32
+ 
+ static bool lapic_timer_advance_dynamic __read_mostly;
+@@ -619,21 +618,6 @@ static const unsigned int apic_lvt_mask[KVM_APIC_MAX_NR_LVT_ENTRIES] = {
+ 	[LVT_CMCI] = LVT_MASK | APIC_MODE_MASK
+ };
+ 
+-static int find_highest_vector(void *bitmap)
+-{
+-	int vec;
+-	u32 *reg;
+-
+-	for (vec = MAX_APIC_VECTOR - APIC_VECTORS_PER_REG;
+-	     vec >= 0; vec -= APIC_VECTORS_PER_REG) {
+-		reg = bitmap + REG_POS(vec);
+-		if (*reg)
+-			return __fls(*reg) + vec;
+-	}
+-
+-	return -1;
+-}
+-
+ static u8 count_vectors(void *bitmap)
+ {
+ 	int vec;
+@@ -697,7 +681,7 @@ EXPORT_SYMBOL_GPL(kvm_apic_update_irr);
+ 
+ static inline int apic_search_irr(struct kvm_lapic *apic)
+ {
+-	return find_highest_vector(apic->regs + APIC_IRR);
++	return kvm_apic_find_highest_vector(apic->regs + APIC_IRR);
+ }
+ 
+ static inline int apic_find_highest_irr(struct kvm_lapic *apic)
+@@ -775,7 +759,7 @@ static inline int apic_find_highest_isr(struct kvm_lapic *apic)
+ 	if (likely(apic->highest_isr_cache != -1))
+ 		return apic->highest_isr_cache;
+ 
+-	result = find_highest_vector(apic->regs + APIC_ISR);
++	result = kvm_apic_find_highest_vector(apic->regs + APIC_ISR);
+ 	ASSERT(result == -1 || result >= 16);
+ 
+ 	return result;
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index 0a0ea4b5dd8c..4239bf329748 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -12,6 +12,8 @@
+ #define KVM_APIC_INIT		0
+ #define KVM_APIC_SIPI		1
+ 
++#define MAX_APIC_VECTOR			256
++
+ #define APIC_SHORT_MASK			0xc0000
+ #define APIC_DEST_NOSHORT		0x0
+ #define APIC_DEST_MASK			0x800
+@@ -151,6 +153,16 @@ u64 kvm_lapic_readable_reg_mask(struct kvm_lapic *apic);
+ #define VEC_POS(v) ((v) & (32 - 1))
+ #define REG_POS(v) (((v) >> 5) << 4)
+ 
++static inline int kvm_apic_find_highest_vector(unsigned long *bitmap)
++{
++	unsigned long bit = find_last_bit(bitmap, MAX_APIC_VECTOR);
++
++	if (bit == MAX_APIC_VECTOR)
++		return -1;
++
++	return bit;
++}
++
+ static inline void kvm_lapic_clear_vector(int vec, void *bitmap)
+ {
+ 	clear_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 4ba46e1b29d2..28b3c1c0830f 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3964,8 +3964,40 @@ static bool nested_vmx_preemption_timer_pending(struct kvm_vcpu *vcpu)
+ 
+ static bool vmx_has_nested_events(struct kvm_vcpu *vcpu)
+ {
+-	return nested_vmx_preemption_timer_pending(vcpu) ||
+-	       to_vmx(vcpu)->nested.mtf_pending;
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	void *vapic = vmx->nested.virtual_apic_map.hva;
++	int max_irr, vppr;
++
++	if (nested_vmx_preemption_timer_pending(vcpu) ||
++	    vmx->nested.mtf_pending)
++		return true;
++
++	if (!nested_cpu_has_vid(get_vmcs12(vcpu)) ||
++	    __vmx_interrupt_blocked(vcpu))
++		return false;
++
++	if (!vapic)
++		return false;
++
++	vppr = *((u32 *)(vapic + APIC_PROCPRI));
++
++	max_irr = vmx_get_rvi();
++	if ((max_irr & 0xf0) > (vppr & 0xf0))
++		return true;
++
++	max_irr = kvm_apic_find_highest_vector(vapic + APIC_IRR);
++	if (max_irr > 0 && (max_irr & 0xf0) > (vppr & 0xf0))
++		return true;
++
++	if (vmx->nested.pi_desc && pi_test_on(vmx->nested.pi_desc)) {
++		void *pir = vmx->nested.pi_desc->pir;
++
++		max_irr = kvm_apic_find_highest_vector(pir);
++		if (max_irr > 0 && (max_irr & 0xf0) > (vppr & 0xf0))
++			return true;
++	}
++
++	return false;
+ }
+ 
+ /*
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index d30df9b3fe3e..be8ab49e9965 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4107,26 +4107,6 @@ void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
+-static bool vmx_guest_apic_has_interrupt(struct kvm_vcpu *vcpu)
+-{
+-	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-	void *vapic_page;
+-	u32 vppr;
+-	int rvi;
+-
+-	if (WARN_ON_ONCE(!is_guest_mode(vcpu)) ||
+-		!nested_cpu_has_vid(get_vmcs12(vcpu)) ||
+-		WARN_ON_ONCE(!vmx->nested.virtual_apic_map.gfn))
+-		return false;
+-
+-	rvi = vmx_get_rvi();
+-
+-	vapic_page = vmx->nested.virtual_apic_map.hva;
+-	vppr = *((u32 *)(vapic_page + APIC_PROCPRI));
+-
+-	return ((rvi & 0xf0) > (vppr & 0xf0));
+-}
+-
+ static void vmx_msr_filter_changed(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+@@ -5040,16 +5020,21 @@ static int vmx_nmi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+ 	return !vmx_nmi_blocked(vcpu);
+ }
+ 
+-bool vmx_interrupt_blocked(struct kvm_vcpu *vcpu)
++bool __vmx_interrupt_blocked(struct kvm_vcpu *vcpu)
+ {
+-	if (is_guest_mode(vcpu) && nested_exit_on_intr(vcpu))
+-		return false;
+-
+ 	return !(vmx_get_rflags(vcpu) & X86_EFLAGS_IF) ||
+ 	       (vmcs_read32(GUEST_INTERRUPTIBILITY_INFO) &
+ 		(GUEST_INTR_STATE_STI | GUEST_INTR_STATE_MOV_SS));
+ }
+ 
++bool vmx_interrupt_blocked(struct kvm_vcpu *vcpu)
++{
++	if (is_guest_mode(vcpu) && nested_exit_on_intr(vcpu))
++		return false;
++
++	return __vmx_interrupt_blocked(vcpu);
++}
++
+ static int vmx_interrupt_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+ {
+ 	if (to_vmx(vcpu)->nested.nested_run_pending)
+@@ -8335,7 +8320,6 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 	.required_apicv_inhibits = VMX_REQUIRED_APICV_INHIBITS,
+ 	.hwapic_irr_update = vmx_hwapic_irr_update,
+ 	.hwapic_isr_update = vmx_hwapic_isr_update,
+-	.guest_apic_has_interrupt = vmx_guest_apic_has_interrupt,
+ 	.sync_pir_to_irr = vmx_sync_pir_to_irr,
+ 	.deliver_interrupt = vmx_deliver_interrupt,
+ 	.dy_apicv_has_pending_interrupt = pi_has_pending_interrupt,
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 45cee1a8bc0a..4097afed4425 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -400,6 +400,7 @@ u64 construct_eptp(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
+ bool vmx_guest_inject_ac(struct kvm_vcpu *vcpu);
+ void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu);
+ bool vmx_nmi_blocked(struct kvm_vcpu *vcpu);
++bool __vmx_interrupt_blocked(struct kvm_vcpu *vcpu);
+ bool vmx_interrupt_blocked(struct kvm_vcpu *vcpu);
+ bool vmx_get_nmi_mask(struct kvm_vcpu *vcpu);
+ void vmx_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 1983947b8965..b9e599a4b487 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12974,12 +12974,6 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 		kvm_arch_free_memslot(kvm, old);
+ }
+ 
+-static inline bool kvm_guest_apic_has_interrupt(struct kvm_vcpu *vcpu)
+-{
+-	return (is_guest_mode(vcpu) &&
+-		static_call(kvm_x86_guest_apic_has_interrupt)(vcpu));
+-}
+-
+ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+ {
+ 	if (!list_empty_careful(&vcpu->async_pf.done))
+@@ -13010,9 +13004,7 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+ 	if (kvm_test_request(KVM_REQ_PMI, vcpu))
+ 		return true;
+ 
+-	if (kvm_arch_interrupt_allowed(vcpu) &&
+-	    (kvm_cpu_has_interrupt(vcpu) ||
+-	    kvm_guest_apic_has_interrupt(vcpu)))
++	if (kvm_arch_interrupt_allowed(vcpu) && kvm_cpu_has_interrupt(vcpu))
+ 		return true;
+ 
+ 	if (kvm_hv_has_stimer_pending(vcpu))
+
+base-commit: 1ab097653e4dd8d23272d028a61352c23486fd4a
+-- 
 
 
