@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-3802-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3803-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03397808105
-	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 07:48:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53A72808107
+	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 07:48:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A16E61F21285
-	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 06:48:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09F0F1F21268
+	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 06:48:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF36512E45;
-	Thu,  7 Dec 2023 06:48:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D16313FF3;
+	Thu,  7 Dec 2023 06:48:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hVOBXHxJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mmhYk4A6"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72F5310D1;
-	Wed,  6 Dec 2023 22:48:13 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 014EC10CC;
+	Wed,  6 Dec 2023 22:48:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701931693; x=1733467693;
+  t=1701931700; x=1733467700;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=weytwHlJaT9QkpiPWOupsraUsDXK0tGZy4jHhXFC/0o=;
-  b=hVOBXHxJ3F9ZWDeU8C0Paq3Vo/c8Mk8RCb6tvDd6w8/t39a5qIQVegIr
-   IepHU6Uxg03MKCEQi3fUtW7hOUPwbIFwd/9OgI7ANwuZy3qTpkXQL6++A
-   01FXydMaHfQMrw6hIV6MOX86lvgwxU2xbY/Nl7Y89g53RPYNIqsbGlXZs
-   72nq9w58XOIuxcjPFzwMb4mKgJViOzl3w/Rn6mCHpX6VscMVqAsBis+vk
-   un0POzJ2okKm5ZFezQOqlMXr9j23rnfvhH2DzPKlbexciaSMpfyT7pByp
-   /OuP16+l9CVxjZzxlJR2KnsYLYiuPSwe3dxPDM7M/U8U9oLBLotkcqkWS
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="1014914"
+  bh=/VO/6EbwWdzOPhuUcdpmviRB/EVopdo3GTWKwLejoSc=;
+  b=mmhYk4A6B55OWyzf6OspRWGJYtuv+dVqzT878sV74XZgpXYbBkoDwkkx
+   ql/lSqFTsJgvJMT5GbtVHjKnFgxAxKMVEWZ3ArdcMc5UlAaNEsrDT8Vqr
+   EkDwZXesVQJ3WPXnNYJGFBjcxb12r3JjA95zeRL615MhKWYmchUsDxptk
+   yryFrAZUjp35bVneUk4r5lYxuPcmzFhqtPowMP3JPfmKxzv5q+lv8uFX+
+   EXxWPrzKQ+VXYCebrEEBWkVc9r5uHMwuHs2B7uTvpgaULHogJjLlN4FOC
+   ki0mem3kJQC0dwXcySmulFema0hq2uVCxp2q0Bb8ARpPufmiApEqlQwuH
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="1014931"
 X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="scan'208";a="1014914"
+   d="scan'208";a="1014931"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2023 22:48:13 -0800
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2023 22:48:20 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="771611494"
+X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="771611575"
 X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="scan'208";a="771611494"
+   d="scan'208";a="771611575"
 Received: from allen-box.sh.intel.com ([10.239.159.127])
-  by orsmga002.jf.intel.com with ESMTP; 06 Dec 2023 22:48:07 -0800
+  by orsmga002.jf.intel.com with ESMTP; 06 Dec 2023 22:48:13 -0800
 From: Lu Baolu <baolu.lu@linux.intel.com>
 To: Joerg Roedel <joro@8bytes.org>,
 	Will Deacon <will@kernel.org>,
@@ -59,9 +59,9 @@ Cc: Yi Liu <yi.l.liu@intel.com>,
 	linux-kernel@vger.kernel.org,
 	Lu Baolu <baolu.lu@linux.intel.com>,
 	Jason Gunthorpe <jgg@nvidia.com>
-Subject: [PATCH v8 03/12] iommu: Remove unrecoverable fault data
-Date: Thu,  7 Dec 2023 14:42:59 +0800
-Message-Id: <20231207064308.313316-4-baolu.lu@linux.intel.com>
+Subject: [PATCH v8 04/12] iommu: Cleanup iopf data structure definitions
+Date: Thu,  7 Dec 2023 14:43:00 +0800
+Message-Id: <20231207064308.313316-5-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231207064308.313316-1-baolu.lu@linux.intel.com>
 References: <20231207064308.313316-1-baolu.lu@linux.intel.com>
@@ -73,113 +73,108 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The unrecoverable fault data is not used anywhere. Remove it to avoid
-dead code.
+struct iommu_fault_page_request and struct iommu_page_response are not
+part of uAPI anymore. Convert them to data structures for kAPI.
 
-Suggested-by: Kevin Tian <kevin.tian@intel.com>
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+Reviewed-by: Yi Liu <yi.l.liu@intel.com>
 Tested-by: Yan Zhao <yan.y.zhao@intel.com>
 Tested-by: Longfang Liu <liulongfang@huawei.com>
 ---
- include/linux/iommu.h | 72 ++-----------------------------------------
- 1 file changed, 2 insertions(+), 70 deletions(-)
+ include/linux/iommu.h      | 27 +++++++++++----------------
+ drivers/iommu/io-pgfault.c |  1 -
+ drivers/iommu/iommu.c      |  4 ----
+ 3 files changed, 11 insertions(+), 21 deletions(-)
 
 diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index d683ebf152bd..c1e4369b1957 100644
+index c1e4369b1957..ca539df70a67 100644
 --- a/include/linux/iommu.h
 +++ b/include/linux/iommu.h
-@@ -50,67 +50,7 @@ struct iommu_dma_cookie;
- 
- /* Generic fault types, can be expanded IRQ remapping fault */
- enum iommu_fault_type {
--	IOMMU_FAULT_DMA_UNRECOV = 1,	/* unrecoverable fault */
--	IOMMU_FAULT_PAGE_REQ,		/* page request fault */
--};
--
--enum iommu_fault_reason {
--	IOMMU_FAULT_REASON_UNKNOWN = 0,
--
--	/* Could not access the PASID table (fetch caused external abort) */
--	IOMMU_FAULT_REASON_PASID_FETCH,
--
--	/* PASID entry is invalid or has configuration errors */
--	IOMMU_FAULT_REASON_BAD_PASID_ENTRY,
--
--	/*
--	 * PASID is out of range (e.g. exceeds the maximum PASID
--	 * supported by the IOMMU) or disabled.
--	 */
--	IOMMU_FAULT_REASON_PASID_INVALID,
--
--	/*
--	 * An external abort occurred fetching (or updating) a translation
--	 * table descriptor
--	 */
--	IOMMU_FAULT_REASON_WALK_EABT,
--
--	/*
--	 * Could not access the page table entry (Bad address),
--	 * actual translation fault
--	 */
--	IOMMU_FAULT_REASON_PTE_FETCH,
--
--	/* Protection flag check failed */
--	IOMMU_FAULT_REASON_PERMISSION,
--
--	/* access flag check failed */
--	IOMMU_FAULT_REASON_ACCESS,
--
--	/* Output address of a translation stage caused Address Size fault */
--	IOMMU_FAULT_REASON_OOR_ADDRESS,
--};
--
--/**
-- * struct iommu_fault_unrecoverable - Unrecoverable fault data
-- * @reason: reason of the fault, from &enum iommu_fault_reason
-- * @flags: parameters of this fault (IOMMU_FAULT_UNRECOV_* values)
-- * @pasid: Process Address Space ID
-- * @perm: requested permission access using by the incoming transaction
-- *        (IOMMU_FAULT_PERM_* values)
-- * @addr: offending page address
-- * @fetch_addr: address that caused a fetch abort, if any
-- */
--struct iommu_fault_unrecoverable {
--	__u32	reason;
--#define IOMMU_FAULT_UNRECOV_PASID_VALID		(1 << 0)
--#define IOMMU_FAULT_UNRECOV_ADDR_VALID		(1 << 1)
--#define IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID	(1 << 2)
+@@ -71,12 +71,12 @@ struct iommu_fault_page_request {
+ #define IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE	(1 << 1)
+ #define IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA	(1 << 2)
+ #define IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID	(1 << 3)
 -	__u32	flags;
 -	__u32	pasid;
+-	__u32	grpid;
 -	__u32	perm;
 -	__u64	addr;
--	__u64	fetch_addr;
-+	IOMMU_FAULT_PAGE_REQ = 1,	/* page request fault */
+-	__u64	private_data[2];
++	u32	flags;
++	u32	pasid;
++	u32	grpid;
++	u32	perm;
++	u64	addr;
++	u64	private_data[2];
  };
  
  /**
-@@ -142,19 +82,11 @@ struct iommu_fault_page_request {
- /**
-  * struct iommu_fault - Generic fault data
-  * @type: fault type from &enum iommu_fault_type
-- * @padding: reserved for future use (should be zero)
-- * @event: fault event, when @type is %IOMMU_FAULT_DMA_UNRECOV
+@@ -85,7 +85,7 @@ struct iommu_fault_page_request {
   * @prm: Page Request message, when @type is %IOMMU_FAULT_PAGE_REQ
-- * @padding2: sets the fault size to allow for future extensions
   */
  struct iommu_fault {
- 	__u32	type;
--	__u32	padding;
--	union {
--		struct iommu_fault_unrecoverable event;
--		struct iommu_fault_page_request prm;
--		__u8 padding2[56];
--	};
-+	struct iommu_fault_page_request prm;
+-	__u32	type;
++	u32 type;
+ 	struct iommu_fault_page_request prm;
  };
  
+@@ -106,8 +106,6 @@ enum iommu_page_response_code {
+ 
  /**
+  * struct iommu_page_response - Generic page response information
+- * @argsz: User filled size of this data
+- * @version: API version of this structure
+  * @flags: encodes whether the corresponding fields are valid
+  *         (IOMMU_FAULT_PAGE_RESPONSE_* values)
+  * @pasid: Process Address Space ID
+@@ -115,14 +113,11 @@ enum iommu_page_response_code {
+  * @code: response code from &enum iommu_page_response_code
+  */
+ struct iommu_page_response {
+-	__u32	argsz;
+-#define IOMMU_PAGE_RESP_VERSION_1	1
+-	__u32	version;
+ #define IOMMU_PAGE_RESP_PASID_VALID	(1 << 0)
+-	__u32	flags;
+-	__u32	pasid;
+-	__u32	grpid;
+-	__u32	code;
++	u32	flags;
++	u32	pasid;
++	u32	grpid;
++	u32	code;
+ };
+ 
+ 
+diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
+index e5b8b9110c13..24b5545352ae 100644
+--- a/drivers/iommu/io-pgfault.c
++++ b/drivers/iommu/io-pgfault.c
+@@ -56,7 +56,6 @@ static int iopf_complete_group(struct device *dev, struct iopf_fault *iopf,
+ 			       enum iommu_page_response_code status)
+ {
+ 	struct iommu_page_response resp = {
+-		.version		= IOMMU_PAGE_RESP_VERSION_1,
+ 		.pasid			= iopf->fault.prm.pasid,
+ 		.grpid			= iopf->fault.prm.grpid,
+ 		.code			= status,
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index d0a28667479a..2064946e2bb4 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -1483,10 +1483,6 @@ int iommu_page_response(struct device *dev,
+ 	if (!param || !param->fault_param)
+ 		return -EINVAL;
+ 
+-	if (msg->version != IOMMU_PAGE_RESP_VERSION_1 ||
+-	    msg->flags & ~IOMMU_PAGE_RESP_PASID_VALID)
+-		return -EINVAL;
+-
+ 	/* Only send response if there is a fault report pending */
+ 	mutex_lock(&param->fault_param->lock);
+ 	if (list_empty(&param->fault_param->faults)) {
 -- 
 2.34.1
 
