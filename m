@@ -1,144 +1,95 @@
-Return-Path: <kvm+bounces-3852-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3853-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29D3F808752
-	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 13:05:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A73E808754
+	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 13:06:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D07AE1F223CB
-	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 12:05:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 731291C21C79
+	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 12:06:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70B7A39AEB;
-	Thu,  7 Dec 2023 12:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B09B139AEB;
+	Thu,  7 Dec 2023 12:06:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="gXVqDHxA"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="eMsrg0Qm"
 X-Original-To: kvm@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF4C3AA;
-	Thu,  7 Dec 2023 04:05:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1701950734; x=1733486734;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+vqAtDYB58+ilZDY2IzWBId3CBwPu+5+VxutobiukMs=;
-  b=gXVqDHxAC3F0kgJ1e9l17h/8swN7yRsFnYFDsm1A0Od/+9d4GezhwSvU
-   fCDvrTlmLHmmuNy92oIC983hN/8/MFfQo+IXbGGmRPbiPlpOL6qkttgb6
-   ZzRaF1YjlmgWi0BQ9isbijNPTy8V2/MNHO2UmDF0TsYYTH6DMZJuQmaeI
-   8CQCjGBEB6/HJLIyvi1TxXWK9fN9BRj5/BrT6mXm7Zcn1YJEYLCFisCiK
-   AHdFIw6adCCOpACh9bTOG6fuSIqsUX4kI9LgMHTlaC4/AevChVzcKPOnH
-   FFE0ircjxt4vHoXgwiBv/W7dsiLWIqrw7HJFFkF3B2CjK0i1NKOZvLaWE
-   g==;
-X-CSE-ConnectionGUID: mTzueT1QSG2gazajd18OtQ==
-X-CSE-MsgGUID: N6fBXV3OSlSjijCehmi7zQ==
-X-ThreatScanner-Verdict: Negative
-X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="asc'?scan'208";a="12928857"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Dec 2023 05:05:33 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 7 Dec 2023 05:05:03 -0700
-Received: from wendy (10.10.85.11) by chn-vm-ex03.mchp-main.com (10.10.85.151)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
- Transport; Thu, 7 Dec 2023 05:05:00 -0700
-Date: Thu, 7 Dec 2023 12:04:30 +0000
-From: Conor Dooley <conor.dooley@microchip.com>
-To: Atish Patra <atishp@rivosinc.com>
-CC: <linux-kernel@vger.kernel.org>, Alexandre Ghiti <alexghiti@rivosinc.com>,
-	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, Icenowy
- Zheng <uwu@icenowy.me>, <kvm-riscv@lists.infradead.org>,
-	<kvm@vger.kernel.org>, <linux-riscv@lists.infradead.org>, Mark Rutland
-	<mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley
-	<paul.walmsley@sifive.com>, Will Deacon <will@kernel.org>
-Subject: Re: [RFC 1/9] RISC-V: Fix the typo in Scountovf CSR name
-Message-ID: <20231207-attractor-undone-a3efe2e0bb4e@wendy>
-References: <20231205024310.1593100-1-atishp@rivosinc.com>
- <20231205024310.1593100-2-atishp@rivosinc.com>
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 31F7AA9
+	for <kvm@vger.kernel.org>; Thu,  7 Dec 2023 04:06:41 -0800 (PST)
+Received: from [192.168.178.49] (dynamic-adsl-84-220-28-122.clienti.tiscali.it [84.220.28.122])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 610B820B74C0;
+	Thu,  7 Dec 2023 04:06:39 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 610B820B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1701950800;
+	bh=MRRG7XrBA3BVkAzFjqapTbb/FV4I0PaANAuLuLVvfIs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eMsrg0QmzHKns1Q7ZwIZwQOeFqRTCi/DP176+0fcheV9JO17Ro3sZvOw/tqsEA0UU
+	 BS56PJ4eeEcxBqi9KFSYWgULywo+eYvcKnhDUwMcTlWcFwZJhoPwDupPyyo15FaLaW
+	 cO+bjfOji/7wZ3DATxkNMApdSmcptIL3ZnFLhjGw=
+Message-ID: <ec2e5f33-4168-4d5d-ac11-2a72e78c7482@linux.microsoft.com>
+Date: Thu, 7 Dec 2023 13:06:39 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="G7tPSZJn8UmPNl7v"
-Content-Disposition: inline
-In-Reply-To: <20231205024310.1593100-2-atishp@rivosinc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 12/16] KVM: x86: Make Hyper-V emulation optional
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, Maxim Levitsky <mlevitsk@redhat.com>
+References: <20231205103630.1391318-1-vkuznets@redhat.com>
+ <20231205103630.1391318-13-vkuznets@redhat.com>
+ <46235.123120606372000354@us-mta-490.us.mimecast.lan>
+ <878r67mrs4.fsf@redhat.com>
+Content-Language: en-US
+From: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+In-Reply-To: <878r67mrs4.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---G7tPSZJn8UmPNl7v
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 06/12/2023 13:36, Vitaly Kuznetsov wrote:
+> Jeremi Piotrowski <jpiotrowski@linux.microsoft.com> writes:
+> 
+>> On Tue, Dec 05, 2023 at 11:36:26AM +0100, Vitaly Kuznetsov wrote:
+>>> Hyper-V emulation in KVM is a fairly big chunk and in some cases it may be
+>>> desirable to not compile it in to reduce module sizes as well as the attack
+>>> surface. Introduce CONFIG_KVM_HYPERV option to make it possible.
+>>>
+>>> Note, there's room for further nVMX/nSVM code optimizations when
+>>> !CONFIG_KVM_HYPERV, this will be done in follow-up patches.
+>>>
+>>> Reorganize Makefile a bit so all CONFIG_HYPERV and CONFIG_KVM_HYPERV files
+>>> are grouped together.
+>>>
+>>
+>> Wanted to test this for the case where KVM is running as a nested hypervisor on
+>> Hyper-V but it doesn't apply cleanly - what base did you use? Tried v6.6,
+>> v6.7-rc1, and v6.7-rc4.
+> 
+> Hi Jeremi,
+> 
+> the base was 'kvm/next' (git://git.kernel.org/pub/scm/virt/kvm/kvm.git,
+> 'next' branch):
+> 
+> commit e9e60c82fe391d04db55a91c733df4a017c28b2f (kvm/next)
+> Author: Paolo Bonzini <pbonzini@redhat.com>
+> Date:   Tue Nov 21 11:24:08 2023 -0500
+> 
+>     selftests/kvm: fix compilation on non-x86_64 platforms
+> 
 
-On Mon, Dec 04, 2023 at 06:43:02PM -0800, Atish Patra wrote:
-> The counter overflow CSR name is "scountovf" not "sscountovf".
->=20
-> Fix the csr name.
->=20
-> Fixes: 4905ec2fb7e6 ("RISC-V: Add sscofpmf extension support")
->=20
-^^ No blank line here.
+Hi Vitaly,
 
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+Thanks. Just tested this running in an AMD Hyper-V guest with CONFIG_KVM_HYPERV
+unset, and tested nested virtualization - no regressions. You can have my tag:
 
-Cheers,
-Conor.
+Tested-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
 
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> ---
->  arch/riscv/include/asm/csr.h         | 2 +-
->  arch/riscv/include/asm/errata_list.h | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
-> index 306a19a5509c..88cdc8a3e654 100644
-> --- a/arch/riscv/include/asm/csr.h
-> +++ b/arch/riscv/include/asm/csr.h
-> @@ -281,7 +281,7 @@
->  #define CSR_HPMCOUNTER30H	0xc9e
->  #define CSR_HPMCOUNTER31H	0xc9f
-> =20
-> -#define CSR_SSCOUNTOVF		0xda0
-> +#define CSR_SCOUNTOVF		0xda0
-> =20
->  #define CSR_SSTATUS		0x100
->  #define CSR_SIE			0x104
-> diff --git a/arch/riscv/include/asm/errata_list.h b/arch/riscv/include/as=
-m/errata_list.h
-> index 83ed25e43553..7026fba12eeb 100644
-> --- a/arch/riscv/include/asm/errata_list.h
-> +++ b/arch/riscv/include/asm/errata_list.h
-> @@ -152,7 +152,7 @@ asm volatile(ALTERNATIVE_2(						\
-> =20
->  #define ALT_SBI_PMU_OVERFLOW(__ovl)					\
->  asm volatile(ALTERNATIVE(						\
-> -	"csrr %0, " __stringify(CSR_SSCOUNTOVF),			\
-> +	"csrr %0, " __stringify(CSR_SCOUNTOVF),				\
->  	"csrr %0, " __stringify(THEAD_C9XX_CSR_SCOUNTEROF),		\
->  		THEAD_VENDOR_ID, ERRATA_THEAD_PMU,			\
->  		CONFIG_ERRATA_THEAD_PMU)				\
-> --=20
-> 2.34.1
->=20
+Jeremi
 
---G7tPSZJn8UmPNl7v
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZXG0zgAKCRB4tDGHoIJi
-0nN2AQCvWU22TUz271qbF0f5QPpTAMxJ3xWOjAley3m+IaVk2AEAgKbSJBE5ydgt
-c0kRj6UIA26wDaBYi2ihZnFJRMAJVw0=
-=pO03
------END PGP SIGNATURE-----
-
---G7tPSZJn8UmPNl7v--
 
