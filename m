@@ -1,245 +1,482 @@
-Return-Path: <kvm+bounces-3797-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3798-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 270578080A6
-	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 07:27:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A15CC8080E8
+	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 07:39:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A2F21C20A19
-	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 06:27:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FCD1281AB6
+	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 06:39:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 752DB134D6;
-	Thu,  7 Dec 2023 06:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FA4C12B68;
+	Thu,  7 Dec 2023 06:39:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TLbOs0wu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dNZW04b7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8FE3D4B;
-	Wed,  6 Dec 2023 22:27:16 -0800 (PST)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B76Qnhl017882;
-	Thu, 7 Dec 2023 06:26:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=d5jbmnW0EkD6CSJajfUaQ5SYiRswnWaio3/w8qMt2xU=;
- b=TLbOs0wuIXlfOt3U7HolEky3DYFoJTWrcDdVEZkJIwt7fmLvzXDbtbRYea5PFcul5JlE
- 813End/Lsnd1UvqSL0CYt2joXmqriVYDk+ahGXIJqgVRL+7zdHzphr+IK1TjsovizYwG
- jmXnkf6aRyEXEXKNXxlHbI8jSEgnwIAV97cv+YdA7EJZKMv/l20XWsa4qQ6lznb8KrE2
- VmhkQ6fV5/xpEnbB+8nO/Sf2QNonxYghTlFdmGaFHB74JonDWf2HoxxsgimoZNR+A4AZ
- tysTAdpxBDo5zCTgsZ1dVSdcy9+dZqqObssMRd0rPK0HLQMo+xNrbI2piRu3d6B+/A2X EA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uu8ehggd4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Dec 2023 06:26:56 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B76QtYG018851;
-	Thu, 7 Dec 2023 06:26:55 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uu8ehgfxt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Dec 2023 06:26:55 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B74Vfci013754;
-	Thu, 7 Dec 2023 06:22:24 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3utau49dss-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Dec 2023 06:22:24 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B76MMdj12517954
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 7 Dec 2023 06:22:22 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F41942004E;
-	Thu,  7 Dec 2023 06:22:21 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BECC52004B;
-	Thu,  7 Dec 2023 06:22:21 +0000 (GMT)
-Received: from DESKTOP-2CCOB1S. (unknown [9.171.170.249])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu,  7 Dec 2023 06:22:21 +0000 (GMT)
-Date: Thu, 7 Dec 2023 07:22:12 +0100
-From: Tobias Huschle <huschle@linux.ibm.com>
-To: Abel Wu <wuyun.abel@bytedance.com>
-Cc: Peter Zijlstra <peterz@infradead.org>,
-        Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev, netdev@vger.kernel.org, mst@redhat.com,
-        jasowang@redhat.com
-Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
- sched/fair: Add lag based placement)
-Message-ID: <ZXFklCgF3EjeKXDC@DESKTOP-2CCOB1S.>
-References: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
- <20231117092318.GJ8262@noisy.programming.kicks-ass.net>
- <ZVdbdSXg4qefTNtg@DESKTOP-2CCOB1S.>
- <20231117123759.GP8262@noisy.programming.kicks-ass.net>
- <46a997c2-5a38-4b60-b589-6073b1fac677@bytedance.com>
- <ZVyt4UU9+XxunIP7@DESKTOP-2CCOB1S.>
- <20231122100016.GO8262@noisy.programming.kicks-ass.net>
- <6564a012.c80a0220.adb78.f0e4SMTPIN_ADDED_BROKEN@mx.google.com>
- <d4110c79-d64f-49bd-9f69-0a94369b5e86@bytedance.com>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2FD3D7E
+	for <kvm@vger.kernel.org>; Wed,  6 Dec 2023 22:39:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701931156;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y8D+mFANWyB/haCVfpYtD6jJQ+9h/Z7nGuaValDJ6r4=;
+	b=dNZW04b7CL2dkzcO0SksPTyfVIqTRXl9BTIylp7yHaptk2WSMvUZZt+SOugvEPOTVzhJjX
+	AP0DBhl8inlpZzsPc0MMySPijbtblCLLT//Cg5YG0sbf39+pWPaLV0Hdwr2UxAUaQ5Onqr
+	D7/Sr5khNr/5vOh7eCjwhNMrmh+DQMQ=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-455-qPNIXhUYNeenrT0QHVtp-Q-1; Thu, 07 Dec 2023 01:39:14 -0500
+X-MC-Unique: qPNIXhUYNeenrT0QHVtp-Q-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2864977ba2dso186318a91.0
+        for <kvm@vger.kernel.org>; Wed, 06 Dec 2023 22:39:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701930849; x=1702535649;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y8D+mFANWyB/haCVfpYtD6jJQ+9h/Z7nGuaValDJ6r4=;
+        b=bbg0lPGU9R8hF70mh+Ooc3Q4bJI8lFa/McgPvtpTSXfnzrnOLYbcfT8iXCC9M49J5y
+         w0vd4U20ox0/1wbtlrKZXG4e7jS+MCGQb/99wYuzioTZKX1hwv9j9xWNbWn7QKfVbBAd
+         nnkwTDPn1iHhXptCuKkSewq6Fi+5QdMmrUq6EkkbPKy6epYAKkfhKgPHoSYYt5nsm7Fy
+         nIBKu6Jtj9jx9h8KAZchw+4xFRZ0f5leFG9lzb1MYDCaFJfW9dnOLVKnFPQrr2Iy/PGX
+         fJf9f0FVGvZaoShQXpgUBqx3fK0Lp68GTwsRrE6BdOYP/DfhgrXd82Zz43SF0o702OMa
+         wGeQ==
+X-Gm-Message-State: AOJu0YxId4EQxWXZ6NRldLUXdxAq89gv2FcBUjwBUNMrpT8c5R1tIPM/
+	Eg2IdSMWJH4j8eCHi8b432RKbFUGL5UyAJWjBjkPBBldGoPRE5pbc4MdIHzxEDPaDB+GLtEMngK
+	xx6FFwr6gunoJ
+X-Received: by 2002:a05:6a21:6d9d:b0:18f:cc5f:ffe with SMTP id wl29-20020a056a216d9d00b0018fcc5f0ffemr3844399pzb.4.1701930848724;
+        Wed, 06 Dec 2023 22:34:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGW8oXSj33tDxC+iF+W/2uB16UvzJufMLnit1Si6yUYE+keN07PeMbWZ+5sRopmpMxWeVQPBQ==
+X-Received: by 2002:a05:6a21:6d9d:b0:18f:cc5f:ffe with SMTP id wl29-20020a056a216d9d00b0018fcc5f0ffemr3844384pzb.4.1701930848323;
+        Wed, 06 Dec 2023 22:34:08 -0800 (PST)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id m9-20020a170902db0900b001cfce833b6fsm523677plx.204.2023.12.06.22.34.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Dec 2023 22:34:07 -0800 (PST)
+Message-ID: <1d374fd6-72cd-cf0d-02bc-71d8e82b7c5f@redhat.com>
+Date: Thu, 7 Dec 2023 14:34:04 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d4110c79-d64f-49bd-9f69-0a94369b5e86@bytedance.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: YxWBNA5v8kUE6HWP3YpGbeQa24-QPgfk
-X-Proofpoint-GUID: BFw7w5Nrp5y0zSu7NHsfReZy4aazozqE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-07_03,2023-12-06_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
- suspectscore=0 clxscore=1015 mlxlogscore=999 lowpriorityscore=0
- phishscore=0 adultscore=0 impostorscore=0 priorityscore=1501 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312070050
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v3] arm/kvm: Enable support for KVM_ARM_VCPU_PMU_V3_FILTER
+Content-Language: en-US
+To: Gavin Shan <gshan@redhat.com>, qemu-arm@nongnu.org
+Cc: eauger@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org
+References: <20231129030827.2657755-1-shahuang@redhat.com>
+ <3a0e0c48-3043-4330-b318-ec15c7ef0725@redhat.com>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <3a0e0c48-3043-4330-b318-ec15c7ef0725@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 28, 2023 at 04:55:11PM +0800, Abel Wu wrote:
-> On 11/27/23 9:56 PM, Tobias Huschle Wrote:
-> > On Wed, Nov 22, 2023 at 11:00:16AM +0100, Peter Zijlstra wrote:
-> > > On Tue, Nov 21, 2023 at 02:17:21PM +0100, Tobias Huschle wrote:
-[...]
+Hi Gavin,
+
+On 12/1/23 13:37, Gavin Shan wrote:
+> Hi Shaoqin,
 > 
-> What are the weights of the two entities?
+> On 11/29/23 14:08, Shaoqin Huang wrote:
+>> The KVM_ARM_VCPU_PMU_V3_FILTER provide the ability to let the VMM decide
+>> which PMU events are provided to the guest. Add a new option
+>> `pmu-filter` as -accel sub-option to set the PMU Event Filtering.
+>> Without the filter, the KVM will expose all events from the host to
+>> guest by default.
+>>
+>> The `pmu-filter` has such format:
+>>
+>>    pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
+>>
+>> The A means "allow" and D means "deny", start is the first event of the
+>> range and the end is the last one. The first registered range defines
+>> the global policy(global ALLOW if the first @action is DENY, global DENY
+>> if the first @action is ALLOW). The start and end only support hex
+>> format now. For example:
+>>
+>>    pmu-filter="A:0x11-0x11;A:0x23-0x3a;D:0x30-0x30"
+>>
+>> Since the first action is allow, we have a global deny policy. It
+>> will allow event 0x11 (The cycle counter), events 0x23 to 0x3a is
+>> also allowed except the event 0x30 is denied, and all the other events
+>> are disallowed.
+>>
+>> Here is an real example shows how to use the PMU Event Filtering, when
+>> we launch a guest by use kvm, add such command line:
+>>
+>>    # qemu-system-aarch64 \
+>>     -accel kvm,pmu-filter="D:0x11-0x11"
+>>
+>> Since the first action is deny, we have a global allow policy. This
+>> disables the filtering of the cycle counter (event 0x11 being 
+>> CPU_CYCLES).
+>>
+>> And then in guest, use the perf to count the cycle:
+>>
+>>    # perf stat sleep 1
+>>
+>>     Performance counter stats for 'sleep 1':
+>>
+>>                1.22 msec task-clock                       #    0.001 
+>> CPUs utilized
+>>                   1      context-switches                 #  820.695 /sec
+>>                   0      cpu-migrations                   #    0.000 /sec
+>>                  55      page-faults                      #   45.138 
+>> K/sec
+>>     <not supported>      cycles
+>>             1128954      instructions
+>>              227031      branches                         #  186.323 
+>> M/sec
+>>                8686      branch-misses                    #    3.83% 
+>> of all branches
+>>
+>>         1.002492480 seconds time elapsed
+>>
+>>         0.001752000 seconds user
+>>         0.000000000 seconds sys
+>>
+>> As we can see, the cycle counter has been disabled in the guest, but
+>> other pmu events are still work.
+>>
+>> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+>> ---
+>> v2->v3:
+>>    - Improve commits message, use kernel doc wording, add more 
+>> explaination on
+>>      filter example, fix some typo error.                [Eric]
+>>    - Add g_free() in kvm_arch_set_pmu_filter() to prevent memory leak. 
+>> [Eric]
+>>    - Add more precise error message report.              [Eric]
+>>    - In options doc, add pmu-filter rely on KVM_ARM_VCPU_PMU_V3_FILTER 
+>> support in
+>>      KVM.                                                [Eric]
+>>
+>> v1->v2:
+>>    - Add more description for allow and deny meaning in
+>>      commit message.                                     [Sebastian]
+>>    - Small improvement.                                  [Sebastian]
+>>
+>> v2: 
+>> https://lore.kernel.org/all/20231117060838.39723-1-shahuang@redhat.com/
+>> v1: 
+>> https://lore.kernel.org/all/20231113081713.153615-1-shahuang@redhat.com/
+>> ---
+>>   include/sysemu/kvm_int.h |  1 +
+>>   qemu-options.hx          | 21 +++++++++++++
+>>   target/arm/kvm.c         | 23 ++++++++++++++
+>>   target/arm/kvm64.c       | 68 ++++++++++++++++++++++++++++++++++++++++
+>>   4 files changed, 113 insertions(+)
+>>
+>> diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+>> index fd846394be..8f4601474f 100644
+>> --- a/include/sysemu/kvm_int.h
+>> +++ b/include/sysemu/kvm_int.h
+>> @@ -120,6 +120,7 @@ struct KVMState
+>>       uint32_t xen_caps;
+>>       uint16_t xen_gnttab_max_frames;
+>>       uint16_t xen_evtchn_max_pirq;
+>> +    char *kvm_pmu_filter;
+>>   };
+>>   void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
+>> diff --git a/qemu-options.hx b/qemu-options.hx
+>> index 42fd09e4de..8b721d6668 100644
+>> --- a/qemu-options.hx
+>> +++ b/qemu-options.hx
+>> @@ -187,6 +187,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+>>       "                tb-size=n (TCG translation block cache size)\n"
+>>       "                dirty-ring-size=n (KVM dirty ring GFN count, 
+>> default 0)\n"
+>>       "                eager-split-size=n (KVM Eager Page Split chunk 
+>> size, default 0, disabled. ARM only)\n"
+>> +    "                pmu-filter={A,D}:start-end[;...] (KVM PMU Event 
+>> Filter, default no filter. ARM only)\n"
+>    ^^^^^^^
+> 
+> Potential alignment issue, or the email isn't shown for me correctly.
+> Besides, why not follow the pattern in the commit log, which is nicer
+> than what's of being:
+> 
+> pmu-filter={A,D}:start-end[;...]
+> 
+> to
+> 
+> pmu-filter="{A,D}:start-end[;{A,D}:start-end...]
 > 
 
-Both entities have the same weights (I saw 1048576 for both of them).
-The story looks different when we look at the cgroup hierarchy though:
+Ok. I can replace it with the better format.
 
-sew := weight of the sched entity (se->load.weight)
+>>       "                
+>> notify-vmexit=run|internal-error|disable,notify-window=n (enable 
+>> notify VM exit and set notify window, x86 only)\n"
+>>       "                thread=single|multi (enable multi-threaded 
+>> TCG)\n", QEMU_ARCH_ALL)
+>>   SRST
+>> @@ -259,6 +260,26 @@ SRST
+>>           impact on the memory. By default, this feature is disabled
+>>           (eager-split-size=0).
+>> +    ``pmu-filter={A,D}:start-end[;...]``
+>> +        KVM implements pmu event filtering to prevent a guest from 
+>> being able to
+>         ^^^^               ^^^^^^^^^^^^^^^^^^^
+>         Alignment          "PMU Event Filtering" to be consistent
+> 
 
-     CPU 6/KVM-2360    [011] d....  1158.884473: sched_place: comm=vhost-2961 pid=2984 sev=3595548386 sed=3598548386 sel=0 sew=1048576 avg=3595548386 min=3595548386 cpu=11 nr=0 vru=3595548386 lag=0
-     CPU 6/KVM-2360    [011] d....  1158.884473: sched_place: comm= pid=0 sev=19998138425 sed=20007532920 sel=0 sew=335754 avg=19998138425 min=19998138425 cpu=11 nr=0 vru=19998138425 lag=0
-     CPU 6/KVM-2360    [011] d....  1158.884474: sched_place: comm= pid=0 sev=37794158943 sed=37807515464 sel=0 sew=236146 avg=37794158943 min=37794158943 cpu=11 nr=0 vru=37794158943 lag=0
-     CPU 6/KVM-2360    [011] d....  1158.884474: sched_place: comm= pid=0 sev=50387168150 sed=50394482435 sel=0 sew=430665 avg=50387168150 min=50387168150 cpu=11 nr=0 vru=50387168150 lag=0
-     CPU 6/KVM-2360    [011] d....  1158.884474: sched_place: comm= pid=0 sev=76600751247 sed=77624751246 sel=0 sew=3876 avg=76600751247 min=76600751247 cpu=11 nr=0 vru=76600751247 lag=0
-<...>
-    vhost-2961-2984    [011] d....  1158.884487: sched_place: comm=kworker/11:2 pid=202 sev=76603905961 sed=76606905961 sel=0 sew=1048576 avg=76603905961 min=76603905961 cpu=11 nr=1 vru=76603905961 lag=0
+Thanks for pointing it out. It should be an alignment issue. I will fix it.
 
-Here we can see the following weights:
-kworker     -> 1048576
-vhost       -> 1048576
-cgroup root ->    3876
+>> +    sample certain events. It depends on the 
+>> KVM_ARM_VCPU_PMU_V3_FILTER attr
+>                                                                              ^^^^
+>                                                                              attribute
+>> +    supported in KVM. It has the following format:
+>> +
+>> +    pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
+>> +
+>> +    The A means "allow" and D means "deny", start is the first event 
+>> of the
+>> +    range and the end is the last one. The first registered range 
+>> defines
+>> +    the global policy(global ALLOW if the first @action is DENY, 
+>> global DENY
+>> +    if the first @action is ALLOW). The start and end only support hex
+>> +    format now. For example:
+>> +
+>> +    pmu-filter="A:0x11-0x11;A:0x23-0x3a;D:0x30-0x30"
+>> +
+>> +    Since the first action is allow, we have a global deny policy. It
+>> +    will allow event 0x11 (The cycle counter), events 0x23 to 0x3a is
+>> +    also allowed except the event 0x30 is denied, and all the other 
+>> events
+>> +    are disallowed.
+>> +
+>>       ``notify-vmexit=run|internal-error|disable,notify-window=n``
+>>           Enables or disables notify VM exit support on x86 host and 
+>> specify
+>>           the corresponding notify window to trigger the VM exit if 
+>> enabled.
+>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>> index 7903e2ddde..116a0d3d2b 100644
+>> --- a/target/arm/kvm.c
+>> +++ b/target/arm/kvm.c
+>> @@ -1108,6 +1108,22 @@ static void 
+>> kvm_arch_set_eager_split_size(Object *obj, Visitor *v,
+>>       s->kvm_eager_split_size = value;
+>>   }
+>> +static char *kvm_arch_get_pmu_filter(Object *obj, Error **errp)
+>> +{
+>> +    KVMState *s = KVM_STATE(obj);
+>> +
+>> +    return g_strdup(s->kvm_pmu_filter);
+>> +}
+>> +
+>> +static void kvm_arch_set_pmu_filter(Object *obj, const char *pmu_filter,
+>> +                                    Error **errp)
+>> +{
+>> +    KVMState *s = KVM_STATE(obj);
+>> +
+>> +    g_free(s->kvm_pmu_filter);
+>> +    s->kvm_pmu_filter = g_strdup(pmu_filter);
+>> +}
+>> +
+>>   void kvm_arch_accel_class_init(ObjectClass *oc)
+>>   {
+>>       object_class_property_add(oc, "eager-split-size", "size",
+>> @@ -1116,4 +1132,11 @@ void kvm_arch_accel_class_init(ObjectClass *oc)
+>>       object_class_property_set_description(oc, "eager-split-size",
+>>           "Eager Page Split chunk size for hugepages. (default: 0, 
+>> disabled)");
+>> +
+>> +    object_class_property_add_str(oc, "pmu-filter",
+>> +                                  kvm_arch_get_pmu_filter,
+>> +                                  kvm_arch_set_pmu_filter);
+>> +
+>> +    object_class_property_set_description(oc, "pmu-filter",
+>> +        "PMU Event Filtering description for guest pmu. (default: 
+>> NULL, disabled)");
+>                                                        ^^^
+>                                                        PMU
 
-kworker and vhost weights remain the same. The weights of the nodes in the cgroup vary.
+Got it.
 
+>>   }
+>> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+>> index 3c175c93a7..7947b83b36 100644
+>> --- a/target/arm/kvm64.c
+>> +++ b/target/arm/kvm64.c
+>> @@ -10,6 +10,7 @@
+>>    */
+>>   #include "qemu/osdep.h"
+>> +#include <asm-arm64/kvm.h>
+>>   #include <sys/ioctl.h>
+>>   #include <sys/ptrace.h>
+>> @@ -131,6 +132,70 @@ static bool kvm_arm_set_device_attr(CPUState *cs, 
+>> struct kvm_device_attr *attr,
+>>       return true;
+>>   }
+>> +static void kvm_arm_pmu_filter_init(CPUState *cs)
+>> +{
+>> +    static bool pmu_filter_init = false;
+>> +    struct kvm_pmu_event_filter filter;
+>> +    struct kvm_device_attr attr = {
+>> +        .group      = KVM_ARM_VCPU_PMU_V3_CTRL,
+>> +        .attr       = KVM_ARM_VCPU_PMU_V3_FILTER,
+>> +        .addr       = (uint64_t)&filter,
+>> +    };
+>> +    KVMState *kvm_state = cs->kvm_state;
+> 
+> I would move @kvm_state to the beginning of the function since it's the 
+> container
+> to everything else.
+> 
 
-I also spent some more thought on this and have some more observations:
+Ok. I can move it to the first.
 
-1. kworker lag after short runtime
+>> +    char *tmp;
+>> +    char *str, act;
+>> +
+>> +    if (!kvm_state->kvm_pmu_filter)
+>> +        return;
+>> +
+>> +    if (kvm_vcpu_ioctl(cs, KVM_HAS_DEVICE_ATTR, attr)) {
+>> +        error_report("The kernel doesn't support the pmu event 
+>> filter!\n");
+>> +        abort();
+>> +    }
+>> +
+> 
+> s/attr/&attr ?
+> 
 
-    vhost-2961-2984    [011] d....  1158.884486: sched_waking: comm=kworker/11:2 pid=202 prio=120 target_cpu=011
-    vhost-2961-2984    [011] d....  1158.884487: sched_place: comm=kworker/11:2 pid=202 sev=76603905961 sed=76606905961 sel=0 sew=1048576 avg=76603905961 min=76603905961 cpu=11 nr=1 vru=76603905961 lag=0
-<...>                                                                                                                   ^^^^^
-    vhost-2961-2984    [011] d....  1158.884490: sched_switch: prev_comm=vhost-2961 prev_pid=2984 prev_prio=120 prev_state=R+ ==> next_comm=kworker/11:2 next_pid=202 next_prio=120
-   kworker/11:2-202    [011] d....  1158.884491: sched_waking: comm=CPU 0/KVM pid=2988 prio=120 target_cpu=009
-   kworker/11:2-202    [011] d....  1158.884492: sched_stat_runtime: comm=kworker/11:2 pid=202 runtime=5150 [ns] vruntime=76603911111 [ns] deadline=76606905961 [ns] lag=76606905961
-                                                                                               ^^^^^^^^^^^^^^^^
-   kworker/11:2-202    [011] d....  1158.884492: sched_update: comm=kworker/11:2 pid=202 sev=76603911111 sed=76606905961 sel=-1128 sew=1048576 avg=76603909983 min=76603905961 cpu=11 nr=2 lag=-1128 lim=10000000
-                                                                                                                         ^^^^^^^^^
-   kworker/11:2-202    [011] d....  1158.884494: sched_stat_wait: comm=vhost-2961 pid=2984 delay=5150 [ns]
-   kworker/11:2-202    [011] d....  1158.884494: sched_switch: prev_comm=kworker/11:2 prev_pid=202 prev_prio=120 prev_state=I ==> next_comm=vhost-2961 next_pid=2984 next_prio=120
+It should be &attr.
 
-In the sequence above, the kworker gets woken up by the vhost and placed on the timeline with 0 lag.
-The kworker then executes for 5150ns and returns control to the vhost.
-Unfortunately, this short runtime earns the kworker a negative lag of -1128.
-This in turn, causes the kworker to not be selected by check_preempt_wakeup_fair.
+> The connection between vCPU and attribute query was set up in Linux 
+> v4.10 by
+> commit f577f6c2a6a ("arm64: KVM: Introduce per-vcpu kvm device 
+> controls"), and
+> the capability depends on KVM_CAP_VCPU_ATTRIBUTES. I think 
+> KVM_CAP_VCPU_ATTRIBUTES
+> needs to be checked prior to kvm_vcpu_ioctl(cs, KVM_HAS_DEVICE_ATTR, ...)
+> 
 
-My naive understanding of lag is, that only those entities get negative lag, which consume
-more time than they should. Why is the kworker being punished for running only a tiny
-portion of time?
+I searched the KVM_CAP_VCPU_ATTRIBUTES, no where check the capability. 
+And the current usage of KVM_HAS_DEVICE_ATTR never check the 
+KVM_CAP_VCPU_ATTRIBUTES. I guess we don't need it.
 
-In the majority of cases, the kworker finishes after a 4-digit number of ns.
-There are occassional outliers with 5-digit numbers. I would therefore not 
-expect negative lag for the kworker.
+> Besides, the PMU Event Filtering was introduced to Linux v4.10. It means 
+> the user
+> can crash qemu when "pmu-filter" is provided on Linux v4.9. So the 
+> correct behavior
+> would be warning and ignore "pmu-filter" since it's an add-on and 
+> best-effort
+> feature.
 
-It is fair to say that the kworker was executing while the vhost was not.
-kworker gets put on the queue with no lag, so it essentially has its vruntime
-set to avg_vruntime.
-After giving up its timeslice the kworker has now a vruntime which is larger
-than the avg_vruntime. Hence the negative lag might make sense here from an
-algorithmic standpoint. 
+Thanks for pointing this out, I think it's reasonable. I can replace all 
+error_report with wran_report and replace delete all abort().
 
+> 
+> 
+>> +    /* The filter only needs to be initialized for 1 vcpu. */
+>> +    if (!pmu_filter_init)
+>> +        pmu_filter_init = true;
+>> +
+> 
+> { } has been missed. QEMU needs it even for the block with single line 
+> of code.
+> 
 
-2a/b. vhost getting increased deadlines over time, no call of pick_eevdf
+Ok. I will add it.
 
-    vhost-2961-2984    [011] d.h..  1158.892878: sched_stat_runtime: comm=vhost-2961 pid=2984 runtime=8385872 [ns] vruntime=3603948448 [ns] deadline=3606948448 [ns] lag=3598548386
-    vhost-2961-2984    [011] d.h..  1158.892879: sched_stat_runtime: comm= pid=0 runtime=8385872 [ns] vruntime=76604158567 [ns] deadline=77624751246 [ns] lag=77624751246
-<..>
-    vhost-2961-2984    [011] d.h..  1158.902877: sched_stat_runtime: comm=vhost-2961 pid=2984 runtime=9999435 [ns] vruntime=3613947883 [ns] deadline=3616947883 [ns] lag=3598548386
-    vhost-2961-2984    [011] d.h..  1158.902878: sched_stat_runtime: comm= pid=0 runtime=9999435 [ns] vruntime=76633826282 [ns] deadline=78137144356 [ns] lag=77624751246
-<..>
-    vhost-2961-2984    [011] d.h..  1158.912877: sched_stat_runtime: comm=vhost-2961 pid=2984 runtime=9999824 [ns] vruntime=3623947707 [ns] deadline=3626947707 [ns] lag=3598548386
-    vhost-2961-2984    [011] d.h..  1158.912878: sched_stat_runtime: comm= pid=0 runtime=9999824 [ns] vruntime=76688003113 [ns] deadline=78161723086 [ns] lag=77624751246
-<..>
-<..>
-    vhost-2961-2984    [011] dN...  1159.152927: sched_stat_runtime: comm=vhost-2961 pid=2984 runtime=40402 [ns] vruntime=3863988069 [ns] deadline=3866947667 [ns] lag=3598548386
-    vhost-2961-2984    [011] dN...  1159.152928: sched_stat_runtime: comm= pid=0 runtime=40402 [ns] vruntime=78355923791 [ns] deadline=78393801472 [ns] lag=77624751246
+>> +    tmp = g_strdup(kvm_state->kvm_pmu_filter);
+>> +
+>> +    for (str = strtok(tmp, ";"); str != NULL; str = strtok(NULL, ";")) {
+>> +        unsigned short start = 0, end = 0;
+>> +
+>> +        sscanf(str, "%c:%hx-%hx", &act, &start, &end);
+>> +        if ((act != 'A' && act != 'D') || (!start && !end)) {
+>> +            error_report("skipping invalid filter %s\n", str);
+>> +            continue;
+>> +        }
+>> +
+>> +        filter = (struct kvm_pmu_event_filter) {
+>> +            .base_event     = start,
+>> +            .nevents        = end - start + 1,
+>> +            .action         = act == 'A' ? KVM_PMU_EVENT_ALLOW :
+>> +                                           KVM_PMU_EVENT_DENY,
+>> +        };
+>> +
+>> +        if (!kvm_arm_set_device_attr(cs, &attr, "PMU Event Filter")) {
+>> +            if (errno == EINVAL)
+>> +                error_report("Invalid filter range [0x%x-0x%x]. "
+>> +                             "ARMv8.0 support 10 bits event space, "
+>> +                             "ARMv8.1 support 16 bits event space",
+>> +                             start, end);
+>> +            else if (errno == ENODEV)
+>> +                error_report("GIC not initialized");
+>> +            else if (errno == ENXIO)
+>> +                error_report("PMUv3 not properly configured or 
+>> in-kernel irqchip "
+>> +                             "not configured.");
+>> +            else if (errno == EBUSY)
+>> +                error_report("PMUv3 already initialized or a VCPU has 
+>> already run");
+>> +
+>> +            abort();
+>> +        }
+>> +    }
+>> +
+>> +    g_free(tmp);
+>> +}
+>> +
+> 
+> { } has been missed.
+> 
+> g_strsplit() may be good fit to parse "pmu-filter". 
+> cpu-target.c::parse_cpu_option()
+> is the example for its usage.
+> 
 
-In the sequence above, I extended the tracing of sched_stat_runtime to use 
-for_each_sched_entity to also output the values for the cgroup hierarchy.
-The first entry represents the actual task, the second entry represents
-the root for that particular cgroup. I dropped the levels in between
-for readability.
+Ok. I can follow the implementation. It actually much simpler.
 
-The first three groupings are happening in sequence. The fourth grouping
-is the last sched_stat_runtime update before the vhost gets migrated off
-the CPU. The ones in between repeat the same pattern.
+> As I explained above, it wouldn't a "abort()" since "pmu-filter" is an 
+> add-on and
+> best-effort attempt. We probably just warn done by warn_report() instead 
+> of raising
+> error if the PMU Event Filter fails to be set.
+> 
 
-Interestingly, the vruntimes of the root grow faster than the actual tasks.
-I assume this is intended.
-At the same time, the deadlines keep on growing for vhost and the cgroup root.
-At the same time, the kworker is left starving with its negative lag.
-At no point in this sequence, pick_eevdf is being called.
+Will do that.
 
-The only time pick_eevdf is being called is right when the kworker is woken up.
-So check_preempt_wakeup_fair seems to be the only chance for the kworker to get
-scheduled in time.
+Thanks,
+Shaoqin
 
-For reference:
-    vhost-2961-2984    [011] d....  1158.884563: sched_place: comm=kworker/11:2 pid=202 sev=76604163719 sed=76607163719 sel=-1128 sew=1048576 avg=76604158567 min=76604158567 cpu=11 nr=1 vru=76604158567 lag=-5152
+>>   void kvm_arm_pmu_init(CPUState *cs)
+>>   {
+>>       struct kvm_device_attr attr = {
+>> @@ -141,6 +206,9 @@ void kvm_arm_pmu_init(CPUState *cs)
+>>       if (!ARM_CPU(cs)->has_pmu) {
+>>           return;
+>>       }
+>> +
+>> +    kvm_arm_pmu_filter_init(cs);
+>> +
+>>       if (!kvm_arm_set_device_attr(cs, &attr, "PMU")) {
+>>           error_report("failed to init PMU");
+>>           abort();
+> 
+> Thanks,
+> Gavin
+> 
 
-The kworker has a deadline which is definitely smaller than the one of vhost
-in later stages. So, I would assume it should get scheduled at some point.
-If vhost is running in kernel space and is therefore not preemptable,
-this would be expected behavior though.
+-- 
+Shaoqin
 
-
-3. vhost looping endlessly, waiting for kworker to be scheduled
-
-I dug a little deeper on what the vhost is doing. I'm not an expert on
-virtio whatsoever, so these are just educated guesses that maybe
-someone can verify/correct. Please bear with me probably messing up 
-the terminology.
-
-- vhost is looping through available queues.
-- vhost wants to wake up a kworker to process a found queue.
-- kworker does something with that queue and terminates quickly.
-
-What I found by throwing in some very noisy trace statements was that,
-if the kworker is not woken up, the vhost just keeps looping accross
-all available queues (and seems to repeat itself). So it essentially
-relies on the scheduler to schedule the kworker fast enough. Otherwise
-it will just keep on looping until it is migrated off the CPU.
-
-
-SUMMARY 
-
-1 and 2a/b have some more or less plausible potential explanations, 
-where the EEVDF scheduler might just do what it is designed to do.
-
-3 is more tricky since I'm not familiar with the topic. If the vhost just
-relies on the kworker pre-empting the vhost, than this sounds a bit
-counter-intuitive. But there might also be a valid design decision
-behind this.
-
-If 1 and 2 are indeed plausible, path 3 is probably the
-one to go in order to figure out if we have a problem there.
-[...]
 
