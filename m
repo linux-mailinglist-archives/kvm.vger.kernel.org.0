@@ -1,154 +1,130 @@
-Return-Path: <kvm+bounces-3830-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3831-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44A0A808404
-	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 10:14:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4FF3808406
+	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 10:15:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E215C1F22769
-	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 09:14:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A58EB213E1
+	for <lists+kvm@lfdr.de>; Thu,  7 Dec 2023 09:15:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8110832C76;
-	Thu,  7 Dec 2023 09:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5528232C77;
+	Thu,  7 Dec 2023 09:15:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Laf2zfNa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I3enIjcB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D90910CF
-	for <kvm@vger.kernel.org>; Thu,  7 Dec 2023 01:14:30 -0800 (PST)
-Received: by mail-oi1-x232.google.com with SMTP id 5614622812f47-3b9db318839so456404b6e.3
-        for <kvm@vger.kernel.org>; Thu, 07 Dec 2023 01:14:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701940470; x=1702545270; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4UGjQCd7LVQJ0VtFzIdDdhxzodi3g57d9KV1C6E0+n8=;
-        b=Laf2zfNafaJGvN5keculosfgrQWQq+1Lu7ziheYSTvv4yxcw3hpXcvtst0S7/kJZhK
-         fxM4Fu0Nlxyw4omhjBo1EK5y88w/wu38XCA+2Jz/3HVQ6g7vrkvA7kEO5LaJisT2xS1s
-         fFafgyLfC6fw5GsmH+GjzEG+L/1BK8s4oJcP1Nch22RbRRe5pFBY3pG0qtVBG1NsdqP1
-         pqP542zanA/XiYJwYCzmoNwCHYOwrWlP98qggUonvIyCggSA+H1WP51A8i6Jggx+rBZg
-         qrQaJI6N9+KBVQ2kAn9m64wTcY5wlkdKNCZZNQ+a4b3iE/6MDq+kk/Ef9IHTeB/dKMET
-         8gAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701940470; x=1702545270;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4UGjQCd7LVQJ0VtFzIdDdhxzodi3g57d9KV1C6E0+n8=;
-        b=O38u8I8xx3pCxF6Erw6DQvLBC9nM4uIzl8ULK4zoiSev+CH5ZHnb+W+EkpV6TCuYUM
-         kYvU2nQWw4TMDaaMjQpW9Wp3P7rhEO/dEi36mc4porV9BM2PsxhGsNoJz/Z3DGzyGwOb
-         HkHKd6CKCy/xBFQnbhSTx+xqmRpbmLOuzcxp0Qy1l7LgG3f+Na7/esXMJNRnzGkc0TEY
-         GkuvHod7aSna6GHufq8jIpbaRPKBUuSYcoSjqFjk2Olzlny+gCA9ShOYZT5abGvxhv/V
-         CmX6zZWeDL8t665Fo96Itp7t6r4Aq64hZDgbmNteTmuGg+jljQ+CN6upwVs5eevJbuuk
-         GlKQ==
-X-Gm-Message-State: AOJu0YwMLq1OKaSLH9PVNmpugM6Vel36p+UwD4trlfF6N7cqNjM5xJBi
-	qtjssjhgZ/VtQOgt2qFYeTviysJx8U1tduiTOqM=
-X-Google-Smtp-Source: AGHT+IFMAgiw3M79ejSrDddrDQo7MF/CVWsVF5aT0rrGGbQnV8/fVx1NkazPHxw78qtagcKmLyS3kLb5SA3+IsDAzw4=
-X-Received: by 2002:a05:6870:3047:b0:1fb:75a:c436 with SMTP id
- u7-20020a056870304700b001fb075ac436mr2173231oau.95.1701940469762; Thu, 07 Dec
- 2023 01:14:29 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327A731A71;
+	Thu,  7 Dec 2023 09:15:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFF49C433C7;
+	Thu,  7 Dec 2023 09:15:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701940526;
+	bh=/Ctyeihvym0TLJckEfSU+fK0IoOk5vWkpWC1s1zEMPM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=I3enIjcBzdi6ERkvUMs8ND5g/RZGWozPoSNu5732cRCy43npx7N7AXF7xHecPxUfr
+	 JLwONzeAnrGWYNeNo8et4zlC1VfSLm1zI+lcNSeQfXcG43eA+DDPi98h8grwMZ9IPT
+	 3LqvHIEfyqgrul+aqRCIT32OxkXczh3fP0eQRuMgP9dOySk3nh7j9D079xJIO/9E5e
+	 r//l5DxlaUS92HGG69hxhjKqrIyy46OPYszmKMFw0pmP9vfgXwPGIRslihA8ZSBxyG
+	 QIhm1BdjGsvR+3cSHaMtn1MK9bO326agDzFHXPCb+4GdoBqKltUuNdEECEW9RGkLG3
+	 7taPRy/0u0j3A==
+X-Mailer: emacs 29.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V (IBM) <aneesh.kumar@kernel.org>
+To: Vaibhav Jain <vaibhav@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
+Cc: Vaibhav Jain <vaibhav@linux.ibm.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Jordan Niethe <jniethe5@gmail.com>,
+	Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
+	mikey@neuling.org, paulus@ozlabs.org, sbhat@linux.ibm.com,
+	gautam@linux.ibm.com, kconsul@linux.vnet.ibm.com,
+	amachhiw@linux.vnet.ibm.com, David.Laight@ACULAB.COM
+Subject: Re: [PATCH 01/12] KVM: PPC: Book3S HV nestedv2: Invalidate RPT
+ before deleting a guest
+In-Reply-To: <20231201132618.555031-2-vaibhav@linux.ibm.com>
+References: <20231201132618.555031-1-vaibhav@linux.ibm.com>
+ <20231201132618.555031-2-vaibhav@linux.ibm.com>
+Date: Thu, 07 Dec 2023 14:45:18 +0530
+Message-ID: <878r66xtjt.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231206155821.1194551-1-michael.roth@amd.com>
-In-Reply-To: <20231206155821.1194551-1-michael.roth@amd.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 7 Dec 2023 04:14:17 -0500
-Message-ID: <CAJSP0QUnqJPTL2W9xknEW7Er0SWCcK1kxST1fCvedmqsics_VA@mail.gmail.com>
-Subject: Re: [PATCH v3 for-8.2] i386/sev: Avoid SEV-ES crash due to missing
- MSR_EFER_LMA bit
-To: Michael Roth <michael.roth@amd.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Marcelo Tosatti <mtosatti@redhat.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
-	Akihiko Odaki <akihiko.odaki@daynix.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	Lara Lazier <laramglazier@gmail.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Wed, 6 Dec 2023 at 10:59, Michael Roth <michael.roth@amd.com> wrote:
+Vaibhav Jain <vaibhav@linux.ibm.com> writes:
+
+> From: Jordan Niethe <jniethe5@gmail.com>
 >
-> Commit 7191f24c7fcf ("accel/kvm/kvm-all: Handle register access errors")
-> added error checking for KVM_SET_SREGS/KVM_SET_SREGS2. In doing so, it
-> exposed a long-running bug in current KVM support for SEV-ES where the
-> kernel assumes that MSR_EFER_LMA will be set explicitly by the guest
-> kernel, in which case EFER write traps would result in KVM eventually
-> seeing MSR_EFER_LMA get set and recording it in such a way that it would
-> be subsequently visible when accessing it via KVM_GET_SREGS/etc.
+> An L0 must invalidate the L2's RPT during H_GUEST_DELETE if this has not
+> already been done. This is a slow operation that means H_GUEST_DELETE
+> must return H_BUSY multiple times before completing. Invalidating the
+> tables before deleting the guest so there is less work for the L0 to do.
 >
-> However, guest kernels currently rely on MSR_EFER_LMA getting set
-> automatically when MSR_EFER_LME is set and paging is enabled via
-> CR0_PG_MASK. As a result, the EFER write traps don't actually expose the
-> MSR_EFER_LMA bit, even though it is set internally, and when QEMU
-> subsequently tries to pass this EFER value back to KVM via
-> KVM_SET_SREGS* it will fail various sanity checks and return -EINVAL,
-> which is now considered fatal due to the aforementioned QEMU commit.
->
-> This can be addressed by inferring the MSR_EFER_LMA bit being set when
-> paging is enabled and MSR_EFER_LME is set, and synthesizing it to ensure
-> the expected bits are all present in subsequent handling on the host
-> side.
->
-> Ultimately, this handling will be implemented in the host kernel, but to
-> avoid breaking QEMU's SEV-ES support when using older host kernels, the
-> same handling can be done in QEMU just after fetching the register
-> values via KVM_GET_SREGS*. Implement that here.
->
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Marcelo Tosatti <mtosatti@redhat.com>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: Akihiko Odaki <akihiko.odaki@daynix.com>
-> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
-> Cc: Lara Lazier <laramglazier@gmail.com>
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Cc: Maxim Levitsky <mlevitsk@redhat.com>
-> Cc: kvm@vger.kernel.org
-> Fixes: 7191f24c7fcf ("accel/kvm/kvm-all: Handle register access errors")
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
 > ---
->  target/i386/kvm/kvm.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
+>  arch/powerpc/include/asm/kvm_book3s.h | 1 +
+>  arch/powerpc/kvm/book3s_hv.c          | 6 ++++--
+>  arch/powerpc/kvm/book3s_hv_nested.c   | 2 +-
+>  3 files changed, 6 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
+> index 4f527d09c92b..a37736ed3728 100644
+> --- a/arch/powerpc/include/asm/kvm_book3s.h
+> +++ b/arch/powerpc/include/asm/kvm_book3s.h
+> @@ -302,6 +302,7 @@ void kvmhv_nested_exit(void);
+>  void kvmhv_vm_nested_init(struct kvm *kvm);
+>  long kvmhv_set_partition_table(struct kvm_vcpu *vcpu);
+>  long kvmhv_copy_tofrom_guest_nested(struct kvm_vcpu *vcpu);
+> +void kvmhv_flush_lpid(u64 lpid);
+>  void kvmhv_set_ptbl_entry(u64 lpid, u64 dw0, u64 dw1);
+>  void kvmhv_release_all_nested(struct kvm *kvm);
+>  long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu);
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 1ed6ec140701..5543e8490cd9 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -5691,10 +5691,12 @@ static void kvmppc_core_destroy_vm_hv(struct kvm *kvm)
+>  			kvmhv_set_ptbl_entry(kvm->arch.lpid, 0, 0);
+>  	}
+>  
+> -	if (kvmhv_is_nestedv2())
+> +	if (kvmhv_is_nestedv2()) {
+> +		kvmhv_flush_lpid(kvm->arch.lpid);
+>  		plpar_guest_delete(0, kvm->arch.lpid);
+>
 
-Applied, thanks!
+I am not sure I follow the optimization here. I would expect the
+hypervisor to kill all the translation caches as part of guest_delete.
+What is the benefit of doing a lpid flush outside the guest delete?
 
-Stefan
-
->
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index 11b8177eff..4ce80555b4 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -3643,6 +3643,10 @@ static int kvm_get_sregs(X86CPU *cpu)
->      env->cr[4] =3D sregs.cr4;
->
->      env->efer =3D sregs.efer;
-> +    if (sev_es_enabled() && env->efer & MSR_EFER_LME &&
-> +        env->cr[0] & CR0_PG_MASK) {
-> +        env->efer |=3D MSR_EFER_LMA;
-> +    }
->
->      /* changes to apic base and cr8/tpr are read back via kvm_arch_post_=
-run */
->      x86_update_hflags(env);
-> @@ -3682,6 +3686,10 @@ static int kvm_get_sregs2(X86CPU *cpu)
->      env->cr[4] =3D sregs.cr4;
->
->      env->efer =3D sregs.efer;
-> +    if (sev_es_enabled() && env->efer & MSR_EFER_LME &&
-> +        env->cr[0] & CR0_PG_MASK) {
-> +        env->efer |=3D MSR_EFER_LMA;
-> +    }
->
->      env->pdptrs_valid =3D sregs.flags & KVM_SREGS2_FLAGS_PDPTRS_VALID;
->
-> --
-> 2.25.1
->
->
+> -	else
+> +	} else {
+>  		kvmppc_free_lpid(kvm->arch.lpid);
+> +	}
+>  
+>  	kvmppc_free_pimap(kvm);
+>  }
+> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
+> index 3b658b8696bc..5c375ec1a3c6 100644
+> --- a/arch/powerpc/kvm/book3s_hv_nested.c
+> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
+> @@ -503,7 +503,7 @@ void kvmhv_nested_exit(void)
+>  	}
+>  }
+>  
+> -static void kvmhv_flush_lpid(u64 lpid)
+> +void kvmhv_flush_lpid(u64 lpid)
+>  {
+>  	long rc;
+>  
+> -- 
+> 2.42.0
 
