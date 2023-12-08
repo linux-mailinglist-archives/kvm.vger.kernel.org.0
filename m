@@ -1,163 +1,125 @@
-Return-Path: <kvm+bounces-3939-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3940-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B29F780AB8A
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 19:02:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91D2980ABB1
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 19:12:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32E281F2134C
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 18:02:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C27931C209BC
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 18:12:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 501B346B9F;
-	Fri,  8 Dec 2023 18:02:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BB7A47A40;
+	Fri,  8 Dec 2023 18:12:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="N683CX5t"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C6swujZf"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2071.outbound.protection.outlook.com [40.107.100.71])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 807CB10EB;
-	Fri,  8 Dec 2023 10:02:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ae6yRQSEr/3LSOvgFFu/1tqgGL9OzL9cehVHi44qEvlP9Jl+hlCupnBV+LU6mBwWpjj6fYvSK/OnFdb8nQUoNNHDDR8/CdsZaCyAkH7cb/0EQD/IyYbHOqi5oM8m10A7mOvUB90Iz9wwbli5XR9Z1cWEkM+dEpOJALijCbleOlRKHCTLUXTCnaXExOCiVWddTtI/5aMf2rOCDmonsUA52t5gRCEVitqOKcUvqJUTwT+NioKi3ZTsi47l/DyH5gKTr6cX6EDLosAn1AnjHaSSqc6AHksfj2ZOg/8qx18t4I4r6jHrufMcM3+QRZRzHXbQ3wFSPc+bEYqMI+lDuCJTrg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jAclD6xjTtRh5V9kUqs+VW64cGIEs2gGRgOeEJKwgcs=;
- b=KVFSKtdIHzjTskYcdGgE8GfeVzBBCPPfRYwjjLxapHQ++Vj/TgWny8mptRDxBB3amXgEA+XWt306c7LfZTDMunANQZtyuVAwUeTGN/vwZgJYg85g80w3e7RJWm8YTkGN663VN0Y9devuTcq7cuZ64wA5PAikjljJjsrQveR3Q/AJzsf+rlLXcWj5hUwyCEjcM2s7sZGWx/IZHvox8WSxx1J6/HAhdushncMtsgFLuADBn/lKSWoY3evymKAlesuO35xPhi0kSZUl2V7WOlMd98ofNRU5ryH4ulB9IeZ2dZNziX6u77x24nXQUb3Nhw+PIkosuz92OiXI3J1wBpLSPg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jAclD6xjTtRh5V9kUqs+VW64cGIEs2gGRgOeEJKwgcs=;
- b=N683CX5tRkEaeCARe/2aSXFs3BvSVsMwUU7Tn+0Cxw8wRU+HKrkkN1dBOjgBe7XPKx5GIpznKNfG51IiQXLaUa3yZq8JzicOMoIZ1vJG1CboWnjvA47IdD4ogzD9crF6jawT3Al9aFFBARnyYlQAhQ3h3P9InMRT/75Bm0pi4iYhjrzv7H+/w6HZM5gSfkDe908iR2bMLKhtWa8vsPGbJ0QrDARVvCh1TVl+bM/AvlrvUc+xXC5+LxiDi0Oh/SZWrvZUNK/pmZwF3v+Gd8L/dD+eHoq+6HWmKT9njXONqQYD2DD83ug8r08xltFQMUoUCmfk131An2uwypwX/kDOyw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM4PR12MB5184.namprd12.prod.outlook.com (2603:10b6:5:397::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.28; Fri, 8 Dec
- 2023 18:01:58 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7046.038; Fri, 8 Dec 2023
- 18:01:58 +0000
-Date: Fri, 8 Dec 2023 14:01:57 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Jim Harris <jim.harris@samsung.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	"bhelgaas@google.com" <bhelgaas@google.com>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"ben@nvidia.com" <ben@nvidia.com>
-Subject: Re: Locking between vfio hot-remove and pci sysfs sriov_numvfs
-Message-ID: <20231208180157.GR2692119@nvidia.com>
-References: <CGME20231207223824uscas1p27dd91f0af56cda282cd28046cc981fe9@uscas1p2.samsung.com>
- <ZXJI5+f8bUelVXqu@ubuntu>
- <20231207162148.2631fa58.alex.williamson@redhat.com>
- <20231207234810.GN2692119@nvidia.com>
- <ZXNUqoLgKLZLDluH@bgt-140510-bm01.eng.stellus.in>
- <20231208174109.GQ2692119@nvidia.com>
- <ZXNZdXgw0xwGtn4g@bgt-140510-bm01.eng.stellus.in>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZXNZdXgw0xwGtn4g@bgt-140510-bm01.eng.stellus.in>
-X-ClientProxiedBy: MN2PR15CA0065.namprd15.prod.outlook.com
- (2603:10b6:208:237::34) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E76DCE9
+	for <kvm@vger.kernel.org>; Fri,  8 Dec 2023 10:12:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702059141;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/TkwU2denrfJVnTiAIr/mTvHxt1y7el//yhAIkwpoKI=;
+	b=C6swujZfzGnO4fN8AoSREX7AwhM/8Y73R2AqSOigIj6NsOywZFuQHeUSxOWy/nbK6kBbqD
+	VfceVzl9Up6qMqnECeLzpD1lKzXlSdagZzg/6q+MPocLFmL/xEei4cjdrMj+1cRypgRFD0
+	IZhSgple59Dfj0GhSW82eZ9tHRjZXyQ=
+Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
+ [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-29-m6EYqw7VMhqFLym5PjIW7g-1; Fri, 08 Dec 2023 13:12:19 -0500
+X-MC-Unique: m6EYqw7VMhqFLym5PjIW7g-1
+Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-1fb3db72d92so4028225fac.0
+        for <kvm@vger.kernel.org>; Fri, 08 Dec 2023 10:12:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702059138; x=1702663938;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/TkwU2denrfJVnTiAIr/mTvHxt1y7el//yhAIkwpoKI=;
+        b=Y7I9TzE4iVOZ6a+pA9HjW+v2rTKGAD23DrR8m7QSLnZWSi51SuGXe7YknzzYRVurE1
+         2C90cV86jZ/RXJ1Ft5po3lSZeF7cdZUlfQoGGToIk4DMIIw889W3V0ZQe5QOb71/4DWq
+         lc2ldRFdmB0ROC0/SoHTv6T+wHR/CiZmMLlqWC7+3FWz1l3i8T0uK3qlzVbZ8a0FEUT2
+         VARRBf2MLIuqICg/tSJJoN+92HCpZpZjOaTk7BL3caCamQyewP8v6OcOgXFLT+6BegOT
+         ls3VQG+zl8d+bwV3pLka2ZgFcgupqRAuvgXmjJgTQH2TvCUUeMOq1xuI15eyFVoMph9r
+         236A==
+X-Gm-Message-State: AOJu0YyPJuay77H1x5DOSPKQn4uJsw/bJcQIt7VKmwhRRaFIBHRMVkE8
+	NDAPDozV0+PEurcajd4IttBGglEY9fLVXw267tcnl6qWKHfPuIuSRw9aN2W5EKTeZmir/B2BeiK
+	E17KPNlwJ65oRnaXvtlEuAo2R5kLJh4pxVs0d
+X-Received: by 2002:a05:6870:4728:b0:1fb:75a:de78 with SMTP id b40-20020a056870472800b001fb075ade78mr583897oaq.102.1702059138561;
+        Fri, 08 Dec 2023 10:12:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG1dBdgMfiuSi5uz+rVRXvKDkpoT9HYByD4Nc2YMvjQiYfF5kVpiZ92tDqJoUOJ4qc/qdT3rZOFMba0vNgZ4z4=
+X-Received: by 2002:a05:6870:4728:b0:1fb:75a:de78 with SMTP id
+ b40-20020a056870472800b001fb075ade78mr583887oaq.102.1702059138295; Fri, 08
+ Dec 2023 10:12:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB5184:EE_
-X-MS-Office365-Filtering-Correlation-Id: 177c4c85-5c35-4eeb-1c54-08dbf817c54d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	d58ndK/unpGZrTbvHbO26u2TmmhlbfixZvNEeQ6uZYqSqszH98CvKsALs/WVnFgmeGskWtUuW6cZ4a6ZRl7dCVrQph+C/4qJNKfic7OHRuK9oOGNU6py8QOdARGVeFL2ZOsWtLxvXwiAg1WqzUM1oPukWF8bOL39m0jtw5KEQF+viMtiEaMrq26RBmr8DaXkl28SG30/fR7xquAN2WnV9AXI+QjTsSg14PHhWN1MkC6pcuAquQUkIB7SBbHnzj4ga4F0MiE90aw+H2U++QnHSvmZXX9+CWrAvZSpHC0HG9JfVLG8oT2CMO5PJMGJz6XKSA4jYFzmk4FzYRTH2pjSUqnioz5tphvuqq8tdlbn6SvJCrBbg7sWM3zBbt0xgaFtY7xX/2TDBEkFjsVd6uRnERLJPoYpjSkODSArUzsX5M8leIKu7HX5ZEP17sjdoDtgHz9ORVbT2ajvG31bkpLt21RvrHfxbywUbDA0551JbE5TGb7ab7JNPzMz/lhvVUwA4tWKmYiuMnHEbiXP0A7LG1iLAgiUN+6ymAHFLKMYtpcRVLjdGN0ZT5I8EBfc1Vpr
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(136003)(39860400002)(366004)(346002)(230922051799003)(186009)(451199024)(1800799012)(64100799003)(6506007)(26005)(6512007)(2616005)(107886003)(1076003)(83380400001)(41300700001)(4326008)(8676002)(8936002)(2906002)(5660300002)(478600001)(6916009)(66476007)(66946007)(66556008)(316002)(54906003)(6486002)(38100700002)(33656002)(86362001)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?5GfI44ASdVTDbtZsmRAcIC/EncZ8K+SkPy5SJpyPAyGXiQYjv8Joy0HUBw/u?=
- =?us-ascii?Q?L1/8Ff7vJ1tEk7ggO4DG/yeL6sQAs3aLcNrPMqI0bielDRVAU9DeooD5m6qp?=
- =?us-ascii?Q?fi+fLNtmS1kWpPhNKp3xvB+sCQl777BiKREsYNzXLX5FcrixD4ms0EMgmOe2?=
- =?us-ascii?Q?QKqMvtbuR/uMFN16c0qApCIrrcAzUHk2NXXo0gHSqlAORoQRV69mGWRmp5Zx?=
- =?us-ascii?Q?+Tevr62z0LbOwgOyULlTJ82EPUnSRYBNKa0Mq02vzw9LkSGcSbb98d9NqbZS?=
- =?us-ascii?Q?YaxS38d+fNDbU9gPmkEXPzEdXvHg4QaWC58HhG4O2fqN9hCZeSAcSkNuvXsF?=
- =?us-ascii?Q?EuMY0CUMaSBmKRt7snvG/Ebs9eR5nzwwRIplwcbkWPLFlthfrCfZ0yEKisYG?=
- =?us-ascii?Q?dkTBlBkg9Khp4hF4Croc7fB1+yizmY4MXCKq/QBaEonMfdJ1HWdD/O2DaJ0L?=
- =?us-ascii?Q?UYadOZoSRVh0MKV9ZsHSRk04Vh4MRotJBLqaQ9iYOnA9oBkO1+wFBl5yw/9F?=
- =?us-ascii?Q?iIPxM+pC7QZaT1P8aDh6/7xgOOtezYFfxFCcMIj/Bxk6M2q4Ndtg41vIZ4Wr?=
- =?us-ascii?Q?ZdoTt26tH2s8gFnZKAJKxKt0y4jLm2QsXP9QBq0AAKcCf2cmqTuF75aqeXEC?=
- =?us-ascii?Q?4MZfjdEBXFSRRL+IRP/AWhK+8bWrY2xu8zZjPZWTgJzD/pDxxBDvlPnoe8ql?=
- =?us-ascii?Q?exVZUqtFiBuUmBWIbpeN2Jw9414sqZBzY1eygoiUPUoAUpHKjmHN+79RfsFP?=
- =?us-ascii?Q?xhuSKIVFpo6jb0v1B2QFUnE4aWqWs9fOKkBEvtwuNF84ZIAoPrmenqQFFbsv?=
- =?us-ascii?Q?O/580KzAiz+3rMRcOmzntoSroU/SFXNH89hzTzV2BUMdiy3FJDhfmbIRZQxg?=
- =?us-ascii?Q?TQ041sYBVjsvKBGCXpmOAboA9uQGIQculiW6SaWaVfz1Ka9wf99sxJQMQ4hd?=
- =?us-ascii?Q?hJUPAgYDxhmVRvqWOoEWcpO9qygegCuS9uVYYnveD3s+UvdLlah4y0r9fqmA?=
- =?us-ascii?Q?P0q5CO33VQP7LRcDFg7d9fAfpUMNAMbWB9dynVSyHqNjMdejx2/jgp3qoSY+?=
- =?us-ascii?Q?QC73fi9OC14Jw/jYouUKEjiX/W9wLjbu4SNboSQRBs8Vb+a0Xd712UhyBQHD?=
- =?us-ascii?Q?ZIMuuaa61ALabp+UfJWqCgvDqVsywkF11r5FWrJV+S4JHXSwvQBUSbdeF6S5?=
- =?us-ascii?Q?TS+PmzFHRg/2DDW8ndexqxtfEpQau3oSHANecnW+5dlpv9n9hE10mXOGoFkh?=
- =?us-ascii?Q?jiJFwj0IQxoP08HMqwFj0dekMS4XnbbM8L2haJbYN8q+3PyeGDiMqZB53xzk?=
- =?us-ascii?Q?x2dFHVAoj/GFTpIuOvkUlAcn8o0lKOoy8XeNxRnUyr1EH3lfngjPE5GYhPul?=
- =?us-ascii?Q?rVJVBkhkRSuOy7sK5CEnJCRYy3MLj7Arj5VgHtgeMQp3UpEH58gnSThg36+m?=
- =?us-ascii?Q?Btw/tiasvCqXsU31PuNFp18OGf3UIIm6SN5D+FfvbJMp0ZwmRJ45ZrCAe1js?=
- =?us-ascii?Q?fte+nmLnHVHqIt+tRZPEAcepbwbkb/DJxJNMvSw0qMm00EyuLpp0loH/9VB0?=
- =?us-ascii?Q?o3gSqViOncO5osBq62EMvIpxfkZvM5ApVpIMIXO9?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 177c4c85-5c35-4eeb-1c54-08dbf817c54d
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Dec 2023 18:01:58.2872
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: n2Lq43o9U1C+f3NdwDImiUN8ZmoeqFRN6gCgSpzmCZ/PeRKWADVX9XOGVb6VfroE
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5184
+References: <ZWufQneeJiBJLnPb@thinky-boi>
+In-Reply-To: <ZWufQneeJiBJLnPb@thinky-boi>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 8 Dec 2023 19:12:05 +0100
+Message-ID: <CABgObfbCy-9VpN+tOvXtS3RcA-M67Vwm7GmoBGmaG+0wrs1Eeg@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.7, take #1
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Kunkun Jiang <jiangkunkun@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 08, 2023 at 05:59:17PM +0000, Jim Harris wrote:
-> On Fri, Dec 08, 2023 at 01:41:09PM -0400, Jason Gunthorpe wrote:
-> > On Fri, Dec 08, 2023 at 05:38:51PM +0000, Jim Harris wrote:
-> > > On Thu, Dec 07, 2023 at 07:48:10PM -0400, Jason Gunthorpe wrote:
-> > > > 
-> > > > The mechanism of waiting in remove for userspace is inherently flawed,
-> > > > it can never work fully correctly. :( I've hit this many times.
-> > > > 
-> > > > Upon remove VFIO should immediately remove itself and leave behind a
-> > > > non-functional file descriptor. Userspace should catch up eventually
-> > > > and see it is toast.
-> > > 
-> > > One nice aspect of the current design is that vfio will leave the BARs
-> > > mapped until userspace releases the vfio handle. It avoids some rather
-> > > nasty hacks for handling SIGBUS errors in the fast path (i.e. writing
-> > > NVMe doorbells) where we cannot try to check for device removal on
-> > > every MMIO write. Would your proposal immediately yank the BARs, without
-> > > waiting for userspace to respond? This is mostly for my curiosity - SPDK
-> > > already has these hacks implemented, so I don't think it would be
-> > > affected by this kind of change in behavior.
-> > 
-> > What we did in RDMA was map a dummy page to the BARs so the sigbus was
-> > avoided. But in that case RDMA knows the BAR memory is used only for
-> > doorbell write so this is a reasonable thing to do.
-> 
-> Yeah, this is exactly what SPDK (and DPDK) does today.
+On Sat, Dec 2, 2023 at 10:19=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> Hi Paolo,
+>
+> Here's the first set of fixes for 6.7. There hasn't been very many
+> interesting issues that have come up this cycle, so it is only a single
+> patch this time around.
+>
+> Please pull :)
 
-To be clear, I mean we did it in the kernel.
+Pulled, thanks.
 
-When the device driver is removed we zap all the VMAs and install a
-fault handler that installs the dummy page instead of SIGBUS
+Paolo
 
-The application doesn't do anything, and this is how SPDK already will
-be supporting device hot unplug of the RDMA drivers.
+> --
+> Thanks,
+> Oliver
+>
+> The following changes since commit b85ea95d086471afb4ad062012a4d73cd328fa=
+86:
+>
+>   Linux 6.7-rc1 (2023-11-12 16:19:07 -0800)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
+marm-fixes-6.7-1
+>
+> for you to fetch changes up to 8e4ece6889a5b1836b6a135827ac831a5350602a:
+>
+>   KVM: arm64: GICv4: Do not perform a map to a mapped vLPI (2023-11-20 19=
+:13:32 +0000)
+>
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 6.7, take #1
+>
+>  - Avoid mapping vLPIs that have already been mapped
+>
+> ----------------------------------------------------------------
+> Kunkun Jiang (1):
+>       KVM: arm64: GICv4: Do not perform a map to a mapped vLPI
+>
+>  arch/arm64/kvm/vgic/vgic-v4.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
 
-Jason
 
