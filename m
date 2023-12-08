@@ -1,52 +1,54 @@
-Return-Path: <kvm+bounces-3947-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3948-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D77680AC69
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 19:46:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B69380AC71
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 19:49:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91C1AB20C37
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 18:46:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D396CB20A48
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 18:49:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D507622329;
-	Fri,  8 Dec 2023 18:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1507047A6A;
+	Fri,  8 Dec 2023 18:49:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h+9mEsAE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q7m8XMyh"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 989DBE0
-	for <kvm@vger.kernel.org>; Fri,  8 Dec 2023 10:46:33 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF71CFB
+	for <kvm@vger.kernel.org>; Fri,  8 Dec 2023 10:49:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702061192;
+	s=mimecast20190719; t=1702061353;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=oyg9tG3YUMXYWf0fhNWSelQCkgGQnlr8E+uOxhosRhg=;
-	b=h+9mEsAEP05BSQTFeGogP0IfMFPKa1HlDK86ak2atQpoH+XTda/HiJJBXBitDklRHHexLW
-	zjFrj7oyDPOb6ua2mQkio4S4ngL85PN7A2bkbVn0tyFZWt0IpxByKr1ChyjQAliK4gmDcd
-	PyI5je4L22wANrB++0I47YueZzWbkAw=
+	bh=1U4FyBTNgaTu3ym4pmdpXt8ICQFx8oOPzOCvbI3KWnc=;
+	b=Q7m8XMyhnN3VM7cpNK8sb1gGYFNN1K+ClDKO1FnDL9WqSMNwb6vuTOm0aGvlxFMdH1UNND
+	Of/RvjPnHL3hgRzRQ5bl+AjAiPmiGQozJH6+bYBZ4Errf/2jkq0tBcsGrQnIA8t6lf1vQx
+	GCgTrOdfKmGvcdrKjpQBvyApybi3olw=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-122-KwE-bmmkNByZfmLRbef5QA-1; Fri, 08 Dec 2023 13:46:29 -0500
-X-MC-Unique: KwE-bmmkNByZfmLRbef5QA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+ us-mta-631-eVXvRh78Mjm_x0I8g51vlQ-1; Fri, 08 Dec 2023 13:49:09 -0500
+X-MC-Unique: eVXvRh78Mjm_x0I8g51vlQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C7E91101A52A;
-	Fri,  8 Dec 2023 18:46:28 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 51FB3832D1B;
+	Fri,  8 Dec 2023 18:49:09 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B03BD112131D;
-	Fri,  8 Dec 2023 18:46:28 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CD93E40C6EB9;
+	Fri,  8 Dec 2023 18:49:08 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
-Subject: [PATCH] KVM: selftests: fix supported_flags for aarch64
-Date: Fri,  8 Dec 2023 13:46:28 -0500
-Message-Id: <20231208184628.2297994-1-pbonzini@redhat.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Sean Christopherson <seanjc@google.com>
+Subject: [PATCH v2] KVM: guest-memfd: fix unused-function warning
+Date: Fri,  8 Dec 2023 13:49:08 -0500
+Message-Id: <20231208184908.2298225-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -55,34 +57,40 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-KVM/Arm supports readonly memslots; fix the calculation of
-supported_flags in set_memory_region_test.c, otherwise the
-test fails.
+With migration disabled, one function becomes unused:
 
+virt/kvm/guest_memfd.c:262:12: error: 'kvm_gmem_migrate_folio' defined but not used [-Werror=unused-function]
+  262 | static int kvm_gmem_migrate_folio(struct address_space *mapping,
+      |            ^~~~~~~~~~~~~~~~~~~~~~
+
+Remove the #ifdef around the reference so that fallback_migrate_folio()
+is never used.  The gmem implementation of the hook is trivial; since
+the gmem mapping is unmovable, the pages should not be migrated anyway.
+
+Fixes: a7800aa80ea4 ("KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific backing memory")
+Reported-by: Arnd Bergmann <arnd@arndb.de>
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tools/testing/selftests/kvm/set_memory_region_test.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ virt/kvm/guest_memfd.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-index 6637a0845acf..dfd1d1e22da3 100644
---- a/tools/testing/selftests/kvm/set_memory_region_test.c
-+++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-@@ -333,9 +333,11 @@ static void test_invalid_memory_region_flags(void)
- 	struct kvm_vm *vm;
- 	int r, i;
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index b99272396119..c2e2371720a9 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -300,9 +300,7 @@ static int kvm_gmem_error_page(struct address_space *mapping, struct page *page)
  
--#ifdef __x86_64__
-+#if defined __aarch64__ || defined __x86_64__
- 	supported_flags |= KVM_MEM_READONLY;
-+#endif
+ static const struct address_space_operations kvm_gmem_aops = {
+ 	.dirty_folio = noop_dirty_folio,
+-#ifdef CONFIG_MIGRATION
+ 	.migrate_folio	= kvm_gmem_migrate_folio,
+-#endif
+ 	.error_remove_page = kvm_gmem_error_page,
+ };
  
-+#ifdef __x86_64__
- 	if (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM))
- 		vm = vm_create_barebones_protected_vm();
- 	else
 -- 
 2.39.1
 
