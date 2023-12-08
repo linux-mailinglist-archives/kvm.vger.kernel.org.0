@@ -1,191 +1,104 @@
-Return-Path: <kvm+bounces-3964-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3965-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 320D880AD6A
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 20:58:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 392E780AD78
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 21:03:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A299B20B59
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 19:58:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCCB7281984
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 20:03:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 878FF5027E;
-	Fri,  8 Dec 2023 19:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4BCA56B91;
+	Fri,  8 Dec 2023 20:03:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JTIJ8rci"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ot5BWO+W"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67D2810F1;
-	Fri,  8 Dec 2023 11:57:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702065475; x=1733601475;
-  h=date:from:to:cc:subject:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=hzztr2vL6DpeporjOTsxI9y9kBcB6HDvx6vV8t2DZhw=;
-  b=JTIJ8rcin+vCpsCi9ijnVaceF05GihHY6WqENT1YS/Mql+IwqrvcOsUW
-   DCGylcBqCwNMlmGy3X1eCfUTygBKp72RBH6/FZlbsL8yaF+X9jxX9fh89
-   eKC7b5/uznYJ/BMbBDGzBZdru3Ijhnx8q9cE/5ocTxpwbWRUBvlUViUxI
-   bf8vksUmdJLzvUG3+Yh2wE++vyf0O83rGnpPucC9M2yYsLmdGf/l5kl7V
-   jtkqzI5aur6CeOacBJ83h5bFN6/ILgB+6bfq4+Jp2pLzh9/Wfeo3uPXxZ
-   vSXgZ24lmvRY77Kse0cKPYjkvbUCxPsWBHpI6bl1xglmFE5IF50LVEWR4
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10918"; a="398320434"
-X-IronPort-AV: E=Sophos;i="6.04,261,1695711600"; 
-   d="scan'208";a="398320434"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2023 11:57:44 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10918"; a="842723679"
-X-IronPort-AV: E=Sophos;i="6.04,261,1695711600"; 
-   d="scan'208";a="842723679"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.24.100.114])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2023 11:57:44 -0800
-Date: Fri, 8 Dec 2023 12:02:36 -0800
-From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Peter Zijlstra <peterz@infradead.org>, LKML
- <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>,
- iommu@lists.linux.dev, Lu Baolu <baolu.lu@linux.intel.com>,
- kvm@vger.kernel.org, Dave Hansen <dave.hansen@intel.com>, Joerg Roedel
- <joro@8bytes.org>, "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov
- <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, Raj Ashok
- <ashok.raj@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
- maz@kernel.org, seanjc@google.com, Robin Murphy <robin.murphy@arm.com>,
- jacob.jun.pan@linux.intel.com
-Subject: Re: [PATCH RFC 09/13] x86/irq: Install posted MSI notification
- handler
-Message-ID: <20231208120236.0f3b287d@jacob-builder>
-In-Reply-To: <87zfyksyge.ffs@tglx>
-References: <20231112041643.2868316-1-jacob.jun.pan@linux.intel.com>
-	<20231112041643.2868316-10-jacob.jun.pan@linux.intel.com>
-	<20231115125624.GF3818@noisy.programming.kicks-ass.net>
-	<87cyvjun3z.ffs@tglx>
-	<20231207204607.2d2a3b72@jacob-builder>
-	<87zfyksyge.ffs@tglx>
-Organization: OTC
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0C4E11D
+	for <kvm@vger.kernel.org>; Fri,  8 Dec 2023 12:03:23 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-54f4f7e88feso1351444a12.3
+        for <kvm@vger.kernel.org>; Fri, 08 Dec 2023 12:03:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1702065802; x=1702670602; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=YwnbFYwpV3LUVIj6IokP8OukY70Ms4xhebL0+HoyxDw=;
+        b=ot5BWO+WIsNaZO9KKYol+U8Skdw1+Shsof952XKipaWxTOUk7wqKKjSaoOpAxsCzDn
+         ljBG3JiCHPQgW7SsE227zay6s0dARaYeV/p9jfhWy7dJipWm0BD7bSjtPx7zybe8sc0F
+         lk5FDeRNpqCeHwkRm5n7zuZ3o8UpRw+IM/Nuivk5lrQK0W2ld5wNmGzbMvZvydtLmi4Y
+         ekN3/+kjBPD8ALClzk0ZqyI8Vhyl0WCB37bk32AuLmFONSRL9l9OD+aEcx+B09NUFJ3a
+         30XWYreGCoM/JF6EUBUjk3viRHnge3ZCvkwz0uTGsV//38d/wo2q/iCkUsH6lHk4+BGa
+         YbqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702065802; x=1702670602;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YwnbFYwpV3LUVIj6IokP8OukY70Ms4xhebL0+HoyxDw=;
+        b=LuAA5w8sne6KuoKugRSlkdDxO3l9DwHJq2Dt2ZO/fZAbNwrO9YCKn4xmTCfCO6CWc8
+         7IV8Cnni9fqOUm0jdMHvynGDxayC8DlUQe1C2Pnoj9foVpL+oR7oOLZZgd+S0g9SFLfu
+         q8yUzMS2g7PxJcqGE4abWVbfLPTBwHuo6Cu8mzdjwqKidb55l9ynlni67H033McfMqgM
+         ZjIdrbCvMhyeX+jB5HaRxUVaG60okZbRchLRv/Uh49YV2yiGj3wsqh3K/C5JYWiRJEv2
+         HU7b1CBcMXgbP2LlNd4gpGFtn8tViPjabP0a8trdwISXQtFArluwyr0ILgHJBJnmSgcV
+         v/Tw==
+X-Gm-Message-State: AOJu0Yx5ek5pnkvHP80H4DAKbMmkuEIRaZqzqstxcpIMKTVZt93ZFV7k
+	FF9RsMYXl7Q7oGfQ2A3CjnkEmA==
+X-Google-Smtp-Source: AGHT+IHiBMv5Qcs8uwg/olNKskwGDaAfdVabppOUwYMzz64eFH3pWfXjLgRZqoQpcDstHTtDsCpEAg==
+X-Received: by 2002:a05:6402:2313:b0:54c:4837:a640 with SMTP id l19-20020a056402231300b0054c4837a640mr416396eda.45.1702065802371;
+        Fri, 08 Dec 2023 12:03:22 -0800 (PST)
+Received: from [192.168.200.206] (83.21.112.88.ipv4.supernova.orange.pl. [83.21.112.88])
+        by smtp.gmail.com with ESMTPSA id a4-20020a509e84000000b0054ccc3b2109sm1087187edf.57.2023.12.08.12.03.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Dec 2023 12:03:21 -0800 (PST)
+Message-ID: <2972842d-e4bf-49eb-9d72-01b8049f18bf@linaro.org>
+Date: Fri, 8 Dec 2023 21:03:17 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 04/10] tests/avocado: machine aarch64: standardize
+ location and RO/RW access
+Content-Language: pl-PL, en-GB, en-HK
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Radoslaw Biernacki <rad@semihalf.com>, Paul Durrant <paul@xen.org>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>,
+ Leif Lindholm <quic_llindhol@quicinc.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
+ <alex.bennee@linaro.org>, kvm@vger.kernel.org, qemu-arm@nongnu.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Beraldo Leal <bleal@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Sriram Yagnaraman <sriram.yagnaraman@est.tech>,
+ David Woodhouse <dwmw2@infradead.org>
+References: <20231208190911.102879-1-crosa@redhat.com>
+ <20231208190911.102879-5-crosa@redhat.com>
+From: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>
+Organization: Linaro
+In-Reply-To: <20231208190911.102879-5-crosa@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Thomas,
-
-On Fri, 08 Dec 2023 12:52:49 +0100, Thomas Gleixner <tglx@linutronix.de>
-wrote:
-
-> On Thu, Dec 07 2023 at 20:46, Jacob Pan wrote:
-> > On Wed, 06 Dec 2023 20:50:24 +0100, Thomas Gleixner <tglx@linutronix.de>
-> > wrote:  
-> >> I don't understand what the whole copy business is about. It's
-> >> absolutely not required.  
-> >
-> > My thinking is the following:
-> > The PIR cache line is contended by between CPU and IOMMU, where CPU can
-> > access PIR much faster. Nevertheless, when IOMMU does atomic swap of the
-> > PID (PIR included), L1 cache gets evicted. Subsequent CPU read or xchg
-> > will deal with invalid cold cache.
-> >
-> > By making a copy of PIR as quickly as possible and clearing PIR with
-> > xchg, we minimized the chance that IOMMU does atomic swap in the middle.
-> > Therefore, having less L1D misses.
-> >
-> > In the code above, it does read, xchg, and call_irq_handler() in a loop
-> > to handle the 4 64bit PIR bits at a time. IOMMU has a greater chance to
-> > do atomic xchg on the PIR cache line while doing call_irq_handler().
-> > Therefore, it causes more L1D misses.  
+W dniu 8.12.2023 o 20:09, Cleber Rosa pisze:
+> The tests under machine_aarch64_virt.py do not need read-write access
+> to the ISOs.  The ones under machine_aarch64_sbsaref.py, on the other
+> hand, will need read-write access, so let's give each test an unique
+> file.
 > 
-> That makes sense and if we go there it wants to be documented.
-will do. How about this explanation:
-"
-Posted interrupt descriptor (PID) fits in a cache line that is frequently
-accessed by both CPU and IOMMU.
-
-During posted MSI processing, the CPU needs to do 64-bit read and xchg for
-checking and clearing posted interrupt request (PIR), a 256 bit field
-within the PID. On the other side, IOMMU do atomic swaps of the entire
-PID cache line when posting interrupts. The CPU can access the cache line
-much faster than the IOMMU.
-
-The cache line states after each operation are as follows:
-
-CPU		IOMMU			PID Cache line state
--------------------------------------------------------------
-read64					exclusive
-lock xchg64				modified
-		post/atomic swap	invalid
--------------------------------------------------------------
-Note that PID cache line is evicted after each IOMMU interrupt posting.
-
-The posted MSI demuxing loop is written to optimize the cache performance
-based on the two considerations around the PID cache line:
-
-1. Reduce L1 data cache miss by avoiding contention with IOMMU's interrupt
-posting/atomic swap, a copy of PIR is used to dispatch interrupt handlers.
-
-2. Keep the cache line state consistent as much as possible. e.g. when
-making a copy and clearing the PIR (assuming non-zero PIR bits are present
-in the entire PIR), do:
-read, read, read, read, xchg, xchg, xchg, xchg
-instead of:
-read, xchg, read, xchg, read, xchg, read, xchg
-"
-
+> And while at it, let's use a single code style and hash for the ISO
+> url.
 > 
-> > Without PIR copy:
-> >
-> > DMA memfill bandwidth: 4.944 Gbps
-> > Performance counter stats for './run_intr.sh 512 30':
-> > 
-> >     77,313,298,506      L1-dcache-loads
-> >               (79.98%) 8,279,458      L1-dcache-load-misses     #
-> > 0.01% of all L1-dcache accesses  (80.03%) 41,654,221,245
-> > L1-dcache-stores                                              (80.01%)
-> > 10,476      LLC-load-misses           #    0.31% of all LL-cache
-> > accesses  (79.99%) 3,332,748      LLC-loads
-> >                         (80.00%) 30.212055434 seconds time elapsed
-> > 
-> >        0.002149000 seconds user
-> > 30.183292000 seconds sys
-> >                         
-> >
-> > With PIR copy:
-> > DMA memfill bandwidth: 5.029 Gbps
-> > Performance counter stats for './run_intr.sh 512 30':
-> >
-> >     78,327,247,423      L1-dcache-loads
-> >               (80.01%) 7,762,311      L1-dcache-load-misses     #
-> > 0.01% of all L1-dcache accesses  (80.01%) 42,203,221,466
-> > L1-dcache-stores                                              (79.99%)
-> > 23,691      LLC-load-misses           #    0.67% of all LL-cache
-> > accesses  (80.01%) 3,561,890      LLC-loads
-> >                         (80.00%)
-> >
-> >       30.201065706 seconds time elapsed
-> >
-> >        0.005950000 seconds user
-> >       30.167885000 seconds sys  
-> 
-> Interesting, though I'm not really convinced that this DMA memfill
-> microbenchmark resembles real work loads.
-> 
-It is just a tool to get some quick experiments done, not realistic. Though
-I am adding various knobs to make it more useful. e.g. adjustable interrupt
-rate, delays in idxd hardirq handler.
+> Signed-off-by: Cleber Rosa<crosa@redhat.com>
 
-> Did you test with something realistic, e.g. storage or networking, too?
-> 
-Not yet for this particular code, working on testing with FIO on Samsung
-Gen5 NVMe disks. I am getting help from the people with the set up.
+It is ISO file, so sbsa-ref tests should be fine with readonly as well.
 
-
-Thanks,
-
-Jacob
+Nothing gets installed so nothing is written. We only test does boot works.
 
