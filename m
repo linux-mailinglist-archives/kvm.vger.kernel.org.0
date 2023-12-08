@@ -1,186 +1,130 @@
-Return-Path: <kvm+bounces-3914-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3915-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAAEC80A4A8
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 14:45:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A7AB80A551
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 15:21:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14E2C1C20D34
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 13:45:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA6641F21348
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 14:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EFF51DA29;
-	Fri,  8 Dec 2023 13:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E361DFD7;
+	Fri,  8 Dec 2023 14:21:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Tosq5VHr"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="F8ob1n3G"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23546172B;
-	Fri,  8 Dec 2023 05:45:42 -0800 (PST)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B8DW9P5007074;
-	Fri, 8 Dec 2023 13:45:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=Qx9R9+DTlQaKkym29SDOcUwTWtQZtP+au1dCPXcNuhs=;
- b=Tosq5VHrYoVkZVD+323lAXW4JnaqfT3YQT8K/2nI3OGC4Vq5ic3ybb04ci1TZO6OYtdy
- rBg/V1kWPV5j4MxSWdrYmTjc0ZSJtJ24y8yfUj3VK8JU6qaqq4DYNaxSmt3Bk+vQipcj
- 0N7o6vGMN+hIrpHcpDiSD1liVgf0zns4YYUfrezMJxTFhFavRHtNFXM85K5I0sp0d9X9
- JIPqkLP5JvAKQqLmsySJ9H9gXRGtQYXr+GrtTTflDwCgNfuwy1Zt32hp036jvXnV8E+i
- SfqX5KPYG9U+UVFpnz3vvB7xB3VPaf9Epny2RcnJqu4oSHW2FhfY3UzXe1rR1bqE1WZK MQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uv4400aw8-1
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F48171D;
+	Fri,  8 Dec 2023 06:21:17 -0800 (PST)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B8DKQxG015335;
+	Fri, 8 Dec 2023 14:21:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=7prP1ZPaFrX9dJQHxUFlI0YQ9pGd5ZixGsXP58BtELA=;
+ b=F8ob1n3GgqTFPaA7dDYP25bjGodNYQAwLs7dkjVByLv5+FpiL6mIeQaHNrubgGoC3fG3
+ xpcEiK9AGSOtmmIU6ALVJNP/mkEywHH3DgHJGUN96FEwQHTh1Pge3htTJls52RDjWLIa
+ JPWb0ZpFeYfKIYyjIEaPkLZrTCbgh1NMGc/D1Bvxp6e3JX+93i8Rv0J+gdrS+cxgd1Xy
+ 5s8qTJGl2OS1SadcZlj2sRJsXcF8cs/1RYPcxgtcfRC9T0Z/+hdxmig/VbGndSEj7K+W
+ 8eQMCapnoFLMBQ0WKgypqDdW+/ulmiEitrZrCX21UkkmQ9FQtZT5YcEGo3OabPAnxpZG /Q== 
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uv0cu8asg-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 Dec 2023 13:45:29 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B8DYJsu014358;
-	Fri, 8 Dec 2023 13:45:29 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uv4400avq-1
+	Fri, 08 Dec 2023 14:21:15 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B8D537i004735;
+	Fri, 8 Dec 2023 14:21:13 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3utav4t0w2-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 Dec 2023 13:45:28 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B8DNTIV027021;
-	Fri, 8 Dec 2023 13:45:28 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3utav39s65-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 Dec 2023 13:45:27 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B8DjP1h4129434
+	Fri, 08 Dec 2023 14:21:13 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B8ELCm952888136
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 8 Dec 2023 13:45:25 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1EED32004D;
-	Fri,  8 Dec 2023 13:45:25 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9003120043;
-	Fri,  8 Dec 2023 13:45:21 +0000 (GMT)
-Received: from vaibhav?linux.ibm.com (unknown [9.171.39.24])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Fri,  8 Dec 2023 13:45:21 +0000 (GMT)
-Received: by vaibhav@linux.ibm.com (sSMTP sendmail emulation); Fri, 08 Dec 2023 19:15:20 +0530
-From: Vaibhav Jain <vaibhav@linux.ibm.com>
-To: "Aneesh Kumar K.V (IBM)" <aneesh.kumar@kernel.org>,
-        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org
-Cc: mikey@neuling.org, sbhat@linux.ibm.com, amachhiw@linux.vnet.ibm.com,
-        Jordan Niethe <jniethe5@gmail.com>, gautam@linux.ibm.com,
-        Nicholas Piggin
- <npiggin@gmail.com>, David.Laight@ACULAB.COM,
-        kconsul@linux.vnet.ibm.com,
-        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>
-Subject: Re: [PATCH 01/12] KVM: PPC: Book3S HV nestedv2: Invalidate RPT
- before deleting a guest
-In-Reply-To: <878r66xtjt.fsf@kernel.org>
-References: <20231201132618.555031-1-vaibhav@linux.ibm.com>
- <20231201132618.555031-2-vaibhav@linux.ibm.com>
- <878r66xtjt.fsf@kernel.org>
-Date: Fri, 08 Dec 2023 19:15:20 +0530
-Message-ID: <87jzpolsen.fsf@vajain21.in.ibm.com>
+	Fri, 8 Dec 2023 14:21:13 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B98ED58054;
+	Fri,  8 Dec 2023 14:21:12 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A9E365805A;
+	Fri,  8 Dec 2023 14:21:11 +0000 (GMT)
+Received: from [9.61.43.82] (unknown [9.61.43.82])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  8 Dec 2023 14:21:11 +0000 (GMT)
+Message-ID: <918b6276-f423-49c8-8719-4517e9d23bad@linux.ibm.com>
+Date: Fri, 8 Dec 2023 09:21:11 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: s390: fix cc for successful PQAP
+Content-Language: en-US
+To: Eric Farman <farman@linux.ibm.com>, Janosch Frank
+ <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Halil Pasic
+ <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>
+Cc: Sven Schnelle <svens@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20231201181657.1614645-1-farman@linux.ibm.com>
+ <fe3082f7-70fd-479f-b6a2-d753d271d6d5@linux.ibm.com>
+ <0fe89d1a4ef539bef4bdf2302faf23f6d5848bf2.camel@linux.ibm.com>
+From: Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <0fe89d1a4ef539bef4bdf2302faf23f6d5848bf2.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: fRpi75ehNiBfjVix_9KQOJvP1cMcR-o6
-X-Proofpoint-GUID: TQZEjuibjHeH_Fz5TXGn_UPQQh1bKHZF
+X-Proofpoint-GUID: XVvNz0tTnDGwb4mHg4tUVcQyXhZeIeSd
+X-Proofpoint-ORIG-GUID: XVvNz0tTnDGwb4mHg4tUVcQyXhZeIeSd
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-12-08_09,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=699 bulkscore=0
- lowpriorityscore=0 impostorscore=0 mlxscore=0 phishscore=0 adultscore=0
- priorityscore=1501 spamscore=0 malwarescore=0 clxscore=1011 suspectscore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ mlxlogscore=815 spamscore=0 clxscore=1015 phishscore=0 suspectscore=0
+ impostorscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0 malwarescore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2312080114
+ definitions=main-2312080118
 
 
-Hi Aneesh,
+On 12/8/23 6:24 AM, Eric Farman wrote:
+> On Fri, 2023-12-08 at 11:31 +0100, Janosch Frank wrote:
+>> On 12/1/23 19:16, Eric Farman wrote:
+>>> The various errors that are possible when processing a PQAP
+>>> instruction (the absence of a driver hook, an error FROM that
+>>> hook), all correctly set the PSW condition code to 3. But if
+>>> that processing works successfully, CC0 needs to be set to
+>>> convey that everything was fine.
+>>>
+>>> Fix the check so that the guest can examine the condition code
+>>> to determine whether GPR1 has meaningful data.
+>>>
+>> Hey Eric, I have yet to see this produce a fail in my AP KVM unit
+>> tests.
+>> If you find some spare time I'd like to discuss how I can extend my
+>> test
+>> so that I can see the fail before it's fixed.
+>>
+> Hi Janosch, absolutely. I had poked around kvm-unit-tests before I sent
+> this up to see if I could adapt something to show this scenario, but
+> came up empty and didn't want to go too far down that rabbit hole
+> creating something from scratch. I'll ping you offline to find a time
+> to talk.
 
-Thanks for looking into this patch. My responses inline below:
 
-"Aneesh Kumar K.V (IBM)" <aneesh.kumar@kernel.org> writes:
+If this is recreateable, I'd like to know how. I don't see any code path 
+that would cause this result.
 
-> Vaibhav Jain <vaibhav@linux.ibm.com> writes:
+
 >
->> From: Jordan Niethe <jniethe5@gmail.com>
->>
->> An L0 must invalidate the L2's RPT during H_GUEST_DELETE if this has not
->> already been done. This is a slow operation that means H_GUEST_DELETE
->> must return H_BUSY multiple times before completing. Invalidating the
->> tables before deleting the guest so there is less work for the L0 to do.
->>
->> Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
->> ---
->>  arch/powerpc/include/asm/kvm_book3s.h | 1 +
->>  arch/powerpc/kvm/book3s_hv.c          | 6 ++++--
->>  arch/powerpc/kvm/book3s_hv_nested.c   | 2 +-
->>  3 files changed, 6 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
->> index 4f527d09c92b..a37736ed3728 100644
->> --- a/arch/powerpc/include/asm/kvm_book3s.h
->> +++ b/arch/powerpc/include/asm/kvm_book3s.h
->> @@ -302,6 +302,7 @@ void kvmhv_nested_exit(void);
->>  void kvmhv_vm_nested_init(struct kvm *kvm);
->>  long kvmhv_set_partition_table(struct kvm_vcpu *vcpu);
->>  long kvmhv_copy_tofrom_guest_nested(struct kvm_vcpu *vcpu);
->> +void kvmhv_flush_lpid(u64 lpid);
->>  void kvmhv_set_ptbl_entry(u64 lpid, u64 dw0, u64 dw1);
->>  void kvmhv_release_all_nested(struct kvm *kvm);
->>  long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu);
->> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
->> index 1ed6ec140701..5543e8490cd9 100644
->> --- a/arch/powerpc/kvm/book3s_hv.c
->> +++ b/arch/powerpc/kvm/book3s_hv.c
->> @@ -5691,10 +5691,12 @@ static void kvmppc_core_destroy_vm_hv(struct kvm *kvm)
->>  			kvmhv_set_ptbl_entry(kvm->arch.lpid, 0, 0);
->>  	}
->>  
->> -	if (kvmhv_is_nestedv2())
->> +	if (kvmhv_is_nestedv2()) {
->> +		kvmhv_flush_lpid(kvm->arch.lpid);
->>  		plpar_guest_delete(0, kvm->arch.lpid);
->>
+> Eric
 >
-> I am not sure I follow the optimization here. I would expect the
-> hypervisor to kill all the translation caches as part of guest_delete.
-> What is the benefit of doing a lpid flush outside the guest delete?
->
-Thats right. However without this optimization the H_GUEST_DELETE hcall
-in plpar_guest_delete() returns H_BUSY multiple times resulting in
-multiple hcalls to the hypervisor until it finishes. Flushing the guest
-translation cache upfront reduces the number of HCALLs L1 guests has to
-make to delete a L2 guest via H_GUEST_DELETE.
-
->> -	else
->> +	} else {
->>  		kvmppc_free_lpid(kvm->arch.lpid);
->> +	}
->>  
->>  	kvmppc_free_pimap(kvm);
->>  }
->> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
->> index 3b658b8696bc..5c375ec1a3c6 100644
->> --- a/arch/powerpc/kvm/book3s_hv_nested.c
->> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
->> @@ -503,7 +503,7 @@ void kvmhv_nested_exit(void)
->>  	}
->>  }
->>  
->> -static void kvmhv_flush_lpid(u64 lpid)
->> +void kvmhv_flush_lpid(u64 lpid)
->>  {
->>  	long rc;
->>  
->> -- 
->> 2.42.0
-
--- 
-Cheers
-~ Vaibhav
 
