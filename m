@@ -1,87 +1,117 @@
-Return-Path: <kvm+bounces-3950-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3952-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE50080AC9F
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 20:05:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 060A380ACA6
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 20:09:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 469C7281AB6
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 19:05:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A687D281A59
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 19:09:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D43A1481CD;
-	Fri,  8 Dec 2023 19:04:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 670D64B137;
+	Fri,  8 Dec 2023 19:09:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eQ91siv+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="APVHA/0V"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AEED10E7
-	for <kvm@vger.kernel.org>; Fri,  8 Dec 2023 11:04:55 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5de8e375768so12666487b3.3
-        for <kvm@vger.kernel.org>; Fri, 08 Dec 2023 11:04:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702062294; x=1702667094; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FaBQJ3hZrcjmPrQd+jYi6U6TZUHaUJywmO1UrbOss5M=;
-        b=eQ91siv+hX7ilCV9ttVUa/8Tyn6DZbtImV8yXBBkLkZ4IUglr9vTVD0Bca8ehUmgq2
-         pZr0CJVEZ8uWG1ygf92MZaEC6fdALCF3dhXMpe3UsAw/1jfL2USydz5OyoT3mynlhZVr
-         XoXk9lhggC8Ie1V5p6EaFORDczsE8+HFkNxkUMlJoli/gL3i46r2/O/mM238v+Rr2kb8
-         +7A4vgZppJGF/DUsNi3EHbTSLKuFMQdbucjRBoTeC0Ovh05JPq7V1CqZjsSjywMpETHF
-         8j+k8HCSuMXTuHYmnvkUJPbhrM/G8VLrGmsLIy4c4HUB++3OCTONniPy84YMKh9MsOi4
-         AY9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702062294; x=1702667094;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FaBQJ3hZrcjmPrQd+jYi6U6TZUHaUJywmO1UrbOss5M=;
-        b=nqB2FzTN5gRnZmO8p20/RmJPN/gv4gFuHuYhYw66qMzwLePzQOUa/6RSocyfFW8hdk
-         Bdy318owLFnuo7DUcPo8AJDdr70HHqPNvgBfYtqN1N42wg1d/JEwsolxTliFoKZ1nYxM
-         Ao44SjymVJRIhkj8EXfYaams7JXBVLXUuS3Sl/i0klJ1IC8oW/zAZscADb6q1oUQEGPN
-         Q9yq0YtmTT7mFnX3Y0aihrR8W0aOlkkeVoL5gZHqoIyaCt4MvyegdOHf9f/YPcdp9aGz
-         8SRqQtzkY41EJJtm4hu05i9wOVUZdu6LnCvXeOjjR21tRMoY3RVS5F4MrRkt0A7Ojyhl
-         P4Bw==
-X-Gm-Message-State: AOJu0Yxpp23qimdIhsFCCbnmDz7eMiAiD4GpPcQHLlw/fQC7p6gr1IvC
-	dEcXoHg947l2MUK8tXioIDJx4COCY/c=
-X-Google-Smtp-Source: AGHT+IFbZkBjd3HF6V02hYYKfry86AYCnPZiPrBQt5m0oHmgAQfsetl9n/CXi8Ziz13kkCERMT8yZ6+2s/4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:338d:b0:5d6:e473:bf60 with SMTP id
- fl13-20020a05690c338d00b005d6e473bf60mr4374ywb.8.1702062294577; Fri, 08 Dec
- 2023 11:04:54 -0800 (PST)
-Date: Fri, 8 Dec 2023 11:04:53 -0800
-In-Reply-To: <20231208184908.2298225-1-pbonzini@redhat.com>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B33510DA
+	for <kvm@vger.kernel.org>; Fri,  8 Dec 2023 11:09:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702062570;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=adJH7rWy3zq1h4h/lqGpwZ7Vbw0iyk9j/MLUkacF4c0=;
+	b=APVHA/0V13MNVxIXPl34qYOnt5ATcO350oqcXieu8nUbOMgbLrApGUBS3d8y+9pkVlB/1Y
+	Xt50VKxSninIZqpkfOiQpRX/ViqjGNU48ACNw1QhrwToJeH2HguZlCrGKkMdAWX7rdrSGb
+	SAHlfSky1iatdi20kwCnPFB4XJDlq8Y=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-650-heyNTEq2N5q3V0XwSXHsjw-1; Fri, 08 Dec 2023 14:09:24 -0500
+X-MC-Unique: heyNTEq2N5q3V0XwSXHsjw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3DB81101A52A;
+	Fri,  8 Dec 2023 19:09:21 +0000 (UTC)
+Received: from p1.localdomain.com (ovpn-114-104.gru2.redhat.com [10.97.114.104])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E7D25112131D;
+	Fri,  8 Dec 2023 19:09:17 +0000 (UTC)
+From: Cleber Rosa <crosa@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>,
+	Radoslaw Biernacki <rad@semihalf.com>,
+	Paul Durrant <paul@xen.org>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Leif Lindholm <quic_llindhol@quicinc.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	kvm@vger.kernel.org,
+	qemu-arm@nongnu.org,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Beraldo Leal <bleal@redhat.com>,
+	Wainer dos Santos Moschetta <wainersm@redhat.com>,
+	Sriram Yagnaraman <sriram.yagnaraman@est.tech>,
+	Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
+	Cleber Rosa <crosa@redhat.com>,
+	David Woodhouse <dwmw2@infradead.org>
+Subject: [PATCH 00/10] for-8.3 tests/avocado: prep for Avocado 103.0 LTS
+Date: Fri,  8 Dec 2023 14:09:01 -0500
+Message-ID: <20231208190911.102879-1-crosa@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231208184908.2298225-1-pbonzini@redhat.com>
-Message-ID: <ZXNo1Rdla2zghM9s@google.com>
-Subject: Re: [PATCH v2] KVM: guest-memfd: fix unused-function warning
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Arnd Bergmann <arnd@arndb.de>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On Fri, Dec 08, 2023, Paolo Bonzini wrote:
-> With migration disabled, one function becomes unused:
-> 
-> virt/kvm/guest_memfd.c:262:12: error: 'kvm_gmem_migrate_folio' defined but not used [-Werror=unused-function]
->   262 | static int kvm_gmem_migrate_folio(struct address_space *mapping,
->       |            ^~~~~~~~~~~~~~~~~~~~~~
-> 
-> Remove the #ifdef around the reference so that fallback_migrate_folio()
-> is never used.  The gmem implementation of the hook is trivial; since
-> the gmem mapping is unmovable, the pages should not be migrated anyway.
-> 
-> Fixes: a7800aa80ea4 ("KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific backing memory")
-> Reported-by: Arnd Bergmann <arnd@arndb.de>
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
+This is a collection of improvements to a number of Avocado based
+tests, but also fixes that will allow them to behave properly under
+Avocado's upcoming new Long Term Stability release (LTS) version
+103.0.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+A pipeline with (pretty much) these changes can be seen at:
+  - https://gitlab.com/cleber.gnu/qemu/-/pipelines/1096168899
+
+While a pipeline with the Avocado version bump (using a preview of the
+103.0 release) can be seen at:
+  - https://gitlab.com/cleber.gnu/qemu/-/pipelines/1099488480
+
+Once Avocado officially releases 103.0 LTS, which is expected to take
+no longer than 2 weeks (after a huge development window), the actual
+version bump will be posted, along with more profound changes to the
+tests to leverage the new features.
+
+Cleber Rosa (10):
+  tests/avocado: mips: fallback to HTTP given certificate expiration
+  tests/avocado: mips: add hint for fetchasset plugin
+  tests/avocado/intel_iommu.py: increase timeout
+  tests/avocado: machine aarch64: standardize location and RO/RW access
+  tests/avocado: use more distinct names for assets
+  tests/avocado/kvm_xen_guest.py: cope with asset RW requirements
+  testa/avocado: test_arm_emcraft_sf2: handle RW requirements for asset
+  tests/avocado/boot_xen.py: merge base classes
+  tests/avocado/boot_xen.py: unify tags
+  tests/avocado/boot_xen.py: use class attribute
+
+ tests/avocado/boot_linux_console.py      | 27 +++++++++++++++----
+ tests/avocado/boot_xen.py                | 34 +++++-------------------
+ tests/avocado/intel_iommu.py             |  2 ++
+ tests/avocado/kvm_xen_guest.py           | 30 ++++++++++++++-------
+ tests/avocado/machine_aarch64_sbsaref.py |  9 +++++--
+ tests/avocado/machine_aarch64_virt.py    | 14 +++++-----
+ tests/avocado/netdev-ethtool.py          |  3 ++-
+ 7 files changed, 67 insertions(+), 52 deletions(-)
+
+-- 
+2.43.0
+
 
