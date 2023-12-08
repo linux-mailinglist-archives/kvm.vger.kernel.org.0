@@ -1,142 +1,88 @@
-Return-Path: <kvm+bounces-3966-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3967-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E081A80AD93
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 21:09:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EB5380ADFC
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 21:36:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A6841F21223
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 20:09:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 127591F212EC
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 20:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401E957327;
-	Fri,  8 Dec 2023 20:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD66057892;
+	Fri,  8 Dec 2023 20:36:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="XbfnUl2W"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3ln6m9oI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailout1.w2.samsung.com (mailout1.w2.samsung.com [211.189.100.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA4D8F1;
-	Fri,  8 Dec 2023 12:09:43 -0800 (PST)
-Received: from uscas1p2.samsung.com (unknown [182.198.245.207])
-	by mailout1.w2.samsung.com (KnoxPortal) with ESMTP id 20231208200935usoutp013eade6b562d56a6dec224e2953fc5c3b~e9CtAUsTA0188501885usoutp01e;
-	Fri,  8 Dec 2023 20:09:35 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w2.samsung.com 20231208200935usoutp013eade6b562d56a6dec224e2953fc5c3b~e9CtAUsTA0188501885usoutp01e
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1702066175;
-	bh=Iv7XyhyxUSiHcnN6SjqD7mdRbAbHc4NXoqsP3KfXXLw=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=XbfnUl2WmEPn7/JEIBVfd5l0rcVEb9sCTyBJTcIeViOfbpkrXLhEberX40srqu3zX
-	 0VfmI8oxUJNc7j6TjSLs3Sffp1i5FYGNEv34ZrwRF1qYemlY+SraOy248j7WADkXjm
-	 UYYrBJZH8TbMPCHkltqUKIFmxvwO+FO/FtDenG/Q=
-Received: from ussmges3new.samsung.com (u112.gpu85.samsung.co.kr
-	[203.254.195.112]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
-	20231208200935uscas1p26edc81734e83823ca1e9631c10c58542~e9Cs6jOxO0752507525uscas1p2b;
-	Fri,  8 Dec 2023 20:09:35 +0000 (GMT)
-Received: from uscas1p1.samsung.com ( [182.198.245.206]) by
-	ussmges3new.samsung.com (USCPEMTA) with SMTP id 87.0B.09550.FF773756; Fri, 
-	8 Dec 2023 15:09:35 -0500 (EST)
-Received: from ussmgxs2new.samsung.com (u91.gpu85.samsung.co.kr
-	[203.254.195.91]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
-	20231208200935uscas1p27bf9af3e1af779eeb569440fbafe1d99~e9CspZ3sm2540125401uscas1p2a;
-	Fri,  8 Dec 2023 20:09:35 +0000 (GMT)
-X-AuditID: cbfec370-933ff7000000254e-8c-657377ff2d18
-Received: from SSI-EX1.ssi.samsung.com ( [105.128.3.67]) by
-	ussmgxs2new.samsung.com (USCPEXMTA) with SMTP id 4F.88.09813.FF773756; Fri, 
-	8 Dec 2023 15:09:35 -0500 (EST)
-Received: from SSI-EX2.ssi.samsung.com (105.128.2.227) by
-	SSI-EX1.ssi.samsung.com (105.128.2.226) with Microsoft SMTP Server
-	(version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
-	15.1.2375.24; Fri, 8 Dec 2023 12:09:34 -0800
-Received: from SSI-EX2.ssi.samsung.com ([105.128.2.227]) by
-	SSI-EX2.ssi.samsung.com ([105.128.2.227]) with mapi id 15.01.2375.024; Fri,
-	8 Dec 2023 12:09:34 -0800
-From: Jim Harris <jim.harris@samsung.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: Leon Romanovsky <leonro@nvidia.com>, Alex Williamson
-	<alex.williamson@redhat.com>, "bhelgaas@google.com" <bhelgaas@google.com>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "ben@nvidia.com"
-	<ben@nvidia.com>, "pierre.cregut@orange.com" <pierre.cregut@orange.com>
-Subject: Re: Locking between vfio hot-remove and pci sysfs sriov_numvfs
-Thread-Topic: Locking between vfio hot-remove and pci sysfs sriov_numvfs
-Thread-Index: AQHaKV4WwNJvmQMe7UuNHg2ttxy7ZbCe+60AgAAHXQCAASJQAIAAKz2AgAAHr4A=
-Date: Fri, 8 Dec 2023 20:09:34 +0000
-Message-ID: <ZXN3+dHzM1N5b7r+@ubuntu>
-In-Reply-To: <20231208194159.GS2692119@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <DF5832D762627B42B9DF6D4214B266B3@ssi.samsung.com>
-Content-Transfer-Encoding: quoted-printable
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E78C198E
+	for <kvm@vger.kernel.org>; Fri,  8 Dec 2023 12:36:20 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5cf4696e202so31977827b3.2
+        for <kvm@vger.kernel.org>; Fri, 08 Dec 2023 12:36:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702067779; x=1702672579; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=orHiJZT0C6fy8Fk3kj9J2cROYJthdQ2Wc1XwHn5ZMq4=;
+        b=3ln6m9oI3jDYCkIaLkrprMOPDZL4zJLDkHJeUd5TD8ROVnPxu6QusfweP8eUz1WUyi
+         wQvVpdwjLE3YzrqKuwb3sWcVJRWaFjDupLV2U96fw1mDUCpK/d7HFfMhFDu7fTSl83eu
+         n1QLUdGLK5It7eLF3CnQAfXHK138ENkZB1SyZJ4FEfFzLHhiJUDCgYd/he5K2JEc0BIH
+         meA4MobzMMmZ5XmU0RACo8+mqGSlcJ0tIjYI0ws79e0/crMfwSttuwNo99Vm+ZEzOQzK
+         2aiU+4SLLY8VysAsuqC8RGhr6Lc3ztkLhZO1nFwvAHfksOT1VofCKXP9Kt3u5AHyuFTI
+         QQ1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702067779; x=1702672579;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=orHiJZT0C6fy8Fk3kj9J2cROYJthdQ2Wc1XwHn5ZMq4=;
+        b=iwd9UGhUKqaTUlqPvrQDX/ALMynBVFPTkqaT0tmYX1ONp08xjmH1sIOyksmRVkZNaG
+         tBpufClOD/J4siM0OEgFbPWrPJb66dVVbUAFgFjovuscbmKfcoSqeGEYvH1Hw8DSf3kc
+         ZrLY+puxCKRvlqrkDM8NdkJCHUCVVaFlBUlHuRedjmEmGrumGAALcmEzeYyDZ1lX+1JY
+         AJvZgxLo6z2I7zG+sNUXUBstb+mOktLEiXLglMIQ5EWVmpNX1uFDHu4q01HZc+VTqGnu
+         0BtQCzpLK7FCsF5l6Ci+oIQjoN3hViU04jw2S+Xw6/JB2j5MgGzWiNiI4ExfyTXbmudG
+         Whlw==
+X-Gm-Message-State: AOJu0YwIRLwRX4mUNXJ5yxhY6u24MORY2H0J5SwvmweuScG3qKq+YQwS
+	GRbp1jrwurtsI3KnTpnusohsPTXfaEA=
+X-Google-Smtp-Source: AGHT+IGM36poiI66KimXwnmZMFV+cug+a/f2/aHqYZGdi3tEpQylnxIgmZTLgmZqxePMHXCOG7mBMbzoJbc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:d1e:b0:5d2:913a:6421 with SMTP id
+ cn30-20020a05690c0d1e00b005d2913a6421mr5795ywb.8.1702067779340; Fri, 08 Dec
+ 2023 12:36:19 -0800 (PST)
+Date: Fri, 8 Dec 2023 12:36:17 -0800
+In-Reply-To: <CABgObfb2AxwvseadmEBS7=VWLKKpYVeHkaecrPXG47sMfCKEZg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrNKsWRmVeSWpSXmKPExsWy7djXc7r/y4tTDR5fUbH49r+HzaJ560xG
-	iyVNGRZX/u1htJgztdBi04YnLBZn5x1ns1j/9T2bA4fHgk2lHr3N79g8Wp6dZPN4v+8qm8fn
-	TXIBrFFcNimpOZllqUX6dglcGfenPWQrOMRe8XT+D8YGxna2LkZODgkBE4kZR3YydzFycQgJ
-	rGSU2DlrMSuE08okcXTZJqAqDrCqo5MiIOJrGCV+r9/GBOF8ZJR41bIfbJSQwFJGiUmrRUFs
-	NgFNiV9X1jCB2CICKhInTpxhB2lgFjjFJLH+ajMjSEJYwF2iefIJRogiD4mdvxrZIGw/iZMb
-	/4A1swA1nzk3nxnE5hVQlZh+4hxYnFPASOLv89msIDajgJjE91MQy5gFxCVuPZnPBPGboMSi
-	2XuYIWwxiX+7HkL9rChx//tLdoh6HYkFuz+xQdh2Ej9e/GSGsLUlli18DbVXUOLkzCcsEL2S
-	EgdX3ICy73BIPNrsBQkhF4nH7aIQYWmJv3eXQZ2QLbFyfQcTREmBRMORIIiwtcTCP+uZJjCq
-	zEJy9CwkB81CctAsJAfNQnLQAkbWVYzipcXFuempxcZ5qeV6xYm5xaV56XrJ+bmbGIHp6fS/
-	wwU7GG/d+qh3iJGJg/EQowQHs5IIb875/FQh3pTEyqrUovz4otKc1OJDjNIcLErivIa2J5OF
-	BNITS1KzU1MLUotgskwcnFINTMmX9V8bqRybri97I8lXbznzjGZrxZdRn95s81pxqrOks/6m
-	ZOAL74OnLi3/8eeSc+VbMV1hrxUqDLp+j4tyoj5P5Tlgpa/X9WFTgcX//Nl3Y3WqapeHhIU7
-	c1l9+RtcmjrrslJcqe+N//cfPD7G/r1i8UfxxBWXeS/Xl1cbNu2a3la3/uPFF00zp53f0L66
-	zTkhMPyI8ROtK/+cNRNPNTSVHp4Sk/H7+0v7j9Ut9neCTt6TqOfNEcj6oDDVcpbtvm0eKlnK
-	zYdf3Vh/UKSbe117152si4Wr1+/+5/rFmvmZpSrXz9POtmd9GaUm5ygvrQ8S+y3G0iYVvI1x
-	6x43x53l4i8nWl2sjGUSYVi7UomlOCPRUIu5qDgRAOEYmhO+AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrNIsWRmVeSWpSXmKPExsWS2cDsrPu/vDjV4PVMQYtv/3vYLJq3zmS0
-	WNKUYXHl3x5GizlTCy02bXjCYnF23nE2i/Vf37M5cHgs2FTq0dv8js2j5dlJNo/3+66yeXze
-	JBfAGsVlk5Kak1mWWqRvl8CVcX/aQ7aCQ+wVT+f/YGxgbGfrYuTgkBAwkTg6KaKLkZNDSGAV
-	o0TfBccuRi4g+yOjxIkfC5khnKWMEj+mTGMHqWIT0JT4dWUNE4gtIqAiceLEGXaQImaBU0wS
-	6682M4IkhAXcJZonn2CEKPKQ2PmrkQ3C9pM4ufEPWDMLUPOZc/OZQWxeAVWJ6SfOMUGcsYVJ
-	Yt2WaBCbU8BI4u/z2awgNqOAmMT3UxCLmQXEJW49mQ9mSwgISCzZc54ZwhaVePn4HyuErShx
-	//tLdoh6HYkFuz+xQdh2Ej9e/GSGsLUlli18DXWDoMTJmU9YIHolJQ6uuMEygVFiFpJ1s5CM
-	moVk1Cwko2YhGbWAkXUVo3hpcXFuekWxUV5quV5xYm5xaV66XnJ+7iZGYHyf/nc4egfj7Vsf
-	9Q4xMnEwHmKU4GBWEuHNOZ+fKsSbklhZlVqUH19UmpNafIhRmoNFSZz37gONVCGB9MSS1OzU
-	1ILUIpgsEwenVAOT1oki6W3B7OqBf38e8m6e1HWieGtf3aKLrx/N6Vfsnny/KOe+mMoZV6nf
-	lWX7bX8ahc/nEDT8GLvux7MMPzaH7OyfgbVZE78z/otgWXdm66Xr7qG3BW6XuzgbJSg8zHWd
-	ni9xz+20wE73assDJ3ZNalx2UvLnR5NTN55PCtT0cvmR+O3weRXV6qBSHa3DKdnycz85ucaz
-	d7hafzHJOmkwLyvio2NG7JRnL98tbdy16dBplt0aR2vL8ut2+hb5aYtPYbhx9PSmB2yTzum4
-	bd/ietmYqUVOqf16YwWD3dXyN3vPP0/gurwidumnxUrMb5u3MZ68++ykgNmvsDlFQsZrFvpt
-	CGM4uG23UL+v/OVOJZbijERDLeai4kQA2gLgtV4DAAA=
-X-CMS-MailID: 20231208200935uscas1p27bf9af3e1af779eeb569440fbafe1d99
-CMS-TYPE: 301P
-X-CMS-RootMailID: 20231207223824uscas1p27dd91f0af56cda282cd28046cc981fe9
-References: <CGME20231207223824uscas1p27dd91f0af56cda282cd28046cc981fe9@uscas1p2.samsung.com>
-	<ZXJI5+f8bUelVXqu@ubuntu>
-	<20231207162148.2631fa58.alex.williamson@redhat.com>
-	<20231207234810.GN2692119@nvidia.com>
-	<ZXNNQkXzluoyeguu@bgt-140510-bm01.eng.stellus.in>
-	<20231208194159.GS2692119@nvidia.com>
+Mime-Version: 1.0
+References: <20231205234956.1156210-1-michael.roth@amd.com>
+ <ZXCTHJPerz6l9sPw@google.com> <CABgObfb2AxwvseadmEBS7=VWLKKpYVeHkaecrPXG47sMfCKEZg@mail.gmail.com>
+Message-ID: <ZXN-QUBpq1nADjUN@google.com>
+Subject: Re: [PATCH] KVM: SEV: Fix handling of EFER_LMA bit when SEV-ES is enabled
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 08, 2023 at 03:41:59PM -0400, Jason Gunthorpe wrote:
-> On Fri, Dec 08, 2023 at 05:07:22PM +0000, Jim Harris wrote:
-> >=20
-> > Maybe for now we just whack this specific mole with a separate mutex
-> > for synchronizing access to sriov->num_VFs in the sysfs paths?
-> > Something like this (tested on my system):
+On Fri, Dec 08, 2023, Paolo Bonzini wrote:
+> On Wed, Dec 6, 2023 at 4:28=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> > So my very strong preference is to first skip the kvm_is_valid_sregs() =
+check
 >=20
-> TBH, I don't have the time right now to unpack this locking
-> mystery. Maybe Leon remembers?
->=20
-> device_lock() gets everywhere and does a lot of different stuff, so I
-> would be surprised if it was so easy..
+> No, please don't. If you want to add a quirk that, when disabled,
+> causes all guest state get/set ioctls to fail, go ahead. But invalid
+> processor state remains invalid, and should be rejected, even when KVM
+> won't consume it.
 
-The store() side still keeps the device_lock(), it just also acquires this
-new sriov lock. So store() side should observe zero differences. The only
-difference is now the show() side can acquire just the more-granular lock,
-since it is only trying to synchronize on sriov->num_VFs with the store()
-side. But maybe I'm missing something subtle here...
-
-Adding Pierre who authored the 35ff867b7 commit.=
+Ugh, true, KVM should still reject garbage.
 
