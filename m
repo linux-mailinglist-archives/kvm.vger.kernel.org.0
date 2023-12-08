@@ -1,193 +1,100 @@
-Return-Path: <kvm+bounces-3902-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3903-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1B8B809DCE
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 09:00:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF836809DF6
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 09:15:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8F971F21330
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 08:00:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37FAAB20BCE
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 08:15:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D45910976;
-	Fri,  8 Dec 2023 08:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F2C11193;
+	Fri,  8 Dec 2023 08:15:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fg74lBd9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dlJzfGFD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7AD619A8
-	for <kvm@vger.kernel.org>; Fri,  8 Dec 2023 00:00:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702022423; x=1733558423;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=8zmr6aPZHYSB/L5ksIIXnJEgwj/On8DSWj2SW4WXc5g=;
-  b=fg74lBd93bmNQKcdjqjLIEpdCkry+CgBQehrtAoMYsUtum1IDSBK8pEe
-   zPLH0EZMQXTB3E0dCMQvoXbN+MiVRYXWgpROf0t8bP7w78J8zm13DWWYP
-   qQcY/uTAUH7wrVMxFrdva+zwkfQv6Ut5zulVqGvLiN5PEgchG6Cyy1PPA
-   JSFZ7Vk2Wj6Eim6srEKrx2h/2AXqrN5DCJdG832IUxLAzdLyujg/Nmbm6
-   7Rx6m9iD8N173y6jmLIQYSWY4Z60Q5VjBEbDCbK4PG8iLtnhnloVzhCyp
-   491KyXTrDQHS/0rGXaheHiMqMaY60HNmBOlKRZYxBeGWKC8GQ0bBmgTu2
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="1478543"
-X-IronPort-AV: E=Sophos;i="6.04,260,1695711600"; 
-   d="scan'208";a="1478543"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2023 23:59:44 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="1019258894"
-X-IronPort-AV: E=Sophos;i="6.04,260,1695711600"; 
-   d="scan'208";a="1019258894"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.29.154]) ([10.93.29.154])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2023 23:59:37 -0800
-Message-ID: <8f20d060-38fe-49d7-8fea-fe665c3c6c78@intel.com>
-Date: Fri, 8 Dec 2023 15:59:35 +0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA10910799;
+	Fri,  8 Dec 2023 08:15:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CB4EC433C7;
+	Fri,  8 Dec 2023 08:15:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702023333;
+	bh=b2dKwJ5VRwAtWWbaaYxqyisFEjNne1OCfokDs9oJo3Y=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=dlJzfGFDB//CEldkopVVGPtuAJR4HTTAZwmi4ZFUaFQoybRoQyvI9sdT1wxpHzK9i
+	 Ljh5a/omN/96xCFqzxtOJ6BgB62yFO7JBos6z5YVszB2TLzLB/k7B2bjyBjTbrhVGy
+	 nmnDzHb7ycaHHo0eYjZTxctG7O6T1wbRrwY+Xbijtx9MtQUHFL8qWj506WzkSM6AW2
+	 ZM0bFbjD+3mDuKkFrTEwYJyyurgNaIjNSuWnEjv6NmWyzQH4Zh1NTTFASR+Etjx1c2
+	 p4RI1Ilh63YjhJCaBAuGj06uRR4pZyTbgWPf0S3cKnEnZI8hMPLmO75E2tkiJRmSI5
+	 f3Xrw+ZTpRo7Q==
+X-Mailer: emacs 29.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V (IBM) <aneesh.kumar@kernel.org>
+To: Vaibhav Jain <vaibhav@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
+Cc: Vaibhav Jain <vaibhav@linux.ibm.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Jordan Niethe <jniethe5@gmail.com>,
+	Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
+	mikey@neuling.org, paulus@ozlabs.org, sbhat@linux.ibm.com,
+	gautam@linux.ibm.com, kconsul@linux.vnet.ibm.com,
+	amachhiw@linux.vnet.ibm.com, David.Laight@ACULAB.COM
+Subject: Re: [PATCH 09/12] KVM: PPC: Book3S HV nestedv2: Do not call
+ H_COPY_TOFROM_GUEST
+In-Reply-To: <20231201132618.555031-10-vaibhav@linux.ibm.com>
+References: <20231201132618.555031-1-vaibhav@linux.ibm.com>
+ <20231201132618.555031-10-vaibhav@linux.ibm.com>
+Date: Fri, 08 Dec 2023 13:45:24 +0530
+Message-ID: <87sf4dun37.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 09/70] physmem: Introduce ram_block_convert_range() for
- page conversion
-To: Isaku Yamahata <isaku.yamahata@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand
- <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
- Sean Christopherson <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>,
- Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
- <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>,
- isaku.yamahata@intel.com
-References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
- <20231115071519.2864957-10-xiaoyao.li@intel.com>
- <20231117210304.GC1645850@ls.amr.corp.intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20231117210304.GC1645850@ls.amr.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 11/18/2023 5:03 AM, Isaku Yamahata wrote:
-> On Wed, Nov 15, 2023 at 02:14:18AM -0500,
-> Xiaoyao Li <xiaoyao.li@intel.com> wrote:
-> 
->> It's used for discarding opposite memory after memory conversion, for
->> confidential guest.
->>
->> When page is converted from shared to private, the original shared
->> memory can be discarded via ram_block_discard_range();
->>
->> When page is converted from private to shared, the original private
->> memory is back'ed by guest_memfd. Introduce
->> ram_block_discard_guest_memfd_range() for discarding memory in
->> guest_memfd.
->>
->> Originally-from: Isaku Yamahata <isaku.yamahata@intel.com>
->> Codeveloped-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> ---
->>   include/exec/cpu-common.h |  2 ++
->>   system/physmem.c          | 50 +++++++++++++++++++++++++++++++++++++++
->>   2 files changed, 52 insertions(+)
->>
->> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
->> index 41115d891940..de728a18eef2 100644
->> --- a/include/exec/cpu-common.h
->> +++ b/include/exec/cpu-common.h
->> @@ -175,6 +175,8 @@ typedef int (RAMBlockIterFunc)(RAMBlock *rb, void *opaque);
->>   
->>   int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque);
->>   int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length);
->> +int ram_block_convert_range(RAMBlock *rb, uint64_t start, size_t length,
->> +                            bool shared_to_private);
->>   
->>   #endif
->>   
->> diff --git a/system/physmem.c b/system/physmem.c
->> index ddfecddefcd6..cd6008fa09ad 100644
->> --- a/system/physmem.c
->> +++ b/system/physmem.c
->> @@ -3641,6 +3641,29 @@ err:
->>       return ret;
->>   }
->>   
->> +static int ram_block_discard_guest_memfd_range(RAMBlock *rb, uint64_t start,
->> +                                               size_t length)
->> +{
->> +    int ret = -1;
->> +
->> +#ifdef CONFIG_FALLOCATE_PUNCH_HOLE
->> +    ret = fallocate(rb->guest_memfd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
->> +                    start, length);
->> +
->> +    if (ret) {
->> +        ret = -errno;
->> +        error_report("%s: Failed to fallocate %s:%" PRIx64 " +%zx (%d)",
->> +                     __func__, rb->idstr, start, length, ret);
->> +    }
->> +#else
->> +    ret = -ENOSYS;
->> +    error_report("%s: fallocate not available %s:%" PRIx64 " +%zx (%d)",
->> +                 __func__, rb->idstr, start, length, ret);
->> +#endif
->> +
->> +    return ret;
->> +}
->> +
->>   bool ramblock_is_pmem(RAMBlock *rb)
->>   {
->>       return rb->flags & RAM_PMEM;
->> @@ -3828,3 +3851,30 @@ bool ram_block_discard_is_required(void)
->>       return qatomic_read(&ram_block_discard_required_cnt) ||
->>              qatomic_read(&ram_block_coordinated_discard_required_cnt);
->>   }
->> +
->> +int ram_block_convert_range(RAMBlock *rb, uint64_t start, size_t length,
->> +                            bool shared_to_private)
->> +{
->> +    if (!rb || rb->guest_memfd < 0) {
->> +        return -1;
->> +    }
->> +
->> +    if (!QEMU_PTR_IS_ALIGNED(start, qemu_host_page_size) ||
->> +        !QEMU_PTR_IS_ALIGNED(length, qemu_host_page_size)) {
->> +        return -1;
->> +    }
->> +
->> +    if (!length) {
->> +        return -1;
->> +    }
->> +
->> +    if (start + length > rb->max_length) {
->> +        return -1;
->> +    }
->> +
->> +    if (shared_to_private) {
->> +        return ram_block_discard_range(rb, start, length);
->> +    } else {
->> +        return ram_block_discard_guest_memfd_range(rb, start, length);
->> +    }
->> +}
-> 
-> Originally this function issued KVM_SET_MEMORY_ATTRIBUTES, the function name
-> mad sense. But now it doesn't, and it issues only punch hole. We should rename
-> it to represent what it actually does. discard_range?
+Vaibhav Jain <vaibhav@linux.ibm.com> writes:
 
-ram_block_discard_range() already exists for non-guest-memfd memory discard.
+> From: Jordan Niethe <jniethe5@gmail.com>
+>
+> H_COPY_TOFROM_GUEST is part of the nestedv1 API and so should not be
+> called by a nestedv2 host. Do not attempt to call it.
+>
 
-I cannot come up with a proper name. e.g., 
-ram_block_discard_opposite_range() while *opposite* seems unclear.
+May be we should use
+firmware_has_feature(FW_FEATURE_H_COPY_TOFROM_GUEST))?
 
-Do you have any better idea?
+the nestedv2 can end up using the above hcall if it is supported by the
+hypervisor right? In its absence we will have to translate the guest ea
+using xlate and then use kvm_guest_read to read location using the guest
+real address right? That xlate will also involves multiple kvm_guest_read.
+
+
+> Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
+> ---
+>  arch/powerpc/kvm/book3s_64_mmu_radix.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> index 916af6c153a5..4a1abb9f7c05 100644
+> --- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> +++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> @@ -40,6 +40,9 @@ unsigned long __kvmhv_copy_tofrom_guest_radix(int lpid, int pid,
+>  	unsigned long quadrant, ret = n;
+>  	bool is_load = !!to;
+>  
+> +	if (kvmhv_is_nestedv2())
+> +		return H_UNSUPPORTED;
+> +
+>  	/* Can't access quadrants 1 or 2 in non-HV mode, call the HV to do it */
+>  	if (kvmhv_on_pseries())
+>  		return plpar_hcall_norets(H_COPY_TOFROM_GUEST, lpid, pid, eaddr,
+> -- 
+> 2.42.0
 
