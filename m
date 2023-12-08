@@ -1,101 +1,163 @@
-Return-Path: <kvm+bounces-3943-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3944-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11BB480ABD0
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 19:14:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88F7380ABF8
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 19:21:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDD0C28176D
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 18:14:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 339921F2122C
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 18:21:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18ACC47A5F;
-	Fri,  8 Dec 2023 18:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3CD47A5E;
+	Fri,  8 Dec 2023 18:21:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hWbPB2w4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AMDsXDON"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A21F72129
-	for <kvm@vger.kernel.org>; Fri,  8 Dec 2023 10:14:26 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3DA690
+	for <kvm@vger.kernel.org>; Fri,  8 Dec 2023 10:21:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702059265;
+	s=mimecast20190719; t=1702059685;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KlSM/zpPbN5WwWA6OTGpQyhIkatTXb5IjuU41HMpNgA=;
-	b=hWbPB2w46QVi+7fBhCnoQEcsRXH1TisVLcKgNyaza/b9tS4pRdUxArPXAjZK3tKxMH9S3f
-	72xJCVyIGCxpC1Xz4tPFy7bEFOt460NjEv0VVK/FmlKWs8JKptww/hTgiRRI7XZpOYgxCm
-	Tx+LSVP/oGMz4OK9u5+9AH03v805pUM=
-Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com
- [209.85.160.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=nLSlZUtE+vJwKxCXyAw/ZXA+/0tHeruZDXjXe1PSA+M=;
+	b=AMDsXDONt7TI2+1pc2NHsdoIDDue+oU9sG8Igex3ImnWYFxZBk5y6ptHtwE+x0qH8PTSsz
+	VOgkTZexKLP8sgrN1SbCeEZNZp20kNJsV1i/VJdf6R923cBTfJfq+W3yGm9k8Hw5/klRUD
+	qsKiXlTKyQmP/otO7pfCiXMGY9pRQ/o=
+Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
+ [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-186-gOLSkbOQMWW90fFFCht3iA-1; Fri, 08 Dec 2023 13:14:24 -0500
-X-MC-Unique: gOLSkbOQMWW90fFFCht3iA-1
-Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-1f9fa14709dso3826254fac.3
-        for <kvm@vger.kernel.org>; Fri, 08 Dec 2023 10:14:24 -0800 (PST)
+ us-mta-383-YF9lLumYNo2kqbemvGF3jw-1; Fri, 08 Dec 2023 13:21:22 -0500
+X-MC-Unique: YF9lLumYNo2kqbemvGF3jw-1
+Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-1faa81282d1so4634485fac.3
+        for <kvm@vger.kernel.org>; Fri, 08 Dec 2023 10:21:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702059263; x=1702664063;
+        d=1e100.net; s=20230601; t=1702059681; x=1702664481;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KlSM/zpPbN5WwWA6OTGpQyhIkatTXb5IjuU41HMpNgA=;
-        b=jfXzPPa8Vt8Sl4hhHurqiTW/rwMqXFHPqo+dHNWQQujlyk51gVEugkBko3ByZkRI3/
-         LF3t63Ow1svOl4UKnSdfFbO28m+Emieus8kAV9BSNzGg7+mUHTUM2Ir9Tx5mhBBdDONZ
-         7mVonJrEJsu7uZkxsxl10ndqnIHEPPrzhTKJ/oAvZQSXcYdkNVK6MnjhGKwZ2Dj5Bsg/
-         HEKabt4bVjdVAJH1QdnbBlVCPFEgIEsGmy4RP05OoxZlZPhHRcEHgG8ricc9o7uUbOAK
-         1QC1x2mFxc+GwNB5kQNeHCCqLSqgRpNF3sAA+D+v/6SjJzUf1UX0AHyLnuUJutCjl+lk
-         UmGg==
-X-Gm-Message-State: AOJu0Yy898RxLNUUsjtJPu7ymdDH44intCrRx/lcSeg/BPNAm3VMUQMO
-	vimXPIDi7C55eKpKwKwBk4a0ICMLgwC464UkxNzjYPkwPGfhw8ejoMAsVxFylZT9Xn2OvPll26X
-	dmn1yELlXpWHLGMvGQeu0swmmrQjt
-X-Received: by 2002:a05:6870:44d3:b0:1fb:19b5:407d with SMTP id t19-20020a05687044d300b001fb19b5407dmr532223oai.61.1702059263599;
-        Fri, 08 Dec 2023 10:14:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG7AOACg3Lf1P9LtBQJnAsa//zi6y83Gtz28lS3HGdoEbMv7ZG8U5H36GSXA/O8Y6UBe2eDB9XKjKRDH8PflPw=
-X-Received: by 2002:a05:6870:44d3:b0:1fb:19b5:407d with SMTP id
- t19-20020a05687044d300b001fb19b5407dmr532218oai.61.1702059263360; Fri, 08 Dec
- 2023 10:14:23 -0800 (PST)
+        bh=nLSlZUtE+vJwKxCXyAw/ZXA+/0tHeruZDXjXe1PSA+M=;
+        b=gZW4ulQA2ENtDO+xqiu4JXy+CApVy7jS3nyMMeRU9yoRojjhS31Arp9DYmCcpp2Xly
+         DPtoagMS23apQFmCrjsK29FxgfdbzJ6EGPveMvS+a13dfS3dpAV7WYsSMvLy2ERQNP8J
+         eT7pgwyuYo8MmvOEBxCgGT2hg41RVHawnIAaYShfLXT+dsWM4DoS322+1drZWseylr1A
+         Nu3vxV4KrAV2s/UM9lu0n+gtGw/rmC+HFtUyNRJT/RCQDixokcIVx5s7lg1CY6ikKcZL
+         GZItuscga+trqTCwfENqnqJrDqO9rQs8pLhRuBTGjapupXyjktea48J3KxlS1cpWPXo3
+         xdxA==
+X-Gm-Message-State: AOJu0YzK3hUadR8ZagCH/ikcXfdXBk2tjqR5o4iNHQXqFWxOlpwCdYtX
+	Q+Lvmvh/mbJ+CmQBBXXMLw15GKk9dtlg3o8ZE2hqisp/QY4sQ4OZC0u2YWKWr3yPRU/d7c4BDSY
+	2Cq9jeXUqkAe9RxT1TWPfD3YB9yJRbNwU5Hw2YTM=
+X-Received: by 2002:a05:6870:71d6:b0:1fb:34a7:ebbd with SMTP id p22-20020a05687071d600b001fb34a7ebbdmr566703oag.1.1702059681263;
+        Fri, 08 Dec 2023 10:21:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEbZzm5wC8wbpVxKq67MC5ECzNPzJFHkvrILIXuTMUoBGMt7D79VxJBXO0NVoVtV46/R206KUxojGA6kEUpH2c=
+X-Received: by 2002:a05:6870:71d6:b0:1fb:34a7:ebbd with SMTP id
+ p22-20020a05687071d600b001fb34a7ebbdmr566694oag.1.1702059681015; Fri, 08 Dec
+ 2023 10:21:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231208020734.1705867-1-seanjc@google.com>
-In-Reply-To: <20231208020734.1705867-1-seanjc@google.com>
+References: <20231208021708.1707327-1-seanjc@google.com>
+In-Reply-To: <20231208021708.1707327-1-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 8 Dec 2023 19:14:11 +0100
-Message-ID: <CABgObfYbWUy5Bvpnr3a+atE5Pyk72jnY8ynkdw7_cJ8_7A1raQ@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM: x86: Fixes for 6.7-rcN
+Date: Fri, 8 Dec 2023 19:21:08 +0100
+Message-ID: <CABgObfbgs0z0Pe37T=TJprEkq0dZngSxKKKVnM74xHg6eFGegg@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM: selftests: Fixes and cleanups for 6.7-rcN
 To: Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 8, 2023 at 3:07=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+On Fri, Dec 8, 2023 at 3:17=E2=80=AFAM Sean Christopherson <seanjc@google.c=
 om> wrote:
 >
-> Please pull a handful of fixes for 6.7-rcN (hopefully N=3D5).  These have=
- all
-> been in -next for a week or so.
+> Please pull selftests fixes/cleanups for 6.7.  The big change is adding
+> __printf() annotation to the guest printf/assert helpers, which is waaay
+> better than me playing whack-a-mole when tests fail (I'm still laughing
+> at myself for not realizing what that annotation does).
 >
-> The following changes since commit ffc253263a1375a65fa6c9f62a893e9767fbeb=
-fa:
+> The following changes since commit e9e60c82fe391d04db55a91c733df4a017c28b=
+2f:
 >
->   Linux 6.6 (2023-10-29 16:31:08 -1000)
+>   selftests/kvm: fix compilation on non-x86_64 platforms (2023-11-21 11:5=
+8:25 -0500)
+
+This would be a 6.8 change though.
+
+I singled out "KVM: selftests: Actually print out magic token in NX
+hugepages skip message" and "KVM: selftests: add -MP to CFLAGS" and
+pulled the rest into kvm/next, which means we'll have a couple dup
+commits but nothing too bad.
+
+Paolo
+
 >
 > are available in the Git repository at:
 >
->   https://github.com/kvm-x86/linux.git tags/kvm-x86-fixes-6.7-rcN
+>   https://github.com/kvm-x86/linux.git tags/kvm-x86-selftests-6.7-rcN
 >
-> for you to fetch changes up to ef8d89033c3f1f6a64757f066b2c17e76d1189f8:
+> for you to fetch changes up to 1b2658e4c709135fe1910423d3216632f641baf9:
 >
->   KVM: x86: Remove 'return void' expression for 'void function' (2023-12-=
-01 08:14:27 -0800)
-
-Pulled, thanks.
-
-Paolo
+>   KVM: selftests: Annotate guest ucall, printf, and assert helpers with _=
+_printf() (2023-12-01 08:15:41 -0800)
+>
+> ----------------------------------------------------------------
+> KVM selftests fixes for 6.7-rcN:
+>
+>  - Fix an annoying goof where the NX hugepage test prints out garbage
+>    instead of the magic token needed to run the text.
+>
+>  - Fix build errors when a header is delete/moved due to a missing flag
+>    in the Makefile.
+>
+>  - Detect if KVM bugged/killed a selftest's VM and print out a helpful
+>    message instead of complaining that a random ioctl() failed.
+>
+>  - Annotate the guest printf/assert helpers with __printf(), and fix the
+>    various bugs that were lurking due to lack of said annotation.
+>
+> ----------------------------------------------------------------
+> David Woodhouse (1):
+>       KVM: selftests: add -MP to CFLAGS
+>
+> Sean Christopherson (7):
+>       KVM: selftests: Drop the single-underscore ioctl() helpers
+>       KVM: selftests: Add logic to detect if ioctl() failed because VM wa=
+s killed
+>       KVM: selftests: Remove x86's so called "MMIO warning" test
+>       KVM: selftests: Fix MWAIT error message when guest assertion fails
+>       KVM: selftests: Fix benign %llx vs. %lx issues in guest asserts
+>       KVM: selftests: Fix broken assert messages in Hyper-V features test
+>       KVM: selftests: Annotate guest ucall, printf, and assert helpers wi=
+th __printf()
+>
+> angquan yu (1):
+>       KVM: selftests: Actually print out magic token in NX hugepages skip=
+ message
+>
+>  tools/testing/selftests/kvm/Makefile               |   3 +-
+>  .../testing/selftests/kvm/include/kvm_util_base.h  |  75 ++++++++-----
+>  tools/testing/selftests/kvm/include/test_util.h    |   2 +-
+>  tools/testing/selftests/kvm/include/ucall_common.h |   7 +-
+>  tools/testing/selftests/kvm/lib/kvm_util.c         |   2 +-
+>  .../testing/selftests/kvm/set_memory_region_test.c |   6 +-
+>  .../testing/selftests/kvm/x86_64/hyperv_features.c |  10 +-
+>  .../selftests/kvm/x86_64/mmio_warning_test.c       | 121 ---------------=
+------
+>  .../selftests/kvm/x86_64/monitor_mwait_test.c      |   6 +-
+>  .../selftests/kvm/x86_64/nx_huge_pages_test.c      |   2 +-
+>  .../kvm/x86_64/private_mem_conversions_test.c      |   2 +-
+>  .../kvm/x86_64/svm_nested_soft_inject_test.c       |   4 +-
+>  .../selftests/kvm/x86_64/vmx_pmu_caps_test.c       |   2 +-
+>  .../testing/selftests/kvm/x86_64/xcr0_cpuid_test.c |   8 +-
+>  14 files changed, 78 insertions(+), 172 deletions(-)
+>  delete mode 100644 tools/testing/selftests/kvm/x86_64/mmio_warning_test.=
+c
+>
 
 
