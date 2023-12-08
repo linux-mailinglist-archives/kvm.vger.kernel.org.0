@@ -1,133 +1,149 @@
-Return-Path: <kvm+bounces-3892-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3893-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5427809916
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 03:17:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6043809917
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 03:18:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38678282191
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 02:17:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6191928208F
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 02:18:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5351E1FA1;
-	Fri,  8 Dec 2023 02:17:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652631C33;
+	Fri,  8 Dec 2023 02:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w2OtNCVN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TmLRKPZc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3352C1728
-	for <kvm@vger.kernel.org>; Thu,  7 Dec 2023 18:17:33 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5c941936f7fso10168037b3.0
-        for <kvm@vger.kernel.org>; Thu, 07 Dec 2023 18:17:33 -0800 (PST)
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E75F1720
+	for <kvm@vger.kernel.org>; Thu,  7 Dec 2023 18:18:08 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1d0b944650bso10785125ad.1
+        for <kvm@vger.kernel.org>; Thu, 07 Dec 2023 18:18:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702001852; x=1702606652; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h7HcAkk9OcO6R26OdgJnZaKpSN5LYlU1FJ4TjFKmXHk=;
-        b=w2OtNCVN/oq88R4HPVOGyI2GILwdBmN5uo6io5EXpgCdnhgbt6pU6CGtnvjMBDkxdc
-         jsPyz9caKZzOG16LIsArcDBkBxCvB3bOH9gx8UiJhsaEaXh3sT0vXtBHQ50DSO5vPLLA
-         euucH1+l8LYpic0atZsoj0K1XrrqqHzH7vR0TljldE2X6L/aakrtmIVe915hZg9/8iIz
-         LwEmqoazuAkNSeCz5YGIYRfaseb+Qzg91cVkj6Z6uFUqEiD1g7+46XMFaFngFX+SzKvD
-         V3FeZys6mu0Nx6bqnC2wCEL4c+6nsRAg7pUBhtPow9DOPmdtofUMXyz45kiPYTrc3bsp
-         3Q2A==
+        d=google.com; s=20230601; t=1702001887; x=1702606687; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=x/RQieb/5hgEZf4ihBfemqOm3bIAp8/aW/Hee+PAMyI=;
+        b=TmLRKPZcGWfygIV8QYasmcXnA7UJZbBlqoPhsSmPmlzvl0bZCF6mIHrKhsgd106sPo
+         +bR2k8diUnPM3rzE2YPplBK0fJj5u3qFf7mY/Y4Ybl9FAhsnqW66iaB3oNM91wIFU6Sm
+         YQVOU1CiyIxDCcHLBKjLJRSdOpYrhmW5cjLu9cKaLxihtDFTtmEep+rRi9am/5MK3aJF
+         3N7tuR2aCkDKXg0q8DFVYIoKPrgDYPlxVVRRKEC1JWU+DwRiQ5aSuOsxyL/RDL2Iu1Vr
+         qtlcHAgvfKylIPvPNObiAJPZ4X3avvY0C/0qJrwm7vWUqjykZ3ROCqq/+r6L+tpHuAf6
+         NcvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702001852; x=1702606652;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+        d=1e100.net; s=20230601; t=1702001887; x=1702606687;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h7HcAkk9OcO6R26OdgJnZaKpSN5LYlU1FJ4TjFKmXHk=;
-        b=c0JDZHT3Y983OkUxIBoqumAAvKR5Syd/PbCxt4jmgcuzdDEUzXYeBUiGprFidqpOUM
-         y2Pq9VoWl3qoRE5VQ4afVfFygvmXgVEGefAWFw18nma1zeImsyVa1eE/F8JY43DbkgOp
-         VeX4a9Zol0GsDQKXaaQrlghuibXiHMLWAGwmMQ/NQJR9VqaWnhITzQs4oJrfZ8v+CYSX
-         OcoyI9aD0sZu47KwCIpIvz3J9V63xuw/ShTV+U10j3F/s5h6cvK7bCklHJeXSB0RvD1v
-         jwXFcHHW/zR4loFAHNBOc1nVFnBA5EFdtEFthJQ7iTX4Y0BS/79UmOtZIg+rJ2dSNSnT
-         sW0A==
-X-Gm-Message-State: AOJu0Yz9AxUo+Sgn2uUDEc09g9mSMHjYVhWifmj2+Hb0n4vIV9m1U/v9
-	kdyYPhT1/lXVxAeQaUH9qDLxEJBac84=
-X-Google-Smtp-Source: AGHT+IF4M/K0KGAhMim7eQLfOFrM5Cj0KkcFsrHAyQxVlnJovHWvRW4FrdnZ3uPQIhVPScAb2KGEmYyn+5Y=
+        bh=x/RQieb/5hgEZf4ihBfemqOm3bIAp8/aW/Hee+PAMyI=;
+        b=Q2fDXnlih/n5nC/KO6/288tK2KTvumZPBNjGmmH0QlUbwwhapOp60/1vGtxNawTCfs
+         RCm9HPZ3lwlDwIDYtHz77m6YuPCoFl8aYmuHq6SoF0apnSLldm65ZlBIdTeTT1b0S4lT
+         65f055G3QyUhvv1diDKA+66a0xeWVETZ0fyZiy4s86eUekrV33FdCChDeRZJLJw9x1SV
+         NdgWPYto6KD2G9nP3boiwoaY0b4bV0xxqPFBbI4h/FCAc9c5KPVjf7W/KNGP95csty6g
+         lx+WyQolcZGihyurW4DuY8PDLek7wclGq0GiLjY7hqk+oyXnPnI2m/gyqR64o0AEVbrR
+         Iijg==
+X-Gm-Message-State: AOJu0YwMFx4ET9NtkGfwQR/DivvOruIotN0+FiSQms/hoF7Wer+MBboT
+	wH0F2ymqr0nMOjIUHs6ZrQyrkzhu/TE=
+X-Google-Smtp-Source: AGHT+IGL5urnZA4xoKYLDChi+OFsiyF9tC+qN9RWgHap2zKqBiBinNmjyAjI/HL7V1qK+N91zHcRX4D74FM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:14d:b0:db5:3aaf:5207 with SMTP id
- p13-20020a056902014d00b00db53aaf5207mr2547ybh.3.1702001852402; Thu, 07 Dec
- 2023 18:17:32 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  7 Dec 2023 18:17:08 -0800
+ (user=seanjc job=sendgmr) by 2002:a17:902:ceca:b0:1d0:9376:c8e5 with SMTP id
+ d10-20020a170902ceca00b001d09376c8e5mr40324plg.13.1702001887529; Thu, 07 Dec
+ 2023 18:18:07 -0800 (PST)
+Date: Thu,  7 Dec 2023 18:17:37 -0800
+In-Reply-To: <20231205103630.1391318-1-vkuznets@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20231205103630.1391318-1-vkuznets@redhat.com>
 X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231208021708.1707327-1-seanjc@google.com>
-Subject: [GIT PULL] KVM: selftests: Fixes and cleanups for 6.7-rcN
+Message-ID: <170197059584.1607462.12996412883406610294.b4-ty@google.com>
+Subject: Re: [PATCH v2 00/16] KVM: x86: Make Hyper-V emulation optional
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 
-Please pull selftests fixes/cleanups for 6.7.  The big change is adding
-__printf() annotation to the guest printf/assert helpers, which is waaay
-better than me playing whack-a-mole when tests fail (I'm still laughing
-at myself for not realizing what that annotation does).
+On Tue, 05 Dec 2023 11:36:14 +0100, Vitaly Kuznetsov wrote:
+> v1:
+>   https://lore.kernel.org/kvm/20231025152406.1879274-1-vkuznets@redhat.com/
+> 
+> Changes since RFC:
+> - "KVM: x86: hyper-v: Split off nested_evmcs_handle_vmclear()" patch added
+>   [Sean]
+> - "KVM: nVMX: Move guest_cpuid_has_evmcs() to hyperv.h" patch added [Sean]
+> - Use evmptr_is_set()/nested_vmx_is_evmptr12_set() helpers instead of
+>   nested_vmx_evmptr12() [Sean]
+> - Move "#ifdef CONFIG_KVM_HYPERV" inside certain functions instead of
+>   adding stubs for !CONFIG_KVM_HYPERV case [Sean]
+> - Minor code re-shuffling [Sean]
+> - Collect R-b tags [Max]
+> 
+> [...]
 
-The following changes since commit e9e60c82fe391d04db55a91c733df4a017c28b2f:
+Applied to kvm-x86 hyperv.  I massaged a lot of the shortlogs to adjust the
+scope, shorten line lengths, and rephrase things using more conversational
+language.
 
-  selftests/kvm: fix compilation on non-x86_64 platforms (2023-11-21 11:58:25 -0500)
+Re: the scopes, while I like the idea of "KVM: x86/hyper-v:", e.g. to pair with
+"KVM: x86/xen:", I think we should forego it for now.  The Xen code is fairly
+well contained and doesn't have VMX or SVM code, let alone nVMX and nSVM code.
 
-are available in the Git repository at:
+Hyper-V... not so much.  It has its greedy little hands in everything :-)  That
+makes it rather difficult to have consistency and correctness, e.g. these three
+are all nVMX+hyper-v specific, yet managed to end up with three different scopes.
 
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-selftests-6.7-rcN
+  KVM: nVMX: Move guest_cpuid_has_evmcs() to hyperv.h
 
-for you to fetch changes up to 1b2658e4c709135fe1910423d3216632f641baf9:
+  KVM: nVMX: hyper-v: Introduce nested_vmx_evmcs() accessor
 
-  KVM: selftests: Annotate guest ucall, printf, and assert helpers with __printf() (2023-12-01 08:15:41 -0800)
+  KVM: x86: hyper-v: Split off nested_evmcs_handle_vmclear()
 
-----------------------------------------------------------------
-KVM selftests fixes for 6.7-rcN:
+And things only get more confusing when KVM-on-Hyper-V comes into play.  So kinda
+like we do with the TDP MMU, which is too intertwined with the regular/common
+MMU code to get its own scope, I think we should use existing scopes and then
+explicitly talk about Hyper-V in the shortlog to make up for the lack of
+precision.
 
- - Fix an annoying goof where the NX hugepage test prints out garbage
-   instead of the magic token needed to run the text.
+Please speak up if you disagree!  I don't expect to apply any other patches to
+this branch, i.e. further massaging the shortlogs isn't a problem.
 
- - Fix build errors when a header is delete/moved due to a missing flag
-   in the Makefile.
+[1/16] KVM: x86/xen: Remove unneeded xen context from kvm_arch when !CONFIG_KVM_XEN
+	  https://github.com/kvm-x86/linux/commit/87562052c965
+[2/16] KVM: x86: Move Hyper-V partition assist page out of Hyper-V emulation context
+	  https://github.com/kvm-x86/linux/commit/cfef5af3cb0e
+[3/16] KVM: VMX: Split off vmx_onhyperv.{ch} from hyperv.{ch}
+	  https://github.com/kvm-x86/linux/commit/50a82b0eb88c
+[4/16] KVM: x86: Introduce helper to check if auto-EOI is set in Hyper-V SynIC
+	  https://github.com/kvm-x86/linux/commit/16e880bfa637
+[5/16] KVM: x86: Introduce helper to check if vector is set in Hyper-V SynIC
+	  https://github.com/kvm-x86/linux/commit/0659262a2625
+[6/16] KVM: VMX: Split off hyperv_evmcs.{ch}
+	  https://github.com/kvm-x86/linux/commit/e7ad84db4d71
+[7/16] KVM: x86: Introduce helper to handle Hyper-V paravirt TLB flush requests
+	  https://github.com/kvm-x86/linux/commit/af9d544a4521
+[8/16] KVM: nVMX: Split off helper for emulating VMCLEAR on Hyper-V eVMCS
+	  https://github.com/kvm-x86/linux/commit/b2e02f82b7f7
+[9/16] KVM: selftests: Make Hyper-V tests explicitly require KVM Hyper-V support
+	  https://github.com/kvm-x86/linux/commit/6dac1195181c
+[10/16] KVM: selftests: Fix vmxon_pa == vmcs12_pa == -1ull nVMX testcase for !eVMCS
+	  https://github.com/kvm-x86/linux/commit/225b7c1117b2
+[11/16] KVM: nVMX: Move guest_cpuid_has_evmcs() to hyperv.h
+	  https://github.com/kvm-x86/linux/commit/f97314626734
+[12/16] KVM: x86: Make Hyper-V emulation optional
+	  https://github.com/kvm-x86/linux/commit/b4f69df0f65e
+[13/16] KVM: nVMX: Introduce helpers to check if Hyper-V evmptr12 is valid/set
+	  https://github.com/kvm-x86/linux/commit/453e42b05571
+[14/16] KVM: nVMX: Introduce accessor to get Hyper-V eVMCS pointer
+	  https://github.com/kvm-x86/linux/commit/c98842b26c23
+[15/16] KVM: nVMX: Hide more stuff under CONFIG_KVM_HYPERV
+	  https://github.com/kvm-x86/linux/commit/5a30f97683af
+[16/16] KVM: nSVM: Hide more stuff under CONFIG_KVM_HYPERV/CONFIG_HYPERV
+	  https://github.com/kvm-x86/linux/commit/017a99a966f1
 
- - Detect if KVM bugged/killed a selftest's VM and print out a helpful
-   message instead of complaining that a random ioctl() failed.
-
- - Annotate the guest printf/assert helpers with __printf(), and fix the
-   various bugs that were lurking due to lack of said annotation.
-
-----------------------------------------------------------------
-David Woodhouse (1):
-      KVM: selftests: add -MP to CFLAGS
-
-Sean Christopherson (7):
-      KVM: selftests: Drop the single-underscore ioctl() helpers
-      KVM: selftests: Add logic to detect if ioctl() failed because VM was killed
-      KVM: selftests: Remove x86's so called "MMIO warning" test
-      KVM: selftests: Fix MWAIT error message when guest assertion fails
-      KVM: selftests: Fix benign %llx vs. %lx issues in guest asserts
-      KVM: selftests: Fix broken assert messages in Hyper-V features test
-      KVM: selftests: Annotate guest ucall, printf, and assert helpers with __printf()
-
-angquan yu (1):
-      KVM: selftests: Actually print out magic token in NX hugepages skip message
-
- tools/testing/selftests/kvm/Makefile               |   3 +-
- .../testing/selftests/kvm/include/kvm_util_base.h  |  75 ++++++++-----
- tools/testing/selftests/kvm/include/test_util.h    |   2 +-
- tools/testing/selftests/kvm/include/ucall_common.h |   7 +-
- tools/testing/selftests/kvm/lib/kvm_util.c         |   2 +-
- .../testing/selftests/kvm/set_memory_region_test.c |   6 +-
- .../testing/selftests/kvm/x86_64/hyperv_features.c |  10 +-
- .../selftests/kvm/x86_64/mmio_warning_test.c       | 121 ---------------------
- .../selftests/kvm/x86_64/monitor_mwait_test.c      |   6 +-
- .../selftests/kvm/x86_64/nx_huge_pages_test.c      |   2 +-
- .../kvm/x86_64/private_mem_conversions_test.c      |   2 +-
- .../kvm/x86_64/svm_nested_soft_inject_test.c       |   4 +-
- .../selftests/kvm/x86_64/vmx_pmu_caps_test.c       |   2 +-
- .../testing/selftests/kvm/x86_64/xcr0_cpuid_test.c |   8 +-
- 14 files changed, 78 insertions(+), 172 deletions(-)
- delete mode 100644 tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
+--
+https://github.com/kvm-x86/linux/tree/next
 
