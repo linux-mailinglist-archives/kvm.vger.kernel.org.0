@@ -1,66 +1,49 @@
-Return-Path: <kvm+bounces-3901-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3902-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73746809B7E
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 06:07:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1B8B809DCE
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 09:00:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F0B1281F1D
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 05:07:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8F971F21330
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 08:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A4805396;
-	Fri,  8 Dec 2023 05:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D45910976;
+	Fri,  8 Dec 2023 08:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bivf7zGL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fg74lBd9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AA131735
-	for <kvm@vger.kernel.org>; Thu,  7 Dec 2023 21:07:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702012051;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7DjOW++h2qpYv/KAC35xyOMKgc1I7IXf0474RhNm4+E=;
-	b=Bivf7zGLH6HHkHSxL/SFmWnzO27NVKMaAAdNF/pIYkcZDows70grjSBIwfpobLjH1aN4kR
-	lu8vpX9o7HajVZaHsZWSIYUR4Dix1ghR7C951ILEgOxhid+maEk5Ei81u5yph+J/Db0Gr0
-	AUCrxYruIdjlEmgKCay+tL7h3nW/+O0=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-336-dEcHNXLiPUKS_0F2bk5U0Q-1; Fri, 08 Dec 2023 00:07:29 -0500
-X-MC-Unique: dEcHNXLiPUKS_0F2bk5U0Q-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-28658658190so1440803a91.1
-        for <kvm@vger.kernel.org>; Thu, 07 Dec 2023 21:07:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702012048; x=1702616848;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7DjOW++h2qpYv/KAC35xyOMKgc1I7IXf0474RhNm4+E=;
-        b=mecDjdeWNLLwl3VYwrwE4fTHxN/bzbAKH92MrF9Elfu7mkcbL7rcD6p9DdRUQ3ITp9
-         t5JPFMwbm3tH3/GwUkYnCq+4pvMyN7FbjUPFrd4s4/udZI0GiP6d8ucnzNn8XV1voz6W
-         zz6AD+9UfDmz5QV893weJE3DAt2OV96cq9E2rirmpY+PCHQgatMMXbxX0AEt7GqcV4yz
-         TQQZrYR56lsl/a+3YKvlbPPpuElxp6JhVmuMHwZOWOFCTQCVpyYOnMyp1YO9HtCm2PlE
-         JLA/XGJ99Qz4pPC6bK0NHTsRsuXdNuxMJu3XoLHBVqXreiXNd6v/OgXLO6gudpI/MqLA
-         nlpw==
-X-Gm-Message-State: AOJu0YxzrIKw+1+gt0XSXs7AWVKDyBvSHnzyD3T1gd/odpXuTYXDIJuV
-	c4GfA/P03ezBxCsu91TGGkIRaRvzDf2WsEdeVZdA94cLRNwYHedmysZ67oHYlrytBvYuJXJzQZ3
-	uXOY63StgJy/1
-X-Received: by 2002:a17:903:228b:b0:1d0:b16a:b26a with SMTP id b11-20020a170903228b00b001d0b16ab26amr3435386plh.4.1702012048129;
-        Thu, 07 Dec 2023 21:07:28 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG6LlOSfQMdwKQHpCvinXE+YTOV9LAn4L/4e5piuadXfTGPzQr096NtqUuMnxxErVNRlrsErQ==
-X-Received: by 2002:a17:903:228b:b0:1d0:b16a:b26a with SMTP id b11-20020a170903228b00b001d0b16ab26amr3435375plh.4.1702012047799;
-        Thu, 07 Dec 2023 21:07:27 -0800 (PST)
-Received: from [192.168.68.51] ([43.252.115.3])
-        by smtp.gmail.com with ESMTPSA id g24-20020a170902869800b001cf9ddd3552sm701722plo.85.2023.12.07.21.07.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Dec 2023 21:07:27 -0800 (PST)
-Message-ID: <c8e1594e-1379-4fb3-904f-fba2cd194cdc@redhat.com>
-Date: Fri, 8 Dec 2023 15:07:22 +1000
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7AD619A8
+	for <kvm@vger.kernel.org>; Fri,  8 Dec 2023 00:00:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702022423; x=1733558423;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=8zmr6aPZHYSB/L5ksIIXnJEgwj/On8DSWj2SW4WXc5g=;
+  b=fg74lBd93bmNQKcdjqjLIEpdCkry+CgBQehrtAoMYsUtum1IDSBK8pEe
+   zPLH0EZMQXTB3E0dCMQvoXbN+MiVRYXWgpROf0t8bP7w78J8zm13DWWYP
+   qQcY/uTAUH7wrVMxFrdva+zwkfQv6Ut5zulVqGvLiN5PEgchG6Cyy1PPA
+   JSFZ7Vk2Wj6Eim6srEKrx2h/2AXqrN5DCJdG832IUxLAzdLyujg/Nmbm6
+   7Rx6m9iD8N173y6jmLIQYSWY4Z60Q5VjBEbDCbK4PG8iLtnhnloVzhCyp
+   491KyXTrDQHS/0rGXaheHiMqMaY60HNmBOlKRZYxBeGWKC8GQ0bBmgTu2
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="1478543"
+X-IronPort-AV: E=Sophos;i="6.04,260,1695711600"; 
+   d="scan'208";a="1478543"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2023 23:59:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="1019258894"
+X-IronPort-AV: E=Sophos;i="6.04,260,1695711600"; 
+   d="scan'208";a="1019258894"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.29.154]) ([10.93.29.154])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2023 23:59:37 -0800
+Message-ID: <8f20d060-38fe-49d7-8fea-fe665c3c6c78@intel.com>
+Date: Fri, 8 Dec 2023 15:59:35 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,52 +51,143 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] KVM: selftests: Fix Assertion on non-x86_64 platforms
+Subject: Re: [PATCH v3 09/70] physmem: Introduce ram_block_convert_range() for
+ page conversion
+To: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand
+ <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
+ <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
+ Sean Christopherson <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>,
+ Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
+ <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>,
+ isaku.yamahata@intel.com
+References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
+ <20231115071519.2864957-10-xiaoyao.li@intel.com>
+ <20231117210304.GC1645850@ls.amr.corp.intel.com>
 Content-Language: en-US
-To: Shaoqin Huang <shahuang@redhat.com>, kvm@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- Sean Christopherson <seanjc@google.com>, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
-References: <20231208033505.2930064-1-shahuang@redhat.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20231208033505.2930064-1-shahuang@redhat.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20231117210304.GC1645850@ls.amr.corp.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/8/23 13:35, Shaoqin Huang wrote:
-> When running the set_memory_region_test on arm64 platform, it causes the
-> below assert:
+On 11/18/2023 5:03 AM, Isaku Yamahata wrote:
+> On Wed, Nov 15, 2023 at 02:14:18AM -0500,
+> Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 > 
-> ==== Test Assertion Failure ====
->    set_memory_region_test.c:355: r && errno == EINVAL
->    pid=40695 tid=40695 errno=0 - Success
->       1	0x0000000000401baf: test_invalid_memory_region_flags at set_memory_region_test.c:355
->       2	 (inlined by) main at set_memory_region_test.c:541
->       3	0x0000ffff951c879b: ?? ??:0
->       4	0x0000ffff951c886b: ?? ??:0
->       5	0x0000000000401caf: _start at ??:?
->    KVM_SET_USER_MEMORY_REGION should have failed on v2 only flag 0x2
+>> It's used for discarding opposite memory after memory conversion, for
+>> confidential guest.
+>>
+>> When page is converted from shared to private, the original shared
+>> memory can be discarded via ram_block_discard_range();
+>>
+>> When page is converted from private to shared, the original private
+>> memory is back'ed by guest_memfd. Introduce
+>> ram_block_discard_guest_memfd_range() for discarding memory in
+>> guest_memfd.
+>>
+>> Originally-from: Isaku Yamahata <isaku.yamahata@intel.com>
+>> Codeveloped-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> ---
+>>   include/exec/cpu-common.h |  2 ++
+>>   system/physmem.c          | 50 +++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 52 insertions(+)
+>>
+>> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+>> index 41115d891940..de728a18eef2 100644
+>> --- a/include/exec/cpu-common.h
+>> +++ b/include/exec/cpu-common.h
+>> @@ -175,6 +175,8 @@ typedef int (RAMBlockIterFunc)(RAMBlock *rb, void *opaque);
+>>   
+>>   int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque);
+>>   int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length);
+>> +int ram_block_convert_range(RAMBlock *rb, uint64_t start, size_t length,
+>> +                            bool shared_to_private);
+>>   
+>>   #endif
+>>   
+>> diff --git a/system/physmem.c b/system/physmem.c
+>> index ddfecddefcd6..cd6008fa09ad 100644
+>> --- a/system/physmem.c
+>> +++ b/system/physmem.c
+>> @@ -3641,6 +3641,29 @@ err:
+>>       return ret;
+>>   }
+>>   
+>> +static int ram_block_discard_guest_memfd_range(RAMBlock *rb, uint64_t start,
+>> +                                               size_t length)
+>> +{
+>> +    int ret = -1;
+>> +
+>> +#ifdef CONFIG_FALLOCATE_PUNCH_HOLE
+>> +    ret = fallocate(rb->guest_memfd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+>> +                    start, length);
+>> +
+>> +    if (ret) {
+>> +        ret = -errno;
+>> +        error_report("%s: Failed to fallocate %s:%" PRIx64 " +%zx (%d)",
+>> +                     __func__, rb->idstr, start, length, ret);
+>> +    }
+>> +#else
+>> +    ret = -ENOSYS;
+>> +    error_report("%s: fallocate not available %s:%" PRIx64 " +%zx (%d)",
+>> +                 __func__, rb->idstr, start, length, ret);
+>> +#endif
+>> +
+>> +    return ret;
+>> +}
+>> +
+>>   bool ramblock_is_pmem(RAMBlock *rb)
+>>   {
+>>       return rb->flags & RAM_PMEM;
+>> @@ -3828,3 +3851,30 @@ bool ram_block_discard_is_required(void)
+>>       return qatomic_read(&ram_block_discard_required_cnt) ||
+>>              qatomic_read(&ram_block_coordinated_discard_required_cnt);
+>>   }
+>> +
+>> +int ram_block_convert_range(RAMBlock *rb, uint64_t start, size_t length,
+>> +                            bool shared_to_private)
+>> +{
+>> +    if (!rb || rb->guest_memfd < 0) {
+>> +        return -1;
+>> +    }
+>> +
+>> +    if (!QEMU_PTR_IS_ALIGNED(start, qemu_host_page_size) ||
+>> +        !QEMU_PTR_IS_ALIGNED(length, qemu_host_page_size)) {
+>> +        return -1;
+>> +    }
+>> +
+>> +    if (!length) {
+>> +        return -1;
+>> +    }
+>> +
+>> +    if (start + length > rb->max_length) {
+>> +        return -1;
+>> +    }
+>> +
+>> +    if (shared_to_private) {
+>> +        return ram_block_discard_range(rb, start, length);
+>> +    } else {
+>> +        return ram_block_discard_guest_memfd_range(rb, start, length);
+>> +    }
+>> +}
 > 
-> This is because the arm64 platform also support the KVM_MEM_READONLY flag, but
-> the current implementation add it into the supportd_flags only on x86_64
-> platform, so this causes assert on other platform which also support the
-> KVM_MEM_READONLY flag.
-> 
-> Fix it by using the __KVM_HAVE_READONLY_MEM macro to detect if the
-> current platform support the KVM_MEM_READONLY, thus fix this problem on
-> all other platform which support KVM_MEM_READONLY.
-> 
-> Fixes: 5d74316466f4 ("KVM: selftests: Add a memory region subtest to validate invalid flags")
-> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-> ---
-> This patch is based on the latest kvm-next[1] branch.
-> 
-> [1] https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?h=next
-> ---
->   tools/testing/selftests/kvm/set_memory_region_test.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
+> Originally this function issued KVM_SET_MEMORY_ATTRIBUTES, the function name
+> mad sense. But now it doesn't, and it issues only punch hole. We should rename
+> it to represent what it actually does. discard_range?
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+ram_block_discard_range() already exists for non-guest-memfd memory discard.
 
+I cannot come up with a proper name. e.g., 
+ram_block_discard_opposite_range() while *opposite* seems unclear.
+
+Do you have any better idea?
 
