@@ -1,163 +1,155 @@
-Return-Path: <kvm+bounces-3944-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3945-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88F7380ABF8
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 19:21:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62D1480AC3A
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 19:39:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 339921F2122C
-	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 18:21:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C401281A6A
+	for <lists+kvm@lfdr.de>; Fri,  8 Dec 2023 18:39:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3CD47A5E;
-	Fri,  8 Dec 2023 18:21:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FE654CB3E;
+	Fri,  8 Dec 2023 18:39:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AMDsXDON"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YR7wyDa9"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3DA690
-	for <kvm@vger.kernel.org>; Fri,  8 Dec 2023 10:21:25 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 926D7BD
+	for <kvm@vger.kernel.org>; Fri,  8 Dec 2023 10:39:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702059685;
+	s=mimecast20190719; t=1702060770;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nLSlZUtE+vJwKxCXyAw/ZXA+/0tHeruZDXjXe1PSA+M=;
-	b=AMDsXDONt7TI2+1pc2NHsdoIDDue+oU9sG8Igex3ImnWYFxZBk5y6ptHtwE+x0qH8PTSsz
-	VOgkTZexKLP8sgrN1SbCeEZNZp20kNJsV1i/VJdf6R923cBTfJfq+W3yGm9k8Hw5/klRUD
-	qsKiXlTKyQmP/otO7pfCiXMGY9pRQ/o=
-Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
- [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=5xpi6oKeZnMTqEA1GU/S46QdXQaCqr8RrHilbjEq4XU=;
+	b=YR7wyDa9riYA9msFbkr7TvyqH/HyMjM2oTp5HM8JHFU94cUhjXRTYVLSi8hqq05LSMsPuN
+	BrDW9AfSo0L9Gn3l0jKubRyamanMLsdPSvtaNPLAmE4hEaD0bhwgm//myywsgPuiRO4VUU
+	xDtyZWZW2545Cu8uygLnIkWfusFexb8=
+Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com
+ [209.85.221.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-383-YF9lLumYNo2kqbemvGF3jw-1; Fri, 08 Dec 2023 13:21:22 -0500
-X-MC-Unique: YF9lLumYNo2kqbemvGF3jw-1
-Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-1faa81282d1so4634485fac.3
-        for <kvm@vger.kernel.org>; Fri, 08 Dec 2023 10:21:22 -0800 (PST)
+ us-mta-147-6IdG74t5OBmTULg7NOZ82Q-1; Fri, 08 Dec 2023 13:39:29 -0500
+X-MC-Unique: 6IdG74t5OBmTULg7NOZ82Q-1
+Received: by mail-vk1-f199.google.com with SMTP id 71dfb90a1353d-4ac34ddfb8aso571129e0c.1
+        for <kvm@vger.kernel.org>; Fri, 08 Dec 2023 10:39:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702059681; x=1702664481;
+        d=1e100.net; s=20230601; t=1702060769; x=1702665569;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nLSlZUtE+vJwKxCXyAw/ZXA+/0tHeruZDXjXe1PSA+M=;
-        b=gZW4ulQA2ENtDO+xqiu4JXy+CApVy7jS3nyMMeRU9yoRojjhS31Arp9DYmCcpp2Xly
-         DPtoagMS23apQFmCrjsK29FxgfdbzJ6EGPveMvS+a13dfS3dpAV7WYsSMvLy2ERQNP8J
-         eT7pgwyuYo8MmvOEBxCgGT2hg41RVHawnIAaYShfLXT+dsWM4DoS322+1drZWseylr1A
-         Nu3vxV4KrAV2s/UM9lu0n+gtGw/rmC+HFtUyNRJT/RCQDixokcIVx5s7lg1CY6ikKcZL
-         GZItuscga+trqTCwfENqnqJrDqO9rQs8pLhRuBTGjapupXyjktea48J3KxlS1cpWPXo3
-         xdxA==
-X-Gm-Message-State: AOJu0YzK3hUadR8ZagCH/ikcXfdXBk2tjqR5o4iNHQXqFWxOlpwCdYtX
-	Q+Lvmvh/mbJ+CmQBBXXMLw15GKk9dtlg3o8ZE2hqisp/QY4sQ4OZC0u2YWKWr3yPRU/d7c4BDSY
-	2Cq9jeXUqkAe9RxT1TWPfD3YB9yJRbNwU5Hw2YTM=
-X-Received: by 2002:a05:6870:71d6:b0:1fb:34a7:ebbd with SMTP id p22-20020a05687071d600b001fb34a7ebbdmr566703oag.1.1702059681263;
-        Fri, 08 Dec 2023 10:21:21 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEbZzm5wC8wbpVxKq67MC5ECzNPzJFHkvrILIXuTMUoBGMt7D79VxJBXO0NVoVtV46/R206KUxojGA6kEUpH2c=
-X-Received: by 2002:a05:6870:71d6:b0:1fb:34a7:ebbd with SMTP id
- p22-20020a05687071d600b001fb34a7ebbdmr566694oag.1.1702059681015; Fri, 08 Dec
- 2023 10:21:21 -0800 (PST)
+        bh=5xpi6oKeZnMTqEA1GU/S46QdXQaCqr8RrHilbjEq4XU=;
+        b=h6KbNFAYMdWwXbvUxMQHV0oaB995TJre5ihw1qTde4LggzZ/uctBVUFbSdDp2+Ckic
+         KOPtMG4wvM0QxVUFCpBcJC+G7k9GbMX/dMrpD3TuAhboSUhD1PB3TRleFt/Fnm/m7qpI
+         cHTcictqv+tFCxADRZF9W7sVbXRQewlQj8NmfBjwNvxH6GpKylBKQeT5hD/FkFy6/c5m
+         +faeJQ2PE/OtnlfW3RezzYVRPcIbjphxf7Eg8KY7LUVO9cbT/m4jj8P4zr7QTLLzglmK
+         rmf/JlCXU/EFgrWnxeA3dCfals4cf0Tl9Q15Ea9H97WV7h9ir6HlWlVT4BGA09oq9w2h
+         4Fwg==
+X-Gm-Message-State: AOJu0YyG3qjn1xuY4hyN2usaQFdz/TSB0oV120CbLgowEfOxQfbZQpvV
+	k4O5QaciwygptjYgbF9WaNKC+nULOyiY9mlkfi4Sd0RnDqsIDIh+w4FiwA9CSspVsdOcst34f03
+	uOLhyvR4UF2gm320WKXMzJ/8lpcmt
+X-Received: by 2002:a05:6122:3109:b0:4b2:f6a2:7736 with SMTP id cg9-20020a056122310900b004b2f6a27736mr649958vkb.28.1702060768855;
+        Fri, 08 Dec 2023 10:39:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEV1aa0sxRQBUtb8Yg9bmtWfZ++LYpyWwYuXdMa4yWBmh1Kh+o1C5/hDc0PWIxzji4w5Q3kKRaFYRtPJHsE5OI=
+X-Received: by 2002:a05:6122:3109:b0:4b2:f6a2:7736 with SMTP id
+ cg9-20020a056122310900b004b2f6a27736mr649953vkb.28.1702060768633; Fri, 08 Dec
+ 2023 10:39:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231208021708.1707327-1-seanjc@google.com>
-In-Reply-To: <20231208021708.1707327-1-seanjc@google.com>
+References: <20231205234956.1156210-1-michael.roth@amd.com> <ZXCTHJPerz6l9sPw@google.com>
+In-Reply-To: <ZXCTHJPerz6l9sPw@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 8 Dec 2023 19:21:08 +0100
-Message-ID: <CABgObfbgs0z0Pe37T=TJprEkq0dZngSxKKKVnM74xHg6eFGegg@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM: selftests: Fixes and cleanups for 6.7-rcN
+Date: Fri, 8 Dec 2023 19:39:16 +0100
+Message-ID: <CABgObfb2AxwvseadmEBS7=VWLKKpYVeHkaecrPXG47sMfCKEZg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: SEV: Fix handling of EFER_LMA bit when SEV-ES is enabled
 To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 8, 2023 at 3:17=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+On Wed, Dec 6, 2023 at 4:28=E2=80=AFPM Sean Christopherson <seanjc@google.c=
 om> wrote:
->
-> Please pull selftests fixes/cleanups for 6.7.  The big change is adding
-> __printf() annotation to the guest printf/assert helpers, which is waaay
-> better than me playing whack-a-mole when tests fail (I'm still laughing
-> at myself for not realizing what that annotation does).
->
-> The following changes since commit e9e60c82fe391d04db55a91c733df4a017c28b=
-2f:
->
->   selftests/kvm: fix compilation on non-x86_64 platforms (2023-11-21 11:5=
-8:25 -0500)
+> Blech.  This is a hack to fix even worse hacks.  KVM ignores CR0/CR4/EFER=
+ values
+> that are set via KVM_SET_SREGS, i.e. KVM is rejecting an EFER value that =
+it will
+> never consume, which is ridiculous.  And the fact that you're not trying =
+to have
+> KVM actually set state further strengthens my assertion that tracking CR0=
+/CR4/EFER
+> in KVM is pointless necessary for SEV-ES+ guests[1].
 
-This would be a 6.8 change though.
+I agree that KVM is not going to consume CR0/CR4/EFER. I disagree that
+it's a good idea to have a value of vcpu->arch.efer that is
+architecturally impossible (so much so that it would fail vmentry in a
+non-SEV-ES guest).
 
-I singled out "KVM: selftests: Actually print out magic token in NX
-hugepages skip message" and "KVM: selftests: add -MP to CFLAGS" and
-pulled the rest into kvm/next, which means we'll have a couple dup
-commits but nothing too bad.
+I also agree that changing the source is not particularly useful, but
+then changing the destination can be easily done in userspace.
+
+In other words, bugfix or not this can and should be merged as a code
+cleanup (though your older "[PATCH 1/2] KVM: SVM: Update EFER software
+model on CR0 trap for SEV-ES" is nicer in that it clarifies that
+svm->vmcb->save.efer is not used, and that's what I would like to
+apply).
+
+> So my very strong preference is to first skip the kvm_is_valid_sregs() ch=
+eck
+
+No, please don't. If you want to add a quirk that, when disabled,
+causes all guest state get/set ioctls to fail, go ahead. But invalid
+processor state remains invalid, and should be rejected, even when KVM
+won't consume it.
+
+> My understanding is that SVM_VMGEXIT_AP_CREATION is going to force KVM to=
+ assume
+> maximal state anyways since KVM will have no way of verifying what state =
+is actually
+> shoved into the VMSA, i.e. emulating INIT is wildly broken[2].
+
+Yes, or alternatively a way to pass CR0/CR4/EFER from the guest should
+be included in the VMGEXIT spec.
+
+> Side topic, Peter suspected that KVM _does_ need to let userspace set CR8=
+ since
+> that's not captured in the VMSA[3].
+
+Makes sense, and then we would have to apply the 2/2 patch from 2021
+as well. But for now I'll leave that aside.
 
 Paolo
 
+> [1] https://lore.kernel.org/all/YJla8vpwqCxqgS8C@google.com
+> [2] https://lore.kernel.org/all/20231016132819.1002933-38-michael.roth@am=
+d.com
+> [3] https://lore.kernel.org/all/CAMkAt6oL9tfF5rvP0htbQNDPr50Zk41Q4KP-dM0N=
++SJ7xmsWvw@mail.gmail.com
 >
-> are available in the Git repository at:
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 2c924075f6f1..6fb2b913009e 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11620,7 +11620,8 @@ static int __set_sregs_common(struct kvm_vcpu *vc=
+pu, struct kvm_sregs *sregs,
+>         int idx;
+>         struct desc_ptr dt;
 >
->   https://github.com/kvm-x86/linux.git tags/kvm-x86-selftests-6.7-rcN
+> -       if (!kvm_is_valid_sregs(vcpu, sregs))
+> +       if (!vcpu->arch.guest_state_protected &&
+> +           !kvm_is_valid_sregs(vcpu, sregs))
+>                 return -EINVAL;
 >
-> for you to fetch changes up to 1b2658e4c709135fe1910423d3216632f641baf9:
->
->   KVM: selftests: Annotate guest ucall, printf, and assert helpers with _=
-_printf() (2023-12-01 08:15:41 -0800)
->
-> ----------------------------------------------------------------
-> KVM selftests fixes for 6.7-rcN:
->
->  - Fix an annoying goof where the NX hugepage test prints out garbage
->    instead of the magic token needed to run the text.
->
->  - Fix build errors when a header is delete/moved due to a missing flag
->    in the Makefile.
->
->  - Detect if KVM bugged/killed a selftest's VM and print out a helpful
->    message instead of complaining that a random ioctl() failed.
->
->  - Annotate the guest printf/assert helpers with __printf(), and fix the
->    various bugs that were lurking due to lack of said annotation.
->
-> ----------------------------------------------------------------
-> David Woodhouse (1):
->       KVM: selftests: add -MP to CFLAGS
->
-> Sean Christopherson (7):
->       KVM: selftests: Drop the single-underscore ioctl() helpers
->       KVM: selftests: Add logic to detect if ioctl() failed because VM wa=
-s killed
->       KVM: selftests: Remove x86's so called "MMIO warning" test
->       KVM: selftests: Fix MWAIT error message when guest assertion fails
->       KVM: selftests: Fix benign %llx vs. %lx issues in guest asserts
->       KVM: selftests: Fix broken assert messages in Hyper-V features test
->       KVM: selftests: Annotate guest ucall, printf, and assert helpers wi=
-th __printf()
->
-> angquan yu (1):
->       KVM: selftests: Actually print out magic token in NX hugepages skip=
- message
->
->  tools/testing/selftests/kvm/Makefile               |   3 +-
->  .../testing/selftests/kvm/include/kvm_util_base.h  |  75 ++++++++-----
->  tools/testing/selftests/kvm/include/test_util.h    |   2 +-
->  tools/testing/selftests/kvm/include/ucall_common.h |   7 +-
->  tools/testing/selftests/kvm/lib/kvm_util.c         |   2 +-
->  .../testing/selftests/kvm/set_memory_region_test.c |   6 +-
->  .../testing/selftests/kvm/x86_64/hyperv_features.c |  10 +-
->  .../selftests/kvm/x86_64/mmio_warning_test.c       | 121 ---------------=
-------
->  .../selftests/kvm/x86_64/monitor_mwait_test.c      |   6 +-
->  .../selftests/kvm/x86_64/nx_huge_pages_test.c      |   2 +-
->  .../kvm/x86_64/private_mem_conversions_test.c      |   2 +-
->  .../kvm/x86_64/svm_nested_soft_inject_test.c       |   4 +-
->  .../selftests/kvm/x86_64/vmx_pmu_caps_test.c       |   2 +-
->  .../testing/selftests/kvm/x86_64/xcr0_cpuid_test.c |   8 +-
->  14 files changed, 78 insertions(+), 172 deletions(-)
->  delete mode 100644 tools/testing/selftests/kvm/x86_64/mmio_warning_test.=
-c
+>         apic_base_msr.data =3D sregs->apic_base;
 >
 
 
