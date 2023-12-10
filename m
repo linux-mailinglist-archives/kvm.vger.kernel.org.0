@@ -1,184 +1,152 @@
-Return-Path: <kvm+bounces-4003-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4004-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14A2A80BA9D
-	for <lists+kvm@lfdr.de>; Sun, 10 Dec 2023 13:16:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDDA980BCA1
+	for <lists+kvm@lfdr.de>; Sun, 10 Dec 2023 20:06:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85B6EB20BA1
-	for <lists+kvm@lfdr.de>; Sun, 10 Dec 2023 12:16:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E862E1C2048F
+	for <lists+kvm@lfdr.de>; Sun, 10 Dec 2023 19:06:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75617BE79;
-	Sun, 10 Dec 2023 12:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75B8A1BDE8;
+	Sun, 10 Dec 2023 19:06:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XNGPxpqM"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LQNqp0KU"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66DB9290C;
-	Sun, 10 Dec 2023 12:16:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF365C433C9;
-	Sun, 10 Dec 2023 12:16:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702210596;
-	bh=zI/jeFRyjHplsqmull7ZiNDfoFDcHnPQwoXdDnLIe58=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XNGPxpqMpKbxiZDIIwqaAP4vnfVrNqeUImkpUgaTvVibWyF+2Td6NYdBTgGCG8ACy
-	 eXA05rq0mJvnlQ7bT6gFshJKSrDZ4rRxoaTWphSdn0dyipzHpkw3agwiO4oRHtBnD7
-	 XdrNR6lyCoQZdaOWT6KN330vSSuhzLMDIw7VHQVZNG1PW9RPfHNniNnkap6e+aI6M5
-	 sUdbMPxuS88tY+Ql086/6F63E7KcTUMRyDs0Kxi7qFZyt46iJ4X5z5zftq1SAiXQyX
-	 CwA9Nh7Xs5MLIRJvzRv+zGsx2zYl5k+gNoRbrnoZgDDskHAaZyCWViXyAjstMkwJJ4
-	 2EEHczNzYYg+g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rCIja-002tai-3P;
-	Sun, 10 Dec 2023 12:16:34 +0000
-Date: Sun, 10 Dec 2023 12:16:32 +0000
-Message-ID: <865y16b6cf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Tianyi Liu <i.pear@outlook.com>
-Cc: seanjc@google.com,
-	pbonzini@redhat.com,
-	peterz@infradead.org,
-	mingo@redhat.com,
-	acme@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
-	kvm@vger.kernel.org,
-	x86@kernel.org,
-	mark.rutland@arm.com,
-	mlevitsk@redhat.com,
-	alexander.shishkin@linux.intel.com,
-	jolsa@kernel.org,
-	namhyung@kernel.org,
-	irogers@google.com,
-	adrian.hunter@intel.com
-Subject: Re: [PATCH v3 1/5] KVM: Add arch specific interfaces for sampling guest callchains
-In-Reply-To: <SYBPR01MB6870FDFBB88F879C735198F39D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
-References: <SYBPR01MB687069BFC9744585B4EEF8C49D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
-	<SYBPR01MB6870FDFBB88F879C735198F39D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2055.outbound.protection.outlook.com [40.107.223.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E634F0;
+	Sun, 10 Dec 2023 11:05:56 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VUFVYFI1qhUn0VTnlIcglhjUJ57VnFEdGVFG8UYp938q74AiP+tTUX9b6waJIVew5EBSUnonKpLl/3RJ4DztmxZTehA2QFQs3btZGbK9zhWYK2A4PaguNjLE5DFfRDO6326TOS6B/rZj4JB8j6a+GSbtO/k0doN7gtzOA42ay/d6mptIaKL0kd/R2zHyz/Ao0DO/hVRES3YMZ04txhnegXMJdhbbkD1SLAw8+YkUvz2ncNuz/YHdQ560DSgoVkHAfJXVBGsLEwc8rb2aj3Jv0vplVP4qv58TFN2YV6u/tUNTRtS5Iq4MAdYZv8yCGZxr0cbxOfulbc308NfRN4AS3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mZBQrpkZoBhIxj/w/mK1NfwQr2EDcC4fHBxdZiol+xM=;
+ b=K9BLoyIWVGevFiOpHMQB+gsSj0dCZrnxG7Stbknd+AQFd22rT21WJTnz1CPsiuNq5e123ETOaBaz+lTSoIp2Q8UlRGENTXkc9MqnDBNaV6s9vRkO+10jlkJsuUR+CD5dBiPGcR1n8osK0QJwtPPeOViPTt4zeR12g1/Mxq2RwrvgST7BmKbZO9VaaLZi7ocNfl1tglUq32JnuqeU15eJWwtFYWCIi+ahY9BuYk/e3cnBPnk5vU2kfwvTbXMHtyeCEXmo5iFuvB1nOZMD+MQNVfBf7WoZSSnCQdS8u6MmhHBsvS2OuATxZSsN56w/BAFkp5WPb2Mbjqja3drU6U8SQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mZBQrpkZoBhIxj/w/mK1NfwQr2EDcC4fHBxdZiol+xM=;
+ b=LQNqp0KUv2mr2ox0ct7By9HKX6fOY1Y5EZlMh2Gq9grCp71T14wW6nRHRyvwUukI+RDlBD46XVlLRYyvt2+JzlTlrO7w26TaFQkIB6MCtF/pxXTStScx1y7+85cvIGpIjXVDroKFE77ipb9zgVXusCafFsIkBFjDeL983WIz3F8IOePGz9ivwbomwfxpg+0Vpp/TAHfyEbDMVtxJnFyrR+Vc8X8ukgE/uoBcfvnPqJYHJ3N7UBnKh4N2+ipPXtt/3V4FhpD+0xOb+S0A4wvH+wwMmypTk/Ns/5I0aU2irqAWra1MFLqKl+q+B3G7volEmovUGVc9fTVpojhWiPZstQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SJ2PR12MB7893.namprd12.prod.outlook.com (2603:10b6:a03:4cc::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Sun, 10 Dec
+ 2023 19:05:51 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7068.031; Sun, 10 Dec 2023
+ 19:05:50 +0000
+Date: Sun, 10 Dec 2023 15:05:49 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Jim Harris <jim.harris@samsung.com>
+Cc: Leon Romanovsky <leonro@nvidia.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	"bhelgaas@google.com" <bhelgaas@google.com>,
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"ben@nvidia.com" <ben@nvidia.com>,
+	"pierre.cregut@orange.com" <pierre.cregut@orange.com>
+Subject: Re: Locking between vfio hot-remove and pci sysfs sriov_numvfs
+Message-ID: <20231210190549.GA2944114@nvidia.com>
+References: <CGME20231207223824uscas1p27dd91f0af56cda282cd28046cc981fe9@uscas1p2.samsung.com>
+ <ZXJI5+f8bUelVXqu@ubuntu>
+ <20231207162148.2631fa58.alex.williamson@redhat.com>
+ <20231207234810.GN2692119@nvidia.com>
+ <ZXNNQkXzluoyeguu@bgt-140510-bm01.eng.stellus.in>
+ <20231208194159.GS2692119@nvidia.com>
+ <ZXN3+dHzM1N5b7r+@ubuntu>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXN3+dHzM1N5b7r+@ubuntu>
+X-ClientProxiedBy: BL0PR02CA0079.namprd02.prod.outlook.com
+ (2603:10b6:208:51::20) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: i.pear@outlook.com, seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, mark.rutland@arm.com, mlevitsk@redhat.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org, namhyung@kernel.org, irogers@google.com, adrian.hunter@intel.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ2PR12MB7893:EE_
+X-MS-Office365-Filtering-Correlation-Id: c72e17e1-98a4-4257-dde6-08dbf9b3068b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	TNM39ovKcUGk9i8g/rJGNffgeBKL6ZGbEuNnrAadmxNHpxHY5uk85txIG8WZL/AEi05UoYLMn/0oJhrmeZbgC7ccUeI96sJSCncNJoYpC/MVsYTgiq47lWXrL8wQumAkVWZrpCSxJ25kn2qyGcgeANhqHdDyywtETLET5JfZRYGqmfbyfzlas/zcaNd8GU0+GofqoFwBEOTMOT2c2RLUHvms3f4flh+Z0HTrvGsjgHbhQR3Q+mcD3gWMRdnd2nZBluHTpdE2QJ+JjmXN6IbbN6tzhKt/PoNeWX0SzIpK0Tqfr6Ufm0RUNRjhNHAL6NVOw+LmXzYIhv2GkGoZDMyNj28brRTyB9/j6yE9GH2dn3RnP815Y3Hj2TTnQs8HTKqeqqrZOiNEv/eQW8mcRH1Z4JQKXG6Q/2Lp0NLoT55OSr58cMdhoxegprmoeyk5Ja/XBQlRld7XkSqoxW1cgyB9mFVFoPW16qSNvcRNGI6DpTl2QXZFCkfD3KGIhXn0WHHSYZ3kUQyMkeJHvlMhuaTbLwR9rKFTSdRarAyQo56G2e0AKFQAsUrBRPhtw3ZYOy/4
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(376002)(39860400002)(346002)(366004)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(36756003)(6506007)(478600001)(2906002)(1076003)(83380400001)(26005)(6512007)(2616005)(6486002)(4326008)(8936002)(8676002)(5660300002)(54906003)(66946007)(6916009)(66556008)(66476007)(316002)(33656002)(38100700002)(86362001)(41300700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?/h/BTh4Gz51U6tRQmawsFMJRc22b6an6dL3ly/ZEfRZ2rwyZ6Ax6/mPjQUtx?=
+ =?us-ascii?Q?eHfxAjhd1Wrp2xkPrSoFIwSl7AuHtZrpOQHUsEuZGpsOkzXi4qHPZ6qoQCBA?=
+ =?us-ascii?Q?gXTMKpTlx06lUkB8O+5MekRsZQYtoyfBCX6Nzjv5GxxnJDt4/gn/WcWHKOPR?=
+ =?us-ascii?Q?3iBqBGtkJ1BwSrq/SgiV0QsjbkhqKqk/hDlHdELv0v1w6AX6rifRawWMSqoe?=
+ =?us-ascii?Q?kCAxrKDX2SlZJLEPq2Zz5jnGYnADU+yFTdwcqxO8M5eY12vbMTgZvNpiIoa1?=
+ =?us-ascii?Q?/6UhLO5tzj6TzE3GLs7fsiGnoqHL+c6d8uuIkUGlNwkcoYI/WPSbWOoRtW5b?=
+ =?us-ascii?Q?zoc1QhOsw6Bgre6qtna0+YfIRIdMhgZ4ZlE587GqkCBnklMrUZqeaAam9Yn7?=
+ =?us-ascii?Q?SsabiscuHD8eI3uSJZDsz3az4Lpm5kYmKy1MLI/Yvc9j6ZXaqbuVqB7m2hHy?=
+ =?us-ascii?Q?6w8seIPVc1Eu5dJwXhjE3yv1s6ZGP9HmaLsemFx7Fj1EpOjnevv0dHo3RF6g?=
+ =?us-ascii?Q?sfPus2zqmRvoOjYC5RPyiQiV0EdhsD9PXBY5R5LwlF4jvmL0FkTs5oe+fLwb?=
+ =?us-ascii?Q?RjzPrYfqKv0g7BLd4zwxBPV8al7Yiz7MQif2+ioLD45e8C72VNo1eWZFaTYG?=
+ =?us-ascii?Q?PVaA2JfmS4yVDExqwzMenXhmkQmM+cgVT5ASWot/YT9gurxDueX9p5tyWji9?=
+ =?us-ascii?Q?KqvqEcolod9Bs60GjTp0zSyLOpl17jgMgu7Uk5vsCoRYy32QJJqghmjAheYK?=
+ =?us-ascii?Q?4mXQBWo2T60zPuOWMzG6RYrhBGaqNmbzCCBDdESFSliG4hyRmoEr+nTnKr89?=
+ =?us-ascii?Q?I85+jQTeO1VZXtUCOy+x17khHS51WibLKoWOcYFLZPwuZ0PFM7mQUf9wKIcj?=
+ =?us-ascii?Q?3M9AtAV7HOQlV31JpDrcJ2846pqcshTcIrE9Dv927H+/Wv3p4yLy6udxQE/j?=
+ =?us-ascii?Q?IU4CK5GOgqchItANGV9bksD9MI3EzBIkvV4q9mYf5TTRzaGcJ/KQ2goY1LAs?=
+ =?us-ascii?Q?ZoR+hIoTnX8N485qACOgZ65sGrJqGcR2EnnPVA0ocJJXLBA7r46OoW4Apjp6?=
+ =?us-ascii?Q?n4NmNZSImUh0HA0J2uANFlCoDXBzz1dOLLEwcVop3B3DYCWkMKktwnU8Rl8Q?=
+ =?us-ascii?Q?JtLwO2vnJu3ptXiov2EuIkzlIuGFuu68n9cWqa8J6tgHQ7zYjPQ/gZZvsxPP?=
+ =?us-ascii?Q?BM58B0rzoywYkGgWY31bp47Cv7ZKW6FfBjo1BOxUYYlWjwK/runzYiM0/+QG?=
+ =?us-ascii?Q?6naMj5G/AUNuDj/fvPBrWOAwDNna/kbQwO9VYcZnsnAp+8K3erYOPO6kKvyM?=
+ =?us-ascii?Q?fQVqsGnb3dfV2atCJvehjjXWNyu3yC4vrL+/G0V0ucVCJgtr41spCCELjsy5?=
+ =?us-ascii?Q?MULufBwncCtrSR6qKLPfFIhhjazdhRSh5ZiQin7vYzqBraW4S0RzT+FH2/q5?=
+ =?us-ascii?Q?V0bmFlexBjfYInBzgNo2BJjhbFHwiO8KHskzhZfYewtQGCrq2Dl/3nVa8HdU?=
+ =?us-ascii?Q?BRYaV991acJJhArCTGsjAW+o8eiqPS3CboYWNR5E+6rmfWtdDFE1dj1/VgJp?=
+ =?us-ascii?Q?oKRBrpVj92oC/grsjnGMIbL5o2UGcCAEnYmO2FXe?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c72e17e1-98a4-4257-dde6-08dbf9b3068b
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2023 19:05:50.8931
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kyP2Dyza2x3QA5MCifgc1JgZst6a801iHJsuGI13TWPjJcvU4VQ7IERB0/AOZw/W
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7893
 
-On Sun, 10 Dec 2023 08:12:18 +0000,
-Tianyi Liu <i.pear@outlook.com> wrote:
+On Fri, Dec 08, 2023 at 08:09:34PM +0000, Jim Harris wrote:
+> On Fri, Dec 08, 2023 at 03:41:59PM -0400, Jason Gunthorpe wrote:
+> > On Fri, Dec 08, 2023 at 05:07:22PM +0000, Jim Harris wrote:
+> > > 
+> > > Maybe for now we just whack this specific mole with a separate mutex
+> > > for synchronizing access to sriov->num_VFs in the sysfs paths?
+> > > Something like this (tested on my system):
+> > 
+> > TBH, I don't have the time right now to unpack this locking
+> > mystery. Maybe Leon remembers?
+> > 
+> > device_lock() gets everywhere and does a lot of different stuff, so I
+> > would be surprised if it was so easy..
 > 
-> This patch adds two architecture specific interfaces used by `perf kvm`:
-> 
-> - kvm_arch_vcpu_get_unwind_info: Return required data for unwinding
->   at once; including ip address, frame pointer, whether the guest vCPU
->   is running in 32 or 64 bits, and possibly the base addresses of
->   the segments.
-> 
-> - kvm_arch_vcpu_read_virt: Read data from a virtual address of the
->   guest vm.
-> 
-> `perf_kvm.h` has been added to the `include/linux/` directory to store
-> the interface structures between the perf events subsystem and the KVM
-> subsystem.
-> 
-> Since arm64 hasn't provided some foundational infrastructure, stub the
-> arm64 implementation for now because it's a bit complex.
+> The store() side still keeps the device_lock(), it just also acquires this
+> new sriov lock. So store() side should observe zero differences. The only
+> difference is now the show() side can acquire just the more-granular lock,
+> since it is only trying to synchronize on sriov->num_VFs with the store()
+> side. But maybe I'm missing something subtle here...
 
-It's not complex. It is *unsafe*. Do you see the difference?
+Oh if that is the only goal then probably a READ_ONCE is fine
 
-> 
-> The above interfaces require architecture support for
-> `CONFIG_GUEST_PERF_EVENTS`, which is only implemented by x86 and arm64
-> currently. For more architectures, they need to implement these interfaces
-> when enabling `CONFIG_GUEST_PERF_EVENTS`.
-> 
-> In terms of safety, guests are designed to be read-only in this feature,
-> and we will never inject page faults into the guests, ensuring that the
-> guests are not interfered by profiling. In extremely rare cases, if the
-> guest is modifying the page table, there is a possibility of reading
-> incorrect data. Additionally, if certain programs running in the guest OS
-> do not support frame pointers, it may also result in some erroneous data.
-> These erroneous data will eventually appear as `[unknown]` entries in the
-> report. It is sufficient as long as most of the records are correct for
-> profiling.
-> 
-> Signed-off-by: Tianyi Liu <i.pear@outlook.com>
-> ---
->  MAINTAINERS              |  1 +
->  arch/arm64/kvm/arm.c     | 12 ++++++++++++
->  arch/x86/kvm/x86.c       | 24 ++++++++++++++++++++++++
->  include/linux/kvm_host.h |  5 +++++
->  include/linux/perf_kvm.h | 18 ++++++++++++++++++
->  5 files changed, 60 insertions(+)
->  create mode 100644 include/linux/perf_kvm.h
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 788be9ab5b73..5ee36b4a9701 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -16976,6 +16976,7 @@ F:	arch/*/kernel/*/perf_event*.c
->  F:	arch/*/kernel/perf_callchain.c
->  F:	arch/*/kernel/perf_event*.c
->  F:	include/linux/perf_event.h
-> +F:	include/linux/perf_kvm.h
->  F:	include/uapi/linux/perf_event.h
->  F:	kernel/events/*
->  F:	tools/lib/perf/
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index e5f75f1f1085..5ae74b5c263a 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -574,6 +574,18 @@ unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
->  {
->  	return *vcpu_pc(vcpu);
->  }
-> +
-> +bool kvm_arch_vcpu_get_unwind_info(struct kvm_vcpu *vcpu, struct perf_kvm_guest_unwind_info *info)
-> +{
-> +	/* TODO: implement */
-> +	return false;
-> +}
-> +
-> +bool kvm_arch_vcpu_read_virt(struct kvm_vcpu *vcpu, gva_t addr, void *dest, unsigned int length)
-> +{
-> +	/* TODO: implement */
-> +	return false;
-> +}
-
-I don't do it very often, but the only thing I can say about this is
-*NAK*.
-
-You have decided to ignore the previous review comments, which is your
-prerogative. However, I absolutely refuse to add half baked and
-*dangerous* stuff to the arm64's version of KVM.
-
-If you can convince the x86 folks that they absolutely want this, fine
-by me. But this need to be a buy-in interface, not something that is
-required for each and every architecture to have stubs, wrongly
-suggesting that extra work is needed.
-
-For arm64, the way to go is to have this in userspace. Which is both
-easy to implement and safe. And until we have such a userspace
-implementation as a baseline, I will not consider a kernel
-version.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Jason
 
