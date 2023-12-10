@@ -1,138 +1,186 @@
-Return-Path: <kvm+bounces-3992-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3993-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 706C180B8F3
-	for <lists+kvm@lfdr.de>; Sun, 10 Dec 2023 06:16:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6417580B93A
+	for <lists+kvm@lfdr.de>; Sun, 10 Dec 2023 07:21:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 068961F2107F
-	for <lists+kvm@lfdr.de>; Sun, 10 Dec 2023 05:16:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1E7A280ED2
+	for <lists+kvm@lfdr.de>; Sun, 10 Dec 2023 06:21:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 365E91FC9;
-	Sun, 10 Dec 2023 05:16:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5CF74426;
+	Sun, 10 Dec 2023 06:21:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="Sa5kv9s/";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="Sa5kv9s/"
 X-Original-To: kvm@vger.kernel.org
-X-Greylist: delayed 1325 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 09 Dec 2023 21:16:17 PST
-Received: from out03.mta.xmission.com (out03.mta.xmission.com [166.70.13.233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC441114
-	for <kvm@vger.kernel.org>; Sat,  9 Dec 2023 21:16:17 -0800 (PST)
-Received: from in02.mta.xmission.com ([166.70.13.52]:33540)
-	by out03.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.93)
-	(envelope-from <ebiederm@xmission.com>)
-	id 1rCBpP-00B9T9-5N; Sat, 09 Dec 2023 21:54:07 -0700
-Received: from ip68-227-168-167.om.om.cox.net ([68.227.168.167]:35840 helo=email.froward.int.ebiederm.org.xmission.com)
-	by in02.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.93)
-	(envelope-from <ebiederm@xmission.com>)
-	id 1rCBpN-00BEzy-T4; Sat, 09 Dec 2023 21:54:06 -0700
-From: "Eric W. Biederman" <ebiederm@xmission.com>
-To: "Gowans, James" <jgowans@amazon.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,  "Graf (AWS), Alexander"
- <graf@amazon.de>,  "seanjc@google.com" <seanjc@google.com>,  =?utf-8?Q?Sc?=
- =?utf-8?Q?h=C3=B6nherr=2C_Jan_H=2E?= <jschoenh@amazon.de>,
-  "yuzenghui@huawei.com"
- <yuzenghui@huawei.com>,  "atishp@atishpatra.org" <atishp@atishpatra.org>,
-  "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
-  "james.morse@arm.com" <james.morse@arm.com>,  "suzuki.poulose@arm.com"
- <suzuki.poulose@arm.com>,  "oliver.upton@linux.dev"
- <oliver.upton@linux.dev>,  "chenhuacai@kernel.org"
- <chenhuacai@kernel.org>,  "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>,  "kvmarm@lists.linux.dev"
- <kvmarm@lists.linux.dev>,  "maz@kernel.org" <maz@kernel.org>,
-  "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-  "aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
-  "anup@brainfault.org" <anup@brainfault.org>,  "kexec@lists.infradead.org"
- <kexec@lists.infradead.org>
-References: <20230512233127.804012-1-seanjc@google.com>
-	<20230512233127.804012-2-seanjc@google.com>
-	<cfed942fc767fa7b2fabc68a3357a7b95bd6a589.camel@amazon.com>
-Date: Sat, 09 Dec 2023 22:53:30 -0600
-In-Reply-To: <cfed942fc767fa7b2fabc68a3357a7b95bd6a589.camel@amazon.com>
-	(James Gowans's message of "Sat, 9 Dec 2023 07:26:36 +0000")
-Message-ID: <871qbud5f9.fsf@email.froward.int.ebiederm.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2a07:de40:b251:101:10:150:64:1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5907102;
+	Sat,  9 Dec 2023 22:21:43 -0800 (PST)
+Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 0EFA421FB5;
+	Sun, 10 Dec 2023 06:21:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1702189301; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=eMbINGogkyxk7Eq7pz90fULe5xNfa98e3nj/JUFDdnE=;
+	b=Sa5kv9s/RLfuNkHAGfZA47cCUM3t1TguXEd4UUr8PBVXwVuxvRUrGvbSmcMM82986I9yEJ
+	N5Hd6l3hgU0llsK4NZE7q74PIPMoL5IEl2SSvd1WyPQ49Ii3T+9azPmY0E7SmSLO24kM0j
+	dnrZ2iAYVmtgxX4miD6yeSQn9kytD2M=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1702189301; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=eMbINGogkyxk7Eq7pz90fULe5xNfa98e3nj/JUFDdnE=;
+	b=Sa5kv9s/RLfuNkHAGfZA47cCUM3t1TguXEd4UUr8PBVXwVuxvRUrGvbSmcMM82986I9yEJ
+	N5Hd6l3hgU0llsK4NZE7q74PIPMoL5IEl2SSvd1WyPQ49Ii3T+9azPmY0E7SmSLO24kM0j
+	dnrZ2iAYVmtgxX4miD6yeSQn9kytD2M=
+Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 8B5AC13240;
+	Sun, 10 Dec 2023 06:21:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap2.dmz-prg2.suse.org with ESMTPSA
+	id JTVQIPRYdWUFewAAn2gu4w
+	(envelope-from <jgross@suse.com>); Sun, 10 Dec 2023 06:21:40 +0000
+From: Juergen Gross <jgross@suse.com>
+To: linux-kernel@vger.kernel.org,
+	x86@kernel.org,
+	virtualization@lists.linux.dev,
+	kvm@vger.kernel.org
+Cc: Juergen Gross <jgross@suse.com>,
+	Ajay Kaher <akaher@vmware.com>,
+	Alexey Makhalov <amakhalov@vmware.com>,
+	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Wanpeng Li <wanpengli@tencent.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	xen-devel@lists.xenproject.org
+Subject: [PATCH v6 0/5] 86/paravirt: Get rid of paravirt patching
+Date: Sun, 10 Dec 2023 07:21:33 +0100
+Message-Id: <20231210062138.2417-1-jgross@suse.com>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-XM-SPF: eid=1rCBpN-00BEzy-T4;;;mid=<871qbud5f9.fsf@email.froward.int.ebiederm.org>;;;hst=in02.mta.xmission.com;;;ip=68.227.168.167;;;frm=ebiederm@xmission.com;;;spf=pass
-X-XM-AID: U2FsdGVkX1+JmH+hfPfL+HY3DU2+KTDcxM737ZP9cTs=
-X-SA-Exim-Connect-IP: 68.227.168.167
-X-SA-Exim-Mail-From: ebiederm@xmission.com
-X-Spam-DCC: XMission; sa06 1397; Body=1 Fuz1=1 Fuz2=1 
-X-Spam-Combo: *;"Gowans, James" <jgowans@amazon.com>
-X-Spam-Relay-Country: 
-X-Spam-Timing: total 676 ms - load_scoreonly_sql: 0.04 (0.0%),
-	signal_user_changed: 12 (1.8%), b_tie_ro: 11 (1.6%), parse: 1.39
-	(0.2%), extract_message_metadata: 4.0 (0.6%), get_uri_detail_list:
-	1.64 (0.2%), tests_pri_-2000: 3.1 (0.5%), tests_pri_-1000: 3.5 (0.5%),
-	tests_pri_-950: 1.20 (0.2%), tests_pri_-900: 1.03 (0.2%),
-	tests_pri_-90: 332 (49.0%), check_bayes: 330 (48.8%), b_tokenize: 8
-	(1.2%), b_tok_get_all: 9 (1.4%), b_comp_prob: 2.4 (0.4%),
-	b_tok_touch_all: 306 (45.3%), b_finish: 0.89 (0.1%), tests_pri_0: 295
-	(43.7%), check_dkim_signature: 0.54 (0.1%), check_dkim_adsp: 3.4
-	(0.5%), poll_dns_idle: 1.54 (0.2%), tests_pri_10: 3.2 (0.5%),
-	tests_pri_500: 10 (1.5%), rewrite_mail: 0.00 (0.0%)
-Subject: Re: [PATCH v2 1/2] KVM: Use syscore_ops instead of reboot_notifier
- to hook restart/shutdown
-X-SA-Exim-Version: 4.2.1 (built Sat, 08 Feb 2020 21:53:50 +0000)
-X-SA-Exim-Scanned: Yes (on in02.mta.xmission.com)
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: ****************
+X-Spam-Score: 16.72
+X-Spam-Level: 
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.com header.s=susede1 header.b="Sa5kv9s/";
+	dmarc=pass (policy=quarantine) header.from=suse.com;
+	spf=fail (smtp-out1.suse.de: domain of jgross@suse.com does not designate 2a07:de40:b281:104:10:150:64:98 as permitted sender) smtp.mailfrom=jgross@suse.com
+X-Rspamd-Server: rspamd2
+X-Spamd-Result: default: False [-3.91 / 50.00];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 R_MISSING_CHARSET(2.50)[];
+	 BROKEN_CONTENT_TYPE(1.50)[];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_TRACE(0.00)[suse.com:+];
+	 MX_GOOD(-0.01)[];
+	 DMARC_POLICY_ALLOW(0.00)[suse.com,quarantine];
+	 DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 BAYES_HAM(-3.00)[100.00%];
+	 ARC_NA(0.00)[];
+	 R_SPF_FAIL(0.00)[-all];
+	 R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
+	 FROM_HAS_DN(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_SPAM_SHORT(2.90)[0.968];
+	 DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	 WHITELIST_DMARC(-7.00)[suse.com:D:+];
+	 RCPT_COUNT_TWELVE(0.00)[18];
+	 MID_CONTAINS_FROM(1.00)[];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 RCVD_TLS_ALL(0.00)[]
+X-Spam-Score: -3.91
+X-Rspamd-Queue-Id: 0EFA421FB5
+X-Spam-Flag: NO
 
-"Gowans, James" <jgowans@amazon.com> writes:
+This is a small series getting rid of paravirt patching by switching
+completely to alternative patching for the same functionality.
 
-> Hi Sean,
->
-> Blast from the past but I've just been bitten by this patch when
-> rebasing across v6.4.
->
-> On Fri, 2023-05-12 at 16:31 -0700, Sean Christopherson wrote:
->> Use syscore_ops.shutdown to disable hardware virtualization during a
->> reboot instead of using the dedicated reboot_notifier so that KVM disabl=
-es
->> virtualization _after_ system_state has been updated.=C2=A0 This will al=
-low
->> fixing a race in KVM's handling of a forced reboot where KVM can end up
->> enabling hardware virtualization between kernel_restart_prepare() and
->> machine_restart().
->
-> The issue is that, AFAICT, the syscore_ops.shutdown are not called when
-> doing a kexec. Reboot notifiers are called across kexec via:
->
-> kernel_kexec
->   kernel_restart_prepare
->     blocking_notifier_call_chain
->       kvm_reboot
->
-> So after this patch, KVM is not shutdown during kexec; if hardware virt
-> mode is enabled then the kexec hangs in exactly the same manner as you
-> describe with the reboot.
+The basic idea is to add the capability to switch from indirect to
+direct calls via a special alternative patching option.
 
-kernel_restart_prepare calls device_shutdown.  Which should call all
-of the shutdown operations.  This has been the way the code has been
-structured since December 2005.
+This removes _some_ of the paravirt macro maze, but most of it needs
+to stay due to the need of hiding the call instructions from the
+compiler in order to avoid needless register save/restore.
 
-> Some specific shutdown callbacks, for example IOMMU, HPET, IRQ, etc are
-> called in native_machine_shutdown, but KVM is not one of these.
->
-> Thoughts on possible ways to fix this:
-> a) go back to reboot notifiers
-> b) get kexec to call syscore_shutdown() to invoke all of these callbacks
-> c) Add a KVM-specific callback to native_machine_shutdown(); we only
-> need this for Intel x86, right?
->
-> My slight preference is towards adding syscore_shutdown() to kexec, but
-> I'm not sure that's feasible. Adding kexec maintainers for input.
+What is going away is the nasty stacking of alternative and paravirt
+patching and (of course) the special .parainstructions linker section.
 
-Why isn't device_suthdown calling syscore_shutdown?
+I have tested the series on bare metal and as Xen PV domain to still
+work.
 
-What problem are you running into with your rebase that worked with
-reboot notifiers that is not working with syscore_shutdown?
+Note that objtool might need some changes to cope with the new
+indirect call patching mechanism. Additionally some paravirt handling
+can probably be removed from it.
 
-Eric
+Changes in V6:
+- addressed Boris' comments
+
+Changes in V5:
+- addressed Boris' comments
+- rebased on top of the tip/master branch
+
+Changes in V4:
+- addressed Boris' comments in patch 1
+- fixed bugs found by kernel test robot (patch 2)
+
+Changes in V3:
+- split v2 patch 3 into 2 patches as requested by Peter and Ingo
+
+Changes in V2:
+- split last patch into 2
+- rebase of patch 2 as suggested by Peter
+- addressed Peter's comments for patch 3
+
+Juergen Gross (5):
+  x86/paravirt: introduce ALT_NOT_XEN
+  x86/paravirt: move some functions and defines to alternative
+  x86/alternative: add indirect call patching
+  x86/paravirt: switch mixed paravirt/alternative calls to alternative_2
+  x86/paravirt: remove no longer needed paravirt patching code
+
+ arch/x86/include/asm/alternative.h        |  30 ++++-
+ arch/x86/include/asm/paravirt.h           |  77 ++++--------
+ arch/x86/include/asm/paravirt_types.h     |  85 +++++---------
+ arch/x86/include/asm/qspinlock_paravirt.h |   4 +-
+ arch/x86/include/asm/text-patching.h      |  12 --
+ arch/x86/kernel/alternative.c             | 136 +++++++++++-----------
+ arch/x86/kernel/callthunks.c              |  17 ++-
+ arch/x86/kernel/kvm.c                     |   4 +-
+ arch/x86/kernel/module.c                  |  20 +---
+ arch/x86/kernel/paravirt.c                |  54 +--------
+ arch/x86/kernel/vmlinux.lds.S             |  13 ---
+ arch/x86/tools/relocs.c                   |   2 +-
+ arch/x86/xen/irq.c                        |   2 +-
+ 13 files changed, 169 insertions(+), 287 deletions(-)
+
+-- 
+2.35.3
+
 
