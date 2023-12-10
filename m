@@ -1,146 +1,184 @@
-Return-Path: <kvm+bounces-4002-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4003-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0E8580BA3E
-	for <lists+kvm@lfdr.de>; Sun, 10 Dec 2023 12:01:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14A2A80BA9D
+	for <lists+kvm@lfdr.de>; Sun, 10 Dec 2023 13:16:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF9601C2090E
-	for <lists+kvm@lfdr.de>; Sun, 10 Dec 2023 11:01:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85B6EB20BA1
+	for <lists+kvm@lfdr.de>; Sun, 10 Dec 2023 12:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326AB8494;
-	Sun, 10 Dec 2023 11:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75617BE79;
+	Sun, 10 Dec 2023 12:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QL5BVqUv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XNGPxpqM"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4829510A
-	for <kvm@vger.kernel.org>; Sun, 10 Dec 2023 03:01:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702206066;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=vcMTkBmsMSR+TJtwz30pl082Vy2SUA+d1o6O16UtCUc=;
-	b=QL5BVqUvW6SPtJMygPSG5ZLZQ67zRlcDB9ZaQLAbIPozkmL8eRH0ZUuXOx/CPQosWJE6Wh
-	Ix4FS1Wr8xoKkZzc2GGxQ2Qzul+WGLPNnZbb8OAQVzEcq0ZMvBNxCt+s9IcDobO73ZNg3a
-	0dX36PqulyxNVuQECKu7Fa+JEEB3aYE=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-15-bbEOZewPMF6L0_gJPRBFDQ-1; Sun,
- 10 Dec 2023 06:01:02 -0500
-X-MC-Unique: bbEOZewPMF6L0_gJPRBFDQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 81AE529AB3E6;
-	Sun, 10 Dec 2023 11:01:02 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 64F1CC157C0;
-	Sun, 10 Dec 2023 11:01:02 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 6.7-rc5
-Date: Sun, 10 Dec 2023 06:01:01 -0500
-Message-Id: <20231210110101.2435586-1-pbonzini@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66DB9290C;
+	Sun, 10 Dec 2023 12:16:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF365C433C9;
+	Sun, 10 Dec 2023 12:16:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702210596;
+	bh=zI/jeFRyjHplsqmull7ZiNDfoFDcHnPQwoXdDnLIe58=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XNGPxpqMpKbxiZDIIwqaAP4vnfVrNqeUImkpUgaTvVibWyF+2Td6NYdBTgGCG8ACy
+	 eXA05rq0mJvnlQ7bT6gFshJKSrDZ4rRxoaTWphSdn0dyipzHpkw3agwiO4oRHtBnD7
+	 XdrNR6lyCoQZdaOWT6KN330vSSuhzLMDIw7VHQVZNG1PW9RPfHNniNnkap6e+aI6M5
+	 sUdbMPxuS88tY+Ql086/6F63E7KcTUMRyDs0Kxi7qFZyt46iJ4X5z5zftq1SAiXQyX
+	 CwA9Nh7Xs5MLIRJvzRv+zGsx2zYl5k+gNoRbrnoZgDDskHAaZyCWViXyAjstMkwJJ4
+	 2EEHczNzYYg+g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rCIja-002tai-3P;
+	Sun, 10 Dec 2023 12:16:34 +0000
+Date: Sun, 10 Dec 2023 12:16:32 +0000
+Message-ID: <865y16b6cf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Tianyi Liu <i.pear@outlook.com>
+Cc: seanjc@google.com,
+	pbonzini@redhat.com,
+	peterz@infradead.org,
+	mingo@redhat.com,
+	acme@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	kvm@vger.kernel.org,
+	x86@kernel.org,
+	mark.rutland@arm.com,
+	mlevitsk@redhat.com,
+	alexander.shishkin@linux.intel.com,
+	jolsa@kernel.org,
+	namhyung@kernel.org,
+	irogers@google.com,
+	adrian.hunter@intel.com
+Subject: Re: [PATCH v3 1/5] KVM: Add arch specific interfaces for sampling guest callchains
+In-Reply-To: <SYBPR01MB6870FDFBB88F879C735198F39D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
+References: <SYBPR01MB687069BFC9744585B4EEF8C49D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
+	<SYBPR01MB6870FDFBB88F879C735198F39D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: i.pear@outlook.com, seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, mark.rutland@arm.com, mlevitsk@redhat.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org, namhyung@kernel.org, irogers@google.com, adrian.hunter@intel.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Linus,
+On Sun, 10 Dec 2023 08:12:18 +0000,
+Tianyi Liu <i.pear@outlook.com> wrote:
+> 
+> This patch adds two architecture specific interfaces used by `perf kvm`:
+> 
+> - kvm_arch_vcpu_get_unwind_info: Return required data for unwinding
+>   at once; including ip address, frame pointer, whether the guest vCPU
+>   is running in 32 or 64 bits, and possibly the base addresses of
+>   the segments.
+> 
+> - kvm_arch_vcpu_read_virt: Read data from a virtual address of the
+>   guest vm.
+> 
+> `perf_kvm.h` has been added to the `include/linux/` directory to store
+> the interface structures between the perf events subsystem and the KVM
+> subsystem.
+> 
+> Since arm64 hasn't provided some foundational infrastructure, stub the
+> arm64 implementation for now because it's a bit complex.
 
-The following changes since commit 33cc938e65a98f1d29d0a18403dbbee050dcad9a:
+It's not complex. It is *unsafe*. Do you see the difference?
 
-  Linux 6.7-rc4 (2023-12-03 18:52:56 +0900)
+> 
+> The above interfaces require architecture support for
+> `CONFIG_GUEST_PERF_EVENTS`, which is only implemented by x86 and arm64
+> currently. For more architectures, they need to implement these interfaces
+> when enabling `CONFIG_GUEST_PERF_EVENTS`.
+> 
+> In terms of safety, guests are designed to be read-only in this feature,
+> and we will never inject page faults into the guests, ensuring that the
+> guests are not interfered by profiling. In extremely rare cases, if the
+> guest is modifying the page table, there is a possibility of reading
+> incorrect data. Additionally, if certain programs running in the guest OS
+> do not support frame pointers, it may also result in some erroneous data.
+> These erroneous data will eventually appear as `[unknown]` entries in the
+> report. It is sufficient as long as most of the records are correct for
+> profiling.
+> 
+> Signed-off-by: Tianyi Liu <i.pear@outlook.com>
+> ---
+>  MAINTAINERS              |  1 +
+>  arch/arm64/kvm/arm.c     | 12 ++++++++++++
+>  arch/x86/kvm/x86.c       | 24 ++++++++++++++++++++++++
+>  include/linux/kvm_host.h |  5 +++++
+>  include/linux/perf_kvm.h | 18 ++++++++++++++++++
+>  5 files changed, 60 insertions(+)
+>  create mode 100644 include/linux/perf_kvm.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 788be9ab5b73..5ee36b4a9701 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -16976,6 +16976,7 @@ F:	arch/*/kernel/*/perf_event*.c
+>  F:	arch/*/kernel/perf_callchain.c
+>  F:	arch/*/kernel/perf_event*.c
+>  F:	include/linux/perf_event.h
+> +F:	include/linux/perf_kvm.h
+>  F:	include/uapi/linux/perf_event.h
+>  F:	kernel/events/*
+>  F:	tools/lib/perf/
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index e5f75f1f1085..5ae74b5c263a 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -574,6 +574,18 @@ unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
+>  {
+>  	return *vcpu_pc(vcpu);
+>  }
+> +
+> +bool kvm_arch_vcpu_get_unwind_info(struct kvm_vcpu *vcpu, struct perf_kvm_guest_unwind_info *info)
+> +{
+> +	/* TODO: implement */
+> +	return false;
+> +}
+> +
+> +bool kvm_arch_vcpu_read_virt(struct kvm_vcpu *vcpu, gva_t addr, void *dest, unsigned int length)
+> +{
+> +	/* TODO: implement */
+> +	return false;
+> +}
 
-are available in the Git repository at:
+I don't do it very often, but the only thing I can say about this is
+*NAK*.
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+You have decided to ignore the previous review comments, which is your
+prerogative. However, I absolutely refuse to add half baked and
+*dangerous* stuff to the arm64's version of KVM.
 
-for you to fetch changes up to 4cdf351d3630a640ab6a05721ef055b9df62277f:
+If you can convince the x86 folks that they absolutely want this, fine
+by me. But this need to be a buy-in interface, not something that is
+required for each and every architecture to have stubs, wrongly
+suggesting that extra work is needed.
 
-  KVM: SVM: Update EFER software model on CR0 trap for SEV-ES (2023-12-08 13:37:05 -0500)
+For arm64, the way to go is to have this in userspace. Which is both
+easy to implement and safe. And until we have such a userspace
+implementation as a baseline, I will not consider a kernel
+version.
 
-----------------------------------------------------------------
-Generic:
+	M.
 
-* Set .owner for various KVM file_operations so that files refcount the
-  KVM module until KVM is done executing _all_ code, including the last
-  few instructions of kvm_put_kvm().  And then revert the misguided
-  attempt to rely on "struct kvm" refcounts to pin KVM-the-module.
-
-ARM:
-
-* Do not redo the mapping of vLPIs, if they have already been mapped
-
-s390:
-
-* Do not leave bits behind in PTEs
-
-* Properly catch page invalidations that affect the prefix of a nested
-  guest
-
-x86:
-
-* When checking if a _running_ vCPU is "in-kernel", i.e. running at CPL0,
-  get the CPL directly instead of relying on preempted_in_kernel (which
-  is valid if and only if the vCPU was preempted, i.e. NOT running).
-
-* Fix a benign "return void" that was recently introduced.
-
-Selftests:
-
-* Makefile tweak for dependency generation
-
-* -Wformat fix
-
-----------------------------------------------------------------
-Claudio Imbrenda (2):
-      KVM: s390: vsie: fix wrong VIR 37 when MSO is used
-      KVM: s390/mm: Properly reset no-dat
-
-David Woodhouse (1):
-      KVM: selftests: add -MP to CFLAGS
-
-Kunkun Jiang (1):
-      KVM: arm64: GICv4: Do not perform a map to a mapped vLPI
-
-Like Xu (2):
-      KVM: x86: Get CPL directly when checking if loaded vCPU is in kernel mode
-      KVM: x86: Remove 'return void' expression for 'void function'
-
-Paolo Bonzini (3):
-      Merge tag 'kvmarm-fixes-6.7-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into kvm-master
-      Merge tag 'kvm-s390-master-6.7-1' of https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into kvm-master
-      Merge tag 'kvm-x86-fixes-6.7-rcN' of https://github.com/kvm-x86/linux into kvm-master
-
-Sean Christopherson (3):
-      KVM: Set file_operations.owner appropriately for all such structures
-      Revert "KVM: Prevent module exit until all VMs are freed"
-      KVM: SVM: Update EFER software model on CR0 trap for SEV-ES
-
-angquan yu (1):
-      KVM: selftests: Actually print out magic token in NX hugepages skip message
-
- arch/arm64/kvm/vgic/vgic-v4.c                          |  4 ++++
- arch/s390/kvm/vsie.c                                   |  4 ----
- arch/s390/mm/pgtable.c                                 |  2 +-
- arch/x86/kvm/debugfs.c                                 |  1 +
- arch/x86/kvm/svm/svm.c                                 |  8 +++++---
- arch/x86/kvm/x86.c                                     |  9 ++++++---
- tools/testing/selftests/kvm/Makefile                   |  2 +-
- .../testing/selftests/kvm/x86_64/nx_huge_pages_test.c  |  2 +-
- virt/kvm/kvm_main.c                                    | 18 ++++++++----------
- 9 files changed, 27 insertions(+), 23 deletions(-)
-
+-- 
+Without deviation from the norm, progress is not possible.
 
