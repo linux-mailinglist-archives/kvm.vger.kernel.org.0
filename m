@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-3996-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-3997-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35F1880B9CA
-	for <lists+kvm@lfdr.de>; Sun, 10 Dec 2023 09:09:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF03480B9CC
+	for <lists+kvm@lfdr.de>; Sun, 10 Dec 2023 09:13:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFFBA280EE0
-	for <lists+kvm@lfdr.de>; Sun, 10 Dec 2023 08:09:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF98BB20A7B
+	for <lists+kvm@lfdr.de>; Sun, 10 Dec 2023 08:13:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 697E36D3F;
-	Sun, 10 Dec 2023 08:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F34006D3F;
+	Sun, 10 Dec 2023 08:13:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="OZ8aMSRP"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="pR+oypzw"
 X-Original-To: kvm@vger.kernel.org
-Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2150.outbound.protection.outlook.com [40.92.62.150])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED3369D;
-	Sun, 10 Dec 2023 00:08:55 -0800 (PST)
+Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2175.outbound.protection.outlook.com [40.92.62.175])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06A9EC5;
+	Sun, 10 Dec 2023 00:13:00 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ivq+NRXjxGDwnKnLRZGXu/whyyqDohuGgc9DHRz/N+8kdS2qwgRx6tXeYiUZsCP4CspfnSLaytb2crBkUMURY84KRfHktzBUlyKtRp2axx7moGbpr/I2+AYNceeMpEw17O7qzSkn+JETGbJHVCcs+Hg6OfAnUIMGYAyYQ09zpQeJtigxpjf/Rc/Fuxxbg90ckylqyMxUsdotknmvOsFJBhH0MdLj/dFlfj8r/fqv8gjqf92aL3GBh7IQgYA3rRa4PW7Gf+BGQdhBFYUoZmzgQahTeN0+Pc10IDGKCikp/uiYsfO735bN0MhhsuJHv4XB5WjQPpUIJBI7GFdAtIKxBQ==
+ b=ksGonCfeaPwR6l5GxKxoTf6pnuz1Bjt0wtGjUOpjJf6cj4uLUkoo7i9+iZU069MuRND+1EMuEymxCokQ3aV/PXa7nFGpKj2mTN1fYNx4U9fI7E89R6P8RQA936lUW8mjzyV9LYXLfc0+yS2lAgzVqQnKUtfVHwFrSKDQhY4KXs5wwj+zzsDHpa8/zxBq/99Z+FqKs/+KFMFT3hF673nI5vaN+KvBNJBGKjdb42c5rm6ec0PiP7lTeJ3DKBupa1L+FbhF85Ocb/IIB42yOSlMwDq9YzMYUGm4apaiyWOKCvIWZHLOwR/Li/ich7zfIg7vCoSW8mz9lCoOrn90oMuNKQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fzAcBBC3/Qh5JHV4M83f1kBaLFDSVNfSmRZxxUCxyog=;
- b=efli0bupdNhVgqjnwi18WmWOk8a5DPWcd1w1edMLvYh0Ujm2yxD5juHOK30nk0OJRRMvxmNPtfxXggYFbV0r6QrhsD6vMHO0wQs58Us8EE+K2t41B1LPBQxr9ok6T1QRYtbs3wzsJoNDjQde4QgA2xnm5HY6yMwaHDYGf9KGqQJfF/B64TQ0m8St6VA+lFToi3KwhJNiyZfzqwARMC3uMq1TXi9t7FIkXNKEjOHRpKQa5sym1blKtFciyHO7TXhwD4YsEDAiYegaM5eZWXOyRoqvrYX1Qc/YwajyuDUafv/NTWjc0xX+UBYmDC3ONBU4AdmHoqEV3ZDeZHJO0L2btw==
+ bh=QPuHegOvjI1Wqy9bawitz85TcVTd7dRsokA5lEbAaHg=;
+ b=CJJHfaihp31VcOb8dRdNImfqLJftgWnv8kkScbTIFaeSvgoh1/avnwQx38q+XkMMXlIPwsQmV8SC3a4ORVwHUubl3+Lqbq3VZcZCiA7JRgeCKJtxr7xXxunGCUHIdXRu41CHdH2Q2eGQCozVkOTOcWlvhhDqU3jWQGDsxSBv4sPyFni+Yr2lnfcCiijbs6/UeQXVtfiP9aPBmrquG0pW1nTKAXcO0PIjl8OsTxcDJfnsTD18Zh4QPnE85ZKgLNr/AYpja/XXsxJFDRCokptrgEzkK+J7VX0IqspcE4Pvzytg4hMzDrlUkm/ftXOS/9Y8IjwjwgtVO9fUoXLVRDwf5Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
  dkim=none; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fzAcBBC3/Qh5JHV4M83f1kBaLFDSVNfSmRZxxUCxyog=;
- b=OZ8aMSRPVUpn99S1lKPRGQWg7meUP76wavfBqFXDlh381lzEeFAA4hgb1JlOj46LcyizVdNsJp7o1qz+BECP7P7qMFPWNhD+/S3OMTAw8R8ff+PNIf1NsawHs5/22gssjQ5JB21vvdnsgTxXPSwS/N5oqNd4mBprA5hxDLZKgMoi1WVDPrlqxMJmw78mUyMzl7gRJB+cHpk+hz9DGWsQDxLF3dr4fPOHbQzeuMO/4zt8T+SJVXjuCrbPfjaM8rRTePfYfd5A56Js8mb3qwknKxT9x08We0j/R1xMpgKRHKKU1NUKLAEWBFOFHjTMwiJs/1z9jm77b4q+e4wF8Igw5g==
+ bh=QPuHegOvjI1Wqy9bawitz85TcVTd7dRsokA5lEbAaHg=;
+ b=pR+oypzw3XWu2MtJ9PWqLyoJXpzYdwiWXRfzQoGX014y3p2dqrcyjSL2EBeHqLD1vEZtVAos/eVyYkRWKlWLHvsIHdv2cadY1a1AFthCw3Kddg2r+I5tnDOtdht9xAT70t3XseQXoeSjM/uWUi1gEpi9DNGJBkjSv2Hvw0+mfEhSPjcNmABUwkwai2eHlzUj9+/Hj0j5zpKMzvQCWxZefL2BKsVXtacDKYgOI+NAN24nCZyBtpWYoTfZ49y8vCgacGCBykd509lQMgjfUDjm+KxA3103CmrL2Out2aP8J2KqDVxrC7OJNBECn22Q0R+d66PnDcDgOCEU3vkmfX2EGA==
 Received: from SYBPR01MB6870.ausprd01.prod.outlook.com (2603:10c6:10:13d::10)
  by MEYPR01MB7339.ausprd01.prod.outlook.com (2603:10c6:220:15f::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.31; Sun, 10 Dec
- 2023 08:08:49 +0000
+ 2023 08:12:53 +0000
 Received: from SYBPR01MB6870.ausprd01.prod.outlook.com
  ([fe80::be5a:160f:5418:9deb]) by SYBPR01MB6870.ausprd01.prod.outlook.com
  ([fe80::be5a:160f:5418:9deb%5]) with mapi id 15.20.7068.030; Sun, 10 Dec 2023
- 08:08:49 +0000
+ 08:12:53 +0000
 From: Tianyi Liu <i.pear@outlook.com>
 To: seanjc@google.com,
 	pbonzini@redhat.com,
@@ -62,18 +62,20 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	irogers@google.com,
 	adrian.hunter@intel.com,
 	Tianyi Liu <i.pear@outlook.com>
-Subject: [PATCH v3 0/5] perf: KVM: Enable callchains for guests
-Date: Sun, 10 Dec 2023 16:07:42 +0800
+Subject: [PATCH v3 1/5] KVM: Add arch specific interfaces for sampling guest callchains
+Date: Sun, 10 Dec 2023 16:12:18 +0800
 Message-ID:
- <SYBPR01MB687069BFC9744585B4EEF8C49D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
+ <SYBPR01MB6870FDFBB88F879C735198F39D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <SYBPR01MB687069BFC9744585B4EEF8C49D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
+References: <SYBPR01MB687069BFC9744585B4EEF8C49D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-TMN: [5hP5SFsKOSJHZzIDoL6ixfHLgGiQ2S0WroETPYou9oYzvUMOQ2+dyQ==]
-X-ClientProxiedBy: SG2PR01CA0189.apcprd01.prod.exchangelabs.com
- (2603:1096:4:189::15) To SYBPR01MB6870.ausprd01.prod.outlook.com
+X-TMN: [QSggTfQqFdbZg1h9Gs/NfozjCC3waagQZgTkdujY8Bxzr5XF3x6M1A==]
+X-ClientProxiedBy: SG2PR01CA0125.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:40::29) To SYBPR01MB6870.ausprd01.prod.outlook.com
  (2603:10c6:10:13d::10)
-X-Microsoft-Original-Message-ID: <20231210080742.2135-1-i.pear@outlook.com>
+X-Microsoft-Original-Message-ID: <20231210081218.2226-1-i.pear@outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,39 +85,39 @@ MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SYBPR01MB6870:EE_|MEYPR01MB7339:EE_
-X-MS-Office365-Filtering-Correlation-Id: bfc982f2-5ffa-4a9b-075e-08dbf9573bf5
+X-MS-Office365-Filtering-Correlation-Id: e6e3b1ce-4bc6-4d46-15a7-08dbf957cec1
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	Z1xFtd/ebhKIquqP+AniVhqEOR5bQv6zvqqrZrQEiWkLDkudW76b3dS0SsnxRSN4Hd8/rd9kqY3hrraBts6vKj04KqNo1hYV8pt49wRx9UJ2Yyxd0xnh+PZP/VSwsJvaPxcUt9UcmNssbrvBX8VfNAqu3LuV1udXL0lel3fYGlYedfgqj8GCUZE8haVvHkUPyY/h4By/Mxyy49T4TH5tscrKw6IH5tryo+aO+ebXHm3Dd4oU6//THlfmYcKbDdvnizO4YspBPoDff2v1X5X0sR8yDay3cIRpBHv+u2ULBpCHc9iCd0IXGF1F8mK8fd9HB7f7/P25onZ6kRybCEogoJE5NeEkkZUEqeNqW9jUIltjaAQomi7ajZxBSM6jg5knxDvLny2g74B/27EtP8cFV1l3s6pPv726B7K8qGeRPxh9sGYX+EJJSKw495/jFBvR3mXBQCA37E+OCcWJs/nAyXyigOtBUjuHPl0iBNxXrVAKb3qKMqu/31aoEu+qK+v1yV57RwdyHkWA1BSDKknRdU778lKQcKE1ji+G9XWB7wvXlZyo9wpd9Onobeq+7qefUHSd/NnU2vFdw/bOpQSAV5xzO609drhfzhpPXuXI69Y2poSVMwjYAG9UPwbHB7LqhM71CxsjCQ0W8DHiswNFHWL9Em+N/nsAdOA95dg0aa8=
+	F3LN9hyPvN0CAVmU+CwhB+XgRrUEjHa4HI1zqe9BR1NM6xasWGUEsY21KafHRI3J6udF87Jntl/23EfJtc/Opb+vhobD14RLba1BTrlHBKYOmzbqq2koxkZRQyO47EL/bpUvwwpJs82XwF97jlhkabhXYL6QpsIGVVtU9lpA10RjaSs21fXg0BN0joIj17O6dK3xewzJ3XS8prVTjc6jURKdavKVp4MtSwUkCxXYXTcfMoFlZfpAgJUcjB64nhmc4a4vVp4s0GhSDaum5OMazYF/Hz6BtUzCXslKzjILBdQ5kiSCKp0NIZIbXdHPKNvnILwL0CqyYi4gvbrMTIUcPYDsYNFf3rXWgHjWybY4j2ZJ+PylNH/1lt9Nhd33yHflJVEkYE8KTeI4cQmMvGQ1K4L2u1Z50F4UtzZCsYcM2qBsvYnzn/tpBVJ8siv2xq+1biS8tCbKTX2LGHzeAv/VcTsmOfMam5OKlH5lRKcwojiBLArs8Oe7JqBihVrzmZmosCNboAUaeIUtAtQMILPIQBEAqiKd9nGVrjLHJXBtOGKZe6/c3uPc7dC3pBbQmuiORR8WwGUS3JF3ELuR7dNB4s+lH2ilIL9wYmogpQn+XtnqLXByGOk5o5pxnpH96IAN
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?qtlAwsuqlHla7xOFiLSX6LBYfVNyLYKnfieGED40ASZkLRpm48NqaEvy1Gzn?=
- =?us-ascii?Q?KEYDZIxEIp6aLSVglZEZSz/9ABY5AvYy8ymwGnVX48RFAROpPf7skfDBLEk9?=
- =?us-ascii?Q?pAnd4hUs2StSdZT5oBFEygDXOiZJrDNFsB2h6jfbxGBPbi92RPz41gtAGP2R?=
- =?us-ascii?Q?tuu/NSkGEEeHnIFHUNvs8YLZdPgJyCAbFwGWT+7oNinI2i9Q7p29jJ9q7WHA?=
- =?us-ascii?Q?D99DqUzTPsuyK93ZQpFjjE9m8UAng/aiZkaBf8E+KRnH8oMrsUc4j2iWDzYA?=
- =?us-ascii?Q?hxSk7E7ktnEBhuM6ZGZpa7J7xgkEgCK+TdCxSEpMW0KjEfk+ZBW8Ji2/yDu9?=
- =?us-ascii?Q?uv8xLMDzXhQkk3EFeuksT9H5jdKzaAtwzsiFSSLDxfEj/7nqVsLauRdF4mK7?=
- =?us-ascii?Q?HOqNwrh0Z95Lz3FQlqnU42Jq4HU1hmA7HFJnzQK8yFyV/1dYAx/HZNPFEjCp?=
- =?us-ascii?Q?wkX/cgIzfDqbaNeLAOqIJb/jluldTsi3kdc7TZ+zpPpZhuMU2tUhv2kkKS3w?=
- =?us-ascii?Q?mPROzsOv1YMFmtHXThsJESAI7RY8L3PRooXB8Ou0t57OSN3NVmqT2Hnfog8e?=
- =?us-ascii?Q?Zbo/vivWQci28E0XrdgkN08wE1iG6eoXw5P5aCtR/fZ6QK6JUdGtr855GTJl?=
- =?us-ascii?Q?ypoE4E/rzeL3S3hqfYZUIor72gka/MZX7ZXIgQCO/XsrFsiH45iuhUNblnVP?=
- =?us-ascii?Q?ynTxRipAPY24Gd3p4oVy7TXWU3dsjF+hJfcGHRzeYlvz8YrpKTn03ckQj5T0?=
- =?us-ascii?Q?ZING7SVnvvLLps0Ev2mF26fbjggEN77COpzpJUF8NYwmu/TDvh8/qDBFfw+o?=
- =?us-ascii?Q?yIklzw48/pcz8vhdxOrAKvNsqf6U+5uDwhHv4f3YsUCBFDoIoovB3AhQpbrT?=
- =?us-ascii?Q?HQQ2bbpKV2mNIrPlokdenJY2owPzxSObNz+xR1vgPuKeeHI0ErQgQR0fPt5p?=
- =?us-ascii?Q?NB3AbBVkWk7IaplOlTy1/XOLJ1pPRiyLJ5MQBHtIfop/TvoXlB90FYKzjgDL?=
- =?us-ascii?Q?QpM3ebECAkJZuXPzCGMzGdrTDoCk4JEY30IqZqwyozUtp41+tyMyWLrcM0SK?=
- =?us-ascii?Q?+ZNIqdWfIsPtK1fQV0LU9MwG5YjaMWGgPrzm8tzCLx9VWXs+a2f5sewXGKsl?=
- =?us-ascii?Q?qVtlsRsTsIo09W2kRsYSz2sBsfwfQ0xd7JV+q+oo8guvIW4P32EoXpV3w8WY?=
- =?us-ascii?Q?FyLx7qZK9JDMdPO52Rpy6s+dCbwH7mA29J+IbV/T8+Ew4Hidw2jvPCBLIICB?=
- =?us-ascii?Q?7/gIWUfqxvcum83cbRLz?=
+	=?us-ascii?Q?bfaX2bWF1FUPdvdpZQncA5I18O7ptYdkMt6nx0ifU5KnqRLHs7jrC+3OkApL?=
+ =?us-ascii?Q?fxVTlDbFNn72Dgr495NNCmI0GGVNCwyXh5SRDIMZ+YvAumLvKeSjIS6RIdXL?=
+ =?us-ascii?Q?emV8BuC3mmRl+747dOAiz70Irb619dO/nEdYGHcONsAOmRNuKAWwdB5beKkT?=
+ =?us-ascii?Q?yZ6fP6TpDQmIVxP6tbJ5eYQn7oDlnoVJSpDlhv7f30cW+494lfvA71sweScc?=
+ =?us-ascii?Q?nWl0lko9StWR7WmPnW8xWCG1IaEP2aKT3C4HVTVWuzPUi3GoiDxDN2/faDxv?=
+ =?us-ascii?Q?+vEQgB2TljwIF90NxgO79kp2A3J078cl+fqJfsxNvSTYqnXUaneJVlA5pzh3?=
+ =?us-ascii?Q?PPHOOwJCG3pmKG9P9jhludrHaSN/FNwo8a38f0oMUJpWsYPNPsa8ifY+tgWb?=
+ =?us-ascii?Q?132mPYMtJ7rdjuxyj/URGu4IlgbwMGiW2piN4H9HCXrqpqNlntj+ieNbvpDE?=
+ =?us-ascii?Q?hXKJM0EGhXxun4QgOmg2WkpeSkpSe7+Rq2qnlZ7r/2zGr7iD6oTC1DCkWVMH?=
+ =?us-ascii?Q?ic9wKPovWHoDqBfBOZu/wwh3nV56p7NQEvt4WkuynEDGkkQr9eJg+iaxd1nK?=
+ =?us-ascii?Q?E2yzjVwj5FnRiVcLe2DSQObzVeayPx+YciEM4VRnMmL99zWtbkbqRJB106wU?=
+ =?us-ascii?Q?ZTS1y7nukBk2PnlNdXxQ2YuzUVRW3EjOn8p7cXE3PZgLsTX7WAMNO/yXN5SK?=
+ =?us-ascii?Q?hPqpmQH4pPQNOax0EujHor/8aRPEK47rYrGW4rIJ31MBTuFs5Xmaw/SQYDIp?=
+ =?us-ascii?Q?GTeFjal0mMrPF0F+dlkrRO5uRf9irmJz+E13bXrKIfHtxMzvAvlxzxnFAGjo?=
+ =?us-ascii?Q?mXzGlLCvykaq4KEmdBJOD4PK4OM9olx8GjBypIVsNCx1CznBHZvhM5A1m5YL?=
+ =?us-ascii?Q?ZyB3QC+/Gre5VNyFdhuSMQtnIVlkwigUwSf1j9NjeChFKTXd7K4/B/hPRMa7?=
+ =?us-ascii?Q?XU8bgBRxNWBvhIyMeRQ3IaVbLBcl7O734I9D0RkV4LTul6ebVJ4h9s4JtbKx?=
+ =?us-ascii?Q?CDx27lwSqItG36eMojY/u+ux7wm78BUNJbvaPx0kp/odVsYv4lI/6K1ajjmP?=
+ =?us-ascii?Q?gKAOu5ilBDYqaWRtm2FivhJo5mlyJvTy+TvaGeo9Yk3kjjWGB6HQV63LoU+o?=
+ =?us-ascii?Q?YF+yPTxyQDZIoI4os49NP8tgvMnS9fRQTXyA1cyeV1WamQW4eIXQ9SufosCw?=
+ =?us-ascii?Q?L7XNF3jSwER7xay8v8Z46Fg1kCAsjn46YpMrZcRhsm/r69oYsuiqnU5C3g/R?=
+ =?us-ascii?Q?v2dTFAh8nf4ZuhvQKY2o?=
 X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bfc982f2-5ffa-4a9b-075e-08dbf9573bf5
+X-MS-Exchange-CrossTenant-Network-Message-Id: e6e3b1ce-4bc6-4d46-15a7-08dbf957cec1
 X-MS-Exchange-CrossTenant-AuthSource: SYBPR01MB6870.ausprd01.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2023 08:08:48.8734
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2023 08:12:53.2638
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
@@ -123,33 +125,29 @@ X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
 	00000000-0000-0000-0000-000000000000
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: MEYPR01MB7339
 
-This series of patches enables callchains for guests (used by `perf kvm`),
-which holds the top spot on the perf wiki TODO list [1]. This allows users
-to perform guest OS callchain or performance analysis from external
-using PMU events. This is also useful for guests like unikernels that
-lack performance event subsystems.
+This patch adds two architecture specific interfaces used by `perf kvm`:
 
-The event processing flow is as follows (shown as backtrace):
-@0 kvm_arch_vcpu_get_unwind_info / kvm_arch_vcpu_read_virt (per arch impl)
-@1 kvm_guest_get_unwind_info / kvm_guest_read_virt
-   <callback function pointers in `struct perf_guest_info_callbacks`>
-@2 perf_guest_get_unwind_info / perf_guest_read_virt
-@3 perf_callchain_guest
-@4 get_perf_callchain
-@5 perf_callchain
+- kvm_arch_vcpu_get_unwind_info: Return required data for unwinding
+  at once; including ip address, frame pointer, whether the guest vCPU
+  is running in 32 or 64 bits, and possibly the base addresses of
+  the segments.
 
-Between @0 and @1 is the interface between KVM and the arch-specific
-impl, while between @1 and @2 is the interface between Perf and KVM.
-The 1st patch implements @0. The 2nd patch extends interfaces between @1
-and @2, while the 3rd patch implements @1. The 4th patch implements @3
-and modifies @4 @5. The last patch is for userspace tools.
+- kvm_arch_vcpu_read_virt: Read data from a virtual address of the
+  guest vm.
 
-Since arm64 hasn't provided some foundational infrastructure (interface
-for reading from a virtual address of guest), the arm64 implementation
-is stubbed for now because it's a bit complex, and will be implemented
-later.
+`perf_kvm.h` has been added to the `include/linux/` directory to store
+the interface structures between the perf events subsystem and the KVM
+subsystem.
 
-For safety, guests are designed to be read-only in this feature,
+Since arm64 hasn't provided some foundational infrastructure, stub the
+arm64 implementation for now because it's a bit complex.
+
+The above interfaces require architecture support for
+`CONFIG_GUEST_PERF_EVENTS`, which is only implemented by x86 and arm64
+currently. For more architectures, they need to implement these interfaces
+when enabling `CONFIG_GUEST_PERF_EVENTS`.
+
+In terms of safety, guests are designed to be read-only in this feature,
 and we will never inject page faults into the guests, ensuring that the
 guests are not interfered by profiling. In extremely rare cases, if the
 guest is modifying the page table, there is a possibility of reading
@@ -159,64 +157,133 @@ These erroneous data will eventually appear as `[unknown]` entries in the
 report. It is sufficient as long as most of the records are correct for
 profiling.
 
-Regarding the necessity of implementing in the kernel:
-Indeed, we could implement this in userspace and access the guest vm
-through the KVM APIs, to interrupt the guest and perform unwinding.
-However, this approach will introduce higher latency, and the overhead of
-syscalls could limit the sampling frequency. Moreover, it appears that
-user space can only interrupt the VCPU at a certain frequency, without
-fully leveraging the richness of the PMU's performance events. On the
-other hand, if we incorporate the logic into kernel, `perf kvm` can bind
-to various PMU events and achieve faster performance in PMU interrupts.
-
-Tested with both Linux and unikernels as guests, the `perf script` command
-could correctly show the callchains.
-FlameGraphs could also be generated with this series of patches and [2].
-
-[1] https://perf.wiki.kernel.org/index.php/Todo
-[2] https://github.com/brendangregg/FlameGraph
-
-v1:
-https://lore.kernel.org/kvm/SYYP282MB108686A73C0F896D90D246569DE5A@SYYP282MB1086.AUSP282.PROD.OUTLOOK.COM/
-
-Changes since v1:
-Post the complete implementation, also updated some code based on
-Sean's feedback.
-
-v2:
-https://lore.kernel.org/kvm/SY4P282MB1084ECBCC1B176153B9E2A009DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM/
-
-Changes since v2:
-Refactored interface, packaged the info required by unwinding into
-a struct; Resolved some type mismatches; Provided more explanations
-based on the feedback from v2; more tests were performed.
-
-Tianyi Liu (5):
-  KVM: Add arch specific interfaces for sampling guest callchains
-  perf kvm: Introduce guest interfaces for sampling callchains
-  KVM: implement new perf callback interfaces
-  perf kvm: Support sampling guest callchains
-  perf tools: Support PERF_CONTEXT_GUEST_* flags
-
- MAINTAINERS                         |  1 +
- arch/arm64/kvm/arm.c                | 12 ++++++
- arch/x86/events/core.c              | 63 ++++++++++++++++++++++++-----
- arch/x86/kvm/x86.c                  | 24 +++++++++++
- include/linux/kvm_host.h            |  5 +++
- include/linux/perf_event.h          | 20 ++++++++-
- include/linux/perf_kvm.h            | 18 +++++++++
- kernel/bpf/stackmap.c               |  8 ++--
- kernel/events/callchain.c           | 27 ++++++++++++-
- kernel/events/core.c                | 17 +++++++-
- tools/perf/builtin-timechart.c      |  6 +++
- tools/perf/util/data-convert-json.c |  6 +++
- tools/perf/util/machine.c           |  6 +++
- virt/kvm/kvm_main.c                 | 22 ++++++++++
- 14 files changed, 218 insertions(+), 17 deletions(-)
+Signed-off-by: Tianyi Liu <i.pear@outlook.com>
+---
+ MAINTAINERS              |  1 +
+ arch/arm64/kvm/arm.c     | 12 ++++++++++++
+ arch/x86/kvm/x86.c       | 24 ++++++++++++++++++++++++
+ include/linux/kvm_host.h |  5 +++++
+ include/linux/perf_kvm.h | 18 ++++++++++++++++++
+ 5 files changed, 60 insertions(+)
  create mode 100644 include/linux/perf_kvm.h
 
-
-base-commit: 33cc938e65a98f1d29d0a18403dbbee050dcad9a
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 788be9ab5b73..5ee36b4a9701 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -16976,6 +16976,7 @@ F:	arch/*/kernel/*/perf_event*.c
+ F:	arch/*/kernel/perf_callchain.c
+ F:	arch/*/kernel/perf_event*.c
+ F:	include/linux/perf_event.h
++F:	include/linux/perf_kvm.h
+ F:	include/uapi/linux/perf_event.h
+ F:	kernel/events/*
+ F:	tools/lib/perf/
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index e5f75f1f1085..5ae74b5c263a 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -574,6 +574,18 @@ unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
+ {
+ 	return *vcpu_pc(vcpu);
+ }
++
++bool kvm_arch_vcpu_get_unwind_info(struct kvm_vcpu *vcpu, struct perf_kvm_guest_unwind_info *info)
++{
++	/* TODO: implement */
++	return false;
++}
++
++bool kvm_arch_vcpu_read_virt(struct kvm_vcpu *vcpu, gva_t addr, void *dest, unsigned int length)
++{
++	/* TODO: implement */
++	return false;
++}
+ #endif
+ 
+ static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 2c924075f6f1..9341cd80f665 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -13039,6 +13039,30 @@ unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
+ 	return kvm_rip_read(vcpu);
+ }
+ 
++bool kvm_arch_vcpu_get_unwind_info(struct kvm_vcpu *vcpu, struct perf_kvm_guest_unwind_info *info)
++{
++	info->ip_pointer = kvm_rip_read(vcpu);
++	info->frame_pointer = kvm_register_read_raw(vcpu, VCPU_REGS_RBP);
++
++	info->is_guest_64bit = is_64_bit_mode(vcpu);
++	if (info->is_guest_64bit) {
++		info->segment_cs_base = 0;
++		info->segment_ss_base = 0;
++	} else {
++		info->segment_cs_base = get_segment_base(vcpu, VCPU_SREG_CS);
++		info->segment_ss_base = get_segment_base(vcpu, VCPU_SREG_SS);
++	}
++	return true;
++}
++
++bool kvm_arch_vcpu_read_virt(struct kvm_vcpu *vcpu, gva_t addr, void *dest, unsigned int length)
++{
++	struct x86_exception e;
++
++	/* Return true on success */
++	return kvm_read_guest_virt(vcpu, addr, dest, length, &e) == X86EMUL_CONTINUE;
++}
++
+ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 4944136efaa2..6f5ff4209b0c 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -41,6 +41,7 @@
+ #include <linux/kvm_para.h>
+ 
+ #include <linux/kvm_types.h>
++#include <linux/perf_kvm.h>
+ 
+ #include <asm/kvm_host.h>
+ #include <linux/kvm_dirty_ring.h>
+@@ -1595,6 +1596,10 @@ static inline bool kvm_arch_intc_initialized(struct kvm *kvm)
+ 
+ #ifdef CONFIG_GUEST_PERF_EVENTS
+ unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu);
++bool kvm_arch_vcpu_get_unwind_info(struct kvm_vcpu *vcpu,
++				   struct perf_kvm_guest_unwind_info *info);
++bool kvm_arch_vcpu_read_virt(struct kvm_vcpu *vcpu, gva_t addr, void *dest,
++			     unsigned int length);
+ 
+ void kvm_register_perf_callbacks(unsigned int (*pt_intr_handler)(void));
+ void kvm_unregister_perf_callbacks(void);
+diff --git a/include/linux/perf_kvm.h b/include/linux/perf_kvm.h
+new file mode 100644
+index 000000000000..e77eeebddabb
+--- /dev/null
++++ b/include/linux/perf_kvm.h
+@@ -0,0 +1,18 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _LINUX_PERF_KVM_H
++#define _LINUX_PERF_KVM_H
++
++/*
++ * Structures as interface between Perf Event and KVM subsystem.
++ * Add more members for new architectures if necessary.
++ */
++
++struct perf_kvm_guest_unwind_info {
++	unsigned long ip_pointer;
++	unsigned long frame_pointer;
++	bool is_guest_64bit;
++	unsigned long segment_cs_base;
++	unsigned long segment_ss_base;
++};
++
++#endif /* _LINUX_PERF_KVM_H */
 -- 
 2.34.1
 
