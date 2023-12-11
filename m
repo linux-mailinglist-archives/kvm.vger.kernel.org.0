@@ -1,189 +1,210 @@
-Return-Path: <kvm+bounces-4011-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4012-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37F6F80BF1F
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 03:30:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1906D80BF75
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 03:51:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB46D1F20F8A
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 02:30:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3127280C56
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 02:51:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5599A28EA;
-	Mon, 11 Dec 2023 02:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4ADE15AF6;
+	Mon, 11 Dec 2023 02:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WnYdcjE1"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="FlJaLcfv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CF4390;
-	Sun, 10 Dec 2023 18:30:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702261812; x=1733797812;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=hJLxE9ua4sukd89jxifKYz0r5650TeqBYFF2rmN/TX4=;
-  b=WnYdcjE1pK0lbLSls+07tLav2jP/50JCV2nPXHmk/58Qb5WaRNsu24Lp
-   e4V5ESe+JJn70r0bSzLlGlriNSQicTpmqtv8yVYcmONTB57/zXTCDz0Li
-   19KWVyKTqJd8jq3YdTKVI41QVKqnSedaiNdWQA8hDdiM+AqWxvyxYZd7K
-   EHFxnBUVm0dDJtWICjdLxJ4lE2tgs9ebzbbJKAiiljTeeLVsoyDS6Jpck
-   DWDDN6sKKQmksTu40yT8zE5aHPbFxJhAtSfck7YoY2WEo+P5vtna98qYw
-   euxwwQ2R9zvIijiTnfO0Uvc0/av6qDNZTDsFOtmejXw4DjeZhrtiAwfo4
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="393447990"
-X-IronPort-AV: E=Sophos;i="6.04,266,1695711600"; 
-   d="scan'208";a="393447990"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2023 18:30:12 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="766189340"
-X-IronPort-AV: E=Sophos;i="6.04,266,1695711600"; 
-   d="scan'208";a="766189340"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Dec 2023 18:30:11 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 10 Dec 2023 18:30:05 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 10 Dec 2023 18:30:04 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Sun, 10 Dec 2023 18:30:04 -0800
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Sun, 10 Dec 2023 18:30:00 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F3+oHHy+g7z/tumBmaN16WcHaQi11BoGjwex88xQaYtpn1cKHbzk5GoPTLmVK6DmS7QO+tIwLQRk0AWFVddmLcqbXBxF1NrxE7GnGrCwcIidQHItMfh/zprTUd7p9FQZEz1nuHr7yzzSv7pYwytRgeEMtJsRA1m8M6om5LDl/MVycVGtzM0UTU/scQBOLOr6gnr2w8OcTODYSvqhQ8EHX6bSs/WO6WY42zuHlx8dpPccbFsqwDZItjhpkuthhIP3CY94Cl/LIOrCN7Zv7EMPwxh+QO1tCS4hdX5ea43HCxe693dXdWmlGNX76imjdLkCAuoBjGpDi0KUIgLLLFEDCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rddNAA6n51KKJk1Y9oJeU75OSc97YWVa2CocOkbiHyU=;
- b=Y4lu/DUIXAWr7n9lIpmM373xI1T2Nq2LXNYo9PzfL7wVl6lIfwDOAei8O7Leq1ioRyltiB/lRYQHWzf3UVMAVed9rIJ0w3plWWfOtUUiDni/9YdWOedx8DRkUq4/7AP+ZUvCHlzzMDZVjF7nVzQfzExZq0CzGL85r3WaHVSLZBDtWGpJed9GUlrlQF3w0Wixi9im61vmKDuew9FEavb1TBqRC8U+s6a7HURxyPatAdz6MTOO+r8tYjMWR4YqDza3blGXXWW+ab9JOgMLNNNm/5cfAPN7lRC2Me78D73XmHz7FgIFisvd9EHGSzrZuNiWgicx5KZffKCUDX4d8eoXFQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by SA3PR11MB7485.namprd11.prod.outlook.com (2603:10b6:806:31c::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Mon, 11 Dec
- 2023 02:29:57 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a%3]) with mapi id 15.20.7068.031; Mon, 11 Dec 2023
- 02:29:56 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Jason Gunthorpe <jgg@nvidia.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
-	"Giani, Dhaval" <Dhaval.Giani@amd.com>, Vasant Hegde <vasant.hegde@amd.com>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-CC: "joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>, "cohuck@redhat.com"
-	<cohuck@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
-	"nicolinc@nvidia.com" <nicolinc@nvidia.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>, "peterx@redhat.com"
-	<peterx@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
-	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
- Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
-	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
-	<yan.y.zhao@intel.com>
-Subject: RE: [PATCH v6 0/6] iommufd: Add nesting infrastructure (part 2/2)
-Thread-Topic: [PATCH v6 0/6] iommufd: Add nesting infrastructure (part 2/2)
-Thread-Index: AQHaGVcGB9517zktWkq6XlvDSMgylbCgUKQAgAMup4A=
-Date: Mon, 11 Dec 2023 02:29:55 +0000
-Message-ID: <BN9PR11MB527647A4DA1620DE354983898C8FA@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20231117130717.19875-1-yi.l.liu@intel.com>
- <20231209014726.GA2945299@nvidia.com>
-In-Reply-To: <20231209014726.GA2945299@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SA3PR11MB7485:EE_
-x-ms-office365-filtering-correlation-id: e4dbc62f-fe5f-49c6-82ea-08dbf9f1104e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: IvSsszgN5HUHsgSampEMthvqcl+mMpIEz+YE6/Uj1fCjFIQsf7Nq5FFiNmKyWhn80shm4KxvfZKZqM0DTV+Wk4xl2wJby2YiqdXdJNLl88ADm449GKz+o+tS8Y9CYilDOrqs9SqK4trcZaI/FewqgbdmQLFb8AoSt9S1z/mpgzCoy86D9Iv8OZb1ZUrs376ccIFLvI6e+mqLrQxvaM0I027bifMVb0CtpWLD02g2Lbca7544WxhYf1LB1RHPLV5DfqRpmqZ5gh5A+9w+P+Yqv/AlCEYClxmOQ+0wF9kN2NR9TDhS07Q8nQjYpO0vKiWo0uZEvmHhNAvHqSrECtsQlCHxPuI+KrIXxfd2c2fa+9+I0gf10gzXvC9884WOYCvArvHm1E6R0YSc6hXOsRlj55uuz/sy+rWYAKokGRzizJGy7qwJA68qGnl69boN2Wy339oTSgtCpHt/kEPJGyffWwuZ7hyVR2IUceFMj5vMhxUQkwNGxr3v4ZP63Av44jRBuCnpXGXUPMidY4nnbaTQCXVNAJJBGM78OyMlZr+Eo6TQl06UUoVRsKKOgUDMkfSOtHldofVbJhwgBbZ/Oo7Pnc8N501QIj8FdDVQeyiIjk4tIFVUdOTGxHeeipv1J0zz
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(136003)(346002)(396003)(366004)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(41300700001)(26005)(82960400001)(38070700009)(33656002)(86362001)(38100700002)(122000001)(5660300002)(316002)(8936002)(4326008)(8676002)(52536014)(7416002)(4744005)(2906002)(7696005)(6506007)(9686003)(71200400001)(66946007)(66556008)(66476007)(66446008)(64756008)(54906003)(76116006)(110136005)(478600001)(55016003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?NT/LxjK0Idknn0MJYd88eGyizDtcquQVRkA4OUjDBBM0xPycWrpDkThcGOv5?=
- =?us-ascii?Q?fcSDsGVjiWhujk09JHzblaGkbcdKKFSrjys/ldOAEbfEC5dM3igWd2cekp9G?=
- =?us-ascii?Q?kWG4Ts5CN6MLZtfdhhbYsPi+cTMlMPXguACzputp8tkbqi1tX8dAQc50OCUq?=
- =?us-ascii?Q?4DUO4UeSXaUddzgTgRa0pYYUs5rG1iVuIErpCih1bHVSHesKZnSPLIvcOKOJ?=
- =?us-ascii?Q?0fuoBdUNQp2IkTDSquxOqm2gb5pRzIfJ8rzBFAi/Ywbq5NVa21tCpqVmCbI1?=
- =?us-ascii?Q?LHR272qzda1PgW6HGdYvWDmJ0w8HlbdJn7Qoxc/NPHUmauMXHzAHumwvpVtG?=
- =?us-ascii?Q?U1A+qibSbtkMDTgR9aHZT3Oh/unxOiPVSMbLCCBWWhBLzhcg2dnpMaL8ZoWy?=
- =?us-ascii?Q?G5cZJ0COZwNISlVbKXM58LbJRgK1A/8wDiuok1eIG1oGJFFNdWX9YHBbc2cc?=
- =?us-ascii?Q?cDDdDvsFOtfvxwAtyoMjkoRT8KTQbNEtFDJkIFULDKSm0Fyis4rcVwsGStxt?=
- =?us-ascii?Q?p8Z/nWiLbKmt/PvAHBifSGwS72p5RSpuRI+YqxPC3vCJ71ejYb1ennYnWgJ2?=
- =?us-ascii?Q?kd6JYgcl2MPvKLk26xDmieAlEl8+fZSuJdGkoXIRF1KzdZZfi26tvurUowff?=
- =?us-ascii?Q?I5maqSnjXUenOqdVV7hMfxj6745ZmLegStjEh0A+AqiGkWAgC6WctKKkQhpk?=
- =?us-ascii?Q?LxEbv/2ZyfteRQXR4WYquHzL5/2bOe+wqFdmxlPSB6TZHNajgxJqtEivemwA?=
- =?us-ascii?Q?kFqVzfcLQezalKujp1hD7DE5giI9GoGtumZFMPxH8aWRA9Dk99aMZdnoKwoM?=
- =?us-ascii?Q?loMCCFtoHt20tyz7EHdbTX9YDDGXBWpod6pXo0j/CaEh2Zgc+4MdG3hURc0a?=
- =?us-ascii?Q?jiHx8B+YojKMOBlzfAVHZLbQ8WKPOWg60RnkBNdDfGoR3Z/EC3VCvN8vE4nA?=
- =?us-ascii?Q?8Tvu7eguXyRhj31fFUiA+Im0YJeNvEvAfskomLepgm2GeNqOZy7uPLjP09j/?=
- =?us-ascii?Q?Bh4AFf04nnpftIyK5wPftPxLofdxDuhpkd7VciVUnAm5TkswRdmjFfhYiQRr?=
- =?us-ascii?Q?FaVgZNuh9ZmekdXUZ0b7MtpQ0nArojy6umaMt81lWQjDBi9QspFZcGosxSA6?=
- =?us-ascii?Q?GPbzlGRyeKD5MdzviBF/H9bB6j7ocf/LIUjSRRsUieETRxsG1NEdogaLzR6b?=
- =?us-ascii?Q?KA090bg1Ztq1U1p9S9+Hz3JECqk+Maik6uSexbRCN8sxORahaEPfeQbXlH/N?=
- =?us-ascii?Q?qmkkk3gwJ0q/dt/2QyfvU7+rBkscERiIEIJ3kQ6AR4wclI2mcpwheA9w661S?=
- =?us-ascii?Q?75IbycPebzuQO5FsjBHWqqoKyx1bl+A8dpKskCi5YqIIwMR3XRxzMpwukt95?=
- =?us-ascii?Q?cVdf5OYHv+Y4uEYETjPzSSKVLmQBZSnixLJbGsE8TKUgCpN6PD36D0zqtNPS?=
- =?us-ascii?Q?JE8G/rs+pgIAuca6pGp0deOyLn8JwQUGvPK0Tl6hR4YbnkTmM5Mz6N3Ubjgf?=
- =?us-ascii?Q?3vUXyNfgZ50hKBNOPM8zpLuRGO788dKPinp31ZXJQK4YYYAAY+g+d6OP2gbx?=
- =?us-ascii?Q?RJQlVYddhe/ijlAjXuYOZmxRL6BB+lTf8JPw+nLB?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 937A21FD2;
+	Sun, 10 Dec 2023 18:51:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1702263056;
+	bh=Sq8nbVEcRVues8cBbXzwXlj2IWgRQ6rEbTmY8CyoHEQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FlJaLcfvWS0edDd1sYTx/8DzmUXQDkHkg7aaaVy2DXBd/DYjO4uRS7amjU047M51z
+	 0leWYyiuNja1b+mhQqTLXKFmZeAExiFUs4Yahv5l6+i/QqscvmIrvMNyTOay2c5qBH
+	 ViUrDHolpRMPXcQRpUmsTwkjiuQev7Rcyx1SdwDlbPwnh/mO3381+uTrqfsdEOTguO
+	 4Gsvr1lOrZBGId28c59lxYnjBFFZpHbAngOG6PRuQBGu2Q7ClTVeBrLzcdg69A+85q
+	 BBOaMws56i3778t58GsA6YA68vMMA/KRAGmHRR5UEuW+hy8uYJxpN3SZlYbFvwFdOK
+	 sJW1eehFHeiiA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4SpR7y06KGz4xNH;
+	Mon, 11 Dec 2023 13:50:53 +1100 (AEDT)
+Date: Mon, 11 Dec 2023 13:50:52 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Paolo Bonzini <pbonzini@redhat.com>, Andrew Morton
+ <akpm@linux-foundation.org>
+Cc: KVM <kvm@vger.kernel.org>, Ackerley Tng <ackerleytng@google.com>, Chao
+ Peng <chao.p.peng@linux.intel.com>, Isaku Yamahata
+ <isaku.yamahata@intel.com>, "Kirill A. Shutemov"
+ <kirill.shutemov@linux.intel.com>, Michael Roth <michael.roth@amd.com>,
+ Sean Christopherson <seanjc@google.com>, Yu Zhang
+ <yu.c.zhang@linux.intel.com>, "Matthew Wilcox (Oracle)"
+ <willy@infradead.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build failure after merge of the kvm tree
+Message-ID: <20231211135052.4fb016a6@canb.auug.org.au>
+In-Reply-To: <20231120152227.3bfe2450@canb.auug.org.au>
+References: <20231120152227.3bfe2450@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4dbc62f-fe5f-49c6-82ea-08dbf9f1104e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Dec 2023 02:29:55.8723
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yVhxBFfSUtvPPofFRMlilgdgNxjt5b6MYq3dFtTkai+Fs7BHTAVBiVELkv9LybQidI14rMkjKH/NnHDb1tNX+w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB7485
-X-OriginatorOrg: intel.com
+Content-Type: multipart/signed; boundary="Sig_/k6L+z4ZF5AITNIBFCyYc60_";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Saturday, December 9, 2023 9:47 AM
+--Sig_/k6L+z4ZF5AITNIBFCyYc60_
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+Hi all,
+
+On Mon, 20 Nov 2023 15:22:27 +1100 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
+>
+> After merging the kvm tree, today's linux-next build (x86_64 allmodconfig)
+> failed like this:
 >=20
-> What is in a Nested domain:
->  Intel: A single IO page table refereed to by a PASID entry
->         Each vDomain-ID,PASID allocates a unique nesting domain
->  AMD: A GCR3 table pointer
->       Nesting domains are created for every unique GCR3 pointer.
->       vDomain-ID can possibly refer to multiple Nesting domains :(
->  ARM: A CD table pointer
->       Nesting domains are created for every unique CD table top pointer.
+> arch/x86/kvm/../../../virt/kvm/guest_memfd.c:306:10: error: 'const struct=
+ address_space_operations' has no member named 'error_remove_page'; did you=
+ mean 'error_remove_folio'?
+>   306 |         .error_remove_page =3D kvm_gmem_error_page,
+>       |          ^~~~~~~~~~~~~~~~~
+>       |          error_remove_folio
+> arch/x86/kvm/../../../virt/kvm/guest_memfd.c:306:30: error: initializatio=
+n of 'int (*)(struct folio *)' from incompatible pointer type 'int (*)(stru=
+ct address_space *, struct page *)' [-Werror=3Dincompatible-pointer-types]
+>   306 |         .error_remove_page =3D kvm_gmem_error_page,
+>       |                              ^~~~~~~~~~~~~~~~~~~
+> arch/x86/kvm/../../../virt/kvm/guest_memfd.c:306:30: note: (near initiali=
+zation for 'kvm_gmem_aops.launder_folio')
+>=20
+> Caused by commit
+>=20
+>   640be5bc564f ("fs: convert error_remove_page to error_remove_folio")
+>=20
+> from the mm tree intercting with commit
+>=20
+>   a7800aa80ea4 ("KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specif=
+ic backing memory")
+>=20
+> I have applied the following supplied merge fix patch (thanks Andrew).
+>=20
+> From: Andrew Morton <akpm@linux-foundation.org>
+> Date: Fri, 17 Nov 2023 09:28:33 -0800
+> Subject: [PATCH] fs: Convert error_remove_page to error_remove_folio
+>=20
+> On Fri, 17 Nov 2023 16:14:47 +0000 "Matthew Wilcox (Oracle)" <willy@infra=
+dead.org> wrote:
+>=20
+> > There were already assertions that we were not passing a tail page
+> > to error_remove_page(), so make the compiler enforce that by converting
+> > everything to pass and use a folio.
+> >
+> > Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+> > ---
+> >  Documentation/filesystems/locking.rst |  4 ++--
+> >  Documentation/filesystems/vfs.rst     |  6 +++---
+> >  block/fops.c                          |  2 +-
+> >  fs/afs/write.c                        |  2 +-
+> >  fs/bcachefs/fs.c                      |  2 +-
+> >  fs/btrfs/inode.c                      |  2 +-
+> >  fs/ceph/addr.c                        |  4 ++--
+> >  fs/ext2/inode.c                       |  2 +-
+> >  fs/ext4/inode.c                       |  6 +++---
+> >  fs/f2fs/compress.c                    |  2 +-
+> >  fs/f2fs/inode.c                       |  2 +-
+> >  fs/gfs2/aops.c                        |  4 ++--
+> >  fs/hugetlbfs/inode.c                  |  6 +++---
+> >  fs/nfs/file.c                         |  2 +-
+> >  fs/ntfs/aops.c                        |  6 +++---
+> >  fs/ocfs2/aops.c                       |  2 +-
+> >  fs/xfs/xfs_aops.c                     |  2 +-
+> >  fs/zonefs/file.c                      |  2 +-
+> >  include/linux/fs.h                    |  2 +-
+> >  include/linux/mm.h                    |  3 ++-
+> >  mm/memory-failure.c                   | 10 +++++-----
+> >  mm/shmem.c                            |  6 +++---
+> >  mm/truncate.c                         |  9 ++++-----
+> >  virt/kvm/guest_memfd.c                |  9 +++++---- =20
+>=20
+> virt/kvm/guest_memfd.c exists only in the KVM tree (and hence
+> linux-next).  So I assume Stephen will use the change from this patch
+> when doing his resolution.
+>=20
+> This:
+> ---
+Now this:
 
-this AMD/ARM difference is not very clear to me.
+ virt/kvm/guest_memfd.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-How could a vDomain-ID refer to multiple GCR3 pointers? Wouldn't it
-lead to cache tag conflict when a same PASID entry in multiple GCR3 tables
-points to different I/O page tables?
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index c2e2371720a9..c23ce219e21c 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -267,7 +267,8 @@ static int kvm_gmem_migrate_folio(struct address_space =
+*mapping,
+ 	return -EINVAL;
+ }
+=20
+-static int kvm_gmem_error_page(struct address_space *mapping, struct page =
+*page)
++static int kvm_gmem_error_folio(struct address_space *mapping,
++		struct folio *folio)
+ {
+ 	struct list_head *gmem_list =3D &mapping->private_list;
+ 	struct kvm_gmem *gmem;
+@@ -275,8 +276,8 @@ static int kvm_gmem_error_page(struct address_space *ma=
+pping, struct page *page)
+=20
+ 	filemap_invalidate_lock_shared(mapping);
+=20
+-	start =3D page->index;
+-	end =3D start + thp_nr_pages(page);
++	start =3D folio->index;
++	end =3D start + folio_nr_pages(folio);
+=20
+ 	list_for_each_entry(gmem, gmem_list, entry)
+ 		kvm_gmem_invalidate_begin(gmem, start, end);
+@@ -301,7 +302,7 @@ static int kvm_gmem_error_page(struct address_space *ma=
+pping, struct page *page)
+ static const struct address_space_operations kvm_gmem_aops =3D {
+ 	.dirty_folio =3D noop_dirty_folio,
+ 	.migrate_folio	=3D kvm_gmem_migrate_folio,
+-	.error_remove_page =3D kvm_gmem_error_page,
++	.error_remove_folio =3D kvm_gmem_error_folio,
+ };
+=20
+ static int kvm_gmem_getattr(struct mnt_idmap *idmap, const struct path *pa=
+th,
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/k6L+z4ZF5AITNIBFCyYc60_
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmV2eQwACgkQAVBC80lX
+0GxNSAf/dDZBSEWcxmOyeozZ/ArXSlpS/X2SmABjDh02ed8wURGrwmrayYtj4HF2
+YnxLKEulMDxUjOT3upvFvamu/xaZhDFwEfBboxjvJ4rqbYKUeBOoB0S8UKAEee7P
+yW0lW0+nvqDqc7nfHCGtBPIq9VsIUdi6P9YD9XHcYuuA73pEL8ZVGi8aWZEOlU8d
+UZ3q9qsMlWZS5Na1RDgIjFR+hY89xCCI3hWwGx5Cw1Dj/MYDqSgsOVENnBrSvBgx
+gWbemvzi5rAdiAZTcFrTlHKTlU6+eJAsmyZzofR3ddwbVs1DX1rIqIZKUZDyhLiG
+ydPrmhDb0eopw1fDRwxu1M0yTAnVIA==
+=EZzi
+-----END PGP SIGNATURE-----
+
+--Sig_/k6L+z4ZF5AITNIBFCyYc60_--
 
