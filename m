@@ -1,169 +1,147 @@
-Return-Path: <kvm+bounces-4111-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4112-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C6CD80DD87
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 22:49:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E67E480DD8A
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 22:50:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0554B215A5
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 21:49:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 927D41F21A8C
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 21:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9334F54FB6;
-	Mon, 11 Dec 2023 21:48:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA3254FB0;
+	Mon, 11 Dec 2023 21:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CMP/RVUx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="citPtmqo"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2065.outbound.protection.outlook.com [40.107.244.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E46CD5;
-	Mon, 11 Dec 2023 13:48:50 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WBpxw8+Xic6YoM9bj/HrqoVUVrrPGA1uo+ncozHX04/cCrhDeo0a83EW0txzUPC5y0LrgGxXDl4h12xqmuL2vStkS9XjoLpaGSzZ0uKNPC/9nsIEQRElfxnwzW3qwwaBo0M1p0+E5+noBVf+b0GKHMHu0DpjHY00ObPCR70pWfra/Ya/DCcbTzu26qhgNNx3UMUwbxzR9BWfhMfTVYuN/etQXJRsf5GT8vhbhgitmaf6OSCkJUxBu31tVH2bzYtbJ4nxShAFG1ZkyjWsPB+jrEVI75JsMQvp07QgrWJpxC7uwATqN+IvOI0hXC1rsuRqBt1xhKHm0G9HDPrrIhutQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TX0lSt+o+2FnjAgjWeFMslPvvVURHD8S0u7zd9l7UjQ=;
- b=ci5bJFl+EX7ppH8QtabAAmxjqOA734g0z8CHzHYlURnBWl5GExiDTgyvsRxqhoJ1Dwvc5zulv8HfuddZoWHJ1kE36JOAIFbbBu1BMKxZMo3P05ppLqm/oHxbK1MZN4vFCg+tAra2Hx2755XoxGlHZ1tJR4BCf6Kcso3aNiGX13HWXvJpTWY+XI+p/aqee9t+m7AO7zP3VBgWhbRFN3trMD8zmV/9tw03FMnRCKDhmQjGpKOjLIwDpK1OYCg5XRnzOOpjZghUag19WXbhkAcmA+0sGL2v1UbL4IW+S6M7OX3cqyToRr0R+wn2MAsp0QMd5SUXScjN4FUa76nQd/NhSA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TX0lSt+o+2FnjAgjWeFMslPvvVURHD8S0u7zd9l7UjQ=;
- b=CMP/RVUxF8vyhjjV8MO5Kv9noxCEBBvNutmT9Z9Ki0LshziKzOEH1PgzVUWPa7RqDHbc7eUxgtHeA4N7mdTaUfmnYfsRuFTovnB7ioKcQFEQzuIrZOvG7HX9v9cQ8CAgmtlfGVf8F0LmqgzZ7PoPa58Fe+ZSTqRsE64Mt9iLu2UPxiQ2spjucbsFc9DZ+DTH3N8P8yS1bfDfMbK1QxNFRvnN1RscIhF5TetevEB9dXZnh7dFnqSdH/BX8nnP0n3Vc4rOwKxBdKf2GSXtQKVNu9f2Sc4vdQygGY6GJ7zAnzmnZXfpeseDUdt97AWKagIm+w0NWu8RPlPhioD+n332Wg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH3PR12MB9171.namprd12.prod.outlook.com (2603:10b6:610:1a2::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.33; Mon, 11 Dec
- 2023 21:48:47 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7068.031; Mon, 11 Dec 2023
- 21:48:47 +0000
-Date: Mon, 11 Dec 2023 17:48:46 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Nicolin Chen <nicolinc@nvidia.com>
-Cc: Yi Liu <yi.l.liu@intel.com>, "Giani, Dhaval" <Dhaval.Giani@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
-	robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
-	eric.auger@redhat.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-	chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-	peterx@redhat.com, jasowang@redhat.com,
-	shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, zhenzhong.duan@intel.com,
-	joao.m.martins@oracle.com, xin.zeng@intel.com, yan.y.zhao@intel.com
-Subject: Re: [PATCH v6 0/6] iommufd: Add nesting infrastructure (part 2/2)
-Message-ID: <20231211214846.GA3014157@nvidia.com>
-References: <20231117130717.19875-1-yi.l.liu@intel.com>
- <20231209014726.GA2945299@nvidia.com>
- <77ac47d0-2ef0-41fa-86c2-091358541465@intel.com>
- <20231211132041.GE2944114@nvidia.com>
- <ZXds7V0Dz0ycF5IR@Asurada-Nvidia>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZXds7V0Dz0ycF5IR@Asurada-Nvidia>
-X-ClientProxiedBy: MN2PR02CA0025.namprd02.prod.outlook.com
- (2603:10b6:208:fc::38) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 777FDD2
+	for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 13:50:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702331415;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Kfby9h2X+ETcxXvZQB4iewUtiQEuEDDiQNei7fOj1mg=;
+	b=citPtmqoqE/ETLcxtridq+ZoKnWG3/EdcoR3oXNtJ5eXrnwZUTDw6UlWyscz0Wi3lFjfuZ
+	DpyIUmGrLxnGv+gBlHJPiDDoRsicEnJFB2cRmY9m8Vdmi0f4PYYNgVjYT+TmPJzvBQkSZB
+	N9ZENZJR66OPC4vsKRvja7ivNnjTUjg=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-353-jb5SEQzzM3a1mRrTgOahzA-1; Mon, 11 Dec 2023 16:50:14 -0500
+X-MC-Unique: jb5SEQzzM3a1mRrTgOahzA-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-50be6eae316so3630804e87.0
+        for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 13:50:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702331409; x=1702936209;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Kfby9h2X+ETcxXvZQB4iewUtiQEuEDDiQNei7fOj1mg=;
+        b=gIJTNDcOr/6AAsQvJ/s9t5Hy9uI+2tgqZZ0fFTDuAdzeiVbW/R5lurwtRiGRWSn7kO
+         yc74HxUt8t7POaSMfcw1tpGBx5MmFtdjPm+TqvYwWx4ljS3yxPuSERLaW7JKqs6o7bpJ
+         TopRrCsWA9UCXZCDX0mp82gMAk+VCi6FpXo3InsNxXLl0+cNz7lUeqAkP0JK6QE/LLyt
+         KRUhjB6arLJYL1l1HgVqxSv46zbYXn5LzzovYcD/0BbTxfZ4+mt7ZA3SKbUU6VzRdivg
+         l+gM+5rVCJRz11CEt7rP0AuXip6uRNfTXFR2anVhz5xOXOJNULFvpbX5iEkKMxiktZD5
+         p/XQ==
+X-Gm-Message-State: AOJu0YzigGhhFYSl9pmOKwyFE98LKaJN/7peodom5t4UVgmyN2/KGH1w
+	K/lRDklu33aHdlTmHAzMf5FHTuWfNI/N260ZVEEl557kMCS17HYhhhtVolPTIJYLLJ7exON1scs
+	pNnAKpWySsPZnSPOJWsQx0sOgcGmZ
+X-Received: by 2002:ac2:5f48:0:b0:50b:f88d:f83b with SMTP id 8-20020ac25f48000000b0050bf88df83bmr1296647lfz.78.1702331409039;
+        Mon, 11 Dec 2023 13:50:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IELwYuI9z4Zk30LZyKvnG2Fl3l1hi1+7dZbZc9jqNmcKtEqcNd2qVVuZVPj4FvG18scDcekQF9FmbxlQPn/gME=
+X-Received: by 2002:ac2:5f48:0:b0:50b:f88d:f83b with SMTP id
+ 8-20020ac25f48000000b0050bf88df83bmr1296631lfz.78.1702331408742; Mon, 11 Dec
+ 2023 13:50:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH3PR12MB9171:EE_
-X-MS-Office365-Filtering-Correlation-Id: cfc646f7-810b-4600-780d-08dbfa92f454
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	PzAJQwCJbPtkTQtMY3SwuQO7U3iIw4moJLm5Og4fjYV4wpdF+NTc0rhg+sxBU/BZo147qt5XFkNH1MZA/UrSwrfmI8or12VfmivRjJNAkQPCDwDg65zZb5RAl+a33wf0ddGujnxPW5r9tj2dlUmlnLgyBXg9TGefythsFgVA8HSrL3rA76uIzdWyRAIWGDcAas2i2Vn7BzRrlqiDjRkdEV4aZclklXgCaYo+JsON/wopXsxFQryDKzgGnIMJb/O+b3nZqak9keyY/Ag4hsvEH/mgBX0dXSVsx8plF8s8AKOkPjmiEsDH5VlPeyQ2sLvj6cETjiFOo5dBBMQ+NG8ZwhiKrk4pY95Nuzrx94HSy2VcQxydYSQDQOSPfBbpokqe9lA5cEl8eMMX2JjupsgkstCM4JR7CWJat48ob4Ilf8BQ4L+Jj1N5YdZCgml8JNRR2taWFIdn1J9W5HQi89cwDTdH/WKmzyQvPHu6aKSnUanP2WsQuaQxzP9OkssUJmVmCWkt6c1yaLYqc8voSG8PRhGYJ2Vf2/Wo7sdrWkh1dehHWUkJygEoV40o1gJ2t+WB
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(376002)(346002)(39860400002)(136003)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(83380400001)(2906002)(41300700001)(86362001)(478600001)(66556008)(66476007)(6636002)(54906003)(7416002)(66946007)(6486002)(316002)(38100700002)(37006003)(8676002)(6862004)(4326008)(8936002)(6506007)(6512007)(66899024)(36756003)(33656002)(1076003)(5660300002)(26005)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?VyBfoeU43U/AIzoA/551ueGOliW2d0OGw8kG/z2AZWtQ76kQHxmsnAIda0RP?=
- =?us-ascii?Q?b/tYDe0I7uB7ooWkl4/wtZha0Kpj/J16AFNFx4DVU1381xGPLCqlTBai+Mvx?=
- =?us-ascii?Q?ZX+3DIJFww5ojTl/ML+Wvw5AmgsnKY+RIckeMpSwmj+ITNfx4OhfpZes69jD?=
- =?us-ascii?Q?cjvi+x7nfi0l6IkjbsH8XckuGHiZkuLAmuafUFPoCp3HjvGHIEpAjmIJvc2l?=
- =?us-ascii?Q?dysbhxYIMnEoHFaMaPQTrV+w4QK+0SMED6yInxrhJz/RXOKu3m+fmTlp1hG9?=
- =?us-ascii?Q?PWQAFWaGqPkO8uacvUT1KsAtmllNKq87l6uO5t79dfL5wP0E4XtGO2lSwLcJ?=
- =?us-ascii?Q?QhfqvWQqVJDso8OrYOwSrj2ZNsrvDH0zayQHnVu95545rT75MsjPuCVQrhR8?=
- =?us-ascii?Q?xV4UWFZJaNHj8pRJU8oUZE4S25esuqIT2mKKFfBrxL4OkhvknmiSzxi7rNaW?=
- =?us-ascii?Q?6ki20i61LJPe7uVtiS14VklX/Ry8s1csJqxVjROEorAvcTnZ9FJ/rBxKFTDM?=
- =?us-ascii?Q?C6tPBIdx6MW9Z9LM0Z1WOWyYyZKt7jymtWEpPopacy1pRxVoBpcRZuboCwZ7?=
- =?us-ascii?Q?2pU/HgQzVOizP4zzO4QLeUByi4l9zJ9ctXGHWeVr893tfvk6M6yB9dn7HFyH?=
- =?us-ascii?Q?qo0a3Pr1UAJ8RVRT8ukRXu+Z/qfteiT+r0Pyv3P71wjY4ZVP5DJR3QAmVSn/?=
- =?us-ascii?Q?yBmF48RZhd2FKQAMNUevSpaFA8p3Dlebf5iJ1pWDqW1mjkx9+ZF012G+gFQ3?=
- =?us-ascii?Q?WWBsXE1PuFItgCTvY/BDyUGSsdDA2Mq4tGnHFbsLZzByjHG6cVCDGJCLzQSZ?=
- =?us-ascii?Q?S/FeHtblW4VO9/FiB1sAcj8Z8WXl1Zdqjoq7vffQaQFisDCd4CjNayBqySnF?=
- =?us-ascii?Q?zACFLPuc8vYk8v1iHvjwOd5+VZ95vg1K2UUy5QwD6SjYbw/FDCM7U2O4uZhP?=
- =?us-ascii?Q?tWZWaQOi89PnokxZppNDydjLDxx+VDDoG/n+fn7O4wvmfiE3UpsbTUimK/7l?=
- =?us-ascii?Q?OFHnu5FXIC8IhrzOlNlSjpCbcZerxgHKAqAHaAgNkS0Nm/SkwHFqik0HG+ov?=
- =?us-ascii?Q?nUrpYsDdDBRAVkZqwJ9zkfbM57vxEShdlSG84TXzt77HrbsTuIOjMGFnuwyT?=
- =?us-ascii?Q?mLWezcMYwxZcWb1RGmjHsc7K1Mehlc6GnIDQVd2JcIwZki5pa6gamLzblVg7?=
- =?us-ascii?Q?VBYjztUiM5M1bz3EoWWH387SfmnXQ9KyYsvCw1M8psgD59mxp+W4iZ3egBVE?=
- =?us-ascii?Q?24ZCIQjHA92+i2yrbM6KNsHDNMSA9S54JAjElZeBOb76Z0pLOyx8Jtnm2fv9?=
- =?us-ascii?Q?pNm3tFWHteoElvKClK55tfNKuxZO8Q/kWl1vNuUq1UGhWvqI5UnNeI3VzwBE?=
- =?us-ascii?Q?q96tJvD3i/ZBDR9GUtvx1ZEY7YPaTbTo065rO+eSLb1hZjI0sX6sKWpjc7pR?=
- =?us-ascii?Q?riGSnyPB7usfwgNKD4L1RETilPLdAAKkt3FakJjLR6QK8JgF0giZzNP/w5Yv?=
- =?us-ascii?Q?FG1KqQx2rzaGvrQQlphBo+lH4fHFImCTnwll2NGZW5KBky+Df7EUM/JqbE36?=
- =?us-ascii?Q?ZWPUE7Q6vGffs1Z8g4ArmSU61VwcrdV12llkV7xY?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cfc646f7-810b-4600-780d-08dbfa92f454
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2023 21:48:47.6339
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fk3cZcqCs+daPBsL4zhGPWmZhEUj35f9f7cpSmA4kc7z8w2Hf19qJVA+SaVQYqg3
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9171
+References: <20230420120948.436661-1-stefanha@redhat.com> <20230420120948.436661-21-stefanha@redhat.com>
+ <CAC1VKkMadcEV4+UwXQQEONTBnw=xfmFC2MeUoruMRNkOLK0+qg@mail.gmail.com> <20231207111110.GA2132561@fedora>
+In-Reply-To: <20231207111110.GA2132561@fedora>
+From: Carlos Santos <casantos@redhat.com>
+Date: Mon, 11 Dec 2023 18:49:57 -0300
+Message-ID: <CAC1VKkP8HgFPnMjFYVGgSDCj6rStzMVS7VrD=bs43zddSsMCCw@mail.gmail.com>
+Subject: Re: [PULL 20/20] tracing: install trace events file only if necessary
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Raphael Norwitz <raphael.norwitz@nutanix.com>, 
+	Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Julia Suvorova <jusual@redhat.com>, 
+	Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	=?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, 
+	Cornelia Huck <cohuck@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, 
+	=?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
+	Peter Maydell <peter.maydell@linaro.org>, Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org, 
+	Hanna Reitz <hreitz@redhat.com>, Fam Zheng <fam@euphon.net>, 
+	Aarushi Mehta <mehta.aaru20@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 11, 2023 at 12:11:25PM -0800, Nicolin Chen wrote:
-> On Mon, Dec 11, 2023 at 09:20:41AM -0400, Jason Gunthorpe wrote:
-> > On Mon, Dec 11, 2023 at 08:35:09PM +0800, Yi Liu wrote:
-> > > > So.. In short.. Invalidation is a PITA. The idea is the same but
-> > > > annoying little details interfere with actually having a compltely
-> > > > common API here. IMHO the uAPI in this series is fine. It will support
-> > > > Intel invalidation and non-ATC invalidation on AMD/ARM. It should be
-> > > > setup to allow that the target domain object can be any HWPT.
-> > > 
-> > > This HWPT is still nested domain. Is it? But it can represent a guest I/O
-> > > page table (VT-d), guest CD table (ARM), guest CR3 Table (AMD, it seems to
-> > > be a set of guest CR3 table pointers). May ARM and AMD guys keep me honest
-> > > here.
-> > 
-> > I was thinking ARM would not want to use a nested domain because
-> > really the invalidation is global to the entire nesting parent.
-> > 
-> > But, there is an issue with that - the nesting parent could be
-> > attached to multiple iommu instances but we only want to invalidate a
-> > single instance. 
-> 
-> I am still not sure about attaching an S2 domain to multiple
-> SMMUs. An S2 domain is created per SMMU, and we have such a
-> rejection in arm_smmu_attach_dev():
-> 	} else if (smmu_domain->smmu != smmu)
-> 		ret = -EINVAL;
+On Mon, Dec 11, 2023 at 4:58=E2=80=AFPM Stefan Hajnoczi <stefanha@redhat.co=
+m> wrote:
+>
+> On Wed, Dec 06, 2023 at 07:26:01AM -0300, Carlos Santos wrote:
+> > On Thu, Apr 20, 2023 at 9:10=E2=80=AFAM Stefan Hajnoczi <stefanha@redha=
+t.com> wrote:
+> > >
+> > > From: Carlos Santos <casantos@redhat.com>
+> > >
+> > > It is not useful when configuring with --enable-trace-backends=3Dnop.
+> > >
+> > > Signed-off-by: Carlos Santos <casantos@redhat.com>
+> > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > Message-Id: <20230408010410.281263-1-casantos@redhat.com>
+> > > ---
+> > >  trace/meson.build | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > > diff --git a/trace/meson.build b/trace/meson.build
+> > > index 8e80be895c..30b1d942eb 100644
+> > > --- a/trace/meson.build
+> > > +++ b/trace/meson.build
+> > > @@ -64,7 +64,7 @@ trace_events_all =3D custom_target('trace-events-al=
+l',
+> > >                                   input: trace_events_files,
+> > >                                   command: [ 'cat', '@INPUT@' ],
+> > >                                   capture: true,
+> > > -                                 install: true,
+> > > +                                 install: get_option('trace_backends=
+') !=3D [ 'nop' ],
+> > >                                   install_dir: qemu_datadir)
+> > >
+> > >  if 'ust' in get_option('trace_backends')
+> > > --
+> > > 2.39.2
+> > >
+> >
+> > Hello,
+> >
+> > I still don't see this in the master branch. Is there something
+> > preventing it from being applied?
+>
+> Hi Carlos,
+> Apologies, I dropped this patch when respinning the pull request after
+> the CI test failures caused by the zoned patches.
+>
+> Your patch has been merged on my tracing tree again and will make it
+> into qemu.git/master when the development window opens again after the
+> QEMU 8.2.0 release (hopefully next Tuesday).
+>
+> Stefan
 
-I intend to remove that eventually
+Great. Thanks!
 
-> I understand that it would be probably ideal to share the S2
-> iopt among the SMMUs. But in the driver the objects (domain)
-> holding a shared S2 iopt must be different to allocate their
-> own VMIDs, right?
+--=20
+Carlos Santos
+Senior Software Maintenance Engineer
+Red Hat
+casantos@redhat.com    T: +55-11-3534-6186
 
-No, the vmid will be moved into the struct arm_smmu_master_domain
-
-Jason
 
