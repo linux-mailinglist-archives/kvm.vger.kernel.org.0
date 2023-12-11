@@ -1,81 +1,112 @@
-Return-Path: <kvm+bounces-4030-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4031-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A92D80C4ED
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 10:41:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80FD280C595
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 11:05:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 896771C20A6C
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 09:41:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AA2A28176A
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 10:04:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F20219E0;
-	Mon, 11 Dec 2023 09:41:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E529822092;
+	Mon, 11 Dec 2023 10:04:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oHe1yCB3"
 X-Original-To: kvm@vger.kernel.org
-Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9E3D9D1
-	for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 01:41:21 -0800 (PST)
-Received: from localhost.localdomain (unknown [10.12.130.31])
-	by app2 (Coremail) with SMTP id TQJkCgB3BtXv2HZl__YAAA--.12166S4;
-	Mon, 11 Dec 2023 17:40:00 +0800 (CST)
-From: Chao Du <duchao@eswincomputing.com>
-To: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	anup@brainfault.org,
-	atishp@atishpatra.org,
-	dbarboza@ventanamicro.com
-Subject: [PATCH] RISC-V: KVM: remove a redundant condition in kvm_arch_vcpu_ioctl_run()
-Date: Mon, 11 Dec 2023 09:40:14 +0000
-Message-Id: <20231211094014.4041-1-duchao@eswincomputing.com>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:TQJkCgB3BtXv2HZl__YAAA--.12166S4
-X-Coremail-Antispam: 1UD129KBjvdXoW7XFy8Jw43ZFWkur4UWF13XFb_yoWfZFg_Gw
-	1xJ3yfKrWxJF1IyryDuayrGrn5Ww4kta9xGw1fXr18GwnFgFsrKwsYgw1fZrW2vrW3Aay7
-	GrZakr47ArW3GjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbzkYjsxI4VWkKwAYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I
-	6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM2
-	8CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0
-	cI8IcVCY1x0267AKxVWxJr0_GcWl84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4
-	A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IE
-	w4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMc
-	vjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCY02Avz4vE-syl42xK82IYc2Ij
-	64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
-	2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
-	xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF
-	7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07beAp5UUUUU=
-X-CM-SenderInfo: xgxfxt3r6h245lqf0zpsxwx03jof0z/
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BE3EBD;
+	Mon, 11 Dec 2023 02:04:50 -0800 (PST)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BB8ZbvM016523;
+	Mon, 11 Dec 2023 10:04:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=bn9m6ZHBOEK4aU3igY1lQ1CdMDbIryMawx9SyqHE66I=;
+ b=oHe1yCB31T5UnQ2TVjabMHAUg6WSCMqcuCWAZhInrwTjM9SJF2RfLDAfnKeDIIlMUTOa
+ zTxg0oZShCe6aKkDHs842OkavKTqCd5I2yEGHZqVFe4PnoT5RwmzsYk+j92fgbOAGvsK
+ whZm8MuhSXq93TQjrEVE3YfTeadB4xy3R9APX+PBb87xZrWa065IxdWQG+RO9fAKnfp/
+ GA3EIjTI+4dyvy/eNtgLmCZv9OkZJPNDEzOCeFNhhL/rgZXq6pmgp3JtoGS/OApU/9Cu
+ k81yoZcoU7mQY7TAglqqOtNASAGpND3NHUVLK/p/MhdNeBF8FTzOlV1FEMGHnjy1ZluJ Dg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uvtckdsn4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Dec 2023 10:04:49 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BB8oWMg024676;
+	Mon, 11 Dec 2023 10:04:49 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uvtckdsmq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Dec 2023 10:04:49 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BB93HCP004139;
+	Mon, 11 Dec 2023 10:04:47 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uw4sk06q5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Dec 2023 10:04:47 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BBA4glQ11993628
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 11 Dec 2023 10:04:43 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E067420063;
+	Mon, 11 Dec 2023 10:04:42 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A4F3E20067;
+	Mon, 11 Dec 2023 10:04:42 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 11 Dec 2023 10:04:42 +0000 (GMT)
+Date: Mon, 11 Dec 2023 11:04:40 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, hca@linux.ibm.com, agordeev@linux.ibm.com,
+        gor@linux.ibm.com
+Subject: Re: [GIT PULL v1 0/2] KVM: s390: two small but important fixes
+Message-ID: <20231211110440.3e4e8346@p-imbrenda>
+In-Reply-To: <CABgObfYVfNsfjy36iBeq7qiV_m3smRKCyOSWQRV2E0OMH1bqAA@mail.gmail.com>
+References: <20231115125111.28217-1-imbrenda@linux.ibm.com>
+	<CABgObfYt3VH-zPwT1whA0N7uE2ioq9GznTt-QhnES8B5tX76jQ@mail.gmail.com>
+	<CABgObfYVfNsfjy36iBeq7qiV_m3smRKCyOSWQRV2E0OMH1bqAA@mail.gmail.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: DrLjTXKdKomyw_z-kYeAKZKBqG2kkePm
+X-Proofpoint-GUID: Q2MkdVnMeB_A4Rcp0-hj5Ek_Eo7tQoFR
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-11_04,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ clxscore=1015 suspectscore=0 mlxscore=0 lowpriorityscore=0 impostorscore=0
+ phishscore=0 priorityscore=1501 mlxlogscore=794 bulkscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2312110082
 
-The latest ret value is updated by kvm_riscv_vcpu_aia_update(),
-the loop will continue if the ret is less than or equal to zero.
-So the later condition will never hit. Thus remove it.
+On Fri, 8 Dec 2023 22:02:43 +0100
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-Signed-off-by: Chao Du <duchao@eswincomputing.com>
----
- arch/riscv/kvm/vcpu.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+> On Fri, Dec 8, 2023 at 7:13=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com=
+> wrote:
+> > >       KVM: s390/mm: Properly reset no-dat =20
+>=20
+> A small question on this one, would it make sense to clear _all_
+> gmap-related bits, including _PGSTE_GPS_ZERO?
 
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index e087c809073c..bf3952d1a621 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -757,8 +757,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		/* Update HVIP CSR for current CPU */
- 		kvm_riscv_update_hvip(vcpu);
- 
--		if (ret <= 0 ||
--		    kvm_riscv_gstage_vmid_ver_changed(&vcpu->kvm->arch.vmid) ||
-+		if (kvm_riscv_gstage_vmid_ver_changed(&vcpu->kvm->arch.vmid) ||
- 		    kvm_request_pending(vcpu) ||
- 		    xfer_to_guest_mode_work_pending()) {
- 			vcpu->mode = OUTSIDE_GUEST_MODE;
--- 
-2.17.1
+That's a good question, I'll have to think about it.
 
+In general, though, not resetting it will not cause issues in the guest.
 
