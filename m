@@ -1,42 +1,42 @@
-Return-Path: <kvm+bounces-4108-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4106-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DBBB80DCFB
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 22:26:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CA4980DCFA
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 22:26:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08C0F28210E
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 21:26:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57D4628210E
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 21:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ECD655C31;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2645B55C14;
 	Mon, 11 Dec 2023 21:25:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="LCDQUQed"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="lB55k2+B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F0ADCE;
-	Mon, 11 Dec 2023 13:25:31 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id DD387120023;
-	Tue, 12 Dec 2023 00:25:29 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru DD387120023
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1650FD0;
+	Mon, 11 Dec 2023 13:25:32 -0800 (PST)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 67B63100010;
+	Tue, 12 Dec 2023 00:25:30 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 67B63100010
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1702329929;
-	bh=VmAdpH9x38zPwDEoj4Gt4kPsMmwatZT92OHzSFYanx4=;
+	s=mail; t=1702329930;
+	bh=t/kjl2Vjg1LdCA2ZU1r92JWEZ4RRp+5azAC7FUXgjBk=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=LCDQUQeddDYYXPI1uhAldeiHRaDTGWtr5e8ntfDR54QD/oKgTddjjSAlumUvJ9OOY
-	 sxFc98yiUncoFwrmMfnQA2x6UMlGTf3cgVoj2CJpOcb5nbOQtkYUVuEP9GlFYxHGvk
-	 AOJrrAEPn7LZwpIJpHORV4BK/RW+aotdZUwC0B0r6Yuze0wvwypOGc13UajP5WdZqE
-	 Y/m7rH2mFR/6LHJKNhjv239I6lOjShh/kiQboVjeTKyYJ4Lt6p1B5R0HkBmr3/F66S
-	 kU8E+D8LJZZ+qJm3jkNyzG7+ZvTEpjuMmkxVQoHZ+chImr6ZDM4jDHTSAWTeYu8fvm
-	 f7ROYDFMaiAew==
+	b=lB55k2+BYtSfnNlz5b9l8/U/Azat0EnnDjxhY2MVPfddzMHK0gO5W50xAv8S+k/sp
+	 758C8c7g1jW2rRGy9oq74peiE7XTercg5N62GSznh9J+q2B3JoD5R8211pZZBoJkFy
+	 4/nche9UKEzYY7bowi7ACojzesNTe068y3swCmYPyO7FSZcC6CXwm+PSsmYTMwGV4q
+	 JH4kIcTkS0rSrmDcVnWdRe6BaKviJ+N6+c7xoe9vl7HVU2xQBrBGkPRdxn2PShTaeQ
+	 Myye2YCiqAVQ8dRtPkJbO3QeDoUDqcqlUj+dvs2jlhDpKu7uD6qb4LEN22iBUvatCS
+	 BwUs+YMA97nyQ==
 Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
 	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Tue, 12 Dec 2023 00:25:29 +0300 (MSK)
+	Tue, 12 Dec 2023 00:25:30 +0300 (MSK)
 Received: from localhost.localdomain (100.64.160.123) by
  p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -50,10 +50,12 @@ To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
 CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
-Subject: [PATCH net-next v8 0/4] send credit update during setting SO_RCVLOWAT
-Date: Tue, 12 Dec 2023 00:16:54 +0300
-Message-ID: <20231211211658.2904268-1-avkrasnov@salutedevices.com>
+Subject: [PATCH net-next v8 1/4] vsock: update SO_RCVLOWAT setting callback
+Date: Tue, 12 Dec 2023 00:16:55 +0300
+Message-ID: <20231211211658.2904268-2-avkrasnov@salutedevices.com>
 X-Mailer: git-send-email 2.35.0
+In-Reply-To: <20231211211658.2904268-1-avkrasnov@salutedevices.com>
+References: <20231211211658.2904268-1-avkrasnov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -73,124 +75,95 @@ X-KSMG-AntiSpam-Rate: 0
 X-KSMG-AntiSpam-Status: not_detected
 X-KSMG-AntiSpam-Method: none
 X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;100.64.160.123:7.1.2;salutedevices.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1;git.kernel.org:7.1.1;lore.kernel.org:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Tracking_from_domain_doesnt_match_to}, smtp.sberdevices.ru:5.0.1,7.1.1;salutedevices.com:7.1.1;100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
 X-MS-Exchange-Organization-SCL: -1
 X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2023/12/11 20:27:00
-X-KSMG-LinksScanning: Clean, bases: 2023/12/11 20:27:00
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
 X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/12/11 18:02:00 #22660190
 X-KSMG-AntiVirus-Status: Clean, skipped
 
-Hello,
+Do not return if transport callback for SO_RCVLOWAT is set (only in
+error case). In this case we don't need to set 'sk_rcvlowat' field in
+each transport - only in 'vsock_set_rcvlowat()'. Also, if 'sk_rcvlowat'
+is now set only in af_vsock.c, change callback name from 'set_rcvlowat'
+to 'notify_set_rcvlowat'.
 
-                               DESCRIPTION
+Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ Changelog:
+ v3 -> v4:
+  * Rename 'set_rcvlowat' to 'notify_set_rcvlowat'.
+  * Commit message updated.
 
-This patchset fixes old problem with hungup of both rx/tx sides and adds
-test for it. This happens due to non-default SO_RCVLOWAT value and
-deferred credit update in virtio/vsock. Link to previous old patchset:
-https://lore.kernel.org/netdev/39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru/
+ include/net/af_vsock.h           | 2 +-
+ net/vmw_vsock/af_vsock.c         | 9 +++++++--
+ net/vmw_vsock/hyperv_transport.c | 4 ++--
+ 3 files changed, 10 insertions(+), 5 deletions(-)
 
-Here is what happens step by step:
-
-                                  TEST
-
-                            INITIAL CONDITIONS
-
-1) Vsock buffer size is 128KB.
-2) Maximum packet size is also 64KB as defined in header (yes it is
-   hardcoded, just to remind about that value).
-3) SO_RCVLOWAT is default, e.g. 1 byte.
-
-
-                                 STEPS
-
-            SENDER                              RECEIVER
-1) sends 128KB + 1 byte in a
-   single buffer. 128KB will
-   be sent, but for 1 byte
-   sender will wait for free
-   space at peer. Sender goes
-   to sleep.
-
-
-2)                                     reads 64KB, credit update not sent
-3)                                     sets SO_RCVLOWAT to 64KB + 1
-4)                                     poll() -> wait forever, there is
-                                       only 64KB available to read.
-
-So in step 4) receiver also goes to sleep, waiting for enough data or
-connection shutdown message from the sender. Idea to fix it is that rx
-kicks tx side to continue transmission (and may be close connection)
-when rx changes number of bytes to be woken up (e.g. SO_RCVLOWAT) and
-this value is bigger than number of available bytes to read.
-
-I've added small test for this, but not sure as it uses hardcoded value
-for maximum packet length, this value is defined in kernel header and
-used to control deferred credit update. And as this is not available to
-userspace, I can't control test parameters correctly (if one day this
-define will be changed - test may become useless). 
-
-Head for this patchset is:
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=021b0c952f226236f2edf89c737efb9a28d1422d
-
-Link to v1:
-https://lore.kernel.org/netdev/20231108072004.1045669-1-avkrasnov@salutedevices.com/
-Link to v2:
-https://lore.kernel.org/netdev/20231119204922.2251912-1-avkrasnov@salutedevices.com/
-Link to v3:
-https://lore.kernel.org/netdev/20231122180510.2297075-1-avkrasnov@salutedevices.com/
-Link to v4:
-https://lore.kernel.org/netdev/20231129212519.2938875-1-avkrasnov@salutedevices.com/
-Link to v5:
-https://lore.kernel.org/netdev/20231130130840.253733-1-avkrasnov@salutedevices.com/
-Link to v6:
-https://lore.kernel.org/netdev/20231205064806.2851305-1-avkrasnov@salutedevices.com/
-Link to v7:
-https://lore.kernel.org/netdev/20231206211849.2707151-1-avkrasnov@salutedevices.com/
-
-Changelog:
-v1 -> v2:
- * Patchset rebased and tested on new HEAD of net-next (see hash above).
- * New patch is added as 0001 - it removes return from SO_RCVLOWAT set
-   callback in 'af_vsock.c' when transport callback is set - with that
-   we can set 'sk_rcvlowat' only once in 'af_vsock.c' and in future do
-   not copy-paste it to every transport. It was discussed in v1.
- * See per-patch changelog after ---.
-v2 -> v3:
- * See changelog after --- in 0003 only (0001 and 0002 still same).
-v3 -> v4:
- * Patchset rebased and tested on new HEAD of net-next (see hash above).
- * See per-patch changelog after ---.
-v4 -> v5:
- * Change patchset tag 'RFC' -> 'net-next'.
- * See per-patch changelog after ---.
-v5 -> v6:
- * New patch 0003 which sends credit update during reading bytes from
-   socket.
- * See per-patch changelog after ---.
-v6 -> v7:
- * Patchset rebased and tested on new HEAD of net-next (see hash above).
- * See per-patch changelog after ---.
-v7 -> v8:
- * See per-patch changelog after ---.
-
-Arseniy Krasnov (4):
-  vsock: update SO_RCVLOWAT setting callback
-  virtio/vsock: send credit update during setting SO_RCVLOWAT
-  virtio/vsock: fix logic which reduces credit update messages
-  vsock/test: two tests to check credit update logic
-
- drivers/vhost/vsock.c                   |   1 +
- include/linux/virtio_vsock.h            |   1 +
- include/net/af_vsock.h                  |   2 +-
- net/vmw_vsock/af_vsock.c                |   9 +-
- net/vmw_vsock/hyperv_transport.c        |   4 +-
- net/vmw_vsock/virtio_transport.c        |   1 +
- net/vmw_vsock/virtio_transport_common.c |  43 +++++-
- net/vmw_vsock/vsock_loopback.c          |   1 +
- tools/testing/vsock/vsock_test.c        | 175 ++++++++++++++++++++++++
- 9 files changed, 229 insertions(+), 8 deletions(-)
-
+diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+index e302c0e804d0..535701efc1e5 100644
+--- a/include/net/af_vsock.h
++++ b/include/net/af_vsock.h
+@@ -137,7 +137,6 @@ struct vsock_transport {
+ 	u64 (*stream_rcvhiwat)(struct vsock_sock *);
+ 	bool (*stream_is_active)(struct vsock_sock *);
+ 	bool (*stream_allow)(u32 cid, u32 port);
+-	int (*set_rcvlowat)(struct vsock_sock *vsk, int val);
+ 
+ 	/* SEQ_PACKET. */
+ 	ssize_t (*seqpacket_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
+@@ -168,6 +167,7 @@ struct vsock_transport {
+ 		struct vsock_transport_send_notify_data *);
+ 	/* sk_lock held by the caller */
+ 	void (*notify_buffer_size)(struct vsock_sock *, u64 *);
++	int (*notify_set_rcvlowat)(struct vsock_sock *vsk, int val);
+ 
+ 	/* Shutdown. */
+ 	int (*shutdown)(struct vsock_sock *, int);
+diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+index 816725af281f..54ba7316f808 100644
+--- a/net/vmw_vsock/af_vsock.c
++++ b/net/vmw_vsock/af_vsock.c
+@@ -2264,8 +2264,13 @@ static int vsock_set_rcvlowat(struct sock *sk, int val)
+ 
+ 	transport = vsk->transport;
+ 
+-	if (transport && transport->set_rcvlowat)
+-		return transport->set_rcvlowat(vsk, val);
++	if (transport && transport->notify_set_rcvlowat) {
++		int err;
++
++		err = transport->notify_set_rcvlowat(vsk, val);
++		if (err)
++			return err;
++	}
+ 
+ 	WRITE_ONCE(sk->sk_rcvlowat, val ? : 1);
+ 	return 0;
+diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+index 7cb1a9d2cdb4..e2157e387217 100644
+--- a/net/vmw_vsock/hyperv_transport.c
++++ b/net/vmw_vsock/hyperv_transport.c
+@@ -816,7 +816,7 @@ int hvs_notify_send_post_enqueue(struct vsock_sock *vsk, ssize_t written,
+ }
+ 
+ static
+-int hvs_set_rcvlowat(struct vsock_sock *vsk, int val)
++int hvs_notify_set_rcvlowat(struct vsock_sock *vsk, int val)
+ {
+ 	return -EOPNOTSUPP;
+ }
+@@ -856,7 +856,7 @@ static struct vsock_transport hvs_transport = {
+ 	.notify_send_pre_enqueue  = hvs_notify_send_pre_enqueue,
+ 	.notify_send_post_enqueue = hvs_notify_send_post_enqueue,
+ 
+-	.set_rcvlowat             = hvs_set_rcvlowat
++	.notify_set_rcvlowat      = hvs_notify_set_rcvlowat
+ };
+ 
+ static bool hvs_check_transport(struct vsock_sock *vsk)
 -- 
 2.25.1
 
