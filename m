@@ -1,189 +1,153 @@
-Return-Path: <kvm+bounces-4017-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4018-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C14E80C09B
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 06:14:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB2F480C119
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 07:03:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C621B208C5
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 05:14:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D36C1F20F29
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 06:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F29011CABA;
-	Mon, 11 Dec 2023 05:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B0C1F5FC;
+	Mon, 11 Dec 2023 06:03:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j1k87/K7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mdg0HjdP"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D716F1C29E;
-	Mon, 11 Dec 2023 05:14:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0966C433C8;
-	Mon, 11 Dec 2023 05:14:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702271651;
-	bh=1RaacpWnTkL7X+JkkZCzrmMSUdmiLmbVja5/lwCyjQE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=j1k87/K7XA8EUz7Zf98AZPRZyBK3naglI6189/lN0rxULeWuXjMdwpoAWl6KaQDu7
-	 3blzWA81dIIb5kC62NvxjL2YeGPGNpo134fVU1OIWCZ8wISzfCfIHLmlVGVMjdoPZG
-	 ypL9U5OwRcNAf1U7n98XUq7ZJFwB4M6SkzSNXqE+3pRpe0S0TGnprKad8mHpY0EmG7
-	 5em7IPy2y3vOan4UyOPX4/fva1R2mmdUqcqVGk1AiRcjfacx76VCU6M0WuYEAjcXh4
-	 T6ORZDmE3uH9ZfnxzMcYRaWZ9lpYmUfPqCmUtVmz1kaPKNOxj7IfYhmyOtAPd0VHzM
-	 xA7qcayxQqJ7Q==
-Date: Mon, 11 Dec 2023 14:14:03 +0900
-From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-To: Xin Li <xin3.li@intel.com>
-Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
- kvm@vger.kernel.org, xen-devel@lists.xenproject.org, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
- x86@kernel.org, hpa@zytor.com, luto@kernel.org, pbonzini@redhat.com,
- seanjc@google.com, peterz@infradead.org, jgross@suse.com,
- ravi.v.shankar@intel.com, mhiramat@kernel.org, andrew.cooper3@citrix.com,
- jiangshanlai@gmail.com, nik.borisov@suse.com, shan.kang@intel.com
-Subject: Re: [PATCH v13 01/35] x86/cpufeatures,opcode,msr: Add the WRMSRNS
- instruction support
-Message-Id: <20231211141403.09e3f2d81eb499ba44035fef@kernel.org>
-In-Reply-To: <20231205105030.8698-2-xin3.li@intel.com>
-References: <20231205105030.8698-1-xin3.li@intel.com>
-	<20231205105030.8698-2-xin3.li@intel.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89A13D9;
+	Sun, 10 Dec 2023 22:03:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702274611; x=1733810611;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=fqItQSWm3yTpgW92qdHNXR7t4gqbCIKE+I2hDEIxe5o=;
+  b=mdg0HjdPiD5tdHlwOLFWspJWL7xK050FikLzt2birfLupd8XSmJPe5gw
+   7EyKSZYm9T+cVuNDQcMgthq7V8cWBGa3eUecuCPP8raDtHrSKOsg/DlDL
+   RcIhltvlpTlQ87tb1pbn8xsdTDTgwcc9RjiN2c/SHsvy8a5TmcAmHfGeV
+   rNA02d3ktn6pBx7AgEhrM5jPZdr18S0/JZT4ZAuMQqtpoB1qdIqxQZOng
+   3WDMpDpsB1ggNFSRsg0udHvOpiXQgB22EIXcggFq6U/ZlesXDd1s+1IfZ
+   mxBDHtY1Q0/jQPVDEwbJYcFCciglzQq/WDPp7qNBaYMOdNfImllqo24tw
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="374103030"
+X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
+   d="scan'208";a="374103030"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2023 22:03:31 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="863642253"
+X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
+   d="scan'208";a="863642253"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.5.53]) ([10.93.5.53])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2023 22:03:28 -0800
+Message-ID: <7639fb68-5142-42fe-9dff-7f7c31d03d22@linux.intel.com>
+Date: Mon, 11 Dec 2023 14:03:26 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 09/28] KVM: x86/pmu: Disallow "fast" RDPMC for
+ architectural Intel PMUs
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Kan Liang <kan.liang@linux.intel.com>, Jim Mattson <jmattson@google.com>,
+ Jinrong Liang <cloudliang@tencent.com>, Aaron Lewis <aaronlewis@google.com>,
+ Like Xu <likexu@tencent.com>
+References: <20231202000417.922113-1-seanjc@google.com>
+ <20231202000417.922113-10-seanjc@google.com>
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <20231202000417.922113-10-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue,  5 Dec 2023 02:49:50 -0800
-Xin Li <xin3.li@intel.com> wrote:
 
-> WRMSRNS is an instruction that behaves exactly like WRMSR, with
-> the only difference being that it is not a serializing instruction
-> by default. Under certain conditions, WRMSRNS may replace WRMSR to
-> improve performance.
-> 
-> Add its CPU feature bit, opcode to the x86 opcode map, and an
-> always inline API __wrmsrns() to embed WRMSRNS into the code.
-> 
-> Tested-by: Shan Kang <shan.kang@intel.com>
-> Signed-off-by: Xin Li <xin3.li@intel.com>
-
-Looks good to me.
-
-Acked-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-
-Thanks,
-
+On 12/2/2023 8:03 AM, Sean Christopherson wrote:
+> Inject #GP on RDPMC if the "fast" flag is set for architectural Intel
+> PMUs, i.e. if the PMU version is non-zero.  Per Intel's SDM, and confirmed
+> on bare metal, the "fast" flag is supported only for non-architectural
+> PMUs, and is reserved for architectural PMUs.
+>
+>    If the processor does not support architectural performance monitoring
+>    (CPUID.0AH:EAX[7:0]=0), ECX[30:0] specifies the index of the PMC to be
+>    read. Setting ECX[31] selects “fast” read mode if supported. In this mode,
+>    RDPMC returns bits 31:0 of the PMC in EAX while clearing EDX to zero.
+>
+>    If the processor does support architectural performance monitoring
+>    (CPUID.0AH:EAX[7:0] ≠ 0), ECX[31:16] specifies type of PMC while ECX[15:0]
+>    specifies the index of the PMC to be read within that type. The following
+>    PMC types are currently defined:
+>    — General-purpose counters use type 0. The index x (to read IA32_PMCx)
+>      must be less than the value enumerated by CPUID.0AH.EAX[15:8] (thus
+>      ECX[15:8] must be zero).
+>    — Fixed-function counters use type 4000H. The index x (to read
+>      IA32_FIXED_CTRx) can be used if either CPUID.0AH.EDX[4:0] > x or
+>      CPUID.0AH.ECX[x] = 1 (thus ECX[15:5] must be 0).
+>    — Performance metrics use type 2000H. This type can be used only if
+>      IA32_PERF_CAPABILITIES.PERF_METRICS_AVAILABLE[bit 15]=1. For this type,
+>      the index in ECX[15:0] is implementation specific.
+>
+> Opportunistically WARN if KVM ever actually tries to complete RDPMC for a
+> non-architectural PMU, and drop the non-existent "support" for fast RDPMC,
+> as KVM doesn't support such PMUs, i.e. kvm_pmu_rdpmc() should reject the
+> RDPMC before getting to the Intel code.
+>
+> Fixes: f5132b01386b ("KVM: Expose a version 2 architectural PMU to a guests")
+> Fixes: 67f4d4288c35 ("KVM: x86: rdpmc emulation checks the counter incorrectly")
+> Cc: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
-> 
-> Changes since v12:
-> * Merge the 3 WRMSRNS patches into one (Borislav Petkov).
-> * s/cpu/CPU/g (Borislav Petkov).
-> * Shorten the WRMSRNS description (Borislav Petkov).
-> ---
->  arch/x86/include/asm/cpufeatures.h       |  1 +
->  arch/x86/include/asm/msr.h               | 18 ++++++++++++++++++
->  arch/x86/lib/x86-opcode-map.txt          |  2 +-
->  tools/arch/x86/include/asm/cpufeatures.h |  1 +
->  tools/arch/x86/lib/x86-opcode-map.txt    |  2 +-
->  5 files changed, 22 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 149cc5d5c2ae..a903fc130e49 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -325,6 +325,7 @@
->  #define X86_FEATURE_FSRS		(12*32+11) /* "" Fast short REP STOSB */
->  #define X86_FEATURE_FSRC		(12*32+12) /* "" Fast short REP {CMPSB,SCASB} */
->  #define X86_FEATURE_LKGS		(12*32+18) /* "" Load "kernel" (userspace) GS */
-> +#define X86_FEATURE_WRMSRNS		(12*32+19) /* "" Non-serializing WRMSR */
->  #define X86_FEATURE_AMX_FP16		(12*32+21) /* "" AMX fp16 Support */
->  #define X86_FEATURE_AVX_IFMA            (12*32+23) /* "" Support for VPMADD52[H,L]UQ */
->  #define X86_FEATURE_LAM			(12*32+26) /* Linear Address Masking */
-> diff --git a/arch/x86/include/asm/msr.h b/arch/x86/include/asm/msr.h
-> index 65ec1965cd28..c284ff9ebe67 100644
-> --- a/arch/x86/include/asm/msr.h
-> +++ b/arch/x86/include/asm/msr.h
-> @@ -97,6 +97,19 @@ static __always_inline void __wrmsr(unsigned int msr, u32 low, u32 high)
->  		     : : "c" (msr), "a"(low), "d" (high) : "memory");
->  }
->  
-> +/*
-> + * WRMSRNS behaves exactly like WRMSR with the only difference being
-> + * that it is not a serializing instruction by default.
-> + */
-> +static __always_inline void __wrmsrns(u32 msr, u32 low, u32 high)
-> +{
-> +	/* Instruction opcode for WRMSRNS; supported in binutils >= 2.40. */
-> +	asm volatile("1: .byte 0x0f,0x01,0xc6\n"
-> +		     "2:\n"
-> +		     _ASM_EXTABLE_TYPE(1b, 2b, EX_TYPE_WRMSR)
-> +		     : : "c" (msr), "a"(low), "d" (high));
-> +}
-> +
->  #define native_rdmsr(msr, val1, val2)			\
->  do {							\
->  	u64 __val = __rdmsr((msr));			\
-> @@ -297,6 +310,11 @@ do {							\
->  
->  #endif	/* !CONFIG_PARAVIRT_XXL */
->  
-> +static __always_inline void wrmsrns(u32 msr, u64 val)
-> +{
-> +	__wrmsrns(msr, val, val >> 32);
-> +}
-> +
->  /*
->   * 64-bit version of wrmsr_safe():
->   */
-> diff --git a/arch/x86/lib/x86-opcode-map.txt b/arch/x86/lib/x86-opcode-map.txt
-> index 5168ee0360b2..1efe1d9bf5ce 100644
-> --- a/arch/x86/lib/x86-opcode-map.txt
-> +++ b/arch/x86/lib/x86-opcode-map.txt
-> @@ -1051,7 +1051,7 @@ GrpTable: Grp6
->  EndTable
->  
->  GrpTable: Grp7
-> -0: SGDT Ms | VMCALL (001),(11B) | VMLAUNCH (010),(11B) | VMRESUME (011),(11B) | VMXOFF (100),(11B) | PCONFIG (101),(11B) | ENCLV (000),(11B)
-> +0: SGDT Ms | VMCALL (001),(11B) | VMLAUNCH (010),(11B) | VMRESUME (011),(11B) | VMXOFF (100),(11B) | PCONFIG (101),(11B) | ENCLV (000),(11B) | WRMSRNS (110),(11B)
->  1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B)
->  2: LGDT Ms | XGETBV (000),(11B) | XSETBV (001),(11B) | VMFUNC (100),(11B) | XEND (101)(11B) | XTEST (110)(11B) | ENCLU (111),(11B)
->  3: LIDT Ms
-> diff --git a/tools/arch/x86/include/asm/cpufeatures.h b/tools/arch/x86/include/asm/cpufeatures.h
-> index 4af140cf5719..26a73ae18a86 100644
-> --- a/tools/arch/x86/include/asm/cpufeatures.h
-> +++ b/tools/arch/x86/include/asm/cpufeatures.h
-> @@ -322,6 +322,7 @@
->  #define X86_FEATURE_FSRS		(12*32+11) /* "" Fast short REP STOSB */
->  #define X86_FEATURE_FSRC		(12*32+12) /* "" Fast short REP {CMPSB,SCASB} */
->  #define X86_FEATURE_LKGS		(12*32+18) /* "" Load "kernel" (userspace) GS */
-> +#define X86_FEATURE_WRMSRNS		(12*32+19) /* "" Non-serializing WRMSR */
->  #define X86_FEATURE_AMX_FP16		(12*32+21) /* "" AMX fp16 Support */
->  #define X86_FEATURE_AVX_IFMA            (12*32+23) /* "" Support for VPMADD52[H,L]UQ */
->  #define X86_FEATURE_LAM			(12*32+26) /* Linear Address Masking */
-> diff --git a/tools/arch/x86/lib/x86-opcode-map.txt b/tools/arch/x86/lib/x86-opcode-map.txt
-> index 5168ee0360b2..1efe1d9bf5ce 100644
-> --- a/tools/arch/x86/lib/x86-opcode-map.txt
-> +++ b/tools/arch/x86/lib/x86-opcode-map.txt
-> @@ -1051,7 +1051,7 @@ GrpTable: Grp6
->  EndTable
->  
->  GrpTable: Grp7
-> -0: SGDT Ms | VMCALL (001),(11B) | VMLAUNCH (010),(11B) | VMRESUME (011),(11B) | VMXOFF (100),(11B) | PCONFIG (101),(11B) | ENCLV (000),(11B)
-> +0: SGDT Ms | VMCALL (001),(11B) | VMLAUNCH (010),(11B) | VMRESUME (011),(11B) | VMXOFF (100),(11B) | PCONFIG (101),(11B) | ENCLV (000),(11B) | WRMSRNS (110),(11B)
->  1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B)
->  2: LGDT Ms | XGETBV (000),(11B) | XSETBV (001),(11B) | VMFUNC (100),(11B) | XEND (101)(11B) | XTEST (110)(11B) | ENCLU (111),(11B)
->  3: LIDT Ms
-> -- 
-> 2.43.0
-> 
+>   arch/x86/kvm/vmx/pmu_intel.c | 22 ++++++++++++++++++----
+>   1 file changed, 18 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 6903dd9b71ad..644de27bd48a 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -22,7 +22,6 @@
+>   
+>   /* Perf's "BASE" is wildly misleading, this is a single-bit flag, not a base. */
+>   #define INTEL_RDPMC_FIXED	INTEL_PMC_FIXED_RDPMC_BASE
+> -#define INTEL_RDPMC_FAST	BIT(31)
+>   
+>   #define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFCTR0)
+>   
+> @@ -67,10 +66,25 @@ static struct kvm_pmc *intel_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
+>   	struct kvm_pmc *counters;
+>   	unsigned int num_counters;
+>   
+> -	if (idx & INTEL_RDPMC_FAST)
+> -		*mask &= GENMASK_ULL(31, 0);
+> +	/*
+> +	 * The encoding of ECX for RDPMC is different for architectural versus
+> +	 * non-architecturals PMUs (PMUs with version '0').  For architectural
+> +	 * PMUs, bits 31:16 specify the PMC type and bits 15:0 specify the PMC
+> +	 * index.  For non-architectural PMUs, bit 31 is a "fast" flag, and
+> +	 * bits 30:0 specify the PMC index.
+> +	 *
+> +	 * Yell and reject attempts to read PMCs for a non-architectural PMU,
+> +	 * as KVM doesn't support such PMUs.
+> +	 */
+> +	if (WARN_ON_ONCE(!pmu->version))
+> +		return NULL;
+>   
+> -	idx &= ~(INTEL_RDPMC_FIXED | INTEL_RDPMC_FAST);
+> +	/*
+> +	 * Fixed PMCs are supported on all architectural PMUs.  Note, KVM only
+> +	 * emulates fixed PMCs for PMU v2+, but the flag itself is still valid,
+> +	 * i.e. let RDPMC fail due to accessing a non-existent counter.
+> +	 */
+> +	idx &= ~INTEL_RDPMC_FIXED;
+>   	if (fixed) {
+>   		counters = pmu->fixed_counters;
+>   		num_counters = pmu->nr_arch_fixed_counters;
 
+Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
--- 
-Masami Hiramatsu (Google) <mhiramat@kernel.org>
 
