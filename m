@@ -1,228 +1,213 @@
-Return-Path: <kvm+bounces-4087-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4088-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C27FD80D45D
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 18:46:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E61980D463
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 18:48:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B63C1F219F6
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 17:46:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01BE51F21A09
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 17:48:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB404EB36;
-	Mon, 11 Dec 2023 17:46:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 041514EB31;
+	Mon, 11 Dec 2023 17:48:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MMA7JVCm"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Len579ea"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2062.outbound.protection.outlook.com [40.107.223.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BB989B;
-	Mon, 11 Dec 2023 09:46:02 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lqbJ5SHEWfSlDL/kYi3F7eGjFWpRTC/i+WVDF4UD0bxuBzNv5q948Qq8xFWtTsNESq5XaZjEK8bXg41u1EzRsRe1/69TOEz/14qnVQiofVm0mqQ5pMCRNHztxD9y9d41dKKojvu2oWob9/J5vj640rBMkWkNTQWiT7mT/+QEJYDR7nL9wN+Z2xUAmFoCe2NlRLCrC3vU8WgwR7wZpGPvHChDwLne0+0sggbCnviiRKPXUZRzYfMVj/5bhIlQuM9bsNLRaK17ur5N27tMosNBxCm8+120E7pmpDlKvzXmGBXKZqwwfQr6/hEkWwo1Qam0kfhTba0g2rY3EjrwPeM8yQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+f2F6AnF+pqrefN721qYQbHcq0KJowVHF/bg9h+ti90=;
- b=LCPOTjOmGU9lNnbDTWt115USqtdR9shd9EPcsKq1fQCYQm6CwozreTtI8zUT6PX5ul1E7qEPada6JUSpChM/rCAqitnFPEABRbWwoiWfZttli122Bhuo0M4O3NCcQIZQ7eG4Nyn/m3ZXu9+v9vP1jQfim2Mt9IhcWj06XTnRe6sI5o/179xgFMqfPf9ZhO6s7OmVnwpCgIXQYVdhwr4MT4GN1f7yM/mcrhbmBuhpJm2R3CiYWZ6femHKrH8YHhz3LqnVgOWtvE2k2FrmYitn6c8MYa0U1ACRaOhJuqJTj1bxUZNfHNORWIAxfQ4baWvsJidlhKEgq9Xj6YgjWcO1bw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+f2F6AnF+pqrefN721qYQbHcq0KJowVHF/bg9h+ti90=;
- b=MMA7JVCmEodkLnATrcd6Z1td58jyIbG7yRMo8h0a9HnulXwaw0dWYma6dOfGKl3gFiLeZA3arqHr4PcOqfNGRdKP9rfipoYk+7jSdxArik731kOcgFUoKjIAT65kE6CcIHsGmG4v4X4vB0vFZDbFlPfvbqterpXLS2bf+MGGOsXd+DjcL+KA+vadqNPMhJdst0DjtVTkbizx0mG3D5tM0/+Yax4oTKDjM0YGZnoJryrIEjqWK+lxqOHhzh4vQCErNC/4UDSUjDJ1I4ZQoYLnlqraT3H6w/sYtyuOyux+FVLWfRBM/PrVnENOciQj1ewtOspNA9U0yE4mU0kTZKSO9g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH7PR12MB7795.namprd12.prod.outlook.com (2603:10b6:510:278::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Mon, 11 Dec
- 2023 17:45:59 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7068.031; Mon, 11 Dec 2023
- 17:45:59 +0000
-Date: Mon, 11 Dec 2023 13:45:58 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
-Cc: Yi Liu <yi.l.liu@intel.com>, "Giani, Dhaval" <Dhaval.Giani@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>, joro@8bytes.org,
-	alex.williamson@redhat.com, kevin.tian@intel.com,
-	robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
-	eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
-	mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
-	yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
-	shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, zhenzhong.duan@intel.com,
-	joao.m.martins@oracle.com, xin.zeng@intel.com, yan.y.zhao@intel.com
-Subject: Re: [PATCH v6 0/6] iommufd: Add nesting infrastructure (part 2/2)
-Message-ID: <20231211174558.GJ2944114@nvidia.com>
-References: <20231117130717.19875-1-yi.l.liu@intel.com>
- <20231209014726.GA2945299@nvidia.com>
- <391ab316-79b1-4535-a45b-4c01bfb80de6@amd.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <391ab316-79b1-4535-a45b-4c01bfb80de6@amd.com>
-X-ClientProxiedBy: MN2PR11CA0009.namprd11.prod.outlook.com
- (2603:10b6:208:23b::14) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B2E59B
+	for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 09:48:01 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-40c32df9174so39386625e9.3
+        for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 09:48:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1702316880; x=1702921680; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6GyIfzmIozQp2p6r6Dz0e+oD9SE+AcfjjewTE6Log7o=;
+        b=Len579eajhL1VI41CDxeZsrbeIwUFgEVjTrdhpyoPMWVtCN+X1oDgUYwmFrLlgKECM
+         EEbK1q+yLwHEYJHkq1HhBHjfWHdQUJ2B4eHLOWEifPh6wuEwe4/7llACkEKbMEQoRxgF
+         v07xj156C/rdSK/58RnNTdBfzTHTTvqsTTMe++Psgsi7QT99FDfVYk+tTNm5SnsC1zx4
+         XCnVBOnjT7wuBP10SH9km4CMTwgw49urvHYoQWyXjRmKCjjn/D+dCnxKrvV8ruIpa7Px
+         Q4T+rQIaq/hmaDR2uvRQvNYX+AL0vlzXabhw+zjcE6aEAgEK5JDw2B5zMAzwjnsFZkFE
+         AKzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702316880; x=1702921680;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6GyIfzmIozQp2p6r6Dz0e+oD9SE+AcfjjewTE6Log7o=;
+        b=LdzmQ3Eopg67wlMGqXW8KyNfCN3A1dqxV6UpaCGpOGbVueINHg39amI/if6AwRxT+U
+         GxE8fMj1dBAh/XDayeM+5JdixNOZmY4gORttB6LOb7HUuvNsr0dom48y+LHrE+C/eCYK
+         feurdLskkBelx5/Y+4RuHS+Uuw3d2U0NYyOyaAGF9dBjXWHPRzhK6gfhXAmS6fYkvX5/
+         JuSt4QDOZRavJ7jEtOT3PQUb5CPuZsGlphahHvDwK+J1sjjAuXEk52wR75hADMEcpWBo
+         hHtWKY/GclkXfcw1PlutTpBDrYi0FvLLTyxrwyaGwiQVtFkdL7B8aSh3o3uvUI/Ml0YY
+         XxrQ==
+X-Gm-Message-State: AOJu0YzY7G9DzmFuSM1e/Uds7pYlLTeopuIjuNuhvt4IJTf2R3LSWIbg
+	rcolzODsJ3pFYZCeFGYoAsrX5Q==
+X-Google-Smtp-Source: AGHT+IG+1JJM7gVsvYVGmWwS9/xIxKeFKXGWkKen1e5v6kRMvEYri/9mxircEIok9/mWKo+AklmsMw==
+X-Received: by 2002:a05:600c:3794:b0:40c:32b3:f297 with SMTP id o20-20020a05600c379400b0040c32b3f297mr1722285wmr.55.1702316879810;
+        Mon, 11 Dec 2023 09:47:59 -0800 (PST)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id h2-20020a05600c350200b0040c44b4a282sm5859487wmq.43.2023.12.11.09.47.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Dec 2023 09:47:59 -0800 (PST)
+Received: from draig (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id 17ED45FBC6;
+	Mon, 11 Dec 2023 17:47:59 +0000 (GMT)
+From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org,  Jiaxun Yang <jiaxun.yang@flygoat.com>,  Radoslaw
+ Biernacki <rad@semihalf.com>,  Paul Durrant <paul@xen.org>,  Akihiko Odaki
+ <akihiko.odaki@daynix.com>,  Leif Lindholm <quic_llindhol@quicinc.com>,
+  Peter Maydell <peter.maydell@linaro.org>,  Paolo Bonzini
+ <pbonzini@redhat.com>,  kvm@vger.kernel.org,  qemu-arm@nongnu.org,
+  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,  Beraldo Leal
+ <bleal@redhat.com>,  Wainer dos Santos Moschetta <wainersm@redhat.com>,
+  Sriram Yagnaraman <sriram.yagnaraman@est.tech>,  Marcin Juszkiewicz
+ <marcin.juszkiewicz@linaro.org>,  David Woodhouse <dwmw2@infradead.org>
+Subject: Re: [PATCH 04/10] tests/avocado: machine aarch64: standardize
+ location and RO/RW access
+In-Reply-To: <20231208190911.102879-5-crosa@redhat.com> (Cleber Rosa's message
+	of "Fri, 8 Dec 2023 14:09:05 -0500")
+References: <20231208190911.102879-1-crosa@redhat.com>
+	<20231208190911.102879-5-crosa@redhat.com>
+User-Agent: mu4e 1.11.26; emacs 29.1
+Date: Mon, 11 Dec 2023 17:47:59 +0000
+Message-ID: <87wmtkeils.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB7795:EE_
-X-MS-Office365-Filtering-Correlation-Id: 66990eab-b3c7-4099-20c0-08dbfa7108fd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	hsI0i7Qs4G8o3UO3LOHgrH36RXSp2L5gls51yYhaIBOA1NV+QGrJcSCMLC/KAsjGIbOUXyPjUqDeFQMKiBSjHvEi8tx+CQamACi37lf3jdpISda0nNCx/F6pTKgPCb9bkWWKu7vEKwWQnjqL6N2rspUrha+2dryXQoN5aE3JVZN4UGzFmdddzsi4MBb40DAYhIhifNPDy7yEFpmqH0GE8qJ/EsYeW0YpJPLwR/5bND+xD7PBXCQ3LuI7we23L5IbWMIMaXS4xYJl8RZBL9mGeozvPRFBxO8wMWsDzQ/v5poCdlS7y+dtDhtjWOwl+SYNjZNAAl5cMwS3tyHepvDgx7rrmNtx1gVlBv5aU6FK+UrCznCJzUmKQbYUccIWu2Gh1vAy9lAlBjF2e9Dmu4mZFUTOlN7hropevDvIckGbz6HDnArYYTT2OEhOEWsJB38vVLbt+1hTg9twdLyL70VsGmAy0+9Ge4mDnUR+mUEboV2feLIcYzQdrBgW/p0JMIGDt98om08x1qneZDwRI+HZSDrT2mT2447fUHKMIwnlM9kCFK2HiOj+fMEifMOoXdR8
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(346002)(39860400002)(136003)(396003)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(1076003)(26005)(2616005)(6506007)(6512007)(53546011)(83380400001)(5660300002)(7416002)(4326008)(2906002)(41300700001)(478600001)(8676002)(8936002)(66946007)(316002)(66556008)(6486002)(66476007)(54906003)(6916009)(33656002)(38100700002)(86362001)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?k68UooqVGSzSNqwGmfnSVtS94KwPNHYejut/KZIpQ3w35WajJ2Epqa1Uj+uw?=
- =?us-ascii?Q?yE9wQfG4VnJ8XbixmA+0bboev2OQ1dp6SkcvnpDAJGlNU6DEZqda2RMi7o86?=
- =?us-ascii?Q?6C+Gu3RBbprC3D6WFEQNTDbn6izW7mQUnghwdhe4JKmFYDuYDrVV2Zz1REOE?=
- =?us-ascii?Q?YXolH63286aCCBOl6H7pPlO6K9cuFSpHko+nA/xxpw4VlJJmS1LGUMCUaolj?=
- =?us-ascii?Q?x9JMI20FjK+2+9wkPcn3cRmX+6Og6l/RefmYKW6NtHsm70hkWllQs6Qg5LPW?=
- =?us-ascii?Q?8IDq3F23h3RTz710aktTIYaSuXiPN2+2xOnP9/tciPDuOrVEZsJXZhS9Ze8/?=
- =?us-ascii?Q?s+nUXEZGT2GhBBSXOoR1qB90iTRQVHnTihbJd0MbQK+7TTrQom7l618i3fOt?=
- =?us-ascii?Q?V7lFjwWJRZ6NPJtvUlv8/2QBicR2dqHp3kVUD3bJA0aQMQsJvXolx50UG+jk?=
- =?us-ascii?Q?2imWGiPOUx4hte0f6phtzb3mTc4t8Mtc1ibgNnghSxkGr2Qc0kEOAjHnr0qb?=
- =?us-ascii?Q?FHubkFJiXQUOKjXVZn8vF2OxIsbiyb4FLDxZMoXm1JsyBiV2MddFekl/eB27?=
- =?us-ascii?Q?HdPojxICsaehY6wRn96mbUtz61PU+3v9ziqwTI7wRB2/kwzuas0DjlOPox7A?=
- =?us-ascii?Q?GfflE8msM/XLEgSdqjNFFWXQzMrZSEDb0d1JC43E0c6E8bnVkSN2B5MMe9vN?=
- =?us-ascii?Q?gV4IOrrURh18lDcvN9lj9CNWR0KiJWUUaXD6ctXYZtb1wzjGse38q+diuUUE?=
- =?us-ascii?Q?xLkopY1JVvLr5xPLrhSg2Meg0u/x9reA9uBRIpvcQI11I0H+tBL2NuOvrT8a?=
- =?us-ascii?Q?2rBfdD/2bouaul3t0YgoWTca/xyUCUajIX9Qy9Evj9cyA8CE/r/VGy8h6JST?=
- =?us-ascii?Q?MRvOLNPSypu/Vdg/d15zdq1FBjCuJFq7cBsX1D0N3NTQk0+3B5CALOeXaIyG?=
- =?us-ascii?Q?ZQJRzJdHuwhSjMSFX981AaWtbAfiC/N4a8UgSRux4O7niA8mEwAjKKSjCRQ7?=
- =?us-ascii?Q?KuBOYVVPa8ioVDbZtXdw4EOipYVI+i4ECz0BuOUfX0ZZz5yW94DkYMnYF4IT?=
- =?us-ascii?Q?8HvILNKvUFGGEJFTqmhFOCzveJclu3mBX+gVgFWIPMeax6ZPHf4UPNZ9/py4?=
- =?us-ascii?Q?Acxz7A1fjPyUdm+QFDrOLMcIn/YuqqKS2NrWj/HOiePwiHwjBzdbJmHlkjgP?=
- =?us-ascii?Q?LNfo01mcLURFqpbmJIPFNkbtUeZuANUH0YepDeP5Ntb4A/RrNCKVrCPI65DV?=
- =?us-ascii?Q?Qss6p98hGMRs45reQL7sclPWq371r+1NJV6iRQEaxHnJibKsWRYRfC+rXR7J?=
- =?us-ascii?Q?FbIeNopNk3aQPnA9O35EU9+rbZZ07eKDh38OjVTzp/XZQ+EvNW2GfBC6FITr?=
- =?us-ascii?Q?rtC2OYvAKdf4d+YEiUA24A7sY7GTy+dbOHbsokFi8V8hTJDcQ2ZU2IoH262s?=
- =?us-ascii?Q?IKVUZ6RIIGzbhXRXebFQl0UkcZaJjorTvW5sA9VSkC4oOOvt5rzrByim3haV?=
- =?us-ascii?Q?r/aLkKJz4JjaFRyzcZ2pjDbCL/jyyUMjDHPhVnYjVu8v9S6QeoAX4XY8Kpp3?=
- =?us-ascii?Q?Z2X4y0PRp6wWqIWdddh/8vf2E2YhYDvaFgT2ePEA?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 66990eab-b3c7-4099-20c0-08dbfa7108fd
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2023 17:45:59.3794
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5BisBPJB/rkQz/DQEnbsHNKIEm3Dcl81LCyD6mpX65Fjs43RO74CSG4DqZi5TDRA
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7795
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 12, 2023 at 12:35:26AM +0700, Suthikulpanit, Suravee wrote:
-> 
-> 
-> On 12/9/2023 8:47 AM, Jason Gunthorpe wrote:
-> > On Fri, Nov 17, 2023 at 05:07:11AM -0800, Yi Liu wrote:
-> > 
-> > > Take Intel VT-d as an example, the stage-1 translation table is I/O page
-> > > table. As the below diagram shows, guest I/O page table pointer in GPA
-> > > (guest physical address) is passed to host and be used to perform the stage-1
-> > > address translation. Along with it, modifications to present mappings in the
-> > > guest I/O page table should be followed with an IOTLB invalidation.
-> > 
-> > I've been looking at what the three HW's need for invalidation, it is
-> > a bit messy.. Here is my thinking. Please let me know if I got it right
-> > 
-> > What is the starting point of the guest memory walks:
-> >   Intel: Single Scalable Mode PASID table entry indexed by a RID & PASID
-> >   AMD: GCR3 table (a table of PASIDs) indexed by RID
-> 
-> GCR3 table is indexed by PASID.
-> Device Table (DTE) is indexted by DeviceID (RID)
+Cleber Rosa <crosa@redhat.com> writes:
 
-Yes, this is what I was trying to say
+> The tests under machine_aarch64_virt.py do not need read-write access
+> to the ISOs.  The ones under machine_aarch64_sbsaref.py, on the other
+> hand, will need read-write access, so let's give each test an unique
+> file.
+
+I think we are making two separate changes here so probably best split
+the patch.
+
+> And while at it, let's use a single code style and hash for the ISO
+> url.
+>
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>  tests/avocado/machine_aarch64_sbsaref.py |  9 +++++++--
+>  tests/avocado/machine_aarch64_virt.py    | 14 +++++++-------
+>  2 files changed, 14 insertions(+), 9 deletions(-)
+>
+> diff --git a/tests/avocado/machine_aarch64_sbsaref.py b/tests/avocado/mac=
+hine_aarch64_sbsaref.py
+> index 528c7d2934..6ae84d77ac 100644
+> --- a/tests/avocado/machine_aarch64_sbsaref.py
+> +++ b/tests/avocado/machine_aarch64_sbsaref.py
+> @@ -7,6 +7,7 @@
+>  # SPDX-License-Identifier: GPL-2.0-or-later
+>=20=20
+>  import os
+> +import shutil
+>=20=20
+>  from avocado import skipUnless
+>  from avocado.utils import archive
+> @@ -123,13 +124,15 @@ def boot_alpine_linux(self, cpu):
+>=20=20
+>          iso_hash =3D "5a36304ecf039292082d92b48152a9ec21009d3a62f459de62=
+3e19c4bd9dc027"
+>          iso_path =3D self.fetch_asset(iso_url, algorithm=3D"sha256", ass=
+et_hash=3Diso_hash)
+> +        iso_path_rw =3D os.path.join(self.workdir, os.path.basename(iso_=
+path))
+> +        shutil.copy(iso_path, iso_path_rw)
+>=20=20
+>          self.vm.set_console()
+>          self.vm.add_args(
+>              "-cpu",
+>              cpu,
+>              "-drive",
+> -            f"file=3D{iso_path},format=3Draw",
+> +            f"file=3D{iso_path_rw},format=3Draw",
+
+Instead of copying why not add ",snapshot=3Don" to preserve the original
+image. We don't want to persist data between tests.
+
+>              "-device",
+>              "virtio-rng-pci,rng=3Drng0",
+>              "-object",
+> @@ -170,13 +173,15 @@ def boot_openbsd73(self, cpu):
+>=20=20
+>          img_hash =3D "7fc2c75401d6f01fbfa25f4953f72ad7d7c18650056d30755c=
+44b9c129b707e5"
+>          img_path =3D self.fetch_asset(img_url, algorithm=3D"sha256", ass=
+et_hash=3Dimg_hash)
+> +        img_path_rw =3D os.path.join(self.workdir, os.path.basename(img_=
+path))
+> +        shutil.copy(img_path, img_path_rw)
+>=20=20
+>          self.vm.set_console()
+>          self.vm.add_args(
+>              "-cpu",
+>              cpu,
+>              "-drive",
+> -            f"file=3D{img_path},format=3Draw",
+> +            f"file=3D{img_path_rw},format=3Draw",
+
+ditto.
 
 
-> > Will ATC be forwarded or synthesized:
-> >   Intel: The (vDomain-ID,PASID) is a unique nesting domain so
-> >          the hypervisor knows exactly which RIDs this nesting domain is
-> > 	linked to and can generate an ATC invalidation. Plan is to
-> > 	supress/discard the ATC invalidations from the VM and generate
-> > 	them in the hypervisor.
-> >   AMD: (vDomain-ID,PASID) is ambiguous, it can refer to multiple GCR3
-> >        tables. We know which maximal set of RIDs it represents, but not
-> >        the actual set. I expect AMD will forward the ATC invalidation
-> >        to avoid over invalidation.
-> 
-> Not sure I understand your description here.
-> 
-> For the AMD IOMMU INVALIDE_IOMMU_PAGES (i.e. invalidate the IOMMU TLB), the
-> hypervisor needs to map gDomainId->hDomainId and issue the command on behalf
-> of the VM along with the PASID and GVA (or GVA range) provided by the guest.
+>              "-device",
+>              "virtio-rng-pci,rng=3Drng0",
+>              "-object",
+> diff --git a/tests/avocado/machine_aarch64_virt.py b/tests/avocado/machin=
+e_aarch64_virt.py
+> index a90dc6ff4b..093d68f837 100644
+> --- a/tests/avocado/machine_aarch64_virt.py
+> +++ b/tests/avocado/machine_aarch64_virt.py
+> @@ -37,13 +37,13 @@ def test_alpine_virt_tcg_gic_max(self):
+>          :avocado: tags=3Dmachine:virt
+>          :avocado: tags=3Daccel:tcg
+>          """
+> -        iso_url =3D ('https://dl-cdn.alpinelinux.org/'
+> -                   'alpine/v3.17/releases/aarch64/'
+> -                   'alpine-standard-3.17.2-aarch64.iso')
+> +        iso_url =3D (
+> +            "https://dl-cdn.alpinelinux.org/"
+> +            "alpine/v3.17/releases/aarch64/alpine-standard-3.17.2-aarch6=
+4.iso"
+> +        )
+>=20=20
+> -        # Alpine use sha256 so I recalculated this myself
+> -        iso_sha1 =3D '76284fcd7b41fe899b0c2375ceb8470803eea839'
+> -        iso_path =3D self.fetch_asset(iso_url, asset_hash=3Diso_sha1)
+> +        iso_hash =3D "5a36304ecf039292082d92b48152a9ec21009d3a62f459de62=
+3e19c4bd9dc027"
+> +        iso_path =3D self.fetch_asset(iso_url, algorithm=3D"sha256", ass=
+et_hash=3Diso_hash)
+>=20=20
+>          self.vm.set_console()
+>          kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
+> @@ -60,7 +60,7 @@ def test_alpine_virt_tcg_gic_max(self):
+>          self.vm.add_args("-smp", "2", "-m", "1024")
+>          self.vm.add_args('-bios', os.path.join(BUILD_DIR, 'pc-bios',
+>                                                 'edk2-aarch64-code.fd'))
+> -        self.vm.add_args("-drive", f"file=3D{iso_path},format=3Draw")
+> +        self.vm.add_args("-drive",
+>          f"file=3D{iso_path},readonly=3Don,format=3Draw")
 
-Yes, that is the "forwarding" approach. Contrast this to the Intel
-approach where the ATC is synthesized by the kernel emulating the
-INVALIDE_IOMMU_PAGES
+Perhaps we can set ",media=3Dcdrom" here.
 
-> > To make this work the iommu needs to be programmed with:
-> >   AMD: A vDomain-ID -> pDomain-ID table
-> >        A vRID -> pRID table
-> >        This is all bound to some "virtual function"
-> 
-> By "virtual function", I assume you are referring to the AMD vIOMMU instance
-> in the guest?
+>          self.vm.add_args('-device', 'virtio-rng-pci,rng=3Drng0')
+>          self.vm.add_args('-object', 'rng-random,id=3Drng0,filename=3D/de=
+v/urandom')
 
-Yes, but it is not in the guest, it has to be some concrete iommufd
-object.
-
-> Something like IOMMUFD_OBJ_VIOMMU? Then operation would include something
-> like:
->   * Init
->   * Destroy
->   * ...
-
-Yes, something like that. It needs to be able to work for ARM vCMDQ
-stuff too. I don't know what the name should be. Maybe viommu is OK
-for now.
-
-- Alloc viommu (against a single iommu instance?)
-- Assign a virtual ID to an iommufd device within the same instance
-- Setup a submission and completion queue in userspace memory
-- mmap the doorbell page (both need this?)
-- Route back completion interrupts via eventfd
-
-When you get here you and Nicolin should work out something along
-those lines that works for both
-
-But I'd like to keep things in steps, so if we can get info, nesting
-parent, nesting domain and SW IOTLB and ATC invalidation as the first
-(two?) steps that would be great
-
-> > Thus next steps:
-> >   - Respin this and lets focus on Intel only (this will be tough for
-> >     the holidays, but if it is available I will try)
-> >   - Get an ARM patch that just does IOTLB invalidation and add it to my
-> >     part 3
-> >   - Start working on IOMMUFD_DEV_INVALIDATE along with an ARM
-> >     implementation of it
-> >   - Reorganize the AMD RFC broadly along these lines and lets see it
-> >     freshened up in the next months as well. I would like to see the
-> >     AMD support structured to implement the SW paths in first steps and
-> >     later add in the "virtual function" acceleration stuff. The latter
-> >     is going to be complex.
-> 
-> Working on refining the part 1 to add HW info reporting and nested
-> translation (minus the invalidation stuff). Should be sending out soon.
-
-Nice!
-
-Jason
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
 
