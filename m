@@ -1,150 +1,139 @@
-Return-Path: <kvm+bounces-4117-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4118-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CE0380DF9F
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 00:43:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DC0180DFB7
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 00:51:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 570EA28259F
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 23:43:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E78E01F21C04
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 23:51:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 561AD56771;
-	Mon, 11 Dec 2023 23:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LO/NJwRl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D35DA5677F;
+	Mon, 11 Dec 2023 23:51:04 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86D3ACF
-	for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 15:43:26 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1d31be67c16so9010035ad.2
-        for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 15:43:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702338206; x=1702943006; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=L2CNIwBgf8qqJqiKqxAd6p8N8y1poBppmKnfZ/wvtKY=;
-        b=LO/NJwRlwFspsaH6vN1v0xWssvr66YFxOJzgoYEKhMHcEnvKaB3FDLpIKr2xHgEiKc
-         VGGh9WcYkfs6y5Fzbl6xty8kf5QIlsmzgP6g79A/4od176GTdXDSZX3woUHwSbfAAFks
-         RtPgvdCY0Gh47kjNvRoPON5k+PKJv+baMk7+kskQS1qRO4uy0WkQnrbkkI8v6oGh6sUw
-         kcMLrlB8UCPYtA02y3p+6DVXN7KsBBhChU4VyxkCRnebMOa9YP06PGbdt4PzCd50WD6C
-         Dl383ilKUaAoh+gQJ8og0OaqZIA0Oup7ddo6SjwXt3OZzny8dd3QNJGCs4jzcP4AIXyd
-         cKqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702338206; x=1702943006;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=L2CNIwBgf8qqJqiKqxAd6p8N8y1poBppmKnfZ/wvtKY=;
-        b=YnbEJpXO2iZAn8GktflQwlNscWUSuInaH0OU2UOdtbIiBGg23WCmMVofpqT9iB+ZtG
-         HppS5q2dqOyGQbQBgs+kPgsOqz3mCpzmBvShXeHtBQvMXxLfzvq25/HPaKd13dPSM2yO
-         44UvTKEzKqCZAEUMbTMHUTFL3CY5PFIlbBYjzTCl2SEWgNMDAm/Pb0WACfOuVzLodqMf
-         0vJR/1wT+fzGz8t1fublIv294XyGJfBclCLRq93I+3Hw13IDE2NaiTRShOzGgpSE0VEo
-         fz7aKEH993Y6bh8Gr6GbzC59XGcjTz3F/O9hgBsze8XZl/+8JGbyHsiXhtFmB2QjHruS
-         2TAQ==
-X-Gm-Message-State: AOJu0YxS+nI+gyvP6aflzbDao32dwRtGwCgrinxY/sa8kzNZR3kn03l8
-	uYZc12OzvT4dkUNDB8OVfepuYQbKb60=
-X-Google-Smtp-Source: AGHT+IHN/X8vpCCGFmK83tyiDZb0nkShOkE/cOQzYYwhwDBDiWNivV7kXXOKQQJDyXYbj1jZ5AdUp5jMSGA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:dacb:b0:1d0:9fdb:a958 with SMTP id
- q11-20020a170902dacb00b001d09fdba958mr42128plx.13.1702338205748; Mon, 11 Dec
- 2023 15:43:25 -0800 (PST)
-Date: Mon, 11 Dec 2023 15:43:24 -0800
-In-Reply-To: <CALMp9eSp_9J9t3ByfHfnirXf=uxvWVWVtLWO5KPoO0nDFJ-gtw@mail.gmail.com>
+Received: from out03.mta.xmission.com (out03.mta.xmission.com [166.70.13.233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E1B99B;
+	Mon, 11 Dec 2023 15:51:00 -0800 (PST)
+Received: from in02.mta.xmission.com ([166.70.13.52]:37898)
+	by out03.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.93)
+	(envelope-from <ebiederm@xmission.com>)
+	id 1rCq36-00EVyC-FL; Mon, 11 Dec 2023 16:50:56 -0700
+Received: from ip68-227-168-167.om.om.cox.net ([68.227.168.167]:49742 helo=email.froward.int.ebiederm.org.xmission.com)
+	by in02.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.93)
+	(envelope-from <ebiederm@xmission.com>)
+	id 1rCq35-00F4Dc-Cg; Mon, 11 Dec 2023 16:50:56 -0700
+From: "Eric W. Biederman" <ebiederm@xmission.com>
+To: "Gowans, James" <jgowans@amazon.com>
+Cc: "Graf (AWS), Alexander" <graf@amazon.de>,  "seanjc@google.com"
+ <seanjc@google.com>,  =?utf-8?Q?Sch=C3=B6nherr=2C_Jan_H=2E?=
+ <jschoenh@amazon.de>,
+  "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+  "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+  "kexec@lists.infradead.org" <kexec@lists.infradead.org>,
+  "james.morse@arm.com" <james.morse@arm.com>,  "oliver.upton@linux.dev"
+ <oliver.upton@linux.dev>,  "suzuki.poulose@arm.com"
+ <suzuki.poulose@arm.com>,  "chenhuacai@kernel.org"
+ <chenhuacai@kernel.org>,  "atishp@atishpatra.org" <atishp@atishpatra.org>,
+  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+  "maz@kernel.org" <maz@kernel.org>,  "pbonzini@redhat.com"
+ <pbonzini@redhat.com>,  "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+  "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,  "anup@brainfault.org"
+ <anup@brainfault.org>,  "aleksandar.qemu.devel@gmail.com"
+ <aleksandar.qemu.devel@gmail.com>
+References: <20230512233127.804012-1-seanjc@google.com>
+	<20230512233127.804012-2-seanjc@google.com>
+	<cfed942fc767fa7b2fabc68a3357a7b95bd6a589.camel@amazon.com>
+	<871qbud5f9.fsf@email.froward.int.ebiederm.org>
+	<a02b40d3d9ae5b3037b9a9d5921cfb0144ab5610.camel@amazon.com>
+	<7e30cfc2359dfef39d038e3734f7e5e3d9e82d68.camel@amazon.com>
+Date: Mon, 11 Dec 2023 17:50:33 -0600
+In-Reply-To: <7e30cfc2359dfef39d038e3734f7e5e3d9e82d68.camel@amazon.com>
+	(James Gowans's message of "Mon, 11 Dec 2023 10:27:15 +0000")
+Message-ID: <87wmtk9u46.fsf@email.froward.int.ebiederm.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231202000417.922113-1-seanjc@google.com> <20231202000417.922113-11-seanjc@google.com>
- <b45efe2f-1b99-4596-b33f-d491726ed34d@linux.intel.com> <CALMp9eSp_9J9t3ByfHfnirXf=uxvWVWVtLWO5KPoO0nDFJ-gtw@mail.gmail.com>
-Message-ID: <ZXeenJ6DAugGCaSN@google.com>
-Subject: Re: [PATCH v9 10/28] KVM: x86/pmu: Explicitly check for RDPMC of
- unsupported Intel PMC types
-From: Sean Christopherson <seanjc@google.com>
-To: Jim Mattson <jmattson@google.com>
-Cc: Dapeng Mi <dapeng1.mi@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Kan Liang <kan.liang@linux.intel.com>, 
-	Jinrong Liang <cloudliang@tencent.com>, Aaron Lewis <aaronlewis@google.com>, 
-	Like Xu <likexu@tencent.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain
+X-XM-SPF: eid=1rCq35-00F4Dc-Cg;;;mid=<87wmtk9u46.fsf@email.froward.int.ebiederm.org>;;;hst=in02.mta.xmission.com;;;ip=68.227.168.167;;;frm=ebiederm@xmission.com;;;spf=pass
+X-XM-AID: U2FsdGVkX183erp/ctJyjnDuDEXnwg8YrcYEg8oGrjc=
+X-SA-Exim-Connect-IP: 68.227.168.167
+X-SA-Exim-Mail-From: ebiederm@xmission.com
+X-Spam-DCC: XMission; sa06 1397; Body=1 Fuz1=1 Fuz2=1 
+X-Spam-Combo: *;"Gowans, James" <jgowans@amazon.com>
+X-Spam-Relay-Country: 
+X-Spam-Timing: total 473 ms - load_scoreonly_sql: 0.04 (0.0%),
+	signal_user_changed: 11 (2.3%), b_tie_ro: 9 (2.0%), parse: 0.99 (0.2%),
+	 extract_message_metadata: 3.6 (0.8%), get_uri_detail_list: 1.61
+	(0.3%), tests_pri_-2000: 3.4 (0.7%), tests_pri_-1000: 3.6 (0.8%),
+	tests_pri_-950: 1.23 (0.3%), tests_pri_-900: 1.01 (0.2%),
+	tests_pri_-90: 93 (19.6%), check_bayes: 91 (19.2%), b_tokenize: 9
+	(1.9%), b_tok_get_all: 9 (1.8%), b_comp_prob: 2.6 (0.5%),
+	b_tok_touch_all: 67 (14.1%), b_finish: 1.02 (0.2%), tests_pri_0: 329
+	(69.5%), check_dkim_signature: 0.53 (0.1%), check_dkim_adsp: 2.9
+	(0.6%), poll_dns_idle: 1.15 (0.2%), tests_pri_10: 3.3 (0.7%),
+	tests_pri_500: 15 (3.1%), rewrite_mail: 0.00 (0.0%)
+Subject: Re: [PATCH v2 1/2] KVM: Use syscore_ops instead of reboot_notifier
+ to hook restart/shutdown
+X-SA-Exim-Version: 4.2.1 (built Sat, 08 Feb 2020 21:53:50 +0000)
+X-SA-Exim-Scanned: Yes (on in02.mta.xmission.com)
 
-On Mon, Dec 11, 2023, Jim Mattson wrote:
-> On Sun, Dec 10, 2023 at 10:26=E2=80=AFPM Mi, Dapeng <dapeng1.mi@linux.int=
-el.com> wrote:
-> >
-> >
-> > On 12/2/2023 8:03 AM, Sean Christopherson wrote:
-> > > Explicitly check for attempts to read unsupported PMC types instead o=
-f
-> > > letting the bounds check fail.  Functionally, letting the check fail =
-is
-> > > ok, but it's unnecessarily subtle and does a poor job of documenting =
-the
-> > > architectural behavior that KVM is emulating.
-> > >
-> > > Opportunistically add macros for the type vs. index to further docume=
-nt
-> > > what is going on.
-> > >
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > ---
-> > >   arch/x86/kvm/vmx/pmu_intel.c | 11 +++++++++--
-> > >   1 file changed, 9 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_inte=
-l.c
-> > > index 644de27bd48a..bd4f4bdf5419 100644
-> > > --- a/arch/x86/kvm/vmx/pmu_intel.c
-> > > +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> > > @@ -23,6 +23,9 @@
-> > >   /* Perf's "BASE" is wildly misleading, this is a single-bit flag, n=
-ot a base. */
-> > >   #define INTEL_RDPMC_FIXED   INTEL_PMC_FIXED_RDPMC_BASE
-> > >
-> > > +#define INTEL_RDPMC_TYPE_MASK        GENMASK(31, 16)
-> > > +#define INTEL_RDPMC_INDEX_MASK       GENMASK(15, 0)
-> > > +
-> > >   #define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFC=
-TR0)
-> > >
-> > >   static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
-> > > @@ -82,9 +85,13 @@ static struct kvm_pmc *intel_rdpmc_ecx_to_pmc(stru=
-ct kvm_vcpu *vcpu,
-> > >       /*
-> > >        * Fixed PMCs are supported on all architectural PMUs.  Note, K=
-VM only
-> > >        * emulates fixed PMCs for PMU v2+, but the flag itself is stil=
-l valid,
-> > > -      * i.e. let RDPMC fail due to accessing a non-existent counter.
-> > > +      * i.e. let RDPMC fail due to accessing a non-existent counter.=
-  Reject
-> > > +      * attempts to read all other types, which are unknown/unsuppor=
-ted.
-> > >        */
-> > > -     idx &=3D ~INTEL_RDPMC_FIXED;
-> > > +     if (idx & INTEL_RDPMC_TYPE_MASK & ~INTEL_RDPMC_FIXED)
->=20
-> You know how I hate to be pedantic (ROFL), but the SDM only says:
->=20
-> If the processor does support architectural performance monitoring
-> (CPUID.0AH:EAX[7:0] =E2=89=A0 0), ECX[31:16] specifies type of PMC while
-> ECX[15:0] specifies the index of the PMC to be read within that type.
->=20
-> It does not say that the types are bitwise-exclusive.
->=20
-> Yes, the types defined thus far are bitwise-exclusive, but who knows
-> what tomorrow may bring?
+"Gowans, James" <jgowans@amazon.com> writes:
 
-The goal isn't to make the types exclusive, the goal is to reject types tha=
-t
-aren't supported by KVM.  The above accomplishes that, no?  I don't see how=
- KVM
-could get a false negative or false positive, the above allows exactly FIXE=
-D and
-"none" types.  Or are you objecting to the comment?
+> On Mon, 2023-12-11 at 09:54 +0200, James Gowans wrote:
+>> > 
+>> > What problem are you running into with your rebase that worked with
+>> > reboot notifiers that is not working with syscore_shutdown?
+>> 
+>> Prior to this commit [1] which changed KVM from reboot notifiers to
+>> syscore_ops, KVM's reboot notifier shutdown callback was invoked on
+>> kexec via kernel_restart_prepare.
+>> 
+>> After this commit, KVM is not being shut down because currently the
+>> kexec flow does not call syscore_shutdown.
+>
+> I think I missed what you're asking here; you're asking for a reproducer
+> for the specific failure? 
+>
+> 1. Launch a QEMU VM with -enable-kvm flag
+>
+> 2. Do an immediate (-f flag) kexec:
+> kexec -f --reuse-cmdline ./bzImage 
+>
+> Somewhere after doing the RET to new kernel in the relocate_kernel asm
+> function the new kernel starts triple faulting; I can't exactly figure
+> out where but I think it has to do with the new kernel trying to modify
+> CR3 while the VMXE bit is still set in CR4 causing the triple fault.
+>
+> If KVM has been shut down via the shutdown callback, or alternatively if
+> the QEMU process has actually been killed first (by not doing a -f exec)
+> then the VMXE bit is clear and the kexec goes smoothly.
+>
+> So, TL;DR: kexec -f use to work with a KVM VM active, now it goes into a
+> triple fault crash.
+
+You mentioned I rebase so I thought your were backporting kernel patches.
+By rebase do you mean you porting your userspace to a newer kernel?
+
+
+In any event I believe the bug with respect to kexec was introduced in
+commit 6f389a8f1dd2 ("PM / reboot: call syscore_shutdown() after
+disable_nonboot_cpus()").  That is where syscore_shutdown was removed
+from kernel_restart_prepare().
+
+At this point it looks like someone just needs to add the missing
+syscore_shutdown call into kernel_kexec() right after
+migrate_to_reboot_cpu() is called.
+
+That said I am not seeing the reboot notifiers being called on the kexec
+path either so your issue with kvm might be deeper.
+
+Eric
 
