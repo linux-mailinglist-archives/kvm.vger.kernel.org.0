@@ -1,104 +1,240 @@
-Return-Path: <kvm+bounces-4035-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4038-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B9F380C86C
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 12:47:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B01E580C905
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 13:07:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4160B2144A
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 11:46:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74B97B21217
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 12:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E7FA38DF2;
-	Mon, 11 Dec 2023 11:46:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A6E239858;
+	Mon, 11 Dec 2023 12:07:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FiUP88yS"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="Fl9xYbyE"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E4B8106;
+	Mon, 11 Dec 2023 04:07:11 -0800 (PST)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 9F018120009;
+	Mon, 11 Dec 2023 15:07:07 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 9F018120009
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1702296427;
+	bh=JzRw1YBG7f3oyr2RSRgTAcTcb1RpGTdfB0MlDiBeNMY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=Fl9xYbyE7vkGTZbfOZpwHZYW6bqdqx7Lvrfr+nuUwVECVTntTRMjTx1hiF0x1o0kT
+	 Va2C9poiamtVwx8OqqpCvLIRuKG13doXix1Ai3CBcuAJGBar3kahzvqIOWRgvQ4JaW
+	 AGNNeoLkvJHb2+mRdEe0jlco0xf6H5i9Lh0OjlxpD/uUrYB5EErAqIGHPcdrO0in1Q
+	 hygPPibh8o5xek6aHo/tl6QmZUkoy4EXMmT5ZOa9Y0Vb0RCCb4vVgHEnNf4hjeC5SW
+	 R5lKIxP3Kc6KXS2f8AixqWHtyKnAtB9DuNr454OkSFEWyUuqPxrP1ZFMp8KUyzW2eJ
+	 B9S+Y3Rcb/LWA==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2A6358A9;
-	Mon, 11 Dec 2023 11:46:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DC84C433C8;
-	Mon, 11 Dec 2023 11:46:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702295210;
-	bh=zok5xX1OP1JBLwsks2rLDSP5o/dPlt9Lm7Y9BmkQ62A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FiUP88yS3tXlhk0c6uic6GYAqPRUcdiOZXIxG5NviwR4WPsfbfbMNCID1WZrbmUBu
-	 Hw6w25nX8M+90iRumlsy28NYhfnur0gRbhZ3s+2YpVc4yBqPS/sXcBuzVpzKlbnBJk
-	 +vm4d7cPgNGWlYPpufsiZQSN2RSC6l85eSZEi9Ky/SzwvhGdhaQQWiIA60smARCyBO
-	 JKw1guoblFXi58hVzWP0n3bhpNQPjXMGDGRSuNh/l5MRQ51UAD842SrrCUy8x6uZ8u
-	 qr4ACm81qJipMkLCLS0byuFnDFak92M7zAdEFBZfk49IHLQgIjm3ASwBoOTqIct+NZ
-	 5GGBsIFYhOp8A==
-Date: Mon, 11 Dec 2023 11:46:42 +0000
-From: Will Deacon <will@kernel.org>
-To: Mihai Carabas <mihai.carabas@oracle.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	catalin.marinas@arm.com, tglx@linutronix.de, mingo@redhat.com,
-	bp@alien8.de, x86@kernel.org, hpa@zytor.com, pbonzini@redhat.com,
-	wanpengli@tencent.com, vkuznets@redhat.com, rafael@kernel.org,
-	daniel.lezcano@linaro.org, akpm@linux-foundation.org,
-	pmladek@suse.com, peterz@infradead.org, dianders@chromium.org,
-	npiggin@gmail.com, rick.p.edgecombe@intel.com,
-	joao.m.martins@oracle.com, juerg.haefliger@canonical.com,
-	mic@digikod.net, arnd@arndb.de, ankur.a.arora@oracle.com
-Subject: Re: [PATCH 7/7] cpuidle/poll_state: replace cpu_relax with
- smp_cond_load_relaxed
-Message-ID: <20231211114642.GB24899@willie-the-truck>
-References: <1700488898-12431-1-git-send-email-mihai.carabas@oracle.com>
- <1700488898-12431-8-git-send-email-mihai.carabas@oracle.com>
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Mon, 11 Dec 2023 15:07:07 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 11 Dec 2023 15:07:07 +0300
+Message-ID: <8687bc31-92a7-8ff4-168f-f194180d0cbf@salutedevices.com>
+Date: Mon, 11 Dec 2023 14:58:49 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1700488898-12431-8-git-send-email-mihai.carabas@oracle.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net-next v7 3/4] virtio/vsock: fix logic which reduces
+ credit update messages
+Content-Language: en-US
+To: Stefano Garzarella <sgarzare@redhat.com>
+CC: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi
+	<stefanha@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
+	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20231206211849.2707151-1-avkrasnov@salutedevices.com>
+ <20231206211849.2707151-4-avkrasnov@salutedevices.com>
+ <20231206165045-mutt-send-email-mst@kernel.org>
+ <d9d1ec6a-dd9b-61d9-9211-52e9437cbb1f@salutedevices.com>
+ <20231206170640-mutt-send-email-mst@kernel.org>
+ <d30a1df7-ecda-652d-8c98-853308a560c9@salutedevices.com>
+ <s5v5hbr2memhwoqm3fxbkq6qsocs43qgyhx432zzy6ugbqhuu2@rsnm3kiwfwjm>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <s5v5hbr2memhwoqm3fxbkq6qsocs43qgyhx432zzy6ugbqhuu2@rsnm3kiwfwjm>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 182013 [Dec 11 2023]
+X-KSMG-AntiSpam-Version: 6.0.0.2
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 6 0.3.6 62f5a4619c57459c9a142aa1486ed27913162963, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/12/11 10:21:00 #22658245
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On Mon, Nov 20, 2023 at 04:01:38PM +0200, Mihai Carabas wrote:
-> cpu_relax on ARM64 does a simple "yield". Thus we replace it with
-> smp_cond_load_relaxed which basically does a "wfe".
+
+
+On 11.12.2023 15:01, Stefano Garzarella wrote:
+> On Thu, Dec 07, 2023 at 01:50:05AM +0300, Arseniy Krasnov wrote:
+>>
+>>
+>> On 07.12.2023 01:08, Michael S. Tsirkin wrote:
+>>> On Thu, Dec 07, 2023 at 12:52:51AM +0300, Arseniy Krasnov wrote:
+>>>>
+>>>>
+>>>> On 07.12.2023 00:53, Michael S. Tsirkin wrote:
+>>>>> On Thu, Dec 07, 2023 at 12:18:48AM +0300, Arseniy Krasnov wrote:
+>>>>>> Add one more condition for sending credit update during dequeue from
+>>>>>> stream socket: when number of bytes in the rx queue is smaller than
+>>>>>> SO_RCVLOWAT value of the socket. This is actual for non-default value
+>>>>>> of SO_RCVLOWAT (e.g. not 1) - idea is to "kick" peer to continue data
+>>>>>> transmission, because we need at least SO_RCVLOWAT bytes in our rx
+>>>>>> queue to wake up user for reading data (in corner case it is also
+>>>>>> possible to stuck both tx and rx sides, this is why 'Fixes' is used).
+>>>>>> Also handle case when 'fwd_cnt' wraps, while 'last_fwd_cnt' is still
+>>>>>> not.
+>>>>>>
+>>>>>> Fixes: b89d882dc9fc ("vsock/virtio: reduce credit update messages")
+>>>>>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>>>>>> ---
+>>>>>>  Changelog:
+>>>>>>  v6 -> v7:
+>>>>>>   * Handle wrap of 'fwd_cnt'.
+>>>>>>   * Do to send credit update when 'fwd_cnt' == 'last_fwd_cnt'.
+>>>>>>
+>>>>>>  net/vmw_vsock/virtio_transport_common.c | 18 +++++++++++++++---
+>>>>>>  1 file changed, 15 insertions(+), 3 deletions(-)
+>>>>>>
+>>>>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>>>>> index e137d740804e..39f8660d825d 100644
+>>>>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>>>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>>>>> @@ -558,6 +558,8 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>>>>>>      struct virtio_vsock_sock *vvs = vsk->trans;
+>>>>>>      size_t bytes, total = 0;
+>>>>>>      struct sk_buff *skb;
+>>>>>> +    u32 fwd_cnt_delta;
+>>>>>> +    bool low_rx_bytes;
+>>>>>>      int err = -EFAULT;
+>>>>>>      u32 free_space;
+>>>>>>
+>>>>>> @@ -601,7 +603,15 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>>>>>>          }
+>>>>>>      }
+>>>>>>
+>>>>>> -    free_space = vvs->buf_alloc - (vvs->fwd_cnt - vvs->last_fwd_cnt);
+>>>>>> +    /* Handle wrap of 'fwd_cnt'. */
+>>>>>> +    if (vvs->fwd_cnt < vvs->last_fwd_cnt)
+>>>>>> +        fwd_cnt_delta = vvs->fwd_cnt + (U32_MAX - vvs->last_fwd_cnt);
+>>>>>
+>>>>> Are you sure there's no off by one here? for example if fwd_cnt is 0
+>>>>> and last_fwd_cnt is 0xfffffffff then apparently delta is 0.
+>>>>
+>>>> Seems yes, I need +1 here
+>>>
+>>> And then you will get a nop, because assigning U32_MAX + 1 to u32
+>>> gives you 0. Adding () does nothing to change the result,
+>>> + and - are commutative.
+>>
+>> Ahh, unsigned here, yes.
 > 
-> Suggested-by: Peter Zijlstra <peterz@infradead.org>
-> Signed-off-by: Mihai Carabas <mihai.carabas@oracle.com>
-> ---
->  drivers/cpuidle/poll_state.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
+> Ooops, sorry I was confused here!
 > 
-> diff --git a/drivers/cpuidle/poll_state.c b/drivers/cpuidle/poll_state.c
-> index 9b6d90a72601..440cd713e39a 100644
-> --- a/drivers/cpuidle/poll_state.c
-> +++ b/drivers/cpuidle/poll_state.c
-> @@ -26,12 +26,16 @@ static int __cpuidle poll_idle(struct cpuidle_device *dev,
->  
->  		limit = cpuidle_poll_time(drv, dev);
->  
-> -		while (!need_resched()) {
-> -			cpu_relax();
-> -			if (loop_count++ < POLL_IDLE_RELAX_COUNT)
-> -				continue;
-> -
-> +		for (;;) {
->  			loop_count = 0;
-> +
-> +			smp_cond_load_relaxed(&current_thread_info()->flags,
-> +					      (VAL & _TIF_NEED_RESCHED) ||
-> +					      (loop_count++ >= POLL_IDLE_RELAX_COUNT));
-> +
-> +			if (loop_count < POLL_IDLE_RELAX_COUNT)
-> +				break;
-> +
->  			if (local_clock_noinstr() - time_start > limit) {
->  				dev->poll_time_limit = true;
->  				break;
+>>
+>> @Stefano, what did You mean about wrapping here?
+>>
+>> I think Michael is right, for example
+> 
+> Yep, I agree!
+> Sorry for this wrong suggestion!
 
-Doesn't this make ARCH_HAS_CPU_RELAX a complete misnomer?
+Got it! I'll remove it, no problem 
 
-Will
+Thanks, Arseniy
+
+> 
+> Stefano
+> 
+>>
+>> vvs->fwd_cnt wraps and now == 5
+>> vvs->last_fwd_cnt == 0xffffffff
+>>
+>> now delta before this patch will be 6 - correct value
+>>
+>> May be I didn't get your idea, so implement it very naive?
+>>
+>> Thanks, Arseniy
+>>
+>>>
+>>>
+>>>>>
+>>>>>
+>>>>>> +    else
+>>>>>> +        fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt;
+>>>>>
+>>>>> I actually don't see what is wrong with just
+>>>>>     fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt
+>>>>> 32 bit unsigned math will I think handle wrap around correctly.
+>>>>>
+>>>>> And given buf_alloc is also u32 - I don't see where the bug is in
+>>>>> the original code.
+>>>>
+>>>> I think problem is when fwd_cnt wraps, while last_fwd_cnt is not. In this
+>>>> case fwd_cnt_delta will be too big, so we won't send credit update which
+>>>> leads to stall for sender
+>>>>
+>>>> Thanks, Arseniy
+>>>
+>>> Care coming up with an example?
+>>>
+>>>
+>>>>>
+>>>>>
+>>>>>> +
+>>>>>> +    free_space = vvs->buf_alloc - fwd_cnt_delta;
+>>>>>> +    low_rx_bytes = (vvs->rx_bytes <
+>>>>>> +            sock_rcvlowat(sk_vsock(vsk), 0, INT_MAX));
+>>>>>>
+>>>>>>      spin_unlock_bh(&vvs->rx_lock);
+>>>>>>
+>>>>>> @@ -611,9 +621,11 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>>>>>>       * too high causes extra messages. Too low causes transmitter
+>>>>>>       * stalls. As stalls are in theory more expensive than extra
+>>>>>>       * messages, we set the limit to a high value. TODO: experiment
+>>>>>> -     * with different values.
+>>>>>> +     * with different values. Also send credit update message when
+>>>>>> +     * number of bytes in rx queue is not enough to wake up reader.
+>>>>>>       */
+>>>>>> -    if (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
+>>>>>> +    if (fwd_cnt_delta &&
+>>>>>> +        (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE || low_rx_bytes))
+>>>>>>          virtio_transport_send_credit_update(vsk);
+>>>>>>
+>>>>>>      return total;
+>>>>>> -- 
+>>>>>> 2.25.1
+>>>>>
+>>>
+>>
+> 
 
