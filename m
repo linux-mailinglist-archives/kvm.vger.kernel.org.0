@@ -1,123 +1,116 @@
-Return-Path: <kvm+bounces-4075-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4076-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 501B180D1DB
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 17:34:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 141BA80D202
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 17:37:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08F0D2818F1
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 16:33:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A86DEB212A0
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 16:37:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C6E31F16B;
-	Mon, 11 Dec 2023 16:33:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFC651EB5D;
+	Mon, 11 Dec 2023 16:37:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IMw7ytCL"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VwxmJBTM"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53A1B91
-	for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 08:33:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702312427;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bzIkbZpiRzJdrc6a6vDeJqlwsyKzW2Z5OW2xriwEAsQ=;
-	b=IMw7ytCLi2monybRlcj8JSOMhfyBFpVdwa5MKXWH0QkExQlITZpPmU0y/JmYut2WGMJzJX
-	RsLdMMMl+1J7z5rK9AtJQbSa33UNBge8OlZyqpXe5kgrWnagiGbGQKX7pIRXhdgR7bV6uu
-	rK7w3p+xY0twgeYmuzIvWAeAELm6P2A=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-495-iIO8g2ImPJaOc9hI2IJPeA-1; Mon, 11 Dec 2023 11:33:45 -0500
-X-MC-Unique: iIO8g2ImPJaOc9hI2IJPeA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3334e7d1951so4077932f8f.3
-        for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 08:33:45 -0800 (PST)
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FEC491
+	for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 08:37:00 -0800 (PST)
+Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-a1ef2f5ed02so501542866b.1
+        for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 08:37:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1702312619; x=1702917419; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rchDbv41LmtjjKEGa4Aos/UEX+s2aj5wfo2X55D4PBs=;
+        b=VwxmJBTMAib8JHVLtw4EzHXlafnKMgYzkrpxwvdXlrDqa0SskGVEyEFshn3Z3h/T4k
+         3DCU6xwXU/0gR+6ZslL9WE/GGlwuFDfd8SchZzWVX5ja0g+JIirgcu7BNn5JbOiM/Xqm
+         ublrUd/w06nqwNuGQRkwluilqDca/kKpxiiXWEMvEkGY5W1/Axdz7IO7Hx1W3xEdOwvv
+         n/frDvxl0O4h9KfogjQbA9vK4CnKBrEolPLLABMCaZfKTevlM5oo9Kq9MMPX3CzVwKRf
+         Jw3K86uxcUaMIBFaZ1xPl1h31Yrjz6DGYwciNUFPogtC/zcPn3NaTZSiCh+l4i11/xIf
+         xhDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702312425; x=1702917225;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bzIkbZpiRzJdrc6a6vDeJqlwsyKzW2Z5OW2xriwEAsQ=;
-        b=uKxr6Yk5ZX/NyjZV/6/AXSjvwBEoWzwl+bFlQP+z98PFY1MpPwsqTbZi/cUj2iUxmI
-         pw2ba3gTy502A4azLOB5sc1JcDcOlZgAVWam5tqyqRRdMjY60zEYTgwIEw/4y2C3h0jF
-         X0itI0AW4YSPmRgdwmChBkn1rgcP21nC6z3V/1rbjMsJN8r7zDkiMvooB3gkTsHWN9pC
-         7bBQYRTbmjlEopcBndIntRsk2hlfy4yGNwHq1NEEAmEFXoYF/kS1o83PyQixP9HEUMP4
-         pbkRTATm5WciCR3YIqfdlqgSylchCtDiZFvp2FPS7b4PU56/VEI4a1r+AI5M29yuN7tt
-         XMXA==
-X-Gm-Message-State: AOJu0Yyy5Yqj4TlfJonue5j8guLDOCc/maawSieqsM9NKghskTF31YEL
-	opTXZb79e4eWFWj9GTTs/CgE9bgp2Zg3b0P9Sejit1xNHUOsyN5DI+sbjemS9g3GXtnsLJ18Y7I
-	9v6Tn3qpPauQZ
-X-Received: by 2002:a05:600c:501e:b0:40c:25c7:b340 with SMTP id n30-20020a05600c501e00b0040c25c7b340mr1172681wmr.281.1702312424866;
-        Mon, 11 Dec 2023 08:33:44 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFVGkZ4+oYYezirnB3Q25N7aHGvQW9MmXB7XVlCjjG2JGiHt8ONICyX4hMLT/PJy3biQX9FqQ==
-X-Received: by 2002:a05:600c:501e:b0:40c:25c7:b340 with SMTP id n30-20020a05600c501e00b0040c25c7b340mr1172674wmr.281.1702312424427;
-        Mon, 11 Dec 2023 08:33:44 -0800 (PST)
-Received: from sgarzare-redhat ([95.131.45.143])
-        by smtp.gmail.com with ESMTPSA id t13-20020a05600c450d00b00405c7591b09sm13524344wmo.35.2023.12.11.08.33.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 08:33:43 -0800 (PST)
-Date: Mon, 11 Dec 2023 17:33:39 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Nikolay Kuratov <kniv@yandex-team.ru>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [PATCH v2] vsock/virtio: Fix unsigned integer wrap around in
- virtio_transport_has_space()
-Message-ID: <nuyxku7erp67jjs2uw4kpufwxcgdrevl2lqys5fyltzgz6ikgk@3db26gkjghjw>
-References: <t6mnn7lyusvwt4knlxkgaajphhs6es5xr6hr7iixtwrfcljw67@foceocwkayk2>
- <20231211162317.4116625-1-kniv@yandex-team.ru>
+        d=1e100.net; s=20230601; t=1702312619; x=1702917419;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rchDbv41LmtjjKEGa4Aos/UEX+s2aj5wfo2X55D4PBs=;
+        b=tDTTpKRA+ckjkNSrFLihuHPpt/u9ltFS4kTxaVxpnMgRkQq21RLNMSGD7uzL7LdVLV
+         BLujuTMe47zH3aQ9V2bjM4o6XuGfPPF0ZyeK99kzpNyJhLLKMJGkriSG/aPS8EvuDhqt
+         HAum+6G88JeZDbe3QtW1QoRFLGUYDf49X/m4Oc2p/lZh2mg06e/GPMEiadF4LX6Hu4Om
+         tKkBDk3yRwVsKyTnbu9MZ1Hc9OLy2V0/Jhg3j9Izz8JarJzBV4bBBJdFS7S7Z34DtO41
+         ol7Ktmc4eeYkAVOpZroTYuAQT8X+dipeRZtqBA/kP1/mdODUSSkz8iwqZ028r7/BRokj
+         jdtg==
+X-Gm-Message-State: AOJu0Yz1wCn2wVleluS+J+CpciMqZGitlvpSgsDuaQFuezjuZ1aFj6P9
+	9DkJME+CW0MbgtVKyf6m9R5rNg==
+X-Google-Smtp-Source: AGHT+IGRSB4xvIcdsnqjQZqKP0M8XN4p5GuuQ1IOBXp8idoQn+ocFfXv4zbe60b/rATCpyHNiOS/1g==
+X-Received: by 2002:a17:906:b0c9:b0:a1f:6433:798c with SMTP id bk9-20020a170906b0c900b00a1f6433798cmr2034910ejb.106.1702312618978;
+        Mon, 11 Dec 2023 08:36:58 -0800 (PST)
+Received: from [192.168.69.100] (cor91-h02-176-184-30-150.dsl.sta.abo.bbox.fr. [176.184.30.150])
+        by smtp.gmail.com with ESMTPSA id rd12-20020a170907a28c00b00a097c5162b0sm4995159ejc.87.2023.12.11.08.36.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Dec 2023 08:36:58 -0800 (PST)
+Message-ID: <5377419a-88dd-4e5c-8be4-1345f6c2115b@linaro.org>
+Date: Mon, 11 Dec 2023 17:36:53 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20231211162317.4116625-1-kniv@yandex-team.ru>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 07/10] testa/avocado: test_arm_emcraft_sf2: handle RW
+ requirements for asset
+Content-Language: en-US
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Radoslaw Biernacki <rad@semihalf.com>, Paul Durrant <paul@xen.org>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>,
+ Leif Lindholm <quic_llindhol@quicinc.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
+ <alex.bennee@linaro.org>, kvm@vger.kernel.org, qemu-arm@nongnu.org,
+ Beraldo Leal <bleal@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Sriram Yagnaraman <sriram.yagnaraman@est.tech>,
+ Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
+ David Woodhouse <dwmw2@infradead.org>
+References: <20231208190911.102879-1-crosa@redhat.com>
+ <20231208190911.102879-8-crosa@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20231208190911.102879-8-crosa@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 11, 2023 at 07:23:17PM +0300, Nikolay Kuratov wrote:
->We need to do signed arithmetic if we expect condition
->`if (bytes < 0)` to be possible
->
->Found by Linux Verification Center (linuxtesting.org) with SVACE
->
->Fixes: 06a8fc78367d ("VSOCK: Introduce virtio_vsock_common.ko")
->Signed-off-by: Nikolay Kuratov <kniv@yandex-team.ru>
->---
->
->V1 -> V2: Added Fixes section
+On 8/12/23 20:09, Cleber Rosa wrote:
+> The asset used in the mentioned test gets truncated before it's used
+> in the test.  This means that the file gets modified, and thus the
+> asset's expected hash doesn't match anymore.  This causes cache misses
+> and re-downloads every time the test is re-run.
+> 
+> Let's make a copy of the asset so that the one in the cache is
+> preserved and the cache sees a hit on re-runs.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>   tests/avocado/boot_linux_console.py | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/avocado/boot_linux_console.py b/tests/avocado/boot_linux_console.py
+> index f5c5d647a4..e2e928e703 100644
+> --- a/tests/avocado/boot_linux_console.py
+> +++ b/tests/avocado/boot_linux_console.py
+> @@ -414,14 +414,16 @@ def test_arm_emcraft_sf2(self):
+>                      'fe371d32e50ca682391e1e70ab98c2942aeffb01/spi.bin')
+>           spi_hash = '65523a1835949b6f4553be96dec1b6a38fb05501'
+>           spi_path = self.fetch_asset(spi_url, asset_hash=spi_hash)
+> +        spi_path_rw = os.path.join(self.workdir, os.path.basename(spi_path))
+> +        shutil.copy(spi_path, spi_path_rw)
 
-Please, next time carry also R-b tags.
-
->
-> net/vmw_vsock/virtio_transport_common.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
-Thanks,
-Stefano
-
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index c8e162c9d1df..6df246b53260 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -843,7 +843,7 @@ static s64 virtio_transport_has_space(struct vsock_sock *vsk)
-> 	struct virtio_vsock_sock *vvs = vsk->trans;
-> 	s64 bytes;
->
->-	bytes = vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
->+	bytes = (s64)vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
-> 	if (bytes < 0)
-> 		bytes = 0;
->
->-- 
->2.34.1
->
->
-
+This is an implementation detail. By default fetch_asset() should return
+a path to a read-only artifact. We should extend it to optionally return
+a writable file path, with the possibility to provide a dir/path.
 
