@@ -1,278 +1,335 @@
-Return-Path: <kvm+bounces-4025-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4026-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 202EF80C2AF
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 09:05:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A40F80C324
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 09:29:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 400DF1C20949
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 08:05:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A00481F20F7F
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 08:28:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E55A120B2D;
-	Mon, 11 Dec 2023 08:05:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ADD020DE2;
+	Mon, 11 Dec 2023 08:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VsmxpWoE"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="jiYUiSPJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3064A100;
-	Mon, 11 Dec 2023 00:05:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702281944; x=1733817944;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=zLKpfEshP81Zk2arI9WmVZOoX9JPFPjvSk5cw9cMK9E=;
-  b=VsmxpWoEYxBsMGtf3hlppe5iLt98+tiXSPKtq5dJIc4Mf3rCDoxGlFJm
-   XOZ9q1ASgF7+rGeQ56OWvitn0WAnmGU5rULedOslGm17zf5TaqGCDG8os
-   3GXJgqT8LKVy5mWue495PVlkA4FTg+OjsHv9FipeRj3XAS84W52Y1Mn9R
-   hFixYY7GtL39L/ZV91HsnRQTsRccTqXtRM1A66cnyGQ6GwsEYSSAty5iZ
-   3w6SIzhR5K80BkayLK56qbcajoyotEOILLFCrQ04j27tkNchame6Dsj7E
-   UPvauv//o2lZKeWievZ+BoOwHEORYtPqqQwy3eWgHmwyG58Mkp+sqILqF
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="1738012"
-X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
-   d="scan'208";a="1738012"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 00:05:44 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="916744452"
-X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
-   d="scan'208";a="916744452"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmsmga001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Dec 2023 00:05:42 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 11 Dec 2023 00:05:42 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 11 Dec 2023 00:05:41 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 11 Dec 2023 00:05:41 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 11 Dec 2023 00:05:40 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2083.outbound.protection.outlook.com [40.107.220.83])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3CDDE5
+	for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 00:28:47 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K3IipY1w+Fp3RwWOYyV8yBbxSFiFWbqy+6y3g7ZkMN4ZZAnDPY4kkwxWUc8gz0mxl+ZM240OdO0Zm59r8G8AOn/ZFWQuAxN502GkZBfWP2RZ1d4k4sENWH2XY5d9Zz3/aojt7X8crWL/HkAdr+qaFQbykVEAqgH+ZNMaPj9rLnRLNc1eEsIhnvV8AYF0r4hS9vBAYSC/MkKbLaImw0ifA/S4MUx0wTfkJMfyzAZ32/RUYM/Pmsl7JTwsiJmfjKvydllnAFnXyJrgp6ITcHJQc/kYDk/y2Lo8KoVENV0J2TB2S19N8dzmOhfhESqrWThlp1J0tVACsc11PrAeR0ywlg==
+ b=Zx+GtPjFrFbRhIiga9ht8Ak5KvbegtNob9S6frFPOew2XIO4gjbPhLVBowPP5c7KLjHE0uZVjAhDSbP1LiWEfc6pET+ABc1sHmtjUEMsCWp73aZW0Te4SEpNPxaskG0amW8VVjakPhEOLZL8uzwmI7V5v50+OMIwVZB6mjbL/PfUZVcHIq2oiPq9woQReil74uU/aBCjUcVfaU35G1rLLYkKdW6in5jI+dSjBNwidyWxUiOSnLtfYCk19vAei9DjgAJxBRFsIjaQyey31l+TRpwRdgbxB+KlJtHI6CXscPSh41UnGHATYZXs0kKuh3jtS5cwbw3WNh9fNG+t7pN6Dg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Q1J6RsllcLPTEgixrOQdSrtNjWcH7iIJ9Qzk8+VJpQA=;
- b=g2TLpXaiiJ2n1VOLjCY2wf+63EqSdg9WC7oIktXC2BhX+SzMGkTpMZus3NcQk74k7V6Pxsa6mJcxo4/1nKKDJgmGbCP1OnN9MFFVpIdw1Z/HwssJWwcLewNUJ07wjn+joQZygTWAGBEnqQeCIhgeUwg5kylaACvw54cc2TnZBj+vkvafJ9rprydBKU2tJAa6n4BDTdtb/WdR8h0/+2IqQJGDIXcIwbdEoQAb7sTIjhK9tzJy+3MB8GO5356CWHbRNsBcMO6ybwpUD/AacK7c7AYO8Ay0yB9fzcZ0VQU7Hya+X42/Oh9EOY7vNDWiTCyOwP65/e6EhNZU2qB5G27XUg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by IA0PR11MB7933.namprd11.prod.outlook.com (2603:10b6:208:407::19) with
+ bh=cnlEZLRP/P5Nhgm5H/RtdKWRMDLS9aibizr6j+o3jsA=;
+ b=aA/qwz9xrDKgqsi1brvhvb7dnnsqpbhwssg4mEI96BLWjEtRjaeEYgbs1bm+GJSr1rSgpFTqrJI2MrFNCPmfIqK7K18/gk/ymlJ7WGLSJlvQ52N2iRrCDmYtI9qZd0pgmAvrh4Za25tD31dMT4C2P8BWAGbgaTyzn4luiguqG42w3VNRznJK+A4WMQ2TllJnsgTgnIrz4qCpIOc2ZkTMORzmfYOVS7qgakcfTSKqJB6p97uvDO9Wuv5hnszCSA+IT2tnr0qHFy+e0qY9KdNSZtc0yhvumCgcI5o7XvEhJ3cvqxsEjnWXmzzBGQbfzceJQSunyTr6JhiI36boAfbxow==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cnlEZLRP/P5Nhgm5H/RtdKWRMDLS9aibizr6j+o3jsA=;
+ b=jiYUiSPJe8EWvautEHnCrjzlWUwRKvKz0OgRkmru6o8TXJfMGBNGpcgLCbADJuVBjdx9FpFoCRqUjKAce0SOIvqkLsFAhyNiZrossRevkaurMJztvjRAdgqt5pRL2qJChn6AdwWrc0gkOvIDgqhRxx9cSxWfeMm4An812VFLMdcaMIcmczXVKKA+YrdfuneHdxIlgJfqwiLHMPuHN0Q14x0EpTtqoMvx0buyQH69R+YSfj71h3Cq4nbf5otxRin/tkH/FKcI4I8UMjHmxBJVqYvS6P5alPm044aSRq9TV2pnqiUJ5tVdkdbrihr40p8uD/xQ33edyt8v7J9wJ/qQZg==
+Received: from BLAPR03CA0134.namprd03.prod.outlook.com (2603:10b6:208:32e::19)
+ by MN2PR12MB4392.namprd12.prod.outlook.com (2603:10b6:208:264::24) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Mon, 11 Dec
- 2023 08:05:39 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::e4ae:3948:1f55:547d]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::e4ae:3948:1f55:547d%5]) with mapi id 15.20.7068.031; Mon, 11 Dec 2023
- 08:05:39 +0000
-Message-ID: <0bdae2ca-a200-4db1-a016-059730d1545e@intel.com>
-Date: Mon, 11 Dec 2023 16:08:11 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] vfio: Report PASID capability via VFIO_DEVICE_FEATURE
- ioctl
-Content-Language: en-US
-To: "Tian, Kevin" <kevin.tian@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
-	<jgg@nvidia.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
-CC: "cohuck@redhat.com" <cohuck@redhat.com>, "eric.auger@redhat.com"
-	<eric.auger@redhat.com>, "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mjrosato@linux.ibm.com"
-	<mjrosato@linux.ibm.com>, "chao.p.peng@linux.intel.com"
-	<chao.p.peng@linux.intel.com>, "yi.y.sun@linux.intel.com"
-	<yi.y.sun@linux.intel.com>, "peterx@redhat.com" <peterx@redhat.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
-	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
- Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
-	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
-	<yan.y.zhao@intel.com>
-References: <20231127063909.129153-1-yi.l.liu@intel.com>
- <20231127063909.129153-4-yi.l.liu@intel.com>
- <BN9PR11MB527639DBE4C433542F351F6D8C8BA@BN9PR11MB5276.namprd11.prod.outlook.com>
-From: Yi Liu <yi.l.liu@intel.com>
-In-Reply-To: <BN9PR11MB527639DBE4C433542F351F6D8C8BA@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI1PR02CA0024.apcprd02.prod.outlook.com
- (2603:1096:4:1f4::12) To DS0PR11MB7529.namprd11.prod.outlook.com
- (2603:10b6:8:141::20)
+ 2023 08:28:44 +0000
+Received: from BL6PEPF0001AB74.namprd02.prod.outlook.com
+ (2603:10b6:208:32e:cafe::a9) by BLAPR03CA0134.outlook.office365.com
+ (2603:10b6:208:32e::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32 via Frontend
+ Transport; Mon, 11 Dec 2023 08:28:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BL6PEPF0001AB74.mail.protection.outlook.com (10.167.242.167) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7091.18 via Frontend Transport; Mon, 11 Dec 2023 08:28:44 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 11 Dec
+ 2023 00:28:30 -0800
+Received: from [172.27.58.65] (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 11 Dec
+ 2023 00:28:25 -0800
+Message-ID: <7929884c-f8f3-4977-9474-33830cde0a07@nvidia.com>
+Date: Mon, 11 Dec 2023 10:28:23 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V7 vfio 0/9] Introduce a vfio driver over virtio devices
+Content-Language: en-US
+To: <alex.williamson@redhat.com>, <mst@redhat.com>
+CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<parav@nvidia.com>, <feliu@nvidia.com>, <jiri@nvidia.com>,
+	<kevin.tian@intel.com>, <joao.m.martins@oracle.com>, <si-wei.liu@oracle.com>,
+	<leonro@nvidia.com>, <maorg@nvidia.com>, <jasowang@redhat.com>, "Jason
+ Gunthorpe" <jgg@nvidia.com>
+References: <20231207102820.74820-1-yishaih@nvidia.com>
+From: Yishai Hadas <yishaih@nvidia.com>
+In-Reply-To: <20231207102820.74820-1-yishaih@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|IA0PR11MB7933:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1993d188-5b0a-46d9-c3e6-08dbfa1ff615
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB74:EE_|MN2PR12MB4392:EE_
+X-MS-Office365-Filtering-Correlation-Id: 14a0387f-6be1-48ec-d45a-08dbfa23307b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: LSR+U5ewM0ndpBsN4jQCtYK/SPx4SnuMnoRISO0JId0i/TaY3piGSCIiT2NHBguaxnRo8/VAP6bzh0uBfWwgUuFHk5z5tKrF2mZUH8C+GcHTSx6cj2JiiaxwFxj02QH6tsFs6ZYKmfxbyAWGyB2qNzHubQedAqnI3cHJH/pG4ZPiCDKnGjvo0WHjlGb6MhJvNiRwLqqJYmAnqiXdO5n+AEerWkDD6QQvZ+9nsfxMizYjW6bpG9pI831ILgMG1PBk1C9ZYtjhRH5S3bgn1ySGK3OQiFPq7VXRe1MEbxb83NsMBXJQt3ScjT2ZnP4fJ0s/Mx4q9EOMdww8wFq21M8jwi21nJ7L55lOvyOspugVlmSgO545ADxyZm3eyTtsN6AXPiUwHpf3VWU4NcfEZlC4EGpoRNLhQMBZcQql2xWdVaCjKO2GFBjk/mx32PTiFnu4u65qpSYIzv/bft9Unn7qIdfdGC5IBla+ovbiqniP5Vfvl1XV5byNZAFQtqT7iwdvpMiAcU96ejJA1aM5pnuG/jhQnidgEXaSE00Q787EptrjUUOFPZ2IeJJ1uKgK6QTgACFRtMs2d1yeYRMjFK/2WNvTgKdrQ9mhzImqz36chL0sYJ3lrNQgNlMnZUcwp2N/YZZAUDLrKYVA0IiGp/kJ3g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(346002)(366004)(136003)(396003)(230922051799003)(1800799012)(186009)(451199024)(64100799003)(6512007)(6486002)(2616005)(26005)(53546011)(478600001)(6506007)(6666004)(7416002)(5660300002)(41300700001)(2906002)(54906003)(66476007)(66556008)(66946007)(4326008)(8676002)(8936002)(316002)(110136005)(38100700002)(82960400001)(86362001)(31696002)(36756003)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VXpOWk43cjVpa0UxV25qQndGdGphNHlVN3R6RUxCNkJUTmxDcHplelAzR0xF?=
- =?utf-8?B?b2Q2Q0M3a291dmg0YzVQT0l0N2dUQ0VMU1ZJSnJ6cHR1dmo5cDJVQXBwVHVQ?=
- =?utf-8?B?cTJOZUZ1cjVidG1oeFZZTjhzbTJwaXR5aE1ySkw2MnBBb1JDODVucjExN0Ry?=
- =?utf-8?B?Zzk1WlFyR1FXQXhBaHdFdFk5R29pMU9GWncxT2E4Z21SUG0xRTlSWTJNMlhG?=
- =?utf-8?B?SmhvZU9WSzFzK2FtVHZCcWo4Q1lUMmg2d1RJYjhkTytDb2VBaXozdzZBREdy?=
- =?utf-8?B?d0haOVFSNU5VLzlod3VTQXV0bnBqbkNRQVdkV2tOK2Q5RE00TENuMDJCbmg5?=
- =?utf-8?B?bTNKRHQ0ZVJZVm5wQVd5Vm9DVzhuY1hDa0wvaU5IS1JvR1NCeWJhLzlOZG5q?=
- =?utf-8?B?bGxnMzBFb21veW45cVpjRExmQ2xSMDFQZFJobUFqaHVWNGM5WWtHSm1HTGRi?=
- =?utf-8?B?T01WQzM5WTRtRWY4NnhUS3YxR2NRZDBjQmN2aGVaRkoraUJrM2t6ZmoyTHFl?=
- =?utf-8?B?SHlsOUJsTkx0VVBLSW9mSkV0UFZSbFZkOC9lQkdsanJuK0RENzhyN0ZpMldG?=
- =?utf-8?B?S0g4MndZVDI0K3FLakVBQzRucGo5Vm5MMDUzZCt2ZzJaVlBXaEZLenM3QXVH?=
- =?utf-8?B?cUtwN3Y1NEZhNU9lWlZGelZCWDBNRWhVSHUwVEp0WkV0YXE4czFQUi92MW5L?=
- =?utf-8?B?SExPcXh6MHJPdEZvRm1CWXBvb0hiSUZmWDZZT3NaSjJQb0xjY3NyNSs2SzBs?=
- =?utf-8?B?bStUbEFUbDVaM0hWTFlheENYUmZESHp4OGk4WTlWdk8vWFp1TGdZZHB4b3pU?=
- =?utf-8?B?MHNORjVJb3ZZbWlSOWgwSEo3ZDU4T3l5SnVENUNocnJvdHE5QVJvdHZpWVBq?=
- =?utf-8?B?eHFuY3FReVlxbnRMcWI2eXRuakh3MHdFaWdXeXFTdDFPUHVGbCtLSjBZbWxT?=
- =?utf-8?B?ZWhHNEpUbW9MZUFIdmgvWURJTVd1TC8xcmJrSWkrazVncTBUekM2TTMvbFRu?=
- =?utf-8?B?cjZLRjdIUkVyYk5hK2U5Y1YzYy9WbDFOTEFBUUdmZm02NHZsNStiUk5SY1Ju?=
- =?utf-8?B?YzV5Y2cxWHZOMmxHbXRNa01yQmJQc2F1T084Ui9xOHdHNTZUL0pDYTg4K2My?=
- =?utf-8?B?K2pyL3hQdzdtZ2VjSFFBZmNPbFBnYnFHTG9lcTZKenAzbTJtcWlkRXoreFM5?=
- =?utf-8?B?cHVFOFJ3ck45bjdiMHFOSStDc0lwdUdPbWk4dzVQVzRmTEswQ1grYmRPZVp2?=
- =?utf-8?B?M1JuWkFsdVExUHplR0V3d1JRUzRaRGxSVnVDRFY0T0xEM2FpdE52UFBTNTBn?=
- =?utf-8?B?UVFsVjJvZFAvM3VCZTI0QmoyTXROM01kNnJHYXVvbXJsOXliMzBJWXVTbytw?=
- =?utf-8?B?LzFGbzVCV3htUmxMNHJIVk1aQmI5MGtYanF5UE0wUnlGRWxPK24yOUQ5ZUR2?=
- =?utf-8?B?ZjBvRzhxRW1JbmN6YmhKZ0NZbWdLc2VUcFRvWFhabGRuTHRZYUh0VHBSV0Fs?=
- =?utf-8?B?ekc2TFp6VzRReUNrd3VRNG5VMGNvUHdXbERJWVRjLzRsRU1KcituNzVYYmlj?=
- =?utf-8?B?TzdTRklqcTNXK0tLTi9ZdmdYZlFaK3Rhbnd5ZDR3S1hjT2dKTUZZL3BaaGwv?=
- =?utf-8?B?eFBreXJ5ajJSODZNYnY0dEJVbUJPNUtVaStsVG12KzBXdU1hdVdPOUh2Nnpa?=
- =?utf-8?B?ZlVtcEZhR0JDRzlsaURIekc4dTg5elBxTlRLYlNlbXFob0IxTDFvR1BNdUcz?=
- =?utf-8?B?S1p1SGY3WnA2dFV5d3FUN0tqMW9ZM2VHdVN1aEltR3hLS3dhOTA0ZUpzQi91?=
- =?utf-8?B?ZTlGSmZGMnNVckoxSzFTTmx6QnlSV2JCSHhWKzFUM1cwOE5mY2JUY3RGV2dO?=
- =?utf-8?B?bzhtVUVQSTFwTUtXREZzMHJpeVBoSFZSWkZjcjJhMyt1Q29aVWl3ZnR1RnY2?=
- =?utf-8?B?b0J2RjlTdllONWM1elJWMFk4UnRGbDRKZWo4QnJjZ0VvamdtRi9JOXV3d2xC?=
- =?utf-8?B?RDJiSnRyRjRGb3pHM3Zha3Q1N3B4RS9kR2ZBQVpFQTdpMXpKWlZNRmdLWGgx?=
- =?utf-8?B?Vi9uSnd2NWQ1VGV0Q01XVVpUcWpRK3R2cmVaQVU3NGlSOEhMV242emhqY05w?=
- =?utf-8?Q?0ZW1MoEjOkDCCbiLszj7tjjJA?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1993d188-5b0a-46d9-c3e6-08dbfa1ff615
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2023 08:05:38.5693
+X-Microsoft-Antispam-Message-Info:
+	TVRmYreoWm8G/oTQv0NybMEzgSR5qvYG8WNb/7U8+OTxGb7652XU2T3Xaga4RTSb4t3AyIIBETo5ieIK00RO/TkavezAJrNVv/gYAW/Z9nKsOezRCFKGaWh2SHtZDTtEz6Xv8mccqAyNycAVxzRuqeXm3THUlOTpYIir7a/uLB2oy+N4mFPQZ+AmPRc+49MKb+O61lpKENhfgBtzY5NLve0fham9sJUSTaarcoCJV7FkCLeKUSVRYf6Ju45qfc0iS8qhDyuTelxHNWrER1jeJUKbJOHegz6yD04w+lo7KYNPRJagDdToAu2ac7cV4skxg/ngdk9R4SXII3sjWcDQSmgsJlh6XfI3e2f010482B4vd4lYZHFaZJGbi/o0OJeBNW9jzUmetn5ZCOtW5atJhbVPX6Ar3FWlNuQ5AKG+JdbqX0jCbeJqSuIoD9mkEXukyrjbFDZbf7P9x/Lreba14yq4W1Ys5RQ0YKkWjUB1axkAF5G7iN2Re9OKIMkPdXceNNkNk32u9lGDbssmY6M5UT1qeI9Wd9TUG7Dy3CocnhhNCoFQNESj+WraDzRzMYtc3DuldsnCgmDYQqfBB19gVv2OydSEUOW8LsnPeg7/12gYNeRCfg9tF3gmu9+QFGyco92FWgS1C3pojrZpwyxCxC1JpUM6gqBih1gV6CWoaxD/pgWwtm55kyByVI6aYKYKHcKuPPxwwrxnor1Y6uU+8F2AxGNexpyVJLRQ/nbqyRF3re7W60JjtQjPi9W7oBHZu6+6yhZFDmith+qa/PZ0PS80md0ZCPy4XOpO3ExFeWXbn2P/0c6u6iNwLHYn5JlVyzR2gQHc0PC4mqJUJnn6XpekKPJvKeVRitujnDasxHEubN6cR4QqJFEAFBOr918l
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(346002)(376002)(39860400002)(136003)(230922051799003)(451199024)(1800799012)(186009)(82310400011)(64100799003)(46966006)(40470700004)(36840700001)(83380400001)(2906002)(478600001)(356005)(41300700001)(31686004)(82740400003)(7636003)(70586007)(54906003)(70206006)(426003)(30864003)(40480700001)(966005)(16576012)(110136005)(316002)(86362001)(31696002)(4326008)(8936002)(8676002)(53546011)(40460700003)(36756003)(47076005)(5660300002)(36860700001)(107886003)(26005)(336012)(16526019)(2616005)(21314003)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2023 08:28:44.5246
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mUXijNr7TdyX/zVkiGfBD54T2C1oPGmD4/eISDQI0FJKjF8NGFMzOrohHet3md6PQlkpxYBOjsxVT7h2UkD1sw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7933
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 14a0387f-6be1-48ec-d45a-08dbfa23307b
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB74.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4392
 
-On 2023/12/7 16:47, Tian, Kevin wrote:
->> From: Liu, Yi L <yi.l.liu@intel.com>
->> Sent: Monday, November 27, 2023 2:39 PM
->>
->> +static int vfio_pci_core_feature_pasid(struct vfio_device *device, u32 flags,
->> +				       struct vfio_device_feature_pasid __user
->> *arg,
->> +				       size_t argsz)
->> +{
->> +	struct vfio_pci_core_device *vdev =
->> +		container_of(device, struct vfio_pci_core_device, vdev);
->> +	struct vfio_device_feature_pasid pasid = { 0 };
->> +	struct pci_dev *pdev = vdev->pdev;
->> +	u32 capabilities = 0;
->> +	int ret;
->> +
->> +	/* We do not support SET of the PASID capability */
+On 07/12/2023 12:28, Yishai Hadas wrote:
+> This series introduce a vfio driver over virtio devices to support the
+> legacy interface functionality for VFs.
 > 
-> this line alone is meaningless. Please explain the reason e.g. due to
-> no PASID capability per VF...
-
-sure. I think the major reason is we don't allow userspace to change the
-PASID configuration. is it?
-
+> Background, from the virtio spec [1].
+> --------------------------------------------------------------------
+> In some systems, there is a need to support a virtio legacy driver with
+> a device that does not directly support the legacy interface. In such
+> scenarios, a group owner device can provide the legacy interface
+> functionality for the group member devices. The driver of the owner
+> device can then access the legacy interface of a member device on behalf
+> of the legacy member device driver.
 > 
->> +	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_GET,
->> +				 sizeof(pasid));
->> +	if (ret != 1)
->> +		return ret;
->> +
->> +	/*
->> +	 * Needs go to PF if the device is VF as VF shares its PF's
->> +	 * PASID Capability.
->> +	 */
+> For example, with the SR-IOV group type, group members (VFs) can not
+> present the legacy interface in an I/O BAR in BAR0 as expected by the
+> legacy pci driver. If the legacy driver is running inside a virtual
+> machine, the hypervisor executing the virtual machine can present a
+> virtual device with an I/O BAR in BAR0. The hypervisor intercepts the
+> legacy driver accesses to this I/O BAR and forwards them to the group
+> owner device (PF) using group administration commands.
+> --------------------------------------------------------------------
 > 
-> /* VF shares the PASID capability of its PF */
-
-got it.
-
->> +	if (pdev->is_virtfn)
->> +		pdev = pci_physfn(pdev);
->> +
->> +	if (!pdev->pasid_enabled)
->> +		goto out;
->> +
->> +#ifdef CONFIG_PCI_PASID
->> +	pci_read_config_dword(pdev, pdev->pasid_cap + PCI_PASID_CAP,
->> +			      &capabilities);
->> +#endif
+> The first 6 patches are in the virtio area and handle the below:
+> - Introduce the admin virtqueue infrastcture.
+> - Expose the layout of the commands that should be used for
+>    supporting the legacy access.
+> - Expose APIs to enable upper layers as of vfio, net, etc
+>    to execute admin commands.
 > 
-> #ifdef is unnecessary. If CONFIG_PCI_PASID is false pdev->pasid_enabled
-> won't be set anyway.
-
-it's sad that the pdev->pasid_cap is defined under #if CONFIG_PCI_PASID.
-Perhaps we can have a wrapper for it.
-
-> and it should read from PCI_PASID_CTRL which indicates whether a
-> capability is actually enabled.
-
-yes, for the EXEC and PRIV capability, needs to check if it's enabled or
-not before reporting.
-
+> The above follows the virtio spec that was lastly accepted in that area
+> [1].
 > 
->> +/**
->> + * Upon VFIO_DEVICE_FEATURE_GET, return the PASID capability for the
->> device.
->> + * Zero width means no support for PASID.
+> The last 3 patches are in the vfio area and handle the below:
+> - Expose some APIs from vfio/pci to be used by the vfio/virtio driver.
+> - Introduce a vfio driver over virtio devices to support the legacy
+>    interface functionality for VFs.
 > 
-> also mention the encoding of this field according to PCIe spec.
-
-yes.
-
-> or turn it to a plain number field.
-
-It is not exact the same as the spec since bit0 is reserved. But
-here bit0 is used as well.
-
->> + */
->> +struct vfio_device_feature_pasid {
->> +	__u16 capabilities;
->> +#define VFIO_DEVICE_PASID_CAP_EXEC	(1 << 0)
->> +#define VFIO_DEVICE_PASID_CAP_PRIV	(1 << 1)
->> +	__u8 width;
->> +	__u8 __reserved;
->> +};
->> +#define VFIO_DEVICE_FEATURE_PASID 11
->> +
->>   /* -------- API for Type1 VFIO IOMMU -------- */
->>
->>   /**
->> --
->> 2.34.1
+> The series was tested successfully over virtio-net VFs in the host,
+> while running in the guest both modern and legacy drivers.
+> 
+> [1]
+> https://github.com/oasis-tcs/virtio-spec/commit/03c2d32e5093ca9f2a17797242fbef88efe94b8c
+> 
+> Changes from V6: https://lore.kernel.org/kvm/20231206083857.241946-1-yishaih@nvidia.com/
+> Vfio:
+> - Put the pm_runtime stuff into translate_io_bar_to_mem_bar() and
+>    organize the callers to be more success oriented, as suggested by Jason.
+> - Add missing 'ops' (i.e. 'detach_ioas' and 'device_feature'), as mentioned by Jason.
+> - Clean virtiovf_bar0_exists() to cast to bool automatically, as
+>    suggested by Jason.
+> - Add Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>.
+> 
+> Changes from V5: https://lore.kernel.org/kvm/20231205170623.197877-1-yishaih@nvidia.com/
+> Vfio:
+> - Rename vfio_pci_iowrite64 to vfio_pci_core_iowrite64 as was mentioned
+>    by Alex.
+> 
+> Changes from V4: https://lore.kernel.org/all/20231129143746.6153-7-yishaih@nvidia.com/T/
+> Virtio:
+> - Drop the unused macro 'VIRTIO_ADMIN_MAX_CMD_OPCODE' as was asked by
+>    Michael.
+> - Add Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> Vfio:
+> - Export vfio_pci_core_setup_barmap() in place and rename
+>    vfio_pci_iowrite/read<xxx> to have the 'core' prefix as part of the
+>    functions names, as was discussed with Alex.
+> - Improve packing of struct virtiovf_pci_core_device, as was suggested
+>    by Alex.
+> - Upon reset, set 'pci_cmd' back to zero, in addition, if
+>    the user didn't set the 'PCI_COMMAND_IO' bit, return -EIO upon any
+>    read/write towards the IO bar, as was suggested by Alex.
+> - Enforce by BUILD_BUG_ON that 'bar0_virtual_buf_size' is power of 2 as
+>    part of virtiovf_pci_init_device() and clean the 'sizing calculation'
+>    code accordingly, as was suggested by Alex.
+> 
+> Changes from V3: https://www.spinics.net/lists/kvm/msg333008.html
+> Virtio:
+> - Rebase on top of 6.7 rc3.
+> Vfio:
+> - Fix a typo, drop 'acc' from 'virtiovf_acc_vfio_pci_tran_ops'.
+> 
+> Changes from V2: https://lore.kernel.org/all/20231029155952.67686-8-yishaih@nvidia.com/T/
+> Virtio:
+> - Rebase on top of 6.7 rc1.
+> - Add a mutex to serialize admin commands execution and virtqueue
+>    deletion, as was suggested by Michael.
+> - Remove the 'ref_count' usage which is not needed any more.
+> - Reduce the depth of the admin vq to match a single command at a given time.
+> - Add a supported check upon command execution and move to use a single
+>    flow of virtqueue_exec_admin_cmd().
+> - Improve the description of the exported commands to better match the
+>    specification and the expected usage as was asked by Michael.
+> 
+> Vfio:
+> - Upon calling to virtio_pci_admin_legacy/common_device_io_read/write()
+>    supply the 'offset' within the relevant configuration area, following
+>    the virtio exported APIs.
+> 
+> Changes from V1: https://lore.kernel.org/all/20231023104548.07b3aa19.alex.williamson@redhat.com/T/
+> Virtio:
+> - Drop its first patch, it was accepted upstream already.
+> - Add a new patch (#6) which initializes the supported admin commands
+>    upon admin queue activation as was suggested by Michael.
+> - Split the legacy_io_read/write commands per common/device
+>    configuration as was asked by Michael.
+> - Don't expose any more the list query/used APIs outside of virtio.
+> - Instead, expose an API to check whether the legacy io functionality is
+>    supported as was suggested by Michael.
+> - Fix some Krobot's note by adding the missing include file.
+> 
+> Vfio:
+> - Refer specifically to virtio-net as part of the driver/module description
+>    as Alex asked.
+> - Change to check MSIX enablement based on the irq type of the given vfio
+>    core device. In addition, drop its capable checking from the probe flow
+>    as was asked by Alex.
+> - Adapt to use the new virtio exposed APIs and clean some code accordingly.
+> - Adapt to some cleaner style code in some places (if/else) as was suggested
+>    by Alex.
+> - Fix the range_intersect_range() function and adapt its usage as was
+>    pointed by Alex.
+> - Make struct virtiovf_pci_core_device better packed.
+> - Overwrite the subsystem vendor ID to be 0x1af4 as was discussed in
+>    the ML.
+> - Add support for the 'bar sizing negotiation' as was asked by Alex.
+> - Drop the 'acc' from the 'ops' as Alex asked.
+> 
+> Changes from V0: https://www.spinics.net/lists/linux-virtualization/msg63802.html
+> 
+> Virtio:
+> - Fix the common config map size issue that was reported by Michael
+>    Tsirkin.
+> - Do not use vp_dev->vqs[] array upon vp_del_vqs() as was asked by
+>    Michael, instead skip the AQ specifically.
+> - Move admin vq implementation into virtio_pci_modern.c as was asked by
+>    Michael.
+> - Rename structure virtio_avq to virtio_pci_admin_vq and some extra
+>    corresponding renames.
+> - Remove exported symbols virtio_pci_vf_get_pf_dev(),
+>    virtio_admin_cmd_exec() as now callers are local to the module.
+> - Handle inflight commands as part of the device reset flow.
+> - Introduce APIs per admin command in virtio-pci as was asked by Michael.
+> 
+> Vfio:
+> - Change to use EXPORT_SYMBOL_GPL instead of EXPORT_SYMBOL for
+>    vfio_pci_core_setup_barmap() and vfio_pci_iowrite#xxx() as pointed by
+>    Alex.
+> - Drop the intermediate patch which prepares the commands and calls the
+>    generic virtio admin command API (i.e. virtio_admin_cmd_exec()).
+> - Instead, call directly to the new APIs per admin command that are
+>    exported from Virtio - based on Michael's request.
+> - Enable only virtio-net as part of the pci_device_id table to enforce
+>    upon binding only what is supported as suggested by Alex.
+> - Add support for byte-wise access (read/write) over the device config
+>    region as was asked by Alex.
+> - Consider whether MSIX is practically enabled/disabled to choose the
+>    right opcode upon issuing read/write admin command, as mentioned
+>    by Michael.
+> - Move to use VIRTIO_PCI_CONFIG_OFF instead of adding some new defines
+>    as was suggested by Michael.
+> - Set the '.close_device' op to vfio_pci_core_close_device() as was
+>    pointed by Alex.
+> - Adapt to Vfio multi-line comment style in a few places.
+> - Add virtualization@lists.linux-foundation.org in the MAINTAINERS file
+>    to be CCed for the new driver as was suggested by Jason.
+> 
+> Yishai
+> 
+> Feng Liu (4):
+>    virtio: Define feature bit for administration virtqueue
+>    virtio-pci: Introduce admin virtqueue
+>    virtio-pci: Introduce admin command sending function
+>    virtio-pci: Introduce admin commands
+> 
+> Yishai Hadas (5):
+>    virtio-pci: Initialize the supported admin commands
+>    virtio-pci: Introduce APIs to execute legacy IO admin commands
+>    vfio/pci: Expose vfio_pci_core_setup_barmap()
+>    vfio/pci: Expose vfio_pci_core_iowrite/read##size()
+>    vfio/virtio: Introduce a vfio driver over virtio devices
+> 
+>   MAINTAINERS                            |   7 +
+>   drivers/vfio/pci/Kconfig               |   2 +
+>   drivers/vfio/pci/Makefile              |   2 +
+>   drivers/vfio/pci/vfio_pci_rdwr.c       |  57 +--
+>   drivers/vfio/pci/virtio/Kconfig        |  16 +
+>   drivers/vfio/pci/virtio/Makefile       |   4 +
+>   drivers/vfio/pci/virtio/main.c         | 567 +++++++++++++++++++++++++
+>   drivers/virtio/virtio.c                |  37 +-
+>   drivers/virtio/virtio_pci_common.c     |  14 +
+>   drivers/virtio/virtio_pci_common.h     |  21 +-
+>   drivers/virtio/virtio_pci_modern.c     | 503 +++++++++++++++++++++-
+>   drivers/virtio/virtio_pci_modern_dev.c |  24 +-
+>   include/linux/vfio_pci_core.h          |  20 +
+>   include/linux/virtio.h                 |   8 +
+>   include/linux/virtio_config.h          |   4 +
+>   include/linux/virtio_pci_admin.h       |  21 +
+>   include/linux/virtio_pci_modern.h      |   2 +
+>   include/uapi/linux/virtio_config.h     |   8 +-
+>   include/uapi/linux/virtio_pci.h        |  68 +++
+>   19 files changed, 1349 insertions(+), 36 deletions(-)
+>   create mode 100644 drivers/vfio/pci/virtio/Kconfig
+>   create mode 100644 drivers/vfio/pci/virtio/Makefile
+>   create mode 100644 drivers/vfio/pci/virtio/main.c
+>   create mode 100644 include/linux/virtio_pci_admin.h
 > 
 
--- 
-Regards,
-Yi Liu
+Hi Michael and Alex,
+
+It seems that we are done with all the last notes here.
+
+Michael,
+Based on Alex's note here [1] "the preferred merge approach would be 
+that virtio maintainers take patches 1-6 and provide a branch or tag I 
+can merge to bring 7-9 in through the vfio tree"
+
+Can that please be done to proceed here ?
+
+[1] 
+https://patchwork.kernel.org/project/kvm/patch/20231205170623.197877-9-yishaih@nvidia.com/
+
+Thanks,
+Yishai
 
