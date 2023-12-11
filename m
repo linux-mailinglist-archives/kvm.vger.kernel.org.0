@@ -1,163 +1,295 @@
-Return-Path: <kvm+bounces-4047-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4049-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBED980CAD3
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 14:21:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F37D580CAE0
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 14:24:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BA6B1F2184B
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 13:21:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5837DB20DB2
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 13:24:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B34743E477;
-	Mon, 11 Dec 2023 13:21:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0AD3E491;
+	Mon, 11 Dec 2023 13:24:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DAy1nsJL"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="qgq0uhGv";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="5icEo1eW";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="qgq0uhGv";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="5icEo1eW"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2066.outbound.protection.outlook.com [40.107.92.66])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFAFDF4;
-	Mon, 11 Dec 2023 05:21:41 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R1QDlmJ+5USfIwg8RTPReGMpWqqhJT0mbCTz5XjmFg7uG4/AKjlG7B2YI8fdWWjddaSTsMn87DkpA9uNmpQjv3ltIs17/uUxi8fmy9rVPmqCijK4nbPEBWSDNYtBPHIhQNiwuRY6pc24wRrCk9BQXt+dLA6BGLVqelWraxlqkdIwjmnKbKLmV473syhcD4BvPdTc0JbuCZ/KY1Kj+jnuDpI1bzccohMC+o00P32rcsEKt+5esXeUj/BjsNMisoOqjLOA2H6pVAJRTpzRyUACUM9itDCqxPTebdtL+6b5/d5HmGs/qLXmf246jrF/inv6/m0jaGKTrYc61MHhgnO7rA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LPi3ESgEafJlRf6NKn/aLh/T2IbfPkmB5EPw2y6hltE=;
- b=gg0G7rkm0SGTh0BWW6v8rD81PzvBGsnx6DvovDiSxCxNrIgGhUDHQXIKQQB97uUyVdIY2fLCM82enLk1Cg9kAKbfAuQaG9vA1tFJKBYWKukoPCIW3dJPsJuNEztBhYEigyZLCtols0Q4qZpVEfqOD2KZym55ezNTKaiwRMBw6rQyljP0N3/SFEjL8MqrGyk3fiKDeVPfEr74mtxwT7b6wElP04XueumXu8uEcR86L3Gb3gNcs32H14jeECrSZSEsz8NSOGf9+6C9VVgxkim/UwpRw5GPLP1nBvxZyE3ptxRQbegm7Hb602aZnMsSw+lNxbN8jhwZ1NCxK7JH0XNnnQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LPi3ESgEafJlRf6NKn/aLh/T2IbfPkmB5EPw2y6hltE=;
- b=DAy1nsJLx63oDyU1bxoRHJYWv80rxDNjgBjhbj5ADxn2a67WXlShI5TJvUs2TCWJfOct2FBAe1KCuJjcLVHL4AuJbi2GApuwV8XlMTLol+XFm54/A45FfTH6b5pkiLagVeoQSzps6kIbYVmllyq4EyHpvLwD55XZXwUk7woN+/c81RLf3KpIoiwPVYiPJbmE8KmHJ7p4Sh8XUFSr25ZIbYgsc112LCpg6IudWkI8mORCrJITR+BlvdD8PcsmIXOEmE1ZdHNKGKzWJK55HGcZN6qpTpd21Bwpw0LacnjdkWm0PM+2fhiysO6WzJFGbUHY+asWXPbBu8Fc758d+VUv8A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SJ2PR12MB8884.namprd12.prod.outlook.com (2603:10b6:a03:547::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Mon, 11 Dec
- 2023 13:21:36 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7068.031; Mon, 11 Dec 2023
- 13:21:36 +0000
-Date: Mon, 11 Dec 2023 09:21:35 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Yi Liu <yi.l.liu@intel.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
-	"joro@8bytes.org" <joro@8bytes.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-	"cohuck@redhat.com" <cohuck@redhat.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>,
-	"nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-	"peterx@redhat.com" <peterx@redhat.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
-	"lulu@redhat.com" <lulu@redhat.com>,
-	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-	"Zeng, Xin" <xin.zeng@intel.com>,
-	"Zhao, Yan Y" <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v6 2/6] iommufd: Add IOMMU_HWPT_INVALIDATE
-Message-ID: <20231211132135.GF2944114@nvidia.com>
-References: <20231117130717.19875-1-yi.l.liu@intel.com>
- <20231117130717.19875-3-yi.l.liu@intel.com>
- <112383df-3ea3-475f-963f-5c53232a1bf4@intel.com>
- <BN9PR11MB5276283CAEAB7A24871B4B188C8BA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20231207144208.GJ2692119@nvidia.com>
- <8c05763d-1668-4b99-af35-b43a34e966c2@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8c05763d-1668-4b99-af35-b43a34e966c2@intel.com>
-X-ClientProxiedBy: MN2PR12CA0027.namprd12.prod.outlook.com
- (2603:10b6:208:a8::40) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2a07:de40:b251:101:10:150:64:2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B03BB9F;
+	Mon, 11 Dec 2023 05:24:36 -0800 (PST)
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 185611FB92;
+	Mon, 11 Dec 2023 13:24:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1702301075; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GMgnxyitx5biXn0pgd3cG6sZC67XFgXymWiCAbEeFTU=;
+	b=qgq0uhGvq6aIfA5kdV6s+QP77h0xXawLNa4A29TZgm39fmSyEMcNuUNl/UJlXlQZ6TlVII
+	zUPmDYi0fH0Yt0D7dLkXicNuqDMiJaxJ5heDUfk+mrsPuy6M1oh6T0tY9SMzDlOSlV4LgP
+	QY8JDDt5fKiuyhv186WN/KT6tMWo6a0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1702301075;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GMgnxyitx5biXn0pgd3cG6sZC67XFgXymWiCAbEeFTU=;
+	b=5icEo1eWkvwddWdmXQVEWIOUzUs2xYmB+HjHHoXSDtcBu2H6WH1b4L1DKOEh4M/mvL1rSS
+	DA8zHNEP7Ohx7sCQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1702301075; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GMgnxyitx5biXn0pgd3cG6sZC67XFgXymWiCAbEeFTU=;
+	b=qgq0uhGvq6aIfA5kdV6s+QP77h0xXawLNa4A29TZgm39fmSyEMcNuUNl/UJlXlQZ6TlVII
+	zUPmDYi0fH0Yt0D7dLkXicNuqDMiJaxJ5heDUfk+mrsPuy6M1oh6T0tY9SMzDlOSlV4LgP
+	QY8JDDt5fKiuyhv186WN/KT6tMWo6a0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1702301075;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GMgnxyitx5biXn0pgd3cG6sZC67XFgXymWiCAbEeFTU=;
+	b=5icEo1eWkvwddWdmXQVEWIOUzUs2xYmB+HjHHoXSDtcBu2H6WH1b4L1DKOEh4M/mvL1rSS
+	DA8zHNEP7Ohx7sCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CE1C0133DE;
+	Mon, 11 Dec 2023 13:24:34 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id IoIJMpINd2W+DAAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 11 Dec 2023 13:24:34 +0000
+Message-ID: <20e52d79-7eff-1aad-2f77-24ed7fd56fa7@suse.cz>
+Date: Mon, 11 Dec 2023 14:24:34 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ2PR12MB8884:EE_
-X-MS-Office365-Filtering-Correlation-Id: db85f659-f780-4562-443c-08dbfa4c1a0f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	GYHkxDxxm6PrrIw2v825Lr5st9R9NO7xVqFcSY3oKIe3S6kc9OPlbzU6GgLgZVtzn5Z1ZGkaTT4PnPBl+tTEgyXe0WAqnHodJV5f+FE8DkfDE1cTtN0EIBuRo05NrJj2btWLTB2OafvPOE1JA5TGS8sMprIzPA5Am1BOU5AloYS/Xqt3yLsSBynFvznDHbD8oDhl/js/4aiMfqO55zbghG/RWChzv++74j39EqKVlxThfBNAeuHvsOWoLHV5UHMEviXaMdmvzuyrVe/F0OjpYUcLJo5uokwz7Ab3cUh0jO21nPuGngu7m0LDu+BY/fxhluGXiiD7mZ3QHS+cSF0l+a2Xx0H7B+l7a+/74OYc37GcwSYkcadDsWtdS7KsNgKk61gSwZ8y9hQ5ABJltJZYWU2vSWMrs5L4x1h7Uz3P+Oe3sLhkcQn+IkpEPp9untnGZHdksa8cvJpg58l3SEXK0sMwGXLqRTlTnRr8rtkFVSdLmRZCM64T6go51C4cHbmaJs6aceeBbRsrUlB2A1x46l3YrVqGfrIEm5eMieJurzGfEyUDolXMoB428hhreNLM
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(396003)(136003)(376002)(346002)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(6512007)(6506007)(1076003)(5660300002)(26005)(2616005)(33656002)(36756003)(7416002)(66946007)(6486002)(54906003)(66476007)(66556008)(6916009)(4744005)(2906002)(41300700001)(478600001)(86362001)(8676002)(8936002)(4326008)(316002)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Sdv7MKXdrSWYFyf1D5Tr6m9jWm+cJ3E7KCnvYYkiyZoOiAe5BCJTIk7vz96x?=
- =?us-ascii?Q?Jgx2bFsGJNhJHl+pncaiFUfx5Z/daKWwkwxghV5MEZD22CIgo2V7LnttQicG?=
- =?us-ascii?Q?2aM9Yj7pwPftbLE9/Ef81OsXTmmOVKboOnzuYzKFtKePdHVsPiruhWZmrNVe?=
- =?us-ascii?Q?BMqERmga7hcC+eb7L1qwOZ6fsD22JlCvfBmGaGCxgqVUSfX8YRgciflxw6R7?=
- =?us-ascii?Q?fxr0B+uiWcaZRaf0lFbf6Lh/inO1ntSJ+P/h+vtkKhKMrwMRAsyisu9biQXQ?=
- =?us-ascii?Q?ukVHZ+q9BqOtye1yvKdXosbEysDf93zSUwc5lniVi3ujlWVmLzl9r1KmUdwN?=
- =?us-ascii?Q?Lg4hLm3M/+6Kcg9202APzue83GfNQWS1IZRzauOpR0d18raB166BWJgDdAGD?=
- =?us-ascii?Q?7qPmAMKgeNHWkUZcdSDS2XPxeYZEVdbgI67tGjs31/liw2m5i2S7DjappJXL?=
- =?us-ascii?Q?gRuijZ2ntLg1IYBQhVRRhlAsA+2t3UUUYea8wzf+NDaSDB/RaInrrfKrnr6a?=
- =?us-ascii?Q?+3RYR4UHEaF31wNDZrnNlkVPxAAO+zTngBY2iGQXRlufESodi+QIhg4DC2g7?=
- =?us-ascii?Q?XTdFff579TBCyxJdk6OhnpR9kaYKfZ+RroC6zL3pXAuVKkgJN+zoJFpWDvjT?=
- =?us-ascii?Q?4LwBCotCPXkaEQnbyrfEE4dLy4TB0D5n+3w61h+TEz+XBS7MXhLh0/2xmLjE?=
- =?us-ascii?Q?ISSkoRb1TjpaZcJRiEGYzt02WvOjTS1FLe2IFu9shNoCZ3XlS1fF4przSNUH?=
- =?us-ascii?Q?s1QqBbPb/ABQbsUsX5XEPLsukrGPJ9g5YNOz3jvvp85TLhntJNhKmJljgypH?=
- =?us-ascii?Q?7Kh7sGcdM/HvmmIwr75F94ysrblQW0bqWe6uKEUGgsyJcQPhIZwuJSnKooxV?=
- =?us-ascii?Q?s9K+SeNCXylN2UzADQffmugCloWsoObhP5Dg0/RR6Bqki5lfFTWP4JdvWeEf?=
- =?us-ascii?Q?KoRrqhm3wi/GNb0lQSj+n0czjiY4vnFdqoK39xxnLtwTRk9vp1rJoQt6DLEU?=
- =?us-ascii?Q?m14ASP0Ut/B8HTUUT/55/hZsThzVnWFcdhuQNm/H8C71VWjenD3eI6qHZDw+?=
- =?us-ascii?Q?p8PjmmNqhnK+ExYe8LqMhGGZryxycHFpGLi6D2QSRDB7RskA7zOiDdVAjYzN?=
- =?us-ascii?Q?yaE8HEeksaVau92xQpyg6NCYDoJOyqU+u2tZAj/z9GFhys5fVbXN26wNW3Up?=
- =?us-ascii?Q?Q7Rhmc8FcT1WWYF16Uxe8XHIs0vFRJfFv0E0hXkLEQhOqtKLeUQDEi33BxM5?=
- =?us-ascii?Q?qXAWbmQXLkvKbVrhpqUhkwFoLFUEne7T6HmlPSTpEhw527XWS0RWeivnsBNv?=
- =?us-ascii?Q?4sLAXTMX4PuWosyKqXC1C5FujKwKPUk2bycObiI4dpYV2bCYGKP87hRdm+3N?=
- =?us-ascii?Q?ELnpu6y2VJQhqfTWxzqeQ6XtE66SgdroK/4H0fWdm+9qSloNmvTYjQnjFAl5?=
- =?us-ascii?Q?lWQMaaXPSQTNkIm14dDrMle0OysjuH1azDlT1usw0u3aFYo0Y438v+kyN2Ft?=
- =?us-ascii?Q?NtOC332D92CwTyBn85KB4o6XG8TVdXnefH1x8KmGJtsJ8FqJZygnK4fFggMV?=
- =?us-ascii?Q?I6qM4rleC2vOLWB/v/LARPN8LeRRI1FUeBJ7EKH+?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: db85f659-f780-4562-443c-08dbfa4c1a0f
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2023 13:21:36.6325
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IPeEVzlaltvTVgqWJ2qAR+eBBtIDz3mLFB54joTh4WfyE7q05soFXZA96hVf3ENF
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8884
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v10 23/50] KVM: SEV: Make AVIC backing, VMSA and VMCB
+ memory allocation SNP safe
+Content-Language: en-US
+To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+ thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+ pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+ jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+ slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+ srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+ dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, kirill@shutemov.name,
+ ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+ sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+ jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+ pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+ Brijesh Singh <brijesh.singh@amd.com>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-24-michael.roth@amd.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <20231016132819.1002933-24-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spam-Score: -4.30
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -4.30
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 BAYES_HAM(-3.00)[100.00%];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 MIME_GOOD(-0.10)[text/plain];
+	 R_RATELIMIT(0.00)[to_ip_from(RL81e5qggtdx371s8ik49ru6xr)];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-0.20)[-0.999];
+	 RCPT_COUNT_TWELVE(0.00)[40];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Spam-Flag: NO
 
-On Mon, Dec 11, 2023 at 03:53:40PM +0800, Yi Liu wrote:
-
-> > >  From that thread Jason mentioned to make the invalidation format
-> > > part of domain allocation. If that is the direction to go then there
-> > > won't be multiple invalidation formats per hwpt. The user should
-> > > create multiple hwpt's per invalidation format (though mixing
-> > > formats in one virtual platform is very unlikely)?
-> > 
-> > I think we could do either, but I have a vauge cleanness preference
-> > that the enums are just different? That would follow a pretty typical
-> > pattern for a structure tag to reflect the content of the structure.
+On 10/16/23 15:27, Michael Roth wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> Is this still following the direction to make the invalidation format
-> part of domain allocation?
+> Implement a workaround for an SNP erratum where the CPU will incorrectly
+> signal an RMP violation #PF if a hugepage (2mb or 1gb) collides with the
+> RMP entry of a VMCB, VMSA or AVIC backing page.
+> 
+> When SEV-SNP is globally enabled, the CPU marks the VMCB, VMSA, and AVIC
+> backing pages as "in-use" via a reserved bit in the corresponding RMP
+> entry after a successful VMRUN. This is done for _all_ VMs, not just
+> SNP-Active VMs.
+> 
+> If the hypervisor accesses an in-use page through a writable
+> translation, the CPU will throw an RMP violation #PF. On early SNP
+> hardware, if an in-use page is 2mb aligned and software accesses any
+> part of the associated 2mb region with a hupage, the CPU will
+> incorrectly treat the entire 2mb region as in-use and signal a spurious
+> RMP violation #PF.
+> 
+> The recommended is to not use the hugepage for the VMCB, VMSA or
+> AVIC backing page for similar reasons. Add a generic allocator that will
+> ensure that the page returns is not hugepage (2mb or 1gb) and is safe to
 
-I think you should make it seperate
+This is a bit confusing wording as we are not avoiding "using a
+hugepage" but AFAIU, avoiding using a (4k) page that has a hugepage
+aligned physical address, right?
 
-Jason
+> be used when SEV-SNP is enabled. Also implement similar handling for the
+> VMCB/VMSA pages of nested guests.
+> 
+> Co-developed-by: Marc Orr <marcorr@google.com>
+> Signed-off-by: Marc Orr <marcorr@google.com>
+> Reported-by: Alper Gun <alpergun@google.com> # for nested VMSA case
+> Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> [mdr: squash in nested guest handling from Ashish]
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+
+<snip>
+
+> +
+> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
+> +{
+> +	unsigned long pfn;
+> +	struct page *p;
+> +
+> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> +		return alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> +
+> +	/*
+> +	 * Allocate an SNP safe page to workaround the SNP erratum where
+> +	 * the CPU will incorrectly signal an RMP violation  #PF if a
+> +	 * hugepage (2mb or 1gb) collides with the RMP entry of VMCB, VMSA
+> +	 * or AVIC backing page. The recommeded workaround is to not use the
+> +	 * hugepage.
+
+Same here "not use the hugepage"
+
+> +	 *
+> +	 * Allocate one extra page, use a page which is not 2mb aligned
+> +	 * and free the other.
+
+This makes more sense.
+
+> +	 */
+> +	p = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO, 1);
+> +	if (!p)
+> +		return NULL;
+> +
+> +	split_page(p, 1);
+
+Yeah I think that's a sensible use of split_page(), as we don't have
+support for forcefully non-aligned allocations or specific "page
+coloring" in the page allocator.
+So even with my wording concerns:
+
+Acked-by: Vlastimil Babka <vbabka@suse.cz>
+
+> +
+> +	pfn = page_to_pfn(p);
+> +	if (IS_ALIGNED(pfn, PTRS_PER_PMD))
+> +		__free_page(p++);
+> +	else
+> +		__free_page(p + 1);
+> +
+> +	return p;
+> +}
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 1e7fb1ea45f7..8e4ef0cd968a 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -706,7 +706,7 @@ static int svm_cpu_init(int cpu)
+>  	int ret = -ENOMEM;
+>  
+>  	memset(sd, 0, sizeof(struct svm_cpu_data));
+> -	sd->save_area = alloc_page(GFP_KERNEL | __GFP_ZERO);
+> +	sd->save_area = snp_safe_alloc_page(NULL);
+>  	if (!sd->save_area)
+>  		return ret;
+>  
+> @@ -1425,7 +1425,7 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
+>  	svm = to_svm(vcpu);
+>  
+>  	err = -ENOMEM;
+> -	vmcb01_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> +	vmcb01_page = snp_safe_alloc_page(vcpu);
+>  	if (!vmcb01_page)
+>  		goto out;
+>  
+> @@ -1434,7 +1434,7 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
+>  		 * SEV-ES guests require a separate VMSA page used to contain
+>  		 * the encrypted register state of the guest.
+>  		 */
+> -		vmsa_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> +		vmsa_page = snp_safe_alloc_page(vcpu);
+>  		if (!vmsa_page)
+>  			goto error_free_vmcb_page;
+>  
+> @@ -4876,6 +4876,16 @@ static int svm_vm_init(struct kvm *kvm)
+>  	return 0;
+>  }
+>  
+> +static void *svm_alloc_apic_backing_page(struct kvm_vcpu *vcpu)
+> +{
+> +	struct page *page = snp_safe_alloc_page(vcpu);
+> +
+> +	if (!page)
+> +		return NULL;
+> +
+> +	return page_address(page);
+> +}
+> +
+>  static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.name = KBUILD_MODNAME,
+>  
+> @@ -5007,6 +5017,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  
+>  	.vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
+>  	.vcpu_get_apicv_inhibit_reasons = avic_vcpu_get_apicv_inhibit_reasons,
+> +	.alloc_apic_backing_page = svm_alloc_apic_backing_page,
+>  };
+>  
+>  /*
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index c13070d00910..b7b8bf73cbb9 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -694,6 +694,7 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm);
+>  void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
+>  void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa);
+>  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
+> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
+>  
+>  /* vmenter.S */
+>  
 
