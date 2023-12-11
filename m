@@ -1,348 +1,155 @@
-Return-Path: <kvm+bounces-4100-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4102-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC37B80D9CA
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 19:57:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B325D80DB4B
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 21:12:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FC8D1F219A5
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 18:57:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73D6B1F21C2B
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 20:12:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 638E152F9A;
-	Mon, 11 Dec 2023 18:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28B2C53812;
+	Mon, 11 Dec 2023 20:11:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ay9WgdUX"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KGOZaqcd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F4DFB8
-	for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 10:56:21 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5de8c2081d1so39045227b3.1
-        for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 10:56:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702320980; x=1702925780; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Po2NuzeRSr6e6XvJUH45J91ZQBQs42rgxiRE1lTRmPo=;
-        b=ay9WgdUXrLyoG+M3jfRPqmx1nRYxndPXXLP1q2CO9IWAXyGVomyMhUyBZo+UgtpzrL
-         LG/Yla83y7OhdVGnMiEBwhItJD8/akhwkueH83YOZ6ZigBAQTJ07+oqpZ7ZkPqnFbhW+
-         b7EFI7dOaa2SdH10bYTjyQKouCmJQsMU5LG/p1jgELqn1qioUW1+L/fI9nPA9OVpvBzU
-         nREzjDZ5Sq66TXV/aoDXw9JJZf7HjC3W4zlEznN0FJtsx21wc68XN3vYzLq9smgRtPa3
-         0mE/r4cgWQ3b9oRG139oMlJaRh1PBJ1m7q5QHuAqJY9IHxfPRkr5fHUFihvRzcuFcCl8
-         0vHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702320980; x=1702925780;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Po2NuzeRSr6e6XvJUH45J91ZQBQs42rgxiRE1lTRmPo=;
-        b=QdsFW39iqJuMO5t5EnLILcZ5nN3hzZk4vJhWYaShSwJCzxwVc1VxMC2SNeFNXixCgb
-         3IgL5pYZ4+hlWshZtcMKYity7Bw/jBuSD/fkc9aBV/WTHLB/OyNjFmw+/S1cvwEcs49K
-         PrKN1a4n/gfxjEDoT4ik/f0viOva08kr2NIN5CUt1yi2+f42IXlpQA4RW99eYkWgqHIN
-         fPQMtjRh53I7XPPL4f5oK7TYyKzTmh3KOBLOzyY15hBCfYYccyMnuOHQRTsNQxP7bJiP
-         CUYt0psfAMH4nG6M2+ICeaBu4omnEZYyyyFIVYeDxWGpFlheUhcVz05tomoFAYkmG7kA
-         PA1g==
-X-Gm-Message-State: AOJu0YwXYMHGr50EC77NbzL0b+2to7dYHDnCENQXwsCtOc0sICA2Qawf
-	7dYm1qgrlph5RgwC8SvcfSzTNTdm/ntmpA==
-X-Google-Smtp-Source: AGHT+IGwoNxDxJen0x0iEmE/EAOpNBvnKl0zodWypqrdQw7SMOVqC4Y0UwsgY+IsGJ0sQ0pBpg5+/v+okoPmKA==
-X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
- (user=jmattson job=sendgmr) by 2002:a05:6902:dc5:b0:db4:5d34:fa5 with SMTP id
- de5-20020a0569020dc500b00db45d340fa5mr40161ybb.0.1702320980637; Mon, 11 Dec
- 2023 10:56:20 -0800 (PST)
-Date: Mon, 11 Dec 2023 10:55:52 -0800
-In-Reply-To: <20231211185552.3856862-1-jmattson@google.com>
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 175B7D8;
+	Mon, 11 Dec 2023 12:11:47 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MCO56p2f/hJJVt4trapfi+2mY0z5QHKgWtEDy2xHwEKB4yQzIPEjMgQWc2KAkeJ+G+BDhdZhOlu/Uj0/Wy139fkwiSkrTsYd7SKZyGgn5/tOGot90ZNFAwfnqG4ips8Y+Nnz49h7+UP00JQmhYK1AOyvmKP8XpPAmXnP/UgkOKC8fr4dYThV98x+6Y6FtkW53qUJijlbLVM1G2Nk5kQPnpdCHJnL6z/YO8ynL66WjkiYqhLW3EOE+EPFvF2C1qrmRI5+MqM2RyXkrno0Hdfvf0gOl6jEQ3sqOg3s7IrUJpZ7+bDglUkVIlbsry7bTRxTb+cjUUNEAdCb/Qa9voTp9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vGBcpctAsuvv1BQ2+Cx81ERhehDJ0sZrjsjKT6lX0/I=;
+ b=AQ6MIpN2SWLXfpdHDzNAxBvHzTxG0or9/gy2v+BuEJbBI0gvlehZTuojAghUeLio3oUDM80ar77Q/zY7fnpevHuEGq0QUJGUpJQskGIypBFAKKllOKS9AokpN2uc5X03ELuWjwuRuI98xyA/W6NE3Bk6lhuIC9d2EV0FlwUcIoHYvlf+/3OmMLBhZOufsEhT1svbufwJIjvoGEO52Ic+iMW3SK/Gbh6+JJSV8C9CDUm2Vzi9IsPv8i8KEsj0I2DycR1DOh6m2ZDuOYN0G8uKtY8fC5JnRbfmAxpVJ4PmlanlqvRO8UZndwbRq0t6tx4NrT+Wh6pTMOE4d3ugj8b8RQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=oracle.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vGBcpctAsuvv1BQ2+Cx81ERhehDJ0sZrjsjKT6lX0/I=;
+ b=KGOZaqcdw9qUBjHfu7W6bEP2pZp4u5jS2P8N7vIes6CrY8G9JmOBQsbQqtzp4rDtUEitG57FnZVwniyQ3VtS3rsZS0zMgXvQxEP4cSazbZxpdZgutYfuvvMnIsMKGo45iv3yrKoVAu47CuQXE/RC8DPmIesNSnlcwMLOEbvtEiQHzdsbjI1u/4VYj78/RQoPHmekh+UZxnsOPU9Hecb95pOALtbgNKL9RKWWoLvZhLPsow7rqVW8DOZz0E+bUCizVYdpG5+ZwgyrT9Fk6ygkOiun3P2RT2+r/WQx9vauCeNOqFmGo/PNSmNSomJ++YhE6aaQsKmTh1YL8HNn6Bx7fQ==
+Received: from CH2PR10CA0027.namprd10.prod.outlook.com (2603:10b6:610:4c::37)
+ by DM8PR12MB5399.namprd12.prod.outlook.com (2603:10b6:8:34::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7068.32; Mon, 11 Dec 2023 20:11:44 +0000
+Received: from DS3PEPF000099DC.namprd04.prod.outlook.com
+ (2603:10b6:610:4c:cafe::f2) by CH2PR10CA0027.outlook.office365.com
+ (2603:10b6:610:4c::37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32 via Frontend
+ Transport; Mon, 11 Dec 2023 20:11:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ DS3PEPF000099DC.mail.protection.outlook.com (10.167.17.198) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7091.18 via Frontend Transport; Mon, 11 Dec 2023 20:11:44 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 11 Dec
+ 2023 12:11:28 -0800
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 11 Dec
+ 2023 12:11:27 -0800
+Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41 via Frontend
+ Transport; Mon, 11 Dec 2023 12:11:26 -0800
+Date: Mon, 11 Dec 2023 12:11:25 -0800
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Yi Liu <yi.l.liu@intel.com>, "Giani, Dhaval" <Dhaval.Giani@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>, Suravee Suthikulpanit
+	<suravee.suthikulpanit@amd.com>, <joro@8bytes.org>,
+	<alex.williamson@redhat.com>, <kevin.tian@intel.com>, <robin.murphy@arm.com>,
+	<baolu.lu@linux.intel.com>, <cohuck@redhat.com>, <eric.auger@redhat.com>,
+	<kvm@vger.kernel.org>, <mjrosato@linux.ibm.com>,
+	<chao.p.peng@linux.intel.com>, <yi.y.sun@linux.intel.com>,
+	<peterx@redhat.com>, <jasowang@redhat.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
+	<iommu@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <zhenzhong.duan@intel.com>,
+	<joao.m.martins@oracle.com>, <xin.zeng@intel.com>, <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v6 0/6] iommufd: Add nesting infrastructure (part 2/2)
+Message-ID: <ZXds7V0Dz0ycF5IR@Asurada-Nvidia>
+References: <20231117130717.19875-1-yi.l.liu@intel.com>
+ <20231209014726.GA2945299@nvidia.com>
+ <77ac47d0-2ef0-41fa-86c2-091358541465@intel.com>
+ <20231211132041.GE2944114@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231211185552.3856862-1-jmattson@google.com>
-X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231211185552.3856862-6-jmattson@google.com>
-Subject: [kvm-unit-tests PATCH 5/5] nVMX: add test for posted interrupts
-From: Jim Mattson <jmattson@google.com>
-To: seanjc@google.com, kvm@vger.kernel.org, pbonzini@redhat.com
-Cc: Oliver Upton <oliver.upton@linux.dev>, Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231211132041.GE2944114@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099DC:EE_|DM8PR12MB5399:EE_
+X-MS-Office365-Filtering-Correlation-Id: 348ab46a-cbd1-4c1f-f1bb-08dbfa85656c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	DxpQIPYlNjgIeKYB7doBOlOK5N49fOpsMDYFlLcfsZK07ZlF9kGePziCQiS1tfnO/NFrGjlpdO67qQMurDKJN7wbyE1l+07rOOijTKGxcPeIU/RZYWknWlJdvSEMbjCo9Y0iJnNzopV7ac1syYkk62yAipL4L6G6b2sv1PSBoA0PsRR8JtI5/nli93pGU8NqNUa4tYkkBpRSNv8cH+ABvfuDC+lu1IvEjGVRAcBjgOXHbdR2ywDPvRnpvUCxl85AgX5/gLYnSOB0aProTHaDY7nn/Xe0qE/6m2XhLKO0O4R3nxF2K34wzSGSbjfkduIpDsGNMJ9IHrY/qsAKhl/5YMLtNiRhAEBbd3ObNT8PRBKuxLAvi+yrtoHOlIiMR8gxb0D0n2t6FxsUi4rzWnaAMLBWEVdsh9JG/NYW+Ic23kibkAGa2nIwynpFU0QVKeGhomjZUKhSCOMXcXnDKIZFhr3VkKnDbFuqFr2SuqjZWoXluIl3zCGxwZFRHYMELo9ul8ATDLO7PyZo63yjzku2Zwh3iMu+addfOkbpHV4ca4NXAbWIwKa4GD653V5/iwc2weVnThzMS8oJT0aiGsEgbUfgGbT20GJ5PoRvJoPsI5wxQMKnuCsNNJUtczKhTsFHZ+doUjCjo5OrnPj+8P9hICAQ2M/LED/nFOxzVzeOWP8/8RmOCi08tWUR50CVrSBsaWq+XsvF3bjRouG7jrG/3+7tdIhLgiR9g2H6J8klTbmmxCb+4WafAh1X/f/3nLm8
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(396003)(136003)(39860400002)(376002)(230922051799003)(1800799012)(451199024)(186009)(82310400011)(64100799003)(36840700001)(46966006)(40470700004)(55016003)(40480700001)(66899024)(26005)(426003)(336012)(40460700003)(82740400003)(7636003)(86362001)(356005)(47076005)(70586007)(83380400001)(70206006)(5660300002)(7416002)(36860700001)(316002)(8936002)(8676002)(6636002)(54906003)(9686003)(478600001)(4326008)(41300700001)(2906002)(33716001)(6862004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2023 20:11:44.0882
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 348ab46a-cbd1-4c1f-f1bb-08dbfa85656c
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF000099DC.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5399
 
-From: Oliver Upton <oliver.upton@linux.dev>
+On Mon, Dec 11, 2023 at 09:20:41AM -0400, Jason Gunthorpe wrote:
+> On Mon, Dec 11, 2023 at 08:35:09PM +0800, Yi Liu wrote:
+> > > So.. In short.. Invalidation is a PITA. The idea is the same but
+> > > annoying little details interfere with actually having a compltely
+> > > common API here. IMHO the uAPI in this series is fine. It will support
+> > > Intel invalidation and non-ATC invalidation on AMD/ARM. It should be
+> > > setup to allow that the target domain object can be any HWPT.
+> > 
+> > This HWPT is still nested domain. Is it? But it can represent a guest I/O
+> > page table (VT-d), guest CD table (ARM), guest CR3 Table (AMD, it seems to
+> > be a set of guest CR3 table pointers). May ARM and AMD guys keep me honest
+> > here.
+> 
+> I was thinking ARM would not want to use a nested domain because
+> really the invalidation is global to the entire nesting parent.
+> 
+> But, there is an issue with that - the nesting parent could be
+> attached to multiple iommu instances but we only want to invalidate a
+> single instance. 
 
-Test virtual posted interrupts under the following conditions:
+I am still not sure about attaching an S2 domain to multiple
+SMMUs. An S2 domain is created per SMMU, and we have such a
+rejection in arm_smmu_attach_dev():
+	} else if (smmu_domain->smmu != smmu)
+		ret = -EINVAL;
 
-    - vTPR[7:4] >= VECTOR[7:4]: Expect the L2 interrupt to be blocked.
-      The bit corresponding to the posted interrupt should be set in L2's
-      vIRR. Test with a running guest.
+I understand that it would be probably ideal to share the S2
+iopt among the SMMUs. But in the driver the objects (domain)
+holding a shared S2 iopt must be different to allocate their
+own VMIDs, right?
 
-    - vTPR[7:4] < VECTOR[7:4]: Expect the interrupt to be delivered and the
-      ISR to execute once. Test with a running and halted guest.
-
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-Co-developed-by: Jim Mattson <jmattson@google.com>
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- lib/x86/asm/bitops.h |   8 +++
- x86/unittests.cfg    |   8 +++
- x86/vmx_tests.c      | 133 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 149 insertions(+)
-
-diff --git a/lib/x86/asm/bitops.h b/lib/x86/asm/bitops.h
-index 13a25ec9853d..54ec9c424cd6 100644
---- a/lib/x86/asm/bitops.h
-+++ b/lib/x86/asm/bitops.h
-@@ -13,4 +13,12 @@
- 
- #define HAVE_BUILTIN_FLS 1
- 
-+static inline void test_and_set_bit(long nr, unsigned long *addr)
-+{
-+	asm volatile("lock; bts %1,%0"
-+		     : "+m" (*addr)
-+		     : "Ir" (nr)
-+		     : "memory");
-+}
-+
- #endif
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index f307168b0e01..9598c61ef7ac 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -366,6 +366,14 @@ arch = x86_64
- groups = vmx
- timeout = 10
- 
-+[vmx_posted_intr_test]
-+file = vmx.flat
-+smp = 2
-+extra_params = -cpu max,+vmx -append "vmx_posted_interrupts_test"
-+arch = x86_64
-+groups = vmx
-+timeout = 10
-+
- [vmx_apic_passthrough_thread]
- file = vmx.flat
- smp = 2
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index a26f77e92f72..1a3da59632dc 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -65,6 +65,11 @@ static u32 *get_vapic_page(void)
- 	return (u32 *)phys_to_virt(vmcs_read(APIC_VIRT_ADDR));
- }
- 
-+static u64 *get_pi_desc(void)
-+{
-+	return (u64 *)phys_to_virt(vmcs_read(POSTED_INTR_DESC_ADDR));
-+}
-+
- static void basic_guest_main(void)
- {
- 	report_pass("Basic VMX test");
-@@ -9327,6 +9332,18 @@ static void enable_vid(void)
- 	vmcs_set_bits(CPU_EXEC_CTRL1, CPU_VINTD | CPU_VIRT_X2APIC);
- }
- 
-+#define	PI_VECTOR	255
-+
-+static void enable_posted_interrupts(void)
-+{
-+	void *pi_desc = alloc_page();
-+
-+	vmcs_set_bits(PIN_CONTROLS, PIN_POST_INTR);
-+	vmcs_set_bits(EXI_CONTROLS, EXI_INTA);
-+	vmcs_write(PINV, PI_VECTOR);
-+	vmcs_write(POSTED_INTR_DESC_ADDR, (u64)pi_desc);
-+}
-+
- static void trigger_ioapic_scan_thread(void *data)
- {
- 	/* Wait until other CPU entered L2 */
-@@ -10722,12 +10739,18 @@ enum Vid_op {
- 	VID_OP_SET_CR8,
- 	VID_OP_SELF_IPI,
- 	VID_OP_TERMINATE,
-+	VID_OP_SPIN,
-+	VID_OP_HLT,
- };
- 
- struct vmx_basic_vid_test_guest_args {
- 	enum Vid_op op;
- 	u8 nr;
- 	u32 isr_exec_cnt;
-+	u32 *virtual_apic_page;
-+	u64 *pi_desc;
-+	u32 dest;
-+	bool in_guest;
- } vmx_basic_vid_test_guest_args;
- 
- /*
-@@ -10743,6 +10766,14 @@ static void set_virr_bit(volatile u32 *virtual_apic_page, u8 nr)
- 	virtual_apic_page[page_offset] |= mask;
- }
- 
-+static void clear_virr_bit(volatile u32 *virtual_apic_page, u8 nr)
-+{
-+	u32 page_offset = (0x200 | ((nr & 0xE0) >> 1)) / sizeof(u32);
-+	u32 mask = 1 << (nr & 0x1f);
-+
-+	virtual_apic_page[page_offset] &= ~mask;
-+}
-+
- static bool get_virr_bit(volatile u32 *virtual_apic_page, u8 nr)
- {
- 	u32 page_offset = (0x200 | ((nr & 0xE0) >> 1)) / sizeof(u32);
-@@ -10783,6 +10814,24 @@ static void vmx_basic_vid_test_guest(void)
- 		case VID_OP_SELF_IPI:
- 			vmx_x2apic_write(APIC_SELF_IPI, nr);
- 			break;
-+		case VID_OP_HLT:
-+			cli();
-+			barrier();
-+			args->in_guest = true;
-+			barrier();
-+			safe_halt();
-+			break;
-+		case VID_OP_SPIN: {
-+			u32 *virtual_apic_page = args->virtual_apic_page;
-+			u32 prev_cnt = args->isr_exec_cnt;
-+			u8 nr = args->nr;
-+
-+			args->in_guest = true;
-+			while (args->isr_exec_cnt == prev_cnt &&
-+			       !get_virr_bit(virtual_apic_page, nr))
-+				pause();
-+			clear_virr_bit(virtual_apic_page, nr);
-+		}
- 		default:
- 			break;
- 		}
-@@ -10803,6 +10852,7 @@ static void set_isrs_for_vmx_basic_vid_test(void)
- 	 */
- 	for (nr = 0x21; nr < 0x100; nr++) {
- 		vmcs_write(GUEST_INT_STATUS, 0);
-+		args->virtual_apic_page = get_vapic_page();
- 		args->op = VID_OP_SET_ISR;
- 		args->nr = nr;
- 		args->isr_exec_cnt = 0;
-@@ -10812,6 +10862,27 @@ static void set_isrs_for_vmx_basic_vid_test(void)
- 	report(true, "Set ISR for vectors 33-255.");
- }
- 
-+static void post_interrupt(u8 vector, u32 dest)
-+{
-+	volatile struct vmx_basic_vid_test_guest_args *args =
-+		&vmx_basic_vid_test_guest_args;
-+
-+	test_and_set_bit(vector, args->pi_desc);
-+	test_and_set_bit(256, args->pi_desc);
-+	apic_icr_write(PI_VECTOR, dest);
-+}
-+
-+static void vmx_posted_interrupts_test_worker(void *data)
-+{
-+	volatile struct vmx_basic_vid_test_guest_args *args =
-+		&vmx_basic_vid_test_guest_args;
-+
-+	while (!args->in_guest)
-+		pause();
-+
-+	post_interrupt(args->nr, args->dest);
-+}
-+
- /*
-  * Test virtual interrupt delivery (VID) at VM-entry or TPR virtualization
-  *
-@@ -10843,6 +10914,7 @@ static void test_basic_vid(u8 nr, u8 tpr, enum Vid_op op, u32 isr_exec_cnt_want,
- 	 * delivery, sets VPPR to VTPR, when SVI is 0.
- 	 */
- 	args->isr_exec_cnt = 0;
-+	args->virtual_apic_page = get_vapic_page();
- 	args->op = op;
- 	switch (op) {
- 	case VID_OP_SELF_IPI:
-@@ -10855,6 +10927,15 @@ static void test_basic_vid(u8 nr, u8 tpr, enum Vid_op op, u32 isr_exec_cnt_want,
- 		args->nr = task_priority_class(tpr);
- 		set_vtpr(0xff);
- 		break;
-+	case VID_OP_SPIN:
-+	case VID_OP_HLT:
-+		vmcs_write(GUEST_INT_STATUS, 0);
-+		args->nr = nr;
-+		set_vtpr(tpr);
-+		args->in_guest = false;
-+		barrier();
-+		on_cpu_async(1, vmx_posted_interrupts_test_worker, NULL);
-+		break;
- 	default:
- 		vmcs_write(GUEST_INT_STATUS, nr);
- 		set_vtpr(tpr);
-@@ -10998,6 +11079,57 @@ static void vmx_eoi_virt_test(void)
- 	assert_exit_reason(VMX_VMCALL);
- }
- 
-+static void vmx_posted_interrupts_test(void)
-+{
-+	volatile struct vmx_basic_vid_test_guest_args *args =
-+		&vmx_basic_vid_test_guest_args;
-+	u16 vector;
-+	u8 class;
-+
-+	if (!cpu_has_apicv()) {
-+		report_skip("%s : Not all required APICv bits supported", __func__);
-+		return;
-+	}
-+
-+	if (cpu_count() < 2) {
-+		report_skip("%s : CPU count < 2", __func__);
-+		return;
-+	}
-+
-+	enable_vid();
-+	enable_posted_interrupts();
-+	args->pi_desc = get_pi_desc();
-+	args->dest = apic_id();
-+
-+	test_set_guest(vmx_basic_vid_test_guest);
-+	set_isrs_for_vmx_basic_vid_test();
-+
-+	for (class = 0; class < 16; class++) {
-+		for (vector = 33; vector < 256; vector++) {
-+			u32 isr_exec_cnt_want =
-+					(task_priority_class(vector) > class) ?
-+					1 : 0;
-+
-+			test_basic_vid(vector, class << 4, VID_OP_SPIN,
-+				       isr_exec_cnt_want, false);
-+
-+			/*
-+			 * Only test posted interrupts to a halted vCPU if we
-+			 * expect the interrupt to be serviced. Otherwise, the
-+			 * vCPU could HLT indefinitely.
-+			 */
-+			if (isr_exec_cnt_want)
-+				test_basic_vid(vector, class << 4, VID_OP_HLT,
-+					       isr_exec_cnt_want, false);
-+		}
-+	}
-+	report(true, "Posted vectors 33-25 cross TPR classes 0-0xf, running and sometimes halted\n");
-+
-+	/* Terminate the guest */
-+	args->op = VID_OP_TERMINATE;
-+	enter_guest();
-+}
-+
- #define TEST(name) { #name, .v2 = name }
- 
- /* name/init/guest_main/exit_handler/syscall_handler/guest_regs */
-@@ -11054,6 +11186,7 @@ struct vmx_test vmx_tests[] = {
- 	TEST(virt_x2apic_mode_test),
- 	TEST(vmx_basic_vid_test),
- 	TEST(vmx_eoi_virt_test),
-+	TEST(vmx_posted_interrupts_test),
- 	/* APIC pass-through tests */
- 	TEST(vmx_apic_passthrough_test),
- 	TEST(vmx_apic_passthrough_thread_test),
--- 
-2.43.0.472.g3155946c3a-goog
-
+Thanks
+Nicolin
 
