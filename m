@@ -1,82 +1,89 @@
-Return-Path: <kvm+bounces-4050-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4051-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46DDD80CE59
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 15:27:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 021D080CE82
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 15:36:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 780B31C20FFE
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 14:27:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 766861F212C6
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 14:36:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6C0D48CE2;
-	Mon, 11 Dec 2023 14:27:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07B748CFE;
+	Mon, 11 Dec 2023 14:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="0keANDS6"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wNDq9+Wr"
 X-Original-To: kvm@vger.kernel.org
-X-Greylist: delayed 71 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 11 Dec 2023 06:27:37 PST
-Received: from forwardcorp1b.mail.yandex.net (forwardcorp1b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:df01])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AF6210D0;
-	Mon, 11 Dec 2023 06:27:36 -0800 (PST)
-Received: from mail-nwsmtp-smtp-corp-main-66.iva.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-66.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:bd84:0:640:4b62:0])
-	by forwardcorp1b.mail.yandex.net (Yandex) with ESMTP id 571116154A;
-	Mon, 11 Dec 2023 17:26:20 +0300 (MSK)
-Received: from kniv-nix.yandex-team.ru (unknown [2a02:6b8:b081:b718::1:2a])
-	by mail-nwsmtp-smtp-corp-main-66.iva.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id FQiaE60IfSw0-y85DjH1F;
-	Mon, 11 Dec 2023 17:26:19 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; t=1702304779;
-	bh=okgSQ4jSQ39ig7kfarAvRYBE8MWRoq0a2/YUSKkMo0Q=;
-	h=Message-Id:Date:Cc:Subject:To:From;
-	b=0keANDS6V0C7aVY3xGtXMkiaVMTvJdnVS5F3XyDJyx9XiAkgJ6M8OgSpGHth7NGnY
-	 NuX+yg8iQbYu4HsIpsvKwre/gFTts5MXRR1vzSU0Rk7E3DdsZU8oFspCy15oQkOo1g
-	 x7OUziUIHBQoOXJ6fuEr42ns6WbdTn8ctoOTyiDo=
-Authentication-Results: mail-nwsmtp-smtp-corp-main-66.iva.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-From: Nikolay Kuratov <kniv@yandex-team.ru>
-To: linux-kernel@vger.kernel.org
-Cc: sgarzare@redhat.com,
-	netdev@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org,
-	Nikolay Kuratov <kniv@yandex-team.ru>
-Subject: [PATCH] vsock/virtio: Fix unsigned integer wrap around in virtio_transport_has_space()
-Date: Mon, 11 Dec 2023 17:25:05 +0300
-Message-Id: <20231211142505.4076725-1-kniv@yandex-team.ru>
-X-Mailer: git-send-email 2.34.1
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 850A59F
+	for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 06:36:45 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-54f4b31494fso6414899a12.1
+        for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 06:36:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1702305404; x=1702910204; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hnlDRuUqfo4QrqddI/qWEwk9SWh3sjr/XXfcP2vUeRg=;
+        b=wNDq9+Wr1V/HEJknxRt5wJ39c6fqZQJoapUFfPupvT/mBI5VPM9lQbMQ5PghILgRGm
+         3i7HefGl7RhoQaIMDcP/kbMTFtQy10WM09EHg86s89q2oQpgPMOsBSNEpCl9mzrxsdZU
+         971L7IGAu+hrbLr056jftKzDW/yadD/PgA6SIpMQ1vYV2whrePMzYHdTMacWAmiDDBoP
+         NYdoK+pPYT/lKbaU2Mnh4k5ekUoT8QieZ5s/k4NumzSpdKAYAj+81LEPlw+kc9GWsz8w
+         tKQ2H6vDJq5Fu9YWVj/CMdw2igQZVzbwv6cLL3sYUqC8c+Jzr/b+JFvXFjyQOCCR2ZY4
+         JRiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702305404; x=1702910204;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hnlDRuUqfo4QrqddI/qWEwk9SWh3sjr/XXfcP2vUeRg=;
+        b=mfYgVeDJ/Oe6266+NnDsv+DJGGj8byLyCeGG6DXIjAf0OxsDLz60LKWt/MNoFymljs
+         A9UYRD2xkwldYzYJRoe4lMq8K46fwvD7SfSiZnQD12PkejvIOQzR9shZztVCKJnt/dLO
+         oR62/6fXVFrHLR58+o/7fbZGi4AlTZQywogLvtgvy/p63UYaL3DgdyD0da9GdrJbcEe9
+         Akd9BYEnAXMaMlUChOf0OZelZrqzUDlJDTPmITnrVeuvbmIKw8uF7kZSULhogKAJcw4Y
+         Y2Gi0HHcsnOIarL0rXwpYIHD0RoXoC4ibXu266JfAK6HYtsfUu5D0KtMmfbMo3s1rGyC
+         Ogww==
+X-Gm-Message-State: AOJu0YxgPIkGLIt+j9HK1SExeb/nxVt3eJKjA9Lxo4otieQQu+g+LXkT
+	g7utG9//ofojqmz0XNbG5jU2J3WjF2vI87SzcsEiVQ==
+X-Google-Smtp-Source: AGHT+IHPVGkHY5T66mLFfrATbBqb9h4CV21aGKeNWVd4/WzZsB76YC8N8NW8EyeJHL66q2Xoxoz1hmp/Ltsje7hwOjo=
+X-Received: by 2002:a50:ef17:0:b0:54b:38f:7263 with SMTP id
+ m23-20020a50ef17000000b0054b038f7263mr5484022eds.8.1702305403990; Mon, 11 Dec
+ 2023 06:36:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231123183518.64569-1-philmd@linaro.org>
+In-Reply-To: <20231123183518.64569-1-philmd@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Dec 2023 14:36:33 +0000
+Message-ID: <CAFEAcA8S7Ug8uFpvDO9FarLpLhTr_236H8gOK=dEOWQZe-3zgg@mail.gmail.com>
+Subject: Re: [PATCH-for-9.0 00/16] target/arm/kvm: Unify kvm_arm_FOO() API
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We need to do signed arithmetic if we expect condition
-`if (bytes < 0)` to be possible
+On Thu, 23 Nov 2023 at 18:35, Philippe Mathieu-Daud=C3=A9 <philmd@linaro.or=
+g> wrote:
+>
+> Half of the API takes CPUState, the other ARMCPU...
+>
+> $ git grep -F 'CPUState *' target/arm/kvm_arm.h | wc -l
+>       16
+> $ git grep -F 'ARMCPU *' target/arm/kvm_arm.h | wc -l
+>       14
+>
+> Since this is ARM specific, have it always take ARMCPU, and
+> call the generic KVM API casting with the CPU() macro.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE
 
-Signed-off-by: Nikolay Kuratov <kniv@yandex-team.ru>
----
- net/vmw_vsock/virtio_transport_common.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index c8e162c9d1df..6df246b53260 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -843,7 +843,7 @@ static s64 virtio_transport_has_space(struct vsock_sock *vsk)
- 	struct virtio_vsock_sock *vvs = vsk->trans;
- 	s64 bytes;
- 
--	bytes = vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
-+	bytes = (s64)vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
- 	if (bytes < 0)
- 		bytes = 0;
- 
--- 
-2.34.1
+Applied to target-arm.next for 9.0, thanks.
 
+-- PMM
 
