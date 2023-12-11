@@ -1,148 +1,164 @@
-Return-Path: <kvm+bounces-4008-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4009-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 474B580BEBC
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 02:21:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7968680BEC9
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 02:41:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 025A3280C32
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 01:21:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68DF71C20912
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 01:41:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C0E8BFC;
-	Mon, 11 Dec 2023 01:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF487EAC9;
+	Mon, 11 Dec 2023 01:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qR17lPs4"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CCFFCE;
-	Sun, 10 Dec 2023 17:21:31 -0800 (PST)
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SpP8h1F1RzsS4X;
-	Mon, 11 Dec 2023 09:21:24 +0800 (CST)
-Received: from kwepemm000005.china.huawei.com (unknown [7.193.23.27])
-	by mail.maildlp.com (Postfix) with ESMTPS id DD11318005A;
-	Mon, 11 Dec 2023 09:21:28 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- kwepemm000005.china.huawei.com (7.193.23.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 11 Dec 2023 09:21:28 +0800
-Subject: Re: [PATCH v19 0/3] add debugfs to migration driver
-To: Alex Williamson <alex.williamson@redhat.com>
-CC: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<jonathan.cameron@huawei.com>, <bcreeley@amd.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
-References: <20231106072225.28577-1-liulongfang@huawei.com>
- <20231204170040.7703f1e1.alex.williamson@redhat.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <4744fd4d-e8de-e079-0acf-acc363d5caaf@huawei.com>
-Date: Mon, 11 Dec 2023 09:21:27 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC4C612D;
+	Mon, 11 Dec 2023 01:41:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F14A9C43395;
+	Mon, 11 Dec 2023 01:41:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702258866;
+	bh=MBOze/c93zYR/s0Tv/psL8lZsa2zAA8epMJdS8MTA48=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=qR17lPs4JMPnH4HZ6ahTIg4TYdw9Z4XEBYFJPU0HqGvQbsEA0QxrteiBI65X0D8wM
+	 OnS+34BNKvsvb7nxZvu3bIFA/LezLHP88kiCw7rXdNOBkbjqjORpXBWYYfYSJCt0q9
+	 2d3TkFNtGktLG+F+95I8YIUrrIFrV4hwTZwW72HEi/SKVOS1p3IekzaLsbSF2ikZnw
+	 q4UCfhQejMRxVHD94ZpJUBrJHFFEQ4e/M/LidZJOEs1GY6tmxMEXinp2TyJHkLSskv
+	 luB8LytAXsQ1RptemeRh0Va7+XGeR/CIiqGvs2FQEEeVPQAslDf3xAlhmqNbBDGsst
+	 uW9/xpQAU60RA==
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2c9efa1ab7fso47837391fa.0;
+        Sun, 10 Dec 2023 17:41:05 -0800 (PST)
+X-Gm-Message-State: AOJu0Yzf2HbO/DTwEGwALmGOL/a6eS7TlzY/75tCyFtE4vopVXpWSqon
+	1GzTgWGdsTC+GxU8ePqYW/9pUC01i5WRXgv5Cas=
+X-Google-Smtp-Source: AGHT+IHifpFa36iHpb1+GyluGw6IQnLTC075/8t8iOHLtdbD3dWDzZ8fH9kQh4f8GxIkuv9w02XPsx/dXrcydyPkjDw=
+X-Received: by 2002:a2e:7e05:0:b0:2ca:1bb4:4426 with SMTP id
+ z5-20020a2e7e05000000b002ca1bb44426mr543816ljc.207.1702258864030; Sun, 10 Dec
+ 2023 17:41:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231204170040.7703f1e1.alex.williamson@redhat.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm000005.china.huawei.com (7.193.23.27)
+References: <20231015141644.260646-1-akihiko.odaki@daynix.com>
+ <20231015141644.260646-2-akihiko.odaki@daynix.com> <CAADnVQLfUDmgYng8Cw1hiZOMfWNWLjbn7ZGc4yOEz-XmeFEz5Q@mail.gmail.com>
+ <2594bb24-74dc-4785-b46d-e1bffcc3e7ed@daynix.com> <CAADnVQ+J+bOtvEfdvgUse_Rr07rM5KOZ5DtAmHDgRmi70W68+g@mail.gmail.com>
+ <CACGkMEs22078F7rSLEz6eQabkZZ=kujSONUNMThZz5Gp=YiidQ@mail.gmail.com>
+ <CAADnVQLt8NWvP8qGWMPx=12PwWWE69P7aS2dbm=khAJkCnJEoQ@mail.gmail.com>
+ <9a4853ad-5ef4-4b15-a49e-9edb5ae4468e@daynix.com> <6253fb6b-9a53-484a-9be5-8facd46c051e@daynix.com>
+ <CAPhsuW5JYoM-Mkehdy=FQsG1nvjbYGzwRZx8BkpG1P7cHdD=eQ@mail.gmail.com>
+ <dba89d4b-84aa-4c9f-b016-56fd3ade04b2@daynix.com> <CAPhsuW5KLgt_gsih7zi+T99iYVbt7hk7=OCwYzin-H3=OhF54Q@mail.gmail.com>
+ <a1f09866-a443-4f74-8025-6cdb32eb1d2c@daynix.com> <CAPhsuW4o5o41a+jVjgGP+Ck3eUD8w6coLXMTYewXKJYmciLLnQ@mail.gmail.com>
+ <664003d3-aadb-4938-80f6-67fab1c9dcdd@daynix.com> <d30a038b-d10f-468d-8879-478a6c5b814b@daynix.com>
+In-Reply-To: <d30a038b-d10f-468d-8879-478a6c5b814b@daynix.com>
+From: Song Liu <song@kernel.org>
+Date: Sun, 10 Dec 2023 17:40:52 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW5CMYiOMUDCgfQyo=K31igZZ+BgXyL6yfq1OG3r2CzQ4g@mail.gmail.com>
+Message-ID: <CAPhsuW5CMYiOMUDCgfQyo=K31igZZ+BgXyL6yfq1OG3r2CzQ4g@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 1/7] bpf: Introduce BPF_PROG_TYPE_VNET_HASH
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Jason Wang <jasowang@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2023/12/5 8:00, Alex Williamson wrote:
-> On Mon, 6 Nov 2023 15:22:22 +0800
-> Longfang Liu <liulongfang@huawei.com> wrote:
-> 
->> Add a debugfs function to the migration driver in VFIO to provide
->> a step-by-step debugfs information for the migration driver.
->>
->> Changes v18 -> v19
->> 	maintainers add a patch.
->>
->> Changes v17 -> v18
->> 	Replace seq_printf() with seq_puts().
->>
->> Changes v16 -> v17
->> 	Add separate VFIO_DEBUGFS Kconfig entries.
->>
->> Changes v15 -> v16
->> 	Update the calling order of functions to maintain symmetry
->>
->> Changes v14 -> v15
->> 	Update the output status value of live migration.
->>
->> Changes v13 -> v14
->> 	Split the patchset and keep the vfio debugfs frame.
->>
->> Changes v12 -> v13
->> 	Solve the problem of open and close competition to debugfs.
->>
->> Changes v11 -> v12
->> 	Update loading conditions of vfio debugfs.
->>
->> Changes v10 -> v11
->> 	Delete the device restore function in debugfs.
->>
->> Changes v9 -> v10
->> 	Update the debugfs file of the live migration driver.
->>
->> Changes v8 -> v9
->> 	Update the debugfs directory structure of vfio.
->>
->> Changes v7 -> v8
->> 	Add support for platform devices.
->>
->> Changes v6 -> v7
->> 	Fix some code style issues.
->>
->> Changes v5 -> v6
->> 	Control the creation of debugfs through the CONFIG_DEBUG_FS.
->>
->> Changes v4 -> v5
->> 	Remove the newly added vfio_migration_ops and use seq_printf
->> 	to optimize the implementation of debugfs.
->>
->> Changes v3 -> v4
->> 	Change the migration_debug_operate interface to debug_root file.
->>
->> Changes v2 -> v3
->> 	Extend the debugfs function from hisilicon device to vfio.
->>
->> Changes v1 -> v2
->> 	Change the registration method of root_debugfs to register
->> 	with module initialization. 
->>
->> Longfang Liu (3):
->>   vfio/migration: Add debugfs to live migration driver
->>   Documentation: add debugfs description for vfio
->>   MAINTAINERS: Update the maintenance directory of vfio driver
->>
->>  Documentation/ABI/testing/debugfs-vfio | 25 +++++++
->>  MAINTAINERS                            |  1 +
->>  drivers/vfio/Kconfig                   | 10 +++
->>  drivers/vfio/Makefile                  |  1 +
->>  drivers/vfio/debugfs.c                 | 90 ++++++++++++++++++++++++++
->>  drivers/vfio/vfio.h                    | 14 ++++
->>  drivers/vfio/vfio_main.c               |  4 ++
->>  include/linux/vfio.h                   |  7 ++
->>  include/uapi/linux/vfio.h              |  1 +
->>  9 files changed, 153 insertions(+)
->>  create mode 100644 Documentation/ABI/testing/debugfs-vfio
->>  create mode 100644 drivers/vfio/debugfs.c
->>
-> 
-> Applied to vfio next branch for v6.8.  I resolved some whitespace
-> issues and updated the date and kernel release version in the
-> Documentation as well.  Thanks,
-> 
+On Sat, Dec 9, 2023 at 11:03=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix=
+.com> wrote:
+>
+> On 2023/11/22 14:36, Akihiko Odaki wrote:
+> > On 2023/11/22 14:25, Song Liu wrote:
+[...]
+>
+> Now the discussion is stale again so let me summarize the discussion:
+>
+> A tuntap device can have an eBPF steering program to let the userspace
+> decide which tuntap queue should be used for each packet. QEMU uses this
+> feature to implement the RSS algorithm for virtio-net emulation. Now,
+> the virtio specification has a new feature to report hash values
+> calculated with the RSS algorithm. The goal of this RFC is to report
+> such hash values from the eBPF steering program to the userspace.
+>
+> There are currently three ideas to implement the proposal:
+>
+> 1. Abandon eBPF steering program and implement RSS in the kernel.
+>
+> It is possible to implement the RSS algorithm in the kernel as it's
+> strictly defined in the specification. However, there are proposals for
+> relevant virtio specification changes, and abandoning eBPF steering
+> program will loose the ability to implement those changes in the
+> userspace. There are concerns that this lead to more UAPI changes in the
+> end.
+>
+> 2. Add BPF kfuncs.
+>
+> Adding BPF kfuncs is *the* standard way to add BPF interfaces. hid-bpf
+> is a good reference for this.
+>
+> The problem with BPF kfuncs is that kfuncs are not considered as stable
+> as UAPI. In my understanding, it is not problematic for things like
+> hid-bpf because programs using those kfuncs affect the entire system
+> state and expected to be centrally managed. Such BPF programs can be
+> updated along with the kernel in a manner similar to kernel modules.
+>
+> The use case of tuntap steering/hash reporting is somewhat different
+> though; the eBPF program is more like a part of application (QEMU or
+> potentially other VMM) and thus needs to be portable. For example, a
+> user may expect a Debian container with QEMU installed to work on Fedora.
+>
+> BPF kfuncs do still provide some level of stability, but there is no
+> documentation that tell how stable they are. The worst case scenario I
+> can imagine is that a future legitimate BPF change breaks QEMU, letting
+> the "no regressions" rule force the change to be reverted. Some
+> assurance that kind scenario will not happen is necessary in my opinion.
 
-OK, thank you very much!
+I don't think we can provide stability guarantees before seeing something
+being used in the field. How do we know it will be useful forever? If a
+couple years later, there is only one person using it somewhere in the
+world, why should we keep supporting it? If there are millions of virtual
+machines using it, why would you worry about it being removed?
 
-Longfang.
+>
+> 3. Add BPF program type derived from the conventional steering program ty=
+pe
+>
+> In principle, it's just to add a feature to report four more bytes to
+> the conventional steering program. However, BPF program types are frozen
+> for feature additions and the proposed change will break the feature free=
+ze.
+>
+> So what's next? I'm inclined to option 3 due to its minimal ABI/API
+> change, but I'm also fine with option 2 if it is possible to guarantee
+> the ABI/API stability necessary to run pre-built QEMUs on future kernel
+> versions by e.g., explicitly stating the stability of kfuncs. If no
+> objection arises, I'll resend this series with the RFC prefix dropped
+> for upstream inclusion. If it's decided to go for option 1 or 2, I'll
+> post a new version of the series implementing the idea.
 
-> Alex
-> 
-> .
-> 
+Probably a dumb question, but does this RFC fall into option 3? If
+that's the case, I seriously don't think it's gonna happen.
+
+I would recommend you give option 2 a try and share the code. This is
+probably the best way to move the discussion forward.
+
+Thanks,
+Song
 
