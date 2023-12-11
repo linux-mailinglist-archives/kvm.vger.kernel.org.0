@@ -1,198 +1,226 @@
-Return-Path: <kvm+bounces-4090-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4091-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F11D80D49D
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 18:52:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4FA580D4E8
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 19:04:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C8331F216A4
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 17:52:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AE0C281B09
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 18:04:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E874D4F211;
-	Mon, 11 Dec 2023 17:51:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872504F21C;
+	Mon, 11 Dec 2023 18:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2icDOyzU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gCBBJ3zI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BC7613A
-	for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 09:51:09 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5e16d7537bcso5813597b3.3
-        for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 09:51:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702317068; x=1702921868; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=b+QItwKYZkmQjKZfvnmL7h1+BIrbGG/qsUdX1MWn8c0=;
-        b=2icDOyzUegWgAgAwSXZvNqptPy5tMC+DrrtpjSrpNdzf3rLtlpzIXKJxnWxNb/RUJa
-         hGFRWiypqWddgbsnTKtHGPJd8kYFpOA5RDnYwPa5xTxRreYEPkTpdPxpIm9PNr0C579x
-         fQlO51oERZNjgQsaiebHA36C3mYxoC/XdlKQJNEylIL6zXxlnKpYS1eL6C4qFUrvL5G3
-         D7bgqO2bXPh2HLUz7B09VzDNRx84Lu3WKslpwFpBpNt/mIWhhcOrA9kAhXod7xuOI/Yj
-         nM/p+PI5++Aap6NxXVFI/2YPFFJKy9qapTWqH+5pzESg/Kz4NtJs9f58uK9VhihRpj/c
-         LoyA==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAAD298
+	for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 10:03:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702317831;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MaxmWb0gmmOa2NNadHjgN+9H3pLxhDx5JIlGNJciyGA=;
+	b=gCBBJ3zIyaJ0EwvqLxdfPFofss4g1kHzuR9ADJrhdddh2as5GrY6o9AC6iQMIwGU4MwYUX
+	A/jVLE/dvF9I5UH35GqUY0DLMnfNlwl3jLBioHQYD+QYmzX10hqnJpwGbSyvwUdpnzGS0q
+	p04Htzdv0znvaW/rg/p0c1JpKnbiib4=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-156-rSm2DaQINm6n2ezNyJhSDQ-1; Mon, 11 Dec 2023 13:03:50 -0500
+X-MC-Unique: rSm2DaQINm6n2ezNyJhSDQ-1
+Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-6d87bcf8a15so7379482a34.0
+        for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 10:03:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702317068; x=1702921868;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=b+QItwKYZkmQjKZfvnmL7h1+BIrbGG/qsUdX1MWn8c0=;
-        b=FUaAiD7ercCUU2DG37tnqBgel9f41+4CJuYAlhbDVaw+OYUxMV9pPWNV8ETyCgusHX
-         FRAIrnwwqEUelZPmYkK8w6+yuPqt72/CUfRY9hj1yaXz7X5PalhO8OosWwCpe8WomGQ4
-         FMKqlzQPTWo90/Z4TJuM+aaqVu2evQ3/cQ9U2Gsz5PmUVQ/DMND4kQI5ULaSF+DuIq0d
-         AxDBU7vM9cevnZ+bT7Imwr/SGL74lgoOdL1eDjXPn/ARMPMhDXMj+38yJhvek9/C80LF
-         pudCHk16VzunArGNTQk/YocF/1o25ZprTXFZ9sNlSccKbPsc8bkahFvRsRGqvixpkOXM
-         q3SA==
-X-Gm-Message-State: AOJu0YxRQq2zYVrW9wjbyC/c5DB3jD5Msf3+7pCrxTidVPYRpRQMUn+s
-	07G4jE6yiadx6KyqjgNpsnbi/asVCV8=
-X-Google-Smtp-Source: AGHT+IEJlbs6t42JuBe9Zaw8UIu5remsf7pFjNUwnZXA86IgYB4Hsz7JOVUF1FGFr+oR81Ahwo5DnMt1rK4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:3381:b0:5d5:5183:ebdb with SMTP id
- fl1-20020a05690c338100b005d55183ebdbmr48534ywb.10.1702317068533; Mon, 11 Dec
- 2023 09:51:08 -0800 (PST)
-Date: Mon, 11 Dec 2023 09:51:07 -0800
-In-Reply-To: <ZXdIIBUXcCIK28ys@google.com>
+        d=1e100.net; s=20230601; t=1702317829; x=1702922629;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MaxmWb0gmmOa2NNadHjgN+9H3pLxhDx5JIlGNJciyGA=;
+        b=GqLnRVc3v6JtcYRHh9FhDgMY5FYHH7unKOOcKvIQbFr6l6MP77Zva8VMWKF9CgjpPE
+         PPqiCnxGjunOIdMSsiB1oKCOas/8rivCN6aN0jc4IVCe+eCUUv9a6a4wdbOwFDhX/RES
+         H/Nod8EWlR9a+rFV97Z/8Z0BfATFlqDW05GXgcdKupRljanlCDrQmXTF6jUTiVtjLWEW
+         yQZOgRaB7dXpsl7VGRzMZR5rJemCkrncl6Gmq6a2Fvpd4J1U5BbStkoS0SiNG3QWkuJn
+         7IQarjoz6XR/sFbSsIXDI2L2DFCRx1n7PqMqCNKju0GhSu+YDTY0Lxo6z83qP6AuJgUk
+         pw5g==
+X-Gm-Message-State: AOJu0YwmeiW9qYeUWL/UG6tMlGeGc4kHgkb+HkLsA1BR0ScfQMxLZuUV
+	CR5yUI4T8HoixmQ+syCTOvspPGZr4Fp47ubLEtUKcIQcLSeZKYMQUaGrdXNk9gJQ1ZLzB+Tyx7u
+	+vDOclYgbuWt1
+X-Received: by 2002:a9d:4e8f:0:b0:6d8:8053:af56 with SMTP id v15-20020a9d4e8f000000b006d88053af56mr5256017otk.39.1702317829720;
+        Mon, 11 Dec 2023 10:03:49 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFSgJpcgGM/uc3eXwfGlIeFBE+F5c01rkGI5ZWrgUL/mGmyGdintBKaoq0B478Ka1tOjndr+w==
+X-Received: by 2002:a9d:4e8f:0:b0:6d8:8053:af56 with SMTP id v15-20020a9d4e8f000000b006d88053af56mr5256002otk.39.1702317829439;
+        Mon, 11 Dec 2023 10:03:49 -0800 (PST)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id c25-20020a9d6859000000b006d9a7a7048asm1827521oto.49.2023.12.11.10.03.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Dec 2023 10:03:48 -0800 (PST)
+Date: Mon, 11 Dec 2023 11:03:45 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yi Liu <yi.l.liu@intel.com>
+Cc: joro@8bytes.org, jgg@nvidia.com, kevin.tian@intel.com,
+ robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
+ eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+ mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
+ yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+ suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ zhenzhong.duan@intel.com, joao.m.martins@oracle.com, xin.zeng@intel.com,
+ yan.y.zhao@intel.com
+Subject: Re: [PATCH 3/3] vfio: Report PASID capability via
+ VFIO_DEVICE_FEATURE ioctl
+Message-ID: <20231211110345.1b4526c6.alex.williamson@redhat.com>
+In-Reply-To: <20231127063909.129153-4-yi.l.liu@intel.com>
+References: <20231127063909.129153-1-yi.l.liu@intel.com>
+	<20231127063909.129153-4-yi.l.liu@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230512233127.804012-1-seanjc@google.com> <20230512233127.804012-2-seanjc@google.com>
- <cfed942fc767fa7b2fabc68a3357a7b95bd6a589.camel@amazon.com> <ZXdIIBUXcCIK28ys@google.com>
-Message-ID: <ZXdMC9rCHqAx2SfF@google.com>
-Subject: Re: [PATCH v2 1/2] KVM: Use syscore_ops instead of reboot_notifier to
- hook restart/shutdown
-From: Sean Christopherson <seanjc@google.com>
-To: James Gowans <jgowans@amazon.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, Alexander Graf <graf@amazon.de>, 
-	"Jan =?utf-8?Q?Sch=C3=B6nherr?=" <jschoenh@amazon.de>, "ebiederm@xmission.com" <ebiederm@xmission.com>, 
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "atishp@atishpatra.org" <atishp@atishpatra.org>, 
-	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>, "james.morse@arm.com" <james.morse@arm.com>, 
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
-	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "maz@kernel.org" <maz@kernel.org>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>, 
-	"anup@brainfault.org" <anup@brainfault.org>, 
-	"kexec@lists.infradead.org" <kexec@lists.infradead.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 11, 2023, Sean Christopherson wrote:
-> On Sat, Dec 09, 2023, James Gowans wrote:
-> > Hi Sean,
-> >=20
-> > Blast from the past but I've just been bitten by this patch when
-> > rebasing across v6.4.
-> >=20
-> > On Fri, 2023-05-12 at 16:31 -0700, Sean Christopherson wrote:
-> > > Use syscore_ops.shutdown to disable hardware virtualization during a
-> > > reboot instead of using the dedicated reboot_notifier so that KVM dis=
-ables
-> > > virtualization _after_ system_state has been updated.=C2=A0 This will=
- allow
-> > > fixing a race in KVM's handling of a forced reboot where KVM can end =
-up
-> > > enabling hardware virtualization between kernel_restart_prepare() and
-> > > machine_restart().
-> >=20
-> > The issue is that, AFAICT, the syscore_ops.shutdown are not called when
-> > doing a kexec. Reboot notifiers are called across kexec via:
-> >=20
-> > kernel_kexec
-> >   kernel_restart_prepare
-> >     blocking_notifier_call_chain
-> >       kvm_reboot
-> >=20
-> > So after this patch, KVM is not shutdown during kexec; if hardware virt
-> > mode is enabled then the kexec hangs in exactly the same manner as you
-> > describe with the reboot.
-> >=20
-> > Some specific shutdown callbacks, for example IOMMU, HPET, IRQ, etc are
-> > called in native_machine_shutdown, but KVM is not one of these.
-> >=20
-> > Thoughts on possible ways to fix this:
-> > a) go back to reboot notifiers
-> > b) get kexec to call syscore_shutdown() to invoke all of these callback=
-s
-> > c) Add a KVM-specific callback to native_machine_shutdown(); we only
-> > need this for Intel x86, right?
->=20
-> I don't like (c).  VMX is the most sensitive/problematic, e.g. the whole =
-blocking
-> of INIT thing, but SVM can also run afoul of EFER.SVME being cleared, and=
- KVM really=20
-> should leave virtualization enabled across kexec(), even if leaving virtu=
-alization
+On Sun, 26 Nov 2023 22:39:09 -0800
+Yi Liu <yi.l.liu@intel.com> wrote:
 
-*shouldn't*
+> This reports the PASID capability data to userspace via VFIO_DEVICE_FEATURE,
+> hence userspace could probe PASID capability by it. This is a bit different
+> with other capabilities which are reported to userspace when the user reads
+> the device's PCI configuration space. There are two reasons for this.
+> 
+>  - First, Qemu by default exposes all available PCI capabilities in vfio-pci
+>    config space to the guest as read-only, so adding PASID capability in the
+>    vfio-pci config space will make it exposed to the guest automatically while
+>    an old Qemu doesn't really support it.
 
-> enabled is relatively benign on other architectures.
->=20
-> One more option would be:
->=20
->  d) Add another sycore hook, e.g. syscore_kexec() specifically for this p=
-ath.
->=20
-> > My slight preference is towards adding syscore_shutdown() to kexec, but
-> > I'm not sure that's feasible. Adding kexec maintainers for input.
->=20
-> In a vacuum, that'd be my preference too.  It's the obvious choice IMO, e=
-.g. the
-> kexec_image->preserve_context path does syscore_suspend() (and then resum=
-e(), so
-> it's not completely uncharted territory.
->=20
-> However, there's a rather big wrinkle in that not all of the existing .sh=
-utdown()
-> implementations are obviously ok to call during kexec.  Luckily, AFAICT t=
-here are
-> very few users of the syscore .shutdown hook, so it's at least feasible t=
-o go that
-> route.
->=20
-> x86's mce_syscore_shutdown() should be ok, and arguably is correct, e.g. =
-I don't
-> see how leaving #MC reporting enabled across kexec can work.
->=20
-> ledtrig_cpu_syscore_shutdown() is also likely ok and arguably correct.
->=20
-> The interrupt controllers though?  x86 disables IRQs at the very beginnin=
-g of
-> machine_kexec(), so it's likely fine.  But every other architecture?  No =
-clue.
-> E.g. PPC's default_machine_kexec() sends IPIs to shutdown other CPUs, tho=
-ugh I
-> have no idea if that can run afoul of any of the paths below.
->=20
->         arch/powerpc/platforms/cell/spu_base.c  .shutdown =3D spu_shutdow=
-n,
->         arch/x86/kernel/cpu/mce/core.c	        .shutdown =3D mce_syscore_=
-shutdown,
->         arch/x86/kernel/i8259.c                 .shutdown =3D i8259A_shut=
-down,
->         drivers/irqchip/irq-i8259.c	        .shutdown =3D i8259A_shutdown=
-,
->         drivers/irqchip/irq-sun6i-r.c	        .shutdown =3D sun6i_r_intc_=
-shutdown,
->         drivers/leds/trigger/ledtrig-cpu.c	.shutdown =3D ledtrig_cpu_sysc=
-ore_shutdown,
->         drivers/power/reset/sc27xx-poweroff.c	.shutdown =3D sc27xx_powero=
-ff_shutdown,
->         kernel/irq/generic-chip.c	        .shutdown =3D irq_gc_shutdown,
->         virt/kvm/kvm_main.c	                .shutdown =3D kvm_shutdown,
->=20
-> The whole thing is a bit of a mess.  E.g. x86 treats machine_shutdown() f=
-rom
-> kexec pretty much the same as shutdown for reboot, but other architecture=
-s have
-> what appear to be unique paths for handling kexec.
->=20
-> FWIW, if we want to go with option (b), syscore_shutdown() hooks could us=
-e
-> kexec_in_progress to differentiate between "regular" shutdown/reboot and =
-kexec.
+Shouldn't we also be working on hiding the PASID capability in QEMU
+ASAP?  This feature only allows QEMU to know PASID control is actually
+available, not the guest.  Maybe we're hoping this is really only used
+by VFs where there's no capability currently exposed to the guest?
+
+>  - Second, PASID capability does not exit on VFs (instead shares the cap of
+
+s/exit/exist/
+
+>    the PF). Creating a virtual PASID capability in vfio-pci config space needs
+>    to find a hole to place it, but doing so may require device specific
+>    knowledge to avoid potential conflict with device specific registers like
+>    hiden bits in VF config space. It's simpler by moving this burden to the
+>    VMM instead of maintaining a quirk system in the kernel.
+
+This feels a bit like an incomplete solution though and we might
+already posses device specific knowledge in the form of a variant
+driver.  Should this feature structure include a flag + field that
+could serve to generically indicate to the VMM a location for
+implementing the PASID capability?  The default core implementation
+might fill this only for PFs where clearly an emualted PASID capability
+can overlap the physical capability.  Thanks,
+
+Alex
+
+> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_core.c | 47 ++++++++++++++++++++++++++++++++
+>  include/uapi/linux/vfio.h        | 13 +++++++++
+>  2 files changed, 60 insertions(+)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 1929103ee59a..8038aa45500e 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -1495,6 +1495,51 @@ static int vfio_pci_core_feature_token(struct vfio_device *device, u32 flags,
+>  	return 0;
+>  }
+>  
+> +static int vfio_pci_core_feature_pasid(struct vfio_device *device, u32 flags,
+> +				       struct vfio_device_feature_pasid __user *arg,
+> +				       size_t argsz)
+> +{
+> +	struct vfio_pci_core_device *vdev =
+> +		container_of(device, struct vfio_pci_core_device, vdev);
+> +	struct vfio_device_feature_pasid pasid = { 0 };
+> +	struct pci_dev *pdev = vdev->pdev;
+> +	u32 capabilities = 0;
+> +	int ret;
+> +
+> +	/* We do not support SET of the PASID capability */
+> +	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_GET,
+> +				 sizeof(pasid));
+> +	if (ret != 1)
+> +		return ret;
+> +
+> +	/*
+> +	 * Needs go to PF if the device is VF as VF shares its PF's
+> +	 * PASID Capability.
+> +	 */
+> +	if (pdev->is_virtfn)
+> +		pdev = pci_physfn(pdev);
+> +
+> +	if (!pdev->pasid_enabled)
+> +		goto out;
+> +
+> +#ifdef CONFIG_PCI_PASID
+> +	pci_read_config_dword(pdev, pdev->pasid_cap + PCI_PASID_CAP,
+> +			      &capabilities);
+> +#endif
+> +
+> +	if (capabilities & PCI_PASID_CAP_EXEC)
+> +		pasid.capabilities |= VFIO_DEVICE_PASID_CAP_EXEC;
+> +	if (capabilities & PCI_PASID_CAP_PRIV)
+> +		pasid.capabilities |= VFIO_DEVICE_PASID_CAP_PRIV;
+> +
+> +	pasid.width = (capabilities >> 8) & 0x1f;
+> +
+> +out:
+> +	if (copy_to_user(arg, &pasid, sizeof(pasid)))
+> +		return -EFAULT;
+> +	return 0;
+> +}
+> +
+>  int vfio_pci_core_ioctl_feature(struct vfio_device *device, u32 flags,
+>  				void __user *arg, size_t argsz)
+>  {
+> @@ -1508,6 +1553,8 @@ int vfio_pci_core_ioctl_feature(struct vfio_device *device, u32 flags,
+>  		return vfio_pci_core_pm_exit(device, flags, arg, argsz);
+>  	case VFIO_DEVICE_FEATURE_PCI_VF_TOKEN:
+>  		return vfio_pci_core_feature_token(device, flags, arg, argsz);
+> +	case VFIO_DEVICE_FEATURE_PASID:
+> +		return vfio_pci_core_feature_pasid(device, flags, arg, argsz);
+>  	default:
+>  		return -ENOTTY;
+>  	}
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 495193629029..8326faf8622b 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -1512,6 +1512,19 @@ struct vfio_device_feature_bus_master {
+>  };
+>  #define VFIO_DEVICE_FEATURE_BUS_MASTER 10
+>  
+> +/**
+> + * Upon VFIO_DEVICE_FEATURE_GET, return the PASID capability for the device.
+> + * Zero width means no support for PASID.
+> + */
+> +struct vfio_device_feature_pasid {
+> +	__u16 capabilities;
+> +#define VFIO_DEVICE_PASID_CAP_EXEC	(1 << 0)
+> +#define VFIO_DEVICE_PASID_CAP_PRIV	(1 << 1)
+> +	__u8 width;
+> +	__u8 __reserved;
+> +};
+> +#define VFIO_DEVICE_FEATURE_PASID 11
+> +
+>  /* -------- API for Type1 VFIO IOMMU -------- */
+>  
+>  /**
+
 
