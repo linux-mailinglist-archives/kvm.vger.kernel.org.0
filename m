@@ -1,110 +1,102 @@
-Return-Path: <kvm+bounces-4079-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4080-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A78F980D2C8
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 17:52:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55E4E80D2E5
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 17:54:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2BC25B21309
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 16:52:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 108F9281ADD
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 16:54:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B3C84CDEB;
-	Mon, 11 Dec 2023 16:52:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FA664CDFE;
+	Mon, 11 Dec 2023 16:54:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wqqtfZuQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SB6X5S1s"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DABFABF
-	for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 08:51:56 -0800 (PST)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-40c339d2b88so33211735e9.3
-        for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 08:51:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702313515; x=1702918315; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NB+xTPLZXpkLiiKkOdT5pTm+XqCQmG6DDHrgwX5/f/k=;
-        b=wqqtfZuQp3MLDZCDlk1ofbmdfFLqYQ2c/HlKyue7dyjofw9+SCyaRNfjrUI44Fo1OS
-         rlmg/tHAAdppKacbFA4kjoDGZNbeZD86JuUhbhoFJYbAPwMDeWuZ5egIpjNmOABaSWB6
-         zEoyz1XaXK4c7VjVPXVcyoc9QpMuI29CFAIXvpHQR5ntnynj3TiYesT2J2bntL1GJ9G9
-         KZvN5E+zCTAFMO9+cPTbAn/i6eDd6bcF2Rl1m9k1W1EAw1jUzp/OyM4bXVGHitQcsxCB
-         Zv5wxYqgtV+QS8fVh9Y77y/4O5iyY1khyhoUkppABnLVtWd1ph9YAmjzR0Xmjk7AGgHT
-         ofww==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90EA9BF
+	for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 08:54:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702313642;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0TaQIjCMRtqoHv9s+WpKU6yUC9m6qOxRLwTnSkQyVwE=;
+	b=SB6X5S1skqHpMNLMJ2h3ZlCJvj6aYXWrCinhkYPfPoAod+dTkigTREAQwGL7ASo8ypRfrU
+	azqK4/fM3KC3Rj5SLqFSXcfzI0T9eGjU35rhymupnPZJXpzJVig7JpAkYdI4djTEAifHCq
+	g5eMAXvWmIvmQ57Xn4jP2Xgib/DG3Jo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-190-QhuxgtR1Pf6FQG5X5iqKfA-1; Mon, 11 Dec 2023 11:54:01 -0500
+X-MC-Unique: QhuxgtR1Pf6FQG5X5iqKfA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-332ee20a3f0so4162194f8f.0
+        for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 08:54:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702313515; x=1702918315;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NB+xTPLZXpkLiiKkOdT5pTm+XqCQmG6DDHrgwX5/f/k=;
-        b=cVTkURBpVBEgwUMNDt/a3N+wX4IR04ohe9675Yn8t+m8K+sQFf96IB5bZdlLNUo/mq
-         fn3mepyxO8UzMaA7r0U0K2QMOixAOd85iDIIwq1O2AAN/19AZ0W3jsoMEnna5jDL1X3I
-         9aJyPCAA77UIl0NjnDz6Feh/Q25rULDIsTxcNprkAgyidKPQN8HwqSrMSuo/BXSMB7fr
-         MW/Tl5ocmIH8hYw+Yx0PsnPWQOROpxxZPxfQ7jiEEqRp/fOKEZ5v8YnwRQI+RaS7DeIq
-         QjfiqsgZe1f/G0aOZpMvNMafI7a/hCCxZ2pzjRIdSmZFIKPOpAVZTjSNvkP5f3TVBgv4
-         2Kbg==
-X-Gm-Message-State: AOJu0YwAL+S9uqqHdhIVYQNcX0YqEi6WsTzbyc1Us7UPlXTk7b9rZD+/
-	T8KtvQLvDRnTc/zuhQtvrp4lVA==
-X-Google-Smtp-Source: AGHT+IG/E9r8AwAUQR/2cAquO/bnR2/jR44nUgtoXgw+QoC5FxbG37RGgw+QF5x6j6pxwjEQIS+UmA==
-X-Received: by 2002:a05:600c:444a:b0:40c:4857:e000 with SMTP id v10-20020a05600c444a00b0040c4857e000mr970778wmn.46.1702313515304;
-        Mon, 11 Dec 2023 08:51:55 -0800 (PST)
-Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id b16-20020a05600c4e1000b0040c310abc4bsm13905683wmq.43.2023.12.11.08.51.55
+        d=1e100.net; s=20230601; t=1702313640; x=1702918440;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0TaQIjCMRtqoHv9s+WpKU6yUC9m6qOxRLwTnSkQyVwE=;
+        b=syU8685vJ917tvJw9xkgudcaaR/3ukc9yHxgCbNrGH/bJsdW5jhkBNTkqQSA0xh7Hp
+         5DqoLUq3d7iiczcYeetT4LsDR5V1yCDpgW8u3svBTVax97Nq0DmO0pjhc+dGYilmdKs/
+         zIDerw/0/eb7WWNRSRTiU+6+zTRRhwCOLLeKST4vZzQ3ttKQKNbsX+yCmCf6t7h1XJ5h
+         RyU8lCTThu/jyRJO+FnXvNdD50NS0ck9r0YZU+CFz7abDtFwFXazhvBlPNoxRPyfdQgp
+         lPDkeWNvCYPQ9J8b4vQuGQUIo35OZy1JuYvxBffFEL73KLyGaPfc6saCBvwmQlU9e2jD
+         j1PA==
+X-Gm-Message-State: AOJu0Yz4BX3Byyultt+EkQyaoDVDd4O+0zZvpHntVHWNhgMITQR8/uuJ
+	AeLHNl8GWY+2x2TdD5B8s9I06KODB/m+cs2yZ/Vzt46YxtRRJT//vGujPOz1FDjXKiT2hw4IsWp
+	OB7TrFX07a76+
+X-Received: by 2002:a05:600c:450e:b0:40b:5f03:b3c8 with SMTP id t14-20020a05600c450e00b0040b5f03b3c8mr1125892wmo.234.1702313640114;
+        Mon, 11 Dec 2023 08:54:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFtiBxrV84vG/3P94lY/VLzXMvM+oAghyKtAHVVBITjmPRXIgn0MXg5y1PSG2jZcwLid9jfxg==
+X-Received: by 2002:a05:600c:450e:b0:40b:5f03:b3c8 with SMTP id t14-20020a05600c450e00b0040b5f03b3c8mr1125883wmo.234.1702313639719;
+        Mon, 11 Dec 2023 08:53:59 -0800 (PST)
+Received: from redhat.com ([2a06:c701:73ff:4f00:b091:120e:5537:ac67])
+        by smtp.gmail.com with ESMTPSA id k17-20020adfe8d1000000b00332fa6cc8acsm8943445wrn.87.2023.12.11.08.53.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 08:51:55 -0800 (PST)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 9E39E5FBC6;
-	Mon, 11 Dec 2023 16:51:54 +0000 (GMT)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org,  Jiaxun Yang <jiaxun.yang@flygoat.com>,  Radoslaw
- Biernacki <rad@semihalf.com>,  Paul Durrant <paul@xen.org>,  Akihiko Odaki
- <akihiko.odaki@daynix.com>,  Leif Lindholm <quic_llindhol@quicinc.com>,
-  Peter Maydell <peter.maydell@linaro.org>,  Paolo Bonzini
- <pbonzini@redhat.com>,  kvm@vger.kernel.org,  qemu-arm@nongnu.org,
-  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,  Beraldo Leal
- <bleal@redhat.com>,  Wainer dos Santos Moschetta <wainersm@redhat.com>,
-  Sriram Yagnaraman <sriram.yagnaraman@est.tech>,  Marcin Juszkiewicz
- <marcin.juszkiewicz@linaro.org>,  David Woodhouse <dwmw2@infradead.org>
-Subject: Re: [PATCH 01/10] tests/avocado: mips: fallback to HTTP given
- certificate expiration
-In-Reply-To: <20231208190911.102879-2-crosa@redhat.com> (Cleber Rosa's message
-	of "Fri, 8 Dec 2023 14:09:02 -0500")
-References: <20231208190911.102879-1-crosa@redhat.com>
-	<20231208190911.102879-2-crosa@redhat.com>
-User-Agent: mu4e 1.11.26; emacs 29.1
-Date: Mon, 11 Dec 2023 16:51:54 +0000
-Message-ID: <878r60fzrp.fsf@draig.linaro.org>
+        Mon, 11 Dec 2023 08:53:58 -0800 (PST)
+Date: Mon, 11 Dec 2023 11:53:56 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Tobias Huschle <huschle@linux.ibm.com>,
+	Abel Wu <wuyun.abel@bytedance.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
+ sched/fair: Add lag based placement)
+Message-ID: <20231211115329-mutt-send-email-mst@kernel.org>
+References: <20231122100016.GO8262@noisy.programming.kicks-ass.net>
+ <6564a012.c80a0220.adb78.f0e4SMTPIN_ADDED_BROKEN@mx.google.com>
+ <d4110c79-d64f-49bd-9f69-0a94369b5e86@bytedance.com>
+ <07513.123120701265800278@us-mta-474.us.mimecast.lan>
+ <20231207014626-mutt-send-email-mst@kernel.org>
+ <56082.123120804242300177@us-mta-137.us.mimecast.lan>
+ <20231208052150-mutt-send-email-mst@kernel.org>
+ <53044.123120806415900549@us-mta-342.us.mimecast.lan>
+ <20231209053443-mutt-send-email-mst@kernel.org>
+ <CACGkMEuSGT-e-i-8U7hum-N_xEnsEKL+_07Mipf6gMLFFhj2Aw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACGkMEuSGT-e-i-8U7hum-N_xEnsEKL+_07Mipf6gMLFFhj2Aw@mail.gmail.com>
 
-Cleber Rosa <crosa@redhat.com> writes:
+On Mon, Dec 11, 2023 at 03:26:46PM +0800, Jason Wang wrote:
+> > Try reducing the VHOST_NET_WEIGHT limit and see if that improves things any?
+> 
+> Or a dirty hack like cond_resched() in translate_desc().
 
-> The SSL certificate installed at mipsdistros.mips.com has expired:
->
->  0 s:CN =3D mipsdistros.mips.com
->  i:C =3D US, O =3D Amazon, OU =3D Server CA 1B, CN =3D Amazon
->  a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA256
->  v:NotBefore: Dec 23 00:00:00 2019 GMT; NotAfter: Jan 23 12:00:00 2021 GMT
->
-> Because this project has no control over that certificate and host,
-> this falls back to plain HTTP instead.  The integrity of the
-> downloaded files can be guaranteed by the existing hashes for those
-> files (which are not modified here).
->
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+what do you mean, exactly?
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+-- 
+MST
 
-
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
 
