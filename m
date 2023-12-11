@@ -1,88 +1,106 @@
-Return-Path: <kvm+bounces-4072-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4073-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A735880D126
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 17:24:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BF9C80D1C1
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 17:30:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 365ACB20E4F
-	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 16:24:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD0B61C21319
+	for <lists+kvm@lfdr.de>; Mon, 11 Dec 2023 16:30:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C46054CB28;
-	Mon, 11 Dec 2023 16:23:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2102207E;
+	Mon, 11 Dec 2023 16:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="BJK5ocSU"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="esS1RkJi"
 X-Original-To: kvm@vger.kernel.org
-X-Greylist: delayed 7044 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 11 Dec 2023 08:23:46 PST
-Received: from forwardcorp1c.mail.yandex.net (forwardcorp1c.mail.yandex.net [178.154.239.200])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAC53A9;
-	Mon, 11 Dec 2023 08:23:46 -0800 (PST)
-Received: from mail-nwsmtp-smtp-corp-main-26.myt.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-26.myt.yp-c.yandex.net [IPv6:2a02:6b8:c12:5329:0:640:5ed5:0])
-	by forwardcorp1c.mail.yandex.net (Yandex) with ESMTP id 3E4B160C91;
-	Mon, 11 Dec 2023 19:23:44 +0300 (MSK)
-Received: from kniv-nix.yandex-team.ru (unknown [2a02:6b8:b081:b718::1:2a])
-	by mail-nwsmtp-smtp-corp-main-26.myt.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id dNkT8A0IWuQ0-nnbTnYGE;
-	Mon, 11 Dec 2023 19:23:43 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; t=1702311823;
-	bh=eeCkrSB3uFHx+QRJXvlLlycFFlbNNEdrpOCWz+C0kpk=;
-	h=Message-Id:Date:In-Reply-To:Cc:Subject:References:To:From;
-	b=BJK5ocSUmwBAXUWxnxRxQ9ZaPvc9/tH0wvTRNftWfHKzpX0ZrG1oMhu0CncAWC4SE
-	 YqPLIYVe+91mVmsWIevlull4NeJhRrdaRu0yN+f5GJ4z4KGaJOwOsKJtae+RT1qah4
-	 q13RtR9UNj5Y0Fa6kBmupOJynNc94YylHEhnzGw4=
-Authentication-Results: mail-nwsmtp-smtp-corp-main-26.myt.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-From: Nikolay Kuratov <kniv@yandex-team.ru>
-To: linux-kernel@vger.kernel.org
-Cc: sgarzare@redhat.com,
-	netdev@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org,
-	Nikolay Kuratov <kniv@yandex-team.ru>
-Subject: [PATCH v2] vsock/virtio: Fix unsigned integer wrap around in virtio_transport_has_space()
-Date: Mon, 11 Dec 2023 19:23:17 +0300
-Message-Id: <20231211162317.4116625-1-kniv@yandex-team.ru>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <t6mnn7lyusvwt4knlxkgaajphhs6es5xr6hr7iixtwrfcljw67@foceocwkayk2>
-References: <t6mnn7lyusvwt4knlxkgaajphhs6es5xr6hr7iixtwrfcljw67@foceocwkayk2>
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0AD395
+	for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 08:30:09 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-3360be874d4so2694984f8f.3
+        for <kvm@vger.kernel.org>; Mon, 11 Dec 2023 08:30:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1702312208; x=1702917008; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lgQR+tJfnuE8VGMsbC6FBzjJNNEawrH+S2egV7A6WNM=;
+        b=esS1RkJiRREA1EzCVKaN5rAgK4+tjQyqi1hiPDxt31eL9Cq4Ee+w6jLjMQvHZ4Z+ZH
+         E5kwxRSLecPwyerAd7d8ZgkQlAHb1+GB2NZmyN28oVN9MDtbM/4DVR4azJAsGQPR9JvF
+         gNJDv5bFxppQz6H674utL7eOhPIVpk3lzrPaN3q0wbEDo9zTJXMcZ73LDmirgKNHmW8W
+         tXwA5mn4yEoDOWhJlzuRu6YvOOnym2vxKvNsJEzd76tL0ENpsIKkt7yHKrflCqaZFHce
+         9EBHtkdmBdKQHb7lsQqkjhUgaRGwnHkaciAGydXaT1C+6QWRg1HMKc88WJGzB+Emp6by
+         J17Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702312208; x=1702917008;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lgQR+tJfnuE8VGMsbC6FBzjJNNEawrH+S2egV7A6WNM=;
+        b=cCysfdgyMJS1xLIdaSCaNpDVAVedXKIjR+M9JK0aFMSqzRcymcTeHeujt3WxR/hbMs
+         AUdSWhskocY59AXlLwMZV7RGJD59YhF8hzJPEZjR6kQwVAAfvg7WGNp2YnydndgpS47b
+         qyhHc5MqSAdb1t3YIGay4HKu8gEkafGgjrQejiBjLfvoEKgOn8WF/zmbgwcQHn6JGeFX
+         adY1G0sKHUv/6aGDHD0BAdKEJa1ZeMCoVaVo6tuiSZkTB+ss0ERL8f+IyMu9L0Kamup+
+         GmV8O2es25SnZcTjs++JVm8a1R8d0oug+azwEmIVgaPE/KTjNt0zzCz0pqcFe9/RY0Mo
+         HkBA==
+X-Gm-Message-State: AOJu0YzbckURTuEvT58qdD5b+ms9LByLscszDQ6se8uPd/TaBbWUDLt7
+	IPmO06PlUbh7YNepAsyJ3mEO+A==
+X-Google-Smtp-Source: AGHT+IFF9z/AOavNKv+0kQtxOnDAqtkj0yCuOY2JfT0TH7m9BaUGBEvIuEABRk5HwMgaIUjH3vYADw==
+X-Received: by 2002:a5d:6685:0:b0:333:2fd2:51e5 with SMTP id l5-20020a5d6685000000b003332fd251e5mr2649904wru.94.1702312208133;
+        Mon, 11 Dec 2023 08:30:08 -0800 (PST)
+Received: from [192.168.69.100] (cor91-h02-176-184-30-150.dsl.sta.abo.bbox.fr. [176.184.30.150])
+        by smtp.gmail.com with ESMTPSA id w7-20020a5d6807000000b0033334625bdbsm8962950wru.13.2023.12.11.08.30.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Dec 2023 08:30:07 -0800 (PST)
+Message-ID: <bfa79c34-629b-474d-ba38-d73af157e25c@linaro.org>
+Date: Mon, 11 Dec 2023 17:30:04 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 05/10] tests/avocado: use more distinct names for assets
+Content-Language: en-US
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Radoslaw Biernacki <rad@semihalf.com>, Paul Durrant <paul@xen.org>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>,
+ Leif Lindholm <quic_llindhol@quicinc.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
+ <alex.bennee@linaro.org>, kvm@vger.kernel.org, qemu-arm@nongnu.org,
+ Beraldo Leal <bleal@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Sriram Yagnaraman <sriram.yagnaraman@est.tech>,
+ Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
+ David Woodhouse <dwmw2@infradead.org>
+References: <20231208190911.102879-1-crosa@redhat.com>
+ <20231208190911.102879-6-crosa@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20231208190911.102879-6-crosa@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-We need to do signed arithmetic if we expect condition
-`if (bytes < 0)` to be possible
+On 8/12/23 20:09, Cleber Rosa wrote:
+> Avocado's asset system will deposit files in a cache organized either
+> by their original location (the URI) or by their names.  Because the
+> cache (and the "by_name" sub directory) is common across tests, it's a
+> good idea to make these names as distinct as possible.
+> 
+> This avoid name clashes, which makes future Avocado runs to attempt to
+> redownload the assets with the same name, but from the different
+> locations they actually are from.  This causes cache misses, extra
+> downloads, and possibly canceled tests.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE
+Could it be clever to use the content hash for asset location?
 
-Fixes: 06a8fc78367d ("VSOCK: Introduce virtio_vsock_common.ko")
-Signed-off-by: Nikolay Kuratov <kniv@yandex-team.ru>
----
-
-V1 -> V2: Added Fixes section
-
- net/vmw_vsock/virtio_transport_common.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index c8e162c9d1df..6df246b53260 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -843,7 +843,7 @@ static s64 virtio_transport_has_space(struct vsock_sock *vsk)
- 	struct virtio_vsock_sock *vvs = vsk->trans;
- 	s64 bytes;
- 
--	bytes = vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
-+	bytes = (s64)vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
- 	if (bytes < 0)
- 		bytes = 0;
- 
--- 
-2.34.1
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>   tests/avocado/kvm_xen_guest.py  | 3 ++-
+>   tests/avocado/netdev-ethtool.py | 3 ++-
+>   2 files changed, 4 insertions(+), 2 deletions(-)
 
 
