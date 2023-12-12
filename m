@@ -1,251 +1,129 @@
-Return-Path: <kvm+bounces-4260-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4265-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA6A980F85C
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 21:49:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4A4380F932
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 22:25:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F7471C20A8C
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 20:49:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 120411C20D64
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 21:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F85F65A70;
-	Tue, 12 Dec 2023 20:48:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5E764150;
+	Tue, 12 Dec 2023 21:25:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yUA+G3z7"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GBd1BqW8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63109211F
-	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 12:47:52 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5e20c9c4080so11332107b3.3
-        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 12:47:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702414071; x=1703018871; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9b8Rem1AmPjfYzBNcLPCGf0Ya+tJ/F2me7CGYJ1U7yY=;
-        b=yUA+G3z7D9ewA7kk8Dj883hsjAJfjykoePzI01xOmdxe4tCxT4x+wG4cCLW2kAsBP6
-         mNEKqhK1Ue5tt0sd2wrRQKvJGkJ+3XtIKdjNYmZERe9abuyCyWR2K7cpPRYP1EwdbXYI
-         YZYczvg49rClwUzXxVXCWSHBqPzngwYLDaneTyuaVgAGKCZdaqzPbQKAD2XKTCpoZv4l
-         VzODXpZUGHDDPmgurdSJUrbOJuzvPDVl2yUaDGhm9+T8lFnK7+RwUQLdfQi5motCyXBQ
-         KFk1WB/o1hsOHQBaCRYeYosPA8cImlfQCVUtykOzQxYEvrUNlBJbOx2EHdgABigCU9et
-         cdcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702414071; x=1703018871;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9b8Rem1AmPjfYzBNcLPCGf0Ya+tJ/F2me7CGYJ1U7yY=;
-        b=KiGI2s8a8KBZdGDUQghbJlD9/4SQIcBB+dronE+Nn9u1M35bdIeRy7ZuS4C3WtSEkR
-         ch6llyPCAa/xOAr7UaQOB7P5qPSmvhLVgJY6Pqn2XI8szBlwWUIOGwBUV+/8gmoXvMvt
-         tRwx+TOBrkiz8fZy7VAQP3CY0MdY1jU7NLs+QyVbLk05OdQMcXTlvS2nFwG6u3zvFP++
-         b+pEm8QH75749WEZh21x1KgcTHyuUzvRpQNcEaobLVeT+z23UgCPXIjKE/lll8rVwlLO
-         DaM9E+6F7WsybqpVNtxyyuutxKbViGlR810ZlO6gOo157E10onhx0srQIqs/JZ32V67V
-         o2YQ==
-X-Gm-Message-State: AOJu0Yxk1y2YQQQchxSu32Y919pyDY4ijVgktco2G8QbNG21U/aUvsr9
-	mDkkzdFCipMcChSRN0h+fvmK/o3ikQ==
-X-Google-Smtp-Source: AGHT+IFxV+KrDYmcwmn1PDxvzNdlpDP4pWeOD1xeuiQDvWiuL5pZVy4R12KnOvAQ3fLYUpwzgPkXIIMt+Q==
-X-Received: from sagi.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:241b])
- (user=sagis job=sendgmr) by 2002:a05:690c:891:b0:5d8:eec5:f57c with SMTP id
- cd17-20020a05690c089100b005d8eec5f57cmr64746ywb.4.1702414070805; Tue, 12 Dec
- 2023 12:47:50 -0800 (PST)
-Date: Tue, 12 Dec 2023 12:46:44 -0800
-In-Reply-To: <20231212204647.2170650-1-sagis@google.com>
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4A91B9;
+	Tue, 12 Dec 2023 13:25:29 -0800 (PST)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BCK2Tp1030525;
+	Tue, 12 Dec 2023 21:25:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=CEaMm5o6vNTyRxNK2pqMXNNjXA1BgQFDyA+wtWmQ9Rk=;
+ b=GBd1BqW8qTW7XX4yhod3BE8asiY75t1mD95R4t3Xk7SKm9961EFKM32dGIUFUio6m4zj
+ 9973V4W2VyjXhZy/fkhASbTTlU+pgNx+D8ORDNQXkM5hu6y/RUPkcqHD11X8SbeS/iv3
+ Alm9YHvtMAh38kjEnU6h0nlrdcrZsW7boV/elyJ/Vo3p/q/5sTnm35EvwOyjEJd2WfYA
+ VqcRV7C1BQVlt5BiNlbotoJVvTNhn0RAjs8hexixaerIxjB6EgaLg9kphAG9BMEuPwt6
+ gQMWfrblDnJuVsjCEKhtYaTCjNbvptAgYxdiP6+O9nTxXvjVMQu2Pm0wmtA/uv6f5kSM 3A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uxx6usyn4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Dec 2023 21:25:27 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BCLCZ8R016814;
+	Tue, 12 Dec 2023 21:25:27 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uxx6usymr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Dec 2023 21:25:27 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BCJ37xe012599;
+	Tue, 12 Dec 2023 21:25:26 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uw3jnv48p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Dec 2023 21:25:26 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BCLPOOK18219554
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 12 Dec 2023 21:25:25 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8F0F658067;
+	Tue, 12 Dec 2023 21:25:24 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AFFFC5805D;
+	Tue, 12 Dec 2023 21:25:23 +0000 (GMT)
+Received: from li-2c1e724c-2c76-11b2-a85c-ae42eaf3cb3d.ibm.com.com (unknown [9.61.187.43])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 12 Dec 2023 21:25:23 +0000 (GMT)
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+To: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc: jjherne@linux.ibm.com, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        pbonzini@redhat.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com
+Subject: [PATCH v2 0/6] s390/vfio-ap: reset queues removed from guest's AP configuration
+Date: Tue, 12 Dec 2023 16:25:11 -0500
+Message-ID: <20231212212522.307893-1-akrowiak@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231212204647.2170650-1-sagis@google.com>
-X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231212204647.2170650-30-sagis@google.com>
-Subject: [RFC PATCH v5 29/29] KVM: selftests: TDX: Add TDX UPM selftests for
- implicit conversion
-From: Sagi Shahar <sagis@google.com>
-To: linux-kselftest@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>, 
-	Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>, 
-	Sagi Shahar <sagis@google.com>, Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Peter Gonda <pgonda@google.com>, Haibo Xu <haibo1.xu@intel.com>, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Vishal Annapurve <vannapurve@google.com>, 
-	Roger Wang <runanwang@google.com>, Vipin Sharma <vipinsh@google.com>, jmattson@google.com, 
-	dmatlack@google.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: WglTkjzc_-8NoLq5n3wnfWMofzrG3NS_
+X-Proofpoint-ORIG-GUID: 5St5TEpbrv5nTB6NOmNWczhYowmjq_vf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-12_12,2023-12-12_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ spamscore=0 adultscore=0 bulkscore=0 phishscore=0 impostorscore=0
+ mlxlogscore=999 lowpriorityscore=0 malwarescore=0 priorityscore=1501
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312120165
 
-From: Ackerley Tng <ackerleytng@google.com>
+All queues removed from a guest's AP configuration must be reset so when
+they are subsequently made available again to a guest, they re-appear in a
+reset state. There are some scenarios where this is not the case. For 
+example, if a queue device that is passed through to a guest is unbound 
+from the vfio_ap device driver, the adapter to which the queue is attached
+will be removed from the guest's AP configuration. Doing so implicitly
+removes all queues associated with that adapter because the AP architecture
+precludes removing a single queue. Those queues also need to be reset.
 
-This tests the use of guest memory without explicit MapGPA calls.
+This patch series ensures that all queues removed from a guest's AP
+configuration are reset for all possible scenarios.
 
-Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-Signed-off-by: Ryan Afranji <afranji@google.com>
-Signed-off-by: Sagi Shahar <sagis@google.com>
----
- .../selftests/kvm/x86_64/tdx_upm_test.c       | 86 +++++++++++++++++--
- 1 file changed, 77 insertions(+), 9 deletions(-)
+Changelog v1=> v2:
+-----------------
+* Restored Halil's Acked-by and Reviewed-by tags (Halil)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/tdx_upm_test.c b/tools/testing/selftests/kvm/x86_64/tdx_upm_test.c
-index 44671874a4f1..bfa921f125a0 100644
---- a/tools/testing/selftests/kvm/x86_64/tdx_upm_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/tdx_upm_test.c
-@@ -149,7 +149,7 @@ enum {
-  * Does vcpu_run, and also manages memory conversions if requested by the TD.
-  */
- void vcpu_run_and_manage_memory_conversions(struct kvm_vm *vm,
--					    struct kvm_vcpu *vcpu)
-+					    struct kvm_vcpu *vcpu, bool handle_conversions)
- {
- 	for (;;) {
- 		vcpu_run(vcpu);
-@@ -163,6 +163,13 @@ void vcpu_run_and_manage_memory_conversions(struct kvm_vm *vm,
- 				!(vm->arch.s_bit & vmcall_info->in_r12));
- 			vmcall_info->status_code = 0;
- 			continue;
-+		} else if (handle_conversions &&
-+			vcpu->run->exit_reason == KVM_EXIT_MEMORY_FAULT) {
-+			handle_memory_conversion(
-+				vm, vcpu->run->memory_fault.gpa,
-+				vcpu->run->memory_fault.size,
-+				vcpu->run->memory_fault.flags == KVM_MEMORY_EXIT_FLAG_PRIVATE);
-+			continue;
- 		} else if (
- 			vcpu->run->exit_reason == KVM_EXIT_IO &&
- 			vcpu->run->io.port == TDX_UPM_TEST_ACCEPT_PRINT_PORT) {
-@@ -243,8 +250,53 @@ static void guest_upm_explicit(void)
- 	tdx_test_success();
- }
- 
-+static void guest_upm_implicit(void)
-+{
-+	struct tdx_upm_test_area *test_area_gva_private =
-+		(struct tdx_upm_test_area *)TDX_UPM_TEST_AREA_GVA_PRIVATE;
-+	struct tdx_upm_test_area *test_area_gva_shared =
-+		(struct tdx_upm_test_area *)TDX_UPM_TEST_AREA_GVA_SHARED;
-+
-+	/* Check: host reading private memory does not modify guest's view */
-+	fill_test_area(test_area_gva_private, PATTERN_GUEST_GENERAL);
-+
-+	tdx_test_report_to_user_space(SYNC_CHECK_READ_PRIVATE_MEMORY_FROM_HOST);
-+
-+	TDX_UPM_TEST_ASSERT(
-+		check_test_area(test_area_gva_private, PATTERN_GUEST_GENERAL));
-+
-+	/* Use focus area as shared */
-+	fill_focus_area(test_area_gva_shared, PATTERN_GUEST_FOCUS);
-+
-+	/* General areas should not be affected */
-+	TDX_UPM_TEST_ASSERT(
-+		check_general_areas(test_area_gva_private, PATTERN_GUEST_GENERAL));
-+
-+	tdx_test_report_to_user_space(SYNC_CHECK_READ_SHARED_MEMORY_FROM_HOST);
-+
-+	/* Check that guest has the same view of shared memory */
-+	TDX_UPM_TEST_ASSERT(
-+		check_focus_area(test_area_gva_shared, PATTERN_HOST_FOCUS));
-+
-+	/* Use focus area as private */
-+	fill_focus_area(test_area_gva_private, PATTERN_GUEST_FOCUS);
-+
-+	/* General areas should be unaffected by remapping */
-+	TDX_UPM_TEST_ASSERT(
-+		check_general_areas(test_area_gva_private, PATTERN_GUEST_GENERAL));
-+
-+	tdx_test_report_to_user_space(SYNC_CHECK_READ_PRIVATE_MEMORY_FROM_HOST_AGAIN);
-+
-+	/* Check that guest can use private memory after focus area is remapped as private */
-+	TDX_UPM_TEST_ASSERT(
-+		fill_and_check(test_area_gva_private, PATTERN_GUEST_GENERAL));
-+
-+	tdx_test_success();
-+}
-+
- static void run_selftest(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
--			 struct tdx_upm_test_area *test_area_base_hva)
-+			 struct tdx_upm_test_area *test_area_base_hva,
-+			 bool implicit)
- {
- 	vcpu_run(vcpu);
- 	TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-@@ -263,7 +315,7 @@ static void run_selftest(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
- 	TEST_ASSERT(check_test_area(test_area_base_hva, PATTERN_CONFIDENCE_CHECK),
- 		"Host should read PATTERN_CONFIDENCE_CHECK from guest's private memory.");
- 
--	vcpu_run_and_manage_memory_conversions(vm, vcpu);
-+	vcpu_run_and_manage_memory_conversions(vm, vcpu, implicit);
- 	TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
- 	TDX_TEST_ASSERT_IO(vcpu, TDX_TEST_REPORT_PORT, TDX_TEST_REPORT_SIZE,
- 		 TDG_VP_VMCALL_INSTRUCTION_IO_WRITE);
-@@ -280,7 +332,7 @@ static void run_selftest(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
- 	TEST_ASSERT(check_focus_area(test_area_base_hva, PATTERN_HOST_FOCUS),
- 		    "Host should be able to use shared memory.");
- 
--	vcpu_run_and_manage_memory_conversions(vm, vcpu);
-+	vcpu_run_and_manage_memory_conversions(vm, vcpu, implicit);
- 	TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
- 	TDX_TEST_ASSERT_IO(vcpu, TDX_TEST_REPORT_PORT, TDX_TEST_REPORT_SIZE,
- 		 TDG_VP_VMCALL_INSTRUCTION_IO_WRITE);
-@@ -329,18 +381,20 @@ static void guest_ve_handler(struct ex_regs *regs)
- 	TDX_UPM_TEST_ASSERT(!ret);
- }
- 
--static void verify_upm_test(void)
-+static void verify_upm_test(bool implicit)
- {
- 	struct kvm_vm *vm;
- 	struct kvm_vcpu *vcpu;
- 
-+	void *guest_code;
- 	vm_vaddr_t test_area_gva_private;
- 	struct tdx_upm_test_area *test_area_base_hva;
- 	uint64_t test_area_npages;
- 
- 	vm = td_create();
- 	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
--	vcpu = td_vcpu_add(vm, 0, guest_upm_explicit);
-+	guest_code = implicit ? guest_upm_implicit : guest_upm_explicit;
-+	vcpu = td_vcpu_add(vm, 0, guest_code);
- 
- 	vm_install_exception_handler(vm, VE_VECTOR, guest_ve_handler);
- 
-@@ -379,13 +433,26 @@ static void verify_upm_test(void)
- 
- 	td_finalize(vm);
- 
--	printf("Verifying UPM functionality: explicit MapGPA\n");
-+	if (implicit)
-+		printf("Verifying UPM functionality: implicit conversion\n");
-+	else
-+		printf("Verifying UPM functionality: explicit MapGPA\n");
- 
--	run_selftest(vm, vcpu, test_area_base_hva);
-+	run_selftest(vm, vcpu, test_area_base_hva, implicit);
- 
- 	kvm_vm_free(vm);
- }
- 
-+void verify_upm_test_explicit(void)
-+{
-+	verify_upm_test(false);
-+}
-+
-+void verify_upm_test_implicit(void)
-+{
-+	verify_upm_test(true);
-+}
-+
- int main(int argc, char **argv)
- {
- 	/* Disable stdout buffering */
-@@ -397,5 +464,6 @@ int main(int argc, char **argv)
- 		return 0;
- 	}
- 
--	run_in_new_process(&verify_upm_test);
-+	run_in_new_process(&verify_upm_test_explicit);
-+	run_in_new_process(&verify_upm_test_implicit);
- }
+* Restored Halil's code refactor of reset_queues_for_apids function in 
+  patch 4
+
+Tony Krowiak (6):
+  s390/vfio-ap: always filter entire AP matrix
+  s390/vfio-ap: loop over the shadow APCB when filtering guest's AP
+    configuration
+  s390/vfio-ap: let 'on_scan_complete' callback filter matrix and update
+    guest's APCB
+  s390/vfio-ap: reset queues filtered from the guest's AP config
+  s390/vfio-ap: reset queues associated with adapter for queue unbound
+    from driver
+  s390/vfio-ap: do not reset queue removed from host config
+
+ drivers/s390/crypto/vfio_ap_ops.c     | 268 +++++++++++++++++---------
+ drivers/s390/crypto/vfio_ap_private.h |  11 +-
+ 2 files changed, 184 insertions(+), 95 deletions(-)
+
 -- 
-2.43.0.472.g3155946c3a-goog
+2.43.0
 
 
