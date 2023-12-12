@@ -1,77 +1,54 @@
-Return-Path: <kvm+bounces-4217-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4218-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE42780F454
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 18:21:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F021C80F46D
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 18:21:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF5BA1C20D21
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 17:21:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABA2128282B
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 17:21:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA61D7D88C;
-	Tue, 12 Dec 2023 17:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 942647D891;
+	Tue, 12 Dec 2023 17:21:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="quWq7NFA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dS4NWFWM"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAF37B3D9;
-	Tue, 12 Dec 2023 17:21:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 955A4C433C9;
-	Tue, 12 Dec 2023 17:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBBD7B3CC;
+	Tue, 12 Dec 2023 17:21:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F6EFC433D9;
+	Tue, 12 Dec 2023 17:21:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702401677;
-	bh=NjEv9qEr/oYVM+wHeeNDWCRv65KfnIhhpX8bgvPrnAA=;
+	s=k20201202; t=1702401709;
+	bh=6YhYaM20GOsMdc8Rc2Fzhf1uOeyj3UQk4B0AXX9Ihmg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=quWq7NFAtXTBXufHjGAQPZuAXrlWxIJ4Rn3ITaI13bZesQeatjNFR7raywE3BfBn7
-	 Pitan+DMqBcCL58QZwCgz3Lh/6jidDw46o+sSHdw2XNETPNFha4R9ntZwxgldpxfvd
-	 ThUunTfPwVTXTNhOAsJ9W9/N6z4PG1M3beyPew54n2U5AZrjlyDMmXs2L7Toa+G5kj
-	 jyTED6ks2sSuPvCG+6dEMiYHKakPG+EvMGSSnpSABMjq1R1ugTLDeB0n3JnFi9LuSS
-	 cUuBfE0LIKezRTEQ8AUTFsdnAhfeVJygPdgHWAaZ27aCb30nqIqsyQPesJMXA3vzFc
-	 vN+/g3oSMdIBg==
+	b=dS4NWFWMEHgzREWxWKBFj9rk19fcouhWvSkakRNe8hzRVRCBQuceUS5Up9m96KetH
+	 WFKwF+0JemkvA2gEXJmwBNgrpJHq+fo0vCe4cCBSFdzg+atzZVkOkqaMy7TVq8XRTg
+	 qB+n5IqGaHJDkNp/tX/Oru0HZpv9gUuJJLtlWFxJAuowjuz7NIhpH0BorrfpFpTD0q
+	 DhQ1udij026w9OKig7NQJu4oDIJWfoY6wxgioMsq2QTWy7ZdTIKXy5gmI1scZ54ka9
+	 QvW8B0r82vg7FWoRP2fhTq2ZH7BZfdKmzWmkJgfxvd3r2IPUVZPdZj0sjlzxviQ27F
+	 Mb7QA48DmU0YA==
 From: Will Deacon <will@kernel.org>
-To: anshuman.khandual@arm.com,
-	mark.rutland@arm.com,
-	linux-arm-kernel@lists.infradead.org,
-	James Clark <james.clark@arm.com>,
-	suzuki.poulose@arm.com,
-	linux-perf-users@vger.kernel.org
+To: Zhangfei Gao <zhangfei.gao@linaro.org>,
+	jean-philippe <jean-philippe@linaro.org>,
+	Joerg Roedel <joro@8bytes.org>,
+	Jason Gunthorpe <jgg@nvidia.com>
 Cc: catalin.marinas@arm.com,
 	kernel-team@android.com,
 	Will Deacon <will@kernel.org>,
-	Zaid Al-Bassam <zalbassam@google.com>,
-	linux-kselftest@vger.kernel.org,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	namhyung@gmail.com,
-	Jonathan Corbet <corbet@lwn.net>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Shuah Khan <shuah@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	kvmarm@lists.linux.dev,
-	linux-doc@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Ian Rogers <irogers@google.com>,
-	linux-kernel@vger.kernel.org,
-	Adrian Hunter <adrian.hunter@intel.com>,
+	iommu@lists.linux.dev,
 	kvm@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>
-Subject: Re: [PATCH v7 00/11] arm64: perf: Add support for event counting threshold
-Date: Tue, 12 Dec 2023 17:20:53 +0000
-Message-Id: <170237438420.1648654.4727808470285684911.b4-ty@kernel.org>
+	Wenkai Lin <linwenkai6@hisilicon.com>
+Subject: Re: [PATCH] iommu/arm-smmu-v3: disable stall for quiet_cd
+Date: Tue, 12 Dec 2023 17:21:01 +0000
+Message-Id: <170238473311.3099166.16078152394414654471.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20231211161331.1277825-1-james.clark@arm.com>
-References: <20231211161331.1277825-1-james.clark@arm.com>
+In-Reply-To: <20231206005727.46150-1-zhangfei.gao@linaro.org>
+References: <20231206005727.46150-1-zhangfei.gao@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,44 +58,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-On Mon, 11 Dec 2023 16:13:12 +0000, James Clark wrote:
-> Changes since v6:
+On Wed, 6 Dec 2023 08:57:27 +0800, Zhangfei Gao wrote:
+> From: Wenkai Lin <linwenkai6@hisilicon.com>
 > 
->   * Remove inlines from arm_pmuv3.c
->   * Use format attribute mechanism from SPE
->   * Re-arrange attributes so that threshold comes last and can
->     potentially be extended
->   * Emit an error if the max threshold is exceeded rather than clamping
->   * Convert all register fields to GENMASK
+> In the stall model, invalid transactions were expected to be
+> stalled and aborted by the IOPF handler.
+> 
+> However, when killing a test case with a huge amount of data, the
+> accelerator streamline can not stop until all data is consumed
+> even if the page fault handler reports errors. As a result, the
+> kill may take a long time, about 10 seconds with numerous iopf
+> interrupts.
 > 
 > [...]
 
-Thanks for respinning, James. This looks really good now.
+Applied to will (for-joerg/arm-smmu/updates), thanks!
 
-Applied to will (for-next/perf), thanks!
-
-[01/11] arm: perf: Remove inlines from arm_pmuv3.c
-        https://git.kernel.org/will/c/9343c790e6de
-[02/11] arm: perf/kvm: Use GENMASK for ARMV8_PMU_PMCR_N
-        https://git.kernel.org/will/c/62e1f212e5fe
-[03/11] arm: perf: Use GENMASK for PMMIR fields
-        https://git.kernel.org/will/c/2f6a00f30600
-[04/11] arm: perf: Convert remaining fields to use GENMASK
-        https://git.kernel.org/will/c/d30f09b6d7de
-[05/11] arm64: perf: Include threshold control fields in PMEVTYPER mask
-        https://git.kernel.org/will/c/3115ee021bfb
-[06/11] arm: pmu: Share user ABI format mechanism with SPE
-        https://git.kernel.org/will/c/f6da86969a3c
-[07/11] perf/arm_dmc620: Remove duplicate format attribute #defines
-        https://git.kernel.org/will/c/a5f4ca68f348
-[08/11] KVM: selftests: aarch64: Update tools copy of arm_pmuv3.h
-        https://git.kernel.org/will/c/c7b98bf0fc79
-[09/11] arm: pmu: Move error message and -EOPNOTSUPP to individual PMUs
-        https://git.kernel.org/will/c/186c91aaf549
-[10/11] arm64: perf: Add support for event counting threshold
-        https://git.kernel.org/will/c/816c26754447
-[11/11] Documentation: arm64: Document the PMU event counting threshold feature
-        https://git.kernel.org/will/c/bd690638e2c2
+[1/1] iommu/arm-smmu-v3: disable stall for quiet_cd
+      https://git.kernel.org/will/c/b41932f54458
 
 Cheers,
 -- 
