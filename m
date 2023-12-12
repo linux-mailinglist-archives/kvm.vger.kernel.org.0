@@ -1,90 +1,108 @@
-Return-Path: <kvm+bounces-4192-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4193-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6893F80F10A
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 16:31:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 171E380F10D
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 16:31:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EB9D1F210EA
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 15:31:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AE6E1C20A04
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 15:31:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B61D76DD1;
-	Tue, 12 Dec 2023 15:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 793C177625;
+	Tue, 12 Dec 2023 15:29:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P4/xKCDu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BkYDT2p7"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8326975434;
-	Tue, 12 Dec 2023 15:28:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62BA5C433C7;
-	Tue, 12 Dec 2023 15:28:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702394938;
-	bh=LsaHooPiHp3ndDNeL8g52+UULWStSBHK+38Nz9ZVSvI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=P4/xKCDuc0UnUpX5qanZAo4sH/mPS4+0zf1vaulKbDZIW0Sv9PQ2cDn0d0uXo/edy
-	 PwoW46GPHh9eFXbwsYIJrJe1kb4/NzaXnF9Rl+9cqQrH8Dp23LYudv8fgNxuVn69/R
-	 6sVwb7fKYJpxDvFt9E7wK3jkWNG7bVMpxPsh3UsgxqPEw0vYip33Bck1OZBijJGbTM
-	 C6gUWQ8xETxZHS0T3hZE20rdXpyd4RbKLu9kbvQ9UDyOn84RX+NOg+eGin8BFWRJHb
-	 bK17BhYxPbRSuylhukcAUw1wUnrg37HZJWHNab0t8f0/DB+OSvlVHl+CpWO7KO5Md8
-	 0qvn1DYufL4IA==
-Date: Tue, 12 Dec 2023 15:28:53 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: selftests: Ensure sysreg-defs.h is generated at the
- expected path
-Message-ID: <51c74e67-99f9-4a6a-b57f-867e7c9f2ee3@sirena.org.uk>
-References: <20231212070431.145544-2-oliver.upton@linux.dev>
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C1C7D5D
+	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 07:28:57 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-db53919e062so6600437276.0
+        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 07:28:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702394936; x=1702999736; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ESTPXNxaOVzfRXXRx0Fvol8yzry2uxBEEuLKqef2q4U=;
+        b=BkYDT2p7AZjoPKT1n33qcBzraBObsSid1Kav0bwVkxm03TEVNC9zjkvdoIvsP0gO75
+         moN91EoItYKY7bE8DYrJiANZQGFCmkf5HIebed+p+oequNpXhL+YOR4EpL4dpgIKSQ5Q
+         rdxafRPM1EMvN39DPwz196VoqroHUedjHpsNgY60Ny4L70huLqKg9p0/ZqM3NMyNGdm6
+         B2u/IQXRbgTONYPciifuv1nD9dRK0KUIoy1No1oaQwluBNg6Ll9BXgX2qVuEIV52N94P
+         uqorvgEZE7Y9ffnxMRIbnnF1PGv2zPAMLd+YB1lWZuWINHkNV+Y+C0LRq892mFgzBrA5
+         /IwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702394936; x=1702999736;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ESTPXNxaOVzfRXXRx0Fvol8yzry2uxBEEuLKqef2q4U=;
+        b=RvEHk2I5GfFvQ4wnpDgnB0Dhw0fT9WFeLYgeL9x31ed/WOSr7pEOsfQ2PiqS1foVqF
+         zyl+iwjH7YXwnwwolzHSgKjyZbs3mfC/ckICVIugmtcSHNC9y8ubIDanHm0HX9dXOzUA
+         d0bKoTJ8msjZUof9R0LXWty7Y9KPJKaTR2DklDxNMOrxn4dcSPL90lO1xSYI0mY19zQa
+         z8WGRAhx/x6T8M1gqup64Wjkyk0JNWQtB1PhT2y72ohb+//CFO9oYBI9unVTETN9GheL
+         07en8SuezjerCyf54ke52IrazyjgHtnue9ksjHl+sssDN1KkE/hWDOpcKJajkfz04rkz
+         j5Mw==
+X-Gm-Message-State: AOJu0YwVpplGUGdk7K7nVQuPkd4ffnNYWPU4QWypoxQ1l37RMxv1D3BR
+	c+ncGzztNcPP8kRYar3cssw0XhjMo4E=
+X-Google-Smtp-Source: AGHT+IHBX6jt6VDhWuABWGol0Nx+Ii84S8r8nT9g/gNamSIHnZwQhzhs+bFmpCR2BuKO/hKALNdpvESE74w=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:db94:0:b0:db4:7ac:fea6 with SMTP id
+ g142-20020a25db94000000b00db407acfea6mr41805ybf.7.1702394935890; Tue, 12 Dec
+ 2023 07:28:55 -0800 (PST)
+Date: Tue, 12 Dec 2023 07:28:54 -0800
+In-Reply-To: <CALMp9eTT97oDmQT7pxeOMLQbt-371aMtC2Kev+-kWXVRDVrjeg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="yaDGDH+hjRObKyJL"
-Content-Disposition: inline
-In-Reply-To: <20231212070431.145544-2-oliver.upton@linux.dev>
-X-Cookie: If rash develops, discontinue use.
+Mime-Version: 1.0
+References: <20220921003201.1441511-11-seanjc@google.com> <20231207010302.2240506-1-jmattson@google.com>
+ <ZXHw7tykubfG04Um@google.com> <CALMp9eTT97oDmQT7pxeOMLQbt-371aMtC2Kev+-kWXVRDVrjeg@mail.gmail.com>
+Message-ID: <ZXh8Nq_y_szj1WN0@google.com>
+Subject: Re: [PATCH v4 10/12] KVM: x86: never write to memory from kvm_vcpu_check_block()
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: alexandru.elisei@arm.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
+	atishp@atishpatra.org, borntraeger@linux.ibm.com, chenhuacai@kernel.org, 
+	david@redhat.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, 
+	james.morse@arm.com, kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, mlevitsk@redhat.com, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, paul.walmsley@sifive.com, 
+	pbonzini@redhat.com, suzuki.poulose@arm.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Sun, Dec 10, 2023, Jim Mattson wrote:
+> On Thu, Dec 7, 2023 at 8:21=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
+> > Doh.  We got the less obvious cases and missed the obvious one.
+> >
+> > Ugh, and we also missed a related mess in kvm_guest_apic_has_interrupt(=
+).  That
+> > thing should really be folded into vmx_has_nested_events().
+> >
+> > Good gravy.  And vmx_interrupt_blocked() does the wrong thing because t=
+hat
+> > specifically checks if L1 interrupts are blocked.
+> >
+> > Compile tested only, and definitely needs to be chunked into multiple p=
+atches,
+> > but I think something like this mess?
+>=20
+> The proposed patch does not fix the problem. In fact, it messes things
+> up so much that I don't get any test results back.
 
---yaDGDH+hjRObKyJL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Drat.
 
-On Tue, Dec 12, 2023 at 07:04:32AM +0000, Oliver Upton wrote:
-> Building the KVM selftests from the main selftests Makefile (as opposed
-> to the kvm subdirectory) doesn't work as OUTPUT is set, forcing the
-> generated header to spill into the selftests directory. Additionally,
-> relative paths do not work when building outside of the srctree, as the
-> canonical selftests path is replaced with 'kselftest' in the output.
+> Google has an internal K-U-T test that demonstrates the problem. I
+> will post it soon.
 
-Tested-by: Mark Brown <broonie@kernel.org>
-
-Hopefully we can get this to Linus' tree quickly!
-
---yaDGDH+hjRObKyJL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmV4fDQACgkQJNaLcl1U
-h9BeiAf/et+vzxfbUp/hiT2qx7WbdTszCOWf2wmxQZUvJYXPtwcS1/x1DB4PJnRD
-3VjnVblQIuDCpdmqTEHVQvpWS0a8DKv1Mc9d4C3JWteq1NmCkPXJCOHIM1YpiMLU
-nSDk/Zz4ZqJ3lnY0JPmcxVWD2LjBgDBJg/G96yX3Lw95/q7wmqfaBtDLbujYFRXe
-360nPOiaEi3XAayBTz59EzEuy/5p1n87aIIGhu49aw32m9F3na7HyZQsN4LFXq5T
-tlCED9LsFHzF4tZQo805W2kzTcMuVrxgorgKmLYFTTniv8rXpZLb3MmT6547WLRo
-m97K/ipoY0ot3XrxcsBohCsdwc8y/w==
-=0GjW
------END PGP SIGNATURE-----
-
---yaDGDH+hjRObKyJL--
+Received, I'll dig in soonish, though "soonish" might unfortunately might m=
+ean
+2024.
 
