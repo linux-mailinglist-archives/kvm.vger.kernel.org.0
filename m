@@ -1,281 +1,195 @@
-Return-Path: <kvm+bounces-4212-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4213-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5556980F334
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 17:38:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7836280F380
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 17:47:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F235281D02
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 16:38:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1893BB20E55
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 16:47:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B590378E96;
-	Tue, 12 Dec 2023 16:37:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DFAF7B3A0;
+	Tue, 12 Dec 2023 16:46:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bQUbMIsv"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="NdJgmgVe"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.alien8.de (mail.alien8.de [IPv6:2a01:4f9:3051:3f93::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F0FCA;
+	Tue, 12 Dec 2023 08:46:50 -0800 (PST)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A109740E00C9;
+	Tue, 12 Dec 2023 16:46:47 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id qnttpbrXiaDF; Tue, 12 Dec 2023 16:46:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1702399604; bh=JgaP6s6ZQuPIIwAkFk4kUIsSkyeDb3qfZ2ZyjHtolEA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NdJgmgVeKvU8liYp3/47c6y/Ybc/cJYAHEezxdSbKUy6ElqCAo0iAf+oTOaEkIWft
+	 MORuUbw0LS6WxLJAP+oW178zvH39uVgrKeitaYSimp4ZniVoTFpm4tplzCCZWa+dCF
+	 nEK2W1q3AoHQk1XKuCwkU5XPtGmfItfQWKgJfwV/4mvbaY3yJbFF9BUGLyMI0CcHUc
+	 cBK3rk8wxsuFTR9FfXLr1jImBJhajECjn9BSjh0F/Z6DDxFNKOMil3DGEnt0kbP4wA
+	 Z7x5Hm31FpBcvuPU7I6ux5hmD8T1HOaDY5ZCc4T47RFgdcn99YAasSeHzjW4xrzMXo
+	 AtmJG6LEHjWmQVNT5Xf0dmtkdYdmNhMhjl4rJtYX6BcTREH+PiN/ikFmDN1Ggl7TPz
+	 ebN+Ni/9+86QlgNuLLfDJR6SF3ipr/QyNW+GOYvuhELllDxQrLvk0ofkoviLv5qs1f
+	 umIQ6gwYHIr4jTQkbitmZ9oDHSxatGyqh6fh++IljKplFsClYZ3bYiB9j9rKiL7+9z
+	 FrBmchtvqeczG949ntc5+H7NqfhaZz0vvt0Zu4abrbLmVrq81OmiSXtAI/vaaV2I5R
+	 sFyHV7PrUD+sDS+qKZS+F72iKoizGDLyCvxq0YKw0dCRZVMGGs+mRiQUv44yGVUcYA
+	 F6EulFumsy6QWxmrT/0qgJ4U=
+Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89F35FEFE
-	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 16:37:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8AD38C433C7
-	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 16:37:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702399076;
-	bh=Z82GuhPVjo2Ggsjvho7LTwzcbpktGSf6T+4mpTyUF4E=;
-	h=From:To:Subject:Date:From;
-	b=bQUbMIsvNlVVF0YBKjCCGs28gScOmpKhO6si8+mjqNvURHokhvZ+EaG2PjtlX5Vrm
-	 kH4H6DL2RbfhNhMN83/GWaedti8bZZv9sLPxMep3n7ZWbr9g/M5KVWk1byJnDryUXW
-	 MxrFHR1bmu3R8iRIfcGChRD4RoMLRw7B3MPKucUExR3NHW7hPIrko/CpjOuMMVOXjG
-	 EM8x+yuTnSs96o/AHjHVg027wvcq1WrEUrlwisuyltjPkYOQT1+cV6Ouuub4k55IbH
-	 JPtmzVG9U87/xgzlvTzJhaf6ucKe4/tCTjBBlFSc2wz+MK1yCuBzepHdBGZlGnZDpx
-	 I0hy8iYlme2Og==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 6D956C53BD1; Tue, 12 Dec 2023 16:37:56 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218259] New: High latency in KVM guests
-Date: Tue, 12 Dec 2023 16:37:56 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: kernelbugs2012@joern-heissler.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-218259-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3500E40E00CB;
+	Tue, 12 Dec 2023 16:46:04 +0000 (UTC)
+Date: Tue, 12 Dec 2023 17:45:57 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+	tony.luck@intel.com, marcorr@google.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v10 19/50] crypto: ccp: Add the SNP_PLATFORM_STATUS
+ command
+Message-ID: <20231212164557.GKZXiORUQjE8pCQBFk@fat_crate.local>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-20-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231016132819.1002933-20-michael.roth@amd.com>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218259
+On Mon, Oct 16, 2023 at 08:27:48AM -0500, Michael Roth wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> The command can be used by the userspace to query the SNP platform status
 
-            Bug ID: 218259
-           Summary: High latency in KVM guests
-           Product: Virtualization
-           Version: unspecified
-          Hardware: Intel
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: kernelbugs2012@joern-heissler.de
-        Regression: No
+s/by the userspace //
 
-Hello,
+> report. See the SEV-SNP spec for more details.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 
-some of my guests are experiencing heavy latency, e.g.:
+Mike, this doesn't have your SOB at the end. The whole set should have
+it if you're sending it. Please go through the whole thing.
 
-* SSH sessions get stuck, sometimes for several seconds, then continue.
-* PING replies can take several seconds.
-* t0 =3D time(); sleep(1); t1 =3D time(); print(t1 - t0); can show several =
-seconds.
-* Various services with small timeouts throw errors.
-* guest system clock appears to work correctly.
+> ---
+>  Documentation/virt/coco/sev-guest.rst | 27 ++++++++++++++++
+>  drivers/crypto/ccp/sev-dev.c          | 45 +++++++++++++++++++++++++++
+>  include/uapi/linux/psp-sev.h          |  1 +
+>  3 files changed, 73 insertions(+)
+> 
+> diff --git a/Documentation/virt/coco/sev-guest.rst b/Documentation/virt/coco/sev-guest.rst
+> index 68b0d2363af8..e828c5326936 100644
+> --- a/Documentation/virt/coco/sev-guest.rst
+> +++ b/Documentation/virt/coco/sev-guest.rst
+> @@ -67,6 +67,22 @@ counter (e.g. counter overflow), then -EIO will be returned.
+>                  };
+>          };
+>  
+> +The host ioctl should be called to /dev/sev device. The ioctl accepts commanda
 
-Sometimes this happens once or twice an hour or not for many hours. Usually=
- the
-lag is way below
-a second, that's why I didn't notice it earlier.
-On highly affected hosts this may happen much more often, and often in
-clusters, e.g. lots of
-time during a span of a few Minutes.
+"... should be sent to the... "
 
-The affected hosts run Debian 12; until Debian 11 there was no trouble.
-I git-bisected the kernel and the commit which appears to somehow cause the
-trouble is:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=
-id=3Df47e5bbbc92f5d234bbab317523c64a65b6ac4e2
+> +id and command input structure.
+> +
+> +::
+> +        struct sev_issue_cmd {
+> +                /* Command ID */
+> +                __u32 cmd;
+> +
+> +                /* Command request structure */
+> +                __u64 data;
+> +
+> +                /* firmware error code on failure (see psp-sev.h) */
+> +                __u32 error;
+> +        };
+> +
+> +
+>  2.1 SNP_GET_REPORT
+>  ------------------
+>  
+> @@ -124,6 +140,17 @@ be updated with the expected value.
+>  
+>  See GHCB specification for further detail on how to parse the certificate blob.
+>  
+> +2.4 SNP_PLATFORM_STATUS
+> +-----------------------
+> +:Technology: sev-snp
+> +:Type: hypervisor ioctl cmd
+> +:Parameters (in): struct sev_data_snp_platform_status
+> +:Returns (out): 0 on success, -negative on error
+> +
+> +The SNP_PLATFORM_STATUS command is used to query the SNP platform status. The
+> +status includes API major, minor version and more. See the SEV-SNP
+> +specification for further details.
+> +
+>  3. SEV-SNP CPUID Enforcement
+>  ============================
+>  
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index b574b0ef2b1f..679b8d6fc09a 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -1772,6 +1772,48 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+>  	return ret;
+>  }
+>  
+> +static int sev_ioctl_snp_platform_status(struct sev_issue_cmd *argp)
 
-CPU model: Intel(R) Xeon(R) CPU E5-2695 v4 (See below for /proc/cpuinfo)
-Host kernels:
-    * Debian, linux-image-6.1.0-15-amd64 (6.1.66-1), affected
-    * Debian, linux-image-6.5.0-0.deb12.4-amd64 (6.5.10-1~bpo12+1), affected
-    * Vanilla, v6.7-rc5, affected
-    * Vanilla, v5.17-rc3-349-gf47e5bbbc92f, first affected commit
-    * Vanilla, v5.17-rc3-348-ga80ced6ea514, last non-affected commit
-    * Vanilla, several other versions during bisecting
-Host kernel arch: x86_64
-Host RAM: 512 GiB.
-Host storage: HW-Raid6 over spinning disks.
-Guest: Debian 11, x86_64. Debian Kernels linux-image-5.10.0-26-amd64
-(5.10.197-1) and linux-image-6.1.0-0.deb11.13-amd64 (6.1.55-1~bpo11+1).
-Qemu command line: See below.
-Problem does *not* go away when appending "kernel_irqchip=3Doff" to the -ma=
-chine
-parameter
-Problem *does* go away with "-accel tcg", even though the guest becomes much
-slower.
+sev_ioctl_do_snp_platform_status like the others.
 
-All affected guests run kubernetes with various workloads, mostly Java,
-databases like postgres
-und a few legacy 32 bit containers.
+> +{
+> +	struct sev_device *sev = psp_master->sev_data;
+> +	struct sev_data_snp_addr buf;
+> +	struct page *status_page;
+> +	void *data;
+> +	int ret;
+> +
+> +	if (!sev->snp_initialized || !argp->data)
+> +		return -EINVAL;
+> +
+> +	status_page = alloc_page(GFP_KERNEL_ACCOUNT);
+> +	if (!status_page)
+> +		return -ENOMEM;
+> +
+> +	data = page_address(status_page);
+> +	if (rmp_mark_pages_firmware(__pa(data), 1, true)) {
+> +		__free_pages(status_page, 0);
+> +		return -EFAULT;
 
-Best method to manually trigger the problem I found was to drain other
-kubernetes nodes, causing
-many pods to start at the same time on the affected guest. But even when the
-initial load
-settled, there's little I/O and the guest is like 80% idle, the problem sti=
-ll
-occurs.
+		ret = -EFAULT;
+		goto cleanup;
 
-The problem occurs whether the host runs only a single guest or lots of oth=
-er
-(non-kubernetes) guests.
+instead.
 
-Other (i.e. not kubernetes) guests don't appear to be affected, but those g=
-ot
-way less resources and usually less load.
+...
 
-I adjusted several qemu parameters, e.g. pass-through host cpu, different s=
-mp
-layout (2
-sockets, 4 cores each, 2 threads each), remove memory balloon, add I/O-thre=
-ad
-for the disk, set
-latest supported machine type. None of those resolved the problem.
+-- 
+Regards/Gruss,
+    Boris.
 
-There are no kernel logs in the host or the guest, and no userspace logs in=
- the
-host.
-
-AMD hosts with SSDs seem to be less severely affected, but they still are.
-
-Sadly I couldn't think of any good way to trigger the problem on say a blank
-Debian guest.
-
-If I can provide additional information or can run additional tests, please=
- let
-me know!
-
-Many thanks in advance!
-J=C3=B6rn Heissler
-
----------
-
-/usr/bin/qemu-system-x86_64
--name guest=3Dk8s-worker6,debug-threads=3Don
--S
--object
-{"qom-type":"secret","id":"masterKey0","format":"raw","file":"/var/lib/libv=
-irt/qemu/domain-1-k8s-worker6/master-key.aes"}
--machine pc-i440fx-3.1,usb=3Doff,dump-guest-core=3Doff,memory-backend=3Dpc.=
-ram
--accel kvm
--cpu qemu64
--m 131072
--object {"qom-type":"memory-backend-ram","id":"pc.ram","size":137438953472}
--overcommit mem-lock=3Doff
--smp 16,sockets=3D16,cores=3D1,threads=3D1
--uuid 2c220b5b-9d0a-4d41-a13e-cd78c5551b35
--no-user-config
--nodefaults
--chardev socket,id=3Dcharmonitor,fd=3D30,server=3Don,wait=3Doff
--mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol
--rtc base=3Dutc
--no-shutdown
--boot menu=3Don,strict=3Don
--device {"driver":"piix3-usb-uhci","id":"usb","bus":"pci.0","addr":"0x1.0x2=
-"}
--blockdev
-{"driver":"host_device","filename":"/dev/vg-kvm/k8s-worker6_root","node-nam=
-e":"libvirt-1-storage","cache":{"direct":true,"no-flush":false},"auto-read-=
-only":true,"discard":"unmap"}
--blockdev
-{"node-name":"libvirt-1-format","read-only":false,"cache":{"direct":true,"n=
-o-flush":false},"driver":"raw","file":"libvirt-1-storage"}
--device
-{"driver":"virtio-blk-pci","bus":"pci.0","addr":"0x4","drive":"libvirt-1-fo=
-rmat","id":"virtio-disk0","bootindex":1,"write-cache":"on"}
--netdev {"type":"tap","fd":"32","vhost":true,"vhostfd":"34","id":"hostnet0"}
--device
-{"driver":"virtio-net-pci","netdev":"hostnet0","id":"net0","mac":"52:54:00:=
-e7:56:ae","bus":"pci.0","addr":"0x3"}
--chardev pty,id=3Dcharserial0
--device
-{"driver":"isa-serial","chardev":"charserial0","id":"serial0","index":0}
--audiodev {"id":"audio1","driver":"none"}
--vnc 127.0.0.1:0,audiodev=3Daudio1
--device {"driver":"cirrus-vga","id":"video0","bus":"pci.0","addr":"0x2"}
--incoming defer
--device
-{"driver":"virtio-balloon-pci","id":"balloon0","bus":"pci.0","addr":"0x5"}
--sandbox
-on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=3D=
-deny
--msg timestamp=3Don
-
----------
-
-processor       : 71
-vendor_id       : GenuineIntel
-cpu family      : 6
-model           : 79
-model name      : Intel(R) Xeon(R) CPU E5-2695 v4 @ 2.10GHz
-stepping        : 1
-microcode       : 0xb000040
-cpu MHz         : 3300.000
-cache size      : 46080 KB
-physical id     : 1
-siblings        : 36
-core id         : 27
-cpu cores       : 18
-apicid          : 119
-initial apicid  : 119
-fpu             : yes
-fpu_exception   : yes
-cpuid level     : 20
-wp              : yes
-flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca =
-cmov
-pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb
-rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology
-nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est
-tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt
-tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch
-cpuid_fault epb cat_l3 cdp_l3 invpcid_single pti intel_ppin ssbd ibrs ibpb
-stibp tpr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1=
- hle
-avx2 smep bmi2 erms invpcid rtm cqm rdt_a rdseed adx smap intel_pt xsaveopt
-cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts
-md_clear flush_l1d
-vmx flags       : vnmi preemption_timer posted_intr invvpid ept_x_only ept_=
-ad
-ept_1gb flexpriority apicv tsc_offset vtpr mtf vapic ept vpid
-unrestricted_guest vapic_reg vid ple shadow_vmcs pml
-bugs            : cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf=
- mds
-swapgs taa itlb_multihit mmio_stale_data
-bogomips        : 4199.23
-clflush size    : 64
-cache_alignment : 64
-address sizes   : 46 bits physical, 48 bits virtual
-power management:
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+https://people.kernel.org/tglx/notes-about-netiquette
 
