@@ -1,60 +1,60 @@
-Return-Path: <kvm+bounces-4154-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4155-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBBB880E56A
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 09:05:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E291180E5A6
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 09:13:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E8CB1F2187A
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 08:05:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86D991F2182E
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 08:13:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57CDD1804E;
-	Tue, 12 Dec 2023 08:05:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1425E18C2E;
+	Tue, 12 Dec 2023 08:13:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="k4ms8joL"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="BA78m/qd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26DABC2
-	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 00:05:23 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id 41be03b00d2f7-5c6ce4dffb5so2683714a12.0
-        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 00:05:23 -0800 (PST)
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 951E8C2
+	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 00:13:31 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1d06fffdb65so30909525ad.2
+        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 00:13:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1702368322; x=1702973122; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xyrJ/oaF1a1+OdMWUr85QqR8PoKu+Afm3G/pEUOxUgM=;
-        b=k4ms8joLRiz69TcncnStNynkMWeX1AAk+q95UPMY08nbTrIPCfAcvMGA8aCj+ZU+lq
-         FYvkGgoDgIU/D4aSbpnM88tWrC11CVQxtjE2ovvCGfndzEoXVZ/PJP58dSUZ0/VVQ2cF
-         HzP8xylyMNogQxZO9AgOervvJOBMCzrSnGRwEwxoIFm8/RYYUpa2UUK8Pm/OICIt+giu
-         bsaKrXXR1NPcxwT6ywFNalqw665P7aKMwEflfMTJcNjakqvAXzd5D0VR86398MrWmMpO
-         UEf1PyoKtz+iIIakiuo0G3cV/+GD+35l5W6HFbkN01kyduWl/MALvQ1uuCT49p7RhReC
-         gzbA==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1702368811; x=1702973611; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aWeXIAcPVQudRWVNMCBKAFyfnETiLoRy/MoLakk4Nn4=;
+        b=BA78m/qdFvbd7APVeeSrToBcEOT+Ux9ShTpS8RT9qYpY4Y5OpXBlMpomJDM/VW/Szq
+         /tnQlNgZecNiBNTrYqEzUX3XWbp8ouwCZreXgSH35tasnPxmWrJ0eO++Ghkh9nrfTMhi
+         BUVmpOvRvHlrjqb4S7UOgnm95WKEx0Qw1fLjWHA0K/8keWeFRCkOKENWu/SyaH7xXi/G
+         7861V/4Ccl5NqVied70sNy1IGV69YicSd9Jpg2crfho3In9P+uH7OEL1jrRYceU8eNyP
+         Bezfsd02ND6fK5OS52aTFH+nZSSVWwoZlnZIs5lMeOMfE28nAsdxWwl/FMZsx/8S/53H
+         fDAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702368322; x=1702973122;
-        h=content-transfer-encoding:cc:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=xyrJ/oaF1a1+OdMWUr85QqR8PoKu+Afm3G/pEUOxUgM=;
-        b=Aoa45aE4nQnAl24Ve3XogQTTn8LHNNJf6XrfSQlZpue8NcoE1+ub8HplmGl3WT46Xw
-         ex8BDBhDrLgolPVmUgWabQCF/Dq+BlQeD4Dd/RNFfvHFcvbIdUUQWQeXqymro2peNzrd
-         OWK3WDUjpKtZiHFz6C4GFnGGIVMQeOkWZiaJHgDlVrPn8ndHmc2CEAnkhUhpAp4HnxVN
-         5EBOxjnyry9RR4d2Cb/cH2Pq6HUoRjQVZy39eEVs75hHl3Mw/zGW9BNKnOWHAnGW8Lbg
-         18dEPXhzAqTmhfrQHZxG/9mNC/zAphFg9ubJKf9Xfe2u79W1gHp108Qg0IAWGwhy7wkp
-         jWkQ==
-X-Gm-Message-State: AOJu0YypDYeY41+xXG+nKRhMRB7+ja3H4gS9KjaR1vWTSwYpJOWppIQ6
-	+C5+NhfmC48Nf1ztvv/uKSPz9A==
-X-Google-Smtp-Source: AGHT+IEql1gIzfMgiC3uwAyX05ccRP/TJmlVXqhwk7OLXHzm7HuO8eWQfZEt37CKdp9jdfYH1gF7Bw==
-X-Received: by 2002:a05:6a21:999d:b0:18f:fb0d:e961 with SMTP id ve29-20020a056a21999d00b0018ffb0de961mr3147656pzb.60.1702368322598;
-        Tue, 12 Dec 2023 00:05:22 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702368811; x=1702973611;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aWeXIAcPVQudRWVNMCBKAFyfnETiLoRy/MoLakk4Nn4=;
+        b=hcTHpITFJYD64GfR88YD7oqUSXKpoBISMdWRNDNaRhqcUUT0rNZhuXqZ8ggtS44eMG
+         1ifyQXqBLnPNkPJf+312mxG1GY53/cZ8695XoayC2ugrQEUtTn1L0Y6BUn/5a7NEMXUU
+         irdIOg3ZbrFq3VOIEFS66r9qg4/AO3qkS6hk029pWwG1qTTAgMoWhiPQmzdp3syX/HZ9
+         65+V12HdkiwpVnqSu6d+Vt8uqeUVq89XtVdrFqmuD5lpgO/ckA/amrjc3elayx9vY4Cn
+         knzJpexksj+D+TPoB7Cv+GPISmduVuUxMdqRz+a4kdU5X+9PNnVp2kXFp+NgwN8POdwV
+         k5wA==
+X-Gm-Message-State: AOJu0YygLT3rkaC/LpTlGxKV70SdoyVJr3BeVDHCTpdMeMuy86oH8r4d
+	/+Q9sRLfNY5GBEU8k/tPM0gVsQ==
+X-Google-Smtp-Source: AGHT+IFvUmziIWBs1OJTpYO7C68nwt4JBi4XL8fGer5kyd+qMcd75C6AEDDD+1T+2txWVzO/tVeY5A==
+X-Received: by 2002:a17:902:650e:b0:1d3:34cb:231a with SMTP id b14-20020a170902650e00b001d334cb231amr377063plk.70.1702368811100;
+        Tue, 12 Dec 2023 00:13:31 -0800 (PST)
 Received: from [157.82.205.15] ([157.82.205.15])
-        by smtp.gmail.com with ESMTPSA id j17-20020a056a00175100b006ce6bf5491dsm7531509pfc.198.2023.12.12.00.05.16
+        by smtp.gmail.com with ESMTPSA id n2-20020a170902d2c200b001cfcf3dd317sm7999185plc.61.2023.12.12.00.13.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Dec 2023 00:05:22 -0800 (PST)
-Message-ID: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
-Date: Tue, 12 Dec 2023 17:05:15 +0900
+        Tue, 12 Dec 2023 00:13:30 -0800 (PST)
+Message-ID: <85f0bd13-9fe3-420d-939f-695955427f5a@daynix.com>
+Date: Tue, 12 Dec 2023 17:13:26 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -62,105 +62,66 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 07/10] testa/avocado: test_arm_emcraft_sf2: handle RW
+ requirements for asset
 Content-Language: en-US
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- Jason Wang <jasowang@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, Yuri Benditovich
- <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>,
- Benjamin Tissoires <bentiss@kernel.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Radoslaw Biernacki <rad@semihalf.com>, Paul Durrant <paul@xen.org>,
+ Leif Lindholm <quic_llindhol@quicinc.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
+ <alex.bennee@linaro.org>, kvm@vger.kernel.org, qemu-arm@nongnu.org,
+ Beraldo Leal <bleal@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Sriram Yagnaraman <sriram.yagnaraman@est.tech>,
+ Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
+ David Woodhouse <dwmw2@infradead.org>
+References: <20231208190911.102879-1-crosa@redhat.com>
+ <20231208190911.102879-8-crosa@redhat.com>
+ <5377419a-88dd-4e5c-8be4-1345f6c2115b@linaro.org>
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: Should I add BPF kfuncs for userspace apps? And how?
-Cc: bpf <bpf@vger.kernel.org>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, kvm@vger.kernel.org,
- LKML <linux-kernel@vger.kernel.org>,
- virtualization@lists.linux-foundation.org,
- "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>
+In-Reply-To: <5377419a-88dd-4e5c-8be4-1345f6c2115b@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi,
+On 2023/12/12 1:36, Philippe Mathieu-Daudé wrote:
+> On 8/12/23 20:09, Cleber Rosa wrote:
+>> The asset used in the mentioned test gets truncated before it's used
+>> in the test.  This means that the file gets modified, and thus the
+>> asset's expected hash doesn't match anymore.  This causes cache misses
+>> and re-downloads every time the test is re-run.
+>>
+>> Let's make a copy of the asset so that the one in the cache is
+>> preserved and the cache sees a hit on re-runs.
+>>
+>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>> ---
+>>   tests/avocado/boot_linux_console.py | 6 ++++--
+>>   1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tests/avocado/boot_linux_console.py 
+>> b/tests/avocado/boot_linux_console.py
+>> index f5c5d647a4..e2e928e703 100644
+>> --- a/tests/avocado/boot_linux_console.py
+>> +++ b/tests/avocado/boot_linux_console.py
+>> @@ -414,14 +414,16 @@ def test_arm_emcraft_sf2(self):
+>>                      'fe371d32e50ca682391e1e70ab98c2942aeffb01/spi.bin')
+>>           spi_hash = '65523a1835949b6f4553be96dec1b6a38fb05501'
+>>           spi_path = self.fetch_asset(spi_url, asset_hash=spi_hash)
+>> +        spi_path_rw = os.path.join(self.workdir, 
+>> os.path.basename(spi_path))
+>> +        shutil.copy(spi_path, spi_path_rw)
+> 
+> This is an implementation detail. By default fetch_asset() should return
+> a path to a read-only artifact. We should extend it to optionally return
+> a writable file path, with the possibility to provide a dir/path.
 
-It is said eBPF is a safe way to extend kernels and that is very 
-attarctive, but we need to use kfuncs to add new usage of eBPF and 
-kfuncs are said as unstable as EXPORT_SYMBOL_GPL. So now I'd like to ask 
-some questions:
+Apparently it is not OK to abstract fetch_asset() away; it confuses some 
+static analysis according to:
+"[PATCH 02/10] tests/avocado: mips: add hint for fetchasset plugin"
 
-1) Which should I choose, BPF kfuncs or ioctl, when adding a new feature 
-for userspace apps?
-2) How should I use BPF kfuncs from userspace apps if I add them?
-
-Here, a "userspace app" means something not like a system-wide daemon 
-like systemd (particularly, I have QEMU in mind). I'll describe the 
-context more below:
-
----
-
-I'm working on a new feature that aids virtio-net implementations using 
-tuntap virtual network device. You can see [1] for details, but 
-basically it's to extend BPF_PROG_TYPE_SOCKET_FILTER to report four more 
-bytes.
-
-However, with long discussions we have confirmed extending 
-BPF_PROG_TYPE_SOCKET_FILTER is not going to happen, and adding kfuncs is 
-the way forward. So I decided how to add kfuncs to the kernel and how to 
-use it. There are rich documentations for the kernel side, but I found 
-little about the userspace. The best I could find is a systemd change 
-proposal that is based on WIP kernel changes[2].
-
-So now I'm wondering how I should use BPF kfuncs from userspace apps if 
-I add them. In the systemd discussion, it is told that Linus said it's 
-fine to use BPF kfuncs in a private infrastructure big companies own, or 
-in systemd as those users know well about the system[3]. Indeed, those 
-users should be able to make more assumptions on the kernel than 
-"normal" userspace applications can.
-
-Returning to my proposal, I'm proposing a new feature to be used by QEMU 
-or other VMM applications. QEMU is more like a normal userspace 
-application, and usually does not make much assumptions on the kernel it 
-runs on. For example, it's generally safe to run a Debian container 
-including QEMU installed with apt on Fedora. BPF kfuncs may work even in 
-such a situation thanks to CO-RE, but it sounds like *accidentally* 
-creating UAPIs.
-
-Considering all above, how can I integrate BPF kfuncs to the application?
-
-If BPF kfuncs are like EXPORT_SYMBOL_GPL, the natural way to handle them 
-is to think of BPF programs as some sort of kernel modules and 
-incorporate logic that behaves like modprobe. More concretely, I can put 
-eBPF binaries to a directory like:
-/usr/local/share/qemu/ebpf/$KERNEL_RELEASE
-
-Then, QEMU can uname() and get the path to the binary. It will give an 
-error if it can't find the binary for the current kernel so that it 
-won't create accidental UAPIs.
-
-The obvious downside of this is that it complicates packaging a lot; it 
-requires packaging QEMU eBPF binaries each time a new kernel comes up. 
-This complexity is centrally managed by modprobe for kernel modules, but 
-apparently each application needs to take care of it for BPF programs.
-
-In conclusion, I see too much complexity to use BPF in a userspace 
-application, which we didn't have to care for 
-BPF_PROG_TYPE_SOCKET_FILTER. Isn't there a better way? Or shouldn't I 
-use BPF in my case in the first place?
-
-Thanks,
-Akihiko Odaki
-
-[1] 
-https://lore.kernel.org/all/20231015141644.260646-1-akihiko.odaki@daynix.com/
-[2] https://github.com/systemd/systemd/pull/29797
-[3] https://github.com/systemd/systemd/pull/29797#discussion_r1384637939
+That said, it is still nice to have a method that does os.path.join() 
+and shutil.copy().
 
