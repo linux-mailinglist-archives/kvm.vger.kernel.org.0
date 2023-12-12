@@ -1,87 +1,99 @@
-Return-Path: <kvm+bounces-4218-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4219-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F021C80F46D
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 18:21:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F29AA80F473
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 18:22:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABA2128282B
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 17:21:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F6B51C20A57
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 17:22:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 942647D891;
-	Tue, 12 Dec 2023 17:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AEEC7D88F;
+	Tue, 12 Dec 2023 17:22:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dS4NWFWM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HnM4jinW"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBBD7B3CC;
-	Tue, 12 Dec 2023 17:21:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F6EFC433D9;
-	Tue, 12 Dec 2023 17:21:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702401709;
-	bh=6YhYaM20GOsMdc8Rc2Fzhf1uOeyj3UQk4B0AXX9Ihmg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dS4NWFWMEHgzREWxWKBFj9rk19fcouhWvSkakRNe8hzRVRCBQuceUS5Up9m96KetH
-	 WFKwF+0JemkvA2gEXJmwBNgrpJHq+fo0vCe4cCBSFdzg+atzZVkOkqaMy7TVq8XRTg
-	 qB+n5IqGaHJDkNp/tX/Oru0HZpv9gUuJJLtlWFxJAuowjuz7NIhpH0BorrfpFpTD0q
-	 DhQ1udij026w9OKig7NQJu4oDIJWfoY6wxgioMsq2QTWy7ZdTIKXy5gmI1scZ54ka9
-	 QvW8B0r82vg7FWoRP2fhTq2ZH7BZfdKmzWmkJgfxvd3r2IPUVZPdZj0sjlzxviQ27F
-	 Mb7QA48DmU0YA==
-From: Will Deacon <will@kernel.org>
-To: Zhangfei Gao <zhangfei.gao@linaro.org>,
-	jean-philippe <jean-philippe@linaro.org>,
-	Joerg Roedel <joro@8bytes.org>,
-	Jason Gunthorpe <jgg@nvidia.com>
-Cc: catalin.marinas@arm.com,
-	kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	iommu@lists.linux.dev,
-	kvm@vger.kernel.org,
-	Wenkai Lin <linwenkai6@hisilicon.com>
-Subject: Re: [PATCH] iommu/arm-smmu-v3: disable stall for quiet_cd
-Date: Tue, 12 Dec 2023 17:21:01 +0000
-Message-Id: <170238473311.3099166.16078152394414654471.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20231206005727.46150-1-zhangfei.gao@linaro.org>
-References: <20231206005727.46150-1-zhangfei.gao@linaro.org>
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37B678E
+	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 09:22:38 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1d08383e566so52692255ad.2
+        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 09:22:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702401758; x=1703006558; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ROCp0xNd0wyqOc7nplsrZkpuLfarMjHYIQNZwVviJ7k=;
+        b=HnM4jinWoc7Y5b/wDcbxzJJepOv8cd4sO9RdKKADcqamDAueL8wrV0FHrWCfx3snha
+         kb3yVOaEw20XaycdieaS9+JG3aDqvlg3rMLHPzUvrdZKKe+oObuCjpJh2kMuUU5v9xvT
+         JbNB8Mfz5t85NmrqChVZgfsHz4/BQWiKq3Mekmx+fjBNSN5zFViZCwlKvVQx0hSmvPYO
+         boqVaOAw0oI+3miZYt2kJU5fOatMy3jMXyJhVmgtoCpjfSy4xxzxdGN7eE0PDdnLo1OI
+         Yo7RpJkmZDIhye5U5vsp5WjHIvgK1t98NzSPOJJq23OGuGmyh5cH+EGutSl2icqNBXHA
+         uB7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702401758; x=1703006558;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ROCp0xNd0wyqOc7nplsrZkpuLfarMjHYIQNZwVviJ7k=;
+        b=bh2prSV2dT2ozYHhUuBTdpzB3XfMYdXjQg4/XpOJ5ksxp3Auivnq1RzW815wHVX36B
+         HS2K+1hJV2hakbj4MIxGV3XWVpoKYJV9hFj9WyUprJioXw6xu9ad2GXyb2RiKa22dUZr
+         TQxKy0osJJklQX+wp68n17j2R/dsZYh8HimH4pmv07IPGYjWKcJYPRWRBET9wsxTpnKO
+         qZlpRjq4X6kHcBJISJdRkWNfAQYUqkLgqLw7JoayjiC+picx2leO3h5XB5cPMDKT8ByG
+         v3flYZxH+lfrkkAhJP6cki0IPmD/8ZBcLe5naoCsHudx8iS5upWUhP8wzKQSagd4EKwT
+         zMMA==
+X-Gm-Message-State: AOJu0YwHXBAOeVR5fHPosTsO/LuZ92vwiIEs9ocw1kblNWoxwnWTLB9i
+	lIeFofh/8bUH47beViribL9VrYtBhFQ=
+X-Google-Smtp-Source: AGHT+IEOEh3C8zTlAW12bJONZI+u1CmuqqelXRvUx1auEKYIObXd3RFyfjdun8PThEpN5T5kS2y4fIeGI98=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:a504:b0:1d0:54ff:da25 with SMTP id
+ s4-20020a170902a50400b001d054ffda25mr46568plq.0.1702401757577; Tue, 12 Dec
+ 2023 09:22:37 -0800 (PST)
+Date: Tue, 12 Dec 2023 09:22:36 -0800
+In-Reply-To: <20231212022749.625238-14-yury.norov@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20231212022749.625238-1-yury.norov@gmail.com> <20231212022749.625238-14-yury.norov@gmail.com>
+Message-ID: <ZXiW3AgIENf7whei@google.com>
+Subject: Re: [PATCH v3 13/35] KVM: x86: hyper-v: optimize and cleanup kvm_hv_process_stimers()
+From: Sean Christopherson <seanjc@google.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, Jan Kara <jack@suse.cz>, 
+	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>, Matthew Wilcox <willy@infradead.org>, 
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+	Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>, Alexey Klimov <klimov.linux@gmail.com>, 
+	Bart Van Assche <bvanassche@acm.org>, Sergey Shtylyov <s.shtylyov@omp.ru>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, 6 Dec 2023 08:57:27 +0800, Zhangfei Gao wrote:
-> From: Wenkai Lin <linwenkai6@hisilicon.com>
+On Mon, Dec 11, 2023, Yury Norov wrote:
+> The function traverses stimer_pending_bitmap in a for-loop bit by bit.
+> Simplify it by using atomic find_and_set_bit().
+
+for_each_test_and_clear_bit(), not find_and_set_bit().
+
+It might also be nice to call out that there are only 4 bits, i.e. that using
+for_each_test_and_clear_bit() will still generate inline code.  Definitely not
+mandatory though, just nice to have (I highly doubt this code would be sensitive
+to using less optimal code).
+
+> While here, refactor the logic by decreasing indentation level.
 > 
-> In the stall model, invalid transactions were expected to be
-> stalled and aborted by the IOPF handler.
-> 
-> However, when killing a test case with a huge amount of data, the
-> accelerator streamline can not stop until all data is consumed
-> even if the page fault handler reports errors. As a result, the
-> kill may take a long time, about 10 seconds with numerous iopf
-> interrupts.
-> 
-> [...]
+> CC: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Yury Norov <yury.norov@gmail.com>
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/kvm/hyperv.c | 40 ++++++++++++++++++++--------------------
 
-Applied to will (for-joerg/arm-smmu/updates), thanks!
+This doesn't conflict with any of the in-flight Hyper-V changes, so with a fixed
+changelog, feel free to take this through the bitmap tree.
 
-[1/1] iommu/arm-smmu-v3: disable stall for quiet_cd
-      https://git.kernel.org/will/c/b41932f54458
-
-Cheers,
--- 
-Will
-
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
+Acked-by: Sean Christopherson <seanjc@google.com>
 
