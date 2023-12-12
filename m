@@ -1,252 +1,184 @@
-Return-Path: <kvm+bounces-4230-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4231-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C30880F67E
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 20:21:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9BC480F683
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 20:22:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 052671F211BB
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 19:21:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB2F71C20DEA
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 19:22:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CCD281E47;
-	Tue, 12 Dec 2023 19:21:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9CC681E47;
+	Tue, 12 Dec 2023 19:22:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Y3EiW9bO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UFY8cfr1"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2044.outbound.protection.outlook.com [40.107.100.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40C909F;
-	Tue, 12 Dec 2023 11:21:05 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=V6X859voliJfChrWaCn3TlmV9BlwHyGKQsTNFwiJSw7Gu+5bV9+2y74y13+6ZPJlaF5ERKjxUURLiEMlQldpmaYG9kPVr+tNvdCUtOVZini4f2atX2vu6nAxEo2flNydPgwn79f+kwVInrAAoTCWIUXys2BMncLx0YJKQdU9yf+6A1EtV+IS71R1JqqkCxp3wV4dD7elT63r1CiO28z9SPS9Vw3M+d/mOAXHInE6exmNTob0r2oNjL1prZM986coh+5iAa2vLF8Cx6D1n+mvT2BpsCgxNpWbmNABn8xwq1l/aXCKAjGtnQ+zAl01/4GzZQ/GoTP0MB/kNRRk6V1SEg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/vvaH62ZuLn29zoShfj2213HgEBdguv0Lpw5AY6dsjs=;
- b=UnD24DjiMQPfRlfSBNdmFuL1205yTG00DPE06VUpzeT+qYb6yjkS2bZLtXenGKLo5mNCZ99xgxcIa9Ulo0pqiojEKrz27Gww1DqjmCFsk7FZbHIh2HmsHmpMj37EHSZ61ZJ6YXN1lXeiAVY3GT1ZcpB+jDGK3NRAYBThtcBCHVwLDnmHbrA6Qt8zHe5jYMyMLoL12F5rV2GuCHQbeaKSlxI4GKhZwzdwe0qbCjs6oY0gW3yamUiatwUJVcQwiHTL4FRJQQYk5sqYagvdpwXMheQW7ktxG0KY+ju+AcI9nbFdxZejnWuevhZSjutu+8QW1AINtrkemvf3WNN2xzEINQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/vvaH62ZuLn29zoShfj2213HgEBdguv0Lpw5AY6dsjs=;
- b=Y3EiW9bOWDwmzgaz34K4MSBanrRYh/3+ndtGBhqmW/fVfSoXPKPVpcVm/Dyw2prXqd1BVkiYdkA7EXyq6KKq3oOir2vHv/mTjXKfwlSBi1Qtc1AEx5MVQbVOnUMoWS5rHufInUhgkxNjP9UQkS0Sz3H8Z1qTAVUk8KUHpOV+YeMkdRYlIgNKRNhHOf7Rj4g3tmUEemC+JkZLUiAib+kJsZ+HJhCez/ttOFXvLPL5w9XmoCHXXAB5yLXtxAkSrKDtvCcLtSkTddPxLniaWZ2vFOi+IP5mV+GfMUxM1u4BjZIxNeBUfhv/Ap6h548qLDBcsuH6v+PUul7sWMDBcx7Ubw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by MN0PR12MB6125.namprd12.prod.outlook.com (2603:10b6:208:3c7::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Tue, 12 Dec
- 2023 19:21:01 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7091.022; Tue, 12 Dec 2023
- 19:21:01 +0000
-Date: Tue, 12 Dec 2023 15:21:00 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Nicolin Chen <nicolinc@nvidia.com>
-Cc: Yi Liu <yi.l.liu@intel.com>, "Giani, Dhaval" <Dhaval.Giani@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
-	robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
-	eric.auger@redhat.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-	chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-	peterx@redhat.com, jasowang@redhat.com,
-	shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, zhenzhong.duan@intel.com,
-	joao.m.martins@oracle.com, xin.zeng@intel.com, yan.y.zhao@intel.com
-Subject: Re: [PATCH v6 0/6] iommufd: Add nesting infrastructure (part 2/2)
-Message-ID: <20231212192100.GP3014157@nvidia.com>
-References: <20231117130717.19875-1-yi.l.liu@intel.com>
- <20231209014726.GA2945299@nvidia.com>
- <ZXd+1UVrcAQePjnD@Asurada-Nvidia>
- <20231211215738.GB3014157@nvidia.com>
- <ZXgL+GCGPgH+hlXo@Asurada-Nvidia>
- <20231212144421.GH3014157@nvidia.com>
- <ZXiw4XK/1+ZdsFV1@Asurada-Nvidia>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZXiw4XK/1+ZdsFV1@Asurada-Nvidia>
-X-ClientProxiedBy: MN2PR02CA0036.namprd02.prod.outlook.com
- (2603:10b6:208:fc::49) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D815DC
+	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 11:21:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702408913;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HurXK5gBPsoHICW5D8Za3/oNGdjuLwbQTQMZFCsDbks=;
+	b=UFY8cfr1DQA0cUEXvKUfgLheO4CN+B6g5JFagY/p3pWYie3tb6pyRRI025S8SzqnalRGUx
+	N7KvwszVnVXFYu5oT+DorGlkA5Y/OuKb7Bxcyc3/3NlTSgEmIAjQceoKUuZnWEa8oIiCzU
+	bZU1xOeYrGuDtou9xvITpvwsy3CF/20=
+Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
+ [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-507-8OwGpZUTO1mSJT0Bh8ceUg-1; Tue, 12 Dec 2023 14:21:51 -0500
+X-MC-Unique: 8OwGpZUTO1mSJT0Bh8ceUg-1
+Received: by mail-yb1-f197.google.com with SMTP id 3f1490d57ef6-dbcb6645f85so1565165276.2
+        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 11:21:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702408911; x=1703013711;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HurXK5gBPsoHICW5D8Za3/oNGdjuLwbQTQMZFCsDbks=;
+        b=bpFrbiWbXVqza+PGcVfNVti/4qUcC3+MHc88G39tqw8o1xWiJrCyhTWRkMEdJoCbit
+         J8CRavZhu8BTjYMsIOoK7zUSO0cRNPtANGavjVkNWwtaNsNcC+3SbMnDGcNYr72zj5YN
+         mp0J7mjrvmMzSz91O8iddTVT1IKouf0fprhTUszLoI43lZoExFc+8yNENhdPTfhLRP7X
+         Y9XGY2ckeF/Wc/DQXqio/zCoMdTW4+O/r/kyLgoGx7cj8yAvKT/QkIKR2jJP3eoZdImg
+         pFMDxntQdQZTJDeNB97XRz1Y4lXnKtYVI62fcFzOfK8Awul+nnTwsmoND1NRsVwn8/c/
+         ksTw==
+X-Gm-Message-State: AOJu0YxhoCptvc3YQYV9vMgC5rLV3R4JbUBIvMK/7vefZ8lpx9D4KLPt
+	4B1Rk4DevRd4ktyeqx8pD97c8rcvzlBdjWDHWtz1dfxl9ygoIjCY3n3JzzCox6itbFk9YgUXQPU
+	nNR4ynbQxlIpuHyLt9Goc1eidofUL
+X-Received: by 2002:a25:6084:0:b0:dbc:cbb7:1396 with SMTP id u126-20020a256084000000b00dbccbb71396mr42497ybb.79.1702408911405;
+        Tue, 12 Dec 2023 11:21:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFwE2PBBX/zi/0sI1dUGV/OYZrCz+Jc8U/PqiB/t32suOa+Cugn7mXgjVi34mzvQKsQy4dZIOiVC3cueoVPamw=
+X-Received: by 2002:a25:6084:0:b0:dbc:cbb7:1396 with SMTP id
+ u126-20020a256084000000b00dbccbb71396mr42489ybb.79.1702408911135; Tue, 12 Dec
+ 2023 11:21:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MN0PR12MB6125:EE_
-X-MS-Office365-Filtering-Correlation-Id: b4c5dc20-3c2e-49e4-89b9-08dbfb477a25
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	wULEmtN+I3GhVpnYMx/1C5nW0AeB70eC4Z3WVGS0uah0ASy7+xWaGOtEem6mhuJJ/c1IRPOs740NVncNofkEocpMsusIaPVbZLLUszEWyRQCK0co2tpJiw193JKqhhB402azSO2IbVHzFaEo8gkTCleQbQ801TLBmXwaxGQ0H8DpScU+at80W5WE2oRSWUPgX4BqagLa4K1FasydxHy37J0UKM/1WKWx/M+67YyU5DbExPHQb3Tlc+oOJUJwfZK+GjbuIkWV5E1UVH1SWq3BHePkOShPJWnIcnX3CaO8QX4002xFf9YKS7CKC0jfVmsRIOJ0U5OP/rD7uaRkubq2FzGzdwqIseloosnSiRXExECgwWJBBUzn8Cchd5KO2ZVStbnSIEF/TvN5p7mheYLnFZOUmzA+oDm+mjdEOhkTau17hiEM8DVPHsMdAIbRLM5Z+uUmL3pzu2FJ8c9Q7iMlkm+pRmAPF4+mhumB7TgZB3pXta5uMdEeh1ZIDzPxCbiGOpu7yVo+ji+sRtFw+DppeKQ3TvIggrJ4/sxLCexuCcuwsulLS35ht/+1DqOWiw6w
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(376002)(39860400002)(396003)(366004)(230922051799003)(186009)(451199024)(1800799012)(64100799003)(41300700001)(2616005)(1076003)(26005)(83380400001)(33656002)(36756003)(38100700002)(5660300002)(8676002)(316002)(8936002)(6862004)(4326008)(2906002)(7416002)(86362001)(6512007)(6506007)(6636002)(66476007)(54906003)(66556008)(66946007)(37006003)(478600001)(6486002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?KIgobnsPTqBMGevWjo84aIsBHHRgXmjbWZuMQjHHXmhX5FmQvr+n+cDMNEs9?=
- =?us-ascii?Q?NGy9mC5gzUkLk/aPrid9yR7aYAWxtavfFds9wrtsw8OMxjayqS958UyvmBds?=
- =?us-ascii?Q?K0yfTwNzRM1C7ZZho4hUWr5hNS5QqG4kTGhmik5p6d+HOFGFOXF+dnCfYKwA?=
- =?us-ascii?Q?0CnGELzF0ODcxOohwTZjxBS0pongC+xklF0ffxAkmD+PSP/BIurT6IAnf9xZ?=
- =?us-ascii?Q?k27Oe4YNr1SzoeILUqnVaIqtYqRYMT/QZnlFtZLGmxe+Vi6UtEQz+y0SkUOi?=
- =?us-ascii?Q?Gq4lQXWqdhb6aO+gxo5WEAPgxQl9XJzgTtyOcO/THfnc7/FZbUsrPiayDIOm?=
- =?us-ascii?Q?mzImkidN4RaTVyhXLytMZj4sydr6jXZZUtootPj8VMnmJS/pSNWlAobXvfHm?=
- =?us-ascii?Q?qtj+4VSLMkJ1ENAcXUL1nCCPr75NfOgdpjPemyW08Uhn+XolaOyLXZaswjFx?=
- =?us-ascii?Q?hRma5mP159RlJpagByPyfBCClYJKLM9ajqK2UC/w9bzK22IgQ93X1ao91z6Q?=
- =?us-ascii?Q?fRCZRdh4mRVr50TqvjP5v+JE1tVLBBQj3tnRCem7n0OdZWT3OSMPugdZmtbc?=
- =?us-ascii?Q?VXUlwGbHgCiwIUTYKws7GWhfmdE38yQ2IXWhoK5cC9JAB0nGNzulWjtq6klw?=
- =?us-ascii?Q?B/6CXzdm587h5AFG79Z7sF+mBk+Af6q54MiKqTUH3mxBFVhvFgci7fwYAx3/?=
- =?us-ascii?Q?k9/yjkehgncbaY6Mq/YmbtzmHy1rvIJOpA0kEBeGaQbCcynA1faURSSBVgd0?=
- =?us-ascii?Q?wd3q78XU8E8BScG9iqQvhHp8XBWAVYuH+9pYDLSYe3NZBhyNrRmof91nk2AM?=
- =?us-ascii?Q?n8V7cH4+QY9Gje8Ijd3cPbznXL9RPi6/gabnTboYJI+dv3I7QbjDuXMSWlF1?=
- =?us-ascii?Q?cTOIkYOiUgVByRk30r0HiAimElsbVFtfkgyB/sKhLxFxhrN4d58Jw8Tp17yB?=
- =?us-ascii?Q?RNkEb38NpGEVP61CLhY7xOcToOV0tnFffqa0r0ifN6mXlHb56zQKukUGuKwd?=
- =?us-ascii?Q?S9+g/x1pU7SuGYfI+SmT8Rr2SbhObCI9m11sZDZVr+/Gd59PPCaJMWIXVYKK?=
- =?us-ascii?Q?TrWJWUq2NlHgn7An033pEeCNS1tP/3QJT02rOjpyaKL4pRktZj+tT0OSzNSz?=
- =?us-ascii?Q?lEdQdEw+LKaWz1PXd2Du4qID4Lt88Mlma29ZNkMSAaQ+wwI9mQ1XGB+4Dacp?=
- =?us-ascii?Q?f4eF+07XDkMgVHkP7xDf1e9j5Y3TkLkjtti2Mc/5SHHPSyB672frsyD7Cb0o?=
- =?us-ascii?Q?mNObj4gK2Q4KkJiAyHoY/ql23cPsz0fi3uFGldiJvxkE6pHGRd2VNmULzLTS?=
- =?us-ascii?Q?DX3D7Q/PmIZ4BKBUgPUn4SHry3Q1a60Sc4DrfAUOBxkrKelPNDou519AfL6j?=
- =?us-ascii?Q?n66aSamAM2nmNu7qVnRgUvzklkh9Q5/w58up0sq1saL2YknAD/qz4uQslyja?=
- =?us-ascii?Q?O9E38eBQ91bLHsrysfH6fNGDWRwhZqTvPjFGWZx3SZAlj7jA7B/M7SN10OE1?=
- =?us-ascii?Q?kU/fhF7LwykrBEHtFfRS3sP1yvaWP7BBzj/5YT3NkhFgx1dm8U3odyn8er6A?=
- =?us-ascii?Q?9cT54JdMgaxSE7WJANwPz2j/RRi6U9GSE4JHbVA6?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b4c5dc20-3c2e-49e4-89b9-08dbfb477a25
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2023 19:21:01.5403
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 47I/lRRI5uDYpHc31hPszL2x0ZOfp8uTIKW+kB05eNeuHcYTepMDT3zaYNv/22KQ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6125
+References: <20231205104609.876194-1-dtatulea@nvidia.com> <20231205104609.876194-5-dtatulea@nvidia.com>
+In-Reply-To: <20231205104609.876194-5-dtatulea@nvidia.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Tue, 12 Dec 2023 20:21:14 +0100
+Message-ID: <CAJaqyWeEY9LNTE8QEnJgLhgS7HiXr5gJEwwPBrC3RRBsAE4_7Q@mail.gmail.com>
+Subject: Re: [PATCH vhost v2 4/8] vdpa/mlx5: Mark vq addrs for modification in
+ hw vq
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Si-Wei Liu <si-wei.liu@oracle.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, virtualization@lists.linux-foundation.org, 
+	Gal Pressman <gal@nvidia.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Parav Pandit <parav@nvidia.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 12, 2023 at 11:13:37AM -0800, Nicolin Chen wrote:
-> On Tue, Dec 12, 2023 at 10:44:21AM -0400, Jason Gunthorpe wrote:
-> > On Mon, Dec 11, 2023 at 11:30:00PM -0800, Nicolin Chen wrote:
-> > 
-> > > > > Could the structure just look like this?
-> > > > > struct iommu_dev_assign_virtual_id {
-> > > > >        __u32 size;
-> > > > >        __u32 dev_id;
-> > > > >        __u32 id_type;
-> > > > >        __u32 id;
-> > > > > };
-> > > > 
-> > > > It needs to take in the viommu_id also, and I'd make the id 64 bits
-> > > > just for good luck.
-> > > 
-> > > What is viommu_id required for in this context? I thought we
-> > > already know which SMMU instance to issue commands via dev_id?
-> > 
-> > The viommu_id would be the container that holds the xarray that maps
-> > the vRID to pRID
-> > 
-> > Logically we could have multiple mappings per iommufd as we could have
-> > multiple iommu instances working here.
-> 
-> I see. This is the object to hold a shared stage-2 HWPT/domain then.
+On Tue, Dec 5, 2023 at 11:46=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.com=
+> wrote:
+>
+> Addresses get set by .set_vq_address. hw vq addresses will be updated on
+> next modify_virtqueue.
+>
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Reviewed-by: Gal Pressman <gal@nvidia.com>
+> Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 
-It could be done like that, yes. I wasn't thinking about linking the
-stage two so tightly but perhaps? If we can avoid putting the hwpt
-here that might be more general.
+I'm kind of ok with this patch and the next one about state, but I
+didn't ack them in the previous series.
 
-> // iommufd_private.h
-> 
-> enum iommufd_object_type {
-> 	...
-> +	IOMMUFD_OBJ_VIOMMU,
-> 	...
-> };
-> 
-> +struct iommufd_viommu {
-> +	struct iommufd_object obj;
-> +	struct iommufd_hwpt_paging *hwpt;
-> +	struct xarray devices;
-> +};
-> 
-> struct iommufd_hwpt_paging hwpt {
-> 	...
-> +	struct list_head viommu_list;
-> 	...
-> };
+My main concern is that it is not valid to change the vq address after
+DRIVER_OK in VirtIO, which vDPA follows. Only memory maps are ok to
+change at this moment. I'm not sure about vq state in vDPA, but vhost
+forbids changing it with an active backend.
 
-I'd probably first try to go backwards and link the hwpt to the
-viommu.
+Suspend is not defined in VirtIO at this moment though, so maybe it is
+ok to decide that all of these parameters may change during suspend.
+Maybe the best thing is to protect this with a vDPA feature flag.
 
-> struct iommufd_group {
-> 	...
-> +	struct iommufd_viommu *viommu; // should we attach to viommu instead of hwpt?
-> 	...
-> };
+Jason, what do you think?
 
-No. Attach is a statement of translation so you still attach to the HWPT.
+Thanks!
 
- 
-> Question to finalize how we maps vRID-pRID in the xarray:
-> how should IOMMUFD_DEV_INVALIDATE work? The ioctl structure has
-> a dev_id and a list of commands that belongs to the device. So,
-> it forwards the struct device pointer to the driver along with
-> the commands. Then, doesn't the driver already know the pRID 
-> from the dev pointer without looking up a vRID-pRID table?
+> ---
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c  | 9 +++++++++
+>  include/linux/mlx5/mlx5_ifc_vdpa.h | 1 +
+>  2 files changed, 10 insertions(+)
+>
+> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/ml=
+x5_vnet.c
+> index f8f088cced50..80e066de0866 100644
+> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> @@ -1209,6 +1209,7 @@ static int modify_virtqueue(struct mlx5_vdpa_net *n=
+dev,
+>         bool state_change =3D false;
+>         void *obj_context;
+>         void *cmd_hdr;
+> +       void *vq_ctx;
+>         void *in;
+>         int err;
+>
+> @@ -1230,6 +1231,7 @@ static int modify_virtqueue(struct mlx5_vdpa_net *n=
+dev,
+>         MLX5_SET(general_obj_in_cmd_hdr, cmd_hdr, uid, ndev->mvdev.res.ui=
+d);
+>
+>         obj_context =3D MLX5_ADDR_OF(modify_virtio_net_q_in, in, obj_cont=
+ext);
+> +       vq_ctx =3D MLX5_ADDR_OF(virtio_net_q_object, obj_context, virtio_=
+q_context);
+>
+>         if (mvq->modified_fields & MLX5_VIRTQ_MODIFY_MASK_STATE) {
+>                 if (!is_valid_state_change(mvq->fw_state, state, is_resum=
+able(ndev))) {
+> @@ -1241,6 +1243,12 @@ static int modify_virtqueue(struct mlx5_vdpa_net *=
+ndev,
+>                 state_change =3D true;
+>         }
+>
+> +       if (mvq->modified_fields & MLX5_VIRTQ_MODIFY_MASK_VIRTIO_Q_ADDRS)=
+ {
+> +               MLX5_SET64(virtio_q, vq_ctx, desc_addr, mvq->desc_addr);
+> +               MLX5_SET64(virtio_q, vq_ctx, used_addr, mvq->device_addr)=
+;
+> +               MLX5_SET64(virtio_q, vq_ctx, available_addr, mvq->driver_=
+addr);
+> +       }
+> +
+>         MLX5_SET64(virtio_net_q_object, obj_context, modify_field_select,=
+ mvq->modified_fields);
+>         err =3D mlx5_cmd_exec(ndev->mvdev.mdev, in, inlen, out, sizeof(ou=
+t));
+>         if (err)
+> @@ -2202,6 +2210,7 @@ static int mlx5_vdpa_set_vq_address(struct vdpa_dev=
+ice *vdev, u16 idx, u64 desc_
+>         mvq->desc_addr =3D desc_area;
+>         mvq->device_addr =3D device_area;
+>         mvq->driver_addr =3D driver_area;
+> +       mvq->modified_fields |=3D MLX5_VIRTQ_MODIFY_MASK_VIRTIO_Q_ADDRS;
+>         return 0;
+>  }
+>
+> diff --git a/include/linux/mlx5/mlx5_ifc_vdpa.h b/include/linux/mlx5/mlx5=
+_ifc_vdpa.h
+> index b86d51a855f6..9594ac405740 100644
+> --- a/include/linux/mlx5/mlx5_ifc_vdpa.h
+> +++ b/include/linux/mlx5/mlx5_ifc_vdpa.h
+> @@ -145,6 +145,7 @@ enum {
+>         MLX5_VIRTQ_MODIFY_MASK_STATE                    =3D (u64)1 << 0,
+>         MLX5_VIRTQ_MODIFY_MASK_DIRTY_BITMAP_PARAMS      =3D (u64)1 << 3,
+>         MLX5_VIRTQ_MODIFY_MASK_DIRTY_BITMAP_DUMP_ENABLE =3D (u64)1 << 4,
+> +       MLX5_VIRTQ_MODIFY_MASK_VIRTIO_Q_ADDRS           =3D (u64)1 << 6,
+>         MLX5_VIRTQ_MODIFY_MASK_DESC_GROUP_MKEY          =3D (u64)1 << 14,
+>  };
+>
+> --
+> 2.42.0
+>
 
-The first version of DEV_INVALIDATE should have no xarray. The
-invalidate commands are stripped of the SID and executed on the given
-dev_id period. VMM splits up the invalidate command list.
-
-The second version maybe we have the xarray, or maybe we just push the
-xarray to the eventual viommu series.
-
-> struct iommu_hwpt_alloc {
-> 	...
-> +	__u32 viommu_id;
-> };
-> 
-> +enum iommu_dev_virtual_id_type {
-> +	IOMMU_DEV_VIRTUAL_ID_TYPE_AMD_VIOMMU_DID, // not sure how this fits the xarray in viommu obj.
-> +	IOMMU_DEV_VIRTUAL_ID_TYPE_AMD_VIOMMU_RID,
-
-It is just DID. In both cases the ID is the index to the "STE" radix
-tree, whatever the driver happens to call it.
-
-> Then, I think that we also need an iommu_viommu_alloc structure
-> and ioctl to allocate an object, and that VMM should know if it
-> needs to allocate multiple viommu objects -- this probably needs
-> the hw_info ioctl to return a piommu_id so VMM gets the list of
-> piommus from the attached devices?
-
-Yes and yes
-
-> Another question, introducing the viommu obj complicates things
-> a lot. Do we want it to come with iommu_dev_assign_virtual_id,
-> or maybe put in a later series? We could stage the xarray in the
-> iommu_hwpt_paging struct for now, so a single-IOMMU system could
-> still work with that.
-
-All this would be in its own series to enable HW accelerated viommu
-support on ARM & AMD as we've been doing so far.
-
-I imagine it after we get the basic invalidation done
-
-> > > And should we rename the "cache_invalidate_user"? Would VT-d
-> > > still uses it for device cache?
-> > 
-> > I think vt-d will not implement it
-> 
-> Then should we "s/cache_invalidate_user/iotlb_sync_user"?
-
-I think cache_invalidate is still a fine name.. vt-d will generate ATC
-invalidations under that function too.
-
-Jason
 
