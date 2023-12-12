@@ -1,157 +1,157 @@
-Return-Path: <kvm+bounces-4159-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4160-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B67E80E6F8
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 09:57:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98BA080E739
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 10:19:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56A27282BAD
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 08:57:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1F851C21388
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 09:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FC775812D;
-	Tue, 12 Dec 2023 08:57:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72BCB584C1;
+	Tue, 12 Dec 2023 09:19:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P2wjb/y5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Kq9A51q9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B17ADDC
-	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 00:57:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702371422;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+DYsFoZHtER6WKTlmJtvh956H3bsUBDuNP4h+dQhswI=;
-	b=P2wjb/y5ymsI+/pOG/8sBHAS2dN3s4wq+0OEOZ7jAtNV/ydX75CUQw3HvC70AkpqxdlIOU
-	hC+TL6KXSwFxp0Ab+Pswkkph+H5BA9zqyoILqzZwWVoKuDtEqVVVv7/ojhxIZ1R9nDh7xm
-	iSWcTkrVwTaD+pOyzz4LB/Gh9Jdh4nE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-15-nGPRoDHJO5yuOxsLvzH7mA-1; Tue, 12 Dec 2023 03:57:01 -0500
-X-MC-Unique: nGPRoDHJO5yuOxsLvzH7mA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40c1e063438so41605865e9.1
-        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 00:57:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702371420; x=1702976220;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+DYsFoZHtER6WKTlmJtvh956H3bsUBDuNP4h+dQhswI=;
-        b=vUveBIz1IEycj0R7YXzJzd+Gy1OQAAvRm26KALRT78CYnQRx7O3bkZkPl9tgzJpRk2
-         5WX+hMZkLg0LVIifWYmvp11IILzRr1rUKB6qYWmLPzHg7nNelIk9ye43sWsjg8bNmHD6
-         D5bpOZcvQzEPQ3C8z3Z1+BpLf8ASQJ4uP/BDuTSCWk2CUi01NU69wDiLt5Y21e7HGLXv
-         dgmRXkBZD09TfjDHTRiQfuHB1zuaHeLppCglj03SQg2syryCmXXzOEa/DYPp+Ja6xPlS
-         LtNN2O4vYfuJ1Uhco3wAEOvJYVF9t/v1qPU08nq4XcFQsM2akiGneZZGC7CQ1jIFwoNi
-         /DZg==
-X-Gm-Message-State: AOJu0YwPK8xjQOPOZxzl3PLss42s6iULOkVo6dC2RYgqH1fZ5+6gNRHL
-	9ygTycwcybJAqhplNgdEXVjfIupHLCX6l8LiJHnM3pRqyMUqunDACC2F6DuN52fgus02XEq/TC+
-	fd4NP7Yiyhi2f
-X-Received: by 2002:a05:600c:3b26:b0:40c:224a:4450 with SMTP id m38-20020a05600c3b2600b0040c224a4450mr3229524wms.37.1702371420268;
-        Tue, 12 Dec 2023 00:57:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEIvN7jWx6yzro4Qv1kFQ+dgRjl2IrdvJ4STo7PXBwwt5ZmQf8etAfWpYSWHF1NH+upAURrYw==
-X-Received: by 2002:a05:600c:3b26:b0:40c:224a:4450 with SMTP id m38-20020a05600c3b2600b0040c224a4450mr3229507wms.37.1702371419828;
-        Tue, 12 Dec 2023 00:56:59 -0800 (PST)
-Received: from sgarzare-redhat ([193.207.128.35])
-        by smtp.gmail.com with ESMTPSA id d13-20020a05600c34cd00b0040c496c64cfsm5430442wmq.12.2023.12.12.00.56.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 00:56:59 -0800 (PST)
-Date: Tue, 12 Dec 2023 09:56:45 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v8 3/4] virtio/vsock: fix logic which reduces
- credit update messages
-Message-ID: <5wewycputeafvvgehioon3j75hlwxeliyni6nt4qtw3ch5rlt4@o7yncdbcyoc4>
-References: <20231211211658.2904268-1-avkrasnov@salutedevices.com>
- <20231211211658.2904268-4-avkrasnov@salutedevices.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FB03C7;
+	Tue, 12 Dec 2023 01:19:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702372750; x=1733908750;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=r1px4BsQs/X7Xgfx+BYJsYmJ0wM7HnTCh77HJxhuwZg=;
+  b=Kq9A51q9SyoffKynEIkyZdQK5BnPL/L/qaxH80gLkSO3Q5CcdT4PweX5
+   vmrs6uPxhvn0J7Lc/OiUbnyXpszN8nQsRCebgWZ3Vr/rLy2qCcHvwPJCo
+   1g0J0uycHJYOhZy6P3wyJooNJRQ5OQ7RIwK8x490PFJ28yxGjcuSWNgqJ
+   x2nw6KAPqt0kGCBQonM1wQVMTyGiS6inGxH9nIVwO4V/SfC35t/LVX7dQ
+   2DjibEZg90pnoKY4NVUO+sz6UrKSQOd8jCGaVz6nI2PAvDlA8pTK4DdYa
+   Ruzr8zgNrtujr5uswJPFzuxacSe8VYBWUbhB1FbJA+vDm9HJ101Jhawdm
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="480974125"
+X-IronPort-AV: E=Sophos;i="6.04,269,1695711600"; 
+   d="scan'208";a="480974125"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 01:19:08 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="917212797"
+X-IronPort-AV: E=Sophos;i="6.04,269,1695711600"; 
+   d="scan'208";a="917212797"
+Received: from haibo-optiplex-7090.sh.intel.com ([10.239.159.132])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 01:19:00 -0800
+From: Haibo Xu <haibo1.xu@intel.com>
+To: 
+Cc: xiaobo55x@gmail.com,
+	haibo1.xu@intel.com,
+	ajones@ventanamicro.com,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Guo Ren <guoren@kernel.org>,
+	Mayuresh Chitale <mchitale@ventanamicro.com>,
+	wchen <waylingii@gmail.com>,
+	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Peter Xu <peterx@redhat.com>,
+	Like Xu <likexu@tencent.com>,
+	Vipin Sharma <vipinsh@google.com>,
+	Aaron Lewis <aaronlewis@google.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org
+Subject: [PATCH v4 00/11] RISCV: Add kvm Sstc timer selftests
+Date: Tue, 12 Dec 2023 17:31:09 +0800
+Message-Id: <cover.1702371136.git.haibo1.xu@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20231211211658.2904268-4-avkrasnov@salutedevices.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 12, 2023 at 12:16:57AM +0300, Arseniy Krasnov wrote:
->Add one more condition for sending credit update during dequeue from
->stream socket: when number of bytes in the rx queue is smaller than
->SO_RCVLOWAT value of the socket. This is actual for non-default value
->of SO_RCVLOWAT (e.g. not 1) - idea is to "kick" peer to continue data
->transmission, because we need at least SO_RCVLOWAT bytes in our rx
->queue to wake up user for reading data (in corner case it is also
->possible to stuck both tx and rx sides, this is why 'Fixes' is used).
->
->Fixes: b89d882dc9fc ("vsock/virtio: reduce credit update messages")
->Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->---
-> Changelog:
-> v6 -> v7:
->  * Handle wrap of 'fwd_cnt'.
->  * Do to send credit update when 'fwd_cnt' == 'last_fwd_cnt'.
-> v7 -> v8:
->  * Remove unneeded/wrong handling of wrap for 'fwd_cnt'.
->
-> net/vmw_vsock/virtio_transport_common.c | 13 ++++++++++---
-> 1 file changed, 10 insertions(+), 3 deletions(-)
+The RISC-V arch_timer selftests is used to validate Sstc timer
+functionality in a guest, which sets up periodic timer interrupts
+and check the basic interrupt status upon its receipt.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+This KVM selftests was ported from aarch64 arch_timer and tested
+with Linux v6.7-rc4 on a Qemu riscv64 virt machine.
 
-Thanks!
-Stefano
+---
+Changed since v4:
+  * Rebased to Linux 6.7-rc4
+  * Included Paolo's patch(01/11) to fix issues with SPLIT_TESTS
+  * Droped the patch(KVM: selftests: Unify the makefile rule for split targets) 
+    since Paolo's patch had included the fix
+  * Added new patch(05/11) to include header file vdso/processor.h from linux
+    source tree to leverage the cpu_relax() definition - Conor/Andrew
+  * Added new patch(11/11) to enable user configuration of timer error margin
+    parameter which alleviate the intermitent failure in stress test - Andrew
+  * Other minor fixes per Andrew's comments
 
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index e137d740804e..8572f94bba88 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -558,6 +558,8 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
-> 	struct virtio_vsock_sock *vvs = vsk->trans;
-> 	size_t bytes, total = 0;
-> 	struct sk_buff *skb;
->+	u32 fwd_cnt_delta;
->+	bool low_rx_bytes;
-> 	int err = -EFAULT;
-> 	u32 free_space;
->
->@@ -601,7 +603,10 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
-> 		}
-> 	}
->
->-	free_space = vvs->buf_alloc - (vvs->fwd_cnt - vvs->last_fwd_cnt);
->+	fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt;
->+	free_space = vvs->buf_alloc - fwd_cnt_delta;
->+	low_rx_bytes = (vvs->rx_bytes <
->+			sock_rcvlowat(sk_vsock(vsk), 0, INT_MAX));
->
-> 	spin_unlock_bh(&vvs->rx_lock);
->
->@@ -611,9 +616,11 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
-> 	 * too high causes extra messages. Too low causes transmitter
-> 	 * stalls. As stalls are in theory more expensive than extra
-> 	 * messages, we set the limit to a high value. TODO: experiment
->-	 * with different values.
->+	 * with different values. Also send credit update message when
->+	 * number of bytes in rx queue is not enough to wake up reader.
-> 	 */
->-	if (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
->+	if (fwd_cnt_delta &&
->+	    (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE || low_rx_bytes))
-> 		virtio_transport_send_credit_update(vsk);
->
-> 	return total;
->-- 
->2.25.1
->
+Haibo Xu (10):
+  KVM: arm64: selftests: Split arch_timer test code
+  KVM: selftests: Add CONFIG_64BIT definition for the build
+  tools: riscv: Add header file csr.h
+  tools: riscv: Add header file vdso/processor.h
+  KVM: riscv: selftests: Switch to use macro from csr.h
+  KVM: riscv: selftests: Add exception handling support
+  KVM: riscv: selftests: Add guest helper to get vcpu id
+  KVM: riscv: selftests: Change vcpu_has_ext to a common function
+  KVM: riscv: selftests: Add sstc timer test
+  KVM: selftests: Enable tunning of err_margin_us in arch timer test
+
+Paolo Bonzini (1):
+  selftests/kvm: Fix issues with $(SPLIT_TESTS)
+
+ tools/arch/riscv/include/asm/csr.h            | 521 ++++++++++++++++++
+ tools/arch/riscv/include/asm/vdso/processor.h |  32 ++
+ tools/testing/selftests/kvm/Makefile          |  27 +-
+ .../selftests/kvm/aarch64/arch_timer.c        | 295 +---------
+ tools/testing/selftests/kvm/arch_timer.c      | 259 +++++++++
+ .../selftests/kvm/include/aarch64/processor.h |   4 -
+ .../selftests/kvm/include/kvm_util_base.h     |   9 +
+ .../selftests/kvm/include/riscv/arch_timer.h  |  71 +++
+ .../selftests/kvm/include/riscv/processor.h   |  65 ++-
+ .../testing/selftests/kvm/include/test_util.h |   2 +
+ .../selftests/kvm/include/timer_test.h        |  45 ++
+ .../selftests/kvm/lib/riscv/handlers.S        | 101 ++++
+ .../selftests/kvm/lib/riscv/processor.c       |  87 +++
+ .../testing/selftests/kvm/riscv/arch_timer.c  | 111 ++++
+ .../selftests/kvm/riscv/get-reg-list.c        |  11 +-
+ 15 files changed, 1333 insertions(+), 307 deletions(-)
+ create mode 100644 tools/arch/riscv/include/asm/csr.h
+ create mode 100644 tools/arch/riscv/include/asm/vdso/processor.h
+ create mode 100644 tools/testing/selftests/kvm/arch_timer.c
+ create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_timer.h
+ create mode 100644 tools/testing/selftests/kvm/include/timer_test.h
+ create mode 100644 tools/testing/selftests/kvm/lib/riscv/handlers.S
+ create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
+
+-- 
+2.34.1
 
 
