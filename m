@@ -1,189 +1,141 @@
-Return-Path: <kvm+bounces-4206-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4207-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3687C80F1C9
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 17:03:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4288E80F1E0
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 17:07:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA6E0B20D9D
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 16:03:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D689BB20D79
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 16:07:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA7177649;
-	Tue, 12 Dec 2023 16:03:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B22577651;
+	Tue, 12 Dec 2023 16:07:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="bKXm2Mfw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HSVz3T3B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 275FC1A1
-	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 08:03:35 -0800 (PST)
-Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2c9f4bb2e5eso81264021fa.1
-        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 08:03:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1702397014; x=1703001814; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QP8xfxj50VGqrIkZIkHug1SrPRuuFi/XxUsjHmRpfqM=;
-        b=bKXm2MfwhdIl3ko9rMq6oi7NfeNZMUoYAgURZnBfxWhA9Oxv1lnHS/JPLHkUhZwlG9
-         Z6kRLbx2c/XFI/FHYFfbsB2O9QKwEefyRODK/7WYLs6GqGlrYiVSf5cYF6sx70H/pC1Z
-         IivaH6zhYVQ5QT/VkFwlctnhGYIU3jb080DWCVFsI4/++5Cl7EibRt8e4ZadTekr/hkb
-         NUGYDeE1IZHpGIlLYfHXl8WWUYv3nac6FXzFS5/mu1l765MLDL3Nehl9AiDwrUNQLQgT
-         V4O8w1/OjRyVm1BWLiEWPRfTmp3tMtC3V8UzsroEyly8yA/UnUS6FztHzqaV+I2GKsoN
-         8I3w==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3107B8E
+	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 08:07:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702397255;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=AX13QLp52fxcEAzzU06zAooOoCuVylV9op9xhQpaESU=;
+	b=HSVz3T3BwYhorFfv82e5JokdYrEE5khb++O8K6jISwIVkdhLzxL67okt5lnz1z67HN+5yl
+	zBJ25Fg/snSvwZjNNuM77EAl8BFUW8CEeMq3W5eyyiMK+/1kKcOkVHdtT368EWT1yQ2ERS
+	wWCZ/iRikHN/EpUz8LSySJePfjKD37Y=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-322-IGB0rNJIM3yU2uwRxROx1A-1; Tue, 12 Dec 2023 11:07:33 -0500
+X-MC-Unique: IGB0rNJIM3yU2uwRxROx1A-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33608b14b3cso4119091f8f.0
+        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 08:07:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702397014; x=1703001814;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QP8xfxj50VGqrIkZIkHug1SrPRuuFi/XxUsjHmRpfqM=;
-        b=uUE6Re9Z5SgJ/31LnOIyXB+ciDSR/2s6IMBILQPwjfZHsqsW61Xr01C2a0/EYQhSSp
-         JO+tcrpYbf9tuPbpKlZFiBfUfd90UuDSo5OPLMMYlbVC7vR5sW66AfUYn81QDme8kzRX
-         75m4S1AlCO+EYLVXgdSIYyPSwtYhQ/IfLrpwdn0l4DuOXHSRqx7QbV5mVdVFVmBKHdBf
-         5eh4DKoVKIGheYR8Hnk/p2LI3BC6uXWOHja+7+5TqkQ0z4t7vBd0ppbVMtAZUy/Td4t8
-         lbY1InzhWeGoqFMDYOAwMGEdyzAHy/ekjsKRdzTnsxd5ot++Mdv+AghXo5DjFglaUM9m
-         5tfA==
-X-Gm-Message-State: AOJu0Ywgn22QOkkAxlpeLIuLXKW3SPVvylxw/RPSPJrvBcdLgex/bNdf
-	Wpera1WVdZBslZMzqjXbhuRhIRGB53y0EXIgD4CG/Q==
-X-Google-Smtp-Source: AGHT+IEz0+50MDCsAQHZ+397Z3sl+6IBS7BadUyZHh4qtGCJPyOtz95wQCVulFs0PwkrFNz1kcnuxWiP/zSSNoxxtu8=
-X-Received: by 2002:a2e:97c7:0:b0:2ca:24e0:f87f with SMTP id
- m7-20020a2e97c7000000b002ca24e0f87fmr2556071ljj.56.1702397013574; Tue, 12 Dec
- 2023 08:03:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702397252; x=1703002052;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AX13QLp52fxcEAzzU06zAooOoCuVylV9op9xhQpaESU=;
+        b=bq8BhxDK6i16dUDbjDSsMtr36PwxrU7fV2bxzesRbjq5qw3bKRiBfat4P5q0TeM11Z
+         +t905wvp2LHz5vvEHGLhkEMlMK3NwlIYLx5S1E6mL0J4RYzrZ3bCq9ayq+2K6HE3cyO4
+         iAeWBtJ4Q3K6LbZrq3lYgRPbwnxbShVUtbo5WFGW4OOlVeHMKLYuiLxfgaMyTxv52RMh
+         iVdtOj0XY+YmItgq/55HSW6nKQ9zCuEOGnqRj2XYKw19BejuBIrLwAUEiDOyWdg9mtOz
+         9lSqMzl2rEFFPb1QQMQJR/LL+kvaYYB7jBU5vZUC3Mj18CzjvBVmiIwlMejU9FrwP0QM
+         G1vQ==
+X-Gm-Message-State: AOJu0YzBAkM67H6PNpTHQuztya1AL0KdVYVjLikcRwsyRZ1Rr1Ubslg/
+	PTNryIstUK9fHIk7WPsgm70xvUr9NVm4injcHwQPiEJHuKsftFigIsgYYkHU5ir/jS+3i1AwsV8
+	i22dF+jRTrR3k
+X-Received: by 2002:a05:600c:4507:b0:40c:5a4:b0dc with SMTP id t7-20020a05600c450700b0040c05a4b0dcmr3068544wmo.113.1702397252407;
+        Tue, 12 Dec 2023 08:07:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFjMQpzQc5MhAj09eWUFTjXsAB04BjM7/TN5+rFoi67i9ZNVTdke0Lk83q2ohgUcY7xbEkJsA==
+X-Received: by 2002:a05:600c:4507:b0:40c:5a4:b0dc with SMTP id t7-20020a05600c450700b0040c05a4b0dcmr3068536wmo.113.1702397252048;
+        Tue, 12 Dec 2023 08:07:32 -0800 (PST)
+Received: from [10.32.181.74] (nat-pool-mxp-t.redhat.com. [149.6.153.186])
+        by smtp.googlemail.com with ESMTPSA id f9-20020a05600c154900b0040c4be1af17sm5548133wmg.21.2023.12.12.08.07.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Dec 2023 08:07:31 -0800 (PST)
+Message-ID: <4a26883e-1acf-421a-9055-07ba9fea783c@redhat.com>
+Date: Tue, 12 Dec 2023 17:07:30 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231212053501.12054-1-yongxuan.wang@sifive.com>
-In-Reply-To: <20231212053501.12054-1-yongxuan.wang@sifive.com>
-From: Anup Patel <apatel@ventanamicro.com>
-Date: Tue, 12 Dec 2023 21:33:22 +0530
-Message-ID: <CAK9=C2VOXj5oCAZEPS24K98UmQycupoJCcATGDNr+HFr9aVCPw@mail.gmail.com>
-Subject: Re: [PATCH 1/1] RISCV: KVM: should not be interrupted when update the
- external interrupt pending
-To: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-Cc: linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org, 
-	greentime.hu@sifive.com, vincent.chen@sifive.com, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] kvm: x86: use a uapi-friendly macro for BIT
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>,
+ Dionna Glaze <dionnaglaze@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
+References: <20231207001142.3617856-1-dionnaglaze@google.com>
+ <ZXh78TApz80DAWUb@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <ZXh78TApz80DAWUb@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 12, 2023 at 11:05=E2=80=AFAM Yong-Xuan Wang
-<yongxuan.wang@sifive.com> wrote:
->
-> The emulated IMSIC update the external interrupt pending depending on the
-> value of eidelivery and topei. It might lose an interrupt when it is
-> interrupted before setting the new value to the pending status.
+On 12/12/23 16:27, Sean Christopherson wrote:
+>> -#define KVM_PMU_EVENT_FLAG_MASKED_EVENTS BIT(0)
+>> +#define KVM_PMU_EVENT_FLAG_MASKED_EVENTS _BITUL(0)
+> It's not just BIT(), won't BIT_ULL() and GENMASK_ULL() also be problematic?  And
+> sadly, I don't see an existing equivalent for GENMASK_ULL().
 
-More simpler PATCH subject can be:
-"RISCV: KVM: update external interrupt atomically for IMSIC swfile"
+BIT_ULL() is easy enough, as you point out:
 
->
-> For example, when VCPU0 sends an IPI to VCPU1 via IMSIC:
->
-> VCPU0                           VCPU1
->
->                                 CSRSWAP topei =3D 0
->                                 The VCPU1 has claimed all the external
->                                 interrupt in its interrupt handler.
->
->                                 topei of VCPU1's IMSIC =3D 0
->
-> set pending in VCPU1's IMSIC
->
-> topei of VCPU1' IMSIC =3D 1
->
-> set the external interrupt
-> pending of VCPU1
->
->                                 clear the external interrupt pending
->                                 of VCPU1
->
-> When the VCPU1 switches back to VS mode, it exits the interrupt handler
-> because the result of CSRSWAP topei is 0. If there are no other external
-> interrupts injected into the VCPU1's IMSIC, VCPU1 will never know this
-> pending interrupt unless it initiative read the topei.
->
-> If the interruption occurs between updating interrupt pending in IMSIC
-> and updating external interrupt pending of VCPU, it will not cause a
-> problem. Suppose that the VCPU1 clears the IPI pending in IMSIC right
-> after VCPU0 sets the pending, the external interrupt pending of VCPU1
-> will not be set because the topei is 0. But when the VCPU1 goes back to
-> VS mode, the pending IPI will be reported by the CSRSWAP topei, it will
-> not lose this interrupt.
->
-> So we only need to make the external interrupt updating procedure as a
-> critical section to avoid the problem.
->
+@@ -550,7 +550,7 @@ struct kvm_pmu_event_filter {
+         (GENMASK_ULL(7, 0) | GENMASK_ULL(35, 32))
+  #define KVM_PMU_MASKED_ENTRY_UMASK_MASK                (GENMASK_ULL(63, 56))
+  #define KVM_PMU_MASKED_ENTRY_UMASK_MATCH       (GENMASK_ULL(15, 8))
+-#define KVM_PMU_MASKED_ENTRY_EXCLUDE           (BIT_ULL(55))
++#define KVM_PMU_MASKED_ENTRY_EXCLUDE           (_BITULL(55))
+  #define KVM_PMU_MASKED_ENTRY_UMASK_MASK_SHIFT  (56)
 
-Please add a "Fixes:" line here
+  /* for KVM_{GET,SET,HAS}_DEVICE_ATTR */
 
-> Tested-by: Roy Lin <roy.lin@sifive.com>
-> Tested-by: Wayling Chen <wayling.chen@sifive.com>
-> Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
-> Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
-> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-> ---
->  arch/riscv/kvm/aia_imsic.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
->
-> diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
-> index 6cf23b8adb71..0278aa0ca16a 100644
-> --- a/arch/riscv/kvm/aia_imsic.c
-> +++ b/arch/riscv/kvm/aia_imsic.c
-> @@ -37,6 +37,8 @@ struct imsic {
->         u32 nr_eix;
->         u32 nr_hw_eix;
->
-> +       spinlock_t extirq_update_lock;
-> +
+And I'll squash it into Dionna's patch since she has already a conversion
+for KVM_EXIT_HYPERCALL_LONG_MODE.  For the others, I'll send a patch.
 
-Please rename this lock to "swfile_extirq_lock".
+Paolo
 
->         /*
->          * At any point in time, the register state is in
->          * one of the following places:
-> @@ -613,12 +615,17 @@ static void imsic_swfile_extirq_update(struct kvm_v=
-cpu *vcpu)
->  {
->         struct imsic *imsic =3D vcpu->arch.aia_context.imsic_state;
->         struct imsic_mrif *mrif =3D imsic->swfile;
-> +       unsigned long flags;
-> +
-
-Add a short summary in a comment block about why external interrupt
-updates are required to be in the critical section.
-
-> +       spin_lock_irqsave(&imsic->extirq_update_lock, flags);
->
->         if (imsic_mrif_atomic_read(mrif, &mrif->eidelivery) &&
->             imsic_mrif_topei(mrif, imsic->nr_eix, imsic->nr_msis))
->                 kvm_riscv_vcpu_set_interrupt(vcpu, IRQ_VS_EXT);
->         else
->                 kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_VS_EXT);
-> +
-> +       spin_unlock_irqrestore(&imsic->extirq_update_lock, flags);
->  }
->
->  static void imsic_swfile_read(struct kvm_vcpu *vcpu, bool clear,
-> @@ -1029,6 +1036,7 @@ int kvm_riscv_vcpu_aia_imsic_init(struct kvm_vcpu *=
-vcpu)
->         imsic->nr_eix =3D BITS_TO_U64(imsic->nr_msis);
->         imsic->nr_hw_eix =3D BITS_TO_U64(kvm_riscv_aia_max_ids);
->         imsic->vsfile_hgei =3D imsic->vsfile_cpu =3D -1;
-> +       spin_lock_init(&imsic->extirq_update_lock);
->
->         /* Setup IMSIC SW-file */
->         swfile_page =3D alloc_pages(GFP_KERNEL | __GFP_ZERO,
-> --
-> 2.17.1
->
->
-
-Regards,
-Anup
 
