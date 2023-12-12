@@ -1,356 +1,272 @@
-Return-Path: <kvm+bounces-4130-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4132-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DD7580E262
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 04:00:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0C0C80E27A
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 04:06:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92C87B216C8
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 03:00:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 057E41C2174A
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 03:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A6F053BE;
-	Tue, 12 Dec 2023 02:59:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U6cJ7lWL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B275676;
+	Tue, 12 Dec 2023 03:06:29 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10C699C;
-	Mon, 11 Dec 2023 18:59:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702349993; x=1733885993;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=DbCoX/9i7wkad1UTB8onFxkCKvtLpRjOfuvvBsRlBPc=;
-  b=U6cJ7lWLyHE7mHzKpGmFShafIlAtHtQpq/JWtjHZJW+czXnNjp9Kzj83
-   4HhWoi9nGHP/5lEndJyaJJkoj83yei5M8pF37uphh0iaK0wKl+0gUCY2H
-   nTxJPBMFO3XAhRtG2y4WfnSxcxiHmk+yoF1nGH/3kIRGrgqW4lMh58hyL
-   vVMjM/jS+0+C1UKDbvE05ZfEf5/x5oX4ELdkEe8BMPtcA0mduMkSYRTyd
-   lVQUyIbSe3ayjWh7viTayZa/lQi1jnKiFXJ44lMJmy3EEaXMuPUI69YQ1
-   w53MaunNEg8Bv5t4qMf1l8XAfIaFrFlDfwA6GRnnxxODYLEQJDpVcxgfL
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="374903482"
-X-IronPort-AV: E=Sophos;i="6.04,269,1695711600"; 
-   d="scan'208";a="374903482"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 18:59:52 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="723056551"
-X-IronPort-AV: E=Sophos;i="6.04,269,1695711600"; 
-   d="scan'208";a="723056551"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Dec 2023 18:59:51 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 11 Dec 2023 18:59:51 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 11 Dec 2023 18:59:50 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 11 Dec 2023 18:59:50 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 11 Dec 2023 18:59:47 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G7RrOt7miIRhw4obk8NvptZ7HZ6J7uhRhQpgKoB4lJb3GGdV7CvwSAd4p6Ri2GnkMUlvvXhbNuPOlct/kosvnhdCsVV8FITbCLB31KW31UCmcsX+W1uEInYW9zXB4Dy+sXQxuBTxFh9P4x9Qke3na3q5/kaPz3dv3A44tORy4BUSHkOLINRbyJTD8HDDDVDRUsqRi+mJX/n6CdihpCF5Anx54yTfJBYtAO7MpRMZWWfyWB+l8vrSDDEda0l6jn3ynJ9aX5UxdMTLJl4uNVPieONXvBzy8SGnrIp57t87BRrnWplrTJprKbKKn1ji49IHRnDpYGtfGQw5zlbInvnw/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+pzP0OLQJSBdhh+5dVbsvch1y/mtbEJNEOnen06YVDU=;
- b=etbZ28bI5EjYcP1luHV+rReRUfeRlWBCBUm994+CPP4muOEd2X08RyzmTfzdkK4AyfvWkq0ph/OuAknepzNMMV5P4HY4Fu2CtyOYJIAOsc73IBluzdnr88Px7JQ7HGxF147vJ7cUeu8qosTqCkEjqKhiciESkC2PRU8Lii5goNfhMLYe4g2hEv9g7zT1I0M9JHtkVIiTvG/F/lYguZwol+RZKMtdHIpLd01T5d728YFUTDTqRl0Hf1qW8g5Ci9v7oMQUavn8PB8pq/W1Apxi8OqOdtBUr8tZ1kVUUOBzAkbVxg7FQdaPjWIUFvJ4go9ojCG2r/qT0LtxXUh0Fqi6qQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by IA0PR11MB7353.namprd11.prod.outlook.com (2603:10b6:208:435::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Tue, 12 Dec
- 2023 02:59:40 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::e4ae:3948:1f55:547d]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::e4ae:3948:1f55:547d%5]) with mapi id 15.20.7068.031; Tue, 12 Dec 2023
- 02:59:39 +0000
-Message-ID: <a5bc36fd-dcbe-4b09-b9e3-90578871f776@intel.com>
-Date: Tue, 12 Dec 2023 11:02:13 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] vfio: Add VFIO_DEVICE_PASID_[AT|DE]TACH_IOMMUFD_PT
-Content-Language: en-US
-To: Alex Williamson <alex.williamson@redhat.com>
-CC: <joro@8bytes.org>, <jgg@nvidia.com>, <kevin.tian@intel.com>,
-	<robin.murphy@arm.com>, <baolu.lu@linux.intel.com>, <cohuck@redhat.com>,
-	<eric.auger@redhat.com>, <nicolinc@nvidia.com>, <kvm@vger.kernel.org>,
-	<mjrosato@linux.ibm.com>, <chao.p.peng@linux.intel.com>,
-	<yi.y.sun@linux.intel.com>, <peterx@redhat.com>, <jasowang@redhat.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
-	<suravee.suthikulpanit@amd.com>, <iommu@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<zhenzhong.duan@intel.com>, <joao.m.martins@oracle.com>,
-	<xin.zeng@intel.com>, <yan.y.zhao@intel.com>
-References: <20231127063909.129153-1-yi.l.liu@intel.com>
- <20231127063909.129153-3-yi.l.liu@intel.com>
- <20231211100501.1c4032ce.alex.williamson@redhat.com>
-From: Yi Liu <yi.l.liu@intel.com>
-In-Reply-To: <20231211100501.1c4032ce.alex.williamson@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR02CA0022.apcprd02.prod.outlook.com
- (2603:1096:3:17::34) To DS0PR11MB7529.namprd11.prod.outlook.com
- (2603:10b6:8:141::20)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 02CFCB5;
+	Mon, 11 Dec 2023 19:06:23 -0800 (PST)
+Received: from loongson.cn (unknown [10.20.42.183])
+	by gateway (Coremail) with SMTP id _____8Ax2uguzndl1zwAAA--.1533S3;
+	Tue, 12 Dec 2023 11:06:22 +0800 (CST)
+Received: from [10.20.42.183] (unknown [10.20.42.183])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxXeEqzndl6BQAAA--.709S3;
+	Tue, 12 Dec 2023 11:06:20 +0800 (CST)
+Subject: Re: [PATCH v5 1/4] KVM: selftests: Add KVM selftests header files for
+ LoongArch
+To: Sean Christopherson <seanjc@google.com>
+Cc: Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ Vishal Annapurve <vannapurve@google.com>, Huacai Chen
+ <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
+ loongarch@lists.linux.dev, Peter Xu <peterx@redhat.com>,
+ Vipin Sharma <vipinsh@google.com>, maobibo@loongson.cn
+References: <20231130111804.2227570-1-zhaotianrui@loongson.cn>
+ <20231130111804.2227570-2-zhaotianrui@loongson.cn>
+From: zhaotianrui <zhaotianrui@loongson.cn>
+Message-ID: <e40d3884-bf39-8286-627f-e0ce7dacfcbe@loongson.cn>
+Date: Tue, 12 Dec 2023 11:08:41 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|IA0PR11MB7353:EE_
-X-MS-Office365-Filtering-Correlation-Id: 79492446-7adc-4d44-5915-08dbfabe61dc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: cD9nszyTy9Lik3IS1e3/1YP1mb/Sl8srb31cEjgRVUPbygIJoaQGc+ihvVY+5jTZjj5LcNq6i59043twmo2PyQrOYtZ3BtqaQeKHWcarML+NJJ3d+JJLD4doL8JBFaJLgSokGr5lFQWxAsvuJG2znSObn0a455ZnxEeC+1JkSWdGOkn7+I4NglO/Q2omqCE/UqUAQtTvhnJVn46LahoNFRcpmuW3LhFtKF8Z3fdTfEur+BpdISmOR1pa4/wC1fjfHuIsfoyQfyHA4D9DTGqTWJdyUT6ydrECxHO9/oGiEp93fmJOn/JoX5exx/BaXYL2wAz/S0QX/w3WJdGRufRn+vQaTb0rbGk5scC+yporBarK1RXXZDuDBzd6kPAN4TkRbZB7VxcexWcR6jxmObY0wzMbiNWr4OsAbkpAfSIUsWyHfNXpNvlqTa5My8cog0KQEVFovC3hsW27GH5uNg/pMbQkAIACOEyspMcPza4XLFH3OSRXdlRK/0ydpm3Uagg2zpV2UJOm2Bksg36ME3kokJY33xvnBxK3nPm3I/5N04E9C3mrxIc+yZKUAjh6q9iI8KvgXtOZ+HlVjYRdmgx5/b84l1l9BrgmmNtWDj9GauJq/JapVGsVcCZpkmcEGZxgchfw7au4nXsZrETtUN4hTiIFCRA/sgDEYTVZBp0zJpI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(396003)(136003)(346002)(376002)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(5660300002)(7416002)(2906002)(41300700001)(38100700002)(82960400001)(36756003)(2616005)(31696002)(86362001)(83380400001)(6506007)(26005)(6512007)(6666004)(6486002)(478600001)(53546011)(8676002)(66476007)(4326008)(8936002)(66946007)(6916009)(66556008)(316002)(31686004)(83133001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?elloeGFNR2tMeUZKUVJzL0NMNGQ5MkthYTQ1aW5Xckh2aHVUWEdHbkhVRmhQ?=
- =?utf-8?B?enh3SzZwQTBJdUJ5SzdoYnMrb0tGVjdVT0g3dDg4MU1tdzNyR0sxbnBFQU9K?=
- =?utf-8?B?VG9kVmJqK1RmOHB4aXp0RXFDVEhQYlpBUEFJcit3YXdINEgyYUhFV2d3ZFFL?=
- =?utf-8?B?c2hPSzF0OXMreE9xTURpWE9PczV1bzYzM25PTCtCQXF1eDcxbVVuWkhSTWUv?=
- =?utf-8?B?Z29NVzFyaDVlVE0zMTBzSW1YWThTUjZLMFNsZkd6R1hWYnk5WWdJbUJScjBh?=
- =?utf-8?B?ZnNLcjZTV1ZWdmdjNllPR3h4bnhscEl5MUhTYm14V0FndllLN01nbWg1Sm1Z?=
- =?utf-8?B?dzdseTdDU25RUEtPYkhEMDVlMmRQK00zZWlrSE9DMEVqWFdnS2ErSVZRQ2c4?=
- =?utf-8?B?TWFMYWFOWVpZenNnVW15ZUtIWnJPVldScGNSNW45TmpoaHlMTkRBWm9uMDNq?=
- =?utf-8?B?bGt5dkFCVTBCdWw4aXZPZkE3dzhKTWRMWFFwRzB2MUJVOWR1OTVpYTJIZ3Nz?=
- =?utf-8?B?L2FDK2VlTUt2c0ZIaEliY3FaaW1sbTVIQk5yUWJ4emgrUlRvVXo1ZW0xdzdY?=
- =?utf-8?B?S1lKS3ltcHlOSk9EOWpUM3A0ZjZUZzdaUER6MEJkSzRHaWdvMGVvWUVEM1oz?=
- =?utf-8?B?bW5VQU1ZbmlIaWk1djkybVBCUG55YWxUUEUvTXREK1VVYU5RU0w2K0ZkVnE2?=
- =?utf-8?B?OHVlUHRUN0pOYmRrcjlqME9lZ1dlYVlOK1pFb01xNkh1NmRUNWI0SUtlTlFw?=
- =?utf-8?B?Vy9idlN5MmJaQkFDM0x2WEZjVE01Z2xVSmphK3NDREVuWk1TV0oyREpVcU5S?=
- =?utf-8?B?SllXVlo1SzhVVU40bzE2eTlBd2N4clNLbW9JNHU2KzZkZllaY0licFo0YTlk?=
- =?utf-8?B?V0FKSGNVb3MrNndEMEdVTXFpK3Z5SmF1bmduZ3dkZmpWRDlBa3p1VTZPSzlP?=
- =?utf-8?B?a0Z0eDFIT1p2L3pCd0Y4L0hoNlF4c2JnTXBnc05FUGtwM2l2eURMWHVXNlFl?=
- =?utf-8?B?ZFdnR21jR3pPUjRzdjRDVGpTQkNWMVlyRUlIODRhd1g0R1lhbTRDQUQ0Y3kx?=
- =?utf-8?B?T1M2a281S3VzMHhmZnMyK2k2cmp0ZkNKZE1MRkZnWXFOYmt6RlJ0aUFDWk5p?=
- =?utf-8?B?aEY2UnFUWnVWdzZDZjlHVGtZWG9UT1ZTR3ZJRzd3VCtKMCtXNU1zWXBab0Zv?=
- =?utf-8?B?T2QvQXo3N2dkZ0ZFam1Qd2JOb1l2Z1BJVkZhR3lzZDFLSUFVWGxvaDRHWUFE?=
- =?utf-8?B?akVUWURjdjl4a2JPV21zQ2RHa1RleE5KcExoSFYyNE5QSk91TGNDSWRvL2N4?=
- =?utf-8?B?SHIyeDU2SWVibDBLRk9EWnJPM000cmo3eTBJdVlBOTdGa3UvWnptMHExbVhh?=
- =?utf-8?B?RG5MK1BoNUVEdmpTbE1IeklGcTRLMGZwNCthUG1xb0tCRlgvL0l6VTNmemVv?=
- =?utf-8?B?Mlg4Y0d0bDdMRzdqWXVqYjFwamlrNWRjelNjSkw0Y0c1bk4vREdFR090RkhJ?=
- =?utf-8?B?RkY5dUlSaXVRdHgwVnVjWnczWWtlRFI2MFdPbEVEc1YxVHN3d0twZjdUMHZ4?=
- =?utf-8?B?cER0VXVlbDRjUEdRa0N4NkdCZU1jUkcvdWM1Y0YwVXF4dDFxTmRFNFNrN20x?=
- =?utf-8?B?aWI5eElMNGtMSEdpVVJaSlEyRFJ3NkFOaldoT0QyTk5xSkJLZ0F4UW1ZMmVE?=
- =?utf-8?B?SVEyMWlueVoxV0hnbjJYYWJjSG9keEZDdjc4MmRyVlB1MXZIN3FFRVFwYjM0?=
- =?utf-8?B?a01TR0xwNDliVTZWdTlWRXpYbThsbXdxRzV5MWQvVjlyZExPb25GVDlMaHM2?=
- =?utf-8?B?b3lwU0FjakR4S054Z3ZSaE1NQUZNd3BsaDYvS0ExZWl0RW15TkFPY015YjZV?=
- =?utf-8?B?ZHMrZnhwK21MRkViNUNKVldzLzl6Z2JHckVENVJZRFpEVEFXSnhiN0VTUjFU?=
- =?utf-8?B?bTE3c1hTYzgyNDN6OEpvNXZsb1NvN0MvcVNsejhJUnAvQkNvd3kyVFBmRHln?=
- =?utf-8?B?ZFAvenZHUnkxaEFsdXJsVGVTeVEyVmF5V3FDdXlVR09qUFN0WUdMcXZCQWsv?=
- =?utf-8?B?Q2gzM1piM2RKeElDb1dJNDQyMGNaRVpMRGsxMzVVQTczWDlKQTFuaWtscEVn?=
- =?utf-8?Q?y/Y5FkHUE9rF301+RZMrGU8RN?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 79492446-7adc-4d44-5915-08dbfabe61dc
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2023 02:59:39.8990
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qaWaHOykDXM0NonHYNXvORpgDn4TNYTjeG6viL+DarBAFBs547/LGhu0vMfJ6aJiwabSXUq9XM6g/2jcGCLonw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7353
-X-OriginatorOrg: intel.com
+In-Reply-To: <20231130111804.2227570-2-zhaotianrui@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:AQAAf8CxXeEqzndl6BQAAA--.709S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3XrW3Ar4UKryxuFW8Xr1rZrc_yoWxZFy5pF
+	WjkFy0kr48tF47K348KFn5Z3W7Gr4xAF18K347XrWj9F45X34kGr12gF45JFy5Xrs5XFyU
+	Ar1vqw4a9rZrW3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUP2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4UJVWxJr1ln4kS14v26r1Y6r17M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
+	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y
+	6r17McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
+	1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxG
+	rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUXVWUAwC20s026c02F40E14
+	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4U
+	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8m9aDUUUU
+	U==
 
-On 2023/12/12 01:05, Alex Williamson wrote:
-> On Sun, 26 Nov 2023 22:39:08 -0800
-> Yi Liu <yi.l.liu@intel.com> wrote:
-> 
->> This adds ioctls for the userspace to attach a given pasid of a vfio
->> device to/from an IOAS/HWPT.
->>
->> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
->> ---
->>   drivers/vfio/device_cdev.c | 45 +++++++++++++++++++++++++++++++
->>   drivers/vfio/vfio.h        |  4 +++
->>   drivers/vfio/vfio_main.c   |  8 ++++++
->>   include/uapi/linux/vfio.h  | 55 ++++++++++++++++++++++++++++++++++++++
->>   4 files changed, 112 insertions(+)
->>
->> diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
->> index e75da0a70d1f..c2ac7ed44537 100644
->> --- a/drivers/vfio/device_cdev.c
->> +++ b/drivers/vfio/device_cdev.c
->> @@ -210,6 +210,51 @@ int vfio_df_ioctl_detach_pt(struct vfio_device_file *df,
->>   	return 0;
->>   }
->>   
->> +int vfio_df_ioctl_pasid_attach_pt(struct vfio_device_file *df,
->> +				  struct vfio_device_pasid_attach_iommufd_pt __user *arg)
->> +{
->> +	struct vfio_device *device = df->device;
->> +	struct vfio_device_pasid_attach_iommufd_pt attach;
->> +	unsigned long minsz;
->> +	int ret;
->> +
->> +	minsz = offsetofend(struct vfio_device_pasid_attach_iommufd_pt, pt_id);
->> +
->> +	if (copy_from_user(&attach, arg, minsz))
->> +		return -EFAULT;
->> +
->> +	if (attach.argsz < minsz || attach.flags)
->> +		return -EINVAL;
->> +
->> +	mutex_lock(&device->dev_set->lock);
->> +	ret = device->ops->pasid_attach_ioas(device, attach.pasid, &attach.pt_id);
-> 
-> These callbacks were only implemented for vfio-pci in the previous
-> patch but they're called unconditionally.  Thanks,
+Hi, Sean:
 
-yes, will correct it and below. thanks for catching it.
+I want to change the definition of  DEFAULT_GUEST_TEST_MEM in the common 
+file "memstress.h", like this:
 
-> 
-> Alex
-> 
->> +	mutex_unlock(&device->dev_set->lock);
->> +
->> +	return ret;
->> +}
->> +
->> +int vfio_df_ioctl_pasid_detach_pt(struct vfio_device_file *df,
->> +				  struct vfio_device_pasid_detach_iommufd_pt __user *arg)
->> +{
->> +	struct vfio_device *device = df->device;
->> +	struct vfio_device_pasid_detach_iommufd_pt detach;
->> +	unsigned long minsz;
->> +
->> +	minsz = offsetofend(struct vfio_device_pasid_detach_iommufd_pt, flags);
->> +
->> +	if (copy_from_user(&detach, arg, minsz))
->> +		return -EFAULT;
->> +
->> +	if (detach.argsz < minsz || detach.flags)
->> +		return -EINVAL;
->> +
->> +	mutex_lock(&device->dev_set->lock);
->> +	device->ops->pasid_detach_ioas(device, detach.pasid);
->> +	mutex_unlock(&device->dev_set->lock);
->> +
->> +	return 0;
->> +}
->> +
->>   static char *vfio_device_devnode(const struct device *dev, umode_t *mode)
->>   {
->>   	return kasprintf(GFP_KERNEL, "vfio/devices/%s", dev_name(dev));
->> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
->> index 307e3f29b527..d228cdb6b345 100644
->> --- a/drivers/vfio/vfio.h
->> +++ b/drivers/vfio/vfio.h
->> @@ -353,6 +353,10 @@ int vfio_df_ioctl_attach_pt(struct vfio_device_file *df,
->>   			    struct vfio_device_attach_iommufd_pt __user *arg);
->>   int vfio_df_ioctl_detach_pt(struct vfio_device_file *df,
->>   			    struct vfio_device_detach_iommufd_pt __user *arg);
->> +int vfio_df_ioctl_pasid_attach_pt(struct vfio_device_file *df,
->> +				  struct vfio_device_pasid_attach_iommufd_pt __user *arg);
->> +int vfio_df_ioctl_pasid_detach_pt(struct vfio_device_file *df,
->> +				  struct vfio_device_pasid_detach_iommufd_pt __user *arg);
->>   
->>   #if IS_ENABLED(CONFIG_VFIO_DEVICE_CDEV)
->>   void vfio_init_device_cdev(struct vfio_device *device);
->> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
->> index 8d4995ada74a..ff50c239873d 100644
->> --- a/drivers/vfio/vfio_main.c
->> +++ b/drivers/vfio/vfio_main.c
->> @@ -1240,6 +1240,14 @@ static long vfio_device_fops_unl_ioctl(struct file *filep,
->>   		case VFIO_DEVICE_DETACH_IOMMUFD_PT:
->>   			ret = vfio_df_ioctl_detach_pt(df, uptr);
->>   			goto out;
->> +
->> +		case VFIO_DEVICE_PASID_ATTACH_IOMMUFD_PT:
->> +			ret = vfio_df_ioctl_pasid_attach_pt(df, uptr);
->> +			goto out;
->> +
->> +		case VFIO_DEVICE_PASID_DETACH_IOMMUFD_PT:
->> +			ret = vfio_df_ioctl_pasid_detach_pt(df, uptr);
->> +			goto out;
->>   		}
->>   	}
->>   
->> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->> index 94b3badefde3..495193629029 100644
->> --- a/include/uapi/linux/vfio.h
->> +++ b/include/uapi/linux/vfio.h
->> @@ -977,6 +977,61 @@ struct vfio_device_detach_iommufd_pt {
->>   
->>   #define VFIO_DEVICE_DETACH_IOMMUFD_PT		_IO(VFIO_TYPE, VFIO_BASE + 20)
->>   
->> +/*
->> + * VFIO_DEVICE_PASID_ATTACH_IOMMUFD_PT - _IOW(VFIO_TYPE, VFIO_BASE + 21,
->> + *					      struct vfio_device_pasid_attach_iommufd_pt)
->> + * @argsz:	User filled size of this data.
->> + * @flags:	Must be 0.
->> + * @pasid:	The pasid to be attached.
->> + * @pt_id:	Input the target id which can represent an ioas or a hwpt
->> + *		allocated via iommufd subsystem.
->> + *		Output the input ioas id or the attached hwpt id which could
->> + *		be the specified hwpt itself or a hwpt automatically created
->> + *		for the specified ioas by kernel during the attachment.
->> + *
->> + * Associate a pasid (of a cdev device) with an address space within the
->> + * bound iommufd. Undo by VFIO_DEVICE_PASID_DETACH_IOMMUFD_PT or device fd
->> + * close. This is only allowed on cdev fds.
->> + *
->> + * If a pasid is currently attached to a valid hw_pagetable (hwpt), without
->> + * doing a VFIO_DEVICE_PASID_DETACH_IOMMUFD_PT, a second
->> + * VFIO_DEVICE_PASID_ATTACH_IOMMUFD_PT ioctl passing in another hwpt id is
->> + * allowed. This action, also known as a hwpt replacement, will replace the
->> + * pasid's currently attached hwpt with a new hwpt corresponding to the given
->> + * @pt_id.
->> + *
->> + * Return: 0 on success, -errno on failure.
->> + */
->> +struct vfio_device_pasid_attach_iommufd_pt {
->> +	__u32	argsz;
->> +	__u32	flags;
->> +	__u32	pasid;
->> +	__u32	pt_id;
->> +};
->> +
->> +#define VFIO_DEVICE_PASID_ATTACH_IOMMUFD_PT	_IO(VFIO_TYPE, VFIO_BASE + 21)
->> +
->> +/*
->> + * VFIO_DEVICE_PASID_DETACH_IOMMUFD_PT - _IOW(VFIO_TYPE, VFIO_BASE + 22,
->> + *					      struct vfio_device_pasid_detach_iommufd_pt)
->> + * @argsz:	User filled size of this data.
->> + * @flags:	Must be 0.
->> + * @pasid:	The pasid to be detached.
->> + *
->> + * Remove the association of a pasid (of a cdev device) and its current
->> + * associated address space.  After it, the pasid of the device should be in
->> + * a blocking DMA state.  This is only allowed on cdev fds.
->> + *
->> + * Return: 0 on success, -errno on failure.
->> + */
->> +struct vfio_device_pasid_detach_iommufd_pt {
->> +	__u32	argsz;
->> +	__u32	flags;
->> +	__u32	pasid;
->> +};
->> +
->> +#define VFIO_DEVICE_PASID_DETACH_IOMMUFD_PT	_IO(VFIO_TYPE, VFIO_BASE + 22)
->> +
->>   /*
->>    * Provide support for setting a PCI VF Token, which is used as a shared
->>    * secret between PF and VF drivers.  This feature may only be set on a
-> 
+  /* Default guest test virtual memory offset */
++#ifndef DEFAULT_GUEST_TEST_MEM
+  #define DEFAULT_GUEST_TEST_MEM		0xc0000000
++#endif
 
--- 
-Regards,
-Yi Liu
+As this address should be re-defined in LoongArch headers.
+So, do you have any suggesstion?
+
+Thanks
+Tianrui Zhao
+
+在 2023/11/30 下午7:18, Tianrui Zhao 写道:
+> Add KVM selftests header files for LoongArch, including processor.h
+> and kvm_util_base.h. Those mainly contain LoongArch CSR register defines
+> and page table information. And change DEFAULT_GUEST_TEST_MEM base addr
+> for LoongArch.
+>
+> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+> ---
+>   .../selftests/kvm/include/kvm_util_base.h     |   5 +
+>   .../kvm/include/loongarch/processor.h         | 133 ++++++++++++++++++
+>   .../testing/selftests/kvm/include/memstress.h |   2 +
+>   3 files changed, 140 insertions(+)
+>   create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
+>
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index a18db6a7b3c..97f8b24741b 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -218,6 +218,11 @@ extern enum vm_guest_mode vm_mode_default;
+>   #define MIN_PAGE_SHIFT			12U
+>   #define ptes_per_page(page_size)	((page_size) / 8)
+>   
+> +#elif defined(__loongarch__)
+> +#define VM_MODE_DEFAULT			VM_MODE_P36V47_16K
+> +#define MIN_PAGE_SHIFT			14U
+> +#define ptes_per_page(page_size)	((page_size) / 8)
+> +
+>   #endif
+>   
+>   #define MIN_PAGE_SIZE		(1U << MIN_PAGE_SHIFT)
+> diff --git a/tools/testing/selftests/kvm/include/loongarch/processor.h b/tools/testing/selftests/kvm/include/loongarch/processor.h
+> new file mode 100644
+> index 00000000000..cea6b284131
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/loongarch/processor.h
+> @@ -0,0 +1,133 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +
+> +#ifndef SELFTEST_KVM_PROCESSOR_H
+> +#define SELFTEST_KVM_PROCESSOR_H
+> +
+> +#define _PAGE_VALID_SHIFT	0
+> +#define _PAGE_DIRTY_SHIFT	1
+> +#define _PAGE_PLV_SHIFT		2  /* 2~3, two bits */
+> +#define _CACHE_SHIFT		4  /* 4~5, two bits */
+> +#define _PAGE_PRESENT_SHIFT	7
+> +#define _PAGE_WRITE_SHIFT	8
+> +
+> +#define PLV_KERN		0
+> +#define PLV_USER		3
+> +#define PLV_MASK		0x3
+> +
+> +#define _PAGE_VALID		(0x1UL << _PAGE_VALID_SHIFT)
+> +#define _PAGE_PRESENT		(0x1UL << _PAGE_PRESENT_SHIFT)
+> +#define _PAGE_WRITE		(0x1UL << _PAGE_WRITE_SHIFT)
+> +#define _PAGE_DIRTY		(0x1UL << _PAGE_DIRTY_SHIFT)
+> +#define _PAGE_USER		(PLV_USER << _PAGE_PLV_SHIFT)
+> +#define __READABLE		(_PAGE_VALID)
+> +#define __WRITEABLE		(_PAGE_DIRTY | _PAGE_WRITE)
+> +#define _CACHE_CC		(0x1UL << _CACHE_SHIFT) /* Coherent Cached */
+> +
+> +/* general registers */
+> +#define zero	$r0
+> +#define ra	$r1
+> +#define tp	$r2
+> +#define sp	$r3
+> +#define a0	$r4
+> +#define a1	$r5
+> +#define a2	$r6
+> +#define a3	$r7
+> +#define a4	$r8
+> +#define a5	$r9
+> +#define a6	$r10
+> +#define a7	$r11
+> +#define t0	$r12
+> +#define t1	$r13
+> +#define t2	$r14
+> +#define t3	$r15
+> +#define t4	$r16
+> +#define t5	$r17
+> +#define t6	$r18
+> +#define t7	$r19
+> +#define t8	$r20
+> +#define u0	$r21
+> +#define fp	$r22
+> +#define s0	$r23
+> +#define s1	$r24
+> +#define s2	$r25
+> +#define s3	$r26
+> +#define s4	$r27
+> +#define s5	$r28
+> +#define s6	$r29
+> +#define s7	$r30
+> +#define s8	$r31
+> +
+> +#define PS_4K				0x0000000c
+> +#define PS_8K				0x0000000d
+> +#define PS_16K				0x0000000e
+> +#define PS_DEFAULT_SIZE			PS_16K
+> +
+> +/* Basic CSR registers */
+> +#define LOONGARCH_CSR_CRMD		0x0 /* Current mode info */
+> +#define CSR_CRMD_PG_SHIFT		4
+> +#define CSR_CRMD_PG			(0x1UL << CSR_CRMD_PG_SHIFT)
+> +#define CSR_CRMD_IE_SHIFT		2
+> +#define CSR_CRMD_IE			(0x1UL << CSR_CRMD_IE_SHIFT)
+> +#define CSR_CRMD_PLV_SHIFT		0
+> +#define CSR_CRMD_PLV_WIDTH		2
+> +#define CSR_CRMD_PLV			(0x3UL << CSR_CRMD_PLV_SHIFT)
+> +#define PLV_MASK			0x3
+> +
+> +#define LOONGARCH_CSR_PRMD		0x1
+> +#define LOONGARCH_CSR_EUEN		0x2
+> +#define LOONGARCH_CSR_ECFG		0x4
+> +#define LOONGARCH_CSR_ESTAT		0x5 /* Exception status */
+> +#define LOONGARCH_CSR_ERA		0x6 /* ERA */
+> +#define LOONGARCH_CSR_BADV		0x7 /* Bad virtual address */
+> +#define LOONGARCH_CSR_EENTRY		0xc
+> +#define LOONGARCH_CSR_TLBIDX		0x10 /* TLB Index, EHINV, PageSize, NP */
+> +#define CSR_TLBIDX_PS_SHIFT		24
+> +#define CSR_TLBIDX_PS_WIDTH		6
+> +#define CSR_TLBIDX_PS			(0x3fUL << CSR_TLBIDX_PS_SHIFT)
+> +#define CSR_TLBIDX_SIZEM		0x3f000000
+> +#define CSR_TLBIDX_SIZE			CSR_TLBIDX_PS_SHIFT
+> +
+> +#define LOONGARCH_CSR_ASID		0x18 /* ASID */
+> +/* Page table base address when VA[VALEN-1] = 0 */
+> +#define LOONGARCH_CSR_PGDL		0x19
+> +/* Page table base address when VA[VALEN-1] = 1 */
+> +#define LOONGARCH_CSR_PGDH		0x1a
+> +/* Page table base */
+> +#define LOONGARCH_CSR_PGD		0x1b
+> +#define LOONGARCH_CSR_PWCTL0		0x1c
+> +#define LOONGARCH_CSR_PWCTL1		0x1d
+> +#define LOONGARCH_CSR_STLBPGSIZE	0x1e
+> +#define LOONGARCH_CSR_CPUID		0x20
+> +#define LOONGARCH_CSR_KS0		0x30
+> +#define LOONGARCH_CSR_KS1		0x31
+> +#define LOONGARCH_CSR_TMID		0x40
+> +#define LOONGARCH_CSR_TCFG		0x41
+> +#define LOONGARCH_CSR_TLBRENTRY		0x88 /* TLB refill exception entry */
+> +/* KSave for TLB refill exception */
+> +#define LOONGARCH_CSR_TLBRSAVE		0x8b
+> +#define LOONGARCH_CSR_TLBREHI		0x8e
+> +#define CSR_TLBREHI_PS_SHIFT		0
+> +#define CSR_TLBREHI_PS			(0x3fUL << CSR_TLBREHI_PS_SHIFT)
+> +
+> +#define DEFAULT_LOONARCH64_STACK_MIN		0x4000
+> +#define DEFAULT_LOONARCH64_PAGE_TABLE_MIN	0x4000
+> +#define EXREGS_GPRS				(32)
+> +
+> +#ifndef __ASSEMBLER__
+> +struct ex_regs {
+> +	unsigned long regs[EXREGS_GPRS];
+> +	unsigned long pc;
+> +	unsigned long estat;
+> +	unsigned long badv;
+> +};
+> +
+> +extern void handle_tlb_refill(void);
+> +extern void handle_exception(void);
+> +#endif
+> +
+> +#define PC_OFFSET_EXREGS		((EXREGS_GPRS + 0) * 8)
+> +#define ESTAT_OFFSET_EXREGS		((EXREGS_GPRS + 1) * 8)
+> +#define BADV_OFFSET_EXREGS		((EXREGS_GPRS + 2) * 8)
+> +#define EXREGS_SIZE			((EXREGS_GPRS + 3) * 8)
+> +
+> +#endif /* SELFTEST_KVM_PROCESSOR_H */
+> diff --git a/tools/testing/selftests/kvm/include/memstress.h b/tools/testing/selftests/kvm/include/memstress.h
+> index ce4e603050e..5bcdaf2efab 100644
+> --- a/tools/testing/selftests/kvm/include/memstress.h
+> +++ b/tools/testing/selftests/kvm/include/memstress.h
+> @@ -13,7 +13,9 @@
+>   #include "kvm_util.h"
+>   
+>   /* Default guest test virtual memory offset */
+> +#ifndef DEFAULT_GUEST_TEST_MEM
+>   #define DEFAULT_GUEST_TEST_MEM		0xc0000000
+> +#endif
+>   
+>   #define DEFAULT_PER_VCPU_MEM_SIZE	(1 << 30) /* 1G */
+>   
+
 
