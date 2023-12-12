@@ -1,53 +1,53 @@
-Return-Path: <kvm+bounces-4213-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4214-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7836280F380
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 17:47:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4272480F3F0
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 18:03:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1893BB20E55
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 16:47:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73C291C20CBE
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 17:03:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DFAF7B3A0;
-	Tue, 12 Dec 2023 16:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F278B7B3C9;
+	Tue, 12 Dec 2023 17:03:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="NdJgmgVe"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Qz/TWsr2"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.alien8.de (mail.alien8.de [IPv6:2a01:4f9:3051:3f93::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F0FCA;
-	Tue, 12 Dec 2023 08:46:50 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 046FF8F;
+	Tue, 12 Dec 2023 09:03:41 -0800 (PST)
 Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A109740E00C9;
-	Tue, 12 Dec 2023 16:46:47 +0000 (UTC)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 2BBAE40E00CC;
+	Tue, 12 Dec 2023 17:03:38 +0000 (UTC)
 X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
 Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
 	header.d=alien8.de
 Received: from mail.alien8.de ([127.0.0.1])
 	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id qnttpbrXiaDF; Tue, 12 Dec 2023 16:46:45 +0000 (UTC)
+	with ESMTP id Vm7FEEs-_cWK; Tue, 12 Dec 2023 17:03:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1702399604; bh=JgaP6s6ZQuPIIwAkFk4kUIsSkyeDb3qfZ2ZyjHtolEA=;
+	t=1702400615; bh=bhGdrNYqkE3/Qchjg60u36U+e6yzbXIMev4JIq22et0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NdJgmgVeKvU8liYp3/47c6y/Ybc/cJYAHEezxdSbKUy6ElqCAo0iAf+oTOaEkIWft
-	 MORuUbw0LS6WxLJAP+oW178zvH39uVgrKeitaYSimp4ZniVoTFpm4tplzCCZWa+dCF
-	 nEK2W1q3AoHQk1XKuCwkU5XPtGmfItfQWKgJfwV/4mvbaY3yJbFF9BUGLyMI0CcHUc
-	 cBK3rk8wxsuFTR9FfXLr1jImBJhajECjn9BSjh0F/Z6DDxFNKOMil3DGEnt0kbP4wA
-	 Z7x5Hm31FpBcvuPU7I6ux5hmD8T1HOaDY5ZCc4T47RFgdcn99YAasSeHzjW4xrzMXo
-	 AtmJG6LEHjWmQVNT5Xf0dmtkdYdmNhMhjl4rJtYX6BcTREH+PiN/ikFmDN1Ggl7TPz
-	 ebN+Ni/9+86QlgNuLLfDJR6SF3ipr/QyNW+GOYvuhELllDxQrLvk0ofkoviLv5qs1f
-	 umIQ6gwYHIr4jTQkbitmZ9oDHSxatGyqh6fh++IljKplFsClYZ3bYiB9j9rKiL7+9z
-	 FrBmchtvqeczG949ntc5+H7NqfhaZz0vvt0Zu4abrbLmVrq81OmiSXtAI/vaaV2I5R
-	 sFyHV7PrUD+sDS+qKZS+F72iKoizGDLyCvxq0YKw0dCRZVMGGs+mRiQUv44yGVUcYA
-	 F6EulFumsy6QWxmrT/0qgJ4U=
+	b=Qz/TWsr2SuS+rR9NHM8oG8oRO23j/1hP7zP0koAIDJ8cigbTGJMi1m2CVlCkSg4O7
+	 yzfpnlyeeZ4H0zEiF5UExO4iH0hG7goOGgN0i6auEOOoyxNkK1OqppS7wFb17OKFi4
+	 vxPvuCMRmQQLluK4kCOzAvdBN1+RZPb3UIsmOJ+u3UlWTU5zft5kq7FSVZQ181fyTm
+	 dMurleDtkvRTuEI8Wc23PX6fhhFNYeATvmmFVPqQs3qHIwKyDD1qctfjZ6UNWjUNEi
+	 7MeotyBqeUjkbG8v9HYIqkhxiLCtW0lj6/KG5M0AHfpzCWtDDWJOottvj0mv24ONy5
+	 4cm7wGcpwo8MRycvT5RPIxvCCVBVVKD/6W22hOJJ+sFG7YYv4Q2olyDETSiAtk/ssQ
+	 J+mMzfxEMzYEpksruaro5BpV1nKHL3x2RV5obNWklibXo4HwKS8wmZUePV/0mjm/qn
+	 BA3nRWgth3HfEbXYxOKXhe9M6b77u4d43t+/gaiZECI9hDG7KOylcSuj4MVSbz06LR
+	 0p2UMW6G2egnJOxYYy+0rvltabYNwkVYQ777nM3XFaiuA77EWx/mWNFfNQTLUsOW8d
+	 nBGxEQ+vRuR/Mj4/bR7FtS9PN1bNV7SYzYExdUV0d3aHAJiWEGs4a+M+j6qaGAmoda
+	 /SKfuf7xGSNRMf7dTWdEI6YY=
 Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3500E40E00CB;
-	Tue, 12 Dec 2023 16:46:04 +0000 (UTC)
-Date: Tue, 12 Dec 2023 17:45:57 +0100
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B914040E00CB;
+	Tue, 12 Dec 2023 17:02:54 +0000 (UTC)
+Date: Tue, 12 Dec 2023 18:02:53 +0100
 From: Borislav Petkov <bp@alien8.de>
 To: Michael Roth <michael.roth@amd.com>
 Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -65,11 +65,11 @@ Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
 	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
 	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
 	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v10 19/50] crypto: ccp: Add the SNP_PLATFORM_STATUS
- command
-Message-ID: <20231212164557.GKZXiORUQjE8pCQBFk@fat_crate.local>
+Subject: Re: [PATCH v10 21/50] KVM: SEV: Add support to handle AP reset MSR
+ protocol
+Message-ID: <20231212170253.GLZXiSPfJWXfuXzuM9@fat_crate.local>
 References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-20-michael.roth@amd.com>
+ <20231016132819.1002933-22-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -78,114 +78,80 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231016132819.1002933-20-michael.roth@amd.com>
+In-Reply-To: <20231016132819.1002933-22-michael.roth@amd.com>
 
-On Mon, Oct 16, 2023 at 08:27:48AM -0500, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
+On Mon, Oct 16, 2023 at 08:27:50AM -0500, Michael Roth wrote:
+> From: Tom Lendacky <thomas.lendacky@amd.com>
 > 
-> The command can be used by the userspace to query the SNP platform status
-
-s/by the userspace //
-
-> report. See the SEV-SNP spec for more details.
+> Add support for AP Reset Hold being invoked using the GHCB MSR protocol,
+> available in version 2 of the GHCB specification.
 > 
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-
-Mike, this doesn't have your SOB at the end. The whole set should have
-it if you're sending it. Please go through the whole thing.
-
 > ---
->  Documentation/virt/coco/sev-guest.rst | 27 ++++++++++++++++
->  drivers/crypto/ccp/sev-dev.c          | 45 +++++++++++++++++++++++++++
->  include/uapi/linux/psp-sev.h          |  1 +
->  3 files changed, 73 insertions(+)
+>  arch/x86/include/asm/sev-common.h |  2 ++
+>  arch/x86/kvm/svm/sev.c            | 56 ++++++++++++++++++++++++++-----
+>  arch/x86/kvm/svm/svm.h            |  1 +
+>  3 files changed, 51 insertions(+), 8 deletions(-)
 > 
-> diff --git a/Documentation/virt/coco/sev-guest.rst b/Documentation/virt/coco/sev-guest.rst
-> index 68b0d2363af8..e828c5326936 100644
-> --- a/Documentation/virt/coco/sev-guest.rst
-> +++ b/Documentation/virt/coco/sev-guest.rst
-> @@ -67,6 +67,22 @@ counter (e.g. counter overflow), then -EIO will be returned.
->                  };
->          };
+> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+> index 93ec8c12c91d..57ced29264ce 100644
+> --- a/arch/x86/include/asm/sev-common.h
+> +++ b/arch/x86/include/asm/sev-common.h
+> @@ -56,6 +56,8 @@
+>  /* AP Reset Hold */
+>  #define GHCB_MSR_AP_RESET_HOLD_REQ	0x006
+>  #define GHCB_MSR_AP_RESET_HOLD_RESP	0x007
+> +#define GHCB_MSR_AP_RESET_HOLD_RESULT_POS	12
+> +#define GHCB_MSR_AP_RESET_HOLD_RESULT_MASK	GENMASK_ULL(51, 0)
+
+Align vertically pls.
+
+>  /* GHCB GPA Register */
+>  #define GHCB_MSR_REG_GPA_REQ		0x012
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 6ee925d66648..4f895a7201ed 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -65,6 +65,10 @@ module_param_named(debug_swap, sev_es_debug_swap_enabled, bool, 0444);
+>  #define sev_es_debug_swap_enabled false
+>  #endif /* CONFIG_KVM_AMD_SEV */
 >  
-> +The host ioctl should be called to /dev/sev device. The ioctl accepts commanda
-
-"... should be sent to the... "
-
-> +id and command input structure.
+> +#define AP_RESET_HOLD_NONE		0
+> +#define AP_RESET_HOLD_NAE_EVENT		1
+> +#define AP_RESET_HOLD_MSR_PROTO		2
 > +
-> +::
-> +        struct sev_issue_cmd {
-> +                /* Command ID */
-> +                __u32 cmd;
-> +
-> +                /* Command request structure */
-> +                __u64 data;
-> +
-> +                /* firmware error code on failure (see psp-sev.h) */
-> +                __u32 error;
-> +        };
-> +
-> +
->  2.1 SNP_GET_REPORT
->  ------------------
+>  static u8 sev_enc_bit;
+>  static DECLARE_RWSEM(sev_deactivate_lock);
+>  static DEFINE_MUTEX(sev_bitmap_lock);
+> @@ -2594,6 +2598,9 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
 >  
-> @@ -124,6 +140,17 @@ be updated with the expected value.
+>  void sev_es_unmap_ghcb(struct vcpu_svm *svm)
+>  {
+> +	/* Clear any indication that the vCPU is in a type of AP Reset Hold */
+> +	svm->sev_es.ap_reset_hold_type = AP_RESET_HOLD_NONE;
+> +
+>  	if (!svm->sev_es.ghcb)
+>  		return;
 >  
->  See GHCB specification for further detail on how to parse the certificate blob.
->  
-> +2.4 SNP_PLATFORM_STATUS
-> +-----------------------
-> +:Technology: sev-snp
-> +:Type: hypervisor ioctl cmd
-> +:Parameters (in): struct sev_data_snp_platform_status
-> +:Returns (out): 0 on success, -negative on error
+> @@ -2805,6 +2812,22 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+>  				  GHCB_MSR_INFO_POS);
+>  		break;
+>  	}
+> +	case GHCB_MSR_AP_RESET_HOLD_REQ:
+> +		svm->sev_es.ap_reset_hold_type = AP_RESET_HOLD_MSR_PROTO;
+> +		ret = kvm_emulate_ap_reset_hold(&svm->vcpu);
 > +
-> +The SNP_PLATFORM_STATUS command is used to query the SNP platform status. The
-> +status includes API major, minor version and more. See the SEV-SNP
-> +specification for further details.
-> +
->  3. SEV-SNP CPUID Enforcement
->  ============================
->  
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index b574b0ef2b1f..679b8d6fc09a 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -1772,6 +1772,48 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
->  	return ret;
->  }
->  
-> +static int sev_ioctl_snp_platform_status(struct sev_issue_cmd *argp)
+> +		/*
+> +		 * Preset the result to a non-SIPI return and then only set
+> +		 * the result to non-zero when delivering a SIPI.
+> +		 */
+> +		set_ghcb_msr_bits(svm, 0,
+> +				  GHCB_MSR_AP_RESET_HOLD_RESULT_MASK,
+> +				  GHCB_MSR_AP_RESET_HOLD_RESULT_POS);
 
-sev_ioctl_do_snp_platform_status like the others.
-
-> +{
-> +	struct sev_device *sev = psp_master->sev_data;
-> +	struct sev_data_snp_addr buf;
-> +	struct page *status_page;
-> +	void *data;
-> +	int ret;
-> +
-> +	if (!sev->snp_initialized || !argp->data)
-> +		return -EINVAL;
-> +
-> +	status_page = alloc_page(GFP_KERNEL_ACCOUNT);
-> +	if (!status_page)
-> +		return -ENOMEM;
-> +
-> +	data = page_address(status_page);
-> +	if (rmp_mark_pages_firmware(__pa(data), 1, true)) {
-> +		__free_pages(status_page, 0);
-> +		return -EFAULT;
-
-		ret = -EFAULT;
-		goto cleanup;
-
-instead.
-
-...
+Yikes, those defines are a mouthful.
 
 -- 
 Regards/Gruss,
