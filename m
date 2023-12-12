@@ -1,182 +1,285 @@
-Return-Path: <kvm+bounces-4195-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4196-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FD2280F125
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 16:35:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01D5080F141
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 16:39:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F47F1F2169B
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 15:35:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA80A28182C
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 15:39:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32AD476DC7;
-	Tue, 12 Dec 2023 15:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D1476DCA;
+	Tue, 12 Dec 2023 15:39:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FD50YnUr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MgS9WgCU"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2053.outbound.protection.outlook.com [40.107.94.53])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EFDD95;
-	Tue, 12 Dec 2023 07:35:08 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UfT+FJeFGIMEJQ3cPJ6D+qT2+Hw6zkX8DS6NMbT7NhgpAT0RuWTDdx+LJ7kR2yKB+AgC692+ssB/UaWEb5sFMvg7dj4+CRgKLd7ytDodRscb7V6iAAsT+3QeaKS4Ak5gXhPVJdoTfZoYzavonIY96ilQCZcbb11Wehqas4MBRANjXxSQN2upMfIMWczVlTiGH/95ofBGH6y3hnpCGbKbehD1nC6bslWYDrEQWpporo6Z5hNkLKpxz3m1JP3sLhIyViYYfhe/1vXCRbLBvvIBHWQCG4y5Hx8gwWqy5607lcyzkvVNhlrjTU2x55sUkHv6SAdA1U4X3Ms66+IR4wZPUw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gUMrgHmqVVlL5srQ3cIufu0V11MfT2Xjy6T+jg/iiJM=;
- b=mI4ZjZdWMFYRJMNf3J0I2N57FlMdS2tvkL/H7dUCtibhuK/zLInK3kYFpEduTcqDNqkVlE2YdX2zp1S1xH9XaO6g52tTPPZ37LNAgCmlC2jsmnejlWtr9/ha/SW/jqRlLHP6voKIPG93lacpNRrcaskyrKWDs+wLuBvfIroYGkFD3xEaCrRDEJn2QjbFafbGEzHoWxMDkZ5NED1WWaKcO2V3FY/U9MsKAQs8T2KalYicERqtjUkHZYllQtEL4Nwtz6hGGgriTaG6BLwZeC5+/URprX9pUotMBIcgOh4fyfgdozVDgSrUhqhRSrKk5Xc5C25teEbvgjJ5Gh5VxvgOTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gUMrgHmqVVlL5srQ3cIufu0V11MfT2Xjy6T+jg/iiJM=;
- b=FD50YnUr+yo94e2m4TP1WSNOM0gMsh1tWEfY+QK1pPWKC0qFd/ev3rAVDnCIWMdJd2c87dNbKjtZs4KLvS4E0tSQfElR61OW9hfQrylKyMWw9SdKA90AWHagkrRor3Z6x9szrbD2GJv6PfM+AWTZnmjF76s5ORyN70FHdnrRPH5kaAmzOqosY9WHJZKBUomhfGqb/IuevZr2zrWO2vfYRrFi9W0sm/zpbpA98wu5Mip6xmecAjUgybG095Uf2mcH4GwuKooKjS6qW44zYmWr1HC6R3YWKqHDOESt8JLii7jV28+W9Hw/5Rl94edIkfaN3Vy1FG96JhcJJeKlBT1CQA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM4PR12MB5103.namprd12.prod.outlook.com (2603:10b6:5:392::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.26; Tue, 12 Dec
- 2023 15:35:05 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7091.022; Tue, 12 Dec 2023
- 15:35:05 +0000
-Date: Tue, 12 Dec 2023 11:35:04 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org, kevin.tian@intel.com,
-	robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
-	eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
-	mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
-	yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
-	shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-	suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	zhenzhong.duan@intel.com, joao.m.martins@oracle.com,
-	xin.zeng@intel.com, yan.y.zhao@intel.com
-Subject: Re: [PATCH 3/3] vfio: Report PASID capability via
- VFIO_DEVICE_FEATURE ioctl
-Message-ID: <20231212153504.GL3014157@nvidia.com>
-References: <20231127063909.129153-1-yi.l.liu@intel.com>
- <20231127063909.129153-4-yi.l.liu@intel.com>
- <20231211110345.1b4526c6.alex.williamson@redhat.com>
- <20231211181028.GL2944114@nvidia.com>
- <20231211114949.273b21c0.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231211114949.273b21c0.alex.williamson@redhat.com>
-X-ClientProxiedBy: MN2PR19CA0050.namprd19.prod.outlook.com
- (2603:10b6:208:19b::27) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F09AA6
+	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 07:39:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702395557;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=mhd5PyZ3DXbsV3qmdtVMB6yuzeux7oigKl5JGcj9MXo=;
+	b=MgS9WgCUUr4qypUywyn9iw2NHJpQwyFg25ntwzNpu9vYXsJGStN2qllkCjUqvy6XUxHQ4H
+	RS0Yg94frBHcRtaPtRF8ivqfJPt8re9O+IcqtiOILCQupf/owt3tiMr/VVIt51Q5ShLdCM
+	WEk+vhnv5c36i7j1gVlJfJIF+gvP/Xo=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-619-r8mzjlprNNObJwkPKy-Xxg-1; Tue,
+ 12 Dec 2023 10:39:12 -0500
+X-MC-Unique: r8mzjlprNNObJwkPKy-Xxg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B274E3C28644;
+	Tue, 12 Dec 2023 15:39:11 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.220])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 922F32026D66;
+	Tue, 12 Dec 2023 15:39:06 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Artyom Tarasenko <atar4qemu@gmail.com>,
+	Paul Durrant <paul@xen.org>,
+	Daniel Henrique Barboza <danielhb413@gmail.com>,
+	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	BALATON Zoltan <balaton@eik.bme.hu>,
+	Jagannathan Raman <jag.raman@oracle.com>,
+	Anthony Perard <anthony.perard@citrix.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+	Alexander Graf <agraf@csgraf.de>,
+	Hailiang Zhang <zhanghailiang@xfusion.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Jiaxun Yang <jiaxun.yang@flygoat.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Harsh Prateek Bora <harshpb@linux.ibm.com>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Peter Xu <peterx@redhat.com>,
+	Hyman Huang <yong.huang@smartx.com>,
+	Fam Zheng <fam@euphon.net>,
+	Song Gao <gaosong@loongson.cn>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Aurelien Jarno <aurelien@aurel32.net>,
+	Leonardo Bras <leobras@redhat.com>,
+	Jiri Slaby <jslaby@suse.cz>,
+	Eric Farman <farman@linux.ibm.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	David Hildenbrand <david@redhat.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Cameron Esfahani <dirty@apple.com>,
+	qemu-ppc@nongnu.org,
+	John Snow <jsnow@redhat.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	Weiwei Li <liwei1518@gmail.com>,
+	Hanna Reitz <hreitz@redhat.com>,
+	qemu-s390x@nongnu.org,
+	qemu-block@nongnu.org,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	kvm@vger.kernel.org,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+	Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
+	Andrey Smirnov <andrew.smirnov@gmail.com>,
+	Reinoud Zandijk <reinoud@netbsd.org>,
+	Kevin Wolf <kwolf@redhat.com>,
+	Bin Meng <bin.meng@windriver.com>,
+	Sunil Muthuswamy <sunilmut@microsoft.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	qemu-riscv@nongnu.org,
+	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+	Stafford Horne <shorne@gmail.com>,
+	Fabiano Rosas <farosas@suse.de>,
+	Juan Quintela <quintela@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	qemu-arm@nongnu.org,
+	Jason Wang <jasowang@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Max Filippov <jcmvbkbc@gmail.com>,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	Eric Blake <eblake@redhat.com>,
+	Roman Bolshakov <rbolshakov@ddn.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	xen-devel@lists.xenproject.org,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Subject: [PATCH v2 0/5] Make Big QEMU Lock naming consistent
+Date: Tue, 12 Dec 2023 10:38:59 -0500
+Message-ID: <20231212153905.631119-1-stefanha@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB5103:EE_
-X-MS-Office365-Filtering-Correlation-Id: cb8e4706-2061-44d4-30ab-08dbfb27ea13
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	6rsgQMyZ/cg/RzfEyCL66AAZtHanRHA4LtRdizDIGxDWNczvblFnkGzeG68X/AyncAofvWxlwv685OEf6GCM0RpLGUJV0F4+C/XRsaSV65EeWNJgnMejbO+T10+DiyBniyD67Yd1qddlKgczjnD+MHme4e5137G2ZRh2vEEtAUu3uVwVSlw8OCKnyEUV79sUmYRpMQieiDZNJRyGecZ6J0nsYCocPN/5cmQ3LfR7BWN8MxM4eaJpKhiDPe41JbND6EjcCs6g1RXsiA7HDXPh82OqK6uFm2OtXCMY/YDoA5g+/x5PglCC+HUApzRuzvDLpUMnX8ufJX7u3PngVQuNio749CnqvaO/tsz+P5GngexAO/tQ07Ta71Mw5XTaXMx7m06GN2tLkKPNdSr+NVTDjmC6JvHS/2aFOG95WkuKXKyVpcVQ/sYtiIdbYMYi7l3GmpYJo71/66s0YLISwyetnzj9JXtPVAkgqyuzS+3RevwXGKHknH8N/sc+DF9pRVc2BZo0LwIAwNM4TVeGIqSjiK8x5HqQviySRC9fBqZ6axxRUnn1RX6iWkdHBxN4xNW5
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(39860400002)(376002)(396003)(136003)(230922051799003)(186009)(451199024)(64100799003)(1800799012)(478600001)(6486002)(33656002)(86362001)(316002)(36756003)(66556008)(66476007)(6916009)(66946007)(2616005)(26005)(1076003)(6506007)(6512007)(38100700002)(41300700001)(4326008)(8676002)(8936002)(5660300002)(7416002)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?F/3pGY9YuUAmH/wOYAVmlw3Xm9Bh5LUrwu3nlH7PA8VINP7IjLm6tW6JBvkz?=
- =?us-ascii?Q?U5g/U7cSyMC16K/CqzY1DMlnF0XReiHpwayTgzbIuNSKeXiyrKXQ5JbzV8CY?=
- =?us-ascii?Q?P8DJ+QyPyaznsUMiKvkxX6AmhyPjw+Euo7BxDUuzRJiZ+J7pMmdDFp06UrCB?=
- =?us-ascii?Q?OIt7TfV5tuqVTgVaXrUypIhj6WVvJ9MDIQxshR+qjPSwrwx/TAs3URyILvIk?=
- =?us-ascii?Q?GBbLiJcWzubzNZZSsyC86njQ/Fvx1uuI4/4XXq9ddQu1b0EWsHka3GEDRpjq?=
- =?us-ascii?Q?C0uYEn7XRAoPRUwAnELVf7ViDNOVQOUnWUkv4gRo0QwlRnC98x5kBFCguilo?=
- =?us-ascii?Q?PsMyqIB89/2ehb44kY3BXb9CCXjPJvaUKUKRo3ZkO+J5QFs0crq6H0yfOICq?=
- =?us-ascii?Q?h4jtH6nDRcn0ZG67M2zK6bKj6QTmw/cIXBjRrlG5m9xr9zuw5voxaKBGm2oW?=
- =?us-ascii?Q?fpV0lABKNT6kiltVVO1DEjlz+xBljpsNQwwMQvjVGbfnluq/B7A/6al6WlFX?=
- =?us-ascii?Q?OjZKQVFTGanXY+gFa9Y0inFxlG/PlUpLtPYNaLSCvJ94KJVnspJK9xz+lgUs?=
- =?us-ascii?Q?E9j5PDpFeflKdnZ1Va89QGweTPlbM5b47ZqK+xv04P1JsMAT2Qt9DUPcwZYy?=
- =?us-ascii?Q?hiZg/KtHI2lXyoN/OOSStltxWDrr1GSOT4P+0+cFjhUb2cvMsV9Sg3eTvM8j?=
- =?us-ascii?Q?NHvShnlYWxo5B53VY68Ycr/+/UG6c5iTFsTrYvbK05OEhLVvkxBWyPhj+I2n?=
- =?us-ascii?Q?KGiTIDGnaNAfKs2UhmSKMLJQfiGnuUTLtpGr6Dr6La6xm6fLGvxdIqVmJEoT?=
- =?us-ascii?Q?bbmTQU5GFv2mY9s1ZLA0NbqaNm1ch/y5kxzJyVSQQVFJtGRjDEiPy3pM8PFH?=
- =?us-ascii?Q?usefjCaaMiqrg8bImTDSIm3ArsSOVJtzemW7JoefqRglLCeNarIJn+HOCXHj?=
- =?us-ascii?Q?J/yhIoj5tpqofYjE2ZqRE/FwbMebWaGE+abxSNshT6fhBXkcFNVkX71WfgF2?=
- =?us-ascii?Q?0KcXrOuAJMGfc3Z+co5NLLHk1Xi3gCvPItBFOrj8vp2CgSczvFMLraCPn7uE?=
- =?us-ascii?Q?h4iQmVWmADJZnIuWDt0M1LyYWcrtjVI7ZhJFTPKiIOnpxY9ZISynnPkan/TJ?=
- =?us-ascii?Q?nTKdZvrwTQUiNC3uDgeGxv+fTAu1Guw0LIeq2Uw3FnT2u+hIDTHih0Zy1l5u?=
- =?us-ascii?Q?4DYVsERAJoxPlzB+8qyxwWujA2P8n1lJApp+LQh2eR33hHLZra9YLK3ZmQ4D?=
- =?us-ascii?Q?AvOW2rwioPd993EX7xDKEVkJUTmZZWRzYNTHuJuoyvHUFdKNJ+yJgcy6zcy7?=
- =?us-ascii?Q?atMXx17NDuBDMJpc44OcZqwcdogSVNvF9OpfosWdCZ/nG5ADvtbRRHHL7db9?=
- =?us-ascii?Q?xM+0XaPOTUFA645Arl6fB4kpcA8EYYe29ohtOr46fBOQ2/ZP+EoF8DSYy51H?=
- =?us-ascii?Q?nKTSmcjyAtIVeYW8bF5W/Amps76PGYZjyvjeaZCXQEyz6bYRGRGTODAkxN8R?=
- =?us-ascii?Q?5a1srxJmbS/1PCkYnfyCzbRTPh+PCM32CCRNaR9ghY79VSu324dp3aboFq8p?=
- =?us-ascii?Q?xoFrn47/m45JzSkhb3vnrUdpjTGvj4amFRIiWlJR?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cb8e4706-2061-44d4-30ab-08dbfb27ea13
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2023 15:35:05.3901
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: f3aBEEvZQFC2/3N/NxJYZVnW9s39rcaappZLg2Dtw38NGcxk1G158Ql+KYaJmzMZ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5103
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-On Mon, Dec 11, 2023 at 11:49:49AM -0700, Alex Williamson wrote:
-> On Mon, 11 Dec 2023 14:10:28 -0400
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > On Mon, Dec 11, 2023 at 11:03:45AM -0700, Alex Williamson wrote:
-> > > On Sun, 26 Nov 2023 22:39:09 -0800
-> > > Yi Liu <yi.l.liu@intel.com> wrote:
-> 
-> > > >    the PF). Creating a virtual PASID capability in vfio-pci config space needs
-> > > >    to find a hole to place it, but doing so may require device specific
-> > > >    knowledge to avoid potential conflict with device specific registers like
-> > > >    hiden bits in VF config space. It's simpler by moving this burden to the
-> > > >    VMM instead of maintaining a quirk system in the kernel.  
-> > > 
-> > > This feels a bit like an incomplete solution though and we might
-> > > already posses device specific knowledge in the form of a variant
-> > > driver.  Should this feature structure include a flag + field that
-> > > could serve to generically indicate to the VMM a location for
-> > > implementing the PASID capability?  The default core implementation
-> > > might fill this only for PFs where clearly an emualted PASID capability
-> > > can overlap the physical capability.  Thanks,  
-> > 
-> > In many ways I would perfer to solve this for good by having a way to
-> > learn a range of available config space - I liked the suggestion to
-> > use a DVSEC to mark empty space.
-> 
-> Yes, DVSEC is the most plausible option for the device itself to convey
-> unused config space, but that requires hardware adoption so presumably
-> we're going to need to fill the gaps with device specific code.  That
-> code might live in a variant driver or in the VMM.  If we have faith
-> that DVSEC is the way, it'd make sense for a variant driver to
-> implement a virtual DVSEC to work out the QEMU implementation and set a
-> precedent.
+v2:
+- Rename APIs bql_*() [PeterX]
+- Spell out "Big QEMU Lock (BQL)" in doc comments [PeterX]
+- Rename "iolock" variables in hw/remote/mpqemu-link.c [Harsh]
+- Fix bql_auto_lock() indentation in Patch 2 [Ilya]
+- "with BQL taken" -> "with the BQL taken" [Philippe]
+- "under BQL" -> "under the BQL" [Philippe]
 
-How hard do you think it would be for the kernel to synthesize the
-dvsec if the varient driver can provide a range for it?
+The Big QEMU Lock ("BQL") has two other names: "iothread lock" and "QEMU global
+mutex". The term "iothread lock" is easily confused with the unrelated --object
+iothread (iothread.c).
 
-On the other hand I'm not so keen on having variant drivers that are
-only doing this just to avoid a table in qemu :\ It seems like a
-reasonable thing to add to existing drivers, though none of them
-support PASID yet..
+This series updates the code and documentation to consistently use "BQL". This
+makes the code easier to understand.
 
-> I mostly just want us to recognize that this feature structure also has
-> the possibility to fill this gap and we're consciously passing it over
-> and should maybe formally propose the DVSEC solution and reference it
-> in the commit log or comments here to provide a complete picture.
+Stefan Hajnoczi (5):
+  system/cpus: rename qemu_mutex_lock_iothread() to bql_lock()
+  qemu/main-loop: rename QEMU_IOTHREAD_LOCK_GUARD to BQL_LOCK_GUARD
+  qemu/main-loop: rename qemu_cond_wait_iothread() to
+    qemu_cond_wait_bql()
+  Replace "iothread lock" with "BQL" in comments
+  Rename "QEMU global mutex" to "BQL" in comments and docs
 
-You mean by passing an explicit empty range or something in a feature
-IOCTL?
+ docs/devel/multi-thread-tcg.rst      |   7 +-
+ docs/devel/qapi-code-gen.rst         |   2 +-
+ docs/devel/replay.rst                |   2 +-
+ docs/devel/reset.rst                 |   2 +-
+ docs/devel/multiple-iothreads.txt    |  16 ++--
+ hw/display/qxl.h                     |   2 +-
+ include/block/aio-wait.h             |   2 +-
+ include/block/blockjob.h             |   6 +-
+ include/exec/cpu-common.h            |   2 +-
+ include/exec/memory.h                |   4 +-
+ include/exec/ramblock.h              |   2 +-
+ include/io/task.h                    |   2 +-
+ include/migration/register.h         |   8 +-
+ include/qemu/coroutine-core.h        |   2 +-
+ include/qemu/coroutine.h             |   2 +-
+ include/qemu/main-loop.h             |  69 ++++++++--------
+ include/qemu/thread.h                |   2 +-
+ target/arm/internals.h               |   4 +-
+ accel/accel-blocker.c                |  10 +--
+ accel/dummy-cpus.c                   |   8 +-
+ accel/hvf/hvf-accel-ops.c            |   4 +-
+ accel/kvm/kvm-accel-ops.c            |   4 +-
+ accel/kvm/kvm-all.c                  |  22 ++---
+ accel/tcg/cpu-exec.c                 |  26 +++---
+ accel/tcg/cputlb.c                   |  20 ++---
+ accel/tcg/tcg-accel-ops-icount.c     |   6 +-
+ accel/tcg/tcg-accel-ops-mttcg.c      |  12 +--
+ accel/tcg/tcg-accel-ops-rr.c         |  18 ++--
+ accel/tcg/tcg-accel-ops.c            |   2 +-
+ accel/tcg/translate-all.c            |   2 +-
+ cpu-common.c                         |   4 +-
+ dump/dump.c                          |   4 +-
+ hw/block/dataplane/virtio-blk.c      |   8 +-
+ hw/block/virtio-blk.c                |   2 +-
+ hw/core/cpu-common.c                 |   6 +-
+ hw/display/virtio-gpu.c              |   2 +-
+ hw/i386/intel_iommu.c                |   6 +-
+ hw/i386/kvm/xen_evtchn.c             |  30 +++----
+ hw/i386/kvm/xen_gnttab.c             |   2 +-
+ hw/i386/kvm/xen_overlay.c            |   2 +-
+ hw/i386/kvm/xen_xenstore.c           |   2 +-
+ hw/intc/arm_gicv3_cpuif.c            |   2 +-
+ hw/intc/s390_flic.c                  |  18 ++--
+ hw/mips/mips_int.c                   |   2 +-
+ hw/misc/edu.c                        |   4 +-
+ hw/misc/imx6_src.c                   |   2 +-
+ hw/misc/imx7_src.c                   |   2 +-
+ hw/net/xen_nic.c                     |   8 +-
+ hw/ppc/pegasos2.c                    |   2 +-
+ hw/ppc/ppc.c                         |   6 +-
+ hw/ppc/spapr.c                       |   2 +-
+ hw/ppc/spapr_events.c                |   2 +-
+ hw/ppc/spapr_rng.c                   |   4 +-
+ hw/ppc/spapr_softmmu.c               |   4 +-
+ hw/remote/mpqemu-link.c              |  22 ++---
+ hw/remote/vfio-user-obj.c            |   2 +-
+ hw/s390x/s390-skeys.c                |   2 +-
+ hw/scsi/virtio-scsi-dataplane.c      |   6 +-
+ migration/block-dirty-bitmap.c       |  14 ++--
+ migration/block.c                    |  40 ++++-----
+ migration/colo.c                     |  62 +++++++-------
+ migration/dirtyrate.c                |  12 +--
+ migration/migration.c                |  54 ++++++------
+ migration/ram.c                      |  16 ++--
+ net/tap.c                            |   2 +-
+ replay/replay-internal.c             |   2 +-
+ semihosting/console.c                |   8 +-
+ stubs/iothread-lock.c                |   6 +-
+ system/cpu-throttle.c                |   6 +-
+ system/cpus.c                        |  55 +++++++------
+ system/dirtylimit.c                  |   4 +-
+ system/memory.c                      |   2 +-
+ system/physmem.c                     |  14 ++--
+ system/runstate.c                    |   2 +-
+ system/watchpoint.c                  |   4 +-
+ target/arm/arm-powerctl.c            |  14 ++--
+ target/arm/helper.c                  |   6 +-
+ target/arm/hvf/hvf.c                 |   8 +-
+ target/arm/kvm.c                     |   4 +-
+ target/arm/kvm64.c                   |   4 +-
+ target/arm/ptw.c                     |   6 +-
+ target/arm/tcg/helper-a64.c          |   8 +-
+ target/arm/tcg/m_helper.c            |   6 +-
+ target/arm/tcg/op_helper.c           |  24 +++---
+ target/arm/tcg/psci.c                |   2 +-
+ target/hppa/int_helper.c             |   8 +-
+ target/i386/hvf/hvf.c                |   6 +-
+ target/i386/kvm/hyperv.c             |   4 +-
+ target/i386/kvm/kvm.c                |  28 +++----
+ target/i386/kvm/xen-emu.c            |  16 ++--
+ target/i386/nvmm/nvmm-accel-ops.c    |   6 +-
+ target/i386/nvmm/nvmm-all.c          |  20 ++---
+ target/i386/tcg/sysemu/fpu_helper.c  |   6 +-
+ target/i386/tcg/sysemu/misc_helper.c |   4 +-
+ target/i386/whpx/whpx-accel-ops.c    |   6 +-
+ target/i386/whpx/whpx-all.c          |  24 +++---
+ target/loongarch/csr_helper.c        |   4 +-
+ target/mips/kvm.c                    |   4 +-
+ target/mips/tcg/sysemu/cp0_helper.c  |   4 +-
+ target/openrisc/sys_helper.c         |  16 ++--
+ target/ppc/excp_helper.c             |  14 ++--
+ target/ppc/helper_regs.c             |   2 +-
+ target/ppc/kvm.c                     |   4 +-
+ target/ppc/misc_helper.c             |   8 +-
+ target/ppc/timebase_helper.c         |   8 +-
+ target/riscv/cpu_helper.c            |   4 +-
+ target/s390x/kvm/kvm.c               |   4 +-
+ target/s390x/tcg/misc_helper.c       | 118 +++++++++++++--------------
+ target/sparc/int32_helper.c          |   2 +-
+ target/sparc/int64_helper.c          |   6 +-
+ target/sparc/win_helper.c            |  20 ++---
+ target/xtensa/exc_helper.c           |   8 +-
+ ui/spice-core.c                      |   6 +-
+ util/async.c                         |   2 +-
+ util/main-loop.c                     |   8 +-
+ util/qsp.c                           |   6 +-
+ util/rcu.c                           |  16 ++--
+ audio/coreaudio.m                    |   8 +-
+ memory_ldst.c.inc                    |  18 ++--
+ target/i386/hvf/README.md            |   2 +-
+ ui/cocoa.m                           |  56 ++++++-------
+ 121 files changed, 644 insertions(+), 645 deletions(-)
 
-Jason
+-- 
+2.43.0
+
 
