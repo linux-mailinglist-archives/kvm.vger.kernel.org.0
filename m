@@ -1,119 +1,281 @@
-Return-Path: <kvm+bounces-4211-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4212-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D84380F225
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 17:15:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5556980F334
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 17:38:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED20E281C6A
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 16:15:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F235281D02
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 16:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DEFC77F10;
-	Tue, 12 Dec 2023 16:15:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B590378E96;
+	Tue, 12 Dec 2023 16:37:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fFO16y9F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bQUbMIsv"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA784E9
-	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 08:15:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702397709;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q2Jz0Vih/peGcNEFAH1I/vwL9Zvjs9OTM4jvQXkmuKw=;
-	b=fFO16y9F2qN2JUXzDAZoz9j0yEJeQmSPdOnBRYWkRHbTKtJaVyJWY+AmLwRuQt/UuQYeg1
-	hTPYxllOoh5ftkW9e0nEfd6mVN4BVDHxMgRTnwB0iz9eFDQeiqaM7Z3YZa6juEkGvGRkmG
-	3lvvi8Q/KmuhL/LlgQkPpGaKl//m3RY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-550-rzCZdJBRMvO0igQdZ9_RBQ-1; Tue, 12 Dec 2023 11:15:07 -0500
-X-MC-Unique: rzCZdJBRMvO0igQdZ9_RBQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40a4c765d3bso28676955e9.0
-        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 08:15:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702397706; x=1703002506;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=q2Jz0Vih/peGcNEFAH1I/vwL9Zvjs9OTM4jvQXkmuKw=;
-        b=hNsN+n7hRI7kq/Hf56PFYA2i0jFFsSOF8+UBwRt8SvK5kfbyC9Il7ZJ51dGmRdjj9P
-         cJkJ1SEbDMEVyOasOUTtodTqcKd4fiW2k1pXbUhQPA/jPW1EpQbG+stsYLLcH2IWlZTj
-         eIuVMNT7VASSzbFD2vuEZQdag6DXy0JaZd5GWVKEOLXanGN3GaVGyUc1rNBNJ+zFOhLN
-         wT/87QtaVvhUyjbvCEdyW1Hfqi19jVSrFUJCfeB/4yqxfpfKhmzIhQHNZ0guTvV4MoG8
-         7XAFYoucMKp0AHMQ9i5fWYAsxnebD+2Z0oegPay6YlEXqyd4mcfVdDQJ6SOwapquqWVU
-         OvbQ==
-X-Gm-Message-State: AOJu0YxditKzL33TIqZA6K5A7zloAWnMomrTKVoDm2zaorcY/xpp3E0n
-	oEqfc3H6IgIl0en3Dw2uyyQKhB7Ntn08pk+V0XAjor58GOIDY496/Bd26YheV3uneQqExvDtXq7
-	ob+Fu55Cj1oUn
-X-Received: by 2002:a05:600c:4fd3:b0:40b:5e56:7b44 with SMTP id o19-20020a05600c4fd300b0040b5e567b44mr3106310wmq.141.1702397706193;
-        Tue, 12 Dec 2023 08:15:06 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEfYaO9aerEATODsvvXvfPwf/DmeS9S4RdZVSfiTQn3TL+p+4u6edQ/gY6/zAQL0WCJWMCW2A==
-X-Received: by 2002:a05:600c:4fd3:b0:40b:5e56:7b44 with SMTP id o19-20020a05600c4fd300b0040b5e567b44mr3106296wmq.141.1702397705901;
-        Tue, 12 Dec 2023 08:15:05 -0800 (PST)
-Received: from redhat.com ([2.52.23.105])
-        by smtp.gmail.com with ESMTPSA id gw18-20020a05600c851200b004053e9276easm19320264wmb.32.2023.12.12.08.15.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 08:15:05 -0800 (PST)
-Date: Tue, 12 Dec 2023 11:15:01 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Tobias Huschle <huschle@linux.ibm.com>,
-	Abel Wu <wuyun.abel@bytedance.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
- sched/fair: Add lag based placement)
-Message-ID: <20231212111433-mutt-send-email-mst@kernel.org>
-References: <d4110c79-d64f-49bd-9f69-0a94369b5e86@bytedance.com>
- <07513.123120701265800278@us-mta-474.us.mimecast.lan>
- <20231207014626-mutt-send-email-mst@kernel.org>
- <56082.123120804242300177@us-mta-137.us.mimecast.lan>
- <20231208052150-mutt-send-email-mst@kernel.org>
- <53044.123120806415900549@us-mta-342.us.mimecast.lan>
- <20231209053443-mutt-send-email-mst@kernel.org>
- <CACGkMEuSGT-e-i-8U7hum-N_xEnsEKL+_07Mipf6gMLFFhj2Aw@mail.gmail.com>
- <20231211115329-mutt-send-email-mst@kernel.org>
- <CACGkMEudZnF7hUajgt0wtNPCxH8j6A3L1DgJj2ayJWhv9Bh1WA@mail.gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89F35FEFE
+	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 16:37:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8AD38C433C7
+	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 16:37:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702399076;
+	bh=Z82GuhPVjo2Ggsjvho7LTwzcbpktGSf6T+4mpTyUF4E=;
+	h=From:To:Subject:Date:From;
+	b=bQUbMIsvNlVVF0YBKjCCGs28gScOmpKhO6si8+mjqNvURHokhvZ+EaG2PjtlX5Vrm
+	 kH4H6DL2RbfhNhMN83/GWaedti8bZZv9sLPxMep3n7ZWbr9g/M5KVWk1byJnDryUXW
+	 MxrFHR1bmu3R8iRIfcGChRD4RoMLRw7B3MPKucUExR3NHW7hPIrko/CpjOuMMVOXjG
+	 EM8x+yuTnSs96o/AHjHVg027wvcq1WrEUrlwisuyltjPkYOQT1+cV6Ouuub4k55IbH
+	 JPtmzVG9U87/xgzlvTzJhaf6ucKe4/tCTjBBlFSc2wz+MK1yCuBzepHdBGZlGnZDpx
+	 I0hy8iYlme2Og==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 6D956C53BD1; Tue, 12 Dec 2023 16:37:56 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 218259] New: High latency in KVM guests
+Date: Tue, 12 Dec 2023 16:37:56 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: kernelbugs2012@joern-heissler.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-218259-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEudZnF7hUajgt0wtNPCxH8j6A3L1DgJj2ayJWhv9Bh1WA@mail.gmail.com>
 
-On Tue, Dec 12, 2023 at 11:00:12AM +0800, Jason Wang wrote:
-> On Tue, Dec 12, 2023 at 12:54 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Mon, Dec 11, 2023 at 03:26:46PM +0800, Jason Wang wrote:
-> > > > Try reducing the VHOST_NET_WEIGHT limit and see if that improves things any?
-> > >
-> > > Or a dirty hack like cond_resched() in translate_desc().
-> >
-> > what do you mean, exactly?
-> 
-> Ideally it should not matter, but Tobias said there's an unexpectedly
-> long time spent on translate_desc() which may indicate that the
-> might_sleep() or other doesn't work for some reason.
-> 
-> Thanks
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218259
 
-You mean for debugging, add it with a patch to see what this does?
+            Bug ID: 218259
+           Summary: High latency in KVM guests
+           Product: Virtualization
+           Version: unspecified
+          Hardware: Intel
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: kernelbugs2012@joern-heissler.de
+        Regression: No
 
-Sure - can you post the debugging patch pls?
+Hello,
 
-> >
-> > --
-> > MST
-> >
+some of my guests are experiencing heavy latency, e.g.:
 
+* SSH sessions get stuck, sometimes for several seconds, then continue.
+* PING replies can take several seconds.
+* t0 =3D time(); sleep(1); t1 =3D time(); print(t1 - t0); can show several =
+seconds.
+* Various services with small timeouts throw errors.
+* guest system clock appears to work correctly.
+
+Sometimes this happens once or twice an hour or not for many hours. Usually=
+ the
+lag is way below
+a second, that's why I didn't notice it earlier.
+On highly affected hosts this may happen much more often, and often in
+clusters, e.g. lots of
+time during a span of a few Minutes.
+
+The affected hosts run Debian 12; until Debian 11 there was no trouble.
+I git-bisected the kernel and the commit which appears to somehow cause the
+trouble is:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=
+id=3Df47e5bbbc92f5d234bbab317523c64a65b6ac4e2
+
+CPU model: Intel(R) Xeon(R) CPU E5-2695 v4 (See below for /proc/cpuinfo)
+Host kernels:
+    * Debian, linux-image-6.1.0-15-amd64 (6.1.66-1), affected
+    * Debian, linux-image-6.5.0-0.deb12.4-amd64 (6.5.10-1~bpo12+1), affected
+    * Vanilla, v6.7-rc5, affected
+    * Vanilla, v5.17-rc3-349-gf47e5bbbc92f, first affected commit
+    * Vanilla, v5.17-rc3-348-ga80ced6ea514, last non-affected commit
+    * Vanilla, several other versions during bisecting
+Host kernel arch: x86_64
+Host RAM: 512 GiB.
+Host storage: HW-Raid6 over spinning disks.
+Guest: Debian 11, x86_64. Debian Kernels linux-image-5.10.0-26-amd64
+(5.10.197-1) and linux-image-6.1.0-0.deb11.13-amd64 (6.1.55-1~bpo11+1).
+Qemu command line: See below.
+Problem does *not* go away when appending "kernel_irqchip=3Doff" to the -ma=
+chine
+parameter
+Problem *does* go away with "-accel tcg", even though the guest becomes much
+slower.
+
+All affected guests run kubernetes with various workloads, mostly Java,
+databases like postgres
+und a few legacy 32 bit containers.
+
+Best method to manually trigger the problem I found was to drain other
+kubernetes nodes, causing
+many pods to start at the same time on the affected guest. But even when the
+initial load
+settled, there's little I/O and the guest is like 80% idle, the problem sti=
+ll
+occurs.
+
+The problem occurs whether the host runs only a single guest or lots of oth=
+er
+(non-kubernetes) guests.
+
+Other (i.e. not kubernetes) guests don't appear to be affected, but those g=
+ot
+way less resources and usually less load.
+
+I adjusted several qemu parameters, e.g. pass-through host cpu, different s=
+mp
+layout (2
+sockets, 4 cores each, 2 threads each), remove memory balloon, add I/O-thre=
+ad
+for the disk, set
+latest supported machine type. None of those resolved the problem.
+
+There are no kernel logs in the host or the guest, and no userspace logs in=
+ the
+host.
+
+AMD hosts with SSDs seem to be less severely affected, but they still are.
+
+Sadly I couldn't think of any good way to trigger the problem on say a blank
+Debian guest.
+
+If I can provide additional information or can run additional tests, please=
+ let
+me know!
+
+Many thanks in advance!
+J=C3=B6rn Heissler
+
+---------
+
+/usr/bin/qemu-system-x86_64
+-name guest=3Dk8s-worker6,debug-threads=3Don
+-S
+-object
+{"qom-type":"secret","id":"masterKey0","format":"raw","file":"/var/lib/libv=
+irt/qemu/domain-1-k8s-worker6/master-key.aes"}
+-machine pc-i440fx-3.1,usb=3Doff,dump-guest-core=3Doff,memory-backend=3Dpc.=
+ram
+-accel kvm
+-cpu qemu64
+-m 131072
+-object {"qom-type":"memory-backend-ram","id":"pc.ram","size":137438953472}
+-overcommit mem-lock=3Doff
+-smp 16,sockets=3D16,cores=3D1,threads=3D1
+-uuid 2c220b5b-9d0a-4d41-a13e-cd78c5551b35
+-no-user-config
+-nodefaults
+-chardev socket,id=3Dcharmonitor,fd=3D30,server=3Don,wait=3Doff
+-mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol
+-rtc base=3Dutc
+-no-shutdown
+-boot menu=3Don,strict=3Don
+-device {"driver":"piix3-usb-uhci","id":"usb","bus":"pci.0","addr":"0x1.0x2=
+"}
+-blockdev
+{"driver":"host_device","filename":"/dev/vg-kvm/k8s-worker6_root","node-nam=
+e":"libvirt-1-storage","cache":{"direct":true,"no-flush":false},"auto-read-=
+only":true,"discard":"unmap"}
+-blockdev
+{"node-name":"libvirt-1-format","read-only":false,"cache":{"direct":true,"n=
+o-flush":false},"driver":"raw","file":"libvirt-1-storage"}
+-device
+{"driver":"virtio-blk-pci","bus":"pci.0","addr":"0x4","drive":"libvirt-1-fo=
+rmat","id":"virtio-disk0","bootindex":1,"write-cache":"on"}
+-netdev {"type":"tap","fd":"32","vhost":true,"vhostfd":"34","id":"hostnet0"}
+-device
+{"driver":"virtio-net-pci","netdev":"hostnet0","id":"net0","mac":"52:54:00:=
+e7:56:ae","bus":"pci.0","addr":"0x3"}
+-chardev pty,id=3Dcharserial0
+-device
+{"driver":"isa-serial","chardev":"charserial0","id":"serial0","index":0}
+-audiodev {"id":"audio1","driver":"none"}
+-vnc 127.0.0.1:0,audiodev=3Daudio1
+-device {"driver":"cirrus-vga","id":"video0","bus":"pci.0","addr":"0x2"}
+-incoming defer
+-device
+{"driver":"virtio-balloon-pci","id":"balloon0","bus":"pci.0","addr":"0x5"}
+-sandbox
+on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=3D=
+deny
+-msg timestamp=3Don
+
+---------
+
+processor       : 71
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 79
+model name      : Intel(R) Xeon(R) CPU E5-2695 v4 @ 2.10GHz
+stepping        : 1
+microcode       : 0xb000040
+cpu MHz         : 3300.000
+cache size      : 46080 KB
+physical id     : 1
+siblings        : 36
+core id         : 27
+cpu cores       : 18
+apicid          : 119
+initial apicid  : 119
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 20
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca =
+cmov
+pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb
+rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology
+nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est
+tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt
+tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch
+cpuid_fault epb cat_l3 cdp_l3 invpcid_single pti intel_ppin ssbd ibrs ibpb
+stibp tpr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1=
+ hle
+avx2 smep bmi2 erms invpcid rtm cqm rdt_a rdseed adx smap intel_pt xsaveopt
+cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts
+md_clear flush_l1d
+vmx flags       : vnmi preemption_timer posted_intr invvpid ept_x_only ept_=
+ad
+ept_1gb flexpriority apicv tsc_offset vtpr mtf vapic ept vpid
+unrestricted_guest vapic_reg vid ple shadow_vmcs pml
+bugs            : cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf=
+ mds
+swapgs taa itlb_multihit mmio_stale_data
+bogomips        : 4199.23
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 46 bits physical, 48 bits virtual
+power management:
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
