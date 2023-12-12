@@ -1,165 +1,262 @@
-Return-Path: <kvm+bounces-4172-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4174-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D05E80E86B
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 11:00:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAF9080E956
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 11:40:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FCA91C20B09
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 10:00:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 757D328156D
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 10:40:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ADDC59175;
-	Tue, 12 Dec 2023 10:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F285CD07;
+	Tue, 12 Dec 2023 10:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cyberus-technology.de header.i=@cyberus-technology.de header.b="OhcR7nR7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cMAyum48"
 X-Original-To: kvm@vger.kernel.org
-Received: from DEU01-FR2-obe.outbound.protection.outlook.com (mail-fr2deu01on2051.outbound.protection.outlook.com [40.107.135.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 872E5E4;
-	Tue, 12 Dec 2023 02:00:06 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TEfBuEC2hEBs+1CxLORxunCUgdv4UI/zZORIQq2LAyoJF5sPhwc/Yp2+L6kogMsc7BU4rZnbblXLXLeyDqLMF+JK6AIdLaVnpIyGBkXdz02rarm48eC+xmNoO2PpPLjUTCbMNRlvZ3nSbatKoYLiA/oe2QZkk0LNKIWK0LYaTiIOIFBTrqtfj+/idng/1/FY2AIJuVXCnBoSZ93YeC6o/3uYyVGLwDCKSAgWN7aHYZgWltdVFv5hthwymyrc0Hr4hfsadKpMyoE0q2CfQ8fyGZq2+KeEvT8tS45dmJKNDfLiJodf2wypJhp4r1zipc/VEfwS/Wk58ZDScIjl3qPKZw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QpQXwji0BqzNCO8LTyDjolxJwTZZIdsvVHQzVVEB9A4=;
- b=bY6hOQldK+y6Xs/q6sCr9s8ckp1UlDneMW3ijT2HxWIWVpz8lS+3Vt9bBw7NfrS/qqSygev4K7UVRjtSgcfip/fw3szz4mUhybzkgpIdD5dZ9xemgvFmlBUxpiFeRcxNfpk3cvbEvFektgDSOB1HRuJF3jtTjjdFNG7e0ltByoA2/jYrp0aWz0AERY0TXkp/paI7wQ2fxNESBhvogOV0t6g/NRhCm5F5ZB7793SH43fYaCZVViHAIobpiVhEjt7LTW6M+vM/cu39ksp4N3+wNWKe2uMDU2ps+OT9hRNg1IvenaWa0sy6+qxe95nDi0oN3pwv9lu4Te9Pq89RAcXt9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=cyberus-technology.de; dmarc=pass action=none
- header.from=cyberus-technology.de; dkim=pass header.d=cyberus-technology.de;
- arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cyberus-technology.de;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QpQXwji0BqzNCO8LTyDjolxJwTZZIdsvVHQzVVEB9A4=;
- b=OhcR7nR7xVxmB4eM73U/XilDjLAcKfFP8wpCSLbN8UXr/QjYP3RAAPn88JcV41Kwmhwp5rPOr9ymDRrdBxSnuTIVlhfuWxddSldgHJ+5/1K+2mRHK09zIDTkvhRV1UyLbSD0RnVa4H2Dfcvu7JlJdep2GwrMxR6+Ffzb/fQ9/9W08FP+hJuq5nTQBgQffcRht5KbSI0h60vJlyepATyxJZZsj6gQmkJ4+F0NVxdOnvqfsaBzsXCnyQnh7CYEnBknNyfqpqXIu1CZc5QRWb27c64y8Hy7kmx9OXTUEAB3SKu0FQKc1L7sFt+6Uoa3S6Rs3NQXnUHmgnvVsfdhTcQUOQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=cyberus-technology.de;
-Received: from FR3P281MB1567.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:7a::10)
- by FR0P281MB1754.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:86::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.33; Tue, 12 Dec
- 2023 10:00:03 +0000
-Received: from FR3P281MB1567.DEUP281.PROD.OUTLOOK.COM
- ([fe80::312f:5918:e76a:3b79]) by FR3P281MB1567.DEUP281.PROD.OUTLOOK.COM
- ([fe80::312f:5918:e76a:3b79%6]) with mapi id 15.20.7068.033; Tue, 12 Dec 2023
- 10:00:02 +0000
-From: Julian Stecklina <julian.stecklina@cyberus-technology.de>
-To: kvm@vger.kernel.org
-Cc: Thomas Prescher <thomas.prescher@cyberus-technology.de>,
-	Julian Stecklina <julian.stecklina@cyberus-technology.de>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/emulator: emulate movbe with operand-size prefix
-Date: Tue, 12 Dec 2023 10:59:37 +0100
-Message-ID: <20231212095938.26731-1-julian.stecklina@cyberus-technology.de>
-X-Mailer: git-send-email 2.42.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BE1P281CA0352.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:7d::8) To FR3P281MB1567.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:7a::10)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB230E8
+	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 02:39:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702377595;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fggtRaV/8orZgO1gMNRIxp3acepW1r0vajRNrmoShyY=;
+	b=cMAyum48wIBJj5VAD1MgNLRgEdL+bWiIP9boCXCsQ9AO/AmuAcDtjcq9MiGADFUf87//fs
+	BtyFYWAkeNVc1HuN1+644on39Y1i7WnnM/A5sb80KpZ8WlHlrFcq0vMWjMxKTlWL/gDeyL
+	NOG8Rt6AObUit9+qfKWulR2v7lMD8wU=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-203-SWbfE8QcMQaYPMMr1ytpYw-1; Tue, 12 Dec 2023 05:39:53 -0500
+X-MC-Unique: SWbfE8QcMQaYPMMr1ytpYw-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a1f9ab28654so83822966b.0
+        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 02:39:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702377587; x=1702982387;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fggtRaV/8orZgO1gMNRIxp3acepW1r0vajRNrmoShyY=;
+        b=Xj8PM30SLm4jgaiDENnQD1Hu2PqqTySv6Gp0j8p9rL7uJz5YynNgY5Y32fbBAYQprJ
+         gWxVKN0HOb/mYltoyhCuhiWWmxWxa+xI9qvQNmOX5V8bZLrajfHTDQX3aTjuBHBzd7SS
+         ShEQI4HaKttDYCyp5lpuug7D+ZqywFXMNp7FHwsxEfrs4V4CEL5Dbn6NLVrBmkNBLbIW
+         1kDA+ss0e5h1F4BWPrL3fy9pkZ5RdSGl6vxnG8EAr0EEMRM0iFsr7pjI2v9+JPOMv4+6
+         OwtoqM9O3MPUrbVUClHB0sm1n/2VLPKmJwavEo1VtWkfJfOtszMvPoFI9ACM412F3ibt
+         3FHg==
+X-Gm-Message-State: AOJu0YzEgRX0tqloBviFaUO5P/WBM0nuiYawZf8kJKMa02LAxPDaHLi4
+	VdEb/ihm+WT/KPCezOd2agvL55lbhNVMq8PoRNoaGzhBDUJP92nZWGTWYVpob1OT1RhoMQ7kmL9
+	D3sa25YamJKMLsFVG0SsXo0W5AY0c
+X-Received: by 2002:a17:906:5194:b0:a1a:4a36:66fc with SMTP id y20-20020a170906519400b00a1a4a3666fcmr1343854ejk.16.1702377587458;
+        Tue, 12 Dec 2023 02:39:47 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE1s9ejU0QHSLLSTC9/iMEf46k/k5nUUYOzmG44Y4BEDGsQWW58tFcSfCa8zIUz3Ryox9pKp23WQ8EeadbhgOA=
+X-Received: by 2002:a17:906:5194:b0:a1a:4a36:66fc with SMTP id
+ y20-20020a170906519400b00a1a4a3666fcmr1343842ejk.16.1702377586761; Tue, 12
+ Dec 2023 02:39:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: FR3P281MB1567:EE_|FR0P281MB1754:EE_
-X-MS-Office365-Filtering-Correlation-Id: fcfb2943-21f2-4369-45c5-08dbfaf91c15
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	5NDcdwH6bZlzoomCzzPE/OSPlfgd3pJvmFiSyAW9UoQNulwxR6bLYKDfExBQ3CXBbyfUqYA+ITy1PTxU0vf0TjIL5yuHGUdZgpKnUlW+V/c5pwnz07xJxSDTvLBSUSUEf3K55eWKddSL8AswKKS1322X7EltWybNpXFHphNFE0G9dr1w/hd/g/FxAczdC67OK+ITD4NLalTTc13dCIi4u2cq2JlcMIKQBXYYVxCLQ6job5ktCwjCn+TCnhBUUT2zNnVqkiY1jWERCDX30eIaFpdLhyxnV0EoE1v+gp5Jh7D+ijfL/emg7MS1qwMlYt5xyOUNst6m24EoNNKYMxYCyt5rZe/KmDpvoQRlDhvkbS3MNnO/PgmECi57c5lkaZxschm7cE1MOdVcsj2wb00p3MgbZADtcGXCoGCihGCPKDpowqr/KqaR89Fs5kgkdCetmB/8KRQDYIc5q93UzPX3zdtnExI8VXIyF2vgP8vwPJTk9qfwPyMGKGZlvtzbVDFCyIN9PvRK1frigsfRIDNcQGAL7VXXfm5EjLEZhvpf7wwhpyuRiEMrQh4wBG+LqPZWxOVT4ju8UcOTTceYKuQxzglQsjT2JJMyXvxOwR/dPwk=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:FR3P281MB1567.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(376002)(346002)(39830400003)(396003)(230922051799003)(186009)(451199024)(64100799003)(1800799012)(83380400001)(52116002)(6512007)(6506007)(2616005)(1076003)(38100700002)(44832011)(8936002)(5660300002)(4326008)(8676002)(41300700001)(7416002)(2906002)(6486002)(478600001)(6666004)(316002)(66476007)(6916009)(54906003)(66946007)(36756003)(86362001)(66556008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?h5OyoDre7f9HIreByZbZw6j1JDC5BzpBXkdA6GDrZycgvghravkYTKU/mGKC?=
- =?us-ascii?Q?9dQTMFlSik065woUtsWErx4+u3CTGxUDgocqtFzNnyjHTsz+3Fd/DPmCnZ9o?=
- =?us-ascii?Q?lhF51B+q8+YOKtBbLVGDLWE7I6puNeXtG0Xll/5naCWNsldA/Qj2Lc9Wu7he?=
- =?us-ascii?Q?BypLc+eTTYY/Q/IvJ90ZjLMovaiCSpnsIrk8UYZFLnikmtPwbKA0j8XjlTh3?=
- =?us-ascii?Q?2svQLyT3OI82XBsIqoH/WkZhEQIW00Yt4XsAm708U57mh/qzckD+RIzRww53?=
- =?us-ascii?Q?hG2HANSA8y8RjGy/SQ6NKbXILOzS26GOnMpSBm1lYFlSler98nH4wwsjKYVg?=
- =?us-ascii?Q?7RtkoOi3q9MkLPgBAoTI4NPUfYKaYOgMLaFGb6hmTk2aO4FzIXf+TD8j18Zw?=
- =?us-ascii?Q?NQgPG6LSOThILARrOjdkz7hHY9nTuLiuEz2WQ0IkoyoGHUZ4jESsHd+9MwXg?=
- =?us-ascii?Q?i+DcDqwOJeNy+6t4QxlEuW3bsrwrD9m4ziYk49hT4Yc4ZL2o5wlD5+hiql79?=
- =?us-ascii?Q?oHcM2asmIkwdVZLzAVi0VCVQapo4IO/AbB2RnEsSUvV/jVsBVsd5+P1BA0zV?=
- =?us-ascii?Q?UHQ1IWCscWrl5DDUVTkCJjCA2PsvNLbQa2Z8oudVz9Rz5/GTCADYBiaIXmi3?=
- =?us-ascii?Q?51iJVl//ESnqRqi4S2ELf5OHOXrT8PwGrcSVlPY4VO7u77AvRtUKkuHPmzuI?=
- =?us-ascii?Q?/tf6x+W+tbbJ/NputV2nm2G5tqaieRVkbrlMqv6xiJsgL1P/dUCufsH+yxtu?=
- =?us-ascii?Q?WWzvqGmWOXlOd2wnkDoU8kVtjc4E9TuBbbwiqhK4TIPkrfU8FXUh9B6+p87I?=
- =?us-ascii?Q?qXVtwchfIxlH3Da4dVz6nz9nE/2BlCS7cEZcI3xEMrwR6McLc7lbXKFpK4Sz?=
- =?us-ascii?Q?sgzKxkXclyHJA8Tpc9nCjbHVeRlpPjeAKtd6IS/5uyq1qqBuBE/DpNQC6plB?=
- =?us-ascii?Q?RgISEY5+n0dqTjupBJrk4dilHWb8uQbiy4VX+25+7etdDyrU0V4k18jKjwo4?=
- =?us-ascii?Q?cQ/409Xd756dBT8ZEs8CIitSzrbVQzxztJF2q5qbd2YMJyV1c50QWAY7WRyt?=
- =?us-ascii?Q?l4VBJX2yGX2sZN8QU+MDj0VZRj4uaP1OLrrpf6t5SXUTLS0aHILyZO0AtzcA?=
- =?us-ascii?Q?TcHHU7QsHniU0cBMUgxmJqD6fVTbak7jsMKHVAgIRRz8+OKPkMk/MsZ0oAV3?=
- =?us-ascii?Q?7mDH0JhbbA0YEBHkxguVtQgwRb+R/00Z/b49/brWXqKH0hEzjl7HRHnpWLAq?=
- =?us-ascii?Q?aWlCWsfw5FpjZpUvWwwSsejg6yyWqxU1AEAFPITam3qJTKvSH5sriEURLERv?=
- =?us-ascii?Q?6qhrA2EtQxHWvbSxcjdihiKQ2LYlnqAsU6Z1TQELa76zb87jW/blETXMJEBs?=
- =?us-ascii?Q?GF+5SUF7S4Nc2PCbPEjFNP5jQajkhWODie2OJTyjdqeOxN6cMjZkaMFa8atC?=
- =?us-ascii?Q?BUGWlYxzyaD8EtC2fze0SzpCIL/jPelep92hSN36MP4h8eWukN3xDOlTKpuG?=
- =?us-ascii?Q?ffEaUCbG8E6RojCvtSN9TDZD6xXK5dO+OhZHTxmbDE5SmeaUnrdvQS5LcsfF?=
- =?us-ascii?Q?gKTDXcOSb98ASAUjgkemWUCQeFA7fsLyRVIYrgdszg/g0xAxBNm83RCwT/K8?=
- =?us-ascii?Q?8Wcfym2GIzsbj+gu22UZoC6s+sgBmj7Z9CBLgJ5AOJKKyn/ExecRq4tW6b3V?=
- =?us-ascii?Q?A2nqzc0AN8I0dijUWoPMHt2bHyqGcA5ftfQfBXknEXyGbUHt?=
-X-OriginatorOrg: cyberus-technology.de
-X-MS-Exchange-CrossTenant-Network-Message-Id: fcfb2943-21f2-4369-45c5-08dbfaf91c15
-X-MS-Exchange-CrossTenant-AuthSource: FR3P281MB1567.DEUP281.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2023 10:00:02.9170
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f4e0f4e0-9d68-4bd6-a95b-0cba36dbac2e
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0p8YRguIZMAI69uniNRCUdiJmKX23DOKZ7oERcRGt7obp7kpMe0xzPp6FjseB5g7q9PiwIHGIeTYr96yDXSua7yDLWZycLbCMLhNAZQCXJWLFHKytCwloqlHlTKPkH6w
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: FR0P281MB1754
+References: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
+In-Reply-To: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
+From: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+Date: Tue, 12 Dec 2023 11:39:34 +0100
+Message-ID: <CAO-hwJJhzHtKrUEw0zrjgub3+eapgJG-zsG0HRB=PaPi6BxG+w@mail.gmail.com>
+Subject: Re: Should I add BPF kfuncs for userspace apps? And how?
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Jason Wang <jasowang@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
+	Benjamin Tissoires <bentiss@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, kvm@vger.kernel.org, 
+	LKML <linux-kernel@vger.kernel.org>, virtualization@lists.linux-foundation.org, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Thomas Prescher <thomas.prescher@cyberus-technology.de>
+Hi,
 
-The MOVBE instruction can come with an operand-size prefix (66h). In
-this, case the x86 emulation code returns EMULATION_FAILED.
+On Tue, Dec 12, 2023 at 9:11=E2=80=AFAM Akihiko Odaki <akihiko.odaki@daynix=
+.com> wrote:
+>
+> Hi,
+>
+> It is said eBPF is a safe way to extend kernels and that is very
+> attarctive, but we need to use kfuncs to add new usage of eBPF and
+> kfuncs are said as unstable as EXPORT_SYMBOL_GPL. So now I'd like to ask
+> some questions:
+>
+> 1) Which should I choose, BPF kfuncs or ioctl, when adding a new feature
+> for userspace apps?
+> 2) How should I use BPF kfuncs from userspace apps if I add them?
+>
+> Here, a "userspace app" means something not like a system-wide daemon
+> like systemd (particularly, I have QEMU in mind). I'll describe the
+> context more below:
 
-It turns out that em_movbe can already handle this case and all that
-is missing is an entry in respective opcode tables to populate
-gprefix->pfx_66.
+I'm probably not the best person in the world to answer your
+questions, Alexei and others from the BPF core group are, but given
+that you pointed at a thread I was involved in, I feel I can give you
+a few pointers.
 
-Signed-off-by: Thomas Prescher <thomas.prescher@cyberus-technology.de>
-Signed-off-by: Julian Stecklina <julian.stecklina@cyberus-technology.de>
----
- arch/x86/kvm/emulate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+But first and foremost, I encourage you to schedule an agenda item in
+the BPF office hour[4]. Being able to talk with the core people
+directly was tremendously helpful to me to understand their point.
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 2673cd5c46cb..08013e158b2d 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -4502,11 +4502,11 @@ static const struct instr_dual instr_dual_0f_38_f1 = {
- };
- 
- static const struct gprefix three_byte_0f_38_f0 = {
--	ID(0, &instr_dual_0f_38_f0), N, N, N
-+	ID(0, &instr_dual_0f_38_f0), ID(0, &instr_dual_0f_38_f0), N, N
- };
- 
- static const struct gprefix three_byte_0f_38_f1 = {
--	ID(0, &instr_dual_0f_38_f1), N, N, N
-+	ID(0, &instr_dual_0f_38_f1), ID(0, &instr_dual_0f_38_f1), N, N
- };
- 
- /*
--- 
-2.42.0
+
+>
+> ---
+>
+> I'm working on a new feature that aids virtio-net implementations using
+> tuntap virtual network device. You can see [1] for details, but
+> basically it's to extend BPF_PROG_TYPE_SOCKET_FILTER to report four more
+> bytes.
+>
+> However, with long discussions we have confirmed extending
+> BPF_PROG_TYPE_SOCKET_FILTER is not going to happen, and adding kfuncs is
+> the way forward. So I decided how to add kfuncs to the kernel and how to
+> use it. There are rich documentations for the kernel side, but I found
+> little about the userspace. The best I could find is a systemd change
+> proposal that is based on WIP kernel changes[2].
+
+Yes, as Alexei already replied, BPF is not adding new stable APIs,
+only kfuncs. The reason being that once it's marked as stable, you
+can't really remove it, even if you think it's badly designed and
+useless.
+
+Kfuncs, OTOH are "unstable" by default meaning that the constraints
+around it are more relaxed.
+
+However, "unstable" doesn't mean "unusable". It just means that the
+kernel might or might not have the function when you load your program
+in userspace. So you have to take that fact into account from day one,
+both from the kernel side and the userspace side. The kernel docs have
+a nice paragraph explaining that situation and makes the distinction
+between relatively unused kfuncs, and well known established ones.
+
+Regarding the systemd discussion you are mentioning ([2]), this is
+something that I have on my plate for a long time. I think I even
+mentioned it to Alexei at Kernel Recipes this year, and he frowned his
+eyebrows when I mentioned it. And looking at the systemd code and the
+benefits over a plain ioctl, it is clearer that in that case, a plain
+ioctl is better, mostly because we already know the API and the
+semantic.
+
+A kfunc would be interesting in cases where you are not sure about the
+overall design, and so you can give a shot at various API solutions
+without having to keep your bad v1 design forever.
+
+>
+> So now I'm wondering how I should use BPF kfuncs from userspace apps if
+> I add them. In the systemd discussion, it is told that Linus said it's
+> fine to use BPF kfuncs in a private infrastructure big companies own, or
+> in systemd as those users know well about the system[3]. Indeed, those
+> users should be able to make more assumptions on the kernel than
+> "normal" userspace applications can.
+>
+> Returning to my proposal, I'm proposing a new feature to be used by QEMU
+> or other VMM applications. QEMU is more like a normal userspace
+> application, and usually does not make much assumptions on the kernel it
+> runs on. For example, it's generally safe to run a Debian container
+> including QEMU installed with apt on Fedora. BPF kfuncs may work even in
+> such a situation thanks to CO-RE, but it sounds like *accidentally*
+> creating UAPIs.
+>
+> Considering all above, how can I integrate BPF kfuncs to the application?
+
+FWIW, I'm not sure you can rely on BPF calls from a container. There
+is a high chance the syscall gets disabled by the runtime.
+
+>
+> If BPF kfuncs are like EXPORT_SYMBOL_GPL, the natural way to handle them
+> is to think of BPF programs as some sort of kernel modules and
+> incorporate logic that behaves like modprobe. More concretely, I can put
+> eBPF binaries to a directory like:
+> /usr/local/share/qemu/ebpf/$KERNEL_RELEASE
+
+I would advise against that (one program per kernel release). Simply
+because your kfunc may or may not have been backported to kernel
+release v6.X.Y+1 while it was not there when v6.X.Y was out. So
+relying on the kernel number is just going to be a headache.
+
+As I understand it, the way forward is to rely on the kernel, libbpf
+and CO-RE: if the function is not available, the program will simply
+not load, and you'll know that this version of the code is not
+available (or has changed API).
+
+So what I would do if some kfunc API is becoming deprecated, is
+embedding both code paths in the same BPF unit, but marking them as
+not loaded by libppf. Then I can load the compilation unit, try v2 of
+the API, and if it's not available, try v1, and if not, then mention
+that I can not rely on BPF. Of course, this can also be done with
+separate compilation units.
+
+>
+> Then, QEMU can uname() and get the path to the binary. It will give an
+> error if it can't find the binary for the current kernel so that it
+> won't create accidental UAPIs.
+>
+> The obvious downside of this is that it complicates packaging a lot; it
+> requires packaging QEMU eBPF binaries each time a new kernel comes up.
+> This complexity is centrally managed by modprobe for kernel modules, but
+> apparently each application needs to take care of it for BPF programs.
+
+For my primary use case: HID-BPF, I put kfuncs in kernel v6.3 and
+given that I haven't touch this part of the API, the same compilation
+unit compiled in the v6.3 era still works on a v6.7-rcx, so no, IMO
+it's not complex and doesn't require to follow the kernel releases
+(which is the whole point of HID-BPF FWIW).
+
+>
+> In conclusion, I see too much complexity to use BPF in a userspace
+> application, which we didn't have to care for
+> BPF_PROG_TYPE_SOCKET_FILTER. Isn't there a better way? Or shouldn't I
+> use BPF in my case in the first place?
+
+Given that I'm not a network person, I'm not sure about your use case,
+but I would make my decision based on:
+- do I know exactly what I want to achieve and I'm confident that I'll
+write the proper kernel API from day one? (if not then kfuncs is
+appealing because  it's less workload in the long run, but userspace
+needs to be slightly smarter)
+- are all of my use cases covered by using BPF? (what happens if I run
+QEMU in a container?) -> BPF might or might not be a solution
+
+But the nice thing about using BPF kfuncs is that it allows you to
+have a testing (not-)UAPI kernel interface. You can then implement the
+userspace changes and see how it behaves. And then, once you got the
+right design, you can decide to promote it to a proper syscall or
+ioctl if you want.
+
+Cheers,
+Benjamin
+
+>
+> Thanks,
+> Akihiko Odaki
+>
+> [1]
+> https://lore.kernel.org/all/20231015141644.260646-1-akihiko.odaki@daynix.=
+com/
+> [2] https://github.com/systemd/systemd/pull/29797
+> [3] https://github.com/systemd/systemd/pull/29797#discussion_r1384637939
+>
+
+[4] https://docs.google.com/spreadsheets/d/1LfrDXZ9-fdhvPEp_LHkxAMYyxxpwBXj=
+ywWa0AejEveU
 
 
