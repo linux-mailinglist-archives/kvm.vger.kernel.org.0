@@ -1,272 +1,268 @@
-Return-Path: <kvm+bounces-4132-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4133-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0C0C80E27A
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 04:06:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1F0B80E2B4
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 04:24:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 057E41C2174A
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 03:06:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 973012823BE
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 03:24:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B275676;
-	Tue, 12 Dec 2023 03:06:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71E28F52;
+	Tue, 12 Dec 2023 03:24:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HiL/5a9K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 02CFCB5;
-	Mon, 11 Dec 2023 19:06:23 -0800 (PST)
-Received: from loongson.cn (unknown [10.20.42.183])
-	by gateway (Coremail) with SMTP id _____8Ax2uguzndl1zwAAA--.1533S3;
-	Tue, 12 Dec 2023 11:06:22 +0800 (CST)
-Received: from [10.20.42.183] (unknown [10.20.42.183])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxXeEqzndl6BQAAA--.709S3;
-	Tue, 12 Dec 2023 11:06:20 +0800 (CST)
-Subject: Re: [PATCH v5 1/4] KVM: selftests: Add KVM selftests header files for
- LoongArch
-To: Sean Christopherson <seanjc@google.com>
-Cc: Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- Vishal Annapurve <vannapurve@google.com>, Huacai Chen
- <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
- loongarch@lists.linux.dev, Peter Xu <peterx@redhat.com>,
- Vipin Sharma <vipinsh@google.com>, maobibo@loongson.cn
-References: <20231130111804.2227570-1-zhaotianrui@loongson.cn>
- <20231130111804.2227570-2-zhaotianrui@loongson.cn>
-From: zhaotianrui <zhaotianrui@loongson.cn>
-Message-ID: <e40d3884-bf39-8286-627f-e0ce7dacfcbe@loongson.cn>
-Date: Tue, 12 Dec 2023 11:08:41 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE74B8F;
+	Mon, 11 Dec 2023 19:23:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702351439; x=1733887439;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=gJeVzPu8tSk3XIBqo71gNmayNjPhHDNbxUYTFRNgwi4=;
+  b=HiL/5a9KLfCm/Jj2qQt4FG6TFp39E8L3CqaXrJRDz8BzBkkTkVNhxNLz
+   SQTSS0x+AFmNY2y3e7+DLqf5dkhfXRCcoApj7eCcNQyMDfaaI/ESgnHgW
+   wntY22ii0UOQZimhC6hY6MqmSCriacONrRy4+qvKhc/G2PpX7vvlTgpm7
+   DfsE/7PhYqqTV6ToLRARti/PC/nwZipG1rsD1PQYv3mEqaEiWN3KndxQd
+   R9GZ9tnpikw3fCVBve2M8wbMPUafAAS/vaka8+uCjolzOVO0/HD3XHTad
+   yPkJhfI/msRuVFL6++V5/zc72s+xQRHalpDF1lbdMyJ4QxHHxbEQon/CM
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="397532718"
+X-IronPort-AV: E=Sophos;i="6.04,269,1695711600"; 
+   d="scan'208";a="397532718"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 19:23:59 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="839284617"
+X-IronPort-AV: E=Sophos;i="6.04,269,1695711600"; 
+   d="scan'208";a="839284617"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Dec 2023 19:23:58 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 11 Dec 2023 19:23:58 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 11 Dec 2023 19:23:58 -0800
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 11 Dec 2023 19:23:55 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=K+lLmML6qQiHk7EXVKOi7ft7fjLem7sRbsISZJyVpvmVM3YdTHhttdAYiHhnitKtXAT6I824ktk71kF2c/Ps8FIujSbD6e951/74t776k1WZppqgaX+D0qVJSqhbF9ewWsfrjMy6B6Z1/G+f4N6c0sSemRXbn0A4N6kZSnih65p7iYKdCZ/u2Yny/xpl85NrT0YDmq9VX4hsheFazgNcE6R2hxvkJ8L75UVfwDxk0Z9lYZ+RQ8GNYxyGZhID7+CIZWzNB2nxdwDF+2D/xRUGJ326LBKydbY8slEB+E+c5Cd4aGnZfUYNpCffuAH3cAX1hPjB9hjQFgxO+IU4Daw6iw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FlxWSQc0+bahEm2rMjl2eypks1uMvxQkHWAd4yT5pmU=;
+ b=c3//tR9wiNZ0pxquTRFtPa8LXK272iwk17zJyJaakgRkvicovk5GUxl8qFySDhVYxSEPx+pYqTrDokAHuwLPJyOm1xKCRdRxlHQjchFdJSG/Cpr8USOvuFoSxj3MTk10EPDeVU2xs39Kjj8LPSNr1OS6QjppzNEIQXnZENXeR35yHoXQHxpuzfI4flTVZqHjfnnmtQ7fUlgHSwNMsaoFFmWPdb5mia/GoTYyn8ybexu3vy9bUXsCb0trU74WNq2FO07RFbyMMByscUeWs7EJViyjWf97+TE+iFWZ1ZBAvc9NQDwqd9jbHf8SJ2oumDgko5eGFTAUTxPypuTst7lXUQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by PH0PR11MB4901.namprd11.prod.outlook.com (2603:10b6:510:3a::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Tue, 12 Dec
+ 2023 03:23:53 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::e4ae:3948:1f55:547d]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::e4ae:3948:1f55:547d%5]) with mapi id 15.20.7068.031; Tue, 12 Dec 2023
+ 03:23:52 +0000
+Message-ID: <ccabd500-6b0a-4663-bf63-715bd28aff76@intel.com>
+Date: Tue, 12 Dec 2023 11:26:25 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] vfio: Report PASID capability via VFIO_DEVICE_FEATURE
+ ioctl
+Content-Language: en-US
+To: "Tian, Kevin" <kevin.tian@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
+	<jgg@nvidia.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
+CC: "cohuck@redhat.com" <cohuck@redhat.com>, "eric.auger@redhat.com"
+	<eric.auger@redhat.com>, "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mjrosato@linux.ibm.com"
+	<mjrosato@linux.ibm.com>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "yi.y.sun@linux.intel.com"
+	<yi.y.sun@linux.intel.com>, "peterx@redhat.com" <peterx@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
+	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
+ Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
+	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
+	<yan.y.zhao@intel.com>
+References: <20231127063909.129153-1-yi.l.liu@intel.com>
+ <20231127063909.129153-4-yi.l.liu@intel.com>
+ <BN9PR11MB527639DBE4C433542F351F6D8C8BA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <0bdae2ca-a200-4db1-a016-059730d1545e@intel.com>
+ <BN9PR11MB52763C75E3D638B722CE63A78C8EA@BN9PR11MB5276.namprd11.prod.outlook.com>
+From: Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <BN9PR11MB52763C75E3D638B722CE63A78C8EA@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR06CA0233.apcprd06.prod.outlook.com
+ (2603:1096:4:ac::17) To DS0PR11MB7529.namprd11.prod.outlook.com
+ (2603:10b6:8:141::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231130111804.2227570-2-zhaotianrui@loongson.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:AQAAf8CxXeEqzndl6BQAAA--.709S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3XrW3Ar4UKryxuFW8Xr1rZrc_yoWxZFy5pF
-	WjkFy0kr48tF47K348KFn5Z3W7Gr4xAF18K347XrWj9F45X34kGr12gF45JFy5Xrs5XFyU
-	Ar1vqw4a9rZrW3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUP2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJr1ln4kS14v26r1Y6r17M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y
-	6r17McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
-	1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxG
-	rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUXVWUAwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4U
-	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8m9aDUUUU
-	U==
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|PH0PR11MB4901:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8ce4ce09-e7bb-4a49-dbf4-08dbfac1c3a2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 1UCQPS2gugMiIf2cJYZNL6WeRCoJjheJdhOLda6XSiW6I490itWCUh2k2isL+BEvoql/SaDybxiq06xvlvBpOPTUt3bD0omLwjLeu3qWKb0zFYPdSCqXdJ4K9oFqh534hGpz/lkZyWeoZQm4boXxNgpcrMTwbHIGhoDz24aAsTRamJldC3IiHVX3vQPpbQ5n/7xBhoCzfkMGEicdqcnsrRuYDw/Hw18XhUKUXRD7iLQQKMnBR1yC+7b7/7qYYZmcIuFplBW4KhYTykhZkATbHnrHDTUfsS0DG7uHHw/YAPLXvHAcUtjcwwDgRfvsHGnQPQMzFOg5Vwnqq3yBg1yBONxUkGgYhVn+dU8xASTOL3q4AahWxXqpXo8Zn2ialg0FFu6gKgAARR1zEwzV/zlSFFOVJKppNHZYvwe3mIekkgpDvVDyvHySqfkaYIKn05X6PdrtED1QuA/ZYU6rql/WVbIt0DuvvQPX5lBh2WB9vEKQsU48eedirKLsdS4iNnCkRjKmzStYk8ADkeSA2p/vh1rIrGLDJ6XwT8kSt1eibTZ2Z5/t55vEBMFxcy+2kLybIiULckXfbHYJrBzHePuHaS2kQSXKNo7YW5kXqKZ4y2I86MKENQFt3MI7H+9F8vzUl1xkU29MmXDA/DuvVy5pUg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(376002)(39860400002)(366004)(346002)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(31696002)(2906002)(82960400001)(86362001)(7416002)(26005)(38100700002)(31686004)(6506007)(6666004)(5660300002)(6512007)(66476007)(66556008)(66946007)(36756003)(2616005)(8676002)(4326008)(8936002)(53546011)(41300700001)(478600001)(6486002)(316002)(110136005)(54906003)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M0lPMk9ialpXZ21BaTF6aEp0SWxUb3YyckViK1BQaGFtcmkreGlyU2N1MWdo?=
+ =?utf-8?B?TmI0TEJYekt6Nzg4UkZWRXZyekt2d1BtSllMbFFHdkppMWo0djZQVHZpaSth?=
+ =?utf-8?B?Z3BwYXdxN25IRVIyOEdnQ2dxSkFla1V1dXZsS29HMjJMcndYQnltRDV3bWJl?=
+ =?utf-8?B?OEJDNFVsZzJmOWliUDdONFM2aGgxbHhONDN3S2tYMExkY0xCWTlLSkhTSG1Z?=
+ =?utf-8?B?S01Jak1veXE0Q2lOZ1pjcDlQSFVyOEJIa3dXb0FyOTNvSWNLK1FiaFpuYkNn?=
+ =?utf-8?B?TkdlQ3A2U3dFb2xaN1RvNjlyK1RVUVZQQlkzQVVvZVQ4NXdMMHNjTmVFdkZB?=
+ =?utf-8?B?MUlQWUJCZHFDVXU2VzJ1eEh1V1c0MjZUZU1CWTdZdklQWEI4QmIxOGNJYjJH?=
+ =?utf-8?B?Y0ZmZTExVHJ1bExVeUZaTjVINTJnV2hwY2cxOG95NEM2bFRhOXJqbVRnangx?=
+ =?utf-8?B?am9INzcydWRDZm9jRkxpVzdsTDdIREFKNk5NeFVwTnU2SDBuTnkvK250MGNt?=
+ =?utf-8?B?TTFKdEtFSGpoY1Q4U1BaMkc1dVJxUGd6RWVYOW9iQ0ZNTjRrOS96ZkpydEFl?=
+ =?utf-8?B?KzNHd1Rva1QyUHlIbTlaY1hyQUUxem9lcnNXcURCdnB4RWFFazNYemdmNFo1?=
+ =?utf-8?B?MHI0bzl6SFBEOFZjYVBQWVlwSUhSK291bkFFU3drUmVQV1pDVmg3dWd6elFj?=
+ =?utf-8?B?cVFYK2YxUzlDMmJCOXJMZ2pzS1E3VmV4Y3hYNnlOa3U1bVV1RWVzTEhSVi95?=
+ =?utf-8?B?T1FhY1NVM2FLN2FpdURYWEtGZTljUjVrWURtb2drL0xFTitVajlzWjZUU3Uv?=
+ =?utf-8?B?d1ByM2hhTkQyd3pBc0pLSU9OY1JVQzV5eGZLeENPb2QwOXBja3NPZGdIcG13?=
+ =?utf-8?B?Vm5ldkxTSGRMdnNOS0JZdnhIRkdHTTREaUVzKzc2R29TWjVJWWxwdllqNkJV?=
+ =?utf-8?B?anFKQWhJK1hpT1U4QkYzMHI2bnZmLzdQYjJBb1NTWGpMSkRhQnZwUVRxdVk1?=
+ =?utf-8?B?WFFEWnFsTHhkWlN6bEh0amlLWkp1OTV1cHVYdHVxRHRpcUxxeXFGS2xzOWZx?=
+ =?utf-8?B?YmhVckQ4cm83TVVJdTZyZm9qVFRIeW4rSlVtNzZvSXAwK3doTXVuNEEzbEJp?=
+ =?utf-8?B?STZ5WEptUEQvTVhrYjd6Nm9jQlR0TkRRMXhnSkZPT2tpRDJ3NVdsVG9rR3pP?=
+ =?utf-8?B?b2hrMHZ2ZGluWkEvTW44V2kvV2UxM3ZveGhDYzlMaEJOR2NaT2kzbEtNdzc2?=
+ =?utf-8?B?aThRV21SSGZzRXdMY3A3c0dBSjF0a0lNS2U2QmZsOElSVy9ibFhxa1ZOS0RH?=
+ =?utf-8?B?TllqY2FiR2htWFo0MnZGZytobERyeUVlbG43aUk4QmNkUFN0UzgzRC9weVU3?=
+ =?utf-8?B?ZUlCV3lKTWVVNFNENDE4dHV1VW9xbjZNQ2VZcmFPWXVQd1NPakJrYmp6NVlp?=
+ =?utf-8?B?Wk5ONENRT2QyUHBmMHQ5czByQm90dUJDTm1HeEhRc2tvSjJ5TTZFSjdZOW9L?=
+ =?utf-8?B?RmRadkxtdlZ1Vk9vUzhNRVN0WFl4RngzeGVoTkg2cGh0ajlVTE4vRVEyMXY1?=
+ =?utf-8?B?TTVhbldMTXBGNDdNVU5XRytyN3dtek1GRlV0S2NtMURxUFpvL01aZWoya2lt?=
+ =?utf-8?B?UzIzanFkd3F1UmhnOG1RalpIZ0FSU1V5SUdXNTY2QUxOOEc4emdtVFpRaHhH?=
+ =?utf-8?B?Tjk5TThHNGxMOGMvZ0FlWkxlOXdwcm9NWUJyY3lSYXlKcmJXUldoTXQ1alV1?=
+ =?utf-8?B?Ums1Vi80RlZMMURXaTB3Z3RKNzF1RVRFTG01MzFxcklCWjJyMkwvQ1ZndVF2?=
+ =?utf-8?B?a1RFeGFWVTlMMzE3eXdtLzFzNEUrZVh3c1c3TzhjRGYzU2NnNW9LamRyMTU2?=
+ =?utf-8?B?WWZGYmNsVWNEejZFS3R3Z2NBRGRPWWVWRi9ndG54Vjd0cDFSSkQ1aVpjV3Zi?=
+ =?utf-8?B?T3VEMGcvTkhWQ08weEg3eW4vMU1rUkZjLzJ5RnNtazA0cUp4emhYTVcwQ2E5?=
+ =?utf-8?B?UE1oVXZCWGZEZXF0bGhERU16Y1VRMkZab0NYSkp6UkZSSnJUQjA2K3JGZXFQ?=
+ =?utf-8?B?cXdWNGg4MHdJK0ErODhPNzF2bjl5c2d1YlAxeWxMUUpBN1BaZWZCa1JHK1JB?=
+ =?utf-8?Q?SBMBZXp/lEq34sMENRifGLuSU?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8ce4ce09-e7bb-4a49-dbf4-08dbfac1c3a2
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2023 03:23:52.4242
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8ROZ/WaQDAHZ/jgsn5fGI8HEbCeFQruo7o0WlCmWVXJT6ho7g/p71bj7JTKsKquIxQbRPyuTg9Dp0Kdh/V79uA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4901
+X-OriginatorOrg: intel.com
 
-Hi, Sean:
+On 2023/12/12 10:20, Tian, Kevin wrote:
+>> From: Liu, Yi L <yi.l.liu@intel.com>
+>> Sent: Monday, December 11, 2023 4:08 PM
+>>
+>> On 2023/12/7 16:47, Tian, Kevin wrote:
+>>>> From: Liu, Yi L <yi.l.liu@intel.com>
+>>>> Sent: Monday, November 27, 2023 2:39 PM
+>>>>
+>>>> +static int vfio_pci_core_feature_pasid(struct vfio_device *device, u32
+>> flags,
+>>>> +				       struct vfio_device_feature_pasid __user
+>>>> *arg,
+>>>> +				       size_t argsz)
+>>>> +{
+>>>> +	struct vfio_pci_core_device *vdev =
+>>>> +		container_of(device, struct vfio_pci_core_device, vdev);
+>>>> +	struct vfio_device_feature_pasid pasid = { 0 };
+>>>> +	struct pci_dev *pdev = vdev->pdev;
+>>>> +	u32 capabilities = 0;
+>>>> +	int ret;
+>>>> +
+>>>> +	/* We do not support SET of the PASID capability */
+>>>
+>>> this line alone is meaningless. Please explain the reason e.g. due to
+>>> no PASID capability per VF...
+>>
+>> sure. I think the major reason is we don't allow userspace to change the
+>> PASID configuration. is it?
+> 
+> if only PF it's still possible to develop a model allowing userspace to
+> change.
+> 
+> but with VF this is not possible in concept.
 
-I want to change the definition of  DEFAULT_GUEST_TEST_MEM in the common 
-file "memstress.h", like this:
+got it.
 
-  /* Default guest test virtual memory offset */
-+#ifndef DEFAULT_GUEST_TEST_MEM
-  #define DEFAULT_GUEST_TEST_MEM		0xc0000000
-+#endif
+> 
+>>>> +	if (pdev->is_virtfn)
+>>>> +		pdev = pci_physfn(pdev);
+>>>> +
+>>>> +	if (!pdev->pasid_enabled)
+>>>> +		goto out;
+>>>> +
+>>>> +#ifdef CONFIG_PCI_PASID
+>>>> +	pci_read_config_dword(pdev, pdev->pasid_cap + PCI_PASID_CAP,
+>>>> +			      &capabilities);
+>>>> +#endif
+>>>
+>>> #ifdef is unnecessary. If CONFIG_PCI_PASID is false pdev->pasid_enabled
+>>> won't be set anyway.
+>>
+>> it's sad that the pdev->pasid_cap is defined under #if CONFIG_PCI_PASID.
+>> Perhaps we can have a wrapper for it.
+> 
+> oh I didn't note it.
 
-As this address should be re-defined in LoongArch headers.
-So, do you have any suggesstion?
+If Alex feels better to have a wrapper, we may have one.
 
-Thanks
-Tianrui Zhao
+>>
+>>> and it should read from PCI_PASID_CTRL which indicates whether a
+>>> capability is actually enabled.
+>>
+>> yes, for the EXEC and PRIV capability, needs to check if it's enabled or
+>> not before reporting.
+>>
+>>>
+>>>> +/**
+>>>> + * Upon VFIO_DEVICE_FEATURE_GET, return the PASID capability for the
+>>>> device.
+>>>> + * Zero width means no support for PASID.
+>>>
+>>> also mention the encoding of this field according to PCIe spec.
+>>
+>> yes.
+>>
+>>> or turn it to a plain number field.
+>>
+>> It is not exact the same as the spec since bit0 is reserved. But
+>> here bit0 is used as well.
+>>
+> 
+> what is bit0 used for?
 
-在 2023/11/30 下午7:18, Tianrui Zhao 写道:
-> Add KVM selftests header files for LoongArch, including processor.h
-> and kvm_util_base.h. Those mainly contain LoongArch CSR register defines
-> and page table information. And change DEFAULT_GUEST_TEST_MEM base addr
-> for LoongArch.
->
-> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
-> ---
->   .../selftests/kvm/include/kvm_util_base.h     |   5 +
->   .../kvm/include/loongarch/processor.h         | 133 ++++++++++++++++++
->   .../testing/selftests/kvm/include/memstress.h |   2 +
->   3 files changed, 140 insertions(+)
->   create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
->
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> index a18db6a7b3c..97f8b24741b 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -218,6 +218,11 @@ extern enum vm_guest_mode vm_mode_default;
->   #define MIN_PAGE_SHIFT			12U
->   #define ptes_per_page(page_size)	((page_size) / 8)
->   
-> +#elif defined(__loongarch__)
-> +#define VM_MODE_DEFAULT			VM_MODE_P36V47_16K
-> +#define MIN_PAGE_SHIFT			14U
-> +#define ptes_per_page(page_size)	((page_size) / 8)
-> +
->   #endif
->   
->   #define MIN_PAGE_SIZE		(1U << MIN_PAGE_SHIFT)
-> diff --git a/tools/testing/selftests/kvm/include/loongarch/processor.h b/tools/testing/selftests/kvm/include/loongarch/processor.h
-> new file mode 100644
-> index 00000000000..cea6b284131
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/loongarch/processor.h
-> @@ -0,0 +1,133 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +
-> +#ifndef SELFTEST_KVM_PROCESSOR_H
-> +#define SELFTEST_KVM_PROCESSOR_H
-> +
-> +#define _PAGE_VALID_SHIFT	0
-> +#define _PAGE_DIRTY_SHIFT	1
-> +#define _PAGE_PLV_SHIFT		2  /* 2~3, two bits */
-> +#define _CACHE_SHIFT		4  /* 4~5, two bits */
-> +#define _PAGE_PRESENT_SHIFT	7
-> +#define _PAGE_WRITE_SHIFT	8
-> +
-> +#define PLV_KERN		0
-> +#define PLV_USER		3
-> +#define PLV_MASK		0x3
-> +
-> +#define _PAGE_VALID		(0x1UL << _PAGE_VALID_SHIFT)
-> +#define _PAGE_PRESENT		(0x1UL << _PAGE_PRESENT_SHIFT)
-> +#define _PAGE_WRITE		(0x1UL << _PAGE_WRITE_SHIFT)
-> +#define _PAGE_DIRTY		(0x1UL << _PAGE_DIRTY_SHIFT)
-> +#define _PAGE_USER		(PLV_USER << _PAGE_PLV_SHIFT)
-> +#define __READABLE		(_PAGE_VALID)
-> +#define __WRITEABLE		(_PAGE_DIRTY | _PAGE_WRITE)
-> +#define _CACHE_CC		(0x1UL << _CACHE_SHIFT) /* Coherent Cached */
-> +
-> +/* general registers */
-> +#define zero	$r0
-> +#define ra	$r1
-> +#define tp	$r2
-> +#define sp	$r3
-> +#define a0	$r4
-> +#define a1	$r5
-> +#define a2	$r6
-> +#define a3	$r7
-> +#define a4	$r8
-> +#define a5	$r9
-> +#define a6	$r10
-> +#define a7	$r11
-> +#define t0	$r12
-> +#define t1	$r13
-> +#define t2	$r14
-> +#define t3	$r15
-> +#define t4	$r16
-> +#define t5	$r17
-> +#define t6	$r18
-> +#define t7	$r19
-> +#define t8	$r20
-> +#define u0	$r21
-> +#define fp	$r22
-> +#define s0	$r23
-> +#define s1	$r24
-> +#define s2	$r25
-> +#define s3	$r26
-> +#define s4	$r27
-> +#define s5	$r28
-> +#define s6	$r29
-> +#define s7	$r30
-> +#define s8	$r31
-> +
-> +#define PS_4K				0x0000000c
-> +#define PS_8K				0x0000000d
-> +#define PS_16K				0x0000000e
-> +#define PS_DEFAULT_SIZE			PS_16K
-> +
-> +/* Basic CSR registers */
-> +#define LOONGARCH_CSR_CRMD		0x0 /* Current mode info */
-> +#define CSR_CRMD_PG_SHIFT		4
-> +#define CSR_CRMD_PG			(0x1UL << CSR_CRMD_PG_SHIFT)
-> +#define CSR_CRMD_IE_SHIFT		2
-> +#define CSR_CRMD_IE			(0x1UL << CSR_CRMD_IE_SHIFT)
-> +#define CSR_CRMD_PLV_SHIFT		0
-> +#define CSR_CRMD_PLV_WIDTH		2
-> +#define CSR_CRMD_PLV			(0x3UL << CSR_CRMD_PLV_SHIFT)
-> +#define PLV_MASK			0x3
-> +
-> +#define LOONGARCH_CSR_PRMD		0x1
-> +#define LOONGARCH_CSR_EUEN		0x2
-> +#define LOONGARCH_CSR_ECFG		0x4
-> +#define LOONGARCH_CSR_ESTAT		0x5 /* Exception status */
-> +#define LOONGARCH_CSR_ERA		0x6 /* ERA */
-> +#define LOONGARCH_CSR_BADV		0x7 /* Bad virtual address */
-> +#define LOONGARCH_CSR_EENTRY		0xc
-> +#define LOONGARCH_CSR_TLBIDX		0x10 /* TLB Index, EHINV, PageSize, NP */
-> +#define CSR_TLBIDX_PS_SHIFT		24
-> +#define CSR_TLBIDX_PS_WIDTH		6
-> +#define CSR_TLBIDX_PS			(0x3fUL << CSR_TLBIDX_PS_SHIFT)
-> +#define CSR_TLBIDX_SIZEM		0x3f000000
-> +#define CSR_TLBIDX_SIZE			CSR_TLBIDX_PS_SHIFT
-> +
-> +#define LOONGARCH_CSR_ASID		0x18 /* ASID */
-> +/* Page table base address when VA[VALEN-1] = 0 */
-> +#define LOONGARCH_CSR_PGDL		0x19
-> +/* Page table base address when VA[VALEN-1] = 1 */
-> +#define LOONGARCH_CSR_PGDH		0x1a
-> +/* Page table base */
-> +#define LOONGARCH_CSR_PGD		0x1b
-> +#define LOONGARCH_CSR_PWCTL0		0x1c
-> +#define LOONGARCH_CSR_PWCTL1		0x1d
-> +#define LOONGARCH_CSR_STLBPGSIZE	0x1e
-> +#define LOONGARCH_CSR_CPUID		0x20
-> +#define LOONGARCH_CSR_KS0		0x30
-> +#define LOONGARCH_CSR_KS1		0x31
-> +#define LOONGARCH_CSR_TMID		0x40
-> +#define LOONGARCH_CSR_TCFG		0x41
-> +#define LOONGARCH_CSR_TLBRENTRY		0x88 /* TLB refill exception entry */
-> +/* KSave for TLB refill exception */
-> +#define LOONGARCH_CSR_TLBRSAVE		0x8b
-> +#define LOONGARCH_CSR_TLBREHI		0x8e
-> +#define CSR_TLBREHI_PS_SHIFT		0
-> +#define CSR_TLBREHI_PS			(0x3fUL << CSR_TLBREHI_PS_SHIFT)
-> +
-> +#define DEFAULT_LOONARCH64_STACK_MIN		0x4000
-> +#define DEFAULT_LOONARCH64_PAGE_TABLE_MIN	0x4000
-> +#define EXREGS_GPRS				(32)
-> +
-> +#ifndef __ASSEMBLER__
-> +struct ex_regs {
-> +	unsigned long regs[EXREGS_GPRS];
-> +	unsigned long pc;
-> +	unsigned long estat;
-> +	unsigned long badv;
-> +};
-> +
-> +extern void handle_tlb_refill(void);
-> +extern void handle_exception(void);
-> +#endif
-> +
-> +#define PC_OFFSET_EXREGS		((EXREGS_GPRS + 0) * 8)
-> +#define ESTAT_OFFSET_EXREGS		((EXREGS_GPRS + 1) * 8)
-> +#define BADV_OFFSET_EXREGS		((EXREGS_GPRS + 2) * 8)
-> +#define EXREGS_SIZE			((EXREGS_GPRS + 3) * 8)
-> +
-> +#endif /* SELFTEST_KVM_PROCESSOR_H */
-> diff --git a/tools/testing/selftests/kvm/include/memstress.h b/tools/testing/selftests/kvm/include/memstress.h
-> index ce4e603050e..5bcdaf2efab 100644
-> --- a/tools/testing/selftests/kvm/include/memstress.h
-> +++ b/tools/testing/selftests/kvm/include/memstress.h
-> @@ -13,7 +13,9 @@
->   #include "kvm_util.h"
->   
->   /* Default guest test virtual memory offset */
-> +#ifndef DEFAULT_GUEST_TEST_MEM
->   #define DEFAULT_GUEST_TEST_MEM		0xc0000000
-> +#endif
->   
->   #define DEFAULT_PER_VCPU_MEM_SIZE	(1 << 30) /* 1G */
->   
+it's just been reserved. No usage is mentioned in the latest spec. I don't
+know the background neither.
 
+-- 
+Regards,
+Yi Liu
 
