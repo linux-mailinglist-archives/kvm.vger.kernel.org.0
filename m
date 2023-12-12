@@ -1,232 +1,227 @@
-Return-Path: <kvm+bounces-4234-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4235-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4D0C80F778
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 21:06:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 988FC80F810
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 21:47:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7A121C20D9D
-	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 20:06:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2656D1F214CA
+	for <lists+kvm@lfdr.de>; Tue, 12 Dec 2023 20:47:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8744F5277B;
-	Tue, 12 Dec 2023 20:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE3396413E;
+	Tue, 12 Dec 2023 20:47:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CLXCERSK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RUrb8xMm"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2070.outbound.protection.outlook.com [40.107.244.70])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5536D2;
-	Tue, 12 Dec 2023 12:06:12 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PwCEkNqsvWO0NTO7T1SltoFb6wRbj1BTv4/MQMol/MFUb8FdGLkKyGFU+HM97PcJfLI1o2h+Tq7xMtGg3FuzhFDlbn2nhEf9g3fbqpJG6bFSiIEzHWJew2pLchXE+hnG4Ej9ylJc2Be/xlUZzGRGsZyp3T3P0IM/bJzC8T1Tkh8pWviTSMKBOa/ZS37SJHdcJG/vbqj20wC5sBtF6PGxgSOFXxYlZ92YXw56af+X4S1daQjVWp7FoGOM8R84QjujfFoiwE+BSYp/EcZIhRON5yBbI0WrYslQ7DPB/7RbuIimugmf1+DpA8lzTpf/kNsquOhCDJEniTAXeXjuqYXGJw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vYmLzQ/rFCr32uNmxfEMFI3JkjhpmAP0pNDS/HmmVaE=;
- b=eHNpIQravmLRFzXadES43W9MiDIxVhnOKZRf30zG+rR9g1fV26vkg72bRfJxyDEH0HBuJxppVYkLHgduBYq1qx2NlaVuXJlrcU65XMkPsgGf8AEUp0l7M7OuDOk6DRadGuFEiTVNIpi7gJMpMWBi1Gx6qGaZ/xJCsEFt5KKAOTQ05pKtyuH+/5b4ErVK1cnyZd1RPUSfzuNNrQY3Vxa3CimjdRkI8hIrmBJWh73L3DvLaQ/bi1jrQJvms1NIyglPPMO1jVnGI+Y05wpIWZyaUYc5GIbMPFNfRgmkllqd3d5Kn954qDcCLzUNbif1BZ820c5kHtsp+j5IOlBrMlLgyA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=oracle.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vYmLzQ/rFCr32uNmxfEMFI3JkjhpmAP0pNDS/HmmVaE=;
- b=CLXCERSKGosRI/BLUvlMzzascsN6nCPytnmEGa7fnQhC3qM1M7ACergBFkOPJzYof5+Ct2+76LAFXWtI73lW6ZU+dZr7irnO9hLaTTrL8Crko5tLRj8OQheBHcfOR+ZaYIzPvyL2qRqe41oR+b6P+X4jnMvTTuEOE+lE+TFUQtX1aaBAGfE4cfiWvyHYseWiP2sXV9VuYupY4nAYIxj3YNqcUJ59ZLGZi1ShA6k64Ad5WZFMW3JJPTNNvOAVY7ktkcnf2ml9XAEaw5EiSezEv9Lebb06R+B2nWEButycdYV9+3du6t7Wjb6dikoH3afI7ORV2kHyo1ERcYXGUnWcyA==
-Received: from MW4PR03CA0226.namprd03.prod.outlook.com (2603:10b6:303:b9::21)
- by SJ1PR12MB6267.namprd12.prod.outlook.com (2603:10b6:a03:456::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Tue, 12 Dec
- 2023 20:06:07 +0000
-Received: from MWH0EPF000971E6.namprd02.prod.outlook.com
- (2603:10b6:303:b9:cafe::21) by MW4PR03CA0226.outlook.office365.com
- (2603:10b6:303:b9::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.33 via Frontend
- Transport; Tue, 12 Dec 2023 20:06:06 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- MWH0EPF000971E6.mail.protection.outlook.com (10.167.243.74) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7091.26 via Frontend Transport; Tue, 12 Dec 2023 20:06:06 +0000
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 12 Dec
- 2023 12:05:44 -0800
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail203.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 12 Dec
- 2023 12:05:44 -0800
-Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.129.68.7)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41 via Frontend
- Transport; Tue, 12 Dec 2023 12:05:42 -0800
-Date: Tue, 12 Dec 2023 12:05:41 -0800
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: Yi Liu <yi.l.liu@intel.com>, "Giani, Dhaval" <Dhaval.Giani@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>, Suravee Suthikulpanit
-	<suravee.suthikulpanit@amd.com>, <joro@8bytes.org>,
-	<alex.williamson@redhat.com>, <kevin.tian@intel.com>, <robin.murphy@arm.com>,
-	<baolu.lu@linux.intel.com>, <cohuck@redhat.com>, <eric.auger@redhat.com>,
-	<kvm@vger.kernel.org>, <mjrosato@linux.ibm.com>,
-	<chao.p.peng@linux.intel.com>, <yi.y.sun@linux.intel.com>,
-	<peterx@redhat.com>, <jasowang@redhat.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
-	<iommu@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <zhenzhong.duan@intel.com>,
-	<joao.m.martins@oracle.com>, <xin.zeng@intel.com>, <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v6 0/6] iommufd: Add nesting infrastructure (part 2/2)
-Message-ID: <ZXi9FaPSkHkCm679@Asurada-Nvidia>
-References: <20231117130717.19875-1-yi.l.liu@intel.com>
- <20231209014726.GA2945299@nvidia.com>
- <ZXd+1UVrcAQePjnD@Asurada-Nvidia>
- <20231211215738.GB3014157@nvidia.com>
- <ZXgL+GCGPgH+hlXo@Asurada-Nvidia>
- <20231212144421.GH3014157@nvidia.com>
- <ZXiw4XK/1+ZdsFV1@Asurada-Nvidia>
- <20231212192100.GP3014157@nvidia.com>
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8423A9F
+	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 12:46:58 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1d05f027846so29097175ad.2
+        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 12:46:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702414018; x=1703018818; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/7dr6LesSd6J0D4aMekJuWGTOXlB00/XOYyVR4kkX9o=;
+        b=RUrb8xMmqcPxye6zfPKW+fyjdevULWJOJh0EPAET8OZ4N5Yy9ue9Kg+cJe3Y7mdeAR
+         cDHOfiF6EH9MJTazfHljZpeNQHeefuGQ6Z4gU61zKjPBbmv2LTfmeXjmzneectoz7Mn0
+         zywgfbpgYwa69CArIgYtIl1AjQRpRuICAk/CVqBQ6zU1oMy7oSvNNtj1AjA8ITntEpYw
+         HTeQqEIGJOdj8k9PlMaQPWai7yb6c8APZwl95b0Il9NIfw9EgrJ7Pp2VOMBJyrAEzG4T
+         07msYqaxuPe4gmiK2n+g8VbYSxV8S0OGvF/v1Vt4QTmBIodmW1ML1dPybkP8Qnre6B/X
+         HHAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702414018; x=1703018818;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/7dr6LesSd6J0D4aMekJuWGTOXlB00/XOYyVR4kkX9o=;
+        b=ngRnpjgBonU/y0Xq5GJ0AebN8x3JvPsBeSutPKihwGLDOTW869KvYzb8UUPuYy/q5j
+         Zp9SHxRBd7EZ7MIRczTXVuw7e+RfwE9m0DvcSB89QLtycubv7ElESLCxmuYt9gdk7jBK
+         OdkFL9eIiGqs8GVLjKjLf7Novbp5BzCLGPwHWGaXdGRrULRqz/VGBoI71blbiykZhlEO
+         Xn0fYXajBKrEKOhRmk9nm4Ulwtms6F3aSItRXBduE2mTTg568Q0NSoK4IGkhS3GK085v
+         EzYmoRjOcbXx6FPvN/o5jGY5ZSSoiL78TFekfCYVYpQNKGE9qNCnEMS1unk1zvMpeVCi
+         UJXQ==
+X-Gm-Message-State: AOJu0Yy7tkFKiwMT3ZhIWOeMVRs6PqslDJppt+ajaRVAiLxEgOd0qXZx
+	J/zqGQP+NoFtLiLUWm1Yc07+mW99wQ==
+X-Google-Smtp-Source: AGHT+IEfcl1fpngZWor1J98CNRcmX2Te7PCQfMM2bpoJPUISib0v7zYmBv6kzfWIo6aCYm3tYDv2DEXrEA==
+X-Received: from sagi.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:241b])
+ (user=sagis job=sendgmr) by 2002:a17:903:32c8:b0:1d0:902c:e834 with SMTP id
+ i8-20020a17090332c800b001d0902ce834mr53461plr.12.1702414017857; Tue, 12 Dec
+ 2023 12:46:57 -0800 (PST)
+Date: Tue, 12 Dec 2023 12:46:15 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20231212192100.GP3014157@nvidia.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000971E6:EE_|SJ1PR12MB6267:EE_
-X-MS-Office365-Filtering-Correlation-Id: cc82d36a-c9df-452f-b3d5-08dbfb4dc6b8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	t6QxDy+zjupoL7UWiD3n/UTT08lLeiurm6D7bQKEfJAxzTgzBgHdrRnZmTyP5yuHCY+PqFr6U76mYXYKbwOcrzhtcGWEAxKknbUJCaZBNK2wds2M0FAk4greLGsomz2/h6RUgFrOlUyZlktq2Up9mln2XIQ2LPxnQfQtJ89BFd6rQkUbx26Pjy7WRu1meY8uGVTHXimKSx+ggD1tH1YjY3NsIwmhtCK37nZXTpsEjAr1lSw4l3jAN+ROI1Tvl5XJA2KBLzmwQ/fihDJv83u+2nTrh3WvlH+RBdvBRrwz4paHTz50tx7wj85X7m1JXNuNu9lqHwuME/Q6Vw3Q5et+SN+rZEGX1I/22z9DV2Uo07rQQmkSL7Fucx5+UTrA99ckhrDOBijS5Fqot6Ej6rnXJDxCGD5LuMWiNv+aCg7mIiBxm2ejF1I6D1irmYq9epPxujZtaFh8NcibsP9Rsvq2dWzSAWl9V16lqiVdorjTf8HKKqtnPLS8QuC1eNIf//RAoNM7Tpja80AERYyQhbyYI4YQiTe7aqURSpPKB/SJvASZOPyl9nOB7pcO5ludVYG9JmpY6q7I/uFwSpwG5GKsULMvfJDLLoMf2fhHM5nMX/wv/5cFbg0tsix1Evr3eRDpJUnCFZwErcqIuFLZk1lV+3/kkg/OeGEQP8p3lNrxZwqxe94/ZfgGALFqv08cgKxqGS3WxNgxF3bQ0PaXjVange/RsCQ1hYCbnh0PyjSkPvS9UyGagl+ksCAqMXWe5qcd
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(376002)(39860400002)(136003)(396003)(230922051799003)(1800799012)(186009)(451199024)(64100799003)(82310400011)(36840700001)(40470700004)(46966006)(40460700003)(2906002)(7416002)(33716001)(41300700001)(36860700001)(86362001)(82740400003)(9686003)(356005)(336012)(426003)(26005)(83380400001)(47076005)(478600001)(54906003)(6862004)(4326008)(5660300002)(6636002)(316002)(70586007)(8936002)(70206006)(7636003)(8676002)(55016003)(40480700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2023 20:06:06.6697
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: cc82d36a-c9df-452f-b3d5-08dbfb4dc6b8
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000971E6.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6267
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20231212204647.2170650-1-sagis@google.com>
+Subject: [RFC PATCH v5 00/29] TDX KVM selftests
+From: Sagi Shahar <sagis@google.com>
+To: linux-kselftest@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>, 
+	Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>, 
+	Sagi Shahar <sagis@google.com>, Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Peter Gonda <pgonda@google.com>, Haibo Xu <haibo1.xu@intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Vishal Annapurve <vannapurve@google.com>, 
+	Roger Wang <runanwang@google.com>, Vipin Sharma <vipinsh@google.com>, jmattson@google.com, 
+	dmatlack@google.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 12, 2023 at 03:21:00PM -0400, Jason Gunthorpe wrote:
-> On Tue, Dec 12, 2023 at 11:13:37AM -0800, Nicolin Chen wrote:
-> > On Tue, Dec 12, 2023 at 10:44:21AM -0400, Jason Gunthorpe wrote:
-> > > On Mon, Dec 11, 2023 at 11:30:00PM -0800, Nicolin Chen wrote:
-> > > 
-> > > > > > Could the structure just look like this?
-> > > > > > struct iommu_dev_assign_virtual_id {
-> > > > > >        __u32 size;
-> > > > > >        __u32 dev_id;
-> > > > > >        __u32 id_type;
-> > > > > >        __u32 id;
-> > > > > > };
-> > > > > 
-> > > > > It needs to take in the viommu_id also, and I'd make the id 64 bits
-> > > > > just for good luck.
-> > > > 
-> > > > What is viommu_id required for in this context? I thought we
-> > > > already know which SMMU instance to issue commands via dev_id?
-> > > 
-> > > The viommu_id would be the container that holds the xarray that maps
-> > > the vRID to pRID
-> > > 
-> > > Logically we could have multiple mappings per iommufd as we could have
-> > > multiple iommu instances working here.
-> > 
-> > I see. This is the object to hold a shared stage-2 HWPT/domain then.
-> 
-> It could be done like that, yes. I wasn't thinking about linking the
-> stage two so tightly but perhaps? If we can avoid putting the hwpt
-> here that might be more general.
-> 
-> > // iommufd_private.h
-> > 
-> > enum iommufd_object_type {
-> > 	...
-> > +	IOMMUFD_OBJ_VIOMMU,
-> > 	...
-> > };
-> > 
-> > +struct iommufd_viommu {
-> > +	struct iommufd_object obj;
-> > +	struct iommufd_hwpt_paging *hwpt;
-> > +	struct xarray devices;
-> > +};
-> > 
-> > struct iommufd_hwpt_paging hwpt {
-> > 	...
-> > +	struct list_head viommu_list;
-> > 	...
-> > };
-> 
-> I'd probably first try to go backwards and link the hwpt to the
-> viommu.
+Hello,
 
-I think a VM should have only one hwpt_paging object while one
-or more viommu objects, so we could do only viommu->hwpt_paging
-and hwpt_paging->viommu_list. How to go backwards?
+This is v4 of the patch series for TDX selftests.
 
-> > struct iommufd_group {
-> > 	...
-> > +	struct iommufd_viommu *viommu; // should we attach to viommu instead of hwpt?
-> > 	...
-> > };
-> 
-> No. Attach is a statement of translation so you still attach to the HWPT.
+It has been updated for Intel=E2=80=99s v17 of the TDX host patches which w=
+as
+proposed here:
+https://lore.kernel.org/all/cover.1699368322.git.isaku.yamahata@intel.com/
 
-OK. It's probably not necessary since we know which piommu the
-device is behind. And we only need to link viommu and piommu,
-right?
+The tree can be found at:
+https://github.com/googleprodkernel/linux-cc/tree/tdx-selftests-rfc-v5
 
-> > Question to finalize how we maps vRID-pRID in the xarray:
-> > how should IOMMUFD_DEV_INVALIDATE work? The ioctl structure has
-> > a dev_id and a list of commands that belongs to the device. So,
-> > it forwards the struct device pointer to the driver along with
-> > the commands. Then, doesn't the driver already know the pRID 
-> > from the dev pointer without looking up a vRID-pRID table?
-> 
-> The first version of DEV_INVALIDATE should have no xarray. The
-> invalidate commands are stripped of the SID and executed on the given
-> dev_id period. VMM splits up the invalidate command list.
+Changes from RFC v4:
 
-Yes. This makes sense to me. VMM knows which device to issue
-an IOMMUFD_DEV_INVALIDATE from the vSID/vRID in the commands.
+Added patch to propagate KVM_EXIT_MEMORY_FAULT to userspace.
 
-> The second version maybe we have the xarray, or maybe we just push the
-> xarray to the eventual viommu series.
+Minor tweaks to align the tests to the new TDX 1.5 spec such as changes
+in the expected values in TDG.VP.INFO.
 
-I think that I still don't get the purpose of the xarray here.
-It was needed previously because a cache invalidate per hwpt
-doesn't know which device. Now IOMMUFD_DEV_INVALIDATE knows.
+In RFCv5, TDX selftest code is organized into:
 
-Maybe it's related to that narrative "logically we could have
-multiple mappings per iommufd" that you mentioned above. Mind
-elaborating a bit?
++ headers in tools/testing/selftests/kvm/include/x86_64/tdx/
++ common code in tools/testing/selftests/kvm/lib/x86_64/tdx/
++ selftests in tools/testing/selftests/kvm/x86_64/tdx_*
 
-In my mind, viommu is allocated by VMM per piommu, by detecting
-the piommu_id via hw_info. In that case, viommu can only have
-one unique device list. If IOMMUFD_DEV_INVALIDATE passes in the
-dev_id, we don't really need a mapping of vRID-pRID in a multi-
-viommu case either? In another word, VMM already has a mapping
-from vRID to dev_id, so it could call the DEV_INVALIDATE ioctl
-in the first place?
+Dependencies
 
-Thanks
-Nicolin
++ Peter=E2=80=99s patches, which provide functions for the host to allocate
+  and track protected memory in the guest.
+  https://lore.kernel.org/all/20230110175057.715453-1-pgonda@google.com/
+
+Further work for this patch series/TODOs
+
++ Sean=E2=80=99s comments for the non-confidential UPM selftests patch seri=
+es
+  at https://lore.kernel.org/lkml/Y8dC8WDwEmYixJqt@google.com/T/#u apply
+  here as well
++ Add ucall support for TDX selftests
+
+I would also like to acknowledge the following people, who helped
+review or test patches in previous versions:
+
++ Sean Christopherson <seanjc@google.com>
++ Zhenzhong Duan <zhenzhong.duan@intel.com>
++ Peter Gonda <pgonda@google.com>
++ Andrew Jones <drjones@redhat.com>
++ Maxim Levitsky <mlevitsk@redhat.com>
++ Xiaoyao Li <xiaoyao.li@intel.com>
++ David Matlack <dmatlack@google.com>
++ Marc Orr <marcorr@google.com>
++ Isaku Yamahata <isaku.yamahata@gmail.com>
++ Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+
+Links to earlier patch series
+
++ RFC v1: https://lore.kernel.org/lkml/20210726183816.1343022-1-erdemaktas@=
+google.com/T/#u
++ RFC v2: https://lore.kernel.org/lkml/20220830222000.709028-1-sagis@google=
+.com/T/#u
++ RFC v3: https://lore.kernel.org/lkml/20230121001542.2472357-1-ackerleytng=
+@google.com/T/#u
++ RFC v4: https://lore.kernel.org/lkml/20230725220132.2310657-1-afranji@goo=
+gle.com/
+
+*** BLURB HERE ***
+
+Ackerley Tng (12):
+  KVM: selftests: Add function to allow one-to-one GVA to GPA mappings
+  KVM: selftests: Expose function that sets up sregs based on VM's mode
+  KVM: selftests: Store initial stack address in struct kvm_vcpu
+  KVM: selftests: Refactor steps in vCPU descriptor table initialization
+  KVM: selftests: TDX: Use KVM_TDX_CAPABILITIES to validate TDs'
+    attribute configuration
+  KVM: selftests: TDX: Update load_td_memory_region for VM memory backed
+    by guest memfd
+  KVM: selftests: Add functions to allow mapping as shared
+  KVM: selftests: Expose _vm_vaddr_alloc
+  KVM: selftests: TDX: Add support for TDG.MEM.PAGE.ACCEPT
+  KVM: selftests: TDX: Add support for TDG.VP.VEINFO.GET
+  KVM: selftests: TDX: Add TDX UPM selftest
+  KVM: selftests: TDX: Add TDX UPM selftests for implicit conversion
+
+Erdem Aktas (3):
+  KVM: selftests: Add helper functions to create TDX VMs
+  KVM: selftests: TDX: Add TDX lifecycle test
+  KVM: selftests: TDX: Adding test case for TDX port IO
+
+Roger Wang (1):
+  KVM: selftests: TDX: Add TDG.VP.INFO test
+
+Ryan Afranji (2):
+  KVM: selftests: TDX: Verify the behavior when host consumes a TD
+    private memory
+  KVM: selftests: TDX: Add shared memory test
+
+Sagi Shahar (11):
+  KVM: selftests: TDX: Add report_fatal_error test
+  KVM: selftests: TDX: Add basic TDX CPUID test
+  KVM: selftests: TDX: Add basic get_td_vmcall_info test
+  KVM: selftests: TDX: Add TDX IO writes test
+  KVM: selftests: TDX: Add TDX IO reads test
+  KVM: selftests: TDX: Add TDX MSR read/write tests
+  KVM: selftests: TDX: Add TDX HLT exit test
+  KVM: selftests: TDX: Add TDX MMIO reads test
+  KVM: selftests: TDX: Add TDX MMIO writes test
+  KVM: selftests: TDX: Add TDX CPUID TDVMCALL test
+  KVM: selftests: Propagate KVM_EXIT_MEMORY_FAULT to userspace
+
+ tools/testing/selftests/kvm/Makefile          |    8 +
+ .../selftests/kvm/include/kvm_util_base.h     |   30 +
+ .../selftests/kvm/include/x86_64/processor.h  |    4 +
+ .../kvm/include/x86_64/tdx/td_boot.h          |   82 +
+ .../kvm/include/x86_64/tdx/td_boot_asm.h      |   16 +
+ .../selftests/kvm/include/x86_64/tdx/tdcall.h |   59 +
+ .../selftests/kvm/include/x86_64/tdx/tdx.h    |   65 +
+ .../kvm/include/x86_64/tdx/tdx_util.h         |   19 +
+ .../kvm/include/x86_64/tdx/test_util.h        |  164 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  101 +-
+ .../selftests/kvm/lib/x86_64/processor.c      |   77 +-
+ .../selftests/kvm/lib/x86_64/tdx/td_boot.S    |  101 ++
+ .../selftests/kvm/lib/x86_64/tdx/tdcall.S     |  158 ++
+ .../selftests/kvm/lib/x86_64/tdx/tdx.c        |  262 ++++
+ .../selftests/kvm/lib/x86_64/tdx/tdx_util.c   |  558 +++++++
+ .../selftests/kvm/lib/x86_64/tdx/test_util.c  |  101 ++
+ .../kvm/x86_64/tdx_shared_mem_test.c          |  135 ++
+ .../selftests/kvm/x86_64/tdx_upm_test.c       |  469 ++++++
+ .../selftests/kvm/x86_64/tdx_vm_tests.c       | 1319 +++++++++++++++++
+ 19 files changed, 3693 insertions(+), 35 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/td_boot.=
+h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/td_boot_=
+asm.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdx_util=
+.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/test_uti=
+l.h
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/td_boot.S
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_shared_mem_test.=
+c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_upm_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
+
+--=20
+2.43.0.472.g3155946c3a-goog
+
 
