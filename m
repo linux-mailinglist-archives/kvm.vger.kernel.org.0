@@ -1,141 +1,281 @@
-Return-Path: <kvm+bounces-4300-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4301-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2E4B810BB2
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 08:42:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88146810BF2
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 09:04:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE0FE2815D3
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 07:42:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01FC91F211AD
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 08:04:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0AC1A584;
-	Wed, 13 Dec 2023 07:42:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39ACE1C6B6;
+	Wed, 13 Dec 2023 08:04:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SGQeHYlE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id A25E69B;
-	Tue, 12 Dec 2023 23:42:42 -0800 (PST)
-Received: from loongson.cn (unknown [10.20.42.173])
-	by gateway (Coremail) with SMTP id _____8BxbOlwYHllCpoAAA--.3578S3;
-	Wed, 13 Dec 2023 15:42:40 +0800 (CST)
-Received: from [10.20.42.173] (unknown [10.20.42.173])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Axv+FtYHll3QYCAA--.13949S3;
-	Wed, 13 Dec 2023 15:42:39 +0800 (CST)
-Subject: Re: [PATCH v5 1/4] KVM: selftests: Add KVM selftests header files for
- LoongArch
-To: zhaotianrui <zhaotianrui@loongson.cn>,
- Sean Christopherson <seanjc@google.com>
-Cc: Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- Vishal Annapurve <vannapurve@google.com>, Huacai Chen
- <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
- loongarch@lists.linux.dev, Peter Xu <peterx@redhat.com>,
- Vipin Sharma <vipinsh@google.com>, huangpei@loongson.cn
-References: <20231130111804.2227570-1-zhaotianrui@loongson.cn>
- <20231130111804.2227570-2-zhaotianrui@loongson.cn>
- <e40d3884-bf39-8286-627f-e0ce7dacfcbe@loongson.cn>
- <ZXiV1rMrXY0hNgvZ@google.com>
- <023b6f8f-301b-a6d0-448b-09a602ba1141@loongson.cn>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <06076290-4efb-5d71-74eb-396d325447e0@loongson.cn>
-Date: Wed, 13 Dec 2023 15:42:26 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6F07DC;
+	Wed, 13 Dec 2023 00:04:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702454678; x=1733990678;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=HnHExTg8+nknaiMkMyLtJsie4oNqgS0pN4C44lFLG/I=;
+  b=SGQeHYlE3diCZLIDm6Iur8zFaLgIWmrbIcscreHK/gGIxOQglUtQ4dAx
+   YSoCJb//KMqDuM+isTVaLIvKJBeRDjmFkttedo11ggpSxQK4AIkooeeWX
+   BM9Q4/VLMGChElVBZFDo/aufoCy8FJcY5yrSBZkyIJLQmRlYQ6cVPYCLu
+   F3+mWnwpq5A2QbOXtRWg3/GLgaaZbs+TOddZ6hkNQqFLyD6vX71EbcBS3
+   U9SZgb/Oe0zx3tz8gxlHIehvLDf8VbltX1KAzVCvp5aZAq8mkMlt7nApj
+   r14L8SQUaaeGJm9CZf0sXNRNpiDtskh5h1zJH6KHSP4Jp20WXo+28y2dQ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="397713145"
+X-IronPort-AV: E=Sophos;i="6.04,272,1695711600"; 
+   d="scan'208";a="397713145"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 00:04:38 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="844223558"
+X-IronPort-AV: E=Sophos;i="6.04,272,1695711600"; 
+   d="scan'208";a="844223558"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.2.128]) ([10.238.2.128])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 00:02:49 -0800
+Message-ID: <0bdec814-abee-491b-b1fe-73cd3d01d579@linux.intel.com>
+Date: Wed, 13 Dec 2023 16:02:47 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <023b6f8f-301b-a6d0-448b-09a602ba1141@loongson.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Axv+FtYHll3QYCAA--.13949S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW7WF13GFWUCFy7Cw4ftF4rXrc_yoW8tF43pr
-	yIkF1Yka1kGrZ7tw4kt3W5XF4agFs3u3W8ArykWr4Uuan8Xw17Ar1jkw4rKas2krW8J3Wj
-	qF4jq3yjv3Z8C3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	XVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
-	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67
-	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
-	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
-	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUc9a9UU
-	UUU
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v17 023/116] KVM: TDX: Refuse to unplug the last cpu on
+ the package
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, David Matlack <dmatlack@google.com>,
+ Kai Huang <kai.huang@intel.com>, Zhi Wang <zhi.wang.linux@gmail.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
+References: <cover.1699368322.git.isaku.yamahata@intel.com>
+ <e40ecd771a513fc0fa6fa207e2c1e408ded7734d.1699368322.git.isaku.yamahata@intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <e40ecd771a513fc0fa6fa207e2c1e408ded7734d.1699368322.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
 
-On 2023/12/13 下午3:15, zhaotianrui wrote:
-> 
-> 
-> 在 2023/12/13 上午1:18, Sean Christopherson 写道:
->> On Tue, Dec 12, 2023, zhaotianrui wrote:
->>> Hi, Sean:
->>>
->>> I want to change the definition of  DEFAULT_GUEST_TEST_MEM in the common
->>> file "memstress.h", like this:
->>>
->>>   /* Default guest test virtual memory offset */
->>> +#ifndef DEFAULT_GUEST_TEST_MEM
->>>   #define DEFAULT_GUEST_TEST_MEM        0xc0000000
->>> +#endif
->>>
->>> As this address should be re-defined in LoongArch headers.
->>
->> Why?  E.g. is 0xc0000000 unconditionally reserved, not guaranteed to 
->> be valid,
->> something else?
->>
->>> So, do you have any suggesstion?
->>
->> Hmm, I think ideally kvm_util_base.h would define a range of memory 
->> that can be
->> used by tests for arbitrary data.  Multiple tests use 0xc0000000, 
->> which is not
->> entirely arbitrary, i.e. it doesn't _need_ to be 0xc0000000, but 
->> 0xc0000000 is
->> convenient because it's 32-bit addressable and doesn't overlap 
->> reserved areas in
->> other architectures.
-In general text entry address of user application on x86/arm64 Linux
-is 0x200000, however on LoongArch system text entry address is strange, 
-its value 0x120000000.
+On 11/7/2023 10:55 PM, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+> In order to reclaim TDX HKID, (i.e. when deleting guest TD), needs to call
+> TDH.PHYMEM.PAGE.WBINVD on all packages.  If we have active TDX HKID, refuse
+> to offline the last online cpu to guarantee at least one CPU online per
+> package. Add arch callback for cpu offline.
+> Because TDX doesn't support suspend, this also refuses suspend if TDs are
+> running.  If no TD is running, suspend is allowed.
+>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 
-When DEFAULT_GUEST_TEST_MEM is defined as 0xc0000000, there is 
-limitation for guest memory size, it cannot exceed 0x120000000 - 
-0xc000000 = 1.5G bytes, else there will be conflict. However
-there is no such issue on x86/arm64, since 0xc0000000 is above text 
-entry address 0x200000.
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 
-The LoongArch link scripts actually is strange, it brings out some 
-compatible issues such dpdk/kvm selftest when user applications
-want fixed virtual address space.
-
-So here DEFAULT_GUEST_TEST_MEM is defined as 0x130000000 separately, 
-maybe 0x140000000 is better since it is 1G super-page aligned for 4K 
-page size.
-
-Regards
-Bibo Mao
-
->>
-> Thanks for your explanation, and LoongArch want to define 
-> DEFAULT_GUEST_TEST_MEM to 0x130000000. As default base address for 
-> application loading is 0x120000000, DEFAULT_GUEST_TEST_MEM should be 
-> larger than app loading address, so that PER_VCPU_MEM_SIZE can be large 
-> enough, and kvm selftests app size is smaller than 256M in generic.
-> 
-> Thanks
-> Tianrui Zhao
+> ---
+>   arch/x86/include/asm/kvm-x86-ops.h |  1 +
+>   arch/x86/include/asm/kvm_host.h    |  1 +
+>   arch/x86/kvm/vmx/main.c            |  1 +
+>   arch/x86/kvm/vmx/tdx.c             | 41 ++++++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/x86_ops.h         |  2 ++
+>   arch/x86/kvm/x86.c                 |  5 ++++
+>   include/linux/kvm_host.h           |  1 +
+>   virt/kvm/kvm_main.c                | 12 +++++++--
+>   8 files changed, 62 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index d05a829254ea..0fbafb287839 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -18,6 +18,7 @@ KVM_X86_OP(check_processor_compatibility)
+>   KVM_X86_OP(hardware_enable)
+>   KVM_X86_OP(hardware_disable)
+>   KVM_X86_OP(hardware_unsetup)
+> +KVM_X86_OP_OPTIONAL_RET0(offline_cpu)
+>   KVM_X86_OP(has_emulated_msr)
+>   KVM_X86_OP(vcpu_after_set_cpuid)
+>   KVM_X86_OP(is_vm_type_supported)
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 742ac63e1992..56d0ba5793cf 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1570,6 +1570,7 @@ struct kvm_x86_ops {
+>   	int (*hardware_enable)(void);
+>   	void (*hardware_disable)(void);
+>   	void (*hardware_unsetup)(void);
+> +	int (*offline_cpu)(void);
+>   	bool (*has_emulated_msr)(struct kvm *kvm, u32 index);
+>   	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
+>   
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index 7082e9ea8492..c8213d6ea301 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -121,6 +121,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>   	.check_processor_compatibility = vmx_check_processor_compat,
+>   
+>   	.hardware_unsetup = vt_hardware_unsetup,
+> +	.offline_cpu = tdx_offline_cpu,
+>   
+>   	.hardware_enable = vt_hardware_enable,
+>   	.hardware_disable = vmx_hardware_disable,
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 6017e0feac1e..51aa114feb86 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -64,6 +64,7 @@ static struct tdx_info tdx_info __ro_after_init;
+>    */
+>   static DEFINE_MUTEX(tdx_lock);
+>   static struct mutex *tdx_mng_key_config_lock;
+> +static atomic_t nr_configured_hkid;
+>   
+>   static __always_inline hpa_t set_hkid_to_hpa(hpa_t pa, u16 hkid)
+>   {
+> @@ -79,6 +80,7 @@ static inline void tdx_hkid_free(struct kvm_tdx *kvm_tdx)
+>   {
+>   	tdx_guest_keyid_free(kvm_tdx->hkid);
+>   	kvm_tdx->hkid = -1;
+> +	atomic_dec(&nr_configured_hkid);
+>   }
+>   
+>   static inline bool is_hkid_assigned(struct kvm_tdx *kvm_tdx)
+> @@ -562,6 +564,7 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
+>   	if (ret < 0)
+>   		return ret;
+>   	kvm_tdx->hkid = ret;
+> +	atomic_inc(&nr_configured_hkid);
+>   
+>   	va = __get_free_page(GFP_KERNEL_ACCOUNT);
+>   	if (!va)
+> @@ -932,3 +935,41 @@ void tdx_hardware_unsetup(void)
+>   	/* kfree accepts NULL. */
+>   	kfree(tdx_mng_key_config_lock);
+>   }
+> +
+> +int tdx_offline_cpu(void)
+> +{
+> +	int curr_cpu = smp_processor_id();
+> +	cpumask_var_t packages;
+> +	int ret = 0;
+> +	int i;
+> +
+> +	/* No TD is running.  Allow any cpu to be offline. */
+> +	if (!atomic_read(&nr_configured_hkid))
+> +		return 0;
+> +
+> +	/*
+> +	 * In order to reclaim TDX HKID, (i.e. when deleting guest TD), need to
+> +	 * call TDH.PHYMEM.PAGE.WBINVD on all packages to program all memory
+> +	 * controller with pconfig.  If we have active TDX HKID, refuse to
+> +	 * offline the last online cpu.
+> +	 */
+> +	if (!zalloc_cpumask_var(&packages, GFP_KERNEL))
+> +		return -ENOMEM;
+> +	for_each_online_cpu(i) {
+> +		if (i != curr_cpu)
+> +			cpumask_set_cpu(topology_physical_package_id(i), packages);
+> +	}
+> +	/* Check if this cpu is the last online cpu of this package. */
+> +	if (!cpumask_test_cpu(topology_physical_package_id(curr_cpu), packages))
+> +		ret = -EBUSY;
+> +	free_cpumask_var(packages);
+> +	if (ret)
+> +		/*
+> +		 * Because it's hard for human operator to understand the
+> +		 * reason, warn it.
+> +		 */
+> +#define MSG_ALLPKG_ONLINE \
+> +	"TDX requires all packages to have an online CPU. Delete all TDs in order to offline all CPUs of a package.\n"
+> +		pr_warn_ratelimited(MSG_ALLPKG_ONLINE);
+> +	return ret;
+> +}
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index feee8c1e737f..ffba64008682 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -138,6 +138,7 @@ void vmx_setup_mce(struct kvm_vcpu *vcpu);
+>   int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
+>   void tdx_hardware_unsetup(void);
+>   bool tdx_is_vm_type_supported(unsigned long type);
+> +int tdx_offline_cpu(void);
+>   
+>   int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+>   int tdx_vm_init(struct kvm *kvm);
+> @@ -148,6 +149,7 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+>   static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
+>   static inline void tdx_hardware_unsetup(void) {}
+>   static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
+> +static inline int tdx_offline_cpu(void) { return 0; }
+>   
+>   static inline int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+>   {
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 9ef81d235406..191ac1e0d96d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12421,6 +12421,11 @@ void kvm_arch_hardware_disable(void)
+>   	drop_user_return_notifiers();
+>   }
+>   
+> +int kvm_arch_offline_cpu(unsigned int cpu)
+> +{
+> +	return static_call(kvm_x86_offline_cpu)();
+> +}
+> +
+>   bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
+>   {
+>   	return vcpu->kvm->arch.bsp_vcpu_id == vcpu->vcpu_id;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 687589ce9f63..96ff951bdd29 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1502,6 +1502,7 @@ static inline void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu) {}
+>   int kvm_arch_hardware_enable(void);
+>   void kvm_arch_hardware_disable(void);
+>   #endif
+> +int kvm_arch_offline_cpu(unsigned int cpu);
+>   int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
+>   bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
+>   int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index ba2f993c9655..29fdb39976e0 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -5578,13 +5578,21 @@ static void hardware_disable_nolock(void *junk)
+>   	__this_cpu_write(hardware_enabled, false);
+>   }
+>   
+> +__weak int kvm_arch_offline_cpu(unsigned int cpu)
+> +{
+> +	return 0;
+> +}
+> +
+>   static int kvm_offline_cpu(unsigned int cpu)
+>   {
+> +	int r = 0;
+> +
+>   	mutex_lock(&kvm_lock);
+> -	if (kvm_usage_count)
+> +	r = kvm_arch_offline_cpu(cpu);
+> +	if (!r && kvm_usage_count)
+>   		hardware_disable_nolock(NULL);
+>   	mutex_unlock(&kvm_lock);
+> -	return 0;
+> +	return r;
+>   }
+>   
+>   static void hardware_disable_all_nolock(void)
 
 
