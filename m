@@ -1,201 +1,204 @@
-Return-Path: <kvm+bounces-4373-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4374-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72EB4811B01
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 18:30:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EAAA4811B21
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 18:32:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B67F21F21AA5
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 17:30:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 885621F219BA
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 17:32:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE7456B8E;
-	Wed, 13 Dec 2023 17:30:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816B457335;
+	Wed, 13 Dec 2023 17:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cRYBECtL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18C8EF3
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 09:30:30 -0800 (PST)
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-286e0d3e04dso8016484a91.1
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 09:30:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702488629; x=1703093429;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1dpYLkiR+l008P7TYyOS0e8q6Tq1gDi6UOb+kiDBW3g=;
-        b=SEqc5GMKQEY2K5IMoDCppyV86H5gcTKfXj5P/Qpxp81ni+DlpfT6y5DyHotB8Cx/4e
-         J1q5wABuerN+ecD3GyIwBm+00EV2WRqDiiPedJBrKtu8HjCBPKpZtrC89wwsYcA6rSHD
-         wVlb+3XAqFYgRgv/15NKLq8nabWlEFZ9hRg0VZ2pHp8nnSXDO3cOEbbgHAX5s+I7/ZFY
-         PuR8IIp4+RylyYbhHOWQlH1w8lur8AvKeTsgXqlGg2yi4XQNgV7fqVBfUyFgA9BXoCcw
-         rpOm4g1XrUEOofrGiAa10H8l3FwcsWnfZ7dzQ7H6pAbnddDI3QqzoxW7i07bfLj2kLBV
-         ZmEQ==
-X-Gm-Message-State: AOJu0YyKZCnK9ng6jaYIOz41U5SAEy8Z/BXGHX+1FKlaHFzvaDW7PvmC
-	Y8wlVy3PQkYHb6TU+dDnFqJJUFAvWoqV0A51LFfSw5wMJcGjA7M=
-X-Google-Smtp-Source: AGHT+IGGlcFdvOZMy8ytduClUq+H57gGxIs2VmGRyblig5KQXMchAWKjYR4Lqeut3qf8ttNtryccMYl8+8hB1JNLvwDJT7GPcZbh
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CA4DDB;
+	Wed, 13 Dec 2023 09:32:02 -0800 (PST)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BDGwLvx006818;
+	Wed, 13 Dec 2023 17:31:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=1KR3edTcL4jaQjRXzpWlk9xms+FnaIYvT1jy50Qd21Q=;
+ b=cRYBECtL1NZjJ0It4UVtr8p87tmnAbsW6xE5zEI9ssTHUzvoNMvoBn/WP2XkXF0Etryp
+ TVqKtqNH2Ex8oxFRNfRuEQlGc8wVX5XOiKLnr4ZXRLLs93AusCHzk7omX4UgSxoz3gUX
+ svL4N8qDMTcZNfdQHLsp4YY71j65xLtLaAr7hngcGCpyv3GCqCOxE4GBVpvZExUislkS
+ 0v/MPuUHvnPfyp59PH/o9pTzCS2q+f38Kyjja1MMEYCGyN4ANr0s/RaeyZd/zcxIEEhs
+ HFbbKRyMc7DLH1ePqXtvNJ08joz6rEe7nNMk0Vj63XsY5xajrMMt2hNm65GUommvBBO5 7w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uybw4t2aj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 17:31:59 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BDFmGgi023705;
+	Wed, 13 Dec 2023 17:31:59 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uybw4t2a7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 17:31:59 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BDGMAO3008442;
+	Wed, 13 Dec 2023 17:31:58 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uw2jtjrug-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 17:31:58 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BDHVtNK17236534
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 13 Dec 2023 17:31:55 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5C77E20043;
+	Wed, 13 Dec 2023 17:31:55 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D9BCA20040;
+	Wed, 13 Dec 2023 17:31:54 +0000 (GMT)
+Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.171.91.103])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 13 Dec 2023 17:31:54 +0000 (GMT)
+Message-ID: <2096291747c433d02cac794a9c85118b85199370.camel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 5/5] s390x: Add test for STFLE
+ interpretive execution (format-0)
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Nico =?ISO-8859-1?Q?B=F6hr?= <nrb@linux.ibm.com>,
+        Janosch Frank
+	 <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
+        Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
+        Thomas Huth <thuth@redhat.com>
+Date: Wed, 13 Dec 2023 18:31:54 +0100
+In-Reply-To: <20231213180033.54516bdd@p-imbrenda>
+References: <20231213124942.604109-1-nsg@linux.ibm.com>
+	 <20231213124942.604109-6-nsg@linux.ibm.com>
+	 <20231213180033.54516bdd@p-imbrenda>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:90a:bb18:b0:28a:abe8:f0e5 with SMTP id
- u24-20020a17090abb1800b0028aabe8f0e5mr349385pjr.0.1702488628971; Wed, 13 Dec
- 2023 09:30:28 -0800 (PST)
-Date: Wed, 13 Dec 2023 09:30:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f6d051060c6785bc@google.com>
-Subject: [syzbot] [kvm?] WARNING in kvm_mmu_notifier_change_pte
-From: syzbot <syzbot+81227d2bd69e9dedb802@syzkaller.appspotmail.com>
-To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: rhbdAUlhJn2SbxofIEDWDVmhl4RLB3EE
+X-Proofpoint-ORIG-GUID: 1ah1fPafAPTcoH7XKn_M40K36gvbOZ3m
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-13_11,2023-12-13_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ phishscore=0 spamscore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0
+ impostorscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2312130125
 
-Hello,
+On Wed, 2023-12-13 at 18:00 +0100, Claudio Imbrenda wrote:
+> On Wed, 13 Dec 2023 13:49:42 +0100
+> Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
+>=20
+> > The STFLE instruction indicates installed facilities.
+> > SIE can interpretively execute STFLE.
+> > Use a snippet guest executing STFLE to get the result of
+> > interpretive execution and check the result.
+> >=20
+> > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+>=20
+> [...]
+>=20
+> >  static inline void setup_facilities(void)
+> > diff --git a/s390x/snippets/c/stfle.c b/s390x/snippets/c/stfle.c
+> > new file mode 100644
+> > index 00000000..eb024a6a
+> > --- /dev/null
+> > +++ b/s390x/snippets/c/stfle.c
+> > @@ -0,0 +1,26 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/*
+> > + * Copyright IBM Corp. 2023
+> > + *
+> > + * Snippet used by the STLFE interpretive execution facilities test.
+> > + */
+> > +#include <libcflat.h>
+> > +#include <snippet-guest.h>
+> > +
+> > +int main(void)
+> > +{
+> > +	const unsigned int max_fac_len =3D 8;
+>=20
+> why 8?
 
-syzbot found the following issue on:
+8 is a somewhat arbitrary, large number :)
+I suppose I could choose an even larger one, maybe even PAGE_SIZE/8.
+That would guarantee that max_fac_len >=3D stfle_size() (8 is enough for th=
+at today)
+It's not necessary for max_fac_len >=3D stfle_size(), but probably good for
+test coverage.
+>=20
+> > +	uint64_t res[max_fac_len + 1];
+> > +
+> > +	res[0] =3D max_fac_len - 1;
+> > +	asm volatile ( "lg	0,%[len]\n"
+> > +		"	stfle	%[fac]\n"
+> > +		"	stg	0,%[len]\n"
+> > +		: [fac] "=3DQS"(*(uint64_t(*)[max_fac_len])&res[1]),
+> > +		  [len] "+RT"(res[0])
+> > +		:
+> > +		: "%r0", "cc"
+> > +	);
+> > +	force_exit_value((uint64_t)&res);
+> > +	return 0;
+> > +}
+> > diff --git a/s390x/stfle-sie.c b/s390x/stfle-sie.c
+> > new file mode 100644
+> > index 00000000..574319ed
+> > --- /dev/null
+> > +++ b/s390x/stfle-sie.c
+> > @@ -0,0 +1,132 @@
 
-HEAD commit:    f2e8a57ee903 Merge tag 'scsi-fixes' of git://git.kernel.or..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=14fdc732e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e56083f7dbe162c2
-dashboard link: https://syzkaller.appspot.com/bug?extid=81227d2bd69e9dedb802
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=129d09cae80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10b8afeee80000
+[...]
+> > +
+> > +static void test_stfle_format_0(void)
+> > +{
+> > +	struct guest_stfle_res res;
+> > +
+> > +	report_prefix_push("format-0");
+> > +	for (int j =3D 0; j < stfle_size(); j++)
+> > +		WRITE_ONCE((*fac)[j], rand64(&rand_s));
+>=20
+> do you really need random numbers? can't you use a static pattern?
+> maybe something like 0x0001020304050607 etc...
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/7b75e59fc59d/disk-f2e8a57e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f853580d61be/vmlinux-f2e8a57e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/8c893ce02e2c/bzImage-f2e8a57e.xz
+Doesn't really need to be random, I need some arbitrary test pattern,
+but I don't think some cumbersome constant literal improves anything.
+The RNG is just initialized with the time, because why not.
 
-Bisection is inconclusive: the first bad commit could be any of:
+>=20
+> > +	vm.sblk->fac =3D (uint32_t)(uint64_t)fac;
+> > +	res =3D run_guest();
+> > +	report(res.len =3D=3D stfle_size(), "stfle len correct");
 
-d61ea1cb0095 userfaultfd: UFFD_FEATURE_WP_ASYNC
-52526ca7fdb9 fs/proc/task_mmu: implement IOCTL to get and optionally clear info about PTEs
+^ should be
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=120b3bdae80000
++	report(res.len =3D=3D min(stfle_size(), 8), "stfle len correct");
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+81227d2bd69e9dedb802@syzkaller.appspotmail.com
+For the case that the guest buffer was shorter.
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5067 at arch/x86/kvm/../../../virt/kvm/kvm_main.c:734 kvm_mmu_notifier_change_pte+0x860/0x960 arch/x86/kvm/../../../virt/kvm/kvm_main.c:734
-Modules linked in:
-CPU: 0 PID: 5067 Comm: syz-executor813 Not tainted 6.7.0-rc4-syzkaller-00358-gf2e8a57ee903 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-RIP: 0010:kvm_mmu_notifier_change_pte+0x860/0x960 arch/x86/kvm/../../../virt/kvm/kvm_main.c:734
-Code: c7 80 16 c2 8a c6 05 61 3e f9 0d 01 e8 29 80 5d 00 e9 80 fa ff ff e8 8f 93 7d 00 90 0f 0b 90 e9 c0 fd ff ff e8 81 93 7d 00 90 <0f> 0b 90 e9 0f f9 ff ff e8 73 93 7d 00 90 0f 0b 90 e9 76 f8 ff ff
-RSP: 0018:ffffc900040e73a0 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000020537000 RCX: ffffffff8109f33e
-RDX: ffff888016fd9dc0 RSI: ffffffff8109fa2f RDI: 0000000000000007
-RBP: 0000000000000000 R08: 0000000000000007 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000003 R12: ffff88801afd5f00
-R13: 0000000020537000 R14: 0000000076630867 R15: ffffffff8109f1d0
-FS:  00007f62e85146c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020537000 CR3: 00000000288fa000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __mmu_notifier_change_pte+0x10d/0x1d0 mm/mmu_notifier.c:438
- mmu_notifier_change_pte include/linux/mmu_notifier.h:446 [inline]
- wp_page_copy mm/memory.c:3197 [inline]
- do_wp_page+0x26a7/0x36b0 mm/memory.c:3511
- handle_pte_fault mm/memory.c:5055 [inline]
- __handle_mm_fault+0x1d7d/0x3d70 mm/memory.c:5180
- handle_mm_fault+0x47a/0xa10 mm/memory.c:5345
- do_user_addr_fault+0x3d1/0x1000 arch/x86/mm/fault.c:1413
- handle_page_fault arch/x86/mm/fault.c:1505 [inline]
- exc_page_fault+0x5d/0xc0 arch/x86/mm/fault.c:1561
- asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:570
-RIP: 0010:rep_movs_alternative+0x4a/0x70 arch/x86/lib/copy_user_64.S:71
-Code: 75 f1 c3 66 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 8b 06 48 89 07 48 83 c6 08 48 83 c7 08 83 e9 08 74 df 83 f9 08 73 e8 eb c9 <f3> a4 c3 48 89 c8 48 c1 e9 03 83 e0 07 f3 48 a5 89 c1 85 c9 75 b3
-RSP: 0018:ffffc900040e7968 EFLAGS: 00050206
-RAX: 0000000000000001 RBX: 0000000000001000 RCX: 0000000000000e80
-RDX: 0000000000000000 RSI: ffff888010b22180 RDI: 0000000020537000
-RBP: 0000000000001000 R08: 0000000000000000 R09: ffffed10021645ff
-R10: ffff888010b22fff R11: 0000000000000000 R12: 0000000000536b80
-R13: ffffc900040e7d60 R14: ffff888010b22000 R15: 0000000020536e80
- copy_user_generic arch/x86/include/asm/uaccess_64.h:112 [inline]
- raw_copy_to_user arch/x86/include/asm/uaccess_64.h:133 [inline]
- copy_to_user_iter lib/iov_iter.c:25 [inline]
- iterate_iovec include/linux/iov_iter.h:51 [inline]
- iterate_and_advance2 include/linux/iov_iter.h:247 [inline]
- iterate_and_advance include/linux/iov_iter.h:271 [inline]
- _copy_to_iter+0x4ce/0x11e0 lib/iov_iter.c:186
- copy_page_to_iter lib/iov_iter.c:381 [inline]
- copy_page_to_iter+0xf1/0x180 lib/iov_iter.c:368
- process_vm_rw_pages mm/process_vm_access.c:45 [inline]
- process_vm_rw_single_vec mm/process_vm_access.c:117 [inline]
- process_vm_rw_core.constprop.0+0x5cd/0xa10 mm/process_vm_access.c:215
- process_vm_rw+0x2ff/0x360 mm/process_vm_access.c:283
- __do_sys_process_vm_readv mm/process_vm_access.c:295 [inline]
- __se_sys_process_vm_readv mm/process_vm_access.c:291 [inline]
- __x64_sys_process_vm_readv+0xe2/0x1b0 mm/process_vm_access.c:291
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7f62e855c889
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 11 1d 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f62e85140c8 EFLAGS: 00000216 ORIG_RAX: 0000000000000136
-RAX: ffffffffffffffda RBX: 00007f62e85df3e8 RCX: 00007f62e855c889
-RDX: 0000000000000002 RSI: 0000000020008400 RDI: 00000000000013ca
-RBP: 00007f62e85df3e0 R08: 0000000000000286 R09: 0000000000000000
-R10: 0000000020008640 R11: 0000000000000216 R12: 00007f62e85df3ec
-R13: 0000000000000000 R14: 00007ffd42ee6360 R15: 00007ffd42ee6448
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	75 f1                	jne    0xfffffff3
-   2:	c3                   	ret
-   3:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
-   a:	00 00 00 00
-   e:	66 90                	xchg   %ax,%ax
-  10:	48 8b 06             	mov    (%rsi),%rax
-  13:	48 89 07             	mov    %rax,(%rdi)
-  16:	48 83 c6 08          	add    $0x8,%rsi
-  1a:	48 83 c7 08          	add    $0x8,%rdi
-  1e:	83 e9 08             	sub    $0x8,%ecx
-  21:	74 df                	je     0x2
-  23:	83 f9 08             	cmp    $0x8,%ecx
-  26:	73 e8                	jae    0x10
-  28:	eb c9                	jmp    0xfffffff3
-* 2a:	f3 a4                	rep movsb %ds:(%rsi),%es:(%rdi) <-- trapping instruction
-  2c:	c3                   	ret
-  2d:	48 89 c8             	mov    %rcx,%rax
-  30:	48 c1 e9 03          	shr    $0x3,%rcx
-  34:	83 e0 07             	and    $0x7,%eax
-  37:	f3 48 a5             	rep movsq %ds:(%rsi),%es:(%rdi)
-  3a:	89 c1                	mov    %eax,%ecx
-  3c:	85 c9                	test   %ecx,%ecx
-  3e:	75 b3                	jne    0xfffffff3
+> > +	report(!memcmp(*fac, res.mem, res.len * sizeof(uint64_t)),
+> > +	       "Guest facility list as specified");
+>=20
+> it seems like you are comparing the full facility list (stfle_size
+> doublewords long) with the result of STFLE in the guest, but the guest
+> is limited to 8 double words?
 
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Their prefixes must be the same. res.len is the guest length, so max 8 righ=
+t now.
+>=20
+> > +	report_prefix_pop();
+> > +}
 
