@@ -1,143 +1,169 @@
-Return-Path: <kvm+bounces-4307-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4308-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86455810CAA
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 09:43:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4281D810CEE
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 10:05:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E95B1B20C8F
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 08:43:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F9642815E4
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 09:05:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90CD81EB45;
-	Wed, 13 Dec 2023 08:43:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2048F1EB50;
+	Wed, 13 Dec 2023 09:05:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A07qou8z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Rp6PUIPp"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 851A8DC
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 00:43:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702457018;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9ypvU2CFpvjA4GuEgMA1XFzF02HXPcVncJHhzWckfAo=;
-	b=A07qou8zhN6INiRcZo6Jts8WashAl5Jg07IQHHatmwFCJPqJWiHlCbGsya6DH2IBb0WvGX
-	OoRfwAHiVD4WZCF+4VCQanrhJfEN8dRQmx1LJFzOcYXV4iWyTEX4eg2KZ+0ltjWEHAfcm4
-	PAHkFbg8YdslPsD7iEErztnLy+zIgbM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-648-X3FQWZc5PSWKydNC9KIcYw-1; Wed, 13 Dec 2023 03:43:37 -0500
-X-MC-Unique: X3FQWZc5PSWKydNC9KIcYw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40c42205ed0so25072765e9.2
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 00:43:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702457016; x=1703061816;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9ypvU2CFpvjA4GuEgMA1XFzF02HXPcVncJHhzWckfAo=;
-        b=qAwuvotYYfcvGr2OZfIgC7hz+rNqJqHVVnZ6hwSJwj7+93WNwhmTLizrV/RP8uYPnD
-         GdDURroanhs3pZ7LHQXs8VwgG/CiXS7bZqsxUCHu7/N4beg8I6PuMdkTMy/9wqEDoeHN
-         6hzTEAmhac7V0gC6Hqn25/RhNy4H7Fy8VgnAFUXJ5s/P4CfebDBm0liL/vVvQvGnpIHn
-         zSX+7HEN63DoxTn7YnFx9y+wR+7xxJ6ZVDMSHP0pG4h/rMxg1sgc1k8ycO20iPalgCwQ
-         AGU0xvK6+Em7RaLRaRP4FnxRpTQKhlsrpD+S0YtseBrsT9A0ahtKK+sCd+kOtuzDiRMF
-         +4uw==
-X-Gm-Message-State: AOJu0YyL35khNcEkVzw1uDAcnxGi2BOfUuwcG2YuT+35TcqFU5lGntfx
-	rQh3L6ntIUkLvWON01iNmiX9fEpxCR4q7V4YiaDAyOCHEzSD7kdd1RwXpd6lMERZlYEYORkAcPT
-	oN8WGzJFBV5Qm
-X-Received: by 2002:a05:600c:401:b0:40c:26ef:b24b with SMTP id q1-20020a05600c040100b0040c26efb24bmr3913391wmb.188.1702457015949;
-        Wed, 13 Dec 2023 00:43:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF1lQ4+EUeiLIk83v4dqAAgqvxh6iPVGvNgRE5vCofRk3mqgAvKUjUC7mCTX0q96Nl9r/GPpQ==
-X-Received: by 2002:a05:600c:401:b0:40c:26ef:b24b with SMTP id q1-20020a05600c040100b0040c26efb24bmr3913382wmb.188.1702457015584;
-        Wed, 13 Dec 2023 00:43:35 -0800 (PST)
-Received: from sgarzare-redhat ([5.179.184.12])
-        by smtp.gmail.com with ESMTPSA id j17-20020a05600c1c1100b0040b48690c49sm19575443wms.6.2023.12.13.00.43.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 00:43:35 -0800 (PST)
-Date: Wed, 13 Dec 2023 09:43:29 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v8 0/4] send credit update during setting
- SO_RCVLOWAT
-Message-ID: <ucmekzurgt3zcaezzdkk6277ukjmwaoy6kdq6tzivbtqd4d32b@izqbcsixgngk>
-References: <20231211211658.2904268-1-avkrasnov@salutedevices.com>
- <20231212105423-mutt-send-email-mst@kernel.org>
- <d27f22f0-0f1e-e1bb-5b13-a524dc6e94d7@salutedevices.com>
- <20231212111131-mutt-send-email-mst@kernel.org>
- <7b362aef-6774-0e08-81e9-0a6f7f616290@salutedevices.com>
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDF95AB;
+	Wed, 13 Dec 2023 01:05:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702458301; x=1733994301;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=XMwYb6E5n1kkH4le2ypm2BfDPNi79ZDLCGsQ36e5vtM=;
+  b=Rp6PUIPpJHYvter17GtaYEzSswpetDVBB9P9NHqv31Xdqj0ygvXtKa+i
+   knZfOB6UC2kWbY8/vJ/IxWTey17f/Z/HVlxkMZC9xLxwAvJN2EXJu2Eaw
+   DstebmC8ynTpuRAGHxp8gRBC0P0YzY0mOMDXBIlTHe049wIoMBkjSYy3U
+   0O5tuRcePTmuZ2mcebr5PtzEZzBIpHUEm4OAVmC6LZVR0/Bo5PMyDse2y
+   rhCd/CmTjoOdDoNZQoDCNt4nLWwvqKFs077d/hNvFn9Nn0leY15OTTzpY
+   NAz8fRrAyBcQDtw49oYbCp8Yfls9qOADX0bXQ681Edh9C+3fEZmPgc91v
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="13631240"
+X-IronPort-AV: E=Sophos;i="6.04,272,1695711600"; 
+   d="scan'208";a="13631240"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 01:05:01 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,272,1695711600"; 
+   d="scan'208";a="17664934"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.2.128]) ([10.238.2.128])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 01:04:56 -0800
+Message-ID: <c8e33fa0-49a1-43d2-9500-a94e951a0d45@linux.intel.com>
+Date: Wed, 13 Dec 2023 17:04:54 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <7b362aef-6774-0e08-81e9-0a6f7f616290@salutedevices.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v17 029/116] KVM: x86/mmu: Add address conversion
+ functions for TDX shared bit of GPA
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, David Matlack <dmatlack@google.com>,
+ Kai Huang <kai.huang@intel.com>, Zhi Wang <zhi.wang.linux@gmail.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>
+References: <cover.1699368322.git.isaku.yamahata@intel.com>
+ <6457cfa5898ae1ab0effb2dd95a3ad9da7fd45f5.1699368322.git.isaku.yamahata@intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <6457cfa5898ae1ab0effb2dd95a3ad9da7fd45f5.1699368322.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 12, 2023 at 08:43:07PM +0300, Arseniy Krasnov wrote:
+
+
+On 11/7/2023 10:55 PM, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >
+> TDX repurposes one GPA bit (51 bit or 47 bit based on configuration) to
+> indicate the GPA is private(if cleared) or shared (if set) with VMM.  If
+> GPA.shared is set, GPA is covered by the existing conventional EPT pointed
+> by EPTP.  If GPA.shared bit is cleared, GPA is covered by TDX module.
+> VMM has to issue SEAMCALLs to operate.
 >
->On 12.12.2023 19:12, Michael S. Tsirkin wrote:
->> On Tue, Dec 12, 2023 at 06:59:03PM +0300, Arseniy Krasnov wrote:
->>>
->>>
->>> On 12.12.2023 18:54, Michael S. Tsirkin wrote:
->>>> On Tue, Dec 12, 2023 at 12:16:54AM +0300, Arseniy Krasnov wrote:
->>>>> Hello,
->>>>>
->>>>>                                DESCRIPTION
->>>>>
->>>>> This patchset fixes old problem with hungup of both rx/tx sides and adds
->>>>> test for it. This happens due to non-default SO_RCVLOWAT value and
->>>>> deferred credit update in virtio/vsock. Link to previous old patchset:
->>>>> https://lore.kernel.org/netdev/39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru/
->>>>
->>>>
->>>> Patchset:
->>>>
->>>> Acked-by: Michael S. Tsirkin <mst@redhat.com>
->>>
->>> Thanks!
->>>
->>>>
->>>>
->>>> But I worry whether we actually need 3/8 in net not in net-next.
->>>
->>> Because of "Fixes" tag ? I think this problem is not critical and reproducible
->>> only in special cases, but i'm not familiar with netdev process so good, so I don't
->>> have strong opinion. I guess @Stefano knows better.
->>>
->>> Thanks, Arseniy
->>
->> Fixes means "if you have that other commit then you need this commit
->> too". I think as a minimum you need to rearrange patches to make the
->> fix go in first. We don't want a regression followed by a fix.
+> Add a member to remember GPA shared bit for each guest TDs, add address
+> conversion functions between private GPA and shared GPA and test if GPA
+> is private.
 >
->I see, ok, @Stefano WDYT? I think rearrange doesn't break anything, 
->because this
->patch fixes problem that is not related with the new patches from this patchset.
+> Because struct kvm_arch (or struct kvm which includes struct kvm_arch. See
+> kvm_arch_alloc_vm() that passes __GPF_ZERO) is zero-cleared when allocated,
+> the new member to remember GPA shared bit is guaranteed to be zero with
+> this patch unless it's initialized explicitly.
+>
+> Co-developed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 
-I agree, patch 3 is for sure net material (I'm fine with both 
-rearrangement or send it separately), but IMHO also patch 2 could be.
-I think with the same fixes tag, since before commit b89d882dc9fc 
-("vsock/virtio: reduce credit update messages") we sent a credit update
-for every bytes we read, so we should not have this problem, right?
-
-So, maybe all the series could be "net".
-
-Thanks,
-Stefano
+> ---
+>   arch/x86/include/asm/kvm_host.h |  4 ++++
+>   arch/x86/kvm/mmu.h              | 27 +++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/tdx.c          |  5 +++++
+>   3 files changed, 36 insertions(+)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 78aa844f4dba..babdc3a6ba5e 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1475,6 +1475,10 @@ struct kvm_arch {
+>   	 */
+>   #define SPLIT_DESC_CACHE_MIN_NR_OBJECTS (SPTE_ENT_PER_PAGE + 1)
+>   	struct kvm_mmu_memory_cache split_desc_cache;
+> +
+> +#ifdef CONFIG_KVM_MMU_PRIVATE
+> +	gfn_t gfn_shared_mask;
+> +#endif
+>   };
+>   
+>   struct kvm_vm_stat {
+> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> index bb8c86eefac0..f64bb734fbb6 100644
+> --- a/arch/x86/kvm/mmu.h
+> +++ b/arch/x86/kvm/mmu.h
+> @@ -311,4 +311,31 @@ static inline gpa_t kvm_translate_gpa(struct kvm_vcpu *vcpu,
+>   		return gpa;
+>   	return translate_nested_gpa(vcpu, gpa, access, exception);
+>   }
+> +
+> +static inline gfn_t kvm_gfn_shared_mask(const struct kvm *kvm)
+> +{
+> +#ifdef CONFIG_KVM_MMU_PRIVATE
+> +	return kvm->arch.gfn_shared_mask;
+> +#else
+> +	return 0;
+> +#endif
+> +}
+> +
+> +static inline gfn_t kvm_gfn_to_shared(const struct kvm *kvm, gfn_t gfn)
+> +{
+> +	return gfn | kvm_gfn_shared_mask(kvm);
+> +}
+> +
+> +static inline gfn_t kvm_gfn_to_private(const struct kvm *kvm, gfn_t gfn)
+> +{
+> +	return gfn & ~kvm_gfn_shared_mask(kvm);
+> +}
+> +
+> +static inline bool kvm_is_private_gpa(const struct kvm *kvm, gpa_t gpa)
+> +{
+> +	gfn_t mask = kvm_gfn_shared_mask(kvm);
+> +
+> +	return mask && !(gpa_to_gfn(gpa) & mask);
+> +}
+> +
+>   #endif
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index c1a8560981a3..fe793425d393 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -878,6 +878,11 @@ static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
+>   	kvm_tdx->attributes = td_params->attributes;
+>   	kvm_tdx->xfam = td_params->xfam;
+>   
+> +	if (td_params->exec_controls & TDX_EXEC_CONTROL_MAX_GPAW)
+> +		kvm->arch.gfn_shared_mask = gpa_to_gfn(BIT_ULL(51));
+> +	else
+> +		kvm->arch.gfn_shared_mask = gpa_to_gfn(BIT_ULL(47));
+> +
+>   out:
+>   	/* kfree() accepts NULL. */
+>   	kfree(init_vm);
 
 
