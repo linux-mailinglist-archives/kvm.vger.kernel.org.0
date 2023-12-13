@@ -1,46 +1,90 @@
-Return-Path: <kvm+bounces-4380-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4381-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7801A811B98
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 18:54:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0B29811BAB
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 18:57:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7D0D282645
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 17:54:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 093C91F21958
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 17:57:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395CA59553;
-	Wed, 13 Dec 2023 17:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139A159E24;
+	Wed, 13 Dec 2023 17:56:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rpYpcepw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WOrjME1a"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1112B93
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 09:53:56 -0800 (PST)
-Date: Wed, 13 Dec 2023 18:53:51 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1702490034;
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56530E8
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 09:56:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702490176;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VuclNBNbIiDYd23oZT5bv7JSGswBpCzrTS//DedbxCY=;
-	b=rpYpcepwG8/MY7sdVTet5OgULPcfBMrBBBqCkiKd1wYTWe+ixkRJHEkecf8KHYLs9obDCh
-	qs4phzLUHAOsHaQDCepAZjvAQ8ixMmALlN+o3su8ubxj0kLEWpSg1kZZrBAwIQj7bOvdJK
-	aYs16CdTkvY0+ZukmOrYs3qA8HvRCiY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Cc: Thomas Huth <thuth@redhat.com>, Nico Boehr <nrb@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH 1/5] lib: Add pseudo random functions
-Message-ID: <20231213-d38a53f4d505a631ead7af80@orel>
-References: <20231213124942.604109-1-nsg@linux.ibm.com>
- <20231213124942.604109-2-nsg@linux.ibm.com>
- <20231213-8407f7ddc3a972de2715db9c@orel>
- <ed6b4a7188389617ffc85453e9270ffadd863a01.camel@linux.ibm.com>
+	bh=vEKtCaZo1O9cfSPgdOwxIJB9fsJXHh/ahknjK4hJAXk=;
+	b=WOrjME1ayHvfkTKPO5SHY7aEkcyuNMQfEGxY1jCgvKuIpbxZxpnTdAHOa+Ky51ErH03xlO
+	oszzJXHfG/NSAmnzVTscWLbp6ao43HBPKCXDGwxiWpnw7eTImz1//3Wy0pIaM4j+86qBET
+	wrZiY6dCHeeSbYQo9Hb/131W5KRPStk=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-584-UQUwczWHMNigPaCteVdNFw-1; Wed, 13 Dec 2023 12:56:15 -0500
+X-MC-Unique: UQUwczWHMNigPaCteVdNFw-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a1fa0ed2058so224135766b.2
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 09:56:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702490174; x=1703094974;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vEKtCaZo1O9cfSPgdOwxIJB9fsJXHh/ahknjK4hJAXk=;
+        b=NSRr/XY+WNj9APRfwXBlVeNu5+qEXA2S98+v1mpamRnyai8JjNLkJhLQrLx1SJ+2vr
+         H0LUCKrKLu0rL4UgQtr/Qw7P13rphjCPYDBhirVYx2VYjD4uJUYXRSmBcglTb2bokYL0
+         +pDQHAvWFRq9kmumNRnXWfvt0oEVWXvBYXyb2SjuzSBgBo2z5p0DajBGUTL+knNYiTgJ
+         BhJ5GSGye0l6l2TUKZgai2lxwJI/2wH7o1sDGrMfaJFB2QoKJkp8caFsGP+/SbgX65QJ
+         /lG5M4hQ5muehdi7jN+nsRX0SyS8zwygzxq1bPmbzLz8LgCopsAVUo73PkjRDy0jJJX/
+         kdAQ==
+X-Gm-Message-State: AOJu0YwNXWqwe77FBvsBpzP52joxUPNAgV4XPL8wpug1UCREpSzZYZ6d
+	yXhAuNqlVMcbioiXYgEzlIJcqqJM0iKi5BV1TQu+XjldxSwV/AKy3IzKMVKLStZIP4Kec6oyfbv
+	wcaf/TTpFBEC4
+X-Received: by 2002:a17:906:51c9:b0:a23:94b:eb76 with SMTP id v9-20020a17090651c900b00a23094beb76mr66460ejk.110.1702490174197;
+        Wed, 13 Dec 2023 09:56:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGc9RJlOVWyo0HyAiFTcOk5Wfn8VDPbQGBmpAhf72fm6DauJ3ApY2N3w9RPj1ICyK7MuA8IVA==
+X-Received: by 2002:a17:906:51c9:b0:a23:94b:eb76 with SMTP id v9-20020a17090651c900b00a23094beb76mr66447ejk.110.1702490173843;
+        Wed, 13 Dec 2023 09:56:13 -0800 (PST)
+Received: from redhat.com ([109.253.189.71])
+        by smtp.gmail.com with ESMTPSA id uv6-20020a170907cf4600b00a1e443bc037sm8258684ejc.147.2023.12.13.09.56.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 09:56:12 -0800 (PST)
+Date: Wed, 13 Dec 2023 12:56:08 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v8 0/4] send credit update during setting
+ SO_RCVLOWAT
+Message-ID: <20231213125404-mutt-send-email-mst@kernel.org>
+References: <20231211211658.2904268-1-avkrasnov@salutedevices.com>
+ <20231212105423-mutt-send-email-mst@kernel.org>
+ <d27f22f0-0f1e-e1bb-5b13-a524dc6e94d7@salutedevices.com>
+ <20231212111131-mutt-send-email-mst@kernel.org>
+ <7b362aef-6774-0e08-81e9-0a6f7f616290@salutedevices.com>
+ <ucmekzurgt3zcaezzdkk6277ukjmwaoy6kdq6tzivbtqd4d32b@izqbcsixgngk>
+ <402ea723-d154-45c9-1efe-b0022d9ea95a@salutedevices.com>
+ <20231213100518-mutt-send-email-mst@kernel.org>
+ <20231213100957-mutt-send-email-mst@kernel.org>
+ <8e6b06a5-eeb3-84c8-c6df-a8b81b596295@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -50,43 +94,91 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ed6b4a7188389617ffc85453e9270ffadd863a01.camel@linux.ibm.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <8e6b06a5-eeb3-84c8-c6df-a8b81b596295@salutedevices.com>
 
-On Wed, Dec 13, 2023 at 06:43:51PM +0100, Nina Schoetterl-Glausch wrote:
-> On Wed, 2023-12-13 at 14:38 +0100, Andrew Jones wrote:
-> > On Wed, Dec 13, 2023 at 01:49:38PM +0100, Nina Schoetterl-Glausch wrote:
-> > > Add functions for generating pseudo random 32 and 64 bit values.
-> > > The implementation is very simple and the randomness likely not
-> > > of high quality.
+On Wed, Dec 13, 2023 at 08:11:57PM +0300, Arseniy Krasnov wrote:
 > 
-> [...]
 > 
-> > Alex Bennée posted a prng patch a long time ago that never got merged.
+> On 13.12.2023 18:13, Michael S. Tsirkin wrote:
+> > On Wed, Dec 13, 2023 at 10:05:44AM -0500, Michael S. Tsirkin wrote:
+> >> On Wed, Dec 13, 2023 at 12:08:27PM +0300, Arseniy Krasnov wrote:
+> >>>
+> >>>
+> >>> On 13.12.2023 11:43, Stefano Garzarella wrote:
+> >>>> On Tue, Dec 12, 2023 at 08:43:07PM +0300, Arseniy Krasnov wrote:
+> >>>>>
+> >>>>>
+> >>>>> On 12.12.2023 19:12, Michael S. Tsirkin wrote:
+> >>>>>> On Tue, Dec 12, 2023 at 06:59:03PM +0300, Arseniy Krasnov wrote:
+> >>>>>>>
+> >>>>>>>
+> >>>>>>> On 12.12.2023 18:54, Michael S. Tsirkin wrote:
+> >>>>>>>> On Tue, Dec 12, 2023 at 12:16:54AM +0300, Arseniy Krasnov wrote:
+> >>>>>>>>> Hello,
+> >>>>>>>>>
+> >>>>>>>>>                                DESCRIPTION
+> >>>>>>>>>
+> >>>>>>>>> This patchset fixes old problem with hungup of both rx/tx sides and adds
+> >>>>>>>>> test for it. This happens due to non-default SO_RCVLOWAT value and
+> >>>>>>>>> deferred credit update in virtio/vsock. Link to previous old patchset:
+> >>>>>>>>> https://lore.kernel.org/netdev/39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru/
+> >>>>>>>>
+> >>>>>>>>
+> >>>>>>>> Patchset:
+> >>>>>>>>
+> >>>>>>>> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> >>>>>>>
+> >>>>>>> Thanks!
+> >>>>>>>
+> >>>>>>>>
+> >>>>>>>>
+> >>>>>>>> But I worry whether we actually need 3/8 in net not in net-next.
+> >>>>>>>
+> >>>>>>> Because of "Fixes" tag ? I think this problem is not critical and reproducible
+> >>>>>>> only in special cases, but i'm not familiar with netdev process so good, so I don't
+> >>>>>>> have strong opinion. I guess @Stefano knows better.
+> >>>>>>>
+> >>>>>>> Thanks, Arseniy
+> >>>>>>
+> >>>>>> Fixes means "if you have that other commit then you need this commit
+> >>>>>> too". I think as a minimum you need to rearrange patches to make the
+> >>>>>> fix go in first. We don't want a regression followed by a fix.
+> >>>>>
+> >>>>> I see, ok, @Stefano WDYT? I think rearrange doesn't break anything, because this
+> >>>>> patch fixes problem that is not related with the new patches from this patchset.
+> >>>>
+> >>>> I agree, patch 3 is for sure net material (I'm fine with both rearrangement or send it separately), but IMHO also patch 2 could be.
+> >>>> I think with the same fixes tag, since before commit b89d882dc9fc ("vsock/virtio: reduce credit update messages") we sent a credit update
+> >>>> for every bytes we read, so we should not have this problem, right?
+> >>>
+> >>> Agree for 2, so I think I can rearrange: two fixes go first, then current 0001, and then tests. And send it as V9 for 'net' only ?
+> >>>
+> >>> Thanks, Arseniy
+> >>
+> >>
+> >> hmm why not net-next?
 > > 
-> > https://www.spinics.net/lists/kvm-arm/msg50921.html
-> > 
-> > would it be better to merge that?
+> > Oh I missed your previous discussion. I think everything in net-next is
+> > safer.  Having said that, I won't nack it net, either.
 > 
-> Well, it's hard to say what metric to apply here.
-> How good does the randomness need to be?
+> So, summarizing all above:
+> 1) This patchset entirely goes to net-next as v9
+> 2) I reorder patches like 3 - 2 - 1 - 4, e.g. two fixes goes first with Fixes tag
+> 3) Add Acked-by: Michael S. Tsirkin <mst@redhat.com> to each patch
+> 
+> @Michael, @Stefano ?
+> 
+> Thanks, Arseniy
 
-Better randomness would improve coverage for random sample set type tests
-and possibly help stress more for stress tests.
+Fine by me.
 
-> I chose a minimal interface that should be amendable to evolution.
-> That's why the state is hidden behind a typedef.
-> I think this would be good for Alex' patch, too, and there is nothing gained
-> by exposing the implementation by prefixing everything with isaac.
+> > 
+> >>>>
+> >>>> So, maybe all the series could be "net".
+> >>>>
+> >>>> Thanks,
+> >>>> Stefano
+> >>>>
+> > 
 
-I agree.
-
-> My patch is also simpler to review.
-> But I'm certainly not opposed to better algorithms.
-
-Do you mind reposting Alex's patch, maintaining his authorship, but with
-your interface changes?
-
-Thanks,
-drew
 
