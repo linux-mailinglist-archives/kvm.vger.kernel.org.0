@@ -1,60 +1,49 @@
-Return-Path: <kvm+bounces-4305-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4306-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 572C6810C5A
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 09:25:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89B0D810C74
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 09:30:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C9A5281B82
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 08:25:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45A73281CFB
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 08:30:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D38981EB38;
-	Wed, 13 Dec 2023 08:25:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A5091EB2B;
+	Wed, 13 Dec 2023 08:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C0dNI53Q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PmwYGScm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5659DF2;
-	Wed, 13 Dec 2023 00:25:02 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-6cea2a38b48so5887103b3a.3;
-        Wed, 13 Dec 2023 00:25:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702455902; x=1703060702; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Uh3dbu4BJGoqG7WyDjS7Ql7hw90UlDVfz+hx8zYG/jE=;
-        b=C0dNI53Qb4NVQjHQS71eLSRw2si/uiDCOBCSdkAA2A+ZmlRwQKkNcQzb5+wvRZ5EYE
-         bqW20YJzTnKYBy+/NbKdwfRyWF9hsmysSPLOhS5Ur8ydKrK7mMCwJg6xxOEC1GGmqmvJ
-         v/fZVibEWCdpcRcYvkxGf7fIyHut2BL0n7d6UkYs9iA024HU0J91jPT3nMRFxUxhR2pf
-         Jt5V0qqxZB2+fRQDTNygb+Y/85Za8utBx8bU2NGniKQe0Neysv5UB6GxYmf/5yRxhgGd
-         3CKRxTdODZerGW8algGMcEm+DonXXOryCnSPWhQQAqu3ysrzk/MFJwQp26CDfFEqf9Kd
-         R6GA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702455902; x=1703060702;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uh3dbu4BJGoqG7WyDjS7Ql7hw90UlDVfz+hx8zYG/jE=;
-        b=iEqzCmsQrr8kEbBCbttMdbzOVBeCehyAbSL9Rj2J9of/9XnpvvWAjFATUGtQroeHju
-         niX5D+E6TjVLATncoD+6BcmZRdlaME+Tp8ahmLw9yCPF8ZDZ3xgJvYgaZO5BnZlbf68I
-         UKgv489j+2pz4849gaux6Ef6/I5yx7lOnJdSb40d2bV/ujWgd09mJHpfPtVSIEZRPc7+
-         W8UkHD967fs5XmE+KAO+49SUMuXmrOwpF+QJyBKYNZ7RX9OrsMlcQ95WV6SG12jYO68A
-         gqJLHBLtZ2YWJGvM9xe31oC35/y5HCHf4ckfdrDYtxRlPVaU7NLUKe0y7jQNsvOfvUCI
-         KK3w==
-X-Gm-Message-State: AOJu0YxHiJQ1ZfDKTsdQOBbdH0CqN1hnJkUN+N95Uy88lAtDQqW0jPcU
-	Lrpt6pSVp7r1j/Q7uArp8Tc=
-X-Google-Smtp-Source: AGHT+IHk9xKbXKXJI4IzKs7YZf5cJqfyU+FKKjoIMbM8cAp68YbPe8olw2mibm4zNmxgq3ynp1h97Q==
-X-Received: by 2002:a05:6a00:10cc:b0:6ce:751b:81d9 with SMTP id d12-20020a056a0010cc00b006ce751b81d9mr8704308pfu.9.1702455901616;
-        Wed, 13 Dec 2023 00:25:01 -0800 (PST)
-Received: from [192.168.255.10] ([203.205.141.118])
-        by smtp.gmail.com with ESMTPSA id u23-20020a62d457000000b006ce9e9d27c7sm9798465pfl.129.2023.12.13.00.24.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Dec 2023 00:25:01 -0800 (PST)
-Message-ID: <0591cb18-77e1-4e98-a405-4a39cfb512e1@gmail.com>
-Date: Wed, 13 Dec 2023 16:24:58 +0800
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BE36F4;
+	Wed, 13 Dec 2023 00:29:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702456192; x=1733992192;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=I6fYYnPqRckfY4Rb+ihD3QNPkzsJczlQfdOs+BmvvqM=;
+  b=PmwYGScmdfkLiAG6FJDiiOnEGj4QzDl2CH/RhDPwj0V0KHw/ZNl/ycZx
+   iWFYavHydC1nlvs++XTVYJmjhRF8rxTnt5SspJ1mf0281RPPrUpIULhA3
+   7VXAqxfvhfo5frACfvUELGMUsjOxtWlDcyR/94xCThUDvHMmTGw9mIeT6
+   hGWDn44kw0orlvcJqGHis+bdhVuPLdiYk4lGFvtY25LELy9OGA7WtMe5S
+   3gzFg0RHfVN+/jfQz+w3yhcvURfG7ilcv2H93j0JwS6gs70X2xmzmzd36
+   iIKFDgQ8NIAqpoRYFhmQkYWMelCa4Bx9ZCgIKM2lO6RGbMgokQ7n05SGb
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="461406357"
+X-IronPort-AV: E=Sophos;i="6.04,272,1695711600"; 
+   d="scan'208";a="461406357"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 00:29:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="777409496"
+X-IronPort-AV: E=Sophos;i="6.04,272,1695711600"; 
+   d="scan'208";a="777409496"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.2.128]) ([10.238.2.128])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 00:29:47 -0800
+Message-ID: <73dadd10-0b67-4338-a3e8-38c174c04f59@linux.intel.com>
+Date: Wed, 13 Dec 2023 16:29:45 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -62,148 +51,234 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] KVM: x86/intr: Explicitly check NMI from guest to
- eliminate false positives
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Andi Kleen <ak@linux.intel.com>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Sean Christopherson <seanjc@google.com>
-References: <20231206032054.55070-1-likexu@tencent.com>
- <6d3417f7-062e-9934-01ab-20e3a46656a7@oracle.com>
-Content-Language: en-US
-From: Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <6d3417f7-062e-9934-01ab-20e3a46656a7@oracle.com>
+Subject: Re: [PATCH v17 025/116] KVM: TDX: allocate/free TDX vcpu structure
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, David Matlack <dmatlack@google.com>,
+ Kai Huang <kai.huang@intel.com>, Zhi Wang <zhi.wang.linux@gmail.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
+References: <cover.1699368322.git.isaku.yamahata@intel.com>
+ <2d8b9860be7fac4b43264b68dc413a228d3e979e.1699368322.git.isaku.yamahata@intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <2d8b9860be7fac4b43264b68dc413a228d3e979e.1699368322.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
 
 
-On 13/12/2023 3:28 pm, Dongli Zhang wrote:
-> Hi Like,
-> 
-> On 12/5/23 19:20, Like Xu wrote:
->> From: Like Xu <likexu@tencent.com>
->>
->> Explicitly checking the source of external interrupt is indeed NMI and not
->> other types in the kvm_arch_pmi_in_guest(), which prevents perf-kvm false
->> positive samples generated in perf/core NMI mode after vm-exit but before
->> kvm_before_interrupt() from being incorrectly labelled as guest samples:
-> 
-> About the before kvm_before_interrupt() ...
-> 
->>
->> # test: perf-record + cpu-cycles:HP (which collects host-only precise samples)
->> # Symbol                                   Overhead       sys       usr  guest sys  guest usr
->> # .......................................  ........  ........  ........  .........  .........
->> #
->> # Before:
->>    [g] entry_SYSCALL_64                       24.63%     0.00%     0.00%     24.63%      0.00%
->>    [g] syscall_return_via_sysret              23.23%     0.00%     0.00%     23.23%      0.00%
->>    [g] files_lookup_fd_raw                     6.35%     0.00%     0.00%      6.35%      0.00%
->> # After:
->>    [k] perf_adjust_freq_unthr_context         57.23%    57.23%     0.00%      0.00%      0.00%
->>    [k] __vmx_vcpu_run                          4.09%     4.09%     0.00%      0.00%      0.00%
->>    [k] vmx_update_host_rsp                     3.17%     3.17%     0.00%      0.00%      0.00%
->>
->> In the above case, perf records the samples labelled '[g]', the RIPs behind
->> the weird samples are actually being queried by perf_instruction_pointer()
->> after determining whether it's in GUEST state or not, and here's the issue:
->>
->> If vm-exit is caused by a non-NMI interrupt (such as hrtimer_interrupt) and
->> at least one PMU counter is enabled on host, the kvm_arch_pmi_in_guest()
->> will remain true (KVM_HANDLING_IRQ is set) until kvm_before_interrupt().
-> 
-> ... and here.
-> 
-> Would you mind helping why kvm_arch_pmi_in_guest() remains true before
-> *kvm_before_interrupt()*.
-> 
-> According to the source code, the vcpu->arch.handling_intr_from_guest
-> is set to non-zero only at kvm_before_interrupt(), and cleared at
-> kvm_after_interrupt().
-> 
-> Or would you mean kvm_after_interrupt()?
+On 11/7/2023 10:55 PM, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+> The next step of TDX guest creation is to create vcpu.  Allocate TDX vcpu
+> structures, initialize it that doesn't require TDX SEAMCALL.
+Didn't see any allocation happens for TDX in this patch.
 
-Oops, it should refer to kvm_after_interrupt() as the code fixed. Thank you.
 
-> 
-> Thank you very much!
-> 
-> Dongli Zhang
-> 
->>
->> During this window, if a PMI occurs on host (since the KVM instructions on
->> host are being executed), the control flow, with the help of the host NMI
->> context, will be transferred to perf/core to generate performance samples,
->> thus perf_instruction_pointer() and perf_guest_get_ip() is called.
->>
->> Since kvm_arch_pmi_in_guest() only checks if there is an interrupt, it may
->> cause perf/core to mistakenly assume that the source RIP of the host NMI
->> belongs to the guest world and use perf_guest_get_ip() to get the RIP of
->> a vCPU that has already exited by a non-NMI interrupt.
->>
->> Error samples are recorded and presented to the end-user via perf-report.
->> Such false positive samples could be eliminated by explicitly determining
->> if the exit reason is KVM_HANDLING_NMI.
->>
->> Note that when vm-exit is indeed triggered by PMI and before HANDLING_NMI
->> is cleared, it's also still possible that another PMI is generated on host.
->> Also for perf/core timer mode, the false positives are still possible since
->> that non-NMI sources of interrupts are not always being used by perf/core.
->> In both cases above, perf/core should correctly distinguish between real
->> RIP sources or even need to generate two samples, belonging to host and
->> guest separately, but that's perf/core's story for interested warriors.
->>
->> Fixes: dd60d217062f ("KVM: x86: Fix perf timer mode IP reporting")
->> Signed-off-by: Like Xu <likexu@tencent.com>
->> ---
->> V1 -> V2 Changelog:
->> - Refine commit message to cover both perf/core timer and NMI modes;
->> - Use in_nmi() to distinguish whether it's NMI mode or not; (Sean)
->> V1: https://urldefense.com/v3/__https://lore.kernel.org/kvm/20231204074535.9567-1-likexu@tencent.com/__;!!ACWV5N9M2RV99hQ!MQ8FetD27SVKN34CS_P-K3qrhspFnpf_Mqb0McFN9y5vSUeScc5b0TlZ3ZMDvt4Cn4b3g0h9ci6EO9k3PBEQXpePrg$
->>   arch/x86/include/asm/kvm_host.h | 10 +++++++++-
->>   arch/x86/kvm/x86.h              |  6 ------
->>   2 files changed, 9 insertions(+), 7 deletions(-)
->>
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index c8c7e2475a18..167d592e08d0 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -1868,8 +1868,16 @@ static inline int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn,
->>   }
->>   #endif /* CONFIG_HYPERV */
->>   
->> +enum kvm_intr_type {
->> +	/* Values are arbitrary, but must be non-zero. */
->> +	KVM_HANDLING_IRQ = 1,
->> +	KVM_HANDLING_NMI,
->> +};
->> +
->> +/* Enable perf NMI and timer modes to work, and minimise false positives. */
->>   #define kvm_arch_pmi_in_guest(vcpu) \
->> -	((vcpu) && (vcpu)->arch.handling_intr_from_guest)
->> +	((vcpu) && (vcpu)->arch.handling_intr_from_guest && \
->> +	 (in_nmi() == ((vcpu)->arch.handling_intr_from_guest == KVM_HANDLING_NMI)))
->>   
->>   void __init kvm_mmu_x86_module_init(void);
->>   int kvm_mmu_vendor_module_init(void);
->> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
->> index 2f7e19166658..4dc38092d599 100644
->> --- a/arch/x86/kvm/x86.h
->> +++ b/arch/x86/kvm/x86.h
->> @@ -431,12 +431,6 @@ static inline bool kvm_notify_vmexit_enabled(struct kvm *kvm)
->>   	return kvm->arch.notify_vmexit_flags & KVM_X86_NOTIFY_VMEXIT_ENABLED;
->>   }
->>   
->> -enum kvm_intr_type {
->> -	/* Values are arbitrary, but must be non-zero. */
->> -	KVM_HANDLING_IRQ = 1,
->> -	KVM_HANDLING_NMI,
->> -};
->> -
->>   static __always_inline void kvm_before_interrupt(struct kvm_vcpu *vcpu,
->>   						 enum kvm_intr_type intr)
->>   {
->>
->> base-commit: 1ab097653e4dd8d23272d028a61352c23486fd4a
+>   TDX specific
+> vcpu initialization will be implemented as independent KVM_TDX_INIT_VCPU
+> so that when error occurs it's easy to determine which component has the
+> issue, KVM or TDX.
+>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+> v15 -> v16:
+> - Add AMX support as the KVM upstream supports it.
+> ---
+>   arch/x86/kvm/vmx/main.c    | 44 ++++++++++++++++++++++++++++++----
+>   arch/x86/kvm/vmx/tdx.c     | 49 ++++++++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/x86_ops.h | 10 ++++++++
+>   arch/x86/kvm/x86.c         |  2 ++
+>   4 files changed, 101 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index c8213d6ea301..f60de0232f7f 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -98,6 +98,42 @@ static void vt_vm_free(struct kvm *kvm)
+>   		tdx_vm_free(kvm);
+>   }
+>   
+> +static int vt_vcpu_precreate(struct kvm *kvm)
+> +{
+> +	if (is_td(kvm))
+> +		return 0;
+> +
+> +	return vmx_vcpu_precreate(kvm);
+> +}
+> +
+> +static int vt_vcpu_create(struct kvm_vcpu *vcpu)
+> +{
+> +	if (is_td_vcpu(vcpu))
+> +		return tdx_vcpu_create(vcpu);
+> +
+> +	return vmx_vcpu_create(vcpu);
+> +}
+> +
+> +static void vt_vcpu_free(struct kvm_vcpu *vcpu)
+> +{
+> +	if (is_td_vcpu(vcpu)) {
+> +		tdx_vcpu_free(vcpu);
+> +		return;
+> +	}
+> +
+> +	vmx_vcpu_free(vcpu);
+> +}
+
+I'm wondering for such wrapper functions without a return value,
+is the following style cleaner?
+It can save two lines of code.
+
++static void vt_vcpu_free(struct kvm_vcpu *vcpu)
++{
++    if (is_td_vcpu(vcpu))
++        tdx_vcpu_free(vcpu);
++    else
++        vmx_vcpu_free(vcpu);
++}
+
+
+> +
+> +static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+> +{
+> +	if (is_td_vcpu(vcpu)) {
+> +		tdx_vcpu_reset(vcpu, init_event);
+> +		return;
+> +	}
+> +
+> +	vmx_vcpu_reset(vcpu, init_event);
+> +}
+> +
+ditto
+
+>   static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>   {
+>   	if (!is_td(kvm))
+> @@ -136,10 +172,10 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>   	.vm_destroy = vt_vm_destroy,
+>   	.vm_free = vt_vm_free,
+>   
+> -	.vcpu_precreate = vmx_vcpu_precreate,
+> -	.vcpu_create = vmx_vcpu_create,
+> -	.vcpu_free = vmx_vcpu_free,
+> -	.vcpu_reset = vmx_vcpu_reset,
+> +	.vcpu_precreate = vt_vcpu_precreate,
+> +	.vcpu_create = vt_vcpu_create,
+> +	.vcpu_free = vt_vcpu_free,
+> +	.vcpu_reset = vt_vcpu_reset,
+>   
+>   	.prepare_switch_to_guest = vmx_prepare_switch_to_guest,
+>   	.vcpu_load = vmx_vcpu_load,
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 51aa114feb86..b7f8ac4b9f95 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -335,6 +335,55 @@ int tdx_vm_init(struct kvm *kvm)
+>   	return 0;
+>   }
+>   
+> +int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+> +
+> +	/*
+> +	 * On cpu creation, cpuid entry is blank.  Forcibly enable
+> +	 * X2APIC feature to allow X2APIC.
+> +	 * Because vcpu_reset() can't return error, allocation is done here.
+> +	 */
+> +	WARN_ON_ONCE(vcpu->arch.cpuid_entries);
+> +	WARN_ON_ONCE(vcpu->arch.cpuid_nent);
+> +
+> +	/* TDX only supports x2APIC, which requires an in-kernel local APIC. */
+> +	if (!vcpu->arch.apic)
+> +		return -EINVAL;
+> +
+> +	fpstate_set_confidential(&vcpu->arch.guest_fpu);
+> +
+> +	vcpu->arch.efer = EFER_SCE | EFER_LME | EFER_LMA | EFER_NX;
+> +
+> +	vcpu->arch.cr0_guest_owned_bits = -1ul;
+> +	vcpu->arch.cr4_guest_owned_bits = -1ul;
+> +
+> +	vcpu->arch.tsc_offset = to_kvm_tdx(vcpu->kvm)->tsc_offset;
+> +	vcpu->arch.l1_tsc_offset = vcpu->arch.tsc_offset;
+> +	vcpu->arch.guest_state_protected =
+> +		!(to_kvm_tdx(vcpu->kvm)->attributes & TDX_TD_ATTRIBUTE_DEBUG);
+> +
+> +	if ((kvm_tdx->xfam & XFEATURE_MASK_XTILE) == XFEATURE_MASK_XTILE)
+> +		vcpu->arch.xfd_no_write_intercept = true;
+> +
+> +	return 0;
+> +}
+> +
+> +void tdx_vcpu_free(struct kvm_vcpu *vcpu)
+> +{
+> +	/* This is stub for now.  More logic will come. */
+> +}
+> +
+> +void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+> +{
+> +
+> +	/* Ignore INIT silently because TDX doesn't support INIT event. */
+> +	if (init_event)
+> +		return;
+> +
+> +	/* This is stub for now. More logic will come here. */
+> +}
+> +
+>   static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
+>   {
+>   	struct kvm_tdx_capabilities __user *user_caps;
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index ffba64008682..ebb963848316 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -144,7 +144,12 @@ int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+>   int tdx_vm_init(struct kvm *kvm);
+>   void tdx_mmu_release_hkid(struct kvm *kvm);
+>   void tdx_vm_free(struct kvm *kvm);
+> +
+>   int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+> +
+> +int tdx_vcpu_create(struct kvm_vcpu *vcpu);
+> +void tdx_vcpu_free(struct kvm_vcpu *vcpu);
+> +void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
+>   #else
+>   static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
+>   static inline void tdx_hardware_unsetup(void) {}
+> @@ -158,7 +163,12 @@ static inline int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+>   static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
+>   static inline void tdx_mmu_release_hkid(struct kvm *kvm) {}
+>   static inline void tdx_vm_free(struct kvm *kvm) {}
+> +
+>   static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
+> +
+> +static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
+> +static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
+> +static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
+>   #endif
+>   
+>   #endif /* __KVM_X86_VMX_X86_OPS_H */
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 191ac1e0d96d..0414822e7a03 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -502,6 +502,7 @@ int kvm_set_apic_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   	kvm_recalculate_apic_map(vcpu->kvm);
+>   	return 0;
+>   }
+> +EXPORT_SYMBOL_GPL(kvm_set_apic_base);
+>   
+>   /*
+>    * Handle a fault on a hardware virtualization (VMX or SVM) instruction.
+> @@ -12430,6 +12431,7 @@ bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
+>   {
+>   	return vcpu->kvm->arch.bsp_vcpu_id == vcpu->vcpu_id;
+>   }
+> +EXPORT_SYMBOL_GPL(kvm_vcpu_is_reset_bsp);
+>   
+>   bool kvm_vcpu_is_bsp(struct kvm_vcpu *vcpu)
+>   {
+
 
