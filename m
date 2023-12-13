@@ -1,438 +1,233 @@
-Return-Path: <kvm+bounces-4314-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4315-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88FFF810E4A
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 11:22:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74C4A810E94
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 11:38:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 402E8281C0E
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 10:22:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0441B1F211F7
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 10:38:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F069422EEE;
-	Wed, 13 Dec 2023 10:22:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B013E22EF3;
+	Wed, 13 Dec 2023 10:37:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cieKq56x"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YI6lNq57"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46E64E8
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 02:22:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702462942;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fKZ/Lgffh6YItnjPVn4vBB8RPVFHrOo+shUDIGrxj94=;
-	b=cieKq56xiuDa0BJbwafnxTw49dnaxMprmRZJaQa3Xb26fJbqfMwSCpDBc+Uj0zhFIt66OU
-	F94PtY2wFT6gr0DcjF5yhaclY8iqIixPgDBAbdl6+yAcYqlofcJMitmI4VSrgzYJEsDNqM
-	WxRVwvkE1sc9hjx4RcSZ1AXFoiWiBGc=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-687-EnG9pIzYOJKY7DBr1tzOOQ-1; Wed, 13 Dec 2023 05:22:21 -0500
-X-MC-Unique: EnG9pIzYOJKY7DBr1tzOOQ-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a1f9ab28654so149658666b.0
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 02:22:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702462939; x=1703067739;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fKZ/Lgffh6YItnjPVn4vBB8RPVFHrOo+shUDIGrxj94=;
-        b=AAtay8STtplVzhqOPus9//YCGm2LqE8oSaOlkhxL1ZbHcbScWf4qvE7vacVB3xLMxt
-         ipIIrYEjl4mWZt1Gu2sBpIEybZeke1Co2EK47YbWH0JMV+7lOxKLDAeLQ1rViKfDxzd7
-         AofvoN1FcFXpShA5I7RBTgTr34JRKBxEqwNFP8mLuym+KA3fT3CKXVdcGwXa0U8xw35m
-         wqchzmUx5P9DsGgs7Uy5vWwXwIc0yzdjs7KRHANAY96tPyzMz4RGN+dDsVpw07uLz5ov
-         ORdmPURyFEJobfpGqDAWQaLeJ/JNtNspjDE6KZrzCfdTDGQLHOR77wj6CyXebIA2GzYu
-         QvsQ==
-X-Gm-Message-State: AOJu0YzDCauLTdsq1VKCPkkWoCsg/9u84iWYWM8w7DCio3qBwoUyvnJM
-	H8c/oKVuMmQQVnusfkNVZ2GpfoIfu2Tet/SRh56AAngHQgnz8vJjIa+AMnoo0l07t2jfZ4njKkG
-	Pj/k0GPP60dIWH2Z1IZ8LLc+n8J6I
-X-Received: by 2002:a17:906:225a:b0:a1d:14a6:2f6e with SMTP id 26-20020a170906225a00b00a1d14a62f6emr2930358ejr.56.1702462939394;
-        Wed, 13 Dec 2023 02:22:19 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG+jZ3nrLP+Wa+070vj84Vz+sqk6KDzCdmeuCiXsoUH30QJib9E+95nujJxOKEw6sQZT25ubnuLQgdExHfby+c=
-X-Received: by 2002:a17:906:225a:b0:a1d:14a6:2f6e with SMTP id
- 26-20020a170906225a00b00a1d14a62f6emr2930335ejr.56.1702462938844; Wed, 13 Dec
- 2023 02:22:18 -0800 (PST)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A82AAC;
+	Wed, 13 Dec 2023 02:37:55 -0800 (PST)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BDAO2Mi003351;
+	Wed, 13 Dec 2023 10:37:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ content-transfer-encoding : in-reply-to; s=pp1;
+ bh=afXyD57CHd9fg95bfg8aUY7o4KARJbvf2+R1FiHzP4k=;
+ b=YI6lNq570hKrQW3jYYE6BV3oxoxC6MsRQ0hBVGWzlX8sroBvzrSgu1qMUahoYr+TSrN1
+ SFcwmZ/Pcy6pbitQSXw+/ZCAlZ2omCpX3xra1qHMn9C7jDLLZmIoJlJ3aNPVnyZsdB4Q
+ GFps1oZmOVAC2uPic4buoKXhoWSw7SvyJiBxFQ4iFnMdXrvjgjMd8RbPE0JZAMzZyYcE
+ Ic6nOoJ7G/sWj2sCJbVskEEiHgtsCtyn8X1jQ4eCpWAG9y7T7FW70vsYSzzHbOlpvRbr
+ MYUjro3dvwJkEctTOdtgeOKYkQU8qBJe8H5QTgcay8Qv0DVE6KsdsknIZPRQnziSxcQ3 dw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uyanc8nkn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 10:37:30 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BDAEpJG010128;
+	Wed, 13 Dec 2023 10:37:30 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uyanc8nk1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 10:37:30 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BD8vQEa028244;
+	Wed, 13 Dec 2023 10:37:28 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uw2xyr6vp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 10:37:28 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BDAbPYO45351502
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 13 Dec 2023 10:37:26 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5DB662004B;
+	Wed, 13 Dec 2023 10:37:25 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3197D20043;
+	Wed, 13 Dec 2023 10:37:25 +0000 (GMT)
+Received: from DESKTOP-2CCOB1S. (unknown [9.171.137.148])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 13 Dec 2023 10:37:25 +0000 (GMT)
+Date: Wed, 13 Dec 2023 11:37:23 +0100
+From: Tobias Huschle <huschle@linux.ibm.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Abel Wu <wuyun.abel@bytedance.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
+ sched/fair: Add lag based placement)
+Message-ID: <ZXmJYxLfLGBtuQ3L@DESKTOP-2CCOB1S.>
+References: <07513.123120701265800278@us-mta-474.us.mimecast.lan>
+ <20231207014626-mutt-send-email-mst@kernel.org>
+ <56082.123120804242300177@us-mta-137.us.mimecast.lan>
+ <20231208052150-mutt-send-email-mst@kernel.org>
+ <53044.123120806415900549@us-mta-342.us.mimecast.lan>
+ <20231209053443-mutt-send-email-mst@kernel.org>
+ <CACGkMEuSGT-e-i-8U7hum-N_xEnsEKL+_07Mipf6gMLFFhj2Aw@mail.gmail.com>
+ <20231211115329-mutt-send-email-mst@kernel.org>
+ <CACGkMEudZnF7hUajgt0wtNPCxH8j6A3L1DgJj2ayJWhv9Bh1WA@mail.gmail.com>
+ <20231212111433-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
- <CAO-hwJJhzHtKrUEw0zrjgub3+eapgJG-zsG0HRB=PaPi6BxG+w@mail.gmail.com> <e256c6df-0a66-4f86-ae96-bff17920c2fb@daynix.com>
-In-Reply-To: <e256c6df-0a66-4f86-ae96-bff17920c2fb@daynix.com>
-From: Benjamin Tissoires <benjamin.tissoires@redhat.com>
-Date: Wed, 13 Dec 2023 11:22:06 +0100
-Message-ID: <CAO-hwJKMrWYRNpuprDj9=k87V0yHtLPEJuQ94bpOF3O81=v0kA@mail.gmail.com>
-Subject: Re: Should I add BPF kfuncs for userspace apps? And how?
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Jason Wang <jasowang@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
-	Benjamin Tissoires <bentiss@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, kvm@vger.kernel.org, 
-	LKML <linux-kernel@vger.kernel.org>, virtualization@lists.linux-foundation.org, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231212111433-mutt-send-email-mst@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: NJ7X8x2DPO5i1YAi5viaSFBL9uVdkghe
+X-Proofpoint-GUID: 8ozMYjH15i4wTe6alK14MMBRna_ewWAc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-13_03,2023-12-13_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=999 adultscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0
+ suspectscore=0 impostorscore=0 clxscore=1011 spamscore=0 malwarescore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312130077
 
-On Tue, Dec 12, 2023 at 1:41=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix=
-.com> wrote:
->
-> On 2023/12/12 19:39, Benjamin Tissoires wrote:
-> > Hi,
-> >
-> > On Tue, Dec 12, 2023 at 9:11=E2=80=AFAM Akihiko Odaki <akihiko.odaki@da=
-ynix.com> wrote:
-> >>
-> >> Hi,
->
-> Hi,
->
-> Thanks for reply.
->
-> >>
-> >> It is said eBPF is a safe way to extend kernels and that is very
-> >> attarctive, but we need to use kfuncs to add new usage of eBPF and
-> >> kfuncs are said as unstable as EXPORT_SYMBOL_GPL. So now I'd like to a=
-sk
-> >> some questions:
-> >>
-> >> 1) Which should I choose, BPF kfuncs or ioctl, when adding a new featu=
-re
-> >> for userspace apps?
-> >> 2) How should I use BPF kfuncs from userspace apps if I add them?
-> >>
-> >> Here, a "userspace app" means something not like a system-wide daemon
-> >> like systemd (particularly, I have QEMU in mind). I'll describe the
-> >> context more below:
-> >
-> > I'm probably not the best person in the world to answer your
-> > questions, Alexei and others from the BPF core group are, but given
-> > that you pointed at a thread I was involved in, I feel I can give you
-> > a few pointers.
-> >
-> > But first and foremost, I encourage you to schedule an agenda item in
-> > the BPF office hour[4]. Being able to talk with the core people
-> > directly was tremendously helpful to me to understand their point.
->
-> I prefer emails because I'm not very fluent when speaking in English and
-> may have a difficultly to listen to other people, but I may try it in
-> future.
->
-> >
-> >
-> >>
-> >> ---
-> >>
-> >> I'm working on a new feature that aids virtio-net implementations usin=
-g
-> >> tuntap virtual network device. You can see [1] for details, but
-> >> basically it's to extend BPF_PROG_TYPE_SOCKET_FILTER to report four mo=
-re
-> >> bytes.
-> >>
-> >> However, with long discussions we have confirmed extending
-> >> BPF_PROG_TYPE_SOCKET_FILTER is not going to happen, and adding kfuncs =
-is
-> >> the way forward. So I decided how to add kfuncs to the kernel and how =
-to
-> >> use it. There are rich documentations for the kernel side, but I found
-> >> little about the userspace. The best I could find is a systemd change
-> >> proposal that is based on WIP kernel changes[2].
-> >
-> > Yes, as Alexei already replied, BPF is not adding new stable APIs,
-> > only kfuncs. The reason being that once it's marked as stable, you
-> > can't really remove it, even if you think it's badly designed and
-> > useless.
-> >
-> > Kfuncs, OTOH are "unstable" by default meaning that the constraints
-> > around it are more relaxed.
-> >
-> > However, "unstable" doesn't mean "unusable". It just means that the
-> > kernel might or might not have the function when you load your program
-> > in userspace. So you have to take that fact into account from day one,
-> > both from the kernel side and the userspace side. The kernel docs have
-> > a nice paragraph explaining that situation and makes the distinction
-> > between relatively unused kfuncs, and well known established ones.
-> >
-> > Regarding the systemd discussion you are mentioning ([2]), this is
-> > something that I have on my plate for a long time. I think I even
-> > mentioned it to Alexei at Kernel Recipes this year, and he frowned his
-> > eyebrows when I mentioned it. And looking at the systemd code and the
-> > benefits over a plain ioctl, it is clearer that in that case, a plain
-> > ioctl is better, mostly because we already know the API and the
-> > semantic.
-> >
-> > A kfunc would be interesting in cases where you are not sure about the
-> > overall design, and so you can give a shot at various API solutions
-> > without having to keep your bad v1 design forever.
-> >
-> >>
-> >> So now I'm wondering how I should use BPF kfuncs from userspace apps i=
-f
-> >> I add them. In the systemd discussion, it is told that Linus said it's
-> >> fine to use BPF kfuncs in a private infrastructure big companies own, =
-or
-> >> in systemd as those users know well about the system[3]. Indeed, those
-> >> users should be able to make more assumptions on the kernel than
-> >> "normal" userspace applications can.
-> >>
-> >> Returning to my proposal, I'm proposing a new feature to be used by QE=
-MU
-> >> or other VMM applications. QEMU is more like a normal userspace
-> >> application, and usually does not make much assumptions on the kernel =
-it
-> >> runs on. For example, it's generally safe to run a Debian container
-> >> including QEMU installed with apt on Fedora. BPF kfuncs may work even =
-in
-> >> such a situation thanks to CO-RE, but it sounds like *accidentally*
-> >> creating UAPIs.
-> >>
-> >> Considering all above, how can I integrate BPF kfuncs to the applicati=
-on?
-> >
-> > FWIW, I'm not sure you can rely on BPF calls from a container. There
-> > is a high chance the syscall gets disabled by the runtime.
->
-> Right. Container runtimes will not pass CAP_BPF by default, but that
-> restriction can be lifted and I think that's a valid scenario.
->
-> >
-> >>
-> >> If BPF kfuncs are like EXPORT_SYMBOL_GPL, the natural way to handle th=
-em
-> >> is to think of BPF programs as some sort of kernel modules and
-> >> incorporate logic that behaves like modprobe. More concretely, I can p=
-ut
-> >> eBPF binaries to a directory like:
-> >> /usr/local/share/qemu/ebpf/$KERNEL_RELEASE
-> >
-> > I would advise against that (one program per kernel release). Simply
-> > because your kfunc may or may not have been backported to kernel
-> > release v6.X.Y+1 while it was not there when v6.X.Y was out. So
-> > relying on the kernel number is just going to be a headache.
-> >
-> > As I understand it, the way forward is to rely on the kernel, libbpf
-> > and CO-RE: if the function is not available, the program will simply
-> > not load, and you'll know that this version of the code is not
-> > available (or has changed API).
-> >
-> > So what I would do if some kfunc API is becoming deprecated, is
-> > embedding both code paths in the same BPF unit, but marking them as
-> > not loaded by libppf. Then I can load the compilation unit, try v2 of
-> > the API, and if it's not available, try v1, and if not, then mention
-> > that I can not rely on BPF. Of course, this can also be done with
-> > separate compilation units.
->
-> Doesn't it mean that the kernel is free to break old versions of QEMU
-> including BPF programs? That's something I'd like to avoid.
+On Tue, Dec 12, 2023 at 11:15:01AM -0500, Michael S. Tsirkin wrote:
+> On Tue, Dec 12, 2023 at 11:00:12AM +0800, Jason Wang wrote:
+> > On Tue, Dec 12, 2023 at 12:54 AM Michael S. Tsirkin <mst@redhat.com> wrote:
 
-Couple of points here:
-- when you say "the kernel", it feels like you are talking about an
-external actor tampering with your code. But if you submit a kernel
-patch with a specific use case and get yourself involved in the
-community, why would anybody change your kfunc API without you knowing
-it?
-- the whole warning about "unstable" policy means that the user space
-component should not take for granted the capability. So if the kfunc
-changes/disappears for good reasons (because it was marked as well
-used and deprecated for quite some time), qemu should not *break*, it
-should not provide the functionality, or have a secondary plan.
+We played around with the suggestions and some other ideas.
+I would like to share some initial results.
 
-But even if you are encountering such issues, in case of a change in
-the ABI of your kfunc, it should be easy enough to backport the bpf
-changes to your old QEMUs and ask users to upgrade the user space if
-they upgrade their kernel.
+We tried the following:
 
-AFAIU, it is as unstable as you want it to be. It's just that we are
-not in the "we don't break user space" contract, because we are
-talking about adding a kernel functionality from userspace, which
-requires knowing the kernel intrinsics.
+1. Call uncondtional schedule in the vhost_worker function
+2. Change the HZ value from 100 to 1000
+3. Reverting 05bfb338fa8d vhost: Fix livepatch timeouts in vhost_worker()
+4. Adding a cond_resched to translate_desc
+5. Reducing VHOST_NET_WEIGHT to 25% of its original value
 
->
-> >
-> >>
-> >> Then, QEMU can uname() and get the path to the binary. It will give an
-> >> error if it can't find the binary for the current kernel so that it
-> >> won't create accidental UAPIs.
-> >>
-> >> The obvious downside of this is that it complicates packaging a lot; i=
-t
-> >> requires packaging QEMU eBPF binaries each time a new kernel comes up.
-> >> This complexity is centrally managed by modprobe for kernel modules, b=
-ut
-> >> apparently each application needs to take care of it for BPF programs.
-> >
-> > For my primary use case: HID-BPF, I put kfuncs in kernel v6.3 and
-> > given that I haven't touch this part of the API, the same compilation
-> > unit compiled in the v6.3 era still works on a v6.7-rcx, so no, IMO
-> > it's not complex and doesn't require to follow the kernel releases
-> > (which is the whole point of HID-BPF FWIW).
->
-> I also expect BPF kfuncs will work well for long if I introduce its
-> usage to QEMU in practice. That said, the interface stability is about
-> when something unexpected happens. What if the interface QEMU relies on
-> is deemed sub-optimal? Without following kernel releases, QEMU may
-> accidentally lose the feature relying on eBPF.
+Please find the diffs below.
 
-In the same way, anybody can tamper with your ioctl or syscall without
-QEMU knowing it.
-And what you need to follow is not the kernel *releases*, but the
-changes in the kfuncs you are interested in.
+Summary:
 
->
-> >
-> >>
-> >> In conclusion, I see too much complexity to use BPF in a userspace
-> >> application, which we didn't have to care for
-> >> BPF_PROG_TYPE_SOCKET_FILTER. Isn't there a better way? Or shouldn't I
-> >> use BPF in my case in the first place?
-> >
-> > Given that I'm not a network person, I'm not sure about your use case,
-> > but I would make my decision based on:
-> > - do I know exactly what I want to achieve and I'm confident that I'll
-> > write the proper kernel API from day one? (if not then kfuncs is
-> > appealing because  it's less workload in the long run, but userspace
-> > needs to be slightly smarter)
->
-> Personally I'm confident that the initial UAPI design will not do a bad
-> thing at least. However, there is a high chance that the design needs to
-> be extended to accommodate new features.
+Option 1 is very very hacky but resolved the regression.
+Option 2 reduces the regression by ~20%.
+Options 3-5 do not help unfortunately.
 
-Not trying to offend you or anything, but designs can change for
-multiple reasons. Floppy disks were a good design at the time, and it
-took decades to remove support for it in the kernel. In the same way,
-removing an architecture from the kernel is hard, because even if you
-can not run a new kernel on those architectures, "we do not break
-userspace".
+Potential explanation:
 
-The whole BPF approach is to say that users of BPF are not plain
-random users, and they have to know a little bit of the kernel, and
-they know that once the kfunc is here, it doesn't mean it'll stay here
-forever.
+While the vhost is executing, the need_resched flag is not set (observable
+in the traces). Therefore cond_resched and alike will do nothing. vhost
+will continue executing until the need_resched flag is set by an external
+party, e.g. by a request to migrate the vhost.
 
->
-> > - are all of my use cases covered by using BPF? (what happens if I run
-> > QEMU in a container?) -> BPF might or might not be a solution
->
-> Yes. Containers can be used to 1) have a different userspace or 2)
-> isolate things for security.
->
-> Regarding 2), QEMU and libvirt has sandbox mechanisms so we can rely on
-> them instead of containers so we can just pass capabilities to the
-> container. At least, we can always have a setuid helper outside
-> container, and pass around file descriptors it generates.
->
-> So 1) is the only problem that matters.
->
-> >
-> > But the nice thing about using BPF kfuncs is that it allows you to
-> > have a testing (not-)UAPI kernel interface. You can then implement the
-> > userspace changes and see how it behaves. And then, once you got the
-> > right design, you can decide to promote it to a proper syscall or
-> > ioctl if you want.
->
-> I expect it's possible to have testing ioctls. Quickly searching online,
-> there are experimental ioctls[1][2]. I also know DRM has a relaxed
-> policy for closed-source userspace[3].
+Calling schedule unconditionally forces the scheduler to re-evaluate all 
+tasks and their vruntime/deadline/vlag values. The scheduler comes to the
+correct conclusion, that the kworker should be executed and from there it
+is smooth sailing. I will have to verify that sequence by collecting more
+traces, but this seems rather plausible.
+This hack might of course introduce all kinds of side effects but might
+provide an indicator that this is the actual problem.
+The big question would be how to solve this conceptually, and, first
+things first, whether you think this is a viable hypothesis.
 
-Sure, but handling a change in the API in those cases is tough in the
-kernel. You probably need to bump versions, return different values
-depending on how many parameters you are given, and you are never sure
-the caller is using the right parameters. BPF simplifies this by
-actually checking the types of the caller, and if there is a
-discrepancy, it'll notify userspace that it is doing something bad.
+Increasing the HZ value helps most likely because the other CPUs take 
+scheduling/load balancing decisions more often as well and therefore
+trigger the migration faster.
 
->
-> So I'm seeing the distinction of UAPI/kfunc even less definitive; UAPIs
-> can also be broken if the subsystem maintainers agree and there is no
-> real user. I also think it's natural to say a kfunc will be stable as
-> long as there is a user, but it contradicts with the current situation.
+Bringing down VHOST_NET_WEIGHT even more might also help to shorten the
+vhost loop. But I have no intuition how low we can/should go here.
 
-Please read more carefully the kernel docs [4] (just quoting here the
-beginning):
 
-"""
-Like any other change to the kernel, maintainers will not change or
-remove a kfunc without having a reasonable justification. Whether or
-not they'll choose to change a kfunc will ultimately depend on a
-variety of factors, such as how widely used the kfunc is, how long the
-kfunc has been in the kernel, whether an alternative kfunc exists,
-what the norm is in terms of stability for the subsystem in question,
-and of course what the technical cost is of continuing to support the
-kfunc.
-"""
+We also changed vq_err to print error messages, but did not encounter any.
 
-> kfunc is expressed as EXPORT_SYMBOL_GPL in the documentation, and Linus
-> expects kfunc is for users like big companies or systemd, which closely
-> follow the kernel, according to the systemd discussion I cited in the
-> last email.
+Diffs:
+--------------------------------------------------------------------------
 
-Please re-read the doc[4], it's not a 1-to-1 matching to EXPORT_SYMBOL_GPL.
-And being the one who reported Linus' words in that systemd thread,
-Linus was not concerned about "potential situations that may or may
-not happen", because he expected the people who use kfunc to do the
-right thing. Because they are not average programmers. And QEMU
-developers would definitely fit in that category IMO.
+1. Call uncondtional schedule in the vhost_worker function
 
-And the whole "you can consider kfunc similar to EXPORT_SYMBOL_GPL" is
-just a warning for user space that the kfunc will never be kept only
-for stability reasons. So when you want to use a kfunc, you need to be
-aware of it and not segfault if it's not there (which can not happen
-TBH unless you don't check that your program was correctly loaded).
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index e0c181ad17e3..16d73fd28831 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -414,6 +414,7 @@ static bool vhost_worker(void *data)
+                }
+        }
+ 
++       schedule();
+        return !!node;
+ }
 
->
-> According to the discussion above, it may be better off abandoning BPF
-> and implementing all in kernel, with ioctl as I have a (hopefully) sound
-> idea of UAPI design. But I'll also continue considering the BPF option;
-> BPF is still attractive due to its extensibility and safety.
+--------------------------------------------------------------------------
 
-We can not tell you to choose one solution over the other. The choice
-is yours. I personally find BPF more appealing because it allows the
-user space application to define its own kernel API for its own needs
-while relying on just a few defined kfuncs.
+2. Change the HZ value from 100 to 1000
 
-But again, sometimes it doesn't work, like the systemd thread you
-linked, it's too big overhead for little gain compared to an ioctl in
-that particular case.
+--> config change 
 
-IMO the biggest issue for you is not the stability of the API, but the
-container capabilities. Because allowing CAP_BPF allows for a whole
-lot of nasty things to happen :)
+--------------------------------------------------------------------------
 
-Cheers,
-Benjamin
+3. Reverting 05bfb338fa8d vhost: Fix livepatch timeouts in vhost_worker()
 
->
-> Regards,
-> Akihiko Odaki
->
-> [1]
-> https://www.kernel.org/doc/html/v6.6/userspace-api/media/v4l/hist-v4l2.ht=
-ml?highlight=3Dexperimental#experimental-api-elements
-> [2]
-> https://www.kernel.org/doc/html/v6.6/userspace-api/media/dvb/dmx-expbuf.h=
-tml?highlight=3Dexperimental
-> [3]
-> https://www.kernel.org/doc/html/v6.6/gpu/drm-uapi.html#open-source-usersp=
-ace-requirements
->
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index e0c181ad17e3..d519d598ebb9 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -410,7 +410,8 @@ static bool vhost_worker(void *data)
+                        kcov_remote_start_common(worker->kcov_handle);
+                        work->fn(work);
+                        kcov_remote_stop();
+-                       cond_resched();
++                       if (need_resched())
++                               schedule();
+                }
+        }
 
-[4] https://www.kernel.org/doc/html/latest/bpf/kfuncs.html?highlight=3Dbpf#=
-kfunc-lifecycle-expectations
+--------------------------------------------------------------------------
 
+4. Adding a cond_resched to translate_desc
+
+I just picked some location.
+
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index e0c181ad17e3..f885dd29cbd1 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -2367,6 +2367,7 @@ static int translate_desc(struct vhost_virtqueue *vq, u64 addr, u32 len,
+                s += size;
+                addr += size;
+                ++ret;
++               cond_resched();
+        }
+ 
+        if (ret == -EAGAIN)
+
+--------------------------------------------------------------------------
+
+5. Reducing VHOST_NET_WEIGHT to 25% of its original value
+
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index f2ed7167c848..2c6966ea6229 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -42,7 +42,7 @@ MODULE_PARM_DESC(experimental_zcopytx, "Enable Zero Copy TX;"
+ 
+ /* Max number of bytes transferred before requeueing the job.
+  * Using this limit prevents one virtqueue from starving others. */
+-#define VHOST_NET_WEIGHT 0x80000
++#define VHOST_NET_WEIGHT 0x20000
+ 
+ /* Max number of packets transferred before requeueing the job.
+  * Using this limit prevents one virtqueue from starving others with small
 
