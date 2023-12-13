@@ -1,184 +1,114 @@
-Return-Path: <kvm+bounces-4381-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4382-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0B29811BAB
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 18:57:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33708811C15
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 19:15:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 093C91F21958
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 17:57:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC8801C21152
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 18:15:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139A159E24;
-	Wed, 13 Dec 2023 17:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BCFA59553;
+	Wed, 13 Dec 2023 18:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WOrjME1a"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g+yrA8Mf"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56530E8
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 09:56:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702490176;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vEKtCaZo1O9cfSPgdOwxIJB9fsJXHh/ahknjK4hJAXk=;
-	b=WOrjME1ayHvfkTKPO5SHY7aEkcyuNMQfEGxY1jCgvKuIpbxZxpnTdAHOa+Ky51ErH03xlO
-	oszzJXHfG/NSAmnzVTscWLbp6ao43HBPKCXDGwxiWpnw7eTImz1//3Wy0pIaM4j+86qBET
-	wrZiY6dCHeeSbYQo9Hb/131W5KRPStk=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-584-UQUwczWHMNigPaCteVdNFw-1; Wed, 13 Dec 2023 12:56:15 -0500
-X-MC-Unique: UQUwczWHMNigPaCteVdNFw-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a1fa0ed2058so224135766b.2
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 09:56:15 -0800 (PST)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B205BAF
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 10:15:15 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-dbcdf587bd6so211863276.0
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 10:15:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702491315; x=1703096115; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=blvS/vSMP5wGXcIzzo9Bxe4pmP25PsC7/K8dybntrXg=;
+        b=g+yrA8Mfg6goxn3eK0IeQIAef/SB81WKRvOAU9basbrL3SvJfGjR9Hh+PZj1lfg/1a
+         +nEXbap7dAoDFVI3VIL9MBY7/SIFSfdZ2HoBNujd6dNFghHPI9f/+ZsMJZTZ39aslPHp
+         AA+UAxijsA96WJXJ4lFn5DXS+DvAVTs5RsuL8deviqj8Vt1ezltOChUJ8BDO3WzzTlTW
+         UXYik3PIsqVuxgqJYuYqSv1UB5/e8vORnVUZ2bkm5QpIPe2vgqbU2JcGokAVMLvXMD7I
+         C+B+S1xcmfb8DepfK4ehxXgjwn9w2+MfNZjD5kV2POa+432AXdY9MVcyBa71U79sTCD4
+         GKfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702490174; x=1703094974;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vEKtCaZo1O9cfSPgdOwxIJB9fsJXHh/ahknjK4hJAXk=;
-        b=NSRr/XY+WNj9APRfwXBlVeNu5+qEXA2S98+v1mpamRnyai8JjNLkJhLQrLx1SJ+2vr
-         H0LUCKrKLu0rL4UgQtr/Qw7P13rphjCPYDBhirVYx2VYjD4uJUYXRSmBcglTb2bokYL0
-         +pDQHAvWFRq9kmumNRnXWfvt0oEVWXvBYXyb2SjuzSBgBo2z5p0DajBGUTL+knNYiTgJ
-         BhJ5GSGye0l6l2TUKZgai2lxwJI/2wH7o1sDGrMfaJFB2QoKJkp8caFsGP+/SbgX65QJ
-         /lG5M4hQ5muehdi7jN+nsRX0SyS8zwygzxq1bPmbzLz8LgCopsAVUo73PkjRDy0jJJX/
-         kdAQ==
-X-Gm-Message-State: AOJu0YwNXWqwe77FBvsBpzP52joxUPNAgV4XPL8wpug1UCREpSzZYZ6d
-	yXhAuNqlVMcbioiXYgEzlIJcqqJM0iKi5BV1TQu+XjldxSwV/AKy3IzKMVKLStZIP4Kec6oyfbv
-	wcaf/TTpFBEC4
-X-Received: by 2002:a17:906:51c9:b0:a23:94b:eb76 with SMTP id v9-20020a17090651c900b00a23094beb76mr66460ejk.110.1702490174197;
-        Wed, 13 Dec 2023 09:56:14 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGc9RJlOVWyo0HyAiFTcOk5Wfn8VDPbQGBmpAhf72fm6DauJ3ApY2N3w9RPj1ICyK7MuA8IVA==
-X-Received: by 2002:a17:906:51c9:b0:a23:94b:eb76 with SMTP id v9-20020a17090651c900b00a23094beb76mr66447ejk.110.1702490173843;
-        Wed, 13 Dec 2023 09:56:13 -0800 (PST)
-Received: from redhat.com ([109.253.189.71])
-        by smtp.gmail.com with ESMTPSA id uv6-20020a170907cf4600b00a1e443bc037sm8258684ejc.147.2023.12.13.09.56.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 09:56:12 -0800 (PST)
-Date: Wed, 13 Dec 2023 12:56:08 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
-	oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v8 0/4] send credit update during setting
- SO_RCVLOWAT
-Message-ID: <20231213125404-mutt-send-email-mst@kernel.org>
-References: <20231211211658.2904268-1-avkrasnov@salutedevices.com>
- <20231212105423-mutt-send-email-mst@kernel.org>
- <d27f22f0-0f1e-e1bb-5b13-a524dc6e94d7@salutedevices.com>
- <20231212111131-mutt-send-email-mst@kernel.org>
- <7b362aef-6774-0e08-81e9-0a6f7f616290@salutedevices.com>
- <ucmekzurgt3zcaezzdkk6277ukjmwaoy6kdq6tzivbtqd4d32b@izqbcsixgngk>
- <402ea723-d154-45c9-1efe-b0022d9ea95a@salutedevices.com>
- <20231213100518-mutt-send-email-mst@kernel.org>
- <20231213100957-mutt-send-email-mst@kernel.org>
- <8e6b06a5-eeb3-84c8-c6df-a8b81b596295@salutedevices.com>
+        d=1e100.net; s=20230601; t=1702491315; x=1703096115;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=blvS/vSMP5wGXcIzzo9Bxe4pmP25PsC7/K8dybntrXg=;
+        b=AYHTLzC0wEz8TKTnhSXzHr1EoFObcvrs8U1UlzdS2zKk3LUXl8Z3YkZ6gFgRYVN8aO
+         t9GbfycuLa8gGDbEiIcekqxfNoyfD7jJsbQI4otJej0U4PzPJK8ymCJq3w93Lrwuwuwy
+         b0jKTU4PkcSvdT2maRvajn9f/C+Li0H4zgBuGfJIbZvNCQYNYNfymnPMGzIsxhd3RcIn
+         EkC5Ik6Pg7D6AvOoi5NwoStIj044O9t7Mkt7AdcFT46NiNw/XbC+Ze29zzPc3XXktJPm
+         j3DbBv6etQ7pUm9ZcvcITEogEQcx7GJfPLfEllj/0ZCxc+wj+DYC3k0njEOl+Y2LX4Ah
+         tIaQ==
+X-Gm-Message-State: AOJu0YxGNNxguMvc3Jsa/kHuvgM4cfN/A216+zyt7HsopT+eyeOJi5xj
+	wSKCiks/26TC6u7oGhGQKN7b3S8lvNg=
+X-Google-Smtp-Source: AGHT+IGFZeUrJrNyb9PFJw/6+D7tjY6iEaOBrvsPZLWtjmp8gFpRySGHdxgk85AyIfxdxLa5ETqGrWwR6y4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:1e46:0:b0:db5:4a39:feb8 with SMTP id
+ e67-20020a251e46000000b00db54a39feb8mr64580ybe.8.1702491314920; Wed, 13 Dec
+ 2023 10:15:14 -0800 (PST)
+Date: Wed, 13 Dec 2023 10:15:13 -0800
+In-Reply-To: <84ad3082-794b-443f-874a-d304934a395b@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8e6b06a5-eeb3-84c8-c6df-a8b81b596295@salutedevices.com>
+Mime-Version: 1.0
+References: <20231208184628.2297994-1-pbonzini@redhat.com> <ZXPRGzgWFqFdI_ep@google.com>
+ <184e253d-06c4-419e-b2b4-7cce1f875ba5@redhat.com> <ZXnoCadq2J3cPz2r@google.com>
+ <84ad3082-794b-443f-874a-d304934a395b@redhat.com>
+Message-ID: <ZXn0sR6IyzLzVHW-@google.com>
+Subject: Re: [PATCH] KVM: selftests: fix supported_flags for aarch64
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Shaoqin Huang <shahuang@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Dec 13, 2023 at 08:11:57PM +0300, Arseniy Krasnov wrote:
-> 
-> 
-> On 13.12.2023 18:13, Michael S. Tsirkin wrote:
-> > On Wed, Dec 13, 2023 at 10:05:44AM -0500, Michael S. Tsirkin wrote:
-> >> On Wed, Dec 13, 2023 at 12:08:27PM +0300, Arseniy Krasnov wrote:
-> >>>
-> >>>
-> >>> On 13.12.2023 11:43, Stefano Garzarella wrote:
-> >>>> On Tue, Dec 12, 2023 at 08:43:07PM +0300, Arseniy Krasnov wrote:
-> >>>>>
-> >>>>>
-> >>>>> On 12.12.2023 19:12, Michael S. Tsirkin wrote:
-> >>>>>> On Tue, Dec 12, 2023 at 06:59:03PM +0300, Arseniy Krasnov wrote:
-> >>>>>>>
-> >>>>>>>
-> >>>>>>> On 12.12.2023 18:54, Michael S. Tsirkin wrote:
-> >>>>>>>> On Tue, Dec 12, 2023 at 12:16:54AM +0300, Arseniy Krasnov wrote:
-> >>>>>>>>> Hello,
-> >>>>>>>>>
-> >>>>>>>>>                                DESCRIPTION
-> >>>>>>>>>
-> >>>>>>>>> This patchset fixes old problem with hungup of both rx/tx sides and adds
-> >>>>>>>>> test for it. This happens due to non-default SO_RCVLOWAT value and
-> >>>>>>>>> deferred credit update in virtio/vsock. Link to previous old patchset:
-> >>>>>>>>> https://lore.kernel.org/netdev/39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru/
-> >>>>>>>>
-> >>>>>>>>
-> >>>>>>>> Patchset:
-> >>>>>>>>
-> >>>>>>>> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> >>>>>>>
-> >>>>>>> Thanks!
-> >>>>>>>
-> >>>>>>>>
-> >>>>>>>>
-> >>>>>>>> But I worry whether we actually need 3/8 in net not in net-next.
-> >>>>>>>
-> >>>>>>> Because of "Fixes" tag ? I think this problem is not critical and reproducible
-> >>>>>>> only in special cases, but i'm not familiar with netdev process so good, so I don't
-> >>>>>>> have strong opinion. I guess @Stefano knows better.
-> >>>>>>>
-> >>>>>>> Thanks, Arseniy
-> >>>>>>
-> >>>>>> Fixes means "if you have that other commit then you need this commit
-> >>>>>> too". I think as a minimum you need to rearrange patches to make the
-> >>>>>> fix go in first. We don't want a regression followed by a fix.
-> >>>>>
-> >>>>> I see, ok, @Stefano WDYT? I think rearrange doesn't break anything, because this
-> >>>>> patch fixes problem that is not related with the new patches from this patchset.
-> >>>>
-> >>>> I agree, patch 3 is for sure net material (I'm fine with both rearrangement or send it separately), but IMHO also patch 2 could be.
-> >>>> I think with the same fixes tag, since before commit b89d882dc9fc ("vsock/virtio: reduce credit update messages") we sent a credit update
-> >>>> for every bytes we read, so we should not have this problem, right?
-> >>>
-> >>> Agree for 2, so I think I can rearrange: two fixes go first, then current 0001, and then tests. And send it as V9 for 'net' only ?
-> >>>
-> >>> Thanks, Arseniy
-> >>
-> >>
-> >> hmm why not net-next?
+On Wed, Dec 13, 2023, Paolo Bonzini wrote:
+> On 12/13/23 18:21, Sean Christopherson wrote:
+> > On Tue, Dec 12, 2023, Paolo Bonzini wrote:
+> > > On 12/9/23 03:29, Sean Christopherson wrote:
+> > > > On Fri, Dec 08, 2023, Paolo Bonzini wrote:
+> > > > > KVM/Arm supports readonly memslots; fix the calculation of
+> > > > > supported_flags in set_memory_region_test.c, otherwise the
+> > > > > test fails.
+> > > > 
+> > > > You got beat by a few hours, and by a better solution ;-)
+> > > > 
+> > > > https://lore.kernel.org/all/20231208033505.2930064-1-shahuang@redhat.com
+> > > 
+> > > Better but also wrong---and my patch has the debatable merit of more
+> > > clearly exposing the wrongness.  Testing individual architectures is bad,
+> > > but testing __KVM_HAVE_READONLY_MEM makes the test fail when running a new
+> > > test on an old kernel.
 > > 
-> > Oh I missed your previous discussion. I think everything in net-next is
-> > safer.  Having said that, I won't nack it net, either.
-> 
-> So, summarizing all above:
-> 1) This patchset entirely goes to net-next as v9
-> 2) I reorder patches like 3 - 2 - 1 - 4, e.g. two fixes goes first with Fixes tag
-> 3) Add Acked-by: Michael S. Tsirkin <mst@redhat.com> to each patch
-> 
-> @Michael, @Stefano ?
-> 
-> Thanks, Arseniy
-
-Fine by me.
-
+> > But we already crossed that bridge and burned it for good measure by switching
+> > to KVM_SET_USER_MEMORY_REGION2, i.e. as of commit
 > > 
-> >>>>
-> >>>> So, maybe all the series could be "net".
-> >>>>
-> >>>> Thanks,
-> >>>> Stefano
-> >>>>
+> >    8d99e347c097 ("KVM: selftests: Convert lib's mem regions to KVM_SET_USER_MEMORY_REGION2")
 > > 
+> > selftests built against a new kernel can't run on an old kernel.  Building KVM
+> > selftests requires kernel headers, so while not having a hard requirement that
+> > the uapi headers are fresh would be nice, I don't think it buys all that much.
+> > 
+> > If we wanted to assert that x86, arm64, etc. enumerate __KVM_HAVE_READONLY_MEM,
+> > i.e. ensure that read-only memory is supported as expected, then that can be done
+> > as a completely unrelated test.
+> 
+> selftests have the luxury of having sync-ed kernel headers, but in general
+> userspace won't, and that means __KVM_HAVE_READONLY_MEM would be a very poor
+> userspace API.  Fortunately it has "__" so it is not userspace API at all,
+> and I don't want selftests to treat it as one.
 
+Wait, what?  How does double underscores exempt it from being uAPI?  AIUI, the C
+standard effectively ensures that userspace won't define/declare symbols with
+double underscores, i.e. ensures there won't be conflicts.  But pretty much all
+of the kernel-defined types are prefixed with "__", e.g. __u8 and friends, so I
+don't see how prefixing with "__" exempts something from becoming uAPI.
+
+I completely agree that __KVM_HAVE_READONLY_MEM shouldn't be uAPI, but then it
+really, really shouldn't be defined in arch/x86/include/uapi/asm/kvm.h.
 
