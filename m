@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-4377-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4378-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 320D5811B5E
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 18:39:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06604811B61
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 18:41:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDF931C20BF8
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 17:39:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 626D21C21151
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 17:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BBE257893;
-	Wed, 13 Dec 2023 17:39:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4451D56B7A;
+	Wed, 13 Dec 2023 17:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TqDpgPEm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JNSWUsBX"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DBEF99
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 09:39:39 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0707E8
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 09:40:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702489178;
+	s=mimecast20190719; t=1702489255;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=wMIRpMzvlSiW4Uq3ildO6AijIYP6wLHY65QDVFZkhBA=;
-	b=TqDpgPEmhuc0amw6sptNjHGCFgTtaFRAnOlcZFc92X6oRrOQja+8uRyhY75EQb3CWzb1ry
-	Tp3vLC/JPSHsNlXp8itmLNON4PaBPitvNuoV6aJU+9S++1TrR4T1kIcOOdpGwBD/t62Zng
-	LU28Dg1sat7YK5HmAZzPMJEXrYALALE=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=5somQ2S3bpJ+yVpaee1GysURi5+Ex675PUxdDG+ZeIQ=;
+	b=JNSWUsBXdQIpSi0V5imIq7WZauAFT2heCi3+WaF3FLnKJslVVbLPyqVILDQfw1h4IKV6Fq
+	g9YP4Q4qr/TVOQ42f62EDS/tE/+ddtwZOLR+ZcVIWPxh11tXJXhbl69eLFD4y+wvqSKGb9
+	hIjd9ypMPm4kdL3YR2ltkMczjtx6rcQ=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-70-VpeCafkAPK6X-SIjZREAHg-1; Wed, 13 Dec 2023 12:39:37 -0500
-X-MC-Unique: VpeCafkAPK6X-SIjZREAHg-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-54caf6220c2so4378660a12.1
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 09:39:36 -0800 (PST)
+ us-mta-578-C9p8rlaHMzuacLtbUI1Atw-1; Wed, 13 Dec 2023 12:40:53 -0500
+X-MC-Unique: C9p8rlaHMzuacLtbUI1Atw-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-54cb8899c20so3350405a12.3
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 09:40:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702489176; x=1703093976;
+        d=1e100.net; s=20230601; t=1702489252; x=1703094052;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wMIRpMzvlSiW4Uq3ildO6AijIYP6wLHY65QDVFZkhBA=;
-        b=LxEZWP+T2Y2YcJEheeq7CUkOjM0ffFXePlIZt/wPZxdlGQipiEk+/4vwgyQRT+l/mV
-         HtmTxr/4WzM08yqIGLbF2ubzooKm+0clmilRu5TMFlzCf1F9RrTYXN3rMEyhWoF+kYJf
-         BOB/MIne+q4VAFGS6z1ZCyoTGKYyeyfuPo511WsDHhhHmaiXMHJ+luF7XawuQSAs9Cqj
-         Y42ec2Z9uN3noU6NeN6E//tEaoSsxnjFR9N5zxA/UXeq3IVuQwfR92MWJDahI+iKTY0M
-         zYyT9oHXHf+Qdn9Ag31SlMGRQeLPjxNfPCjgPKbIfRCHc2cXxNY/Dl1I+Obcb84EaXL/
-         +aqQ==
-X-Gm-Message-State: AOJu0YyiAY/AJrVVSHhpzuALp3XRlfDYPHMYeUXs4K4itCmoxH7ETMFB
-	PD+2IhZ5rkkfsm8aAa7UR6efBCLR0AztmFLPX9323G4ft7qggezrY+XlP8KLL6yY5Ygen6JN7+A
-	kMCbn6/5xqLT6
-X-Received: by 2002:a50:aa81:0:b0:54f:64f4:c2da with SMTP id q1-20020a50aa81000000b0054f64f4c2damr5011983edc.11.1702489175929;
-        Wed, 13 Dec 2023 09:39:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGu6ssPvrQwbmBqBdkria3LO2iu4eH+D3bNohApbXQ+P+kueeoHLhMBh/6iNtBbxAhA1JkmLA==
-X-Received: by 2002:a50:aa81:0:b0:54f:64f4:c2da with SMTP id q1-20020a50aa81000000b0054f64f4c2damr5011977edc.11.1702489175593;
-        Wed, 13 Dec 2023 09:39:35 -0800 (PST)
+        bh=5somQ2S3bpJ+yVpaee1GysURi5+Ex675PUxdDG+ZeIQ=;
+        b=W4yR0glnjMUxjw38QuxKEa+4eM/W/uk+/SXHYumYg1IlEfJv5pXm/oqiFPB5VfBhJf
+         tgUz9CyceZqxjxjYnqjX0dh/06MPGVtqrRZlbIQPMMvN8prr426fSkh67Vl4GIUhUMAe
+         fLziGc68MprpLYN1HvoR/XCxOd1ly9eW2b0xcO0xE7ZwlBcJyCUyHFlO11Yzc0Gcz1Ai
+         ispn6BFT+EaVGAPR2ZsK5mbk6tw3uej5lDhkTOdMOSrnWq+ljEbBVGYEN0WdomOvyzZt
+         kvE1J8TCzdrxvVqckQiUfJbElNjcBt8cu96ZUUuP6bIhfEd0NiPavbJGem78xkEpfwmR
+         I34A==
+X-Gm-Message-State: AOJu0Yw+5u43S7HEDJdfsb65WAGG/VVpqYodV9PGIG2rijB8bAKB/j1w
+	JXxwwx8ZOQ7bDDShRCYQv/Wh/H+Wy74z2QFL6e+XoJehIFcZTOlRdrIsLmSSAv+M/vA3SFLrXp/
+	4+1AO13HpFPpM
+X-Received: by 2002:a50:d089:0:b0:552:27d2:a10d with SMTP id v9-20020a50d089000000b0055227d2a10dmr704218edd.12.1702489252470;
+        Wed, 13 Dec 2023 09:40:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEJkEAJ6CTdBfyQKvtHpMnagmfVq2yCVoMPjKxPagyIMlry/rmA+m2NFU3o+SUgvBr7eRY7SA==
+X-Received: by 2002:a50:d089:0:b0:552:27d2:a10d with SMTP id v9-20020a50d089000000b0055227d2a10dmr704204edd.12.1702489252175;
+        Wed, 13 Dec 2023 09:40:52 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id dc23-20020a056402311700b005525a9abf73sm171094edb.11.2023.12.13.09.39.34
+        by smtp.googlemail.com with ESMTPSA id dc23-20020a056402311700b005525a9abf73sm171094edb.11.2023.12.13.09.40.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Dec 2023 09:39:34 -0800 (PST)
-Message-ID: <84ad3082-794b-443f-874a-d304934a395b@redhat.com>
-Date: Wed, 13 Dec 2023 18:39:33 +0100
+        Wed, 13 Dec 2023 09:40:51 -0800 (PST)
+Message-ID: <13d72960-c7bc-4bc2-8404-931d3de04ecf@redhat.com>
+Date: Wed, 13 Dec 2023 18:40:47 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,15 +68,29 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: selftests: fix supported_flags for aarch64
+Subject: Re: [PATCH v10 03/50] KVM: SEV: Do not intercept accesses to
+ MSR_IA32_XSS for SEV-ES guests
 Content-Language: en-US
 To: Sean Christopherson <seanjc@google.com>
-Cc: Shaoqin Huang <shahuang@redhat.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-References: <20231208184628.2297994-1-pbonzini@redhat.com>
- <ZXPRGzgWFqFdI_ep@google.com>
- <184e253d-06c4-419e-b2b4-7cce1f875ba5@redhat.com>
- <ZXnoCadq2J3cPz2r@google.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+ linux-coco@lists.linux.dev, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+ thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+ vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+ dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+ peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+ rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+ vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+ tony.luck@intel.com, marcorr@google.com,
+ sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+ jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+ pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+ Alexey Kardashevskiy <aik@amd.com>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-4-michael.roth@amd.com>
+ <e094dc8b-6758-4dd8-89a5-8aab05b2626b@redhat.com>
+ <ZXnqJMKD6lO6a0oq@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -113,55 +127,22 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <ZXnoCadq2J3cPz2r@google.com>
+In-Reply-To: <ZXnqJMKD6lO6a0oq@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/13/23 18:21, Sean Christopherson wrote:
-> On Tue, Dec 12, 2023, Paolo Bonzini wrote:
->> On 12/9/23 03:29, Sean Christopherson wrote:
->>> On Fri, Dec 08, 2023, Paolo Bonzini wrote:
->>>> KVM/Arm supports readonly memslots; fix the calculation of
->>>> supported_flags in set_memory_region_test.c, otherwise the
->>>> test fails.
->>>
->>> You got beat by a few hours, and by a better solution ;-)
->>>
->>> https://lore.kernel.org/all/20231208033505.2930064-1-shahuang@redhat.com
->>
->> Better but also wrong---and my patch has the debatable merit of more
->> clearly exposing the wrongness.  Testing individual architectures is bad,
->> but testing __KVM_HAVE_READONLY_MEM makes the test fail when running a new
->> test on an old kernel.
+On 12/13/23 18:30, Sean Christopherson wrote:
+>> For now, all we can do is document our wishes, with which userspace had
+>> better comply.  Please send a patch to QEMU that makes it obey.
+> Discussed this early today with Paolo at PUCK and pointed out that (a) the CPU
+> context switches the underlying state, (b) SVM doesn't allow intercepting*just*
+> XSAVES, and (c) SNP's AP creation can bypass XSS interception.
 > 
-> But we already crossed that bridge and burned it for good measure by switching
-> to KVM_SET_USER_MEMORY_REGION2, i.e. as of commit
-> 
->    8d99e347c097 ("KVM: selftests: Convert lib's mem regions to KVM_SET_USER_MEMORY_REGION2")
-> 
-> selftests built against a new kernel can't run on an old kernel.  Building KVM
-> selftests requires kernel headers, so while not having a hard requirement that
-> the uapi headers are fresh would be nice, I don't think it buys all that much.
-> 
-> If we wanted to assert that x86, arm64, etc. enumerate __KVM_HAVE_READONLY_MEM,
-> i.e. ensure that read-only memory is supported as expected, then that can be done
-> as a completely unrelated test.
+> So while we all (all == KVM folks) agree that this is rather terrifying, e.g.
+> gives KVM zero option if there is a hardware issue, it's "fine" to let the guest
+> use XSAVES/XSS.
 
-selftests have the luxury of having sync-ed kernel headers, but in 
-general userspace won't, and that means __KVM_HAVE_READONLY_MEM would be 
-a very poor userspace API.  Fortunately it has "__" so it is not 
-userspace API at all, and I don't want selftests to treat it as one.
-
-> IMO, one of the big selling points of selftests over KUT is that we can punt on
-> supporting old kernels since selftests are in-tree.  I don't think it's at all
-> unreasonable to require that selftests be built against the target kernel, and
-> by doing so we can signficantly reduce the maintenance burden.  The kernel needs
-> to be backwards compatibile, but I don't see why selftests need to be backwards
-> compatible.
-
-It does help sometimes to be able to run old tests on new kernel or vice 
-versa.  So even without making that a requirement, it is a nice thing to 
-have whenever possible.
+Indeed; looks like I've got to queue this for 6.7 after all.
 
 Paolo
 
