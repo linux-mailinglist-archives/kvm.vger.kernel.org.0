@@ -1,201 +1,178 @@
-Return-Path: <kvm+bounces-4286-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4287-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 896A48108D5
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 04:48:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A19EC810A1E
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 07:16:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA6051C20E42
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 03:48:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16A44B20CE4
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 06:16:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC90FBA3A;
-	Wed, 13 Dec 2023 03:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F07C0F9FA;
+	Wed, 13 Dec 2023 06:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="l1zGqCMV"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Igxe7+XE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-x35.google.com (mail-oa1-x35.google.com [IPv6:2001:4860:4864:20::35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E67B4D0
-	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 19:48:26 -0800 (PST)
-Received: by mail-oa1-x35.google.com with SMTP id 586e51a60fabf-20308664c13so791337fac.3
-        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 19:48:26 -0800 (PST)
+Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD831AD
+	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 22:16:16 -0800 (PST)
+Received: by mail-ot1-x32d.google.com with SMTP id 46e09a7af769-6d9f7af8918so3655025a34.0
+        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 22:16:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1702439306; x=1703044106; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=sifive.com; s=google; t=1702448176; x=1703052976; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=clomx9PL4E/h6EqVWy6k5UtmANF6+S2n+IcanEDP7iw=;
-        b=l1zGqCMVEoBeB9fSsZMLI6hWpscYG1oRN2SwRzx7v2LdPPeVTdQo0sDsCvay8fTnYu
-         KWjl8VI2GC01gktsZRSEkJvCU+X16KxuIO9aJx2FJ0zXr33+uACELJq0gRU6Ku20wOfp
-         3LZlGpL2/LS+V5s6o3eLYcyOaoRih7HLWm+O4ha/11nBS0PuM7Dc85sciSy867l7nm97
-         KPMqe+cRbxETUyFcdF4FvBPnmQG/Vi8yJO8fYrhm4aKjqycBg1bs9Uc6c/CE70yA2SQJ
-         zcpchv0pc8757jFSX7cYzfwswBPWMHt00YdCrBfztuOWXbQCE0GWJ6aCe69QN46rf3SM
-         P2iA==
+        bh=uvNv5wfHF4xhsTtKWQpkLRjgdWBIUIRMHOfm0nTFkAs=;
+        b=Igxe7+XErz0OpoPk/X2UUroCzmLxq0eraYDWHPJe2KaVNQ6dWfFphGgBafPBeeAjMV
+         3d3NUNVMPWyi7wlitNCoe3lH8VCPMxNUNkabFDz6ZK1zRB7hJjc3KFsAOizhJGp8ISHJ
+         XRhifwLqSgRLoZDcma9TUX0KVgSwp8YV0Z7zC7muAdthhvG058jPM43Utex7KUAukAyI
+         3+ae72ojMj/zRFsQ4Rm9bxRrrSi1ZUZSvvCuX9ENd4orDS3UOucdXjzjKjdePhMsVZ8u
+         M/YC2cbjYG2G7AzTxb9xJhHX2NwKd0H98xe5FP5ukIsAYUpQSB42Nh6jjCsmpWEFaAnj
+         uJMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702439306; x=1703044106;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1702448176; x=1703052976;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=clomx9PL4E/h6EqVWy6k5UtmANF6+S2n+IcanEDP7iw=;
-        b=pc3XDYMTVjqiOwp/MJ6RFpw1/To+8RIZhrRBS04yyFhoqL5FY6FOI+IBgZvhDhf/sY
-         T84e70mowyfK4IDJmaK3YtzU5hq/+86RXvDzVBjdE2I3KdDytgsZ4IRb4sxcs+k/aEjN
-         e77BB8ZjYpjor1E6NThDPubcn+rqmxc70HhDrwPDznEsTKh6NrVFDyUxfn77q0mrg+6C
-         +t4s6FCX3rGe8+jtaR5AHqryURHsXjFTDPzIOnm/bdAccNBgibAS9pUtXG+4U52U9i00
-         /+b/bq7hWEEz3V5f1kObeFSwIOmnAizCrFDkV1H2gI/Al0i0b+fRRi+CZikN2E7NW+UC
-         bBJg==
-X-Gm-Message-State: AOJu0YzJL700rzuXi+vPpiVNBI7fEv6RapZriEqUi422cimwioN5/3TG
-	0Cc+JtLcE4Imujh4Qj91aAtlgDg7TzsKhXs9/q7S5g==
-X-Google-Smtp-Source: AGHT+IHaD7oMNiw44MXxn+uDeF6j7vus4UTyBrcemloFE3EsCuYwUQ2y1gCTT2NYO5EC6m2cG+Vf+ppSjaTtGglMAhY=
-X-Received: by 2002:a05:6870:e8c5:b0:203:27d2:8db4 with SMTP id
- r5-20020a056870e8c500b0020327d28db4mr82714oan.108.1702439306195; Tue, 12 Dec
- 2023 19:48:26 -0800 (PST)
+        bh=uvNv5wfHF4xhsTtKWQpkLRjgdWBIUIRMHOfm0nTFkAs=;
+        b=Eqml71s5p8Q9keyDmSTVzTKtO6zbOSBR5HaPaz751+EddzL9Bug19K9jHEFlpuPWq2
+         nsC94oCu0LTdoGsd0c7gNpARFSfETRYcYBQHrVe3Qna1riXFOcihLw5wtxtcZ7JVRtq3
+         aXinI4vilwDjxXnGm4w6zSUAHWkTuwuh5nPwy9KL9VPMOazy2mwsE3yZhlAbjhoRrz7G
+         HkRxEmtJTtUiLF4vjIhUfcDdbNB9DQVz55Mms7AP0DLt3Q0zI4tFIK/xz66bahmJLBYQ
+         Ord0qqqEkcBqG9bu9XfPoksrLNpdT7lZ5qmnXNAm5+Sxon6wgPj0jzHQ4akmK4G2N+Hj
+         689w==
+X-Gm-Message-State: AOJu0YwB7RgTwcMYx51WO9vJkdD5+w1+0bSPRf9Uts7G+6QC7zNAROWN
+	4GuoV/XkVYKuF5ReVMQeTvJXFw==
+X-Google-Smtp-Source: AGHT+IGagDM0nKL4ki3x1mUmX8Sb5HGZKw8UWtPHqF+o2WY74k963vboMKd1J30RZCv1Lb6uCLOblA==
+X-Received: by 2002:a05:6808:1385:b0:3b8:45cf:9b2 with SMTP id c5-20020a056808138500b003b845cf09b2mr9139581oiw.20.1702448175749;
+        Tue, 12 Dec 2023 22:16:15 -0800 (PST)
+Received: from hsinchu26.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
+        by smtp.gmail.com with ESMTPSA id w2-20020a654102000000b005c65ed23b65sm7731076pgp.94.2023.12.12.22.16.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Dec 2023 22:16:14 -0800 (PST)
+From: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+To: linux-riscv@lists.infradead.org,
+	kvm-riscv@lists.infradead.org
+Cc: greentime.hu@sifive.com,
+	vincent.chen@sifive.com,
+	Yong-Xuan Wang <yongxuan.wang@sifive.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 1/1] RISCV: KVM: update external interrupt atomically for IMSIC swfile
+Date: Wed, 13 Dec 2023 06:16:09 +0000
+Message-Id: <20231213061610.11100-1-yongxuan.wang@sifive.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231212053501.12054-1-yongxuan.wang@sifive.com> <CAK9=C2VOXj5oCAZEPS24K98UmQycupoJCcATGDNr+HFr9aVCPw@mail.gmail.com>
-In-Reply-To: <CAK9=C2VOXj5oCAZEPS24K98UmQycupoJCcATGDNr+HFr9aVCPw@mail.gmail.com>
-From: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-Date: Wed, 13 Dec 2023 11:48:15 +0800
-Message-ID: <CAMWQL2gWGYYD1mFHOnd6oQGvAmh6UHb9w++KMOTLbB9p=om-2Q@mail.gmail.com>
-Subject: Re: [PATCH 1/1] RISCV: KVM: should not be interrupted when update the
- external interrupt pending
-To: Anup Patel <apatel@ventanamicro.com>
-Cc: linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org, 
-	greentime.hu@sifive.com, vincent.chen@sifive.com, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 13, 2023 at 12:03=E2=80=AFAM Anup Patel <apatel@ventanamicro.co=
-m> wrote:
->
-> On Tue, Dec 12, 2023 at 11:05=E2=80=AFAM Yong-Xuan Wang
-> <yongxuan.wang@sifive.com> wrote:
-> >
-> > The emulated IMSIC update the external interrupt pending depending on t=
-he
-> > value of eidelivery and topei. It might lose an interrupt when it is
-> > interrupted before setting the new value to the pending status.
->
-> More simpler PATCH subject can be:
-> "RISCV: KVM: update external interrupt atomically for IMSIC swfile"
->
-> >
-> > For example, when VCPU0 sends an IPI to VCPU1 via IMSIC:
-> >
-> > VCPU0                           VCPU1
-> >
-> >                                 CSRSWAP topei =3D 0
-> >                                 The VCPU1 has claimed all the external
-> >                                 interrupt in its interrupt handler.
-> >
-> >                                 topei of VCPU1's IMSIC =3D 0
-> >
-> > set pending in VCPU1's IMSIC
-> >
-> > topei of VCPU1' IMSIC =3D 1
-> >
-> > set the external interrupt
-> > pending of VCPU1
-> >
-> >                                 clear the external interrupt pending
-> >                                 of VCPU1
-> >
-> > When the VCPU1 switches back to VS mode, it exits the interrupt handler
-> > because the result of CSRSWAP topei is 0. If there are no other externa=
-l
-> > interrupts injected into the VCPU1's IMSIC, VCPU1 will never know this
-> > pending interrupt unless it initiative read the topei.
-> >
-> > If the interruption occurs between updating interrupt pending in IMSIC
-> > and updating external interrupt pending of VCPU, it will not cause a
-> > problem. Suppose that the VCPU1 clears the IPI pending in IMSIC right
-> > after VCPU0 sets the pending, the external interrupt pending of VCPU1
-> > will not be set because the topei is 0. But when the VCPU1 goes back to
-> > VS mode, the pending IPI will be reported by the CSRSWAP topei, it will
-> > not lose this interrupt.
-> >
-> > So we only need to make the external interrupt updating procedure as a
-> > critical section to avoid the problem.
-> >
->
-> Please add a "Fixes:" line here
->
-> > Tested-by: Roy Lin <roy.lin@sifive.com>
-> > Tested-by: Wayling Chen <wayling.chen@sifive.com>
-> > Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
-> > Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
-> > Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-> > ---
-> >  arch/riscv/kvm/aia_imsic.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> >
-> > diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
-> > index 6cf23b8adb71..0278aa0ca16a 100644
-> > --- a/arch/riscv/kvm/aia_imsic.c
-> > +++ b/arch/riscv/kvm/aia_imsic.c
-> > @@ -37,6 +37,8 @@ struct imsic {
-> >         u32 nr_eix;
-> >         u32 nr_hw_eix;
-> >
-> > +       spinlock_t extirq_update_lock;
-> > +
->
-> Please rename this lock to "swfile_extirq_lock".
->
-> >         /*
-> >          * At any point in time, the register state is in
-> >          * one of the following places:
-> > @@ -613,12 +615,17 @@ static void imsic_swfile_extirq_update(struct kvm=
-_vcpu *vcpu)
-> >  {
-> >         struct imsic *imsic =3D vcpu->arch.aia_context.imsic_state;
-> >         struct imsic_mrif *mrif =3D imsic->swfile;
-> > +       unsigned long flags;
-> > +
->
-> Add a short summary in a comment block about why external interrupt
-> updates are required to be in the critical section.
->
-> > +       spin_lock_irqsave(&imsic->extirq_update_lock, flags);
-> >
-> >         if (imsic_mrif_atomic_read(mrif, &mrif->eidelivery) &&
-> >             imsic_mrif_topei(mrif, imsic->nr_eix, imsic->nr_msis))
-> >                 kvm_riscv_vcpu_set_interrupt(vcpu, IRQ_VS_EXT);
-> >         else
-> >                 kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_VS_EXT);
-> > +
-> > +       spin_unlock_irqrestore(&imsic->extirq_update_lock, flags);
-> >  }
-> >
-> >  static void imsic_swfile_read(struct kvm_vcpu *vcpu, bool clear,
-> > @@ -1029,6 +1036,7 @@ int kvm_riscv_vcpu_aia_imsic_init(struct kvm_vcpu=
- *vcpu)
-> >         imsic->nr_eix =3D BITS_TO_U64(imsic->nr_msis);
-> >         imsic->nr_hw_eix =3D BITS_TO_U64(kvm_riscv_aia_max_ids);
-> >         imsic->vsfile_hgei =3D imsic->vsfile_cpu =3D -1;
-> > +       spin_lock_init(&imsic->extirq_update_lock);
-> >
-> >         /* Setup IMSIC SW-file */
-> >         swfile_page =3D alloc_pages(GFP_KERNEL | __GFP_ZERO,
-> > --
-> > 2.17.1
-> >
-> >
->
-> Regards,
-> Anup
+The emulated IMSIC update the external interrupt pending depending on the
+value of eidelivery and topei. It might lose an interrupt when it is
+interrupted before setting the new value to the pending status.
 
-Hi Anup,
+For example, when VCPU0 sends an IPI to VCPU1 via IMSIC:
 
-Thank you! I will update in next version.
+VCPU0                           VCPU1
 
-Regards,
-Yong-Xuan
+                                CSRSWAP topei = 0
+                                The VCPU1 has claimed all the external
+                                interrupt in its interrupt handler.
+
+                                topei of VCPU1's IMSIC = 0
+
+set pending in VCPU1's IMSIC
+
+topei of VCPU1' IMSIC = 1
+
+set the external interrupt
+pending of VCPU1
+
+                                clear the external interrupt pending
+                                of VCPU1
+
+When the VCPU1 switches back to VS mode, it exits the interrupt handler
+because the result of CSRSWAP topei is 0. If there are no other external
+interrupts injected into the VCPU1's IMSIC, VCPU1 will never know this
+pending interrupt unless it initiative read the topei.
+
+If the interruption occurs between updating interrupt pending in IMSIC
+and updating external interrupt pending of VCPU, it will not cause a
+problem. Suppose that the VCPU1 clears the IPI pending in IMSIC right
+after VCPU0 sets the pending, the external interrupt pending of VCPU1
+will not be set because the topei is 0. But when the VCPU1 goes back to
+VS mode, the pending IPI will be reported by the CSRSWAP topei, it will
+not lose this interrupt.
+
+So we only need to make the external interrupt updating procedure as a
+critical section to avoid the problem.
+
+Fixes: db8b7e97d613 ("RISC-V: KVM: Add in-kernel virtualization of AIA IMSIC")
+Tested-by: Roy Lin <roy.lin@sifive.com>
+Tested-by: Wayling Chen <wayling.chen@sifive.com>
+Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
+Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
+Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+---
+Changelog
+v2:
+- rename the variable and add a short comment in the code
+---
+ arch/riscv/kvm/aia_imsic.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
+index 6cf23b8adb71..e808723a85f1 100644
+--- a/arch/riscv/kvm/aia_imsic.c
++++ b/arch/riscv/kvm/aia_imsic.c
+@@ -55,6 +55,7 @@ struct imsic {
+ 	/* IMSIC SW-file */
+ 	struct imsic_mrif *swfile;
+ 	phys_addr_t swfile_pa;
++	spinlock_t swfile_extirq_lock;
+ };
+ 
+ #define imsic_vs_csr_read(__c)			\
+@@ -613,12 +614,23 @@ static void imsic_swfile_extirq_update(struct kvm_vcpu *vcpu)
+ {
+ 	struct imsic *imsic = vcpu->arch.aia_context.imsic_state;
+ 	struct imsic_mrif *mrif = imsic->swfile;
++	unsigned long flags;
++
++	/*
++	 * The critical section is necessary during external interrupt
++	 * updates to avoid the risk of losing interrupts due to potential
++	 * interruptions between reading topei and updating pending status.
++	 */
++
++	spin_lock_irqsave(&imsic->swfile_extirq_lock, flags);
+ 
+ 	if (imsic_mrif_atomic_read(mrif, &mrif->eidelivery) &&
+ 	    imsic_mrif_topei(mrif, imsic->nr_eix, imsic->nr_msis))
+ 		kvm_riscv_vcpu_set_interrupt(vcpu, IRQ_VS_EXT);
+ 	else
+ 		kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_VS_EXT);
++
++	spin_unlock_irqrestore(&imsic->swfile_extirq_lock, flags);
+ }
+ 
+ static void imsic_swfile_read(struct kvm_vcpu *vcpu, bool clear,
+@@ -1039,6 +1051,7 @@ int kvm_riscv_vcpu_aia_imsic_init(struct kvm_vcpu *vcpu)
+ 	}
+ 	imsic->swfile = page_to_virt(swfile_page);
+ 	imsic->swfile_pa = page_to_phys(swfile_page);
++	spin_lock_init(&imsic->swfile_extirq_lock);
+ 
+ 	/* Setup IO device */
+ 	kvm_iodevice_init(&imsic->iodev, &imsic_iodoev_ops);
+-- 
+2.17.1
+
 
