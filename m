@@ -1,75 +1,74 @@
-Return-Path: <kvm+bounces-4350-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4351-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E2E1811533
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 15:48:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A94F0811557
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 15:56:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFF9B282408
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 14:48:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5875F281CDF
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 14:56:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9CB92F52A;
-	Wed, 13 Dec 2023 14:48:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A82E52F85F;
+	Wed, 13 Dec 2023 14:56:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P/tRTiM9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B1YKqLnI"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA5A0E8
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 06:47:55 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 510DBDD
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 06:55:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702478875;
+	s=mimecast20190719; t=1702479357;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0jKzahdW3Z8DiMF4k91DJLvHn4lH9K58mF9LO/614r8=;
-	b=P/tRTiM9Ks8WW7uBmIFDb9PS1xnTIbN9vggE/k8xRk8Swa4dLoSpWnHZ2ICRoHrMvwgdGo
-	VxWi5c3JpOaMjyuf8qgOofQ4hcQuLhr4a8zy1zhMb6y529RqtWpriH5Wl5n17oEIzxgA0I
-	EXdKnBzL2p3yWH3WPH6u1UGTV5/lWwI=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=uIFKxiFZihO9GqXmA3HovwJ/rQqe1hgcv8SZULAHlOU=;
+	b=B1YKqLnIUR3cDTacgyLgNoDVTwfS3L2fO/vjk/RjTf6HUF0i5ErZLc6d/C3mE3JDTUfEXb
+	Y/wGir4ZRpe6Ql14ho2oJz+qf/Cg1NIJX/JUJgcIWyafTRC3TauG1zOMXYKo9WY8Tc4CNR
+	9ChoNRDJoDHu0r0w0MnRa9+Skbf5h5g=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-328-VLSJ_-UGPYitf2Dm6cd1TQ-1; Wed, 13 Dec 2023 09:47:53 -0500
-X-MC-Unique: VLSJ_-UGPYitf2Dm6cd1TQ-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a00dd93a5f9so425078766b.1
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 06:47:53 -0800 (PST)
+ us-mta-479-y_KGy23aM_WAU2UJWEnZcQ-1; Wed, 13 Dec 2023 09:55:25 -0500
+X-MC-Unique: y_KGy23aM_WAU2UJWEnZcQ-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2c9fa16728aso55281891fa.0
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 06:55:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702478872; x=1703083672;
+        d=1e100.net; s=20230601; t=1702479324; x=1703084124;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0jKzahdW3Z8DiMF4k91DJLvHn4lH9K58mF9LO/614r8=;
-        b=GuGjxf60ZqJcA3pMxh79oYoLo+8xxdpa8LsZf+pe702KYwB52iTQNJeBuQL410aqaZ
-         8r/5hs3peztPrbMgvAO8UWSCKHLgRvpWSLDcW7Z6wQAgS7wXfZ6rB8KlRbCjofNauM7e
-         1Uvt53ip5ac54nzOjaEcrKJ4cn7LI5pHxRRCXGmlZPAiphAIknQMJX+y+8HefCtjbIfD
-         uHAZriPAtibaqWXpd1GdrmVAXVfkXDL1IZhKFw1ezbBhSLG8J8dpjb1E2cbvkLC70DKz
-         szOEBbOMsiCzzjVnMHKnu1SYA3mWTMgrX6VNrOTkxnvy9jUhvHXGgEFicOG4ONjpmgBd
-         DIew==
-X-Gm-Message-State: AOJu0YxNQ93cV5Go3gs1L1L7FcXzTC9MDL/JT9UBlIEFEfE02IDy0Cw3
-	/4cqYQpvrRnomX4/4t9QjwBq9FLDqyTp7AM8enu9z6DzDNDWRrBUkhTqcAoBUMKnugtg0tVJ5iT
-	7WEAIslNgsWMM
-X-Received: by 2002:a17:907:72cb:b0:a1d:9d7b:f2cf with SMTP id du11-20020a17090772cb00b00a1d9d7bf2cfmr2746751ejc.15.1702478872415;
-        Wed, 13 Dec 2023 06:47:52 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHH225M+fWShUJGXunG1g7mFoAwsjGf+FIVoxeFbFwopVnE+cUOXBfhM3binQy7H2O/ZZGcAw==
-X-Received: by 2002:a17:907:72cb:b0:a1d:9d7b:f2cf with SMTP id du11-20020a17090772cb00b00a1d9d7bf2cfmr2746745ejc.15.1702478872109;
-        Wed, 13 Dec 2023 06:47:52 -0800 (PST)
+        bh=uIFKxiFZihO9GqXmA3HovwJ/rQqe1hgcv8SZULAHlOU=;
+        b=OMF8BtSUSS0T0+W6miyEqr2xC7my9IS+8F3VIMsU6gw8xnFPdRAWkZKOk6fF89g02a
+         Hbfc8fjbE84C/vOQ8AuccM/nYoTFmSJxd2HhEOgb5FwrN3b4Iz7US2x7RRDe5PVwF3ag
+         GPkh5AzcEiEmLIJqXX7bRMPkm//i78okzNeUq4fM928+OjSvINBCdvK0zDRrD3cCpOLE
+         AeKuFGTNrDvQV4+Y5aokeAAXHgDseqQlGGreo4CV/FBC0S5rewTvLxxXg5rHQH/dqDXS
+         NuCCCCwK8fP8AYQPktx63x5RxozwT5xIJc/H11PDMjJXRsCxt/vNDh35Bjw4tTZNRqSD
+         W2hw==
+X-Gm-Message-State: AOJu0YyIyit8hrzOQ0uSqfp1d8NO21EM05QPAR35Aax4TQm1+QVzOPAf
+	VsVmp6YEa95HT43svx2rwE2ysgUxu/R6N/XlT82+CB/swa51waZwFh8nhBYWRIOzetciTP3H9fU
+	9Rjff8SH/0kTu
+X-Received: by 2002:a2e:828f:0:b0:2c9:e9eb:8ccb with SMTP id y15-20020a2e828f000000b002c9e9eb8ccbmr3769066ljg.69.1702479324254;
+        Wed, 13 Dec 2023 06:55:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHviyKH7wfcVf+I7xtZv4/UFi1AvA8vImQUb3UJSgTbMIYjDNrX0hdJf2t7gC7r7QeAbgewkg==
+X-Received: by 2002:a2e:828f:0:b0:2c9:e9eb:8ccb with SMTP id y15-20020a2e828f000000b002c9e9eb8ccbmr3769060ljg.69.1702479323843;
+        Wed, 13 Dec 2023 06:55:23 -0800 (PST)
 Received: from redhat.com ([2a02:14f:16d:d414:dc39:9ae8:919b:572d])
-        by smtp.gmail.com with ESMTPSA id tb19-20020a1709078b9300b00a1cd30d06d1sm8049662ejc.14.2023.12.13.06.47.49
+        by smtp.gmail.com with ESMTPSA id ck9-20020a0564021c0900b0054f4097fea2sm5763020edb.0.2023.12.13.06.55.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 06:47:51 -0800 (PST)
-Date: Wed, 13 Dec 2023 09:47:47 -0500
+        Wed, 13 Dec 2023 06:55:23 -0800 (PST)
+Date: Wed, 13 Dec 2023 09:55:18 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Tobias Huschle <huschle@linux.ibm.com>
 Cc: Jason Wang <jasowang@redhat.com>, Abel Wu <wuyun.abel@bytedance.com>,
 	Peter Zijlstra <peterz@infradead.org>,
 	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	Mike Christie <michael.christie@oracle.com>
+	virtualization@lists.linux.dev, netdev@vger.kernel.org
 Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
  sched/fair: Add lag based placement)
-Message-ID: <20231213093627-mutt-send-email-mst@kernel.org>
+Message-ID: <20231213094854-mutt-send-email-mst@kernel.org>
 References: <20231208052150-mutt-send-email-mst@kernel.org>
  <53044.123120806415900549@us-mta-342.us.mimecast.lan>
  <20231209053443-mutt-send-email-mst@kernel.org>
@@ -145,17 +144,22 @@ On Wed, Dec 13, 2023 at 01:45:35PM +0100, Tobias Huschle wrote:
 > Seems indeed like a nasty little side effect caused by EEVDF not scheduling
 > the woken up kworker right away.
 
-Indeed, but previously vhost_worker was looping itself.
-And it did:
--               node = llist_del_all(&worker->work_list);
--               if (!node)
--                       schedule();
 
-so I don't think this was changed at all.
+So we are actually making an effort to be nice.
+Documentation/kernel-hacking/hacking.rst says:
+
+If you're doing longer computations: first think userspace. If you
+**really** want to do it in kernel you should regularly check if you need
+to give up the CPU (remember there is cooperative multitasking per CPU).
+Idiom::
+
+    cond_resched(); /* Will sleep */
 
 
+and this is what vhost.c does.
 
-
+At this point I'm not sure why it's appropriate to call schedule() as opposed to
+cond_resched(). Ideas?
 
 
 -- 
