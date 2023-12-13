@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-4403-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4404-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBA3581219F
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 23:39:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB8668121A2
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 23:40:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A05B1C21322
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 22:39:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C37DB20DC5
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 22:40:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3539B8183C;
-	Wed, 13 Dec 2023 22:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5248183D;
+	Wed, 13 Dec 2023 22:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hrS/6Ha7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eg68xvYZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EAEBB7
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 14:39:49 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B806DF5
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 14:40:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702507188;
+	s=mimecast20190719; t=1702507223;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wm5p9I7UJkzSD0p8OE27VhydPzQpwjBdq8jwEHxdPN4=;
-	b=hrS/6Ha7t2N1VdUdGJ5IgRe7iOLaZVQOFZxALFWbyxb+8MxWjOsQ+h73fON7uJsX/nKEKT
-	HKyS3CLY7urGDMWEHXPKAP9YYms76Atx2pPZzPaJFsqQsmmHu5gjUYybwcHPXn8SLBFBsT
-	iJdckcyp35eQTqQL2IbO9nKtra1A44M=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=U6q+SujD6T+0deWVz0gmo5g4QASJTJJ5VQOUwvjSYJk=;
+	b=Eg68xvYZu6Xkguw5pYNhpv8fuYx63neI8BhJ9D4kdchOYb9pyDrU/X/29mqs74vgNTrK39
+	d1a10iSIZSWCfaT19lw/lvYUeTtpWgKfR0Je5kRXevfkH878Sk1hynPRp+dipdmZsTNRKz
+	nuaKSshbgD/30aNUqOsW1T3ES/BwxsY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-42-UjJPlVOgM7W0cjIS3aQQCg-1; Wed, 13 Dec 2023 17:39:47 -0500
-X-MC-Unique: UjJPlVOgM7W0cjIS3aQQCg-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33608b00a04so4073773f8f.1
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 14:39:46 -0800 (PST)
+ us-mta-567-wzOSKwgZN1apcqmRyc6zMQ-1; Wed, 13 Dec 2023 17:40:22 -0500
+X-MC-Unique: wzOSKwgZN1apcqmRyc6zMQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33344663fbcso6211313f8f.2
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 14:40:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702507185; x=1703111985;
+        d=1e100.net; s=20230601; t=1702507221; x=1703112021;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=wm5p9I7UJkzSD0p8OE27VhydPzQpwjBdq8jwEHxdPN4=;
-        b=uEE4aNgcZAK2CsI9qO32MthSJ5j2tdXxOHUpUsIF5Lrebo/hYA/PhGDkbSJi5P98ck
-         Ga+lq2FFaobD0z+S4iKQ7ghCM2BHDjwA+i8ckdCYG/GnpCEqeog+JH9qBW/wdx1debzy
-         0ZEJz5lDD+IXr2cTZgLiPXrMlGaEYjrJd8ZeQLbRkoeTQwNDw3DGvgz+MU1vxwD9hN+k
-         ReP+N/1cqh4hMoqYGCcY/PjmHozPb1NjTYTHVuIdNCOA1VIv8/f/jEb6+dFsYvE1Bvcq
-         b+Bzr8bg8qLuAkWngYmkzV1bHWBjaz4TOFbwkuyHqNVCtX5Gt2PuMn++EimJfVGu3r8c
-         MaUw==
-X-Gm-Message-State: AOJu0YzLJYu1gFLJuJyKTxBXSKcvEeTglN6rS0rwuUSH1aQi449I/TJQ
-	eCBZwLEbySqjez0p/sFjmF+V/C96ErCD+MDHKPhrgFnQEzmjcFlBpWy3HADFKcDl/euaKLYvl+V
-	ihKMIRKOxOlblS17y/xu0
-X-Received: by 2002:adf:f789:0:b0:336:3896:3212 with SMTP id q9-20020adff789000000b0033638963212mr1056496wrp.42.1702507184828;
-        Wed, 13 Dec 2023 14:39:44 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF2YvVojA6u3l32cs2cxNmacCsVUAdngyGOO/S6aUI/fOAWaC28mwX0n+N+OTer5XvsMi+22w==
-X-Received: by 2002:adf:f789:0:b0:336:3896:3212 with SMTP id q9-20020adff789000000b0033638963212mr1056492wrp.42.1702507184522;
-        Wed, 13 Dec 2023 14:39:44 -0800 (PST)
+        bh=U6q+SujD6T+0deWVz0gmo5g4QASJTJJ5VQOUwvjSYJk=;
+        b=MrWkhEYdWAwI9pcHfcz+ewzCzT5DqSNodNsV63UpdEZ85aToJDlfxMG8MAkoxx/LuH
+         Q6drL+Eqc2PR33npsjhsdVk7qODmsKkenPdCgu/M7/K49LUhScnISOd9G2cN6DBgOrSX
+         StdwnCr+5jW70yxWzyv1mjbDF8CyttjvoVAtrS7wmtFTo70RnJ2iEB1erNSzAr/Vx9ie
+         bckyFA6WD9b47KGGNGfpeXmE4TKoPU69epww9G8eElTQsMne88Z/+PsuzL1naK9BJxBk
+         MQbHwfTgxAf3qDTopRb/9jSP5rM1v7EMJgjWxNB2niAy6HfJEtqNgQj94csXsWHgbsaZ
+         cUPw==
+X-Gm-Message-State: AOJu0Yxgugx/Mz2Ant2182keRl9i5tzcUQn+zhAs3pf5rnZ7N6NkNWXL
+	QpeFAc+mL/zz79uloTj5Db8lOc3QnspVlG9k0b5OOpjftLE1hdxGon83RK8Mzv4GQUIIIQy3XWj
+	VZgEbEuhyDW8F
+X-Received: by 2002:a05:600c:1649:b0:40c:328f:e0ec with SMTP id o9-20020a05600c164900b0040c328fe0ecmr2082720wmn.310.1702507221203;
+        Wed, 13 Dec 2023 14:40:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEQCGkL5TGtKZoyg8vvA0GfoknejAmJIQbtGc5w1kZf8ypAOMUXwoxjQJA9XmdBve+KRVtdig==
+X-Received: by 2002:a05:600c:1649:b0:40c:328f:e0ec with SMTP id o9-20020a05600c164900b0040c328fe0ecmr2082713wmn.310.1702507220970;
+        Wed, 13 Dec 2023 14:40:20 -0800 (PST)
 Received: from starship ([77.137.131.62])
-        by smtp.gmail.com with ESMTPSA id s18-20020a5d4ed2000000b00336421f1818sm1882905wrv.112.2023.12.13.14.39.43
+        by smtp.gmail.com with ESMTPSA id be9-20020a05600c1e8900b0040596352951sm24529011wmb.5.2023.12.13.14.40.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 14:39:44 -0800 (PST)
-Message-ID: <938efd3cfcb25d828deab0cc0ba797177cc69602.camel@redhat.com>
-Subject: Re: [PATCH v2 1/3] KVM: x86: Make the hardcoded APIC bus frequency
- vm variable
+        Wed, 13 Dec 2023 14:40:20 -0800 (PST)
+Message-ID: <61530aa466a038efb0e648da002432d02a9692a3.camel@redhat.com>
+Subject: Re: [PATCH v2 2/3] KVM: X86: Add a capability to configure bus
+ frequency for APIC timer
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: isaku.yamahata@intel.com, kvm@vger.kernel.org,
  linux-kernel@vger.kernel.org
 Cc: isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>, 
  erdemaktas@google.com, Sean Christopherson <seanjc@google.com>, Vishal
  Annapurve <vannapurve@google.com>, Jim Mattson <jmattson@google.com>
-Date: Thu, 14 Dec 2023 00:39:42 +0200
-In-Reply-To: <1c12f378af7de16d7895f8badb18c3b1715e9271.1699936040.git.isaku.yamahata@intel.com>
+Date: Thu, 14 Dec 2023 00:40:18 +0200
+In-Reply-To: <88774b9dc566c89141bf75aef341fdf7e238e60b.1699936040.git.isaku.yamahata@intel.com>
 References: <cover.1699936040.git.isaku.yamahata@intel.com>
-	 <1c12f378af7de16d7895f8badb18c3b1715e9271.1699936040.git.isaku.yamahata@intel.com>
+	 <88774b9dc566c89141bf75aef341fdf7e238e60b.1699936040.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -85,140 +85,139 @@ Content-Transfer-Encoding: 7bit
 On Mon, 2023-11-13 at 20:35 -0800, isaku.yamahata@intel.com wrote:
 > From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> TDX virtualizes the advertised APIC bus frequency to be 25MHz. 
-
-Can you explain a bit better why TDX needs this? I am not familiar
-with TDX well enough yet to fully understand.
-
-AFAIK, the guest writes the TMICT, that makes the KVM set up a HR timer,
-and KVM is free to use any apic frequency to determine the deadline of that timer,
-and then once the HR timer fires, KVM injects an interrupt to the guest.
-
-Are some parts of this process overridden by the TDX?
-
-I am sure that there is a good reason to do this, but I would be very happy
-to see a detailed explanation in the changelog for future readers who
-might know nothing about TDX.
-
-
->  The KVM
-> hardcodedes it to be 1GHz.  This mismatch causes the vAPIC timer to fire
-> earlier than the TDX guest expects.
-
-Here too, what do you mean by "TDX guest expects"? Is the APIC frequency
-given to the guest using some TDX specific way like HV_X64_MSR_APIC_FREQUENCY? 
-
->   In order to reconcile this mismatch,
-> make the frequency configurable for the user space VMM.  As the first step,
-> Replace the constants with the VM value in struct kvm.
-
-
-
+> Add KVM_CAP_X86_BUS_FREQUENCY_CONTROL capability to configure the core
+> crystal clock (or processor's bus clock) for APIC timer emulation.  Allow
+> KVM_ENABLE_CAPABILITY(KVM_CAP_X86_BUS_FREQUENCY_CONTROL) to set the
+> frequency.
 > 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
-> Changes v2:
-> - no change
-> ---
->  arch/x86/include/asm/kvm_host.h | 2 ++
->  arch/x86/kvm/hyperv.c           | 2 +-
->  arch/x86/kvm/lapic.c            | 6 ++++--
->  arch/x86/kvm/lapic.h            | 4 ++--
->  arch/x86/kvm/x86.c              | 2 ++
->  5 files changed, 11 insertions(+), 5 deletions(-)
+> TDX virtualizes CPUID[0x15] for the core crystal clock to be 25MHz.  The
+> x86 KVM hardcodes its frequency for APIC timer to be 1GHz.  This mismatch
+> causes the vAPIC timer to fire earlier than the guest expects. [1] The KVM
+> APIC timer emulation uses hrtimer, whose unit is nanosecond.  Make the
+> parameter configurable for conversion from the TMICT value to nanosecond.
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index d7036982332e..f2b1c6b3fb11 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1334,6 +1334,8 @@ struct kvm_arch {
->  
->  	u32 default_tsc_khz;
->  	bool user_set_tsc;
-> +	u64 apic_bus_cycle_ns;
-> +	u64 apic_bus_frequency;
->  
->  	seqcount_raw_spinlock_t pvclock_sc;
->  	bool use_master_clock;
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index 238afd7335e4..995ce2c74ce0 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -1687,7 +1687,7 @@ static int kvm_hv_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata,
->  		data = (u64)vcpu->arch.virtual_tsc_khz * 1000;
->  		break;
->  	case HV_X64_MSR_APIC_FREQUENCY:
-> -		data = APIC_BUS_FREQUENCY;
-> +		data = vcpu->kvm->arch.apic_bus_frequency;
->  		break;
->  	default:
->  		kvm_pr_unimpl_rdmsr(vcpu, msr);
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 245b20973cae..73956b0ac1f1 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1542,7 +1542,8 @@ static u32 apic_get_tmcct(struct kvm_lapic *apic)
->  		remaining = 0;
->  
->  	ns = mod_64(ktime_to_ns(remaining), apic->lapic_timer.period);
-> -	return div64_u64(ns, (APIC_BUS_CYCLE_NS * apic->divide_count));
-> +	return div64_u64(ns, (apic->vcpu->kvm->arch.apic_bus_cycle_ns *
-> +			      apic->divide_count));
->  }
->  
->  static void __report_tpr_access(struct kvm_lapic *apic, bool write)
-> @@ -1960,7 +1961,8 @@ static void start_sw_tscdeadline(struct kvm_lapic *apic)
->  
->  static inline u64 tmict_to_ns(struct kvm_lapic *apic, u32 tmict)
->  {
-> -	return (u64)tmict * APIC_BUS_CYCLE_NS * (u64)apic->divide_count;
-> +	return (u64)tmict * apic->vcpu->kvm->arch.apic_bus_cycle_ns *
-> +		(u64)apic->divide_count;
->  }
->  
->  static void update_target_expiration(struct kvm_lapic *apic, uint32_t old_divisor)
-> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> index 0a0ea4b5dd8c..3a425ea2a515 100644
-> --- a/arch/x86/kvm/lapic.h
-> +++ b/arch/x86/kvm/lapic.h
-> @@ -16,8 +16,8 @@
->  #define APIC_DEST_NOSHORT		0x0
->  #define APIC_DEST_MASK			0x800
->  
-> -#define APIC_BUS_CYCLE_NS       1
-> -#define APIC_BUS_FREQUENCY      (1000000000ULL / APIC_BUS_CYCLE_NS)
-> +#define APIC_BUS_CYCLE_NS_DEFAULT	1
-> +#define APIC_BUS_FREQUENCY_DEFAULT	(1000000000ULL / APIC_BUS_CYCLE_NS_DEFAULT)
->  
->  #define APIC_BROADCAST			0xFF
->  #define X2APIC_BROADCAST		0xFFFFFFFFul
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 2c924075f6f1..a9f4991b3e2e 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12466,6 +12466,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
->  
->  	kvm->arch.default_tsc_khz = max_tsc_khz ? : tsc_khz;
-> +	kvm->arch.apic_bus_cycle_ns = APIC_BUS_CYCLE_NS_DEFAULT;
-> +	kvm->arch.apic_bus_frequency = APIC_BUS_FREQUENCY_DEFAULT;
->  	kvm->arch.guest_can_read_msr_platform_info = true;
->  	kvm->arch.enable_pmu = enable_pmu;
->  
+> This patch doesn't affect the TSC deadline timer emulation.  The TSC
+> deadline emulation path records its expiring TSC value and calculates the
+> expiring time in nanoseconds.  The APIC timer emulation path calculates the
+> TSC value from the TMICT register value and uses the TSC deadline timer
+> path.  This patch touches the APIC timer-specific code but doesn't touch
+> common logic.
 
-Only one minor nitpick: We might not need 'apic_bus_frequency' and instead have
-it calculated from apic_bus_cycle_ns? (to have single source of truth)
+Nitpick: To be honest IMHO the paragraph about tsc deadline is redundant, because by definition (x86 spec)
+the tsc deadline timer doesn't use APIC bus frequency.
 
-Frequency is only used by HV_X64_MSR_APIC_FREQUENCY, and I don't think that HyperV guests read
-this MSR often, nor that a division will make a dent in the emulation time of this msr,
-even if they do.
-
-But if you prefer, I won't mind either.
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 Best regards,
 	Maxim Levitsky
 
-
+> 
+> [1] https://lore.kernel.org/lkml/20231006011255.4163884-1-vannapurve@google.com/
+> Reported-by: Vishal Annapurve <vannapurve@google.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+> Changes v2:
+> - Add check if vcpu isn't created.
+> - Add check if lapic chip is in-kernel emulation.
+> - Fix build error for i386
+> - Add document to api.rst
+> - typo in the commit message
+> ---
+>  Documentation/virt/kvm/api.rst | 14 ++++++++++++++
+>  arch/x86/kvm/x86.c             | 35 ++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h       |  1 +
+>  3 files changed, 50 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 7025b3751027..cc976df2651e 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -7858,6 +7858,20 @@ This capability is aimed to mitigate the threat that malicious VMs can
+>  cause CPU stuck (due to event windows don't open up) and make the CPU
+>  unavailable to host or other VMs.
+>  
+> +7.34 KVM_CAP_X86_BUS_FREQUENCY_CONTROL
+> +--------------------------------------
+> +
+> +:Architectures: x86
+> +:Target: VM
+> +:Parameters: args[0] is the value of apic bus clock frequency
+> +:Returns: 0 on success, -EINVAL if args[0] contains invalid value for the
+> +          frequency, or -ENXIO if virtual local APIC isn't enabled by
+> +          KVM_CREATE_IRQCHIP, or -EBUSY if any vcpu is created.
+> +
+> +This capability sets the APIC bus clock frequency (or core crystal clock
+> +frequency) for kvm to emulate APIC in the kernel.  The default value is 1000000
+> +(1GHz).
+> +
+>  8. Other capabilities.
+>  ======================
+>  
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index a9f4991b3e2e..a8fb862c4f8e 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4625,6 +4625,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_ENABLE_CAP:
+>  	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
+>  	case KVM_CAP_IRQFD_RESAMPLE:
+> +	case KVM_CAP_X86_BUS_FREQUENCY_CONTROL:
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_EXIT_HYPERCALL:
+> @@ -6616,6 +6617,40 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		}
+>  		mutex_unlock(&kvm->lock);
+>  		break;
+> +	case KVM_CAP_X86_BUS_FREQUENCY_CONTROL: {
+> +		u64 bus_frequency = cap->args[0];
+> +		u64 bus_cycle_ns;
+> +
+> +		if (!bus_frequency)
+> +			return -EINVAL;
+> +		/* CPUID[0x15] only support 32bits.  */
+> +		if (bus_frequency != (u32)bus_frequency)
+> +			return -EINVAL;
+> +
+> +		/* Cast to avoid 64bit division on 32bit platform. */
+> +		bus_cycle_ns = 1000000000UL / (u32)bus_frequency;
+> +		if (!bus_cycle_ns)
+> +			return -EINVAL;
+> +
+> +		r = 0;
+> +		mutex_lock(&kvm->lock);
+> +		/*
+> +		 * Don't allow to change the frequency dynamically during vcpu
+> +		 * running to avoid potentially bizarre behavior.
+> +		 */
+> +		if (kvm->created_vcpus)
+> +			r = -EBUSY;
+> +		/* This is for in-kernel vAPIC emulation. */
+> +		else if (!irqchip_in_kernel(kvm))
+> +			r = -ENXIO;
+> +
+> +		if (!r) {
+> +			kvm->arch.apic_bus_cycle_ns = bus_cycle_ns;
+> +			kvm->arch.apic_bus_frequency = bus_frequency;
+> +		}
+> +		mutex_unlock(&kvm->lock);
+> +		return r;
+> +	}
+>  	default:
+>  		r = -EINVAL;
+>  		break;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 211b86de35ac..d74a057df173 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1201,6 +1201,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+>  #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
+>  #define KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES 230
+> +#define KVM_CAP_X86_BUS_FREQUENCY_CONTROL 231
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
 
 
 
