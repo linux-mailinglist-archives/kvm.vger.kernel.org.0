@@ -1,106 +1,133 @@
-Return-Path: <kvm+bounces-4390-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4391-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6686811FA9
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 21:05:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07A8E811FB3
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 21:09:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DB5BB211F7
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 20:05:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C30D281B55
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 20:09:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1D07E548;
-	Wed, 13 Dec 2023 20:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BDF7E54F;
+	Wed, 13 Dec 2023 20:08:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jJcnDy5b"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q20k+MmV"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [IPv6:2001:41d0:203:375::ba])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9268DDB
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 12:05:38 -0800 (PST)
-Date: Wed, 13 Dec 2023 20:05:29 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1702497936;
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D2A99C
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 12:08:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702498131;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=bs3RmWkkBEnHpfKuSLQmU1XdcllYwTl+oGw2E3qh8dc=;
-	b=jJcnDy5bHbUQZ++rOn61pjWjrjxub6x7tQGxN6Q/n2e8x8QqbvQBN0WMjqMDzS9KbV0iYs
-	wCgSpmwEUbVv6YEq3zCdtU1qGuTE6IwHyJzcoTRQw4SP/Qsfm9Sz/cIkb2d4mN4aAQUtts
-	tgUEit1z6/gIrWV69f2FgtcachFAZYI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, ankita@nvidia.com,
-	maz@kernel.org, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	will@kernel.org, alex.williamson@redhat.com, kevin.tian@intel.com,
-	yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org,
-	gshan@redhat.com, linux-mm@kvack.org, lpieralisi@kernel.org,
-	aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
-	targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
-	apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
-	mochs@nvidia.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 2/2] kvm: arm64: set io memory s2 pte as normalnc for
- vfio pci devices
-Message-ID: <ZXoOieQN7rBiLL4A@linux.dev>
-References: <20231208164709.23101-1-ankita@nvidia.com>
- <20231208164709.23101-3-ankita@nvidia.com>
- <ZXicemDzXm8NShs1@arm.com>
- <20231212181156.GO3014157@nvidia.com>
+	bh=oaPLT/w+GJhxx6euDyuvXTKoL3tEsYpftnOe2O3RcpI=;
+	b=Q20k+MmVOoMixOuONEBKqYT3UtZ0OhyEnHHEUsQAzzDHLT7SOJGqLRpjY/ybIDzH9wr6oF
+	LrHsn6FURs9AFYPeJd2LCKpbRFwZoD0g/vypbKFE8HoNuuwnF9QQj9KeUDfQdoLxoet0aQ
+	PiAMi2Hh8T2LkRwbM1b9W/a26RMyN9M=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-346-tr7boWT0NyC4lFUxfgo2Cw-1; Wed, 13 Dec 2023 15:08:45 -0500
+X-MC-Unique: tr7boWT0NyC4lFUxfgo2Cw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D00978910C2;
+	Wed, 13 Dec 2023 20:08:44 +0000 (UTC)
+Received: from p1.localdomain.some.host.somewhere.org (ovpn-114-21.gru2.redhat.com [10.97.114.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1324C3C25;
+	Wed, 13 Dec 2023 20:08:35 +0000 (UTC)
+From: Cleber Rosa <crosa@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Eric Auger
+ <eric.auger@redhat.com>
+Cc: qemu-devel@nongnu.org, Jiaxun Yang <jiaxun.yang@flygoat.com>, Radoslaw
+ Biernacki <rad@semihalf.com>, Paul Durrant <paul@xen.org>, Akihiko Odaki
+ <akihiko.odaki@daynix.com>, Leif Lindholm <quic_llindhol@quicinc.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, kvm@vger.kernel.org, qemu-arm@nongnu.org, Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>, Beraldo Leal
+ <bleal@redhat.com>, Wainer
+ dos Santos Moschetta <wainersm@redhat.com>, Sriram Yagnaraman
+ <sriram.yagnaraman@est.tech>, Marcin Juszkiewicz
+ <marcin.juszkiewicz@linaro.org>, David Woodhouse <dwmw2@infradead.org>,
+ Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH 03/10] tests/avocado/intel_iommu.py: increase timeout
+In-Reply-To: <8734w8fzbc.fsf@draig.linaro.org>
+References: <20231208190911.102879-1-crosa@redhat.com>
+ <20231208190911.102879-4-crosa@redhat.com>
+ <8734w8fzbc.fsf@draig.linaro.org>
+Date: Wed, 13 Dec 2023 15:08:26 -0500
+Message-ID: <87sf45vpad.fsf@p1.localdomain>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231212181156.GO3014157@nvidia.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-Hi,
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-Sorry, a bit late to the discussion :)
+> Cleber Rosa <crosa@redhat.com> writes:
+>
+>> Based on many runs, the average run time for these 4 tests is around
+>> 250 seconds, with 320 seconds being the ceiling.  In any way, the
+>> default 120 seconds timeout is inappropriate in my experience.
+>
+> I would rather see these tests updated to fix:
+>
+>  - Don't use such an old Fedora 31 image
 
-On Tue, Dec 12, 2023 at 02:11:56PM -0400, Jason Gunthorpe wrote:
-> On Tue, Dec 12, 2023 at 05:46:34PM +0000, Catalin Marinas wrote:
-> > should know the implications. There's also an expectation that the
-> > actual driver (KVM guests) or maybe later DPDK can choose the safe
-> > non-cacheable or write-combine (Linux terminology) attributes for the
-> > BAR.
-> 
-> DPDK won't rely on this interface
+I remember proposing a bump in Fedora version used by default in
+avocado_qemu.LinuxTest (which would propagate to tests such as
+boot_linux.py and others), but that was not well accepted.  I can
+definitely work on such a version bump again.
 
-Wait, so what's the expected interface for determining the memory
-attributes at stage-1? I'm somewhat concerned that we're conflating two
-things here:
+>  - Avoid updating image packages (when will RH stop serving them?)
 
- 1) KVM needs to know the memory attributes to use at stage-2, which
-    isn't fundamentally different from what's needed for userspace
-    stage-1 mappings.
+IIUC the only reason for updating the packages is to test the network
+from the guest, and could/should be done another way.
 
- 2) KVM additionally needs a hint that the device / VFIO can handle
-    mismatched aliases w/o the machine exploding. This goes beyond
-    supporting Normal-NC mappings at stage-2 and is really a bug
-    with our current scheme (nGnRnE at stage-1, nGnRE at stage-2).
+Eric, could you confirm this?
 
-I was hoping that (1) could be some 'common' plumbing for both userspace
-and KVM mappings. And for (2), any case where a device is intolerant of
-mismatches && KVM cannot force the memory attributes should be rejected.
+>  - The "test" is a fairly basic check of dmesg/sysfs output
 
-AFAICT, the only reason PCI devices can get the blanket treatment of
-Normal-NC at stage-2 is because userspace has a Device-* mapping and can't
-speculatively load from the alias. This feels a bit hacky, and maybe we
-should prioritize an interface for mapping a device into a VM w/o a
-valid userspace mapping.
+Maybe the network is also an implicit check here.  Let's see what Eric
+has to say.
 
-I very much understand that this has been going on for a while, and we
-need to do *something* to get passthrough working well for devices that
-like 'WC'. I just want to make sure we don't paint ourselves into a corner
-that's hard to get out of in the future.
+>
+> I think building a buildroot image with the tools pre-installed (with
+> perhaps more testing) would be a better use of our limited test time.
+>
+> FWIW the runtime on my machine is:
+>
+> =E2=9E=9C  env QEMU_TEST_FLAKY_TESTS=3D1 ./pyvenv/bin/avocado run ./tests=
+/avocado/intel_iommu.py
+> JOB ID     : 5c582ccf274f3aee279c2208f969a7af8ceb9943
+> JOB LOG    : /home/alex/avocado/job-results/job-2023-12-11T16.53-5c582cc/=
+job.log
+>  (1/4) ./tests/avocado/intel_iommu.py:IntelIOMMU.test_intel_iommu: PASS (=
+44.21 s)
+>  (2/4) ./tests/avocado/intel_iommu.py:IntelIOMMU.test_intel_iommu_strict:=
+ PASS (78.60 s)
+>  (3/4) ./tests/avocado/intel_iommu.py:IntelIOMMU.test_intel_iommu_strict_=
+cm: PASS (65.57 s)
+>  (4/4) ./tests/avocado/intel_iommu.py:IntelIOMMU.test_intel_iommu_pt: PAS=
+S (66.63 s)
+> RESULTS    : PASS 4 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | =
+CANCEL 0
+> JOB TIME   : 255.43 s
+>
 
--- 
-Thanks,
-Oliver
+Yes, I've also seen similar runtimes in other environments... so it
+looks like it depends a lot on the "dnf -y install numactl-devel".  If
+that can be removed, the tests would have much more predictable runtimes.
+
 
