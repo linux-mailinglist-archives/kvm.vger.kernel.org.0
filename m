@@ -1,122 +1,301 @@
-Return-Path: <kvm+bounces-4362-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4366-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1715811A3C
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 18:00:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D4C6811A4D
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 18:01:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80F851F21C28
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 17:00:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A55FC281F42
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 17:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDA103A8EC;
-	Wed, 13 Dec 2023 17:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8DE34C62F;
+	Wed, 13 Dec 2023 17:01:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BersAbf/"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Bcay2Ih4"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC08C35F1A
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 17:00:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2C010C433CA
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 17:00:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702486826;
-	bh=DyVDaQyDZnWu60dzoTXWiXA7SGSuC4rzKLSNn8GYeyE=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=BersAbf/u1ER806iqR6zYY8mIvaDofODFaSU4mkQSHNjo08/TcHJQ7zSThxoROn3w
-	 XYCeFm+BQZAXWoCV0ohU+8GlnzwTyJFIFkDXpKwlxav7vWA6AWWCt5UoVSiAaGpG1i
-	 h0bvbXDaOUPUcV8SFBwIslme4kH18x6KtV1QRcvpuvuqMgDa5Fj22KTKAOIxc8xxp6
-	 ProuLgDeTPPqzzOg9sdtbBd7Mx7k/h0Ie0ZsQ7pCGzjDzVyUcaEcmEl3Z3YtmPiduV
-	 RW6NzdaLuLOsioDL4IMn4l/Q0uNrI8xtyQNT3/OwUoyHM+D1Z+XUfDJ27kPRlQLR9Z
-	 SDFP3nSZtf3SQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 0F5C1C53BD2; Wed, 13 Dec 2023 17:00:26 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218257] [Nested VM] Failed to boot L2 Windows guest on L1
- Windows guest
-Date: Wed, 13 Dec 2023 17:00:25 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: seanjc@google.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218257-28872-pwqJm82fAR@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218257-28872@https.bugzilla.kernel.org/>
-References: <bug-218257-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DEADD0;
+	Wed, 13 Dec 2023 09:00:57 -0800 (PST)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BDFND9T027050;
+	Wed, 13 Dec 2023 17:00:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=hNTPoikdwEb6oOA+VqHykjaZKyLdgxvqiEq+g0mXvnA=;
+ b=Bcay2Ih4p00UyajuRWlMmZKjgmQAbxEiQuD2fTjgXuc7PdnHyqUYWpOVFVX8OmJzNYu8
+ x3HBGQV/hKLs9xKwv++mCP8CKMr846dIRJlg9hqNGqWqlGffkcxi78PbIgfIX5YyMtOM
+ 8bW8CUEYBX7AhZDwTai1pdda2aehMpv5GC9ya0Mm+0SsFGPD9RGiGewSLgsjeXSeBqdE
+ +oESxMoOFV+0bTEGE45flMBBBczahV8VtSLpA0yHqwmLfSIr9+e32c614vVYV9uRaKvJ
+ f3V98oJawVCjZgrDhX4KzRUI0O1/RXx7RrRs6C9XDZCZ3tb7LWDnpw/Maht0XIRlc7du Xw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uyf72b2ms-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 17:00:48 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BDGgPrk002823;
+	Wed, 13 Dec 2023 17:00:47 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uyf72b2jq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 17:00:47 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BDG4cWH013878;
+	Wed, 13 Dec 2023 17:00:44 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uw5929sd1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 17:00:44 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BDH0fX133358570
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 13 Dec 2023 17:00:42 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E05A820043;
+	Wed, 13 Dec 2023 17:00:41 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C130720040;
+	Wed, 13 Dec 2023 17:00:41 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 13 Dec 2023 17:00:41 +0000 (GMT)
+Date: Wed, 13 Dec 2023 18:00:33 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Cc: Nico =?UTF-8?B?QsO2aHI=?= <nrb@linux.ibm.com>,
+        Janosch Frank
+ <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
+        Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
+        Thomas Huth <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 5/5] s390x: Add test for STFLE
+ interpretive execution (format-0)
+Message-ID: <20231213180033.54516bdd@p-imbrenda>
+In-Reply-To: <20231213124942.604109-6-nsg@linux.ibm.com>
+References: <20231213124942.604109-1-nsg@linux.ibm.com>
+	<20231213124942.604109-6-nsg@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: lDwjlNG91U_8fU0YMzihknB93SPAe1B3
+X-Proofpoint-GUID: o1kTSGK_bC_RgErfPTfEsE6CHBlrsSwB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-13_09,2023-12-13_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ priorityscore=1501 phishscore=0 adultscore=0 mlxscore=0 malwarescore=0
+ mlxlogscore=999 lowpriorityscore=0 impostorscore=0 spamscore=0
+ clxscore=1015 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312130119
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218257
+On Wed, 13 Dec 2023 13:49:42 +0100
+Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
 
---- Comment #1 from Sean Christopherson (seanjc@google.com) ---
-On Tue, Dec 12, 2023, bugzilla-daemon@kernel.org wrote:
-> Environment:
-> ------------
-> CPU Architecture: x86_64
-> Host OS: CentOS Stream 9
-> Guest OS L1: Windows 10 Pro (10.0.18362 N/A Build 18362), x64-based PC
-> Guest OS L2: Windows 10 Enterprises (10.0.10240 N/A Build 10240), x64-bas=
-ed
-> PC
-> kvm.git next branch commit id: e9e60c82fe391d04db55a91c733df4a017c28b2f
-> qemu-kvm commit id:=20
-> Host Kernel Version: 6.7.0-rc1
-> Hardware: Sapphire Rapids
->=20
-> Bug detailed description:
-> --------------------------
-> To verify two nested Windows guests scenarios, we used Windows image to
-> create
-> L1 guest, then failed to boot L2 Windows guest on L1 guest. The error scr=
-een
-> is
-> captured in attachment.=20
->=20
-> Note: this is suspected to be a KVM Kernel bug by bisect the different
-> commits:
-> kvm next                                 + qemu-kvm   =3D result
-> a1c288f87de7aff94e87724127eabb6cdb38b120 + d451e32c   =3D bad
-> e1a6d5cf10dd93fc27d8c85cd7b3e41f08a816e6 + d451e32c   =3D good
+> The STFLE instruction indicates installed facilities.
+> SIE can interpretively execute STFLE.
+> Use a snippet guest executing STFLE to get the result of
+> interpretive execution and check the result.
+> 
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 
-Assuming `git bisect` didn't point at exactly the merge commit, can you ple=
-ase
-bisect to the exact commit, instead of the merge commit?  I.e.
+[...]
 
-  git bisect start
-  git bisect bad a1c288f87de7aff94e87724127eabb6cdb38b120
-  git bisect good e1a6d5cf10dd93fc27d8c85cd7b3e41f08a816e6
+>  static inline void setup_facilities(void)
+> diff --git a/s390x/snippets/c/stfle.c b/s390x/snippets/c/stfle.c
+> new file mode 100644
+> index 00000000..eb024a6a
+> --- /dev/null
+> +++ b/s390x/snippets/c/stfle.c
+> @@ -0,0 +1,26 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright IBM Corp. 2023
+> + *
+> + * Snippet used by the STLFE interpretive execution facilities test.
+> + */
+> +#include <libcflat.h>
+> +#include <snippet-guest.h>
+> +
+> +int main(void)
+> +{
+> +	const unsigned int max_fac_len = 8;
 
-and go from there.
+why 8?
 
-Hopefully it isn't the merge commit that's being blamed, as that will be far
-more
-painful to figure out.
+> +	uint64_t res[max_fac_len + 1];
+> +
+> +	res[0] = max_fac_len - 1;
+> +	asm volatile ( "lg	0,%[len]\n"
+> +		"	stfle	%[fac]\n"
+> +		"	stg	0,%[len]\n"
+> +		: [fac] "=QS"(*(uint64_t(*)[max_fac_len])&res[1]),
+> +		  [len] "+RT"(res[0])
+> +		:
+> +		: "%r0", "cc"
+> +	);
+> +	force_exit_value((uint64_t)&res);
+> +	return 0;
+> +}
+> diff --git a/s390x/stfle-sie.c b/s390x/stfle-sie.c
+> new file mode 100644
+> index 00000000..574319ed
+> --- /dev/null
+> +++ b/s390x/stfle-sie.c
+> @@ -0,0 +1,132 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright IBM Corp. 2023
+> + *
+> + * SIE with STLFE interpretive execution facilities test.
+> + */
+> +#include <libcflat.h>
+> +#include <stdlib.h>
+> +#include <asm/facility.h>
+> +#include <asm/time.h>
+> +#include <snippet-host.h>
+> +#include <alloc_page.h>
+> +#include <sclp.h>
+> +
+> +static struct vm vm;
+> +static uint64_t (*fac)[PAGE_SIZE / sizeof(uint64_t)];
+> +static rand_state rand_s;
+> +
+> +static void setup_guest(void)
+> +{
+> +	extern const char SNIPPET_NAME_START(c, stfle)[];
+> +	extern const char SNIPPET_NAME_END(c, stfle)[];
+> +
+> +	setup_vm();
+> +	fac = alloc_pages_flags(0, AREA_DMA31);
+> +
+> +	snippet_setup_guest(&vm, false);
+> +	snippet_init(&vm, SNIPPET_NAME_START(c, stfle),
+> +		     SNIPPET_LEN(c, stfle), SNIPPET_UNPACK_OFF);
+> +}
+> +
+> +struct guest_stfle_res {
+> +	uint16_t len;
+> +	uint64_t reg;
+> +	unsigned char *mem;
+> +};
+> +
+> +static struct guest_stfle_res run_guest(void)
+> +{
+> +	struct guest_stfle_res res;
+> +	uint64_t guest_stfle_addr;
+> +
+> +	sie(&vm);
+> +	assert(snippet_get_force_exit_value(&vm, &guest_stfle_addr));
+> +	res.mem = &vm.guest_mem[guest_stfle_addr];
+> +	memcpy(&res.reg, res.mem, sizeof(res.reg));
+> +	res.len = (res.reg & 0xff) + 1;
+> +	res.mem += sizeof(res.reg);
+> +	return res;
+> +}
+> +
+> +static void test_stfle_format_0(void)
+> +{
+> +	struct guest_stfle_res res;
+> +
+> +	report_prefix_push("format-0");
+> +	for (int j = 0; j < stfle_size(); j++)
+> +		WRITE_ONCE((*fac)[j], rand64(&rand_s));
 
---=20
-You may reply to this email to add a comment.
+do you really need random numbers? can't you use a static pattern?
+maybe something like 0x0001020304050607 etc...
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+> +	vm.sblk->fac = (uint32_t)(uint64_t)fac;
+> +	res = run_guest();
+> +	report(res.len == stfle_size(), "stfle len correct");
+> +	report(!memcmp(*fac, res.mem, res.len * sizeof(uint64_t)),
+> +	       "Guest facility list as specified");
+
+it seems like you are comparing the full facility list (stfle_size
+doublewords long) with the result of STFLE in the guest, but the guest
+is limited to 8 double words?
+
+> +	report_prefix_pop();
+> +}
+> +
+> +struct args {
+> +	uint64_t seed;
+> +};
+> +
+> +static bool parse_uint64_t(const char *arg, uint64_t *out)
+> +{
+> +	char *end;
+> +	uint64_t num;
+> +
+> +	if (arg[0] == '\0')
+> +		return false;
+> +	num = strtoul(arg, &end, 0);
+> +	if (end[0] != '\0')
+> +		return false;
+> +	*out = num;
+> +	return true;
+> +}
+> +
+> +static struct args parse_args(int argc, char **argv)
+> +{
+> +	struct args args;
+> +	const char *flag;
+> +	unsigned int i;
+> +	uint64_t arg;
+> +	bool has_arg;
+> +
+> +	stck(&args.seed);
+> +
+> +	for (i = 1; i < argc; i++) {
+> +		if (i + 1 < argc)
+> +			has_arg = parse_uint64_t(argv[i + 1], &arg);
+> +		else
+> +			has_arg = false;
+> +
+> +		flag = "--seed";
+> +		if (!strcmp(flag, argv[i])) {
+> +			if (!has_arg)
+> +				report_abort("%s needs an uint64_t parameter", flag);
+> +			args.seed = arg;
+> +			++i;
+> +			continue;
+> +		}
+> +		report_abort("Unsupported parameter '%s'",
+> +			     argv[i]);
+> +	}
+> +
+> +	return args;
+> +}
+
+this is lots of repeated code in all tests, I should really resurrect
+and polish my patchseries for argument parsing
+
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	struct args args = parse_args(argc, argv);
+> +
+> +	if (!sclp_facilities.has_sief2) {
+> +		report_skip("SIEF2 facility unavailable");
+> +		goto out;
+> +	}
+> +
+> +	report_info("pseudo rand seed: 0x%lx", args.seed);
+> +	rand_s = RAND_STATE_INIT(args.seed);
+> +	setup_guest();
+> +	if (test_facility(7))
+> +		test_stfle_format_0();
+> +out:
+> +	return report_summary();
+> +}
+
 
