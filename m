@@ -1,93 +1,112 @@
-Return-Path: <kvm+bounces-4276-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4277-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F9688107B4
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 02:36:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DB0A8107BB
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 02:38:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EDF72B20AE0
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 01:36:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E3AF1C20E42
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 01:38:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BA731109;
-	Wed, 13 Dec 2023 01:36:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FFAA1C2F;
+	Wed, 13 Dec 2023 01:38:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o6UQ8y9w"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R/2yqKYC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DE17B2
-	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 17:36:16 -0800 (PST)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-50c222a022dso6917551e87.1
-        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 17:36:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702431375; x=1703036175; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=8Hxc3TLAQxGrVMxCKcgPL57up2sHDuMinvi71A2jdig=;
-        b=o6UQ8y9w9dNjYAylF0bVCFUSmfbjacxSJyTHWQlCC00v4Yr5wER2zJBjMYjI/NXP72
-         Bpz8ypoZmMamG9ioxO0Te1APdSkk6xgGLm5Tt7o6vGcIRcwK2yyMqBzCduFur1PhSxKG
-         s9ZblBnRbjPBtGUkIuWWoDjYISFjR4vrncHjZgjtHI0lQAU1wAmaBleiqJjO5wXEP7SZ
-         GrNVsAsQoB8OvG2UTynrIlYWFSdmAxTSckFCgCFDHd9chJChV4HABTotytKdHAklXA6x
-         nY+q2mPynPoVJXxFJqTfWJDynQw+mkoi/KP9qegrliyNUcP7Q69H7nk7oyL4llSI5MoT
-         6blQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702431375; x=1703036175;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8Hxc3TLAQxGrVMxCKcgPL57up2sHDuMinvi71A2jdig=;
-        b=SzPVMXYAXiH1ncJdXCNCkisgmQmL7txyYJ8wysGlpgewWiNDpx0EeIy+x4qVH4Q/Ui
-         kTxZ2jilgH6ZHgYwHLTIk5OBWFn1z0IrKpraObx7rrI/QXk0s5pYUPfYVNmfrYri6VSa
-         s+JO8O/92PM1dkR2d4Og6mgwpiilMTU80mgomu81F8sghylP+uGzyLOFTZYs6Nk8UFwO
-         PMAbZlYi2l7nqy6Xx+1Li+/bNtP7SzI2nk0hRRVm52R8B/2Fstr4pT/drDmQNIuWZ+nf
-         L41b2lwynygEQLwBjvo4Wf1CGYVJGLPNUpa2AYYpxS4qhvWoYgtavj2R0lFlZtxj3Pa4
-         V+Sg==
-X-Gm-Message-State: AOJu0Yy0PT0NtjkaWkRQASlGxYc8l8Qd1OpGbcjhtl+FO5C0ALloZ9eJ
-	T3NIfMuyKmMVYQe/FdwMqhWxpbcZqHQ5WC+nNoK05g==
-X-Google-Smtp-Source: AGHT+IE8qr+3ZvJkExQliW6jHkHk7Az0eZ+hzQWcAo5QVabKY02QemCYudczVw2seK85vsVg+FKoN5iLYzGZmBPee8U=
-X-Received: by 2002:a05:6512:aca:b0:50b:e056:396a with SMTP id
- n10-20020a0565120aca00b0050be056396amr4240552lfu.28.1702431374658; Tue, 12
- Dec 2023 17:36:14 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 880B6B7
+	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 17:38:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702431484; x=1733967484;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=E5bo38G9wSrHW4X6lsQVsL4jEOOuwQSDXNiS3Q5rqh8=;
+  b=R/2yqKYCi71oTOpGRhy2tHKmBajXhU6hBt7laNgrlEtyhLXAvX1r84z7
+   xCwW2HSYAAaOQtkaxJSFqbqvrlXgw4psMJD6pRuQjyqC8uhbk5an51jYv
+   Rqvpz3eXZcQcXvnGQzBVnJvozeOQ/yDYMpkbP+Bv8PS9VbAxdo/jrjhdc
+   3ielszfLskUEx+nmBnSnYgPB2U9aKoOzjbHkQyb81zpcwMiHJrz6+efxz
+   PI5ksg0gQ7zmSNsOWSAdGQTHmQrK+6b9PqDpDs/qGW5rGd2kL1YqlG+Ru
+   SLvDy7Vs6RoWfwP+oHyqXkCIgQtnvanVXIukkGDhMN+l1x9LnEdNM+gdV
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="1743024"
+X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
+   d="scan'208";a="1743024"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 17:38:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="807988078"
+X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
+   d="scan'208";a="807988078"
+Received: from danwu1-mobl.ccr.corp.intel.com (HELO [10.238.4.153]) ([10.238.4.153])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 17:38:02 -0800
+Message-ID: <67f29426-7af4-4b07-a22e-fdf89a7b452c@intel.com>
+Date: Wed, 13 Dec 2023 09:36:56 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231206005727.46150-1-zhangfei.gao@linaro.org> <170238473311.3099166.16078152394414654471.b4-ty@kernel.org>
-In-Reply-To: <170238473311.3099166.16078152394414654471.b4-ty@kernel.org>
-From: Zhangfei Gao <zhangfei.gao@linaro.org>
-Date: Wed, 13 Dec 2023 09:36:03 +0800
-Message-ID: <CABQgh9EWiHXxEpNPNmS9r1HPSaxraYgtGC+cqJOTeSdYFp1TGw@mail.gmail.com>
-Subject: Re: [PATCH] iommu/arm-smmu-v3: disable stall for quiet_cd
-To: Will Deacon <will@kernel.org>
-Cc: jean-philippe <jean-philippe@linaro.org>, Joerg Roedel <joro@8bytes.org>, 
-	Jason Gunthorpe <jgg@nvidia.com>, catalin.marinas@arm.com, kernel-team@android.com, 
-	iommu@lists.linux.dev, kvm@vger.kernel.org, 
-	Wenkai Lin <linwenkai6@hisilicon.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v1 0/3] x86: fix async page fault issues
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, xiaoyao.li@intel.com
+References: <20231212062708.16509-1-dan1.wu@intel.com>
+ <ZXh5fJonSWLcHmkN@google.com>
+From: "Wu, Dan1" <dan1.wu@intel.com>
+In-Reply-To: <ZXh5fJonSWLcHmkN@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 13 Dec 2023 at 01:21, Will Deacon <will@kernel.org> wrote:
->
-> On Wed, 6 Dec 2023 08:57:27 +0800, Zhangfei Gao wrote:
-> > From: Wenkai Lin <linwenkai6@hisilicon.com>
-> >
-> > In the stall model, invalid transactions were expected to be
-> > stalled and aborted by the IOPF handler.
-> >
-> > However, when killing a test case with a huge amount of data, the
-> > accelerator streamline can not stop until all data is consumed
-> > even if the page fault handler reports errors. As a result, the
-> > kill may take a long time, about 10 seconds with numerous iopf
-> > interrupts.
-> >
-> > [...]
->
-> Applied to will (for-joerg/arm-smmu/updates), thanks!
->
-> [1/1] iommu/arm-smmu-v3: disable stall for quiet_cd
->       https://git.kernel.org/will/c/b41932f54458
 
-Thanks Will
+On 12/12/2023 11:17 PM, Sean Christopherson wrote:
+> On Tue, Dec 12, 2023, Dan Wu wrote:
+>> When running asyncpf test, it gets skipped without a clear reason:
+>>
+>>      ./asyncpf
+>>
+>>      enabling apic
+>>      smp: waiting for 0 APs
+>>      paging enabled
+>>      cr0 = 80010011
+>>      cr3 = 107f000
+>>      cr4 = 20
+>>      install handler
+>>      enable async pf
+>>      alloc memory
+>>      start loop
+>>      end loop
+>>      start loop
+>>      end loop
+>>      SUMMARY: 0 tests
+>>      SKIP asyncpf (0 tests)
+>>
+>> The reason is that KVM changed to use interrupt-based 'page-ready' notification
+>> and abandoned #PF-based 'page-ready' notification mechanism. Interrupt-based
+>> 'page-ready' notification requires KVM_ASYNC_PF_DELIVERY_AS_INT to be set as well
+>> in MSR_KVM_ASYNC_PF_EN to enable asyncpf.
+>>
+>> This series tries to fix the problem by separating two testcases for different mechanisms.
+>>
+>> - For old #PF-based notification, changes current asyncpf.c to add CPUID check
+>>    at the beginning. It checks (KVM_FEATURE_ASYNC_PF && !KVM_FEATURE_ASYNC_PF_INT),
+>>    otherwise it gets skipped.
+>>
+>> - For new interrupt-based notification, add a new test, asyncpf-int.c, to check
+>>    (KVM_FEATURE_ASYNC_PF && KVM_FEATURE_ASYNC_PF_INT) and implement interrupt-based
+>>    'page-ready' handler.
+> Using #PF to deliver page-ready is completely dead, no?  Unless I'm mistaken, let's
+> just drop the existing support and replace it with the interrupted-based mechanism.
+> I see no reason to continue maintaining the old crud.  If someone wants to verify
+> an old, broken KVM, then they can use the old version of  KUT.
+
+Yes, since Linux v5.10 the feature asyncpf is deprecated.
+
+So, just drop asyncpf.c and add asyncpf_int.c is enough, right?
+
+>
 
