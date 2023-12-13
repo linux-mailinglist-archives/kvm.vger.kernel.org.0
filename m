@@ -1,134 +1,134 @@
-Return-Path: <kvm+bounces-4392-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4393-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4908B811FDF
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 21:24:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84F6F811FFC
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 21:30:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E262D1F2189F
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 20:24:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13F712827DF
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 20:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E317E56D;
-	Wed, 13 Dec 2023 20:24:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DF4F5A10C;
+	Wed, 13 Dec 2023 20:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S3hi+Mbo"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="gZ68dQNw"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE9559C
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 12:23:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702499035;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5C/keDxF1/pt3LjYpoXehfsM1EqRnMNHBvxaU+Hjdwg=;
-	b=S3hi+MboDUrdHQJqBzkeOIQFwyWda4sG/QH8lMDmu1hcuFK64MNlC7ZK8ZLszrUzzGOtlr
-	4Iyvxhd2T1QD4rvrdp5VWe2KDDhtwa32Bpc9pM1ulq2POyqTBKVlaGOs/2dG7nfysW/8vn
-	KKtN/+KGgpMmx4wWd2KC8rdrl0EXASc=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-484-PAsCtSL4PXK6q8sx3DVITQ-1; Wed, 13 Dec 2023 15:23:53 -0500
-X-MC-Unique: PAsCtSL4PXK6q8sx3DVITQ-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7b71b4b179aso342848839f.1
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 12:23:53 -0800 (PST)
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7F6E100
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 12:30:18 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-33621d443a7so3699690f8f.3
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 12:30:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1702499417; x=1703104217; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=i+467Loz3LrvYEdXAV5s12LMqcUY9odwCyEv1IdVOvU=;
+        b=gZ68dQNw/RKx0d/oICoetz555Ra/uNpzcF7W/+PXeUdEN8b28FE0zRdTMG7aZcvOd3
+         khRv3oWfsZ8UFA3eDrp8OWX0SgZQb4PHzky2v/sMMIgKbOJVVs4lY5FXM+RqFemkmXsu
+         fV8tPbNPboESY07Bv6Bb5vQnFSCSDITsEyyLGf/D4TOiDiWLydRuU6PemOJMXrckW41Y
+         6ehCVKWYTa9883sRrWJzRXxEiPtzrv0hPQvjFyuEhVvxwXRrS285HsCrPyTrmEQt1JXg
+         IVaGD8fJ0oQbSL3OpHtATR3by/loi94TtYmySiThArcC4hEQ4UMXNWEgLLPIqW56IoCk
+         MKgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702499033; x=1703103833;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5C/keDxF1/pt3LjYpoXehfsM1EqRnMNHBvxaU+Hjdwg=;
-        b=O7XpOmmzU3wyEosbvonbkqR52BagBsrucou0mfgJX/QiKkeFn50UCqPta6eX5YOJHX
-         P7w1rY8nyandGAi4dvE50EUJnLy4B3s8G05XRofpwucYWeLbzwyj6CLK6CiUxrjCr+pP
-         NBrcvDUDN1J1zYkn2nuxRLW6Vx9SfKPOPPt7vb+x2csvzuXM4Zf47kDRhmlKKBGbWJmH
-         bKBdJbPx8rhvaK5b3szFW0s/c5qxhxsmIl5Dxueajz/xVMKU2Ddkg6AP9AqXLp8O+6az
-         zZ0hQVYF55/Cfigo8P1LOcgm2jVa6YH2OGoZppWNC33XRqrs1pISQSrXWvq8gpBi0HL2
-         VCOQ==
-X-Gm-Message-State: AOJu0YyRkS2VqYtIbxUCyKi+gxfHaUAcUNGNWQfEefab38HwANH+6jDd
-	hLVnPSbDpOSwDIqe8p03OJhS+mpwJFWuBl3OBBjrI9nnvvpgA23RgVasSrjAKNREnZbSQwUF6FM
-	Ex60AHKZn6FjT
-X-Received: by 2002:a6b:7009:0:b0:7b7:430e:b6d3 with SMTP id l9-20020a6b7009000000b007b7430eb6d3mr4887261ioc.19.1702499033005;
-        Wed, 13 Dec 2023 12:23:53 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFVH/Wa4FgSzR7V+CcfM/i9gA7Z0wWs/QWlnrtIE7JmYOrHsB69O/zXT6ljBY0amDk6CkU7pw==
-X-Received: by 2002:a6b:7009:0:b0:7b7:430e:b6d3 with SMTP id l9-20020a6b7009000000b007b7430eb6d3mr4887249ioc.19.1702499032741;
-        Wed, 13 Dec 2023 12:23:52 -0800 (PST)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id p8-20020a0566380e8800b0046926dafa32sm3041580jas.135.2023.12.13.12.23.51
+        d=1e100.net; s=20230601; t=1702499417; x=1703104217;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=i+467Loz3LrvYEdXAV5s12LMqcUY9odwCyEv1IdVOvU=;
+        b=ZH6aczQvcViId0RERXDksj2vJ//ZySBVQMDMiQgKtd1RKCJMHdRnbNog00sdcj2W0x
+         G8DiGwlrUfoqvTRMbE4Xnir5GNF1sp3sAz1gDsC8Sh01ljnStZCqCa/5FOaQrBJ0kr0m
+         1h1wfLe3u2RJJ+LvVqqhSsjeZJ4V/ytHvVUo2d8xVChZL867bDlgeItV+NfHfOuRnztd
+         FNU5Bm9FDOsVlf6GXt9TyOgQQssvHBcJ/DCxv7pi4XVJXOaqsN466RmXPxxvwxRgR/dH
+         AfvHKoyQLVXDbu2tIPrVtzkTG3rLL/idGZzVifvrKKlmEXMO1bou58txOl+EFLqpJkK+
+         T+jg==
+X-Gm-Message-State: AOJu0YypXcTBayri1EwYuDXYAQVY4AMkr6WaIABVEk0LLxv2LWcCO0nJ
+	o08mL8ekKLno/GZcgpzaeKOe4A==
+X-Google-Smtp-Source: AGHT+IGBLga6z9pG2jLj7Eh24QZCKuh/cAtflhfd+Zgtj1tOF9StAT24MMOv0TqcLPwKldvFFyI7jA==
+X-Received: by 2002:a05:6000:10c1:b0:336:38ef:1e91 with SMTP id b1-20020a05600010c100b0033638ef1e91mr917003wrx.128.1702499416911;
+        Wed, 13 Dec 2023 12:30:16 -0800 (PST)
+Received: from alex-rivos.ba.rivosinc.com (amontpellier-656-1-456-62.w92-145.abo.wanadoo.fr. [92.145.124.62])
+        by smtp.gmail.com with ESMTPSA id x10-20020a5d444a000000b00336371fafe6sm2945256wrr.16.2023.12.13.12.30.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 12:23:52 -0800 (PST)
-Date: Wed, 13 Dec 2023 13:23:40 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yishai Hadas <yishaih@nvidia.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, "jgg@nvidia.com" <jgg@nvidia.com>,
- "mst@redhat.com" <mst@redhat.com>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, "virtualization@lists.linux-foundation.org"
- <virtualization@lists.linux-foundation.org>, "parav@nvidia.com"
- <parav@nvidia.com>, "feliu@nvidia.com" <feliu@nvidia.com>,
- "jiri@nvidia.com" <jiri@nvidia.com>, "joao.m.martins@oracle.com"
- <joao.m.martins@oracle.com>, "si-wei.liu@oracle.com"
- <si-wei.liu@oracle.com>, "leonro@nvidia.com" <leonro@nvidia.com>,
- "maorg@nvidia.com" <maorg@nvidia.com>, "jasowang@redhat.com"
- <jasowang@redhat.com>
-Subject: Re: [PATCH V7 vfio 9/9] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Message-ID: <20231213132340.4f692bd0.alex.williamson@redhat.com>
-In-Reply-To: <fc4a3133-0233-4843-a4e4-ad86e5b91b3d@nvidia.com>
-References: <20231207102820.74820-1-yishaih@nvidia.com>
-	<20231207102820.74820-10-yishaih@nvidia.com>
-	<BN9PR11MB5276C9276E78C66B0C5DA9088C8DA@BN9PR11MB5276.namprd11.prod.outlook.com>
-	<fc4a3133-0233-4843-a4e4-ad86e5b91b3d@nvidia.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+        Wed, 13 Dec 2023 12:30:16 -0800 (PST)
+From: Alexandre Ghiti <alexghiti@rivosinc.com>
+To: Russell King <linux@armlinux.org.uk>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Alexander Potapenko <glider@google.com>,
+	Marco Elver <elver@google.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Vincenzo Frascino <vincenzo.frascino@arm.com>,
+	kasan-dev@googlegroups.com,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-efi@vger.kernel.org,
+	linux-mm@kvack.org
+Cc: Alexandre Ghiti <alexghiti@rivosinc.com>
+Subject: [PATCH v2 0/4] riscv: Use READ_ONCE()/WRITE_ONCE() for pte accesses
+Date: Wed, 13 Dec 2023 21:29:57 +0100
+Message-Id: <20231213203001.179237-1-alexghiti@rivosinc.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 13 Dec 2023 14:25:10 +0200
-Yishai Hadas <yishaih@nvidia.com> wrote:
+This series is a follow-up for riscv of a recent series from Ryan [1] which
+converts all direct dereferences of pte_t into a ptet_get() access.
 
-> On 13/12/2023 10:23, Tian, Kevin wrote:
- 
-> >> +
-> >> +static int virtiovf_pci_probe(struct pci_dev *pdev,
-> >> +			      const struct pci_device_id *id)
-> >> +{
-> >> +	const struct vfio_device_ops *ops = &virtiovf_vfio_pci_ops;
-> >> +	struct virtiovf_pci_core_device *virtvdev;
-> >> +	int ret;
-> >> +
-> >> +	if (pdev->is_virtfn && virtio_pci_admin_has_legacy_io(pdev) &&
-> >> +	    !virtiovf_bar0_exists(pdev))
-> >> +		ops = &virtiovf_vfio_pci_tran_ops;  
-> > 
-> > I have a confusion here.
-> > 
-> > why do we want to allow this driver binding to non-matching VF or
-> > even PF?  
-> 
-> The intention is to allow the binding of any virtio-net device (i.e. PF, 
-> VF which is not transitional capable) to have a single driver over VFIO 
-> for all virtio-net devices.
-> 
-> This enables any user space application to bind and use any virtio-net 
-> device without the need to care.
-> 
-> In case the device is not transitional capable, it will simply use the 
-> generic vfio functionality.
+The goal here for riscv is to use READ_ONCE()/WRITE_ONCE() for all page
+table entries accesses to avoid any compiler transformation when the
+hardware can concurrently modify the page tables entries (A/D bits for
+example).
 
-The algorithm we've suggested for finding the most appropriate variant
-driver for the device doesn't include a step of moving on to another
-driver if the binding fails.  We lose determinism at that point.
-Therefore this driver needs to handle all devices matching the id table.
-The fact that virtio dictates various config space fields limits our
-ability to refine the match from the id table. Thanks,
+I went a bit further and added pud/p4d/pgd_get() helpers as such concurrent
+modifications can happen too at those levels.
 
-Alex
+[1] https://lore.kernel.org/all/20230612151545.3317766-1-ryan.roberts@arm.com/
+
+Changes in v2:
+- Fix the kernel test report on arm32
+- Remove the pte suffix patch
+- Fix pud_offset/p4d_offset which were missing the use of accessors
+- Rebase on top of 6.7-rc4
+
+Alexandre Ghiti (4):
+  riscv: Use WRITE_ONCE() when setting page table entries
+  mm: Introduce pudp/p4dp/pgdp_get() functions
+  riscv: mm: Only compile pgtable.c if MMU
+  riscv: Use accessors to page table entries instead of direct
+    dereference
+
+ arch/arm/include/asm/pgtable.h      |  2 ++
+ arch/riscv/include/asm/kfence.h     |  4 +--
+ arch/riscv/include/asm/pgtable-64.h | 22 +++----------
+ arch/riscv/include/asm/pgtable.h    | 33 +++++--------------
+ arch/riscv/kernel/efi.c             |  2 +-
+ arch/riscv/kvm/mmu.c                | 22 ++++++-------
+ arch/riscv/mm/Makefile              |  3 +-
+ arch/riscv/mm/fault.c               | 16 ++++-----
+ arch/riscv/mm/hugetlbpage.c         | 12 +++----
+ arch/riscv/mm/kasan_init.c          | 45 +++++++++++++------------
+ arch/riscv/mm/pageattr.c            | 44 ++++++++++++-------------
+ arch/riscv/mm/pgtable.c             | 51 ++++++++++++++++++++++++++---
+ include/linux/pgtable.h             | 21 ++++++++++++
+ 13 files changed, 157 insertions(+), 120 deletions(-)
+
+-- 
+2.39.2
 
 
