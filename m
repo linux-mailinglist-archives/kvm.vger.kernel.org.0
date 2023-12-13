@@ -1,127 +1,108 @@
-Return-Path: <kvm+bounces-4289-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4292-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44739810A21
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 07:16:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CE95810A80
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 07:40:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00B4C281E47
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 06:16:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD4D51F2190F
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 06:40:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54BF2FC00;
-	Wed, 13 Dec 2023 06:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="hwx4i2gL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7815C10A0C;
+	Wed, 13 Dec 2023 06:40:42 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F9AEEB
-	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 22:16:43 -0800 (PST)
-Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2cb21afa6c1so76773251fa.0
-        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 22:16:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1702448202; x=1703053002; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=71L6UE8bKw9xAm3N5o4/wivq75A3TGoxxbYsqvN4Hr0=;
-        b=hwx4i2gLSl4bcvr9DhAI5+kNX6LiOF78YQbCipRICgjWAFcaCaKRchlaqR7KnEx3Bb
-         KQq4SL9I9NGxYDfARVmPKv4QrKlL8GzEpIHEB987BqMTKUm0G0IyTxj7SDfAHuYZFVsp
-         CDXFZptk515kIOSCkeCdZFQiiKcTjuzW6aMfWjMGGOYrTV1vICIQTDL0jXipdTgv/6eR
-         pF15RsJYq3Sup4kb8ZIMafr4BEnmPq7vYZH3HDUnyqVWbgenvw/Ee7dY+tRy46BKCzTy
-         7BIUhEUODWOKvbz3Nm+7/C3/k5BOchSZgOy+cDgvzz/PxP7/5Wr4YvvSQhtpf2F3SY4u
-         g39Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702448202; x=1703053002;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=71L6UE8bKw9xAm3N5o4/wivq75A3TGoxxbYsqvN4Hr0=;
-        b=BQu4dF1Ak43nxIkaRz9tGxljBslYmvGXDS5xwJltNGXnl/lhor3FHkwBOhg2brx64c
-         Vp7XtiZm5Bz6XVHnckLaKKj9FdQbmEBXwxZCK6GLAfbvsRTUPie9mgYhLb1sPXzWVBaY
-         zUD1GTzN9W+Zv8WPNAkAPK5r7P8SbPEpKetusAsgacx5fI9uohumWMnNShKxEudsNwyj
-         jRZ/VzzwkUDmk7q/LZo2L1ubwJNrj9Yejhy6bTBDQgkRFPjssvywZf9Xa3JUXLLlGsDi
-         7xdLM1zO0lcD0NB3FvO/S4m6lzDOq9VAc6kkSFeRbvcmGy38YsKtqXvf3KQqv8Krcdwd
-         V7cA==
-X-Gm-Message-State: AOJu0Yxnt04xGfljX0E3hmU+B/QnEftpKif29sxZDCAltBwoQLOyWzj6
-	5gn3CDFmglxalu4LRukkfIrYocpao7iczZrC3dSN3A==
-X-Google-Smtp-Source: AGHT+IG/SLo7IZipsDDy7zRrZC+GgAuTAGWON0Bsoqj4uYyJv+RSVk/6F7C6tK2fz6ryDtVCQEYyyNn3PWzHDXcwocU=
-X-Received: by 2002:a05:651c:1145:b0:2cc:1ee4:a930 with SMTP id
- h5-20020a05651c114500b002cc1ee4a930mr3971199ljo.106.1702448201538; Tue, 12
- Dec 2023 22:16:41 -0800 (PST)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0DACAAD;
+	Tue, 12 Dec 2023 22:40:37 -0800 (PST)
+Received: from loongson.cn (unknown [10.2.5.185])
+	by gateway (Coremail) with SMTP id _____8AxZfDjUXll_pUAAA--.3703S3;
+	Wed, 13 Dec 2023 14:40:35 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.185])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxvnPhUXllJvMBAA--.12195S2;
+	Wed, 13 Dec 2023 14:40:33 +0800 (CST)
+From: Tianrui Zhao <zhaotianrui@loongson.cn>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	maobibo@loongson.cn,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: WANG Xuerui <kernel@xen0n.name>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	loongarch@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>,
+	Mark Brown <broonie@kernel.org>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Xi Ruoyao <xry111@xry111.site>,
+	zhaotianrui@loongson.cn
+Subject: [PATCH v4 0/2] LoongArch: KVM: Add LSX,LASX support
+Date: Wed, 13 Dec 2023 14:27:38 +0800
+Message-Id: <20231213062740.4175002-1-zhaotianrui@loongson.cn>
+X-Mailer: git-send-email 2.39.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231024132655.730417-1-cleger@rivosinc.com> <20231024132655.730417-6-cleger@rivosinc.com>
-In-Reply-To: <20231024132655.730417-6-cleger@rivosinc.com>
-From: Anup Patel <apatel@ventanamicro.com>
-Date: Wed, 13 Dec 2023 11:46:30 +0530
-Message-ID: <CAK9=C2UTww1AcF+U+7MBiT5c7PVtQrQQN=tNszjse+AgJd6xCQ@mail.gmail.com>
-Subject: Re: [PATCH v2 5/5] riscv: kvm: use ".L" local labels in assembly when applicable
-To: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Andrew Jones <ajones@ventanamicro.com>, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8DxvnPhUXllJvMBAA--.12195S2
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-On Tue, Oct 24, 2023 at 6:58=E2=80=AFPM Cl=C3=A9ment L=C3=A9ger <cleger@riv=
-osinc.com> wrote:
->
-> For the sake of coherency, use local labels in assembly when
-> applicable. This also avoid kprobes being confused when applying a
-> kprobe since the size of function is computed by checking where the
-> next visible symbol is located. This might end up in computing some
-> function size to be way shorter than expected and thus failing to apply
-> kprobes to the specified offset.
->
-> Signed-off-by: Cl=C3=A9ment L=C3=A9ger <cleger@rivosinc.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+This patch series add LSX,LASX support for LoongArch KVM.
+There will be LSX,LASX exception in KVM when guest use the
+LSX,LASX instructions. KVM will enable LSX,LASX and restore
+the vector registers for guest then return to guest to continue
+running.
 
-Queued this patch for Linux-6.8
+Changes for v4:
+1. Supplement vcpu features checking when cpucfg2 is passed from
+user space.
+(1) The LLFTP must be set, as guest must has a constant timer.
+(2) Single and double float point must both be set when enable FP.
+(3) FP should be set when enable LSX.
+(4) LSX,FP should be set when enable LASX.
 
-Thanks,
-Anup
+Changes for v3:
+1. Use KVM_GET_DEVICE_ATTR interface to return CPUCFG2
+features which are supported by KVM to user space.
+2. Remove version checking in kvm_check_cpucfg.
 
+Changes for v2:
+1. Add interface to return CPUCFG2 features which have
+been supported by current KVM to user space. So that
+user space can get CPU features such as FPU,LSX,LASX
+whether support by KVM.
+2. Add CPUCFG2 checking interface to check that if the
+value which is passed from user space has any errors.
+3. Export both _restore_lsx_upper and _restore_lasx_upper
+to keep consistency.
+4. Use "jr ra" instruction to repalce "jirl zero, ra, 0".
 
-> ---
->  arch/riscv/kvm/vcpu_switch.S | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/riscv/kvm/vcpu_switch.S b/arch/riscv/kvm/vcpu_switch.S
-> index 8b18473780ac..0c26189aa01c 100644
-> --- a/arch/riscv/kvm/vcpu_switch.S
-> +++ b/arch/riscv/kvm/vcpu_switch.S
-> @@ -45,7 +45,7 @@ SYM_FUNC_START(__kvm_riscv_switch_to)
->         REG_L   t0, (KVM_ARCH_GUEST_SSTATUS)(a0)
->         REG_L   t1, (KVM_ARCH_GUEST_HSTATUS)(a0)
->         REG_L   t2, (KVM_ARCH_GUEST_SCOUNTEREN)(a0)
-> -       la      t4, __kvm_switch_return
-> +       la      t4, .Lkvm_switch_return
->         REG_L   t5, (KVM_ARCH_GUEST_SEPC)(a0)
->
->         /* Save Host and Restore Guest SSTATUS */
-> @@ -113,7 +113,7 @@ SYM_FUNC_START(__kvm_riscv_switch_to)
->
->         /* Back to Host */
->         .align 2
-> -__kvm_switch_return:
-> +.Lkvm_switch_return:
->         /* Swap Guest A0 with SSCRATCH */
->         csrrw   a0, CSR_SSCRATCH, a0
->
-> --
-> 2.42.0
->
->
-> --
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+Changes for v1:
+1. Add LSX support for LoongArch KVM.
+2. Add LASX support for LoongArch KVM.
+
+Tianrui Zhao (2):
+  LoongArch: KVM: Add LSX support
+  LoongArch: KVM: Add LASX support
+
+ arch/loongarch/include/asm/kvm_host.h |  17 ++
+ arch/loongarch/include/asm/kvm_vcpu.h |  22 +++
+ arch/loongarch/include/uapi/asm/kvm.h |   1 +
+ arch/loongarch/kernel/fpu.S           |   2 +
+ arch/loongarch/kvm/exit.c             |  37 ++++
+ arch/loongarch/kvm/switch.S           |  36 ++++
+ arch/loongarch/kvm/trace.h            |   6 +-
+ arch/loongarch/kvm/vcpu.c             | 271 +++++++++++++++++++++++++-
+ 8 files changed, 386 insertions(+), 6 deletions(-)
+
+-- 
+2.39.1
+
 
