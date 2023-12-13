@@ -1,107 +1,134 @@
-Return-Path: <kvm+bounces-4338-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4339-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EADBA81130D
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 14:37:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33531811315
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 14:38:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2721A1C20F82
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 13:37:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2A2628257A
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 13:38:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D35992D60F;
-	Wed, 13 Dec 2023 13:37:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC742D608;
+	Wed, 13 Dec 2023 13:38:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="k3ZzSSDZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DC0eJUCr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [IPv6:2a01:4f9:3051:3f93::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0981010C;
-	Wed, 13 Dec 2023 05:37:20 -0800 (PST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 4A62C40E00CB;
-	Wed, 13 Dec 2023 13:37:17 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id p0U30yDLCYky; Wed, 13 Dec 2023 13:37:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1702474635; bh=YsH4/BEojnoqKhDSs/A5b/HEN4SIud9JxkU6bHGIETQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k3ZzSSDZFMpQnaGW9BcncZOs/yVlI6yaQuxN6E4vcYoNlELe7nKhzl5Ik0qVn3oCj
-	 j668Gcp+/P66Y/urrTJ/vDsLk9/u6n0FhhoHumDxwbG6N4kzmUxOYTDWxC6/YZ5kwB
-	 P2RvyUbZAsO9a2zbTdYt/KEi46RNH17BK36Co1IQx9rA+FmaoEAwEs1YRgnUvX6QOH
-	 nwmAuHRJ7f7lFi0bF1U52LiE2eaebb6Euoue6vucw+tjUql0v+bw4niwzaqnyJSzrm
-	 oPSXD2Sf5804v4D77oHC+2hj2afMmDhzZcmCBap/0qpDNXkWSeZXPEozTQT7i3DFmy
-	 NK1B3CIlO7Mur7agPdg7Cv5V5bYdtCkeOyVunRvDENHpzfqXPztmJASQTJko8b3MWs
-	 2pVgAX2EDaCFdMS2yokm6/WC4MaLq34kZHykWEN9B+aNOhe2bBQ68ROFc21zpCATjq
-	 Z6izNFCptB7hsGt5LHhLKuYrSpX3KSWtf/S1Ge7HqcvVBElo+FVS4SI2kbg7Ku6yS+
-	 +BGSHFFPGfNLsa6Izyhk8ONszw2sMQAzHgctgg1JqPdFFDJJ+zcEm37XpBVmK5W66f
-	 MRjOacIFonlsxm3SyICQvheBm5bJfg+y2x7srt0/+ep3HXHJ649sQOVzVCEUe35hmt
-	 p2C8L6CILEGJSIBky90kQ8fs=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8F45140E0030;
-	Wed, 13 Dec 2023 13:36:33 +0000 (UTC)
-Date: Wed, 13 Dec 2023 14:36:28 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-	linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, seanjc@google.com, vkuznets@redhat.com,
-	jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
-	slp@redhat.com, pgonda@google.com, peterz@infradead.org,
-	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-	dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
-	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-	marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-	alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
-	nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
-	liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>,
-	Jarkko Sakkinen <jarkko@profian.com>
-Subject: Re: [PATCH v10 04/50] x86/cpufeatures: Add SEV-SNP CPU feature
-Message-ID: <20231213133628.GEZXmzXFwA1p+crH/5@fat_crate.local>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-5-michael.roth@amd.com>
- <0b2eb374-356c-46c6-9c4a-9512fbfece7a@redhat.com>
- <20231213131324.GDZXmt9LsMmJZyzCJw@fat_crate.local>
- <40915dc3-4083-4b9f-bc64-7542833566e1@redhat.com>
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B853FDD
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 05:38:38 -0800 (PST)
+Date: Wed, 13 Dec 2023 14:38:34 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1702474717;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=k2KabcvDu24T1/+RDnEEzXHQcrYL/MoAqaQFJlpJvLI=;
+	b=DC0eJUCr0cAftytPYVnxVAH6Np3sdf6QKY67g0GbehyqaA3ktxshLwKov3rH+Yjn82XALi
+	VjmQMKqOnfXw0a66Lo+36aeDWolPQMU9sqCa8NLkpOGLn852JLnlhdy0plu6Ayt0lVfz4g
+	1CY/YQemVIcylJNWNq2/3pTMkCbK7Gw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, Nico Boehr <nrb@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH 1/5] lib: Add pseudo random functions
+Message-ID: <20231213-8407f7ddc3a972de2715db9c@orel>
+References: <20231213124942.604109-1-nsg@linux.ibm.com>
+ <20231213124942.604109-2-nsg@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <40915dc3-4083-4b9f-bc64-7542833566e1@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231213124942.604109-2-nsg@linux.ibm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Dec 13, 2023 at 02:31:05PM +0100, Paolo Bonzini wrote:
-> Sure, I only queued it because you gave Acked-by for 05/50 and this is an
-> obvious dependency.  I would like to get things in as they are ready
-> (whenever it makes sense), so if you want to include those two in the x86
-> tree for 6.8, that would work for me.
+On Wed, Dec 13, 2023 at 01:49:38PM +0100, Nina Schoetterl-Glausch wrote:
+> Add functions for generating pseudo random 32 and 64 bit values.
+> The implementation is very simple and the randomness likely not
+> of high quality.
+> 
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> ---
+>  Makefile       |  1 +
+>  lib/libcflat.h |  7 +++++++
+>  lib/rand.c     | 19 +++++++++++++++++++
+>  3 files changed, 27 insertions(+)
+>  create mode 100644 lib/rand.c
+> 
+> diff --git a/Makefile b/Makefile
+> index 602910dd..7997e035 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -28,6 +28,7 @@ cflatobjs := \
+>  	lib/printf.o \
+>  	lib/string.o \
+>  	lib/abort.o \
+> +	lib/rand.o \
+>  	lib/report.o \
+>  	lib/stack.o
+>  
+> diff --git a/lib/libcflat.h b/lib/libcflat.h
+> index 700f4352..ed947f98 100644
+> --- a/lib/libcflat.h
+> +++ b/lib/libcflat.h
+> @@ -83,6 +83,13 @@ extern void abort(void) __attribute__((noreturn));
+>  extern long atol(const char *ptr);
+>  extern char *getenv(const char *name);
+>  
+> +typedef struct {
+> +	uint32_t val;
+> +} rand_state;
+> +#define RAND_STATE_INIT(x) ((rand_state){ .val = (x) })
+> +uint32_t rand32(rand_state *state);
+> +uint64_t rand64(rand_state *state);
+> +
+>  extern int printf(const char *fmt, ...)
+>  					__attribute__((format(printf, 1, 2)));
+>  extern int snprintf(char *buf, int size, const char *fmt, ...)
+> diff --git a/lib/rand.c b/lib/rand.c
+> new file mode 100644
+> index 00000000..658c4cbf
+> --- /dev/null
+> +++ b/lib/rand.c
+> @@ -0,0 +1,19 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * pseudo random functions
+> + *
+> + * Copyright IBM Corp. 2023
+> + */
+> +
+> +#include "libcflat.h"
+> +
+> +uint32_t rand32(rand_state *state)
+> +{
+> +	state->val = 0x915f77f5 * state->val + 1;
+> +	return state->val ^ (state->val >> 16);
+> +}
+> +
+> +uint64_t rand64(rand_state *state)
+> +{
+> +	return (uint64_t)rand32(state) << 32 | rand32(state);
+> +}
+> -- 
+> 2.41.0
+>
 
-It doesn't make sense to include them into 6.8 because the two alone are
-simply dead code in 6.8.
+Alex Bennée posted a prng patch a long time ago that never got merged.
 
-The plan is to put the x86 patches first in the next submission, I'll
-pick them up for 6.9 and then give you an immutable branch to apply the
-KVM bits ontop. This way it all goes together.
+https://www.spinics.net/lists/kvm-arm/msg50921.html
 
-Thx.
+would it be better to merge that?
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks,
+drew
 
