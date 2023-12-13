@@ -1,156 +1,217 @@
-Return-Path: <kvm+bounces-4336-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4337-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E9E78112F1
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 14:32:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 426E78112F4
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 14:32:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 117281F21560
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 13:32:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F34262821CB
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 13:32:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A10BE2D042;
-	Wed, 13 Dec 2023 13:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EBBC2D057;
+	Wed, 13 Dec 2023 13:32:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WUbAju55"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jEyh2AC1"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1986E10A
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 05:31:47 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDA5D111
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 05:31:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702474306;
+	s=mimecast20190719; t=1702474313;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=6ZKsZXAGZPzGdkl/Bds/E/0NRdRFaaRkoaeJez+DeeI=;
-	b=WUbAju55neVpt0AUOTcWy+B33D0HS3h81dzrBJx6jThjeH8kxtwDtwk1Yjoi9Yz+VMujdH
-	V+3/fMUGNIEy+NdO5AaOTU08wvRHZmjVHJ1wwqlqA7ii8qyP9zlCIU9zhEg2QdXy4OG1cy
-	ef5xsQlqCb/gapYNAr+sAwcyY0NqxKI=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references;
+	bh=gQtkRA/2TDpcW18aYB4J7SwpoOh/Je4S8M49iURqxd8=;
+	b=jEyh2AC1nGfBQWt5OCZIJejs6TCmQiWBCrTAEUngVjj3DPvAC7/oNzuZZ3UPxj7Ynq+xqA
+	zaILwy/7HUtAjvU2w+iPGZVOMWwYlkE4ZAV7WPhpFvCjhDBSsZ1acmrpfymdJqrIk3reuF
+	0jNraP4308bk1y4OqSbdi7yMahau9kM=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-688-R5zgAqAUOBe5ZkIRjEYjmQ-1; Wed, 13 Dec 2023 08:31:45 -0500
-X-MC-Unique: R5zgAqAUOBe5ZkIRjEYjmQ-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a1d1c249b3aso371886666b.0
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 05:31:45 -0800 (PST)
+ us-mta-321-eaoKHo90MxugDO1tZKnjfQ-1; Wed, 13 Dec 2023 08:31:52 -0500
+X-MC-Unique: eaoKHo90MxugDO1tZKnjfQ-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40c514f9243so11202695e9.3
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 05:31:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702474304; x=1703079104;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6ZKsZXAGZPzGdkl/Bds/E/0NRdRFaaRkoaeJez+DeeI=;
-        b=qTSK8t4u+K3GYCtC15yMNGJMdn6b6ojbvfBCeyrki7BzGAxP16mrkUGMV3azXHlHyw
-         Z53VgH5mknWtSWzNzvnzvraZaCkzJ5iA9R9OwucL7Zqai1PgC9iuTdDFWIS3S2G4Wnhg
-         J4xpaynY/SXS/UfICb8DrwDCBn1BWMtTQvW6ILeIcBnSkJmUquriSsWiXe6CQ56kTM68
-         38sAFnRTaJ9VbRALVsLubdknE1zGb+3kO7AcEkJVHKcX0DBobK4dACd5xEw93WlE37CJ
-         b3bnVJF0YzyOyB8Va1vqZlKq3c3BHKWmp6sxAT1TjToKAqQof8yMcO6MxgJf2rrFct6l
-         IblA==
-X-Gm-Message-State: AOJu0YxCw4qRHgBbQJFSI5AH9n81cSEUuexSqidSLjcBkZbgAsMubKfQ
-	hA37kr5TmCJhsXc+iJ+FM7eDyYw4Ivvvzg46+02NxaYi2dyVxHtHMFQ8jWK11+KMy8XHP81B1W4
-	MQmRi1J2OTKDL
-X-Received: by 2002:a17:906:2:b0:a23:482:ee74 with SMTP id 2-20020a170906000200b00a230482ee74mr251954eja.28.1702474303954;
-        Wed, 13 Dec 2023 05:31:43 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFPrwg34mR9QL3IK9lbbz36ejShRG3Tw1YL7unA2WVHwsE4ZIHQYfrs0+x2kBoMmIZzjvL3FA==
-X-Received: by 2002:a17:906:2:b0:a23:482:ee74 with SMTP id 2-20020a170906000200b00a230482ee74mr251933eja.28.1702474303726;
-        Wed, 13 Dec 2023 05:31:43 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id tg10-20020a1709078dca00b00a178b965899sm7819372ejc.100.2023.12.13.05.31.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Dec 2023 05:31:43 -0800 (PST)
-Message-ID: <f08334c6-24b4-4451-b1e1-3834b933f2fa@redhat.com>
-Date: Wed, 13 Dec 2023 14:31:37 +0100
+        d=1e100.net; s=20230601; t=1702474311; x=1703079111;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gQtkRA/2TDpcW18aYB4J7SwpoOh/Je4S8M49iURqxd8=;
+        b=K1ietQbLe8xTR7rimXzHO0Dw0/YZfoOuY6lEr+tCinbzXZRsugzYzZs1Jfcg+rnF5k
+         6YXqgs2IN1Rm+L1WcGHHABe8eb392UMQQk+Aqpf0gl7uvH4wzvzWfyKeRfsTUfcEtDrg
+         PHUmJePW/S/3QaFCZ/2s3nct+csqJDDWYsv11nTRx8BGzD6RPqU1waxUzCvyYDheuaPP
+         MqG0bjlBWGe0Cl0dKCbIqSBNm00AjxjQLnrPkPd2yaCz6t8cx2ZLlQXCFKHdPZ6iSMn3
+         fwPXPzzAfur6MEaWMP90x6lK2oEyibn4+QlBgC2u40xQ4gxHdpBLVDD4xBGndlMbT7kE
+         XceA==
+X-Gm-Message-State: AOJu0YxCr3TWbKGIo2/+fXdAzxFzjsjWujEEQVLk+IhTb6SsgPegea7c
+	Jrd78F3CAkmN9OB1KRqFLV1qxgMrjwuYyFMkGdJyXwVdgfxbwGcbLFk4tGHiDY7uEPo12c8juSa
+	U0jwW/3Bi5hlt
+X-Received: by 2002:a05:600c:35c8:b0:40b:5e22:966 with SMTP id r8-20020a05600c35c800b0040b5e220966mr4019265wmq.85.1702474310854;
+        Wed, 13 Dec 2023 05:31:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHz6/382oZVklkSfS7PyW38xqR9hfeJHgFvfuiQ5DRc+j3pBJLr2n9+6P9kv6aIsrbRQItCCg==
+X-Received: by 2002:a05:600c:35c8:b0:40b:5e22:966 with SMTP id r8-20020a05600c35c800b0040b5e220966mr4019257wmq.85.1702474310423;
+        Wed, 13 Dec 2023 05:31:50 -0800 (PST)
+Received: from starship ([77.137.131.62])
+        by smtp.gmail.com with ESMTPSA id q14-20020a05600c46ce00b0040c4c9c52a3sm8815394wmo.12.2023.12.13.05.31.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 05:31:50 -0800 (PST)
+Message-ID: <47b946e58491b563f6ac572604b1bbc769100ff5.camel@redhat.com>
+Subject: Re: [PATCH v7 02/26] x86/fpu/xstate: Refine CET user xstate bit
+ enabling
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: "Yang, Weijiang" <weijiang.yang@intel.com>, chang.seok.bae@intel.com
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ dave.hansen@intel.com,  pbonzini@redhat.com, seanjc@google.com,
+ peterz@infradead.org, chao.gao@intel.com,  rick.p.edgecombe@intel.com,
+ john.allen@amd.com
+Date: Wed, 13 Dec 2023 15:31:48 +0200
+In-Reply-To: <917a9dc4-bcae-4a1d-b5b5-d086431e8650@intel.com>
+References: <20231124055330.138870-1-weijiang.yang@intel.com>
+	 <20231124055330.138870-3-weijiang.yang@intel.com>
+	 <c22d17ab04bf5f27409518e3e79477d579b55071.camel@redhat.com>
+	 <cdf53e44-62d0-452d-9c06-5c2d2ce3ce66@intel.com>
+	 <20d45cb6adaa4a8203822535e069cdbbf3b8ba2d.camel@redhat.com>
+	 <a3a14562-db72-4c19-9f40-7778f14fc516@intel.com>
+	 <039eaa7c35020774b74dc5e2d03bb0ecfa7c6d60.camel@redhat.com>
+	 <eb30c3e0-8e13-402c-b23d-48b21e0a1498@intel.com>
+	 <e7d7709a5962e8518ccb062e3818811cdbe110f8.camel@redhat.com>
+	 <917a9dc4-bcae-4a1d-b5b5-d086431e8650@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 23/50] KVM: SEV: Make AVIC backing, VMSA and VMCB
- memory allocation SNP safe
-Content-Language: en-US
-To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
- thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, seanjc@google.com,
- vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
- dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
- peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
- rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
- vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
- tony.luck@intel.com, marcorr@google.com,
- sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
- jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
- pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
- Brijesh Singh <brijesh.singh@amd.com>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-24-michael.roth@amd.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20231016132819.1002933-24-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/16/23 15:27, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
+On Wed, 2023-12-13 at 17:30 +0800, Yang, Weijiang wrote:
+> On 12/8/2023 11:15 PM, Maxim Levitsky wrote:
+> > On Fri, 2023-12-08 at 22:57 +0800, Yang, Weijiang wrote:
+> > > On 12/6/2023 11:57 PM, Maxim Levitsky wrote:
+> > > > On Wed, 2023-12-06 at 09:03 +0800, Yang, Weijiang wrote:
+> > > > > On 12/5/2023 5:53 PM, Maxim Levitsky wrote:
+> > > > > > On Fri, 2023-12-01 at 14:51 +0800, Yang, Weijiang wrote:
+> > > > > > > On 12/1/2023 1:26 AM, Maxim Levitsky wrote:
+> > > > > > > > On Fri, 2023-11-24 at 00:53 -0500, Yang Weijiang wrote:
+> > > > > > > > > Remove XFEATURE_CET_USER entry from dependency array as the entry doesn't
+> > > > > > > > > reflect true dependency between CET features and the user xstate bit.
+> > > > > > > > > Enable the bit in fpu_kernel_cfg.max_features when either SHSTK or IBT is
+> > > > > > > > > available.
+> > > > > > > > > 
+> > > > > > > > > Both user mode shadow stack and indirect branch tracking features depend
+> > > > > > > > > on XFEATURE_CET_USER bit in XSS to automatically save/restore user mode
+> > > > > > > > > xstate registers, i.e., IA32_U_CET and IA32_PL3_SSP whenever necessary.
+> > > > > > > > > 
+> > > > > > > > > Note, the issue, i.e., CPUID only enumerates IBT but no SHSTK is resulted
+> > > > > > > > > from CET KVM series which synthesizes guest CPUIDs based on userspace
+> > > > > > > > > settings,in real world the case is rare. In other words, the exitings
+> > > > > > > > > dependency check is correct when only user mode SHSTK is available.
+> > > > > > > > > 
+> > > > > > > > > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> > > > > > > > > Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> > > > > > > > > Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> > > > > > > > > ---
+> > > > > > > > >      arch/x86/kernel/fpu/xstate.c | 9 ++++++++-
+> > > > > > > > >      1 file changed, 8 insertions(+), 1 deletion(-)
+> > > > > > > > > 
+> > > > > > > > > diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+> > > > > > > > > index 73f6bc00d178..6e50a4251e2b 100644
+> > > > > > > > > --- a/arch/x86/kernel/fpu/xstate.c
+> > > > > > > > > +++ b/arch/x86/kernel/fpu/xstate.c
+> > > > > > > > > @@ -73,7 +73,6 @@ static unsigned short xsave_cpuid_features[] __initdata = {
+> > > > > > > > >      	[XFEATURE_PT_UNIMPLEMENTED_SO_FAR]	= X86_FEATURE_INTEL_PT,
+> > > > > > > > >      	[XFEATURE_PKRU]				= X86_FEATURE_OSPKE,
+> > > > > > > > >      	[XFEATURE_PASID]			= X86_FEATURE_ENQCMD,
+> > > > > > > > > -	[XFEATURE_CET_USER]			= X86_FEATURE_SHSTK,
+> > > > > > > > >      	[XFEATURE_XTILE_CFG]			= X86_FEATURE_AMX_TILE,
+> > > > > > > > >      	[XFEATURE_XTILE_DATA]			= X86_FEATURE_AMX_TILE,
+> > > > > > > > >      };
+> > > > > > > > > @@ -798,6 +797,14 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
+> > > > > > > > >      			fpu_kernel_cfg.max_features &= ~BIT_ULL(i);
+> > > > > > > > >      	}
+> > > > > > > > >      
+> > > > > > > > > +	/*
+> > > > > > > > > +	 * CET user mode xstate bit has been cleared by above sanity check.
+> > > > > > > > > +	 * Now pick it up if either SHSTK or IBT is available. Either feature
+> > > > > > > > > +	 * depends on the xstate bit to save/restore user mode states.
+> > > > > > > > > +	 */
+> > > > > > > > > +	if (boot_cpu_has(X86_FEATURE_SHSTK) || boot_cpu_has(X86_FEATURE_IBT))
+> > > > > > > > > +		fpu_kernel_cfg.max_features |= BIT_ULL(XFEATURE_CET_USER);
+> > > > > > > > > +
+> > > > > > > > >      	if (!cpu_feature_enabled(X86_FEATURE_XFD))
+> > > > > > > > >      		fpu_kernel_cfg.max_features &= ~XFEATURE_MASK_USER_DYNAMIC;
+> > > > > > > > >      
+> > > > > > > > I am curious:
+> > > > > > > > 
+> > > > > > > > Any reason why my review feedback was not applied even though you did agree
+> > > > > > > > that it is reasonable?
+> > > > > > > My apology! I changed the patch per you feedback but found XFEATURE_CET_USER didn't
+> > > > > > > work before sending out v7 version, after a close look at the existing code:
+> > > > > > > 
+> > > > > > >             for (i = 0; i < ARRAY_SIZE(xsave_cpuid_features); i++) {
+> > > > > > >                     unsigned short cid = xsave_cpuid_features[i];
+> > > > > > > 
+> > > > > > >                     /* Careful: X86_FEATURE_FPU is 0! */
+> > > > > > >                     if ((i != XFEATURE_FP && !cid) || !boot_cpu_has(cid))
+> > > > > > >                             fpu_kernel_cfg.max_features &= ~BIT_ULL(i);
+> > > > > > >             }
+> > > > > > > 
+> > > > > > > With removal of XFEATURE_CET_USER entry from xsave_cpuid_features, actually
+> > > > > > > above check will clear the bit from fpu_kernel_cfg.max_features.
+> > > > > > Are you sure about this? If we remove the XFEATURE_CET_USER from the xsave_cpuid_features,
+> > > > > > then the above loop will not touch it - it loops only over the items in the xsave_cpuid_features
+> > > > > > array.
+> > > > > No,  the code is a bit tricky, the actual array size is XFEATURE_XTILE_DATA( ie, 18) + 1, those xfeature bits not listed in init code leave a blank entry with xsave_cpuid_features[i] == 0, so for the blank elements, the loop hits (i != XFEATURE_FP && !cid) then the relevant xfeature bit for i is cleared in fpu_kernel_cfg.max_features. I had the same illusion at first when I replied your comments in v6, and modified the code as you suggested but found the issue during tests. Please double check it.
+> > > > Oh I see now. IMHO the current code is broken, or at least it violates the
+> > > > 'Clear XSAVE features that are disabled in the normal CPUID' comment, because
+> > > > it also clears all xfeatures which have no CPUID bit in the table (except FPU,
+> > > > for which we have a workaround).
+> > > > 
+> > > > 
+> > > > How about we do this instead:
+> > > > 
+> > > > 	for (i = 0; i < ARRAY_SIZE(xsave_cpuid_features); i++) {
+> > > > 		unsigned short cid = xsave_cpuid_features[i];
+> > > > 
+> > > > 		if (cid && !boot_cpu_has(cid))
+> > > > 			fpu_kernel_cfg.max_features &= ~BIT_ULL(i);
+> > > > 	}
+> > > I think existing code is more reasonable,  the side-effect of current code, i.e., masking out
+> > > the unclaimed xfeature bits, sanitizes the bits in max_features at the first place, then following calculations derived from it become reasonable too.
+> > 
+> > I strongly disagree with that. Kernel already removes all features bits which it knows nothing about.
+> > 
+> > There is no need to also remove the xfeatures that it knows about but knows nothing about a CPUID bit.
+> > For such features the kernel needs either to accept it (like FPU) or remove the feature from set of supported features.
 > 
-> Implement a workaround for an SNP erratum where the CPU will incorrectly
-> signal an RMP violation #PF if a hugepage (2mb or 1gb) collides with the
-> RMP entry of a VMCB, VMSA or AVIC backing page.
+> Let me involve Chang, the author of the code in question.
 > 
-> When SEV-SNP is globally enabled, the CPU marks the VMCB, VMSA, and AVIC
-> backing pages as "in-use" via a reserved bit in the corresponding RMP
-> entry after a successful VMRUN. This is done for _all_ VMs, not just
-> SNP-Active VMs.
+> Hi, Chang,
+> In commit 70c3f1671b0c ("x86/fpu/xstate: Prepare XSAVE feature table for gaps in state component numbers"),
+> you modified the loop as below:
+>          for (i = 0; i < ARRAY_SIZE(xsave_cpuid_features); i++) {
+> -               if (!boot_cpu_has(xsave_cpuid_features[i]))
+> +               unsigned short cid = xsave_cpuid_features[i];
+> +
+> +               /* Careful: X86_FEATURE_FPU is 0! */
+> +               if ((i != XFEATURE_FP && !cid) || !boot_cpu_has(cid))
+>                          fpu_kernel_cfg.max_features &= ~BIT_ULL(i);
+>          }
 > 
-> If the hypervisor accesses an in-use page through a writable
-> translation, the CPU will throw an RMP violation #PF. On early SNP
-> hardware, if an in-use page is 2mb aligned and software accesses any
-> part of the associated 2mb region with a hupage, the CPU will
-> incorrectly treat the entire 2mb region as in-use and signal a spurious
-> RMP violation #PF.
+> IMHO the change resulted functional change of the loop, i.e., before that only it only clears the bits without CPUIDs,
+> but after the change, the side-effect of the loop will clear the bits of blank entries ( where xsave_cpuid_features[i] == 0 )
+> since the loop hits (i != XFEATURE_FP && !cid), is it intended or something else?
+> 
+> 
+100% agree.
 
-I don't understand if this can happen even if SEV-SNP is not in use, 
-just because it is supported on the host?  If so, should this be Cc'd to 
-stable?  (I can tweak the wording and submit it).
-
-Paolo
+Best regards,
+	Maxim Levitsky
 
 
