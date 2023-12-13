@@ -1,120 +1,136 @@
-Return-Path: <kvm+bounces-4281-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4283-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8886F81082C
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 03:22:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B841B810839
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 03:25:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9B331C20E3C
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 02:22:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FC9428242C
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 02:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95D6F20F2;
-	Wed, 13 Dec 2023 02:22:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A58186E;
+	Wed, 13 Dec 2023 02:25:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="37bbQvFD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IZKJMI6X"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5782F1AA
-	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 18:22:02 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-28a30542c37so2284272a91.1
-        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 18:22:02 -0800 (PST)
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16647D5
+	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 18:25:40 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1d08383e566so57212535ad.2
+        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 18:25:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702434122; x=1703038922; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=H3dbLwG3pwrVNc+flPqWL0ROEahdeYkxOItBObS2igQ=;
-        b=37bbQvFDGMCUMMmZAr6gnZV6N9L25995j3u+veppJTxeYq/glZSQPf/JqGcWsBupsH
-         4aAxmcHxa4PBX4wpSMjZEjG9Ou0D9n11VzOdnGE7fWAx+cqGwrKrjuYG08NPNy6OwH6M
-         Sd0Eyh+C/LsHQtQqVWiryloo/wA/YVYu+GMtDT4Oio/RSmodHMiAxdE32iibzs8CcE4A
-         Wn6Fxthx7HQF/QvqNJf634cY64ed/8gUcc8ZftZ7myx5GRt7C+oRIyIYNdaOe0hJSH9f
-         0fQWrAy0yEz7P9/jB75hj/9Y5/xYSqQrCfxFhiHOGw4nN6CF58Lg/DMgUaOfhp5uERkU
-         ecOA==
+        d=google.com; s=20230601; t=1702434339; x=1703039139; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uToa4vWGRVyqvNFgMnA004x4lYo/i2CHkX+gzS+aQ5U=;
+        b=IZKJMI6XpjJ5pzY3zpODomr7ey0c/FzlY9F0mtrBNv3aJI3CadHMYYPMn8FdcBRctm
+         cchNyz5bEuAfAVBEyUEHqorQs3XMHu1PdHBpEGeLWPjvKsjNM6UROGaxJYVfxAavI0x9
+         SkXIbMmf9p/Oq0K/+UE8Pxg+SzCitEL1WYkj+/4ZUN9EcWldJgWPW5LePYc/YKhsE/Oi
+         yD07iI9jnRREjbXG7PuyE0bQLqhHzvboB/1Jd2Iq6XeUrrWtcp91phn8hQHv3VuD3tUi
+         axah1yp4ojXscggSrB1+QbajQbTtTwPiNkeQH6Zzj6JDDauno0cRVybhCMhKqYi25Wd+
+         W32w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702434122; x=1703038922;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H3dbLwG3pwrVNc+flPqWL0ROEahdeYkxOItBObS2igQ=;
-        b=sKLGjw2FF0rNmcrOFj2piqQwkfoJ2lIOOGZcWALsgmKrQSkjRwCRktJ3iGZxxR0Juc
-         5NM40Sjn/xW7JOdY+rSgpn8SjLoWenfXnPCTUvD4xDVqUOxRtOJeh9OY4L5B2MD+VpGo
-         GNBGlXRTdyBWMtWVcwuDZUMB/5616wZha0PbYJjrODXXHg3PdQfYROOhzYSNpLVmIIlz
-         wEdmXFxSu4YT+5tyIb4+gfDSoVPOCzm+i0NZvVPr9NQ2thbPcPzv+tGoukcU5lZn9xiY
-         q6Db8bsdBQlTAwgAulFu08wVqSlPAAV59j8mETX8IOEtTBwJ9I4ghcQd99IrrvZdw1VD
-         jXrg==
-X-Gm-Message-State: AOJu0YwG/bWWxkmsh4ksKVoVSfHSrCEbeQAvOHhi0Yx3me4QtVcIK8sY
-	Td7uDQFMU3zvdSUuyiyllKojhbmzHKs=
-X-Google-Smtp-Source: AGHT+IEMdNbXZWy9ISUMeWXjYiRzXRSqXuBEtLtB2quA6rPLGk41btEuk2vriof3H/B+MEphfzV6B3hdgbQ=
+        d=1e100.net; s=20230601; t=1702434339; x=1703039139;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=uToa4vWGRVyqvNFgMnA004x4lYo/i2CHkX+gzS+aQ5U=;
+        b=nc+qMMlNKZyAroe1qz5+Nnlz3VwCaCwT+APQzUaDu/f7CQqZmOr9virlr0VpH3GF5e
+         8dTf5DwpR47pRAvay7fnR5guHmFNp6+9Rri4o7A2lAONCYFkLjBui/5VAlLqIUpTl5YM
+         2hrQD2x1LDUoTySGem86V9dV27nRmb8e2W2zGmePF+7FC5WitwhyfHlwTL2zhFC/Gz84
+         MaFWT4yTboCF3pAJJlgIVcNFKR5rwIqa26L5TRwaQEnpVQAUtajzCBJOKYiGPwB9Uto2
+         CgN4DoKAv0mmRTEW44NJRBpMe4ffF+IeoPFiQyUCy+n7X5VZOEdcNgllgYO/yV6K4Xl3
+         MOrw==
+X-Gm-Message-State: AOJu0YzrAuyok7rcXQlhCNttvCuUbvPHBDlwPAvXm+b6Kruei/A8jViU
+	S8gYxnY4F+c+M1ZeSpkLkur+9xVLwHs=
+X-Google-Smtp-Source: AGHT+IGjOh77pJErMrAJlmF68uCB8WZKhfF3L0MvWcwu5DdcLA6O2G9co0lomVJzEXM1kfJKmMWCn26moNg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:41c9:b0:1d0:cd87:64dd with SMTP id
- u9-20020a17090341c900b001d0cd8764ddmr52067ple.3.1702434121579; Tue, 12 Dec
- 2023 18:22:01 -0800 (PST)
-Date: Tue, 12 Dec 2023 18:22:00 -0800
-In-Reply-To: <20231203140756.GI1489931@ziepe.ca>
+ (user=seanjc job=sendgmr) by 2002:a17:902:a504:b0:1d0:54ff:da25 with SMTP id
+ s4-20020a170902a50400b001d054ffda25mr50045plq.0.1702434339424; Tue, 12 Dec
+ 2023 18:25:39 -0800 (PST)
+Date: Tue, 12 Dec 2023 18:25:37 -0800
+In-Reply-To: <CALMp9eSZdPyZChd1PwFy+PqFAM2Eg4zQS97LG1s2DOov5e_mUQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20230916003118.2540661-1-seanjc@google.com> <20230916003118.2540661-6-seanjc@google.com>
- <20230918152110.GI13795@ziepe.ca> <ZQhxpesyXeG+qbS6@google.com>
- <20230918160258.GL13795@ziepe.ca> <ZWp_q1w01NCZi8KX@google.com> <20231203140756.GI1489931@ziepe.ca>
-Message-ID: <ZXkVSKULLivrMkBl@google.com>
-Subject: Re: [PATCH 05/26] vfio: KVM: Pass get/put helpers from KVM to VFIO,
- don't do circular lookup
+References: <20231202000417.922113-1-seanjc@google.com> <20231202000417.922113-11-seanjc@google.com>
+ <b45efe2f-1b99-4596-b33f-d491726ed34d@linux.intel.com> <CALMp9eSp_9J9t3ByfHfnirXf=uxvWVWVtLWO5KPoO0nDFJ-gtw@mail.gmail.com>
+ <ZXeenJ6DAugGCaSN@google.com> <CALMp9eSZdPyZChd1PwFy+PqFAM2Eg4zQS97LG1s2DOov5e_mUQ@mail.gmail.com>
+Message-ID: <ZXkWIY6WRcBiuLMd@google.com>
+Subject: Re: [PATCH v9 10/28] KVM: x86/pmu: Explicitly check for RDPMC of
+ unsupported Intel PMC types
 From: Sean Christopherson <seanjc@google.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Tony Krowiak <akrowiak@linux.ibm.com>, 
-	Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>, 
-	Harald Freudenberger <freude@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	Andy Lutomirski <luto@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	Anish Ghulati <aghulati@google.com>, Venkatesh Srinivas <venkateshs@chromium.org>, 
-	Andrew Thornton <andrewth@google.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Jim Mattson <jmattson@google.com>
+Cc: Dapeng Mi <dapeng1.mi@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Kan Liang <kan.liang@linux.intel.com>, 
+	Jinrong Liang <cloudliang@tencent.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Like Xu <likexu@tencent.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Dec 03, 2023, Jason Gunthorpe wrote:
-> On Fri, Dec 01, 2023 at 04:51:55PM -0800, Sean Christopherson wrote:
-> 
-> > There's one more wrinkle: this patch is buggy in that it doesn't ensure the liveliness
-> > of KVM-the-module, i.e. nothing prevents userspace from unloading kvm.ko while VFIO
-> > still holds a reference to a kvm structure, and so invoking ->put_kvm() could jump
-> > into freed code.  To fix that, KVM would also need to pass along a module pointer :-(
-> 
-> Maybe we should be refcounting the struct file not the struct kvm?
-> 
-> Then we don't need special helpers and it keeps the module alive correctly.
+On Mon, Dec 11, 2023, Jim Mattson wrote:
+> On Mon, Dec 11, 2023 at 3:43=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > > > > @@ -82,9 +85,13 @@ static struct kvm_pmc *intel_rdpmc_ecx_to_pmc(=
+struct kvm_vcpu *vcpu,
+> > > > >       /*
+> > > > >        * Fixed PMCs are supported on all architectural PMUs.  Not=
+e, KVM only
+> > > > >        * emulates fixed PMCs for PMU v2+, but the flag itself is =
+still valid,
+> > > > > -      * i.e. let RDPMC fail due to accessing a non-existent coun=
+ter.
+> > > > > +      * i.e. let RDPMC fail due to accessing a non-existent coun=
+ter.  Reject
+> > > > > +      * attempts to read all other types, which are unknown/unsu=
+pported.
+> > > > >        */
+> > > > > -     idx &=3D ~INTEL_RDPMC_FIXED;
+> > > > > +     if (idx & INTEL_RDPMC_TYPE_MASK & ~INTEL_RDPMC_FIXED)
+> > >
+> > > You know how I hate to be pedantic (ROFL), but the SDM only says:
+> > >
+> > > If the processor does support architectural performance monitoring
+> > > (CPUID.0AH:EAX[7:0] =E2=89=A0 0), ECX[31:16] specifies type of PMC wh=
+ile
+> > > ECX[15:0] specifies the index of the PMC to be read within that type.
+> > >
+> > > It does not say that the types are bitwise-exclusive.
+> > >
+> > > Yes, the types defined thus far are bitwise-exclusive, but who knows
+> > > what tomorrow may bring?
+> >
+> > The goal isn't to make the types exclusive, the goal is to reject types=
+ that
+> > aren't supported by KVM.  The above accomplishes that, no?  I don't see=
+ how KVM
+> > could get a false negative or false positive, the above allows exactly =
+FIXED and
+> > "none" types.  Or are you objecting to the comment?
+>=20
+> You're right. The code is fine. My brain is not.
+>=20
+> But what's wrong with something like:
+>=20
+> type =3D idx & INTEL_RDPMC_TYPE_MASK;
+> if (type !=3D INTEL_RDPMC_GP && type !=3D INTEL_RDPMC_FIXED) ...
+>=20
+> This makes it more clear what kvm accepts and what it doesn't accept,
+> regardless of the actual values of the macros.
 
-Huh.  It took my brain a while to catch up, but this seems comically obvious in
-hindsight.  I *love* this approach, both conceptually and from a code perspective.
-
-Handing VFIO (and any other external entities) a file makes it so that KVM effectively
-interacts with users via files, regardless of whether the user lives in userspace
-or the kernel.  That makes it easier to reason about the safety of operations,
-e.g. in addition to ensuring KVM-the-module is pinned, having a file pointer allows
-KVM to verify that the incoming pointer does indeed represent a VM.  Which isn't
-necessary by any means, but it's a nice sanity check.
-
-From a code perspective, it's far cleaner than manually grabbing module references,
-and having only a file pointers makes it a wee bit harder for non-KVM code to
-poke into KVM, e.g. keeps us honest.
-
-Assuming nothing blows up in testing, I'll go this route for v2.
-
-Thanks!
+Because when I read the SDM, my reading was heavily colored by KVM's existi=
+ng
+implementation.  And the SDM using 4000H and 2000H for the non-zero types d=
+oesn't
+help (those scream "flags" to me).  But rereading things, the SDM clearly s=
+tates
+they are explicit, distinct types.  I'll massage this to have KVM treat the=
+m as
+such.
 
