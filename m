@@ -1,214 +1,108 @@
-Return-Path: <kvm+bounces-4316-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4317-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CC528110AF
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 13:01:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D32181110D
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 13:22:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A120EB20D5A
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 12:01:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93360B20EF2
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 12:22:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52AE328DD7;
-	Wed, 13 Dec 2023 12:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D7C28E26;
+	Wed, 13 Dec 2023 12:22:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CQQLAnqQ"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="w/BMiEeC"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8218FE4
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 04:01:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702468860;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nTPYpZwAOhjAyPYYnK4hzvfKTahVi5tJRBmZC1f6ZW8=;
-	b=CQQLAnqQbHtNxnvHZKenqqaLoMBpGtsGjUdN5n8Vuij2pIw8JWexDOZkm0zu1xCG2MGzds
-	XghIj5cVWodhXCZ+KW3XjK+19BycSenweQVduJz3AWEm3mhmI3iBw8QP0XwnSbktNuyXQB
-	PwdmXL6EsZgTxqr2W80t/eSnVbkO+i8=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-614-ESdjjcFJMRKKc7sEdT6oMg-1; Wed, 13 Dec 2023 07:00:58 -0500
-X-MC-Unique: ESdjjcFJMRKKc7sEdT6oMg-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-55223c5b428so273798a12.0
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 04:00:58 -0800 (PST)
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DD5F121
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 04:22:32 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id 98e67ed59e1d1-2868605fa4aso4815455a91.0
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 04:22:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1702470151; x=1703074951; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oBQ6DjtF6aJnNMhcozBBdPGYIOHs9FwMHWOJVKrpI6o=;
+        b=w/BMiEeCreufGp9DxOB5F/vycZMrwKQPvxuQP3y6ZDkU+is2eQFirnxx3gmaSvqa//
+         w70J8Ni++pjhLZtDDJK4gKf3bBP3xvq/h5FNiAXcrSkJuMF0+Ug2bd2ThfaWBuntmRB0
+         agegOFjAUYpsRXVM4P+tjDGdSg1WrNTvL8M2wwiKiEWDs5QRMVTQuVVVabSAS9G45o2f
+         bCtewUQEnAO2dXT77hZowhgjJ0STkdGooJUq0k2ZRgVCaPubigV3flFJltxTaHYAQgpG
+         uQdr8FBFdLa+u7td2J8EaoGLneTr4116QlZMelOXWOjcKXEYnurC5r0sDkcyNr/j4ZoY
+         4rLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702468858; x=1703073658;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nTPYpZwAOhjAyPYYnK4hzvfKTahVi5tJRBmZC1f6ZW8=;
-        b=pBNYGD/J/iT4k6VBlQ1zFC84VEdyA5aTiZ8a28LpJKJpO1UFiDm7UN3D5yCfwEuZhm
-         AvnBw1a0oUZFmlUStQJbp29+L5w0i2gBRyHzwtRcV+h4UDDtqI6s/bUZZ4y0c/B92oku
-         qbYakyA2omKonAjOfK+IyZDThT+PW5D0Wka3iJkJySZnrrGIrYeebBLYCzxKRJOhsOJe
-         hkbTw/Ho1gyz03h8tPk9CZlGsWMOUI8ShMuDnX5CVM+TGowc7RPTV9Ht8b/AJ7OOzPOq
-         vwNcr56MDJIRkFe3wnBZ4cHD09UWRZT8CeVWnya4XOhmQEnja0c2R6UXg95G63X0Y9Ie
-         fMKg==
-X-Gm-Message-State: AOJu0YxorlG7JKO+ATToANmFX4vh+PHVQg3af0r0NDMUgSX1+5aiaDxi
-	dtZYZGOz4tc3uoxyoBZo1Me/w5ynS05WoEUHfw4USEeiXJRa3KEa2k17P33XB8AsU1b0gV+qwJV
-	mjhuNOekiIOn0
-X-Received: by 2002:a50:858d:0:b0:551:1775:207 with SMTP id a13-20020a50858d000000b0055117750207mr2984142edh.17.1702468857817;
-        Wed, 13 Dec 2023 04:00:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF0c9/lpfdtIRoYWRQu0pmj/b0D4R6L9UEAHj8W7P/aMFmYE+jvnwxBab8G5vMGQjvYkS/yKg==
-X-Received: by 2002:a50:858d:0:b0:551:1775:207 with SMTP id a13-20020a50858d000000b0055117750207mr2984133edh.17.1702468857417;
-        Wed, 13 Dec 2023 04:00:57 -0800 (PST)
-Received: from redhat.com ([2a02:14f:16d:d414:dc39:9ae8:919b:572d])
-        by smtp.gmail.com with ESMTPSA id c63-20020a509fc5000000b0054c738b6c31sm5913003edf.55.2023.12.13.04.00.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 04:00:56 -0800 (PST)
-Date: Wed, 13 Dec 2023 07:00:53 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Tobias Huschle <huschle@linux.ibm.com>
-Cc: Jason Wang <jasowang@redhat.com>, Abel Wu <wuyun.abel@bytedance.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
- sched/fair: Add lag based placement)
-Message-ID: <20231213061719-mutt-send-email-mst@kernel.org>
-References: <20231207014626-mutt-send-email-mst@kernel.org>
- <56082.123120804242300177@us-mta-137.us.mimecast.lan>
- <20231208052150-mutt-send-email-mst@kernel.org>
- <53044.123120806415900549@us-mta-342.us.mimecast.lan>
- <20231209053443-mutt-send-email-mst@kernel.org>
- <CACGkMEuSGT-e-i-8U7hum-N_xEnsEKL+_07Mipf6gMLFFhj2Aw@mail.gmail.com>
- <20231211115329-mutt-send-email-mst@kernel.org>
- <CACGkMEudZnF7hUajgt0wtNPCxH8j6A3L1DgJj2ayJWhv9Bh1WA@mail.gmail.com>
- <20231212111433-mutt-send-email-mst@kernel.org>
- <42870.123121305373200110@us-mta-641.us.mimecast.lan>
+        d=1e100.net; s=20230601; t=1702470151; x=1703074951;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oBQ6DjtF6aJnNMhcozBBdPGYIOHs9FwMHWOJVKrpI6o=;
+        b=G8ag/QYJ7PwHwbzKqveN0c8LtP1E472S4QYcr9u7Qaxpq3dzK6DWOIOpHF76qUCGx0
+         Kfk30EtveLy8Kg+kz6oZ3WlmUMxJzcShhCZzuA3kmstjGrea5Zt5LpfsVVXglRXCQKDp
+         WT+/Fhpr/Vmu3r5T/aZ3/VWrtfYLwrzl0O7lQjM6HNMlkMyesTt4lR6m1dMPFgkbFvXg
+         /x1vhFrZMbHRPEEWAy4mjmzKEb/Qs9i7O2/ZmVaF2dnpfIG3OUrm6Hwx6Rf7Q6y8FM6o
+         QTu1y/21E70Mvr7Uiya6y5oyzZrfXUVd++NA84y+w6G6eDt0Crih2Slv5i7m1xvNZmAR
+         JjPg==
+X-Gm-Message-State: AOJu0Yyfiv6OtvIA8AUzaYRtJzatEUux37pRUDzUYEJ3O0U4tcOgeqki
+	UTxGh09iv7MbA5IQ0VdtIQAKlhVuyWjOewnIb8FV0A==
+X-Google-Smtp-Source: AGHT+IFwLyMcfcKUGk6CTyJcWrM3SNpKvu7ioIaVsdymTbcvQD5mWw2+3MIOJj1SW4L/sTVFgdVYxfIcHk0rxce6gx4=
+X-Received: by 2002:a17:90a:7d05:b0:286:c0ca:48e with SMTP id
+ g5-20020a17090a7d0500b00286c0ca048emr3154153pjl.15.1702470151247; Wed, 13 Dec
+ 2023 04:22:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <42870.123121305373200110@us-mta-641.us.mimecast.lan>
+References: <20231211094014.4041-1-duchao@eswincomputing.com>
+In-Reply-To: <20231211094014.4041-1-duchao@eswincomputing.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Wed, 13 Dec 2023 17:52:19 +0530
+Message-ID: <CAAhSdy0t01YVX3iBq+w1eiEo+NAPotFR3TD2m_558CgS0=AQzw@mail.gmail.com>
+Subject: Re: [PATCH] RISC-V: KVM: remove a redundant condition in kvm_arch_vcpu_ioctl_run()
+To: Chao Du <duchao@eswincomputing.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, atishp@atishpatra.org, 
+	dbarboza@ventanamicro.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 13, 2023 at 11:37:23AM +0100, Tobias Huschle wrote:
-> On Tue, Dec 12, 2023 at 11:15:01AM -0500, Michael S. Tsirkin wrote:
-> > On Tue, Dec 12, 2023 at 11:00:12AM +0800, Jason Wang wrote:
-> > > On Tue, Dec 12, 2023 at 12:54 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> 
-> We played around with the suggestions and some other ideas.
-> I would like to share some initial results.
-> 
-> We tried the following:
-> 
-> 1. Call uncondtional schedule in the vhost_worker function
-> 2. Change the HZ value from 100 to 1000
-> 3. Reverting 05bfb338fa8d vhost: Fix livepatch timeouts in vhost_worker()
-> 4. Adding a cond_resched to translate_desc
-> 5. Reducing VHOST_NET_WEIGHT to 25% of its original value
-> 
-> Please find the diffs below.
-> 
-> Summary:
-> 
-> Option 1 is very very hacky but resolved the regression.
-> Option 2 reduces the regression by ~20%.
-> Options 3-5 do not help unfortunately.
-> 
-> Potential explanation:
-> 
-> While the vhost is executing, the need_resched flag is not set (observable
-> in the traces). Therefore cond_resched and alike will do nothing. vhost
-> will continue executing until the need_resched flag is set by an external
-> party, e.g. by a request to migrate the vhost.
-> 
-> Calling schedule unconditionally forces the scheduler to re-evaluate all 
-> tasks and their vruntime/deadline/vlag values. The scheduler comes to the
-> correct conclusion, that the kworker should be executed and from there it
-> is smooth sailing. I will have to verify that sequence by collecting more
-> traces, but this seems rather plausible.
-> This hack might of course introduce all kinds of side effects but might
-> provide an indicator that this is the actual problem.
-> The big question would be how to solve this conceptually, and, first
-> things first, whether you think this is a viable hypothesis.
-> 
-> Increasing the HZ value helps most likely because the other CPUs take 
-> scheduling/load balancing decisions more often as well and therefore
-> trigger the migration faster.
-> 
-> Bringing down VHOST_NET_WEIGHT even more might also help to shorten the
-> vhost loop. But I have no intuition how low we can/should go here.
-> 
-> 
-> We also changed vq_err to print error messages, but did not encounter any.
-> 
-> Diffs:
-> --------------------------------------------------------------------------
-> 
-> 1. Call uncondtional schedule in the vhost_worker function
-> 
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index e0c181ad17e3..16d73fd28831 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -414,6 +414,7 @@ static bool vhost_worker(void *data)
->                 }
->         }
->  
-> +       schedule();
->         return !!node;
->  }
+On Mon, Dec 11, 2023 at 3:11=E2=80=AFPM Chao Du <duchao@eswincomputing.com>=
+ wrote:
+>
+> The latest ret value is updated by kvm_riscv_vcpu_aia_update(),
+> the loop will continue if the ret is less than or equal to zero.
+> So the later condition will never hit. Thus remove it.
+>
+> Signed-off-by: Chao Du <duchao@eswincomputing.com>
 
+Queued this patch for Linux-6.8
 
-So, this helps.
-But this is very surprising!
+Thanks,
+Anup
 
-
-static int vhost_task_fn(void *data)
-{
-        struct vhost_task *vtsk = data;
-        bool dead = false;
-
-        for (;;) {
-                bool did_work;
-
-                if (!dead && signal_pending(current)) {
-                        struct ksignal ksig;
-                        /*
-                         * Calling get_signal will block in SIGSTOP,
-                         * or clear fatal_signal_pending, but remember
-                         * what was set.
-                         *
-                         * This thread won't actually exit until all
-                         * of the file descriptors are closed, and
-                         * the release function is called.
-                         */
-                        dead = get_signal(&ksig);
-                        if (dead)
-                                clear_thread_flag(TIF_SIGPENDING);
-                }
-
-                /* mb paired w/ vhost_task_stop */
-                set_current_state(TASK_INTERRUPTIBLE);
-
-                if (test_bit(VHOST_TASK_FLAGS_STOP, &vtsk->flags)) {
-                        __set_current_state(TASK_RUNNING);
-                        break;
-                }
-
-                did_work = vtsk->fn(vtsk->data);
-                if (!did_work)
-                        schedule();
-        }
-
-        complete(&vtsk->exited);
-        do_exit(0);
-
-}
-
-Apparently schedule is already called?
-
-
--- 
-MST
-
+> ---
+>  arch/riscv/kvm/vcpu.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index e087c809073c..bf3952d1a621 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -757,8 +757,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>                 /* Update HVIP CSR for current CPU */
+>                 kvm_riscv_update_hvip(vcpu);
+>
+> -               if (ret <=3D 0 ||
+> -                   kvm_riscv_gstage_vmid_ver_changed(&vcpu->kvm->arch.vm=
+id) ||
+> +               if (kvm_riscv_gstage_vmid_ver_changed(&vcpu->kvm->arch.vm=
+id) ||
+>                     kvm_request_pending(vcpu) ||
+>                     xfer_to_guest_mode_work_pending()) {
+>                         vcpu->mode =3D OUTSIDE_GUEST_MODE;
+> --
+> 2.17.1
+>
 
