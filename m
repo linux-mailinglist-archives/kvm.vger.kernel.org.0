@@ -1,190 +1,110 @@
-Return-Path: <kvm+bounces-4297-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4298-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C137810AC2
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 07:59:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A760810B22
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 08:13:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1EF21F21804
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 06:59:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 360562822A8
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 07:13:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD24712B65;
-	Wed, 13 Dec 2023 06:59:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="kago5zP5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB04C182AA;
+	Wed, 13 Dec 2023 07:13:15 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 849FED0
-	for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 22:58:56 -0800 (PST)
-Received: by mail-pg1-x52e.google.com with SMTP id 41be03b00d2f7-5c66b093b86so5788943a12.0
-        for <kvm@vger.kernel.org>; Tue, 12 Dec 2023 22:58:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1702450736; x=1703055536; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bf5KPLLb5mppiqs2V6fQXEFnrR5qxzVp6zV/S8php7g=;
-        b=kago5zP5qVzZdiiFSAWsUlll3+uS2kBoj1cV77yAUWeM9HcjI7f1RPoUhv9EieGBdP
-         tcXZ/B3MDr/T6ys6En0Zf/VZgS6Q2hnZNQJaA1wDmzTRq/L0uXtsUiPNrDUnbI/bBDWi
-         O0WzieA+UcFy078/YBNWqDZdOjLFbLIxQcHnkYfrq1CsM3rqAxJnbGokvWjiWlve9O77
-         RkicZlhTkAV52UuA+zIXIhUCUJ6+pJ7FF9NgsM78n3LByp3GAtwKlWv4m+XzdlxUNMIy
-         +97qsTz0I0+Kfmt50eDkW6WnzW8k9u5VDkkj/STv6MH3KPma3tuuV9b+ntJ+7D4+6FWm
-         6bzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702450736; x=1703055536;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bf5KPLLb5mppiqs2V6fQXEFnrR5qxzVp6zV/S8php7g=;
-        b=URVn24bIhC6OYekiMA6eg6HY8KLHnTIrJehhBmS24gSfuN9WUsyfnN0L/FnfGov2OB
-         UESwtuKTTKkrLdEJ//gbqx1L0EuQ5GNZD2dZJrScmiCbqrBoXwtCjP9dy7M6XWajf7qA
-         6OgBcdBFf07Y9ASE4qUaZD1OelL9LVwVlT+kD9rVRC/BzM33hOFq2HBPyhlGHXh2et0l
-         C9WH9+72A+bHyaHjk+IoiK7zQtVZNv5sMReL08IfoFmKtNuVsiFPgP8F9H12JXrCr0pR
-         HLFUWrtTZMGxHagZCehYiny8Qb/+fTM/ZlyWczzdGgRA12QWk2Ka4fixrFabCCyy5sUb
-         p+FQ==
-X-Gm-Message-State: AOJu0YywNWNo9sB2G28/4s4V/Y4pj+1T5ECs1CLsbBssykrP/qwEBEMD
-	IwEIBuAy08e949trgVnA72rBE8fnyAWvcQBOXEPBlw==
-X-Google-Smtp-Source: AGHT+IHcel4RGxuhUT4S+8ysviVVjUdeLRd5uUE5iIk9tDQ4l9HK3ci0gXUWjTSy85PhMRS2cyHdeWlEIcHWxtLc5Bs=
-X-Received: by 2002:a17:90a:fd0b:b0:286:6cd8:ef09 with SMTP id
- cv11-20020a17090afd0b00b002866cd8ef09mr9239266pjb.33.1702450735785; Tue, 12
- Dec 2023 22:58:55 -0800 (PST)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id A83D8E4;
+	Tue, 12 Dec 2023 23:13:10 -0800 (PST)
+Received: from loongson.cn (unknown [10.20.42.183])
+	by gateway (Coremail) with SMTP id _____8CxRPCFWXllbZgAAA--.3567S3;
+	Wed, 13 Dec 2023 15:13:09 +0800 (CST)
+Received: from [10.20.42.183] (unknown [10.20.42.183])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxPeGBWXllsv0BAA--.13577S3;
+	Wed, 13 Dec 2023 15:13:08 +0800 (CST)
+Subject: Re: Re: [PATCH v5 1/4] KVM: selftests: Add KVM selftests header files
+ for LoongArch
+To: Sean Christopherson <seanjc@google.com>
+Cc: Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ Vishal Annapurve <vannapurve@google.com>, Huacai Chen
+ <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
+ loongarch@lists.linux.dev, Peter Xu <peterx@redhat.com>,
+ Vipin Sharma <vipinsh@google.com>, maobibo@loongson.cn
+References: <20231130111804.2227570-1-zhaotianrui@loongson.cn>
+ <20231130111804.2227570-2-zhaotianrui@loongson.cn>
+ <e40d3884-bf39-8286-627f-e0ce7dacfcbe@loongson.cn>
+ <ZXiV1rMrXY0hNgvZ@google.com>
+From: zhaotianrui <zhaotianrui@loongson.cn>
+Message-ID: <023b6f8f-301b-a6d0-448b-09a602ba1141@loongson.cn>
+Date: Wed, 13 Dec 2023 15:15:28 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231213061610.11100-1-yongxuan.wang@sifive.com>
-In-Reply-To: <20231213061610.11100-1-yongxuan.wang@sifive.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Wed, 13 Dec 2023 12:28:44 +0530
-Message-ID: <CAAhSdy11SyXB0f0TOB4jX6mxCXTS-_RTXm6bFSfyY+4PThY5bg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] RISCV: KVM: update external interrupt atomically
- for IMSIC swfile
-To: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-Cc: linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org, 
-	greentime.hu@sifive.com, vincent.chen@sifive.com, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <ZXiV1rMrXY0hNgvZ@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8AxPeGBWXllsv0BAA--.13577S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7WF1fXr4kWr1kCFyrCryrZrc_yoW8Jw4UpF
+	yI9F1aka1kGFW7tws5Jw1UuF43KFs3uF18CrWDGw4Du3Z8Jwnrtr4jkw4rKa4vyr47J3W2
+	v3W2q34vqa9093gCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	XVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
+	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jOa93UUU
+	UU=
 
-On Wed, Dec 13, 2023 at 11:46=E2=80=AFAM Yong-Xuan Wang
-<yongxuan.wang@sifive.com> wrote:
->
-> The emulated IMSIC update the external interrupt pending depending on the
-> value of eidelivery and topei. It might lose an interrupt when it is
-> interrupted before setting the new value to the pending status.
->
-> For example, when VCPU0 sends an IPI to VCPU1 via IMSIC:
->
-> VCPU0                           VCPU1
->
->                                 CSRSWAP topei =3D 0
->                                 The VCPU1 has claimed all the external
->                                 interrupt in its interrupt handler.
->
->                                 topei of VCPU1's IMSIC =3D 0
->
-> set pending in VCPU1's IMSIC
->
-> topei of VCPU1' IMSIC =3D 1
->
-> set the external interrupt
-> pending of VCPU1
->
->                                 clear the external interrupt pending
->                                 of VCPU1
->
-> When the VCPU1 switches back to VS mode, it exits the interrupt handler
-> because the result of CSRSWAP topei is 0. If there are no other external
-> interrupts injected into the VCPU1's IMSIC, VCPU1 will never know this
-> pending interrupt unless it initiative read the topei.
->
-> If the interruption occurs between updating interrupt pending in IMSIC
-> and updating external interrupt pending of VCPU, it will not cause a
-> problem. Suppose that the VCPU1 clears the IPI pending in IMSIC right
-> after VCPU0 sets the pending, the external interrupt pending of VCPU1
-> will not be set because the topei is 0. But when the VCPU1 goes back to
-> VS mode, the pending IPI will be reported by the CSRSWAP topei, it will
-> not lose this interrupt.
->
-> So we only need to make the external interrupt updating procedure as a
-> critical section to avoid the problem.
->
-> Fixes: db8b7e97d613 ("RISC-V: KVM: Add in-kernel virtualization of AIA IM=
-SIC")
-> Tested-by: Roy Lin <roy.lin@sifive.com>
-> Tested-by: Wayling Chen <wayling.chen@sifive.com>
-> Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
-> Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
-> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
 
-Queued as fixes for Linux-6.7
 
-Thanks,
-Anup
+在 2023/12/13 上午1:18, Sean Christopherson 写道:
+> On Tue, Dec 12, 2023, zhaotianrui wrote:
+>> Hi, Sean:
+>>
+>> I want to change the definition of  DEFAULT_GUEST_TEST_MEM in the common
+>> file "memstress.h", like this:
+>>
+>>   /* Default guest test virtual memory offset */
+>> +#ifndef DEFAULT_GUEST_TEST_MEM
+>>   #define DEFAULT_GUEST_TEST_MEM		0xc0000000
+>> +#endif
+>>
+>> As this address should be re-defined in LoongArch headers.
+> 
+> Why?  E.g. is 0xc0000000 unconditionally reserved, not guaranteed to be valid,
+> something else?
+> 
+>> So, do you have any suggesstion?
+> 
+> Hmm, I think ideally kvm_util_base.h would define a range of memory that can be
+> used by tests for arbitrary data.  Multiple tests use 0xc0000000, which is not
+> entirely arbitrary, i.e. it doesn't _need_ to be 0xc0000000, but 0xc0000000 is
+> convenient because it's 32-bit addressable and doesn't overlap reserved areas in
+> other architectures.
+> 
+Thanks for your explanation, and LoongArch want to define 
+DEFAULT_GUEST_TEST_MEM to 0x130000000. As default base address for 
+application loading is 0x120000000, DEFAULT_GUEST_TEST_MEM should be 
+larger than app loading address, so that PER_VCPU_MEM_SIZE can be large 
+enough, and kvm selftests app size is smaller than 256M in generic.
 
-> ---
-> Changelog
-> v2:
-> - rename the variable and add a short comment in the code
-> ---
->  arch/riscv/kvm/aia_imsic.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
->
-> diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
-> index 6cf23b8adb71..e808723a85f1 100644
-> --- a/arch/riscv/kvm/aia_imsic.c
-> +++ b/arch/riscv/kvm/aia_imsic.c
-> @@ -55,6 +55,7 @@ struct imsic {
->         /* IMSIC SW-file */
->         struct imsic_mrif *swfile;
->         phys_addr_t swfile_pa;
-> +       spinlock_t swfile_extirq_lock;
->  };
->
->  #define imsic_vs_csr_read(__c)                 \
-> @@ -613,12 +614,23 @@ static void imsic_swfile_extirq_update(struct kvm_v=
-cpu *vcpu)
->  {
->         struct imsic *imsic =3D vcpu->arch.aia_context.imsic_state;
->         struct imsic_mrif *mrif =3D imsic->swfile;
-> +       unsigned long flags;
-> +
-> +       /*
-> +        * The critical section is necessary during external interrupt
-> +        * updates to avoid the risk of losing interrupts due to potentia=
-l
-> +        * interruptions between reading topei and updating pending statu=
-s.
-> +        */
-> +
-> +       spin_lock_irqsave(&imsic->swfile_extirq_lock, flags);
->
->         if (imsic_mrif_atomic_read(mrif, &mrif->eidelivery) &&
->             imsic_mrif_topei(mrif, imsic->nr_eix, imsic->nr_msis))
->                 kvm_riscv_vcpu_set_interrupt(vcpu, IRQ_VS_EXT);
->         else
->                 kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_VS_EXT);
-> +
-> +       spin_unlock_irqrestore(&imsic->swfile_extirq_lock, flags);
->  }
->
->  static void imsic_swfile_read(struct kvm_vcpu *vcpu, bool clear,
-> @@ -1039,6 +1051,7 @@ int kvm_riscv_vcpu_aia_imsic_init(struct kvm_vcpu *=
-vcpu)
->         }
->         imsic->swfile =3D page_to_virt(swfile_page);
->         imsic->swfile_pa =3D page_to_phys(swfile_page);
-> +       spin_lock_init(&imsic->swfile_extirq_lock);
->
->         /* Setup IO device */
->         kvm_iodevice_init(&imsic->iodev, &imsic_iodoev_ops);
-> --
-> 2.17.1
->
+Thanks
+Tianrui Zhao
+
 
