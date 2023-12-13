@@ -1,165 +1,134 @@
-Return-Path: <kvm+bounces-4355-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4356-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A0838115DC
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 16:13:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FA1B8117E2
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 16:45:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 101FE1C20B19
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 15:13:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28DD71C212A7
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 15:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 568B330F89;
-	Wed, 13 Dec 2023 15:13:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF379446C8;
+	Wed, 13 Dec 2023 15:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AJhe5Hff"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="QOAG/cZ1"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85E1AA0
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 07:13:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702480406;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v2OWzLPbe7fefjvMfxhIYzTmKhON3iT9TY5UrL/jTLs=;
-	b=AJhe5HffHhSEzPYcU6maWeD1P1aXiv/AJ7DiSkP8pDNYdNmPlrkiJchoi/Zat0fg4TCXwh
-	AG9hPZif0GrnR/jM/GFlqV25hC+LDKvfGDVP8Ds23AdfNdYgLHFs1pUNjM8k0x2lclduH5
-	ZmmestuBE5rjt1YNIOXgRPJefMW4MpE=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-259-4OmOcAnNMhGVkX20kMau5A-1; Wed, 13 Dec 2023 10:13:25 -0500
-X-MC-Unique: 4OmOcAnNMhGVkX20kMau5A-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a1f6b30185bso346175266b.2
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 07:13:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702480404; x=1703085204;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v2OWzLPbe7fefjvMfxhIYzTmKhON3iT9TY5UrL/jTLs=;
-        b=AySEmrDaRyQxExuK0QjjbSeAV0zNKa3ochjfYDlRNbb5g/l3zEomE0nevLOs52RHQl
-         uDDMDP7sIsTf/WUj3m44v0jlzblm0jE+fDfVfTFlRnweDDYNPqOkPCtT6o8d3VOapxlc
-         0jgVQcj0ubjUudiCHT/GlitO76/91nhVa0esjYOfBo0xNVF8K35TyQU3GzRNAA/V7qxl
-         Aq1LGIcAmMJWZ6Pq8GFOWUgxXDhowYDlD7ywkOKqAolVvgREz6B0m8gnaBcz44Zvbm+n
-         z+UyxHVF2gnsejvWroNrCEbam3OJDq+WJzn4rIcAwdrOZc8KD0BhHYuneDRuuIv8ksCt
-         DDyA==
-X-Gm-Message-State: AOJu0YweShg8TYfBmBdm0hswkcf3L++pqOLW17KX95qA5t/I9cfTIYs+
-	utFtFhphqVFUrE+dsAZG3hujvtg3UbZP2u7QPo1boI+wnBQlBet2ECZElFup9jf62feCHMP88eL
-	KgfRUsPNE1/XK
-X-Received: by 2002:a17:906:209:b0:a1c:966c:2962 with SMTP id 9-20020a170906020900b00a1c966c2962mr2353783ejd.5.1702480404111;
-        Wed, 13 Dec 2023 07:13:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGVEHNhpEpNkKjGAhK/XWOUUTGGv28PciIr/kdbCXWcbETJTEaPRgwgaTCSAZtVYbJ3/DARkA==
-X-Received: by 2002:a17:906:209:b0:a1c:966c:2962 with SMTP id 9-20020a170906020900b00a1c966c2962mr2353768ejd.5.1702480403779;
-        Wed, 13 Dec 2023 07:13:23 -0800 (PST)
-Received: from redhat.com ([2a02:14f:16d:d414:dc39:9ae8:919b:572d])
-        by smtp.gmail.com with ESMTPSA id s16-20020a17090699d000b00a1e27e584c7sm7934486ejn.69.2023.12.13.07.13.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 07:13:23 -0800 (PST)
-Date: Wed, 13 Dec 2023 10:13:15 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
-	oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v8 0/4] send credit update during setting
- SO_RCVLOWAT
-Message-ID: <20231213100957-mutt-send-email-mst@kernel.org>
-References: <20231211211658.2904268-1-avkrasnov@salutedevices.com>
- <20231212105423-mutt-send-email-mst@kernel.org>
- <d27f22f0-0f1e-e1bb-5b13-a524dc6e94d7@salutedevices.com>
- <20231212111131-mutt-send-email-mst@kernel.org>
- <7b362aef-6774-0e08-81e9-0a6f7f616290@salutedevices.com>
- <ucmekzurgt3zcaezzdkk6277ukjmwaoy6kdq6tzivbtqd4d32b@izqbcsixgngk>
- <402ea723-d154-45c9-1efe-b0022d9ea95a@salutedevices.com>
- <20231213100518-mutt-send-email-mst@kernel.org>
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A0E5126;
+	Wed, 13 Dec 2023 07:42:00 -0800 (PST)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 834E940E00CB;
+	Wed, 13 Dec 2023 15:41:57 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 3WN12W1SPrIZ; Wed, 13 Dec 2023 15:41:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1702482115; bh=IyhM7Slw/zIKLzW0NKmy0CrnbMXBOwC2G6bxrBly64g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QOAG/cZ16FSsNmwYJBb7r6qQgBeJQZTYcRo4azQifv+sKJfJy0k00NV5msq6ymTAY
+	 NdSWQqiaJzIIbbjQawtF5wiDnmZRIpMjCY5i5wVf1mcEiJ5QdOMvwYylKQB0wtBzsA
+	 wADGzcVl17JzPGddFLy0pTMafOg2YyX7aoMJdR8zVSaPE7JKCZNzqsXKkBWQRozFUr
+	 jaFqS5IATs10wyL7JrP6lrjpe/uG23/9rJkvrNsl+S8T76DZT7ZSxIhSBIwItLek0B
+	 4fbUky4Eiz7wCrJoMdKeUoBz12+M+ToP6KNiAj0eYkTIKvM4ANAKMXiWWvW4/ZFTbY
+	 tsZr7I8vWlAoUPMOtYV0mVZaUei4nttnjdpAvWsNNX05bY6ByXb10hG7vZuoAnbRiW
+	 ZRHqIscTgQNR0E3nEVAczRVmsSUnmQve5Li6FeVGf5BmVgKrVl2psZiiTXV+N6UdWF
+	 pRYwOSxj4xEoiW73XfixRM7B8R1yJ01piZAtC1OZHPaBlUT2kqUaUlQVg62qfO/Cjy
+	 TQrMu6YCHcrmOGZjE2T5WSBPMUEh/ayPYhujwMrw3O/+wYBDFxhpyeAsLK3xChvB5O
+	 HBPreAb4duw1cKA5I6mD6repeSryseqxrlv4kLdUJJTs956fDOM2icXv+LzuLksbOW
+	 BbNi0uSQw+rozRuITpo5zsMI=
+Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id ED3D640E00CD;
+	Wed, 13 Dec 2023 15:41:13 +0000 (UTC)
+Date: Wed, 13 Dec 2023 16:41:07 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+	linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, seanjc@google.com, vkuznets@redhat.com,
+	jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+	slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+	dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+	alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
+	nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
+	liam.merwick@oracle.com, zhi.a.wang@intel.com,
+	Brijesh Singh <brijesh.singh@amd.com>,
+	Jarkko Sakkinen <jarkko@profian.com>
+Subject: Re: [PATCH v10 04/50] x86/cpufeatures: Add SEV-SNP CPU feature
+Message-ID: <20231213154107.GGZXnQkxEuw6dJfbc7@fat_crate.local>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-5-michael.roth@amd.com>
+ <0b2eb374-356c-46c6-9c4a-9512fbfece7a@redhat.com>
+ <20231213131324.GDZXmt9LsMmJZyzCJw@fat_crate.local>
+ <40915dc3-4083-4b9f-bc64-7542833566e1@redhat.com>
+ <20231213133628.GEZXmzXFwA1p+crH/5@fat_crate.local>
+ <9ac2311c-9ccc-4468-9b26-6cb0872e207f@redhat.com>
+ <20231213134945.GFZXm2eTkd+IfdsjVE@fat_crate.local>
+ <b4aab361-4494-4a4b-b180-d7df05fd3d5b@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231213100518-mutt-send-email-mst@kernel.org>
+In-Reply-To: <b4aab361-4494-4a4b-b180-d7df05fd3d5b@redhat.com>
 
-On Wed, Dec 13, 2023 at 10:05:44AM -0500, Michael S. Tsirkin wrote:
-> On Wed, Dec 13, 2023 at 12:08:27PM +0300, Arseniy Krasnov wrote:
-> > 
-> > 
-> > On 13.12.2023 11:43, Stefano Garzarella wrote:
-> > > On Tue, Dec 12, 2023 at 08:43:07PM +0300, Arseniy Krasnov wrote:
-> > >>
-> > >>
-> > >> On 12.12.2023 19:12, Michael S. Tsirkin wrote:
-> > >>> On Tue, Dec 12, 2023 at 06:59:03PM +0300, Arseniy Krasnov wrote:
-> > >>>>
-> > >>>>
-> > >>>> On 12.12.2023 18:54, Michael S. Tsirkin wrote:
-> > >>>>> On Tue, Dec 12, 2023 at 12:16:54AM +0300, Arseniy Krasnov wrote:
-> > >>>>>> Hello,
-> > >>>>>>
-> > >>>>>>                                DESCRIPTION
-> > >>>>>>
-> > >>>>>> This patchset fixes old problem with hungup of both rx/tx sides and adds
-> > >>>>>> test for it. This happens due to non-default SO_RCVLOWAT value and
-> > >>>>>> deferred credit update in virtio/vsock. Link to previous old patchset:
-> > >>>>>> https://lore.kernel.org/netdev/39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru/
-> > >>>>>
-> > >>>>>
-> > >>>>> Patchset:
-> > >>>>>
-> > >>>>> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> > >>>>
-> > >>>> Thanks!
-> > >>>>
-> > >>>>>
-> > >>>>>
-> > >>>>> But I worry whether we actually need 3/8 in net not in net-next.
-> > >>>>
-> > >>>> Because of "Fixes" tag ? I think this problem is not critical and reproducible
-> > >>>> only in special cases, but i'm not familiar with netdev process so good, so I don't
-> > >>>> have strong opinion. I guess @Stefano knows better.
-> > >>>>
-> > >>>> Thanks, Arseniy
-> > >>>
-> > >>> Fixes means "if you have that other commit then you need this commit
-> > >>> too". I think as a minimum you need to rearrange patches to make the
-> > >>> fix go in first. We don't want a regression followed by a fix.
-> > >>
-> > >> I see, ok, @Stefano WDYT? I think rearrange doesn't break anything, because this
-> > >> patch fixes problem that is not related with the new patches from this patchset.
-> > > 
-> > > I agree, patch 3 is for sure net material (I'm fine with both rearrangement or send it separately), but IMHO also patch 2 could be.
-> > > I think with the same fixes tag, since before commit b89d882dc9fc ("vsock/virtio: reduce credit update messages") we sent a credit update
-> > > for every bytes we read, so we should not have this problem, right?
-> > 
-> > Agree for 2, so I think I can rearrange: two fixes go first, then current 0001, and then tests. And send it as V9 for 'net' only ?
-> > 
-> > Thanks, Arseniy
-> 
-> 
-> hmm why not net-next?
+On Wed, Dec 13, 2023 at 03:18:17PM +0100, Paolo Bonzini wrote:
+> Surely we can agree that cpu_feature_enabled(X86_FEATURE_SEV_SNP) has nothing
+> to do with SEV-SNP host patches being present? 
 
-Oh I missed your previous discussion. I think everything in net-next is
-safer.  Having said that, I won't nack it net, either.
+It does - we're sanitizing the meaning of a CPUID flag present in
+/proc/cpuinfo, see here:
 
-> > > 
-> > > So, maybe all the series could be "net".
-> > > 
-> > > Thanks,
-> > > Stefano
-> > > 
+https://git.kernel.org/tip/79c603ee43b2674fba0257803bab265147821955
 
+> And that therefore retpolines are preferred even without any SEV-SNP
+> support in KVM?
+
+No, automatic IBRS should be disabled when SNP is enabled. Not CPUID
+present - enabled. We clear that bit on a couple of occasions in the SNP
+host patchset if we determine that SNP host support is not possible so
+4/50 needs to go together with the rest to mean something.
+
+> And can we agree that "Acked-by" means "feel free and take it if you wish,
+
+I can see how it can mean that and I'm sorry for the misunderstanding
+I caused. Two things here:
+
+* I acked it because I did a lengthly digging internally on whether
+disabling AIBRS makes sense on SNP and this was a note more to myself to
+say, yes, that's a good change.
+
+* If I wanted for you to pick it up, I would've acked 4/50 too. Which
+I haven't.
+
+> I'm asking because I'm not sure if we agree on these two things, but they
+> really seem basic to me?
+
+I think KVM and x86 maintainers should sit down and discuss who picks up
+what and through which tree so that there's no more confusion in the
+future. It seems things need discussion...
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
