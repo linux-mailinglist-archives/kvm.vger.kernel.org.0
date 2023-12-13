@@ -1,179 +1,263 @@
-Return-Path: <kvm+bounces-4348-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4349-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92D0D811475
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 15:18:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53D5A811496
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 15:28:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E414282801
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 14:18:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AF7B1C210D0
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 14:28:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CFF62E852;
-	Wed, 13 Dec 2023 14:18:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02C12E85B;
+	Wed, 13 Dec 2023 14:28:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cwx1JGJ+"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="GWq71PmV"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 149A4F5
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 06:18:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702477104;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Fws0gJvMeLr/QEe2P9D0VBdduPdR7zo8ED97N4rFNAU=;
-	b=Cwx1JGJ+etOOL9jfEA19tblFnXXNs2XtJKygOu+GsWe+xrW3dCy10kzlDoI3sUAFEe48u6
-	yPDpNyD5VuSBGQaJ0JSJyBBG+LumGFC0QiilpaIO3VfWjk7LfYCB49B5sHZHBy1KGwIVaI
-	sdgqb6VTNZQjNgviNmcyOo+Bo5BGPlY=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-620-J13x2G-AMUqa9ijmFJH8Ow-1; Wed, 13 Dec 2023 09:18:23 -0500
-X-MC-Unique: J13x2G-AMUqa9ijmFJH8Ow-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9fd0a58549bso771767266b.0
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 06:18:22 -0800 (PST)
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53C2EF3
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 06:28:01 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-3363e9240b4so356674f8f.0
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 06:28:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1702477680; x=1703082480; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BNBKKpdkcV+DWdI5qHghcJ1sc4cC3NPDWZMmK3clSqQ=;
+        b=GWq71PmVvUKq8qkycBdckO4JE/vWenKJ9iEUl2CzYP8qtGR81XmWJHla7bcoo6kGT6
+         Z0TAoEjJ87C40TxHsfQS/WAEJOZdcYpIDhemROM3H+ni3/Je8HUYXqvoZi+LVe5prHgM
+         1EqA/tEZfUWVtgUsCruLL16ZQ7F5l9AqHA/AHGTINHDSf56jUa5e+Bve3eOF3j4sHCNs
+         mgfczFv7PFO6CgQLFbiQUAGnXpizwLrCxv0SPp+XF0I8jvvvgJnaCh4O2Eu9JbvOykCz
+         5BVMMlyg7ge+MYHi66KGCizCfsNNpCVITPh5oCzWpvoOSs764zWQZxHDASdzqWjNFf3I
+         Sysw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702477102; x=1703081902;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fws0gJvMeLr/QEe2P9D0VBdduPdR7zo8ED97N4rFNAU=;
-        b=oEZFPEZrLjxKpIOjcgTKh1zU6J4T2WKJXVadCOwR7RfoSARqZtlJGE1k7s8O/vexQR
-         ZwrBa093BjQLQZTJ8i17aKeaSgxHcbbIo7uNRo73URr3I8L2KFdQlYuxJYN4FldOqQ2v
-         I1Q8+3oCs7GBvB0kXbDfWxhkE8BHJNSnJM3DD0xWWjzVTpbiXY35+T/HvER3AuiUzQAk
-         Rfe0tfKyClzZdF/dQiBV26mUAW2xz50qqVVsrAU/O9ks8TxGXUnDgXOL3sDi0mQWYDUG
-         hrG2eoK6hyCTcb7NKYutuoksNSXvtKGMahPvQYeufFCTyhH33E3VyQt6FgOzt5nbShDw
-         sZ5g==
-X-Gm-Message-State: AOJu0YwG84E6iq+/sLzNxTxwdMtZp4ZM905e7D+5jOrsTZn7UtyM9KSl
-	iT3Ml/tmhKH3tjanUMNnvMgy8Al4LF94wumDCiAs/e+dLUNvfsNG7+0Ahgs8BPkcoAKsnoQUFem
-	/xn9pNUOC3UJF
-X-Received: by 2002:a17:906:24d:b0:a22:e7d2:5a52 with SMTP id 13-20020a170906024d00b00a22e7d25a52mr2784681ejl.71.1702477101806;
-        Wed, 13 Dec 2023 06:18:21 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGrQokzT8zXusJ+hPGTT9RJ5H7cGwq+NBw1vIEMeKjoo6GUcHW4Rk0RO9/h3vuME7VBPouVjg==
-X-Received: by 2002:a17:906:24d:b0:a22:e7d2:5a52 with SMTP id 13-20020a170906024d00b00a22e7d25a52mr2784659ejl.71.1702477101439;
-        Wed, 13 Dec 2023 06:18:21 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id tk3-20020a170907c28300b00a1cd54ec021sm7876334ejc.57.2023.12.13.06.18.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Dec 2023 06:18:20 -0800 (PST)
-Message-ID: <b4aab361-4494-4a4b-b180-d7df05fd3d5b@redhat.com>
-Date: Wed, 13 Dec 2023 15:18:17 +0100
+        d=1e100.net; s=20230601; t=1702477680; x=1703082480;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BNBKKpdkcV+DWdI5qHghcJ1sc4cC3NPDWZMmK3clSqQ=;
+        b=V2+4cjUaB2twHdURSPOfzqao2pISEYO8Yp4GCNNv3w1KJ20Ud0EC4DHYEXFuZzzy9l
+         QF/pZG1+LourEr7nNQw3o7bE1I6GH0XAFMA7af8Ystd85+nK4uivLnqI8W88i06Wt9jq
+         vFDk92sR/z1jjdNgg4h/1Sx6MSYDBcM2sv6A65o2mNrqpbcsXC1uXSK2bEcTkJDcsJVV
+         YOOoychr0bNMcpb6sCIXi0IplyYqBkSAyOk8hlP5uR3GzTrPAkYPsaeLdnx5kzNWBxDQ
+         Z+aAy+kYFk+kTy0knTB1B/xKhDAhoM1TDNiyyVGG0FYqBl+N3JicqL8HSiiRxxgW3U3l
+         F0/g==
+X-Gm-Message-State: AOJu0Yx8dZ0nbQNectlvymew2g2JAr15r3JofldVzutR0qefyFiMEehG
+	FpyeOESVEM87esMq/ea61n274Q==
+X-Google-Smtp-Source: AGHT+IESrcYW1zLn88so6PPi/w2TK6eJ4zzs7Zy4OWB48vOb0ysA2lcJnRlPw1rsdBQFtDNlOBH5BQ==
+X-Received: by 2002:a05:6000:b42:b0:336:4322:a428 with SMTP id dk2-20020a0560000b4200b003364322a428mr150689wrb.35.1702477679716;
+        Wed, 13 Dec 2023 06:27:59 -0800 (PST)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id t4-20020adff044000000b0033340937da6sm13364422wro.95.2023.12.13.06.27.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 06:27:59 -0800 (PST)
+Date: Wed, 13 Dec 2023 15:27:53 +0100
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Haibo Xu <haibo1.xu@intel.com>
+Cc: xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
+	Mayuresh Chitale <mchitale@ventanamicro.com>, Greentime Hu <greentime.hu@sifive.com>, 
+	wchen <waylingii@gmail.com>, Conor Dooley <conor.dooley@microchip.com>, 
+	Heiko Stuebner <heiko@sntech.de>, Minda Chen <minda.chen@starfivetech.com>, 
+	Samuel Holland <samuel@sholland.org>, Jisheng Zhang <jszhang@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, Like Xu <likexu@tencent.com>, 
+	Vipin Sharma <vipinsh@google.com>, Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, 
+	Aaron Lewis <aaronlewis@google.com>, Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v4 11/11] KVM: selftests: Enable tunning of err_margin_us
+ in arch timer test
+Message-ID: <20231213-e11bcfdf39a34099bbc48cea@orel>
+References: <cover.1702371136.git.haibo1.xu@intel.com>
+ <0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 04/50] x86/cpufeatures: Add SEV-SNP CPU feature
-Content-Language: en-US
-To: Borislav Petkov <bp@alien8.de>
-Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
- thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, seanjc@google.com,
- vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
- dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
- peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
- rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
- kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
- marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
- alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
- nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
- zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>,
- Jarkko Sakkinen <jarkko@profian.com>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-5-michael.roth@amd.com>
- <0b2eb374-356c-46c6-9c4a-9512fbfece7a@redhat.com>
- <20231213131324.GDZXmt9LsMmJZyzCJw@fat_crate.local>
- <40915dc3-4083-4b9f-bc64-7542833566e1@redhat.com>
- <20231213133628.GEZXmzXFwA1p+crH/5@fat_crate.local>
- <9ac2311c-9ccc-4468-9b26-6cb0872e207f@redhat.com>
- <20231213134945.GFZXm2eTkd+IfdsjVE@fat_crate.local>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20231213134945.GFZXm2eTkd+IfdsjVE@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
 
-On 12/13/23 14:49, Borislav Petkov wrote:
-> On Wed, Dec 13, 2023 at 02:40:24PM +0100, Paolo Bonzini wrote:
->> Why are they dead code?  X86_FEATURE_SEV_SNP is set automatically based on
->> CPUID, therefore patch 5 is a performance improvement on all processors that
->> support SEV-SNP.  This is independent of whether KVM can create SEV-SNP
->> guests or not.
+On Tue, Dec 12, 2023 at 05:31:20PM +0800, Haibo Xu wrote:
+> There are intermittent failures occured when stressing the
+> arch-timer test in a Qemu VM:
 > 
-> No, it is not. This CPUID bit means:
+>  Guest assert failed,  vcpu 0; stage; 4; iter: 3
+>  ==== Test Assertion Failure ====
+>    aarch64/arch_timer.c:196: config_iter + 1 == irq_iter
+>    pid=4048 tid=4049 errno=4 - Interrupted system call
+>       1  0x000000000040253b: test_vcpu_run at arch_timer.c:248
+>       2  0x0000ffffb60dd5c7: ?? ??:0
+>       3  0x0000ffffb6145d1b: ?? ??:0
+>    0x3 != 0x2 (config_iter + 1 != irq_iter)e
 > 
-> "RMP table can be enabled to protect memory even from hypervisor."
+> Further test and debug show that the timeout for an interrupt
+> to arrive do have random high fluctuation, espectially when
+> testing in an virtual environment.
 > 
-> Without the SNP host patches, it is dead code.
-
--	if ((ia32_cap & ARCH_CAP_IBRS_ALL) || cpu_has(c, X86_FEATURE_AUTOIBRS)) {
-+	if ((ia32_cap & ARCH_CAP_IBRS_ALL) ||
-+	    (cpu_has(c, X86_FEATURE_AUTOIBRS) &&
-+	     !cpu_feature_enabled(X86_FEATURE_SEV_SNP))) {
-
-Surely we can agree that cpu_feature_enabled(X86_FEATURE_SEV_SNP) has nothing
-to do with SEV-SNP host patches being present?  And that therefore retpolines
-are preferred even without any SEV-SNP support in KVM?
-
-And can we agree that "Acked-by" means "feel free and take it if you wish,
-I don't care enough to merge it through my tree or provide a topic branch"?
-
-I'm asking because I'm not sure if we agree on these two things, but they
-really seem basic to me?
-
-Paolo
-
-> And regardless, arch/x86/kvm/ patches go through the kvm tree. The rest
-> of arch/x86/ through the tip tree. We've been over this a bunch of times
-> already.
-
-
-> If you don't agree with this split, let's discuss it offlist with all
-> tip and kvm maintainers, reach an agreement who picks up what and to put
-> an end to this nonsense.
+> To alleviate this issue, just expose the timeout value as user
+> configurable and print some hint message to increase the value
+> when hitting the failure..
 > 
-> Thx.
+> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> ---
+>  .../selftests/kvm/aarch64/arch_timer.c        |  8 +++++--
+>  tools/testing/selftests/kvm/arch_timer.c      | 22 +++++++++++++------
+>  .../selftests/kvm/include/timer_test.h        |  1 +
+>  .../testing/selftests/kvm/riscv/arch_timer.c  |  8 +++++--
+>  4 files changed, 28 insertions(+), 11 deletions(-)
 > 
+> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> index 4b421d421c3f..139eecbf77e7 100644
+> --- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> @@ -131,10 +131,14 @@ static void guest_run_stage(struct test_vcpu_shared_data *shared_data,
+>  
+>  		/* Setup a timeout for the interrupt to arrive */
+>  		udelay(msecs_to_usecs(test_args.timer_period_ms) +
+> -			TIMER_TEST_ERR_MARGIN_US);
+> +			test_args.timer_err_margin_us);
+>  
+>  		irq_iter = READ_ONCE(shared_data->nr_iter);
+> -		GUEST_ASSERT_EQ(config_iter + 1, irq_iter);
+> +		__GUEST_ASSERT(config_iter + 1 == irq_iter,
+> +			"config_iter + 1 = 0x%lx, irq_iter = 0x%lx.\n"
+> +			"  Guest timer interrupt was not trigged within the specified\n"
+> +			"  interval, try to increase the error margin by [-e] option.\n",
+> +			config_iter + 1, irq_iter);
+>  	}
+>  }
+>  
+> diff --git a/tools/testing/selftests/kvm/arch_timer.c b/tools/testing/selftests/kvm/arch_timer.c
+> index 60963fce16f2..5050022fd345 100644
+> --- a/tools/testing/selftests/kvm/arch_timer.c
+> +++ b/tools/testing/selftests/kvm/arch_timer.c
+> @@ -5,16 +5,17 @@
+>   * The guest's main thread configures the timer interrupt and waits
+>   * for it to fire, with a timeout equal to the timer period.
+>   * It asserts that the timeout doesn't exceed the timer period plus
+> - * an error margin of 100us.
+> + * an user configurable error margin(default to 100us).
+>   *
+>   * On the other hand, upon receipt of an interrupt, the guest's interrupt
+>   * handler validates the interrupt by checking if the architectural state
+>   * is in compliance with the specifications.
+>   *
+>   * The test provides command-line options to configure the timer's
+> - * period (-p), number of vCPUs (-n), and iterations per stage (-i).
+> - * To stress-test the timer stack even more, an option to migrate the
+> - * vCPUs across pCPUs (-m), at a particular rate, is also provided.
+> + * period (-p), number of vCPUs (-n), iterations per stage (-i), and timer
+> + * interrupt arrival error margin (-e). To stress-test the timer stack even
+> + * more, an option to migrate the vCPUs across pCPUs (-m), at a particular
+> + * rate, is also provided.
+>   *
+>   * Copyright (c) 2021, Google LLC.
+>   */
+> @@ -34,6 +35,7 @@ struct test_args test_args = {
+>  	.nr_iter = NR_TEST_ITERS_DEF,
+>  	.timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
+>  	.migration_freq_ms = TIMER_TEST_MIGRATION_FREQ_MS,
+> +	.timer_err_margin_us = TIMER_TEST_ERR_MARGIN_US,
+>  	.reserved = 1,
+>  };
+>  
+> @@ -179,8 +181,9 @@ static void test_run(struct kvm_vm *vm)
+>  
+>  static void test_print_help(char *name)
+>  {
+> -	pr_info("Usage: %s [-h] [-n nr_vcpus] [-i iterations] [-p timer_period_ms]\n",
+> -		name);
+> +	pr_info("Usage: %s [-h] [-n nr_vcpus] [-i iterations] [-p timer_period_ms]\n"
+> +	        "\t\t    [-m migration_freq_ms] [-o counter_offset]\n"
+> +	        "\t\t    [-e timer_err_margin_us]\n", name);
+>  	pr_info("\t-n: Number of vCPUs to configure (default: %u; max: %u)\n",
+>  		NR_VCPUS_DEF, KVM_MAX_VCPUS);
+>  	pr_info("\t-i: Number of iterations per stage (default: %u)\n",
+> @@ -190,6 +193,8 @@ static void test_print_help(char *name)
+>  	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. 0 to turn off (default: %u)\n",
+>  		TIMER_TEST_MIGRATION_FREQ_MS);
+>  	pr_info("\t-o: Counter offset (in counter cycles, default: 0) [aarch64-only]\n");
+> +	pr_info("\t-e: Interrupt arrival error margin(in us) of the guest timer (default: %u)\n",
+                                                     ^ need space here
 
+> +		TIMER_TEST_ERR_MARGIN_US);
+>  	pr_info("\t-h: print this help screen\n");
+>  }
+>  
+> @@ -197,7 +202,7 @@ static bool parse_args(int argc, char *argv[])
+>  {
+>  	int opt;
+>  
+> -	while ((opt = getopt(argc, argv, "hn:i:p:m:o:")) != -1) {
+> +	while ((opt = getopt(argc, argv, "hn:i:p:m:o:e:")) != -1) {
+>  		switch (opt) {
+>  		case 'n':
+>  			test_args.nr_vcpus = atoi_positive("Number of vCPUs", optarg);
+> @@ -216,6 +221,9 @@ static bool parse_args(int argc, char *argv[])
+>  		case 'm':
+>  			test_args.migration_freq_ms = atoi_non_negative("Frequency", optarg);
+>  			break;
+> +		case 'e':
+> +			test_args.timer_err_margin_us = atoi_non_negative("Error Margin", optarg);
+> +			break;
+>  		case 'o':
+>  			test_args.counter_offset = strtol(optarg, NULL, 0);
+>  			test_args.reserved = 0;
+> diff --git a/tools/testing/selftests/kvm/include/timer_test.h b/tools/testing/selftests/kvm/include/timer_test.h
+> index 968257b893a7..b1d405e7157d 100644
+> --- a/tools/testing/selftests/kvm/include/timer_test.h
+> +++ b/tools/testing/selftests/kvm/include/timer_test.h
+> @@ -22,6 +22,7 @@ struct test_args {
+>  	int nr_iter;
+>  	int timer_period_ms;
+>  	int migration_freq_ms;
+> +	int timer_err_margin_us;
+>  	/* Members of struct kvm_arm_counter_offset */
+>  	uint64_t counter_offset;
+>  	uint64_t reserved;
+> diff --git a/tools/testing/selftests/kvm/riscv/arch_timer.c b/tools/testing/selftests/kvm/riscv/arch_timer.c
+> index 13bf184d1ff5..45a139dc7ce3 100644
+> --- a/tools/testing/selftests/kvm/riscv/arch_timer.c
+> +++ b/tools/testing/selftests/kvm/riscv/arch_timer.c
+> @@ -55,10 +55,14 @@ static void guest_run(struct test_vcpu_shared_data *shared_data)
+>  
+>  		/* Setup a timeout for the interrupt to arrive */
+>  		udelay(msecs_to_usecs(test_args.timer_period_ms) +
+> -			TIMER_TEST_ERR_MARGIN_US);
+> +			test_args.timer_err_margin_us);
+>  
+>  		irq_iter = READ_ONCE(shared_data->nr_iter);
+> -		GUEST_ASSERT_EQ(config_iter + 1, irq_iter);
+> +		__GUEST_ASSERT(config_iter + 1 == irq_iter,
+> +			"config_iter + 1 = 0x%lx, irq_iter = 0x%lx.\n"
+> +			"  Guest timer interrupt was not trigged within the specified\n"
+> +			"  interval, try to increase the error margin by [-e] option.\n",
+> +			config_iter + 1, irq_iter);
+>  	}
+>  }
+>  
+> -- 
+> 2.34.1
+>
+
+I probably would have started the series with this patch since you said
+you could reproduce the problem on aarch64. Starting the series with
+this patch would allow just this patch to get picked up to fix aarch64,
+if that's necessary, and also avoids touching a couple places twice
+with the code split for riscv.
+
+But anyway, other than the missing space in the help text,
+
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+
+Thanks,
+drew
 
