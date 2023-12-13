@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-4331-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4330-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C71D811223
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 13:54:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B787481121C
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 13:52:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 904301F2143C
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 12:54:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F910281D42
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 12:52:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590452C193;
-	Wed, 13 Dec 2023 12:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95CCC2C198;
+	Wed, 13 Dec 2023 12:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bo7/GC8+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e1VvnWDP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EFA13269
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 04:52:05 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7729D3277
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 04:52:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702471924;
+	s=mimecast20190719; t=1702471933;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=q9EqIwf08LmEIH+cEN/dULDXznjNTZrCAOaSTuIwhOA=;
-	b=Bo7/GC8+1FoKU5ZcOlKjxScKJEDHPoF6vC9rlmxFWye4/ZwVBzIswa74+yQKdfo1YKiujJ
-	8V1EkiNoDPrNz//bOMVVXw/+8z9b0sfbehjAQEgzQqt/Kf8O0ECyx7uUB9jiPhY/P7FuaV
-	2AVjYRj06Mi3OK7yOTpQkC1gdOsDwEs=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=bJEv3Wgqf4ketU6WFDuIdEXMdIFFad1fKIX/8Z1IzcQ=;
+	b=e1VvnWDP3Z4eFvd20X2t0dQoynVFy6dukEfrXJ50tBdhdDoqfETyUNpp1o33UjOOEFl3sR
+	89pE0Oiy3qPzqoOHGoSW//DL8pS+rm7sQAs6K6cQTkOsC0ooFQVUR/KCqlaqwEbw72PZCR
+	uZhD7938lT9S7oOxJVy0aWo4aLMnDzI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-28-vVOfmfv-PHeEDjwWqSNcEw-1; Wed, 13 Dec 2023 07:52:02 -0500
-X-MC-Unique: vVOfmfv-PHeEDjwWqSNcEw-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33637be635aso607229f8f.1
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 04:52:02 -0800 (PST)
+ us-mta-495-bRGskfC2Pn6hytV9RV7BlQ-1; Wed, 13 Dec 2023 07:52:12 -0500
+X-MC-Unique: bRGskfC2Pn6hytV9RV7BlQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-333405020f3so5291895f8f.1
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 04:52:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702471921; x=1703076721;
+        d=1e100.net; s=20230601; t=1702471930; x=1703076730;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=q9EqIwf08LmEIH+cEN/dULDXznjNTZrCAOaSTuIwhOA=;
-        b=qzgT7So0+7YKDa9UUVxPKd1FbyQHi6cbr0kd0pyfy1vAW3xHtafo8ttxBTJ3tjkqSA
-         t5eksBlX7BneNOK+XNoqC7V35GjqakWxjV4FwTPBaKQMnEhdU+Xhq4UJF7ErRsXyMbRI
-         gp0BEWIO5eKuGyqa7U79M2thqtjG+sUQLqdu6I39ZiTNI+khWKi+6uJn7ZzlBtRaKT2v
-         HJN4UhUHxWb7maxgkuOE0QDmyiRVodnITIdwWoxmrEf9ZuUjP+VDh8wULO6u/gClOJCF
-         qecvKKszIMXaXorO04T2RdKpSHsGme/4ilgRQoahPPQ41jtkeDtzXmWwGJiRDtl/y9Uv
-         Q3Wg==
-X-Gm-Message-State: AOJu0YwL5zi9tOe+lleWnq9nAjG8/RIBlYYZ805RXKcEW3f0FU4qFvbI
-	Bul2sx2O9ZK/e4ikVQxsOoaDSvfRezeZBpzMfSkrTSMUL29+oLCFCln6JN/n4xRjTrvzCqkdCdN
-	wZ6ZLB8ajgXyc
-X-Received: by 2002:adf:f5c3:0:b0:336:42b3:e6fc with SMTP id k3-20020adff5c3000000b0033642b3e6fcmr221047wrp.139.1702471921737;
-        Wed, 13 Dec 2023 04:52:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGS9kEb5NuIiXVIRCHPgHr8JyshyCNd1dXxmiolZKU6PUXqbebhVxtgWC/2E00NW6AGSO/0RQ==
-X-Received: by 2002:adf:f5c3:0:b0:336:42b3:e6fc with SMTP id k3-20020adff5c3000000b0033642b3e6fcmr221030wrp.139.1702471921394;
-        Wed, 13 Dec 2023 04:52:01 -0800 (PST)
+        bh=bJEv3Wgqf4ketU6WFDuIdEXMdIFFad1fKIX/8Z1IzcQ=;
+        b=JuKjD2pHqtDw0yPxxlZWgLheBJNyawWhko0suw7bMm9aRgodB1skTh0jfq82TwBZmg
+         0DuKebwdIp/YNkMKpRsZV2fDSqZvK3C6cyMMBZIw3h78aZbm0RZ4Opq6/gFFTZBPn1Uu
+         ByvqIg6kpoBWMOto5RYQJjSJ5CkS2IHRK49zkV72WXHWDPgpSu62aUPc5033yPf9Xjdy
+         gPhJCPvLqwJA+D/8CRo59Qqg7JO5vh5ps7rEg69EsRV7/vecSvB8TCuTJiGo2J74J4DS
+         Ab0wzfLsyXUa2yujczOmPiOk/2GMU6OOX/UOZifxwMq5+ITk/Ig70BOJJkm4b76DddEP
+         P7Vw==
+X-Gm-Message-State: AOJu0YwqkByUM/iIZUh1aHjStRb+xlzLNjKkD2p6vBEGdZ9D7U4S3zA0
+	NO44sPIVHFTe6hh9nCW/X2Ohabfz0SnzbXs2yVm7/p2J02yLYcmQCcRokHKIuPUmOUZ3WmTdB2G
+	BAtL/ksWyg6sm
+X-Received: by 2002:adf:fd46:0:b0:336:975:1832 with SMTP id h6-20020adffd46000000b0033609751832mr4108933wrs.9.1702471930069;
+        Wed, 13 Dec 2023 04:52:10 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHsiuI3U3USlVbrEOowWazssqrIJRsCiZR7plKklR2Gi3O2ESNv8XGdBBceH98jEgWRta30fA==
+X-Received: by 2002:adf:fd46:0:b0:336:975:1832 with SMTP id h6-20020adffd46000000b0033609751832mr4108893wrs.9.1702471929744;
+        Wed, 13 Dec 2023 04:52:09 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id h3-20020a5d4303000000b0033629538fa2sm4664964wrq.18.2023.12.13.04.51.59
+        by smtp.googlemail.com with ESMTPSA id h3-20020a5d4303000000b0033629538fa2sm4664964wrq.18.2023.12.13.04.52.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Dec 2023 04:52:00 -0800 (PST)
-Message-ID: <0b2eb374-356c-46c6-9c4a-9512fbfece7a@redhat.com>
-Date: Wed, 13 Dec 2023 13:51:58 +0100
+        Wed, 13 Dec 2023 04:52:09 -0800 (PST)
+Message-ID: <addcbff6-5db9-446a-a0a2-78f3be7f33db@redhat.com>
+Date: Wed, 13 Dec 2023 13:52:07 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,7 +68,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 04/50] x86/cpufeatures: Add SEV-SNP CPU feature
+Subject: Re: [PATCH v10 05/50] x86/speculation: Do not enable Automatic IBRS
+ if SEV SNP is enabled
 Content-Language: en-US
 To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
 Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -84,9 +85,9 @@ Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
  sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
  jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
  pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
- Brijesh Singh <brijesh.singh@amd.com>, Jarkko Sakkinen <jarkko@profian.com>
+ Kim Phillips <kim.phillips@amd.com>
 References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-5-michael.roth@amd.com>
+ <20231016132819.1002933-6-michael.roth@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -123,21 +124,23 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20231016132819.1002933-5-michael.roth@amd.com>
+In-Reply-To: <20231016132819.1002933-6-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 10/16/23 15:27, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
+> From: Kim Phillips <kim.phillips@amd.com>
 > 
-> Add CPU feature detection for Secure Encrypted Virtualization with
-> Secure Nested Paging. This feature adds a strong memory integrity
-> protection to help prevent malicious hypervisor-based attacks like
-> data replay, memory re-mapping, and more.
+> Without SEV-SNP, Automatic IBRS protects only the kernel. But when
+> SEV-SNP is enabled, the Automatic IBRS protection umbrella widens to all
+> host-side code, including userspace. This protection comes at a cost:
+> reduced userspace indirect branch performance.
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
-> Signed-off-by: Ashish Kalra <Ashish.Kalra@amd.com>
+> To avoid this performance loss, don't use Automatic IBRS on SEV-SNP
+> hosts. Fall back to retpolines instead.
+> 
+> Signed-off-by: Kim Phillips <kim.phillips@amd.com>
+> [mdr: squash in changes from review discussion]
 > Signed-off-by: Michael Roth <michael.roth@amd.com>
 
 Queued, thanks.
@@ -145,57 +148,27 @@ Queued, thanks.
 Paolo
 
 > ---
->   arch/x86/include/asm/cpufeatures.h       | 1 +
->   arch/x86/kernel/cpu/amd.c                | 5 +++--
->   tools/arch/x86/include/asm/cpufeatures.h | 1 +
->   3 files changed, 5 insertions(+), 2 deletions(-)
+>   arch/x86/kernel/cpu/common.c | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 58cb9495e40f..1640cedd77f1 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -437,6 +437,7 @@
->   #define X86_FEATURE_SEV			(19*32+ 1) /* AMD Secure Encrypted Virtualization */
->   #define X86_FEATURE_VM_PAGE_FLUSH	(19*32+ 2) /* "" VM Page Flush MSR is supported */
->   #define X86_FEATURE_SEV_ES		(19*32+ 3) /* AMD Secure Encrypted Virtualization - Encrypted State */
-> +#define X86_FEATURE_SEV_SNP		(19*32+ 4) /* AMD Secure Encrypted Virtualization - Secure Nested Paging */
->   #define X86_FEATURE_V_TSC_AUX		(19*32+ 9) /* "" Virtual TSC_AUX */
->   #define X86_FEATURE_SME_COHERENT	(19*32+10) /* "" AMD hardware-enforced cache coherency */
->   #define X86_FEATURE_DEBUG_SWAP		(19*32+14) /* AMD SEV-ES full debug state swap support */
-> diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
-> index dd8379d84445..14ee7f750cc7 100644
-> --- a/arch/x86/kernel/cpu/amd.c
-> +++ b/arch/x86/kernel/cpu/amd.c
-> @@ -630,8 +630,8 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
->   	 *	      SME feature (set in scattered.c).
->   	 *	      If the kernel has not enabled SME via any means then
->   	 *	      don't advertise the SME feature.
-> -	 *   For SEV: If BIOS has not enabled SEV then don't advertise the
-> -	 *            SEV and SEV_ES feature (set in scattered.c).
-> +	 *   For SEV: If BIOS has not enabled SEV then don't advertise SEV and
-> +	 *	      any additional functionality based on it.
->   	 *
->   	 *   In all cases, since support for SME and SEV requires long mode,
->   	 *   don't advertise the feature under CONFIG_X86_32.
-> @@ -666,6 +666,7 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
->   clear_sev:
->   		setup_clear_cpu_cap(X86_FEATURE_SEV);
->   		setup_clear_cpu_cap(X86_FEATURE_SEV_ES);
-> +		setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
->   	}
->   }
->   
-> diff --git a/tools/arch/x86/include/asm/cpufeatures.h b/tools/arch/x86/include/asm/cpufeatures.h
-> index 798e60b5454b..669f45eefa0c 100644
-> --- a/tools/arch/x86/include/asm/cpufeatures.h
-> +++ b/tools/arch/x86/include/asm/cpufeatures.h
-> @@ -432,6 +432,7 @@
->   #define X86_FEATURE_SEV			(19*32+ 1) /* AMD Secure Encrypted Virtualization */
->   #define X86_FEATURE_VM_PAGE_FLUSH	(19*32+ 2) /* "" VM Page Flush MSR is supported */
->   #define X86_FEATURE_SEV_ES		(19*32+ 3) /* AMD Secure Encrypted Virtualization - Encrypted State */
-> +#define X86_FEATURE_SEV_SNP		(19*32+ 4) /* AMD Secure Encrypted Virtualization - Secure Nested Paging */
->   #define X86_FEATURE_V_TSC_AUX		(19*32+ 9) /* "" Virtual TSC_AUX */
->   #define X86_FEATURE_SME_COHERENT	(19*32+10) /* "" AMD hardware-enforced cache coherency */
->   #define X86_FEATURE_DEBUG_SWAP		(19*32+14) /* AMD SEV-ES full debug state swap support */
+> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+> index 382d4e6b848d..11fae89b799e 100644
+> --- a/arch/x86/kernel/cpu/common.c
+> +++ b/arch/x86/kernel/cpu/common.c
+> @@ -1357,8 +1357,13 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
+>   	/*
+>   	 * AMD's AutoIBRS is equivalent to Intel's eIBRS - use the Intel feature
+>   	 * flag and protect from vendor-specific bugs via the whitelist.
+> +	 *
+> +	 * Don't use AutoIBRS when SNP is enabled because it degrades host
+> +	 * userspace indirect branch performance.
+>   	 */
+> -	if ((ia32_cap & ARCH_CAP_IBRS_ALL) || cpu_has(c, X86_FEATURE_AUTOIBRS)) {
+> +	if ((ia32_cap & ARCH_CAP_IBRS_ALL) ||
+> +	    (cpu_has(c, X86_FEATURE_AUTOIBRS) &&
+> +	     !cpu_feature_enabled(X86_FEATURE_SEV_SNP))) {
+>   		setup_force_cpu_cap(X86_FEATURE_IBRS_ENHANCED);
+>   		if (!cpu_matches(cpu_vuln_whitelist, NO_EIBRS_PBRSB) &&
+>   		    !(ia32_cap & ARCH_CAP_PBRSB_NO))
 
 
