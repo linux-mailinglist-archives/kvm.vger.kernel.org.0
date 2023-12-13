@@ -1,101 +1,122 @@
-Return-Path: <kvm+bounces-4408-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4409-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FE2381229D
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 00:10:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E6BA8122BD
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 00:18:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E8EE1F2189F
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 23:10:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3060A1F21A4A
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 23:18:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E18283AE5;
-	Wed, 13 Dec 2023 23:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB93477B2F;
+	Wed, 13 Dec 2023 23:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ps6YFuZW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gEMmEMI4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED43199
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 15:10:27 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5e2bf6066e4so15614507b3.2
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 15:10:27 -0800 (PST)
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13E40B0
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 15:18:43 -0800 (PST)
+Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so5474a12.0
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 15:18:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702509027; x=1703113827; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CUqoDbZM9AopeA8SWQ56D3q7Q5pOcG2dnxXupG6r4AM=;
-        b=Ps6YFuZWcYOBgvbAejx+2etW7sQb71fvhn6DU5QSVgdDdRoCp7E4/qn/oWnb/4/q32
-         +dCCQp1pBFtMaBanO9n96vbs3G8/NT9JlMw5vq9FaNDGdyr2qRZHDK5xxtXc1X+7Ie/j
-         PRRjCvb+EZj3x9ruEH5cvuagLa7nvEhRGDfXxRrUlCI+78JpZbY9A1tExCvvfKRxcBI6
-         hkMXGUVETtq/SAE1bwd1uYWwMZDh3TUaOQqJyqUj0ZGcT6g8Xws7thBAP4HdPz61Cdys
-         yXtPnXIpj29B+1zO9I55kZvDjXzkZ2b4vSfVIcbfI4UlMYMbpyyKkG+YmtBqACwROnH8
-         PCEg==
+        d=google.com; s=20230601; t=1702509521; x=1703114321; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CtO9cW/bS+T4J2DvUT4r9uDI2FISmZm46NtsOlUjLfk=;
+        b=gEMmEMI4zDG3ms5JSyMCGI8dKWw4l+cb3b17NjP+xghWg9KpVVYAtCDh8mtYCx7WuB
+         8iSxOIOKKgU0z8a31nXvfw8aCi/VavJFtceBJ+7jFGdy+dZ1bSjm06NeIz4DAgd5d3Sq
+         af2b/IzRfF9Fb3Yt1e+JOx6gcHhbXYFW0WycpX/aQI9SOglXhXZPlScuz6TPdxFpg7Ro
+         +pAFEQng4gDyyWEktI4ysG1AF/obOwDWCs3GJ4rLTShYGEMzNqyFODtWEi+CFVjGPxfj
+         PsScc5RnyTUAIfKA9RVeZDRMVVxzV0MzK2VmbtcjS850SDlptpJFaAN5iVn80GoXhR6h
+         vKTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702509027; x=1703113827;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CUqoDbZM9AopeA8SWQ56D3q7Q5pOcG2dnxXupG6r4AM=;
-        b=GM406GFja0FUGWO9j4gzKx73KuRBbv2KWpajfRYjwJX5OHHJvcpLkd4tL6VRDrYsaO
-         5ZDxvkRKQrgv4OvqtdzJQE7Ge8XvdEyoDEy0mkqb9TIZc7DRFvaT8MlLkZrXl62nTYc2
-         FzUMJA5lcJCtFBpk9Qft7up2tsP6NbNNm+2kDH089PJPOE2dG0TkkhxQ6VnGarmHvl+6
-         OwFvUeL2JPvSYbiXVJXK160gfuFNNXWlGuozsLvHQFt1LKVeQbCII2OS+ZMAzOHwK9cs
-         XaoUixB/5YdSQaIK3BWUcO9pqKkyp0skkfttELP2wjb0hEwmbxv5G8uQrJDW9X2CBnt4
-         8nig==
-X-Gm-Message-State: AOJu0Yyuk+TNuugrXJVCfSe4ftbUcofXZ1lFVWc7/7qH/SkAnaLZAjdp
-	nbAOA6eB5voDSZxUSbL+AFZKUj+AYos=
-X-Google-Smtp-Source: AGHT+IF4eGkuED2YgGkikQHjB/qkyEMf7VDdEnq9on8ks3iMiGrniK1KQ/mlVQ/drqNz1BaE3Btrpi0R9vk=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:d0e:b0:5d7:9a6c:54aa with SMTP id
- cn14-20020a05690c0d0e00b005d79a6c54aamr98099ywb.5.1702509027129; Wed, 13 Dec
- 2023 15:10:27 -0800 (PST)
-Date: Wed, 13 Dec 2023 15:10:25 -0800
-In-Reply-To: <938efd3cfcb25d828deab0cc0ba797177cc69602.camel@redhat.com>
+        d=1e100.net; s=20230601; t=1702509521; x=1703114321;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CtO9cW/bS+T4J2DvUT4r9uDI2FISmZm46NtsOlUjLfk=;
+        b=TgaKSp4SAk3nQvTMWLZfxKsoKBD6g1O2Dbid9UmuPIG70Nz3Z8CR4ey6jIKaf9Fb7H
+         m3xeaqVeB+nvvShiP11qgHkFt4d2GWOO7s03Zs+2q6UI4P589qF9IM2XI1zqVExUSgKr
+         ABBh1Bya59rTU+PTKoxMkUURUlPV1mvhnlY6JG67qk5Qg3uH0oxdSWVGjWQiBUDp5jNn
+         VFEhr1vxm6DEMymx22RFrX3vTZyxnlQ3IgwTGrhwWnIK8oYlg4+R7KajSXKKq8+A33Sq
+         JbCmpAwe9YSxBSacO0rUylsnx54xjko8+Bad5q689PlSe7hSB4mTVSnK/b4+OOKwXRxx
+         Py3A==
+X-Gm-Message-State: AOJu0YxqWZKVdgTqDJxDBxW3m2Rz4Tpc4lQeaKkMvmLb6QDhQBcHsY1Y
+	GaT9pM6uiw0aRm4eo49u+0Wpbe4wj/k7sw8qLqLD+A==
+X-Google-Smtp-Source: AGHT+IHJlijaS4jp5pajI4NmOiafXFWdXV2A3PlgtibtORBNW9UNjAL2V2BgHeLDv+VyAiVat1lsNy4sHnzcE+xRGIA=
+X-Received: by 2002:a50:d7ca:0:b0:54a:ee8b:7a8c with SMTP id
+ m10-20020a50d7ca000000b0054aee8b7a8cmr550601edj.0.1702509521358; Wed, 13 Dec
+ 2023 15:18:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
 References: <cover.1699936040.git.isaku.yamahata@intel.com>
  <1c12f378af7de16d7895f8badb18c3b1715e9271.1699936040.git.isaku.yamahata@intel.com>
- <938efd3cfcb25d828deab0cc0ba797177cc69602.camel@redhat.com>
-Message-ID: <ZXo54VNuIqbMsYv-@google.com>
+ <938efd3cfcb25d828deab0cc0ba797177cc69602.camel@redhat.com> <ZXo54VNuIqbMsYv-@google.com>
+In-Reply-To: <ZXo54VNuIqbMsYv-@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Wed, 13 Dec 2023 15:18:25 -0800
+Message-ID: <CALMp9eQUs44tq-3mbqGxcnXjmAx=-jHOLxmW+DuMfeVXGVSDzg@mail.gmail.com>
 Subject: Re: [PATCH v2 1/3] KVM: x86: Make the hardcoded APIC bus frequency vm variable
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org, 
+To: Sean Christopherson <seanjc@google.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, isaku.yamahata@intel.com, kvm@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com, 
 	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com, 
-	Vishal Annapurve <vannapurve@google.com>, Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="us-ascii"
+	Vishal Annapurve <vannapurve@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 14, 2023, Maxim Levitsky wrote:
-> On Mon, 2023-11-13 at 20:35 -0800, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > TDX virtualizes the advertised APIC bus frequency to be 25MHz. 
-> 
-> Can you explain a bit better why TDX needs this? I am not familiar
-> with TDX well enough yet to fully understand.
+On Wed, Dec 13, 2023 at 3:10=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Thu, Dec 14, 2023, Maxim Levitsky wrote:
+> > On Mon, 2023-11-13 at 20:35 -0800, isaku.yamahata@intel.com wrote:
+> > > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > >
+> > > TDX virtualizes the advertised APIC bus frequency to be 25MHz.
+> >
+> > Can you explain a bit better why TDX needs this? I am not familiar
+> > with TDX well enough yet to fully understand.
+>
+> TDX (the module/architecture) hardcodes the core crystal frequency to 25M=
+hz,
+> whereas KVM hardcodes the APIC bus frequency to 1Ghz.  And TDX (again, th=
+e module)
+> *unconditionally* enumerates CPUID 0x15 to TDX guests, i.e. _tells_ the g=
+uest that
+> the frequency is 25MHz regardless of what the VMM/hypervisor actually emu=
+lates.
+> And so the guest skips calibrating the APIC timer, which results in the g=
+uest
+> scheduling timer interrupts waaaaaaay too frequently, i.e. the guest ends=
+ up
+> gettings interrupts at 40x the rate it wants.
+>
+> Upstream KVM's non-TDX behavior is fine, because KVM doesn't advertise su=
+pport
+> for CPUID 0x15, i.e. doesn't announce to host userspace that it's safe to=
+ expose
+> CPUID 0x15 to the guest.  Because TDX makes exposing CPUID 0x15 mandatory=
+, KVM
+> needs to be taught to correctly emulate the guest's APIC bus frequency, a=
+.k.a.
+> the TDX guest core crystal frequency of 25Mhz.
 
-TDX (the module/architecture) hardcodes the core crystal frequency to 25Mhz,
-whereas KVM hardcodes the APIC bus frequency to 1Ghz.  And TDX (again, the module)
-*unconditionally* enumerates CPUID 0x15 to TDX guests, i.e. _tells_ the guest that
-the frequency is 25MHz regardless of what the VMM/hypervisor actually emulates.
-And so the guest skips calibrating the APIC timer, which results in the guest
-scheduling timer interrupts waaaaaaay too frequently, i.e. the guest ends up
-gettings interrupts at 40x the rate it wants.
+Aside from placating a broken guest infrastructure that ignores a
+17-year old contract between KVM and its guests, what are the
+advantages to supporting a range of APIC bus frequencies?
 
-Upstream KVM's non-TDX behavior is fine, because KVM doesn't advertise support
-for CPUID 0x15, i.e. doesn't announce to host userspace that it's safe to expose
-CPUID 0x15 to the guest.  Because TDX makes exposing CPUID 0x15 mandatory, KVM
-needs to be taught to correctly emulate the guest's APIC bus frequency, a.k.a.
-the TDX guest core crystal frequency of 25Mhz.
+> I halfheartedly floated the idea of "fixing" the TDX module/architecture =
+to either
+> use 1Ghz as the base frequency (off list), but it definitely isn't a hill=
+ worth
+> dying on since the KVM changes are relatively simple.
 
-I halfheartedly floated the idea of "fixing" the TDX module/architecture to either
-use 1Ghz as the base frequency (off list), but it definitely isn't a hill worth
-dying on since the KVM changes are relatively simple.
-
-https://lore.kernel.org/all/ZSnIKQ4bUavAtBz6@google.com
+Not making the KVM changes is even simpler. :)
 
