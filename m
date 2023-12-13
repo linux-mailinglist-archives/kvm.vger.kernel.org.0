@@ -1,209 +1,144 @@
-Return-Path: <kvm+bounces-4400-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4401-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E15A18120FD
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 22:55:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93489812166
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 23:26:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B70C1F219DC
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 21:55:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD1D0B21244
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 22:26:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A5E7FBBC;
-	Wed, 13 Dec 2023 21:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D6C28182E;
+	Wed, 13 Dec 2023 22:26:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QG1ufpIW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YL+HWKix"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1D3810C;
-	Wed, 13 Dec 2023 13:55:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702504527; x=1734040527;
-  h=date:from:to:cc:subject:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=o2lEbwHxUNP/lL0Zv5x84LTlhNESluWyXeo3F7KR8cs=;
-  b=QG1ufpIWnyLB6Up/SG/2/l0SBsGxKtIXVr9pqrSIXikgVjTw7BH93F5V
-   3K3N2STz19gAQGHcapG1HsRgcSz4nwHKgKBG5bOBWJhZAroMqy54coHb1
-   H8sAIUJED7wa84abxrJH1xKF+zAoRhlrGcO+G2Z3WOs1KiNNkqoIhQ/Sp
-   B2J/eLnKdkLYuD80ER/h/2oDnz9oQqBROtanRtMjHw3dQ/+t4R13TbW5o
-   PsWfTEKYve1sPwIIZwR7QNC/ca3auSOAszXHKLt+6puaNGU562MpIc3fs
-   RHybNZTKqE3wUeERDn4xaxcbejNnU6A9ySpXe/+IzMP2TopElH8LjLBfd
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10923"; a="2176917"
-X-IronPort-AV: E=Sophos;i="6.04,274,1695711600"; 
-   d="scan'208";a="2176917"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 13:55:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10923"; a="808320353"
-X-IronPort-AV: E=Sophos;i="6.04,274,1695711600"; 
-   d="scan'208";a="808320353"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.24.100.114])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 13:55:26 -0800
-Date: Wed, 13 Dec 2023 14:00:21 -0800
-From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>,
- iommu@lists.linux.dev, Lu Baolu <baolu.lu@linux.intel.com>,
- kvm@vger.kernel.org, Dave Hansen <dave.hansen@intel.com>, Joerg Roedel
- <joro@8bytes.org>, "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov
- <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, Raj Ashok
- <ashok.raj@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
- maz@kernel.org, peterz@infradead.org, seanjc@google.com, Robin Murphy
- <robin.murphy@arm.com>, jacob.jun.pan@linux.intel.com
-Subject: Re: [PATCH RFC 13/13] iommu/vt-d: Enable posted mode for device
- MSIs
-Message-ID: <20231213140021.4cc84bb2@jacob-builder>
-In-Reply-To: <87zfynt6uo.ffs@tglx>
-References: <20231112041643.2868316-1-jacob.jun.pan@linux.intel.com>
-	<20231112041643.2868316-14-jacob.jun.pan@linux.intel.com>
-	<87zfynt6uo.ffs@tglx>
-Organization: OTC
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0CE49C
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 14:25:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702506356;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GtHNIqYNLvneVefWnBC6zOfsKWdZrXaTN0MEXSsNlm4=;
+	b=YL+HWKixxRZDtjayL4IGhuxJaNn+EhTwhRVwbLqYBYbdxAMg10OSspGWG0GJDPQi+MBHNK
+	6t87v77FBfU0RTR12wa5IWNpzWSDupxmbmCDSsR4qbL1kZRP/fKLrPu7kuftg+0bKGJjKr
+	4Gh5Mr51BVsyrE8Ydqoto5lDEOdHDoE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-176-ZEmR8ivDOo-m2ZHtS5Ou6g-1; Wed, 13 Dec 2023 17:25:55 -0500
+X-MC-Unique: ZEmR8ivDOo-m2ZHtS5Ou6g-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40c22bc1ebdso50835e9.1
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 14:25:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702506354; x=1703111154;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GtHNIqYNLvneVefWnBC6zOfsKWdZrXaTN0MEXSsNlm4=;
+        b=bBhFXFGKBZXjwmeKh5vCBU3lcRaWioZxuflr9zvZkwIwasCYn7nFfC9SVwTs9DW2Do
+         ONqVcTdKTeHYFnHv7zRZBNcCIUcqm0ijdRqe+ey8MwIIWyBa22mNGQz9yf1g7HLOhj8k
+         cKwWifAH0yUDUepXBDNmNgW+na6BI4MAFS6G9UC+U00JQYNG03kb24ZwtR2the42CCo7
+         diGotqqUx65yEDd43WgafVTWG1ZGl3PQMGuNQ0x6rKHciLS4ENeXbmABoynEgdUzeYJm
+         QsWcvwXeGStpxooblzUGllqXTSq1w2sQOW4UfWKqQfPvNjz1GYDpnuN/zW88Hc6WPzNc
+         ROWA==
+X-Gm-Message-State: AOJu0YzV8Cg/y5ooDSScxIh44rTyOGAy9dc+IwuHxHv6clbnEmPU22GQ
+	9xky+JkfgmoXdtfsGDzStGxCiCbMa1fKqRxid65NNHBtTFoNT/+tdX8wWQR0Pk3CZT0qY4Ohfkx
+	niiJhTYF5eCZL
+X-Received: by 2002:a05:600c:518a:b0:40b:5e4a:2354 with SMTP id fa10-20020a05600c518a00b0040b5e4a2354mr4800764wmb.86.1702506354405;
+        Wed, 13 Dec 2023 14:25:54 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGq5vSBS9iWIl4hhY+47LaF7O2e11U2yVs0UmGQ3dWeLwMn5yVhoe2ukGq+e6/HNoX4k1QrCw==
+X-Received: by 2002:a05:600c:518a:b0:40b:5e4a:2354 with SMTP id fa10-20020a05600c518a00b0040b5e4a2354mr4800760wmb.86.1702506354019;
+        Wed, 13 Dec 2023 14:25:54 -0800 (PST)
+Received: from starship ([77.137.131.62])
+        by smtp.gmail.com with ESMTPSA id m27-20020a05600c3b1b00b0040b38292253sm24509354wms.30.2023.12.13.14.25.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 14:25:53 -0800 (PST)
+Message-ID: <5ca5592b21131f515e296afae006e5bb28b1fb87.camel@redhat.com>
+Subject: Re: [PATCH v4 10/12] KVM: x86: never write to memory from
+ kvm_vcpu_check_block()
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, Jim Mattson
+ <jmattson@google.com>
+Cc: alexandru.elisei@arm.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
+	atishp@atishpatra.org, borntraeger@linux.ibm.com, chenhuacai@kernel.org, 
+	david@redhat.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, 
+	james.morse@arm.com, kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linuxppc-dev@lists.ozlabs.org, maz@kernel.org, oliver.upton@linux.dev, 
+	palmer@dabbelt.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
+	suzuki.poulose@arm.com
+Date: Thu, 14 Dec 2023 00:25:50 +0200
+In-Reply-To: <ZXh8Nq_y_szj1WN0@google.com>
+References: <20220921003201.1441511-11-seanjc@google.com>
+	 <20231207010302.2240506-1-jmattson@google.com>
+	 <ZXHw7tykubfG04Um@google.com>
+	 <CALMp9eTT97oDmQT7pxeOMLQbt-371aMtC2Kev+-kWXVRDVrjeg@mail.gmail.com>
+	 <ZXh8Nq_y_szj1WN0@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Thomas,
-
-On Wed, 06 Dec 2023 21:26:55 +0100, Thomas Gleixner <tglx@linutronix.de>
-wrote:
-
-> On Sat, Nov 11 2023 at 20:16, Jacob Pan wrote:
-> >  #ifdef CONFIG_X86_POSTED_MSI
-> >  
-> >  static u64 get_pi_desc_addr(struct irq_data *irqd)
-> > @@ -1133,6 +1144,29 @@ static u64 get_pi_desc_addr(struct irq_data
-> > *irqd) 
-> >  	return __pa(per_cpu_ptr(&posted_interrupt_desc, cpu));
-> >  }
-> > +
-> > +static void intel_ir_reconfigure_irte_posted(struct irq_data *irqd)
-> > +{
-> > +	struct intel_ir_data *ir_data = irqd->chip_data;
-> > +	struct irte *irte = &ir_data->irte_entry;
-> > +	struct irte irte_pi;
-> > +	u64 pid_addr;
-> > +
-> > +	pid_addr = get_pi_desc_addr(irqd);
-> > +
-> > +	memset(&irte_pi, 0, sizeof(irte_pi));
-> > +
-> > +	/* The shared IRTE already be set up as posted during
-> > alloc_irte */  
+On Tue, 2023-12-12 at 07:28 -0800, Sean Christopherson wrote:
+> On Sun, Dec 10, 2023, Jim Mattson wrote:
+> > On Thu, Dec 7, 2023 at 8:21 AM Sean Christopherson <seanjc@google.com> wrote:
+> > > Doh.  We got the less obvious cases and missed the obvious one.
+> > > 
+> > > Ugh, and we also missed a related mess in kvm_guest_apic_has_interrupt().  That
+> > > thing should really be folded into vmx_has_nested_events().
+> > > 
+> > > Good gravy.  And vmx_interrupt_blocked() does the wrong thing because that
+> > > specifically checks if L1 interrupts are blocked.
+> > > 
+> > > Compile tested only, and definitely needs to be chunked into multiple patches,
+> > > but I think something like this mess?
+> > 
+> > The proposed patch does not fix the problem. In fact, it messes things
+> > up so much that I don't get any test results back.
 > 
-> -ENOPARSE
-Will delete this. What I meant was that the shared IRTE has already been
-setup as posted mode instead of remappable mode. So when we make a copy,
-there is no need to change the mode.
-
-> > +	dmar_copy_shared_irte(&irte_pi, irte);
-> > +
-> > +	irte_pi.pda_l = (pid_addr >> (32 - PDA_LOW_BIT)) & ~(-1UL <<
-> > PDA_LOW_BIT);
-> > +	irte_pi.pda_h = (pid_addr >> 32) & ~(-1UL << PDA_HIGH_BIT);
-> > +
-> > +	modify_irte(&ir_data->irq_2_iommu, &irte_pi);
-> > +}
-> > +
-> > +#else
-> > +static inline void intel_ir_reconfigure_irte_posted(struct irq_data
-> > *irqd) {} #endif
-> >  
-> >  static void intel_ir_reconfigure_irte(struct irq_data *irqd, bool
-> > force) @@ -1148,8 +1182,9 @@ static void
-> > intel_ir_reconfigure_irte(struct irq_data *irqd, bool force)
-> > irte->vector = cfg->vector; irte->dest_id = IRTE_DEST(cfg->dest_apicid);
-> >  
-> > -	/* Update the hardware only if the interrupt is in remapped
-> > mode. */
-> > -	if (force || ir_data->irq_2_iommu.mode == IRQ_REMAPPING)
-> > +	if (ir_data->irq_2_iommu.posted_msi)
-> > +		intel_ir_reconfigure_irte_posted(irqd);
-> > +	else if (force || ir_data->irq_2_iommu.mode == IRQ_REMAPPING)
-> >  		modify_irte(&ir_data->irq_2_iommu, irte);
-> >  }
-> >  
-> > @@ -1203,7 +1238,7 @@ static int intel_ir_set_vcpu_affinity(struct
-> > irq_data *data, void *info) struct intel_ir_data *ir_data =
-> > data->chip_data; struct vcpu_data *vcpu_pi_info = info;
-> >  
-> > -	/* stop posting interrupts, back to remapping mode */
-> > +	/* stop posting interrupts, back to the default mode */
-> >  	if (!vcpu_pi_info) {
-> >  		modify_irte(&ir_data->irq_2_iommu,
-> > &ir_data->irte_entry); } else {
-> > @@ -1300,10 +1335,14 @@ static void
-> > intel_irq_remapping_prepare_irte(struct intel_ir_data *data, {
-> >  	struct irte *irte = &data->irte_entry;
-> >  
-> > -	prepare_irte(irte, irq_cfg->vector, irq_cfg->dest_apicid);
-> > +	if (data->irq_2_iommu.mode == IRQ_POSTING)
-> > +		prepare_irte_posted(irte);
-> > +	else
-> > +		prepare_irte(irte, irq_cfg->vector,
-> > irq_cfg->dest_apicid); 
-> >  	switch (info->type) {
-> >  	case X86_IRQ_ALLOC_TYPE_IOAPIC:
-> > +		prepare_irte(irte, irq_cfg->vector,
-> > irq_cfg->dest_apicid);  
+> Drat.
 > 
-> What? This is just wrong. Above you have:
+> > Google has an internal K-U-T test that demonstrates the problem. I
+> > will post it soon.
 > 
-> > +	if (data->irq_2_iommu.mode == IRQ_POSTING)
-> > +		prepare_irte_posted(irte);
-> > +	else
-> > +		prepare_irte(irte, irq_cfg->vector,
-> > irq_cfg->dest_apicid);  
+> Received, I'll dig in soonish, though "soonish" might unfortunately might mean
+> 2024.
 > 
-> Can you spot the fail?
-My bad, I forgot to delete this.
 
-It is probably easier just override the IRTE for the posted MSI case.
-@@ -1274,6 +1354,11 @@ static void intel_irq_remapping_prepare_irte(struct intel_ir_data 
-*data,
-                break;
-        case X86_IRQ_ALLOC_TYPE_PCI_MSI:
-        case X86_IRQ_ALLOC_TYPE_PCI_MSIX:
-+               if (posted_msi_supported()) {
-+                       prepare_irte_posted(irte);
-+                       data->irq_2_iommu.posted_msi = 1;
-+               }
-+
+Hi,
 
-> 
-> >  		/* Set source-id of interrupt request */
-> >  		set_ioapic_sid(irte, info->devid);
-> >  		apic_printk(APIC_VERBOSE, KERN_DEBUG "IOAPIC[%d]: Set
-> > IRTE entry (P:%d FPD:%d Dst_Mode:%d Redir_hint:%d Trig_Mode:%d
-> > Dlvry_Mode:%X Avail:%X Vector:%02X Dest:%08X SID:%04X SQ:%X SVT:%X)\n",
-> > @@ -1315,10 +1354,18 @@ static void
-> > intel_irq_remapping_prepare_irte(struct intel_ir_data *data, sub_handle
-> > = info->ioapic.pin; break; case X86_IRQ_ALLOC_TYPE_HPET:
-> > +		prepare_irte(irte, irq_cfg->vector,
-> > irq_cfg->dest_apicid); set_hpet_sid(irte, info->devid);
-> >  		break;
-> >  	case X86_IRQ_ALLOC_TYPE_PCI_MSI:
-> >  	case X86_IRQ_ALLOC_TYPE_PCI_MSIX:
-> > +		if (posted_msi_supported()) {
-> > +			prepare_irte_posted(irte);
-> > +			data->irq_2_iommu.posted_msi = 1;
-> > +		} else {
-> > +			prepare_irte(irte, irq_cfg->vector,
-> > irq_cfg->dest_apicid);
-> > +		}  
-> 
-> Here it gets even more hilarious.
+So this is what I think:
 
 
-Thanks,
+KVM does have kvm_guest_apic_has_interrupt() for this exact purpose,
+to check if nested APICv has a pending interrupt before halting.
 
-Jacob
+
+However the problem is bigger - with APICv we have in essence 2 pending interrupt
+bitmaps - the PIR and the IRR, and to know if the guest has a pending interrupt
+one has in theory to copy PIR to IRR, then see if the max is larger then the current PPR.
+
+Since we don't want to write to guest memory, and the IRR here resides in the guest memory,
+I guess we have to do a 'dry-run' version of 'vmx_complete_nested_posted_interrupt' and call
+it from  kvm_guest_apic_has_interrupt().
+
+What do you think? I can prepare a patch for this.
+
+Can you share a reproducer or write a new one that can be shared?
+
+Best regards,
+	Maxim Levitsky
+
 
