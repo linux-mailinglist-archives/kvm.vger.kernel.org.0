@@ -1,175 +1,209 @@
-Return-Path: <kvm+bounces-4304-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4305-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 911B8810C59
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 09:25:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 572C6810C5A
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 09:25:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE59D1C20B06
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 08:25:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C9A5281B82
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 08:25:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABF9F1EB37;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D38981EB38;
 	Wed, 13 Dec 2023 08:25:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FNKF825v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C0dNI53Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32622F4
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 00:25:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702455904; x=1733991904;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=0ppWB4KUf9ItlUkFxKIcx5LJBpcaHf4hW7PG+q5J6mw=;
-  b=FNKF825vv2GqpHncDW33Xr2Pi4sr0NyWW6kmwo78vj0pJ1sBG8sPrOnR
-   CvpOIn6K/DBsInW1BnshjWh/90LcW9+dJcOrbou8qnw9yP59FG/Zkc6cM
-   5J1ywQTxilUHrqmzBSLHjRSTxNW5k29kfejYHJbLLLm0AT9jBGqXSimyC
-   3QzGKzfzgB8la2U9uScR6e2ExREAS0hcXuIcxFUO4lWXz0XEftZvnLli3
-   6/8cNzzc+Q7xR94p8mABc4OAZHCh4pFtj0HQu6VILLpB3EiSFAS+qkMLi
-   zvbpG+u1w7P4iwdopSJtqYJb1eME0ppZVjwpFNigB08RQYQHqSSnwd7JC
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="8319065"
-X-IronPort-AV: E=Sophos;i="6.04,272,1695711600"; 
-   d="scan'208";a="8319065"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 00:25:04 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="839776110"
-X-IronPort-AV: E=Sophos;i="6.04,272,1695711600"; 
-   d="scan'208";a="839776110"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Dec 2023 00:25:03 -0800
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 13 Dec 2023 00:25:03 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 13 Dec 2023 00:25:03 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 13 Dec 2023 00:25:00 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XCaJBwYgp0W33gEVuiEpYrSKuhfwARfWlXLBfLb19XCVy4QX8VI0Rq7UgzCdZFNkaNHePHPBfB5HmPb9WSqsfxkYS5PGwlyaEJfVzsbQlBnA0gbzPS0lk0BRTtHOFmRf4j/vc/cZ32APKOKlLLzVV8gihcYYJLkv1J04Q3e6R9IvbDT1BgwLVAEkvwzGusO7r+7cqiXBeF3+M0DV6mS3ES3kGOu8SMruC6lYfY84bjenem2z20mwiU4jZ0FzsnINcNhF5FN0n82bESIY9pR+SxnZDWMGkrM7URqXuM9/aA0pe7AqC1FciFovbsj85MXuXZQH5svws4qmzi8gIBlgVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0ppWB4KUf9ItlUkFxKIcx5LJBpcaHf4hW7PG+q5J6mw=;
- b=oSh4JfLosjLGJ29WPQhYQcM8dXUjw1/gNwQOpYJX2UNVy+eRtIMIjV4lLm+oF5K3v7C6m4oGs1OURPJA399X7pSMXrzvuvnz5Txigg1KGmXC4fRDQhxFh1jqyV5sqthgjHf7wis/EKbt245HIFNVwUekouIt4fSBfdoc306zw/Fyu5cIGnQ79rNInHkRYX4efy9ep5tvRAYBE71G+2aHLUc9KTA9aloDGfkp7NStdozf8fEz3YKDGL6G4bjUemybFvf/ZBxW2jGf1LnYV3qCsvVuku3zU0SFj3ACEn0H4NbGe9YA3U55Rbv74GnBOUEwzRyTl1soMmRubmttxdkr0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by CO1PR11MB4898.namprd11.prod.outlook.com (2603:10b6:303:92::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.26; Wed, 13 Dec
- 2023 08:24:59 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a%3]) with mapi id 15.20.7091.022; Wed, 13 Dec 2023
- 08:24:58 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Yishai Hadas <yishaih@nvidia.com>, "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>, "jgg@nvidia.com"
-	<jgg@nvidia.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"virtualization@lists.linux-foundation.org"
-	<virtualization@lists.linux-foundation.org>, "parav@nvidia.com"
-	<parav@nvidia.com>, "feliu@nvidia.com" <feliu@nvidia.com>, "jiri@nvidia.com"
-	<jiri@nvidia.com>, "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-	"si-wei.liu@oracle.com" <si-wei.liu@oracle.com>, "leonro@nvidia.com"
-	<leonro@nvidia.com>, "maorg@nvidia.com" <maorg@nvidia.com>
-Subject: RE: [PATCH V7 vfio 8/9] vfio/pci: Expose
- vfio_pci_core_iowrite/read##size()
-Thread-Topic: [PATCH V7 vfio 8/9] vfio/pci: Expose
- vfio_pci_core_iowrite/read##size()
-Thread-Index: AQHaKPhTopma7TgkSESlM9yvYqC5CbCm6a4g
-Date: Wed, 13 Dec 2023 08:24:58 +0000
-Message-ID: <BN9PR11MB52768E3E55C1597D23B5C3518C8DA@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20231207102820.74820-1-yishaih@nvidia.com>
- <20231207102820.74820-9-yishaih@nvidia.com>
-In-Reply-To: <20231207102820.74820-9-yishaih@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|CO1PR11MB4898:EE_
-x-ms-office365-filtering-correlation-id: f8e0c1cc-af51-4269-2aed-08dbfbb4febd
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: D7IC8MlnuXe0noltlHbcaHuBIHc5kaMDlIfRQoPPDMKBDoLoeu1igZV7Q03u2THgE4jwlwTxEM0OHWouuNISe1oJO43edWKMZhQ4gIvh8C1Ro119NDFNAJl9XnnpmikoSOsgGNrqLY9V6Wst866os8XXwaS9j0IO2P5ojk7+dRv4+60icMK7qGXkkUdupQW/VZwbh4aPqMuYK6Xpr0rmXWEXlBXemfYjCYpEK1LKK6ilUZuheDFxLdvoUT6m4O+3vVyKuxDhoLpTLC36mcwDNb+sQcpLpb4nq3ATUY50U3bhtHcJrD2+jUini8PkOPdAxqEXFdPzqvbKI96//tyB+Sq4y77P0Af0ScuZBv9qJ99iUCc+jWIKiKwGptwXtOw5gii0toPfflENqpMgdlPOsYF9k7sg6pqerDhg4FHVnA5yVwjeP8doiXDhAT2adCP5K0cQb3AlTqEyM5xqNi4sV4Y06p47N0YKLJNFgXe17lHNbSbBpGEl30rb3ulgjWpqCka7A0FCaJuyNA6zx3N7+8PSgZAKNZMB7zxOPy4Tsm5AmovCm1+kb1UrnWv7C6Cclx/eusD8Q/2FwetiPwAn9HgSbzXN4KcNk6/kFllthv7JhyS2T9IViOZOIn3AiaVH
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(346002)(396003)(366004)(376002)(230922051799003)(64100799003)(186009)(1800799012)(451199024)(5660300002)(55016003)(2906002)(7416002)(4326008)(4744005)(52536014)(8936002)(316002)(54906003)(64756008)(66446008)(66556008)(66946007)(76116006)(66476007)(110136005)(8676002)(478600001)(9686003)(6506007)(7696005)(71200400001)(41300700001)(26005)(83380400001)(122000001)(38100700002)(38070700009)(33656002)(86362001)(82960400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?lZupxaoEYrLZW86RO3GYzAL+ZTb16aZvLGojt4Q5Qgj+rfB4kJa6svCnzK3W?=
- =?us-ascii?Q?MHbOA1lT+ZU6zDnqbfEji3noyULTlsw908Xba8d73SUwwiHQaVKm2uJDtWQt?=
- =?us-ascii?Q?sscJC+7OyDuYQ67fNqyQagktlNreYHLQmemm1FFu8up7bbdv2UrhgnWIW3hF?=
- =?us-ascii?Q?MfRk3caKAQswRWBVZMyw89dqzL+KJnYciImT6kGLLRFtxCBvWFOjC3+FWmJS?=
- =?us-ascii?Q?VaaDs2jDqXcVY/WtJ6oFd18Olv4rxzIcZyRWT5llIxiCn5E2IqYCw4Use+Ow?=
- =?us-ascii?Q?P8oa742zLUvn3czRMmID8+zRTxp/beQrmhozR/RtYBsZZ6Sxx5wnL6CS83SZ?=
- =?us-ascii?Q?0xyicdPs2Oh/oehr8gBQn+UgveSJcZSC6S2I4I6cT8rxhS9QGqZ3XjCQtvPr?=
- =?us-ascii?Q?vS0MfkMQIL/IDh6AaWe8fCEL80dKgMLWDUWjzjpQs6CitzaByaro5n3OPALH?=
- =?us-ascii?Q?V3mvHJK+4MaJVmysInIKaXxqWeahJdtWb5aKI+wPWG2XmAiA7lGkaZ/+VnYc?=
- =?us-ascii?Q?VpKrNUZxyF7C0j+hNpNq4d2YmDic60X2Bm5zr6G7qp4s4nN6nWZguuFY4rHC?=
- =?us-ascii?Q?ktS4OVVDfYJ5HzzZ92U7jOqnGEJDDwEh/6mOEyBh1344yBGuMyovlHXqorAr?=
- =?us-ascii?Q?Z3GN7VHyyCZgUc5w8I37zomwsjwjhxY+Oi+TSjjc3z01YpUniiAV1OEmLu+B?=
- =?us-ascii?Q?JezSroHj+5Cgp37k/eymQE7NHSJMKPChZ8xGtmsMeS69mJ6IIW/qSp0afbL8?=
- =?us-ascii?Q?MQL6bfvSVyEf6TDobhQhE0BF0x5YqHOcR7pp5jeYrTH4dMd1s7EZoO5brmH2?=
- =?us-ascii?Q?iYdCyAVnxG8M3dztg7mJYMOECURo+yob7rPCh12ap6SM7C0BReu5CGHEf/01?=
- =?us-ascii?Q?+S9vcHjNGv/LzkRJtZXyKpT+VEqo9PtKeriHfl0hWHXyHlLwSllFvbSp9vCt?=
- =?us-ascii?Q?CuCzkF1KxmbP9ZMYpYpA2bMvERJ//HmVhjJAf2vxetHF5By9RMynFq/zbDfB?=
- =?us-ascii?Q?Wmsvk/eHvmoQiIJVRTOKSIPOa57H0oVbbYy/JhvA0fd4VWxbabK3eimGEzA/?=
- =?us-ascii?Q?n/tnadLT/BdywKeRBmPWU8Dzjp/bREHepwtOUX/vb4pbERq0PgM6+rk/iV+N?=
- =?us-ascii?Q?kF8tAyTDHP120JJY9MhRXF6bMKNy97SDGfGZVw+zMZmlhzZE50ZEyUiuDOKq?=
- =?us-ascii?Q?33WU7hMz2iP4SKb6YOVqnkT1+1dGse+ZPwKdMOLFA9iv6MXoxW5FQ8Qc+Z/K?=
- =?us-ascii?Q?6d4DLvX2gTOIBKIqaviV1lBWfs0XPvTkDcaO2nUB1o+wxoiNeqwi40BJqe52?=
- =?us-ascii?Q?gMxUSW9koc2MkESotfn8VKyk+33Nuq3ozYR/1Nq4Cd5Cv5iCgeJjDmsxwXIm?=
- =?us-ascii?Q?o5oY8kO2cyq6vtvbwR5vyHmxOuprl3Th/M6foJMz2rI0isY9SeLsPdZK+yCz?=
- =?us-ascii?Q?Rkr6Eu5D5F6j71AVHwQUBju1TbdL39otLitEi5KvlLV3Sz4PDXoLvS6VvqTG?=
- =?us-ascii?Q?1QIhxvsAvkwXYoJaB+11g7Q4RuHzzSggt8zWpw+41o5dOB5OGJhkLzzaTSBT?=
- =?us-ascii?Q?/aTL9kXmV+1faDwA2D6sRsF7dv5TCCYzocgxKKTx?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5659DF2;
+	Wed, 13 Dec 2023 00:25:02 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-6cea2a38b48so5887103b3a.3;
+        Wed, 13 Dec 2023 00:25:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702455902; x=1703060702; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Uh3dbu4BJGoqG7WyDjS7Ql7hw90UlDVfz+hx8zYG/jE=;
+        b=C0dNI53Qb4NVQjHQS71eLSRw2si/uiDCOBCSdkAA2A+ZmlRwQKkNcQzb5+wvRZ5EYE
+         bqW20YJzTnKYBy+/NbKdwfRyWF9hsmysSPLOhS5Ur8ydKrK7mMCwJg6xxOEC1GGmqmvJ
+         v/fZVibEWCdpcRcYvkxGf7fIyHut2BL0n7d6UkYs9iA024HU0J91jPT3nMRFxUxhR2pf
+         Jt5V0qqxZB2+fRQDTNygb+Y/85Za8utBx8bU2NGniKQe0Neysv5UB6GxYmf/5yRxhgGd
+         3CKRxTdODZerGW8algGMcEm+DonXXOryCnSPWhQQAqu3ysrzk/MFJwQp26CDfFEqf9Kd
+         R6GA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702455902; x=1703060702;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Uh3dbu4BJGoqG7WyDjS7Ql7hw90UlDVfz+hx8zYG/jE=;
+        b=iEqzCmsQrr8kEbBCbttMdbzOVBeCehyAbSL9Rj2J9of/9XnpvvWAjFATUGtQroeHju
+         niX5D+E6TjVLATncoD+6BcmZRdlaME+Tp8ahmLw9yCPF8ZDZ3xgJvYgaZO5BnZlbf68I
+         UKgv489j+2pz4849gaux6Ef6/I5yx7lOnJdSb40d2bV/ujWgd09mJHpfPtVSIEZRPc7+
+         W8UkHD967fs5XmE+KAO+49SUMuXmrOwpF+QJyBKYNZ7RX9OrsMlcQ95WV6SG12jYO68A
+         gqJLHBLtZ2YWJGvM9xe31oC35/y5HCHf4ckfdrDYtxRlPVaU7NLUKe0y7jQNsvOfvUCI
+         KK3w==
+X-Gm-Message-State: AOJu0YxHiJQ1ZfDKTsdQOBbdH0CqN1hnJkUN+N95Uy88lAtDQqW0jPcU
+	Lrpt6pSVp7r1j/Q7uArp8Tc=
+X-Google-Smtp-Source: AGHT+IHk9xKbXKXJI4IzKs7YZf5cJqfyU+FKKjoIMbM8cAp68YbPe8olw2mibm4zNmxgq3ynp1h97Q==
+X-Received: by 2002:a05:6a00:10cc:b0:6ce:751b:81d9 with SMTP id d12-20020a056a0010cc00b006ce751b81d9mr8704308pfu.9.1702455901616;
+        Wed, 13 Dec 2023 00:25:01 -0800 (PST)
+Received: from [192.168.255.10] ([203.205.141.118])
+        by smtp.gmail.com with ESMTPSA id u23-20020a62d457000000b006ce9e9d27c7sm9798465pfl.129.2023.12.13.00.24.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Dec 2023 00:25:01 -0800 (PST)
+Message-ID: <0591cb18-77e1-4e98-a405-4a39cfb512e1@gmail.com>
+Date: Wed, 13 Dec 2023 16:24:58 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f8e0c1cc-af51-4269-2aed-08dbfbb4febd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Dec 2023 08:24:58.9010
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Rxm+7WtSzpZCpGJpla4ra2mEAi42ZWybTGZstEprGsiYMk/iZ6bCplsRolEQNswcumuTuFoF6wFcbQ9kS+uitA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4898
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] KVM: x86/intr: Explicitly check NMI from guest to
+ eliminate false positives
+To: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Andi Kleen <ak@linux.intel.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Sean Christopherson <seanjc@google.com>
+References: <20231206032054.55070-1-likexu@tencent.com>
+ <6d3417f7-062e-9934-01ab-20e3a46656a7@oracle.com>
+Content-Language: en-US
+From: Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <6d3417f7-062e-9934-01ab-20e3a46656a7@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> From: Yishai Hadas <yishaih@nvidia.com>
-> Sent: Thursday, December 7, 2023 6:28 PM
->=20
-> Expose vfio_pci_core_iowrite/read##size() to let it be used by drivers.
->=20
-> This functionality is needed to enable direct access to some physical
-> BAR of the device with the proper locks/checks in place.
->=20
-> The next patches from this series will use this functionality on a data
-> path flow when a direct access to the BAR is needed.
->=20
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
 
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+
+On 13/12/2023 3:28 pm, Dongli Zhang wrote:
+> Hi Like,
+> 
+> On 12/5/23 19:20, Like Xu wrote:
+>> From: Like Xu <likexu@tencent.com>
+>>
+>> Explicitly checking the source of external interrupt is indeed NMI and not
+>> other types in the kvm_arch_pmi_in_guest(), which prevents perf-kvm false
+>> positive samples generated in perf/core NMI mode after vm-exit but before
+>> kvm_before_interrupt() from being incorrectly labelled as guest samples:
+> 
+> About the before kvm_before_interrupt() ...
+> 
+>>
+>> # test: perf-record + cpu-cycles:HP (which collects host-only precise samples)
+>> # Symbol                                   Overhead       sys       usr  guest sys  guest usr
+>> # .......................................  ........  ........  ........  .........  .........
+>> #
+>> # Before:
+>>    [g] entry_SYSCALL_64                       24.63%     0.00%     0.00%     24.63%      0.00%
+>>    [g] syscall_return_via_sysret              23.23%     0.00%     0.00%     23.23%      0.00%
+>>    [g] files_lookup_fd_raw                     6.35%     0.00%     0.00%      6.35%      0.00%
+>> # After:
+>>    [k] perf_adjust_freq_unthr_context         57.23%    57.23%     0.00%      0.00%      0.00%
+>>    [k] __vmx_vcpu_run                          4.09%     4.09%     0.00%      0.00%      0.00%
+>>    [k] vmx_update_host_rsp                     3.17%     3.17%     0.00%      0.00%      0.00%
+>>
+>> In the above case, perf records the samples labelled '[g]', the RIPs behind
+>> the weird samples are actually being queried by perf_instruction_pointer()
+>> after determining whether it's in GUEST state or not, and here's the issue:
+>>
+>> If vm-exit is caused by a non-NMI interrupt (such as hrtimer_interrupt) and
+>> at least one PMU counter is enabled on host, the kvm_arch_pmi_in_guest()
+>> will remain true (KVM_HANDLING_IRQ is set) until kvm_before_interrupt().
+> 
+> ... and here.
+> 
+> Would you mind helping why kvm_arch_pmi_in_guest() remains true before
+> *kvm_before_interrupt()*.
+> 
+> According to the source code, the vcpu->arch.handling_intr_from_guest
+> is set to non-zero only at kvm_before_interrupt(), and cleared at
+> kvm_after_interrupt().
+> 
+> Or would you mean kvm_after_interrupt()?
+
+Oops, it should refer to kvm_after_interrupt() as the code fixed. Thank you.
+
+> 
+> Thank you very much!
+> 
+> Dongli Zhang
+> 
+>>
+>> During this window, if a PMI occurs on host (since the KVM instructions on
+>> host are being executed), the control flow, with the help of the host NMI
+>> context, will be transferred to perf/core to generate performance samples,
+>> thus perf_instruction_pointer() and perf_guest_get_ip() is called.
+>>
+>> Since kvm_arch_pmi_in_guest() only checks if there is an interrupt, it may
+>> cause perf/core to mistakenly assume that the source RIP of the host NMI
+>> belongs to the guest world and use perf_guest_get_ip() to get the RIP of
+>> a vCPU that has already exited by a non-NMI interrupt.
+>>
+>> Error samples are recorded and presented to the end-user via perf-report.
+>> Such false positive samples could be eliminated by explicitly determining
+>> if the exit reason is KVM_HANDLING_NMI.
+>>
+>> Note that when vm-exit is indeed triggered by PMI and before HANDLING_NMI
+>> is cleared, it's also still possible that another PMI is generated on host.
+>> Also for perf/core timer mode, the false positives are still possible since
+>> that non-NMI sources of interrupts are not always being used by perf/core.
+>> In both cases above, perf/core should correctly distinguish between real
+>> RIP sources or even need to generate two samples, belonging to host and
+>> guest separately, but that's perf/core's story for interested warriors.
+>>
+>> Fixes: dd60d217062f ("KVM: x86: Fix perf timer mode IP reporting")
+>> Signed-off-by: Like Xu <likexu@tencent.com>
+>> ---
+>> V1 -> V2 Changelog:
+>> - Refine commit message to cover both perf/core timer and NMI modes;
+>> - Use in_nmi() to distinguish whether it's NMI mode or not; (Sean)
+>> V1: https://urldefense.com/v3/__https://lore.kernel.org/kvm/20231204074535.9567-1-likexu@tencent.com/__;!!ACWV5N9M2RV99hQ!MQ8FetD27SVKN34CS_P-K3qrhspFnpf_Mqb0McFN9y5vSUeScc5b0TlZ3ZMDvt4Cn4b3g0h9ci6EO9k3PBEQXpePrg$
+>>   arch/x86/include/asm/kvm_host.h | 10 +++++++++-
+>>   arch/x86/kvm/x86.h              |  6 ------
+>>   2 files changed, 9 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index c8c7e2475a18..167d592e08d0 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -1868,8 +1868,16 @@ static inline int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn,
+>>   }
+>>   #endif /* CONFIG_HYPERV */
+>>   
+>> +enum kvm_intr_type {
+>> +	/* Values are arbitrary, but must be non-zero. */
+>> +	KVM_HANDLING_IRQ = 1,
+>> +	KVM_HANDLING_NMI,
+>> +};
+>> +
+>> +/* Enable perf NMI and timer modes to work, and minimise false positives. */
+>>   #define kvm_arch_pmi_in_guest(vcpu) \
+>> -	((vcpu) && (vcpu)->arch.handling_intr_from_guest)
+>> +	((vcpu) && (vcpu)->arch.handling_intr_from_guest && \
+>> +	 (in_nmi() == ((vcpu)->arch.handling_intr_from_guest == KVM_HANDLING_NMI)))
+>>   
+>>   void __init kvm_mmu_x86_module_init(void);
+>>   int kvm_mmu_vendor_module_init(void);
+>> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+>> index 2f7e19166658..4dc38092d599 100644
+>> --- a/arch/x86/kvm/x86.h
+>> +++ b/arch/x86/kvm/x86.h
+>> @@ -431,12 +431,6 @@ static inline bool kvm_notify_vmexit_enabled(struct kvm *kvm)
+>>   	return kvm->arch.notify_vmexit_flags & KVM_X86_NOTIFY_VMEXIT_ENABLED;
+>>   }
+>>   
+>> -enum kvm_intr_type {
+>> -	/* Values are arbitrary, but must be non-zero. */
+>> -	KVM_HANDLING_IRQ = 1,
+>> -	KVM_HANDLING_NMI,
+>> -};
+>> -
+>>   static __always_inline void kvm_before_interrupt(struct kvm_vcpu *vcpu,
+>>   						 enum kvm_intr_type intr)
+>>   {
+>>
+>> base-commit: 1ab097653e4dd8d23272d028a61352c23486fd4a
 
