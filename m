@@ -1,134 +1,472 @@
-Return-Path: <kvm+bounces-4356-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4357-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FA1B8117E2
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 16:45:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DC3681185F
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 16:52:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28DD71C212A7
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 15:45:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46B5D2810B2
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 15:52:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF379446C8;
-	Wed, 13 Dec 2023 15:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA0FA85377;
+	Wed, 13 Dec 2023 15:52:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="QOAG/cZ1"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="RjEGKU4t"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A0E5126;
-	Wed, 13 Dec 2023 07:42:00 -0800 (PST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 834E940E00CB;
-	Wed, 13 Dec 2023 15:41:57 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 3WN12W1SPrIZ; Wed, 13 Dec 2023 15:41:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1702482115; bh=IyhM7Slw/zIKLzW0NKmy0CrnbMXBOwC2G6bxrBly64g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QOAG/cZ16FSsNmwYJBb7r6qQgBeJQZTYcRo4azQifv+sKJfJy0k00NV5msq6ymTAY
-	 NdSWQqiaJzIIbbjQawtF5wiDnmZRIpMjCY5i5wVf1mcEiJ5QdOMvwYylKQB0wtBzsA
-	 wADGzcVl17JzPGddFLy0pTMafOg2YyX7aoMJdR8zVSaPE7JKCZNzqsXKkBWQRozFUr
-	 jaFqS5IATs10wyL7JrP6lrjpe/uG23/9rJkvrNsl+S8T76DZT7ZSxIhSBIwItLek0B
-	 4fbUky4Eiz7wCrJoMdKeUoBz12+M+ToP6KNiAj0eYkTIKvM4ANAKMXiWWvW4/ZFTbY
-	 tsZr7I8vWlAoUPMOtYV0mVZaUei4nttnjdpAvWsNNX05bY6ByXb10hG7vZuoAnbRiW
-	 ZRHqIscTgQNR0E3nEVAczRVmsSUnmQve5Li6FeVGf5BmVgKrVl2psZiiTXV+N6UdWF
-	 pRYwOSxj4xEoiW73XfixRM7B8R1yJ01piZAtC1OZHPaBlUT2kqUaUlQVg62qfO/Cjy
-	 TQrMu6YCHcrmOGZjE2T5WSBPMUEh/ayPYhujwMrw3O/+wYBDFxhpyeAsLK3xChvB5O
-	 HBPreAb4duw1cKA5I6mD6repeSryseqxrlv4kLdUJJTs956fDOM2icXv+LzuLksbOW
-	 BbNi0uSQw+rozRuITpo5zsMI=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id ED3D640E00CD;
-	Wed, 13 Dec 2023 15:41:13 +0000 (UTC)
-Date: Wed, 13 Dec 2023 16:41:07 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-	linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, seanjc@google.com, vkuznets@redhat.com,
-	jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
-	slp@redhat.com, pgonda@google.com, peterz@infradead.org,
-	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-	dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
-	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-	marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-	alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
-	nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
-	liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>,
-	Jarkko Sakkinen <jarkko@profian.com>
-Subject: Re: [PATCH v10 04/50] x86/cpufeatures: Add SEV-SNP CPU feature
-Message-ID: <20231213154107.GGZXnQkxEuw6dJfbc7@fat_crate.local>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-5-michael.roth@amd.com>
- <0b2eb374-356c-46c6-9c4a-9512fbfece7a@redhat.com>
- <20231213131324.GDZXmt9LsMmJZyzCJw@fat_crate.local>
- <40915dc3-4083-4b9f-bc64-7542833566e1@redhat.com>
- <20231213133628.GEZXmzXFwA1p+crH/5@fat_crate.local>
- <9ac2311c-9ccc-4468-9b26-6cb0872e207f@redhat.com>
- <20231213134945.GFZXm2eTkd+IfdsjVE@fat_crate.local>
- <b4aab361-4494-4a4b-b180-d7df05fd3d5b@redhat.com>
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62211BD
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 07:52:13 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-3332fc9b9b2so6181735f8f.1
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 07:52:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1702482732; x=1703087532; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lpDmW/iIGlPSvg3fzm2BuUDLYZQ66k1VVtclq5xo0Ok=;
+        b=RjEGKU4tVrQHCic2Zaor+gEfBNKMtgQaRAET4LQ16a5Kl1ry1ERuxP67Et7seY/zZt
+         LWVRDLBFGe9IXC8JnCJS8AjqC1GZR+8c03x7uuO6DSZdrO6zHOVplQOcJWCYJaibbfKz
+         sNwms24STf/4C+7a1QDy5RzH29h5Lxiw43ct9mbD+0UPQU6RgpYUMg1Otw4FM40d+aXz
+         aLsqQH2Eb/+0x+LT51VAvPcMlpxM92Os53DbX7BJeLg0Z8GwVTni6XH0j/RsGleOkP3e
+         t90KcF5mN3cAEhmEfEf1LCJEez7VFfJq3SFtxBk0g67pGsa12RbkBTHc5v5qBZMZjxbY
+         Z/Ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702482732; x=1703087532;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lpDmW/iIGlPSvg3fzm2BuUDLYZQ66k1VVtclq5xo0Ok=;
+        b=sHflt3a7hzkYjwIAaG5RnLtgPYsLgL/XG/Sup1MX/9IKCL06BfnHjIkxPKa3nSUhC7
+         5CitZibZR+2GoXajs8mpsju11KvQUK8CLlnnfTtxjiUyssjKtHsIVQI1MS9eiYBglfv5
+         EhACjFFY8+ZvsSWQiFvlcF2c5LD7NdcWoXqXRKvzNp34XtPYerJ0Ty6w1K3j/b2OfsD9
+         vySdl4rC+VDaVpkgLeDMQa8pQWJOdubLK/CqHtKsYp/J+MviTdMVJQXKI9Y7kdJGfNu3
+         1FWb9Vdbsu9MapCIZ0jCITkcPDkBjMcqfsntP66rv0D1s5fFWMLtYkSkomXv9zUE/z48
+         v/1g==
+X-Gm-Message-State: AOJu0Ywk3LOoTCIYbyF04DrBW6xsdRxBqeqvZl4daoPce1FK+KJGslJy
+	i8fjtvty373159Cdt9lCqsonJA==
+X-Google-Smtp-Source: AGHT+IHDW+YwKQtUrbtwkk1DM8B9MfE1x/+QpfrhZiICg/+9oaOJUsNFN9R3/9BxmYQ4NyzwyG+uTw==
+X-Received: by 2002:a5d:6e55:0:b0:333:3117:c469 with SMTP id j21-20020a5d6e55000000b003333117c469mr1971889wrz.250.1702482731803;
+        Wed, 13 Dec 2023 07:52:11 -0800 (PST)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id k2-20020a5d6282000000b003363432c0ffsm3887670wru.113.2023.12.13.07.52.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 07:52:11 -0800 (PST)
+Date: Wed, 13 Dec 2023 16:52:10 +0100
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Anup Patel <apatel@ventanamicro.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, 
+	Atish Patra <atishp@atishpatra.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Shuah Khan <shuah@kernel.org>, Anup Patel <anup@brainfault.org>, 
+	devicetree@vger.kernel.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 01/15] KVM: riscv: selftests: Generate ISA extension
+ reg_list using macros
+Message-ID: <20231213-f8c7c8ca94f67631dfa97631@orel>
+References: <20231128145357.413321-1-apatel@ventanamicro.com>
+ <20231128145357.413321-2-apatel@ventanamicro.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b4aab361-4494-4a4b-b180-d7df05fd3d5b@redhat.com>
+In-Reply-To: <20231128145357.413321-2-apatel@ventanamicro.com>
 
-On Wed, Dec 13, 2023 at 03:18:17PM +0100, Paolo Bonzini wrote:
-> Surely we can agree that cpu_feature_enabled(X86_FEATURE_SEV_SNP) has nothing
-> to do with SEV-SNP host patches being present? 
+On Tue, Nov 28, 2023 at 08:23:43PM +0530, Anup Patel wrote:
+> Various ISA extension reg_list have common pattern so let us generate
+> these using macros.
+> 
+> We define two macros for the above purpose:
+> 1) KVM_ISA_EXT_SIMPLE_CONFIG - Macro to generate reg_list for
+>    ISA extension without any additional ONE_REG registers
+> 2) KVM_ISA_EXT_SUBLIST_CONFIG - Macro to generate reg_list for
+>    ISA extension with additional ONE_REG registers
 
-It does - we're sanitizing the meaning of a CPUID flag present in
-/proc/cpuinfo, see here:
+This patch also adds the missing config for svnapot.
 
-https://git.kernel.org/tip/79c603ee43b2674fba0257803bab265147821955
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
-> And that therefore retpolines are preferred even without any SEV-SNP
-> support in KVM?
+Thanks,
+drew
 
-No, automatic IBRS should be disabled when SNP is enabled. Not CPUID
-present - enabled. We clear that bit on a couple of occasions in the SNP
-host patchset if we determine that SNP host support is not possible so
-4/50 needs to go together with the rest to mean something.
-
-> And can we agree that "Acked-by" means "feel free and take it if you wish,
-
-I can see how it can mean that and I'm sorry for the misunderstanding
-I caused. Two things here:
-
-* I acked it because I did a lengthly digging internally on whether
-disabling AIBRS makes sense on SNP and this was a note more to myself to
-say, yes, that's a good change.
-
-* If I wanted for you to pick it up, I would've acked 4/50 too. Which
-I haven't.
-
-> I'm asking because I'm not sure if we agree on these two things, but they
-> really seem basic to me?
-
-I think KVM and x86 maintainers should sit down and discuss who picks up
-what and through which tree so that there's no more confusion in the
-future. It seems things need discussion...
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+> 
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> ---
+>  .../selftests/kvm/riscv/get-reg-list.c        | 331 ++++--------------
+>  1 file changed, 76 insertions(+), 255 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> index 6bedaea95395..b6b4b6d7dacd 100644
+> --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> @@ -581,10 +581,6 @@ static __u64 base_skips_set[] = {
+>  	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_RISCV_TIMER_REG(state),
+>  };
+>  
+> -static __u64 h_regs[] = {
+> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_H,
+> -};
+> -
+>  static __u64 zicbom_regs[] = {
+>  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CONFIG | KVM_REG_RISCV_CONFIG_REG(zicbom_block_size),
+>  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICBOM,
+> @@ -595,54 +591,6 @@ static __u64 zicboz_regs[] = {
+>  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICBOZ,
+>  };
+>  
+> -static __u64 svpbmt_regs[] = {
+> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SVPBMT,
+> -};
+> -
+> -static __u64 sstc_regs[] = {
+> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SSTC,
+> -};
+> -
+> -static __u64 svinval_regs[] = {
+> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SVINVAL,
+> -};
+> -
+> -static __u64 zihintpause_regs[] = {
+> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIHINTPAUSE,
+> -};
+> -
+> -static __u64 zba_regs[] = {
+> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZBA,
+> -};
+> -
+> -static __u64 zbb_regs[] = {
+> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZBB,
+> -};
+> -
+> -static __u64 zbs_regs[] = {
+> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZBS,
+> -};
+> -
+> -static __u64 zicntr_regs[] = {
+> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICNTR,
+> -};
+> -
+> -static __u64 zicond_regs[] = {
+> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICOND,
+> -};
+> -
+> -static __u64 zicsr_regs[] = {
+> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICSR,
+> -};
+> -
+> -static __u64 zifencei_regs[] = {
+> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIFENCEI,
+> -};
+> -
+> -static __u64 zihpm_regs[] = {
+> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIHPM,
+> -};
+> -
+>  static __u64 aia_regs[] = {
+>  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(siselect),
+>  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(iprio1),
+> @@ -733,221 +681,94 @@ static __u64 fp_d_regs[] = {
+>  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_D,
+>  };
+>  
+> -#define BASE_SUBLIST \
+> +#define SUBLIST_BASE \
+>  	{"base", .regs = base_regs, .regs_n = ARRAY_SIZE(base_regs), \
+>  	 .skips_set = base_skips_set, .skips_set_n = ARRAY_SIZE(base_skips_set),}
+> -#define H_REGS_SUBLIST \
+> -	{"h", .feature = KVM_RISCV_ISA_EXT_H, .regs = h_regs, .regs_n = ARRAY_SIZE(h_regs),}
+> -#define ZICBOM_REGS_SUBLIST \
+> +#define SUBLIST_ZICBOM \
+>  	{"zicbom", .feature = KVM_RISCV_ISA_EXT_ZICBOM, .regs = zicbom_regs, .regs_n = ARRAY_SIZE(zicbom_regs),}
+> -#define ZICBOZ_REGS_SUBLIST \
+> +#define SUBLIST_ZICBOZ \
+>  	{"zicboz", .feature = KVM_RISCV_ISA_EXT_ZICBOZ, .regs = zicboz_regs, .regs_n = ARRAY_SIZE(zicboz_regs),}
+> -#define SVPBMT_REGS_SUBLIST \
+> -	{"svpbmt", .feature = KVM_RISCV_ISA_EXT_SVPBMT, .regs = svpbmt_regs, .regs_n = ARRAY_SIZE(svpbmt_regs),}
+> -#define SSTC_REGS_SUBLIST \
+> -	{"sstc", .feature = KVM_RISCV_ISA_EXT_SSTC, .regs = sstc_regs, .regs_n = ARRAY_SIZE(sstc_regs),}
+> -#define SVINVAL_REGS_SUBLIST \
+> -	{"svinval", .feature = KVM_RISCV_ISA_EXT_SVINVAL, .regs = svinval_regs, .regs_n = ARRAY_SIZE(svinval_regs),}
+> -#define ZIHINTPAUSE_REGS_SUBLIST \
+> -	{"zihintpause", .feature = KVM_RISCV_ISA_EXT_ZIHINTPAUSE, .regs = zihintpause_regs, .regs_n = ARRAY_SIZE(zihintpause_regs),}
+> -#define ZBA_REGS_SUBLIST \
+> -	{"zba", .feature = KVM_RISCV_ISA_EXT_ZBA, .regs = zba_regs, .regs_n = ARRAY_SIZE(zba_regs),}
+> -#define ZBB_REGS_SUBLIST \
+> -	{"zbb", .feature = KVM_RISCV_ISA_EXT_ZBB, .regs = zbb_regs, .regs_n = ARRAY_SIZE(zbb_regs),}
+> -#define ZBS_REGS_SUBLIST \
+> -	{"zbs", .feature = KVM_RISCV_ISA_EXT_ZBS, .regs = zbs_regs, .regs_n = ARRAY_SIZE(zbs_regs),}
+> -#define ZICNTR_REGS_SUBLIST \
+> -	{"zicntr", .feature = KVM_RISCV_ISA_EXT_ZICNTR, .regs = zicntr_regs, .regs_n = ARRAY_SIZE(zicntr_regs),}
+> -#define ZICOND_REGS_SUBLIST \
+> -	{"zicond", .feature = KVM_RISCV_ISA_EXT_ZICOND, .regs = zicond_regs, .regs_n = ARRAY_SIZE(zicond_regs),}
+> -#define ZICSR_REGS_SUBLIST \
+> -	{"zicsr", .feature = KVM_RISCV_ISA_EXT_ZICSR, .regs = zicsr_regs, .regs_n = ARRAY_SIZE(zicsr_regs),}
+> -#define ZIFENCEI_REGS_SUBLIST \
+> -	{"zifencei", .feature = KVM_RISCV_ISA_EXT_ZIFENCEI, .regs = zifencei_regs, .regs_n = ARRAY_SIZE(zifencei_regs),}
+> -#define ZIHPM_REGS_SUBLIST \
+> -	{"zihpm", .feature = KVM_RISCV_ISA_EXT_ZIHPM, .regs = zihpm_regs, .regs_n = ARRAY_SIZE(zihpm_regs),}
+> -#define AIA_REGS_SUBLIST \
+> +#define SUBLIST_AIA \
+>  	{"aia", .feature = KVM_RISCV_ISA_EXT_SSAIA, .regs = aia_regs, .regs_n = ARRAY_SIZE(aia_regs),}
+> -#define SMSTATEEN_REGS_SUBLIST \
+> +#define SUBLIST_SMSTATEEN \
+>  	{"smstateen", .feature = KVM_RISCV_ISA_EXT_SMSTATEEN, .regs = smstateen_regs, .regs_n = ARRAY_SIZE(smstateen_regs),}
+> -#define FP_F_REGS_SUBLIST \
+> +#define SUBLIST_FP_F \
+>  	{"fp_f", .feature = KVM_RISCV_ISA_EXT_F, .regs = fp_f_regs, \
+>  		.regs_n = ARRAY_SIZE(fp_f_regs),}
+> -#define FP_D_REGS_SUBLIST \
+> +#define SUBLIST_FP_D \
+>  	{"fp_d", .feature = KVM_RISCV_ISA_EXT_D, .regs = fp_d_regs, \
+>  		.regs_n = ARRAY_SIZE(fp_d_regs),}
+>  
+> -static struct vcpu_reg_list h_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	H_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list zicbom_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	ZICBOM_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list zicboz_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	ZICBOZ_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list svpbmt_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	SVPBMT_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list sstc_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	SSTC_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list svinval_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	SVINVAL_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list zihintpause_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	ZIHINTPAUSE_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list zba_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	ZBA_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list zbb_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	ZBB_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list zbs_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	ZBS_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list zicntr_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	ZICNTR_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list zicond_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	ZICOND_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list zicsr_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	ZICSR_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list zifencei_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	ZIFENCEI_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list zihpm_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	ZIHPM_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list aia_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	AIA_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list smstateen_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	SMSTATEEN_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list fp_f_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	FP_F_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> -
+> -static struct vcpu_reg_list fp_d_config = {
+> -	.sublists = {
+> -	BASE_SUBLIST,
+> -	FP_D_REGS_SUBLIST,
+> -	{0},
+> -	},
+> -};
+> +#define KVM_ISA_EXT_SIMPLE_CONFIG(ext, extu)			\
+> +static __u64 regs_##ext[] = {					\
+> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG |			\
+> +	KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_##extu,	\
+> +};								\
+> +static struct vcpu_reg_list config_##ext = {			\
+> +	.sublists = {						\
+> +		SUBLIST_BASE,					\
+> +		{						\
+> +			.name = #ext,				\
+> +			.feature = KVM_RISCV_ISA_EXT_##extu,	\
+> +			.regs = regs_##ext,			\
+> +			.regs_n = ARRAY_SIZE(regs_##ext),	\
+> +		},						\
+> +		{0},						\
+> +	},							\
+> +}								\
+> +
+> +#define KVM_ISA_EXT_SUBLIST_CONFIG(ext, extu)			\
+> +static struct vcpu_reg_list config_##ext = {			\
+> +	.sublists = {						\
+> +		SUBLIST_BASE,					\
+> +		SUBLIST_##extu,					\
+> +		{0},						\
+> +	},							\
+> +}								\
+> +
+> +/* Note: The below list is alphabetically sorted. */
+> +
+> +KVM_ISA_EXT_SUBLIST_CONFIG(aia, AIA);
+> +KVM_ISA_EXT_SUBLIST_CONFIG(fp_f, FP_F);
+> +KVM_ISA_EXT_SUBLIST_CONFIG(fp_d, FP_D);
+> +KVM_ISA_EXT_SIMPLE_CONFIG(h, H);
+> +KVM_ISA_EXT_SUBLIST_CONFIG(smstateen, SMSTATEEN);
+> +KVM_ISA_EXT_SIMPLE_CONFIG(sstc, SSTC);
+> +KVM_ISA_EXT_SIMPLE_CONFIG(svinval, SVINVAL);
+> +KVM_ISA_EXT_SIMPLE_CONFIG(svnapot, SVNAPOT);
+> +KVM_ISA_EXT_SIMPLE_CONFIG(svpbmt, SVPBMT);
+> +KVM_ISA_EXT_SIMPLE_CONFIG(zba, ZBA);
+> +KVM_ISA_EXT_SIMPLE_CONFIG(zbb, ZBB);
+> +KVM_ISA_EXT_SIMPLE_CONFIG(zbs, ZBS);
+> +KVM_ISA_EXT_SUBLIST_CONFIG(zicbom, ZICBOM);
+> +KVM_ISA_EXT_SUBLIST_CONFIG(zicboz, ZICBOZ);
+> +KVM_ISA_EXT_SIMPLE_CONFIG(zicntr, ZICNTR);
+> +KVM_ISA_EXT_SIMPLE_CONFIG(zicond, ZICOND);
+> +KVM_ISA_EXT_SIMPLE_CONFIG(zicsr, ZICSR);
+> +KVM_ISA_EXT_SIMPLE_CONFIG(zifencei, ZIFENCEI);
+> +KVM_ISA_EXT_SIMPLE_CONFIG(zihintpause, ZIHINTPAUSE);
+> +KVM_ISA_EXT_SIMPLE_CONFIG(zihpm, ZIHPM);
+>  
+>  struct vcpu_reg_list *vcpu_configs[] = {
+> -	&h_config,
+> -	&zicbom_config,
+> -	&zicboz_config,
+> -	&svpbmt_config,
+> -	&sstc_config,
+> -	&svinval_config,
+> -	&zihintpause_config,
+> -	&zba_config,
+> -	&zbb_config,
+> -	&zbs_config,
+> -	&zicntr_config,
+> -	&zicond_config,
+> -	&zicsr_config,
+> -	&zifencei_config,
+> -	&zihpm_config,
+> -	&aia_config,
+> -	&smstateen_config,
+> -	&fp_f_config,
+> -	&fp_d_config,
+> +	&config_aia,
+> +	&config_fp_f,
+> +	&config_fp_d,
+> +	&config_h,
+> +	&config_smstateen,
+> +	&config_sstc,
+> +	&config_svinval,
+> +	&config_svnapot,
+> +	&config_svpbmt,
+> +	&config_zba,
+> +	&config_zbb,
+> +	&config_zbs,
+> +	&config_zicbom,
+> +	&config_zicboz,
+> +	&config_zicntr,
+> +	&config_zicond,
+> +	&config_zicsr,
+> +	&config_zifencei,
+> +	&config_zihintpause,
+> +	&config_zihpm,
+>  };
+>  int vcpu_configs_n = ARRAY_SIZE(vcpu_configs);
+> -- 
+> 2.34.1
+> 
 
