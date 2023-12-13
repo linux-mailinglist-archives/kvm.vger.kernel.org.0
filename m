@@ -1,472 +1,525 @@
-Return-Path: <kvm+bounces-4357-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4358-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DC3681185F
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 16:52:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AD4881191C
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 17:21:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46B5D2810B2
-	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 15:52:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 785F3B21195
+	for <lists+kvm@lfdr.de>; Wed, 13 Dec 2023 16:21:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA0FA85377;
-	Wed, 13 Dec 2023 15:52:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32E82321B1;
+	Wed, 13 Dec 2023 16:21:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="RjEGKU4t"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="d6qh7Xut"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62211BD
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 07:52:13 -0800 (PST)
-Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-3332fc9b9b2so6181735f8f.1
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 07:52:13 -0800 (PST)
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0C96CF
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 08:20:57 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id 98e67ed59e1d1-28ac6ecb9bdso1557279a91.1
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 08:20:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1702482732; x=1703087532; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lpDmW/iIGlPSvg3fzm2BuUDLYZQ66k1VVtclq5xo0Ok=;
-        b=RjEGKU4tVrQHCic2Zaor+gEfBNKMtgQaRAET4LQ16a5Kl1ry1ERuxP67Et7seY/zZt
-         LWVRDLBFGe9IXC8JnCJS8AjqC1GZR+8c03x7uuO6DSZdrO6zHOVplQOcJWCYJaibbfKz
-         sNwms24STf/4C+7a1QDy5RzH29h5Lxiw43ct9mbD+0UPQU6RgpYUMg1Otw4FM40d+aXz
-         aLsqQH2Eb/+0x+LT51VAvPcMlpxM92Os53DbX7BJeLg0Z8GwVTni6XH0j/RsGleOkP3e
-         t90KcF5mN3cAEhmEfEf1LCJEez7VFfJq3SFtxBk0g67pGsa12RbkBTHc5v5qBZMZjxbY
-         Z/Ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702482732; x=1703087532;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1702484457; x=1703089257; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lpDmW/iIGlPSvg3fzm2BuUDLYZQ66k1VVtclq5xo0Ok=;
-        b=sHflt3a7hzkYjwIAaG5RnLtgPYsLgL/XG/Sup1MX/9IKCL06BfnHjIkxPKa3nSUhC7
-         5CitZibZR+2GoXajs8mpsju11KvQUK8CLlnnfTtxjiUyssjKtHsIVQI1MS9eiYBglfv5
-         EhACjFFY8+ZvsSWQiFvlcF2c5LD7NdcWoXqXRKvzNp34XtPYerJ0Ty6w1K3j/b2OfsD9
-         vySdl4rC+VDaVpkgLeDMQa8pQWJOdubLK/CqHtKsYp/J+MviTdMVJQXKI9Y7kdJGfNu3
-         1FWb9Vdbsu9MapCIZ0jCITkcPDkBjMcqfsntP66rv0D1s5fFWMLtYkSkomXv9zUE/z48
-         v/1g==
-X-Gm-Message-State: AOJu0Ywk3LOoTCIYbyF04DrBW6xsdRxBqeqvZl4daoPce1FK+KJGslJy
-	i8fjtvty373159Cdt9lCqsonJA==
-X-Google-Smtp-Source: AGHT+IHDW+YwKQtUrbtwkk1DM8B9MfE1x/+QpfrhZiICg/+9oaOJUsNFN9R3/9BxmYQ4NyzwyG+uTw==
-X-Received: by 2002:a5d:6e55:0:b0:333:3117:c469 with SMTP id j21-20020a5d6e55000000b003333117c469mr1971889wrz.250.1702482731803;
-        Wed, 13 Dec 2023 07:52:11 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id k2-20020a5d6282000000b003363432c0ffsm3887670wru.113.2023.12.13.07.52.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 07:52:11 -0800 (PST)
-Date: Wed, 13 Dec 2023 16:52:10 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Anup Patel <apatel@ventanamicro.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, 
-	Atish Patra <atishp@atishpatra.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Shuah Khan <shuah@kernel.org>, Anup Patel <anup@brainfault.org>, 
-	devicetree@vger.kernel.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 01/15] KVM: riscv: selftests: Generate ISA extension
- reg_list using macros
-Message-ID: <20231213-f8c7c8ca94f67631dfa97631@orel>
-References: <20231128145357.413321-1-apatel@ventanamicro.com>
- <20231128145357.413321-2-apatel@ventanamicro.com>
+        bh=MIJjv+e0tTxf8PNAHYeP7fkm8EBld5oupHXn0lAaJpk=;
+        b=d6qh7Xut8AmuUTLCdpkiPOdby63QOfFSI4lSJ8Mu68Eei5YpHiZhjwF2EmszS7wdfh
+         +FVJeaP0emZYytQFOjFGFyyMyVxYiF+Rug567Iu6Rmsx6de8ieYZmighvc2b1Ohmq1Gg
+         hnOdAmq6g2gwBNs8VRPWhqiMXgRDZVSllDqc0a66kPoo/88Fw4d2ua0CrAkdAIhIci/G
+         xPtxRbje2eaBOPTgyQjUAYfwXnpa6wxNS08u0nL0QYwIUQfSymfAWIUU557zHabiXeoO
+         KAj0C389iMlDdnVjn/wgTwlam5r/D8cdETlgmrMWqCgXfdfYqZrvSwaGQxfZ2eaYqEEo
+         izmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702484457; x=1703089257;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MIJjv+e0tTxf8PNAHYeP7fkm8EBld5oupHXn0lAaJpk=;
+        b=PIOBYxErd9XLmzAG5ye/zYyCr6wI2OrYUu4US7WO5/1/SSZxrf3AA8zvdtN0/e/Mhe
+         1qXER2JZPYTpFG6D2sDgqoc3lJ3LgDfvjL1weCOeHBuV3ERnetW3YUTZbaL7DaX9Yk78
+         akaumfoNlme7wW93wJak5VOkP54EXLa99bXwL6Aflk6ZEVb637VGNSG4qT9Yey6MZlD0
+         upxbZ9Lk0YWs3S/193QQTjbS6wf6c2ZdFcNLb3PEWca73W8aclnsQE16pmuFhYAxZ5MM
+         cdVR+GlcY6BIeAKLpqeJtcPlkkqQn91M4p1Z6aJl4hWplqUb4LvLTj7IeakxVhKs8M/R
+         +q4w==
+X-Gm-Message-State: AOJu0YzVn7cJ+YDpII2jU+akkLzSp+LTO6GVWoP3aqqQSW7QBJ4etiH7
+	ej3wKGkGbKRfxXTKTeYljTwJwW4mVgvrlo9x6tHmLg==
+X-Google-Smtp-Source: AGHT+IEjzcK13S4bpQjHvkP/WNLaAwG8IF+WhDBPm+KYbX9sTlmVKVPfIA+3J8TrHXDfS/9GnhkMO7Q29MoC2FkpLPA=
+X-Received: by 2002:a17:90b:1298:b0:280:280c:efe3 with SMTP id
+ fw24-20020a17090b129800b00280280cefe3mr8682239pjb.14.1702484457249; Wed, 13
+ Dec 2023 08:20:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231128145357.413321-2-apatel@ventanamicro.com>
+References: <20231128145357.413321-1-apatel@ventanamicro.com>
+ <20231128145357.413321-2-apatel@ventanamicro.com> <20231213-f8c7c8ca94f67631dfa97631@orel>
+In-Reply-To: <20231213-f8c7c8ca94f67631dfa97631@orel>
+From: Anup Patel <anup@brainfault.org>
+Date: Wed, 13 Dec 2023 21:50:45 +0530
+Message-ID: <CAAhSdy0ehPWpbcny3oxOF+_=7x69zJ81dOEhg5rhCN+vQci9DA@mail.gmail.com>
+Subject: Re: [PATCH 01/15] KVM: riscv: selftests: Generate ISA extension
+ reg_list using macros
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Anup Patel <apatel@ventanamicro.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Atish Patra <atishp@atishpatra.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Shuah Khan <shuah@kernel.org>, devicetree@vger.kernel.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 28, 2023 at 08:23:43PM +0530, Anup Patel wrote:
-> Various ISA extension reg_list have common pattern so let us generate
-> these using macros.
-> 
-> We define two macros for the above purpose:
-> 1) KVM_ISA_EXT_SIMPLE_CONFIG - Macro to generate reg_list for
->    ISA extension without any additional ONE_REG registers
-> 2) KVM_ISA_EXT_SUBLIST_CONFIG - Macro to generate reg_list for
->    ISA extension with additional ONE_REG registers
+On Wed, Dec 13, 2023 at 9:22=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
+om> wrote:
+>
+> On Tue, Nov 28, 2023 at 08:23:43PM +0530, Anup Patel wrote:
+> > Various ISA extension reg_list have common pattern so let us generate
+> > these using macros.
+> >
+> > We define two macros for the above purpose:
+> > 1) KVM_ISA_EXT_SIMPLE_CONFIG - Macro to generate reg_list for
+> >    ISA extension without any additional ONE_REG registers
+> > 2) KVM_ISA_EXT_SUBLIST_CONFIG - Macro to generate reg_list for
+> >    ISA extension with additional ONE_REG registers
+>
+> This patch also adds the missing config for svnapot.
+>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
-This patch also adds the missing config for svnapot.
+Thanks Drew, I am queuing this one patch so that others can rebase
+on the RISC-V KVM queue. Other patches of this series, will have to
+wait for dependent patches to be merged by Palmer.
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+Queued this patch for Linux-6.8.
 
-Thanks,
-drew
+Regards,
+Anup
 
-> 
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> ---
->  .../selftests/kvm/riscv/get-reg-list.c        | 331 ++++--------------
->  1 file changed, 76 insertions(+), 255 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> index 6bedaea95395..b6b4b6d7dacd 100644
-> --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> @@ -581,10 +581,6 @@ static __u64 base_skips_set[] = {
->  	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_RISCV_TIMER_REG(state),
->  };
->  
-> -static __u64 h_regs[] = {
-> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_H,
-> -};
-> -
->  static __u64 zicbom_regs[] = {
->  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CONFIG | KVM_REG_RISCV_CONFIG_REG(zicbom_block_size),
->  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICBOM,
-> @@ -595,54 +591,6 @@ static __u64 zicboz_regs[] = {
->  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICBOZ,
->  };
->  
-> -static __u64 svpbmt_regs[] = {
-> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SVPBMT,
-> -};
-> -
-> -static __u64 sstc_regs[] = {
-> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SSTC,
-> -};
-> -
-> -static __u64 svinval_regs[] = {
-> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SVINVAL,
-> -};
-> -
-> -static __u64 zihintpause_regs[] = {
-> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIHINTPAUSE,
-> -};
-> -
-> -static __u64 zba_regs[] = {
-> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZBA,
-> -};
-> -
-> -static __u64 zbb_regs[] = {
-> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZBB,
-> -};
-> -
-> -static __u64 zbs_regs[] = {
-> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZBS,
-> -};
-> -
-> -static __u64 zicntr_regs[] = {
-> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICNTR,
-> -};
-> -
-> -static __u64 zicond_regs[] = {
-> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICOND,
-> -};
-> -
-> -static __u64 zicsr_regs[] = {
-> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICSR,
-> -};
-> -
-> -static __u64 zifencei_regs[] = {
-> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIFENCEI,
-> -};
-> -
-> -static __u64 zihpm_regs[] = {
-> -	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIHPM,
-> -};
-> -
->  static __u64 aia_regs[] = {
->  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(siselect),
->  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(iprio1),
-> @@ -733,221 +681,94 @@ static __u64 fp_d_regs[] = {
->  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_D,
->  };
->  
-> -#define BASE_SUBLIST \
-> +#define SUBLIST_BASE \
->  	{"base", .regs = base_regs, .regs_n = ARRAY_SIZE(base_regs), \
->  	 .skips_set = base_skips_set, .skips_set_n = ARRAY_SIZE(base_skips_set),}
-> -#define H_REGS_SUBLIST \
-> -	{"h", .feature = KVM_RISCV_ISA_EXT_H, .regs = h_regs, .regs_n = ARRAY_SIZE(h_regs),}
-> -#define ZICBOM_REGS_SUBLIST \
-> +#define SUBLIST_ZICBOM \
->  	{"zicbom", .feature = KVM_RISCV_ISA_EXT_ZICBOM, .regs = zicbom_regs, .regs_n = ARRAY_SIZE(zicbom_regs),}
-> -#define ZICBOZ_REGS_SUBLIST \
-> +#define SUBLIST_ZICBOZ \
->  	{"zicboz", .feature = KVM_RISCV_ISA_EXT_ZICBOZ, .regs = zicboz_regs, .regs_n = ARRAY_SIZE(zicboz_regs),}
-> -#define SVPBMT_REGS_SUBLIST \
-> -	{"svpbmt", .feature = KVM_RISCV_ISA_EXT_SVPBMT, .regs = svpbmt_regs, .regs_n = ARRAY_SIZE(svpbmt_regs),}
-> -#define SSTC_REGS_SUBLIST \
-> -	{"sstc", .feature = KVM_RISCV_ISA_EXT_SSTC, .regs = sstc_regs, .regs_n = ARRAY_SIZE(sstc_regs),}
-> -#define SVINVAL_REGS_SUBLIST \
-> -	{"svinval", .feature = KVM_RISCV_ISA_EXT_SVINVAL, .regs = svinval_regs, .regs_n = ARRAY_SIZE(svinval_regs),}
-> -#define ZIHINTPAUSE_REGS_SUBLIST \
-> -	{"zihintpause", .feature = KVM_RISCV_ISA_EXT_ZIHINTPAUSE, .regs = zihintpause_regs, .regs_n = ARRAY_SIZE(zihintpause_regs),}
-> -#define ZBA_REGS_SUBLIST \
-> -	{"zba", .feature = KVM_RISCV_ISA_EXT_ZBA, .regs = zba_regs, .regs_n = ARRAY_SIZE(zba_regs),}
-> -#define ZBB_REGS_SUBLIST \
-> -	{"zbb", .feature = KVM_RISCV_ISA_EXT_ZBB, .regs = zbb_regs, .regs_n = ARRAY_SIZE(zbb_regs),}
-> -#define ZBS_REGS_SUBLIST \
-> -	{"zbs", .feature = KVM_RISCV_ISA_EXT_ZBS, .regs = zbs_regs, .regs_n = ARRAY_SIZE(zbs_regs),}
-> -#define ZICNTR_REGS_SUBLIST \
-> -	{"zicntr", .feature = KVM_RISCV_ISA_EXT_ZICNTR, .regs = zicntr_regs, .regs_n = ARRAY_SIZE(zicntr_regs),}
-> -#define ZICOND_REGS_SUBLIST \
-> -	{"zicond", .feature = KVM_RISCV_ISA_EXT_ZICOND, .regs = zicond_regs, .regs_n = ARRAY_SIZE(zicond_regs),}
-> -#define ZICSR_REGS_SUBLIST \
-> -	{"zicsr", .feature = KVM_RISCV_ISA_EXT_ZICSR, .regs = zicsr_regs, .regs_n = ARRAY_SIZE(zicsr_regs),}
-> -#define ZIFENCEI_REGS_SUBLIST \
-> -	{"zifencei", .feature = KVM_RISCV_ISA_EXT_ZIFENCEI, .regs = zifencei_regs, .regs_n = ARRAY_SIZE(zifencei_regs),}
-> -#define ZIHPM_REGS_SUBLIST \
-> -	{"zihpm", .feature = KVM_RISCV_ISA_EXT_ZIHPM, .regs = zihpm_regs, .regs_n = ARRAY_SIZE(zihpm_regs),}
-> -#define AIA_REGS_SUBLIST \
-> +#define SUBLIST_AIA \
->  	{"aia", .feature = KVM_RISCV_ISA_EXT_SSAIA, .regs = aia_regs, .regs_n = ARRAY_SIZE(aia_regs),}
-> -#define SMSTATEEN_REGS_SUBLIST \
-> +#define SUBLIST_SMSTATEEN \
->  	{"smstateen", .feature = KVM_RISCV_ISA_EXT_SMSTATEEN, .regs = smstateen_regs, .regs_n = ARRAY_SIZE(smstateen_regs),}
-> -#define FP_F_REGS_SUBLIST \
-> +#define SUBLIST_FP_F \
->  	{"fp_f", .feature = KVM_RISCV_ISA_EXT_F, .regs = fp_f_regs, \
->  		.regs_n = ARRAY_SIZE(fp_f_regs),}
-> -#define FP_D_REGS_SUBLIST \
-> +#define SUBLIST_FP_D \
->  	{"fp_d", .feature = KVM_RISCV_ISA_EXT_D, .regs = fp_d_regs, \
->  		.regs_n = ARRAY_SIZE(fp_d_regs),}
->  
-> -static struct vcpu_reg_list h_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	H_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list zicbom_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	ZICBOM_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list zicboz_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	ZICBOZ_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list svpbmt_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	SVPBMT_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list sstc_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	SSTC_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list svinval_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	SVINVAL_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list zihintpause_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	ZIHINTPAUSE_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list zba_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	ZBA_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list zbb_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	ZBB_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list zbs_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	ZBS_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list zicntr_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	ZICNTR_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list zicond_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	ZICOND_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list zicsr_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	ZICSR_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list zifencei_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	ZIFENCEI_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list zihpm_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	ZIHPM_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list aia_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	AIA_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list smstateen_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	SMSTATEEN_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list fp_f_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	FP_F_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> -
-> -static struct vcpu_reg_list fp_d_config = {
-> -	.sublists = {
-> -	BASE_SUBLIST,
-> -	FP_D_REGS_SUBLIST,
-> -	{0},
-> -	},
-> -};
-> +#define KVM_ISA_EXT_SIMPLE_CONFIG(ext, extu)			\
-> +static __u64 regs_##ext[] = {					\
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG |			\
-> +	KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_##extu,	\
-> +};								\
-> +static struct vcpu_reg_list config_##ext = {			\
-> +	.sublists = {						\
-> +		SUBLIST_BASE,					\
-> +		{						\
-> +			.name = #ext,				\
-> +			.feature = KVM_RISCV_ISA_EXT_##extu,	\
-> +			.regs = regs_##ext,			\
-> +			.regs_n = ARRAY_SIZE(regs_##ext),	\
-> +		},						\
-> +		{0},						\
-> +	},							\
-> +}								\
-> +
-> +#define KVM_ISA_EXT_SUBLIST_CONFIG(ext, extu)			\
-> +static struct vcpu_reg_list config_##ext = {			\
-> +	.sublists = {						\
-> +		SUBLIST_BASE,					\
-> +		SUBLIST_##extu,					\
-> +		{0},						\
-> +	},							\
-> +}								\
-> +
-> +/* Note: The below list is alphabetically sorted. */
-> +
-> +KVM_ISA_EXT_SUBLIST_CONFIG(aia, AIA);
-> +KVM_ISA_EXT_SUBLIST_CONFIG(fp_f, FP_F);
-> +KVM_ISA_EXT_SUBLIST_CONFIG(fp_d, FP_D);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(h, H);
-> +KVM_ISA_EXT_SUBLIST_CONFIG(smstateen, SMSTATEEN);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(sstc, SSTC);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(svinval, SVINVAL);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(svnapot, SVNAPOT);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(svpbmt, SVPBMT);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(zba, ZBA);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(zbb, ZBB);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(zbs, ZBS);
-> +KVM_ISA_EXT_SUBLIST_CONFIG(zicbom, ZICBOM);
-> +KVM_ISA_EXT_SUBLIST_CONFIG(zicboz, ZICBOZ);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(zicntr, ZICNTR);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(zicond, ZICOND);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(zicsr, ZICSR);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(zifencei, ZIFENCEI);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(zihintpause, ZIHINTPAUSE);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(zihpm, ZIHPM);
->  
->  struct vcpu_reg_list *vcpu_configs[] = {
-> -	&h_config,
-> -	&zicbom_config,
-> -	&zicboz_config,
-> -	&svpbmt_config,
-> -	&sstc_config,
-> -	&svinval_config,
-> -	&zihintpause_config,
-> -	&zba_config,
-> -	&zbb_config,
-> -	&zbs_config,
-> -	&zicntr_config,
-> -	&zicond_config,
-> -	&zicsr_config,
-> -	&zifencei_config,
-> -	&zihpm_config,
-> -	&aia_config,
-> -	&smstateen_config,
-> -	&fp_f_config,
-> -	&fp_d_config,
-> +	&config_aia,
-> +	&config_fp_f,
-> +	&config_fp_d,
-> +	&config_h,
-> +	&config_smstateen,
-> +	&config_sstc,
-> +	&config_svinval,
-> +	&config_svnapot,
-> +	&config_svpbmt,
-> +	&config_zba,
-> +	&config_zbb,
-> +	&config_zbs,
-> +	&config_zicbom,
-> +	&config_zicboz,
-> +	&config_zicntr,
-> +	&config_zicond,
-> +	&config_zicsr,
-> +	&config_zifencei,
-> +	&config_zihintpause,
-> +	&config_zihpm,
->  };
->  int vcpu_configs_n = ARRAY_SIZE(vcpu_configs);
-> -- 
-> 2.34.1
-> 
+>
+> Thanks,
+> drew
+>
+> >
+> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> > ---
+> >  .../selftests/kvm/riscv/get-reg-list.c        | 331 ++++--------------
+> >  1 file changed, 76 insertions(+), 255 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/t=
+esting/selftests/kvm/riscv/get-reg-list.c
+> > index 6bedaea95395..b6b4b6d7dacd 100644
+> > --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> > +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> > @@ -581,10 +581,6 @@ static __u64 base_skips_set[] =3D {
+> >       KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_=
+RISCV_TIMER_REG(state),
+> >  };
+> >
+> > -static __u64 h_regs[] =3D {
+> > -     KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_=
+RISCV_ISA_EXT_H,
+> > -};
+> > -
+> >  static __u64 zicbom_regs[] =3D {
+> >       KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CONFIG | KVM_R=
+EG_RISCV_CONFIG_REG(zicbom_block_size),
+> >       KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_=
+RISCV_ISA_EXT_ZICBOM,
+> > @@ -595,54 +591,6 @@ static __u64 zicboz_regs[] =3D {
+> >       KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_=
+RISCV_ISA_EXT_ZICBOZ,
+> >  };
+> >
+> > -static __u64 svpbmt_regs[] =3D {
+> > -     KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_=
+RISCV_ISA_EXT_SVPBMT,
+> > -};
+> > -
+> > -static __u64 sstc_regs[] =3D {
+> > -     KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_=
+RISCV_ISA_EXT_SSTC,
+> > -};
+> > -
+> > -static __u64 svinval_regs[] =3D {
+> > -     KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_=
+RISCV_ISA_EXT_SVINVAL,
+> > -};
+> > -
+> > -static __u64 zihintpause_regs[] =3D {
+> > -     KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_=
+RISCV_ISA_EXT_ZIHINTPAUSE,
+> > -};
+> > -
+> > -static __u64 zba_regs[] =3D {
+> > -     KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_=
+RISCV_ISA_EXT_ZBA,
+> > -};
+> > -
+> > -static __u64 zbb_regs[] =3D {
+> > -     KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_=
+RISCV_ISA_EXT_ZBB,
+> > -};
+> > -
+> > -static __u64 zbs_regs[] =3D {
+> > -     KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_=
+RISCV_ISA_EXT_ZBS,
+> > -};
+> > -
+> > -static __u64 zicntr_regs[] =3D {
+> > -     KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_=
+RISCV_ISA_EXT_ZICNTR,
+> > -};
+> > -
+> > -static __u64 zicond_regs[] =3D {
+> > -     KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_=
+RISCV_ISA_EXT_ZICOND,
+> > -};
+> > -
+> > -static __u64 zicsr_regs[] =3D {
+> > -     KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_=
+RISCV_ISA_EXT_ZICSR,
+> > -};
+> > -
+> > -static __u64 zifencei_regs[] =3D {
+> > -     KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_=
+RISCV_ISA_EXT_ZIFENCEI,
+> > -};
+> > -
+> > -static __u64 zihpm_regs[] =3D {
+> > -     KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_=
+RISCV_ISA_EXT_ZIHPM,
+> > -};
+> > -
+> >  static __u64 aia_regs[] =3D {
+> >       KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_=
+RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(siselect),
+> >       KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_=
+RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(iprio1),
+> > @@ -733,221 +681,94 @@ static __u64 fp_d_regs[] =3D {
+> >       KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_=
+RISCV_ISA_EXT_D,
+> >  };
+> >
+> > -#define BASE_SUBLIST \
+> > +#define SUBLIST_BASE \
+> >       {"base", .regs =3D base_regs, .regs_n =3D ARRAY_SIZE(base_regs), =
+\
+> >        .skips_set =3D base_skips_set, .skips_set_n =3D ARRAY_SIZE(base_=
+skips_set),}
+> > -#define H_REGS_SUBLIST \
+> > -     {"h", .feature =3D KVM_RISCV_ISA_EXT_H, .regs =3D h_regs, .regs_n=
+ =3D ARRAY_SIZE(h_regs),}
+> > -#define ZICBOM_REGS_SUBLIST \
+> > +#define SUBLIST_ZICBOM \
+> >       {"zicbom", .feature =3D KVM_RISCV_ISA_EXT_ZICBOM, .regs =3D zicbo=
+m_regs, .regs_n =3D ARRAY_SIZE(zicbom_regs),}
+> > -#define ZICBOZ_REGS_SUBLIST \
+> > +#define SUBLIST_ZICBOZ \
+> >       {"zicboz", .feature =3D KVM_RISCV_ISA_EXT_ZICBOZ, .regs =3D zicbo=
+z_regs, .regs_n =3D ARRAY_SIZE(zicboz_regs),}
+> > -#define SVPBMT_REGS_SUBLIST \
+> > -     {"svpbmt", .feature =3D KVM_RISCV_ISA_EXT_SVPBMT, .regs =3D svpbm=
+t_regs, .regs_n =3D ARRAY_SIZE(svpbmt_regs),}
+> > -#define SSTC_REGS_SUBLIST \
+> > -     {"sstc", .feature =3D KVM_RISCV_ISA_EXT_SSTC, .regs =3D sstc_regs=
+, .regs_n =3D ARRAY_SIZE(sstc_regs),}
+> > -#define SVINVAL_REGS_SUBLIST \
+> > -     {"svinval", .feature =3D KVM_RISCV_ISA_EXT_SVINVAL, .regs =3D svi=
+nval_regs, .regs_n =3D ARRAY_SIZE(svinval_regs),}
+> > -#define ZIHINTPAUSE_REGS_SUBLIST \
+> > -     {"zihintpause", .feature =3D KVM_RISCV_ISA_EXT_ZIHINTPAUSE, .regs=
+ =3D zihintpause_regs, .regs_n =3D ARRAY_SIZE(zihintpause_regs),}
+> > -#define ZBA_REGS_SUBLIST \
+> > -     {"zba", .feature =3D KVM_RISCV_ISA_EXT_ZBA, .regs =3D zba_regs, .=
+regs_n =3D ARRAY_SIZE(zba_regs),}
+> > -#define ZBB_REGS_SUBLIST \
+> > -     {"zbb", .feature =3D KVM_RISCV_ISA_EXT_ZBB, .regs =3D zbb_regs, .=
+regs_n =3D ARRAY_SIZE(zbb_regs),}
+> > -#define ZBS_REGS_SUBLIST \
+> > -     {"zbs", .feature =3D KVM_RISCV_ISA_EXT_ZBS, .regs =3D zbs_regs, .=
+regs_n =3D ARRAY_SIZE(zbs_regs),}
+> > -#define ZICNTR_REGS_SUBLIST \
+> > -     {"zicntr", .feature =3D KVM_RISCV_ISA_EXT_ZICNTR, .regs =3D zicnt=
+r_regs, .regs_n =3D ARRAY_SIZE(zicntr_regs),}
+> > -#define ZICOND_REGS_SUBLIST \
+> > -     {"zicond", .feature =3D KVM_RISCV_ISA_EXT_ZICOND, .regs =3D zicon=
+d_regs, .regs_n =3D ARRAY_SIZE(zicond_regs),}
+> > -#define ZICSR_REGS_SUBLIST \
+> > -     {"zicsr", .feature =3D KVM_RISCV_ISA_EXT_ZICSR, .regs =3D zicsr_r=
+egs, .regs_n =3D ARRAY_SIZE(zicsr_regs),}
+> > -#define ZIFENCEI_REGS_SUBLIST \
+> > -     {"zifencei", .feature =3D KVM_RISCV_ISA_EXT_ZIFENCEI, .regs =3D z=
+ifencei_regs, .regs_n =3D ARRAY_SIZE(zifencei_regs),}
+> > -#define ZIHPM_REGS_SUBLIST \
+> > -     {"zihpm", .feature =3D KVM_RISCV_ISA_EXT_ZIHPM, .regs =3D zihpm_r=
+egs, .regs_n =3D ARRAY_SIZE(zihpm_regs),}
+> > -#define AIA_REGS_SUBLIST \
+> > +#define SUBLIST_AIA \
+> >       {"aia", .feature =3D KVM_RISCV_ISA_EXT_SSAIA, .regs =3D aia_regs,=
+ .regs_n =3D ARRAY_SIZE(aia_regs),}
+> > -#define SMSTATEEN_REGS_SUBLIST \
+> > +#define SUBLIST_SMSTATEEN \
+> >       {"smstateen", .feature =3D KVM_RISCV_ISA_EXT_SMSTATEEN, .regs =3D=
+ smstateen_regs, .regs_n =3D ARRAY_SIZE(smstateen_regs),}
+> > -#define FP_F_REGS_SUBLIST \
+> > +#define SUBLIST_FP_F \
+> >       {"fp_f", .feature =3D KVM_RISCV_ISA_EXT_F, .regs =3D fp_f_regs, \
+> >               .regs_n =3D ARRAY_SIZE(fp_f_regs),}
+> > -#define FP_D_REGS_SUBLIST \
+> > +#define SUBLIST_FP_D \
+> >       {"fp_d", .feature =3D KVM_RISCV_ISA_EXT_D, .regs =3D fp_d_regs, \
+> >               .regs_n =3D ARRAY_SIZE(fp_d_regs),}
+> >
+> > -static struct vcpu_reg_list h_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     H_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list zicbom_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     ZICBOM_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list zicboz_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     ZICBOZ_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list svpbmt_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     SVPBMT_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list sstc_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     SSTC_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list svinval_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     SVINVAL_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list zihintpause_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     ZIHINTPAUSE_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list zba_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     ZBA_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list zbb_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     ZBB_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list zbs_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     ZBS_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list zicntr_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     ZICNTR_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list zicond_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     ZICOND_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list zicsr_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     ZICSR_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list zifencei_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     ZIFENCEI_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list zihpm_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     ZIHPM_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list aia_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     AIA_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list smstateen_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     SMSTATEEN_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list fp_f_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     FP_F_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > -
+> > -static struct vcpu_reg_list fp_d_config =3D {
+> > -     .sublists =3D {
+> > -     BASE_SUBLIST,
+> > -     FP_D_REGS_SUBLIST,
+> > -     {0},
+> > -     },
+> > -};
+> > +#define KVM_ISA_EXT_SIMPLE_CONFIG(ext, extu)                 \
+> > +static __u64 regs_##ext[] =3D {                                       =
+ \
+> > +     KVM_REG_RISCV | KVM_REG_SIZE_ULONG |                    \
+> > +     KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_##extu,       \
+> > +};                                                           \
+> > +static struct vcpu_reg_list config_##ext =3D {                 \
+> > +     .sublists =3D {                                           \
+> > +             SUBLIST_BASE,                                   \
+> > +             {                                               \
+> > +                     .name =3D #ext,                           \
+> > +                     .feature =3D KVM_RISCV_ISA_EXT_##extu,    \
+> > +                     .regs =3D regs_##ext,                     \
+> > +                     .regs_n =3D ARRAY_SIZE(regs_##ext),       \
+> > +             },                                              \
+> > +             {0},                                            \
+> > +     },                                                      \
+> > +}                                                            \
+> > +
+> > +#define KVM_ISA_EXT_SUBLIST_CONFIG(ext, extu)                        \
+> > +static struct vcpu_reg_list config_##ext =3D {                 \
+> > +     .sublists =3D {                                           \
+> > +             SUBLIST_BASE,                                   \
+> > +             SUBLIST_##extu,                                 \
+> > +             {0},                                            \
+> > +     },                                                      \
+> > +}                                                            \
+> > +
+> > +/* Note: The below list is alphabetically sorted. */
+> > +
+> > +KVM_ISA_EXT_SUBLIST_CONFIG(aia, AIA);
+> > +KVM_ISA_EXT_SUBLIST_CONFIG(fp_f, FP_F);
+> > +KVM_ISA_EXT_SUBLIST_CONFIG(fp_d, FP_D);
+> > +KVM_ISA_EXT_SIMPLE_CONFIG(h, H);
+> > +KVM_ISA_EXT_SUBLIST_CONFIG(smstateen, SMSTATEEN);
+> > +KVM_ISA_EXT_SIMPLE_CONFIG(sstc, SSTC);
+> > +KVM_ISA_EXT_SIMPLE_CONFIG(svinval, SVINVAL);
+> > +KVM_ISA_EXT_SIMPLE_CONFIG(svnapot, SVNAPOT);
+> > +KVM_ISA_EXT_SIMPLE_CONFIG(svpbmt, SVPBMT);
+> > +KVM_ISA_EXT_SIMPLE_CONFIG(zba, ZBA);
+> > +KVM_ISA_EXT_SIMPLE_CONFIG(zbb, ZBB);
+> > +KVM_ISA_EXT_SIMPLE_CONFIG(zbs, ZBS);
+> > +KVM_ISA_EXT_SUBLIST_CONFIG(zicbom, ZICBOM);
+> > +KVM_ISA_EXT_SUBLIST_CONFIG(zicboz, ZICBOZ);
+> > +KVM_ISA_EXT_SIMPLE_CONFIG(zicntr, ZICNTR);
+> > +KVM_ISA_EXT_SIMPLE_CONFIG(zicond, ZICOND);
+> > +KVM_ISA_EXT_SIMPLE_CONFIG(zicsr, ZICSR);
+> > +KVM_ISA_EXT_SIMPLE_CONFIG(zifencei, ZIFENCEI);
+> > +KVM_ISA_EXT_SIMPLE_CONFIG(zihintpause, ZIHINTPAUSE);
+> > +KVM_ISA_EXT_SIMPLE_CONFIG(zihpm, ZIHPM);
+> >
+> >  struct vcpu_reg_list *vcpu_configs[] =3D {
+> > -     &h_config,
+> > -     &zicbom_config,
+> > -     &zicboz_config,
+> > -     &svpbmt_config,
+> > -     &sstc_config,
+> > -     &svinval_config,
+> > -     &zihintpause_config,
+> > -     &zba_config,
+> > -     &zbb_config,
+> > -     &zbs_config,
+> > -     &zicntr_config,
+> > -     &zicond_config,
+> > -     &zicsr_config,
+> > -     &zifencei_config,
+> > -     &zihpm_config,
+> > -     &aia_config,
+> > -     &smstateen_config,
+> > -     &fp_f_config,
+> > -     &fp_d_config,
+> > +     &config_aia,
+> > +     &config_fp_f,
+> > +     &config_fp_d,
+> > +     &config_h,
+> > +     &config_smstateen,
+> > +     &config_sstc,
+> > +     &config_svinval,
+> > +     &config_svnapot,
+> > +     &config_svpbmt,
+> > +     &config_zba,
+> > +     &config_zbb,
+> > +     &config_zbs,
+> > +     &config_zicbom,
+> > +     &config_zicboz,
+> > +     &config_zicntr,
+> > +     &config_zicond,
+> > +     &config_zicsr,
+> > +     &config_zifencei,
+> > +     &config_zihintpause,
+> > +     &config_zihpm,
+> >  };
+> >  int vcpu_configs_n =3D ARRAY_SIZE(vcpu_configs);
+> > --
+> > 2.34.1
+> >
 
