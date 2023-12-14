@@ -1,313 +1,384 @@
-Return-Path: <kvm+bounces-4529-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4530-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5727F8138DE
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 18:41:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BE9D81398E
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 19:13:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5DEDB217FA
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 17:40:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10D78B2196E
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 18:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1246E675CE;
-	Thu, 14 Dec 2023 17:40:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9627067E98;
+	Thu, 14 Dec 2023 18:13:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="HtpH4jdQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JRdL8mzg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02755122
-	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 09:40:46 -0800 (PST)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6ce6b62746dso5408414b3a.2
-        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 09:40:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1702575645; x=1703180445; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H40nK5IpwIy9PQlp7QwxJH6+lSaRPIO031fd0w6k2mM=;
-        b=HtpH4jdQ2kUP5QG5waUErTB6IWLsGrKrx4CbmWQVa43lgHvZxjD/UVJ/rpr3K2BCOb
-         +3cuMjQzv9Dc/4jMMOZP02NcDKFMu9koKgzs7SzzGlLzt5kFuH/XyUI9nXGN1Zm2HjOq
-         uYdoa6+E89rfKFTbOvyJzOnoPAAoR/3tOtfnyJWl24dw9G69nMUsE1xo+VVSKq8UtfOC
-         JT0WM2F7WewNqAdBcpMExKgn0A4YQmBiSNoc1z7nQsaYdKfNYL39m9Pnvr2xiGZNIUJX
-         ZNcuMdtDOffzl9Ca/ISyL30vRIdBD8YAKiR8PNTS/yXZelJWypowKiwqzKLzOXmDj3JP
-         Iv1A==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AF93114
+	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 10:13:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702577602;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=u7D1qb3i1Fz1TYjcQ8WdxAH+WPTMa4JXCS02CvPeQ14=;
+	b=JRdL8mzgzVEUCJOtSS+qzmPEBAohZch+uAk9OGo6a/qx6fru/v8CVTBXiyvVyF0sQgYTJv
+	Q0QE4rI+MRnYr6ofgMbc5CBnMV3b1o14Je/WMhSb1yJe0KnYKKGCJHTYGfEqAXozsyMSah
+	g5pEHDkYokdkL2jDooMayRHdLLyuHRY=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-EhvreSsoM-e3W3U1Y2aC6Q-1; Thu, 14 Dec 2023 13:13:21 -0500
+X-MC-Unique: EhvreSsoM-e3W3U1Y2aC6Q-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-67ee87ff6bfso32134706d6.3
+        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 10:13:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702575645; x=1703180445;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H40nK5IpwIy9PQlp7QwxJH6+lSaRPIO031fd0w6k2mM=;
-        b=U2en7dGjUMjhhyIe2NXEe86HQRgE57zrvgLvirAsO2BG/r5cly9V5OJa6Bu1KEGch6
-         uSZuJ1U6HVENUVVEukF+hp+zyE+6dABloo59i4Hd74PlqEZkzCwFpnniAx3E2EYqTwpT
-         RCdXipDnz7Ymg+ICPIwdqmgL7BsJ3cNO2e6z4gYP6PStV2+NFbVD8uAvT7Ck3FNguN5H
-         xEq6bbyn236OpW1M7YSgktGsXu4g4giA7bX5SytYwsuZ+AS2xc15+OYJo6guekZxLa/G
-         8gnozyX8Va/QxZXpBlCig+3taJ40lv2R5L2mWES7lmsFtixDgTMLTm4w5gg/VZLfATIM
-         P59g==
-X-Gm-Message-State: AOJu0Ywq4VXeXdO2BCbN605ojF5NFHn1WMW1bjgyzMPoZZXam1uMaoxz
-	dY05I3uPn4w7cwbax93VTl5rZA==
-X-Google-Smtp-Source: AGHT+IG7BgMGBuhTiCRVz5+mmRVftl5nKnTPsJ0urkZwVBwUIyjnJt5RfXGtkUUTbsy+ZMQJSeGPrg==
-X-Received: by 2002:a05:6a00:1381:b0:6ce:fa6e:5781 with SMTP id t1-20020a056a00138100b006cefa6e5781mr6017348pfg.45.1702575645311;
-        Thu, 14 Dec 2023 09:40:45 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id x26-20020a62fb1a000000b006ce48a0b7c6sm12066018pfm.109.2023.12.14.09.40.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 09:40:45 -0800 (PST)
-Date: Thu, 14 Dec 2023 09:40:42 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Benjamin Tissoires <benjamin.tissoires@redhat.com>, Alexei Starovoitov
- <alexei.starovoitov@gmail.com>, Jason Wang <jasowang@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Yonghong Song <yonghong.song@linux.dev>, John
- Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan
- <shuah@kernel.org>, Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew
- Melnychenko <andrew@daynix.com>, Benjamin Tissoires <bentiss@kernel.org>,
- bpf <bpf@vger.kernel.org>, "open list:DOCUMENTATION"
- <linux-doc@vger.kernel.org>, kvm@vger.kernel.org, LKML
- <linux-kernel@vger.kernel.org>, virtualization@lists.linux-foundation.org,
- "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>
-Subject: Re: Should I add BPF kfuncs for userspace apps? And how?
-Message-ID: <20231214094042.75f704f6@hermes.local>
-In-Reply-To: <0d68722c-9e29-407b-9ef0-331683c995d2@daynix.com>
-References: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
-	<CAO-hwJJhzHtKrUEw0zrjgub3+eapgJG-zsG0HRB=PaPi6BxG+w@mail.gmail.com>
-	<e256c6df-0a66-4f86-ae96-bff17920c2fb@daynix.com>
-	<CAO-hwJKMrWYRNpuprDj9=k87V0yHtLPEJuQ94bpOF3O81=v0kA@mail.gmail.com>
-	<0d68722c-9e29-407b-9ef0-331683c995d2@daynix.com>
+        d=1e100.net; s=20230601; t=1702577600; x=1703182400;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u7D1qb3i1Fz1TYjcQ8WdxAH+WPTMa4JXCS02CvPeQ14=;
+        b=NKXVsElOKqSHXx03eKy22WZIdlJqy5uS5jXj09NBpgMqED4b5yp8cMf0+1AX1el9oM
+         OiH1F59ANtW0pa1FUdgfedopo13cuyePdhznFKTDUoNA+urx8lrlGdIrFb8HF5gGY4U1
+         zqZVy6CmRInjPfY5sJc1d9iq8Xu6m4GtdLcwdOyc3EMa9bcwRogfXMdByw/NXET1dAV1
+         mNVD+BoL+n5tRmM2ZT1NgqGvMlrnGXpa/9jLfGLdhS6cSeEtkWnfw5HVvctjTqIvtu3x
+         0N60nAoqZ4SkN4hQ+t+EhCrIEu7A8dI78D3wzwx1TRcqrrGlFnU9FoW0NCps+8Ham5SU
+         sQZA==
+X-Gm-Message-State: AOJu0YxLFyy9OPY9bbrkgHpPT3Fj7iQkb2BIUbuTHHjE+h2MXtwh+vlA
+	xndT6pKe7VNw5Fwj0tDF0+F071ULrEoDG7MB8T3E9144Vs1zyE/YU20wC17c7vUkTU+oglOtznF
+	gNfVgjX3vNp89
+X-Received: by 2002:ad4:5c8d:0:b0:67f:153a:c6e9 with SMTP id o13-20020ad45c8d000000b0067f153ac6e9mr86475qvh.124.1702577600358;
+        Thu, 14 Dec 2023 10:13:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFhd8N1VbNAq1y2WYDSLTEkjfaBNb20AFoGupokLK0eOr/7teNDDHD5KBJblSJ1k3b4AVnhLA==
+X-Received: by 2002:ad4:5c8d:0:b0:67f:153a:c6e9 with SMTP id o13-20020ad45c8d000000b0067f153ac6e9mr86458qvh.124.1702577599990;
+        Thu, 14 Dec 2023 10:13:19 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id c11-20020a0ce64b000000b0067ab7eada1dsm6177573qvn.59.2023.12.14.10.13.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Dec 2023 10:13:19 -0800 (PST)
+Message-ID: <be70b17c-21cf-4f4e-8ec1-62c18ffd4100@redhat.com>
+Date: Thu, 14 Dec 2023 19:13:15 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] arm/kvm: Enable support for KVM_ARM_VCPU_PMU_V3_FILTER
+Content-Language: en-US
+To: Shaoqin Huang <shahuang@redhat.com>, qemu-arm@nongnu.org
+Cc: Gavin Shan <gshan@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org
+References: <20231207103648.2925112-1-shahuang@redhat.com>
+From: Eric Auger <eauger@redhat.com>
+In-Reply-To: <20231207103648.2925112-1-shahuang@redhat.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-On Thu, 14 Dec 2023 14:51:12 +0900
-Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+Hi Shaoqin,
 
-> On 2023/12/13 19:22, Benjamin Tissoires wrote:
-> > On Tue, Dec 12, 2023 at 1:41=E2=80=AFPM Akihiko Odaki <akihiko.odaki@da=
-ynix.com> wrote: =20
-> >>
-> >> On 2023/12/12 19:39, Benjamin Tissoires wrote: =20
-> >>> Hi,
-> >>>
-> >>> On Tue, Dec 12, 2023 at 9:11=E2=80=AFAM Akihiko Odaki <akihiko.odaki@=
-daynix.com> wrote: =20
-> >>>>
-> >>>> Hi, =20
-> >>
-> >> Hi,
-> >>
-> >> Thanks for reply.
-> >> =20
-> >>>>
-> >>>> It is said eBPF is a safe way to extend kernels and that is very
-> >>>> attarctive, but we need to use kfuncs to add new usage of eBPF and
-> >>>> kfuncs are said as unstable as EXPORT_SYMBOL_GPL. So now I'd like to=
- ask
-> >>>> some questions:
-> >>>>
-> >>>> 1) Which should I choose, BPF kfuncs or ioctl, when adding a new fea=
-ture
-> >>>> for userspace apps?
-> >>>> 2) How should I use BPF kfuncs from userspace apps if I add them?
-> >>>>
-> >>>> Here, a "userspace app" means something not like a system-wide daemon
-> >>>> like systemd (particularly, I have QEMU in mind). I'll describe the
-> >>>> context more below: =20
-> >>>
-> >>> I'm probably not the best person in the world to answer your
-> >>> questions, Alexei and others from the BPF core group are, but given
-> >>> that you pointed at a thread I was involved in, I feel I can give you
-> >>> a few pointers.
-> >>>
-> >>> But first and foremost, I encourage you to schedule an agenda item in
-> >>> the BPF office hour[4]. Being able to talk with the core people
-> >>> directly was tremendously helpful to me to understand their point. =20
-> >>
-> >> I prefer emails because I'm not very fluent when speaking in English a=
-nd
-> >> may have a difficultly to listen to other people, but I may try it in
-> >> future.
-> >> =20
-> >>>
-> >>> =20
-> >>>>
-> >>>> ---
-> >>>>
-> >>>> I'm working on a new feature that aids virtio-net implementations us=
-ing
-> >>>> tuntap virtual network device. You can see [1] for details, but
-> >>>> basically it's to extend BPF_PROG_TYPE_SOCKET_FILTER to report four =
-more
-> >>>> bytes.
-> >>>>
-> >>>> However, with long discussions we have confirmed extending
-> >>>> BPF_PROG_TYPE_SOCKET_FILTER is not going to happen, and adding kfunc=
-s is
-> >>>> the way forward. So I decided how to add kfuncs to the kernel and ho=
-w to
-> >>>> use it. There are rich documentations for the kernel side, but I fou=
-nd
-> >>>> little about the userspace. The best I could find is a systemd change
-> >>>> proposal that is based on WIP kernel changes[2]. =20
-> >>>
-> >>> Yes, as Alexei already replied, BPF is not adding new stable APIs,
-> >>> only kfuncs. The reason being that once it's marked as stable, you
-> >>> can't really remove it, even if you think it's badly designed and
-> >>> useless.
-> >>>
-> >>> Kfuncs, OTOH are "unstable" by default meaning that the constraints
-> >>> around it are more relaxed.
-> >>>
-> >>> However, "unstable" doesn't mean "unusable". It just means that the
-> >>> kernel might or might not have the function when you load your program
-> >>> in userspace. So you have to take that fact into account from day one,
-> >>> both from the kernel side and the userspace side. The kernel docs have
-> >>> a nice paragraph explaining that situation and makes the distinction
-> >>> between relatively unused kfuncs, and well known established ones.
-> >>>
-> >>> Regarding the systemd discussion you are mentioning ([2]), this is
-> >>> something that I have on my plate for a long time. I think I even
-> >>> mentioned it to Alexei at Kernel Recipes this year, and he frowned his
-> >>> eyebrows when I mentioned it. And looking at the systemd code and the
-> >>> benefits over a plain ioctl, it is clearer that in that case, a plain
-> >>> ioctl is better, mostly because we already know the API and the
-> >>> semantic.
-> >>>
-> >>> A kfunc would be interesting in cases where you are not sure about the
-> >>> overall design, and so you can give a shot at various API solutions
-> >>> without having to keep your bad v1 design forever.
-> >>> =20
-> >>>>
-> >>>> So now I'm wondering how I should use BPF kfuncs from userspace apps=
- if
-> >>>> I add them. In the systemd discussion, it is told that Linus said it=
-'s
-> >>>> fine to use BPF kfuncs in a private infrastructure big companies own=
-, or
-> >>>> in systemd as those users know well about the system[3]. Indeed, tho=
-se
-> >>>> users should be able to make more assumptions on the kernel than
-> >>>> "normal" userspace applications can.
-> >>>>
-> >>>> Returning to my proposal, I'm proposing a new feature to be used by =
-QEMU
-> >>>> or other VMM applications. QEMU is more like a normal userspace
-> >>>> application, and usually does not make much assumptions on the kerne=
-l it
-> >>>> runs on. For example, it's generally safe to run a Debian container
-> >>>> including QEMU installed with apt on Fedora. BPF kfuncs may work eve=
-n in
-> >>>> such a situation thanks to CO-RE, but it sounds like *accidentally*
-> >>>> creating UAPIs.
-> >>>>
-> >>>> Considering all above, how can I integrate BPF kfuncs to the applica=
-tion? =20
-> >>>
-> >>> FWIW, I'm not sure you can rely on BPF calls from a container. There
-> >>> is a high chance the syscall gets disabled by the runtime. =20
-> >>
-> >> Right. Container runtimes will not pass CAP_BPF by default, but that
-> >> restriction can be lifted and I think that's a valid scenario.
-> >> =20
-> >>> =20
-> >>>>
-> >>>> If BPF kfuncs are like EXPORT_SYMBOL_GPL, the natural way to handle =
-them
-> >>>> is to think of BPF programs as some sort of kernel modules and
-> >>>> incorporate logic that behaves like modprobe. More concretely, I can=
- put
-> >>>> eBPF binaries to a directory like:
-> >>>> /usr/local/share/qemu/ebpf/$KERNEL_RELEASE =20
-> >>>
-> >>> I would advise against that (one program per kernel release). Simply
-> >>> because your kfunc may or may not have been backported to kernel
-> >>> release v6.X.Y+1 while it was not there when v6.X.Y was out. So
-> >>> relying on the kernel number is just going to be a headache.
-> >>>
-> >>> As I understand it, the way forward is to rely on the kernel, libbpf
-> >>> and CO-RE: if the function is not available, the program will simply
-> >>> not load, and you'll know that this version of the code is not
-> >>> available (or has changed API).
-> >>>
-> >>> So what I would do if some kfunc API is becoming deprecated, is
-> >>> embedding both code paths in the same BPF unit, but marking them as
-> >>> not loaded by libppf. Then I can load the compilation unit, try v2 of
-> >>> the API, and if it's not available, try v1, and if not, then mention
-> >>> that I can not rely on BPF. Of course, this can also be done with
-> >>> separate compilation units. =20
-> >>
-> >> Doesn't it mean that the kernel is free to break old versions of QEMU
-> >> including BPF programs? That's something I'd like to avoid. =20
-> >=20
-> > Couple of points here:
-> > - when you say "the kernel", it feels like you are talking about an
-> > external actor tampering with your code. But if you submit a kernel
-> > patch with a specific use case and get yourself involved in the
-> > community, why would anybody change your kfunc API without you knowing
-> > it? =20
->=20
-> You are right in the practical aspect.  I can pay efforts to keep kfunc=20
-> APIs alive and I'm also sure other developers would also try not to=20
-> break them for good.
->=20
-> Nevertheless I'm being careful to evaluate APIs from both of the kernel=20
-> and userspace (QEMU) viewpoints. If I fail to keep kfuncs stable because=
-=20
-> I die in an accident, for example, it's a poor excuse for other QEMU=20
-> developers that I intended to keep them stable with my personal effort.
->=20
-> > - the whole warning about "unstable" policy means that the user space
-> > component should not take for granted the capability. So if the kfunc
-> > changes/disappears for good reasons (because it was marked as well
-> > used and deprecated for quite some time), qemu should not *break*, it
-> > should not provide the functionality, or have a secondary plan.
-> >=20
-> > But even if you are encountering such issues, in case of a change in
-> > the ABI of your kfunc, it should be easy enough to backport the bpf
-> > changes to your old QEMUs and ask users to upgrade the user space if
-> > they upgrade their kernel.
-> >=20
-> > AFAIU, it is as unstable as you want it to be. It's just that we are
-> > not in the "we don't break user space" contract, because we are
-> > talking about adding a kernel functionality from userspace, which
-> > requires knowing the kernel intrinsics. =20
->=20
-> I must admit I'm still not convinced the proposed BPF program=20
-> functionality needs to know internals of the kernel.
->=20
-> The eBPF program QEMU carries is just to calculate hashes from packets.=20
-> It doesn't need to know the details of how the kernel handles packets.=20
-> It only needs to have an access to the packet content.
->=20
-> It is exactly what BPF_PROG_TYPE_SOCKET_FILTER does, but it lacks a=20
-> mechanism to report hash values so I need to extend it or invent a new=20
-> method. Extending BPF_PROG_TYPE_SOCKET_FILTER is not a way forward since=
-=20
-> CO-RE is superior to the context rewrite it relies on. But apparently=20
-> adopting kfuncs and CO-RE also means to lose the "we don't break user=20
-> space" contract although I have no intention to expose kernel internals=20
-> to the eBPF program.
+On 12/7/23 11:36, Shaoqin Huang wrote:
+> The KVM_ARM_VCPU_PMU_V3_FILTER provide the ability to let the VMM decide
+> which PMU events are provided to the guest. Add a new option
+> `pmu-filter` as -accel sub-option to set the PMU Event Filtering.
+> Without the filter, the KVM will expose all events from the host to
+> guest by default.
+> 
+> The `pmu-filter` has such format:
+> 
+>   pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
+> 
+> The A means "allow" and D means "deny", start is the first event of the
+> range and the end is the last one. The first registered range defines
+> the global policy(global ALLOW if the first @action is DENY, global DENY
+> if the first @action is ALLOW). The start and end only support hex
+> format now. For example:
+> 
+>   pmu-filter="A:0x11-0x11;A:0x23-0x3a;D:0x30-0x30"
+> 
+> Since the first action is allow, we have a global deny policy. It
+> will allow event 0x11 (The cycle counter), events 0x23 to 0x3a is
+> also allowed except the event 0x30 is denied, and all the other events
+> are disallowed.
+> 
+> Here is an real example shows how to use the PMU Event Filtering, when
+> we launch a guest by use kvm, add such command line:
+> 
+>   # qemu-system-aarch64 \
+> 	-accel kvm,pmu-filter="D:0x11-0x11"
+> 
+> Since the first action is deny, we have a global allow policy. This
+> disables the filtering of the cycle counter (event 0x11 being CPU_CYCLES).
+> 
+> And then in guest, use the perf to count the cycle:
+> 
+>   # perf stat sleep 1
+> 
+>    Performance counter stats for 'sleep 1':
+> 
+>               1.22 msec task-clock                       #    0.001 CPUs utilized
+>                  1      context-switches                 #  820.695 /sec
+>                  0      cpu-migrations                   #    0.000 /sec
+>                 55      page-faults                      #   45.138 K/sec
+>    <not supported>      cycles
+>            1128954      instructions
+>             227031      branches                         #  186.323 M/sec
+>               8686      branch-misses                    #    3.83% of all branches
+> 
+>        1.002492480 seconds time elapsed
+> 
+>        0.001752000 seconds user
+>        0.000000000 seconds sys
+> 
+> As we can see, the cycle counter has been disabled in the guest, but
+> other pmu events are still work.
+> 
+> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+> v3->v4:
+>   - Fix the wrong check for pmu_filter_init.            [Sebastian]
+>   - Fix multiple alignment issue.                       [Gavin]
+>   - Report error by warn_report() instead of error_report(), and don't use
+>   abort() since the PMU Event Filter is an add-on and best-effort feature.
+>                                                         [Gavin]
+>   - Add several missing {  } for single line of code.   [Gavin]
+>   - Use the g_strsplit() to replace strtok().           [Gavin]
+> 
+> v2->v3:
+>   - Improve commits message, use kernel doc wording, add more explaination on
+>     filter example, fix some typo error.                [Eric]
+>   - Add g_free() in kvm_arch_set_pmu_filter() to prevent memory leak. [Eric]
+>   - Add more precise error message report.              [Eric]
+>   - In options doc, add pmu-filter rely on KVM_ARM_VCPU_PMU_V3_FILTER support in
+>     KVM.                                                [Eric]
+> 
+> v1->v2:
+>   - Add more description for allow and deny meaning in 
+>     commit message.                                     [Sebastian]
+>   - Small improvement.                                  [Sebastian]
+> 
+> v2: https://lore.kernel.org/all/20231117060838.39723-1-shahuang@redhat.com/
+> v1: https://lore.kernel.org/all/20231113081713.153615-1-shahuang@redhat.com/
+> ---
+>  include/sysemu/kvm_int.h |  1 +
+>  qemu-options.hx          | 21 +++++++++++
+>  target/arm/kvm.c         | 23 ++++++++++++
+>  target/arm/kvm64.c       | 75 ++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 120 insertions(+)
+> 
+> diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+> index fd846394be..8f4601474f 100644
+> --- a/include/sysemu/kvm_int.h
+> +++ b/include/sysemu/kvm_int.h
+> @@ -120,6 +120,7 @@ struct KVMState
+>      uint32_t xen_caps;
+>      uint16_t xen_gnttab_max_frames;
+>      uint16_t xen_evtchn_max_pirq;
+> +    char *kvm_pmu_filter;
+>  };
+>  
+>  void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 42fd09e4de..054865ba0d 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -187,6 +187,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+>      "                tb-size=n (TCG translation block cache size)\n"
+>      "                dirty-ring-size=n (KVM dirty ring GFN count, default 0)\n"
+>      "                eager-split-size=n (KVM Eager Page Split chunk size, default 0, disabled. ARM only)\n"
+> +    "                pmu-filter={A,D}:start-end[;{A,D}:start-end...] (KVM PMU Event Filter, default no filter. ARM only)\n"
+Sorry for coming back late with this kind of comment but I am not
+comfortable with the pmu-filter being an accel suboption. Why isn't it a
+cpu option instead like the pmu option?
 
-An example is how one part of DPDK recomputes RSS over TAP.
+qemu-system-aarch64 -M virt -cpu
+max,pmu-filter="A:0x11-0x11;A:0x23-0x3a;D:0x30-0x30",sve=on,sve128=on,sve256=on
 
-https://git.dpdk.org/dpdk/tree/drivers/net/tap/bpf/tap_bpf_program.c
+See https://qemu-project.gitlab.io/qemu/system/arm/cpu-features.html
 
-This feature is likely to be removed, because it is not actively used
-and the changes in BPF program loading broke it on current kernel
-releases.  Which brings up the point that since the kernel does
-not have stable API/ABI for BPF program infrastructure, I would
-avoid it for projects that don't want to deal with that.
+Wouldn't it make more sense? The PMU filter control is a vcpu device
+ctrl, isn't it.
+
+
+>      "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
+>      "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
+>  SRST
+> @@ -259,6 +260,26 @@ SRST
+>          impact on the memory. By default, this feature is disabled
+>          (eager-split-size=0).
+>  
+> +    ``pmu-filter={A,D}:start-end[;{A,D}:start-end...]``
+> +        KVM implements PMU Event Filtering to prevent a guest from being able to
+> +        sample certain events. It depends on the KVM_ARM_VCPU_PMU_V3_FILTER
+> +        attribute supported in KVM. It has the following format:
+> +
+> +        pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
+> +
+> +        The A means "allow" and D means "deny", start is the first event of the
+> +        range and the end is the last one. The first registered range defines
+> +        the global policy(global ALLOW if the first @action is DENY, global DENY
+> +        if the first @action is ALLOW). The start and end only support hex
+> +        format now. For example:
+> +
+> +        pmu-filter="A:0x11-0x11;A:0x23-0x3a;D:0x30-0x30"
+> +
+> +        Since the first action is allow, we have a global deny policy. It
+> +        will allow event 0x11 (The cycle counter), events 0x23 to 0x3a is
+> +        also allowed except the event 0x30 is denied, and all the other events
+> +        are disallowed.
+> +
+>      ``notify-vmexit=run|internal-error|disable,notify-window=n``
+>          Enables or disables notify VM exit support on x86 host and specify
+>          the corresponding notify window to trigger the VM exit if enabled.
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 7903e2ddde..1f73b83674 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -1108,6 +1108,22 @@ static void kvm_arch_set_eager_split_size(Object *obj, Visitor *v,
+>      s->kvm_eager_split_size = value;
+>  }
+>  
+> +static char *kvm_arch_get_pmu_filter(Object *obj, Error **errp)
+> +{
+> +    KVMState *s = KVM_STATE(obj);
+> +
+> +    return g_strdup(s->kvm_pmu_filter);
+> +}
+> +
+> +static void kvm_arch_set_pmu_filter(Object *obj, const char *pmu_filter,
+> +                                    Error **errp)
+> +{
+> +    KVMState *s = KVM_STATE(obj);
+> +
+> +    g_free(s->kvm_pmu_filter);
+> +    s->kvm_pmu_filter = g_strdup(pmu_filter);
+> +}
+> +
+>  void kvm_arch_accel_class_init(ObjectClass *oc)
+>  {
+>      object_class_property_add(oc, "eager-split-size", "size",
+> @@ -1116,4 +1132,11 @@ void kvm_arch_accel_class_init(ObjectClass *oc)
+>  
+>      object_class_property_set_description(oc, "eager-split-size",
+>          "Eager Page Split chunk size for hugepages. (default: 0, disabled)");
+> +
+> +    object_class_property_add_str(oc, "pmu-filter",
+> +                                  kvm_arch_get_pmu_filter,
+> +                                  kvm_arch_set_pmu_filter);
+> +
+> +    object_class_property_set_description(oc, "pmu-filter",
+> +        "PMU Event Filtering description for guest PMU. (default: NULL, disabled)");
+>  }
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index 3c175c93a7..0ed6744057 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -10,6 +10,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include <asm-arm64/kvm.h>
+>  #include <sys/ioctl.h>
+>  #include <sys/ptrace.h>
+>  
+> @@ -131,6 +132,77 @@ static bool kvm_arm_set_device_attr(CPUState *cs, struct kvm_device_attr *attr,
+>      return true;
+>  }
+>  
+> +static void kvm_arm_pmu_filter_init(CPUState *cs)
+> +{
+> +    KVMState *kvm_state = cs->kvm_state;
+> +    static bool pmu_filter_init = false;
+> +    struct kvm_pmu_event_filter filter;
+> +    struct kvm_device_attr attr = {
+> +        .group      = KVM_ARM_VCPU_PMU_V3_CTRL,
+> +        .attr       = KVM_ARM_VCPU_PMU_V3_FILTER,
+> +        .addr       = (uint64_t)&filter,
+> +    };
+> +    char act;
+> +    int i;
+> +    gchar **event_filters;
+> +
+> +    if (!kvm_state->kvm_pmu_filter)
+> +        return;
+> +
+> +    if (kvm_vcpu_ioctl(cs, KVM_HAS_DEVICE_ATTR, &attr)) {
+> +        warn_report("The kernel doesn't support the PMU Event Filter!\n");
+> +        return;
+> +    }
+> +
+> +    /* The filter only needs to be initialized for 1 vcpu. */
+Are you sure? This is a per vcpu device ctrl. Where is it written in the
+doc that this shall not be called for each vcpu
+> +    if (pmu_filter_init) {
+> +        return;
+> +    }
+> +    pmu_filter_init = true;
+> +
+> +    event_filters = g_strsplit(kvm_state->kvm_pmu_filter, ";", -1);
+> +
+> +    for (i = 0; event_filters[i]; i++) {
+> +        unsigned short start = 0, end = 0;
+> +
+> +        sscanf(event_filters[i], "%c:%hx-%hx", &act, &start, &end);
+> +        if ((act != 'A' && act != 'D') || (!start && !end)) {
+> +            warn_report("Skipping invalid PMU filter %s\n", event_filters[i]);
+> +            continue;
+> +        }
+> +
+> +        filter = (struct kvm_pmu_event_filter) {
+> +            .base_event     = start,
+> +            .nevents        = end - start + 1,
+> +            .action         = act == 'A' ? KVM_PMU_EVENT_ALLOW :
+> +                                           KVM_PMU_EVENT_DENY,
+> +        };
+> +
+> +        if (!kvm_arm_set_device_attr(cs, &attr, "PMU Event Filter")) {
+> +            if (errno == EINVAL) {
+> +                warn_report("Invalid PMU filter range [0x%x-0x%x]. "
+> +                             "ARMv8.0 support 10 bits event space, "
+> +                             "ARMv8.1 support 16 bits event space",
+> +                             start, end);
+> +            }
+> +            else if (errno == ENODEV) {
+> +                warn_report("GIC not initialized");
+> +            }
+> +            else if (errno == ENXIO) {
+> +                warn_report("PMUv3 not properly configured or in-kernel irqchip "
+> +                            "not configured.");
+> +            }
+> +            else if (errno == EBUSY) {
+> +                warn_report("PMUv3 already initialized or a VCPU has already run");
+> +            }
+> +
+> +            break;
+> +        }
+> +    }
+> +
+> +    g_strfreev(event_filters);
+> +}
+> +
+>  void kvm_arm_pmu_init(CPUState *cs)
+>  {
+>      struct kvm_device_attr attr = {
+> @@ -141,6 +213,9 @@ void kvm_arm_pmu_init(CPUState *cs)
+>      if (!ARM_CPU(cs)->has_pmu) {
+>          return;
+>      }
+> +
+> +    kvm_arm_pmu_filter_init(cs);
+> +
+>      if (!kvm_arm_set_device_attr(cs, &attr, "PMU")) {
+>          error_report("failed to init PMU");
+>          abort();
+
+Thanks
+
+Eric
+
 
