@@ -1,138 +1,326 @@
-Return-Path: <kvm+bounces-4456-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4457-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D376812BBC
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 10:31:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23F3B812BCB
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 10:37:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CDF41C2153C
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 09:31:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0D5B2822AC
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 09:37:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F6492EB09;
-	Thu, 14 Dec 2023 09:31:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D962A30D06;
+	Thu, 14 Dec 2023 09:37:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f5sXNC1A"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gpfguuDm"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C8B5A6
-	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 01:31:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702546290;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tTE0cMZgmLT4mbBDje7gzm+ln7P9WsJQeR7EiRHzoUg=;
-	b=f5sXNC1A7XZe3RNYucaDlQL/OepM/HPXECyKAexugVZLcqR/9Q9Jx6IE7nQU0DdNVtV0jQ
-	r+x/Rz8aL92XjiBdLY5MVJycllH0ex/ZWvHk6fhb8Cu0oCAhtTWQsLCLprT8gbXFeeUjlT
-	CHrQ3FZ+gIkiyBQoOpxpFGjUhH3oAUY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-247-4aMuPSAuPJWrWOrb5jGIaQ-1; Thu, 14 Dec 2023 04:31:27 -0500
-X-MC-Unique: 4aMuPSAuPJWrWOrb5jGIaQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40c2a43b0f3so53760635e9.2
-        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 01:31:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702546286; x=1703151086;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tTE0cMZgmLT4mbBDje7gzm+ln7P9WsJQeR7EiRHzoUg=;
-        b=CcYF/CT/A24QWiaYvcQrOcIlg3lnqoqgEBpNL4VwSObbYrf3lmAx32Gsr6Oe0En8/i
-         Sn1qoWdlJeQDCa9zmc9sF1Kl2E75S7xVO09I37bbcKLKfE6CyVGLfZ7wDSyyfcOv/Eqg
-         TQ6hjoF65AXCRDn8ax2bbIb6wFL1aDojgFQ8ShVEcch7juvBwn1aetMUvvPpweh17evW
-         0pARQZTFO8u2L2N8rLvgNJ+nc6gZnO+F7B0S12ZJLbaVqPo0zTFCN2PsK6AYX2qj9vRe
-         ydAkZVgo3FNZldSCNfldjx99n2tAdx3ZZLCO1w9+gTK55uS0zNqWfPuHcyF2wkZJHsWw
-         EBrA==
-X-Gm-Message-State: AOJu0Ywx3FgmL7hHK5UCf/nYNT7vLgwLq0DVl9k9RTnnP8osY6QOZ32U
-	dOtPdtdH/llPlJYJV4ZdSHCz+SVtO0or4tDGZa2XZ1jBfTts2Tbt/msXshBCN/Yto84W6JkZpH+
-	89zbpjNqJ3kLa
-X-Received: by 2002:a05:600c:188f:b0:40c:32e6:d567 with SMTP id x15-20020a05600c188f00b0040c32e6d567mr3338888wmp.119.1702546286721;
-        Thu, 14 Dec 2023 01:31:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFRxP7fEK8hsKy8ujv5AAy1+oBp2F4A/KQqv4ZVDGZIIzspF+szw+DRvb7Fz+JaTSBb7ZWKhg==
-X-Received: by 2002:a05:600c:188f:b0:40c:32e6:d567 with SMTP id x15-20020a05600c188f00b0040c32e6d567mr3338872wmp.119.1702546286273;
-        Thu, 14 Dec 2023 01:31:26 -0800 (PST)
-Received: from starship ([77.137.131.62])
-        by smtp.gmail.com with ESMTPSA id fl9-20020a05600c0b8900b0040b43da0bbasm24076640wmb.30.2023.12.14.01.31.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 01:31:25 -0800 (PST)
-Message-ID: <aa7aa5ea5b112a0ec70c6276beb281e19c052f0e.camel@redhat.com>
-Subject: Re: [PATCH v2 1/3] KVM: x86: Make the hardcoded APIC bus frequency
- vm variable
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org,  isaku.yamahata@gmail.com, Paolo Bonzini
- <pbonzini@redhat.com>,  erdemaktas@google.com, Vishal Annapurve
- <vannapurve@google.com>, Jim Mattson <jmattson@google.com>
-Date: Thu, 14 Dec 2023 11:31:24 +0200
-In-Reply-To: <ZXo54VNuIqbMsYv-@google.com>
-References: <cover.1699936040.git.isaku.yamahata@intel.com>
-	 <1c12f378af7de16d7895f8badb18c3b1715e9271.1699936040.git.isaku.yamahata@intel.com>
-	 <938efd3cfcb25d828deab0cc0ba797177cc69602.camel@redhat.com>
-	 <ZXo54VNuIqbMsYv-@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2059.outbound.protection.outlook.com [40.107.100.59])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24598B7
+	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 01:37:36 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UaOjyynDrF/TOtBCDBbf9p+fXFxSmmWZOjsqfrVdr5lS0ZSGaGz0xJD6kncvkxqTbqTYeJczI2mz7/6/gmk5UaF5viA6qVKxGrxt3K3oMG0hV6V+qc1oy85eYnO7Kz0kE7Z8l4QNrRBu4hurjE2hj62Acu94n/6q8DT8HR91PqzYKQ8fxudl0x9YhwIf22L1ozexvJQgodcZC7WPOuf1yBk/UvxwTLMEhCIN7QEy9F5jXEbKRs88NktpkQx8S1jmg756pgkMFZvaEJU432z8skDKug5hi5mgdMKtm57bAMilRkJytW+mv3UFPyU1t0b0hBe0CpT8iDkz+dSoh63T7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4lv/ykUTyxXpCjdXygp5Y113WtyjEX+Ewo2/qTom714=;
+ b=GOBA44dHngEJqtwBPDZWbNcYtRFMLgmGHo4PVeq8nZyGJps81GnDXchFMD0htgqjHf9f4NUmnB8HE1pu0MG94YcisSsJr3YN46TDZLZ3RfQFFW9Zrwp5N83PI1yZjDvASopUmZXYAms6HvyqcbCmKn8wQbPC7JKhwhn5ASNmjDSAB4gsGdtpylacwKML3UWjqsYIPPE5lIQ3AgaUs9vPCtPd7EL/bGZYm1ROIUB4UAvDJbjI1bokokDaIXkL36kw5opAqi0BMdFBq2ZoUWW4Xwpn7/p8A72SxNBl9liuGFhLKolatecVN1dMWDqlgWuhSR7eXYD+1pFzipATGf65Hg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4lv/ykUTyxXpCjdXygp5Y113WtyjEX+Ewo2/qTom714=;
+ b=gpfguuDmSnegZDUCo7Nlio5q1CcaGIpFmDCjbIZCDDl7lm369gKZbCaT207eHTWdjHP35tDROFIZjTgqyHn9Snevk27kWqhQ+vnWU30/jGn5bPQ13PO60pa+SHKPYBeVtb+1cPI2DFFRrM/hLQTs/dyfG43a9n6x6IkJL4GGUh9pSoeWKJH76oDXtoeJOkVdiTE1xNTW58NgkI/MZ11canwgfyVKTO0T2FB8uBBr6RcFZQxWMsVnGkwwowOEy/U6kj/jzPdoO3txH6mz8D6VsvHk/guIuUDiQRgXB1hKYP6gjKtbMJ6oK+uhnEvwWQdpqUuWscUQ6o0IkW2TI4+26A==
+Received: from MN2PR15CA0011.namprd15.prod.outlook.com (2603:10b6:208:1b4::24)
+ by DS0PR12MB8576.namprd12.prod.outlook.com (2603:10b6:8:165::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28; Thu, 14 Dec
+ 2023 09:37:33 +0000
+Received: from BL6PEPF0001AB59.namprd02.prod.outlook.com
+ (2603:10b6:208:1b4:cafe::c6) by MN2PR15CA0011.outlook.office365.com
+ (2603:10b6:208:1b4::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.26 via Frontend
+ Transport; Thu, 14 Dec 2023 09:37:33 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BL6PEPF0001AB59.mail.protection.outlook.com (10.167.241.11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7091.26 via Frontend Transport; Thu, 14 Dec 2023 09:37:33 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 14 Dec
+ 2023 01:37:17 -0800
+Received: from [172.27.58.65] (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 14 Dec
+ 2023 01:37:12 -0800
+Message-ID: <37bcb2f0-a83d-4806-809c-ec5d004ddb20@nvidia.com>
+Date: Thu, 14 Dec 2023 11:37:10 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V7 vfio 9/9] vfio/virtio: Introduce a vfio driver over
+ virtio devices
+Content-Language: en-US
+To: "Michael S. Tsirkin" <mst@redhat.com>
+CC: <alex.williamson@redhat.com>, <jasowang@redhat.com>, <jgg@nvidia.com>,
+	<kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<parav@nvidia.com>, <feliu@nvidia.com>, <jiri@nvidia.com>,
+	<kevin.tian@intel.com>, <joao.m.martins@oracle.com>, <si-wei.liu@oracle.com>,
+	<leonro@nvidia.com>, <maorg@nvidia.com>
+References: <20231207102820.74820-1-yishaih@nvidia.com>
+ <20231207102820.74820-10-yishaih@nvidia.com>
+ <20231214013642-mutt-send-email-mst@kernel.org>
+ <ea0cdfc9-35f4-4cc1-b0de-aaef0bebeb51@nvidia.com>
+ <20231214041515-mutt-send-email-mst@kernel.org>
+From: Yishai Hadas <yishaih@nvidia.com>
+In-Reply-To: <20231214041515-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB59:EE_|DS0PR12MB8576:EE_
+X-MS-Office365-Filtering-Correlation-Id: f11806a4-0dab-46f5-1475-08dbfc884cac
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	2jZ8Zd3W1sEB+EcBxt4cPcu9ypV/eqVlwpcNQrVrQzRPj5W4KOlhEzoZmw5Hf254AIKPwP+efpA/HwDDeTlPJbFxQDJ5AdLGbYAD6wptZQnCD1rxqAV5yGvnspziIOKP2IBa04Z+Vkh+KJSTk74BnlIpERtyUpPTU9BRvWaFhALXyVWFYeOIOSFcg5xdZQr3wF5X3iuBt1mFT7Is/iGO8tfDjbmcJ6uh1+i7P2af+Jy7kfizK8WTBzQagNmAQSG8RQeRkHMsT8aoCeL3r63ZWF0iCmH71K7PJyL5k+4nsRttRNTfheyQo7ygsPz6KdAeROX2mhjfifHTbPZPvzMxkJyE2bVV4MXChZfuKS2Y95bAQYiV2pvrGoLcrESqtE+BlZ1WyN6TZ5E5fAAFroFHn4D8gHIUabDBS1SBjV4YgPTun+Xl29w0Qf+53BiSjPxglLaWa3DbcZcOximvyS8hVDyq+/p9WnwfZ6wrAY/GE2zPdmK2sQ1/R7pnzNpVMByLPMxP7x36RuEiGU5exmcBoHwfhpcRbtPGyB0zyIYlUeuRCPQCDbIjJXzqEufUZyIqwZSozIoKZmdHWtcLD8UHJCV7+FCfsM0+4HGvgGBSxcVV2YCP27m9YnXHFt4W8IvJ1uM9U0tpt6kmkvRmTFM37+TPDbDs8ihx85MUa4PU7g0yahblz9Yro3tVB0cnXW91AZ2IT1Hx7Up6f06O27P6CL8ldnWFdwnt9LeYVsnL6heL+SdoYsIbiKWoiVn2tNJNKYoTGQQF/8C3AFzxSf0BcHbmJ3CK7YjqAH3h/Vz68bT7viQJCniq1Zmvb0V73QkR
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(346002)(396003)(376002)(136003)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(82310400011)(46966006)(40470700004)(36840700001)(82740400003)(7636003)(356005)(40460700003)(2906002)(36756003)(41300700001)(31696002)(86362001)(31686004)(2616005)(4326008)(8676002)(8936002)(966005)(478600001)(40480700001)(336012)(426003)(83380400001)(54906003)(70206006)(70586007)(316002)(6916009)(16576012)(36860700001)(5660300002)(53546011)(16526019)(107886003)(47076005)(26005)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2023 09:37:33.3123
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f11806a4-0dab-46f5-1475-08dbfc884cac
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB59.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8576
 
-On Wed, 2023-12-13 at 15:10 -0800, Sean Christopherson wrote:
-> On Thu, Dec 14, 2023, Maxim Levitsky wrote:
-> > On Mon, 2023-11-13 at 20:35 -0800, isaku.yamahata@intel.com wrote:
-> > > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > > 
-> > > TDX virtualizes the advertised APIC bus frequency to be 25MHz. 
-> > 
-> > Can you explain a bit better why TDX needs this? I am not familiar
-> > with TDX well enough yet to fully understand.
+On 14/12/2023 11:19, Michael S. Tsirkin wrote:
+> On Thu, Dec 14, 2023 at 11:03:49AM +0200, Yishai Hadas wrote:
+>> On 14/12/2023 8:38, Michael S. Tsirkin wrote:
+>>> On Thu, Dec 07, 2023 at 12:28:20PM +0200, Yishai Hadas wrote:
+>>>> Introduce a vfio driver over virtio devices to support the legacy
+>>>> interface functionality for VFs.
+>>>>
+>>>> Background, from the virtio spec [1].
+>>>> --------------------------------------------------------------------
+>>>> In some systems, there is a need to support a virtio legacy driver with
+>>>> a device that does not directly support the legacy interface. In such
+>>>> scenarios, a group owner device can provide the legacy interface
+>>>> functionality for the group member devices. The driver of the owner
+>>>> device can then access the legacy interface of a member device on behalf
+>>>> of the legacy member device driver.
+>>>>
+>>>> For example, with the SR-IOV group type, group members (VFs) can not
+>>>> present the legacy interface in an I/O BAR in BAR0 as expected by the
+>>>> legacy pci driver. If the legacy driver is running inside a virtual
+>>>> machine, the hypervisor executing the virtual machine can present a
+>>>> virtual device with an I/O BAR in BAR0. The hypervisor intercepts the
+>>>> legacy driver accesses to this I/O BAR and forwards them to the group
+>>>> owner device (PF) using group administration commands.
+>>>> --------------------------------------------------------------------
+>>>>
+>>>> Specifically, this driver adds support for a virtio-net VF to be exposed
+>>>> as a transitional device to a guest driver and allows the legacy IO BAR
+>>>> functionality on top.
+>>>>
+>>>> This allows a VM which uses a legacy virtio-net driver in the guest to
+>>>> work transparently over a VF which its driver in the host is that new
+>>>> driver.
+>>>>
+>>>> The driver can be extended easily to support some other types of virtio
+>>>> devices (e.g virtio-blk), by adding in a few places the specific type
+>>>> properties as was done for virtio-net.
+>>>>
+>>>> For now, only the virtio-net use case was tested and as such we introduce
+>>>> the support only for such a device.
+>>>>
+>>>> Practically,
+>>>> Upon probing a VF for a virtio-net device, in case its PF supports
+>>>> legacy access over the virtio admin commands and the VF doesn't have BAR
+>>>> 0, we set some specific 'vfio_device_ops' to be able to simulate in SW a
+>>>> transitional device with I/O BAR in BAR 0.
+>>>>
+>>>> The existence of the simulated I/O bar is reported later on by
+>>>> overwriting the VFIO_DEVICE_GET_REGION_INFO command and the device
+>>>> exposes itself as a transitional device by overwriting some properties
+>>>> upon reading its config space.
+>>>>
+>>>> Once we report the existence of I/O BAR as BAR 0 a legacy driver in the
+>>>> guest may use it via read/write calls according to the virtio
+>>>> specification.
+>>>>
+>>>> Any read/write towards the control parts of the BAR will be captured by
+>>>> the new driver and will be translated into admin commands towards the
+>>>> device.
+>>>>
+>>>> Any data path read/write access (i.e. virtio driver notifications) will
+>>>> be forwarded to the physical BAR which its properties were supplied by
+>>>> the admin command VIRTIO_ADMIN_CMD_LEGACY_NOTIFY_INFO upon the
+>>>> probing/init flow.
+>>>>
+>>>> With that code in place a legacy driver in the guest has the look and
+>>>> feel as if having a transitional device with legacy support for both its
+>>>> control and data path flows.
+>>>>
+>>>> [1]
+>>>> https://github.com/oasis-tcs/virtio-spec/commit/03c2d32e5093ca9f2a17797242fbef88efe94b8c
+>>>>
+>>>> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+>>>> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+>>>> ---
+>>>>    MAINTAINERS                      |   7 +
+>>>>    drivers/vfio/pci/Kconfig         |   2 +
+>>>>    drivers/vfio/pci/Makefile        |   2 +
+>>>>    drivers/vfio/pci/virtio/Kconfig  |  16 +
+>>>>    drivers/vfio/pci/virtio/Makefile |   4 +
+>>>>    drivers/vfio/pci/virtio/main.c   | 567 +++++++++++++++++++++++++++++++
+>>>>    6 files changed, 598 insertions(+)
+>>>>    create mode 100644 drivers/vfio/pci/virtio/Kconfig
+>>>>    create mode 100644 drivers/vfio/pci/virtio/Makefile
+>>>>    create mode 100644 drivers/vfio/pci/virtio/main.c
+>>>>
+>>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>>> index 012df8ccf34e..b246b769092d 100644
+>>>> --- a/MAINTAINERS
+>>>> +++ b/MAINTAINERS
+>>>> @@ -22872,6 +22872,13 @@ L:	kvm@vger.kernel.org
+>>>>    S:	Maintained
+>>>>    F:	drivers/vfio/pci/mlx5/
+>>>> +VFIO VIRTIO PCI DRIVER
+>>>> +M:	Yishai Hadas <yishaih@nvidia.com>
+>>>> +L:	kvm@vger.kernel.org
+>>>> +L:	virtualization@lists.linux-foundation.org
+>>>> +S:	Maintained
+>>>> +F:	drivers/vfio/pci/virtio
+>>>> +
+>>>>    VFIO PCI DEVICE SPECIFIC DRIVERS
+>>>>    R:	Jason Gunthorpe <jgg@nvidia.com>
+>>>>    R:	Yishai Hadas <yishaih@nvidia.com>
+>>>> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+>>>> index 8125e5f37832..18c397df566d 100644
+>>>> --- a/drivers/vfio/pci/Kconfig
+>>>> +++ b/drivers/vfio/pci/Kconfig
+>>>> @@ -65,4 +65,6 @@ source "drivers/vfio/pci/hisilicon/Kconfig"
+>>>>    source "drivers/vfio/pci/pds/Kconfig"
+>>>> +source "drivers/vfio/pci/virtio/Kconfig"
+>>>> +
+>>>>    endmenu
+>>>> diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
+>>>> index 45167be462d8..046139a4eca5 100644
+>>>> --- a/drivers/vfio/pci/Makefile
+>>>> +++ b/drivers/vfio/pci/Makefile
+>>>> @@ -13,3 +13,5 @@ obj-$(CONFIG_MLX5_VFIO_PCI)           += mlx5/
+>>>>    obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisilicon/
+>>>>    obj-$(CONFIG_PDS_VFIO_PCI) += pds/
+>>>> +
+>>>> +obj-$(CONFIG_VIRTIO_VFIO_PCI) += virtio/
+>>>> diff --git a/drivers/vfio/pci/virtio/Kconfig b/drivers/vfio/pci/virtio/Kconfig
+>>>> new file mode 100644
+>>>> index 000000000000..3a6707639220
+>>>> --- /dev/null
+>>>> +++ b/drivers/vfio/pci/virtio/Kconfig
+>>>> @@ -0,0 +1,16 @@
+>>>> +# SPDX-License-Identifier: GPL-2.0-only
+>>>> +config VIRTIO_VFIO_PCI
+>>>> +        tristate "VFIO support for VIRTIO NET PCI devices"
+>>>> +        depends on VIRTIO_PCI
+>>>> +        select VFIO_PCI_CORE
+>>>> +        help
+>>>> +          This provides support for exposing VIRTIO NET VF devices which support
+>>>> +          legacy IO access, using the VFIO framework that can work with a legacy
+>>>> +          virtio driver in the guest.
+>>>> +          Based on PCIe spec, VFs do not support I/O Space; thus, VF BARs shall
+>>>> +          not indicate I/O Space.
+>>>> +          As of that this driver emulated I/O BAR in software to let a VF be
+>>>> +          seen as a transitional device in the guest and let it work with
+>>>> +          a legacy driver.
+>>>> +
+>>>> +          If you don't know what to do here, say N.
+>>>
+>>> BTW shouldn't this driver be limited to X86? Things like lack of memory
+>>> barriers will make legacy virtio racy on e.g. ARM will they not?
+>>> And endian-ness will be broken on PPC ...
+>>>
+>>
+>> OK, if so, we can come with the below extra code.
+>> Makes sense ?
+>>
+>> I'll squash it as part of V8 to the relevant patch.
+>>
+>> diff --git a/drivers/virtio/virtio_pci_modern.c
+>> b/drivers/virtio/virtio_pci_modern.c
+>> index 37a0035f8381..b652e91b9df4 100644
+>> --- a/drivers/virtio/virtio_pci_modern.c
+>> +++ b/drivers/virtio/virtio_pci_modern.c
+>> @@ -794,6 +794,9 @@ bool virtio_pci_admin_has_legacy_io(struct pci_dev
+>> *pdev)
+>>          struct virtio_device *virtio_dev = virtio_pci_vf_get_pf_dev(pdev);
+>>          struct virtio_pci_device *vp_dev;
+>>
+>> +#ifndef CONFIG_X86
+>> +       return false;
+>> +#endif
+>>          if (!virtio_dev)
+>>                  return false;
+>>
+>> Yishai
 > 
-> TDX (the module/architecture) hardcodes the core crystal frequency to 25Mhz,
-> whereas KVM hardcodes the APIC bus frequency to 1Ghz.  And TDX (again, the module)
-> *unconditionally* enumerates CPUID 0x15 to TDX guests, i.e. _tells_ the guest that
-> the frequency is 25MHz regardless of what the VMM/hypervisor actually emulates.
-> And so the guest skips calibrating the APIC timer, which results in the guest
-> scheduling timer interrupts waaaaaaay too frequently, i.e. the guest ends up
-> gettings interrupts at 40x the rate it wants.
-
-That is what I wanted to hear without opening the PRM ;) - so there is a CPUID leaf,
-but KVM just doesn't advertise it. Now it makes sense.
-
-Please add something like that to the commit message:
-
-"TDX guests have the APIC bus frequency hardcoded to 25 Mhz in the CPUID leaf 0x15.
-KVM doesn't expose this leaf, but TDX mandates it to be exposed,
-and doesn't allow to override it's value either.
-
-To ensure that the guest doesn't have a conflicting view of the APIC bus frequency, 
-allow the userspace to tell KVM to use the same frequency that TDX mandates,
-instead of the default 1Ghz"
-
-> 
-> Upstream KVM's non-TDX behavior is fine, because KVM doesn't advertise support
-> for CPUID 0x15, i.e. doesn't announce to host userspace that it's safe to expose
-> CPUID 0x15 to the guest.  Because TDX makes exposing CPUID 0x15 mandatory, KVM
-> needs to be taught to correctly emulate the guest's APIC bus frequency, a.k.a.
-> the TDX guest core crystal frequency of 25Mhz.
-
-I assume that TDX doesn't allow to change the CPUID 0x15 leaf.
-
-> 
-> I halfheartedly floated the idea of "fixing" the TDX module/architecture to either
-> use 1Ghz as the base frequency (off list), but it definitely isn't a hill worth
-> dying on since the KVM changes are relatively simple.
-> 
-> https://lore.kernel.org/all/ZSnIKQ4bUavAtBz6@google.com
+> Isn't there going to be a bunch more dead code that compiler won't be
+> able to elide?
 > 
 
-Best regards,
-	Maxim Levitsky
+On my setup the compiler didn't complain about dead-code (I simulated it 
+by using ifdef CONFIG_X86 return false).
 
+However, if we suspect that some compiler might complain, we can come 
+with the below instead.
+
+Do you prefer that ?
+
+index 37a0035f8381..53e29824d404 100644
+--- a/drivers/virtio/virtio_pci_modern.c
++++ b/drivers/virtio/virtio_pci_modern.c
+@@ -782,6 +782,7 @@ static void vp_modern_destroy_avq(struct 
+virtio_device *vdev)
+          BIT_ULL(VIRTIO_ADMIN_CMD_LEGACY_DEV_CFG_READ) | \
+          BIT_ULL(VIRTIO_ADMIN_CMD_LEGACY_NOTIFY_INFO))
+
++#ifdef CONFIG_X86
+  /*
+   * virtio_pci_admin_has_legacy_io - Checks whether the legacy IO
+   * commands are supported
+@@ -807,6 +808,12 @@ bool virtio_pci_admin_has_legacy_io(struct pci_dev 
+*pdev)
+                 return true;
+         return false;
+  }
++#else
++bool virtio_pci_admin_has_legacy_io(struct pci_dev *pdev)
++{
++       return false;
++}
++#endif
+  EXPORT_SYMBOL_GPL(virtio_pci_admin_has_legacy_io);
+
+Yishai
 
