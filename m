@@ -1,84 +1,82 @@
-Return-Path: <kvm+bounces-4466-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4467-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC538812CEB
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 11:30:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C7F4812D0A
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 11:34:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 106BDB2137F
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 10:30:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6FADB2118E
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 10:34:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65CBA3C063;
-	Thu, 14 Dec 2023 10:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21FE03BB2A;
+	Thu, 14 Dec 2023 10:34:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cCi4m7Mh"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BMd62n8G"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00B7310F
-	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 02:30:09 -0800 (PST)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-40c48d7a7a7so37242185e9.3
-        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 02:30:09 -0800 (PST)
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE9EE10E
+	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 02:34:43 -0800 (PST)
+Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-3333074512bso236850f8f.1
+        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 02:34:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702549808; x=1703154608; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1702550082; x=1703154882; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:user-agent
          :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uOVO+bfnnJKpEsOHryNuWrr2usdamUm/q/5hMMN7t4I=;
-        b=cCi4m7MhDRKwmbzE2WnUH9sBMb+6JDrMU1uMh6Jt5C6m4VM5LNP3sbfHAN5LjOFGKY
-         TVS/zZXhwGAvNu7JbTIduDg8GuTIR6SuV3gJtq6G3d/TZCQ00hTbMW2ZSbZzWaR2D3MF
-         l0AUk5j7krI92119phi1zRXBPGdkjVwqWJ96kbVJEQEm5RaFLIiHbwN2dQBADE0q+dBl
-         CsSt4FTvPJRIbk9TUiouEcF+qcQQqKQYYa8O+aa6LDaGJ0v0PEbtTZwz6ij73K2Nw4GS
-         juQtIxiRff/DbS6Y1lJPjKl/eFbx45M+gRsCy8M/w2Ai4ygjOImeyPO4TBDgnVLIZK0h
-         Ujgg==
+        bh=VTIMG9FJoGMyoT9rRoj2x7tqQ0Gr6d1LxVablCR6iy8=;
+        b=BMd62n8Gm/Z9NL+2zqIdSEPhX9+DBCHsD6GAfNYwKnsWhBHUF6p86UgkMhJlqsHA9+
+         sWC4hpBNQLaChhDfX9+fZIJHnDvX1PNRhDav47FgVkFYsqu8ViTPVOWHV1lp/vkqQmu1
+         Q10rf0dqSRDC5gKEOd3N0uz8fIp7vrDkUkXVC/kHdeavGXzGt+JsovnFssRVjhmt820x
+         yjtf3GW6+8OyImoOefDdZEfqvdzGer3uTbOAmYMso4Bnqd1C/o+UzDOtWeKPDMKy5bMb
+         iXa1bx1uW1yXLIaG9Cpp+GKBiXrqtGUfC8g3lXv1VVCJv8i6WSnHK8iJ4KhfxbckS/y/
+         sN5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702549808; x=1703154608;
+        d=1e100.net; s=20230601; t=1702550082; x=1703154882;
         h=content-transfer-encoding:mime-version:message-id:date:user-agent
          :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=uOVO+bfnnJKpEsOHryNuWrr2usdamUm/q/5hMMN7t4I=;
-        b=Xx1RH85u7C0BeFiyJg/bZNIPLnzrUQz0pi8a82fWj1wPtF7cJaUFWBfcosVXC7URac
-         d34MzOb9dPyI40hoZ5ocwD8zRN7WrmTlT76qz1xhd81anM8vGfalIP3EKXw0fYkXckIq
-         Xch34+sZJEcTspgSizey4GLyJbWKZlV5asnL4jF4j6NoLOT9yjWwA9jWvBsjRUd7qyzZ
-         eASJu317gNky4FojOal1VwaITt5TyoWWPta2weyogwWQaSWdsxDyLo4yJ7J0obx8jugK
-         knc8VwZWH7bli7fKLlt+uDo1e21E5u4r9vDCUhCl/SgeykVYSz17yWrolWbSsHtYIq6S
-         V7YQ==
-X-Gm-Message-State: AOJu0YxVut1fE4Jm+T80SoH8tG1V/RyyxrGzfTqwcgyrrtA2G7Rrhe4g
-	UEZe6W0NHuDuvK2kAraJwgjo5A==
-X-Google-Smtp-Source: AGHT+IGfGsKpkGfYhg49s8Yquwu96sYE4oPzI7EF/ZouNO4OCHspwjlC8bcFEg/vs/gJgAL1beDnrQ==
-X-Received: by 2002:a7b:cb95:0:b0:40c:9fa:592f with SMTP id m21-20020a7bcb95000000b0040c09fa592fmr5374387wmi.104.1702549808302;
-        Thu, 14 Dec 2023 02:30:08 -0800 (PST)
+        bh=VTIMG9FJoGMyoT9rRoj2x7tqQ0Gr6d1LxVablCR6iy8=;
+        b=Ur62KrtORngLPdGjjXIqTsNzl/1TlPoFryo8Zw2YoS9s/xGI766xdj4N7ZjZM1Yyhn
+         c7pjvlDM1Z3Kj0ceVeARoIkbYk/QQPYBopUaOcMTGRfnVfeptpDzmCTNPxDDSecZtODi
+         IVdsC5NEkKgc/VktK4EKmSIhTELWp0u7myjnt3TCNxy6KOaFDLDFW5ENFtpyvhEC+29N
+         gw9TvX1A6VK2l4Y7qqkrGAwUaeiZUTHHCzklPNn7IjHVWsXypps37PwYZzlLA0LvXBig
+         ZzKUx4gr6XW+piRKD81zWc0nKT4FBSuSCSLhfq8RQ46MHZJIPrsImC4DU+0GycFN+ViN
+         0I+w==
+X-Gm-Message-State: AOJu0YyxV9skvP/Es19KygeaERSZL7juOUKzYKYtwirEHxOX+EgeVPfF
+	zuwyV0XMQNJTYroHG0qWspC1qQ==
+X-Google-Smtp-Source: AGHT+IEnzdfsAufZfsYDDmCA8IJHdokLbFAltymI6snKzyOYYZjuz900q/taMvC1Zuz+SQEW3V/P3g==
+X-Received: by 2002:a1c:7906:0:b0:40b:5e4a:235b with SMTP id l6-20020a1c7906000000b0040b5e4a235bmr4708868wme.93.1702550082208;
+        Thu, 14 Dec 2023 02:34:42 -0800 (PST)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id m27-20020a05600c3b1b00b0040b38292253sm26513051wms.30.2023.12.14.02.30.07
+        by smtp.gmail.com with ESMTPSA id bi11-20020a05600c3d8b00b0040c2963e5f3sm23970057wmb.38.2023.12.14.02.34.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 02:30:07 -0800 (PST)
+        Thu, 14 Dec 2023 02:34:41 -0800 (PST)
 Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 838705F7D3;
-	Thu, 14 Dec 2023 10:30:07 +0000 (GMT)
+	by draig.lan (Postfix) with ESMTP id 758725F7D3;
+	Thu, 14 Dec 2023 10:34:41 +0000 (GMT)
 From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Cleber Rosa <crosa@redhat.com>
-Cc: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
-  qemu-devel@nongnu.org,  Jiaxun Yang <jiaxun.yang@flygoat.com>,  Radoslaw
+Cc: qemu-devel@nongnu.org,  Jiaxun Yang <jiaxun.yang@flygoat.com>,  Radoslaw
  Biernacki <rad@semihalf.com>,  Paul Durrant <paul@xen.org>,  Akihiko Odaki
  <akihiko.odaki@daynix.com>,  Leif Lindholm <quic_llindhol@quicinc.com>,
   Peter Maydell <peter.maydell@linaro.org>,  Paolo Bonzini
  <pbonzini@redhat.com>,  kvm@vger.kernel.org,  qemu-arm@nongnu.org,
   Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,  Beraldo Leal
  <bleal@redhat.com>,  Wainer dos Santos Moschetta <wainersm@redhat.com>,
-  Sriram Yagnaraman <sriram.yagnaraman@est.tech>,  David Woodhouse
- <dwmw2@infradead.org>
+  Sriram Yagnaraman <sriram.yagnaraman@est.tech>,  Marcin Juszkiewicz
+ <marcin.juszkiewicz@linaro.org>,  David Woodhouse <dwmw2@infradead.org>
 Subject: Re: [PATCH 04/10] tests/avocado: machine aarch64: standardize
  location and RO/RW access
-In-Reply-To: <87le9xvmto.fsf@p1.localdomain> (Cleber Rosa's message of "Wed,
-	13 Dec 2023 16:01:39 -0500")
+In-Reply-To: <87h6klvm90.fsf@p1.localdomain> (Cleber Rosa's message of "Wed,
+	13 Dec 2023 16:14:03 -0500")
 References: <20231208190911.102879-1-crosa@redhat.com>
 	<20231208190911.102879-5-crosa@redhat.com>
-	<2972842d-e4bf-49eb-9d72-01b8049f18bf@linaro.org>
-	<87le9xvmto.fsf@p1.localdomain>
+	<87wmtkeils.fsf@draig.linaro.org> <87h6klvm90.fsf@p1.localdomain>
 User-Agent: mu4e 1.11.26; emacs 29.1
-Date: Thu, 14 Dec 2023 10:30:07 +0000
-Message-ID: <87r0jp84b4.fsf@draig.linaro.org>
+Date: Thu, 14 Dec 2023 10:34:41 +0000
+Message-ID: <87le9x843i.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,104 +88,146 @@ Content-Transfer-Encoding: quoted-printable
 
 Cleber Rosa <crosa@redhat.com> writes:
 
-> Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org> writes:
+> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 >
->> W dniu 8.12.2023 o=C2=A020:09, Cleber Rosa pisze:
+>> Cleber Rosa <crosa@redhat.com> writes:
+>>
 >>> The tests under machine_aarch64_virt.py do not need read-write access
 >>> to the ISOs.  The ones under machine_aarch64_sbsaref.py, on the other
 >>> hand, will need read-write access, so let's give each test an unique
 >>> file.
->>>=20
+>>
+>> I think we are making two separate changes here so probably best split
+>> the patch.
+>>
+>
+> Sure, but, do you mean separating the "readonly=3Don" and the "writable
+> file" changes?  Or separating those two from the ISO url code style
+> change?
+
+I was thinking about splitting the sbsaref and virt patches, but
+actually they are fairly related as they all use the alpine image so
+maybe no need.
+
+>
 >>> And while at it, let's use a single code style and hash for the ISO
 >>> url.
->>>=20
->>> Signed-off-by: Cleber Rosa<crosa@redhat.com>
+>>>
+>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>>> ---
+>>>  tests/avocado/machine_aarch64_sbsaref.py |  9 +++++++--
+>>>  tests/avocado/machine_aarch64_virt.py    | 14 +++++++-------
+>>>  2 files changed, 14 insertions(+), 9 deletions(-)
+>>>
+>>> diff --git a/tests/avocado/machine_aarch64_sbsaref.py b/tests/avocado/m=
+achine_aarch64_sbsaref.py
+>>> index 528c7d2934..6ae84d77ac 100644
+>>> --- a/tests/avocado/machine_aarch64_sbsaref.py
+>>> +++ b/tests/avocado/machine_aarch64_sbsaref.py
+>>> @@ -7,6 +7,7 @@
+>>>  # SPDX-License-Identifier: GPL-2.0-or-later
+>>>=20=20
+>>>  import os
+>>> +import shutil
+>>>=20=20
+>>>  from avocado import skipUnless
+>>>  from avocado.utils import archive
+>>> @@ -123,13 +124,15 @@ def boot_alpine_linux(self, cpu):
+>>>=20=20
+>>>          iso_hash =3D "5a36304ecf039292082d92b48152a9ec21009d3a62f459de=
+623e19c4bd9dc027"
+>>>          iso_path =3D self.fetch_asset(iso_url, algorithm=3D"sha256", a=
+sset_hash=3Diso_hash)
+>>> +        iso_path_rw =3D os.path.join(self.workdir, os.path.basename(is=
+o_path))
+>>> +        shutil.copy(iso_path, iso_path_rw)
+>>>=20=20
+>>>          self.vm.set_console()
+>>>          self.vm.add_args(
+>>>              "-cpu",
+>>>              cpu,
+>>>              "-drive",
+>>> -            f"file=3D{iso_path},format=3Draw",
+>>> +            f"file=3D{iso_path_rw},format=3Draw",
 >>
->> It is ISO file, so sbsa-ref tests should be fine with readonly as well.
+>> Instead of copying why not add ",snapshot=3Don" to preserve the original
+>> image. We don't want to persist data between tests.
+
+Ahh yes these are isos so snapshot isn't needed.
+
 >>
->> Nothing gets installed so nothing is written. We only test does boot wor=
-ks.
+>>>              "-device",
+>>>              "virtio-rng-pci,rng=3Drng0",
+>>>              "-object",
+>>> @@ -170,13 +173,15 @@ def boot_openbsd73(self, cpu):
+>>>=20=20
+>>>          img_hash =3D "7fc2c75401d6f01fbfa25f4953f72ad7d7c18650056d3075=
+5c44b9c129b707e5"
+>>>          img_path =3D self.fetch_asset(img_url, algorithm=3D"sha256", a=
+sset_hash=3Dimg_hash)
+>>> +        img_path_rw =3D os.path.join(self.workdir, os.path.basename(im=
+g_path))
+>>> +        shutil.copy(img_path, img_path_rw)
+>>>=20=20
+>>>          self.vm.set_console()
+>>>          self.vm.add_args(
+>>>              "-cpu",
+>>>              cpu,
+>>>              "-drive",
+>>> -            f"file=3D{img_path},format=3Draw",
+>>> +            f"file=3D{img_path_rw},format=3Draw",
+>>
+>> ditto.
+>>
+>>
+>>>              "-device",
+>>>              "virtio-rng-pci,rng=3Drng0",
+>>>              "-object",
+>>> diff --git a/tests/avocado/machine_aarch64_virt.py b/tests/avocado/mach=
+ine_aarch64_virt.py
+>>> index a90dc6ff4b..093d68f837 100644
+>>> --- a/tests/avocado/machine_aarch64_virt.py
+>>> +++ b/tests/avocado/machine_aarch64_virt.py
+>>> @@ -37,13 +37,13 @@ def test_alpine_virt_tcg_gic_max(self):
+>>>          :avocado: tags=3Dmachine:virt
+>>>          :avocado: tags=3Daccel:tcg
+>>>          """
+>>> -        iso_url =3D ('https://dl-cdn.alpinelinux.org/'
+>>> -                   'alpine/v3.17/releases/aarch64/'
+>>> -                   'alpine-standard-3.17.2-aarch64.iso')
+>>> +        iso_url =3D (
+>>> +            "https://dl-cdn.alpinelinux.org/"
+>>> +            "alpine/v3.17/releases/aarch64/alpine-standard-3.17.2-aarc=
+h64.iso"
+>>> +        )
+>>>=20=20
+>>> -        # Alpine use sha256 so I recalculated this myself
+>>> -        iso_sha1 =3D '76284fcd7b41fe899b0c2375ceb8470803eea839'
+>>> -        iso_path =3D self.fetch_asset(iso_url, asset_hash=3Diso_sha1)
+>>> +        iso_hash =3D "5a36304ecf039292082d92b48152a9ec21009d3a62f459de=
+623e19c4bd9dc027"
+>>> +        iso_path =3D self.fetch_asset(iso_url, algorithm=3D"sha256", a=
+sset_hash=3Diso_hash)
+>>>=20=20
+>>>          self.vm.set_console()
+>>>          kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
+>>> @@ -60,7 +60,7 @@ def test_alpine_virt_tcg_gic_max(self):
+>>>          self.vm.add_args("-smp", "2", "-m", "1024")
+>>>          self.vm.add_args('-bios', os.path.join(BUILD_DIR, 'pc-bios',
+>>>                                                 'edk2-aarch64-code.fd'))
+>>> -        self.vm.add_args("-drive", f"file=3D{iso_path},format=3Draw")
+>>> +        self.vm.add_args("-drive",
+>>>          f"file=3D{iso_path},readonly=3Don,format=3Draw")
+>>
+>> Perhaps we can set ",media=3Dcdrom" here.
+>>
 >
-> That was my original expectation too.  But, with nothing but the
-> following change:
+> Yes, but more importantly, adding both "readonly=3Don" and "media=3Dcdrom"
+> to the tests under machine_aarch64_sbsaref.py do the trick.  Now, the
+> behavior explained in my previous response still warrants investigation
+> IMO.
 >
-> diff --git a/tests/avocado/machine_aarch64_sbsaref.py b/tests/avocado/mac=
-hine_aarch64_sbsaref.py
-> index 528c7d2934..436da4b156 100644
-> --- a/tests/avocado/machine_aarch64_sbsaref.py
-> +++ b/tests/avocado/machine_aarch64_sbsaref.py
-> @@ -129,7 +129,7 @@ def boot_alpine_linux(self, cpu):
->              "-cpu",
->              cpu,
->              "-drive",
-> -            f"file=3D{iso_path},format=3Draw",
-> +            f"file=3D{iso_path},readonly=3Don,format=3Draw",
-
-               f"file=3D{iso_path},readonly=3Don,media=3Dcdrom,format=3Draw=
-",
-
-works (although possible the readonly is redundant in this case).
-
->              "-device",
->              "virtio-rng-pci,rng=3Drng0",
->              "-object",
->
-> We get:
->
-> 15:55:10 DEBUG| VM launch command: './qemu-system-aarch64 -display none -=
-vga none -chardev socket,id=3Dmon,fd=3D15 -mon chardev=3Dmon,mode=3Dcontrol=
- -machine sbsa-ref -
-> chardev socket,id=3Dconsole,fd=3D20 -serial chardev:console -cpu cortex-a=
-57 -drive if=3Dpflash,file=3D/home/cleber/avocado/job-results/job-2023-12-1=
-3T15.55-28ef2b5/test
-> -results/tmp_dirx8p5xzt4/1-tests_avocado_machine_aarch64_sbsaref.py_Aarch=
-64SbsarefMachine.test_sbsaref_alpine_linux_cortex_a57/SBSA_FLASH0.fd,format=
-=3Draw -drive=20
-> if=3Dpflash,file=3D/home/cleber/avocado/job-results/job-2023-12-13T15.55-=
-28ef2b5/test-results/tmp_dirx8p5xzt4/1-tests_avocado_machine_aarch64_sbsare=
-f.py_Aarch64Sbsa
-> refMachine.test_sbsaref_alpine_linux_cortex_a57/SBSA_FLASH1.fd,format=3Dr=
-aw -smp 1 -machine sbsa-ref -cpu cortex-a57 -drive file=3D/home/cleber/avoc=
-ado/data/cache/b
-> y_location/0154b7cd3a4f5e135299060c8cabbeec10b70b6d/alpine-standard-3.17.=
-2-aarch64.iso,readonly=3Don,format=3Draw -device virtio-rng-pci,rng=3Drng0 =
--object rng-random
-> ,id=3Drng0,filename=3D/dev/urandom'
->
-> Followed by:
->
-> 15:55:10 DEBUG| Failed to establish session:
->   | Traceback (most recent call last):
->   |   File "/home/cleber/src/qemu/python/qemu/qmp/protocol.py", line 425,=
- in _session_guard
->   |     await coro
->   |   File "/home/cleber/src/qemu/python/qemu/qmp/qmp_client.py", line 25=
-3, in _establish_session
->   |     await self._negotiate()
->   |   File "/home/cleber/src/qemu/python/qemu/qmp/qmp_client.py", line 30=
-5, in _negotiate
->   |     reply =3D await self._recv()
->   |             ^^^^^^^^^^^^^^^^^^
->   |   File "/home/cleber/src/qemu/python/qemu/qmp/protocol.py", line 1009=
-, in _recv
->   |     message =3D await self._do_recv()
->   |               ^^^^^^^^^^^^^^^^^^^^^
->   |   File "/home/cleber/src/qemu/python/qemu/qmp/qmp_client.py", line 40=
-2, in _do_recv
->   |     msg_bytes =3D await self._readline()
->   |                 ^^^^^^^^^^^^^^^^^^^^^^
->   |   File "/home/cleber/src/qemu/python/qemu/qmp/protocol.py", line 977,=
- in _readline
->   |     raise EOFError
->   | EOFError
->
-> With qemu-system-arch producing on stdout:
->
->    qemu-system-aarch64: Block node is read-only
->
-> Any ideas on the reason or cause?
->
-> Thanks,
+> Thanks
 > - Cleber.
 
 --=20
