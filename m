@@ -1,43 +1,43 @@
-Return-Path: <kvm+bounces-4443-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4444-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E03A68128E8
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 08:16:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3AD88128ED
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 08:16:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 952E41F21BB9
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 07:16:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E4B6281FCB
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 07:16:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF0D12E53;
-	Thu, 14 Dec 2023 07:15:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B718DDDC;
+	Thu, 14 Dec 2023 07:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M2Yjd8MA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N+c3+x94"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5DE125A9
-	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 07:15:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 123CCC433CA
-	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 07:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95F9FD26E
+	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 07:16:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 185EFC433CA
+	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 07:16:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702538157;
-	bh=3Ow67Spx5Bo857JGiFoPfcrSFEyQ50BCdTap7x52Z48=;
+	s=k20201202; t=1702538186;
+	bh=W4QHKZhIedZQ1cZMw+tK+Bry4CBdVBScjm1Qtop48/4=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=M2Yjd8MAVtKjAnk7MvEeqFRV03ARykIteq1F6gOD8ugXP8BmoWNpat0/2XSlgehU9
-	 r9QKfUuKy/sC2XDORezPNaEyf21aO3NdyHcsR6129YoVUTFNfPOTxaBuwUoIwEUQ9E
-	 Tyglf1ppz+1e/eT4mzc94l7y1BDfXU92vrYkvEeuv/Fi4OiXoRR7v3moUOYTl0qQJq
-	 oLymp1vWjH1L709gVAJjUoqRqx9vX/su3grxH4t139p5k2vj7pdVb8pbOSe2dkBact
-	 I+7+CxzSn5mzwt5FciUInIcjBa5wGYHZpgbAfIMTnhOei0LOOORVo7pm8j9WC7ZsjH
-	 RUsi31uQh04ew==
+	b=N+c3+x94vQqxRYGGIZwftdksEvn+A2K2XclnoQSLQ3ZlIvag/qbuXF2ByKavtk4XW
+	 WJSAtv4HT1p3vP1ryB0jRjRB+CAKx6BQXOYcq3RFkuK9VuVcbo2JiKQv1fnV0JCzoa
+	 epKg8TJCSHFRzxQv1TaZMI0Y1iLZnlXGsvEHftSBYZXzKQJ7Niup2TEAb6s3mjPMJj
+	 2/69SMqpFzl/E/jlQtk3SmVN1okCrf+AL842sAkLbrl5wVCHllKcE6+7gzHggmtGr4
+	 pdsU5NZwTnBNVKQipUgRioBA6cCOzEvttSieMdBsH9fbZkq0mggDN7aEKTv43H1lWV
+	 Anue+P/azLUAw==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 02A7CC53BD1; Thu, 14 Dec 2023 07:15:57 +0000 (UTC)
+	id 08605C53BD1; Thu, 14 Dec 2023 07:16:26 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: kvm@vger.kernel.org
 Subject: [Bug 218259] High latency in KVM guests
-Date: Thu, 14 Dec 2023 07:15:56 +0000
+Date: Thu, 14 Dec 2023 07:16:25 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -53,7 +53,7 @@ X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-218259-28872-ddCGmuIKJg@https.bugzilla.kernel.org/>
+Message-ID: <bug-218259-28872-fud6TikVgw@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-218259-28872@https.bugzilla.kernel.org/>
 References: <bug-218259-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,10 +69,10 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D218259
 
---- Comment #3 from Joern Heissler (kernelbugs2012@joern-heissler.de) ---
-Created attachment 305596
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D305596&action=3Dedit
-dmesg
+--- Comment #4 from Joern Heissler (kernelbugs2012@joern-heissler.de) ---
+Created attachment 305597
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D305597&action=3Dedit
+lspci -v
 
 --=20
 You may reply to this email to add a comment.
