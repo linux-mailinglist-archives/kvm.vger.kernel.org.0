@@ -1,208 +1,370 @@
-Return-Path: <kvm+bounces-4432-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4433-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24765812726
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 06:52:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7B8581278A
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 07:03:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3643B20E36
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 05:52:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02FA01C2145D
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 06:03:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7678836;
-	Thu, 14 Dec 2023 05:52:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CC3B8C07;
+	Thu, 14 Dec 2023 06:03:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d4FL69sW"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="EYzBOEyq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FD78BD
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 21:52:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702533145; x=1734069145;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=EgTf9gEDy6NnQ0lLIZiTnP8wYrpf4NDfEHg6s61/psY=;
-  b=d4FL69sWsv1yXdndnqKvJyI5OGRKH05n3tj5Z/mNleQGqjP2mRre2Lbr
-   VvCBYwtJ0Tojs+04fNbrQvkwG3jD/9EMbg7DbjZ5rV5brb0r+htgjxm0o
-   e14au0bXycSGloNqB9LrtT81OQs/4EqDjjHcwYpU5DTAi7y+vV/k8agXJ
-   SiauzbnKizmoYvK79Y35LhiNR9v/nmNpxIBL9A2W8RjInaUx3UTgT+B8s
-   tE0my1AvCiny8gIGTWF6O81ocnN9xJ840IxpYvqble8pcQF+Ej6XxRymn
-   2+gJ8cOF0fh94/niZY/wxvCn193ls/2Gu/C0T9HW3ae7n4hVe3cpoDSJ8
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10923"; a="2226339"
-X-IronPort-AV: E=Sophos;i="6.04,274,1695711600"; 
-   d="scan'208";a="2226339"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 21:52:25 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10923"; a="750398668"
-X-IronPort-AV: E=Sophos;i="6.04,274,1695711600"; 
-   d="scan'208";a="750398668"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Dec 2023 21:52:24 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 13 Dec 2023 21:52:23 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 13 Dec 2023 21:52:23 -0800
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 13 Dec 2023 21:52:22 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gSZhWJIIAjqsl3PZp63e8FRYtyroI4wIWOiCfKdQWHePF+PGsKsZrhSB+yzcqUyc2lr2n821XSbyHjjRsy1VLysDldtJKFykxSWib0qg1hjEocvuCCbd0SPrVP/h/jg9hGmbWJGVhekPhFCn1DK0A2ShXqk3dc2+xvKM4fARuXIejii3DcxCvM2gfdfLc9HYZ0e0ZCd88Yi7M9+klh8HtCr4A3ITSQw0nSvd+6KJwHxlsK4ss1aqOrROtjMxiGxFKVZePdhJCXyKETF+RNqlWylI4Lky88qL9ocqQmXLlI0AFZbx/oRdyV4GuTTtm3oLmFotgLmUGbk0qjp4rbn4Ew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XMJD4eghlyEHnkSUA+k4DNJLQCTz5jZo4yPL+JIItoE=;
- b=fG4iErVPUvm1bwn2vQ3QYxBgJbG564VMtrTRQbTJn8MHvF74dAKYeNIJ4+riO1p5rofSbxlCyyPal7KFY5lKYbDzx9q0KGNwVEtpPMMarcTfke1CiL7Naum6mPTfco6jVRIgMQrn5F0NnRvUJBy0ubjIiOka3FJHceQcacsPR0GIgWjQxU6AhqCnr+IovzOsjcJEQENuHS6hmPrX3gZKQI9QTWrRoHuycin/vNAwRLa0etQub1qUQaUdSsjmR9QdYNE5mtlmAxiQoFzZ8Z4Ouv/PHlhSiIZnaG5Cxzttkkb/6Y9fsP8kFJ9XGoeHK7Pf5jDpiRkSsg+vC5cVQBSzyg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by CH0PR11MB5428.namprd11.prod.outlook.com (2603:10b6:610:d3::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28; Thu, 14 Dec
- 2023 05:52:15 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a%3]) with mapi id 15.20.7091.028; Thu, 14 Dec 2023
- 05:52:15 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>, Yishai Hadas
-	<yishaih@nvidia.com>
-CC: "jgg@nvidia.com" <jgg@nvidia.com>, "mst@redhat.com" <mst@redhat.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"virtualization@lists.linux-foundation.org"
-	<virtualization@lists.linux-foundation.org>, "parav@nvidia.com"
-	<parav@nvidia.com>, "feliu@nvidia.com" <feliu@nvidia.com>, "jiri@nvidia.com"
-	<jiri@nvidia.com>, "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-	"si-wei.liu@oracle.com" <si-wei.liu@oracle.com>, "leonro@nvidia.com"
-	<leonro@nvidia.com>, "maorg@nvidia.com" <maorg@nvidia.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>
-Subject: RE: [PATCH V7 vfio 9/9] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Thread-Topic: [PATCH V7 vfio 9/9] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Thread-Index: AQHaKPhWxx9HXujfsUi0tG4mXIDTXLCm0VsQgABbiACAAIWxAIAAnryg
-Date: Thu, 14 Dec 2023 05:52:15 +0000
-Message-ID: <BN9PR11MB52762A39B525CBEBB8E89B638C8CA@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20231207102820.74820-1-yishaih@nvidia.com>
-	<20231207102820.74820-10-yishaih@nvidia.com>
-	<BN9PR11MB5276C9276E78C66B0C5DA9088C8DA@BN9PR11MB5276.namprd11.prod.outlook.com>
-	<fc4a3133-0233-4843-a4e4-ad86e5b91b3d@nvidia.com>
- <20231213132340.4f692bd0.alex.williamson@redhat.com>
-In-Reply-To: <20231213132340.4f692bd0.alex.williamson@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|CH0PR11MB5428:EE_
-x-ms-office365-filtering-correlation-id: da10d798-fc2c-4862-49ad-08dbfc68d373
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Rp7SeMfQI1vX2wzR9YlN9VQAIEQBq2UcwRuVD/wn1mkwlpoFpqpMbQhPPlkW+g4kT3NCD1e3qta9sy1XmIGnMrCSAwwbZSg0vD0K82aENuYvmknxnfmkAoykECV2yadmLClxk8aqroIRhHe9tqLoeEDj1i53iyJe6Y1SkNvFPCPXmzZkTj99OM6NAmTvjqiejo8YmuvEToNaDVIiCEvrnxVCIhtORwrLKS7rEZgjkFmb2xZlrenS6hmGcJY8Q6+qinWGzBZ2IdoknDHmNJy7Dv5jJSuaE+QdgU3dUhn8eLsjKKG1e3X8srlKlLHUq0TjOnQYQOdcBqYiedjBqpMmUglk6BJNZpc6uS0JGZJmme60affot+Zh5PN+BC66e8IUFexhf65IFzM1aXuO1xVp743TFZmKwsQ5IS/GG+ZuWiwD+JPKsrmFc/hpWANxs4rVHv6BdsMKuPJVboOCu4VCPbaKNCimjEoSLdFOYio8Iq6Mf/fQBW0Iya1f0PofGCjkBo3v/o6NV9Zq5g9H9Jfa/0XlsXMYsarORBHyKnbzAIdv53hIwyG1kWu2pm4CyZQe1zRDqSRaRA3+nWpb13uveyKAnBG3+as4zOWZ/vleJHL5+PSIb9Fj+xQ2zPSmrvhj
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(376002)(136003)(366004)(396003)(230922051799003)(186009)(451199024)(1800799012)(64100799003)(52536014)(55016003)(478600001)(5660300002)(7416002)(71200400001)(2906002)(82960400001)(9686003)(7696005)(6506007)(26005)(86362001)(110136005)(54906003)(76116006)(66446008)(316002)(64756008)(33656002)(66556008)(66476007)(66946007)(4326008)(8676002)(8936002)(41300700001)(122000001)(83380400001)(38070700009)(38100700002)(53546011);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?NwVWvI0gE+A69ptqUzV26K+tzK8Pt20DFX39lNVXxewd/guatsR+2zGAYb6z?=
- =?us-ascii?Q?YsZqiYiCpbMev3CA5HFfRKge2WiNsdykX3batoR1gDB5P3OXJEoBPTCeMV1F?=
- =?us-ascii?Q?GdzPjKSnfLHGEgw1jXNx2sQi2UYtBpLN88YffiXdPzS1uLxGBwJcSDB7Alyd?=
- =?us-ascii?Q?Q363ykWWhlzDQdWpYuN9SNW2baLkXaAPhP7Jtgz0rBryWTgL1f3m/fRT9ilB?=
- =?us-ascii?Q?VKlx6Sz2UdFFj+WtUJuF2aVE6Jh130y8qTr6nIgHnbdzd77m5hdZe+Bby9XC?=
- =?us-ascii?Q?66EBWPXKJSjaFAfI7WslhwaUKpqvsJfexFwCxWKPpscY31QAx2/sLdp1yuQD?=
- =?us-ascii?Q?LO2L5YmQNfk2MQsTEvuphTEOMWZzuepsK4Bx8mTfuArLHL7ps4OhwnufBhpV?=
- =?us-ascii?Q?jry+twC4h4F9QK/nFjOCCh74HTDEZILMqdgcCzwfwRh7vhhjYAuIQza3XRgX?=
- =?us-ascii?Q?lqWbu9w2xwtq3p3IBv2NApnMiTerdkfEXBrwD8XN/ria5KSvd+tyMyxI0E0/?=
- =?us-ascii?Q?60IcB+Z4vY9QtW6TGo7bOOmXE4bjCTA15hrjE2H56omvGZHpY0wwK6cj7rTi?=
- =?us-ascii?Q?yrp5XlC+qHDeCO0kYtOxoRXyxq6HOCnX9ExpyEOv378jSP0IWfs4Yxrbqaoy?=
- =?us-ascii?Q?BLYHBPnBRV8cWaK/qI8qG0F7TkP0pnb+4+Vz/gpFF9cFqOxA7UWYHxxrBG7N?=
- =?us-ascii?Q?h9QQZmtcH9e0L2FEnHizL2+SYxNVn4RSTTgzj04khVB1ydX4dckSFobvIY7v?=
- =?us-ascii?Q?PeLnpPYnlzbRUzjTWRgdUqy6Z9oFAWoWvj0AnnXh6RH019q+JYA3l56g8wFT?=
- =?us-ascii?Q?h/rIYNIG1ANZJ6j68l5dBm5pfIu+Gaas3lcTR61EIhzw6FoN5oEEeDedEKGI?=
- =?us-ascii?Q?ZJXFvO+XYYk75sKLj8pAT9ZChlSFreSq9ykB+nkK3g4K1rEf4VtYYZZjzLMD?=
- =?us-ascii?Q?6cKbKfUdQSC6rihd0+BiKifgz7UIgeUvqAeorJikG/LAJESCi0bVWajh63FL?=
- =?us-ascii?Q?3Crmf3BqxvyWH4YhCZfxo17QmurmmrpP8jMqz8Avmk+1xRUb5OEZNB7aFXac?=
- =?us-ascii?Q?yYkIiKTrfh9BvoB0gFYPopJGB1ChxzbYydBPUc98R5ZnRaa36eeFxZWbdNTW?=
- =?us-ascii?Q?O2wrzKfAo2ti3UiWdCBoXBC0oM4RiuBIbW8BLZHCpRoQhbLzVtQkDqMptgV5?=
- =?us-ascii?Q?CoL25DsSijAmP32nRugNRaKqdvV+UXsNfi2rOK7bZP9Y6TlAO9QftBTdmh0w?=
- =?us-ascii?Q?gv8+BUPHz8nUNgDyXLln49Jb7MWFTDq0eydKW45O1HEOyvpQ0SaIkuAQxCDd?=
- =?us-ascii?Q?3mrfo9RHhNY+ekiR/9F36uXgch9qe+2Wkyyg68R3lpcK1vZaxETtQ+GkF9TE?=
- =?us-ascii?Q?7R6ImiVioKV4FllQv55mv7ZueKgCcpwzoqxB4DyJAB4gIkYU/m75lK99PUE0?=
- =?us-ascii?Q?nA9CMuWBdLAfrSBp+Efb4M9fRThW2yjv4bPDmBEWnRhRxUuJaZrzGDUulwcj?=
- =?us-ascii?Q?Dl1iO/RsmNanrcjpjFNEOeC7rDq1xKb7KJ3dNXEbrA2nmvM+05Md7V9G3F3X?=
- =?us-ascii?Q?grZOXh1aFdJhpASJoCWWUTKMy9+0lJR7PCjDH2C9?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68948198C
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 22:02:47 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1d098b87eeeso69910205ad.0
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 22:02:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1702533767; x=1703138567; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rR88+KJ4oetYgNJPPfLxYGb3zN8cHiA15JFTdJl3Cf4=;
+        b=EYzBOEyqOU2OeUHkT0F0MAJeYrxovJZes3YbwZ8yE89ghw1axwSVwBud02jKXET/CM
+         f4iO3xgPngtKp4HPOHqoDhv8ogNvYem25PHWKB/CBWn/MK17LdLOhDyefRlW2Fbgi6rs
+         qv7iTm1+WBrUEGpYjcvSyRVq8EL6BbSn7l1O/1is5N6EWCu/ti9546YuDJpsTYRSb5A9
+         n2DovChO3B+c5TWpY58d+Hwz+U0QNhOVGECzbjDTv96SOkuOAQUO744miTrhYwjrDk64
+         RCJmWsH2up6A+YvEcTZVqhQtQo5RxhIt5omaRIfESGDdxjFCArCJyxC563bb9NGIML/k
+         JmHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702533767; x=1703138567;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rR88+KJ4oetYgNJPPfLxYGb3zN8cHiA15JFTdJl3Cf4=;
+        b=Jmj9Hqhln8DYF2CAVAzvNGEd5Yu6PHmI02sh7O5Gho+Lk+GOoMHRiMnpGC/ALUMOEk
+         NpZlfTNXsRjpmYNBqrOcMw4+bay5CD2tNcLnDmVjCI3D+pWXv8204sjMqIs7qWCr5rms
+         vNsbX4jllvWthbpM/lbSMxGNKG4BVld33fhRvWOgC5tNkoi5P9iseqQjBfeDQ6xD4ICq
+         Y9nyZGz1QKTNEia/BvGBmjuJajqXGJQEG1L4/J/2Ti9W7CrzGq/LHTCosbUpfHSItlHu
+         1ZBLKnn5IBeHq5xOqug3Xk+Rlx7UZ1wDYw43KjItfT4nr53vV0wGN2KkJ9+SYhbE24MI
+         FDqw==
+X-Gm-Message-State: AOJu0Yz0KIEt1FsBHyQRQql5f+ErKTmZO4RuoeLP7baZkQwKBQ5LY58G
+	xNktpmU/fsEhf4BznIgFDdsk1NH/EMR9t1rdrSmhiQ==
+X-Google-Smtp-Source: AGHT+IHApeJ6ArYXy3rl2+lkJnBjQtf5ZPUukPygJf2EkLx2G75ff0WSU5JG6Xt465dG74MxwoWECoutji/AYS76NKE=
+X-Received: by 2002:a17:90b:3692:b0:28a:ee4d:20e4 with SMTP id
+ mj18-20020a17090b369200b0028aee4d20e4mr1197143pjb.87.1702533766622; Wed, 13
+ Dec 2023 22:02:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: da10d798-fc2c-4862-49ad-08dbfc68d373
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Dec 2023 05:52:15.7127
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: HC+/TEd51R2OIu4SN1joBweF+Bi0gFgms1Bl6T2EXhUCi4uUoMBYeiw9NuAl7iYuI18ksYKwyckDgW4ANLP2Yg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5428
-X-OriginatorOrg: intel.com
+References: <20230916003118.2540661-1-seanjc@google.com> <20230916003118.2540661-16-seanjc@google.com>
+In-Reply-To: <20230916003118.2540661-16-seanjc@google.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Thu, 14 Dec 2023 11:32:35 +0530
+Message-ID: <CAAhSdy2aW0vUsaA_sVKROv8tr9ixuY+RZQt6XFs86bzy++AegA@mail.gmail.com>
+Subject: Re: [PATCH 15/26] KVM: Move include/kvm/iodev.h to include/linux as kvm_iodev.h
+To: Sean Christopherson <seanjc@google.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Tony Krowiak <akrowiak@linux.ibm.com>, 
+	Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>, 
+	Harald Freudenberger <freude@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, 
+	Andy Lutomirski <luto@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	Anish Ghulati <aghulati@google.com>, Venkatesh Srinivas <venkateshs@chromium.org>, 
+	Andrew Thornton <andrewth@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> From: Alex Williamson <alex.williamson@redhat.com>
-> Sent: Thursday, December 14, 2023 4:24 AM
->=20
-> On Wed, 13 Dec 2023 14:25:10 +0200
-> Yishai Hadas <yishaih@nvidia.com> wrote:
->=20
-> > On 13/12/2023 10:23, Tian, Kevin wrote:
->=20
-> > >> +
-> > >> +static int virtiovf_pci_probe(struct pci_dev *pdev,
-> > >> +			      const struct pci_device_id *id)
-> > >> +{
-> > >> +	const struct vfio_device_ops *ops =3D &virtiovf_vfio_pci_ops;
-> > >> +	struct virtiovf_pci_core_device *virtvdev;
-> > >> +	int ret;
-> > >> +
-> > >> +	if (pdev->is_virtfn && virtio_pci_admin_has_legacy_io(pdev) &&
-> > >> +	    !virtiovf_bar0_exists(pdev))
-> > >> +		ops =3D &virtiovf_vfio_pci_tran_ops;
-> > >
-> > > I have a confusion here.
-> > >
-> > > why do we want to allow this driver binding to non-matching VF or
-> > > even PF?
-> >
-> > The intention is to allow the binding of any virtio-net device (i.e. PF=
-,
-> > VF which is not transitional capable) to have a single driver over VFIO
-> > for all virtio-net devices.
-> >
-> > This enables any user space application to bind and use any virtio-net
-> > device without the need to care.
-> >
-> > In case the device is not transitional capable, it will simply use the
-> > generic vfio functionality.
->=20
-> The algorithm we've suggested for finding the most appropriate variant
-> driver for the device doesn't include a step of moving on to another
-> driver if the binding fails.  We lose determinism at that point.
-> Therefore this driver needs to handle all devices matching the id table.
-> The fact that virtio dictates various config space fields limits our
-> ability to refine the match from the id table. Thanks,
->=20
+On Sat, Sep 16, 2023 at 6:01=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> Move iodev.h, the last remaining holdout in include/kvm, to the standard
+> include/linux directory as kvm_iodev.h and delete include/kvm.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-OK, that makes sense.
+For KVM RISC-V:
+Acked-by: Anup Patel <anup@brainfault.org>
+
+Regards,
+Anup
+
+> ---
+>  MAINTAINERS                                | 1 -
+>  arch/arm64/include/asm/kvm_vgic.h          | 2 +-
+>  arch/arm64/kvm/vgic/vgic-mmio-v2.c         | 2 +-
+>  arch/arm64/kvm/vgic/vgic-mmio-v3.c         | 2 +-
+>  arch/arm64/kvm/vgic/vgic-mmio.c            | 2 +-
+>  arch/mips/include/asm/kvm_host.h           | 3 +--
+>  arch/powerpc/kvm/mpic.c                    | 2 +-
+>  arch/riscv/kvm/aia_aplic.c                 | 2 +-
+>  arch/riscv/kvm/aia_imsic.c                 | 2 +-
+>  arch/x86/kvm/i8254.h                       | 2 +-
+>  arch/x86/kvm/ioapic.h                      | 2 +-
+>  arch/x86/kvm/irq.h                         | 2 +-
+>  arch/x86/kvm/lapic.h                       | 2 +-
+>  include/{kvm/iodev.h =3D> linux/kvm_iodev.h} | 0
+>  virt/kvm/coalesced_mmio.c                  | 3 +--
+>  virt/kvm/eventfd.c                         | 2 +-
+>  virt/kvm/kvm_main.c                        | 3 +--
+>  17 files changed, 15 insertions(+), 19 deletions(-)
+>  rename include/{kvm/iodev.h =3D> linux/kvm_iodev.h} (100%)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 90f13281d297..ddc8375d536c 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -11498,7 +11498,6 @@ W:      http://www.linux-kvm.org
+>  T:     git git://git.kernel.org/pub/scm/virt/kvm/kvm.git
+>  F:     Documentation/virt/kvm/
+>  F:     include/asm-generic/kvm*
+> -F:     include/kvm/iodev.h
+>  F:     include/linux/kvm*
+>  F:     include/trace/events/kvm.h
+>  F:     include/uapi/asm-generic/kvm*
+> diff --git a/arch/arm64/include/asm/kvm_vgic.h b/arch/arm64/include/asm/k=
+vm_vgic.h
+> index 5b27f94d4fad..2ca52888bc75 100644
+> --- a/arch/arm64/include/asm/kvm_vgic.h
+> +++ b/arch/arm64/include/asm/kvm_vgic.h
+> @@ -13,7 +13,7 @@
+>  #include <linux/spinlock.h>
+>  #include <linux/static_key.h>
+>  #include <linux/types.h>
+> -#include <kvm/iodev.h>
+> +#include <linux/kvm_iodev.h>
+>  #include <linux/list.h>
+>  #include <linux/jump_label.h>
+>
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgi=
+c-mmio-v2.c
+> index bba0cfeefffe..646053ee892f 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
+> @@ -6,9 +6,9 @@
+>  #include <linux/irqchip/arm-gic.h>
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
+> +#include <linux/kvm_iodev.h>
+>  #include <linux/nospec.h>
+>
+> -#include <kvm/iodev.h>
+>  #include <asm/kvm_vgic.h>
+>
+>  #include "vgic.h"
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgi=
+c-mmio-v3.c
+> index d54a90beef61..b79a2e860415 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> @@ -7,8 +7,8 @@
+>  #include <linux/irqchip/arm-gic-v3.h>
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
+> +#include <linux/kvm_iodev.h>
+>  #include <linux/interrupt.h>
+> -#include <kvm/iodev.h>
+>
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/kvm_arm.h>
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-m=
+mio.c
+> index 68a3d8062473..4feca3b1d915 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+> @@ -9,7 +9,7 @@
+>  #include <linux/irq.h>
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
+> -#include <kvm/iodev.h>
+> +#include <linux/kvm_iodev.h>
+>  #include <asm/kvm_arch_timer.h>
+>  #include <asm/kvm_vgic.h>
+>
+> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm=
+_host.h
+> index 54a85f1d4f2c..f8f63d0aa399 100644
+> --- a/arch/mips/include/asm/kvm_host.h
+> +++ b/arch/mips/include/asm/kvm_host.h
+> @@ -16,6 +16,7 @@
+>  #include <linux/interrupt.h>
+>  #include <linux/types.h>
+>  #include <linux/kvm.h>
+> +#include <linux/kvm_iodev.h>
+>  #include <linux/kvm_types.h>
+>  #include <linux/threads.h>
+>  #include <linux/spinlock.h>
+> @@ -24,8 +25,6 @@
+>  #include <asm/inst.h>
+>  #include <asm/mipsregs.h>
+>
+> -#include <kvm/iodev.h>
+> -
+>  /* MIPS KVM register ids */
+>  #define MIPS_CP0_32(_R, _S)                                    \
+>         (KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U32 | (8 * (_R) + (_S)))
+> diff --git a/arch/powerpc/kvm/mpic.c b/arch/powerpc/kvm/mpic.c
+> index 23e9c2bd9f27..b25a03251544 100644
+> --- a/arch/powerpc/kvm/mpic.c
+> +++ b/arch/powerpc/kvm/mpic.c
+> @@ -26,6 +26,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/mutex.h>
+>  #include <linux/kvm_host.h>
+> +#include <linux/kvm_iodev.h>
+>  #include <linux/errno.h>
+>  #include <linux/fs.h>
+>  #include <linux/anon_inodes.h>
+> @@ -33,7 +34,6 @@
+>  #include <asm/mpic.h>
+>  #include <asm/kvm_para.h>
+>  #include <asm/kvm_ppc.h>
+> -#include <kvm/iodev.h>
+>
+>  #define MAX_CPU     32
+>  #define MAX_SRC     256
+> diff --git a/arch/riscv/kvm/aia_aplic.c b/arch/riscv/kvm/aia_aplic.c
+> index 39e72aa016a4..b49e747f2bad 100644
+> --- a/arch/riscv/kvm/aia_aplic.c
+> +++ b/arch/riscv/kvm/aia_aplic.c
+> @@ -11,7 +11,7 @@
+>  #include <linux/math.h>
+>  #include <linux/spinlock.h>
+>  #include <linux/swab.h>
+> -#include <kvm/iodev.h>
+> +#include <linux/kvm_iodev.h>
+>  #include <asm/kvm_aia_aplic.h>
+>
+>  struct aplic_irq {
+> diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
+> index 6cf23b8adb71..586e466a1c6d 100644
+> --- a/arch/riscv/kvm/aia_imsic.c
+> +++ b/arch/riscv/kvm/aia_imsic.c
+> @@ -10,10 +10,10 @@
+>  #include <linux/atomic.h>
+>  #include <linux/bitmap.h>
+>  #include <linux/kvm_host.h>
+> +#include <linux/kvm_iodev.h>
+>  #include <linux/math.h>
+>  #include <linux/spinlock.h>
+>  #include <linux/swab.h>
+> -#include <kvm/iodev.h>
+>  #include <asm/csr.h>
+>  #include <asm/kvm_aia_imsic.h>
+>
+> diff --git a/arch/x86/kvm/i8254.h b/arch/x86/kvm/i8254.h
+> index a768212ba821..4de7a0b88e4f 100644
+> --- a/arch/x86/kvm/i8254.h
+> +++ b/arch/x86/kvm/i8254.h
+> @@ -4,7 +4,7 @@
+>
+>  #include <linux/kthread.h>
+>
+> -#include <kvm/iodev.h>
+> +#include <linux/kvm_iodev.h>
+>
+>  struct kvm_kpit_channel_state {
+>         u32 count; /* can be 65536 */
+> diff --git a/arch/x86/kvm/ioapic.h b/arch/x86/kvm/ioapic.h
+> index 539333ac4b38..2beec2daf1a3 100644
+> --- a/arch/x86/kvm/ioapic.h
+> +++ b/arch/x86/kvm/ioapic.h
+> @@ -3,7 +3,7 @@
+>  #define __KVM_IO_APIC_H
+>
+>  #include <linux/kvm_host.h>
+> -#include <kvm/iodev.h>
+> +#include <linux/kvm_iodev.h>
+>  #include "irq.h"
+>
+>  struct kvm;
+> diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
+> index c2d7cfe82d00..f9530e9a66f8 100644
+> --- a/arch/x86/kvm/irq.h
+> +++ b/arch/x86/kvm/irq.h
+> @@ -13,9 +13,9 @@
+>  #include <linux/mm_types.h>
+>  #include <linux/hrtimer.h>
+>  #include <linux/kvm_host.h>
+> +#include <linux/kvm_iodev.h>
+>  #include <linux/spinlock.h>
+>
+> -#include <kvm/iodev.h>
+>  #include "lapic.h"
+>
+>  #define PIC_NUM_PINS 16
+> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+> index 0a0ea4b5dd8c..bfd99ad1882e 100644
+> --- a/arch/x86/kvm/lapic.h
+> +++ b/arch/x86/kvm/lapic.h
+> @@ -2,7 +2,7 @@
+>  #ifndef __KVM_X86_LAPIC_H
+>  #define __KVM_X86_LAPIC_H
+>
+> -#include <kvm/iodev.h>
+> +#include <linux/kvm_iodev.h>
+>
+>  #include <linux/kvm_host.h>
+>
+> diff --git a/include/kvm/iodev.h b/include/linux/kvm_iodev.h
+> similarity index 100%
+> rename from include/kvm/iodev.h
+> rename to include/linux/kvm_iodev.h
+> diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
+> index 1b90acb6e3fe..cfcb4b84d632 100644
+> --- a/virt/kvm/coalesced_mmio.c
+> +++ b/virt/kvm/coalesced_mmio.c
+> @@ -9,8 +9,7 @@
+>   *
+>   */
+>
+> -#include <kvm/iodev.h>
+> -
+> +#include <linux/kvm_iodev.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/slab.h>
+>  #include <linux/kvm.h>
+> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+> index 89912a17f5d5..4d7cfb1095fd 100644
+> --- a/virt/kvm/eventfd.c
+> +++ b/virt/kvm/eventfd.c
+> @@ -26,7 +26,7 @@
+>  #include <linux/irqbypass.h>
+>  #include <trace/events/kvm.h>
+>
+> -#include <kvm/iodev.h>
+> +#include <linux/kvm_iodev.h>
+>
+>  #ifdef CONFIG_HAVE_KVM_IRQFD
+>
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 486800a7024b..f585a159b4f5 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -13,9 +13,8 @@
+>   *   Yaniv Kamay  <yaniv@qumranet.com>
+>   */
+>
+> -#include <kvm/iodev.h>
+> -
+>  #include <linux/kvm_host.h>
+> +#include <linux/kvm_iodev.h>
+>  #include <linux/kvm.h>
+>  #include <linux/module.h>
+>  #include <linux/errno.h>
+> --
+> 2.42.0.459.ge4e396fd5e-goog
+>
 
