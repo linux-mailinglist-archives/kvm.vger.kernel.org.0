@@ -1,172 +1,172 @@
-Return-Path: <kvm+bounces-4446-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4447-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BFB08129C1
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 08:52:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3886812A9B
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 09:46:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFBEA28227A
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 07:52:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34F5E28133E
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 08:46:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3ED514AAC;
-	Thu, 14 Dec 2023 07:52:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EADF72421D;
+	Thu, 14 Dec 2023 08:45:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="VHpq9mfZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N8xrOQDc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C143EA7
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 23:52:39 -0800 (PST)
-Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-336437ae847so874003f8f.2
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 23:52:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1702540358; x=1703145158; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kKmbX2YPpXuRY6IHo6cBzkg+NMrJJvxaEEC8NjKnxGY=;
-        b=VHpq9mfZE1XYZzd6nMuutgRxkVQCDOjfnRS8Qzh0Qg4TY8VxWWoVDC512DViv5Bou/
-         5HKtEfAcLLqMLqWL6PvsU0uO3y5rGc7M+2+3YLlSAS1U19Hh3livL5cY7J/W5WL0XcRo
-         yH03VvPRltYaLlt9K77DMSZ6Ilkg0zS4rI6YsSDX7cQBC2mGkJq+SjGGX4LcwRtO72TK
-         eIz9HfIM6uO4sErEee0gvmsrP3/7uuknBz1Y2UWtkvy5JGjQ7Z6ty57FYe7yAjcPxkD7
-         nAgyiBHm2avZlpsDhqHc925u70+dQJ6ASppqtVvfN9QH6jVaCsTYqFyUUnJ8Hx+KOM3A
-         CgUw==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4261B116
+	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 00:45:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702543542;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uecrAR2SvWDsLJrH3uSpDFiFSpzellwPNoFaP7Q0oHU=;
+	b=N8xrOQDcZ9Od6WUoOj9he4irq+RLKGUXhgdgJTI/2elcM576OMBNLpWMbfeRQYg8zNhSb9
+	Ub9JiREyfEKPAYwQxqiK6lzpJCBQNAja0EqtBAKMJ9JffXxw64Si3a3Cc+Dam+dg1jBzsc
+	yo7ilL0MbdjmBrSo+LaIwd97Eop6YCA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-523-EwfkhP7XM2yU7HyBw5kV3A-1; Thu, 14 Dec 2023 03:45:39 -0500
+X-MC-Unique: EwfkhP7XM2yU7HyBw5kV3A-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40c4a824c4bso26750155e9.2
+        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 00:45:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702540358; x=1703145158;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kKmbX2YPpXuRY6IHo6cBzkg+NMrJJvxaEEC8NjKnxGY=;
-        b=lTLyA5kqxWXo0K2b6AHgjsBS2PzcDN9PZ0xr4wRZvw+cbCDucWJpujJ4G7ht/21Ny+
-         Q9DsnGit6mHNdyqYCvpp7AEtfKDCYKd3DdZoUH0BBbLVSg7qpWlPF6tgzRvs1JYLwrdF
-         /r1uZpwuE0c2bv1SGRSOy38cDOw2owcwOZtfeljyUY4oFMnchsOrz/bVskeLILOFXKCC
-         M+LoSwIFwW29QG1trlGs6VK5W7vkZJvhE+wpz5d6+4LsnOReJ1Ber5/hI2ipWI6pnvoh
-         GZiKvxbwdViBQhkqCmLibbzfHTobaDwp5x9CKD6u+UX+OXC+iuKrE1JxpCU2biwevhMn
-         Xf7g==
-X-Gm-Message-State: AOJu0Yw2hfY47lJ8A2a3Fu1xPuPHp8beX4J+gM2FYmoMdgQx/dKBMdGO
-	3PgIreIHqyjHqkTO4i6QaxGKQQ==
-X-Google-Smtp-Source: AGHT+IEcg4w5zPjg1p98QCYf6W1xFs9iv4IikObE4ZRhGgbZ28NqkIVLjUjAV+O24f828odOwuc64g==
-X-Received: by 2002:a05:6000:4c6:b0:333:1c97:48c4 with SMTP id h6-20020a05600004c600b003331c9748c4mr4411047wri.7.1702540357383;
-        Wed, 13 Dec 2023 23:52:37 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id x14-20020adfdd8e000000b0033630da3528sm5702110wrl.25.2023.12.13.23.52.36
+        d=1e100.net; s=20230601; t=1702543538; x=1703148338;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uecrAR2SvWDsLJrH3uSpDFiFSpzellwPNoFaP7Q0oHU=;
+        b=JuR3OC5arLYi2OkGn7okjLmuO03N+YJamXKpJVshtBcwW8Q3Kn3VLvyhGiAPK+0mX0
+         GH3VHQs8JEfv5T/evhMb3oN5Z2lOLGbRWTh4YPk64vFYVYX4msfCdjU7EiXzF7+FwkOG
+         aV0u0r9NwyLmGzmyw2Px3Kv1LaDG/4P58AU+Zs0FJdhbhHfBfzMM9M3XoDzg5j3UJMDz
+         hjyM1tV1mtdSsRp+6HzgmDoAcJq0c4ihYVDV/4MRXsA6L2sfcTG16HZOmSKUQSysLc+p
+         rc2pSM/AFJ+j8WtrgNCypTIK26zjHKiG4E7ebAJF82ruYKytwB0HctI+DTZQzNKhShbz
+         zNYw==
+X-Gm-Message-State: AOJu0YyxxrTL8dlFIPIE8J/IaSUme0ItbFDjT6vjj6tu2uXdV0yWf5+q
+	vEFJB/3Lp4PGtemy2sEZBbC2BbLqBwc8Wcm4Dmn8bjp+mnaMgKgdsS1H5qFGjR6O/s7Zq7CyMsH
+	EBWLG2W1PvZbf
+X-Received: by 2002:a05:600c:246:b0:409:637b:890d with SMTP id 6-20020a05600c024600b00409637b890dmr4662198wmj.2.1702543538706;
+        Thu, 14 Dec 2023 00:45:38 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEd9LpPd9LlR4EdQvDKYuR630GgNDCt0NG+pjD6dcylIDtVJwCEubGxS9oHa85KaPw5yjKlKA==
+X-Received: by 2002:a05:600c:246:b0:409:637b:890d with SMTP id 6-20020a05600c024600b00409637b890dmr4662193wmj.2.1702543538360;
+        Thu, 14 Dec 2023 00:45:38 -0800 (PST)
+Received: from sgarzare-redhat ([5.11.101.217])
+        by smtp.gmail.com with ESMTPSA id dd14-20020a0560001e8e00b003364277e714sm2802139wrb.89.2023.12.14.00.45.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 23:52:36 -0800 (PST)
-Date: Thu, 14 Dec 2023 08:52:35 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-Cc: kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, anup@brainfault.org, atishp@atishpatra.org, palmer@dabbelt.com
-Subject: Re: [PATCH v3 3/3] RISC-V: KVM: add vector CSRs in KVM_GET_REG_LIST
-Message-ID: <20231214-315a8cd86b5eeb5a1a4ebd88@orel>
-References: <20231205174509.2238870-1-dbarboza@ventanamicro.com>
- <20231205174509.2238870-4-dbarboza@ventanamicro.com>
+        Thu, 14 Dec 2023 00:45:37 -0800 (PST)
+Date: Thu, 14 Dec 2023 09:45:33 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v8 0/4] send credit update during setting
+ SO_RCVLOWAT
+Message-ID: <gu2yvaqqgrfnffnh67fodsoob4cdpcw4zaifncku3qvadtuq5j@6unpf5ifdmtd>
+References: <20231211211658.2904268-1-avkrasnov@salutedevices.com>
+ <20231212105423-mutt-send-email-mst@kernel.org>
+ <d27f22f0-0f1e-e1bb-5b13-a524dc6e94d7@salutedevices.com>
+ <20231212111131-mutt-send-email-mst@kernel.org>
+ <7b362aef-6774-0e08-81e9-0a6f7f616290@salutedevices.com>
+ <ucmekzurgt3zcaezzdkk6277ukjmwaoy6kdq6tzivbtqd4d32b@izqbcsixgngk>
+ <402ea723-d154-45c9-1efe-b0022d9ea95a@salutedevices.com>
+ <20231213100518-mutt-send-email-mst@kernel.org>
+ <20231213100957-mutt-send-email-mst@kernel.org>
+ <8e6b06a5-eeb3-84c8-c6df-a8b81b596295@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20231205174509.2238870-4-dbarboza@ventanamicro.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8e6b06a5-eeb3-84c8-c6df-a8b81b596295@salutedevices.com>
 
-On Tue, Dec 05, 2023 at 02:45:09PM -0300, Daniel Henrique Barboza wrote:
-> Add all vector CSRs (vstart, vl, vtype, vcsr, vlenb) in get-reg-list.
+On Wed, Dec 13, 2023 at 08:11:57PM +0300, Arseniy Krasnov wrote:
+>
+>
+>On 13.12.2023 18:13, Michael S. Tsirkin wrote:
+>> On Wed, Dec 13, 2023 at 10:05:44AM -0500, Michael S. Tsirkin wrote:
+>>> On Wed, Dec 13, 2023 at 12:08:27PM +0300, Arseniy Krasnov wrote:
+>>>>
+>>>>
+>>>> On 13.12.2023 11:43, Stefano Garzarella wrote:
+>>>>> On Tue, Dec 12, 2023 at 08:43:07PM +0300, Arseniy Krasnov wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 12.12.2023 19:12, Michael S. Tsirkin wrote:
+>>>>>>> On Tue, Dec 12, 2023 at 06:59:03PM +0300, Arseniy Krasnov wrote:
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> On 12.12.2023 18:54, Michael S. Tsirkin wrote:
+>>>>>>>>> On Tue, Dec 12, 2023 at 12:16:54AM +0300, Arseniy Krasnov wrote:
+>>>>>>>>>> Hello,
+>>>>>>>>>>
+>>>>>>>>>>                                DESCRIPTION
+>>>>>>>>>>
+>>>>>>>>>> This patchset fixes old problem with hungup of both rx/tx sides and adds
+>>>>>>>>>> test for it. This happens due to non-default SO_RCVLOWAT value and
+>>>>>>>>>> deferred credit update in virtio/vsock. Link to previous old patchset:
+>>>>>>>>>> https://lore.kernel.org/netdev/39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru/
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> Patchset:
+>>>>>>>>>
+>>>>>>>>> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+>>>>>>>>
+>>>>>>>> Thanks!
+>>>>>>>>
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> But I worry whether we actually need 3/8 in net not in net-next.
+>>>>>>>>
+>>>>>>>> Because of "Fixes" tag ? I think this problem is not critical and reproducible
+>>>>>>>> only in special cases, but i'm not familiar with netdev process so good, so I don't
+>>>>>>>> have strong opinion. I guess @Stefano knows better.
+>>>>>>>>
+>>>>>>>> Thanks, Arseniy
+>>>>>>>
+>>>>>>> Fixes means "if you have that other commit then you need this commit
+>>>>>>> too". I think as a minimum you need to rearrange patches to make the
+>>>>>>> fix go in first. We don't want a regression followed by a fix.
+>>>>>>
+>>>>>> I see, ok, @Stefano WDYT? I think rearrange doesn't break anything, because this
+>>>>>> patch fixes problem that is not related with the new patches from this patchset.
+>>>>>
+>>>>> I agree, patch 3 is for sure net material (I'm fine with both rearrangement or send it separately), but IMHO also patch 2 could be.
+>>>>> I think with the same fixes tag, since before commit b89d882dc9fc ("vsock/virtio: reduce credit update messages") we sent a credit update
+>>>>> for every bytes we read, so we should not have this problem, right?
+>>>>
+>>>> Agree for 2, so I think I can rearrange: two fixes go first, then current 0001, and then tests. And send it as V9 for 'net' only ?
+>>>>
+>>>> Thanks, Arseniy
+>>>
+>>>
+>>> hmm why not net-next?
+>>
+>> Oh I missed your previous discussion. I think everything in net-next is
+>> safer.  Having said that, I won't nack it net, either.
+>
+>So, summarizing all above:
+>1) This patchset entirely goes to net-next as v9
+>2) I reorder patches like 3 - 2 - 1 - 4, e.g. two fixes goes first with Fixes tag
+>3) Add Acked-by: Michael S. Tsirkin <mst@redhat.com> to each patch
+>
+>@Michael, @Stefano ?
 
-We should add another patch for the test for these
-(tools/testing/selftests/kvm/riscv/get-reg-list.c)
+Okay, let's do that ;-)
 
-Thanks,
-drew
+Stefano
 
-> 
-> Signed-off-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-> ---
->  arch/riscv/kvm/vcpu_onereg.c | 55 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 55 insertions(+)
-> 
-> diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
-> index f8c9fa0c03c5..2eb4980295ae 100644
-> --- a/arch/riscv/kvm/vcpu_onereg.c
-> +++ b/arch/riscv/kvm/vcpu_onereg.c
-> @@ -986,6 +986,55 @@ static int copy_sbi_ext_reg_indices(u64 __user *uindices)
->  	return num_sbi_ext_regs();
->  }
->  
-> +static inline unsigned long num_vector_regs(const struct kvm_vcpu *vcpu)
-> +{
-> +	if (!riscv_isa_extension_available(vcpu->arch.isa, v))
-> +		return 0;
-> +
-> +	/* vstart, vl, vtype, vcsr, vlenb and 32 vector regs */
-> +	return 37;
-> +}
-> +
-> +static int copy_vector_reg_indices(const struct kvm_vcpu *vcpu,
-> +				u64 __user *uindices)
-> +{
-> +	const struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
-> +	int n = num_vector_regs(vcpu);
-> +	u64 reg, size;
-> +	int i;
-> +
-> +	if (n == 0)
-> +		return 0;
-> +
-> +	/* copy vstart, vl, vtype, vcsr and vlenb */
-> +	size = IS_ENABLED(CONFIG_32BIT) ? KVM_REG_SIZE_U32 : KVM_REG_SIZE_U64;
-> +	for (i = 0; i < 5; i++) {
-> +		reg = KVM_REG_RISCV | size | KVM_REG_RISCV_VECTOR | i;
-> +
-> +		if (uindices) {
-> +			if (put_user(reg, uindices))
-> +				return -EFAULT;
-> +			uindices++;
-> +		}
-> +	}
-> +
-> +	/* vector_regs have a variable 'vlenb' size */
-> +	size = __builtin_ctzl(cntx->vector.vlenb);
-> +	size <<= KVM_REG_SIZE_SHIFT;
-> +	for (i = 0; i < 32; i++) {
-> +		reg = KVM_REG_RISCV | KVM_REG_RISCV_VECTOR | size |
-> +			KVM_REG_RISCV_VECTOR_REG(i);
-> +
-> +		if (uindices) {
-> +			if (put_user(reg, uindices))
-> +				return -EFAULT;
-> +			uindices++;
-> +		}
-> +	}
-> +
-> +	return n;
-> +}
-> +
->  /*
->   * kvm_riscv_vcpu_num_regs - how many registers do we present via KVM_GET/SET_ONE_REG
->   *
-> @@ -1001,6 +1050,7 @@ unsigned long kvm_riscv_vcpu_num_regs(struct kvm_vcpu *vcpu)
->  	res += num_timer_regs();
->  	res += num_fp_f_regs(vcpu);
->  	res += num_fp_d_regs(vcpu);
-> +	res += num_vector_regs(vcpu);
->  	res += num_isa_ext_regs(vcpu);
->  	res += num_sbi_ext_regs();
->  
-> @@ -1045,6 +1095,11 @@ int kvm_riscv_vcpu_copy_reg_indices(struct kvm_vcpu *vcpu,
->  		return ret;
->  	uindices += ret;
->  
-> +	ret = copy_vector_reg_indices(vcpu, uindices);
-> +	if (ret < 0)
-> +		return ret;
-> +	uindices += ret;
-> +
->  	ret = copy_isa_ext_reg_indices(vcpu, uindices);
->  	if (ret < 0)
->  		return ret;
-> -- 
-> 2.41.0
-> 
 
