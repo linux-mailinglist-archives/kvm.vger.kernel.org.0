@@ -1,183 +1,196 @@
-Return-Path: <kvm+bounces-4465-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4466-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10EFF812CE9
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 11:30:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC538812CEB
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 11:30:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 179F31C214B0
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 10:30:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 106BDB2137F
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 10:30:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A5C73C461;
-	Thu, 14 Dec 2023 10:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65CBA3C063;
+	Thu, 14 Dec 2023 10:30:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bo7FbkhB"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cCi4m7Mh"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B314118
-	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 02:29:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702549788;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mNaidnArOatG5DPMZgGUNeTPrppTOu1ght+u2+9nPgo=;
-	b=Bo7FbkhBee1ZsvFqeKV7xlwzV5nF0IJGhAJx6U2JV8Z+ctcFplytgVYwjJX4sN88q9f9sZ
-	cC4huT7To850WW0hMa+JESjiJSw+r4Pb9KOIHxEMIZmDf2vmrTQrqZfhd8tGsX69bUN0rz
-	wS0wp8XDJQ+CwYqVBd6rbncnzCrFeao=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-349-10PMUlKmMG-yLMOPzDb7aA-1; Thu, 14 Dec 2023 05:29:47 -0500
-X-MC-Unique: 10PMUlKmMG-yLMOPzDb7aA-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2ca29454857so73217371fa.0
-        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 02:29:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702549785; x=1703154585;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00B7310F
+	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 02:30:09 -0800 (PST)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-40c48d7a7a7so37242185e9.3
+        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 02:30:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1702549808; x=1703154608; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mNaidnArOatG5DPMZgGUNeTPrppTOu1ght+u2+9nPgo=;
-        b=q3P+egTM4HQna7Umr62nrnoC3EXRKuiK+IDVExcYA4KG52f/zLNDF/zmFfN80vOFxi
-         d4h8IqdqXxm5CikddRRFj7zWd6potqr9gdaRheaHprghlv5okSHCvGao79zkuCs2M1AC
-         ZDMsEi9zTdTqZjWSIY82hD8jNg2rEvaTOzFvN3uSKyz3x60uOi+rJmUQV02T6vYRVoPG
-         DvIyWwezplAXvTTV6rQF7bfKtuAN89c8UuoMNd3wVnkUioIyJSjb22cjBkHAZ8zIUXx6
-         X3BD/boFG5fcTmEbx0HuPLicoip1LxzFBucitQyPmGoasbmQ94YTgRAQZsO9axSk7iMZ
-         B7DQ==
-X-Gm-Message-State: AOJu0Yz3oZ0BEM1rtiJK8+WORUO1EOGltY8Kl2e6THo2YTaenEzP2W3t
-	dVHulH1BZo4FK9Sv4Y3zru6GF1L5OuyyfFLmyC6zvHAY17CXkE203MSf7cz3VZGpmxkH0qSs+hG
-	QGWjXqcVbPTkq
-X-Received: by 2002:a2e:b88a:0:b0:2cc:1c21:f729 with SMTP id r10-20020a2eb88a000000b002cc1c21f729mr3199476ljp.60.1702549785335;
-        Thu, 14 Dec 2023 02:29:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEjkT5w/kdScbgQ5jnlJ/iNq1v76LhwoQiz85pVMwCHKmLvFjAg9HfOnqm6pisPjZpcYg0XYw==
-X-Received: by 2002:a2e:b88a:0:b0:2cc:1c21:f729 with SMTP id r10-20020a2eb88a000000b002cc1c21f729mr3199467ljp.60.1702549784912;
-        Thu, 14 Dec 2023 02:29:44 -0800 (PST)
-Received: from redhat.com ([2.52.132.243])
-        by smtp.gmail.com with ESMTPSA id v21-20020a2e9615000000b002c9f1316121sm2098658ljh.36.2023.12.14.02.29.40
+        bh=uOVO+bfnnJKpEsOHryNuWrr2usdamUm/q/5hMMN7t4I=;
+        b=cCi4m7MhDRKwmbzE2WnUH9sBMb+6JDrMU1uMh6Jt5C6m4VM5LNP3sbfHAN5LjOFGKY
+         TVS/zZXhwGAvNu7JbTIduDg8GuTIR6SuV3gJtq6G3d/TZCQ00hTbMW2ZSbZzWaR2D3MF
+         l0AUk5j7krI92119phi1zRXBPGdkjVwqWJ96kbVJEQEm5RaFLIiHbwN2dQBADE0q+dBl
+         CsSt4FTvPJRIbk9TUiouEcF+qcQQqKQYYa8O+aa6LDaGJ0v0PEbtTZwz6ij73K2Nw4GS
+         juQtIxiRff/DbS6Y1lJPjKl/eFbx45M+gRsCy8M/w2Ai4ygjOImeyPO4TBDgnVLIZK0h
+         Ujgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702549808; x=1703154608;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uOVO+bfnnJKpEsOHryNuWrr2usdamUm/q/5hMMN7t4I=;
+        b=Xx1RH85u7C0BeFiyJg/bZNIPLnzrUQz0pi8a82fWj1wPtF7cJaUFWBfcosVXC7URac
+         d34MzOb9dPyI40hoZ5ocwD8zRN7WrmTlT76qz1xhd81anM8vGfalIP3EKXw0fYkXckIq
+         Xch34+sZJEcTspgSizey4GLyJbWKZlV5asnL4jF4j6NoLOT9yjWwA9jWvBsjRUd7qyzZ
+         eASJu317gNky4FojOal1VwaITt5TyoWWPta2weyogwWQaSWdsxDyLo4yJ7J0obx8jugK
+         knc8VwZWH7bli7fKLlt+uDo1e21E5u4r9vDCUhCl/SgeykVYSz17yWrolWbSsHtYIq6S
+         V7YQ==
+X-Gm-Message-State: AOJu0YxVut1fE4Jm+T80SoH8tG1V/RyyxrGzfTqwcgyrrtA2G7Rrhe4g
+	UEZe6W0NHuDuvK2kAraJwgjo5A==
+X-Google-Smtp-Source: AGHT+IGfGsKpkGfYhg49s8Yquwu96sYE4oPzI7EF/ZouNO4OCHspwjlC8bcFEg/vs/gJgAL1beDnrQ==
+X-Received: by 2002:a7b:cb95:0:b0:40c:9fa:592f with SMTP id m21-20020a7bcb95000000b0040c09fa592fmr5374387wmi.104.1702549808302;
+        Thu, 14 Dec 2023 02:30:08 -0800 (PST)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id m27-20020a05600c3b1b00b0040b38292253sm26513051wms.30.2023.12.14.02.30.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 02:29:43 -0800 (PST)
-Date: Thu, 14 Dec 2023 05:29:38 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
-	oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v9 3/4] vsock: update SO_RCVLOWAT setting
- callback
-Message-ID: <20231214052502-mutt-send-email-mst@kernel.org>
-References: <20231214091947.395892-1-avkrasnov@salutedevices.com>
- <20231214091947.395892-4-avkrasnov@salutedevices.com>
+        Thu, 14 Dec 2023 02:30:07 -0800 (PST)
+Received: from draig (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id 838705F7D3;
+	Thu, 14 Dec 2023 10:30:07 +0000 (GMT)
+From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
+  qemu-devel@nongnu.org,  Jiaxun Yang <jiaxun.yang@flygoat.com>,  Radoslaw
+ Biernacki <rad@semihalf.com>,  Paul Durrant <paul@xen.org>,  Akihiko Odaki
+ <akihiko.odaki@daynix.com>,  Leif Lindholm <quic_llindhol@quicinc.com>,
+  Peter Maydell <peter.maydell@linaro.org>,  Paolo Bonzini
+ <pbonzini@redhat.com>,  kvm@vger.kernel.org,  qemu-arm@nongnu.org,
+  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,  Beraldo Leal
+ <bleal@redhat.com>,  Wainer dos Santos Moschetta <wainersm@redhat.com>,
+  Sriram Yagnaraman <sriram.yagnaraman@est.tech>,  David Woodhouse
+ <dwmw2@infradead.org>
+Subject: Re: [PATCH 04/10] tests/avocado: machine aarch64: standardize
+ location and RO/RW access
+In-Reply-To: <87le9xvmto.fsf@p1.localdomain> (Cleber Rosa's message of "Wed,
+	13 Dec 2023 16:01:39 -0500")
+References: <20231208190911.102879-1-crosa@redhat.com>
+	<20231208190911.102879-5-crosa@redhat.com>
+	<2972842d-e4bf-49eb-9d72-01b8049f18bf@linaro.org>
+	<87le9xvmto.fsf@p1.localdomain>
+User-Agent: mu4e 1.11.26; emacs 29.1
+Date: Thu, 14 Dec 2023 10:30:07 +0000
+Message-ID: <87r0jp84b4.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231214091947.395892-4-avkrasnov@salutedevices.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 14, 2023 at 12:19:46PM +0300, Arseniy Krasnov wrote:
-> Do not return if transport callback for SO_RCVLOWAT is set (only in
-> error case). In this case we don't need to set 'sk_rcvlowat' field in
-> each transport - only in 'vsock_set_rcvlowat()'. Also, if 'sk_rcvlowat'
-> is now set only in af_vsock.c, change callback name from 'set_rcvlowat'
-> to 'notify_set_rcvlowat'.
-> 
-> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Cleber Rosa <crosa@redhat.com> writes:
 
-Maybe squash this with patch 2/4?
+> Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org> writes:
+>
+>> W dniu 8.12.2023 o=C2=A020:09, Cleber Rosa pisze:
+>>> The tests under machine_aarch64_virt.py do not need read-write access
+>>> to the ISOs.  The ones under machine_aarch64_sbsaref.py, on the other
+>>> hand, will need read-write access, so let's give each test an unique
+>>> file.
+>>>=20
+>>> And while at it, let's use a single code style and hash for the ISO
+>>> url.
+>>>=20
+>>> Signed-off-by: Cleber Rosa<crosa@redhat.com>
+>>
+>> It is ISO file, so sbsa-ref tests should be fine with readonly as well.
+>>
+>> Nothing gets installed so nothing is written. We only test does boot wor=
+ks.
+>
+> That was my original expectation too.  But, with nothing but the
+> following change:
+>
+> diff --git a/tests/avocado/machine_aarch64_sbsaref.py b/tests/avocado/mac=
+hine_aarch64_sbsaref.py
+> index 528c7d2934..436da4b156 100644
+> --- a/tests/avocado/machine_aarch64_sbsaref.py
+> +++ b/tests/avocado/machine_aarch64_sbsaref.py
+> @@ -129,7 +129,7 @@ def boot_alpine_linux(self, cpu):
+>              "-cpu",
+>              cpu,
+>              "-drive",
+> -            f"file=3D{iso_path},format=3Draw",
+> +            f"file=3D{iso_path},readonly=3Don,format=3Draw",
 
-> ---
->  Changelog:
->  v3 -> v4:
->   * Rename 'set_rcvlowat' to 'notify_set_rcvlowat'.
->   * Commit message updated.
-> 
->  include/net/af_vsock.h           | 2 +-
->  net/vmw_vsock/af_vsock.c         | 9 +++++++--
->  net/vmw_vsock/hyperv_transport.c | 4 ++--
->  3 files changed, 10 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-> index e302c0e804d0..535701efc1e5 100644
-> --- a/include/net/af_vsock.h
-> +++ b/include/net/af_vsock.h
-> @@ -137,7 +137,6 @@ struct vsock_transport {
->  	u64 (*stream_rcvhiwat)(struct vsock_sock *);
->  	bool (*stream_is_active)(struct vsock_sock *);
->  	bool (*stream_allow)(u32 cid, u32 port);
-> -	int (*set_rcvlowat)(struct vsock_sock *vsk, int val);
->  
->  	/* SEQ_PACKET. */
->  	ssize_t (*seqpacket_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
-> @@ -168,6 +167,7 @@ struct vsock_transport {
->  		struct vsock_transport_send_notify_data *);
->  	/* sk_lock held by the caller */
->  	void (*notify_buffer_size)(struct vsock_sock *, u64 *);
-> +	int (*notify_set_rcvlowat)(struct vsock_sock *vsk, int val);
->  
->  	/* Shutdown. */
->  	int (*shutdown)(struct vsock_sock *, int);
-> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> index 816725af281f..54ba7316f808 100644
-> --- a/net/vmw_vsock/af_vsock.c
-> +++ b/net/vmw_vsock/af_vsock.c
-> @@ -2264,8 +2264,13 @@ static int vsock_set_rcvlowat(struct sock *sk, int val)
->  
->  	transport = vsk->transport;
->  
-> -	if (transport && transport->set_rcvlowat)
-> -		return transport->set_rcvlowat(vsk, val);
-> +	if (transport && transport->notify_set_rcvlowat) {
-> +		int err;
-> +
-> +		err = transport->notify_set_rcvlowat(vsk, val);
-> +		if (err)
-> +			return err;
-> +	}
->  
->  	WRITE_ONCE(sk->sk_rcvlowat, val ? : 1);
->  	return 0;
+               f"file=3D{iso_path},readonly=3Don,media=3Dcdrom,format=3Draw=
+",
 
+works (although possible the readonly is redundant in this case).
 
+>              "-device",
+>              "virtio-rng-pci,rng=3Drng0",
+>              "-object",
+>
+> We get:
+>
+> 15:55:10 DEBUG| VM launch command: './qemu-system-aarch64 -display none -=
+vga none -chardev socket,id=3Dmon,fd=3D15 -mon chardev=3Dmon,mode=3Dcontrol=
+ -machine sbsa-ref -
+> chardev socket,id=3Dconsole,fd=3D20 -serial chardev:console -cpu cortex-a=
+57 -drive if=3Dpflash,file=3D/home/cleber/avocado/job-results/job-2023-12-1=
+3T15.55-28ef2b5/test
+> -results/tmp_dirx8p5xzt4/1-tests_avocado_machine_aarch64_sbsaref.py_Aarch=
+64SbsarefMachine.test_sbsaref_alpine_linux_cortex_a57/SBSA_FLASH0.fd,format=
+=3Draw -drive=20
+> if=3Dpflash,file=3D/home/cleber/avocado/job-results/job-2023-12-13T15.55-=
+28ef2b5/test-results/tmp_dirx8p5xzt4/1-tests_avocado_machine_aarch64_sbsare=
+f.py_Aarch64Sbsa
+> refMachine.test_sbsaref_alpine_linux_cortex_a57/SBSA_FLASH1.fd,format=3Dr=
+aw -smp 1 -machine sbsa-ref -cpu cortex-a57 -drive file=3D/home/cleber/avoc=
+ado/data/cache/b
+> y_location/0154b7cd3a4f5e135299060c8cabbeec10b70b6d/alpine-standard-3.17.=
+2-aarch64.iso,readonly=3Don,format=3Draw -device virtio-rng-pci,rng=3Drng0 =
+-object rng-random
+> ,id=3Drng0,filename=3D/dev/urandom'
+>
+> Followed by:
+>
+> 15:55:10 DEBUG| Failed to establish session:
+>   | Traceback (most recent call last):
+>   |   File "/home/cleber/src/qemu/python/qemu/qmp/protocol.py", line 425,=
+ in _session_guard
+>   |     await coro
+>   |   File "/home/cleber/src/qemu/python/qemu/qmp/qmp_client.py", line 25=
+3, in _establish_session
+>   |     await self._negotiate()
+>   |   File "/home/cleber/src/qemu/python/qemu/qmp/qmp_client.py", line 30=
+5, in _negotiate
+>   |     reply =3D await self._recv()
+>   |             ^^^^^^^^^^^^^^^^^^
+>   |   File "/home/cleber/src/qemu/python/qemu/qmp/protocol.py", line 1009=
+, in _recv
+>   |     message =3D await self._do_recv()
+>   |               ^^^^^^^^^^^^^^^^^^^^^
+>   |   File "/home/cleber/src/qemu/python/qemu/qmp/qmp_client.py", line 40=
+2, in _do_recv
+>   |     msg_bytes =3D await self._readline()
+>   |                 ^^^^^^^^^^^^^^^^^^^^^^
+>   |   File "/home/cleber/src/qemu/python/qemu/qmp/protocol.py", line 977,=
+ in _readline
+>   |     raise EOFError
+>   | EOFError
+>
+> With qemu-system-arch producing on stdout:
+>
+>    qemu-system-aarch64: Block node is read-only
+>
+> Any ideas on the reason or cause?
+>
+> Thanks,
+> - Cleber.
 
-I would s
-
-> diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
-> index 7cb1a9d2cdb4..e2157e387217 100644
-> --- a/net/vmw_vsock/hyperv_transport.c
-> +++ b/net/vmw_vsock/hyperv_transport.c
-> @@ -816,7 +816,7 @@ int hvs_notify_send_post_enqueue(struct vsock_sock *vsk, ssize_t written,
->  }
->  
->  static
-> -int hvs_set_rcvlowat(struct vsock_sock *vsk, int val)
-> +int hvs_notify_set_rcvlowat(struct vsock_sock *vsk, int val)
->  {
->  	return -EOPNOTSUPP;
->  }
-> @@ -856,7 +856,7 @@ static struct vsock_transport hvs_transport = {
->  	.notify_send_pre_enqueue  = hvs_notify_send_pre_enqueue,
->  	.notify_send_post_enqueue = hvs_notify_send_post_enqueue,
->  
-> -	.set_rcvlowat             = hvs_set_rcvlowat
-> +	.notify_set_rcvlowat      = hvs_notify_set_rcvlowat
->  };
->  
->  static bool hvs_check_transport(struct vsock_sock *vsk)
-> -- 
-> 2.25.1
-
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
 
