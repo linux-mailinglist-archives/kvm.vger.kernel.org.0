@@ -1,384 +1,275 @@
-Return-Path: <kvm+bounces-4530-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4531-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BE9D81398E
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 19:13:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44F5F813A01
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 19:31:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10D78B2196E
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 18:13:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6CC61F21B17
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 18:31:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9627067E98;
-	Thu, 14 Dec 2023 18:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67F0060B81;
+	Thu, 14 Dec 2023 18:31:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JRdL8mzg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvbgRHrt"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AF93114
-	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 10:13:23 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BA5712B
+	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 10:31:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702577602;
+	s=mimecast20190719; t=1702578683;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=u7D1qb3i1Fz1TYjcQ8WdxAH+WPTMa4JXCS02CvPeQ14=;
-	b=JRdL8mzgzVEUCJOtSS+qzmPEBAohZch+uAk9OGo6a/qx6fru/v8CVTBXiyvVyF0sQgYTJv
-	Q0QE4rI+MRnYr6ofgMbc5CBnMV3b1o14Je/WMhSb1yJe0KnYKKGCJHTYGfEqAXozsyMSah
-	g5pEHDkYokdkL2jDooMayRHdLLyuHRY=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=iO9Z5bH3UoawNv41qnNm90edN2DQtPwUydpbqgWOOQg=;
+	b=JvbgRHrt9tXA80jTsVzLGRcupWQtb7uT/pHY60XHtaP2DPRjVjhg+iSoUg6xyPuZgzepM9
+	LZxFrD71bPtp1geHLogrVJ5ryz+ma8olUyyaZpBjTPYEAaVgLLjpc8WhkeiajMEQAdoXc7
+	ZwoaORDobP16Pd0RB2o0yUr2/qHE9KU=
+Received: from mail-yb1-f200.google.com (mail-yb1-f200.google.com
+ [209.85.219.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-642-EhvreSsoM-e3W3U1Y2aC6Q-1; Thu, 14 Dec 2023 13:13:21 -0500
-X-MC-Unique: EhvreSsoM-e3W3U1Y2aC6Q-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-67ee87ff6bfso32134706d6.3
-        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 10:13:20 -0800 (PST)
+ us-mta-66-qLXeK_GSMYa4W8BEmqhyXw-1; Thu, 14 Dec 2023 13:31:21 -0500
+X-MC-Unique: qLXeK_GSMYa4W8BEmqhyXw-1
+Received: by mail-yb1-f200.google.com with SMTP id 3f1490d57ef6-db402e6f61dso8987155276.3
+        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 10:31:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702577600; x=1703182400;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u7D1qb3i1Fz1TYjcQ8WdxAH+WPTMa4JXCS02CvPeQ14=;
-        b=NKXVsElOKqSHXx03eKy22WZIdlJqy5uS5jXj09NBpgMqED4b5yp8cMf0+1AX1el9oM
-         OiH1F59ANtW0pa1FUdgfedopo13cuyePdhznFKTDUoNA+urx8lrlGdIrFb8HF5gGY4U1
-         zqZVy6CmRInjPfY5sJc1d9iq8Xu6m4GtdLcwdOyc3EMa9bcwRogfXMdByw/NXET1dAV1
-         mNVD+BoL+n5tRmM2ZT1NgqGvMlrnGXpa/9jLfGLdhS6cSeEtkWnfw5HVvctjTqIvtu3x
-         0N60nAoqZ4SkN4hQ+t+EhCrIEu7A8dI78D3wzwx1TRcqrrGlFnU9FoW0NCps+8Ham5SU
-         sQZA==
-X-Gm-Message-State: AOJu0YxLFyy9OPY9bbrkgHpPT3Fj7iQkb2BIUbuTHHjE+h2MXtwh+vlA
-	xndT6pKe7VNw5Fwj0tDF0+F071ULrEoDG7MB8T3E9144Vs1zyE/YU20wC17c7vUkTU+oglOtznF
-	gNfVgjX3vNp89
-X-Received: by 2002:ad4:5c8d:0:b0:67f:153a:c6e9 with SMTP id o13-20020ad45c8d000000b0067f153ac6e9mr86475qvh.124.1702577600358;
-        Thu, 14 Dec 2023 10:13:20 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFhd8N1VbNAq1y2WYDSLTEkjfaBNb20AFoGupokLK0eOr/7teNDDHD5KBJblSJ1k3b4AVnhLA==
-X-Received: by 2002:ad4:5c8d:0:b0:67f:153a:c6e9 with SMTP id o13-20020ad45c8d000000b0067f153ac6e9mr86458qvh.124.1702577599990;
-        Thu, 14 Dec 2023 10:13:19 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id c11-20020a0ce64b000000b0067ab7eada1dsm6177573qvn.59.2023.12.14.10.13.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Dec 2023 10:13:19 -0800 (PST)
-Message-ID: <be70b17c-21cf-4f4e-8ec1-62c18ffd4100@redhat.com>
-Date: Thu, 14 Dec 2023 19:13:15 +0100
+        d=1e100.net; s=20230601; t=1702578681; x=1703183481;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iO9Z5bH3UoawNv41qnNm90edN2DQtPwUydpbqgWOOQg=;
+        b=fAgH2jO0creWSyZk90FuWplp2su378EbFZoFliF7rUAgglRibe0r5KOfmG1BwKK90U
+         m4i3CrChQfXdwmz+TuIJ81glrPQX5v9+2Y99cqGISpqZ9dR09ERYjh3GzaSavOdOCQAB
+         G5rwanwef1ImSXsRdHODRjhLYj/tPETqSlWw9aQ0kWeg9uD1nXKv1bOaFBzFFbzso7Hb
+         nYBJoGK9MiP3UwER2WaHX83DdQvRTX974WEiaQZBSGKcsWCPOhMddJGZtJaHJqgCLf7S
+         dvOKaqOY0vSN2H/uNcOiwy7yKxqu9oZtJABu0bx7uz6cBl8Fwyl0ia/btb6MWxR1V3zZ
+         4LBw==
+X-Gm-Message-State: AOJu0YxsAEy8UQKCOCB1j5vMLyV6N0sWKwyxp62hxIahEA1j16cd/9h9
+	FBX60A1yuYdmpkX3u5OgMeavWd+lSYi8Ctdb/BW6CTqFtZUHSDyN8vLM+JlfhblEc1DJiSnVwzm
+	ZqeswcDDlBi60IPbboGXDCxSyDYby
+X-Received: by 2002:a5b:683:0:b0:dbc:c0bf:3484 with SMTP id j3-20020a5b0683000000b00dbcc0bf3484mr3086000ybq.96.1702578681326;
+        Thu, 14 Dec 2023 10:31:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IERAJfkzeOqw68wFJBpzHz7S6oso9Uir2zMFtVFe79pxYdFBmx6eqBTVqGzZ0NwkOrMyG1o4V0VpfQKL5CXxME=
+X-Received: by 2002:a5b:683:0:b0:dbc:c0bf:3484 with SMTP id
+ j3-20020a5b0683000000b00dbcc0bf3484mr3085985ybq.96.1702578680983; Thu, 14 Dec
+ 2023 10:31:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] arm/kvm: Enable support for KVM_ARM_VCPU_PMU_V3_FILTER
-Content-Language: en-US
-To: Shaoqin Huang <shahuang@redhat.com>, qemu-arm@nongnu.org
-Cc: Gavin Shan <gshan@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
- qemu-devel@nongnu.org
-References: <20231207103648.2925112-1-shahuang@redhat.com>
-From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <20231207103648.2925112-1-shahuang@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231205104609.876194-1-dtatulea@nvidia.com> <20231205104609.876194-5-dtatulea@nvidia.com>
+ <CAJaqyWeEY9LNTE8QEnJgLhgS7HiXr5gJEwwPBrC3RRBsAE4_7Q@mail.gmail.com>
+ <27312106-07b9-4719-970c-b8e1aed7c4eb@oracle.com> <075cf7d1ada0ee4ee30d46b993a1fe21acfe9d92.camel@nvidia.com>
+ <20231214084526-mutt-send-email-mst@kernel.org> <9a6465a3d6c8fde63643fbbdde60d5dd84b921d4.camel@nvidia.com>
+In-Reply-To: <9a6465a3d6c8fde63643fbbdde60d5dd84b921d4.camel@nvidia.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Thu, 14 Dec 2023 19:30:44 +0100
+Message-ID: <CAJaqyWfF9eVehQ+wutMDdwYToMq=G1+War_7wANmnyuONj=18g@mail.gmail.com>
+Subject: Re: [PATCH vhost v2 4/8] vdpa/mlx5: Mark vq addrs for modification in
+ hw vq
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, 
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, Parav Pandit <parav@nvidia.com>, 
+	Gal Pressman <gal@nvidia.com>, 
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"si-wei.liu@oracle.com" <si-wei.liu@oracle.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"jasowang@redhat.com" <jasowang@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	"leon@kernel.org" <leon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Shaoqin,
+On Thu, Dec 14, 2023 at 4:51=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
+> wrote:
+>
+> On Thu, 2023-12-14 at 08:45 -0500, Michael S. Tsirkin wrote:
+> > On Thu, Dec 14, 2023 at 01:39:55PM +0000, Dragos Tatulea wrote:
+> > > On Tue, 2023-12-12 at 15:44 -0800, Si-Wei Liu wrote:
+> > > >
+> > > > On 12/12/2023 11:21 AM, Eugenio Perez Martin wrote:
+> > > > > On Tue, Dec 5, 2023 at 11:46=E2=80=AFAM Dragos Tatulea <dtatulea@=
+nvidia.com> wrote:
+> > > > > > Addresses get set by .set_vq_address. hw vq addresses will be u=
+pdated on
+> > > > > > next modify_virtqueue.
+> > > > > >
+> > > > > > Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> > > > > > Reviewed-by: Gal Pressman <gal@nvidia.com>
+> > > > > > Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > > > > I'm kind of ok with this patch and the next one about state, but =
+I
+> > > > > didn't ack them in the previous series.
+> > > > >
+> > > > > My main concern is that it is not valid to change the vq address =
+after
+> > > > > DRIVER_OK in VirtIO, which vDPA follows. Only memory maps are ok =
+to
+> > > > > change at this moment. I'm not sure about vq state in vDPA, but v=
+host
+> > > > > forbids changing it with an active backend.
+> > > > >
+> > > > > Suspend is not defined in VirtIO at this moment though, so maybe =
+it is
+> > > > > ok to decide that all of these parameters may change during suspe=
+nd.
+> > > > > Maybe the best thing is to protect this with a vDPA feature flag.
+> > > > I think protect with vDPA feature flag could work, while on the oth=
+er
+> > > > hand vDPA means vendor specific optimization is possible around sus=
+pend
+> > > > and resume (in case it helps performance), which doesn't have to be
+> > > > backed by virtio spec. Same applies to vhost user backend features,
+> > > > variations there were not backed by spec either. Of course, we shou=
+ld
+> > > > try best to make the default behavior backward compatible with
+> > > > virtio-based backend, but that circles back to no suspend definitio=
+n in
+> > > > the current virtio spec, for which I hope we don't cease developmen=
+t on
+> > > > vDPA indefinitely. After all, the virtio based vdap backend can wel=
+l
+> > > > define its own feature flag to describe (minor difference in) the
+> > > > suspend behavior based on the later spec once it is formed in futur=
+e.
+> > > >
+> > > So what is the way forward here? From what I understand the options a=
+re:
+> > >
+> > > 1) Add a vdpa feature flag for changing device properties while suspe=
+nded.
+> > >
+> > > 2) Drop these 2 patches from the series for now. Not sure if this mak=
+es sense as
+> > > this. But then Si-Wei's qemu device suspend/resume poc [0] that exerc=
+ises this
+> > > code won't work anymore. This means the series would be less well tes=
+ted.
+> > >
+> > > Are there other possible options? What do you think?
+> > >
+> > > [0] https://github.com/siwliu-kernel/qemu/tree/svq-resume-wip
+> >
+> > I am fine with either of these.
+> >
+> How about allowing the change only under the following conditions:
+>   vhost_vdpa_can_suspend && vhost_vdpa_can_resume &&
+> VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK is set
+>
+> ?
 
-On 12/7/23 11:36, Shaoqin Huang wrote:
-> The KVM_ARM_VCPU_PMU_V3_FILTER provide the ability to let the VMM decide
-> which PMU events are provided to the guest. Add a new option
-> `pmu-filter` as -accel sub-option to set the PMU Event Filtering.
-> Without the filter, the KVM will expose all events from the host to
-> guest by default.
-> 
-> The `pmu-filter` has such format:
-> 
->   pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
-> 
-> The A means "allow" and D means "deny", start is the first event of the
-> range and the end is the last one. The first registered range defines
-> the global policy(global ALLOW if the first @action is DENY, global DENY
-> if the first @action is ALLOW). The start and end only support hex
-> format now. For example:
-> 
->   pmu-filter="A:0x11-0x11;A:0x23-0x3a;D:0x30-0x30"
-> 
-> Since the first action is allow, we have a global deny policy. It
-> will allow event 0x11 (The cycle counter), events 0x23 to 0x3a is
-> also allowed except the event 0x30 is denied, and all the other events
-> are disallowed.
-> 
-> Here is an real example shows how to use the PMU Event Filtering, when
-> we launch a guest by use kvm, add such command line:
-> 
->   # qemu-system-aarch64 \
-> 	-accel kvm,pmu-filter="D:0x11-0x11"
-> 
-> Since the first action is deny, we have a global allow policy. This
-> disables the filtering of the cycle counter (event 0x11 being CPU_CYCLES).
-> 
-> And then in guest, use the perf to count the cycle:
-> 
->   # perf stat sleep 1
-> 
->    Performance counter stats for 'sleep 1':
-> 
->               1.22 msec task-clock                       #    0.001 CPUs utilized
->                  1      context-switches                 #  820.695 /sec
->                  0      cpu-migrations                   #    0.000 /sec
->                 55      page-faults                      #   45.138 K/sec
->    <not supported>      cycles
->            1128954      instructions
->             227031      branches                         #  186.323 M/sec
->               8686      branch-misses                    #    3.83% of all branches
-> 
->        1.002492480 seconds time elapsed
-> 
->        0.001752000 seconds user
->        0.000000000 seconds sys
-> 
-> As we can see, the cycle counter has been disabled in the guest, but
-> other pmu events are still work.
-> 
-> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-> ---
-> v3->v4:
->   - Fix the wrong check for pmu_filter_init.            [Sebastian]
->   - Fix multiple alignment issue.                       [Gavin]
->   - Report error by warn_report() instead of error_report(), and don't use
->   abort() since the PMU Event Filter is an add-on and best-effort feature.
->                                                         [Gavin]
->   - Add several missing {  } for single line of code.   [Gavin]
->   - Use the g_strsplit() to replace strtok().           [Gavin]
-> 
-> v2->v3:
->   - Improve commits message, use kernel doc wording, add more explaination on
->     filter example, fix some typo error.                [Eric]
->   - Add g_free() in kvm_arch_set_pmu_filter() to prevent memory leak. [Eric]
->   - Add more precise error message report.              [Eric]
->   - In options doc, add pmu-filter rely on KVM_ARM_VCPU_PMU_V3_FILTER support in
->     KVM.                                                [Eric]
-> 
-> v1->v2:
->   - Add more description for allow and deny meaning in 
->     commit message.                                     [Sebastian]
->   - Small improvement.                                  [Sebastian]
-> 
-> v2: https://lore.kernel.org/all/20231117060838.39723-1-shahuang@redhat.com/
-> v1: https://lore.kernel.org/all/20231113081713.153615-1-shahuang@redhat.com/
-> ---
->  include/sysemu/kvm_int.h |  1 +
->  qemu-options.hx          | 21 +++++++++++
->  target/arm/kvm.c         | 23 ++++++++++++
->  target/arm/kvm64.c       | 75 ++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 120 insertions(+)
-> 
-> diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-> index fd846394be..8f4601474f 100644
-> --- a/include/sysemu/kvm_int.h
-> +++ b/include/sysemu/kvm_int.h
-> @@ -120,6 +120,7 @@ struct KVMState
->      uint32_t xen_caps;
->      uint16_t xen_gnttab_max_frames;
->      uint16_t xen_evtchn_max_pirq;
-> +    char *kvm_pmu_filter;
->  };
->  
->  void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 42fd09e4de..054865ba0d 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -187,6 +187,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
->      "                tb-size=n (TCG translation block cache size)\n"
->      "                dirty-ring-size=n (KVM dirty ring GFN count, default 0)\n"
->      "                eager-split-size=n (KVM Eager Page Split chunk size, default 0, disabled. ARM only)\n"
-> +    "                pmu-filter={A,D}:start-end[;{A,D}:start-end...] (KVM PMU Event Filter, default no filter. ARM only)\n"
-Sorry for coming back late with this kind of comment but I am not
-comfortable with the pmu-filter being an accel suboption. Why isn't it a
-cpu option instead like the pmu option?
+I think the best option by far is 1, as there is no hint in the
+combination of these 3 indicating that you can change device
+properties in the suspended state.
 
-qemu-system-aarch64 -M virt -cpu
-max,pmu-filter="A:0x11-0x11;A:0x23-0x3a;D:0x30-0x30",sve=on,sve128=on,sve256=on
-
-See https://qemu-project.gitlab.io/qemu/system/arm/cpu-features.html
-
-Wouldn't it make more sense? The PMU filter control is a vcpu device
-ctrl, isn't it.
-
-
->      "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
->      "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
->  SRST
-> @@ -259,6 +260,26 @@ SRST
->          impact on the memory. By default, this feature is disabled
->          (eager-split-size=0).
->  
-> +    ``pmu-filter={A,D}:start-end[;{A,D}:start-end...]``
-> +        KVM implements PMU Event Filtering to prevent a guest from being able to
-> +        sample certain events. It depends on the KVM_ARM_VCPU_PMU_V3_FILTER
-> +        attribute supported in KVM. It has the following format:
-> +
-> +        pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
-> +
-> +        The A means "allow" and D means "deny", start is the first event of the
-> +        range and the end is the last one. The first registered range defines
-> +        the global policy(global ALLOW if the first @action is DENY, global DENY
-> +        if the first @action is ALLOW). The start and end only support hex
-> +        format now. For example:
-> +
-> +        pmu-filter="A:0x11-0x11;A:0x23-0x3a;D:0x30-0x30"
-> +
-> +        Since the first action is allow, we have a global deny policy. It
-> +        will allow event 0x11 (The cycle counter), events 0x23 to 0x3a is
-> +        also allowed except the event 0x30 is denied, and all the other events
-> +        are disallowed.
-> +
->      ``notify-vmexit=run|internal-error|disable,notify-window=n``
->          Enables or disables notify VM exit support on x86 host and specify
->          the corresponding notify window to trigger the VM exit if enabled.
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index 7903e2ddde..1f73b83674 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -1108,6 +1108,22 @@ static void kvm_arch_set_eager_split_size(Object *obj, Visitor *v,
->      s->kvm_eager_split_size = value;
->  }
->  
-> +static char *kvm_arch_get_pmu_filter(Object *obj, Error **errp)
-> +{
-> +    KVMState *s = KVM_STATE(obj);
-> +
-> +    return g_strdup(s->kvm_pmu_filter);
-> +}
-> +
-> +static void kvm_arch_set_pmu_filter(Object *obj, const char *pmu_filter,
-> +                                    Error **errp)
-> +{
-> +    KVMState *s = KVM_STATE(obj);
-> +
-> +    g_free(s->kvm_pmu_filter);
-> +    s->kvm_pmu_filter = g_strdup(pmu_filter);
-> +}
-> +
->  void kvm_arch_accel_class_init(ObjectClass *oc)
->  {
->      object_class_property_add(oc, "eager-split-size", "size",
-> @@ -1116,4 +1132,11 @@ void kvm_arch_accel_class_init(ObjectClass *oc)
->  
->      object_class_property_set_description(oc, "eager-split-size",
->          "Eager Page Split chunk size for hugepages. (default: 0, disabled)");
-> +
-> +    object_class_property_add_str(oc, "pmu-filter",
-> +                                  kvm_arch_get_pmu_filter,
-> +                                  kvm_arch_set_pmu_filter);
-> +
-> +    object_class_property_set_description(oc, "pmu-filter",
-> +        "PMU Event Filtering description for guest PMU. (default: NULL, disabled)");
->  }
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index 3c175c93a7..0ed6744057 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -10,6 +10,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include <asm-arm64/kvm.h>
->  #include <sys/ioctl.h>
->  #include <sys/ptrace.h>
->  
-> @@ -131,6 +132,77 @@ static bool kvm_arm_set_device_attr(CPUState *cs, struct kvm_device_attr *attr,
->      return true;
->  }
->  
-> +static void kvm_arm_pmu_filter_init(CPUState *cs)
-> +{
-> +    KVMState *kvm_state = cs->kvm_state;
-> +    static bool pmu_filter_init = false;
-> +    struct kvm_pmu_event_filter filter;
-> +    struct kvm_device_attr attr = {
-> +        .group      = KVM_ARM_VCPU_PMU_V3_CTRL,
-> +        .attr       = KVM_ARM_VCPU_PMU_V3_FILTER,
-> +        .addr       = (uint64_t)&filter,
-> +    };
-> +    char act;
-> +    int i;
-> +    gchar **event_filters;
-> +
-> +    if (!kvm_state->kvm_pmu_filter)
-> +        return;
-> +
-> +    if (kvm_vcpu_ioctl(cs, KVM_HAS_DEVICE_ATTR, &attr)) {
-> +        warn_report("The kernel doesn't support the PMU Event Filter!\n");
-> +        return;
-> +    }
-> +
-> +    /* The filter only needs to be initialized for 1 vcpu. */
-Are you sure? This is a per vcpu device ctrl. Where is it written in the
-doc that this shall not be called for each vcpu
-> +    if (pmu_filter_init) {
-> +        return;
-> +    }
-> +    pmu_filter_init = true;
-> +
-> +    event_filters = g_strsplit(kvm_state->kvm_pmu_filter, ";", -1);
-> +
-> +    for (i = 0; event_filters[i]; i++) {
-> +        unsigned short start = 0, end = 0;
-> +
-> +        sscanf(event_filters[i], "%c:%hx-%hx", &act, &start, &end);
-> +        if ((act != 'A' && act != 'D') || (!start && !end)) {
-> +            warn_report("Skipping invalid PMU filter %s\n", event_filters[i]);
-> +            continue;
-> +        }
-> +
-> +        filter = (struct kvm_pmu_event_filter) {
-> +            .base_event     = start,
-> +            .nevents        = end - start + 1,
-> +            .action         = act == 'A' ? KVM_PMU_EVENT_ALLOW :
-> +                                           KVM_PMU_EVENT_DENY,
-> +        };
-> +
-> +        if (!kvm_arm_set_device_attr(cs, &attr, "PMU Event Filter")) {
-> +            if (errno == EINVAL) {
-> +                warn_report("Invalid PMU filter range [0x%x-0x%x]. "
-> +                             "ARMv8.0 support 10 bits event space, "
-> +                             "ARMv8.1 support 16 bits event space",
-> +                             start, end);
-> +            }
-> +            else if (errno == ENODEV) {
-> +                warn_report("GIC not initialized");
-> +            }
-> +            else if (errno == ENXIO) {
-> +                warn_report("PMUv3 not properly configured or in-kernel irqchip "
-> +                            "not configured.");
-> +            }
-> +            else if (errno == EBUSY) {
-> +                warn_report("PMUv3 already initialized or a VCPU has already run");
-> +            }
-> +
-> +            break;
-> +        }
-> +    }
-> +
-> +    g_strfreev(event_filters);
-> +}
-> +
->  void kvm_arm_pmu_init(CPUState *cs)
->  {
->      struct kvm_device_attr attr = {
-> @@ -141,6 +213,9 @@ void kvm_arm_pmu_init(CPUState *cs)
->      if (!ARM_CPU(cs)->has_pmu) {
->          return;
->      }
-> +
-> +    kvm_arm_pmu_filter_init(cs);
-> +
->      if (!kvm_arm_set_device_attr(cs, &attr, "PMU")) {
->          error_report("failed to init PMU");
->          abort();
-
-Thanks
-
-Eric
+>
+> Thanks,
+> Dragos
+>
+> > > Thanks,
+> > > Dragos
+> > >
+> > > > Regards,
+> > > > -Siwei
+> > > >
+> > > >
+> > > >
+> > > > >
+> > > > > Jason, what do you think?
+> > > > >
+> > > > > Thanks!
+> > > > >
+> > > > > > ---
+> > > > > >   drivers/vdpa/mlx5/net/mlx5_vnet.c  | 9 +++++++++
+> > > > > >   include/linux/mlx5/mlx5_ifc_vdpa.h | 1 +
+> > > > > >   2 files changed, 10 insertions(+)
+> > > > > >
+> > > > > > diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/m=
+lx5/net/mlx5_vnet.c
+> > > > > > index f8f088cced50..80e066de0866 100644
+> > > > > > --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> > > > > > +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> > > > > > @@ -1209,6 +1209,7 @@ static int modify_virtqueue(struct mlx5_v=
+dpa_net *ndev,
+> > > > > >          bool state_change =3D false;
+> > > > > >          void *obj_context;
+> > > > > >          void *cmd_hdr;
+> > > > > > +       void *vq_ctx;
+> > > > > >          void *in;
+> > > > > >          int err;
+> > > > > >
+> > > > > > @@ -1230,6 +1231,7 @@ static int modify_virtqueue(struct mlx5_v=
+dpa_net *ndev,
+> > > > > >          MLX5_SET(general_obj_in_cmd_hdr, cmd_hdr, uid, ndev->m=
+vdev.res.uid);
+> > > > > >
+> > > > > >          obj_context =3D MLX5_ADDR_OF(modify_virtio_net_q_in, i=
+n, obj_context);
+> > > > > > +       vq_ctx =3D MLX5_ADDR_OF(virtio_net_q_object, obj_contex=
+t, virtio_q_context);
+> > > > > >
+> > > > > >          if (mvq->modified_fields & MLX5_VIRTQ_MODIFY_MASK_STAT=
+E) {
+> > > > > >                  if (!is_valid_state_change(mvq->fw_state, stat=
+e, is_resumable(ndev))) {
+> > > > > > @@ -1241,6 +1243,12 @@ static int modify_virtqueue(struct mlx5_=
+vdpa_net *ndev,
+> > > > > >                  state_change =3D true;
+> > > > > >          }
+> > > > > >
+> > > > > > +       if (mvq->modified_fields & MLX5_VIRTQ_MODIFY_MASK_VIRTI=
+O_Q_ADDRS) {
+> > > > > > +               MLX5_SET64(virtio_q, vq_ctx, desc_addr, mvq->de=
+sc_addr);
+> > > > > > +               MLX5_SET64(virtio_q, vq_ctx, used_addr, mvq->de=
+vice_addr);
+> > > > > > +               MLX5_SET64(virtio_q, vq_ctx, available_addr, mv=
+q->driver_addr);
+> > > > > > +       }
+> > > > > > +
+> > > > > >          MLX5_SET64(virtio_net_q_object, obj_context, modify_fi=
+eld_select, mvq->modified_fields);
+> > > > > >          err =3D mlx5_cmd_exec(ndev->mvdev.mdev, in, inlen, out=
+, sizeof(out));
+> > > > > >          if (err)
+> > > > > > @@ -2202,6 +2210,7 @@ static int mlx5_vdpa_set_vq_address(struc=
+t vdpa_device *vdev, u16 idx, u64 desc_
+> > > > > >          mvq->desc_addr =3D desc_area;
+> > > > > >          mvq->device_addr =3D device_area;
+> > > > > >          mvq->driver_addr =3D driver_area;
+> > > > > > +       mvq->modified_fields |=3D MLX5_VIRTQ_MODIFY_MASK_VIRTIO=
+_Q_ADDRS;
+> > > > > >          return 0;
+> > > > > >   }
+> > > > > >
+> > > > > > diff --git a/include/linux/mlx5/mlx5_ifc_vdpa.h b/include/linux=
+/mlx5/mlx5_ifc_vdpa.h
+> > > > > > index b86d51a855f6..9594ac405740 100644
+> > > > > > --- a/include/linux/mlx5/mlx5_ifc_vdpa.h
+> > > > > > +++ b/include/linux/mlx5/mlx5_ifc_vdpa.h
+> > > > > > @@ -145,6 +145,7 @@ enum {
+> > > > > >          MLX5_VIRTQ_MODIFY_MASK_STATE                    =3D (u=
+64)1 << 0,
+> > > > > >          MLX5_VIRTQ_MODIFY_MASK_DIRTY_BITMAP_PARAMS      =3D (u=
+64)1 << 3,
+> > > > > >          MLX5_VIRTQ_MODIFY_MASK_DIRTY_BITMAP_DUMP_ENABLE =3D (u=
+64)1 << 4,
+> > > > > > +       MLX5_VIRTQ_MODIFY_MASK_VIRTIO_Q_ADDRS           =3D (u6=
+4)1 << 6,
+> > > > > >          MLX5_VIRTQ_MODIFY_MASK_DESC_GROUP_MKEY          =3D (u=
+64)1 << 14,
+> > > > > >   };
+> > > > > >
+> > > > > > --
+> > > > > > 2.42.0
+> > > > > >
+> > > >
+> > >
+> >
+>
 
 
