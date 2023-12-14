@@ -1,136 +1,194 @@
-Return-Path: <kvm+bounces-4462-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4463-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC168812C95
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 11:14:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F662812CC3
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 11:19:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AE95B2118E
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 10:13:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF51B282985
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 10:19:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF0F3B2A2;
-	Thu, 14 Dec 2023 10:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559F43BB26;
+	Thu, 14 Dec 2023 10:18:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cetuARQw"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="s21e8J/F"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BE94E3
-	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 02:13:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702548825;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kDMg3HUsC1D+7iMcfX6C49T0/PYwQi9wuLRR5tvdCBQ=;
-	b=cetuARQw5MkeyzHiUK8Wngwpj++u7RtHx6RkdJA2Q6IU4vxxH139sXZVI+GQwb2zF7KyoO
-	AlJy0SBCrcjkhj+NeDy7nP1xxWl7PQh5iUXHGYj2bc3pj0xfn30s97DbMLGP61Y8xZvYPW
-	sc79u6F0R+B4Vf879Pjyf+/AxJyILOU=
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
- [209.85.167.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-298-XUffS1e5Nqu57mZ4qsE2tg-1; Thu, 14 Dec 2023 05:13:43 -0500
-X-MC-Unique: XUffS1e5Nqu57mZ4qsE2tg-1
-Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3b8b66d49easo11630520b6e.1
-        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 02:13:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702548823; x=1703153623;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kDMg3HUsC1D+7iMcfX6C49T0/PYwQi9wuLRR5tvdCBQ=;
-        b=liDX9/nngbKIfRyopWNhgmfZ1/AeLBYdFVSD6BTjLc5qfWW1GsDFTUJNEt1QWlvE8r
-         wPfvuL35nTpfn+fGqieSShAG4uCnlrQCFufw36AqZr3uaRLAU+EWG6tTbl0pgQ7aCTgx
-         3bMBJ9SykjUiSM/E+d0pxpH2sdF2Rys7gNuFmYVEmxyzpb+AcF+UF8vWrY9O+Zfu9/NS
-         Jykil546iJs/EtBXHTOZUB0Gof9qBONyGJjJ40Rmfu0x6RMfamWYmz9b1TtUoG6wm7yM
-         Wz66V7jcsoe2ncZbJIYPDfp90LaVqMLlh4bLuUaKWaSLEpx3oa0G960I923rsnKQLacH
-         2Bqg==
-X-Gm-Message-State: AOJu0Yyd5C1f3bdp64Rc0WrGuTE1EeLSiQ2MkZtwn/TUoLEqZM+7xHpV
-	yjNdMWfg0Ywa69Uygt+No9ZcWSBvEiTlvDXfTrTlG+4G5UPHyPgUnz2gtbJutlhY+gJSdWrtiEZ
-	Mva+hpDNAhheH
-X-Received: by 2002:a05:6358:9dae:b0:170:26c3:ae83 with SMTP id d46-20020a0563589dae00b0017026c3ae83mr8097284rwo.57.1702548823110;
-        Thu, 14 Dec 2023 02:13:43 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFB8csX1ryjDrxVFDCJY0uU76NV+YESezciiIbJoADXQAiSZe/NmTA3B8WcS0+AnSTCcwNpzQ==
-X-Received: by 2002:a05:6358:9dae:b0:170:26c3:ae83 with SMTP id d46-20020a0563589dae00b0017026c3ae83mr8097264rwo.57.1702548822646;
-        Thu, 14 Dec 2023 02:13:42 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id et2-20020a056214176200b0067f02d13157sm804679qvb.15.2023.12.14.02.13.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Dec 2023 02:13:42 -0800 (PST)
-Message-ID: <b3882f12-04e0-4293-9f94-19895b182d2f@redhat.com>
-Date: Thu, 14 Dec 2023 11:13:38 +0100
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6D4A106;
+	Thu, 14 Dec 2023 02:18:49 -0800 (PST)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BEA8i5l029803;
+	Thu, 14 Dec 2023 10:18:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=7sbqsZI/dIh7/sQIt7TDuIeiF4sOnSbRyAmeSQz0zu0=;
+ b=s21e8J/FoK7QGJ+5lb9TPT6gNh/B9HeNspwnolY4mt0qkVZzUBzKmrtLPhFTOSB4nrCk
+ wILfVEPVB/u+k7GQsU04wkIbwRx2+Y93xM6TsPoT73e+4rojLM5bkYmSZgsnUEg3a8G8
+ Si0rkxfNIU7XwDzq1U+C36Y2WTbLPmjwVIdsds3SDyRrOpvzi+W4gxBCLt4gB2I65lNN
+ rFVEiq9SUi/hHHcEkJYCZgdv1kCCgeoOUNbOBimoNcxLVvhzoCFsRcxd2fdx2JToWpHI
+ h/K+GH0LKpytSo4+0IDIOYqiO4O9d20IcmLB2IdSvpj+pk7/LVVgJUCmSepALzOT7F3E VQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uyxbvj91x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Dec 2023 10:18:46 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BE9CvqM020754;
+	Thu, 14 Dec 2023 10:18:46 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uyxbvj91j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Dec 2023 10:18:46 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BE9T3Ld028201;
+	Thu, 14 Dec 2023 10:18:45 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uw2xyyupd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Dec 2023 10:18:45 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BEAIfgm65863960
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 14 Dec 2023 10:18:41 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A569820070;
+	Thu, 14 Dec 2023 10:18:41 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7EB582006E;
+	Thu, 14 Dec 2023 10:18:41 +0000 (GMT)
+Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.152.224.238])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 14 Dec 2023 10:18:41 +0000 (GMT)
+Message-ID: <05d13c9ffc4876602044311d737e3074dd81894a.camel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 5/5] s390x: Add test for STFLE
+ interpretive execution (format-0)
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Nico =?ISO-8859-1?Q?B=F6hr?= <nrb@linux.ibm.com>,
+        Janosch Frank
+	 <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
+        Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
+        Thomas Huth <thuth@redhat.com>
+Date: Thu, 14 Dec 2023 11:18:41 +0100
+In-Reply-To: <2096291747c433d02cac794a9c85118b85199370.camel@linux.ibm.com>
+References: <20231213124942.604109-1-nsg@linux.ibm.com>
+	 <20231213124942.604109-6-nsg@linux.ibm.com>
+	 <20231213180033.54516bdd@p-imbrenda>
+	 <2096291747c433d02cac794a9c85118b85199370.camel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/5] KVM: selftests: aarch64: Fix the buggy
- [enable|disable]_counter
-Content-Language: en-US
-To: Shaoqin Huang <shahuang@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc: James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231129072712.2667337-1-shahuang@redhat.com>
- <20231129072712.2667337-4-shahuang@redhat.com>
-From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <20231129072712.2667337-4-shahuang@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: rfPjk788Q4mJJvFJxBx86wL4WJ2hffLM
+X-Proofpoint-ORIG-GUID: wonD1QMixsCob4D44TNf64cQUuJBwMBU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-14_06,2023-12-13_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ mlxscore=0 mlxlogscore=999 priorityscore=1501 adultscore=0 phishscore=0
+ clxscore=1015 malwarescore=0 suspectscore=0 lowpriorityscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2312140067
 
-Hi Shaoqin,
+On Wed, 2023-12-13 at 18:31 +0100, Nina Schoetterl-Glausch wrote:
+> On Wed, 2023-12-13 at 18:00 +0100, Claudio Imbrenda wrote:
+> > On Wed, 13 Dec 2023 13:49:42 +0100
+> > Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
+> >=20
+> > > The STFLE instruction indicates installed facilities.
+> > > SIE can interpretively execute STFLE.
+> > > Use a snippet guest executing STFLE to get the result of
+> > > interpretive execution and check the result.
+> > >=20
+> > > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> >=20
+> > [...]
+> >=20
+> > >  static inline void setup_facilities(void)
+> > > diff --git a/s390x/snippets/c/stfle.c b/s390x/snippets/c/stfle.c
+> > > new file mode 100644
+> > > index 00000000..eb024a6a
+> > > --- /dev/null
+> > > +++ b/s390x/snippets/c/stfle.c
+> > > @@ -0,0 +1,26 @@
+> > > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > > +/*
+> > > + * Copyright IBM Corp. 2023
+> > > + *
+> > > + * Snippet used by the STLFE interpretive execution facilities test.
+> > > + */
+> > > +#include <libcflat.h>
+> > > +#include <snippet-guest.h>
+> > > +
+> > > +int main(void)
+> > > +{
+> > > +	const unsigned int max_fac_len =3D 8;
+> >=20
+> > why 8?
+>=20
+> 8 is a somewhat arbitrary, large number :)
+> I suppose I could choose an even larger one, maybe even PAGE_SIZE/8.
+> That would guarantee that max_fac_len >=3D stfle_size() (8 is enough for =
+that today)
+> It's not necessary for max_fac_len >=3D stfle_size(), but probably good f=
+or
+> test coverage.
+> >=20
+> > > +	uint64_t res[max_fac_len + 1];
+> > > +
+> > > +	res[0] =3D max_fac_len - 1;
+> > > +	asm volatile ( "lg	0,%[len]\n"
+> > > +		"	stfle	%[fac]\n"
+> > > +		"	stg	0,%[len]\n"
+> > > +		: [fac] "=3DQS"(*(uint64_t(*)[max_fac_len])&res[1]),
+> > > +		  [len] "+RT"(res[0])
+> > > +		:
+> > > +		: "%r0", "cc"
+> > > +	);
+> > > +	force_exit_value((uint64_t)&res);
+> > > +	return 0;
+> > > +}
+> > > diff --git a/s390x/stfle-sie.c b/s390x/stfle-sie.c
+> > > new file mode 100644
+> > > index 00000000..574319ed
+> > > --- /dev/null
+> > > +++ b/s390x/stfle-sie.c
+> > > @@ -0,0 +1,132 @@
 
-On 11/29/23 08:27, Shaoqin Huang wrote:
-> In general, the set/clr registers should always be used in their
-> write form, never in a RMW form (imagine an interrupt disabling
-> a counter between the read and the write...).
-> 
-> The current implementation of [enable|disable]_counter both use the RMW
-> form, fix them by directly write to the set/clr registers.
-> 
-> At the same time, it also fix the buggy disable_counter() which would
-> end up disabling all the counters.
-> 
-> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+[...]
 
-Eric
+> > > +	vm.sblk->fac =3D (uint32_t)(uint64_t)fac;
+> > > +	res =3D run_guest();
+> > > +	report(res.len =3D=3D stfle_size(), "stfle len correct");
 
-> ---
->  tools/testing/selftests/kvm/include/aarch64/vpmu.h | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/vpmu.h b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
-> index e0cc1ca1c4b7..644dae3814b5 100644
-> --- a/tools/testing/selftests/kvm/include/aarch64/vpmu.h
-> +++ b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
-> @@ -78,17 +78,13 @@ static inline void write_sel_evtyper(int sel, unsigned long val)
->  
->  static inline void enable_counter(int idx)
->  {
-> -	uint64_t v = read_sysreg(pmcntenset_el0);
-> -
-> -	write_sysreg(BIT(idx) | v, pmcntenset_el0);
-> +	write_sysreg(BIT(idx), pmcntenset_el0);
->  	isb();
->  }
->  
->  static inline void disable_counter(int idx)
->  {
-> -	uint64_t v = read_sysreg(pmcntenset_el0);
-> -
-> -	write_sysreg(BIT(idx) | v, pmcntenclr_el0);
-> +	write_sysreg(BIT(idx), pmcntenclr_el0);
->  	isb();
->  }
->  
+You're right, disregard everything below.
+>=20
+> ^ should be
+>=20
+> +	report(res.len =3D=3D min(stfle_size(), 8), "stfle len correct");
+>=20
+> For the case that the guest buffer was shorter.
+>=20
+> > > +	report(!memcmp(*fac, res.mem, res.len * sizeof(uint64_t)),
+> > > +	       "Guest facility list as specified");
+> >=20
+> > it seems like you are comparing the full facility list (stfle_size
+> > doublewords long) with the result of STFLE in the guest, but the guest
+> > is limited to 8 double words?
+>=20
+> Their prefixes must be the same. res.len is the guest length, so max 8 ri=
+ght now.
+> >=20
+> > > +	report_prefix_pop();
+> > > +}
 
 
