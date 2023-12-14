@@ -1,236 +1,193 @@
-Return-Path: <kvm+bounces-4467-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4469-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C7F4812D0A
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 11:34:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71DAC812DFA
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 12:01:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6FADB2118E
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 10:34:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AB081F2186B
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 11:01:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21FE03BB2A;
-	Thu, 14 Dec 2023 10:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD4853E469;
+	Thu, 14 Dec 2023 11:01:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BMd62n8G"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="XTPV9i/4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE9EE10E
-	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 02:34:43 -0800 (PST)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-3333074512bso236850f8f.1
-        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 02:34:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702550082; x=1703154882; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VTIMG9FJoGMyoT9rRoj2x7tqQ0Gr6d1LxVablCR6iy8=;
-        b=BMd62n8Gm/Z9NL+2zqIdSEPhX9+DBCHsD6GAfNYwKnsWhBHUF6p86UgkMhJlqsHA9+
-         sWC4hpBNQLaChhDfX9+fZIJHnDvX1PNRhDav47FgVkFYsqu8ViTPVOWHV1lp/vkqQmu1
-         Q10rf0dqSRDC5gKEOd3N0uz8fIp7vrDkUkXVC/kHdeavGXzGt+JsovnFssRVjhmt820x
-         yjtf3GW6+8OyImoOefDdZEfqvdzGer3uTbOAmYMso4Bnqd1C/o+UzDOtWeKPDMKy5bMb
-         iXa1bx1uW1yXLIaG9Cpp+GKBiXrqtGUfC8g3lXv1VVCJv8i6WSnHK8iJ4KhfxbckS/y/
-         sN5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702550082; x=1703154882;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=VTIMG9FJoGMyoT9rRoj2x7tqQ0Gr6d1LxVablCR6iy8=;
-        b=Ur62KrtORngLPdGjjXIqTsNzl/1TlPoFryo8Zw2YoS9s/xGI766xdj4N7ZjZM1Yyhn
-         c7pjvlDM1Z3Kj0ceVeARoIkbYk/QQPYBopUaOcMTGRfnVfeptpDzmCTNPxDDSecZtODi
-         IVdsC5NEkKgc/VktK4EKmSIhTELWp0u7myjnt3TCNxy6KOaFDLDFW5ENFtpyvhEC+29N
-         gw9TvX1A6VK2l4Y7qqkrGAwUaeiZUTHHCzklPNn7IjHVWsXypps37PwYZzlLA0LvXBig
-         ZzKUx4gr6XW+piRKD81zWc0nKT4FBSuSCSLhfq8RQ46MHZJIPrsImC4DU+0GycFN+ViN
-         0I+w==
-X-Gm-Message-State: AOJu0YyxV9skvP/Es19KygeaERSZL7juOUKzYKYtwirEHxOX+EgeVPfF
-	zuwyV0XMQNJTYroHG0qWspC1qQ==
-X-Google-Smtp-Source: AGHT+IEnzdfsAufZfsYDDmCA8IJHdokLbFAltymI6snKzyOYYZjuz900q/taMvC1Zuz+SQEW3V/P3g==
-X-Received: by 2002:a1c:7906:0:b0:40b:5e4a:235b with SMTP id l6-20020a1c7906000000b0040b5e4a235bmr4708868wme.93.1702550082208;
-        Thu, 14 Dec 2023 02:34:42 -0800 (PST)
-Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id bi11-20020a05600c3d8b00b0040c2963e5f3sm23970057wmb.38.2023.12.14.02.34.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 02:34:41 -0800 (PST)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 758725F7D3;
-	Thu, 14 Dec 2023 10:34:41 +0000 (GMT)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org,  Jiaxun Yang <jiaxun.yang@flygoat.com>,  Radoslaw
- Biernacki <rad@semihalf.com>,  Paul Durrant <paul@xen.org>,  Akihiko Odaki
- <akihiko.odaki@daynix.com>,  Leif Lindholm <quic_llindhol@quicinc.com>,
-  Peter Maydell <peter.maydell@linaro.org>,  Paolo Bonzini
- <pbonzini@redhat.com>,  kvm@vger.kernel.org,  qemu-arm@nongnu.org,
-  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,  Beraldo Leal
- <bleal@redhat.com>,  Wainer dos Santos Moschetta <wainersm@redhat.com>,
-  Sriram Yagnaraman <sriram.yagnaraman@est.tech>,  Marcin Juszkiewicz
- <marcin.juszkiewicz@linaro.org>,  David Woodhouse <dwmw2@infradead.org>
-Subject: Re: [PATCH 04/10] tests/avocado: machine aarch64: standardize
- location and RO/RW access
-In-Reply-To: <87h6klvm90.fsf@p1.localdomain> (Cleber Rosa's message of "Wed,
-	13 Dec 2023 16:14:03 -0500")
-References: <20231208190911.102879-1-crosa@redhat.com>
-	<20231208190911.102879-5-crosa@redhat.com>
-	<87wmtkeils.fsf@draig.linaro.org> <87h6klvm90.fsf@p1.localdomain>
-User-Agent: mu4e 1.11.26; emacs 29.1
-Date: Thu, 14 Dec 2023 10:34:41 +0000
-Message-ID: <87le9x843i.fsf@draig.linaro.org>
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80E1712A;
+	Thu, 14 Dec 2023 03:01:16 -0800 (PST)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 9D06410002A;
+	Thu, 14 Dec 2023 14:01:13 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 9D06410002A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1702551673;
+	bh=Ocja7oLDcU2O2ANLOIyPEwBcA8pE24kYRcLiOan5xok=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=XTPV9i/4hEsj0ZH0ZnUL4L4qi6NFTyCbyJyrhwEBeG/40659PSOwVxLBaXYF36AqZ
+	 OE4WoOaEaI2nUMisuHA9lIGp7EoDWeAH1w56j13GauAKBU8juoc0/7WY8kwHTYM6+P
+	 /C9nfY/ntx/hX1uIPQrwJZDuVvJSpZxlygivzBezrvquTuxzTWfigV1wC8WEDzL8KY
+	 /PFlkKqIyc3rNjx5zb0p1TrgcYHZFfwZZ92sZJ8OibH6/zEyeeC3HIFqNE9sOOGxfB
+	 2QTMPl+LBUGY1EshExG2z8s+MVwqkxWQfGi1E4mzXM0+x1Cl8n5AEKIU0eXF6zdOHr
+	 h/c4LW2IHdFwQ==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Thu, 14 Dec 2023 14:01:13 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 14 Dec 2023 14:01:13 +0300
+Message-ID: <e0e601a9-6cb2-e484-eb70-f41e7ec69c65@salutedevices.com>
+Date: Thu, 14 Dec 2023 13:52:50 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net-next v9 3/4] vsock: update SO_RCVLOWAT setting
+ callback
+Content-Language: en-US
+To: "Michael S. Tsirkin" <mst@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
+	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20231214091947.395892-1-avkrasnov@salutedevices.com>
+ <20231214091947.395892-4-avkrasnov@salutedevices.com>
+ <20231214052502-mutt-send-email-mst@kernel.org>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <20231214052502-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 182107 [Dec 14 2023]
+X-KSMG-AntiSpam-Version: 6.1.0.3
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Tracking_from_domain_doesnt_match_to}, smtp.sberdevices.ru:7.1.1,5.0.1;127.0.0.199:7.1.2;100.64.160.123:7.1.2;salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/12/14 08:33:00 #22688916
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-Cleber Rosa <crosa@redhat.com> writes:
 
-> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
->
->> Cleber Rosa <crosa@redhat.com> writes:
->>
->>> The tests under machine_aarch64_virt.py do not need read-write access
->>> to the ISOs.  The ones under machine_aarch64_sbsaref.py, on the other
->>> hand, will need read-write access, so let's give each test an unique
->>> file.
->>
->> I think we are making two separate changes here so probably best split
->> the patch.
->>
->
-> Sure, but, do you mean separating the "readonly=3Don" and the "writable
-> file" changes?  Or separating those two from the ISO url code style
-> change?
 
-I was thinking about splitting the sbsaref and virt patches, but
-actually they are fairly related as they all use the alpine image so
-maybe no need.
+On 14.12.2023 13:29, Michael S. Tsirkin wrote:
+> On Thu, Dec 14, 2023 at 12:19:46PM +0300, Arseniy Krasnov wrote:
+>> Do not return if transport callback for SO_RCVLOWAT is set (only in
+>> error case). In this case we don't need to set 'sk_rcvlowat' field in
+>> each transport - only in 'vsock_set_rcvlowat()'. Also, if 'sk_rcvlowat'
+>> is now set only in af_vsock.c, change callback name from 'set_rcvlowat'
+>> to 'notify_set_rcvlowat'.
+>>
+>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> Maybe squash this with patch 2/4?
 
->
->>> And while at it, let's use a single code style and hash for the ISO
->>> url.
->>>
->>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->>> ---
->>>  tests/avocado/machine_aarch64_sbsaref.py |  9 +++++++--
->>>  tests/avocado/machine_aarch64_virt.py    | 14 +++++++-------
->>>  2 files changed, 14 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/tests/avocado/machine_aarch64_sbsaref.py b/tests/avocado/m=
-achine_aarch64_sbsaref.py
->>> index 528c7d2934..6ae84d77ac 100644
->>> --- a/tests/avocado/machine_aarch64_sbsaref.py
->>> +++ b/tests/avocado/machine_aarch64_sbsaref.py
->>> @@ -7,6 +7,7 @@
->>>  # SPDX-License-Identifier: GPL-2.0-or-later
->>>=20=20
->>>  import os
->>> +import shutil
->>>=20=20
->>>  from avocado import skipUnless
->>>  from avocado.utils import archive
->>> @@ -123,13 +124,15 @@ def boot_alpine_linux(self, cpu):
->>>=20=20
->>>          iso_hash =3D "5a36304ecf039292082d92b48152a9ec21009d3a62f459de=
-623e19c4bd9dc027"
->>>          iso_path =3D self.fetch_asset(iso_url, algorithm=3D"sha256", a=
-sset_hash=3Diso_hash)
->>> +        iso_path_rw =3D os.path.join(self.workdir, os.path.basename(is=
-o_path))
->>> +        shutil.copy(iso_path, iso_path_rw)
->>>=20=20
->>>          self.vm.set_console()
->>>          self.vm.add_args(
->>>              "-cpu",
->>>              cpu,
->>>              "-drive",
->>> -            f"file=3D{iso_path},format=3Draw",
->>> +            f"file=3D{iso_path_rw},format=3Draw",
->>
->> Instead of copying why not add ",snapshot=3Don" to preserve the original
->> image. We don't want to persist data between tests.
+You mean just do 'git squash' without updating commit message manually?
 
-Ahh yes these are isos so snapshot isn't needed.
+Thanks, Arseniy
 
+> 
+>> ---
+>>  Changelog:
+>>  v3 -> v4:
+>>   * Rename 'set_rcvlowat' to 'notify_set_rcvlowat'.
+>>   * Commit message updated.
 >>
->>>              "-device",
->>>              "virtio-rng-pci,rng=3Drng0",
->>>              "-object",
->>> @@ -170,13 +173,15 @@ def boot_openbsd73(self, cpu):
->>>=20=20
->>>          img_hash =3D "7fc2c75401d6f01fbfa25f4953f72ad7d7c18650056d3075=
-5c44b9c129b707e5"
->>>          img_path =3D self.fetch_asset(img_url, algorithm=3D"sha256", a=
-sset_hash=3Dimg_hash)
->>> +        img_path_rw =3D os.path.join(self.workdir, os.path.basename(im=
-g_path))
->>> +        shutil.copy(img_path, img_path_rw)
->>>=20=20
->>>          self.vm.set_console()
->>>          self.vm.add_args(
->>>              "-cpu",
->>>              cpu,
->>>              "-drive",
->>> -            f"file=3D{img_path},format=3Draw",
->>> +            f"file=3D{img_path_rw},format=3Draw",
+>>  include/net/af_vsock.h           | 2 +-
+>>  net/vmw_vsock/af_vsock.c         | 9 +++++++--
+>>  net/vmw_vsock/hyperv_transport.c | 4 ++--
+>>  3 files changed, 10 insertions(+), 5 deletions(-)
 >>
->> ditto.
->>
->>
->>>              "-device",
->>>              "virtio-rng-pci,rng=3Drng0",
->>>              "-object",
->>> diff --git a/tests/avocado/machine_aarch64_virt.py b/tests/avocado/mach=
-ine_aarch64_virt.py
->>> index a90dc6ff4b..093d68f837 100644
->>> --- a/tests/avocado/machine_aarch64_virt.py
->>> +++ b/tests/avocado/machine_aarch64_virt.py
->>> @@ -37,13 +37,13 @@ def test_alpine_virt_tcg_gic_max(self):
->>>          :avocado: tags=3Dmachine:virt
->>>          :avocado: tags=3Daccel:tcg
->>>          """
->>> -        iso_url =3D ('https://dl-cdn.alpinelinux.org/'
->>> -                   'alpine/v3.17/releases/aarch64/'
->>> -                   'alpine-standard-3.17.2-aarch64.iso')
->>> +        iso_url =3D (
->>> +            "https://dl-cdn.alpinelinux.org/"
->>> +            "alpine/v3.17/releases/aarch64/alpine-standard-3.17.2-aarc=
-h64.iso"
->>> +        )
->>>=20=20
->>> -        # Alpine use sha256 so I recalculated this myself
->>> -        iso_sha1 =3D '76284fcd7b41fe899b0c2375ceb8470803eea839'
->>> -        iso_path =3D self.fetch_asset(iso_url, asset_hash=3Diso_sha1)
->>> +        iso_hash =3D "5a36304ecf039292082d92b48152a9ec21009d3a62f459de=
-623e19c4bd9dc027"
->>> +        iso_path =3D self.fetch_asset(iso_url, algorithm=3D"sha256", a=
-sset_hash=3Diso_hash)
->>>=20=20
->>>          self.vm.set_console()
->>>          kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
->>> @@ -60,7 +60,7 @@ def test_alpine_virt_tcg_gic_max(self):
->>>          self.vm.add_args("-smp", "2", "-m", "1024")
->>>          self.vm.add_args('-bios', os.path.join(BUILD_DIR, 'pc-bios',
->>>                                                 'edk2-aarch64-code.fd'))
->>> -        self.vm.add_args("-drive", f"file=3D{iso_path},format=3Draw")
->>> +        self.vm.add_args("-drive",
->>>          f"file=3D{iso_path},readonly=3Don,format=3Draw")
->>
->> Perhaps we can set ",media=3Dcdrom" here.
->>
->
-> Yes, but more importantly, adding both "readonly=3Don" and "media=3Dcdrom"
-> to the tests under machine_aarch64_sbsaref.py do the trick.  Now, the
-> behavior explained in my previous response still warrants investigation
-> IMO.
->
-> Thanks
-> - Cleber.
-
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
+>> diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>> index e302c0e804d0..535701efc1e5 100644
+>> --- a/include/net/af_vsock.h
+>> +++ b/include/net/af_vsock.h
+>> @@ -137,7 +137,6 @@ struct vsock_transport {
+>>  	u64 (*stream_rcvhiwat)(struct vsock_sock *);
+>>  	bool (*stream_is_active)(struct vsock_sock *);
+>>  	bool (*stream_allow)(u32 cid, u32 port);
+>> -	int (*set_rcvlowat)(struct vsock_sock *vsk, int val);
+>>  
+>>  	/* SEQ_PACKET. */
+>>  	ssize_t (*seqpacket_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
+>> @@ -168,6 +167,7 @@ struct vsock_transport {
+>>  		struct vsock_transport_send_notify_data *);
+>>  	/* sk_lock held by the caller */
+>>  	void (*notify_buffer_size)(struct vsock_sock *, u64 *);
+>> +	int (*notify_set_rcvlowat)(struct vsock_sock *vsk, int val);
+>>  
+>>  	/* Shutdown. */
+>>  	int (*shutdown)(struct vsock_sock *, int);
+>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>> index 816725af281f..54ba7316f808 100644
+>> --- a/net/vmw_vsock/af_vsock.c
+>> +++ b/net/vmw_vsock/af_vsock.c
+>> @@ -2264,8 +2264,13 @@ static int vsock_set_rcvlowat(struct sock *sk, int val)
+>>  
+>>  	transport = vsk->transport;
+>>  
+>> -	if (transport && transport->set_rcvlowat)
+>> -		return transport->set_rcvlowat(vsk, val);
+>> +	if (transport && transport->notify_set_rcvlowat) {
+>> +		int err;
+>> +
+>> +		err = transport->notify_set_rcvlowat(vsk, val);
+>> +		if (err)
+>> +			return err;
+>> +	}
+>>  
+>>  	WRITE_ONCE(sk->sk_rcvlowat, val ? : 1);
+>>  	return 0;
+> 
+> 
+> 
+> I would s
+> 
+>> diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+>> index 7cb1a9d2cdb4..e2157e387217 100644
+>> --- a/net/vmw_vsock/hyperv_transport.c
+>> +++ b/net/vmw_vsock/hyperv_transport.c
+>> @@ -816,7 +816,7 @@ int hvs_notify_send_post_enqueue(struct vsock_sock *vsk, ssize_t written,
+>>  }
+>>  
+>>  static
+>> -int hvs_set_rcvlowat(struct vsock_sock *vsk, int val)
+>> +int hvs_notify_set_rcvlowat(struct vsock_sock *vsk, int val)
+>>  {
+>>  	return -EOPNOTSUPP;
+>>  }
+>> @@ -856,7 +856,7 @@ static struct vsock_transport hvs_transport = {
+>>  	.notify_send_pre_enqueue  = hvs_notify_send_pre_enqueue,
+>>  	.notify_send_post_enqueue = hvs_notify_send_post_enqueue,
+>>  
+>> -	.set_rcvlowat             = hvs_set_rcvlowat
+>> +	.notify_set_rcvlowat      = hvs_notify_set_rcvlowat
+>>  };
+>>  
+>>  static bool hvs_check_transport(struct vsock_sock *vsk)
+>> -- 
+>> 2.25.1
+> 
 
