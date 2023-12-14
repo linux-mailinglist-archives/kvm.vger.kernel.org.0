@@ -1,193 +1,360 @@
-Return-Path: <kvm+bounces-4469-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4468-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71DAC812DFA
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 12:01:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2348C812DC3
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 11:54:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AB081F2186B
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 11:01:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5DF6CB212B0
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 10:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD4853E469;
-	Thu, 14 Dec 2023 11:01:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E29163FB18;
+	Thu, 14 Dec 2023 10:53:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="XTPV9i/4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q6pYGnGK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80E1712A;
-	Thu, 14 Dec 2023 03:01:16 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 9D06410002A;
-	Thu, 14 Dec 2023 14:01:13 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 9D06410002A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1702551673;
-	bh=Ocja7oLDcU2O2ANLOIyPEwBcA8pE24kYRcLiOan5xok=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=XTPV9i/4hEsj0ZH0ZnUL4L4qi6NFTyCbyJyrhwEBeG/40659PSOwVxLBaXYF36AqZ
-	 OE4WoOaEaI2nUMisuHA9lIGp7EoDWeAH1w56j13GauAKBU8juoc0/7WY8kwHTYM6+P
-	 /C9nfY/ntx/hX1uIPQrwJZDuVvJSpZxlygivzBezrvquTuxzTWfigV1wC8WEDzL8KY
-	 /PFlkKqIyc3rNjx5zb0p1TrgcYHZFfwZZ92sZJ8OibH6/zEyeeC3HIFqNE9sOOGxfB
-	 2QTMPl+LBUGY1EshExG2z8s+MVwqkxWQfGi1E4mzXM0+x1Cl8n5AEKIU0eXF6zdOHr
-	 h/c4LW2IHdFwQ==
-Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Thu, 14 Dec 2023 14:01:13 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 14 Dec 2023 14:01:13 +0300
-Message-ID: <e0e601a9-6cb2-e484-eb70-f41e7ec69c65@salutedevices.com>
-Date: Thu, 14 Dec 2023 13:52:50 +0300
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD55E193
+	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 02:53:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702551192;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MnhJLfTgIa3SLXx4xPA9543TtdSKVB5MmnU2aw58KwM=;
+	b=Q6pYGnGKECFf0S8X2bx4bTbnyhfkl3H1KPZoSi15MwJDD+EBt1m5MF7gdx8Db1MOwyj0pd
+	+fzw5S8LDa4iemqUNroA/sebLK0FZ+YoRyazjPLP47f1STX3hz5+AZNBRDLGobTiuZz2mD
+	x4vpCzOxytrHknZTRU9ILYpf2wmV2Gs=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-65-xMvqU_3pNaGjwxpUsgJV6w-1; Thu, 14 Dec 2023 05:53:10 -0500
+X-MC-Unique: xMvqU_3pNaGjwxpUsgJV6w-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2c9ef4b6ce4so65756281fa.1
+        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 02:53:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702551188; x=1703155988;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MnhJLfTgIa3SLXx4xPA9543TtdSKVB5MmnU2aw58KwM=;
+        b=ImUX6pdqwawWHrtv4hKtCdokxuHDOQR6Yv+4TZ5vqT4NBfjwaDdbPi+FFBAhsAmj1K
+         uTyj6hr1rjBK1e4JokvxRET9fK3FxKpZxzc8fgqAfduT/6dGw/orSkJTfV9fgbCU2lx3
+         jKpLsYZ0AxIqgYWP/ri40xOSCNZ7M4cUOtzXGE/mA3JwIwKO/jMASsuqkHVGHDSrz/50
+         +grpLBRumAmBEGA7hi74fKC95DIhBD0lK3OgV2ho2Wr+cgBfrX69luyFP38eaTxU/qEq
+         aXt2qACv2UDx7F9kikor6+djd6jnh8awXCq8CO86vjEiS2QxxGOSVlBVZ1Fu5Jhki48K
+         sbkQ==
+X-Gm-Message-State: AOJu0Yw4bUDbgdeQ3kqUM9VWpzRLcUg7XTY8bAVdgeeWZnQC7Hf7+xjg
+	HyrORzImyy8MiHT04sxuDQEwuWGqF4nHMGCphqljSKLN9XN2xZPHch/YqpVJt1nzYNSFc8r1+W5
+	M5YnYWNvME/E+
+X-Received: by 2002:ac2:5bc6:0:b0:50b:f7c1:e560 with SMTP id u6-20020ac25bc6000000b0050bf7c1e560mr4949377lfn.64.1702551188434;
+        Thu, 14 Dec 2023 02:53:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEk+Q1l8hgiJ7UNrZAfbbpiLBywjIYVZ2ilgn7mgJ9X6HXByaqkQ5JHzQ6fHFgg15QB4WdHxw==
+X-Received: by 2002:ac2:5bc6:0:b0:50b:f7c1:e560 with SMTP id u6-20020ac25bc6000000b0050bf7c1e560mr4949372lfn.64.1702551188062;
+        Thu, 14 Dec 2023 02:53:08 -0800 (PST)
+Received: from fedora (g2.ign.cz. [91.219.240.8])
+        by smtp.gmail.com with ESMTPSA id g13-20020a056000118d00b003333d46a9e8sm15714036wrx.56.2023.12.14.02.53.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 02:53:07 -0800 (PST)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>
+Cc: Suleiman Souhlal <suleiman@google.com>, Masami Hiramatsu
+ <mhiramat@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ x86@kernel.org, Joel Fernandes <joel@joelfernandes.org>, Ben Segall
+ <bsegall@google.com>, Borislav Petkov <bp@alien8.de>, Daniel Bristot de
+ Oliveira <bristot@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>,
+ Dietmar Eggemann <dietmar.eggemann@arm.com>, "H . Peter Anvin"
+ <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Juri Lelli
+ <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>, Paolo Bonzini
+ <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra
+ <peterz@infradead.org>, Sean Christopherson <seanjc@google.com>, Steven
+ Rostedt <rostedt@goodmis.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Valentin Schneider <vschneid@redhat.com>, Vincent Guittot
+ <vincent.guittot@linaro.org>, Wanpeng Li <wanpengli@tencent.com>
+Subject: Re: [RFC PATCH 1/8] kvm: x86: MSR for setting up scheduler info
+ shared memory
+In-Reply-To: <20231214024727.3503870-2-vineeth@bitbyteword.org>
+References: <20231214024727.3503870-1-vineeth@bitbyteword.org>
+ <20231214024727.3503870-2-vineeth@bitbyteword.org>
+Date: Thu, 14 Dec 2023 11:53:06 +0100
+Message-ID: <877clhkqct.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v9 3/4] vsock: update SO_RCVLOWAT setting
- callback
-Content-Language: en-US
-To: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
-	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20231214091947.395892-1-avkrasnov@salutedevices.com>
- <20231214091947.395892-4-avkrasnov@salutedevices.com>
- <20231214052502-mutt-send-email-mst@kernel.org>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <20231214052502-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 182107 [Dec 14 2023]
-X-KSMG-AntiSpam-Version: 6.1.0.3
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Tracking_from_domain_doesnt_match_to}, smtp.sberdevices.ru:7.1.1,5.0.1;127.0.0.199:7.1.2;100.64.160.123:7.1.2;salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/12/14 08:33:00 #22688916
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain
 
+"Vineeth Pillai (Google)" <vineeth@bitbyteword.org> writes:
 
+> Implement a kvm MSR that guest uses to provide the GPA of shared memory
+> for communicating the scheduling information between host and guest.
+>
+> wrmsr(0) disables the feature. wrmsr(valid_gpa) enables the feature and
+> uses the gpa for further communication.
+>
+> Also add a new cpuid feature flag for the host to advertise the feature
+> to the guest.
+>
+> Co-developed-by: Joel Fernandes (Google) <joel@joelfernandes.org>
+> Signed-off-by: Joel Fernandes (Google) <joel@joelfernandes.org>
+> Signed-off-by: Vineeth Pillai (Google) <vineeth@bitbyteword.org>
+> ---
+>  arch/x86/include/asm/kvm_host.h      | 25 ++++++++++++
+>  arch/x86/include/uapi/asm/kvm_para.h | 24 +++++++++++
+>  arch/x86/kvm/Kconfig                 | 12 ++++++
+>  arch/x86/kvm/cpuid.c                 |  2 +
+>  arch/x86/kvm/x86.c                   | 61 ++++++++++++++++++++++++++++
+>  include/linux/kvm_host.h             |  5 +++
+>  6 files changed, 129 insertions(+)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index f72b30d2238a..f89ba1f07d88 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -987,6 +987,18 @@ struct kvm_vcpu_arch {
+>  	/* Protected Guests */
+>  	bool guest_state_protected;
+>  
+> +#ifdef CONFIG_PARAVIRT_SCHED_KVM
+> +	/*
+> +	 * MSR to setup a shared memory for scheduling
+> +	 * information sharing between host and guest.
+> +	 */
+> +	struct {
+> +		enum kvm_vcpu_boost_state boost_status;
+> +		u64 msr_val;
+> +		struct gfn_to_hva_cache data;
+> +	} pv_sched;
+> +#endif
+> +
+>  	/*
+>  	 * Set when PDPTS were loaded directly by the userspace without
+>  	 * reading the guest memory
+> @@ -2217,4 +2229,17 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
+>   */
+>  #define KVM_EXIT_HYPERCALL_MBZ		GENMASK_ULL(31, 1)
+>  
+> +#ifdef CONFIG_PARAVIRT_SCHED_KVM
+> +static inline bool kvm_arch_vcpu_pv_sched_enabled(struct kvm_vcpu_arch *arch)
+> +{
+> +	return arch->pv_sched.msr_val;
+> +}
+> +
+> +static inline void kvm_arch_vcpu_set_boost_status(struct kvm_vcpu_arch *arch,
+> +		enum kvm_vcpu_boost_state boost_status)
+> +{
+> +	arch->pv_sched.boost_status = boost_status;
+> +}
+> +#endif
+> +
+>  #endif /* _ASM_X86_KVM_HOST_H */
+> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+> index 6e64b27b2c1e..6b1dea07a563 100644
+> --- a/arch/x86/include/uapi/asm/kvm_para.h
+> +++ b/arch/x86/include/uapi/asm/kvm_para.h
+> @@ -36,6 +36,7 @@
+>  #define KVM_FEATURE_MSI_EXT_DEST_ID	15
+>  #define KVM_FEATURE_HC_MAP_GPA_RANGE	16
+>  #define KVM_FEATURE_MIGRATION_CONTROL	17
+> +#define KVM_FEATURE_PV_SCHED		18
+>  
+>  #define KVM_HINTS_REALTIME      0
+>  
+> @@ -58,6 +59,7 @@
+>  #define MSR_KVM_ASYNC_PF_INT	0x4b564d06
+>  #define MSR_KVM_ASYNC_PF_ACK	0x4b564d07
+>  #define MSR_KVM_MIGRATION_CONTROL	0x4b564d08
+> +#define MSR_KVM_PV_SCHED	0x4b564da0
+>  
+>  struct kvm_steal_time {
+>  	__u64 steal;
+> @@ -150,4 +152,26 @@ struct kvm_vcpu_pv_apf_data {
+>  #define KVM_PV_EOI_ENABLED KVM_PV_EOI_MASK
+>  #define KVM_PV_EOI_DISABLED 0x0
+>  
+> +/*
+> + * VCPU boost state shared between the host and guest.
+> + */
+> +enum kvm_vcpu_boost_state {
+> +	/* Priority boosting feature disabled in host */
+> +	VCPU_BOOST_DISABLED = 0,
+> +	/*
+> +	 * vcpu is not explicitly boosted by the host.
+> +	 * (Default priority when the guest started)
+> +	 */
+> +	VCPU_BOOST_NORMAL,
+> +	/* vcpu is boosted by the host */
+> +	VCPU_BOOST_BOOSTED
+> +};
+> +
+> +/*
+> + * Structure passed in via MSR_KVM_PV_SCHED
+> + */
+> +struct pv_sched_data {
+> +	__u64 boost_status;
+> +};
+> +
+>  #endif /* _UAPI_ASM_X86_KVM_PARA_H */
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index 89ca7f4c1464..dbcba73fb508 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -141,4 +141,16 @@ config KVM_XEN
+>  config KVM_EXTERNAL_WRITE_TRACKING
+>  	bool
+>  
+> +config PARAVIRT_SCHED_KVM
+> +	bool "Enable paravirt scheduling capability for kvm"
+> +	depends on KVM
+> +	help
+> +	  Paravirtualized scheduling facilitates the exchange of scheduling
+> +	  related information between the host and guest through shared memory,
+> +	  enhancing the efficiency of vCPU thread scheduling by the hypervisor.
+> +	  An illustrative use case involves dynamically boosting the priority of
+> +	  a vCPU thread when the guest is executing a latency-sensitive workload
+> +	  on that specific vCPU.
+> +	  This config enables paravirt scheduling in the kvm hypervisor.
+> +
+>  endif # VIRTUALIZATION
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 7bdc66abfc92..960ef6e869f2 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -1113,6 +1113,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>  			     (1 << KVM_FEATURE_POLL_CONTROL) |
+>  			     (1 << KVM_FEATURE_PV_SCHED_YIELD) |
+>  			     (1 << KVM_FEATURE_ASYNC_PF_INT);
+> +		if (IS_ENABLED(CONFIG_PARAVIRT_SCHED_KVM))
+> +			entry->eax |= (1 << KVM_FEATURE_PV_SCHED);
+>  
+>  		if (sched_info_on())
+>  			entry->eax |= (1 << KVM_FEATURE_STEAL_TIME);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7bcf1a76a6ab..0f475b50ac83 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3879,6 +3879,33 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  			return 1;
+>  		break;
+>  
+> +#ifdef CONFIG_PARAVIRT_SCHED_KVM
+> +	case MSR_KVM_PV_SCHED:
+> +		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_SCHED))
+> +			return 1;
+> +
+> +		if (!(data & KVM_MSR_ENABLED))
+> +			break;
+> +
+> +		if (!(data & ~KVM_MSR_ENABLED)) {
+> +			/*
+> +			 * Disable the feature
+> +			 */
+> +			vcpu->arch.pv_sched.msr_val = 0;
+> +			kvm_set_vcpu_boosted(vcpu, false);
+> +		} if (!kvm_gfn_to_hva_cache_init(vcpu->kvm,
+> +				&vcpu->arch.pv_sched.data, data & ~KVM_MSR_ENABLED,
+> +				sizeof(struct pv_sched_data))) {
+> +			vcpu->arch.pv_sched.msr_val = data;
+> +			kvm_set_vcpu_boosted(vcpu, false);
+> +		} else {
+> +			pr_warn("MSR_KVM_PV_SCHED: kvm:%p, vcpu:%p, "
+> +				"msr value: %llx, kvm_gfn_to_hva_cache_init failed!\n",
+> +				vcpu->kvm, vcpu, data & ~KVM_MSR_ENABLED);
 
-On 14.12.2023 13:29, Michael S. Tsirkin wrote:
-> On Thu, Dec 14, 2023 at 12:19:46PM +0300, Arseniy Krasnov wrote:
->> Do not return if transport callback for SO_RCVLOWAT is set (only in
->> error case). In this case we don't need to set 'sk_rcvlowat' field in
->> each transport - only in 'vsock_set_rcvlowat()'. Also, if 'sk_rcvlowat'
->> is now set only in af_vsock.c, change callback name from 'set_rcvlowat'
->> to 'notify_set_rcvlowat'.
->>
->> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
->> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> 
-> Maybe squash this with patch 2/4?
+As this is triggerable by the guest please drop this print (which is not
+even ratelimited!). I think it would be better to just 'return 1;' in case
+of kvm_gfn_to_hva_cache_init() failure but maybe you also need to
+account for 'msr_info->host_initiated' to not fail setting this MSR from
+the host upon migration.
 
-You mean just do 'git squash' without updating commit message manually?
+> +		}
+> +		break;
+> +#endif
+> +
+>  	case MSR_KVM_POLL_CONTROL:
+>  		if (!guest_pv_has(vcpu, KVM_FEATURE_POLL_CONTROL))
+>  			return 1;
+> @@ -4239,6 +4266,11 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  
+>  		msr_info->data = vcpu->arch.pv_eoi.msr_val;
+>  		break;
+> +#ifdef CONFIG_PARAVIRT_SCHED_KVM
+> +	case MSR_KVM_PV_SCHED:
+> +		msr_info->data = vcpu->arch.pv_sched.msr_val;
+> +		break;
+> +#endif
+>  	case MSR_KVM_POLL_CONTROL:
+>  		if (!guest_pv_has(vcpu, KVM_FEATURE_POLL_CONTROL))
+>  			return 1;
+> @@ -9820,6 +9852,29 @@ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
+>  	return kvm_skip_emulated_instruction(vcpu);
+>  }
+>  
+> +#ifdef CONFIG_PARAVIRT_SCHED_KVM
+> +static void record_vcpu_boost_status(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 val = vcpu->arch.pv_sched.boost_status;
+> +
+> +	if (!kvm_arch_vcpu_pv_sched_enabled(&vcpu->arch))
+> +		return;
+> +
+> +	pagefault_disable();
+> +	kvm_write_guest_offset_cached(vcpu->kvm, &vcpu->arch.pv_sched.data,
+> +		&val, offsetof(struct pv_sched_data, boost_status), sizeof(u64));
+> +	pagefault_enable();
+> +}
+> +
+> +void kvm_set_vcpu_boosted(struct kvm_vcpu *vcpu, bool boosted)
+> +{
+> +	kvm_arch_vcpu_set_boost_status(&vcpu->arch,
+> +			boosted ? VCPU_BOOST_BOOSTED : VCPU_BOOST_NORMAL);
+> +
+> +	kvm_make_request(KVM_REQ_VCPU_BOOST_UPDATE, vcpu);
+> +}
+> +#endif
+> +
+>  int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>  {
+>  	unsigned long nr, a0, a1, a2, a3, ret;
+> @@ -10593,6 +10648,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  		}
+>  		if (kvm_check_request(KVM_REQ_STEAL_UPDATE, vcpu))
+>  			record_steal_time(vcpu);
+> +
+> +#ifdef CONFIG_PARAVIRT_SCHED_KVM
+> +		if (kvm_check_request(KVM_REQ_VCPU_BOOST_UPDATE, vcpu))
+> +			record_vcpu_boost_status(vcpu);
+> +#endif
+> +
+>  #ifdef CONFIG_KVM_SMM
+>  		if (kvm_check_request(KVM_REQ_SMI, vcpu))
+>  			process_smi(vcpu);
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 9d3ac7720da9..a74aeea55347 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -167,6 +167,7 @@ static inline bool is_error_page(struct page *page)
+>  #define KVM_REQ_VM_DEAD			(1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>  #define KVM_REQ_UNBLOCK			2
+>  #define KVM_REQ_DIRTY_RING_SOFT_FULL	3
+> +#define KVM_REQ_VCPU_BOOST_UPDATE	6
+>  #define KVM_REQUEST_ARCH_BASE		8
+>  
+>  /*
+> @@ -2287,4 +2288,8 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+>  /* Max number of entries allowed for each kvm dirty ring */
+>  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
+>  
+> +#ifdef CONFIG_PARAVIRT_SCHED_KVM
+> +void kvm_set_vcpu_boosted(struct kvm_vcpu *vcpu, bool boosted);
+> +#endif
+> +
+>  #endif
 
-Thanks, Arseniy
+-- 
+Vitaly
 
-> 
->> ---
->>  Changelog:
->>  v3 -> v4:
->>   * Rename 'set_rcvlowat' to 'notify_set_rcvlowat'.
->>   * Commit message updated.
->>
->>  include/net/af_vsock.h           | 2 +-
->>  net/vmw_vsock/af_vsock.c         | 9 +++++++--
->>  net/vmw_vsock/hyperv_transport.c | 4 ++--
->>  3 files changed, 10 insertions(+), 5 deletions(-)
->>
->> diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->> index e302c0e804d0..535701efc1e5 100644
->> --- a/include/net/af_vsock.h
->> +++ b/include/net/af_vsock.h
->> @@ -137,7 +137,6 @@ struct vsock_transport {
->>  	u64 (*stream_rcvhiwat)(struct vsock_sock *);
->>  	bool (*stream_is_active)(struct vsock_sock *);
->>  	bool (*stream_allow)(u32 cid, u32 port);
->> -	int (*set_rcvlowat)(struct vsock_sock *vsk, int val);
->>  
->>  	/* SEQ_PACKET. */
->>  	ssize_t (*seqpacket_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
->> @@ -168,6 +167,7 @@ struct vsock_transport {
->>  		struct vsock_transport_send_notify_data *);
->>  	/* sk_lock held by the caller */
->>  	void (*notify_buffer_size)(struct vsock_sock *, u64 *);
->> +	int (*notify_set_rcvlowat)(struct vsock_sock *vsk, int val);
->>  
->>  	/* Shutdown. */
->>  	int (*shutdown)(struct vsock_sock *, int);
->> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->> index 816725af281f..54ba7316f808 100644
->> --- a/net/vmw_vsock/af_vsock.c
->> +++ b/net/vmw_vsock/af_vsock.c
->> @@ -2264,8 +2264,13 @@ static int vsock_set_rcvlowat(struct sock *sk, int val)
->>  
->>  	transport = vsk->transport;
->>  
->> -	if (transport && transport->set_rcvlowat)
->> -		return transport->set_rcvlowat(vsk, val);
->> +	if (transport && transport->notify_set_rcvlowat) {
->> +		int err;
->> +
->> +		err = transport->notify_set_rcvlowat(vsk, val);
->> +		if (err)
->> +			return err;
->> +	}
->>  
->>  	WRITE_ONCE(sk->sk_rcvlowat, val ? : 1);
->>  	return 0;
-> 
-> 
-> 
-> I would s
-> 
->> diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
->> index 7cb1a9d2cdb4..e2157e387217 100644
->> --- a/net/vmw_vsock/hyperv_transport.c
->> +++ b/net/vmw_vsock/hyperv_transport.c
->> @@ -816,7 +816,7 @@ int hvs_notify_send_post_enqueue(struct vsock_sock *vsk, ssize_t written,
->>  }
->>  
->>  static
->> -int hvs_set_rcvlowat(struct vsock_sock *vsk, int val)
->> +int hvs_notify_set_rcvlowat(struct vsock_sock *vsk, int val)
->>  {
->>  	return -EOPNOTSUPP;
->>  }
->> @@ -856,7 +856,7 @@ static struct vsock_transport hvs_transport = {
->>  	.notify_send_pre_enqueue  = hvs_notify_send_pre_enqueue,
->>  	.notify_send_post_enqueue = hvs_notify_send_post_enqueue,
->>  
->> -	.set_rcvlowat             = hvs_set_rcvlowat
->> +	.notify_set_rcvlowat      = hvs_notify_set_rcvlowat
->>  };
->>  
->>  static bool hvs_check_transport(struct vsock_sock *vsk)
->> -- 
->> 2.25.1
-> 
 
