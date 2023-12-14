@@ -1,319 +1,138 @@
-Return-Path: <kvm+bounces-4454-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4456-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDB56812BAE
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 10:29:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D376812BBC
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 10:31:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 983A6281CCE
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 09:29:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CDF41C2153C
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 09:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B2873A8CD;
-	Thu, 14 Dec 2023 09:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F6492EB09;
+	Thu, 14 Dec 2023 09:31:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="BAdCeLBl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f5sXNC1A"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04B3BA6;
-	Thu, 14 Dec 2023 01:28:24 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 76A5110006F;
-	Thu, 14 Dec 2023 12:28:23 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 76A5110006F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1702546103;
-	bh=Sv8rsH7eOUnxbebfktUfNJl1DL9SXKAXmrEdY/m72mo=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=BAdCeLBlknQ42/3HyEQtOhSStX24qT2Awg4Boe+/l6v/gOMcifFEE0lLZRs07lCpm
-	 5FHU95XYVjZhK0IYjVo2gBs1Q3jCr0QXlEfRFOVmvFyg9Doq9Ie4A/PfTidk3T/Gk+
-	 PwgXCaq7Roh/i+rDE5zGiSOmyoqEJJP0TE4eC8CaooEglSD0A60+Dbzgf0vbrsMZw4
-	 HEkg8MugZzYXex0h4Vq86Xdak19lkVJfMMXxuJxje+O4Zw7deikC0JQYHrOftGHHqa
-	 8QPYgoaU5Mj6shnKf5wYa2nXuXQa9nSbwiVJn7bztUGVl6ul9x9HsxZkxwZW1jpuCZ
-	 TppAktHGI/3UA==
-Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Thu, 14 Dec 2023 12:28:23 +0300 (MSK)
-Received: from localhost.localdomain (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 14 Dec 2023 12:28:22 +0300
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
-Subject: [PATCH net-next v9 4/4] vsock/test: two tests to check credit update logic
-Date: Thu, 14 Dec 2023 12:19:47 +0300
-Message-ID: <20231214091947.395892-5-avkrasnov@salutedevices.com>
-X-Mailer: git-send-email 2.35.0
-In-Reply-To: <20231214091947.395892-1-avkrasnov@salutedevices.com>
-References: <20231214091947.395892-1-avkrasnov@salutedevices.com>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C8B5A6
+	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 01:31:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702546290;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tTE0cMZgmLT4mbBDje7gzm+ln7P9WsJQeR7EiRHzoUg=;
+	b=f5sXNC1A7XZe3RNYucaDlQL/OepM/HPXECyKAexugVZLcqR/9Q9Jx6IE7nQU0DdNVtV0jQ
+	r+x/Rz8aL92XjiBdLY5MVJycllH0ex/ZWvHk6fhb8Cu0oCAhtTWQsLCLprT8gbXFeeUjlT
+	CHrQ3FZ+gIkiyBQoOpxpFGjUhH3oAUY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-247-4aMuPSAuPJWrWOrb5jGIaQ-1; Thu, 14 Dec 2023 04:31:27 -0500
+X-MC-Unique: 4aMuPSAuPJWrWOrb5jGIaQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40c2a43b0f3so53760635e9.2
+        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 01:31:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702546286; x=1703151086;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tTE0cMZgmLT4mbBDje7gzm+ln7P9WsJQeR7EiRHzoUg=;
+        b=CcYF/CT/A24QWiaYvcQrOcIlg3lnqoqgEBpNL4VwSObbYrf3lmAx32Gsr6Oe0En8/i
+         Sn1qoWdlJeQDCa9zmc9sF1Kl2E75S7xVO09I37bbcKLKfE6CyVGLfZ7wDSyyfcOv/Eqg
+         TQ6hjoF65AXCRDn8ax2bbIb6wFL1aDojgFQ8ShVEcch7juvBwn1aetMUvvPpweh17evW
+         0pARQZTFO8u2L2N8rLvgNJ+nc6gZnO+F7B0S12ZJLbaVqPo0zTFCN2PsK6AYX2qj9vRe
+         ydAkZVgo3FNZldSCNfldjx99n2tAdx3ZZLCO1w9+gTK55uS0zNqWfPuHcyF2wkZJHsWw
+         EBrA==
+X-Gm-Message-State: AOJu0Ywx3FgmL7hHK5UCf/nYNT7vLgwLq0DVl9k9RTnnP8osY6QOZ32U
+	dOtPdtdH/llPlJYJV4ZdSHCz+SVtO0or4tDGZa2XZ1jBfTts2Tbt/msXshBCN/Yto84W6JkZpH+
+	89zbpjNqJ3kLa
+X-Received: by 2002:a05:600c:188f:b0:40c:32e6:d567 with SMTP id x15-20020a05600c188f00b0040c32e6d567mr3338888wmp.119.1702546286721;
+        Thu, 14 Dec 2023 01:31:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFRxP7fEK8hsKy8ujv5AAy1+oBp2F4A/KQqv4ZVDGZIIzspF+szw+DRvb7Fz+JaTSBb7ZWKhg==
+X-Received: by 2002:a05:600c:188f:b0:40c:32e6:d567 with SMTP id x15-20020a05600c188f00b0040c32e6d567mr3338872wmp.119.1702546286273;
+        Thu, 14 Dec 2023 01:31:26 -0800 (PST)
+Received: from starship ([77.137.131.62])
+        by smtp.gmail.com with ESMTPSA id fl9-20020a05600c0b8900b0040b43da0bbasm24076640wmb.30.2023.12.14.01.31.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 01:31:25 -0800 (PST)
+Message-ID: <aa7aa5ea5b112a0ec70c6276beb281e19c052f0e.camel@redhat.com>
+Subject: Re: [PATCH v2 1/3] KVM: x86: Make the hardcoded APIC bus frequency
+ vm variable
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  isaku.yamahata@gmail.com, Paolo Bonzini
+ <pbonzini@redhat.com>,  erdemaktas@google.com, Vishal Annapurve
+ <vannapurve@google.com>, Jim Mattson <jmattson@google.com>
+Date: Thu, 14 Dec 2023 11:31:24 +0200
+In-Reply-To: <ZXo54VNuIqbMsYv-@google.com>
+References: <cover.1699936040.git.isaku.yamahata@intel.com>
+	 <1c12f378af7de16d7895f8badb18c3b1715e9271.1699936040.git.isaku.yamahata@intel.com>
+	 <938efd3cfcb25d828deab0cc0ba797177cc69602.camel@redhat.com>
+	 <ZXo54VNuIqbMsYv-@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 182105 [Dec 14 2023]
-X-KSMG-AntiSpam-Version: 6.1.0.3
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;smtp.sberdevices.ru:5.0.1,7.1.1;100.64.160.123:7.1.2;salutedevices.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/12/14 08:33:00 #22688916
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Transfer-Encoding: 7bit
 
-Both tests are almost same, only differs in two 'if' conditions, so
-implemented in a single function. Tests check, that credit update
-message is sent:
+On Wed, 2023-12-13 at 15:10 -0800, Sean Christopherson wrote:
+> On Thu, Dec 14, 2023, Maxim Levitsky wrote:
+> > On Mon, 2023-11-13 at 20:35 -0800, isaku.yamahata@intel.com wrote:
+> > > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > > 
+> > > TDX virtualizes the advertised APIC bus frequency to be 25MHz. 
+> > 
+> > Can you explain a bit better why TDX needs this? I am not familiar
+> > with TDX well enough yet to fully understand.
+> 
+> TDX (the module/architecture) hardcodes the core crystal frequency to 25Mhz,
+> whereas KVM hardcodes the APIC bus frequency to 1Ghz.  And TDX (again, the module)
+> *unconditionally* enumerates CPUID 0x15 to TDX guests, i.e. _tells_ the guest that
+> the frequency is 25MHz regardless of what the VMM/hypervisor actually emulates.
+> And so the guest skips calibrating the APIC timer, which results in the guest
+> scheduling timer interrupts waaaaaaay too frequently, i.e. the guest ends up
+> gettings interrupts at 40x the rate it wants.
 
-1) During setting SO_RCVLOWAT value of the socket.
-2) When number of 'rx_bytes' become smaller than SO_RCVLOWAT value.
+That is what I wanted to hear without opening the PRM ;) - so there is a CPUID leaf,
+but KVM just doesn't advertise it. Now it makes sense.
 
-Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
----
- Changelog:
- v1 -> v2:
-  * Update commit message by removing 'This patch adds XXX' manner.
-  * Update commit message by adding details about dependency for this
-    test from kernel internal define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE.
-  * Add comment for this dependency in 'vsock_test.c' where this define
-    is duplicated.
- v2 -> v3:
-  * Replace synchronization based on control TCP socket with vsock
-    data socket - this is needed to allow sender transmit data only
-    when new buffer size of receiver is visible to sender. Otherwise
-    there is race and test fails sometimes.
- v3 -> v4:
-  * Replace 'recv_buf()' to 'recv(MSG_DONTWAIT)' in last read operation
-    in server part. This is needed to ensure that 'poll()' wake up us
-    when number of bytes ready to read is equal to SO_RCVLOWAT value.
- v4 -> v5:
-  * Use 'recv_buf(MSG_DONTWAIT)' instead of 'recv(MSG_DONTWAIT)'.
- v5 -> v6:
-  * Add second test which checks, that credit update is sent during
-    reading data from socket.
-  * Update commit message.
+Please add something like that to the commit message:
 
- tools/testing/vsock/vsock_test.c | 175 +++++++++++++++++++++++++++++++
- 1 file changed, 175 insertions(+)
+"TDX guests have the APIC bus frequency hardcoded to 25 Mhz in the CPUID leaf 0x15.
+KVM doesn't expose this leaf, but TDX mandates it to be exposed,
+and doesn't allow to override it's value either.
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 01fa816868bc..66246d81d654 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -1232,6 +1232,171 @@ static void test_double_bind_connect_client(const struct test_opts *opts)
- 	}
- }
- 
-+#define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
-+/* This define is the same as in 'include/linux/virtio_vsock.h':
-+ * it is used to decide when to send credit update message during
-+ * reading from rx queue of a socket. Value and its usage in
-+ * kernel is important for this test.
-+ */
-+#define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE	(1024 * 64)
-+
-+static void test_stream_rcvlowat_def_cred_upd_client(const struct test_opts *opts)
-+{
-+	size_t buf_size;
-+	void *buf;
-+	int fd;
-+
-+	fd = vsock_stream_connect(opts->peer_cid, 1234);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Send 1 byte more than peer's buffer size. */
-+	buf_size = RCVLOWAT_CREDIT_UPD_BUF_SIZE + 1;
-+
-+	buf = malloc(buf_size);
-+	if (!buf) {
-+		perror("malloc");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Wait until peer sets needed buffer size. */
-+	recv_byte(fd, 1, 0);
-+
-+	if (send(fd, buf, buf_size, 0) != buf_size) {
-+		perror("send failed");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	free(buf);
-+	close(fd);
-+}
-+
-+static void test_stream_credit_update_test(const struct test_opts *opts,
-+					   bool low_rx_bytes_test)
-+{
-+	size_t recv_buf_size;
-+	struct pollfd fds;
-+	size_t buf_size;
-+	void *buf;
-+	int fd;
-+
-+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	buf_size = RCVLOWAT_CREDIT_UPD_BUF_SIZE;
-+
-+	if (setsockopt(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
-+		       &buf_size, sizeof(buf_size))) {
-+		perror("setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (low_rx_bytes_test) {
-+		/* Set new SO_RCVLOWAT here. This enables sending credit
-+		 * update when number of bytes if our rx queue become <
-+		 * SO_RCVLOWAT value.
-+		 */
-+		recv_buf_size = 1 + VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
-+
-+		if (setsockopt(fd, SOL_SOCKET, SO_RCVLOWAT,
-+			       &recv_buf_size, sizeof(recv_buf_size))) {
-+			perror("setsockopt(SO_RCVLOWAT)");
-+			exit(EXIT_FAILURE);
-+		}
-+	}
-+
-+	/* Send one dummy byte here, because 'setsockopt()' above also
-+	 * sends special packet which tells sender to update our buffer
-+	 * size. This 'send_byte()' will serialize such packet with data
-+	 * reads in a loop below. Sender starts transmission only when
-+	 * it receives this single byte.
-+	 */
-+	send_byte(fd, 1, 0);
-+
-+	buf = malloc(buf_size);
-+	if (!buf) {
-+		perror("malloc");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Wait until there will be 128KB of data in rx queue. */
-+	while (1) {
-+		ssize_t res;
-+
-+		res = recv(fd, buf, buf_size, MSG_PEEK);
-+		if (res == buf_size)
-+			break;
-+
-+		if (res <= 0) {
-+			fprintf(stderr, "unexpected 'recv()' return: %zi\n", res);
-+			exit(EXIT_FAILURE);
-+		}
-+	}
-+
-+	/* There is 128KB of data in the socket's rx queue, dequeue first
-+	 * 64KB, credit update is sent if 'low_rx_bytes_test' == true.
-+	 * Otherwise, credit update is sent in 'if (!low_rx_bytes_test)'.
-+	 */
-+	recv_buf_size = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
-+	recv_buf(fd, buf, recv_buf_size, 0, recv_buf_size);
-+
-+	if (!low_rx_bytes_test) {
-+		recv_buf_size++;
-+
-+		/* Updating SO_RCVLOWAT will send credit update. */
-+		if (setsockopt(fd, SOL_SOCKET, SO_RCVLOWAT,
-+			       &recv_buf_size, sizeof(recv_buf_size))) {
-+			perror("setsockopt(SO_RCVLOWAT)");
-+			exit(EXIT_FAILURE);
-+		}
-+	}
-+
-+	fds.fd = fd;
-+	fds.events = POLLIN | POLLRDNORM | POLLERR |
-+		     POLLRDHUP | POLLHUP;
-+
-+	/* This 'poll()' will return once we receive last byte
-+	 * sent by client.
-+	 */
-+	if (poll(&fds, 1, -1) < 0) {
-+		perror("poll");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (fds.revents & POLLERR) {
-+		fprintf(stderr, "'poll()' error\n");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (fds.revents & (POLLIN | POLLRDNORM)) {
-+		recv_buf(fd, buf, recv_buf_size, MSG_DONTWAIT, recv_buf_size);
-+	} else {
-+		/* These flags must be set, as there is at
-+		 * least 64KB of data ready to read.
-+		 */
-+		fprintf(stderr, "POLLIN | POLLRDNORM expected\n");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	free(buf);
-+	close(fd);
-+}
-+
-+static void test_stream_cred_upd_on_low_rx_bytes(const struct test_opts *opts)
-+{
-+	test_stream_credit_update_test(opts, true);
-+}
-+
-+static void test_stream_cred_upd_on_set_rcvlowat(const struct test_opts *opts)
-+{
-+	test_stream_credit_update_test(opts, false);
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -1342,6 +1507,16 @@ static struct test_case test_cases[] = {
- 		.run_client = test_double_bind_connect_client,
- 		.run_server = test_double_bind_connect_server,
- 	},
-+	{
-+		.name = "SOCK_STREAM virtio credit update + SO_RCVLOWAT",
-+		.run_client = test_stream_rcvlowat_def_cred_upd_client,
-+		.run_server = test_stream_cred_upd_on_set_rcvlowat,
-+	},
-+	{
-+		.name = "SOCK_STREAM virtio credit update + low rx_bytes",
-+		.run_client = test_stream_rcvlowat_def_cred_upd_client,
-+		.run_server = test_stream_cred_upd_on_low_rx_bytes,
-+	},
- 	{},
- };
- 
--- 
-2.25.1
+To ensure that the guest doesn't have a conflicting view of the APIC bus frequency, 
+allow the userspace to tell KVM to use the same frequency that TDX mandates,
+instead of the default 1Ghz"
+
+> 
+> Upstream KVM's non-TDX behavior is fine, because KVM doesn't advertise support
+> for CPUID 0x15, i.e. doesn't announce to host userspace that it's safe to expose
+> CPUID 0x15 to the guest.  Because TDX makes exposing CPUID 0x15 mandatory, KVM
+> needs to be taught to correctly emulate the guest's APIC bus frequency, a.k.a.
+> the TDX guest core crystal frequency of 25Mhz.
+
+I assume that TDX doesn't allow to change the CPUID 0x15 leaf.
+
+> 
+> I halfheartedly floated the idea of "fixing" the TDX module/architecture to either
+> use 1Ghz as the base frequency (off list), but it definitely isn't a hill worth
+> dying on since the KVM changes are relatively simple.
+> 
+> https://lore.kernel.org/all/ZSnIKQ4bUavAtBz6@google.com
+> 
+
+Best regards,
+	Maxim Levitsky
 
 
