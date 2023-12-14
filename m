@@ -1,157 +1,172 @@
-Return-Path: <kvm+bounces-4445-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4446-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4662381290B
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 08:24:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BFB08129C1
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 08:52:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1AD3B20C74
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 07:24:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFBEA28227A
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 07:52:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC4510961;
-	Thu, 14 Dec 2023 07:24:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3ED514AAC;
+	Thu, 14 Dec 2023 07:52:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pz+CUiLu"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="VHpq9mfZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F31BFF5
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 23:24:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702538652;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nTrq+3Cdbpt4RVJomfi0QnbN0tB/JIdZpvtKrvEXuC8=;
-	b=Pz+CUiLu1e/N9JR3lEdfrBHxqibJXgGtvpExX0HuUuLCo5dYACWkXV5cnuZF7N4lWVn6Uh
-	NMweK7GbQhOY+AM9KmiKGcUcP4txLLyVte3IJqC8Ljl6l+MYvj5iN7oK6wq3fjOLIUJb7V
-	eCtxgNlBRib2iPGJL7jR1ZuA+VKVryw=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-608-vWNppZLDPwuG1OrnZAutmA-1; Thu, 14 Dec 2023 02:24:10 -0500
-X-MC-Unique: vWNppZLDPwuG1OrnZAutmA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40c440f9595so27455585e9.2
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 23:24:10 -0800 (PST)
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C143EA7
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 23:52:39 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-336437ae847so874003f8f.2
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 23:52:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1702540358; x=1703145158; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kKmbX2YPpXuRY6IHo6cBzkg+NMrJJvxaEEC8NjKnxGY=;
+        b=VHpq9mfZE1XYZzd6nMuutgRxkVQCDOjfnRS8Qzh0Qg4TY8VxWWoVDC512DViv5Bou/
+         5HKtEfAcLLqMLqWL6PvsU0uO3y5rGc7M+2+3YLlSAS1U19Hh3livL5cY7J/W5WL0XcRo
+         yH03VvPRltYaLlt9K77DMSZ6Ilkg0zS4rI6YsSDX7cQBC2mGkJq+SjGGX4LcwRtO72TK
+         eIz9HfIM6uO4sErEee0gvmsrP3/7uuknBz1Y2UWtkvy5JGjQ7Z6ty57FYe7yAjcPxkD7
+         nAgyiBHm2avZlpsDhqHc925u70+dQJ6ASppqtVvfN9QH6jVaCsTYqFyUUnJ8Hx+KOM3A
+         CgUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702538649; x=1703143449;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nTrq+3Cdbpt4RVJomfi0QnbN0tB/JIdZpvtKrvEXuC8=;
-        b=mVEoZH3nUwgu15omnuARUqqobM5ots/CQLzuprSycavtxtg2fBCnV0tk1G5lkXBX9C
-         13qsWcpImqV60b90eRe3xEIbdCLaDRWSvP+9ES269uAoJhkwJbfJ77jR1ClHFWPIdorV
-         XiOorpJU/H8ptvAiNxLtu2LcK16hEOdkkrxuvGYNCltkACrpr38w6DzcVecljtyNc9vs
-         lKZa/Ox21De9dLHSTwhU2HeqrkVbncm6TX6P97QtJqR5RkFfBmTAhwjV/j/8csst+xjH
-         zk1GSPSe+I+VpbIfopqkJmSUglACLgC5qjxZTt84Dwh9ZodBZLTI46v13L1bu1krSDLH
-         uong==
-X-Gm-Message-State: AOJu0YxvL0rAxWXYj2Jfd7fa6cWyqDlld2D45eEi6eN70hS2xFn73CYz
-	Toaoi/ncfqYCzqCWG0UruCYgp3W9vlC5pr1ZaDTjFirPQh1974K8SYSeKsdR1w7ZYa15UJ7x3/z
-	vz9JexOJtsxjh
-X-Received: by 2002:a1c:7916:0:b0:40c:55a7:7735 with SMTP id l22-20020a1c7916000000b0040c55a77735mr2016778wme.118.1702538649509;
-        Wed, 13 Dec 2023 23:24:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEP1uSGIJVLfMWqdXKJluitZInxrGncOnNatxqUThqfOfa95Chpt5bRpMkX2rLimEB8pTCrnA==
-X-Received: by 2002:a1c:7916:0:b0:40c:55a7:7735 with SMTP id l22-20020a1c7916000000b0040c55a77735mr2016754wme.118.1702538649091;
-        Wed, 13 Dec 2023 23:24:09 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id gw18-20020a05600c851200b004053e9276easm25685177wmb.32.2023.12.13.23.24.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Dec 2023 23:24:08 -0800 (PST)
-Message-ID: <6140fc8a-4044-4891-854d-9bf555c5dd78@redhat.com>
-Date: Thu, 14 Dec 2023 08:24:05 +0100
+        d=1e100.net; s=20230601; t=1702540358; x=1703145158;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kKmbX2YPpXuRY6IHo6cBzkg+NMrJJvxaEEC8NjKnxGY=;
+        b=lTLyA5kqxWXo0K2b6AHgjsBS2PzcDN9PZ0xr4wRZvw+cbCDucWJpujJ4G7ht/21Ny+
+         Q9DsnGit6mHNdyqYCvpp7AEtfKDCYKd3DdZoUH0BBbLVSg7qpWlPF6tgzRvs1JYLwrdF
+         /r1uZpwuE0c2bv1SGRSOy38cDOw2owcwOZtfeljyUY4oFMnchsOrz/bVskeLILOFXKCC
+         M+LoSwIFwW29QG1trlGs6VK5W7vkZJvhE+wpz5d6+4LsnOReJ1Ber5/hI2ipWI6pnvoh
+         GZiKvxbwdViBQhkqCmLibbzfHTobaDwp5x9CKD6u+UX+OXC+iuKrE1JxpCU2biwevhMn
+         Xf7g==
+X-Gm-Message-State: AOJu0Yw2hfY47lJ8A2a3Fu1xPuPHp8beX4J+gM2FYmoMdgQx/dKBMdGO
+	3PgIreIHqyjHqkTO4i6QaxGKQQ==
+X-Google-Smtp-Source: AGHT+IEcg4w5zPjg1p98QCYf6W1xFs9iv4IikObE4ZRhGgbZ28NqkIVLjUjAV+O24f828odOwuc64g==
+X-Received: by 2002:a05:6000:4c6:b0:333:1c97:48c4 with SMTP id h6-20020a05600004c600b003331c9748c4mr4411047wri.7.1702540357383;
+        Wed, 13 Dec 2023 23:52:37 -0800 (PST)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id x14-20020adfdd8e000000b0033630da3528sm5702110wrl.25.2023.12.13.23.52.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 23:52:36 -0800 (PST)
+Date: Thu, 14 Dec 2023 08:52:35 +0100
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+Cc: kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, anup@brainfault.org, atishp@atishpatra.org, palmer@dabbelt.com
+Subject: Re: [PATCH v3 3/3] RISC-V: KVM: add vector CSRs in KVM_GET_REG_LIST
+Message-ID: <20231214-315a8cd86b5eeb5a1a4ebd88@orel>
+References: <20231205174509.2238870-1-dbarboza@ventanamicro.com>
+ <20231205174509.2238870-4-dbarboza@ventanamicro.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH 03/10] tests/avocado/intel_iommu.py: increase timeout
-Content-Language: en-US
-To: Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
- <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Radoslaw Biernacki <rad@semihalf.com>, Paul Durrant <paul@xen.org>,
- Akihiko Odaki <akihiko.odaki@daynix.com>,
- Leif Lindholm <quic_llindhol@quicinc.com>,
- Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
- <pbonzini@redhat.com>, kvm@vger.kernel.org, qemu-arm@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Beraldo Leal <bleal@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Sriram Yagnaraman <sriram.yagnaraman@est.tech>,
- Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
- David Woodhouse <dwmw2@infradead.org>
-References: <20231208190911.102879-1-crosa@redhat.com>
- <20231208190911.102879-4-crosa@redhat.com> <8734w8fzbc.fsf@draig.linaro.org>
- <87sf45vpad.fsf@p1.localdomain>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <87sf45vpad.fsf@p1.localdomain>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231205174509.2238870-4-dbarboza@ventanamicro.com>
 
-Hi Cleber,
+On Tue, Dec 05, 2023 at 02:45:09PM -0300, Daniel Henrique Barboza wrote:
+> Add all vector CSRs (vstart, vl, vtype, vcsr, vlenb) in get-reg-list.
 
-On 12/13/23 21:08, Cleber Rosa wrote:
-> Alex Bennée <alex.bennee@linaro.org> writes:
->
->> Cleber Rosa <crosa@redhat.com> writes:
->>
->>> Based on many runs, the average run time for these 4 tests is around
->>> 250 seconds, with 320 seconds being the ceiling.  In any way, the
->>> default 120 seconds timeout is inappropriate in my experience.
->> I would rather see these tests updated to fix:
->>
->>  - Don't use such an old Fedora 31 image
-> I remember proposing a bump in Fedora version used by default in
-> avocado_qemu.LinuxTest (which would propagate to tests such as
-> boot_linux.py and others), but that was not well accepted.  I can
-> definitely work on such a version bump again.
->
->>  - Avoid updating image packages (when will RH stop serving them?)
-> IIUC the only reason for updating the packages is to test the network
-> from the guest, and could/should be done another way.
->
-> Eric, could you confirm this?
-Sorry for the delay. Yes effectively I used the dnf install to stress
-the viommu. In the past I was able to trigger viommu bugs that way
-whereas getting an IP @ for the guest was just successful.
->
->>  - The "test" is a fairly basic check of dmesg/sysfs output
-> Maybe the network is also an implicit check here.  Let's see what Eric
-> has to say.
+We should add another patch for the test for these
+(tools/testing/selftests/kvm/riscv/get-reg-list.c)
 
-To be honest I do not remember how avocado does the check in itself; my
-guess if that if the dnf install does not complete you get a timeout and
-the test fails. But you may be more knowledged on this than me ;-)
+Thanks,
+drew
 
-Thanks
-
-Eric
->
->> I think building a buildroot image with the tools pre-installed (with
->> perhaps more testing) would be a better use of our limited test time.
->>
->> FWIW the runtime on my machine is:
->>
->> ➜  env QEMU_TEST_FLAKY_TESTS=1 ./pyvenv/bin/avocado run ./tests/avocado/intel_iommu.py
->> JOB ID     : 5c582ccf274f3aee279c2208f969a7af8ceb9943
->> JOB LOG    : /home/alex/avocado/job-results/job-2023-12-11T16.53-5c582cc/job.log
->>  (1/4) ./tests/avocado/intel_iommu.py:IntelIOMMU.test_intel_iommu: PASS (44.21 s)
->>  (2/4) ./tests/avocado/intel_iommu.py:IntelIOMMU.test_intel_iommu_strict: PASS (78.60 s)
->>  (3/4) ./tests/avocado/intel_iommu.py:IntelIOMMU.test_intel_iommu_strict_cm: PASS (65.57 s)
->>  (4/4) ./tests/avocado/intel_iommu.py:IntelIOMMU.test_intel_iommu_pt: PASS (66.63 s)
->> RESULTS    : PASS 4 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
->> JOB TIME   : 255.43 s
->>
-> Yes, I've also seen similar runtimes in other environments... so it
-> looks like it depends a lot on the "dnf -y install numactl-devel".  If
-> that can be removed, the tests would have much more predictable runtimes.
->
-
+> 
+> Signed-off-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+> ---
+>  arch/riscv/kvm/vcpu_onereg.c | 55 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 55 insertions(+)
+> 
+> diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
+> index f8c9fa0c03c5..2eb4980295ae 100644
+> --- a/arch/riscv/kvm/vcpu_onereg.c
+> +++ b/arch/riscv/kvm/vcpu_onereg.c
+> @@ -986,6 +986,55 @@ static int copy_sbi_ext_reg_indices(u64 __user *uindices)
+>  	return num_sbi_ext_regs();
+>  }
+>  
+> +static inline unsigned long num_vector_regs(const struct kvm_vcpu *vcpu)
+> +{
+> +	if (!riscv_isa_extension_available(vcpu->arch.isa, v))
+> +		return 0;
+> +
+> +	/* vstart, vl, vtype, vcsr, vlenb and 32 vector regs */
+> +	return 37;
+> +}
+> +
+> +static int copy_vector_reg_indices(const struct kvm_vcpu *vcpu,
+> +				u64 __user *uindices)
+> +{
+> +	const struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
+> +	int n = num_vector_regs(vcpu);
+> +	u64 reg, size;
+> +	int i;
+> +
+> +	if (n == 0)
+> +		return 0;
+> +
+> +	/* copy vstart, vl, vtype, vcsr and vlenb */
+> +	size = IS_ENABLED(CONFIG_32BIT) ? KVM_REG_SIZE_U32 : KVM_REG_SIZE_U64;
+> +	for (i = 0; i < 5; i++) {
+> +		reg = KVM_REG_RISCV | size | KVM_REG_RISCV_VECTOR | i;
+> +
+> +		if (uindices) {
+> +			if (put_user(reg, uindices))
+> +				return -EFAULT;
+> +			uindices++;
+> +		}
+> +	}
+> +
+> +	/* vector_regs have a variable 'vlenb' size */
+> +	size = __builtin_ctzl(cntx->vector.vlenb);
+> +	size <<= KVM_REG_SIZE_SHIFT;
+> +	for (i = 0; i < 32; i++) {
+> +		reg = KVM_REG_RISCV | KVM_REG_RISCV_VECTOR | size |
+> +			KVM_REG_RISCV_VECTOR_REG(i);
+> +
+> +		if (uindices) {
+> +			if (put_user(reg, uindices))
+> +				return -EFAULT;
+> +			uindices++;
+> +		}
+> +	}
+> +
+> +	return n;
+> +}
+> +
+>  /*
+>   * kvm_riscv_vcpu_num_regs - how many registers do we present via KVM_GET/SET_ONE_REG
+>   *
+> @@ -1001,6 +1050,7 @@ unsigned long kvm_riscv_vcpu_num_regs(struct kvm_vcpu *vcpu)
+>  	res += num_timer_regs();
+>  	res += num_fp_f_regs(vcpu);
+>  	res += num_fp_d_regs(vcpu);
+> +	res += num_vector_regs(vcpu);
+>  	res += num_isa_ext_regs(vcpu);
+>  	res += num_sbi_ext_regs();
+>  
+> @@ -1045,6 +1095,11 @@ int kvm_riscv_vcpu_copy_reg_indices(struct kvm_vcpu *vcpu,
+>  		return ret;
+>  	uindices += ret;
+>  
+> +	ret = copy_vector_reg_indices(vcpu, uindices);
+> +	if (ret < 0)
+> +		return ret;
+> +	uindices += ret;
+> +
+>  	ret = copy_isa_ext_reg_indices(vcpu, uindices);
+>  	if (ret < 0)
+>  		return ret;
+> -- 
+> 2.41.0
+> 
 
