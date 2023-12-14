@@ -1,99 +1,136 @@
-Return-Path: <kvm+bounces-4514-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4515-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 550358134DD
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 16:35:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAE8781352C
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 16:48:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1089E281D05
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 15:35:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 781CE1F21863
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 15:48:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 372995D8E6;
-	Thu, 14 Dec 2023 15:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADFCE5D90B;
+	Thu, 14 Dec 2023 15:48:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tyrKwbbJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YJqaV9dj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1CCF9A
-	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 07:34:47 -0800 (PST)
-Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-54f4f7d082cso9339041a12.0
-        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 07:34:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702568086; x=1703172886; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nv2TX1Ip2iaU3Gdt+lOUIp5X3QhzzFnX3LN7f4+v81w=;
-        b=tyrKwbbJDIuHSi4IIlJwfNewNpDtDo1iPXhfslYXKRtpVDo1/zNfnMcMOipSXUaFll
-         AQZ/Qed4M2PTxKgqtMoCMY50jhpFVHlakc22h5ANm/ph7Dd4Kqgdeku+q7vvZC+vVUtZ
-         l60QTejFCeE9ICxoeCamk6zQvCn3SAfO4JOIwqYyypiGTRTHnKcOp3pf3kAcJCtvr9Xx
-         PoSeEL2s9b+6n1QRRAM1MgJ9Cz4NV8REalcP1DZanqWLqGAnAH4h28/8QQMaRs7tFjBz
-         uKazkBrMUduxzAIWyTywnWwaQLBLSKRXqNnJ72r+k7QEwN8KWEmTckr4i2IEJQVDEPJz
-         PUJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702568086; x=1703172886;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nv2TX1Ip2iaU3Gdt+lOUIp5X3QhzzFnX3LN7f4+v81w=;
-        b=MGZEKQ8f13G8l7UsI4puzQXg6/3gYm+U/CrrijDTYIXWZNu2VCiwi4HrQAriq8p+Xl
-         x8OOABcwSeMZHFGVhLCQ7TJXwRtKliO3VO2MY2Pb4zbv0khO8fJ4P6yPMPEcnh6ieezy
-         DIV5loYCA0agULZrtPgUWzbofCYxFSu5GfWoq6H5gaX7p7MbHIHpdhHZFDiyw7meOh2F
-         LUXfrqx+njnfDIkslK1KuXoVjAAmnEVExMDBrPHalh8jmgyHF5jIZjln8ulj3LQFxaui
-         Q3uhItGC+0oAwA2bbIyZKZCZSF9rkyGN/e3/teJ0TB4B/Nn6GhNUGHx0SmPQx2VRiGbS
-         R4oQ==
-X-Gm-Message-State: AOJu0Yzdy0hckwjUvobNer5Ef0ot2ujavJaLSOmo4FK8c+PO7HQucvsH
-	+U51vkbo2O3wN6Bi4mm0Ef14F9AIjzbPXhHQw8nTKQ==
-X-Google-Smtp-Source: AGHT+IFcq6DemeL/YJ2XuTTh4jlsRgMuGMuDQEtXvj/bCvfTy5ls4pzl8QuwCb3aopkrNe2aCWakxkKBHdxMz7mxpTg=
-X-Received: by 2002:a50:9514:0:b0:552:31c2:83b0 with SMTP id
- u20-20020a509514000000b0055231c283b0mr1088462eda.39.1702568086292; Thu, 14
- Dec 2023 07:34:46 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B383C55784;
+	Thu, 14 Dec 2023 15:48:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57E61C433C8;
+	Thu, 14 Dec 2023 15:48:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702568907;
+	bh=c5Hrhu9jv1aI02dxQqDlqaubcSiytClNWLM8d4C/kvI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YJqaV9djsO/05rDV52LNkS1/r3WX1iHi+z4LvSF0/Di2UKXcchnv6sNH/cOKDIuBx
+	 6MpAsvRG7pW6buIuMSK5/WrN8+vWJn03EpganGs7uk0UJSNmk2VfbrrARLeUyrYLqb
+	 DrjO+9QjEGyJkOWwoGkiMkxi93cpzZJOeLBi7crnAeQEDvyrV7Fqr9tTj4usU4fsz4
+	 p3KC5eQByNZx19W2DV9ABOEKUr2SF0bWlWuEEOK/zS5y0Dn+xhk7PZ7JYQ0r3ZrKAL
+	 FeGwO/Bi3QkCYVvPEXbACz4VsJMvz7XU3430O1c+P0LxSe2lJjXSwOo5SYUFY2MP/w
+	 pFc7cqInVHFIQ==
+Date: Thu, 14 Dec 2023 16:48:15 +0100
+From: Lorenzo Pieralisi <lpieralisi@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Catalin Marinas <catalin.marinas@arm.com>, ankita@nvidia.com,
+	maz@kernel.org, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	will@kernel.org, alex.williamson@redhat.com, kevin.tian@intel.com,
+	yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org,
+	gshan@redhat.com, linux-mm@kvack.org, aniketa@nvidia.com,
+	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
+	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	james.morse@arm.com
+Subject: Re: [PATCH v3 2/2] kvm: arm64: set io memory s2 pte as normalnc for
+ vfio pci devices
+Message-ID: <ZXsjv+svp44YjMmh@lpieralisi>
+References: <20231208164709.23101-1-ankita@nvidia.com>
+ <20231208164709.23101-3-ankita@nvidia.com>
+ <ZXicemDzXm8NShs1@arm.com>
+ <20231212181156.GO3014157@nvidia.com>
+ <ZXoOieQN7rBiLL4A@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231123183518.64569-1-philmd@linaro.org> <CAFEAcA8S7Ug8uFpvDO9FarLpLhTr_236H8gOK=dEOWQZe-3zgg@mail.gmail.com>
- <e4443aa8-1b36-41fd-b1a8-6ed7ddb2f130@linaro.org>
-In-Reply-To: <e4443aa8-1b36-41fd-b1a8-6ed7ddb2f130@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Dec 2023 15:34:34 +0000
-Message-ID: <CAFEAcA9v33h4EgfvFdH0EtVaf0jxtyAahUwEqoVDA39Z1izwTQ@mail.gmail.com>
-Subject: Re: [PATCH-for-9.0 00/16] target/arm/kvm: Unify kvm_arm_FOO() API
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXoOieQN7rBiLL4A@linux.dev>
 
-On Wed, 13 Dec 2023 at 09:42, Philippe Mathieu-Daud=C3=A9 <philmd@linaro.or=
-g> wrote:
->
-> On 11/12/23 15:36, Peter Maydell wrote:
-> > On Thu, 23 Nov 2023 at 18:35, Philippe Mathieu-Daud=C3=A9 <philmd@linar=
-o.org> wrote:
-> >>
-> >> Half of the API takes CPUState, the other ARMCPU...
-> >>
-> >> $ git grep -F 'CPUState *' target/arm/kvm_arm.h | wc -l
-> >>        16
-> >> $ git grep -F 'ARMCPU *' target/arm/kvm_arm.h | wc -l
-> >>        14
-> >>
-> >> Since this is ARM specific, have it always take ARMCPU, and
-> >> call the generic KVM API casting with the CPU() macro.
-> >
-> >
-> >
-> > Applied to target-arm.next for 9.0, thanks.
->
-> Thanks Peter, the only change I added from Gavin review is
-> on top of patch #3:
+[+James]
 
-OK, I've squashed that in.
+On Wed, Dec 13, 2023 at 08:05:29PM +0000, Oliver Upton wrote:
+> Hi,
+> 
+> Sorry, a bit late to the discussion :)
+> 
+> On Tue, Dec 12, 2023 at 02:11:56PM -0400, Jason Gunthorpe wrote:
+> > On Tue, Dec 12, 2023 at 05:46:34PM +0000, Catalin Marinas wrote:
+> > > should know the implications. There's also an expectation that the
+> > > actual driver (KVM guests) or maybe later DPDK can choose the safe
+> > > non-cacheable or write-combine (Linux terminology) attributes for the
+> > > BAR.
+> > 
+> > DPDK won't rely on this interface
+> 
+> Wait, so what's the expected interface for determining the memory
+> attributes at stage-1? I'm somewhat concerned that we're conflating two
+> things here:
+> 
+>  1) KVM needs to know the memory attributes to use at stage-2, which
+>     isn't fundamentally different from what's needed for userspace
+>     stage-1 mappings.
+> 
+>  2) KVM additionally needs a hint that the device / VFIO can handle
+>     mismatched aliases w/o the machine exploding. This goes beyond
+>     supporting Normal-NC mappings at stage-2 and is really a bug
+>     with our current scheme (nGnRnE at stage-1, nGnRE at stage-2).
+> 
+> I was hoping that (1) could be some 'common' plumbing for both userspace
+> and KVM mappings. And for (2), any case where a device is intolerant of
+> mismatches && KVM cannot force the memory attributes should be rejected.
+> 
+> AFAICT, the only reason PCI devices can get the blanket treatment of
+> Normal-NC at stage-2 is because userspace has a Device-* mapping and can't
+> speculatively load from the alias. This feels a bit hacky, and maybe we
+> should prioritize an interface for mapping a device into a VM w/o a
+> valid userspace mapping.
 
--- PMM
+FWIW - I have tried to summarize the reasoning behind PCIe devices
+Normal-NC default stage-2 safety in a document that I have just realized
+now it has become this series cover letter, I don't think the PCI blanket
+treatment is related *only* to the current user space mappings (ie
+BTW, AFAICS it is also *possible* at present to map a prefetchable BAR through
+sysfs with Normal-NC memory attributes in the host at the same time a PCI
+device is passed-through to a guest with VFIO - and therefore we have a
+dev-nGnRnE stage-1 mapping for it. Don't think anyone does that - what for -
+but it is possible and KVM would not know about it).
+
+Again, FWIW, we were told (source Arm ARM) mismatched aliases concerning
+device-XXX vs Normal-NC are not problematic as long as the transactions
+issued for the related mappings are independent (and none of the
+mappings is cacheable).
+
+I appreciate this is not enough to give everyone full confidence on
+this solution robustness - that's why I wrote that up so that we know
+what we are up against and write KVM interfaces accordingly.
+
+> I very much understand that this has been going on for a while, and we
+> need to do *something* to get passthrough working well for devices that
+> like 'WC'. I just want to make sure we don't paint ourselves into a corner
+> that's hard to get out of in the future.
+
+That makes perfect sense, see above, if there is anything we can do
+to clarify we will, in whatever shape it is preferred.
+
+Thanks,
+Lorenzo
 
