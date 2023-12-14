@@ -1,58 +1,58 @@
-Return-Path: <kvm+bounces-4419-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4418-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 001B0812577
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 03:48:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 577E0812574
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 03:48:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8503F282E3C
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 02:48:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0D941F219BD
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 02:48:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2388F46AD;
-	Thu, 14 Dec 2023 02:47:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198B32106;
+	Thu, 14 Dec 2023 02:47:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b="p3sofx11"
+	dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b="E28tJ5RP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18501D0
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 18:47:38 -0800 (PST)
-Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-4258e0a0dc1so45300791cf.2
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 18:47:38 -0800 (PST)
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BF5210B
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 18:47:39 -0800 (PST)
+Received: by mail-qt1-x82e.google.com with SMTP id d75a77b69052e-425a2b4df7bso45273131cf.0
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 18:47:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bitbyteword.org; s=google; t=1702522057; x=1703126857; darn=vger.kernel.org;
+        d=bitbyteword.org; s=google; t=1702522059; x=1703126859; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ekpxaaikq3I9HLHBaO2l2iBuB2axaTEVCYm2OaBnRno=;
-        b=p3sofx11abKQooywzYyPteiIcvfZ7riV6Aa6EAwPAQh2fYduZiYUIQTcgzo9jkag4Q
-         c2PcTJhu+0ladh5/S1DKTG4fR+EXb9NsMKAW+sMknOUoJm3M9/22lPZMazM4ZbjFV1ky
-         pybaJtrYmnk5DCOlE9NxxYTlO57dI/4C4P9FD1MnGpW8eD6KuDJw0vUjpiuooUZwvam1
-         a4Xmh1aiEF9L+VCosq/3jvK9HkzTNSnzvuYKylw/cqyNyO/CbURge1csoT7K1+9EU2w1
-         iv6ChdYfUMBMsdKc/hLTMZqT/83uN8jZ51RFy6jBspW/tioOo8cWjdjIe6xGIgzR4jUB
-         hJFA==
+        bh=gTSAC8lorgQBroJi8wDtWTizY3Sq3NA2keDTcoNJeiU=;
+        b=E28tJ5RP/YYloN5KYrVjjeROKlG/JunnuwxD6Il3I6T6YvRmpMq51N9KkkNBmNswzN
+         wTmyjgWlSLk5HVBQshysM6JawkK8RDuhLi9in9RTT+YpePoVUerXU/4W58tKoxhAWrSh
+         qXuFLVoVX79+Tyosr4QjXE1foejYZUjFxO/MIiOb02ccBOeZx/lkHZ3hkpn1wh932Fpi
+         dvWa5tnyRQgnfZNel+URgPB05B5NbQ1oKEidcdVJWJBwmkxfuT0jwhF7FaMexfMSjX/F
+         xlcOualUpnQUzK6XxMsS6Rbbb5+tMMEw9KzlPGpibeatp++uGyQghnczU1h9wIzyZgTB
+         8Pyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702522057; x=1703126857;
+        d=1e100.net; s=20230601; t=1702522059; x=1703126859;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ekpxaaikq3I9HLHBaO2l2iBuB2axaTEVCYm2OaBnRno=;
-        b=eru7V7oqWIcgMCTJR74kDAggOSbpJBBdUXygbuNOFQj2jSRY9SDTtmRuaYQ+U74l20
-         JJbN548Lka3ejui49mLL9HAAD2KhYzIKWJK4MdcUmpyJsm5jzl3LRCOqZPdwirLU+yl/
-         Wlk/ZmZMMJY5Iv8w3VxDtR+ldkHnu1ThVTfwOAxSaUhszqRuovKUkHf145Z93DfdGId5
-         Z2mrTleFq1Iui7UxlqaEofsJzKOOjUpmSwrjpWCQWWIatxUccwLUMmycEbOI5aFkIEC1
-         bkKA31QmjOz3jsWKsoGKZFPVCtfw5T10FFccOlLXs10r1ZSB+Q1v5ioPEOAvfo3xLH2z
-         bJbQ==
-X-Gm-Message-State: AOJu0YxtlmTEKueugu2o0jfEk3isUV7IQbmPS+eGLvKcpPglYEhKRq+E
-	eGfSlKfiQiOhGH14bNB2M7+esA==
-X-Google-Smtp-Source: AGHT+IFvU0N0QxWo4eV6lx4Bbxuz57j3TWF3PwmsDngRIU5vBkxPxZDnBO+vqLYngLOzGAuFoeRARQ==
-X-Received: by 2002:a05:622a:10a:b0:423:b290:e7e6 with SMTP id u10-20020a05622a010a00b00423b290e7e6mr12537997qtw.37.1702522057118;
-        Wed, 13 Dec 2023 18:47:37 -0800 (PST)
+        bh=gTSAC8lorgQBroJi8wDtWTizY3Sq3NA2keDTcoNJeiU=;
+        b=FofifLVJNwrR3PL3hdLdeVjQ6mMw9jI33K+2OZDxFuU/gRlRfaixGcvvUcnrEYrz1j
+         B0EpEV2/VMxdd0K5wNyAYbFV8VB0PapA0wj4KW4BwNmV5rg5j9hnR88r0aRw0Y4HrHIQ
+         TLVoMxhshEOnF3d+JOFsmr1JO2eiUuubMEaYoEr8SN0jX1coL/ycoMi6MRH9rZ+V2Vsx
+         rMdZNVIkP+Sr5ZzX0rnTdmZA02e+hLaVIxKWXkCWjQR5Je7CBfaHNM0KfWTdWV4mVx0m
+         SScwMPiE6h+SiKsRiU5dDXQS6VnayfrqFFTze3KN2RPtbfn4ylzlvlb7KeqHDCEVAPwC
+         xQjg==
+X-Gm-Message-State: AOJu0YyuouQaJmGEEZ43LWnKEFyCREKgRYQmFCY9OwJ4tv99WrqvPI9y
+	JPPBEq/S612E3UkFwRMp192UtA==
+X-Google-Smtp-Source: AGHT+IFCknomeNY7bK13m6X0xaXsU9OorF5sm50ko/Fs0P9mA9ckrWT4Qq2LVghLRhWQezBZWpVAAQ==
+X-Received: by 2002:ac8:5d4c:0:b0:423:7d72:6c8 with SMTP id g12-20020ac85d4c000000b004237d7206c8mr14420946qtx.53.1702522058661;
+        Wed, 13 Dec 2023 18:47:38 -0800 (PST)
 Received: from vinp3lin.lan (c-73-143-21-186.hsd1.vt.comcast.net. [73.143.21.186])
-        by smtp.gmail.com with ESMTPSA id fh3-20020a05622a588300b00425b356b919sm4240208qtb.55.2023.12.13.18.47.35
+        by smtp.gmail.com with ESMTPSA id fh3-20020a05622a588300b00425b356b919sm4240208qtb.55.2023.12.13.18.47.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 18:47:36 -0800 (PST)
+        Wed, 13 Dec 2023 18:47:38 -0800 (PST)
 From: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>
 To: Ben Segall <bsegall@google.com>,
 	Borislav Petkov <bp@alien8.de>,
@@ -80,9 +80,9 @@ Cc: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>,
 	linux-kernel@vger.kernel.org,
 	x86@kernel.org,
 	Joel Fernandes <joel@joelfernandes.org>
-Subject: [RFC PATCH 3/8] kvm: x86: vcpu boosting/unboosting framework
-Date: Wed, 13 Dec 2023 21:47:20 -0500
-Message-ID: <20231214024727.3503870-4-vineeth@bitbyteword.org>
+Subject: [RFC PATCH 4/8] kvm: x86: boost vcpu threads on latency sensitive paths
+Date: Wed, 13 Dec 2023 21:47:21 -0500
+Message-ID: <20231214024727.3503870-5-vineeth@bitbyteword.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231214024727.3503870-1-vineeth@bitbyteword.org>
 References: <20231214024727.3503870-1-vineeth@bitbyteword.org>
@@ -94,335 +94,150 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When the guest kernel is about to run a critical or latency sensitive
-workload, it can request the hypervisor to boost the priority of the
-vcpu thread. Similarly, guest kernel can request to unboost when the
-vcpu switches to a normal workload.
+Proactively boost the vcpu thread when delivering an interrupt so
+that the guest vcpu gets to run with minimum latency and service the
+interrupt. The host knows that guest vcpu is going to service an irq/nmi
+as soon as its delivered and boosting the priority will help the guest
+to avoid latencies. Timer interrupt is one common scenario which
+benefits from this.
 
-When a guest determines that it needs a boost, it need not immediately
-request a synchronous boost as it is already running at that moment.
-Synchronous request is detrimental because it incurs a VMEXIT. Rather,
-let the guest note down its request on a shared memory and the host can
-check this request on next VMEXIT and boost if needed.
-
-Preemption disabled state in a vcpu is also considered latency sensitive
-and requires boosting. Guest passes its preemption state to host and
-host boosts the vcpu thread as needed.
-
-Unboost requests needs to be synchronous because guest running boosted
-while really not required might hurt host workload. Implement a
-synchronous mechanism to unboost using MSR_KVM_PV_SCHED. Host checks
-the shared memory for boost/unboost request on every VMEXIT. So, the
-VMEXIT due to wrmsr(ULLONG_MAX) also goes through a fastexit path which
-takes care of the boost/unboost.
+When a vcpu resumes from halt, it would be because of an event like
+timer or irq/nmi and is latency sensitive. So, boosting the priority
+of vcpu thread when it goes idle makes sense as the wakeup would be
+because of a latency sensitive event and this boosting will not hurt
+the host as the thread is scheduled out.
 
 Co-developed-by: Joel Fernandes (Google) <joel@joelfernandes.org>
 Signed-off-by: Joel Fernandes (Google) <joel@joelfernandes.org>
 Signed-off-by: Vineeth Pillai (Google) <vineeth@bitbyteword.org>
 ---
- arch/x86/include/asm/kvm_host.h      | 42 ++++++++++++++++
- arch/x86/include/uapi/asm/kvm_para.h | 19 +++++++
- arch/x86/kvm/x86.c                   | 48 ++++++++++++++++++
- include/linux/kvm_host.h             | 11 +++++
- virt/kvm/kvm_main.c                  | 74 ++++++++++++++++++++++++++++
- 5 files changed, 194 insertions(+)
+ arch/x86/kvm/i8259.c     | 2 +-
+ arch/x86/kvm/lapic.c     | 8 ++++----
+ arch/x86/kvm/svm/svm.c   | 2 +-
+ arch/x86/kvm/vmx/vmx.c   | 2 +-
+ include/linux/kvm_host.h | 8 ++++++++
+ virt/kvm/kvm_main.c      | 8 ++++++++
+ 6 files changed, 23 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index f89ba1f07d88..474fe2d6d3e0 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -994,6 +994,8 @@ struct kvm_vcpu_arch {
- 	 */
- 	struct {
- 		enum kvm_vcpu_boost_state boost_status;
-+		int boost_policy;
-+		int boost_prio;
- 		u64 msr_val;
- 		struct gfn_to_hva_cache data;
- 	} pv_sched;
-@@ -2230,6 +2232,13 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
- #define KVM_EXIT_HYPERCALL_MBZ		GENMASK_ULL(31, 1)
+diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
+index 8dec646e764b..6841ed802f00 100644
+--- a/arch/x86/kvm/i8259.c
++++ b/arch/x86/kvm/i8259.c
+@@ -62,7 +62,7 @@ static void pic_unlock(struct kvm_pic *s)
+ 		kvm_for_each_vcpu(i, vcpu, s->kvm) {
+ 			if (kvm_apic_accept_pic_intr(vcpu)) {
+ 				kvm_make_request(KVM_REQ_EVENT, vcpu);
+-				kvm_vcpu_kick(vcpu);
++				kvm_vcpu_kick_boost(vcpu);
+ 				return;
+ 			}
+ 		}
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index e74e223f46aa..ae25176fddc8 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1309,12 +1309,12 @@ static int __apic_accept_irq(struct kvm_lapic *apic, int delivery_mode,
+ 		result = 1;
+ 		vcpu->arch.pv.pv_unhalted = 1;
+ 		kvm_make_request(KVM_REQ_EVENT, vcpu);
+-		kvm_vcpu_kick(vcpu);
++		kvm_vcpu_kick_boost(vcpu);
+ 		break;
  
- #ifdef CONFIG_PARAVIRT_SCHED_KVM
-+/*
-+ * Default policy and priority used for boosting
-+ * VCPU threads.
-+ */
-+#define VCPU_BOOST_DEFAULT_PRIO	8
-+#define VCPU_BOOST_DEFAULT_POLICY	SCHED_RR
-+
- static inline bool kvm_arch_vcpu_pv_sched_enabled(struct kvm_vcpu_arch *arch)
- {
- 	return arch->pv_sched.msr_val;
-@@ -2240,6 +2249,39 @@ static inline void kvm_arch_vcpu_set_boost_status(struct kvm_vcpu_arch *arch,
- {
- 	arch->pv_sched.boost_status = boost_status;
- }
-+
-+static inline bool kvm_arch_vcpu_boosted(struct kvm_vcpu_arch *arch)
-+{
-+	return arch->pv_sched.boost_status == VCPU_BOOST_BOOSTED;
-+}
-+
-+static inline int kvm_arch_vcpu_boost_policy(struct kvm_vcpu_arch *arch)
-+{
-+	return arch->pv_sched.boost_policy;
-+}
-+
-+static inline int kvm_arch_vcpu_boost_prio(struct kvm_vcpu_arch *arch)
-+{
-+	return arch->pv_sched.boost_prio;
-+}
-+
-+static inline int kvm_arch_vcpu_set_boost_prio(struct kvm_vcpu_arch *arch, u64 prio)
-+{
-+	if (prio >= MAX_RT_PRIO)
-+		return -EINVAL;
-+
-+	arch->pv_sched.boost_prio = prio;
-+	return 0;
-+}
-+
-+static inline int kvm_arch_vcpu_set_boost_policy(struct kvm_vcpu_arch *arch, u64 policy)
-+{
-+	if (policy != SCHED_FIFO && policy != SCHED_RR)
-+		return -EINVAL;
-+
-+	arch->pv_sched.boost_policy = policy;
-+	return 0;
-+}
- #endif
- 
- #endif /* _ASM_X86_KVM_HOST_H */
-diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-index 6b1dea07a563..e53c3f3a88d7 100644
---- a/arch/x86/include/uapi/asm/kvm_para.h
-+++ b/arch/x86/include/uapi/asm/kvm_para.h
-@@ -167,11 +167,30 @@ enum kvm_vcpu_boost_state {
- 	VCPU_BOOST_BOOSTED
- };
- 
-+/*
-+ * Boost Request from guest to host for lazy boosting.
-+ */
-+enum kvm_vcpu_boost_request {
-+	VCPU_REQ_NONE = 0,
-+	VCPU_REQ_UNBOOST,
-+	VCPU_REQ_BOOST,
-+};
-+
-+
-+union guest_schedinfo {
-+	struct {
-+		__u8 boost_req;
-+		__u8 preempt_disabled;
-+	};
-+	__u64 pad;
-+};
-+
- /*
-  * Structure passed in via MSR_KVM_PV_SCHED
-  */
- struct pv_sched_data {
- 	__u64 boost_status;
-+	union guest_schedinfo schedinfo;
- };
- 
- #endif /* _UAPI_ASM_X86_KVM_PARA_H */
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 0f475b50ac83..2577e1083f91 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2148,6 +2148,37 @@ static inline bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu)
- 		xfer_to_guest_mode_work_pending();
- }
- 
-+#ifdef CONFIG_PARAVIRT_SCHED_KVM
-+static inline bool __vcpu_needs_boost(struct kvm_vcpu *vcpu, union guest_schedinfo schedinfo)
-+{
-+	bool pending_event = kvm_cpu_has_pending_timer(vcpu) || kvm_cpu_has_interrupt(vcpu);
-+
-+	/*
-+	 * vcpu needs a boost if
-+	 * - A lazy boost request active, or
-+	 * - Pending latency sensitive event, or
-+	 * - Preemption disabled in this vcpu.
-+	 */
-+	return (schedinfo.boost_req == VCPU_REQ_BOOST || pending_event || schedinfo.preempt_disabled);
-+}
-+
-+static inline void kvm_vcpu_do_pv_sched(struct kvm_vcpu *vcpu)
-+{
-+	union guest_schedinfo schedinfo;
-+
-+	if (!kvm_vcpu_sched_enabled(vcpu))
-+		return;
-+
-+	if (kvm_read_guest_offset_cached(vcpu->kvm, &vcpu->arch.pv_sched.data,
-+		&schedinfo, offsetof(struct pv_sched_data, schedinfo), sizeof(schedinfo)))
-+		return;
-+
-+	kvm_vcpu_set_sched(vcpu, __vcpu_needs_boost(vcpu, schedinfo));
-+}
-+#else
-+static inline void kvm_vcpu_do_pv_sched(struct kvm_vcpu *vcpu) { }
-+#endif
-+
- /*
-  * The fast path for frequent and performance sensitive wrmsr emulation,
-  * i.e. the sending of IPI, sending IPI early in the VM-Exit flow reduces
-@@ -2201,6 +2232,15 @@ fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu)
- 			ret = EXIT_FASTPATH_REENTER_GUEST;
+ 	case APIC_DM_SMI:
+ 		if (!kvm_inject_smi(vcpu)) {
+-			kvm_vcpu_kick(vcpu);
++			kvm_vcpu_kick_boost(vcpu);
+ 			result = 1;
  		}
  		break;
-+#ifdef CONFIG_PARAVIRT_SCHED_KVM
-+	case MSR_KVM_PV_SCHED:
-+		data = kvm_read_edx_eax(vcpu);
-+		if (data == ULLONG_MAX) {
-+			kvm_skip_emulated_instruction(vcpu);
-+			ret = EXIT_FASTPATH_EXIT_HANDLED;
-+		}
-+		break;
-+#endif
- 	default:
+@@ -1322,7 +1322,7 @@ static int __apic_accept_irq(struct kvm_lapic *apic, int delivery_mode,
+ 	case APIC_DM_NMI:
+ 		result = 1;
+ 		kvm_inject_nmi(vcpu);
+-		kvm_vcpu_kick(vcpu);
++		kvm_vcpu_kick_boost(vcpu);
  		break;
+ 
+ 	case APIC_DM_INIT:
+@@ -1901,7 +1901,7 @@ static void apic_timer_expired(struct kvm_lapic *apic, bool from_timer_fn)
+ 	atomic_inc(&apic->lapic_timer.pending);
+ 	kvm_make_request(KVM_REQ_UNBLOCK, vcpu);
+ 	if (from_timer_fn)
+-		kvm_vcpu_kick(vcpu);
++		kvm_vcpu_kick_boost(vcpu);
+ }
+ 
+ static void start_sw_tscdeadline(struct kvm_lapic *apic)
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index c8466bc64b87..578c19aeef73 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3566,7 +3566,7 @@ void svm_complete_interrupt_delivery(struct kvm_vcpu *vcpu, int delivery_mode,
+ 	if (!READ_ONCE(vcpu->arch.apic->apicv_active)) {
+ 		/* Process the interrupt via kvm_check_and_inject_events(). */
+ 		kvm_make_request(KVM_REQ_EVENT, vcpu);
+-		kvm_vcpu_kick(vcpu);
++		kvm_vcpu_kick_boost(vcpu);
+ 		return;
  	}
-@@ -10919,6 +10959,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	guest_timing_exit_irqoff();
  
- 	local_irq_enable();
-+
-+	kvm_vcpu_do_pv_sched(vcpu);
-+
- 	preempt_enable();
- 
- 	kvm_vcpu_srcu_read_lock(vcpu);
-@@ -11990,6 +12033,11 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	if (r)
- 		goto free_guest_fpu;
- 
-+#ifdef CONFIG_PARAVIRT_SCHED_KVM
-+	kvm_arch_vcpu_set_boost_prio(&vcpu->arch, VCPU_BOOST_DEFAULT_PRIO);
-+	kvm_arch_vcpu_set_boost_policy(&vcpu->arch, VCPU_BOOST_DEFAULT_POLICY);
-+#endif
-+
- 	vcpu->arch.arch_capabilities = kvm_get_arch_capabilities();
- 	vcpu->arch.msr_platform_info = MSR_PLATFORM_INFO_CPUID_FAULT;
- 	kvm_xen_init_vcpu(vcpu);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index bc6f0fea48b4..b786cb2eb185 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4266,7 +4266,7 @@ static void vmx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
+ 	if (vmx_deliver_posted_interrupt(vcpu, vector)) {
+ 		kvm_lapic_set_irr(vector, apic);
+ 		kvm_make_request(KVM_REQ_EVENT, vcpu);
+-		kvm_vcpu_kick(vcpu);
++		kvm_vcpu_kick_boost(vcpu);
+ 	} else {
+ 		trace_kvm_apicv_accept_irq(vcpu->vcpu_id, delivery_mode,
+ 					   trig_mode, vector);
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index a74aeea55347..c6647f6312c9 100644
+index c6647f6312c9..f76680fbc60d 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -2290,6 +2290,17 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
- 
- #ifdef CONFIG_PARAVIRT_SCHED_KVM
- void kvm_set_vcpu_boosted(struct kvm_vcpu *vcpu, bool boosted);
-+int kvm_vcpu_set_sched(struct kvm_vcpu *vcpu, bool boost);
+@@ -2296,11 +2296,19 @@ static inline bool kvm_vcpu_sched_enabled(struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_arch_vcpu_pv_sched_enabled(&vcpu->arch);
+ }
 +
-+static inline bool kvm_vcpu_sched_enabled(struct kvm_vcpu *vcpu)
++static inline void kvm_vcpu_kick_boost(struct kvm_vcpu *vcpu)
 +{
-+	return kvm_arch_vcpu_pv_sched_enabled(&vcpu->arch);
++	kvm_vcpu_set_sched(vcpu, true);
++	kvm_vcpu_kick(vcpu);
 +}
-+#else
-+static inline int kvm_vcpu_set_sched(struct kvm_vcpu *vcpu, bool boost)
-+{
-+	return 0;
-+}
+ #else
+ static inline int kvm_vcpu_set_sched(struct kvm_vcpu *vcpu, bool boost)
+ {
+ 	return 0;
+ }
++
++#define kvm_vcpu_kick_boost kvm_vcpu_kick
  #endif
  
  #endif
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 5bbb5612b207..37748e2512e1 100644
+index 37748e2512e1..0dd8b84ed073 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -57,6 +57,9 @@
- #include <asm/ioctl.h>
- #include <linux/uaccess.h>
+@@ -3460,6 +3460,14 @@ bool kvm_vcpu_block(struct kvm_vcpu *vcpu)
+ 		if (kvm_vcpu_check_block(vcpu) < 0)
+ 			break;
  
-+#include <linux/sched.h>
-+#include <uapi/linux/sched/types.h>
-+
- #include "coalesced_mmio.h"
- #include "async_pf.h"
- #include "kvm_mm.h"
-@@ -3602,6 +3605,77 @@ bool kvm_vcpu_wake_up(struct kvm_vcpu *vcpu)
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_wake_up);
- 
-+#ifdef CONFIG_PARAVIRT_SCHED_KVM
-+/*
-+ * Check if we need to act on the boost/unboost request.
-+ * Returns true if:
-+ *  - caller is requesting boost and vcpu is boosted, or
-+ *  - caller is requesting unboost and vcpu is not boosted.
-+ */
-+static inline bool __can_ignore_set_sched(struct kvm_vcpu *vcpu, bool boost)
-+{
-+	return ((boost && kvm_arch_vcpu_boosted(&vcpu->arch)) ||
-+		(!boost && !kvm_arch_vcpu_boosted(&vcpu->arch)));
-+}
-+
-+int kvm_vcpu_set_sched(struct kvm_vcpu *vcpu, bool boost)
-+{
-+	int policy;
-+	int ret = 0;
-+	struct pid *pid;
-+	struct sched_param param = { 0 };
-+	struct task_struct *vcpu_task = NULL;
-+
-+	/*
-+	 * We can ignore the request if a boost request comes
-+	 * when we are already boosted or an unboost request
-+	 * when we are already unboosted.
-+	 */
-+	if (__can_ignore_set_sched(vcpu, boost))
-+		goto set_boost_status;
-+
-+	if (boost) {
-+		policy = kvm_arch_vcpu_boost_policy(&vcpu->arch);
-+		param.sched_priority = kvm_arch_vcpu_boost_prio(&vcpu->arch);
-+	} else {
 +		/*
-+		 * TODO: here we just unboost to SCHED_NORMAL. Ideally we
-+		 * should either
-+		 * - revert to the initial priority before boost, or
-+		 * - introduce tunables for unboost priority.
++		 * Boost before scheduling out. Wakeup happens only on
++		 * an event or a signal and hence it is beneficial to
++		 * be scheduled ASAP. Ultimately, guest gets to idle loop
++		 * and then will request deboost.
 +		 */
-+		policy = SCHED_NORMAL;
-+		param.sched_priority = 0;
-+	}
++		kvm_vcpu_set_sched(vcpu, true);
 +
-+	rcu_read_lock();
-+	pid = rcu_dereference(vcpu->pid);
-+	if (pid)
-+		vcpu_task = get_pid_task(pid, PIDTYPE_PID);
-+	rcu_read_unlock();
-+	if (vcpu_task == NULL)
-+		return -KVM_EINVAL;
-+
-+	/*
-+	 * This might be called from interrupt context.
-+	 * Since we do not use rt-mutexes, we can safely call
-+	 * sched_setscheduler_pi_nocheck with pi = false.
-+	 * NOTE: If in future, we use rt-mutexes, this should
-+	 * be modified to use a tasklet to do boost/unboost.
-+	 */
-+	WARN_ON_ONCE(vcpu_task->pi_top_task);
-+	ret = sched_setscheduler_pi_nocheck(vcpu_task, policy,
-+			&param, false);
-+	put_task_struct(vcpu_task);
-+set_boost_status:
-+	if (!ret)
-+		kvm_set_vcpu_boosted(vcpu, boost);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(kvm_vcpu_set_sched);
-+#endif
-+
- #ifndef CONFIG_S390
- /*
-  * Kick a sleeping VCPU, or a guest VCPU in guest mode, into host kernel mode.
+ 		waited = true;
+ 		schedule();
+ 	}
 -- 
 2.43.0
 
