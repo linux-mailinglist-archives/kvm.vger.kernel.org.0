@@ -1,284 +1,179 @@
-Return-Path: <kvm+bounces-4536-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4537-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 274DC813B2E
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 21:03:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 709C3813B56
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 21:13:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D19DC1F225B3
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 20:03:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A00E2827CB
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 20:13:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBE526A01C;
-	Thu, 14 Dec 2023 20:03:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33B896A02A;
+	Thu, 14 Dec 2023 20:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CxDxm+FC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3uXO53yS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF92697B9;
-	Thu, 14 Dec 2023 20:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BEIqAnu014262;
-	Thu, 14 Dec 2023 20:03:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=x8XoeypXWZ9sNEFHxUhrm0suPboCMN4kuoiSzfdehZs=;
- b=CxDxm+FCfIoqcouqCoYS75SpQk/xrcx9EAzIVeEEbgwOH5zQny9cX9GLP1lWs3nnYl3m
- y9f6tdf2sHCGIHF5DNT352mx50yf6H8y/yU2jb9dKO7hFOVgUQMGB4vsjLDqn/vmztiM
- c6q8IolZEbMUiXe7Vo14x55djWogdtC+YdrdezD97E5/gHSBRPHsg0NMO5Nq2N4Mnktd
- 4o1CQGDwfgQyABnwa+ulH8cEsN/sry6EoCitJQOYYD78ZuqHFHLAk5jx0znTxurHkwKB
- hiST3QY06ZW6cLa3Bhf0sKrRWEpAjngefXvF8sGNsZlzomh7tZ/cRkgmURrF75cBfKp9 Ow== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v07c39sde-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Dec 2023 20:02:59 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BEJKSdC015537;
-	Thu, 14 Dec 2023 20:02:59 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v07c39sch-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Dec 2023 20:02:59 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BEJX3B0014819;
-	Thu, 14 Dec 2023 20:02:58 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uw42khyfu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Dec 2023 20:02:58 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BEK2tsj10420826
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 14 Dec 2023 20:02:55 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E8B372004B;
-	Thu, 14 Dec 2023 20:02:54 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B2D3720043;
-	Thu, 14 Dec 2023 20:02:54 +0000 (GMT)
-Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.152.224.238])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 14 Dec 2023 20:02:54 +0000 (GMT)
-Message-ID: <b61da0ed88a86d0823ac26d72f9914a7c392b415.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 3/5] s390x: Add library functions for
- exiting from snippet
-From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Nico =?ISO-8859-1?Q?B=F6hr?= <nrb@linux.ibm.com>,
-        Thomas Huth
- <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Andrew Jones
- <andrew.jones@linux.dev>,
-        David Hildenbrand <david@redhat.com>
-Date: Thu, 14 Dec 2023 21:02:53 +0100
-In-Reply-To: <20231213174222.542e11c6@p-imbrenda>
-References: <20231213124942.604109-1-nsg@linux.ibm.com>
-	 <20231213124942.604109-4-nsg@linux.ibm.com>
-	 <20231213174222.542e11c6@p-imbrenda>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB94D6A032
+	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 20:13:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1d32b4a8ea0so52019595ad.3
+        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 12:13:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702584816; x=1703189616; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=o6UuF2I+ksa0nRBkfH8g4L0LiVSfO6AHAS12VBA0d84=;
+        b=3uXO53yS0xx9GMoa+komR8PI861qPpzCKzKGgx56phJ8Hs2Bgv1uJfdXktZ1DtAf+h
+         LMpt+mcZiChHv4qbuyM9LI+CGrJNAriiPtatLimiZp9Y41osIH4nu3+QaYQa9ylrtp9c
+         5XFOnAdGlNNMZmSwqtIBU87d/AbBuy+Zx0egjOtZmvDQZuot3Y92Q/+KUbJ4NWxR31Ci
+         TY1i5HPd93n+XrZ9a+LE2NPhE1cX9lYO0t+sHD/vPL0IxZus8SjQF/u/RkJCZZfEzpgP
+         Sl25R2eTWqEldgUPSw2vtHsi792+1hzII1t1YpSE4U10WnU/KUCMqeRZhMckVE/88TC4
+         +8Og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702584816; x=1703189616;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=o6UuF2I+ksa0nRBkfH8g4L0LiVSfO6AHAS12VBA0d84=;
+        b=COL0xAYvRLNVQYnEsgW5HbsCMYTuJAyfGgFBXV7xZ7WaFPROxJsKTVpKyuuTfLc+3J
+         ilFjZmhTPV1FEeamfXiPpldpikbyY2t5UEkBdVrHTCPMFFiCenYf3r/tO1tet+rmMsCd
+         yxE8jRbef4fCFYN3zkN68W+7pSj4jCh6RG9JiF8ocDqLKm1Emvw9DsN6vjigNP7FlraZ
+         921y/Ta6f0kuS9e8WmRFqh4H6FreGvod+Sc6Cpv+032tWOFzbDF/5EEtCkgCk96DHhLc
+         1oG5W+UUPJ5C7VBo/f8nT2LYm9/ghb4Pb9LCJ0/bPi0zweTfpdeSki/4+kibowFzaNee
+         UMBg==
+X-Gm-Message-State: AOJu0YwDLzuThjsbl/m3yTWulVnzyy2pyntqnz58Cc6jT3R4n7OoppAi
+	SzVj60KnIpSym5Q+oOqMzLGD0CWjuB0=
+X-Google-Smtp-Source: AGHT+IGEiwa1cSoRDflydMN7++Q6taulTF4HV3L/RNxde17wAejKqSXkzjYYxVXM2/0619dGhrSppCrZiaM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:b18f:b0:1d0:9b2d:5651 with SMTP id
+ s15-20020a170902b18f00b001d09b2d5651mr1570045plr.1.1702584816052; Thu, 14 Dec
+ 2023 12:13:36 -0800 (PST)
+Date: Thu, 14 Dec 2023 12:13:34 -0800
+In-Reply-To: <CAO7JXPihjjko6qe8tr6e6UE=L7uSR6AACq1Zwg+7n95s5A-yoQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: BEgDQ_ICxsHzdmvnWFzV6Tu-p3pG7yDz
-X-Proofpoint-GUID: nrXwyXTR7dzykkA7dZ9jVI4yy-H1u5Nh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-14_13,2023-12-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 lowpriorityscore=0 suspectscore=0 mlxlogscore=999 mlxscore=0
- spamscore=0 impostorscore=0 phishscore=0 malwarescore=0 adultscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312140143
+Mime-Version: 1.0
+References: <20231214024727.3503870-1-vineeth@bitbyteword.org>
+ <ZXsvl7mabUuNkWcY@google.com> <CAO7JXPihjjko6qe8tr6e6UE=L7uSR6AACq1Zwg+7n95s5A-yoQ@mail.gmail.com>
+Message-ID: <ZXth7hu7jaHbJZnj@google.com>
+Subject: Re: [RFC PATCH 0/8] Dynamic vcpu priority management in kvm
+From: Sean Christopherson <seanjc@google.com>
+To: Vineeth Remanan Pillai <vineeth@bitbyteword.org>
+Cc: Ben Segall <bsegall@google.com>, Borislav Petkov <bp@alien8.de>, 
+	Daniel Bristot de Oliveira <bristot@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Dietmar Eggemann <dietmar.eggemann@arm.com>, "H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
+	Juri Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Valentin Schneider <vschneid@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Wanpeng Li <wanpengli@tencent.com>, Suleiman Souhlal <suleiman@google.com>, 
+	Masami Hiramatsu <mhiramat@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, Tejun Heo <tj@kernel.org>, Josh Don <joshdon@google.com>, 
+	Barret Rhoden <brho@google.com>, David Vernet <dvernet@meta.com>, 
+	Joel Fernandes <joel@joelfernandes.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2023-12-13 at 17:42 +0100, Claudio Imbrenda wrote:
-> On Wed, 13 Dec 2023 13:49:40 +0100
-> Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
->=20
-> > It is useful to be able to force an exit to the host from the snippet,
-> > as well as do so while returning a value.
-> > Add this functionality, also add helper functions for the host to check
-> > for an exit and get or check the value.
-> > Use diag 0x44 and 0x9c for this.
-> > Add a guest specific snippet header file and rename the host's.
->=20
-> you should also mention here that you are splitting snippet.h into a
-> host-only part and a guest-only part
+On Thu, Dec 14, 2023, Vineeth Remanan Pillai wrote:
+> On Thu, Dec 14, 2023 at 11:38=E2=80=AFAM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> Now when I think about it, the implementation seems to
+> suggest that we are putting policies in kvm. Ideally, the goal is:
+> - guest scheduler communicates the priority requirements of the workload
+> - kvm applies the priority to the vcpu task.
 
-Well, I'm not splitting anything. Is it not clear that "the host's"
-refers to snippet.h?
+Why?  Tasks are tasks, why does KVM need to get involved?  E.g. if the prob=
+lem
+is that userspace doesn't have the right knobs to adjust the priority of a =
+task
+quickly and efficiently, then wouldn't it be better to solve that problem i=
+n a
+generic way?
 
-How about:
-Add a guest specific snippet header file and rename snippet.h to reflect
-that it is host specific.
+> - Now that vcpu is appropriately prioritized, host scheduler can make
+> the right choice of picking the next best task.
 >=20
-> >=20
-> > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> > ---
-> >  s390x/Makefile                          |  1 +
-> >  lib/s390x/asm/arch_def.h                | 13 ++++++++
-> >  lib/s390x/sie.h                         |  1 +
-> >  lib/s390x/snippet-guest.h               | 26 ++++++++++++++++
-> >  lib/s390x/{snippet.h =3D> snippet-host.h} |  9 ++++--
-> >  lib/s390x/sie.c                         | 28 +++++++++++++++++
-> >  lib/s390x/snippet-host.c                | 40 +++++++++++++++++++++++++
-> >  lib/s390x/uv.c                          |  2 +-
-> >  s390x/mvpg-sie.c                        |  2 +-
-> >  s390x/pv-diags.c                        |  2 +-
-> >  s390x/pv-icptcode.c                     |  2 +-
-> >  s390x/pv-ipl.c                          |  2 +-
-> >  s390x/sie-dat.c                         |  2 +-
-> >  s390x/spec_ex-sie.c                     |  2 +-
-> >  s390x/uv-host.c                         |  2 +-
-> >  15 files changed, 123 insertions(+), 11 deletions(-)
-> >  create mode 100644 lib/s390x/snippet-guest.h
-> >  rename lib/s390x/{snippet.h =3D> snippet-host.h} (93%)
-> >  create mode 100644 lib/s390x/snippet-host.c
+> We have an exception of proactive boosting for interrupts/nmis. I
+> don't expect these proactive boosting cases to grow. And I think this
+> also to be controlled by the guest where the guest can say what
+> scenarios would it like to be proactive boosted.
 >=20
-> [...]
->=20
-> > diff --git a/lib/s390x/sie.c b/lib/s390x/sie.c
-> > index 40936bd2..908b0130 100644
-> > --- a/lib/s390x/sie.c
-> > +++ b/lib/s390x/sie.c
-> > @@ -42,6 +42,34 @@ void sie_check_validity(struct vm *vm, uint16_t vir_=
-exp)
-> >  	report(vir_exp =3D=3D vir, "VALIDITY: %x", vir);
-> >  }
-> > =20
-> > +bool sie_is_diag_icpt(struct vm *vm, unsigned int diag)
-> > +{
-> > +	uint32_t ipb =3D vm->sblk->ipb;
-> > +	uint64_t code;
->=20
-> uint64_t code =3D 0;
->=20
-> > +	uint16_t displace;
-> > +	uint8_t base;
-> > +	bool ret =3D true;
->=20
-> bool ret;
->=20
-> > +
-> > +	ret =3D ret && vm->sblk->icptcode =3D=3D ICPT_INST;
-> > +	ret =3D ret && (vm->sblk->ipa & 0xff00) =3D=3D 0x8300;
->=20
-> ret =3D vm->sblk->icptcode =3D=3D ICPT_INST && (vm->sblk->ipa & 0xff00) =
-=3D=3D
-> 0x8300;
+> That would make kvm just a medium to communicate the scheduler
+> requirements from guest to host and not house any policies.  What do
+> you think?
 
-(*) see below
->=20
-> > +	switch (diag) {
-> > +	case 0x44:
-> > +	case 0x9c:
-> > +		ret =3D ret && !(ipb & 0xffff);
-> > +		ipb >>=3D 16;
-> > +		displace =3D ipb & 0xfff;
->=20
-> maybe it's more readable to avoid shifting thigs around all the time:
+...
+=20
+> > Pushing the scheduling policies to host userspace would allow for far m=
+ore control
+> > and flexibility.  E.g. a heavily paravirtualized environment where host=
+ userspace
+> > knows *exactly* what workloads are being run could have wildly differen=
+t policies
+> > than an environment where the guest is a fairly vanilla Linux VM that h=
+as received
+> > a small amount of enlightment.
+> >
+> > Lastly, if the concern/argument is that userspace doesn't have the righ=
+t knobs
+> > to (quickly) boost vCPU tasks, then the proposed sched_ext functionalit=
+y seems
+> > tailor made for the problems you are trying to solve.
+> >
+> > https://lkml.kernel.org/r/20231111024835.2164816-1-tj%40kernel.org
+> >
+> You are right, sched_ext is a good choice to have policies
+> implemented. In our case, we would need a communication mechanism as
+> well and hence we thought kvm would work best to be a medium between
+> the guest and the host.
 
-I don't know, now I gotta be able to do rudimentary arithmetic :D
-I don't really have a preference.
-I wonder if defining a bit field would be worth it.
->=20
-> displace =3D (ipb >> 16) & 0xfff;
-> base =3D (ipb >> 28) & 0xf;
-> if (base)
-> 	code =3D vm->....[base];
-> code =3D (code + displace) & 0xffff;
-> if (ipb & 0xffff || code !=3D diag)
-> 	return false;
->=20
-> > +		ipb >>=3D 12;
-> > +		base =3D ipb & 0xf;
-> > +		code =3D base ? vm->save_area.guest.grs[base] + displace : displace;
-> > +		code &=3D 0xffff;
-> > +		ret =3D ret && (code =3D=3D diag);
-> > +		break;
-> > +	default:
-> > +		abort(); /* not implemented */
-> > +	}
-> > +	return ret;
->=20
-> although I have the feeling that this would be more readable if you
-> would check diag immediately, and avoid using ret
+Making KVM be the medium may be convenient and the quickest way to get a Po=
+C
+out the door, but effectively making KVM a middle-man is going to be a huge=
+ net
+negative in the long term.  Userspace can communicate with the guest just a=
+s
+easily as KVM, and if you make KVM the middle-man, then you effectively *mu=
+st*
+define a relatively rigid guest/host ABI.
 
-Not sure what you mean, do you want an early return at (*)?
->=20
-> > +}
-> > +
-> >  void sie_handle_validity(struct vm *vm)
-> >  {
-> >  	if (vm->sblk->icptcode !=3D ICPT_VALIDITY)
-> > diff --git a/lib/s390x/snippet-host.c b/lib/s390x/snippet-host.c
-> > new file mode 100644
-> > index 00000000..a829c1d5
-> > --- /dev/null
-> > +++ b/lib/s390x/snippet-host.c
-> > @@ -0,0 +1,40 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +/*
-> > + * Snippet functionality for the host.
-> > + *
-> > + * Copyright IBM Corp. 2023
-> > + */
-> > +
-> > +#include <libcflat.h>
-> > +#include <snippet-host.h>
-> > +#include <sie.h>
-> > +
-> > +bool snippet_check_force_exit(struct vm *vm)
-> > +{
-> > +	bool r;
-> > +
-> > +	r =3D sie_is_diag_icpt(vm, 0x44);
-> > +	report(r, "guest forced exit");
-> > +	return r;
-> > +}
-> > +
-> > +bool snippet_get_force_exit_value(struct vm *vm, uint64_t *value)
-> > +{
-> > +	struct kvm_s390_sie_block *sblk =3D vm->sblk;
-> > +
-> > +	if (sie_is_diag_icpt(vm, 0x9c)) {
-> > +		*value =3D vm->save_area.guest.grs[(sblk->ipa & 0xf0) >> 4];
-> > +		report_pass("guest forced exit with value: 0x%lx", *value);
-> > +		return true;
-> > +	}
-> > +	report_fail("guest forced exit with value");
-> > +	return false;
-> > +}
-> > +
-> > +void snippet_check_force_exit_value(struct vm *vm, uint64_t value_exp)
-> > +{
-> > +	uint64_t value;
-> > +
-> > +	if (snippet_get_force_exit_value(vm, &value))
-> > +		report(value =3D=3D value_exp, "guest exit value matches 0x%lx", val=
-ue_exp);
-> > +}
->=20
-> from a readability and a consistency perspective, it would be better if
-> the functions would only check stuff and return a bool or a value, and
-> do the report() in the body of the testcase
+If instead the contract is between host userspace and the guest, the ABI ca=
+n be
+much more fluid, e.g. if you (or any setup) can control at least some amoun=
+t of
+code that runs in the guest, then the contract between the guest and host d=
+oesn't
+even need to be formally defined, it could simply be a matter of bundling h=
+ost
+and guest code appropriately.
 
-Hmm, I chose to do the report in order to be consistent with check_pgm_int_=
-code.
->=20
->=20
-> [...]
+If you want to land support for a given contract in upstream repositories, =
+e.g.
+to broadly enable paravirt scheduling support across a variety of usersepac=
+e VMMs
+and/or guests, then yeah, you'll need a formal ABI.  But that's still not a=
+ good
+reason to have KVM define the ABI.  Doing it in KVM might be a wee bit easi=
+er because
+it's largely just a matter of writing code, and LKML provides a centralized=
+ channel
+for getting buyin from all parties.  But defining an ABI that's independent=
+ of the
+kernel is absolutely doable, e.g. see the many virtio specs.
 
+I'm not saying KVM can't help, e.g. if there is information that is known o=
+nly
+to KVM, but the vast majority of the contract doesn't need to be defined by=
+ KVM.
 
