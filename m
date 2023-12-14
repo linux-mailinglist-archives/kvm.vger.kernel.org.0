@@ -1,121 +1,165 @@
-Return-Path: <kvm+bounces-4521-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4522-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48CD9813657
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 17:34:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36C6081366E
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 17:39:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B4E11C20F13
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 16:34:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CEA10B20A95
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 16:39:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C20CE60B88;
-	Thu, 14 Dec 2023 16:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8053360BA5;
+	Thu, 14 Dec 2023 16:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gK+FOFhA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RIgX3CLh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74261112
-	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 08:34:15 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5d12853cb89so96477277b3.3
-        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 08:34:15 -0800 (PST)
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C63610F
+	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 08:38:49 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-28b0f6a62f9so925561a91.3
+        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 08:38:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702571654; x=1703176454; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1702571929; x=1703176729; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dgQLvbaqZFtHigUp/EtkoVbLXyham3BzC/5JXoUn+l4=;
-        b=gK+FOFhAVl3PwgI3iS9BejvlarVDZflJr7QhpAqXpl72Ivi79wfMikHl+C4cyb2VPm
-         Ax9PkOYgXCAdEGtWZhn612Q/igA/Pe3DOkCaoNxl18+h3MUxW1Ca63ybW6fkwGWy7HZL
-         IALEV1cnD2NZ7gr/vwQ9AUJqfhkflZH2X1nrbo8NHYJiTKwfASA2/fgNtbVaN9dXO2rh
-         wfwSHVyeDTT3LX8V16Kkift9w7vZyuGuW8pEvyqKNxbvaovg/InGNVfKS/1GZRA4LxOk
-         HfK9qH2aU81RDeYaqq04IEkiwAM9uvizqK9GuIe4i1oBzZqeXY0ZlPWk1erMKSAdoSrl
-         afQQ==
+        bh=wgFC2UkHZlElWA30ukvsWw2kCiyu/c5uf7p4lb7iNbg=;
+        b=RIgX3CLhwvI9e4qLUdkZKjdVUhE/5wRLP9vaNpV3KTN/NrBCYTJYB9KNsEwKmiP9pT
+         msw+hoILAn4hrM2oxLrbBGdbheeGzwRt98reGcTWp4f2Zk3KSlViesyQQTDdcpC6YBJN
+         BynK9lDpfDd53sltuq7VLu2LiIAZ4UGdLMAKO1iaJX46W8gLC+qrnOul9ErNflSTSEEQ
+         VSuZBHUTBSOwcIUOS4tKKU2Jhru1jAvu1X4mQZHEw0CpvSiuQa1CnV6rtPbptajkfSil
+         q12HYSGnEkgo+DQJFLSsq07rThItJRgSlMUAXrh4hKjYN96W7O7kbSSoHWFpLYvhjLZC
+         YnDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702571654; x=1703176454;
+        d=1e100.net; s=20230601; t=1702571929; x=1703176729;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dgQLvbaqZFtHigUp/EtkoVbLXyham3BzC/5JXoUn+l4=;
-        b=Pp+7ABIyVgDmtjp+YX4+/9pk5wfx9bAg9cv4U09zsFGwguxRyxIh/uVzqu+l76gu75
-         MVVeVhZ/MAyjalL35ltQqQ04ItHZQnw4tpo9bH3hywjKNI47Ykxe0Z2HcEhTBf6KdMyx
-         L7KF8xdQ9R1vKr+dQg3vymmNEa5BVNlP/CTPzFdbTVk0UWLGkVTctflUdVCKNdy0/W4H
-         ufCwn7R/o0hoaJ9fBoi/vzTXwZwoyMYYmNQH63z8jwVLYaAFdddL4HdyYllKaVl4ftQ1
-         RqQms1VCneYY7ZHBEWF3FMWGQgjOKYt31IaKNVKWC/mnm6wSBv31XVPeXGiZw10dZyGV
-         Fh3w==
-X-Gm-Message-State: AOJu0Yxl/ThmXWB8ZvVMm1avHFbVqbvflGgy8opJ1LDQWiRXJ8ujLheM
-	EpQRTu26gJDoiitV66LaX2B2VN68F5Y=
-X-Google-Smtp-Source: AGHT+IGyuwsOx8hONotcvinU2TL/jZLWZjMBvbCKpQOSyVHlnfNq//5voUQE6Lf7ldDRVqln11okKSYy69w=
+        bh=wgFC2UkHZlElWA30ukvsWw2kCiyu/c5uf7p4lb7iNbg=;
+        b=FGthQKsMQNXfh/lMzlrPslIO785wDU+RGfCHNl0X1Sn4AIQ2M05x1uyfPc+oUbAyIQ
+         9OMW52M0smPr72UoAE0B0lwQghGmf5dn2D3ee9H0JBFgAMs/oqiLSQMMu5Ndzivn6shi
+         mYTRXrCd5QyQOfu8nz9OmD57+smYj7mLk4+AmzqtySCHB5MInG/rKTP8ELVUSaad3KwU
+         OS0aCCZLl+Kc8zpXPuhx8Hh31FTHUsiia6Vir/XXktTONsuuzFbsdcZ1ogZzE6wG3FW9
+         g3GOdUnPgcFtL6+JoxApG62CpVQcrLRcV8r3j95XFEXKASsFbyYT/oRmkAuaz3nFhto4
+         8VpQ==
+X-Gm-Message-State: AOJu0YzY5ylV5EdXD3XDWU4KXWpZ5u78pzFhYg+0g9mTEhx2SLH6AtDM
+	qdspLxgwqSCrfiqBAdxKDyIIM0ACafQ=
+X-Google-Smtp-Source: AGHT+IFw3A95D/cMefOg8sp5pB4196OqT6qF241cjoGEiu9axW1D3f3RuNRCUtwd783u/60K/NHS0q5tgd4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:c9c:b0:5e2:1d4d:bb78 with SMTP id
- cm28-20020a05690c0c9c00b005e21d4dbb78mr63397ywb.2.1702571654638; Thu, 14 Dec
- 2023 08:34:14 -0800 (PST)
-Date: Thu, 14 Dec 2023 16:34:12 +0000
-In-Reply-To: <864jglbgsh.wl-maz@kernel.org>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:ebcb:b0:286:4090:7397 with SMTP id
+ cf11-20020a17090aebcb00b0028640907397mr1058904pjb.5.1702571929027; Thu, 14
+ Dec 2023 08:38:49 -0800 (PST)
+Date: Thu, 14 Dec 2023 08:38:47 -0800
+In-Reply-To: <20231214024727.3503870-1-vineeth@bitbyteword.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231214001753.779022-1-seanjc@google.com> <864jglbgsh.wl-maz@kernel.org>
-Message-ID: <ZXsuhF5Rns1H53zK@google.com>
-Subject: Re: [ANNOUNCE / RFC] PUCK Future Topics
+References: <20231214024727.3503870-1-vineeth@bitbyteword.org>
+Message-ID: <ZXsvl7mabUuNkWcY@google.com>
+Subject: Re: [RFC PATCH 0/8] Dynamic vcpu priority management in kvm
 From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, James Houghton <jthoughton@google.com>, 
-	Peter Xu <peterx@redhat.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Isaku Yamahata <isaku.yamahata@linux.intel.com>, 
-	David Matlack <dmatlack@google.com>, Yan Zhao <yan.y.zhao@intel.com>, 
-	Michael Roth <michael.roth@amd.com>, Aaron Lewis <aaronlewis@google.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nicholas Piggin <npiggin@gmail.com>, Huacai Chen <chenhuacai@kernel.org>
+To: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>
+Cc: Ben Segall <bsegall@google.com>, Borislav Petkov <bp@alien8.de>, 
+	Daniel Bristot de Oliveira <bristot@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Dietmar Eggemann <dietmar.eggemann@arm.com>, "H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
+	Juri Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Valentin Schneider <vschneid@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Wanpeng Li <wanpengli@tencent.com>, Suleiman Souhlal <suleiman@google.com>, 
+	Masami Hiramatsu <mhiramat@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, Tejun Heo <tj@kernel.org>, Josh Don <joshdon@google.com>, 
+	Barret Rhoden <brho@google.com>, David Vernet <dvernet@meta.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Dec 14, 2023, Marc Zyngier wrote:
-> On Thu, 14 Dec 2023 00:17:53 +0000,
-> Sean Christopherson <seanjc@google.com> wrote:
-> > 
-> > Hi all!  There are a handful of PUCK topics that I want to get scheduled, and
-> > would like your help/input in confirming attendance to ensure we reach critical
-> > mass.
-> > 
-> > If you are on the Cc, please confirm that you are willing and able to attend
-> > PUCK on the proposed/tentative date for any topics tagged with your name.  Or
-> > if you simply don't want to attend, I suppose that's a valid answer too. :-)
-> > 
-> > If you are not on the Cc but want to ensure that you can be present for a given
-> > topic, please speak up asap if you have a conflict.  I will do my best to
-> > accomodate everyone's schedules, and the more warning I get the easier that will
-> > be.
-> > 
-> > Note, the proposed schedule is largely arbitrary, I am not wedded to any
-> > particular order.  The only known conflict at this time is the guest_memfd()
-> > post-copy discussion can't land on Jan 10th.
-> > 
-> > Thanks!
-> > 
-> > 
-> > 2024.01.03 - Post-copy for guest_memfd()
-> >     Needs: David M, Paolo, Peter Xu, James, Oliver, Aaron
-> > 
-> > 2024.01.10 - Unified uAPI for protected VMs
-> >     Needs: Paolo, Isaku, Mike R
-> > 
-> > 2024.01.17 - Memtypes for non-coherent MDA
++sched_ext folks
+
+On Wed, Dec 13, 2023, Vineeth Pillai (Google) wrote:
+> Double scheduling is a concern with virtualization hosts where the host
+> schedules vcpus without knowing whats run by the vcpu and guest schedules
+> tasks without knowing where the vcpu is physically running. This causes
+> issues related to latencies, power consumption, resource utilization
+> etc. An ideal solution would be to have a cooperative scheduling
+> framework where the guest and host shares scheduling related information
+> and makes an educated scheduling decision to optimally handle the
+> workloads. As a first step, we are taking a stab at reducing latencies
+> for latency sensitive workloads in the guest.
 > 
-> DMA?
-
-Doh, yes, DMA.
-
-> >     Needs: Paolo, Yan, Oliver, Marc, more ARM folks?
+> This series of patches aims to implement a framework for dynamically
+> managing the priority of vcpu threads based on the needs of the workload
+> running on the vcpu. Latency sensitive workloads (nmi, irq, softirq,
+> critcal sections, RT tasks etc) will get a boost from the host so as to
+> minimize the latency.
 > 
-> Do we need anyone from the other architectures? I wouldn't be
-> surprised if RISC-V was at least as picky as ARM on that front
-> (assuming this really is about DMA and not something else).
+> The host can proactively boost the vcpu threads when it has enough
+> information about what is going to run on the vcpu - fo eg: injecting
+> interrupts. For rest of the case, guest can request boost if the vcpu is
+> not already boosted. The guest can subsequently request unboost after
+> the latency sensitive workloads completes. Guest can also request a
+> boost if needed.
+> 
+> A shared memory region is used to communicate the scheduling information.
+> Guest shares its needs for priority boosting and host shares the boosting
+> status of the vcpu. Guest sets a flag when it needs a boost and continues
+> running. Host reads this on next VMEXIT and boosts the vcpu thread. For
+> unboosting, it is done synchronously so that host workloads can fairly
+> compete with guests when guest is not running any latency sensitive
+> workload.
 
-Ah, yeah, probably.  I had just heard rumblings about ARM, and so ARM was on my
-mind.  I added people from all the other flavors of KVM.
+Big thumbs down on my end.  Nothing in this RFC explains why this should be done
+in KVM.  In general, I am very opposed to putting policy of any kind into KVM,
+and this puts a _lot_ of unmaintainable policy into KVM by deciding when to
+start/stop boosting a vCPU.
+
+Concretely, boosting vCPUs for most events is far too coarse grained.  E.g. boosting
+a vCPU that is running a low priority workload just because the vCPU triggered
+an NMI due to PMU counter overflow doesn't make sense.  Ditto for if a guest's
+hrtimer expires on a vCPU running a low priority workload.
+
+And as evidenced by patch 8/8, boosting vCPUs based on when an event is _pending_
+is not maintainable.  As hardware virtualizes more and more functionality, KVM's
+visilibity into the guest effectively decreases, e.g. Intel and AMD both support
+with IPI virtualization.
+
+Boosting the target of a PV spinlock kick is similarly flawed.  In that case, KVM
+only gets involved _after_ there is a problem, i.e. after a lock is contended so
+heavily that a vCPU stops spinning and instead decided to HLT.  It's not hard to
+imagine scenarios where a guest would want to communicate to the host that it's
+acquiring a spinlock for a latency sensitive path and so shouldn't be scheduled
+out.  And of course that's predicated on the assumption that all vCPUs are subject
+to CPU overcommit.
+
+Initiating a boost from the host is also flawed in the sense that it relies on
+the guest to be on the same page as to when it should stop boosting.  E.g. if
+KVM boosts a vCPU because an IRQ is pending, but the guest doesn't want to boost
+IRQs on that vCPU and thus doesn't stop boosting at the end of the IRQ handler,
+then the vCPU could end up being boosted long after its done with the IRQ.
+
+Throw nested virtualization into the mix and then all of this becomes nigh
+impossible to sort out in KVM.  E.g. if an L1 vCPU is a running an L2 vCPU, i.e.
+a nested guest, and L2 is spamming interrupts for whatever reason, KVM will end
+repeatedly boosting the L1 vCPU regardless of the priority of the L2 workload.
+
+For things that aren't clearly in KVM's domain, I don't think we should implement
+KVM-specific functionality until every other option has been tried (and failed).
+I don't see any reason why KVM needs to get involved in scheduling, beyond maybe
+providing *input* regarding event injection, emphasis on *input* because KVM
+providing information to userspace or some other entity is wildly different than
+KVM making scheduling decisions based on that information.
+
+Pushing the scheduling policies to host userspace would allow for far more control
+and flexibility.  E.g. a heavily paravirtualized environment where host userspace
+knows *exactly* what workloads are being run could have wildly different policies
+than an environment where the guest is a fairly vanilla Linux VM that has received
+a small amount of enlightment.
+
+Lastly, if the concern/argument is that userspace doesn't have the right knobs
+to (quickly) boost vCPU tasks, then the proposed sched_ext functionality seems
+tailor made for the problems you are trying to solve.
+
+https://lkml.kernel.org/r/20231111024835.2164816-1-tj%40kernel.org
 
