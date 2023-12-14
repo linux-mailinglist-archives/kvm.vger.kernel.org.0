@@ -1,255 +1,467 @@
-Return-Path: <kvm+bounces-4533-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4534-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8B90813AB4
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 20:25:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BFE6813AC0
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 20:29:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC44F1C209BF
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 19:25:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 807B91C20AE7
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 19:29:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1411B6979C;
-	Thu, 14 Dec 2023 19:25:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A58697B0;
+	Thu, 14 Dec 2023 19:29:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b="VdVhvKO9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f9+zi497"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B69969790
-	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 19:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bitbyteword.org
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-1fb9a22b4a7so5066387fac.3
-        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 11:25:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bitbyteword.org; s=google; t=1702581911; x=1703186711; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JwXVK8YsyVLmc2yBDAeX97qZitBh++UFD7dC4Hziebg=;
-        b=VdVhvKO9sctnKqXHSz4/ySoIAzpe89B8c9/M5uFEyb8+5Zy08RtvxGWrGbywfYd4QJ
-         UaNLm/ROlt6A7hVWfNobsPDT6uGp/wrnonCwBN+pedVbnAyzFcwcZ17cUM/4fSKBGPOt
-         xE8HC9uDjNG2+Wm3e9BbmeFXmmD17i3ByvShds1GlAl4QIhmRKb6NsNBVmRCdrAva5We
-         a09Xlz47RGKxvDkaIHC8rOEY/jmixYYKY0VWFhcUA5afKR5HK7uY4rgsrfD2cZNgY+G8
-         mL1ejFUh8S3mZyTleMHM7U0Wo4l0HcPVOAzX0DR99pLtYNH8t/cRP1ELKKn0sKR1sJBB
-         E8nA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200F66978F
+	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 19:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702582174;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xUk3eG+68EZSTIrjQkfVQpGuO5D5nt4u7CUzC6kn+ms=;
+	b=f9+zi497kqaCK6AR+NYF5YU+dCcJL4Uhcqg9ibZm/eLVcYXGnCNtK7+YJMe00ua92Ftzo4
+	gX25CO0wSjlo9vj0p2LeERh5g2FKgUo3o7Q8u3rPwjm7CMRL20C2LZdoGRcsuljc/4TUb1
+	Vh4ZXny5xaWXf12ygqpcgSrk1Wnq3HY=
+Received: from mail-vk1-f197.google.com (mail-vk1-f197.google.com
+ [209.85.221.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-372-zJysEiPzMPizObVe5maFYw-1; Thu, 14 Dec 2023 14:29:32 -0500
+X-MC-Unique: zJysEiPzMPizObVe5maFYw-1
+Received: by mail-vk1-f197.google.com with SMTP id 71dfb90a1353d-4b4d91b71e5so1344933e0c.2
+        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 11:29:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702581911; x=1703186711;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JwXVK8YsyVLmc2yBDAeX97qZitBh++UFD7dC4Hziebg=;
-        b=RE6+enlIsN7zBxVC7cSDYBvZ75Wh0lEf691yi+b1ZIicPWNQLlUYt3VuNl63iUaP/Z
-         09llwI9IKPdJDua8izLEDQxpW+8Tkxo/5qfihe32wQsMhiIQ+Ryz2LQg6Arw99BKCyKW
-         ltu4vnLD+C2vYJEWRdIb3ZVx4Edx3dJNgBVWOgSOxI0XgB03AvxZ+SKzbgauslOUaO/r
-         ajayD5O1UXoUfbuQsB8016ZKz9jVH1gSmHUb8Yd4W2vmgprKZqS/6ZuH6NnlUvD182NR
-         T3bMUVa2vSHiyqtmzFkoKd7IsFRac7p0Aa2dccbyVmBX8Zyaoq1fID17+h1Cqs/Yy3hG
-         Oygw==
-X-Gm-Message-State: AOJu0Yygq7HzhtQ4EUc7NbyA+dylD7bkczMV1XGIgM/v1wKqoDuuncN2
-	AdtMxk1QXKrM26lXNA788Q4b46RHWN6gMy2+F1MGcg==
-X-Google-Smtp-Source: AGHT+IH3G1TwNH1i/u30wxM0ViP2JcHCzdgBU1KULniy/qBA6V05JFTRAJqrED3PWzIUkv3l1XZDc4QGM8133tI0sTw=
-X-Received: by 2002:a05:6870:7013:b0:203:40a0:b786 with SMTP id
- u19-20020a056870701300b0020340a0b786mr2122394oae.63.1702581910907; Thu, 14
- Dec 2023 11:25:10 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702582170; x=1703186970;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xUk3eG+68EZSTIrjQkfVQpGuO5D5nt4u7CUzC6kn+ms=;
+        b=LfaKBtvcdcOiz0KDW8c8osuTDA92IhjQSu+H/T2N956AtML5ooFhr1L6j/QZn9Drj/
+         wP+oWhWJBGhEMg1OJArrFyno+9jxyPNXmPmXEJWdKy1l1SsH5UVe0S76pKAjvC9gg++r
+         lpGbrBnwkp/Lfpz1cBynNwWGhnkZgrkmaWswHgaebmLOXAvtvnuYUILK7grmyDKONT2F
+         qpcjaSuzUHA7qUqdabUoHDPWws6FopZ1v5aRjcgWiIFGt0t0795XRXFHUqz+wSr2GCK7
+         fiZpZrjaiGuZNQzXNtPSwrL6/Jm0lOcSggtyHVqSkoHg7w/4aFJ5T5aPfp7d0ap9UEEs
+         Xv3Q==
+X-Gm-Message-State: AOJu0Yyf5p3qTq6DVaKjyoy2l4J8GXHrqorMxyx03ds0F7TI197+0A24
+	LGa+0HGL6TNwAgIcnvFAcuDLT7+8oszPTqAa3LmRdaZgNqIMmrS/48PmzE5nS6gY6ANqrbBaiOL
+	v2Pakf58g9g8vf+ZF/Xmz
+X-Received: by 2002:ac5:c38f:0:b0:4b2:956e:f651 with SMTP id s15-20020ac5c38f000000b004b2956ef651mr6137832vkk.0.1702582170623;
+        Thu, 14 Dec 2023 11:29:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE51zbBMPgEBfDxOsVJeFCrbH7TB4ZBojjQo3bgaphGVUfxRbU+URMAd9Lv4bepko/KkIfhQg==
+X-Received: by 2002:ac5:c38f:0:b0:4b2:956e:f651 with SMTP id s15-20020ac5c38f000000b004b2956ef651mr6137817vkk.0.1702582170275;
+        Thu, 14 Dec 2023 11:29:30 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id dv4-20020a05620a1b8400b0077da476d403sm5498175qkb.58.2023.12.14.11.29.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Dec 2023 11:29:29 -0800 (PST)
+Message-ID: <e14dcae7-db8c-4a82-a829-b783e754163b@redhat.com>
+Date: Thu, 14 Dec 2023 20:29:25 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231214024727.3503870-1-vineeth@bitbyteword.org> <ZXsvl7mabUuNkWcY@google.com>
-In-Reply-To: <ZXsvl7mabUuNkWcY@google.com>
-From: Vineeth Remanan Pillai <vineeth@bitbyteword.org>
-Date: Thu, 14 Dec 2023 14:25:00 -0500
-Message-ID: <CAO7JXPihjjko6qe8tr6e6UE=L7uSR6AACq1Zwg+7n95s5A-yoQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/8] Dynamic vcpu priority management in kvm
-To: Sean Christopherson <seanjc@google.com>
-Cc: Ben Segall <bsegall@google.com>, Borislav Petkov <bp@alien8.de>, 
-	Daniel Bristot de Oliveira <bristot@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Dietmar Eggemann <dietmar.eggemann@arm.com>, "H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
-	Juri Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Valentin Schneider <vschneid@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Wanpeng Li <wanpengli@tencent.com>, Suleiman Souhlal <suleiman@google.com>, 
-	Masami Hiramatsu <mhiramat@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, Tejun Heo <tj@kernel.org>, Josh Don <joshdon@google.com>, 
-	Barret Rhoden <brho@google.com>, David Vernet <dvernet@meta.com>, 
-	Joel Fernandes <joel@joelfernandes.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 4/5] KVM: selftests: aarch64: Introduce
+ pmu_event_filter_test
+Content-Language: en-US
+From: Eric Auger <eauger@redhat.com>
+To: Shaoqin Huang <shahuang@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+References: <20231129072712.2667337-1-shahuang@redhat.com>
+ <20231129072712.2667337-5-shahuang@redhat.com>
+ <72c68db7-3de0-4517-9410-fd19d4564fea@redhat.com>
+In-Reply-To: <72c68db7-3de0-4517-9410-fd19d4564fea@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 14, 2023 at 11:38=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> +sched_ext folks
->
-> On Wed, Dec 13, 2023, Vineeth Pillai (Google) wrote:
-> > Double scheduling is a concern with virtualization hosts where the host
-> > schedules vcpus without knowing whats run by the vcpu and guest schedul=
-es
-> > tasks without knowing where the vcpu is physically running. This causes
-> > issues related to latencies, power consumption, resource utilization
-> > etc. An ideal solution would be to have a cooperative scheduling
-> > framework where the guest and host shares scheduling related informatio=
-n
-> > and makes an educated scheduling decision to optimally handle the
-> > workloads. As a first step, we are taking a stab at reducing latencies
-> > for latency sensitive workloads in the guest.
-> >
-> > This series of patches aims to implement a framework for dynamically
-> > managing the priority of vcpu threads based on the needs of the workloa=
-d
-> > running on the vcpu. Latency sensitive workloads (nmi, irq, softirq,
-> > critcal sections, RT tasks etc) will get a boost from the host so as to
-> > minimize the latency.
-> >
-> > The host can proactively boost the vcpu threads when it has enough
-> > information about what is going to run on the vcpu - fo eg: injecting
-> > interrupts. For rest of the case, guest can request boost if the vcpu i=
-s
-> > not already boosted. The guest can subsequently request unboost after
-> > the latency sensitive workloads completes. Guest can also request a
-> > boost if needed.
-> >
-> > A shared memory region is used to communicate the scheduling informatio=
-n.
-> > Guest shares its needs for priority boosting and host shares the boosti=
-ng
-> > status of the vcpu. Guest sets a flag when it needs a boost and continu=
-es
-> > running. Host reads this on next VMEXIT and boosts the vcpu thread. For
-> > unboosting, it is done synchronously so that host workloads can fairly
-> > compete with guests when guest is not running any latency sensitive
-> > workload.
->
-> Big thumbs down on my end.  Nothing in this RFC explains why this should =
-be done
-> in KVM.  In general, I am very opposed to putting policy of any kind into=
- KVM,
-> and this puts a _lot_ of unmaintainable policy into KVM by deciding when =
-to
-> start/stop boosting a vCPU.
->
-I am sorry for not clearly explaining the goal. The intent was not to
-have scheduling policies implemented in kvm, but to have a mechanism
-for guest and host schedulers to communicate so that guest workloads
-get a fair treatment from host scheduler while competing with host
-workloads. Now when I think about it, the implementation seems to
-suggest that we are putting policies in kvm. Ideally, the goal is:
-- guest scheduler communicates the priority requirements of the workload
-- kvm applies the priority to the vcpu task.
-- Now that vcpu is appropriately prioritized, host scheduler can make
-the right choice of picking the next best task.
+Hi Shaoqin,
 
-We have an exception of proactive boosting for interrupts/nmis. I
-don't expect these proactive boosting cases to grow. And I think this
-also to be controlled by the guest where the guest can say what
-scenarios would it like to be proactive boosted.
+On 12/14/23 14:45, Eric Auger wrote:
+> Hi Shaoqin,
+> 
+> On 11/29/23 08:27, Shaoqin Huang wrote:
+>> Introduce pmu_event_filter_test for arm64 platforms. The test configures
+>> PMUv3 for a vCPU, and sets different pmu event filters for the vCPU, and
+>> check if the guest can use those events which user allow and can't use
+>> those events which use deny.
+>>
+>> This test refactor the create_vpmu_vm() and make it a wrapper for
+>> __create_vpmu_vm(), which allows some extra init code before
+>> KVM_ARM_VCPU_PMU_V3_INIT.
+>>
+>> And this test use the KVM_ARM_VCPU_PMU_V3_FILTER attribute to set the
+>> pmu event filter in KVM. And choose to filter two common event
+>> branches_retired and instructions_retired, and let guest use the two
+>> events in pmu. And check if the result is expected.
+>>
+>> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+>> ---
+>>  tools/testing/selftests/kvm/Makefile          |   1 +
+>>  .../kvm/aarch64/pmu_event_filter_test.c       | 231 ++++++++++++++++++
+>>  .../selftests/kvm/include/aarch64/vpmu.h      |   4 +
+>>  .../testing/selftests/kvm/lib/aarch64/vpmu.c  |  14 +-
+>>  4 files changed, 248 insertions(+), 2 deletions(-)
+>>  create mode 100644 tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+>>
+>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+>> index b60852c222ac..5f126e1a1dbf 100644
+>> --- a/tools/testing/selftests/kvm/Makefile
+>> +++ b/tools/testing/selftests/kvm/Makefile
+>> @@ -155,6 +155,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
+>>  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+>>  TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
+>>  TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
+>> +TEST_GEN_PROGS_aarch64 += aarch64/pmu_event_filter_test
+>>  TEST_GEN_PROGS_aarch64 += aarch64/psci_test
+>>  TEST_GEN_PROGS_aarch64 += aarch64/set_id_regs
+>>  TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
+>> diff --git a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+>> new file mode 100644
+>> index 000000000000..0e652fbdb37a
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+>> @@ -0,0 +1,231 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * pmu_event_filter_test - Test user limit pmu event for guest.
+>> + *
+>> + * Copyright (c) 2023 Red Hat, Inc.
+>> + *
+>> + * This test checks if the guest only see the limited pmu event that userspace
+>> + * sets, if the guest can use those events which user allow, and if the guest
+>> + * can't use those events which user deny.
+>> + * This test runs only when KVM_CAP_ARM_PMU_V3, KVM_ARM_VCPU_PMU_V3_FILTER
+>> + * is supported on the host.
+>> + */
+>> +#include <kvm_util.h>
+>> +#include <processor.h>
+>> +#include <vgic.h>
+>> +#include <vpmu.h>
+>> +#include <test_util.h>
+>> +#include <perf/arm_pmuv3.h>
+>> +
+>> +struct {
+>> +	uint64_t branches_retired;
+>> +	uint64_t instructions_retired;
+>> +} pmc_results;
+>> +
+>> +static struct vpmu_vm *vpmu_vm;
+>> +static uint64_t pmceid0;
+>> +
+>> +#define FILTER_NR 10
+>> +
+>> +struct test_desc {
+>> +	const char *name;
+>> +	void (*check_result)(void);
+>> +	struct kvm_pmu_event_filter filter[FILTER_NR];
+>> +};
+>> +> +#define __DEFINE_FILTER(base, num, act)		\
+>> +	((struct kvm_pmu_event_filter) {	\
+>> +		.base_event	= base,		\
+>> +		.nevents	= num,		\
+>> +		.action		= act,		\
+>> +	})
+>> +
+>> +#define DEFINE_FILTER(base, act) __DEFINE_FILTER(base, 1, act)
+>> +
+>> +#define EMPTY_FILTER	{ 0 }
+>> +
+>> +#define SW_INCR		0x0
+>> +#define INST_RETIRED	0x8
+>> +#define BR_RETIRED	0x21
+>> +
+>> +#define NUM_BRANCHES	10
+>> +
+>> +static void run_and_measure_loop(void)
+>> +{
+>> +	asm volatile(
+>> +		"	mov	x10, %[loop]\n"
+>> +		"1:	sub	x10, x10, #1\n"
+>> +		"	cmp	x10, #0x0\n"
+>> +		"	b.gt	1b\n"
+>> +		:
+>> +		: [loop] "r" (NUM_BRANCHES)
+>> +		: "x10", "cc");
+>> +}
+>> +
+>> +static void guest_code(void)
+>> +{
+>> +	uint64_t pmcr = read_sysreg(pmcr_el0);
+>> +
+>> +	pmu_disable_reset();
+>> +
+>> +	write_pmevtypern(0, BR_RETIRED);
+>> +	write_pmevtypern(1, INST_RETIRED);
+>> +	enable_counter(0);
+>> +	enable_counter(1);
+>> +	write_sysreg(pmcr | ARMV8_PMU_PMCR_E, pmcr_el0);
+>> +
+>> +	run_and_measure_loop();
+>> +
+>> +	write_sysreg(pmcr, pmcr_el0);
+>> +
+>> +	pmc_results.branches_retired = read_sysreg(pmevcntr0_el0);
+>> +	pmc_results.instructions_retired = read_sysreg(pmevcntr1_el0);
+>> +
+>> +	GUEST_DONE();
+>> +}
+>> +
+>> +static void guest_get_pmceid0(void)
+>> +{
+>> +	uint64_t pmceid0 = read_sysreg(pmceid0_el0);
+>> +
+>> +	GUEST_PRINTF("%lx\n", pmceid0);
+>> +
+>> +	GUEST_DONE();
+>> +}
+>> +
+>> +static void pmu_event_filter_init(struct vpmu_vm *vm, void *arg)
+>> +{
+>> +	struct kvm_device_attr attr = {
+>> +		.group	= KVM_ARM_VCPU_PMU_V3_CTRL,
+>> +		.attr	= KVM_ARM_VCPU_PMU_V3_FILTER,
+>> +	};
+>> +	struct kvm_pmu_event_filter *filter = (struct kvm_pmu_event_filter *)arg;
+>> +
+>> +	while (filter && filter->nevents != 0) {
+>> +		attr.addr = (uint64_t)filter;
+>> +		vcpu_ioctl(vm->vcpu, KVM_SET_DEVICE_ATTR, &attr);
+>> +		filter++;
+>> +	}
+>> +}
+>> +
+>> +static void create_vpmu_vm_with_filter(void *guest_code,
+>> +				       struct kvm_pmu_event_filter *filter)
+>> +{
+>> +	vpmu_vm = __create_vpmu_vm(guest_code, pmu_event_filter_init, filter);
+>> +}
+>> +
+>> +static void run_vcpu(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct ucall uc;
+>> +
+>> +	while (1) {
+>> +		vcpu_run(vcpu);
+>> +		switch (get_ucall(vcpu, &uc)) {
+>> +		case UCALL_DONE:
+>> +			return;
+>> +		case UCALL_PRINTF:
+>> +			pmceid0 = strtoll(uc.buffer, NULL, 16);
+>> +			break;
+>> +		default:
+>> +			TEST_FAIL("Unknown ucall %lu", uc.cmd);
+>> +		}
+>> +	}
+>> +}
+>> +
+>> +static void check_pmc_counting(void)
+>> +{
+>> +	uint64_t br = pmc_results.branches_retired;
+>> +	uint64_t ir = pmc_results.instructions_retired;
+>> +
+>> +	TEST_ASSERT(br && br == NUM_BRANCHES, "Branch instructions retired = "
+>> +		    "%lu (expected %u)", br, NUM_BRANCHES);
+> have you tested on several machines? My experience with some events
+> (MEM_ACCESS for instance) is that you have variance (sometimes
+> significant) on some event count. I am a little bit scared that having
+> this br == NUM_BRANCHES check without taking into account some margin
+> will cause failures on some HW.
 
-That would make kvm just a medium to communicate the scheduler
-requirements from guest to host and not house any policies.  What do
-you think?
+I confirm the usual suspect, Amberwing, does not like this check ;-)
 
-> Concretely, boosting vCPUs for most events is far too coarse grained.  E.=
-g. boosting
-> a vCPU that is running a low priority workload just because the vCPU trig=
-gered
-> an NMI due to PMU counter overflow doesn't make sense.  Ditto for if a gu=
-est's
-> hrtimer expires on a vCPU running a low priority workload.
->
-> And as evidenced by patch 8/8, boosting vCPUs based on when an event is _=
-pending_
-> is not maintainable.  As hardware virtualizes more and more functionality=
-, KVM's
-> visibility into the guest effectively decreases, e.g. Intel and AMD both =
-support
-> with IPI virtualization.
->
-> Boosting the target of a PV spinlock kick is similarly flawed.  In that c=
-ase, KVM
-> only gets involved _after_ there is a problem, i.e. after a lock is conte=
-nded so
-> heavily that a vCPU stops spinning and instead decided to HLT.  It's not =
-hard to
-> imagine scenarios where a guest would want to communicate to the host tha=
-t it's
-> acquiring a spinlock for a latency sensitive path and so shouldn't be sch=
-eduled
-> out.  And of course that's predicated on the assumption that all vCPUs ar=
-e subject
-> to CPU overcommit.
->
-> Initiating a boost from the host is also flawed in the sense that it reli=
-es on
-> the guest to be on the same page as to when it should stop boosting.  E.g=
-. if
-> KVM boosts a vCPU because an IRQ is pending, but the guest doesn't want t=
-o boost
-> IRQs on that vCPU and thus doesn't stop boosting at the end of the IRQ ha=
-ndler,
-> then the vCPU could end up being boosted long after its done with the IRQ=
-.
->
-> Throw nested virtualization into the mix and then all of this becomes nig=
-h
-> impossible to sort out in KVM.  E.g. if an L1 vCPU is a running an L2 vCP=
-U, i.e.
-> a nested guest, and L2 is spamming interrupts for whatever reason, KVM wi=
-ll end
-> repeatedly boosting the L1 vCPU regardless of the priority of the L2 work=
-load.
->
-> For things that aren't clearly in KVM's domain, I don't think we should i=
-mplement
-> KVM-specific functionality until every other option has been tried (and f=
-ailed).
-> I don't see any reason why KVM needs to get involved in scheduling, beyon=
-d maybe
-> providing *input* regarding event injection, emphasis on *input* because =
-KVM
-> providing information to userspace or some other entity is wildly differe=
-nt than
-> KVM making scheduling decisions based on that information.
->
-Agreed with all the points above and it doesn't make sense to have
-policies in kvm. But if kvm can act as a medium to communicate
-scheduling requirements between guest and host and not make any
-decisions, would that be more reasonable?
+augere@qualcomm-amberwing-rep-06:~/UPSTREAM/linux/tools/testing/selftests/kvm/aarch64#
+./pmu_event_filter_test
+==== Test Assertion Failure ====
+  aarch64/pmu_event_filter_test.c:141: br && br == NUM_BRANCHES
+  pid=7750 tid=7750 errno=4 - Interrupted system call
+     1	0x0000000000401d6b: check_pmc_counting at pmu_event_filter_test.c:141
+     2	0x0000000000401967: run_test at pmu_event_filter_test.c:173
+     3	 (inlined by) for_each_test at pmu_event_filter_test.c:198
+     4	 (inlined by) main at pmu_event_filter_test.c:264
+     5	0x0000ffffaaa6c79b: ?? ??:0
+     6	0x0000ffffaaa6c86b: ?? ??:0
+     7	0x0000000000401aaf: _start at ??:?
+  Branch instructions retired = 15 (expected 10)
 
-> Pushing the scheduling policies to host userspace would allow for far mor=
-e control
-> and flexibility.  E.g. a heavily paravirtualized environment where host u=
-serspace
-> knows *exactly* what workloads are being run could have wildly different =
-policies
-> than an environment where the guest is a fairly vanilla Linux VM that has=
- received
-> a small amount of enlightment.
->
-> Lastly, if the concern/argument is that userspace doesn't have the right =
-knobs
-> to (quickly) boost vCPU tasks, then the proposed sched_ext functionality =
-seems
-> tailor made for the problems you are trying to solve.
->
-> https://lkml.kernel.org/r/20231111024835.2164816-1-tj%40kernel.org
->
-You are right, sched_ext is a good choice to have policies
-implemented. In our case, we would need a communication mechanism as
-well and hence we thought kvm would work best to be a medium between
-the guest and the host. The policies could be in the guest and the
-guest shall communicate its priority requirements(based on policy) to
-the host via kvm and then the host scheduler takes action based on
-that.
+Eric
 
-Please let me know.
+> 
+> in v1 I suggested to read to PMCEID* in a guest code to check if the
+> event is supported. This method would also have the benefice to allow
+> testing more complex filter range combinations.
+>> +	TEST_ASSERT(ir, "Instructions retired = %lu (expected > 0)", ir);
+>> +}
+>> +
+>> +static void check_pmc_not_counting(void)
+>> +{
+>> +	uint64_t br = pmc_results.branches_retired;
+>> +	uint64_t ir = pmc_results.instructions_retired;
+>> +
+>> +	TEST_ASSERT(!br, "Branch instructions retired = %lu (expected 0)", br);
+>> +	TEST_ASSERT(!ir, "Instructions retired = %lu (expected 0)", ir);
+>> +}
+>> +
+>> +static void run_vcpu_and_sync_pmc_results(void)
+>> +{
+>> +	memset(&pmc_results, 0, sizeof(pmc_results));
+>> +	sync_global_to_guest(vpmu_vm->vm, pmc_results);
+>> +
+>> +	run_vcpu(vpmu_vm->vcpu);
+>> +
+>> +	sync_global_from_guest(vpmu_vm->vm, pmc_results);
+>> +}
+>> +
+>> +static void run_test(struct test_desc *t)
+>> +{
+>> +	pr_debug("Test: %s\n", t->name);
+>> +
+>> +	create_vpmu_vm_with_filter(guest_code, t->filter);
+>> +
+>> +	run_vcpu_and_sync_pmc_results();
+>> +
+>> +	t->check_result();
+>> +
+>> +	destroy_vpmu_vm(vpmu_vm);
+>> +}
+>> +
+>> +static struct test_desc tests[] = {
+>> +	{"without_filter", check_pmc_counting, { EMPTY_FILTER }},
+>> +	{"member_allow_filter", check_pmc_counting,
+>> +	 {DEFINE_FILTER(SW_INCR, 0), DEFINE_FILTER(INST_RETIRED, 0),
+> Note the doc says that Event 0 (SW_INCR) is never filtered, as it
+> doesn't count a hardware event
+> 
+> 
+> I would use the defines exposed in the uapi
+>> +#define KVM_PMU_EVENT_ALLOW	0
+>> +#define KVM_PMU_EVENT_DENY	1
+>> +	  DEFINE_FILTER(BR_RETIRED, 0), EMPTY_FILTER}},
+>> +	{"member_deny_filter", check_pmc_not_counting,
+>> +	 {DEFINE_FILTER(SW_INCR, 1), DEFINE_FILTER(INST_RETIRED, 1),
+> what is the purpose of SW_INCR. YOu do not seem to test it anyway?
+>> +	  DEFINE_FILTER(BR_RETIRED, 1), EMPTY_FILTER}},
+>> +	{"not_member_deny_filter", check_pmc_counting,
+>> +	 {DEFINE_FILTER(SW_INCR, 1), EMPTY_FILTER}},
+>> +	{"not_member_allow_filter", check_pmc_not_counting,
+>> +	 {DEFINE_FILTER(SW_INCR, 0), EMPTY_FILTER}},
+>> +	{ 0 }
+>> +};
+>> +
+>> +static void for_each_test(void)
+>> +{
+>> +	struct test_desc *t;
+>> +
+>> +	for (t = &tests[0]; t->name; t++)
+>> +		run_test(t);
+>> +}
+>> +
+>> +static bool kvm_supports_pmu_event_filter(void)
+>> +{
+>> +	int r;
+>> +
+>> +	vpmu_vm = create_vpmu_vm(guest_code);
+>> +
+>> +	r = __kvm_has_device_attr(vpmu_vm->vcpu->fd, KVM_ARM_VCPU_PMU_V3_CTRL,
+>> +				  KVM_ARM_VCPU_PMU_V3_FILTER);
+> you can use __vcpu_has_device_attr directly
+>> +
+>> +	destroy_vpmu_vm(vpmu_vm);
+>> +	return !r;
+>> +}
+>> +
+>> +static bool host_pmu_supports_events(void)
+>> +{
+>> +	vpmu_vm = create_vpmu_vm(guest_get_pmceid0);
+>> +
+>> +	run_vcpu(vpmu_vm->vcpu);
+>> +
+>> +	destroy_vpmu_vm(vpmu_vm);
+>> +
+>> +	return pmceid0 & (BR_RETIRED | INST_RETIRED);
+> this will return true if either event is supported. I suspect this is
+> not what you want.
+>> +}
+>> +
+>> +int main(void)
+>> +{
+>> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
+>> +	TEST_REQUIRE(kvm_supports_pmu_event_filter());
+>> +	TEST_REQUIRE(host_pmu_supports_events());
+>> +
+>> +	for_each_test();
+>> +}
+>> diff --git a/tools/testing/selftests/kvm/include/aarch64/vpmu.h b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
+>> index 644dae3814b5..f103d0824f8a 100644
+>> --- a/tools/testing/selftests/kvm/include/aarch64/vpmu.h
+>> +++ b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
+>> @@ -18,6 +18,10 @@ struct vpmu_vm {
+>>  	int gic_fd;
+>>  };
+>>  
+>> +struct vpmu_vm *__create_vpmu_vm(void *guest_code,
+>> +				 void (*init_pmu)(struct vpmu_vm *vm, void *arg),
+>> +				 void *arg);
+>> +
+>>  struct vpmu_vm *create_vpmu_vm(void *guest_code);
+>>  
+>>  void destroy_vpmu_vm(struct vpmu_vm *vpmu_vm);
+>> diff --git a/tools/testing/selftests/kvm/lib/aarch64/vpmu.c b/tools/testing/selftests/kvm/lib/aarch64/vpmu.c
+>> index b3de8fdc555e..76ea03d607f1 100644
+>> --- a/tools/testing/selftests/kvm/lib/aarch64/vpmu.c
+>> +++ b/tools/testing/selftests/kvm/lib/aarch64/vpmu.c
+>> @@ -7,8 +7,9 @@
+>>  #include <vpmu.h>
+>>  #include <perf/arm_pmuv3.h>
+>>  
+>> -/* Create a VM that has one vCPU with PMUv3 configured. */
+>> -struct vpmu_vm *create_vpmu_vm(void *guest_code)
+>> +struct vpmu_vm *__create_vpmu_vm(void *guest_code,
+>> +				 void (*init_pmu)(struct vpmu_vm *vm, void *arg),
+>> +				 void *arg)
+>>  {
+>>  	struct kvm_vcpu_init init;
+>>  	uint8_t pmuver;
+>> @@ -50,12 +51,21 @@ struct vpmu_vm *create_vpmu_vm(void *guest_code)
+>>  		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
+>>  
+>>  	/* Initialize vPMU */
+>> +	if (init_pmu)
+>> +		init_pmu(vpmu_vm, arg);
+>> +
+>>  	vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
+>>  	vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
+>>  
+>>  	return vpmu_vm;
+>>  }
+>>  
+>> +/* Create a VM that has one vCPU with PMUv3 configured. */
+>> +struct vpmu_vm *create_vpmu_vm(void *guest_code)
+>> +{
+>> +	return __create_vpmu_vm(guest_code, NULL, NULL);
+>> +}
+>> +
+>>  void destroy_vpmu_vm(struct vpmu_vm *vpmu_vm)
+>>  {
+>>  	close(vpmu_vm->gic_fd);
+> 
+> Thanks
+> 
+> Eric
 
-Thanks,
-Vineeth
 
