@@ -1,934 +1,459 @@
-Return-Path: <kvm+bounces-4430-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4431-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49DF58126FB
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 06:35:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8079E812724
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 06:51:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F17692819F0
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 05:35:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DE9D1F21AD6
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 05:51:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D1DA6FAF;
-	Thu, 14 Dec 2023 05:35:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F315CA53;
+	Thu, 14 Dec 2023 05:51:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="ImycSiFz"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="TvQf26mB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3C7EF4
-	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 21:35:02 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so6577275a12.1
-        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 21:35:02 -0800 (PST)
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21A6210C
+	for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 21:51:21 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1d35dc7e1bbso10942465ad.1
+        for <kvm@vger.kernel.org>; Wed, 13 Dec 2023 21:51:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1702532102; x=1703136902; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nh20kotH6U9RvpT2z7NAawg/dMhTYSwJgB2POD6vzRk=;
-        b=ImycSiFzRF3N5nQRQXIMYNdgvSXw8xT847fsikTdNnqGAPU9LXIYl4COL8lZK8K6GL
-         6ie+cgxRklyv/ZaXHlKmxA47wt97k2Mzee2wWrfMRE7rFxP6l8InTMtsgz3zIbxgQsj8
-         3s54IhFr7KkeXTFkcYw6ubY61GGyi+YuKahSwBAmf7bXiacaTua2NC1VO7ojeRILNIb5
-         eIYvF6VJbN9znz1zjdCWROdj1GVRLiy4JkgxB9MXjv3YQCvydcDK73yZOgRLB3g/V/8S
-         Ixhc3x91c700DkWWiNClZIjX8Mm+Ko9mBFJ5+H4/6CgNbF+mFUDMtj+fMnlCNwH+GgN5
-         nKoQ==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1702533080; x=1703137880; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rLainWpRefX2BTolt8NbE6C+P9Qi+Zj6K6itw8mdgIw=;
+        b=TvQf26mB301sj3Zt1fR3/p1A2llZ4P2wF0g6eOyazWS11Zvq3gjNPA0n4l6d9pszyy
+         AdThC9H418m6+lKJ/F/vB0YLFI4B9b6ZyDUUv5TibU4on9stmbPa1+L6m7UOvAIpuEX8
+         VhUY1mlcl8fS4NthRaEWbpF6cnkmP8KZZFuy011pv1ssKZ+za/2GT4IfAEzSzVl65atB
+         PD3AZGrxf2rZurpBqPCqJv5W8hDqANA/LABM+MsDOBPfST85SEmbWPtX5nlVOi/SkkzW
+         JQR7piN3vsciPFBbM8VULgXtDHyQI+9UQNZq+BYq6M/7Q73jDHrq4gusDvyIVrs45SzB
+         MuHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702532102; x=1703136902;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nh20kotH6U9RvpT2z7NAawg/dMhTYSwJgB2POD6vzRk=;
-        b=gtQOncz+/vFOV4tVoaG74JKtz+SGHN8heCKyMNOfrl0cYTvjuOwThaax3Xel/n74jY
-         udb9U2kaS4UyRWIAbjHDoUoWjiHm5Nf3cfCrG/ZZ4uNcrVqK5d++gfvjpN7lEKdemkkH
-         yYOBtSBhXGRQT3OuI6BNQb/5rN1QkJDsjhTCQ/mFQ3i6uIvfSxY4WHjIpct+TE28/7xS
-         oLmBi5r0q249vkPX6hsE8+CfiD9G283wh+sul1Zw2jxjeesUDU9IezDfZjJJ6Z0yM44E
-         jFpFj+TanvBM2k5Gs7iT/WLp7NrvyKJNhXAIZrtAzHD3NkL+NY3mOz7vuaGbGZA70qKS
-         t+Mg==
-X-Gm-Message-State: AOJu0Ywk6DeGWtR6pBFVDRSaLt0Dh9jiaHU9xq3+tAS+h3AKBEq5e+Fp
-	vqVzHi8gFdtWj1PZHL7dhsebQnqGVO7pxJ98SZRfEA==
-X-Google-Smtp-Source: AGHT+IEBY1L7yDp3Cd6IrCmKJN9YcgBbxGegTCQenBOjpVYqMS/Ic28DMqWA6cM6abhLSwSmL0XeMkuZuSEkAVy9Kvs=
-X-Received: by 2002:a05:6a21:609:b0:190:16bb:4f6b with SMTP id
- ll9-20020a056a21060900b0019016bb4f6bmr9829149pzb.39.1702532101745; Wed, 13
- Dec 2023 21:35:01 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702533080; x=1703137880;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rLainWpRefX2BTolt8NbE6C+P9Qi+Zj6K6itw8mdgIw=;
+        b=H5lrF6VZaqgiZ7xRHYmnAGWm/nWFC+Uh8Vx8Jq1+4Cnj7LYDuCmJ6p7MX4qorYqQo7
+         gOIs+TLU0GTi0BuL3bFUUyxq4YQYl+EOuEuQ76CGG2dut50aaoyn9jHpHJnUDRXEMGE0
+         u3MVsNNERyUAObaf4hwupBDejoP7wdf7V7vcUJtmXsy11Nkl4NZJShPj7mBsVxpWDxSz
+         z96yG7fVl/T+p23X8lrhCt+l4cMKio7RP0ZNl2fRSgiyYokG1TKanXxVQDogqk6ETUyi
+         vqXi9OpV1ShU/OGe4vH/+re0JdEoeR0QaSfMQlsG//DYQP6u3tHOVvzBfwxf2uQwPbR5
+         SDRQ==
+X-Gm-Message-State: AOJu0YwPyu9ijj28P1F2VSUtnKh8ntz5cXfCjg4SABgqAMKryOGp33P8
+	04kvcykmgEvIj6BONgnTNSKrqw==
+X-Google-Smtp-Source: AGHT+IFRyNQvpvdQRX4JOkIHdq7XsS4REgw0KvXGNYFu7hOA1IvlbkCqaQ4DOqq+4tpbuujLUp6ryw==
+X-Received: by 2002:a17:903:32ce:b0:1d0:c535:c5d5 with SMTP id i14-20020a17090332ce00b001d0c535c5d5mr11735028plr.60.1702533080380;
+        Wed, 13 Dec 2023 21:51:20 -0800 (PST)
+Received: from [192.168.205.173] ([157.82.200.183])
+        by smtp.gmail.com with ESMTPSA id jl13-20020a170903134d00b001d0b410271fsm11481858plb.218.2023.12.13.21.51.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Dec 2023 21:51:20 -0800 (PST)
+Message-ID: <0d68722c-9e29-407b-9ef0-331683c995d2@daynix.com>
+Date: Thu, 14 Dec 2023 14:51:12 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231213203001.179237-1-alexghiti@rivosinc.com> <20231213203001.179237-5-alexghiti@rivosinc.com>
-In-Reply-To: <20231213203001.179237-5-alexghiti@rivosinc.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Thu, 14 Dec 2023 11:04:50 +0530
-Message-ID: <CAAhSdy0iPD4+2efHqV1Bt6hstFiHGRrB8aTgQw6L3niDE2A00g@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] riscv: Use accessors to page table entries instead
- of direct dereference
-To: Alexandre Ghiti <alexghiti@rivosinc.com>
-Cc: Russell King <linux@armlinux.org.uk>, Ryan Roberts <ryan.roberts@arm.com>, 
-	Alexander Potapenko <glider@google.com>, Marco Elver <elver@google.com>, Dmitry Vyukov <dvyukov@google.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Atish Patra <atishp@atishpatra.org>, 
-	Ard Biesheuvel <ardb@kernel.org>, Andrey Ryabinin <ryabinin.a.a@gmail.com>, 
-	Andrey Konovalov <andreyknvl@gmail.com>, Vincenzo Frascino <vincenzo.frascino@arm.com>, 
-	kasan-dev@googlegroups.com, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-efi@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: Should I add BPF kfuncs for userspace apps? And how?
+To: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, Yuri Benditovich
+ <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>,
+ Benjamin Tissoires <bentiss@kernel.org>, bpf <bpf@vger.kernel.org>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, kvm@vger.kernel.org,
+ LKML <linux-kernel@vger.kernel.org>,
+ virtualization@lists.linux-foundation.org,
+ "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>
+References: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
+ <CAO-hwJJhzHtKrUEw0zrjgub3+eapgJG-zsG0HRB=PaPi6BxG+w@mail.gmail.com>
+ <e256c6df-0a66-4f86-ae96-bff17920c2fb@daynix.com>
+ <CAO-hwJKMrWYRNpuprDj9=k87V0yHtLPEJuQ94bpOF3O81=v0kA@mail.gmail.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CAO-hwJKMrWYRNpuprDj9=k87V0yHtLPEJuQ94bpOF3O81=v0kA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 14, 2023 at 2:04=E2=80=AFAM Alexandre Ghiti <alexghiti@rivosinc=
-.com> wrote:
->
-> As very well explained in commit 20a004e7b017 ("arm64: mm: Use
-> READ_ONCE/WRITE_ONCE when accessing page tables"), an architecture whose
-> page table walker can modify the PTE in parallel must use
-> READ_ONCE()/WRITE_ONCE() macro to avoid any compiler transformation.
->
-> So apply that to riscv which is such architecture.
->
-> Signed-off-by: Alexandre Ghiti <alexghiti@rivosinc.com>
+On 2023/12/13 19:22, Benjamin Tissoires wrote:
+> On Tue, Dec 12, 2023 at 1:41 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> On 2023/12/12 19:39, Benjamin Tissoires wrote:
+>>> Hi,
+>>>
+>>> On Tue, Dec 12, 2023 at 9:11 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>
+>>>> Hi,
+>>
+>> Hi,
+>>
+>> Thanks for reply.
+>>
+>>>>
+>>>> It is said eBPF is a safe way to extend kernels and that is very
+>>>> attarctive, but we need to use kfuncs to add new usage of eBPF and
+>>>> kfuncs are said as unstable as EXPORT_SYMBOL_GPL. So now I'd like to ask
+>>>> some questions:
+>>>>
+>>>> 1) Which should I choose, BPF kfuncs or ioctl, when adding a new feature
+>>>> for userspace apps?
+>>>> 2) How should I use BPF kfuncs from userspace apps if I add them?
+>>>>
+>>>> Here, a "userspace app" means something not like a system-wide daemon
+>>>> like systemd (particularly, I have QEMU in mind). I'll describe the
+>>>> context more below:
+>>>
+>>> I'm probably not the best person in the world to answer your
+>>> questions, Alexei and others from the BPF core group are, but given
+>>> that you pointed at a thread I was involved in, I feel I can give you
+>>> a few pointers.
+>>>
+>>> But first and foremost, I encourage you to schedule an agenda item in
+>>> the BPF office hour[4]. Being able to talk with the core people
+>>> directly was tremendously helpful to me to understand their point.
+>>
+>> I prefer emails because I'm not very fluent when speaking in English and
+>> may have a difficultly to listen to other people, but I may try it in
+>> future.
+>>
+>>>
+>>>
+>>>>
+>>>> ---
+>>>>
+>>>> I'm working on a new feature that aids virtio-net implementations using
+>>>> tuntap virtual network device. You can see [1] for details, but
+>>>> basically it's to extend BPF_PROG_TYPE_SOCKET_FILTER to report four more
+>>>> bytes.
+>>>>
+>>>> However, with long discussions we have confirmed extending
+>>>> BPF_PROG_TYPE_SOCKET_FILTER is not going to happen, and adding kfuncs is
+>>>> the way forward. So I decided how to add kfuncs to the kernel and how to
+>>>> use it. There are rich documentations for the kernel side, but I found
+>>>> little about the userspace. The best I could find is a systemd change
+>>>> proposal that is based on WIP kernel changes[2].
+>>>
+>>> Yes, as Alexei already replied, BPF is not adding new stable APIs,
+>>> only kfuncs. The reason being that once it's marked as stable, you
+>>> can't really remove it, even if you think it's badly designed and
+>>> useless.
+>>>
+>>> Kfuncs, OTOH are "unstable" by default meaning that the constraints
+>>> around it are more relaxed.
+>>>
+>>> However, "unstable" doesn't mean "unusable". It just means that the
+>>> kernel might or might not have the function when you load your program
+>>> in userspace. So you have to take that fact into account from day one,
+>>> both from the kernel side and the userspace side. The kernel docs have
+>>> a nice paragraph explaining that situation and makes the distinction
+>>> between relatively unused kfuncs, and well known established ones.
+>>>
+>>> Regarding the systemd discussion you are mentioning ([2]), this is
+>>> something that I have on my plate for a long time. I think I even
+>>> mentioned it to Alexei at Kernel Recipes this year, and he frowned his
+>>> eyebrows when I mentioned it. And looking at the systemd code and the
+>>> benefits over a plain ioctl, it is clearer that in that case, a plain
+>>> ioctl is better, mostly because we already know the API and the
+>>> semantic.
+>>>
+>>> A kfunc would be interesting in cases where you are not sure about the
+>>> overall design, and so you can give a shot at various API solutions
+>>> without having to keep your bad v1 design forever.
+>>>
+>>>>
+>>>> So now I'm wondering how I should use BPF kfuncs from userspace apps if
+>>>> I add them. In the systemd discussion, it is told that Linus said it's
+>>>> fine to use BPF kfuncs in a private infrastructure big companies own, or
+>>>> in systemd as those users know well about the system[3]. Indeed, those
+>>>> users should be able to make more assumptions on the kernel than
+>>>> "normal" userspace applications can.
+>>>>
+>>>> Returning to my proposal, I'm proposing a new feature to be used by QEMU
+>>>> or other VMM applications. QEMU is more like a normal userspace
+>>>> application, and usually does not make much assumptions on the kernel it
+>>>> runs on. For example, it's generally safe to run a Debian container
+>>>> including QEMU installed with apt on Fedora. BPF kfuncs may work even in
+>>>> such a situation thanks to CO-RE, but it sounds like *accidentally*
+>>>> creating UAPIs.
+>>>>
+>>>> Considering all above, how can I integrate BPF kfuncs to the application?
+>>>
+>>> FWIW, I'm not sure you can rely on BPF calls from a container. There
+>>> is a high chance the syscall gets disabled by the runtime.
+>>
+>> Right. Container runtimes will not pass CAP_BPF by default, but that
+>> restriction can be lifted and I think that's a valid scenario.
+>>
+>>>
+>>>>
+>>>> If BPF kfuncs are like EXPORT_SYMBOL_GPL, the natural way to handle them
+>>>> is to think of BPF programs as some sort of kernel modules and
+>>>> incorporate logic that behaves like modprobe. More concretely, I can put
+>>>> eBPF binaries to a directory like:
+>>>> /usr/local/share/qemu/ebpf/$KERNEL_RELEASE
+>>>
+>>> I would advise against that (one program per kernel release). Simply
+>>> because your kfunc may or may not have been backported to kernel
+>>> release v6.X.Y+1 while it was not there when v6.X.Y was out. So
+>>> relying on the kernel number is just going to be a headache.
+>>>
+>>> As I understand it, the way forward is to rely on the kernel, libbpf
+>>> and CO-RE: if the function is not available, the program will simply
+>>> not load, and you'll know that this version of the code is not
+>>> available (or has changed API).
+>>>
+>>> So what I would do if some kfunc API is becoming deprecated, is
+>>> embedding both code paths in the same BPF unit, but marking them as
+>>> not loaded by libppf. Then I can load the compilation unit, try v2 of
+>>> the API, and if it's not available, try v1, and if not, then mention
+>>> that I can not rely on BPF. Of course, this can also be done with
+>>> separate compilation units.
+>>
+>> Doesn't it mean that the kernel is free to break old versions of QEMU
+>> including BPF programs? That's something I'd like to avoid.
+> 
+> Couple of points here:
+> - when you say "the kernel", it feels like you are talking about an
+> external actor tampering with your code. But if you submit a kernel
+> patch with a specific use case and get yourself involved in the
+> community, why would anybody change your kfunc API without you knowing
+> it?
 
-For KVM RISC-V:
-Acked-by: Anup Patel <anup@brainfault.org>
+You are right in the practical aspect.  I can pay efforts to keep kfunc 
+APIs alive and I'm also sure other developers would also try not to 
+break them for good.
 
-Thanks,
-Anup
+Nevertheless I'm being careful to evaluate APIs from both of the kernel 
+and userspace (QEMU) viewpoints. If I fail to keep kfuncs stable because 
+I die in an accident, for example, it's a poor excuse for other QEMU 
+developers that I intended to keep them stable with my personal effort.
 
-> ---
->  arch/riscv/include/asm/kfence.h     |  4 +--
->  arch/riscv/include/asm/pgtable-64.h | 16 ++-------
->  arch/riscv/include/asm/pgtable.h    | 29 ++++------------
->  arch/riscv/kernel/efi.c             |  2 +-
->  arch/riscv/kvm/mmu.c                | 22 ++++++-------
->  arch/riscv/mm/fault.c               | 16 ++++-----
->  arch/riscv/mm/hugetlbpage.c         | 12 +++----
->  arch/riscv/mm/kasan_init.c          | 45 +++++++++++++------------
->  arch/riscv/mm/pageattr.c            | 44 ++++++++++++-------------
->  arch/riscv/mm/pgtable.c             | 51 ++++++++++++++++++++++++++---
->  10 files changed, 128 insertions(+), 113 deletions(-)
->
-> diff --git a/arch/riscv/include/asm/kfence.h b/arch/riscv/include/asm/kfe=
-nce.h
-> index 0bbffd528096..7388edd88986 100644
-> --- a/arch/riscv/include/asm/kfence.h
-> +++ b/arch/riscv/include/asm/kfence.h
-> @@ -18,9 +18,9 @@ static inline bool kfence_protect_page(unsigned long ad=
-dr, bool protect)
->         pte_t *pte =3D virt_to_kpte(addr);
->
->         if (protect)
-> -               set_pte(pte, __pte(pte_val(*pte) & ~_PAGE_PRESENT));
-> +               set_pte(pte, __pte(pte_val(ptep_get(pte)) & ~_PAGE_PRESEN=
-T));
->         else
-> -               set_pte(pte, __pte(pte_val(*pte) | _PAGE_PRESENT));
-> +               set_pte(pte, __pte(pte_val(ptep_get(pte)) | _PAGE_PRESENT=
-));
->
->         flush_tlb_kernel_range(addr, addr + PAGE_SIZE);
->
-> diff --git a/arch/riscv/include/asm/pgtable-64.h b/arch/riscv/include/asm=
-/pgtable-64.h
-> index 5d8431a390dd..b42017d76924 100644
-> --- a/arch/riscv/include/asm/pgtable-64.h
-> +++ b/arch/riscv/include/asm/pgtable-64.h
-> @@ -340,13 +340,7 @@ static inline struct page *p4d_page(p4d_t p4d)
->  #define pud_index(addr) (((addr) >> PUD_SHIFT) & (PTRS_PER_PUD - 1))
->
->  #define pud_offset pud_offset
-> -static inline pud_t *pud_offset(p4d_t *p4d, unsigned long address)
-> -{
-> -       if (pgtable_l4_enabled)
-> -               return p4d_pgtable(*p4d) + pud_index(address);
-> -
-> -       return (pud_t *)p4d;
-> -}
-> +pud_t *pud_offset(p4d_t *p4d, unsigned long address);
->
->  static inline void set_pgd(pgd_t *pgdp, pgd_t pgd)
->  {
-> @@ -404,12 +398,6 @@ static inline struct page *pgd_page(pgd_t pgd)
->  #define p4d_index(addr) (((addr) >> P4D_SHIFT) & (PTRS_PER_P4D - 1))
->
->  #define p4d_offset p4d_offset
-> -static inline p4d_t *p4d_offset(pgd_t *pgd, unsigned long address)
-> -{
-> -       if (pgtable_l5_enabled)
-> -               return pgd_pgtable(*pgd) + p4d_index(address);
-> -
-> -       return (p4d_t *)pgd;
-> -}
-> +p4d_t *p4d_offset(pgd_t *pgd, unsigned long address);
->
->  #endif /* _ASM_RISCV_PGTABLE_64_H */
-> diff --git a/arch/riscv/include/asm/pgtable.h b/arch/riscv/include/asm/pg=
-table.h
-> index c9f4b250b4ee..3773f454f0fa 100644
-> --- a/arch/riscv/include/asm/pgtable.h
-> +++ b/arch/riscv/include/asm/pgtable.h
-> @@ -544,19 +544,12 @@ static inline void pte_clear(struct mm_struct *mm,
->         __set_pte_at(ptep, __pte(0));
->  }
->
-> -#define __HAVE_ARCH_PTEP_SET_ACCESS_FLAGS
-> -static inline int ptep_set_access_flags(struct vm_area_struct *vma,
-> -                                       unsigned long address, pte_t *pte=
-p,
-> -                                       pte_t entry, int dirty)
-> -{
-> -       if (!pte_same(*ptep, entry))
-> -               __set_pte_at(ptep, entry);
-> -       /*
-> -        * update_mmu_cache will unconditionally execute, handling both
-> -        * the case that the PTE changed and the spurious fault case.
-> -        */
-> -       return true;
-> -}
-> +#define __HAVE_ARCH_PTEP_SET_ACCESS_FLAGS      /* defined in mm/pgtable.=
-c */
-> +extern int ptep_set_access_flags(struct vm_area_struct *vma, unsigned lo=
-ng address,
-> +                                pte_t *ptep, pte_t entry, int dirty);
-> +#define __HAVE_ARCH_PTEP_TEST_AND_CLEAR_YOUNG  /* defined in mm/pgtable.=
-c */
-> +extern int ptep_test_and_clear_young(struct vm_area_struct *vma, unsigne=
-d long address,
-> +                                    pte_t *ptep);
->
->  #define __HAVE_ARCH_PTEP_GET_AND_CLEAR
->  static inline pte_t ptep_get_and_clear(struct mm_struct *mm,
-> @@ -569,16 +562,6 @@ static inline pte_t ptep_get_and_clear(struct mm_str=
-uct *mm,
->         return pte;
->  }
->
-> -#define __HAVE_ARCH_PTEP_TEST_AND_CLEAR_YOUNG
-> -static inline int ptep_test_and_clear_young(struct vm_area_struct *vma,
-> -                                           unsigned long address,
-> -                                           pte_t *ptep)
-> -{
-> -       if (!pte_young(*ptep))
-> -               return 0;
-> -       return test_and_clear_bit(_PAGE_ACCESSED_OFFSET, &pte_val(*ptep))=
-;
-> -}
-> -
->  #define __HAVE_ARCH_PTEP_SET_WRPROTECT
->  static inline void ptep_set_wrprotect(struct mm_struct *mm,
->                                       unsigned long address, pte_t *ptep)
-> diff --git a/arch/riscv/kernel/efi.c b/arch/riscv/kernel/efi.c
-> index aa6209a74c83..b64bf1624a05 100644
-> --- a/arch/riscv/kernel/efi.c
-> +++ b/arch/riscv/kernel/efi.c
-> @@ -60,7 +60,7 @@ int __init efi_create_mapping(struct mm_struct *mm, efi=
-_memory_desc_t *md)
->  static int __init set_permissions(pte_t *ptep, unsigned long addr, void =
-*data)
->  {
->         efi_memory_desc_t *md =3D data;
-> -       pte_t pte =3D READ_ONCE(*ptep);
-> +       pte_t pte =3D ptep_get(ptep);
->         unsigned long val;
->
->         if (md->attribute & EFI_MEMORY_RO) {
-> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-> index 068c74593871..a9e2fd7245e1 100644
-> --- a/arch/riscv/kvm/mmu.c
-> +++ b/arch/riscv/kvm/mmu.c
-> @@ -103,7 +103,7 @@ static bool gstage_get_leaf_entry(struct kvm *kvm, gp=
-a_t addr,
->         *ptep_level =3D current_level;
->         ptep =3D (pte_t *)kvm->arch.pgd;
->         ptep =3D &ptep[gstage_pte_index(addr, current_level)];
-> -       while (ptep && pte_val(*ptep)) {
-> +       while (ptep && pte_val(ptep_get(ptep))) {
->                 if (gstage_pte_leaf(ptep)) {
->                         *ptep_level =3D current_level;
->                         *ptepp =3D ptep;
-> @@ -113,7 +113,7 @@ static bool gstage_get_leaf_entry(struct kvm *kvm, gp=
-a_t addr,
->                 if (current_level) {
->                         current_level--;
->                         *ptep_level =3D current_level;
-> -                       ptep =3D (pte_t *)gstage_pte_page_vaddr(*ptep);
-> +                       ptep =3D (pte_t *)gstage_pte_page_vaddr(ptep_get(=
-ptep));
->                         ptep =3D &ptep[gstage_pte_index(addr, current_lev=
-el)];
->                 } else {
->                         ptep =3D NULL;
-> @@ -149,25 +149,25 @@ static int gstage_set_pte(struct kvm *kvm, u32 leve=
-l,
->                 if (gstage_pte_leaf(ptep))
->                         return -EEXIST;
->
-> -               if (!pte_val(*ptep)) {
-> +               if (!pte_val(ptep_get(ptep))) {
->                         if (!pcache)
->                                 return -ENOMEM;
->                         next_ptep =3D kvm_mmu_memory_cache_alloc(pcache);
->                         if (!next_ptep)
->                                 return -ENOMEM;
-> -                       *ptep =3D pfn_pte(PFN_DOWN(__pa(next_ptep)),
-> -                                       __pgprot(_PAGE_TABLE));
-> +                       set_pte(ptep, pfn_pte(PFN_DOWN(__pa(next_ptep)),
-> +                                             __pgprot(_PAGE_TABLE)));
->                 } else {
->                         if (gstage_pte_leaf(ptep))
->                                 return -EEXIST;
-> -                       next_ptep =3D (pte_t *)gstage_pte_page_vaddr(*pte=
-p);
-> +                       next_ptep =3D (pte_t *)gstage_pte_page_vaddr(ptep=
-_get(ptep));
->                 }
->
->                 current_level--;
->                 ptep =3D &next_ptep[gstage_pte_index(addr, current_level)=
-];
->         }
->
-> -       *ptep =3D *new_pte;
-> +       set_pte(ptep, *new_pte);
->         if (gstage_pte_leaf(ptep))
->                 gstage_remote_tlb_flush(kvm, current_level, addr);
->
-> @@ -239,11 +239,11 @@ static void gstage_op_pte(struct kvm *kvm, gpa_t ad=
-dr,
->
->         BUG_ON(addr & (page_size - 1));
->
-> -       if (!pte_val(*ptep))
-> +       if (!pte_val(ptep_get(ptep)))
->                 return;
->
->         if (ptep_level && !gstage_pte_leaf(ptep)) {
-> -               next_ptep =3D (pte_t *)gstage_pte_page_vaddr(*ptep);
-> +               next_ptep =3D (pte_t *)gstage_pte_page_vaddr(ptep_get(pte=
-p));
->                 next_ptep_level =3D ptep_level - 1;
->                 ret =3D gstage_level_to_page_size(next_ptep_level,
->                                                 &next_page_size);
-> @@ -261,7 +261,7 @@ static void gstage_op_pte(struct kvm *kvm, gpa_t addr=
-,
->                 if (op =3D=3D GSTAGE_OP_CLEAR)
->                         set_pte(ptep, __pte(0));
->                 else if (op =3D=3D GSTAGE_OP_WP)
-> -                       set_pte(ptep, __pte(pte_val(*ptep) & ~_PAGE_WRITE=
-));
-> +                       set_pte(ptep, __pte(pte_val(ptep_get(ptep)) & ~_P=
-AGE_WRITE));
->                 gstage_remote_tlb_flush(kvm, ptep_level, addr);
->         }
->  }
-> @@ -603,7 +603,7 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn=
-_range *range)
->                                    &ptep, &ptep_level))
->                 return false;
->
-> -       return pte_young(*ptep);
-> +       return pte_young(ptep_get(ptep));
->  }
->
->  int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
-> diff --git a/arch/riscv/mm/fault.c b/arch/riscv/mm/fault.c
-> index 90d4ba36d1d0..76f1df709a21 100644
-> --- a/arch/riscv/mm/fault.c
-> +++ b/arch/riscv/mm/fault.c
-> @@ -136,24 +136,24 @@ static inline void vmalloc_fault(struct pt_regs *re=
-gs, int code, unsigned long a
->         pgd =3D (pgd_t *)pfn_to_virt(pfn) + index;
->         pgd_k =3D init_mm.pgd + index;
->
-> -       if (!pgd_present(*pgd_k)) {
-> +       if (!pgd_present(pgdp_get(pgd_k))) {
->                 no_context(regs, addr);
->                 return;
->         }
-> -       set_pgd(pgd, *pgd_k);
-> +       set_pgd(pgd, pgdp_get(pgd_k));
->
->         p4d_k =3D p4d_offset(pgd_k, addr);
-> -       if (!p4d_present(*p4d_k)) {
-> +       if (!p4d_present(p4dp_get(p4d_k))) {
->                 no_context(regs, addr);
->                 return;
->         }
->
->         pud_k =3D pud_offset(p4d_k, addr);
-> -       if (!pud_present(*pud_k)) {
-> +       if (!pud_present(pudp_get(pud_k))) {
->                 no_context(regs, addr);
->                 return;
->         }
-> -       if (pud_leaf(*pud_k))
-> +       if (pud_leaf(pudp_get(pud_k)))
->                 goto flush_tlb;
->
->         /*
-> @@ -161,11 +161,11 @@ static inline void vmalloc_fault(struct pt_regs *re=
-gs, int code, unsigned long a
->          * to copy individual PTEs
->          */
->         pmd_k =3D pmd_offset(pud_k, addr);
-> -       if (!pmd_present(*pmd_k)) {
-> +       if (!pmd_present(pmdp_get(pmd_k))) {
->                 no_context(regs, addr);
->                 return;
->         }
-> -       if (pmd_leaf(*pmd_k))
-> +       if (pmd_leaf(pmdp_get(pmd_k)))
->                 goto flush_tlb;
->
->         /*
-> @@ -175,7 +175,7 @@ static inline void vmalloc_fault(struct pt_regs *regs=
-, int code, unsigned long a
->          * silently loop forever.
->          */
->         pte_k =3D pte_offset_kernel(pmd_k, addr);
-> -       if (!pte_present(*pte_k)) {
-> +       if (!pte_present(ptep_get(pte_k))) {
->                 no_context(regs, addr);
->                 return;
->         }
-> diff --git a/arch/riscv/mm/hugetlbpage.c b/arch/riscv/mm/hugetlbpage.c
-> index b52f0210481f..431596c0e20e 100644
-> --- a/arch/riscv/mm/hugetlbpage.c
-> +++ b/arch/riscv/mm/hugetlbpage.c
-> @@ -54,7 +54,7 @@ pte_t *huge_pte_alloc(struct mm_struct *mm,
->         }
->
->         if (sz =3D=3D PMD_SIZE) {
-> -               if (want_pmd_share(vma, addr) && pud_none(*pud))
-> +               if (want_pmd_share(vma, addr) && pud_none(pudp_get(pud)))
->                         pte =3D huge_pmd_share(mm, vma, addr, pud);
->                 else
->                         pte =3D (pte_t *)pmd_alloc(mm, pud, addr);
-> @@ -93,11 +93,11 @@ pte_t *huge_pte_offset(struct mm_struct *mm,
->         pmd_t *pmd;
->
->         pgd =3D pgd_offset(mm, addr);
-> -       if (!pgd_present(*pgd))
-> +       if (!pgd_present(pgdp_get(pgd)))
->                 return NULL;
->
->         p4d =3D p4d_offset(pgd, addr);
-> -       if (!p4d_present(*p4d))
-> +       if (!p4d_present(p4dp_get(p4d)))
->                 return NULL;
->
->         pud =3D pud_offset(p4d, addr);
-> @@ -105,7 +105,7 @@ pte_t *huge_pte_offset(struct mm_struct *mm,
->                 /* must be pud huge, non-present or none */
->                 return (pte_t *)pud;
->
-> -       if (!pud_present(*pud))
-> +       if (!pud_present(pudp_get(pud)))
->                 return NULL;
->
->         pmd =3D pmd_offset(pud, addr);
-> @@ -113,7 +113,7 @@ pte_t *huge_pte_offset(struct mm_struct *mm,
->                 /* must be pmd huge, non-present or none */
->                 return (pte_t *)pmd;
->
-> -       if (!pmd_present(*pmd))
-> +       if (!pmd_present(pmdp_get(pmd)))
->                 return NULL;
->
->         for_each_napot_order(order) {
-> @@ -293,7 +293,7 @@ void huge_pte_clear(struct mm_struct *mm,
->                     pte_t *ptep,
->                     unsigned long sz)
->  {
-> -       pte_t pte =3D READ_ONCE(*ptep);
-> +       pte_t pte =3D ptep_get(ptep);
->         int i, pte_num;
->
->         if (!pte_napot(pte)) {
-> diff --git a/arch/riscv/mm/kasan_init.c b/arch/riscv/mm/kasan_init.c
-> index 5e39dcf23fdb..e96251853037 100644
-> --- a/arch/riscv/mm/kasan_init.c
-> +++ b/arch/riscv/mm/kasan_init.c
-> @@ -31,7 +31,7 @@ static void __init kasan_populate_pte(pmd_t *pmd, unsig=
-ned long vaddr, unsigned
->         phys_addr_t phys_addr;
->         pte_t *ptep, *p;
->
-> -       if (pmd_none(*pmd)) {
-> +       if (pmd_none(pmdp_get(pmd))) {
->                 p =3D memblock_alloc(PTRS_PER_PTE * sizeof(pte_t), PAGE_S=
-IZE);
->                 set_pmd(pmd, pfn_pmd(PFN_DOWN(__pa(p)), PAGE_TABLE));
->         }
-> @@ -39,7 +39,7 @@ static void __init kasan_populate_pte(pmd_t *pmd, unsig=
-ned long vaddr, unsigned
->         ptep =3D pte_offset_kernel(pmd, vaddr);
->
->         do {
-> -               if (pte_none(*ptep)) {
-> +               if (pte_none(ptep_get(ptep))) {
->                         phys_addr =3D memblock_phys_alloc(PAGE_SIZE, PAGE=
-_SIZE);
->                         set_pte(ptep, pfn_pte(PFN_DOWN(phys_addr), PAGE_K=
-ERNEL));
->                         memset(__va(phys_addr), KASAN_SHADOW_INIT, PAGE_S=
-IZE);
-> @@ -53,7 +53,7 @@ static void __init kasan_populate_pmd(pud_t *pud, unsig=
-ned long vaddr, unsigned
->         pmd_t *pmdp, *p;
->         unsigned long next;
->
-> -       if (pud_none(*pud)) {
-> +       if (pud_none(pudp_get(pud))) {
->                 p =3D memblock_alloc(PTRS_PER_PMD * sizeof(pmd_t), PAGE_S=
-IZE);
->                 set_pud(pud, pfn_pud(PFN_DOWN(__pa(p)), PAGE_TABLE));
->         }
-> @@ -63,7 +63,8 @@ static void __init kasan_populate_pmd(pud_t *pud, unsig=
-ned long vaddr, unsigned
->         do {
->                 next =3D pmd_addr_end(vaddr, end);
->
-> -               if (pmd_none(*pmdp) && IS_ALIGNED(vaddr, PMD_SIZE) && (ne=
-xt - vaddr) >=3D PMD_SIZE) {
-> +               if (pmd_none(pmdp_get(pmdp)) && IS_ALIGNED(vaddr, PMD_SIZ=
-E) &&
-> +                   (next - vaddr) >=3D PMD_SIZE) {
->                         phys_addr =3D memblock_phys_alloc(PMD_SIZE, PMD_S=
-IZE);
->                         if (phys_addr) {
->                                 set_pmd(pmdp, pfn_pmd(PFN_DOWN(phys_addr)=
-, PAGE_KERNEL));
-> @@ -83,7 +84,7 @@ static void __init kasan_populate_pud(p4d_t *p4d,
->         pud_t *pudp, *p;
->         unsigned long next;
->
-> -       if (p4d_none(*p4d)) {
-> +       if (p4d_none(p4dp_get(p4d))) {
->                 p =3D memblock_alloc(PTRS_PER_PUD * sizeof(pud_t), PAGE_S=
-IZE);
->                 set_p4d(p4d, pfn_p4d(PFN_DOWN(__pa(p)), PAGE_TABLE));
->         }
-> @@ -93,7 +94,8 @@ static void __init kasan_populate_pud(p4d_t *p4d,
->         do {
->                 next =3D pud_addr_end(vaddr, end);
->
-> -               if (pud_none(*pudp) && IS_ALIGNED(vaddr, PUD_SIZE) && (ne=
-xt - vaddr) >=3D PUD_SIZE) {
-> +               if (pud_none(pudp_get(pudp)) && IS_ALIGNED(vaddr, PUD_SIZ=
-E) &&
-> +                   (next - vaddr) >=3D PUD_SIZE) {
->                         phys_addr =3D memblock_phys_alloc(PUD_SIZE, PUD_S=
-IZE);
->                         if (phys_addr) {
->                                 set_pud(pudp, pfn_pud(PFN_DOWN(phys_addr)=
-, PAGE_KERNEL));
-> @@ -113,7 +115,7 @@ static void __init kasan_populate_p4d(pgd_t *pgd,
->         p4d_t *p4dp, *p;
->         unsigned long next;
->
-> -       if (pgd_none(*pgd)) {
-> +       if (pgd_none(pgdp_get(pgd))) {
->                 p =3D memblock_alloc(PTRS_PER_P4D * sizeof(p4d_t), PAGE_S=
-IZE);
->                 set_pgd(pgd, pfn_pgd(PFN_DOWN(__pa(p)), PAGE_TABLE));
->         }
-> @@ -123,7 +125,8 @@ static void __init kasan_populate_p4d(pgd_t *pgd,
->         do {
->                 next =3D p4d_addr_end(vaddr, end);
->
-> -               if (p4d_none(*p4dp) && IS_ALIGNED(vaddr, P4D_SIZE) && (ne=
-xt - vaddr) >=3D P4D_SIZE) {
-> +               if (p4d_none(p4dp_get(p4dp)) && IS_ALIGNED(vaddr, P4D_SIZ=
-E) &&
-> +                   (next - vaddr) >=3D P4D_SIZE) {
->                         phys_addr =3D memblock_phys_alloc(P4D_SIZE, P4D_S=
-IZE);
->                         if (phys_addr) {
->                                 set_p4d(p4dp, pfn_p4d(PFN_DOWN(phys_addr)=
-, PAGE_KERNEL));
-> @@ -145,7 +148,7 @@ static void __init kasan_populate_pgd(pgd_t *pgdp,
->         do {
->                 next =3D pgd_addr_end(vaddr, end);
->
-> -               if (pgd_none(*pgdp) && IS_ALIGNED(vaddr, PGDIR_SIZE) &&
-> +               if (pgd_none(pgdp_get(pgdp)) && IS_ALIGNED(vaddr, PGDIR_S=
-IZE) &&
->                     (next - vaddr) >=3D PGDIR_SIZE) {
->                         phys_addr =3D memblock_phys_alloc(PGDIR_SIZE, PGD=
-IR_SIZE);
->                         if (phys_addr) {
-> @@ -168,7 +171,7 @@ static void __init kasan_early_clear_pud(p4d_t *p4dp,
->         if (!pgtable_l4_enabled) {
->                 pudp =3D (pud_t *)p4dp;
->         } else {
-> -               base_pud =3D pt_ops.get_pud_virt(pfn_to_phys(_p4d_pfn(*p4=
-dp)));
-> +               base_pud =3D pt_ops.get_pud_virt(pfn_to_phys(_p4d_pfn(p4d=
-p_get(p4dp))));
->                 pudp =3D base_pud + pud_index(vaddr);
->         }
->
-> @@ -193,7 +196,7 @@ static void __init kasan_early_clear_p4d(pgd_t *pgdp,
->         if (!pgtable_l5_enabled) {
->                 p4dp =3D (p4d_t *)pgdp;
->         } else {
-> -               base_p4d =3D pt_ops.get_p4d_virt(pfn_to_phys(_pgd_pfn(*pg=
-dp)));
-> +               base_p4d =3D pt_ops.get_p4d_virt(pfn_to_phys(_pgd_pfn(pgd=
-p_get(pgdp))));
->                 p4dp =3D base_p4d + p4d_index(vaddr);
->         }
->
-> @@ -239,14 +242,14 @@ static void __init kasan_early_populate_pud(p4d_t *=
-p4dp,
->         if (!pgtable_l4_enabled) {
->                 pudp =3D (pud_t *)p4dp;
->         } else {
-> -               base_pud =3D pt_ops.get_pud_virt(pfn_to_phys(_p4d_pfn(*p4=
-dp)));
-> +               base_pud =3D pt_ops.get_pud_virt(pfn_to_phys(_p4d_pfn(p4d=
-p_get(p4dp))));
->                 pudp =3D base_pud + pud_index(vaddr);
->         }
->
->         do {
->                 next =3D pud_addr_end(vaddr, end);
->
-> -               if (pud_none(*pudp) && IS_ALIGNED(vaddr, PUD_SIZE) &&
-> +               if (pud_none(pudp_get(pudp)) && IS_ALIGNED(vaddr, PUD_SIZ=
-E) &&
->                     (next - vaddr) >=3D PUD_SIZE) {
->                         phys_addr =3D __pa((uintptr_t)kasan_early_shadow_=
-pmd);
->                         set_pud(pudp, pfn_pud(PFN_DOWN(phys_addr), PAGE_T=
-ABLE));
-> @@ -277,14 +280,14 @@ static void __init kasan_early_populate_p4d(pgd_t *=
-pgdp,
->         if (!pgtable_l5_enabled) {
->                 p4dp =3D (p4d_t *)pgdp;
->         } else {
-> -               base_p4d =3D pt_ops.get_p4d_virt(pfn_to_phys(_pgd_pfn(*pg=
-dp)));
-> +               base_p4d =3D pt_ops.get_p4d_virt(pfn_to_phys(_pgd_pfn(pgd=
-p_get(pgdp))));
->                 p4dp =3D base_p4d + p4d_index(vaddr);
->         }
->
->         do {
->                 next =3D p4d_addr_end(vaddr, end);
->
-> -               if (p4d_none(*p4dp) && IS_ALIGNED(vaddr, P4D_SIZE) &&
-> +               if (p4d_none(p4dp_get(p4dp)) && IS_ALIGNED(vaddr, P4D_SIZ=
-E) &&
->                     (next - vaddr) >=3D P4D_SIZE) {
->                         phys_addr =3D __pa((uintptr_t)kasan_early_shadow_=
-pud);
->                         set_p4d(p4dp, pfn_p4d(PFN_DOWN(phys_addr), PAGE_T=
-ABLE));
-> @@ -305,7 +308,7 @@ static void __init kasan_early_populate_pgd(pgd_t *pg=
-dp,
->         do {
->                 next =3D pgd_addr_end(vaddr, end);
->
-> -               if (pgd_none(*pgdp) && IS_ALIGNED(vaddr, PGDIR_SIZE) &&
-> +               if (pgd_none(pgdp_get(pgdp)) && IS_ALIGNED(vaddr, PGDIR_S=
-IZE) &&
->                     (next - vaddr) >=3D PGDIR_SIZE) {
->                         phys_addr =3D __pa((uintptr_t)kasan_early_shadow_=
-p4d);
->                         set_pgd(pgdp, pfn_pgd(PFN_DOWN(phys_addr), PAGE_T=
-ABLE));
-> @@ -381,7 +384,7 @@ static void __init kasan_shallow_populate_pud(p4d_t *=
-p4d,
->         do {
->                 next =3D pud_addr_end(vaddr, end);
->
-> -               if (pud_none(*pud_k)) {
-> +               if (pud_none(pudp_get(pud_k))) {
->                         p =3D memblock_alloc(PAGE_SIZE, PAGE_SIZE);
->                         set_pud(pud_k, pfn_pud(PFN_DOWN(__pa(p)), PAGE_TA=
-BLE));
->                         continue;
-> @@ -401,7 +404,7 @@ static void __init kasan_shallow_populate_p4d(pgd_t *=
-pgd,
->         do {
->                 next =3D p4d_addr_end(vaddr, end);
->
-> -               if (p4d_none(*p4d_k)) {
-> +               if (p4d_none(p4dp_get(p4d_k))) {
->                         p =3D memblock_alloc(PAGE_SIZE, PAGE_SIZE);
->                         set_p4d(p4d_k, pfn_p4d(PFN_DOWN(__pa(p)), PAGE_TA=
-BLE));
->                         continue;
-> @@ -420,7 +423,7 @@ static void __init kasan_shallow_populate_pgd(unsigne=
-d long vaddr, unsigned long
->         do {
->                 next =3D pgd_addr_end(vaddr, end);
->
-> -               if (pgd_none(*pgd_k)) {
-> +               if (pgd_none(pgdp_get(pgd_k))) {
->                         p =3D memblock_alloc(PAGE_SIZE, PAGE_SIZE);
->                         set_pgd(pgd_k, pfn_pgd(PFN_DOWN(__pa(p)), PAGE_TA=
-BLE));
->                         continue;
-> @@ -451,7 +454,7 @@ static void __init create_tmp_mapping(void)
->
->         /* Copy the last p4d since it is shared with the kernel mapping. =
-*/
->         if (pgtable_l5_enabled) {
-> -               ptr =3D (p4d_t *)pgd_page_vaddr(*pgd_offset_k(KASAN_SHADO=
-W_END));
-> +               ptr =3D (p4d_t *)pgd_page_vaddr(pgdp_get(pgd_offset_k(KAS=
-AN_SHADOW_END)));
->                 memcpy(tmp_p4d, ptr, sizeof(p4d_t) * PTRS_PER_P4D);
->                 set_pgd(&tmp_pg_dir[pgd_index(KASAN_SHADOW_END)],
->                         pfn_pgd(PFN_DOWN(__pa(tmp_p4d)), PAGE_TABLE));
-> @@ -462,7 +465,7 @@ static void __init create_tmp_mapping(void)
->
->         /* Copy the last pud since it is shared with the kernel mapping. =
-*/
->         if (pgtable_l4_enabled) {
-> -               ptr =3D (pud_t *)p4d_page_vaddr(*(base_p4d + p4d_index(KA=
-SAN_SHADOW_END)));
-> +               ptr =3D (pud_t *)p4d_page_vaddr(p4dp_get(base_p4d + p4d_i=
-ndex(KASAN_SHADOW_END)));
->                 memcpy(tmp_pud, ptr, sizeof(pud_t) * PTRS_PER_PUD);
->                 set_p4d(&base_p4d[p4d_index(KASAN_SHADOW_END)],
->                         pfn_p4d(PFN_DOWN(__pa(tmp_pud)), PAGE_TABLE));
-> diff --git a/arch/riscv/mm/pageattr.c b/arch/riscv/mm/pageattr.c
-> index fc5fc4f785c4..0b5e38e018c8 100644
-> --- a/arch/riscv/mm/pageattr.c
-> +++ b/arch/riscv/mm/pageattr.c
-> @@ -29,7 +29,7 @@ static unsigned long set_pageattr_masks(unsigned long v=
-al, struct mm_walk *walk)
->  static int pageattr_p4d_entry(p4d_t *p4d, unsigned long addr,
->                               unsigned long next, struct mm_walk *walk)
->  {
-> -       p4d_t val =3D READ_ONCE(*p4d);
-> +       p4d_t val =3D p4dp_get(p4d);
->
->         if (p4d_leaf(val)) {
->                 val =3D __p4d(set_pageattr_masks(p4d_val(val), walk));
-> @@ -42,7 +42,7 @@ static int pageattr_p4d_entry(p4d_t *p4d, unsigned long=
- addr,
->  static int pageattr_pud_entry(pud_t *pud, unsigned long addr,
->                               unsigned long next, struct mm_walk *walk)
->  {
-> -       pud_t val =3D READ_ONCE(*pud);
-> +       pud_t val =3D pudp_get(pud);
->
->         if (pud_leaf(val)) {
->                 val =3D __pud(set_pageattr_masks(pud_val(val), walk));
-> @@ -55,7 +55,7 @@ static int pageattr_pud_entry(pud_t *pud, unsigned long=
- addr,
->  static int pageattr_pmd_entry(pmd_t *pmd, unsigned long addr,
->                               unsigned long next, struct mm_walk *walk)
->  {
-> -       pmd_t val =3D READ_ONCE(*pmd);
-> +       pmd_t val =3D pmdp_get(pmd);
->
->         if (pmd_leaf(val)) {
->                 val =3D __pmd(set_pageattr_masks(pmd_val(val), walk));
-> @@ -68,7 +68,7 @@ static int pageattr_pmd_entry(pmd_t *pmd, unsigned long=
- addr,
->  static int pageattr_pte_entry(pte_t *pte, unsigned long addr,
->                               unsigned long next, struct mm_walk *walk)
->  {
-> -       pte_t val =3D READ_ONCE(*pte);
-> +       pte_t val =3D ptep_get(pte);
->
->         val =3D __pte(set_pageattr_masks(pte_val(val), walk));
->         set_pte(pte, val);
-> @@ -108,10 +108,10 @@ static int __split_linear_mapping_pmd(pud_t *pudp,
->                     vaddr <=3D (vaddr & PMD_MASK) && end >=3D next)
->                         continue;
->
-> -               if (pmd_leaf(*pmdp)) {
-> +               if (pmd_leaf(pmdp_get(pmdp))) {
->                         struct page *pte_page;
-> -                       unsigned long pfn =3D _pmd_pfn(*pmdp);
-> -                       pgprot_t prot =3D __pgprot(pmd_val(*pmdp) & ~_PAG=
-E_PFN_MASK);
-> +                       unsigned long pfn =3D _pmd_pfn(pmdp_get(pmdp));
-> +                       pgprot_t prot =3D __pgprot(pmd_val(pmdp_get(pmdp)=
-) & ~_PAGE_PFN_MASK);
->                         pte_t *ptep_new;
->                         int i;
->
-> @@ -148,10 +148,10 @@ static int __split_linear_mapping_pud(p4d_t *p4dp,
->                     vaddr <=3D (vaddr & PUD_MASK) && end >=3D next)
->                         continue;
->
-> -               if (pud_leaf(*pudp)) {
-> +               if (pud_leaf(pudp_get(pudp))) {
->                         struct page *pmd_page;
-> -                       unsigned long pfn =3D _pud_pfn(*pudp);
-> -                       pgprot_t prot =3D __pgprot(pud_val(*pudp) & ~_PAG=
-E_PFN_MASK);
-> +                       unsigned long pfn =3D _pud_pfn(pudp_get(pudp));
-> +                       pgprot_t prot =3D __pgprot(pud_val(pudp_get(pudp)=
-) & ~_PAGE_PFN_MASK);
->                         pmd_t *pmdp_new;
->                         int i;
->
-> @@ -197,10 +197,10 @@ static int __split_linear_mapping_p4d(pgd_t *pgdp,
->                     vaddr <=3D (vaddr & P4D_MASK) && end >=3D next)
->                         continue;
->
-> -               if (p4d_leaf(*p4dp)) {
-> +               if (p4d_leaf(p4dp_get(p4dp))) {
->                         struct page *pud_page;
-> -                       unsigned long pfn =3D _p4d_pfn(*p4dp);
-> -                       pgprot_t prot =3D __pgprot(p4d_val(*p4dp) & ~_PAG=
-E_PFN_MASK);
-> +                       unsigned long pfn =3D _p4d_pfn(p4dp_get(p4dp));
-> +                       pgprot_t prot =3D __pgprot(p4d_val(p4dp_get(p4dp)=
-) & ~_PAGE_PFN_MASK);
->                         pud_t *pudp_new;
->                         int i;
->
-> @@ -406,29 +406,29 @@ bool kernel_page_present(struct page *page)
->         pte_t *pte;
->
->         pgd =3D pgd_offset_k(addr);
-> -       if (!pgd_present(*pgd))
-> +       if (!pgd_present(pgdp_get(pgd)))
->                 return false;
-> -       if (pgd_leaf(*pgd))
-> +       if (pgd_leaf(pgdp_get(pgd)))
->                 return true;
->
->         p4d =3D p4d_offset(pgd, addr);
-> -       if (!p4d_present(*p4d))
-> +       if (!p4d_present(p4dp_get(p4d)))
->                 return false;
-> -       if (p4d_leaf(*p4d))
-> +       if (p4d_leaf(p4dp_get(p4d)))
->                 return true;
->
->         pud =3D pud_offset(p4d, addr);
-> -       if (!pud_present(*pud))
-> +       if (!pud_present(pudp_get(pud)))
->                 return false;
-> -       if (pud_leaf(*pud))
-> +       if (pud_leaf(pudp_get(pud)))
->                 return true;
->
->         pmd =3D pmd_offset(pud, addr);
-> -       if (!pmd_present(*pmd))
-> +       if (!pmd_present(pmdp_get(pmd)))
->                 return false;
-> -       if (pmd_leaf(*pmd))
-> +       if (pmd_leaf(pmdp_get(pmd)))
->                 return true;
->
->         pte =3D pte_offset_kernel(pmd, addr);
-> -       return pte_present(*pte);
-> +       return pte_present(ptep_get(pte));
->  }
-> diff --git a/arch/riscv/mm/pgtable.c b/arch/riscv/mm/pgtable.c
-> index fef4e7328e49..ef887efcb679 100644
-> --- a/arch/riscv/mm/pgtable.c
-> +++ b/arch/riscv/mm/pgtable.c
-> @@ -5,6 +5,47 @@
->  #include <linux/kernel.h>
->  #include <linux/pgtable.h>
->
-> +int ptep_set_access_flags(struct vm_area_struct *vma,
-> +                         unsigned long address, pte_t *ptep,
-> +                         pte_t entry, int dirty)
-> +{
-> +       if (!pte_same(ptep_get(ptep), entry))
-> +               __set_pte_at(ptep, entry);
-> +       /*
-> +        * update_mmu_cache will unconditionally execute, handling both
-> +        * the case that the PTE changed and the spurious fault case.
-> +        */
-> +       return true;
-> +}
-> +
-> +int ptep_test_and_clear_young(struct vm_area_struct *vma,
-> +                             unsigned long address,
-> +                             pte_t *ptep)
-> +{
-> +       if (!pte_young(ptep_get(ptep)))
-> +               return 0;
-> +       return test_and_clear_bit(_PAGE_ACCESSED_OFFSET, &pte_val(*ptep))=
-;
-> +}
-> +EXPORT_SYMBOL_GPL(ptep_test_and_clear_young);
-> +
-> +#ifdef CONFIG_64BIT
-> +pud_t *pud_offset(p4d_t *p4d, unsigned long address)
-> +{
-> +       if (pgtable_l4_enabled)
-> +               return p4d_pgtable(p4dp_get(p4d)) + pud_index(address);
-> +
-> +       return (pud_t *)p4d;
-> +}
-> +
-> +p4d_t *p4d_offset(pgd_t *pgd, unsigned long address)
-> +{
-> +       if (pgtable_l5_enabled)
-> +               return pgd_pgtable(pgdp_get(pgd)) + p4d_index(address);
-> +
-> +       return (p4d_t *)pgd;
-> +}
-> +#endif
-> +
->  #ifdef CONFIG_HAVE_ARCH_HUGE_VMAP
->  int p4d_set_huge(p4d_t *p4d, phys_addr_t addr, pgprot_t prot)
->  {
-> @@ -25,7 +66,7 @@ int pud_set_huge(pud_t *pud, phys_addr_t phys, pgprot_t=
- prot)
->
->  int pud_clear_huge(pud_t *pud)
->  {
-> -       if (!pud_leaf(READ_ONCE(*pud)))
-> +       if (!pud_leaf(pudp_get(pud)))
->                 return 0;
->         pud_clear(pud);
->         return 1;
-> @@ -33,7 +74,7 @@ int pud_clear_huge(pud_t *pud)
->
->  int pud_free_pmd_page(pud_t *pud, unsigned long addr)
->  {
-> -       pmd_t *pmd =3D pud_pgtable(*pud);
-> +       pmd_t *pmd =3D pud_pgtable(pudp_get(pud));
->         int i;
->
->         pud_clear(pud);
-> @@ -63,7 +104,7 @@ int pmd_set_huge(pmd_t *pmd, phys_addr_t phys, pgprot_=
-t prot)
->
->  int pmd_clear_huge(pmd_t *pmd)
->  {
-> -       if (!pmd_leaf(READ_ONCE(*pmd)))
-> +       if (!pmd_leaf(pmdp_get(pmd)))
->                 return 0;
->         pmd_clear(pmd);
->         return 1;
-> @@ -71,7 +112,7 @@ int pmd_clear_huge(pmd_t *pmd)
->
->  int pmd_free_pte_page(pmd_t *pmd, unsigned long addr)
->  {
-> -       pte_t *pte =3D (pte_t *)pmd_page_vaddr(*pmd);
-> +       pte_t *pte =3D (pte_t *)pmd_page_vaddr(pmdp_get(pmd));
->
->         pmd_clear(pmd);
->
-> @@ -88,7 +129,7 @@ pmd_t pmdp_collapse_flush(struct vm_area_struct *vma,
->         pmd_t pmd =3D pmdp_huge_get_and_clear(vma->vm_mm, address, pmdp);
->
->         VM_BUG_ON(address & ~HPAGE_PMD_MASK);
-> -       VM_BUG_ON(pmd_trans_huge(*pmdp));
-> +       VM_BUG_ON(pmd_trans_huge(pmdp_get(pmdp)));
->         /*
->          * When leaf PTE entries (regular pages) are collapsed into a lea=
-f
->          * PMD entry (huge page), a valid non-leaf PTE is converted into =
-a
-> --
-> 2.39.2
->
+> - the whole warning about "unstable" policy means that the user space
+> component should not take for granted the capability. So if the kfunc
+> changes/disappears for good reasons (because it was marked as well
+> used and deprecated for quite some time), qemu should not *break*, it
+> should not provide the functionality, or have a secondary plan.
+> 
+> But even if you are encountering such issues, in case of a change in
+> the ABI of your kfunc, it should be easy enough to backport the bpf
+> changes to your old QEMUs and ask users to upgrade the user space if
+> they upgrade their kernel.
+> 
+> AFAIU, it is as unstable as you want it to be. It's just that we are
+> not in the "we don't break user space" contract, because we are
+> talking about adding a kernel functionality from userspace, which
+> requires knowing the kernel intrinsics.
+
+I must admit I'm still not convinced the proposed BPF program 
+functionality needs to know internals of the kernel.
+
+The eBPF program QEMU carries is just to calculate hashes from packets. 
+It doesn't need to know the details of how the kernel handles packets. 
+It only needs to have an access to the packet content.
+
+It is exactly what BPF_PROG_TYPE_SOCKET_FILTER does, but it lacks a 
+mechanism to report hash values so I need to extend it or invent a new 
+method. Extending BPF_PROG_TYPE_SOCKET_FILTER is not a way forward since 
+CO-RE is superior to the context rewrite it relies on. But apparently 
+adopting kfuncs and CO-RE also means to lose the "we don't break user 
+space" contract although I have no intention to expose kernel internals 
+to the eBPF program.
+
+> 
+>>
+>>>
+>>>>
+>>>> Then, QEMU can uname() and get the path to the binary. It will give an
+>>>> error if it can't find the binary for the current kernel so that it
+>>>> won't create accidental UAPIs.
+>>>>
+>>>> The obvious downside of this is that it complicates packaging a lot; it
+>>>> requires packaging QEMU eBPF binaries each time a new kernel comes up.
+>>>> This complexity is centrally managed by modprobe for kernel modules, but
+>>>> apparently each application needs to take care of it for BPF programs.
+>>>
+>>> For my primary use case: HID-BPF, I put kfuncs in kernel v6.3 and
+>>> given that I haven't touch this part of the API, the same compilation
+>>> unit compiled in the v6.3 era still works on a v6.7-rcx, so no, IMO
+>>> it's not complex and doesn't require to follow the kernel releases
+>>> (which is the whole point of HID-BPF FWIW).
+>>
+>> I also expect BPF kfuncs will work well for long if I introduce its
+>> usage to QEMU in practice. That said, the interface stability is about
+>> when something unexpected happens. What if the interface QEMU relies on
+>> is deemed sub-optimal? Without following kernel releases, QEMU may
+>> accidentally lose the feature relying on eBPF.
+> 
+> In the same way, anybody can tamper with your ioctl or syscall without
+> QEMU knowing it.
+
+I suppose it's only the case when the ioctl is marked as experimental, 
+and it's also possible to mark it stable when the design is 
+consolidated. The latter part matters; once I and other kernel/QEMU 
+developers become confident, I'd like to drop the experimental notes 
+from the kernel and QEMU and expect kfuncs to keep working.
+
+> And what you need to follow is not the kernel *releases*, but the
+> changes in the kfuncs you are interested in.
+
+That works as long as a version of kfunc is stable across kernel 
+releases. I have to ensure that a breaking change will always require a 
+different symbol for that purpose.
+
+> 
+>>
+>>>
+>>>>
+>>>> In conclusion, I see too much complexity to use BPF in a userspace
+>>>> application, which we didn't have to care for
+>>>> BPF_PROG_TYPE_SOCKET_FILTER. Isn't there a better way? Or shouldn't I
+>>>> use BPF in my case in the first place?
+>>>
+>>> Given that I'm not a network person, I'm not sure about your use case,
+>>> but I would make my decision based on:
+>>> - do I know exactly what I want to achieve and I'm confident that I'll
+>>> write the proper kernel API from day one? (if not then kfuncs is
+>>> appealing because  it's less workload in the long run, but userspace
+>>> needs to be slightly smarter)
+>>
+>> Personally I'm confident that the initial UAPI design will not do a bad
+>> thing at least. However, there is a high chance that the design needs to
+>> be extended to accommodate new features.
+> 
+> Not trying to offend you or anything, but designs can change for
+> multiple reasons. Floppy disks were a good design at the time, and it
+> took decades to remove support for it in the kernel. In the same way,
+> removing an architecture from the kernel is hard, because even if you
+> can not run a new kernel on those architectures, "we do not break
+> userspace".
+
+It's a totally valid point. I expect the underlying networking technique 
+(RSS) will matter for the next decade, but I'm not sure after that.
+
+> 
+> The whole BPF approach is to say that users of BPF are not plain
+> random users, and they have to know a little bit of the kernel, and
+> they know that once the kfunc is here, it doesn't mean it'll stay here
+> forever.
+> 
+>>
+>>> - are all of my use cases covered by using BPF? (what happens if I run
+>>> QEMU in a container?) -> BPF might or might not be a solution
+>>
+>> Yes. Containers can be used to 1) have a different userspace or 2)
+>> isolate things for security.
+>>
+>> Regarding 2), QEMU and libvirt has sandbox mechanisms so we can rely on
+>> them instead of containers so we can just pass capabilities to the
+>> container. At least, we can always have a setuid helper outside
+>> container, and pass around file descriptors it generates.
+>>
+>> So 1) is the only problem that matters.
+>>
+>>>
+>>> But the nice thing about using BPF kfuncs is that it allows you to
+>>> have a testing (not-)UAPI kernel interface. You can then implement the
+>>> userspace changes and see how it behaves. And then, once you got the
+>>> right design, you can decide to promote it to a proper syscall or
+>>> ioctl if you want.
+>>
+>> I expect it's possible to have testing ioctls. Quickly searching online,
+>> there are experimental ioctls[1][2]. I also know DRM has a relaxed
+>> policy for closed-source userspace[3].
+> 
+> Sure, but handling a change in the API in those cases is tough in the
+> kernel. You probably need to bump versions, return different values
+> depending on how many parameters you are given, and you are never sure
+> the caller is using the right parameters. BPF simplifies this by
+> actually checking the types of the caller, and if there is a
+> discrepancy, it'll notify userspace that it is doing something bad.
+
+That's the whole reason I'm reluctant to have an ioctl while I intend to 
+use it like a UAPI. BPF looks nice; it's safer, allows to extend the 
+functionality when the virtio spec QEMU implements gets updated and to 
+reuse the existing code for BPF_PROG_TYPE_SOCKET_FILTER.
+
+> 
+>>
+>> So I'm seeing the distinction of UAPI/kfunc even less definitive; UAPIs
+>> can also be broken if the subsystem maintainers agree and there is no
+>> real user. I also think it's natural to say a kfunc will be stable as
+>> long as there is a user, but it contradicts with the current situation.
+> 
+> Please read more carefully the kernel docs [4] (just quoting here the
+> beginning):
+> 
+> """
+> Like any other change to the kernel, maintainers will not change or
+> remove a kfunc without having a reasonable justification. Whether or
+> not they'll choose to change a kfunc will ultimately depend on a
+> variety of factors, such as how widely used the kfunc is, how long the
+> kfunc has been in the kernel, whether an alternative kfunc exists,
+> what the norm is in terms of stability for the subsystem in question,
+> and of course what the technical cost is of continuing to support the
+> kfunc.
+> """
+> 
+>> kfunc is expressed as EXPORT_SYMBOL_GPL in the documentation, and Linus
+>> expects kfunc is for users like big companies or systemd, which closely
+>> follow the kernel, according to the systemd discussion I cited in the
+>> last email.
+> 
+> Please re-read the doc[4], it's not a 1-to-1 matching to EXPORT_SYMBOL_GPL.
+> And being the one who reported Linus' words in that systemd thread,
+> Linus was not concerned about "potential situations that may or may
+> not happen", because he expected the people who use kfunc to do the
+> right thing. Because they are not average programmers. And QEMU
+> developers would definitely fit in that category IMO.
+> 
+> And the whole "you can consider kfunc similar to EXPORT_SYMBOL_GPL" is
+> just a warning for user space that the kfunc will never be kept only
+> for stability reasons. So when you want to use a kfunc, you need to be
+> aware of it and not segfault if it's not there (which can not happen
+> TBH unless you don't check that your program was correctly loaded).
+> 
+>>
+>> According to the discussion above, it may be better off abandoning BPF
+>> and implementing all in kernel, with ioctl as I have a (hopefully) sound
+>> idea of UAPI design. But I'll also continue considering the BPF option;
+>> BPF is still attractive due to its extensibility and safety.
+> 
+> We can not tell you to choose one solution over the other. The choice
+> is yours. I personally find BPF more appealing because it allows the
+> user space application to define its own kernel API for its own needs
+> while relying on just a few defined kfuncs.
+> 
+> But again, sometimes it doesn't work, like the systemd thread you
+> linked, it's too big overhead for little gain compared to an ioctl in
+> that particular case.
+> 
+> IMO the biggest issue for you is not the stability of the API, but the
+> container capabilities. Because allowing CAP_BPF allows for a whole
+> lot of nasty things to happen :)
+
+I'll keep thinking about what QEMU developers can do for kfuncs, lacking 
+UAPI stability, and if it makes sense to require CAP_BPF.
+
+Regards,
+Akihiko Odaki
 
