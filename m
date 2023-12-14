@@ -1,455 +1,197 @@
-Return-Path: <kvm+bounces-4470-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4471-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D643812E0D
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 12:04:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95EBB812E64
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 12:18:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7790282332
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 11:04:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C49D1F21BC7
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 11:18:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 987833E48A;
-	Thu, 14 Dec 2023 11:04:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0ADD3FB18;
+	Thu, 14 Dec 2023 11:18:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P7DrjrDl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eM4GF+Af"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75B2C11A;
-	Thu, 14 Dec 2023 03:04:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702551883; x=1734087883;
-  h=from:to:cc:subject:date:message-id;
-  bh=PPJ0qo+v4gU51NZ6QR1Rk2xhM3fO+C3owLqS4ypDdH8=;
-  b=P7DrjrDlccdgzyGxKAYA6wtrd7xo1xXYGpsL2ZgeWrA23jwC5KFa2Zi4
-   +AXaZSXzbtC4QQW7h9ZSP0DkjmweU9vhDacREMtB54Re9Kgv0uFXYCOHS
-   S9Rez4M5HH8fYiNYjsjjF7qgRk2yfbrqy3FbPe+2C7HsKPb1jaJAnlWvl
-   yuZFMki2/s3wxxIQlIs3RnHp022jec6b8OTO2tfB2R9SwEq+nnI4T8v1Z
-   tOPCCcVOq5AirnrK9a5ajO0LOSO2qlWu2Byew1weV0HI88pto3FA9v6Ip
-   TxGZqoKHvX2QiA0SIL3jIDSIooTTHJi76wrODzggkVrHcMs4Vh8cCZRgz
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10923"; a="8500543"
-X-IronPort-AV: E=Sophos;i="6.04,275,1695711600"; 
-   d="scan'208";a="8500543"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 03:04:42 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,275,1695711600"; 
-   d="scan'208";a="22358938"
-Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 03:04:37 -0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dri-devel@lists.freedesktop.org
-Cc: pbonzini@redhat.com,
-	seanjc@google.com,
-	olvaffe@gmail.com,
-	kevin.tian@intel.com,
-	zhiyuan.lv@intel.com,
-	zhenyu.z.wang@intel.com,
-	yongwei.ma@intel.com,
-	vkuznets@redhat.com,
-	wanpengli@tencent.com,
-	jmattson@google.com,
-	joro@8bytes.org,
-	gurchetansingh@chromium.org,
-	kraxel@redhat.com,
-	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [RFC PATCH] KVM: Introduce KVM VIRTIO device
-Date: Thu, 14 Dec 2023 18:35:20 +0800
-Message-Id: <20231214103520.7198-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.17.1
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B6C8118
+	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 03:18:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702552685;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VaN6TC3I4TNZRPtVPtcTdPQQalk1XpMFkRRRirXd7I0=;
+	b=eM4GF+AffIoOz8rhw4PCT04rTw+/brEJvU5WuDsXFBhapFfAFgpGjek3YcIk9W1EoJ70n0
+	1c2InCiEN6GNDpmPxNyFr+5wJiF4sX/qjRgFxkxUHBfvmOzjoKR1vUEqgKQcQEO/oO8M2r
+	HUIeJS4/uMY2Qb4gyw6a+cK6NNpdbYY=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-622-JPXXRMqyM4u9f-931DaFCg-1; Thu, 14 Dec 2023 06:18:04 -0500
+X-MC-Unique: JPXXRMqyM4u9f-931DaFCg-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-54455e2a5c8so4538008a12.3
+        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 03:18:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702552683; x=1703157483;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VaN6TC3I4TNZRPtVPtcTdPQQalk1XpMFkRRRirXd7I0=;
+        b=r7QB7gRHmwo393dtwtg95/zql2kRGJTuMY0MIui3HxmV/oQ/sX8VM5RQPZTWPjHLOa
+         wlIuCOgnMd/siz0ZoKdiso2+zaXmYp7owFR6DD1StHve7bmbVN6bNup769gvYJGnw8Aa
+         ggI6J+qcu23/bPtvOxLw9KeeqmFQJTpl1uXDWUL6mxAB/gigiGqPdyP1aAuLjE3TyDA8
+         tnCWx6eIkBgnZrTIY4tXeF016PshWRfYnRQ9hN/uFRYKm5AZjiSHRDh+cyafttjtUuMK
+         y47xXyZrWkDb0Waf+u4NxLkEtW2hp6CKITPjINy0teBQ1oBYATC3sKPj5wY0XiXzfm/R
+         BHcA==
+X-Gm-Message-State: AOJu0YyXoYRSKrV9X6zSo+zhHWBl/RtXOsaulzmm3io0T1KLc3VTXzon
+	WFx9Q6Ka70c6Ek8LVjAV4qlQ8L98tUuJJGa2xCTDEc5e51VEIhtQCGg5BwHWpHW7iW+ap50HEX0
+	/FEhcT5RwQwvR
+X-Received: by 2002:a05:6402:2318:b0:551:76e6:afdb with SMTP id l24-20020a056402231800b0055176e6afdbmr2088862eda.77.1702552683019;
+        Thu, 14 Dec 2023 03:18:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IExaY3rnjXkKwpudV8D5zjSW1Nso5V7k/Hde8rQ0+0YKYqG4gygBYOpDhXTnB2wvb4N1mYL8Q==
+X-Received: by 2002:a05:6402:2318:b0:551:76e6:afdb with SMTP id l24-20020a056402231800b0055176e6afdbmr2088851eda.77.1702552682642;
+        Thu, 14 Dec 2023 03:18:02 -0800 (PST)
+Received: from redhat.com ([2.52.132.243])
+        by smtp.gmail.com with ESMTPSA id dk4-20020a0564021d8400b005522eddd380sm1316992edb.34.2023.12.14.03.17.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 03:18:01 -0800 (PST)
+Date: Thu, 14 Dec 2023 06:17:57 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v9 3/4] vsock: update SO_RCVLOWAT setting
+ callback
+Message-ID: <20231214061738-mutt-send-email-mst@kernel.org>
+References: <20231214091947.395892-1-avkrasnov@salutedevices.com>
+ <20231214091947.395892-4-avkrasnov@salutedevices.com>
+ <20231214052502-mutt-send-email-mst@kernel.org>
+ <e0e601a9-6cb2-e484-eb70-f41e7ec69c65@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e0e601a9-6cb2-e484-eb70-f41e7ec69c65@salutedevices.com>
 
-Introduce a new KVM device that represents a virtio device in order to
-allow user to indicate device hardware's noncoherent DMA status.
+On Thu, Dec 14, 2023 at 01:52:50PM +0300, Arseniy Krasnov wrote:
+> 
+> 
+> On 14.12.2023 13:29, Michael S. Tsirkin wrote:
+> > On Thu, Dec 14, 2023 at 12:19:46PM +0300, Arseniy Krasnov wrote:
+> >> Do not return if transport callback for SO_RCVLOWAT is set (only in
+> >> error case). In this case we don't need to set 'sk_rcvlowat' field in
+> >> each transport - only in 'vsock_set_rcvlowat()'. Also, if 'sk_rcvlowat'
+> >> is now set only in af_vsock.c, change callback name from 'set_rcvlowat'
+> >> to 'notify_set_rcvlowat'.
+> >>
+> >> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+> >> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> >> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> > 
+> > Maybe squash this with patch 2/4?
+> 
+> You mean just do 'git squash' without updating commit message manually?
+> 
+> Thanks, Arseniy
 
-Motivation
-===
-A virtio GPU device may want to configure GPU hardware to work in
-noncoherent mode, i.e. some of its DMAs do not snoop CPU caches.
-This is generally for performance consideration.
-In certain platform, GFX performance can improve 20+% with DMAs going to
-noncoherent path.
+commit message should reflect all that patch does.
 
-This noncoherent DMA mode works in below sequence:
-1. Host backend driver programs hardware not to snoop memory of target
-   DMA buffer.
-2. Host backend driver indicates guest frontend driver to program guest PAT
-   to WC for target DMA buffer.
-3. Guest frontend driver writes to the DMA buffer without clflush stuffs.
-4. Hardware does noncoherent DMA to the target buffer.
-
-In this noncoherent DMA mode, both guest and hardware regard a DMA buffer
-as not cached. So, if KVM forces the effective memory type of this DMA
-buffer to be WB, hardware DMA may read incorrect data and cause misc
-failures.
-
-Therefore, we introduce a new KVM virtio device to let KVM be aware that
-the virtio device hardware is working in noncoherent mode.
-Then, KVM will honor guest PAT type in Intel's platform.
-
-For a virtio device model (e.g. QEMU), if it knows device hardware is to be
-configured to work in
-
-a. noncoherent mode,
-   - on device realization,
-     it can create a KVM virtio device and set device attr to increase KVM
-     noncoherent DMA count;
-   - on device unrealization,
-     destroy the KVM virtio device to decrease KVM noncoherent DMA count.
-
-b. coherent mode,
-   just do nothing.
-
-Security
-===
-The biggest concern for KVM to honor guest's memory type in Intel platform
-is page aliasing issue.
-- For host MMIO, it's not a concern as KVM VMX programs EPT memory type to
-  UC (which will overwrite all guest PAT type except WC) no matter guest
-  memory type is honored or not.
-
-- For host non-MMIO pages,
-  * virtio guest frontend and host backend driver should be synced to use
-    the same memory type to map a buffer. Otherwise, there will be
-    potential problem for incorrect memory data. But this will only impact
-    the buggy guest alone.
-  * for live migration,
-    as QEMU will read all guest memory during live migration, page aliasing
-    could happen.
-    Current thinking is to disable live migration if a virtio device has
-    indicated its noncoherent state.
-    As a follow-up, we can discuss other solutions. e.g.
-    (a) switching back to coherent path before starting live migration.
-    (b) read/write of guest memory with clflush during live migration.
-
-Implementation Consideration
-===
-There is a previous series [1] from google to serve the same purpose to
-let KVM be aware of virtio GPU's noncoherent DMA status. That series
-requires a new memslot flag, and special memslots in user space.
-
-We don't choose to use memslot flag to request honoring guest memory type.
-Instead we hope to make the honoring request to be explicit (not tied to a
-memslot flag). This is because once guest memory type is honored, not only
-memory used by guest virtio device, but all guest memory is facing page
-aliasing issue potentially. KVM needs a generic solution to take care of
-page aliasing issue rather than counting on memory type of a special
-memslot being aligned in host and guest.
-(we can discuss what a generic solution to handle page aliasing issue will
-look like in later follow-up series).
-
-On the other hand, we choose to introduce a KVM virtio device rather than
-just provide an ioctl to wrap kvm_arch_[un]register_noncoherent_dma()
-directly, which is based on considerations that
-1. Explicitly limit the "register noncoherent DMA" ability to virtio
-   devices.
-2. Provide a better encapsulation.
-   Repeated setting noncoherent attribute to a KVM virtio device will only
-   increase KVM noncoherent DMA count for once.
-   KVM noncohrent DMA count will be decreased automatically when KVM virtio
-   device is closed.
-3. The KVM virtio device can be extended to let KVM know more info about
-   the device to introduce non-coherent DMA.
-
-Example QEMU usage
-===
-- on virtio device realize:
-   struct kvm_create_device cd = {
-       .type = KVM_DEV_TYPE_VIRTIO,
-   };
-   kvm_vm_ioctl(kvm_state, KVM_CREATE_DEVICE, &cd);
-
-   struct kvm_device_attr attr = {
-       .group = KVM_DEV_VIRTIO_NONCOHERENT,
-       .attr = KVM_DEV_VIRTIO_NONCOHERENT_SET,
-   };
-
-   ioctl(cd.fd, KVM_SET_DEVICE_ATTR, &attr);
-
-   g->kvm_device_fd = cd.fd;
-
-- on virtio device unrealize
-  close(g->kvm_device_fd);
-
-Reviewed-by: Zhenyu Wang <zhenyuw@linux.intel.com>
-Link: https://patchwork.kernel.org/project/dri-devel/cover/20200213213036.207625-1-olvaffe@gmail.com/ [1]
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
----
- arch/x86/kvm/Kconfig     |   1 +
- include/uapi/linux/kvm.h |   5 ++
- virt/kvm/Kconfig         |   3 +
- virt/kvm/Makefile.kvm    |   1 +
- virt/kvm/kvm_main.c      |   8 +++
- virt/kvm/virtio.c        | 121 +++++++++++++++++++++++++++++++++++++++
- virt/kvm/virtio.h        |  18 ++++++
- 7 files changed, 157 insertions(+)
- create mode 100644 virt/kvm/virtio.c
- create mode 100644 virt/kvm/virtio.h
-
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index b07247b0b958..9f7223d298a2 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -44,6 +44,7 @@ config KVM
- 	select KVM_XFER_TO_GUEST_WORK
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select KVM_VFIO
-+	select KVM_VIRTIO
- 	select INTERVAL_TREE
- 	select HAVE_KVM_PM_NOTIFIER if PM
- 	select KVM_GENERIC_HARDWARE_ENABLING
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index b1f92a0edc35..7f57fa902a0a 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1394,6 +1394,9 @@ struct kvm_device_attr {
- #define   KVM_DEV_VFIO_GROUP_DEL	KVM_DEV_VFIO_FILE_DEL
- #define   KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE		3
- 
-+#define KVM_DEV_VIRTIO_NONCOHERENT	1
-+#define KVM_DEV_VIRTIO_NONCOHERENT_SET	1
-+
- enum kvm_device_type {
- 	KVM_DEV_TYPE_FSL_MPIC_20	= 1,
- #define KVM_DEV_TYPE_FSL_MPIC_20	KVM_DEV_TYPE_FSL_MPIC_20
-@@ -1417,6 +1420,8 @@ enum kvm_device_type {
- #define KVM_DEV_TYPE_ARM_PV_TIME	KVM_DEV_TYPE_ARM_PV_TIME
- 	KVM_DEV_TYPE_RISCV_AIA,
- #define KVM_DEV_TYPE_RISCV_AIA		KVM_DEV_TYPE_RISCV_AIA
-+	KVM_DEV_TYPE_VIRTIO,
-+#define KVM_DEV_TYPE_VIRTIO		KVM_DEV_TYPE_VIRTIO
- 	KVM_DEV_TYPE_MAX,
- };
- 
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index 6793211a0b64..5dcba034593c 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -56,6 +56,9 @@ config HAVE_KVM_CPU_RELAX_INTERCEPT
- config KVM_VFIO
-        bool
- 
-+config KVM_VIRTIO
-+       bool
-+
- config HAVE_KVM_INVALID_WAKEUPS
-        bool
- 
-diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
-index 724c89af78af..614c4c4fe50e 100644
---- a/virt/kvm/Makefile.kvm
-+++ b/virt/kvm/Makefile.kvm
-@@ -7,6 +7,7 @@ KVM ?= ../../../virt/kvm
- 
- kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
- kvm-$(CONFIG_KVM_VFIO) += $(KVM)/vfio.o
-+kvm-$(CONFIG_KVM_VIRTIO) += $(KVM)/virtio.o
- kvm-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
- kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
- kvm-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index acd67fb40183..dca2040368da 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -61,6 +61,7 @@
- #include "async_pf.h"
- #include "kvm_mm.h"
- #include "vfio.h"
-+#include "virtio.h"
- 
- #include <trace/events/ipi.h>
- 
-@@ -6453,6 +6454,10 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
- 	if (WARN_ON_ONCE(r))
- 		goto err_vfio;
- 
-+	r = kvm_virtio_ops_init();
-+	if (WARN_ON_ONCE(r))
-+		goto err_virtio;
-+
- 	kvm_gmem_init(module);
- 
- 	/*
-@@ -6468,6 +6473,8 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
- 	return 0;
- 
- err_register:
-+	kvm_virtio_ops_exit();
-+err_virtio:
- 	kvm_vfio_ops_exit();
- err_vfio:
- 	kvm_async_pf_deinit();
-@@ -6503,6 +6510,7 @@ void kvm_exit(void)
- 		free_cpumask_var(per_cpu(cpu_kick_mask, cpu));
- 	kmem_cache_destroy(kvm_vcpu_cache);
- 	kvm_vfio_ops_exit();
-+	kvm_virtio_ops_exit();
- 	kvm_async_pf_deinit();
- #ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
- 	unregister_syscore_ops(&kvm_syscore_ops);
-diff --git a/virt/kvm/virtio.c b/virt/kvm/virtio.c
-new file mode 100644
-index 000000000000..dbb25d9784c5
---- /dev/null
-+++ b/virt/kvm/virtio.c
-@@ -0,0 +1,121 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * KVM-VIRTIO device
-+ *
-+ */
-+#include <linux/kvm_host.h>
-+#include <linux/errno.h>
-+#include <linux/mutex.h>
-+#include <linux/slab.h>
-+#include "virtio.h"
-+
-+struct kvm_virtio {
-+	struct mutex lock;
-+	bool noncoherent;
-+};
-+
-+static int kvm_virtio_set_noncoherent(struct kvm_device *dev, long attr,
-+				      void __user *arg)
-+{
-+	struct kvm_virtio *kv = dev->private;
-+
-+	/*
-+	 * Currently, only set to noncoherent is allowed, and therefore a virtio
-+	 * device is not allowed to switch back to coherent once it's set to
-+	 * noncoherent.
-+	 * User arg is also not checked as the attr name has indicated that the
-+	 * purpose is to set to noncoherent.
-+	 */
-+	if (attr != KVM_DEV_VIRTIO_NONCOHERENT_SET)
-+		return -ENXIO;
-+
-+	mutex_lock(&kv->lock);
-+	if (kv->noncoherent)
-+		goto out;
-+
-+	kv->noncoherent = true;
-+	kvm_arch_register_noncoherent_dma(dev->kvm);
-+out:
-+	mutex_unlock(&kv->lock);
-+	return 0;
-+}
-+
-+static int kvm_virtio_set_attr(struct kvm_device *dev,
-+			       struct kvm_device_attr *attr)
-+{
-+	switch (attr->group) {
-+	case KVM_DEV_VIRTIO_NONCOHERENT:
-+		return kvm_virtio_set_noncoherent(dev, attr->attr,
-+						  u64_to_user_ptr(attr->addr));
-+	}
-+
-+	return -ENXIO;
-+}
-+
-+static int kvm_virtio_has_attr(struct kvm_device *dev,
-+			     struct kvm_device_attr *attr)
-+{
-+	switch (attr->group) {
-+	case KVM_DEV_VIRTIO_NONCOHERENT:
-+		switch (attr->attr) {
-+		case KVM_DEV_VIRTIO_NONCOHERENT_SET:
-+			return 0;
-+		}
-+
-+		break;
-+	}
-+
-+	return -ENXIO;
-+}
-+
-+static void kvm_virtio_release(struct kvm_device *dev)
-+{
-+	struct kvm_virtio *kv = dev->private;
-+
-+	if (kv->noncoherent)
-+		kvm_arch_unregister_noncoherent_dma(dev->kvm);
-+	kfree(kv);
-+	kfree(dev); /* alloc by kvm_ioctl_create_device, free by .release */
-+}
-+
-+static int kvm_virtio_create(struct kvm_device *dev, u32 type);
-+
-+static struct kvm_device_ops kvm_virtio_ops = {
-+	.name = "kvm-virtio",
-+	.create = kvm_virtio_create,
-+	.release = kvm_virtio_release,
-+	.set_attr = kvm_virtio_set_attr,
-+	.has_attr = kvm_virtio_has_attr,
-+};
-+
-+static int kvm_virtio_create(struct kvm_device *dev, u32 type)
-+{
-+	struct kvm_virtio *kv;
-+
-+	if (type != KVM_DEV_TYPE_VIRTIO)
-+		return -ENODEV;
-+
-+	/*
-+	 * This kvm_virtio device is created per virtio device.
-+	 * Its default noncoherent state is false.
-+	 */
-+	kv = kzalloc(sizeof(*kv), GFP_KERNEL_ACCOUNT);
-+	if (!kv)
-+		return -ENOMEM;
-+
-+	mutex_init(&kv->lock);
-+
-+	dev->private = kv;
-+
-+	return 0;
-+}
-+
-+int kvm_virtio_ops_init(void)
-+{
-+	return kvm_register_device_ops(&kvm_virtio_ops, KVM_DEV_TYPE_VIRTIO);
-+}
-+
-+void kvm_virtio_ops_exit(void)
-+{
-+	kvm_unregister_device_ops(KVM_DEV_TYPE_VIRTIO);
-+}
-diff --git a/virt/kvm/virtio.h b/virt/kvm/virtio.h
-new file mode 100644
-index 000000000000..0353398ee1f2
---- /dev/null
-+++ b/virt/kvm/virtio.h
-@@ -0,0 +1,18 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __KVM_VIRTIO_H
-+#define __KVM_VIRTIO_H
-+
-+#ifdef CONFIG_KVM_VIRTIO
-+int kvm_virtio_ops_init(void);
-+void kvm_virtio_ops_exit(void);
-+#else
-+static inline int kvm_virtio_ops_init(void)
-+{
-+	return 0;
-+}
-+static inline void kvm_virtio_ops_exit(void)
-+{
-+}
-+#endif
-+
-+#endif
-
-base-commit: 8ed26ab8d59111c2f7b86d200d1eb97d2a458fd1
--- 
-2.17.1
+> > 
+> >> ---
+> >>  Changelog:
+> >>  v3 -> v4:
+> >>   * Rename 'set_rcvlowat' to 'notify_set_rcvlowat'.
+> >>   * Commit message updated.
+> >>
+> >>  include/net/af_vsock.h           | 2 +-
+> >>  net/vmw_vsock/af_vsock.c         | 9 +++++++--
+> >>  net/vmw_vsock/hyperv_transport.c | 4 ++--
+> >>  3 files changed, 10 insertions(+), 5 deletions(-)
+> >>
+> >> diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+> >> index e302c0e804d0..535701efc1e5 100644
+> >> --- a/include/net/af_vsock.h
+> >> +++ b/include/net/af_vsock.h
+> >> @@ -137,7 +137,6 @@ struct vsock_transport {
+> >>  	u64 (*stream_rcvhiwat)(struct vsock_sock *);
+> >>  	bool (*stream_is_active)(struct vsock_sock *);
+> >>  	bool (*stream_allow)(u32 cid, u32 port);
+> >> -	int (*set_rcvlowat)(struct vsock_sock *vsk, int val);
+> >>  
+> >>  	/* SEQ_PACKET. */
+> >>  	ssize_t (*seqpacket_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
+> >> @@ -168,6 +167,7 @@ struct vsock_transport {
+> >>  		struct vsock_transport_send_notify_data *);
+> >>  	/* sk_lock held by the caller */
+> >>  	void (*notify_buffer_size)(struct vsock_sock *, u64 *);
+> >> +	int (*notify_set_rcvlowat)(struct vsock_sock *vsk, int val);
+> >>  
+> >>  	/* Shutdown. */
+> >>  	int (*shutdown)(struct vsock_sock *, int);
+> >> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> >> index 816725af281f..54ba7316f808 100644
+> >> --- a/net/vmw_vsock/af_vsock.c
+> >> +++ b/net/vmw_vsock/af_vsock.c
+> >> @@ -2264,8 +2264,13 @@ static int vsock_set_rcvlowat(struct sock *sk, int val)
+> >>  
+> >>  	transport = vsk->transport;
+> >>  
+> >> -	if (transport && transport->set_rcvlowat)
+> >> -		return transport->set_rcvlowat(vsk, val);
+> >> +	if (transport && transport->notify_set_rcvlowat) {
+> >> +		int err;
+> >> +
+> >> +		err = transport->notify_set_rcvlowat(vsk, val);
+> >> +		if (err)
+> >> +			return err;
+> >> +	}
+> >>  
+> >>  	WRITE_ONCE(sk->sk_rcvlowat, val ? : 1);
+> >>  	return 0;
+> > 
+> > 
+> > 
+> > I would s
+> > 
+> >> diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+> >> index 7cb1a9d2cdb4..e2157e387217 100644
+> >> --- a/net/vmw_vsock/hyperv_transport.c
+> >> +++ b/net/vmw_vsock/hyperv_transport.c
+> >> @@ -816,7 +816,7 @@ int hvs_notify_send_post_enqueue(struct vsock_sock *vsk, ssize_t written,
+> >>  }
+> >>  
+> >>  static
+> >> -int hvs_set_rcvlowat(struct vsock_sock *vsk, int val)
+> >> +int hvs_notify_set_rcvlowat(struct vsock_sock *vsk, int val)
+> >>  {
+> >>  	return -EOPNOTSUPP;
+> >>  }
+> >> @@ -856,7 +856,7 @@ static struct vsock_transport hvs_transport = {
+> >>  	.notify_send_pre_enqueue  = hvs_notify_send_pre_enqueue,
+> >>  	.notify_send_post_enqueue = hvs_notify_send_post_enqueue,
+> >>  
+> >> -	.set_rcvlowat             = hvs_set_rcvlowat
+> >> +	.notify_set_rcvlowat      = hvs_notify_set_rcvlowat
+> >>  };
+> >>  
+> >>  static bool hvs_check_transport(struct vsock_sock *vsk)
+> >> -- 
+> >> 2.25.1
+> > 
 
 
