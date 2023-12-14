@@ -1,294 +1,284 @@
-Return-Path: <kvm+bounces-4535-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4536-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D76C813B1A
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 20:55:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 274DC813B2E
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 21:03:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF3D71F222A9
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 19:55:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D19DC1F225B3
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 20:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F69F6A35B;
-	Thu, 14 Dec 2023 19:54:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBE526A01C;
+	Thu, 14 Dec 2023 20:03:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b="f1uo5HYh"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CxDxm+FC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A363769794
-	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 19:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bitbyteword.org
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3b9e7f4a0d7so5885668b6e.1
-        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 11:54:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bitbyteword.org; s=google; t=1702583646; x=1703188446; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=whJNqJEvK2equSL1Yk+tP3TQhBfQ0dYWdrlrbsekLXg=;
-        b=f1uo5HYhacHQM29wEytt4BCuaOs3nSnGdNN68mQiN3C9sRjhU8qDmOd+pdhr+jEWFa
-         FdWYwgCp7lk8SdvbPq7u8GytcRg5d6vtY2tcQneCIjPQtBIthu5VXdQZ0CcnF8+WSx9G
-         fpEnuxP5vMf3ufKmrd/mJTCA6YE2mY0CCsqe22C5MU4HMBxI8SHfA7826rCuKm5w2SfZ
-         IXz8erUmGN09japhqPn24R5SbnlKh7EAIIn83K0MiGVTFbYjaI3Dv8tYNhR37bYOCYWO
-         rDIPP7DR1At7928LenT7tH1qG2UmosbuufqBiA+4CrZUbgSsiuDfdjzq6ETFicCP6nEZ
-         3RBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702583646; x=1703188446;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=whJNqJEvK2equSL1Yk+tP3TQhBfQ0dYWdrlrbsekLXg=;
-        b=PL1VlH/1OKvnpXzlD2rnbT5oxSrmpOgFWGaPdLO/lsMzJUKi6+zDRfLGqSIuFhhBpt
-         WcTHtaPSi/lYiATdyE4QWYDESIv22drYrx0nUu6LtxrMNw7lhev7ttSemzTKCvjdCNeZ
-         8kixAL2rEU5zKGpq2kdRJ+s7eu+M7asrd7SvBCdUNvqUS6ifc+vY1I08iU0k6nY0lCn7
-         lPhGDb4sm8AZsviV3uqvIU8TTMrfR48JUPYvBom3TgfhzGt+SotfB1D3DgzwarJu3yN9
-         vKPsSyJ2uW3xMPmDV/49qN6MhN5cGjDidDRroecJEpsrhkiMuYudNGlNmta/GxnYj4dl
-         hdNw==
-X-Gm-Message-State: AOJu0YyIM2a1kP5UiYH7bTnHTQ16vm0BGMuMcxgsnz2a/rg+NGL2LXUk
-	mueFU/8pigJi9UawKr1M8m3e8vldaXZ6Fs7K0dxNMg==
-X-Google-Smtp-Source: AGHT+IHaLrp5FbFQ3YpWs9+aTsAYCEx3GzWSlZGvk1xuyNLtqt4BpMhYleL1VDKPiiKksmT1W/bLP9mBsZ1SfhoaBUc=
-X-Received: by 2002:a05:6870:219e:b0:203:27a5:cf21 with SMTP id
- l30-20020a056870219e00b0020327a5cf21mr3585305oae.26.1702583646337; Thu, 14
- Dec 2023 11:54:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF92697B9;
+	Thu, 14 Dec 2023 20:03:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BEIqAnu014262;
+	Thu, 14 Dec 2023 20:03:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=x8XoeypXWZ9sNEFHxUhrm0suPboCMN4kuoiSzfdehZs=;
+ b=CxDxm+FCfIoqcouqCoYS75SpQk/xrcx9EAzIVeEEbgwOH5zQny9cX9GLP1lWs3nnYl3m
+ y9f6tdf2sHCGIHF5DNT352mx50yf6H8y/yU2jb9dKO7hFOVgUQMGB4vsjLDqn/vmztiM
+ c6q8IolZEbMUiXe7Vo14x55djWogdtC+YdrdezD97E5/gHSBRPHsg0NMO5Nq2N4Mnktd
+ 4o1CQGDwfgQyABnwa+ulH8cEsN/sry6EoCitJQOYYD78ZuqHFHLAk5jx0znTxurHkwKB
+ hiST3QY06ZW6cLa3Bhf0sKrRWEpAjngefXvF8sGNsZlzomh7tZ/cRkgmURrF75cBfKp9 Ow== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v07c39sde-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Dec 2023 20:02:59 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BEJKSdC015537;
+	Thu, 14 Dec 2023 20:02:59 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v07c39sch-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Dec 2023 20:02:59 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BEJX3B0014819;
+	Thu, 14 Dec 2023 20:02:58 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uw42khyfu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Dec 2023 20:02:58 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BEK2tsj10420826
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 14 Dec 2023 20:02:55 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E8B372004B;
+	Thu, 14 Dec 2023 20:02:54 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B2D3720043;
+	Thu, 14 Dec 2023 20:02:54 +0000 (GMT)
+Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.152.224.238])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 14 Dec 2023 20:02:54 +0000 (GMT)
+Message-ID: <b61da0ed88a86d0823ac26d72f9914a7c392b415.camel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 3/5] s390x: Add library functions for
+ exiting from snippet
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Nico =?ISO-8859-1?Q?B=F6hr?= <nrb@linux.ibm.com>,
+        Thomas Huth
+ <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Andrew Jones
+ <andrew.jones@linux.dev>,
+        David Hildenbrand <david@redhat.com>
+Date: Thu, 14 Dec 2023 21:02:53 +0100
+In-Reply-To: <20231213174222.542e11c6@p-imbrenda>
+References: <20231213124942.604109-1-nsg@linux.ibm.com>
+	 <20231213124942.604109-4-nsg@linux.ibm.com>
+	 <20231213174222.542e11c6@p-imbrenda>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231214024727.3503870-1-vineeth@bitbyteword.org>
- <20231214024727.3503870-2-vineeth@bitbyteword.org> <877clhkqct.fsf@redhat.com>
-In-Reply-To: <877clhkqct.fsf@redhat.com>
-From: Vineeth Remanan Pillai <vineeth@bitbyteword.org>
-Date: Thu, 14 Dec 2023 14:53:55 -0500
-Message-ID: <CAO7JXPg9wN3SQOciAjVTn6fdgdpKA0CjaYg5UvXosYHT=1CeuA@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/8] kvm: x86: MSR for setting up scheduler info
- shared memory
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Suleiman Souhlal <suleiman@google.com>, Masami Hiramatsu <mhiramat@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, x86@kernel.org, 
-	Joel Fernandes <joel@joelfernandes.org>, Ben Segall <bsegall@google.com>, 
-	Borislav Petkov <bp@alien8.de>, Daniel Bristot de Oliveira <bristot@redhat.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Dietmar Eggemann <dietmar.eggemann@arm.com>, 
-	"H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, 
-	Mel Gorman <mgorman@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Sean Christopherson <seanjc@google.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	Valentin Schneider <vschneid@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Wanpeng Li <wanpengli@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: BEgDQ_ICxsHzdmvnWFzV6Tu-p3pG7yDz
+X-Proofpoint-GUID: nrXwyXTR7dzykkA7dZ9jVI4yy-H1u5Nh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-14_13,2023-12-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 lowpriorityscore=0 suspectscore=0 mlxlogscore=999 mlxscore=0
+ spamscore=0 impostorscore=0 phishscore=0 malwarescore=0 adultscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312140143
 
-On Thu, Dec 14, 2023 at 5:53=E2=80=AFAM Vitaly Kuznetsov <vkuznets@redhat.c=
-om> wrote:
->
-> "Vineeth Pillai (Google)" <vineeth@bitbyteword.org> writes:
->
-> > Implement a kvm MSR that guest uses to provide the GPA of shared memory
-> > for communicating the scheduling information between host and guest.
-> >
-> > wrmsr(0) disables the feature. wrmsr(valid_gpa) enables the feature and
-> > uses the gpa for further communication.
-> >
-> > Also add a new cpuid feature flag for the host to advertise the feature
-> > to the guest.
-> >
-> > Co-developed-by: Joel Fernandes (Google) <joel@joelfernandes.org>
-> > Signed-off-by: Joel Fernandes (Google) <joel@joelfernandes.org>
-> > Signed-off-by: Vineeth Pillai (Google) <vineeth@bitbyteword.org>
+On Wed, 2023-12-13 at 17:42 +0100, Claudio Imbrenda wrote:
+> On Wed, 13 Dec 2023 13:49:40 +0100
+> Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
+>=20
+> > It is useful to be able to force an exit to the host from the snippet,
+> > as well as do so while returning a value.
+> > Add this functionality, also add helper functions for the host to check
+> > for an exit and get or check the value.
+> > Use diag 0x44 and 0x9c for this.
+> > Add a guest specific snippet header file and rename the host's.
+>=20
+> you should also mention here that you are splitting snippet.h into a
+> host-only part and a guest-only part
+
+Well, I'm not splitting anything. Is it not clear that "the host's"
+refers to snippet.h?
+
+How about:
+Add a guest specific snippet header file and rename snippet.h to reflect
+that it is host specific.
+>=20
+> >=20
+> > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 > > ---
-> >  arch/x86/include/asm/kvm_host.h      | 25 ++++++++++++
-> >  arch/x86/include/uapi/asm/kvm_para.h | 24 +++++++++++
-> >  arch/x86/kvm/Kconfig                 | 12 ++++++
-> >  arch/x86/kvm/cpuid.c                 |  2 +
-> >  arch/x86/kvm/x86.c                   | 61 ++++++++++++++++++++++++++++
-> >  include/linux/kvm_host.h             |  5 +++
-> >  6 files changed, 129 insertions(+)
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
-_host.h
-> > index f72b30d2238a..f89ba1f07d88 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -987,6 +987,18 @@ struct kvm_vcpu_arch {
-> >       /* Protected Guests */
-> >       bool guest_state_protected;
-> >
-> > +#ifdef CONFIG_PARAVIRT_SCHED_KVM
-> > +     /*
-> > +      * MSR to setup a shared memory for scheduling
-> > +      * information sharing between host and guest.
-> > +      */
-> > +     struct {
-> > +             enum kvm_vcpu_boost_state boost_status;
-> > +             u64 msr_val;
-> > +             struct gfn_to_hva_cache data;
-> > +     } pv_sched;
-> > +#endif
-> > +
-> >       /*
-> >        * Set when PDPTS were loaded directly by the userspace without
-> >        * reading the guest memory
-> > @@ -2217,4 +2229,17 @@ int memslot_rmap_alloc(struct kvm_memory_slot *s=
-lot, unsigned long npages);
-> >   */
-> >  #define KVM_EXIT_HYPERCALL_MBZ               GENMASK_ULL(31, 1)
-> >
-> > +#ifdef CONFIG_PARAVIRT_SCHED_KVM
-> > +static inline bool kvm_arch_vcpu_pv_sched_enabled(struct kvm_vcpu_arch=
- *arch)
+> >  s390x/Makefile                          |  1 +
+> >  lib/s390x/asm/arch_def.h                | 13 ++++++++
+> >  lib/s390x/sie.h                         |  1 +
+> >  lib/s390x/snippet-guest.h               | 26 ++++++++++++++++
+> >  lib/s390x/{snippet.h =3D> snippet-host.h} |  9 ++++--
+> >  lib/s390x/sie.c                         | 28 +++++++++++++++++
+> >  lib/s390x/snippet-host.c                | 40 +++++++++++++++++++++++++
+> >  lib/s390x/uv.c                          |  2 +-
+> >  s390x/mvpg-sie.c                        |  2 +-
+> >  s390x/pv-diags.c                        |  2 +-
+> >  s390x/pv-icptcode.c                     |  2 +-
+> >  s390x/pv-ipl.c                          |  2 +-
+> >  s390x/sie-dat.c                         |  2 +-
+> >  s390x/spec_ex-sie.c                     |  2 +-
+> >  s390x/uv-host.c                         |  2 +-
+> >  15 files changed, 123 insertions(+), 11 deletions(-)
+> >  create mode 100644 lib/s390x/snippet-guest.h
+> >  rename lib/s390x/{snippet.h =3D> snippet-host.h} (93%)
+> >  create mode 100644 lib/s390x/snippet-host.c
+>=20
+> [...]
+>=20
+> > diff --git a/lib/s390x/sie.c b/lib/s390x/sie.c
+> > index 40936bd2..908b0130 100644
+> > --- a/lib/s390x/sie.c
+> > +++ b/lib/s390x/sie.c
+> > @@ -42,6 +42,34 @@ void sie_check_validity(struct vm *vm, uint16_t vir_=
+exp)
+> >  	report(vir_exp =3D=3D vir, "VALIDITY: %x", vir);
+> >  }
+> > =20
+> > +bool sie_is_diag_icpt(struct vm *vm, unsigned int diag)
 > > +{
-> > +     return arch->pv_sched.msr_val;
-> > +}
+> > +	uint32_t ipb =3D vm->sblk->ipb;
+> > +	uint64_t code;
+>=20
+> uint64_t code =3D 0;
+>=20
+> > +	uint16_t displace;
+> > +	uint8_t base;
+> > +	bool ret =3D true;
+>=20
+> bool ret;
+>=20
 > > +
-> > +static inline void kvm_arch_vcpu_set_boost_status(struct kvm_vcpu_arch=
- *arch,
-> > +             enum kvm_vcpu_boost_state boost_status)
-> > +{
-> > +     arch->pv_sched.boost_status =3D boost_status;
-> > +}
-> > +#endif
-> > +
-> >  #endif /* _ASM_X86_KVM_HOST_H */
-> > diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/ua=
-pi/asm/kvm_para.h
-> > index 6e64b27b2c1e..6b1dea07a563 100644
-> > --- a/arch/x86/include/uapi/asm/kvm_para.h
-> > +++ b/arch/x86/include/uapi/asm/kvm_para.h
-> > @@ -36,6 +36,7 @@
-> >  #define KVM_FEATURE_MSI_EXT_DEST_ID  15
-> >  #define KVM_FEATURE_HC_MAP_GPA_RANGE 16
-> >  #define KVM_FEATURE_MIGRATION_CONTROL        17
-> > +#define KVM_FEATURE_PV_SCHED         18
-> >
-> >  #define KVM_HINTS_REALTIME      0
-> >
-> > @@ -58,6 +59,7 @@
-> >  #define MSR_KVM_ASYNC_PF_INT 0x4b564d06
-> >  #define MSR_KVM_ASYNC_PF_ACK 0x4b564d07
-> >  #define MSR_KVM_MIGRATION_CONTROL    0x4b564d08
-> > +#define MSR_KVM_PV_SCHED     0x4b564da0
-> >
-> >  struct kvm_steal_time {
-> >       __u64 steal;
-> > @@ -150,4 +152,26 @@ struct kvm_vcpu_pv_apf_data {
-> >  #define KVM_PV_EOI_ENABLED KVM_PV_EOI_MASK
-> >  #define KVM_PV_EOI_DISABLED 0x0
-> >
-> > +/*
-> > + * VCPU boost state shared between the host and guest.
-> > + */
-> > +enum kvm_vcpu_boost_state {
-> > +     /* Priority boosting feature disabled in host */
-> > +     VCPU_BOOST_DISABLED =3D 0,
-> > +     /*
-> > +      * vcpu is not explicitly boosted by the host.
-> > +      * (Default priority when the guest started)
-> > +      */
-> > +     VCPU_BOOST_NORMAL,
-> > +     /* vcpu is boosted by the host */
-> > +     VCPU_BOOST_BOOSTED
-> > +};
-> > +
-> > +/*
-> > + * Structure passed in via MSR_KVM_PV_SCHED
-> > + */
-> > +struct pv_sched_data {
-> > +     __u64 boost_status;
-> > +};
-> > +
-> >  #endif /* _UAPI_ASM_X86_KVM_PARA_H */
-> > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> > index 89ca7f4c1464..dbcba73fb508 100644
-> > --- a/arch/x86/kvm/Kconfig
-> > +++ b/arch/x86/kvm/Kconfig
-> > @@ -141,4 +141,16 @@ config KVM_XEN
-> >  config KVM_EXTERNAL_WRITE_TRACKING
-> >       bool
-> >
-> > +config PARAVIRT_SCHED_KVM
-> > +     bool "Enable paravirt scheduling capability for kvm"
-> > +     depends on KVM
-> > +     help
-> > +       Paravirtualized scheduling facilitates the exchange of scheduli=
-ng
-> > +       related information between the host and guest through shared m=
-emory,
-> > +       enhancing the efficiency of vCPU thread scheduling by the hyper=
-visor.
-> > +       An illustrative use case involves dynamically boosting the prio=
-rity of
-> > +       a vCPU thread when the guest is executing a latency-sensitive w=
-orkload
-> > +       on that specific vCPU.
-> > +       This config enables paravirt scheduling in the kvm hypervisor.
-> > +
-> >  endif # VIRTUALIZATION
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index 7bdc66abfc92..960ef6e869f2 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -1113,6 +1113,8 @@ static inline int __do_cpuid_func(struct kvm_cpui=
-d_array *array, u32 function)
-> >                            (1 << KVM_FEATURE_POLL_CONTROL) |
-> >                            (1 << KVM_FEATURE_PV_SCHED_YIELD) |
-> >                            (1 << KVM_FEATURE_ASYNC_PF_INT);
-> > +             if (IS_ENABLED(CONFIG_PARAVIRT_SCHED_KVM))
-> > +                     entry->eax |=3D (1 << KVM_FEATURE_PV_SCHED);
-> >
-> >               if (sched_info_on())
-> >                       entry->eax |=3D (1 << KVM_FEATURE_STEAL_TIME);
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 7bcf1a76a6ab..0f475b50ac83 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -3879,6 +3879,33 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, st=
-ruct msr_data *msr_info)
-> >                       return 1;
-> >               break;
-> >
-> > +#ifdef CONFIG_PARAVIRT_SCHED_KVM
-> > +     case MSR_KVM_PV_SCHED:
-> > +             if (!guest_pv_has(vcpu, KVM_FEATURE_PV_SCHED))
-> > +                     return 1;
-> > +
-> > +             if (!(data & KVM_MSR_ENABLED))
-> > +                     break;
-> > +
-> > +             if (!(data & ~KVM_MSR_ENABLED)) {
-> > +                     /*
-> > +                      * Disable the feature
-> > +                      */
-> > +                     vcpu->arch.pv_sched.msr_val =3D 0;
-> > +                     kvm_set_vcpu_boosted(vcpu, false);
-> > +             } if (!kvm_gfn_to_hva_cache_init(vcpu->kvm,
-> > +                             &vcpu->arch.pv_sched.data, data & ~KVM_MS=
-R_ENABLED,
-> > +                             sizeof(struct pv_sched_data))) {
-> > +                     vcpu->arch.pv_sched.msr_val =3D data;
-> > +                     kvm_set_vcpu_boosted(vcpu, false);
-> > +             } else {
-> > +                     pr_warn("MSR_KVM_PV_SCHED: kvm:%p, vcpu:%p, "
-> > +                             "msr value: %llx, kvm_gfn_to_hva_cache_in=
-it failed!\n",
-> > +                             vcpu->kvm, vcpu, data & ~KVM_MSR_ENABLED)=
-;
->
-> As this is triggerable by the guest please drop this print (which is not
-> even ratelimited!). I think it would be better to just 'return 1;' in cas=
-e
-> of kvm_gfn_to_hva_cache_init() failure but maybe you also need to
-> account for 'msr_info->host_initiated' to not fail setting this MSR from
-> the host upon migration.
->
-Makes sense, shall remove the pr_warn.
-I hadn't thought about migration, thanks for bringing this up. Will
-make modifications to account for migration as well.
+> > +	ret =3D ret && vm->sblk->icptcode =3D=3D ICPT_INST;
+> > +	ret =3D ret && (vm->sblk->ipa & 0xff00) =3D=3D 0x8300;
+>=20
+> ret =3D vm->sblk->icptcode =3D=3D ICPT_INST && (vm->sblk->ipa & 0xff00) =
+=3D=3D
+> 0x8300;
 
-Thanks,
-Vineeth
+(*) see below
+>=20
+> > +	switch (diag) {
+> > +	case 0x44:
+> > +	case 0x9c:
+> > +		ret =3D ret && !(ipb & 0xffff);
+> > +		ipb >>=3D 16;
+> > +		displace =3D ipb & 0xfff;
+>=20
+> maybe it's more readable to avoid shifting thigs around all the time:
+
+I don't know, now I gotta be able to do rudimentary arithmetic :D
+I don't really have a preference.
+I wonder if defining a bit field would be worth it.
+>=20
+> displace =3D (ipb >> 16) & 0xfff;
+> base =3D (ipb >> 28) & 0xf;
+> if (base)
+> 	code =3D vm->....[base];
+> code =3D (code + displace) & 0xffff;
+> if (ipb & 0xffff || code !=3D diag)
+> 	return false;
+>=20
+> > +		ipb >>=3D 12;
+> > +		base =3D ipb & 0xf;
+> > +		code =3D base ? vm->save_area.guest.grs[base] + displace : displace;
+> > +		code &=3D 0xffff;
+> > +		ret =3D ret && (code =3D=3D diag);
+> > +		break;
+> > +	default:
+> > +		abort(); /* not implemented */
+> > +	}
+> > +	return ret;
+>=20
+> although I have the feeling that this would be more readable if you
+> would check diag immediately, and avoid using ret
+
+Not sure what you mean, do you want an early return at (*)?
+>=20
+> > +}
+> > +
+> >  void sie_handle_validity(struct vm *vm)
+> >  {
+> >  	if (vm->sblk->icptcode !=3D ICPT_VALIDITY)
+> > diff --git a/lib/s390x/snippet-host.c b/lib/s390x/snippet-host.c
+> > new file mode 100644
+> > index 00000000..a829c1d5
+> > --- /dev/null
+> > +++ b/lib/s390x/snippet-host.c
+> > @@ -0,0 +1,40 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/*
+> > + * Snippet functionality for the host.
+> > + *
+> > + * Copyright IBM Corp. 2023
+> > + */
+> > +
+> > +#include <libcflat.h>
+> > +#include <snippet-host.h>
+> > +#include <sie.h>
+> > +
+> > +bool snippet_check_force_exit(struct vm *vm)
+> > +{
+> > +	bool r;
+> > +
+> > +	r =3D sie_is_diag_icpt(vm, 0x44);
+> > +	report(r, "guest forced exit");
+> > +	return r;
+> > +}
+> > +
+> > +bool snippet_get_force_exit_value(struct vm *vm, uint64_t *value)
+> > +{
+> > +	struct kvm_s390_sie_block *sblk =3D vm->sblk;
+> > +
+> > +	if (sie_is_diag_icpt(vm, 0x9c)) {
+> > +		*value =3D vm->save_area.guest.grs[(sblk->ipa & 0xf0) >> 4];
+> > +		report_pass("guest forced exit with value: 0x%lx", *value);
+> > +		return true;
+> > +	}
+> > +	report_fail("guest forced exit with value");
+> > +	return false;
+> > +}
+> > +
+> > +void snippet_check_force_exit_value(struct vm *vm, uint64_t value_exp)
+> > +{
+> > +	uint64_t value;
+> > +
+> > +	if (snippet_get_force_exit_value(vm, &value))
+> > +		report(value =3D=3D value_exp, "guest exit value matches 0x%lx", val=
+ue_exp);
+> > +}
+>=20
+> from a readability and a consistency perspective, it would be better if
+> the functions would only check stuff and return a bool or a value, and
+> do the report() in the body of the testcase
+
+Hmm, I chose to do the report in order to be consistent with check_pgm_int_=
+code.
+>=20
+>=20
+> [...]
+
 
