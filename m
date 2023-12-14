@@ -1,193 +1,177 @@
-Return-Path: <kvm+bounces-4493-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4494-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 815F48130D3
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 14:02:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60DAC813185
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 14:27:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E9FA1C21AE0
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 13:02:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 171AB1F221E7
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 13:27:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71D452F9F;
-	Thu, 14 Dec 2023 13:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75ACC56B67;
+	Thu, 14 Dec 2023 13:27:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="j/OX8htx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aswqkEwH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7E321B8;
-	Thu, 14 Dec 2023 05:01:23 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 010FB12006E;
-	Thu, 14 Dec 2023 16:01:22 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 010FB12006E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1702558882;
-	bh=qQ0wXpLN/ynFGKJ85yV9ErVRRB1u/PzlcDbnZakJogE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=j/OX8htx3B7dxoYJH9ZRKbsOojBStiMSYKkMl1AXbllCu+Xr/Xbd5crEviprYA5vB
-	 nYlHl+ciEZatBBm2UXTRHsdmoIQYDs4Cn5ja7vHqhnHMShuL/mxbDezXhmpCNsmrzf
-	 5qaanmTOkoVrnm0AZUeGqQTDWnhmXKW2hruV6oB0vOs2kpqULbPDJ8s+0RzfoCE7cW
-	 vzSrvH5Y7EallXx9+XCYwS8Vu3xlo1uB6f4fpSytgsTF8qTTvluySlQuG7+YwpwTko
-	 n/IkyI5OkULiBxRfy/Q0jl93dp1rDsrdLSxBG/hdB/l81PGGeQ2RANz6jF9LyoXVjE
-	 OX3pu9V/Vj10g==
-Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Thu, 14 Dec 2023 16:01:21 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 14 Dec 2023 16:01:21 +0300
-Message-ID: <1c768c53-74d8-3220-779a-d2771cb7bab6@salutedevices.com>
-Date: Thu, 14 Dec 2023 15:52:58 +0300
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F203137
+	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 05:26:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702560417;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IFAffqF6CJ5tF413gWMsZUdS3F+1RarOrkMLNThRh2g=;
+	b=aswqkEwH2gbs93vOONgPekW71o0qacZVgMDNfzUIZT/NDOdUwqct9O7wsnyOQC0oEKN4tK
+	fjnhrJ+PHSzw+lkemFtdluEgkiy5p5llDimFLp/Tg7WwCkB1qXdRZizKtckjnIVKf53QyH
+	DbiaWhP66aDjm3g+NSwu2i2ciHnJiOk=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-638-lp5439zRNua0xxywikmdkw-1; Thu, 14 Dec 2023 08:26:56 -0500
+X-MC-Unique: lp5439zRNua0xxywikmdkw-1
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-3ba2072052cso3554770b6e.2
+        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 05:26:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702560415; x=1703165215;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IFAffqF6CJ5tF413gWMsZUdS3F+1RarOrkMLNThRh2g=;
+        b=LEiHVP5rimnXXRKMPQBNisC4jtoqQf2yRGYOZGCpSxGhwCl4/KEM1rRNv2ei5u9GPd
+         Vb0dJAwhh/o4Wn9DoSuw/JasUlS4j65bb7QEjSVwq/wbC3ToUztY+C90tPfBYKIOpKFZ
+         GODoI9k/IrKlITM5zRL7FJnGDFnDCLfXnPqr68aTxIUmdBti32K2h4SuM7C0sza6LVsi
+         aDVavohg/EMxXMfOXVCDNkWbh+PuzpwiFN9bKD6hIPoYXeFO00mo+4rHcdWKQ1DHC4Tb
+         /Gc0WQ/1X4RlO7VCWFXWWfd2Wq+GjQaXHF38GDt3pSvf3SJ3sew8GeI+IV45w269+Crw
+         XHlA==
+X-Gm-Message-State: AOJu0YyXEzaKyzjv6vYCYSNprfZa71Xcqtbe1rYq3QabbAm+d3Qj+Kp8
+	JhmzF/IVqK5osHb9j7adBB4BIQE0Vx9dlqguL1McSoIg5+hU6eGE8oLcYGFn7vFL2XSw1cQeZ5w
+	vYgtsIXqQteWo
+X-Received: by 2002:a05:6808:15a0:b0:3b8:8f56:1528 with SMTP id t32-20020a05680815a000b003b88f561528mr12655501oiw.59.1702560415792;
+        Thu, 14 Dec 2023 05:26:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH6A0o6LtxHVOtyd6bLE1stOm98A3AEhVYosXAG/J+EBuGTbNiQGBFRYQUwTAT43kL/SCrf1A==
+X-Received: by 2002:a05:6808:15a0:b0:3b8:8f56:1528 with SMTP id t32-20020a05680815a000b003b88f561528mr12655487oiw.59.1702560415543;
+        Thu, 14 Dec 2023 05:26:55 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id m19-20020ae9e013000000b0076db5b792basm5271768qkk.75.2023.12.14.05.26.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Dec 2023 05:26:54 -0800 (PST)
+Message-ID: <9e96236b-4346-434c-8e5e-3cc8fb60c32a@redhat.com>
+Date: Thu, 14 Dec 2023 14:26:49 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v9 3/4] vsock: update SO_RCVLOWAT setting
- callback
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH 03/10] tests/avocado/intel_iommu.py: increase timeout
 Content-Language: en-US
-To: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
-	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20231214091947.395892-1-avkrasnov@salutedevices.com>
- <20231214091947.395892-4-avkrasnov@salutedevices.com>
- <20231214052502-mutt-send-email-mst@kernel.org>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <20231214052502-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 182113 [Dec 14 2023]
-X-KSMG-AntiSpam-Version: 6.1.0.3
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Tracking_from_domain_doesnt_match_to}, smtp.sberdevices.ru:5.0.1,7.1.1;100.64.160.123:7.1.2;salutedevices.com:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/12/14 10:50:00 #22693095
-X-KSMG-AntiVirus-Status: Clean, skipped
+To: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, Radoslaw Biernacki
+ <rad@semihalf.com>, Paul Durrant <paul@xen.org>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>,
+ Leif Lindholm <quic_llindhol@quicinc.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, kvm@vger.kernel.org, qemu-arm@nongnu.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Beraldo Leal <bleal@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Sriram Yagnaraman <sriram.yagnaraman@est.tech>,
+ Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
+ David Woodhouse <dwmw2@infradead.org>
+References: <20231208190911.102879-1-crosa@redhat.com>
+ <20231208190911.102879-4-crosa@redhat.com> <8734w8fzbc.fsf@draig.linaro.org>
+ <87sf45vpad.fsf@p1.localdomain>
+ <6140fc8a-4044-4891-854d-9bf555c5dd78@redhat.com>
+ <878r5x9l4b.fsf@draig.linaro.org>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <878r5x9l4b.fsf@draig.linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 
 
-On 14.12.2023 13:29, Michael S. Tsirkin wrote:
-> On Thu, Dec 14, 2023 at 12:19:46PM +0300, Arseniy Krasnov wrote:
->> Do not return if transport callback for SO_RCVLOWAT is set (only in
->> error case). In this case we don't need to set 'sk_rcvlowat' field in
->> each transport - only in 'vsock_set_rcvlowat()'. Also, if 'sk_rcvlowat'
->> is now set only in af_vsock.c, change callback name from 'set_rcvlowat'
->> to 'notify_set_rcvlowat'.
+On 12/14/23 10:41, Alex Bennée wrote:
+> Eric Auger <eric.auger@redhat.com> writes:
+>
+>> Hi Cleber,
 >>
->> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
->> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> 
-> Maybe squash this with patch 2/4?
+>> On 12/13/23 21:08, Cleber Rosa wrote:
+>>> Alex Bennée <alex.bennee@linaro.org> writes:
+>>>
+>>>> Cleber Rosa <crosa@redhat.com> writes:
+>>>>
+>>>>> Based on many runs, the average run time for these 4 tests is around
+>>>>> 250 seconds, with 320 seconds being the ceiling.  In any way, the
+>>>>> default 120 seconds timeout is inappropriate in my experience.
+>>>> I would rather see these tests updated to fix:
+>>>>
+>>>>  - Don't use such an old Fedora 31 image
+>>> I remember proposing a bump in Fedora version used by default in
+>>> avocado_qemu.LinuxTest (which would propagate to tests such as
+>>> boot_linux.py and others), but that was not well accepted.  I can
+>>> definitely work on such a version bump again.
+>>>
+>>>>  - Avoid updating image packages (when will RH stop serving them?)
+>>> IIUC the only reason for updating the packages is to test the network
+>>> from the guest, and could/should be done another way.
+>>>
+>>> Eric, could you confirm this?
+>> Sorry for the delay. Yes effectively I used the dnf install to stress
+>> the viommu. In the past I was able to trigger viommu bugs that way
+>> whereas getting an IP @ for the guest was just successful.
+>>>>  - The "test" is a fairly basic check of dmesg/sysfs output
+>>> Maybe the network is also an implicit check here.  Let's see what Eric
+>>> has to say.
+>> To be honest I do not remember how avocado does the check in itself; my
+>> guess if that if the dnf install does not complete you get a timeout and
+>> the test fails. But you may be more knowledged on this than me ;-)
+> I guess the problem is relying on external infrastructure can lead to
+> unpredictable results. However its a lot easier to configure user mode
+> networking just to pull something off the internet than have a local
+> netperf or some such setup to generate local traffic.
+>
+> I guess there is no loopback like setup which would sufficiently
+> exercise the code?
 
-Done in v10
+I don't think so. This test is a reproducer for a bug I encountered and
+fixed in the past.
+Besudes, I am totally fine moving the test out of the gating CI and just
+keep it as a tier2 test, as suggested by Phil.
 
-Thanks, Arseniy
+Thanks
 
-> 
->> ---
->>  Changelog:
->>  v3 -> v4:
->>   * Rename 'set_rcvlowat' to 'notify_set_rcvlowat'.
->>   * Commit message updated.
+Eric
+>
+>> Thanks
 >>
->>  include/net/af_vsock.h           | 2 +-
->>  net/vmw_vsock/af_vsock.c         | 9 +++++++--
->>  net/vmw_vsock/hyperv_transport.c | 4 ++--
->>  3 files changed, 10 insertions(+), 5 deletions(-)
->>
->> diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->> index e302c0e804d0..535701efc1e5 100644
->> --- a/include/net/af_vsock.h
->> +++ b/include/net/af_vsock.h
->> @@ -137,7 +137,6 @@ struct vsock_transport {
->>  	u64 (*stream_rcvhiwat)(struct vsock_sock *);
->>  	bool (*stream_is_active)(struct vsock_sock *);
->>  	bool (*stream_allow)(u32 cid, u32 port);
->> -	int (*set_rcvlowat)(struct vsock_sock *vsk, int val);
->>  
->>  	/* SEQ_PACKET. */
->>  	ssize_t (*seqpacket_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
->> @@ -168,6 +167,7 @@ struct vsock_transport {
->>  		struct vsock_transport_send_notify_data *);
->>  	/* sk_lock held by the caller */
->>  	void (*notify_buffer_size)(struct vsock_sock *, u64 *);
->> +	int (*notify_set_rcvlowat)(struct vsock_sock *vsk, int val);
->>  
->>  	/* Shutdown. */
->>  	int (*shutdown)(struct vsock_sock *, int);
->> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->> index 816725af281f..54ba7316f808 100644
->> --- a/net/vmw_vsock/af_vsock.c
->> +++ b/net/vmw_vsock/af_vsock.c
->> @@ -2264,8 +2264,13 @@ static int vsock_set_rcvlowat(struct sock *sk, int val)
->>  
->>  	transport = vsk->transport;
->>  
->> -	if (transport && transport->set_rcvlowat)
->> -		return transport->set_rcvlowat(vsk, val);
->> +	if (transport && transport->notify_set_rcvlowat) {
->> +		int err;
->> +
->> +		err = transport->notify_set_rcvlowat(vsk, val);
->> +		if (err)
->> +			return err;
->> +	}
->>  
->>  	WRITE_ONCE(sk->sk_rcvlowat, val ? : 1);
->>  	return 0;
-> 
-> 
-> 
-> I would s
-> 
->> diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
->> index 7cb1a9d2cdb4..e2157e387217 100644
->> --- a/net/vmw_vsock/hyperv_transport.c
->> +++ b/net/vmw_vsock/hyperv_transport.c
->> @@ -816,7 +816,7 @@ int hvs_notify_send_post_enqueue(struct vsock_sock *vsk, ssize_t written,
->>  }
->>  
->>  static
->> -int hvs_set_rcvlowat(struct vsock_sock *vsk, int val)
->> +int hvs_notify_set_rcvlowat(struct vsock_sock *vsk, int val)
->>  {
->>  	return -EOPNOTSUPP;
->>  }
->> @@ -856,7 +856,7 @@ static struct vsock_transport hvs_transport = {
->>  	.notify_send_pre_enqueue  = hvs_notify_send_pre_enqueue,
->>  	.notify_send_post_enqueue = hvs_notify_send_post_enqueue,
->>  
->> -	.set_rcvlowat             = hvs_set_rcvlowat
->> +	.notify_set_rcvlowat      = hvs_notify_set_rcvlowat
->>  };
->>  
->>  static bool hvs_check_transport(struct vsock_sock *vsk)
->> -- 
->> 2.25.1
-> 
+>> Eric
+>>>> I think building a buildroot image with the tools pre-installed (with
+>>>> perhaps more testing) would be a better use of our limited test time.
+>>>>
+>>>> FWIW the runtime on my machine is:
+>>>>
+>>>> ➜  env QEMU_TEST_FLAKY_TESTS=1 ./pyvenv/bin/avocado run ./tests/avocado/intel_iommu.py
+>>>> JOB ID     : 5c582ccf274f3aee279c2208f969a7af8ceb9943
+>>>> JOB LOG    : /home/alex/avocado/job-results/job-2023-12-11T16.53-5c582cc/job.log
+>>>>  (1/4) ./tests/avocado/intel_iommu.py:IntelIOMMU.test_intel_iommu: PASS (44.21 s)
+>>>>  (2/4) ./tests/avocado/intel_iommu.py:IntelIOMMU.test_intel_iommu_strict: PASS (78.60 s)
+>>>>  (3/4) ./tests/avocado/intel_iommu.py:IntelIOMMU.test_intel_iommu_strict_cm: PASS (65.57 s)
+>>>>  (4/4) ./tests/avocado/intel_iommu.py:IntelIOMMU.test_intel_iommu_pt: PASS (66.63 s)
+>>>> RESULTS    : PASS 4 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
+>>>> JOB TIME   : 255.43 s
+>>>>
+>>> Yes, I've also seen similar runtimes in other environments... so it
+>>> looks like it depends a lot on the "dnf -y install numactl-devel".  If
+>>> that can be removed, the tests would have much more predictable runtimes.
+>>>
+
 
