@@ -1,194 +1,226 @@
-Return-Path: <kvm+bounces-4463-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4464-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F662812CC3
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 11:19:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E752F812CDA
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 11:25:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF51B282985
-	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 10:19:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0409D1C21550
+	for <lists+kvm@lfdr.de>; Thu, 14 Dec 2023 10:25:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559F43BB26;
-	Thu, 14 Dec 2023 10:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EB223C060;
+	Thu, 14 Dec 2023 10:24:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="s21e8J/F"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ijj2xQtW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6D4A106;
-	Thu, 14 Dec 2023 02:18:49 -0800 (PST)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BEA8i5l029803;
-	Thu, 14 Dec 2023 10:18:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=7sbqsZI/dIh7/sQIt7TDuIeiF4sOnSbRyAmeSQz0zu0=;
- b=s21e8J/FoK7QGJ+5lb9TPT6gNh/B9HeNspwnolY4mt0qkVZzUBzKmrtLPhFTOSB4nrCk
- wILfVEPVB/u+k7GQsU04wkIbwRx2+Y93xM6TsPoT73e+4rojLM5bkYmSZgsnUEg3a8G8
- Si0rkxfNIU7XwDzq1U+C36Y2WTbLPmjwVIdsds3SDyRrOpvzi+W4gxBCLt4gB2I65lNN
- rFVEiq9SUi/hHHcEkJYCZgdv1kCCgeoOUNbOBimoNcxLVvhzoCFsRcxd2fdx2JToWpHI
- h/K+GH0LKpytSo4+0IDIOYqiO4O9d20IcmLB2IdSvpj+pk7/LVVgJUCmSepALzOT7F3E VQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uyxbvj91x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Dec 2023 10:18:46 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BE9CvqM020754;
-	Thu, 14 Dec 2023 10:18:46 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uyxbvj91j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Dec 2023 10:18:46 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BE9T3Ld028201;
-	Thu, 14 Dec 2023 10:18:45 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uw2xyyupd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Dec 2023 10:18:45 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BEAIfgm65863960
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 14 Dec 2023 10:18:41 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A569820070;
-	Thu, 14 Dec 2023 10:18:41 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7EB582006E;
-	Thu, 14 Dec 2023 10:18:41 +0000 (GMT)
-Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.152.224.238])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 14 Dec 2023 10:18:41 +0000 (GMT)
-Message-ID: <05d13c9ffc4876602044311d737e3074dd81894a.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 5/5] s390x: Add test for STFLE
- interpretive execution (format-0)
-From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Nico =?ISO-8859-1?Q?B=F6hr?= <nrb@linux.ibm.com>,
-        Janosch Frank
-	 <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
-        Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
-        Thomas Huth <thuth@redhat.com>
-Date: Thu, 14 Dec 2023 11:18:41 +0100
-In-Reply-To: <2096291747c433d02cac794a9c85118b85199370.camel@linux.ibm.com>
-References: <20231213124942.604109-1-nsg@linux.ibm.com>
-	 <20231213124942.604109-6-nsg@linux.ibm.com>
-	 <20231213180033.54516bdd@p-imbrenda>
-	 <2096291747c433d02cac794a9c85118b85199370.camel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8CBCAF
+	for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 02:24:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702549488;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DSSH8LtzM2s/nHi8p5P1p50CtgKbNQDA/Xelk2DiA14=;
+	b=ijj2xQtW7klWiHpC6Jyf3UNxDJ4Sy1cUiY+fyHG/gVFPdD7IpKRUvHCxuGc4vjgOKKvd99
+	Ed9n0xcKPFzygb67uhIPjZYWXbmZ+GtPpJtccw1kpt5Vs8XDW054J9InhOqUp5oIb6nX64
+	PmgWevn2VnePlFQtGGEhTDF8aoqCA9s=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-304-DcyZwwt5NDWfMXOZQffTMw-1; Thu, 14 Dec 2023 05:24:46 -0500
+X-MC-Unique: DcyZwwt5NDWfMXOZQffTMw-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a1d03a03bc9so440498366b.0
+        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 02:24:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702549485; x=1703154285;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DSSH8LtzM2s/nHi8p5P1p50CtgKbNQDA/Xelk2DiA14=;
+        b=M/m4i72wy6aIrVnbQIF6qlq1WHObL1u1ZE6S3UXJ2Jcow1Cphnmbh7b8LwZQm/iWap
+         9hL2jcrIEvaYNlRdfuhSAX8QcaIrxZtf+rxowksPJApUPXkG8JPS20Zt1siu1Z49omym
+         pwEh35g+E/59jULb+d4KUGmK+imFtB2ydVZN28WQcxwwGu6+zRHYpwSzyX8uIVM1ytyU
+         yg4KfDarNV4VDD45PrlfY21ceYvaGooS35fIVbVY6xoceLp4kiifLKgOQAuX/ipEIXzq
+         YUpHWGvfWhE002ytYA2thAMPR1WwK+0c54UvLeWvBGQ+GgDODc1ZDJbUdquD7706Hucb
+         W7sg==
+X-Gm-Message-State: AOJu0Yz+zbcQD8/MXz6PRGYnQT1rWLd7virXh5uQkYpRviErXcczd5sy
+	PsGcvJF3fi9sdZWzJPNGMBhQzn3fUR3LV/X4B6kyC9fPmkfG7JdNPxkc/OybvvneGLtaZJFhgp0
+	+0ckg5R1R2+Hg
+X-Received: by 2002:a17:907:3a97:b0:a1f:7352:3c0 with SMTP id fh23-20020a1709073a9700b00a1f735203c0mr4111130ejc.59.1702549485723;
+        Thu, 14 Dec 2023 02:24:45 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFJ4mtbeRMe02kWwF6Hh+xBcu1mR/wHuPokTQ+4Rni40u2pBzA16VxW6ly8OowEf1SbmDDVig==
+X-Received: by 2002:a17:907:3a97:b0:a1f:7352:3c0 with SMTP id fh23-20020a1709073a9700b00a1f735203c0mr4111122ejc.59.1702549485320;
+        Thu, 14 Dec 2023 02:24:45 -0800 (PST)
+Received: from redhat.com ([2.52.132.243])
+        by smtp.gmail.com with ESMTPSA id vv6-20020a170907a68600b00a1dff479037sm9103575ejc.127.2023.12.14.02.24.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 02:24:44 -0800 (PST)
+Date: Thu, 14 Dec 2023 05:24:40 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v9 2/4] virtio/vsock: send credit update during
+ setting SO_RCVLOWAT
+Message-ID: <20231214052234-mutt-send-email-mst@kernel.org>
+References: <20231214091947.395892-1-avkrasnov@salutedevices.com>
+ <20231214091947.395892-3-avkrasnov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: rfPjk788Q4mJJvFJxBx86wL4WJ2hffLM
-X-Proofpoint-ORIG-GUID: wonD1QMixsCob4D44TNf64cQUuJBwMBU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-14_06,2023-12-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- mlxscore=0 mlxlogscore=999 priorityscore=1501 adultscore=0 phishscore=0
- clxscore=1015 malwarescore=0 suspectscore=0 lowpriorityscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2312140067
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231214091947.395892-3-avkrasnov@salutedevices.com>
 
-On Wed, 2023-12-13 at 18:31 +0100, Nina Schoetterl-Glausch wrote:
-> On Wed, 2023-12-13 at 18:00 +0100, Claudio Imbrenda wrote:
-> > On Wed, 13 Dec 2023 13:49:42 +0100
-> > Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
-> >=20
-> > > The STFLE instruction indicates installed facilities.
-> > > SIE can interpretively execute STFLE.
-> > > Use a snippet guest executing STFLE to get the result of
-> > > interpretive execution and check the result.
-> > >=20
-> > > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> >=20
-> > [...]
-> >=20
-> > >  static inline void setup_facilities(void)
-> > > diff --git a/s390x/snippets/c/stfle.c b/s390x/snippets/c/stfle.c
-> > > new file mode 100644
-> > > index 00000000..eb024a6a
-> > > --- /dev/null
-> > > +++ b/s390x/snippets/c/stfle.c
-> > > @@ -0,0 +1,26 @@
-> > > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > > +/*
-> > > + * Copyright IBM Corp. 2023
-> > > + *
-> > > + * Snippet used by the STLFE interpretive execution facilities test.
-> > > + */
-> > > +#include <libcflat.h>
-> > > +#include <snippet-guest.h>
-> > > +
-> > > +int main(void)
-> > > +{
-> > > +	const unsigned int max_fac_len =3D 8;
-> >=20
-> > why 8?
->=20
-> 8 is a somewhat arbitrary, large number :)
-> I suppose I could choose an even larger one, maybe even PAGE_SIZE/8.
-> That would guarantee that max_fac_len >=3D stfle_size() (8 is enough for =
-that today)
-> It's not necessary for max_fac_len >=3D stfle_size(), but probably good f=
-or
-> test coverage.
-> >=20
-> > > +	uint64_t res[max_fac_len + 1];
-> > > +
-> > > +	res[0] =3D max_fac_len - 1;
-> > > +	asm volatile ( "lg	0,%[len]\n"
-> > > +		"	stfle	%[fac]\n"
-> > > +		"	stg	0,%[len]\n"
-> > > +		: [fac] "=3DQS"(*(uint64_t(*)[max_fac_len])&res[1]),
-> > > +		  [len] "+RT"(res[0])
-> > > +		:
-> > > +		: "%r0", "cc"
-> > > +	);
-> > > +	force_exit_value((uint64_t)&res);
-> > > +	return 0;
-> > > +}
-> > > diff --git a/s390x/stfle-sie.c b/s390x/stfle-sie.c
-> > > new file mode 100644
-> > > index 00000000..574319ed
-> > > --- /dev/null
-> > > +++ b/s390x/stfle-sie.c
-> > > @@ -0,0 +1,132 @@
+On Thu, Dec 14, 2023 at 12:19:45PM +0300, Arseniy Krasnov wrote:
+> Send credit update message when SO_RCVLOWAT is updated and it is bigger
+> than number of bytes in rx queue. It is needed, because 'poll()' will
+> wait until number of bytes in rx queue will be not smaller than
+> SO_RCVLOWAT, so kick sender to send more data. Otherwise mutual hungup
+> for tx/rx is possible: sender waits for free space and receiver is
+> waiting data in 'poll()'.
+> 
+> Fixes: b89d882dc9fc ("vsock/virtio: reduce credit update messages")
+> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  Changelog:
+>  v1 -> v2:
+>   * Update commit message by removing 'This patch adds XXX' manner.
+>   * Do not initialize 'send_update' variable - set it directly during
+>     first usage.
+>  v3 -> v4:
+>   * Fit comment in 'virtio_transport_notify_set_rcvlowat()' to 80 chars.
+>  v4 -> v5:
+>   * Do not change callbacks order in transport structures.
+>  v5 -> v6:
+>   * Reorder callbacks in transport structures.
+>   * Do to send credit update when 'fwd_cnt' == 'last_fwd_cnt'.
+>  v8 -> v9:
+>   * Add 'Fixes' tag.
+> 
+>  drivers/vhost/vsock.c                   |  1 +
+>  include/linux/virtio_vsock.h            |  1 +
+>  net/vmw_vsock/virtio_transport.c        |  1 +
+>  net/vmw_vsock/virtio_transport_common.c | 30 +++++++++++++++++++++++++
+>  net/vmw_vsock/vsock_loopback.c          |  1 +
+>  5 files changed, 34 insertions(+)
+> 
+> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> index f75731396b7e..ec20ecff85c7 100644
+> --- a/drivers/vhost/vsock.c
+> +++ b/drivers/vhost/vsock.c
+> @@ -449,6 +449,7 @@ static struct virtio_transport vhost_transport = {
+>  		.notify_send_pre_enqueue  = virtio_transport_notify_send_pre_enqueue,
+>  		.notify_send_post_enqueue = virtio_transport_notify_send_post_enqueue,
+>  		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+> +		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>  
 
-[...]
+This needs to be set_rcvlowat.
 
-> > > +	vm.sblk->fac =3D (uint32_t)(uint64_t)fac;
-> > > +	res =3D run_guest();
-> > > +	report(res.len =3D=3D stfle_size(), "stfle len correct");
+>  		.read_skb = virtio_transport_read_skb,
+>  	},
+> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+> index ebb3ce63d64d..c82089dee0c8 100644
+> --- a/include/linux/virtio_vsock.h
+> +++ b/include/linux/virtio_vsock.h
+> @@ -256,4 +256,5 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
+>  void virtio_transport_deliver_tap_pkt(struct sk_buff *skb);
+>  int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *list);
+>  int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t read_actor);
+> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk, int val);
+>  #endif /* _LINUX_VIRTIO_VSOCK_H */
+> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> index af5bab1acee1..f495b9e5186b 100644
+> --- a/net/vmw_vsock/virtio_transport.c
+> +++ b/net/vmw_vsock/virtio_transport.c
+> @@ -537,6 +537,7 @@ static struct virtio_transport virtio_transport = {
+>  		.notify_send_pre_enqueue  = virtio_transport_notify_send_pre_enqueue,
+>  		.notify_send_post_enqueue = virtio_transport_notify_send_post_enqueue,
+>  		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+> +		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>  
+>  		.read_skb = virtio_transport_read_skb,
+>  	},
 
-You're right, disregard everything below.
->=20
-> ^ should be
->=20
-> +	report(res.len =3D=3D min(stfle_size(), 8), "stfle len correct");
->=20
-> For the case that the guest buffer was shorter.
->=20
-> > > +	report(!memcmp(*fac, res.mem, res.len * sizeof(uint64_t)),
-> > > +	       "Guest facility list as specified");
-> >=20
-> > it seems like you are comparing the full facility list (stfle_size
-> > doublewords long) with the result of STFLE in the guest, but the guest
-> > is limited to 8 double words?
->=20
-> Their prefixes must be the same. res.len is the guest length, so max 8 ri=
-ght now.
-> >=20
-> > > +	report_prefix_pop();
-> > > +}
+
+This, too.
+
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index 7eabe5219ef7..9d2305fdc65c 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -1690,6 +1690,36 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
+>  }
+>  EXPORT_SYMBOL_GPL(virtio_transport_read_skb);
+>  
+> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk, int val)
+> +{
+> +	struct virtio_vsock_sock *vvs = vsk->trans;
+> +	bool send_update;
+> +
+> +	spin_lock_bh(&vvs->rx_lock);
+> +
+> +	/* If number of available bytes is less than new SO_RCVLOWAT value,
+> +	 * kick sender to send more data, because sender may sleep in its
+> +	 * 'send()' syscall waiting for enough space at our side. Also
+> +	 * don't send credit update when peer already knows actual value -
+> +	 * such transmission will be useless.
+> +	 */
+> +	send_update = (vvs->rx_bytes < val) &&
+> +		      (vvs->fwd_cnt != vvs->last_fwd_cnt);
+> +
+> +	spin_unlock_bh(&vvs->rx_lock);
+> +
+> +	if (send_update) {
+> +		int err;
+> +
+> +		err = virtio_transport_send_credit_update(vsk);
+> +		if (err < 0)
+> +			return err;
+> +	}
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(virtio_transport_notify_set_rcvlowat);
+> +
+>  MODULE_LICENSE("GPL v2");
+>  MODULE_AUTHOR("Asias He");
+>  MODULE_DESCRIPTION("common code for virtio vsock");
+
+I think you need to set sk->sk_rcvlowat here, no?
+Follow up patch will move it to transport independent code.
+
+
+> diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+> index 048640167411..6dea6119f5b2 100644
+> --- a/net/vmw_vsock/vsock_loopback.c
+> +++ b/net/vmw_vsock/vsock_loopback.c
+> @@ -96,6 +96,7 @@ static struct virtio_transport loopback_transport = {
+>  		.notify_send_pre_enqueue  = virtio_transport_notify_send_pre_enqueue,
+>  		.notify_send_post_enqueue = virtio_transport_notify_send_post_enqueue,
+>  		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+> +		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>  
+>  		.read_skb = virtio_transport_read_skb,
+>  	},
+> -- 
+> 2.25.1
 
 
